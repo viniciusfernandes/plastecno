@@ -1,0 +1,28 @@
+.bloco_picklist {
+	padding-bottom: 10px;
+}
+
+.bloco_picklist > div {
+	float: left;
+	position: relative;
+}
+
+.picklist {
+	height: 150px;
+}
+
+.bloco_picklist .blocoBotoesPicklist {
+	width: 10%;
+}
+
+.bloco_picklist .blocoBotoesPicklist div {
+	background-position: center;
+	width: 100%;
+}
+
+.bloco_picklist .blocoBotoesPicklist div:FIRST-CHILD {
+	margin-top: 50px;
+}
+.bloco_picklist .tituloElementos {
+	font-weight: bold;
+}

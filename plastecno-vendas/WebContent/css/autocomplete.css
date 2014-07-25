@@ -1,0 +1,51 @@
+.conbgn:hover {
+	background-color: #DCDCDC;
+	color: #FFFFFF;
+	font-weight: bold;	
+}
+
+ul {
+	margin: 1px;
+	padding: 1px;
+	list-style: none;
+}
+
+body {
+	font-family: Helvetica;
+	font-size: 11px;
+	color: #000;
+}
+
+h3 {
+	margin: 0px;
+	padding: 0px;
+}
+
+.suggestionsBox {
+	background-color: white;
+	border: 1px solid #4B7931;
+	position: absolute;
+	width: 200px;
+	z-index: 1;	
+}
+
+.suggestionList {
+	margin: 0px;
+	padding: 0px;
+}
+
+.suggestionList li {
+	margin: 0px 0px 3px 0px;
+	padding: 3px;
+	cursor: pointer;
+	list-style-type: none;
+}
+
+.suggestionList li:hover {
+	background-color: #659CD8;
+}
+
+.footSuggestionBox {
+	background-color: #C4D3A7;
+	text-align: center;
+}

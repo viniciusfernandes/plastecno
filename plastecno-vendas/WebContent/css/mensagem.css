@@ -1,0 +1,47 @@
+.areaMensagem {
+	border-radius: 5px;
+	list-style-type: none;
+	margin: 10px 0;
+    padding: 5px;
+}
+
+.areaMensagem ul {
+	left: 30%;	
+	position: relative;
+	width: 50%; 
+}
+
+.areaMensagem ul li {
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.mensagemSucesso {
+	color: #15316B;
+	background: #E6EBF4;
+	border: 1px solid #15316B;
+}
+
+.mensagemSucesso ul {
+	list-style-image: url("../images/ok_blue_16.png");
+}
+
+.mensagemErro {
+	color: #7F0000;
+	background: #FFE8E8;
+	border: 1px solid #7F0000;
+} 
+
+.mensagemErro ul {
+	list-style-image: url("../images/cross_red_16.png");
+}
+
+.mensagemAlerta {
+	color: #894C1C;
+	background: #FCFACF;
+	border: 1px solid #894C1C;
+}
+
+.mensagemAlerta ul {
+	list-style-image: url("../images/warning_16.png");
+}

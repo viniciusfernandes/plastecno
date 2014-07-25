@@ -1,0 +1,1 @@
+\i C:/ambiente_trabalho/projetos/plastecno-vendas/script/criacao_tabela_enderecamento.sql \i C:/ambiente_trabalho/projetos/plastecno-vendas/script/update_tabela_enderecamento.sql 

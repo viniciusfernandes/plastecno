@@ -1,0 +1,43 @@
+
+.total1, .fundo1 {
+	background-color: #E9FFC1;
+}
+
+.total2, .fundo2 {
+	background-color: white;
+}
+
+.listrada {
+	border-collapse: collapse;
+	margin-left: 5%;
+	margin-right: 5%;
+	margin-bottom: 60px;
+	width: 90%;
+}
+
+.listrada caption {
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 5px;
+	background-color: #8AB66B;
+    color: white;
+    padding: 5px;
+}
+
+.listrada thead tr th {
+	background-color: #848484;
+	font-size: 15px;
+}
+
+.listrada thead tr th, .listrada tbody tr td {
+	text-align: center;
+}
+
+.listrada th:last-child {
+	width: 30%;
+}
+
+.total, .listrada tfoot th, .listrada tfoot th:last-child {
+    color: #2D4F1F;
+    background-color: #C4EA98;
+}

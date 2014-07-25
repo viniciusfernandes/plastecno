@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style type="text/css">
+{conteudoCss}
+
+</style>
+</head>
+<body>
+
+{conteudoCabecalho}
+
+<table>
+	<thead>
+		<tr>
+			<th colspan="6">{titulo}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class="label">Vendedor:</td>
+			<td colspan="2">{pedido.vendedor.nomeCompleto} - {pedido.vendedor.email}</td>
+			<td class="label" style="width: 70px">Email Envio NFe:</td>
+			<td colspan="2">{pedido.cliente.email}</td>
+		</tr>
+		<tr>
+			<td class="label">Num. Pedido:</td>
+			<td>{pedido.id}</td>
+			<td class="label">Ped. Cli.:</td>
+			<td>{pedido.numeroPedidoCliente}</td>
+			<td class="label">Represent.:</td>
+			<td>{pedido.representada.nomeFantasia}</td>
+		</tr>
+		<tr>
+			<td class="label">Finalidade:</td>
+			<td>{pedido.finalidadePedido.descricao}</td>
+			<td class="label">Pagamento:</td>
+			<td>{pedido.formaPagamento}</td>
+		</tr>
+		<tr>
+			<td class="label">Tip. Entr.:</td>
+			<td>{pedido.tipoEntrega.descricao}</td>
+			<td class="label">Data Inclusão:</td>
+			<td>{pedido.dataInclusaoFormatada}</td>
+			<td class="label">Data Entrega:</td>
+			<td>{pedido.dataEntregaFormatada}</td>
+		</tr>
+		<tr>
+			<td class="label">Cliente:</td>
+			<td colspan="5">{pedido.cliente.nomeCompleto}</td>
+		</tr>
+		<tr>
+			<td class="label">CNPJ:</td>
+			<td>{pedido.cliente.cnpj}</td>
+			<td class="label">CPF:</td>
+			<td>{pedido.cliente.cpf}</td>
+			<td class="label">Insc. Est.:</td>
+			<td>{pedido.cliente.inscricaoEstadual}</td>
+		</tr>
+		<tr>
+			<td class="label">Observação:</td>
+			<td colspan="5">{pedido.observacao}</td>
+		</tr>
+	</tbody>
+</table>
+<table>
+	<thead>
+		<tr>
+			<th colspan="6">Contato do Pedido</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class="label">Contato:</td>
+			<td>{pedido.contato.nome}</td>
+			<td class="label">Email:</td>
+			<td colspan="3">{pedido.contato.email}</td>
+		</tr>
+		<tr>
+			<td class="label">Tel.:</td>
+			<td>{pedido.contato.dDDTelefone}</td>
+			<td class="label">Ramal:</td>
+			<td>{pedido.contato.ramal}</td>
+			<td class="label">Fax:</td>
+			<td>{pedido.contato.fax}</td>
+		</tr>
+		<tr>
+			<td class="label">Tel.:</td>
+			<td>{pedido.contato.dDDTelefoneSecundario}</td>
+			<td class="label">Ramal:</td>
+			<td>{pedido.contato.ramalSecundario}</td>
+			<td class="label">Fax:</td>
+			<td>{pedido.contato.faxSecundario}</td>
+		</tr>
+	</tbody>
+</table>
+<table>
+	<thead>
+		<tr>
+			<th colspan="2">Lista de Endereços</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class="label">End. Fat.:</td>
+			<td>{logradouroFaturamento}</td>
+		</tr>
+		<tr>
+			<td class="label">End. Cob.:</td>
+			<td>{logradouroCobranca}</td>
+		</tr>
+		<tr>
+			<td class="label">End. Ent.:</td>
+			<td>{logradouroEntrega}</td>
+		</tr>
+	</tbody>
+</table>
+<table>
+	<thead>
+		<tr>
+			<th colspan="8">Transportadora</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class="label">Transport.:</td>
+			<td>{pedido.transportadora.nomeFantasia}</td>
+			<td class="label">CNPJ:</td>
+			<td>{pedido.transportadora.cnpj}</td>
+			<td class="label">Insc. Estad.:</td>
+			<td>{pedido.transportadora.inscricaoEstadual}</td>
+			<td class="label">Contato:</td>
+			<td>{pedido.transportadora.contatoPrincipal.nome} - {pedido.transportadora.contatoPrincipal.email} - {pedido.transportadora.contatoPrincipal.telefoneFormatado}</td>
+		</tr>
+		<tr>
+			<td class="label">End. Transp.</td>
+			<td colspan="7">{pedido.transportadora.logradouro.descricao}</td>
+		</tr>
+		<tr>
+			<td class="label">Redesp.:</td>
+			<td>{pedido.transportadoraRedespacho.nomeFantasia}</td>
+			<td class="label">CNPJ:</td>
+			<td>{pedido.transportadoraRedespacho.cnpj}</td>
+			<td class="label">Insc. Estad.:</td>
+			<td>{pedido.transportadoraRedespacho.inscricaoEstadual}</td>
+			<td class="label">Contato:</td>
+			<td>{pedido.transportadoraRedespacho.contatoPrincipal.nome} - {pedido.transportadoraRedespacho.contatoPrincipal.email} - {pedido.transportadoraRedespacho.contatoPrincipal.telefoneFormatado}</td>
+		</tr>
+		<tr>
+			<td class="label">End. Redesp.</td>
+			<td colspan="7">{pedido.transportadoraRedespacho.logradouro.descricao}</td>
+		</tr>
+	</tbody>
+</table>
+<table class="listagem">
+	<thead>
+		<tr>
+			<th class="descricaoTabela" colspan="7">Lista de Itens do Pedido</th>
+		</tr>
+	</thead>
+	<thead>
+		<tr>
+			<th>Qtde.</th>
+			<th>Descrição</th>
+			<th>Tipo Venda</th>
+			<th>Preço Venda</th>
+			<th>Preço Unid. (R$)</th>
+			<th>Preço IPI. (R$)</th>
+			<th>ICMS (%)</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr {listaItem}><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoUnidadeIPIFormatado}</td><td style="text-align: center">{aliquotaICMSFormatado}</td></tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="4"></td>
+			<td>TOTAL:</td>
+			<td>R$ {pedido.valorPedidoFormatado}</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td colspan="4"></td>
+			<td>TOTAL IPI:</td>
+			<td>R$ {pedido.valorPedidoIPIFormatado}</td>
+			<td></td>
+		</tr>
+	</tfoot>
+</table>
+</body>
+</html>

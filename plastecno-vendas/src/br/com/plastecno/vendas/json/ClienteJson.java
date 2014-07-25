@@ -1,0 +1,83 @@
+package br.com.plastecno.vendas.json;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Transportadora;
+
+/*
+ * Essa classe foi criada para enviarmos a lista de transporda e redespacho
+ * para a tela de pedido, ja que os conteudos dessas listas sao diferentes
+ */
+public class ClienteJson {
+    private final Integer id;
+    private final String site;
+    private final String email;
+    private final String cnpj;
+    private final String cpf;
+    private final String nomeCompleto;
+    private final VendedorJson vendedor;
+    private final List<TransportadoraJson> listaTransportadora;
+    private final List<TransportadoraJson> listaRedespacho;
+
+    public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora) {
+        id = cliente.getId();
+        site = cliente.getSite();
+        email = cliente.getEmail();
+        cnpj = cliente.getCnpj();
+        cpf = cliente.getCpf();
+        nomeCompleto = cliente.getNomeCompleto();
+        vendedor = new VendedorJson(cliente.getVendedor());
+        this.listaTransportadora = new ArrayList<TransportadoraJson>();
+        this.listaRedespacho = new ArrayList<TransportadoraJson>();
+
+        if (cliente.getListaRedespacho() != null) {
+            for (Transportadora redespacho : cliente.getListaRedespacho()) {
+                this.listaRedespacho.add(new TransportadoraJson(redespacho));
+            }
+        }
+
+        if (listaTransportadora != null) {
+            for (Transportadora transportadora : listaTransportadora) {
+                this.listaTransportadora.add(new TransportadoraJson(transportadora));
+            }
+        }
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getSite() {
+        return site;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getCnpj() {
+        return cnpj;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public String getNomeCompleto() {
+        return nomeCompleto;
+    }
+
+    public VendedorJson getVendedor() {
+        return vendedor;
+    }
+
+    public List<TransportadoraJson> getListaTransportadora() {
+        return listaTransportadora;
+    }
+
+    public List<TransportadoraJson> getListaRedespacho() {
+        return listaRedespacho;
+    }
+}

@@ -1,0 +1,45 @@
+* {
+	font-family: arial black;
+	margin: 0;
+	padding: 0;
+}
+
+table {
+	width: 100%;
+	border: 1px #004C02 solid;
+	margin-bottom: 15px;
+}
+
+
+table thead tr th {
+	font-size: 12px;
+	background-color: #004C02;
+	color: white;
+	font-weight: bold;
+	padding: 5px 0 5px 0;
+	text-align: center;
+}
+
+table tfoot tr td {
+	font-size: 11px;
+	font-weight: bold;
+	text-align: center;
+}
+
+table tbody tr td {
+	font-size: 8px;
+}
+
+table tbody tr td label {
+	font-weight: bold;
+}
+
+.label {
+	font-weight: bold;
+	text-align: right;
+	width: 50px;
+}
+
+.listagem tbody tr td {
+	text-align: center;
+}

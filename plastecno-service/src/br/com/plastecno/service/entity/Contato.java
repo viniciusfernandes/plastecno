@@ -53,7 +53,7 @@ public class Contato implements Serializable {
 	@Column(name="ddd_1")
 	private String ddd;
 	
-	@InformacaoValidavel(nomeExibicao="Telefone do contato")
+	@InformacaoValidavel(intervalo={0, 10}, nomeExibicao="Telefone do contato")
 	@Column(name="telefone_1")
 	private String telefone;
 	
@@ -61,7 +61,7 @@ public class Contato implements Serializable {
 	@Column(name="ramal_1")
 	private String ramal;
 	
-	@InformacaoValidavel(intervalo={0, 8}, nomeExibicao="FAX do contato")
+	@InformacaoValidavel(intervalo={0, 9}, nomeExibicao="FAX do contato")
 	@Column(name="fax_1")
 	private String fax;
 	
@@ -73,7 +73,7 @@ public class Contato implements Serializable {
 	@Column(name="ddd_2")
 	private String dddSecundario;
 	
-	@InformacaoValidavel(nomeExibicao="Telefone secundario do contato")
+	@InformacaoValidavel(intervalo={0, 10}, nomeExibicao="Telefone secundario do contato")
 	@Column(name="telefone_2")
 	private String telefoneSecundario;
 	
@@ -81,9 +81,13 @@ public class Contato implements Serializable {
 	@Column(name="ramal_2")
 	private String ramalSecundario;
 	
-	@InformacaoValidavel(intervalo={0, 8}, nomeExibicao="FAX secundario do contato")
+	@InformacaoValidavel(intervalo={0, 9}, nomeExibicao="FAX secundario do contato")
 	@Column(name="fax_2")
 	private String faxSecundario;
+	
+	@InformacaoValidavel(intervalo={0, 50}, nomeExibicao="Departamento do contato")
+	@Column(name="departamento")
+	private String departamento;
 	
 	@InformacaoValidavel(cascata=true, nomeExibicao="Logradouro do contato")
 	@OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
@@ -155,7 +159,7 @@ public class Contato implements Serializable {
 		
 		telefoneFormatado.append("(").append(ddi == null ? "" : ddi);
 		telefoneFormatado.append(" / ").append(ddd == null ? "" : ddd).append(") ");
-		telefoneFormatado.append(telefone == null ? "" : telefone);
+		telefoneFormatado.append(telefone == null ? "" : formatarTelefoneComHifen(telefone));
 		
 		return telefoneFormatado.toString();
 	}
@@ -165,7 +169,7 @@ public class Contato implements Serializable {
 		
 		telefoneFormatado.append("(").append(ddiSecundario == null ? "" : ddiSecundario);
 		telefoneFormatado.append(" / ").append(dddSecundario == null ? "" : dddSecundario).append(") ");
-		telefoneFormatado.append(telefoneSecundario == null ? "" : telefoneSecundario);
+		telefoneFormatado.append(telefoneSecundario == null ? "" : formatarTelefoneComHifen(telefoneSecundario));
 		
 		return telefoneFormatado.toString();
 	}
@@ -280,6 +284,14 @@ public class Contato implements Serializable {
 		return "";
 	}
 	
+	public String getDepartamento() {
+		return departamento;
+	}
+
+	public void setDepartamento(String departamento) {
+		this.departamento = departamento;
+	}
+
 	@Override
 	public boolean equals (Object o) {
 		return o instanceof Contato && this.id != null && this.id.equals(((Contato)o).id);
@@ -289,15 +301,47 @@ public class Contato implements Serializable {
 		return this.id != null ? this.id.hashCode() : super.hashCode();
 	}
 	
+	public String getTelefoneComHifen(){
+		return formatarTelefoneComHifen(telefone);
+	}
+
+	public String getTelefoneSecundarioComHifen(){
+		return formatarTelefoneComHifen(telefoneSecundario);
+	}
+	
+	public String getFaxComHifen(){
+		return formatarTelefoneComHifen(fax);
+	}
+	
+	public String getFaxSecundarioComHifen(){
+		return formatarTelefoneComHifen(faxSecundario);
+	}
+	
+	
 	private String formatarTelefone (String ddi, String ddd, String telefone, String ramal, String fax) {
 		
 		StringBuilder telefoneFormatado = new StringBuilder();
 		telefoneFormatado.append("(")
 		.append(ddi == null ? "" : ddi).append(" / ")
 		.append(ddd == null ? "" : ddd).append(") ")
-		.append(telefone == null ? "" : telefone).append(" / ")
-		.append(ramal == null ? "" : ramal).append(" / ").append(fax == null ? "" : fax);
+		.append(telefone == null ? "" : formatarTelefoneComHifen(telefone)).append(" / ")
+		.append(ramal == null ? "" : ramal).append(" / ").append(fax == null ? "" : formatarTelefoneComHifen(fax));
 		
 		return telefoneFormatado.toString();
+	}
+	
+	private String formatarTelefoneComHifen(String telefone){
+		if (telefone == null || telefone.length() < 5 || telefone.contains("-")) {
+			return telefone;
+		}
+		
+		StringBuilder formatado = new StringBuilder();
+		int index = telefone.length() - 4;
+		
+		formatado.append(telefone.substring(0, index));
+		formatado.append("-");
+		formatado.append(telefone.substring(index, telefone.length()));
+		
+		return formatado.toString();
 	}
 }

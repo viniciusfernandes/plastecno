@@ -4,13 +4,18 @@
 			<input type="hidden" id="contato_idContato" name="contato.id" value="${contato.id}" />
 
 			<div class="label condicional">Nome:</div>
-			<div class="input" style="width: 39%">
+			<div class="input" style="width: 40%">
 				<input type="text" id="contato_nome" name="contato.nome" value="${contato.nome}" /> 
 			</div>
 
-			<div class="label" style="width: 6%">Email:</div>
-			<div class="input" style="width: 34%">
-				<input type="text" id="contato_email" name="contato.email" value="${contato.email}" style="width: 100%" class="apenasLowerCase uppercaseBloqueado lowerCase"/>
+			<div class="label condicional" style="width: 12%">Departamento:</div>
+			<div class="input" style="width: 30%">
+				<input type="text" id="contato_departamento" name="contato.departamento" value="${contato.departamento}" style="width: 90%" maxlength="50"/> 
+			</div>
+
+			<div class="label">Email:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" id="contato_email" name="contato.email" value="${contato.email}" style="width: 50%" class="apenasLowerCase uppercaseBloqueado lowerCase"/>
 			</div>
 			
 			<div class="label">DDI:</div>
@@ -32,7 +37,7 @@
 			
 			<div class="label" style="width: 8%">Telefone:</div>
 			<div class="input" style="width: 15%">
-				<input type="text" id="contato_telefone" name="contato.telefone" value="${contato.telefone}" maxlength="9" />
+				<input type="text" id="contato_telefone" name="contato.telefone" value="${contato.telefoneComHifen}" maxlength="9" />
 			</div>
 
 			<div class="label" style="width: 6%">Ramal:</div>
@@ -42,7 +47,7 @@
 			
 			<div class="label" style="width: 5%">FAX:</div>
 			<div class="input" style="width: 20%">
-				<input type="text" id="contato_fax" name="contato.fax" value="${contato.fax}" maxlength="8" style="width: 90%"/>
+				<input type="text" id="contato_fax" name="contato.fax" value="${contato.faxComHifen}" maxlength="8" style="width: 90%"/>
 			</div>
 			
 			<div class="label">DDI:</div>
@@ -64,7 +69,7 @@
 			
 			<div class="label" style="width: 8%">Telefone:</div>
 			<div class="input" style="width: 15%">
-				<input type="text" id="contato_telefoneSecundario" name="contato.telefoneSecundario" value="${contato.telefoneSecundario}" maxlength="9" />
+				<input type="text" id="contato_telefoneSecundario" name="contato.telefoneSecundario" value="${contato.telefoneSecundarioComHifen}" maxlength="9" />
 			</div>
 
 			<div class="label" style="width: 6%">Ramal:</div>
@@ -74,7 +79,7 @@
 			
 			<div class="label" style="width: 5%">FAX:</div>
 			<div class="input" style="width: 20%">
-				<input type="text" id="contato_faxSecundario" name="contato.faxSecundario" value="${contato.faxSecundario}" maxlength="8" style="width: 90%"/>
+				<input type="text" id="contato_faxSecundario" name="contato.faxSecundario" value="${contato.faxSecundarioComHifen}" maxlength="8" style="width: 90%"/>
 			</div>
 			
 			<c:if test="${!listaContatoDesabilitada}">
@@ -87,10 +92,11 @@
 				<table id="tabelaContatos" class="listrada">
 					<thead>
 						<tr>
-							<th style="width: 22%">Nome</th>
-							<th style="width: 24%">Email</th>
-							<th style="width: 22%">Pri. (DDI / DDD) Tel. / Ram. / Fax</th>
-							<th style="width: 22%">Sec. (DDI / DDD) Tel. / Ram. / Fax</th>
+							<th style="width: 19%">Nome</th>
+							<th style="width: 19%">Departamento</th>
+							<th style="width: 19%">Email</th>
+							<th style="width: 19%">Pri. (DDI / DDD) Tel. / Ram. / Fax</th>
+							<th style="width: 19%">Sec. (DDI / DDD) Tel. / Ram. / Fax</th>
 							<th>Ações</th>
 						</tr>
 					</thead>
@@ -100,6 +106,7 @@
 							<tr id="${status.count - 1}">
 								<td style="display: none;">${contato.id}</td>
 								<td>${contato.nome}</td>
+								<td >${contato.departamento}</td>
 								<td >${contato.email}</td>
 								<td >${contato.telefoneFormatado}</td>
 								<td >${contato.telefoneSecundarioFormatado}</td>

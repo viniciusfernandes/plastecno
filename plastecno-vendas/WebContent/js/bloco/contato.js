@@ -87,8 +87,9 @@ function gerarParametroTelefone(indiceLinha, nomeLista, telefoneFormatado, isSec
 
 function inicializarBlocoContato(urlTela) {
 
+	var TOTAL_COLUNAS_TABELA_CONTATO = 6; 
 	var tabelaContatoHandler = new BlocoTabelaHandler(urlTela, 'Contato', 'tabelaContatos', 'bloco_contato');
-	tabelaContatoHandler.setTotalColunas(5);
+	tabelaContatoHandler.setTotalColunas(TOTAL_COLUNAS_TABELA_CONTATO);
 	
 	inserirMascaraCamposContato();
 	
@@ -115,12 +116,15 @@ function inicializarBlocoContato(urlTela) {
 						parametros += '&'+nomeLista+'['+indiceLinha+'].'+'nome'+'='+celulas[j].innerHTML;
 						break;
 					case 2:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].'+'email'+'='+celulas[j].innerHTML;
+						parametros += '&'+nomeLista+'['+indiceLinha+'].'+'departamento'+'='+celulas[j].innerHTML;
 						break;
 					case 3:
-						parametros += gerarParametroTelefone(indiceLinha, nomeLista, celulas[j].innerHTML, false);
+						parametros += '&'+nomeLista+'['+indiceLinha+'].'+'email'+'='+celulas[j].innerHTML;
 						break;
 					case 4:
+						parametros += gerarParametroTelefone(indiceLinha, nomeLista, celulas[j].innerHTML, false);
+						break;
+					case 5:
 						parametros += gerarParametroTelefone(indiceLinha, nomeLista, celulas[j].innerHTML, true);
 						break;
 				}
@@ -143,12 +147,15 @@ function inicializarBlocoContato(urlTela) {
 					celula.innerHTML = doc.getElementById('contato_nome').value.toUpperCase();
 					break;
 				case 2:
-					celula.innerHTML = doc.getElementById('contato_email').value.toLowerCase();
+					celula.innerHTML = doc.getElementById('contato_departamento').value.toLowerCase();
 					break;
 				case 3:
-					celula.innerHTML = gerarTelefone(false);
+					celula.innerHTML = doc.getElementById('contato_email').value.toLowerCase();
 					break;
 				case 4:
+					celula.innerHTML = gerarTelefone(false);
+					break;
+				case 5:
 					celula.innerHTML = gerarTelefone(true);
 					break;
 			}
@@ -172,13 +179,16 @@ function inicializarBlocoContato(urlTela) {
 						doc.getElementById('contato_nome').value = celula.innerHTML;
 						break;
 					case 2:
-						doc.getElementById('contato_email').value = celula.innerHTML;
+						doc.getElementById('contato_departamento').value = celula.innerHTML;
 						break;
 					case 3:
+						doc.getElementById('contato_email').value = celula.innerHTML;
+						break;
+					case 4:
 						// preencendo o telefone primario
 						preencherCamposTelefone(celula.innerHTML, false);
 						break;
-					case 4:
+					case 5:
 						// preencendo o telefone secundario
 						preencherCamposTelefone(celula.innerHTML, true);
 						break;

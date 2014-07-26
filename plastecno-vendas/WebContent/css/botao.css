@@ -149,6 +149,14 @@
 	width: 16px;
 }
 
+.botaoPdfPequeno {
+	background: url("../images/pdf_16.png") no-repeat scroll 0 0 transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
 .botaoRemover {
 	background: url("../images/minus_16.png") no-repeat scroll 0 0 transparent;
 	border: none;

@@ -60,7 +60,7 @@ public class Pedido implements Serializable {
 	@Column(name="data_entrega")
 	private Date dataEntrega;
 	
-	@InformacaoValidavel(intervalo={0, 500}, nomeExibicao="Observacao do pedido")
+	@InformacaoValidavel(intervalo={0, 800}, nomeExibicao="Observacao do pedido")
 	private String observacao;
 	/*
 	 * Atributo criado para usar em relatorios evitando o calculo do pedido

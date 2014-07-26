@@ -149,12 +149,16 @@
 	width: 16px;
 }
 
-.botaoPdfPequeno {
+.botaoPdf_16, .botaoPdf_16_centro  {
 	background: url("../images/pdf_16.png") no-repeat scroll 0 0 transparent;
 	border: none;
 	cursor: pointer;
 	height: 16px;
 	width: 16px;
+}
+
+.botaoPdf_16_centro {
+	margin-left: 2%;
 }
 
 .botaoRemover {

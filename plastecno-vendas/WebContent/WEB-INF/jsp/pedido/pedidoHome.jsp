@@ -319,13 +319,13 @@ $(document).ready(function() {
 				<thead>
 					<tr>
 						<th style="width: 10%">Situação</th>
-						<th style="width: 8%">Nr. Pedido</th>
-						<th style="width: 10%">Nr. Pedido Cliente</th>
+						<th style="width: 10%">Nr. Pedido</th>
+						<th style="width: 11%">Nr. Pedido Cliente</th>
 						<th style="width: 33%">Cliente / Vendedor</th>
 						<th style="width: 10%">Data Incl.</th>
-						<th style="width: 10%; text-align: center">CNPJ/CPF</th>
+						<th style="width: 12%; text-align: center">CNPJ/CPF</th>
 						<th style="width: 9%">Valor (R$)</th>
-						<th style="width: 10%">Ações</th>
+						<th style="width: 4%">Ações</th>
 					</tr>
 				</thead>
 	
@@ -341,15 +341,10 @@ $(document).ready(function() {
 							<td style="text-align: right;">${pedido.valorPedido}</td>
 							<td>
 								<div class="coluna_acoes_listagem">
-								<form action="<c:url value="/pedido/pdf"/>" >
+									<form action="<c:url value="/pedido/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}"/>
-										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdfPequeno" style="border: none;"/>
+										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
 									</form>
-									<form action="<c:url value="/pedido/${pedido.id}"/>" method="get">
-										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
-										<input type="hidden" name="id" value="${pedido.id}" />
-									</form>
-									
 								</div>
 								
 							</td>

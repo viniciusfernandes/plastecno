@@ -47,6 +47,12 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
+
+	$("#botaoRemoverPicklist").click(function() {
+		$('#formVazio').submit();
+	});
+	
+	
 	inserirMascaraCPF('cpf');
 	inicializarPaginador(
 			'<c:out value="${not empty paginaSelecionada ? paginaSelecionada : 0}"/>', 

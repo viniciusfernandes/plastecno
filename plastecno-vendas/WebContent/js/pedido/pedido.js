@@ -1,9 +1,12 @@
 var tabelaItemHandler = null;
 
 function inicializarBlocoItemPedido(urlTela) {
+	
+	var TOTAL_COLUNAS_ITEM_PEDIDO = 10;
+	
 	tabelaItemHandler = new BlocoTabelaHandler(urlTela, 'ItemPedido',
 			'tabelaItemPedido', 'bloco_item_pedido');
-	tabelaItemHandler.setTotalColunas(8);
+	tabelaItemHandler.setTotalColunas(TOTAL_COLUNAS_ITEM_PEDIDO);
 
 	// Estamos passando uma funcao de callback para a tabela_handler popular o
 	// valor do pedido atualizado
@@ -26,7 +29,6 @@ function inicializarBlocoItemPedido(urlTela) {
 					case 0:
 						celula.innerHTML = $('#bloco_item_pedido #idItemPedido')
 								.val();
-						celula.style.display = 'none';
 						break;
 
 					case 1:
@@ -58,11 +60,16 @@ function inicializarBlocoItemPedido(urlTela) {
 						celula.innerHTML = $("#bloco_item_pedido #precoUnidade")
 								.val();
 						break;
+
 					case 6:
-						celula.innerHTML = $(
-								"#bloco_item_pedido #precoUnidadeIPI").val();
+						celula.innerHTML = $("#bloco_item_pedido #precoItem").val();
 						break;
+						
 					case 7:
+						celula.innerHTML = $("#bloco_item_pedido #precoUnidadeIPI").val();
+						break;
+					
+					case 8:
 						celula.innerHTML = $("#bloco_item_pedido #aliquotaICMS")
 								.val();
 						break;
@@ -143,6 +150,7 @@ function editarItemPedido(botaoEdicao) {
 function removerItemPedido(botaoRemocao) {
 	tabelaItemHandler.removerRegistro(botaoRemocao);
 };
+
 
 function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 		urlInclusaoItemPedido) {
@@ -342,6 +350,12 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 				 */
 				$('#idRepresentada').val($('#representada').val());
 				$('#idRepresentada').attr('disabled', false);
+				
+				/*
+				 * Preenchendo o campo com o valor do item que foi calculado no servidor.
+				 */
+				$('#bloco_item_pedido #precoItem').val(itemPedido.precoItem);
+				
 				habilitar('#representada', false);
 
 				tabelaItemHandler.adicionar();

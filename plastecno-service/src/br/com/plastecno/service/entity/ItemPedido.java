@@ -97,6 +97,9 @@ public class ItemPedido implements Serializable {
 	private String precoUnidadeIPIFormatado;
 	
 	@Transient
+	private String precoItemFormatado;
+	
+	@Transient
 	private String precoVendaFormatado;
 	
 	@Transient
@@ -210,6 +213,14 @@ public class ItemPedido implements Serializable {
 		this.aliquotaICMS = aliquotaICMS;
 	}
 	
+	public String getPrecoItemFormatado() {
+		return precoItemFormatado;
+	}
+
+	public void setPrecoItemFormatado(String precoItemFormatado) {
+		this.precoItemFormatado = precoItemFormatado;
+	}
+
 	public String getDescricao() {
 		
 		StringBuilder descricao = new StringBuilder();
@@ -329,4 +340,11 @@ public class ItemPedido implements Serializable {
 		return formaMaterial != null && formaMaterial.isFormaMaterialVazada();
 	}
 	
+	public double getPrecoItem() {
+		if(precoUnidade == null|| quantidade == null) {
+			return 0d;
+		}
+		
+		return precoUnidade * quantidade;
+	}
 }

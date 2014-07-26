@@ -156,35 +156,35 @@
 <table class="listagem">
 	<thead>
 		<tr>
-			<th class="descricaoTabela" colspan="7">Lista de Itens do Pedido</th>
+			<th class="descricaoTabela" colspan="9">Lista de Itens do Pedido</th>
 		</tr>
 	</thead>
 	<thead>
 		<tr>
+			<th>Cod. Item</th>
 			<th>Qtde.</th>
 			<th>Descrição</th>
 			<th>Tipo Venda</th>
-			<th>Preço Venda</th>
-			<th>Preço Unid. (R$)</th>
-			<th>Preço IPI. (R$)</th>
+			<th>Preço (R$)</th>
+			<th>Unid. (R$)</th>
+			<th>Item (R$)</th>
+			<th>IPI (R$)</th>
 			<th>ICMS (%)</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr {listaItem}><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoUnidadeIPIFormatado}</td><td style="text-align: center">{aliquotaICMSFormatado}</td></tr>
+		<tr {listaItem}><td style="text-align: center">{id}</td><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoItemFormatado}</td><td style="text-align: center">{precoUnidadeIPIFormatado}</td><td style="text-align: center">{aliquotaICMSFormatado}</td></tr>
 	</tbody>
 	<tfoot>
 		<tr>
 			<td colspan="4"></td>
-			<td>TOTAL:</td>
-			<td>R$ {pedido.valorPedidoFormatado}</td>
-			<td></td>
+			<td colspan="2" style="text-align: right;">TOTAL:</td>
+			<td colspan="3" style="text-align: left;">R$ {pedido.valorPedidoFormatado}</td>
 		</tr>
 		<tr>
 			<td colspan="4"></td>
-			<td>TOTAL IPI:</td>
-			<td>R$ {pedido.valorPedidoIPIFormatado}</td>
-			<td></td>
+			<td colspan="2" style="text-align: right;">TOTAL IPI:</td>
+			<td colspan="3" style="text-align: left;">R$ {pedido.valorPedidoIPIFormatado}</td>
 		</tr>
 	</tfoot>
 </table>

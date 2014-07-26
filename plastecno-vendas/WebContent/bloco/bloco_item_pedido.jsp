@@ -2,12 +2,14 @@
 <fieldset id="bloco_item_pedido">
 	<legend>::: Itens do Pedido :::</legend>
 			
-			<input type="hidden" id="idMaterial" name="itemPedido.material.id" />
-			<input type="hidden" id="idItemPedido" name="itemPedido.id" />
-			<input type="hidden" id="precoUnidade" />
 			<!-- Esse campo sera usado para popular a tabela de itens com os dados que vieram do ItemPedidoJson -->
 			<input type="hidden" id="precoUnidadeIPI" />
 			<input type="hidden" id="descricaoItemPedido" />
+			<input type="hidden" id="precoItem"/>
+			
+			<input type="hidden" id="idMaterial" name="itemPedido.material.id" />
+			<input type="hidden" id="idItemPedido" name="itemPedido.id" />
+			<input type="hidden" id="precoUnidade" />
 			
 			<div class="label">Tipo de Venda: </div>
 			<div class="input"><input type="radio" id="tipoVendaKilo" name="itemPedido.tipoVenda" value="KILO" <c:if test="${empty pedido.id}">checked</c:if>/></div>
@@ -73,11 +75,13 @@
 				<table id="tabelaItemPedido" class="listrada">
 					<thead>
 						<tr>
-							<th style="width: 7%">Qtde.</th>
+							<th style="width: 2%">Cod. Item</th>
+							<th style="width: 5%">Qtde.</th>
 							<th style="width: 50%">Descrição</th>
 							<th style="width: 7%">Venda</th>
 							<th style="width: 10%">Preço (R$)</th>
 							<th style="width: 10%">Unid. (R$)</th>
+							<th style="width: 10%">Item (R$)</th>
 							<th style="width: 10%">Unid. IPI (R$)</th>
 							<th style="width: 10%">ICMS (%)</th>
 							<th>Ações</th>
@@ -87,12 +91,13 @@
 					<tbody>
 						<c:forEach items="${listaItemPedido}" var="itemPedido" varStatus="status">
 							<tr id="${status.count - 1}">
-								<td style="display: none;">${itemPedido.id}</td>
+								<td>${itemPedido.id}</td>
 								<td class="valorNumerico">${itemPedido.quantidade}</td>
 								<td >${itemPedido.descricao}</td>
 								<td style="text-align: center;">${itemPedido.tipoVenda}</td>
 								<td class="valorNumerico">${itemPedido.precoVendaFormatado}</td>
 								<td class="valorNumerico">${itemPedido.precoUnidadeFormatado}</td>
+								<td class="valorNumerico">${itemPedido.precoItemFormatado}</td>
 								<td class="valorNumerico">${not empty itemPedido.precoUnidadeIPI ? itemPedido.precoUnidadeIPIFormatado : ""}</td>
 								<td class="valorNumerico">${itemPedido.aliquotaICMSFormatado}</td>
 								<td >
@@ -110,14 +115,16 @@
 					</tbody>
 					<tfoot>
 						<tr>
-							<td colspan="4"></td>
-							<td colspan="2" style="text-align: left;">TOTAL: <div id="valorPedido">R$ ${not empty pedido.valorPedido ? pedido.valorPedidoFormatado : 0}</div></td>
-							<td colspan="2"></td>
+							<td></td>
+							<td colspan="3"></td>
+							<td colspan="2" style="text-align: right;">TOTAL:</td>
+							<td colspan="4"><div id="valorPedido" style="text-align: left;">R$ ${not empty pedido.valorPedido ? pedido.valorPedidoFormatado : 0}</div></td>
 						</tr>
 						<tr>
-							<td colspan="4"></td>
-							<td colspan="2" style="text-align: left;">TOTAL IPI:<div id="valorPedidoIPI">R$ ${not empty pedido.valorPedidoIPI ? pedido.valorPedidoIPIFormatado : 0}</div></td>
-							<td colspan="2"></td>
+							<td></td>
+							<td colspan="3"></td>
+							<td colspan="2" style="text-align: right;">TOTAL IPI:</td>
+							<td colspan="4"><div id="valorPedidoIPI" style="text-align: left;">R$ ${not empty pedido.valorPedidoIPI ? pedido.valorPedidoIPIFormatado : 0}</div></td>
 						</tr>
 					</tfoot>
 				</table>

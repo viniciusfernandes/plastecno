@@ -15,6 +15,7 @@ public class ItemPedidoJson {
     private final Double medidaInterna;
     private final Double comprimento;
     private final String precoUnidadeIPI;
+    private final String precoItem;
     private final Double precoVenda;
     private final String precoUnidade;
     private final String valorPedido;
@@ -34,6 +35,7 @@ public class ItemPedidoJson {
                 .getMedidaInterna();
         peca = itemPedido.isPeca();
         precoUnidadeIPI = itemPedido.getPrecoUnidadeIPIFormatado();
+        precoItem = itemPedido.getPrecoItemFormatado();
         precoVenda = itemPedido.getPrecoVenda();
         precoUnidade = itemPedido.getPrecoUnidadeFormatado();
         quantidade = itemPedido.getQuantidade();
@@ -118,4 +120,9 @@ public class ItemPedidoJson {
     public String getPrecoUnidade() {
         return precoUnidade;
     }
+
+    public String getPrecoItem() {
+        return precoItem;
+    }
+    
 }

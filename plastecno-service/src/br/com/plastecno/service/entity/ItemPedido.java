@@ -347,4 +347,12 @@ public class ItemPedido implements Serializable {
 		
 		return precoUnidade * quantidade;
 	}
+	
+	public int getAliquotaIPI() {
+		if(precoUnidade == null || precoUnidadeIPI == null) {
+			return 0;
+		}
+		
+		return (int) ((precoUnidadeIPI/precoUnidade - 1d) * 100);
+	}
 }

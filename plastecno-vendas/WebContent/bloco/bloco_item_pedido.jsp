@@ -3,7 +3,6 @@
 	<legend>::: Itens do Pedido :::</legend>
 			
 			<!-- Esse campo sera usado para popular a tabela de itens com os dados que vieram do ItemPedidoJson -->
-			<input type="hidden" id="precoUnidadeIPI" />
 			<input type="hidden" id="descricaoItemPedido" />
 			<input type="hidden" id="precoItem"/>
 			
@@ -58,7 +57,9 @@
 			</div>
 			<div class="label" style="width: 8%">IPI (%) :</div>
 			<div class="input" style="width: 5%">
-				<input type="text" id="ipi" name="aliquotaIPI" maxlength="2" />
+				<!--  Esse campo nao sera inserido no banco de dados e sera submetido 
+					para o servidor apenas para calcular o valor do item com o IPI por isso nao temos item.aliquotaIPI definidos. -->
+				<input type="text" id="aliquotaIPI" name="aliquotaIPI" maxlength="2" />
 			</div>
 			<div class="label" style="width: 10%">ICMS (%) :</div>
 			<div class="input" style="width: 5%">
@@ -82,7 +83,7 @@
 							<th style="width: 10%">Preço (R$)</th>
 							<th style="width: 10%">Unid. (R$)</th>
 							<th style="width: 10%">Item (R$)</th>
-							<th style="width: 10%">Unid. IPI (R$)</th>
+							<th style="width: 10%">IPI (%)</th>
 							<th style="width: 10%">ICMS (%)</th>
 							<th>Ações</th>
 						</tr>
@@ -98,7 +99,7 @@
 								<td class="valorNumerico">${itemPedido.precoVendaFormatado}</td>
 								<td class="valorNumerico">${itemPedido.precoUnidadeFormatado}</td>
 								<td class="valorNumerico">${itemPedido.precoItemFormatado}</td>
-								<td class="valorNumerico">${not empty itemPedido.precoUnidadeIPI ? itemPedido.precoUnidadeIPIFormatado : ""}</td>
+								<td class="valorNumerico">${itemPedido.aliquotaIPI}</td>
 								<td class="valorNumerico">${itemPedido.aliquotaICMSFormatado}</td>
 								<td >
 									<c:if test="${not pedidoDesabilitado}">
@@ -117,13 +118,13 @@
 						<tr>
 							<td></td>
 							<td colspan="3"></td>
-							<td colspan="2" style="text-align: right;">TOTAL:</td>
+							<td colspan="2" style="text-align: right;">TOTAL SEM IPI:</td>
 							<td colspan="4"><div id="valorPedido" style="text-align: left;">R$ ${not empty pedido.valorPedido ? pedido.valorPedidoFormatado : 0}</div></td>
 						</tr>
 						<tr>
 							<td></td>
 							<td colspan="3"></td>
-							<td colspan="2" style="text-align: right;">TOTAL IPI:</td>
+							<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
 							<td colspan="4"><div id="valorPedidoIPI" style="text-align: left;">R$ ${not empty pedido.valorPedidoIPI ? pedido.valorPedidoIPIFormatado : 0}</div></td>
 						</tr>
 					</tfoot>

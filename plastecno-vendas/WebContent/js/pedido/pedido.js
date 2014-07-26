@@ -66,7 +66,7 @@ function inicializarBlocoItemPedido(urlTela) {
 						break;
 						
 					case 7:
-						celula.innerHTML = $("#bloco_item_pedido #precoUnidadeIPI").val();
+						celula.innerHTML = $("#bloco_item_pedido #aliquotaIPI").val();
 						break;
 					
 					case 8:
@@ -109,6 +109,7 @@ function inicializarBlocoItemPedido(urlTela) {
 					$('#precoUnidade').val(itemPedidoJson.precoUnidade);
 					$('#descricao').val(itemPedidoJson.descricaoPeca);
 					$('#aliquotaICMS').val(itemPedidoJson.aliquotaICMS);
+					$('#aliquotaIPI').val(itemPedidoJson.aliquotaIPI);
 
 					habilitarPreenchimentoPeca(itemPedidoJson.peca);
 				});
@@ -331,8 +332,8 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 						itemPedido.precoUnidade);
 				// Esse campo sera usado para popular a tabela de itens com os
 				// dados pois nao estao no grid de inputs com os dados do item
-				$('#bloco_item_pedido #precoUnidadeIPI').val(
-						itemPedido.precoUnidadeIPI);
+				$('#bloco_item_pedido #aliquotaIPI').val(
+						itemPedido.aliquotaIPI);
 				// Esse valores foram preenchidos no controller de acordo com a
 				// forma do material
 				$('#bloco_item_pedido #descricaoItemPedido').val(
@@ -399,11 +400,11 @@ function preencherComboTransportadora(combo, listaTransportadora) {
 function habilitarIPI(idRepresentada) {
 	var request = $.ajax({
 		type : 'get',
-		url : '/vendas/pedido/representada/' + idRepresentada + '/ipi/'
+		url : '/vendas/pedido/representada/' + idRepresentada + '/aliquotaIPI/'
 	});
 
 	request.done(function(response) {
-		habilitar('#bloco_item_pedido #ipi',
+		habilitar('#bloco_item_pedido #aliquotaIPI',
 				response.representada.ipiHabilitado);
 	});
 

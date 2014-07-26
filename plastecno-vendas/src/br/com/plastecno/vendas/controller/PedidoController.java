@@ -394,7 +394,6 @@ public final class PedidoController extends AbstractController {
             item.setPrecoUnidadeIPIFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidadeIPI()));
             item.setPrecoVendaFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoVenda()));
             item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoItem()));
-            
             item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
             item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
             item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));

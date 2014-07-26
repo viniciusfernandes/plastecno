@@ -168,22 +168,22 @@
 			<th>Preço (R$)</th>
 			<th>Unid. (R$)</th>
 			<th>Item (R$)</th>
-			<th>IPI (R$)</th>
+			<th>IPI (%)</th>
 			<th>ICMS (%)</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr {listaItem}><td style="text-align: center">{id}</td><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoItemFormatado}</td><td style="text-align: center">{precoUnidadeIPIFormatado}</td><td style="text-align: center">{aliquotaICMSFormatado}</td></tr>
+		<tr {listaItem}><td style="text-align: center">{id}</td><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoItemFormatado}</td><td style="text-align: center">{aliquotaIPI}</td><td style="text-align: center">{aliquotaICMSFormatado}</td></tr>
 	</tbody>
 	<tfoot>
 		<tr>
 			<td colspan="4"></td>
-			<td colspan="2" style="text-align: right;">TOTAL:</td>
+			<td colspan="2" style="text-align: right;">TOTAL SEM IPI:</td>
 			<td colspan="3" style="text-align: left;">R$ {pedido.valorPedidoFormatado}</td>
 		</tr>
 		<tr>
 			<td colspan="4"></td>
-			<td colspan="2" style="text-align: right;">TOTAL IPI:</td>
+			<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
 			<td colspan="3" style="text-align: left;">R$ {pedido.valorPedidoIPIFormatado}</td>
 		</tr>
 	</tfoot>

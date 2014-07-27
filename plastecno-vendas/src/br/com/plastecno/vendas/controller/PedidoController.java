@@ -120,11 +120,12 @@ public class PedidoController extends AbstractController {
 
     }
     
-    @Post("pedido/copiar")
-    public void copiarPedido(Integer idPedido){
+    @Post("pedido/refazer")
+    public void refazerPedido(Integer idPedido){
         try {
-            Integer idPedidoClone = pedidoService.copiarPedido(idPedido);
+            Integer idPedidoClone = pedidoService.refazerPedido(idPedido);
             this.pesquisarPedidoById(idPedidoClone);
+            this.gerarMensagemSucesso("Pedido No. " + idPedidoClone + " inserido e refeito a partir do pedido No. "+idPedido);
         } catch (BusinessException e) {
             this.gerarListaMensagemErro(e);
             this.redirecTo(this.getClass()).pesquisarPedidoById(idPedido);

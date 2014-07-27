@@ -90,6 +90,20 @@ $(document).ready(function() {
 		form.submit();
 		
 	});
+	
+	$("#botaoCancelarPedido").click(function() {
+		var confirmado = confirm("Essa ação não poderá será desfeita. Você tem certeza de que deseja cancelar esse pedido?");
+		if(confirmado) {
+			$(this).closest('form').submit();	
+		}
+	});
+	
+	$("#botaoRefazerPedido").click(function() {
+		var confirmado = confirm("Essa ação não poderá será desfeita. Você tem certeza de que deseja refazer esse pedido?");
+		if(confirmado) {
+			$(this).closest('form').submit();	
+		}
+	});
 
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	
@@ -283,21 +297,20 @@ $(document).ready(function() {
 		<form action="pedido" method="get">
 			<input type="submit" value="" title="Limpar Dados do Pedido" class="botaoLimpar"/>			
 		</form>
+		<form action="pedido/pdf" method="get">
+			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}"/>
+			<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF"/>			
+		</form>
 		<c:if test="${acessoCancelamentoPedidoPermitido}">
-			<form action="pedido/copiar" method="post">
+			<form action="pedido/refazer" method="post">
 				<input type="hidden" name="idPedido" id="idPedido" value="${pedido.id}"/>
-				<input type="submit" id="botaoCopiaPedido" value="" title="Copiar Pedido" class="botaoEditar_24"/>			
+				<input id="botaoRefazerPedido" type="button" value="" title="Refazer Pedido" class="botaoRefazer"/>			
 			</form>
 			<form action="pedido/cancelamento" method="post">
 				<input type="hidden" name="idPedido" id="idPedidoCancelamento" value="${pedido.id}"/>
-				<input type="submit" value="" title="Cancelar Pedido" class="botaoCancelar"/>			
+				<input id="botaoCancelarPedido" type="button" value="" title="Cancelar Pedido" class="botaoCancelar"/>			
 			</form>
 		</c:if>
-			<form action="pedido/pdf" method="get">
-				<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}"/>
-				<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF"/>			
-			</form>
-		
 	</div>
 	
 	<jsp:include page="/bloco/bloco_contato.jsp" />

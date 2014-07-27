@@ -99,6 +99,14 @@
 	width: 24px;
 }
 
+
+.botaoRefazer {
+	background: url("../images/redo_black_24.png") no-repeat scroll 0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoEnviarEmail {
 	background: url("../images/mail_send_24.png") no-repeat scroll 0 0 transparent;
 	cursor: pointer;
@@ -227,6 +235,13 @@
 
 .botaoEditar_24:hover {
 	background: url("../images/pencil_orange_16.png") no-repeat scroll 0 0 transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoRefazer:hover {
+	background: url("../images/redo_black_16.png") no-repeat scroll 0 0 transparent;
 	background-position: center center;
 	height: 24px;
 	width: 24px;

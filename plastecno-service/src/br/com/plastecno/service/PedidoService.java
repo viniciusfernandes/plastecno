@@ -87,5 +87,5 @@ public interface PedidoService {
     List<Pedido> pesquisarByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
             throws BusinessException;
     
-    Integer copiarPedido(Integer idPedido) throws BusinessException;
+    Integer refazerPedido(Integer idPedido) throws BusinessException;
 }

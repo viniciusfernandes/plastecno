@@ -126,5 +126,8 @@ public class ItemPedidoJson {
     public String getPrecoItem() {
         return precoItem;
     }
-    
+
+    public int getAliquotaIPI() {
+        return aliquotaIPI;
+    }
 }

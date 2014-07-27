@@ -34,7 +34,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Entity
 @Table(name="tb_pedido", schema="vendas")
 @InformacaoValidavel
-public class Pedido implements Serializable {
+public class Pedido implements Serializable, Cloneable {
 	/**
 	 * 
 	 */
@@ -377,4 +377,8 @@ public class Pedido implements Serializable {
 		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
 	}
 	
+	@Override
+	public Pedido clone() throws CloneNotSupportedException {
+		return (Pedido) super.clone();
+	}
 }

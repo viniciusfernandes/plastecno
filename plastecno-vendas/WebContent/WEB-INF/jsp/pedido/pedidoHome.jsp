@@ -32,6 +32,12 @@
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 
 
+<style type="text/css">
+	.listrada td:last-child form input:first-child {
+		margin-left: 8%;
+	}
+</style>
+
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -278,15 +284,20 @@ $(document).ready(function() {
 			<input type="submit" value="" title="Limpar Dados do Pedido" class="botaoLimpar"/>			
 		</form>
 		<c:if test="${acessoCancelamentoPedidoPermitido}">
+			<form action="pedido/copiar" method="post">
+				<input type="hidden" name="idPedido" id="idPedido" value="${pedido.id}"/>
+				<input type="submit" id="botaoCopiaPedido" value="" title="Copiar Pedido" class="botaoEditar_24"/>			
+			</form>
 			<form action="pedido/cancelamento" method="post">
 				<input type="hidden" name="idPedido" id="idPedidoCancelamento" value="${pedido.id}"/>
 				<input type="submit" value="" title="Cancelar Pedido" class="botaoCancelar"/>			
 			</form>
 		</c:if>
-		<form action="pedido/pdf" method="get">
-			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}"/>
-			<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF"/>			
-		</form>
+			<form action="pedido/pdf" method="get">
+				<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}"/>
+				<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF"/>			
+			</form>
+		
 	</div>
 	
 	<jsp:include page="/bloco/bloco_contato.jsp" />
@@ -319,13 +330,13 @@ $(document).ready(function() {
 				<thead>
 					<tr>
 						<th style="width: 10%">Situação</th>
-						<th style="width: 10%">Nr. Pedido</th>
+						<th style="width: 9%">Nr. Pedido</th>
 						<th style="width: 11%">Nr. Pedido Cliente</th>
 						<th style="width: 33%">Cliente / Vendedor</th>
 						<th style="width: 10%">Data Incl.</th>
 						<th style="width: 12%; text-align: center">CNPJ/CPF</th>
-						<th style="width: 9%">Valor (R$)</th>
-						<th style="width: 4%">Ações</th>
+						<th style="width: 8%">Valor (R$)</th>
+						<th style="width: 7%">Ações</th>
 					</tr>
 				</thead>
 	
@@ -344,6 +355,10 @@ $(document).ready(function() {
 									<form action="<c:url value="/pedido/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}"/>
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
+									</form>
+									<form action="<c:url value="/pedido/${pedido.id}"/>" method="get">
+										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
+										<input type="hidden" name="id" value="${pedido.id}" />
 									</form>
 								</div>
 								

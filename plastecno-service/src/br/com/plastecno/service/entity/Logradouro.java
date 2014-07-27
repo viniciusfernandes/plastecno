@@ -25,7 +25,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Table(name = "tb_logradouro", schema="vendas")
 @Inheritance(strategy=InheritanceType.JOINED)
 @InformacaoValidavel
-public class Logradouro implements Serializable {
+public class Logradouro implements Serializable, Cloneable {
 	/**
 	 * 
 	 */
@@ -209,5 +209,10 @@ public class Logradouro implements Serializable {
 		.append(" - ").append(this.getPais());
 		
 		return logradouro.toString();
+	}
+	
+	@Override
+	public Logradouro clone() throws CloneNotSupportedException {
+		return (Logradouro) super.clone();
 	}
 }

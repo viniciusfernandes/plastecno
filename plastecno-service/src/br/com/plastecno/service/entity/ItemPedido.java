@@ -23,7 +23,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Entity
 @Table(name="tb_item_pedido", schema="vendas")
 @InformacaoValidavel
-public class ItemPedido implements Serializable {
+public class ItemPedido implements Serializable, Cloneable {
 
 	/**
 	 * 
@@ -354,5 +354,13 @@ public class ItemPedido implements Serializable {
 		}
 		
 		return (int) ((precoUnidadeIPI/precoUnidade - 1d) * 100);
+	}
+	
+	@Override
+	public ItemPedido clone() throws CloneNotSupportedException{
+		ItemPedido clone = (ItemPedido) super.clone();
+		clone.setId(null);
+		clone.setPedido(null);
+		return clone;
 	}
 }

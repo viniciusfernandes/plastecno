@@ -2,7 +2,7 @@ var tabelaItemHandler = null;
 
 function inicializarBlocoItemPedido(urlTela) {
 	
-	var TOTAL_COLUNAS_ITEM_PEDIDO = 10;
+	var TOTAL_COLUNAS_ITEM_PEDIDO = 9;
 	
 	tabelaItemHandler = new BlocoTabelaHandler(urlTela, 'ItemPedido',
 			'tabelaItemPedido', 'bloco_item_pedido');
@@ -72,8 +72,6 @@ function inicializarBlocoItemPedido(urlTela) {
 					case 8:
 						celula.innerHTML = $("#bloco_item_pedido #aliquotaICMS")
 								.val();
-						break;
-					default:
 						break;
 					}
 

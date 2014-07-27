@@ -20,6 +20,10 @@ public final class NumeroUtils {
         }
         return new BigDecimal(valor).setScale(escala, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
+    
+    public static Double arredondarValorMonetario(Double valor) {
+        return arredondar(valor, ESCALA_MONETARIA);
+    }
 
     public static Float arredondar(Float valor, Integer escala) {
         if (valor == null) {

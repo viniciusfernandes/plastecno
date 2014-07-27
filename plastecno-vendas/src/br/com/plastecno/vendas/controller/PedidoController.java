@@ -48,7 +48,7 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 import br.com.plastecno.vendas.relatorio.conversor.GeradorRelatorioPDF;
 
 @Resource
-public final class PedidoController extends AbstractController {
+public class PedidoController extends AbstractController {
 
     @Servico
     private TipoEntregaService tipoEntregaService;
@@ -118,6 +118,20 @@ public final class PedidoController extends AbstractController {
             return null;
         }
 
+    }
+    
+    @Post("pedido/copiar")
+    public void copiarPedido(Integer idPedido){
+        try {
+            Integer idPedidoClone = pedidoService.copiarPedido(idPedido);
+            this.pesquisarPedidoById(idPedidoClone);
+        } catch (BusinessException e) {
+            this.gerarListaMensagemErro(e);
+            this.redirecTo(this.getClass()).pesquisarPedidoById(idPedido);
+        } catch (Exception e) {
+            gerarLogErroRequestAjax("copia do pedido de No. "+idPedido, e);
+            this.redirecTo(this.getClass()).pesquisarPedidoById(idPedido);
+        }
     }
 
     @Post("pedido/cancelamento")
@@ -379,7 +393,7 @@ public final class PedidoController extends AbstractController {
         }
     }
 
-    @Get("pedido/representada/{idRepresentada}/ipi/")
+    @Get("pedido/representada/{idRepresentada}/aliquotaIPI/")
     public void verificarRepresentadaCalculaIPI(Integer idRepresentada) {
         final RepresentadaJson json = new RepresentadaJson(idRepresentada,
                 this.representadaService.isCalculoIPIHabilitado(idRepresentada));

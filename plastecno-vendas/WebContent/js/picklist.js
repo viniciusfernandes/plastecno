@@ -116,7 +116,7 @@ function pickListToParameter (nomeLista) {
 	var options = document.getElementById('PickList').options;
 	var parameter = '';
 	for ( var i = 0; i < options.length; i++) {
-		parameter += '&'+nomeLista+'['+i+'].id='+options[i].value;
+		parameter += '&'+nomeLista+'[]='+options[i].value;
 	}
 	return parameter;
 };

@@ -23,6 +23,7 @@ via "wiscp" para o diretorio /home
 host=184.107.24.87, porta=22, usuario=root, senha=XnJ@!1uK
 4) Ir ate o diretorio /home e lá estarao os arquivos "criacao_tabela_enderecamento.sql" e "update_tabela_enderecamento.sql"
 5) Alternar para o usuario "postgres", para isso rodar o comando "su postgres"
+5.1) É muito importante executar o comando especificando o caminho até o diretório utilizando o slash ("/")
 6) Abrir o terminal rodando o "psql" e executar a importacao atraves do comando \i criacao_tabela_enderecamento.sql
 7) E depois o comando para atualizar as tabelas \i update_tabela_enderecamento.sql
 8) sair

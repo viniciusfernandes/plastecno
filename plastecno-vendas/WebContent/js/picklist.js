@@ -134,9 +134,9 @@ function inicializarCampoPesquisaPicklist(config) {
 	var url = config.url;
 	var mensagem = config.mensagemEspera;
 	var parametro = config.parametro;
-	
+
 	$('#campoPesquisaPicklist').attr('maxlength', 8);
-	
+
 	$('#botaoPesquisaPicklist').click(function () {
 		var valor = $('#campoPesquisaPicklist').val(); 
 		/*
@@ -146,7 +146,7 @@ function inicializarCampoPesquisaPicklist(config) {
 		if (valor == undefined || valor == null || valor.trim().length < 1) {
 			return;
 		}
-		
+
 		/*
 		* Vamos limpar o select e inserir uma informacao de que a requisicao estaem andamento
 		* pois em alguns casos o resultado da consulta eh demorado
@@ -169,9 +169,9 @@ function inicializarCampoPesquisaPicklist(config) {
 				selectlist.add(new Option(elemento.label, elemento.valor, false, false));
 			}
 		});
-		
+
 		request.fail(function(request, status) {
 			gerarListaMensagemErro(new Array('Falha na busca dos registros dos valores para preencher picklist: => Status da requisicao: '+status));
 		});
 	});
-}
+};

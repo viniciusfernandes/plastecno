@@ -9,7 +9,7 @@
 			<input type="button" id="botaoPesquisaPicklist" title="Pesquisar ${tituloPicklist}" value="" class="botaoPesquisarPequeno" style="width: 20px"/>
 		</div>
 	</c:if>
-	
+
 
 	<legend >::: ${tituloPicklist} :::</legend>
 	<div class="picklist" style="width: 33%; margin-left: 16%;">

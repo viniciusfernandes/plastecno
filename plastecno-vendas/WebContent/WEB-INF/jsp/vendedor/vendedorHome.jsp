@@ -27,14 +27,13 @@
 
 $(document).ready(function() {
 	scrollTo('${ancora}');
-	
+
 	$("#botaoAssociarCliente").click(function() {
 		var parametros = pickListToParameter('listaIdClienteAssociado');
-		parametros += '&'+nonPickListToParameter('listaIdClienteDesassociado');
 		$('#formVendedor').attr("action",$('#formVendedor').attr('action')+'?'+ parametros);
 		$('#formVendedor').submit();
 	});
-	
+
 	$("#botaoPesquisarVendedor").click(function() {
 		var listaId = ['cpf'];
 		removerNaoDigitos(listaId);
@@ -46,12 +45,6 @@ $(document).ready(function() {
 	$("#botaoLimpar").click(function() {
 		$('#formVazio').submit();
 	});
-	
-
-	$("#botaoRemoverPicklist").click(function() {
-		$('#formVazio').submit();
-	});
-	
 	
 	inserirMascaraCPF('cpf');
 	inicializarPaginador(
@@ -91,10 +84,10 @@ function remover(codigo, sigla) {
 	<form id="formVendedor" action="vendedor/associacao/cliente" method="post">
 		<input type="hidden" id="id" name="vendedor.id" value="${vendedor.id}" />
 	</form>
-	
+
 	<form id="formVazio" action="vendedor" method="get">
 	</form>
-	
+
 		<fieldset>
 			<legend>::: Dados do Vendedor :::</legend>
 
@@ -124,7 +117,7 @@ function remover(codigo, sigla) {
 			<a id="botaoPesquisarVendedor" title="Pesquisar Dados do Vendedor" class="botaoPesquisar"></a>
 			<a id="botaoLimpar" title="Limpar Dados do Vendedor" class="botaoLimpar"></a>
 		</div>
-	
+
 	<jsp:include page="/bloco/bloco_picklist.jsp" />
 
 	<div class="bloco_botoes">
@@ -149,7 +142,7 @@ function remover(codigo, sigla) {
 						<th>Ações</th>
 					</tr>
 				</thead>
-	
+
 				<tbody>
 					<c:forEach var="vendedor" items="${listaVendedor}">
 						<tr>
@@ -173,10 +166,10 @@ function remover(codigo, sigla) {
 								</div>
 							</td>
 						</tr>
-	
+
 					</c:forEach>
 				</tbody>
-	
+
 			</table>
 		</div>
 	</fieldset>

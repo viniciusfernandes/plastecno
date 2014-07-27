@@ -69,17 +69,16 @@ public class VendedorController extends AbstractController {
     }
 
     @Post("vendedor/associacao/cliente")
-    public void associarCliente(Usuario vendedor, List<Integer> listaIdClienteAssociado,
-            List<Integer> listaIdClienteDesassociado) {
+    public void associarCliente(Usuario vendedor, List<Integer> listaIdClienteAssociado) {
         try {
-            usuarioService.associarCliente(vendedor.getId(), listaIdClienteAssociado, listaIdClienteDesassociado);
+            usuarioService.associarCliente(vendedor.getId(), listaIdClienteAssociado);
             gerarMensagemSucesso("Cliente(s) associado(s) com sucesso");
         } catch (BusinessException e) {
             vendedor.setCpf(formatarCPF(vendedor.getCpf()));
             addAtributo("vendedor", vendedor);
             try {
-                popularPicklist(this.clienteService.pesquisarById(listaIdClienteDesassociado),
-                        this.clienteService.pesquisarById(listaIdClienteAssociado));
+                popularPicklist(this.clienteService.pesquisarClientesAssociados(vendedor.getId()),
+                        this.clienteService.pesquisarClientesDesassociados());
                 gerarListaMensagemErro(e);
             } catch (ControllerException e1) {
                 gerarLogErroNavegacao("Cliente", e1);
@@ -89,5 +88,4 @@ public class VendedorController extends AbstractController {
         }
         irTopoPagina();
     }
-
 }

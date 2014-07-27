@@ -48,7 +48,7 @@ public interface ClienteService {
     List<Cliente> pesquisarBy(Cliente filtro, boolean carregarVendedor, Integer indiceRegistroInicial,
             Integer numeroMaximoRegistros);
 
-    List<Cliente> pesquisarById(List<Integer> listaIdCliente);
+    List<Cliente> pesquisarClientesById(List<Integer> listaIdCliente);
 
     List<Cliente> pesquisarClientesAssociados(Integer idVendedor);
 

@@ -198,7 +198,7 @@ function remover(codigo, nome) {
 			<a id="botaoContactarCliente" title="Cliente Contactado" onclick="contactarCliente(${cliente.id});" class="botaoContactar"></a>
 		</c:if>		
 	</div>	
-	
+	<!--  jsp:include page="/bloco/bloco_comentario.jsp" /-->
 	<jsp:include page="/bloco/bloco_logradouro.jsp" />
 	<jsp:include page="/bloco/bloco_picklist.jsp" />
 	<jsp:include page="/bloco/bloco_contato.jsp" />

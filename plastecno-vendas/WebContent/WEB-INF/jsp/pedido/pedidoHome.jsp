@@ -301,11 +301,14 @@ $(document).ready(function() {
 			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}"/>
 			<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF"/>			
 		</form>
-		<c:if test="${acessoCancelamentoPedidoPermitido}">
+		
+		<c:if test="${acessoRefazerPedidoPermitido}">
 			<form action="pedido/refazer" method="post">
 				<input type="hidden" name="idPedido" id="idPedido" value="${pedido.id}"/>
 				<input id="botaoRefazerPedido" type="button" value="" title="Refazer Pedido" class="botaoRefazer"/>			
 			</form>
+		</c:if>
+		<c:if test="${acessoCancelamentoPedidoPermitido}">
 			<form action="pedido/cancelamento" method="post">
 				<input type="hidden" name="idPedido" id="idPedidoCancelamento" value="${pedido.id}"/>
 				<input id="botaoCancelarPedido" type="button" value="" title="Cancelar Pedido" class="botaoCancelar"/>			

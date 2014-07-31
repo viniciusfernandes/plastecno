@@ -347,11 +347,15 @@ public class PedidoController extends AbstractController {
             // pedidos ja enviados
             final boolean acessoCancelamentoPedidoPermitido = SituacaoPedido.ENVIADO.equals(situacao)
                     && !SituacaoPedido.CANCELADO.equals(situacao) && isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+            
+            final boolean acessoRefazerPedidoPermitido = SituacaoPedido.ENVIADO.equals(situacao) 
+                    && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO);
 
             liberarAcesso("pedidoDesabilitado", isPedidoDesabilitado(pedido));
             liberarAcesso("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);
             liberarAcesso("acessoReenvioPedidoPermitido", acessoReenvioPedidoPermitido);
             liberarAcesso("acessoCancelamentoPedidoPermitido", acessoCancelamentoPedidoPermitido);
+            liberarAcesso("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
         }
 
         irTopoPagina();

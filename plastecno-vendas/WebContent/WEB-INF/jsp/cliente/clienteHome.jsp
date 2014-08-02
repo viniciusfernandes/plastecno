@@ -59,6 +59,16 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
+	$("#botaoIncluirComentario").click(function () {
+		if(!isEmpty($("#comentario").val())) {
+			$(this).closest('form').submit();			
+		}
+	});
+	
+	$("#botaoLimparComentario").click(function () {
+		$("#comentario").val("");	
+	});
+	
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
@@ -198,7 +208,31 @@ function remover(codigo, nome) {
 			<a id="botaoContactarCliente" title="Cliente Contactado" onclick="contactarCliente(${cliente.id});" class="botaoContactar"></a>
 		</c:if>		
 	</div>	
-	<jsp:include page="/bloco/bloco_comentario.jsp" />
+	<fieldset id="bloco_comentario">
+		<legend>::: Comentários :::</legend>
+			<form action="<c:url value="/cliente/inclusao/comentario"/>" method="post">
+				<input type="hidden" value="${cliente.id}" name="idCliente"/>
+				<div class="label condicional">Comentário:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="comentario" name="comentario" value="${comentario}" style="width: 100%"/> 
+				</div>
+	
+				<div class="bloco_botoes">
+					<c:if test="${acessoInclusaoPermitido}">
+						<a id="botaoIncluirComentario" title="Adicionar Dados do Comentario" class="botaoAdicionar" ></a>
+						<a id="botaoLimparComentario" title="Limpar Dados do Comentario" class="botaoLimpar" ></a>
+					</c:if>
+				</div>
+			
+			</form>
+						
+			<div class="label condicional">Histórico:</div>
+			<div class="input areatexto" style="width: 80%">
+				<textarea style="width: 100%;" disabled="disabled">
+				${comentarios}
+				</textarea>
+			</div>
+	</fieldset>
 	<jsp:include page="/bloco/bloco_logradouro.jsp" />
 	<jsp:include page="/bloco/bloco_picklist.jsp" />
 	<jsp:include page="/bloco/bloco_contato.jsp" />

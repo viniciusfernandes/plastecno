@@ -204,7 +204,7 @@ public final class ClienteController extends AbstractController {
 
     private String formatarComentarios(Integer idCliente) {
         List<ComentarioCliente> listaComentario = this.clienteService
-                .pesquisarComentarioFormatadoByIdCliente(idCliente);
+                .pesquisarComentarioByIdCliente(idCliente);
         StringBuilder concat = new StringBuilder();
         for (ComentarioCliente comentarioCliente : listaComentario) {
             concat.append("\n");

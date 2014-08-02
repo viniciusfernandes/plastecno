@@ -19,6 +19,7 @@ import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
+import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.controller.exception.ControllerException;
 import br.com.plastecno.vendas.json.SerializacaoJson;
@@ -200,13 +201,21 @@ public final class ClienteController extends AbstractController {
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaCliente");
         addAtributo("cliente", filtro);
     }
-    
-    private String formatarComentarios(Integer idCliente){
-        List<ComentarioCliente> listaComentario = this.clienteService.pesquisarComentarioByIdCliente(idCliente);
+
+    private String formatarComentarios(Integer idCliente) {
+        List<ComentarioCliente> listaComentario = this.clienteService
+                .pesquisarComentarioFormatadoByIdCliente(idCliente);
         StringBuilder concat = new StringBuilder();
         for (ComentarioCliente comentarioCliente : listaComentario) {
-            concat.append("\n").append(comentarioCliente.getConteudoFormatado()).append("\n");
-            
+            concat.append("\n");
+            concat.append(StringUtils.formatarData(comentarioCliente.getDataInclusao()));
+            concat.append(" - ");
+            concat.append(comentarioCliente.getNomeVendedor());
+            concat.append(" ");
+            concat.append(comentarioCliente.getSobrenomeVendedor());
+            concat.append(" - ");
+            concat.append(comentarioCliente.getConteudo());
+            concat.append("\n");
         }
         return concat.toString();
     }

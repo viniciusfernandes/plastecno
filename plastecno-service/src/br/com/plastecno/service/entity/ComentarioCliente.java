@@ -17,6 +17,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -45,7 +46,7 @@ public class ComentarioCliente implements Serializable {
 	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 300 }, nomeExibicao = "Conteúdo do comentário sobre o cliente")
 	private String conteudo;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_vendedor")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Vendedor que fez o comentário")
 	private Usuario vendedor;
@@ -54,6 +55,28 @@ public class ComentarioCliente implements Serializable {
 	@JoinColumn(name = "id_cliente")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Cliente")
 	private Cliente cliente;
+
+	/*
+	 * Atributo criado para ser exibido na tela de cliente de forma que nao
+	 * fosse necessario carregar todos os dados do vendedor.
+	 */
+	@Transient
+	private String nomeVendedor;
+
+	@Transient
+	private String sobrenomeVendedor;
+
+	public ComentarioCliente() {
+
+	}
+
+	public ComentarioCliente(Date dataInclusao, String conteudo,
+			String nomeVendedor, String sobrenomeVendedor) {
+		this.dataInclusao = dataInclusao;
+		this.conteudo = conteudo;
+		this.nomeVendedor = nomeVendedor;
+		this.sobrenomeVendedor = sobrenomeVendedor;
+	}
 
 	public Integer getId() {
 		return id;
@@ -95,8 +118,19 @@ public class ComentarioCliente implements Serializable {
 		this.cliente = cliente;
 	}
 
-	public String getConteudoFormatado() {
-		return DATE_FORMAT.format(dataInclusao) + " - "
-				+ vendedor.getNomeCompleto() + " - " + conteudo;
+	public String getNomeVendedor() {
+		return nomeVendedor;
+	}
+
+	public void setNomeVendedor(String nomeVendedor) {
+		this.nomeVendedor = nomeVendedor;
+	}
+
+	public String getSobrenomeVendedor() {
+		return sobrenomeVendedor;
+	}
+
+	public void setSobrenomeVendedor(String sobrenomeVendedor) {
+		this.sobrenomeVendedor = sobrenomeVendedor;
 	}
 }

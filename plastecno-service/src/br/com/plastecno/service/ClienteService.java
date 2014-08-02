@@ -80,5 +80,5 @@ public interface ClienteService {
 
 	void inserirComentario(Integer idCliente, String comentario) throws BusinessException;
 
-	List<ComentarioCliente> pesquisarComentarioByIdCliente(Integer idCliente);
+	List<ComentarioCliente> pesquisarComentarioFormatadoByIdCliente(Integer idCliente);
 }

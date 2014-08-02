@@ -459,11 +459,13 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<ComentarioCliente> pesquisarComentarioByIdCliente(
+	public List<ComentarioCliente> pesquisarComentarioFormatadoByIdCliente(
 			Integer idCliente) {
 		return (List<ComentarioCliente>) entityManager
 				.createQuery(
-						"select c from ComentarioCliente c where c.cliente.id = :idCliente ")
+						"select new ComentarioCliente (c.dataInclusao, c.conteudo, v.nome, v.sobrenome) from ComentarioCliente c "
+						+" inner join c.vendedor v where c.cliente.id = :idCliente"
+						)
 				.setParameter("idCliente", idCliente).getResultList();
 	}
 

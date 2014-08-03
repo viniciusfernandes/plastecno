@@ -21,7 +21,7 @@ import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
-@Table(name="tb_item_pedido", schema="vendas")
+@Table(name = "tb_item_pedido", schema = "vendas")
 @InformacaoValidavel
 public class ItemPedido implements Serializable, Cloneable {
 
@@ -29,174 +29,196 @@ public class ItemPedido implements Serializable, Cloneable {
 	 * 
 	 */
 	private static final long serialVersionUID = 3397681910683242844L;
-	
+
 	@Id
-	@SequenceGenerator(name = "itemPedidoSequence", sequenceName = "vendas.seq_item_pedido_id", allocationSize=1, initialValue=1)
+	@SequenceGenerator(name = "itemPedidoSequence", sequenceName = "vendas.seq_item_pedido_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemPedidoSequence")
 	private Integer id;
 	private Double comprimento;
-	
-	@Column(name="medida_interna")
+
+	@Column(name = "medida_interna")
 	private Double medidaInterna;
-	
-	@Column(name="medida_externa")
+
+	@Column(name = "medida_externa")
 	private Double medidaExterna;
-	
-	@InformacaoValidavel(obrigatorio= true, numerico=true, 
-			valorNegativo=false, nomeExibicao="Quantidade de itens do pedido")
+
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do pedido")
 	private Integer quantidade;
-	
-	@Column(name="preco_unidade")
-	@InformacaoValidavel(obrigatorio= true, numerico=true, 
-		valorNaoNegativo=false, nomeExibicao="Preço da unidade item do pedido")
+
+	@Column(name = "preco_unidade")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido")
 	private Double precoUnidade;
-	
-	@Column(name="preco_unidade_ipi")
-	@InformacaoValidavel(obrigatorio= true, numerico=true, 
-		valorNaoNegativo=false, nomeExibicao="Preço da unidade item do pedido com IPI")
+
+	@Column(name = "preco_unidade_ipi")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido com IPI")
 	private Double precoUnidadeIPI;
-	
-	@Column(name="aliquota_icms")
-	@InformacaoValidavel(numerico=true, 
-	valorNaoNegativo=false, nomeExibicao="Alíquota ICMS")
+
+	@Column(name = "aliquota_icms")
+	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
-	
-	@Column(name="descricao_peca")
-	@InformacaoValidavel(intervalo={1, 100}, nomeExibicao="Descrição do item do pedido")
+
+	@Column(name = "aliquota_ipi")
+	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota IPI")
+	private Double aliquotaIPI;
+
+	@Column(name = "descricao_peca")
+	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
 	private String descricaoPeca;
-	
-	@Column(name="preco_venda")
-	@InformacaoValidavel(obrigatorio= true, numerico=true, 
-		valorNegativo=false, nomeExibicao="Preço de venda do item do pedido")
+
+	@Column(name = "preco_venda")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Preço de venda do item do pedido")
 	private Double precoVenda;
-	
+
 	@Enumerated(EnumType.ORDINAL)
-	@Column(name="id_forma_material")
-	@InformacaoValidavel(obrigatorio=true, nomeExibicao="Forma do material do item do pedido")
+	@Column(name = "id_forma_material")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma do material do item do pedido")
 	private FormaMaterial formaMaterial;
-	
+
 	@Enumerated(EnumType.ORDINAL)
-	@Column(name="id_tipo_venda")
-	@InformacaoValidavel(obrigatorio=true, nomeExibicao="Tipo de venda do item do pedido")
+	@Column(name = "id_tipo_venda")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo de venda do item do pedido")
 	private TipoVenda tipoVenda;
 
 	@ManyToOne
 	@JoinColumn(name = "id_pedido", referencedColumnName = "id", nullable = false)
-	@InformacaoValidavel(cascata=true, nomeExibicao="Pedido associado ao item")
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Pedido associado ao item")
 	private Pedido pedido;
-	
-	@ManyToOne(fetch=FetchType.EAGER)
+
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
-	@InformacaoValidavel(relacionamentoObrigatorio=true, nomeExibicao="Material associado ao pedido")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao pedido")
 	private Material material;
-	
+
 	@Transient
 	private String precoUnidadeFormatado;
-	
+
 	@Transient
 	private String precoUnidadeIPIFormatado;
-	
+
 	@Transient
 	private String precoItemFormatado;
-	
+
 	@Transient
 	private String precoVendaFormatado;
-	
+
 	@Transient
 	private String aliquotaICMSFormatado;
-	
+
+	@Transient
+	private String aliquotaIPIFormatado;
+
 	@Transient
 	private String medidaExternaFomatada;
-	
+
 	@Transient
 	private String medidaInternaFomatada;
-	
+
 	@Transient
 	private String comprimentoFormatado;
-	
-	public ItemPedido() {}
-	
+
+	public ItemPedido() {
+	}
+
 	public ItemPedido(FormaMaterial formaMaterial) {
 		this.formaMaterial = formaMaterial;
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 	public Double getComprimento() {
 		return comprimento;
 	}
+
 	public void setComprimento(Double comprimento) {
 		this.comprimento = comprimento;
 	}
+
 	public Integer getQuantidade() {
 		return quantidade;
 	}
+
 	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
 	}
-	
+
 	public FormaMaterial getFormaMaterial() {
 		return formaMaterial;
 	}
+
 	public void setFormaMaterial(FormaMaterial formaMaterial) {
 		this.formaMaterial = formaMaterial;
 	}
+
 	public TipoVenda getTipoVenda() {
 		return tipoVenda;
 	}
+
 	public void setTipoVenda(TipoVenda tipoVenda) {
 		this.tipoVenda = tipoVenda;
 	}
+
 	public Double getMedidaInterna() {
 		return medidaInterna;
 	}
+
 	public void setMedidaInterna(Double medidaInterna) {
 		this.medidaInterna = medidaInterna;
 	}
+
 	public Double getMedidaExterna() {
 		return medidaExterna;
 	}
+
 	public void setMedidaExterna(Double medidaExterna) {
 		this.medidaExterna = medidaExterna;
 	}
+
 	public Double getPrecoUnidade() {
 		return precoUnidade;
 	}
+
 	public void setPrecoUnidade(Double precoUnidade) {
 		this.precoUnidade = precoUnidade;
 	}
+
 	public Pedido getPedido() {
 		return pedido;
 	}
+
 	public void setPedido(Pedido pedido) {
 		this.pedido = pedido;
 	}
+
 	public Material getMaterial() {
 		return material;
 	}
+
 	public void setMaterial(Material material) {
 		this.material = material;
 	}
-	
+
 	public String getDescricaoPeca() {
 		return descricaoPeca;
 	}
+
 	public void setDescricaoPeca(String descricaoPeca) {
 		this.descricaoPeca = descricaoPeca;
 	}
-	
+
 	public Double getPrecoVenda() {
 		return precoVenda;
 	}
-	
+
 	public void setPrecoVenda(Double precoVenda) {
 		this.precoVenda = precoVenda;
 	}
-	
+
 	public Double getPrecoUnidadeIPI() {
 		return precoUnidadeIPI;
 	}
@@ -204,7 +226,7 @@ public class ItemPedido implements Serializable, Cloneable {
 	public void setPrecoUnidadeIPI(Double precoUnidadeIPI) {
 		this.precoUnidadeIPI = precoUnidadeIPI;
 	}
-	
+
 	public Double getAliquotaICMS() {
 		return aliquotaICMS;
 	}
@@ -212,7 +234,7 @@ public class ItemPedido implements Serializable, Cloneable {
 	public void setAliquotaICMS(Double aliquotaICMS) {
 		this.aliquotaICMS = aliquotaICMS;
 	}
-	
+
 	public String getPrecoItemFormatado() {
 		return precoItemFormatado;
 	}
@@ -222,26 +244,27 @@ public class ItemPedido implements Serializable, Cloneable {
 	}
 
 	public String getDescricao() {
-		
+
 		StringBuilder descricao = new StringBuilder();
 		if (material != null) {
 			descricao.append(this.formaMaterial);
 			descricao.append(" - ");
 			descricao.append(this.material.getSigla());
 			descricao.append(" - ");
-			descricao.append(this.material.getDescricao() == null ? " " : this.material.getDescricao());
+			descricao.append(this.material.getDescricao() == null ? " "
+					: this.material.getDescricao());
 			descricao.append(" - ");
-		} 
-		
+		}
+
 		if (!this.isPeca()) {
 			descricao.append(getMedidaExternaFomatada());
 			descricao.append(" X ");
-			
+
 			if (this.medidaInterna != null) {
 				descricao.append(getMedidaInternaFomatada());
-				descricao.append(" X ");	
+				descricao.append(" X ");
 			}
-			
+
 			descricao.append(getComprimentoFormatado());
 			descricao.append(" mm");
 		} else {
@@ -249,26 +272,28 @@ public class ItemPedido implements Serializable, Cloneable {
 		}
 		return descricao.toString();
 	}
-	
+
 	public boolean isPeca() {
 		return FormaMaterial.PC.equals(this.formaMaterial);
 	}
-	
+
 	public boolean isVendaKilo() {
 		return TipoVenda.KILO.equals(this.tipoVenda);
 	}
-	
+
 	public double calcularPrecoTotal() {
-		return this.quantidade != null && this.precoVenda != null ? 
-				this.quantidade * this.precoVenda : 0d;
+		return this.quantidade != null && this.precoVenda != null ? this.quantidade
+				* this.precoVenda
+				: 0d;
 	}
-	
+
 	public boolean contemLargura() {
 		return this.formaMaterial != null && this.formaMaterial.contemLargura();
 	}
-	
-	public boolean isMedidaExternaIgualInterna(){
-		return this.formaMaterial != null && this.formaMaterial.isMedidaExternaIgualInterna();
+
+	public boolean isMedidaExternaIgualInterna() {
+		return this.formaMaterial != null
+				&& this.formaMaterial.isMedidaExternaIgualInterna();
 	}
 
 	public String getPrecoUnidadeFormatado() {
@@ -335,32 +360,41 @@ public class ItemPedido implements Serializable, Cloneable {
 	public void setComprimentoFormatado(String comprimentoFormatado) {
 		this.comprimentoFormatado = comprimentoFormatado;
 	}
-	
+
 	public boolean isFormaMaterialVazada() {
 		return formaMaterial != null && formaMaterial.isFormaMaterialVazada();
 	}
-	
+
 	public double getPrecoItem() {
-		if(precoUnidade == null|| quantidade == null) {
+		if (precoUnidade == null || quantidade == null) {
 			return 0d;
 		}
-		
+
 		return precoUnidade * quantidade;
 	}
-	
-	public int getAliquotaIPI() {
-		if(precoUnidade == null || precoUnidadeIPI == null) {
-			return 0;
-		}
-		
-		return (int) ((precoUnidadeIPI/precoUnidade - 1d) * 100);
-	}
-	
+
 	@Override
-	public ItemPedido clone() throws CloneNotSupportedException{
+	public ItemPedido clone() throws CloneNotSupportedException {
 		ItemPedido clone = (ItemPedido) super.clone();
 		clone.setId(null);
 		clone.setPedido(null);
 		return clone;
 	}
+
+	public Double getAliquotaIPI() {
+		return aliquotaIPI;
+	}
+
+	public void setAliquotaIPI(Double aliquotaIPI) {
+		this.aliquotaIPI = aliquotaIPI;
+	}
+
+	public String getAliquotaIPIFormatado() {
+		return aliquotaIPIFormatado;
+	}
+
+	public void setAliquotaIPIFormatado(String aliquotaIPIFormatado) {
+		this.aliquotaIPIFormatado = aliquotaIPIFormatado;
+	}
+
 }

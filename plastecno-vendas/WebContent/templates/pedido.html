@@ -75,7 +75,9 @@
 			<td class="label">Contato:</td>
 			<td>{pedido.contato.nome}</td>
 			<td class="label">Email:</td>
-			<td colspan="3">{pedido.contato.email}</td>
+			<td>{pedido.contato.email}</td>
+			<td class="label">Departamento:</td>
+			<td>{pedido.contato.departamento}</td>
 		</tr>
 		<tr>
 			<td class="label">Tel.:</td>
@@ -161,19 +163,19 @@
 	</thead>
 	<thead>
 		<tr>
-			<th>Cod. Item</th>
+			<th>Item</th>
 			<th>Qtde.</th>
 			<th>Descrição</th>
 			<th>Tipo Venda</th>
 			<th>Preço (R$)</th>
 			<th>Unid. (R$)</th>
-			<th>Item (R$)</th>
+			<th>Total Item (R$)</th>
 			<th>IPI (%)</th>
 			<th>ICMS (%)</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr {listaItem}><td style="text-align: center">{id}</td><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoItemFormatado}</td><td style="text-align: center">{aliquotaIPI}</td><td style="text-align: center">{aliquotaICMSFormatado}</td></tr>
+		<tr {listaItem}><td style="text-align: center">{id}</td><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoItemFormatado}</td><td style="text-align: center">{aliquotaIPIFormatado}</td><td style="text-align: center">{aliquotaICMSFormatado}</td></tr>
 	</tbody>
 	<tfoot>
 		<tr>

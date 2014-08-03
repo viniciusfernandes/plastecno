@@ -76,13 +76,13 @@
 				<table id="tabelaItemPedido" class="listrada">
 					<thead>
 						<tr>
-							<th style="width: 2%">Cod. Item</th>
+							<th style="width: 2%">Item</th>
 							<th style="width: 5%">Qtde.</th>
 							<th style="width: 50%">Descrição</th>
 							<th style="width: 7%">Venda</th>
 							<th style="width: 10%">Preço (R$)</th>
 							<th style="width: 10%">Unid. (R$)</th>
-							<th style="width: 10%">Item (R$)</th>
+							<th style="width: 10%">Total Item (R$)</th>
 							<th style="width: 10%">IPI (%)</th>
 							<th style="width: 10%">ICMS (%)</th>
 							<th>Ações</th>
@@ -99,7 +99,7 @@
 								<td class="valorNumerico">${itemPedido.precoVendaFormatado}</td>
 								<td class="valorNumerico">${itemPedido.precoUnidadeFormatado}</td>
 								<td class="valorNumerico">${itemPedido.precoItemFormatado}</td>
-								<td class="valorNumerico">${itemPedido.aliquotaIPI}</td>
+								<td class="valorNumerico">${itemPedido.aliquotaIPIFormatado}</td>
 								<td class="valorNumerico">${itemPedido.aliquotaICMSFormatado}</td>
 								<td >
 									<c:if test="${not pedidoDesabilitado}">

@@ -17,3 +17,5 @@ ALTER TABLE vendas.tb_observacao_cliente ADD PRIMARY KEY (id);
 ALTER TABLE vendas.tb_observacao_cliente  ADD CONSTRAINT id_vendedor FOREIGN KEY (id_vendedor) REFERENCES vendas.tb_usuario (id);
 
 create sequence vendas.seq_cliente_observacao_id increment by 1 minvalue 1 no maxvalue start with 1;
+
+alter table vendas.tb_item_pedido add aliquota_ipi numeric (5,5) default 0;

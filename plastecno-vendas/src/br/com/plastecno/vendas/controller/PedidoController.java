@@ -409,6 +409,7 @@ public class PedidoController extends AbstractController {
     private void formatarItemPedido(ItemPedido... itens) {
         for (ItemPedido item : itens) {
             item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
+            item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
             item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
             item.setPrecoUnidadeIPIFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidadeIPI()));
             item.setPrecoVendaFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoVenda()));

@@ -21,7 +21,7 @@ public class ItemPedidoJson {
     private final String valorPedido;
     private final String valorPedidoIPI;
     private final String aliquotaICMS;
-    private final int aliquotaIPI;
+    private final String aliquotaIPI;
     private final String descricaoItemPedido;
 
     public ItemPedidoJson(ItemPedido itemPedido) {
@@ -48,7 +48,7 @@ public class ItemPedidoJson {
                 ? itemPedido.getPedido().getValorPedidoIPIFormatado() : "";
         descricaoItemPedido = itemPedido.getDescricao();
         aliquotaICMS = itemPedido.getAliquotaICMSFormatado();
-        aliquotaIPI = itemPedido.getAliquotaIPI();
+        aliquotaIPI = itemPedido.getAliquotaIPIFormatado();
     }
 
     public Integer getId() {
@@ -127,7 +127,7 @@ public class ItemPedidoJson {
         return precoItem;
     }
 
-    public int getAliquotaIPI() {
+    public String getAliquotaIPI() {
         return aliquotaIPI;
     }
 }

@@ -25,8 +25,8 @@ public enum FormaMaterial {
 		return this.ipi;
 	}
 	
-	public double getIpiPercentual() {
-		return this.getIpi() * 100;
+	public int getIpiPercentual() {
+		return (int)(this.getIpi() * 100);
 	}
 	
 	public boolean contemLargura(){

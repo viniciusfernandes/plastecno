@@ -7,7 +7,6 @@ import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.util.NumeroUtils;
 
 public class CalculadoraPreco {
     private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgoritmo;

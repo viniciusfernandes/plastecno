@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 import br.com.plastecno.vendas.relatorio.conversor.exception.ConversaoHTML2PDFException;
 
@@ -30,6 +31,7 @@ final class ConversorHTML2PDF {
         PdfWriter writer = null;
         try {
             writer = PdfWriter.getInstance(document, outputStream);
+            writer.setLanguage(Locale.getDefault().toString());
         } catch (DocumentException e) {
             throw new ConversaoHTML2PDFException("Não foi possivel gerar o outputstream do arquivo PDF", e);
         }

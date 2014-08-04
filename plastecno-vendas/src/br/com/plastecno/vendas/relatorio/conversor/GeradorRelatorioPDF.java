@@ -5,7 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -42,7 +41,7 @@ public final class GeradorRelatorioPDF {
 
     public byte[] gerarPDF() throws ConversaoHTML2PDFException {
         return html == null || html.length() == 0 ? new byte[0] : conversor.converter(new ByteArrayInputStream(this
-                .gerarHTML().getBytes()));
+                .gerarHTML().getBytes(charset)));
     }
 
     public void processar(File arquivo) throws ConversaoHTML2PDFException {
@@ -64,7 +63,7 @@ public final class GeradorRelatorioPDF {
         // problemas durante o processamento.
         int numLinha = 1;
         try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(arquivo)));
+            reader = gerarBufferedFileReader(arquivo, charset);
 
             while ((linha = reader.readLine()) != null) {
 
@@ -186,6 +185,13 @@ public final class GeradorRelatorioPDF {
         this.addAtributo("conteudoCss", this.css.toString());
     }
 
+    /*
+     * Esse metodo foi implementado para reaproveitamento de codigo para futuros
+     * relatorios exibirem o mesmo cabecalho, mas ainda nao sei o porque ele
+     * esta com problemas no charset, entao removemos a marcacao dele no
+     * relatorio de pedidos.
+     */
+    @Deprecated
     private void addCabecalho(File arquivoCabecalho) throws ConversaoHTML2PDFException {
         this.cabecalho = new StringBuilder();
         copiarConteudo(arquivoCabecalho, this.cabecalho);
@@ -198,12 +204,17 @@ public final class GeradorRelatorioPDF {
         this.addAtributo("conteudoCabecalho", this.cabecalho.toString());
     }
 
-    private void copiarConteudo(File arquivoCSS, StringBuilder conteudo) throws ConversaoHTML2PDFException {
+    private void copiarConteudo(File arquivo, StringBuilder conteudo) throws ConversaoHTML2PDFException {
         BufferedReader reader;
         try {
-            reader = new BufferedReader(new FileReader(arquivoCSS));
+            /*
+             * Aqui nao estamos passando o charset pois o conteudo sera
+             * convertido apenas na etapa final ao fazermos o gerarHTML.
+             */
+
+            reader = gerarBufferedFileReader(arquivo, null);
         } catch (FileNotFoundException e1) {
-            throw new ConversaoHTML2PDFException("Nao foi possivel encontrar o arquivo " + arquivoCSS.getName(), e1);
+            throw new ConversaoHTML2PDFException("Nao foi possivel encontrar o arquivo " + arquivo.getName(), e1);
         }
         String linha = null;
         try {
@@ -211,14 +222,14 @@ public final class GeradorRelatorioPDF {
                 conteudo.append(linha).append("\n");
             }
         } catch (IOException e) {
-            throw new ConversaoHTML2PDFException("Falha na leitura do arquivo " + arquivoCSS.getName(), e);
+            throw new ConversaoHTML2PDFException("Falha na leitura do arquivo " + arquivo.getName(), e);
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
                     throw new ConversaoHTML2PDFException("Falha na liberacao dos recursos na leitura do arquivo "
-                            + arquivoCSS.getName(), e);
+                            + arquivo.getName(), e);
                 }
             }
         }
@@ -232,5 +243,12 @@ public final class GeradorRelatorioPDF {
      */
     private static String limpar(String property) {
         return property.replace("{", "").replace("}", "");
+    }
+
+    private BufferedReader gerarBufferedFileReader(File file, Charset charset) throws FileNotFoundException {
+        if (charset == null) {
+            return new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+        }
+        return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
     }
 }

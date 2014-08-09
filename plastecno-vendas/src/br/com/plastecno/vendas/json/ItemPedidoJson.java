@@ -4,6 +4,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 
 public class ItemPedidoJson {
     private final Integer id;
+    private final Integer sequencial;
     private final Integer idMaterial;
     private final Integer quantidade;
     private final String formaMaterial;
@@ -25,10 +26,11 @@ public class ItemPedidoJson {
     private final String descricaoItemPedido;
 
     public ItemPedidoJson(ItemPedido itemPedido) {
+        id = itemPedido.getId();
+        sequencial = itemPedido.getSequencial();
         comprimento = itemPedido.getComprimento();
         descricaoPeca = itemPedido.getDescricaoPeca();
         formaMaterial = itemPedido.getFormaMaterial() != null ? itemPedido.getFormaMaterial().toString() : "";
-        id = itemPedido.getId();
         idMaterial = itemPedido.getMaterial() != null ? itemPedido.getMaterial().getId() : -1;
         medidaExterna = itemPedido.getMedidaExterna();
         // Caso a barra seja quadrada ambas as medidas serao iguais
@@ -49,6 +51,10 @@ public class ItemPedidoJson {
         descricaoItemPedido = itemPedido.getDescricao();
         aliquotaICMS = itemPedido.getAliquotaICMSFormatado();
         aliquotaIPI = itemPedido.getAliquotaIPIFormatado();
+    }
+
+    public Integer getSequencial() {
+        return sequencial;
     }
 
     public Integer getId() {

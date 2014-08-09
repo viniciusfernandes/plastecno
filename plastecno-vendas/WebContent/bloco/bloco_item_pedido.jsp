@@ -8,6 +8,8 @@
 			
 			<input type="hidden" id="idMaterial" name="itemPedido.material.id" />
 			<input type="hidden" id="idItemPedido" name="itemPedido.id" />
+			<input type="hidden" id="sequencial" name="itemPedido.sequencial" />
+			
 			<input type="hidden" id="precoUnidade" />
 			
 			<div class="label">Tipo de Venda: </div>
@@ -76,6 +78,7 @@
 				<table id="tabelaItemPedido" class="listrada">
 					<thead>
 						<tr>
+							<th style="display: none;">Item</th>
 							<th style="width: 2%">Item</th>
 							<th style="width: 5%">Qtde.</th>
 							<th style="width: 50%">Descrição</th>
@@ -92,7 +95,8 @@
 					<tbody>
 						<c:forEach items="${listaItemPedido}" var="itemPedido" varStatus="status">
 							<tr id="${status.count - 1}">
-								<td>${itemPedido.id}</td>
+								<td style="display: none;">${itemPedido.id}</td>
+								<td>${itemPedido.sequencial}</td>
 								<td class="valorNumerico">${itemPedido.quantidade}</td>
 								<td >${itemPedido.descricao}</td>
 								<td style="text-align: center;">${itemPedido.tipoVenda}</td>

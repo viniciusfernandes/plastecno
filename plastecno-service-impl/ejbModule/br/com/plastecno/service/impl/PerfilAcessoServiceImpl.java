@@ -22,7 +22,7 @@ public class PerfilAcessoServiceImpl implements PerfilAcessoService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<PerfilAcesso> pesquisar() {
-		return this.entityManager.createQuery("SELECT p FROM PerfilAcesso p order by p.descricao ").getResultList();
+		return this.entityManager.createQuery("SELECT p FROM PerfilAcesso p order by p.descricao asc ").getResultList();
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class PerfilAcessoServiceImpl implements PerfilAcessoService {
 		if (listaIdPerfilAcesso == null || listaIdPerfilAcesso.isEmpty()) {
 			return Collections.EMPTY_LIST;
 		} else {
-			Query query = this.entityManager.createQuery("SELECT p FROM PerfilAcesso p where p.id in (:listaIdPerfilAcesso) order by p.descricao ");
+			Query query = this.entityManager.createQuery("SELECT p FROM PerfilAcesso p where p.id in (:listaIdPerfilAcesso) order by p.descricao asc ");
 			query.setParameter("listaIdPerfilAcesso", listaIdPerfilAcesso);
 			return query.getResultList();
 		}

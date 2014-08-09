@@ -154,7 +154,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Cliente> pesquisarClientesAssociados(Integer idVendedor) {
-		return this.entityManager.createQuery("select c from Cliente c where c.vendedor.id = :idVendedor")
+		return this.entityManager.createQuery("select c from Cliente c where c.vendedor.id = :idVendedor order by c.nomeFantasia asc")
 				.setParameter("idVendedor", idVendedor).getResultList();
 		
 	}
@@ -174,7 +174,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Cliente> pesquisarClientesDesassociados() {
-		return this.entityManager.createQuery("select c from Cliente c where c.vendedor = null")
+		return this.entityManager.createQuery("select c from Cliente c where c.vendedor = null order by c.nomeFantasia asc")
 				.getResultList();
 		
 	}
@@ -325,7 +325,8 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Transportadora> pesquisarTransportadorasAssociadas(Integer idCliente) {
-		return this.entityManager.createQuery("select t from Cliente c inner join c.listaRedespacho t where c.id = :idCliente and t.ativo = true ")
+		return this.entityManager.createQuery(
+				"select new Transportadora(t.id, t.nomeFantasia) from Cliente c inner join c.listaRedespacho t where c.id = :idCliente and t.ativo = true order by t.nomeFantasia asc")
 				.setParameter("idCliente", idCliente).getResultList();
 	}
 	
@@ -335,10 +336,11 @@ public class ClienteServiceImpl implements ClienteService {
 		List<Transportadora> listaTransportadora = this.pesquisarTransportadorasAssociadas(idCliente);
 		Query query = null;
 		if (!listaTransportadora.isEmpty()) {
-			query = this.entityManager.createQuery("select t from Transportadora t where t not in (:listaTransportadora) and t.ativo = true ");
+			query = this.entityManager.createQuery(
+					"select new Transportadora(t.id, t.nomeFantasia) from Transportadora t where t not in (:listaTransportadora) and t.ativo = true by t.nomeFantasia asc");
 			query.setParameter("listaTransportadora", listaTransportadora);
 		} else {
-			query = this.entityManager.createQuery("select t from Transportadora t ");
+			query = this.entityManager.createQuery("select new Transportadora(t.id, t.nomeFantasia) from Transportadora t by t.nomeFantasia asc");
 		}
 		return query.getResultList();
 	}

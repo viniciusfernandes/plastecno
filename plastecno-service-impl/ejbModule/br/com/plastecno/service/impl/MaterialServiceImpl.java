@@ -91,7 +91,7 @@ public class MaterialServiceImpl implements MaterialService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Representada> pesquisarRepresentadasAssociadas(Integer idMaterial) {
-		Query query = this.entityManager.createQuery("select r from Material m , IN (m.listaRepresentada) r where  m.id = :id ");
+		Query query = this.entityManager.createQuery("select new Representada(r.id, r.nomeFantasia) from Material m , IN (m.listaRepresentada) r where  m.id = :id order by r.nomeFantasia asc");
 		query.setParameter("id", idMaterial);
 		return query.getResultList();
 	}
@@ -130,7 +130,7 @@ public class MaterialServiceImpl implements MaterialService {
 		List<Representada> listaRepresentada = this.pesquisarRepresentadasAssociadas(idMaterial);
 		Query query = null;
 		if (!listaRepresentada.isEmpty()) {
-			query = this.entityManager.createQuery("select r from Representada r where  r not in (:listaRepresentada)");
+			query = this.entityManager.createQuery("select new Representada(r.id, r.nomeFantasia) from Representada r where  r not in (:listaRepresentada) order by r.nomeFantasia asc");
 			query.setParameter("listaRepresentada", listaRepresentada);
 		} else {
 			query = this.entityManager.createQuery("select r from Representada r");

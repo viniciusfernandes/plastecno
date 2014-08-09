@@ -5,9 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -186,6 +184,10 @@ public abstract class AbstractController {
         }
     }
 
+    List<PicklistElement> gerarPicklistElement(){
+        return null;
+    }
+    
     void inicializarPicklist(String tituloBloco, String tituloElementosNaoAssociados, String tituloElementosAssociados,
             String nomeAtributoValor, String nomeAtributoLabel) {
 
@@ -574,11 +576,11 @@ enum TipoOperacao {
 class Picklist {
     private String nomeAtributoLabel;
     private String nomeAtributoValor;
-    private Map<Object, Object> mapaElementosNaoAssociados;
-    private Map<Object, Object> mapaElementosAssociados;
+    private List<PicklistElement> listaElementosNaoAssociados;
+    private List<PicklistElement> listaElementosAssociados;
 
-    private final String associados = "mapaElementosAssociados";
-    private final String naoAssociados = "mapaElementosNaoAssociados";
+    private final String associados = "listaElementosAssociados";
+    private final String naoAssociados = "listaElementosNaoAssociados";
 
     private final Result result;
 
@@ -631,22 +633,24 @@ class Picklist {
                             + "do picklist sao obrigatorios");
         }
 
-        Field chave = null;
         Field valor = null;
+        Field label = null;
         if (elementosNaoAssociados != null) {
-            this.mapaElementosNaoAssociados = new HashMap<Object, Object>();
-
+            
+            this.listaElementosNaoAssociados = new ArrayList<PicklistElement>(30);
+            
             for (Object object : elementosNaoAssociados) {
                 try {
-                    chave = object.getClass().getDeclaredField(this.nomeAtributoValor);
-                    valor = object.getClass().getDeclaredField(this.nomeAtributoLabel);
+                    valor = object.getClass().getDeclaredField(this.nomeAtributoValor);
+                    label = object.getClass().getDeclaredField(this.nomeAtributoLabel);
 
-                    chave.setAccessible(true);
                     valor.setAccessible(true);
-                    this.mapaElementosNaoAssociados.put(chave.get(object), valor.get(object));
-
-                    chave.setAccessible(false);
+                    label.setAccessible(true);
+                    
+                    this.listaElementosNaoAssociados.add(new PicklistElement(valor.get(object), label.get(object)));
+                    
                     valor.setAccessible(false);
+                    label.setAccessible(false);
                 } catch (Exception e) {
                     throw new IllegalStateException(
                             "Não foi possível montar o picklist da tela para os elementos nao associados", e);
@@ -655,18 +659,21 @@ class Picklist {
         }
 
         if (elementosAssociados != null) {
-            this.mapaElementosAssociados = new HashMap<Object, Object>();
+            
+            this.listaElementosAssociados = new ArrayList<PicklistElement>(30);
+            
             for (Object object : elementosAssociados) {
                 try {
-                    chave = object.getClass().getDeclaredField(this.nomeAtributoValor);
-                    valor = object.getClass().getDeclaredField(this.nomeAtributoLabel);
+                    valor = object.getClass().getDeclaredField(this.nomeAtributoValor);
+                    label = object.getClass().getDeclaredField(this.nomeAtributoLabel);
 
-                    chave.setAccessible(true);
                     valor.setAccessible(true);
-                    this.mapaElementosAssociados.put(chave.get(object), valor.get(object));
-
-                    chave.setAccessible(false);
+                    label.setAccessible(true);
+                    
+                    this.listaElementosAssociados.add(new PicklistElement(valor.get(object), label.get(object)));
+                    
                     valor.setAccessible(false);
+                    label.setAccessible(false);
                 } catch (Exception e) {
                     throw new IllegalStateException(
                             "Não foi possível montar o picklist da tela para os elementos associados", e);
@@ -674,7 +681,9 @@ class Picklist {
             }
         }
 
-        this.result.include(naoAssociados, this.mapaElementosNaoAssociados);
-        this.result.include(associados, this.mapaElementosAssociados);
+        this.result.include(naoAssociados, this.listaElementosNaoAssociados);
+        this.result.include(associados, this.listaElementosAssociados);
     }
 }
+
+

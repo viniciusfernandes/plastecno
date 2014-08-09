@@ -209,7 +209,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<PerfilAcesso> pesquisarPerfisAssociados(Integer id) {
-		Query query = this.entityManager.createQuery("select p from Usuario u , IN (u.listaPerfilAcesso) p where  u.id = :id ");
+		Query query = this.entityManager.createQuery("select p from Usuario u , IN (u.listaPerfilAcesso) p where  u.id = :id order by p.descricao asc");
 		query.setParameter("id", id);
 		return query.getResultList();
 	}
@@ -220,7 +220,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		List<PerfilAcesso> listaPerfil = this.pesquisarPerfisAssociados(id);
 		Query query = null;
 		if (!listaPerfil.isEmpty()) {
-			query = this.entityManager.createQuery("select p from PerfilAcesso p where  p not in (:listaPerfil)");
+			query = this.entityManager.createQuery("select p from PerfilAcesso p where  p not in (:listaPerfil) order by p.descricao asc");
 			query.setParameter("listaPerfil", listaPerfil);
 		} else {
 			query = this.entityManager.createQuery("select p from PerfilAcesso p ");

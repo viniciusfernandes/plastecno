@@ -89,6 +89,8 @@ public class ItemPedido implements Serializable, Cloneable {
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao pedido")
 	private Material material;
 
+	private Integer sequencial;
+
 	@Transient
 	private String precoUnidadeFormatado;
 
@@ -121,6 +123,14 @@ public class ItemPedido implements Serializable, Cloneable {
 
 	public ItemPedido(FormaMaterial formaMaterial) {
 		this.formaMaterial = formaMaterial;
+	}
+
+	public Integer getSequencial() {
+		return sequencial;
+	}
+
+	public void setSequencial(Integer sequencial) {
+		this.sequencial = sequencial;
 	}
 
 	public Integer getId() {
@@ -273,6 +283,10 @@ public class ItemPedido implements Serializable, Cloneable {
 		return descricao.toString();
 	}
 
+	public boolean isNovo() {
+		return this.id == null;
+	}
+	
 	public boolean isPeca() {
 		return FormaMaterial.PC.equals(this.formaMaterial);
 	}

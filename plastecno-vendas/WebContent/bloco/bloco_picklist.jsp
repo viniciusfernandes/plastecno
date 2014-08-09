@@ -16,8 +16,8 @@
 		<div class="tituloElementos">${labelElementosNaoAssociados}:</div>
 		<div class="input" style="width: 100%">
 			<select id="SelectList" size="8" multiple="multiple" style="width: 100%">
-				<c:forEach var="elemento" items="${mapaElementosNaoAssociados}">
-					<option value="${elemento.key}">${elemento.value}</option>
+				<c:forEach var="elemento" items="${listaElementosNaoAssociados}">
+					<option value="${elemento.valor}">${elemento.label}</option>
 				</c:forEach>
 			</select>
 		</div>
@@ -32,8 +32,8 @@
 		<div class="tituloElementos <c:if test="${preenchimentoPicklistObrigatorio}">obrigatorio</c:if>">${labelElementosAssociados}:</div>
 		<div class="input" style="width: 100%">
 			<select id="PickList" size="8" multiple="multiple" style="width: 100%;">
-				<c:forEach var="elemento" items="${mapaElementosAssociados}">
-					<option value="${elemento.key}">${elemento.value}</option>
+				<c:forEach var="elemento" items="${listaElementosAssociados}">
+					<option value="${elemento.valor}">${elemento.label}</option>
 				</c:forEach>
 			</select>
 		</div>

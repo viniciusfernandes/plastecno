@@ -2,7 +2,7 @@ var tabelaItemHandler = null;
 
 function inicializarBlocoItemPedido(urlTela) {
 	
-	var TOTAL_COLUNAS_ITEM_PEDIDO = 9;
+	var TOTAL_COLUNAS_ITEM_PEDIDO = 10;
 	
 	tabelaItemHandler = new BlocoTabelaHandler(urlTela, 'ItemPedido',
 			'tabelaItemPedido', 'bloco_item_pedido');
@@ -29,13 +29,20 @@ function inicializarBlocoItemPedido(urlTela) {
 					case 0:
 						celula.innerHTML = $('#bloco_item_pedido #idItemPedido')
 								.val();
+						
+						celula.style.display="none";
+						break;
+						
+					case 1:
+						celula.innerHTML = $('#bloco_item_pedido #sequencial')
+								.val();
 						break;
 
-					case 1:
+					case 2:
 						celula.innerHTML = $('#bloco_item_pedido #quantidade')
 								.val();
 						break;
-					case 2:
+					case 3:
 						/*
 						 * Esse item foi recuperado o json retornado pelo
 						 * controller pois assim teremos e que eh identica ao
@@ -45,31 +52,31 @@ function inicializarBlocoItemPedido(urlTela) {
 								'#bloco_item_pedido #descricaoItemPedido')
 								.val();
 						break;
-					case 3:
+					case 4:
 						// Pegando o valor que foi escolhido no ragio group do
 						// tipo de vendas
 						celula.innerHTML = $(
 								"#bloco_item_pedido input[type='radio']:checked")
 								.val();
 						break;
-					case 4:
+					case 5:
 						celula.innerHTML = $("#bloco_item_pedido #precoVenda")
 								.val();
 						break;
-					case 5:
+					case 6:
 						celula.innerHTML = $("#bloco_item_pedido #precoUnidade")
 								.val();
 						break;
 
-					case 6:
+					case 7:
 						celula.innerHTML = $("#bloco_item_pedido #precoItem").val();
 						break;
 						
-					case 7:
+					case 8:
 						celula.innerHTML = $("#bloco_item_pedido #aliquotaIPI").val();
 						break;
 					
-					case 8:
+					case 9:
 						celula.innerHTML = $("#bloco_item_pedido #aliquotaICMS")
 								.val();
 						break;
@@ -89,6 +96,8 @@ function inicializarBlocoItemPedido(urlTela) {
 				request.done(function(response) {
 					var itemPedidoJson = response.itemPedido;
 					$('#idItemPedido').val(itemPedidoJson.id);
+					$('#sequencial').val(itemPedidoJson.sequencial);
+					
 					$('#formaMaterial').val(itemPedidoJson.formaMaterial);
 
 					if (itemPedidoJson.vendaKilo) {
@@ -108,7 +117,7 @@ function inicializarBlocoItemPedido(urlTela) {
 					$('#descricao').val(itemPedidoJson.descricaoPeca);
 					$('#aliquotaICMS').val(itemPedidoJson.aliquotaICMS);
 					$('#aliquotaIPI').val(itemPedidoJson.aliquotaIPI);
-
+					
 					habilitarPreenchimentoPeca(itemPedidoJson.peca);
 				});
 

@@ -81,6 +81,15 @@ public class Representada implements Serializable {
 	private TipoApresentacaoIPI tipoApresentacaoIPI = TipoApresentacaoIPI.NUNCA;
 	
 	
+	public Representada(){}
+	
+	
+	
+	public Representada(Integer id, String nomeFantasia) {
+		this.id = id;
+		this.nomeFantasia = nomeFantasia;
+	}
+
 	public Integer getId() {
 		return id;
 	}

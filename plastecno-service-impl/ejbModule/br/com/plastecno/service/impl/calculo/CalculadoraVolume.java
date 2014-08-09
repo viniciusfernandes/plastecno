@@ -30,7 +30,7 @@ public class CalculadoraVolume {
 		
 		AlgoritmoCalculo algoritmoCalculo = mapaAlgoritmo.get(itemPedido.getFormaMaterial());
 		if (algoritmoCalculo == null) {
-			throw new AlgoritmoCalculoException("Não  existe algoritmo para o calculo de volume da forma de material "+itemPedido.getFormaMaterial());
+			throw new AlgoritmoCalculoException("Não existe algoritmo para o calculo de volume da forma de material "+itemPedido.getFormaMaterial());
 		}
 		return algoritmoCalculo.calcular(itemPedido);
 	}

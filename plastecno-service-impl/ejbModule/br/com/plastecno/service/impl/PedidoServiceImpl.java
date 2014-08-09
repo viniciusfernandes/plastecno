@@ -377,7 +377,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemPedidoByIdPedido (Integer idPedido) {
-		Query query = this.entityManager.createQuery("select i from ItemPedido i where i.pedido.id = :idPedido order by i.id desc ");
+		Query query = this.entityManager.createQuery("select i from ItemPedido i where i.pedido.id = :idPedido order by i.sequencial asc ");
 		query.setParameter("idPedido", idPedido);
 		return query.getResultList();
 	}
@@ -409,7 +409,9 @@ public class PedidoServiceImpl implements PedidoService {
 		try {
 		itemPedido = (ItemPedido) this.entityManager.createQuery("select i from ItemPedido i join fetch i.pedido where i.id = :idItemPedido")
 				.setParameter("idItemPedido", idItemPedido).getSingleResult();
+		
 		Pedido pedido = itemPedido.getPedido();
+		alterarSequencialItemPedido(pedido.getId(), itemPedido.getSequencial());
 		
 		this.entityManager.remove(itemPedido);
 		
@@ -493,6 +495,16 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		itemPedido.setAliquotaIPI(aliquotaIPI);
 		
+		/*
+		 * O valor sequencial sera utilizado para que a representada identifique rapidamento qual eh o item que deve ser 
+		 * customizado, assim o vendedor podera fazer referencias ao item no campo de observacao, por exemplo: o item 1 
+		 * deve ter acabamento, etc.
+		 */
+		if(itemPedido.isNovo()) {
+			itemPedido.setSequencial(gerarSequencialItemPedido(idPedido));			
+		}
+		
+		
 		ValidadorInformacao.validar(itemPedido);
 		itemPedido = this.entityManager.merge(itemPedido);
 
@@ -502,6 +514,8 @@ public class PedidoServiceImpl implements PedidoService {
 		 */
 		pedido.setValorPedido(this.calcularValorPedido(idPedido));
 		pedido.setValorPedidoIPI(this.calcularValorPedidoIPI(idPedido));
+		
+		
 		return itemPedido.getId();
 	}
 	
@@ -666,5 +680,36 @@ public class PedidoServiceImpl implements PedidoService {
 		pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
 		this.inserir(pedido);
 		return pedidoClone.getId();
+	}
+	
+	private Integer gerarSequencialItemPedido(Integer idPedido) {
+		Integer seq = (Integer) entityManager.createQuery("select max(i.sequencial) from ItemPedido i where i.pedido.id = :idPedido")
+				.setParameter("idPedido", idPedido).getSingleResult();
+		return seq == null ? 1 : ++seq;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void alterarSequencialItemPedido(Integer idPedido,
+			Integer sequencial) {
+		if (sequencial != null && sequencial > 0) {
+
+			List<Object[]> resultados = entityManager
+					.createQuery(
+							"select i.id, i.sequencial from ItemPedido i where i.pedido.id = :idPedido")
+					.setParameter("idPedido", idPedido).getResultList();
+			Integer novaSeq = null;
+			Integer id = null;
+			for (Object[] array : resultados) {
+				id = (Integer) array[0];
+				novaSeq = (Integer) array[1];
+				entityManager
+					.createQuery("update ItemPedido i set i.sequencial = :novaSeq where i.id = :id and i.sequencial >= :sequencial")
+						.setParameter("novaSeq", --novaSeq)	
+						.setParameter("id", id)
+						.setParameter("sequencial", sequencial)
+						.executeUpdate();
+			}
+
+		}
 	}
 }

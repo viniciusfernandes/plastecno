@@ -46,7 +46,7 @@ public class TransportadoraServiceImpl implements TransportadoraService {
     @Override
     public List<Transportadora> pesquisarByNomeFantasia(String nomeFantasia) {
         Query query = this.entityManager
-                .createQuery("select new Transportadora(c.id, c.nomeFantasia) from Transportadora c where c.nomeFantasia like :nomeFantasia order by c.nomeFantasia ");
+                .createQuery("select new Transportadora(c.id, c.nomeFantasia) from Transportadora c where c.nomeFantasia like :nomeFantasia order by c.nomeFantasia asc ");
         query.setParameter("nomeFantasia", "%" + nomeFantasia + "%");
         return query.getResultList();
     }
@@ -63,7 +63,7 @@ public class TransportadoraServiceImpl implements TransportadoraService {
     public List<Transportadora> pesquisarTransportadoraByIdCliente(Integer idCliente) {
         return this.entityManager
                 .createQuery(
-                        "select new Transportadora(t.id, t.nomeFantasia) from Cliente c inner join c.listaRedespacho t where c.id = :idCliente ")
+                        "select new Transportadora(t.id, t.nomeFantasia) from Cliente c inner join c.listaRedespacho t where c.id = :idCliente order by t.nomeFantasia asc ")
                 .setParameter("idCliente", idCliente).getResultList();
     }
 
@@ -135,14 +135,14 @@ public class TransportadoraServiceImpl implements TransportadoraService {
     @Override
     public Transportadora pesquisarById(Integer id) {
         return QueryUtil
-                .gerarRegistroUnico(this.entityManager.createQuery("select m from Transportadora m where m.id =:id")
+                .gerarRegistroUnico(this.entityManager.createQuery("select m from Transportadora m where m.id =:id ")
                         .setParameter("id", id), Transportadora.class, null);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Transportadora> pesquisarById(List<Integer> listaId) {
-        return this.entityManager.createQuery("select m from Transportadora m where m.id in (:listaId)")
+        return this.entityManager.createQuery("select m from Transportadora m where m.id in (:listaId) order by m.nomeFantasia asc")
                 .setParameter("listaId", listaId).getResultList();
     }
 

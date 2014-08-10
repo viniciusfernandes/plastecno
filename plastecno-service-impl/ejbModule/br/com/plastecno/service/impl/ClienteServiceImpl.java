@@ -9,8 +9,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -20,14 +18,16 @@ import br.com.plastecno.service.ConfiguracaoSistemaService;
 import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
+import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.GenericDAO;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ComentarioCliente;
 import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.LogradouroCliente;
-import br.com.plastecno.service.entity.ObservacaoCliente;
 import br.com.plastecno.service.entity.Transportadora;
+import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
@@ -52,6 +52,9 @@ public class ClienteServiceImpl implements ClienteService {
 	
 	@EJB
 	private EnderecamentoService enderecamentoService;
+	
+	@EJB
+	private UsuarioService usuarioService;
 	
 	private GenericDAO genericDAO;
 	
@@ -464,9 +467,30 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ObservacaoCliente> pesquisarObservacaoCliente(Integer idCliente) {
-		// TODO Auto-generated method stub
-		return null;
+	public void inserirComentario(Integer idCliente, String comentario)
+			throws BusinessException {
+		Cliente cliente = pesquisarById(idCliente);
+		Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(idCliente);
+
+		ComentarioCliente comentarioCliente = new ComentarioCliente();
+		comentarioCliente.setCliente(cliente);
+		comentarioCliente.setVendedor(vendedor);
+		comentarioCliente.setDataInclusao(new Date());
+		comentarioCliente.setConteudo(comentario);
+
+		ValidadorInformacao.validar(comentarioCliente);
+		entityManager.persist(comentarioCliente);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<ComentarioCliente> pesquisarComentarioByIdCliente(
+			Integer idCliente) {
+		return (List<ComentarioCliente>) entityManager
+				.createQuery(
+						"select new ComentarioCliente (c.dataInclusao, c.conteudo, v.nome, v.sobrenome) from ComentarioCliente c "
+						+" inner join c.vendedor v where c.cliente.id = :idCliente order by c.dataInclusao desc"
+						)
+				.setParameter("idCliente", idCliente).getResultList();
 	}
 }

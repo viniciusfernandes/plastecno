@@ -1,8 +1,6 @@
 package br.com.plastecno.service.entity;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -30,9 +28,7 @@ public class ComentarioCliente implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 422899612343389268L;
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
-			"dd/MM/yyyy");
-
+	
 	@Id
 	@SequenceGenerator(name = "clienteComentarioSequence", sequenceName = "vendas.seq_comentario_cliente_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clienteComentarioSequence")

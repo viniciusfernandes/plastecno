@@ -107,6 +107,9 @@ public class Cliente implements Serializable {
 	
 	public Cliente () {}
 	
+	/*
+	 * Construtor para popular o picklist da tela de vendedor
+	 */
 	public Cliente(Integer id, String nomeFantasia) {
 		this.id = id;
 		this.nomeFantasia = nomeFantasia;

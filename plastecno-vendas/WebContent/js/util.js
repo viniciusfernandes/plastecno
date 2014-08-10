@@ -297,4 +297,21 @@ function gerarData(data) {
 	}
 	var array = data.split('/');
 	return new Date(array[2], array[1], array[0], 0, 0, 0, 0);
-}
+};
+
+function gerarListaParametroId (listaId, nomeLista){
+	
+	var parametros = '';
+	
+	// Vamo iniciar de i=1 pois devemos pular o header da tabela
+	var NUMERO_REGISTROS = listaId.length;
+	var index = NUMERO_REGISTROS - 1;
+	for (var i = 0; i < NUMERO_REGISTROS; i++) {
+		// Estamos subtraindo 1 do indice da lista pois desconsideramos o header da tabela
+		parametros += nomeLista+"[]="+listaId[i];
+		if(i < index){
+			parametros += '&';	
+		}
+	}
+	return parametros;
+};

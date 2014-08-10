@@ -47,6 +47,8 @@ $(document).ready(function() {
 	inicializarPaginador(
 			'<c:out value="${not empty paginaSelecionada ? paginaSelecionada : 0}"/>', 
 			'<c:out value="${not empty totalPaginas ? totalPaginas : 1}"/>');
+	
+	new PickList().initPickList();
 
 });
 

@@ -26,6 +26,7 @@
 
 <script type="text/javascript">
 
+
 var tabelaLogradouroHandler = null;
 var tabelaContatoHandler = null; 
 
@@ -76,7 +77,7 @@ $(document).ready(function() {
 	tabelaLogradouroHandler = inicializarBlocoLogradouro(urlTela);
 	tabelaContatoHandler = inicializarBlocoContato(urlTela);
 	
-	
+	new PickList().initPickList();
 
 });
 

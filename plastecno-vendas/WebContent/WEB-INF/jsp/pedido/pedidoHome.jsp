@@ -12,7 +12,6 @@
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/botao.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/formulario.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/paginacao.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/picklist.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/autocomplete.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/jquery-ui-1.10.3.custom.min.css"/>" />
 
@@ -20,7 +19,6 @@
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>

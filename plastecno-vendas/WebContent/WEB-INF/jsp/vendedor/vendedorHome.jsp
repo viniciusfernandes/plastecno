@@ -24,7 +24,6 @@
 
 
 <script type="text/javascript">
-var picklistCliente = new PickList();
 
 $(document).ready(function() {
 	scrollTo('${ancora}');
@@ -47,6 +46,7 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
+	var picklistCliente = new PickList();
 	picklistCliente.initPickList();
 	
 	picklistCliente.onAddItem = function(listaId) {

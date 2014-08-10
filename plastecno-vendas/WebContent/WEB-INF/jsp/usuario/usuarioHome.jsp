@@ -80,6 +80,8 @@ $(document).ready(function() {
 			'<c:out value="${not empty totalPaginas ? totalPaginas : 1}"/>');
 	tabelaContatoHandler = inicializarBlocoContato('<c:url value="/usuario"/>');
 	
+	new PickList().initPickList();
+	
 });
 
 function inicializarFiltro () {

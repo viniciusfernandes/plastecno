@@ -110,10 +110,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado) throws BusinessException {
 		this.verificarVendedorAtivo(idVendedor);
 		
-		this.entityManager.createQuery("update Cliente c set c.vendedor = null where c.vendedor.id = :idVendedor")
-		.setParameter("idVendedor", idVendedor)
-		.executeUpdate();
-		
 		this.entityManager.createQuery("update Cliente c set c.vendedor.id = :idVendedor where c.id in (:listaIdClienteAssociado)")
 			.setParameter("idVendedor", idVendedor)
 			.setParameter("listaIdClienteAssociado", listaIdClienteAssociado)

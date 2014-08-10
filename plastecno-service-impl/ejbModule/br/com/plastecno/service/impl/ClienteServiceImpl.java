@@ -154,7 +154,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Cliente> pesquisarClientesAssociados(Integer idVendedor) {
-		return this.entityManager.createQuery("select c from Cliente c where c.vendedor.id = :idVendedor order by c.nomeFantasia asc")
+		return this.entityManager.createQuery("select new Cliente(c.id, c.nomeFantasia) from Cliente c where c.vendedor.id = :idVendedor order by c.nomeFantasia asc")
 				.setParameter("idVendedor", idVendedor).getResultList();
 		
 	}
@@ -174,7 +174,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Cliente> pesquisarClientesDesassociados() {
-		return this.entityManager.createQuery("select c from Cliente c where c.vendedor = null order by c.nomeFantasia asc")
+		return this.entityManager.createQuery("select new Cliente(c.id, c.nomeFantasia) from Cliente c where c.vendedor = null order by c.nomeFantasia asc")
 				.getResultList();
 		
 	}

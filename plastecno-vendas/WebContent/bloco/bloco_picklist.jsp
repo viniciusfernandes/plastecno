@@ -24,8 +24,8 @@
 	</div>
 
 	<div class="blocoBotoesPicklist picklist">
-		<div id="botaoAdicionarPicklist" title="Associar Elemento" class="botaoAdicionarPicklist" onclick="addIt();"></div>
-		<div id="botaoRemoverPicklist" title="Remover Associacao" class="botaoRemoverPicklist" onclick="delIt()"></div>
+		<div id="botaoAdicionarPicklist" title="Associar Elemento" class="botaoAdicionarPicklist" ></div>
+		<div id="botaoRemoverPicklist" title="Remover Associacao" class="botaoRemoverPicklist" ></div>
 	</div>
 
 	<div class="picklist" style="width: 33%">

@@ -24,6 +24,7 @@
 
 
 <script type="text/javascript">
+var picklistCliente = new PickList();
 
 $(document).ready(function() {
 	scrollTo('${ancora}');
@@ -45,6 +46,24 @@ $(document).ready(function() {
 	$("#botaoLimpar").click(function() {
 		$('#formVazio').submit();
 	});
+	
+	picklistCliente.initPickList();
+	
+	picklistCliente.onAddItem = function(listaId) {
+		if(listaId != undefined && listaId.length > 0) {
+			var parametros = gerarListaParametroId(listaId, 'listaIdClienteAssociado');
+			$('#formVendedor').attr("action",action='vendedor/associacaocliente?'+ parametros);
+			$('#formVendedor').submit();
+		}
+	};
+	
+	picklistCliente.onDelItem = function(listaId) {
+		if(listaId != undefined && listaId.length > 0) {
+			var parametros = gerarListaParametroId(listaId, 'listaIdClienteDesassociado');
+			$('#formVendedor').attr("action",'vendedor/desassociacaocliente?'+ parametros);
+			$('#formVendedor').submit();	
+		}
+	};
 	
 	inserirMascaraCPF('cpf');
 	inicializarPaginador(
@@ -119,12 +138,6 @@ function remover(codigo, sigla) {
 		</div>
 
 	<jsp:include page="/bloco/bloco_picklist.jsp" />
-
-	<div class="bloco_botoes">
-		<c:if test="${acessoDistribuicaoClientePermitido}">
-			<a id="botaoAssociarCliente" title="Associar Cliente aos Dados do Vendedor" class="botaoInserir"></a>
-		</c:if>
-	</div>
 
 	<a id="rodape"></a>
 	<fieldset>

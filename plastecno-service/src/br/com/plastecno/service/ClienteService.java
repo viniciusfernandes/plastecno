@@ -6,9 +6,9 @@ import java.util.List;
 import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ComentarioCliente;
 import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.LogradouroCliente;
-import br.com.plastecno.service.entity.ObservacaoCliente;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -78,5 +78,7 @@ public interface ClienteService {
 
     List<Cliente> pesquisarByRamoAtividade(Integer idRamoAtividade);
 
-    List<ObservacaoCliente> pesquisarObservacaoCliente(Integer idCliente);
+	void inserirComentario(Integer idCliente, String comentario) throws BusinessException;
+
+	List<ComentarioCliente> pesquisarComentarioByIdCliente(Integer idCliente);
 }

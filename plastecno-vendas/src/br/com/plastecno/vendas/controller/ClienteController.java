@@ -12,12 +12,14 @@ import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ComentarioCliente;
 import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
+import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.controller.exception.ControllerException;
 import br.com.plastecno.vendas.json.SerializacaoJson;
@@ -60,6 +62,24 @@ public final class ClienteController extends AbstractController {
         this.liberarAcesso("acessoInclusaoPermitido", isInclusaoCliente || isVendedorIgual);
     }
 
+    @Post("cliente/inclusao/comentario")
+    public void inserirComentario(Integer idCliente, String comentario) {
+
+        if (idCliente == null) {
+            gerarListaMensagemErro("Para inserir um comentário é necessário escolher um cliente.");
+            irTopoPagina();
+        } else {
+            try {
+                clienteService.inserirComentario(idCliente, comentario);
+                this.gerarMensagemSucesso("Comentário sonre o cliente No. " + idCliente + " inserido com sucesso.");
+            } catch (BusinessException e) {
+                gerarListaMensagemErro(e);
+                addAtributo("comentario", comentario);
+            }
+            pesquisarClienteById(idCliente);
+        }
+    }
+
     @Get("cliente/transportadora")
     public void pesquisarTransportadoraByNomeFantasia(String nomeFantasia) {
         final List<Autocomplete> listaResultado = new ArrayList<Autocomplete>();
@@ -94,7 +114,7 @@ public final class ClienteController extends AbstractController {
                 : "");
         addAtributo("listaLogradouro", this.clienteService.pesquisarLogradouro(idCliente));
         addAtributo("listaContato", this.clienteService.pesquisarContato(idCliente));
-
+        addAtributo("comentarios", formatarComentarios(idCliente));
         irTopoPagina();
     }
 
@@ -180,5 +200,23 @@ public final class ClienteController extends AbstractController {
 
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaCliente");
         addAtributo("cliente", filtro);
+    }
+
+    private String formatarComentarios(Integer idCliente) {
+        List<ComentarioCliente> listaComentario = this.clienteService
+                .pesquisarComentarioByIdCliente(idCliente);
+        StringBuilder concat = new StringBuilder();
+        for (ComentarioCliente comentarioCliente : listaComentario) {
+            concat.append("\n");
+            concat.append(StringUtils.formatarData(comentarioCliente.getDataInclusao()));
+            concat.append(" - ");
+            concat.append(comentarioCliente.getNomeVendedor());
+            concat.append(" ");
+            concat.append(comentarioCliente.getSobrenomeVendedor());
+            concat.append(" - ");
+            concat.append(comentarioCliente.getConteudo());
+            concat.append("\n");
+        }
+        return concat.toString();
     }
 }

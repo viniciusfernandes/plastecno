@@ -10,6 +10,7 @@
 		<class>br.com.plastecno.service.entity.Cidade</class>
 		<class>br.com.plastecno.service.entity.Cliente</class>
 		<class>br.com.plastecno.service.entity.Contato</class>
+		<class>br.com.plastecno.service.entity.ComentarioCliente</class>
 		<class>br.com.plastecno.service.entity.ContatoCliente</class>
 		<class>br.com.plastecno.service.entity.ContatoRepresentada</class>
 		<class>br.com.plastecno.service.entity.ContatoTransportadora</class>
@@ -33,7 +34,7 @@
 		
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />	
-			<property name = "hibernate.show_sql" value = "false" />		
+			<property name = "hibernate.show_sql" value = "true" />		
 		</properties>
 	</persistence-unit>
 </persistence>

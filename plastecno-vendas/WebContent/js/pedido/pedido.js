@@ -351,6 +351,13 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 				 * edicao do item
 				 */
 				$('#bloco_item_pedido #idItemPedido').val(itemPedido.id);
+				
+				/*
+				 * O sequencial eh o indicador de qual item o vendedor esta atuando assim pode
+				 * fazer referencia a esse item no campo de observacao.
+				 */
+				$('#bloco_item_pedido #sequencial').val(itemPedido.sequencial);
+				
 				/*
 				 * Aqui o campo de representada sera desabilitado e nao sera
 				 * enviado na submissao do formulario, por isso criamos um campo

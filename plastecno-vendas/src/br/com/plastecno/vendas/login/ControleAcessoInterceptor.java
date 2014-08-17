@@ -3,6 +3,8 @@ package br.com.plastecno.vendas.login;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Intercepts;
 import br.com.caelum.vraptor.Path;
@@ -22,10 +24,12 @@ public class ControleAcessoInterceptor implements Interceptor {
     private Result result;
     private UsuarioInfo usuarioInfo;
     private Logger logger = Logger.getLogger(this.getClass().getSimpleName());
+    private final boolean auditoriaHabilidata;
 
-    public ControleAcessoInterceptor(Result result, UsuarioInfo usuarioInfo) {
+    public ControleAcessoInterceptor(Result result, UsuarioInfo usuarioInfo, HttpServletRequest request) {
         this.result = result;
         this.usuarioInfo = usuarioInfo;
+        auditoriaHabilidata = Boolean.parseBoolean(request.getServletContext().getInitParameter("auditoriaHabilidata"));
     }
 
     @Override
@@ -44,7 +48,7 @@ public class ControleAcessoInterceptor implements Interceptor {
             this.result.forwardTo(LoginController.class).redirecionarLogin();
         }
 
-        if (logger.isLoggable(Level.FINE)) {
+        if (auditoriaHabilidata) {
             Get get = null;
             Post post = null;
             Path path = null;

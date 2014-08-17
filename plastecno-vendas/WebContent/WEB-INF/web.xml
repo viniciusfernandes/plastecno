@@ -4,6 +4,10 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	id="WebApp_ID" version="2.5">
 	<display-name>plastecno-vendas</display-name>
+	<context-param>
+		<param-name>auditoriaHabilidata</param-name>
+		<param-value>false</param-value>
+	</context-param>
 	<filter>
 		<filter-name>vraptor</filter-name>
 		<filter-class>br.com.caelum.vraptor.VRaptor</filter-class>

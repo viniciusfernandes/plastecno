@@ -17,11 +17,10 @@ import br.com.plastecno.service.entity.Usuario;
 public class UsuarioInfo {
 
     private Integer codigoUsuario;
-    private Date dataAutenticacao;
     private boolean usuarioLogado = false;
     private List<TipoAcesso> listaTipoAcesso;
-    private String descricaoLogin;
     private boolean vendaPermitida;
+    private String nomeCompleto;
 
     public void inicializar(Usuario usuario) {
         if (usuario == null) {
@@ -30,7 +29,7 @@ public class UsuarioInfo {
 
         this.codigoUsuario = usuario.getId();
         this.vendaPermitida = usuario.isVendedorAtivo();
-        this.dataAutenticacao = new Date();
+        this.nomeCompleto = usuario.getNomeCompleto();
         this.usuarioLogado = true;
         this.listaTipoAcesso = new ArrayList<TipoAcesso>();
 
@@ -44,8 +43,6 @@ public class UsuarioInfo {
             }
         }
 
-        this.descricaoLogin = usuario.getNomeCompleto() + " - "
-                + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(dataAutenticacao);
     }
 
     public boolean isVendaPermitida() {
@@ -58,12 +55,7 @@ public class UsuarioInfo {
 
     public void limpar() {
         this.usuarioLogado = false;
-        this.dataAutenticacao = null;
         this.listaTipoAcesso = null;
-    }
-
-    public Date getDataAutenticacao() {
-        return dataAutenticacao;
     }
 
     public Integer getCodigoUsuario() {
@@ -71,7 +63,7 @@ public class UsuarioInfo {
     }
 
     public String getDescricaoLogin() {
-        return this.descricaoLogin;
+        return nomeCompleto + " - " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date());
     }
 
     public boolean isAcessoPermitido(TipoAcesso... tipoAcesso) {

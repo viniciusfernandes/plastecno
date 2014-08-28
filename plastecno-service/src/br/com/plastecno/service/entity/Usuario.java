@@ -69,7 +69,7 @@ public class Usuario implements Serializable {
 		this.sobrenome = sobrenome;
 	}
 
-	@ManyToMany(fetch=FetchType.EAGER)
+	@ManyToMany(fetch=FetchType.LAZY)
 	@JoinTable(name="tb_usuario_tb_perfil_acesso", schema="vendas", 
 			joinColumns={@JoinColumn(name="id_usuario")}, 
 			inverseJoinColumns={@JoinColumn(name="id_perfil_acesso")})

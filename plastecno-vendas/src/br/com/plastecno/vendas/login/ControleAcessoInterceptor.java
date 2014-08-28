@@ -17,8 +17,13 @@ import br.com.caelum.vraptor.resource.ResourceMethod;
 import br.com.plastecno.vendas.controller.LoginController;
 import br.com.plastecno.vendas.controller.anotacao.Login;
 
-@Intercepts
+/*
+ * Consideramos como escopo de sessao pois em qualquer momento que fosse
+ * disparado um ajax os recursos serao interceptados podem impactar na
+ * performance.
+ */
 @SessionScoped
+@Intercepts
 public class ControleAcessoInterceptor implements Interceptor {
 
     private Result result;

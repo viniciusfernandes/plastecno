@@ -63,7 +63,7 @@ public class UsuarioInfo {
     }
 
     public String getDescricaoLogin() {
-        return nomeCompleto + " - " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date());
+        return nomeCompleto + " - " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
     }
 
     public boolean isAcessoPermitido(TipoAcesso... tipoAcesso) {

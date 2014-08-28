@@ -72,7 +72,7 @@ public class VendedorController extends AbstractController {
             usuarioService.associarCliente(vendedor.getId(), listaIdClienteAssociado);
             
             gerarMensagemSucesso("Cliente(s) associado(s) com sucesso");
-            redirecTo(this.getClass()).pesquisarVendedor(vendedor.getId());
+            pesquisarVendedor(vendedor.getId());
         } catch (BusinessException e) {
             vendedor.setCpf(formatarCPF(vendedor.getCpf()));
             addAtributo("vendedor", vendedor);
@@ -97,7 +97,7 @@ public class VendedorController extends AbstractController {
             usuarioService.desassociarCliente(vendedor.getId(), listaIdClienteDesassociado);
             
             gerarMensagemSucesso("Cliente(s) desassociado(s) com sucesso");
-            redirecTo(this.getClass()).pesquisarVendedor(vendedor.getId());
+            pesquisarVendedor(vendedor.getId());
         } catch (BusinessException e) {
             vendedor.setCpf(formatarCPF(vendedor.getCpf()));
             addAtributo("vendedor", vendedor);

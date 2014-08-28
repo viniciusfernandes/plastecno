@@ -92,7 +92,7 @@ public class PedidoController extends AbstractController {
         addAtributo("industrializacao", FinalidadePedido.INDUSTRIALIZACAO);
         addAtributo("consumo", FinalidadePedido.CONSUMO);
         addAtributo("revenda", FinalidadePedido.REVENDA);
-        
+
         // verificando se o parametro para desabilitar ja foi incluido em outro
         // fluxo
         if (!contemAtributo("pedidoDesabilitado")) {
@@ -119,20 +119,23 @@ public class PedidoController extends AbstractController {
         }
 
     }
-    
+
     @Post("pedido/refazer")
-    public void refazerPedido(Integer idPedido){
+    public void refazerPedido(Integer idPedido) {
         try {
             Integer idPedidoClone = pedidoService.refazerPedido(idPedido);
             this.pesquisarPedidoById(idPedidoClone);
-            this.gerarMensagemSucesso("Pedido No. " + idPedidoClone + " inserido e refeito a partir do pedido No. "+idPedido);
+            this.gerarMensagemSucesso("Pedido No. " + idPedidoClone + " inserido e refeito a partir do pedido No. "
+                    + idPedido);
+
         } catch (BusinessException e) {
             this.gerarListaMensagemErro(e);
-            this.redirecTo(this.getClass()).pesquisarPedidoById(idPedido);
+            pesquisarPedidoById(idPedido);
         } catch (Exception e) {
-            gerarLogErroRequestAjax("copia do pedido de No. "+idPedido, e);
-            this.redirecTo(this.getClass()).pesquisarPedidoById(idPedido);
+            gerarLogErroRequestAjax("copia do pedido de No. " + idPedido, e);
+            pesquisarPedidoById(idPedido);
         }
+
     }
 
     @Post("pedido/cancelamento")
@@ -347,8 +350,8 @@ public class PedidoController extends AbstractController {
             // pedidos ja enviados
             final boolean acessoCancelamentoPedidoPermitido = SituacaoPedido.ENVIADO.equals(situacao)
                     && !SituacaoPedido.CANCELADO.equals(situacao) && isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
-            
-            final boolean acessoRefazerPedidoPermitido = SituacaoPedido.ENVIADO.equals(situacao) 
+
+            final boolean acessoRefazerPedidoPermitido = SituacaoPedido.ENVIADO.equals(situacao)
                     && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO);
 
             liberarAcesso("pedidoDesabilitado", isPedidoDesabilitado(pedido));
@@ -498,7 +501,7 @@ public class PedidoController extends AbstractController {
         pedido.setListaLogradouro(this.pedidoService.pesquisarLogradouro(idPedido));
 
         final List<ItemPedido> listaItem = this.pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-        
+
         formatarItemPedido(listaItem);
         formatarPedido(pedido);
 
@@ -538,10 +541,11 @@ public class PedidoController extends AbstractController {
 
     private Pedido pesquisarPedido(Integer idPedido) {
         final Pedido pedido = pedidoService.pesquisarById(idPedido);
+        final Integer idVendedor = getCodigoUsuario();
         // Verificando se o usuario que esta tentando acessar os dados do pedido
         // eh o mesmo usuario que efetuou a venda.
-        final boolean pedidoPertenceAoVendedor = pedido != null && pedido.getVendedor() != null
-                && getCodigoUsuario().equals(pedido.getVendedor().getId());
+        final boolean pedidoPertenceAoVendedor = pedido != null && pedido.getVendedor() != null && idVendedor != null
+                && idVendedor.equals(pedido.getVendedor().getId());
         // Verificando se tem poderes para visualizar o pedido.
         final boolean visualizacaoPermitida = pedidoPertenceAoVendedor || isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
         return visualizacaoPermitida ? pedido : null;
@@ -573,12 +577,12 @@ public class PedidoController extends AbstractController {
             this.importado = importado;
         }
 
-        @SuppressWarnings(value = {"unused" })
+        @SuppressWarnings(value = {"unused"})
         public Boolean getImportado() {
             return importado;
         }
 
-        @SuppressWarnings(value = {"unused" })
+        @SuppressWarnings(value = {"unused"})
         public void setImportado(Boolean importado) {
             this.importado = importado;
         }

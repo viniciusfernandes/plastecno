@@ -4,17 +4,7 @@
 <html>
 <head>
 
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/geral.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/tabela.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/mensagem.css"/>" />
-
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/cadastro_pesquisa.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/botao.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/formulario.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/paginacao.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/autocomplete.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/jquery-ui-1.10.3.custom.min.css"/>" />
-
+<jsp:include page="/bloco/bloco_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>

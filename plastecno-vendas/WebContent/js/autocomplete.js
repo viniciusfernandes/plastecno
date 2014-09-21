@@ -34,7 +34,7 @@ var autocompletar = function(configuracao) {
 
 							conteudo += '</ul>';
 
-							conteudo += '<div style="background-color: #C4D3A7; text-align: center;" ">Lista de "'+ TOTAL_REGISTROS+ '" resultados resultados para "'+ valorPesquisa.toUpperCase()+ '" </br></div>';
+							conteudo += '<div style="background-color: #BECEBE; text-align: center;" ">Lista de "'+ TOTAL_REGISTROS+ '" resultados resultados para "'+ valorPesquisa.toUpperCase()+ '" </br></div>';
 							$(idContainerResultados).html(conteudo);
 
 							$(idContainerResultados + ' ul li ').click(

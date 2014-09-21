@@ -40,7 +40,7 @@ body {
 }
 
 .logo {
-	background-image: url("../images/logo_plastecno.jpg");
+	background-image: url("../../images/logo_plastecno.jpg");
 	background-position: center center;
 	background-repeat: no-repeat;
 	height: 150px;
@@ -129,10 +129,6 @@ nav ul ul ul {
 
 nav ul li:hover > ul {
 	display: block;
-}
-
-nav ul ul li:hover a {
-	background: white;
 }
 
 nav ul ul li:hover a {

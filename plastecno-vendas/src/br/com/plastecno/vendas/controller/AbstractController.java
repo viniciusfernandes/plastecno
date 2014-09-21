@@ -184,10 +184,10 @@ public abstract class AbstractController {
         }
     }
 
-    List<PicklistElement> gerarPicklistElement(){
+    List<PicklistElement> gerarPicklistElement() {
         return null;
     }
-    
+
     void inicializarPicklist(String tituloBloco, String tituloElementosNaoAssociados, String tituloElementosAssociados,
             String nomeAtributoValor, String nomeAtributoLabel) {
 
@@ -248,13 +248,13 @@ public abstract class AbstractController {
             result.redirectTo(path);
         }
     }
-    
+
     void forwardTo(String path) {
         if (!result.used()) {
             result.forwardTo(path);
         }
     }
-    
+
     <T extends AbstractController> T redirecTo(Class<T> classe) {
         if (!result.used()) {
             return this.result.redirectTo(classe);
@@ -636,9 +636,9 @@ class Picklist {
         Field valor = null;
         Field label = null;
         if (elementosNaoAssociados != null) {
-            
+
             this.listaElementosNaoAssociados = new ArrayList<PicklistElement>(30);
-            
+
             for (Object object : elementosNaoAssociados) {
                 try {
                     valor = object.getClass().getDeclaredField(this.nomeAtributoValor);
@@ -646,9 +646,9 @@ class Picklist {
 
                     valor.setAccessible(true);
                     label.setAccessible(true);
-                    
+
                     this.listaElementosNaoAssociados.add(new PicklistElement(valor.get(object), label.get(object)));
-                    
+
                     valor.setAccessible(false);
                     label.setAccessible(false);
                 } catch (Exception e) {
@@ -659,9 +659,9 @@ class Picklist {
         }
 
         if (elementosAssociados != null) {
-            
+
             this.listaElementosAssociados = new ArrayList<PicklistElement>(30);
-            
+
             for (Object object : elementosAssociados) {
                 try {
                     valor = object.getClass().getDeclaredField(this.nomeAtributoValor);
@@ -669,9 +669,9 @@ class Picklist {
 
                     valor.setAccessible(true);
                     label.setAccessible(true);
-                    
+
                     this.listaElementosAssociados.add(new PicklistElement(valor.get(object), label.get(object)));
-                    
+
                     valor.setAccessible(false);
                     label.setAccessible(false);
                 } catch (Exception e) {
@@ -685,5 +685,3 @@ class Picklist {
         this.result.include(associados, this.listaElementosAssociados);
     }
 }
-
-

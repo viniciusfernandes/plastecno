@@ -1,0 +1,43 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-size: 12px;
+	font-family: 'verdana'
+}
+
+input, select, fieldset, textarea {
+	border: 1px solid;
+	border-color: #107DA8;
+	border-radius: 3px;
+}
+
+/* Todos os inputs serao uppercase a menos dos que contenham a classe upperCaseBloqueado */
+input:not(.uppercaseBloqueado), textarea:not(.uppercaseBloqueado) {
+	text-transform: uppercase;
+}
+
+select option {
+	margin-left: 5px;
+}
+
+.lowerCase {
+	text-transform: lowercase;
+}
+
+.campoObrigatorio {	
+	border: 1px solid;
+	border-color: #F40414;
+}
+
+.campoDesabilitado {
+	color: black;
+	background-color:#B6D8C3;
+	opacity:0.5;
+}
+
+.campoValorInvalido {
+	opacity:0.5;
+	border: 1px solid;
+	border-color: red;
+	background-color: #F40414;
+}

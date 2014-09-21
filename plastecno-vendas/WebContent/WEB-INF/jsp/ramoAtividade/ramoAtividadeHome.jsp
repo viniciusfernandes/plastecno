@@ -5,14 +5,8 @@
 <head>
 <meta charset="utf-8">
 
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/geral.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/tabela.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/mensagem.css"/>" />
+<jsp:include page="/bloco/bloco_css.jsp" />
 
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/cadastro_pesquisa.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/botao.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/formulario.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/paginacao.css"/>" />
 <style type="text/css">
 .bloco_input {
 	height: 110px;

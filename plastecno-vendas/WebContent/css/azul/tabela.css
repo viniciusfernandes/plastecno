@@ -1,0 +1,93 @@
+.coluna_acoes_listagem input, .coluna_acoes_listagem form input {
+	border: none;
+	float: left;
+	margin-right: 15%;
+	position: relative;
+}
+
+.listrada {
+	border: 1px solid #B1B1B1;
+	border-collapse: collapse;
+	float: left;	
+	margin: 0 1% 15px 1%;
+	width: 98%;
+}
+
+.listrada td, th {
+	border: 1px solid #B1B1B1;
+	border-collapse: collapse;
+	padding: 5px;
+}
+
+.listrada tbody tr:nth-child(2n+1) {
+	background-color: white;
+}
+
+.listrada tbody tr:nth-child(2n){
+	background-color: #EFF9F9;
+}
+
+	
+.listrada th {
+	background-color: #398396;
+	color: white;	
+}
+
+.listrada th:last-child {
+	background-color: #BECEBE;
+	color: white;
+	width: 8%;
+} 
+
+.listrada td:last-child {
+	text-align: center;
+}
+
+.listrada td:last-child form input {
+	margin-right: 5px;
+}
+
+.listrada td:last-child form input:first-child {
+	margin-left: 15%;
+}
+
+.listrada tbody tr:hover, tbody tr:hover input  {
+    background-color: #BECEBE;
+    color: white;
+}
+
+.listrada a {
+	cursor: pointer;
+}
+
+.listrada th {
+	text-align: center;
+	font-weight: bold;
+	margin: 5px;
+}
+
+.listrada td {
+	text-align: left;
+	margin: 5px;
+	font-weight: bold;
+}
+
+.listrada td.valorNumerico {
+	text-align: right;
+}
+
+.listrada a {
+	margin-right: 2px;
+	height: 16px;
+	width: 16px;
+}
+
+.listrada tfoot tr {
+	background-color: #BECEBE;
+	color: #398396;	
+}
+
+.listrada tfoot tr td {
+	border: none;
+	text-align: center;
+}

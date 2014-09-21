@@ -1,0 +1,188 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-size: 12px;
+	font-family: 'verdana';
+}
+
+body {
+	background: -moz-radial-gradient(center, ellipse cover,  #f9f9f9 16%, #edf6ff 66%, #58afdd 100%); /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(16%,#f9f9f9), color-stop(66%,#edf6ff), color-stop(100%,#58afdd)); /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, ellipse cover,  #f9f9f9 16%,#edf6ff 66%,#58afdd 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, ellipse cover,  #f9f9f9 16%,#edf6ff 66%,#58afdd 100%); /* Opera 12+ */
+	background: radial-gradient(ellipse at center,  #f9f9f9 16%,#edf6ff 66%,#58afdd 100%); /* W3C */
+
+	font: 12px Arial;	
+}
+
+#content {
+	background-color: white; 
+	box-shadow: 0px 0px 35px #1E5799;
+	margin: 0 5%;
+	padding: 0 0.5%;
+	width: 90%; 
+}
+
+#center_content {
+	background: #ffffff; /* Old browsers */
+	background: -moz-linear-gradient(top,  #ffffff 0%, #f7fbfc 15%, #f7fbfc 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(15%,#f7fbfc), color-stop(100%,#f7fbfc)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #ffffff 0%,#f7fbfc 15%,#f7fbfc 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #ffffff 0%,#f7fbfc 15%,#f7fbfc 100%); /* Opera 11.10+ */
+	background: linear-gradient(to bottom,  #ffffff 0%,#f7fbfc 15%,#f7fbfc 100%); /* W3C */
+
+	height: 1500px;
+}
+
+#footer {
+	background: black;	
+	color: white;
+	font-size: 20px;
+	height: 50px;
+	text-align: center;
+}
+
+.logo {
+	background-image: url("../../images/logo_plastecno.jpg");
+	background-position: center center;
+	background-repeat: no-repeat;
+	height: 150px;
+}
+
+.enfeite {
+	background: -moz-linear-gradient(left,  rgba(255,215,0,1) 0%, rgba(122,99,0,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(255,215,0,1)), color-stop(100%,rgba(122,99,0,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(left,  rgba(255,215,0,1) 0%,rgba(122,99,0,1) 100%); /* Chrome10+,Safari5.1+ */
+	height: 1px;
+	margin-bottom: 1px;	
+}
+
+.flutuante_esquerda {
+	display: block;
+	float: left;
+	width: 100%;
+}
+
+nav {
+	height: 25px;
+	margin-bottom: 15px;
+}
+
+nav ul {
+	background: #277696;
+	height: 100%;
+	list-style: none;
+	position: relative;
+	margin: 0 0 5px;
+}
+
+nav ul:after {
+	content: "";
+	clear: both;
+	display: block;
+}
+
+nav ul li {
+	float: left;
+}
+
+nav ul li a:hover {
+	box-shadow: 0 0 2px 1px #277696;
+}
+
+nav > ul li:not(:first-child) {
+	border-left: 1px solid white;
+}
+
+nav ul li a {
+	background: #277696;
+	color: white;
+	font-weight: bold;
+	display: block;
+	padding: 5px 40px;
+	text-decoration: none;
+}
+
+nav ul ul {
+	display: none;
+}
+
+nav ul ul {
+	padding: 0;
+	position: absolute;
+	top: 100%;
+}
+
+nav ul ul li {
+	
+	border-top: 1px solid white;
+	float: none;
+	position: relative;
+}
+
+nav ul ul li a {
+	background-color: #DBFBFF;
+	padding: 5px 40px;
+	color: #277696;
+}
+
+nav ul ul ul {
+	position: absolute; left: 100%; top:0;
+}
+
+nav ul li:hover > ul {
+	display: block;
+}
+
+nav ul ul li:hover a {
+	background: white;
+}
+
+nav ul li a:hover {
+	background: #DBFBFF;
+	color: #277696;
+}
+
+nav ul ul li a:hover {
+	background: #277696;
+	color: white;
+}
+
+.bloco_autenticacao {
+	float: left;
+	height: 30px;
+	width: 100%;
+}
+
+.bloco_autenticacao input, .bloco_autenticacao label {
+	background-position: center center;
+	float: right;
+	margin-right: 5px;
+}
+
+.bloco_autenticacao input[type='submit'] {
+	border: 0;	
+}
+
+.bloco_autenticacao input:not([type='submit']) {
+	border: 1px solid;
+	border-color: #107DA8;
+	border-radius: 3px;
+}
+
+.bloco_autenticacao input:focus {
+	box-shadow: 0 0 2px 1px #6CAD5D;
+}
+
+.bloco_autenticacao label {
+	font-size: 13px;
+	font-weight: bold;
+	margin-right: 1%;
+	text-align: right;
+}
+
+.bloco_autenticacao .bemVindo {
+	color: #0D6282;
+	float: left;
+	margin-top: 5px;
+}

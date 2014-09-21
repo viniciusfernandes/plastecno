@@ -6,13 +6,9 @@
 
 
 <title>Plastecno - Cadastro de Transportadoras</title>
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/geral.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/tabela.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/mensagem.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/cadastro_pesquisa.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/formulario.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/botao.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/paginacao.css"/>"/>
+
+<jsp:include page="/bloco/bloco_css.jsp" />
+
 <style type="text/css">
 body {
 	height: 100%;

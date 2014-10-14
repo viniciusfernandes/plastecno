@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
 <jsp:include page="/bloco/bloco_css.jsp" />
+<jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>

@@ -20,5 +20,9 @@
         <dependent-module archiveName="plastecno-service.jar" deploy-path="/lib" handle="module:/resource/plastecno-service/plastecno-service">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="plastecno-service-impl.jar" deploy-path="/" handle="module:/resource/plastecno-service-impl/plastecno-service-impl">
+            <dependent-object/>
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
     </wb-module>
 </project-modules>

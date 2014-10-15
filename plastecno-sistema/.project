@@ -6,6 +6,7 @@
 		<project>plastecno-vendas</project>
 		<project>plastecno-utils</project>
 		<project>plastecno-service</project>
+		<project>plastecno-service-impl</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

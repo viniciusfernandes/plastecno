@@ -38,7 +38,7 @@
 		</properties>
 	</persistence-unit>
 
-	<persistence-unit name="junit" transaction-type="RESOURCE_LOCAL">
+	<!-- persistence-unit name="junit" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 
 		<class>br.com.plastecno.service.entity.Pais</class>
@@ -53,5 +53,5 @@
 			<property name="hibernate.connection.shutdown" value="true" />
 			<property name="hibernate.hbm2ddl.auto" value="create" />
 		</properties>
-	</persistence-unit>
+	</persistence-unit-->
 </persistence>

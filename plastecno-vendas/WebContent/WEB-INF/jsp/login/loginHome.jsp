@@ -3,9 +3,11 @@
 <!DOCTYPE html >
 <html >
 <head>
-<jsp:include page="/bloco/bloco_header.jsp" />
 
+
+<jsp:include page="/bloco/bloco_header.jsp" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/mensagem.css"/>" />
+
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <style type="text/css">
 .areaMensagem {

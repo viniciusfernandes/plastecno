@@ -57,7 +57,7 @@ public class LoginController extends AbstractController {
         }
     }
 
-    @Get("login/sair")
+    @Get("/login/sair")
     public void sair() {
         this.sessao.invalidate();
         redirecionarLogin();

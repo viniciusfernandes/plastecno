@@ -3,7 +3,6 @@
 	<name>plastecno-sistema</name>
 	<comment></comment>
 	<projects>
-		<project>plastecno-service-impl</project>
 		<project>plastecno-vendas</project>
 		<project>plastecno-utils</project>
 		<project>plastecno-service</project>

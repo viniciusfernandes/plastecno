@@ -2,56 +2,41 @@
 <persistence version="1.0"
 	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
-	<persistence-unit name="plastecno" transaction-type="JTA">
+	<!-- persistence-unit name="plastecno" transaction-type="JTA"> <provider>org.hibernate.ejb.HibernatePersistence</provider> 
+		<jta-data-source>java:/datasources/plastecno</jta-data-source> <class>br.com.plastecno.service.entity.Bairro</class> 
+		<class>br.com.plastecno.service.entity.Cidade</class> <class>br.com.plastecno.service.entity.Cliente</class> 
+		<class>br.com.plastecno.service.entity.Contato</class> <class>br.com.plastecno.service.entity.ComentarioCliente</class> 
+		<class>br.com.plastecno.service.entity.ContatoCliente</class> <class>br.com.plastecno.service.entity.ContatoRepresentada</class> 
+		<class>br.com.plastecno.service.entity.ContatoTransportadora</class> <class>br.com.plastecno.service.entity.ContatoUsuario</class> 
+		<class>br.com.plastecno.service.entity.Endereco</class> <class>br.com.plastecno.service.entity.ItemPedido</class> 
+		<class>br.com.plastecno.service.entity.Logradouro</class> <class>br.com.plastecno.service.entity.LogradouroCliente</class> 
+		<class>br.com.plastecno.service.entity.Pais</class> <class>br.com.plastecno.service.entity.PerfilAcesso</class> 
+		<class>br.com.plastecno.service.entity.Material</class> <class>br.com.plastecno.service.entity.Pedido</class> 
+		<class>br.com.plastecno.service.entity.RamoAtividade</class> <class>br.com.plastecno.service.entity.Regiao</class> 
+		<class>br.com.plastecno.service.entity.Remuneracao</class> <class>br.com.plastecno.service.entity.Representada</class> 
+		<class>br.com.plastecno.service.entity.Transportadora</class> <class>br.com.plastecno.service.entity.UF</class> 
+		<class>br.com.plastecno.service.entity.Usuario</class> <properties> <property 
+		name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" 
+		/> <property name="hibernate.show_sql" value="false" /> </properties> </persistence-unit -->
+
+	<!-- persistence-unit name="junit" transaction-type="RESOURCE_LOCAL"> <provider>org.hibernate.ejb.HibernatePersistence</provider> 
+		<class>br.com.plastecno.service.entity.Pais</class> <properties> <property 
+		name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" /> <property 
+		name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:." /> <property 
+		name="javax.persistence.jdbc.user" value="sa" /> <property name="javax.persistence.jdbc.password" 
+		value="" /> <property name="hibernate.show_sql" value="true" /> <property 
+		name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" /> <property 
+		name="hibernate.connection.shutdown" value="true" /> <property name="hibernate.hbm2ddl.auto" 
+		value="create" /> </properties> </persistence-unit -->
+
+	<persistence-unit name="plastecno">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<jta-data-source>java:/datasources/plastecno</jta-data-source>
-
-		<class>br.com.plastecno.service.entity.Bairro</class>
-		<class>br.com.plastecno.service.entity.Cidade</class>
-		<class>br.com.plastecno.service.entity.Cliente</class>
-		<class>br.com.plastecno.service.entity.Contato</class>
-		<class>br.com.plastecno.service.entity.ComentarioCliente</class>
-		<class>br.com.plastecno.service.entity.ContatoCliente</class>
-		<class>br.com.plastecno.service.entity.ContatoRepresentada</class>
-		<class>br.com.plastecno.service.entity.ContatoTransportadora</class>
-		<class>br.com.plastecno.service.entity.ContatoUsuario</class>
-		<class>br.com.plastecno.service.entity.Endereco</class>
-		<class>br.com.plastecno.service.entity.ItemPedido</class>
-		<class>br.com.plastecno.service.entity.Logradouro</class>
-		<class>br.com.plastecno.service.entity.LogradouroCliente</class>
-		<class>br.com.plastecno.service.entity.Pais</class>
-		<class>br.com.plastecno.service.entity.PerfilAcesso</class>
-		<class>br.com.plastecno.service.entity.Material</class>
-		<class>br.com.plastecno.service.entity.Pedido</class>
-		<class>br.com.plastecno.service.entity.RamoAtividade</class>
-		<class>br.com.plastecno.service.entity.Regiao</class>
-		<class>br.com.plastecno.service.entity.Remuneracao</class>
-		<class>br.com.plastecno.service.entity.Representada</class>
-		<class>br.com.plastecno.service.entity.Transportadora</class>
-		<class>br.com.plastecno.service.entity.UF</class>
-		<class>br.com.plastecno.service.entity.Usuario</class>
-
-
+		<jta-data-source>plastecno</jta-data-source>
+		<non-jta-data-source>plastecnoUnmanaged</non-jta-data-source>
 		<properties>
-			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
-			<property name="hibernate.show_sql" value="false" />
+			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
+			<property name="hibernate.transaction.manager_lookup_class"
+				value="org.apache.openejb.hibernate.TransactionManagerLookup" />
 		</properties>
 	</persistence-unit>
-
-	<!-- persistence-unit name="junit" transaction-type="RESOURCE_LOCAL">
-		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-
-		<class>br.com.plastecno.service.entity.Pais</class>
-
-		<properties>
-			<property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:." />
-			<property name="javax.persistence.jdbc.user" value="sa" />
-			<property name="javax.persistence.jdbc.password" value="" />
-			<property name="hibernate.show_sql" value="true" />
-			<property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />
-			<property name="hibernate.connection.shutdown" value="true" />
-			<property name="hibernate.hbm2ddl.auto" value="create" />
-		</properties>
-	</persistence-unit-->
 </persistence>

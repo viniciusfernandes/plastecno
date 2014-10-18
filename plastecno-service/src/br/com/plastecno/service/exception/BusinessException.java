@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.ejb.ApplicationException;
 
-@ApplicationException(rollback=true, inherited=true)
+@ApplicationException(rollback = true, inherited = true)
 public class BusinessException extends Exception {
 
 	private static final long serialVersionUID = 4002460058473505938L;
@@ -13,9 +13,9 @@ public class BusinessException extends Exception {
 	private List<String> listaMensagem;
 
 	public BusinessException() {
-		listaMensagem = new ArrayList<String>();		
+		listaMensagem = new ArrayList<String>();
 	}
-	
+
 	public BusinessException(String mensagem) {
 		super(mensagem);
 		this.listaMensagem = new ArrayList<String>();
@@ -35,28 +35,36 @@ public class BusinessException extends Exception {
 	public List<String> getListaMensagem() {
 		return this.listaMensagem;
 	}
-	
-	public void addMensagem (List<String> listaMensagem) {
+
+	public void addMensagem(List<String> listaMensagem) {
 		this.listaMensagem.addAll(listaMensagem);
 	}
-	
-	public void addMensagem (String mensagem) {
+
+	public void addMensagem(String mensagem) {
 		this.listaMensagem.add(mensagem);
 	}
-	
+
 	public String getMensagemConcatenada() {
-		final StringBuilder concatenada = new StringBuilder();
-		for (String mesagem : this.listaMensagem) {
-			concatenada.append(mesagem).append(". ");
-		}
-		return concatenada.toString();
+		return gerarMensagemString(". ");
 	}
-	
+
+	public String getMensagemEmpilhada() {
+		return gerarMensagemString("\n");
+	}
+
 	public boolean contemExceptionPropagada() {
 		return getCause() != null;
 	}
-	
+
 	public boolean contemMensagem() {
 		return !this.listaMensagem.isEmpty();
+	}
+
+	private String gerarMensagemString(String separador) {
+		final StringBuilder mensagem = new StringBuilder();
+		for (String mesagem : this.listaMensagem) {
+			mensagem.append(mesagem).append(separador);
+		}
+		return mensagem.toString();
 	}
 }

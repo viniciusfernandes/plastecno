@@ -29,13 +29,12 @@ public class PedidoDAOMock implements PedidoDAO {
 	@Override
 	public void alterar(Object entidade) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void inserir(Object entidade) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

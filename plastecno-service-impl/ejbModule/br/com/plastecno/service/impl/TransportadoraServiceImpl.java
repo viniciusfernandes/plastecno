@@ -13,7 +13,7 @@ import javax.persistence.Query;
 import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.TransportadoraService;
-import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.impl.GenericDAOImpl;
 import br.com.plastecno.service.entity.ContatoTransportadora;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Transportadora;
@@ -35,11 +35,11 @@ public class TransportadoraServiceImpl implements TransportadoraService {
     @EJB
     private ContatoService contatoService;
 
-    private GenericDAO genericDAO;
+    private GenericDAOImpl genericDAO;
 
     @PostConstruct
     public void init() {
-        this.genericDAO = new GenericDAO(entityManager);
+        this.genericDAO = new GenericDAOImpl(entityManager);
     }
 
     @SuppressWarnings("unchecked")

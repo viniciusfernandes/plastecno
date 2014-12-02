@@ -13,7 +13,7 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
-import br.com.plastecno.service.dao.RelatorioVendasDAO;
+import br.com.plastecno.service.dao.impl.RelatorioVendasDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.Pedido;

@@ -11,7 +11,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.RegiaoService;
-import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.impl.GenericDAOImpl;
 import br.com.plastecno.service.entity.Bairro;
 import br.com.plastecno.service.entity.Regiao;
 import br.com.plastecno.service.exception.BusinessException;
@@ -32,11 +32,11 @@ public class RegiaoServiceImpl implements RegiaoService {
 		this.entityManager.remove(this.pesquisarById(id));
 	}
 	
-	private GenericDAO genericDAO;
+	private GenericDAOImpl genericDAO;
 	
 	@PostConstruct
 	public void init() {
-		this.genericDAO = new GenericDAO(this.entityManager);
+		this.genericDAO = new GenericDAOImpl(this.entityManager);
 	}
 	
 	@Override

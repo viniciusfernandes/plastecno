@@ -14,7 +14,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.RamoAtividadeService;
-import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.impl.GenericDAOImpl;
 import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -27,11 +27,11 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 	@PersistenceContext(unitName="plastecno")
 	private EntityManager entityManager;
 	
-	private GenericDAO genericDAO;
+	private GenericDAOImpl genericDAO;
 	
 	@PostConstruct
 	public void init() {
-		this.genericDAO = new GenericDAO(this.entityManager);
+		this.genericDAO = new GenericDAOImpl(this.entityManager);
 	}
 	
 	

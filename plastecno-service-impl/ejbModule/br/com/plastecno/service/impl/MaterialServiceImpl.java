@@ -15,7 +15,7 @@ import javax.persistence.Query;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
-import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.impl.GenericDAOImpl;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
@@ -33,11 +33,11 @@ public class MaterialServiceImpl implements MaterialService {
 	
 	@EJB
 	private RepresentadaService representadaService;
-	private GenericDAO genericDAO;
+	private GenericDAOImpl genericDAO;
 	
 	@PostConstruct
 	public void init() {
-		this.genericDAO = new GenericDAO(entityManager);
+		this.genericDAO = new GenericDAOImpl(entityManager);
 	}
 	
 	@Override

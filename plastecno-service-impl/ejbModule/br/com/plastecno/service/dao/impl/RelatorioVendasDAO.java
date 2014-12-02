@@ -1,4 +1,4 @@
-package br.com.plastecno.service.dao;
+package br.com.plastecno.service.dao.impl;
 
 import java.util.Date;
 import java.util.List;
@@ -8,7 +8,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.SituacaoPedido;
 
-public class RelatorioVendasDAO extends GenericDAO {
+public class RelatorioVendasDAO extends GenericDAOImpl {
 	
 	public RelatorioVendasDAO(EntityManager entityManager) {
 		super(entityManager);

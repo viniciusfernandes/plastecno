@@ -14,7 +14,7 @@ import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
-import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.impl.GenericDAOImpl;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
@@ -35,11 +35,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
     @EJB
     private ContatoService contatoService;
 
-    private GenericDAO genericDAO;
+    private GenericDAOImpl genericDAO;
 
     @PostConstruct
     public void init() {
-        this.genericDAO = new GenericDAO(this.entityManager);
+        this.genericDAO = new GenericDAOImpl(this.entityManager);
     }
 
     @Override

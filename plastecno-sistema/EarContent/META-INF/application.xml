@@ -7,7 +7,4 @@
       <context-root>vendas</context-root>
     </web>
   </module>
-  <module>
-    <ejb>plastecno-service-impl.jar</ejb>
-  </module>
 </application>

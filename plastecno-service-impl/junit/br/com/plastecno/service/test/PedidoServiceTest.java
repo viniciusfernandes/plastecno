@@ -2,6 +2,7 @@ package br.com.plastecno.service.test;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -20,6 +21,7 @@ import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.dao.ClienteDAO;
+import br.com.plastecno.service.dao.GenericDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.Cliente;
@@ -71,9 +73,6 @@ public class PedidoServiceTest extends AbstractTest {
 	private PedidoService gerarPedidoService() {
 		PedidoServiceImpl pedidoService = new PedidoServiceImpl();
 		new MockUp<PedidoDAO>() {
-			@Mock
-			public void $init(EntityManager entityManager) {
-			}
 
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
@@ -86,7 +85,7 @@ public class PedidoServiceTest extends AbstractTest {
 			public void $init() {
 			}
 		};
-
+		initGenericDAO();
 		pedidoService.init();
 		inject(pedidoService, gerarUsuarioService(), "usuarioService");
 		inject(pedidoService, gerarClienteService(), "clienteService");
@@ -115,6 +114,22 @@ public class PedidoServiceTest extends AbstractTest {
 		pedidoService = gerarPedidoService();
 	}
 
+	private void initGenericDAO() {
+		new MockUp<GenericDAO<Object>>() {
+
+			@Mock
+			Object alterar(Object t) {
+				return t;
+			}
+
+			@Mock
+			Object inserir(Object t) {
+				return t;
+			}
+		};
+
+	}
+
 	private void inject(Object service, Object dependencia, String nomeCampo) {
 		try {
 			Field campo = service.getClass().getDeclaredField(nomeCampo);
@@ -125,11 +140,6 @@ public class PedidoServiceTest extends AbstractTest {
 			throw new IllegalArgumentException("Falha ao injetar a dependencia para o servico \""
 					+ service.getClass().getName() + "\". Campo com problemas eh \"" + nomeCampo);
 		}
-	}
-
-	@Test
-	public void testInclusao() {
-		pedidoService.pesquisarById(1);
 	}
 
 	@Test
@@ -164,10 +174,23 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoOrcamento() {
-		Pedido pedido = gerarPedido();
-		pedido.setId(null);
-		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+		initTestInclusaoPedidoOrcamento();
 
+		Pedido pedido = gerarPedido();
+		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+		// Incluindo o pedido no sistema para, posteriormente, inclui-lo como
+		// orcamento.
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		if (pedido.getId() == null) {
+			Assert.fail("Pedido deve ser incluido no sistema antes de virar um orcamento");
+		}
+
+		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -177,6 +200,37 @@ public class PedidoServiceTest extends AbstractTest {
 			Assert.fail("Pedido incluido deve ir para orcamento e esta definido como: "
 					+ pedido.getSituacaoPedido().getDescricao());
 		}
+	}
+
+	private void initTestInclusaoPedidoOrcamento() {
+		new MockUp<PedidoDAO>() {
+			@Mock
+			Pedido inserir(Pedido t) {
+				t.setId(1);
+				return t;
+			}
+
+			@Mock
+			Date pesquisarDataInclusaoById(Integer idPedido) {
+				return new Date();
+			}
+
+			@Mock
+			Date pesquisarDataEnvioById(Integer idPedido) {
+				return new Date();
+			}
+
+			@Mock
+			Double pesquisarValorPedido(Integer idPedido) {
+				return 1200d;
+			}
+
+			@Mock
+			Double pesquisarValorPedidoIPI(Integer idPedido) {
+				return 12d;
+			}
+		};
+
 	}
 
 	@Test
@@ -193,4 +247,5 @@ public class PedidoServiceTest extends AbstractTest {
 			Assert.fail("O pedido foi incluido uma transportadora para redespacho.");
 		}
 	}
+
 }

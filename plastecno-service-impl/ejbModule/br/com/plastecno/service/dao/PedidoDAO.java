@@ -1,5 +1,6 @@
 package br.com.plastecno.service.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,96 +11,131 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
 
-public class PedidoDAO extends GenericDAO {
+public class PedidoDAO extends GenericDAO<Pedido> {
 
-    public PedidoDAO(EntityManager entityManager) {
-        super(entityManager);
-    }
+	public PedidoDAO(EntityManager entityManager) {
+		super(entityManager);
+	}
 
-    public Pedido pesquisarById(Integer idPedido) {
-        StringBuilder select = new StringBuilder();
-        select.append("select p from Pedido p ");
-        select.append("join fetch p.vendedor ");
-        select.append("left join fetch p.transportadora ");
-        select.append("left join fetch p.transportadoraRedespacho ");
-        select.append("join fetch p.representada ");
-        select.append("join fetch p.contato ");
-        select.append("where p.id = :idPedido");
-        
-        Query query = this.entityManager.createQuery(select.toString());
-        query.setParameter("idPedido", idPedido);
-        return QueryUtil.gerarRegistroUnico(query, Pedido.class, null);
-    }
+	private Query gerarQueryPesquisa(Pedido filtro, StringBuilder select) {
+		Query query = this.entityManager.createQuery(select.toString());
+		final Cliente cliente = filtro.getCliente();
+		if (cliente != null && StringUtils.isNotEmpty(cliente.getNomeFantasia())) {
+			query.setParameter("nomeFantasia", "%" + cliente.getNomeFantasia() + "%");
+		}
 
-    public List<Pedido> pesquisarByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
-            Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-        StringBuilder select = new StringBuilder(
-                "select p from Pedido p left join fetch p.vendedor where p.cliente.id = :idCliente ");
-        if (idVendedor != null) {
-            select.append(" and p.vendedor.id = :idVendedor ");
-        }
+		if (cliente != null && StringUtils.isNotEmpty(cliente.getEmail())) {
+			query.setParameter("email", "%" + cliente.getEmail() + "%");
+		}
 
-        select.append(" order by p.dataInclusao desc, p.cliente.nomeFantasia ");
+		if (cliente != null && StringUtils.isNotEmpty(cliente.getCpf())) {
+			query.setParameter("cpf", "%" + cliente.getCpf() + "%");
+		} else if (cliente != null && StringUtils.isNotEmpty(cliente.getCnpj())) {
+			query.setParameter("cnpj", "%" + cliente.getCnpj() + "%");
+		}
+		return query;
+	}
 
-        Query query = this.entityManager.createQuery(select.toString());
-        query.setParameter("idCliente", idCliente);
-        if (idVendedor != null) {
-            query.setParameter("idVendedor", idVendedor);
-        }
+	private void gerarRestricaoPesquisa(Pedido filtro, StringBuilder select) {
+		StringBuilder restricao = new StringBuilder();
+		final Cliente cliente = filtro.getCliente();
 
-        return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
-    }
+		if (cliente != null && StringUtils.isNotEmpty(cliente.getNomeFantasia())) {
+			restricao.append("p.cliente.nomeFantasia LIKE :nomeFantasia AND ");
+		}
 
-    public List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-        StringBuilder select = null;
-        select = new StringBuilder("select p from Pedido p ");
+		if (cliente != null && StringUtils.isNotEmpty(cliente.getEmail())) {
+			restricao.append("p.cliente.email LIKE :email AND ");
+		}
 
-        this.gerarRestricaoPesquisa(filtro, select);
-        Query query = this.gerarQueryPesquisa(filtro, select);
+		if (cliente != null && StringUtils.isNotEmpty(cliente.getCpf())) {
+			restricao.append("p.cliente.cpf LIKE :cpf AND ");
+		} else if (cliente != null && StringUtils.isNotEmpty(cliente.getCnpj())) {
+			restricao.append("p.cliente.cnpj LIKE :cnpj AND ");
+		}
 
-        return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
-    }
+		if (restricao.length() > 0) {
+			select.append(" WHERE ").append(restricao);
+			select.delete(select.lastIndexOf("AND"), select.length() - 1);
+		}
+	}
 
-    private void gerarRestricaoPesquisa(Pedido filtro, StringBuilder select) {
-        StringBuilder restricao = new StringBuilder();
-        final Cliente cliente = filtro.getCliente();
+	public List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		StringBuilder select = null;
+		select = new StringBuilder("select p from Pedido p ");
 
-        if (cliente != null && StringUtils.isNotEmpty(cliente.getNomeFantasia())) {
-            restricao.append("p.cliente.nomeFantasia LIKE :nomeFantasia AND ");
-        }
+		this.gerarRestricaoPesquisa(filtro, select);
+		Query query = this.gerarQueryPesquisa(filtro, select);
 
-        if (cliente != null && StringUtils.isNotEmpty(cliente.getEmail())) {
-            restricao.append("p.cliente.email LIKE :email AND ");
-        }
+		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
+	}
 
-        if (cliente != null && StringUtils.isNotEmpty(cliente.getCpf())) {
-            restricao.append("p.cliente.cpf LIKE :cpf AND ");
-        } else if (cliente != null && StringUtils.isNotEmpty(cliente.getCnpj())) {
-            restricao.append("p.cliente.cnpj LIKE :cnpj AND ");
-        }
+	public Pedido pesquisarById(Integer idPedido) {
+		StringBuilder select = new StringBuilder();
+		select.append("select p from Pedido p ");
+		select.append("join fetch p.vendedor ");
+		select.append("left join fetch p.transportadora ");
+		select.append("left join fetch p.transportadoraRedespacho ");
+		select.append("join fetch p.representada ");
+		select.append("join fetch p.contato ");
+		select.append("where p.id = :idPedido");
 
-        if (restricao.length() > 0) {
-            select.append(" WHERE ").append(restricao);
-            select.delete(select.lastIndexOf("AND"), select.length() - 1);
-        }
-    }
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("idPedido", idPedido);
+		return QueryUtil.gerarRegistroUnico(query, Pedido.class, null);
+	}
 
-    private Query gerarQueryPesquisa(Pedido filtro, StringBuilder select) {
-        Query query = this.entityManager.createQuery(select.toString());
-        final Cliente cliente = filtro.getCliente();
-        if (cliente != null && StringUtils.isNotEmpty(cliente.getNomeFantasia())) {
-            query.setParameter("nomeFantasia", "%" + cliente.getNomeFantasia() + "%");
-        }
+	public List<Pedido> pesquisarByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		StringBuilder select = new StringBuilder(
+				"select p from Pedido p left join fetch p.vendedor where p.cliente.id = :idCliente ");
+		if (idVendedor != null) {
+			select.append(" and p.vendedor.id = :idVendedor ");
+		}
 
-        if (cliente != null && StringUtils.isNotEmpty(cliente.getEmail())) {
-            query.setParameter("email", "%" + cliente.getEmail() + "%");
-        }
+		select.append(" order by p.dataInclusao desc, p.cliente.nomeFantasia ");
 
-        if (cliente != null && StringUtils.isNotEmpty(cliente.getCpf())) {
-            query.setParameter("cpf", "%" + cliente.getCpf() + "%");
-        } else if (cliente != null && StringUtils.isNotEmpty(cliente.getCnpj())) {
-            query.setParameter("cnpj", "%" + cliente.getCnpj() + "%");
-        }
-        return query;
-    }
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("idCliente", idCliente);
+		if (idVendedor != null) {
+			query.setParameter("idVendedor", idVendedor);
+		}
+
+		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	public Date pesquisarDataEnvioById(Integer idPedido) {
+		StringBuilder select = new StringBuilder();
+		select.append("select p.dataEnvio from Pedido p where p.id = :id");
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("id", idPedido);
+
+		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
+	}
+
+	public Date pesquisarDataInclusaoById(Integer idPedido) {
+		StringBuilder select = new StringBuilder();
+		select.append("select p.dataInclusao from Pedido p where p.id = :id");
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("id", idPedido);
+
+		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
+	}
+
+	public Double pesquisarValorPedido(Integer idPedido) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i.valorPedido from Pedido i where i.id = :idPedido ");
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("idPedido", idPedido);
+		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+	}
+
+	public Double pesquisarValorPedidoIPI(Integer idPedido) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i.valorPedidoIPI from Pedido i where i.id = :idPedido ");
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("idPedido", idPedido);
+		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+	}
+
 }

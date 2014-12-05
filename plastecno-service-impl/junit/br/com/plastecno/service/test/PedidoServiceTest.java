@@ -130,6 +130,62 @@ public class PedidoServiceTest extends AbstractTest {
 
 	}
 
+	private void initTestInclusaoPedidoDigitadoSemVendedorAssociado() {
+		new MockUp<UsuarioDAO>() {
+			@Mock
+			Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {
+				return null;
+			}
+		};
+
+		new MockUp<ClienteDAO>() {
+			@Mock
+			Cliente pesquisarById(Integer id) {
+				Cliente cliente = new Cliente(id, "vinicius");
+				return cliente;
+			}
+		};
+
+		new MockUp<UsuarioDAO>() {
+			@Mock
+			Usuario pesquisarById(Integer id) {
+				Usuario usuario = new Usuario(11, "vinicius", "fernandes");
+				return usuario;
+			}
+		};
+	}
+
+	private void initTestInclusaoPedidoOrcamento() {
+		new MockUp<PedidoDAO>() {
+			@Mock
+			Pedido inserir(Pedido t) {
+				t.setId(1);
+				return t;
+			}
+
+			@Mock
+			Date pesquisarDataEnvioById(Integer idPedido) {
+				return new Date();
+			}
+
+			@Mock
+			Date pesquisarDataInclusaoById(Integer idPedido) {
+				return new Date();
+			}
+
+			@Mock
+			Double pesquisarValorPedido(Integer idPedido) {
+				return 1200d;
+			}
+
+			@Mock
+			Double pesquisarValorPedidoIPI(Integer idPedido) {
+				return 12d;
+			}
+		};
+
+	}
+
 	private void inject(Object service, Object dependencia, String nomeCampo) {
 		try {
 			Field campo = service.getClass().getDeclaredField(nomeCampo);
@@ -173,6 +229,19 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoPedidoDigitadoSemVendedorAssociado() {
+		initTestInclusaoPedidoDigitadoSemVendedorAssociado();
+		Pedido pedido = gerarPedido();
+		boolean throwed = false;
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		Assert.assertTrue("O Pedido a ser incluido nao esta associado ao vendedor do cliente", throwed);
+	}
+
+	@Test
 	public void testInclusaoPedidoOrcamento() {
 		initTestInclusaoPedidoOrcamento();
 
@@ -200,37 +269,6 @@ public class PedidoServiceTest extends AbstractTest {
 			Assert.fail("Pedido incluido deve ir para orcamento e esta definido como: "
 					+ pedido.getSituacaoPedido().getDescricao());
 		}
-	}
-
-	private void initTestInclusaoPedidoOrcamento() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido inserir(Pedido t) {
-				t.setId(1);
-				return t;
-			}
-
-			@Mock
-			Date pesquisarDataInclusaoById(Integer idPedido) {
-				return new Date();
-			}
-
-			@Mock
-			Date pesquisarDataEnvioById(Integer idPedido) {
-				return new Date();
-			}
-
-			@Mock
-			Double pesquisarValorPedido(Integer idPedido) {
-				return 1200d;
-			}
-
-			@Mock
-			Double pesquisarValorPedidoIPI(Integer idPedido) {
-				return 12d;
-			}
-		};
-
 	}
 
 	@Test

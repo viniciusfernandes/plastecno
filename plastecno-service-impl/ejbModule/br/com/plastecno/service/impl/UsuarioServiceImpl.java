@@ -16,7 +16,6 @@ import br.com.plastecno.service.AutenticacaoService;
 import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.UsuarioService;
-import br.com.plastecno.service.dao.GenericDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.ContatoUsuario;
 import br.com.plastecno.service.entity.Logradouro;
@@ -45,8 +44,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@EJB
 	private AutenticacaoService autenticacaoService;
-
-	private GenericDAO genericDAO;
 
 	private UsuarioDAO usuarioDAO;
 
@@ -192,12 +189,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public boolean isCPF(Integer id, String cpf) {
-		return this.genericDAO.isEntidadeExistente(Usuario.class, id, "cpf", cpf);
+		return usuarioDAO.isEntidadeExistente(Usuario.class, id, "cpf", cpf);
 	}
 
 	@Override
 	public boolean isEmailExistente(Integer id, String email) {
-		return this.genericDAO.isEntidadeExistente(Usuario.class, id, "email", email);
+		return usuarioDAO.isEntidadeExistente(Usuario.class, id, "email", email);
 	}
 
 	@Override
@@ -252,8 +249,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public Usuario pesquisarById(Integer id) {
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery("select c from Usuario c where c.id = :id")
-				.setParameter("id", id), Usuario.class, null);
+		return usuarioDAO.pesquisarById(id);
 	}
 
 	@Override

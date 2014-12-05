@@ -6,11 +6,17 @@ import javax.persistence.EntityManager;
 
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.LogradouroCliente;
+import br.com.plastecno.service.impl.util.QueryUtil;
 
 public class ClienteDAO extends GenericDAO<Cliente> {
 
 	public ClienteDAO(EntityManager entityManager) {
 		super(entityManager);
+	}
+
+	public Cliente pesquisarById(Integer id) {
+		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery("select c from Cliente c where c.id = :id")
+				.setParameter("id", id), Cliente.class, null);
 	}
 
 	@SuppressWarnings("unchecked")

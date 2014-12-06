@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="plastecno-service-impl">
         <wb-resource deploy-path="/" source-path="/ejbModule" tag="defaultRootSource"/>
-        <wb-resource deploy-path="/" source-path="/junit"/>
         <property name="java-output-path" value="/plastecno-service-impl/build/classes"/>
     </wb-module>
 </project-modules>

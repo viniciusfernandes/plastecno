@@ -8,7 +8,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.SituacaoPedido;
 
-public class RelatorioVendasDAO extends GenericDAO {
+public class RelatorioVendasDAO extends GenericDAO<Object> {
 	
 	public RelatorioVendasDAO(EntityManager entityManager) {
 		super(entityManager);

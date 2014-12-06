@@ -23,26 +23,26 @@ public class PerfilAcesso implements Serializable{
 	private String descricao;
 	
 	
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	public String getDescricao() {
-		return descricao;
-	}
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
-	
 	@Override
 	public boolean equals (Object o) {
 		return o instanceof PerfilAcesso && id != null && id.equals(((PerfilAcesso)o).id);
 	}
-	
+	public String getDescricao() {
+		return descricao;
+	}
+	public Integer getId() {
+		return id;
+	}
 	@Override
 	public int hashCode () {
 		return id != null ? id : -1;
+	}
+	
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
 	}
 }

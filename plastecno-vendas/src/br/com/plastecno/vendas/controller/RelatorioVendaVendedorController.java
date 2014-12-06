@@ -20,34 +20,14 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 @Resource
 public class RelatorioVendaVendedorController extends AbstractController {
 
-    public RelatorioVendaVendedorController(Result result, UsuarioInfo usuarioInfo) {
-        super(result, usuarioInfo);
-    }
-
     @Servico
     private UsuarioService usuarioService;
 
     @Servico
     private RelatorioService relatorioService;
 
-    @Get("relatorio/venda/vendedor")
-    public void relatorioVendaVendedorHome() {
-        addAtributo("relatorioGerado", contemAtributo("relatorio"));
-        addAtributo("titulo",
-                isAcessoPermitido(TipoAcesso.OPERACAO_CONTABIL) ? "Relatório de Orçamento do Vendedor"
-                        : "Relatório de Vendas do Vendedor");
-
-        boolean acessoPesquisaVendaVendedorPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO,
-                TipoAcesso.GERENCIA_VENDAS, TipoAcesso.OPERACAO_CONTABIL);
-        addAtributo("acessoPesquisaVendaVendedorPermitido", acessoPesquisaVendaVendedorPermitido);
-        /*
-         * Caso o vendedor nao tenha permissao de administrador, etc, o campo de
-         * vendedor sera desabilitado e para isso vamos preencher o campo com o
-         * nome do vendedor que acessou a tela.
-         */
-        if (!acessoPesquisaVendaVendedorPermitido) {
-            addAtributo("vendedor", usuarioService.pesquisarUsuarioResumidoById(getCodigoUsuario()));
-        }
+    public RelatorioVendaVendedorController(Result result, UsuarioInfo usuarioInfo) {
+        super(result, usuarioInfo);
     }
 
     @Get("relatorio/venda/vendedor/listagem")
@@ -76,5 +56,25 @@ public class RelatorioVendaVendedorController extends AbstractController {
             lista.add(new Autocomplete(usuario.getId(), usuario.getNomeCompleto()));
         }
         serializarJson(new SerializacaoJson("lista", lista));
+    }
+
+    @Get("relatorio/venda/vendedor")
+    public void relatorioVendaVendedorHome() {
+        addAtributo("relatorioGerado", contemAtributo("relatorio"));
+        addAtributo("titulo",
+                isAcessoPermitido(TipoAcesso.OPERACAO_CONTABIL) ? "Relatório de Orçamento do Vendedor"
+                        : "Relatório de Vendas do Vendedor");
+
+        boolean acessoPesquisaVendaVendedorPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO,
+                TipoAcesso.GERENCIA_VENDAS, TipoAcesso.OPERACAO_CONTABIL);
+        addAtributo("acessoPesquisaVendaVendedorPermitido", acessoPesquisaVendaVendedorPermitido);
+        /*
+         * Caso o vendedor nao tenha permissao de administrador, etc, o campo de
+         * vendedor sera desabilitado e para isso vamos preencher o campo com o
+         * nome do vendedor que acessou a tela.
+         */
+        if (!acessoPesquisaVendaVendedorPermitido) {
+            addAtributo("vendedor", usuarioService.pesquisarUsuarioResumidoById(getCodigoUsuario()));
+        }
     }
 }

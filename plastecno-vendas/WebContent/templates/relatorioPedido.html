@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8"/>
+<meta charset="UTF-8" />
 <style type="text/css">
-
-{conteudoCss}
-
+{
+conteudoCss
+}
 </style>
 </head>
 <body>
 
-{conteudoCabecalho}
-	<table >
-	<caption></caption>
+	{conteudoCabecalho}
+	<table>
+		<caption></caption>
 		<thead>
 			<tr>
-				<th colspan="4">Vendas da Representada {representada.nomeFantasia} de {dataInicial} à {dataFinal}</th>
+				<th colspan="4">Vendas da Representada
+					{representada.nomeFantasia} de {dataInicial} à {dataFinal}</th>
 			</tr>
 			<tr>
 				<th>Dt. Envio</th>
@@ -25,7 +26,12 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr {listaPedido}><td style="text-align: center">{dataEnvioFormatada}</td><td style="text-align: center">{id}</td><td style="text-align: center">{cliente.razaoSocial}</td><td style="text-align: center">{valorPedidoFormatado}</td></tr>
+			<tr{listaPedido}>
+				<td style="text-align: center">{dataEnvioFormatada}</td>
+				<td style="text-align: center">{id}</td>
+				<td style="text-align: center">{cliente.razaoSocial}</td>
+				<td style="text-align: center">{valorPedidoFormatado}</td>
+			</tr>
 		</tbody>
 		<tfoot>
 			<tr>

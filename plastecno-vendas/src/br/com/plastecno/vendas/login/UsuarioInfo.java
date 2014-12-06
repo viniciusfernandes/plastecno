@@ -22,6 +22,14 @@ public class UsuarioInfo {
     private boolean vendaPermitida;
     private String nomeCompleto;
 
+    public Integer getCodigoUsuario() {
+        return this.codigoUsuario;
+    }
+
+    public String getDescricaoLogin() {
+        return nomeCompleto + " - " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+    }
+
     public void inicializar(Usuario usuario) {
         if (usuario == null) {
             return;
@@ -45,25 +53,11 @@ public class UsuarioInfo {
 
     }
 
-    public boolean isVendaPermitida() {
-        return vendaPermitida;
-    }
-
-    public boolean isLogado() {
-        return usuarioLogado;
-    }
-
-    public void limpar() {
-        this.usuarioLogado = false;
-        this.listaTipoAcesso = null;
-    }
-
-    public Integer getCodigoUsuario() {
-        return this.codigoUsuario;
-    }
-
-    public String getDescricaoLogin() {
-        return nomeCompleto + " - " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+    public boolean isAcessoNaoPermitido(TipoAcesso... tipoAcesso) {
+        if (tipoAcesso == null) {
+            return false;
+        }
+        return this.usuarioLogado && !this.listaTipoAcesso.containsAll(Arrays.asList(tipoAcesso));
     }
 
     public boolean isAcessoPermitido(TipoAcesso... tipoAcesso) {
@@ -79,10 +73,16 @@ public class UsuarioInfo {
         return false;
     }
 
-    public boolean isAcessoNaoPermitido(TipoAcesso... tipoAcesso) {
-        if (tipoAcesso == null) {
-            return false;
-        }
-        return this.usuarioLogado && !this.listaTipoAcesso.containsAll(Arrays.asList(tipoAcesso));
+    public boolean isLogado() {
+        return usuarioLogado;
+    }
+
+    public boolean isVendaPermitida() {
+        return vendaPermitida;
+    }
+
+    public void limpar() {
+        this.usuarioLogado = false;
+        this.listaTipoAcesso = null;
     }
 }

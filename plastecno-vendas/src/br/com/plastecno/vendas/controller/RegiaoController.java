@@ -42,15 +42,13 @@ public class RegiaoController extends AbstractController {
         this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
     }
 
-    @Get("regiao")
-    public void regiaoHome() {
-        if (!isElementosAssociadosPreenchidosPicklist()) {
-            try {
-                popularPicklist(null, null);
-            } catch (ControllerException e) {
-                gerarLogErroNavegacao("Cliente", e);
-            }
+    private List<CidadeBairroJson> gerarListaCidadeBairro(List<Bairro> listaBairro) {
+        final List<CidadeBairroJson> listaCidadeBairroJson = new ArrayList<CidadeBairroJson>();
+        for (Bairro bairro : listaBairro) {
+            listaCidadeBairroJson.add(new CidadeBairroJson(bairro.getId(), bairro.getCidade().getDescricao() + " - "
+                    + bairro.getDescricao()));
         }
+        return listaCidadeBairroJson;
     }
 
     @Post("regiao/inclusao")
@@ -76,14 +74,6 @@ public class RegiaoController extends AbstractController {
         irTopoPagina();
     }
 
-    @Get("regiao/listagem")
-    public void pesquisar(Regiao filtro, Integer paginaSelecionada) {
-        PaginacaoWrapper<Regiao> paginacao = this.regiaoService.paginarRegiao(filtro,
-                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
-
-        this.inicializarPaginacao(paginaSelecionada, paginacao, "listaRegiao");
-    }
-
     @Get("regiao/{idRegiao}")
     public void pesquisar(Integer idRegiao) {
         Regiao regiao = this.regiaoService.pesquisarById(idRegiao);
@@ -94,6 +84,14 @@ public class RegiaoController extends AbstractController {
             gerarLogErroNavegacao("Região", e);
         }
         irTopoPagina();
+    }
+
+    @Get("regiao/listagem")
+    public void pesquisar(Regiao filtro, Integer paginaSelecionada) {
+        PaginacaoWrapper<Regiao> paginacao = this.regiaoService.paginarRegiao(filtro,
+                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+
+        this.inicializarPaginacao(paginaSelecionada, paginacao, "listaRegiao");
     }
 
     @Get("regiao/bairro/listagem")
@@ -107,6 +105,17 @@ public class RegiaoController extends AbstractController {
         serializarJson(new SerializacaoJson("listaResultado", listaResultado));
     }
 
+    @Get("regiao")
+    public void regiaoHome() {
+        if (!isElementosAssociadosPreenchidosPicklist()) {
+            try {
+                popularPicklist(null, null);
+            } catch (ControllerException e) {
+                gerarLogErroNavegacao("Cliente", e);
+            }
+        }
+    }
+
     @Post("regiao/remocao")
     public void remover(Integer idRegiao) {
         this.regiaoService.remover(idRegiao);
@@ -116,14 +125,5 @@ public class RegiaoController extends AbstractController {
             gerarLogErroNavegacao("Região", e);
         }
         irTopoPagina();
-    }
-
-    private List<CidadeBairroJson> gerarListaCidadeBairro(List<Bairro> listaBairro) {
-        final List<CidadeBairroJson> listaCidadeBairroJson = new ArrayList<CidadeBairroJson>();
-        for (Bairro bairro : listaBairro) {
-            listaCidadeBairroJson.add(new CidadeBairroJson(bairro.getId(), bairro.getCidade().getDescricao() + " - "
-                    + bairro.getDescricao()));
-        }
-        return listaCidadeBairroJson;
     }
 }

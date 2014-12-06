@@ -29,9 +29,8 @@ public class LoginController extends AbstractController {
         this.sessao = httpSession;
     }
 
-    @Login
-    @Get("login")
-    public void loginHome() {
+    private void inicializarUsuarioInfo(Usuario usuario) {
+        this.usuarioInfo.inicializar(usuario);
     }
 
     @Login
@@ -58,10 +57,8 @@ public class LoginController extends AbstractController {
     }
 
     @Login
-    @Get("/login/sair")
-    public void sair() {
-        this.sessao.invalidate();
-        redirecTo(this.getClass()).redirecionarLogin();
+    @Get("login")
+    public void loginHome() {
     }
 
     /*
@@ -78,7 +75,10 @@ public class LoginController extends AbstractController {
     public void redirecionarLogin() {
     }
 
-    private void inicializarUsuarioInfo(Usuario usuario) {
-        this.usuarioInfo.inicializar(usuario);
+    @Login
+    @Get("/login/sair")
+    public void sair() {
+        this.sessao.invalidate();
+        redirecTo(this.getClass()).redirecionarLogin();
     }
 }

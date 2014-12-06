@@ -16,6 +16,11 @@ public class TipoLogradouroServiceImpl implements TipoLogradouroService {
 	@PersistenceContext(unitName="plastecno")
 	private EntityManager entityManager;
 		
+	@Override
+	public List<TipoLogradouro> pesquisar() {
+		return Arrays.asList(TipoLogradouro.values());
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public TipoLogradouro pesquisarByDescricao(String descricao) {		
@@ -24,11 +29,6 @@ public class TipoLogradouroServiceImpl implements TipoLogradouroService {
 		query.setParameter("descricao", descricao);
 		List<TipoLogradouro> lista = query.getResultList();
 		return lista.size() == 1 ? lista.get(0) : null;
-	}
-
-	@Override
-	public List<TipoLogradouro> pesquisar() {
-		return Arrays.asList(TipoLogradouro.values());
 	}
 
 	@Override

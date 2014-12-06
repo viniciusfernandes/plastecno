@@ -5,7 +5,11 @@ import java.util.Date;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 
 public class Periodo  {
+	public static Periodo getPeriodo(Date inicio, Date fim) throws InformacaoInvalidaException {
+		return new Periodo(inicio, fim);
+	}
 	final Date inicio;
+	
 	final Date fim;
 	
 	public Periodo(Date inicio, Date fim) throws InformacaoInvalidaException {
@@ -20,17 +24,13 @@ public class Periodo  {
 		this.inicio = inicio;
 		this.fim = fim;
 	}
-	
-	public static Periodo getPeriodo(Date inicio, Date fim) throws InformacaoInvalidaException {
-		return new Periodo(inicio, fim);
+
+	public Date getFim() {
+		return fim;
 	}
 
 	public Date getInicio() {
 		return inicio;
-	}
-
-	public Date getFim() {
-		return fim;
 	}
 	
 }

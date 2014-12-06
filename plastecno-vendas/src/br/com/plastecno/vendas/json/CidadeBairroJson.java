@@ -10,11 +10,11 @@ public final class CidadeBairroJson {
         this.descricao = valor;
     }
 
-    public Integer getIdBairro() {
-        return idBairro;
-    }
-
     public String getDescricao() {
         return descricao;
+    }
+
+    public Integer getIdBairro() {
+        return idBairro;
     }
 }

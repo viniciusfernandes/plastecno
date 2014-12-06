@@ -11,15 +11,15 @@ public class ClienteWrapper {
 		this.contato = contato;
 	}
 
-	public String getNomeVendedor() {
-		return nomeVendedor;
+	public String getContato() {
+		return contato;
 	}
 
 	public String getNome() {
 		return nome;
 	}
 
-	public String getContato() {
-		return contato;
+	public String getNomeVendedor() {
+		return nomeVendedor;
 	}
 }

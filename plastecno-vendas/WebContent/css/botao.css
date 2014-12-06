@@ -1,31 +1,34 @@
 .flagOK {
-	background: url("../images/ok_blue_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/ok_blue_16.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 16px;
 	width: 16px;
 }
 
 .flagNaoOK {
-	background: url("../images/cross_red_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/cross_red_16.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 16px;
 	width: 16px;
 }
 
 .botaoAdicionarPicklist {
-	background: url("../images/right_arrow_green_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/right_arrow_green_24.png") no-repeat scroll 0
+		0 transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoRemoverPicklist {
-	background: url("../images/left_arrow_green_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/left_arrow_green_24.png") no-repeat scroll 0
+		0 transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
-
 
 .bloco_botoes {
 	float: left;
@@ -34,13 +37,14 @@
 	width: 100%;
 }
 
-.bloco_botoes > a, .bloco_botoes > input, .bloco_botoes > label, .bloco_botoes form input  {
+.bloco_botoes>a, .bloco_botoes>input, .bloco_botoes>label, .bloco_botoes form input
+	{
 	background-position: center center;
 	float: right;
 	margin-right: 5px;
 }
 
-.bloco_botoes > input, .bloco_botoes > label, .bloco_botoes form input {
+.bloco_botoes>input, .bloco_botoes>label, .bloco_botoes form input {
 	border: 0;
 }
 
@@ -52,70 +56,77 @@
 	float: left;
 	margin-right: 5%;
 	position: relative;
-	left: 10%;	
+	left: 10%;
 }
 
 .botaoAdicionar {
-	background: url("../images/package_down_arrow_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/package_down_arrow_24.png") no-repeat scroll
+		0 0 transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoCancelar {
-	background: url("../images/minus_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/minus_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoContactar {
-	background: url("../images/phone_green_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/phone_green_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoEndereco {
-	background: url("../images/address_add_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/address_add_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoEditar {
-	background: url("../images/pencil_orange_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/pencil_orange_16.png") no-repeat scroll 0 0
+		transparent;
 	border: none;
 	cursor: pointer;
 	height: 16px;
 	width: 16px;
 }
 
-
 .botaoEditar_24 {
-	background: url("../images/pencil_orange_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/pencil_orange_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
-
 .botaoRefazer {
-	background: url("../images/redo_black_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/redo_black_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoEnviarEmail {
-	background: url("../images/mail_send_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/mail_send_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoImprimir {
-	background: url("../images/printer_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/printer_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
@@ -129,35 +140,40 @@
 }
 
 .botaoIncluir {
-	background: url("../images/disk_arrow_down_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/disk_arrow_down_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoInserir {
-	background: url("../images/disk_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/disk_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoLimpar {
-	background: url("../images/broom_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/broom_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoPesquisar {
-	background: url("../images/search_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/search_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoPesquisarPequeno {
-	background: url("../images/search_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/search_16.png") no-repeat scroll 0 0
+		transparent;
 	border: 0;
 	cursor: pointer;
 	height: 16px;
@@ -165,7 +181,7 @@
 	width: 16px;
 }
 
-.botaoPdf_16, .botaoPdf_16_centro  {
+.botaoPdf_16, .botaoPdf_16_centro {
 	background: url("../images/pdf_16.png") no-repeat scroll 0 0 transparent;
 	border: none;
 	cursor: pointer;
@@ -178,7 +194,8 @@
 }
 
 .botaoRemover {
-	background: url("../images/minus_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/minus_16.png") no-repeat scroll 0 0
+		transparent;
 	border: none;
 	cursor: pointer;
 	height: 16px;
@@ -186,38 +203,44 @@
 }
 
 .botaoLogin {
-	background: url("../images/login_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/login_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoLogout {
-	background: url("../images/logout_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/logout_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoVoltar {
-	background: url("../images/arrow_left_blue_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/arrow_left_blue_24.png") no-repeat scroll 0 0
+		transparent;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoAdicionar:hover {
-	background: url("../images/package_down_arrow_16.png") no-repeat scroll 0 0 transparent;
-	background-position: center center;	
+	background: url("../images/package_down_arrow_16.png") no-repeat scroll
+		0 0 transparent;
+	background-position: center center;
 }
 
 .botaoContactar:hover {
-	background: url("../images/phone_green_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/phone_green_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 }
 
 .botaoImprimir:hover {
-	background: url("../images/printer_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/printer_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 }
 
@@ -227,76 +250,87 @@
 }
 
 .botaoInserir:hover {
-	background: url("../images/disk_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/disk_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoEditar_24:hover {
-	background: url("../images/pencil_orange_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/pencil_orange_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoRefazer:hover {
-	background: url("../images/redo_black_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/redo_black_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 	height: 24px;
 	width: 24px;
 }
 
-
 .botaoEnviarEmail:hover {
-	background: url("../images/mail_send_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/mail_send_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoCancelar:hover {
-	background: url("../images/minus_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/minus_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 }
 
 .botaoLimpar:hover {
-	background: url("../images/broom_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/broom_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoLogin:hover {
-	background: url("../images/login_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/login_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoLogout:hover {
-	background: url("../images/logout_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/logout_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 	height: 24px;
 	width: 24px;
 }
 
 .botaoVoltar:hover {
-	background: url("../images/arrow_left_blue_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/arrow_left_blue_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 }
 
 .botaoVoltar:click {
-	background: url("../images/arrow_left_blue_24.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/arrow_left_blue_24.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 }
 
 .botaoRemover:hover {
-	background: url("../images/minus_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/minus_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 }
 
 .botaoPesquisar:hover {
-	background: url("../images/search_16.png") no-repeat scroll 0 0 transparent;
+	background: url("../images/search_16.png") no-repeat scroll 0 0
+		transparent;
 	background-position: center center;
 }

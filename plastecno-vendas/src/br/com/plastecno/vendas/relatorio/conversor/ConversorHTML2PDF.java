@@ -17,12 +17,12 @@ final class ConversorHTML2PDF {
 
     private Charset charset;
 
-    public ConversorHTML2PDF(Charset charset) {
-        this.charset = charset;
-    }
-
     public ConversorHTML2PDF() {
 
+    }
+
+    public ConversorHTML2PDF(Charset charset) {
+        this.charset = charset;
     }
 
     public byte[] converter(InputStream arquivoHTML) throws ConversaoHTML2PDFException {

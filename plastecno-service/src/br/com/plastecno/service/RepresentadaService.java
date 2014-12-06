@@ -11,32 +11,32 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface RepresentadaService {
-    List<ContatoRepresentada> pesquisarContato(Integer id);
-
-    Representada pesquisarById(Integer id);
-
-    Logradouro pesquisarLogradorouro(Integer id);
-
     Integer desativar(Integer id);
 
-    List<Representada> pesquisar();
+    Integer inserir(Representada representada) throws BusinessException;
+
+    Boolean isCalculoIPIHabilitado(Integer idRepresentada);
 
     boolean isCNPJExistente(Integer id, String cnpj);
 
-    List<Representada> pesquisarBy(Representada filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+    boolean isNomeFantasiaExistente(Integer id, String nomeFantasia);
 
-    Long pesquisarTotalRegistros(Representada filtro, Boolean apenasAtivos);
+    List<Representada> pesquisar();
 
     List<Representada> pesquisar(Boolean ativo);
 
     List<Representada> pesquisarAtivo();
 
-    Integer inserir(Representada representada) throws BusinessException;
+    List<Representada> pesquisarBy(Representada filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
+            Integer numeroMaximoRegistros);
 
-    boolean isNomeFantasiaExistente(Integer id, String nomeFantasia);
-
-    Boolean isCalculoIPIHabilitado(Integer idRepresentada);
+    Representada pesquisarById(Integer id);
 
     List<Representada> pesquisarById(List<Integer> listaIdRepresentada);
+
+    List<ContatoRepresentada> pesquisarContato(Integer id);
+
+    Logradouro pesquisarLogradorouro(Integer id);
+
+    Long pesquisarTotalRegistros(Representada filtro, Boolean apenasAtivos);
 }

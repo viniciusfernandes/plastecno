@@ -23,10 +23,6 @@ public class RelatorioEntregaController extends AbstractController {
         super(result, usuarioInfo);
     }
 
-    @Get("relatorio/entrega")
-    public void relatorioEntregaHome() {
-    }
-
     @Get("relatorio/entrega/listagem")
     public void pesquisarEntregas(Date dataInicial, Date dataFinal) {
         try {
@@ -47,6 +43,10 @@ public class RelatorioEntregaController extends AbstractController {
         addAtributo("dataInicial", this.formatarData(dataInicial));
         addAtributo("dataFinal", this.formatarData(dataFinal));
         this.irPaginaHome();
+    }
+
+    @Get("relatorio/entrega")
+    public void relatorioEntregaHome() {
     }
 
 }

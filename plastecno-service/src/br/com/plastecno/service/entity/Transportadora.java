@@ -74,77 +74,6 @@ public class Transportadora implements Serializable {
 		this.nomeFantasia = nomeFantasia;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	public String getNomeFantasia() {
-		return nomeFantasia;
-	}
-	public void setNomeFantasia(String nomeFantasia) {
-		this.nomeFantasia = nomeFantasia;
-	}
-	public String getRazaoSocial() {
-		return razaoSocial;
-	}
-	public void setRazaoSocial(String razaoSocial) {
-		this.razaoSocial = razaoSocial;
-	}
-	public String getCnpj() {
-		return cnpj;
-	}
-	public void setCnpj(String cnpj) {
-		this.cnpj = cnpj;
-	}
-	public String getInscricaoEstadual() {
-		return inscricaoEstadual;
-	}
-	public void setInscricaoEstadual(String inscricaoEstadual) {
-		this.inscricaoEstadual = inscricaoEstadual;
-	}
-	
-	public String getAreaAtuacao() {
-		return areaAtuacao;
-	}
-	public void setAreaAtuacao(String areaAtuacao) {
-		this.areaAtuacao = areaAtuacao;
-	}
-	public Logradouro getLogradouro() {
-		return logradouro;
-	}
-	public void setLogradouro(Logradouro logradouro) {
-		this.logradouro = logradouro;
-	}
-	public String getSite() {
-		return site;
-	}
-	public void setSite(String site) {
-		this.site = site;
-	}
-	public List<ContatoTransportadora> getListaContato() {
-		return listaContato;
-	}
-	
-	public void setListaContato(List<ContatoTransportadora> listaContato) {
-		this.listaContato = listaContato;
-	}
-
-	public boolean isAtivo() {
-		return ativo;
-	}
-	
-	public void setAtivo(boolean ativo) {
-		this.ativo = ativo;
-	}
-	
-	public void addContato(List<ContatoTransportadora> listaContato) {
-		for (ContatoTransportadora contato : listaContato) {
-			this.addContato(contato);	
-		}
-	}
-	
 	public void addContato(ContatoTransportadora contato) {
 		if (this.listaContato == null) {
 			this.listaContato = new ArrayList<ContatoTransportadora>();
@@ -152,23 +81,94 @@ public class Transportadora implements Serializable {
 		this.listaContato.add(contato);		
 		contato.setTransportadora(this);
 	}
+	public void addContato(List<ContatoTransportadora> listaContato) {
+		for (ContatoTransportadora contato : listaContato) {
+			this.addContato(contato);	
+		}
+	}
+	@Override
+	public boolean equals (Object o) {
+		return o instanceof Transportadora && this.id != null && this.id.equals(((Transportadora)o).id);
+	}
+	public String getAreaAtuacao() {
+		return areaAtuacao;
+	}
+	public String getCnpj() {
+		return cnpj;
+	}
+	public Contato getContatoPrincipal() {
+		return this.listaContato != null && !this.listaContato.isEmpty() ? listaContato.get(0) : null;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public String getInscricaoEstadual() {
+		return inscricaoEstadual;
+	}
+	public List<ContatoTransportadora> getListaContato() {
+		return listaContato;
+	}
+	public Logradouro getLogradouro() {
+		return logradouro;
+	}
 	
+	public String getNomeFantasia() {
+		return nomeFantasia;
+	}
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+	public String getSite() {
+		return site;
+	}
+	@Override
+	public int hashCode () {
+		return this.id != null ? this.id.hashCode() : -1;
+	}
+	public boolean isAtivo() {
+		return ativo;
+	}
 	public List<ContatoTransportadora> limparContato() {
 		final List<ContatoTransportadora> lista = new ArrayList<ContatoTransportadora>(this.listaContato);
 		this.listaContato.clear();
 		return lista;
 	}
-	
-	public Contato getContatoPrincipal() {
-		return this.listaContato != null && !this.listaContato.isEmpty() ? listaContato.get(0) : null;
+	public void setAreaAtuacao(String areaAtuacao) {
+		this.areaAtuacao = areaAtuacao;
 	}
 	
-	@Override
-	public boolean equals (Object o) {
-		return o instanceof Transportadora && this.id != null && this.id.equals(((Transportadora)o).id);
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
-	@Override
-	public int hashCode () {
-		return this.id != null ? this.id.hashCode() : -1;
+
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public void setInscricaoEstadual(String inscricaoEstadual) {
+		this.inscricaoEstadual = inscricaoEstadual;
+	}
+	
+	public void setListaContato(List<ContatoTransportadora> listaContato) {
+		this.listaContato = listaContato;
+	}
+	
+	public void setLogradouro(Logradouro logradouro) {
+		this.logradouro = logradouro;
+	}
+	
+	public void setNomeFantasia(String nomeFantasia) {
+		this.nomeFantasia = nomeFantasia;
+	}
+	
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
+	}
+	public void setSite(String site) {
+		this.site = site;
 	}
 }

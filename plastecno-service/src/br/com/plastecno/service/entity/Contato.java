@@ -94,230 +94,11 @@ public class Contato implements Serializable {
 	@JoinColumn(name="id_logradouro")
 	private Logradouro logradouro;
 	
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getNome() {
-		return nome;
-	}
-
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-
-	public String getSobrenome() {
-		return sobrenome;
-	}
-
-	public void setSobrenome(String sobrenome) {
-		this.sobrenome = sobrenome;
-	}
-
-	public String getCpf() {
-		return cpf;
-	}
-
-	public void setCpf(String cpf) {
-		this.cpf = cpf;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getDdi() {
-		return ddi;
-	}
-
-	public void setDdi(String ddi) {
-		this.ddi = ddi;
-	}
-
-	public String getDdd() {
-		return ddd;
-	}
-
-	public void setDdd(String ddd) {
-		this.ddd = ddd;
-	}
-
-	public String getTelefone() {
-		return telefone;
-	}
-	
-	public String getDDDTelefone() {
-		StringBuilder telefoneFormatado = new StringBuilder();
-		
-		telefoneFormatado.append("(").append(ddi == null ? "" : ddi);
-		telefoneFormatado.append(" / ").append(ddd == null ? "" : ddd).append(") ");
-		telefoneFormatado.append(telefone == null ? "" : formatarTelefoneComHifen(telefone));
-		
-		return telefoneFormatado.toString();
-	}
-	
-	public String getDDDTelefoneSecundario() {
-		StringBuilder telefoneFormatado = new StringBuilder();
-		
-		telefoneFormatado.append("(").append(ddiSecundario == null ? "" : ddiSecundario);
-		telefoneFormatado.append(" / ").append(dddSecundario == null ? "" : dddSecundario).append(") ");
-		telefoneFormatado.append(telefoneSecundario == null ? "" : formatarTelefoneComHifen(telefoneSecundario));
-		
-		return telefoneFormatado.toString();
-	}
-
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
-	}
-
-	public String getRamal() {
-		return ramal;
-	}
-
-	public void setRamal(String ramal) {
-		this.ramal = ramal;
-	}
-
-	public String getFax() {
-		return fax;
-	}
-
-	public void setFax(String fax) {
-		this.fax = fax;
-	}
-
-	public String getDdiSecundario() {
-		return ddiSecundario;
-	}
-
-	public void setDdiSecundario(String ddiSecundario) {
-		this.ddiSecundario = ddiSecundario;
-	}
-
-	public String getDddSecundario() {
-		return dddSecundario;
-	}
-
-	public void setDddSecundario(String dddSecundario) {
-		this.dddSecundario = dddSecundario;
-	}
-
-	public String getTelefoneSecundario() {
-		return telefoneSecundario;
-	}
-
-	public void setTelefoneSecundario(String telefoneSecundario) {
-		this.telefoneSecundario = telefoneSecundario;
-	}
-
-	public String getRamalSecundario() {
-		return ramalSecundario;
-	}
-
-	public void setRamalSecundario(String ramalSecundario) {
-		this.ramalSecundario = ramalSecundario;
-	}
-
-	public String getFaxSecundario() {
-		return faxSecundario;
-	}
-
-	public void setFaxSecundario(String faxSecundario) {
-		this.faxSecundario = faxSecundario;
-	}
-
-	public Logradouro getLogradouro() {
-		return logradouro;
-	}
-
-	public void setLogradouro(Logradouro logradouro) {
-		this.logradouro = logradouro;
-	}
-
-	public boolean isTelefoneVazio() {
-		return this.telefone == null; 
-	}
-	
-	public boolean isTelefoneSecundarioVazio() {
-		return this.telefoneSecundario == null; 
-	}
-
-	public String getTelefoneFormatado () {
-		if (this.isTelefoneVazio()) {
-			return "";
-		}
-		return this.formatarTelefone(this.ddi, this.ddd, this.telefone, this.ramal, this.fax);
-	}
-	
-	public String getTelefoneSecundarioFormatado () {
-		if (this.isTelefoneSecundarioVazio()) {
-			return "";
-		}
-		return this.formatarTelefone(this.ddiSecundario, this.dddSecundario, this.telefoneSecundario, this.ramalSecundario, this.faxSecundario);
-	}
-	
-	public String getDDDTelefoneFormatado() {
-		if (this.telefone != null) {
-			StringBuilder dddTelefone = new StringBuilder();
-			dddTelefone.append(this.ddi).append("-").append(this.ddd)
-			.append("-").append(this.telefone);
-			return dddTelefone.toString();
-		}
-		return "";
-	}
-	
-	public String getDDDTelefoneSecundarioFormatado() {
-		if (this.telefoneSecundario != null) {
-			StringBuilder dddTelefone = new StringBuilder();
-			dddTelefone.append(this.ddiSecundario).append("-").append(this.dddSecundario)
-			.append("-").append(this.telefoneSecundario);
-			return dddTelefone.toString();
-		}
-		return "";
-	}
-	
-	public String getDepartamento() {
-		return departamento;
-	}
-
-	public void setDepartamento(String departamento) {
-		this.departamento = departamento;
-	}
-
 	@Override
 	public boolean equals (Object o) {
 		return o instanceof Contato && this.id != null && this.id.equals(((Contato)o).id);
 	}
-	@Override
-	public int hashCode () {
-		return this.id != null ? this.id.hashCode() : super.hashCode();
-	}
-	
-	public String getTelefoneComHifen(){
-		return formatarTelefoneComHifen(telefone);
-	}
 
-	public String getTelefoneSecundarioComHifen(){
-		return formatarTelefoneComHifen(telefoneSecundario);
-	}
-	
-	public String getFaxComHifen(){
-		return formatarTelefoneComHifen(fax);
-	}
-	
-	public String getFaxSecundarioComHifen(){
-		return formatarTelefoneComHifen(faxSecundario);
-	}
-	
-	
 	private String formatarTelefone (String ddi, String ddd, String telefone, String ramal, String fax) {
 		
 		StringBuilder telefoneFormatado = new StringBuilder();
@@ -329,7 +110,7 @@ public class Contato implements Serializable {
 		
 		return telefoneFormatado.toString();
 	}
-	
+
 	private String formatarTelefoneComHifen(String telefone){
 		if (telefone == null || telefone.length() < 5 || telefone.contains("-")) {
 			return telefone;
@@ -343,5 +124,224 @@ public class Contato implements Serializable {
 		formatado.append(telefone.substring(index, telefone.length()));
 		
 		return formatado.toString();
+	}
+
+	public String getCpf() {
+		return cpf;
+	}
+
+	public String getDdd() {
+		return ddd;
+	}
+
+	public String getDddSecundario() {
+		return dddSecundario;
+	}
+
+	public String getDDDTelefone() {
+		StringBuilder telefoneFormatado = new StringBuilder();
+		
+		telefoneFormatado.append("(").append(ddi == null ? "" : ddi);
+		telefoneFormatado.append(" / ").append(ddd == null ? "" : ddd).append(") ");
+		telefoneFormatado.append(telefone == null ? "" : formatarTelefoneComHifen(telefone));
+		
+		return telefoneFormatado.toString();
+	}
+
+	public String getDDDTelefoneFormatado() {
+		if (this.telefone != null) {
+			StringBuilder dddTelefone = new StringBuilder();
+			dddTelefone.append(this.ddi).append("-").append(this.ddd)
+			.append("-").append(this.telefone);
+			return dddTelefone.toString();
+		}
+		return "";
+	}
+
+	public String getDDDTelefoneSecundario() {
+		StringBuilder telefoneFormatado = new StringBuilder();
+		
+		telefoneFormatado.append("(").append(ddiSecundario == null ? "" : ddiSecundario);
+		telefoneFormatado.append(" / ").append(dddSecundario == null ? "" : dddSecundario).append(") ");
+		telefoneFormatado.append(telefoneSecundario == null ? "" : formatarTelefoneComHifen(telefoneSecundario));
+		
+		return telefoneFormatado.toString();
+	}
+
+	public String getDDDTelefoneSecundarioFormatado() {
+		if (this.telefoneSecundario != null) {
+			StringBuilder dddTelefone = new StringBuilder();
+			dddTelefone.append(this.ddiSecundario).append("-").append(this.dddSecundario)
+			.append("-").append(this.telefoneSecundario);
+			return dddTelefone.toString();
+		}
+		return "";
+	}
+
+	public String getDdi() {
+		return ddi;
+	}
+
+	public String getDdiSecundario() {
+		return ddiSecundario;
+	}
+
+	public String getDepartamento() {
+		return departamento;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getFax() {
+		return fax;
+	}
+	
+	public String getFaxComHifen(){
+		return formatarTelefoneComHifen(fax);
+	}
+	
+	public String getFaxSecundario() {
+		return faxSecundario;
+	}
+
+	public String getFaxSecundarioComHifen(){
+		return formatarTelefoneComHifen(faxSecundario);
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public Logradouro getLogradouro() {
+		return logradouro;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public String getRamal() {
+		return ramal;
+	}
+
+	public String getRamalSecundario() {
+		return ramalSecundario;
+	}
+
+	public String getSobrenome() {
+		return sobrenome;
+	}
+
+	public String getTelefone() {
+		return telefone;
+	}
+
+	public String getTelefoneComHifen(){
+		return formatarTelefoneComHifen(telefone);
+	}
+
+	public String getTelefoneFormatado () {
+		if (this.isTelefoneVazio()) {
+			return "";
+		}
+		return this.formatarTelefone(this.ddi, this.ddd, this.telefone, this.ramal, this.fax);
+	}
+
+	public String getTelefoneSecundario() {
+		return telefoneSecundario;
+	}
+
+	public String getTelefoneSecundarioComHifen(){
+		return formatarTelefoneComHifen(telefoneSecundario);
+	}
+
+	public String getTelefoneSecundarioFormatado () {
+		if (this.isTelefoneSecundarioVazio()) {
+			return "";
+		}
+		return this.formatarTelefone(this.ddiSecundario, this.dddSecundario, this.telefoneSecundario, this.ramalSecundario, this.faxSecundario);
+	}
+
+	@Override
+	public int hashCode () {
+		return this.id != null ? this.id.hashCode() : super.hashCode();
+	}
+
+	public boolean isTelefoneSecundarioVazio() {
+		return this.telefoneSecundario == null; 
+	}
+
+	public boolean isTelefoneVazio() {
+		return this.telefone == null; 
+	}
+
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
+	}
+
+	public void setDdd(String ddd) {
+		this.ddd = ddd;
+	}
+	
+	public void setDddSecundario(String dddSecundario) {
+		this.dddSecundario = dddSecundario;
+	}
+
+	public void setDdi(String ddi) {
+		this.ddi = ddi;
+	}
+	
+	public void setDdiSecundario(String ddiSecundario) {
+		this.ddiSecundario = ddiSecundario;
+	}
+	
+	public void setDepartamento(String departamento) {
+		this.departamento = departamento;
+	}
+	
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	public void setFax(String fax) {
+		this.fax = fax;
+	}
+
+	public void setFaxSecundario(String faxSecundario) {
+		this.faxSecundario = faxSecundario;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public void setLogradouro(Logradouro logradouro) {
+		this.logradouro = logradouro;
+	}
+	
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public void setRamal(String ramal) {
+		this.ramal = ramal;
+	}
+	
+	public void setRamalSecundario(String ramalSecundario) {
+		this.ramalSecundario = ramalSecundario;
+	}
+	
+	public void setSobrenome(String sobrenome) {
+		this.sobrenome = sobrenome;
+	}
+	
+	
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
+	}
+	
+	public void setTelefoneSecundario(String telefoneSecundario) {
+		this.telefoneSecundario = telefoneSecundario;
 	}
 }

@@ -9,12 +9,12 @@ public class Subgrupo {
 		this.nomeSubgrupo = nomeSubgrupo;
 	}
 
-	public String getNomeSubgrupo() {
-		return nomeSubgrupo;
-	}
-
 	public String getNomeGrupo() {
 		return nomeGrupo;
+	}
+
+	public String getNomeSubgrupo() {
+		return nomeSubgrupo;
 	}
 
 }

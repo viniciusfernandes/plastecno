@@ -5,9 +5,6 @@ import java.util.Date;
 
 public final class DateUtils {
 
-    private DateUtils() {
-    }
-
     public static Calendar gerarCalendario(Date data) {
 
         if (data == null) {
@@ -34,12 +31,26 @@ public final class DateUtils {
         return calendar;
     }
 
+    public static Date gerarDataAtualSemHorario() {
+        return gerarCalendarioSemHorario(new Date()).getTime();
+    }
+
     public static Date gerarDataSemHorario(Date data) {
         return data != null ? gerarCalendarioSemHorario(data).getTime() : null;
     }
 
-    public static Date gerarDataAtualSemHorario() {
-        return gerarCalendarioSemHorario(new Date()).getTime();
+    public static boolean isAnterior(Date inicio, Date fim) {
+        if (inicio == null || fim == null) {
+            throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
+        }
+
+        inicio = gerarDataSemHorario(inicio);
+        fim = gerarDataSemHorario(fim);
+        return inicio.compareTo(fim) < 0;
+    }
+
+    public static boolean isAnteriorDataAtual(Date inicio) {
+        return isAnterior(inicio, new Date());
     }
 
     public static boolean isPosteriror(Date inicio, Date fim) {
@@ -53,21 +64,10 @@ public final class DateUtils {
         return inicio.compareTo(fim) > 0;
     }
 
-    public static boolean isAnterior(Date inicio, Date fim) {
-        if (inicio == null || fim == null) {
-            throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
-        }
-
-        inicio = gerarDataSemHorario(inicio);
-        fim = gerarDataSemHorario(fim);
-        return inicio.compareTo(fim) < 0;
-    }
-
     public static boolean isPosterirorDataAtual(final Date inicio) {
         return isPosteriror(inicio, new Date());
     }
 
-    public static boolean isAnteriorDataAtual(Date inicio) {
-        return isAnterior(inicio, new Date());
+    private DateUtils() {
     }
 }

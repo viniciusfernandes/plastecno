@@ -46,13 +46,26 @@ public class EnderecamentoServiceImpl implements EnderecamentoService {
 		return endereco;		
 	}
 	
+	private void inserirUF(String sigla, Pais pais) {
+		boolean isExistente = 
+				QueryUtil.gerarRegistroUnico(
+						this.entityManager.createQuery("select u from UF u where u.sigla = :sigla and u.pais.id = :idPais ")
+						.setParameter("sigla", sigla)
+						.setParameter("idPais", pais.getId()), UF.class, null) != null;
+
+
+		if (!isExistente) {
+			this.entityManager.merge(new UF(sigla, pais));
+		}
+	}
+
 	@Override
 	public boolean isCepExitente(String cep) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery("select e.cep from Endereco e where e.cep =:cep ")
 				.setParameter("cep", cep), Boolean.class, false, true);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see br.com.plastecno.service.CEPService#pesquisarBairroByCep(java.lang.String)
@@ -82,26 +95,21 @@ public class EnderecamentoServiceImpl implements EnderecamentoService {
 		return this.entityManager.createQuery(select.toString())
 				.setParameter("listaIdBairro", listaIdBairro).getResultList();
 	}
-	
+
 	@Override
 	public Endereco pesquisarByCep(String cep) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery("select e from Endereco e where e.cep =:cep ")
 				.setParameter("cep", cep), Endereco.class, null);
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<UF> pesquisarUF() {
-		return this.entityManager.createQuery("select uf from UF uf ").getResultList();
-	}
 	
 	@SuppressWarnings("unchecked")
-	private Integer pesquisarIdPaisByDescricao(String descricao) {
-		List<Integer> lista = this.entityManager.createQuery("select p.id from Pais p where p.descricao = :descricao")
-				.setParameter("descricao", descricao).getResultList();
+	private Integer pesquisarIdBairroByDescricao(String descricao, Integer idCidade) {
+		List<Integer> lista = this.entityManager.createQuery(
+				"select b.id from Bairro b where b.cidade.id = :idCidade and b.descricao = :descricao ")
+				.setParameter("descricao", descricao)
+				.setParameter("idCidade", idCidade).getResultList();
 		return lista.isEmpty() ? null : lista.get(0);
-	
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -115,24 +123,16 @@ public class EnderecamentoServiceImpl implements EnderecamentoService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Integer pesquisarIdBairroByDescricao(String descricao, Integer idCidade) {
-		List<Integer> lista = this.entityManager.createQuery(
-				"select b.id from Bairro b where b.cidade.id = :idCidade and b.descricao = :descricao ")
-				.setParameter("descricao", descricao)
-				.setParameter("idCidade", idCidade).getResultList();
+	private Integer pesquisarIdPaisByDescricao(String descricao) {
+		List<Integer> lista = this.entityManager.createQuery("select p.id from Pais p where p.descricao = :descricao")
+				.setParameter("descricao", descricao).getResultList();
 		return lista.isEmpty() ? null : lista.get(0);
+	
 	}
 	
-	private void inserirUF(String sigla, Pais pais) {
-		boolean isExistente = 
-				QueryUtil.gerarRegistroUnico(
-						this.entityManager.createQuery("select u from UF u where u.sigla = :sigla and u.pais.id = :idPais ")
-						.setParameter("sigla", sigla)
-						.setParameter("idPais", pais.getId()), UF.class, null) != null;
-
-
-		if (!isExistente) {
-			this.entityManager.merge(new UF(sigla, pais));
-		}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UF> pesquisarUF() {
+		return this.entityManager.createQuery("select uf from UF uf ").getResultList();
 	}
 }

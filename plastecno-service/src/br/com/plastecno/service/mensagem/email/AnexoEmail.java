@@ -18,14 +18,14 @@ public class AnexoEmail implements Serializable {
 	public byte[] getConteudo() {
 		return conteudo;
 	}
-	public String getTipoAnexo() {
-		return tipoAnexo;
+	public String getDescricao() {
+		return descricao;
 	}
 	public String getNome() {
 		return nome;
 	}
-	public String getDescricao() {
-		return descricao;
+	public String getTipoAnexo() {
+		return tipoAnexo;
 	}
 	
 }

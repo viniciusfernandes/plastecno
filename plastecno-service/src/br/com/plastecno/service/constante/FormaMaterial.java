@@ -17,6 +17,10 @@ public enum FormaMaterial {
 		this.temlargura = temlargura;
 	}
 	
+	public boolean contemLargura(){
+		return this.temlargura;
+	}
+	
 	public String getDescricao() {
 		return this.descricao;
 	}
@@ -29,15 +33,11 @@ public enum FormaMaterial {
 		return (int)(this.getIpi() * 100);
 	}
 	
-	public boolean contemLargura(){
-		return this.temlargura;
+	public boolean isFormaMaterialVazada(){
+		return TB.equals(this);
 	}
 	
 	public boolean isMedidaExternaIgualInterna(){
 		return BQ.equals(this);
-	}
-	
-	public boolean isFormaMaterialVazada(){
-		return TB.equals(this);
 	}
 }

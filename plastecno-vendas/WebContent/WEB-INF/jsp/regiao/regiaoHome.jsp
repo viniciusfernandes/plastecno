@@ -7,9 +7,11 @@
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
-<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 
@@ -94,76 +96,85 @@ function inicializarPesquisaBairro() {
 </script>
 
 </head>
-<body >
+<body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-	
-	<form id="formPesquisa" action="<c:url value="/regiao/listagem"/>" method="get">
-		<input type="hidden" id="filtroNome" name="filtro.nome"/>
+
+	<form id="formPesquisa" action="<c:url value="/regiao/listagem"/>"
+		method="get">
+		<input type="hidden" id="filtroNome" name="filtro.nome" />
 	</form>
-	
+
 	<form id="formVazio" action="<c:url value="/regiao"/>" method="get"></form>
-	
-	<form id="formRegiao" action="<c:url value="/regiao/inclusao"/>" method="post">
+
+	<form id="formRegiao" action="<c:url value="/regiao/inclusao"/>"
+		method="post">
 		<input type="hidden" id="codigo" name="regiao.id" value="${regiao.id}">
 		<fieldset>
 			<legend>::: Dados da Região :::</legend>
-			<div class="label obrigatorio" >Região:</div>
+			<div class="label obrigatorio">Região:</div>
 			<div class="input" style="width: 40%">
-				<input type="text" id="nome" name="regiao.nome" value="${regiao.nome}" class="pesquisavel"/>
+				<input type="text" id="nome" name="regiao.nome"
+					value="${regiao.nome}" class="pesquisavel" />
 			</div>
 		</fieldset>
 		<div class="bloco_botoes">
-			<a id="botaoPesquisarRegiao" title="Pesquisar Dados da Região" class="botaoPesquisar"></a>
-			<a id="botaoLimpar" title="Limpar Dados da Região" onclick="limparFormulario();" class="botaoLimpar"></a>
+			<a id="botaoPesquisarRegiao" title="Pesquisar Dados da Região"
+				class="botaoPesquisar"></a> <a id="botaoLimpar"
+				title="Limpar Dados da Região" onclick="limparFormulario();"
+				class="botaoLimpar"></a>
 		</div>
 
-	<jsp:include page="/bloco/bloco_picklist.jsp" />		
-	
-	<div class="bloco_botoes">
-		<c:if test="${acessoCadastroBasicoPermitido}">
-			<input type="button" id="botaoInserirRegiao" title="Incluir Dados da Região" class="botaoInserir"/>
-		</c:if>
-	</div>
+		<jsp:include page="/bloco/bloco_picklist.jsp" />
+
+		<div class="bloco_botoes">
+			<c:if test="${acessoCadastroBasicoPermitido}">
+				<input type="button" id="botaoInserirRegiao"
+					title="Incluir Dados da Região" class="botaoInserir" />
+			</c:if>
+		</div>
 	</form>
 
 	<a id="rodape"></a>
 	<fieldset>
 		<legend>::: Resultado da Pesquisa de Regiões :::</legend>
-			<div id="paginador"></div>
-			<div>
-				<table class="listrada">
-					<thead>
+		<div id="paginador"></div>
+		<div>
+			<table class="listrada">
+				<thead>
+					<tr>
+						<th style="width: 90%">Região</th>
+						<th>Ações</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					<c:forEach var="regiao" items="${listaRegiao}">
 						<tr>
-							<th style="width: 90%">Região</th>
-							<th>Ações</th>
-						</tr>
-					</thead>
-					
-					<tbody>
-						<c:forEach var="regiao" items="${listaRegiao}">
-							<tr>
-								<td>${regiao.nome}</td>
-								<td>
-									<div class="coluna_acoes_listagem">
-										<form action="<c:url value="/regiao/"/>${regiao.id}" method="get">
-											<input type="submit" title="Editar Dados da Região" value="" class="botaoEditar" />
+							<td>${regiao.nome}</td>
+							<td>
+								<div class="coluna_acoes_listagem">
+									<form action="<c:url value="/regiao/"/>${regiao.id}"
+										method="get">
+										<input type="submit" title="Editar Dados da Região" value=""
+											class="botaoEditar" />
+									</form>
+									<c:if test="${acessoCadastroBasicoPermitido}">
+										<form action="<c:url value="/regiao/remocao"/>" method="post">
+											<input type="hidden" name="idRegiao" value="${regiao.id}">
+											<input type="submit" id="botaoRemoverRegiao"
+												title="Remover Região" value="" class="botaoRemover"
+												onclick="javascript: return confirm('Voce deseja mesmo remover a REGIÃO?');" />
 										</form>
-										<c:if test="${acessoCadastroBasicoPermitido}">
-											<form action="<c:url value="/regiao/remocao"/>" method="post">
-												<input type="hidden" name="idRegiao" value="${regiao.id}">
-												<input type="submit" id="botaoRemoverRegiao" title="Remover Região" value="" class="botaoRemover"
-													onclick="javascript: return confirm('Voce deseja mesmo remover a REGIÃO?');"/>
-											</form>
-										</c:if>
-									</div>
-								</td>
-							</tr>
-		
-						</c:forEach>
-					</tbody>
-		
-				</table>
-			</div>
-		</fieldset>
+									</c:if>
+								</div>
+							</td>
+						</tr>
+
+					</c:forEach>
+				</tbody>
+
+			</table>
+		</div>
+	</fieldset>
 </body>
 </html>

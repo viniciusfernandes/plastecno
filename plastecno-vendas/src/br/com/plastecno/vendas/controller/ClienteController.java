@@ -62,60 +62,33 @@ public final class ClienteController extends AbstractController {
         this.liberarAcesso("acessoInclusaoPermitido", isInclusaoCliente || isVendedorIgual);
     }
 
-    @Post("cliente/inclusao/comentario")
-    public void inserirComentario(Integer idCliente, String comentario) {
-
-        if (idCliente == null) {
-            gerarListaMensagemErro("Para inserir um comentário é necessário escolher um cliente.");
-            irTopoPagina();
-        } else {
-            try {
-                clienteService.inserirComentario(idCliente, comentario);
-                this.gerarMensagemSucesso("Comentário sonre o cliente No. " + idCliente + " inserido com sucesso.");
-            } catch (BusinessException e) {
-                gerarListaMensagemErro(e);
-                addAtributo("comentario", comentario);
-            }
-            pesquisarClienteById(idCliente);
-        }
-    }
-
-    @Get("cliente/transportadora")
-    public void pesquisarTransportadoraByNomeFantasia(String nomeFantasia) {
-        final List<Autocomplete> listaResultado = new ArrayList<Autocomplete>();
-        final List<Transportadora> listaTransportadora = this.transportadoraService
-                .pesquisarByNomeFantasia(nomeFantasia);
-        for (Transportadora transportadora : listaTransportadora) {
-            listaResultado.add(new Autocomplete(transportadora.getId(), transportadora.getNomeFantasia()));
-        }
-        serializarJson(new SerializacaoJson("listaResultado", listaResultado));
-    }
-
-    @Get("cliente/{idCliente}")
-    public void pesquisarClienteById(Integer idCliente) {
-        Cliente cliente = this.clienteService.pesquisarById(idCliente);
-        this.carregarVendedor(cliente);
-
+    @Post("cliente/contactar")
+    public void contactar(Integer idClienteContactado) {
         try {
-            popularPicklist(null, this.clienteService.pesquisarTransportadorasAssociadas(idCliente));
-        } catch (ControllerException e) {
-            gerarLogErroNavegacao("Cliente", e);
+            this.clienteService.contactarCliente(idClienteContactado);
+            gerarMensagemSucesso("Cliente contactado com sucesso");
+        } catch (Exception e) {
+            gerarLogErroInclusao("Cliente", e);
         }
-
-        addAtributo("clienteAtivo", this.clienteService.isClienteAtivo(idCliente));
-
-        if (cliente.getDataUltimoContato() != null) {
-            addAtributo("ultimoContato", this.formatarData(cliente.getDataUltimoContato()));
-        }
-
-        this.formatarDocumento(cliente);
-        addAtributo("cliente", cliente);
-        addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade().getId()
-                : "");
-        addAtributo("listaLogradouro", this.clienteService.pesquisarLogradouro(idCliente));
-        addAtributo("listaContato", this.clienteService.pesquisarContato(idCliente));
-        addAtributo("comentarios", formatarComentarios(idCliente));
         irTopoPagina();
+    }
+
+    private String formatarComentarios(Integer idCliente) {
+        List<ComentarioCliente> listaComentario = this.clienteService
+                .pesquisarComentarioByIdCliente(idCliente);
+        StringBuilder concat = new StringBuilder();
+        for (ComentarioCliente comentarioCliente : listaComentario) {
+            concat.append("\n");
+            concat.append(StringUtils.formatarData(comentarioCliente.getDataInclusao()));
+            concat.append(" - ");
+            concat.append(comentarioCliente.getNomeVendedor());
+            concat.append(" ");
+            concat.append(comentarioCliente.getSobrenomeVendedor());
+            concat.append(" - ");
+            concat.append(comentarioCliente.getConteudo());
+            concat.append("\n");
+        }
+        return concat.toString();
     }
 
     @Post("cliente/inclusao")
@@ -165,27 +138,22 @@ public final class ClienteController extends AbstractController {
         irTopoPagina();
     }
 
-    @Post("cliente/logradouro/remocao/{idLogradouro}")
-    public void removerLogradouro(Integer idLogradouro) {
-        this.clienteService.removerLogradouro(idLogradouro);
-        irTopoPagina();
-    }
+    @Post("cliente/inclusao/comentario")
+    public void inserirComentario(Integer idCliente, String comentario) {
 
-    @Post("cliente/contato/remocao/{idContato}")
-    public void removerContato(Integer idContato) {
-        this.contatoService.remover(idContato, ContatoCliente.class);
-        irTopoPagina();
-    }
-
-    @Post("cliente/contactar")
-    public void contactar(Integer idClienteContactado) {
-        try {
-            this.clienteService.contactarCliente(idClienteContactado);
-            gerarMensagemSucesso("Cliente contactado com sucesso");
-        } catch (Exception e) {
-            gerarLogErroInclusao("Cliente", e);
+        if (idCliente == null) {
+            gerarListaMensagemErro("Para inserir um comentário é necessário escolher um cliente.");
+            irTopoPagina();
+        } else {
+            try {
+                clienteService.inserirComentario(idCliente, comentario);
+                this.gerarMensagemSucesso("Comentário sonre o cliente No. " + idCliente + " inserido com sucesso.");
+            } catch (BusinessException e) {
+                gerarListaMensagemErro(e);
+                addAtributo("comentario", comentario);
+            }
+            pesquisarClienteById(idCliente);
         }
-        irTopoPagina();
     }
 
     @Get("cliente/listagem")
@@ -202,21 +170,53 @@ public final class ClienteController extends AbstractController {
         addAtributo("cliente", filtro);
     }
 
-    private String formatarComentarios(Integer idCliente) {
-        List<ComentarioCliente> listaComentario = this.clienteService
-                .pesquisarComentarioByIdCliente(idCliente);
-        StringBuilder concat = new StringBuilder();
-        for (ComentarioCliente comentarioCliente : listaComentario) {
-            concat.append("\n");
-            concat.append(StringUtils.formatarData(comentarioCliente.getDataInclusao()));
-            concat.append(" - ");
-            concat.append(comentarioCliente.getNomeVendedor());
-            concat.append(" ");
-            concat.append(comentarioCliente.getSobrenomeVendedor());
-            concat.append(" - ");
-            concat.append(comentarioCliente.getConteudo());
-            concat.append("\n");
+    @Get("cliente/{idCliente}")
+    public void pesquisarClienteById(Integer idCliente) {
+        Cliente cliente = this.clienteService.pesquisarById(idCliente);
+        this.carregarVendedor(cliente);
+
+        try {
+            popularPicklist(null, this.clienteService.pesquisarTransportadorasAssociadas(idCliente));
+        } catch (ControllerException e) {
+            gerarLogErroNavegacao("Cliente", e);
         }
-        return concat.toString();
+
+        addAtributo("clienteAtivo", this.clienteService.isClienteAtivo(idCliente));
+
+        if (cliente.getDataUltimoContato() != null) {
+            addAtributo("ultimoContato", this.formatarData(cliente.getDataUltimoContato()));
+        }
+
+        this.formatarDocumento(cliente);
+        addAtributo("cliente", cliente);
+        addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade().getId()
+                : "");
+        addAtributo("listaLogradouro", this.clienteService.pesquisarLogradouro(idCliente));
+        addAtributo("listaContato", this.clienteService.pesquisarContato(idCliente));
+        addAtributo("comentarios", formatarComentarios(idCliente));
+        irTopoPagina();
+    }
+
+    @Get("cliente/transportadora")
+    public void pesquisarTransportadoraByNomeFantasia(String nomeFantasia) {
+        final List<Autocomplete> listaResultado = new ArrayList<Autocomplete>();
+        final List<Transportadora> listaTransportadora = this.transportadoraService
+                .pesquisarByNomeFantasia(nomeFantasia);
+        for (Transportadora transportadora : listaTransportadora) {
+            listaResultado.add(new Autocomplete(transportadora.getId(), transportadora.getNomeFantasia()));
+        }
+        serializarJson(new SerializacaoJson("listaResultado", listaResultado));
+    }
+
+    @Post("cliente/contato/remocao/{idContato}")
+    public void removerContato(Integer idContato) {
+        this.contatoService.remover(idContato, ContatoCliente.class);
+        irTopoPagina();
+    }
+
+    @Post("cliente/logradouro/remocao/{idLogradouro}")
+    public void removerLogradouro(Integer idLogradouro) {
+        this.clienteService.removerLogradouro(idLogradouro);
+        irTopoPagina();
     }
 }

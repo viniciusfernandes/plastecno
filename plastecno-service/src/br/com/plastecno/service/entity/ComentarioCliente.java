@@ -74,59 +74,59 @@ public class ComentarioCliente implements Serializable {
 		this.sobrenomeVendedor = sobrenomeVendedor;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public Date getDataInclusao() {
-		return dataInclusao;
-	}
-
-	public void setDataInclusao(Date dataInclusao) {
-		this.dataInclusao = dataInclusao;
+	public Cliente getCliente() {
+		return cliente;
 	}
 
 	public String getConteudo() {
 		return conteudo;
 	}
 
-	public void setConteudo(String conteudo) {
-		this.conteudo = conteudo;
+	public Date getDataInclusao() {
+		return dataInclusao;
 	}
 
-	public Usuario getVendedor() {
-		return vendedor;
-	}
-
-	public void setVendedor(Usuario vendedor) {
-		this.vendedor = vendedor;
-	}
-
-	public Cliente getCliente() {
-		return cliente;
-	}
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
+	public Integer getId() {
+		return id;
 	}
 
 	public String getNomeVendedor() {
 		return nomeVendedor;
 	}
 
-	public void setNomeVendedor(String nomeVendedor) {
-		this.nomeVendedor = nomeVendedor;
-	}
-
 	public String getSobrenomeVendedor() {
 		return sobrenomeVendedor;
 	}
 
+	public Usuario getVendedor() {
+		return vendedor;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public void setConteudo(String conteudo) {
+		this.conteudo = conteudo;
+	}
+
+	public void setDataInclusao(Date dataInclusao) {
+		this.dataInclusao = dataInclusao;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void setNomeVendedor(String nomeVendedor) {
+		this.nomeVendedor = nomeVendedor;
+	}
+
 	public void setSobrenomeVendedor(String sobrenomeVendedor) {
 		this.sobrenomeVendedor = sobrenomeVendedor;
+	}
+
+	public void setVendedor(Usuario vendedor) {
+		this.vendedor = vendedor;
 	}
 }

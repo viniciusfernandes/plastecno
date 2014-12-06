@@ -41,15 +41,15 @@ public class LogradouroCliente extends Logradouro {
 	Cliente getCliente() {
 		return cliente;
 	}
-	void setCliente(Cliente cliente) {
-		this.cliente = cliente;
-	}
-
 	public boolean isCancelado() {
 		return cancelado;
 	}
 
 	public void setCancelado(boolean cancelado) {
 		this.cancelado = cancelado;
+	}
+
+	void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 }

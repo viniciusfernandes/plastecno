@@ -13,7 +13,8 @@ $(document).ready(function(){
 
 </script>
 <a id="topo"></a>
-<div id="bloco_mensagem"  class="areaMensagem ${cssMensagem}" <c:if test="${empty listaMensagem}"> style="display: none;"</c:if>>
+<div id="bloco_mensagem" class="areaMensagem ${cssMensagem}"
+	<c:if test="${empty listaMensagem}"> style="display: none;"</c:if>>
 	<ul>
 		<c:forEach var="mensagem" items="${listaMensagem}">
 			<li>${mensagem}</li>

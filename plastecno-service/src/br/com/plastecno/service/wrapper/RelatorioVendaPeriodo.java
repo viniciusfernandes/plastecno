@@ -16,16 +16,8 @@ public class RelatorioVendaPeriodo {
         this.agrupamento = new Agrupamento<VendedorWrapper, VendaRepresentadaWrapper>(titulo);
     }
 
-    public List<VendedorWrapper> getListaVendedor() {
-        return this.agrupamento.getListaGrupo();
-    }
-
     public void addVenda(String nomeVendedor, VendaRepresentadaWrapper venda) throws AgrupamentoException {
         this.agrupamento.addSubgrupo(nomeVendedor, venda, VendedorWrapper.class);
-    }
-
-    public String getTitulo() {
-        return this.agrupamento.getTitulo();
     }
 
     public List<VendaRepresentadaWrapper> getListaVendaRepresentada() {
@@ -45,6 +37,14 @@ public class RelatorioVendaPeriodo {
         }
 
         return listaVenda;
+    }
+
+    public List<VendedorWrapper> getListaVendedor() {
+        return this.agrupamento.getListaGrupo();
+    }
+
+    public String getTitulo() {
+        return this.agrupamento.getTitulo();
     }
 
     public String getValorTotalVendido() {

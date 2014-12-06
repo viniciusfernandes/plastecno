@@ -125,132 +125,49 @@ public class ItemPedido implements Serializable, Cloneable {
 		this.formaMaterial = formaMaterial;
 	}
 
-	public Integer getSequencial() {
-		return sequencial;
+	public double calcularPrecoTotal() {
+		return this.quantidade != null && this.precoVenda != null ? this.quantidade
+				* this.precoVenda
+				: 0d;
 	}
 
-	public void setSequencial(Integer sequencial) {
-		this.sequencial = sequencial;
+	@Override
+	public ItemPedido clone() throws CloneNotSupportedException {
+		ItemPedido clone = (ItemPedido) super.clone();
+		clone.setId(null);
+		clone.setPedido(null);
+		return clone;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public Double getComprimento() {
-		return comprimento;
-	}
-
-	public void setComprimento(Double comprimento) {
-		this.comprimento = comprimento;
-	}
-
-	public Integer getQuantidade() {
-		return quantidade;
-	}
-
-	public void setQuantidade(Integer quantidade) {
-		this.quantidade = quantidade;
-	}
-
-	public FormaMaterial getFormaMaterial() {
-		return formaMaterial;
-	}
-
-	public void setFormaMaterial(FormaMaterial formaMaterial) {
-		this.formaMaterial = formaMaterial;
-	}
-
-	public TipoVenda getTipoVenda() {
-		return tipoVenda;
-	}
-
-	public void setTipoVenda(TipoVenda tipoVenda) {
-		this.tipoVenda = tipoVenda;
-	}
-
-	public Double getMedidaInterna() {
-		return medidaInterna;
-	}
-
-	public void setMedidaInterna(Double medidaInterna) {
-		this.medidaInterna = medidaInterna;
-	}
-
-	public Double getMedidaExterna() {
-		return medidaExterna;
-	}
-
-	public void setMedidaExterna(Double medidaExterna) {
-		this.medidaExterna = medidaExterna;
-	}
-
-	public Double getPrecoUnidade() {
-		return precoUnidade;
-	}
-
-	public void setPrecoUnidade(Double precoUnidade) {
-		this.precoUnidade = precoUnidade;
-	}
-
-	public Pedido getPedido() {
-		return pedido;
-	}
-
-	public void setPedido(Pedido pedido) {
-		this.pedido = pedido;
-	}
-
-	public Material getMaterial() {
-		return material;
-	}
-
-	public void setMaterial(Material material) {
-		this.material = material;
-	}
-
-	public String getDescricaoPeca() {
-		return descricaoPeca;
-	}
-
-	public void setDescricaoPeca(String descricaoPeca) {
-		this.descricaoPeca = descricaoPeca;
-	}
-
-	public Double getPrecoVenda() {
-		return precoVenda;
-	}
-
-	public void setPrecoVenda(Double precoVenda) {
-		this.precoVenda = precoVenda;
-	}
-
-	public Double getPrecoUnidadeIPI() {
-		return precoUnidadeIPI;
-	}
-
-	public void setPrecoUnidadeIPI(Double precoUnidadeIPI) {
-		this.precoUnidadeIPI = precoUnidadeIPI;
+	public boolean contemLargura() {
+		return this.formaMaterial != null && this.formaMaterial.contemLargura();
 	}
 
 	public Double getAliquotaICMS() {
 		return aliquotaICMS;
 	}
 
-	public void setAliquotaICMS(Double aliquotaICMS) {
-		this.aliquotaICMS = aliquotaICMS;
+	public String getAliquotaICMSFormatado() {
+		return aliquotaICMSFormatado;
 	}
 
-	public String getPrecoItemFormatado() {
-		return precoItemFormatado;
+	public Double getAliquotaIPI() {
+		return aliquotaIPI;
 	}
 
-	public void setPrecoItemFormatado(String precoItemFormatado) {
-		this.precoItemFormatado = precoItemFormatado;
+	public String getAliquotaIPIFormatado() {
+		return aliquotaIPIFormatado;
+	}
+
+	public Double getComprimento() {
+		return comprimento;
+	}
+
+	public String getComprimentoFormatado() {
+		if (comprimentoFormatado == null) {
+			return " _ ";
+		}
+		return comprimentoFormatado;
 	}
 
 	public String getDescricao() {
@@ -283,63 +200,24 @@ public class ItemPedido implements Serializable, Cloneable {
 		return descricao.toString();
 	}
 
-	public boolean isNovo() {
-		return this.id == null;
-	}
-	
-	public boolean isPeca() {
-		return FormaMaterial.PC.equals(this.formaMaterial);
+	public String getDescricaoPeca() {
+		return descricaoPeca;
 	}
 
-	public boolean isVendaKilo() {
-		return TipoVenda.KILO.equals(this.tipoVenda);
+	public FormaMaterial getFormaMaterial() {
+		return formaMaterial;
 	}
 
-	public double calcularPrecoTotal() {
-		return this.quantidade != null && this.precoVenda != null ? this.quantidade
-				* this.precoVenda
-				: 0d;
+	public Integer getId() {
+		return id;
 	}
 
-	public boolean contemLargura() {
-		return this.formaMaterial != null && this.formaMaterial.contemLargura();
+	public Material getMaterial() {
+		return material;
 	}
 
-	public boolean isMedidaExternaIgualInterna() {
-		return this.formaMaterial != null
-				&& this.formaMaterial.isMedidaExternaIgualInterna();
-	}
-
-	public String getPrecoUnidadeFormatado() {
-		return precoUnidadeFormatado;
-	}
-
-	public void setPrecoUnidadeFormatado(String precoUnidadeFormatado) {
-		this.precoUnidadeFormatado = precoUnidadeFormatado;
-	}
-
-	public String getPrecoUnidadeIPIFormatado() {
-		return precoUnidadeIPIFormatado;
-	}
-
-	public void setPrecoUnidadeIPIFormatado(String precoUnidadeIPIFormatado) {
-		this.precoUnidadeIPIFormatado = precoUnidadeIPIFormatado;
-	}
-
-	public String getPrecoVendaFormatado() {
-		return precoVendaFormatado;
-	}
-
-	public void setPrecoVendaFormatado(String precoVendaFormatado) {
-		this.precoVendaFormatado = precoVendaFormatado;
-	}
-
-	public String getAliquotaICMSFormatado() {
-		return aliquotaICMSFormatado;
-	}
-
-	public void setAliquotaICMSFormatado(String aliquotaICMSFormatado) {
-		this.aliquotaICMSFormatado = aliquotaICMSFormatado;
+	public Double getMedidaExterna() {
+		return medidaExterna;
 	}
 
 	public String getMedidaExternaFomatada() {
@@ -349,8 +227,8 @@ public class ItemPedido implements Serializable, Cloneable {
 		return medidaExternaFomatada;
 	}
 
-	public void setMedidaExternaFomatada(String medidaExternaFomatada) {
-		this.medidaExternaFomatada = medidaExternaFomatada;
+	public Double getMedidaInterna() {
+		return medidaInterna;
 	}
 
 	public String getMedidaInternaFomatada() {
@@ -360,23 +238,8 @@ public class ItemPedido implements Serializable, Cloneable {
 		return medidaInternaFomatada;
 	}
 
-	public void setMedidaInternaFomatada(String medidaInternaFomatada) {
-		this.medidaInternaFomatada = medidaInternaFomatada;
-	}
-
-	public String getComprimentoFormatado() {
-		if (comprimentoFormatado == null) {
-			return " _ ";
-		}
-		return comprimentoFormatado;
-	}
-
-	public void setComprimentoFormatado(String comprimentoFormatado) {
-		this.comprimentoFormatado = comprimentoFormatado;
-	}
-
-	public boolean isFormaMaterialVazada() {
-		return formaMaterial != null && formaMaterial.isFormaMaterialVazada();
+	public Pedido getPedido() {
+		return pedido;
 	}
 
 	public double getPrecoItem() {
@@ -387,28 +250,165 @@ public class ItemPedido implements Serializable, Cloneable {
 		return precoUnidade * quantidade;
 	}
 
-	@Override
-	public ItemPedido clone() throws CloneNotSupportedException {
-		ItemPedido clone = (ItemPedido) super.clone();
-		clone.setId(null);
-		clone.setPedido(null);
-		return clone;
+	public String getPrecoItemFormatado() {
+		return precoItemFormatado;
 	}
 
-	public Double getAliquotaIPI() {
-		return aliquotaIPI;
+	public Double getPrecoUnidade() {
+		return precoUnidade;
+	}
+
+	public String getPrecoUnidadeFormatado() {
+		return precoUnidadeFormatado;
+	}
+
+	public Double getPrecoUnidadeIPI() {
+		return precoUnidadeIPI;
+	}
+
+	public String getPrecoUnidadeIPIFormatado() {
+		return precoUnidadeIPIFormatado;
+	}
+
+	public Double getPrecoVenda() {
+		return precoVenda;
+	}
+
+	public String getPrecoVendaFormatado() {
+		return precoVendaFormatado;
+	}
+
+	public Integer getQuantidade() {
+		return quantidade;
+	}
+
+	public Integer getSequencial() {
+		return sequencial;
+	}
+
+	public TipoVenda getTipoVenda() {
+		return tipoVenda;
+	}
+
+	public boolean isFormaMaterialVazada() {
+		return formaMaterial != null && formaMaterial.isFormaMaterialVazada();
+	}
+
+	public boolean isMedidaExternaIgualInterna() {
+		return this.formaMaterial != null
+				&& this.formaMaterial.isMedidaExternaIgualInterna();
+	}
+
+	public boolean isNovo() {
+		return this.id == null;
+	}
+
+	public boolean isPeca() {
+		return FormaMaterial.PC.equals(this.formaMaterial);
+	}
+	
+	public boolean isVendaKilo() {
+		return TipoVenda.KILO.equals(this.tipoVenda);
+	}
+
+	public void setAliquotaICMS(Double aliquotaICMS) {
+		this.aliquotaICMS = aliquotaICMS;
+	}
+
+	public void setAliquotaICMSFormatado(String aliquotaICMSFormatado) {
+		this.aliquotaICMSFormatado = aliquotaICMSFormatado;
 	}
 
 	public void setAliquotaIPI(Double aliquotaIPI) {
 		this.aliquotaIPI = aliquotaIPI;
 	}
 
-	public String getAliquotaIPIFormatado() {
-		return aliquotaIPIFormatado;
-	}
-
 	public void setAliquotaIPIFormatado(String aliquotaIPIFormatado) {
 		this.aliquotaIPIFormatado = aliquotaIPIFormatado;
+	}
+
+	public void setComprimento(Double comprimento) {
+		this.comprimento = comprimento;
+	}
+
+	public void setComprimentoFormatado(String comprimentoFormatado) {
+		this.comprimentoFormatado = comprimentoFormatado;
+	}
+
+	public void setDescricaoPeca(String descricaoPeca) {
+		this.descricaoPeca = descricaoPeca;
+	}
+
+	public void setFormaMaterial(FormaMaterial formaMaterial) {
+		this.formaMaterial = formaMaterial;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void setMaterial(Material material) {
+		this.material = material;
+	}
+
+	public void setMedidaExterna(Double medidaExterna) {
+		this.medidaExterna = medidaExterna;
+	}
+
+	public void setMedidaExternaFomatada(String medidaExternaFomatada) {
+		this.medidaExternaFomatada = medidaExternaFomatada;
+	}
+
+	public void setMedidaInterna(Double medidaInterna) {
+		this.medidaInterna = medidaInterna;
+	}
+
+	public void setMedidaInternaFomatada(String medidaInternaFomatada) {
+		this.medidaInternaFomatada = medidaInternaFomatada;
+	}
+
+	public void setPedido(Pedido pedido) {
+		this.pedido = pedido;
+	}
+
+	public void setPrecoItemFormatado(String precoItemFormatado) {
+		this.precoItemFormatado = precoItemFormatado;
+	}
+
+	public void setPrecoUnidade(Double precoUnidade) {
+		this.precoUnidade = precoUnidade;
+	}
+
+	public void setPrecoUnidadeFormatado(String precoUnidadeFormatado) {
+		this.precoUnidadeFormatado = precoUnidadeFormatado;
+	}
+
+	public void setPrecoUnidadeIPI(Double precoUnidadeIPI) {
+		this.precoUnidadeIPI = precoUnidadeIPI;
+	}
+
+	public void setPrecoUnidadeIPIFormatado(String precoUnidadeIPIFormatado) {
+		this.precoUnidadeIPIFormatado = precoUnidadeIPIFormatado;
+	}
+
+	public void setPrecoVenda(Double precoVenda) {
+		this.precoVenda = precoVenda;
+	}
+
+	public void setPrecoVendaFormatado(String precoVendaFormatado) {
+		this.precoVendaFormatado = precoVendaFormatado;
+	}
+
+	public void setQuantidade(Integer quantidade) {
+		this.quantidade = quantidade;
+	}
+
+	public void setSequencial(Integer sequencial) {
+		this.sequencial = sequencial;
+	}
+
+	public void setTipoVenda(TipoVenda tipoVenda) {
+		this.tipoVenda = tipoVenda;
 	}
 
 }

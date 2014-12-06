@@ -55,78 +55,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 
     private RelatorioVendasDAO relatorioVendasDAO;
 
-    @PostConstruct
-    public void init() {
-        relatorioVendasDAO = new RelatorioVendasDAO(this.entityManager);
-    }
-
-    @Override
-    public RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,
-            Integer idVendedor) throws BusinessException {
-        Usuario vendedor = this.usuarioService.pesquisarVendedorById(idVendedor);
-
-        if (vendedor == null) {
-            throw new BusinessException("O vendedor é obrigatório para a geração do relatório");
-        }
-
-        final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamento " : "Vendas ").append(" do Vendedor ")
-                .append(vendedor.getNome()).append(" de ").append(StringUtils.formatarData(periodo.getInicio()))
-                .append(" à ").append(StringUtils.formatarData(periodo.getFim()));
-
-        final RelatorioVendaVendedorByRepresentada relatorio = new RelatorioVendaVendedorByRepresentada(
-                titulo.toString());
-        List<Pedido> listaPedido = this.pedidoService.pesquisarByPeriodoEVendedor(orcamento, periodo, idVendedor);
-        for (Pedido pedido : listaPedido) {
-            try {
-                pedido.setDataEnvioFormatada(StringUtils.formatarData(pedido.getDataEnvio()));
-                relatorio.addRepresentada(pedido.getRepresentada().getNomeFantasia(), new VendaClienteWrapper(pedido));
-            } catch (Exception e) {
-                throw new BusinessException("Falha na geracao do relatorio de vendas do vendedor " + idVendedor, e);
-            }
-        }
-
-        return relatorio;
-    }
-
-    @Override
-    public List<Pedido> pesquisarEntregas(Periodo periodo) throws InformacaoInvalidaException {
-        return this.pedidoService.pesquisarEnviadosByPeriodo(periodo);
-    }
-
-    @Override
-    public List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor) {
-        return this.clienteService.pesquisarByIdVendedor(idVendedor);
-    }
-
-    @Override
-    public RelatorioVendaPeriodo gerarRelatorioVendaPeriodo(Periodo periodo)
-            throws BusinessException {
-
-        final List<Object[]> resultados = this.relatorioVendasDAO
-                .pesquisarVendas(periodo.getInicio(), periodo.getFim());
-
-        final StringBuilder titulo = new StringBuilder();
-        titulo.append("Relatório das Vendas do Período de ");
-        titulo.append(StringUtils.formatarData(periodo.getInicio()));
-        titulo.append(" à ");
-        titulo.append(StringUtils.formatarData(periodo.getFim()));
-        final RelatorioVendaPeriodo relatorio = new RelatorioVendaPeriodo(
-                titulo.toString());
-
-        for (Object[] resultado : resultados) {
-
-            try {
-                relatorio.addVenda(resultado[0].toString(), new VendaRepresentadaWrapper(resultado[1].toString(),
-                        (Double) resultado[2]));
-            } catch (AgrupamentoException e) {
-                throw new BusinessException(
-                        "Falha na construcao do relatorio de vendas da representada por vendedor", e);
-            }
-        }
-
-        return relatorio;
-    }
-
     @Override
     public RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade)
             throws BusinessException {
@@ -163,5 +91,77 @@ public class RelatorioServiceImpl implements RelatorioService {
         }
 
         return relatorio;
+    }
+
+    @Override
+    public RelatorioVendaPeriodo gerarRelatorioVendaPeriodo(Periodo periodo)
+            throws BusinessException {
+
+        final List<Object[]> resultados = this.relatorioVendasDAO
+                .pesquisarVendas(periodo.getInicio(), periodo.getFim());
+
+        final StringBuilder titulo = new StringBuilder();
+        titulo.append("Relatório das Vendas do Período de ");
+        titulo.append(StringUtils.formatarData(periodo.getInicio()));
+        titulo.append(" à ");
+        titulo.append(StringUtils.formatarData(periodo.getFim()));
+        final RelatorioVendaPeriodo relatorio = new RelatorioVendaPeriodo(
+                titulo.toString());
+
+        for (Object[] resultado : resultados) {
+
+            try {
+                relatorio.addVenda(resultado[0].toString(), new VendaRepresentadaWrapper(resultado[1].toString(),
+                        (Double) resultado[2]));
+            } catch (AgrupamentoException e) {
+                throw new BusinessException(
+                        "Falha na construcao do relatorio de vendas da representada por vendedor", e);
+            }
+        }
+
+        return relatorio;
+    }
+
+    @Override
+    public RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,
+            Integer idVendedor) throws BusinessException {
+        Usuario vendedor = this.usuarioService.pesquisarVendedorById(idVendedor);
+
+        if (vendedor == null) {
+            throw new BusinessException("O vendedor é obrigatório para a geração do relatório");
+        }
+
+        final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamento " : "Vendas ").append(" do Vendedor ")
+                .append(vendedor.getNome()).append(" de ").append(StringUtils.formatarData(periodo.getInicio()))
+                .append(" à ").append(StringUtils.formatarData(periodo.getFim()));
+
+        final RelatorioVendaVendedorByRepresentada relatorio = new RelatorioVendaVendedorByRepresentada(
+                titulo.toString());
+        List<Pedido> listaPedido = this.pedidoService.pesquisarByPeriodoEVendedor(orcamento, periodo, idVendedor);
+        for (Pedido pedido : listaPedido) {
+            try {
+                pedido.setDataEnvioFormatada(StringUtils.formatarData(pedido.getDataEnvio()));
+                relatorio.addRepresentada(pedido.getRepresentada().getNomeFantasia(), new VendaClienteWrapper(pedido));
+            } catch (Exception e) {
+                throw new BusinessException("Falha na geracao do relatorio de vendas do vendedor " + idVendedor, e);
+            }
+        }
+
+        return relatorio;
+    }
+
+    @PostConstruct
+    public void init() {
+        relatorioVendasDAO = new RelatorioVendasDAO(this.entityManager);
+    }
+
+    @Override
+    public List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor) {
+        return this.clienteService.pesquisarByIdVendedor(idVendedor);
+    }
+
+    @Override
+    public List<Pedido> pesquisarEntregas(Periodo periodo) throws InformacaoInvalidaException {
+        return this.pedidoService.pesquisarEnviadosByPeriodo(periodo);
     }
 }

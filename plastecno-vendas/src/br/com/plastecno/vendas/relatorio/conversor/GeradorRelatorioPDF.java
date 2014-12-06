@@ -20,6 +20,15 @@ import br.com.plastecno.vendas.relatorio.conversor.exception.ConversaoHTML2PDFEx
 @Component
 public final class GeradorRelatorioPDF {
 
+    /*
+     * Os grupos encontrados em cada linha sao recuperados contendo as chaves
+     * como {cliente.nome}, {pedido.id}, etc. Sendo que para recuperarmos os
+     * valores dos objetos atraves de reflection devemos remover as chaves,
+     * ficando assim: {cliente.nome} => cliente.nome, {pedido.id} => pedido.id
+     */
+    private static String limpar(String property) {
+        return property.replace("{", "").replace("}", "");
+    }
     private final String regex = "\\{[a-zA-Z]+(\\.[a-zA-Z]+)*\\}";
     private final PropertyResolver resolver;
     private final ConversorHTML2PDF conversor;
@@ -27,12 +36,97 @@ public final class GeradorRelatorioPDF {
     private StringBuilder html;
     private StringBuilder css;
     private StringBuilder cabecalho;
+
     private boolean layoutConfigurado;
 
     public GeradorRelatorioPDF() {
         charset = Charset.forName("UTF-8");
         conversor = new ConversorHTML2PDF(charset);
         resolver = new PropertyResolver();
+    }
+
+    public void addAtributo(String property, Object value) {
+        this.resolver.addProperty(property, value);
+    }
+
+    /*
+     * Esse metodo foi implementado para reaproveitamento de codigo para futuros
+     * relatorios exibirem o mesmo cabecalho, mas ainda nao sei o porque ele
+     * esta com problemas no charset, entao removemos a marcacao dele no
+     * relatorio de pedidos.
+     */
+    @Deprecated
+    private void addCabecalho(File arquivoCabecalho) throws ConversaoHTML2PDFException {
+        this.cabecalho = new StringBuilder();
+        copiarConteudo(arquivoCabecalho, this.cabecalho);
+
+        // Temos que adicionar o conteudo do CABECALHO nas propriedades que
+        // serao
+        // populadas no momento de converter o arquivo para o CABECALHO seja
+        // incluido
+        // no HTML resultante da conversao.
+        this.addAtributo("conteudoCabecalho", this.cabecalho.toString());
+    }
+
+    private void addCss(File arquivoCSS) throws ConversaoHTML2PDFException {
+        this.css = new StringBuilder();
+        copiarConteudo(arquivoCSS, this.css);
+
+        // Temos que adicionar o conteudo CSS nas propriedades que serao
+        // populadas no momento de converter o arquivo para o o CSS sea incluido
+        // no HTML resultante da conversao.
+        this.addAtributo("conteudoCss", this.css.toString());
+    }
+
+    private void configurarLayout(File arquivo) throws ConversaoHTML2PDFException {
+        // Vamos configuraro o layout apenas 1 vez pois foi definido que o CSS e
+        // o cabecalho do relatorio sera o mesmo para todos os arquivos gerados,
+        // independente do tipo de relatorio requisitado. Entao, se tivermos um
+        // laco para gerar varios relatorios em um lote teremos um ganho de
+        // performance ao carregar o CSS.
+        if (!this.layoutConfigurado) {
+            this.addCss(new File(arquivo.getParentFile(), "/css/relatorio.css"));
+            this.addCabecalho(new File(arquivo.getParentFile(), "/cabecalho.html"));
+            layoutConfigurado = true;
+        }
+    }
+
+    private void copiarConteudo(File arquivo, StringBuilder conteudo) throws ConversaoHTML2PDFException {
+        BufferedReader reader;
+        try {
+            /*
+             * Aqui nao estamos passando o charset pois o conteudo sera
+             * convertido apenas na etapa final ao fazermos o gerarHTML.
+             */
+
+            reader = gerarBufferedFileReader(arquivo, null);
+        } catch (FileNotFoundException e1) {
+            throw new ConversaoHTML2PDFException("Nao foi possivel encontrar o arquivo " + arquivo.getName(), e1);
+        }
+        String linha = null;
+        try {
+            while ((linha = reader.readLine()) != null) {
+                conteudo.append(linha).append("\n");
+            }
+        } catch (IOException e) {
+            throw new ConversaoHTML2PDFException("Falha na leitura do arquivo " + arquivo.getName(), e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    throw new ConversaoHTML2PDFException("Falha na liberacao dos recursos na leitura do arquivo "
+                            + arquivo.getName(), e);
+                }
+            }
+        }
+    }
+
+    private BufferedReader gerarBufferedFileReader(File file, Charset charset) throws FileNotFoundException {
+        if (charset == null) {
+            return new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+        }
+        return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
     }
 
     public String gerarHTML() {
@@ -156,99 +250,5 @@ public final class GeradorRelatorioPDF {
                         + "Nao foi possivel liberar recursos de leitura do arquivo.", e);
             }
         }
-    }
-
-    public void addAtributo(String property, Object value) {
-        this.resolver.addProperty(property, value);
-    }
-
-    private void configurarLayout(File arquivo) throws ConversaoHTML2PDFException {
-        // Vamos configuraro o layout apenas 1 vez pois foi definido que o CSS e
-        // o cabecalho do relatorio sera o mesmo para todos os arquivos gerados,
-        // independente do tipo de relatorio requisitado. Entao, se tivermos um
-        // laco para gerar varios relatorios em um lote teremos um ganho de
-        // performance ao carregar o CSS.
-        if (!this.layoutConfigurado) {
-            this.addCss(new File(arquivo.getParentFile(), "/css/relatorio.css"));
-            this.addCabecalho(new File(arquivo.getParentFile(), "/cabecalho.html"));
-            layoutConfigurado = true;
-        }
-    }
-
-    private void addCss(File arquivoCSS) throws ConversaoHTML2PDFException {
-        this.css = new StringBuilder();
-        copiarConteudo(arquivoCSS, this.css);
-
-        // Temos que adicionar o conteudo CSS nas propriedades que serao
-        // populadas no momento de converter o arquivo para o o CSS sea incluido
-        // no HTML resultante da conversao.
-        this.addAtributo("conteudoCss", this.css.toString());
-    }
-
-    /*
-     * Esse metodo foi implementado para reaproveitamento de codigo para futuros
-     * relatorios exibirem o mesmo cabecalho, mas ainda nao sei o porque ele
-     * esta com problemas no charset, entao removemos a marcacao dele no
-     * relatorio de pedidos.
-     */
-    @Deprecated
-    private void addCabecalho(File arquivoCabecalho) throws ConversaoHTML2PDFException {
-        this.cabecalho = new StringBuilder();
-        copiarConteudo(arquivoCabecalho, this.cabecalho);
-
-        // Temos que adicionar o conteudo do CABECALHO nas propriedades que
-        // serao
-        // populadas no momento de converter o arquivo para o CABECALHO seja
-        // incluido
-        // no HTML resultante da conversao.
-        this.addAtributo("conteudoCabecalho", this.cabecalho.toString());
-    }
-
-    private void copiarConteudo(File arquivo, StringBuilder conteudo) throws ConversaoHTML2PDFException {
-        BufferedReader reader;
-        try {
-            /*
-             * Aqui nao estamos passando o charset pois o conteudo sera
-             * convertido apenas na etapa final ao fazermos o gerarHTML.
-             */
-
-            reader = gerarBufferedFileReader(arquivo, null);
-        } catch (FileNotFoundException e1) {
-            throw new ConversaoHTML2PDFException("Nao foi possivel encontrar o arquivo " + arquivo.getName(), e1);
-        }
-        String linha = null;
-        try {
-            while ((linha = reader.readLine()) != null) {
-                conteudo.append(linha).append("\n");
-            }
-        } catch (IOException e) {
-            throw new ConversaoHTML2PDFException("Falha na leitura do arquivo " + arquivo.getName(), e);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    throw new ConversaoHTML2PDFException("Falha na liberacao dos recursos na leitura do arquivo "
-                            + arquivo.getName(), e);
-                }
-            }
-        }
-    }
-
-    /*
-     * Os grupos encontrados em cada linha sao recuperados contendo as chaves
-     * como {cliente.nome}, {pedido.id}, etc. Sendo que para recuperarmos os
-     * valores dos objetos atraves de reflection devemos remover as chaves,
-     * ficando assim: {cliente.nome} => cliente.nome, {pedido.id} => pedido.id
-     */
-    private static String limpar(String property) {
-        return property.replace("{", "").replace("}", "");
-    }
-
-    private BufferedReader gerarBufferedFileReader(File file, Charset charset) throws FileNotFoundException {
-        if (charset == null) {
-            return new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-        }
-        return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
     }
 }

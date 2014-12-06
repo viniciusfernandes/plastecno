@@ -61,38 +61,6 @@ public class Logradouro implements Serializable, Cloneable {
 		this.endereco = endereco;
 	}
 	
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public Integer getNumero() {
-		return numero;
-	}
-
-	public void setNumero(Integer numero) {
-		this.numero = numero;
-	}
-
-	public String getComplemento() {
-		return complemento;
-	}
-
-	public void setComplemento(String complemento) {
-		this.complemento = complemento;
-	}
-	
-	public String getEndereco(){
-		return this.endereco.getDescricao();
-	}
-	
-	public void setEndereco(String endereco){
-		this.endereco.setDescricao(endereco);
-	}
-	
 	/*
 	 * Esse metodo foi nao pode ser sobreecrito por setEndereco(Endereco)
 	 * pois o preenchimento dos entities pelo vraptor nao compreende essa 
@@ -101,81 +69,17 @@ public class Logradouro implements Serializable, Cloneable {
 	public void addEndereco(Endereco endereco){
 		this.endereco = endereco;
 	}
-	
-	public Endereco recuperarEndereco() {
-		return this.endereco;
-	}
-	
-	public String getCep(){
-		return this.endereco.getCep();
-	}
-	
-	public void setCep(String cep){
-		this.endereco.setCep(cep);
-	}
-	
-	public String getBairro(){
-		return this.endereco.getBairro().getDescricao();
-	}
-	
-	public void setBairro(String bairro){
-		this.endereco.getBairro().setDescricao(bairro);
-	}
-	
-	public String getCidade(){
-		return this.endereco.getCidade().getDescricao();
-	}
-	
-	public void setCidade(String cidade){
-		this.endereco.getCidade().setDescricao(cidade);
-	}
-	
-	public String getUf(){
-		return this.endereco.getCidade().getUf();
-	}
-	
-	public void setUf(String uf){
-		this.endereco.getCidade().setUf(uf);
+
+	@Override
+	public Logradouro clone() throws CloneNotSupportedException {
+		return (Logradouro) super.clone();
 	}
 
-	public TipoLogradouro getTipoLogradouro() {
-		return this.tipoLogradouro;
-	}
-	
-	public void setTipoLogradouro(TipoLogradouro tipoLogradouro) {
-		this.tipoLogradouro = tipoLogradouro;
-	}
-	
-	public String getPais() {
-		return this.endereco.getCidade().getPais().getDescricao();
-	}
-	
-	public void setPais(String pais) {
-		this.endereco.getCidade().getPais().setDescricao(pais);
-	}
-	
-	public Boolean getCodificado() {
-		return codificado;
-	}
-
-	public void setCodificado(Boolean codificado) {
-		this.codificado = codificado;
-	}
-
-	public String getDescricao() {
-		return this.codificado ? this.gerarDescricaoLogradouroCodificado() 
-				: this.gerarDescricaoLogradouroNaoCodificado();
-	}
-	
 	@Override
 	public boolean equals (Object o) {
 		return o instanceof Logradouro && this.id != null && this.id.equals(((Logradouro)o).id);
 	}
-	@Override
-	public int hashCode () {
-		return this.id != null ? this.id.hashCode() : super.hashCode();
-	}
-	
+
 	private String gerarDescricaoLogradouroCodificado() {
 		
 		StringBuilder logradouro = new StringBuilder()
@@ -193,7 +97,7 @@ public class Logradouro implements Serializable, Cloneable {
 		
 		return logradouro.toString();
 	}
-	
+
 	private String gerarDescricaoLogradouroNaoCodificado() {
 		
 		StringBuilder logradouro = new StringBuilder()
@@ -210,9 +114,105 @@ public class Logradouro implements Serializable, Cloneable {
 		
 		return logradouro.toString();
 	}
+
+	public String getBairro(){
+		return this.endereco.getBairro().getDescricao();
+	}
+	
+	public String getCep(){
+		return this.endereco.getCep();
+	}
+	
+	public String getCidade(){
+		return this.endereco.getCidade().getDescricao();
+	}
+	
+	public Boolean getCodificado() {
+		return codificado;
+	}
+	
+	public String getComplemento() {
+		return complemento;
+	}
+	
+	public String getDescricao() {
+		return this.codificado ? this.gerarDescricaoLogradouroCodificado() 
+				: this.gerarDescricaoLogradouroNaoCodificado();
+	}
+	
+	public String getEndereco(){
+		return this.endereco.getDescricao();
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+	
+	public Integer getNumero() {
+		return numero;
+	}
+	
+	public String getPais() {
+		return this.endereco.getCidade().getPais().getDescricao();
+	}
+	
+	public TipoLogradouro getTipoLogradouro() {
+		return this.tipoLogradouro;
+	}
+	
+	public String getUf(){
+		return this.endereco.getCidade().getUf();
+	}
 	
 	@Override
-	public Logradouro clone() throws CloneNotSupportedException {
-		return (Logradouro) super.clone();
+	public int hashCode () {
+		return this.id != null ? this.id.hashCode() : super.hashCode();
+	}
+
+	public Endereco recuperarEndereco() {
+		return this.endereco;
+	}
+	
+	public void setBairro(String bairro){
+		this.endereco.getBairro().setDescricao(bairro);
+	}
+	
+	public void setCep(String cep){
+		this.endereco.setCep(cep);
+	}
+	
+	public void setCidade(String cidade){
+		this.endereco.getCidade().setDescricao(cidade);
+	}
+	
+	public void setCodificado(Boolean codificado) {
+		this.codificado = codificado;
+	}
+
+	public void setComplemento(String complemento) {
+		this.complemento = complemento;
+	}
+
+	public void setEndereco(String endereco){
+		this.endereco.setDescricao(endereco);
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public void setNumero(Integer numero) {
+		this.numero = numero;
+	}
+	
+	public void setPais(String pais) {
+		this.endereco.getCidade().getPais().setDescricao(pais);
+	}
+	
+	public void setTipoLogradouro(TipoLogradouro tipoLogradouro) {
+		this.tipoLogradouro = tipoLogradouro;
+	}
+	
+	public void setUf(String uf){
+		this.endereco.getCidade().setUf(uf);
 	}
 }

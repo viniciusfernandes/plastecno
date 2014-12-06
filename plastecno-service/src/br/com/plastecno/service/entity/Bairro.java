@@ -56,27 +56,27 @@ public class Bairro implements Serializable {
         this.descricao = descricaoBairro;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+    public Cidade getCidade() {
+        return cidade;
     }
 
     public String getDescricao() {
         return descricao;
     }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public Cidade getCidade() {
-        return cidade;
+    public Integer getId() {
+        return id;
     }
 
     public void setCidade(Cidade cidade) {
         this.cidade = cidade;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

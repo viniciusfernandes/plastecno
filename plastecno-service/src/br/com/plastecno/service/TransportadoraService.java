@@ -13,34 +13,34 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 @Local
 public interface TransportadoraService {
 
-    List<Transportadora> pesquisar();
-
-    Transportadora pesquisarById(Integer id);
-
-    Logradouro pesquisarLogradorouro(Integer id);
-
-    List<ContatoTransportadora> pesquisarContato(Integer id);
-
     Integer desativar(Integer id);
-
-    boolean isCNPJExistente(Integer idTransportadora, String cnpj);
-
-    List<Transportadora> pesquisarBy(Transportadora filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
-
-    Long pesquisarTotalRegistros(Transportadora filtro, Boolean apenasAtivos);
 
     Integer inserir(Transportadora transportadora) throws BusinessException;
 
-    List<Transportadora> pesquisarTransportadoraByIdCliente(Integer idCliente);
+    boolean isCNPJExistente(Integer idTransportadora, String cnpj);
+
+    boolean isNomeFantasiaExistente(Integer idTransportadora, String nomeFantasia);
 
     PaginacaoWrapper<Transportadora> paginarTransportadora(Transportadora filtro, Boolean apenasAtivos,
             Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-    boolean isNomeFantasiaExistente(Integer idTransportadora, String nomeFantasia);
+    List<Transportadora> pesquisar();
+
+    List<Transportadora> pesquisarBy(Transportadora filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
+            Integer numeroMaximoRegistros);
+
+    Transportadora pesquisarById(Integer id);
+
+    List<Transportadora> pesquisarById(List<Integer> listaId);
 
     List<Transportadora> pesquisarByNomeFantasia(String nomeFantasia);
 
-    List<Transportadora> pesquisarById(List<Integer> listaId);
+    List<ContatoTransportadora> pesquisarContato(Integer id);
+
+    Logradouro pesquisarLogradorouro(Integer id);
+
+    Long pesquisarTotalRegistros(Transportadora filtro, Boolean apenasAtivos);
+
+    List<Transportadora> pesquisarTransportadoraByIdCliente(Integer idCliente);
 
 }

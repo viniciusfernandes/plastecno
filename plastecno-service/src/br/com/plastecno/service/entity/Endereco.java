@@ -51,38 +51,38 @@ public class Endereco implements Serializable {
 		this.bairro.setCidade(cidade);
 	}
 	
-	public String getCep() {
-		return cep;
-	}
-	public void setCep(String cep) {
-		this.cep = cep;
-	}
-	public Bairro getBairro() {
-		return bairro;
-	}
-	public void setBairro(Bairro bairro) {
-		this.bairro = bairro;
-	}
-	public Cidade getCidade() {
-		return cidade;
-	}
-	public void setCidade(Cidade cidade) {
-		this.cidade = cidade;
-	}
-	public String getDescricao() {
-		return descricao;
-	}
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
-	
 	@Override
 	public boolean equals(Object o ) {
 		return o instanceof Endereco && this.cep != null && this.cep.equals(((Endereco)o).cep);
 	}
-	
+	public Bairro getBairro() {
+		return bairro;
+	}
+	public String getCep() {
+		return cep;
+	}
+	public Cidade getCidade() {
+		return cidade;
+	}
+	public String getDescricao() {
+		return descricao;
+	}
 	public int hashCode() {
 		return this.cep != null ? this.cep.hashCode() : -1;
+	}
+	public void setBairro(Bairro bairro) {
+		this.bairro = bairro;
+	}
+	public void setCep(String cep) {
+		this.cep = cep;
+	}
+	
+	public void setCidade(Cidade cidade) {
+		this.cidade = cidade;
+	}
+	
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
 	}
 	
 }

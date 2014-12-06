@@ -28,14 +28,53 @@ public class VendedorController extends AbstractController {
         this.inicializarPicklist("Clientes", "Clientes Cadastrados", "Clientes Associados", "id", "nomeFantasia");
     }
 
-    @Get("vendedor")
-    public void vendedorHome() {
-        if (!isElementosNaoAssociadosPreenchidosPicklist()) {
+    @Post("vendedor/associacaocliente")
+    public void associarCliente(Usuario vendedor, List<Integer> listaIdClienteAssociado) {
+        try {
+            
+            usuarioService.associarCliente(vendedor.getId(), listaIdClienteAssociado);
+            
+            gerarMensagemSucesso("Cliente(s) associado(s) com sucesso");
+            pesquisarVendedor(vendedor.getId());
+        } catch (BusinessException e) {
+            vendedor.setCpf(formatarCPF(vendedor.getCpf()));
+            addAtributo("vendedor", vendedor);
             try {
-                popularPicklist(null, null);
-            } catch (ControllerException e) {
-                gerarLogErroNavegacao("Material", e);
+                popularPicklist(this.clienteService.pesquisarClientesAssociados(vendedor.getId()),
+                        this.clienteService.pesquisarClientesDesassociados());
+                gerarListaMensagemErro(e);
+            } catch (ControllerException e1) {
+                gerarLogErroNavegacao("Cliente", e1);
             }
+            irTopoPagina();
+        } catch (Exception e) {
+            gerarLogErroInclusao("Vendedor", e);
+            irTopoPagina();
+        }
+    }
+
+    @Post("vendedor/desassociacaocliente")
+    public void desassociarCliente(Usuario vendedor, List<Integer> listaIdClienteDesassociado) {
+        try {
+            
+            usuarioService.desassociarCliente(vendedor.getId(), listaIdClienteDesassociado);
+            
+            gerarMensagemSucesso("Cliente(s) desassociado(s) com sucesso");
+            pesquisarVendedor(vendedor.getId());
+        } catch (BusinessException e) {
+            vendedor.setCpf(formatarCPF(vendedor.getCpf()));
+            addAtributo("vendedor", vendedor);
+            try {
+                popularPicklist(this.clienteService.pesquisarClientesAssociados(vendedor.getId()),
+                        this.clienteService.pesquisarClientesDesassociados());
+                gerarListaMensagemErro(e);
+            } catch (ControllerException e1) {
+                gerarLogErroNavegacao("Cliente", e1);
+            }
+            irTopoPagina();
+        } catch (Exception e) {
+            gerarLogErroInclusao("Vendedor", e);
+            irTopoPagina();
         }
     }
 
@@ -64,54 +103,15 @@ public class VendedorController extends AbstractController {
 
         irTopoPagina();
     }
-
-    @Post("vendedor/associacaocliente")
-    public void associarCliente(Usuario vendedor, List<Integer> listaIdClienteAssociado) {
-        try {
-            
-            usuarioService.associarCliente(vendedor.getId(), listaIdClienteAssociado);
-            
-            gerarMensagemSucesso("Cliente(s) associado(s) com sucesso");
-            pesquisarVendedor(vendedor.getId());
-        } catch (BusinessException e) {
-            vendedor.setCpf(formatarCPF(vendedor.getCpf()));
-            addAtributo("vendedor", vendedor);
-            try {
-                popularPicklist(this.clienteService.pesquisarClientesAssociados(vendedor.getId()),
-                        this.clienteService.pesquisarClientesDesassociados());
-                gerarListaMensagemErro(e);
-            } catch (ControllerException e1) {
-                gerarLogErroNavegacao("Cliente", e1);
-            }
-            irTopoPagina();
-        } catch (Exception e) {
-            gerarLogErroInclusao("Vendedor", e);
-            irTopoPagina();
-        }
-    }
     
-    @Post("vendedor/desassociacaocliente")
-    public void desassociarCliente(Usuario vendedor, List<Integer> listaIdClienteDesassociado) {
-        try {
-            
-            usuarioService.desassociarCliente(vendedor.getId(), listaIdClienteDesassociado);
-            
-            gerarMensagemSucesso("Cliente(s) desassociado(s) com sucesso");
-            pesquisarVendedor(vendedor.getId());
-        } catch (BusinessException e) {
-            vendedor.setCpf(formatarCPF(vendedor.getCpf()));
-            addAtributo("vendedor", vendedor);
+    @Get("vendedor")
+    public void vendedorHome() {
+        if (!isElementosNaoAssociadosPreenchidosPicklist()) {
             try {
-                popularPicklist(this.clienteService.pesquisarClientesAssociados(vendedor.getId()),
-                        this.clienteService.pesquisarClientesDesassociados());
-                gerarListaMensagemErro(e);
-            } catch (ControllerException e1) {
-                gerarLogErroNavegacao("Cliente", e1);
+                popularPicklist(null, null);
+            } catch (ControllerException e) {
+                gerarLogErroNavegacao("Material", e);
             }
-            irTopoPagina();
-        } catch (Exception e) {
-            gerarLogErroInclusao("Vendedor", e);
-            irTopoPagina();
         }
     }
 }

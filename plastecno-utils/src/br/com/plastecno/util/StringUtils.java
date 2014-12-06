@@ -6,38 +6,6 @@ import java.util.Date;
 
 public final class StringUtils {
 
-    private static final String DATA_PATTERN = "dd/MM/yyyy";
-    private static final String DATA_HORA_PATTERN = "dd/MM/yyyy HH:mm:ss";
-    private static final SimpleDateFormat FORMATADOR_DATA = new SimpleDateFormat(DATA_PATTERN);
-    private static final SimpleDateFormat FORMATADOR_DATA_HORA = new SimpleDateFormat(DATA_HORA_PATTERN);
-
-    private StringUtils() {
-    }
-
-    public static boolean isEmpty(String string) {
-        return string == null || string.trim().length() == 0;
-    }
-
-    public static boolean isNotEmpty(String string) {
-        return !isEmpty(string);
-    }
-
-    public static String formatarData(Date date) {
-        return date == null ? "" : FORMATADOR_DATA.format(date);
-    }
-
-    public static String formatarDataHora(Date date) {
-        return date == null ? "" : FORMATADOR_DATA_HORA.format(date);
-    }
-
-    public static Date parsearData(String date) throws ParseException {
-        return isEmpty(date) ? null : FORMATADOR_DATA.parse(date);
-    }
-
-    public static Date parsearDataHora(String date) throws ParseException {
-        return isEmpty(date) ? null : FORMATADOR_DATA_HORA.parse(date);
-    }
-
     public static String formatarCNPJ(String conteudo) {
         if (conteudo == null) {
             return "";
@@ -71,6 +39,41 @@ public final class StringUtils {
             }
         }
         return documento.toString();
+    }
+    public static String formatarCPF(String conteudo) {
+        if (conteudo == null) {
+            return "";
+        }
+
+        final String[] conteudoArray = conteudo.replaceAll("\\D", "").split("");
+        final StringBuilder documento = new StringBuilder();
+
+        final int posicao3 = 3;
+        final int posicao6 = 6;
+        final int posicao9 = 9;
+        for (int i = 0; i < conteudoArray.length; i++) {
+            documento.append(conteudoArray[i]);
+            switch (i) {
+            case posicao3:
+                documento.append(".");
+                break;
+            case posicao6:
+                documento.append(".");
+                break;
+            case posicao9:
+                documento.append("-");
+                break;
+            default:
+                continue;
+            }
+        }
+        return documento.toString();
+    }
+    public static String formatarData(Date date) {
+        return date == null ? "" : FORMATADOR_DATA.format(date);
+    }
+    public static String formatarDataHora(Date date) {
+        return date == null ? "" : FORMATADOR_DATA_HORA.format(date);
     }
 
     public static String formatarInscricaoEstadual(String conteudo) {
@@ -107,34 +110,20 @@ public final class StringUtils {
         return documento.toString();
     }
 
-    public static String formatarCPF(String conteudo) {
-        if (conteudo == null) {
-            return "";
-        }
+    public static boolean isEmpty(String string) {
+        return string == null || string.trim().length() == 0;
+    }
 
-        final String[] conteudoArray = conteudo.replaceAll("\\D", "").split("");
-        final StringBuilder documento = new StringBuilder();
+    public static boolean isNotEmpty(String string) {
+        return !isEmpty(string);
+    }
 
-        final int posicao3 = 3;
-        final int posicao6 = 6;
-        final int posicao9 = 9;
-        for (int i = 0; i < conteudoArray.length; i++) {
-            documento.append(conteudoArray[i]);
-            switch (i) {
-            case posicao3:
-                documento.append(".");
-                break;
-            case posicao6:
-                documento.append(".");
-                break;
-            case posicao9:
-                documento.append("-");
-                break;
-            default:
-                continue;
-            }
-        }
-        return documento.toString();
+    public static Date parsearData(String date) throws ParseException {
+        return isEmpty(date) ? null : FORMATADOR_DATA.parse(date);
+    }
+
+    public static Date parsearDataHora(String date) throws ParseException {
+        return isEmpty(date) ? null : FORMATADOR_DATA_HORA.parse(date);
     }
 
     public static String removerMascaraDocumento(String documento) {
@@ -142,5 +131,16 @@ public final class StringUtils {
             return null;
         }
         return documento.replaceAll("\\.", "").replace("-", "").replaceAll("/", "");
+    }
+
+    private static final String DATA_PATTERN = "dd/MM/yyyy";
+
+    private static final String DATA_HORA_PATTERN = "dd/MM/yyyy HH:mm:ss";
+
+    private static final SimpleDateFormat FORMATADOR_DATA = new SimpleDateFormat(DATA_PATTERN);
+
+    private static final SimpleDateFormat FORMATADOR_DATA_HORA = new SimpleDateFormat(DATA_HORA_PATTERN);
+
+    private StringUtils() {
     }
 }

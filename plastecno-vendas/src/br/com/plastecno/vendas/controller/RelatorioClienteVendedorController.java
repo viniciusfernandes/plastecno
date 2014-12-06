@@ -19,24 +19,14 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 @Resource
 public class RelatorioClienteVendedorController extends AbstractController {
 
-    public RelatorioClienteVendedorController(Result result, UsuarioInfo usuarioInfo) {
-        super(result, usuarioInfo);
-    }
-
     @Servico
     private UsuarioService usuarioService;
 
     @Servico
     private ClienteService clienteService;
 
-    @Get("relatorio/cliente/vendedor")
-    public void relatorioClienteVendedorHome() {
-        boolean acessoClienteVendedorPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
-        if (!acessoClienteVendedorPermitido) {
-            addAtributo("vendedor", this.usuarioService.pesquisarUsuarioResumidoById(getCodigoUsuario()));
-        }
-        addAtributo("acessoClienteVendedorPermitido", acessoClienteVendedorPermitido);
-        addAtributo("relatorioGerado", contemAtributo("listaCliente"));
+    public RelatorioClienteVendedorController(Result result, UsuarioInfo usuarioInfo) {
+        super(result, usuarioInfo);
     }
 
     @Get("relatorio/cliente/vendedor/listagem")
@@ -68,5 +58,15 @@ public class RelatorioClienteVendedorController extends AbstractController {
             lista.add(new Autocomplete(usuario.getId(), usuario.getNomeCompleto()));
         }
         serializarJson(new SerializacaoJson("lista", lista));
+    }
+
+    @Get("relatorio/cliente/vendedor")
+    public void relatorioClienteVendedorHome() {
+        boolean acessoClienteVendedorPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+        if (!acessoClienteVendedorPermitido) {
+            addAtributo("vendedor", this.usuarioService.pesquisarUsuarioResumidoById(getCodigoUsuario()));
+        }
+        addAtributo("acessoClienteVendedorPermitido", acessoClienteVendedorPermitido);
+        addAtributo("relatorioGerado", contemAtributo("listaCliente"));
     }
 }

@@ -16,14 +16,14 @@ import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 @Local
 public interface RelatorioService {
 
-    List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor);
-
-    List<Pedido> pesquisarEntregas(Periodo periodo) throws InformacaoInvalidaException;
-
     RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) throws BusinessException;
+
+    RelatorioVendaPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException;
 
     RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,
             Integer idVendedor) throws BusinessException;
 
-    RelatorioVendaPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException;
+    List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor);
+
+    List<Pedido> pesquisarEntregas(Periodo periodo) throws InformacaoInvalidaException;
 }

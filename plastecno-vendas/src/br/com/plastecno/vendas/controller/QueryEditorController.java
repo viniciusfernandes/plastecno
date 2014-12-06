@@ -18,10 +18,6 @@ public final class QueryEditorController extends AbstractController {
         super(result);
     }
 
-    @Get("administracao/sql")
-    public void queryEditorHome() {
-    }
-
     @Post("administracao/sql/execucao")
     public void executarQuery(String query) {
         addAtributo("query", query);
@@ -32,6 +28,10 @@ public final class QueryEditorController extends AbstractController {
             this.gerarListaMensagemAltera(e);
         }
         this.irPaginaHome();
+    }
+
+    @Get("administracao/sql")
+    public void queryEditorHome() {
     }
 
 }

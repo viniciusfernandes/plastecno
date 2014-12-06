@@ -66,58 +66,18 @@ public class Material implements Serializable {
 		this.descricao = descricao;
 	}
 	
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	
-	public String getSigla() {
-		return sigla;
-	}
-
-	public void setSigla(String sigla) {
-		this.sigla = sigla;
-	}
-
-	public String getDescricao() {
-		return descricao;
-	}
-
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
-
-	public Double getPesoEspecifico() {
-		return pesoEspecifico;
-	}
-
-	public void setPesoEspecifico(Double pesoEspecifico) {
-		this.pesoEspecifico = pesoEspecifico;
-	}
-
-	public List<Representada> getListaRepresentada() {
-		return listaRepresentada;
-	}
-
-	void setListaRepresentada(List<Representada> listaRepresentada) {
-		this.listaRepresentada = listaRepresentada;
-	}
-	
-	public void addRepresentada(final Representada representada) {
-		if (this.listaRepresentada == null) {
-			this.listaRepresentada = new ArrayList<Representada>();
-		}
-		this.listaRepresentada.add(representada);		
-	}
-	
 	public void addRepresentada(final List<Representada> listaRepresentada) {
 		if (this.listaRepresentada == null) {
 			this.listaRepresentada = new ArrayList<Representada>();
 		}
 		this.listaRepresentada.addAll(listaRepresentada);		
+	}
+
+	public void addRepresentada(final Representada representada) {
+		if (this.listaRepresentada == null) {
+			this.listaRepresentada = new ArrayList<Representada>();
+		}
+		this.listaRepresentada.add(representada);		
 	}
 	
 	public void clearListaRepresentada() {
@@ -126,19 +86,59 @@ public class Material implements Serializable {
 		}
 	}
 
-	public boolean isAtivo() {
-		return ativo;
+	public String getDescricao() {
+		return descricao;
 	}
 
-	public void setAtivo(boolean ativo) {
-		this.ativo = ativo;
+	public Integer getId() {
+		return id;
+	}
+
+	public List<Representada> getListaRepresentada() {
+		return listaRepresentada;
+	}
+
+	public Double getPesoEspecifico() {
+		return pesoEspecifico;
+	}
+
+	public String getSigla() {
+		return sigla;
+	}
+
+	public boolean isAtivo() {
+		return ativo;
 	}
 
 	public boolean isImportado() {
 		return importado;
 	}
+	
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
+	}
+	
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	public void setImportado(boolean importado) {
 		this.importado = importado;
+	}
+
+	void setListaRepresentada(List<Representada> listaRepresentada) {
+		this.listaRepresentada = listaRepresentada;
+	}
+
+	public void setPesoEspecifico(Double pesoEspecifico) {
+		this.pesoEspecifico = pesoEspecifico;
+	}
+
+	public void setSigla(String sigla) {
+		this.sigla = sigla;
 	}
 }

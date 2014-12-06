@@ -6,13 +6,17 @@
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
-<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/bloco/contato.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 
 
 <script type="text/javascript">
@@ -86,48 +90,66 @@ function remover(codigo, sigla) {
 
 
 	<form id="formPesquisa" action="vendedor/listagem" method="get">
-		<input type="hidden" id="filtro_nome" name="filtro.nome"/> 
-		<input type="hidden" id="filtro_sobrenome" name="filtro.sobrenome"/> 
-		<input type="hidden" id="filtro_email" name="filtro.email" /> 
-		<input type="hidden" id="filtro_cpf" name="filtro.cpf" />
+		<input type="hidden" id="filtro_nome" name="filtro.nome" /> <input
+			type="hidden" id="filtro_sobrenome" name="filtro.sobrenome" /> <input
+			type="hidden" id="filtro_email" name="filtro.email" /> <input
+			type="hidden" id="filtro_cpf" name="filtro.cpf" />
 	</form>
 
-	<form id="formVendedor" action="vendedor/associacao/cliente" method="post">
+	<form id="formVendedor" action="vendedor/associacao/cliente"
+		method="post">
 		<input type="hidden" id="id" name="vendedor.id" value="${vendedor.id}" />
 	</form>
 
-	<form id="formVazio" action="vendedor" method="get">
-	</form>
+	<form id="formVazio" action="vendedor" method="get"></form>
 
-		<fieldset>
-			<legend>::: Dados do Vendedor :::</legend>
+	<fieldset>
+		<legend>::: Dados do Vendedor :::</legend>
 
 
-			<div class="label" >Ativo:</div>
-			<div class="input" style="width: 80%">
-				<input type="checkbox" id="ativo" name="vendedor.ativo" <c:if test="${vendedor.ativo}">checked</c:if> class="checkbox <c:if test="${not empty vendedor.id}">desabilitado</c:if>" <c:if test="${not empty vendedor.id}">disabled='disabled'</c:if>/>
-			</div>
-			<div class="label" >Nome:</div>
-			<div class="input" style="width: 20%">
-				<input type="text" id="nome" name="vendedor.nome" value="${vendedor.nome}" class="pesquisavel <c:if test="${not empty vendedor.id}">desabilitado</c:if>" <c:if test="${not empty vendedor.id}">disabled='disabled'</c:if>/>
-			</div>
-			<div class="label">Sobrenome:</div>
-			<div class="input" style="width: 40%">
-				<input type="text" id="sobrenome" name="vendedor.sobrenome" value="${vendedor.sobrenome}" class="pesquisavel <c:if test="${not empty vendedor.id}">desabilitado</c:if>" style="width: 50%" <c:if test="${not empty vendedor.id}">disabled='disabled'</c:if>/>
-			</div>
-			<div class="label">CPF:</div>
-			<div class="input" style="width: 20%">
-				<input type="text" id="cpf" name="vendedor.cpf" value="${vendedor.cpf}" class="pesquisavel <c:if test="${not empty vendedor.id}">desabilitado</c:if>" style="width: 50%" <c:if test="${not empty vendedor.id}">disabled='disabled'</c:if>/>
-			</div>
-			<div class="label" >Email:</div>
-			<div class="input" style="width: 40%">
-				<input type="text" id="email" name="vendedor.email" value="${vendedor.email}" style="width: 50%" class="uppercaseBloqueado pesquisavel <c:if test="${not empty vendedor.id}">desabilitado</c:if>" <c:if test="${not empty vendedor.id}">disabled='disabled'</c:if>/>
-			</div>			
-		</fieldset>
-		<div class="bloco_botoes">
-			<a id="botaoPesquisarVendedor" title="Pesquisar Dados do Vendedor" class="botaoPesquisar"></a>
-			<a id="botaoLimpar" title="Limpar Dados do Vendedor" class="botaoLimpar"></a>
+		<div class="label">Ativo:</div>
+		<div class="input" style="width: 80%">
+			<input type="checkbox" id="ativo" name="vendedor.ativo"
+				<c:if test="${vendedor.ativo}">checked</c:if>
+				class="checkbox <c:if test="${not empty vendedor.id}">desabilitado</c:if>"
+				<c:if test="${not empty vendedor.id}">disabled='disabled'</c:if> />
 		</div>
+		<div class="label">Nome:</div>
+		<div class="input" style="width: 20%">
+			<input type="text" id="nome" name="vendedor.nome"
+				value="${vendedor.nome}"
+				class="pesquisavel <c:if test="${not empty vendedor.id}">desabilitado</c:if>"
+				<c:if test="${not empty vendedor.id}">disabled='disabled'</c:if> />
+		</div>
+		<div class="label">Sobrenome:</div>
+		<div class="input" style="width: 40%">
+			<input type="text" id="sobrenome" name="vendedor.sobrenome"
+				value="${vendedor.sobrenome}"
+				class="pesquisavel <c:if test="${not empty vendedor.id}">desabilitado</c:if>"
+				style="width: 50%"
+				<c:if test="${not empty vendedor.id}">disabled='disabled'</c:if> />
+		</div>
+		<div class="label">CPF:</div>
+		<div class="input" style="width: 20%">
+			<input type="text" id="cpf" name="vendedor.cpf"
+				value="${vendedor.cpf}"
+				class="pesquisavel <c:if test="${not empty vendedor.id}">desabilitado</c:if>"
+				style="width: 50%"
+				<c:if test="${not empty vendedor.id}">disabled='disabled'</c:if> />
+		</div>
+		<div class="label">Email:</div>
+		<div class="input" style="width: 40%">
+			<input type="text" id="email" name="vendedor.email"
+				value="${vendedor.email}" style="width: 50%"
+				class="uppercaseBloqueado pesquisavel <c:if test="${not empty vendedor.id}">desabilitado</c:if>"
+				<c:if test="${not empty vendedor.id}">disabled='disabled'</c:if> />
+		</div>
+	</fieldset>
+	<div class="bloco_botoes">
+		<a id="botaoPesquisarVendedor" title="Pesquisar Dados do Vendedor"
+			class="botaoPesquisar"></a> <a id="botaoLimpar"
+			title="Limpar Dados do Vendedor" class="botaoLimpar"></a>
+	</div>
 
 	<jsp:include page="/bloco/bloco_picklist.jsp" />
 
@@ -165,9 +187,10 @@ function remover(codigo, sigla) {
 							<td>
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/vendedor/edicao"/>" method="get">
-										<input type="submit" id="botaoEditarVendedor" title="Editar Dados do Vendedor" value="" class="botaoEditar" />
-										<input type="hidden" name="idVendedor" value="${vendedor.id}"/>
-									</form>	
+										<input type="submit" id="botaoEditarVendedor"
+											title="Editar Dados do Vendedor" value="" class="botaoEditar" />
+										<input type="hidden" name="idVendedor" value="${vendedor.id}" />
+									</form>
 								</div>
 							</td>
 						</tr>

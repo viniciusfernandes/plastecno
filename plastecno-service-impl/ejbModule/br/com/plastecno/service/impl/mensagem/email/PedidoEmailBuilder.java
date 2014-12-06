@@ -18,16 +18,16 @@ abstract class PedidoEmailBuilder {
 		this.arquivoAnexo = arquivoAnexo;
 	}
 
-	public abstract String gerarTitulo();
-	public abstract String gerarRemetente();
-	public abstract String gerarDestinatario();
-	public abstract String gerarConteudo();
 	public abstract AnexoEmail gerarArquivoAnexo();
-	
+	public abstract String gerarConteudo();
+	public abstract String gerarDestinatario();
 	public final MensagemEmail gerarMensagemEmail() {
 		final MensagemEmail email = new MensagemEmail(gerarTitulo(), gerarRemetente(), gerarDestinatario(), gerarConteudo());
 		email.addAnexo(gerarArquivoAnexo());
 		return email;
 	}
+	public abstract String gerarRemetente();
+	
+	public abstract String gerarTitulo();
 
 }

@@ -43,19 +43,19 @@ public class UF implements Serializable {
 	public String getDescricao() {
 		return descricao;
 	}
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
+	public Pais getPais() {
+		return pais;
 	}
 	public String getSigla() {
 		return sigla;
 	}
-	public void setSigla(String sigla) {
-		this.sigla = sigla;
-	}
-	public Pais getPais() {
-		return pais;
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
 	}
 	public void setPais(Pais pais) {
 		this.pais = pais;
+	}
+	public void setSigla(String sigla) {
+		this.sigla = sigla;
 	}
 }

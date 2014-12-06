@@ -86,12 +86,409 @@ public abstract class AbstractController {
         this.result.include(nomeAtributo, valorAtributo);
     }
 
+    int calcularIndiceRegistroInicial(Integer paginaSelecionada) {
+        if (paginaSelecionada == null || paginaSelecionada <= 1) {
+            return 0;
+        } else {
+            return numerRegistrosPorPagina * (paginaSelecionada - 1);
+        }
+    }
+
+    private int calcularTotalPaginas(Long totalRegistros) {
+        if (totalRegistros == null || totalRegistros <= 0) {
+            return 1;
+        }
+        return (int) Math.ceil(((double) totalRegistros / numerRegistrosPorPagina));
+    }
+
+    void carregarVendedor(Cliente cliente) {
+
+        Usuario vendedor = this.usuarioService.pesquisarVendedorByIdCliente(cliente.getId());
+        if (vendedor == null) {
+            /*
+             * Vamos sinalizar o usuario que o cliente que ele pretende efetuar
+             * as pesquisas nao possui vendedor.
+             */
+            vendedor = new Usuario(null, "NÃO POSSUI VENDEDOR");
+            vendedor.setSobrenome("");
+            vendedor.setEmail("");
+        }
+        cliente.setVendedor(vendedor);
+    }
+
+    void configurarPaginacao() {
+
+    }
+
     boolean contemAtributo(String nomeAtributo) {
         return this.result.included().containsKey(nomeAtributo);
     }
 
+    String formatarCNPJ(String conteudo) {
+        return StringUtils.formatarCNPJ(conteudo);
+    }
+
+    String formatarCPF(String conteudo) {
+        return StringUtils.formatarCPF(conteudo);
+    }
+
+    String formatarData(Date dataHora) {
+        return StringUtils.formatarData(dataHora);
+    }
+
+    String formatarDataHora(Date dataHora) {
+        return StringUtils.formatarDataHora(dataHora);
+    }
+
+    void formatarDocumento(Cliente cliente) {
+        cliente.setCnpj(this.formatarCNPJ(cliente.getCnpj()));
+        cliente.setCpf(this.formatarCPF(cliente.getCpf()));
+        cliente.setInscricaoEstadual(this.formatarInscricaoEstadual(cliente.getInscricaoEstadual()));
+    }
+
+    String formatarInscricaoEstadual(String conteudo) {
+        return StringUtils.formatarInscricaoEstadual(conteudo);
+    }
+
+    void formatarPedido(Pedido pedido) {
+        pedido.setDataInclusaoFormatada(this.formatarData(pedido.getDataInclusao()));
+        pedido.setDataEnvioFormatada(this.formatarData(pedido.getDataEnvio()));
+        pedido.setDataEntregaFormatada(this.formatarData(pedido.getDataEntrega()));
+        pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));
+        pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedidoIPI()));
+    }
+
+    <T extends AbstractController> T forwardTo(Class<T> classe) {
+        if (!result.used()) {
+            return this.result.forwardTo(classe);
+        }
+        return result.of(classe);
+    }
+
+    void forwardTo(String path) {
+        if (!result.used()) {
+            result.forwardTo(path);
+        }
+    }
+
+    Download gerarDownload(byte[] bytesArquivo, String nomeArquivo) {
+        final String contentType = "application/pdf;charset=ISO-8859-1";
+        return new ByteArrayDownload(bytesArquivo, contentType, nomeArquivo);
+    }
+
+    void gerarListaMensagemAjax(String mensagem, String categoria) {
+        final List<String> lista = new ArrayList<String>();
+        lista.add(mensagem);
+        this.result.use(Results.json()).from(lista, categoria).serialize();
+    }
+
+    void gerarListaMensagemAltera(BusinessException e) {
+        this.result.include("listaMensagem", e.getListaMensagem());
+        this.result.include("cssMensagem", cssMensagemAlerta);
+    }
+
+    void gerarListaMensagemAltera(String mensagem) {
+        this.result.include("listaMensagem", new String[] {mensagem});
+        this.result.include("cssMensagem", cssMensagemAlerta);
+    }
+
+    void gerarListaMensagemErro(BusinessException e) {
+        this.gerarListaMensagemErro(e.getListaMensagem());
+    }
+
+    void gerarListaMensagemErro(List<String> listaMensagem) {
+        this.result.include("listaMensagem", listaMensagem);
+        this.result.include("cssMensagem", cssMensagemErro);
+    }
+
+    void gerarListaMensagemErro(String mensagem) {
+        this.result.include("listaMensagem", new String[] {mensagem});
+        this.result.include("cssMensagem", cssMensagemErro);
+    }
+
+    void gerarListaMensagemSucesso(Object o, String nomeAtributoExibicao, TipoOperacao tipoOperacao)
+            throws ControllerException {
+        Method metodo = null;
+        try {
+            if (o != null) {
+                metodo = o.getClass().getMethod(
+                        "get" + nomeAtributoExibicao.substring(0, 1).toUpperCase() + nomeAtributoExibicao.substring(1));
+                this.gerarMensagemSucesso(nomeTela + " " + tipoOperacao.getDescricao() + " com sucesso: "
+                        + metodo.invoke(o, (Object[]) null));
+            } else {
+                this.gerarMensagemSucesso(nomeTela + " " + tipoOperacao.getDescricao() + " com sucesso.");
+            }
+
+        } catch (Exception e) {
+            throw new ControllerException("Não foi possível montar a menagem de sucesso para a inclusao do(a) "
+                    + nomeTela);
+        }
+    }
+
+    void gerarLogErro(String descricaoOperacao) {
+        this.logger.log(Level.SEVERE, "Falha na operacao " + descricaoOperacao);
+        this.result.include("cssMensagem", cssMensagemErro);
+        this.result.include("listaMensagem", new String[] {"Falha na operacao " + descricaoOperacao
+                + " .Verifique o log do servidor para maiores detalhes."});
+        irTelaErro();
+    }
+
+    /*
+     * Metodo responsavel por logar ua excecao e redirecionar o usuario para a
+     * tela de erro generico.
+     */
+    void gerarLogErro(String descricaoOperacao, Exception e) {
+        this.logger.log(Level.SEVERE, "Falha na operacao " + descricaoOperacao, e);
+        this.result.include("cssMensagem", cssMensagemErro);
+        this.result.include("listaMensagem", new String[] {"Falha na operacao " + descricaoOperacao
+                + " .Verifique o log do servidor para maiores detalhes. CAUSA: " + e.getMessage()});
+        irTelaErro();
+    }
+
+    void gerarLogErroInclusao(String nomeTela, Exception e) {
+        this.gerarLogErro(" inclusao/alteracao de " + nomeTela, e);
+    }
+
+    void gerarLogErroNavegacao(String nomeTela, Exception e) {
+        this.gerarLogErro(" inicializacao da tela de " + nomeTela, e);
+    }
+
+    /*
+     * Metodo utilizado para efetuar o log da excecao e enviar o "response" via
+     * ajax. Como esperamos que seja uma resposta de uma chamada ajax nao
+     * devemos efetuar navegacao alguma tal como, irTopoPagina, redirect,
+     * forward, etc
+     */
+    void gerarLogErroRequestAjax(String descricaoOperacao, Exception e) {
+        this.logger.log(Level.SEVERE, "Falha na operacao " + descricaoOperacao, e);
+        this.gerarRetornoErroAjax("Não foi possível inserir o pedido. Veja o log para obter mais informações. "
+                + "Mensagem: " + e.getMessage());
+    }
+
+    void gerarMensagemCadastroSucesso(Object o, String nomeAtributoExibicao) throws ControllerException {
+        this.gerarListaMensagemSucesso(o, nomeAtributoExibicao, TipoOperacao.CADASTRO);
+    }
+
+    void gerarMensagemRemocaoSucesso() throws ControllerException {
+        this.gerarListaMensagemSucesso(null, null, TipoOperacao.REMOCAO);
+    }
+
+    void gerarMensagemSucesso(String mensagem) {
+        List<String> mensagens = new ArrayList<String>();
+        mensagens.add(mensagem);
+        this.result.include("listaMensagem", mensagens);
+        this.result.include("cssMensagem", cssMensagemSucesso);
+    }
+
+    List<PicklistElement> gerarPicklistElement() {
+        return null;
+    }
+
+    void gerarRetornoAlertaAjax(String mensagem) {
+        this.gerarListaMensagemAjax(mensagem, "alertas");
+    }
+
+    void gerarRetornoErroAjax(String mensagem) {
+        this.gerarListaMensagemAjax(mensagem, "erros");
+    }
+
     Object getAtributo(String nomeAtributo) {
         return this.result.included().get(nomeAtributo);
+    }
+
+    Integer getCodigoUsuario() {
+        return usuarioInfo.getCodigoUsuario();
+    }
+
+    String getNomeTela() {
+        return nomeTela;
+    }
+
+    Integer getNumerRegistrosPorPagina() {
+        return numerRegistrosPorPagina;
+    }
+
+    void habilitarMultiplosLogradouros() {
+        this.result.include(possuiMultiplosLogradouros, true);
+    }
+
+    boolean hasAtributo(Object obj) {
+        for (Method metodo : obj.getClass().getMethods()) {
+            try {
+                if (!"getClass".equals(metodo.getName()) && metodo.getName().startsWith("get")
+                        && metodo.invoke(obj, (Object[]) null) != null) {
+                    return true;
+                }
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return false;
+    }
+
+    void inicializarComboTipoLogradouro() {
+        this.result.include("listaTipoLogradouro", this.tipoLogradouroService.pesquisar());
+        this.result.include("tipoLogradouroRenderizado", true);
+    }
+
+    /*
+     * Esse metodo ja garante que o usuario sera navegado para o rodape da
+     * pagina
+     */
+    <T> void inicializarPaginacao(Integer paginaSelecionada, PaginacaoWrapper<T> paginacao, String nomeLista) {
+        if (paginaSelecionada == null) {
+            paginaSelecionada = 0;
+        }
+        this.result.include("paginaSelecionada", paginaSelecionada);
+        this.result.include("totalPaginas", this.calcularTotalPaginas(paginacao.getTotalPaginado()));
+        this.result.include(nomeLista, paginacao.getLista());
+        irRodapePagina();
+    }
+
+    /*
+     * Metodo utilizado para definir qual eh o metodo HOME definido em cada
+     * controller, isto eh, o PATH que aponta para a tela inicial
+     */
+    private void inicializarPathHome() throws ControllerException {
+        String nome = this.getClass().getSimpleName().replace("Controller", "");
+        nome += "Home";
+        Method[] metodos = this.getClass().getDeclaredMethods();
+        for (Method metodo : metodos) {
+            if (metodo.getName().equalsIgnoreCase(nome)) {
+                Get get = metodo.getAnnotation(Get.class);
+                if (get == null) {
+                    throw new ControllerException("É obrigatório que o método home " + metodo.getName()
+                            + " seja anotado com @Get");
+                }
+                this.homePath = "/" + get.value()[0];
+                break;
+            }
+        }
+    }
+
+    void inicializarPicklist(String tituloBloco, String tituloElementosNaoAssociados, String tituloElementosAssociados,
+            String nomeAtributoValor, String nomeAtributoLabel) {
+
+        this.inicializarPicklist(tituloBloco, tituloElementosNaoAssociados, tituloElementosAssociados,
+                nomeAtributoValor, nomeAtributoLabel, true);
+    }
+
+    final void inicializarPicklist(String tituloBloco, String tituloElementosNaoAssociados,
+            String tituloElementosAssociados, String nomeAtributoValor, String nomeAtributoLabel,
+            boolean preenchimentoObrigatorio) {
+
+        this.picklist = new Picklist(this.result);
+        this.picklist.setTituloBloco(tituloBloco);
+        this.picklist.setTituloElementosNaoAssociados(tituloElementosNaoAssociados);
+        this.picklist.setTituloElementosAssociados(tituloElementosAssociados);
+        this.picklist.setNomeAtributoValor(nomeAtributoValor);
+        this.picklist.setNomeAtributoLabel(nomeAtributoLabel);
+        this.picklist.setPreenchimentoObrigatorio(preenchimentoObrigatorio);
+    }
+
+    void inicializarPicklist(String tituloBloco, String tituloElementosNaoAssociados, String tituloElementosAssociados,
+            String nomeAtributoValor, String nomeAtributoLabel, boolean preenchimentoObrigatorio,
+            String tituloCampoPesquisa) {
+        this.inicializarPicklist(tituloBloco, tituloElementosNaoAssociados, tituloElementosAssociados,
+                nomeAtributoValor, nomeAtributoLabel);
+        this.picklist.setTituloCampoPesquisa(tituloCampoPesquisa);
+    }
+
+    void inicializarPicklist(String tituloBloco, String tituloElementosNaoAssociados, String tituloElementosAssociados,
+            String nomeAtributoValor, String nomeAtributoLabel, String tituloCampoPesquisa) {
+        this.inicializarPicklist(tituloBloco, tituloElementosNaoAssociados, tituloElementosAssociados,
+                nomeAtributoValor, nomeAtributoLabel, true, tituloCampoPesquisa);
+    }
+
+    void init() throws ServiceLocatorException {
+        this.tipoLogradouroService = ServiceLocator.locate(TipoLogradouroService.class);
+        this.usuarioService = ServiceLocator.locate(UsuarioService.class);
+
+        Field[] listaCampos = this.getClass().getDeclaredFields();
+        for (Field campo : listaCampos) {
+            if (campo.isAnnotationPresent(Servico.class)) {
+                try {
+                    campo.setAccessible(true);
+                    campo.set(this, ServiceLocator.locate(campo.getType()));
+                } catch (Exception e) {
+                    throw new ServiceLocatorException("Falha na inicilizacao dos servicos do controller", e);
+                } finally {
+                    campo.setAccessible(false);
+                }
+            }
+        }
+    }
+
+    void irPaginaHome() {
+        if (this.homePath == null) {
+            throw new IllegalStateException("O controller " + this.getClass().getName() + " nao possui um metodo HOME");
+        }
+        redirecTo(this.homePath);
+    }
+
+    final void irRodapePagina() {
+        this.irPaginaHome();
+        this.result.include("ancora", "rodape");
+    }
+
+    private void irTelaErro() {
+        this.result.forwardTo(ErroController.class).erroHome();
+        this.result.include("ancora", "topo");
+    }
+
+    void irTopoPagina() {
+        this.irPaginaHome();
+        this.result.include("ancora", "topo");
+    }
+
+    boolean isAcessoPermitido(TipoAcesso... tipoAcesso) {
+        return this.usuarioInfo.isAcessoPermitido(tipoAcesso);
+    }
+
+    boolean isElementosAssociadosPreenchidosPicklist() {
+        return this.picklist.isElementosAssociadosPreenchidos();
+    }
+
+    boolean isElementosNaoAssociadosPreenchidosPicklist() {
+        return this.picklist.isElementosNaoAssociadosPreenchidos();
+    }
+
+    void liberarAcesso(String nomePermissaoAcesso, boolean acessoPermitido) {
+        this.result.include(nomePermissaoAcesso, acessoPermitido);
+    }
+
+    /*
+     * Esse metodo ja garante que o usuario sera navegado para o rodape da
+     * pagina
+     */
+    void paginarPesquisa(Integer paginaSelecionada, Long totalRegistros) {
+        if (paginaSelecionada == null) {
+            paginaSelecionada = 0;
+        }
+        this.result.include("paginaSelecionada", paginaSelecionada);
+        this.result.include("totalPaginas", this.calcularTotalPaginas(totalRegistros));
+        irRodapePagina();
+    }
+
+    void popularPicklist(List<?> elementosNaoAssociados, List<?> elementosAssociados) throws ControllerException {
+        this.picklist.popular(elementosNaoAssociados, elementosAssociados);
+    }
+
+    <T extends AbstractController> T redirecTo(Class<T> classe) {
+        if (!result.used()) {
+            return this.result.redirectTo(classe);
+        }
+        return result.of(classe);
+    }
+
+    void redirecTo(String path) {
+        if (!result.used()) {
+            result.redirectTo(path);
+        }
+    }
+
+    String removerMascaraDocumento(String documento) {
+        return StringUtils.removerMascaraDocumento(documento);
     }
 
     void serializarJson(SerializacaoJson serializacaoJson) {
@@ -120,52 +517,12 @@ public abstract class AbstractController {
         serializer.serialize();
     }
 
-    void habilitarMultiplosLogradouros() {
-        this.result.include(possuiMultiplosLogradouros, true);
-    }
-
-    Integer getNumerRegistrosPorPagina() {
-        return numerRegistrosPorPagina;
-    }
-
-    String getNomeTela() {
-        return nomeTela;
-    }
-
     void setNomeTela(String nomeTela) {
         this.nomeTela = nomeTela;
     }
 
-    Integer getCodigoUsuario() {
-        return usuarioInfo.getCodigoUsuario();
-    }
-
-    boolean isAcessoPermitido(TipoAcesso... tipoAcesso) {
-        return this.usuarioInfo.isAcessoPermitido(tipoAcesso);
-    }
-
-    void carregarVendedor(Cliente cliente) {
-
-        Usuario vendedor = this.usuarioService.pesquisarVendedorByIdCliente(cliente.getId());
-        if (vendedor == null) {
-            /*
-             * Vamos sinalizar o usuario que o cliente que ele pretende efetuar
-             * as pesquisas nao possui vendedor.
-             */
-            vendedor = new Usuario(null, "NÃO POSSUI VENDEDOR");
-            vendedor.setSobrenome("");
-            vendedor.setEmail("");
-        }
-        cliente.setVendedor(vendedor);
-    }
-
-    Download gerarDownload(byte[] bytesArquivo, String nomeArquivo) {
-        final String contentType = "application/pdf;charset=ISO-8859-1";
-        return new ByteArrayDownload(bytesArquivo, contentType, nomeArquivo);
-    }
-
-    void liberarAcesso(String nomePermissaoAcesso, boolean acessoPermitido) {
-        this.result.include(nomePermissaoAcesso, acessoPermitido);
+    boolean temElementos(Collection<?> lista) {
+        return lista != null && !lista.isEmpty();
     }
 
     void verificarPermissaoAcesso(String nomePermissaoAcesso, TipoAcesso... listaTipoAcesso) {
@@ -183,363 +540,6 @@ public abstract class AbstractController {
             }
         }
     }
-
-    List<PicklistElement> gerarPicklistElement() {
-        return null;
-    }
-
-    void inicializarPicklist(String tituloBloco, String tituloElementosNaoAssociados, String tituloElementosAssociados,
-            String nomeAtributoValor, String nomeAtributoLabel) {
-
-        this.inicializarPicklist(tituloBloco, tituloElementosNaoAssociados, tituloElementosAssociados,
-                nomeAtributoValor, nomeAtributoLabel, true);
-    }
-
-    final void inicializarPicklist(String tituloBloco, String tituloElementosNaoAssociados,
-            String tituloElementosAssociados, String nomeAtributoValor, String nomeAtributoLabel,
-            boolean preenchimentoObrigatorio) {
-
-        this.picklist = new Picklist(this.result);
-        this.picklist.setTituloBloco(tituloBloco);
-        this.picklist.setTituloElementosNaoAssociados(tituloElementosNaoAssociados);
-        this.picklist.setTituloElementosAssociados(tituloElementosAssociados);
-        this.picklist.setNomeAtributoValor(nomeAtributoValor);
-        this.picklist.setNomeAtributoLabel(nomeAtributoLabel);
-        this.picklist.setPreenchimentoObrigatorio(preenchimentoObrigatorio);
-    }
-
-    void inicializarPicklist(String tituloBloco, String tituloElementosNaoAssociados, String tituloElementosAssociados,
-            String nomeAtributoValor, String nomeAtributoLabel, String tituloCampoPesquisa) {
-        this.inicializarPicklist(tituloBloco, tituloElementosNaoAssociados, tituloElementosAssociados,
-                nomeAtributoValor, nomeAtributoLabel, true, tituloCampoPesquisa);
-    }
-
-    void inicializarPicklist(String tituloBloco, String tituloElementosNaoAssociados, String tituloElementosAssociados,
-            String nomeAtributoValor, String nomeAtributoLabel, boolean preenchimentoObrigatorio,
-            String tituloCampoPesquisa) {
-        this.inicializarPicklist(tituloBloco, tituloElementosNaoAssociados, tituloElementosAssociados,
-                nomeAtributoValor, nomeAtributoLabel);
-        this.picklist.setTituloCampoPesquisa(tituloCampoPesquisa);
-    }
-
-    boolean hasAtributo(Object obj) {
-        for (Method metodo : obj.getClass().getMethods()) {
-            try {
-                if (!"getClass".equals(metodo.getName()) && metodo.getName().startsWith("get")
-                        && metodo.invoke(obj, (Object[]) null) != null) {
-                    return true;
-                }
-            } catch (Exception e) {
-                continue;
-            }
-        }
-        return false;
-    }
-
-    void irPaginaHome() {
-        if (this.homePath == null) {
-            throw new IllegalStateException("O controller " + this.getClass().getName() + " nao possui um metodo HOME");
-        }
-        redirecTo(this.homePath);
-    }
-
-    void redirecTo(String path) {
-        if (!result.used()) {
-            result.redirectTo(path);
-        }
-    }
-
-    void forwardTo(String path) {
-        if (!result.used()) {
-            result.forwardTo(path);
-        }
-    }
-
-    <T extends AbstractController> T redirecTo(Class<T> classe) {
-        if (!result.used()) {
-            return this.result.redirectTo(classe);
-        }
-        return result.of(classe);
-    }
-
-    <T extends AbstractController> T forwardTo(Class<T> classe) {
-        if (!result.used()) {
-            return this.result.forwardTo(classe);
-        }
-        return result.of(classe);
-    }
-
-    void init() throws ServiceLocatorException {
-        this.tipoLogradouroService = ServiceLocator.locate(TipoLogradouroService.class);
-        this.usuarioService = ServiceLocator.locate(UsuarioService.class);
-
-        Field[] listaCampos = this.getClass().getDeclaredFields();
-        for (Field campo : listaCampos) {
-            if (campo.isAnnotationPresent(Servico.class)) {
-                try {
-                    campo.setAccessible(true);
-                    campo.set(this, ServiceLocator.locate(campo.getType()));
-                } catch (Exception e) {
-                    throw new ServiceLocatorException("Falha na inicilizacao dos servicos do controller", e);
-                } finally {
-                    campo.setAccessible(false);
-                }
-            }
-        }
-    }
-
-    void configurarPaginacao() {
-
-    }
-
-    String formatarCNPJ(String conteudo) {
-        return StringUtils.formatarCNPJ(conteudo);
-    }
-
-    String formatarInscricaoEstadual(String conteudo) {
-        return StringUtils.formatarInscricaoEstadual(conteudo);
-    }
-
-    String formatarCPF(String conteudo) {
-        return StringUtils.formatarCPF(conteudo);
-    }
-
-    String removerMascaraDocumento(String documento) {
-        return StringUtils.removerMascaraDocumento(documento);
-    }
-
-    String formatarDataHora(Date dataHora) {
-        return StringUtils.formatarDataHora(dataHora);
-    }
-
-    String formatarData(Date dataHora) {
-        return StringUtils.formatarData(dataHora);
-    }
-
-    void formatarPedido(Pedido pedido) {
-        pedido.setDataInclusaoFormatada(this.formatarData(pedido.getDataInclusao()));
-        pedido.setDataEnvioFormatada(this.formatarData(pedido.getDataEnvio()));
-        pedido.setDataEntregaFormatada(this.formatarData(pedido.getDataEntrega()));
-        pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));
-        pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedidoIPI()));
-    }
-
-    void formatarDocumento(Cliente cliente) {
-        cliente.setCnpj(this.formatarCNPJ(cliente.getCnpj()));
-        cliente.setCpf(this.formatarCPF(cliente.getCpf()));
-        cliente.setInscricaoEstadual(this.formatarInscricaoEstadual(cliente.getInscricaoEstadual()));
-    }
-
-    void gerarLogErroInclusao(String nomeTela, Exception e) {
-        this.gerarLogErro(" inclusao/alteracao de " + nomeTela, e);
-    }
-
-    void gerarLogErroNavegacao(String nomeTela, Exception e) {
-        this.gerarLogErro(" inicializacao da tela de " + nomeTela, e);
-    }
-
-    /*
-     * Metodo responsavel por logar ua excecao e redirecionar o usuario para a
-     * tela de erro generico.
-     */
-    void gerarLogErro(String descricaoOperacao, Exception e) {
-        this.logger.log(Level.SEVERE, "Falha na operacao " + descricaoOperacao, e);
-        this.result.include("cssMensagem", cssMensagemErro);
-        this.result.include("listaMensagem", new String[] {"Falha na operacao " + descricaoOperacao
-                + " .Verifique o log do servidor para maiores detalhes. CAUSA: " + e.getMessage()});
-        irTelaErro();
-    }
-
-    void gerarLogErro(String descricaoOperacao) {
-        this.logger.log(Level.SEVERE, "Falha na operacao " + descricaoOperacao);
-        this.result.include("cssMensagem", cssMensagemErro);
-        this.result.include("listaMensagem", new String[] {"Falha na operacao " + descricaoOperacao
-                + " .Verifique o log do servidor para maiores detalhes."});
-        irTelaErro();
-    }
-
-    /*
-     * Metodo utilizado para efetuar o log da excecao e enviar o "response" via
-     * ajax. Como esperamos que seja uma resposta de uma chamada ajax nao
-     * devemos efetuar navegacao alguma tal como, irTopoPagina, redirect,
-     * forward, etc
-     */
-    void gerarLogErroRequestAjax(String descricaoOperacao, Exception e) {
-        this.logger.log(Level.SEVERE, "Falha na operacao " + descricaoOperacao, e);
-        this.gerarRetornoErroAjax("Não foi possível inserir o pedido. Veja o log para obter mais informações. "
-                + "Mensagem: " + e.getMessage());
-    }
-
-    void gerarRetornoErroAjax(String mensagem) {
-        this.gerarListaMensagemAjax(mensagem, "erros");
-    }
-
-    void gerarRetornoAlertaAjax(String mensagem) {
-        this.gerarListaMensagemAjax(mensagem, "alertas");
-    }
-
-    void gerarListaMensagemAjax(String mensagem, String categoria) {
-        final List<String> lista = new ArrayList<String>();
-        lista.add(mensagem);
-        this.result.use(Results.json()).from(lista, categoria).serialize();
-    }
-
-    void inicializarComboTipoLogradouro() {
-        this.result.include("listaTipoLogradouro", this.tipoLogradouroService.pesquisar());
-        this.result.include("tipoLogradouroRenderizado", true);
-    }
-
-    void gerarMensagemCadastroSucesso(Object o, String nomeAtributoExibicao) throws ControllerException {
-        this.gerarListaMensagemSucesso(o, nomeAtributoExibicao, TipoOperacao.CADASTRO);
-    }
-
-    void gerarMensagemRemocaoSucesso() throws ControllerException {
-        this.gerarListaMensagemSucesso(null, null, TipoOperacao.REMOCAO);
-    }
-
-    void gerarListaMensagemSucesso(Object o, String nomeAtributoExibicao, TipoOperacao tipoOperacao)
-            throws ControllerException {
-        Method metodo = null;
-        try {
-            if (o != null) {
-                metodo = o.getClass().getMethod(
-                        "get" + nomeAtributoExibicao.substring(0, 1).toUpperCase() + nomeAtributoExibicao.substring(1));
-                this.gerarMensagemSucesso(nomeTela + " " + tipoOperacao.getDescricao() + " com sucesso: "
-                        + metodo.invoke(o, (Object[]) null));
-            } else {
-                this.gerarMensagemSucesso(nomeTela + " " + tipoOperacao.getDescricao() + " com sucesso.");
-            }
-
-        } catch (Exception e) {
-            throw new ControllerException("Não foi possível montar a menagem de sucesso para a inclusao do(a) "
-                    + nomeTela);
-        }
-    }
-
-    void gerarMensagemSucesso(String mensagem) {
-        List<String> mensagens = new ArrayList<String>();
-        mensagens.add(mensagem);
-        this.result.include("listaMensagem", mensagens);
-        this.result.include("cssMensagem", cssMensagemSucesso);
-    }
-
-    void gerarListaMensagemErro(BusinessException e) {
-        this.gerarListaMensagemErro(e.getListaMensagem());
-    }
-
-    void gerarListaMensagemErro(String mensagem) {
-        this.result.include("listaMensagem", new String[] {mensagem});
-        this.result.include("cssMensagem", cssMensagemErro);
-    }
-
-    void gerarListaMensagemErro(List<String> listaMensagem) {
-        this.result.include("listaMensagem", listaMensagem);
-        this.result.include("cssMensagem", cssMensagemErro);
-    }
-
-    void gerarListaMensagemAltera(BusinessException e) {
-        this.result.include("listaMensagem", e.getListaMensagem());
-        this.result.include("cssMensagem", cssMensagemAlerta);
-    }
-
-    void gerarListaMensagemAltera(String mensagem) {
-        this.result.include("listaMensagem", new String[] {mensagem});
-        this.result.include("cssMensagem", cssMensagemAlerta);
-    }
-
-    void irTopoPagina() {
-        this.irPaginaHome();
-        this.result.include("ancora", "topo");
-    }
-
-    final void irRodapePagina() {
-        this.irPaginaHome();
-        this.result.include("ancora", "rodape");
-    }
-
-    int calcularIndiceRegistroInicial(Integer paginaSelecionada) {
-        if (paginaSelecionada == null || paginaSelecionada <= 1) {
-            return 0;
-        } else {
-            return numerRegistrosPorPagina * (paginaSelecionada - 1);
-        }
-    }
-
-    void popularPicklist(List<?> elementosNaoAssociados, List<?> elementosAssociados) throws ControllerException {
-        this.picklist.popular(elementosNaoAssociados, elementosAssociados);
-    }
-
-    boolean isElementosAssociadosPreenchidosPicklist() {
-        return this.picklist.isElementosAssociadosPreenchidos();
-    }
-
-    boolean isElementosNaoAssociadosPreenchidosPicklist() {
-        return this.picklist.isElementosNaoAssociadosPreenchidos();
-    }
-
-    /*
-     * Metodo utilizado para definir qual eh o metodo HOME definido em cada
-     * controller, isto eh, o PATH que aponta para a tela inicial
-     */
-    private void inicializarPathHome() throws ControllerException {
-        String nome = this.getClass().getSimpleName().replace("Controller", "");
-        nome += "Home";
-        Method[] metodos = this.getClass().getDeclaredMethods();
-        for (Method metodo : metodos) {
-            if (metodo.getName().equalsIgnoreCase(nome)) {
-                Get get = metodo.getAnnotation(Get.class);
-                if (get == null) {
-                    throw new ControllerException("É obrigatório que o método home " + metodo.getName()
-                            + " seja anotado com @Get");
-                }
-                this.homePath = "/" + get.value()[0];
-                break;
-            }
-        }
-    }
-
-    private int calcularTotalPaginas(Long totalRegistros) {
-        if (totalRegistros == null || totalRegistros <= 0) {
-            return 1;
-        }
-        return (int) Math.ceil(((double) totalRegistros / numerRegistrosPorPagina));
-    }
-
-    private void irTelaErro() {
-        this.result.forwardTo(ErroController.class).erroHome();
-        this.result.include("ancora", "topo");
-    }
-
-    /*
-     * Esse metodo ja garante que o usuario sera navegado para o rodape da
-     * pagina
-     */
-    void paginarPesquisa(Integer paginaSelecionada, Long totalRegistros) {
-        if (paginaSelecionada == null) {
-            paginaSelecionada = 0;
-        }
-        this.result.include("paginaSelecionada", paginaSelecionada);
-        this.result.include("totalPaginas", this.calcularTotalPaginas(totalRegistros));
-        irRodapePagina();
-    }
-
-    /*
-     * Esse metodo ja garante que o usuario sera navegado para o rodape da
-     * pagina
-     */
-    <T> void inicializarPaginacao(Integer paginaSelecionada, PaginacaoWrapper<T> paginacao, String nomeLista) {
-        if (paginaSelecionada == null) {
-            paginaSelecionada = 0;
-        }
-        this.result.include("paginaSelecionada", paginaSelecionada);
-        this.result.include("totalPaginas", this.calcularTotalPaginas(paginacao.getTotalPaginado()));
-        this.result.include(nomeLista, paginacao.getLista());
-        irRodapePagina();
-    }
-
-    boolean temElementos(Collection<?> lista) {
-        return lista != null && !lista.isEmpty();
-    }
 }
 
 class Autocomplete {
@@ -551,25 +551,12 @@ class Autocomplete {
         this.label = label;
     }
 
-    public Integer getValor() {
-        return valor;
-    }
-
     public String getLabel() {
         return label;
     }
-}
 
-enum TipoOperacao {
-    CADASTRO("cadastro(a)"), REMOCAO("removido(a)"), ENVIO("Envio");
-    private final String descricao;
-
-    private TipoOperacao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public String getDescricao() {
-        return descricao;
+    public Integer getValor() {
+        return valor;
     }
 }
 
@@ -588,41 +575,12 @@ class Picklist {
         this.result = result;
     }
 
-    public void setPreenchimentoObrigatorio(boolean preenchimentoObrigatorio) {
-        this.result.include("preenchimentoPicklistObrigatorio", preenchimentoObrigatorio);
-    }
-
-    public void setTituloBloco(String tituloBloco) {
-        this.result.include("tituloPicklist", tituloBloco);
-    }
-
-    public void setTituloElementosNaoAssociados(String tituloElementosNaoAssociados) {
-        this.result.include("labelElementosNaoAssociados", tituloElementosNaoAssociados);
-    }
-
-    public void setTituloElementosAssociados(String tituloElementosAssociados) {
-        this.result.include("labelElementosAssociados", tituloElementosAssociados);
-    }
-
-    public void setNomeAtributoLabel(String nomeAtributoLabel) {
-        this.nomeAtributoLabel = nomeAtributoLabel;
-    }
-
-    public void setNomeAtributoValor(String nomeAtributoValor) {
-        this.nomeAtributoValor = nomeAtributoValor;
-    }
-
-    public void setTituloCampoPesquisa(String tituloCampoPesquisa) {
-        this.result.include("tituloCampoPesquisa", tituloCampoPesquisa);
-        this.result.include("possuiCampoPesquisa", true);
+    public boolean isElementosAssociadosPreenchidos() {
+        return this.result.included().get(associados) != null;
     }
 
     public boolean isElementosNaoAssociadosPreenchidos() {
         return this.result.included().get(naoAssociados) != null;
-    }
-
-    public boolean isElementosAssociadosPreenchidos() {
-        return this.result.included().get(associados) != null;
     }
 
     void popular(List<?> elementosNaoAssociados, List<?> elementosAssociados) throws ControllerException {
@@ -683,5 +641,47 @@ class Picklist {
 
         this.result.include(naoAssociados, this.listaElementosNaoAssociados);
         this.result.include(associados, this.listaElementosAssociados);
+    }
+
+    public void setNomeAtributoLabel(String nomeAtributoLabel) {
+        this.nomeAtributoLabel = nomeAtributoLabel;
+    }
+
+    public void setNomeAtributoValor(String nomeAtributoValor) {
+        this.nomeAtributoValor = nomeAtributoValor;
+    }
+
+    public void setPreenchimentoObrigatorio(boolean preenchimentoObrigatorio) {
+        this.result.include("preenchimentoPicklistObrigatorio", preenchimentoObrigatorio);
+    }
+
+    public void setTituloBloco(String tituloBloco) {
+        this.result.include("tituloPicklist", tituloBloco);
+    }
+
+    public void setTituloCampoPesquisa(String tituloCampoPesquisa) {
+        this.result.include("tituloCampoPesquisa", tituloCampoPesquisa);
+        this.result.include("possuiCampoPesquisa", true);
+    }
+
+    public void setTituloElementosAssociados(String tituloElementosAssociados) {
+        this.result.include("labelElementosAssociados", tituloElementosAssociados);
+    }
+
+    public void setTituloElementosNaoAssociados(String tituloElementosNaoAssociados) {
+        this.result.include("labelElementosNaoAssociados", tituloElementosNaoAssociados);
+    }
+}
+
+enum TipoOperacao {
+    CADASTRO("cadastro(a)"), REMOCAO("removido(a)"), ENVIO("Envio");
+    private final String descricao;
+
+    private TipoOperacao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public String getDescricao() {
+        return descricao;
     }
 }

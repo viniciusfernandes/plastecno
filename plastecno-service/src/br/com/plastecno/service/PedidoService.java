@@ -15,50 +15,25 @@ import br.com.plastecno.service.wrapper.Periodo;
 
 @Local
 public interface PedidoService {
+    Double calcularValorPedido(Integer idPedido) throws BusinessException;
+
+    Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException;
+
+    void cancelar(Integer idPedido) throws BusinessException;
+
+    boolean contemItemPedido(Integer idPedido);
+
+    void enviar(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
+
     Pedido inserir(Pedido pedido) throws BusinessException;
 
     Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException;
 
-    Pedido pesquisarById(Integer id);
-
-    Long pesquisarTotalRegistros(Integer idCliente);
-
-    List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
-
-    List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
-
-    ItemPedido pesquisarItemPedido(Integer idItemPedido);
-
-    Date pesquisarDataInclusao(Integer idPedido);
-
-    Usuario pesquisarVendedor(Integer idPedido);
-
-    Date pesquisarDataEnvio(Integer idPedido);
-
-    void enviar(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
-
-    Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
-
-    Double pesquisarValorPedido(Integer idPedido);
-
-    List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
-
-    List<Pedido> pesquisarByIdCliente(Integer idCliente);
-
-    Long pesquisarTotalItemPedido(Integer idPedido);
-
-    boolean contemItemPedido(Integer idPedido);
+    Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido, Double aliquotaIPI) throws BusinessException;
 
     boolean isClienteProspectado(Integer idPedido);
 
-    Double calcularValorPedido(Integer idPedido) throws BusinessException;
-
-    List<Pedido> pesquisarByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
-
-    Long pesquisarTotalRegistros(Integer idCliente, Integer idVendedor);
-
-    Integer pesquisarIdVendedorByIdPedido(Integer idPedido);
+    boolean isPedidoEnviado(Integer idPedido);
 
     PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer indiceRegistroInicial,
             Integer numeroMaximoRegistros);
@@ -66,26 +41,51 @@ public interface PedidoService {
     PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer indiceRegistroInicial,
             Integer numeroMaximoRegistros);
 
-    void cancelar(Integer idPedido) throws BusinessException;
+    List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-    boolean isPedidoEnviado(Integer idPedido);
+    Pedido pesquisarById(Integer id);
 
-    Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException;
+    List<Pedido> pesquisarByIdCliente(Integer idCliente);
 
-    Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido, Double aliquotaIPI) throws BusinessException;
+    List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-    Double pesquisarValorPedidoIPI(Integer idPedido);
+    List<Pedido> pesquisarByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, Integer indiceRegistroInicial,
+            Integer numeroMaximoRegistros);
 
-    List<Logradouro> pesquisarLogradouro(Integer idPedido);
+    List<Pedido> pesquisarByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
+            throws BusinessException;
+
+    Date pesquisarDataEnvio(Integer idPedido);
+
+    Date pesquisarDataInclusao(Integer idPedido);
+
+    List<Pedido> pesquisarEnviadosByPeriodo(Periodo periodo);
 
     List<Pedido> pesquisarEnviadosByPeriodoERepresentada(Periodo periodo, Integer idRepresentada);
 
     List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException;
 
-    List<Pedido> pesquisarEnviadosByPeriodo(Periodo periodo);
+    Integer pesquisarIdVendedorByIdPedido(Integer idPedido);
 
-    List<Pedido> pesquisarByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
-            throws BusinessException;
-    
+    ItemPedido pesquisarItemPedido(Integer idItemPedido);
+
+    List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
+
+    List<Logradouro> pesquisarLogradouro(Integer idPedido);
+
+    Long pesquisarTotalItemPedido(Integer idPedido);
+
+    Long pesquisarTotalRegistros(Integer idCliente);
+
+    Long pesquisarTotalRegistros(Integer idCliente, Integer idVendedor);
+
+    Double pesquisarValorPedido(Integer idPedido);
+
+    Double pesquisarValorPedidoIPI(Integer idPedido);
+
+    Usuario pesquisarVendedor(Integer idPedido);
+
     Integer refazerPedido(Integer idPedido) throws BusinessException;
+    
+    Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
 }

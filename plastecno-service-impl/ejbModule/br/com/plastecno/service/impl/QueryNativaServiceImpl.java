@@ -21,6 +21,20 @@ public class QueryNativaServiceImpl implements QueryNativaService {
 	
 	private Connection connection;
 	
+	private void abrirConexao () throws BusinessException {
+		DataSource ds;
+		try {
+			ds = (DataSource) new InitialContext().lookup(NOME_DATA_SOURCE);
+		} catch (NamingException e1) {
+			throw new BusinessException("Não foi possível encontrato o data source "+NOME_DATA_SOURCE, e1);
+		}
+        try {
+			this.connection = ds.getConnection();
+		} catch (SQLException e) {
+			throw new BusinessException("Não foi possível abri uma conexao com o banco de dados para execucao de query nativa", e);
+		}
+	}
+
 	@Override
 	public String executar(String query) throws BusinessException {
 		if (StringUtils.isEmpty(query)) {
@@ -53,20 +67,6 @@ public class QueryNativaServiceImpl implements QueryNativaService {
 			this.fecharConexao();
 		}
 		
-	}
-
-	private void abrirConexao () throws BusinessException {
-		DataSource ds;
-		try {
-			ds = (DataSource) new InitialContext().lookup(NOME_DATA_SOURCE);
-		} catch (NamingException e1) {
-			throw new BusinessException("Não foi possível encontrato o data source "+NOME_DATA_SOURCE, e1);
-		}
-        try {
-			this.connection = ds.getConnection();
-		} catch (SQLException e) {
-			throw new BusinessException("Não foi possível abri uma conexao com o banco de dados para execucao de query nativa", e);
-		}
 	}
 	
 	private void fecharConexao() throws BusinessException {

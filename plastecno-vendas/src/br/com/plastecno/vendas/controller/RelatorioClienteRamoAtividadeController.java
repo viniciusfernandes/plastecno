@@ -22,12 +22,6 @@ public class RelatorioClienteRamoAtividadeController extends AbstractController 
         super(result, usuarioInfo);
     }
 
-    @Get("relatorio/cliente/ramoAtividade")
-    public void relatorioClienteRamoAtividadeHome() {
-        addAtributo("listaRamoAtividade", this.ramoAtividadeService.pesquisar());
-        addAtributo("relatorioGerado", contemAtributo("relatorio"));
-    }
-
     @Get("relatorio/cliente/ramoAtividade/listagem")
     public void gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) {
         try {
@@ -38,5 +32,11 @@ public class RelatorioClienteRamoAtividadeController extends AbstractController 
         }
         addAtributo("ramoAtividadeSelecionado", idRamoAtividade);
         irTopoPagina();
+    }
+
+    @Get("relatorio/cliente/ramoAtividade")
+    public void relatorioClienteRamoAtividadeHome() {
+        addAtributo("listaRamoAtividade", this.ramoAtividadeService.pesquisar());
+        addAtributo("relatorioGerado", contemAtributo("relatorio"));
     }
 }

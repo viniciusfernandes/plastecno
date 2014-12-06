@@ -11,9 +11,9 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface EnderecamentoService {
-    Endereco pesquisarByCep(String cep);
+    Endereco inserir(Endereco endereco) throws BusinessException;
 
-    List<UF> pesquisarUF();
+    boolean isCepExitente(String cep);
 
     /**
      * Metodo implementado para realizar uma pesquisa dos bairros atraves de um
@@ -25,7 +25,7 @@ public interface EnderecamentoService {
 
     List<Bairro> pesquisarBairroById(List<Integer> listaIdBairro);
 
-    boolean isCepExitente(String cep);
+    Endereco pesquisarByCep(String cep);
 
-    Endereco inserir(Endereco endereco) throws BusinessException;
+    List<UF> pesquisarUF();
 }

@@ -115,118 +115,6 @@ public class Cliente implements Serializable {
 		this.nomeFantasia = nomeFantasia;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	public String getNomeFantasia() {
-		return nomeFantasia;
-	}
-	public void setNomeFantasia(String nomeFantasia) {
-		this.nomeFantasia = nomeFantasia;
-	}
-	public String getRazaoSocial() {
-		return razaoSocial;
-	}
-	public void setRazaoSocial(String razaoSocial) {
-		this.razaoSocial = razaoSocial;
-	}
-	public String getCnpj() {
-		return cnpj;
-	}
-	public void setCnpj(String cnpj) {
-		this.cnpj = cnpj;
-	}
-	public String getCpf() {
-		return cpf;
-	}
-	public void setCpf(String cpf) {
-		this.cpf = cpf;
-	}
-	public String getInscricaoEstadual() {
-		return inscricaoEstadual;
-	}
-	public void setInscricaoEstadual(String inscricaoEstadual) {
-		this.inscricaoEstadual = inscricaoEstadual;
-	}
-	
-	public String getInformacoesAdicionais() {
-		return informacoesAdicionais;
-	}
-	public void setInformacoesAdicionais(String informacoesAdicionais) {
-		this.informacoesAdicionais = informacoesAdicionais;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getSite() {
-		return site;
-	}
-	public void setSite(String site) {
-		this.site = site;
-	}
-	public RamoAtividade getRamoAtividade() {
-		return ramoAtividade;
-	}
-	public void setRamoAtividade(RamoAtividade ramoAtividade) {
-		this.ramoAtividade = ramoAtividade;
-	}
-	public List<Transportadora> getListaRedespacho() {
-		return listaRedespacho;
-	}
-	public void setListaRedespacho(List<Transportadora> listaRedespacho) {
-		this.listaRedespacho = listaRedespacho;
-	}
-	public Set<ContatoCliente> getListaContato() {
-		return listaContato;
-	}
-	public void setListaContato(Set<ContatoCliente> listaContato) {
-		this.listaContato = listaContato;
-	}
-	public Usuario getVendedor() {
-		return vendedor;
-	}
-	public void setVendedor(Usuario vendedor) {
-		this.vendedor = vendedor;
-	}
-	public Date getDataUltimoContato() {
-		return dataUltimoContato;
-	}
-	public void setDataUltimoContato(Date dataUltimoContato) {
-		this.dataUltimoContato = dataUltimoContato;
-	}
-	
-	public List<LogradouroCliente> getListaLogradouro() {
-		return listaLogradouro;
-	}
-	
-	public void setListaLogradouro(List<LogradouroCliente> listalogradouro) {
-		this.listaLogradouro = listalogradouro;
-	}
-	
-	public void addLogradouro(LogradouroCliente logradouroCliente) {
-		if(this.listaLogradouro == null) {
-			this.setListaLogradouro(new ArrayList<LogradouroCliente>());
-		}
-		this.listaLogradouro.add(logradouroCliente);
-		logradouroCliente.setCliente(this);
-	}
-	
-	public void addLogradouro(List<LogradouroCliente> listaLogradouro) {
-		if (listaLogradouro == null) {
-			return;
-		}
-		
-		for (LogradouroCliente logradouroCliente : listaLogradouro) {
-			this.addLogradouro(logradouroCliente);		
-		}
-	}
-	
 	public void addContato(ContatoCliente contatoCliente) {
 		if(this.listaContato == null) {
 			this.setListaContato(new HashSet<ContatoCliente>());
@@ -234,7 +122,6 @@ public class Cliente implements Serializable {
 		this.listaContato.add(contatoCliente);
 		contatoCliente.setCliente(this);
 	}
-	
 	public void addContato(List<ContatoCliente> listaContato) {
 		
 		if (listaContato == null) {
@@ -245,14 +132,22 @@ public class Cliente implements Serializable {
 			this.addContato(contatoCliente);		
 		}
 	}
-	
-	public void addRedespacho(Transportadora transportadora) {
-		if(this.listaRedespacho == null) {
-			this.listaRedespacho = new ArrayList<Transportadora>();
+	public void addLogradouro(List<LogradouroCliente> listaLogradouro) {
+		if (listaLogradouro == null) {
+			return;
 		}
-		this.listaRedespacho.add(transportadora);
+		
+		for (LogradouroCliente logradouroCliente : listaLogradouro) {
+			this.addLogradouro(logradouroCliente);		
+		}
 	}
-	
+	public void addLogradouro(LogradouroCliente logradouroCliente) {
+		if(this.listaLogradouro == null) {
+			this.setListaLogradouro(new ArrayList<LogradouroCliente>());
+		}
+		this.listaLogradouro.add(logradouroCliente);
+		logradouroCliente.setCliente(this);
+	}
 	public void addRedespacho(List<Transportadora> listaRedespacho) {
 		if (listaRedespacho == null) {
 			return;
@@ -262,55 +157,94 @@ public class Cliente implements Serializable {
 			this.addRedespacho(transportadora);		
 		}
 	}
+	public void addRedespacho(Transportadora transportadora) {
+		if(this.listaRedespacho == null) {
+			this.listaRedespacho = new ArrayList<Transportadora>();
+		}
+		this.listaRedespacho.add(transportadora);
+	}
+	public String getCnpj() {
+		return cnpj;
+	}
+	public Contato getContatoPrincipal() {
+		return this.isListaContatoPreenchida() ? this.listaContato.iterator().next() : null;
+	}
+	public String getCpf() {
+		return cpf;
+	}
+	public Date getDataUltimoContato() {
+		return dataUltimoContato;
+	}
+	public String getDataUltimoContatoFormatada() {
+		return dataUltimoContatoFormatada;
+	}
+	public String getDocumento() {
+		return this.isJuridico() ? this.cnpj : this.cpf;
+	}
+	
+	public String getEmail() {
+		return email;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public String getInformacoesAdicionais() {
+		return informacoesAdicionais;
+	}
+	public String getInscricaoEstadual() {
+		return inscricaoEstadual;
+	}
+	public Set<ContatoCliente> getListaContato() {
+		return listaContato;
+	}
+	public List<LogradouroCliente> getListaLogradouro() {
+		return listaLogradouro;
+	}
+	public List<Transportadora> getListaRedespacho() {
+		return listaRedespacho;
+	}
+	public Logradouro getLogradouro(TipoLogradouro tipoLogradouro) {
+		return EntityUtils.getLogradouro(listaLogradouro, tipoLogradouro);
+	}
+	public Logradouro getLogradouroFaturamento () {
+		return this.getLogradouro(TipoLogradouro.FATURAMENTO);
+	}
+	public String getNomeCompleto() {
+		return this.getNomeFantasia()+" - "+this.getRazaoSocial();
+	}
+	public String getNomeFantasia() {
+		return nomeFantasia;
+	}
+	public Boolean getProspeccaoFinalizada() {
+		return prospeccaoFinalizada;
+	}
+	public RamoAtividade getRamoAtividade() {
+		return ramoAtividade;
+	}
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+	public String getSite() {
+		return site;
+	}
+	public Usuario getVendedor() {
+		return vendedor;
+	}
 	
 	public boolean isJuridico() {
 		return this.cnpj != null;
 	}
 	
-	public String getDocumento() {
-		return this.isJuridico() ? this.cnpj : this.cpf;
+	public boolean isListaContatoPreenchida() {
+		return this.listaContato != null && !this.listaContato.isEmpty();
 	}
 	
-	public Contato getContatoPrincipal() {
-		return this.isListaContatoPreenchida() ? this.listaContato.iterator().next() : null;
-	}
-
-	public String getDataUltimoContatoFormatada() {
-		return dataUltimoContatoFormatada;
-	}
-
-	public void setDataUltimoContatoFormatada(String dataUltimoContatoFormatada) {
-		this.dataUltimoContatoFormatada = dataUltimoContatoFormatada;
-	}
-	
-	
-	public void setProspeccaoFinalizada(Boolean prospeccaoFinalizada) {
-		this.prospeccaoFinalizada = prospeccaoFinalizada;
-	}
-	
-	public Boolean getProspeccaoFinalizada() {
-		return prospeccaoFinalizada;
+	public boolean isListaLogradouroPreenchida() {
+		return this.listaLogradouro != null && !this.listaLogradouro.isEmpty();
 	}
 	
 	public boolean isProspectado() {
 		return this.prospeccaoFinalizada != null && this.prospeccaoFinalizada.booleanValue();
-	}
-
-	public String getNomeCompleto() {
-		return this.getNomeFantasia()+" - "+this.getRazaoSocial();
-	}
-	
-
-	public Logradouro getLogradouro(TipoLogradouro tipoLogradouro) {
-		return EntityUtils.getLogradouro(listaLogradouro, tipoLogradouro);
-	}
-	
-	public Logradouro getLogradouroFaturamento () {
-		return this.getLogradouro(TipoLogradouro.FATURAMENTO);
-	}
-	
-	public boolean isListaContatoPreenchida() {
-		return this.listaContato != null && !this.listaContato.isEmpty();
 	}
 	
 	public void limparListaLogradouro(){
@@ -320,7 +254,73 @@ public class Cliente implements Serializable {
 		
 	}
 	
-	public boolean isListaLogradouroPreenchida() {
-		return this.listaLogradouro != null && !this.listaLogradouro.isEmpty();
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+	
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
+	}
+	
+	public void setDataUltimoContato(Date dataUltimoContato) {
+		this.dataUltimoContato = dataUltimoContato;
+	}
+	
+	public void setDataUltimoContatoFormatada(String dataUltimoContatoFormatada) {
+		this.dataUltimoContatoFormatada = dataUltimoContatoFormatada;
+	}
+	
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void setInformacoesAdicionais(String informacoesAdicionais) {
+		this.informacoesAdicionais = informacoesAdicionais;
+	}
+
+	public void setInscricaoEstadual(String inscricaoEstadual) {
+		this.inscricaoEstadual = inscricaoEstadual;
+	}
+	
+	
+	public void setListaContato(Set<ContatoCliente> listaContato) {
+		this.listaContato = listaContato;
+	}
+	
+	public void setListaLogradouro(List<LogradouroCliente> listalogradouro) {
+		this.listaLogradouro = listalogradouro;
+	}
+	
+	public void setListaRedespacho(List<Transportadora> listaRedespacho) {
+		this.listaRedespacho = listaRedespacho;
+	}
+
+	public void setNomeFantasia(String nomeFantasia) {
+		this.nomeFantasia = nomeFantasia;
+	}
+	
+
+	public void setProspeccaoFinalizada(Boolean prospeccaoFinalizada) {
+		this.prospeccaoFinalizada = prospeccaoFinalizada;
+	}
+	
+	public void setRamoAtividade(RamoAtividade ramoAtividade) {
+		this.ramoAtividade = ramoAtividade;
+	}
+	
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
+	}
+	
+	public void setSite(String site) {
+		this.site = site;
+	}
+	
+	public void setVendedor(Usuario vendedor) {
+		this.vendedor = vendedor;
 	}
 }

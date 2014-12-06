@@ -12,7 +12,7 @@ input, select, fieldset, textarea {
 }
 
 /* Todos os inputs serao uppercase a menos dos que contenham a classe upperCaseBloqueado */
-input:not(.uppercaseBloqueado), textarea:not(.uppercaseBloqueado) {
+input:not (.uppercaseBloqueado ), textarea:not (.uppercaseBloqueado ) {
 	text-transform: uppercase;
 }
 
@@ -24,19 +24,19 @@ select option {
 	text-transform: lowercase;
 }
 
-.campoObrigatorio {	
+.campoObrigatorio {
 	border: 1px solid;
 	border-color: #F40414;
 }
 
 .campoDesabilitado {
 	color: black;
-	background-color:#B6D8C3;
-	opacity:0.5;
+	background-color: #B6D8C3;
+	opacity: 0.5;
 }
 
 .campoValorInvalido {
-	opacity:0.5;
+	opacity: 0.5;
 	border: 1px solid;
 	border-color: red;
 	background-color: #F40414;

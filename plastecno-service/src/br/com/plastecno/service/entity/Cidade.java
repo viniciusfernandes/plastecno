@@ -41,35 +41,35 @@ public class Cidade implements Serializable {
     @JoinColumn(name = "id_pais")
     private Pais pais;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public String getDescricao() {
         return descricao;
     }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public String getUf() {
-        return uf;
-    }
-
-    public void setUf(String uf) {
-        this.uf = uf;
+    public Integer getId() {
+        return id;
     }
 
     public Pais getPais() {
         return pais;
     }
 
+    public String getUf() {
+        return uf;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public void setPais(Pais pais) {
         this.pais = pais;
+    }
+
+    public void setUf(String uf) {
+        this.uf = uf;
     }
 }

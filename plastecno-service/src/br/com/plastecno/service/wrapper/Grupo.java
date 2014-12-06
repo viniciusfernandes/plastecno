@@ -33,19 +33,20 @@ class Grupo {
 		return listaSubgrupo;
 	}
 
-	void limparListaSubgrupo() {
-		if (listaSubgrupo != null) {
-			listaSubgrupo.clear();
-		}
-		;
-	}
-
 	public String getNome() {
 		return nome;
 	}
 
+	int getNumeroSubgrupo() {
+		return listaSubgrupo != null ? listaSubgrupo.size() : 0;
+	}
+
 	public Double getValor() {
 		return valor;
+	}
+
+	String getValorFormatado() {
+		return valorFormatado;
 	}
 
 	public Double getValorTotal() {
@@ -61,15 +62,14 @@ class Grupo {
 		return t;
 	}
 
-	int getNumeroSubgrupo() {
-		return listaSubgrupo != null ? listaSubgrupo.size() : 0;
-	}
-
-	String getValorFormatado() {
-		return valorFormatado;
-	}
-	
 	String getValorTotalFormatado() {
 		return NumeroUtils.formatarValorMonetario(this.getValorTotal());
+	}
+	
+	void limparListaSubgrupo() {
+		if (listaSubgrupo != null) {
+			listaSubgrupo.clear();
+		}
+		;
 	}
 }

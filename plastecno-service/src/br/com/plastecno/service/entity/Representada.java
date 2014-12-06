@@ -90,60 +90,6 @@ public class Representada implements Serializable {
 		this.nomeFantasia = nomeFantasia;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getNomeFantasia() {
-		return nomeFantasia;
-	}
-
-	public void setNomeFantasia(String nomeFantasia) {
-		this.nomeFantasia = nomeFantasia;
-	}
-
-	public String getRazaoSocial() {
-		return razaoSocial;
-	}
-
-	public void setRazaoSocial(String razaoSocial) {
-		this.razaoSocial = razaoSocial;
-	}
-
-	public String getInscricaoEstadual() {
-		return inscricaoEstadual;
-	}
-
-	public void setInscricaoEstadual(String inscricaoEstadual) {
-		this.inscricaoEstadual = inscricaoEstadual;
-	}
-
-	public Logradouro getLogradouro() {
-		return logradouro;
-	}
-
-	public void setLogradouro(Logradouro logradouro) {
-		this.logradouro = logradouro;
-	}
-
-	public List<ContatoRepresentada> getListaContato() {
-		return listaContato;
-	}
-
-	public void setListaContato(List<ContatoRepresentada> listaContato) {
-		this.listaContato = listaContato;
-	}
-	
-	public void addContato(List<ContatoRepresentada> listaContato) {
-		for (ContatoRepresentada contato : listaContato) {
-			this.addContato(contato);	
-		}
-	}
-	
 	public void addContato(ContatoRepresentada contato) {
 		if (this.listaContato == null) {
 			this.listaContato = new ArrayList<ContatoRepresentada>();
@@ -152,78 +98,132 @@ public class Representada implements Serializable {
 		contato.setRepresentada(this);
 	}
 
+	public void addContato(List<ContatoRepresentada> listaContato) {
+		for (ContatoRepresentada contato : listaContato) {
+			this.addContato(contato);	
+		}
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Representada && this.id != null && this.id.equals(((Representada)o).id);
+	}
+
 	public String getCnpj() {
 		return cnpj;
-	}
-
-	public void setCnpj(String cnpj) {
-		this.cnpj = cnpj;
-	}
-
-	public String getSite() {
-		return site;
-	}
-
-	public void setSite(String site) {
-		this.site = site;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public boolean isAtivo() {
-		return ativo;
-	}
-
-	public void setAtivo(boolean ativo) {
-		this.ativo = ativo;
-	}
-
-	public List<Material> getListaMaterial() {
-		return listaMaterial;
-	}
-
-	void setListaMaterial(List<Material> listaMaterial) {
-		this.listaMaterial = listaMaterial;
-	}
-	
-	public TipoApresentacaoIPI getTipoApresentacaoIPI() {
-		return tipoApresentacaoIPI;
-	}
-
-	public void setTipoApresentacaoIPI(TipoApresentacaoIPI tipoApresentacaoIPI) {
-		this.tipoApresentacaoIPI = tipoApresentacaoIPI;
-	}
-	
-	public boolean isIPIHabilitado() {
-		return !TipoApresentacaoIPI.NUNCA.equals(this.tipoApresentacaoIPI);
 	}
 
 	public double getComissao() {
 		return comissao;
 	}
 
-	public void setComissao(double comissao) {
-		this.comissao = comissao;
-	}
-	
 	public double getComissaoPercentual() {
 		return this.comissao * 100;
 	}
-	
 
-	@Override
-	public boolean equals(Object o) {
-		return o instanceof Representada && this.id != null && this.id.equals(((Representada)o).id);
+	public String getEmail() {
+		return email;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public String getInscricaoEstadual() {
+		return inscricaoEstadual;
+	}
+
+	public List<ContatoRepresentada> getListaContato() {
+		return listaContato;
+	}
+
+	public List<Material> getListaMaterial() {
+		return listaMaterial;
+	}
+
+	public Logradouro getLogradouro() {
+		return logradouro;
 	}
 	
+	public String getNomeFantasia() {
+		return nomeFantasia;
+	}
+	
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+
+	public String getSite() {
+		return site;
+	}
+
+	public TipoApresentacaoIPI getTipoApresentacaoIPI() {
+		return tipoApresentacaoIPI;
+	}
+
 	@Override
 	public int hashCode() {
 		return this.id == null ? -1 : this.id;
+	}
+
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	public boolean isIPIHabilitado() {
+		return !TipoApresentacaoIPI.NUNCA.equals(this.tipoApresentacaoIPI);
+	}
+
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
+	}
+
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+
+	public void setComissao(double comissao) {
+		this.comissao = comissao;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public void setInscricaoEstadual(String inscricaoEstadual) {
+		this.inscricaoEstadual = inscricaoEstadual;
+	}
+
+	public void setListaContato(List<ContatoRepresentada> listaContato) {
+		this.listaContato = listaContato;
+	}
+	
+	void setListaMaterial(List<Material> listaMaterial) {
+		this.listaMaterial = listaMaterial;
+	}
+
+	public void setLogradouro(Logradouro logradouro) {
+		this.logradouro = logradouro;
+	}
+
+	public void setNomeFantasia(String nomeFantasia) {
+		this.nomeFantasia = nomeFantasia;
+	}
+	
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
+	}
+	
+
+	public void setSite(String site) {
+		this.site = site;
+	}
+	
+	public void setTipoApresentacaoIPI(TipoApresentacaoIPI tipoApresentacaoIPI) {
+		this.tipoApresentacaoIPI = tipoApresentacaoIPI;
 	}
 }

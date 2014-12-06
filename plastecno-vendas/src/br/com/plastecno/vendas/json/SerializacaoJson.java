@@ -11,22 +11,54 @@ public class SerializacaoJson {
     private List<String> atributoInclusao;
     private List<String> atributoExclusao;
 
-    public SerializacaoJson(String nome, Object objeto, boolean isRecursivo) {
-        this.nome = nome;
-        this.objeto = objeto;
-        this.recursivo = isRecursivo;
-    }
-
-    public SerializacaoJson(String nome, Object objeto) {
-        this(nome, objeto, false);
+    public SerializacaoJson(Object objeto) {
+        this(null, objeto);
     }
 
     public SerializacaoJson(Object objeto, boolean isRecursivo) {
         this(null, objeto, isRecursivo);
     }
 
-    public SerializacaoJson(Object objeto) {
-        this(null, objeto);
+    public SerializacaoJson(String nome, Object objeto) {
+        this(nome, objeto, false);
+    }
+
+    public SerializacaoJson(String nome, Object objeto, boolean isRecursivo) {
+        this.nome = nome;
+        this.objeto = objeto;
+        this.recursivo = isRecursivo;
+    }
+
+    public boolean contemExclusaoAtributo() {
+        return atributoExclusao != null && !atributoExclusao.isEmpty();
+    }
+
+    public boolean contemInclusaoAtributo() {
+        return atributoInclusao != null && !atributoInclusao.isEmpty();
+    }
+
+    public boolean contemNome() {
+        return this.nome != null;
+    }
+
+    public SerializacaoJson excluirAtributo(String... nomeAtributo) {
+        if (nomeAtributo == null) {
+            return this;
+        }
+
+        if (atributoExclusao == null) {
+            atributoExclusao = new ArrayList<String>();
+        }
+        atributoExclusao.addAll(Arrays.asList(nomeAtributo));
+        return this;
+    }
+
+    public String[] getAtributoExclusao() {
+        return atributoExclusao == null ? null : atributoExclusao.toArray(new String[] {});
+    }
+
+    public String[] getAtributoInclusao() {
+        return atributoInclusao == null ? null : atributoInclusao.toArray(new String[] {});
     }
 
     public String getNome() {
@@ -47,38 +79,6 @@ public class SerializacaoJson {
         }
         atributoInclusao.addAll(Arrays.asList(nomeAtributo));
         return this;
-    }
-
-    public SerializacaoJson excluirAtributo(String... nomeAtributo) {
-        if (nomeAtributo == null) {
-            return this;
-        }
-
-        if (atributoExclusao == null) {
-            atributoExclusao = new ArrayList<String>();
-        }
-        atributoExclusao.addAll(Arrays.asList(nomeAtributo));
-        return this;
-    }
-
-    public String[] getAtributoInclusao() {
-        return atributoInclusao == null ? null : atributoInclusao.toArray(new String[] {});
-    }
-
-    public String[] getAtributoExclusao() {
-        return atributoExclusao == null ? null : atributoExclusao.toArray(new String[] {});
-    }
-
-    public boolean contemNome() {
-        return this.nome != null;
-    }
-
-    public boolean contemInclusaoAtributo() {
-        return atributoInclusao != null && !atributoInclusao.isEmpty();
-    }
-
-    public boolean contemExclusaoAtributo() {
-        return atributoExclusao != null && !atributoExclusao.isEmpty();
     }
 
     public boolean isRecursivo() {

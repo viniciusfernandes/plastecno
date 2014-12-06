@@ -27,21 +27,11 @@ public class RegiaoServiceImpl implements RegiaoService {
 	@PersistenceContext(unitName="plastecno")
 	private EntityManager entityManager;
 	
-	@Override
-	public void remover (Integer id) {
-		this.entityManager.remove(this.pesquisarById(id));
-	}
-	
 	private GenericDAO genericDAO;
 	
 	@PostConstruct
 	public void init() {
 		this.genericDAO = new GenericDAO(this.entityManager);
-	}
-	
-	@Override
-	public boolean isNomeRegiaoExistente(Integer idRegiao, String nomeRegiao) {
-		return this.genericDAO.isEntidadeExistente(Regiao.class, idRegiao, "nome", nomeRegiao); 
 	}
 	
 	@Override
@@ -60,6 +50,18 @@ public class RegiaoServiceImpl implements RegiaoService {
 		}
 		
 		return this.entityManager.merge(regiao).getId();
+	}
+	
+	@Override
+	public boolean isNomeRegiaoExistente(Integer idRegiao, String nomeRegiao) {
+		return this.genericDAO.isEntidadeExistente(Regiao.class, idRegiao, "nome", nomeRegiao); 
+	}
+	
+	@Override
+	public PaginacaoWrapper<Regiao> paginarRegiao(Regiao filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		return new PaginacaoWrapper<Regiao>(
+				this.pesquisatTotalRegistros(filtro),
+				this.pesquisarBy(filtro, indiceRegistroInicial, numeroMaximoRegistros));
 	}
 	
 	@Override
@@ -84,31 +86,29 @@ public class RegiaoServiceImpl implements RegiaoService {
 	}
 	
 		@Override
-	public Long pesquisatTotalRegistros(Regiao filtro) {
-		StringBuilder select = new StringBuilder("select count(r.id) from Regiao r ");
-		
-		if (!StringUtils.isEmpty(filtro.getNome())) {
-			select.append("where r.nome like :nome ");
+		public Regiao pesquisarById(Integer id) {
+			return QueryUtil.gerarRegistroUnico(
+					this.entityManager.createQuery("select r from Regiao r join fetch r.listaBairro where r.id = :id")
+					.setParameter("id", id), Regiao.class, null);
 		}
-		
-		Query query = this.entityManager.createQuery(select.toString());
-		if (!StringUtils.isEmpty(filtro.getNome())) {
-			query.setParameter("nome", "%"+filtro.getNome()+"%");
-		}
-		return QueryUtil.gerarRegistroUnico(query, Long.class, 0L);
-	}
 	
 	@Override
-	public PaginacaoWrapper<Regiao> paginarRegiao(Regiao filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-		return new PaginacaoWrapper<Regiao>(
-				this.pesquisatTotalRegistros(filtro),
-				this.pesquisarBy(filtro, indiceRegistroInicial, numeroMaximoRegistros));
+public Long pesquisatTotalRegistros(Regiao filtro) {
+	StringBuilder select = new StringBuilder("select count(r.id) from Regiao r ");
+	
+	if (!StringUtils.isEmpty(filtro.getNome())) {
+		select.append("where r.nome like :nome ");
 	}
 	
+	Query query = this.entityManager.createQuery(select.toString());
+	if (!StringUtils.isEmpty(filtro.getNome())) {
+		query.setParameter("nome", "%"+filtro.getNome()+"%");
+	}
+	return QueryUtil.gerarRegistroUnico(query, Long.class, 0L);
+}
+	
 	@Override
-	public Regiao pesquisarById(Integer id) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select r from Regiao r join fetch r.listaBairro where r.id = :id")
-				.setParameter("id", id), Regiao.class, null);
+	public void remover (Integer id) {
+		this.entityManager.remove(this.pesquisarById(id));
 	}
 }

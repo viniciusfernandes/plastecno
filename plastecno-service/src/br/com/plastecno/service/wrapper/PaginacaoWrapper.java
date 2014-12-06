@@ -8,11 +8,11 @@ public final class PaginacaoWrapper<T> extends ChaveValorWrapper<Long, Collectio
 		super(chave, valor);		
 	}
 	
-	public Long getTotalPaginado() {
-		return this.chave;
-	}
-	
 	public Collection<T> getLista(){
 		return this.valor;
+	}
+	
+	public Long getTotalPaginado() {
+		return this.chave;
 	} 
 }

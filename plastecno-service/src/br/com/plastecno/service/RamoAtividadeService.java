@@ -10,31 +10,31 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 
 @Local
 public interface RamoAtividadeService {
+    void desativar(Integer id);
+
     RamoAtividade inserir(RamoAtividade ramoAtividade) throws BusinessException;
+
+    boolean isSiglaExistente(Integer id, String sigla);
 
     boolean isSiglaExistente(String sigla);
 
+    PaginacaoWrapper<RamoAtividade> paginarRamoAtividade(RamoAtividade filtro, Boolean apenasAtivos,
+            Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+
     List<RamoAtividade> pesquisar();
-
-    List<RamoAtividade> pesquisarBy(RamoAtividade filtro);
-
-    RamoAtividade pesquisarById(Integer id);
-
-    void remover(RamoAtividade ramoAtividade);
-
-    List<RamoAtividade> pesquisarBy(RamoAtividade filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
-
-    void desativar(Integer id);
-
-    Long pesquisarTotalRegistros(RamoAtividade filtro, Boolean apenasRamoAtividadeAtivo);
 
     List<RamoAtividade> pesquisar(Boolean ativo);
 
     List<RamoAtividade> pesquisarAtivo();
 
-    PaginacaoWrapper<RamoAtividade> paginarRamoAtividade(RamoAtividade filtro, Boolean apenasAtivos,
-            Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+    List<RamoAtividade> pesquisarBy(RamoAtividade filtro);
 
-    boolean isSiglaExistente(Integer id, String sigla);
+    List<RamoAtividade> pesquisarBy(RamoAtividade filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
+            Integer numeroMaximoRegistros);
+
+    RamoAtividade pesquisarById(Integer id);
+
+    Long pesquisarTotalRegistros(RamoAtividade filtro, Boolean apenasRamoAtividadeAtivo);
+
+    void remover(RamoAtividade ramoAtividade);
 }

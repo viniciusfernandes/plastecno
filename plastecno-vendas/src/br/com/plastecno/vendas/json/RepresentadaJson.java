@@ -13,12 +13,12 @@ public class RepresentadaJson {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public Boolean getIpiHabilitado() {
         return ipiHabilitado;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public void setIpiHabilitado(Boolean ipiHabilitado) {

@@ -45,11 +45,6 @@ public class RelatorioVendaRepresentadaController extends AbstractController {
         this.geradorRelatorio = gerador;
     }
 
-    @Get("relatorio/venda/representada")
-    public void relatorioVendaRepresentadaHome() {
-        addAtributo("listaRepresentada", this.representadaService.pesquisar());
-    }
-
     @Get("relatorio/venda/representada/pdf")
     public Download gerarRelatorioVendaRepresentada(Date dataInicial, Date dataFinal, Integer idRepresentada) {
 
@@ -94,5 +89,10 @@ public class RelatorioVendaRepresentadaController extends AbstractController {
             gerarLogErro("geracao do relatorio de pedidos por representada", e);
             return null;
         }
+    }
+
+    @Get("relatorio/venda/representada")
+    public void relatorioVendaRepresentadaHome() {
+        addAtributo("listaRepresentada", this.representadaService.pesquisar());
     }
 }

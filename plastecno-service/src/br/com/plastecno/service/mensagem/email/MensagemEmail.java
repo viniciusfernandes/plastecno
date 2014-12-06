@@ -22,22 +22,6 @@ public class MensagemEmail implements Serializable {
 		this.conteudo = conteudo;
 	}
 	
-	public String getRemetente() {
-		return remetente;
-	}
-	
-	public String getDestinatario() {
-		return destinatario;
-	}
-	
-	public String getTitulo() {
-		return titulo;
-	}
-	
-	public String getConteudo() {
-		return conteudo;
-	}
-	
 	public void addAnexo(AnexoEmail anexoEmail) {
 		if (this.listaAnexo == null) {
 			this.listaAnexo = new ArrayList<AnexoEmail>();
@@ -45,11 +29,27 @@ public class MensagemEmail implements Serializable {
 		this.listaAnexo.add(anexoEmail);
 	}
 	
+	public boolean contemAnexo() {
+		return this.listaAnexo != null && !this.listaAnexo.isEmpty();
+	}
+	
+	public String getConteudo() {
+		return conteudo;
+	}
+	
+	public String getDestinatario() {
+		return destinatario;
+	}
+	
 	public List<AnexoEmail> getListaAnexo() {
 		return listaAnexo;
 	}
 	
-	public boolean contemAnexo() {
-		return this.listaAnexo != null && !this.listaAnexo.isEmpty();
+	public String getRemetente() {
+		return remetente;
+	}
+	
+	public String getTitulo() {
+		return titulo;
 	}
 }

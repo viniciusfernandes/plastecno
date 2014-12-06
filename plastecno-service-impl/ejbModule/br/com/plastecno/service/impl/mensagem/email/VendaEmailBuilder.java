@@ -12,18 +12,9 @@ public class VendaEmailBuilder extends PedidoEmailBuilder {
 	}
 
 	@Override
-	public String gerarTitulo() {
-		return "Plastecno - Pedido de Venda No: "+pedido.getId()+" - "+pedido.getCliente().getNomeFantasia();
-	}
-
-	@Override
-	public String gerarRemetente() {
-		return pedido.getVendedor().getEmail();
-	}
-
-	@Override
-	public String gerarDestinatario() {
-		return pedido.getRepresentada().getEmail();
+	public AnexoEmail gerarArquivoAnexo() {
+		return new AnexoEmail(arquivoAnexo, "application/pdf", 
+				"Pedido No. "+pedido.getId()+" "+pedido.getCliente().getNomeFantasia()+".pdf", "Pedido de venda realizado pela Plastecno");
 	}
 
 	@Override
@@ -35,8 +26,17 @@ public class VendaEmailBuilder extends PedidoEmailBuilder {
 	}
 
 	@Override
-	public AnexoEmail gerarArquivoAnexo() {
-		return new AnexoEmail(arquivoAnexo, "application/pdf", 
-				"Pedido No. "+pedido.getId()+" "+pedido.getCliente().getNomeFantasia()+".pdf", "Pedido de venda realizado pela Plastecno");
+	public String gerarDestinatario() {
+		return pedido.getRepresentada().getEmail();
+	}
+
+	@Override
+	public String gerarRemetente() {
+		return pedido.getVendedor().getEmail();
+	}
+
+	@Override
+	public String gerarTitulo() {
+		return "Plastecno - Pedido de Venda No: "+pedido.getId()+" - "+pedido.getCliente().getNomeFantasia();
 	}
 }

@@ -11,15 +11,6 @@ import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 
 public final class ValidadorInformacao {
 	
-	public static void validar (Object obj) throws InformacaoInvalidaException {
-		List<String> listaMensagem = new ArrayList<String>(20);
-		preencherListaMensagemValidacao(obj, listaMensagem);
-		
-		if (listaMensagem.size() != 0) {
-			throw new InformacaoInvalidaException(listaMensagem);
-		}
-	}
-	
 	public static void preencherListaMensagemValidacao (Object obj, List<String> listaMensagem) {
 		if(obj.getClass().getAnnotation(InformacaoValidavel.class) == null){
 			throw new IllegalArgumentException("A classe "+obj.getClass()+
@@ -146,5 +137,14 @@ public final class ValidadorInformacao {
 				throw new IllegalStateException("O objeto do tipo "+conteudoCampo.getClass()+" não possui um de acesso ao campo de identificação ID. Implementar um metodo de acesso getId(), mas no caso de ENUM, substitua pelo atributo \"obrigatório\"");
 			}
 		
+	}
+	
+	public static void validar (Object obj) throws InformacaoInvalidaException {
+		List<String> listaMensagem = new ArrayList<String>(20);
+		preencherListaMensagemValidacao(obj, listaMensagem);
+		
+		if (listaMensagem.size() != 0) {
+			throw new InformacaoInvalidaException(listaMensagem);
+		}
 	}
 }

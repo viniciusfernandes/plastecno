@@ -142,217 +142,198 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private String valorPedidoIPIFormatado;
 		
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getNumeroPedidoCliente() {
-		return numeroPedidoCliente;
-	}
-
-	public void setNumeroPedidoCliente(String numeroPedidoCliente) {
-		this.numeroPedidoCliente = numeroPedidoCliente;
-	}
-
-	public Date getDataInclusao() {
-		return dataInclusao;
-	}
-
-	public void setDataInclusao(Date dataInclusao) {
-		this.dataInclusao = dataInclusao;
-	}
-
-	public Date getDataEnvio() {
-		return dataEnvio;
-	}
-
-	public void setDataEnvio(Date dataEnvio) {
-		this.dataEnvio = dataEnvio;
-	}
-
-	public String getObservacao() {
-		return observacao;
-	}
-
-	public void setObservacao(String observacao) {
-		this.observacao = observacao;
-	}
-
-	public Cliente getCliente() {
-		return cliente;
-	}
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
-	}
-
-	public Representada getRepresentada() {
-		return representada;
-	}
-
-	public void setRepresentada(Representada representada) {
-		this.representada = representada;
-	}
-
-	public Transportadora getTransportadora() {
-		return transportadora;
-	}
-
-	public void setTransportadora(Transportadora transportadora) {
-		this.transportadora = transportadora;
-	}
-
-	public Transportadora getTransportadoraRedespacho() {
-		return transportadoraRedespacho;
-	}
-
-	public void setTransportadoraRedespacho(Transportadora transportadoraRedespacho) {
-		this.transportadoraRedespacho = transportadoraRedespacho;
-	}
-
-	public TipoEntrega getTipoEntrega() {
-		return tipoEntrega;
-	}
-
-	public void setTipoEntrega(TipoEntrega tipoEntrega) {
-		this.tipoEntrega = tipoEntrega;
-	}
-
-	public SituacaoPedido getSituacaoPedido() {
-		return situacaoPedido;
-	}
-
-	public void setSituacaoPedido(SituacaoPedido situacaoPedido) {
-		this.situacaoPedido = situacaoPedido;
-	}
-
-	public Usuario getVendedor() {
-		return vendedor;
-	}
-
-	public void setVendedor(Usuario vendedor) {
-		this.vendedor = vendedor;
-	}
-
-	public FinalidadePedido getFinalidadePedido() {
-		return finalidadePedido;
-	}
-
-	public void setFinalidadePedido(FinalidadePedido finalidadePedido) {
-		this.finalidadePedido = finalidadePedido;
-	}
-
-	public String getFormaPagamento() {
-		return formaPagamento;
-	}
-
-	public void setFormaPagamento(String formaPagamento) {
-		this.formaPagamento = formaPagamento;
-	}
-
-	public Contato getContato() {
-		return contato;
-	}
-
-	public void setContato(Contato contato) {
-		this.contato = contato;
-	}
-
-	public String getDataInclusaoFormatada() {
-		return dataInclusaoFormatada;
-	}
-
-	public void setDataInclusaoFormatada(String dataInclusaoFormatada) {
-		this.dataInclusaoFormatada = dataInclusaoFormatada;
-	}
-
-	public String getDataEnvioFormatada() {
-		return dataEnvioFormatada;
-	}
-
-	public void setDataEnvioFormatada(String dataEnvioFormatada) {
-		this.dataEnvioFormatada = dataEnvioFormatada;
-	}
-
-	public Double getValorPedido() {
-		return valorPedido;
-	}
-
-	public void setValorPedido(Double valorPedido) {
-		this.valorPedido = valorPedido;
-	}
-	
-	public double addValorPedido (double valor) {
-		return this.valorPedido += valor;
-	}
-
-	public Date getDataEntrega() {
-		return dataEntrega;
-	}
-
-	public void setDataEntrega(Date dataEntrega) {
-		this.dataEntrega = dataEntrega;
-	}
-
-	public String getDataEntregaFormatada() {
-		return dataEntregaFormatada;
-	}
-
-	public void setDataEntregaFormatada(String dataEntregaFormatada) {
-		this.dataEntregaFormatada = dataEntregaFormatada;
-	}
-	
-	public boolean isEnviado() {
-		return SituacaoPedido.ENVIADO.equals(this.situacaoPedido);
-	}
-
-	public Double getValorPedidoIPI() {
-		return valorPedidoIPI;
-	}
-
-	public void setValorPedidoIPI(Double valorPedidoIPI) {
-		this.valorPedidoIPI = valorPedidoIPI;
-	}
-
-	public List<Logradouro> getListaLogradouro() {
-		return listaLogradouro;
-	}
-
-	public void setListaLogradouro(List<Logradouro> listaLogradouro) {
-		this.listaLogradouro = listaLogradouro;
-	}
-
-	public Logradouro getLogradouro(TipoLogradouro tipoLogradouro) {
-		return EntityUtils.getLogradouro(listaLogradouro, tipoLogradouro);
-	}
-	
-	public void addLogradouro(Logradouro logradouro) {
-		if (this.listaLogradouro == null){
-			this.setListaLogradouro(new ArrayList<Logradouro>());
-		}
-		this.listaLogradouro.add(logradouro);
-	}
-	
 	public void addLogradouro(List<? extends Logradouro> listaLogradouro) {
 		for (Logradouro logradouro : listaLogradouro) {
 			this.addLogradouro(logradouro);
 		}
 	}
 
+	public void addLogradouro(Logradouro logradouro) {
+		if (this.listaLogradouro == null){
+			this.setListaLogradouro(new ArrayList<Logradouro>());
+		}
+		this.listaLogradouro.add(logradouro);
+	}
+
+	public double addValorPedido (double valor) {
+		return this.valorPedido += valor;
+	}
+
+	@Override
+	public Pedido clone() throws CloneNotSupportedException {
+		return (Pedido) super.clone();
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public Contato getContato() {
+		return contato;
+	}
+
+	public Date getDataEntrega() {
+		return dataEntrega;
+	}
+
+	public String getDataEntregaFormatada() {
+		return dataEntregaFormatada;
+	}
+
+	public Date getDataEnvio() {
+		return dataEnvio;
+	}
+
+	public String getDataEnvioFormatada() {
+		return dataEnvioFormatada;
+	}
+
+	public Date getDataInclusao() {
+		return dataInclusao;
+	}
+
+	public String getDataInclusaoFormatada() {
+		return dataInclusaoFormatada;
+	}
+
+	public FinalidadePedido getFinalidadePedido() {
+		return finalidadePedido;
+	}
+
+	public String getFormaPagamento() {
+		return formaPagamento;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public List<Logradouro> getListaLogradouro() {
+		return listaLogradouro;
+	}
+
+	public Logradouro getLogradouro(TipoLogradouro tipoLogradouro) {
+		return EntityUtils.getLogradouro(listaLogradouro, tipoLogradouro);
+	}
+
+	public String getNumeroPedidoCliente() {
+		return numeroPedidoCliente;
+	}
+
+	public String getObservacao() {
+		return observacao;
+	}
+
+	public Representada getRepresentada() {
+		return representada;
+	}
+
+	public SituacaoPedido getSituacaoPedido() {
+		return situacaoPedido;
+	}
+
+	public TipoEntrega getTipoEntrega() {
+		return tipoEntrega;
+	}
+
+	public Transportadora getTransportadora() {
+		return transportadora;
+	}
+
+	public Transportadora getTransportadoraRedespacho() {
+		return transportadoraRedespacho;
+	}
+
+	public Double getValorPedido() {
+		return valorPedido;
+	}
+
 	public String getValorPedidoFormatado() {
 		return valorPedidoFormatado;
 	}
 
-	public void setValorPedidoFormatado(String valorPedidoFormatado) {
-		this.valorPedidoFormatado = valorPedidoFormatado;
+	public Double getValorPedidoIPI() {
+		return valorPedidoIPI;
 	}
-	
+
+	public String getValorPedidoIPIFormatado() {
+		return valorPedidoIPIFormatado;
+	}
+
+	public Usuario getVendedor() {
+		return vendedor;
+	}
+
+	public boolean isClienteNotificadoVenda() {
+		return this.clienteNotificadoVenda;
+	}
+
+	public boolean isEnviado() {
+		return SituacaoPedido.ENVIADO.equals(this.situacaoPedido);
+	}
+
 	public boolean isOrcamento() {
 		return SituacaoPedido.ORCAMENTO.equals(this.situacaoPedido);
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public void setClienteNotificadoVenda(boolean clienteNotificadoVenda) {
+		this.clienteNotificadoVenda = clienteNotificadoVenda;
+	}
+
+	public void setContato(Contato contato) {
+		this.contato = contato;
+	}
+
+	public void setDataEntrega(Date dataEntrega) {
+		this.dataEntrega = dataEntrega;
+	}
+	
+	public void setDataEntregaFormatada(String dataEntregaFormatada) {
+		this.dataEntregaFormatada = dataEntregaFormatada;
+	}
+
+	public void setDataEnvio(Date dataEnvio) {
+		this.dataEnvio = dataEnvio;
+	}
+
+	public void setDataEnvioFormatada(String dataEnvioFormatada) {
+		this.dataEnvioFormatada = dataEnvioFormatada;
+	}
+
+	public void setDataInclusao(Date dataInclusao) {
+		this.dataInclusao = dataInclusao;
+	}
+
+	public void setDataInclusaoFormatada(String dataInclusaoFormatada) {
+		this.dataInclusaoFormatada = dataInclusaoFormatada;
+	}
+	
+	public void setFinalidadePedido(FinalidadePedido finalidadePedido) {
+		this.finalidadePedido = finalidadePedido;
+	}
+
+	public void setFormaPagamento(String formaPagamento) {
+		this.formaPagamento = formaPagamento;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void setListaLogradouro(List<Logradouro> listaLogradouro) {
+		this.listaLogradouro = listaLogradouro;
+	}
+
+	public void setNumeroPedidoCliente(String numeroPedidoCliente) {
+		this.numeroPedidoCliente = numeroPedidoCliente;
+	}
+
+	public void setObservacao(String observacao) {
+		this.observacao = observacao;
 	}
 	
 	public void setOrcamento(boolean isOrcamento) {
@@ -361,24 +342,43 @@ public class Pedido implements Serializable, Cloneable {
 		}
 	}
 	
-	public boolean isClienteNotificadoVenda() {
-		return this.clienteNotificadoVenda;
-	}
-	
-	public void setClienteNotificadoVenda(boolean clienteNotificadoVenda) {
-		this.clienteNotificadoVenda = clienteNotificadoVenda;
+	public void setRepresentada(Representada representada) {
+		this.representada = representada;
 	}
 
-	public String getValorPedidoIPIFormatado() {
-		return valorPedidoIPIFormatado;
+	public void setSituacaoPedido(SituacaoPedido situacaoPedido) {
+		this.situacaoPedido = situacaoPedido;
+	}
+
+	public void setTipoEntrega(TipoEntrega tipoEntrega) {
+		this.tipoEntrega = tipoEntrega;
+	}
+	
+	public void setTransportadora(Transportadora transportadora) {
+		this.transportadora = transportadora;
+	}
+	
+	public void setTransportadoraRedespacho(Transportadora transportadoraRedespacho) {
+		this.transportadoraRedespacho = transportadoraRedespacho;
+	}
+	
+	public void setValorPedido(Double valorPedido) {
+		this.valorPedido = valorPedido;
+	}
+	
+	public void setValorPedidoFormatado(String valorPedidoFormatado) {
+		this.valorPedidoFormatado = valorPedidoFormatado;
+	}
+
+	public void setValorPedidoIPI(Double valorPedidoIPI) {
+		this.valorPedidoIPI = valorPedidoIPI;
 	}
 
 	public void setValorPedidoIPIFormatado(String valorPedidoIPIFormatado) {
 		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
 	}
 	
-	@Override
-	public Pedido clone() throws CloneNotSupportedException {
-		return (Pedido) super.clone();
+	public void setVendedor(Usuario vendedor) {
+		this.vendedor = vendedor;
 	}
 }

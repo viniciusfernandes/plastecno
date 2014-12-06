@@ -56,38 +56,38 @@ public class Remuneracao implements Serializable {
 
 
 
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	public Double getSalario() {
-		return salario;
-	}
-	public void setSalario(Double salario) {
-		this.salario = salario;
-	}
 	public Double getComissao() {
 		return comissao;
-	}
-	public void setComissao(Double comissao) {
-		this.comissao = comissao;
-	}
-	public Calendar getDataInicioVigencia() {
-		return dataInicioVigencia;
-	}
-	public void setDataInicioVigencia(Calendar dataInicioVigencia) {
-		this.dataInicioVigencia = dataInicioVigencia;
 	}
 	public Calendar getDataFimVigencia() {
 		return dataFimVigencia;
 	}
-	public void setDataFimVigencia(Calendar dataFimVigencia) {
-		this.dataFimVigencia = dataFimVigencia;
+	public Calendar getDataInicioVigencia() {
+		return dataInicioVigencia;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public Double getSalario() {
+		return salario;
 	}
 	public Usuario getUsuario() {
 		return usuario;
+	}
+	public void setComissao(Double comissao) {
+		this.comissao = comissao;
+	}
+	public void setDataFimVigencia(Calendar dataFimVigencia) {
+		this.dataFimVigencia = dataFimVigencia;
+	}
+	public void setDataInicioVigencia(Calendar dataInicioVigencia) {
+		this.dataInicioVigencia = dataInicioVigencia;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public void setSalario(Double salario) {
+		this.salario = salario;
 	}
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;

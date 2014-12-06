@@ -18,10 +18,6 @@ public class RelatorioClienteRamoAtividade {
 		this.titulo = titulo;
 	}
 	
-	public String getTitulo () {
-		return this.titulo;
-	}
-	
 	public void addCliente(ClienteWrapper cliente) {
 		VendedorClienteWrapper vendedor = this.repositorioVendedorCliente.get(cliente.getNomeVendedor());
 		if (vendedor != null) {
@@ -35,6 +31,10 @@ public class RelatorioClienteRamoAtividade {
 	
 	public List<VendedorClienteWrapper> getListaVendedorCliente() {
 		return new ArrayList<VendedorClienteWrapper>(repositorioVendedorCliente.values());
+	}
+	
+	public String getTitulo () {
+		return this.titulo;
 	}
 	
 }

@@ -8,7 +8,7 @@
 .listrada {
 	border: 1px solid #B1B1B1;
 	border-collapse: collapse;
-	float: left;	
+	float: left;
 	margin: 0 1% 15px 1%;
 	width: 98%;
 }
@@ -23,21 +23,20 @@
 	background-color: white;
 }
 
-.listrada tbody tr:nth-child(2n){
+.listrada tbody tr:nth-child(2n) {
 	background-color: #E3F5AB;
 }
 
-	
 .listrada th {
 	background-color: #318239;
-	color: white;	
+	color: white;
 }
 
 .listrada th:last-child {
 	background-color: #BECEBE;
 	color: white;
 	width: 8%;
-} 
+}
 
 .listrada td:last-child {
 	text-align: center;
@@ -51,9 +50,9 @@
 	margin-left: 15%;
 }
 
-.listrada tbody tr:hover, tbody tr:hover input  {
-    background-color: #BECEBE;
-    color: white;
+.listrada tbody tr:hover, tbody tr:hover input {
+	background-color: #BECEBE;
+	color: white;
 }
 
 .listrada a {
@@ -84,7 +83,7 @@
 
 .listrada tfoot tr {
 	background-color: #BECEBE;
-	color: #318239;	
+	color: #318239;
 }
 
 .listrada tfoot tr td {

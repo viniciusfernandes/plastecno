@@ -21,11 +21,6 @@ public class RelatorioVendaPeriodoController extends AbstractController {
         super(result, usuarioInfo);
     }
 
-    @Get("relatorio/venda/periodo")
-    public void relatorioVendaPeriodoHome() {
-        addAtributo("relatorioGerado", contemAtributo("relatorio"));
-    }
-
     @Get("relatorio/venda/periodo/listagem")
     public void gerarRelatorioVendaPeriodo(Date dataInicial, Date dataFinal) {
 
@@ -39,5 +34,10 @@ public class RelatorioVendaPeriodoController extends AbstractController {
         addAtributo("dataInicial", this.formatarData(dataInicial));
         addAtributo("dataFinal", this.formatarData(dataFinal));
         this.irPaginaHome();
+    }
+
+    @Get("relatorio/venda/periodo")
+    public void relatorioVendaPeriodoHome() {
+        addAtributo("relatorioGerado", contemAtributo("relatorio"));
     }
 }

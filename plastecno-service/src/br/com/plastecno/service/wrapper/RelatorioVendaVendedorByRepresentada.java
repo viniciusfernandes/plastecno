@@ -20,15 +20,15 @@ public final class RelatorioVendaVendedorByRepresentada {
         return this.agrupamento.getListaGrupo();
     }
 
+    public String getTitulo() {
+        return this.agrupamento.getTitulo();
+    }
+
     public double getTotalVendido() {
         return agrupamento.getValorTotalAgrupado();
     }
 
     public String getTotalVendidoFormatado() {
         return agrupamento.getValorTotalAgrupadoFormatado();
-    }
-
-    public String getTitulo() {
-        return this.agrupamento.getTitulo();
     }
 }

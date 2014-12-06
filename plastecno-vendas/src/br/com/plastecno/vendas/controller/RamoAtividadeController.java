@@ -29,8 +29,13 @@ public class RamoAtividadeController extends AbstractController {
         this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
     }
 
-    @Get("ramo")
-    public void ramoAtividadeHome() {
+    @Post("ramo/desativacao")
+    public void desativar(Integer id) {
+        this.ramoAtividadeService.desativar(id);
+        List<String> mensagens = new ArrayList<String>();
+        mensagens.add("Ramo de atividade desativado com sucesso");
+        addAtributo("listaMensagemSucesso", mensagens);
+        this.irPaginaHome();
     }
 
     @Post(value = "ramo/inclusao")
@@ -49,6 +54,12 @@ public class RamoAtividadeController extends AbstractController {
         this.irPaginaHome();
     }
 
+    @Get("ramo/{idRamo}")
+    public void pesquisar(Integer idRamo) {
+        addAtributo("ramoAtividade", this.ramoAtividadeService.pesquisarById(idRamo));
+        irTopoPagina();
+    }
+
     @Path(value = "ramo/listagem")
     public void pesquisar(RamoAtividade filtro, Integer paginaSelecionada) {
 
@@ -59,18 +70,7 @@ public class RamoAtividadeController extends AbstractController {
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaRamoAtividade");
     }
 
-    @Get("ramo/{idRamo}")
-    public void pesquisar(Integer idRamo) {
-        addAtributo("ramoAtividade", this.ramoAtividadeService.pesquisarById(idRamo));
-        irTopoPagina();
-    }
-
-    @Post("ramo/desativacao")
-    public void desativar(Integer id) {
-        this.ramoAtividadeService.desativar(id);
-        List<String> mensagens = new ArrayList<String>();
-        mensagens.add("Ramo de atividade desativado com sucesso");
-        addAtributo("listaMensagemSucesso", mensagens);
-        this.irPaginaHome();
+    @Get("ramo")
+    public void ramoAtividadeHome() {
     }
 }

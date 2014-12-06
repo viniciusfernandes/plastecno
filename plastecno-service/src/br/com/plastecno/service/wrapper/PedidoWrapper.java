@@ -11,11 +11,11 @@ public class PedidoWrapper extends ChaveValorWrapper<Pedido, List<ItemPedido>> {
 		super(pedido, listaItemPedido);
 	}
 
-	public Pedido getPedido() {
-		return this.chave;
-	}
-	
 	public List<ItemPedido> getListaItemPedido() {
 		return this.valor;
+	}
+	
+	public Pedido getPedido() {
+		return this.chave;
 	}
 }

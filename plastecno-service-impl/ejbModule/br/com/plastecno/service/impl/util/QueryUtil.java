@@ -7,6 +7,10 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 
 public class QueryUtil {
+	public static <T> T gerarRegistroUnico(Query query, Class<T> classe, T casoPadrao) {
+		return gerarRegistroUnico(query, classe, casoPadrao, casoPadrao);
+	}
+	
 	public static <T> T gerarRegistroUnico(Query query, Class<T> classe, T casoPadrao, T casoMultiplos) {
 		try {
 			return classe.cast(query.getSingleResult());
@@ -15,10 +19,6 @@ public class QueryUtil {
 		} catch (NonUniqueResultException e) {
 			return casoMultiplos;
 		}
-	}
-	
-	public static <T> T gerarRegistroUnico(Query query, Class<T> classe, T casoPadrao) {
-		return gerarRegistroUnico(query, classe, casoPadrao, casoPadrao);
 	}
 	
 	@SuppressWarnings("unchecked")

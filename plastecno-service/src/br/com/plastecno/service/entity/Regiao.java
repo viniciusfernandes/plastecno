@@ -48,41 +48,41 @@ public class Regiao implements Serializable {
 		this.nome = nome;
 	}
 	
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getNome() {
-		return nome;
-	}
-
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-
-	public List<Bairro> getListaBairro() {
-		return listaBairro;
-	}
-
-	public void setListaBairro(List<Bairro> listaBairro) {
-		this.listaBairro = listaBairro;
-	}
-	
 	public void addBairro(Bairro bairro){
 		if (this.listaBairro == null) {
 			this.listaBairro = new ArrayList<Bairro>();
 		}
 		this.listaBairro.add(bairro);
 	}
-	
+
 	public void addBairro(List<Bairro> listaBairro){
 		if (this.listaBairro == null) {
 			this.listaBairro = new ArrayList<Bairro>();
 		}
 		this.listaBairro.addAll(listaBairro);
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public List<Bairro> getListaBairro() {
+		return listaBairro;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public void setListaBairro(List<Bairro> listaBairro) {
+		this.listaBairro = listaBairro;
+	}
+	
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 }

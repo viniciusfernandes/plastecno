@@ -32,11 +32,6 @@ public class RepresentadaController extends AbstractController {
         this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
     }
 
-    @Get("representada")
-    public void representadaHome() {
-        addAtributo("listaTipoApresentacaoIPI", TipoApresentacaoIPI.values());
-    }
-
     @Post("representada/desativacao")
     public void desativar(Integer idRepresentada) {
         this.representadaService.desativar(idRepresentada);
@@ -44,10 +39,9 @@ public class RepresentadaController extends AbstractController {
         this.gerarMensagemSucesso("Representada desativada com sucesso");
     }
 
-    @Post("representada/contato/remocao/{idContato}")
-    public void removerContato(Integer idContato) {
-        this.contatoService.remover(idContato);
-        irTopoPagina();
+    private void formataDocumentos(Representada representada) {
+        representada.setCnpj(this.formatarCNPJ(representada.getCnpj()));
+        representada.setInscricaoEstadual(this.formatarInscricaoEstadual(representada.getInscricaoEstadual()));
     }
 
     @Post("representada/inclusao")
@@ -108,8 +102,14 @@ public class RepresentadaController extends AbstractController {
         irTopoPagina();
     }
 
-    private void formataDocumentos(Representada representada) {
-        representada.setCnpj(this.formatarCNPJ(representada.getCnpj()));
-        representada.setInscricaoEstadual(this.formatarInscricaoEstadual(representada.getInscricaoEstadual()));
+    @Post("representada/contato/remocao/{idContato}")
+    public void removerContato(Integer idContato) {
+        this.contatoService.remover(idContato);
+        irTopoPagina();
+    }
+
+    @Get("representada")
+    public void representadaHome() {
+        addAtributo("listaTipoApresentacaoIPI", TipoApresentacaoIPI.values());
     }
 }

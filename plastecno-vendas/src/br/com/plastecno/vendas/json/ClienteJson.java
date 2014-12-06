@@ -45,18 +45,6 @@ public class ClienteJson {
         }
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public String getSite() {
-        return site;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
     public String getCnpj() {
         return cnpj;
     }
@@ -65,19 +53,31 @@ public class ClienteJson {
         return cpf;
     }
 
-    public String getNomeCompleto() {
-        return nomeCompleto;
+    public String getEmail() {
+        return email;
     }
 
-    public VendedorJson getVendedor() {
-        return vendedor;
+    public Integer getId() {
+        return id;
+    }
+
+    public List<TransportadoraJson> getListaRedespacho() {
+        return listaRedespacho;
     }
 
     public List<TransportadoraJson> getListaTransportadora() {
         return listaTransportadora;
     }
 
-    public List<TransportadoraJson> getListaRedespacho() {
-        return listaRedespacho;
+    public String getNomeCompleto() {
+        return nomeCompleto;
+    }
+
+    public String getSite() {
+        return site;
+    }
+
+    public VendedorJson getVendedor() {
+        return vendedor;
     }
 }

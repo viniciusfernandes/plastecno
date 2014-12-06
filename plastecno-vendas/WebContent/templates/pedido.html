@@ -1,212 +1,241 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
 <style type="text/css">
-{conteudoCss}
-
+{
+conteudoCss
+}
 </style>
 </head>
 <body>
 
-<table style="border: 0; margin-bottom: 40px">
-<tbody>
-	
-	<tr>
-		<td style="color: green; font-family: arial black; font-size: 25px; text-align: left; font-weight: bold;">PLASTECNO</td>
-		<td style="color: green; font-family: arial black; font-size: 12px; text-align: right">www.plastecno.com.br</td>
-	</tr>
-	<tr>
-		<td style="color: green; font-family: arial black; font-size: 15px; text-align: left; font-weight: bold;">Representações e Com. LTDA.</td>
-		<td style="color: green; font-family: arial black; font-size: 8px; text-align: right">Matriz: R. Alice Macuco Alves, 39 – cep:05453-010 – Lapa – São Paulo – SP</td>
-	</tr>
-	<tr>
-		<td colspan="2" style="color: green; font-family: arial black; font-size: 8px; text-align: right">Filial : R. Dr. José Elias, 544- cep:05083-030 – Lapa – São Paulo - SP</td>
-	</tr>
-	<tr>
-		<td colspan="2" style="color: green; font-family: arial black; font-size: 8px; text-align: right">Contato: (11) 3021-9600 ou 3024-3330</td>
-	</tr>
-</tbody>
-</table>
+	<table style="border: 0; margin-bottom: 40px">
+		<tbody>
 
-<table>
-	<thead>
-		<tr>
-			<th colspan="6">{titulo}</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td class="label">Vendedor:</td>
-			<td colspan="2">{pedido.vendedor.nomeCompleto} - {pedido.vendedor.email}</td>
-			<td class="label" style="width: 70px">Email Envio NFe:</td>
-			<td colspan="2">{pedido.cliente.email}</td>
-		</tr>
-		<tr>
-			<td class="label">Num. Pedido:</td>
-			<td>{pedido.id}</td>
-			<td class="label">Ped. Cli.:</td>
-			<td>{pedido.numeroPedidoCliente}</td>
-			<td class="label">Represent.:</td>
-			<td>{pedido.representada.nomeFantasia}</td>
-		</tr>
-		<tr>
-			<td class="label">Finalidade:</td>
-			<td>{pedido.finalidadePedido.descricao}</td>
-			<td class="label">Pagamento:</td>
-			<td>{pedido.formaPagamento}</td>
-		</tr>
-		<tr>
-			<td class="label">Tip. Entr.:</td>
-			<td>{pedido.tipoEntrega.descricao}</td>
-			<td class="label">Data Inclusão:</td>
-			<td>{pedido.dataInclusaoFormatada}</td>
-			<td class="label">Data Entrega:</td>
-			<td>{pedido.dataEntregaFormatada}</td>
-		</tr>
-		<tr>
-			<td class="label">Cliente:</td>
-			<td colspan="5">{pedido.cliente.nomeCompleto}</td>
-		</tr>
-		<tr>
-			<td class="label">CNPJ:</td>
-			<td>{pedido.cliente.cnpj}</td>
-			<td class="label">CPF:</td>
-			<td>{pedido.cliente.cpf}</td>
-			<td class="label">Insc. Est.:</td>
-			<td>{pedido.cliente.inscricaoEstadual}</td>
-		</tr>
-		<tr>
-			<td class="label">Observação:</td>
-			<td colspan="5">{pedido.observacao}</td>
-		</tr>
-	</tbody>
-</table>
-<table>
-	<thead>
-		<tr>
-			<th colspan="6">Contato do Pedido</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td class="label">Contato:</td>
-			<td>{pedido.contato.nome}</td>
-			<td class="label">Email:</td>
-			<td>{pedido.contato.email}</td>
-			<td class="label">Departamento:</td>
-			<td>{pedido.contato.departamento}</td>
-		</tr>
-		<tr>
-			<td class="label">Tel.:</td>
-			<td>{pedido.contato.dDDTelefone}</td>
-			<td class="label">Ramal:</td>
-			<td>{pedido.contato.ramal}</td>
-			<td class="label">Fax:</td>
-			<td>{pedido.contato.faxComHifen}</td>
-		</tr>
-		<tr>
-			<td class="label">Tel.:</td>
-			<td>{pedido.contato.dDDTelefoneSecundario}</td>
-			<td class="label">Ramal:</td>
-			<td>{pedido.contato.ramalSecundario}</td>
-			<td class="label">Fax:</td>
-			<td>{pedido.contato.faxSecundarioComHifen}</td>
-		</tr>
-	</tbody>
-</table>
-<table>
-	<thead>
-		<tr>
-			<th colspan="2">Lista de Endereços</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td class="label">End. Fat.:</td>
-			<td>{logradouroFaturamento}</td>
-		</tr>
-		<tr>
-			<td class="label">End. Cob.:</td>
-			<td>{logradouroCobranca}</td>
-		</tr>
-		<tr>
-			<td class="label">End. Ent.:</td>
-			<td>{logradouroEntrega}</td>
-		</tr>
-	</tbody>
-</table>
-<table>
-	<thead>
-		<tr>
-			<th colspan="8">Transportadora</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td class="label">Transport.:</td>
-			<td>{pedido.transportadora.nomeFantasia}</td>
-			<td class="label">CNPJ:</td>
-			<td>{pedido.transportadora.cnpj}</td>
-			<td class="label">Insc. Estad.:</td>
-			<td>{pedido.transportadora.inscricaoEstadual}</td>
-			<td class="label">Contato:</td>
-			<td>{pedido.transportadora.contatoPrincipal.nome} - {pedido.transportadora.contatoPrincipal.email} - {pedido.transportadora.contatoPrincipal.telefoneFormatado}</td>
-		</tr>
-		<tr>
-			<td class="label">End. Transp.</td>
-			<td colspan="7">{pedido.transportadora.logradouro.descricao}</td>
-		</tr>
-		<tr>
-			<td class="label">Redesp.:</td>
-			<td>{pedido.transportadoraRedespacho.nomeFantasia}</td>
-			<td class="label">CNPJ:</td>
-			<td>{pedido.transportadoraRedespacho.cnpj}</td>
-			<td class="label">Insc. Estad.:</td>
-			<td>{pedido.transportadoraRedespacho.inscricaoEstadual}</td>
-			<td class="label">Contato:</td>
-			<td>{pedido.transportadoraRedespacho.contatoPrincipal.nome} - {pedido.transportadoraRedespacho.contatoPrincipal.email} - {pedido.transportadoraRedespacho.contatoPrincipal.telefoneFormatado}</td>
-		</tr>
-		<tr>
-			<td class="label">End. Redesp.</td>
-			<td colspan="7">{pedido.transportadoraRedespacho.logradouro.descricao}</td>
-		</tr>
-	</tbody>
-</table>
-<table class="listagem">
-	<thead>
-		<tr>
-			<th class="descricaoTabela" colspan="9">Lista de Itens do Pedido</th>
-		</tr>
-	</thead>
-	<thead>
-		<tr>
-			<th>Item</th>
-			<th>Qtde.</th>
-			<th>Descrição</th>
-			<th>Tipo Venda</th>
-			<th>Preço (R$)</th>
-			<th>Unid. (R$)</th>
-			<th>Total Item (R$)</th>
-			<th>IPI (%)</th>
-			<th>ICMS (%)</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr {listaItem}><td style="text-align: center">{sequencial}</td><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoItemFormatado}</td><td style="text-align: center">{aliquotaIPIFormatado}</td><td style="text-align: center">{aliquotaICMSFormatado}</td></tr>
-	</tbody>
-	<tfoot>
-		<tr>
-			<td colspan="4"></td>
-			<td colspan="2" style="text-align: right;">TOTAL SEM IPI:</td>
-			<td colspan="3" style="text-align: left;">R$ {pedido.valorPedidoFormatado}</td>
-		</tr>
-		<tr>
-			<td colspan="4"></td>
-			<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
-			<td colspan="3" style="text-align: left;">R$ {pedido.valorPedidoIPIFormatado}</td>
-		</tr>
-	</tfoot>
-</table>
+			<tr>
+				<td
+					style="color: green; font-family: arial black; font-size: 25px; text-align: left; font-weight: bold;">PLASTECNO</td>
+				<td
+					style="color: green; font-family: arial black; font-size: 12px; text-align: right">www.plastecno.com.br</td>
+			</tr>
+			<tr>
+				<td
+					style="color: green; font-family: arial black; font-size: 15px; text-align: left; font-weight: bold;">Representações
+					e Com. LTDA.</td>
+				<td
+					style="color: green; font-family: arial black; font-size: 8px; text-align: right">Matriz:
+					R. Alice Macuco Alves, 39 – cep:05453-010 – Lapa – São Paulo – SP</td>
+			</tr>
+			<tr>
+				<td colspan="2"
+					style="color: green; font-family: arial black; font-size: 8px; text-align: right">Filial
+					: R. Dr. José Elias, 544- cep:05083-030 – Lapa – São Paulo - SP</td>
+			</tr>
+			<tr>
+				<td colspan="2"
+					style="color: green; font-family: arial black; font-size: 8px; text-align: right">Contato:
+					(11) 3021-9600 ou 3024-3330</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<table>
+		<thead>
+			<tr>
+				<th colspan="6">{titulo}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="label">Vendedor:</td>
+				<td colspan="2">{pedido.vendedor.nomeCompleto} -
+					{pedido.vendedor.email}</td>
+				<td class="label" style="width: 70px">Email Envio NFe:</td>
+				<td colspan="2">{pedido.cliente.email}</td>
+			</tr>
+			<tr>
+				<td class="label">Num. Pedido:</td>
+				<td>{pedido.id}</td>
+				<td class="label">Ped. Cli.:</td>
+				<td>{pedido.numeroPedidoCliente}</td>
+				<td class="label">Represent.:</td>
+				<td>{pedido.representada.nomeFantasia}</td>
+			</tr>
+			<tr>
+				<td class="label">Finalidade:</td>
+				<td>{pedido.finalidadePedido.descricao}</td>
+				<td class="label">Pagamento:</td>
+				<td>{pedido.formaPagamento}</td>
+			</tr>
+			<tr>
+				<td class="label">Tip. Entr.:</td>
+				<td>{pedido.tipoEntrega.descricao}</td>
+				<td class="label">Data Inclusão:</td>
+				<td>{pedido.dataInclusaoFormatada}</td>
+				<td class="label">Data Entrega:</td>
+				<td>{pedido.dataEntregaFormatada}</td>
+			</tr>
+			<tr>
+				<td class="label">Cliente:</td>
+				<td colspan="5">{pedido.cliente.nomeCompleto}</td>
+			</tr>
+			<tr>
+				<td class="label">CNPJ:</td>
+				<td>{pedido.cliente.cnpj}</td>
+				<td class="label">CPF:</td>
+				<td>{pedido.cliente.cpf}</td>
+				<td class="label">Insc. Est.:</td>
+				<td>{pedido.cliente.inscricaoEstadual}</td>
+			</tr>
+			<tr>
+				<td class="label">Observação:</td>
+				<td colspan="5">{pedido.observacao}</td>
+			</tr>
+		</tbody>
+	</table>
+	<table>
+		<thead>
+			<tr>
+				<th colspan="6">Contato do Pedido</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="label">Contato:</td>
+				<td>{pedido.contato.nome}</td>
+				<td class="label">Email:</td>
+				<td>{pedido.contato.email}</td>
+				<td class="label">Departamento:</td>
+				<td>{pedido.contato.departamento}</td>
+			</tr>
+			<tr>
+				<td class="label">Tel.:</td>
+				<td>{pedido.contato.dDDTelefone}</td>
+				<td class="label">Ramal:</td>
+				<td>{pedido.contato.ramal}</td>
+				<td class="label">Fax:</td>
+				<td>{pedido.contato.faxComHifen}</td>
+			</tr>
+			<tr>
+				<td class="label">Tel.:</td>
+				<td>{pedido.contato.dDDTelefoneSecundario}</td>
+				<td class="label">Ramal:</td>
+				<td>{pedido.contato.ramalSecundario}</td>
+				<td class="label">Fax:</td>
+				<td>{pedido.contato.faxSecundarioComHifen}</td>
+			</tr>
+		</tbody>
+	</table>
+	<table>
+		<thead>
+			<tr>
+				<th colspan="2">Lista de Endereços</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="label">End. Fat.:</td>
+				<td>{logradouroFaturamento}</td>
+			</tr>
+			<tr>
+				<td class="label">End. Cob.:</td>
+				<td>{logradouroCobranca}</td>
+			</tr>
+			<tr>
+				<td class="label">End. Ent.:</td>
+				<td>{logradouroEntrega}</td>
+			</tr>
+		</tbody>
+	</table>
+	<table>
+		<thead>
+			<tr>
+				<th colspan="8">Transportadora</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="label">Transport.:</td>
+				<td>{pedido.transportadora.nomeFantasia}</td>
+				<td class="label">CNPJ:</td>
+				<td>{pedido.transportadora.cnpj}</td>
+				<td class="label">Insc. Estad.:</td>
+				<td>{pedido.transportadora.inscricaoEstadual}</td>
+				<td class="label">Contato:</td>
+				<td>{pedido.transportadora.contatoPrincipal.nome} -
+					{pedido.transportadora.contatoPrincipal.email} -
+					{pedido.transportadora.contatoPrincipal.telefoneFormatado}</td>
+			</tr>
+			<tr>
+				<td class="label">End. Transp.</td>
+				<td colspan="7">{pedido.transportadora.logradouro.descricao}</td>
+			</tr>
+			<tr>
+				<td class="label">Redesp.:</td>
+				<td>{pedido.transportadoraRedespacho.nomeFantasia}</td>
+				<td class="label">CNPJ:</td>
+				<td>{pedido.transportadoraRedespacho.cnpj}</td>
+				<td class="label">Insc. Estad.:</td>
+				<td>{pedido.transportadoraRedespacho.inscricaoEstadual}</td>
+				<td class="label">Contato:</td>
+				<td>{pedido.transportadoraRedespacho.contatoPrincipal.nome} -
+					{pedido.transportadoraRedespacho.contatoPrincipal.email} -
+					{pedido.transportadoraRedespacho.contatoPrincipal.telefoneFormatado}</td>
+			</tr>
+			<tr>
+				<td class="label">End. Redesp.</td>
+				<td colspan="7">{pedido.transportadoraRedespacho.logradouro.descricao}</td>
+			</tr>
+		</tbody>
+	</table>
+	<table class="listagem">
+		<thead>
+			<tr>
+				<th class="descricaoTabela" colspan="9">Lista de Itens do
+					Pedido</th>
+			</tr>
+		</thead>
+		<thead>
+			<tr>
+				<th>Item</th>
+				<th>Qtde.</th>
+				<th>Descrição</th>
+				<th>Tipo Venda</th>
+				<th>Preço (R$)</th>
+				<th>Unid. (R$)</th>
+				<th>Total Item (R$)</th>
+				<th>IPI (%)</th>
+				<th>ICMS (%)</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr{listaItem}>
+				<td style="text-align: center">{sequencial}</td>
+				<td style="text-align: center">{quantidade}</td>
+				<td style="text-align: left">{descricao}</td>
+				<td style="text-align: center">{tipoVenda}</td>
+				<td style="text-align: center">{precoVendaFormatado}</td>
+				<td style="text-align: center">{precoUnidadeFormatado}</td>
+				<td style="text-align: center">{precoItemFormatado}</td>
+				<td style="text-align: center">{aliquotaIPIFormatado}</td>
+				<td style="text-align: center">{aliquotaICMSFormatado}</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="4"></td>
+				<td colspan="2" style="text-align: right;">TOTAL SEM IPI:</td>
+				<td colspan="3" style="text-align: left;">R$
+					{pedido.valorPedidoFormatado}</td>
+			</tr>
+			<tr>
+				<td colspan="4"></td>
+				<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
+				<td colspan="3" style="text-align: left;">R$
+					{pedido.valorPedidoIPIFormatado}</td>
+			</tr>
+		</tfoot>
+	</table>
 </body>
 </html>

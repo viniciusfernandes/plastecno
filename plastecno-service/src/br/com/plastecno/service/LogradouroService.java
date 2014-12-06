@@ -10,6 +10,8 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface LogradouroService {
+    <T extends Logradouro> List<T> inserir(List<T> listaLogradouro) throws BusinessException;
+
     /**
      * Metodo criado para recuperaros ids do pais, estado, cidade e bairro e no
      * caso em que nao existam ele cria um novo registro no sistema.
@@ -19,6 +21,12 @@ public interface LogradouroService {
      * @throws BusinessException
      */
     <T extends Logradouro> T inserir(T logradouro) throws BusinessException;
+
+    List<? extends Logradouro> pesquisar(Integer id, Class<? extends Logradouro> classe);
+
+    <T extends Logradouro> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
+
+    <T extends Logradouro> T pesquisarById(Integer idLogradouro, Class<T> classe);
 
     /**
      * Metodo que remove todos os logradouros cadastrados no sistema que nao
@@ -36,14 +44,6 @@ public interface LogradouroService {
      *            tipo de logradouro que sera removido
      */
     <T extends Logradouro> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
-
-    List<? extends Logradouro> pesquisar(Integer id, Class<? extends Logradouro> classe);
-
-    <T extends Logradouro> List<T> inserir(List<T> listaLogradouro) throws BusinessException;
-
-    <T extends Logradouro> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
-
-    <T extends Logradouro> T pesquisarById(Integer idLogradouro, Class<T> classe);
 
     void verificarListaLogradouroObrigatorio(Collection<? extends Logradouro> listaLogradouro) throws BusinessException;
 

@@ -53,8 +53,28 @@ public class ItemPedidoJson {
         aliquotaIPI = itemPedido.getAliquotaIPIFormatado();
     }
 
-    public Integer getSequencial() {
-        return sequencial;
+    public String getAliquotaICMS() {
+        return aliquotaICMS;
+    }
+
+    public String getAliquotaIPI() {
+        return aliquotaIPI;
+    }
+
+    public Double getComprimento() {
+        return comprimento;
+    }
+
+    public String getDescricaoItemPedido() {
+        return descricaoItemPedido;
+    }
+
+    public String getDescricaoPeca() {
+        return descricaoPeca;
+    }
+
+    public String getFormaMaterial() {
+        return formaMaterial;
     }
 
     public Integer getId() {
@@ -65,30 +85,6 @@ public class ItemPedidoJson {
         return idMaterial;
     }
 
-    public Integer getQuantidade() {
-        return quantidade;
-    }
-
-    public String getFormaMaterial() {
-        return formaMaterial;
-    }
-
-    public String getDescricaoPeca() {
-        return descricaoPeca;
-    }
-
-    public boolean isPeca() {
-        return peca;
-    }
-
-    public boolean isVendaKilo() {
-        return vendaKilo;
-    }
-
-    public String getSiglaMaterial() {
-        return siglaMaterial;
-    }
-
     public Double getMedidaExterna() {
         return medidaExterna;
     }
@@ -97,43 +93,47 @@ public class ItemPedidoJson {
         return medidaInterna;
     }
 
-    public Double getComprimento() {
-        return comprimento;
-    }
-
-    public Double getPrecoVenda() {
-        return precoVenda;
-    }
-
-    public String getValorPedido() {
-        return valorPedido;
-    }
-
-    public String getDescricaoItemPedido() {
-        return descricaoItemPedido;
-    }
-
-    public String getValorPedidoIPI() {
-        return valorPedidoIPI;
-    }
-
-    public String getPrecoUnidadeIPI() {
-        return precoUnidadeIPI;
-    }
-
-    public String getAliquotaICMS() {
-        return aliquotaICMS;
+    public String getPrecoItem() {
+        return precoItem;
     }
 
     public String getPrecoUnidade() {
         return precoUnidade;
     }
 
-    public String getPrecoItem() {
-        return precoItem;
+    public String getPrecoUnidadeIPI() {
+        return precoUnidadeIPI;
     }
 
-    public String getAliquotaIPI() {
-        return aliquotaIPI;
+    public Double getPrecoVenda() {
+        return precoVenda;
+    }
+
+    public Integer getQuantidade() {
+        return quantidade;
+    }
+
+    public Integer getSequencial() {
+        return sequencial;
+    }
+
+    public String getSiglaMaterial() {
+        return siglaMaterial;
+    }
+
+    public String getValorPedido() {
+        return valorPedido;
+    }
+
+    public String getValorPedidoIPI() {
+        return valorPedidoIPI;
+    }
+
+    public boolean isPeca() {
+        return peca;
+    }
+
+    public boolean isVendaKilo() {
+        return vendaKilo;
     }
 }

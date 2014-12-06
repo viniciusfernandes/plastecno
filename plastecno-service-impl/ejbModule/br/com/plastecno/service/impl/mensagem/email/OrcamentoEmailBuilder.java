@@ -12,18 +12,9 @@ public class OrcamentoEmailBuilder extends PedidoEmailBuilder {
 	}
 
 	@Override
-	public String gerarTitulo() {
-		return "Plastecno - Orçamento de Venda No. "+pedido.getId()+" - "+pedido.getCliente().getNomeFantasia();
-	}
-
-	@Override
-	public String gerarRemetente() {
-		return pedido.getVendedor().getEmail();
-	}
-
-	@Override
-	public String gerarDestinatario() {
-		return pedido.getContato().getEmail();
+	public AnexoEmail gerarArquivoAnexo() {
+		return new AnexoEmail(arquivoAnexo, "application/pdf", 
+				"Orçamento No. "+pedido.getId()+" "+pedido.getCliente().getNomeFantasia()+".pdf", "Orçamento realizado pela Plastecno");
 	}
 
 	@Override
@@ -33,9 +24,18 @@ public class OrcamentoEmailBuilder extends PedidoEmailBuilder {
 	}
 
 	@Override
-	public AnexoEmail gerarArquivoAnexo() {
-		return new AnexoEmail(arquivoAnexo, "application/pdf", 
-				"Orçamento No. "+pedido.getId()+" "+pedido.getCliente().getNomeFantasia()+".pdf", "Orçamento realizado pela Plastecno");
+	public String gerarDestinatario() {
+		return pedido.getContato().getEmail();
+	}
+
+	@Override
+	public String gerarRemetente() {
+		return pedido.getVendedor().getEmail();
+	}
+
+	@Override
+	public String gerarTitulo() {
+		return "Plastecno - Orçamento de Venda No. "+pedido.getId()+" - "+pedido.getCliente().getNomeFantasia();
 	}
 
 }

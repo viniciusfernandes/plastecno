@@ -11,6 +11,23 @@ class PropertyResolver {
         this.propss.put(property, value);
     }
 
+    private Object getProperty(String property, Object o) throws PropriedadeNaoEncontradaException {
+        Method[] m = o.getClass().getMethods();
+        final String get = "get" + property.substring(0, 1).toUpperCase() + property.substring(1);
+        for (Method method : m) {
+            if (get.equals(method.getName())) {
+                try {
+                    return method.invoke(o);
+                } catch (Exception e) {
+                    throw new PropriedadeNaoEncontradaException("Falha ao tentar recuperar o atributo " + property
+                            + " do objeto " + o.getClass().getName(), e);
+                }
+            }
+        }
+
+        throw new IllegalStateException("Nao exite o metodo " + get + " na classe " + o.getClass().getName());
+    }
+
     public Object getValue(String property) throws PropriedadeNaoEncontradaException {
         if (property == null || property.trim().length() == 0) {
             return null;
@@ -43,22 +60,5 @@ class PropertyResolver {
         }
 
         return getProperty(property, o);
-    }
-
-    private Object getProperty(String property, Object o) throws PropriedadeNaoEncontradaException {
-        Method[] m = o.getClass().getMethods();
-        final String get = "get" + property.substring(0, 1).toUpperCase() + property.substring(1);
-        for (Method method : m) {
-            if (get.equals(method.getName())) {
-                try {
-                    return method.invoke(o);
-                } catch (Exception e) {
-                    throw new PropriedadeNaoEncontradaException("Falha ao tentar recuperar o atributo " + property
-                            + " do objeto " + o.getClass().getName(), e);
-                }
-            }
-        }
-
-        throw new IllegalStateException("Nao exite o metodo " + get + " na classe " + o.getClass().getName());
     }
 }

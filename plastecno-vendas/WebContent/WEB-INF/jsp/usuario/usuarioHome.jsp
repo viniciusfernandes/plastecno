@@ -6,14 +6,19 @@
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
-<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/bloco/contato.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
 
 
@@ -91,28 +96,31 @@ function inicializarFiltro () {
 
 
 	<form id="formPesquisa" action="usuario/listagem" method="get">
-		<input type="hidden" id="filtro_nome" name="filtro.nome" /> 
-		<input type="hidden" id="filtro_sobrenome" name="filtro.sobrenome" /> 
-		<input type="hidden" id="filtro_email" name="filtro.email" /> 
-		<input type="hidden" id="filtro_cpf" name="filtro.cpf" />
+		<input type="hidden" id="filtro_nome" name="filtro.nome" /> <input
+			type="hidden" id="filtro_sobrenome" name="filtro.sobrenome" /> <input
+			type="hidden" id="filtro_email" name="filtro.email" /> <input
+			type="hidden" id="filtro_cpf" name="filtro.cpf" />
 	</form>
-	<form id="formVazio" action="usuario" method="get">
-	</form>
-	
-		<fieldset>
+	<form id="formVazio" action="usuario" method="get"></form>
+
+	<fieldset>
 		<legend>::: Dados do Usuario :::</legend>
 		<form id="formUsuario" action="usuario/inclusao" method="post">
 			<input type="hidden" id="id" name="usuario.id" value="${usuario.id}" />
-			
-			<div class="label" >Ativo:</div>
+
+			<div class="label">Ativo:</div>
 			<div class="input" style="width: 80%">
-				<input type="checkbox" id="ativo" name="usuario.ativo" <c:if test="${usuario.ativo}">checked</c:if> class="checkbox"/>
+				<input type="checkbox" id="ativo" name="usuario.ativo"
+					<c:if test="${usuario.ativo}">checked</c:if> class="checkbox" />
 			</div>
-			<div class="label" >Vendedor:</div>
+			<div class="label">Vendedor:</div>
 			<div class="input" style="width: 80%">
-				<input type="checkbox" id="vendedorAtivo" name="usuario.vendedorAtivo" <c:if test="${usuario.vendedorAtivo}">checked</c:if> class="checkbox" />
+				<input type="checkbox" id="vendedorAtivo"
+					name="usuario.vendedorAtivo"
+					<c:if test="${usuario.vendedorAtivo}">checked</c:if>
+					class="checkbox" />
 			</div>
-			<div class="label obrigatorio" >Nome:</div>
+			<div class="label obrigatorio">Nome:</div>
 			<div class="input" style="width: 20%">
 				<input type="text" id="nome" name="usuario.nome"
 					value="${usuario.nome}" class="pesquisavel" />
@@ -127,37 +135,43 @@ function inicializarFiltro () {
 				<input type="text" id="cpf" name="usuario.cpf"
 					value="${usuario.cpf}" class="pesquisavel" />
 			</div>
-			<div class="label obrigatorio" >Email:</div>
+			<div class="label obrigatorio">Email:</div>
 			<div class="input" style="width: 40%">
-				<input type="text" id="email" name="usuario.email" value="${usuario.email}" style="width: 80%" 
+				<input type="text" id="email" name="usuario.email"
+					value="${usuario.email}" style="width: 80%"
 					class="apenasLowerCase uppercaseBloqueado pesquisavel lowerCase" />
 			</div>
-			<div class="label" >Cadastrar senha:</div>
+			<div class="label">Cadastrar senha:</div>
 			<div class="input" style="width: 80%">
-				<input type="checkbox" id="isAlteracaoSenha" name="isAlteracaoSenha" class="checkbox"></input>
+				<input type="checkbox" id="isAlteracaoSenha" name="isAlteracaoSenha"
+					class="checkbox"></input>
 			</div>
-			<div class="label obrigatorio" >Senha:</div>
+			<div class="label obrigatorio">Senha:</div>
 			<div class="input" style="width: 80%">
-				<input type="password" id="senha" name="usuario.senha" style="width: 20%" class="uppercaseBloqueado"/>
+				<input type="password" id="senha" name="usuario.senha"
+					style="width: 20%" class="uppercaseBloqueado" />
 			</div>
-			<div class="label obrigatorio" >Confirmacao Senha:</div>
+			<div class="label obrigatorio">Confirmacao Senha:</div>
 			<div class="input" style="width: 80%">
-				<input type="password" id="senhaConfirmada" style="width: 20%" class="upperCaseBloqueado"/>
+				<input type="password" id="senhaConfirmada" style="width: 20%"
+					class="upperCaseBloqueado" />
 			</div>
 		</form>
-		</fieldset>
+	</fieldset>
 	<div class="bloco_botoes">
-		<a id="botaoPesquisarUsuario" title="Pesquisar Dados do Usuario" class="botaoPesquisar"></a>
-		<a id="botaoLimpar" title="Limpar Dados do Usuario" class="botaoLimpar"></a>	
+		<a id="botaoPesquisarUsuario" title="Pesquisar Dados do Usuario"
+			class="botaoPesquisar"></a> <a id="botaoLimpar"
+			title="Limpar Dados do Usuario" class="botaoLimpar"></a>
 	</div>
-	
+
 	<jsp:include page="/bloco/bloco_picklist.jsp" />
 	<jsp:include page="/bloco/bloco_logradouro.jsp" />
 	<jsp:include page="/bloco/bloco_contato.jsp" />
 
 	<div class="bloco_botoes">
 		<c:if test="${acessoCadastroBasicoPermitido}">
-			<a id="botaoInserirUsuario" title="Incluir Dados do Usuario" class="botaoInserir"></a>
+			<a id="botaoInserirUsuario" title="Incluir Dados do Usuario"
+				class="botaoInserir"></a>
 		</c:if>
 	</div>
 
@@ -179,7 +193,7 @@ function inicializarFiltro () {
 						<th>Ações</th>
 					</tr>
 				</thead>
-	
+
 				<tbody>
 					<c:forEach var="usuario" items="${listaUsuario}">
 						<tr>
@@ -190,7 +204,7 @@ function inicializarFiltro () {
 								<c:otherwise>
 									<td><div class="flagNaoOK"></div></td>
 								</c:otherwise>
-							</c:choose>					
+							</c:choose>
 							<c:choose>
 								<c:when test="${usuario.ativo}">
 									<td><div class="flagOK"></div></td>
@@ -199,7 +213,7 @@ function inicializarFiltro () {
 									<td><div class="flagNaoOK"></div></td>
 								</c:otherwise>
 							</c:choose>
-	
+
 							<td>${usuario.nome}</td>
 							<td>${usuario.sobrenome}</td>
 							<td>${usuario.cpf}</td>
@@ -207,23 +221,26 @@ function inicializarFiltro () {
 							<td>
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/usuario/edicao"/>" method="get">
-										<input type="submit" title="Editar Dados do Usuario" value="" class="botaoEditar" />
-										<input type="hidden" name="id" value="${usuario.id}" /> 
+										<input type="submit" title="Editar Dados do Usuario" value=""
+											class="botaoEditar" /> <input type="hidden" name="id"
+											value="${usuario.id}" />
 									</form>
 									<c:if test="${acessoCadastroBasicoPermitido}">
-										<form action="<c:url value="/usuario/desativacao"/>" method="post">
+										<form action="<c:url value="/usuario/desativacao"/>"
+											method="post">
 											<input type="hidden" name="idUsuario" value="${usuario.id}">
-											<input type="submit" title="Desativar Usuário" value="" class="botaoRemover"
-												onclick="javascript: return confirm('Voce deseja mesmo desativar o USUARIO?');"/>
+											<input type="submit" title="Desativar Usuário" value=""
+												class="botaoRemover"
+												onclick="javascript: return confirm('Voce deseja mesmo desativar o USUARIO?');" />
 										</form>
 									</c:if>
 								</div>
 							</td>
 						</tr>
-	
+
 					</c:forEach>
 				</tbody>
-	
+
 			</table>
 		</div>
 	</fieldset>

@@ -27,10 +27,6 @@ public class RelatorioClienteRegiaoController extends AbstractController {
         super(result, usuarioInfo);
     }
 
-    @Get("relatorio/cliente/regiao")
-    public void relatorioClienteRegiaoHome() {
-    }
-
     @Get("relatorio/cliente/regiao/listagem/cliente")
     public void pesquisarClienteByRegiao(Regiao regiao) {
         try {
@@ -52,6 +48,10 @@ public class RelatorioClienteRegiaoController extends AbstractController {
             lista.add(new Autocomplete(regiao.getId(), regiao.getNome()));
         }
         serializarJson(new SerializacaoJson("lista", lista));
+    }
+
+    @Get("relatorio/cliente/regiao")
+    public void relatorioClienteRegiaoHome() {
     }
 
 }

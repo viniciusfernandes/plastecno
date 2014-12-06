@@ -19,19 +19,19 @@ public class ContatoCliente extends Contato {
 	@ManyToOne
 	@JoinColumn(name = "id_cliente", referencedColumnName = "id", nullable = false)
 	private Cliente cliente;
-	public Cliente getCliente() {
-		return cliente;
-	}
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
-	}
-	
 	@Override
 	public boolean equals (Object o) {
 		return o instanceof Contato && this.getId() != null && this.getId().equals(((Contato)o).getId());
 	}
+	public Cliente getCliente() {
+		return cliente;
+	}
+	
 	@Override
 	public int hashCode () {
 		return this.getId()!= null ? this.getId().hashCode() : -1;
+	}
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 }

@@ -9,13 +9,6 @@ import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.ItemPedido;
 
 public class CalculadoraPreco {
-    private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgoritmo;
-    static {
-        mapaAlgoritmo = new HashMap<TipoVenda, AlgoritmoCalculo>();
-        mapaAlgoritmo.put(TipoVenda.KILO, new AlgoritmoCalculoPrecoKilo());
-        mapaAlgoritmo.put(TipoVenda.PECA, new AlgoritmoCalculoPrecoPeca());
-    }
-
     public static double calcular(ItemPedido itemPedido) throws AlgoritmoCalculoException {
         validarCalculo(itemPedido);
 
@@ -26,7 +19,6 @@ public class CalculadoraPreco {
         }
         return algoritmoCalculo.calcular(itemPedido);
     }
-
     public static double calcularPorUnidade(ItemPedido itemPedido) throws AlgoritmoCalculoException {
         return itemPedido.getQuantidade() != null ? calcular(itemPedido) / itemPedido.getQuantidade() : 0d;
     }
@@ -45,14 +37,6 @@ public class CalculadoraPreco {
         return calcularPorUnidade(itemPedido) * (1 + aliquotaIPI);
     }
 
-    private static void validarCalculoIPI(ItemPedido itemPedido, Double aliquotaIPI) throws AlgoritmoCalculoException {
-        validarCalculo(itemPedido);
-
-        if (aliquotaIPI == null && FormaMaterial.PC.equals(itemPedido.getFormaMaterial())) {
-            throw new AlgoritmoCalculoException("Toda peca deve ter aliquota de IPI");
-        }
-    }
-
     private static void validarCalculo(ItemPedido itemPedido) throws AlgoritmoCalculoException {
 
         if (itemPedido == null) {
@@ -62,5 +46,21 @@ public class CalculadoraPreco {
         if (itemPedido != null && itemPedido.getFormaMaterial() == null) {
             throw new AlgoritmoCalculoException("Forma do material é obrigatório para o cálculo do preço");
         }
+    }
+
+    private static void validarCalculoIPI(ItemPedido itemPedido, Double aliquotaIPI) throws AlgoritmoCalculoException {
+        validarCalculo(itemPedido);
+
+        if (aliquotaIPI == null && FormaMaterial.PC.equals(itemPedido.getFormaMaterial())) {
+            throw new AlgoritmoCalculoException("Toda peca deve ter aliquota de IPI");
+        }
+    }
+
+    private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgoritmo;
+
+    static {
+        mapaAlgoritmo = new HashMap<TipoVenda, AlgoritmoCalculo>();
+        mapaAlgoritmo.put(TipoVenda.KILO, new AlgoritmoCalculoPrecoKilo());
+        mapaAlgoritmo.put(TipoVenda.PECA, new AlgoritmoCalculoPrecoPeca());
     }
 }

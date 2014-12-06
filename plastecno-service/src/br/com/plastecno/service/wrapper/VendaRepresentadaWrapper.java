@@ -6,12 +6,12 @@ public class VendaRepresentadaWrapper extends Grupo{
 		super(nome, valor);
 	}
 
-	public Double getValorVenda() {
-		return this.valor;
-	}
-	
 	public String getNomeRepresentada() {
 		return this.nome;
+	}
+	
+	public Double getValorVenda() {
+		return this.valor;
 	}
 	
 	public String getValorVendaFormatado() {

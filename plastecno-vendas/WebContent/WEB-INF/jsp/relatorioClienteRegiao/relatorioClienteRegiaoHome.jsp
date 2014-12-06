@@ -9,12 +9,14 @@
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
 
-<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript"
+	src="<c:url value="/js/autocomplete.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <style type="text/css">
-
 .listrada {
 	margin-left: 10%;
 	margin-right: 10%;
@@ -47,32 +49,39 @@ function inicializarAutomcompleteRegiao () {
 </script>
 
 </head>
-<body >
+<body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-	
-		<fieldset>
-			<legend>::: Dados do Relatório dos Clientes da Região :::</legend>
-			<div class="label obrigatorio" >Região:</div>
-			<div class="input" style="width: 40%">
-				<input type="text" id="nome" name="regiao.nome" value="${regiao.nome}" class="pesquisavel" />
-				<div class="suggestionsBox" id="containerPesquisaRegiao" style="display:none; width: 50%"></div>
-			</div>
-		</fieldset>
-		<div class="bloco_botoes">
-			<form id="formPesquisa" action="<c:url value="/relatorio/cliente/regiao/listagem/cliente"/>" method="get">
-				<input type="hidden" id="idRegiao" name="regiao.id"/>
-				<input type="hidden" id="nomeRegiao" name="regiao.nome"/>
-				<input type="submit" value="" title="Pesquisar Clientes da Região" class="botaoPesquisar"/>
-			</form>
-			<form action="<c:url value="/relatorio/cliente/regiao"/>" method="get">
-				<input type="submit" value="" title="Limpar Dados do Relatório de Clientes da Região" class="botaoLimpar" />
-			</form>
-			
+
+	<fieldset>
+		<legend>::: Dados do Relatório dos Clientes da Região :::</legend>
+		<div class="label obrigatorio">Região:</div>
+		<div class="input" style="width: 40%">
+			<input type="text" id="nome" name="regiao.nome"
+				value="${regiao.nome}" class="pesquisavel" />
+			<div class="suggestionsBox" id="containerPesquisaRegiao"
+				style="display: none; width: 50%"></div>
 		</div>
+	</fieldset>
+	<div class="bloco_botoes">
+		<form id="formPesquisa"
+			action="<c:url value="/relatorio/cliente/regiao/listagem/cliente"/>"
+			method="get">
+			<input type="hidden" id="idRegiao" name="regiao.id" /> <input
+				type="hidden" id="nomeRegiao" name="regiao.nome" /> <input
+				type="submit" value="" title="Pesquisar Clientes da Região"
+				class="botaoPesquisar" />
+		</form>
+		<form action="<c:url value="/relatorio/cliente/regiao"/>" method="get">
+			<input type="submit" value=""
+				title="Limpar Dados do Relatório de Clientes da Região"
+				class="botaoLimpar" />
+		</form>
+
+	</div>
 
 	<a id="rodape"></a>
 	<c:if test="${relatorioGerado}">
-		<table class="listrada" >
+		<table class="listrada">
 			<caption>${tituloRelatorio}</caption>
 			<thead>
 				<tr>
@@ -89,7 +98,8 @@ function inicializarAutomcompleteRegiao () {
 						<td>${cliente.nomeFantasia}</td>
 						<c:choose>
 							<c:when test="${cliente.listaContatoPreenchida}">
-								<td>${cliente.contatoPrincipal.nome}- ${cliente.contatoPrincipal.telefoneFormatado}</td>
+								<td>${cliente.contatoPrincipal.nome}-
+									${cliente.contatoPrincipal.telefoneFormatado}</td>
 							</c:when>
 							<c:otherwise>
 								<td></td>
@@ -98,8 +108,10 @@ function inicializarAutomcompleteRegiao () {
 						<td>${cliente.logradouroFaturamento.descricao}</td>
 						<td>
 							<div class="coluna_acoes_listagem">
-								<form action="<c:url value="/cliente/"/>${cliente.id}" method="get">
-									<input type="submit" title="Visualizar Dados do Cliente" value="" class="botaoEditar" />
+								<form action="<c:url value="/cliente/"/>${cliente.id}"
+									method="get">
+									<input type="submit" title="Visualizar Dados do Cliente"
+										value="" class="botaoEditar" />
 								</form>
 							</div>
 						</td>

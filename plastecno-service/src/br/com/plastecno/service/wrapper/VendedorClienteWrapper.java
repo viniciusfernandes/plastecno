@@ -9,14 +9,14 @@ public class VendedorClienteWrapper  {
 	public VendedorClienteWrapper(String nome) {
 		this.nome = nome;
 	}
-	public String getNome() {
-		return nome;
+	public void  addCliente(ClienteWrapper cliente) {
+		listaCliente.add(cliente);
 	}
 	public List<ClienteWrapper> getListaCliente() {
 		return listaCliente;
 	}
-	public void  addCliente(ClienteWrapper cliente) {
-		listaCliente.add(cliente);
+	public String getNome() {
+		return nome;
 	}
 	
 	public int getTotalClientes() {

@@ -13,16 +13,16 @@ public class VendedorJson {
         email = vendedor.getEmail();
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public Integer getId() {
         return id;
     }
 
     public String getNome() {
         return nome;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
 }

@@ -29,106 +29,13 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 	
 	private GenericDAO genericDAO;
 	
-	@PostConstruct
-	public void init() {
-		this.genericDAO = new GenericDAO(this.entityManager);
-	}
-	
-	
 	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public RamoAtividade inserir(RamoAtividade ramoAtividade) throws BusinessException {
-		
-		ValidadorInformacao.validar(ramoAtividade);
-		
-		if(this.isSiglaExistente(ramoAtividade.getId(), ramoAtividade.getSigla())) {
-			throw new BusinessException("A sigla do ramo de atividade ja existe no sistema");			
-		}
-		
-		return this.entityManager.merge(ramoAtividade);		
+	public void desativar (Integer id) {
+		Query query = this.entityManager.createQuery("update RamoAtividade r set r.ativo = false where r.id = :id");
+		query.setParameter("id", id);
+		query.executeUpdate();		
 	}
 	
-	@Override
-	public boolean isSiglaExistente(Integer id, String sigla) {
-		return this.genericDAO.isEntidadeExistente(RamoAtividade.class, id, "sigla", sigla);
-	}
-	
-
-	@Override
-	public List<RamoAtividade> pesquisar() {
-		return this.pesquisar(null);
-	}
-	
-	@Override
-	public List<RamoAtividade> pesquisarAtivo() {
-		return this.pesquisar(true);
-	}
-	
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<RamoAtividade> pesquisar(Boolean ativo) {
-		
-		StringBuilder select = new StringBuilder("SELECT r FROM RamoAtividade r ");
-		if (ativo != null) {
-			select.append("where r.ativo = :ativo ");
-		}
-		select.append("order by r.sigla ");
-		
-		Query query = this.entityManager.createQuery(select.toString());
-		
-		if (ativo != null) {
-			query.setParameter("ativo", ativo);
-		}
-		return query.getResultList();
-	}
-	
-	@Override
-	public List<RamoAtividade> pesquisarBy(RamoAtividade filtro) {
-		return this.pesquisarBy(filtro, null, null, null);
-	}
-	
-	@Override
-	public PaginacaoWrapper<RamoAtividade> paginarRamoAtividade(RamoAtividade filtro, Boolean apenasAtivos,  
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-		
-		return new PaginacaoWrapper<RamoAtividade>(
-				this.pesquisarTotalRegistros(filtro, apenasAtivos), 
-				this.pesquisarBy(filtro, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public Long pesquisarTotalRegistros(RamoAtividade filtro, Boolean apenasRamoAtividadeAtivo) {
-		if (filtro == null){
-			return 0L;
-		}
-		
-		final StringBuilder select = new StringBuilder("SELECT count(r.id) FROM RamoAtividade r ");
-		this.gerarRestricaoPesquisa(filtro, apenasRamoAtividadeAtivo, select);
-		Query query = this.gerarQueryPesquisa(filtro, select);
-		List<Long> lista = query.getResultList();
-		return lista.size() == 1 ? lista.get(0) : 0L; 
-	}
-	
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<RamoAtividade> pesquisarBy(RamoAtividade filtro, Boolean apenasAtivos,  Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-		if (filtro == null){
-			return Collections.emptyList();
-		}
-		
-		final StringBuilder select = new StringBuilder("SELECT r FROM RamoAtividade r ");
-		this.gerarRestricaoPesquisa(filtro, apenasAtivos, select);
-		
-		select.append("order by r.sigla ");
-		
-		Query query = this.gerarQueryPesquisa(filtro, select);
-		
-		if(indiceRegistroInicial != null && indiceRegistroInicial >= 0 && numeroMaximoRegistros != null && numeroMaximoRegistros >= 0) {
-			query.setFirstResult(indiceRegistroInicial).setMaxResults(numeroMaximoRegistros);
-		}
-		return query.getResultList();
-	}
 	
 	private Query gerarQueryPesquisa (RamoAtividade filtro, StringBuilder select) {
 		Query query = this.entityManager.createQuery(select.toString());
@@ -165,21 +72,95 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 		}
 	}
 	
-	@Override
-	public void remover(RamoAtividade ramoAtividade) {
-		this.entityManager.remove(this.entityManager.merge(ramoAtividade));
-	}
 
+	@PostConstruct
+	public void init() {
+		this.genericDAO = new GenericDAO(this.entityManager);
+	}
+	
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public RamoAtividade inserir(RamoAtividade ramoAtividade) throws BusinessException {
+		
+		ValidadorInformacao.validar(ramoAtividade);
+		
+		if(this.isSiglaExistente(ramoAtividade.getId(), ramoAtividade.getSigla())) {
+			throw new BusinessException("A sigla do ramo de atividade ja existe no sistema");			
+		}
+		
+		return this.entityManager.merge(ramoAtividade);		
+	}
+	
+	@Override
+	public boolean isSiglaExistente(Integer id, String sigla) {
+		return this.genericDAO.isEntidadeExistente(RamoAtividade.class, id, "sigla", sigla);
+	}
+	
 	@Override
 	public boolean isSiglaExistente(String sigla) {
 		return this.genericDAO.isEntidadeExistente(RamoAtividade.class, "sigla", sigla);
 	}
 	
 	@Override
-	public void desativar (Integer id) {
-		Query query = this.entityManager.createQuery("update RamoAtividade r set r.ativo = false where r.id = :id");
-		query.setParameter("id", id);
-		query.executeUpdate();		
+	public PaginacaoWrapper<RamoAtividade> paginarRamoAtividade(RamoAtividade filtro, Boolean apenasAtivos,  
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		
+		return new PaginacaoWrapper<RamoAtividade>(
+				this.pesquisarTotalRegistros(filtro, apenasAtivos), 
+				this.pesquisarBy(filtro, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
+	}
+	
+	@Override
+	public List<RamoAtividade> pesquisar() {
+		return this.pesquisar(null);
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<RamoAtividade> pesquisar(Boolean ativo) {
+		
+		StringBuilder select = new StringBuilder("SELECT r FROM RamoAtividade r ");
+		if (ativo != null) {
+			select.append("where r.ativo = :ativo ");
+		}
+		select.append("order by r.sigla ");
+		
+		Query query = this.entityManager.createQuery(select.toString());
+		
+		if (ativo != null) {
+			query.setParameter("ativo", ativo);
+		}
+		return query.getResultList();
+	}
+	
+	@Override
+	public List<RamoAtividade> pesquisarAtivo() {
+		return this.pesquisar(true);
+	}
+	
+	@Override
+	public List<RamoAtividade> pesquisarBy(RamoAtividade filtro) {
+		return this.pesquisarBy(filtro, null, null, null);
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<RamoAtividade> pesquisarBy(RamoAtividade filtro, Boolean apenasAtivos,  Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		if (filtro == null){
+			return Collections.emptyList();
+		}
+		
+		final StringBuilder select = new StringBuilder("SELECT r FROM RamoAtividade r ");
+		this.gerarRestricaoPesquisa(filtro, apenasAtivos, select);
+		
+		select.append("order by r.sigla ");
+		
+		Query query = this.gerarQueryPesquisa(filtro, select);
+		
+		if(indiceRegistroInicial != null && indiceRegistroInicial >= 0 && numeroMaximoRegistros != null && numeroMaximoRegistros >= 0) {
+			query.setFirstResult(indiceRegistroInicial).setMaxResults(numeroMaximoRegistros);
+		}
+		return query.getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -189,5 +170,24 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 		query.setParameter("id", id);
 		List<RamoAtividade> lista = query.getResultList();
 		return lista.size() == 1 ? lista.get(0) : null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Long pesquisarTotalRegistros(RamoAtividade filtro, Boolean apenasRamoAtividadeAtivo) {
+		if (filtro == null){
+			return 0L;
+		}
+		
+		final StringBuilder select = new StringBuilder("SELECT count(r.id) FROM RamoAtividade r ");
+		this.gerarRestricaoPesquisa(filtro, apenasRamoAtividadeAtivo, select);
+		Query query = this.gerarQueryPesquisa(filtro, select);
+		List<Long> lista = query.getResultList();
+		return lista.size() == 1 ? lista.get(0) : 0L; 
+	}
+
+	@Override
+	public void remover(RamoAtividade ramoAtividade) {
+		this.entityManager.remove(this.entityManager.merge(ramoAtividade));
 	}
 }

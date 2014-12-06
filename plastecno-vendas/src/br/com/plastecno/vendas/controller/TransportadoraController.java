@@ -33,15 +33,16 @@ public class TransportadoraController extends AbstractController {
         this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
     }
 
-    @Post("transportadora/contato/remocao/{idContato}")
-    public void removerContato(Integer idContato) {
-        this.contatoService.remover(idContato);
+    @Post("transportadora/desativacao")
+    public void desativar(Integer idTransportadora) {
+        this.transportadoraService.desativar(idTransportadora);
+        gerarMensagemSucesso("Transportadora desativada com sucesso");
         irTopoPagina();
     }
 
-    @Get("transportadora")
-    public void transportadoraHome() {
-        addAtributo("listaTipoLogradouroRenderizada", false);
+    private void formatarDocumentos(Transportadora transportadora) {
+        transportadora.setCnpj(this.formatarCNPJ(transportadora.getCnpj()));
+        transportadora.setInscricaoEstadual(this.formatarInscricaoEstadual(transportadora.getInscricaoEstadual()));
     }
 
     @Post("transportadora/inclusao")
@@ -71,6 +72,18 @@ public class TransportadoraController extends AbstractController {
         irTopoPagina();
     }
 
+    @Get("transportadora/{idTransportadora}")
+    public void pesquisar(Integer idTransportadora) {
+
+        Transportadora transportadora = this.transportadoraService.pesquisarById(idTransportadora);
+        this.formatarDocumentos(transportadora);
+
+        addAtributo("transportadora", transportadora);
+        addAtributo("listaContato", this.transportadoraService.pesquisarContato(idTransportadora));
+        addAtributo("logradouro", this.transportadoraService.pesquisarLogradorouro(idTransportadora));
+        irTopoPagina();
+    }
+
     @Get("transportadora/listagem")
     public void pesquisar(Transportadora filtro, Integer paginaSelecionada) {
         filtro.setCnpj(this.removerMascaraDocumento(filtro.getCnpj()));
@@ -86,27 +99,14 @@ public class TransportadoraController extends AbstractController {
         addAtributo("transportadora", filtro);
     }
 
-    @Get("transportadora/{idTransportadora}")
-    public void pesquisar(Integer idTransportadora) {
-
-        Transportadora transportadora = this.transportadoraService.pesquisarById(idTransportadora);
-        this.formatarDocumentos(transportadora);
-
-        addAtributo("transportadora", transportadora);
-        addAtributo("listaContato", this.transportadoraService.pesquisarContato(idTransportadora));
-        addAtributo("logradouro", this.transportadoraService.pesquisarLogradorouro(idTransportadora));
+    @Post("transportadora/contato/remocao/{idContato}")
+    public void removerContato(Integer idContato) {
+        this.contatoService.remover(idContato);
         irTopoPagina();
     }
 
-    @Post("transportadora/desativacao")
-    public void desativar(Integer idTransportadora) {
-        this.transportadoraService.desativar(idTransportadora);
-        gerarMensagemSucesso("Transportadora desativada com sucesso");
-        irTopoPagina();
-    }
-
-    private void formatarDocumentos(Transportadora transportadora) {
-        transportadora.setCnpj(this.formatarCNPJ(transportadora.getCnpj()));
-        transportadora.setInscricaoEstadual(this.formatarInscricaoEstadual(transportadora.getInscricaoEstadual()));
+    @Get("transportadora")
+    public void transportadoraHome() {
+        addAtributo("listaTipoLogradouroRenderizada", false);
     }
 }

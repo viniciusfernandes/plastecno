@@ -31,18 +31,11 @@ public final class MaterialController extends AbstractController {
         this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
     }
 
-    @Get("material")
-    public void materialHome() {
-
-        // No caso em que temos uma excecao na insercao de um novo registro nao
-        // devemos popular o picklist
-        if (!isElementosAssociadosPreenchidosPicklist()) {
-            try {
-                popularPicklist(this.representadaService.pesquisar(), null);
-            } catch (ControllerException e) {
-                gerarLogErroNavegacao("Material", e);
-            }
-        }
+    @Post("material/desativacao")
+    public void desativar(Integer id) {
+        this.materialService.desativar(id);
+        gerarMensagemSucesso("Material desativado com sucesso");
+        this.irPaginaHome();
     }
 
     @Post(value = "material/inclusao")
@@ -66,13 +59,18 @@ public final class MaterialController extends AbstractController {
         this.irPaginaHome();
     }
 
-    @Get("material/listagem")
-    public void pesquisar(Material filtro, Integer paginaSelecionada) {
-        final PaginacaoWrapper<Material> paginacao = this.materialService.paginarMaterial(filtro, null,
-                calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+    @Get("material")
+    public void materialHome() {
 
-        this.inicializarPaginacao(paginaSelecionada, paginacao, "listaMaterial");
-        addAtributo("material", filtro);
+        // No caso em que temos uma excecao na insercao de um novo registro nao
+        // devemos popular o picklist
+        if (!isElementosAssociadosPreenchidosPicklist()) {
+            try {
+                popularPicklist(this.representadaService.pesquisar(), null);
+            } catch (ControllerException e) {
+                gerarLogErroNavegacao("Material", e);
+            }
+        }
     }
 
     @Post("material/edicao")
@@ -90,10 +88,12 @@ public final class MaterialController extends AbstractController {
         irTopoPagina();
     }
 
-    @Post("material/desativacao")
-    public void desativar(Integer id) {
-        this.materialService.desativar(id);
-        gerarMensagemSucesso("Material desativado com sucesso");
-        this.irPaginaHome();
+    @Get("material/listagem")
+    public void pesquisar(Material filtro, Integer paginaSelecionada) {
+        final PaginacaoWrapper<Material> paginacao = this.materialService.paginarMaterial(filtro, null,
+                calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+
+        this.inicializarPaginacao(paginaSelecionada, paginacao, "listaMaterial");
+        addAtributo("material", filtro);
     }
 }

@@ -37,30 +37,42 @@ public class UsuarioController extends AbstractController {
         this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.ADMINISTRACAO);
     }
 
-    @Get("usuario")
-    public void usuarioHome() {
-        inicializarComboTipoLogradouro();
-
-        if (!isElementosNaoAssociadosPreenchidosPicklist()) {
-
-            try {
-                popularPicklist(this.perfilAcessoService.pesquisar(), null);
-            } catch (ControllerException e) {
-                gerarLogErroNavegacao("Usuario", e);
-            }
+    @Post("usuario/desativacao")
+    public void destivar(Integer idUsuario) {
+        try {
+            this.usuarioService.desabilitar(idUsuario);
+            gerarMensagemSucesso("Usuario desabilitado com sucesso.");
+        } catch (BusinessException e) {
+            addAtributo("listaMensagemErro", e.getListaMensagem());
+        } catch (Exception e) {
+            gerarLogErroInclusao("Usuario", e);
         }
+        this.irPaginaHome();
     }
 
-    public void pesquisarVendedorByNome() {
+    @Get("usuario/edicao")
+    public void editar(Integer id) {
+        Usuario usuario = this.usuarioService.pesquisarById(id);
+        Logradouro logradouro = this.usuarioService.pesquisarLogradouro(usuario.getId());
+        usuario.setLogradouro(logradouro);
 
-    }
-    
-    @Post("usuario/contato/remocao/{idContato}")
-    public void removerContato(Integer idContato) {
-        this.contatoService.remover(idContato);
+        usuario.setSenha(null);
+        inserirMascaraDocumentos(usuario);
+        addAtributo("tipoLogradouroSelecionado", logradouro != null ? logradouro.getTipoLogradouro() : null);
+        addAtributo("usuario", usuario);
+        addAtributo("logradouro", logradouro);
+        addAtributo("listaContato", this.usuarioService.pesquisarContatos(id));
+
+        try {
+            popularPicklist(usuarioService.pesquisarPerfisNaoAssociados(id),
+                    usuarioService.pesquisarPerfisAssociados(id));
+        } catch (ControllerException e) {
+            gerarLogErroNavegacao("Usuario", e);
+        }
+
         irTopoPagina();
     }
-
+    
     @Post("usuario/inclusao")
     public void inserir(Double salario, Double comissao, Usuario usuario, List<ContatoUsuario> listaContato,
             Logradouro logradouro, List<Integer> listaIdPerfilAssociado, boolean isAlteracaoSenha) {
@@ -107,6 +119,10 @@ public class UsuarioController extends AbstractController {
         irTopoPagina();
     }
 
+    private void inserirMascaraDocumentos(Usuario usuario) {
+        usuario.setCpf(formatarCPF(usuario.getCpf()));
+    }
+
     @Get("usuario/listagem")
     public void pesquisar(Usuario filtro, Integer paginaSelecionada) {
         final PaginacaoWrapper<Usuario> paginacao = this.usuarioService.paginarUsuario(filtro, false, false,
@@ -120,43 +136,27 @@ public class UsuarioController extends AbstractController {
         addAtributo("usuario", filtro);
     }
 
-    @Get("usuario/edicao")
-    public void editar(Integer id) {
-        Usuario usuario = this.usuarioService.pesquisarById(id);
-        Logradouro logradouro = this.usuarioService.pesquisarLogradouro(usuario.getId());
-        usuario.setLogradouro(logradouro);
+    public void pesquisarVendedorByNome() {
 
-        usuario.setSenha(null);
-        inserirMascaraDocumentos(usuario);
-        addAtributo("tipoLogradouroSelecionado", logradouro != null ? logradouro.getTipoLogradouro() : null);
-        addAtributo("usuario", usuario);
-        addAtributo("logradouro", logradouro);
-        addAtributo("listaContato", this.usuarioService.pesquisarContatos(id));
+    }
 
-        try {
-            popularPicklist(usuarioService.pesquisarPerfisNaoAssociados(id),
-                    usuarioService.pesquisarPerfisAssociados(id));
-        } catch (ControllerException e) {
-            gerarLogErroNavegacao("Usuario", e);
-        }
-
+    @Post("usuario/contato/remocao/{idContato}")
+    public void removerContato(Integer idContato) {
+        this.contatoService.remover(idContato);
         irTopoPagina();
     }
 
-    @Post("usuario/desativacao")
-    public void destivar(Integer idUsuario) {
-        try {
-            this.usuarioService.desabilitar(idUsuario);
-            gerarMensagemSucesso("Usuario desabilitado com sucesso.");
-        } catch (BusinessException e) {
-            addAtributo("listaMensagemErro", e.getListaMensagem());
-        } catch (Exception e) {
-            gerarLogErroInclusao("Usuario", e);
-        }
-        this.irPaginaHome();
-    }
+    @Get("usuario")
+    public void usuarioHome() {
+        inicializarComboTipoLogradouro();
 
-    private void inserirMascaraDocumentos(Usuario usuario) {
-        usuario.setCpf(formatarCPF(usuario.getCpf()));
+        if (!isElementosNaoAssociadosPreenchidosPicklist()) {
+
+            try {
+                popularPicklist(this.perfilAcessoService.pesquisar(), null);
+            } catch (ControllerException e) {
+                gerarLogErroNavegacao("Usuario", e);
+            }
+        }
     }
 }

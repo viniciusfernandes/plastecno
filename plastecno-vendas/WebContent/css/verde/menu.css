@@ -6,33 +6,42 @@
 }
 
 body {
-	background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 50%, rgba(150,197,111,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(50%,rgba(255,255,255,1)), color-stop(100%,rgba(150,197,111,1))); /* Chrome,Safari4+ */
-	background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 50%,rgba(150,197,111,1) 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 50%,rgba(150,197,111,1) 100%); /* Opera 12+ */
-	background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 50%,rgba(150,197,111,1) 100%); /* IE10+ */
-	
-	font: 12px Arial;	
+	background: -moz-radial-gradient(center, ellipse cover, rgba(255, 255, 255, 1)
+		50%, rgba(150, 197, 111, 1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%,
+		color-stop(50%, rgba(255, 255, 255, 1)),
+		color-stop(100%, rgba(150, 197, 111, 1))); /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, ellipse cover, rgba(255, 255, 255, 1)
+		50%, rgba(150, 197, 111, 1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, ellipse cover, rgba(255, 255, 255, 1)
+		50%, rgba(150, 197, 111, 1) 100%); /* Opera 12+ */
+	background: -ms-radial-gradient(center, ellipse cover, rgba(255, 255, 255, 1)
+		50%, rgba(150, 197, 111, 1) 100%); /* IE10+ */
+	font: 12px Arial;
 }
 
 #content {
-	background-color: white; 
+	background-color: white;
 	box-shadow: 0px 0px 35px #6B7A69;
 	margin: 0 5%;
 	padding: 0 0.5%;
-	width: 90%; 
+	width: 90%;
 }
 
 #center_content {
-	background: -moz-linear-gradient(top,  #ffffff 0%, #d6dbc9 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#d6dbc9)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #ffffff 0%,#d6dbc9 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #ffffff 0%,#d6dbc9 100%); /* Opera 11.10+ */
+	background: -moz-linear-gradient(top, #ffffff 0%, #d6dbc9 100%);
+	/* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff),
+		color-stop(100%, #d6dbc9)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #ffffff 0%, #d6dbc9 100%);
+	/* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #ffffff 0%, #d6dbc9 100%);
+	/* Opera 11.10+ */
 	height: 1500px;
 }
 
 #footer {
-	background: black;	
+	background: black;
 	color: white;
 	font-size: 20px;
 	height: 50px;
@@ -47,11 +56,15 @@ body {
 }
 
 .enfeite {
-	background: -moz-linear-gradient(left,  rgba(255,215,0,1) 0%, rgba(122,99,0,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(255,215,0,1)), color-stop(100%,rgba(122,99,0,1))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(left,  rgba(255,215,0,1) 0%,rgba(122,99,0,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -moz-linear-gradient(left, rgba(255, 215, 0, 1) 0%,
+		rgba(122, 99, 0, 1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%, rgba(255,
+		215, 0, 1)), color-stop(100%, rgba(122, 99, 0, 1)));
+	/* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(left, rgba(255, 215, 0, 1) 0%,
+		rgba(122, 99, 0, 1) 100%); /* Chrome10+,Safari5.1+ */
 	height: 1px;
-	margin-bottom: 1px;	
+	margin-bottom: 1px;
 }
 
 .flutuante_esquerda {
@@ -87,7 +100,7 @@ nav ul li a:hover {
 	box-shadow: 0 0 2px 1px #6B7A69;
 }
 
-nav > ul li:not(:first-child) {
+nav>ul li:not (:first-child ) {
 	border-left: 1px solid white;
 }
 
@@ -111,7 +124,6 @@ nav ul ul {
 }
 
 nav ul ul li {
-	
 	border-top: 1px solid white;
 	float: none;
 	position: relative;
@@ -124,10 +136,12 @@ nav ul ul li a {
 }
 
 nav ul ul ul {
-	position: absolute; left: 100%; top:0;
+	position: absolute;
+	left: 100%;
+	top: 0;
 }
 
-nav ul li:hover > ul {
+nav ul li:hover>ul {
 	display: block;
 }
 
@@ -158,10 +172,10 @@ nav ul ul li a:hover {
 }
 
 .bloco_autenticacao input[type='submit'] {
-	border: 0;	
+	border: 0;
 }
 
-.bloco_autenticacao input:not([type='submit']) {
+.bloco_autenticacao input:not ([type='submit'] ) {
 	border: 1px solid;
 	border-color: #4B7931;
 	border-radius: 3px;

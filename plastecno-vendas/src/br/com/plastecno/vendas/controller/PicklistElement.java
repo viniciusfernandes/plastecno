@@ -9,11 +9,11 @@ public class PicklistElement {
         this.label = label;
     }
 
-    public Object getValor() {
-        return valor;
-    }
-
     public Object getLabel() {
         return label;
+    }
+
+    public Object getValor() {
+        return valor;
     }
 }

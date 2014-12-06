@@ -16,6 +16,10 @@ public class BusinessException extends Exception {
 		listaMensagem = new ArrayList<String>();
 	}
 
+	public BusinessException(final List<String> listaMensagem) {
+		this.listaMensagem = listaMensagem;
+	}
+
 	public BusinessException(String mensagem) {
 		super(mensagem);
 		this.listaMensagem = new ArrayList<String>();
@@ -28,28 +32,12 @@ public class BusinessException extends Exception {
 		this.listaMensagem.add(mensagem);
 	}
 
-	public BusinessException(final List<String> listaMensagem) {
-		this.listaMensagem = listaMensagem;
-	}
-
-	public List<String> getListaMensagem() {
-		return this.listaMensagem;
-	}
-
 	public void addMensagem(List<String> listaMensagem) {
 		this.listaMensagem.addAll(listaMensagem);
 	}
 
 	public void addMensagem(String mensagem) {
 		this.listaMensagem.add(mensagem);
-	}
-
-	public String getMensagemConcatenada() {
-		return gerarMensagemString(". ");
-	}
-
-	public String getMensagemEmpilhada() {
-		return gerarMensagemString("\n");
 	}
 
 	public boolean contemExceptionPropagada() {
@@ -66,5 +54,17 @@ public class BusinessException extends Exception {
 			mensagem.append(mesagem).append(separador);
 		}
 		return mensagem.toString();
+	}
+
+	public List<String> getListaMensagem() {
+		return this.listaMensagem;
+	}
+
+	public String getMensagemConcatenada() {
+		return gerarMensagemString(". ");
+	}
+
+	public String getMensagemEmpilhada() {
+		return gerarMensagemString("\n");
 	}
 }

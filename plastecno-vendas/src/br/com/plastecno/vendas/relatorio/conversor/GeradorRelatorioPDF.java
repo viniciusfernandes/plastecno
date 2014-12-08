@@ -130,6 +130,7 @@ public final class GeradorRelatorioPDF {
     }
 
     public String gerarHTML() {
+        System.out.println(html);
         return html == null ? "" : html.toString();
     }
 

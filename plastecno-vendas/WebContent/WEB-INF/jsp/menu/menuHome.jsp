@@ -4,6 +4,7 @@
 <html>
 <head>
 <jsp:include page="/bloco/bloco_header.jsp" />
+<jsp:include page="/bloco/bloco_css.jsp" />
 </head>
 <body>
 	<div id="content">

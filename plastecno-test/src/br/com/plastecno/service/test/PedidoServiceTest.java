@@ -47,10 +47,7 @@ import br.com.plastecno.service.impl.EmailServiceImpl;
 import br.com.plastecno.service.impl.LogradouroServiceImpl;
 import br.com.plastecno.service.impl.PedidoServiceImpl;
 import br.com.plastecno.service.impl.UsuarioServiceImpl;
-import br.com.plastecno.service.impl.mensagem.email.GeradorPedidoEmail;
-import br.com.plastecno.service.impl.mensagem.email.TipoMensagemPedido;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
-import br.com.plastecno.service.mensagem.email.exception.MensagemEmailException;
 
 public class PedidoServiceTest extends AbstractTest {
 
@@ -271,6 +268,78 @@ public class PedidoServiceTest extends AbstractTest {
 		};
 	}
 
+	private void initTestEnvioEmailPedidoOrcamento() {
+		new MockUp<PedidoDAO>() {
+			@Mock
+			Pedido pesquisarById(Integer idPedido) {
+				Pedido pedido = gerarPedido();
+				pedido.setId(idPedido);
+				// Estamos supondo que o cliente ja foi prospectado
+				pedido.getCliente().setProspeccaoFinalizada(true);
+				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
+				pedido.setFormaPagamento("A VISTA");
+				pedido.setTipoEntrega(TipoEntrega.FOB);
+				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+				pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+				pedido.getContato().setEmail("vinicius@hotmail.com");
+				return pedido;
+			}
+
+			@Mock
+			Long pesquisarTotalItemPedido(Integer idPedido) {
+				return 12L;
+			}
+		};
+	}
+
+	private void initTestEnvioEmailPedidoOrcamentoSemEmailContato() {
+		new MockUp<PedidoDAO>() {
+			@Mock
+			Pedido pesquisarById(Integer idPedido) {
+				Pedido pedido = gerarPedido();
+				pedido.setId(idPedido);
+				// Estamos supondo que o cliente ja foi prospectado
+				pedido.getCliente().setProspeccaoFinalizada(true);
+				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
+				pedido.setFormaPagamento("A VISTA");
+				pedido.setTipoEntrega(TipoEntrega.FOB);
+				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+				pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+				return pedido;
+			}
+
+			@Mock
+			Long pesquisarTotalItemPedido(Integer idPedido) {
+				return 12L;
+			}
+		};
+	}
+
+	private void initTestEnvioEmailPedidoSemEnderecoCobranca() {
+		new MockUp<PedidoDAO>() {
+			@Mock
+			Pedido pesquisarById(Integer idPedido) {
+				Pedido pedido = gerarPedido();
+				pedido.setId(idPedido);
+				// Estamos supondo que o cliente ja foi prospectado
+				pedido.getCliente().setProspeccaoFinalizada(true);
+				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
+				pedido.setFormaPagamento("A VISTA");
+				pedido.setTipoEntrega(TipoEntrega.FOB);
+				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+
+				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.ENTREGA));
+				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.FATURAMENTO));
+				return pedido;
+			}
+
+			@Mock
+			Long pesquisarTotalItemPedido(Integer idPedido) {
+				return 12L;
+			}
+		};
+	}
+
 	private void initTestEnvioEmailPedidoSemEnderecoEntrega() {
 		new MockUp<PedidoDAO>() {
 			@Mock
@@ -286,6 +355,31 @@ public class PedidoServiceTest extends AbstractTest {
 
 				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.COBRANCA));
 				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.FATURAMENTO));
+				return pedido;
+			}
+
+			@Mock
+			Long pesquisarTotalItemPedido(Integer idPedido) {
+				return 12L;
+			}
+		};
+	}
+
+	private void initTestEnvioEmailPedidoSemEnderecoFaturamento() {
+		new MockUp<PedidoDAO>() {
+			@Mock
+			Pedido pesquisarById(Integer idPedido) {
+				Pedido pedido = gerarPedido();
+				pedido.setId(idPedido);
+				// Estamos supondo que o cliente ja foi prospectado
+				pedido.getCliente().setProspeccaoFinalizada(true);
+				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
+				pedido.setFormaPagamento("A VISTA");
+				pedido.setTipoEntrega(TipoEntrega.FOB);
+				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+
+				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.COBRANCA));
+				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.ENTREGA));
 				return pedido;
 			}
 
@@ -429,6 +523,40 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testEnvioEmailPedidoOrcamento() {
+		initTestEnvioEmailPedidoOrcamento();
+		try {
+			pedidoService.enviar(1, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
+	@Test
+	public void testEnvioEmailPedidoOrcamentoSemEmailContato() {
+		initTestEnvioEmailPedidoOrcamentoSemEmailContato();
+		boolean throwed = false;
+		try {
+			pedidoService.enviar(1, new byte[] {});
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O email do contato eh obrigatorio para o envio do orcamento", throwed);
+	}
+
+	@Test
+	public void testEnvioEmailPedidoSemEnderecoCobranca() {
+		initTestEnvioEmailPedidoSemEnderecoCobranca();
+		boolean throwed = false;
+		try {
+			pedidoService.enviar(1, new byte[] {});
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O endereco de cobranca eh obrigatorio para o envio do pedido por email", throwed);
+	}
+
+	@Test
 	public void testEnvioEmailPedidoSemEnderecoEntrega() {
 		initTestEnvioEmailPedidoSemEnderecoEntrega();
 		boolean throwed = false;
@@ -438,6 +566,18 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O endereco de entrega eh obrigatorio para o envio do pedido por email", throwed);
+	}
+
+	@Test
+	public void testEnvioEmailPedidoSemEnderecoFaturamento() {
+		initTestEnvioEmailPedidoSemEnderecoFaturamento();
+		boolean throwed = false;
+		try {
+			pedidoService.enviar(1, new byte[] {});
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O endereco de faturamento eh obrigatorio para o envio do pedido por email", throwed);
 	}
 
 	@Test

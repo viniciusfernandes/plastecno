@@ -26,7 +26,6 @@ import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
-import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -115,9 +114,7 @@ public class PedidoServiceImpl implements PedidoService {
 		if (idPedido == null) {
 			throw new BusinessException("Não é possível cancelar o pedido pois ele não existe no sistema");
 		}
-
-		this.entityManager.createQuery("update Pedido p set p.situacaoPedido = :situacao where p.id = :idPedido")
-				.setParameter("situacao", SituacaoPedido.CANCELADO).setParameter("idPedido", idPedido).executeUpdate();
+		pedidoDAO.cancelar(idPedido);
 	}
 
 	@Override
@@ -128,13 +125,20 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public void enviar(Integer idPedido, byte[] arquivoAnexado) throws BusinessException {
 
-		final Pedido pedido = this.pesquisarById(idPedido);
-		this.validarEnvio(pedido);
+		final Pedido pedido = pesquisarById(idPedido);
+		/*
+		 * Devemos sempre usar a lista do cliente pois o cliente pode ter
+		 * alterado os dados de logradouro
+		 */
+		pedido.addLogradouro(clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
+		pedido.setDataEnvio(new Date());
+
+		validarEnvio(pedido);
 
 		if (pedido.isOrcamento()) {
-			this.enviarOrcamento(pedido, arquivoAnexado);
+			enviarOrcamento(pedido, arquivoAnexado);
 		} else {
-			this.enviarVenda(pedido, arquivoAnexado);
+			enviarVenda(pedido, arquivoAnexado);
 		}
 
 	}
@@ -144,9 +148,6 @@ public class PedidoServiceImpl implements PedidoService {
 		if (StringUtils.isEmpty(pedido.getContato().getEmail())) {
 			throw new BusinessException("Email do contato é obrigatório para envio do orçamento");
 		}
-
-		pedido.addLogradouro(this.clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
-		pedido.setDataEnvio(new Date());
 		try {
 			emailService.enviar(new GeradorPedidoEmail(pedido, arquivoAnexado)
 					.gerarMensagem(TipoMensagemPedido.ORCAMENTO));
@@ -164,15 +165,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	private void enviarVenda(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
 		this.validarEnvioVenda(pedido);
-		final List<LogradouroCliente> listaLogradouro = this.clienteService.pesquisarLogradouro(pedido.getCliente()
-				.getId());
-		this.logradouroService.verificarListaLogradouroObrigatorio(listaLogradouro);
-		/*
-		 * Devemos sempre usar a lista do cliente pois o cliente pode ter
-		 * alterado os dados de logradouro
-		 */
-		pedido.addLogradouro(listaLogradouro);
-		pedido.setDataEnvio(new Date());
+		logradouroService.verificarListaLogradouroObrigatorio(pedido.getListaLogradouro());
 		pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
 		try {
 			GeradorPedidoEmail gerador = new GeradorPedidoEmail(pedido, arquivoAnexado);
@@ -212,6 +205,9 @@ public class PedidoServiceImpl implements PedidoService {
 	 */
 	@Override
 	public Pedido inserir(Pedido pedido) throws BusinessException {
+		if (SituacaoPedido.CANCELADO.equals(pedido.getSituacaoPedido())) {
+			throw new InformacaoInvalidaException("Pedido ja foi cancelado e nao pode ser alterado");
+		}
 
 		ValidadorInformacao.validar(pedido);
 		final Integer idPedido = pedido.getId();
@@ -234,8 +230,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());
-		if (!SituacaoPedido.CANCELADO.equals(pedido.getSituacaoPedido()) && dataEntrega != null
-				&& DateUtils.isAnteriorDataAtual(dataEntrega)) {
+		if (dataEntrega != null && DateUtils.isAnteriorDataAtual(dataEntrega)) {
 			throw new InformacaoInvalidaException("Data de entrega deve ser posterior a data atual");
 		}
 
@@ -524,18 +519,13 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<Logradouro> pesquisarLogradouro(Integer idPedido) {
-		return this.entityManager
-				.createQuery("select l from Pedido p inner join p.listaLogradouro l where p.id = :idPedido")
-				.setParameter("idPedido", idPedido).getResultList();
+		return pedidoDAO.pesquisarLogradouro(idPedido);
 	}
 
 	@Override
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
-		return (Long) this.entityManager
-				.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
-				.setParameter("idPedido", idPedido).getSingleResult();
+		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
 	}
 
 	@Override

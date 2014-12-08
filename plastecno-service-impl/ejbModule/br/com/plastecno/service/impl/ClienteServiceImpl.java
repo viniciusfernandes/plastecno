@@ -487,8 +487,6 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	private void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException {
-		// logradouroService.validarLogradouro(cliente.getListaLogradouro());
-
 		if (cliente.isProspectado()) {
 			logradouroService.verificarListaLogradouroObrigatorio(cliente.getListaLogradouro());
 		}

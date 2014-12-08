@@ -6,7 +6,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
@@ -16,7 +18,11 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	public PedidoDAO(EntityManager entityManager) {
 		super(entityManager);
 	}
-
+	
+	public void cancelar(Integer idPedido) {
+		this.entityManager.createQuery("update Pedido p set p.situacaoPedido = :situacao where p.id = :idPedido")
+				.setParameter("situacao", SituacaoPedido.CANCELADO).setParameter("idPedido", idPedido).executeUpdate();
+	}
 	private Query gerarQueryPesquisa(Pedido filtro, StringBuilder select) {
 		Query query = this.entityManager.createQuery(select.toString());
 		final Cliente cliente = filtro.getCliente();
@@ -120,6 +126,19 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		query.setParameter("id", idPedido);
 
 		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Logradouro> pesquisarLogradouro(Integer idPedido) {
+		return this.entityManager
+				.createQuery("select l from Pedido p inner join p.listaLogradouro l where p.id = :idPedido")
+				.setParameter("idPedido", idPedido).getResultList();
+	}
+
+	public Long pesquisarTotalItemPedido(Integer idPedido) {
+		return (Long) this.entityManager
+				.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
+				.setParameter("idPedido", idPedido).getSingleResult();
 	}
 
 	public Double pesquisarValorPedido(Integer idPedido) {

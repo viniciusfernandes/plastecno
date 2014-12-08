@@ -126,6 +126,11 @@ public class PedidoServiceImpl implements PedidoService {
 	public void enviar(Integer idPedido, byte[] arquivoAnexado) throws BusinessException {
 
 		final Pedido pedido = pesquisarById(idPedido);
+
+		if (pedido == null) {
+			throw new BusinessException("Pedido não exite no sistema");
+		}
+
 		/*
 		 * Devemos sempre usar a lista do cliente pois o cliente pode ter
 		 * alterado os dados de logradouro
@@ -638,11 +643,6 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	private void validarEnvio(Pedido pedido) throws BusinessException {
-
-		if (pedido == null) {
-			throw new BusinessException("Pedido não exite no sistema");
-		}
-
 		if (!pedido.getCliente().isProspectado()) {
 			throw new BusinessException("Não é possível enviar pedido para clientes em prospecção");
 		}

@@ -6,8 +6,7 @@
 
 
 <jsp:include page="/bloco/bloco_header.jsp" />
-<link rel="stylesheet" type="text/css"
-	href="<c:url value="/css/mensagem.css"/>" />
+<jsp:include page="/bloco/bloco_css.jsp" />
 
 <script type="text/javascript"
 	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>

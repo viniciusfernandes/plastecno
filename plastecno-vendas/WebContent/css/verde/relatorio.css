@@ -1,3 +1,4 @@
+
 .total1, .fundo1 {
 	background-color: #E9FFC1;
 }
@@ -19,8 +20,8 @@
 	font-weight: bold;
 	margin-bottom: 5px;
 	background-color: #8AB66B;
-	color: white;
-	padding: 5px;
+    color: white;
+    padding: 5px;
 }
 
 .listrada thead tr th {
@@ -37,6 +38,6 @@
 }
 
 .total, .listrada tfoot th, .listrada tfoot th:last-child {
-	color: #2D4F1F;
-	background-color: #C4EA98;
+    color: #2D4F1F;
+    background-color: #C4EA98;
 }

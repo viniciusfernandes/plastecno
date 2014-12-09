@@ -4,7 +4,7 @@
 }
 
 .desabilitado {
-	background-color: #EAEAEA;
+	background-color: #EAEAEA; 
 	border-color: #ADADAD;
 	color: #6B6B6B;
 }
@@ -32,7 +32,7 @@ fieldset {
 }
 
 fieldset, legend {
-	border: 1px solid #107DA8;
+	border: 1px solid #107DA8 ;
 	border-radius: 12px;
 }
 
@@ -46,17 +46,19 @@ legend {
 	padding: 5px;
 }
 /* fim das definicoes do layout para o fieldset dos inputs de cadastro */
+
 .label, .input {
 	float: left;
 	height: 22px;
 }
 
+
 .input .checkbox {
-	width: 15px;
+	width: 15px;	
 }
 
 .input input[type='radio'] {
-	width: 15px;
+	width: 15px;	
 }
 
 .label {
@@ -86,6 +88,6 @@ legend {
 	height: 90%;
 }
 
-input:focus, textarea:focus, select:focus {
-	box-shadow: 0 0 2px 1px #6CAD5D;
+input:focus, textarea:focus, select:focus   {
+	box-shadow: 0 0 2px 1px #6CAD5D;	
 }

@@ -1,7 +1,7 @@
 .conbgn:hover {
 	background-color: #DCDCDC;
 	color: #FFFFFF;
-	font-weight: bold;
+	font-weight: bold;	
 }
 
 ul {
@@ -26,7 +26,7 @@ h3 {
 	border: 1px solid #4B7931;
 	position: absolute;
 	width: 200px;
-	z-index: 1;
+	z-index: 1;	
 }
 
 .suggestionList {

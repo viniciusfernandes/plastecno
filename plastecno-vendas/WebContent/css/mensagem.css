@@ -2,13 +2,13 @@
 	border-radius: 5px;
 	list-style-type: none;
 	margin: 10px 0;
-	padding: 5px;
+    padding: 5px;
 }
 
 .areaMensagem ul {
-	left: 30%;
+	left: 30%;	
 	position: relative;
-	width: 50%;
+	width: 50%; 
 }
 
 .areaMensagem ul li {
@@ -30,7 +30,7 @@
 	color: #7F0000;
 	background: #FFE8E8;
 	border: 1px solid #7F0000;
-}
+} 
 
 .mensagemErro ul {
 	list-style-image: url("../images/cross_red_16.png");

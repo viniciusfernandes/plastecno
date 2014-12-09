@@ -96,7 +96,7 @@ function inicializarBlocoContato(urlTela) {
 	tabelaContatoHandler.validarInclusaoRegistro(function (){
 		var nome = document.getElementById('contato_nome').value.toUpperCase();
 		if(isEmpty(nome)) {
-			throw "O nome do contato não pode estar em branco";
+			throw "O nome do contato nï¿½o pode estar em branco";
 		}			
 	});
 	

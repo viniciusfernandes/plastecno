@@ -609,8 +609,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 		// Ao final da clonaem do pedido precisamos cancelar o antigo para que
 		// esse nao aparece nos faturamentos da empresa.
-		pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
-		this.inserir(pedido);
+		cancelar(pedido.getId());
 		return pedidoClone.getId();
 	}
 

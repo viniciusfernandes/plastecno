@@ -32,7 +32,7 @@ import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
-@Table(name="tb_pedido", schema="vendas")
+@Table(name = "tb_pedido", schema = "vendas")
 @InformacaoValidavel
 public class Pedido implements Serializable, Cloneable {
 	/**
@@ -41,107 +41,105 @@ public class Pedido implements Serializable, Cloneable {
 	private static final long serialVersionUID = -7474382741231270790L;
 
 	@Id
-	@SequenceGenerator(name = "pedidoSequence", sequenceName = "vendas.seq_pedido_id", allocationSize=1, initialValue=1)
+	@SequenceGenerator(name = "pedidoSequence", sequenceName = "vendas.seq_pedido_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pedidoSequence")
 	private Integer id;
-	
-	@Column(name="numero_pedido_cliente")
+
+	@Column(name = "numero_pedido_cliente")
 	private String numeroPedidoCliente;
-	
+
 	@Temporal(TemporalType.DATE)
-	@Column(name="data_inclusao")
+	@Column(name = "data_inclusao")
 	private Date dataInclusao;
-	
+
 	@Temporal(TemporalType.DATE)
-	@Column(name="data_envio")
+	@Column(name = "data_envio")
 	private Date dataEnvio;
-	
+
 	@Temporal(TemporalType.DATE)
-	@Column(name="data_entrega")
+	@Column(name = "data_entrega")
 	private Date dataEntrega;
-	
-	@InformacaoValidavel(intervalo={0, 800}, nomeExibicao="Observacao do pedido")
+
+	@InformacaoValidavel(intervalo = { 0, 800 }, nomeExibicao = "Observacao do pedido")
 	private String observacao;
 	/*
 	 * Atributo criado para usar em relatorios evitando o calculo do pedido
 	 */
-	@Column(name="valor_pedido")
+	@Column(name = "valor_pedido")
 	private Double valorPedido;
-	
-	@Column(name="valor_pedido_ipi")
+
+	@Column(name = "valor_pedido_ipi")
 	private Double valorPedidoIPI;
-	
-	@Column(name="forma_pagamento")
+
+	@Column(name = "forma_pagamento")
 	private String formaPagamento;
-	
-	@Column(name="cliente_notificado_venda")
+
+	@Column(name = "cliente_notificado_venda")
 	private boolean clienteNotificadoVenda = false;
-	
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="id_cliente")
-	@InformacaoValidavel(relacionamentoObrigatorio=true, nomeExibicao="Cliente do pedido")
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_cliente")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Cliente do pedido")
 	private Cliente cliente;
-	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="id_representada")
-	@InformacaoValidavel(relacionamentoObrigatorio=true, nomeExibicao="Representada do pedido")
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_representada")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Representada do pedido")
 	private Representada representada;
-	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="id_transportadora")
-	@InformacaoValidavel(nomeExibicao="Transportadora do pedido")
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_transportadora")
+	@InformacaoValidavel(nomeExibicao = "Transportadora do pedido")
 	private Transportadora transportadora;
-	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="id_transportadora_redespacho")
-	@InformacaoValidavel(nomeExibicao="Redespacho do pedido")
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_transportadora_redespacho")
+	@InformacaoValidavel(nomeExibicao = "Redespacho do pedido")
 	private Transportadora transportadoraRedespacho;
-	
+
 	@Enumerated(EnumType.ORDINAL)
-	@Column(name="id_tipo_entrega")
+	@Column(name = "id_tipo_entrega")
 	private TipoEntrega tipoEntrega;
-	
-	@Column(name="id_situacao_pedido")
+
+	@Column(name = "id_situacao_pedido")
 	@Enumerated(EnumType.ORDINAL)
-	@InformacaoValidavel(obrigatorio=true, nomeExibicao="Situacao do pedido")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Situacao do pedido")
 	private SituacaoPedido situacaoPedido;
-	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="id_vendedor")
-	@InformacaoValidavel(relacionamentoObrigatorio=true, nomeExibicao="Vendedor do pedido")
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_vendedor")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor do pedido")
 	private Usuario vendedor;
-	
+
 	@Enumerated(EnumType.STRING)
-	@Column(name="id_finalidade_pedido")
-	@InformacaoValidavel(obrigatorio=true, nomeExibicao="Finalidade do pedido")
+	@Column(name = "id_finalidade_pedido")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Finalidade do pedido")
 	private FinalidadePedido finalidadePedido;
-	
-	@OneToOne(fetch=FetchType.LAZY, cascade={CascadeType.ALL})
-	@JoinColumn(name="id_contato")
-	@InformacaoValidavel(obrigatorio=true, cascata=true, nomeExibicao="Contato do pedido")
+
+	@OneToOne(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@JoinColumn(name = "id_contato")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Contato do pedido")
 	private Contato contato;
-	
-	@OneToMany(fetch=FetchType.LAZY, cascade={CascadeType.MERGE, CascadeType.PERSIST})
-	@JoinTable(name="tb_pedido_tb_logradouro", schema="vendas", 
-			joinColumns={@JoinColumn(name = "id_pedido", referencedColumnName = "id")},
-			inverseJoinColumns={@JoinColumn(name = "id_logradouro", referencedColumnName = "id")})
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+	@JoinTable(name = "tb_pedido_tb_logradouro", schema = "vendas", joinColumns = { @JoinColumn(name = "id_pedido", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_logradouro", referencedColumnName = "id") })
 	private List<Logradouro> listaLogradouro;
-	
+
 	@Transient
 	private String dataInclusaoFormatada;
-	
+
 	@Transient
 	private String dataEnvioFormatada;
-	
+
 	@Transient
 	private String dataEntregaFormatada;
-	
+
 	@Transient
 	private String valorPedidoFormatado;
-	
+
 	@Transient
 	private String valorPedidoIPIFormatado;
-		
+
 	public void addLogradouro(List<? extends Logradouro> listaLogradouro) {
 		for (Logradouro logradouro : listaLogradouro) {
 			this.addLogradouro(logradouro);
@@ -149,13 +147,13 @@ public class Pedido implements Serializable, Cloneable {
 	}
 
 	public void addLogradouro(Logradouro logradouro) {
-		if (this.listaLogradouro == null){
+		if (this.listaLogradouro == null) {
 			this.setListaLogradouro(new ArrayList<Logradouro>());
 		}
 		this.listaLogradouro.add(logradouro);
 	}
 
-	public double addValorPedido (double valor) {
+	public double addValorPedido(double valor) {
 		return this.valorPedido += valor;
 	}
 
@@ -291,7 +289,7 @@ public class Pedido implements Serializable, Cloneable {
 	public void setDataEntrega(Date dataEntrega) {
 		this.dataEntrega = dataEntrega;
 	}
-	
+
 	public void setDataEntregaFormatada(String dataEntregaFormatada) {
 		this.dataEntregaFormatada = dataEntregaFormatada;
 	}
@@ -311,7 +309,7 @@ public class Pedido implements Serializable, Cloneable {
 	public void setDataInclusaoFormatada(String dataInclusaoFormatada) {
 		this.dataInclusaoFormatada = dataInclusaoFormatada;
 	}
-	
+
 	public void setFinalidadePedido(FinalidadePedido finalidadePedido) {
 		this.finalidadePedido = finalidadePedido;
 	}
@@ -335,13 +333,13 @@ public class Pedido implements Serializable, Cloneable {
 	public void setObservacao(String observacao) {
 		this.observacao = observacao;
 	}
-	
+
 	public void setOrcamento(boolean isOrcamento) {
 		if (isOrcamento) {
 			this.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 		}
 	}
-	
+
 	public void setRepresentada(Representada representada) {
 		this.representada = representada;
 	}
@@ -353,19 +351,19 @@ public class Pedido implements Serializable, Cloneable {
 	public void setTipoEntrega(TipoEntrega tipoEntrega) {
 		this.tipoEntrega = tipoEntrega;
 	}
-	
+
 	public void setTransportadora(Transportadora transportadora) {
 		this.transportadora = transportadora;
 	}
-	
+
 	public void setTransportadoraRedespacho(Transportadora transportadoraRedespacho) {
 		this.transportadoraRedespacho = transportadoraRedespacho;
 	}
-	
+
 	public void setValorPedido(Double valorPedido) {
 		this.valorPedido = valorPedido;
 	}
-	
+
 	public void setValorPedidoFormatado(String valorPedidoFormatado) {
 		this.valorPedidoFormatado = valorPedidoFormatado;
 	}
@@ -377,8 +375,18 @@ public class Pedido implements Serializable, Cloneable {
 	public void setValorPedidoIPIFormatado(String valorPedidoIPIFormatado) {
 		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
 	}
-	
+
 	public void setVendedor(Usuario vendedor) {
 		this.vendedor = vendedor;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Pedido && id != null && id.equals(((Pedido) o).id);
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id : -1;
 	}
 }

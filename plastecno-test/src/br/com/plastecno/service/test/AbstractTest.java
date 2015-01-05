@@ -1,27 +1,41 @@
 package br.com.plastecno.service.test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Before;
 
 import br.com.plastecno.service.exception.BusinessException;
 
 public class AbstractTest {
-	private final Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
+	private final Map<Class<?>, List<Object>> entidades = new HashMap<Class<?>, List<Object>>();
 
-	public void addService(Class<?> type, Object serviceObj) {
-		services.put(type, serviceObj);
+	void inserirEntidade(Object entidade) {
+		if (!entidades.containsKey(entidade.getClass())) {
+			entidades.put(entidade.getClass(), new ArrayList<Object>());
+		}
+		entidades.get(entidade.getClass()).add(entidade);
 	}
 
-	public Object getService(Class<?> type) {
-		return services.get(type);
-	}
-
-	@Before
-	public void init() {
-
+	@SuppressWarnings("unchecked")
+	<T> T pesquisarEntidadeById(Class<T> classe, Integer Id) {
+		if (!entidades.containsKey(classe)) {
+			return null;
+		}
+		Integer idObj = null;
+		for (Object o : entidades.get(classe)) {
+			try {
+				idObj = (Integer) o.getClass().getMethod("getId", (Class[]) null).invoke(o, (Object[]) null);
+			} catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+			if (idObj != null) {
+				return (T) o;
+			}
+		}
+		return null;
 	}
 
 	void printMensagens(BusinessException exception) {

@@ -8,6 +8,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.impl.util.QueryUtil;
@@ -23,7 +24,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		this.entityManager.createQuery("update Pedido p set p.situacaoPedido = :situacao where p.id = :idPedido")
 				.setParameter("situacao", SituacaoPedido.CANCELADO).setParameter("idPedido", idPedido).executeUpdate();
 	}
-
+	
 	private Query gerarQueryPesquisa(Pedido filtro, StringBuilder select) {
 		Query query = this.entityManager.createQuery(select.toString());
 		final Cliente cliente = filtro.getCliente();
@@ -127,6 +128,14 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		query.setParameter("id", idPedido);
 
 		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
+		Query query = this.entityManager
+				.createQuery("select i from ItemPedido i where i.pedido.id = :idPedido order by i.sequencial asc ");
+		query.setParameter("idPedido", idPedido);
+		return query.getResultList();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -1,7 +1,6 @@
 package br.com.plastecno.service.test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -34,8 +33,10 @@ import br.com.plastecno.service.entity.Cidade;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.Endereco;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
+import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pais;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
@@ -439,7 +440,13 @@ public class PedidoServiceTest extends AbstractTest {
 			@Mock
 			Pedido inserir(Pedido t) {
 				t.setId(1);
+				inserirEntidade(t);
 				return t;
+			}
+
+			@Mock
+			Pedido pesquisarById(Integer idPedido) {
+				return pesquisarEntidadeById(Pedido.class, idPedido);
 			}
 
 			@Mock
@@ -463,6 +470,37 @@ public class PedidoServiceTest extends AbstractTest {
 			}
 		};
 
+	}
+
+	private void initTestRefazerPedido() {
+		new MockUp<PedidoDAO>() {
+			@Mock
+			Pedido inserir(Pedido pedido) {
+				pedido.setId(10);
+				inserirEntidade(pedido);
+				return pedido;
+			}
+
+			@Mock
+			Pedido pesquisarById(Integer idPedido) {
+				return pesquisarEntidadeById(Pedido.class, idPedido);
+			}
+
+			@Mock
+			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
+				List<ItemPedido> listaItem = new ArrayList<ItemPedido>();
+				listaItem.add(gerarItemPedido());
+				return listaItem;
+			}
+		};
+	}
+
+	private ItemPedido gerarItemPedido() {
+		ItemPedido itemPedido = new ItemPedido();
+		itemPedido.setAliquotaIPI(11.1d);
+
+		itemPedido.setMaterial(new Material(1, "PLAST", "PLASTICO DURO"));
+		return itemPedido;
 	}
 
 	private void inject(Object service, Object dependencia, String nomeCampo) {
@@ -703,4 +741,32 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 	}
 
+	@Test
+	public void testRefazerPedido() {
+		initTestRefazerPedido();
+
+		Pedido pedido = gerarPedido();
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		Integer idPedidoRefeito = null;
+		try {
+			idPedidoRefeito = pedidoService.refazerPedido(idPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
+				idPedidoRefeito);
+
+		pedido = pesquisarEntidadeById(Pedido.class, idPedido);
+		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,
+				SituacaoPedido.CANCELADO, pedido.getSituacaoPedido());
+
+	}
 }

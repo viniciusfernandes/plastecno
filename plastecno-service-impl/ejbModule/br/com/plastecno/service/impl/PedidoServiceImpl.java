@@ -515,12 +515,8 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
-		Query query = this.entityManager
-				.createQuery("select i from ItemPedido i where i.pedido.id = :idPedido order by i.sequencial asc ");
-		query.setParameter("idPedido", idPedido);
-		return query.getResultList();
+		return pedidoDAO.pesquisarItemPedidoByIdPedido(idPedido);
 	}
 
 	@Override

@@ -31,7 +31,6 @@ public class GenericDAO<T> {
 			Object nomeIdEntidade, Object valorIdEntidade) {
 
 		StringBuilder select = new StringBuilder();
-
 		select.append("select r.").append(nomeAtributo).append(" ");
 		select.append("from ").append(classe.getSimpleName()).append(" r ");
 		select.append(" where ").append("r.").append(nomeAtributo);

@@ -3,6 +3,8 @@ package br.com.plastecno.service.dao;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import br.com.plastecno.service.impl.util.QueryUtil;
+
 public class GenericDAO<T> {
 	final EntityManager entityManager;
 
@@ -27,8 +29,8 @@ public class GenericDAO<T> {
 		return this.isEntidadeExistente(classe, nomeAtributo, valorAtributo, null, null);
 	}
 
-	public boolean isEntidadeExistente(Class<T> classe, String nomeAtributo, Object valorAtributo,
-			Object nomeIdEntidade, Object valorIdEntidade) {
+	public boolean isEntidadeExistente(Class<T> classe, String nomeAtributo, Object valorAtributo, Object nomeIdEntidade,
+			Object valorIdEntidade) {
 
 		StringBuilder select = new StringBuilder();
 		select.append("select r.").append(nomeAtributo).append(" ");
@@ -49,5 +51,13 @@ public class GenericDAO<T> {
 			query.setParameter("valorIdEntidade", valorIdEntidade);
 		}
 		return query.getResultList().size() > 0;
+	}
+
+	T pesquisarById(Class<T> classe, Integer id) {
+		StringBuilder select = new StringBuilder();
+		select.append("select e from ").append(classe.getSimpleName());
+		select.append(" e where e.id = :id");
+		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id), classe,
+				null);
 	}
 }

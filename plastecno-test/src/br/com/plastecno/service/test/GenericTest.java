@@ -9,8 +9,12 @@ import org.junit.Assert;
 
 import br.com.plastecno.service.exception.BusinessException;
 
-public class AbstractTest {
+class GenericTest {
 	private final Map<Class<?>, List<Object>> entidades = new HashMap<Class<?>, List<Object>>();
+
+	Integer gerarId() {
+		return (int) (9999 * Math.random());
+	}
 
 	void inserirEntidade(Object entidade) {
 		if (!entidades.containsKey(entidade.getClass())) {
@@ -18,7 +22,7 @@ public class AbstractTest {
 		}
 		entidades.get(entidade.getClass()).add(entidade);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	<T> T pesquisarEntidadeById(Class<T> classe, Integer Id) {
 		if (!entidades.containsKey(classe)) {
@@ -36,6 +40,11 @@ public class AbstractTest {
 			}
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	<T> List<T> pesquisarTodos(Class<T> classe){
+		return (List<T>) entidades.get(classe);
 	}
 
 	void printMensagens(BusinessException exception) {

@@ -1,8 +1,12 @@
 package br.com.plastecno.service.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,7 +63,7 @@ import br.com.plastecno.service.impl.RepresentadaServiceImpl;
 import br.com.plastecno.service.impl.UsuarioServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
-public class PedidoServiceTest extends AbstractTest {
+public class PedidoServiceTest extends GenericTest {
 
 	public PedidoService pedidoService;
 
@@ -110,12 +114,12 @@ public class PedidoServiceTest extends AbstractTest {
 		itemPedido.setAliquotaIPI(11.1d);
 		itemPedido.setMaterial(gerarMaterial());
 		itemPedido.setFormaMaterial(FormaMaterial.TB);
-		itemPedido.setQuantidade(12);
+		itemPedido.setQuantidade(2);
 		itemPedido.setMedidaExterna(120d);
 		itemPedido.setMedidaInterna(100d);
 		itemPedido.setComprimento(1000d);
 		itemPedido.setTipoVenda(TipoVenda.KILO);
-		itemPedido.setPrecoVenda(50d);
+		itemPedido.setPrecoVenda(60d);
 		return itemPedido;
 	}
 
@@ -195,6 +199,11 @@ public class PedidoServiceTest extends AbstractTest {
 			}
 
 			@Mock
+			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
+				return pesquisarEntidadeById(Pedido.class, idPedido).getRepresentada().getId();
+			}
+
+			@Mock
 			List<Logradouro> pesquisarLogradouro(Integer idPedido) {
 				List<Logradouro> lista = new ArrayList<Logradouro>();
 				lista.add(gerarLogradouro(TipoLogradouro.COBRANCA));
@@ -211,7 +220,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 			@Mock
 			Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
-				return 53d;
+				return 120d;
 			}
 
 			@Mock
@@ -283,11 +292,19 @@ public class PedidoServiceTest extends AbstractTest {
 
 			@Mock
 			Object alterar(Object t) {
+				inserirEntidade(t);
 				return t;
 			}
 
 			@Mock
 			Object inserir(Object t) {
+				try {
+					Method m = t.getClass().getMethod("setId", Integer.class);
+					m.invoke(t, gerarId());
+				} catch (Exception e) {
+					throw new IllegalArgumentException(e);
+				}
+				inserirEntidade(t);
 				return t;
 			}
 		};
@@ -554,12 +571,6 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private void initTestRefazerPedido() {
 		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido inserir(Pedido pedido) {
-				pedido.setId(10);
-				inserirEntidade(pedido);
-				return pedido;
-			}
 
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
@@ -837,8 +848,7 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-
-		assertEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
+		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);
 
 		pedido = pesquisarEntidadeById(Pedido.class, idPedido);

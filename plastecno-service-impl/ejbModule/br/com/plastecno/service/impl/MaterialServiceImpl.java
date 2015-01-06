@@ -15,7 +15,7 @@ import javax.persistence.Query;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
-import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.MaterialDAO;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
@@ -33,13 +33,11 @@ public class MaterialServiceImpl implements MaterialService {
 
 	@EJB
 	private RepresentadaService representadaService;
-	private GenericDAO<Material> genericDAO;
+	private MaterialDAO materialDAO;
 
 	@Override
 	public void desativar(Integer id) {
-		Query query = this.entityManager.createQuery("update Material r set r.ativo = false where r.id = :id");
-		query.setParameter("id", id);
-		query.executeUpdate();
+		materialDAO.desativar(id);
 	}
 
 	private Query gerarQueryPesquisa(Material filtro, StringBuilder select) {
@@ -72,7 +70,7 @@ public class MaterialServiceImpl implements MaterialService {
 
 	@PostConstruct
 	public void init() {
-		this.genericDAO = new GenericDAO<Material>(entityManager);
+		this.materialDAO = new MaterialDAO(entityManager);
 	}
 
 	@Override
@@ -106,22 +104,13 @@ public class MaterialServiceImpl implements MaterialService {
 			throw new BusinessException("Material já existente com a sigla " + material.getSigla());
 		}
 		// Realizando o merge das associacoes das representadas
-		return this.entityManager.merge(material).getId();
+		return material.getId() != null ? materialDAO.alterar(material).getId() : materialDAO.inserir(material).getId();
 	}
 
 	@Override
 	public boolean isCalculoIPIObrigatorio(Integer idMaterial, Integer idRepresentada) {
-		final StringBuilder select = new StringBuilder("select m.importado, r.tipoApresentacaoIPI from Material m ")
-				.append("inner join m.listaRepresentada r where m.id = :idMaterial and ").append(
-						"r.id = :idRepresentada ");
-
-		final Query query = this.entityManager.createQuery(select.toString()).setParameter("idMaterial", idMaterial)
-				.setParameter("idRepresentada", idRepresentada);
-
-		Object[] resultado = QueryUtil.gerarRegistroUnico(query, Object[].class, null);
-		final Boolean materialImportado = (Boolean) resultado[0];
-		final TipoApresentacaoIPI tipoApresentacaoIPI = (TipoApresentacaoIPI) resultado[1];
-
+		final Boolean materialImportado = isMaterialImportado(idMaterial);
+		final TipoApresentacaoIPI tipoApresentacaoIPI = representadaService.pesquisarTipoApresentacaoIPI(idRepresentada);
 		if (TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
 			return false;
 		}
@@ -133,17 +122,22 @@ public class MaterialServiceImpl implements MaterialService {
 		return false;
 	}
 
+	public boolean isMaterialImportado(Integer idMaterial) {
+		Material material = pesquisarById(idMaterial);
+		return material != null ? material.isImportado() : false;
+	}
+
 	@Override
 	public boolean isMaterialExistente(String sigla, Integer idMaterial) {
-		return this.genericDAO.isEntidadeExistente(Material.class, idMaterial, "sigla", sigla);
+		return materialDAO.isEntidadeExistente(Material.class, idMaterial, "sigla", sigla);
 	}
 
 	@Override
 	public PaginacaoWrapper<Material> paginarMaterial(Material filtro, Boolean apenasAtivos,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 
-		return new PaginacaoWrapper<Material>(this.pesquisarTotalRegistros(filtro, apenasAtivos), this.pesquisarBy(
-				filtro, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
+		return new PaginacaoWrapper<Material>(this.pesquisarTotalRegistros(filtro, apenasAtivos), this.pesquisarBy(filtro,
+				apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
 
 	}
 
@@ -165,8 +159,7 @@ public class MaterialServiceImpl implements MaterialService {
 
 	@Override
 	public Material pesquisarById(Integer id) {
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery("select m from Material m where m.id =:id")
-				.setParameter("id", id), Material.class, null);
+		return materialDAO.pesquisarById(id);
 	}
 
 	@SuppressWarnings("unchecked")

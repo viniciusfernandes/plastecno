@@ -18,6 +18,7 @@ import org.junit.Test;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.EmailService;
 import br.com.plastecno.service.LogradouroService;
+import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FinalidadePedido;
@@ -26,6 +27,7 @@ import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.MaterialDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.Bairro;
@@ -46,6 +48,7 @@ import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.impl.ClienteServiceImpl;
 import br.com.plastecno.service.impl.EmailServiceImpl;
 import br.com.plastecno.service.impl.LogradouroServiceImpl;
+import br.com.plastecno.service.impl.MaterialServiceImpl;
 import br.com.plastecno.service.impl.PedidoServiceImpl;
 import br.com.plastecno.service.impl.UsuarioServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
@@ -96,6 +99,14 @@ public class PedidoServiceTest extends AbstractTest {
 		return endereco;
 	}
 
+	private ItemPedido gerarItemPedido() {
+		ItemPedido itemPedido = new ItemPedido();
+		itemPedido.setAliquotaIPI(11.1d);
+
+		itemPedido.setMaterial(new Material(1, "PLAST", "PLASTICO DURO"));
+		return itemPedido;
+	}
+
 	private Logradouro gerarLogradouro(TipoLogradouro tipoLogradouro) {
 		Logradouro logradouro = new Logradouro(gerarEndereco());
 		logradouro.setTipoLogradouro(tipoLogradouro);
@@ -104,6 +115,18 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private LogradouroService gerarLogradouroService() {
 		return new LogradouroServiceImpl();
+	}
+
+	private MaterialService gerarMaterialService() {
+		MaterialServiceImpl materialService = new MaterialServiceImpl();
+		new MockUp<MaterialDAO>() {
+			@Mock
+			Material pesquisarById(Integer id) {
+				return new Material(12, "TEST", "APENAS PARA TESTE");
+			}
+		};
+		inject(materialService, new MaterialDAO(null), "materialDAO");
+		return materialService;
 	}
 
 	private Pedido gerarPedido() {
@@ -172,6 +195,7 @@ public class PedidoServiceTest extends AbstractTest {
 		inject(pedidoService, gerarClienteService(), "clienteService");
 		inject(pedidoService, gerarLogradouroService(), "logradouroService");
 		inject(pedidoService, gerarEmailService(), "emailService");
+		inject(pedidoService, gerarMaterialService(), "materialService");
 
 		return pedidoService;
 	}
@@ -487,20 +511,17 @@ public class PedidoServiceTest extends AbstractTest {
 			}
 
 			@Mock
+			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
+				return 1;
+			}
+
+			@Mock
 			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 				List<ItemPedido> listaItem = new ArrayList<ItemPedido>();
 				listaItem.add(gerarItemPedido());
 				return listaItem;
 			}
 		};
-	}
-
-	private ItemPedido gerarItemPedido() {
-		ItemPedido itemPedido = new ItemPedido();
-		itemPedido.setAliquotaIPI(11.1d);
-
-		itemPedido.setMaterial(new Material(1, "PLAST", "PLASTICO DURO"));
-		return itemPedido;
 	}
 
 	private void inject(Object service, Object dependencia, String nomeCampo) {
@@ -696,8 +717,7 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		if (!SituacaoPedido.ORCAMENTO.equals(pedido.getSituacaoPedido())) {
-			fail("Pedido incluido deve ir para orcamento e esta definido como: "
-					+ pedido.getSituacaoPedido().getDescricao());
+			fail("Pedido incluido deve ir para orcamento e esta definido como: " + pedido.getSituacaoPedido().getDescricao());
 		}
 	}
 
@@ -761,8 +781,7 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		assertEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
-				idPedidoRefeito);
+		assertEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido, idPedidoRefeito);
 
 		pedido = pesquisarEntidadeById(Pedido.class, idPedido);
 		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,

@@ -104,7 +104,11 @@ public class MaterialServiceImpl implements MaterialService {
 			throw new BusinessException("Material já existente com a sigla " + material.getSigla());
 		}
 		// Realizando o merge das associacoes das representadas
+<<<<<<< .mine
 		return material.getId() != null ? materialDAO.alterar(material).getId() : materialDAO.inserir(material).getId();
+=======
+		return inserir(material);
+>>>>>>> .theirs
 	}
 
 	@Override

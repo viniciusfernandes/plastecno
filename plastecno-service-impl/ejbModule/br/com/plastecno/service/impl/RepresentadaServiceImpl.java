@@ -15,6 +15,7 @@ import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
@@ -35,7 +36,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	@EJB
 	private ContatoService contatoService;
 
-	private GenericDAO genericDAO;
+	private RepresentadaDAO representadaDAO;
 
 	@Override
 	public Integer desativar(Integer id) {
@@ -91,7 +92,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@PostConstruct
 	public void init() {
-		this.genericDAO = new GenericDAO(this.entityManager);
+		this.representadaDAO = new RepresentadaDAO(this.entityManager);
 	}
 
 	@Override
@@ -129,12 +130,12 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@Override
 	public boolean isCNPJExistente(Integer id, String cnpj) {
-		return this.genericDAO.isEntidadeExistente(Representada.class, id, "cnpj", cnpj);
+		return this.representadaDAO.isEntidadeExistente(Representada.class, id, "cnpj", cnpj);
 	}
 
 	@Override
 	public boolean isNomeFantasiaExistente(Integer id, String nomeFantasia) {
-		return this.genericDAO.isEntidadeExistente(Representada.class, id, "nomeFantasia", nomeFantasia);
+		return this.representadaDAO.isEntidadeExistente(Representada.class, id, "nomeFantasia", nomeFantasia);
 	}
 
 	@Override
@@ -188,8 +189,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@Override
 	public Representada pesquisarById(Integer id) {
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery("select m from Representada m where m.id =:id")
-				.setParameter("id", id), Representada.class, null);
+		return representadaDAO.pesquisarById(id);
 	}
 
 	@SuppressWarnings("unchecked")

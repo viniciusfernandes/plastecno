@@ -25,6 +25,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				.setParameter("situacao", SituacaoPedido.CANCELADO).setParameter("idPedido", idPedido).executeUpdate();
 	}
 
+
 	private Query gerarQueryPesquisa(Pedido filtro, StringBuilder select) {
 		Query query = this.entityManager.createQuery(select.toString());
 		final Cliente cliente = filtro.getCliente();
@@ -44,6 +45,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return query;
 	}
 
+	
 	private void gerarRestricaoPesquisa(Pedido filtro, StringBuilder select) {
 		StringBuilder restricao = new StringBuilder();
 		final Cliente cliente = filtro.getCliente();
@@ -151,8 +153,28 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				.setParameter("idPedido", idPedido).getResultList();
 	}
 
+	public Integer pesquisarMaxSequenciaItemPedido(Integer idPedido) {
+		return (Integer) entityManager
+				.createQuery("select max(i.sequencial) from ItemPedido i where i.pedido.id = :idPedido")
+				.setParameter("idPedido", idPedido).getSingleResult();
+
+	}
+
+	public Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(
+				"select SUM(i.quantidade * i.precoUnidade) from ItemPedido i where i.pedido.id = :idPedido ").setParameter(
+				"idPedido", idPedido), Double.class, 0d);
+	}
+
+	public Double pesquisarQuantidadePrecoUnidadeIPI(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(
+				"select SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ").setParameter(
+				"idPedido", idPedido), Double.class, 0d);
+	}
+
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
-		return (Long) this.entityManager.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
+		return (Long) this.entityManager
+				.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
 				.setParameter("idPedido", idPedido).getSingleResult();
 	}
 

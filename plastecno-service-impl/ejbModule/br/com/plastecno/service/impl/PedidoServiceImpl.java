@@ -22,6 +22,7 @@ import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
+import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -44,28 +45,29 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @Stateless
 public class PedidoServiceImpl implements PedidoService {
 
-	@PersistenceContext(name = "plastecno")
-	private EntityManager entityManager;
-
-	@EJB
-	private MaterialService materialService;
-
-	@EJB
-	private EmailService emailService;
-
-	@EJB
-	private UsuarioService usuarioService;
-
 	@EJB
 	private ClienteService clienteService;
 
 	@EJB
-	private TransportadoraService transportadoraService;
+	private EmailService emailService;
+
+	@PersistenceContext(name = "plastecno")
+	private EntityManager entityManager;
+
+	private ItemPedidoDAO itemPedidoDAO;
 
 	@EJB
 	private LogradouroService logradouroService;
 
+	@EJB
+	private MaterialService materialService;
+
 	private PedidoDAO pedidoDAO;
+
+	@EJB
+	private TransportadoraService transportadoraService;
+	@EJB
+	private UsuarioService usuarioService;
 
 	@SuppressWarnings("unchecked")
 	private void alterarSequencialItemPedido(Integer idPedido, Integer sequencial) {
@@ -82,8 +84,8 @@ public class PedidoServiceImpl implements PedidoService {
 				entityManager
 						.createQuery(
 								"update ItemPedido i set i.sequencial = :novaSeq where i.id = :id and i.sequencial >= :sequencial")
-						.setParameter("novaSeq", --novaSeq).setParameter("id", id).setParameter("sequencial", sequencial)
-						.executeUpdate();
+						.setParameter("novaSeq", --novaSeq).setParameter("id", id)
+						.setParameter("sequencial", sequencial).executeUpdate();
 			}
 
 		}
@@ -91,20 +93,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public Double calcularValorPedido(Integer idPedido) throws BusinessException {
-		final Double valor = QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select SUM(i.quantidade * i.precoUnidade) from ItemPedido i where i.pedido.id = :idPedido ").setParameter(
-						"idPedido", idPedido), Double.class, 0d);
-		return valor == null ? 0d : valor;
+		return pedidoDAO.pesquisarQuantidadePrecoUnidade(idPedido);
 	}
 
 	@Override
 	public Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException {
-		final Double valor = QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ")
-						.setParameter("idPedido", idPedido), Double.class, 0d);
-		return valor == null ? 0d : valor;
+		return pedidoDAO.pesquisarQuantidadePrecoUnidadeIPI(idPedido);
 	}
 
 	@Override
@@ -130,8 +124,8 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		/*
-		 * Devemos sempre usar a lista do cliente pois o cliente pode ter alterado
-		 * os dados de logradouro
+		 * Devemos sempre usar a lista do cliente pois o cliente pode ter
+		 * alterado os dados de logradouro
 		 */
 		pedido.addLogradouro(clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
 		pedido.setDataEnvio(new Date());
@@ -152,7 +146,8 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Email do contato é obrigatório para envio do orçamento");
 		}
 		try {
-			emailService.enviar(new GeradorPedidoEmail(pedido, arquivoAnexado).gerarMensagem(TipoMensagemPedido.ORCAMENTO));
+			emailService.enviar(new GeradorPedidoEmail(pedido, arquivoAnexado)
+					.gerarMensagem(TipoMensagemPedido.ORCAMENTO));
 		} catch (NotificacaoException e) {
 			StringBuilder mensagem = new StringBuilder();
 			mensagem.append("Falha no envio do orçamento No. ").append(pedido.getId()).append(" do vendedor ")
@@ -189,21 +184,20 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	private Integer gerarSequencialItemPedido(Integer idPedido) {
-		Integer seq = (Integer) entityManager
-				.createQuery("select max(i.sequencial) from ItemPedido i where i.pedido.id = :idPedido")
-				.setParameter("idPedido", idPedido).getSingleResult();
+		Integer seq = pedidoDAO.pesquisarMaxSequenciaItemPedido(idPedido);
 		return seq == null ? 1 : ++seq;
 	}
 
 	@PostConstruct
 	public void init() {
 		pedidoDAO = new PedidoDAO(entityManager);
+		itemPedidoDAO = new ItemPedidoDAO(entityManager);
 	}
 
 	/*
 	 * Esse metodo retorna um pedido pois, apos a inclusao de um novo pedido,
-	 * configuramos a data de inclusao como sendo a data atual, e essa informacao
-	 * deve ser retornada para o componente chamador.
+	 * configuramos a data de inclusao como sendo a data atual, e essa
+	 * informacao deve ser retornada para o componente chamador.
 	 */
 	@Override
 	public Pedido inserir(Pedido pedido) throws BusinessException {
@@ -215,18 +209,20 @@ public class PedidoServiceImpl implements PedidoService {
 		final Integer idPedido = pedido.getId();
 		final boolean isPedidoNovo = idPedido == null;
 		/*
-		 * Estamos proibindo que qualquer vendedor cadastre um NOVO pedido para um
-		 * cliente que nao esteja associado em sua carteira de clientes.
+		 * Estamos proibindo que qualquer vendedor cadastre um NOVO pedido para
+		 * um cliente que nao esteja associado em sua carteira de clientes.
 		 */
 		if (isPedidoNovo
-				&& !this.usuarioService.isClienteAssociadoVendedor(pedido.getCliente().getId(), pedido.getVendedor().getId())) {
+				&& !this.usuarioService.isClienteAssociadoVendedor(pedido.getCliente().getId(), pedido.getVendedor()
+						.getId())) {
 
 			final Cliente cliente = this.clienteService.pesquisarById(pedido.getCliente().getId());
 			Usuario vendedor = this.usuarioService.pesquisarById(pedido.getVendedor().getId());
 			throw new BusinessException("Não é possível incluir o pedido pois o cliente "
 					+ (cliente != null ? cliente.getNomeCompleto() : pedido.getCliente().getId())
 					+ " não esta associado ao vendedor "
-					+ (vendedor != null ? vendedor.getNome() + " - " + vendedor.getEmail() : pedido.getCliente().getId()));
+					+ (vendedor != null ? vendedor.getNome() + " - " + vendedor.getEmail() : pedido.getCliente()
+							.getId()));
 		}
 
 		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());
@@ -293,8 +289,8 @@ public class PedidoServiceImpl implements PedidoService {
 		itemPedido.setPedido(pedido);
 		/*
 		 * Atualizando o valor de cada unidade do item que podera ser usado
-		 * posteriormente em relatorios, alem disso, eh pbrigatorio para inclusao do
-		 * item no sistema
+		 * posteriormente em relatorios, alem disso, eh pbrigatorio para
+		 * inclusao do item no sistema
 		 */
 		itemPedido.setPrecoUnidade(CalculadoraPreco.calcularPorUnidade(itemPedido));
 
@@ -305,10 +301,11 @@ public class PedidoServiceImpl implements PedidoService {
 		itemPedido.setPrecoUnidadeIPI(precoUnidadeIPI);
 
 		/*
-		 * Caso o ipi seja nulo, isso indica que o usuario nao digitou o valor entao
-		 * utilizaremos os valores definidos para as formas dos materiais, que eh o
-		 * default do sistema. Esse preenchimento foi realizado pois agora temos que
-		 * incluir essa informacao do pedido.html que sera enviado para o cliente.
+		 * Caso o ipi seja nulo, isso indica que o usuario nao digitou o valor
+		 * entao utilizaremos os valores definidos para as formas dos materiais,
+		 * que eh o default do sistema. Esse preenchimento foi realizado pois
+		 * agora temos que incluir essa informacao do pedido.html que sera
+		 * enviado para o cliente.
 		 */
 
 		if (aliquotaIPI == null) {
@@ -319,19 +316,19 @@ public class PedidoServiceImpl implements PedidoService {
 		/*
 		 * O valor sequencial sera utilizado para que a representada identifique
 		 * rapidamento qual eh o item que deve ser customizado, assim o vendedor
-		 * podera fazer referencias ao item no campo de observacao, por exemplo: o
-		 * item 1 deve ter acabamento, etc.
+		 * podera fazer referencias ao item no campo de observacao, por exemplo:
+		 * o item 1 deve ter acabamento, etc.
 		 */
 		if (itemPedido.isNovo()) {
 			itemPedido.setSequencial(gerarSequencialItemPedido(idPedido));
 		}
 
 		ValidadorInformacao.validar(itemPedido);
-		itemPedido = this.entityManager.merge(itemPedido);
+		itemPedido = itemPedidoDAO.alterar(itemPedido);
 
 		/*
-		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao de
-		 * validacoes, caso contrario teremos um valor nulo na base de dados.
+		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao
+		 * de validacoes, caso contrario teremos um valor nulo na base de dados.
 		 */
 		pedido.setValorPedido(this.calcularValorPedido(idPedido));
 		pedido.setValorPedidoIPI(this.calcularValorPedidoIPI(idPedido));
@@ -346,7 +343,8 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		if (itemPedido.getMaterial() == null) {
-			throw new BusinessException("Não é possível verificar a obrigatoriedade do IPI pois o item não possui material");
+			throw new BusinessException(
+					"Não é possível verificar a obrigatoriedade do IPI pois o item não possui material");
 		}
 
 		final Integer idRepresentada = pedidoDAO.pesquisarIdRepresentadaByIdPedido(itemPedido.getPedido().getId());
@@ -357,15 +355,15 @@ public class PedidoServiceImpl implements PedidoService {
 	public boolean isClienteProspectado(Integer idPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery(
-						"select c.prospeccaoFinalizada from Pedido p inner join p.cliente c where p.id = :idPedido").setParameter(
-						"idPedido", idPedido), Boolean.class, false);
+						"select c.prospeccaoFinalizada from Pedido p inner join p.cliente c where p.id = :idPedido")
+						.setParameter("idPedido", idPedido), Boolean.class, false);
 	}
 
 	@Override
 	public boolean isPedidoEnviado(Integer idPedido) {
 		SituacaoPedido situacao = QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select p.situacaoPedido from Pedido p where p.id = :idPedido").setParameter(
-						"idPedido", idPedido), SituacaoPedido.class, null);
+				this.entityManager.createQuery("select p.situacaoPedido from Pedido p where p.id = :idPedido")
+						.setParameter("idPedido", idPedido), SituacaoPedido.class, null);
 
 		return SituacaoPedido.ENVIADO.equals(situacao);
 
@@ -381,7 +379,8 @@ public class PedidoServiceImpl implements PedidoService {
 	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalRegistros(idCliente, idVendedor),
-				this.pesquisarByIdClienteByIdVendedor(idCliente, idVendedor, indiceRegistroInicial, numeroMaximoRegistros));
+				this.pesquisarByIdClienteByIdVendedor(idCliente, idVendedor, indiceRegistroInicial,
+						numeroMaximoRegistros));
 	}
 
 	@Override
@@ -480,7 +479,8 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException {
+	public List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor)
+			throws BusinessException {
 		return this.pesquisarByPeriodoEVendedor(true, periodo, idVendedor);
 	}
 
@@ -490,8 +490,9 @@ public class PedidoServiceImpl implements PedidoService {
 			return null;
 		}
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select v.id from Pedido p inner join p.vendedor v where p.id = idPedido ")
-						.setParameter("idPedido", idPedido), Integer.class, null);
+				this.entityManager.createQuery(
+						"select v.id from Pedido p inner join p.vendedor v where p.id = idPedido ").setParameter(
+						"idPedido", idPedido), Integer.class, null);
 	}
 
 	@Override
@@ -585,8 +586,8 @@ public class PedidoServiceImpl implements PedidoService {
 				itemPedidoClone = itemPedido.clone();
 				inserirItemPedido(pedidoClone.getId(), itemPedidoClone);
 			} catch (CloneNotSupportedException e) {
-				throw new BusinessException("Falha no processo de copia do item No. " + itemPedido.getId() + " do pedido No. "
-						+ idPedido, e);
+				throw new BusinessException("Falha no processo de copia do item No. " + itemPedido.getId()
+						+ " do pedido No. " + idPedido, e);
 			}
 		}
 
@@ -615,10 +616,11 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setValorPedidoIPI(this.calcularValorPedidoIPI(pedido.getId()));
 			return pedido;
 		} catch (NonUniqueResultException e) {
-			throw new BusinessException("Não foi possivel remover o item pois foi encontrato mais de um item para o codigo "
-					+ idItemPedido);
+			throw new BusinessException(
+					"Não foi possivel remover o item pois foi encontrato mais de um item para o codigo " + idItemPedido);
 		} catch (NoResultException e) {
-			throw new BusinessException("Não foi possivel remover o item pois não existe item com o codigo " + idItemPedido);
+			throw new BusinessException("Não foi possivel remover o item pois não existe item com o codigo "
+					+ idItemPedido);
 		}
 
 	}

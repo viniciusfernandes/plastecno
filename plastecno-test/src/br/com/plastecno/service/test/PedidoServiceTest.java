@@ -20,15 +20,20 @@ import br.com.plastecno.service.EmailService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FinalidadePedido;
+import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.MaterialDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
+import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.Bairro;
 import br.com.plastecno.service.entity.Cidade;
@@ -50,6 +55,7 @@ import br.com.plastecno.service.impl.EmailServiceImpl;
 import br.com.plastecno.service.impl.LogradouroServiceImpl;
 import br.com.plastecno.service.impl.MaterialServiceImpl;
 import br.com.plastecno.service.impl.PedidoServiceImpl;
+import br.com.plastecno.service.impl.RepresentadaServiceImpl;
 import br.com.plastecno.service.impl.UsuarioServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
@@ -102,8 +108,14 @@ public class PedidoServiceTest extends AbstractTest {
 	private ItemPedido gerarItemPedido() {
 		ItemPedido itemPedido = new ItemPedido();
 		itemPedido.setAliquotaIPI(11.1d);
-
-		itemPedido.setMaterial(new Material(1, "PLAST", "PLASTICO DURO"));
+		itemPedido.setMaterial(gerarMaterial());
+		itemPedido.setFormaMaterial(FormaMaterial.TB);
+		itemPedido.setQuantidade(12);
+		itemPedido.setMedidaExterna(120d);
+		itemPedido.setMedidaInterna(100d);
+		itemPedido.setComprimento(1000d);
+		itemPedido.setTipoVenda(TipoVenda.KILO);
+		itemPedido.setPrecoVenda(50d);
 		return itemPedido;
 	}
 
@@ -117,15 +129,22 @@ public class PedidoServiceTest extends AbstractTest {
 		return new LogradouroServiceImpl();
 	}
 
+	private Material gerarMaterial() {
+		Material material = new Material(1, "PLAST", "PLASTICO DURO");
+		material.setPesoEspecifico(0.33);
+		return material;
+	}
+
 	private MaterialService gerarMaterialService() {
 		MaterialServiceImpl materialService = new MaterialServiceImpl();
 		new MockUp<MaterialDAO>() {
 			@Mock
 			Material pesquisarById(Integer id) {
-				return new Material(12, "TEST", "APENAS PARA TESTE");
+				return gerarMaterial();
 			}
 		};
 		inject(materialService, new MaterialDAO(null), "materialDAO");
+		inject(materialService, gerarRepresentadaService(), "representadaService");
 		return materialService;
 	}
 
@@ -149,6 +168,14 @@ public class PedidoServiceTest extends AbstractTest {
 	private PedidoService gerarPedidoService() {
 		PedidoServiceImpl pedidoService = new PedidoServiceImpl();
 		new MockUp<PedidoDAO>() {
+
+			@Mock
+			void cancelar(Integer IdPedido) {
+				Pedido pedido = pesquisarEntidadeById(Pedido.class, IdPedido);
+				if (pedido != null) {
+					pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
+				}
+			}
 
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
@@ -178,19 +205,29 @@ public class PedidoServiceTest extends AbstractTest {
 			}
 
 			@Mock
+			Integer pesquisarMaxSequenciaItemPedido(Integer idPedido) {
+				return 1;
+			}
+
+			@Mock
+			Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
+				return 53d;
+			}
+
+			@Mock
+			Double pesquisarQuantidadePrecoUnidadeIPI(Integer idPedido) {
+				return 55d;
+			}
+
+			@Mock
 			Long pesquisarTotalItemPedido(Integer idPedido) {
 				return 12L;
 			}
 		};
 
-		new MockUp<PedidoServiceImpl>() {
-			@Mock
-			public void $init() {
-			}
-		};
-
 		initGenericDAO();
 		inject(pedidoService, new PedidoDAO(null), "pedidoDAO");
+		inject(pedidoService, new ItemPedidoDAO(null), "itemPedidoDAO");
 		inject(pedidoService, gerarUsuarioService(), "usuarioService");
 		inject(pedidoService, gerarClienteService(), "clienteService");
 		inject(pedidoService, gerarLogradouroService(), "logradouroService");
@@ -198,6 +235,25 @@ public class PedidoServiceTest extends AbstractTest {
 		inject(pedidoService, gerarMaterialService(), "materialService");
 
 		return pedidoService;
+	}
+
+	private Representada gerarRepresentada() {
+		Representada representada = new Representada(1, "COBEX");
+		return representada;
+	}
+
+	private RepresentadaService gerarRepresentadaService() {
+		RepresentadaService representadaService = new RepresentadaServiceImpl();
+
+		new MockUp<RepresentadaDAO>() {
+			@Mock
+			Representada pesquisarById(Integer id) {
+				return gerarRepresentada();
+			}
+		};
+
+		inject(representadaService, new RepresentadaDAO(null), "representadaDAO");
+		return representadaService;
 	}
 
 	private UsuarioService gerarUsuarioService() {
@@ -717,7 +773,8 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		if (!SituacaoPedido.ORCAMENTO.equals(pedido.getSituacaoPedido())) {
-			fail("Pedido incluido deve ir para orcamento e esta definido como: " + pedido.getSituacaoPedido().getDescricao());
+			fail("Pedido incluido deve ir para orcamento e esta definido como: "
+					+ pedido.getSituacaoPedido().getDescricao());
 		}
 	}
 
@@ -781,7 +838,8 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		assertEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido, idPedidoRefeito);
+		assertEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
+				idPedidoRefeito);
 
 		pedido = pesquisarEntidadeById(Pedido.class, idPedido);
 		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,

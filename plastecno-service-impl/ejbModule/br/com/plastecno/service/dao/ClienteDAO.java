@@ -26,4 +26,11 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 
 		return this.entityManager.createQuery(select.toString()).setParameter("idCliente", idCliente).getResultList();
 	}
+	
+	public List<Cliente> pesquisarByNomeFantasia(String nomeFantasia){
+		StringBuilder select = new StringBuilder().append("select c from Cliente c ")
+				.append("where c.nomeFantasia like :nomeFantasia");
+		return this.entityManager.createQuery(select.toString()).setParameter("nomeFantasia", nomeFantasia).getResultList();
+		
+	}
 }

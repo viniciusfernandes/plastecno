@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.caelum.vraptor.Get;
@@ -13,6 +14,7 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.controller.exception.ControllerException;
+import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
@@ -31,9 +33,9 @@ public class VendedorController extends AbstractController {
     @Post("vendedor/associacaocliente")
     public void associarCliente(Usuario vendedor, List<Integer> listaIdClienteAssociado) {
         try {
-            
+
             usuarioService.associarCliente(vendedor.getId(), listaIdClienteAssociado);
-            
+
             gerarMensagemSucesso("Cliente(s) associado(s) com sucesso");
             pesquisarVendedor(vendedor.getId());
         } catch (BusinessException e) {
@@ -56,9 +58,9 @@ public class VendedorController extends AbstractController {
     @Post("vendedor/desassociacaocliente")
     public void desassociarCliente(Usuario vendedor, List<Integer> listaIdClienteDesassociado) {
         try {
-            
+
             usuarioService.desassociarCliente(vendedor.getId(), listaIdClienteDesassociado);
-            
+
             gerarMensagemSucesso("Cliente(s) desassociado(s) com sucesso");
             pesquisarVendedor(vendedor.getId());
         } catch (BusinessException e) {
@@ -87,23 +89,36 @@ public class VendedorController extends AbstractController {
         addAtributo("vendedor", filtro);
     }
 
+    @Get("vendedor/listagem/nome")
+    public void pesquisarVendedorByNome(String nome) {
+        List<Autocomplete> lista = new ArrayList<Autocomplete>();
+        List<Usuario> listaVendedor = usuarioService.pesquisarVendedorByNome(nome);
+        for (Usuario vendedor : listaVendedor) {
+            lista.add(new Autocomplete(vendedor.getId(), vendedor.getNome()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
+    }
+
     @Get("vendedor/edicao")
     public void pesquisarVendedor(Integer idVendedor) {
         Usuario vendedor = this.usuarioService.pesquisarById(idVendedor);
-        vendedor.setCpf(formatarCPF(vendedor.getCpf()));
-        vendedor.addRemuneracao(this.usuarioService.pesquisarRemuneracaoById(idVendedor));
-        addAtributo("vendedor", vendedor);
+        if (vendedor == null) {
+            this.gerarListaMensagemErro("Vendedor não existe no sistema");
+        } else {
+            vendedor.setCpf(formatarCPF(vendedor.getCpf()));
+            vendedor.addRemuneracao(this.usuarioService.pesquisarRemuneracaoById(idVendedor));
+            addAtributo("vendedor", vendedor);
 
-        try {
-            popularPicklist(clienteService.pesquisarClientesDesassociados(),
-                    clienteService.pesquisarClientesAssociados(idVendedor));
-        } catch (ControllerException e) {
-            gerarLogErroNavegacao("Vendedor", e);
+            try {
+                popularPicklist(clienteService.pesquisarClientesDesassociados(),
+                        clienteService.pesquisarClientesAssociados(idVendedor));
+            } catch (ControllerException e) {
+                gerarLogErroNavegacao("Vendedor", e);
+            }
         }
-
         irTopoPagina();
     }
-    
+
     @Get("vendedor")
     public void vendedorHome() {
         if (!isElementosNaoAssociadosPreenchidosPicklist()) {

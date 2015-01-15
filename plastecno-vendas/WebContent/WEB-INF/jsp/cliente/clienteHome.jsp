@@ -6,20 +6,16 @@
 
 <jsp:include page="/bloco/bloco_css.jsp"></jsp:include>
 
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.mask.min.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/tabela_handler.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/bloco/contato.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 
 <script type="text/javascript">
 
@@ -85,6 +81,18 @@ $(document).ready(function() {
 	tabelaContatoHandler = inicializarBlocoContato(urlTela);
 	
 	new PickList().initPickList();
+	
+	autocompletar({
+		url : '<c:url value="/cliente/listagem/nome"/>',
+		campoPesquisavel : 'nomeFantasia',
+		parametro : 'nomeFantasia',
+		containerResultados : 'containerPesquisaCliente',
+		selecionarItem: function(itemLista) {
+			var formVazio = document.getElementById('formVazio');
+			formVazio.action = '<c:url value="/cliente/"/>'+itemLista.id;
+			formVazio.submit();
+		}
+	});
 
 });
 
@@ -132,7 +140,8 @@ function remover(codigo, nome) {
 			type="hidden" />
 	</form>
 
-	<form id="formVazio" action="cliente" method="get"></form>
+	<form id="formVazio" action="cliente" method="get">
+	</form>
 
 	<fieldset>
 		<legend>::: Dados do Cliente :::</legend>
@@ -179,8 +188,8 @@ function remover(codigo, nome) {
 			</div>
 			<div class="label obrigatorio">Nome:</div>
 			<div class="input" style="width: 20%">
-				<input type="text" id="nomeFantasia" name="cliente.nomeFantasia"
-					value="${cliente.nomeFantasia}" class="pesquisavel" />
+				<input type="text" id="nomeFantasia" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" />
+				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			<div class="label obrigatorio">Razão Social:</div>
 			<div class="input" style="width: 40%">

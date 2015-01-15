@@ -169,6 +169,16 @@ public final class ClienteController extends AbstractController {
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaCliente");
         addAtributo("cliente", filtro);
     }
+    
+    @Get("cliente/listagem/nome")
+    public void pesquisarClienteByNomeFantasia(String nomeFantasia) {
+        List<Autocomplete> lista = new ArrayList<Autocomplete>();
+        List<Cliente> listaCliente = this.clienteService.pesquisarByNomeFantasia(nomeFantasia);
+        for (Cliente cliente : listaCliente) {
+            lista.add(new Autocomplete(cliente.getId(), cliente.getNomeFantasia()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
+    }
 
     @Get("cliente/{idCliente}")
     public void pesquisarClienteById(Integer idCliente) {

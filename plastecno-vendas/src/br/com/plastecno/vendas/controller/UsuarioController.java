@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.caelum.vraptor.Get;
@@ -18,6 +19,7 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.controller.exception.ControllerException;
+import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
@@ -51,28 +53,31 @@ public class UsuarioController extends AbstractController {
     }
 
     @Get("usuario/edicao")
-    public void editar(Integer id) {
+    public void pesquisarUsuarioById(Integer id) {
         Usuario usuario = this.usuarioService.pesquisarById(id);
-        Logradouro logradouro = this.usuarioService.pesquisarLogradouro(usuario.getId());
-        usuario.setLogradouro(logradouro);
+        if (usuario == null) {
+            this.gerarListaMensagemErro("Usuário não existe no sistema");
+        } else {
+            Logradouro logradouro = this.usuarioService.pesquisarLogradouro(usuario.getId());
+            usuario.setLogradouro(logradouro);
 
-        usuario.setSenha(null);
-        inserirMascaraDocumentos(usuario);
-        addAtributo("tipoLogradouroSelecionado", logradouro != null ? logradouro.getTipoLogradouro() : null);
-        addAtributo("usuario", usuario);
-        addAtributo("logradouro", logradouro);
-        addAtributo("listaContato", this.usuarioService.pesquisarContatos(id));
+            usuario.setSenha(null);
+            inserirMascaraDocumentos(usuario);
+            addAtributo("tipoLogradouroSelecionado", logradouro != null ? logradouro.getTipoLogradouro() : null);
+            addAtributo("usuario", usuario);
+            addAtributo("logradouro", logradouro);
+            addAtributo("listaContato", this.usuarioService.pesquisarContatos(id));
 
-        try {
-            popularPicklist(usuarioService.pesquisarPerfisNaoAssociados(id),
-                    usuarioService.pesquisarPerfisAssociados(id));
-        } catch (ControllerException e) {
-            gerarLogErroNavegacao("Usuario", e);
+            try {
+                popularPicklist(usuarioService.pesquisarPerfisNaoAssociados(id),
+                        usuarioService.pesquisarPerfisAssociados(id));
+            } catch (ControllerException e) {
+                gerarLogErroNavegacao("Usuario", e);
+            }
         }
-
         irTopoPagina();
     }
-    
+
     @Post("usuario/inclusao")
     public void inserir(Double salario, Double comissao, Usuario usuario, List<ContatoUsuario> listaContato,
             Logradouro logradouro, List<Integer> listaIdPerfilAssociado, boolean isAlteracaoSenha) {
@@ -136,8 +141,14 @@ public class UsuarioController extends AbstractController {
         addAtributo("usuario", filtro);
     }
 
-    public void pesquisarVendedorByNome() {
-
+    @Get("usuario/listagem/nome")
+    public void pesquisarUsuarioByNome(String nome) {
+        List<Autocomplete> lista = new ArrayList<Autocomplete>();
+        List<Usuario> listaUsuario = usuarioService.pesquisarByNome(nome);
+        for (Usuario usuario : listaUsuario) {
+            lista.add(new Autocomplete(usuario.getId(), usuario.getNome()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
     }
 
     @Post("usuario/contato/remocao/{idContato}")

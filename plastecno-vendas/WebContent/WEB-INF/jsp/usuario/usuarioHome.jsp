@@ -6,21 +6,16 @@
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/bloco/contato.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.mask.min.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/tabela_handler.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
-
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 
 <script type="text/javascript">
 
@@ -33,12 +28,14 @@ $(document).ready(function() {
 	
 	$("#botaoInserirUsuario").click(function() {
 		var isSenhaEmBranco = isEmpty($('#senha').val()) || isEmpty($('#senhaConfirmada').val());
-		if (($('#isAlteracaoSenha').prop('checked') || isEmpty($('#id').val())) && isSenhaEmBranco) {
+		var isAlteracaoSenha = $('#isAlteracaoSenha').prop('checked');
+		var isNovoUsuario = isEmpty($('#idUsuario').val());
+		if ((isAlteracaoSenha || isNovoUsuario) && isSenhaEmBranco) {
 			gerarListaMensagemErro(new Array('As senhas não podem estar em branco'));
 			return;
 		} 
 		
-		if ($('#isAlteracaoSenha').prop('checked') && $('#senha').val() != $('#senhaConfirmada').val()) {
+		if (isAlteracaoSenha && $('#senha').val() != $('#senhaConfirmada').val()) {
 			gerarListaMensagemErro(new Array('As senhas não conferem, favor digitar novamente'));
 			return;
 		}
@@ -78,7 +75,18 @@ $(document).ready(function() {
 	tabelaContatoHandler = inicializarBlocoContato('<c:url value="/usuario"/>');
 	
 	new PickList().initPickList();
-	
+	autocompletar({
+		url : '<c:url value="/usuario/listagem/nome"/>',
+		campoPesquisavel : 'nome',
+		parametro : 'nome',
+		containerResultados : 'containerPesquisaUsuario',
+		selecionarItem: function(itemLista) {
+			var formVazio = document.getElementById('formVazio');
+			formVazio.action = '<c:url value="/usuario/edicao"/>';
+			formVazio.elements['id'].value = itemLista.id;
+			formVazio.submit();
+		}
+	});
 });
 
 function inicializarFiltro () {
@@ -96,17 +104,19 @@ function inicializarFiltro () {
 
 
 	<form id="formPesquisa" action="usuario/listagem" method="get">
-		<input type="hidden" id="filtro_nome" name="filtro.nome" /> <input
-			type="hidden" id="filtro_sobrenome" name="filtro.sobrenome" /> <input
-			type="hidden" id="filtro_email" name="filtro.email" /> <input
-			type="hidden" id="filtro_cpf" name="filtro.cpf" />
+		<input type="hidden" id="filtro_nome" name="filtro.nome" /> 
+		<input type="hidden" id="filtro_sobrenome" name="filtro.sobrenome" /> 
+		<input type="hidden" id="filtro_email" name="filtro.email" /> 
+		<input type="hidden" id="filtro_cpf" name="filtro.cpf" />
 	</form>
-	<form id="formVazio" action="usuario" method="get"></form>
+	<form id="formVazio" action="usuario" method="get">
+		<input type="hidden" id="id" name="id"/>
+	</form>
 
 	<fieldset>
 		<legend>::: Dados do Usuario :::</legend>
 		<form id="formUsuario" action="usuario/inclusao" method="post">
-			<input type="hidden" id="id" name="usuario.id" value="${usuario.id}" />
+			<input type="hidden" id="idUsuario" name="usuario.id" value="${usuario.id}" />
 
 			<div class="label">Ativo:</div>
 			<div class="input" style="width: 80%">
@@ -124,6 +134,8 @@ function inicializarFiltro () {
 			<div class="input" style="width: 20%">
 				<input type="text" id="nome" name="usuario.nome"
 					value="${usuario.nome}" class="pesquisavel" />
+					<div class="suggestionsBox" id="containerPesquisaUsuario"
+					style="display: none; width: 50%"></div>
 			</div>
 			<div class="label obrigatorio">Sobrenome:</div>
 			<div class="input" style="width: 40%">

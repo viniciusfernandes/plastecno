@@ -164,9 +164,9 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	public boolean isClienteProspectado(Integer idCliente) {
-		Query query = this.entityManager.createQuery(
-				"select c.prospeccaoFinalizada from Cliente c where c.id = :idCliente").setParameter("idCliente",
-				idCliente);
+		Query query = this.entityManager
+				.createQuery("select c.prospeccaoFinalizada from Cliente c where c.id = :idCliente").setParameter("idCliente",
+						idCliente);
 		return QueryUtil.gerarRegistroUnico(query, Boolean.class, false);
 	}
 
@@ -287,9 +287,8 @@ public class ClienteServiceImpl implements ClienteService {
 		if (idRamoAtividade == null) {
 			return Collections.emptyList();
 		}
-		StringBuilder select = new StringBuilder("SELECT u FROM Cliente u ")
-				.append("left join fetch u.listaContato l ").append("left join fetch u.vendedor ")
-				.append("where u.ramoAtividade.id = :idRamoAtividade ");
+		StringBuilder select = new StringBuilder("SELECT u FROM Cliente u ").append("left join fetch u.listaContato l ")
+				.append("left join fetch u.vendedor ").append("where u.ramoAtividade.id = :idRamoAtividade ");
 
 		select.append("order by u.vendedor.nome, u.nomeFantasia ");
 
@@ -314,7 +313,8 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		StringBuilder select = new StringBuilder();
-		select.append("select c from Cliente c ")
+		select
+				.append("select c from Cliente c ")
 				// o contato deve ser exibido no relatorio e usamos um let join
 				// pois um cliente pode nao ter contatos
 				.append("left join fetch c.listaContato lc ").append("inner join fetch c.listaLogradouro l ")
@@ -344,9 +344,8 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Cliente> pesquisarClientesDesassociados() {
-		return this.entityManager
-				.createQuery(
-						"select new Cliente(c.id, c.nomeFantasia) from Cliente c where c.vendedor = null order by c.nomeFantasia asc")
+		return this.entityManager.createQuery(
+				"select new Cliente(c.id, c.nomeFantasia) from Cliente c where c.vendedor = null order by c.nomeFantasia asc")
 				.getResultList();
 
 	}

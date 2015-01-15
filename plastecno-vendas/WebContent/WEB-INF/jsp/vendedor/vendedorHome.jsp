@@ -6,17 +6,14 @@
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/bloco/contato.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 
 
 <script type="text/javascript">
@@ -65,6 +62,19 @@ $(document).ready(function() {
 	inicializarPaginador(
 			'<c:out value="${not empty paginaSelecionada ? paginaSelecionada : 0}"/>', 
 			'<c:out value="${not empty totalPaginas ? totalPaginas : 1}"/>');
+	
+	autocompletar({
+		url : '<c:url value="/vendedor/listagem/nome"/>',
+		campoPesquisavel : 'nome',
+		parametro : 'nome',
+		containerResultados : 'containerPesquisaVendedor',
+		selecionarItem: function(itemLista) {
+			var formVazio = document.getElementById('formVazio');
+			formVazio.action = '<c:url value="/vendedor/edicao"/>';
+			formVazio.elements['idVendedor'].value = itemLista.id;
+			formVazio.submit();
+		}
+	});
 });
 
 function inicializarFiltro() {
@@ -90,10 +100,10 @@ function remover(codigo, sigla) {
 
 
 	<form id="formPesquisa" action="vendedor/listagem" method="get">
-		<input type="hidden" id="filtro_nome" name="filtro.nome" /> <input
-			type="hidden" id="filtro_sobrenome" name="filtro.sobrenome" /> <input
-			type="hidden" id="filtro_email" name="filtro.email" /> <input
-			type="hidden" id="filtro_cpf" name="filtro.cpf" />
+		<input type="hidden" id="filtro_nome" name="filtro.nome" /> 
+		<input type="hidden" id="filtro_sobrenome" name="filtro.sobrenome" /> 
+		<input type="hidden" id="filtro_email" name="filtro.email" /> 
+		<input type="hidden" id="filtro_cpf" name="filtro.cpf" />
 	</form>
 
 	<form id="formVendedor" action="vendedor/associacao/cliente"
@@ -101,7 +111,9 @@ function remover(codigo, sigla) {
 		<input type="hidden" id="id" name="vendedor.id" value="${vendedor.id}" />
 	</form>
 
-	<form id="formVazio" action="vendedor" method="get"></form>
+	<form id="formVazio" action="vendedor" method="get">
+		<input type="hidden" id="idVendedor" name="idVendedor" />
+	</form>
 
 	<fieldset>
 		<legend>::: Dados do Vendedor :::</legend>
@@ -120,6 +132,7 @@ function remover(codigo, sigla) {
 				value="${vendedor.nome}"
 				class="pesquisavel <c:if test="${not empty vendedor.id}">desabilitado</c:if>"
 				<c:if test="${not empty vendedor.id}">disabled='disabled'</c:if> />
+			<div class="suggestionsBox" id="containerPesquisaVendedor" style="display: none; width: 50%"></div>
 		</div>
 		<div class="label">Sobrenome:</div>
 		<div class="input" style="width: 40%">

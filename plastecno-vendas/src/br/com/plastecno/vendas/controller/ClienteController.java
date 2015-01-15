@@ -176,7 +176,7 @@ public final class ClienteController extends AbstractController {
         this.carregarVendedor(cliente);
 
         try {
-            popularPicklist(null, this.clienteService.pesquisarTransportadorasAssociadas(idCliente));
+            popularPicklist(null, this.clienteService.pesquisarTransportadorasRedespacho(idCliente));
         } catch (ControllerException e) {
             gerarLogErroNavegacao("Cliente", e);
         }

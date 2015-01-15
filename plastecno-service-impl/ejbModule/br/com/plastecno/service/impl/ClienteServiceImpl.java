@@ -427,7 +427,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<Transportadora> pesquisarTransportadorasAssociadas(Integer idCliente) {
+	public List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente) {
 		return this.entityManager
 				.createQuery(
 						"select new Transportadora(t.id, t.nomeFantasia) from Cliente c inner join c.listaRedespacho t where c.id = :idCliente and t.ativo = true order by t.nomeFantasia asc")
@@ -437,15 +437,15 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Transportadora> pesquisarTransportadorasDesassociadas(Integer idCliente) {
-		List<Transportadora> listaTransportadora = this.pesquisarTransportadorasAssociadas(idCliente);
+		List<Transportadora> listaTransportadora = this.pesquisarTransportadorasRedespacho(idCliente);
 		Query query = null;
 		if (!listaTransportadora.isEmpty()) {
 			query = this.entityManager
-					.createQuery("select new Transportadora(t.id, t.nomeFantasia) from Transportadora t where t not in (:listaTransportadora) and t.ativo = true by t.nomeFantasia asc");
+					.createQuery("select new Transportadora(t.id, t.nomeFantasia) from Transportadora t where t not in (:listaTransportadora) and t.ativo = true order by t.nomeFantasia asc");
 			query.setParameter("listaTransportadora", listaTransportadora);
 		} else {
 			query = this.entityManager
-					.createQuery("select new Transportadora(t.id, t.nomeFantasia) from Transportadora t by t.nomeFantasia asc");
+					.createQuery("select new Transportadora(t.id, t.nomeFantasia) from Transportadora t order by t.nomeFantasia asc");
 		}
 		return query.getResultList();
 	}

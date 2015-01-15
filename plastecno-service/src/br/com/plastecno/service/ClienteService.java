@@ -74,7 +74,7 @@ public interface ClienteService {
 
     Long pesquisarTotalRegistros(Cliente filtro);
 
-    List<Transportadora> pesquisarTransportadorasAssociadas(Integer idCliente);
+    List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente);
 
     List<Transportadora> pesquisarTransportadorasDesassociadas(Integer idCliente);
 

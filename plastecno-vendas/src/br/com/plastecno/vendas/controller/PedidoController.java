@@ -68,6 +68,7 @@ public class PedidoController extends AbstractController {
             this.importado = importado;
         }
     }
+
     private class PedidoPDFWrapper {
         private final Pedido pedido;
         private final byte[] arquivoPDF;
@@ -85,6 +86,7 @@ public class PedidoController extends AbstractController {
             return pedido;
         }
     }
+
     @Servico
     private TipoEntregaService tipoEntregaService;
     @Servico
@@ -403,7 +405,7 @@ public class PedidoController extends AbstractController {
     @Get("pedido/cliente/{id}")
     public void pesquisarClienteById(Integer id) {
         Cliente cliente = this.clienteService.pesquisarById(id);
-        cliente.setListaRedespacho(this.clienteService.pesquisarTransportadorasAssociadas(id));
+        cliente.setListaRedespacho(this.clienteService.pesquisarTransportadorasRedespacho(id));
         this.carregarVendedor(cliente);
         this.formatarDocumento(cliente);
 
@@ -476,13 +478,26 @@ public class PedidoController extends AbstractController {
             this.formatarPedido(pedido);
             this.formatarDocumento(pedido.getCliente());
 
-            List<Transportadora> listaTransportadora = this.clienteService.pesquisarTransportadorasAssociadas(pedido
+            List<Transportadora> listaRedespacho = this.clienteService.pesquisarTransportadorasRedespacho(pedido
                     .getCliente().getId());
+
+            List<Transportadora> listaTransportadora = this.clienteService.pesquisarTransportadorasDesassociadas(pedido
+                    .getCliente().getId());
+
+            if (!listaRedespacho.contains(pedido.getTransportadoraRedespacho())) {
+                listaRedespacho.add(pedido.getTransportadoraRedespacho());
+            }
+
+            if (!listaTransportadora.contains(pedido.getTransportadora())) {
+                listaTransportadora.add(pedido.getTransportadora());
+            }
+
             List<ItemPedido> listaItem = this.pedidoService.pesquisarItemPedidoByIdPedido(pedido.getId());
 
             formatarItemPedido(listaItem);
 
             addAtributo("listaTransportadora", listaTransportadora);
+            addAtributo("listaRedespacho", listaRedespacho);
             addAtributo("listaItemPedido", listaItem);
             addAtributo("contemItem", !listaItem.isEmpty());
             addAtributo("pedido", pedido);

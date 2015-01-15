@@ -298,9 +298,9 @@ $(document).ready(function() {
 				<select id="listaRedespacho"
 					name="pedido.transportadoraRedespacho.id" style="width: 80%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
-					<c:forEach var="transportadora" items="${listaTransportadora}">
-						<option value="${transportadora.id}"
-							<c:if test="${transportadora.id eq pedido.transportadoraRedespacho.id}">selected</c:if>>${transportadora.nomeFantasia}</option>
+					<c:forEach var="redespacho" items="${listaRedespacho}">
+						<option value="${redespacho.id}"
+							<c:if test="${redespacho.id eq pedido.transportadoraRedespacho.id}">selected</c:if>>${redespacho.nomeFantasia}</option>
 					</c:forEach>
 				</select>
 			</div>

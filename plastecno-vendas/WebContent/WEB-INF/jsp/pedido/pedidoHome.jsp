@@ -117,9 +117,9 @@ $(document).ready(function() {
 	inserirMascaraMonetaria('medidaExterna', 8);
 	inserirMascaraMonetaria('medidaInterna', 8);
 	
-	inicializarPaginador(
-			'<c:out value="${not empty paginaSelecionada ? paginaSelecionada : 0}"/>', 
-			'<c:out value="${not empty totalPaginas ? totalPaginas : 1}"/>');
+
+	<jsp:include page="/bloco/bloco_paginador.jsp" />
+	
 	inicializarAutomcompleteCliente('<c:url value="/pedido/cliente"/>');
 
 	<c:if test="${pedidoDesabilitado}">

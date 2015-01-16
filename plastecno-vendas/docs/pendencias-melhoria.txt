@@ -1,7 +1,7 @@
 1) Cabecalho do relatorio de venda por representada ainda exibe o problema de "encoding" com o ser vidor da integrator.
-2) Inserir autocomplete no campo "nome" no cadastro de clientes
-3) Inserir autocomplete no campo "nome" no cadastro de vendedores
-4) Inserir autocomplete no campo "nome" no cadastro de usuarios
-5) O icone "inicio e fim" da paginacao nao funciona corretamente, primeiro temos que clicar em algum numero para 
+ok 2) Inserir autocomplete no campo "nome" no cadastro de clientes
+ok 3) Inserir autocomplete no campo "nome" no cadastro de vendedores
+ok 4) Inserir autocomplete no campo "nome" no cadastro de usuarios
+ok 5) O icone "inicio e fim" da paginacao nao funciona corretamente, primeiro temos que clicar em algum numero para 
 paginar para somente depois navegarmos para a primeira e ultimas paginas.
 6) Corpo do email de envio de pedido esta com problema de codificação.

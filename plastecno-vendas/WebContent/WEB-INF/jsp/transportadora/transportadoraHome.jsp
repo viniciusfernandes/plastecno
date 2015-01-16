@@ -67,9 +67,9 @@ $(document).ready(function() {
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
 	
 	tabelaContatoHandler = inicializarBlocoContato('<c:url value="/transportadora"/>');
-	inicializarPaginador(
-			'<c:out value="${not empty paginaSelecionada ? paginaSelecionada : 0}"/>', 
-			'<c:out value="${not empty totalPaginas ? totalPaginas : 1}"/>');
+
+	<jsp:include page="/bloco/bloco_paginador.jsp" />
+	
 			
 });
 

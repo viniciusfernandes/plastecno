@@ -38,9 +38,9 @@ $(document).ready(function() {
 		mensagemEspera: 'CARREGANDO OS BAIRROS ...',
 		parametro: 'cep'
 	});
-	inicializarPaginador(
-			'<c:out value="${not empty paginaSelecionada ? paginaSelecionada : 0}"/>', 
-			'<c:out value="${not empty totalPaginas ? totalPaginas : 1}"/>');
+
+	<jsp:include page="/bloco/bloco_paginador.jsp" />
+	
 	
 	new PickList().initPickList();
 

@@ -336,8 +336,8 @@ public abstract class AbstractController {
      * pagina
      */
     <T> void inicializarPaginacao(Integer paginaSelecionada, PaginacaoWrapper<T> paginacao, String nomeLista) {
-        if (paginaSelecionada == null) {
-            paginaSelecionada = 0;
+        if (paginaSelecionada == null || paginaSelecionada <= 1) {
+            paginaSelecionada = 1;
         }
         this.result.include("paginaSelecionada", paginaSelecionada);
         this.result.include("totalPaginas", this.calcularTotalPaginas(paginacao.getTotalPaginado()));
@@ -462,8 +462,8 @@ public abstract class AbstractController {
      * pagina
      */
     void paginarPesquisa(Integer paginaSelecionada, Long totalRegistros) {
-        if (paginaSelecionada == null) {
-            paginaSelecionada = 0;
+        if (paginaSelecionada == null || paginaSelecionada <= 1) {
+            paginaSelecionada = 1;
         }
         this.result.include("paginaSelecionada", paginaSelecionada);
         this.result.include("totalPaginas", this.calcularTotalPaginas(totalRegistros));

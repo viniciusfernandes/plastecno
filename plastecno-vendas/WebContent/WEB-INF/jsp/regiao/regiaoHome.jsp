@@ -7,11 +7,9 @@
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 
@@ -32,23 +30,21 @@ $(document).ready(function() {
 		$('#formRegiao').attr("action",$('#formRegiao').attr("action")+'?'+ parametros);
 		$('#formRegiao').submit();
 	});
-	//inicializarPesquisaBairro();
+	
 	inicializarCampoPesquisaPicklist({
 		url: '<c:url value="regiao/bairro/listagem"/>', 
 		mensagemEspera: 'CARREGANDO OS BAIRROS ...',
 		parametro: 'cep'
 	});
 
-	<jsp:include page="/bloco/bloco_paginador.jsp" />
-	
-	
 	new PickList().initPickList();
 
+	<jsp:include page="/bloco/bloco_paginador.jsp" />
 });
 
 
 function inicializarFiltro() {
-	$("#filtroNome").val($("#nome").val());
+	$("#formPesquisa #filtroNome").val($("#nome").val());
 }
 
 function inicializarPesquisaBairro() {
@@ -99,8 +95,7 @@ function inicializarPesquisaBairro() {
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 
-	<form id="formPesquisa" action="<c:url value="/regiao/listagem"/>"
-		method="get">
+	<form id="formPesquisa" action="<c:url value="/regiao/listagem"/>" method="get">
 		<input type="hidden" id="filtroNome" name="filtro.nome" />
 	</form>
 

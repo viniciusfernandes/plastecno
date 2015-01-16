@@ -92,12 +92,10 @@ function inicializarFiltro() {
 
 	<form id="formVazio" action="transportadora" method="get"></form>
 
-	<form id="formPesquisa"
-		action="<c:url value="/transportadora/listagem"/>" method="get">
-		<input type="hidden" id="filtroNomeFantasia"
-			name="filtro.nomeFantasia" /> <input type="hidden" id="filtroCnpj"
-			name="filtro.cnpj" /> <input type="hidden" id="filtroRazaoSocial"
-			name="filtro.razaoSocial" />
+	<form id="formPesquisa" action="<c:url value="/transportadora/listagem"/>" method="get">
+		<input type="hidden" id="filtroNomeFantasia" name="filtro.nomeFantasia" /> 
+		<input type="hidden" id="filtroCnpj" name="filtro.cnpj" /> 
+		<input type="hidden" id="filtroRazaoSocial" name="filtro.razaoSocial" />
 	</form>
 
 	<form id="formTransportadora"

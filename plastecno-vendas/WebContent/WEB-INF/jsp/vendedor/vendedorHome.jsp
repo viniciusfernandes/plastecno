@@ -59,9 +59,8 @@ $(document).ready(function() {
 	};
 	
 	inserirMascaraCPF('cpf');
-	inicializarPaginador(
-			'<c:out value="${not empty paginaSelecionada ? paginaSelecionada : 0}"/>', 
-			'<c:out value="${not empty totalPaginas ? totalPaginas : 1}"/>');
+	
+	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	autocompletar({
 		url : '<c:url value="/vendedor/listagem/nome"/>',

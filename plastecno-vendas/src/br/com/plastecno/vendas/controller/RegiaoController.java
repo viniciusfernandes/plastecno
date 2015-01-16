@@ -92,6 +92,7 @@ public class RegiaoController extends AbstractController {
                 this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
 
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaRegiao");
+        addAtributo("regiao", filtro);
     }
 
     @Get("regiao/bairro/listagem")

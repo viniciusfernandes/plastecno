@@ -161,9 +161,9 @@ public final class ClienteController extends AbstractController {
         final PaginacaoWrapper<Cliente> paginacao = this.clienteService.paginarCliente(filtro, true,
                 this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
 
-        for (Cliente cliente : paginacao.getLista()) {
-            cliente.setCnpj(formatarCNPJ(cliente.getCnpj()));
-            cliente.setCpf(formatarCPF(cliente.getCpf()));
+        for (Cliente cli : paginacao.getLista()) {
+            cli.setCnpj(formatarCNPJ(cli.getCnpj()));
+            cli.setCpf(formatarCPF(cli.getCpf()));
         }
 
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaCliente");

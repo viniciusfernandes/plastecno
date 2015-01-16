@@ -28,7 +28,7 @@ function toLowerCaseInput (){
 	});
 }
 
-function inicializarPaginador(paginaSelecionada, totalPaginas) {
+function inicializarPaginador(inicializarFiltro, paginaSelecionada, totalPaginas) {
 	$("#paginador").paginate({
 		count 		: totalPaginas,
 		start 		: paginaSelecionada,
@@ -56,6 +56,7 @@ function inicializarPaginador(paginaSelecionada, totalPaginas) {
 		}
 		
 		toUpperCaseInput();
+		inicializarFiltro();
 		var input = $("<input>").attr("type", "hidden").attr("name", "paginaSelecionada").val(pagina);
 		$('#formPesquisa').append($(input));
 		$('#formPesquisa').submit();

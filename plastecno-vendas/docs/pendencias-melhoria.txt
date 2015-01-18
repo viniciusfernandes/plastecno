@@ -5,3 +5,5 @@ ok 4) Inserir autocomplete no campo "nome" no cadastro de usuarios
 ok 5) O icone "inicio e fim" da paginacao nao funciona corretamente, primeiro temos que clicar em algum numero para 
 paginar para somente depois navegarmos para a primeira e ultimas paginas.
 6) Corpo do email de envio de pedido esta com problema de codificação.
+7) Implementar uma tela de "modal" contendo a identidade visual do sistema para substituir o "consele" do browser.
+8) Colocar o foco no autocomplete apos a pesquisa utilizando o tecka tab ou "seta down"

@@ -18,11 +18,12 @@
 	width: 50%;
 }
 </style>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
+
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 
 <script type="text/javascript">
 
@@ -50,12 +51,20 @@ function inicializarFiltro() {
 	$("#filtroDescricao").val($("#descricao").val());	
 }
 
+function inicializarModalCancelamento(botao){
+	inicializarModalConfirmacao({
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja DESATIVAR esse ramo de atividade?',
+		confirmar: function(){
+			$(botao).closest('form').submit();	
+		}
+	});
+}
 </script>
 
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-
+	<div id="modal"></div>
 	<form id="formVazio" action="ramo" method="get"></form>
 
 	<form id="formPesquisa" action="<c:url value="/ramo/listagem"/>"
@@ -139,10 +148,9 @@ function inicializarFiltro() {
 										<form action="<c:url value="/ramo/desativacao"/>"
 											method="post">
 
-											<input type="hidden" name="id" value="${ramo.id}"> <input
-												type="submit" title="Desativar Ramo de Atividades" value=""
-												class="botaoRemover"
-												onclick="javascript: return confirm('Voce deseja mesmo desativar o RAMO?');" />
+											<input type="hidden"  name="id" value="${ramo.id}"> 
+											<input type="button" id="desativarRamo_${ramo.id}" title="Desativar Ramo de Atividades" value=""
+												class="botaoRemover" onclick="inicializarModalCancelamento(this);" />
 
 										</form>
 									</c:if>

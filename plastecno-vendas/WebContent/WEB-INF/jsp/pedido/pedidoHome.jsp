@@ -80,13 +80,6 @@ $(document).ready(function() {
 		
 	});
 	
-	$("#botaoCancelarPedido").click(function() {
-		var confirmado = confirm("Essa ação não poderá será desfeita. Você tem certeza de que deseja cancelar esse pedido?");
-		if(confirmado) {
-			$(this).closest('form').submit();	
-		}
-	});
-	
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	
 	inserirMascaraData('dataEntrega');
@@ -127,13 +120,22 @@ $(document).ready(function() {
 	habilitar('#bloco_item_pedido #ipi', <c:out value="${not ipiDesabilitado}"/>);
 	habilitar('#idRepresentada', <c:out value="${not empty pedido.id and contemItem}"/>);
 	
-	inicializarModalConfirmacao({
-		idModal: 'confirmacaoRefazerPedido',
-		idButton: 'botaoRefazerPedido',
-		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REFAZER esse pedido?',
-		confirmar: function(){
-			$('#botaoRefazerPedido').closest('form').submit();	
-		}
+	$('#botaoRefazerPedido').click(function (){
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REFAZER esse pedido?',
+			confirmar: function(){
+				$('#botaoRefazerPedido').closest('form').submit();	
+			}
+		});
+	});	
+	
+	$('#botaoCancelarPedido').click(function (){
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja CANCELAR esse pedido?',
+			confirmar: function(){
+				$('#botaoCancelarPedido').closest('form').submit();	
+			}
+		});
 	});
 });
 
@@ -143,7 +145,7 @@ $(document).ready(function() {
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-	<div id="confirmacaoRefazerPedido"></div>
+	<div id="modal"></div>
 
 	<form id="formVazio" action="pedido" method="get"></form>
 

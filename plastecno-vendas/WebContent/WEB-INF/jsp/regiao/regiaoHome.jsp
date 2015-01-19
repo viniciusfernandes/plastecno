@@ -13,6 +13,9 @@
 <script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
+
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -89,12 +92,22 @@ function inicializarPesquisaBairro() {
 	});
 }
 
+
+function inicializarModalCancelamento(botao){
+	inicializarModalConfirmacao({
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REMOVER essa região?',
+		confirmar: function(){
+			$(botao).closest('form').submit();	
+		}
+	});
+}
+
 </script>
 
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-
+	<div id="modal"></div>
 	<form id="formPesquisa" action="<c:url value="/regiao/listagem"/>" method="get">
 		<input type="hidden" id="filtroNome" name="filtro.nome" />
 	</form>
@@ -156,9 +169,9 @@ function inicializarPesquisaBairro() {
 									<c:if test="${acessoCadastroBasicoPermitido}">
 										<form action="<c:url value="/regiao/remocao"/>" method="post">
 											<input type="hidden" name="idRegiao" value="${regiao.id}">
-											<input type="submit" id="botaoRemoverRegiao"
+											<input type="button" id="botaoRemoverRegiao"
 												title="Remover Região" value="" class="botaoRemover"
-												onclick="javascript: return confirm('Voce deseja mesmo remover a REGIÃO?');" />
+												onclick="inicializarModalCancelamento(this);"/>
 										</form>
 									</c:if>
 								</div>

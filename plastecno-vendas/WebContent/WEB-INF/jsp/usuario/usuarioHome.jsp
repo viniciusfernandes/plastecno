@@ -17,6 +17,9 @@
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
+
 <script type="text/javascript">
 
 var tabelaContatoHandler = null;
@@ -95,12 +98,20 @@ function inicializarFiltro () {
 	$("#filtro_email").val($("#email").val());	
 };
 
+function inicializarModalCancelamento(botao){
+	inicializarModalConfirmacao({
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja DESATIVAR esse usuário?',
+		confirmar: function(){
+			$(botao).closest('form').submit();	
+		}
+	});
+}
 </script>
 
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-
+	<div id="modal"></div>
 
 	<form id="formPesquisa" action="usuario/listagem" method="get">
 		<input type="hidden" id="filtro_nome" name="filtro.nome" /> 
@@ -240,9 +251,9 @@ function inicializarFiltro () {
 										<form action="<c:url value="/usuario/desativacao"/>"
 											method="post">
 											<input type="hidden" name="idUsuario" value="${usuario.id}">
-											<input type="submit" title="Desativar Usuário" value=""
+											<input type="button" title="Desativar Usuário" value=""
 												class="botaoRemover"
-												onclick="javascript: return confirm('Voce deseja mesmo desativar o USUARIO?');" />
+												onclick="inicializarModalCancelamento(this);" />
 										</form>
 									</c:if>
 								</div>

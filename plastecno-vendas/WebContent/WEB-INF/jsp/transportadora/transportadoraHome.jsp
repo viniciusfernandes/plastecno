@@ -15,19 +15,17 @@ body {
 }
 </style>
 
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.mask.min.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.paginate.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/tabela_handler.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/bloco/contato.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
+
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 
 
 <script type="text/javascript">
@@ -79,6 +77,14 @@ function inicializarFiltro() {
 	$("#filtroRazaoSocial").val($("#razaoSocial").val());
 }
 
+function inicializarModalCancelamento(botao){
+	inicializarModalConfirmacao({
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja DESATIVAR esse transportadora?',
+		confirmar: function(){
+			$(botao).closest('form').submit();	
+		}
+	});
+}
 </script>
 
 </head>
@@ -89,7 +95,7 @@ function inicializarFiltro() {
 	<input type="hidden" name="contato.id" value="${contato.id}">
 
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-
+	<div id="modal"></div>
 	<form id="formVazio" action="transportadora" method="get"></form>
 
 	<form id="formPesquisa" action="<c:url value="/transportadora/listagem"/>" method="get">
@@ -215,10 +221,11 @@ function inicializarFiltro() {
 										<form action="<c:url value="/transportadora/desativacao"/>"
 											method="post">
 											<input type="hidden" name="idTransportadora"
-												value="${transportadora.id}"> <input type="submit"
+												value="${transportadora.id}"> 
+											<input type="button"
 												title="Remover Dados do(a) Transportadora" value=""
 												class="botaoRemover"
-												onclick="javascript: return confirm('Voce tem certeza de que deseja desativar a TRANSPORTADORA?');" />
+												onclick="inicializarModalCancelamento(this);" />
 										</form>
 									</c:if>
 								</div>

@@ -149,7 +149,7 @@ function inicializarModalCancelamento(botao){
 											method="post">
 
 											<input type="hidden"  name="id" value="${ramo.id}"> 
-											<input type="button" id="desativarRamo_${ramo.id}" title="Desativar Ramo de Atividades" value=""
+											<input type="button" title="Desativar Ramo de Atividades" value=""
 												class="botaoRemover" onclick="inicializarModalCancelamento(this);" />
 
 										</form>

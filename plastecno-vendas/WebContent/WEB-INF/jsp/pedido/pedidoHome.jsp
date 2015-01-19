@@ -1,33 +1,25 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE html >
+<!DOCTYPE html>
 <html>
 <head>
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/tabela_handler.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/bloco/contato.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/autocomplete.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.mask.min.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/pedido/pedido.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
-
+<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/pedido/pedido.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 
 <style type="text/css">
 .listrada td:last-child form input:first-child {
@@ -95,13 +87,6 @@ $(document).ready(function() {
 		}
 	});
 	
-	$("#botaoRefazerPedido").click(function() {
-		var confirmado = confirm("Essa ação não poderá será desfeita. Você tem certeza de que deseja refazer esse pedido?");
-		if(confirmado) {
-			$(this).closest('form').submit();	
-		}
-	});
-
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	
 	inserirMascaraData('dataEntrega');
@@ -142,6 +127,14 @@ $(document).ready(function() {
 	habilitar('#bloco_item_pedido #ipi', <c:out value="${not ipiDesabilitado}"/>);
 	habilitar('#idRepresentada', <c:out value="${not empty pedido.id and contemItem}"/>);
 	
+	inicializarModalConfirmacao({
+		idModal: 'confirmacaoRefazerPedido',
+		idButton: 'botaoRefazerPedido',
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REFAZER esse pedido?',
+		confirmar: function(){
+			$('#botaoRefazerPedido').closest('form').submit();	
+		}
+	});
 });
 
 
@@ -150,7 +143,7 @@ $(document).ready(function() {
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-
+	<div id="confirmacaoRefazerPedido"></div>
 
 	<form id="formVazio" action="pedido" method="get"></form>
 
@@ -335,26 +328,22 @@ $(document).ready(function() {
 	</form>
 	<div class="bloco_botoes">
 		<form id="formPesquisa" action="pedido/listagem" method="get">
-			<input type="hidden" name="idCliente" id="idClientePesquisa"
-				value="${cliente.id}" /> <input type="submit" value=""
-				title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
+			<input type="hidden" name="idCliente" id="idClientePesquisa" value="${cliente.id}" /> 
+			<input type="submit" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
 		</form>
 		<form action="pedido" method="get">
 			<input type="submit" value="" title="Limpar Dados do Pedido"
 				class="botaoLimpar" />
 		</form>
 		<form action="pedido/pdf" method="get">
-			<input type="hidden" name="idPedido" id="idPedidoImpressao"
-				value="${pedido.id}" /> <input type="button"
-				id="botaoImpressaoPedido" value="" title="Imprimir Pedido"
-				class="botaoPDF" />
+			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}" /> 
+			<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF" />
 		</form>
 
 		<c:if test="${acessoRefazerPedidoPermitido}">
 			<form action="pedido/refazer" method="post">
-				<input type="hidden" name="idPedido" id="idPedido"
-					value="${pedido.id}" /> <input id="botaoRefazerPedido"
-					type="button" value="" title="Refazer Pedido" class="botaoRefazer" />
+				<input type="hidden" name="idPedido" id="idPedido" value="${pedido.id}" /> 
+				<input id="botaoRefazerPedido" type="button" value="" title="Refazer Pedido" class="botaoRefazer" />
 			</form>
 		</c:if>
 		<c:if test="${acessoCancelamentoPedidoPermitido}">
@@ -446,5 +435,6 @@ $(document).ready(function() {
 			</table>
 		</div>
 	</fieldset>
+	
 </body>
 </html>

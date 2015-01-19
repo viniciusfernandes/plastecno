@@ -9,6 +9,8 @@
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/${initParam['padraoCSS']}/formulario.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/${initParam['padraoCSS']}/paginacao.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/${initParam['padraoCSS']}/autocomplete.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/jquery-ui-1.10.3.custom.min.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/jquery-ui-1.10.3.datepicker.min.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/jquery-ui-1.10.4.dialog.min.css"/>" />
+
 
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/picklist.css"/>" />

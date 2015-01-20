@@ -113,6 +113,7 @@ public class PedidoController extends AbstractController {
             HttpServletRequest request) {
         super(result, usuarioInfo);
         this.liberarAcesso("acessoVendaPermitida", usuarioInfo.isVendaPermitida());
+        this.verificarPermissaoAcesso("acessoCompraPermitido", TipoAcesso.CADASTRO_PEDIDO_COMPRA);
         this.geradorRelatorio = gerador;
         this.diretorioTemplateRelatorio = request.getServletContext().getRealPath("/templates");
     }
@@ -501,6 +502,7 @@ public class PedidoController extends AbstractController {
             addAtributo("listaItemPedido", listaItem);
             addAtributo("contemItem", !listaItem.isEmpty());
             addAtributo("pedido", pedido);
+            addAtributo("tipoPedido", pedido.getTipoPedido());
             addAtributo("vendedor", this.pedidoService.pesquisarVendedor(id));
             addAtributo("cliente", pedido.getCliente());
             addAtributo("contato", pedido.getContato());

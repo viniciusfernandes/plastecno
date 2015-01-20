@@ -29,6 +29,7 @@ import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
@@ -125,6 +126,11 @@ public class Pedido implements Serializable, Cloneable {
 	@JoinTable(name = "tb_pedido_tb_logradouro", schema = "vendas", joinColumns = { @JoinColumn(name = "id_pedido", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_logradouro", referencedColumnName = "id") })
 	private List<Logradouro> listaLogradouro;
 
+	@Column(name = "id_tipo_pedido")
+	@Enumerated(EnumType.ORDINAL)
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo do pedido")
+	private TipoPedido tipoPedido;
+
 	@Transient
 	private String dataInclusaoFormatada;
 
@@ -160,6 +166,11 @@ public class Pedido implements Serializable, Cloneable {
 	@Override
 	public Pedido clone() throws CloneNotSupportedException {
 		return (Pedido) super.clone();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Pedido && id != null && id.equals(((Pedido) o).id);
 	}
 
 	public Cliente getCliente() {
@@ -234,6 +245,10 @@ public class Pedido implements Serializable, Cloneable {
 		return tipoEntrega;
 	}
 
+	public TipoPedido getTipoPedido() {
+		return tipoPedido;
+	}
+
 	public Transportadora getTransportadora() {
 		return transportadora;
 	}
@@ -262,8 +277,17 @@ public class Pedido implements Serializable, Cloneable {
 		return vendedor;
 	}
 
+	@Override
+	public int hashCode() {
+		return id != null ? id : -1;
+	}
+
 	public boolean isClienteNotificadoVenda() {
 		return this.clienteNotificadoVenda;
+	}
+
+	public boolean isCompra() {
+		return TipoPedido.COMPRA.equals(tipoPedido);
 	}
 
 	public boolean isEnviado() {
@@ -272,6 +296,14 @@ public class Pedido implements Serializable, Cloneable {
 
 	public boolean isOrcamento() {
 		return SituacaoPedido.ORCAMENTO.equals(this.situacaoPedido);
+	}
+
+	public boolean isRepresentacao() {
+		return TipoPedido.REPRESENTACAO.equals(tipoPedido);
+	}
+
+	public boolean isRevenda() {
+		return TipoPedido.REVENDA.equals(tipoPedido);
 	}
 
 	public void setCliente(Cliente cliente) {
@@ -352,6 +384,10 @@ public class Pedido implements Serializable, Cloneable {
 		this.tipoEntrega = tipoEntrega;
 	}
 
+	public void setTipoPedido(TipoPedido tipoPedido) {
+		this.tipoPedido = tipoPedido;
+	}
+
 	public void setTransportadora(Transportadora transportadora) {
 		this.transportadora = transportadora;
 	}
@@ -378,15 +414,5 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setVendedor(Usuario vendedor) {
 		this.vendedor = vendedor;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return o instanceof Pedido && id != null && id.equals(((Pedido) o).id);
-	}
-
-	@Override
-	public int hashCode() {
-		return id != null ? id : -1;
 	}
 }

@@ -31,6 +31,7 @@ import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.GenericDAO;
@@ -166,6 +167,7 @@ public class PedidoServiceTest extends GenericTest {
 		pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 		pedido.setFinalidadePedido(FinalidadePedido.CONSUMO);
 		pedido.setContato(contato);
+		pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
 		return pedido;
 	}
 

@@ -7,3 +7,4 @@ paginar para somente depois navegarmos para a primeira e ultimas paginas.
 6) Corpo do email de envio de pedido esta com problema de codificação.
 ok 7) Implementar uma tela de "modal" contendo a identidade visual do sistema para substituir o "consele" do browser.
 8) Colocar o foco no autocomplete apos a pesquisa utilizando o tecka tab ou "seta down"
+9) Criar um esquema sequencial em que os scripts de criacao do banco devem ser executados.

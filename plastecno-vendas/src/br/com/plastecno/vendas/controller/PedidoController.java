@@ -26,6 +26,7 @@ import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -378,6 +379,13 @@ public class PedidoController extends AbstractController {
         }
     }
 
+    @Get("pedido/compra")
+    public void pedidoCompra() {
+        addAtributo("tipoPedido", TipoPedido.COMPRA);
+        addAtributo("descricaoTipoPedido", TipoPedido.COMPRA.getDescricao());
+        redirecTo(this.getClass()).pedidoHome();
+    }
+
     @Get("pedido")
     public void pedidoHome() {
         inicializarListaSituacaoPedido();
@@ -398,6 +406,20 @@ public class PedidoController extends AbstractController {
         if (!contemAtributo("pedidoDesabilitado")) {
             addAtributo("pedidoDesabilitado", false);
         }
+    }
+
+    @Get("pedido/representacao")
+    public void pedidoRepresentacao() {
+        addAtributo("tipoPedido", TipoPedido.REPRESENTACAO);
+        addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
+        redirecTo(this.getClass()).pedidoHome();
+    }
+
+    @Get("pedido/revenda")
+    public void pedidoRevenda() {
+        addAtributo("tipoPedido", TipoPedido.REVENDA);
+        addAtributo("descricaoTipoPedido", TipoPedido.REVENDA.getDescricao());
+        redirecTo(this.getClass()).pedidoHome();
     }
 
     /*
@@ -502,6 +524,8 @@ public class PedidoController extends AbstractController {
             addAtributo("listaItemPedido", listaItem);
             addAtributo("contemItem", !listaItem.isEmpty());
             addAtributo("pedido", pedido);
+            addAtributo("tipoPedido", pedido.getTipoPedido());
+            addAtributo("descricaoTipoPedido", pedido.getTipoPedido().getDescricao());
             addAtributo("tipoPedido", pedido.getTipoPedido());
             addAtributo("vendedor", this.pedidoService.pesquisarVendedor(id));
             addAtributo("cliente", pedido.getCliente());

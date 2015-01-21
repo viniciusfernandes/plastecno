@@ -162,26 +162,9 @@ $(document).ready(function() {
 
 			<div class="label obrigatorio">Tipo:</div>
 			<div class="input">
-				<input type="radio" name="pedido.tipoPedido"
-					value="${tipoPedido}"
-					<c:if test="${empty pedido or tipoPedido eq pedido.tipoPedido}">checked</c:if> />
+				<input type="radio" name="pedido.tipoPedido" value="${tipoPedido}" checked/>
 			</div>
-			<div class="label label_radio_button">Representação</div>
-			
-			<div class="input">
-				<input type="radio" name="pedido.tipoPedido"
-					value="${tipoPedido}"
-					<c:if test="${not empty pedido and tipoPedido eq pedido.tipoPedido}">checked</c:if> />
-			</div>
-			<div class="label label_radio_button">Revenda</div>
-			
-			<div class="input">
-					<input type="radio" name="pedido.tipoPedido"
-						value="${tipoPedido}"
-						<c:if test="${not empty pedido and tipoPedido eq pedido.tipoPedido}">checked</c:if> 
-						<c:if test="${not acessoCompraPermitido}">disabled="disabled"</c:if>/>
-				</div>
-				<div class="label label_radio_button" style="width: 50%">Compra</div>
+			<div class="label label_radio_button" style="width: 80%">${descricaoTipoPedido}</div>
 			
 			<div class="label">Vendedor:</div>
 			<div class="input" style="width: 40%">

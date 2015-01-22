@@ -129,7 +129,10 @@ public class PedidoServiceImpl implements PedidoService {
 		 */
 		pedido.addLogradouro(clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
 		pedido.setDataEnvio(new Date());
-
+		if (pedido.isCompra()) {
+			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+		}
+		
 		validarEnvio(pedido);
 
 		if (pedido.isOrcamento()) {

@@ -131,7 +131,7 @@ public class ClienteServiceImpl implements ClienteService {
 		validarDocumentosPreenchidos(cliente);
 		validarListaLogradouroPreenchida(cliente);
 		inserirEndereco(cliente);
-		return this.entityManager.merge(cliente);
+		return clienteDAO.inserir(cliente);
 	}
 
 	@Override
@@ -182,18 +182,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	public boolean isEmailExistente(Integer idCliente, String email) {
-		Query query = null;
-		if (idCliente == null) {
-			query = this.entityManager.createQuery("select count(r.id) from Cliente r where r.email = :email ");
-			query.setParameter("email", email);
-		} else {
-			query = this.entityManager
-					.createQuery("select count(r.id) from Cliente  r where r.id != :id AND r.email = :email ");
-			query.setParameter("email", email);
-			query.setParameter("id", idCliente);
-		}
-
-		return QueryUtil.gerarRegistroUnico(query, Long.class, 0L) > 1;
+		return clienteDAO.isEmailExistente(idCliente, email);
 	}
 
 	@Override

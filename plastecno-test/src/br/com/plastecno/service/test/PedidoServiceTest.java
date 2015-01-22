@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.EmailService;
+import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
@@ -34,6 +35,7 @@ import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.dao.ClienteDAO;
+import br.com.plastecno.service.dao.EnderecoDAO;
 import br.com.plastecno.service.dao.GenericDAO;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.MaterialDAO;
@@ -51,12 +53,14 @@ import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pais;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.impl.ClienteServiceImpl;
 import br.com.plastecno.service.impl.EmailServiceImpl;
+import br.com.plastecno.service.impl.EnderecamentoServiceImpl;
 import br.com.plastecno.service.impl.LogradouroServiceImpl;
 import br.com.plastecno.service.impl.MaterialServiceImpl;
 import br.com.plastecno.service.impl.PedidoServiceImpl;
@@ -64,21 +68,46 @@ import br.com.plastecno.service.impl.RepresentadaServiceImpl;
 import br.com.plastecno.service.impl.UsuarioServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
-public class PedidoServiceTest extends GenericTest {
+public class PedidoServiceTest extends GenericTestRepository {
 
+	public ClienteService clienteService;
 	public PedidoService pedidoService;
+
+	private Cliente gerarCliente() {
+		Cliente cliente = new Cliente();
+		cliente.setProspeccaoFinalizada(false);
+		cliente.addLogradouro(gerarLogradouroCliente(TipoLogradouro.FATURAMENTO));
+		cliente.addLogradouro(gerarLogradouroCliente(TipoLogradouro.ENTREGA));
+		cliente.addLogradouro(gerarLogradouroCliente(TipoLogradouro.COBRANCA));
+		cliente.setRazaoSocial("Exercito Brasileiro");
+		cliente.setNomeFantasia("Exercito Brasileiro");
+		cliente.setCnpj("25632147000125");
+		cliente.setRamoAtividade(gerarRamoAtividade());
+
+		cliente.setId(gerarId());
+		return cliente;
+	}
 
 	private ClienteService gerarClienteService() {
 		ClienteServiceImpl clienteService = new ClienteServiceImpl();
 
 		new MockUp<ClienteDAO>() {
 			@Mock
-			List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
-				return new ArrayList<LogradouroCliente>();
+			boolean isEmailExistente(Integer idCliente, String email) {
+				return contemEntidade(Cliente.class, "email", email, idCliente);
 			}
+
+			@Mock
+			List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
+				Cliente cliente = pesquisarEntidadeById(Cliente.class, idCliente);
+				return cliente == null ? new ArrayList<LogradouroCliente>() : cliente.getListaLogradouro();
+			}
+
 		};
 
 		inject(clienteService, new ClienteDAO(null), "clienteDAO");
+		inject(clienteService, gerarLogradouroService(), "logradouroService");
+		inject(clienteService, gerarEnderecamentoService(), "enderecamentoService");
 		return clienteService;
 	}
 
@@ -93,20 +122,56 @@ public class PedidoServiceTest extends GenericTest {
 		return emailService;
 	}
 
+	private EnderecamentoService gerarEnderecamentoService() {
+		EnderecamentoService enderecamentoService = new EnderecamentoServiceImpl();
+		new MockUp<EnderecoDAO>() {
+			@Mock
+			boolean isUFExistente(String sigla, Integer idPais) {
+				return true;
+			}
+
+			@Mock
+			Integer pesquisarIdBairroByDescricao(String descricao, Integer idCidade) {
+				return 1;
+			}
+
+			@Mock
+			Integer pesquisarIdCidadeByDescricao(String descricao, Integer idPais) {
+				return 1;
+			}
+
+			@Mock
+			Integer pesquisarIdPaisByDescricao(String descricao) {
+				return 1;
+			}
+
+		};
+		inject(enderecamentoService, new EnderecoDAO(null), "enderecoDAO");
+		return enderecamentoService;
+	}
+
 	private Endereco gerarEndereco() {
 		Bairro bairro = new Bairro();
 		bairro.setDescricao("Centro");
-		bairro.setId(1);
+		bairro.setId(gerarId());
 
 		Cidade cidade = new Cidade();
 		cidade.setDescricao("Sao Paulo");
-		cidade.setId(1);
+		cidade.setUf("SP");
+		cidade.setId(gerarId());
 
 		Pais pais = new Pais();
-		pais.setId(1);
+		pais.setId(gerarId());
 		pais.setDescricao("Brasil");
 
 		Endereco endereco = new Endereco(bairro, cidade, pais);
+		endereco.setCep("09910456");
+		endereco.setDescricao("Av Paulista");
+
+		inserirEntidade(bairro);
+		inserirEntidade(cidade);
+		inserirEntidade(pais);
+		inserirEntidade(endereco);
 		return endereco;
 	}
 
@@ -130,8 +195,16 @@ public class PedidoServiceTest extends GenericTest {
 		return logradouro;
 	}
 
+	private LogradouroCliente gerarLogradouroCliente(TipoLogradouro tipoLogradouro) {
+		LogradouroCliente logradouro = new LogradouroCliente(gerarEndereco());
+		logradouro.setTipoLogradouro(tipoLogradouro);
+		return logradouro;
+	}
+
 	private LogradouroService gerarLogradouroService() {
-		return new LogradouroServiceImpl();
+		LogradouroService logradouroService = new LogradouroServiceImpl();
+		inject(logradouroService, gerarEnderecamentoService(), "enderecamentoService");
+		return logradouroService;
 	}
 
 	private Material gerarMaterial() {
@@ -154,9 +227,10 @@ public class PedidoServiceTest extends GenericTest {
 	}
 
 	private Pedido gerarPedido() {
-		Cliente cliente = new Cliente(1, "Vinicius");
+		Usuario vendedor = gerarVendedor();
+		Cliente cliente = gerarCliente();
+		cliente.setVendedor(vendedor);
 		Representada representada = new Representada(1, "COBEX");
-		Usuario vendedor = new Usuario(1, null, null);
 		Contato contato = new Contato();
 		contato.setNome("Adriano");
 
@@ -171,10 +245,21 @@ public class PedidoServiceTest extends GenericTest {
 		return pedido;
 	}
 
+	private Pedido gerarPedidoClienteProspectado() {
+		Pedido pedido = gerarPedido();
+		Cliente cliente = pedido.getCliente();
+		cliente.setProspeccaoFinalizada(true);
+		try {
+			clienteService.inserir(cliente);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return pedido;
+	}
+
 	private PedidoService gerarPedidoService() {
 		PedidoServiceImpl pedidoService = new PedidoServiceImpl();
 		new MockUp<PedidoDAO>() {
-
 			@Mock
 			void cancelar(Integer IdPedido) {
 				Pedido pedido = pesquisarEntidadeById(Pedido.class, IdPedido);
@@ -184,20 +269,15 @@ public class PedidoServiceTest extends GenericTest {
 			}
 
 			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
-				pedido.setId(idPedido);
-				// Estamos supondo que o cliente ja foi prospectado
-				pedido.getCliente().setProspeccaoFinalizada(true);
-				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-				pedido.setFormaPagamento("A VISTA");
-				pedido.setTipoEntrega(TipoEntrega.FOB);
-				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+			Pedido inserir(Pedido t) {
+				t.setId(1);
+				inserirEntidade(t);
+				return t;
+			}
 
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.ENTREGA));
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.FATURAMENTO));
-				return pedido;
+			@Mock
+			Pedido pesquisarById(Integer idPedido) {
+				return pesquisarEntidadeById(Pedido.class, idPedido);
 			}
 
 			@Mock
@@ -248,6 +328,16 @@ public class PedidoServiceTest extends GenericTest {
 		return pedidoService;
 	}
 
+	private RamoAtividade gerarRamoAtividade() {
+		RamoAtividade ramoAtividade = new RamoAtividade();
+		ramoAtividade.setAtivo(true);
+		ramoAtividade.setDescricao("Industria Belica");
+		ramoAtividade.setSigla("IB");
+		ramoAtividade.setId(gerarId());
+		inserirEntidade(ramoAtividade);
+		return ramoAtividade;
+	}
+
 	private Representada gerarRepresentada() {
 		Representada representada = new Representada(1, "COBEX");
 		return representada;
@@ -284,9 +374,17 @@ public class PedidoServiceTest extends GenericTest {
 		return usuarioService;
 	}
 
+	private Usuario gerarVendedor() {
+		Usuario vendedor = new Usuario(gerarId(), "Vinicius", "Fernandes Vendedor");
+		vendedor.setVendedorAtivo(true);
+		inserirEntidade(vendedor);
+		return vendedor;
+	}
+
 	@Before
 	public void init() {
 		pedidoService = gerarPedidoService();
+		clienteService = gerarClienteService();
 	}
 
 	private void initGenericDAO() {
@@ -308,6 +406,12 @@ public class PedidoServiceTest extends GenericTest {
 				}
 				inserirEntidade(t);
 				return t;
+			}
+
+			@Mock
+			<T> boolean isEntidadeExistente(Class<T> classe, String nomeAtributo, Object valorAtributo,
+					Object nomeIdEntidade, Object valorIdEntidade) {
+				return contemEntidade(classe, nomeAtributo, valorAtributo, valorIdEntidade);
 			}
 		};
 
@@ -536,17 +640,6 @@ public class PedidoServiceTest extends GenericTest {
 
 	private void initTestInclusaoPedidoOrcamento() {
 		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido inserir(Pedido t) {
-				t.setId(1);
-				inserirEntidade(t);
-				return t;
-			}
-
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				return pesquisarEntidadeById(Pedido.class, idPedido);
-			}
 
 			@Mock
 			Date pesquisarDataEnvioById(Integer idPedido) {
@@ -607,8 +700,20 @@ public class PedidoServiceTest extends GenericTest {
 
 	@Test
 	public void testEnvioEmailPedido() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+		pedido.setFormaPagamento("30 dias");
+		pedido.setTipoEntrega(TipoEntrega.FOB);
+		Integer idPedido = null;
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedido = pedidoService.inserir(pedido);
+			idPedido = pedido.getId();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviar(idPedido, new byte[] {});
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -721,6 +826,29 @@ public class PedidoServiceTest extends GenericTest {
 	}
 
 	@Test
+	public void testEnvioPedidoCompra() {
+		Pedido pedido = gerarPedido();
+		pedido.setTipoPedido(TipoPedido.COMPRA);
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals("Antes do envio do pedido de compra ele deve estar como em digitacao", SituacaoPedido.DIGITACAO,
+				pedido.getSituacaoPedido());
+
+		try {
+			pedidoService.enviar(pedido.getId(), new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertEquals("Apos o envio do pedido de compra, seu estado deve ser como pendente",
+				SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO, pedido.getSituacaoPedido());
+
+	}
+
+	@Test
 	public void testInclusaoPedidoDataEntregaInvalida() {
 		Pedido pedido = gerarPedido();
 		pedido.setDataEntrega(TestUtils.gerarDataAnterior());
@@ -786,8 +914,7 @@ public class PedidoServiceTest extends GenericTest {
 			printMensagens(e);
 		}
 		if (!SituacaoPedido.ORCAMENTO.equals(pedido.getSituacaoPedido())) {
-			fail("Pedido incluido deve ir para orcamento e esta definido como: "
-					+ pedido.getSituacaoPedido().getDescricao());
+			fail("Pedido incluido deve ir para orcamento e esta definido como: " + pedido.getSituacaoPedido().getDescricao());
 		}
 	}
 

@@ -827,7 +827,10 @@ public class PedidoServiceTest extends GenericTestRepository {
 
 	@Test
 	public void testEnvioPedidoCompra() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+		pedido.setFormaPagamento("30 dias a vista");
+		pedido.setTipoEntrega(TipoEntrega.CIF);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
 		try {
 			pedido = pedidoService.inserir(pedido);

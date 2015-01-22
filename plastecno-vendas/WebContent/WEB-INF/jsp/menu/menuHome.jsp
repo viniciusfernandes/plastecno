@@ -29,16 +29,16 @@
 
 		<nav class="flutuante_esquerda">
 			<ul>
-				<li><a href="<c:url value="/"/>">Início</a></li>
-				<li><a href="javascript: void(0)" target="principal_frame">Pedidos</a>
-					<ul>
-						<li><a href="pedido/representacao" target="principal_frame">Representação</a></li>
-						<li><a href="pedido/revenda" target="principal_frame">Revenda</a></li>
-						<c:if test="${empty acessoCompraPermitido}">
-							<li><a href="pedido/compra" target="principal_frame">Compra</a></li>
-						</c:if>
-					</ul>
-				</li>
+				<li><a href="pedido" target="principal_frame">Vendas</a></li>
+				<c:if test="${empty acessoCompraPermitido}">
+					<li><a href="javascript: void(0)" target="principal_frame">Compras</a>
+						<ul>
+							<li><a href="pedido/compra" target="principal_frame">Pedido</a></li>
+							<li><a href="pedido/compra/pendencias" target="principal_frame">Compras Pedentes</a></li>
+							<li><a href="pedido/compra/recepcao" target="principal_frame">Recepção Compras</a></li>
+						</ul>
+					</li>
+				</c:if>
 				<li><a href="cliente" target="principal_frame">Clientes</a></li>
 				<li><a href="javascript: void(0)">Cadastros</a>
 					<ul>

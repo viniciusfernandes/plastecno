@@ -191,6 +191,7 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 			 * tela sera desabilitado e nao sera enviado no request.
 			 */
 			$('#numeroPedido').val(pedidoJson.id);
+			$('#tipoPedido').val(pedidoJson.tipoPedido);
 			$('#numeroPedidoPesquisa').val(pedidoJson.id);
 			$('#formEnvioPedido #idPedido').val(pedidoJson.id);
 
@@ -424,7 +425,7 @@ function habilitarIPI(idRepresentada) {
 
 	request
 			.fail(function(request, status) {
-				alert('Falha na verificação se é possível o cálculo do IPI pela representada => '
+				alert('Falha na verificaï¿½ï¿½o se ï¿½ possï¿½vel o cï¿½lculo do IPI pela representada => '
 						+ request.responseText);
 			});
 }

@@ -149,8 +149,7 @@ $(document).ready(function() {
 
 	<form id="formVazio" action="pedido" method="get"></form>
 
-	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>"
-		method="post">
+	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>" method="post">
 		<fieldset>
 			<legend>::: Dados do Pedido :::</legend>
 
@@ -162,7 +161,7 @@ $(document).ready(function() {
 
 			<div class="label obrigatorio">Tipo:</div>
 			<div class="input">
-				<input type="radio" name="pedido.tipoPedido" value="${tipoPedido}" checked/>
+				<input type="radio" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" checked/>
 			</div>
 			<div class="label label_radio_button" style="width: 80%">${descricaoTipoPedido}</div>
 			

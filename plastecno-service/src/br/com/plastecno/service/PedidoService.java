@@ -55,6 +55,8 @@ public interface PedidoService {
     List<Pedido> pesquisarByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
             throws BusinessException;
 
+    List<Pedido> pesquisarCompraPendente(Integer idRepresentada, Periodo periodo);
+
     Date pesquisarDataEnvio(Integer idPedido);
 
     Date pesquisarDataInclusao(Integer idPedido);
@@ -84,8 +86,8 @@ public interface PedidoService {
     Double pesquisarValorPedidoIPI(Integer idPedido);
 
     Usuario pesquisarVendedor(Integer idPedido);
-
-    Integer refazerPedido(Integer idPedido) throws BusinessException;
     
-    Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
+    Integer refazerPedido(Integer idPedido) throws BusinessException;
+
+	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
 }

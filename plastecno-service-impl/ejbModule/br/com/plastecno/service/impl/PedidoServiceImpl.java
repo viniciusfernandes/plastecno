@@ -7,6 +7,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -381,6 +383,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		if (filtro == null) {
 			return Collections.emptyList();
@@ -389,6 +392,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Pedido pesquisarById(Integer id) {
 
 		if (id == null) {
@@ -398,17 +402,20 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarByIdCliente(Integer idCliente) {
 		return this.pesquisarByIdCliente(idCliente, null, null);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 		return this.pesquisarByIdClienteByIdVendedor(idCliente, null, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 
@@ -421,6 +428,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException {
 		if (idVendedor == null) {
@@ -439,17 +447,26 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pedido> pesquisarCompraPendente(Integer idRepresentada, Periodo periodo) {
+		return pedidoDAO.pesquisarCompraPendenteByPeriodo(idRepresentada, periodo);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Date pesquisarDataEnvio(Integer idPedido) {
 		return pedidoDAO.pesquisarDataEnvioById(idPedido);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Date pesquisarDataInclusao(Integer idPedido) {
 		return pedidoDAO.pesquisarDataInclusaoById(idPedido);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarEnviadosByPeriodo(Periodo periodo) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p from Pedido p join fetch p.representada ");
@@ -464,6 +481,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarEnviadosByPeriodoERepresentada(Periodo periodo, Integer idRepresentada) {
 		StringBuilder select = new StringBuilder()
 				.append("select p from Pedido p where p.situacaoPedido = :situacaoPedido and ")
@@ -476,11 +494,13 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException {
 		return this.pesquisarByPeriodoEVendedor(true, periodo, idVendedor);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer pesquisarIdVendedorByIdPedido(Integer idPedido) {
 		if (idPedido == null) {
 			return null;
@@ -491,6 +511,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemPedido pesquisarItemPedido(Integer idItemPedido) {
 		Query query = this.entityManager.createQuery("select i from ItemPedido i where i.id = :idItemPedido");
 		query.setParameter("idItemPedido", idItemPedido);
@@ -498,26 +519,31 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarItemPedidoByIdPedido(idPedido);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Logradouro> pesquisarLogradouro(Integer idPedido) {
 		return pedidoDAO.pesquisarLogradouro(idPedido);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalRegistros(Integer idCliente) {
 		return this.pesquisarTotalRegistros(idCliente, null);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalRegistros(Integer idCliente, Integer idVendedor) {
 		if (idCliente == null) {
 			return 0L;
@@ -538,18 +564,21 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double pesquisarValorPedido(Integer idPedido) {
 		final Double valor = pedidoDAO.pesquisarValorPedido(idPedido);
 		return valor == null ? 0D : valor;
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double pesquisarValorPedidoIPI(Integer idPedido) {
 		final Double valor = pedidoDAO.pesquisarValorPedidoIPI(idPedido);
 		return valor == null ? 0D : valor;
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Usuario pesquisarVendedor(Integer idPedido) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p.vendedor from Pedido p where p.id = :id");
@@ -669,4 +698,5 @@ public class PedidoServiceImpl implements PedidoService {
 			throw exception;
 		}
 	}
+
 }

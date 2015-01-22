@@ -381,9 +381,9 @@ public class PedidoController extends AbstractController {
 
     @Get("pedido/compra")
     public void pedidoCompra() {
+        redirecTo(this.getClass()).pedidoHome();
         addAtributo("tipoPedido", TipoPedido.COMPRA);
         addAtributo("descricaoTipoPedido", TipoPedido.COMPRA.getDescricao());
-        redirecTo(this.getClass()).pedidoHome();
     }
 
     @Get("pedido")
@@ -400,6 +400,8 @@ public class PedidoController extends AbstractController {
         addAtributo("industrializacao", FinalidadePedido.INDUSTRIALIZACAO);
         addAtributo("consumo", FinalidadePedido.CONSUMO);
         addAtributo("revenda", FinalidadePedido.REVENDA);
+        addAtributo("tipoPedido", TipoPedido.REPRESENTACAO);
+        addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
 
         // verificando se o parametro para desabilitar ja foi incluido em outro
         // fluxo
@@ -410,16 +412,16 @@ public class PedidoController extends AbstractController {
 
     @Get("pedido/representacao")
     public void pedidoRepresentacao() {
+        redirecTo(this.getClass()).pedidoHome();
         addAtributo("tipoPedido", TipoPedido.REPRESENTACAO);
         addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
-        redirecTo(this.getClass()).pedidoHome();
     }
 
     @Get("pedido/revenda")
     public void pedidoRevenda() {
+        redirecTo(this.getClass()).pedidoHome();
         addAtributo("tipoPedido", TipoPedido.REVENDA);
         addAtributo("descricaoTipoPedido", TipoPedido.REVENDA.getDescricao());
-        redirecTo(this.getClass()).pedidoHome();
     }
 
     /*

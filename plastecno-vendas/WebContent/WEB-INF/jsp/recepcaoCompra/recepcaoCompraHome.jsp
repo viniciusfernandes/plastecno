@@ -1,10 +1,10 @@
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-
+<title>Recepção de Compras</title>
 <jsp:include page="/bloco/bloco_css.jsp" />
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
@@ -12,36 +12,42 @@
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 
-
-<title>Relatório de Vendas por Período</title>
 <script type="text/javascript">
-	$(document).ready(function() {
-		$('#botaoLimpar').click(function () {
-			$('#formVazio').submit();
-		});
-		inserirMascaraData('dataInicial');
-		inserirMascaraData('dataFinal');
-	});
+
+$(document).ready(function() {
+	inserirMascaraData('dataInicial');
+	inserirMascaraData('dataFinal');
+});
 </script>
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-	<form id="formVazio" action="<c:url value="/relatorio/venda/periodo"/>"></form>
+	<div id="modal"></div>
 
-	<form action="<c:url value="/relatorio/venda/periodo/listagem"/>"
-		method="get">
+
+	<form action="<c:url value="/pedido/compra/recepcao"/>" method="get">
 		<fieldset>
-			<legend>::: Relatório de Vendas por Período :::</legend>
-			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
+			<legend>::: Pedidos de Compra em Pendência :::</legend>
+			<div class="label" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="dataInicial" name="dataInicial"
 					value="${dataInicial}" maxlength="10" class="pesquisavel" />
 			</div>
 
-			<div class="label obrigatorio" style="width: 10%">Data Final:</div>
+			<div class="label" style="width: 10%">Data Final:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="dataFinal" name="dataFinal"
 					value="${dataFinal}" maxlength="100" class="pesquisavel" />
+			</div>
+			<div class="label" style="width: 30%">Representada:</div>
+			<div class="input" style="width: 40%">
+				<select name="idRepresentada" style="width: 70%">
+					<option value="">&lt&lt SELECIONE &gt&gt</option>
+					<c:forEach var="representada" items="${listaRepresentada}">
+						<option value="${representada.id}"
+							<c:if test="${representada eq representadaSelecionada}">selected</c:if>>${representada.nomeFantasia}</option>
+					</c:forEach>
+				</select>
 			</div>
 		</fieldset>
 		<div class="bloco_botoes">
@@ -51,16 +57,19 @@
 				class="botaoLimpar" />
 		</div>
 	</form>
-
+	
 	<a id="rodape"></a>
-	<c:if test="${relatorioGerado}">
+	<c:if test="${true}">
 		<table class="listrada">
-			<caption>${relatorio.titulo}</caption>
+			<caption>XXXXXXXXXXx xxxxxxxxxxxxxxxxxxx${relatorio.titulo}</caption>
 			<thead>
 				<tr>
-					<th style="width: 40%">Vendedor</th>
-					<th style="width: 30%">Representada</th>
-					<th>Valor Venda (R$)</th>
+					<th style="width: 10%">Num. Pedido</th>
+					<th style="width: 60%">Desc. Item</th>
+					<th style="width: 10%">Comprador</th>
+					<th style="width: 10%">Represent.</th>
+					<th style="width: 5%">Valor (R$)</th>
+					<th style="width: 5%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -89,29 +98,7 @@
 			</tbody>
 
 		</table>
-
-		<table class="listrada">
-			<caption>Total de Vendas por Representada</caption>
-			<thead>
-				<tr>
-					<th>Representada</th>
-					<th>Total (R$)</th>
-				</tr>
-			</thead>
-			<c:forEach items="${relatorio.listaVendaRepresentada}" var="venda">
-				<tr>
-					<td>${venda.nomeRepresentada}</td>
-					<td>${venda.valorVendaFormatado}</td>
-				</tr>
-			</c:forEach>
-
-			<tfoot>
-				<tr>
-					<th>TOTAL GERAL (R$)</th>
-					<th>${relatorio.valorTotalVendido}</th>
-				</tr>
-			</tfoot>
-		</table>
 	</c:if>
+
 </body>
 </html>

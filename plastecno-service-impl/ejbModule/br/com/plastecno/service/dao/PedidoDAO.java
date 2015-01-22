@@ -12,6 +12,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.impl.util.QueryUtil;
+import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.util.StringUtils;
 
 public class PedidoDAO extends GenericDAO<Pedido> {
@@ -24,7 +25,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		this.entityManager.createQuery("update Pedido p set p.situacaoPedido = :situacao where p.id = :idPedido")
 				.setParameter("situacao", SituacaoPedido.CANCELADO).setParameter("idPedido", idPedido).executeUpdate();
 	}
-
 
 	private Query gerarQueryPesquisa(Pedido filtro, StringBuilder select) {
 		Query query = this.entityManager.createQuery(select.toString());
@@ -45,7 +45,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return query;
 	}
 
-	
 	private void gerarRestricaoPesquisa(Pedido filtro, StringBuilder select) {
 		StringBuilder restricao = new StringBuilder();
 		final Cliente cliente = filtro.getCliente();
@@ -114,6 +113,22 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Pedido> pesquisarCompraPendenteByPeriodo(Integer idRepresentada, Periodo periodo) {
+		StringBuilder select = new StringBuilder();
+		select.append("select p from Pedido p join fetch p.representada ");
+		select.append("where p.dataEntrega >= :dataInicio and ");
+		select.append("p.dataEntrega <= :dataFim and ");
+		select.append("p.situacaoPedido = :situacaoPedido and ");
+		select.append("p.representada.id = :idRepresentada ");
+		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
+		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
+				.setParameter("dataFim", periodo.getFim())
+				.setParameter("situacaoPedido", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO)
+				.setParameter("idRepresentada", idRepresentada).getResultList();
+
+	}
+
 	public Date pesquisarDataEnvioById(Integer idPedido) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p.dataEnvio from Pedido p where p.id = :id");
@@ -161,20 +176,21 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	public Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(
-				"select SUM(i.quantidade * i.precoUnidade) from ItemPedido i where i.pedido.id = :idPedido ").setParameter(
-				"idPedido", idPedido), Double.class, 0d);
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery(
+						"select SUM(i.quantidade * i.precoUnidade) from ItemPedido i where i.pedido.id = :idPedido ").setParameter(
+						"idPedido", idPedido), Double.class, 0d);
 	}
 
 	public Double pesquisarQuantidadePrecoUnidadeIPI(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(
-				"select SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ").setParameter(
-				"idPedido", idPedido), Double.class, 0d);
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery(
+						"select SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ")
+						.setParameter("idPedido", idPedido), Double.class, 0d);
 	}
 
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
-		return (Long) this.entityManager
-				.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
+		return (Long) this.entityManager.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
 				.setParameter("idPedido", idPedido).getSingleResult();
 	}
 

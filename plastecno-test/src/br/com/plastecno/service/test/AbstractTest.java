@@ -6,6 +6,7 @@ import mockit.Mock;
 import mockit.MockUp;
 
 import org.junit.Assert;
+import org.junit.Before;
 
 import br.com.plastecno.service.dao.GenericDAO;
 import br.com.plastecno.service.exception.BusinessException;
@@ -17,6 +18,13 @@ class AbstractTest {
 
 	private Integer gerarId() {
 		return (int) (9999 * Math.random());
+	}
+
+	@Before
+	public void init() {
+		initGenericDAO();
+		repositorio.clear();
+
 	}
 
 	void initGenericDAO() {

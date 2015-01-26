@@ -15,12 +15,17 @@ class RepositorioEntidade {
 	public static RepositorioEntidade getInstance() {
 		return repositorio;
 	}
+
 	private static final Map<Class<?>, List<Object>> entidades = new HashMap<Class<?>, List<Object>>();
 
 	private static final RepositorioEntidade repositorio = new RepositorioEntidade();
 
 	private RepositorioEntidade() {
 
+	}
+
+	void clear() {
+		entidades.clear();
 	}
 
 	<T> boolean contemEntidade(Class<T> classe, String nomeAtributo, Object valorAtributo, Object valorIdEntidade) {

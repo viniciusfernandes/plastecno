@@ -49,7 +49,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Before
 	public void init() {
-		initGenericDAO();
+		super.init();
 		pedidoService = GeradorServico.gerarServico(PedidoService.class);
 		clienteService = GeradorServico.gerarServico(ClienteService.class);
 	}
@@ -457,6 +457,7 @@ public class PedidoServiceTest extends AbstractTest {
 		pedido.setFormaPagamento("30 dias a vista");
 		pedido.setTipoEntrega(TipoEntrega.CIF);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
+
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {

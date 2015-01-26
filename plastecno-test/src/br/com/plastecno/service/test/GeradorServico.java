@@ -47,33 +47,33 @@ import br.com.plastecno.service.mensagem.email.MensagemEmail;
 class GeradorServico {
 	@SuppressWarnings("unchecked")
 	static <T> T gerarServico(Class<T> classe) {
-			String metodoName = "gerar" + classe.getSimpleName();
-			Method method = null;
+		String metodoName = "gerar" + classe.getSimpleName();
+		Method method = null;
+		try {
+			method = GeradorServico.class.getDeclaredMethod(metodoName);
 			try {
-				method = GeradorServico.class.getDeclaredMethod(metodoName);
-				try {
-					method.setAccessible(true);
-					return (T) method.invoke(GERADOR_SERVICO, (Object[]) null);
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					throw new TestUtilException("Falha na execucao do metodo de inicializacao do servico \"" + "gerar"
-							+ classe.getSimpleName() + "\"", e);
-
-				}
-			} catch (SecurityException | NoSuchMethodException e) {
-				throw new TestUtilException("Falha na localizacao do metodo de inicializacao do servico \"" + "gerar"
+				method.setAccessible(true);
+				return (T) method.invoke(GERADOR_SERVICO, (Object[]) null);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new TestUtilException("Falha na execucao do metodo de inicializacao do servico \"" + "gerar"
 						+ classe.getSimpleName() + "\"", e);
-			} finally {
-				if (method != null) {
-					method.setAccessible(false);
-				}
+
 			}
+		} catch (SecurityException | NoSuchMethodException e) {
+			throw new TestUtilException("Falha na localizacao do metodo de inicializacao do servico \"" + "gerar"
+					+ classe.getSimpleName() + "\"", e);
+		} finally {
+			if (method != null) {
+				method.setAccessible(false);
+			}
+		}
 	}
 
 	private static final RepositorioEntidade REPOSITORIO = RepositorioEntidade.getInstance();
 	private static final GeradorEntidade GERADOR_ENTIDADE = GeradorEntidade.getInstance();
 	private static final GeradorServico GERADOR_SERVICO = new GeradorServico();
 
-	 GeradorServico() {
+	GeradorServico() {
 	}
 
 	public ClienteService gerarClienteService() {
@@ -170,7 +170,7 @@ class GeradorServico {
 
 			@Mock
 			Pedido inserir(Pedido t) {
-				t.setId(1);
+				t.setId(GERADOR_ENTIDADE.gerarId());
 				REPOSITORIO.inserirEntidade(t);
 				return t;
 			}
@@ -250,7 +250,7 @@ class GeradorServico {
 			public Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {
 				return idVendedor;
 			}
-			
+
 			@Mock
 			public void $init(EntityManager entityManager) {
 			}

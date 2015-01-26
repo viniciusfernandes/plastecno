@@ -4,9 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 
@@ -49,15 +47,13 @@ import br.com.plastecno.service.mensagem.email.MensagemEmail;
 class GeradorServico {
 	@SuppressWarnings("unchecked")
 	static <T> T gerarServico(Class<T> classe) {
-		if (!mapService.containsKey(classe)) {
 			String metodoName = "gerar" + classe.getSimpleName();
 			Method method = null;
 			try {
 				method = GeradorServico.class.getDeclaredMethod(metodoName);
 				try {
 					method.setAccessible(true);
-					T t = (T) method.invoke(GERADOR_SERVICO, (Object[]) null);
-					mapService.put(classe, t);
+					return (T) method.invoke(GERADOR_SERVICO, (Object[]) null);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new TestUtilException("Falha na execucao do metodo de inicializacao do servico \"" + "gerar"
 							+ classe.getSimpleName() + "\"", e);
@@ -71,29 +67,27 @@ class GeradorServico {
 					method.setAccessible(false);
 				}
 			}
-		}
-		return (T) mapService.get(classe);
 	}
-	private static final Map<Class<?>, Object> mapService = new HashMap<Class<?>, Object>();
-	private static final MockedRepository repository = new MockedRepository();
 
+	private static final RepositorioEntidade REPOSITORIO = RepositorioEntidade.getInstance();
+	private static final GeradorEntidade GERADOR_ENTIDADE = GeradorEntidade.getInstance();
 	private static final GeradorServico GERADOR_SERVICO = new GeradorServico();
 
-	private GeradorServico() {
+	 GeradorServico() {
 	}
 
-	private ClienteService gerarClienteService() {
+	public ClienteService gerarClienteService() {
 		ClienteServiceImpl clienteService = new ClienteServiceImpl();
 
 		new MockUp<ClienteDAO>() {
 			@Mock
 			boolean isEmailExistente(Integer idCliente, String email) {
-				return repository.contemEntidade(Cliente.class, "email", email, idCliente);
+				return REPOSITORIO.contemEntidade(Cliente.class, "email", email, idCliente);
 			}
 
 			@Mock
 			List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
-				Cliente cliente = repository.pesquisarEntidadeById(Cliente.class, idCliente);
+				Cliente cliente = REPOSITORIO.pesquisarEntidadeById(Cliente.class, idCliente);
 				return cliente == null ? new ArrayList<LogradouroCliente>() : cliente.getListaLogradouro();
 			}
 
@@ -105,7 +99,7 @@ class GeradorServico {
 		return clienteService;
 	}
 
-	private EmailService gerarEmailService() {
+	public EmailService gerarEmailService() {
 		EmailServiceImpl emailService = new EmailServiceImpl();
 		new MockUp<EmailServiceImpl>() {
 			@Mock
@@ -116,7 +110,7 @@ class GeradorServico {
 		return emailService;
 	}
 
-	private EnderecamentoService gerarEnderecamentoService() {
+	public EnderecamentoService gerarEnderecamentoService() {
 		EnderecamentoService enderecamentoService = new EnderecamentoServiceImpl();
 		new MockUp<EnderecoDAO>() {
 			@Mock
@@ -144,18 +138,18 @@ class GeradorServico {
 		return enderecamentoService;
 	}
 
-	private LogradouroService gerarLogradouroService() {
+	public LogradouroService gerarLogradouroService() {
 		LogradouroService logradouroService = new LogradouroServiceImpl();
 		inject(logradouroService, gerarEnderecamentoService(), "enderecamentoService");
 		return logradouroService;
 	}
 
-	private MaterialService gerarMaterialService() {
+	public MaterialService gerarMaterialService() {
 		MaterialServiceImpl materialService = new MaterialServiceImpl();
 		new MockUp<MaterialDAO>() {
 			@Mock
 			Material pesquisarById(Integer id) {
-				return repository.gerarMaterial();
+				return GERADOR_ENTIDADE.gerarMaterial();
 			}
 		};
 		inject(materialService, new MaterialDAO(null), "materialDAO");
@@ -163,12 +157,12 @@ class GeradorServico {
 		return materialService;
 	}
 
-	private PedidoService gerarPedidoService() {
+	public PedidoService gerarPedidoService() {
 		PedidoServiceImpl pedidoService = new PedidoServiceImpl();
 		new MockUp<PedidoDAO>() {
 			@Mock
 			void cancelar(Integer IdPedido) {
-				Pedido pedido = repository.pesquisarEntidadeById(Pedido.class, IdPedido);
+				Pedido pedido = REPOSITORIO.pesquisarEntidadeById(Pedido.class, IdPedido);
 				if (pedido != null) {
 					pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
 				}
@@ -177,26 +171,26 @@ class GeradorServico {
 			@Mock
 			Pedido inserir(Pedido t) {
 				t.setId(1);
-				repository.inserirEntidade(t);
+				REPOSITORIO.inserirEntidade(t);
 				return t;
 			}
 
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				return repository.pesquisarEntidadeById(Pedido.class, idPedido);
+				return REPOSITORIO.pesquisarEntidadeById(Pedido.class, idPedido);
 			}
 
 			@Mock
 			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
-				return repository.pesquisarEntidadeById(Pedido.class, idPedido).getRepresentada().getId();
+				return REPOSITORIO.pesquisarEntidadeById(Pedido.class, idPedido).getRepresentada().getId();
 			}
 
 			@Mock
 			List<Logradouro> pesquisarLogradouro(Integer idPedido) {
 				List<Logradouro> lista = new ArrayList<Logradouro>();
-				lista.add(repository.gerarLogradouro(TipoLogradouro.COBRANCA));
-				lista.add(repository.gerarLogradouro(TipoLogradouro.ENTREGA));
-				lista.add(repository.gerarLogradouro(TipoLogradouro.FATURAMENTO));
+				lista.add(GERADOR_ENTIDADE.gerarLogradouro(TipoLogradouro.COBRANCA));
+				lista.add(GERADOR_ENTIDADE.gerarLogradouro(TipoLogradouro.ENTREGA));
+				lista.add(GERADOR_ENTIDADE.gerarLogradouro(TipoLogradouro.FATURAMENTO));
 
 				return lista;
 			}
@@ -222,26 +216,25 @@ class GeradorServico {
 			}
 		};
 
-		repository.init();
 		inject(pedidoService, new PedidoDAO(null), "pedidoDAO");
 		inject(pedidoService, new ItemPedidoDAO(null), "itemPedidoDAO");
-		inject(pedidoService, gerarUsuarioService(), "usuarioService");
-		inject(pedidoService, gerarClienteService(), "clienteService");
-		inject(pedidoService, gerarLogradouroService(), "logradouroService");
-		inject(pedidoService, gerarEmailService(), "emailService");
-		inject(pedidoService, gerarMaterialService(), "materialService");
-		inject(pedidoService, gerarRepresentadaService(), "representadaService");
+		inject(pedidoService, gerarServico(UsuarioService.class), "usuarioService");
+		inject(pedidoService, gerarServico(ClienteService.class), "clienteService");
+		inject(pedidoService, gerarServico(LogradouroService.class), "logradouroService");
+		inject(pedidoService, gerarServico(EmailService.class), "emailService");
+		inject(pedidoService, gerarServico(MaterialService.class), "materialService");
+		inject(pedidoService, gerarServico(RepresentadaService.class), "representadaService");
 
 		return pedidoService;
 	}
 
-	private RepresentadaService gerarRepresentadaService() {
+	public RepresentadaService gerarRepresentadaService() {
 		RepresentadaService representadaService = new RepresentadaServiceImpl();
 
 		new MockUp<RepresentadaDAO>() {
 			@Mock
 			Representada pesquisarById(Integer id) {
-				return repository.gerarRepresentada();
+				return GERADOR_ENTIDADE.gerarRepresentada();
 			}
 		};
 
@@ -249,20 +242,21 @@ class GeradorServico {
 		return representadaService;
 	}
 
-	private UsuarioService gerarUsuarioService() {
+	public UsuarioService gerarUsuarioService() {
 		UsuarioServiceImpl usuarioService = new UsuarioServiceImpl();
 		new MockUp<UsuarioDAO>() {
-			@Mock
-			public void $init(EntityManager entityManager) {
-			}
 
 			@Mock
 			public Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {
 				return idVendedor;
 			}
-		};
+			
+			@Mock
+			public void $init(EntityManager entityManager) {
+			}
 
-		usuarioService.init();
+		};
+		inject(usuarioService, new UsuarioDAO(null), "usuarioDAO");
 		return usuarioService;
 	}
 

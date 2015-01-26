@@ -30,13 +30,13 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 
-public class PedidoServiceTest extends MockedRepository {
+public class PedidoServiceTest extends AbstractTest {
 
 	private ClienteService clienteService;
 	private PedidoService pedidoService;
 
 	private Pedido gerarPedidoClienteProspectado() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		Cliente cliente = pedido.getCliente();
 		cliente.setProspeccaoFinalizada(true);
 		try {
@@ -49,6 +49,7 @@ public class PedidoServiceTest extends MockedRepository {
 
 	@Before
 	public void init() {
+		initGenericDAO();
 		pedidoService = GeradorServico.gerarServico(PedidoService.class);
 		clienteService = GeradorServico.gerarServico(ClienteService.class);
 	}
@@ -57,7 +58,7 @@ public class PedidoServiceTest extends MockedRepository {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -76,7 +77,7 @@ public class PedidoServiceTest extends MockedRepository {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				pedido.getCliente().setProspeccaoFinalizada(false);
 				return pedido;
@@ -93,7 +94,7 @@ public class PedidoServiceTest extends MockedRepository {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -112,7 +113,7 @@ public class PedidoServiceTest extends MockedRepository {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -136,7 +137,7 @@ public class PedidoServiceTest extends MockedRepository {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -159,7 +160,7 @@ public class PedidoServiceTest extends MockedRepository {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -168,8 +169,8 @@ public class PedidoServiceTest extends MockedRepository {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.ENTREGA));
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.FATURAMENTO));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.ENTREGA));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.FATURAMENTO));
 				return pedido;
 			}
 
@@ -184,7 +185,7 @@ public class PedidoServiceTest extends MockedRepository {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -193,8 +194,8 @@ public class PedidoServiceTest extends MockedRepository {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.FATURAMENTO));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.COBRANCA));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.FATURAMENTO));
 				return pedido;
 			}
 
@@ -209,7 +210,7 @@ public class PedidoServiceTest extends MockedRepository {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -218,8 +219,8 @@ public class PedidoServiceTest extends MockedRepository {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.ENTREGA));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.COBRANCA));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.ENTREGA));
 				return pedido;
 			}
 
@@ -234,7 +235,7 @@ public class PedidoServiceTest extends MockedRepository {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -305,7 +306,7 @@ public class PedidoServiceTest extends MockedRepository {
 
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				return pesquisarEntidadeById(Pedido.class, idPedido);
+				return repositorio.pesquisarEntidadeById(Pedido.class, idPedido);
 			}
 
 			@Mock
@@ -316,7 +317,7 @@ public class PedidoServiceTest extends MockedRepository {
 			@Mock
 			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 				List<ItemPedido> listaItem = new ArrayList<ItemPedido>();
-				listaItem.add(gerarItemPedido());
+				listaItem.add(gerador.gerarItemPedido());
 				return listaItem;
 			}
 		};
@@ -477,7 +478,7 @@ public class PedidoServiceTest extends MockedRepository {
 
 	@Test
 	public void testInclusaoPedidoCompra() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		pedido.setId(null);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
 		try {
@@ -493,7 +494,7 @@ public class PedidoServiceTest extends MockedRepository {
 
 	@Test
 	public void testInclusaoPedidoDataEntregaInvalida() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		pedido.setDataEntrega(TestUtils.gerarDataAnterior());
 		boolean throwed = false;
 		try {
@@ -506,7 +507,7 @@ public class PedidoServiceTest extends MockedRepository {
 
 	@Test
 	public void testInclusaoPedidoDigitado() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		pedido.setId(null);
 
 		try {
@@ -522,7 +523,7 @@ public class PedidoServiceTest extends MockedRepository {
 	@Test
 	public void testInclusaoPedidoDigitadoSemVendedorAssociado() {
 		initTestInclusaoPedidoDigitadoSemVendedorAssociado();
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		boolean throwed = false;
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -536,7 +537,7 @@ public class PedidoServiceTest extends MockedRepository {
 	public void testInclusaoPedidoOrcamento() {
 		initTestInclusaoPedidoOrcamento();
 
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 		// Incluindo o pedido no sistema para, posteriormente, inclui-lo como
 		// orcamento.
@@ -563,7 +564,7 @@ public class PedidoServiceTest extends MockedRepository {
 
 	@Test
 	public void testInclusaoPedidoRepresentacao() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -577,7 +578,7 @@ public class PedidoServiceTest extends MockedRepository {
 
 	@Test
 	public void testInclusaoPedidoRevenda() {
-		Pedido pedido = gerarPedidoRevenda();
+		Pedido pedido = gerador.gerarPedidoRevenda();
 
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -590,7 +591,7 @@ public class PedidoServiceTest extends MockedRepository {
 
 	@Test
 	public void testInclusaoPedidoTipoDeEntregaSemRedespacho() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		pedido.setTipoEntrega(TipoEntrega.CIF_TRANS);
 		boolean throwed = false;
 		try {
@@ -605,7 +606,7 @@ public class PedidoServiceTest extends MockedRepository {
 
 	@Test
 	public void testPedidoCanceladoDataEntregaInvalida() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		try {
 			// Inserindo o pedido no sistema
 			pedido = pedidoService.inserir(pedido);
@@ -632,7 +633,7 @@ public class PedidoServiceTest extends MockedRepository {
 	public void testRefazerPedido() {
 		initTestRefazerPedido();
 
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -650,7 +651,7 @@ public class PedidoServiceTest extends MockedRepository {
 		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);
 
-		pedido = pesquisarEntidadeById(Pedido.class, idPedido);
+		pedido = repositorio.pesquisarEntidadeById(Pedido.class, idPedido);
 		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,
 				SituacaoPedido.CANCELADO, pedido.getSituacaoPedido());
 

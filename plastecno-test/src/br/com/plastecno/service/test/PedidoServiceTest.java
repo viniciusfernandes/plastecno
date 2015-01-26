@@ -5,13 +5,9 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.EntityManager;
 
 import mockit.Mock;
 import mockit.MockUp;
@@ -20,302 +16,48 @@ import org.junit.Before;
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
-import br.com.plastecno.service.EmailService;
-import br.com.plastecno.service.LogradouroService;
-import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
-import br.com.plastecno.service.RepresentadaService;
-import br.com.plastecno.service.UsuarioService;
-import br.com.plastecno.service.constante.FinalidadePedido;
-import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
-import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.dao.ClienteDAO;
-import br.com.plastecno.service.dao.GenericDAO;
-import br.com.plastecno.service.dao.ItemPedidoDAO;
-import br.com.plastecno.service.dao.MaterialDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
-import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
-import br.com.plastecno.service.entity.Bairro;
-import br.com.plastecno.service.entity.Cidade;
 import br.com.plastecno.service.entity.Cliente;
-import br.com.plastecno.service.entity.Contato;
-import br.com.plastecno.service.entity.Endereco;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouro;
-import br.com.plastecno.service.entity.LogradouroCliente;
-import br.com.plastecno.service.entity.Material;
-import br.com.plastecno.service.entity.Pais;
 import br.com.plastecno.service.entity.Pedido;
-import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
-import br.com.plastecno.service.exception.NotificacaoException;
-import br.com.plastecno.service.impl.ClienteServiceImpl;
-import br.com.plastecno.service.impl.EmailServiceImpl;
-import br.com.plastecno.service.impl.LogradouroServiceImpl;
-import br.com.plastecno.service.impl.MaterialServiceImpl;
-import br.com.plastecno.service.impl.PedidoServiceImpl;
-import br.com.plastecno.service.impl.RepresentadaServiceImpl;
-import br.com.plastecno.service.impl.UsuarioServiceImpl;
-import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
-public class PedidoServiceTest extends GenericTest {
+public class PedidoServiceTest extends AbstractTest {
 
-	public PedidoService pedidoService;
+	private ClienteService clienteService;
+	private PedidoService pedidoService;
 
-	private ClienteService gerarClienteService() {
-		ClienteServiceImpl clienteService = new ClienteServiceImpl();
-
-		new MockUp<ClienteDAO>() {
-			@Mock
-			List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
-				return new ArrayList<LogradouroCliente>();
-			}
-		};
-
-		inject(clienteService, new ClienteDAO(null), "clienteDAO");
-		return clienteService;
-	}
-
-	private EmailService gerarEmailService() {
-		EmailServiceImpl emailService = new EmailServiceImpl();
-		new MockUp<EmailServiceImpl>() {
-			@Mock
-			void enviar(MensagemEmail mensagemEmail) throws NotificacaoException {
-			}
-		};
-
-		return emailService;
-	}
-
-	private Endereco gerarEndereco() {
-		Bairro bairro = new Bairro();
-		bairro.setDescricao("Centro");
-		bairro.setId(1);
-
-		Cidade cidade = new Cidade();
-		cidade.setDescricao("Sao Paulo");
-		cidade.setId(1);
-
-		Pais pais = new Pais();
-		pais.setId(1);
-		pais.setDescricao("Brasil");
-
-		Endereco endereco = new Endereco(bairro, cidade, pais);
-		return endereco;
-	}
-
-	private ItemPedido gerarItemPedido() {
-		ItemPedido itemPedido = new ItemPedido();
-		itemPedido.setAliquotaIPI(11.1d);
-		itemPedido.setMaterial(gerarMaterial());
-		itemPedido.setFormaMaterial(FormaMaterial.TB);
-		itemPedido.setQuantidade(2);
-		itemPedido.setMedidaExterna(120d);
-		itemPedido.setMedidaInterna(100d);
-		itemPedido.setComprimento(1000d);
-		itemPedido.setTipoVenda(TipoVenda.KILO);
-		itemPedido.setPrecoVenda(60d);
-		return itemPedido;
-	}
-
-	private Logradouro gerarLogradouro(TipoLogradouro tipoLogradouro) {
-		Logradouro logradouro = new Logradouro(gerarEndereco());
-		logradouro.setTipoLogradouro(tipoLogradouro);
-		return logradouro;
-	}
-
-	private LogradouroService gerarLogradouroService() {
-		return new LogradouroServiceImpl();
-	}
-
-	private Material gerarMaterial() {
-		Material material = new Material(1, "PLAST", "PLASTICO DURO");
-		material.setPesoEspecifico(0.33);
-		return material;
-	}
-
-	private MaterialService gerarMaterialService() {
-		MaterialServiceImpl materialService = new MaterialServiceImpl();
-		new MockUp<MaterialDAO>() {
-			@Mock
-			Material pesquisarById(Integer id) {
-				return gerarMaterial();
-			}
-		};
-		inject(materialService, new MaterialDAO(null), "materialDAO");
-		inject(materialService, gerarRepresentadaService(), "representadaService");
-		return materialService;
-	}
-
-	private Pedido gerarPedido() {
-		Cliente cliente = new Cliente(1, "Vinicius");
-		Representada representada = new Representada(1, "COBEX");
-		Usuario vendedor = new Usuario(1, null, null);
-		Contato contato = new Contato();
-		contato.setNome("Adriano");
-
-		Pedido pedido = new Pedido();
-		pedido.setCliente(cliente);
-		pedido.setRepresentada(representada);
-		pedido.setVendedor(vendedor);
-		pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-		pedido.setFinalidadePedido(FinalidadePedido.CONSUMO);
-		pedido.setContato(contato);
+	private Pedido gerarPedidoClienteProspectado() {
+		Pedido pedido = gerador.gerarPedido();
+		Cliente cliente = pedido.getCliente();
+		cliente.setProspeccaoFinalizada(true);
+		try {
+			clienteService.inserir(cliente);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 		return pedido;
-	}
-
-	private PedidoService gerarPedidoService() {
-		PedidoServiceImpl pedidoService = new PedidoServiceImpl();
-		new MockUp<PedidoDAO>() {
-
-			@Mock
-			void cancelar(Integer IdPedido) {
-				Pedido pedido = pesquisarEntidadeById(Pedido.class, IdPedido);
-				if (pedido != null) {
-					pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
-				}
-			}
-
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
-				pedido.setId(idPedido);
-				// Estamos supondo que o cliente ja foi prospectado
-				pedido.getCliente().setProspeccaoFinalizada(true);
-				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-				pedido.setFormaPagamento("A VISTA");
-				pedido.setTipoEntrega(TipoEntrega.FOB);
-				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
-
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.ENTREGA));
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.FATURAMENTO));
-				return pedido;
-			}
-
-			@Mock
-			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
-				return pesquisarEntidadeById(Pedido.class, idPedido).getRepresentada().getId();
-			}
-
-			@Mock
-			List<Logradouro> pesquisarLogradouro(Integer idPedido) {
-				List<Logradouro> lista = new ArrayList<Logradouro>();
-				lista.add(gerarLogradouro(TipoLogradouro.COBRANCA));
-				lista.add(gerarLogradouro(TipoLogradouro.ENTREGA));
-				lista.add(gerarLogradouro(TipoLogradouro.FATURAMENTO));
-
-				return lista;
-			}
-
-			@Mock
-			Integer pesquisarMaxSequenciaItemPedido(Integer idPedido) {
-				return 1;
-			}
-
-			@Mock
-			Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
-				return 120d;
-			}
-
-			@Mock
-			Double pesquisarQuantidadePrecoUnidadeIPI(Integer idPedido) {
-				return 55d;
-			}
-
-			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 12L;
-			}
-		};
-
-		initGenericDAO();
-		inject(pedidoService, new PedidoDAO(null), "pedidoDAO");
-		inject(pedidoService, new ItemPedidoDAO(null), "itemPedidoDAO");
-		inject(pedidoService, gerarUsuarioService(), "usuarioService");
-		inject(pedidoService, gerarClienteService(), "clienteService");
-		inject(pedidoService, gerarLogradouroService(), "logradouroService");
-		inject(pedidoService, gerarEmailService(), "emailService");
-		inject(pedidoService, gerarMaterialService(), "materialService");
-
-		return pedidoService;
-	}
-
-	private Representada gerarRepresentada() {
-		Representada representada = new Representada(1, "COBEX");
-		return representada;
-	}
-
-	private RepresentadaService gerarRepresentadaService() {
-		RepresentadaService representadaService = new RepresentadaServiceImpl();
-
-		new MockUp<RepresentadaDAO>() {
-			@Mock
-			Representada pesquisarById(Integer id) {
-				return gerarRepresentada();
-			}
-		};
-
-		inject(representadaService, new RepresentadaDAO(null), "representadaDAO");
-		return representadaService;
-	}
-
-	private UsuarioService gerarUsuarioService() {
-		UsuarioServiceImpl usuarioService = new UsuarioServiceImpl();
-		new MockUp<UsuarioDAO>() {
-			@Mock
-			public void $init(EntityManager entityManager) {
-			}
-
-			@Mock
-			public Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {
-				return idVendedor;
-			}
-		};
-
-		usuarioService.init();
-		return usuarioService;
 	}
 
 	@Before
 	public void init() {
-		pedidoService = gerarPedidoService();
-	}
-
-	private void initGenericDAO() {
-		new MockUp<GenericDAO<Object>>() {
-
-			@Mock
-			Object alterar(Object t) {
-				inserirEntidade(t);
-				return t;
-			}
-
-			@Mock
-			Object inserir(Object t) {
-				try {
-					Method m = t.getClass().getMethod("setId", Integer.class);
-					m.invoke(t, gerarId());
-				} catch (Exception e) {
-					throw new IllegalArgumentException(e);
-				}
-				inserirEntidade(t);
-				return t;
-			}
-		};
-
+		super.init();
+		pedidoService = GeradorServico.gerarServico(PedidoService.class);
+		clienteService = GeradorServico.gerarServico(ClienteService.class);
 	}
 
 	private void initTestEnvioEmailPedidoCancelado() {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -334,7 +76,7 @@ public class PedidoServiceTest extends GenericTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				pedido.getCliente().setProspeccaoFinalizada(false);
 				return pedido;
@@ -351,7 +93,7 @@ public class PedidoServiceTest extends GenericTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -370,7 +112,7 @@ public class PedidoServiceTest extends GenericTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -394,7 +136,7 @@ public class PedidoServiceTest extends GenericTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -417,7 +159,7 @@ public class PedidoServiceTest extends GenericTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -426,8 +168,8 @@ public class PedidoServiceTest extends GenericTest {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.ENTREGA));
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.FATURAMENTO));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.ENTREGA));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.FATURAMENTO));
 				return pedido;
 			}
 
@@ -442,7 +184,7 @@ public class PedidoServiceTest extends GenericTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -451,8 +193,8 @@ public class PedidoServiceTest extends GenericTest {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.FATURAMENTO));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.COBRANCA));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.FATURAMENTO));
 				return pedido;
 			}
 
@@ -467,7 +209,7 @@ public class PedidoServiceTest extends GenericTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -476,8 +218,8 @@ public class PedidoServiceTest extends GenericTest {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(gerarLogradouro(TipoLogradouro.ENTREGA));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.COBRANCA));
+				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.ENTREGA));
 				return pedido;
 			}
 
@@ -492,7 +234,7 @@ public class PedidoServiceTest extends GenericTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerarPedido();
+				Pedido pedido = gerador.gerarPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -534,17 +276,6 @@ public class PedidoServiceTest extends GenericTest {
 
 	private void initTestInclusaoPedidoOrcamento() {
 		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido inserir(Pedido t) {
-				t.setId(1);
-				inserirEntidade(t);
-				return t;
-			}
-
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				return pesquisarEntidadeById(Pedido.class, idPedido);
-			}
 
 			@Mock
 			Date pesquisarDataEnvioById(Integer idPedido) {
@@ -574,7 +305,7 @@ public class PedidoServiceTest extends GenericTest {
 
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				return pesquisarEntidadeById(Pedido.class, idPedido);
+				return repositorio.pesquisarEntidadeById(Pedido.class, idPedido);
 			}
 
 			@Mock
@@ -585,28 +316,28 @@ public class PedidoServiceTest extends GenericTest {
 			@Mock
 			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 				List<ItemPedido> listaItem = new ArrayList<ItemPedido>();
-				listaItem.add(gerarItemPedido());
+				listaItem.add(gerador.gerarItemPedido());
 				return listaItem;
 			}
 		};
 	}
 
-	private void inject(Object service, Object dependencia, String nomeCampo) {
-		try {
-			Field campo = service.getClass().getDeclaredField(nomeCampo);
-			campo.setAccessible(true);
-			campo.set(service, dependencia);
-			campo.setAccessible(false);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Falha ao injetar a dependencia para o servico \""
-					+ service.getClass().getName() + "\". Campo com problemas eh \"" + nomeCampo);
-		}
-	}
-
 	@Test
 	public void testEnvioEmailPedido() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+		pedido.setFormaPagamento("30 dias");
+		pedido.setTipoEntrega(TipoEntrega.FOB);
+		Integer idPedido = null;
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedido = pedidoService.inserir(pedido);
+			idPedido = pedido.getId();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviar(idPedido, new byte[] {});
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -720,7 +451,7 @@ public class PedidoServiceTest extends GenericTest {
 
 	@Test
 	public void testInclusaoPedidoDataEntregaInvalida() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		pedido.setDataEntrega(TestUtils.gerarDataAnterior());
 		boolean throwed = false;
 		try {
@@ -733,7 +464,7 @@ public class PedidoServiceTest extends GenericTest {
 
 	@Test
 	public void testInclusaoPedidoDigitado() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		pedido.setId(null);
 
 		try {
@@ -749,7 +480,7 @@ public class PedidoServiceTest extends GenericTest {
 	@Test
 	public void testInclusaoPedidoDigitadoSemVendedorAssociado() {
 		initTestInclusaoPedidoDigitadoSemVendedorAssociado();
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		boolean throwed = false;
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -763,7 +494,7 @@ public class PedidoServiceTest extends GenericTest {
 	public void testInclusaoPedidoOrcamento() {
 		initTestInclusaoPedidoOrcamento();
 
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 		// Incluindo o pedido no sistema para, posteriormente, inclui-lo como
 		// orcamento.
@@ -784,14 +515,14 @@ public class PedidoServiceTest extends GenericTest {
 			printMensagens(e);
 		}
 		if (!SituacaoPedido.ORCAMENTO.equals(pedido.getSituacaoPedido())) {
-			fail("Pedido incluido deve ir para orcamento e esta definido como: "
-					+ pedido.getSituacaoPedido().getDescricao());
+			fail("Pedido incluido deve ir para orcamento e esta definido como: " + pedido.getSituacaoPedido().getDescricao());
 		}
 	}
 
+
 	@Test
 	public void testInclusaoPedidoTipoDeEntregaSemRedespacho() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		pedido.setTipoEntrega(TipoEntrega.CIF_TRANS);
 		boolean throwed = false;
 		try {
@@ -806,7 +537,7 @@ public class PedidoServiceTest extends GenericTest {
 
 	@Test
 	public void testPedidoCanceladoDataEntregaInvalida() {
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 		try {
 			// Inserindo o pedido no sistema
 			pedido = pedidoService.inserir(pedido);
@@ -833,7 +564,7 @@ public class PedidoServiceTest extends GenericTest {
 	public void testRefazerPedido() {
 		initTestRefazerPedido();
 
-		Pedido pedido = gerarPedido();
+		Pedido pedido = gerador.gerarPedido();
 
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -851,7 +582,7 @@ public class PedidoServiceTest extends GenericTest {
 		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);
 
-		pedido = pesquisarEntidadeById(Pedido.class, idPedido);
+		pedido = repositorio.pesquisarEntidadeById(Pedido.class, idPedido);
 		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,
 				SituacaoPedido.CANCELADO, pedido.getSituacaoPedido());
 

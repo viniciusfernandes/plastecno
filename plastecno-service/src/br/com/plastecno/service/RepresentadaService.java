@@ -22,6 +22,8 @@ public interface RepresentadaService {
 
 	boolean isNomeFantasiaExistente(Integer id, String nomeFantasia);
 
+	boolean isRevendedor(String nomeRepresentada);
+
 	List<Representada> pesquisar();
 
 	List<Representada> pesquisar(Boolean ativo);

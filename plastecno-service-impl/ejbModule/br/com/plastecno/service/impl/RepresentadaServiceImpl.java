@@ -14,7 +14,6 @@ import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
-import br.com.plastecno.service.dao.GenericDAO;
 import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;
@@ -101,6 +100,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 		return representada != null ? representada.getTipoApresentacaoIPI() : null;
 	}
 
+	@Override
+	public boolean isRevendedor(String nomeRepresentada){
+		return "PLASTECNO FILIAL".equals(nomeRepresentada);
+	}
+	
 	@Override
 	public Integer inserir(final Representada representada) throws BusinessException {
 		ValidadorInformacao.validar(representada);

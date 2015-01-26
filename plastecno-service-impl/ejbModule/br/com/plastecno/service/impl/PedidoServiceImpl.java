@@ -20,10 +20,12 @@ import br.com.plastecno.service.EmailService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
@@ -60,6 +62,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private LogradouroService logradouroService;
+
+	@EJB
+	private RepresentadaService representadaService;
 
 	@EJB
 	private MaterialService materialService;
@@ -114,6 +119,19 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public boolean contemItemPedido(Integer idPedido) {
 		return this.pesquisarTotalItemPedido(idPedido) > 0;
+	}
+
+	private void definirTipoPedido(Pedido pedido) {
+		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
+		// portanto, faremos uma consulta pelo nome da representada para decidir, ja
+		// que os pedidos de compra sempre serao configurados antes de inserir.
+		if (pedido.getTipoPedido() == null) {
+			if (representadaService.isRevendedor(pedido.getRepresentada().getNomeFantasia())) {
+				pedido.setTipoPedido(TipoPedido.REVENDA);
+			} else {
+				pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
+			}
+		}
 	}
 
 	@Override
@@ -208,6 +226,8 @@ public class PedidoServiceImpl implements PedidoService {
 		if (SituacaoPedido.CANCELADO.equals(pedido.getSituacaoPedido())) {
 			throw new InformacaoInvalidaException("Pedido ja foi cancelado e nao pode ser alterado");
 		}
+
+		definirTipoPedido(pedido);
 
 		ValidadorInformacao.validar(pedido);
 		final Integer idPedido = pedido.getId();
@@ -370,16 +390,16 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
-		return paginarPedido(idCliente, null, indiceRegistroInicial, numeroMaximoRegistros);
+	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		return paginarPedido(idCliente, null, isCompra, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
-	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
+	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor,boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalRegistros(idCliente, idVendedor),
-				this.pesquisarByIdClienteByIdVendedor(idCliente, idVendedor, indiceRegistroInicial, numeroMaximoRegistros));
+				this.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, isCompra,indiceRegistroInicial, numeroMaximoRegistros));
 	}
 
 	@Override
@@ -411,18 +431,18 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
-		return this.pesquisarByIdClienteByIdVendedor(idCliente, null, indiceRegistroInicial, numeroMaximoRegistros);
+		return this.pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, false, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
+			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 
 		if (idCliente == null) {
 			return Collections.emptyList();
 		}
-		return this.pedidoDAO.pesquisarByIdClienteByIdVendedor(idCliente, idVendedor, indiceRegistroInicial,
+		return this.pedidoDAO.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, isCompra,indiceRegistroInicial,
 				numeroMaximoRegistros);
 	}
 
@@ -698,5 +718,4 @@ public class PedidoServiceImpl implements PedidoService {
 			throw exception;
 		}
 	}
-
 }

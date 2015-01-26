@@ -220,13 +220,14 @@ public class PedidoController extends AbstractController {
      * administrador, sendo assim, ele podera consultar os pedidos de todos os
      * vendedores
      */
-    private PaginacaoWrapper<Pedido> gerarPaginacaoPedido(Integer idCliente, Integer paginaSelecionada) {
+    private PaginacaoWrapper<Pedido> gerarPaginacaoPedido(Integer idCliente, boolean isCompra, Integer paginaSelecionada) {
         final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
 
         if (this.isAcessoPermitido(TipoAcesso.ADMINISTRACAO)) {
-            return this.pedidoService.paginarPedido(idCliente, indiceRegistroInicial, getNumerRegistrosPorPagina());
+            return this.pedidoService.paginarPedido(idCliente, null, isCompra, indiceRegistroInicial,
+                    getNumerRegistrosPorPagina());
         } else {
-            return this.pedidoService.paginarPedido(idCliente, getCodigoUsuario(), indiceRegistroInicial,
+            return this.pedidoService.paginarPedido(idCliente, getCodigoUsuario(), isCompra, indiceRegistroInicial,
                     getNumerRegistrosPorPagina());
         }
     }
@@ -400,7 +401,6 @@ public class PedidoController extends AbstractController {
         addAtributo("industrializacao", FinalidadePedido.INDUSTRIALIZACAO);
         addAtributo("consumo", FinalidadePedido.CONSUMO);
         addAtributo("revenda", FinalidadePedido.REVENDA);
-        addAtributo("tipoPedido", TipoPedido.REPRESENTACAO);
         addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
 
         // verificando se o parametro para desabilitar ja foi incluido em outro
@@ -408,20 +408,6 @@ public class PedidoController extends AbstractController {
         if (!contemAtributo("pedidoDesabilitado")) {
             addAtributo("pedidoDesabilitado", false);
         }
-    }
-
-    @Get("pedido/representacao")
-    public void pedidoRepresentacao() {
-        redirecTo(this.getClass()).pedidoHome();
-        addAtributo("tipoPedido", TipoPedido.REPRESENTACAO);
-        addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
-    }
-
-    @Get("pedido/revenda")
-    public void pedidoRevenda() {
-        redirecTo(this.getClass()).pedidoHome();
-        addAtributo("tipoPedido", TipoPedido.REVENDA);
-        addAtributo("descricaoTipoPedido", TipoPedido.REVENDA.getDescricao());
     }
 
     /*
@@ -563,13 +549,13 @@ public class PedidoController extends AbstractController {
     }
 
     @Get("pedido/listagem")
-    public void pesquisarPedidoByIdCliente(Integer idCliente, Integer paginaSelecionada) {
+    public void pesquisarPedidoByIdCliente(Integer idCliente, TipoPedido tipoPedido, Integer paginaSelecionada) {
         if (idCliente == null) {
             gerarListaMensagemErro("Cliente é obrigatório para a pesquisa de pedidos");
             irTopoPagina();
         } else {
-
-            final PaginacaoWrapper<Pedido> paginacao = gerarPaginacaoPedido(idCliente, paginaSelecionada);
+            boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
+            final PaginacaoWrapper<Pedido> paginacao = gerarPaginacaoPedido(idCliente, isCompra, paginaSelecionada);
 
             final Collection<Pedido> listaPedido = paginacao.getLista();
             if (!listaPedido.isEmpty()) {

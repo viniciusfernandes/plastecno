@@ -35,11 +35,11 @@ public interface PedidoService {
 
     boolean isPedidoEnviado(Integer idPedido);
 
-    PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+    PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra,
+            Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-    PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+    PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, boolean isCompra,
+            Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
     List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
@@ -49,8 +49,8 @@ public interface PedidoService {
 
     List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-    List<Pedido> pesquisarByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+    List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
+            Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
     List<Pedido> pesquisarByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
             throws BusinessException;

@@ -161,7 +161,7 @@ $(document).ready(function() {
 			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
 
 			
-			<div class="label">Vendedor:</div>
+			<div class="label">Comprador:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="vendedor" name="vendedor.nome"
 					value="${vendedor.nome} - ${vendedor.email}" disabled="disabled"
@@ -206,11 +206,11 @@ $(document).ready(function() {
 					value="${pedido.formaPagamento}" style="width: 100%" />
 			</div>
 			<div class="label">
-				<label>Data Entrega:</label>
+				<label>Data Compra:</label>
 			</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="dataEntrega" name="pedido.dataEntrega"
-					value="${pedido.dataEntregaFormatada}" />
+					value="${pedido.dataCompraFormatada}" />
 			</div>
 			<div class="label" style="width: 17%">Data Inclusão:</div>
 			<div class="input" style="width: 10%">
@@ -382,60 +382,5 @@ $(document).ready(function() {
 		</div>
 	</form>
 
-	<a id="rodape"></a>
-	<fieldset>
-		<legend>::: Resultado da Pesquisa de Pedidos :::</legend>
-		<div id="paginador"></div>
-		<div>
-			<table class="listrada">
-				<thead>
-					<tr>
-						<th style="width: 10%">Situação</th>
-						<th style="width: 9%">Nr. Pedido</th>
-						<th style="width: 11%">Nr. Pedido Cliente</th>
-						<th style="width: 33%">Cliente / Vendedor</th>
-						<th style="width: 10%">Data Incl.</th>
-						<th style="width: 12%; text-align: center">CNPJ/CPF</th>
-						<th style="width: 8%">Valor (R$)</th>
-						<th style="width: 7%">Ações</th>
-					</tr>
-				</thead>
-
-				<tbody>
-					<c:forEach var="pedido" items="${listaPedido}">
-						<tr>
-							<td style="text-align: center;">${pedido.situacaoPedido}</td>
-							<td>${pedido.id}</td>
-							<td>${pedido.numeroPedidoCliente}</td>
-							<td>${pedido.cliente.nomeFantasia}/
-								${pedido.vendedor.nomeCompleto}</td>
-							<td style="text-align: center;">${pedido.dataInclusaoFormatada}</td>
-							<td>${pedido.cliente.documento}</td>
-							<td style="text-align: right;">${pedido.valorPedido}</td>
-							<td>
-								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/pedido/pdf"/>">
-										<input type="hidden" name="idPedido" value="${pedido.id}" /> <input
-											type="submit" value="" title="Visualizar Pedido PDF"
-											class="botaoPdf_16 botaoPdf_16_centro" />
-									</form>
-									<form action="<c:url value="/pedido/${pedido.id}"/>"
-										method="get">
-										<input type="submit" id="botaoEditarPedido"
-											title="Editar Dados do Pedido" value="" class="botaoEditar" />
-										<input type="hidden" name="id" value="${pedido.id}" />
-									</form>
-								</div>
-
-							</td>
-						</tr>
-
-					</c:forEach>
-				</tbody>
-
-			</table>
-		</div>
-	</fieldset>
-	
 </body>
 </html>

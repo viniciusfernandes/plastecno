@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
@@ -94,14 +95,16 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Pedido.class, null);
 	}
 
-	public List<Pedido> pesquisarByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
+	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		StringBuilder select = new StringBuilder(
 				"select p from Pedido p left join fetch p.vendedor where p.cliente.id = :idCliente ");
 		if (idVendedor != null) {
 			select.append(" and p.vendedor.id = :idVendedor ");
 		}
-
+		if (isCompra) {
+			select.append(" and p.tipoPedido = :tipoPedido ");
+		}
 		select.append(" order by p.dataInclusao desc, p.cliente.nomeFantasia ");
 
 		Query query = this.entityManager.createQuery(select.toString());
@@ -110,6 +113,9 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 			query.setParameter("idVendedor", idVendedor);
 		}
 
+		if (isCompra) {
+			query.setParameter("tipoPedido", TipoPedido.COMPRA);
+		}
 		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 

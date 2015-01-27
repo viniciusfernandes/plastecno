@@ -199,9 +199,9 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 			$('#idPedidoCancelamento').val(pedidoJson.id);
 			$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);
 			$('#vendedor').val(
-					pedidoJson.vendedor.nome + ' - '
-							+ pedidoJson.vendedor.email);
-			$('#idVendedor').val(pedidoJson.vendedor.id);
+					pedidoJson.proprietario.nome + ' - '
+							+ pedidoJson.proprietario.email);
+			$('#idVendedor').val(pedidoJson.proprietario.id);
 			$('#formEnvioPedido #botaoEnviarPedido').show();
 
 			habilitar('#numeroPedidoPesquisa', false);

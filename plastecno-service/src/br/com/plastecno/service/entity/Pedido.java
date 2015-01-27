@@ -108,15 +108,9 @@ public class Pedido implements Serializable, Cloneable {
 	private SituacaoPedido situacaoPedido;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_vendedor")
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor do pedido")
-	private Usuario vendedor;
-	
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_vendedor")
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Comprador do pedido")
-	private Usuario comprador;
+	@JoinColumn(name = "id_proprietario")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor/Comprador do pedido")
+	private Usuario proprietario;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "id_finalidade_pedido")
@@ -280,7 +274,15 @@ public class Pedido implements Serializable, Cloneable {
 	}
 
 	public Usuario getVendedor() {
-		return vendedor;
+		return proprietario;
+	}
+
+	public Usuario getComprador() {
+		return proprietario;
+	}
+
+	public void setComprador(Usuario comprador) {
+		proprietario = comprador;
 	}
 
 	@Override
@@ -419,6 +421,6 @@ public class Pedido implements Serializable, Cloneable {
 	}
 
 	public void setVendedor(Usuario vendedor) {
-		this.vendedor = vendedor;
+		this.proprietario = vendedor;
 	}
 }

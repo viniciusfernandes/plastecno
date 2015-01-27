@@ -25,9 +25,10 @@ public class MenuController extends AbstractController {
         this.verificarPermissaoAcesso("acessoRelatorioEntregaPermitido", TipoAcesso.CONSULTA_RELATORIO_ENTREGA);
         this.verificarPermissaoAcesso("acessoRelatorioPedidoRepresentadaPermitido", TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.OPERACAO_CONTABIL);
-        this.verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido",
-                TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS);
+        this.verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", TipoAcesso.ADMINISTRACAO,
+                TipoAcesso.GERENCIA_VENDAS);
         this.verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", TipoAcesso.ADMINISTRACAO);
+        this.verificarPermissaoAcesso("acessoCompraPermitido", TipoAcesso.CADASTRO_PEDIDO_COMPRA);
     }
 
     @Get("/")

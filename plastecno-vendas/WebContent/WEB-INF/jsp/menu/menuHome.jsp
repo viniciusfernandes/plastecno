@@ -34,7 +34,7 @@
 						<li><a href="pedido" target="principal_frame">Ped. Vendas</a></li>
 					</ul>
 				</li>
-				<c:if test="${empty acessoCompraPermitido}">
+				<c:if test="${acessoCompraPermitido}">
 					<li><a href="javascript: void(0)" target="principal_frame">Compras</a>
 						<ul>
 							<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a></li>

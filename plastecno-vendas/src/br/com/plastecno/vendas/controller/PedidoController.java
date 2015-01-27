@@ -357,7 +357,7 @@ public class PedidoController extends AbstractController {
             pedido = this.pedidoService.inserir(pedido);
             this.formatarPedido(pedido);
 
-            serializarJson(new SerializacaoJson(pedido).incluirAtributo("vendedor"));
+            serializarJson(new SerializacaoJson(pedido).incluirAtributo("proprietario"));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
@@ -378,6 +378,8 @@ public class PedidoController extends AbstractController {
     public void pedidoCompra() {
         redirecTo(this.getClass()).pedidoHome();
         addAtributo("tipoPedido", TipoPedido.COMPRA);
+        addAtributo("isCompra", true);
+        addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
         addAtributo("descricaoTipoPedido", TipoPedido.COMPRA.getDescricao());
     }
 

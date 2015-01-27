@@ -19,7 +19,7 @@ public class RelatorioVendasDAO extends GenericDAO<Object> {
 		StringBuilder select = new StringBuilder();
 		select.append("select v.nome, r.nomeFantasia, sum(p.valorPedido) from Pedido p ");
 		select.append("inner join p.representada r ");
-		select.append("inner join p.vendedor v ");
+		select.append("inner join p.proprietario v ");
 		select.append("where p.dataEnvio >= :dataInicio and p.dataEnvio <= :dataFim ");
 		select.append("and p.situacaoPedido = :situacaoEnviado ");
 		select.append("group by v.nome, r.nomeFantasia ");

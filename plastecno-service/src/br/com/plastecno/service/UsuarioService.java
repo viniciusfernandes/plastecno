@@ -26,11 +26,15 @@ public interface UsuarioService {
 
     Integer inserir(Usuario usuario, boolean isAlteracaoSenha) throws BusinessException;
 
+    boolean isAdministrador(Integer idUsuario);
+
     boolean isClienteAssociadoVendedor(Integer idCliente, Integer idVendedor);
 
     boolean isCPF(Integer id, String cpf);
 
     boolean isEmailExistente(Integer id, String email);
+
+    boolean isVendaPermitida(Integer idCliente, Integer idVendedor);
 
     boolean isVendedorAtivo(Integer idVendedor);
 
@@ -69,8 +73,8 @@ public interface UsuarioService {
 
     Usuario pesquisarVendedorByIdCliente(Integer idCliente);
 
-    List<Usuario> pesquisarVendedorByNome(String nome);
+	List<Usuario> pesquisarVendedorByNome(String nome);
 
-    List<Usuario> pesquisarVendedores(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+	List<Usuario> pesquisarVendedores(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
+	        Integer numeroMaximoRegistros);
 }

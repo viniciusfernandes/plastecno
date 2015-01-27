@@ -220,13 +220,8 @@ public class PedidoController extends AbstractController {
      */
     private PaginacaoWrapper<Pedido> gerarPaginacaoPedido(Integer idCliente, Integer paginaSelecionada) {
         final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
-
-        if (this.isAcessoPermitido(TipoAcesso.ADMINISTRACAO)) {
-            return this.pedidoService.paginarPedido(idCliente, indiceRegistroInicial, getNumerRegistrosPorPagina());
-        } else {
-            return this.pedidoService.paginarPedido(idCliente, getCodigoUsuario(), indiceRegistroInicial,
-                    getNumerRegistrosPorPagina());
-        }
+        return this.pedidoService.paginarPedido(idCliente, getCodigoUsuario(), indiceRegistroInicial,
+                getNumerRegistrosPorPagina());
     }
 
     private PedidoPDFWrapper gerarPDF(Integer idPedido) throws BusinessException {

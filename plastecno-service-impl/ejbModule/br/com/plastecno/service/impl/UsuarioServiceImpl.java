@@ -182,6 +182,17 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	public boolean isAdministrador(Integer idUsuario) {
+		List<PerfilAcesso> l = pesquisarPerfisAssociados(idUsuario);
+		for (PerfilAcesso perfilAcesso : l) {
+			if (perfilAcesso.getDescricao().equals("ADMINISTRACAO")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public boolean isClienteAssociadoVendedor(Integer idCliente, Integer idVendedor) {
 		return usuarioDAO.pesquisarIdVendedorByIdCliente(idCliente, idVendedor) != null;
 	}
@@ -194,6 +205,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	public boolean isEmailExistente(Integer id, String email) {
 		return usuarioDAO.isEntidadeExistente(Usuario.class, id, "email", email);
+	}
+
+	@Override
+	public boolean isVendaPermitida(Integer idCliente, Integer idVendedor) {
+		return isAdministrador(idVendedor) || isClienteAssociadoVendedor(idCliente, idVendedor);
 	}
 
 	@Override
@@ -275,13 +291,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return QueryUtil.gerarRegistroUnico(query, Logradouro.class, null);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<PerfilAcesso> pesquisarPerfisAssociados(Integer id) {
-		Query query = this.entityManager
-				.createQuery("select p from Usuario u , IN (u.listaPerfilAcesso) p where  u.id = :id order by p.descricao asc");
-		query.setParameter("id", id);
-		return query.getResultList();
+		return usuarioDAO.pesquisarPerfisAssociados(id);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -358,9 +370,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public Usuario pesquisarVendedorByIdCliente(Integer idCliente) {
-		Query query = this.entityManager.createQuery("select v from Cliente c inner join c.vendedor v where c.id =:id");
-		query.setParameter("id", idCliente);
-		return QueryUtil.gerarRegistroUnico(query, Usuario.class, null);
+		return usuarioDAO.pesquisarVendedorByIdCliente(idCliente);
 	}
 
 	@Override

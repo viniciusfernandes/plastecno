@@ -25,7 +25,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				.setParameter("situacao", SituacaoPedido.CANCELADO).setParameter("idPedido", idPedido).executeUpdate();
 	}
 
-
 	private Query gerarQueryPesquisa(Pedido filtro, StringBuilder select) {
 		Query query = this.entityManager.createQuery(select.toString());
 		final Cliente cliente = filtro.getCliente();
@@ -45,7 +44,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return query;
 	}
 
-	
 	private void gerarRestricaoPesquisa(Pedido filtro, StringBuilder select) {
 		StringBuilder restricao = new StringBuilder();
 		final Cliente cliente = filtro.getCliente();
@@ -95,25 +93,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Pedido.class, null);
 	}
 
-	public List<Pedido> pesquisarByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-		StringBuilder select = new StringBuilder(
-				"select p from Pedido p left join fetch p.vendedor where p.cliente.id = :idCliente ");
-		if (idVendedor != null) {
-			select.append(" and p.vendedor.id = :idVendedor ");
-		}
-
-		select.append(" order by p.dataInclusao desc, p.cliente.nomeFantasia ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idCliente", idCliente);
-		if (idVendedor != null) {
-			query.setParameter("idVendedor", idVendedor);
-		}
-
-		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
-	}
-
 	public Date pesquisarDataEnvioById(Integer idPedido) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p.dataEnvio from Pedido p where p.id = :id");
@@ -161,20 +140,21 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	public Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(
-				"select SUM(i.quantidade * i.precoUnidade) from ItemPedido i where i.pedido.id = :idPedido ").setParameter(
-				"idPedido", idPedido), Double.class, 0d);
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery(
+						"select SUM(i.quantidade * i.precoUnidade) from ItemPedido i where i.pedido.id = :idPedido ").setParameter(
+						"idPedido", idPedido), Double.class, 0d);
 	}
 
 	public Double pesquisarQuantidadePrecoUnidadeIPI(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(
-				"select SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ").setParameter(
-				"idPedido", idPedido), Double.class, 0d);
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery(
+						"select SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ")
+						.setParameter("idPedido", idPedido), Double.class, 0d);
 	}
 
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
-		return (Long) this.entityManager
-				.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
+		return (Long) this.entityManager.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
 				.setParameter("idPedido", idPedido).getSingleResult();
 	}
 
@@ -194,7 +174,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
 	}
 
-	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, 
+	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		StringBuilder select = new StringBuilder(
 				"select p from Pedido p left join fetch p.vendedor where p.cliente.id = :idCliente ");
@@ -209,6 +189,11 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 			query.setParameter("idVendedor", idVendedor);
 		}
 		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	public List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
+		return pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 }

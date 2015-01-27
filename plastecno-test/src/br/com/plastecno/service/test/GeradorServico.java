@@ -32,7 +32,9 @@ import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.impl.ClienteServiceImpl;
 import br.com.plastecno.service.impl.EmailServiceImpl;
@@ -247,12 +249,23 @@ class GeradorServico {
 		new MockUp<UsuarioDAO>() {
 
 			@Mock
+			public void $init(EntityManager entityManager) {
+			}
+
+			@Mock
 			public Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {
 				return idVendedor;
 			}
 
 			@Mock
-			public void $init(EntityManager entityManager) {
+			public Usuario pesquisarVendedorByIdCliente(Integer idCliente) {
+				Cliente c = REPOSITORIO.pesquisarEntidadeById(Cliente.class, idCliente);
+				return c != null ? c.getVendedor() : null;
+			}
+
+			@Mock
+			public List<PerfilAcesso> pesquisarPerfisAssociados(Integer id) {
+				return new ArrayList<PerfilAcesso>();
 			}
 
 		};

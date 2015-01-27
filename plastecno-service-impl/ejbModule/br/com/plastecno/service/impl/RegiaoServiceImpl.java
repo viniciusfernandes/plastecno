@@ -27,11 +27,11 @@ public class RegiaoServiceImpl implements RegiaoService {
 	@PersistenceContext(unitName = "plastecno")
 	private EntityManager entityManager;
 
-	private GenericDAO genericDAO;
+	private GenericDAO<Regiao> genericDAO;
 
 	@PostConstruct
 	public void init() {
-		this.genericDAO = new GenericDAO(this.entityManager);
+		this.genericDAO = new GenericDAO<Regiao>(this.entityManager);
 	}
 
 	@Override

@@ -69,6 +69,12 @@ public interface PedidoService {
 
 	List<Logradouro> pesquisarLogradouro(Integer idPedido);
 
+	List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros);
+
+	List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
 	Long pesquisarTotalRegistros(Integer idCliente);
@@ -84,8 +90,5 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
-
-	List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
 }

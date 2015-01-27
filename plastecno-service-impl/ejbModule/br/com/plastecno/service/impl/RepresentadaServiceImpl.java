@@ -14,7 +14,6 @@ import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
-import br.com.plastecno.service.dao.GenericDAO;
 import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;

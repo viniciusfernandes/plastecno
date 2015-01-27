@@ -41,7 +41,6 @@ public class GeradorEntidade {
 		cliente.setNomeFantasia("Exercito Brasileiro");
 		cliente.setCnpj("25632147000125");
 		cliente.setRamoAtividade(gerarRamoAtividade());
-
 		cliente.setId(gerarId());
 		return cliente;
 	}

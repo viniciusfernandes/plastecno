@@ -634,7 +634,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Usuario pesquisarVendedor(Integer idPedido) {
+	public Usuario pesquisarProprietario(Integer idPedido) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p.proprietario from Pedido p where p.id = :id");
 		Query query = this.entityManager.createQuery(select.toString());

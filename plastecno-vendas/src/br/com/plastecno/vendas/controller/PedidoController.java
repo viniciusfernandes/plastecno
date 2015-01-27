@@ -351,7 +351,7 @@ public class PedidoController extends AbstractController {
              * vendedor, pois o JSON devera conter o nome e email do vendedor.
              */
             final Usuario vendedor = pedido.getId() == null ? this.usuarioService.pesquisarById(getCodigoUsuario())
-                    : this.pedidoService.pesquisarVendedor(pedido.getId());
+                    : this.pedidoService.pesquisarProprietario(pedido.getId());
 
             pedido.setVendedor(vendedor);
             pedido = this.pedidoService.inserir(pedido);
@@ -511,7 +511,7 @@ public class PedidoController extends AbstractController {
             addAtributo("tipoPedido", pedido.getTipoPedido());
             addAtributo("descricaoTipoPedido", pedido.getTipoPedido().getDescricao());
             addAtributo("tipoPedido", pedido.getTipoPedido());
-            addAtributo("vendedor", this.pedidoService.pesquisarVendedor(id));
+            addAtributo("proprietario", pedidoService.pesquisarProprietario(id));
             addAtributo("cliente", pedido.getCliente());
             addAtributo("contato", pedido.getContato());
             addAtributo("situacaoPedidoSelecionada", pedido.getSituacaoPedido());

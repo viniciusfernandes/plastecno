@@ -91,7 +91,7 @@ public interface PedidoService {
 
 	Double pesquisarValorPedidoIPI(Integer idPedido);
 
-	Usuario pesquisarVendedor(Integer idPedido);
+	Usuario pesquisarProprietario(Integer idPedido);
 
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 

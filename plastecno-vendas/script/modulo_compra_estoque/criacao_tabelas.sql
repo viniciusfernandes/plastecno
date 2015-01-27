@@ -13,5 +13,4 @@ ALTER TABLE vendas.tb_pedido ADD CONSTRAINT id_tipo_pedido FOREIGN KEY (id_tipo_
 
 insert into vendas.tb_perfil_acesso (id, descricao) values (nextval('vendas.seq_perfil_acesso_id'), 'CADASTRO_PEDIDO_COMPRA');
 
-
 ALTER TABLE vendas.tb_pedido RENAME id_vendedor TO id_proprietario;

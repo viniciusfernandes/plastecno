@@ -52,10 +52,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 		this.verificarVendedorAtivo(idVendedor);
 
 		this.entityManager
-				.createQuery(
-						"update Cliente c set c.vendedor.id = :idVendedor where c.id in (:listaIdClienteAssociado)")
-				.setParameter("idVendedor", idVendedor)
-				.setParameter("listaIdClienteAssociado", listaIdClienteAssociado).executeUpdate();
+				.createQuery("update Cliente c set c.vendedor.id = :idVendedor where c.id in (:listaIdClienteAssociado)")
+				.setParameter("idVendedor", idVendedor).setParameter("listaIdClienteAssociado", listaIdClienteAssociado)
+				.executeUpdate();
 	}
 
 	@Override
@@ -84,15 +83,14 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
-	public void desassociarCliente(Integer idVendedor, List<Integer> listaIdClienteDesassociado)
-			throws BusinessException {
+	public void desassociarCliente(Integer idVendedor, List<Integer> listaIdClienteDesassociado) throws BusinessException {
 		this.verificarVendedorAtivo(idVendedor);
 
 		this.entityManager
 				.createQuery(
 						"update Cliente c set c.vendedor = null where c.vendedor.id = :idVendedor and c.id in (:listaIdClienteDesassociado)")
-				.setParameter("idVendedor", idVendedor)
-				.setParameter("listaIdClienteDesassociado", listaIdClienteDesassociado).executeUpdate();
+				.setParameter("idVendedor", idVendedor).setParameter("listaIdClienteDesassociado", listaIdClienteDesassociado)
+				.executeUpdate();
 	}
 
 	private Query gerarQueryPesquisa(Usuario filtro, StringBuilder select) {
@@ -179,7 +177,19 @@ public class UsuarioServiceImpl implements UsuarioService {
 				throw new BusinessException("Não foi possível criptografar a senha do usuário " + usuario.getEmail());
 			}
 		}
-		return this.entityManager.merge(usuario).getId();
+
+		return usuario.getId() == null ? usuarioDAO.inserir(usuario).getId() : usuarioDAO.alterar(usuario).getId();
+	}
+
+	@Override
+	public boolean isAdministrador(Integer idUsuario) {
+		List<PerfilAcesso> l = pesquisarPerfisAssociados(idUsuario);
+		for (PerfilAcesso perfilAcesso : l) {
+			if (perfilAcesso.getDescricao().equals("ADMINISTRACAO")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -198,11 +208,16 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	public boolean isVendaPermitida(Integer idCliente, Integer idVendedor) {
+		return isAdministrador(idVendedor) || isClienteAssociadoVendedor(idCliente, idVendedor);
+	}
+
+	@Override
 	public boolean isVendedorAtivo(Integer idVendedor) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery(
-						"select v.ativo from Usuario v where v.id =:idVendedor and v.vendedorAtivo = true")
-						.setParameter("idVendedor", idVendedor), Boolean.class, false);
+						"select v.ativo from Usuario v where v.id =:idVendedor and v.vendedorAtivo = true").setParameter(
+						"idVendedor", idVendedor), Boolean.class, false);
 	}
 
 	@Override
@@ -214,8 +229,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
-	public PaginacaoWrapper<Usuario> paginarVendedor(Usuario filtro, Boolean apenasAtivos,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+	public PaginacaoWrapper<Usuario> paginarVendedor(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
 		return new PaginacaoWrapper<Usuario>(this.pesquisarTotalRegistros(filtro, apenasAtivos, true), this.pesquisar(
 				filtro, true, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
 
@@ -276,13 +291,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return QueryUtil.gerarRegistroUnico(query, Logradouro.class, null);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<PerfilAcesso> pesquisarPerfisAssociados(Integer id) {
-		Query query = this.entityManager
-				.createQuery("select p from Usuario u , IN (u.listaPerfilAcesso) p where  u.id = :id order by p.descricao asc");
-		query.setParameter("id", id);
-		return query.getResultList();
+		return usuarioDAO.pesquisarPerfisAssociados(id);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -313,8 +324,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	public String pesquisarSenhaByEmail(String email) {
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select u.senha from Usuario u where u.email = :email ").setParameter(
-						"email", email), String.class, null);
+				this.entityManager.createQuery("select u.senha from Usuario u where u.email = :email ").setParameter("email",
+						email), String.class, null);
 	}
 
 	@Override
@@ -345,24 +356,21 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public Usuario pesquisarUsuarioResumidoById(Integer idUsuario) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery(
-						"select new Usuario(u.id, u.nome, u.sobrenome) from Usuario u where u.id = :idUsuario ")
-						.setParameter("idUsuario", idUsuario), Usuario.class, null);
+						"select new Usuario(u.id, u.nome, u.sobrenome) from Usuario u where u.id = :idUsuario ").setParameter(
+						"idUsuario", idUsuario), Usuario.class, null);
 	}
 
 	@Override
 	public Usuario pesquisarVendedorById(Integer idVendedor) {
 
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select c from Usuario c where c.id = :idVendedor and c.vendedorAtivo = true").setParameter(
-						"idVendedor", idVendedor), Usuario.class, null);
+				this.entityManager.createQuery("select c from Usuario c where c.id = :idVendedor and c.vendedorAtivo = true")
+						.setParameter("idVendedor", idVendedor), Usuario.class, null);
 	}
 
 	@Override
 	public Usuario pesquisarVendedorByIdCliente(Integer idCliente) {
-		Query query = this.entityManager.createQuery("select v from Cliente c inner join c.vendedor v where c.id =:id");
-		query.setParameter("id", idCliente);
-		return QueryUtil.gerarRegistroUnico(query, Usuario.class, null);
+		return usuarioDAO.pesquisarVendedorByIdCliente(idCliente);
 	}
 
 	@Override

@@ -131,7 +131,7 @@ public class ClienteServiceImpl implements ClienteService {
 		validarDocumentosPreenchidos(cliente);
 		validarListaLogradouroPreenchida(cliente);
 		inserirEndereco(cliente);
-		return clienteDAO.inserir(cliente);
+		return cliente.getId() == null ? clienteDAO.inserir(cliente) : clienteDAO.alterar(cliente);
 	}
 
 	@Override
@@ -415,15 +415,6 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente) {
-		return this.entityManager
-				.createQuery(
-						"select new Transportadora(t.id, t.nomeFantasia) from Cliente c inner join c.listaRedespacho t where c.id = :idCliente and t.ativo = true order by t.nomeFantasia asc")
-				.setParameter("idCliente", idCliente).getResultList();
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
 	public List<Transportadora> pesquisarTransportadorasDesassociadas(Integer idCliente) {
 		List<Transportadora> listaTransportadora = this.pesquisarTransportadorasRedespacho(idCliente);
 		Query query = null;
@@ -436,6 +427,15 @@ public class ClienteServiceImpl implements ClienteService {
 					.createQuery("select new Transportadora(t.id, t.nomeFantasia) from Transportadora t order by t.nomeFantasia asc");
 		}
 		return query.getResultList();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente) {
+		return this.entityManager
+				.createQuery(
+						"select new Transportadora(t.id, t.nomeFantasia) from Cliente c inner join c.listaRedespacho t where c.id = :idCliente and t.ativo = true order by t.nomeFantasia asc")
+				.setParameter("idCliente", idCliente).getResultList();
 	}
 
 	@Override

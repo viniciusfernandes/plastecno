@@ -2,6 +2,7 @@ package br.com.plastecno.service.impl;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -23,6 +24,11 @@ public class EnderecamentoServiceImpl implements EnderecamentoService {
 	@PersistenceContext(unitName = "plastecno")
 	private EntityManager entityManager;
 	private EnderecoDAO enderecoDAO;
+
+	@PostConstruct
+	public void init() {
+		enderecoDAO = new EnderecoDAO(entityManager);
+	}
 
 	@Override
 	public Endereco inserir(Endereco endereco) throws BusinessException {

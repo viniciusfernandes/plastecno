@@ -510,6 +510,7 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testInclusaoPedidoDigitado() {
 		Pedido pedido = gerador.gerarPedido();
 		pedido.setId(null);
+		associarVendedor(pedido.getCliente());
 
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -518,6 +519,15 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
 			fail("Todo pedido incluido deve ir para a digitacao");
+		}
+	}
+
+	private void associarVendedor(Cliente cliente) {
+		cliente.setVendedor(GeradorEntidade.getInstance().gerarVendedor());
+		try {
+			clienteService.inserir(cliente);
+		} catch (BusinessException e) {
+			printMensagens(e);
 		}
 	}
 
@@ -539,6 +549,8 @@ public class PedidoServiceTest extends AbstractTest {
 		initTestInclusaoPedidoOrcamento();
 
 		Pedido pedido = gerador.gerarPedido();
+		associarVendedor(pedido.getCliente());
+
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 		// Incluindo o pedido no sistema para, posteriormente, inclui-lo como
 		// orcamento.
@@ -608,6 +620,8 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testPedidoCanceladoDataEntregaInvalida() {
 		Pedido pedido = gerador.gerarPedido();
+		associarVendedor(pedido.getCliente());
+		
 		try {
 			// Inserindo o pedido no sistema
 			pedido = pedidoService.inserir(pedido);
@@ -635,7 +649,8 @@ public class PedidoServiceTest extends AbstractTest {
 		initTestRefazerPedido();
 
 		Pedido pedido = gerador.gerarPedido();
-
+		associarVendedor(pedido.getCliente());
+		
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {

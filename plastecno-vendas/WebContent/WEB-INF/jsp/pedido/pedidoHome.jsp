@@ -137,6 +137,15 @@ $(document).ready(function() {
 			}
 		});
 	});
+	
+	$('#botaoEnviarPedido').click(function (){
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ENVIAR esse pedido?',
+			confirmar: function(){
+				$('#botaoEnviarPedido').closest('form').submit();	
+			}
+		});
+	});
 });
 
 
@@ -371,9 +380,8 @@ $(document).ready(function() {
 		method="post">
 		<div class="bloco_botoes">
 
-			<input type="submit" id="botaoEnviarPedido"
+			<input type="button" id="botaoEnviarPedido"
 				title="Enviar Dados do Pedido" value=""
-				onclick="javascript: return confirm('Voce deseja mesmo enviar o PEDIDO?');"
 				class="botaoEnviarEmail"
 				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> />
 			<input type="hidden" id="idPedido" name="idPedido"

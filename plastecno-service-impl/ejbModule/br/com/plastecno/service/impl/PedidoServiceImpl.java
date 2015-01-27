@@ -1,5 +1,6 @@
 package br.com.plastecno.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -157,7 +158,6 @@ public class PedidoServiceImpl implements PedidoService {
 		} else {
 			enviarVenda(pedido, arquivoAnexado);
 		}
-
 		if (pedido.isCompra()) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
 		}
@@ -230,6 +230,7 @@ public class PedidoServiceImpl implements PedidoService {
 		definirTipoPedido(pedido);
 
 		ValidadorInformacao.validar(pedido);
+
 		final Integer idPedido = pedido.getId();
 		final boolean isPedidoNovo = idPedido == null;
 		/*
@@ -237,9 +238,9 @@ public class PedidoServiceImpl implements PedidoService {
 		 * cliente que nao esteja associado em sua carteira de clientes.
 		 */
 		if (isPedidoNovo
-				&& !this.usuarioService.isClienteAssociadoVendedor(pedido.getCliente().getId(), pedido.getVendedor().getId())) {
+				&& !this.usuarioService.isVendaPermitida(pedido.getCliente().getId(), pedido.getVendedor().getId())) {
 
-			final Cliente cliente = this.clienteService.pesquisarById(pedido.getCliente().getId());
+			Cliente cliente = this.clienteService.pesquisarById(pedido.getCliente().getId());
 			Usuario vendedor = this.usuarioService.pesquisarById(pedido.getVendedor().getId());
 			throw new BusinessException("Não é possível incluir o pedido pois o cliente "
 					+ (cliente != null ? cliente.getNomeCompleto() : pedido.getCliente().getId())
@@ -256,6 +257,16 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("A transportadora de redespacho é obrigatória para o tipo de entrega "
 					+ TipoEntrega.CIF_TRANS.getDescricao());
 		}
+
+		// Efetuando o vinculo entre o vendedor e o pedido pois o vendedor eh
+		// obrigatorio pois agora eh possivel que um outro vendedor com o perfil de
+		// administrador faca cadastro de pedidos em nome de outro. Por isso estamos
+		// ajustando o vendedor correto.
+		Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(pedido.getCliente().getId());
+		if (vendedor == null) {
+			throw new BusinessException("Nao existe vendedor associado ao cliente " + pedido.getCliente().getNomeCompleto());
+		}
+		pedido.setVendedor(vendedor);
 
 		/*
 		 * Devemos sempre pesquisar pois o cliente pode ter alterado os dados de
@@ -398,8 +409,13 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor,boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalRegistros(idCliente, idVendedor),
-				this.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, isCompra,indiceRegistroInicial, numeroMaximoRegistros));
+		List<Pedido> listaPedido = null;
+		if (usuarioService.isVendaPermitida(idCliente, idVendedor)) {
+			listaPedido = pesquisarByIdCliente(idCliente, indiceRegistroInicial, numeroMaximoRegistros);
+		} else {
+			listaPedido = new ArrayList<Pedido>();
+		}
+		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalRegistros(idCliente, idVendedor), listaPedido);
 	}
 
 	@Override
@@ -431,7 +447,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
-		return this.pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, false, indiceRegistroInicial, numeroMaximoRegistros);
+		return this.pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
@@ -548,6 +564,29 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Logradouro> pesquisarLogradouro(Integer idPedido) {
 		return pedidoDAO.pesquisarLogradouro(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
+
+		if (idCliente == null) {
+			return Collections.emptyList();
+		}
+		return pedidoDAO.pesquisarPedidoByIdCliente(idCliente, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+
+		if (idCliente == null) {
+			return Collections.emptyList();
+		}
+		return pedidoDAO.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, indiceRegistroInicial,
+				numeroMaximoRegistros);
 	}
 
 	@Override
@@ -718,4 +757,5 @@ public class PedidoServiceImpl implements PedidoService {
 			throw exception;
 		}
 	}
+
 }

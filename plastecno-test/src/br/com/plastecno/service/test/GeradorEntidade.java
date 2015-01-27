@@ -4,7 +4,6 @@ import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoLogradouro;
-import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.Bairro;
 import br.com.plastecno.service.entity.Cidade;
@@ -42,7 +41,6 @@ public class GeradorEntidade {
 		cliente.setNomeFantasia("Exercito Brasileiro");
 		cliente.setCnpj("25632147000125");
 		cliente.setRamoAtividade(gerarRamoAtividade());
-
 		cliente.setId(gerarId());
 		return cliente;
 	}
@@ -123,13 +121,11 @@ public class GeradorEntidade {
 		pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 		pedido.setFinalidadePedido(FinalidadePedido.CONSUMO);
 		pedido.setContato(contato);
-		pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
 		return pedido;
 	}
 
 	public Pedido gerarPedidoRevenda() {
 		Pedido pedido = gerarPedido();
-		pedido.setTipoPedido(null);
 		pedido.getRepresentada().setNomeFantasia("PLASTECNO FILIAL");
 		return pedido;
 	}

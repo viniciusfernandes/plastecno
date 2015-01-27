@@ -401,17 +401,17 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
 		return paginarPedido(idCliente, null, isCompra, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
-	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor,boolean isCompra,
+	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		List<Pedido> listaPedido = null;
 		if (usuarioService.isVendaPermitida(idCliente, idVendedor)) {
-			listaPedido = pesquisarByIdCliente(idCliente, indiceRegistroInicial, numeroMaximoRegistros);
+			listaPedido = pesquisarByIdCliente(idCliente, isCompra,indiceRegistroInicial, numeroMaximoRegistros);
 		} else {
 			listaPedido = new ArrayList<Pedido>();
 		}
@@ -447,19 +447,27 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
-		return this.pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, indiceRegistroInicial, numeroMaximoRegistros);
+		return pesquisarByIdCliente(idCliente, false, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
-			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+	public List<Pedido> pesquisarByIdCliente(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
+		return this.pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, isCompra, indiceRegistroInicial,
+				numeroMaximoRegistros);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 
 		if (idCliente == null) {
 			return Collections.emptyList();
 		}
-		return this.pedidoDAO.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, isCompra,indiceRegistroInicial,
-				numeroMaximoRegistros);
+		return this.pedidoDAO.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, isCompra,
+				indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
@@ -473,7 +481,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 		StringBuilder select = new StringBuilder()
 				.append("select p from Pedido p join fetch p.representada where p.situacaoPedido = :situacaoPedido and ")
-				.append("p.vendedor.id = :idVendedor and ").append(" p.dataEnvio >= :dataInicio and ")
+				.append("p.proprietario.id = :idVendedor and ").append(" p.dataEnvio >= :dataInicio and ")
 				.append(" p.dataEnvio <= :dataFim ").append("order by p.dataEnvio desc ");
 
 		return this.entityManager.createQuery(select.toString())
@@ -542,7 +550,7 @@ public class PedidoServiceImpl implements PedidoService {
 			return null;
 		}
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select v.id from Pedido p inner join p.vendedor v where p.id = idPedido ")
+				this.entityManager.createQuery("select v.id from Pedido p inner join p.proprietario v where p.id = idPedido ")
 						.setParameter("idPedido", idPedido), Integer.class, null);
 	}
 
@@ -579,18 +587,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-
-		if (idCliente == null) {
-			return Collections.emptyList();
-		}
-		return pedidoDAO.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, indiceRegistroInicial,
-				numeroMaximoRegistros);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
 	}
@@ -610,7 +606,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 		StringBuilder select = new StringBuilder("select count(p.id) from Pedido p where p.cliente.id = :idCliente ");
 		if (idVendedor != null) {
-			select.append(" and p.vendedor.id = :idVendedor ");
+			select.append(" and p.proprietario.id = :idVendedor ");
 		}
 
 		Query query = this.entityManager.createQuery(select.toString());
@@ -640,7 +636,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Usuario pesquisarVendedor(Integer idPedido) {
 		StringBuilder select = new StringBuilder();
-		select.append("select p.vendedor from Pedido p where p.id = :id");
+		select.append("select p.proprietario from Pedido p where p.id = :id");
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("id", idPedido);
 

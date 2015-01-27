@@ -165,15 +165,15 @@ $(document).ready(function() {
 			<!-- O campo id do pedido eh hidden pois o input text nao eh enviado na edicao do formulario pois esta "disabled" -->
 			<input type="hidden" id="numeroPedido" name="pedido.id" value="${pedido.id}" /> 
 			<input type="hidden" id="idCliente" name="pedido.cliente.id" value="${cliente.id}" /> 
-			<input type="hidden" id="idVendedor" name="pedido.vendedor.id" value="${vendedor.id}" /> 
+			<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${proprietario.id}" /> 
 			<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${representadaSelecionada.id}" />
 			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
 
 			
-			<div class="label">Vendedor:</div>
+			<div class="label">${isCompra ? 'Comprador:': 'Vendedor:'}</div>
 			<div class="input" style="width: 40%">
-				<input type="text" id="vendedor" name="vendedor.nome"
-					value="${vendedor.nome} - ${vendedor.email}" disabled="disabled"
+				<input type="text" id="proprietario" name="proprietario.nome"
+					value="${proprietario.nome} - ${proprietario.email}" disabled="disabled"
 					class="uppercaseBloqueado desabilitado" />
 			</div>
 			<c:choose>

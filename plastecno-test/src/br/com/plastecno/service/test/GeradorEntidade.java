@@ -24,6 +24,7 @@ public class GeradorEntidade {
 	public static GeradorEntidade getInstance() {
 		return gerador;
 	}
+
 	private RepositorioEntidade repositorio = RepositorioEntidade.getInstance();
 
 	private static final GeradorEntidade gerador = new GeradorEntidade();

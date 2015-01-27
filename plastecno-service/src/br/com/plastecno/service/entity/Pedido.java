@@ -111,6 +111,12 @@ public class Pedido implements Serializable, Cloneable {
 	@JoinColumn(name = "id_vendedor")
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor do pedido")
 	private Usuario vendedor;
+	
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_vendedor")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Comprador do pedido")
+	private Usuario comprador;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "id_finalidade_pedido")

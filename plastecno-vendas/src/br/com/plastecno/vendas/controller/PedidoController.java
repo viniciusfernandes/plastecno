@@ -222,7 +222,7 @@ public class PedidoController extends AbstractController {
      */
     private PaginacaoWrapper<Pedido> gerarPaginacaoPedido(Integer idCliente, boolean isCompra, Integer paginaSelecionada) {
         final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
-        return this.pedidoService.paginarPedido(idCliente, getCodigoUsuario(), indiceRegistroInicial,
+        return this.pedidoService.paginarPedido(idCliente, getCodigoUsuario(), isCompra, indiceRegistroInicial,
                 getNumerRegistrosPorPagina());
     }
 

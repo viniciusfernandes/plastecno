@@ -35,11 +35,11 @@ public interface PedidoService {
 
 	boolean isPedidoEnviado(Integer idPedido);
 
-    PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra,
-            Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros);
 
-    PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, boolean isCompra,
-            Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
 	List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
@@ -49,14 +49,9 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-    List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
-            Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+	List<Pedido> pesquisarCompraPendente(Integer idRepresentada, Periodo periodo);
 
 	Date pesquisarDataEnvio(Integer idPedido);
-
-    List<Pedido> pesquisarCompraPendente(Integer idRepresentada, Periodo periodo);
-
-    Date pesquisarDataEnvio(Integer idPedido);
 
 	List<Pedido> pesquisarEnviadosByPeriodo(Periodo periodo);
 
@@ -75,6 +70,9 @@ public interface PedidoService {
 	List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros);
 
+	List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+
 	List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
@@ -87,13 +85,16 @@ public interface PedidoService {
 	Double pesquisarValorPedido(Integer idPedido);
 
 	Double pesquisarValorPedidoIPI(Integer idPedido);
-    
-    Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Usuario pesquisarVendedor(Integer idPedido);
 
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
+
+	List<Pedido> pesquisarByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
+			throws BusinessException;
+
+	Date pesquisarDataInclusao(Integer idPedido);
 
 }

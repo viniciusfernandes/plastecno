@@ -482,6 +482,8 @@ public class PedidoServiceTest extends AbstractTest {
 		Pedido pedido = gerador.gerarPedido();
 		pedido.setId(null);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
+		associarVendedor(pedido.getCliente());
+
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -578,7 +580,8 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoPedidoRepresentacao() {
 		Pedido pedido = gerador.gerarPedido();
-
+		associarVendedor(pedido.getCliente());
+		
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -592,6 +595,7 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoPedidoRevenda() {
 		Pedido pedido = gerador.gerarPedidoRevenda();
+		associarVendedor(pedido.getCliente());
 
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -621,7 +625,7 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testPedidoCanceladoDataEntregaInvalida() {
 		Pedido pedido = gerador.gerarPedido();
 		associarVendedor(pedido.getCliente());
-		
+
 		try {
 			// Inserindo o pedido no sistema
 			pedido = pedidoService.inserir(pedido);
@@ -650,7 +654,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		Pedido pedido = gerador.gerarPedido();
 		associarVendedor(pedido.getCliente());
-		
+
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {

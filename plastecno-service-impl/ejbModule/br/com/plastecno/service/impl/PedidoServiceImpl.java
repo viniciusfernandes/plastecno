@@ -138,7 +138,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public void enviar(Integer idPedido, byte[] arquivoAnexado) throws BusinessException {
 
-		final Pedido pedido = pesquisarVendaById(idPedido);
+		final Pedido pedido = pesquisarPedidoById(idPedido);
 
 		if (pedido == null) {
 			throw new BusinessException("Pedido não exite no sistema");

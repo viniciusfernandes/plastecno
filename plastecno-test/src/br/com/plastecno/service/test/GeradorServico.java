@@ -178,8 +178,9 @@ class GeradorServico {
 			}
 
 			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				return REPOSITORIO.pesquisarEntidadeById(Pedido.class, idPedido);
+			Pedido pesquisarById(Integer idPedido, boolean isCompra) {
+				Pedido pedido = REPOSITORIO.pesquisarEntidadeById(Pedido.class, idPedido);
+				return pedido != null && pedido.isCompra() == isCompra ? pedido : null;
 			}
 
 			@Mock

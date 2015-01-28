@@ -157,6 +157,7 @@ public class PedidoController extends AbstractController {
             final PedidoPDFWrapper wrapper = this.gerarPDF(idPedido);
             final Pedido pedido = wrapper.getPedido();
 
+            tipoPedido = pedido.getTipoPedido();
             this.pedidoService.enviar(idPedido, wrapper.getArquivoPDF());
 
             final String mensagem = pedido.isOrcamento() ? "Orçamento No. " + idPedido
@@ -164,10 +165,8 @@ public class PedidoController extends AbstractController {
                     : "Pedido No. " + idPedido + " foi enviado com sucesso para a representada "
                             + pedido.getRepresentada().getNomeFantasia();
 
-            tipoPedido = pedido.getTipoPedido();
-            configurarTipoPedido(tipoPedido);
             gerarMensagemSucesso(mensagem);
-            
+
             irTopoPagina();
         } catch (NotificacaoException e) {
             gerarLogErro("envio de email do pedido No. " + idPedido, e);
@@ -179,6 +178,7 @@ public class PedidoController extends AbstractController {
             gerarLogErro("envio de email do pedido No. " + idPedido, e);
         }
 
+        configurarTipoPedido(tipoPedido);
     }
 
     private void formatarItemPedido(ItemPedido... itens) {
@@ -264,8 +264,10 @@ public class PedidoController extends AbstractController {
         final Logradouro logradouroEntrega = pedido.getLogradouro(TipoLogradouro.ENTREGA);
         final Logradouro logradouroCobranca = pedido.getLogradouro(TipoLogradouro.COBRANCA);
 
+        String tipoPedido = pedido.isVenda() ? "Venda" : "Compra";
+        geradorRelatorio.addAtributo("titulo", pedido.isOrcamento() ? "Orçamento de " + tipoPedido : "Pedido de "
+                + tipoPedido);
         geradorRelatorio.addAtributo("pedido", pedido);
-        geradorRelatorio.addAtributo("titulo", pedido.isOrcamento() ? "Orçamento de Venda" : "Pedido de Venda");
         geradorRelatorio.addAtributo("logradouroFaturamento",
                 logradouroFaturamento != null ? logradouroFaturamento.getDescricao() : "");
         geradorRelatorio.addAtributo("logradouroEntrega", logradouroEntrega != null ? logradouroEntrega.getDescricao()
@@ -374,7 +376,10 @@ public class PedidoController extends AbstractController {
             return false;
         } else {
             SituacaoPedido situacao = pedido.getSituacaoPedido();
-            return SituacaoPedido.CANCELADO.equals(situacao) || SituacaoPedido.ENVIADO.equals(situacao);
+            boolean isCompraFinalizada = pedido.isCompra()
+                    && SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacao);
+            boolean isVendaFinalizada = pedido.isVenda() && SituacaoPedido.ENVIADO.equals(situacao);
+            return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
         }
     }
 

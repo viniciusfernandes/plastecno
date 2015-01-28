@@ -409,7 +409,7 @@ $(document).ready(function() {
 				<tbody>
 					<c:forEach var="pedido" items="${listaPedido}">
 						<tr>
-							<td style="text-align: center;">${pedido.situacaoPedido}</td>
+							<td style="text-align: center;">${pedido.situacaoPedido.descricao}</td>
 							<td>${pedido.id}</td>
 							<td>${pedido.numeroPedidoCliente}</td>
 							<td>${pedido.cliente.nomeFantasia}/

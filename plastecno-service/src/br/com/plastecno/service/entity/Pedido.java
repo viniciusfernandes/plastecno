@@ -177,6 +177,10 @@ public class Pedido implements Serializable, Cloneable {
 		return cliente;
 	}
 
+	public Usuario getComprador() {
+		return proprietario;
+	}
+
 	public Contato getContato() {
 		return contato;
 	}
@@ -233,6 +237,10 @@ public class Pedido implements Serializable, Cloneable {
 		return observacao;
 	}
 
+	public Usuario getProprietario() {
+		return proprietario;
+	}
+
 	public Representada getRepresentada() {
 		return representada;
 	}
@@ -277,14 +285,6 @@ public class Pedido implements Serializable, Cloneable {
 		return proprietario;
 	}
 
-	public Usuario getComprador() {
-		return proprietario;
-	}
-
-	public void setComprador(Usuario comprador) {
-		proprietario = comprador;
-	}
-
 	@Override
 	public int hashCode() {
 		return id != null ? id : -1;
@@ -314,12 +314,20 @@ public class Pedido implements Serializable, Cloneable {
 		return TipoPedido.REVENDA.equals(tipoPedido);
 	}
 
+	public boolean isVenda() {
+		return isRevenda() || isRepresentacao();
+	}
+
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}
 
 	public void setClienteNotificadoVenda(boolean clienteNotificadoVenda) {
 		this.clienteNotificadoVenda = clienteNotificadoVenda;
+	}
+
+	public void setComprador(Usuario comprador) {
+		proprietario = comprador;
 	}
 
 	public void setContato(Contato contato) {
@@ -378,6 +386,10 @@ public class Pedido implements Serializable, Cloneable {
 		if (isOrcamento) {
 			this.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 		}
+	}
+
+	public void setProprietario(Usuario proprietario) {
+		this.proprietario = proprietario;
 	}
 
 	public void setRepresentada(Representada representada) {

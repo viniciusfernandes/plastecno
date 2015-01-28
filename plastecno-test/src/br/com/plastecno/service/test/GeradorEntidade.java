@@ -118,7 +118,7 @@ public class GeradorEntidade {
 		Pedido pedido = new Pedido();
 		pedido.setCliente(cliente);
 		pedido.setRepresentada(representada);
-		pedido.setVendedor(vendedor);
+		pedido.setProprietario(vendedor);
 		pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 		pedido.setFinalidadePedido(FinalidadePedido.CONSUMO);
 		pedido.setContato(contato);

@@ -81,6 +81,10 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	public Pedido pesquisarById(Integer idPedido) {
+		return super.pesquisarById(Pedido.class, idPedido);
+	}
+
+	public Pedido pesquisarById(Integer idPedido, boolean isCompra) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p from Pedido p ");
 		select.append("join fetch p.proprietario ");
@@ -88,10 +92,17 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		select.append("left join fetch p.transportadoraRedespacho ");
 		select.append("join fetch p.representada ");
 		select.append("join fetch p.contato ");
-		select.append("where p.id = :idPedido");
+		select.append("where p.id = :idPedido ");
+
+		if (isCompra) {
+			select.append("and p.tipoPedido = :tipoPedido ");
+		} else {
+			select.append("and p.tipoPedido != :tipoPedido ");
+		}
 
 		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idPedido", idPedido);
+		query.setParameter("idPedido", idPedido).setParameter("tipoPedido", TipoPedido.COMPRA);
+
 		return QueryUtil.gerarRegistroUnico(query, Pedido.class, null);
 	}
 

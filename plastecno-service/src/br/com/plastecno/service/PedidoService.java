@@ -43,7 +43,7 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-	Pedido pesquisarById(Integer id);
+	Pedido pesquisarVendaById(Integer id);
 
 	List<Pedido> pesquisarByIdCliente(Integer idCliente);
 
@@ -96,5 +96,9 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
+
+	Pedido pesquisarCompraById(Integer id);
+
+	Pedido pesquisarPedidoById(Integer id);
 
 }

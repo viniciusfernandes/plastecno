@@ -138,7 +138,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public void enviar(Integer idPedido, byte[] arquivoAnexado) throws BusinessException {
 
-		final Pedido pedido = pesquisarById(idPedido);
+		final Pedido pedido = pesquisarVendaById(idPedido);
 
 		if (pedido == null) {
 			throw new BusinessException("Pedido não exite no sistema");
@@ -241,11 +241,12 @@ public class PedidoServiceImpl implements PedidoService {
 				&& !this.usuarioService.isVendaPermitida(pedido.getCliente().getId(), pedido.getVendedor().getId())) {
 
 			Cliente cliente = this.clienteService.pesquisarById(pedido.getCliente().getId());
-			Usuario vendedor = this.usuarioService.pesquisarById(pedido.getVendedor().getId());
+			Usuario proprietario = this.usuarioService.pesquisarById(pedido.getProprietario().getId());
 			throw new BusinessException("Não é possível incluir o pedido pois o cliente "
 					+ (cliente != null ? cliente.getNomeCompleto() : pedido.getCliente().getId())
 					+ " não esta associado ao vendedor "
-					+ (vendedor != null ? vendedor.getNome() + " - " + vendedor.getEmail() : pedido.getCliente().getId()));
+					+ (proprietario != null ? proprietario.getNome() + " - " + proprietario.getEmail() : pedido.getCliente()
+							.getId()));
 		}
 
 		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());
@@ -258,16 +259,19 @@ public class PedidoServiceImpl implements PedidoService {
 					+ TipoEntrega.CIF_TRANS.getDescricao());
 		}
 
-		// Efetuando o vinculo entre o vendedor e o pedido pois o vendedor eh
-		// obrigatorio pois agora eh possivel que um outro vendedor com o perfil de
-		// administrador faca cadastro de pedidos em nome de outro. Por isso estamos
-		// ajustando o vendedor correto.
-		Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(pedido.getCliente().getId());
-		if (vendedor == null) {
-			throw new BusinessException("Nao existe vendedor associado ao cliente " + pedido.getCliente().getNomeCompleto());
-		}
-		pedido.setVendedor(vendedor);
+		if (pedido.isVenda()) {
 
+			// Efetuando o vinculo entre o vendedor e o pedido pois o vendedor eh
+			// obrigatorio pois agora eh possivel que um outro vendedor com o perfil
+			// de administrador faca cadastro de pedidos em nome de outro. Por isso
+			// estamos ajustando o vendedor correto.
+			Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(pedido.getCliente().getId());
+			if (vendedor == null) {
+				throw new BusinessException("Nao existe vendedor associado ao cliente " + pedido.getCliente().getNomeCompleto());
+			}
+			pedido.setVendedor(vendedor);
+
+		}
 		/*
 		 * Devemos sempre pesquisar pois o cliente pode ter alterado os dados de
 		 * logradouro
@@ -318,7 +322,7 @@ public class PedidoServiceImpl implements PedidoService {
 			itemPedido.setMedidaInterna(itemPedido.getMedidaExterna());
 		}
 
-		final Pedido pedido = this.pesquisarById(idPedido);
+		final Pedido pedido = this.pesquisarPedidoById(idPedido);
 		itemPedido.setPedido(pedido);
 		/*
 		 * Atualizando o valor de cada unidade do item que podera ser usado
@@ -411,7 +415,7 @@ public class PedidoServiceImpl implements PedidoService {
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		List<Pedido> listaPedido = null;
 		if (usuarioService.isVendaPermitida(idCliente, idVendedor)) {
-			listaPedido = pesquisarByIdCliente(idCliente, isCompra,indiceRegistroInicial, numeroMaximoRegistros);
+			listaPedido = pesquisarByIdCliente(idCliente, isCompra, indiceRegistroInicial, numeroMaximoRegistros);
 		} else {
 			listaPedido = new ArrayList<Pedido>();
 		}
@@ -429,25 +433,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Pedido pesquisarById(Integer id) {
-
-		if (id == null) {
-			return null;
-		}
-		return this.pedidoDAO.pesquisarById(id);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarByIdCliente(Integer idCliente) {
 		return this.pesquisarByIdCliente(idCliente, null, null);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
-		return pesquisarByIdCliente(idCliente, false, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
@@ -460,14 +447,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-
-		if (idCliente == null) {
-			return Collections.emptyList();
-		}
-		return this.pedidoDAO.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, isCompra,
-				indiceRegistroInicial, numeroMaximoRegistros);
+	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
+		return pesquisarByIdCliente(idCliente, false, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
@@ -488,6 +470,16 @@ public class PedidoServiceImpl implements PedidoService {
 				.setParameter("situacaoPedido", orcamento ? SituacaoPedido.ORCAMENTO : SituacaoPedido.ENVIADO)
 				.setParameter("idVendedor", idVendedor).setParameter("dataInicio", periodo.getInicio())
 				.setParameter("dataFim", periodo.getFim()).getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Pedido pesquisarCompraById(Integer id) {
+
+		if (id == null) {
+			return null;
+		}
+		return this.pedidoDAO.pesquisarById(id, true);
 	}
 
 	@Override
@@ -576,6 +568,16 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Pedido pesquisarPedidoById(Integer id) {
+
+		if (id == null) {
+			return null;
+		}
+		return this.pedidoDAO.pesquisarById(id);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 
@@ -583,6 +585,29 @@ public class PedidoServiceImpl implements PedidoService {
 			return Collections.emptyList();
 		}
 		return pedidoDAO.pesquisarPedidoByIdCliente(idCliente, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+
+		if (idCliente == null) {
+			return Collections.emptyList();
+		}
+		return this.pedidoDAO.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, isCompra,
+				indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Usuario pesquisarProprietario(Integer idPedido) {
+		StringBuilder select = new StringBuilder();
+		select.append("select p.proprietario from Pedido p where p.id = :id");
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("id", idPedido);
+
+		return QueryUtil.gerarRegistroUnico(query, Usuario.class, null);
 	}
 
 	@Override
@@ -634,18 +659,17 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Usuario pesquisarProprietario(Integer idPedido) {
-		StringBuilder select = new StringBuilder();
-		select.append("select p.proprietario from Pedido p where p.id = :id");
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("id", idPedido);
+	public Pedido pesquisarVendaById(Integer id) {
 
-		return QueryUtil.gerarRegistroUnico(query, Usuario.class, null);
+		if (id == null) {
+			return null;
+		}
+		return this.pedidoDAO.pesquisarById(id, false);
 	}
 
 	@Override
 	public Integer refazerPedido(Integer idPedido) throws BusinessException {
-		Pedido pedido = this.pesquisarById(idPedido);
+		Pedido pedido = this.pesquisarVendaById(idPedido);
 		Pedido pedidoClone = null;
 		try {
 			pedidoClone = pedido.clone();

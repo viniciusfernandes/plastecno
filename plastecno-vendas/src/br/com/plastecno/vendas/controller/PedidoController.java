@@ -152,6 +152,7 @@ public class PedidoController extends AbstractController {
 
     @Post("pedido/envio")
     public void enviarPedido(Integer idPedido) {
+        TipoPedido tipoPedido = null;
         try {
             final PedidoPDFWrapper wrapper = this.gerarPDF(idPedido);
             final Pedido pedido = wrapper.getPedido();
@@ -163,16 +164,19 @@ public class PedidoController extends AbstractController {
                     : "Pedido No. " + idPedido + " foi enviado com sucesso para a representada "
                             + pedido.getRepresentada().getNomeFantasia();
 
-            this.gerarMensagemSucesso(mensagem);
+            tipoPedido = pedido.getTipoPedido();
+            configurarTipoPedido(tipoPedido);
+            gerarMensagemSucesso(mensagem);
+            
             irTopoPagina();
         } catch (NotificacaoException e) {
-            this.gerarLogErro("envio de email do pedido No. " + idPedido, e);
+            gerarLogErro("envio de email do pedido No. " + idPedido, e);
         } catch (BusinessException e) {
-            this.gerarListaMensagemErro(e);
+            gerarListaMensagemErro(e);
             // populado a tela de pedidos
-            this.pesquisarPedidoById(idPedido);
+            pesquisarPedidoById(idPedido, tipoPedido);
         } catch (Exception e) {
-            this.gerarLogErro("envio de email do pedido No. " + idPedido, e);
+            gerarLogErro("envio de email do pedido No. " + idPedido, e);
         }
 
     }
@@ -227,7 +231,7 @@ public class PedidoController extends AbstractController {
     }
 
     private PedidoPDFWrapper gerarPDF(Integer idPedido) throws BusinessException {
-        Pedido pedido = pesquisarPedido(idPedido);
+        Pedido pedido = pesquisarPedido(idPedido, TipoPedido.COMPRA);
         if (pedido == null) {
             throw new BusinessException("Não é possível gerar o PDF do pedido de numero " + idPedido
                     + " pois não existe no sistema");
@@ -374,12 +378,23 @@ public class PedidoController extends AbstractController {
         }
     }
 
+    @Get("pedido/limpar")
+    public void limpar(TipoPedido tipoPedido) {
+        configurarTipoPedido(tipoPedido);
+        redirecTo(this.getClass()).pedidoHome();
+    }
+
+    private void configurarTipoPedido(TipoPedido tipoPedido) {
+        if (TipoPedido.COMPRA.equals(tipoPedido)) {
+            addAtributo("tipoPedido", tipoPedido);
+            addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
+        }
+    }
+
     @Get("pedido/compra")
     public void pedidoCompra() {
         redirecTo(this.getClass()).pedidoHome();
-        addAtributo("tipoPedido", TipoPedido.COMPRA);
-        addAtributo("isCompra", true);
-        addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
+        configurarTipoPedido(TipoPedido.COMPRA);
         addAtributo("descricaoTipoPedido", TipoPedido.COMPRA.getDescricao());
     }
 
@@ -460,25 +475,33 @@ public class PedidoController extends AbstractController {
         serializarJson(new SerializacaoJson("lista", lista));
     }
 
-    private Pedido pesquisarPedido(Integer idPedido) {
-        final Pedido pedido = pedidoService.pesquisarById(idPedido);
-        final Integer idVendedor = getCodigoUsuario();
+    private Pedido pesquisarPedido(Integer idPedido, TipoPedido tipoPedido) {
+        boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
+
+        Pedido pedido = null;
+        if (isCompra) {
+            pedido = pedidoService.pesquisarCompraById(idPedido);
+        } else {
+            pedido = pedidoService.pesquisarVendaById(idPedido);
+        }
+
+        final Integer idUsuario = getCodigoUsuario();
         // Verificando se o usuario que esta tentando acessar os dados do pedido
         // eh o mesmo usuario que efetuou a venda.
-        final boolean pedidoPertenceAoVendedor = pedido != null && pedido.getVendedor() != null && idVendedor != null
-                && idVendedor.equals(pedido.getVendedor().getId());
+        final boolean pedidoPertenceAoUsuario = pedido != null && pedido.getVendedor() != null && idUsuario != null
+                && idUsuario.equals(pedido.getVendedor().getId());
         // Verificando se tem poderes para visualizar o pedido.
-        final boolean visualizacaoPermitida = pedidoPertenceAoVendedor || isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+        final boolean visualizacaoPermitida = pedidoPertenceAoUsuario || isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
         return visualizacaoPermitida ? pedido : null;
     }
 
     @Get("pedido/{id}")
-    public void pesquisarPedidoById(Integer id) {
+    public void pesquisarPedidoById(Integer id, TipoPedido tipoPedido) {
 
         // Se vendedor que pesquisa o pedido nao for o mesmo que efetuou a venda
         // nao devemos exibi-lo para o vendedor que pesquisa por questao de
         // sigilo.
-        Pedido pedido = pesquisarPedido(id);
+        Pedido pedido = pesquisarPedido(id, tipoPedido);
         if (pedido == null) {
             this.gerarListaMensagemErro("Pedido não existe no sistema");
         } else {
@@ -503,12 +526,12 @@ public class PedidoController extends AbstractController {
 
             formatarItemPedido(listaItem);
 
+            configurarTipoPedido(pedido.getTipoPedido());
             addAtributo("listaTransportadora", listaTransportadora);
             addAtributo("listaRedespacho", listaRedespacho);
             addAtributo("listaItemPedido", listaItem);
             addAtributo("contemItem", !listaItem.isEmpty());
             addAtributo("pedido", pedido);
-            addAtributo("tipoPedido", pedido.getTipoPedido());
             addAtributo("descricaoTipoPedido", pedido.getTipoPedido().getDescricao());
             addAtributo("tipoPedido", pedido.getTipoPedido());
             addAtributo("proprietario", pedidoService.pesquisarProprietario(id));
@@ -571,26 +594,34 @@ public class PedidoController extends AbstractController {
             this.formatarDocumento(cliente);
             this.carregarVendedor(cliente);
             addAtributo("cliente", cliente);
-            addAtributo("vendedor", cliente.getVendedor());
+            configurarTipoPedido(tipoPedido);
+            if (isCompra) {
+                // Aqui estamos supondo que o usuario que acessou a tela eh um
+                // comprador pois ele tem permissao para isso. E o campo com o
+                // nome do comprador deve sempre estar preenchido.
+                addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
+            } else {
+                addAtributo("vendedor", cliente.getVendedor());
+            }
             addAtributo("listaTransportadora", this.transportadoraService.pesquisar());
             addAtributo("listaRedespacho", this.transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
         }
     }
 
     @Post("pedido/refazer")
-    public void refazerPedido(Integer idPedido) {
+    public void refazerPedido(Integer idPedido, TipoPedido tipoPedido) {
         try {
             Integer idPedidoClone = pedidoService.refazerPedido(idPedido);
-            this.pesquisarPedidoById(idPedidoClone);
+            this.pesquisarPedidoById(idPedidoClone, tipoPedido);
             this.gerarMensagemSucesso("Pedido No. " + idPedidoClone + " inserido e refeito a partir do pedido No. "
                     + idPedido);
 
         } catch (BusinessException e) {
             this.gerarListaMensagemErro(e);
-            pesquisarPedidoById(idPedido);
+            pesquisarPedidoById(idPedido, tipoPedido);
         } catch (Exception e) {
             gerarLogErroRequestAjax("copia do pedido de No. " + idPedido, e);
-            pesquisarPedidoById(idPedido);
+            pesquisarPedidoById(idPedido, tipoPedido);
         }
 
     }

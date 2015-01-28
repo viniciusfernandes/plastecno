@@ -37,10 +37,6 @@ $(document).ready(function() {
 	habilitar('#bloco_item_pedido #descricao', false);
 	habilitar('#bloco_item_pedido #ipi', false);
 	
-	$("#botaoLimpar").click(function() {
-		$('#formVazio').submit();
-	});
-
 	var urlInclusaoPedido = '<c:url value="/pedido/inclusao"/>';
 	var urlInclusaoItemPedido = '<c:url value="/pedido/item/inclusao"/>';
 	$("#botaoInserirPedido").click(function() {
@@ -58,7 +54,7 @@ $(document).ready(function() {
 			return;
 		} 
 		var form = $('#formVazio'); 
-		form.attr('action', '<c:url value="/pedido/'+numeroPedido+'"/>');
+		form.attr('action', '<c:url value="/pedido/'+numeroPedido+'?tipoPedido=${tipoPedido}"/>');
 		form.submit();
 		
 	});
@@ -156,7 +152,9 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 
-	<form id="formVazio" action="pedido" method="get"></form>
+	<form id="formVazio" action="pedido" method="get">
+		<input type="hidden" name="tipoPedido" value="${tipoPedido}" />
+	</form>
 
 	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>" method="post">
 		<fieldset>
@@ -170,7 +168,7 @@ $(document).ready(function() {
 			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
 
 			
-			<div class="label">${isCompra ? 'Comprador:': 'Vendedor:'}</div>
+			<div class="label">${not empty tipoPedido ? 'Comprador:': 'Vendedor:'}</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="proprietario" name="proprietario.nome"
 					value="${proprietario.nome} - ${proprietario.email}" disabled="disabled"
@@ -338,26 +336,30 @@ $(document).ready(function() {
 	</form>
 	<div class="bloco_botoes">
 		<form id="formPesquisa" action="pedido/listagem" method="get">
+			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 			<input type="hidden" name="idCliente" id="idClientePesquisa" value="${cliente.id}" /> 
 			<input type="submit" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
 		</form>
-		<form action="pedido" method="get">
-			<input type="submit" value="" title="Limpar Dados do Pedido"
-				class="botaoLimpar" />
+		<form action="pedido/limpar" method="get">
+			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
+			<input type="submit" value="" title="Limpar Dados do Pedido" class="botaoLimpar" />
 		</form>
 		<form action="pedido/pdf" method="get">
+			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}" /> 
 			<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF" />
 		</form>
 
 		<c:if test="${acessoRefazerPedidoPermitido}">
 			<form action="pedido/refazer" method="post">
+				<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 				<input type="hidden" name="idPedido" id="idPedido" value="${pedido.id}" /> 
 				<input id="botaoRefazerPedido" type="button" value="" title="Refazer Pedido" class="botaoRefazer" />
 			</form>
 		</c:if>
 		<c:if test="${acessoCancelamentoPedidoPermitido}">
 			<form action="pedido/cancelamento" method="post">
+				<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 				<input type="hidden" name="idPedido" id="idPedidoCancelamento"
 					value="${pedido.id}" /> <input id="botaoCancelarPedido"
 					type="button" value="" title="Cancelar Pedido"
@@ -376,17 +378,12 @@ $(document).ready(function() {
 	</div>
 	<jsp:include page="/bloco/bloco_item_pedido.jsp" />
 
-	<form id="formEnvioPedido" action="<c:url value="/pedido/envio"/>"
-		method="post">
+	<form id="formEnvioPedido" action="<c:url value="/pedido/envio"/>" method="post">
 		<div class="bloco_botoes">
-
-			<input type="button" id="botaoEnviarPedido"
-				title="Enviar Dados do Pedido" value=""
-				class="botaoEnviarEmail"
-				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> />
-			<input type="hidden" id="idPedido" name="idPedido"
-				value="${pedido.id}" />
-
+			<input type="button" id="botaoEnviarPedido" title="Enviar Dados do Pedido" value="" class="botaoEnviarEmail"
+				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> 
+			/>
+			<input type="hidden" id="idPedido" name="idPedido" value="${pedido.id}" />
 		</div>
 	</form>
 
@@ -416,7 +413,7 @@ $(document).ready(function() {
 							<td>${pedido.id}</td>
 							<td>${pedido.numeroPedidoCliente}</td>
 							<td>${pedido.cliente.nomeFantasia}/
-								${pedido.vendedor.nomeCompleto}</td>
+								${pedido.proprietario.nomeCompleto}</td>
 							<td style="text-align: center;">${pedido.dataInclusaoFormatada}</td>
 							<td>${pedido.cliente.documento}</td>
 							<td style="text-align: right;">${pedido.valorPedido}</td>
@@ -427,8 +424,8 @@ $(document).ready(function() {
 											type="submit" value="" title="Visualizar Pedido PDF"
 											class="botaoPdf_16 botaoPdf_16_centro" />
 									</form>
-									<form action="<c:url value="/pedido/${pedido.id}"/>"
-										method="get">
+									<form action="<c:url value="/pedido/${pedido.id}"/>" method="get">
+										<input type="hidden" name="tipoPedido" value="${pedido.tipoPedido}" /> 
 										<input type="submit" id="botaoEditarPedido"
 											title="Editar Dados do Pedido" value="" class="botaoEditar" />
 										<input type="hidden" name="id" value="${pedido.id}" />

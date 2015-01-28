@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <fieldset id="bloco_item_pedido">
-	<legend>::: Itens do Pedido :::</legend>
+	<legend>::: Itens do Pedido de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 
 	<!-- Esse campo sera usado para popular a tabela de itens com os dados que vieram do ItemPedidoJson -->
 	<input type="hidden" id="descricaoItemPedido" /> <input type="hidden"

@@ -10,6 +10,7 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
+import br.com.plastecno.service.wrapper.RelatorioCompraPendente;
 import br.com.plastecno.service.wrapper.RelatorioVendaPeriodo;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 
@@ -18,6 +19,8 @@ public interface RelatorioService {
 
     RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) throws BusinessException;
 
+    RelatorioCompraPendente gerarRelatorioCompraPendente();
+
     RelatorioVendaPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException;
 
     RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,
@@ -25,5 +28,5 @@ public interface RelatorioService {
 
     List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor);
 
-    List<Pedido> pesquisarEntregas(Periodo periodo) throws InformacaoInvalidaException;
+		List<Pedido> pesquisarEntregas(Periodo periodo) throws InformacaoInvalidaException;
 }

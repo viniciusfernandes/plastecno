@@ -562,6 +562,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarCompraPendenteRecebimento() {
+		return pedidoDAO.pesquisarCompraPendenteRecebimento();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Logradouro> pesquisarLogradouro(Integer idPedido) {
 		return pedidoDAO.pesquisarLogradouro(idPedido);
 	}

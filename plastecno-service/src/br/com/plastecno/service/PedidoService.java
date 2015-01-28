@@ -101,4 +101,6 @@ public interface PedidoService {
 
 	Pedido pesquisarPedidoById(Integer id);
 
+	List<ItemPedido> pesquisarCompraPendenteRecebimento();
+
 }

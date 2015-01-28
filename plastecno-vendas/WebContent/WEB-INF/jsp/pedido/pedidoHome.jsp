@@ -158,7 +158,7 @@ $(document).ready(function() {
 
 	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>" method="post">
 		<fieldset>
-			<legend>::: Dados do Pedido :::</legend>
+			<legend>::: Dados do Pedido de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 
 			<!-- O campo id do pedido eh hidden pois o input text nao eh enviado na edicao do formulario pois esta "disabled" -->
 			<input type="hidden" id="numeroPedido" name="pedido.id" value="${pedido.id}" /> 
@@ -389,7 +389,7 @@ $(document).ready(function() {
 
 	<a id="rodape"></a>
 	<fieldset>
-		<legend>::: Resultado da Pesquisa de Pedidos :::</legend>
+		<legend>::: Resultado da Pesquisa de Pedidos de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 		<div id="paginador"></div>
 		<div>
 			<table class="listrada">

@@ -385,8 +385,8 @@ public class PedidoController extends AbstractController {
 
     @Get("pedido/limpar")
     public void limpar(TipoPedido tipoPedido) {
-        configurarTipoPedido(tipoPedido);
         redirecTo(this.getClass()).pedidoHome();
+        configurarTipoPedido(tipoPedido);
     }
 
     private void configurarTipoPedido(TipoPedido tipoPedido) {

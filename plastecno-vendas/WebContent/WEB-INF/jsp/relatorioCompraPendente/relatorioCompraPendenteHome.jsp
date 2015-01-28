@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Recepção de Compras</title>
+<title>Relatório de Compras Pendentes</title>
 <jsp:include page="/bloco/bloco_css.jsp" />
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
@@ -61,7 +61,7 @@ $(document).ready(function() {
 	<a id="rodape"></a>
 	<c:if test="${true}">
 		<table class="listrada">
-			<caption>XXXXXXXXXXx xxxxxxxxxxxxxxxxxxx${relatorio.titulo}</caption>
+			<caption>${relatorio.titulo}</caption>
 			<thead>
 				<tr>
 					<th style="width: 10%">Num. Pedido</th>
@@ -73,30 +73,46 @@ $(document).ready(function() {
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach items="${relatorio.listaVendedor}" var="vendedor"
-					varStatus="iteracaoVendedor">
-					<c:forEach items="${vendedor.listaRepresentada}" var="representada"
-						varStatus="iteracaoRepresentada">
+				<c:forEach items="${relatorio.lista}" var="representada"
+					varStatus="iteracaoRepresentada">
+					<!-- bloco de totalizacao de valores vendidos para cada representada -->
+					<c:forEach items="${representada.listaVenda}" var="venda"
+						varStatus="iteracaoVenda">
 						<tr>
-							<c:if test="${iteracaoRepresentada.count eq 1}">
-								<td class="fundo${iteracaoVendedor.index % 2 == 0 ? 1 : 2}"
-									rowspan="${vendedor.numeroVendas + 1}">${vendedor.nomeVendedor}</td>
+							<c:if test="${iteracaoVenda.count eq 1}">
+								<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}"
+									rowspan="${representada.numeroVendas + 1}">${representada.nome}</td>
 							</c:if>
-							<td class="fundo${iteracaoVendedor.index % 2 == 0 ? 1 : 2}">${representada.nome}</td>
-							<td class="fundo${iteracaoVendedor.index % 2 == 0 ? 1 : 2}">${representada.valorVendaFormatado}</td>
+							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${venda.dataEnvio}</td>
+							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${venda.numeroPedido}</td>
+							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${venda.nomeCliente}</td>
+							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${venda.valorVendaFormatado}</td>
+							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">
+								<form action="<c:url value="/pedido/pdf"/>">
+									<input type="hidden" name="idPedido"
+										value="${venda.numeroPedido}" /> <input type="submit" value=""
+										title="Visualizar Pedido PDF" class="botaoPDF"
+										style="border: none;" />
+								</form>
+							</td>
+
 						</tr>
 					</c:forEach>
 
 					<tr>
-						<td class="total${iteracaoVendedor.index % 2 == 0 ? 1 : 2}"
+						<td class="total${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}"
+							style="border-right: none;"></td>
+						<td class="total${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}"
+							style="border-left: none;"></td>
+						<td class="total${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}"
 							style="font-weight: bold;">TOTAL (R$)</td>
-						<td class="total${iteracaoVendedor.index % 2 == 0 ? 1 : 2}"
-							style="font-weight: bold;">${vendedor.totalVendidoFormatado}</td>
+						<td class="total${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}"
+							style="font-weight: bold;">${representada.valorVendaTotalFormatado}</td>
+						<td class="total${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}"
+							style="border-left: none;"></td>
 					</tr>
 				</c:forEach>
-
 			</tbody>
-
 		</table>
 	</c:if>
 

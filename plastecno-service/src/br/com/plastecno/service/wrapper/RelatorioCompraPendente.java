@@ -1,16 +1,26 @@
 package br.com.plastecno.service.wrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RelatorioCompraPendente {
-	private Agrupamento<RepresentadaWrapper, ItemPedidoWrapper> agrupamento;
+	private final String titulo;
+	private final List<MasterDetail> lista = new ArrayList<MasterDetail>();
 
 	public RelatorioCompraPendente() {
-		agrupamento = new Agrupamento<RepresentadaWrapper, ItemPedidoWrapper>("Relatório de Compras com Pendências");
+		titulo = "Relatório de Compras com Pendências";
 	}
 
-	public List<RepresentadaWrapper> getListaRepresentada() {
-		return agrupamento.getListaGrupo();
+	public void add(MasterDetail linha) {
+		lista.add(linha);
+	}
+
+	public List<MasterDetail> getLista() {
+		return lista;
+	}
+
+	public String getTitulo() {
+		return titulo;
 	}
 
 }

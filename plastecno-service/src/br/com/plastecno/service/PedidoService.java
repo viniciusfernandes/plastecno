@@ -43,8 +43,6 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-	Pedido pesquisarVendaById(Integer id);
-
 	List<Pedido> pesquisarByIdCliente(Integer idCliente);
 
 	List<Pedido> pesquisarByIdCliente(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
@@ -55,7 +53,11 @@ public interface PedidoService {
 	List<Pedido> pesquisarByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException;
 
+	Pedido pesquisarCompraById(Integer id);
+
 	List<Pedido> pesquisarCompraPendente(Integer idRepresentada, Periodo periodo);
+
+	List<ItemPedido> pesquisarCompraPendenteRecebimento(Date dataInicial, Date dataFinal, Integer idRepresentada);
 
 	Date pesquisarDataEnvio(Integer idPedido);
 
@@ -75,11 +77,15 @@ public interface PedidoService {
 
 	List<Logradouro> pesquisarLogradouro(Integer idPedido);
 
+	Pedido pesquisarPedidoById(Integer id);
+
 	List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros);
 
 	List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+
+	Usuario pesquisarProprietario(Integer idPedido);
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
@@ -91,14 +97,10 @@ public interface PedidoService {
 
 	Double pesquisarValorPedidoIPI(Integer idPedido);
 
-	Usuario pesquisarProprietario(Integer idPedido);
+	Pedido pesquisarVendaById(Integer id);
 
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
-
-	Pedido pesquisarCompraById(Integer id);
-
-	Pedido pesquisarPedidoById(Integer id);
 
 }

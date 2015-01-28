@@ -122,6 +122,44 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Date dataInicial, Date dataFinal, Integer idRepresentada) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i from ItemPedido i ");
+		select.append("where i.pedido.tipoPedido = :tipoPedido ");
+		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
+
+		if (dataInicial != null) {
+			select.append("and i.pedido.dataEnvio >= :dataInicial ");
+		}
+
+		if (dataFinal != null) {
+			select.append("and i.pedido.dataEnvio <= :dataFinal ");
+		}
+
+		if (idRepresentada != null) {
+			select.append("and i.pedido.representada.id <= :idRepresentada ");
+		}
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+		query.setParameter("situacaoPedido", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+
+		if (dataInicial != null) {
+			query.setParameter("dataInicial", dataInicial);
+		}
+
+		if (dataFinal != null) {
+			query.setParameter("dataFinal", dataFinal);
+		}
+
+		if (idRepresentada != null) {
+			query.setParameter("idRepresentada", idRepresentada);
+		}
+
+		return query.getResultList();
+	}
+
 	public Date pesquisarDataEnvioById(Integer idPedido) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p.dataEnvio from Pedido p where p.id = :id");
@@ -168,6 +206,35 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	}
 
+	public List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
+		return pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, false, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idProprietario,
+			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		StringBuilder select = new StringBuilder(
+				"select p from Pedido p left join fetch p.proprietario where p.cliente.id = :idCliente ");
+		if (idProprietario != null) {
+			select.append(" and p.proprietario.id = :idVendedor ");
+		}
+
+		if (isCompra) {
+			select.append(" and p.tipoPedido = :tipoPedido ");
+		} else {
+			select.append(" and p.tipoPedido != :tipoPedido ");
+		}
+		select.append(" order by p.dataInclusao desc, p.cliente.nomeFantasia ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("idCliente", idCliente);
+		if (idProprietario != null) {
+			query.setParameter("idVendedor", idProprietario);
+		}
+		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
 	public Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery(
@@ -201,35 +268,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idPedido", idPedido);
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
-	}
-
-	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idProprietario,
-			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-		StringBuilder select = new StringBuilder(
-				"select p from Pedido p left join fetch p.proprietario where p.cliente.id = :idCliente ");
-		if (idProprietario != null) {
-			select.append(" and p.proprietario.id = :idVendedor ");
-		}
-
-		if (isCompra) {
-			select.append(" and p.tipoPedido = :tipoPedido ");
-		} else {
-			select.append(" and p.tipoPedido != :tipoPedido ");
-		}
-		select.append(" order by p.dataInclusao desc, p.cliente.nomeFantasia ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idCliente", idCliente);
-		if (idProprietario != null) {
-			query.setParameter("idVendedor", idProprietario);
-		}
-		query.setParameter("tipoPedido", TipoPedido.COMPRA);
-		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
-	}
-
-	public List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
-		return pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, false, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 }

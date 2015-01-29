@@ -94,7 +94,6 @@ function submeterForm(botao){
 		</div>
 	</form>
 	
-	<a id="rodape"></a>
 	<c:if test="${not empty relatorio}">
 		<table class="listrada">
 			<caption>${relatorio.titulo}</caption>

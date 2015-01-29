@@ -123,6 +123,20 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	@SuppressWarnings("unchecked")
+	public List<ItemPedido> pesquisarCompraPendenteRecebimento() {
+		StringBuilder select = new StringBuilder();
+		select.append("select i from ItemPedido i ");
+		select.append("where i.pedido.tipoPedido = :tipoPedido ");
+		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
+		select.append("order by i.sequencial asc ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+		query.setParameter("situacaoPedido", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemPedido i ");
@@ -193,21 +207,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarCompraPendenteRecebimento() {
-		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemPedido i ");
-		select.append("where i.pedido.tipoPedido = :tipoPedido ");
-		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
-		select.append("order by i.sequencial asc ");
-		
-		Query query = this.entityManager
-				.createQuery(select.toString());
-		query.setParameter("tipoPedido", TipoPedido.COMPRA);
-		query.setParameter("situacaoPedido", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
-		return query.getResultList();
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<Logradouro> pesquisarLogradouro(Integer idPedido) {
 		return this.entityManager
 				.createQuery("select l from Pedido p inner join p.listaLogradouro l where p.id = :idPedido")
@@ -267,6 +266,14 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
 		return (Long) this.entityManager.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
 				.setParameter("idPedido", idPedido).getSingleResult();
+	}
+
+	public long pesquisarTotalItensPedido(Integer idPedido) {
+		StringBuilder select = new StringBuilder();
+		select.append("select count(i.id) from ItemPedido i inner join i.pedido p where p.id = :idPedido");
+		Query query = entityManager.createQuery(select.toString()).setParameter("idPedido", idPedido);
+
+		return QueryUtil.gerarRegistroUnico(query, Long.class, 0L);
 	}
 
 	public Double pesquisarValorPedido(Integer idPedido) {

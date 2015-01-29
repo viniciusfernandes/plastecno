@@ -47,14 +47,19 @@ public class RecepcaoCompraPendenteController extends AbstractController {
         addAtributo("listaRepresentada", representadaService.pesquisar());
     }
 
+    @Get("compra/edicao")
+    public void pesquisarPedidoById(Integer idPedido) {
+        redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.COMPRA);
+    }
+
     @Get("compra/recepcao")
     public void recepcaoCompraPendenteHome() {
         addAtributo("listaRepresentada", representadaService.pesquisar());
     }
 
     @Post("compra/item/recepcao")
-    public void recepcionarItemCompra(Integer idItemCompra) {
-
+    public void recepcionarItemCompra(Date dataInicial, Date dataFinal, Integer idRepresentada, Integer idItemCompra) {
+        redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
     }
 
     @Post("compra/item/remocao")
@@ -65,10 +70,5 @@ public class RecepcaoCompraPendenteController extends AbstractController {
             this.gerarListaMensagemErro(e);
         }
         redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
-    }
-
-    @Get("compra/edicao")
-    public void pesquisarPedidoById(Integer idPedido) {
-        redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.COMPRA);
     }
 }

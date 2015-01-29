@@ -490,7 +490,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo){
+	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo) {
 		return pedidoDAO.pesquisarCompraPendenteRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
@@ -715,6 +715,13 @@ public class PedidoServiceImpl implements PedidoService {
 					.setParameter("idItemPedido", idItemPedido).getSingleResult();
 
 			Pedido pedido = itemPedido.getPedido();
+
+			long totalItens = pedidoDAO.pesquisarTotalItensPedido(pedido.getId());
+			if (totalItens <= 1) {
+				throw new BusinessException(
+						"Esse pedido contém apenas 1 item e é possível que um pedido fique sem item cadastrado.");
+			}
+
 			alterarSequencialItemPedido(pedido.getId(), itemPedido.getSequencial());
 
 			this.entityManager.remove(itemPedido);

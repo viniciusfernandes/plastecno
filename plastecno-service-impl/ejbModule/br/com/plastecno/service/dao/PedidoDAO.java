@@ -193,6 +193,21 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	@SuppressWarnings("unchecked")
+	public List<ItemPedido> pesquisarCompraPendenteRecebimento() {
+		StringBuilder select = new StringBuilder();
+		select.append("select i from ItemPedido i ");
+		select.append("where i.pedido.tipoPedido = :tipoPedido ");
+		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
+		select.append("order by i.sequencial asc ");
+		
+		Query query = this.entityManager
+				.createQuery(select.toString());
+		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+		query.setParameter("situacaoPedido", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<Logradouro> pesquisarLogradouro(Integer idPedido) {
 		return this.entityManager
 				.createQuery("select l from Pedido p inner join p.listaLogradouro l where p.id = :idPedido")

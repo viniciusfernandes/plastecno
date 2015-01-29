@@ -7,9 +7,7 @@ import javax.ejb.TransactionAttributeType;
 
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
-import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Pedido;
 
 @Stateless
 public class EstoqueServiceImpl implements EstoqueService {
@@ -19,12 +17,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void inserirItemEstoque(Integer idItemPedido) {
-		ItemPedido item = pedidoService.pesquisarItemPedido(idItemPedido);
-		Pedido pedido = item.getPedido();
-		long quantidadePendentes = pedidoService.pesquisarTotalItemPendente(pedido.getId());
-		if (quantidadePendentes <= 1) {
-			pedido.setSituacaoPedido(SituacaoPedido.RECEBIDO);
-		}
-		item.setRecebido(true);
+		ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
+		itemPedido.setRecebido(true);
+
+	}
+
+	public void pesquisarQuantidadeItemPendentes(Integer idPedido) {
+
 	}
 }

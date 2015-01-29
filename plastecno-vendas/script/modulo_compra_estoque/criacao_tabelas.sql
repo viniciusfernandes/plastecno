@@ -16,5 +16,3 @@ insert into vendas.tb_perfil_acesso (id, descricao) values (nextval('vendas.seq_
 ALTER TABLE vendas.tb_pedido RENAME id_vendedor TO id_proprietario;
 
 ALTER TABLE vendas.tb_item_pedido add item_recebido boolean;
-
-INSERT INTO vendas.tb_situacao_pedido VALUES (4, 'RECEBIDO');

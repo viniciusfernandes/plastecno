@@ -6,6 +6,7 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoPedido;
@@ -24,6 +25,8 @@ public class RecepcaoCompraPendenteController extends AbstractController {
     private RelatorioService relatorioService;
     @Servico
     private PedidoService pedidoService;
+    @Servico
+    private EstoqueService estoqueService;
 
     public RecepcaoCompraPendenteController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -59,6 +62,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
 
     @Post("compra/item/recepcao")
     public void recepcionarItemCompra(Date dataInicial, Date dataFinal, Integer idRepresentada, Integer idItemCompra) {
+        estoqueService.inserirItemEstoque(idItemCompra);
         redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
     }
 

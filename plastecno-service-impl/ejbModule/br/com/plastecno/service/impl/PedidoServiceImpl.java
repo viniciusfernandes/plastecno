@@ -100,6 +100,12 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public long pesquisarTotalItemPendente(Integer idPedido) {
+		return pedidoDAO.pesquisarTotalItemPedido(idPedido, false);
+	}
+
+	@Override
 	public Double calcularValorPedido(Integer idPedido) throws BusinessException {
 		return pedidoDAO.pesquisarQuantidadePrecoUnidade(idPedido);
 	}

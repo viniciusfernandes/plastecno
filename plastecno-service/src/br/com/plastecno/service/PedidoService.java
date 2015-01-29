@@ -15,6 +15,7 @@ import br.com.plastecno.service.wrapper.Periodo;
 
 @Local
 public interface PedidoService {
+
 	Double calcularValorPedido(Integer idPedido) throws BusinessException;
 
 	Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException;

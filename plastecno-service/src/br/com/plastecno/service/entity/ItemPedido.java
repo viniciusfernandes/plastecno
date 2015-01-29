@@ -34,10 +34,13 @@ public class ItemPedido implements Serializable, Cloneable {
 	@SequenceGenerator(name = "itemPedidoSequence", sequenceName = "vendas.seq_item_pedido_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemPedidoSequence")
 	private Integer id;
+
 	private Double comprimento;
 
 	@Column(name = "medida_interna")
 	private Double medidaInterna;
+	@Column(name = "item_recebido")
+	private boolean recebido;
 
 	@Column(name = "medida_externa")
 	private Double medidaExterna;
@@ -126,9 +129,7 @@ public class ItemPedido implements Serializable, Cloneable {
 	}
 
 	public double calcularPrecoTotal() {
-		return this.quantidade != null && this.precoVenda != null ? this.quantidade
-				* this.precoVenda
-				: 0d;
+		return this.quantidade != null && this.precoVenda != null ? this.quantidade * this.precoVenda : 0d;
 	}
 
 	@Override
@@ -178,8 +179,7 @@ public class ItemPedido implements Serializable, Cloneable {
 			descricao.append(" - ");
 			descricao.append(this.material.getSigla());
 			descricao.append(" - ");
-			descricao.append(this.material.getDescricao() == null ? " "
-					: this.material.getDescricao());
+			descricao.append(this.material.getDescricao() == null ? " " : this.material.getDescricao());
 			descricao.append(" - ");
 		}
 
@@ -295,8 +295,7 @@ public class ItemPedido implements Serializable, Cloneable {
 	}
 
 	public boolean isMedidaExternaIgualInterna() {
-		return this.formaMaterial != null
-				&& this.formaMaterial.isMedidaExternaIgualInterna();
+		return this.formaMaterial != null && this.formaMaterial.isMedidaExternaIgualInterna();
 	}
 
 	public boolean isNovo() {
@@ -306,7 +305,11 @@ public class ItemPedido implements Serializable, Cloneable {
 	public boolean isPeca() {
 		return FormaMaterial.PC.equals(this.formaMaterial);
 	}
-	
+
+	public boolean isRecebido() {
+		return recebido;
+	}
+
 	public boolean isVendaKilo() {
 		return TipoVenda.KILO.equals(this.tipoVenda);
 	}
@@ -401,6 +404,10 @@ public class ItemPedido implements Serializable, Cloneable {
 
 	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
+	}
+
+	public void setRecebido(boolean recebido) {
+		this.recebido = recebido;
 	}
 
 	public void setSequencial(Integer sequencial) {

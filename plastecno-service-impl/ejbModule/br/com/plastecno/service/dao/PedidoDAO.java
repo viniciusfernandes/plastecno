@@ -123,7 +123,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Date dataInicial, Date dataFinal, Integer idRepresentada) {
+	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemPedido i ");
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
@@ -138,7 +138,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		}
 
 		if (idRepresentada != null) {
-			select.append("and i.pedido.representada.id <= :idRepresentada ");
+			select.append("and i.pedido.representada.id = :idRepresentada ");
 		}
 
 		Query query = this.entityManager.createQuery(select.toString());

@@ -57,7 +57,7 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarCompraPendente(Integer idRepresentada, Periodo periodo);
 
-	List<ItemPedido> pesquisarCompraPendenteRecebimento(Date dataInicial, Date dataFinal, Integer idRepresentada);
+	List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo);
 
 	Date pesquisarDataEnvio(Integer idPedido);
 

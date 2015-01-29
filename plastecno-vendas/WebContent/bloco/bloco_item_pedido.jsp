@@ -3,12 +3,12 @@
 	<legend>::: Itens do Pedido de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 
 	<!-- Esse campo sera usado para popular a tabela de itens com os dados que vieram do ItemPedidoJson -->
-	<input type="hidden" id="descricaoItemPedido" /> <input type="hidden"
-		id="precoItem" /> <input type="hidden" id="idMaterial"
-		name="itemPedido.material.id" /> <input type="hidden"
-		id="idItemPedido" name="itemPedido.id" /> <input type="hidden"
-		id="sequencial" name="itemPedido.sequencial" /> <input type="hidden"
-		id="precoUnidade" />
+	<input type="hidden" id="descricaoItemPedido" /> 
+	<input type="hidden" id="precoItem" /> 
+	<input type="hidden" id="idMaterial" name="itemPedido.material.id" /> 
+	<input type="hidden" id="idItemPedido" name="itemPedido.id" /> 
+	<input type="hidden" id="sequencial" name="itemPedido.sequencial" /> 
+	<input type="hidden" id="precoUnidade" />
 
 	<div class="label">Tipo de Venda:</div>
 	<div class="input">
@@ -81,10 +81,8 @@
 	</div>
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoVendaPermitida}">
-			<a id="botaoInserirItemPedido"
-				title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>
-			<a id="botaoLimparItemPedido" title="Limpar Dados do Item do Pedido"
-				class="botaoLimpar"></a>
+			<a id="botaoInserirItemPedido" title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>
+			<a id="botaoLimparItemPedido" title="Limpar Dados do Item do Pedido" class="botaoLimpar"></a>
 		</c:if>
 	</div>
 
@@ -107,8 +105,7 @@
 			</thead>
 
 			<tbody>
-				<c:forEach items="${listaItemPedido}" var="itemPedido"
-					varStatus="status">
+				<c:forEach items="${listaItemPedido}" var="itemPedido" varStatus="status">
 					<tr id="${status.count - 1}">
 						<td style="display: none;">${itemPedido.id}</td>
 						<td>${itemPedido.sequencial}</td>
@@ -120,14 +117,14 @@
 						<td class="valorNumerico">${itemPedido.precoItemFormatado}</td>
 						<td class="valorNumerico">${itemPedido.aliquotaIPIFormatado}</td>
 						<td class="valorNumerico">${itemPedido.aliquotaICMSFormatado}</td>
-						<td><c:if test="${not pedidoDesabilitado}">
-								<input type="button" id="botaoEditarPedido"
-									title="Editar Dados do Item do Pedido" value=""
+						<td>
+							<c:if test="${not pedidoDesabilitado}">
+								<input type="button" id="botaoEditarPedido" title="Editar Dados do Item do Pedido" value=""
 									class="botaoEditar" onclick="editarItemPedido(this);" />
-								<input type="button" id="botaoEditarPedido"
-									title="Remover Dados do Item do Pedido" value=""
+								<input type="button" id="botaoEditarPedido" title="Remover Dados do Item do Pedido" value=""
 									class="botaoRemover" onclick="removerItemPedido(this);" />
-							</c:if></td>
+							</c:if>
+						</td>
 					</tr>
 				</c:forEach>
 

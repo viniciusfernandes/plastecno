@@ -4,38 +4,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MasterDetail {
-	private final Object value;
+	private final Object label;
 	private final List<Object[]> details = new ArrayList<Object[]>();
 	private final int columns;
-	private int count = 0;
+	private int currentDetail = -1;
 
-	public MasterDetail(Object value, int columns) {
-		this.value = value;
-		this.columns = columns;
+	public MasterDetail(Object label, int detailColumns) {
+		this.label = label;
+		this.columns = detailColumns;
 	}
 
-	public void addDetail(int col, String value) {
-		if (details.isEmpty()) {
-			details.add(new String[columns]);
-		}
-
-		Object[] detail = details.get(count);
+	public void addDetail(int col, String detailValue) {
+		Object[] detail = details.get(currentDetail);
 		if (detail == null) {
 			detail = new String[columns];
 			details.add(detail);
 		}
-		detail[col] = value;
+		detail[col] = detailValue;
 	}
 
 	public List<Object[]> getDetails() {
 		return details;
 	}
 
-	public Object getValue() {
-		return value;
+	public Object getLabel() {
+		return label;
 	}
 
-	public void next() {
-		count++;
+	public void nextDetail() {
+		details.add(new String[columns]);
+		currentDetail++;
+	}
+
+	public int getSize() {
+		return details.size();
 	}
 }

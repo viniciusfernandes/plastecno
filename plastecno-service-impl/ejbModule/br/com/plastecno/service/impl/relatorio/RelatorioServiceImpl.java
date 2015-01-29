@@ -1,6 +1,5 @@
 package br.com.plastecno.service.impl.relatorio;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -28,12 +27,13 @@ import br.com.plastecno.service.wrapper.ClienteWrapper;
 import br.com.plastecno.service.wrapper.MasterDetail;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
-import br.com.plastecno.service.wrapper.RelatorioCompraPendente;
+import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.service.wrapper.RelatorioVendaPeriodo;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 import br.com.plastecno.service.wrapper.VendaClienteWrapper;
 import br.com.plastecno.service.wrapper.VendaRepresentadaWrapper;
 import br.com.plastecno.service.wrapper.exception.AgrupamentoException;
+import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 
 @Stateless
@@ -98,20 +98,23 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioCompraPendente gerarRelatorioCompraPendente(Date dataInicial, Date dataFinal, Integer idRepresentada) {
-		List<ItemPedido> listaItem = pedidoService.pesquisarCompraPendenteRecebimento(dataInicial, dataFinal,
-				idRepresentada);
-		RelatorioCompraPendente relatorio = new RelatorioCompraPendente();
+	public RelatorioWrapper gerarRelatorioCompraPendente(Integer idRepresentada, Periodo periodo) {
+		List<ItemPedido> listaItem = pedidoService.pesquisarCompraPendenteRecebimento(idRepresentada, periodo);
+		RelatorioWrapper relatorio = new RelatorioWrapper("Recepção de Compras com Pendências", 6);
 		Pedido pedido = null;
-		MasterDetail masterDetail = null;
+
 		for (ItemPedido item : listaItem) {
 			pedido = item.getPedido();
-			masterDetail = new MasterDetail(item.getPedido().getId(), 4);
-			masterDetail.addDetail(0, item.getDescricao());
-			masterDetail.addDetail(1, pedido.getProprietario().getNome());
-			masterDetail.addDetail(2, pedido.getRepresentada().getNomeFantasia());
-			masterDetail.addDetail(3, pedido.getValorPedidoFormatado());
-			relatorio.add(masterDetail);
+
+			relatorio.toMaster(pedido.getId());
+			relatorio.nextDetail();
+			relatorio.addDetail(0, String.valueOf(item.getQuantidade()));
+			relatorio.addDetail(1, item.getDescricao());
+			relatorio.addDetail(2, pedido.getProprietario().getNome());
+			relatorio.addDetail(3, pedido.getRepresentada().getNomeFantasia());
+			relatorio.addDetail(4, NumeroUtils.formatarValorMonetario(item.getPrecoVenda()));
+			relatorio.addDetail(5, String.valueOf(item.getId()));
+
 		}
 		return relatorio;
 	}

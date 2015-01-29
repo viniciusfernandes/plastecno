@@ -38,8 +38,8 @@
 					<li><a href="javascript: void(0)" target="principal_frame">Compras</a>
 						<ul>
 							<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a></li>
-							<li><a href="pedido/compra/pendencias" target="principal_frame">Compras Pedentes</a></li>
-							<li><a href="pedido/compra/recepcao" target="principal_frame">Recepção Compras</a></li>
+							<li><a href="compra/pendencia" target="principal_frame">Compras Pedentes</a></li>
+							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
 						</ul>
 					</li>
 				</c:if>

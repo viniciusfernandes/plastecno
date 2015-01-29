@@ -42,8 +42,8 @@
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-	<form id="formVazio"
-		action="<c:url value="/relatorio/venda/vendedor"/>"></form>
+	<form id="formVazio" action="<c:url value="/relatorio/venda/vendedor"/>">
+	</form>
 
 	<form action="<c:url value="/relatorio/venda/vendedor/listagem"/>">
 		<input type="hidden" id="idVendedor" name="idVendedor"

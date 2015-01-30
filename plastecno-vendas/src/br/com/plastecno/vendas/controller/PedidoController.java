@@ -531,14 +531,11 @@ public class PedidoController extends AbstractController {
 
             formatarItemPedido(listaItem);
 
-            configurarTipoPedido(pedido.getTipoPedido());
             addAtributo("listaTransportadora", listaTransportadora);
             addAtributo("listaRedespacho", listaRedespacho);
             addAtributo("listaItemPedido", listaItem);
             addAtributo("contemItem", !listaItem.isEmpty());
             addAtributo("pedido", pedido);
-            addAtributo("descricaoTipoPedido", pedido.getTipoPedido().getDescricao());
-            addAtributo("tipoPedido", pedido.getTipoPedido());
             addAtributo("proprietario", pedidoService.pesquisarProprietario(id));
             addAtributo("cliente", pedido.getCliente());
             addAtributo("contato", pedido.getContato());
@@ -568,7 +565,7 @@ public class PedidoController extends AbstractController {
             liberarAcesso("acessoCancelamentoPedidoPermitido", acessoCancelamentoPedidoPermitido);
             liberarAcesso("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
         }
-
+        configurarTipoPedido(tipoPedido);
         irTopoPagina();
     }
 
@@ -599,7 +596,6 @@ public class PedidoController extends AbstractController {
             this.formatarDocumento(cliente);
             this.carregarVendedor(cliente);
             addAtributo("cliente", cliente);
-            configurarTipoPedido(tipoPedido);
             if (isCompra) {
                 // Aqui estamos supondo que o usuario que acessou a tela eh um
                 // comprador pois ele tem permissao para isso. E o campo com o
@@ -611,6 +607,7 @@ public class PedidoController extends AbstractController {
             addAtributo("listaTransportadora", this.transportadoraService.pesquisar());
             addAtributo("listaRedespacho", this.transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
         }
+        configurarTipoPedido(tipoPedido);
     }
 
     @Post("pedido/refazer")

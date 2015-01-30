@@ -23,7 +23,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Pedido pedido = item.getPedido();
 		long qtdePendente = pedidoService.pesquisarTotalItemPendente(pedido.getId());
 		if (qtdePendente <= 1) {
-			pedido.setSituacaoPedido(SituacaoPedido.RECEBIDO);
+			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_RECEBIDA);
 		}
 		item.setRecebido(true);
 	}

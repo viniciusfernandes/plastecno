@@ -120,20 +120,22 @@ public class PedidoController extends AbstractController {
     }
 
     @Post("pedido/cancelamento")
-    public void cancelarPedido(Integer idPedido) {
+    public void cancelarPedido(Integer idPedido, TipoPedido tipoPedido) {
         try {
             this.pedidoService.cancelar(idPedido);
             this.gerarMensagemSucesso("Pedido No. " + idPedido + " cancelado com sucesso");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e.getListaMensagem());
         }
+
+        configurarTipoPedido(tipoPedido);
         irTopoPagina();
     }
 
     @Get("pedido/pdf")
-    public Download downloadPedidoPDF(Integer idPedido) {
+    public Download downloadPedidoPDF(Integer idPedido, TipoPedido tipoPedido) {
         try {
-            PedidoPDFWrapper wrapper = this.gerarPDF(idPedido);
+            PedidoPDFWrapper wrapper = this.gerarPDF(idPedido, tipoPedido);
             final Pedido pedido = wrapper.getPedido();
 
             final StringBuilder titulo = new StringBuilder(pedido.isOrcamento() ? "Orçamento " : "Pedido ")
@@ -151,13 +153,11 @@ public class PedidoController extends AbstractController {
     }
 
     @Post("pedido/envio")
-    public void enviarPedido(Integer idPedido) {
-        TipoPedido tipoPedido = null;
+    public void enviarPedido(Integer idPedido, TipoPedido tipoPedido) {
         try {
-            final PedidoPDFWrapper wrapper = this.gerarPDF(idPedido);
+            final PedidoPDFWrapper wrapper = this.gerarPDF(idPedido, tipoPedido);
             final Pedido pedido = wrapper.getPedido();
 
-            tipoPedido = pedido.getTipoPedido();
             this.pedidoService.enviar(idPedido, wrapper.getArquivoPDF());
 
             final String mensagem = pedido.isOrcamento() ? "Orçamento No. " + idPedido
@@ -172,8 +172,8 @@ public class PedidoController extends AbstractController {
             gerarLogErro("envio de email do pedido No. " + idPedido, e);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
-            // populado a tela de pedidos
-            pesquisarPedidoById(idPedido, tipoPedido);
+            // populando a tela de pedidos
+            redirecTo(this.getClass()).pesquisarPedidoById(idPedido, tipoPedido);
         } catch (Exception e) {
             gerarLogErro("envio de email do pedido No. " + idPedido, e);
         }
@@ -230,8 +230,8 @@ public class PedidoController extends AbstractController {
                 getNumerRegistrosPorPagina());
     }
 
-    private PedidoPDFWrapper gerarPDF(Integer idPedido) throws BusinessException {
-        Pedido pedido = pesquisarPedido(idPedido, TipoPedido.COMPRA);
+    private PedidoPDFWrapper gerarPDF(Integer idPedido, TipoPedido tipoPedido) throws BusinessException {
+        Pedido pedido = pesquisarPedido(idPedido, tipoPedido);
         if (pedido == null) {
             throw new BusinessException("Não é possível gerar o PDF do pedido de numero " + idPedido
                     + " pois não existe no sistema");
@@ -264,9 +264,8 @@ public class PedidoController extends AbstractController {
         final Logradouro logradouroEntrega = pedido.getLogradouro(TipoLogradouro.ENTREGA);
         final Logradouro logradouroCobranca = pedido.getLogradouro(TipoLogradouro.COBRANCA);
 
-        String tipoPedido = pedido.isVenda() ? "Venda" : "Compra";
-        geradorRelatorio.addAtributo("titulo", pedido.isOrcamento() ? "Orçamento de " + tipoPedido : "Pedido de "
-                + tipoPedido);
+        String tipo = pedido.isVenda() ? "Venda" : "Compra";
+        geradorRelatorio.addAtributo("titulo", pedido.isOrcamento() ? "Orçamento de " + tipo : "Pedido de " + tipo);
         geradorRelatorio.addAtributo("pedido", pedido);
         geradorRelatorio.addAtributo("logradouroFaturamento",
                 logradouroFaturamento != null ? logradouroFaturamento.getDescricao() : "");
@@ -376,8 +375,7 @@ public class PedidoController extends AbstractController {
             return false;
         } else {
             SituacaoPedido situacao = pedido.getSituacaoPedido();
-            boolean isCompraFinalizada = pedido.isCompra()
-                    && SituacaoPedido.RECEBIDO.equals(situacao);
+            boolean isCompraFinalizada = pedido.isCompra() && SituacaoPedido.COMPRA_RECEBIDA.equals(situacao);
             boolean isVendaFinalizada = pedido.isVenda() && SituacaoPedido.ENVIADO.equals(situacao);
             return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
         }
@@ -545,19 +543,21 @@ public class PedidoController extends AbstractController {
             SituacaoPedido situacao = pedido.getSituacaoPedido();
             // Condicao indicadora de pedido pronto para enviar
             final boolean acessoEnvioPedidoPermitido = !SituacaoPedido.ENVIADO.equals(situacao)
-                    && !SituacaoPedido.CANCELADO.equals(situacao);
+                    && !SituacaoPedido.CANCELADO.equals(situacao) && !SituacaoPedido.COMPRA_RECEBIDA.equals(situacao);
 
             // Condicao indicadora para reenvio do pedido
             final boolean acessoReenvioPedidoPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO)
-                    && SituacaoPedido.ENVIADO.equals(situacao);
+                    && (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao));
 
             // Condicao indicadora de que apenas o administrador podera cancelar
             // pedidos ja enviados
-            final boolean acessoCancelamentoPedidoPermitido = SituacaoPedido.ENVIADO.equals(situacao)
-                    && !SituacaoPedido.CANCELADO.equals(situacao) && isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+            final boolean acessoCancelamentoPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO
+                    .equals(situacao))
+                    && !SituacaoPedido.CANCELADO.equals(situacao)
+                    && isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
 
-            final boolean acessoRefazerPedidoPermitido = SituacaoPedido.ENVIADO.equals(situacao)
-                    && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO);
+            final boolean acessoRefazerPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
+                    .equals(situacao)) && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO);
 
             liberarAcesso("pedidoDesabilitado", isPedidoDesabilitado(pedido));
             liberarAcesso("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);

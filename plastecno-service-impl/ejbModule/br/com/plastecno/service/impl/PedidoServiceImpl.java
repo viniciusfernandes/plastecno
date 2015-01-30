@@ -681,7 +681,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public Integer refazerPedido(Integer idPedido) throws BusinessException {
-		Pedido pedido = this.pesquisarVendaById(idPedido);
+		Pedido pedido = pesquisarPedidoById(idPedido);
 		Pedido pedidoClone = null;
 		try {
 			pedidoClone = pedido.clone();
@@ -720,13 +720,10 @@ public class PedidoServiceImpl implements PedidoService {
 					.createQuery("select i from ItemPedido i join fetch i.pedido where i.id = :idItemPedido")
 					.setParameter("idItemPedido", idItemPedido).getSingleResult();
 
-			Pedido pedido = itemPedido.getPedido();
-
-			long totalItens = pedidoDAO.pesquisarTotalItensPedido(pedido.getId());
-			if (totalItens <= 1) {
-				throw new BusinessException(
-						"Esse pedido contém apenas 1 item e é possível que um pedido fique sem item cadastrado.");
+			if (itemPedido == null) {
+				return null;
 			}
+			Pedido pedido = itemPedido.getPedido();
 
 			alterarSequencialItemPedido(pedido.getId(), itemPedido.getSequencial());
 

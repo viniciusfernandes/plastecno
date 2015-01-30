@@ -107,22 +107,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Pedido> pesquisarCompraPendenteByPeriodo(Integer idRepresentada, Periodo periodo) {
-		StringBuilder select = new StringBuilder();
-		select.append("select p from Pedido p join fetch p.representada ");
-		select.append("where p.dataEntrega >= :dataInicio and ");
-		select.append("p.dataEntrega <= :dataFim and ");
-		select.append("p.situacaoPedido = :situacaoPedido and ");
-		select.append("p.representada.id = :idRepresentada ");
-		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
-		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
-				.setParameter("dataFim", periodo.getFim())
-				.setParameter("situacaoPedido", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO)
-				.setParameter("idRepresentada", idRepresentada).getResultList();
-
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarCompraPendenteRecebimento() {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemPedido i ");

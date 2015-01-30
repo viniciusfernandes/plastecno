@@ -56,8 +56,6 @@ public interface PedidoService {
 
 	Pedido pesquisarCompraById(Integer id);
 
-	List<Pedido> pesquisarCompraPendente(Integer idRepresentada, Periodo periodo);
-
 	List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo);
 
 	Date pesquisarDataEnvio(Integer idPedido);
@@ -90,6 +88,8 @@ public interface PedidoService {
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
+	long pesquisarTotalItemPendente(Integer idPedido);
+
 	Long pesquisarTotalRegistros(Integer idCliente);
 
 	Long pesquisarTotalRegistros(Integer idCliente, Integer idVendedor);
@@ -103,7 +103,5 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
-
-	long pesquisarTotalItemPendente(Integer idPedido);
 
 }

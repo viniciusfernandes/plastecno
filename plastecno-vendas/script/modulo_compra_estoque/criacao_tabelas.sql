@@ -17,3 +17,20 @@ ALTER TABLE vendas.tb_pedido RENAME id_vendedor TO id_proprietario;
 INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (4, 'COMPRA_PENDENTE_RECEBIMENTO');
 INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (5, 'COMPRA_RECEBIDA');
 ALTER TABLE vendas.tb_item_pedido add item_recebido boolean default false;
+
+create table vendas.tb_item_estoque (
+	id integer not null,
+	id_material integer not null,
+	id_forma_material integer not null,
+	descricao_peca varchar (100),
+	comprimento integer,
+	medida_interna integer,
+	medida_externa integer,
+	quantidade integer not null default 0,
+	preco_medio numeric(9, 2)
+);
+
+ALTER TABLE vendas.tb_item_estoque ADD PRIMARY KEY (id);
+ALTER TABLE vendas.tb_item_estoque ADD CONSTRAINT id_material FOREIGN KEY (id_material) REFERENCES vendas.tb_material (id);
+ALTER TABLE vendas.tb_item_estoque ADD CONSTRAINT id_forma_material FOREIGN KEY (id_forma_material) REFERENCES vendas.tb_forma_material (id);
+create sequence vendas.seq_item_estoque_id increment by 1 minvalue 1 no maxvalue start with 1;

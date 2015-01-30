@@ -100,12 +100,6 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public long pesquisarTotalItemPendente(Integer idPedido) {
-		return pedidoDAO.pesquisarTotalItemPedido(idPedido, false);
-	}
-
-	@Override
 	public Double calcularValorPedido(Integer idPedido) throws BusinessException {
 		return pedidoDAO.pesquisarQuantidadePrecoUnidade(idPedido);
 	}
@@ -490,12 +484,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarCompraPendente(Integer idRepresentada, Periodo periodo) {
-		return pedidoDAO.pesquisarCompraPendenteByPeriodo(idRepresentada, periodo);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo) {
 		return pedidoDAO.pesquisarCompraPendenteRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
@@ -626,6 +614,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public long pesquisarTotalItemPendente(Integer idPedido) {
+		return pedidoDAO.pesquisarTotalItemPedido(idPedido, false);
 	}
 
 	@Override

@@ -452,8 +452,8 @@ public class PedidoController extends AbstractController {
         if (sigla != null && idRepresentada != null) {
             List<Material> listaMaterial = this.materialService.pesquisarBySigla(sigla, idRepresentada);
             for (Material material : listaMaterial) {
-                lista.add(new MaterialAutocomplete(material.getId(), material.getDescricao() == null ? material
-                        .getSigla() : material.getSigla() + " - " + material.getDescricao(), material.isImportado()));
+                lista.add(new MaterialAutocomplete(material.getId(), material.getDescricaoFormatada(), material
+                        .isImportado()));
             }
         }
         serializarJson(new SerializacaoJson("lista", lista));

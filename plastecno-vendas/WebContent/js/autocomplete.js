@@ -58,7 +58,7 @@ var autocompletar = function(configuracao) {
 
 			request.fail(function(request, status, excecao) {
 				var mensagem = 'Falha no AUTOCOMPLETE do campo: '+ idCampoPesquisavel;
-				mensagem += ' para a URL ' + autocomplete.url;
+				mensagem += ' para a URL ' + url;
 				mensagem += ' contendo o valor de requisicao ' + parametro;
 				mensagem += ' => Excecao: ' + excecao;
 				gerarListaMensagemErro(new Array(mensagem));

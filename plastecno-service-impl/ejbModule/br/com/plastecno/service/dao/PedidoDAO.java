@@ -13,7 +13,6 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.impl.util.QueryUtil;
-import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.util.StringUtils;
 
 public class PedidoDAO extends GenericDAO<Pedido> {

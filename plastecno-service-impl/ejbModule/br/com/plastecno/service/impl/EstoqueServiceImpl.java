@@ -8,6 +8,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
@@ -15,6 +16,7 @@ import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 
 @Stateless
@@ -101,10 +103,32 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return entityManager
-				.createQuery(
-						"select i from ItemEstoque i where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial")
-				.setParameter("idMaterial", idMaterial).setParameter("formaMaterial", formaMaterial).getResultList();
+		StringBuilder select = new StringBuilder();
+		select.append("select i from ItemEstoque i ");
+		if (idMaterial != null || formaMaterial != null) {
+			select.append("where ");
+		}
+
+		if (idMaterial != null) {
+			select.append("i.material.id = :idMaterial ");
+		}
+
+		if (formaMaterial != null && idMaterial != null) {
+			select.append("and i.formaMaterial = :formaMaterial ");
+		} else if (formaMaterial != null) {
+			select.append("i.formaMaterial = :formaMaterial ");
+		}
+		
+		Query query = entityManager.createQuery(select.toString());
+		if (idMaterial != null) {
+			query.setParameter("idMaterial", idMaterial);
+		}
+
+		if (formaMaterial != null) {
+			query.setParameter("formaMaterial", formaMaterial);
+		}
+
+		return query.getResultList();
 	}
 
 	@Override
@@ -124,5 +148,14 @@ public class EstoqueServiceImpl implements EstoqueService {
 			return item;
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Material> pesquisarMateriaEstoque(String sigla) {
+		Query query = this.entityManager
+				.createQuery("select distinct new Material(m.id, m.sigla, m.descricao) from ItemEstoque i inner join i.material m where m.sigla like :sigla order by m.sigla ");
+		query.setParameter("sigla", "%" + sigla + "%");
+		return query.getResultList();
 	}
 }

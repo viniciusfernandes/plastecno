@@ -26,33 +26,20 @@ $(document).ready(function() {
 	});
 	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
+	inicializarAutocompleteMaterial();
 });
 
 
-function removerItem(botao){
-	inicializarModalConfirmacao({
-		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REMOVER esse item do pedido de compra?',
-		confirmar: function(){
-			submeterForm(botao);
+function inicializarAutocompleteMaterial() {
+	autocompletar({
+		url : '<c:url value="/estoque/material/listagem"/>',
+		campoPesquisavel : 'material',
+		parametro : 'sigla',
+		containerResultados : 'containerPesquisaMaterial',
+		selecionarItem : function(itemLista) {
+			$('#idMaterial').val(itemLista.id);
 		}
 	});
-};
-
-
-function recepcionarItem(botao){
-	inicializarModalConfirmacao({
-		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja RECEPCIONAR esse item do pedido de compra?',
-		confirmar: function(){
-			submeterForm(botao);
-		}
-	});
-};
-
-function submeterForm(botao){
-	var parametros = $('#formPesquisa').serialize();
-	var form = $(botao).closest('form');
-	var action = $(form).attr('action')+'?'+parametros;
-	$(form).attr('action', action).submit();
 };
 
 function inicializarFiltro() {
@@ -76,7 +63,7 @@ function inicializarFiltro() {
 			<legend>::: Itens do Estoque :::</legend>
 			<div class="label" style="width: 30%">Forma Material:</div>
 			<div class="input" style="width: 60%">
-				<select name="idRepresentada" style="width: 20%">
+				<select name="formaMaterial" style="width: 20%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="forma" items="${listaFormaMaterial}">
 						<option value="${forma}"
@@ -86,7 +73,8 @@ function inicializarFiltro() {
 			</div>
 			<div class="label" style="width: 30%">Material:</div>
 			<div class="input" style="width: 60%">
-				<input type="text" id="material" name="material.id" style="width: 60%" />
+				<input type="hidden" id="idMaterial" name="idMaterial" value="${idMaterial}"/>
+				<input type="text" id="material" name="descricaoMaterial" value="${descricaoMaterial}" style="width: 60%" />
 				<div class="suggestionsBox" id="containerPesquisaMaterial"
 					style="display: none; width: 50%"></div>
 			</div>

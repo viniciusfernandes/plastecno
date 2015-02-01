@@ -122,14 +122,14 @@ public class MaterialServiceImpl implements MaterialService {
 		return false;
 	}
 
-	public boolean isMaterialImportado(Integer idMaterial) {
-		Material material = pesquisarById(idMaterial);
-		return material != null ? material.isImportado() : false;
-	}
-
 	@Override
 	public boolean isMaterialExistente(String sigla, Integer idMaterial) {
 		return materialDAO.isEntidadeExistente(Material.class, idMaterial, "sigla", sigla);
+	}
+
+	public boolean isMaterialImportado(Integer idMaterial) {
+		Material material = pesquisarById(idMaterial);
+		return material != null ? material.isImportado() : false;
 	}
 
 	@Override
@@ -162,14 +162,14 @@ public class MaterialServiceImpl implements MaterialService {
 		return materialDAO.pesquisarById(id);
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
+	public List<Material> pesquisarBySigla(String sigla) {
+		return materialDAO.pesquisarBySigla(sigla);
+	}
+
 	@Override
 	public List<Material> pesquisarBySigla(String sigla, Integer idRepresentada) {
-		Query query = this.entityManager
-				.createQuery("select new Material(m.id, m.sigla, m.descricao) from Material m inner join m.listaRepresentada r where r.id = :idRepresentada and m.sigla like :sigla order by m.sigla ");
-		query.setParameter("sigla", "%" + sigla + "%");
-		query.setParameter("idRepresentada", idRepresentada);
-		return query.getResultList();
+		return materialDAO.pesquisarBySigla(sigla, idRepresentada);
 	}
 
 	@SuppressWarnings("unchecked")

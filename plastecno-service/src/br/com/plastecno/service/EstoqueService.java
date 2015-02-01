@@ -6,6 +6,7 @@ import javax.ejb.Local;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.service.entity.Material;
 
 @Local
 public interface EstoqueService {
@@ -15,4 +16,6 @@ public interface EstoqueService {
 
 	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
 			Double medidaInterna, Double comprimento);
+
+	List<Material> pesquisarMateriaEstoque(String sigla);
 }

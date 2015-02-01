@@ -38,7 +38,6 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
-import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ClienteJson;
 import br.com.plastecno.vendas.json.ItemPedidoJson;
@@ -132,6 +131,13 @@ public class PedidoController extends AbstractController {
         irTopoPagina();
     }
 
+    private void configurarTipoPedido(TipoPedido tipoPedido) {
+        if (TipoPedido.COMPRA.equals(tipoPedido)) {
+            addAtributo("tipoPedido", tipoPedido);
+            addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
+        }
+    }
+
     @Get("pedido/pdf")
     public Download downloadPedidoPDF(Integer idPedido, TipoPedido tipoPedido) {
         try {
@@ -179,24 +185,6 @@ public class PedidoController extends AbstractController {
         }
 
         configurarTipoPedido(tipoPedido);
-    }
-
-    private void formatarItemPedido(ItemPedido... itens) {
-        for (ItemPedido item : itens) {
-            item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
-            item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
-            item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
-            item.setPrecoUnidadeIPIFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidadeIPI()));
-            item.setPrecoVendaFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoVenda()));
-            item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoItem()));
-            item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
-            item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
-            item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
-        }
-    }
-
-    private void formatarItemPedido(List<ItemPedido> itens) {
-        this.formatarItemPedido(itens.toArray(new ItemPedido[itens.size()]));
     }
 
     private void gerarListaRepresentada(Pedido pedido) {
@@ -385,13 +373,6 @@ public class PedidoController extends AbstractController {
     public void limpar(TipoPedido tipoPedido) {
         redirecTo(this.getClass()).pedidoHome();
         configurarTipoPedido(tipoPedido);
-    }
-
-    private void configurarTipoPedido(TipoPedido tipoPedido) {
-        if (TipoPedido.COMPRA.equals(tipoPedido)) {
-            addAtributo("tipoPedido", tipoPedido);
-            addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
-        }
     }
 
     @Get("pedido/compra")

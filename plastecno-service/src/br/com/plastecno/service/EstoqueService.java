@@ -12,4 +12,7 @@ public interface EstoqueService {
 	void inserirItemEstoque(Integer idItemPedido);
 
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
+
+	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
+			Double medidaInterna, Double comprimento);
 }

@@ -19,6 +19,8 @@ import br.com.plastecno.service.TipoLogradouroService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -148,6 +150,37 @@ public abstract class AbstractController {
 
     String formatarInscricaoEstadual(String conteudo) {
         return StringUtils.formatarInscricaoEstadual(conteudo);
+    }
+
+    void formatarItemEstoque(ItemEstoque item) {
+        item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
+        item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
+        item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
+        item.setPrecoMedioFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoMedio()));
+    }
+
+    void formatarItemEstoque(List<ItemEstoque> itens) {
+        for (ItemEstoque item : itens) {
+            this.formatarItemEstoque(item);
+        }
+    }
+
+    void formatarItemPedido(ItemPedido item) {
+        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
+        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
+        item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
+        item.setPrecoUnidadeIPIFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidadeIPI()));
+        item.setPrecoVendaFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoVenda()));
+        item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoItem()));
+        item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
+        item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
+        item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
+    }
+
+    void formatarItemPedido(List<ItemPedido> itens) {
+        for (ItemPedido item : itens) {
+            this.formatarItemPedido(item);
+        }
     }
 
     void formatarPedido(Pedido pedido) {

@@ -40,6 +40,7 @@
 							<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a></li>
 							<li><a href="compra/pendencia" target="principal_frame">Compras Pedentes</a></li>
 							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
+							<li><a href="estoque" target="principal_frame">Estoque</a></li>							
 						</ul>
 					</li>
 				</c:if>

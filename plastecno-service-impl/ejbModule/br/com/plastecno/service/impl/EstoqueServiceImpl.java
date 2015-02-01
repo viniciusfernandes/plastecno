@@ -107,6 +107,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 				.setParameter("idMaterial", idMaterial).setParameter("formaMaterial", formaMaterial).getResultList();
 	}
 
+	@Override
 	public ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
 			Double medidaInterna, Double comprimento) {
 		List<ItemEstoque> listItem = pesquisarItemEstoque(idMaterial, formaMaterial);

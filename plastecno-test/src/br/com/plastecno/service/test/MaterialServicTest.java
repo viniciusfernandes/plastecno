@@ -17,10 +17,6 @@ import br.com.plastecno.service.exception.BusinessException;
 
 public class MaterialServicTest extends AbstractTest {
 
-	@Before
-	public void init(){
-		initGenericDAO();
-	}
 	private Pedido gerarPedidoClienteProspectado() {
 		Pedido pedido = gerador.gerarPedido();
 		Cliente cliente = pedido.getCliente();
@@ -32,6 +28,10 @@ public class MaterialServicTest extends AbstractTest {
 			printMensagens(e);
 		}
 		return pedido;
+	}
+
+	@Before
+	public void init() {
 	}
 
 	@Test

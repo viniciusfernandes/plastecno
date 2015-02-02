@@ -77,7 +77,10 @@ class RepositorioEntidade {
 				inserirEntidade(t);
 				return t;
 			}
-
+			@Mock
+			<T> T pesquisarById(Class<T> classe, Integer id) {
+				return pesquisarEntidadeById(classe, id);
+			}
 			@Mock
 			<T> boolean isEntidadeExistente(Class<T> classe, String nomeAtributo, Object valorAtributo,
 					Object nomeIdEntidade, Object valorIdEntidade) {
@@ -95,7 +98,7 @@ class RepositorioEntidade {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T> T pesquisarEntidadeById(Class<T> classe, Integer Id) {
+	<T> T pesquisarEntidadeById(Class<T> classe, Integer id) {
 		if (!entidades.containsKey(classe)) {
 			return null;
 		}

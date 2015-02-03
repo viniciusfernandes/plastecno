@@ -139,6 +139,28 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	}
 
+	public List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
+		return pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		StringBuilder select = new StringBuilder(
+				"select p from Pedido p left join fetch p.vendedor where p.cliente.id = :idCliente ");
+		if (idVendedor != null) {
+			select.append(" and p.vendedor.id = :idVendedor ");
+		}
+		select.append(" order by p.dataInclusao desc, p.cliente.nomeFantasia ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("idCliente", idCliente);
+		if (idVendedor != null) {
+			query.setParameter("idVendedor", idVendedor);
+		}
+		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
 	public Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery(
@@ -172,28 +194,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idPedido", idPedido);
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
-	}
-
-	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-		StringBuilder select = new StringBuilder(
-				"select p from Pedido p left join fetch p.vendedor where p.cliente.id = :idCliente ");
-		if (idVendedor != null) {
-			select.append(" and p.vendedor.id = :idVendedor ");
-		}
-		select.append(" order by p.dataInclusao desc, p.cliente.nomeFantasia ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idCliente", idCliente);
-		if (idVendedor != null) {
-			query.setParameter("idVendedor", idVendedor);
-		}
-		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
-	}
-
-	public List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
-		return pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 }

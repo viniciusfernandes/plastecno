@@ -95,12 +95,6 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(Integer idRepresentada) {
-		Representada representada = pesquisarById(idRepresentada);
-		return representada != null ? representada.getTipoApresentacaoIPI() : null;
-	}
-
-	@Override
 	public Integer inserir(final Representada representada) throws BusinessException {
 		ValidadorInformacao.validar(representada);
 
@@ -118,13 +112,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@Override
 	public Boolean isCalculoIPIHabilitado(Integer idRepresentada) {
-		Query query = this.entityManager.createQuery(
-				"select r.tipoApresentacaoIPI from Representada r where r.id = :idRepresentada").setParameter("idRepresentada",
-				idRepresentada);
-		final TipoApresentacaoIPI apresentacaoIPI = QueryUtil.gerarRegistroUnico(query, TipoApresentacaoIPI.class,
-				TipoApresentacaoIPI.NUNCA);
-
-		return !TipoApresentacaoIPI.NUNCA.equals(apresentacaoIPI);
+		return !TipoApresentacaoIPI.NUNCA.equals(representadaDAO.pesquisarTipoApresentacaoIPI(idRepresentada));
 	}
 
 	@Override
@@ -212,6 +200,12 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("id", id);
 		return QueryUtil.gerarRegistroUnico(query, Logradouro.class, null);
+	}
+
+	@Override
+	public TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(Integer idRepresentada) {
+		Representada representada = pesquisarById(idRepresentada);
+		return representada != null ? representada.getTipoApresentacaoIPI() : null;
 	}
 
 	@Override

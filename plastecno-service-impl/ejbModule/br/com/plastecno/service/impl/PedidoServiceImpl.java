@@ -320,9 +320,12 @@ public class PedidoServiceImpl implements PedidoService {
 		 * default do sistema. Esse preenchimento foi realizado pois agora temos que
 		 * incluir essa informacao do pedido.html que sera enviado para o cliente.
 		 */
-
-		if (aliquotaIPI == null) {
+		final boolean isCalculoIPIHabilitado = isCalculoIPIHabilitado(idPedido);
+		if (aliquotaIPI == null && isCalculoIPIHabilitado) {
 			aliquotaIPI = itemPedido.getFormaMaterial().getIpi();
+		} else if (aliquotaIPI != null && !isCalculoIPIHabilitado) {
+			throw new BusinessException(
+					"Remova o valor do IPI do item pois representada escolhida não apresenta cáculo de IPI.");
 		}
 		itemPedido.setAliquotaIPI(aliquotaIPI);
 
@@ -347,6 +350,12 @@ public class PedidoServiceImpl implements PedidoService {
 		pedido.setValorPedidoIPI(this.calcularValorPedidoIPI(idPedido));
 
 		return itemPedido.getId();
+	}
+
+	@Override
+	public boolean isCalculoIPIHabilitado(Integer idPedido) {
+		Integer idRepresentada = pesquisarIdRepresentadaByIdPedido(idPedido);
+		return representadaService.isCalculoIPIHabilitado(idRepresentada);
 	}
 
 	private boolean isCalculoIPIObrigatorio(ItemPedido itemPedido) throws BusinessException {
@@ -496,6 +505,11 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException {
 		return this.pesquisarByPeriodoEVendedor(true, periodo, idVendedor);
+	}
+
+	@Override
+	public Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarIdRepresentadaByIdPedido(idPedido);
 	}
 
 	@Override

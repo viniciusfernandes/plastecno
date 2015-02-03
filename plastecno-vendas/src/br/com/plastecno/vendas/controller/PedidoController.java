@@ -299,15 +299,16 @@ public class PedidoController extends AbstractController {
                 itemPedido.setMaterial(null);
             }
 
-            if (aliquotaIPI != null) {
+            if (aliquotaIPI != null && aliquotaIPI > 0) {
                 aliquotaIPI /= cem;
+                itemPedido.setAliquotaIPI(aliquotaIPI);
             }
 
             if (itemPedido.getAliquotaICMS() != null) {
                 itemPedido.setAliquotaICMS(itemPedido.getAliquotaICMS() / cem);
             }
 
-            final Integer idItemPedido = this.pedidoService.inserirItemPedido(numeroPedido, itemPedido, aliquotaIPI);
+            final Integer idItemPedido = this.pedidoService.inserirItemPedido(numeroPedido, itemPedido);
             itemPedido.setId(idItemPedido);
             itemPedido.getPedido().setValorPedido(this.pedidoService.pesquisarValorPedido(numeroPedido));
 

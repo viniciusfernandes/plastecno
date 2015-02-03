@@ -248,6 +248,7 @@ class GeradorServico {
 		};
 
 		inject(representadaService, new RepresentadaDAO(null), "representadaDAO");
+		inject(representadaService, gerarLogradouroService(), "logradouroService");
 		return representadaService;
 	}
 

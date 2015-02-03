@@ -275,12 +275,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException {
-		return inserirItemPedido(idPedido, itemPedido, null);
-	}
-
-	@Override
-	public Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido, Double aliquotaIPI)
-			throws BusinessException {
 		// configurando o material para efetuar o calculo usando o peso
 		// especifico
 		if (itemPedido.getMaterial() != null) {
@@ -308,26 +302,28 @@ public class PedidoServiceImpl implements PedidoService {
 		 */
 		itemPedido.setPrecoUnidade(CalculadoraPreco.calcularPorUnidade(itemPedido));
 
-		// No caso em que nao exista a cobranca de IPI os precos serao iguais
-		final Double precoUnidadeIPI = isCalculoIPIObrigatorio(itemPedido) ? CalculadoraPreco.calcularPorUnidadeIPI(
-				itemPedido, aliquotaIPI) : itemPedido.getPrecoUnidade();
-
-		itemPedido.setPrecoUnidadeIPI(precoUnidadeIPI);
-
 		/*
 		 * Caso o ipi seja nulo, isso indica que o usuario nao digitou o valor entao
 		 * utilizaremos os valores definidos para as formas dos materiais, que eh o
 		 * default do sistema. Esse preenchimento foi realizado pois agora temos que
 		 * incluir essa informacao do pedido.html que sera enviado para o cliente.
 		 */
-		final boolean isCalculoIPIHabilitado = isCalculoIPIHabilitado(idPedido);
-		if (aliquotaIPI == null && isCalculoIPIHabilitado) {
+		Double aliquotaIPI = itemPedido.getAliquotaIPI();
+		final boolean isCalculoIPIObrigatorio = isCalculoIPIObrigatorio(itemPedido);
+
+		if (aliquotaIPI == null && isCalculoIPIObrigatorio) {
 			aliquotaIPI = itemPedido.getFormaMaterial().getIpi();
-		} else if (aliquotaIPI != null && !isCalculoIPIHabilitado) {
+		} else if (aliquotaIPI != null && !isCalculoIPIObrigatorio) {
 			throw new BusinessException(
 					"Remova o valor do IPI do item pois representada escolhida não apresenta cáculo de IPI.");
 		}
 		itemPedido.setAliquotaIPI(aliquotaIPI);
+
+		// No caso em que nao exista a cobranca de IPI os precos serao iguais
+		final Double precoUnidadeIPI = isCalculoIPIObrigatorio(itemPedido) ? CalculadoraPreco
+				.calcularPorUnidadeIPI(itemPedido) : itemPedido.getPrecoUnidade();
+
+		itemPedido.setPrecoUnidadeIPI(precoUnidadeIPI);
 
 		/*
 		 * O valor sequencial sera utilizado para que a representada identifique

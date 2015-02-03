@@ -107,7 +107,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 		}
 
 		representada.setLogradouro(this.logradouroService.inserir(representada.getLogradouro()));
-		return this.entityManager.merge(representada).getId();
+		if (representada.getId() == null) {
+			return representadaDAO.inserir(representada).getId();
+		} else {
+			return representadaDAO.alterar(representada).getId();
+		}
 	}
 
 	@Override

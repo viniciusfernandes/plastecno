@@ -309,12 +309,12 @@ public class PedidoServiceImpl implements PedidoService {
 		 * incluir essa informacao do pedido.html que sera enviado para o cliente.
 		 */
 		Double aliquotaIPI = itemPedido.getAliquotaIPI();
-		final boolean contemIPI = aliquotaIPI != null && aliquotaIPI > 0d;
+		final boolean ipiPreenchido = aliquotaIPI != null && aliquotaIPI > 0d;
 		final boolean isCalculoIPIObrigatorio = isCalculoIPIObrigatorio(itemPedido);
 
-		if (aliquotaIPI == null && isCalculoIPIObrigatorio) {
+		if (!ipiPreenchido && isCalculoIPIObrigatorio) {
 			aliquotaIPI = itemPedido.getFormaMaterial().getIpi();
-		} else if (contemIPI && !isCalculoIPIObrigatorio) {
+		} else if (ipiPreenchido && !isCalculoIPIObrigatorio) {
 			throw new BusinessException(
 					"Remova o valor do IPI do item pois representada escolhida não apresenta cáculo de IPI.");
 		}

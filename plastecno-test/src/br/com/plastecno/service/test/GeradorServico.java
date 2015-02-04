@@ -152,7 +152,7 @@ class GeradorServico {
 		new MockUp<MaterialDAO>() {
 			@Mock
 			Material pesquisarById(Integer id) {
-				return GERADOR_ENTIDADE.gerarMaterial();
+				return REPOSITORIO.pesquisarEntidadeById(Material.class, id);
 			}
 		};
 		inject(materialService, new MaterialDAO(null), "materialDAO");

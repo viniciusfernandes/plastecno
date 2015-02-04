@@ -13,7 +13,6 @@ import java.util.List;
 import mockit.Mock;
 import mockit.MockUp;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
@@ -72,9 +71,7 @@ public class PedidoServiceTest extends AbstractTest {
 		return pedido;
 	}
 
-	@Before
 	public void init() {
-		super.init();
 		pedidoService = GeradorServico.gerarServico(PedidoService.class);
 		clienteService = GeradorServico.gerarServico(ClienteService.class);
 		representadaService = GeradorServico.gerarServico(RepresentadaService.class);
@@ -485,6 +482,48 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoItemPedidoIPINuloRepresentadaComIPIObrigatorio() {
+		Pedido pedido = gerarPedidoClienteProspectadoERepresentadaComIPI();
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido itemPedido = gerador.gerarItemPedido();
+		itemPedido.setAliquotaIPI(null);
+
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertNull("O IPI do item nao confere com o IPI da forma de material escolhida",
+				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI().doubleValue());
+	}
+
+	@Test
+	public void testInclusaoItemPedidoIPIZeradoRepresentadaComIPIObrigatorio() {
+		Pedido pedido = gerarPedidoClienteProspectadoERepresentadaComIPI();
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido itemPedido = gerador.gerarItemPedido();
+		itemPedido.setAliquotaIPI(0d);
+
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertTrue("O IPI do item nao confere com o IPI da forma de material escolhida",
+				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI().doubleValue());
+	}
+
+	@Test
 	public void testInclusaoItemPedidoRepresentadaSemIPI() {
 		Pedido pedido = gerarPedidoClienteProspectado();
 		try {
@@ -500,25 +539,6 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		assertNull("O IPI nao foi configurado e deve ser nulo", itemPedido.getAliquotaIPI());
-	}
-
-	@Test
-	public void testInclusaoItemPedidoSemIPIRepresentadaComIPIObrigatorio() {
-		Pedido pedido = gerarPedidoClienteProspectadoERepresentadaComIPI();
-		try {
-			pedido = pedidoService.inserir(pedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		ItemPedido itemPedido = gerador.gerarItemPedido();
-
-		try {
-			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		assertTrue("O IPI do item nao confere com o IPI da forma de material escolhida",
-				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI().doubleValue());
 	}
 
 	@Test

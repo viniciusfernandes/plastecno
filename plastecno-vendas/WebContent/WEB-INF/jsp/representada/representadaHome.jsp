@@ -66,7 +66,7 @@ $(document).ready(function() {
 	tabelaContatoHandler = inicializarBlocoContato('<c:url value="/representada"/>');
 	tabelaLogradouroHandler = new BlocoTabelaHandler('Logradouro', null, 'bloco_logradouro'); 
 	
-	inicializarPaginador(paginaSelecionada, totalPaginas);
+	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');

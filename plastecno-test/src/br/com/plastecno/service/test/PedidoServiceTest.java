@@ -2,6 +2,7 @@ package br.com.plastecno.service.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -328,17 +329,6 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private void initTestRefazerPedido() {
 		new MockUp<PedidoDAO>() {
-
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				return repositorio.pesquisarEntidadeById(Pedido.class, idPedido);
-			}
-
-			@Mock
-			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
-				return 1;
-			}
-
 			@Mock
 			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 				List<ItemPedido> listaItem = new ArrayList<ItemPedido>();
@@ -503,11 +493,13 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		ItemPedido itemPedido = gerador.gerarItemPedido();
+		itemPedido.setAliquotaIPI(null);
 		try {
 			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+		assertNull("O IPI nao foi configurado e deve ser nulo", itemPedido.getAliquotaIPI());
 	}
 
 	@Test
@@ -519,6 +511,7 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		ItemPedido itemPedido = gerador.gerarItemPedido();
+
 		try {
 			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
 		} catch (BusinessException e) {
@@ -644,12 +637,10 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testRefazerPedido() {
+	public void testRefazerPedidoComIPI() {
 		initTestRefazerPedido();
 
-		Pedido pedido = gerador.gerarPedido();
-		associarVendedor(pedido.getCliente());
-
+		Pedido pedido = gerarPedidoClienteProspectadoERepresentadaComIPI();
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -663,6 +654,38 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
+				idPedidoRefeito);
+
+		pedido = repositorio.pesquisarEntidadeById(Pedido.class, idPedido);
+		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,
+				SituacaoPedido.CANCELADO, pedido.getSituacaoPedido());
+
+	}
+
+	@Test
+	public void testRefazerPedidoRepresentadaSemIPI() {
+		initTestRefazerPedido();
+
+		Pedido pedido = gerador.gerarPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		Integer idPedidoRefeito = null;
+		boolean throwed = false;
+		try {
+			idPedidoRefeito = pedidoService.refazerPedido(idPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Os itens do pedido contem IPI mas a representada nao permite apresentacao de IPI", throwed);
+
 		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);
 

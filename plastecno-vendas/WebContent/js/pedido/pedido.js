@@ -412,6 +412,9 @@ function preencherComboTransportadora(combo, listaTransportadora) {
 }
 
 function habilitarIPI(idRepresentada) {
+	if(isEmpty(idRepresentada)){
+		return;
+	}
 	var request = $.ajax({
 		type : 'get',
 		url : '/vendas/pedido/representada/' + idRepresentada + '/aliquotaIPI/'
@@ -424,7 +427,7 @@ function habilitarIPI(idRepresentada) {
 
 	request
 			.fail(function(request, status) {
-				alert('Falha na verificação se é possível o cálculo do IPI pela representada => '
+				alert('Falha na verificaï¿½ï¿½o se ï¿½ possï¿½vel o cï¿½lculo do IPI pela representada => '
 						+ request.responseText);
 			});
 }

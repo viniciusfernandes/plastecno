@@ -30,7 +30,7 @@ public interface PedidoService {
 
 	Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException;
 
-	Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido, Double aliquotaIPI) throws BusinessException;
+	boolean isCalculoIPIHabilitado(Integer idPedido);
 
 	boolean isClienteProspectado(Integer idPedido);
 
@@ -67,6 +67,8 @@ public interface PedidoService {
 	List<Pedido> pesquisarEnviadosByPeriodoERepresentada(Periodo periodo, Integer idRepresentada);
 
 	List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException;
+
+	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
 
 	Integer pesquisarIdVendedorByIdPedido(Integer idPedido);
 

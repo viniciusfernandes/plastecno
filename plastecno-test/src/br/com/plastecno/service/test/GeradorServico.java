@@ -19,6 +19,7 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.EnderecoDAO;
@@ -151,7 +152,7 @@ class GeradorServico {
 		new MockUp<MaterialDAO>() {
 			@Mock
 			Material pesquisarById(Integer id) {
-				return GERADOR_ENTIDADE.gerarMaterial();
+				return REPOSITORIO.pesquisarEntidadeById(Material.class, id);
 			}
 		};
 		inject(materialService, new MaterialDAO(null), "materialDAO");
@@ -239,9 +240,16 @@ class GeradorServico {
 			Representada pesquisarById(Integer id) {
 				return GERADOR_ENTIDADE.gerarRepresentada();
 			}
+
+			@Mock
+			TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(Integer idRepresentada) {
+				Representada representada = REPOSITORIO.pesquisarEntidadeById(Representada.class, idRepresentada);
+				return representada == null ? null : representada.getTipoApresentacaoIPI();
+			}
 		};
 
 		inject(representadaService, new RepresentadaDAO(null), "representadaDAO");
+		inject(representadaService, gerarLogradouroService(), "logradouroService");
 		return representadaService;
 	}
 
@@ -259,14 +267,14 @@ class GeradorServico {
 			}
 
 			@Mock
-			public Usuario pesquisarVendedorByIdCliente(Integer idCliente) {
-				Cliente c = REPOSITORIO.pesquisarEntidadeById(Cliente.class, idCliente);
-				return c != null ? c.getVendedor() : null;
+			public List<PerfilAcesso> pesquisarPerfisAssociados(Integer id) {
+				return new ArrayList<PerfilAcesso>();
 			}
 
 			@Mock
-			public List<PerfilAcesso> pesquisarPerfisAssociados(Integer id) {
-				return new ArrayList<PerfilAcesso>();
+			public Usuario pesquisarVendedorByIdCliente(Integer idCliente) {
+				Cliente c = REPOSITORIO.pesquisarEntidadeById(Cliente.class, idCliente);
+				return c != null ? c.getVendedor() : null;
 			}
 
 		};

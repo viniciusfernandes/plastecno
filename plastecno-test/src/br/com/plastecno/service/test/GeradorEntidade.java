@@ -111,7 +111,7 @@ public class GeradorEntidade {
 		Usuario vendedor = gerarVendedor();
 		Cliente cliente = gerarCliente();
 		cliente.setVendedor(vendedor);
-		Representada representada = new Representada(1, "COBEX");
+		Representada representada = gerarRepresentada();
 		Contato contato = new Contato();
 		contato.setNome("Adriano");
 
@@ -143,6 +143,10 @@ public class GeradorEntidade {
 
 	public Representada gerarRepresentada() {
 		Representada representada = new Representada(1, "COBEX");
+		representada.setAtivo(true);
+		representada.setRazaoSocial("COBEX LTDA");
+		representada.setEmail("vendas@cobex.com.br");
+		representada.setComissao(0.05);
 		return representada;
 	}
 

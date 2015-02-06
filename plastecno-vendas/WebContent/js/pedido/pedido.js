@@ -413,6 +413,9 @@ function preencherComboTransportadora(combo, listaTransportadora) {
 }
 
 function habilitarIPI(idRepresentada) {
+	if(isEmpty(idRepresentada)){
+		return;
+	}
 	var request = $.ajax({
 		type : 'get',
 		url : '/vendas/pedido/representada/' + idRepresentada + '/aliquotaIPI/'

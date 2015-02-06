@@ -2,6 +2,7 @@ package br.com.plastecno.service.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -12,12 +13,14 @@ import java.util.List;
 import mockit.Mock;
 import mockit.MockUp;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.RepresentadaService;
+import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
@@ -34,6 +37,16 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private ClienteService clienteService;
 	private PedidoService pedidoService;
+	private RepresentadaService representadaService;
+
+	private void associarVendedor(Cliente cliente) {
+		cliente.setVendedor(GeradorEntidade.getInstance().gerarVendedor());
+		try {
+			clienteService.inserir(cliente);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
 
 	private Pedido gerarPedidoClienteProspectado() {
 		Pedido pedido = gerador.gerarPedido();
@@ -44,14 +57,25 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+
+		try {
+			representadaService.inserir(pedido.getRepresentada());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 		return pedido;
 	}
 
-	@Before
+	private Pedido gerarPedidoClienteProspectadoERepresentadaComIPI() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
+		return pedido;
+	}
+
 	public void init() {
-		super.init();
 		pedidoService = GeradorServico.gerarServico(PedidoService.class);
 		clienteService = GeradorServico.gerarServico(ClienteService.class);
+		representadaService = GeradorServico.gerarServico(RepresentadaService.class);
 	}
 
 	private void initTestEnvioEmailPedidoCancelado() {
@@ -303,17 +327,6 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private void initTestRefazerPedido() {
 		new MockUp<PedidoDAO>() {
-
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				return repositorio.pesquisarEntidadeById(Pedido.class, idPedido);
-			}
-
-			@Mock
-			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
-				return 1;
-			}
-
 			@Mock
 			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 				List<ItemPedido> listaItem = new ArrayList<ItemPedido>();
@@ -478,6 +491,85 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoItemPedidoComIPIRepresentadaSemIPI() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		ItemPedido itemPedido = gerador.gerarItemPedido();
+		itemPedido.setAliquotaIPI(0.02);
+		boolean throwed = false;
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A representada definida no pedido nao permite valores de IPI", throwed);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoIPINuloRepresentadaComIPIObrigatorio() {
+		Pedido pedido = gerarPedidoClienteProspectadoERepresentadaComIPI();
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido itemPedido = gerador.gerarItemPedido();
+		itemPedido.setAliquotaIPI(null);
+
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertNull("O IPI do item nao confere com o IPI da forma de material escolhida",
+				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI().doubleValue());
+	}
+
+	@Test
+	public void testInclusaoItemPedidoIPIZeradoRepresentadaComIPIObrigatorio() {
+		Pedido pedido = gerarPedidoClienteProspectadoERepresentadaComIPI();
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido itemPedido = gerador.gerarItemPedido();
+		itemPedido.setAliquotaIPI(0d);
+
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertTrue("O IPI do item nao confere com o IPI da forma de material escolhida",
+				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI().doubleValue());
+	}
+
+	@Test
+	public void testInclusaoItemPedidoRepresentadaSemIPI() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		ItemPedido itemPedido = gerador.gerarItemPedido();
+		itemPedido.setAliquotaIPI(null);
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertNull("O IPI nao foi configurado e deve ser nulo", itemPedido.getAliquotaIPI());
+	}
+
+	@Test
 	public void testInclusaoPedidoCompra() {
 		Pedido pedido = gerador.gerarPedido();
 		pedido.setId(null);
@@ -521,15 +613,6 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
 			fail("Todo pedido incluido deve ir para a digitacao");
-		}
-	}
-
-	private void associarVendedor(Cliente cliente) {
-		cliente.setVendedor(GeradorEntidade.getInstance().gerarVendedor());
-		try {
-			clienteService.inserir(cliente);
-		} catch (BusinessException e) {
-			printMensagens(e);
 		}
 	}
 
@@ -581,7 +664,7 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testInclusaoPedidoRepresentacao() {
 		Pedido pedido = gerador.gerarPedido();
 		associarVendedor(pedido.getCliente());
-		
+
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -649,12 +732,10 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testRefazerPedido() {
+	public void testRefazerPedidoComIPI() {
 		initTestRefazerPedido();
 
-		Pedido pedido = gerador.gerarPedido();
-		associarVendedor(pedido.getCliente());
-
+		Pedido pedido = gerarPedidoClienteProspectadoERepresentadaComIPI();
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -668,6 +749,38 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
+				idPedidoRefeito);
+
+		pedido = repositorio.pesquisarEntidadeById(Pedido.class, idPedido);
+		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,
+				SituacaoPedido.CANCELADO, pedido.getSituacaoPedido());
+
+	}
+
+	@Test
+	public void testRefazerPedidoRepresentadaSemIPI() {
+		initTestRefazerPedido();
+
+		Pedido pedido = gerador.gerarPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		Integer idPedidoRefeito = null;
+		boolean throwed = false;
+		try {
+			idPedidoRefeito = pedidoService.refazerPedido(idPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Os itens do pedido contem IPI mas a representada nao permite apresentacao de IPI", throwed);
+
 		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);
 

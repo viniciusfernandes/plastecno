@@ -109,12 +109,12 @@ public class MaterialServiceImpl implements MaterialService {
 
 	@Override
 	public boolean isCalculoIPIObrigatorio(Integer idMaterial, Integer idRepresentada) {
-		final Boolean materialImportado = isMaterialImportado(idMaterial);
+
 		final TipoApresentacaoIPI tipoApresentacaoIPI = representadaService.pesquisarTipoApresentacaoIPI(idRepresentada);
 		if (TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
 			return false;
 		}
-
+		final boolean materialImportado = isMaterialImportado(idMaterial);
 		if (TipoApresentacaoIPI.SEMPRE.equals(tipoApresentacaoIPI)
 				|| (TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI) && materialImportado)) {
 			return true;

@@ -5,16 +5,19 @@ import org.junit.Before;
 
 import br.com.plastecno.service.exception.BusinessException;
 
-class AbstractTest {
+public abstract class AbstractTest {
 
-	RepositorioEntidade repositorio = RepositorioEntidade.getInstance();
-	GeradorEntidade gerador = GeradorEntidade.getInstance();
+	protected RepositorioEntidade repositorio = RepositorioEntidade.getInstance();
+	protected GeradorEntidade gerador = GeradorEntidade.getInstance();
 
 	@Before
-	public void init() {
+	public void clean() {
 		repositorio.init();
 		repositorio.clear();
+		init();
 	}
+
+	public abstract void init();
 
 	void printMensagens(BusinessException exception) {
 		Assert.fail("Falha em alguma regra de negocio. As mensagens sao: " + exception.getMensagemConcatenada());

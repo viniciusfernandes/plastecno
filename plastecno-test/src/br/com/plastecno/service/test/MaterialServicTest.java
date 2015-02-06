@@ -17,11 +17,11 @@ import br.com.plastecno.service.exception.BusinessException;
 
 public class MaterialServicTest extends AbstractTest {
 
-	private Pedido gerarPedidoClienteProspectado() {
-		Pedido pedido = gerador.gerarPedido();
+	private Pedido buildPedidoClienteProspectado() {
+		Pedido pedido = gerador.buildPedido();
 		Cliente cliente = pedido.getCliente();
 		cliente.setProspeccaoFinalizada(true);
-		ClienteService clienteService = GeradorServico.gerarServico(ClienteService.class);
+		ClienteService clienteService = ServiceBuilder.buildService(ClienteService.class);
 		try {
 			clienteService.inserir(cliente);
 		} catch (BusinessException e) {
@@ -36,12 +36,12 @@ public class MaterialServicTest extends AbstractTest {
 
 	@Test
 	public void testEnvioPedidoCompra() {
-		Pedido pedido = gerarPedidoClienteProspectado();
+		Pedido pedido = buildPedidoClienteProspectado();
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 		pedido.setFormaPagamento("30 dias a vista");
 		pedido.setTipoEntrega(TipoEntrega.CIF);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
-		PedidoService pedidoService = GeradorServico.gerarServico(PedidoService.class);
+		PedidoService pedidoService = ServiceBuilder.buildService(PedidoService.class);
 		;
 		try {
 
@@ -65,11 +65,11 @@ public class MaterialServicTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoDataEntregaInvalida() {
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		pedido.setDataEntrega(TestUtils.gerarDataAnterior());
 		boolean throwed = false;
 		try {
-			PedidoService pedidoService = GeradorServico.gerarServico(PedidoService.class);
+			PedidoService pedidoService = ServiceBuilder.buildService(PedidoService.class);
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
 			throwed = true;

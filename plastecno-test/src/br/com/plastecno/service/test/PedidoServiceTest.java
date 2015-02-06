@@ -40,7 +40,7 @@ public class PedidoServiceTest extends AbstractTest {
 	private RepresentadaService representadaService;
 
 	private void associarVendedor(Cliente cliente) {
-		cliente.setVendedor(GeradorEntidade.getInstance().gerarVendedor());
+		cliente.setVendedor(EntidadeBuilder.getInstance().buildVendedor());
 		try {
 			clienteService.inserir(cliente);
 		} catch (BusinessException e) {
@@ -49,7 +49,7 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	private Pedido gerarPedidoClienteProspectado() {
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		Cliente cliente = pedido.getCliente();
 		cliente.setProspeccaoFinalizada(true);
 		try {
@@ -73,16 +73,16 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	public void init() {
-		pedidoService = GeradorServico.gerarServico(PedidoService.class);
-		clienteService = GeradorServico.gerarServico(ClienteService.class);
-		representadaService = GeradorServico.gerarServico(RepresentadaService.class);
+		pedidoService = ServiceBuilder.buildService(PedidoService.class);
+		clienteService = ServiceBuilder.buildService(ClienteService.class);
+		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
 	}
 
 	private void initTestEnvioEmailPedidoCancelado() {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.gerarPedido();
+				Pedido pedido = gerador.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -101,7 +101,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.gerarPedido();
+				Pedido pedido = gerador.buildPedido();
 				pedido.setId(idPedido);
 				pedido.getCliente().setProspeccaoFinalizada(false);
 				return pedido;
@@ -118,7 +118,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.gerarPedido();
+				Pedido pedido = gerador.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -137,7 +137,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.gerarPedido();
+				Pedido pedido = gerador.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -161,7 +161,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.gerarPedido();
+				Pedido pedido = gerador.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -184,7 +184,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.gerarPedido();
+				Pedido pedido = gerador.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -193,8 +193,8 @@ public class PedidoServiceTest extends AbstractTest {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.ENTREGA));
-				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.FATURAMENTO));
+				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.ENTREGA));
+				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.FATURAMENTO));
 				return pedido;
 			}
 
@@ -209,7 +209,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.gerarPedido();
+				Pedido pedido = gerador.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -218,8 +218,8 @@ public class PedidoServiceTest extends AbstractTest {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.FATURAMENTO));
+				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.COBRANCA));
+				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.FATURAMENTO));
 				return pedido;
 			}
 
@@ -234,7 +234,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.gerarPedido();
+				Pedido pedido = gerador.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -243,8 +243,8 @@ public class PedidoServiceTest extends AbstractTest {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(gerador.gerarLogradouro(TipoLogradouro.ENTREGA));
+				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.COBRANCA));
+				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.ENTREGA));
 				return pedido;
 			}
 
@@ -259,7 +259,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.gerarPedido();
+				Pedido pedido = gerador.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -330,7 +330,7 @@ public class PedidoServiceTest extends AbstractTest {
 			@Mock
 			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 				List<ItemPedido> listaItem = new ArrayList<ItemPedido>();
-				listaItem.add(gerador.gerarItemPedido());
+				listaItem.add(gerador.buildItemPedido());
 				return listaItem;
 			}
 		};
@@ -498,7 +498,7 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		ItemPedido itemPedido = gerador.gerarItemPedido();
+		ItemPedido itemPedido = gerador.buildItemPedido();
 		itemPedido.setAliquotaIPI(0.02);
 		boolean throwed = false;
 		try {
@@ -518,7 +518,7 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		ItemPedido itemPedido = gerador.gerarItemPedido();
+		ItemPedido itemPedido = gerador.buildItemPedido();
 		itemPedido.setAliquotaIPI(null);
 
 		try {
@@ -539,7 +539,7 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		ItemPedido itemPedido = gerador.gerarItemPedido();
+		ItemPedido itemPedido = gerador.buildItemPedido();
 		itemPedido.setAliquotaIPI(0d);
 
 		try {
@@ -559,7 +559,7 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		ItemPedido itemPedido = gerador.gerarItemPedido();
+		ItemPedido itemPedido = gerador.buildItemPedido();
 		itemPedido.setAliquotaIPI(null);
 		try {
 			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
@@ -571,7 +571,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoCompra() {
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		pedido.setId(null);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
 		associarVendedor(pedido.getCliente());
@@ -589,7 +589,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoDataEntregaInvalida() {
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		pedido.setDataEntrega(TestUtils.gerarDataAnterior());
 		boolean throwed = false;
 		try {
@@ -602,7 +602,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoDigitado() {
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		pedido.setId(null);
 		associarVendedor(pedido.getCliente());
 
@@ -619,7 +619,7 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoPedidoDigitadoSemVendedorAssociado() {
 		initTestInclusaoPedidoDigitadoSemVendedorAssociado();
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		boolean throwed = false;
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -633,7 +633,7 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testInclusaoPedidoOrcamento() {
 		initTestInclusaoPedidoOrcamento();
 
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		associarVendedor(pedido.getCliente());
 
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
@@ -662,7 +662,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoRepresentacao() {
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		associarVendedor(pedido.getCliente());
 
 		try {
@@ -677,7 +677,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoRevenda() {
-		Pedido pedido = gerador.gerarPedidoRevenda();
+		Pedido pedido = gerador.buildPedidoRevenda();
 		associarVendedor(pedido.getCliente());
 
 		try {
@@ -691,7 +691,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoTipoDeEntregaSemRedespacho() {
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		pedido.setTipoEntrega(TipoEntrega.CIF_TRANS);
 		boolean throwed = false;
 		try {
@@ -706,7 +706,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testPedidoCanceladoDataEntregaInvalida() {
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		associarVendedor(pedido.getCliente());
 
 		try {
@@ -762,7 +762,7 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testRefazerPedidoRepresentadaSemIPI() {
 		initTestRefazerPedido();
 
-		Pedido pedido = gerador.gerarPedido();
+		Pedido pedido = gerador.buildPedido();
 		associarVendedor(pedido.getCliente());
 
 		try {

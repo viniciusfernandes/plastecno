@@ -47,16 +47,16 @@ import br.com.plastecno.service.impl.RepresentadaServiceImpl;
 import br.com.plastecno.service.impl.UsuarioServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
-class GeradorServico {
+class ServiceBuilder {
 	@SuppressWarnings("unchecked")
-	static <T> T gerarServico(Class<T> classe) {
-		String metodoName = "gerar" + classe.getSimpleName();
+	static <T> T buildService(Class<T> classe) {
+		String metodoName = "build" + classe.getSimpleName();
 		Method method = null;
 		try {
-			method = GeradorServico.class.getDeclaredMethod(metodoName);
+			method = ServiceBuilder.class.getDeclaredMethod(metodoName);
 			try {
 				method.setAccessible(true);
-				return (T) method.invoke(GERADOR_SERVICO, (Object[]) null);
+				return (T) method.invoke(SERVICE_BUILDER, (Object[]) null);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new TestUtilException("Falha na execucao do metodo de inicializacao do servico \"" + "gerar"
 						+ classe.getSimpleName() + "\"", e);
@@ -72,37 +72,37 @@ class GeradorServico {
 		}
 	}
 
-	private static final RepositorioEntidade REPOSITORIO = RepositorioEntidade.getInstance();
-	private static final GeradorEntidade GERADOR_ENTIDADE = GeradorEntidade.getInstance();
-	private static final GeradorServico GERADOR_SERVICO = new GeradorServico();
+	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
+	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
+	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
 
-	GeradorServico() {
+	ServiceBuilder() {
 	}
 
-	public ClienteService gerarClienteService() {
+	public ClienteService buildClienteService() {
 		ClienteServiceImpl clienteService = new ClienteServiceImpl();
 
 		new MockUp<ClienteDAO>() {
 			@Mock
 			boolean isEmailExistente(Integer idCliente, String email) {
-				return REPOSITORIO.contemEntidade(Cliente.class, "email", email, idCliente);
+				return REPOSITORY.contemEntidade(Cliente.class, "email", email, idCliente);
 			}
 
 			@Mock
 			List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
-				Cliente cliente = REPOSITORIO.pesquisarEntidadeById(Cliente.class, idCliente);
+				Cliente cliente = REPOSITORY.pesquisarEntidadeById(Cliente.class, idCliente);
 				return cliente == null ? new ArrayList<LogradouroCliente>() : cliente.getListaLogradouro();
 			}
 
 		};
 
 		inject(clienteService, new ClienteDAO(null), "clienteDAO");
-		inject(clienteService, gerarLogradouroService(), "logradouroService");
-		inject(clienteService, gerarEnderecamentoService(), "enderecamentoService");
+		inject(clienteService, buildLogradouroService(), "logradouroService");
+		inject(clienteService, buildEnderecamentoService(), "enderecamentoService");
 		return clienteService;
 	}
 
-	public EmailService gerarEmailService() {
+	public EmailService buildEmailService() {
 		EmailServiceImpl emailService = new EmailServiceImpl();
 		new MockUp<EmailServiceImpl>() {
 			@Mock
@@ -113,7 +113,7 @@ class GeradorServico {
 		return emailService;
 	}
 
-	public EnderecamentoService gerarEnderecamentoService() {
+	public EnderecamentoService buildEnderecamentoService() {
 		EnderecamentoService enderecamentoService = new EnderecamentoServiceImpl();
 		new MockUp<EnderecoDAO>() {
 			@Mock
@@ -141,31 +141,31 @@ class GeradorServico {
 		return enderecamentoService;
 	}
 
-	public LogradouroService gerarLogradouroService() {
+	public LogradouroService buildLogradouroService() {
 		LogradouroService logradouroService = new LogradouroServiceImpl();
-		inject(logradouroService, gerarEnderecamentoService(), "enderecamentoService");
+		inject(logradouroService, buildEnderecamentoService(), "enderecamentoService");
 		return logradouroService;
 	}
 
-	public MaterialService gerarMaterialService() {
+	public MaterialService buildMaterialService() {
 		MaterialServiceImpl materialService = new MaterialServiceImpl();
 		new MockUp<MaterialDAO>() {
 			@Mock
 			Material pesquisarById(Integer id) {
-				return REPOSITORIO.pesquisarEntidadeById(Material.class, id);
+				return REPOSITORY.pesquisarEntidadeById(Material.class, id);
 			}
 		};
 		inject(materialService, new MaterialDAO(null), "materialDAO");
-		inject(materialService, gerarRepresentadaService(), "representadaService");
+		inject(materialService, buildRepresentadaService(), "representadaService");
 		return materialService;
 	}
 
-	public PedidoService gerarPedidoService() {
+	public PedidoService buildPedidoService() {
 		PedidoServiceImpl pedidoService = new PedidoServiceImpl();
 		new MockUp<PedidoDAO>() {
 			@Mock
 			void cancelar(Integer IdPedido) {
-				Pedido pedido = REPOSITORIO.pesquisarEntidadeById(Pedido.class, IdPedido);
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, IdPedido);
 				if (pedido != null) {
 					pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
 				}
@@ -173,28 +173,28 @@ class GeradorServico {
 
 			@Mock
 			Pedido inserir(Pedido t) {
-				t.setId(GERADOR_ENTIDADE.gerarId());
-				REPOSITORIO.inserirEntidade(t);
+				t.setId(ENTIDADE_BUILDER.gerarId());
+				REPOSITORY.inserirEntidade(t);
 				return t;
 			}
 
 			@Mock
 			Pedido pesquisarById(Integer idPedido, boolean isCompra) {
-				Pedido pedido = REPOSITORIO.pesquisarEntidadeById(Pedido.class, idPedido);
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null && pedido.isCompra() == isCompra ? pedido : null;
 			}
 
 			@Mock
 			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
-				return REPOSITORIO.pesquisarEntidadeById(Pedido.class, idPedido).getRepresentada().getId();
+				return REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido).getRepresentada().getId();
 			}
 
 			@Mock
 			List<Logradouro> pesquisarLogradouro(Integer idPedido) {
 				List<Logradouro> lista = new ArrayList<Logradouro>();
-				lista.add(GERADOR_ENTIDADE.gerarLogradouro(TipoLogradouro.COBRANCA));
-				lista.add(GERADOR_ENTIDADE.gerarLogradouro(TipoLogradouro.ENTREGA));
-				lista.add(GERADOR_ENTIDADE.gerarLogradouro(TipoLogradouro.FATURAMENTO));
+				lista.add(ENTIDADE_BUILDER.buildLogradouro(TipoLogradouro.COBRANCA));
+				lista.add(ENTIDADE_BUILDER.buildLogradouro(TipoLogradouro.ENTREGA));
+				lista.add(ENTIDADE_BUILDER.buildLogradouro(TipoLogradouro.FATURAMENTO));
 
 				return lista;
 			}
@@ -222,38 +222,38 @@ class GeradorServico {
 
 		inject(pedidoService, new PedidoDAO(null), "pedidoDAO");
 		inject(pedidoService, new ItemPedidoDAO(null), "itemPedidoDAO");
-		inject(pedidoService, gerarServico(UsuarioService.class), "usuarioService");
-		inject(pedidoService, gerarServico(ClienteService.class), "clienteService");
-		inject(pedidoService, gerarServico(LogradouroService.class), "logradouroService");
-		inject(pedidoService, gerarServico(EmailService.class), "emailService");
-		inject(pedidoService, gerarServico(MaterialService.class), "materialService");
-		inject(pedidoService, gerarServico(RepresentadaService.class), "representadaService");
+		inject(pedidoService, buildService(UsuarioService.class), "usuarioService");
+		inject(pedidoService, buildService(ClienteService.class), "clienteService");
+		inject(pedidoService, buildService(LogradouroService.class), "logradouroService");
+		inject(pedidoService, buildService(EmailService.class), "emailService");
+		inject(pedidoService, buildService(MaterialService.class), "materialService");
+		inject(pedidoService, buildService(RepresentadaService.class), "representadaService");
 
 		return pedidoService;
 	}
 
-	public RepresentadaService gerarRepresentadaService() {
+	public RepresentadaService buildRepresentadaService() {
 		RepresentadaService representadaService = new RepresentadaServiceImpl();
 
 		new MockUp<RepresentadaDAO>() {
 			@Mock
 			Representada pesquisarById(Integer id) {
-				return GERADOR_ENTIDADE.gerarRepresentada();
+				return REPOSITORY.pesquisarEntidadeById(Representada.class, id);
 			}
 
 			@Mock
 			TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(Integer idRepresentada) {
-				Representada representada = REPOSITORIO.pesquisarEntidadeById(Representada.class, idRepresentada);
+				Representada representada = REPOSITORY.pesquisarEntidadeById(Representada.class, idRepresentada);
 				return representada == null ? null : representada.getTipoApresentacaoIPI();
 			}
 		};
 
 		inject(representadaService, new RepresentadaDAO(null), "representadaDAO");
-		inject(representadaService, gerarLogradouroService(), "logradouroService");
+		inject(representadaService, buildLogradouroService(), "logradouroService");
 		return representadaService;
 	}
 
-	public UsuarioService gerarUsuarioService() {
+	public UsuarioService buildUsuarioService() {
 		UsuarioServiceImpl usuarioService = new UsuarioServiceImpl();
 		new MockUp<UsuarioDAO>() {
 
@@ -273,7 +273,7 @@ class GeradorServico {
 
 			@Mock
 			public Usuario pesquisarVendedorByIdCliente(Integer idCliente) {
-				Cliente c = REPOSITORIO.pesquisarEntidadeById(Cliente.class, idCliente);
+				Cliente c = REPOSITORY.pesquisarEntidadeById(Cliente.class, idCliente);
 				return c != null ? c.getVendedor() : null;
 			}
 

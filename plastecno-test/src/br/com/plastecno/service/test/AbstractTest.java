@@ -7,8 +7,8 @@ import br.com.plastecno.service.exception.BusinessException;
 
 public abstract class AbstractTest {
 
-	protected RepositorioEntidade repositorio = RepositorioEntidade.getInstance();
-	protected GeradorEntidade gerador = GeradorEntidade.getInstance();
+	protected EntidadeRepository repositorio = EntidadeRepository.getInstance();
+	protected EntidadeBuilder gerador = EntidadeBuilder.getInstance();
 
 	@Before
 	public void clean() {

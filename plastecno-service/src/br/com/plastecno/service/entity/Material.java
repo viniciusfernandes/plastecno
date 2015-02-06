@@ -66,14 +66,14 @@ public class Material implements Serializable {
 
 	public void addRepresentada(final List<Representada> listaRepresentada) {
 		if (this.listaRepresentada == null) {
-			this.listaRepresentada = new ArrayList<Representada>();
+			setListaRepresentada(new ArrayList<Representada>());
 		}
 		this.listaRepresentada.addAll(listaRepresentada);
 	}
 
 	public void addRepresentada(final Representada representada) {
 		if (this.listaRepresentada == null) {
-			this.listaRepresentada = new ArrayList<Representada>();
+			setListaRepresentada(new ArrayList<Representada>());
 		}
 		this.listaRepresentada.add(representada);
 	}

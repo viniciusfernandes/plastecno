@@ -18,7 +18,7 @@ import br.com.plastecno.service.exception.BusinessException;
 public class MaterialServicTest extends AbstractTest {
 
 	private Pedido buildPedidoClienteProspectado() {
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		Cliente cliente = pedido.getCliente();
 		cliente.setProspeccaoFinalizada(true);
 		ClienteService clienteService = ServiceBuilder.buildService(ClienteService.class);
@@ -65,7 +65,7 @@ public class MaterialServicTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoDataEntregaInvalida() {
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		pedido.setDataEntrega(TestUtils.gerarDataAnterior());
 		boolean throwed = false;
 		try {

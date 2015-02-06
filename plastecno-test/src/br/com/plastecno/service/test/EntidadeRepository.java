@@ -120,6 +120,38 @@ class EntidadeRepository {
 		return null;
 	}
 
+	<T> List<T> pesquisarEntidadeByRelacionamento(Class<T> classe, String nomeAtributo, Object valorAtributo) {
+		List<T> entidadeLista = pesquisarTodos(classe);
+		if (entidadeLista == null || entidadeLista.isEmpty()) {
+			return new ArrayList<T>();
+		}
+		try {
+			Field field = classe.getDeclaredField(nomeAtributo);
+			field.setAccessible(true);
+			try {
+				List<T> novaLista = new ArrayList<T>();
+				Object valor = null;
+				boolean ambosNulos = false;
+				boolean valorIgual = false;
+				for (T entidade : entidadeLista) {
+					valor = field.get(entidade);
+					valorIgual = valor != null && valor.equals(valorAtributo);
+					ambosNulos = valor == null && valorAtributo == null;
+					if (valorIgual || ambosNulos) {
+						novaLista.add(entidade);
+					}
+				}
+				return novaLista;
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				throw new IllegalArgumentException("Falha no acesso o valor do atributo \"" + nomeAtributo
+						+ "\" da entidade cujo valor eh \"" + valorAtributo + "\"", e);
+			}
+		} catch (NoSuchFieldException | SecurityException e) {
+			throw new IllegalArgumentException("A entidade do tipo " + classe + " nao possui o atributo \"" + nomeAtributo
+					+ "\"", e);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	<T> List<T> pesquisarTodos(Class<T> classe) {
 		return (List<T>) mapaEntidades.get(classe);

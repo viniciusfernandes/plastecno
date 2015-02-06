@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +15,7 @@ import mockit.MockUp;
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.FormaMaterial;
@@ -29,7 +29,9 @@ import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 
@@ -38,9 +40,10 @@ public class PedidoServiceTest extends AbstractTest {
 	private ClienteService clienteService;
 	private PedidoService pedidoService;
 	private RepresentadaService representadaService;
+	private MaterialService materialService;
 
 	private void associarVendedor(Cliente cliente) {
-		cliente.setVendedor(EntidadeBuilder.getInstance().buildVendedor());
+		cliente.setVendedor(eBuilder.buildVendedor());
 		try {
 			clienteService.inserir(cliente);
 		} catch (BusinessException e) {
@@ -48,8 +51,34 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 	}
 
+	private ItemPedido gerarItemPedido() {
+		List<Representada> listaRepresentada = representadaService.pesquisar();
+		Representada representada = null;
+		if (listaRepresentada.isEmpty()) {
+			representada = eBuilder.buildRepresentada();
+			try {
+				representadaService.inserir(representada);
+			} catch (BusinessException e) {
+				printMensagens(e);
+			}
+		}
+
+		Material material = eBuilder.buildMaterial();
+		material.addRepresentada(representada);
+		try {
+			materialService.inserir(material);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		itemPedido.setMaterial(material);
+		itemPedido.setAliquotaIPI(null);
+		return itemPedido;
+	}
+
 	private Pedido gerarPedidoClienteProspectado() {
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		Cliente cliente = pedido.getCliente();
 		cliente.setProspeccaoFinalizada(true);
 		try {
@@ -66,23 +95,18 @@ public class PedidoServiceTest extends AbstractTest {
 		return pedido;
 	}
 
-	private Pedido gerarPedidoClienteProspectadoERepresentadaComIPI() {
-		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
-		return pedido;
-	}
-
 	public void init() {
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
 		clienteService = ServiceBuilder.buildService(ClienteService.class);
 		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
+		materialService = ServiceBuilder.buildService(MaterialService.class);
 	}
 
 	private void initTestEnvioEmailPedidoCancelado() {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.buildPedido();
+				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -101,7 +125,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.buildPedido();
+				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				pedido.getCliente().setProspeccaoFinalizada(false);
 				return pedido;
@@ -118,7 +142,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.buildPedido();
+				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -137,7 +161,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.buildPedido();
+				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -161,7 +185,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.buildPedido();
+				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -184,7 +208,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.buildPedido();
+				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -193,8 +217,8 @@ public class PedidoServiceTest extends AbstractTest {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.ENTREGA));
-				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.FATURAMENTO));
+				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.ENTREGA));
+				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.FATURAMENTO));
 				return pedido;
 			}
 
@@ -209,7 +233,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.buildPedido();
+				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -218,8 +242,8 @@ public class PedidoServiceTest extends AbstractTest {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.FATURAMENTO));
+				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.COBRANCA));
+				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.FATURAMENTO));
 				return pedido;
 			}
 
@@ -234,7 +258,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.buildPedido();
+				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -243,8 +267,8 @@ public class PedidoServiceTest extends AbstractTest {
 				pedido.setTipoEntrega(TipoEntrega.FOB);
 				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 
-				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(gerador.buildLogradouro(TipoLogradouro.ENTREGA));
+				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.COBRANCA));
+				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.ENTREGA));
 				return pedido;
 			}
 
@@ -259,7 +283,7 @@ public class PedidoServiceTest extends AbstractTest {
 		new MockUp<PedidoDAO>() {
 			@Mock
 			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = gerador.buildPedido();
+				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
 				pedido.getCliente().setProspeccaoFinalizada(true);
@@ -323,17 +347,6 @@ public class PedidoServiceTest extends AbstractTest {
 			}
 		};
 
-	}
-
-	private void initTestRefazerPedido() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
-				List<ItemPedido> listaItem = new ArrayList<ItemPedido>();
-				listaItem.add(gerador.buildItemPedido());
-				return listaItem;
-			}
-		};
 	}
 
 	@Test
@@ -490,6 +503,25 @@ public class PedidoServiceTest extends AbstractTest {
 
 	}
 
+	public void testInclusaoItemPedido() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
 	@Test
 	public void testInclusaoItemPedidoComIPIRepresentadaSemIPI() {
 		Pedido pedido = gerarPedidoClienteProspectado();
@@ -498,7 +530,7 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		ItemPedido itemPedido = gerador.buildItemPedido();
+		ItemPedido itemPedido = eBuilder.buildItemPedido();
 		itemPedido.setAliquotaIPI(0.02);
 		boolean throwed = false;
 		try {
@@ -511,35 +543,59 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoIPINuloRepresentadaComIPIObrigatorio() {
-		Pedido pedido = gerarPedidoClienteProspectadoERepresentadaComIPI();
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		ItemPedido itemPedido = gerador.buildItemPedido();
-		itemPedido.setAliquotaIPI(null);
+		Representada representada = pedido.getRepresentada();
+		representada.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
+		try {
+			representadaService.inserir(representada);
+		} catch (BusinessException e2) {
+			printMensagens(e2);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
 
 		try {
 			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertNull("O IPI do item nao confere com o IPI da forma de material escolhida",
+		assertTrue("O IPI do item nao confere com o IPI da forma de material escolhida",
 				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI().doubleValue());
 	}
 
 	@Test
 	public void testInclusaoItemPedidoIPIZeradoRepresentadaComIPIObrigatorio() {
-		Pedido pedido = gerarPedidoClienteProspectadoERepresentadaComIPI();
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
+
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		ItemPedido itemPedido = gerador.buildItemPedido();
+		ItemPedido itemPedido = gerarItemPedido();
 		itemPedido.setAliquotaIPI(0d);
 
 		try {
@@ -553,13 +609,14 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoRepresentadaSemIPI() {
-		Pedido pedido = gerarPedidoClienteProspectado();
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		ItemPedido itemPedido = gerador.buildItemPedido();
+		ItemPedido itemPedido = gerarItemPedido();
 		itemPedido.setAliquotaIPI(null);
 		try {
 			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
@@ -571,7 +628,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoCompra() {
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		pedido.setId(null);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
 		associarVendedor(pedido.getCliente());
@@ -589,7 +646,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoDataEntregaInvalida() {
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		pedido.setDataEntrega(TestUtils.gerarDataAnterior());
 		boolean throwed = false;
 		try {
@@ -602,7 +659,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoDigitado() {
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		pedido.setId(null);
 		associarVendedor(pedido.getCliente());
 
@@ -619,7 +676,7 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoPedidoDigitadoSemVendedorAssociado() {
 		initTestInclusaoPedidoDigitadoSemVendedorAssociado();
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		boolean throwed = false;
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -633,7 +690,7 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testInclusaoPedidoOrcamento() {
 		initTestInclusaoPedidoOrcamento();
 
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		associarVendedor(pedido.getCliente());
 
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
@@ -662,7 +719,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoRepresentacao() {
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		associarVendedor(pedido.getCliente());
 
 		try {
@@ -677,7 +734,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoRevenda() {
-		Pedido pedido = gerador.buildPedidoRevenda();
+		Pedido pedido = eBuilder.buildPedidoRevenda();
 		associarVendedor(pedido.getCliente());
 
 		try {
@@ -691,7 +748,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoTipoDeEntregaSemRedespacho() {
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		pedido.setTipoEntrega(TipoEntrega.CIF_TRANS);
 		boolean throwed = false;
 		try {
@@ -706,7 +763,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testPedidoCanceladoDataEntregaInvalida() {
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		associarVendedor(pedido.getCliente());
 
 		try {
@@ -733,9 +790,8 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testRefazerPedidoComIPI() {
-		initTestRefazerPedido();
-
-		Pedido pedido = gerarPedidoClienteProspectadoERepresentadaComIPI();
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -743,6 +799,13 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
 		Integer idPedidoRefeito = null;
 		try {
 			idPedidoRefeito = pedidoService.refazerPedido(idPedido);
@@ -760,9 +823,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testRefazerPedidoRepresentadaSemIPI() {
-		initTestRefazerPedido();
-
-		Pedido pedido = gerador.buildPedido();
+		Pedido pedido = eBuilder.buildPedido();
 		associarVendedor(pedido.getCliente());
 
 		try {
@@ -772,14 +833,19 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		Integer idPedidoRefeito = null;
-		boolean throwed = false;
 		try {
 			idPedidoRefeito = pedidoService.refazerPedido(idPedido);
 		} catch (BusinessException e) {
-			throwed = true;
+			printMensagens(e);
 		}
-		assertTrue("Os itens do pedido contem IPI mas a representada nao permite apresentacao de IPI", throwed);
 
 		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);

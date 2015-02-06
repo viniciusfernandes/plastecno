@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -29,6 +30,7 @@ import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Material;
@@ -163,6 +165,7 @@ class ServiceBuilder {
 	public PedidoService buildPedidoService() {
 		PedidoServiceImpl pedidoService = new PedidoServiceImpl();
 		new MockUp<PedidoDAO>() {
+
 			@Mock
 			void cancelar(Integer IdPedido) {
 				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, IdPedido);
@@ -184,8 +187,26 @@ class ServiceBuilder {
 			}
 
 			@Mock
+			Date pesquisarDataEnvioById(Integer idPedido) {
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return pedido != null ? pedido.getDataEntrega() : null;
+			}
+
+			@Mock
+			Date pesquisarDataInclusaoById(Integer idPedido) {
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return pedido != null ? pedido.getDataInclusao() : null;
+			}
+
+			@Mock
 			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
 				return REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido).getRepresentada().getId();
+			}
+
+			@Mock
+			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
+				Pedido pedido = this.pesquisarById(idPedido);
+				return REPOSITORY.pesquisarEntidadeByRelacionamento(ItemPedido.class, "pedido", pedido);
 			}
 
 			@Mock
@@ -217,6 +238,18 @@ class ServiceBuilder {
 			Long pesquisarTotalItemPedido(Integer idPedido) {
 				return 12L;
 			}
+
+			@Mock
+			Double pesquisarValorPedido(Integer idPedido) {
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return pedido != null ? pedido.getValorPedido() : null;
+			}
+
+			@Mock
+			Double pesquisarValorPedidoIPI(Integer idPedido) {
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return pedido != null ? pedido.getValorPedidoIPI() : null;
+			}
 		};
 
 		inject(pedidoService, new PedidoDAO(null), "pedidoDAO");
@@ -235,6 +268,11 @@ class ServiceBuilder {
 		RepresentadaService representadaService = new RepresentadaServiceImpl();
 
 		new MockUp<RepresentadaDAO>() {
+			@Mock
+			List<Representada> pesquisar(Boolean ativo) {
+				return REPOSITORY.pesquisarEntidadeByRelacionamento(Representada.class, "ativo", true);
+			}
+
 			@Mock
 			Representada pesquisarById(Integer id) {
 				return REPOSITORY.pesquisarEntidadeById(Representada.class, id);

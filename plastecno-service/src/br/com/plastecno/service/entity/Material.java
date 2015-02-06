@@ -20,7 +20,7 @@ import javax.persistence.Table;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
-@Table(name="tb_material", schema="vendas")
+@Table(name = "tb_material", schema = "vendas")
 @InformacaoValidavel
 public class Material implements Serializable {
 	/**
@@ -28,58 +28,56 @@ public class Material implements Serializable {
 	 */
 	private static final long serialVersionUID = 9196522865218486979L;
 	@Id
-	@SequenceGenerator(name = "materialSequence", sequenceName = "vendas.seq_material_id", initialValue=1, allocationSize=1)
+	@SequenceGenerator(name = "materialSequence", sequenceName = "vendas.seq_material_id", initialValue = 1, allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "materialSequence")
 	private Integer id;
-	
+
 	private boolean ativo = true;
-	
-	@InformacaoValidavel(obrigatorio=true, intervalo={1, 10}, nomeExibicao="Sigla do Material")
+
+	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 10 }, nomeExibicao = "Sigla do Material")
 	private String sigla;
-	
-	@InformacaoValidavel(intervalo={0, 50}, nomeExibicao="Descrição do Material")
+
+	@InformacaoValidavel(intervalo = { 0, 50 }, nomeExibicao = "Descrição do Material")
 	private String descricao;
-	
-	@Column(name="peso_especifico")
-	@InformacaoValidavel(obrigatorio=true, nomeExibicao="Peso especifico do Material")
+
+	@Column(name = "peso_especifico")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Peso especifico do Material")
 	private Double pesoEspecifico;
-	
+
 	private boolean importado;
-	
-	@ManyToMany(fetch=FetchType.LAZY, cascade={CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name="tb_material_tb_representada", schema="vendas", 
-		joinColumns={@JoinColumn(name = "id_material", referencedColumnName = "id")},
-		inverseJoinColumns={@JoinColumn(name = "id_representada", referencedColumnName = "id")})
+
+	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@JoinTable(name = "tb_material_tb_representada", schema = "vendas", joinColumns = { @JoinColumn(name = "id_material", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_representada", referencedColumnName = "id") })
 	private List<Representada> listaRepresentada;
-	
-	public Material(){
-		
+
+	public Material() {
+
 	}
-	
+
 	public Material(Double pesoEspecifico) {
 		this.pesoEspecifico = pesoEspecifico;
 	}
-	
+
 	public Material(Integer id, String sigla, String descricao) {
 		this.id = id;
 		this.sigla = sigla;
 		this.descricao = descricao;
 	}
-	
+
 	public void addRepresentada(final List<Representada> listaRepresentada) {
 		if (this.listaRepresentada == null) {
-			this.listaRepresentada = new ArrayList<Representada>();
+			setListaRepresentada(new ArrayList<Representada>());
 		}
-		this.listaRepresentada.addAll(listaRepresentada);		
+		this.listaRepresentada.addAll(listaRepresentada);
 	}
 
 	public void addRepresentada(final Representada representada) {
 		if (this.listaRepresentada == null) {
-			this.listaRepresentada = new ArrayList<Representada>();
+			setListaRepresentada(new ArrayList<Representada>());
 		}
-		this.listaRepresentada.add(representada);		
+		this.listaRepresentada.add(representada);
 	}
-	
+
 	public void clearListaRepresentada() {
 		if (this.listaRepresentada != null) {
 			this.listaRepresentada.clear();
@@ -113,15 +111,15 @@ public class Material implements Serializable {
 	public boolean isImportado() {
 		return importado;
 	}
-	
+
 	public void setAtivo(boolean ativo) {
 		this.ativo = ativo;
 	}
-	
+
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}

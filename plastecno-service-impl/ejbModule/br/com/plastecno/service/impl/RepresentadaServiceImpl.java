@@ -135,21 +135,8 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<Representada> pesquisar(Boolean ativo) {
-		StringBuilder select = new StringBuilder("SELECT r FROM Representada r ");
-		if (ativo != null) {
-			select.append("where r.ativo = :ativo");
-		}
-
-		select.append(" order by r.nomeFantasia ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-
-		if (ativo != null) {
-			query.setParameter("ativo", ativo);
-		}
-		return query.getResultList();
+		return representadaDAO.pesquisar(ativo);
 	}
 
 	@Override

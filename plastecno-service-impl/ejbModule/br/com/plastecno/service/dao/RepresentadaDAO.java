@@ -1,5 +1,7 @@
 package br.com.plastecno.service.dao;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -12,6 +14,23 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 	public RepresentadaDAO(EntityManager entityManager) {
 		super(entityManager);
 	}
+	@SuppressWarnings("unchecked")
+	public List<Representada> pesquisar(Boolean ativo) {
+		StringBuilder select = new StringBuilder("SELECT r FROM Representada r ");
+		if (ativo != null) {
+			select.append("where r.ativo = :ativo");
+		}
+
+		select.append(" order by r.nomeFantasia ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+
+		if (ativo != null) {
+			query.setParameter("ativo", ativo);
+		}
+		return query.getResultList();
+	}
+
 
 	public Representada pesquisarById(Integer idRepresentada) {
 		return pesquisarById(Representada.class, idRepresentada);

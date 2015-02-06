@@ -71,10 +71,6 @@ public class EntidadeBuilder {
 		return endereco;
 	}
 
-	public Integer gerarId() {
-		return (int) (9999 * Math.random());
-	}
-
 	public ItemPedido buildItemPedido() {
 		ItemPedido itemPedido = new ItemPedido();
 		itemPedido.setAliquotaIPI(11.1d);
@@ -102,7 +98,9 @@ public class EntidadeBuilder {
 	}
 
 	public Material buildMaterial() {
-		Material material = new Material(1, "PLAST", "PLASTICO DURO");
+		Material material = new Material();
+		material.setSigla("PLAST");
+		material.setDescricao("PLASTICO DURO");
 		material.setPesoEspecifico(0.33);
 		return material;
 	}
@@ -155,6 +153,10 @@ public class EntidadeBuilder {
 		vendedor.setVendedorAtivo(true);
 		repositorio.inserirEntidade(vendedor);
 		return vendedor;
+	}
+
+	public Integer gerarId() {
+		return (int) (9999 * Math.random());
 	}
 
 }

@@ -20,33 +20,33 @@ import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 
-public class GeradorEntidade {
-	public static GeradorEntidade getInstance() {
-		return gerador;
+public class EntidadeBuilder {
+	public static EntidadeBuilder getInstance() {
+		return builder;
 	}
 
-	private RepositorioEntidade repositorio = RepositorioEntidade.getInstance();
+	private EntidadeRepository repositorio = EntidadeRepository.getInstance();
 
-	private static final GeradorEntidade gerador = new GeradorEntidade();
+	private static final EntidadeBuilder builder = new EntidadeBuilder();
 
-	private GeradorEntidade() {
+	private EntidadeBuilder() {
 	}
 
-	public Cliente gerarCliente() {
+	public Cliente buildCliente() {
 		Cliente cliente = new Cliente();
 		cliente.setProspeccaoFinalizada(false);
-		cliente.addLogradouro(gerarLogradouroCliente(TipoLogradouro.FATURAMENTO));
-		cliente.addLogradouro(gerarLogradouroCliente(TipoLogradouro.ENTREGA));
-		cliente.addLogradouro(gerarLogradouroCliente(TipoLogradouro.COBRANCA));
+		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
+		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.ENTREGA));
+		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.COBRANCA));
 		cliente.setRazaoSocial("Exercito Brasileiro");
 		cliente.setNomeFantasia("Exercito Brasileiro");
 		cliente.setCnpj("25632147000125");
-		cliente.setRamoAtividade(gerarRamoAtividade());
+		cliente.setRamoAtividade(buildRamoAtividade());
 		cliente.setId(gerarId());
 		return cliente;
 	}
 
-	public Endereco gerarEndereco() {
+	public Endereco buildEndereco() {
 		Bairro bairro = new Bairro();
 		bairro.setDescricao("Centro");
 		bairro.setId(gerarId());
@@ -75,10 +75,10 @@ public class GeradorEntidade {
 		return (int) (9999 * Math.random());
 	}
 
-	public ItemPedido gerarItemPedido() {
+	public ItemPedido buildItemPedido() {
 		ItemPedido itemPedido = new ItemPedido();
 		itemPedido.setAliquotaIPI(11.1d);
-		itemPedido.setMaterial(gerarMaterial());
+		itemPedido.setMaterial(buildMaterial());
 		itemPedido.setFormaMaterial(FormaMaterial.TB);
 		itemPedido.setQuantidade(2);
 		itemPedido.setMedidaExterna(120d);
@@ -89,29 +89,29 @@ public class GeradorEntidade {
 		return itemPedido;
 	}
 
-	public Logradouro gerarLogradouro(TipoLogradouro tipoLogradouro) {
-		Logradouro logradouro = new Logradouro(gerarEndereco());
+	public Logradouro buildLogradouro(TipoLogradouro tipoLogradouro) {
+		Logradouro logradouro = new Logradouro(buildEndereco());
 		logradouro.setTipoLogradouro(tipoLogradouro);
 		return logradouro;
 	}
 
-	public LogradouroCliente gerarLogradouroCliente(TipoLogradouro tipoLogradouro) {
-		LogradouroCliente logradouro = new LogradouroCliente(gerarEndereco());
+	public LogradouroCliente buildLogradouroCliente(TipoLogradouro tipoLogradouro) {
+		LogradouroCliente logradouro = new LogradouroCliente(buildEndereco());
 		logradouro.setTipoLogradouro(tipoLogradouro);
 		return logradouro;
 	}
 
-	public Material gerarMaterial() {
+	public Material buildMaterial() {
 		Material material = new Material(1, "PLAST", "PLASTICO DURO");
 		material.setPesoEspecifico(0.33);
 		return material;
 	}
 
-	public Pedido gerarPedido() {
-		Usuario vendedor = gerarVendedor();
-		Cliente cliente = gerarCliente();
+	public Pedido buildPedido() {
+		Usuario vendedor = buildVendedor();
+		Cliente cliente = buildCliente();
 		cliente.setVendedor(vendedor);
-		Representada representada = gerarRepresentada();
+		Representada representada = buildRepresentada();
 		Contato contato = new Contato();
 		contato.setNome("Adriano");
 
@@ -125,13 +125,13 @@ public class GeradorEntidade {
 		return pedido;
 	}
 
-	public Pedido gerarPedidoRevenda() {
-		Pedido pedido = gerarPedido();
+	public Pedido buildPedidoRevenda() {
+		Pedido pedido = buildPedido();
 		pedido.getRepresentada().setNomeFantasia("PLASTECNO FILIAL");
 		return pedido;
 	}
 
-	public RamoAtividade gerarRamoAtividade() {
+	public RamoAtividade buildRamoAtividade() {
 		RamoAtividade ramoAtividade = new RamoAtividade();
 		ramoAtividade.setAtivo(true);
 		ramoAtividade.setDescricao("Industria Belica");
@@ -141,7 +141,7 @@ public class GeradorEntidade {
 		return ramoAtividade;
 	}
 
-	public Representada gerarRepresentada() {
+	public Representada buildRepresentada() {
 		Representada representada = new Representada(1, "COBEX");
 		representada.setAtivo(true);
 		representada.setRazaoSocial("COBEX LTDA");
@@ -150,7 +150,7 @@ public class GeradorEntidade {
 		return representada;
 	}
 
-	public Usuario gerarVendedor() {
+	public Usuario buildVendedor() {
 		Usuario vendedor = new Usuario(gerarId(), "Vinicius", "Fernandes Vendedor");
 		vendedor.setVendedorAtivo(true);
 		repositorio.inserirEntidade(vendedor);

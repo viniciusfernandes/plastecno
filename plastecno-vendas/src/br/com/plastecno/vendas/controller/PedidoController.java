@@ -155,7 +155,6 @@ public class PedidoController extends AbstractController {
             // efetuar o download do arquivo
             return null;
         }
-
     }
 
     @Post("pedido/envio")

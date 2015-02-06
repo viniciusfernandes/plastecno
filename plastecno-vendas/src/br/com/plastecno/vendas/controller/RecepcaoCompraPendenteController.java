@@ -6,6 +6,7 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
@@ -33,13 +34,18 @@ public class RecepcaoCompraPendenteController extends AbstractController {
         super(result, usuarioInfo);
     }
 
+    @Get("compra/pdf")
+    public Download downloadPedidoPDF(Integer idPedido) {
+        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.COMPRA);
+    }
+
     @Get("compra/recepcao/listagem")
     public void pesquisarCompraPendente(Date dataInicial, Date dataFinal, Integer idRepresentada) {
 
         try {
             Periodo periodo = new Periodo(dataInicial, dataFinal);
             RelatorioWrapper relatorio = relatorioService.gerarRelatorioCompraPendente(idRepresentada, periodo);
-            
+
             addAtributo("relatorio", relatorio);
             irRodapePagina();
         } catch (BusinessException e) {

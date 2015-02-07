@@ -1,5 +1,6 @@
 package br.com.plastecno.service.wrapper;
 
+
 class ChaveValorWrapper<K, V> {
     protected final K chave;
     protected final V valor;

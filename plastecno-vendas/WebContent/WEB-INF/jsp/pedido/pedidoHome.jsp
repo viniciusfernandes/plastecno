@@ -382,7 +382,7 @@ $(document).ready(function() {
 		<input type="hidden" name="tipoPedido" value="${tipoPedido}"/>
 		<div class="bloco_botoes">
 			<input type="button" id="botaoEnviarPedido" title="Enviar Dados do Pedido" value="" class="botaoEnviarEmail"
-				<c:if test="${not acessoEnvioPedidoPermitido or not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> 
+				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> 
 			/>
 			<input type="hidden" id="idPedido" name="idPedido" value="${pedido.id}" />
 		</div>

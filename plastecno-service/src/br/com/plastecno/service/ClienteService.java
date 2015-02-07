@@ -72,11 +72,13 @@ public interface ClienteService {
 
     LogradouroCliente pesquisarLogradouroById(Integer idLogradouro);
 
+    String pesquisarNomeFantasia(Integer idCliente);
+
     Long pesquisarTotalRegistros(Cliente filtro);
 
-    List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente);
-
     List<Transportadora> pesquisarTransportadorasDesassociadas(Integer idCliente);
+
+	List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente);
 
 	void removerLogradouro(Integer idLogradouro);
 

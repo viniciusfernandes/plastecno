@@ -87,11 +87,11 @@ function submeterForm(botao){
 					</c:forEach>
 				</select>
 			</div>
+			<div class="bloco_botoes">
+				<input type="submit" value="" class="botaoPesquisar" /> 
+				<input id="botaoLimpar" type="button" value="" title="Limpar Dados de Geração do Relatório de Compras" class="botaoLimpar" />
+			</div>
 		</fieldset>
-		<div class="bloco_botoes">
-			<input type="submit" value="" class="botaoPesquisar" /> 
-			<input id="botaoLimpar" type="button" value="" title="Limpar Dados de Geração do Relatório de Compras" class="botaoLimpar" />
-		</div>
 	</form>
 	
 	<c:if test="${not empty relatorio}">
@@ -104,40 +104,40 @@ function submeterForm(botao){
 					<th style="width: 45%">Desc. Item</th>
 					<th style="width: 10%">Comprador</th>
 					<th style="width: 10%">Represent.</th>
-					<th style="width: 5%">Valor (R$)</th>
+					<th style="width: 5%">Unid. (R$)</th>
+					<th style="width: 5%">Total (R$)</th>
 					<th style="width: 5%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach items="${relatorio.lista}" var="master" varStatus="countMaster">
-					<c:forEach items="${master.details}" var="detail"
-						varStatus="countDetail">
+				<c:forEach items="${relatorio.listaGrupo}" var="pedido" varStatus="iGrupo">
+					<c:forEach items="${pedido.listaElemento}" var="item" varStatus="iElemento">
 						<tr>
-							<c:if test="${countDetail.count le 1}">
-								<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}"
-								rowspan="${master.size}">${master.label}</td>
+							<c:if test="${iElemento.count le 1}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.id}</td>
 							</c:if>
-							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${detail[0]}</td>
-							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${detail[1]}</td>
-							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${detail[2]}</td>
-							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${detail[3]}</td>
-							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${detail[4]}</td>
-							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeProprietario}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeRepresentada}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoUnidadeFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<form action="<c:url value="/compra/item/recepcao"/>" method="post" style="width: 20%">
-									<input type="hidden" name="idItemCompra" value="${detail[5]}" /> 
+									<input type="hidden" name="idItemCompra" value="${item.id}" /> 
 									<input type="button" value="" title="Recepcionar o Item do Pedido" 
 									onclick="recepcionarItem(this);" class="botaoAdicionar" style="border: none;" />
 								</form>
 								<form action="<c:url value="/compra/pdf"/>" style="width: 20%">
-									<input type="hidden" name="idPedido" value="${master.label}" /> 
+									<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 									<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPDF" style="border: none;" />
 								</form>
 								<form action="<c:url value="/compra/edicao"/>" style="width: 20%">
-									<input type="hidden" name="idPedido" value="${master.label}" /> 
+									<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 									<input type="submit" value="" title="Editar o Item do Pedido" class="botaoEditar" style="border: none;" />
 								</form>
 								<form action="<c:url value="/compra/item/remocao"/>" method="post" style="width: 20%">
-									<input type="hidden" name="idItemCompra" value="${detail[5]}" /> 
+									<input type="hidden" name="idItemCompra" value="${item.id}" /> 
 									<input type="button" value="" title="Remover o Item da Compra" 
 										onclick="removerItem(this);" class="botaoRemover" style="border: none;" />
 								</form>

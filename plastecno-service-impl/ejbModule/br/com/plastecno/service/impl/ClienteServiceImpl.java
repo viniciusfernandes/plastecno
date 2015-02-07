@@ -59,6 +59,11 @@ public class ClienteServiceImpl implements ClienteService {
 	private ClienteDAO clienteDAO;
 
 	@Override
+	public String pesquisarNomeFantasia(Integer idCliente) {
+		return clienteDAO.pesquisarNomeFantasia(idCliente);
+	}
+
+	@Override
 	public Integer contactarCliente(Integer id) {
 		Query query = this.entityManager
 				.createQuery("update Cliente c set c.dataUltimoContato = :dataUltimoContato  where c.id = :id");

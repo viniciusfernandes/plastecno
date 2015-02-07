@@ -528,7 +528,7 @@ public class PedidoController extends AbstractController {
 
             // Condicao indicadora para reenvio do pedido
             final boolean acessoReenvioPedidoPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO)
-                    && (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao));
+                    && (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacao));
 
             // Condicao indicadora de que apenas o administrador podera cancelar
             // pedidos ja enviados

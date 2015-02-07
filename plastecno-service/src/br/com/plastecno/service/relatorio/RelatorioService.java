@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
@@ -19,7 +20,7 @@ public interface RelatorioService {
 
 	RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) throws BusinessException;
 
-	RelatorioWrapper gerarRelatorioCompraPendente(Integer idRepresentada, Periodo periodo);
+	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraPendente(Integer idRepresentada, Periodo periodo);
 
 	RelatorioVendaPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException;
 

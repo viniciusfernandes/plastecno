@@ -267,7 +267,8 @@ public class PedidoServiceImpl implements PedidoService {
 			// estamos ajustando o vendedor correto.
 			Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(pedido.getCliente().getId());
 			if (vendedor == null) {
-				throw new BusinessException("Nao existe vendedor associado ao cliente " + pedido.getCliente().getNomeCompleto());
+				String nomeCliente = clienteService.pesquisarNomeFantasia(pedido.getCliente().getId());
+				throw new BusinessException("Não existe vendedor associado ao cliente " + nomeCliente);
 			}
 			pedido.setVendedor(vendedor);
 

@@ -121,6 +121,12 @@ public class ItemPedido implements Serializable, Cloneable {
 	@Transient
 	private String comprimentoFormatado;
 
+	@Transient
+	private String nomeProprietario;
+
+	@Transient
+	private String nomeRepresentada;
+
 	public ItemPedido() {
 	}
 
@@ -236,6 +242,14 @@ public class ItemPedido implements Serializable, Cloneable {
 			return " _ ";
 		}
 		return medidaInternaFomatada;
+	}
+
+	public String getNomeProprietario() {
+		return nomeProprietario;
+	}
+
+	public String getNomeRepresentada() {
+		return nomeRepresentada;
 	}
 
 	public Pedido getPedido() {
@@ -368,6 +382,14 @@ public class ItemPedido implements Serializable, Cloneable {
 
 	public void setMedidaInternaFomatada(String medidaInternaFomatada) {
 		this.medidaInternaFomatada = medidaInternaFomatada;
+	}
+
+	public void setNomeProprietario(String nomeProprietario) {
+		this.nomeProprietario = nomeProprietario;
+	}
+
+	public void setNomeRepresentada(String nomeRepresentada) {
+		this.nomeRepresentada = nomeRepresentada;
 	}
 
 	public void setPedido(Pedido pedido) {

@@ -11,6 +11,7 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoPedido;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
@@ -44,7 +45,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
 
         try {
             Periodo periodo = new Periodo(dataInicial, dataFinal);
-            RelatorioWrapper relatorio = relatorioService.gerarRelatorioCompraPendente(idRepresentada, periodo);
+            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraPendente(idRepresentada, periodo);
 
             addAtributo("relatorio", relatorio);
             irRodapePagina();

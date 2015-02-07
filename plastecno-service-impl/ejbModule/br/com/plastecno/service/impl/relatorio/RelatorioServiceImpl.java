@@ -97,23 +97,27 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioWrapper gerarRelatorioCompraPendente(Integer idRepresentada, Periodo periodo) {
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraPendente(Integer idRepresentada, Periodo periodo) {
+		/*
+		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
+		 * estoque para recuperar apenas a informacao necessaria.
+		 */
 		List<ItemPedido> listaItem = pedidoService.pesquisarCompraPendenteRecebimento(idRepresentada, periodo);
-		RelatorioWrapper relatorio = new RelatorioWrapper("Recepção de Compras com Pendências", 6);
+		RelatorioWrapper<Integer, ItemPedido> relatorio = new RelatorioWrapper<Integer, ItemPedido>(
+				"Recepção de Compras com Pendências");
 		Pedido pedido = null;
-
 		for (ItemPedido item : listaItem) {
 			pedido = item.getPedido();
 
-			relatorio.toMaster(pedido.getId());
-			relatorio.nextDetail();
-			relatorio.addDetail(0, String.valueOf(item.getQuantidade()));
-			relatorio.addDetail(1, item.getDescricao());
-			relatorio.addDetail(2, pedido.getProprietario().getNome());
-			relatorio.addDetail(3, pedido.getRepresentada().getNomeFantasia());
-			relatorio.addDetail(4, NumeroUtils.formatarValorMonetario(item.getPrecoVenda()));
-			relatorio.addDetail(5, String.valueOf(item.getId()));
+			item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
+			item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
+			item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
+			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
+			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoItem()));
 
+			item.setNomeProprietario(pedido.getProprietario().getNomeCompleto());
+			item.setNomeRepresentada(pedido.getRepresentada().getNomeFantasia());
+			relatorio.addElemento(pedido.getId(), item);
 		}
 		return relatorio;
 	}

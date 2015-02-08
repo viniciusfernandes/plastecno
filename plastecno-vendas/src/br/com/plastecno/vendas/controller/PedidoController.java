@@ -363,7 +363,9 @@ public class PedidoController extends AbstractController {
             return false;
         } else {
             SituacaoPedido situacao = pedido.getSituacaoPedido();
-            boolean isCompraFinalizada = pedido.isCompra() && SituacaoPedido.COMPRA_RECEBIDA.equals(situacao);
+            boolean isCompraFinalizada = pedido.isCompra()
+                    && (SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
+                            .equals(situacao));
             boolean isVendaFinalizada = pedido.isVenda() && SituacaoPedido.ENVIADO.equals(situacao);
             return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
         }
@@ -528,7 +530,8 @@ public class PedidoController extends AbstractController {
 
             // Condicao indicadora para reenvio do pedido
             final boolean acessoReenvioPedidoPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO)
-                    && (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacao));
+                    && (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO
+                            .equals(situacao));
 
             // Condicao indicadora de que apenas o administrador podera cancelar
             // pedidos ja enviados

@@ -350,7 +350,7 @@ public class PedidoController extends AbstractController {
             pedido = this.pedidoService.inserir(pedido);
             this.formatarPedido(pedido);
 
-            serializarJson(new SerializacaoJson(pedido).incluirAtributo("proprietario"));
+            serializarJson(new SerializacaoJson(pedido).incluirAtributo("proprietario", "situacaoPedido"));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {

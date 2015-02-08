@@ -194,7 +194,9 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 			$('#tipoPedido').val(pedidoJson.tipoPedido);
 			$('#numeroPedidoPesquisa').val(pedidoJson.id);
 			$('#formEnvioPedido #idPedido').val(pedidoJson.id);
-
+			
+			$('#situacaoPedido').val(pedidoJson.situacao);
+			
 			// preenchendo esse campo caso o usuario queira cancelar o pedido
 			$('#idPedidoCancelamento').val(pedidoJson.id);
 			$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);

@@ -174,22 +174,22 @@ $(document).ready(function() {
 					value="${proprietario.nome} - ${proprietario.email}" disabled="disabled"
 					class="uppercaseBloqueado desabilitado" />
 			</div>
+			<!-- Verificamos se o tipo de pedido foi preenchido pois pedido de compra nao tera orcamento -->
 			<c:choose>
-				<c:when test="${not pedidoDesabilitado}">
+				<c:when test="${empty tipoPedido and not pedidoDesabilitado}">
 					<div class="label" style="width: 10%">Orçamento:</div>
 					<div class="input" style="width: 30%">
 						<input type="checkbox" id="orcamento" name="pedido.orcamento"
 							<c:if test="${pedido.orcamento}">checked</c:if> class="checkbox" />
 					</div>
 				</c:when>
-				<c:otherwise>
+				<c:when test="${not empty tipoPedido or pedidoDesabilitado}">
 					<div class="label" style="width: 10%">Situação:</div>
 					<div class="input" style="width: 20%">
-						<input type="text" id="situacaoPedido"
-							name="pedido.situacaoPedido"
-							value="${pedido.situacaoPedido.descricao}" />
+						<input type="text" id="situacaoPedido" name="pedido.situacaoPedido"
+							value="${pedido.situacaoPedido.descricao}" class="desabilitado"/>
 					</div>
-				</c:otherwise>
+				</c:when>
 			</c:choose>
 
 			<div class="label">Nr. Pedido:</div>

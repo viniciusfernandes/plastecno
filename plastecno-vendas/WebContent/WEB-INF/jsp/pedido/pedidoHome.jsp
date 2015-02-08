@@ -421,14 +421,12 @@ $(document).ready(function() {
 							<td>
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/pedido/pdf"/>">
-										<input type="hidden" name="idPedido" value="${pedido.id}" /> <input
-											type="submit" value="" title="Visualizar Pedido PDF"
-											class="botaoPdf_16 botaoPdf_16_centro" />
+										<input type="hidden" name="idPedido" value="${pedido.id}" />
+										 <input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
 									</form>
 									<form action="<c:url value="/pedido/${pedido.id}"/>" method="get">
 										<input type="hidden" name="tipoPedido" value="${pedido.tipoPedido}" /> 
-										<input type="submit" id="botaoEditarPedido"
-											title="Editar Dados do Pedido" value="" class="botaoEditar" />
+										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
 										<input type="hidden" name="id" value="${pedido.id}" />
 									</form>
 								</div>

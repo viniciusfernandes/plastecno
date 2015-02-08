@@ -106,7 +106,7 @@ function submeterForm(botao){
 					<th style="width: 10%">Represent.</th>
 					<th style="width: 5%">Unid. (R$)</th>
 					<th style="width: 5%">Total (R$)</th>
-					<th style="width: 5%">Ação</th>
+					<th style="width: 10%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -123,26 +123,28 @@ function submeterForm(botao){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoUnidadeFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
-								<form action="<c:url value="/compra/item/recepcao"/>" method="post" style="width: 20%">
-									<input type="hidden" name="idItemCompra" value="${item.id}" /> 
-									<input type="button" value="" title="Recepcionar o Item do Pedido" 
-									onclick="recepcionarItem(this);" class="botaoAdicionar" style="border: none;" />
-								</form>
-								<form action="<c:url value="/compra/pdf"/>" style="width: 20%">
-									<input type="hidden" name="idPedido" value="${pedido.id}" /> 
-									<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPDF" style="border: none;" />
-								</form>
-								<form action="<c:url value="/compra/edicao"/>" style="width: 20%">
-									<input type="hidden" name="idPedido" value="${pedido.id}" /> 
-									<input type="submit" value="" title="Editar o Item do Pedido" class="botaoEditar" style="border: none;" />
-								</form>
-								<form action="<c:url value="/compra/item/remocao"/>" method="post" style="width: 20%">
-									<input type="hidden" name="idItemCompra" value="${item.id}" /> 
-									<input type="button" value="" title="Remover o Item da Compra" 
-										onclick="removerItem(this);" class="botaoRemover" style="border: none;" />
-								</form>
+								<div class="coluna_acoes_listagem">
+									<form action="<c:url value="/compra/pdf"/>" >
+										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
+										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
+									</form>
+									<form action="<c:url value="/compra/item/recepcao"/>" method="post" >
+										<input type="hidden" name="idItemCompra" value="${item.id}" /> 
+										<input type="button" value="" title="Recepcionar o Item do Pedido" 
+										onclick="recepcionarItem(this);" class="botaoAdicionar_16" />
+									</form>
+									<form action="<c:url value="/compra/edicao"/>" >
+										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
+										<input type="submit" value="" title="Editar o Item do Pedido" class="botaoEditar"/>
+									</form>
+									<form action="<c:url value="/compra/item/remocao"/>" method="post" >
+										<input type="hidden" name="idItemCompra" value="${item.id}" /> 
+										<input type="button" value="" title="Remover o Item da Compra" 
+											onclick="removerItem(this);" class="botaoRemover" />
+									</form>
+									
+								</div>
 							</td>
-
 						</tr>
 					</c:forEach>
 				</c:forEach>

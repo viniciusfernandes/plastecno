@@ -30,6 +30,8 @@ public interface PedidoService {
 
 	Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException;
 
+	Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException;
+
 	boolean isCalculoIPIHabilitado(Integer idPedido);
 
 	boolean isClienteProspectado(Integer idPedido);

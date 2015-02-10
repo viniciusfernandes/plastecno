@@ -176,6 +176,12 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
 	}
 
+	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.id from ItemPedido i inner join i.pedido p where i.id = :idItemPedido")
+						.setParameter("idItemPedido", idItemPedido), Integer.class, null);
+	}
+
 	public Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
 		final String select = "select r.id from Pedido p inner join p.representada r where p.id = :idPedido";
 		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(select).setParameter("idPedido", idPedido),

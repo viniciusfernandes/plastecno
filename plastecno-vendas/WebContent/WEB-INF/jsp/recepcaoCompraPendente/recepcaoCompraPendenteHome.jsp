@@ -25,6 +25,13 @@ $(document).ready(function() {
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();
 	});
+	
+	var parametros = $('#bloco_item_pedido').serialize();
+	$('#botaoInserirItemPedido').click(function () {
+		var parametros = $('#bloco_item_pedido').serialize();
+		$('#formVazio').attr('action', 'action="<c:url value="/compra/item/edicao"/>?"'+paramentros);
+		$('#formVazio').submit();
+	});
 });
 
 
@@ -53,13 +60,14 @@ function submeterForm(botao){
 	var action = $(form).attr('action')+'?'+parametros;
 	$(form).attr('action', action).submit();
 };
+
 </script>
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 
-	<form id="formVazio" action="<c:url value="/compra/recepcao"/>">
+	<form id="formVazio" >
 	</form>
 
 
@@ -95,6 +103,8 @@ function submeterForm(botao){
 	</form>
 	
 	<c:if test="${not empty relatorio}">
+		<jsp:include page="/bloco/bloco_edicao_item_compra.jsp"/>
+		
 		<table class="listrada">
 			<caption>${relatorio.titulo}</caption>
 			<thead>
@@ -129,16 +139,16 @@ function submeterForm(botao){
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 									</form>
 									<form action="<c:url value="/compra/item/recepcao"/>" method="post" >
-										<input type="hidden" name="idItemCompra" value="${item.id}" /> 
+										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
 										<input type="button" value="" title="Recepcionar o Item do Pedido" 
 										onclick="recepcionarItem(this);" class="botaoAdicionar_16" />
 									</form>
-									<form action="<c:url value="/compra/edicao"/>" >
-										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
-										<input type="submit" value="" title="Editar o Item do Pedido" class="botaoEditar"/>
+									<form action="<c:url value="/compra/item"/>" method="get">
+										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
+										<input type="button" value="" title="Editar o Item do Pedido" class="botaoEditar" onclick="submeterForm(this);"/>
 									</form>
 									<form action="<c:url value="/compra/item/remocao"/>" method="post" >
-										<input type="hidden" name="idItemCompra" value="${item.id}" /> 
+										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
 										<input type="button" value="" title="Remover o Item da Compra" 
 											onclick="removerItem(this);" class="botaoRemover" />
 									</form>

@@ -303,6 +303,7 @@ public class ItemPedido implements Serializable, Cloneable {
 	public TipoVenda getTipoVenda() {
 		return tipoVenda;
 	}
+	
 
 	public boolean isFormaMaterialVazada() {
 		return formaMaterial != null && formaMaterial.isFormaMaterialVazada();

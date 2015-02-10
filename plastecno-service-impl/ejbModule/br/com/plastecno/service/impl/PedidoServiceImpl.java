@@ -374,6 +374,12 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	public Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException {
+		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdItemPedido(itemPedido.getId());
+		return inserirItemPedido(idPedido, itemPedido);
+	}
+
+	@Override
 	public boolean isCalculoIPIHabilitado(Integer idPedido) {
 		Integer idRepresentada = pesquisarIdRepresentadaByIdPedido(idPedido);
 		return representadaService.isCalculoIPIHabilitado(idRepresentada);

@@ -35,7 +35,7 @@ $(document).ready(function() {
 	inicializarAutomcompleteMaterial('<c:url value="/pedido/material"/>');
 
 	habilitar('#bloco_item_pedido #descricao', false);
-	habilitar('#bloco_item_pedido #ipi', false);
+	habilitar('#bloco_item_pedido #aliquotaIPI', <c:out value="${not empty pedido and pedido.representada.IPIHabilitado}"/>);
 	
 	var urlInclusaoPedido = '<c:url value="/pedido/inclusao"/>';
 	var urlInclusaoItemPedido = '<c:url value="/pedido/item/inclusao"/>';

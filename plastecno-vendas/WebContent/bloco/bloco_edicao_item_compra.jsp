@@ -1,14 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <fieldset id="bloco_item_pedido">
-	<legend>::: Itens do Pedido de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
-
-	<!-- Esse campo sera usado para popular a tabela de itens com os dados que vieram do ItemPedidoJson -->
-	<input type="hidden" id="descricaoItemPedido" /> 
-	<input type="hidden" id="precoItem" /> 
-	<input type="hidden" id="idMaterial" name="itemPedido.material.id" /> 
-	<input type="hidden" id="idItemPedido" name="itemPedido.id" /> 
-	<input type="hidden" id="sequencial" name="itemPedido.sequencial" /> 
-	<input type="hidden" id="precoUnidade" />
+	<legend>::: Itens de ${not empty tipoPedido ? 'Compra': 'Estoque'} :::</legend>
 
 	<div class="label">Tipo de ${not empty tipoPedido ? 'Compra': 'Venda'}:</div>
 	<div class="input">

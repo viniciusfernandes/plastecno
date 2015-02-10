@@ -253,6 +253,7 @@ public class PedidoController extends AbstractController {
 
         String tipo = pedido.isVenda() ? "Venda" : "Compra";
         geradorRelatorio.addAtributo("titulo", pedido.isOrcamento() ? "Orçamento de " + tipo : "Pedido de " + tipo);
+        geradorRelatorio.addAtributo("tipoPedido", tipo);
         geradorRelatorio.addAtributo("pedido", pedido);
         geradorRelatorio.addAtributo("logradouroFaturamento",
                 logradouroFaturamento != null ? logradouroFaturamento.getDescricao() : "");

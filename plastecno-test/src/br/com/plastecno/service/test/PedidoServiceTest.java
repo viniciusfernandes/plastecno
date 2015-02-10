@@ -27,6 +27,7 @@ import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
@@ -600,6 +601,36 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoPedidoComContatoEmBranco() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+		pedido.setContato(new Contato());
+
+		boolean throwed = false;
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O pedido deve conter um contato com informacoes preenchidas", throwed);
+	}
+
+	@Test
+	public void testInclusaoPedidoContatoNulo() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+		pedido.setContato(null);
+
+		boolean throwed = false;
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O pedido deve conter um contato", throwed);
+	}
+
+	@Test
 	public void testInclusaoPedidoDataEntregaInvalida() {
 		Pedido pedido = eBuilder.buildPedido();
 		pedido.setDataEntrega(TestUtils.gerarDataAnterior());
@@ -639,6 +670,23 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O Pedido a ser incluido nao esta associado ao vendedor do cliente", throwed);
+	}
+
+	@Test
+	public void testInclusaoPedidoNomeContatoObrigatorio() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+		Contato contato = new Contato();
+		contato.setNome("");
+		pedido.setContato(contato);
+
+		boolean throwed = false;
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O nome do contato eh obrigatorio para a inclusao do pedido", throwed);
 	}
 
 	@Test

@@ -29,6 +29,7 @@ public class EstoqueController extends AbstractController {
     @Get("estoque")
     public void estoqueHome() {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
+        addAtributo("isEstoque", true);
     }
 
     @Get("estoque/item/listagem")
@@ -36,13 +37,24 @@ public class EstoqueController extends AbstractController {
         List<ItemEstoque> lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
         formatarItemEstoque(lista);
         Material material = materialService.pesquisarById(idMaterial);
-        
+
         addAtributo("formaSelecionada", formaMaterial);
         addAtributo("listaItemEstoque", lista);
         addAtributo("idMaterial", idMaterial);
         addAtributo("descricaoMaterial", material != null ? material.getDescricaoFormatada() : "");
-        
+
         redirecTo(this.getClass()).estoqueHome();
+    }
+
+    @Get("estoque/item/{idItemEstoque}")
+    public void pesquisarItemEstoqueById(Integer idItemEstoque, Integer idMaterial, FormaMaterial formaMaterial) {
+        ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+        if (itemEstoque == null) {
+            gerarListaMensagemErro("Item de estoque não existe no sistema");
+        } else {
+            addAtributo("itemPedido", itemEstoque);
+        }
+        redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
     }
 
     @Get("estoque/material/listagem")

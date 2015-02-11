@@ -54,13 +54,13 @@ function inicializarFiltro() {
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 
-	<form id="formVazio" action="<c:url value="/compra/recepcao"/>">
+	<form id="formVazio" action="<c:url value="/estoque"/>">
 	</form>
 
 
 	<form id="formPesquisa" action="<c:url value="/estoque/item/listagem"/>" method="get">
 		<fieldset>
-			<legend>::: Itens do Estoque :::</legend>
+			<legend>::: Pesquisa de Itens do Estoque :::</legend>
 			<div class="label" style="width: 30%">Forma Material:</div>
 			<div class="input" style="width: 60%">
 				<select name="formaMaterial" style="width: 20%">
@@ -85,6 +85,8 @@ function inicializarFiltro() {
 		</div>
 	</form>
 	
+	<jsp:include page="/bloco/bloco_edicao_item_compra.jsp"/>
+		
 	<a id="rodape"></a>
 	<fieldset>
 		<legend>::: Resultado da Pesquisa de Itens de Estoque :::</legend>
@@ -95,9 +97,9 @@ function inicializarFiltro() {
 					<tr>
 						<th style="width: 5%">Cód.</th>
 						<th style="width: 10%">Qtde.</th>
-						<th style="width: 50%">Descrição</th>
+						<th style="width: 70%">Descrição</th>
 						<th style="width: 10%">Valor (R$)</th>
-						<th>Ações</th>
+						<th style="width: 5%">Ações</th>
 					</tr>
 				</thead>
 
@@ -111,8 +113,7 @@ function inicializarFiltro() {
 							<td>${item.precoMedioFormatado}</td>
 							<td>
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/cliente/${cliente.id}"/>"
-										method="get">
+									<form action="<c:url value="/estoque/item/${item.id}"/>">
 										<input type="submit" id="botaoEditarCliente"
 											title="Editar Dados do Cliente" value="" class="botaoEditar" />
 									</form>

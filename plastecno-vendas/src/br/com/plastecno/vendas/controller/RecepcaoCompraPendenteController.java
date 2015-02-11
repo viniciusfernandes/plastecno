@@ -53,7 +53,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
-        redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraPendente(new Date(), new Date(), idRepresentada);
     }
 
     @Get("compra/recepcao/listagem")

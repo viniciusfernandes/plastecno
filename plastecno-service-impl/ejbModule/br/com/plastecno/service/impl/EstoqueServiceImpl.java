@@ -2,6 +2,7 @@ package br.com.plastecno.service.impl;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -14,6 +15,7 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
@@ -26,6 +28,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
+	private ItemEstoqueDAO itemEstoqueDAO;
 
 	private void calcularValorMedio(ItemEstoque itemEstoque, ItemPedido itemPedido) {
 		if (itemEstoque.getId() == null) {
@@ -118,7 +121,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		} else if (formaMaterial != null) {
 			select.append("i.formaMaterial = :formaMaterial ");
 		}
-		
+
 		Query query = entityManager.createQuery(select.toString());
 		if (idMaterial != null) {
 			query.setParameter("idMaterial", idMaterial);
@@ -148,6 +151,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 			return item;
 		}
 		return null;
+	}
+
+	@PostConstruct
+	public void init() {
+		itemEstoqueDAO = new ItemEstoqueDAO(entityManager);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque) {
+		return itemEstoqueDAO.pesquisarById(idItemEstoque);
 	}
 
 	@SuppressWarnings("unchecked")

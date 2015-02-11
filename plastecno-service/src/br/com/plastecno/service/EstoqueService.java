@@ -18,4 +18,6 @@ public interface EstoqueService {
 			Double medidaInterna, Double comprimento);
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
+
+	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);
 }

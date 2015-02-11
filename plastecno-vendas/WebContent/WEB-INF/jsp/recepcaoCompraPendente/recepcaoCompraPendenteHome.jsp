@@ -26,14 +26,14 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
-	var parametros = $('#bloco_item_pedido').serialize();
 	$('#botaoInserirItemPedido').click(function () {
 		var parametros = $('#bloco_item_pedido').serialize();
-		$('#formVazio').attr('action', 'action="<c:url value="/compra/item/edicao"/>?"'+paramentros);
-		$('#formVazio').submit();
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/compra/item/edicao"/>?'+parametros);
+		$(form).submit();
 	});
 });
-
 
 function removerItem(botao){
 	inicializarModalConfirmacao({
@@ -110,13 +110,14 @@ function submeterForm(botao){
 			<thead>
 				<tr>
 					<th style="width: 10%">Num. Pedido</th>
+					<th style="width: 1%">Item</th>
 					<th style="width: 5%">Qtde</th>
-					<th style="width: 45%">Desc. Item</th>
+					<th style="width: 43%">Desc. Item</th>
 					<th style="width: 10%">Comprador</th>
 					<th style="width: 10%">Represent.</th>
 					<th style="width: 5%">Unid. (R$)</th>
 					<th style="width: 5%">Total (R$)</th>
-					<th style="width: 10%">Ação</th>
+					<th style="width: 11%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -126,6 +127,7 @@ function submeterForm(botao){
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.id}</td>
 							</c:if>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeProprietario}</td>

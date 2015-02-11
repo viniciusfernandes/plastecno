@@ -1,18 +1,23 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <fieldset id="bloco_item_pedido">
-	<legend>::: Item de ${not empty tipoPedido ? 'Compra': 'Estoque'} :::</legend>
+	<legend>::: Item de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 	<input type="hidden" id="idItemPedido" name="itemPedido.id" value="${itemPedido.id}"/>
-	<div class="label">Tipo de ${not empty tipoPedido ? 'Compra': 'Venda'}:</div>
-	<div class="input">
-		<input type="radio" id="tipoVendaKilo" name="itemPedido.tipoVenda"
-			value="KILO" <c:if test="${empty itemPedido or itemPedido.vendaKilo}">checked</c:if> />
-	</div>
-	<div class="label label_radio_button" style="width: 2%">Kilo</div>
-	<div class="input">
-		<input type="radio" id="tipoVendaPeca" name="itemPedido.tipoVenda"
-			value="PECA" <c:if test="${not empty itemPedido and not itemPedido.vendaKilo}">checked</c:if>/>
-	</div>
-	<div class="label label_radio_button" style="width: 60%">Peça</div>
+	<input type="hidden" id="idMaterial" name="itemPedido.material.id" value="${itemPedido.material.id}"/>
+	<c:if test="${not isEstoque}">
+		<input type="hidden" id="itemSequencial" name="itemPedido.sequencial" value="${itemPedido.sequencial}"/>
+		<div class="label">Tipo de ${not empty tipoPedido ? 'Compra': 'Venda'}:</div>
+		<div class="input">
+			<input type="radio" id="tipoVendaKilo" name="itemPedido.tipoVenda"
+				value="KILO" <c:if test="${empty itemPedido or itemPedido.vendaKilo}">checked</c:if> />
+		</div>
+		<div class="label label_radio_button" style="width: 2%">Kilo</div>
+		<div class="input">
+			<input type="radio" id="tipoVendaPeca" name="itemPedido.tipoVenda"
+				value="PECA" <c:if test="${not empty itemPedido and not itemPedido.vendaKilo}">checked</c:if>/>
+		</div>
+		<div class="label label_radio_button" style="width: 60%">Peça</div>
+	</c:if>
+	
 	<div class="label">Qtde:</div>
 	<div class="input" style="width: 7%">
 		<input type="text" id="quantidade" name="itemPedido.quantidade" value="${itemPedido.quantidade}"/>
@@ -34,8 +39,7 @@
 	<div class="label">Material:</div>
 	<div class="input" style="width: 80%">
 		<input type="text" id="material" name="material.id" style="width: 50%" value="${itemPedido.material.descricao}"/>
-		<div class="suggestionsBox" id="containerPesquisaMaterial"
-			style="display: none; width: 50%"></div>
+		<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 	</div>
 	<div class="label">Med. Ext / Espessura:</div>
 	<div class="input" style="width: 10%">

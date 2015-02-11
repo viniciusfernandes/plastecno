@@ -17,24 +17,36 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-@Entity
-@Table(name = "tb_item_estoque", schema = "vendas")
 @InformacaoValidavel
-public class ItemEstoque implements Serializable {
+public class Item implements Serializable, Cloneable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1883261895674297946L;
-
-	@Id
-	@SequenceGenerator(name = "itemEstoqueSequence", sequenceName = "vendas.seq_item_estoque_id", allocationSize = 1, initialValue = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemEstoqueSequence")
-	private Integer id;
+	private static final long serialVersionUID = 3397681910683242844L;
 
 	private Double comprimento;
+
+	@Column(name = "medida_interna")
+	private Double medidaInterna;
+
+	@Column(name = "medida_externa")
+	private Double medidaExterna;
+
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do pedido")
+	private Integer quantidade;
+
+	@Column(name = "preco_unidade")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido")
+	private Double precoUnidade;
+
+	@Column(name = "preco_unidade_ipi")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido com IPI")
+	private Double precoUnidadeIPI;
+
 	@Column(name = "aliquota_icms")
 	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
@@ -43,35 +55,31 @@ public class ItemEstoque implements Serializable {
 	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota IPI")
 	private Double aliquotaIPI;
 
-	@Column(name = "medida_interna")
-	private Double medidaInterna;
-
-	@Column(name = "medida_externa")
-	private Double medidaExterna;
-
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do estoque")
-	private Integer quantidade;
-
 	@Column(name = "descricao_peca")
-	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do estoque")
+	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
 	private String descricaoPeca;
-
-	@Column(name = "preco_medio")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Preço de médio de compra do item de estoque")
-	private Double precoMedio;
 
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_forma_material")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma do material do item do estoque")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma do material do item do pedido")
 	private FormaMaterial formaMaterial;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao item do estoque")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao pedido")
 	private Material material;
 
 	@Transient
-	private String precoMedioFormatado;
+	private String precoUnidadeFormatado;
+
+	@Transient
+	private String precoUnidadeIPIFormatado;
+
+	@Transient
+	private String aliquotaICMSFormatado;
+
+	@Transient
+	private String aliquotaIPIFormatado;
 
 	@Transient
 	private String medidaExternaFomatada;
@@ -82,19 +90,31 @@ public class ItemEstoque implements Serializable {
 	@Transient
 	private String comprimentoFormatado;
 
-	public ItemEstoque() {
+	public Item() {
 	}
 
-	public ItemEstoque(FormaMaterial formaMaterial) {
+	public Item(FormaMaterial formaMaterial) {
 		this.formaMaterial = formaMaterial;
-	}
-
-	public double calcularPrecoTotal() {
-		return this.quantidade != null && this.precoMedio != null ? this.quantidade * this.precoMedio : 0d;
 	}
 
 	public boolean contemLargura() {
 		return this.formaMaterial != null && this.formaMaterial.contemLargura();
+	}
+
+	public Double getAliquotaICMS() {
+		return aliquotaICMS;
+	}
+
+	public String getAliquotaICMSFormatado() {
+		return aliquotaICMSFormatado;
+	}
+
+	public Double getAliquotaIPI() {
+		return aliquotaIPI;
+	}
+
+	public String getAliquotaIPIFormatado() {
+		return aliquotaIPIFormatado;
 	}
 
 	public Double getComprimento() {
@@ -145,10 +165,6 @@ public class ItemEstoque implements Serializable {
 		return formaMaterial;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-
 	public Material getMaterial() {
 		return material;
 	}
@@ -175,16 +191,28 @@ public class ItemEstoque implements Serializable {
 		return medidaInternaFomatada;
 	}
 
-	public Double getPrecoMedio() {
-		return precoMedio;
+	public double getPrecoItem() {
+		if (precoUnidade == null || quantidade == null) {
+			return 0d;
+		}
+
+		return precoUnidade * quantidade;
 	}
 
-	public String getPrecoMedioFormatado() {
-		return precoMedioFormatado;
+	public Double getPrecoUnidade() {
+		return precoUnidade;
 	}
 
-	public Double getPrecoVenda() {
-		return precoMedio;
+	public String getPrecoUnidadeFormatado() {
+		return precoUnidadeFormatado;
+	}
+
+	public Double getPrecoUnidadeIPI() {
+		return precoUnidadeIPI;
+	}
+
+	public String getPrecoUnidadeIPIFormatado() {
+		return precoUnidadeIPIFormatado;
 	}
 
 	public Integer getQuantidade() {
@@ -199,12 +227,24 @@ public class ItemEstoque implements Serializable {
 		return this.formaMaterial != null && this.formaMaterial.isMedidaExternaIgualInterna();
 	}
 
-	public boolean isNovo() {
-		return this.id == null;
-	}
-
 	public boolean isPeca() {
 		return FormaMaterial.PC.equals(this.formaMaterial);
+	}
+
+	public void setAliquotaICMS(Double aliquotaICMS) {
+		this.aliquotaICMS = aliquotaICMS;
+	}
+
+	public void setAliquotaICMSFormatado(String aliquotaICMSFormatado) {
+		this.aliquotaICMSFormatado = aliquotaICMSFormatado;
+	}
+
+	public void setAliquotaIPI(Double aliquotaIPI) {
+		this.aliquotaIPI = aliquotaIPI;
+	}
+
+	public void setAliquotaIPIFormatado(String aliquotaIPIFormatado) {
+		this.aliquotaIPIFormatado = aliquotaIPIFormatado;
 	}
 
 	public void setComprimento(Double comprimento) {
@@ -221,10 +261,6 @@ public class ItemEstoque implements Serializable {
 
 	public void setFormaMaterial(FormaMaterial formaMaterial) {
 		this.formaMaterial = formaMaterial;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 
 	public void setMaterial(Material material) {
@@ -247,15 +283,24 @@ public class ItemEstoque implements Serializable {
 		this.medidaInternaFomatada = medidaInternaFomatada;
 	}
 
-	public void setPrecoMedio(Double precoMedio) {
-		this.precoMedio = precoMedio;
+	public void setPrecoUnidade(Double precoUnidade) {
+		this.precoUnidade = precoUnidade;
 	}
 
-	public void setPrecoMedioFormatado(String precoMedioFormatado) {
-		this.precoMedioFormatado = precoMedioFormatado;
+	public void setPrecoUnidadeFormatado(String precoUnidadeFormatado) {
+		this.precoUnidadeFormatado = precoUnidadeFormatado;
+	}
+
+	public void setPrecoUnidadeIPI(Double precoUnidadeIPI) {
+		this.precoUnidadeIPI = precoUnidadeIPI;
+	}
+
+	public void setPrecoUnidadeIPIFormatado(String precoUnidadeIPIFormatado) {
+		this.precoUnidadeIPIFormatado = precoUnidadeIPIFormatado;
 	}
 
 	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
 	}
+
 }

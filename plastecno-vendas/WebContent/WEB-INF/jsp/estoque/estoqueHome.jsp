@@ -21,8 +21,18 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+	scrollTo('${ancora}');
+	
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();
+	});
+	
+	$('#botaoInserirItemPedido').click(function () {
+		var parametros = $('#bloco_item_pedido').serialize();
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/estoque/item/edicao"/>?'+parametros);
+		$(form).submit();
 	});
 	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />

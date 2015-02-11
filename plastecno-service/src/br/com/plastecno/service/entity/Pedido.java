@@ -117,9 +117,9 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Finalidade do pedido")
 	private FinalidadePedido finalidadePedido;
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
 	@JoinColumn(name = "id_contato")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Contato do pedido")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Contato do pedido")
 	private Contato contato;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })

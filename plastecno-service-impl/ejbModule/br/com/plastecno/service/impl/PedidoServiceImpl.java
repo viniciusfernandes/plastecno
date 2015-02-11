@@ -328,6 +328,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 		/*
 		 * Caso o ipi seja nulo, isso indica que o usuario nao digitou o valor entao
+		 * 
 		 * utilizaremos os valores definidos para as formas dos materiais, que eh o
 		 * default do sistema. Esse preenchimento foi realizado pois agora temos que
 		 * incluir essa informacao do pedido.html que sera enviado para o cliente.

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.caelum.vraptor.Get;
+import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.EstoqueService;
@@ -11,6 +12,7 @@ import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.Material;
+import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -32,6 +34,17 @@ public class EstoqueController extends AbstractController {
         addAtributo("isEstoque", true);
     }
 
+    @Post("estoque/item/edicao")
+    public void inserirItemEstoque(ItemEstoque itemEstoque) {
+        try {
+            estoqueService.inserirItemEstoque(itemEstoque);
+            gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+        irTopoPagina();
+    }
+
     @Get("estoque/item/listagem")
     public void pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
         List<ItemEstoque> lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
@@ -44,6 +57,7 @@ public class EstoqueController extends AbstractController {
         addAtributo("descricaoMaterial", material != null ? material.getDescricaoFormatada() : "");
 
         redirecTo(this.getClass()).estoqueHome();
+        irRodapePagina();
     }
 
     @Get("estoque/item/{idItemEstoque}")

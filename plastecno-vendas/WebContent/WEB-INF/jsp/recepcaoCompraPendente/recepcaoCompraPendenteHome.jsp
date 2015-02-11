@@ -10,6 +10,8 @@
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 
@@ -22,15 +24,23 @@ $(document).ready(function() {
 	inserirMascaraData('dataInicial');
 	inserirMascaraData('dataFinal');
 	
+	inserirMascaraMonetaria('precoVenda', 7);
+	inserirMascaraNumerica('ipi', '99');
+	inserirMascaraNumerica('quantidade', '9999999');
+	inserirMascaraMonetaria('comprimento', 8);
+	inserirMascaraMonetaria('medidaExterna', 8);
+	inserirMascaraMonetaria('medidaInterna', 8);
+	
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();
 	});
 	
 	$('#botaoInserirItemPedido').click(function () {
 		var parametros = $('#bloco_item_pedido').serialize();
+		parametros += '&' + $('#formPesquisa').serialize();
 		var form = $('#formVazio');
 		$(form).attr('method', 'post');
-		$(form).attr('action', '<c:url value="/compra/item/edicao"/>?'+parametros);
+		$(form).attr('action', '<c:url value="/compra/item/inclusao"/>?'+parametros);
 		$(form).submit();
 	});
 });
@@ -102,9 +112,11 @@ function submeterForm(botao){
 		</fieldset>
 	</form>
 	
-	<c:if test="${not empty relatorio}">
+	<c:if test="${not empty itemPedido}">
 		<jsp:include page="/bloco/bloco_edicao_item_compra.jsp"/>
-		
+	</c:if>
+	
+	<c:if test="${not empty relatorio}">
 		<table class="listrada">
 			<caption>${relatorio.titulo}</caption>
 			<thead>
@@ -145,7 +157,7 @@ function submeterForm(botao){
 										<input type="button" value="" title="Recepcionar o Item do Pedido" 
 										onclick="recepcionarItem(this);" class="botaoAdicionar_16" />
 									</form>
-									<form action="<c:url value="/compra/item"/>" method="get">
+									<form action="<c:url value="/compra/item/edicao"/>" method="post">
 										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
 										<input type="button" value="" title="Editar o Item do Pedido" class="botaoEditar" onclick="submeterForm(this);"/>
 									</form>

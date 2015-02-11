@@ -97,6 +97,14 @@ public class ItemEstoque implements Serializable {
 		return this.formaMaterial != null && this.formaMaterial.contemLargura();
 	}
 
+	public Double getAliquotaICMS() {
+		return aliquotaICMS;
+	}
+
+	public Double getAliquotaIPI() {
+		return aliquotaIPI;
+	}
+
 	public Double getComprimento() {
 		return comprimento;
 	}
@@ -205,6 +213,14 @@ public class ItemEstoque implements Serializable {
 
 	public boolean isPeca() {
 		return FormaMaterial.PC.equals(this.formaMaterial);
+	}
+
+	public void setAliquotaICMS(Double aliquotaICMS) {
+		this.aliquotaICMS = aliquotaICMS;
+	}
+
+	public void setAliquotaIPI(Double aliquotaIPI) {
+		this.aliquotaIPI = aliquotaIPI;
 	}
 
 	public void setComprimento(Double comprimento) {

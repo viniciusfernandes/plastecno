@@ -34,3 +34,6 @@ ALTER TABLE vendas.tb_item_estoque ADD PRIMARY KEY (id);
 ALTER TABLE vendas.tb_item_estoque ADD CONSTRAINT id_material FOREIGN KEY (id_material) REFERENCES vendas.tb_material (id);
 ALTER TABLE vendas.tb_item_estoque ADD CONSTRAINT id_forma_material FOREIGN KEY (id_forma_material) REFERENCES vendas.tb_forma_material (id);
 create sequence vendas.seq_item_estoque_id increment by 1 minvalue 1 no maxvalue start with 1;
+
+ALTER TABLE vendas.tb_item_estoque add aliquota_icms numeric(5,5) default 0;  
+alter table vendas.tb_item_estoque add aliquota_ipi numeric (5,5) default 0;

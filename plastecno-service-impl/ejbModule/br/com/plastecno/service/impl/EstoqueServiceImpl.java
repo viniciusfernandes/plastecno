@@ -20,6 +20,7 @@ import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.exception.BusinessException;
 
 @Stateless
 public class EstoqueServiceImpl implements EstoqueService {
@@ -58,6 +59,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return itemEstoque;
 	}
 
+	@PostConstruct
+	public void init() {
+		itemEstoqueDAO = new ItemEstoqueDAO(entityManager);
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void inserirItemEstoque(Integer idItemPedido) {
@@ -89,6 +95,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 		} else {
 			entityManager.merge(itemEstoque);
 		}
+	}
+
+	@Override
+	public Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException{
+		return null;
 	}
 
 	private boolean isEquivalente(Double val1, Double val2) {
@@ -151,11 +162,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 			return item;
 		}
 		return null;
-	}
-
-	@PostConstruct
-	public void init() {
-		itemEstoqueDAO = new ItemEstoqueDAO(entityManager);
 	}
 
 	@Override

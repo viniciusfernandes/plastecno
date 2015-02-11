@@ -45,15 +45,16 @@ public class RecepcaoCompraPendenteController extends AbstractController {
         return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.COMPRA);
     }
 
-    @Post("compra/item/edicao")
+    @Post("compra/item/inclusao")
     public void inserirItemPedido(ItemPedido itemPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         try {
             pedidoService.inserirItemPedido(itemPedido);
             gerarMensagemSucesso("O item de compra foi alterado com sucesso. Essas alterações já podem ser incluidas no estoque.");
         } catch (BusinessException e) {
+            addAtributo("itemPedido", itemPedido);
             gerarListaMensagemErro(e);
         }
-        redirecTo(this.getClass()).pesquisarCompraPendente(new Date(), new Date(), idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao/listagem")
@@ -77,7 +78,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
         addAtributo("listaRepresentada", representadaService.pesquisar());
     }
 
-    @Get("compra/item")
+    @Post("compra/item/edicao")
     public void pesquisarItemCompraById(Integer idItemPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
         if (itemPedido == null) {
@@ -88,7 +89,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("idRepresentadaSelecionada", idRepresentada);
-        redirecTo(this.getClass()).pesquisarCompraPendente(new Date(), new Date(), idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao")

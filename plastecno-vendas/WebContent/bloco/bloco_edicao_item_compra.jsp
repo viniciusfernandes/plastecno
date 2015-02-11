@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <fieldset id="bloco_item_pedido">
-	<legend>::: Item de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
+	<legend>::: Edição do Item de ${not isEstoque ? 'Compra': 'Estoque'} :::</legend>
 	<input type="hidden" id="idItemPedido" name="itemPedido.id" value="${itemPedido.id}"/>
 	<input type="hidden" id="idMaterial" name="itemPedido.material.id" value="${itemPedido.material.id}"/>
 	<c:if test="${not isEstoque}">

@@ -153,6 +153,12 @@ class ServiceBuilder {
 		MaterialServiceImpl materialService = new MaterialServiceImpl();
 		new MockUp<MaterialDAO>() {
 			@Mock
+			boolean isMaterialImportado(Integer idMaterial) {
+				Material material = REPOSITORY.pesquisarEntidadeById(Material.class, idMaterial);
+				return material != null ? material.isImportado() : false;
+			}
+
+			@Mock
 			Material pesquisarById(Integer id) {
 				return REPOSITORY.pesquisarEntidadeById(Material.class, id);
 			}

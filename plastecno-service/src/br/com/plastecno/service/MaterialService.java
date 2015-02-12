@@ -11,29 +11,29 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 
 @Local
 public interface MaterialService {
-    void desativar(Integer id);
+	void desativar(Integer id);
 
-    Integer inserir(Material material) throws BusinessException;
+	Integer inserir(Material material) throws BusinessException;
 
-    Integer inserir(Material material, List<Integer> listaIdRepresentadaAssociada) throws BusinessException;
+	Integer inserir(Material material, List<Integer> listaIdRepresentadaAssociada) throws BusinessException;
 
-    boolean isCalculoIPIObrigatorio(Integer idMaterial, Integer idRepresentada);
+	boolean isMaterialExistente(String sigla, Integer idMaterial);
 
-    boolean isMaterialExistente(String sigla, Integer idMaterial);
+	boolean isMaterialImportado(Integer idMaterial);
 
-    PaginacaoWrapper<Material> paginarMaterial(Material filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+	PaginacaoWrapper<Material> paginarMaterial(Material filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros);
 
-    List<Material> pesquisarBy(Material filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+	List<Material> pesquisarBy(Material filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros);
 
-    Material pesquisarById(Integer id);
+	Material pesquisarById(Integer id);
 
-    List<Material> pesquisarBySigla(String sigla, Integer idRepresentada);
+	List<Material> pesquisarBySigla(String sigla, Integer idRepresentada);
 
-    List<Representada> pesquisarRepresentadasAssociadas(Integer idMaterial);
+	List<Representada> pesquisarRepresentadasAssociadas(Integer idMaterial);
 
-    List<Representada> pesquisarRepresentadasNaoAssociadas(Integer idMaterial);
+	List<Representada> pesquisarRepresentadasNaoAssociadas(Integer idMaterial);
 
-    Long pesquisarTotalRegistros(Material filtro, Boolean apenasAtivos);
+	Long pesquisarTotalRegistros(Material filtro, Boolean apenasAtivos);
 }

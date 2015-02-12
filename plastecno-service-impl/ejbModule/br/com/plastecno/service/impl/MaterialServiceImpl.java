@@ -14,7 +14,6 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.RepresentadaService;
-import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.dao.MaterialDAO;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Representada;
@@ -108,28 +107,13 @@ public class MaterialServiceImpl implements MaterialService {
 	}
 
 	@Override
-	public boolean isCalculoIPIObrigatorio(Integer idMaterial, Integer idRepresentada) {
-
-		final TipoApresentacaoIPI tipoApresentacaoIPI = representadaService.pesquisarTipoApresentacaoIPI(idRepresentada);
-		if (TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
-			return false;
-		}
-		final boolean materialImportado = isMaterialImportado(idMaterial);
-		if (TipoApresentacaoIPI.SEMPRE.equals(tipoApresentacaoIPI)
-				|| (TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI) && materialImportado)) {
-			return true;
-		}
-		return false;
-	}
-
-	public boolean isMaterialImportado(Integer idMaterial) {
-		Material material = pesquisarById(idMaterial);
-		return material != null ? material.isImportado() : false;
+	public boolean isMaterialExistente(String sigla, Integer idMaterial) {
+		return materialDAO.isEntidadeExistente(Material.class, idMaterial, "sigla", sigla);
 	}
 
 	@Override
-	public boolean isMaterialExistente(String sigla, Integer idMaterial) {
-		return materialDAO.isEntidadeExistente(Material.class, idMaterial, "sigla", sigla);
+	public boolean isMaterialImportado(Integer idMaterial) {
+		return materialDAO.isMaterialImportado(idMaterial);
 	}
 
 	@Override

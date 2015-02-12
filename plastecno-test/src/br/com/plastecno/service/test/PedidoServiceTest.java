@@ -23,6 +23,7 @@ import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
+import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
@@ -836,8 +837,8 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 		assertNull("O IPI nao foi configurado e deve ser nulo", itemPedido.getAliquotaIPI());
 	}
-@Test
 
+	@Test
 	public void testInclusaoItemPedidoSemIPIMaterialNacionalRepresentadaIPIOcasional() {
 		Pedido pedido = gerarPedidoClienteProspectado();
 		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);

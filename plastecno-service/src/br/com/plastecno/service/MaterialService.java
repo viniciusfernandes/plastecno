@@ -29,7 +29,9 @@ public interface MaterialService {
 
 	Material pesquisarById(Integer id);
 
-    List<Material> pesquisarBySigla(String sigla);
+	List<Material> pesquisarBySigla(String sigla);
+
+	List<Material> pesquisarBySigla(String sigla, Integer idRepresentada);
 
 	List<Representada> pesquisarRepresentadasAssociadas(Integer idMaterial);
 

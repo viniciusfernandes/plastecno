@@ -106,7 +106,6 @@ public class MaterialServiceImpl implements MaterialService {
 		return material.getId() != null ? materialDAO.alterar(material).getId() : materialDAO.inserir(material).getId();
 	}
 
-	@Override
 	public boolean isMaterialExistente(String sigla, Integer idMaterial) {
 		return materialDAO.isEntidadeExistente(Material.class, idMaterial, "sigla", sigla);
 	}
@@ -116,7 +115,6 @@ public class MaterialServiceImpl implements MaterialService {
 		return materialDAO.isMaterialImportado(idMaterial);
 	}
 
-	@Override
 	public PaginacaoWrapper<Material> paginarMaterial(Material filtro, Boolean apenasAtivos,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 

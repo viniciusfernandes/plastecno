@@ -17,7 +17,7 @@ public interface MaterialService {
 
     Integer inserir(Material material, List<Integer> listaIdRepresentadaAssociada) throws BusinessException;
 
-    boolean isCalculoIPIObrigatorio(Integer idMaterial, Integer idRepresentada);
+    boolean isCalculoIPIProibido(Integer idMaterial, Integer idRepresentada);
 
     boolean isMaterialExistente(String sigla, Integer idMaterial);
 
@@ -36,4 +36,6 @@ public interface MaterialService {
     List<Representada> pesquisarRepresentadasNaoAssociadas(Integer idMaterial);
 
     Long pesquisarTotalRegistros(Material filtro, Boolean apenasAtivos);
+
+		boolean isMaterialImportado(Integer idMaterial);
 }

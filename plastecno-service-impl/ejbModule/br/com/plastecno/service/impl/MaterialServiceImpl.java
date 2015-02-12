@@ -108,28 +108,28 @@ public class MaterialServiceImpl implements MaterialService {
 	}
 
 	@Override
-	public boolean isCalculoIPIObrigatorio(Integer idMaterial, Integer idRepresentada) {
+	public boolean isCalculoIPIProibido(Integer idMaterial, Integer idRepresentada) {
 
 		final TipoApresentacaoIPI tipoApresentacaoIPI = representadaService.pesquisarTipoApresentacaoIPI(idRepresentada);
 		if (TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
-			return false;
+			return true;
 		}
 		final boolean materialImportado = isMaterialImportado(idMaterial);
 		if (TipoApresentacaoIPI.SEMPRE.equals(tipoApresentacaoIPI)
 				|| (TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI) && materialImportado)) {
-			return true;
+			return false;
 		}
-		return false;
-	}
-
-	public boolean isMaterialImportado(Integer idMaterial) {
-		Material material = pesquisarById(idMaterial);
-		return material != null ? material.isImportado() : false;
+		return true;
 	}
 
 	@Override
 	public boolean isMaterialExistente(String sigla, Integer idMaterial) {
 		return materialDAO.isEntidadeExistente(Material.class, idMaterial, "sigla", sigla);
+	}
+	
+	@Override
+	public boolean isMaterialImportado(Integer idMaterial) {
+		return materialDAO.isMaterialImportado(idMaterial);
 	}
 
 	@Override

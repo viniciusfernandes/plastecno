@@ -25,6 +25,7 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
@@ -310,19 +311,21 @@ public class PedidoServiceImpl implements PedidoService {
 		 */
 		Double aliquotaIPI = itemPedido.getAliquotaIPI();
 		final boolean ipiPreenchido = aliquotaIPI != null && aliquotaIPI > 0d;
-		final boolean isCalculoIPIObrigatorio = isCalculoIPIObrigatorio(itemPedido);
+		final TipoApresentacaoIPI tipoApresentacaoIPI = pesquisarTipoApresentacaoIPI(itemPedido);
+		final boolean materialImportado = materialService.isMaterialImportado(itemPedido.getMaterial().getId());
+		final boolean ipiNecessario = TipoApresentacaoIPI.SEMPRE.equals(tipoApresentacaoIPI)
+				|| (TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI) && materialImportado);
 
-		if (!ipiPreenchido && isCalculoIPIObrigatorio) {
-			aliquotaIPI = itemPedido.getFormaMaterial().getIpi();
-		} else if (ipiPreenchido && !isCalculoIPIObrigatorio) {
+		if (ipiPreenchido && TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
 			throw new BusinessException(
 					"Remova o valor do IPI do item pois representada escolhida não apresenta cáculo de IPI.");
+		} else if (!ipiPreenchido && ipiNecessario) {
+			itemPedido.setAliquotaIPI(itemPedido.getFormaMaterial().getIpi());
 		}
-		itemPedido.setAliquotaIPI(aliquotaIPI);
 
 		// No caso em que nao exista a cobranca de IPI os precos serao iguais
-		final Double precoUnidadeIPI = isCalculoIPIObrigatorio ? CalculadoraPreco.calcularPorUnidadeIPI(itemPedido)
-				: itemPedido.getPrecoUnidade();
+		final Double precoUnidadeIPI = ipiNecessario ? CalculadoraPreco.calcularPorUnidadeIPI(itemPedido) : itemPedido
+				.getPrecoUnidade();
 
 		itemPedido.setPrecoUnidadeIPI(precoUnidadeIPI);
 
@@ -353,20 +356,6 @@ public class PedidoServiceImpl implements PedidoService {
 	public boolean isCalculoIPIHabilitado(Integer idPedido) {
 		Integer idRepresentada = pesquisarIdRepresentadaByIdPedido(idPedido);
 		return representadaService.isCalculoIPIHabilitado(idRepresentada);
-	}
-
-	private boolean isCalculoIPIObrigatorio(ItemPedido itemPedido) throws BusinessException {
-		if (itemPedido.getPedido() == null || itemPedido.getPedido().getId() == null) {
-			throw new BusinessException(
-					"Não é possível verificar a obrigatoriedade do IPI pois pedido ainda não existe no sistema");
-		}
-
-		if (itemPedido.getMaterial() == null) {
-			throw new BusinessException("Não é possível verificar a obrigatoriedade do IPI pois o item não possui material");
-		}
-
-		final Integer idRepresentada = pedidoDAO.pesquisarIdRepresentadaByIdPedido(itemPedido.getPedido().getId());
-		return this.materialService.isCalculoIPIObrigatorio(itemPedido.getMaterial().getId(), idRepresentada);
 	}
 
 	@Override
@@ -561,6 +550,20 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		return pedidoDAO.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, indiceRegistroInicial,
 				numeroMaximoRegistros);
+	}
+
+	private TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(ItemPedido itemPedido) throws BusinessException {
+		if (itemPedido.getPedido() == null || itemPedido.getPedido().getId() == null) {
+			throw new BusinessException(
+					"Não é possível verificar a obrigatoriedade do IPI pois pedido ainda não existe no sistema");
+		}
+
+		if (itemPedido.getMaterial() == null) {
+			throw new BusinessException("Não é possível verificar a obrigatoriedade do IPI pois o item não possui material");
+		}
+
+		final Integer idRepresentada = pedidoDAO.pesquisarIdRepresentadaByIdPedido(itemPedido.getPedido().getId());
+		return representadaService.pesquisarTipoApresentacaoIPI(idRepresentada);
 	}
 
 	@Override

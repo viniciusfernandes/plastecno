@@ -23,6 +23,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
@@ -75,6 +76,18 @@ public class PedidoServiceTest extends AbstractTest {
 		itemPedido.setMaterial(material);
 		itemPedido.setAliquotaIPI(null);
 		return itemPedido;
+	}
+
+	private Material gerarMaterial(Representada representada) {
+		Material material = eBuilder.buildMaterial();
+		material.setImportado(true);
+		material.addRepresentada(representada);
+		try {
+			materialService.inserir(material);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		return material;
 	}
 
 	private Pedido gerarPedidoClienteProspectado() {
@@ -499,6 +512,7 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoItemPedidoComIPIRepresentadaSemIPI() {
 		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.NUNCA);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -513,6 +527,30 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("A representada definida no pedido nao permite valores de IPI", throwed);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoFormaQuadradaMedidaInternaIgualExterna() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		itemPedido.setFormaMaterial(FormaMaterial.BQ);
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertEquals(
+				"Para a forma de material qaudrada as medidas interna e externa devem ser identicas apos a inclusao do item",
+				itemPedido.getMedidaExterna(), itemPedido.getMedidaInterna());
 	}
 
 	@Test
@@ -582,6 +620,180 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoItemPedidoMaterialImportadoRepresentadaIPIOcasional() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Material material = gerarMaterial(pedido.getRepresentada());
+		final Double ipi = 0.02d;
+		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		itemPedido.setMaterial(material);
+		itemPedido.setAliquotaIPI(ipi);
+
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertEquals("O IPI foi enviado e deve ser o mesmo apos a inclusao do item do pedido", ipi,
+				itemPedido.getAliquotaIPI());
+	}
+
+	@Test
+	public void testInclusaoItemPedidoMaterialImportadoRepresentadaSemIPI() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.NUNCA);
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Material material = gerarMaterial(pedido.getRepresentada());
+
+		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		itemPedido.setMaterial(material);
+		itemPedido.setAliquotaIPI(0.02);
+		boolean throwed = false;
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A representada definida no pedido nao permite valores de IPI", throwed);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoMaterialNacionalRepresentadaIPIOcasional() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Material material = gerarMaterial(pedido.getRepresentada());
+		material.setImportado(false);
+
+		final Double ipi = 0.02d;
+		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		itemPedido.setMaterial(material);
+		itemPedido.setAliquotaIPI(ipi);
+
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertEquals("O IPI foi enviado e deve ser o mesmo apos a inclusao do item do pedido", ipi,
+				itemPedido.getAliquotaIPI());
+	}
+
+	@Test
+	public void testInclusaoItemPedidoPeca() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		itemPedido.setTipoVenda(TipoVenda.PECA);
+		itemPedido.setFormaMaterial(FormaMaterial.PC);
+		itemPedido.setDescricaoPeca("engrenagem de plastico");
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
+	@Test
+	public void testInclusaoItemPedidoPecaDescricaoNula() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		itemPedido.setTipoVenda(TipoVenda.PECA);
+		itemPedido.setFormaMaterial(FormaMaterial.PC);
+		itemPedido.setDescricaoPeca(null);
+		boolean throwed = false;
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A venda de peca deve conter uma descricao", throwed);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoPecaPorKilo() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		itemPedido.setTipoVenda(TipoVenda.KILO);
+		itemPedido.setFormaMaterial(FormaMaterial.PC);
+		itemPedido.setDescricaoPeca("engrenagem de plastico");
+		boolean throwed = false;
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Nao eh possivel vender uma peca por kilo. A venda deve ser feita por peca", throwed);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoPecaSemDescricao() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		itemPedido.setTipoVenda(TipoVenda.PECA);
+		itemPedido.setFormaMaterial(FormaMaterial.PC);
+		itemPedido.setDescricaoPeca("");
+		boolean throwed = false;
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A venda de peca deve conter uma descricao", throwed);
+	}
+
+	@Test
 	public void testInclusaoItemPedidoRepresentadaSemIPI() {
 		Pedido pedido = eBuilder.buildPedido();
 		associarVendedor(pedido.getCliente());
@@ -598,6 +810,32 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		assertNull("O IPI nao foi configurado e deve ser nulo", itemPedido.getAliquotaIPI());
+	}
+
+	@Test
+	public void testInclusaoItemPedidoSemIPIMaterialNacionalRepresentadaIPIOcasional() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Material material = gerarMaterial(pedido.getRepresentada());
+		material.setImportado(false);
+
+		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		itemPedido.setMaterial(material);
+		itemPedido.setAliquotaIPI(null);
+
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertNull("O IPI foi nao foi enviado, portanto, nao deve existir apos a inclusao do item do pedido",
+				itemPedido.getAliquotaIPI());
 	}
 
 	@Test

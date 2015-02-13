@@ -865,6 +865,32 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoItemSemIPIPedidoMaterialImportadoRepresentadaIPIOcasional() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Material material = gerarMaterial(pedido.getRepresentada());
+		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		itemPedido.setMaterial(material);
+		itemPedido.setAliquotaIPI(null);
+		itemPedido.setFormaMaterial(FormaMaterial.CH);
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		Double padrao = FormaMaterial.CH.getIpi();
+		assertEquals(
+				"O IPI de material importado nao foi enviado portanto deve ser utilizado o default apos a inclusao do item do pedido",
+				padrao, itemPedido.getAliquotaIPI());
+	}
+
+	@Test
 	public void testInclusaoPedidoComContatoEmBranco() {
 		Pedido pedido = eBuilder.buildPedido();
 		associarVendedor(pedido.getCliente());

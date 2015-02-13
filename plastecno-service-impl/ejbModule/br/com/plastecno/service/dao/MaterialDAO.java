@@ -14,7 +14,7 @@ public class MaterialDAO extends GenericDAO<Material> {
 
 	public boolean isMaterialImportado(Integer idMaterial) {
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select m.importado Material m where m.id = :idMaterial").setParameter(
+				this.entityManager.createQuery("select m.importado from Material m where m.id = :idMaterial").setParameter(
 						"idMaterial", idMaterial), Boolean.class, false);
 	}
 

@@ -110,8 +110,8 @@ function submeterForm(botao){
 					value="${dataFinal}" maxlength="100" class="pesquisavel" />
 			</div>
 			<div class="label" style="width: 30%">Representada:</div>
-			<div class="input" style="width: 40%">
-				<select name="idRepresentada" style="width: 70%">
+			<div class="input" style="width: 50%">
+				<select name="idRepresentada" style="width: 30%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="representada" items="${listaRepresentada}">
 						<option value="${representada.id}"

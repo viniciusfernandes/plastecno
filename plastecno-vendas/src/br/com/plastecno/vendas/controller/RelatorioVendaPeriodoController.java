@@ -25,15 +25,14 @@ public class RelatorioVendaPeriodoController extends AbstractController {
     public void gerarRelatorioVendaPeriodo(Date dataInicial, Date dataFinal) {
 
         try {
-            addAtributo("relatorio",
-                    this.relatorioService.gerarRelatorioVendaPeriodo(new Periodo(dataInicial, dataFinal)));
+            addAtributo("relatorio", relatorioService.gerarRelatorioVendaPeriodo(new Periodo(dataInicial, dataFinal)));
         } catch (BusinessException e) {
-            this.gerarListaMensagemErro(e);
+            gerarListaMensagemErro(e);
         }
 
         addAtributo("dataInicial", this.formatarData(dataInicial));
         addAtributo("dataFinal", this.formatarData(dataFinal));
-        this.irPaginaHome();
+        irPaginaHome();
     }
 
     @Get("relatorio/venda/periodo")

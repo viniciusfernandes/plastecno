@@ -51,6 +51,7 @@ public class MaterialDAO extends GenericDAO<Material> {
 		select.append("m.sigla like :sigla order by m.sigla ");
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("sigla", "%" + sigla + "%");
+		
 
 		if (idRepresentada != null) {
 			query.setParameter("idRepresentada", idRepresentada);

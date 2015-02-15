@@ -190,7 +190,7 @@ public class PedidoController extends AbstractController {
         // Verificando se a lista de representada ja foi preenchida em outro
         // fluxo
         if (!contemAtributo("listaRepresentada")) {
-            addAtributo("listaRepresentada", this.representadaService.pesquisarAtivo());
+            addAtributo("listaRepresentada", this.representadaService.pesquisarRepresentada(true));
         }
 
         if (pedido != null) {
@@ -380,9 +380,10 @@ public class PedidoController extends AbstractController {
 
     @Get("pedido/compra")
     public void pedidoCompra() {
-        redirecTo(this.getClass()).pedidoHome();
         configurarTipoPedido(TipoPedido.COMPRA);
+        addAtributo("listaRepresentada", representadaService.pesquisarFornecedor(true));
         addAtributo("descricaoTipoPedido", TipoPedido.COMPRA.getDescricao());
+        redirecTo(this.getClass()).pedidoHome();
     }
 
     @Get("pedido")
@@ -391,7 +392,7 @@ public class PedidoController extends AbstractController {
 
         addAtributo("listaTipoEntrega", this.tipoEntregaService.pesquisar());
 
-        this.gerarListaRepresentada(null);
+        gerarListaRepresentada(null);
 
         addAtributo("listaFormaMaterial", this.formaMaterialService.pesquisar());
         addAtributo("listaContatoDesabilitada", true);

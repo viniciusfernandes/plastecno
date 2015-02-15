@@ -37,3 +37,17 @@ create sequence vendas.seq_item_estoque_id increment by 1 minvalue 1 no maxvalue
 
 ALTER TABLE vendas.tb_item_estoque add aliquota_icms numeric(5,5) default 0;  
 alter table vendas.tb_item_estoque add aliquota_ipi numeric (5,5) default 0;
+
+create table vendas.tb_tipo_relacionamento (
+	id integer not null,
+	descricao varchar(50)
+);
+ALTER TABLE vendas.tb_tipo_relacionamento ADD PRIMARY KEY (id);
+insert into vendas.tb_tipo_relacionamento values (0, 'REPRESENTACAO');
+insert into vendas.tb_tipo_relacionamento  values (1, 'FORNECIMENTO');
+insert into vendas.tb_tipo_relacionamento  values (2, 'REPRESENTACAO E FORNECIMENTO');
+
+
+ALTER TABLE vendas.tb_representada ADD id_tipo_relacionamento integer not null default 0;
+ALTER TABLE vendas.tb_representada ADD CONSTRAINT id_tipo_relacionamento FOREIGN KEY (id_tipo_relacionamento) REFERENCES vendas.tb_tipo_relacionamento (id);
+

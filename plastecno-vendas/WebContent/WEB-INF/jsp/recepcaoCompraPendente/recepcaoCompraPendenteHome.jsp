@@ -17,7 +17,7 @@
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
-
+<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -30,6 +30,11 @@ $(document).ready(function() {
 	inserirMascaraMonetaria('comprimento', 8);
 	inserirMascaraMonetaria('medidaExterna', 8);
 	inserirMascaraMonetaria('medidaInterna', 8);
+	
+	habilitar('#bloco_item_pedido input:radio', false);
+	habilitar('#bloco_item_pedido #formaMaterial', false);
+	habilitar('#bloco_item_pedido #descricao', false);
+	habilitar('#bloco_item_pedido #material', false);
 	
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();
@@ -163,7 +168,7 @@ function submeterForm(botao){
 									</form>
 									<form action="<c:url value="/compra/item/remocao"/>" method="post" >
 										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
-										<input type="button" value="" title="Remover o Item da Compra" 
+										<input type="button" value="" title="Remover o Item do Pedido" 
 											onclick="removerItem(this);" class="botaoRemover" />
 									</form>
 									

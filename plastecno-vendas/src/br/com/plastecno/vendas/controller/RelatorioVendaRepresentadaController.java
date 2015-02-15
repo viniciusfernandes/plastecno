@@ -93,6 +93,6 @@ public class RelatorioVendaRepresentadaController extends AbstractController {
 
     @Get("relatorio/venda/representada")
     public void relatorioVendaRepresentadaHome() {
-        addAtributo("listaRepresentada", this.representadaService.pesquisar());
+        addAtributo("listaRepresentada", this.representadaService.pesquisarRepresentada());
     }
 }

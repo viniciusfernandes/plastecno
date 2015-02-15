@@ -14,6 +14,7 @@ import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
+import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;
@@ -95,10 +96,10 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public boolean isRevendedor(String nomeRepresentada){
+	public boolean isRevendedor(String nomeRepresentada) {
 		return "PLASTECNO FILIAL".equals(nomeRepresentada);
 	}
-	
+
 	@Override
 	public Integer inserir(final Representada representada) throws BusinessException {
 		ValidadorInformacao.validar(representada);
@@ -135,18 +136,23 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public List<Representada> pesquisar() {
-		return this.pesquisar(null);
+	public List<Representada> pesquisarRepresentada() {
+		return this.pesquisarRepresentada(null);
 	}
 
 	@Override
-	public List<Representada> pesquisar(Boolean ativo) {
-		return representadaDAO.pesquisar(ativo);
+	public List<Representada> pesquisarRepresentada(Boolean ativo) {
+		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.FORNECIMENTO);
 	}
 
 	@Override
-	public List<Representada> pesquisarAtivo() {
-		return this.pesquisar(true);
+	public List<Representada> pesquisarFornecedor(Boolean ativo) {
+		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.REPRESENTACAO);
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentadaAtivo() {
+		return this.pesquisarRepresentada(true);
 	}
 
 	@Override

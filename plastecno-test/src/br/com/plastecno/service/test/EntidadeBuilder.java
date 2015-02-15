@@ -4,6 +4,7 @@ import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.Bairro;
 import br.com.plastecno.service.entity.Cidade;
@@ -145,6 +146,7 @@ public class EntidadeBuilder {
 		representada.setRazaoSocial("COBEX LTDA");
 		representada.setEmail("vendas@cobex.com.br");
 		representada.setComissao(0.05);
+		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
 		return representada;
 	}
 

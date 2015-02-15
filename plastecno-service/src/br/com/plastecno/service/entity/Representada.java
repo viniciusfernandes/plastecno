@@ -22,69 +22,73 @@ import javax.persistence.Table;
 
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoDocumento;
+import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
-@Table(name="tb_representada", schema="vendas")
+@Table(name = "tb_representada", schema = "vendas")
 @InformacaoValidavel
 public class Representada implements Serializable {
-	
+
 	private static final long serialVersionUID = -6187905223269978645L;
 
 	@Id
-	@SequenceGenerator(name = "representadaSequence", sequenceName = "vendas.seq_representada_id", allocationSize=1, initialValue=1)
+	@SequenceGenerator(name = "representadaSequence", sequenceName = "vendas.seq_representada_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "representadaSequence")
 	private Integer id;
-	
-	@InformacaoValidavel(obrigatorio=true, intervalo={1, 150}, nomeExibicao="Nome fantasia")
-	@Column(name="nome_fantasia")
+
+	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Nome fantasia")
+	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
-	
-	@InformacaoValidavel(obrigatorio=true, intervalo={1, 150}, nomeExibicao="Razao social")
-	@Column(name="razao_social")
+
+	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Razao social")
+	@Column(name = "razao_social")
 	private String razaoSocial;
-	
-	@InformacaoValidavel(intervalo={1, 150}, nomeExibicao="Site da representada")
-	@Column(name="site")
+
+	@InformacaoValidavel(intervalo = { 1, 150 }, nomeExibicao = "Site da representada")
+	@Column(name = "site")
 	private String site;
-	
-	@InformacaoValidavel(obrigatorio=true, intervalo={1, 150}, nomeExibicao="Email para envio dos pedidos")
-	@Column(name="email")
+
+	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Email para envio dos pedidos")
+	@Column(name = "email")
 	private String email;
-	
-	@InformacaoValidavel(tipoDocumento=TipoDocumento.CNPJ, nomeExibicao="CNPJ")
+
+	@InformacaoValidavel(tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ")
 	private String cnpj;
-	
-	@Column(name="insc_estadual")
-	@InformacaoValidavel(intervalo={0, 12}, tipoDocumento=TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao="Inscricao estadual")
+
+	@Column(name = "insc_estadual")
+	@InformacaoValidavel(intervalo = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual")
 	private String inscricaoEstadual;
-	
+
 	private boolean ativo = true;
-	
-	@InformacaoValidavel(obrigatorio=true, numerico=true, valorNaoNegativo=true, nomeExibicao="Comissão da representada")
+
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = true, nomeExibicao = "Comissão da representada")
 	private double comissao = 0;
-	
-	@InformacaoValidavel(cascata=true, nomeExibicao="Logradouro da representada")
-	@OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinColumn(name="id_logradouro")
+
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da representada")
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "id_logradouro")
 	private Logradouro logradouro;
-	
-	@OneToMany(mappedBy="representada", fetch=FetchType.LAZY, cascade={CascadeType.ALL})
-	@InformacaoValidavel(iteravel=true, nomeExibicao="Lista de contato da representada")
+
+	@OneToMany(mappedBy = "representada", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de contato da representada")
 	private List<ContatoRepresentada> listaContato;
 
-	@ManyToMany(mappedBy="listaRepresentada")
+	@ManyToMany(mappedBy = "listaRepresentada")
 	private List<Material> listaMaterial;
-	
-	@Column(name="id_tipo_apresentacao_ipi")
+
+	@Column(name = "id_tipo_apresentacao_ipi")
 	@Enumerated(EnumType.ORDINAL)
 	private TipoApresentacaoIPI tipoApresentacaoIPI = TipoApresentacaoIPI.NUNCA;
-	
-	
-	public Representada(){}
-	
-	
-	
+
+	@Column(name = "id_tipo_relacionamento")
+	@Enumerated(EnumType.ORDINAL)
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo de relacionamento")
+	private TipoRelacionamento tipoRelacionamento;
+
+	public Representada() {
+	}
+
 	public Representada(Integer id, String nomeFantasia) {
 		this.id = id;
 		this.nomeFantasia = nomeFantasia;
@@ -93,20 +97,20 @@ public class Representada implements Serializable {
 	public void addContato(ContatoRepresentada contato) {
 		if (this.listaContato == null) {
 			this.listaContato = new ArrayList<ContatoRepresentada>();
-		} 
-		this.listaContato.add(contato);	
+		}
+		this.listaContato.add(contato);
 		contato.setRepresentada(this);
 	}
 
 	public void addContato(List<ContatoRepresentada> listaContato) {
 		for (ContatoRepresentada contato : listaContato) {
-			this.addContato(contato);	
+			this.addContato(contato);
 		}
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof Representada && this.id != null && this.id.equals(((Representada)o).id);
+		return o instanceof Representada && this.id != null && this.id.equals(((Representada) o).id);
 	}
 
 	public String getCnpj() {
@@ -144,11 +148,11 @@ public class Representada implements Serializable {
 	public Logradouro getLogradouro() {
 		return logradouro;
 	}
-	
+
 	public String getNomeFantasia() {
 		return nomeFantasia;
 	}
-	
+
 	public String getRazaoSocial() {
 		return razaoSocial;
 	}
@@ -159,6 +163,10 @@ public class Representada implements Serializable {
 
 	public TipoApresentacaoIPI getTipoApresentacaoIPI() {
 		return tipoApresentacaoIPI;
+	}
+
+	public TipoRelacionamento getTipoRelacionamento() {
+		return tipoRelacionamento;
 	}
 
 	@Override
@@ -193,7 +201,7 @@ public class Representada implements Serializable {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
+
 	public void setInscricaoEstadual(String inscricaoEstadual) {
 		this.inscricaoEstadual = inscricaoEstadual;
 	}
@@ -201,7 +209,7 @@ public class Representada implements Serializable {
 	public void setListaContato(List<ContatoRepresentada> listaContato) {
 		this.listaContato = listaContato;
 	}
-	
+
 	void setListaMaterial(List<Material> listaMaterial) {
 		this.listaMaterial = listaMaterial;
 	}
@@ -213,17 +221,20 @@ public class Representada implements Serializable {
 	public void setNomeFantasia(String nomeFantasia) {
 		this.nomeFantasia = nomeFantasia;
 	}
-	
+
 	public void setRazaoSocial(String razaoSocial) {
 		this.razaoSocial = razaoSocial;
 	}
-	
 
 	public void setSite(String site) {
 		this.site = site;
 	}
-	
+
 	public void setTipoApresentacaoIPI(TipoApresentacaoIPI tipoApresentacaoIPI) {
 		this.tipoApresentacaoIPI = tipoApresentacaoIPI;
+	}
+
+	public void setTipoRelacionamento(TipoRelacionamento tipoRelacionamento) {
+		this.tipoRelacionamento = tipoRelacionamento;
 	}
 }

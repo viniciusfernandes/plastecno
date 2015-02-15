@@ -121,6 +121,24 @@ function inicializarModalCancelamento(botao){
 					<c:if test="${empty representada or representada.ativo}">checked="checked"</c:if>
 					class="checkbox" />
 			</div>
+			
+			<div class="label obrigatorio">Tipo de Relacionamento:</div>
+			<div class="input">
+				<input type="radio" name="representada.tipoRelacionamento"
+					value="REPRESENTACAO" <c:if test="${not empty representada and representada.tipoRelacionamento == 'REPRESENTACAO'}">checked</c:if> />
+			</div>
+			<div class="label label_radio_button" style="width: 8%">Representação</div>
+			<div class="input">
+				<input type="radio" name="representada.tipoRelacionamento" 
+					value="FORNECIMENTO" <c:if test="${not empty representada and representada.tipoRelacionamento == 'FORNECIMENTO'}">checked</c:if>/>
+			</div>
+			<div class="label label_radio_button" style="width: 8%">Fornecimento</div>
+			<div class="input">
+				<input type="radio" name="representada.tipoRelacionamento" 
+					value="REPRESENTACAO_FORNECIMENTO" <c:if test="${not empty representada and representada.tipoRelacionamento == 'REPRESENTACAO_FORNECIMENTO'}">checked</c:if>/>
+			</div>
+			<div class="label label_radio_button" style="width: 50%">Ambos</div>
+					
 			<div class="label obrigatorio">Apresent. IPI:</div>
 			<div class="input" style="width: 20%">
 				<select id="tipoApresentacaoIPI"
@@ -206,7 +224,8 @@ function inicializarModalCancelamento(botao){
 				<thead>
 					<tr>
 						<th style="width: 5%">Ativo</th>
-						<th style="width: 30%">Nome</th>
+						<th style="width: 12%">Relação</th>
+						<th style="width: 15%">Nome</th>
 						<th style="width: 35%">Razão Social</th>
 						<th>CNPJ</th>
 						<th>Ações</th>
@@ -223,6 +242,7 @@ function inicializarModalCancelamento(botao){
 									<td><div class="flagNaoOK"></div></td>
 								</c:otherwise>
 							</c:choose>
+							<td>${representada.tipoRelacionamento.descricao}</td>
 							<td>${representada.nomeFantasia}</td>
 							<td>${representada.razaoSocial}</td>
 							<td>${representada.cnpj}</td>

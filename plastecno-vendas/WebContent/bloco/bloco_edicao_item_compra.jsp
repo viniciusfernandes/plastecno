@@ -3,6 +3,10 @@
 	<legend>::: Edição do Item de ${not isEstoque ? 'Compra': 'Estoque'} :::</legend>
 	<input type="hidden" id="idItemPedido" name="itemPedido.id" value="${itemPedido.id}"/>
 	<input type="hidden" id="idMaterial" name="itemPedido.material.id" value="${itemPedido.material.id}"/>
+	<input type="hidden" id="idFormaMaterial" name="itemPedido.formaMaterial" value="${itemPedido.formaMaterial}"/>
+	<input type="hidden" id="idTipoVenda" name="itemPedido.tipoVenda" value="${itemPedido.tipoVenda}"/>
+	<input type="hidden" id="idDescricaoPeca" name="itemPedido.descricaoPeca" value="${itemPedido.descricaoPeca}"/>
+	
 	<c:if test="${not isEstoque}">
 		<input type="hidden" id="itemSequencial" name="itemPedido.sequencial" value="${itemPedido.sequencial}"/>
 		<div class="label">Tipo de ${not empty tipoPedido ? 'Compra': 'Venda'}:</div>
@@ -24,8 +28,7 @@
 	</div>
 	<div class="label" style="width: 6%">Forma:</div>
 	<div class="input" style="width: 60%">
-		<select id="formaMaterial" name="itemPedido.formaMaterial"
-			style="width: 40%">
+		<select id="formaMaterial" name="itemPedido.formaMaterial" style="width: 35%">
 			<option value="">&lt&lt SELECIONE &gt&gt</option>
 			<c:forEach var="formaMaterial" items="${listaFormaMaterial}">
 				<option value="${formaMaterial}" <c:if test="${formaMaterial eq itemPedido.formaMaterial}">selected</c:if>>${formaMaterial.descricao}</option>
@@ -33,11 +36,11 @@
 		</select>
 	</div>
 	<div class="label">Descrição:</div>
-	<div class="input" style="width: 80%">
+	<div class="input" style="width: 70%">
 		<input type="text" id="descricao" name="itemPedido.descricaoPeca" value="${itemPedido.descricaoPeca}" style="width: 50%" />
 	</div>
 	<div class="label">Material:</div>
-	<div class="input" style="width: 80%">
+	<div class="input" style="width: 70%">
 		<input type="text" id="material" name="material.id" style="width: 50%" value="${itemPedido.material.descricao}"/>
 		<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 	</div>

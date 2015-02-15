@@ -54,6 +54,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
             addAtributo("itemPedido", itemPedido);
             gerarListaMensagemErro(e);
         }
+        addAtributo("mensagemInclusaoItem", true);
         redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
     }
 
@@ -66,7 +67,11 @@ public class RecepcaoCompraPendenteController extends AbstractController {
                     idRepresentada, periodo);
 
             addAtributo("relatorio", relatorio);
-            irRodapePagina();
+            if (!contemAtributo("mensagemInclusaoItem")) {
+                irRodapePagina();
+            } else {
+                irTopoPagina();
+            }
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             irTopoPagina();

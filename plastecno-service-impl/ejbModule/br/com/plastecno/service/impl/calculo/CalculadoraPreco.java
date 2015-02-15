@@ -12,12 +12,12 @@ public class CalculadoraPreco {
 	public static double calcular(ItemPedido itemPedido) throws AlgoritmoCalculoException {
 		validarCalculo(itemPedido);
 
-		AlgoritmoCalculo algoritmoCalculo = mapaAlgoritmo.get(itemPedido.getTipoVenda());
-		if (algoritmoCalculo == null) {
+		AlgoritmoCalculo algoritmoCalculoPreco = mapaAlgoritmoPreco.get(itemPedido.getTipoVenda());
+		if (algoritmoCalculoPreco == null) {
 			throw new AlgoritmoCalculoException("Não existe algoritmo para o cálculo do valor do tipo de venda "
 					+ itemPedido.getTipoVenda());
 		}
-		return algoritmoCalculo.calcular(itemPedido);
+		return algoritmoCalculoPreco.calcular(itemPedido);
 	}
 
 	public static double calcularPorUnidade(ItemPedido itemPedido) throws AlgoritmoCalculoException {
@@ -53,11 +53,11 @@ public class CalculadoraPreco {
 		}
 	}
 
-	private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgoritmo;
+	private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgoritmoPreco;
 
 	static {
-		mapaAlgoritmo = new HashMap<TipoVenda, AlgoritmoCalculo>();
-		mapaAlgoritmo.put(TipoVenda.KILO, new AlgoritmoCalculoPrecoKilo());
-		mapaAlgoritmo.put(TipoVenda.PECA, new AlgoritmoCalculoPrecoPeca());
+		mapaAlgoritmoPreco = new HashMap<TipoVenda, AlgoritmoCalculo>();
+		mapaAlgoritmoPreco.put(TipoVenda.KILO, new AlgoritmoCalculoPrecoKilo());
+		mapaAlgoritmoPreco.put(TipoVenda.PECA, new AlgoritmoCalculoPrecoPeca());
 	}
 }

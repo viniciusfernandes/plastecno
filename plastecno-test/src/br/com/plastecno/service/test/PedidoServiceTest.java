@@ -722,29 +722,6 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testInclusaoItemPedidoPeca() {
-		Pedido pedido = eBuilder.buildPedido();
-		associarVendedor(pedido.getCliente());
-
-		try {
-			pedido = pedidoService.inserir(pedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		Integer idPedido = pedido.getId();
-		ItemPedido itemPedido = gerarItemPedido();
-		itemPedido.setTipoVenda(TipoVenda.PECA);
-		itemPedido.setFormaMaterial(FormaMaterial.PC);
-		itemPedido.setDescricaoPeca("engrenagem de plastico");
-		try {
-			pedidoService.inserirItemPedido(idPedido, itemPedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-	}
-
-	@Test
 	public void testInclusaoItemPedidoPecaDescricaoNula() {
 		Pedido pedido = eBuilder.buildPedido();
 		associarVendedor(pedido.getCliente());
@@ -817,6 +794,57 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("A venda de peca deve conter uma descricao", throwed);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoPecaVendidoPorKilo() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		itemPedido.setTipoVenda(TipoVenda.KILO);
+		itemPedido.setFormaMaterial(FormaMaterial.PC);
+		itemPedido.setDescricaoPeca("engrenagem de plastico");
+		boolean throwed = false;
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Uma peca nunca pode ser vendida a kilo", throwed);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoPecaVendidoPorPeca() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		itemPedido.setTipoVenda(TipoVenda.PECA);
+		itemPedido.setFormaMaterial(FormaMaterial.PC);
+		itemPedido.setDescricaoPeca("engrenagem de plastico");
+		itemPedido.setMedidaExterna(null);
+		itemPedido.setMedidaInterna(null);
+		itemPedido.setComprimento(null);
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test

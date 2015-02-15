@@ -21,6 +21,9 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+	
+	scrollTo('${ancora}');
+	
 	inserirMascaraData('dataInicial');
 	inserirMascaraData('dataFinal');
 	
@@ -35,6 +38,12 @@ $(document).ready(function() {
 	habilitar('#bloco_item_pedido #formaMaterial', false);
 	habilitar('#bloco_item_pedido #descricao', false);
 	habilitar('#bloco_item_pedido #material', false);
+	
+	<c:if test="${itemPedido.peca}">
+	habilitar('#bloco_item_pedido #medidaExterna', false);
+	habilitar('#bloco_item_pedido #medidaInterna', false);
+	habilitar('#bloco_item_pedido #comprimento', false);
+	</c:if>
 	
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();

@@ -22,6 +22,7 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.EnderecoDAO;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
@@ -276,13 +277,21 @@ class ServiceBuilder {
 
 		new MockUp<RepresentadaDAO>() {
 			@Mock
-			List<Representada> pesquisar(Boolean ativo) {
-				return REPOSITORY.pesquisarEntidadeByRelacionamento(Representada.class, "ativo", true);
+			Representada pesquisarById(Integer id) {
+				return REPOSITORY.pesquisarEntidadeById(Representada.class, id);
 			}
 
 			@Mock
-			Representada pesquisarById(Integer id) {
-				return REPOSITORY.pesquisarEntidadeById(Representada.class, id);
+			List<Representada> pesquisarRepresentadaExcluindoRelacionamento(Boolean ativo,
+					TipoRelacionamento tipoRelacionamento) {
+				List<Representada> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(Representada.class, "ativo", true);
+				List<Representada> representadas = new ArrayList<Representada>();
+				for (Representada representada : lista) {
+					if (tipoRelacionamento != null && !tipoRelacionamento.equals(representada.getTipoRelacionamento())) {
+						representadas.add(representada);
+					}
+				}
+				return representadas;
 			}
 
 			@Mock

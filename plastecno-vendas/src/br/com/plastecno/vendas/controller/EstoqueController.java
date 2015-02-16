@@ -35,14 +35,14 @@ public class EstoqueController extends AbstractController {
     }
 
     @Post("estoque/item/edicao")
-    public void inserirItemEstoque(ItemEstoque itemEstoque) {
+    public void inserirItemEstoque(ItemEstoque itemEstoque, Integer idMaterial, FormaMaterial formaMaterial) {
         try {
             estoqueService.inserirItemEstoque(itemEstoque);
             gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
-        irTopoPagina();
+        redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
     }
 
     @Get("estoque/item/listagem")
@@ -56,8 +56,12 @@ public class EstoqueController extends AbstractController {
         addAtributo("idMaterial", idMaterial);
         addAtributo("descricaoMaterial", material != null ? material.getDescricaoFormatada() : "");
 
-        redirecTo(this.getClass()).estoqueHome();
-        irRodapePagina();
+        estoqueHome();
+        if (contemAtributo("permanecerTopo")) {
+            irTopoPagina();
+        } else {
+            irRodapePagina();
+        }
     }
 
     @Get("estoque/item/{idItemEstoque}")
@@ -68,6 +72,7 @@ public class EstoqueController extends AbstractController {
         } else {
             addAtributo("itemPedido", itemEstoque);
         }
+        addAtributo("permanecerTopo", true);
         redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
     }
 

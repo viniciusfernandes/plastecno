@@ -29,6 +29,8 @@ $(document).ready(function() {
 	
 	$('#botaoInserirItemPedido').click(function () {
 		var parametros = $('#bloco_item_pedido').serialize();
+		parametros = $('#bloco_item_pedido').serialize();
+		parametros += '&'+$('#formPesquisa').serialize();
 		var form = $('#formVazio');
 		$(form).attr('method', 'post');
 		$(form).attr('action', '<c:url value="/estoque/item/edicao"/>?'+parametros);

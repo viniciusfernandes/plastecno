@@ -4,10 +4,10 @@
 	<input type="hidden" id="idItemPedido" name="itemPedido.id" value="${itemPedido.id}"/>
 	<input type="hidden" id="idMaterial" name="itemPedido.material.id" value="${itemPedido.material.id}"/>
 	<input type="hidden" id="idFormaMaterial" name="itemPedido.formaMaterial" value="${itemPedido.formaMaterial}"/>
-	<input type="hidden" id="idTipoVenda" name="itemPedido.tipoVenda" value="${itemPedido.tipoVenda}"/>
-	<input type="hidden" id="idDescricaoPeca" name="itemPedido.descricaoPeca" value="${itemPedido.descricaoPeca}"/>
 	
 	<c:if test="${not isEstoque}">
+		<input type="hidden" id="idTipoVenda" name="itemPedido.tipoVenda" value="${itemPedido.tipoVenda}"/>
+		<input type="hidden" id="idDescricaoPeca" name="itemPedido.descricaoPeca" value="${itemPedido.descricaoPeca}"/>
 		<input type="hidden" id="itemSequencial" name="itemPedido.sequencial" value="${itemPedido.sequencial}"/>
 		<div class="label">Tipo de ${not empty tipoPedido ? 'Compra': 'Venda'}:</div>
 		<div class="input">

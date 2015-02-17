@@ -115,7 +115,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
 
     @Post("compra/item/recepcao")
     public void recepcionarItemCompra(Date dataInicial, Date dataFinal, Integer idRepresentada, Integer idItemPedido) {
-        estoqueService.inserirItemEstoque(idItemPedido);
+        estoqueService.inserirItemPedido(idItemPedido);
         redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
     }
 

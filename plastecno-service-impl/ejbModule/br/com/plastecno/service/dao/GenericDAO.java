@@ -61,11 +61,11 @@ public class GenericDAO<T> {
 				null);
 	}
 
-	<K> K pesquisarCampoById(Class<T> classe, Integer id, String nomeCampo, Class<K> classeRetorno) {
+	<K> K pesquisarCampoById(Class<T> classe, Integer id, String nomeCampo, Class<K> retorno) {
 		StringBuilder select = new StringBuilder();
 		select.append("select ").append("e.").append(nomeCampo).append(" from ").append(classe.getSimpleName());
 		select.append(" e where e.id = :id");
 		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id),
-				classeRetorno, null);
+				retorno, null);
 	}
 }

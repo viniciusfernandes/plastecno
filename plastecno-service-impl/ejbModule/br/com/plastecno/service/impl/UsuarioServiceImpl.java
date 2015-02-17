@@ -155,9 +155,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public Integer inserir(Usuario usuario, boolean isAlteracaoSenha) throws BusinessException {
 
 		if (!isAlteracaoSenha && usuario.getId() != null) {
-			Query query = this.entityManager.createQuery("select u.senha from Usuario u where u.id = :id");
-			query.setParameter("id", usuario.getId());
-			usuario.setSenha(QueryUtil.gerarRegistroUnico(query, String.class, null));
+			usuario.setSenha(usuarioDAO.pesquisarSenha(usuario.getId()));
 		}
 
 		if (this.isEmailExistente(usuario.getId(), usuario.getEmail())) {
@@ -168,7 +166,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			throw new BusinessException("CPF enviado ja foi cadastrado para outro usuario");
 		}
 
-		usuario.setLogradouro(this.logradouroService.inserir(usuario.getLogradouro()));
+		usuario.setLogradouro(logradouroService.inserir(usuario.getLogradouro()));
 		ValidadorInformacao.validar(usuario);
 		if (isAlteracaoSenha) {
 			try {

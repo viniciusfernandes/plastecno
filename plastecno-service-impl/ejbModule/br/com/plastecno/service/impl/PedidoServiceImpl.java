@@ -365,8 +365,11 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		ValidadorInformacao.validar(itemPedido);
-		itemPedido = itemPedidoDAO.alterar(itemPedido);
-
+		if (itemPedido.isNovo()) {
+			itemPedidoDAO.inserir(itemPedido);
+		} else {
+			itemPedido = itemPedidoDAO.alterar(itemPedido);
+		}
 		/*
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao de
 		 * validacoes, caso contrario teremos um valor nulo na base de dados.
@@ -557,9 +560,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemPedido pesquisarItemPedido(Integer idItemPedido) {
-		Query query = this.entityManager.createQuery("select i from ItemPedido i where i.id = :idItemPedido");
-		query.setParameter("idItemPedido", idItemPedido);
-		return QueryUtil.gerarRegistroUnico(query, ItemPedido.class, null);
+		return pedidoDAO.pesquisarItemPedido(idItemPedido);
 	}
 
 	@Override

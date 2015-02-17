@@ -11,9 +11,11 @@ import javax.persistence.EntityManager;
 
 import mockit.Mock;
 import mockit.MockUp;
+import br.com.plastecno.service.AutenticacaoService;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.EmailService;
 import br.com.plastecno.service.EnderecamentoService;
+import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
@@ -40,9 +42,11 @@ import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.NotificacaoException;
+import br.com.plastecno.service.impl.AutenticacaoServiceImpl;
 import br.com.plastecno.service.impl.ClienteServiceImpl;
 import br.com.plastecno.service.impl.EmailServiceImpl;
 import br.com.plastecno.service.impl.EnderecamentoServiceImpl;
+import br.com.plastecno.service.impl.EstoqueServiceImpl;
 import br.com.plastecno.service.impl.LogradouroServiceImpl;
 import br.com.plastecno.service.impl.MaterialServiceImpl;
 import br.com.plastecno.service.impl.PedidoServiceImpl;
@@ -80,6 +84,12 @@ class ServiceBuilder {
 	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
 
 	ServiceBuilder() {
+	}
+
+	private AutenticacaoService buildAutenticacaoService() {
+		AutenticacaoService autenticacaoService = new AutenticacaoServiceImpl();
+		inject(autenticacaoService, new UsuarioDAO(null), "usuarioDAO");
+		return autenticacaoService;
 	}
 
 	public ClienteService buildClienteService() {
@@ -142,6 +152,12 @@ class ServiceBuilder {
 		};
 		inject(enderecamentoService, new EnderecoDAO(null), "enderecoDAO");
 		return enderecamentoService;
+	}
+
+	public EstoqueService buildEstoqueService() {
+		EstoqueServiceImpl estoqueService = new EstoqueServiceImpl();
+		inject(estoqueService, buildPedidoService(), "pedidoService");
+		return estoqueService;
 	}
 
 	public LogradouroService buildLogradouroService() {
@@ -207,8 +223,23 @@ class ServiceBuilder {
 			}
 
 			@Mock
+			public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				if (i == null) {
+					return null;
+				}
+				Pedido p = i.getPedido();
+				return p != null ? p.getId() : null;
+			}
+
+			@Mock
 			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
 				return REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido).getRepresentada().getId();
+			}
+
+			@Mock
+			public ItemPedido pesquisarItemPedido(Integer idItemPedido) {
+				return REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 			}
 
 			@Mock
@@ -244,7 +275,19 @@ class ServiceBuilder {
 
 			@Mock
 			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 12L;
+				return pesquisarTotalItemPedido(idPedido, false);
+			}
+
+			@Mock
+			Long pesquisarTotalItemPedido(Integer idPedido, Boolean isItemPendente) {
+				List<ItemPedido> lista = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				long cout = 0;
+				for (ItemPedido itemPedido : lista) {
+					if (itemPedido.getPedido() != null && itemPedido.getPedido().getId().equals(idPedido)) {
+						cout++;
+					}
+				}
+				return cout;
 			}
 
 			@Mock
@@ -315,6 +358,17 @@ class ServiceBuilder {
 			}
 
 			@Mock
+			public Usuario pesquisarByEmailSenha(String email, String senha) {
+				List<Usuario> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(Usuario.class, "email", email);
+				for (Usuario u : lista) {
+					if (u != null && u.getEmail() != null && u.getSenha().equals(senha)) {
+						return u;
+					}
+				}
+				return null;
+			}
+
+			@Mock
 			public Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {
 				return idVendedor;
 			}
@@ -325,6 +379,11 @@ class ServiceBuilder {
 			}
 
 			@Mock
+			public String pesquisarSenha(Integer idUsuario) {
+				return REPOSITORY.pesquisarEntidadeAtributoById(Usuario.class, idUsuario, "senha", String.class);
+			}
+
+			@Mock
 			public Usuario pesquisarVendedorByIdCliente(Integer idCliente) {
 				Cliente c = REPOSITORY.pesquisarEntidadeById(Cliente.class, idCliente);
 				return c != null ? c.getVendedor() : null;
@@ -332,6 +391,8 @@ class ServiceBuilder {
 
 		};
 		inject(usuarioService, new UsuarioDAO(null), "usuarioDAO");
+		inject(usuarioService, buildLogradouroService(), "logradouroService");
+		inject(usuarioService, buildAutenticacaoService(), "autenticacaoService");
 		return usuarioService;
 	}
 

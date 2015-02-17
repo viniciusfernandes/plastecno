@@ -68,7 +68,7 @@
 	</div>
 	<div class="label" style="width: 8%">IPI (%) :</div>
 	<div class="input" style="width: 5%">
-		<input type="text" id="aliquotaIPI" name="aliquotaIPI" value="${itemPedido.aliquotaIPI}" maxlength="2" />
+		<input type="text" id="aliquotaIPI" name="itemPedido.aliquotaIPI" value="${itemPedido.aliquotaIPI}" maxlength="2" />
 	</div>
 	<div class="label" style="width: 10%">ICMS (%) :</div>
 	<div class="input" style="width: 5%">

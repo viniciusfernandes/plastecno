@@ -35,9 +35,9 @@ public class EstoqueController extends AbstractController {
     }
 
     @Post("estoque/item/edicao")
-    public void inserirItemEstoque(ItemEstoque itemEstoque, Integer idMaterial, FormaMaterial formaMaterial) {
+    public void inserirItemEstoque(ItemEstoque itemPedido, Integer idMaterial, FormaMaterial formaMaterial) {
         try {
-            estoqueService.inserirItemEstoque(itemEstoque);
+            estoqueService.inserirItemEstoque(itemPedido);
             gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

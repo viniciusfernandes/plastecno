@@ -60,14 +60,21 @@ class EntidadeRepository {
 				inserirEntidade(t);
 				return t;
 			}
-			@Mock
-			<T> T pesquisarById(Class<T> classe, Integer id) {
-				return pesquisarEntidadeById(classe, id);
-			}
+
 			@Mock
 			<T> boolean isEntidadeExistente(Class<T> classe, String nomeAtributo, Object valorAtributo,
 					Object nomeIdEntidade, Object valorIdEntidade) {
 				return contemEntidade(classe, nomeAtributo, valorAtributo, valorIdEntidade);
+			}
+
+			@Mock
+			<T> T pesquisarById(Class<T> classe, Integer id) {
+				return pesquisarEntidadeById(classe, id);
+			}
+
+			@Mock
+			<K> K pesquisarCampoById(Class<Object> classe, Integer id, String nomeCampo, Class<K> retorno) {
+				return repository.pesquisarEntidadeAtributoById(classe, id, nomeCampo, retorno);
 			}
 		};
 
@@ -78,6 +85,28 @@ class EntidadeRepository {
 			mapaEntidades.put(entidade.getClass(), new ArrayList<Object>());
 		}
 		mapaEntidades.get(entidade.getClass()).add(entidade);
+	}
+
+	@SuppressWarnings("unchecked")
+	<T, K> K pesquisarEntidadeAtributoById(Class<T> classe, Integer id, String nomeCampo, Class<K> retorno) {
+		T o = pesquisarEntidadeById(classe, id);
+		if (o == null) {
+			return null;
+		}
+		Object valor = null;
+		Field campo = null;
+		try {
+			campo = classe.getDeclaredField(nomeCampo);
+			campo.setAccessible(true);
+			valor = campo.get(o);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			throw new IllegalStateException("Falha na procura do " + classe.getName() + "." + nomeCampo, e);
+		} finally {
+			if (campo != null) {
+				campo.setAccessible(true);
+			}
+		}
+		return (K) valor;
 	}
 
 	<T> T pesquisarEntidadeByAtributo(Class<T> classe, String nomeAtributo, Object valorAtributo, Object valorIdEntidade) {

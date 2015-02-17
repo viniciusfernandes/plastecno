@@ -108,6 +108,7 @@ public class PedidoServiceTest extends AbstractTest {
 		return pedido;
 	}
 
+	@Override
 	public void init() {
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
 		clienteService = ServiceBuilder.buildService(ClienteService.class);

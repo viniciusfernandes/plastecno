@@ -65,10 +65,19 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
+	public Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
+		return null;
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirItemEstoque(Integer idItemPedido) {
+	public void inserirItemPedido(Integer idItemPedido) throws BusinessException {
 		ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
+		if (itemPedido == null) {
+			throw new BusinessException("O item de pedido No: " + idItemPedido + " não existe no sistema");
+		}
 		Pedido pedido = itemPedido.getPedido();
+
 		long qtdePendente = pedidoService.pesquisarTotalItemPendente(pedido.getId());
 		if (qtdePendente <= 1) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_RECEBIDA);
@@ -91,15 +100,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 		calcularValorMedio(itemEstoque, itemPedido);
 
 		if (isNovo) {
-			entityManager.persist(itemEstoque);
+			itemEstoqueDAO.inserir(itemEstoque);
 		} else {
-			entityManager.merge(itemEstoque);
+			itemEstoqueDAO.alterar(itemEstoque);
 		}
-	}
-
-	@Override
-	public Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException{
-		return null;
 	}
 
 	private boolean isEquivalente(Double val1, Double val2) {

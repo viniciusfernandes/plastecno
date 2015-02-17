@@ -140,7 +140,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		}
 
 		select.append("order by i.pedido.id asc ");
-		
+
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("tipoPedido", TipoPedido.COMPRA);
 		query.setParameter("situacaoPedido", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
@@ -188,6 +188,12 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		final String select = "select r.id from Pedido p inner join p.representada r where p.id = :idPedido";
 		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(select).setParameter("idPedido", idPedido),
 				Integer.class, null);
+	}
+
+	public ItemPedido pesquisarItemPedido(Integer idItemPedido) {
+		Query query = this.entityManager.createQuery("select i from ItemPedido i where i.id = :idItemPedido");
+		query.setParameter("idItemPedido", idItemPedido);
+		return QueryUtil.gerarRegistroUnico(query, ItemPedido.class, null);
 	}
 
 	@SuppressWarnings("unchecked")

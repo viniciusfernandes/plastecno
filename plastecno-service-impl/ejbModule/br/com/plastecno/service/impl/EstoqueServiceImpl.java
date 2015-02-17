@@ -31,18 +31,14 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private EntityManager entityManager;
 	private ItemEstoqueDAO itemEstoqueDAO;
 
-	private void calcularValorMedio(ItemEstoque itemEstoque, ItemPedido itemPedido) {
-		if (itemEstoque.getId() == null) {
-			itemEstoque.setPrecoMedio(itemPedido.getPrecoUnidade());
-		} else {
-			final double valorEstoque = itemEstoque.getQuantidade() * itemEstoque.getPrecoMedio();
-			final double valorItem = itemPedido.getQuantidade() * itemPedido.getPrecoUnidade();
-			final double quantidadeTotal = itemEstoque.getQuantidade() + itemPedido.getQuantidade();
-			final double precoMedio = (valorEstoque + valorItem) / quantidadeTotal;
+	private void calcularValorMedio(ItemEstoque itemCadastrado, ItemEstoque itemIncluido) {
+		final double valorEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getPrecoMedio();
+		final double valorItem = itemIncluido.getQuantidade() * itemIncluido.getPrecoMedio();
+		final double quantidadeTotal = itemCadastrado.getQuantidade() + itemIncluido.getQuantidade();
+		final double precoMedio = (valorEstoque + valorItem) / quantidadeTotal;
 
-			itemEstoque.setPrecoMedio(precoMedio);
-			itemEstoque.setQuantidade((int) quantidadeTotal);
-		}
+		itemCadastrado.setPrecoMedio(precoMedio);
+		itemCadastrado.setQuantidade((int) quantidadeTotal);
 	}
 
 	private ItemEstoque gerarItemEstoque(ItemPedido itemPedido) {
@@ -56,6 +52,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemEstoque.setMedidaExterna(itemPedido.getMedidaExterna());
 		itemEstoque.setMedidaInterna(itemPedido.getMedidaInterna());
 		itemEstoque.setQuantidade(itemPedido.getQuantidade());
+		itemEstoque.setPrecoMedio(itemPedido.getPrecoUnidade());
 		return itemEstoque;
 	}
 
@@ -66,12 +63,31 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	public Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
-		return null;
+		if (itemEstoque == null) {
+			throw new BusinessException("Item de estoque nulo");
+		}
+
+		Integer idMaterial = itemEstoque.getMaterial().getId();
+		FormaMaterial formaMaterial = itemEstoque.getFormaMaterial();
+		Double medidaExt = itemEstoque.getMedidaExterna();
+		Double medidaInt = itemEstoque.getMedidaInterna();
+		Double comp = itemEstoque.getComprimento();
+
+		// Verificando se existe item equivalente no estoque, caso nao exista vamos
+		// criar um novo.
+		ItemEstoque itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, medidaExt, medidaInt, comp);
+		boolean isNovo = itemCadastrado == null;
+		if (isNovo) {
+			return itemEstoqueDAO.inserir(itemEstoque).getId();
+		}
+
+		calcularValorMedio(itemCadastrado, itemEstoque);
+		return itemEstoqueDAO.alterar(itemCadastrado).getId();
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirItemPedido(Integer idItemPedido) throws BusinessException {
+	public Integer inserirItemPedido(Integer idItemPedido) throws BusinessException {
 		ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
 		if (itemPedido == null) {
 			throw new BusinessException("O item de pedido No: " + idItemPedido + " não existe no sistema");
@@ -84,26 +100,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		itemPedido.setRecebido(true);
 
-		Integer idMaterial = itemPedido.getMaterial().getId();
-		FormaMaterial formaMaterial = itemPedido.getFormaMaterial();
-		Double medidaExt = itemPedido.getMedidaExterna();
-		Double medidaInt = itemPedido.getMedidaInterna();
-		Double comp = itemPedido.getComprimento();
-
-		// Verificando se existe item equivalente no estoque, caso nao exista vamos
-		// criar um novo.
-		ItemEstoque itemEstoque = pesquisarItemEstoque(idMaterial, formaMaterial, medidaExt, medidaInt, comp);
-		boolean isNovo = itemEstoque == null;
-		if (isNovo) {
-			itemEstoque = gerarItemEstoque(itemPedido);
-		}
-		calcularValorMedio(itemEstoque, itemPedido);
-
-		if (isNovo) {
-			itemEstoqueDAO.inserir(itemEstoque);
-		} else {
-			itemEstoqueDAO.alterar(itemEstoque);
-		}
+		return inserirItemEstoque(gerarItemEstoque(itemPedido));
 	}
 
 	private boolean isEquivalente(Double val1, Double val2) {
@@ -119,34 +116,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemEstoque i ");
-		if (idMaterial != null || formaMaterial != null) {
-			select.append("where ");
-		}
-
-		if (idMaterial != null) {
-			select.append("i.material.id = :idMaterial ");
-		}
-
-		if (formaMaterial != null && idMaterial != null) {
-			select.append("and i.formaMaterial = :formaMaterial ");
-		} else if (formaMaterial != null) {
-			select.append("i.formaMaterial = :formaMaterial ");
-		}
-
-		Query query = entityManager.createQuery(select.toString());
-		if (idMaterial != null) {
-			query.setParameter("idMaterial", idMaterial);
-		}
-
-		if (formaMaterial != null) {
-			query.setParameter("formaMaterial", formaMaterial);
-		}
-
-		return query.getResultList();
+		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial);
 	}
 
 	@Override

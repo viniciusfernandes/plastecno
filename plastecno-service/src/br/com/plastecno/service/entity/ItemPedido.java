@@ -139,11 +139,16 @@ public class ItemPedido implements Serializable, Cloneable {
 	}
 
 	@Override
-	public ItemPedido clone() throws CloneNotSupportedException {
-		ItemPedido clone = (ItemPedido) super.clone();
-		clone.setId(null);
-		clone.setPedido(null);
-		return clone;
+	public ItemPedido clone() {
+		ItemPedido clone;
+		try {
+			clone = (ItemPedido) super.clone();
+			clone.setId(null);
+			clone.setPedido(null);
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new IllegalStateException("Falha ao clonar o item de pedido " + getId(), e);
+		}
 	}
 
 	public boolean contemLargura() {
@@ -303,7 +308,6 @@ public class ItemPedido implements Serializable, Cloneable {
 	public TipoVenda getTipoVenda() {
 		return tipoVenda;
 	}
-	
 
 	public boolean isFormaMaterialVazada() {
 		return formaMaterial != null && formaMaterial.isFormaMaterialVazada();

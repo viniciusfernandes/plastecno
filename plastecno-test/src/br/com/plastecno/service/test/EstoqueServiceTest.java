@@ -1,5 +1,7 @@
 package br.com.plastecno.service.test;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
@@ -8,8 +10,11 @@ import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
@@ -25,8 +30,10 @@ public class EstoqueServiceTest extends AbstractTest {
 	private MaterialService materialService;
 	private RepresentadaService representadaService;
 
-	public ItemPedido gerarItemPedido() {
+	public ItemPedido gerarItemPedidoCompra() {
 		Pedido pedido = eBuilder.buildPedido();
+		pedido.setTipoPedido(TipoPedido.COMPRA);
+		
 		Usuario vendedor = eBuilder.buildVendedor();
 		try {
 			usuarioService.inserir(vendedor, true);
@@ -35,6 +42,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		Cliente cliente = pedido.getCliente();
+		cliente.setProspeccaoFinalizada(true);
 		cliente.setVendedor(vendedor);
 		try {
 			clienteService.inserir(cliente);
@@ -84,14 +92,90 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	}
 
+	private Integer pesquisarQuantidadeTotalItemEstoque(Integer idItemEstoque) {
+		ItemEstoque i = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		return i != null ? i.getQuantidade() : 0;
+
+	}
+
 	@Test
-	public void testInclusaoItemPedidoNoEstoque() {
-		ItemPedido i = gerarItemPedido();
+	public void testAlteracaoItemPedidoNoEstoque() {
+		ItemPedido i = gerarItemPedidoCompra();
+		Integer idItemEstoque = null;
 		try {
-			estoqueService.inserirItemPedido(i.getId());
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+
+		verificarQuantidadeTotalItemEstoque(i.getQuantidade(), idItemEstoque);
+		Integer estoqueAntes = pesquisarQuantidadeTotalItemEstoque(idItemEstoque);
+		i.setQuantidade(i.getQuantidade() + 100);
+		try {
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		estoqueAntes += i.getQuantidade();
+		verificarQuantidadeTotalItemEstoque(estoqueAntes, idItemEstoque);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoInexistenteNoEstoque() {
+		boolean throwed = false;
+		try {
+			estoqueService.inserirItemPedido(null);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Um item de pedido inexistente nao pode ser incluido no estoque", throwed);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoNoEstoque() {
+		ItemPedido i = gerarItemPedidoCompra();
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		verificarQuantidadeTotalItemEstoque(i.getQuantidade(), idItemEstoque);
+		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, i.getPedido().getSituacaoPedido());
+	}
+
+	@Test
+	public void testSituacaoPedidoAposInclusaoVariosItensNoEstoque() {
+		ItemPedido i1 = gerarItemPedidoCompra();
+		ItemPedido i2 = i1.clone();
+
+		try {
+			pedidoService.inserirItemPedido(i2);
+			pedidoService.enviar(i1.getPedido().getId(), new byte[] {});
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			estoqueService.inserirItemPedido(i1.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertEquals(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO, i1.getPedido().getSituacaoPedido());
+
+		try {
+			estoqueService.inserirItemPedido(i2.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertEquals(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO, i2.getPedido().getSituacaoPedido());
+
+	}
+
+	private void verificarQuantidadeTotalItemEstoque(Integer quantidade, Integer idItemEstoque) {
+		Integer quantidadeEstoque = pesquisarQuantidadeTotalItemEstoque(idItemEstoque);
+		assertEquals("As quantidades dos itens devem ser as mesmas apos inclusao no estoque", quantidade, quantidadeEstoque);
 
 	}
 }

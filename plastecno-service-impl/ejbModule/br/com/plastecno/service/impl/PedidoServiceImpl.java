@@ -717,7 +717,7 @@ public class PedidoServiceImpl implements PedidoService {
 			try {
 				itemPedidoClone = itemPedido.clone();
 				inserirItemPedido(pedidoClone.getId(), itemPedidoClone);
-			} catch (CloneNotSupportedException e) {
+			} catch (IllegalStateException e) {
 				throw new BusinessException("Falha no processo de copia do item No. " + itemPedido.getId() + " do pedido No. "
 						+ idPedido, e);
 			}

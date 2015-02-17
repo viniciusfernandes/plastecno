@@ -84,8 +84,17 @@ public class Material implements Serializable {
 		}
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Material && id != null && id.equals(((Material) o).id);
+	}
+
 	public String getDescricao() {
 		return descricao;
+	}
+
+	public String getDescricaoFormatada() {
+		return descricao == null ? sigla : sigla + " - " + descricao;
 	}
 
 	public Integer getId() {
@@ -102,6 +111,11 @@ public class Material implements Serializable {
 
 	public String getSigla() {
 		return sigla;
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id : -1;
 	}
 
 	public boolean isAtivo() {
@@ -138,9 +152,5 @@ public class Material implements Serializable {
 
 	public void setSigla(String sigla) {
 		this.sigla = sigla;
-	}
-
-	public String getDescricaoFormatada() {
-		return descricao == null ? sigla : sigla + " - " + descricao;
 	}
 }

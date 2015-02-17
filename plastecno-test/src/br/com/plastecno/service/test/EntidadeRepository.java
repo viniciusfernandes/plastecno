@@ -183,7 +183,11 @@ class EntidadeRepository {
 
 	@SuppressWarnings("unchecked")
 	<T> List<T> pesquisarTodos(Class<T> classe) {
-		return (List<T>) mapaEntidades.get(classe);
+		List<T> l = (List<T>) mapaEntidades.get(classe);
+		if (l == null) {
+			l = new ArrayList<T>();
+		}
+		return l;
 	}
 
 }

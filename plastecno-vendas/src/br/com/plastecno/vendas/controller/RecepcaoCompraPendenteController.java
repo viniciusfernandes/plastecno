@@ -54,7 +54,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
             addAtributo("itemPedido", itemPedido);
             gerarListaMensagemErro(e);
         }
-        addAtributo("mensagemInclusaoItem", true);
+        addAtributo("permanecerTopo", true);
         redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
     }
 
@@ -67,10 +67,10 @@ public class RecepcaoCompraPendenteController extends AbstractController {
                     idRepresentada, periodo);
 
             addAtributo("relatorio", relatorio);
-            if (!contemAtributo("mensagemInclusaoItem")) {
-                irRodapePagina();
-            } else {
+            if (contemAtributo("permanecerTopo")) {
                 irTopoPagina();
+            } else {
+                irRodapePagina();
             }
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
@@ -115,7 +115,11 @@ public class RecepcaoCompraPendenteController extends AbstractController {
 
     @Post("compra/item/recepcao")
     public void recepcionarItemCompra(Date dataInicial, Date dataFinal, Integer idRepresentada, Integer idItemPedido) {
-        estoqueService.inserirItemPedido(idItemPedido);
+        try {
+            estoqueService.inserirItemPedido(idItemPedido);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
         redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
     }
 

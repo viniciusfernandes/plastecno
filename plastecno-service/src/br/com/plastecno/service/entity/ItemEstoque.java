@@ -274,4 +274,5 @@ public class ItemEstoque implements Serializable {
 	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
 	}
+
 }

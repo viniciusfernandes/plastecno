@@ -13,7 +13,7 @@ import br.com.plastecno.service.exception.BusinessException;
 public interface EstoqueService {
 	Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
-	void inserirItemPedido(Integer idItemPedido) throws BusinessException;
+	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 

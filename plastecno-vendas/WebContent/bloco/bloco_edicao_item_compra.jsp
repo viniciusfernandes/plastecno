@@ -63,8 +63,14 @@
 	</div>
 	<div class="label">Preço:</div>
 	<div class="input" style="width: 5%">
-		<input type="text" id="precoVenda" name="itemPedido.precoVenda"
-			value="${itemPedido.precoVenda}" maxlength="8" />
+		<c:choose>
+			<c:when test="${isEstoque}">
+				<input type="text" id="preco" name="itemPedido.precoMedio" value="${itemPedido.precoMedio}" maxlength="8" />
+			</c:when>
+			<c:otherwise>
+				<input type="text" id="preco" name="itemPedido.precoVenda" value="${itemPedido.precoVenda}" maxlength="8" />
+			</c:otherwise>
+		</c:choose>
 	</div>
 	<div class="label" style="width: 8%">IPI (%) :</div>
 	<div class="input" style="width: 5%">

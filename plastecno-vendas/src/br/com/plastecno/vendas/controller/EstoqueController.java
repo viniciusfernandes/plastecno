@@ -70,6 +70,7 @@ public class EstoqueController extends AbstractController {
         if (itemEstoque == null) {
             gerarListaMensagemErro("Item de estoque não existe no sistema");
         } else {
+            formatarAliquotaItemEstoque(itemEstoque);
             addAtributo("itemPedido", itemEstoque);
         }
         addAtributo("permanecerTopo", true);

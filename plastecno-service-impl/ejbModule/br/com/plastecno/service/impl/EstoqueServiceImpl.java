@@ -101,6 +101,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemPedido.setRecebido(true);
 
 		return inserirItemEstoque(gerarItemEstoque(itemPedido));
+		return itemEstoque.getId();
 	}
 
 	private boolean isEquivalente(Double val1, Double val2) {

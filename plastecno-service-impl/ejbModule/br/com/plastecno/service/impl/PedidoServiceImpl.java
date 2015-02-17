@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.ClienteService;
@@ -101,13 +102,25 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double calcularValorPedido(Integer idPedido) throws BusinessException {
-		return pedidoDAO.pesquisarQuantidadePrecoUnidade(idPedido);
+		try {
+			return pedidoDAO.pesquisarQuantidadePrecoUnidade(idPedido);
+		} catch (PersistenceException e) {
+			throw new BusinessException("Falha no calculo do valor da unidade do item do pedido " + idPedido
+					+ ". Provavelmente o valor do item esta estourando os limites do sistema.");
+		}
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException {
-		return pedidoDAO.pesquisarQuantidadePrecoUnidadeIPI(idPedido);
+		try {
+			return pedidoDAO.pesquisarQuantidadePrecoUnidadeIPI(idPedido);
+		} catch (PersistenceException e) {
+			throw new BusinessException("Falha no calculo do valor IPI do item do pedido " + idPedido
+					+ ". Provavelmente o valor do item esta estourando os limites do sistema.");
+		}
 	}
 
 	@Override
@@ -119,6 +132,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean contemItemPedido(Integer idPedido) {
 		return this.pesquisarTotalItemPedido(idPedido) > 0;
 	}
@@ -299,6 +313,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException {
 		// configurando o material para efetuar o calculo usando o peso
 		// especifico

@@ -48,6 +48,15 @@ public class RecepcaoCompraPendenteController extends AbstractController {
     @Post("compra/item/inclusao")
     public void inserirItemPedido(ItemPedido itemPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         try {
+
+            if (itemPedido.getAliquotaIPI() != null) {
+                itemPedido.setAliquotaIPI(itemPedido.getAliquotaIPI() / 100d);
+            }
+
+            if (itemPedido.getAliquotaICMS() != null) {
+                itemPedido.setAliquotaICMS(itemPedido.getAliquotaICMS() / 100);
+            }
+
             pedidoService.inserirItemPedido(itemPedido);
             gerarMensagemSucesso("O item de compra foi alterado com sucesso. Essas alterações já podem ser incluidas no estoque.");
         } catch (BusinessException e) {
@@ -89,6 +98,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
         if (itemPedido == null) {
             gerarListaMensagemErro("Item de compra não existe no sistema");
         } else {
+            formatarAliquotaItemPedido(itemPedido);
             addAtributo("itemPedido", itemPedido);
         }
         addAtributo("dataInicial", formatarData(dataInicial));

@@ -68,12 +68,12 @@
 	</div>
 	<div class="label" style="width: 8%">IPI (%) :</div>
 	<div class="input" style="width: 5%">
-		<input type="text" id="aliquotaIPI" name="itemPedido.aliquotaIPI" value="${itemPedido.aliquotaIPI}" maxlength="2" />
+		<input type="text" id="aliquotaIPI" name="itemPedido.aliquotaIPI" value="${itemPedido.aliquotaIPIFormatado}" maxlength="2" />
 	</div>
 	<div class="label" style="width: 10%">ICMS (%) :</div>
 	<div class="input" style="width: 5%">
 		<input type="text" id="aliquotaICMS" name="itemPedido.aliquotaICMS"
-			value="${itemPedido.aliquotaICMS}" maxlength="2" />
+			value="${itemPedido.aliquotaICMSFormatado}" maxlength="2" />
 	</div>
 	<div class="bloco_botoes">
 		<a id="botaoInserirItemPedido" title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>

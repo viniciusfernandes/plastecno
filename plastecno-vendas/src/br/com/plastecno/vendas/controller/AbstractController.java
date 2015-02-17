@@ -126,6 +126,11 @@ public abstract class AbstractController {
         return this.result.included().containsKey(nomeAtributo);
     }
 
+    void formatarAliquotaItemPedido(ItemPedido item) {
+        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
+        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
+    }
+
     String formatarCNPJ(String conteudo) {
         return StringUtils.formatarCNPJ(conteudo);
     }
@@ -164,6 +169,7 @@ public abstract class AbstractController {
             this.formatarItemEstoque(item);
         }
     }
+    
 
     void formatarItemPedido(ItemPedido item) {
         item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));

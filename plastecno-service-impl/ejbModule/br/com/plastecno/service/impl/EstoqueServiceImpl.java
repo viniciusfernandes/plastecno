@@ -71,7 +71,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirItemPedido(Integer idItemPedido) throws BusinessException {
+	public Integer inserirItemPedido(Integer idItemPedido) throws BusinessException {
 		ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
 		if (itemPedido == null) {
 			throw new BusinessException("O item de pedido No: " + idItemPedido + " não existe no sistema");
@@ -104,6 +104,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		} else {
 			itemEstoqueDAO.alterar(itemEstoque);
 		}
+		return itemEstoque.getId();
 	}
 
 	private boolean isEquivalente(Double val1, Double val2) {
@@ -119,34 +120,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemEstoque i ");
-		if (idMaterial != null || formaMaterial != null) {
-			select.append("where ");
-		}
-
-		if (idMaterial != null) {
-			select.append("i.material.id = :idMaterial ");
-		}
-
-		if (formaMaterial != null && idMaterial != null) {
-			select.append("and i.formaMaterial = :formaMaterial ");
-		} else if (formaMaterial != null) {
-			select.append("i.formaMaterial = :formaMaterial ");
-		}
-
-		Query query = entityManager.createQuery(select.toString());
-		if (idMaterial != null) {
-			query.setParameter("idMaterial", idMaterial);
-		}
-
-		if (formaMaterial != null) {
-			query.setParameter("formaMaterial", formaMaterial);
-		}
-
-		return query.getResultList();
+		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial);
 	}
 
 	@Override

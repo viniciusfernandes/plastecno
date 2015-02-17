@@ -1,5 +1,7 @@
 package br.com.plastecno.service.test;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
@@ -10,6 +12,7 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
@@ -84,14 +87,61 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	}
 
+	private Integer pesquisarQuantidadeTotalItemEstoque(Integer idItemEstoque) {
+		ItemEstoque i = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		return i != null ? i.getQuantidade() : 0;
+
+	}
+
 	@Test
-	public void testInclusaoItemPedidoNoEstoque() {
+	public void testAlteracaoItemPedidoNoEstoque() {
 		ItemPedido i = gerarItemPedido();
+		Integer idItemEstoque = null;
 		try {
-			estoqueService.inserirItemPedido(i.getId());
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+
+		verificarQuantidadeTotalItemEstoque(i.getQuantidade(), idItemEstoque);
+		Integer estoqueAntes = pesquisarQuantidadeTotalItemEstoque(idItemEstoque);
+		i.setQuantidade(i.getQuantidade() + 100);
+		try {
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		estoqueAntes += i.getQuantidade();
+		verificarQuantidadeTotalItemEstoque(estoqueAntes, idItemEstoque);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoInexistenteNoEstoque() {
+		boolean throwed = false;
+		try {
+			estoqueService.inserirItemPedido(null);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Um item de pedido inexistente nao pode ser incluido no estoque", throwed);
+	}
+
+	@Test
+	public void testInclusaoItemPedidoNoEstoque() {
+		ItemPedido i = gerarItemPedido();
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		verificarQuantidadeTotalItemEstoque(i.getQuantidade(), idItemEstoque);
+	}
+
+	private void verificarQuantidadeTotalItemEstoque(Integer quantidade, Integer idItemEstoque) {
+		Integer quantidadeEstoque = pesquisarQuantidadeTotalItemEstoque(idItemEstoque);
+		assertEquals("As quantidades dos itens devem ser as mesmas apos inclusao no estoque", quantidade, quantidadeEstoque);
 
 	}
 }

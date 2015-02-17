@@ -21,18 +21,21 @@ import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.EnderecoDAO;
+import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.MaterialDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
@@ -156,6 +159,24 @@ class ServiceBuilder {
 
 	public EstoqueService buildEstoqueService() {
 		EstoqueServiceImpl estoqueService = new EstoqueServiceImpl();
+		new MockUp<ItemEstoqueDAO>() {
+			@Mock
+			public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+				List<ItemEstoque> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(ItemEstoque.class, "formaMaterial",
+						formaMaterial);
+				List<ItemEstoque> itens = new ArrayList<ItemEstoque>();
+				for (ItemEstoque item : lista) {
+					// A primeira condicao indica que se deseja todas as formas de
+					// materiais.
+					if (idMaterial == null || (item.getMaterial() != null && idMaterial.equals(item.getMaterial().getId()))) {
+						itens.add(item);
+					}
+				}
+				return itens;
+			}
+
+		};
+		inject(estoqueService, new ItemEstoqueDAO(null), "itemEstoqueDAO");
 		inject(estoqueService, buildPedidoService(), "pedidoService");
 		return estoqueService;
 	}

@@ -18,6 +18,7 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
+import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -49,14 +50,9 @@ public class RecepcaoCompraPendenteController extends AbstractController {
     public void inserirItemPedido(ItemPedido itemPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         try {
 
-            if (itemPedido.getAliquotaIPI() != null) {
-                itemPedido.setAliquotaIPI(itemPedido.getAliquotaIPI() / 100d);
-            }
-
-            if (itemPedido.getAliquotaICMS() != null) {
-                itemPedido.setAliquotaICMS(itemPedido.getAliquotaICMS() / 100);
-            }
-
+            itemPedido.setAliquotaIPI(NumeroUtils.gerarPercentual(itemPedido.getAliquotaIPI()));
+            itemPedido.setAliquotaICMS(NumeroUtils.gerarPercentual((itemPedido.getAliquotaICMS())));
+            
             pedidoService.inserirItemPedido(itemPedido);
             gerarMensagemSucesso("O item de compra foi alterado com sucesso. Essas alterações já podem ser incluidas no estoque.");
         } catch (BusinessException e) {

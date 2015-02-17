@@ -15,6 +15,7 @@ import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
@@ -46,7 +47,6 @@ public class RepresentadaController extends AbstractController {
 
     @Post("representada/inclusao")
     public void inserir(Representada representada, Logradouro logradouro, List<ContatoRepresentada> listaContato) {
-        final int cem = 100;
         try {
 
             if (hasAtributo(logradouro)) {
@@ -58,7 +58,7 @@ public class RepresentadaController extends AbstractController {
                 representada.addContato(listaContato);
             }
 
-            representada.setComissao(representada.getComissao() / cem);
+            representada.setComissao(NumeroUtils.gerarPercentual(representada.getComissao()));
 
             this.representadaService.inserir(representada);
             this.gerarMensagemCadastroSucesso(representada, "nomeFantasia");

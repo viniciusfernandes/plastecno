@@ -27,7 +27,7 @@ $(document).ready(function() {
 	inserirMascaraData('dataInicial');
 	inserirMascaraData('dataFinal');
 	
-	inserirMascaraMonetaria('precoVenda', 7);
+	inserirMascaraMonetaria('preco', 7);
 	inserirMascaraNumerica('ipi', '99');
 	inserirMascaraNumerica('quantidade', '9999999');
 	inserirMascaraMonetaria('comprimento', 8);

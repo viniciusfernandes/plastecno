@@ -163,6 +163,12 @@ public abstract class AbstractController {
         item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
         item.setPrecoMedioFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoMedio()));
     }
+    
+
+    void formatarAliquotaItemEstoque(ItemEstoque item) {
+        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
+        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
+    }
 
     void formatarItemEstoque(List<ItemEstoque> itens) {
         for (ItemEstoque item : itens) {

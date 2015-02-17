@@ -1,11 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <fieldset id="bloco_item_pedido">
 	<legend>::: Edição do Item de ${not isEstoque ? 'Compra': 'Estoque'} :::</legend>
-	<input type="hidden" id="idItemPedido" name="itemPedido.id" value="${itemPedido.id}"/>
 	<input type="hidden" id="idMaterial" name="itemPedido.material.id" value="${itemPedido.material.id}"/>
 	<input type="hidden" id="idFormaMaterial" name="itemPedido.formaMaterial" value="${itemPedido.formaMaterial}"/>
 	
 	<c:if test="${not isEstoque}">
+		<input type="hidden" id="idItemPedido" name="itemPedido.id" value="${itemPedido.id}"/>
 		<input type="hidden" id="idTipoVenda" name="itemPedido.tipoVenda" value="${itemPedido.tipoVenda}"/>
 		<input type="hidden" id="idDescricaoPeca" name="itemPedido.descricaoPeca" value="${itemPedido.descricaoPeca}"/>
 		<input type="hidden" id="itemSequencial" name="itemPedido.sequencial" value="${itemPedido.sequencial}"/>
@@ -63,8 +63,14 @@
 	</div>
 	<div class="label">Preço:</div>
 	<div class="input" style="width: 5%">
-		<input type="text" id="precoVenda" name="itemPedido.precoVenda"
-			value="${itemPedido.precoVenda}" maxlength="8" />
+		<c:choose>
+			<c:when test="${isEstoque}">
+				<input type="text" id="preco" name="itemPedido.precoMedio" value="${itemPedido.precoMedio}" maxlength="8" />
+			</c:when>
+			<c:otherwise>
+				<input type="text" id="preco" name="itemPedido.precoVenda" value="${itemPedido.precoVenda}" maxlength="8" />
+			</c:otherwise>
+		</c:choose>
 	</div>
 	<div class="label" style="width: 8%">IPI (%) :</div>
 	<div class="input" style="width: 5%">

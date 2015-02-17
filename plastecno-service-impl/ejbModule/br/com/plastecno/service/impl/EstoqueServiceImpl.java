@@ -21,6 +21,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
 public class EstoqueServiceImpl implements EstoqueService {
@@ -66,6 +67,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (itemEstoque == null) {
 			throw new BusinessException("Item de estoque nulo");
 		}
+		
+		ValidadorInformacao.validar(itemEstoque);
 
 		Integer idMaterial = itemEstoque.getMaterial().getId();
 		FormaMaterial formaMaterial = itemEstoque.getFormaMaterial();

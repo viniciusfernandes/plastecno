@@ -38,6 +38,7 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
+import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ClienteJson;
 import br.com.plastecno.vendas.json.ItemPedidoJson;
@@ -288,20 +289,13 @@ public class PedidoController extends AbstractController {
 
     @Post("pedido/item/inclusao")
     public void inserirItemPedido(Integer numeroPedido, ItemPedido itemPedido, Double aliquotaIPI) {
-        final int cem = 100;
         try {
             if (itemPedido.getMaterial().getId() == null) {
                 itemPedido.setMaterial(null);
             }
 
-            if (aliquotaIPI != null && aliquotaIPI > 0) {
-                aliquotaIPI /= cem;
-                itemPedido.setAliquotaIPI(aliquotaIPI);
-            }
-
-            if (itemPedido.getAliquotaICMS() != null) {
-                itemPedido.setAliquotaICMS(itemPedido.getAliquotaICMS() / cem);
-            }
+            itemPedido.setAliquotaIPI(NumeroUtils.gerarPercentual(aliquotaIPI));
+            itemPedido.setAliquotaICMS(NumeroUtils.gerarPercentual(itemPedido.getAliquotaICMS()));
 
             final Integer idItemPedido = this.pedidoService.inserirItemPedido(numeroPedido, itemPedido);
             itemPedido.setId(idItemPedido);

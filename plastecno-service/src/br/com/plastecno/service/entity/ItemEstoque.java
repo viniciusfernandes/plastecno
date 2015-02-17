@@ -46,6 +46,12 @@ public class ItemEstoque implements Serializable {
 	@Column(name = "medida_interna")
 	private Double medidaInterna;
 
+	@Transient
+	private String aliquotaIPIFormatado;
+
+	@Transient
+	private String aliquotaICMSFormatado;
+
 	@Column(name = "medida_externa")
 	private Double medidaExterna;
 
@@ -101,8 +107,16 @@ public class ItemEstoque implements Serializable {
 		return aliquotaICMS;
 	}
 
+	public String getAliquotaICMSFormatado() {
+		return aliquotaICMSFormatado;
+	}
+
 	public Double getAliquotaIPI() {
 		return aliquotaIPI;
+	}
+
+	public String getAliquotaIPIFormatado() {
+		return aliquotaIPIFormatado;
 	}
 
 	public Double getComprimento() {
@@ -219,8 +233,16 @@ public class ItemEstoque implements Serializable {
 		this.aliquotaICMS = aliquotaICMS;
 	}
 
+	public void setAliquotaICMSFormatado(String aliquotaICMSFormatado) {
+		this.aliquotaICMSFormatado = aliquotaICMSFormatado;
+	}
+
 	public void setAliquotaIPI(Double aliquotaIPI) {
 		this.aliquotaIPI = aliquotaIPI;
+	}
+
+	public void setAliquotaIPIFormatado(String aliquotaIPIFormatado) {
+		this.aliquotaIPIFormatado = aliquotaIPIFormatado;
 	}
 
 	public void setComprimento(Double comprimento) {

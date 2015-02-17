@@ -27,7 +27,17 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
+	$('#botaoLimparItemPedido').click(function () {
+		$('#bloco_item_pedido input:text').val('');
+		$('#formaMaterial').val('');
+	});
+	
 	$('#botaoInserirItemPedido').click(function () {
+		/*
+		if(isEmpty($('#idItemPedido').val())){
+			return;
+		}
+		*/
 		var parametros = $('#bloco_item_pedido').serialize();
 		parametros = $('#bloco_item_pedido').serialize();
 		parametros += '&'+$('#formPesquisa').serialize();
@@ -37,8 +47,9 @@ $(document).ready(function() {
 		$(form).submit();
 	});
 	
-	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	inicializarAutocompleteMaterial();
+	
+	<jsp:include page="/bloco/bloco_paginador.jsp" />
 });
 
 
@@ -87,8 +98,7 @@ function inicializarFiltro() {
 			<div class="input" style="width: 60%">
 				<input type="hidden" id="idMaterial" name="idMaterial" value="${idMaterial}"/>
 				<input type="text" id="material" name="descricaoMaterial" value="${descricaoMaterial}" style="width: 60%" />
-				<div class="suggestionsBox" id="containerPesquisaMaterial"
-					style="display: none; width: 50%"></div>
+				<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 			</div>
 		</fieldset>
 		<div class="bloco_botoes">

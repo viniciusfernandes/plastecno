@@ -299,7 +299,7 @@ public class PedidoController extends AbstractController {
                 itemPedido.setMaterial(null);
             }
 
-            if (aliquotaIPI != null && aliquotaIPI > 0) {
+            if (aliquotaIPI != null) {
                 aliquotaIPI /= cem;
                 itemPedido.setAliquotaIPI(aliquotaIPI);
             }

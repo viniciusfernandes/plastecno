@@ -293,8 +293,9 @@ public class PedidoController extends AbstractController {
             if (itemPedido.getMaterial().getId() == null) {
                 itemPedido.setMaterial(null);
             }
-
-            itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
+            if (aliquotaIPI != null) {
+                itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
+            }
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
 
             final Integer idItemPedido = this.pedidoService.inserirItemPedido(numeroPedido, itemPedido);

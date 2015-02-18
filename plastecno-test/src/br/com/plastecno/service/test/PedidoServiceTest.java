@@ -595,6 +595,30 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoItemPedidoIPINuloMaterialImportadoRepresentadaIPIOcasional() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Material material = gerarMaterial(pedido.getRepresentada());
+		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		itemPedido.setMaterial(material);
+		itemPedido.setAliquotaIPI(null);
+
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		Double ipi = itemPedido.getFormaMaterial().getIpi();
+		assertEquals("O IPI nao foi enviado e deve ser o valor default apos a inclusao", ipi, itemPedido.getAliquotaIPI());
+	}
+
+	@Test
 	public void testInclusaoItemPedidoIPINuloRepresentadaComIPIObrigatorio() {
 		Pedido pedido = eBuilder.buildPedido();
 		associarVendedor(pedido.getCliente());
@@ -634,6 +658,30 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 		assertTrue("O IPI do item nao confere com o IPI da forma de material escolhida",
 				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI().doubleValue());
+	}
+
+	@Test
+	public void testInclusaoItemPedidoIPIZeradoMaterialImportadoRepresentadaIPIOcasional() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Material material = gerarMaterial(pedido.getRepresentada());
+		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		itemPedido.setMaterial(material);
+		itemPedido.setAliquotaIPI(0d);
+
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		Double ipi = 0d;
+		assertEquals("O IPI foi enviado zerado e deve ser o mesmo apos a inclusao", ipi, itemPedido.getAliquotaIPI());
 	}
 
 	@Test

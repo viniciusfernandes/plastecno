@@ -82,8 +82,11 @@
 			value="${itemPedido.aliquotaICMSFormatado}" maxlength="2" />
 	</div>
 	<div class="bloco_botoes">
-		<a id="botaoInserirItemPedido" title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>
-		<a id="botaoLimparItemPedido" title="Limpar Dados do Item do Pedido" class="botaoLimpar"></a>
+		<a id="botaoInserirItemPedido" title="Adicionar Dados do Item" class="botaoAdicionar"></a>
+		<c:if test="${acessoRedefinicaoItemPermitido}">
+			<a id="botaoRefazerItemPedido" title="Redefinir os Dados do Item" class="botaoRefazer"></a>
+		</c:if>
+		<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
 	</div>
 
 </fieldset>

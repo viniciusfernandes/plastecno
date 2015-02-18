@@ -174,7 +174,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (itemEstoque.isMedidaExternaIgualInterna()) {
 			itemEstoque.setMedidaInterna(itemEstoque.getMedidaExterna());
 		}
-
+		
 		itemEstoqueDAO.alterar(itemEstoque);
 	}
 }

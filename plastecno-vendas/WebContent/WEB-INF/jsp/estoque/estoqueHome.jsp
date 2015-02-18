@@ -14,14 +14,20 @@
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 
 <script type="text/javascript">
 
 $(document).ready(function() {
 	scrollTo('${ancora}');
+	
+	<c:if test="${not empty itemPedido.id}">
+	habilitarCamposEdicaoItem(false);
+	</c:if>
+	
 	
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();
@@ -30,6 +36,8 @@ $(document).ready(function() {
 	$('#botaoLimparItemPedido').click(function () {
 		$('#bloco_item_pedido input:text').val('');
 		$('#formaMaterial').val('');
+		$('#idItemPedido').val('');
+		habilitarCamposEdicaoItem(true);
 	});
 	
 	$('#botaoInserirItemPedido').click(function () {
@@ -47,20 +55,55 @@ $(document).ready(function() {
 		$(form).submit();
 	});
 	
+	$('#botaoRefazerItemPedido').click(function () {
+		if(isEmpty($('#idItemPedido').val())){
+			return;
+		}
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REDEFINIR esse item, pois o estoque terá seu valor alterado?',
+			confirmar: function(){
+				var parametros = $('#bloco_item_pedido').serialize();
+				parametros = $('#bloco_item_pedido').serialize();
+				parametros += '&'+$('#formPesquisa').serialize();
+				var form = $('#formVazio');
+				$(form).attr('method', 'post');
+				$(form).attr('action', '<c:url value="/estoque/item/redefinicao"/>?'+parametros);
+				$(form).submit();	
+			}
+		});
+	});
 	inicializarAutocompleteMaterial();
 	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 });
 
+function habilitarCamposEdicaoItem(habilitado){
+	habilitar('#bloco_item_pedido #formaMaterial', habilitado);
+	habilitar('#bloco_item_pedido #descricao', habilitado);
+	habilitar('#bloco_item_pedido #material', habilitado);
+	habilitar('#bloco_item_pedido #medidaExterna', habilitado);
+	habilitar('#bloco_item_pedido #medidaInterna', habilitado);
+	habilitar('#bloco_item_pedido #comprimento', habilitado);
+};
 
 function inicializarAutocompleteMaterial() {
 	autocompletar({
 		url : '<c:url value="/estoque/material/listagem"/>',
-		campoPesquisavel : 'material',
+		campoPesquisavel : 'formPesquisa #material',
 		parametro : 'sigla',
-		containerResultados : 'containerPesquisaMaterial',
+		containerResultados : 'formPesquisa #containerPesquisaMaterial',
 		selecionarItem : function(itemLista) {
-			$('#idMaterial').val(itemLista.id);
+			$('#formPesquisa #idMaterial').val(itemLista.id);
+		}
+	});
+	
+	autocompletar({
+		url : '<c:url value="/estoque/material/listagem"/>',
+		campoPesquisavel : 'bloco_item_pedido #material',
+		parametro : 'sigla',
+		containerResultados : 'bloco_item_pedido #containerPesquisaMaterial',
+		selecionarItem : function(itemLista) {
+			$('#bloco_item_pedido #idMaterial').val(itemLista.id);
 		}
 	});
 };

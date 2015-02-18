@@ -50,8 +50,8 @@ public class RecepcaoCompraPendenteController extends AbstractController {
     public void inserirItemPedido(ItemPedido itemPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         try {
 
-            itemPedido.setAliquotaIPI(NumeroUtils.gerarPercentual(itemPedido.getAliquotaIPI()));
-            itemPedido.setAliquotaICMS(NumeroUtils.gerarPercentual((itemPedido.getAliquotaICMS())));
+            itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
+            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota((itemPedido.getAliquotaICMS())));
             
             pedidoService.inserirItemPedido(itemPedido);
             gerarMensagemSucesso("O item de compra foi alterado com sucesso. Essas alterações já podem ser incluidas no estoque.");

@@ -10,9 +10,11 @@ import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -32,6 +34,7 @@ public class EstoqueController extends AbstractController {
     public void estoqueHome() {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("isEstoque", true);
+        verificarPermissaoAcesso("acessoRedefinicaoItemPermitido", TipoAcesso.ADMINISTRACAO);
     }
 
     @Post("estoque/item/edicao")
@@ -41,7 +44,9 @@ public class EstoqueController extends AbstractController {
             gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
+            
         }
+        addAtributo("permanecerTopo", true);
         redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
     }
 
@@ -87,5 +92,26 @@ public class EstoqueController extends AbstractController {
             }
         }
         serializarJson(new SerializacaoJson("lista", lista));
+    }
+
+    @Post("estoque/item/redefinicao")
+    public void redefinirItemEstoque(ItemEstoque itemPedido, Integer idMaterial, FormaMaterial formaMaterial) {
+        try {
+            itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
+            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
+            estoqueService.redefinirItemEstoque(itemPedido);
+            
+            itemPedido.setMaterial(materialService.pesquisarById(itemPedido.getMaterial().getId()));
+            formatarItemEstoque(itemPedido);
+            
+            String descricaoItem = itemPedido.isPeca() ? itemPedido.getDescricaoPeca() : itemPedido.getDescricao();
+            gerarMensagemSucesso("O item de estoque \"" + descricaoItem
+                    + "\" foi redefinido e o estoque teve seus valores alterados com sucesso");
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+        addAtributo("permanecerTopo", true);
+        redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
+
     }
 }

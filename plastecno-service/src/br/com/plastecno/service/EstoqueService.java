@@ -23,4 +23,6 @@ public interface EstoqueService {
 	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
+
+	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 }

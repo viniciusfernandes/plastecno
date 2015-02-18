@@ -377,6 +377,13 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 
+		ItemPedido itemPedido = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
 		try {
 			pedidoService.enviar(idPedido, new byte[] {});
 		} catch (BusinessException e) {
@@ -500,6 +507,13 @@ public class PedidoServiceTest extends AbstractTest {
 
 		try {
 			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido itemPedido = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

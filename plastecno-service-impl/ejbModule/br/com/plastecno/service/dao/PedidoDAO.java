@@ -247,6 +247,35 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Object[]> pesquisarTotalPedidoByPeriodo(Date dataInicio, Date dataFim, boolean isCompra) {
+		StringBuilder select = new StringBuilder();
+		select.append("select v.nome, r.nomeFantasia, sum(p.valorPedido) from Pedido p ");
+		select.append("inner join p.representada r ");
+		select.append("inner join p.proprietario v ");
+		select.append("where p.dataEnvio >= :dataInicio and p.dataEnvio <= :dataFim ");
+		select.append("and p.situacaoPedido = :situacaoEnviado ");
+
+		SituacaoPedido situacaoPedido = null;
+		if (isCompra) {
+			select.append("and p.tipoPedido = :tipoPedido ");
+			situacaoPedido = SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO;
+		} else {
+			select.append("and p.tipoPedido != :tipoPedido ");
+			situacaoPedido = SituacaoPedido.ENVIADO;
+		}
+
+		select.append("group by v.nome, r.nomeFantasia ");
+		select.append("order by v.nome ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("dataInicio", dataInicio);
+		query.setParameter("dataFim", dataFim);
+		query.setParameter("situacaoEnviado", situacaoPedido);
+		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+		return query.getResultList();
+	}
+
 	public Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery(
@@ -299,5 +328,4 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		query.setParameter("idPedido", idPedido);
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
 	}
-
 }

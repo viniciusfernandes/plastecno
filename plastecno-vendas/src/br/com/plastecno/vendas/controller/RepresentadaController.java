@@ -58,7 +58,7 @@ public class RepresentadaController extends AbstractController {
                 representada.addContato(listaContato);
             }
 
-            representada.setComissao(NumeroUtils.gerarPercentual(representada.getComissao()));
+            representada.setComissao(NumeroUtils.gerarAliquota(representada.getComissao()));
 
             this.representadaService.inserir(representada);
             this.gerarMensagemCadastroSucesso(representada, "nomeFantasia");

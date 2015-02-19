@@ -38,10 +38,20 @@ public class EstoqueController extends AbstractController {
     }
 
     @Post("estoque/item/edicao")
-    public void inserirItemEstoque(ItemEstoque itemPedido, Integer idMaterial, FormaMaterial formaMaterial) {
+    public void inserirItemEstoque(Integer quantidade, Double preco, Double aliquotaIPI, Double aliquotaICMS,
+            Integer idItem, Integer idMaterial, FormaMaterial formaMaterial) {
         try {
-            estoqueService.inserirItemEstoque(itemPedido);
-            gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
+            ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
+            if (itemEstoque == null) {
+                gerarListaMensagemErro("O item de estoque não foi encontrado.");
+            } else {
+                itemEstoque.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
+                itemEstoque.setAliquotaICMS(NumeroUtils.gerarAliquota(aliquotaICMS));
+                itemEstoque.setQuantidade(quantidade);
+                itemEstoque.setPrecoMedio(preco);
+                estoqueService.inserirItemEstoque(itemEstoque);
+                gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
+            }
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
 

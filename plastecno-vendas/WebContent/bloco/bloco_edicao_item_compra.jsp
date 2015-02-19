@@ -2,7 +2,10 @@
 <fieldset id="bloco_item_pedido">
 	<legend>::: Edição do Item de ${not isEstoque ? 'Compra': 'Estoque'} :::</legend>
 	<input type="hidden" id="idMaterial" name="itemPedido.material.id" value="${itemPedido.material.id}"/>
-	<input type="hidden" id="idFormaMaterial" name="itemPedido.formaMaterial" value="${itemPedido.formaMaterial}"/>
+	<c:if test="${not empty itemPedido}">
+		<!-- INCLUI ESSE CAMPO OCULTO COM A FORMA DE MATERIAL POIS A EDICAO DESABILITA O CAMPO E NO SUBMIT TEMOS QUE MANTER A INFORMACAO -->
+		<input type="hidden" id="idFormaMaterial" name="itemPedido.formaMaterial" value="${itemPedido.formaMaterial}"/>
+	</c:if>
 	<input type="hidden" id="idItemPedido" name="itemPedido.id" value="${itemPedido.id}"/>
 	
 	<c:if test="${not isEstoque}">

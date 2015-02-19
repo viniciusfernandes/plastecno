@@ -46,9 +46,13 @@ $(document).ready(function() {
 			return;
 		}
 		*/
-		var parametros = $('#bloco_item_pedido').serialize();
-		parametros = $('#bloco_item_pedido').serialize();
-		parametros += '&'+$('#formPesquisa').serialize();
+		var parametros = $('#formPesquisa').serialize();
+		parametros += '&idItem='+$('#bloco_item_pedido #idItemPedido').val();
+		parametros += '&quantidade='+$('#bloco_item_pedido #quantidade').val();
+		parametros += '&aliquotaIPI='+$('#bloco_item_pedido #aliquotaIPI').val();
+		parametros += '&aliquotaICMS='+$('#bloco_item_pedido #aliquotaICMS').val();
+		parametros += '&preco='+$('#bloco_item_pedido #preco').val();
+		
 		var form = $('#formVazio');
 		$(form).attr('method', 'post');
 		$(form).attr('action', '<c:url value="/estoque/item/edicao"/>?'+parametros);
@@ -63,7 +67,6 @@ $(document).ready(function() {
 			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REDEFINIR esse item, pois o estoque terá seu valor alterado?',
 			confirmar: function(){
 				var parametros = $('#bloco_item_pedido').serialize();
-				parametros = $('#bloco_item_pedido').serialize();
 				parametros += '&'+$('#formPesquisa').serialize();
 				var form = $('#formVazio');
 				$(form).attr('method', 'post');
@@ -177,12 +180,14 @@ function inicializarFiltro() {
 							<td>${item.descricao}</td>
 							<td>${item.precoMedioFormatado}</td>
 							<td>
+								<c:if test="${acessoRedefinicaoItemPermitido}">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/estoque/item/${item.id}"/>">
 										<input type="submit" id="botaoEditarCliente"
 											title="Editar Dados do Cliente" value="" class="botaoEditar" />
 									</form>
 								</div>
+								</c:if>
 							</td>
 						</tr>
 

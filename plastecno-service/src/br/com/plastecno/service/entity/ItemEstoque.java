@@ -89,6 +89,7 @@ public class ItemEstoque implements Serializable {
 	private String comprimentoFormatado;
 
 	public ItemEstoque() {
+		System.out.print("KKKKKKKKKKKKKKKKKKKKKKKK");
 	}
 
 	public ItemEstoque(FormaMaterial formaMaterial) {

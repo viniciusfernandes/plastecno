@@ -63,6 +63,7 @@ public class Pedido implements Serializable, Cloneable {
 
 	@InformacaoValidavel(intervalo = { 0, 800 }, nomeExibicao = "Observacao do pedido")
 	private String observacao;
+
 	/*
 	 * Atributo criado para usar em relatorios evitando o calculo do pedido
 	 */
@@ -145,6 +146,22 @@ public class Pedido implements Serializable, Cloneable {
 
 	@Transient
 	private String valorPedidoIPIFormatado;
+
+	public Pedido() {
+	}
+
+	public Pedido(Integer id, Date dataEntrega, Double valorPedido, String nomeFantasiaCliente,String razaoSocialCliente, String nomeFantasiaRepresentada) {
+		this.id = id;
+		this.dataEntrega = dataEntrega;
+		this.valorPedido = valorPedido;
+		
+		this.cliente = new Cliente();
+		this.cliente.setNomeFantasia(nomeFantasiaCliente);
+		this.cliente.setRazaoSocial(razaoSocialCliente);
+		
+		this.representada = new Representada();
+		this.representada.setRazaoSocial(nomeFantasiaRepresentada);
+	}
 
 	public void addLogradouro(List<? extends Logradouro> listaLogradouro) {
 		for (Logradouro logradouro : listaLogradouro) {

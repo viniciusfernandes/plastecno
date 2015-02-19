@@ -83,7 +83,7 @@
 	</div>
 	<div class="bloco_botoes">
 		<a id="botaoInserirItemPedido" title="Adicionar Dados do Item" class="botaoAdicionar"></a>
-		<c:if test="${acessoRedefinicaoItemPermitido}">
+		<c:if test="${not empty itemPedido.id and acessoRedefinicaoItemPermitido}">
 			<a id="botaoRefazerItemPedido" title="Redefinir os Dados do Item" class="botaoRefazer"></a>
 		</c:if>
 		<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>

@@ -2,7 +2,6 @@ package br.com.plastecno.service.impl.relatorio;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -13,7 +12,6 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
-import br.com.plastecno.service.dao.RelatorioVendasDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -55,8 +53,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@EJB
 	private UsuarioService usuarioService;
-
-	private RelatorioVendasDAO relatorioVendasDAO;
 
 	@Override
 	public RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade)
@@ -125,7 +121,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@Override
 	public RelatorioVendaPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException {
 
-		final List<Object[]> resultados = this.relatorioVendasDAO.pesquisarVendas(periodo.getInicio(), periodo.getFim());
+		final List<Object[]> resultados = pedidoService.pesquisarTotalVendaResumidaByPeriodo(periodo);
 
 		final StringBuilder titulo = new StringBuilder();
 		titulo.append("Relatório das Vendas do Período de ");
@@ -161,7 +157,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 				.append(StringUtils.formatarData(periodo.getFim()));
 
 		final RelatorioVendaVendedorByRepresentada relatorio = new RelatorioVendaVendedorByRepresentada(titulo.toString());
-		List<Pedido> listaPedido = this.pedidoService.pesquisarByPeriodoEVendedor(orcamento, periodo, idVendedor);
+		List<Pedido> listaPedido = this.pedidoService.pesquisarVendaByPeriodoEVendedor(orcamento, periodo, idVendedor);
 		for (Pedido pedido : listaPedido) {
 			try {
 				pedido.setDataEnvioFormatada(StringUtils.formatarData(pedido.getDataEnvio()));
@@ -172,11 +168,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 
 		return relatorio;
-	}
-
-	@PostConstruct
-	public void init() {
-		relatorioVendasDAO = new RelatorioVendasDAO(this.entityManager);
 	}
 
 	@Override

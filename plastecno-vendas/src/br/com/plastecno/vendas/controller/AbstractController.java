@@ -3,6 +3,7 @@ package br.com.plastecno.vendas.controller;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -118,12 +119,28 @@ public abstract class AbstractController {
         cliente.setVendedor(vendedor);
     }
 
+    void configurarFiltroPediodoMensal() {
+        if (!contemAtributo("dataInicial") && !contemAtributo("dataFinal")) {
+            Calendar dataInicial = Calendar.getInstance();
+            dataInicial.set(Calendar.DAY_OF_MONTH, 1);
+
+            addAtributo("dataInicial", StringUtils.formatarData(dataInicial.getTime()));
+            addAtributo("dataFinal", StringUtils.formatarData(new Date()));
+
+        }
+    }
+
     void configurarPaginacao() {
 
     }
 
     boolean contemAtributo(String nomeAtributo) {
         return this.result.included().containsKey(nomeAtributo);
+    }
+
+    void formatarAliquotaItemEstoque(ItemEstoque item) {
+        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
+        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
     }
 
     void formatarAliquotaItemPedido(ItemPedido item) {
@@ -163,19 +180,12 @@ public abstract class AbstractController {
         item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
         item.setPrecoMedioFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoMedio()));
     }
-    
-
-    void formatarAliquotaItemEstoque(ItemEstoque item) {
-        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
-        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
-    }
 
     void formatarItemEstoque(List<ItemEstoque> itens) {
         for (ItemEstoque item : itens) {
             this.formatarItemEstoque(item);
         }
     }
-    
 
     void formatarItemPedido(ItemPedido item) {
         item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));

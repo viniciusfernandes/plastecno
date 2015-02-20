@@ -1,8 +1,8 @@
 package br.com.plastecno.service.wrapper;
 
-public class VendaRepresentadaWrapper extends Grupo{
+public class RepresentadaValorWrapper extends Grupo{
 
-	public VendaRepresentadaWrapper(String nome, Double valor) {
+	public RepresentadaValorWrapper(String nome, Double valor) {
 		super(nome, valor);
 	}
 

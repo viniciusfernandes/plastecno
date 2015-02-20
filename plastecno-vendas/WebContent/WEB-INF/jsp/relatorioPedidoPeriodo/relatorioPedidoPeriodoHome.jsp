@@ -26,12 +26,14 @@
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-	<form id="formVazio" action="<c:url value="/relatorio/venda/periodo"/>"></form>
+	<form id="formVazio" action="<c:url value="/relatorio/pedido/periodo"/>">
+		<input type="hidden" name="isCompra" value="${isCompra}"/>
+	</form>
 
-	<form action="<c:url value="/relatorio/venda/periodo/listagem"/>"
-		method="get">
+	<form action="<c:url value="/relatorio/pedido/periodo/listagem"/>" method="get">
+		<input type="hidden" name="isCompra" value="${isCompra}"/>
 		<fieldset>
-			<legend>::: Relatório de Vendas por Período :::</legend>
+			<legend>::: Relatório de ${isCompra ? 'Compras' : 'Vendas'} por Período :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="dataInicial" name="dataInicial"
@@ -47,20 +49,20 @@
 		<div class="bloco_botoes">
 			<input type="submit" value="" class="botaoPesquisar" /> <input
 				id="botaoLimpar" type="button" value=""
-				title="Limpar Dados de Geração do Relatório de Vendas"
+				title="Limpar Dados de Geração do Relatório de ${isCompra ? 'Compras' : 'Vendas'} por Período"
 				class="botaoLimpar" />
 		</div>
 	</form>
 
 	<a id="rodape"></a>
-	<c:if test="${relatorioGerado}">
+	<c:if test="${not empty relatorio}">
 		<table class="listrada">
 			<caption>${relatorio.titulo}</caption>
 			<thead>
 				<tr>
-					<th style="width: 40%">Vendedor</th>
-					<th style="width: 30%">Representada</th>
-					<th>Valor Venda (R$)</th>
+					<th style="width: 40%">${isCompra ? 'Comprador' : 'Vendedor'}</th>
+					<th style="width: 30%">${isCompra ? 'Fornecedor' : 'Representada'}</th>
+					<th>Valor ${isCompra ? 'Compras' : 'Vendas'} (R$)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -91,10 +93,10 @@
 		</table>
 
 		<table class="listrada">
-			<caption>Total de Vendas por Representada</caption>
+			<caption>Total de ${isCompra ? 'Compras por Fornecedor' : 'Vendas por Representada'}</caption>
 			<thead>
 				<tr>
-					<th>Representada</th>
+					<th>${isCompra ? 'Fornecedor' : 'Representada'}</th>
 					<th>Total (R$)</th>
 				</tr>
 			</thead>

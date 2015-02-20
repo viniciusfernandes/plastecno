@@ -32,4 +32,5 @@ public class RelatorioWrapper<T, K> {
 	public String getTitulo() {
 		return titulo;
 	}
+
 }

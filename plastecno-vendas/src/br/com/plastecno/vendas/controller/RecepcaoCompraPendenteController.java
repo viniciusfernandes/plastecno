@@ -109,14 +109,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
     public void recepcaoCompraPendenteHome() {
         // Pode ser que essas datas ja tenham sido preenchidas em outra
         // navegacao pois esse metodo eh reaproveitado.
-        if (!contemAtributo("dataInicial") && !contemAtributo("dataFinal")) {
-            Calendar dataInicial = Calendar.getInstance();
-            dataInicial.set(Calendar.DAY_OF_MONTH, 1);
-
-            addAtributo("dataInicial", StringUtils.formatarData(dataInicial.getTime()));
-            addAtributo("dataFinal", StringUtils.formatarData(new Date()));
-
-        }
+        configurarFiltroPediodoMensal();
         addAtributo("listaRepresentada", representadaService.pesquisarRepresentada());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
     }

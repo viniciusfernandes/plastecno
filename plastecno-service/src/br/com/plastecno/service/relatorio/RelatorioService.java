@@ -12,7 +12,7 @@ import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
-import br.com.plastecno.service.wrapper.RelatorioVendaPeriodo;
+import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 
 @Local
@@ -22,7 +22,9 @@ public interface RelatorioService {
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraPendente(Integer idRepresentada, Periodo periodo);
 
-	RelatorioVendaPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException;
+	RelatorioPedidoPeriodo gerarRelatorioCompraPeriodo(Periodo periodo) throws BusinessException;
+
+	RelatorioPedidoPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException;
 
 	RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,
 			Integer idVendedor) throws BusinessException;

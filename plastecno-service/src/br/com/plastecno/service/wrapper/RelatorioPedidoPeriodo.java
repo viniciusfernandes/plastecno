@@ -9,18 +9,18 @@ import java.util.Set;
 
 import br.com.plastecno.service.wrapper.exception.AgrupamentoException;
 
-public class RelatorioVendaPeriodo {
-    private final Agrupamento<VendedorWrapper, VendaRepresentadaWrapper> agrupamento;
+public class RelatorioPedidoPeriodo {
+    private final Agrupamento<VendedorWrapper, RepresentadaValorWrapper> agrupamento;
 
-    public RelatorioVendaPeriodo(String titulo) {
-        this.agrupamento = new Agrupamento<VendedorWrapper, VendaRepresentadaWrapper>(titulo);
+    public RelatorioPedidoPeriodo(String titulo) {
+        this.agrupamento = new Agrupamento<VendedorWrapper, RepresentadaValorWrapper>(titulo);
     }
 
-    public void addVenda(String nomeVendedor, VendaRepresentadaWrapper venda) throws AgrupamentoException {
+    public void addVenda(String nomeVendedor, RepresentadaValorWrapper venda) throws AgrupamentoException {
         this.agrupamento.addSubgrupo(nomeVendedor, venda, VendedorWrapper.class);
     }
 
-    public List<VendaRepresentadaWrapper> getListaVendaRepresentada() {
+    public List<RepresentadaValorWrapper> getListaVendaRepresentada() {
         final Map<String, Double> mapaValor = new HashMap<String, Double>();
         Double valor = null;
         for (VendedorWrapper vendedor : this.agrupamento.getListaGrupo()) {
@@ -30,10 +30,10 @@ public class RelatorioVendaPeriodo {
             }
         }
 
-        final List<VendaRepresentadaWrapper> listaVenda = new ArrayList<VendaRepresentadaWrapper>();
+        final List<RepresentadaValorWrapper> listaVenda = new ArrayList<RepresentadaValorWrapper>();
         Set<Entry<String, Double>> entrySet = mapaValor.entrySet();
         for (Entry<String, Double> entry : entrySet) {
-            listaVenda.add(new VendaRepresentadaWrapper(entry.getKey(), entry.getValue()));
+            listaVenda.add(new RepresentadaValorWrapper(entry.getKey(), entry.getValue()));
         }
 
         return listaVenda;

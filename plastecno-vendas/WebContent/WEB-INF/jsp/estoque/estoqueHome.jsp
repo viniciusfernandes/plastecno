@@ -118,9 +118,6 @@ function inicializarFiltro() {
 	$("#filtro_email").val($("#email").val());
 };
 
-function editarItem(botao){
-	submeterForm(botao);
-};
 </script>
 </head>
 <body>
@@ -186,9 +183,11 @@ function editarItem(botao){
 							<td>
 								<c:if test="${acessoRedefinicaoItemPermitido}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/estoque/item/${item.id}"/>">
-										<input type="button" id="botaoEditarCliente" title="Editar Dados do Cliente" value="" 
-											class="botaoEditar" onclick="editarItem(this);"/>
+									<form action="<c:url value="/estoque/item/${item.id}"/>" method="get">
+										<input type="hidden" name="idMaterial" value="${idMaterial}"/>
+										<input type="hidden" name="formaMaterial" value="${formaSelecionada}"/>
+						
+										<input type="submit" id="botaoEditarCliente" title="Editar Dados do Cliente" value="" class="botaoEditar"/>
 									</form>
 								</div>
 								</c:if>

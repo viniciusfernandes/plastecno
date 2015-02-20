@@ -36,6 +36,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			select.append("i.formaMaterial = :formaMaterial ");
 		}
 
+		select.append("order by i.formaMaterial, i.material.sigla , i.precoMedio asc");
 		Query query = entityManager.createQuery(select.toString());
 		if (idMaterial != null) {
 			query.setParameter("idMaterial", idMaterial);
@@ -44,6 +45,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		if (formaMaterial != null) {
 			query.setParameter("formaMaterial", formaMaterial);
 		}
+		
 
 		return query.getResultList();
 	}

@@ -38,8 +38,19 @@ public class EstoqueServiceImpl implements EstoqueService {
 		final double valorItem = itemIncluido.getQuantidade() * itemIncluido.getPrecoMedio();
 		final double quantidadeTotal = itemCadastrado.getQuantidade() + itemIncluido.getQuantidade();
 		final double precoMedio = (valorEstoque + valorItem) / quantidadeTotal;
+		
+		final double ipiEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getAliquotaIPI();
+		final double ipiItem = itemIncluido.getQuantidade() * itemIncluido.getAliquotaIPI();
+		final double ipiMedio = (ipiEstoque + ipiItem) / quantidadeTotal;
 
+		final double icmsEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getAliquotaICMS();
+		final double icmsItem = itemIncluido.getQuantidade() * itemIncluido.getAliquotaICMS();
+		final double icmsMedio = (icmsEstoque + icmsItem) / quantidadeTotal;
+
+		
 		itemCadastrado.setPrecoMedio(precoMedio);
+		itemCadastrado.setAliquotaIPI(ipiMedio);
+		itemCadastrado.setAliquotaICMS(icmsMedio);
 		itemCadastrado.setQuantidade((int) quantidadeTotal);
 	}
 

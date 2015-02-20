@@ -78,13 +78,6 @@ function recepcionarItem(botao){
 	});
 };
 
-function submeterForm(botao){
-	var parametros = $('#formPesquisa').serialize();
-	var form = $(botao).closest('form');
-	var action = $(form).attr('action')+'?'+parametros;
-	$(form).attr('action', action).submit();
-};
-
 </script>
 </head>
 <body>

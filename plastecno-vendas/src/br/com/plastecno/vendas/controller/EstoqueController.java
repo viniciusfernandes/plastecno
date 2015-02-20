@@ -38,8 +38,8 @@ public class EstoqueController extends AbstractController {
     }
 
     @Post("estoque/item/edicao")
-    public void inserirItemEstoque(Integer quantidade, Double preco, Double aliquotaIPI, Double aliquotaICMS,
-            Integer idItem, Integer idMaterial, FormaMaterial formaMaterial) {
+    public void inserirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
+            Double aliquotaICMS, Integer idMaterial, FormaMaterial formaMaterial) {
         try {
             ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
             if (itemEstoque == null) {
@@ -49,7 +49,7 @@ public class EstoqueController extends AbstractController {
                 itemEstoque.setAliquotaICMS(NumeroUtils.gerarAliquota(aliquotaICMS));
                 itemEstoque.setQuantidade(quantidade);
                 itemEstoque.setPrecoMedio(preco);
-                estoqueService.inserirItemEstoque(itemEstoque);
+                estoqueService.redefinirItemEstoque(itemEstoque);
                 gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
             }
         } catch (BusinessException e) {
@@ -60,23 +60,43 @@ public class EstoqueController extends AbstractController {
         redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
     }
 
+    @Post("estoque/item/inclusao")
+    public void inserirItemEstoque(ItemEstoque itemPedido, Integer idMaterial, FormaMaterial formaMaterial) {
+        try {
+            itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
+            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
+            estoqueService.inserirItemEstoque(itemPedido);
+            gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            addAtributo("itemPedido", itemPedido);
+        }
+        addAtributo("permanecerTopo", true);
+        redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
+    }
+
     @Get("estoque/item/listagem")
     public void pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-        List<ItemEstoque> lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
-        formatarItemEstoque(lista);
-        Material material = materialService.pesquisarById(idMaterial);
+        if (idMaterial == null && formaMaterial == null) {
+            gerarListaMensagemErro("Escolha o material e/ou forma de material. Não é possível pesquisar o estoque inteiro.");
+            addAtributo("permanecerTopo", true);
+        } else {
+            List<ItemEstoque> lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
+            formatarItemEstoque(lista);
+            Material material = materialService.pesquisarById(idMaterial);
 
-        addAtributo("formaSelecionada", formaMaterial);
-        addAtributo("listaItemEstoque", lista);
-        addAtributo("idMaterial", idMaterial);
-        addAtributo("descricaoMaterial", material != null ? material.getDescricaoFormatada() : "");
+            addAtributo("formaSelecionada", formaMaterial);
+            addAtributo("listaItemEstoque", lista);
+            addAtributo("idMaterial", idMaterial);
+            addAtributo("descricaoMaterial", material != null ? material.getDescricaoFormatada() : "");
+        }
 
-        estoqueHome();
         if (contemAtributo("permanecerTopo")) {
             irTopoPagina();
         } else {
             irRodapePagina();
         }
+        estoqueHome();
     }
 
     @Get("estoque/item/{idItemEstoque}")
@@ -102,26 +122,5 @@ public class EstoqueController extends AbstractController {
             }
         }
         serializarJson(new SerializacaoJson("lista", lista));
-    }
-
-    @Post("estoque/item/redefinicao")
-    public void redefinirItemEstoque(ItemEstoque itemPedido, Integer idMaterial, FormaMaterial formaMaterial) {
-        try {
-            itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
-            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
-            estoqueService.redefinirItemEstoque(itemPedido);
-
-            itemPedido.setMaterial(materialService.pesquisarById(itemPedido.getMaterial().getId()));
-            formatarItemEstoque(itemPedido);
-
-            String descricaoItem = itemPedido.isPeca() ? itemPedido.getDescricaoPeca() : itemPedido.getDescricao();
-            gerarMensagemSucesso("O item de estoque \"" + descricaoItem
-                    + "\" foi redefinido e o estoque teve seus valores alterados com sucesso");
-        } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
-        }
-        addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
-
     }
 }

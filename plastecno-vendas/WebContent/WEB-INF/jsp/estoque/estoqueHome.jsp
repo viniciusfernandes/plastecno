@@ -41,40 +41,40 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoInserirItemPedido').click(function () {
-		/*
+
 		if(isEmpty($('#idItemPedido').val())){
-			return;
+			inicializarModalConfirmacao({
+				mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ADICIONAR esse item, pois o estoque terá seu valor alterado?',
+				confirmar: function(){
+					var parametros = $('#formPesquisa').serialize();
+					parametros += '&'+$('#bloco_item_pedido').serialize();
+					
+					var form = $('#formVazio');
+					$(form).attr('method', 'post');
+					$(form).attr('action', '<c:url value="/estoque/item/inclusao"/>?'+parametros);
+					$(form).submit();
+				}
+			});
+		} else {
+			inicializarModalConfirmacao({
+				mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REDEFINIR esse item, pois o estoque terá seu valor alterado?',
+				confirmar: function(){
+					var parametros = $('#formPesquisa').serialize();
+					parametros += '&idItem='+$('#bloco_item_pedido #idItemPedido').val();
+					parametros += '&quantidade='+$('#bloco_item_pedido #quantidade').val();
+					parametros += '&aliquotaIPI='+$('#bloco_item_pedido #aliquotaIPI').val();
+					parametros += '&aliquotaICMS='+$('#bloco_item_pedido #aliquotaICMS').val();
+					parametros += '&preco='+$('#bloco_item_pedido #preco').val();
+					
+					var form = $('#formVazio');
+					$(form).attr('method', 'post');
+					$(form).attr('action', '<c:url value="/estoque/item/edicao"/>?'+parametros);
+					$(form).submit();
+				}
+			});
 		}
-		*/
-		var parametros = $('#formPesquisa').serialize();
-		parametros += '&idItem='+$('#bloco_item_pedido #idItemPedido').val();
-		parametros += '&quantidade='+$('#bloco_item_pedido #quantidade').val();
-		parametros += '&aliquotaIPI='+$('#bloco_item_pedido #aliquotaIPI').val();
-		parametros += '&aliquotaICMS='+$('#bloco_item_pedido #aliquotaICMS').val();
-		parametros += '&preco='+$('#bloco_item_pedido #preco').val();
-		
-		var form = $('#formVazio');
-		$(form).attr('method', 'post');
-		$(form).attr('action', '<c:url value="/estoque/item/edicao"/>?'+parametros);
-		$(form).submit();
 	});
 	
-	$('#botaoRefazerItemPedido').click(function () {
-		if(isEmpty($('#idItemPedido').val())){
-			return;
-		}
-		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REDEFINIR esse item, pois o estoque terá seu valor alterado?',
-			confirmar: function(){
-				var parametros = $('#bloco_item_pedido').serialize();
-				parametros += '&'+$('#formPesquisa').serialize();
-				var form = $('#formVazio');
-				$(form).attr('method', 'post');
-				$(form).attr('action', '<c:url value="/estoque/item/redefinicao"/>?'+parametros);
-				$(form).submit();	
-			}
-		});
-	});
 	inicializarAutocompleteMaterial();
 	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
@@ -117,6 +117,10 @@ function inicializarFiltro() {
 	$("#filtro_cpf").val($("#cpf").val());
 	$("#filtro_email").val($("#email").val());
 };
+
+function editarItem(botao){
+	submeterForm(botao);
+};
 </script>
 </head>
 <body>
@@ -130,7 +134,7 @@ function inicializarFiltro() {
 	<form id="formPesquisa" action="<c:url value="/estoque/item/listagem"/>" method="get">
 		<fieldset>
 			<legend>::: Pesquisa de Itens do Estoque :::</legend>
-			<div class="label" style="width: 30%">Forma Material:</div>
+			<div class="label condicional" style="width: 30%">Forma Material:</div>
 			<div class="input" style="width: 60%">
 				<select name="formaMaterial" style="width: 20%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
@@ -140,7 +144,7 @@ function inicializarFiltro() {
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label" style="width: 30%">Material:</div>
+			<div class="label condicional" style="width: 30%">Material:</div>
 			<div class="input" style="width: 60%">
 				<input type="hidden" id="idMaterial" name="idMaterial" value="${idMaterial}"/>
 				<input type="text" id="material" name="descricaoMaterial" value="${descricaoMaterial}" style="width: 60%" />
@@ -183,8 +187,8 @@ function inicializarFiltro() {
 								<c:if test="${acessoRedefinicaoItemPermitido}">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/estoque/item/${item.id}"/>">
-										<input type="submit" id="botaoEditarCliente"
-											title="Editar Dados do Cliente" value="" class="botaoEditar" />
+										<input type="button" id="botaoEditarCliente" title="Editar Dados do Cliente" value="" 
+											class="botaoEditar" onclick="editarItem(this);"/>
 									</form>
 								</div>
 								</c:if>

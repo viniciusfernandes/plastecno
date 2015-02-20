@@ -34,11 +34,14 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private ItemEstoqueDAO itemEstoqueDAO;
 
 	private void calcularValorMedio(ItemEstoque itemCadastrado, ItemEstoque itemIncluido) {
+		removerValoresNulos(itemCadastrado);
+		removerValoresNulos(itemIncluido);
+
 		final double valorEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getPrecoMedio();
 		final double valorItem = itemIncluido.getQuantidade() * itemIncluido.getPrecoMedio();
 		final double quantidadeTotal = itemCadastrado.getQuantidade() + itemIncluido.getQuantidade();
 		final double precoMedio = (valorEstoque + valorItem) / quantidadeTotal;
-		
+
 		final double ipiEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getAliquotaIPI();
 		final double ipiItem = itemIncluido.getQuantidade() * itemIncluido.getAliquotaIPI();
 		final double ipiMedio = (ipiEstoque + ipiItem) / quantidadeTotal;
@@ -47,7 +50,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 		final double icmsItem = itemIncluido.getQuantidade() * itemIncluido.getAliquotaICMS();
 		final double icmsMedio = (icmsEstoque + icmsItem) / quantidadeTotal;
 
-		
 		itemCadastrado.setPrecoMedio(precoMedio);
 		itemCadastrado.setAliquotaIPI(ipiMedio);
 		itemCadastrado.setAliquotaICMS(icmsMedio);
@@ -185,7 +187,22 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (itemEstoque.isMedidaExternaIgualInterna()) {
 			itemEstoque.setMedidaInterna(itemEstoque.getMedidaExterna());
 		}
-		
+
 		itemEstoqueDAO.alterar(itemEstoque);
+	}
+
+	private void removerValoresNulos(ItemEstoque itemEstoque) {
+		if (itemEstoque.getQuantidade() == null) {
+			itemEstoque.setQuantidade(0);
+		}
+		if (itemEstoque.getPrecoMedio() == null) {
+			itemEstoque.setPrecoMedio(0d);
+		}
+		if (itemEstoque.getAliquotaIPI() == null) {
+			itemEstoque.setAliquotaIPI(0d);
+		}
+		if (itemEstoque.getAliquotaICMS() == null) {
+			itemEstoque.setAliquotaICMS(0d);
+		}
 	}
 }

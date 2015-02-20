@@ -38,8 +38,8 @@ public class EstoqueController extends AbstractController {
     }
 
     @Post("estoque/item/edicao")
-    public void inserirItemEstoque(Integer quantidade, Double preco, Double aliquotaIPI, Double aliquotaICMS,
-            Integer idItem, Integer idMaterial, FormaMaterial formaMaterial) {
+    public void inserirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
+            Double aliquotaICMS, Integer idMaterial, FormaMaterial formaMaterial) {
         try {
             ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
             if (itemEstoque == null) {
@@ -55,6 +55,21 @@ public class EstoqueController extends AbstractController {
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
 
+        }
+        addAtributo("permanecerTopo", true);
+        redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
+    }
+
+    @Post("estoque/item/inclusao")
+    public void inserirItemEstoque(ItemEstoque itemPedido, Integer idMaterial, FormaMaterial formaMaterial) {
+        try {
+            itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
+            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
+            estoqueService.inserirItemEstoque(itemPedido);
+            gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            addAtributo("itemPedido", itemPedido);
         }
         addAtributo("permanecerTopo", true);
         redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);

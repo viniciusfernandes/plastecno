@@ -41,22 +41,28 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoInserirItemPedido').click(function () {
-		/*
+
 		if(isEmpty($('#idItemPedido').val())){
-			return;
+			var parametros = $('#formPesquisa').serialize();
+			parametros += '&'+$('#bloco_item_pedido').serialize();
+			
+			var form = $('#formVazio');
+			$(form).attr('method', 'post');
+			$(form).attr('action', '<c:url value="/estoque/item/inclusao"/>?'+parametros);
+			$(form).submit();
+		}else {
+			var parametros = $('#formPesquisa').serialize();
+			parametros += '&idItem='+$('#bloco_item_pedido #idItemPedido').val();
+			parametros += '&quantidade='+$('#bloco_item_pedido #quantidade').val();
+			parametros += '&aliquotaIPI='+$('#bloco_item_pedido #aliquotaIPI').val();
+			parametros += '&aliquotaICMS='+$('#bloco_item_pedido #aliquotaICMS').val();
+			parametros += '&preco='+$('#bloco_item_pedido #preco').val();
+			
+			var form = $('#formVazio');
+			$(form).attr('method', 'post');
+			$(form).attr('action', '<c:url value="/estoque/item/edicao"/>?'+parametros);
+			$(form).submit();
 		}
-		*/
-		var parametros = $('#formPesquisa').serialize();
-		parametros += '&idItem='+$('#bloco_item_pedido #idItemPedido').val();
-		parametros += '&quantidade='+$('#bloco_item_pedido #quantidade').val();
-		parametros += '&aliquotaIPI='+$('#bloco_item_pedido #aliquotaIPI').val();
-		parametros += '&aliquotaICMS='+$('#bloco_item_pedido #aliquotaICMS').val();
-		parametros += '&preco='+$('#bloco_item_pedido #preco').val();
-		
-		var form = $('#formVazio');
-		$(form).attr('method', 'post');
-		$(form).attr('action', '<c:url value="/estoque/item/edicao"/>?'+parametros);
-		$(form).submit();
 	});
 	
 	$('#botaoRefazerItemPedido').click(function () {

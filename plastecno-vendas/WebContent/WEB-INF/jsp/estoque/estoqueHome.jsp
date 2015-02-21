@@ -46,6 +46,7 @@ $(document).ready(function() {
 			inicializarModalConfirmacao({
 				mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ADICIONAR esse item, pois o estoque terá seu valor alterado?',
 				confirmar: function(){
+					$('#bloco_item_pedido #descricao').val($('#bloco_item_pedido #descricao').val().toUpperCase());
 					var parametros = $('#formPesquisa').serialize();
 					parametros += '&'+$('#bloco_item_pedido').serialize();
 					
@@ -59,6 +60,7 @@ $(document).ready(function() {
 			inicializarModalConfirmacao({
 				mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REDEFINIR esse item, pois o estoque terá seu valor alterado?',
 				confirmar: function(){
+					$('#bloco_item_pedido #descricao').val($('#bloco_item_pedido #descricao').val().toUpperCase());
 					var parametros = $('#formPesquisa').serialize();
 					parametros += '&idItem='+$('#bloco_item_pedido #idItemPedido').val();
 					parametros += '&quantidade='+$('#bloco_item_pedido #quantidade').val();

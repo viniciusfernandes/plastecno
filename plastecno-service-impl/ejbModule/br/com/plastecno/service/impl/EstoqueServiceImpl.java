@@ -92,7 +92,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		// Verificando se existe item equivalente no estoque, caso nao exista vamos
 		// criar um novo.
-		ItemEstoque itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, medidaExt, medidaInt, comp);
+		ItemEstoque itemCadastrado = null;
+		if (itemEstoque.isPeca()) {
+			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, itemEstoque.getDescricaoPeca());
+		} else {
+			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, medidaExt, medidaInt, comp);
+		}
+		
 		boolean isNovo = itemCadastrado == null;
 		if (isNovo) {
 			return itemEstoqueDAO.inserir(itemEstoque).getId();
@@ -135,7 +141,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial);
+		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null);
 	}
 
 	@Override
@@ -155,6 +161,21 @@ public class EstoqueServiceImpl implements EstoqueService {
 			return item;
 		}
 		return null;
+	}
+
+	@Override
+	public ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca)
+			throws BusinessException {
+		List<ItemEstoque> listItem = itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, descricaoPeca);
+		if (listItem.isEmpty()) {
+			return null;
+		}
+		if (listItem.size() > 1) {
+			throw new BusinessException("Foi encontrado mais de um registro para o codigo de material \"" + idMaterial
+					+ "\", foma de material \"" + formaMaterial.getDescricao() + "\" e descrição de peça \"" + descricaoPeca
+					+ "\"");
+		}
+		return listItem.get(0);
 	}
 
 	@Override

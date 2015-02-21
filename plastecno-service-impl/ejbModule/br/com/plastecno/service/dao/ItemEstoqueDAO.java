@@ -7,6 +7,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.util.StringUtils;
 
 public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
@@ -19,7 +20,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca) {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemEstoque i ");
 		if (idMaterial != null || formaMaterial != null) {
@@ -36,6 +37,10 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			select.append("i.formaMaterial = :formaMaterial ");
 		}
 
+		if (StringUtils.isNotEmpty(descricaoPeca)) {
+			select.append("and i.descricaoPeca = :descricaoPeca ");
+		}
+
 		select.append("order by i.formaMaterial, i.material.sigla , i.precoMedio asc");
 		Query query = entityManager.createQuery(select.toString());
 		if (idMaterial != null) {
@@ -45,8 +50,10 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		if (formaMaterial != null) {
 			query.setParameter("formaMaterial", formaMaterial);
 		}
-		
 
+		if (StringUtils.isNotEmpty(descricaoPeca)) {
+			query.setParameter("descricaoPeca", descricaoPeca);
+		}
 		return query.getResultList();
 	}
 }

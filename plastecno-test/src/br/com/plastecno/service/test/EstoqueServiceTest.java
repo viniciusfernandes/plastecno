@@ -32,6 +32,18 @@ public class EstoqueServiceTest extends AbstractTest {
 	private MaterialService materialService;
 	private RepresentadaService representadaService;
 
+	private ItemEstoque geraritemEstoque() {
+		ItemPedido i = gerarItemPedidoCompra();
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		return estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+	}
+
 	private ItemPedido gerarItemPedidoCompra() {
 		Pedido pedido = eBuilder.buildPedido();
 		pedido.setTipoPedido(TipoPedido.COMPRA);
@@ -123,6 +135,17 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoItemInexistenteEstoque() {
+		ItemEstoque itemEstoque = geraritemEstoque();
+		itemEstoque.setId(null);
+		try {
+			estoqueService.inserirItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
+	@Test
 	public void testInclusaoItemPedidoInexistenteNoEstoque() {
 		boolean throwed = false;
 		try {
@@ -145,6 +168,21 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		verificarQuantidadeTotalItemEstoque(i.getQuantidade(), idItemEstoque);
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, i.getPedido().getSituacaoPedido());
+	}
+
+	@Test
+	public void testInclusaoPecaExistenteEstoque() {
+		ItemEstoque itemEstoque = geraritemEstoque();
+		itemEstoque.setFormaMaterial(FormaMaterial.PC);
+		itemEstoque.setDescricaoPeca("ENGRENAGEM TESTES");
+		itemEstoque.setMedidaExterna(null);
+		itemEstoque.setMedidaInterna(null);
+		itemEstoque.setComprimento(null);
+		try {
+			estoqueService.inserirItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test
@@ -358,6 +396,78 @@ public class EstoqueServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O item de estoque deve conter quantidade positiva", throwed);
+	}
+
+	@Test
+	public void testRedefinicaoInvalidaPecaComComprimento() {
+		ItemPedido i = gerarItemPedidoCompra();
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		itemEstoque.setFormaMaterial(FormaMaterial.PC);
+		itemEstoque.setMedidaExterna(null);
+		itemEstoque.setMedidaInterna(null);
+		itemEstoque.setComprimento(100d);
+		boolean throwed = false;
+		try {
+			estoqueService.redefinirItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Pecas devem ter descricao preenchida", throwed);
+	}
+
+	@Test
+	public void testRedefinicaoInvalidaPecaComMedidaExterna() {
+		ItemPedido i = gerarItemPedidoCompra();
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		itemEstoque.setFormaMaterial(FormaMaterial.PC);
+		itemEstoque.setMedidaExterna(100d);
+		itemEstoque.setMedidaInterna(null);
+		itemEstoque.setComprimento(null);
+		boolean throwed = false;
+		try {
+			estoqueService.redefinirItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Pecas nao podem ter medida externa", throwed);
+	}
+
+	@Test
+	public void testRedefinicaoInvalidaPecaComMedidaInterna() {
+		ItemPedido i = gerarItemPedidoCompra();
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		itemEstoque.setFormaMaterial(FormaMaterial.PC);
+		itemEstoque.setMedidaExterna(null);
+		itemEstoque.setMedidaInterna(100d);
+		itemEstoque.setComprimento(null);
+		boolean throwed = false;
+		try {
+			estoqueService.redefinirItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Pecas nao podem ter medida interna", throwed);
 	}
 
 	@Test

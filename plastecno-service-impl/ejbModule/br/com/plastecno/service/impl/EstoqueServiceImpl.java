@@ -200,6 +200,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
 		ValidadorInformacao.validar(itemEstoque);
+
 		if (itemEstoque.isNovo()) {
 			throw new BusinessException("Não é possivel realizar a redefinição de estoque para itens não existentes");
 		}
@@ -211,7 +212,23 @@ public class EstoqueServiceImpl implements EstoqueService {
 			itemEstoque.setMedidaInterna(itemEstoque.getMedidaExterna());
 		}
 
-		itemEstoqueDAO.alterar(itemEstoque);
+		ItemEstoque itemCadastrado = pesquisarItemEstoqueById(itemEstoque.getId());
+		if (itemCadastrado == null) {
+			throw new BusinessException("O item de codigo \"" + itemEstoque.getId()
+					+ "\" nao exite no estoque para ser redefinido.");
+		}
+		
+		itemCadastrado.setAliquotaICMS(itemEstoque.getAliquotaICMS());
+		itemCadastrado.setAliquotaIPI(itemEstoque.getAliquotaIPI());
+		itemCadastrado.setPrecoMedio(itemEstoque.getPrecoMedio());
+		itemCadastrado.setQuantidade(itemEstoque.getQuantidade());
+		if (!itemCadastrado.isPeca()) {
+			itemCadastrado.setMedidaExterna(itemEstoque.getMedidaExterna());
+			itemCadastrado.setMedidaInterna(itemEstoque.getMedidaInterna());
+			itemCadastrado.setComprimento(itemEstoque.getComprimento());
+		}
+
+		itemEstoqueDAO.alterar(itemCadastrado);
 	}
 
 	private void removerValoresNulos(ItemEstoque itemEstoque) {

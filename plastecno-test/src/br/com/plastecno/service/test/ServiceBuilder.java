@@ -166,13 +166,22 @@ class ServiceBuilder {
 				List<ItemEstoque> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(ItemEstoque.class, "formaMaterial",
 						formaMaterial);
 				List<ItemEstoque> itens = new ArrayList<ItemEstoque>();
+				boolean isMaterialSelecionado = false;
+				boolean isPecaSelecionada = false;
 				for (ItemEstoque item : lista) {
 					// A primeira condicao indica que se deseja todas as formas de
 					// materiais.
-					if (idMaterial == null
-							|| (item.getMaterial() != null && idMaterial.equals(item.getMaterial().getId()) && descricaoPeca
-									.equals(item.getDescricaoPeca()))) {
+					isMaterialSelecionado = idMaterial == null
+							|| (item.getMaterial() != null && idMaterial.equals(item.getMaterial().getId()));
+					if (!item.isPeca() && isMaterialSelecionado) {
 						itens.add(item);
+						continue;
+					}
+
+					isPecaSelecionada = descricaoPeca == null || descricaoPeca.equals(item.getDescricaoPeca());
+					if (item.isPeca() && isMaterialSelecionado && isPecaSelecionada) {
+						itens.add(item);
+						continue;
 					}
 				}
 				return itens;

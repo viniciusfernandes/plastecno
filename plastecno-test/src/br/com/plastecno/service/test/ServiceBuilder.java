@@ -161,14 +161,17 @@ class ServiceBuilder {
 		EstoqueServiceImpl estoqueService = new EstoqueServiceImpl();
 		new MockUp<ItemEstoqueDAO>() {
 			@Mock
-			public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+			public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
+					String descricaoPeca) {
 				List<ItemEstoque> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(ItemEstoque.class, "formaMaterial",
 						formaMaterial);
 				List<ItemEstoque> itens = new ArrayList<ItemEstoque>();
 				for (ItemEstoque item : lista) {
 					// A primeira condicao indica que se deseja todas as formas de
 					// materiais.
-					if (idMaterial == null || (item.getMaterial() != null && idMaterial.equals(item.getMaterial().getId()))) {
+					if (idMaterial == null
+							|| (item.getMaterial() != null && idMaterial.equals(item.getMaterial().getId()) && descricaoPeca
+									.equals(item.getDescricaoPeca()))) {
 						itens.add(item);
 					}
 				}

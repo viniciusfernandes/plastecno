@@ -3,37 +3,17 @@ package br.com.plastecno.service.entity;
 import java.io.Serializable;
 
 import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-@InformacaoValidavel
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-public class Item implements Serializable, Cloneable {
+public abstract class Item implements Serializable, Cloneable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3397681910683242844L;
-
-	private Double comprimento;
-
-	@Column(name = "medida_interna")
-	private Double medidaInterna;
-
-	@Column(name = "medida_externa")
-	private Double medidaExterna;
-
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do pedido")
-	private Integer quantidade;
+	private static final long serialVersionUID = -1708677510288806140L;
 
 	@Column(name = "preco_unidade")
 	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido")
@@ -43,30 +23,17 @@ public class Item implements Serializable, Cloneable {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido com IPI")
 	private Double precoUnidadeIPI;
 
-	@Column(name = "aliquota_icms")
-	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota ICMS")
-	private Double aliquotaICMS;
-
-	@Column(name = "aliquota_ipi")
-	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota IPI")
-	private Double aliquotaIPI;
-
-	@Column(name = "descricao_peca")
-	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
-	private String descricaoPeca;
-
-	@Enumerated(EnumType.ORDINAL)
-	@Column(name = "id_forma_material")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma do material do item do pedido")
-	private FormaMaterial formaMaterial;
-
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao pedido")
-	private Material material;
-
 	@Transient
 	private String precoUnidadeFormatado;
+
+	@Transient
+	private String precoItemFormatado;
+
+	@Transient
+	private String precoVendaFormatado;
+
+	@Transient
+	private String precoMedioFormatado;
 
 	@Transient
 	private String precoUnidadeIPIFormatado;
@@ -89,33 +56,23 @@ public class Item implements Serializable, Cloneable {
 	public Item() {
 	}
 
-	public Item(FormaMaterial formaMaterial) {
-		this.formaMaterial = formaMaterial;
-	}
-
 	public boolean contemLargura() {
-		return this.formaMaterial != null && this.formaMaterial.contemLargura();
+		return getFormaMaterial() != null && getFormaMaterial().contemLargura();
 	}
 
-	public Double getAliquotaICMS() {
-		return aliquotaICMS;
-	}
+	public abstract Double getAliquotaICMS();
 
 	public String getAliquotaICMSFormatado() {
 		return aliquotaICMSFormatado;
 	}
 
-	public Double getAliquotaIPI() {
-		return aliquotaIPI;
-	}
+	public abstract Double getAliquotaIPI();
 
 	public String getAliquotaIPIFormatado() {
 		return aliquotaIPIFormatado;
 	}
 
-	public Double getComprimento() {
-		return comprimento;
-	}
+	public abstract Double getComprimento();
 
 	public String getComprimentoFormatado() {
 		if (comprimentoFormatado == null) {
@@ -127,12 +84,12 @@ public class Item implements Serializable, Cloneable {
 	public String getDescricao() {
 
 		StringBuilder descricao = new StringBuilder();
-		if (material != null) {
-			descricao.append(this.formaMaterial);
+		if (getMaterial() != null) {
+			descricao.append(getFormaMaterial());
 			descricao.append(" - ");
-			descricao.append(this.material.getSigla());
+			descricao.append(getMaterial().getSigla());
 			descricao.append(" - ");
-			descricao.append(this.material.getDescricao() == null ? " " : this.material.getDescricao());
+			descricao.append(getMaterial().getDescricao() == null ? " " : getMaterial().getDescricao());
 			descricao.append(" - ");
 		}
 
@@ -140,7 +97,7 @@ public class Item implements Serializable, Cloneable {
 			descricao.append(getMedidaExternaFomatada());
 			descricao.append(" X ");
 
-			if (this.medidaInterna != null) {
+			if (getMedidaInterna() != null) {
 				descricao.append(getMedidaInternaFomatada());
 				descricao.append(" X ");
 			}
@@ -148,26 +105,18 @@ public class Item implements Serializable, Cloneable {
 			descricao.append(getComprimentoFormatado());
 			descricao.append(" mm");
 		} else {
-			descricao.append(this.descricaoPeca);
+			descricao.append(getDescricaoPeca());
 		}
 		return descricao.toString();
 	}
 
-	public String getDescricaoPeca() {
-		return descricaoPeca;
-	}
+	public abstract String getDescricaoPeca();
 
-	public FormaMaterial getFormaMaterial() {
-		return formaMaterial;
-	}
+	public abstract FormaMaterial getFormaMaterial();
 
-	public Material getMaterial() {
-		return material;
-	}
+	public abstract Material getMaterial();
 
-	public Double getMedidaExterna() {
-		return medidaExterna;
-	}
+	public abstract Double getMedidaExterna();
 
 	public String getMedidaExternaFomatada() {
 		if (medidaExternaFomatada == null) {
@@ -176,9 +125,7 @@ public class Item implements Serializable, Cloneable {
 		return medidaExternaFomatada;
 	}
 
-	public Double getMedidaInterna() {
-		return medidaInterna;
-	}
+	public abstract Double getMedidaInterna();
 
 	public String getMedidaInternaFomatada() {
 		if (medidaInternaFomatada == null) {
@@ -188,11 +135,19 @@ public class Item implements Serializable, Cloneable {
 	}
 
 	public double getPrecoItem() {
-		if (precoUnidade == null || quantidade == null) {
+		if (precoUnidade == null || getQuantidade() == null) {
 			return 0d;
 		}
 
-		return precoUnidade * quantidade;
+		return precoUnidade * getQuantidade();
+	}
+
+	public String getPrecoItemFormatado() {
+		return precoItemFormatado;
+	}
+
+	public String getPrecoMedioFormatado() {
+		return precoMedioFormatado;
 	}
 
 	public Double getPrecoUnidade() {
@@ -211,72 +166,68 @@ public class Item implements Serializable, Cloneable {
 		return precoUnidadeIPIFormatado;
 	}
 
-	public Integer getQuantidade() {
-		return quantidade;
+	public String getPrecoVendaFormatado() {
+		return precoVendaFormatado;
 	}
 
+	public abstract Integer getQuantidade();
+
 	public boolean isFormaMaterialVazada() {
-		return formaMaterial != null && formaMaterial.isFormaMaterialVazada();
+		return getFormaMaterial() != null && getFormaMaterial().isFormaMaterialVazada();
 	}
 
 	public boolean isMedidaExternaIgualInterna() {
-		return this.formaMaterial != null && this.formaMaterial.isMedidaExternaIgualInterna();
+		return getFormaMaterial() != null && getFormaMaterial().isMedidaExternaIgualInterna();
 	}
+
+	public abstract boolean isNovo();
 
 	public boolean isPeca() {
-		return FormaMaterial.PC.equals(this.formaMaterial);
+		return FormaMaterial.PC.equals(getFormaMaterial());
 	}
 
-	public void setAliquotaICMS(Double aliquotaICMS) {
-		this.aliquotaICMS = aliquotaICMS;
-	}
+	public abstract void setAliquotaICMS(Double aliquotaICMS);
 
 	public void setAliquotaICMSFormatado(String aliquotaICMSFormatado) {
 		this.aliquotaICMSFormatado = aliquotaICMSFormatado;
 	}
 
-	public void setAliquotaIPI(Double aliquotaIPI) {
-		this.aliquotaIPI = aliquotaIPI;
-	}
+	public abstract void setAliquotaIPI(Double aliquotaIPI);
 
 	public void setAliquotaIPIFormatado(String aliquotaIPIFormatado) {
 		this.aliquotaIPIFormatado = aliquotaIPIFormatado;
 	}
 
-	public void setComprimento(Double comprimento) {
-		this.comprimento = comprimento;
-	}
+	public abstract void setComprimento(Double comprimento);
 
 	public void setComprimentoFormatado(String comprimentoFormatado) {
 		this.comprimentoFormatado = comprimentoFormatado;
 	}
 
-	public void setDescricaoPeca(String descricaoPeca) {
-		this.descricaoPeca = descricaoPeca;
-	}
+	public abstract void setDescricaoPeca(String descricaoPeca);
 
-	public void setFormaMaterial(FormaMaterial formaMaterial) {
-		this.formaMaterial = formaMaterial;
-	}
+	public abstract void setFormaMaterial(FormaMaterial formaMaterial);
 
-	public void setMaterial(Material material) {
-		this.material = material;
-	}
+	public abstract void setMaterial(Material material);
 
-	public void setMedidaExterna(Double medidaExterna) {
-		this.medidaExterna = medidaExterna;
-	}
+	public abstract void setMedidaExterna(Double medidaExterna);
 
 	public void setMedidaExternaFomatada(String medidaExternaFomatada) {
 		this.medidaExternaFomatada = medidaExternaFomatada;
 	}
 
-	public void setMedidaInterna(Double medidaInterna) {
-		this.medidaInterna = medidaInterna;
-	}
+	public abstract void setMedidaInterna(Double medidaInterna);
 
 	public void setMedidaInternaFomatada(String medidaInternaFomatada) {
 		this.medidaInternaFomatada = medidaInternaFomatada;
+	}
+
+	public void setPrecoItemFormatado(String precoItemFormatado) {
+		this.precoItemFormatado = precoItemFormatado;
+	}
+
+	public void setPrecoMedioFormatado(String precoMedioFormatado) {
+		this.precoMedioFormatado = precoMedioFormatado;
 	}
 
 	public void setPrecoUnidade(Double precoUnidade) {
@@ -295,8 +246,9 @@ public class Item implements Serializable, Cloneable {
 		this.precoUnidadeIPIFormatado = precoUnidadeIPIFormatado;
 	}
 
-	public void setQuantidade(Integer quantidade) {
-		this.quantidade = quantidade;
+	public void setPrecoVendaFormatado(String precoVendaFormatado) {
+		this.precoVendaFormatado = precoVendaFormatado;
 	}
 
+	public abstract void setQuantidade(Integer quantidade);
 }

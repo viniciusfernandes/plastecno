@@ -21,6 +21,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.impl.calculo.CalculadoraVolume;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
 
@@ -83,6 +84,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		ValidadorInformacao.validar(itemEstoque);
+		CalculadoraVolume.validarVolume(itemEstoque);
 
 		Integer idMaterial = itemEstoque.getMaterial().getId();
 		FormaMaterial formaMaterial = itemEstoque.getFormaMaterial();
@@ -98,7 +100,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		} else {
 			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, medidaExt, medidaInt, comp);
 		}
-		
+
 		boolean isNovo = itemCadastrado == null;
 		if (isNovo) {
 			return itemEstoqueDAO.inserir(itemEstoque).getId();

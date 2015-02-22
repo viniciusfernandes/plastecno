@@ -146,6 +146,19 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoItemInvalidoComDescricao() {
+		ItemEstoque itemEstoque = geraritemEstoque();
+		itemEstoque.setDescricaoPeca("ENGRENAGEM TESTES");
+		boolean throwed = false;
+		try {
+			estoqueService.inserirItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A descricao de peca eh apenas para pecas.", throwed);
+	}
+
+	@Test
 	public void testInclusaoItemPedidoInexistenteNoEstoque() {
 		boolean throwed = false;
 		try {

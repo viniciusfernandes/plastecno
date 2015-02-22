@@ -84,6 +84,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		ValidadorInformacao.validar(itemEstoque);
+		if (!itemEstoque.isPeca() && StringUtils.isNotEmpty(itemEstoque.getDescricaoPeca())) {
+			throw new BusinessException("A descrição é apenas itens do tipo peças. Remova a descrição.");
+		}
 		CalculadoraVolume.validarVolume(itemEstoque);
 
 		Integer idMaterial = itemEstoque.getMaterial().getId();
@@ -200,6 +203,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
 		ValidadorInformacao.validar(itemEstoque);
+		CalculadoraVolume.validarVolume(itemEstoque);
 
 		if (itemEstoque.isNovo()) {
 			throw new BusinessException("Não é possivel realizar a redefinição de estoque para itens não existentes");
@@ -217,7 +221,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			throw new BusinessException("O item de codigo \"" + itemEstoque.getId()
 					+ "\" nao exite no estoque para ser redefinido.");
 		}
-		
+
 		itemCadastrado.setAliquotaICMS(itemEstoque.getAliquotaICMS());
 		itemCadastrado.setAliquotaIPI(itemEstoque.getAliquotaIPI());
 		itemCadastrado.setPrecoMedio(itemEstoque.getPrecoMedio());

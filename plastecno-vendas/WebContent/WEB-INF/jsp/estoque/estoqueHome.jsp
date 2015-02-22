@@ -18,6 +18,7 @@
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/pedido/pedido.js"/>"></script>
 
 <script type="text/javascript">
 
@@ -78,6 +79,7 @@ $(document).ready(function() {
 	});
 	
 	inicializarAutocompleteMaterial();
+	inicializarSelectFormaMaterial();
 	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 });

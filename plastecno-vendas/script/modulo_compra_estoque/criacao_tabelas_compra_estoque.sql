@@ -14,8 +14,8 @@ ALTER TABLE vendas.tb_pedido ADD CONSTRAINT id_tipo_pedido FOREIGN KEY (id_tipo_
 insert into vendas.tb_perfil_acesso (id, descricao) values (nextval('vendas.seq_perfil_acesso_id'), 'CADASTRO_PEDIDO_COMPRA');
 
 ALTER TABLE vendas.tb_pedido RENAME id_vendedor TO id_proprietario;
-INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (4, 'COMPRA_PENDENTE_RECEBIMENTO');
-INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (5, 'COMPRA_RECEBIDA');
+INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (4, 'COMPRA COM PENDÊNCIA DE RECEBIMENTO');
+INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (5, 'COMPRA RECEBIDA');
 ALTER TABLE vendas.tb_item_pedido add item_recebido boolean default false;
 
 create table vendas.tb_item_estoque (
@@ -49,4 +49,24 @@ insert into vendas.tb_tipo_relacionamento  values (2, 'REPRESENTACAO E FORNECIME
 
 ALTER TABLE vendas.tb_representada ADD id_tipo_relacionamento integer not null default 0;
 ALTER TABLE vendas.tb_representada ADD CONSTRAINT id_tipo_relacionamento FOREIGN KEY (id_tipo_relacionamento) REFERENCES vendas.tb_tipo_relacionamento (id);
+
+alter table vendas.tb_item_estoque add quantidade_reservada integer default 0;
+alter table vendas.tb_item_pedido add item_reservado boolean default false;
+
+INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (6, 'ITEM DE PEDIDO RESERVADO');
+INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (7, 'ITEM COM PENDENCIA DE RESERVA');
+
+
+create table vendas.tb_item_reservado (
+	id integer not null,
+	id_item_estoque integer not null,
+	id_item_pedido integer not null,
+	data_reserva date default null
+);
+
+ALTER TABLE vendas.tb_item_reservado ADD PRIMARY KEY (id);
+ALTER TABLE vendas.tb_item_reservado ADD CONSTRAINT id_item_estoque FOREIGN KEY (id_item_estoque) REFERENCES vendas.tb_item_estoque (id);
+ALTER TABLE vendas.tb_item_reservado ADD CONSTRAINT id_item_pedido FOREIGN KEY (id_item_pedido) REFERENCES vendas.tb_item_pedido (id);
+create sequence vendas.seq_item_reservado_id increment by 1 minvalue 1 no maxvalue start with 1;
+
 

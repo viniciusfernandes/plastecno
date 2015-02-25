@@ -6,6 +6,7 @@ import javax.ejb.Local;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.exception.BusinessException;
 
@@ -27,4 +28,6 @@ public interface EstoqueService {
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
+
+	boolean reservarItemPedido(ItemPedido itemPedido) throws BusinessException;
 }

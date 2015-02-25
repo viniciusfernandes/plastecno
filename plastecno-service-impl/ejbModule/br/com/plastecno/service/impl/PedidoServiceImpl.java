@@ -155,17 +155,6 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 	}
 
-	private void encomendarItemPedido(Integer idPedido) throws BusinessException {
-		Pedido pedido = pesquisarPedidoById(idPedido);
-		if (!TipoPedido.REVENDA.equals(pedido.getTipoPedido())) {
-			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não é um pedido de revenda.");
-		}
-		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
-			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não esta em digitação.");
-		}
-		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(idPedido);
-	}
-
 	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
 
 		if (StringUtils.isEmpty(pedido.getContato().getEmail())) {
@@ -212,6 +201,11 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido.isCompra()) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
 		}
+
+		if (pedido.isRevenda()) {
+			reservarItemPedido(idPedido);
+		}
+
 		pedidoDAO.alterar(pedido);
 	}
 
@@ -844,6 +838,27 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Não foi possivel remover o item pois não existe item com o codigo " + idItemPedido);
 		}
 
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public boolean reservarItemPedido(Integer idPedido) throws BusinessException {
+		Pedido pedido = pesquisarPedidoById(idPedido);
+		if (!TipoPedido.REVENDA.equals(pedido.getTipoPedido())) {
+			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não é um pedido de revenda.");
+		}
+		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
+			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não esta em digitação.");
+		}
+		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(idPedido);
+		boolean todosReservados = true;
+		for (ItemPedido itemPedido : listaItem) {
+			itemPedido.setReservado(estoqueService.reservarItemPedido(itemPedido));
+			todosReservados &= itemPedido.isReservado();
+		}
+		pedido.setSituacaoPedido(todosReservados ? SituacaoPedido.ITEM_RESERVADO : SituacaoPedido.ITEM_PENDENTE_RESERVA);
+		pedidoDAO.alterar(pedido);
+		return todosReservados;
 	}
 
 	private void validarEnvio(Pedido pedido) throws BusinessException {

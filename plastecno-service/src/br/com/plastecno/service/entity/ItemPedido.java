@@ -28,32 +28,6 @@ public class ItemPedido extends Item {
 	 */
 	private static final long serialVersionUID = 3602081055672681943L;
 
-	@Id
-	@SequenceGenerator(name = "itemPedidoSequence", sequenceName = "vendas.seq_item_pedido_id", allocationSize = 1, initialValue = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemPedidoSequence")
-	private Integer id;
-
-	private Double comprimento;
-
-	@Column(name = "medida_interna")
-	private Double medidaInterna;
-	@Column(name = "item_recebido")
-	private boolean recebido;
-
-	@Column(name = "medida_externa")
-	private Double medidaExterna;
-
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do pedido")
-	private Integer quantidade;
-
-	@Column(name = "preco_unidade")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido")
-	private Double precoUnidade;
-
-	@Column(name = "preco_unidade_ipi")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido com IPI")
-	private Double precoUnidadeIPI;
-
 	@Column(name = "aliquota_icms")
 	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
@@ -62,47 +36,76 @@ public class ItemPedido extends Item {
 	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota IPI")
 	private Double aliquotaIPI;
 
+	private Double comprimento;
 	@Column(name = "descricao_peca")
 	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
 	private String descricaoPeca;
-
-	@Column(name = "preco_venda")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Preço de venda do item do pedido")
-	private Double precoVenda;
 
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_forma_material")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma do material do item do pedido")
 	private FormaMaterial formaMaterial;
 
-	@Enumerated(EnumType.ORDINAL)
-	@Column(name = "id_tipo_venda")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo de venda do item do pedido")
-	private TipoVenda tipoVenda;
-
-	@ManyToOne
-	@JoinColumn(name = "id_pedido", referencedColumnName = "id", nullable = false)
-	@InformacaoValidavel(cascata = true, nomeExibicao = "Pedido associado ao item")
-	private Pedido pedido;
+	@Id
+	@SequenceGenerator(name = "itemPedidoSequence", sequenceName = "vendas.seq_item_pedido_id", allocationSize = 1, initialValue = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemPedidoSequence")
+	private Integer id;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao pedido")
 	private Material material;
 
-	private Integer sequencial;
+	@Column(name = "medida_externa")
+	private Double medidaExterna;
 
-	@Transient
-	private String precoUnidadeFormatado;
-
-	@Transient
-	private String precoUnidadeIPIFormatado;
+	@Column(name = "medida_interna")
+	private Double medidaInterna;
 
 	@Transient
 	private String nomeProprietario;
 
 	@Transient
 	private String nomeRepresentada;
+
+	@ManyToOne
+	@JoinColumn(name = "id_pedido", referencedColumnName = "id", nullable = false)
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Pedido associado ao item")
+	private Pedido pedido;
+
+	@Column(name = "preco_unidade")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido")
+	private Double precoUnidade;
+
+	@Transient
+	private String precoUnidadeFormatado;
+
+	@Column(name = "preco_unidade_ipi")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido com IPI")
+	private Double precoUnidadeIPI;
+
+	@Transient
+	private String precoUnidadeIPIFormatado;
+
+	@Column(name = "preco_venda")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Preço de venda do item do pedido")
+	private Double precoVenda;
+
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do pedido")
+	private Integer quantidade;
+
+	@Column(name = "item_recebido")
+	private boolean recebido;
+
+	@Column(name = "item_reservado")
+	private boolean reservado;
+
+	private Integer sequencial;
+
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "id_tipo_venda")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo de venda do item do pedido")
+	private TipoVenda tipoVenda;
 
 	public ItemPedido() {
 	}
@@ -211,13 +214,17 @@ public class ItemPedido extends Item {
 	public TipoVenda getTipoVenda() {
 		return tipoVenda;
 	}
+
 	public boolean isNovo() {
 		return this.id == null;
 	}
 
-
 	public boolean isRecebido() {
 		return recebido;
+	}
+
+	public boolean isReservado() {
+		return reservado;
 	}
 
 	public boolean isVendaKilo() {
@@ -298,6 +305,10 @@ public class ItemPedido extends Item {
 
 	public void setRecebido(boolean recebido) {
 		this.recebido = recebido;
+	}
+
+	public void setReservado(boolean reservado) {
+		this.reservado = reservado;
 	}
 
 	public void setSequencial(Integer sequencial) {

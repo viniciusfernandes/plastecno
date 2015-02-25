@@ -26,12 +26,6 @@ public class ItemEstoque extends Item {
 	 */
 	private static final long serialVersionUID = 589189336309859982L;
 
-	@Id
-	@SequenceGenerator(name = "itemEstoqueSequence", sequenceName = "vendas.seq_item_estoque_id", allocationSize = 1, initialValue = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemEstoqueSequence")
-	private Integer id;
-
-	private Double comprimento;
 	@Column(name = "aliquota_icms")
 	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
@@ -39,33 +33,43 @@ public class ItemEstoque extends Item {
 	@Column(name = "aliquota_ipi")
 	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota IPI")
 	private Double aliquotaIPI;
-
-	@Column(name = "medida_interna")
-	private Double medidaInterna;
-
-	@Column(name = "medida_externa")
-	private Double medidaExterna;
-
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do estoque")
-	private Integer quantidade;
+	private Double comprimento;
 
 	@Column(name = "descricao_peca")
 	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do estoque")
 	private String descricaoPeca;
-
-	@Column(name = "preco_medio")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Preço de médio de compra do item de estoque")
-	private Double precoMedio;
 
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_forma_material")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma do material do item do estoque")
 	private FormaMaterial formaMaterial;
 
+	@Id
+	@SequenceGenerator(name = "itemEstoqueSequence", sequenceName = "vendas.seq_item_estoque_id", allocationSize = 1, initialValue = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemEstoqueSequence")
+	private Integer id;
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao item do estoque")
 	private Material material;
+
+	@Column(name = "medida_externa")
+	private Double medidaExterna;
+
+	@Column(name = "medida_interna")
+	private Double medidaInterna;
+
+	@Column(name = "preco_medio")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Preço de médio de compra do item de estoque")
+	private Double precoMedio;
+
+	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do estoque")
+	private Integer quantidade;
+
+	@Column(name = "quantidade_reservada")
+	@InformacaoValidavel(numerico = true, valorNegativo = false, nomeExibicao = "Quantidade reservada do item do estoque")
+	private Integer quantidadeReservada;
 
 	public ItemEstoque() {
 	}
@@ -130,6 +134,10 @@ public class ItemEstoque extends Item {
 		return quantidade;
 	}
 
+	public Integer getQuantidadeReservada() {
+		return quantidadeReservada;
+	}
+
 	public boolean isNovo() {
 		return this.id == null;
 	}
@@ -176,5 +184,9 @@ public class ItemEstoque extends Item {
 
 	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
+	}
+
+	public void setQuantidadeReservada(Integer quantidadeReservada) {
+		this.quantidadeReservada = quantidadeReservada;
 	}
 }

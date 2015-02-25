@@ -1,5 +1,6 @@
 package br.com.plastecno.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -16,6 +17,7 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
+import br.com.plastecno.service.dao.ItemReservadoDAO;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.ItemReservado;
@@ -32,6 +34,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private EntityManager entityManager;
 
 	private ItemEstoqueDAO itemEstoqueDAO;
+	private ItemReservadoDAO itemReservadoDAO;
+
 	@EJB
 	private PedidoService pedidoService;
 
@@ -76,6 +80,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@PostConstruct
 	public void init() {
 		itemEstoqueDAO = new ItemEstoqueDAO(entityManager);
+		itemReservadoDAO = new ItemReservadoDAO(entityManager);
 	}
 
 	@Override
@@ -251,7 +256,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 	}
 
-	public ItemReservado reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public boolean reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
 		ItemEstoque itemEstoque = null;
 		if (itemPedido.isPeca()) {
 			itemEstoque = pesquisarItemEstoque(itemPedido.getMaterial().getId(), itemPedido.getFormaMaterial(),
@@ -263,14 +270,20 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Integer quantidadeReservada = null;
 		Integer quantidadePedido = itemPedido.getQuantidade();
 		Integer quantidadeEstoque = itemEstoque != null ? itemEstoque.getQuantidade() : 0;
-		
+
 		if (quantidadeEstoque <= 0) {
-			quantidadeReservada = quantidadePedido;
+			return false;
 		} else if (quantidadePedido >= quantidadeEstoque) {
 			quantidadeReservada = quantidadeEstoque;
 		} else if (quantidadePedido < quantidadeEstoque) {
 			quantidadeReservada = quantidadeEstoque - quantidadePedido;
 		}
-		return new ItemReservado(itemEstoque, itemPedido, quantidadeReservada);
+		itemEstoque.setQuantidade(quantidadeEstoque - quantidadeReservada);
+		itemEstoque.setQuantidadeReservada(quantidadeReservada);
+
+		itemEstoqueDAO.alterar(itemEstoque);
+		itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido, quantidadeReservada));
+
+		return true;
 	}
 }

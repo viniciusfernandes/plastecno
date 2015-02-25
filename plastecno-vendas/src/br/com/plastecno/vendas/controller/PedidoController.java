@@ -164,7 +164,7 @@ public class PedidoController extends AbstractController {
             final PedidoPDFWrapper wrapper = this.gerarPDF(idPedido, tipoPedido);
             final Pedido pedido = wrapper.getPedido();
 
-            this.pedidoService.enviar(idPedido, wrapper.getArquivoPDF());
+            this.pedidoService.enviarPedido(idPedido, wrapper.getArquivoPDF());
 
             final String mensagem = pedido.isOrcamento() ? "Orçamento No. " + idPedido
                     + " foi enviado com sucesso para o cliente " + pedido.getCliente().getNomeFantasia()

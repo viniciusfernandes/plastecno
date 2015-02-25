@@ -52,6 +52,25 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 	}
 
+	@Test
+	public void testEfetuarEncomendaItemPedido(){
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
 	private ItemPedido gerarItemPedido() {
 		List<Representada> listaRepresentada = representadaService.pesquisarRepresentada();
 		Representada representada = null;
@@ -385,7 +404,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviar(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new byte[] {});
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -396,7 +415,7 @@ public class PedidoServiceTest extends AbstractTest {
 		initTestEnvioEmailPedidoCancelado();
 		boolean throwed = false;
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedidoService.enviarPedido(1, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -408,7 +427,7 @@ public class PedidoServiceTest extends AbstractTest {
 		initTestEnvioEmailPedidoClienteNaoPropspectado();
 		boolean throwed = false;
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedidoService.enviarPedido(1, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -420,7 +439,7 @@ public class PedidoServiceTest extends AbstractTest {
 		initTestEnvioEmailPedidoJaEnviado();
 		boolean throwed = false;
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedidoService.enviarPedido(1, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -431,7 +450,7 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testEnvioEmailPedidoOrcamento() {
 		initTestEnvioEmailPedidoOrcamento();
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedidoService.enviarPedido(1, new byte[] {});
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -442,7 +461,7 @@ public class PedidoServiceTest extends AbstractTest {
 		initTestEnvioEmailPedidoOrcamentoSemEmailContato();
 		boolean throwed = false;
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedidoService.enviarPedido(1, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -454,7 +473,7 @@ public class PedidoServiceTest extends AbstractTest {
 		initTestEnvioEmailPedidoSemEnderecoCobranca();
 		boolean throwed = false;
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedidoService.enviarPedido(1, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -466,7 +485,7 @@ public class PedidoServiceTest extends AbstractTest {
 		initTestEnvioEmailPedidoSemEnderecoEntrega();
 		boolean throwed = false;
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedidoService.enviarPedido(1, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -478,7 +497,7 @@ public class PedidoServiceTest extends AbstractTest {
 		initTestEnvioEmailPedidoSemEnderecoFaturamento();
 		boolean throwed = false;
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedidoService.enviarPedido(1, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -490,7 +509,7 @@ public class PedidoServiceTest extends AbstractTest {
 		initTestEnvioEmailPedidoSemItens();
 		boolean throwed = false;
 		try {
-			pedidoService.enviar(1, new byte[] {});
+			pedidoService.enviarPedido(1, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -522,7 +541,7 @@ public class PedidoServiceTest extends AbstractTest {
 				pedido.getSituacaoPedido());
 
 		try {
-			pedidoService.enviar(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

@@ -19,6 +19,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.EmailService;
+import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
@@ -62,18 +63,21 @@ public class PedidoServiceImpl implements PedidoService {
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
 
+	@EJB
+	private EstoqueService estoqueService;
+
 	private ItemPedidoDAO itemPedidoDAO;
 
 	@EJB
 	private LogradouroService logradouroService;
 
 	@EJB
-	private RepresentadaService representadaService;
-
-	@EJB
 	private MaterialService materialService;
 
 	private PedidoDAO pedidoDAO;
+
+	@EJB
+	private RepresentadaService representadaService;
 
 	@EJB
 	private TransportadoraService transportadoraService;
@@ -151,8 +155,39 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 	}
 
+	private void encomendarItemPedido(Integer idPedido) throws BusinessException {
+		Pedido pedido = pesquisarPedidoById(idPedido);
+		if (!TipoPedido.REVENDA.equals(pedido.getTipoPedido())) {
+			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não é um pedido de revenda.");
+		}
+		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
+			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não esta em digitação.");
+		}
+		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(idPedido);
+	}
+
+	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
+
+		if (StringUtils.isEmpty(pedido.getContato().getEmail())) {
+			throw new BusinessException("Email do contato é obrigatório para envio do orçamento");
+		}
+		try {
+			emailService.enviar(new GeradorPedidoEmail(pedido, arquivoAnexado).gerarMensagem(TipoMensagemPedido.ORCAMENTO));
+		} catch (NotificacaoException e) {
+			StringBuilder mensagem = new StringBuilder();
+			mensagem.append("Falha no envio do orçamento No. ").append(pedido.getId()).append(" do vendedor ")
+					.append(pedido.getVendedor().getNomeCompleto()).append(" para o cliente ")
+					.append(pedido.getCliente().getNomeCompleto())
+					.append(" e contato feito por " + pedido.getContato().getNome());
+
+			e.addMensagem(e.getListaMensagem());
+			throw e;
+		}
+	}
+
 	@Override
-	public void enviar(Integer idPedido, byte[] arquivoAnexado) throws BusinessException {
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException {
 
 		final Pedido pedido = pesquisarPedidoById(idPedido);
 
@@ -177,25 +212,7 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido.isCompra()) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
 		}
-	}
-
-	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
-
-		if (StringUtils.isEmpty(pedido.getContato().getEmail())) {
-			throw new BusinessException("Email do contato é obrigatório para envio do orçamento");
-		}
-		try {
-			emailService.enviar(new GeradorPedidoEmail(pedido, arquivoAnexado).gerarMensagem(TipoMensagemPedido.ORCAMENTO));
-		} catch (NotificacaoException e) {
-			StringBuilder mensagem = new StringBuilder();
-			mensagem.append("Falha no envio do orçamento No. ").append(pedido.getId()).append(" do vendedor ")
-					.append(pedido.getVendedor().getNomeCompleto()).append(" para o cliente ")
-					.append(pedido.getCliente().getNomeCompleto())
-					.append(" e contato feito por " + pedido.getContato().getNome());
-
-			e.addMensagem(e.getListaMensagem());
-			throw e;
-		}
+		pedidoDAO.alterar(pedido);
 	}
 
 	private void enviarVenda(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
@@ -398,6 +415,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException {
 		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdItemPedido(itemPedido.getId());
 		return inserirItemPedido(idPedido, itemPedido);

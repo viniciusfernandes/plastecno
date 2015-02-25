@@ -18,6 +18,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.ItemReservado;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
@@ -27,12 +28,12 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
 public class EstoqueServiceImpl implements EstoqueService {
-	@EJB
-	private PedidoService pedidoService;
-
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
+
 	private ItemEstoqueDAO itemEstoqueDAO;
+	@EJB
+	private PedidoService pedidoService;
 
 	private void calcularValorMedio(ItemEstoque itemCadastrado, ItemEstoque itemIncluido) {
 		removerValoresNulos(itemCadastrado);
@@ -248,5 +249,28 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (itemEstoque.getAliquotaICMS() == null) {
 			itemEstoque.setAliquotaICMS(0d);
 		}
+	}
+
+	public ItemReservado reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
+		ItemEstoque itemEstoque = null;
+		if (itemPedido.isPeca()) {
+			itemEstoque = pesquisarItemEstoque(itemPedido.getMaterial().getId(), itemPedido.getFormaMaterial(),
+					itemPedido.getDescricaoPeca());
+		} else {
+			itemEstoque = pesquisarItemEstoque(itemPedido.getMaterial().getId(), itemPedido.getFormaMaterial(),
+					itemPedido.getMedidaExterna(), itemPedido.getMedidaInterna(), itemPedido.getComprimento());
+		}
+		Integer quantidadeReservada = null;
+		Integer quantidadePedido = itemPedido.getQuantidade();
+		Integer quantidadeEstoque = itemEstoque != null ? itemEstoque.getQuantidade() : 0;
+		
+		if (quantidadeEstoque <= 0) {
+			quantidadeReservada = quantidadePedido;
+		} else if (quantidadePedido >= quantidadeEstoque) {
+			quantidadeReservada = quantidadeEstoque;
+		} else if (quantidadePedido < quantidadeEstoque) {
+			quantidadeReservada = quantidadeEstoque - quantidadePedido;
+		}
+		return new ItemReservado(itemEstoque, itemPedido, quantidadeReservada);
 	}
 }

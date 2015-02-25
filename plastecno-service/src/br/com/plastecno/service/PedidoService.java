@@ -24,7 +24,7 @@ public interface PedidoService {
 
 	boolean contemItemPedido(Integer idPedido);
 
-	void enviar(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
+	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
 
 	Pedido inserir(Pedido pedido) throws BusinessException;
 

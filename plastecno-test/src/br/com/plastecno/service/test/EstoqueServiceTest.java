@@ -512,7 +512,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		try {
 			pedidoService.inserirItemPedido(i2);
-			pedidoService.enviar(i1.getPedido().getId(), new byte[] {});
+			pedidoService.enviarPedido(i1.getPedido().getId(), new byte[] {});
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}

@@ -1,6 +1,5 @@
 package br.com.plastecno.vendas.controller;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import br.com.caelum.vraptor.Get;
@@ -19,7 +18,6 @@ import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.NumeroUtils;
-import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 

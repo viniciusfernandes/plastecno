@@ -27,14 +27,14 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @Stateless
 public class RepresentadaServiceImpl implements RepresentadaService {
 
+	@EJB
+	private ContatoService contatoService;
+
 	@PersistenceContext(unitName = "plastecno")
 	private EntityManager entityManager;
 
 	@EJB
 	private LogradouroService logradouroService;
-
-	@EJB
-	private ContatoService contatoService;
 
 	private RepresentadaDAO representadaDAO;
 
@@ -96,11 +96,6 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public boolean isRevendedor(String nomeRepresentada) {
-		return "PLASTECNO FILIAL".equals(nomeRepresentada);
-	}
-
-	@Override
 	public Integer inserir(final Representada representada) throws BusinessException {
 		ValidadorInformacao.validar(representada);
 
@@ -136,23 +131,8 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public List<Representada> pesquisarRepresentada() {
-		return this.pesquisarRepresentada(null);
-	}
-
-	@Override
-	public List<Representada> pesquisarRepresentada(Boolean ativo) {
-		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.FORNECIMENTO);
-	}
-
-	@Override
-	public List<Representada> pesquisarFornecedor(Boolean ativo) {
-		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.REPRESENTACAO);
-	}
-
-	@Override
-	public List<Representada> pesquisarRepresentadaAtivo() {
-		return this.pesquisarRepresentada(true);
+	public boolean isRevendedor(Integer idRepresentada) {
+		return "PLASTECNO FILIAL".equals(representadaDAO.pesquisarNomeFantasia(idRepresentada));
 	}
 
 	@Override
@@ -195,6 +175,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	public List<Representada> pesquisarFornecedor(Boolean ativo) {
+		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.REPRESENTACAO);
+	}
+
+	@Override
 	public Logradouro pesquisarLogradorouro(Integer id) {
 		StringBuilder select = new StringBuilder("select t.logradouro from Representada t  ");
 		select.append(" INNER JOIN t.logradouro where t.id = :id ");
@@ -202,6 +187,21 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("id", id);
 		return QueryUtil.gerarRegistroUnico(query, Logradouro.class, null);
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentada() {
+		return this.pesquisarRepresentada(null);
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentada(Boolean ativo) {
+		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.FORNECIMENTO);
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentadaAtivo() {
+		return this.pesquisarRepresentada(true);
 	}
 
 	@Override

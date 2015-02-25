@@ -16,6 +16,7 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemReservadoDAO;
 import br.com.plastecno.service.entity.ItemEstoque;
@@ -258,6 +259,27 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public boolean reservarItemPedido(Integer idPedido) throws BusinessException {
+		Pedido pedido = pedidoService.pesquisarPedidoById(idPedido);
+		if (!TipoPedido.REVENDA.equals(pedido.getTipoPedido())) {
+			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não é um pedido de revenda.");
+		}
+		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
+			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não esta em digitação.");
+		}
+		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		boolean todosReservados = true;
+		for (ItemPedido itemPedido : listaItem) {
+			itemPedido.setReservado(reservarItemPedido(itemPedido));
+			todosReservados &= itemPedido.isReservado();
+		}
+		pedido.setSituacaoPedido(todosReservados ? SituacaoPedido.ITEM_RESERVADO : SituacaoPedido.ITEM_PENDENTE_RESERVA);
+		pedidoService.inserir(pedido);
+		return todosReservados;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public boolean reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
 		ItemEstoque itemEstoque = null;
 		if (itemPedido.isPeca()) {
@@ -276,7 +298,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		} else if (quantidadePedido >= quantidadeEstoque) {
 			quantidadeReservada = quantidadeEstoque;
 		} else if (quantidadePedido < quantidadeEstoque) {
-			quantidadeReservada = quantidadeEstoque - quantidadePedido;
+			quantidadeReservada = quantidadePedido;
 		}
 		itemEstoque.setQuantidade(quantidadeEstoque - quantidadeReservada);
 		itemEstoque.setQuantidadeReservada(quantidadeReservada);
@@ -286,4 +308,5 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		return true;
 	}
+
 }

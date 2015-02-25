@@ -55,8 +55,7 @@ public interface PedidoService {
 
 	Pedido pesquisarCompraById(Integer id);
 
-	List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador)
-			throws BusinessException;
+	List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador) throws BusinessException;
 
 	List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo);
 
@@ -114,7 +113,5 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
-
-	boolean reservarItemPedido(Integer idPedido) throws BusinessException;
 
 }

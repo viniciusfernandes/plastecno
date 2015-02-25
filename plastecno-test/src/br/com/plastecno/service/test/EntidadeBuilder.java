@@ -87,6 +87,21 @@ public class EntidadeBuilder {
 		return itemPedido;
 	}
 
+	public ItemPedido buildItemPedidoPeca() {
+		ItemPedido itemPedido = new ItemPedido();
+		itemPedido.setAliquotaIPI(11.1d);
+		itemPedido.setMaterial(buildMaterial());
+		itemPedido.setFormaMaterial(FormaMaterial.PC);
+		itemPedido.setQuantidade(2);
+		itemPedido.setMedidaExterna(null);
+		itemPedido.setMedidaInterna(null);
+		itemPedido.setComprimento(null);
+		itemPedido.setTipoVenda(TipoVenda.PECA);
+		itemPedido.setDescricaoPeca("ENGRENAGEM DE TESTE");
+		itemPedido.setPrecoVenda(60d);
+		return itemPedido;
+	}
+
 	public Logradouro buildLogradouro(TipoLogradouro tipoLogradouro) {
 		Logradouro logradouro = new Logradouro(buildEndereco());
 		logradouro.setTipoLogradouro(tipoLogradouro);

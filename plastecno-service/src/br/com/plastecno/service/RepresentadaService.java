@@ -22,7 +22,7 @@ public interface RepresentadaService {
 
 	boolean isNomeFantasiaExistente(Integer id, String nomeFantasia);
 
-	boolean isRevendedor(String nomeRepresentada);
+	boolean isRevendedor(Integer idRepresentada);
 
 	List<Representada> pesquisarRepresentadaAtivo();
 

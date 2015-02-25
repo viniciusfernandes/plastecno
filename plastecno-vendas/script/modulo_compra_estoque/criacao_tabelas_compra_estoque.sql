@@ -61,12 +61,11 @@ create table vendas.tb_item_reservado (
 	id integer not null,
 	id_item_estoque integer not null,
 	id_item_pedido integer not null,
-	data_reserva date default null
+	data_reserva date default null,
+	quantidade_reservada integer default 0
 );
 
 ALTER TABLE vendas.tb_item_reservado ADD PRIMARY KEY (id);
 ALTER TABLE vendas.tb_item_reservado ADD CONSTRAINT id_item_estoque FOREIGN KEY (id_item_estoque) REFERENCES vendas.tb_item_estoque (id);
 ALTER TABLE vendas.tb_item_reservado ADD CONSTRAINT id_item_pedido FOREIGN KEY (id_item_pedido) REFERENCES vendas.tb_item_pedido (id);
 create sequence vendas.seq_item_reservado_id increment by 1 minvalue 1 no maxvalue start with 1;
-
-

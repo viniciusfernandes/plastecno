@@ -39,9 +39,9 @@ import br.com.plastecno.service.exception.BusinessException;
 public class PedidoServiceTest extends AbstractTest {
 
 	private ClienteService clienteService;
+	private MaterialService materialService;
 	private PedidoService pedidoService;
 	private RepresentadaService representadaService;
-	private MaterialService materialService;
 
 	private void associarVendedor(Cliente cliente) {
 		cliente.setVendedor(eBuilder.buildVendedor());
@@ -52,25 +52,6 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 	}
 
-	@Test
-	public void testEfetuarEncomendaItemPedido(){
-		Pedido pedido = eBuilder.buildPedido();
-		associarVendedor(pedido.getCliente());
-
-		try {
-			pedido = pedidoService.inserir(pedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		Integer idPedido = pedido.getId();
-		ItemPedido itemPedido = gerarItemPedido();
-		try {
-			pedidoService.inserirItemPedido(idPedido, itemPedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-	}
 	private ItemPedido gerarItemPedido() {
 		List<Representada> listaRepresentada = representadaService.pesquisarRepresentada();
 		Representada representada = null;
@@ -383,6 +364,26 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testEfetuarEncomendaItemPedido() {
+		Pedido pedido = eBuilder.buildPedido();
+		associarVendedor(pedido.getCliente());
+
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
+	@Test
 	public void testEnvioEmailPedido() {
 		Pedido pedido = gerarPedidoClienteProspectado();
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
@@ -466,6 +467,34 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O email do contato eh obrigatorio para o envio do orcamento", throwed);
+	}
+
+	@Test
+	public void testEnvioEmailPedidoReservaInvalida() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+		pedido.setFormaPagamento("30 dias");
+		pedido.setTipoEntrega(TipoEntrega.FOB);
+		Integer idPedido = null;
+		try {
+			pedido = pedidoService.inserir(pedido);
+			idPedido = pedido.getId();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		ItemPedido itemPedido = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test

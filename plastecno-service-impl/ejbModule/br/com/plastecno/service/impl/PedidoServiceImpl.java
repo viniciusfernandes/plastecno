@@ -147,7 +147,7 @@ public class PedidoServiceImpl implements PedidoService {
 		// portanto, faremos uma consulta pelo nome da representada para decidir, ja
 		// que os pedidos de compra sempre serao configurados antes de inserir.
 		if (pedido.getTipoPedido() == null) {
-			if (representadaService.isRevendedor(pedido.getRepresentada().getNomeFantasia())) {
+			if (representadaService.isRevendedor(pedido.getRepresentada().getId())) {
 				pedido.setTipoPedido(TipoPedido.REVENDA);
 			} else {
 				pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
@@ -202,17 +202,24 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
 		}
 
-		if (pedido.isRevenda()) {
-			reservarItemPedido(idPedido);
-		}
-
 		pedidoDAO.alterar(pedido);
 	}
 
 	private void enviarVenda(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
 		this.validarEnvioVenda(pedido);
+
+		if (pedido.isRevenda()) {
+			estoqueService.reservarItemPedido(pedido.getId());
+		}
+
 		logradouroService.verificarListaLogradouroObrigatorio(pedido.getListaLogradouro());
-		pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
+		// Aqui estamos tratando o caso em que a situacao do pedido nao foi definida
+		// na reserva dos itens do pedido, pois la o pedido entre em pendecia de
+		// reserva.
+		if (SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
+			pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
+		}
+
 		try {
 			GeradorPedidoEmail gerador = new GeradorPedidoEmail(pedido, arquivoAnexado);
 			emailService.enviar(gerador.gerarMensagem(TipoMensagemPedido.VENDA));
@@ -838,27 +845,6 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Não foi possivel remover o item pois não existe item com o codigo " + idItemPedido);
 		}
 
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public boolean reservarItemPedido(Integer idPedido) throws BusinessException {
-		Pedido pedido = pesquisarPedidoById(idPedido);
-		if (!TipoPedido.REVENDA.equals(pedido.getTipoPedido())) {
-			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não é um pedido de revenda.");
-		}
-		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
-			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não esta em digitação.");
-		}
-		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(idPedido);
-		boolean todosReservados = true;
-		for (ItemPedido itemPedido : listaItem) {
-			itemPedido.setReservado(estoqueService.reservarItemPedido(itemPedido));
-			todosReservados &= itemPedido.isReservado();
-		}
-		pedido.setSituacaoPedido(todosReservados ? SituacaoPedido.ITEM_RESERVADO : SituacaoPedido.ITEM_PENDENTE_RESERVA);
-		pedidoDAO.alterar(pedido);
-		return todosReservados;
 	}
 
 	private void validarEnvio(Pedido pedido) throws BusinessException {

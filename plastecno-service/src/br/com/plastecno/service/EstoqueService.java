@@ -21,13 +21,16 @@ public interface EstoqueService {
 	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
 			Double medidaInterna, Double comprimento);
 
-	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca) throws BusinessException;
+	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca)
+			throws BusinessException;
 
 	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
+
+	boolean reservarItemPedido(Integer idPedido) throws BusinessException;
 
 	boolean reservarItemPedido(ItemPedido itemPedido) throws BusinessException;
 }

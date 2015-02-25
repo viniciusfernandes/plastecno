@@ -5,7 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 
@@ -30,6 +32,7 @@ import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.EnderecoDAO;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
+import br.com.plastecno.service.dao.ItemReservadoDAO;
 import br.com.plastecno.service.dao.MaterialDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.RepresentadaDAO;
@@ -58,8 +61,20 @@ import br.com.plastecno.service.impl.UsuarioServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
 class ServiceBuilder {
+	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
+
+	private final static Map<Class<?>, Object> mapServices = new HashMap<Class<?>, Object>();
+
+	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
+	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
+
 	@SuppressWarnings("unchecked")
 	static <T> T buildService(Class<T> classe) {
+		T service = (T) mapServices.get(classe);
+		if (service != null) {
+			return service;
+		}
+
 		String metodoName = "build" + classe.getSimpleName();
 		Method method = null;
 		try {
@@ -81,10 +96,6 @@ class ServiceBuilder {
 			}
 		}
 	}
-
-	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
-	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
-	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
 
 	ServiceBuilder() {
 	}
@@ -189,7 +200,8 @@ class ServiceBuilder {
 
 		};
 		inject(estoqueService, new ItemEstoqueDAO(null), "itemEstoqueDAO");
-		inject(estoqueService, buildPedidoService(), "pedidoService");
+		inject(estoqueService, new ItemReservadoDAO(null), "itemReservadoDAO");
+		inject(estoqueService, buildService(PedidoService.class), "pedidoService");
 		return estoqueService;
 	}
 
@@ -344,6 +356,7 @@ class ServiceBuilder {
 		inject(pedidoService, buildService(EmailService.class), "emailService");
 		inject(pedidoService, buildService(MaterialService.class), "materialService");
 		inject(pedidoService, buildService(RepresentadaService.class), "representadaService");
+		inject(pedidoService, buildService(EstoqueService.class), "estoqueService");
 
 		return pedidoService;
 	}
@@ -432,6 +445,7 @@ class ServiceBuilder {
 	private void inject(Object service, Object dependencia, String nomeCampo) {
 		try {
 			Field campo = service.getClass().getDeclaredField(nomeCampo);
+
 			campo.setAccessible(true);
 			campo.set(service, dependencia);
 			campo.setAccessible(false);
@@ -441,4 +455,21 @@ class ServiceBuilder {
 		}
 	}
 
+	private void injectCyclicReference(Object service, Object dependencia) throws IllegalArgumentException,
+			IllegalAccessException {
+		String serviceName = service.getClass().getSimpleName();
+		serviceName = serviceName.substring(0, 1).toLowerCase() + serviceName.substring(1);
+		Field campo = null;
+		try {
+			campo = dependencia.getClass().getDeclaredField(serviceName);
+			campo.setAccessible(true);
+			campo.set(dependencia, service);
+		} catch (NoSuchFieldException e) {
+		} finally {
+			if (campo != null) {
+				campo.setAccessible(false);
+			}
+		}
+
+	}
 }

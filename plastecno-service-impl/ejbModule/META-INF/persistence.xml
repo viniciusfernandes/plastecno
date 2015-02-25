@@ -18,6 +18,7 @@
 		<class>br.com.plastecno.service.entity.Endereco</class>
 		<class>br.com.plastecno.service.entity.ItemEstoque</class>
 		<class>br.com.plastecno.service.entity.ItemPedido</class>
+		<class>br.com.plastecno.service.entity.ItemReservado</class>
 		<class>br.com.plastecno.service.entity.Logradouro</class>
 		<class>br.com.plastecno.service.entity.LogradouroCliente</class>
 		<class>br.com.plastecno.service.entity.Pais</class>

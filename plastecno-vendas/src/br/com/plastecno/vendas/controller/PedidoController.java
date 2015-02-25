@@ -71,8 +71,8 @@ public class PedidoController extends AbstractController {
     }
 
     private class PedidoPDFWrapper {
-        private final Pedido pedido;
         private final byte[] arquivoPDF;
+        private final Pedido pedido;
 
         public PedidoPDFWrapper(Pedido pedido, byte[] arquivoPDF) {
             this.pedido = pedido;
@@ -89,26 +89,26 @@ public class PedidoController extends AbstractController {
     }
 
     @Servico
-    private TipoEntregaService tipoEntregaService;
-    @Servico
     private ClienteService clienteService;
+    private String diretorioTemplateRelatorio;
     @Servico
-    private RepresentadaService representadaService;
+    private FormaMaterialService formaMaterialService;
+    private GeradorRelatorioPDF geradorRelatorio;
     @Servico
     private MaterialService materialService;
     @Servico
     private PedidoService pedidoService;
+
     @Servico
-    private FormaMaterialService formaMaterialService;
+    private RepresentadaService representadaService;
+    @Servico
+    private TipoEntregaService tipoEntregaService;
 
     @Servico
     private TransportadoraService transportadoraService;
+
     @Servico
     private UsuarioService usuarioService;
-
-    private GeradorRelatorioPDF geradorRelatorio;
-
-    private String diretorioTemplateRelatorio;
 
     public PedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF gerador,
             HttpServletRequest request) {
@@ -362,7 +362,10 @@ public class PedidoController extends AbstractController {
             boolean isCompraFinalizada = pedido.isCompra()
                     && (SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
                             .equals(situacao));
-            boolean isVendaFinalizada = pedido.isVenda() && SituacaoPedido.ENVIADO.equals(situacao);
+            boolean isVendaFinalizada = pedido.isVenda()
+                    && (SituacaoPedido.ENVIADO.equals(situacao)
+                            || SituacaoPedido.ITEM_PENDENTE_RESERVA.equals(situacao) || SituacaoPedido.ITEM_RESERVADO
+                                .equals(situacao));
             return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
         }
     }

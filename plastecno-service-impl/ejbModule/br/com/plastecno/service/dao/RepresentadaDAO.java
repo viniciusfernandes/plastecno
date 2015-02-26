@@ -20,7 +20,7 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 		return pesquisarById(Representada.class, idRepresentada);
 	}
 
-	public String pesquisarNomeFantasia(Integer idRepresentada) {
+	public String pesquisarNomeFantasiaById(Integer idRepresentada) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("SELECT r.nomeFantasia FROM Representada r where r.id = :idRepresentada")
 						.setParameter("idRepresentada", idRepresentada), String.class, null);

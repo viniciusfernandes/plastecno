@@ -65,7 +65,12 @@ public class GenericDAO<T> {
 		StringBuilder select = new StringBuilder();
 		select.append("select ").append("e.").append(nomeCampo).append(" from ").append(classe.getSimpleName());
 		select.append(" e where e.id = :id");
-		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id),
-				retorno, null);
+		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id), retorno,
+				null);
+	}
+
+	public T remover(T t) {
+		entityManager.remove(t);
+		return t;
 	}
 }

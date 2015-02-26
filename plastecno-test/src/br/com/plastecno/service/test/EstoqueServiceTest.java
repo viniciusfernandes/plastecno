@@ -596,30 +596,6 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testReservaPedidoComItemNaoExistenteEstoque() {
-		Pedido pedido = gerarPedido(TipoPedido.REVENDA);
-		ItemPedido item1 = eBuilder.buildItemPedido();
-		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
-
-		try {
-			final Integer idItemPedido = pedidoService.inserirItemPedido(pedido.getId(), item1);
-			pedidoService.inserirItemPedido(pedido.getId(), item2);
-			// Inserindo apenas um dos itens para fazermos os testes de pendencia
-			estoqueService.inserirItemPedido(idItemPedido);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		boolean throwed = false;
-		try {
-			estoqueService.reservarItemPedido(pedido.getId());
-		} catch (BusinessException e) {
-			throwed = true;
-		}
-		assertTrue("Pedidos de representacao nao", throwed);
-	}
-
-	@Test
 	public void testReservaPedidoCompraInvalido() {
 		Pedido pedido = gerarPedido(TipoPedido.COMPRA);
 		ItemPedido item1 = eBuilder.buildItemPedido();
@@ -638,6 +614,56 @@ public class EstoqueServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("Pedidos de compra nao pode fazer reserva de estoque", throwed);
+	}
+
+	@Test
+	public void testReservaPedidoComTodosItensExistentesEstoque() {
+		Pedido pedido = gerarPedido(TipoPedido.REVENDA);
+		ItemPedido item1 = eBuilder.buildItemPedido();
+		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
+
+		try {
+			pedidoService.inserirItemPedido(pedido.getId(), item1);
+			pedidoService.inserirItemPedido(pedido.getId(), item2);
+
+			// Inserindo apenas um dos itens para fazermos os testes de pendencia
+			estoqueService.inserirItemPedido(item1.getId());
+			estoqueService.inserirItemPedido(item2.getId());
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		boolean existe = false;
+		try {
+			existe = estoqueService.reservarItemPedido(pedido.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertTrue("Todos os itens desse pedido esxistem no estoque", existe);
+	}
+
+	@Test
+	public void testReservaPedidoComUmDosItemNaoExistenteEstoque() {
+		Pedido pedido = gerarPedido(TipoPedido.REVENDA);
+		ItemPedido item1 = eBuilder.buildItemPedido();
+		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
+
+		try {
+			final Integer idItemPedido = pedidoService.inserirItemPedido(pedido.getId(), item1);
+			pedidoService.inserirItemPedido(pedido.getId(), item2);
+			// Inserindo apenas um dos itens para fazermos os testes de pendencia
+			estoqueService.inserirItemPedido(idItemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		boolean existe = false;
+		try {
+			existe = estoqueService.reservarItemPedido(pedido.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertFalse("O pedido nao contem todos os itens no estoque", existe);
 	}
 
 	@Test

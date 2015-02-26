@@ -24,7 +24,6 @@ import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoVenda;
-import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.Cliente;
@@ -45,6 +44,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private void associarVendedor(Cliente cliente) {
 		cliente.setVendedor(eBuilder.buildVendedor());
+		cliente.setEmail(cliente.getEmail() + Math.random());
 		try {
 			clienteService.inserir(cliente);
 		} catch (BusinessException e) {
@@ -320,14 +320,12 @@ public class PedidoServiceTest extends AbstractTest {
 			}
 		};
 
-		new MockUp<ClienteDAO>() {
-			@Mock
-			Cliente pesquisarById(Integer id) {
-				Cliente cliente = new Cliente(id, "vinicius");
-				return cliente;
-			}
-		};
-
+		/*
+		 * new MockUp<ClienteDAO>() {
+		 * 
+		 * @Mock Cliente pesquisarById(Integer id) { Cliente cliente = new
+		 * Cliente(id, "vinicius"); return cliente; } };
+		 */
 		new MockUp<UsuarioDAO>() {
 			@Mock
 			Usuario pesquisarById(Integer id) {
@@ -1165,7 +1163,15 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoRevenda() {
-		Pedido pedido = eBuilder.buildPedidoRevenda();
+		Representada representada = eBuilder.buildRepresentadaRevendedora();
+		try {
+			representadaService.inserir(representada);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		Pedido pedido = eBuilder.buildPedido();
+		pedido.setRepresentada(representada);
 		associarVendedor(pedido.getCliente());
 
 		try {
@@ -1242,7 +1248,7 @@ public class PedidoServiceTest extends AbstractTest {
 		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);
 
-		pedido = repositorio.pesquisarEntidadeById(Pedido.class, idPedido);
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
 		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,
 				SituacaoPedido.CANCELADO, pedido.getSituacaoPedido());
 
@@ -1277,7 +1283,7 @@ public class PedidoServiceTest extends AbstractTest {
 		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);
 
-		pedido = repositorio.pesquisarEntidadeById(Pedido.class, idPedido);
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
 		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,
 				SituacaoPedido.CANCELADO, pedido.getSituacaoPedido());
 

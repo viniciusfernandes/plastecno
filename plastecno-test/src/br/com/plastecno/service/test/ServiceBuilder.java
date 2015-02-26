@@ -54,21 +54,45 @@ import br.com.plastecno.service.mensagem.email.MensagemEmail;
 class ServiceBuilder {
 	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
 
-	private final static Map<Class<?>, Object> mapServices = new HashMap<Class<?>, Object>();
+	/*
+	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
+	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
+	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
+	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
+	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
+	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
+	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
+	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
+	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
+	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
+	 */
+	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
 
 	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
 	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
 
 	@SuppressWarnings("unchecked")
 	static <T> T buildService(Class<T> classe) {
-		T service = (T) mapServices.get(classe);
+		T service = (T) mapTemporarioServices.get(classe);
 		if (service != null) {
 			return service;
 		}
-
 		String serviceNameImpl = classe.getName().replace("service", "service.impl") + "Impl";
 		try {
-			mapServices.put(classe, Class.forName(serviceNameImpl).newInstance());
+			/*
+			 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS
+			 * CICLICAS ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE
+			 * SERVICE. QUANDO VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE
+			 * EFETUAR O BUILD DO ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK
+			 * ENTRE OS BUILDS, JOGAMOS O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM
+			 * QUE O ESTOQUESERVICE FOR EFFETUAR O BUILD DO PEDIDOSSERVICE,
+			 * VERIFICAMOS QUE ELE JA ESTA EM MEMORIA E RETORNAMOS ESSE OBJETO. SENDO
+			 * QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS EM MEMORIA POIS O MECANISMO
+			 * DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE UNITARIO, POIS ESSE EH O
+			 * CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS METODOS. ELAS VALEM
+			 * APENAS EM CADA TESTE UNITARIO.
+			 */
+			mapTemporarioServices.put(classe, Class.forName(serviceNameImpl).newInstance());
 		} catch (Exception e1) {
 			throw new IllegalStateException("Nao foi possivel instanciar a implementacao do servico \"" + serviceNameImpl
 					+ "\"");
@@ -81,7 +105,13 @@ class ServiceBuilder {
 			try {
 				method.setAccessible(true);
 				service = (T) method.invoke(SERVICE_BUILDER, (Object[]) null);
-				mapServices.put(classe, service);
+				/*
+				 * REMOVENDO OS OBJETOS EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER
+				 * EXECUTADO PARA CADA TESTE UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS
+				 * IMPLEMENTACOES MOCKADAS DOS METODOS. ELAS VALEM APENAS EM CADA TESTE
+				 * UNITARIO.
+				 */
+				mapTemporarioServices.remove(classe);
 				return service;
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new TestUtilException("Falha na execucao do metodo de inicializacao do servico \"" + "gerar"
@@ -114,20 +144,23 @@ class ServiceBuilder {
 
 		new MockUp<ClienteDAO>() {
 			@Mock
+			public boolean isEmailExistente(Integer idCliente, String email) {
+				return REPOSITORY.contemEntidade(Cliente.class, "email", email, idCliente);
+			};
+
+			@Mock
 			public List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
 				Cliente cliente = REPOSITORY.pesquisarEntidadeById(Cliente.class, idCliente);
 				return cliente == null ? new ArrayList<LogradouroCliente>() : cliente.getListaLogradouro();
 			}
-
-			@Mock
-			public boolean isEmailExistente(Integer idCliente, String email) {
-				return REPOSITORY.contemEntidade(Cliente.class, "email", email, idCliente);
-			}
-
 		};
+		ClienteDAO d = new ClienteDAO(null);
+		d.isEmailExistente(1, "");
+
 		inject(clienteService, new ClienteDAO(null), "clienteDAO");
 		inject(clienteService, buildService(LogradouroService.class), "logradouroService");
 		inject(clienteService, buildService(EnderecamentoService.class), "enderecamentoService");
+		clienteService.isEmailExistente(1, "");
 		return clienteService;
 	}
 
@@ -146,6 +179,8 @@ class ServiceBuilder {
 	@SuppressWarnings("unused")
 	private EnderecamentoService buildEnderecamentoService() {
 		EnderecamentoService enderecamentoService = getServiceImpl(EnderecamentoService.class);
+		inject(enderecamentoService, new EnderecoDAO(null), "enderecoDAO");
+
 		new MockUp<EnderecoDAO>() {
 			@Mock
 			boolean isUFExistente(String sigla, Integer idPais) {
@@ -168,13 +203,16 @@ class ServiceBuilder {
 			}
 
 		};
-		inject(enderecamentoService, new EnderecoDAO(null), "enderecoDAO");
 		return enderecamentoService;
 	}
 
 	@SuppressWarnings("unused")
 	private EstoqueService buildEstoqueService() {
 		EstoqueService estoqueService = getServiceImpl(EstoqueService.class);
+		inject(estoqueService, new ItemEstoqueDAO(null), "itemEstoqueDAO");
+		inject(estoqueService, new ItemReservadoDAO(null), "itemReservadoDAO");
+		inject(estoqueService, buildService(PedidoService.class), "pedidoService");
+
 		new MockUp<ItemEstoqueDAO>() {
 			@Mock
 			public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
@@ -204,9 +242,7 @@ class ServiceBuilder {
 			}
 
 		};
-		inject(estoqueService, new ItemEstoqueDAO(null), "itemEstoqueDAO");
-		inject(estoqueService, new ItemReservadoDAO(null), "itemReservadoDAO");
-		inject(estoqueService, buildService(PedidoService.class), "pedidoService");
+
 		return estoqueService;
 	}
 
@@ -220,6 +256,9 @@ class ServiceBuilder {
 	@SuppressWarnings("unused")
 	private MaterialService buildMaterialService() {
 		MaterialService materialService = getServiceImpl(MaterialService.class);
+		inject(materialService, new MaterialDAO(null), "materialDAO");
+		inject(materialService, buildService(RepresentadaService.class), "representadaService");
+
 		new MockUp<MaterialDAO>() {
 			@Mock
 			boolean isMaterialImportado(Integer idMaterial) {
@@ -232,15 +271,22 @@ class ServiceBuilder {
 				return REPOSITORY.pesquisarEntidadeById(Material.class, id);
 			}
 		};
-		inject(materialService, new MaterialDAO(null), "materialDAO");
-		inject(materialService, buildService(RepresentadaService.class), "representadaService");
+
 		return materialService;
 	}
 
 	@SuppressWarnings("unused")
 	private PedidoService buildPedidoService() {
 		PedidoService pedidoService = getServiceImpl(PedidoService.class);
-		mapServices.put(PedidoService.class, pedidoService);
+		inject(pedidoService, new PedidoDAO(null), "pedidoDAO");
+		inject(pedidoService, new ItemPedidoDAO(null), "itemPedidoDAO");
+		inject(pedidoService, buildService(UsuarioService.class), "usuarioService");
+		inject(pedidoService, buildService(ClienteService.class), "clienteService");
+		inject(pedidoService, buildService(LogradouroService.class), "logradouroService");
+		inject(pedidoService, buildService(EmailService.class), "emailService");
+		inject(pedidoService, buildService(MaterialService.class), "materialService");
+		inject(pedidoService, buildService(RepresentadaService.class), "representadaService");
+		inject(pedidoService, buildService(EstoqueService.class), "estoqueService");
 
 		new MockUp<PedidoDAO>() {
 
@@ -358,22 +404,14 @@ class ServiceBuilder {
 			}
 		};
 
-		inject(pedidoService, new PedidoDAO(null), "pedidoDAO");
-		inject(pedidoService, new ItemPedidoDAO(null), "itemPedidoDAO");
-		inject(pedidoService, buildService(UsuarioService.class), "usuarioService");
-		inject(pedidoService, buildService(ClienteService.class), "clienteService");
-		inject(pedidoService, buildService(LogradouroService.class), "logradouroService");
-		inject(pedidoService, buildService(EmailService.class), "emailService");
-		inject(pedidoService, buildService(MaterialService.class), "materialService");
-		inject(pedidoService, buildService(RepresentadaService.class), "representadaService");
-		inject(pedidoService, buildService(EstoqueService.class), "estoqueService");
-
 		return pedidoService;
 	}
 
 	@SuppressWarnings("unused")
 	private RepresentadaService buildRepresentadaService() {
 		RepresentadaService representadaService = getServiceImpl(RepresentadaService.class);
+		inject(representadaService, new RepresentadaDAO(null), "representadaDAO");
+		inject(representadaService, buildService(LogradouroService.class), "logradouroService");
 
 		new MockUp<RepresentadaDAO>() {
 			@Mock
@@ -382,7 +420,7 @@ class ServiceBuilder {
 			}
 
 			@Mock
-			String pesquisarNomeFantasia(Integer idRepresentada) {
+			String pesquisarNomeFantasiaById(Integer idRepresentada) {
 				Representada r = REPOSITORY.pesquisarEntidadeById(Representada.class, idRepresentada);
 				return r != null ? r.getNomeFantasia() : null;
 			}
@@ -405,16 +443,24 @@ class ServiceBuilder {
 				Representada representada = REPOSITORY.pesquisarEntidadeById(Representada.class, idRepresentada);
 				return representada == null ? null : representada.getTipoApresentacaoIPI();
 			}
+
+			@Mock
+			TipoRelacionamento pesquisarTipoRelacionamento(Integer idRepresentada) {
+				return REPOSITORY.pesquisarEntidadeAtributoById(Representada.class, idRepresentada, "tipoRelacionamento",
+						TipoRelacionamento.class);
+			}
 		};
 
-		inject(representadaService, new RepresentadaDAO(null), "representadaDAO");
-		inject(representadaService, buildService(LogradouroService.class), "logradouroService");
 		return representadaService;
 	}
 
 	@SuppressWarnings("unused")
 	private UsuarioService buildUsuarioService() {
 		UsuarioService usuarioService = getServiceImpl(UsuarioService.class);
+		inject(usuarioService, new UsuarioDAO(null), "usuarioDAO");
+		inject(usuarioService, buildService(LogradouroService.class), "logradouroService");
+		inject(usuarioService, buildService(AutenticacaoService.class), "autenticacaoService");
+
 		new MockUp<UsuarioDAO>() {
 
 			@Mock
@@ -454,15 +500,13 @@ class ServiceBuilder {
 			}
 
 		};
-		inject(usuarioService, new UsuarioDAO(null), "usuarioDAO");
-		inject(usuarioService, buildService(LogradouroService.class), "logradouroService");
-		inject(usuarioService, buildService(AutenticacaoService.class), "autenticacaoService");
+
 		return usuarioService;
 	}
 
 	@SuppressWarnings("unchecked")
 	private <T> T getServiceImpl(Class<T> classe) {
-		return (T) mapServices.get(classe);
+		return (T) mapTemporarioServices.get(classe);
 	}
 
 	private void inject(Object service, Object dependencia, String nomeCampo) {

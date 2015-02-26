@@ -146,7 +146,7 @@ public class EntidadeBuilder {
 
 	public Pedido buildPedidoRevenda() {
 		Pedido pedido = buildPedido();
-		pedido.getRepresentada().setNomeFantasia("PLASTECNO FILIAL");
+		pedido.setRepresentada(buildRepresentadaRevendedora());
 		return pedido;
 	}
 
@@ -167,6 +167,12 @@ public class EntidadeBuilder {
 		representada.setEmail("vendas@cobex.com.br");
 		representada.setComissao(0.05);
 		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
+		return representada;
+	}
+	
+	public Representada buildRepresentadaRevendedora() {
+		Representada representada = buildRepresentada();
+		representada.setTipoRelacionamento(TipoRelacionamento.REVENDA);
 		return representada;
 	}
 

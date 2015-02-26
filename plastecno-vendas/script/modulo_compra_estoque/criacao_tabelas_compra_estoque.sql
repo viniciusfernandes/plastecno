@@ -45,7 +45,9 @@ ALTER TABLE vendas.tb_tipo_relacionamento ADD PRIMARY KEY (id);
 insert into vendas.tb_tipo_relacionamento values (0, 'REPRESENTACAO');
 insert into vendas.tb_tipo_relacionamento  values (1, 'FORNECIMENTO');
 insert into vendas.tb_tipo_relacionamento  values (2, 'REPRESENTACAO E FORNECIMENTO');
+insert into vendas.tb_tipo_relacionamento  values (3, 'REVENDA');
 
+update vendas.tb_representada set id_tipo_relacionamento = 3 where nome_fantasia = 'PLASTECNO FILIAL';
 
 ALTER TABLE vendas.tb_representada ADD id_tipo_relacionamento integer not null default 0;
 ALTER TABLE vendas.tb_representada ADD CONSTRAINT id_tipo_relacionamento FOREIGN KEY (id_tipo_relacionamento) REFERENCES vendas.tb_tipo_relacionamento (id);

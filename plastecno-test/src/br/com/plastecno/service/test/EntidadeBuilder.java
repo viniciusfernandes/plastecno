@@ -44,6 +44,7 @@ public class EntidadeBuilder {
 		cliente.setNomeFantasia("Exercito Brasileiro");
 		cliente.setCnpj("25632147000125");
 		cliente.setRamoAtividade(buildRamoAtividade());
+		cliente.setEmail("alex@gmail.com.br");
 		cliente.setId(gerarId());
 		return cliente;
 	}

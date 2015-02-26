@@ -117,7 +117,6 @@ public class EstoqueServiceTest extends AbstractTest {
 		clienteService = ServiceBuilder.buildService(ClienteService.class);
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
-
 	}
 
 	private Integer pesquisarQuantidadeTotalItemEstoque(Integer idItemEstoque) {

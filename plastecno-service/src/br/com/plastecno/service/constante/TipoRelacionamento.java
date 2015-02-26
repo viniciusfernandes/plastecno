@@ -1,7 +1,10 @@
 package br.com.plastecno.service.constante;
 
 public enum TipoRelacionamento {
-	REPRESENTACAO("Representação"), FORNECIMENTO("Fornecimento"), REPRESENTACAO_FORNECIMENTO("Ambos");
+	REPRESENTACAO("Representação"), 
+	FORNECIMENTO("Fornecimento"), 
+	REPRESENTACAO_FORNECIMENTO("Ambos"), 
+	REVENDA("Revenda");
 
 	private String descricao;
 

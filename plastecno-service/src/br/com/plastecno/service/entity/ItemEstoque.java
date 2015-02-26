@@ -126,6 +126,16 @@ public class ItemEstoque extends Item {
 		return precoMedio;
 	}
 
+	@Override
+	public Double getPrecoUnidade() {
+		return getPrecoMedio();
+	}
+
+	@Override
+	public Double getPrecoUnidadeIPI() {
+		throw new UnsupportedOperationException();
+	}
+
 	public Double getPrecoVenda() {
 		return precoMedio;
 	}
@@ -180,6 +190,16 @@ public class ItemEstoque extends Item {
 
 	public void setPrecoMedio(Double precoMedio) {
 		this.precoMedio = precoMedio;
+	}
+
+	@Override
+	public void setPrecoUnidade(Double precoUnidade) {
+		setPrecoMedio(precoUnidade);
+	}
+
+	@Override
+	public void setPrecoUnidadeIPI(Double precoUnidadeIPI) {
+		throw new UnsupportedOperationException();
 	}
 
 	public void setQuantidade(Integer quantidade) {

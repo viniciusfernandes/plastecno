@@ -2,11 +2,9 @@ package br.com.plastecno.service.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.FormaMaterial;
-import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 public abstract class Item implements Serializable, Cloneable {
 
@@ -15,34 +13,14 @@ public abstract class Item implements Serializable, Cloneable {
 	 */
 	private static final long serialVersionUID = -1708677510288806140L;
 
-	@Column(name = "preco_unidade")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido")
-	private Double precoUnidade;
-
-	@Column(name = "preco_unidade_ipi")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido com IPI")
-	private Double precoUnidadeIPI;
-
-	@Transient
-	private String precoUnidadeFormatado;
-
-	@Transient
-	private String precoItemFormatado;
-
-	@Transient
-	private String precoVendaFormatado;
-
-	@Transient
-	private String precoMedioFormatado;
-
-	@Transient
-	private String precoUnidadeIPIFormatado;
-
 	@Transient
 	private String aliquotaICMSFormatado;
 
 	@Transient
 	private String aliquotaIPIFormatado;
+
+	@Transient
+	private String comprimentoFormatado;
 
 	@Transient
 	private String medidaExternaFomatada;
@@ -51,7 +29,19 @@ public abstract class Item implements Serializable, Cloneable {
 	private String medidaInternaFomatada;
 
 	@Transient
-	private String comprimentoFormatado;
+	private String precoItemFormatado;
+
+	@Transient
+	private String precoMedioFormatado;
+
+	@Transient
+	private String precoUnidadeFormatado;
+
+	@Transient
+	private String precoUnidadeIPIFormatado;
+
+	@Transient
+	private String precoVendaFormatado;
 
 	public Item() {
 	}
@@ -135,11 +125,11 @@ public abstract class Item implements Serializable, Cloneable {
 	}
 
 	public double getPrecoItem() {
-		if (precoUnidade == null || getQuantidade() == null) {
+		if (getPrecoUnidade() == null || getQuantidade() == null) {
 			return 0d;
 		}
 
-		return precoUnidade * getQuantidade();
+		return getPrecoUnidade() * getQuantidade();
 	}
 
 	public String getPrecoItemFormatado() {
@@ -150,17 +140,13 @@ public abstract class Item implements Serializable, Cloneable {
 		return precoMedioFormatado;
 	}
 
-	public Double getPrecoUnidade() {
-		return precoUnidade;
-	}
+	public abstract Double getPrecoUnidade();
 
 	public String getPrecoUnidadeFormatado() {
 		return precoUnidadeFormatado;
 	}
 
-	public Double getPrecoUnidadeIPI() {
-		return precoUnidadeIPI;
-	}
+	public abstract Double getPrecoUnidadeIPI();
 
 	public String getPrecoUnidadeIPIFormatado() {
 		return precoUnidadeIPIFormatado;
@@ -230,17 +216,13 @@ public abstract class Item implements Serializable, Cloneable {
 		this.precoMedioFormatado = precoMedioFormatado;
 	}
 
-	public void setPrecoUnidade(Double precoUnidade) {
-		this.precoUnidade = precoUnidade;
-	}
+	public abstract void setPrecoUnidade(Double precoUnidade);
 
 	public void setPrecoUnidadeFormatado(String precoUnidadeFormatado) {
 		this.precoUnidadeFormatado = precoUnidadeFormatado;
 	}
 
-	public void setPrecoUnidadeIPI(Double precoUnidadeIPI) {
-		this.precoUnidadeIPI = precoUnidadeIPI;
-	}
+	public abstract void setPrecoUnidadeIPI(Double precoUnidadeIPI);
 
 	public void setPrecoUnidadeIPIFormatado(String precoUnidadeIPIFormatado) {
 		this.precoUnidadeIPIFormatado = precoUnidadeIPIFormatado;

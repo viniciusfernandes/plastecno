@@ -132,7 +132,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@Override
 	public boolean isRevendedor(Integer idRepresentada) {
-		return "PLASTECNO FILIAL".equals(representadaDAO.pesquisarNomeFantasia(idRepresentada));
+		return TipoRelacionamento.REVENDA.equals(representadaDAO.pesquisarTipoRelacionamento(idRepresentada));
 	}
 
 	@Override

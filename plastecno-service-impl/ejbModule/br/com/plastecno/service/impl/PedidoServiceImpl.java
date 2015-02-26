@@ -142,6 +142,7 @@ public class PedidoServiceImpl implements PedidoService {
 		return this.pesquisarTotalItemPedido(idPedido) > 0;
 	}
 
+	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
 	private void definirTipoPedido(Pedido pedido) {
 		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
 		// portanto, faremos uma consulta pelo nome da representada para decidir, ja
@@ -820,9 +821,7 @@ public class PedidoServiceImpl implements PedidoService {
 	public Pedido removerItemPedido(Integer idItemPedido) throws BusinessException {
 		ItemPedido itemPedido = null;
 		try {
-			itemPedido = (ItemPedido) this.entityManager
-					.createQuery("select i from ItemPedido i join fetch i.pedido where i.id = :idItemPedido")
-					.setParameter("idItemPedido", idItemPedido).getSingleResult();
+			itemPedido = pesquisarItemPedido(idItemPedido);
 
 			if (itemPedido == null) {
 				return null;
@@ -831,12 +830,16 @@ public class PedidoServiceImpl implements PedidoService {
 
 			alterarSequencialItemPedido(pedido.getId(), itemPedido.getSequencial());
 
-			this.entityManager.remove(itemPedido);
+			itemPedidoDAO.remover(itemPedido);
 
 			// Efetuando novamente o calculo pois na remocao o valor do pedido
 			// deve ser atualizado
 			pedido.setValorPedido(this.calcularValorPedido(pedido.getId()));
 			pedido.setValorPedidoIPI(this.calcularValorPedidoIPI(pedido.getId()));
+
+			if (pedido.isCompraEfetuada() && pesquisarTotalItemPedido(pedido.getId()) <= 0L) {
+				pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
+			}
 			return pedido;
 		} catch (NonUniqueResultException e) {
 			throw new BusinessException("Não foi possivel remover o item pois foi encontrato mais de um item para o codigo "

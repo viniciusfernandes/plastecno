@@ -150,15 +150,16 @@ public class Pedido implements Serializable, Cloneable {
 	public Pedido() {
 	}
 
-	public Pedido(Integer id, Date dataEntrega, Double valorPedido, String nomeFantasiaCliente,String razaoSocialCliente, String nomeFantasiaRepresentada) {
+	public Pedido(Integer id, Date dataEntrega, Double valorPedido, String nomeFantasiaCliente,
+			String razaoSocialCliente, String nomeFantasiaRepresentada) {
 		this.id = id;
 		this.dataEntrega = dataEntrega;
 		this.valorPedido = valorPedido;
-		
+
 		this.cliente = new Cliente();
 		this.cliente.setNomeFantasia(nomeFantasiaCliente);
 		this.cliente.setRazaoSocial(razaoSocialCliente);
-		
+
 		this.representada = new Representada();
 		this.representada.setRazaoSocial(nomeFantasiaRepresentada);
 	}
@@ -451,5 +452,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setVendedor(Usuario vendedor) {
 		this.proprietario = vendedor;
+	}
+
+	public boolean isCompraEfetuada() {
+		return SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacaoPedido)
+				|| SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido);
 	}
 }

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
@@ -118,7 +119,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
 	}
-
+	
 	private Integer pesquisarQuantidadeTotalItemEstoque(Integer idItemEstoque) {
 		ItemEstoque i = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 		return i != null ? i.getQuantidade() : 0;
@@ -595,6 +596,7 @@ public class EstoqueServiceTest extends AbstractTest {
 				itemEstoque.getQuantidade());
 	}
 
+	/*
 	@Test
 	public void testReservaPedidoComItemNaoExistenteEstoque() {
 		Pedido pedido = gerarPedido(TipoPedido.REVENDA);
@@ -618,7 +620,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 		assertTrue("Pedidos de representacao nao", throwed);
 	}
-
+	 */
+	
 	@Test
 	public void testReservaPedidoCompraInvalido() {
 		Pedido pedido = gerarPedido(TipoPedido.COMPRA);

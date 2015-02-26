@@ -28,6 +28,15 @@ class EntidadeRepository {
 		mapaEntidades.clear();
 	}
 
+	void print() {
+		for (List<Object> lista : mapaEntidades.values()) {
+			for (Object object : lista) {
+				System.out.println("Entidade: " + object);
+			}
+		}
+		System.out.println();
+	}
+
 	<T> boolean contemEntidade(Class<T> classe, String nomeAtributo, Object valorAtributo, Object valorIdEntidade) {
 		return pesquisarEntidadeByAtributo(classe, nomeAtributo, valorAtributo, valorIdEntidade) != null;
 	}

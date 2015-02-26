@@ -15,13 +15,8 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 		super(entityManager);
 	}
 
-	public boolean isEmailExistente(Integer idCliente, String email) {
-		return true;
-	}
-
 	public Cliente pesquisarById(Integer id) {
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery("select c from Cliente c where c.id = :id")
-				.setParameter("id", id), Cliente.class, null);
+		return super.pesquisarById(Cliente.class, id);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -30,6 +25,21 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 				"where c.nomeFantasia like :nomeFantasia");
 		return this.entityManager.createQuery(select.toString()).setParameter("nomeFantasia", nomeFantasia).getResultList();
 
+	}
+
+	public boolean isEmailExistente(Integer idCliente, String email) {
+		Query query = null;
+		if (idCliente == null) {
+			query = this.entityManager.createQuery("select count(r.id) from Cliente r where r.email = :email ");
+			query.setParameter("email", email);
+		} else {
+			query = this.entityManager
+					.createQuery("select count(r.id) from Cliente  r where r.id != :id AND r.email = :email ");
+			query.setParameter("email", email);
+			query.setParameter("id", idCliente);
+		}
+
+		return QueryUtil.gerarRegistroUnico(query, Long.class, 0L) > 1;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -43,5 +53,4 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 	public String pesquisarNomeFantasia(Integer idCliente) {
 		return super.pesquisarCampoById(Cliente.class, idCliente, "nomeFantasia", String.class);
 	}
-
 }

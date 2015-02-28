@@ -19,6 +19,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemReservadoDAO;
+import br.com.plastecno.service.entity.Item;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.ItemReservado;
@@ -64,7 +65,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	public void cancelarTransacaoEstoqueByIdPedido(Integer idPedido) throws BusinessException {
+	public void cancelarReservaEstoqueByIdPedido(Integer idPedido) throws BusinessException {
 		removerItemReservadoByIdPedido(idPedido);
 		reinserirItemPedidoEstoque(idPedido);
 	}
@@ -73,6 +74,27 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean contemItemPedidoReservado(Integer idPedido) {
 		return itemReservadoDAO.pesquisarTotalItemPedidoReservado(idPedido) >= 1;
+	}
+
+	@Override
+	public void devolverItemCompradoEstoque(ItemPedido itemPedido) throws BusinessException {
+		ItemEstoque itemEstoque = pesquisarItemCadastradoEstoque(itemPedido);
+
+		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoByIdItemPedido(itemPedido.getId());
+		if (!SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido) && !itemPedido.isRecebido()) {
+			throw new BusinessException("A devolução é permitida apenas para os itens de compra que foram recebidos");
+		}
+
+		if (itemEstoque != null) {
+			Integer quantidadeEstoque = itemEstoque.getQuantidade();
+			Integer quantidadePedido = itemPedido.getQuantidade();
+			if (quantidadePedido > quantidadeEstoque) {
+				throw new BusinessException(
+						"O item que esta sendo devolvido contém quantidade maior do que a quantidade existente em estoque");
+			}
+			itemEstoque.setQuantidade(quantidadeEstoque - quantidadePedido);
+			itemEstoqueDAO.alterar(itemEstoque);
+		}
 	}
 
 	@Override
@@ -119,20 +141,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		CalculadoraVolume.validarVolume(itemEstoque);
 
-		Integer idMaterial = itemEstoque.getMaterial().getId();
-		FormaMaterial formaMaterial = itemEstoque.getFormaMaterial();
-		Double medidaExt = itemEstoque.getMedidaExterna();
-		Double medidaInt = itemEstoque.getMedidaInterna();
-		Double comp = itemEstoque.getComprimento();
-
 		// Verificando se existe item equivalente no estoque, caso nao exista vamos
 		// criar um novo.
-		ItemEstoque itemCadastrado = null;
-		if (itemEstoque.isPeca()) {
-			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, itemEstoque.getDescricaoPeca());
-		} else {
-			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, medidaExt, medidaInt, comp);
-		}
+		ItemEstoque itemCadastrado = pesquisarItemCadastradoEstoque(itemEstoque);
 
 		boolean isNovo = itemCadastrado == null;
 		if (isNovo) {
@@ -173,6 +184,24 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return Math.abs(1 - val1 / val2) <= tolerancia;
 	}
 
+	private ItemEstoque pesquisarItemCadastradoEstoque(Item filtro) {
+		Integer idMaterial = filtro.getMaterial().getId();
+		FormaMaterial formaMaterial = filtro.getFormaMaterial();
+		Double medidaExt = filtro.getMedidaExterna();
+		Double medidaInt = filtro.getMedidaInterna();
+		Double comp = filtro.getComprimento();
+
+		// Verificando se existe item equivalente no estoque, caso nao exista vamos
+		// criar um novo.
+		ItemEstoque itemCadastrado = null;
+		if (filtro.isPeca()) {
+			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, filtro.getDescricaoPeca());
+		} else {
+			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, medidaExt, medidaInt, comp);
+		}
+		return itemCadastrado;
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
@@ -199,14 +228,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	public ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca)
-			throws BusinessException {
+	public ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca) {
 		List<ItemEstoque> listItem = itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, descricaoPeca);
 		if (listItem.isEmpty()) {
 			return null;
 		}
 		if (listItem.size() > 1) {
-			throw new BusinessException("Foi encontrado mais de um registro para o codigo de material \"" + idMaterial
+			throw new IllegalStateException("Foi encontrado mais de um registro para o codigo de material \"" + idMaterial
 					+ "\", foma de material \"" + formaMaterial.getDescricao() + "\" e descrição de peça \"" + descricaoPeca
 					+ "\"");
 		}
@@ -343,5 +371,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
 
 		return true;
+	}
+
+	@Override
+	public void devolverItemCompradoEstoqueByIdPedido(Integer idPedido) throws BusinessException {
+		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		for (ItemPedido itemPedido : listaItem) {
+			devolverItemCompradoEstoque(itemPedido);
+		}
 	}
 }

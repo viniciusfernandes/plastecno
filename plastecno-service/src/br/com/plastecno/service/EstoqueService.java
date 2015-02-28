@@ -12,7 +12,13 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface EstoqueService {
+	void cancelarReservaEstoqueByIdPedido(Integer idPedido) throws BusinessException;
+
 	boolean contemItemPedidoReservado(Integer idPedido);
+
+	void devolverItemCompradoEstoque(ItemPedido itemPedido) throws BusinessException;
+	
+	void devolverItemCompradoEstoqueByIdPedido(Integer idPedido) throws BusinessException;
 
 	void empacotarItemPedido(Integer idItemPedido);
 
@@ -33,8 +39,6 @@ public interface EstoqueService {
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
-
-	void cancelarTransacaoEstoqueByIdPedido(Integer idPedido) throws BusinessException;
 
 	boolean reservarItemPedido(Integer idPedido) throws BusinessException;
 

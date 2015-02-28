@@ -265,8 +265,22 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return pesquisarCampoById(Pedido.class, idPedido, "situacaoPedido", SituacaoPedido.class);
 	}
 
+	public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select p.situacaoPedido from ItemPedido i inner join i.pedido p where i.id = :idItemPedido").setParameter(
+						"idItemPedido", idItemPedido), SituacaoPedido.class, null);
+	}
+
 	public TipoPedido pesquisarTipoPedidoById(Integer idPedido) {
 		return pesquisarCampoById(Pedido.class, idPedido, "tipoPedido", TipoPedido.class);
+	}
+
+	public SituacaoPedido pesquisarTipoPedidoByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select p.tipoPedido from ItemPedido i inner join i.pedido p where i.id = :idItemPedido").setParameter(
+						"idItemPedido", idItemPedido), SituacaoPedido.class, null);
 	}
 
 	public Long pesquisarTotalItemPedido(Integer idPedido) {

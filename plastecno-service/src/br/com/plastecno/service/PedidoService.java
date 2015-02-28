@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
@@ -119,5 +120,7 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
+
+	SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido);
 
 }

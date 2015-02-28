@@ -138,12 +138,17 @@ public class PedidoServiceImpl implements PedidoService {
 		// Essas condicoes serao analisadas quando um pedido for cancelado a partir
 		// de um "refazer do pedido".
 		if (TipoPedido.COMPRA.equals(tipoPedido) && SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido)) {
-			throw new BusinessException("Não é possível cancelar uma compra que já foi recebida");
+			estoqueService.devolverItemCompradoEstoqueByIdPedido(idPedido);
 		}
 		if (TipoPedido.REVENDA.equals(pedidoDAO.pesquisarTipoPedidoById(idPedido))) {
-			estoqueService.cancelarTransacaoEstoqueByIdPedido(idPedido);
+			estoqueService.cancelarReservaEstoqueByIdPedido(idPedido);
 		}
 		pedidoDAO.cancelar(idPedido);
+	}
+
+	@Override
+	public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
+		return pedidoDAO.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
 	}
 
 	@Override

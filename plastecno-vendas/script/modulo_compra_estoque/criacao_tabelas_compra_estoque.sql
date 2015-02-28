@@ -55,7 +55,7 @@ ALTER TABLE vendas.tb_representada ADD CONSTRAINT id_tipo_relacionamento FOREIGN
 alter table vendas.tb_item_estoque add quantidade_reservada integer default 0;
 alter table vendas.tb_item_pedido add item_reservado boolean default false;
 
-INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (6, 'ITEM DE PEDIDO RESERVADO');
+INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (6, 'PEDIDO PARA EMPACOTAR');
 INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (7, 'ITEM COM PENDENCIA DE RESERVA');
 
 

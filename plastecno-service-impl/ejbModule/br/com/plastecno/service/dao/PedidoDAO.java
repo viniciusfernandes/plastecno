@@ -139,7 +139,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 			select.append("and i.pedido.representada.id = :idRepresentada ");
 		}
 
-		select.append("order by i.pedido.id asc ");
+		select.append("order by i.pedido.dataEnvio asc ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("tipoPedido", TipoPedido.COMPRA);

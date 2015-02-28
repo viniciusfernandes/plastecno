@@ -50,6 +50,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		Pedido pedido = gerarPedido(tipoPedido);
 
 		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		itemPedido.setMaterial(gerarMaterial(pedido.getRepresentada().getId()));
+
 		try {
 			final Integer id = pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
 			itemPedido.setId(id);
@@ -87,7 +89,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		try {
-			pedidoService.inserir(pedido);
+			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -103,11 +105,22 @@ public class EstoqueServiceTest extends AbstractTest {
 		Material material = eBuilder.buildMaterial();
 		material.addRepresentada(representada);
 		try {
-			materialService.inserir(material);
+			material.setId(materialService.inserir(material));
 		} catch (BusinessException e2) {
 			printMensagens(e2);
 		}
 		return pedido;
+	}
+
+	private Material gerarMaterial(Integer idRepresentada) {
+		Material material = eBuilder.buildMaterial();
+		material.addRepresentada(representadaService.pesquisarById(idRepresentada));
+		try {
+			material.setId(materialService.inserir(material));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return material;
 	}
 
 	@Override
@@ -119,7 +132,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
 	}
-	
+
 	private Integer pesquisarQuantidadeTotalItemEstoque(Integer idItemEstoque) {
 		ItemEstoque i = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 		return i != null ? i.getQuantidade() : 0;
@@ -597,33 +610,32 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	/*
-	@Test
-	public void testReservaPedidoCompraInvalido() {
-		Pedido pedido = gerarPedido(TipoPedido.COMPRA);
-		ItemPedido item1 = eBuilder.buildItemPedido();
-
-		try {
-			final Integer idItemPedido = pedidoService.inserirItemPedido(pedido.getId(), item1);
-			estoqueService.inserirItemPedido(idItemPedido);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		boolean throwed = false;
-		try {
-			estoqueService.reservarItemPedido(pedido.getId());
-		} catch (BusinessException e) {
-			throwed = true;
-		}
-		assertTrue("Pedidos de compra nao pode fazer reserva de estoque", throwed);
-	}
+	 * @Test public void testReservaPedidoCompraInvalido() { Pedido pedido =
+	 * gerarPedido(TipoPedido.COMPRA); ItemPedido item1 =
+	 * eBuilder.buildItemPedido();
+	 * 
+	 * try { final Integer idItemPedido =
+	 * pedidoService.inserirItemPedido(pedido.getId(), item1);
+	 * estoqueService.inserirItemPedido(idItemPedido); } catch (BusinessException
+	 * e1) { printMensagens(e1); }
+	 * 
+	 * boolean throwed = false; try {
+	 * estoqueService.reservarItemPedido(pedido.getId()); } catch
+	 * (BusinessException e) { throwed = true; }
+	 * assertTrue("Pedidos de compra nao pode fazer reserva de estoque", throwed);
+	 * }
 	 */
-	
+
 	@Test
 	public void testReservaPedidoComTodosItensExistentesEstoque() {
 		Pedido pedido = gerarPedido(TipoPedido.REVENDA);
+		Material material = gerarMaterial(pedido.getRepresentada().getId());
+
 		ItemPedido item1 = eBuilder.buildItemPedido();
 		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
+
+		item1.setMaterial(material);
+		item2.setMaterial(material);
 
 		try {
 			pedidoService.inserirItemPedido(pedido.getId(), item1);
@@ -673,6 +685,7 @@ public class EstoqueServiceTest extends AbstractTest {
 	public void testReservaPedidoRepresentadaInvalido() {
 		Pedido pedido = gerarPedido(TipoPedido.REPRESENTACAO);
 		ItemPedido item1 = eBuilder.buildItemPedido();
+		item1.setMaterial(gerarMaterial(pedido.getRepresentada().getId()));
 
 		try {
 			final Integer idItemPedido = pedidoService.inserirItemPedido(pedido.getId(), item1);
@@ -693,7 +706,8 @@ public class EstoqueServiceTest extends AbstractTest {
 	@Test
 	public void testSituacaoPedidoAposInclusaoVariosItensNoEstoque() {
 		ItemPedido i1 = gerarItemPedidoCompra();
-		ItemPedido i2 = i1.clone();
+		// Fabricando um segundo item para facilitar.
+		ItemPedido i2 = gerarItemPedidoRevenda();
 
 		try {
 			pedidoService.inserirItemPedido(i2);

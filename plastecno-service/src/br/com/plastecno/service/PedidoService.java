@@ -87,6 +87,10 @@ public interface PedidoService {
 	List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
+	List<ItemPedido> pesquisarRevendaEmpacotamento();
+
+	List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo);
+
 	Usuario pesquisarProprietario(Integer idPedido);
 
 	List<Object[]> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo);

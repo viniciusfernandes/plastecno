@@ -39,7 +39,8 @@
 						<ul>
 							<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a></li>
 							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
-							<li><a href="estoque" target="principal_frame">Estoque</a></li>							
+							<li><a href="estoque" target="principal_frame">Estoque</a></li>
+							<li><a href="empacotamento" target="principal_frame">Empacotamento</a></li>					
 						</ul>
 					</li>
 				</c:if>

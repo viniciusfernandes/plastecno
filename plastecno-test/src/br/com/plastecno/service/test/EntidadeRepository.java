@@ -141,19 +141,22 @@ class EntidadeRepository {
 
 	@SuppressWarnings("unchecked")
 	<T> T pesquisarEntidadeById(Class<T> classe, Integer id) {
-		if (!mapaEntidades.containsKey(classe)) {
+		if (id == null || !mapaEntidades.containsKey(classe)) {
 			return null;
 		}
+
 		Integer idObj = null;
-		for (Object o : mapaEntidades.get(classe)) {
+		List<Object> listaEntidade = mapaEntidades.get(classe);
+		for (Object o : listaEntidade) {
 			try {
 				idObj = (Integer) o.getClass().getMethod("getId", (Class[]) null).invoke(o, (Object[]) null);
+				if (id.equals(idObj)) {
+					return (T) o;
+				}
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
-			if (idObj != null) {
-				return (T) o;
-			}
+
 		}
 		return null;
 	}

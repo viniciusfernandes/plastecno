@@ -273,7 +273,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			itemPedido.setReservado(reservarItemPedido(itemPedido));
 			todosReservados &= itemPedido.isReservado();
 		}
-		pedido.setSituacaoPedido(todosReservados ? SituacaoPedido.ITEM_RESERVADO : SituacaoPedido.ITEM_PENDENTE_RESERVA);
+		pedido.setSituacaoPedido(todosReservados ? SituacaoPedido.EMPACOTAMENTO : SituacaoPedido.ITEM_PENDENTE_RESERVA);
 		pedidoService.inserir(pedido);
 		return todosReservados;
 	}

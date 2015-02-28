@@ -98,9 +98,41 @@ public class RelatorioServiceImpl implements RelatorioService {
 		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
 		 * estoque para recuperar apenas a informacao necessaria.
 		 */
-		List<ItemPedido> listaItem = pedidoService.pesquisarCompraPendenteRecebimento(idRepresentada, periodo);
-		RelatorioWrapper<Integer, ItemPedido> relatorio = new RelatorioWrapper<Integer, ItemPedido>(
-				"Recepção de Compras com Pendências");
+		return gerarRelatorioItensPorPedido("Recepção de Compras com Pendências",
+				pedidoService.pesquisarCompraPendenteRecebimento(idRepresentada, periodo));
+	}
+
+	@Override
+	public RelatorioPedidoPeriodo gerarRelatorioCompraPeriodo(Periodo periodo) throws BusinessException {
+
+		final List<Object[]> resultados = pedidoService.pesquisarTotalCompraResumidaByPeriodo(periodo);
+
+		final StringBuilder titulo = new StringBuilder();
+		titulo.append("Relatório das Compras do Período de ");
+		titulo.append(StringUtils.formatarData(periodo.getInicio()));
+		titulo.append(" à ");
+		titulo.append(StringUtils.formatarData(periodo.getFim()));
+		final RelatorioPedidoPeriodo relatorio = new RelatorioPedidoPeriodo(titulo.toString());
+
+		for (Object[] resultado : resultados) {
+
+			try {
+				relatorio.addVenda(resultado[0].toString(), new RepresentadaValorWrapper(resultado[1].toString(),
+						(Double) resultado[2]));
+			} catch (AgrupamentoException e) {
+				throw new BusinessException("Falha na construcao do relatorio de vendas da representada por vendedor", e);
+			}
+		}
+
+		return relatorio;
+	}
+
+	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(String titulo, List<ItemPedido> listaItem) {
+		/*
+		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
+		 * estoque para recuperar apenas a informacao necessaria.
+		 */
+		RelatorioWrapper<Integer, ItemPedido> relatorio = new RelatorioWrapper<Integer, ItemPedido>(titulo);
 		Pedido pedido = null;
 		for (ItemPedido item : listaItem) {
 			pedido = item.getPedido();
@@ -119,37 +151,22 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente, Periodo periodo) {
+		/*
+		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
+		 * estoque para recuperar apenas a informacao necessaria.
+		 */
+		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Empacotar",
+				pedidoService.pesquisarRevendaEmpacotamento(idCliente, periodo));
+	}
+
+	@Override
 	public RelatorioPedidoPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException {
 
 		final List<Object[]> resultados = pedidoService.pesquisarTotalVendaResumidaByPeriodo(periodo);
 
 		final StringBuilder titulo = new StringBuilder();
 		titulo.append("Relatório das Vendas do Período de ");
-		titulo.append(StringUtils.formatarData(periodo.getInicio()));
-		titulo.append(" à ");
-		titulo.append(StringUtils.formatarData(periodo.getFim()));
-		final RelatorioPedidoPeriodo relatorio = new RelatorioPedidoPeriodo(titulo.toString());
-
-		for (Object[] resultado : resultados) {
-
-			try {
-				relatorio.addVenda(resultado[0].toString(), new RepresentadaValorWrapper(resultado[1].toString(),
-						(Double) resultado[2]));
-			} catch (AgrupamentoException e) {
-				throw new BusinessException("Falha na construcao do relatorio de vendas da representada por vendedor", e);
-			}
-		}
-
-		return relatorio;
-	}
-	
-	@Override
-	public RelatorioPedidoPeriodo gerarRelatorioCompraPeriodo(Periodo periodo) throws BusinessException {
-
-		final List<Object[]> resultados = pedidoService.pesquisarTotalCompraResumidaByPeriodo(periodo);
-
-		final StringBuilder titulo = new StringBuilder();
-		titulo.append("Relatório das Compras do Período de ");
 		titulo.append(StringUtils.formatarData(periodo.getInicio()));
 		titulo.append(" à ");
 		titulo.append(StringUtils.formatarData(periodo.getFim()));

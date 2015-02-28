@@ -645,6 +645,16 @@ public class PedidoServiceImpl implements PedidoService {
 				indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
+	@Override
+	public List<ItemPedido> pesquisarRevendaEmpacotamento() {
+		return pesquisarRevendaEmpacotamento(null, null);
+	}
+
+	@Override
+	public List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo) {
+		return itemPedidoDAO.pesquisarItemPedidoEmpacotamento(idCliente, periodo.getInicio(), periodo.getFim());
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<Pedido> pesquisarPedidoEnviadoByPeriodoEProprietario(boolean orcamento, Periodo periodo,
 			Integer idProprietario, boolean isCompra) throws BusinessException {

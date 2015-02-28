@@ -70,7 +70,7 @@ public class GenericDAO<T> {
 	}
 
 	public T remover(T t) {
-		entityManager.remove(t);
+		entityManager.remove(entityManager.merge(t));
 		return t;
 	}
 }

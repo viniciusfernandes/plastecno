@@ -64,6 +64,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
+	public void cancelarTransacaoEstoqueByIdPedido(Integer idPedido) throws BusinessException {
+		removerItemReservadoByIdPedido(idPedido);
+		reinserirItemPedidoEstoque(idPedido);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean contemItemPedidoReservado(Integer idPedido) {
 		return itemReservadoDAO.pesquisarTotalItemPedidoReservado(idPedido) >= 1;
@@ -257,6 +263,20 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		itemEstoqueDAO.alterar(itemCadastrado);
+	}
+
+	private void reinserirItemPedidoEstoque(Integer idPedido) throws BusinessException {
+		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		for (ItemPedido itemPedido : listaItemPedido) {
+			inserirItemPedido(itemPedido.getId());
+		}
+	}
+
+	private void removerItemReservadoByIdPedido(Integer idPedido) {
+		List<ItemReservado> listaItem = itemReservadoDAO.pesquisarItemReservadoByIdPedido(idPedido);
+		for (ItemReservado itemReservado : listaItem) {
+			itemReservadoDAO.remover(itemReservado);
+		}
 	}
 
 	private void removerValoresNulos(ItemEstoque itemEstoque) {

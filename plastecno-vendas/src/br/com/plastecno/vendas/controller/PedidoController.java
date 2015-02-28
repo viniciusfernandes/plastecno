@@ -122,7 +122,7 @@ public class PedidoController extends AbstractController {
     @Post("pedido/cancelamento")
     public void cancelarPedido(Integer idPedido, TipoPedido tipoPedido) {
         try {
-            this.pedidoService.cancelar(idPedido);
+            this.pedidoService.cancelarPedido(idPedido);
             this.gerarMensagemSucesso("Pedido No. " + idPedido + " cancelado com sucesso");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e.getListaMensagem());
@@ -364,7 +364,8 @@ public class PedidoController extends AbstractController {
                             .equals(situacao));
             boolean isVendaFinalizada = pedido.isVenda()
                     && (SituacaoPedido.ENVIADO.equals(situacao)
-                            || SituacaoPedido.ITEM_PENDENTE_RESERVA.equals(situacao) || SituacaoPedido.EMPACOTAMENTO
+                            || SituacaoPedido.ITEM_PENDENTE_RESERVA.equals(situacao)
+                            || SituacaoPedido.EMPACOTAMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO
                                 .equals(situacao));
             return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
         }
@@ -535,13 +536,16 @@ public class PedidoController extends AbstractController {
 
             // Condicao indicadora de que apenas o administrador podera cancelar
             // pedidos ja enviados
-            final boolean acessoCancelamentoPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO
-                    .equals(situacao))
+            final boolean acessoCancelamentoPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao)
+                    || SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacao)
+                    || SituacaoPedido.EMPACOTAMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
+                        .equals(situacao))
                     && !SituacaoPedido.CANCELADO.equals(situacao)
                     && isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
 
-            final boolean acessoRefazerPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
-                    .equals(situacao)) && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO);
+            final boolean acessoRefazerPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao)
+                    || SituacaoPedido.EMPACOTAMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao) || SituacaoPedido.EMPACOTADO
+                        .equals(situacao)) && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO);
 
             liberarAcesso("pedidoDesabilitado", isPedidoDesabilitado(pedido));
             liberarAcesso("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);

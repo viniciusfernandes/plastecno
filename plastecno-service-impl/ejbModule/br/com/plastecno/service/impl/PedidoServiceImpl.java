@@ -129,9 +129,19 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public void cancelar(Integer idPedido) throws BusinessException {
+	public void cancelarPedido(Integer idPedido) throws BusinessException {
 		if (idPedido == null) {
 			throw new BusinessException("Não é possível cancelar o pedido pois ele não existe no sistema");
+		}
+		TipoPedido tipoPedido = pedidoDAO.pesquisarTipoPedidoById(idPedido);
+		SituacaoPedido situacaoPedido = pedidoDAO.pesquisarSituacaoPedidoById(idPedido);
+		// Essas condicoes serao analisadas quando um pedido for cancelado a partir
+		// de um "refazer do pedido".
+		if (TipoPedido.COMPRA.equals(tipoPedido) && SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido)) {
+			throw new BusinessException("Não é possível cancelar uma compra que já foi recebida");
+		}
+		if (TipoPedido.REVENDA.equals(pedidoDAO.pesquisarTipoPedidoById(idPedido))) {
+			estoqueService.cancelarTransacaoEstoqueByIdPedido(idPedido);
 		}
 		pedidoDAO.cancelar(idPedido);
 	}
@@ -424,12 +434,6 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
-		return pedidoDAO.pesquisarIdPedidoByIdItemPedido(idItemPedido);
-	}
-
-	@Override
 	public boolean isCalculoIPIHabilitado(Integer idPedido) {
 		Integer idRepresentada = pesquisarIdRepresentadaByIdPedido(idPedido);
 		return representadaService.isCalculoIPIHabilitado(idRepresentada);
@@ -585,6 +589,12 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
+		return pedidoDAO.pesquisarIdPedidoByIdItemPedido(idItemPedido);
+	}
+
+	@Override
 	public Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarIdRepresentadaByIdPedido(idPedido);
 	}
@@ -651,16 +661,6 @@ public class PedidoServiceImpl implements PedidoService {
 				indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
-	@Override
-	public List<ItemPedido> pesquisarRevendaEmpacotamento() {
-		return pesquisarRevendaEmpacotamento(null, null);
-	}
-
-	@Override
-	public List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo) {
-		return itemPedidoDAO.pesquisarItemPedidoEmpacotamento(idCliente, periodo.getInicio(), periodo.getFim());
-	}
-
 	@SuppressWarnings("unchecked")
 	private List<Pedido> pesquisarPedidoEnviadoByPeriodoEProprietario(boolean orcamento, Periodo periodo,
 			Integer idProprietario, boolean isCompra) throws BusinessException {
@@ -702,6 +702,16 @@ public class PedidoServiceImpl implements PedidoService {
 		query.setParameter("id", idPedido);
 
 		return QueryUtil.gerarRegistroUnico(query, Usuario.class, null);
+	}
+
+	@Override
+	public List<ItemPedido> pesquisarRevendaEmpacotamento() {
+		return pesquisarRevendaEmpacotamento(null, null);
+	}
+
+	@Override
+	public List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo) {
+		return itemPedidoDAO.pesquisarItemPedidoEmpacotamento(idCliente, periodo.getInicio(), periodo.getFim());
 	}
 
 	private TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(ItemPedido itemPedido) throws BusinessException {
@@ -829,7 +839,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 		// Ao final da clonaem do pedido precisamos cancelar o antigo para que
 		// esse nao aparece nos faturamentos da empresa.
-		cancelar(pedido.getId());
+		cancelarPedido(pedido.getId());
 		return pedidoClone.getId();
 	}
 

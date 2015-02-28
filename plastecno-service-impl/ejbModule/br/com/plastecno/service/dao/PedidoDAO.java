@@ -261,6 +261,14 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						.setParameter("idPedido", idPedido), Double.class, 0d);
 	}
 
+	public SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido) {
+		return pesquisarCampoById(Pedido.class, idPedido, "situacaoPedido", SituacaoPedido.class);
+	}
+
+	public TipoPedido pesquisarTipoPedidoById(Integer idPedido) {
+		return pesquisarCampoById(Pedido.class, idPedido, "tipoPedido", TipoPedido.class);
+	}
+
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
 		return (Long) this.entityManager.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
 				.setParameter("idPedido", idPedido).getSingleResult();

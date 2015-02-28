@@ -34,6 +34,8 @@ public interface EstoqueService {
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
+	void cancelarTransacaoEstoqueByIdPedido(Integer idPedido) throws BusinessException;
+
 	boolean reservarItemPedido(Integer idPedido) throws BusinessException;
 
 	boolean reservarItemPedido(ItemPedido itemPedido) throws BusinessException;

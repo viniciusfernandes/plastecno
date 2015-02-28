@@ -20,7 +20,7 @@ public interface PedidoService {
 
 	Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException;
 
-	void cancelar(Integer idPedido) throws BusinessException;
+	void cancelarPedido(Integer idPedido) throws BusinessException;
 
 	boolean contemItemPedido(Integer idPedido);
 

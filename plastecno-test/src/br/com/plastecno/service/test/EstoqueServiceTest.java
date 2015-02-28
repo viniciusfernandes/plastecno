@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
@@ -69,6 +68,17 @@ public class EstoqueServiceTest extends AbstractTest {
 		return gerarItemPedido(TipoPedido.REVENDA);
 	}
 
+	private Material gerarMaterial(Integer idRepresentada) {
+		Material material = eBuilder.buildMaterial();
+		material.addRepresentada(representadaService.pesquisarById(idRepresentada));
+		try {
+			material.setId(materialService.inserir(material));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return material;
+	}
+
 	private Pedido gerarPedido(TipoPedido tipoPedido) {
 		Pedido pedido = eBuilder.buildPedido();
 		pedido.setTipoPedido(tipoPedido);
@@ -110,17 +120,6 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e2);
 		}
 		return pedido;
-	}
-
-	private Material gerarMaterial(Integer idRepresentada) {
-		Material material = eBuilder.buildMaterial();
-		material.addRepresentada(representadaService.pesquisarById(idRepresentada));
-		try {
-			material.setId(materialService.inserir(material));
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		return material;
 	}
 
 	@Override
@@ -560,9 +559,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertTrue("A quantidade do estoque eh inferior ao pedido, mas pode ser reservado", reservado);
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(itemEstoque.getId());
 
-		Integer quantidadeReservada = 2;
 		Integer quantidadeEstoque = 0;
-		assertEquals(quantidadeReservada, itemEstoque.getQuantidadeReservada());
 		assertEquals("A quantidade no estoque era igual ao pedido e foi toda reservada", quantidadeEstoque,
 				itemEstoque.getQuantidade());
 	}
@@ -581,9 +578,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertTrue("A quantidade do estoque eh inferior ao pedido, mas pode ser reservado", reservado);
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(itemEstoque.getId());
 
-		Integer quantidadeReservada = 2;
 		Integer quantidadeEstoque = 0;
-		assertEquals(quantidadeReservada, itemEstoque.getQuantidadeReservada());
 		assertEquals("A quantidade no estoque era inferior ao pedido e foi toda reservada", quantidadeEstoque,
 				itemEstoque.getQuantidade());
 	}
@@ -602,9 +597,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertTrue("A quantidade do estoque eh inferior ao pedido, mas pode ser reservado", reservado);
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(itemEstoque.getId());
 
-		Integer quantidadeReservada = 1;
 		Integer quantidadeEstoque = 1;
-		assertEquals(quantidadeReservada, itemEstoque.getQuantidadeReservada());
 		assertEquals("A quantidade no estoque era superior ao pedido e foi toda reservada", quantidadeEstoque,
 				itemEstoque.getQuantidade());
 	}

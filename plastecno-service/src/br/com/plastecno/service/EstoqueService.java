@@ -12,6 +12,10 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface EstoqueService {
+	boolean contemItemPedidoReservado(Integer idPedido);
+
+	void empacotarItemPedido(Integer idItemPedido);
+
 	Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;

@@ -63,6 +63,23 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemCadastrado.setQuantidade((int) quantidadeTotal);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean contemItemPedidoReservado(Integer idPedido) {
+		return itemReservadoDAO.pesquisarTotalItemPedidoReservado(idPedido) >= 1;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void empacotarItemPedido(Integer idItemPedido) {
+		itemReservadoDAO.removerByIdItemPedido(idItemPedido);
+		Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
+		if (!contemItemPedidoReservado(idPedido)) {
+			Pedido pedido = pedidoService.pesquisarPedidoById(idPedido);
+			pedido.setSituacaoPedido(SituacaoPedido.EMPACOTADO);
+		}
+	}
+
 	private ItemEstoque gerarItemEstoque(ItemPedido itemPedido) {
 
 		ItemEstoque itemEstoque = new ItemEstoque();
@@ -301,12 +318,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 			quantidadeReservada = quantidadePedido;
 		}
 		itemEstoque.setQuantidade(quantidadeEstoque - quantidadeReservada);
-		itemEstoque.setQuantidadeReservada(quantidadeReservada);
 
 		itemEstoqueDAO.alterar(itemEstoque);
-		itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido, quantidadeReservada));
+		itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
 
 		return true;
 	}
-
 }

@@ -67,10 +67,6 @@ public class ItemEstoque extends Item {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do estoque")
 	private Integer quantidade;
 
-	@Column(name = "quantidade_reservada")
-	@InformacaoValidavel(numerico = true, valorNegativo = false, nomeExibicao = "Quantidade reservada do item do estoque")
-	private Integer quantidadeReservada;
-
 	public ItemEstoque() {
 	}
 
@@ -144,10 +140,6 @@ public class ItemEstoque extends Item {
 		return quantidade;
 	}
 
-	public Integer getQuantidadeReservada() {
-		return quantidadeReservada;
-	}
-
 	public boolean isNovo() {
 		return this.id == null;
 	}
@@ -206,7 +198,4 @@ public class ItemEstoque extends Item {
 		this.quantidade = quantidade;
 	}
 
-	public void setQuantidadeReservada(Integer quantidadeReservada) {
-		this.quantidadeReservada = quantidadeReservada;
-	}
 }

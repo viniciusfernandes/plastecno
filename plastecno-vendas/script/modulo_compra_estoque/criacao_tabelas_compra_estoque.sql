@@ -47,12 +47,11 @@ insert into vendas.tb_tipo_relacionamento  values (1, 'FORNECIMENTO');
 insert into vendas.tb_tipo_relacionamento  values (2, 'REPRESENTACAO E FORNECIMENTO');
 insert into vendas.tb_tipo_relacionamento  values (3, 'REVENDA');
 
-update vendas.tb_representada set id_tipo_relacionamento = 3 where nome_fantasia = 'PLASTECNO FILIAL';
-
 ALTER TABLE vendas.tb_representada ADD id_tipo_relacionamento integer not null default 0;
 ALTER TABLE vendas.tb_representada ADD CONSTRAINT id_tipo_relacionamento FOREIGN KEY (id_tipo_relacionamento) REFERENCES vendas.tb_tipo_relacionamento (id);
 
-alter table vendas.tb_item_estoque add quantidade_reservada integer default 0;
+update vendas.tb_representada set id_tipo_relacionamento = 3 where nome_fantasia = 'PLASTECNO FILIAL';
+
 alter table vendas.tb_item_pedido add item_reservado boolean default false;
 
 INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (6, 'PEDIDO PARA EMPACOTAR');
@@ -63,11 +62,13 @@ create table vendas.tb_item_reservado (
 	id integer not null,
 	id_item_estoque integer not null,
 	id_item_pedido integer not null,
-	data_reserva date default null,
-	quantidade_reservada integer default 0
+	data_reserva date default null
 );
 
 ALTER TABLE vendas.tb_item_reservado ADD PRIMARY KEY (id);
 ALTER TABLE vendas.tb_item_reservado ADD CONSTRAINT id_item_estoque FOREIGN KEY (id_item_estoque) REFERENCES vendas.tb_item_estoque (id);
 ALTER TABLE vendas.tb_item_reservado ADD CONSTRAINT id_item_pedido FOREIGN KEY (id_item_pedido) REFERENCES vendas.tb_item_pedido (id);
 create sequence vendas.seq_item_reservado_id increment by 1 minvalue 1 no maxvalue start with 1;
+
+
+INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (8, 'PEDIDO EMPACOTADO');

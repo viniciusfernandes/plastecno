@@ -51,15 +51,17 @@ public class EmpacotamentoRevendaController extends AbstractController {
 
     @Post("empacotamento/item/inclusao")
     public void empacotarItem(Integer idItemPedido, Date dataInicial, Date dataFinal, Integer idCliente) {
-
+        estoqueService.empacotarItemPedido(idItemPedido);
+        pesquisarRevendaEmpacotamento(idCliente, dataInicial, dataFinal);
     }
-    
+
     @Get("empacotamento/revenda/listagem")
     public void pesquisarRevendaEmpacotamento(Integer idCliente, Date dataInicial, Date dataFinal) {
 
         try {
             Periodo periodo = new Periodo(dataInicial, dataFinal);
-            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioRevendaEmpacotamento(idCliente, periodo);
+            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioRevendaEmpacotamento(
+                    idCliente, periodo);
 
             addAtributo("relatorio", relatorio);
             if (contemAtributo("permanecerTopo")) {

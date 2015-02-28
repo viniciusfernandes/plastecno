@@ -15,6 +15,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		super(entityManager);
 	}
 
+	/*
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemPedidoEmpacotamento(Integer idCliente, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
@@ -33,6 +34,43 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		select.append("order by i.pedido.dataEnvio asc ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("situacaoPedido", SituacaoPedido.EMPACOTAMENTO);
+
+		if (dataInicial != null) {
+			query.setParameter("dataInicial", dataInicial);
+		}
+
+		if (dataFinal != null) {
+			query.setParameter("dataFinal", dataFinal);
+		}
+
+		if (idCliente != null) {
+			query.setParameter("idCliente", idCliente);
+		}
+
+		return query.getResultList();
+	}
+	*/
+	@SuppressWarnings("unchecked")
+	public List<ItemPedido> pesquisarItemPedidoEmpacotamento(Integer idCliente, Date dataInicial, Date dataFinal) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i.itemPedido from ItemReservado i where i.itemPedido.pedido.situacaoPedido = :situacaoPedido ");
+
+		if (dataInicial != null) {
+			select.append("and i.itemPedido.pedido.dataEnvio >= :dataInicial ");
+		}
+
+		if (dataFinal != null) {
+			select.append("and i.itemPedido.pedido.dataEnvio <= :dataFinal ");
+		}
+
+		if (idCliente != null) {
+			select.append("and i.itemPedido.pedido.cliente.id = :idCliente ");
+		}
+
+		select.append("order by i.itemPedido.pedido.dataEnvio asc ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("situacaoPedido", SituacaoPedido.EMPACOTAMENTO);

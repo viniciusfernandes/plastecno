@@ -424,6 +424,12 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
+		return pedidoDAO.pesquisarIdPedidoByIdItemPedido(idItemPedido);
+	}
+
+	@Override
 	public boolean isCalculoIPIHabilitado(Integer idPedido) {
 		Integer idRepresentada = pesquisarIdRepresentadaByIdPedido(idPedido);
 		return representadaService.isCalculoIPIHabilitado(idRepresentada);

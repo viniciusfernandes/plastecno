@@ -16,8 +16,6 @@ public interface EstoqueService {
 
 	boolean contemItemPedidoReservado(Integer idPedido);
 
-	void devolverItemCompradoEstoque(ItemPedido itemPedido) throws BusinessException;
-	
 	void devolverItemCompradoEstoqueByIdPedido(Integer idPedido) throws BusinessException;
 
 	void empacotarItemPedido(Integer idItemPedido);

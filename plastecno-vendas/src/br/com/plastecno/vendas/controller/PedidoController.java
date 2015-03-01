@@ -124,12 +124,12 @@ public class PedidoController extends AbstractController {
         try {
             this.pedidoService.cancelarPedido(idPedido);
             this.gerarMensagemSucesso("Pedido No. " + idPedido + " cancelado com sucesso");
+            configurarTipoPedido(tipoPedido);
+            irTopoPagina();
         } catch (BusinessException e) {
             gerarListaMensagemErro(e.getListaMensagem());
+            pesquisarPedidoById(idPedido, tipoPedido);
         }
-
-        configurarTipoPedido(tipoPedido);
-        irTopoPagina();
     }
 
     private void configurarTipoPedido(TipoPedido tipoPedido) {
@@ -544,7 +544,8 @@ public class PedidoController extends AbstractController {
                     && isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
 
             final boolean acessoRefazerPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao)
-                    || SituacaoPedido.EMPACOTAMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao) || SituacaoPedido.EMPACOTADO
+                    || SituacaoPedido.EMPACOTAMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao)
+                    || SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO
                         .equals(situacao)) && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO);
 
             liberarAcesso("pedidoDesabilitado", isPedidoDesabilitado(pedido));

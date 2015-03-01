@@ -125,6 +125,8 @@ public class ItemPedido extends Item {
 			clone = (ItemPedido) super.clone();
 			clone.setId(null);
 			clone.setPedido(null);
+			clone.setRecebido(false);
+			clone.setReservado(false);
 			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new IllegalStateException("Falha ao clonar o item de pedido " + getId(), e);

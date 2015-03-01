@@ -77,23 +77,33 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	public void devolverItemCompradoEstoque(ItemPedido itemPedido) throws BusinessException {
-		ItemEstoque itemEstoque = pesquisarItemCadastradoEstoque(itemPedido);
-
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoByIdItemPedido(itemPedido.getId());
-		if (!SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido) && !itemPedido.isRecebido()) {
-			throw new BusinessException("A devolução é permitida apenas para os itens de compra que foram recebidos");
+	public void devolverItemCompradoEstoqueByIdPedido(Integer idPedido) throws BusinessException {
+		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		if (!SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido)
+				&& !SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacaoPedido)) {
+			throw new BusinessException("A devolução é permitida apenas para os itens de pedido de compra já efetuados");
 		}
-
-		if (itemEstoque != null) {
-			Integer quantidadeEstoque = itemEstoque.getQuantidade();
-			Integer quantidadePedido = itemPedido.getQuantidade();
-			if (quantidadePedido > quantidadeEstoque) {
-				throw new BusinessException(
-						"O item que esta sendo devolvido contém quantidade maior do que a quantidade existente em estoque");
+		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		for (ItemPedido itemPedido : listaItem) {
+			if (!itemPedido.isRecebido()) {
+				continue;
 			}
-			itemEstoque.setQuantidade(quantidadeEstoque - quantidadePedido);
-			itemEstoqueDAO.alterar(itemEstoque);
+			ItemEstoque itemEstoque = pesquisarItemCadastradoEstoque(itemPedido);
+
+			if (itemEstoque != null) {
+				Integer quantidadeEstoque = itemEstoque.getQuantidade();
+				Integer quantidadePedido = itemPedido.getQuantidade();
+				if (quantidadePedido > quantidadeEstoque) {
+					throw new BusinessException(
+							"O pedido No. "
+									+ idPedido
+									+ " contém item \""
+									+ (itemPedido.isPeca() ? itemPedido.getDescricaoPeca() : itemPedido.getDescricao())
+									+ "\" sendo devolvido com quantidade maior do que a quantidade existente em estoque. Isso inidica uma provável inconsistência entre estoque e compras.");
+				}
+				itemEstoque.setQuantidade(quantidadeEstoque - quantidadePedido);
+				itemEstoqueDAO.alterar(itemEstoque);
+			}
 		}
 	}
 
@@ -371,13 +381,5 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
 
 		return true;
-	}
-
-	@Override
-	public void devolverItemCompradoEstoqueByIdPedido(Integer idPedido) throws BusinessException {
-		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-		for (ItemPedido itemPedido : listaItem) {
-			devolverItemCompradoEstoque(itemPedido);
-		}
 	}
 }

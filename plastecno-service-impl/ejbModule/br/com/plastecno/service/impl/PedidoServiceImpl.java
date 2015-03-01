@@ -134,21 +134,15 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Não é possível cancelar o pedido pois ele não existe no sistema");
 		}
 		TipoPedido tipoPedido = pedidoDAO.pesquisarTipoPedidoById(idPedido);
-		SituacaoPedido situacaoPedido = pedidoDAO.pesquisarSituacaoPedidoById(idPedido);
 		// Essas condicoes serao analisadas quando um pedido for cancelado a partir
 		// de um "refazer do pedido".
-		if (TipoPedido.COMPRA.equals(tipoPedido) && SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido)) {
+		if (TipoPedido.COMPRA.equals(tipoPedido)) {
 			estoqueService.devolverItemCompradoEstoqueByIdPedido(idPedido);
 		}
 		if (TipoPedido.REVENDA.equals(pedidoDAO.pesquisarTipoPedidoById(idPedido))) {
 			estoqueService.cancelarReservaEstoqueByIdPedido(idPedido);
 		}
 		pedidoDAO.cancelar(idPedido);
-	}
-
-	@Override
-	public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
-		return pedidoDAO.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
 	}
 
 	@Override
@@ -717,6 +711,16 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo) {
 		return itemPedidoDAO.pesquisarItemPedidoEmpacotamento(idCliente, periodo.getInicio(), periodo.getFim());
+	}
+
+	@Override
+	public SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido) {
+		return pedidoDAO.pesquisarSituacaoPedidoById(idPedido);
+	}
+
+	@Override
+	public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
+		return pedidoDAO.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
 	}
 
 	private TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(ItemPedido itemPedido) throws BusinessException {

@@ -124,12 +124,12 @@ public class PedidoController extends AbstractController {
         try {
             this.pedidoService.cancelarPedido(idPedido);
             this.gerarMensagemSucesso("Pedido No. " + idPedido + " cancelado com sucesso");
+            configurarTipoPedido(tipoPedido);
+            irTopoPagina();
         } catch (BusinessException e) {
             gerarListaMensagemErro(e.getListaMensagem());
+            pesquisarPedidoById(idPedido, tipoPedido);
         }
-
-        configurarTipoPedido(tipoPedido);
-        irTopoPagina();
     }
 
     private void configurarTipoPedido(TipoPedido tipoPedido) {

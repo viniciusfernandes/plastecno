@@ -345,10 +345,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 		boolean todosReservados = true;
 		for (ItemPedido itemPedido : listaItem) {
-			itemPedido.setReservado(reservarItemPedido(itemPedido));
-			todosReservados &= itemPedido.isReservado();
+			todosReservados &= reservarItemPedido(itemPedido);
 		}
-		pedido.setSituacaoPedido(todosReservados ? SituacaoPedido.EMPACOTAMENTO : SituacaoPedido.ITEM_PENDENTE_RESERVA);
+		pedido
+				.setSituacaoPedido(todosReservados ? SituacaoPedido.EMPACOTAMENTO : SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
 		pedidoService.inserir(pedido);
 		return todosReservados;
 	}
@@ -364,22 +364,27 @@ public class EstoqueServiceImpl implements EstoqueService {
 			itemEstoque = pesquisarItemEstoque(itemPedido.getMaterial().getId(), itemPedido.getFormaMaterial(),
 					itemPedido.getMedidaExterna(), itemPedido.getMedidaInterna(), itemPedido.getComprimento());
 		}
-		Integer quantidadeReservada = null;
+		Integer quantidadeReservada = 0;
 		Integer quantidadePedido = itemPedido.getQuantidade();
 		Integer quantidadeEstoque = itemEstoque != null ? itemEstoque.getQuantidade() : 0;
 
+		boolean reservado = true;
 		if (quantidadeEstoque <= 0) {
-			return false;
+			reservado = false;
 		} else if (quantidadePedido >= quantidadeEstoque) {
 			quantidadeReservada = quantidadeEstoque;
 		} else if (quantidadePedido < quantidadeEstoque) {
 			quantidadeReservada = quantidadePedido;
 		}
-		itemEstoque.setQuantidade(quantidadeEstoque - quantidadeReservada);
+		
+		itemPedido.setQuantidadeEncomenda(quantidadePedido - quantidadeReservada);
+		pedidoService.inserirItemPedido(itemPedido);
+		
+		if (itemEstoque != null) {
+			itemEstoqueDAO.alterar(itemEstoque);
+			itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
+		}
 
-		itemEstoqueDAO.alterar(itemEstoque);
-		itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
-
-		return true;
+		return reservado;
 	}
 }

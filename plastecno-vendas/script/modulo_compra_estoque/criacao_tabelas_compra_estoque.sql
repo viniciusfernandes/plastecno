@@ -52,10 +52,8 @@ ALTER TABLE vendas.tb_representada ADD CONSTRAINT id_tipo_relacionamento FOREIGN
 
 update vendas.tb_representada set id_tipo_relacionamento = 3 where nome_fantasia = 'PLASTECNO FILIAL';
 
-alter table vendas.tb_item_pedido add item_reservado boolean default false;
-
 INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (6, 'PEDIDO PARA EMPACOTAR');
-INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (7, 'ITEM COM PENDENCIA DE RESERVA');
+INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (7, 'REVENDA COM PENDENCIA DE ENCOMENDA');
 
 
 create table vendas.tb_item_reservado (
@@ -72,3 +70,17 @@ create sequence vendas.seq_item_reservado_id increment by 1 minvalue 1 no maxval
 
 
 INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (8, 'PEDIDO EMPACOTADO');
+alter table vendas.tb_item_pedido add quantidade_encomenda integer default 0;
+
+
+CREATE TABLE VENDAS.TB_TIPO_CLIENTE(
+	id integer not null,
+	descricao varchar(50)
+);
+ALTER TABLE vendas.TB_TIPO_CLIENTE ADD PRIMARY KEY (id);
+
+insert into vendas.TB_TIPO_CLIENTE values (0, 'NORMAL');
+insert into vendas.TB_TIPO_CLIENTE values (1, 'COMPRADOR');
+
+ALTER TABLE VENDAS.TB_CLIENTE ADD ID_TIPO_CLIENTE INTEGER DEFAULT 0;
+ALTER TABLE vendas.TB_CLIENTE ADD CONSTRAINT ID_TIPO_CLIENTE FOREIGN KEY (ID_TIPO_CLIENTE) REFERENCES vendas.TB_TIPO_CLIENTE (id);

@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,89 +25,94 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoDocumento;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
-@Table(name="tb_cliente", schema="vendas")
+@Table(name = "tb_cliente", schema = "vendas")
 @InformacaoValidavel
 public class Cliente implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4628886058991048859L;
+
 	@Id
-	@SequenceGenerator(name = "clienteSequence", sequenceName = "vendas.seq_cliente_id", allocationSize=1, initialValue=1)
+	@SequenceGenerator(name = "clienteSequence", sequenceName = "vendas.seq_cliente_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clienteSequence")
 	private Integer id;
-	
-	@InformacaoValidavel(obrigatorio=true, intervalo={1, 150}, nomeExibicao="Nome fantasia do cliente")
-	@Column(name="nome_fantasia")
+
+	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Nome fantasia do cliente")
+	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
-	
-	@InformacaoValidavel(obrigatorio=true, intervalo={1, 150}, nomeExibicao="Razao social do cliente")
-	@Column(name="razao_social")
+	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Razao social do cliente")
+	@Column(name = "razao_social")
 	private String razaoSocial;
-	
-	@InformacaoValidavel(tipoDocumento=TipoDocumento.CNPJ, nomeExibicao="CNPJ do cliente")
+
+	@InformacaoValidavel(tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
 	private String cnpj;
-	
-	@InformacaoValidavel(tipoDocumento=TipoDocumento.CPF, nomeExibicao="CPF do cliente")
+
+	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF do cliente")
 	private String cpf;
-	
-	@Column(name="insc_estadual")
-	@InformacaoValidavel(intervalo={0, 15}, tipoDocumento=TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao="Inscrição estadual do Cliente")
+
+	@Column(name = "insc_estadual")
+	@InformacaoValidavel(intervalo = { 0, 15 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscrição estadual do Cliente")
 	private String inscricaoEstadual;
-	
+
 	@Temporal(TemporalType.DATE)
-	@Column(name="data_ultimo_contato ")
+	@Column(name = "data_ultimo_contato ")
 	private Date dataUltimoContato;
-	
-	@Column(name="informacoes_adicionais")
+
+	@Column(name = "informacoes_adicionais")
 	private String informacoesAdicionais;
-	
-	@InformacaoValidavel(padrao=".+@.+\\..{2,}", nomeExibicao="Email do cliente")
+
+	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email do cliente")
 	private String email;
+
 	private String site;
-	
-	@Column(name="prospeccao_finalizada")
+
+	@Column(name = "prospeccao_finalizada")
 	private Boolean prospeccaoFinalizada;
-	
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="id_ramo_atividade")
-	@InformacaoValidavel(relacionamentoObrigatorio=true, nomeExibicao="Ramo de atividade do cliente")
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_ramo_atividade")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Ramo de atividade do cliente")
 	private RamoAtividade ramoAtividade;
-	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="id_vendedor", referencedColumnName="id", nullable=false)
-	@InformacaoValidavel(relacionamentoObrigatorio=true, nomeExibicao="Vendedor do cliente")
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_vendedor", referencedColumnName = "id", nullable = false)
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor do cliente")
 	private Usuario vendedor;
-	
-	@OneToMany(fetch=FetchType.LAZY)
-	@JoinTable(name="tb_cliente_tb_transportadora", schema="vendas", 
-			joinColumns={@JoinColumn(name = "id_cliente", referencedColumnName = "id")},
-			inverseJoinColumns={@JoinColumn(name = "id_transportadora", referencedColumnName = "id")})
+
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "tb_cliente_tb_transportadora", schema = "vendas", joinColumns = { @JoinColumn(name = "id_cliente", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_transportadora", referencedColumnName = "id") })
 	private List<Transportadora> listaRedespacho;
-	
 
 	/*
-	 * Tivemos que implementar como um Set pois o hibernate tem uma limitacao em fazer multiplos 
-	 * fetchs com o tipo list e collection. Isso apareceu na geracao do relatorio de cliente-regiao
+	 * Tivemos que implementar como um Set pois o hibernate tem uma limitacao em
+	 * fazer multiplos fetchs com o tipo list e collection. Isso apareceu na
+	 * geracao do relatorio de cliente-regiao
 	 */
-	@OneToMany(mappedBy="cliente", fetch=FetchType.LAZY, cascade={CascadeType.ALL})
-	@InformacaoValidavel(iteravel=true, nomeExibicao="Lista de contato do cliente")
+	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de contato do cliente")
 	private Set<ContatoCliente> listaContato;
-	
-	@OneToMany(mappedBy="cliente", fetch=FetchType.LAZY, cascade={CascadeType.ALL})
-	@InformacaoValidavel(iteravel=true, nomeExibicao="Lista de logradouro do cliente")
+
+	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de logradouro do cliente")
 	private List<LogradouroCliente> listaLogradouro;
-	
+
+	@Enumerated
+	@Column(name = "id_tipo_cliente")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo de cliente")
+	private TipoCliente tipoCliente;
+
 	@Transient
 	private String dataUltimoContatoFormatada;
-	
-	public Cliente () {}
-	
+
+	public Cliente() {
+	}
+
 	/*
 	 * Construtor para popular o picklist da tela de vendedor
 	 */
@@ -116,164 +122,198 @@ public class Cliente implements Serializable {
 	}
 
 	public void addContato(ContatoCliente contatoCliente) {
-		if(this.listaContato == null) {
+		if (this.listaContato == null) {
 			this.setListaContato(new HashSet<ContatoCliente>());
 		}
 		this.listaContato.add(contatoCliente);
 		contatoCliente.setCliente(this);
 	}
+
 	public void addContato(List<ContatoCliente> listaContato) {
-		
+
 		if (listaContato == null) {
 			return;
 		}
-		
+
 		for (ContatoCliente contatoCliente : listaContato) {
-			this.addContato(contatoCliente);		
+			this.addContato(contatoCliente);
 		}
 	}
+
 	public void addLogradouro(List<LogradouroCliente> listaLogradouro) {
 		if (listaLogradouro == null) {
 			return;
 		}
-		
+
 		for (LogradouroCliente logradouroCliente : listaLogradouro) {
-			this.addLogradouro(logradouroCliente);		
+			this.addLogradouro(logradouroCliente);
 		}
 	}
+
 	public void addLogradouro(LogradouroCliente logradouroCliente) {
-		if(this.listaLogradouro == null) {
+		if (this.listaLogradouro == null) {
 			this.setListaLogradouro(new ArrayList<LogradouroCliente>());
 		}
 		this.listaLogradouro.add(logradouroCliente);
 		logradouroCliente.setCliente(this);
 	}
+
 	public void addRedespacho(List<Transportadora> listaRedespacho) {
 		if (listaRedespacho == null) {
 			return;
 		}
-		
+
 		for (Transportadora transportadora : listaRedespacho) {
-			this.addRedespacho(transportadora);		
+			this.addRedespacho(transportadora);
 		}
 	}
+
 	public void addRedespacho(Transportadora transportadora) {
-		if(this.listaRedespacho == null) {
+		if (this.listaRedespacho == null) {
 			this.listaRedespacho = new ArrayList<Transportadora>();
 		}
 		this.listaRedespacho.add(transportadora);
 	}
+
 	public String getCnpj() {
 		return cnpj;
 	}
+
 	public Contato getContatoPrincipal() {
 		return this.isListaContatoPreenchida() ? this.listaContato.iterator().next() : null;
 	}
+
 	public String getCpf() {
 		return cpf;
 	}
+
 	public Date getDataUltimoContato() {
 		return dataUltimoContato;
 	}
+
 	public String getDataUltimoContatoFormatada() {
 		return dataUltimoContatoFormatada;
 	}
+
 	public String getDocumento() {
 		return this.isJuridico() ? this.cnpj : this.cpf;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
+
 	public Integer getId() {
 		return id;
 	}
+
 	public String getInformacoesAdicionais() {
 		return informacoesAdicionais;
 	}
+
 	public String getInscricaoEstadual() {
 		return inscricaoEstadual;
 	}
+
 	public Set<ContatoCliente> getListaContato() {
 		return listaContato;
 	}
+
 	public List<LogradouroCliente> getListaLogradouro() {
 		return listaLogradouro;
 	}
+
 	public List<Transportadora> getListaRedespacho() {
 		return listaRedespacho;
 	}
+
 	public Logradouro getLogradouro(TipoLogradouro tipoLogradouro) {
 		return EntityUtils.getLogradouro(listaLogradouro, tipoLogradouro);
 	}
-	public Logradouro getLogradouroFaturamento () {
+
+	public Logradouro getLogradouroFaturamento() {
 		return this.getLogradouro(TipoLogradouro.FATURAMENTO);
 	}
+
 	public String getNomeCompleto() {
-		return this.getNomeFantasia()+" - "+this.getRazaoSocial();
+		return this.getNomeFantasia() + " - " + this.getRazaoSocial();
 	}
+
 	public String getNomeFantasia() {
 		return nomeFantasia;
 	}
+
 	public Boolean getProspeccaoFinalizada() {
 		return prospeccaoFinalizada;
 	}
+
 	public RamoAtividade getRamoAtividade() {
 		return ramoAtividade;
 	}
+
 	public String getRazaoSocial() {
 		return razaoSocial;
 	}
+
 	public String getSite() {
 		return site;
 	}
+
+	public TipoCliente getTipoCliente() {
+		return tipoCliente;
+	}
+
 	public Usuario getVendedor() {
 		return vendedor;
 	}
-	
+
 	public boolean isJuridico() {
 		return this.cnpj != null;
 	}
-	
+
 	public boolean isListaContatoPreenchida() {
 		return this.listaContato != null && !this.listaContato.isEmpty();
 	}
-	
+
 	public boolean isListaLogradouroPreenchida() {
 		return this.listaLogradouro != null && !this.listaLogradouro.isEmpty();
 	}
-	
+
 	public boolean isProspectado() {
 		return this.prospeccaoFinalizada != null && this.prospeccaoFinalizada.booleanValue();
 	}
-	
-	public void limparListaLogradouro(){
-		if (this.listaLogradouro != null){
-			this.listaLogradouro.clear();	
-		}
-		
+
+	public boolean isRevendedor() {
+		return TipoCliente.REVENDEDOR.equals(tipoCliente);
 	}
-	
+
+	public void limparListaLogradouro() {
+		if (this.listaLogradouro != null) {
+			this.listaLogradouro.clear();
+		}
+
+	}
+
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
-	
+
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
 	}
-	
+
 	public void setDataUltimoContato(Date dataUltimoContato) {
 		this.dataUltimoContato = dataUltimoContato;
 	}
-	
+
 	public void setDataUltimoContatoFormatada(String dataUltimoContatoFormatada) {
 		this.dataUltimoContatoFormatada = dataUltimoContatoFormatada;
 	}
-	
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -285,16 +325,15 @@ public class Cliente implements Serializable {
 	public void setInscricaoEstadual(String inscricaoEstadual) {
 		this.inscricaoEstadual = inscricaoEstadual;
 	}
-	
-	
+
 	public void setListaContato(Set<ContatoCliente> listaContato) {
 		this.listaContato = listaContato;
 	}
-	
+
 	public void setListaLogradouro(List<LogradouroCliente> listalogradouro) {
 		this.listaLogradouro = listalogradouro;
 	}
-	
+
 	public void setListaRedespacho(List<Transportadora> listaRedespacho) {
 		this.listaRedespacho = listaRedespacho;
 	}
@@ -302,24 +341,27 @@ public class Cliente implements Serializable {
 	public void setNomeFantasia(String nomeFantasia) {
 		this.nomeFantasia = nomeFantasia;
 	}
-	
 
 	public void setProspeccaoFinalizada(Boolean prospeccaoFinalizada) {
 		this.prospeccaoFinalizada = prospeccaoFinalizada;
 	}
-	
+
 	public void setRamoAtividade(RamoAtividade ramoAtividade) {
 		this.ramoAtividade = ramoAtividade;
 	}
-	
+
 	public void setRazaoSocial(String razaoSocial) {
 		this.razaoSocial = razaoSocial;
 	}
-	
+
 	public void setSite(String site) {
 		this.site = site;
 	}
-	
+
+	public void setTipoCliente(TipoCliente tipoCliente) {
+		this.tipoCliente = tipoCliente;
+	}
+
 	public void setVendedor(Usuario vendedor) {
 		this.vendedor = vendedor;
 	}

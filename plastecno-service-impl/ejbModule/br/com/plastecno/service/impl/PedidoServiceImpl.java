@@ -26,6 +26,7 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
@@ -33,9 +34,11 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
@@ -161,6 +164,60 @@ public class PedidoServiceImpl implements PedidoService {
 				pedido.setTipoPedido(TipoPedido.REVENDA);
 			} else {
 				pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
+			}
+		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void encomendarItemPedido(Integer idComprador, Integer idRepresentadaFornecedora,
+			List<Integer> listaIdItemPedido) throws BusinessException {
+		if (listaIdItemPedido == null || listaIdItemPedido.isEmpty()) {
+			throw new BusinessException("A lista de itens de pedido para encomendar não pode estar vazia");
+		}
+		Representada fornecedor = representadaService.pesquisarById(idRepresentadaFornecedora);
+		if (fornecedor == null) {
+			throw new BusinessException("Fornecedor é obrigatório para realizar a encomenda");
+		}
+
+		if (!fornecedor.isFornecedor()) {
+			throw new BusinessException("A fornecedor \"" + fornecedor.getNomeFantasia()
+					+ "\" escolhido não esta cadastrado como fornecedor");
+		}
+		Usuario comprador = usuarioService.pesquisarById(idComprador);
+
+		Contato contato = new Contato();
+		contato.setNome(comprador.getNome());
+		contato.setEmail(comprador.getEmail());
+
+		Pedido pedido = new Pedido();
+		pedido.setCliente(clienteService.pesquisarRevendedor());
+		pedido.setComprador(comprador);
+		pedido.setContato(contato);
+		pedido.setDataInclusao(new Date());
+		pedido.setFormaPagamento("A DEFINIR");
+		pedido.setFinalidadePedido(FinalidadePedido.REVENDA);
+		pedido.setProprietario(comprador);
+		pedido.setRepresentada(fornecedor);
+		pedido.setSituacaoPedido(SituacaoPedido.ENCOMENDA);
+		pedido.setTipoPedido(TipoPedido.COMPRA);
+
+		pedido = inserir(pedido);
+		ItemPedido itemCadastrado = null;
+		ItemPedido itemClone = null;
+		for (Integer idItemPedido : listaIdItemPedido) {
+			itemCadastrado = pesquisarItemPedido(idItemPedido);
+			if (itemCadastrado == null) {
+				continue;
+			}
+			itemClone = itemCadastrado.clone();
+			itemClone.setPedido(pedido);
+			try {
+				inserirItemPedido(pedido.getId(), itemClone);
+			} catch (BusinessException e) {
+				throw new BusinessException("Não foi possível cadastrar uma nova encomenda pois houve falha no item No. "
+						+ itemCadastrado.getSequencial() + " do pedido No. " + itemCadastrado.getPedido().getId()
+						+ ". Possível problema: " + e.getMensagemEmpilhada());
 			}
 		}
 	}
@@ -326,7 +383,7 @@ public class PedidoServiceImpl implements PedidoService {
 		if (isPedidoNovo) {
 			pedido.setDataInclusao(new Date());
 			pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-			pedidoDAO.inserir(pedido);
+			pedido = pedidoDAO.inserir(pedido);
 
 		} else {
 			// recuperando as informacoes do sistema que nao devem ser alteradas
@@ -335,7 +392,7 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setDataEnvio(this.pesquisarDataEnvio(idPedido));
 			pedido.setValorPedido(this.pesquisarValorPedido(idPedido));
 			pedido.setValorPedidoIPI(this.pesquisarValorPedidoIPI(idPedido));
-			pedidoDAO.alterar(pedido);
+			pedido = pedidoDAO.alterar(pedido);
 		}
 
 		return pedido;
@@ -523,7 +580,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo) {
-		return pedidoDAO.pesquisarCompraPendenteRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
+		return itemPedidoDAO.pesquisarCompraPendenteRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override
@@ -607,6 +664,12 @@ public class PedidoServiceImpl implements PedidoService {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery("select v.id from Pedido p inner join p.proprietario v where p.id = idPedido ")
 						.setParameter("idPedido", idPedido), Integer.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemEncomenda(Integer idCliente, Periodo periodo) {
+		return itemPedidoDAO.pesquisarItemEncomenda(idCliente, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override
@@ -935,5 +998,4 @@ public class PedidoServiceImpl implements PedidoService {
 			throw exception;
 		}
 	}
-
 }

@@ -25,6 +25,9 @@ public interface PedidoService {
 
 	boolean contemItemPedido(Integer idPedido);
 
+	void encomendarItemPedido(Integer idComprador, Integer idFornecedor, List<Integer> listaIdItemPedido)
+			throws BusinessException;
+
 	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
 
 	Pedido inserir(Pedido pedido) throws BusinessException;
@@ -76,6 +79,8 @@ public interface PedidoService {
 
 	Integer pesquisarIdVendedorByIdPedido(Integer idPedido);
 
+	List<ItemPedido> pesquisarItemEncomenda(Integer idCliente, Periodo periodo);
+
 	ItemPedido pesquisarItemPedido(Integer idItemPedido);
 
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
@@ -117,12 +122,12 @@ public interface PedidoService {
 	Double pesquisarValorPedidoIPI(Integer idPedido);
 
 	Pedido pesquisarVendaById(Integer id);
-
+	
 	List<Pedido> pesquisarVendaByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException;
 
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
-	
+
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
 
 }

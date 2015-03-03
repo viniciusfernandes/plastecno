@@ -24,8 +24,6 @@ public interface RepresentadaService {
 
 	boolean isRevendedor(Integer idRepresentada);
 
-	List<Representada> pesquisarRepresentadaAtivo();
-
 	List<Representada> pesquisarBy(Representada filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros);
 
@@ -37,11 +35,17 @@ public interface RepresentadaService {
 
 	List<Representada> pesquisarFornecedor(Boolean ativo);
 
+	List<Representada> pesquisarFornecedorAtivo();
+
 	Logradouro pesquisarLogradorouro(Integer id);
 
 	List<Representada> pesquisarRepresentada();
 
 	List<Representada> pesquisarRepresentada(Boolean ativo);
+
+	List<Representada> pesquisarRepresentadaAtivo();
+
+	Representada pesquisarRevendedor();
 
 	TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(Integer idRepresentada);
 

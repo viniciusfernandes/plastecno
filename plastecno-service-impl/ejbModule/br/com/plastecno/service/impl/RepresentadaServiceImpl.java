@@ -107,7 +107,14 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 			throw new BusinessException("CNPJ enviado ja foi cadastrado para outra representada");
 		}
 
+		if (representada.isRevendedor() && isRevendedorExistente(representada.getId())) {
+			Representada revendedor = pesquisarRevendedor();
+			throw new BusinessException("Já existe um revendedor cadastrado no sistema. Remova o revendedor \""
+					+ revendedor.getNomeFantasia() + "\" para em seguida cadastrar um outro.");
+		}
+
 		representada.setLogradouro(this.logradouroService.inserir(representada.getLogradouro()));
+
 		if (representada.getId() == null) {
 			return representadaDAO.inserir(representada).getId();
 		} else {
@@ -133,6 +140,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	@Override
 	public boolean isRevendedor(Integer idRepresentada) {
 		return TipoRelacionamento.REVENDA.equals(representadaDAO.pesquisarTipoRelacionamento(idRepresentada));
+	}
+
+	private boolean isRevendedorExistente(Integer id) {
+		return this.representadaDAO.isEntidadeExistente(Representada.class, id, "tipoRelacionamento",
+				TipoRelacionamento.REVENDA);
 	}
 
 	@Override
@@ -180,6 +192,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	public List<Representada> pesquisarFornecedorAtivo() {
+		return pesquisarFornecedor(true);
+	}
+
+	@Override
 	public Logradouro pesquisarLogradorouro(Integer id) {
 		StringBuilder select = new StringBuilder("select t.logradouro from Representada t  ");
 		select.append(" INNER JOIN t.logradouro where t.id = :id ");
@@ -202,6 +219,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	@Override
 	public List<Representada> pesquisarRepresentadaAtivo() {
 		return this.pesquisarRepresentada(true);
+	}
+
+	@Override
+	public Representada pesquisarRevendedor() {
+		return representadaDAO.pesquisarRevendedor();
 	}
 
 	@Override

@@ -22,7 +22,7 @@ import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
-public class RecepcaoCompraPendenteController extends AbstractController {
+public class RecepcaoCompraController extends AbstractController {
     @Servico
     private RepresentadaService representadaService;
 
@@ -35,7 +35,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
     @Servico
     private EstoqueService estoqueService;
 
-    public RecepcaoCompraPendenteController(Result result, UsuarioInfo usuarioInfo) {
+    public RecepcaoCompraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
     }
 
@@ -60,15 +60,15 @@ public class RecepcaoCompraPendenteController extends AbstractController {
             gerarListaMensagemErro(e);
         }
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraPendenteRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao/listagem")
-    public void pesquisarCompraPendente(Date dataInicial, Date dataFinal, Integer idRepresentada) {
+    public void pesquisarCompraPendenteRecebimento(Date dataInicial, Date dataFinal, Integer idRepresentada) {
 
         try {
             Periodo periodo = new Periodo(dataInicial, dataFinal);
-            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraPendente(
+            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraPendenteRecebimento(
                     idRepresentada, periodo);
 
             addAtributo("relatorio", relatorio);
@@ -100,11 +100,11 @@ public class RecepcaoCompraPendenteController extends AbstractController {
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("idRepresentadaSelecionada", idRepresentada);
-        redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraPendenteRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao")
-    public void recepcaoCompraPendenteHome() {
+    public void recepcaoCompraHome() {
         // Pode ser que essas datas ja tenham sido preenchidas em outra
         // navegacao pois esse metodo eh reaproveitado.
         configurarFiltroPediodoMensal();
@@ -119,7 +119,7 @@ public class RecepcaoCompraPendenteController extends AbstractController {
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
-        redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraPendenteRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Post("compra/item/remocao")
@@ -129,6 +129,6 @@ public class RecepcaoCompraPendenteController extends AbstractController {
         } catch (BusinessException e) {
             this.gerarListaMensagemErro(e);
         }
-        redirecTo(this.getClass()).pesquisarCompraPendente(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraPendenteRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 }

@@ -9,6 +9,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -57,11 +59,6 @@ public class ClienteServiceImpl implements ClienteService {
 	private UsuarioService usuarioService;
 
 	private ClienteDAO clienteDAO;
-
-	@Override
-	public String pesquisarNomeFantasia(Integer idCliente) {
-		return clienteDAO.pesquisarNomeFantasia(idCliente);
-	}
 
 	@Override
 	public Integer contactarCliente(Integer id) {
@@ -135,6 +132,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 		validarDocumentosPreenchidos(cliente);
 		validarListaLogradouroPreenchida(cliente);
+		validarRevendedorExistente(cliente);
 		inserirEndereco(cliente);
 		return cliente.getId() == null ? clienteDAO.inserir(cliente) : clienteDAO.alterar(cliente);
 	}
@@ -163,11 +161,7 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
-	public boolean isClienteAtivo(Integer idCliente) {
-		return true;
-	}
-
-	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isClienteProspectado(Integer idCliente) {
 		Query query = this.entityManager
 				.createQuery("select c.prospeccaoFinalizada from Cliente c where c.id = :idCliente").setParameter("idCliente",
@@ -176,31 +170,37 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isCNPJExistente(Integer idCliente, String cnpj) {
 		return clienteDAO.isEntidadeExistente(Cliente.class, idCliente, "cnpj", cnpj);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isCPFExistente(Integer idCliente, String cpf) {
 		return clienteDAO.isEntidadeExistente(Cliente.class, idCliente, "cpf", cpf);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isEmailExistente(Integer idCliente, String email) {
 		return clienteDAO.isEmailExistente(idCliente, email);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isInscricaoEstadualExistente(Integer idCliente, String inscricaoEstadual) {
 		return clienteDAO.isEntidadeExistente(Cliente.class, idCliente, "inscricaoEstadual", inscricaoEstadual);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isNomeFantasiaExistente(Integer id, String nomeFantasia) {
 		return clienteDAO.isEntidadeExistente(Cliente.class, id, "nomeFantasia", nomeFantasia);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public PaginacaoWrapper<Cliente> paginarCliente(Cliente filtro, boolean carregarVendedor,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		return new PaginacaoWrapper<Cliente>(this.pesquisarTotalRegistros(filtro), this.pesquisarBy(filtro, true,
@@ -209,6 +209,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarBy(Cliente filtro, boolean carregarVendedor, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 		if (filtro == null) {
@@ -233,17 +234,20 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarBy(Cliente filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		return this.pesquisarBy(filtro, false, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Cliente pesquisarById(Integer id) {
 		return clienteDAO.pesquisarById(id);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarByIdVendedor(Integer idVendedor) {
 		StringBuilder select = new StringBuilder("select c from Cliente c left join fetch c.listaContato ");
 		if (idVendedor != null) {
@@ -407,6 +411,17 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
+	public String pesquisarNomeFantasia(Integer idCliente) {
+		return clienteDAO.pesquisarNomeFantasia(idCliente);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Cliente pesquisarRevendedor() {
+		return clienteDAO.pesquisarRevendedor();
+	}
+
+	@Override
 	public Long pesquisarTotalRegistros(Cliente filtro) {
 		if (filtro == null) {
 			return 0L;
@@ -482,6 +497,14 @@ public class ClienteServiceImpl implements ClienteService {
 	private void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException {
 		if (cliente.isProspectado()) {
 			logradouroService.verificarListaLogradouroObrigatorio(cliente.getListaLogradouro());
+		}
+	}
+
+	public void validarRevendedorExistente(Cliente cliente) throws BusinessException {
+		if (cliente.isRevendedor() && clienteDAO.isRevendedorExistente(cliente.getId())) {
+			Cliente revendedor = clienteDAO.pesquisarRevendedor();
+			throw new BusinessException("Não é possível mais de um cliente revendedor cadastrado. O cliente \""
+					+ revendedor.getNomeFantasia() + "\" já esta cadastrado como revendedor.");
 		}
 	}
 }

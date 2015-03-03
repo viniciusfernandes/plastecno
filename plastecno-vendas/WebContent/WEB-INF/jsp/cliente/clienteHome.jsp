@@ -159,7 +159,19 @@ function remover(codigo, nome) {
 						class="checkbox" />
 				</div>
 			</c:if>
-
+			
+			<div class="label obrigatorio">Tipo Cliente:</div>
+			<div class="input">
+				<input type="radio" name="cliente.tipoCliente" 
+					value="NORMAL" <c:if test="${not empty cliente and cliente.tipoCliente == 'NORMAL'}">checked</c:if>/>
+			</div>
+			<div class="label label_radio_button" style="width: 5%">Normal</div>
+			<div class="input">
+				<input type="radio" name="cliente.tipoCliente"
+					value="REVENDEDOR" <c:if test="${not empty cliente and cliente.tipoCliente == 'REVENDEDOR'}">checked</c:if> />
+			</div>
+			<div class="label label_radio_button" style="width: 70%">Revendedor</div>
+			
 			<div class="label">Último Contato:</div>
 			<div class="input" style="width: 20%">
 				<input type="text" id="ultimoContato" value="${ultimoContato}"

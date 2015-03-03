@@ -62,6 +62,9 @@ public class ItemPedido extends Item {
 	@Column(name = "medida_interna")
 	private Double medidaInterna;
 
+	@Column(name = "quantidade_encomenda")
+	private Integer quantidadeEncomenda;
+
 	@Transient
 	private String nomeProprietario;
 
@@ -97,9 +100,6 @@ public class ItemPedido extends Item {
 	@Column(name = "item_recebido")
 	private boolean recebido;
 
-	@Column(name = "item_reservado")
-	private boolean reservado;
-
 	private Integer sequencial;
 
 	@Enumerated(EnumType.ORDINAL)
@@ -126,7 +126,6 @@ public class ItemPedido extends Item {
 			clone.setId(null);
 			clone.setPedido(null);
 			clone.setRecebido(false);
-			clone.setReservado(false);
 			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new IllegalStateException("Falha ao clonar o item de pedido " + getId(), e);
@@ -209,6 +208,10 @@ public class ItemPedido extends Item {
 		return quantidade;
 	}
 
+	public Integer getQuantidadeEncomenda() {
+		return quantidadeEncomenda;
+	}
+
 	public Integer getSequencial() {
 		return sequencial;
 	}
@@ -223,10 +226,6 @@ public class ItemPedido extends Item {
 
 	public boolean isRecebido() {
 		return recebido;
-	}
-
-	public boolean isReservado() {
-		return reservado;
 	}
 
 	public boolean isVendaKilo() {
@@ -305,12 +304,12 @@ public class ItemPedido extends Item {
 		this.quantidade = quantidade;
 	}
 
-	public void setRecebido(boolean recebido) {
-		this.recebido = recebido;
+	public void setQuantidadeEncomenda(Integer quantidadeEncomenda) {
+		this.quantidadeEncomenda = quantidadeEncomenda;
 	}
 
-	public void setReservado(boolean reservado) {
-		this.reservado = reservado;
+	public void setRecebido(boolean recebido) {
+		this.recebido = recebido;
 	}
 
 	public void setSequencial(Integer sequencial) {

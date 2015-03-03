@@ -191,7 +191,7 @@ public class PedidoController extends AbstractController {
         // Verificando se a lista de representada ja foi preenchida em outro
         // fluxo
         if (!contemAtributo("listaRepresentada")) {
-            addAtributo("listaRepresentada", this.representadaService.pesquisarRepresentada(true));
+            addAtributo("listaRepresentada", this.representadaService.pesquisarRepresentadaAtivo());
         }
 
         if (pedido != null) {
@@ -364,7 +364,7 @@ public class PedidoController extends AbstractController {
                             .equals(situacao));
             boolean isVendaFinalizada = pedido.isVenda()
                     && (SituacaoPedido.ENVIADO.equals(situacao)
-                            || SituacaoPedido.ITEM_PENDENTE_RESERVA.equals(situacao)
+                            || SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA.equals(situacao)
                             || SituacaoPedido.EMPACOTAMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO
                                 .equals(situacao));
             return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;

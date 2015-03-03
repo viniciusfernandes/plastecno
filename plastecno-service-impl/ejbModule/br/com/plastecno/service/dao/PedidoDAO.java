@@ -119,47 +119,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return query.getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Date dataInicial, Date dataFinal) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemPedido i ");
-		select.append("where i.pedido.tipoPedido = :tipoPedido ");
-		select.append("and i.recebido = false ");
-		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
-
-		if (dataInicial != null) {
-			select.append("and i.pedido.dataEnvio >= :dataInicial ");
-		}
-
-		if (dataFinal != null) {
-			select.append("and i.pedido.dataEnvio <= :dataFinal ");
-		}
-
-		if (idRepresentada != null) {
-			select.append("and i.pedido.representada.id = :idRepresentada ");
-		}
-
-		select.append("order by i.pedido.dataEnvio asc ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("tipoPedido", TipoPedido.COMPRA);
-		query.setParameter("situacaoPedido", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
-
-		if (dataInicial != null) {
-			query.setParameter("dataInicial", dataInicial);
-		}
-
-		if (dataFinal != null) {
-			query.setParameter("dataFinal", dataFinal);
-		}
-
-		if (idRepresentada != null) {
-			query.setParameter("idRepresentada", idRepresentada);
-		}
-
-		return query.getResultList();
-	}
-
 	public Date pesquisarDataEnvioById(Integer idPedido) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p.dataEnvio from Pedido p where p.id = :id");

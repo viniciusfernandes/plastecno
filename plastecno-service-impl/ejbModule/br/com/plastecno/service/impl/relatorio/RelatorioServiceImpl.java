@@ -93,12 +93,13 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraPendente(Integer idRepresentada, Periodo periodo) {
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraPendenteRecebimento(Integer idRepresentada,
+			Periodo periodo) {
 		/*
 		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
 		 * estoque para recuperar apenas a informacao necessaria.
 		 */
-		return gerarRelatorioItensPorPedido("Recepção de Compras com Pendências",
+		return gerarRelatorioItensPorPedido("Recepção de Compras para Recebimento",
 				pedidoService.pesquisarCompraPendenteRecebimento(idRepresentada, periodo));
 	}
 
@@ -125,6 +126,16 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 
 		return relatorio;
+	}
+
+	@Override
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemEncomenda(Integer idCliente, Periodo periodo) {
+		/*
+		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
+		 * estoque para recuperar apenas a informacao necessaria.
+		 */
+		return gerarRelatorioItensPorPedido("Itens para Encomendar",
+				pedidoService.pesquisarItemEncomenda(idCliente, periodo));
 	}
 
 	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(String titulo, List<ItemPedido> listaItem) {

@@ -15,5 +15,4 @@ public enum TipoRelacionamento {
 	public String getDescricao() {
 		return this.descricao;
 	}
-
 }

@@ -316,6 +316,15 @@ public class Pedido implements Serializable, Cloneable {
 		return TipoPedido.COMPRA.equals(tipoPedido);
 	}
 
+	public boolean isCompraEfetuada() {
+		return SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacaoPedido)
+				|| SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido);
+	}
+
+	public boolean isEncomenda() {
+		return SituacaoPedido.ENCOMENDA.equals(this.situacaoPedido);
+	}
+
 	public boolean isEnviado() {
 		return SituacaoPedido.ENVIADO.equals(this.situacaoPedido);
 	}
@@ -452,10 +461,5 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setVendedor(Usuario vendedor) {
 		this.proprietario = vendedor;
-	}
-
-	public boolean isCompraEfetuada() {
-		return SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacaoPedido)
-				|| SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido);
 	}
 }

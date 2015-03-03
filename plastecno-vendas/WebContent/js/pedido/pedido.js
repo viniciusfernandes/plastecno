@@ -268,8 +268,8 @@ function inicializarAutomcompleteCliente(url) {
 					$('#cnpj').val(clienteJson.cnpj);
 					$('#cpf').val(clienteJson.cpf);
 					$('#nomeCliente').val(clienteJson.nomeCompleto);
-					$('#idVendedor').val(clienteJson.vendedor.id);
-					$('#proprietario').val(clienteJson.vendedor.nome + ' - '+ clienteJson.vendedor.email);
+					$('#idVendedor').val(clienteJson.proprietario.id);
+					$('#proprietario').val(clienteJson.proprietario.nome + ' - '+ clienteJson.proprietario.email);
 
 					limparComboBox('listaTransportadora');
 					limparComboBox('listaRedespacho');

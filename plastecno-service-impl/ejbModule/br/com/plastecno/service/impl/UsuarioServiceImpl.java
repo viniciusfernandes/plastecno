@@ -352,10 +352,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public Usuario pesquisarUsuarioResumidoById(Integer idUsuario) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select new Usuario(u.id, u.nome, u.sobrenome) from Usuario u where u.id = :idUsuario ").setParameter(
-						"idUsuario", idUsuario), Usuario.class, null);
+		return usuarioDAO.pesquisarUsuarioResumidoById(idUsuario);
 	}
 
 	@Override

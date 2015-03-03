@@ -170,7 +170,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void encomendarItemPedido(Integer idComprador, Integer idRepresentadaFornecedora,
+	public Integer encomendarItemPedido(Integer idComprador, Integer idRepresentadaFornecedora,
 			List<Integer> listaIdItemPedido) throws BusinessException {
 		if (listaIdItemPedido == null || listaIdItemPedido.isEmpty()) {
 			throw new BusinessException("A lista de itens de pedido para encomendar não pode estar vazia");
@@ -195,7 +195,6 @@ public class PedidoServiceImpl implements PedidoService {
 		pedido.setComprador(comprador);
 		pedido.setContato(contato);
 		pedido.setDataInclusao(new Date());
-		pedido.setFormaPagamento("A DEFINIR");
 		pedido.setFinalidadePedido(FinalidadePedido.REVENDA);
 		pedido.setProprietario(comprador);
 		pedido.setRepresentada(fornecedor);
@@ -219,7 +218,10 @@ public class PedidoServiceImpl implements PedidoService {
 						+ itemCadastrado.getSequencial() + " do pedido No. " + itemCadastrado.getPedido().getId()
 						+ ". Possível problema: " + e.getMensagemEmpilhada());
 			}
+			itemCadastrado.setEncomendado(true);
+			inserirItemPedido(itemCadastrado);
 		}
+		return pedido.getId();
 	}
 
 	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
@@ -382,7 +384,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 		if (isPedidoNovo) {
 			pedido.setDataInclusao(new Date());
-			pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
+			if (!pedido.isEncomenda()) {
+				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
+			}
 			pedido = pedidoDAO.inserir(pedido);
 
 		} else {

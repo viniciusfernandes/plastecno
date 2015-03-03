@@ -100,6 +100,9 @@ public class ItemPedido extends Item {
 	@Column(name = "item_recebido")
 	private boolean recebido;
 
+	@Column(name = "item_encomendado")
+	private boolean encomendado;
+
 	private Integer sequencial;
 
 	@Enumerated(EnumType.ORDINAL)
@@ -220,6 +223,10 @@ public class ItemPedido extends Item {
 		return tipoVenda;
 	}
 
+	public boolean isEncomendado() {
+		return encomendado;
+	}
+
 	public boolean isNovo() {
 		return this.id == null;
 	}
@@ -246,6 +253,10 @@ public class ItemPedido extends Item {
 
 	public void setDescricaoPeca(String descricaoPeca) {
 		this.descricaoPeca = descricaoPeca;
+	}
+
+	public void setEncomendado(boolean encomendado) {
+		this.encomendado = encomendado;
 	}
 
 	public void setFormaMaterial(FormaMaterial formaMaterial) {

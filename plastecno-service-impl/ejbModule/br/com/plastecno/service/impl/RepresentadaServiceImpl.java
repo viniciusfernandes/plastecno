@@ -14,6 +14,7 @@ import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.entity.ContatoRepresentada;
@@ -219,6 +220,14 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	@Override
 	public List<Representada> pesquisarRepresentadaAtivo() {
 		return this.pesquisarRepresentada(true);
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentadaAtivoByTipoPedido(TipoPedido tipoPedido) {
+		if (TipoPedido.COMPRA.equals(tipoPedido)) {
+			return pesquisarFornecedorAtivo();
+		}
+		return pesquisarRepresentadaAtivo();
 	}
 
 	@Override

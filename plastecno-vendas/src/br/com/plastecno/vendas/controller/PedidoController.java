@@ -191,7 +191,8 @@ public class PedidoController extends AbstractController {
         // Verificando se a lista de representada ja foi preenchida em outro
         // fluxo
         if (!contemAtributo("listaRepresentada")) {
-            addAtributo("listaRepresentada", this.representadaService.pesquisarRepresentadaAtivo());
+            TipoPedido tipoPedido = pedido == null ? null : pedido.getTipoPedido();
+            addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaAtivoByTipoPedido(tipoPedido));
         }
 
         if (pedido != null) {
@@ -339,14 +340,14 @@ public class PedidoController extends AbstractController {
              * recuperamos o usuario que efetuou a venda. Precisamo recuperar o
              * vendedor, pois o JSON devera conter o nome e email do vendedor.
              */
-            final Usuario vendedor = pedido.getId() == null ? this.usuarioService.pesquisarById(getCodigoUsuario())
-                    : this.pedidoService.pesquisarProprietario(pedido.getId());
+            final Usuario proprietario = pedido.getId() == null ? this.usuarioService
+                    .pesquisarUsuarioResumidoById(getCodigoUsuario()) : this.pedidoService.pesquisarProprietario(pedido
+                    .getId());
 
-            pedido.setVendedor(vendedor);
-            pedido = this.pedidoService.inserir(pedido);
-            this.formatarPedido(pedido);
-
-            serializarJson(new SerializacaoJson(pedido).incluirAtributo("proprietario", "situacaoPedido"));
+            pedido.setProprietario(proprietario);
+            pedidoService.inserir(pedido);
+            formatarPedido(pedido);
+            serializarJson(new SerializacaoJson(pedido).incluirAtributo("situacaoPedido", "proprietario"));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {

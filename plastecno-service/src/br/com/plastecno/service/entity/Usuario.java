@@ -39,10 +39,13 @@ public class Usuario implements Serializable {
 
 	@InformacaoValidavel(obrigatorio = true, intervalo = { 6, 30 }, nomeExibicao = "Senha do usuario")
 	private String senha;
+
 	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 50 }, nomeExibicao = "Email do usuario")
 	private String email;
+
 	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 20 }, nomeExibicao = "Nome do usuario")
 	private String nome;
+
 	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 40 }, nomeExibicao = "Sobrenome do usuario")
 	private String sobrenome;
 
@@ -266,7 +269,7 @@ public class Usuario implements Serializable {
 		this.listaPerfilAcesso = listaPerfilAcesso;
 	}
 
-	void setListaRemuneracao(List<Remuneracao> listaRemuneracao) {
+	public void setListaRemuneracao(List<Remuneracao> listaRemuneracao) {
 		this.listaRemuneracao = listaRemuneracao;
 	}
 

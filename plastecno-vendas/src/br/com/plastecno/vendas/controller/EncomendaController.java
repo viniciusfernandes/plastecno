@@ -50,11 +50,13 @@ public class EncomendaController extends AbstractController {
     public void encomendarItemPedido(Date dataInicial, Date dataFinal, Integer idRepresentadaFornecedora,
             Integer idCliente, List<Integer> listaIdItem) {
         try {
-            pedidoService.encomendarItemPedido(getCodigoUsuario(), idRepresentadaFornecedora, listaIdItem);
+            Integer idPedidoCompra = pedidoService.encomendarItemPedido(getCodigoUsuario(), idRepresentadaFornecedora,
+                    listaIdItem);
             addAtributo("dataInicial", formatarData(dataInicial));
             addAtributo("dataFinal", formatarData(dataFinal));
             addAtributo("idClienteSelecionado", idCliente);
-            redirecTo(this.getClass()).encomendaHome();
+
+            redirecTo(PedidoController.class).pesquisarPedidoById(idPedidoCompra, TipoPedido.COMPRA);
         } catch (BusinessException e) {
             addAtributo("permanecerTopo", true);
             gerarListaMensagemErro(e);

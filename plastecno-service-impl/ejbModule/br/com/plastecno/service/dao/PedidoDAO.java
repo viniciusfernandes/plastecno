@@ -16,14 +16,17 @@ import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
 
 public class PedidoDAO extends GenericDAO<Pedido> {
-
 	public PedidoDAO(EntityManager entityManager) {
 		super(entityManager);
 	}
 
-	public void cancelar(Integer idPedido) {
+	public void atualizarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
 		this.entityManager.createQuery("update Pedido p set p.situacaoPedido = :situacao where p.id = :idPedido")
-				.setParameter("situacao", SituacaoPedido.CANCELADO).setParameter("idPedido", idPedido).executeUpdate();
+				.setParameter("situacao", situacaoPedido).setParameter("idPedido", idPedido).executeUpdate();
+	}
+
+	public void cancelar(Integer idPedido) {
+		atualizarSituacaoPedidoById(idPedido, SituacaoPedido.CANCELADO);
 	}
 
 	private Query gerarQueryPesquisa(Pedido filtro, StringBuilder select) {

@@ -17,6 +17,10 @@ import br.com.plastecno.service.wrapper.Periodo;
 @Local
 public interface PedidoService {
 
+	void atualizarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
+
+	void atualizarSituacaoPedidoPedidoEncomendado(Integer idItemPedido);
+
 	Double calcularValorPedido(Integer idPedido) throws BusinessException;
 
 	Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException;
@@ -118,11 +122,11 @@ public interface PedidoService {
 	List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo);
 
 	Double pesquisarValorPedido(Integer idPedido);
-
+	
 	Double pesquisarValorPedidoIPI(Integer idPedido);
 
 	Pedido pesquisarVendaById(Integer id);
-	
+
 	List<Pedido> pesquisarVendaByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException;
 

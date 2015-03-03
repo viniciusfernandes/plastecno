@@ -366,7 +366,8 @@ public class PedidoController extends AbstractController {
             boolean isVendaFinalizada = pedido.isVenda()
                     && (SituacaoPedido.ENVIADO.equals(situacao)
                             || SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA.equals(situacao)
-                            || SituacaoPedido.EMPACOTAMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO
+                            || SituacaoPedido.EMPACOTAMENTO.equals(situacao)
+                            || SituacaoPedido.EMPACOTADO.equals(situacao) || SituacaoPedido.ENCOMENDA.equals(situacao) || SituacaoPedido.REVENDA_ENCOMENDADA
                                 .equals(situacao));
             return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
         }

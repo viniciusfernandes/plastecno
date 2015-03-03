@@ -108,16 +108,18 @@ function encomendarItem(idItem){
 	<c:if test="${not empty relatorio}">
 		<fieldset>
 		<legend>::: Itens de Pedidos para Comprar :::</legend>
-		<input type="button" id="botaoEnviarEncomenda" title="Enviar Itens para Compras" value="" class="botaoEnviarEmail"/>
-		<div class="label obrigatorio" style="width: 25%">Fornecedor:</div>
+		<div class="label obrigatorio" style="width: 30%">Fornecedor:</div>
 		<div class="input" style="width: 30%">
-			<select id="fornecedor">
+			<select id="fornecedor" style="width: 50%">
 				<option value="">&lt&lt SELECIONE &gt&gt</option>
 				<c:forEach var="fornecedor" items="${listaFornecedor}">
 					<option value="${fornecedor.id}"
 						<c:if test="${fornecedor eq fornecedorSelecionado}">selected</c:if>>${fornecedor.nomeFantasia}</option>
 				</c:forEach>
 			</select>
+		</div>
+		<div class="bloco_botoes">
+			<input type="button" id="botaoEnviarEncomenda" title="Enviar Itens para Compras" value="" class="botaoEnviarEmail"/>
 		</div>
 		<table id="tabelaItemEncomenda" class="listrada">
 			<thead>

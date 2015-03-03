@@ -110,6 +110,19 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void atualizarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido) {
+		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
+		pedidoDAO.atualizarSituacaoPedidoById(idPedido, situacaoPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void atualizarSituacaoPedidoPedidoEncomendado(Integer idItemPedido) {
+		atualizarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double calcularValorPedido(Integer idPedido) throws BusinessException {
 		try {
@@ -220,6 +233,7 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 			itemCadastrado.setEncomendado(true);
 			inserirItemPedido(itemCadastrado);
+			atualizarSituacaoPedidoPedidoEncomendado(itemCadastrado.getId());
 		}
 		return pedido.getId();
 	}
@@ -971,7 +985,7 @@ public class PedidoServiceImpl implements PedidoService {
 			throw exception;
 		}
 	}
-
+	
 	private void validarEnvioVenda(Pedido pedido) throws BusinessException {
 		final BusinessException exception = new BusinessException();
 		try {

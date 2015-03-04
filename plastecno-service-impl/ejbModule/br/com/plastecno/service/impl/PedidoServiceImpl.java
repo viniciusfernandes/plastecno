@@ -654,7 +654,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		return query.getResultList();
 	}
-
+	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException {

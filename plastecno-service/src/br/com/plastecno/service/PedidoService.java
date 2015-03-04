@@ -71,7 +71,7 @@ public interface PedidoService {
 
 	Date pesquisarDataInclusao(Integer idPedido);
 
-	List<Pedido> pesquisarEnviadosByPeriodo(Periodo periodo);
+	List<Pedido> pesquisarPedidoVendaByPeriodo(Periodo periodo);
 
 	List<Pedido> pesquisarEnviadosByPeriodoERepresentada(Periodo periodo, Integer idRepresentada);
 
@@ -133,5 +133,9 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
+
+	List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo);
+
+	List<Pedido> pesquisarEntregaVendaByPeriodo(Periodo periodo);
 
 }

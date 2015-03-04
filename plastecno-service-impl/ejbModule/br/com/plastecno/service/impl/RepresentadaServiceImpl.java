@@ -189,7 +189,8 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@Override
 	public List<Representada> pesquisarFornecedor(Boolean ativo) {
-		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.REPRESENTACAO);
+		return representadaDAO.pesquisarRepresentadaByTipoRelacionamento(ativo, TipoRelacionamento.FORNECIMENTO,
+				TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
 	}
 
 	@Override

@@ -36,14 +36,20 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoEnviarEncomenda').click(function () {
-		var parametros = $('#formPesquisa').serialize();
-		parametros+='&idRepresentadaFornecedora='+$('#fornecedor').val();
-		for (var i = 0; i < listaIdItem.length; i++) {
-			parametros+='&listaIdItem='+listaIdItem[i];
-		};
-		var action = '<c:url value="/encomenda/item/compra"/>'+'?'+parametros;
-		$('#formVazio').attr('method', 'post').attr('action', action);
-		$('#formVazio').submit();
+
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ENVIAR ESSES PEDIDOS PARA A ENCOMENDA?',
+			confirmar: function(){
+				var parametros = $('#formPesquisa').serialize();
+				parametros+='&idRepresentadaFornecedora='+$('#fornecedor').val();
+				for (var i = 0; i < listaIdItem.length; i++) {
+					parametros+='&listaIdItem='+listaIdItem[i];
+				};
+				var action = '<c:url value="/encomenda/item/compra"/>'+'?'+parametros;
+				$('#formVazio').attr('method', 'post').attr('action', action);
+				$('#formVazio').submit();
+			}
+		});
 	});
 	
 	inicializarAutocompleteCliente();

@@ -156,7 +156,12 @@ function editarItemPedido(botaoEdicao) {
 };
 
 function removerItemPedido(botaoRemocao) {
-	tabelaItemHandler.removerRegistro(botaoRemocao);
+	inicializarModalConfirmacao({
+		mensagem: 'Essa acao nao podera ser desfeita. Voce tem certeza de que deseja REMOVER esse item?',
+		confirmar: function(){
+			tabelaItemHandler.removerRegistro(botaoRemocao);
+		}
+	});
 };
 
 
@@ -268,8 +273,8 @@ function inicializarAutomcompleteCliente(url) {
 					$('#cnpj').val(clienteJson.cnpj);
 					$('#cpf').val(clienteJson.cpf);
 					$('#nomeCliente').val(clienteJson.nomeCompleto);
-					$('#idVendedor').val(clienteJson.proprietario.id);
-					$('#proprietario').val(clienteJson.proprietario.nome + ' - '+ clienteJson.proprietario.email);
+					$('#idVendedor').val(clienteJson.vendedor.id);
+					$('#proprietario').val(clienteJson.vendedor.nome + ' - '+ clienteJson.vendedor.email);
 
 					limparComboBox('listaTransportadora');
 					limparComboBox('listaRedespacho');

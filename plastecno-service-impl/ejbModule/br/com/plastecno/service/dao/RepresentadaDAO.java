@@ -1,5 +1,6 @@
 package br.com.plastecno.service.dao;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -23,6 +24,24 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("SELECT r.nomeFantasia FROM Representada r where r.id = :idRepresentada")
 						.setParameter("idRepresentada", idRepresentada), String.class, null);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Representada> pesquisarRepresentadaByTipoRelacionamento(boolean ativo, TipoRelacionamento... tipos) {
+		StringBuilder select = new StringBuilder(
+				"SELECT new Representada(r.id, r.nomeFantasia) FROM Representada r where r.ativo = :ativo ");
+
+		if (tipos != null && tipos.length > 0) {
+			select.append("and r.tipoRelacionamento IN (:tipos) ");
+		}
+
+		select.append("order by r.nomeFantasia ");
+
+		Query query = this.entityManager.createQuery(select.toString()).setParameter("ativo", ativo);
+		if (tipos != null) {
+			query.setParameter("tipos", Arrays.asList(tipos));
+		}
+		return query.getResultList();
 	}
 
 	@SuppressWarnings("unchecked")

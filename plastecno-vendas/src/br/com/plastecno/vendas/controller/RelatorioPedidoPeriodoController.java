@@ -1,16 +1,16 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.Date;
+import java.util.List;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.relatorio.RelatorioService;
+import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.Periodo;
-import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
-import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class RelatorioPedidoPeriodoController extends AbstractController {
@@ -18,33 +18,68 @@ public class RelatorioPedidoPeriodoController extends AbstractController {
     @Servico
     private RelatorioService relatorioService;
 
-    public RelatorioPedidoPeriodoController(Result result, UsuarioInfo usuarioInfo) {
-        super(result, usuarioInfo);
+    public RelatorioPedidoPeriodoController(Result result) {
+        super(result);
     }
 
-    @Get("relatorio/pedido/periodo/listagem")
-    public void gerarRelatorioPedidoPeriodo(boolean isCompra, Date dataInicial, Date dataFinal) {
-
+    @Get("relatorio/pedido/listagem")
+    public void pesquisarPediddoByPeriodo(Date dataInicial, Date dataFinal, boolean isCompra, boolean isEntrega) {
         try {
-            if (isCompra) {
-                addAtributo("relatorio",
-                        relatorioService.gerarRelatorioCompraPeriodo(new Periodo(dataInicial, dataFinal)));
+            List<Pedido> listaPedido = null;
+            if (isEntrega) {
+                listaPedido = relatorioService.gerarRelatorioEntrega(new Periodo(dataInicial, dataFinal));
+                addAtributo(
+                        "tituloRelatorio",
+                        "Relátorio de Acompanhamento de Entregas de " + this.formatarData(dataInicial) + " à "
+                                + this.formatarData(dataFinal));
+            } else if (isCompra) {
+                listaPedido = relatorioService.gerarRelatorioCompra(new Periodo(dataInicial, dataFinal));
+                addAtributo("tituloRelatorio", "Relátorio de Pedido de Compras de " + this.formatarData(dataInicial)
+                        + " à " + this.formatarData(dataFinal));
+
             } else {
-                addAtributo("relatorio",
-                        relatorioService.gerarRelatorioVendaPeriodo(new Periodo(dataInicial, dataFinal)));
+                listaPedido = relatorioService.gerarRelatorioVenda(new Periodo(dataInicial, dataFinal));
+                addAtributo("tituloRelatorio", "Relátorio de Pedido de Vendas de " + this.formatarData(dataInicial)
+                        + " à " + this.formatarData(dataFinal));
+
             }
-        } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
+
+            for (Pedido pedido : listaPedido) {
+                formatarPedido(pedido);
+            }
+            addAtributo("listaPedido", listaPedido);
+            addAtributo("relatorioGerado", true);
+        } catch (InformacaoInvalidaException e) {
+            this.gerarListaMensagemErro(e);
         }
 
-        addAtributo("dataInicial", StringUtils.formatarData(dataInicial));
-        addAtributo("dataFinal", StringUtils.formatarData(dataFinal));
-        redirecTo(this.getClass()).relatorioPedidoPeriodoHome(isCompra);
+        addAtributo("dataInicial", formatarData(dataInicial));
+        addAtributo("dataFinal", formatarData(dataFinal));
+        redirecTo(this.getClass()).relatorioPedidoPeriodoHome(dataInicial, dataFinal, isCompra, isEntrega);
     }
 
-    @Get("relatorio/pedido/periodo")
-    public void relatorioPedidoPeriodoHome(boolean isCompra) {
+    @Get("relatorio/pedido")
+    public void relatorioPedidoPeriodoHome(Date dataInicial, Date dataFinal, boolean isCompra, boolean isEntrega) {
+        if (isEntrega) {
+            addAtributo("titulo", "Relatório de Entregas por Período");
+            addAtributo(
+                    "tituloRelatorio",
+                    "Relátorio de Acompanhamento de Entregas de " + this.formatarData(dataInicial) + " à "
+                            + this.formatarData(dataFinal));
+        } else if (isCompra) {
+            addAtributo("titulo", "Relatório de Compras por Período");
+            addAtributo("tituloRelatorio", "Relátorio de Pedido de Compras de " + this.formatarData(dataInicial)
+                    + " à " + this.formatarData(dataFinal));
+
+        } else {
+            addAtributo("titulo", "Relatório de Vendas por Período");
+            addAtributo("tituloRelatorio", "Relátorio de Pedido de Vendas de " + this.formatarData(dataInicial) + " à "
+                    + this.formatarData(dataFinal));
+
+        }
         addAtributo("isCompra", isCompra);
+        addAtributo("isEntrega", isEntrega);
+
         configurarFiltroPediodoMensal();
     }
 }

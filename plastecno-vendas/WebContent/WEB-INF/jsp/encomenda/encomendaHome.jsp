@@ -43,7 +43,10 @@ $(document).ready(function() {
 				var parametros = $('#formPesquisa').serialize();
 				parametros+='&idRepresentadaFornecedora='+$('#fornecedor').val();
 				for (var i = 0; i < listaIdItem.length; i++) {
-					parametros+='&listaIdItem='+listaIdItem[i];
+					// Estamos validando aqui pois no DELETE dos itens da lista o javascript mantem undefined.
+					if(listaIdItem[i] != undefined){
+						parametros+='&listaIdItem='+listaIdItem[i];
+					}
 				};
 				var action = '<c:url value="/encomenda/item/compra"/>'+'?'+parametros;
 				$('#formVazio').attr('method', 'post').attr('action', action);
@@ -67,9 +70,14 @@ function inicializarAutocompleteCliente(){
 	});
 };
 
-function encomendarItem(idItem){
-	listaIdItem.push(idItem);
-}
+function encomendarItem(campo){
+	if(campo.checked){
+		listaIdItem.push(campo.value);	
+	} else {
+		var index = listaIdItem.indexOf(campo.value);
+		delete listaIdItem[index];
+	}
+};
 </script>
 </head>
 <body>
@@ -149,7 +157,7 @@ function encomendarItem(idItem){
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.id}</td>
 							</c:if>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}"><input type="checkbox" name="idItemPedido" onclick="encomendarItem(${item.id})"/></td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}"><input type="checkbox" name="idItemPedido" value="${item.id}" onclick="encomendarItem(this)"/></td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeEncomenda}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>

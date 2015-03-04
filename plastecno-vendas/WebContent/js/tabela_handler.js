@@ -84,42 +84,43 @@ function BlocoTabelaHandler (urlTela, nomeBloco, idTabela, idBlocoInput) {
 	};
 	
 	this.removerRegistro = function (botao) {
-		var remocaoConfirmada = confirm("Voce tem certeza de que deseja remover o "+this.nomeBloco.toUpperCase()+"?");
-		if (remocaoConfirmada) {
-			var linha = $(botao).closest("tr")[0];
-			var idRegistro = linha.cells[0].innerHTML;			
-			var registroRemovido = true;
-			var resposta = null;
-			
-			// Removendo apenas os contatos que existem na base, ou seja, possuem um ID.
-			if (!isEmpty(idRegistro)) {
-					var handler = this;
-					var request = $.ajax({
-						async:   false,
-						type: 'post',
-						url: handler.urlTela+'/'+handler.nomeBloco.toLowerCase()+'/remocao/'+idRegistro
-					});
-					
-					request.done(function (response){
-						resposta = response; 
-					});
-					
-					request.fail(function(request, status) {
-						registroRemovido = false;
-						alert('Falha na remocao do registro => Status da requisicao: '+status);
-					});
-			}
-			
-			if (registroRemovido) {
-				this.tabela.deleteRow(linha.rowIndex);
-				this.limparBlocoInput();
+		var handler = this;
+		inicializarModalConfirmacao({
+			mensagem: 'Essa acao nao podera ser desfeita. Voce tem certeza de que deseja REMOVER esse item?',
+			confirmar: function(){
+				var linha = $(botao).closest("tr")[0];
+				var idRegistro = linha.cells[0].innerHTML;			
+				var registroRemovido = true;
+				var resposta = null;
 				
-				if (this.removerRegistroCallback != undefined) {
-					this.removerRegistroCallback(resposta);
+				// Removendo apenas os contatos que existem na base, ou seja, possuem um ID.
+				if (!isEmpty(idRegistro)) {
+						var request = $.ajax({
+							async:   false,
+							type: 'post',
+							url: handler.urlTela+'/'+handler.nomeBloco.toLowerCase()+'/remocao/'+idRegistro
+						});
+						
+						request.done(function (response){
+							resposta = response; 
+						});
+						
+						request.fail(function(request, status) {
+							registroRemovido = false;
+							alert('Falha na remocao do registro => Status da requisicao: '+status);
+						});
+				}
+				
+				if (registroRemovido) {
+					handler.tabela.deleteRow(linha.rowIndex);
+					handler.limparBlocoInput();
+					
+					if (handler.removerRegistroCallback != undefined) {
+						handler.removerRegistroCallback(resposta);
+					}
 				}
 			}
-			
-		}
+		});
 	};
 	
 	this.gerarParametros = function (funcaoGeracaoParametros) {

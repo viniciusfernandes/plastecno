@@ -1,7 +1,9 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
@@ -50,8 +52,9 @@ public class EncomendaController extends AbstractController {
     public void encomendarItemPedido(Date dataInicial, Date dataFinal, Integer idRepresentadaFornecedora,
             Integer idCliente, List<Integer> listaIdItem) {
         try {
+            final Set<Integer> ids = listaIdItem == null ? new HashSet<Integer>() : new HashSet<Integer>(listaIdItem);
             Integer idPedidoCompra = pedidoService.encomendarItemPedido(getCodigoUsuario(), idRepresentadaFornecedora,
-                    listaIdItem);
+                    ids);
             addAtributo("dataInicial", formatarData(dataInicial));
             addAtributo("dataFinal", formatarData(dataFinal));
             addAtributo("idClienteSelecionado", idCliente);

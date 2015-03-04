@@ -156,12 +156,7 @@ function editarItemPedido(botaoEdicao) {
 };
 
 function removerItemPedido(botaoRemocao) {
-	inicializarModalConfirmacao({
-		mensagem: 'Essa acao nao podera ser desfeita. Voce tem certeza de que deseja REMOVER esse item?',
-		confirmar: function(){
-			tabelaItemHandler.removerRegistro(botaoRemocao);
-		}
-	});
+	tabelaItemHandler.removerRegistro(botaoRemocao);
 };
 
 

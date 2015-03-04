@@ -12,6 +12,8 @@
 <script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
@@ -122,6 +124,7 @@ function remover(codigo, nome) {
 <body>
 
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
+	<div id="modal"></div>
 
 	<form id="formPesquisa" action="cliente/listagem" method="get">
 		<input type="hidden" id="filtro_nomeFantasia"

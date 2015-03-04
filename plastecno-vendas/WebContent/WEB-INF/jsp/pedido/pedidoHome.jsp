@@ -10,6 +10,7 @@
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
@@ -19,7 +20,6 @@
 <script type="text/javascript" src="<c:url value="/js/pedido/pedido.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 
 <style type="text/css">
 .listrada td:last-child form input:first-child {

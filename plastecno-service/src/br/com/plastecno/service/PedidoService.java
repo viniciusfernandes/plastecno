@@ -2,6 +2,7 @@ package br.com.plastecno.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.Local;
 
@@ -29,7 +30,7 @@ public interface PedidoService {
 
 	boolean contemItemPedido(Integer idPedido);
 
-	Integer encomendarItemPedido(Integer idComprador, Integer idFornecedor, List<Integer> listaIdItemPedido)
+	Integer encomendarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
 			throws BusinessException;
 
 	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;

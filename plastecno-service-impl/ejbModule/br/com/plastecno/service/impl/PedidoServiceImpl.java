@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -183,7 +184,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer encomendarItemPedido(Integer idComprador, Integer idRepresentadaFornecedora,
-			List<Integer> listaIdItemPedido) throws BusinessException {
+			Set<Integer> listaIdItemPedido) throws BusinessException {
 		if (listaIdItemPedido == null || listaIdItemPedido.isEmpty()) {
 			throw new BusinessException("A lista de itens de pedido para encomendar não pode estar vazia");
 		}

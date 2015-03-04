@@ -27,8 +27,8 @@ import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
 import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
-import br.com.plastecno.service.wrapper.VendaClienteWrapper;
 import br.com.plastecno.service.wrapper.RepresentadaValorWrapper;
+import br.com.plastecno.service.wrapper.VendaClienteWrapper;
 import br.com.plastecno.service.wrapper.exception.AgrupamentoException;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
@@ -90,6 +90,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 
 		return relatorio;
+	}
+
+	@Override
+	public List<Pedido> gerarRelatorioCompra(Periodo periodo) throws InformacaoInvalidaException {
+		return this.pedidoService.pesquisarPedidoCompraByPeriodo(periodo);
 	}
 
 	@Override
@@ -172,6 +177,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	public List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException {
+		return this.pedidoService.pesquisarPedidoVendaByPeriodo(periodo);
+	}
+
+	@Override
 	public RelatorioPedidoPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException {
 
 		final List<Object[]> resultados = pedidoService.pesquisarTotalVendaResumidaByPeriodo(periodo);
@@ -229,7 +239,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public List<Pedido> pesquisarEntregas(Periodo periodo) throws InformacaoInvalidaException {
-		return this.pedidoService.pesquisarEnviadosByPeriodo(periodo);
+	public List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException {
+		return pedidoService.pesquisarEntregaVendaByPeriodo(periodo);
 	}
 }

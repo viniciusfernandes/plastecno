@@ -211,7 +211,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedido.setFinalidadePedido(FinalidadePedido.REVENDA);
 		pedido.setProprietario(comprador);
 		pedido.setRepresentada(fornecedor);
-		pedido.setSituacaoPedido(SituacaoPedido.ENCOMENDA);
+		pedido.setSituacaoPedido(SituacaoPedido.COMPRA_ENCOMENDADA);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
 
 		pedido = inserir(pedido);
@@ -617,7 +617,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
-	public List<Pedido> pesquisarEnviadosByPeriodo(Periodo periodo) {
+	public List<Pedido> pesquisarEntregaVendaByPeriodo(Periodo periodo) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p from Pedido p join fetch p.representada ");
 		select.append("where p.tipoPedido != :tipoPedido and ");
@@ -655,7 +655,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		return query.getResultList();
 	}
-
+	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException {
@@ -741,6 +741,28 @@ public class PedidoServiceImpl implements PedidoService {
 				indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
+	public List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo) {
+		StringBuilder select = new StringBuilder();
+		select.append("select p from Pedido p join fetch p.representada ");
+		select.append("where p.tipoPedido = :tipoPedido and ");
+		select.append("p.dataEnvio >= :dataInicio and ");
+		select.append("p.dataEnvio <= :dataFim and ");
+		select.append("p.situacaoPedido in :situacoes ");
+		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
+
+		List<SituacaoPedido> situacoes = new ArrayList<SituacaoPedido>();
+		situacoes.add(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+		situacoes.add(SituacaoPedido.COMPRA_RECEBIDA);
+
+		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
+				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", situacoes)
+				.setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<Pedido> pesquisarPedidoEnviadoByPeriodoEProprietario(boolean orcamento, Periodo periodo,
 			Integer idProprietario, boolean isCompra) throws BusinessException {
@@ -771,6 +793,24 @@ public class PedidoServiceImpl implements PedidoService {
 		return this.entityManager.createQuery(select.toString()).setParameter("situacaoPedido", situacaoPedido)
 				.setParameter("idProprietario", idProprietario).setParameter("dataInicio", periodo.getInicio())
 				.setParameter("dataFim", periodo.getFim()).setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
+	public List<Pedido> pesquisarPedidoVendaByPeriodo(Periodo periodo) {
+		StringBuilder select = new StringBuilder();
+		select.append("select p from Pedido p join fetch p.representada ");
+		select.append("where p.tipoPedido != :tipoPedido and ");
+		select.append(" p.dataEnvio >= :dataInicio and ");
+		select.append("p.dataEnvio <= :dataFim and ");
+		select.append("p.situacaoPedido = :situacaoPedido ");
+		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
+
+		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
+				.setParameter("dataFim", periodo.getFim()).setParameter("situacaoPedido", SituacaoPedido.ENVIADO)
+				.setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
 	}
 
 	@Override
@@ -985,7 +1025,7 @@ public class PedidoServiceImpl implements PedidoService {
 			throw exception;
 		}
 	}
-	
+
 	private void validarEnvioVenda(Pedido pedido) throws BusinessException {
 		final BusinessException exception = new BusinessException();
 		try {

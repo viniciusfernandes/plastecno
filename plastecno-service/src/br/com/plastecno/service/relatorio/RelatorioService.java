@@ -35,5 +35,9 @@ public interface RelatorioService {
 
 	List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor);
 
-	List<Pedido> pesquisarEntregas(Periodo periodo) throws InformacaoInvalidaException;
+	List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException;
+	
+	List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException;
+
+	List<Pedido> gerarRelatorioCompra(Periodo periodo) throws InformacaoInvalidaException;
 }

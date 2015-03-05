@@ -257,6 +257,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return itemEstoqueDAO.pesquisarById(idItemEstoque);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ItemEstoque pesquisarItemEstoqueByItemPedido(ItemPedido itemPedido) {
+		return pesquisarItemCadastradoEstoque(itemPedido);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -339,8 +345,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (!TipoPedido.REVENDA.equals(pedido.getTipoPedido())) {
 			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não é um pedido de revenda.");
 		}
-		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
-			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não esta em digitação.");
+		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())
+				&& !SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA.equals(pedido.getSituacaoPedido())) {
+			throw new BusinessException(
+					"O pedido não pode ter seus itens encomendados pois não esta em digitação e não é revenda pendente de encomenda.");
 		}
 		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 		boolean todosReservados = true;
@@ -376,10 +384,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 		} else if (quantidadePedido < quantidadeEstoque) {
 			quantidadeReservada = quantidadePedido;
 		}
-		
+
 		itemPedido.setQuantidadeEncomenda(quantidadePedido - quantidadeReservada);
 		pedidoService.inserirItemPedido(itemPedido);
-		
+
 		if (itemEstoque != null) {
 			itemEstoqueDAO.alterar(itemEstoque);
 			itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));

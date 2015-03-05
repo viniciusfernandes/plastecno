@@ -58,11 +58,51 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	@SuppressWarnings("unchecked")
+	public List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i from ItemPedido i ");
+		select.append("where i.pedido.situacaoPedido = :situacaoPedido and i.pedido.tipoPedido = :tipoPedido ");
+		select.append("and i.encomendado = true and i.quantidadeEncomenda > 0 ");
+
+		if (dataInicial != null) {
+			select.append("and i.pedido.dataEnvio >= :dataInicial ");
+		}
+
+		if (dataFinal != null) {
+			select.append("and i.pedido.dataEnvio <= :dataFinal ");
+		}
+
+		if (idCliente != null) {
+			select.append("and i.pedido.cliente.id = :idCliente ");
+		}
+
+		select.append("order by i.pedido.dataEnvio asc ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("tipoPedido", TipoPedido.REVENDA);
+		query.setParameter("situacaoPedido", SituacaoPedido.REVENDA_ENCOMENDADA);
+
+		if (dataInicial != null) {
+			query.setParameter("dataInicial", dataInicial);
+		}
+
+		if (dataFinal != null) {
+			query.setParameter("dataFinal", dataFinal);
+		}
+
+		if (idCliente != null) {
+			query.setParameter("idCliente", idCliente);
+		}
+
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemEncomenda(Integer idCliente, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemPedido i ");
-		select.append("where i.quantidadeEncomenda > 0 and i.pedido.tipoPedido = :tipoPedido ");
-		select.append("and i.pedido.situacaoPedido = :situacaoPedido and i.encomendado = false ");
+		select.append("where i.pedido.situacaoPedido = :situacaoPedido and i.pedido.tipoPedido = :tipoPedido ");
+		select.append("and i.encomendado = false and i.quantidadeEncomenda > 0 ");
 
 		if (dataInicial != null) {
 			select.append("and i.pedido.dataEnvio >= :dataInicial ");

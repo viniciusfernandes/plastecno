@@ -150,6 +150,10 @@ public class Pedido implements Serializable, Cloneable {
 	public Pedido() {
 	}
 
+	public Pedido(Integer id) {
+		this.id = id;
+	}
+
 	public Pedido(Integer id, Date dataEntrega, Double valorPedido, String nomeFantasiaCliente,
 			String razaoSocialCliente, String nomeFantasiaRepresentada) {
 		this.id = id;

@@ -20,7 +20,7 @@ public interface PedidoService {
 
 	void atualizarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
 
-	void atualizarSituacaoPedidoPedidoEncomendado(Integer idItemPedido);
+	void atualizarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido);
 
 	Double calcularValorPedido(Integer idPedido) throws BusinessException;
 
@@ -72,13 +72,15 @@ public interface PedidoService {
 
 	Date pesquisarDataInclusao(Integer idPedido);
 
-	List<Pedido> pesquisarPedidoVendaByPeriodo(Periodo periodo);
+	List<Pedido> pesquisarEntregaVendaByPeriodo(Periodo periodo);
 
 	List<Pedido> pesquisarEnviadosByPeriodoERepresentada(Periodo periodo, Integer idRepresentada);
 
 	List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException;
 
 	Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido);
+
+	List<Integer> pesquisarIdPedidoRevendaPendenteEncomenda();
 
 	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
 
@@ -90,6 +92,10 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
+	List<ItemPedido> pesquisarItemPedidoEncomendado();
+
+	List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal);
+
 	List<Logradouro> pesquisarLogradouro(Integer idPedido);
 
 	Pedido pesquisarPedidoById(Integer id);
@@ -99,6 +105,10 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+
+	List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo);
+
+	List<Pedido> pesquisarPedidoVendaByPeriodo(Periodo periodo);
 
 	Usuario pesquisarProprietario(Integer idPedido);
 
@@ -123,7 +133,7 @@ public interface PedidoService {
 	List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo);
 
 	Double pesquisarValorPedido(Integer idPedido);
-	
+
 	Double pesquisarValorPedidoIPI(Integer idPedido);
 
 	Pedido pesquisarVendaById(Integer id);
@@ -134,9 +144,5 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
-
-	List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo);
-
-	List<Pedido> pesquisarEntregaVendaByPeriodo(Periodo periodo);
 
 }

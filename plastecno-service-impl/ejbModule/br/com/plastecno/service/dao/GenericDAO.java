@@ -68,7 +68,7 @@ public class GenericDAO<T> {
 		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id), retorno,
 				null);
 	}
-
+	
 	public T remover(T t) {
 		entityManager.remove(entityManager.merge(t));
 		return t;

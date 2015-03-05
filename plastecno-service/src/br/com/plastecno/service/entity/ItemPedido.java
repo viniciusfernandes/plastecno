@@ -331,4 +331,7 @@ public class ItemPedido extends Item {
 		this.tipoVenda = tipoVenda;
 	}
 
+	public boolean isTodasUnidadesReservadas() {
+		return encomendado && quantidadeEncomenda.equals(quantidade);
+	}
 }

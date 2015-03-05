@@ -119,7 +119,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void atualizarSituacaoPedidoPedidoEncomendado(Integer idItemPedido) {
+	public void atualizarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido) {
 		atualizarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
 	}
 
@@ -233,7 +233,7 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 			itemCadastrado.setEncomendado(true);
 			inserirItemPedido(itemCadastrado);
-			atualizarSituacaoPedidoPedidoEncomendado(itemCadastrado.getId());
+			atualizarSituacaoPedidoEncomendadoByIdItem(itemCadastrado.getId());
 		}
 		return pedido.getId();
 	}
@@ -655,7 +655,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		return query.getResultList();
 	}
-	
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException {
@@ -666,6 +666,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 		return pedidoDAO.pesquisarIdPedidoByIdItemPedido(idItemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdPedidoRevendaPendenteEncomenda() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
 	}
 
 	@Override
@@ -700,6 +706,18 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarItemPedidoByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoEncomendado() {
+		return pesquisarItemPedidoEncomendado(null, null, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal) {
+		return itemPedidoDAO.pesquisarItemPedidoEncomendado(idCliente, dataInicial, dataFinal);
 	}
 
 	@Override

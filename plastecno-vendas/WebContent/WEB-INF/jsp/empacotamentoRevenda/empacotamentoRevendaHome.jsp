@@ -30,7 +30,7 @@ $(document).ready(function() {
 	inserirMascaraData('dataFinal');
 	
 	$('#botaoLimpar').click(function () {
-		$('#formPesquisa input').val('');	
+		$('#formVazio').submit();	
 	});
 	
 	$('#botaoInserirItemPedido').click(function () {
@@ -48,7 +48,7 @@ $(document).ready(function() {
 function inicializarAutocompleteCliente(){
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
-		campoPesquisavel : 'cliente',
+		campoPesquisavel : 'nomeFantasia',
 		parametro : 'nomeFantasia',
 		containerResultados : 'containerPesquisaCliente',
 		selecionarItem: function(itemLista) {
@@ -72,18 +72,17 @@ function empacotarItem(botao){
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 
-	<form id="formVazio" >
+	<form id="formVazio" action="<c:url value="/empacotamento"/>">
 	</form>
 
 
 	<form id="formPesquisa" action="<c:url value="/empacotamento/revenda/listagem"/>" method="get">
-		<input type="hidden" id="idCliente" name="idCliente"/>
+		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<fieldset>
 			<legend>::: Pedidos de Revenda para Empacotamento :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
-				<input type="text" id="dataInicial" name="dataInicial"
-					value="${dataInicial}" maxlength="10" class="pesquisavel" />
+				<input type="text" id="dataInicial" name="dataInicial" value="${dataInicial}" maxlength="10" class="pesquisavel" />
 			</div>
 
 			<div class="label obrigatorio" style="width: 10%">Data Final:</div>
@@ -93,7 +92,7 @@ function empacotarItem(botao){
 			</div>
 			<div class="label" style="width: 30%">Cliente:</div>
 			<div class="input" style="width: 50%">
-				<input type="text" id="cliente" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" />
+				<input type="text" id="nomeFantasia" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" style="width: 40%"/>
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			<div class="bloco_botoes">

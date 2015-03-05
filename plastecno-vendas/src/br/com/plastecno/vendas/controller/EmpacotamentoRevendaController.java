@@ -7,10 +7,12 @@ import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.download.Download;
+import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoPedido;
+import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
@@ -33,6 +35,9 @@ public class EmpacotamentoRevendaController extends AbstractController {
     @Servico
     private EstoqueService estoqueService;
 
+    @Servico
+    private ClienteService clienteService;
+
     public EmpacotamentoRevendaController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
     }
@@ -50,18 +55,17 @@ public class EmpacotamentoRevendaController extends AbstractController {
     }
 
     @Post("empacotamento/item/inclusao")
-    public void empacotarItem(Integer idItemPedido, Date dataInicial, Date dataFinal, Integer idCliente) {
+    public void empacotarItem(Integer idItemPedido, Date dataInicial, Date dataFinal, Cliente cliente) {
         estoqueService.empacotarItemPedido(idItemPedido);
-        pesquisarRevendaEmpacotamento(idCliente, dataInicial, dataFinal);
+        pesquisarRevendaEmpacotamento(dataInicial, dataFinal, cliente);
     }
 
     @Get("empacotamento/revenda/listagem")
-    public void pesquisarRevendaEmpacotamento(Integer idCliente, Date dataInicial, Date dataFinal) {
-
+    public void pesquisarRevendaEmpacotamento(Date dataInicial, Date dataFinal, Cliente cliente) {
         try {
             Periodo periodo = new Periodo(dataInicial, dataFinal);
             RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioRevendaEmpacotamento(
-                    idCliente, periodo);
+                    cliente.getId(), periodo);
 
             addAtributo("relatorio", relatorio);
             if (contemAtributo("permanecerTopo")) {
@@ -76,6 +80,6 @@ public class EmpacotamentoRevendaController extends AbstractController {
 
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
-        addAtributo("idClienteSelecionado", idCliente);
+        addAtributo("cliente", cliente);
     }
 }

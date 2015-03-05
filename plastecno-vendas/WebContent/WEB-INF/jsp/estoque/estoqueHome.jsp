@@ -147,8 +147,8 @@ function inicializarFiltro() {
 			</div>
 			<div class="label condicional" style="width: 30%">Material:</div>
 			<div class="input" style="width: 60%">
-				<input type="hidden" id="idMaterial" name="idMaterial" value="${idMaterial}"/>
-				<input type="text" id="material" name="descricaoMaterial" value="${descricaoMaterial}" style="width: 60%" />
+				<input type="hidden" id="idMaterial" name="material.id" value="${material.id}"/>
+				<input type="text" id="material" name="material.descricao" value="${material.descricao}" style="width: 60%" />
 				<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 			</div>
 		</fieldset>
@@ -188,7 +188,7 @@ function inicializarFiltro() {
 								<c:if test="${acessoRedefinicaoItemPermitido}">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/estoque/item/${item.id}"/>" method="get">
-										<input type="hidden" name="idMaterial" value="${idMaterial}"/>
+										<input type="hidden" name="material.id" value="${material.id}"/>
 										<input type="hidden" name="formaMaterial" value="${formaSelecionada}"/>
 						
 										<input type="submit" id="botaoEditarCliente" title="Editar Dados do Cliente" value="" class="botaoEditar"/>

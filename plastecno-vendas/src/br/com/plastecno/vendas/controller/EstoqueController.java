@@ -39,7 +39,7 @@ public class EstoqueController extends AbstractController {
 
     @Post("estoque/item/edicao")
     public void inserirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
-            Double aliquotaICMS, Integer idMaterial, FormaMaterial formaMaterial) {
+            Double aliquotaICMS, Material material, FormaMaterial formaMaterial) {
         try {
             ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
             if (itemEstoque == null) {
@@ -57,11 +57,11 @@ public class EstoqueController extends AbstractController {
 
         }
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
+        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
     }
 
     @Post("estoque/item/inclusao")
-    public void inserirItemEstoque(ItemEstoque itemPedido, Integer idMaterial, FormaMaterial formaMaterial) {
+    public void inserirItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
         try {
             itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
@@ -72,23 +72,21 @@ public class EstoqueController extends AbstractController {
             addAtributo("itemPedido", itemPedido);
         }
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
+        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
     }
 
     @Get("estoque/item/listagem")
-    public void pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-        if (idMaterial == null && formaMaterial == null) {
+    public void pesquisarItemEstoque(Material material, FormaMaterial formaMaterial) {
+        if ((material == null || material.getId() == null) && formaMaterial == null) {
             gerarListaMensagemErro("Escolha o material e/ou forma de material. Não é possível pesquisar o estoque inteiro.");
             addAtributo("permanecerTopo", true);
         } else {
-            List<ItemEstoque> lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
+            List<ItemEstoque> lista = estoqueService.pesquisarItemEstoque(material.getId(), formaMaterial);
             formatarItemEstoque(lista);
-            Material material = materialService.pesquisarById(idMaterial);
 
             addAtributo("formaSelecionada", formaMaterial);
             addAtributo("listaItemEstoque", lista);
-            addAtributo("idMaterial", idMaterial);
-            addAtributo("descricaoMaterial", material != null ? material.getDescricaoFormatada() : "");
+            addAtributo("material", material);
         }
 
         if (contemAtributo("permanecerTopo")) {
@@ -100,7 +98,7 @@ public class EstoqueController extends AbstractController {
     }
 
     @Get("estoque/item/{idItemEstoque}")
-    public void pesquisarItemEstoqueById(Integer idItemEstoque, Integer idMaterial, FormaMaterial formaMaterial) {
+    public void pesquisarItemEstoqueById(Integer idItemEstoque, Material material, FormaMaterial formaMaterial) {
         ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
         if (itemEstoque == null) {
             gerarListaMensagemErro("Item de estoque não existe no sistema");
@@ -109,7 +107,8 @@ public class EstoqueController extends AbstractController {
             addAtributo("itemPedido", itemEstoque);
         }
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarItemEstoque(idMaterial, formaMaterial);
+        material = materialService.pesquisarById(material.getId());
+        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
     }
 
     @Get("estoque/material/listagem")

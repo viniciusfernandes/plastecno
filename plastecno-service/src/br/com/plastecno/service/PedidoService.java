@@ -120,6 +120,8 @@ public interface PedidoService {
 
 	SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido);
 
+	List<SituacaoPedido> pesquisarSituacaoVendaEfetivada();
+
 	List<Object[]> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo);
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
@@ -144,5 +146,7 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
+
+	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 
 }

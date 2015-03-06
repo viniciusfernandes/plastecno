@@ -197,6 +197,12 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("A fornecedor \"" + fornecedor.getNomeFantasia()
 					+ "\" escolhido não esta cadastrado como fornecedor");
 		}
+
+		Cliente revendedor = clienteService.pesquisarRevendedor();
+		if (revendedor == null) {
+			throw new BusinessException("Para efetuar uma encomenda é necessário cadastrar um cliente como revendedor no sistema");
+		}
+		
 		Usuario comprador = usuarioService.pesquisarById(idComprador);
 
 		Contato contato = new Contato();
@@ -623,11 +629,11 @@ public class PedidoServiceImpl implements PedidoService {
 		select.append("where p.tipoPedido != :tipoPedido and ");
 		select.append(" p.dataEntrega >= :dataInicio and ");
 		select.append("p.dataEntrega <= :dataFim and ");
-		select.append("p.situacaoPedido = :situacaoPedido ");
+		select.append("p.situacaoPedido IN :situacoes ");
 		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
 
 		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
-				.setParameter("dataFim", periodo.getFim()).setParameter("situacaoPedido", SituacaoPedido.ENVIADO)
+				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoVendaEfetivada())
 				.setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
 	}
 
@@ -637,7 +643,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
 	public List<Pedido> pesquisarEnviadosByPeriodoERepresentada(Periodo periodo, Integer idRepresentada) {
 		StringBuilder select = new StringBuilder()
-				.append("select p from Pedido p where p.situacaoPedido = :situacaoPedido and ")
+				.append("select p from Pedido p where p.situacaoPedido in :situacoes and ")
 				.append(" p.dataEnvio >= :dataInicio and ").append(" p.dataEnvio <= :dataFim and ")
 				.append("p.tipoPedido != :tipoPedido ");
 
@@ -647,7 +653,7 @@ public class PedidoServiceImpl implements PedidoService {
 		select.append("order by p.dataEnvio desc ");
 
 		Query query = this.entityManager.createQuery(select.toString())
-				.setParameter("situacaoPedido", SituacaoPedido.ENVIADO).setParameter("dataInicio", periodo.getInicio())
+				.setParameter("situacoes", pesquisarSituacaoVendaEfetivada()).setParameter("dataInicio", periodo.getInicio())
 				.setParameter("dataFim", periodo.getFim()).setParameter("tipoPedido", TipoPedido.COMPRA);
 
 		if (idRepresentada != null) {
@@ -772,12 +778,8 @@ public class PedidoServiceImpl implements PedidoService {
 		select.append("p.situacaoPedido in :situacoes ");
 		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
 
-		List<SituacaoPedido> situacoes = new ArrayList<SituacaoPedido>();
-		situacoes.add(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
-		situacoes.add(SituacaoPedido.COMPRA_RECEBIDA);
-
 		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
-				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", situacoes)
+				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoCompraEfetivada())
 				.setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
 	}
 
@@ -823,11 +825,11 @@ public class PedidoServiceImpl implements PedidoService {
 		select.append("where p.tipoPedido != :tipoPedido and ");
 		select.append(" p.dataEnvio >= :dataInicio and ");
 		select.append("p.dataEnvio <= :dataFim and ");
-		select.append("p.situacaoPedido = :situacaoPedido ");
+		select.append("p.situacaoPedido in (:situacoes) ");
 		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
 
 		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
-				.setParameter("dataFim", periodo.getFim()).setParameter("situacaoPedido", SituacaoPedido.ENVIADO)
+				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoVendaEfetivada())
 				.setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
 	}
 
@@ -853,6 +855,11 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	public List<SituacaoPedido> pesquisarSituacaoCompraEfetivada() {
+		return pedidoDAO.pesquisarSituacaoCompraEfetivada();
+	}
+
+	@Override
 	public SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido) {
 		return pedidoDAO.pesquisarSituacaoPedidoById(idPedido);
 	}
@@ -860,6 +867,11 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
 		return pedidoDAO.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
+	}
+
+	@Override
+	public List<SituacaoPedido> pesquisarSituacaoVendaEfetivada() {
+		return pedidoDAO.pesquisarSituacaoVendaEfetivada();
 	}
 
 	private TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(ItemPedido itemPedido) throws BusinessException {

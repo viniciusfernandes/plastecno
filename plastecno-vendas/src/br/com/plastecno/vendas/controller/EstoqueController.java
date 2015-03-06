@@ -38,7 +38,7 @@ public class EstoqueController extends AbstractController {
     }
 
     @Post("estoque/item/edicao")
-    public void inserirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
+    public void redefinirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
             Double aliquotaICMS, Material material, FormaMaterial formaMaterial) {
         try {
             ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
@@ -81,7 +81,8 @@ public class EstoqueController extends AbstractController {
             gerarListaMensagemErro("Escolha o material e/ou forma de material. Não é possível pesquisar o estoque inteiro.");
             addAtributo("permanecerTopo", true);
         } else {
-            List<ItemEstoque> lista = estoqueService.pesquisarItemEstoque(material.getId(), formaMaterial);
+            final Integer idMaterial = material != null ? material.getId() : null;
+            List<ItemEstoque> lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
             formatarItemEstoque(lista);
 
             addAtributo("formaSelecionada", formaMaterial);

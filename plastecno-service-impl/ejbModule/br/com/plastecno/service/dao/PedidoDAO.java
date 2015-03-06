@@ -1,5 +1,6 @@
 package br.com.plastecno.service.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -229,6 +230,13 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						.setParameter("idPedido", idPedido), Double.class, 0d);
 	}
 
+	public List<SituacaoPedido> pesquisarSituacaoCompraEfetivada() {
+		List<SituacaoPedido> situacoes = new ArrayList<SituacaoPedido>();
+		situacoes.add(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+		situacoes.add(SituacaoPedido.COMPRA_RECEBIDA);
+		return situacoes;
+	}
+
 	public SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido) {
 		return pesquisarCampoById(Pedido.class, idPedido, "situacaoPedido", SituacaoPedido.class);
 	}
@@ -238,6 +246,16 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				entityManager.createQuery(
 						"select p.situacaoPedido from ItemPedido i inner join i.pedido p where i.id = :idItemPedido").setParameter(
 						"idItemPedido", idItemPedido), SituacaoPedido.class, null);
+	}
+
+	public List<SituacaoPedido> pesquisarSituacaoVendaEfetivada() {
+		List<SituacaoPedido> situacoes = new ArrayList<SituacaoPedido>();
+		situacoes.add(SituacaoPedido.REVENDA_ENCOMENDADA);
+		situacoes.add(SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
+		situacoes.add(SituacaoPedido.EMPACOTADO);
+		situacoes.add(SituacaoPedido.EMPACOTAMENTO);
+		situacoes.add(SituacaoPedido.ENVIADO);
+		return situacoes;
 	}
 
 	public TipoPedido pesquisarTipoPedidoById(Integer idPedido) {
@@ -282,11 +300,11 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		select.append("inner join p.proprietario v ");
 		select.append("where p.dataEnvio >= :dataInicio and p.dataEnvio <= :dataFim ");
 
+		select.append("and p.situacaoPedido IN (:situacoes) ");
+
 		if (isCompra) {
-			select.append("and (p.situacaoPedido = :situacaoPedido1 or p.situacaoPedido = :situacaoPedido2) ");
 			select.append("and p.tipoPedido = :tipoPedido ");
 		} else {
-			select.append("and p.situacaoPedido = :situacaoPedido ");
 			select.append("and p.tipoPedido != :tipoPedido ");
 		}
 
@@ -297,12 +315,13 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		query.setParameter("dataInicio", dataInicio);
 		query.setParameter("dataFim", dataFim);
 		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+
 		if (isCompra) {
-			query.setParameter("situacaoPedido1", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
-			query.setParameter("situacaoPedido2", SituacaoPedido.COMPRA_RECEBIDA);
+			query.setParameter("situacoes", pesquisarSituacaoCompraEfetivada());
 		} else {
-			query.setParameter("situacaoPedido", SituacaoPedido.ENVIADO);
+			query.setParameter("situacoes", pesquisarSituacaoVendaEfetivada());
 		}
+
 		return query.getResultList();
 	}
 

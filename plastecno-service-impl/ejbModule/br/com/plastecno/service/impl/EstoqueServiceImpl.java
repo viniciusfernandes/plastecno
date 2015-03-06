@@ -353,7 +353,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 		boolean todosReservados = true;
 		for (ItemPedido itemPedido : listaItem) {
-			todosReservados &= reservarItemPedido(itemPedido);
+			reservarItemPedido(itemPedido);
+			todosReservados &= itemPedido.isTodasUnidadesReservadas();
 		}
 		pedido
 				.setSituacaoPedido(todosReservados ? SituacaoPedido.EMPACOTAMENTO : SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);

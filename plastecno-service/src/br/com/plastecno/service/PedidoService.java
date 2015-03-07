@@ -18,9 +18,9 @@ import br.com.plastecno.service.wrapper.Periodo;
 @Local
 public interface PedidoService {
 
-	void atualizarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
+	void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
 
-	void atualizarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido);
+	void alterarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido);
 
 	Double calcularValorPedido(Integer idPedido) throws BusinessException;
 

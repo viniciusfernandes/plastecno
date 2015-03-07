@@ -112,15 +112,15 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void atualizarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido) {
+	public void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido) {
 		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 		pedidoDAO.atualizarSituacaoPedidoById(idPedido, situacaoPedido);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void atualizarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido) {
-		atualizarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
+	public void alterarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido) {
+		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
 	}
 
 	@Override
@@ -200,9 +200,10 @@ public class PedidoServiceImpl implements PedidoService {
 
 		Cliente revendedor = clienteService.pesquisarRevendedor();
 		if (revendedor == null) {
-			throw new BusinessException("Para efetuar uma encomenda é necessário cadastrar um cliente como revendedor no sistema");
+			throw new BusinessException(
+					"Para efetuar uma encomenda é necessário cadastrar um cliente como revendedor no sistema");
 		}
-		
+
 		Usuario comprador = usuarioService.pesquisarById(idComprador);
 
 		Contato contato = new Contato();
@@ -239,7 +240,7 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 			itemCadastrado.setEncomendado(true);
 			inserirItemPedido(itemCadastrado);
-			atualizarSituacaoPedidoEncomendadoByIdItem(itemCadastrado.getId());
+			alterarSituacaoPedidoEncomendadoByIdItem(itemCadastrado.getId());
 		}
 		return pedido.getId();
 	}
@@ -489,13 +490,14 @@ public class PedidoServiceImpl implements PedidoService {
 		if (itemPedido.isNovo()) {
 			itemPedido.setSequencial(gerarSequencialItemPedido(idPedido));
 		}
-
-		ValidadorInformacao.validar(itemPedido);
+		
 		if (itemPedido.isNovo()) {
 			itemPedidoDAO.inserir(itemPedido);
 		} else {
 			itemPedido = itemPedidoDAO.alterar(itemPedido);
 		}
+		
+		ValidadorInformacao.validar(itemPedido);
 		/*
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao de
 		 * validacoes, caso contrario teremos um valor nulo na base de dados.

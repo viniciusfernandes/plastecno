@@ -34,6 +34,8 @@ public interface EstoqueService {
 
 	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);
 
+	ItemEstoque pesquisarItemEstoqueByItemPedido(ItemPedido itemPedido);
+
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;

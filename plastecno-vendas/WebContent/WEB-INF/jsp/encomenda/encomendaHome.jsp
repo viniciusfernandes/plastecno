@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Recepção de Compras Pendentes</title>
+<title>Itens para Encomendar</title>
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
@@ -18,7 +18,11 @@
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+
 <script type="text/javascript">
+
+var listaIdItem = new Array();
 
 $(document).ready(function() {
 	
@@ -27,57 +31,53 @@ $(document).ready(function() {
 	inserirMascaraData('dataInicial');
 	inserirMascaraData('dataFinal');
 	
-	inserirMascaraMonetaria('preco', 7);
-	inserirMascaraNumerica('ipi', '99');
-	inserirMascaraNumerica('quantidade', '9999999');
-	inserirMascaraMonetaria('comprimento', 8);
-	inserirMascaraMonetaria('medidaExterna', 8);
-	inserirMascaraMonetaria('medidaInterna', 8);
-	
-	habilitar('#bloco_item_pedido input:radio', false);
-	habilitar('#bloco_item_pedido #formaMaterial', false);
-	habilitar('#bloco_item_pedido #descricao', false);
-	habilitar('#bloco_item_pedido #material', false);
-	
-	<c:if test="${itemPedido.peca}">
-	habilitar('#bloco_item_pedido #medidaExterna', false);
-	habilitar('#bloco_item_pedido #medidaInterna', false);
-	habilitar('#bloco_item_pedido #comprimento', false);
-	</c:if>
-	
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();
 	});
 	
-	$('#botaoInserirItemPedido').click(function () {
-		var parametros = $('#bloco_item_pedido').serialize();
-		parametros += '&' + $('#formPesquisa').serialize();
-		var form = $('#formVazio');
-		$(form).attr('method', 'post');
-		$(form).attr('action', '<c:url value="/compra/item/inclusao"/>?'+parametros);
-		$(form).submit();
+	$('#botaoEnviarEncomenda').click(function () {
+
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ENVIAR ESSES PEDIDOS PARA A ENCOMENDA?',
+			confirmar: function(){
+				var parametros = $('#formPesquisa').serialize();
+				parametros+='&idRepresentadaFornecedora='+$('#fornecedor').val();
+				for (var i = 0; i < listaIdItem.length; i++) {
+					// Estamos validando aqui pois no DELETE dos itens da lista o javascript mantem undefined.
+					if(listaIdItem[i] != undefined){
+						parametros+='&listaIdItem='+listaIdItem[i];
+					}
+				};
+				var action = '<c:url value="/encomenda/item/compra"/>'+'?'+parametros;
+				$('#formVazio').attr('method', 'post').attr('action', action);
+				$('#formVazio').submit();
+			}
+		});
 	});
+	
+	inicializarAutocompleteCliente();
 });
 
-function removerItem(botao){
-	inicializarModalConfirmacao({
-		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REMOVER esse item do pedido de compra?',
-		confirmar: function(){
-			submeterForm(botao);
+function inicializarAutocompleteCliente(){
+	autocompletar({
+		url : '<c:url value="/cliente/listagem/nome"/>',
+		campoPesquisavel : 'nomeFantasia',
+		parametro : 'nomeFantasia',
+		containerResultados : 'containerPesquisaCliente',
+		selecionarItem: function(itemLista) {
+			$('#formPesquisa #idCliente').val(itemLista.id);
 		}
 	});
 };
 
-
-function recepcionarItem(botao){
-	inicializarModalConfirmacao({
-		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja RECEPCIONAR esse item do pedido de compra?',
-		confirmar: function(){
-			submeterForm(botao);
-		}
-	});
+function encomendarItem(campo){
+	if(campo.checked){
+		listaIdItem.push(campo.value);	
+	} else {
+		var index = listaIdItem.indexOf(campo.value);
+		delete listaIdItem[index];
+	}
 };
-
 </script>
 </head>
 <body>
@@ -88,9 +88,10 @@ function recepcionarItem(botao){
 	</form>
 
 
-	<form id="formPesquisa" action="<c:url value="/compra/recepcao/listagem"/>" method="get">
+	<form id="formPesquisa" action="<c:url value="/encomenda/item/listagem"/>" method="get">
+		<input type="hidden" id="idCliente" name="idCliente"/>
 		<fieldset>
-			<legend>::: Pedidos de Compra para Recepção :::</legend>
+			<legend>::: Pesquisa de Encomendas :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="dataInicial" name="dataInicial"
@@ -102,15 +103,10 @@ function recepcionarItem(botao){
 				<input type="text" id="dataFinal" name="dataFinal"
 					value="${dataFinal}" maxlength="100" class="pesquisavel" />
 			</div>
-			<div class="label" style="width: 30%">Representada:</div>
-			<div class="input" style="width: 50%">
-				<select name="idRepresentada" style="width: 30%">
-					<option value="">&lt&lt SELECIONE &gt&gt</option>
-					<c:forEach var="representada" items="${listaRepresentada}">
-						<option value="${representada.id}"
-							<c:if test="${representada.id eq idRepresentadaSelecionada}">selected</c:if>>${representada.nomeFantasia}</option>
-					</c:forEach>
-				</select>
+			<div class="label" style="width: 30%">Cliente:</div>
+			<div class="input" style="width: 20%">
+				<input type="text" id="nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" />
+				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			<div class="bloco_botoes">
 				<input type="submit" value="" class="botaoPesquisar" /> 
@@ -124,19 +120,34 @@ function recepcionarItem(botao){
 	</c:if>
 	
 	<c:if test="${not empty relatorio}">
-		<table class="listrada">
-			<caption>${relatorio.titulo}</caption>
+		<fieldset>
+		<legend>::: Itens de Pedidos para Comprar :::</legend>
+		<div class="label obrigatorio" style="width: 30%">Fornecedor:</div>
+		<div class="input" style="width: 30%">
+			<select id="fornecedor" style="width: 50%">
+				<option value="">&lt&lt SELECIONE &gt&gt</option>
+				<c:forEach var="fornecedor" items="${listaFornecedor}">
+					<option value="${fornecedor.id}"
+						<c:if test="${fornecedor eq fornecedorSelecionado}">selected</c:if>>${fornecedor.nomeFantasia}</option>
+				</c:forEach>
+			</select>
+		</div>
+		<div class="bloco_botoes">
+			<input type="button" id="botaoEnviarEncomenda" title="Enviar Itens para Compras" value="" class="botaoEnviarEmail"/>
+		</div>
+		<table id="tabelaItemEncomenda" class="listrada">
 			<thead>
 				<tr>
 					<th style="width: 10%">Num. Pedido</th>
+					<th style="width: 1%">Encom.</th>
 					<th style="width: 1%">Item</th>
-					<th style="width: 5%">Qtde</th>
-					<th style="width: 43%">Desc. Item</th>
+					<th style="width: 5%">Qtde.</th>
+					<th style="width: 48%">Desc. Item</th>
 					<th style="width: 10%">Comprador</th>
 					<th style="width: 10%">Represent.</th>
 					<th style="width: 5%">Unid. (R$)</th>
 					<th style="width: 5%">Total (R$)</th>
-					<th style="width: 11%">Ação</th>
+					<th style="width: 5%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -146,8 +157,9 @@ function recepcionarItem(botao){
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.id}</td>
 							</c:if>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}"><input type="checkbox" name="idItemPedido" value="${item.id}" onclick="encomendarItem(this)"/></td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeEncomenda}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeProprietario}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeRepresentada}</td>
@@ -155,25 +167,10 @@ function recepcionarItem(botao){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/compra/pdf"/>" >
+									<form action="<c:url value="/encomenda/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 									</form>
-									<form action="<c:url value="/compra/item/recepcao"/>" method="post" >
-										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
-										<input type="button" value="" title="Recepcionar o Item do Pedido" 
-										onclick="recepcionarItem(this);" class="botaoAdicionar_16" />
-									</form>
-									<form action="<c:url value="/compra/item/edicao"/>" method="post">
-										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
-										<input type="button" value="" title="Editar o Item do Pedido" class="botaoEditar" onclick="submeterForm(this);"/>
-									</form>
-									<form action="<c:url value="/compra/item/remocao"/>" method="post" >
-										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
-										<input type="button" value="" title="Remover o Item do Pedido" 
-											onclick="removerItem(this);" class="botaoRemover" />
-									</form>
-									
 								</div>
 							</td>
 						</tr>
@@ -181,6 +178,7 @@ function recepcionarItem(botao){
 				</c:forEach>
 			</tbody>
 		</table>
+		</fieldset>
 	</c:if>
 
 </body>

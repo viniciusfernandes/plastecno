@@ -182,6 +182,15 @@ public class Representada implements Serializable {
 		return !TipoApresentacaoIPI.NUNCA.equals(this.tipoApresentacaoIPI);
 	}
 
+	public boolean isRevendedor() {
+		return TipoRelacionamento.REVENDA.equals(tipoRelacionamento);
+	}
+
+	public boolean isFornecedor() {
+		return TipoRelacionamento.FORNECIMENTO.equals(tipoRelacionamento)
+				|| TipoRelacionamento.REPRESENTACAO_FORNECIMENTO.equals(tipoRelacionamento);
+	}
+
 	public void setAtivo(boolean ativo) {
 		this.ativo = ativo;
 	}

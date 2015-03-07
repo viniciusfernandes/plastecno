@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -26,6 +27,7 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
@@ -33,9 +35,11 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
@@ -107,6 +111,19 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido) {
+		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
+		pedidoDAO.atualizarSituacaoPedidoById(idPedido, situacaoPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido) {
+		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double calcularValorPedido(Integer idPedido) throws BusinessException {
 		try {
@@ -138,8 +155,7 @@ public class PedidoServiceImpl implements PedidoService {
 		// de um "refazer do pedido".
 		if (TipoPedido.COMPRA.equals(tipoPedido)) {
 			estoqueService.devolverItemCompradoEstoqueByIdPedido(idPedido);
-		}
-		if (TipoPedido.REVENDA.equals(pedidoDAO.pesquisarTipoPedidoById(idPedido))) {
+		} else if (TipoPedido.REVENDA.equals(tipoPedido)) {
 			estoqueService.cancelarReservaEstoqueByIdPedido(idPedido);
 		}
 		pedidoDAO.cancelar(idPedido);
@@ -163,6 +179,70 @@ public class PedidoServiceImpl implements PedidoService {
 				pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
 			}
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer encomendarItemPedido(Integer idComprador, Integer idRepresentadaFornecedora,
+			Set<Integer> listaIdItemPedido) throws BusinessException {
+		if (listaIdItemPedido == null || listaIdItemPedido.isEmpty()) {
+			throw new BusinessException("A lista de itens de pedido para encomendar não pode estar vazia");
+		}
+		Representada fornecedor = representadaService.pesquisarById(idRepresentadaFornecedora);
+		if (fornecedor == null) {
+			throw new BusinessException("Fornecedor é obrigatório para realizar a encomenda");
+		}
+
+		if (!fornecedor.isFornecedor()) {
+			throw new BusinessException("A fornecedor \"" + fornecedor.getNomeFantasia()
+					+ "\" escolhido não esta cadastrado como fornecedor");
+		}
+
+		Cliente revendedor = clienteService.pesquisarRevendedor();
+		if (revendedor == null) {
+			throw new BusinessException(
+					"Para efetuar uma encomenda é necessário cadastrar um cliente como revendedor no sistema");
+		}
+
+		Usuario comprador = usuarioService.pesquisarById(idComprador);
+
+		Contato contato = new Contato();
+		contato.setNome(comprador.getNome());
+		contato.setEmail(comprador.getEmail());
+
+		Pedido pedido = new Pedido();
+		pedido.setCliente(clienteService.pesquisarRevendedor());
+		pedido.setComprador(comprador);
+		pedido.setContato(contato);
+		pedido.setDataInclusao(new Date());
+		pedido.setFinalidadePedido(FinalidadePedido.REVENDA);
+		pedido.setProprietario(comprador);
+		pedido.setRepresentada(fornecedor);
+		pedido.setSituacaoPedido(SituacaoPedido.COMPRA_ENCOMENDADA);
+		pedido.setTipoPedido(TipoPedido.COMPRA);
+
+		pedido = inserir(pedido);
+		ItemPedido itemCadastrado = null;
+		ItemPedido itemClone = null;
+		for (Integer idItemPedido : listaIdItemPedido) {
+			itemCadastrado = pesquisarItemPedido(idItemPedido);
+			if (itemCadastrado == null) {
+				continue;
+			}
+			itemClone = itemCadastrado.clone();
+			itemClone.setPedido(pedido);
+			try {
+				inserirItemPedido(pedido.getId(), itemClone);
+			} catch (BusinessException e) {
+				throw new BusinessException("Não foi possível cadastrar uma nova encomenda pois houve falha no item No. "
+						+ itemCadastrado.getSequencial() + " do pedido No. " + itemCadastrado.getPedido().getId()
+						+ ". Possível problema: " + e.getMensagemEmpilhada());
+			}
+			itemCadastrado.setEncomendado(true);
+			inserirItemPedido(itemCadastrado);
+			alterarSituacaoPedidoEncomendadoByIdItem(itemCadastrado.getId());
+		}
+		return pedido.getId();
 	}
 
 	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
@@ -325,8 +405,10 @@ public class PedidoServiceImpl implements PedidoService {
 
 		if (isPedidoNovo) {
 			pedido.setDataInclusao(new Date());
-			pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-			pedidoDAO.inserir(pedido);
+			if (!pedido.isEncomenda()) {
+				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
+			}
+			pedido = pedidoDAO.inserir(pedido);
 
 		} else {
 			// recuperando as informacoes do sistema que nao devem ser alteradas
@@ -335,7 +417,7 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setDataEnvio(this.pesquisarDataEnvio(idPedido));
 			pedido.setValorPedido(this.pesquisarValorPedido(idPedido));
 			pedido.setValorPedidoIPI(this.pesquisarValorPedidoIPI(idPedido));
-			pedidoDAO.alterar(pedido);
+			pedido = pedidoDAO.alterar(pedido);
 		}
 
 		return pedido;
@@ -408,13 +490,14 @@ public class PedidoServiceImpl implements PedidoService {
 		if (itemPedido.isNovo()) {
 			itemPedido.setSequencial(gerarSequencialItemPedido(idPedido));
 		}
-
-		ValidadorInformacao.validar(itemPedido);
+		
 		if (itemPedido.isNovo()) {
 			itemPedidoDAO.inserir(itemPedido);
 		} else {
 			itemPedido = itemPedidoDAO.alterar(itemPedido);
 		}
+		
+		ValidadorInformacao.validar(itemPedido);
 		/*
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao de
 		 * validacoes, caso contrario teremos um valor nulo na base de dados.
@@ -523,7 +606,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo) {
-		return pedidoDAO.pesquisarCompraPendenteRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
+		return itemPedidoDAO.pesquisarCompraPendenteRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override
@@ -542,17 +625,17 @@ public class PedidoServiceImpl implements PedidoService {
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
-	public List<Pedido> pesquisarEnviadosByPeriodo(Periodo periodo) {
+	public List<Pedido> pesquisarEntregaVendaByPeriodo(Periodo periodo) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p from Pedido p join fetch p.representada ");
 		select.append("where p.tipoPedido != :tipoPedido and ");
 		select.append(" p.dataEntrega >= :dataInicio and ");
 		select.append("p.dataEntrega <= :dataFim and ");
-		select.append("p.situacaoPedido = :situacaoPedido ");
+		select.append("p.situacaoPedido IN :situacoes ");
 		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
 
 		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
-				.setParameter("dataFim", periodo.getFim()).setParameter("situacaoPedido", SituacaoPedido.ENVIADO)
+				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoVendaEfetivada())
 				.setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
 	}
 
@@ -562,7 +645,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
 	public List<Pedido> pesquisarEnviadosByPeriodoERepresentada(Periodo periodo, Integer idRepresentada) {
 		StringBuilder select = new StringBuilder()
-				.append("select p from Pedido p where p.situacaoPedido = :situacaoPedido and ")
+				.append("select p from Pedido p where p.situacaoPedido in :situacoes and ")
 				.append(" p.dataEnvio >= :dataInicio and ").append(" p.dataEnvio <= :dataFim and ")
 				.append("p.tipoPedido != :tipoPedido ");
 
@@ -572,7 +655,7 @@ public class PedidoServiceImpl implements PedidoService {
 		select.append("order by p.dataEnvio desc ");
 
 		Query query = this.entityManager.createQuery(select.toString())
-				.setParameter("situacaoPedido", SituacaoPedido.ENVIADO).setParameter("dataInicio", periodo.getInicio())
+				.setParameter("situacoes", pesquisarSituacaoVendaEfetivada()).setParameter("dataInicio", periodo.getInicio())
 				.setParameter("dataFim", periodo.getFim()).setParameter("tipoPedido", TipoPedido.COMPRA);
 
 		if (idRepresentada != null) {
@@ -594,6 +677,12 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdPedidoRevendaPendenteEncomenda() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
+	}
+
+	@Override
 	public Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarIdRepresentadaByIdPedido(idPedido);
 	}
@@ -611,6 +700,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemEncomenda(Integer idCliente, Periodo periodo) {
+		return itemPedidoDAO.pesquisarItemEncomenda(idCliente, periodo.getInicio(), periodo.getFim());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemPedido pesquisarItemPedido(Integer idItemPedido) {
 		return pedidoDAO.pesquisarItemPedido(idItemPedido);
 	}
@@ -619,6 +714,18 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarItemPedidoByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoEncomendado() {
+		return pesquisarItemPedidoEncomendado(null, null, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal) {
+		return itemPedidoDAO.pesquisarItemPedidoEncomendado(idCliente, dataInicial, dataFinal);
 	}
 
 	@Override
@@ -660,6 +767,24 @@ public class PedidoServiceImpl implements PedidoService {
 				indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
+	public List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo) {
+		StringBuilder select = new StringBuilder();
+		select.append("select p from Pedido p join fetch p.representada ");
+		select.append("where p.tipoPedido = :tipoPedido and ");
+		select.append("p.dataEnvio >= :dataInicio and ");
+		select.append("p.dataEnvio <= :dataFim and ");
+		select.append("p.situacaoPedido in :situacoes ");
+		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
+
+		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
+				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoCompraEfetivada())
+				.setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<Pedido> pesquisarPedidoEnviadoByPeriodoEProprietario(boolean orcamento, Periodo periodo,
 			Integer idProprietario, boolean isCompra) throws BusinessException {
@@ -693,6 +818,24 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
+	public List<Pedido> pesquisarPedidoVendaByPeriodo(Periodo periodo) {
+		StringBuilder select = new StringBuilder();
+		select.append("select p from Pedido p join fetch p.representada ");
+		select.append("where p.tipoPedido != :tipoPedido and ");
+		select.append(" p.dataEnvio >= :dataInicio and ");
+		select.append("p.dataEnvio <= :dataFim and ");
+		select.append("p.situacaoPedido in (:situacoes) ");
+		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
+
+		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
+				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoVendaEfetivada())
+				.setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Usuario pesquisarProprietario(Integer idPedido) {
 		StringBuilder select = new StringBuilder();
@@ -714,6 +857,11 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	public List<SituacaoPedido> pesquisarSituacaoCompraEfetivada() {
+		return pedidoDAO.pesquisarSituacaoCompraEfetivada();
+	}
+
+	@Override
 	public SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido) {
 		return pedidoDAO.pesquisarSituacaoPedidoById(idPedido);
 	}
@@ -721,6 +869,11 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
 		return pedidoDAO.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
+	}
+
+	@Override
+	public List<SituacaoPedido> pesquisarSituacaoVendaEfetivada() {
+		return pedidoDAO.pesquisarSituacaoVendaEfetivada();
 	}
 
 	private TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(ItemPedido itemPedido) throws BusinessException {
@@ -935,5 +1088,4 @@ public class PedidoServiceImpl implements PedidoService {
 			throw exception;
 		}
 	}
-
 }

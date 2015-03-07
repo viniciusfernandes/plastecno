@@ -65,7 +65,7 @@ public class ItemEstoque extends Item {
 	private Double precoMedio;
 
 	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do estoque")
-	private Integer quantidade;
+	private Integer quantidade = 0;
 
 	public ItemEstoque() {
 	}

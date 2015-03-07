@@ -1,5 +1,6 @@
 package br.com.plastecno.service.dao;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -11,7 +12,6 @@ import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.impl.util.QueryUtil;
 
 public class RepresentadaDAO extends GenericDAO<Representada> {
-
 	public RepresentadaDAO(EntityManager entityManager) {
 		super(entityManager);
 	}
@@ -27,9 +27,27 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 	}
 
 	@SuppressWarnings("unchecked")
+	public List<Representada> pesquisarRepresentadaByTipoRelacionamento(boolean ativo, TipoRelacionamento... tipos) {
+		StringBuilder select = new StringBuilder(
+				"SELECT new Representada(r.id, r.nomeFantasia) FROM Representada r where r.ativo = :ativo ");
+
+		if (tipos != null && tipos.length > 0) {
+			select.append("and r.tipoRelacionamento IN (:tipos) ");
+		}
+
+		select.append("order by r.nomeFantasia ");
+
+		Query query = this.entityManager.createQuery(select.toString()).setParameter("ativo", ativo);
+		if (tipos != null) {
+			query.setParameter("tipos", Arrays.asList(tipos));
+		}
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<Representada> pesquisarRepresentadaExcluindoRelacionamento(Boolean ativo,
 			TipoRelacionamento tipoRelacionamento) {
-		StringBuilder select = new StringBuilder("SELECT r FROM Representada r ");
+		StringBuilder select = new StringBuilder("SELECT new Representada(r.id, r.nomeFantasia) FROM Representada r ");
 
 		if (ativo != null && tipoRelacionamento != null) {
 			select.append("where r.ativo = :ativo and r.tipoRelacionamento != :tipoRelacionamento ");
@@ -47,6 +65,15 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 			query.setParameter("tipoRelacionamento", tipoRelacionamento);
 		}
 		return query.getResultList();
+	}
+
+	public Representada pesquisarRevendedor() {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Representada(r.id, r.nomeFantasia) from Representada r where r.tipoRelacionamento = :tipoRelacionamento")
+								.setParameter("tipoRelacionamento", TipoRelacionamento.REVENDA), Representada.class, null);
 	}
 
 	public TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(Integer idRepresentada) {

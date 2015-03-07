@@ -191,8 +191,6 @@ public final class ClienteController extends AbstractController {
             gerarLogErroNavegacao("Cliente", e);
         }
 
-        addAtributo("clienteAtivo", this.clienteService.isClienteAtivo(idCliente));
-
         if (cliente.getDataUltimoContato() != null) {
             addAtributo("ultimoContato", this.formatarData(cliente.getDataUltimoContato()));
         }

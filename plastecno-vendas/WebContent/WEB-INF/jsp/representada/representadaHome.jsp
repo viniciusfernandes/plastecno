@@ -124,6 +124,11 @@ function inicializarModalCancelamento(botao){
 			
 			<div class="label obrigatorio">Tipo de Relacionamento:</div>
 			<div class="input">
+				<input type="radio" name="representada.tipoRelacionamento" 
+					value="REVENDA" <c:if test="${not empty representada and representada.tipoRelacionamento == 'REVENDA'}">checked</c:if>/>
+			</div>
+			<div class="label label_radio_button" style="width: 5%">Revenda</div>
+			<div class="input">
 				<input type="radio" name="representada.tipoRelacionamento"
 					value="REPRESENTACAO" <c:if test="${not empty representada and representada.tipoRelacionamento == 'REPRESENTACAO'}">checked</c:if> />
 			</div>
@@ -137,7 +142,7 @@ function inicializarModalCancelamento(botao){
 				<input type="radio" name="representada.tipoRelacionamento" 
 					value="REPRESENTACAO_FORNECIMENTO" <c:if test="${not empty representada and representada.tipoRelacionamento == 'REPRESENTACAO_FORNECIMENTO'}">checked</c:if>/>
 			</div>
-			<div class="label label_radio_button" style="width: 50%">Ambos</div>
+			<div class="label label_radio_button" style="width: 40%">Represent. e Fornec.</div>
 					
 			<div class="label obrigatorio">Apresent. IPI:</div>
 			<div class="input" style="width: 20%">

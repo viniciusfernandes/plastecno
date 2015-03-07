@@ -14,6 +14,7 @@ import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.entity.ContatoRepresentada;
@@ -107,7 +108,14 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 			throw new BusinessException("CNPJ enviado ja foi cadastrado para outra representada");
 		}
 
+		if (representada.isRevendedor() && isRevendedorExistente(representada.getId())) {
+			Representada revendedor = pesquisarRevendedor();
+			throw new BusinessException("Já existe um revendedor cadastrado no sistema. Remova o revendedor \""
+					+ revendedor.getNomeFantasia() + "\" para em seguida cadastrar um outro.");
+		}
+
 		representada.setLogradouro(this.logradouroService.inserir(representada.getLogradouro()));
+
 		if (representada.getId() == null) {
 			return representadaDAO.inserir(representada).getId();
 		} else {
@@ -133,6 +141,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	@Override
 	public boolean isRevendedor(Integer idRepresentada) {
 		return TipoRelacionamento.REVENDA.equals(representadaDAO.pesquisarTipoRelacionamento(idRepresentada));
+	}
+
+	private boolean isRevendedorExistente(Integer id) {
+		return this.representadaDAO.isEntidadeExistente(Representada.class, id, "tipoRelacionamento",
+				TipoRelacionamento.REVENDA);
 	}
 
 	@Override
@@ -176,7 +189,13 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@Override
 	public List<Representada> pesquisarFornecedor(Boolean ativo) {
-		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.REPRESENTACAO);
+		return representadaDAO.pesquisarRepresentadaByTipoRelacionamento(ativo, TipoRelacionamento.FORNECIMENTO,
+				TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+	}
+
+	@Override
+	public List<Representada> pesquisarFornecedorAtivo() {
+		return pesquisarFornecedor(true);
 	}
 
 	@Override
@@ -202,6 +221,19 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	@Override
 	public List<Representada> pesquisarRepresentadaAtivo() {
 		return this.pesquisarRepresentada(true);
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentadaAtivoByTipoPedido(TipoPedido tipoPedido) {
+		if (TipoPedido.COMPRA.equals(tipoPedido)) {
+			return pesquisarFornecedorAtivo();
+		}
+		return pesquisarRepresentadaAtivo();
+	}
+
+	@Override
+	public Representada pesquisarRevendedor() {
+		return representadaDAO.pesquisarRevendedor();
 	}
 
 	@Override

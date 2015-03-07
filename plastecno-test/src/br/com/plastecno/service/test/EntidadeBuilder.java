@@ -3,6 +3,7 @@ package br.com.plastecno.service.test;
 import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoRelacionamento;
@@ -46,6 +47,7 @@ public class EntidadeBuilder {
 		cliente.setRamoAtividade(buildRamoAtividade());
 		cliente.setEmail("alex@gmail.com.br");
 		cliente.setId(gerarId());
+		cliente.setTipoCliente(TipoCliente.NORMAL);
 		return cliente;
 	}
 

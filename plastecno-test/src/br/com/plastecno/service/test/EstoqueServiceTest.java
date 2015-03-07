@@ -534,8 +534,11 @@ public class EstoqueServiceTest extends AbstractTest {
 	@Test
 	public void testReservaItemEstoqueNaoExistente() {
 		gerarItemEstoque();
-		ItemPedido itemPedido = eBuilder.buildItemPedido();
-		itemPedido.setFormaMaterial(FormaMaterial.PC);
+		
+		Pedido pedido = gerarPedido(TipoPedido.REPRESENTACAO);
+		ItemPedido itemPedido = eBuilder.buildItemPedidoPeca();
+		itemPedido.setPedido(pedido);
+		
 		boolean reservado = true;
 		try {
 			reservado = estoqueService.reservarItemPedido(itemPedido);

@@ -4,22 +4,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Recepção de Compras Pendentes</title>
+<title>Recepção de Compras</title>
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
-
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -29,8 +27,26 @@ $(document).ready(function() {
 	inserirMascaraData('dataInicial');
 	inserirMascaraData('dataFinal');
 	
+	inserirMascaraMonetaria('preco', 7);
+	inserirMascaraNumerica('ipi', '99');
+	inserirMascaraNumerica('quantidade', '9999999');
+	inserirMascaraMonetaria('comprimento', 8);
+	inserirMascaraMonetaria('medidaExterna', 8);
+	inserirMascaraMonetaria('medidaInterna', 8);
+	
+	habilitar('#bloco_item_pedido input:radio', false);
+	habilitar('#bloco_item_pedido #formaMaterial', false);
+	habilitar('#bloco_item_pedido #descricao', false);
+	habilitar('#bloco_item_pedido #material', false);
+	
+	<c:if test="${itemPedido.peca}">
+	habilitar('#bloco_item_pedido #medidaExterna', false);
+	habilitar('#bloco_item_pedido #medidaInterna', false);
+	habilitar('#bloco_item_pedido #comprimento', false);
+	</c:if>
+	
 	$('#botaoLimpar').click(function () {
-		$('#formVazio').submit();	
+		$('#formVazio').submit();
 	});
 	
 	$('#botaoInserirItemPedido').click(function () {
@@ -41,25 +57,21 @@ $(document).ready(function() {
 		$(form).attr('action', '<c:url value="/compra/item/inclusao"/>?'+parametros);
 		$(form).submit();
 	});
-	
-	inicializarAutocompleteCliente();
 });
 
-function inicializarAutocompleteCliente(){
-	autocompletar({
-		url : '<c:url value="/cliente/listagem/nome"/>',
-		campoPesquisavel : 'nomeFantasia',
-		parametro : 'nomeFantasia',
-		containerResultados : 'containerPesquisaCliente',
-		selecionarItem: function(itemLista) {
-			$('#formPesquisa #idCliente').val(itemLista.id);
-		}
-	});	
-}
-
-function empacotarItem(botao){
+function removerItem(botao){
 	inicializarModalConfirmacao({
-		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja EMPACOTAR esse item do pedido de revenda?',
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REMOVER esse item do pedido de compra?',
+		confirmar: function(){
+			submeterForm(botao);
+		}
+	});
+};
+
+
+function recepcionarItem(botao){
+	inicializarModalConfirmacao({
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja RECEPCIONAR esse item do pedido de compra?',
 		confirmar: function(){
 			submeterForm(botao);
 		}
@@ -72,17 +84,17 @@ function empacotarItem(botao){
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 
-	<form id="formVazio" action="<c:url value="/empacotamento"/>">
+	<form id="formVazio" >
 	</form>
 
 
-	<form id="formPesquisa" action="<c:url value="/empacotamento/revenda/listagem"/>" method="get">
-		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
+	<form id="formPesquisa" action="<c:url value="/compra/recepcao/listagem"/>" method="get">
 		<fieldset>
-			<legend>::: Pedidos de Revenda para Empacotamento :::</legend>
+			<legend>::: Pedidos de Compra para Recepção :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
-				<input type="text" id="dataInicial" name="dataInicial" value="${dataInicial}" maxlength="10" class="pesquisavel" />
+				<input type="text" id="dataInicial" name="dataInicial"
+					value="${dataInicial}" maxlength="10" class="pesquisavel" />
 			</div>
 
 			<div class="label obrigatorio" style="width: 10%">Data Final:</div>
@@ -90,17 +102,26 @@ function empacotarItem(botao){
 				<input type="text" id="dataFinal" name="dataFinal"
 					value="${dataFinal}" maxlength="100" class="pesquisavel" />
 			</div>
-			<div class="label" style="width: 30%">Cliente:</div>
+			<div class="label" style="width: 30%">Representada:</div>
 			<div class="input" style="width: 50%">
-				<input type="text" id="nomeFantasia" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" style="width: 40%"/>
-				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
+				<select name="idRepresentada" style="width: 30%">
+					<option value="">&lt&lt SELECIONE &gt&gt</option>
+					<c:forEach var="representada" items="${listaRepresentada}">
+						<option value="${representada.id}"
+							<c:if test="${representada.id eq idRepresentadaSelecionada}">selected</c:if>>${representada.nomeFantasia}</option>
+					</c:forEach>
+				</select>
 			</div>
 			<div class="bloco_botoes">
 				<input type="submit" value="" class="botaoPesquisar" /> 
-				<input id="botaoLimpar" type="button" value="" title="Limpar Dados de Pesquisa dos Pedidos para Empacotamento" class="botaoLimpar" />
+				<input id="botaoLimpar" type="button" value="" title="Limpar Dados de Geração do Relatório de Compras" class="botaoLimpar" />
 			</div>
 		</fieldset>
 	</form>
+	
+	<c:if test="${not empty itemPedido}">
+		<jsp:include page="/bloco/bloco_edicao_item_compra.jsp"/>
+	</c:if>
 	
 	<c:if test="${not empty relatorio}">
 		<table class="listrada">
@@ -134,14 +155,23 @@ function empacotarItem(botao){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/empacotamento/pedido/pdf"/>" >
+									<form action="<c:url value="/compra/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 									</form>
-									<form action="<c:url value="/empacotamento/item/inclusao"/>" method="post" >
+									<form action="<c:url value="/compra/item/recepcao"/>" method="post" >
 										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
-										<input type="button" value="" title="Incluir o Item no Pacote" 
-										onclick="empacotarItem(this);" class="botaoAdicionar_16" />
+										<input type="button" value="" title="Recepcionar o Item do Pedido" 
+										onclick="recepcionarItem(this);" class="botaoAdicionar_16" />
+									</form>
+									<form action="<c:url value="/compra/item/edicao"/>" method="post">
+										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
+										<input type="button" value="" title="Editar o Item do Pedido" class="botaoEditar" onclick="submeterForm(this);"/>
+									</form>
+									<form action="<c:url value="/compra/item/remocao"/>" method="post" >
+										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
+										<input type="button" value="" title="Remover o Item do Pedido" 
+											onclick="removerItem(this);" class="botaoRemover" />
 									</form>
 									
 								</div>

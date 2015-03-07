@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
 
 public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
@@ -15,11 +16,53 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		super(entityManager);
 	}
 
-	/*
 	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarItemPedidoEmpacotamento(Integer idCliente, Date dataInicial, Date dataFinal) {
+	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemPedido i where i.pedido.situacaoPedido = :situacaoPedido ");
+		select.append("select i from ItemPedido i ");
+		select.append("where i.pedido.tipoPedido = :tipoPedido ");
+		select.append("and i.recebido = false ");
+		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
+
+		if (dataInicial != null) {
+			select.append("and i.pedido.dataEnvio >= :dataInicial ");
+		}
+
+		if (dataFinal != null) {
+			select.append("and i.pedido.dataEnvio <= :dataFinal ");
+		}
+
+		if (idRepresentada != null) {
+			select.append("and i.pedido.representada.id = :idRepresentada ");
+		}
+
+		select.append("order by i.pedido.dataEnvio asc ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+		query.setParameter("situacaoPedido", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+
+		if (dataInicial != null) {
+			query.setParameter("dataInicial", dataInicial);
+		}
+
+		if (dataFinal != null) {
+			query.setParameter("dataFinal", dataFinal);
+		}
+
+		if (idRepresentada != null) {
+			query.setParameter("idRepresentada", idRepresentada);
+		}
+
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i from ItemPedido i ");
+		select.append("where i.pedido.situacaoPedido = :situacaoPedido and i.pedido.tipoPedido = :tipoPedido ");
+		select.append("and i.encomendado = true and i.quantidadeEncomenda > 0 ");
 
 		if (dataInicial != null) {
 			select.append("and i.pedido.dataEnvio >= :dataInicial ");
@@ -36,7 +79,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		select.append("order by i.pedido.dataEnvio asc ");
 
 		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("situacaoPedido", SituacaoPedido.EMPACOTAMENTO);
+		query.setParameter("tipoPedido", TipoPedido.REVENDA);
+		query.setParameter("situacaoPedido", SituacaoPedido.REVENDA_ENCOMENDADA);
 
 		if (dataInicial != null) {
 			query.setParameter("dataInicial", dataInicial);
@@ -52,11 +96,52 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 		return query.getResultList();
 	}
-	*/
+
+	@SuppressWarnings("unchecked")
+	public List<ItemPedido> pesquisarItemEncomenda(Integer idCliente, Date dataInicial, Date dataFinal) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i from ItemPedido i ");
+		select.append("where i.pedido.situacaoPedido = :situacaoPedido and i.pedido.tipoPedido = :tipoPedido ");
+		select.append("and i.encomendado = false and i.quantidadeEncomenda > 0 ");
+
+		if (dataInicial != null) {
+			select.append("and i.pedido.dataEnvio >= :dataInicial ");
+		}
+
+		if (dataFinal != null) {
+			select.append("and i.pedido.dataEnvio <= :dataFinal ");
+		}
+
+		if (idCliente != null) {
+			select.append("and i.pedido.cliente.id = :idCliente ");
+		}
+
+		select.append("order by i.pedido.dataEnvio asc ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("tipoPedido", TipoPedido.REVENDA);
+		query.setParameter("situacaoPedido", SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
+
+		if (dataInicial != null) {
+			query.setParameter("dataInicial", dataInicial);
+		}
+
+		if (dataFinal != null) {
+			query.setParameter("dataFinal", dataFinal);
+		}
+
+		if (idCliente != null) {
+			query.setParameter("idCliente", idCliente);
+		}
+
+		return query.getResultList();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemPedidoEmpacotamento(Integer idCliente, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
-		select.append("select i.itemPedido from ItemReservado i where i.itemPedido.pedido.situacaoPedido = :situacaoPedido ");
+		select
+				.append("select i.itemPedido from ItemReservado i where i.itemPedido.pedido.situacaoPedido = :situacaoPedido ");
 
 		if (dataInicial != null) {
 			select.append("and i.itemPedido.pedido.dataEnvio >= :dataInicial ");

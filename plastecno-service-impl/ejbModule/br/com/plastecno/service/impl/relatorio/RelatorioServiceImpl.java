@@ -27,8 +27,8 @@ import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
 import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
-import br.com.plastecno.service.wrapper.VendaClienteWrapper;
 import br.com.plastecno.service.wrapper.RepresentadaValorWrapper;
+import br.com.plastecno.service.wrapper.VendaClienteWrapper;
 import br.com.plastecno.service.wrapper.exception.AgrupamentoException;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
@@ -93,12 +93,18 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraPendente(Integer idRepresentada, Periodo periodo) {
+	public List<Pedido> gerarRelatorioCompra(Periodo periodo) throws InformacaoInvalidaException {
+		return this.pedidoService.pesquisarPedidoCompraByPeriodo(periodo);
+	}
+
+	@Override
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraPendenteRecebimento(Integer idRepresentada,
+			Periodo periodo) {
 		/*
 		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
 		 * estoque para recuperar apenas a informacao necessaria.
 		 */
-		return gerarRelatorioItensPorPedido("Recepção de Compras com Pendências",
+		return gerarRelatorioItensPorPedido("Recepção de Compras para Recebimento",
 				pedidoService.pesquisarCompraPendenteRecebimento(idRepresentada, periodo));
 	}
 
@@ -125,6 +131,16 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 
 		return relatorio;
+	}
+
+	@Override
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemEncomenda(Integer idCliente, Periodo periodo) {
+		/*
+		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
+		 * estoque para recuperar apenas a informacao necessaria.
+		 */
+		return gerarRelatorioItensPorPedido("Itens para Encomendar",
+				pedidoService.pesquisarItemEncomenda(idCliente, periodo));
 	}
 
 	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(String titulo, List<ItemPedido> listaItem) {
@@ -158,6 +174,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 		 */
 		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Empacotar",
 				pedidoService.pesquisarRevendaEmpacotamento(idCliente, periodo));
+	}
+
+	@Override
+	public List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException {
+		return this.pedidoService.pesquisarPedidoVendaByPeriodo(periodo);
 	}
 
 	@Override
@@ -218,7 +239,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public List<Pedido> pesquisarEntregas(Periodo periodo) throws InformacaoInvalidaException {
-		return this.pedidoService.pesquisarEnviadosByPeriodo(periodo);
+	public List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException {
+		return pedidoService.pesquisarEntregaVendaByPeriodo(periodo);
 	}
 }

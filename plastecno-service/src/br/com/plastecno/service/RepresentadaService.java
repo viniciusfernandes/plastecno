@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
@@ -24,8 +25,6 @@ public interface RepresentadaService {
 
 	boolean isRevendedor(Integer idRepresentada);
 
-	List<Representada> pesquisarRepresentadaAtivo();
-
 	List<Representada> pesquisarBy(Representada filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros);
 
@@ -37,11 +36,19 @@ public interface RepresentadaService {
 
 	List<Representada> pesquisarFornecedor(Boolean ativo);
 
+	List<Representada> pesquisarFornecedorAtivo();
+
 	Logradouro pesquisarLogradorouro(Integer id);
 
 	List<Representada> pesquisarRepresentada();
 
 	List<Representada> pesquisarRepresentada(Boolean ativo);
+
+	List<Representada> pesquisarRepresentadaAtivo();
+
+	List<Representada> pesquisarRepresentadaAtivoByTipoPedido(TipoPedido tipoPedido);
+
+	Representada pesquisarRevendedor();
 
 	TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(Integer idRepresentada);
 

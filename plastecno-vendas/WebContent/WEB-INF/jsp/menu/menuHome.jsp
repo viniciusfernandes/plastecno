@@ -37,6 +37,7 @@
 				<c:if test="${acessoCompraPermitido}">
 					<li><a href="javascript: void(0)" target="principal_frame">Compras</a>
 						<ul>
+							<li><a href="encomenda" target="principal_frame">Encomenda</a></li>
 							<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a></li>
 							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
 							<li><a href="estoque" target="principal_frame">Estoque</a></li>
@@ -69,13 +70,19 @@
 						<li><a href="relatorio/cliente/vendedor"
 							target="principal_frame">Cliente Vendedor</a></li>
 						<c:if test="${acessoRelatorioVendasRepresentadaPermitido}">
-							<li><a href="relatorio/pedido/periodo?isCompra=false" target="principal_frame">Venda Período</a></li>
+							<li><a href="relatorio/pedido/periodo?isCompra=false" target="principal_frame">Valor Venda Período</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioComprasRepresentadaPermitido}">
-							<li><a href="relatorio/pedido/periodo?isCompra=true" target="principal_frame">Compra Período</a></li>
+							<li><a href="relatorio/pedido/periodo?isCompra=true" target="principal_frame">Valor Compra Período</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioEntregaPermitido}">
-							<li><a href="relatorio/entrega" target="principal_frame">Acompanhamento Entrega</a></li>
+							<li><a href="relatorio/pedido?isEntrega=true" target="principal_frame">Acompanhamento Entrega</a></li>
+						</c:if>
+						<c:if test="${acessoRelatorioEntregaPermitido}">
+							<li><a href="relatorio/pedido?isCompra=false" target="principal_frame">Pedido Venda Período</a></li>
+						</c:if>
+						<c:if test="${acessoRelatorioEntregaPermitido}">
+							<li><a href="relatorio/pedido?isCompra=true" target="principal_frame">Pedido Compra Período</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioPedidoRepresentadaPermitido}">
 							<li><a href="relatorio/venda/representada"

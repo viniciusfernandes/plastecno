@@ -21,13 +21,13 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		super(entityManager);
 	}
 
-	public void atualizarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
+	public void alterarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
 		this.entityManager.createQuery("update Pedido p set p.situacaoPedido = :situacao where p.id = :idPedido")
 				.setParameter("situacao", situacaoPedido).setParameter("idPedido", idPedido).executeUpdate();
 	}
 
 	public void cancelar(Integer idPedido) {
-		atualizarSituacaoPedidoById(idPedido, SituacaoPedido.CANCELADO);
+		alterarSituacaoPedidoById(idPedido, SituacaoPedido.CANCELADO);
 	}
 
 	private Query gerarQueryPesquisa(Pedido filtro, StringBuilder select) {

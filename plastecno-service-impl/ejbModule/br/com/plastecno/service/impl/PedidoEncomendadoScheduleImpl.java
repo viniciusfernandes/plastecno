@@ -13,12 +13,12 @@ import javax.ejb.Timer;
 import javax.ejb.TimerService;
 
 import br.com.plastecno.service.EstoqueService;
-import br.com.plastecno.service.MonitorPedidoEncomendadoSchedule;
+import br.com.plastecno.service.PedidoEncomendadoSchedule;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Singleton
-public class MonitorPedidoEncomendadoScheduleImpl implements MonitorPedidoEncomendadoSchedule {
+public class PedidoEncomendadoScheduleImpl implements PedidoEncomendadoSchedule {
 	@Resource
 	private SessionContext sessionContext;
 
@@ -30,7 +30,7 @@ public class MonitorPedidoEncomendadoScheduleImpl implements MonitorPedidoEncome
 
 	@Resource
 	private TimerService timerService;
-	private Logger logger = Logger.getLogger(MonitorPedidoEncomendadoScheduleImpl.class.getName());
+	private Logger logger = Logger.getLogger(PedidoEncomendadoScheduleImpl.class.getName());
 
 	@Timeout
 	public void init(Timer timer) {

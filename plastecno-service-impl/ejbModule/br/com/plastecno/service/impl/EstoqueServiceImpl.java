@@ -1,7 +1,9 @@
 package br.com.plastecno.service.impl;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -307,6 +309,28 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		itemEstoqueDAO.alterar(itemCadastrado);
+
+		redefinirItemReservadoByItemEstoque(itemCadastrado.getId());
+	}
+
+	private void redefinirItemReservadoByItemEstoque(Integer idItemEstoque) throws BusinessException {
+
+		List<ItemReservado> listaItemReservado = itemReservadoDAO.pesquisarItemReservadoByIdItemEstoque(idItemEstoque);
+
+		Set<Integer> listaIdPedido = new HashSet<Integer>();
+		for (ItemReservado itemReservado : listaItemReservado) {
+			itemReservadoDAO.remover(itemReservado);
+			listaIdPedido.add(pedidoService.pesquisarIdPedidoByIdItemPedido(itemReservado.getItemPedido().getId()));
+		}
+
+		// Apos a remocao das reservas, estamos supondo que o estoque ja foi
+		// redefinido, assim devemos tentar reservar os itens novamente,
+		// consequentemente alteraremos os estado do pedido para revenda com
+		// pendencia, e enfim, o setor de comprar podera monitorar os pedidos
+		// novamente.
+		for (Integer idPedido : listaIdPedido) {
+			reservarItemPedido(idPedido);
+		}
 	}
 
 	private void reinserirItemPedidoEstoque(Integer idPedido) throws BusinessException {
@@ -365,6 +389,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public boolean reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
+		if (isItemPedidoReservado(itemPedido.getId())) {
+			return true;
+		}
+		
 		ItemEstoque itemEstoque = null;
 		if (itemPedido.isPeca()) {
 			itemEstoque = pesquisarItemEstoque(itemPedido.getMaterial().getId(), itemPedido.getFormaMaterial(),
@@ -395,5 +423,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		return reservado;
+	}
+
+	public boolean isItemPedidoReservado(Integer idItemPedido) {
+		return itemReservadoDAO.pesquisarItemReservadoByIdItemPedido(idItemPedido) != null;
 	}
 }

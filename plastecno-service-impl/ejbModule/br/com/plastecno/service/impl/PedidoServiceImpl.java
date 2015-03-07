@@ -114,7 +114,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido) {
 		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
-		pedidoDAO.atualizarSituacaoPedidoById(idPedido, situacaoPedido);
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
 	}
 
 	@Override

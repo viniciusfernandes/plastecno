@@ -37,7 +37,7 @@ public class PedidoEncomendadoScheduleImpl implements PedidoEncomendadoSchedule 
 		logger.info("Inicializando o monitoramento dos itens de pedidos encomendados aguardando reserva");
 	}
 
-	@Schedule(second = "*/60", minute = "*", hour = "*")
+	@Schedule(second = "*/300", minute = "*", hour = "*")
 	public void reservarItemPedidoEncomendadoEstoque() throws BusinessException {
 		List<Integer> listaItem = pedidoService.pesquisarIdPedidoRevendaPendenteEncomenda();
 		boolean reservado = false;

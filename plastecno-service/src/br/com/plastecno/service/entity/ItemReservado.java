@@ -60,6 +60,10 @@ public class ItemReservado {
 		itemEstoque.setQuantidade(quantidadeEstoque);
 	}
 
+	public ItemReservado(Integer id, Integer idItemPedido, Integer idItemEstoque) {
+		this(idItemEstoque, idItemPedido, null, idItemEstoque, null);
+	}
+
 	public Date getDataReserva() {
 		return dataReserva;
 	}

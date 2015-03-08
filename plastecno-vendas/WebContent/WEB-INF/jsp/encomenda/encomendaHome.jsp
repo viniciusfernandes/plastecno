@@ -159,7 +159,7 @@ function encomendarItem(campo){
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}"><input type="checkbox" name="idItemPedido" value="${item.id}" onclick="encomendarItem(this)"/></td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeEncomenda}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeEncomendada}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeProprietario}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeRepresentada}</td>

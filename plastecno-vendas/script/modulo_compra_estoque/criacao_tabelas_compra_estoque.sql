@@ -70,7 +70,7 @@ create sequence vendas.seq_item_reservado_id increment by 1 minvalue 1 no maxval
 
 
 INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (8, 'PEDIDO EMPACOTADO');
-alter table vendas.tb_item_pedido add quantidade_encomenda integer default 0;
+alter table vendas.tb_item_pedido add quantidade_reservada integer default 0;
 
 
 CREATE TABLE VENDAS.TB_TIPO_CLIENTE(

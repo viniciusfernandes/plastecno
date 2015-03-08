@@ -32,6 +32,9 @@ public class ItemReservado {
 	@JoinColumn(name = "id_item_pedido", referencedColumnName = "id", nullable = false)
 	private ItemPedido itemPedido;
 
+	@Column(name = "quantidade_reservada")
+	private int quantidadeReservada;
+
 	public ItemReservado() {
 	}
 
@@ -39,6 +42,10 @@ public class ItemReservado {
 		this.dataReserva = dataReserva;
 		this.itemEstoque = itemEstoque;
 		this.itemPedido = itemPedido;
+	}
+
+	public ItemReservado(Integer id, Integer idItemPedido, Integer idItemEstoque) {
+		this(idItemEstoque, idItemPedido, null, idItemEstoque, null);
 	}
 
 	public ItemReservado(Integer id, Integer idItemPedido, Integer quantidadeReservada, Integer idItemEstoque,
@@ -51,10 +58,6 @@ public class ItemReservado {
 		itemEstoque = new ItemEstoque();
 		itemEstoque.setId(idItemEstoque);
 		itemEstoque.setQuantidade(quantidadeEstoque);
-	}
-
-	public ItemReservado(Integer id, Integer idItemPedido, Integer idItemEstoque) {
-		this(idItemEstoque, idItemPedido, null, idItemEstoque, null);
 	}
 
 	public Date getDataReserva() {
@@ -73,6 +76,18 @@ public class ItemReservado {
 		return itemPedido;
 	}
 
+	public Integer getQuantidadeItemEstoque() {
+		return itemEstoque != null ? itemEstoque.getQuantidade() : null;
+	}
+
+	public Integer getQuantidadeItemPedido() {
+		return itemPedido != null ? itemPedido.getQuantidade() : null;
+	}
+
+	public int getQuantidadeReservada() {
+		return quantidadeReservada;
+	}
+
 	public void setDataReserva(Date dataReserva) {
 		this.dataReserva = dataReserva;
 	}
@@ -87,6 +102,10 @@ public class ItemReservado {
 
 	public void setItemPedido(ItemPedido itemPedido) {
 		this.itemPedido = itemPedido;
+	}
+
+	public void setQuantidadeReservada(int quantidadeReservada) {
+		this.quantidadeReservada = quantidadeReservada;
 	}
 
 }

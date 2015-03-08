@@ -18,6 +18,7 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemReservadoDAO;
@@ -196,6 +197,14 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return Math.abs(1 - val1 / val2) <= tolerancia;
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean isTodasUnidadesItemPedidoReservadas(Integer idItemPedido) {
+		int total = pesquisarTotalReservadoByIdItemPedido(idItemPedido);
+		int quantidade = pedidoService.pesquisarQuantidadeItemPedido(idItemPedido);
+		return quantidade != total;
+	}
+
 	private ItemEstoque pesquisarItemCadastradoEstoque(Item filtro) {
 		Integer idMaterial = filtro.getMaterial().getId();
 		FormaMaterial formaMaterial = filtro.getFormaMaterial();
@@ -276,6 +285,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public int pesquisarTotalReservadoByIdItemPedido(Integer idItemPedido) {
+		List<ItemReservado> lsitaItemReservado = itemReservadoDAO.pesquisarItemReservadoByIdItemPedido(idItemPedido);
+		int total = 0;
+		for (ItemReservado itemReservado : lsitaItemReservado) {
+			total += itemReservado.getQuantidadeReservada();
+		}
+		return total;
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
 		ValidadorInformacao.validar(itemEstoque);
@@ -310,7 +330,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		itemEstoqueDAO.alterar(itemCadastrado);
 
-		redefinirItemReservadoByItemEstoque(itemCadastrado.getId());
+		//redefinirItemReservadoByItemEstoque(itemCadastrado.getId());
 	}
 
 	private void redefinirItemReservadoByItemEstoque(Integer idItemEstoque) throws BusinessException {
@@ -370,15 +390,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não é um pedido de revenda.");
 		}
 		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())
+				&& !SituacaoPedido.REVENDA_ENCOMENDADA.equals(pedido.getSituacaoPedido())
 				&& !SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA.equals(pedido.getSituacaoPedido())) {
 			throw new BusinessException(
 					"O pedido não pode ter seus itens encomendados pois não esta em digitação e não é revenda pendente de encomenda.");
 		}
 		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 		boolean todosReservados = true;
+		SituacaoReservaEstoque situacaoReserva = null;
 		for (ItemPedido itemPedido : listaItem) {
-			reservarItemPedido(itemPedido);
-			todosReservados &= itemPedido.isTodasUnidadesReservadas();
+			situacaoReserva = reservarItemPedido(itemPedido);
+			todosReservados &= SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS.equals(situacaoReserva);
 		}
 		pedido
 				.setSituacaoPedido(todosReservados ? SituacaoPedido.EMPACOTAMENTO : SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
@@ -388,11 +410,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public boolean reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
-		if (isItemPedidoReservado(itemPedido.getId())) {
-			return true;
+	public SituacaoReservaEstoque reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
+		// if (isTodasUnidadesItemPedidoReservadas(itemPedido.getId())) {
+		if (itemPedido.isTodasUnidadesReservadas()) {
+			return SituacaoReservaEstoque.JA_RESERVADO;
 		}
-		
+
 		ItemEstoque itemEstoque = null;
 		if (itemPedido.isPeca()) {
 			itemEstoque = pesquisarItemEstoque(itemPedido.getMaterial().getId(), itemPedido.getFormaMaterial(),
@@ -405,27 +428,29 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Integer quantidadePedido = itemPedido.getQuantidade();
 		Integer quantidadeEstoque = itemEstoque != null ? itemEstoque.getQuantidade() : 0;
 
-		boolean reservado = true;
+		SituacaoReservaEstoque situacao = null;
 		if (quantidadeEstoque <= 0) {
-			reservado = false;
-		} else if (quantidadePedido >= quantidadeEstoque) {
+			situacao = SituacaoReservaEstoque.NAO_CONTEM_ESTOQUE;
+		} else if (quantidadePedido > quantidadeEstoque) {
 			quantidadeReservada = quantidadeEstoque;
-		} else if (quantidadePedido < quantidadeEstoque) {
+			situacao = SituacaoReservaEstoque.UNIDADES_PARCIALEMENTE_RESERVADAS;
+		} else if (quantidadePedido <= quantidadeEstoque) {
 			quantidadeReservada = quantidadePedido;
+			situacao = SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS;
 		}
-
-		itemPedido.setQuantidadeEncomenda(quantidadePedido - quantidadeReservada);
+		if (itemPedido.getQuantidadeReservada() == null) {
+			itemPedido.setQuantidadeReservada(quantidadeReservada);
+		} else {
+			itemPedido.setQuantidadeReservada(itemPedido.getQuantidadeReservada() + quantidadeReservada);
+		}
 		pedidoService.inserirItemPedido(itemPedido);
 
 		if (itemEstoque != null) {
+			itemEstoque.setQuantidade(quantidadeEstoque - quantidadeReservada);
 			itemEstoqueDAO.alterar(itemEstoque);
 			itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
 		}
 
-		return reservado;
-	}
-
-	public boolean isItemPedidoReservado(Integer idItemPedido) {
-		return itemReservadoDAO.pesquisarItemReservadoByIdItemPedido(idItemPedido) != null;
+		return situacao;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
@@ -24,6 +25,8 @@ public interface EstoqueService {
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
+	boolean isTodasUnidadesItemPedidoReservadas(Integer idItemPedido);
+
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
 	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
@@ -38,9 +41,11 @@ public interface EstoqueService {
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
+	int pesquisarTotalReservadoByIdItemPedido(Integer idItemPedido);
+
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	boolean reservarItemPedido(Integer idPedido) throws BusinessException;
 
-	boolean reservarItemPedido(ItemPedido itemPedido) throws BusinessException;
+	SituacaoReservaEstoque reservarItemPedido(ItemPedido itemPedido) throws BusinessException;
 }

@@ -119,8 +119,20 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido) {
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido) {
 		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarSituacaoPedidoEncomendadoByIdPedido(Integer idPedido) {
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
 	}
 
 	@Override
@@ -231,6 +243,8 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 			itemClone = itemCadastrado.clone();
 			itemClone.setPedido(pedido);
+			itemClone.setQuantidade(itemCadastrado.getQuantidadeEncomendada());
+			itemClone.setQuantidadeReservada(0);
 			try {
 				inserirItemPedido(pedido.getId(), itemClone);
 			} catch (BusinessException e) {
@@ -490,13 +504,13 @@ public class PedidoServiceImpl implements PedidoService {
 		if (itemPedido.isNovo()) {
 			itemPedido.setSequencial(gerarSequencialItemPedido(idPedido));
 		}
-		
+
 		if (itemPedido.isNovo()) {
 			itemPedidoDAO.inserir(itemPedido);
 		} else {
 			itemPedido = itemPedidoDAO.alterar(itemPedido);
 		}
-		
+
 		ValidadorInformacao.validar(itemPedido);
 		/*
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao de
@@ -678,6 +692,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdPedidoRevendaEncomendada() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_ENCOMENDADA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoRevendaPendenteEncomenda() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
 	}
@@ -844,6 +864,12 @@ public class PedidoServiceImpl implements PedidoService {
 		query.setParameter("id", idPedido);
 
 		return QueryUtil.gerarRegistroUnico(query, Usuario.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public int pesquisarQuantidadeItemPedido(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
 	}
 
 	@Override

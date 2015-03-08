@@ -20,7 +20,11 @@ public interface PedidoService {
 
 	void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
 
+	void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido);
+
 	void alterarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido);
+
+	void alterarSituacaoPedidoEncomendadoByIdPedido(Integer idPedido);
 
 	Double calcularValorPedido(Integer idPedido) throws BusinessException;
 
@@ -80,6 +84,8 @@ public interface PedidoService {
 
 	Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido);
 
+	List<Integer> pesquisarIdPedidoRevendaEncomendada();
+
 	List<Integer> pesquisarIdPedidoRevendaPendenteEncomenda();
 
 	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
@@ -112,9 +118,13 @@ public interface PedidoService {
 
 	Usuario pesquisarProprietario(Integer idPedido);
 
+	int pesquisarQuantidadeItemPedido(Integer idItemPedido);
+
 	List<ItemPedido> pesquisarRevendaEmpacotamento();
 
 	List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo);
+
+	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 
 	SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido);
 
@@ -146,7 +156,5 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
-
-	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 
 }

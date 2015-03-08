@@ -22,7 +22,6 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Table(name = "tb_item_pedido", schema = "vendas")
 @InformacaoValidavel
 public class ItemPedido extends Item {
-
 	/**
 	 * 
 	 */
@@ -37,9 +36,12 @@ public class ItemPedido extends Item {
 	private Double aliquotaIPI;
 
 	private Double comprimento;
+
 	@Column(name = "descricao_peca")
 	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
 	private String descricaoPeca;
+	@Column(name = "item_encomendado")
+	private boolean encomendado;
 
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_forma_material")
@@ -61,9 +63,6 @@ public class ItemPedido extends Item {
 
 	@Column(name = "medida_interna")
 	private Double medidaInterna;
-
-	@Column(name = "quantidade_encomenda")
-	private Integer quantidadeEncomenda;
 
 	@Transient
 	private String nomeProprietario;
@@ -97,11 +96,11 @@ public class ItemPedido extends Item {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do pedido")
 	private Integer quantidade;
 
+	@Column(name = "quantidade_reservada")
+	private Integer quantidadeReservada;
+
 	@Column(name = "item_recebido")
 	private boolean recebido;
-
-	@Column(name = "item_encomendado")
-	private boolean encomendado;
 
 	private Integer sequencial;
 
@@ -208,11 +207,15 @@ public class ItemPedido extends Item {
 	}
 
 	public Integer getQuantidade() {
-		return quantidade;
+		return quantidade == null ? 0 : quantidade;
 	}
 
-	public Integer getQuantidadeEncomenda() {
-		return quantidadeEncomenda;
+	public int getQuantidadeEncomendada() {
+		return getQuantidade() - getQuantidadeReservada();
+	}
+
+	public Integer getQuantidadeReservada() {
+		return quantidadeReservada == null ? 0 : quantidadeReservada;
 	}
 
 	public Integer getSequencial() {
@@ -233,6 +236,10 @@ public class ItemPedido extends Item {
 
 	public boolean isRecebido() {
 		return recebido;
+	}
+
+	public boolean isTodasUnidadesReservadas() {
+		return quantidade != null && quantidade.equals(quantidadeReservada);
 	}
 
 	public boolean isVendaKilo() {
@@ -315,8 +322,8 @@ public class ItemPedido extends Item {
 		this.quantidade = quantidade;
 	}
 
-	public void setQuantidadeEncomenda(Integer quantidadeEncomenda) {
-		this.quantidadeEncomenda = quantidadeEncomenda;
+	public void setQuantidadeReservada(Integer quantidadeReservada) {
+		this.quantidadeReservada = quantidadeReservada;
 	}
 
 	public void setRecebido(boolean recebido) {
@@ -329,9 +336,5 @@ public class ItemPedido extends Item {
 
 	public void setTipoVenda(TipoVenda tipoVenda) {
 		this.tipoVenda = tipoVenda;
-	}
-
-	public boolean isTodasUnidadesReservadas() {
-		return encomendado && quantidadeEncomenda.equals(quantidade);
 	}
 }

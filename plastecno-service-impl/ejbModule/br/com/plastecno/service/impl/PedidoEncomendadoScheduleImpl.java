@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.SessionContext;
@@ -18,6 +20,7 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Singleton
+@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 public class PedidoEncomendadoScheduleImpl implements PedidoEncomendadoSchedule {
 	@EJB
 	private EstoqueService estoqueService;

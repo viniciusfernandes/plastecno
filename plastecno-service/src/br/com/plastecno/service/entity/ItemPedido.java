@@ -134,6 +134,10 @@ public class ItemPedido extends Item {
 		}
 	}
 
+	public boolean contemAlgumaReserva() {
+		return quantidadeReservada != null && quantidadeReservada > 0;
+	}
+
 	public boolean contemLargura() {
 		return this.formaMaterial != null && this.formaMaterial.contemLargura();
 	}
@@ -324,6 +328,10 @@ public class ItemPedido extends Item {
 
 	public void setQuantidadeReservada(Integer quantidadeReservada) {
 		this.quantidadeReservada = quantidadeReservada;
+	}
+
+	public void addQuantidadeReservada(Integer quantidadeReservada) {
+		setQuantidadeReservada(getQuantidadeReservada() + quantidadeReservada);
 	}
 
 	public void setRecebido(boolean recebido) {

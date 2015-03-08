@@ -25,7 +25,6 @@ public interface EstoqueService {
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
-	boolean isTodasUnidadesItemPedidoReservadas(Integer idItemPedido);
 
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
@@ -40,8 +39,6 @@ public interface EstoqueService {
 	ItemEstoque pesquisarItemEstoqueByItemPedido(ItemPedido itemPedido);
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
-
-	int pesquisarTotalReservadoByIdItemPedido(Integer idItemPedido);
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 

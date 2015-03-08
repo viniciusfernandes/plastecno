@@ -197,14 +197,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return Math.abs(1 - val1 / val2) <= tolerancia;
 	}
 
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public boolean isTodasUnidadesItemPedidoReservadas(Integer idItemPedido) {
-		int total = pesquisarTotalReservadoByIdItemPedido(idItemPedido);
-		int quantidade = pedidoService.pesquisarQuantidadeItemPedido(idItemPedido);
-		return quantidade != total;
-	}
-
 	private ItemEstoque pesquisarItemCadastradoEstoque(Item filtro) {
 		Integer idMaterial = filtro.getMaterial().getId();
 		FormaMaterial formaMaterial = filtro.getFormaMaterial();
@@ -285,17 +277,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public int pesquisarTotalReservadoByIdItemPedido(Integer idItemPedido) {
-		List<ItemReservado> lsitaItemReservado = itemReservadoDAO.pesquisarItemReservadoByIdItemPedido(idItemPedido);
-		int total = 0;
-		for (ItemReservado itemReservado : lsitaItemReservado) {
-			total += itemReservado.getQuantidadeReservada();
-		}
-		return total;
-	}
-
-	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
 		ValidadorInformacao.validar(itemEstoque);
@@ -330,7 +311,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		itemEstoqueDAO.alterar(itemCadastrado);
 
-		//redefinirItemReservadoByItemEstoque(itemCadastrado.getId());
+		// redefinirItemReservadoByItemEstoque(itemCadastrado.getId());
 	}
 
 	private void redefinirItemReservadoByItemEstoque(Integer idItemEstoque) throws BusinessException {
@@ -411,7 +392,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public SituacaoReservaEstoque reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
-		// if (isTodasUnidadesItemPedidoReservadas(itemPedido.getId())) {
 		if (itemPedido.isTodasUnidadesReservadas()) {
 			return SituacaoReservaEstoque.JA_RESERVADO;
 		}
@@ -425,7 +405,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 					itemPedido.getMedidaExterna(), itemPedido.getMedidaInterna(), itemPedido.getComprimento());
 		}
 		Integer quantidadeReservada = 0;
-		Integer quantidadePedido = itemPedido.getQuantidade();
+		Integer quantidadePedido = itemPedido.contemAlgumaReserva() ? itemPedido.getQuantidadeEncomendada() : itemPedido
+				.getQuantidade();
 		Integer quantidadeEstoque = itemEstoque != null ? itemEstoque.getQuantidade() : 0;
 
 		SituacaoReservaEstoque situacao = null;
@@ -438,17 +419,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 			quantidadeReservada = quantidadePedido;
 			situacao = SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS;
 		}
-		if (itemPedido.getQuantidadeReservada() == null) {
-			itemPedido.setQuantidadeReservada(quantidadeReservada);
-		} else {
-			itemPedido.setQuantidadeReservada(itemPedido.getQuantidadeReservada() + quantidadeReservada);
-		}
+
+		itemPedido.addQuantidadeReservada(quantidadeReservada);
 		pedidoService.inserirItemPedido(itemPedido);
 
-		if (itemEstoque != null) {
+		if (quantidadeEstoque > 0) {
 			itemEstoque.setQuantidade(quantidadeEstoque - quantidadeReservada);
 			itemEstoqueDAO.alterar(itemEstoque);
-			itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
+			
+			if (!itemPedido.contemAlgumaReserva()) {
+				itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
+			}
 		}
 
 		return situacao;

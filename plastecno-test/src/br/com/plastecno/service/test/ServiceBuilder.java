@@ -383,7 +383,6 @@ class ServiceBuilder {
 			Long pesquisarTotalItemPedido(Integer idPedido, Boolean recebido) {
 				List<ItemPedido> lista = REPOSITORY.pesquisarTodos(ItemPedido.class);
 				long count = 0;
-				System.out.println("total de itens do pedido " + idPedido + " : " + lista.size());
 				for (ItemPedido itemPedido : lista) {
 					if (recebido == null && itemPedido.getPedido() != null && itemPedido.getPedido().getId().equals(idPedido)) {
 						count++;

@@ -533,6 +533,10 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException {
 		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdItemPedido(itemPedido.getId());
+		if (idPedido == null) {
+			throw new BusinessException("Não existe pedido cadastrado para o item "
+					+ (itemPedido.isPeca() ? itemPedido.getDescricaoPeca() : itemPedido.getDescricao()));
+		}
 		return inserirItemPedido(idPedido, itemPedido);
 	}
 

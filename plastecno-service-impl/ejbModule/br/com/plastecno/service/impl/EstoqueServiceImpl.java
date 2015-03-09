@@ -177,7 +177,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		Pedido pedido = itemPedido.getPedido();
 
-		long qtdePendente = pedidoService.pesquisarTotalItemPendente(pedido.getId());
+		long qtdePendente = pedidoService.pesquisarTotalItemCompradoNaoRecebido(pedido.getId());
 		if (qtdePendente <= 1) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_RECEBIDA);
 		}
@@ -375,7 +375,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 				&& !SituacaoPedido.REVENDA_ENCOMENDADA.equals(pedido.getSituacaoPedido())
 				&& !SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA.equals(pedido.getSituacaoPedido())) {
 			throw new BusinessException(
-					"O pedido não pode ter seus itens encomendados pois não esta em digitação e não é revenda pendente de encomenda.");
+					"O pedido esta na situação de \""
+							+ pedido.getSituacaoPedido().getDescricao()
+							+ "\" e não pode ter seus itens encomendados pois não esta em digitação e não é revenda pendente de encomenda.");
 		}
 		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 		boolean todosReservados = true;
@@ -424,12 +426,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (quantidadeEstoque > 0) {
 			itemEstoque.setQuantidade(quantidadeEstoque - quantidadeReservada);
 			itemEstoqueDAO.alterar(itemEstoque);
-			
+
 			if (!itemPedido.contemAlgumaReserva()) {
 				itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
 			}
 		}
-		
+
 		itemPedido.addQuantidadeReservada(quantidadeReservada);
 		pedidoService.inserirItemPedido(itemPedido);
 		return situacao;

@@ -380,15 +380,19 @@ class ServiceBuilder {
 			}
 
 			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido, Boolean isItemPendente) {
+			Long pesquisarTotalItemPedido(Integer idPedido, Boolean recebido) {
 				List<ItemPedido> lista = REPOSITORY.pesquisarTodos(ItemPedido.class);
-				long cout = 0;
+				long count = 0;
+				System.out.println("total de itens do pedido " + idPedido + " : " + lista.size());
 				for (ItemPedido itemPedido : lista) {
-					if (itemPedido.getPedido() != null && itemPedido.getPedido().getId().equals(idPedido)) {
-						cout++;
+					if (recebido == null && itemPedido.getPedido() != null && itemPedido.getPedido().getId().equals(idPedido)) {
+						count++;
+					} else if (recebido != null && recebido == itemPedido.isRecebido() && itemPedido.getPedido() != null
+							&& itemPedido.getPedido().getId().equals(idPedido)) {
+						count++;
 					}
 				}
-				return cout;
+				return count;
 			}
 
 			@Mock

@@ -62,7 +62,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemPedido i ");
 		select.append("where i.pedido.situacaoPedido = :situacaoPedido and i.pedido.tipoPedido = :tipoPedido ");
-		select.append("and i.encomendado = false ");
+		select.append("and i.encomendado = false and i.quantidade > i.quantidadeReservada ");
 
 		if (dataInicial != null) {
 			select.append("and i.pedido.dataEnvio >= :dataInicial ");
@@ -101,21 +101,21 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	public List<ItemPedido> pesquisarItemPedidoEmpacotamento(Integer idCliente, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
 		select
-				.append("select i.itemPedido from ItemReservado i where i.itemPedido.pedido.situacaoPedido = :situacaoPedido ");
+				.append("select i from ItemPedido i where i.pedido.situacaoPedido = :situacaoPedido and i.quantidadeReservada > 0 ");
 
 		if (dataInicial != null) {
-			select.append("and i.itemPedido.pedido.dataEnvio >= :dataInicial ");
+			select.append("and i.pedido.dataEnvio >= :dataInicial ");
 		}
 
 		if (dataFinal != null) {
-			select.append("and i.itemPedido.pedido.dataEnvio <= :dataFinal ");
+			select.append("and i.pedido.dataEnvio <= :dataFinal ");
 		}
 
 		if (idCliente != null) {
-			select.append("and i.itemPedido.pedido.cliente.id = :idCliente ");
+			select.append("and i.pedido.cliente.id = :idCliente ");
 		}
 
-		select.append("order by i.itemPedido.pedido.dataEnvio asc ");
+		select.append("order by i.pedido.dataEnvio asc ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("situacaoPedido", SituacaoPedido.EMPACOTAMENTO);

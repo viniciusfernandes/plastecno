@@ -114,6 +114,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void empacotarItemPedido(Integer idItemPedido) {
 		itemReservadoDAO.removerByIdItemPedido(idItemPedido);
+		pedidoService.alterarQuantidadeReservadaByIdItemPedido(idItemPedido);
 		Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
 		if (!contemItemPedidoReservado(idPedido)) {
 			Pedido pedido = pedidoService.pesquisarPedidoById(idPedido);
@@ -393,7 +394,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public SituacaoReservaEstoque reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
 		if (itemPedido.isTodasUnidadesReservadas()) {
-			return SituacaoReservaEstoque.JA_RESERVADO;
+			return SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS;
 		}
 
 		ItemEstoque itemEstoque = null;
@@ -420,9 +421,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 			situacao = SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS;
 		}
 
-		itemPedido.addQuantidadeReservada(quantidadeReservada);
-		pedidoService.inserirItemPedido(itemPedido);
-
 		if (quantidadeEstoque > 0) {
 			itemEstoque.setQuantidade(quantidadeEstoque - quantidadeReservada);
 			itemEstoqueDAO.alterar(itemEstoque);
@@ -431,7 +429,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 				itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
 			}
 		}
-
+		
+		itemPedido.addQuantidadeReservada(quantidadeReservada);
+		pedidoService.inserirItemPedido(itemPedido);
 		return situacao;
 	}
 }

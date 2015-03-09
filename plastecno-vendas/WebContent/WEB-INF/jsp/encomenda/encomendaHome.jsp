@@ -115,10 +115,6 @@ function encomendarItem(campo){
 		</fieldset>
 	</form>
 	
-	<c:if test="${not empty itemPedido}">
-		<jsp:include page="/bloco/bloco_edicao_item_compra.jsp"/>
-	</c:if>
-	
 	<c:if test="${not empty relatorio}">
 		<fieldset>
 		<legend>::: Itens de Pedidos para Comprar :::</legend>

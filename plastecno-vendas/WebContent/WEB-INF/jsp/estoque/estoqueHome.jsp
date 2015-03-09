@@ -34,13 +34,6 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
-	$('#botaoLimparItemPedido').click(function () {
-		$('#bloco_item_pedido input:text').val('');
-		$('#formaMaterial').val('');
-		$('#idItemPedido').val('');
-		habilitarCamposEdicaoItem(true);
-	});
-	
 	$('#botaoInserirItemPedido').click(function () {
 
 		if(isEmpty($('#idItemPedido').val())){
@@ -83,15 +76,6 @@ $(document).ready(function() {
 	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 });
-
-function habilitarCamposEdicaoItem(habilitado){
-	habilitar('#bloco_item_pedido #formaMaterial', habilitado);
-	habilitar('#bloco_item_pedido #descricao', habilitado);
-	habilitar('#bloco_item_pedido #material', habilitado);
-	habilitar('#bloco_item_pedido #medidaExterna', habilitado);
-	habilitar('#bloco_item_pedido #medidaInterna', habilitado);
-	habilitar('#bloco_item_pedido #comprimento', habilitado);
-};
 
 function inicializarAutocompleteMaterial() {
 	autocompletar({

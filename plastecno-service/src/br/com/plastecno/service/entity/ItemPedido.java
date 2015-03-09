@@ -112,6 +112,10 @@ public class ItemPedido extends Item {
 	public ItemPedido() {
 	}
 
+	public ItemPedido(Integer id) {
+		this.id = id;
+	}
+
 	public ItemPedido(FormaMaterial formaMaterial) {
 		this.formaMaterial = formaMaterial;
 	}

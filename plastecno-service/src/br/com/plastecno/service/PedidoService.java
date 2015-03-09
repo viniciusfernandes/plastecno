@@ -18,6 +18,8 @@ import br.com.plastecno.service.wrapper.Periodo;
 @Local
 public interface PedidoService {
 
+	void alterarQuantidadeReservadaByIdItemPedido(Integer idItemPedido);
+
 	void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
 
 	void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido);
@@ -138,9 +140,9 @@ public interface PedidoService {
 
 	long pesquisarTotalItemPendente(Integer idPedido);
 
-	Long pesquisarTotalRegistros(Integer idCliente);
+	Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, boolean isCompra);
 
-	Long pesquisarTotalRegistros(Integer idCliente, Integer idVendedor);
+	Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente);
 
 	List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo);
 

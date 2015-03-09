@@ -88,6 +88,13 @@ public class PedidoServiceImpl implements PedidoService {
 	@EJB
 	private UsuarioService usuarioService;
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarQuantidadeReservadaByIdItemPedido(Integer idItemPedido) {
+		entityManager.createQuery("update ItemPedido i set i.quantidadeReservada = 0 where i.id=:id")
+				.setParameter("id", idItemPedido).executeUpdate();
+	}
+
 	@SuppressWarnings("unchecked")
 	private void alterarSequencialItemPedido(Integer idPedido, Integer sequencial) {
 		if (sequencial != null && sequencial > 0) {
@@ -568,7 +575,8 @@ public class PedidoServiceImpl implements PedidoService {
 		} else {
 			listaPedido = new ArrayList<Pedido>();
 		}
-		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalRegistros(idCliente, idVendedor), listaPedido);
+		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalPedidoByIdCliente(idCliente, idVendedor, isCompra),
+				listaPedido);
 	}
 
 	@Override
@@ -936,29 +944,35 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalRegistros(Integer idCliente) {
-		return this.pesquisarTotalRegistros(idCliente, null);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalRegistros(Integer idCliente, Integer idVendedor) {
+	public Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, boolean isCompra) {
 		if (idCliente == null) {
 			return 0L;
 		}
 
 		StringBuilder select = new StringBuilder("select count(p.id) from Pedido p where p.cliente.id = :idCliente ");
 		if (idVendedor != null) {
-			select.append(" and p.proprietario.id = :idVendedor ");
+			select.append("and p.proprietario.id = :idVendedor ");
+		}
+
+		if (isCompra) {
+			select.append("and p.tipoPedido = :tipoPedido ");
+		} else {
+			select.append("and p.tipoPedido != :tipoPedido ");
 		}
 
 		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idCliente", idCliente);
+		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA);
 		if (idVendedor != null) {
 			query.setParameter("idVendedor", idVendedor);
 		}
 
 		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente) {
+		return this.pesquisarTotalPedidoByIdCliente(idCliente, null, false);
 	}
 
 	@Override

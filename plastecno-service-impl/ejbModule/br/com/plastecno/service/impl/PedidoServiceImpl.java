@@ -938,7 +938,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public long pesquisarTotalItemPendente(Integer idPedido) {
+	public long pesquisarTotalItemCompradoNaoRecebido(Integer idPedido) {
 		return pedidoDAO.pesquisarTotalItemPedido(idPedido, false);
 	}
 

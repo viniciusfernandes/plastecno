@@ -14,6 +14,7 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
@@ -98,11 +99,6 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		try {
-			pedido = pedidoService.inserir(pedido);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
 
 		Representada representada = eBuilder.buildRepresentada();
 		representada.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
@@ -110,6 +106,13 @@ public class EstoqueServiceTest extends AbstractTest {
 			representadaService.inserir(representada);
 		} catch (BusinessException e3) {
 			printMensagens(e3);
+		}
+
+		pedido.setRepresentada(representada);
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
 		}
 
 		Material material = eBuilder.buildMaterial();
@@ -534,32 +537,35 @@ public class EstoqueServiceTest extends AbstractTest {
 	@Test
 	public void testReservaItemEstoqueNaoExistente() {
 		gerarItemEstoque();
-		
-		Pedido pedido = gerarPedido(TipoPedido.REPRESENTACAO);
-		ItemPedido itemPedido = eBuilder.buildItemPedidoPeca();
-		itemPedido.setPedido(pedido);
-		
-		boolean reservado = true;
+
+		ItemPedido itemPedido = gerarItemPedidoRevenda();
+
+		SituacaoReservaEstoque situacaoReservaEstoque = null;
 		try {
-			reservado = estoqueService.reservarItemPedido(itemPedido);
+			situacaoReservaEstoque = estoqueService.reservarItemPedido(itemPedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertFalse("Um item inexistente no estoque nao pode ser reservado", reservado);
+		assertEquals("Um item inexistente no estoque nao pode ser reservado", SituacaoReservaEstoque.NAO_CONTEM_ESTOQUE,
+				situacaoReservaEstoque);
 	}
 
 	@Test
 	public void testReservaItemEstoqueQuantidadeIgualAoItemPedido() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
-		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		ItemPedido itemPedido = gerarItemPedidoRevenda();
+		// Garantindo que o material eh o mesmo para manter a consistencia dos dados
+		// entre item pedido e item estoque.
+		itemPedido.setMaterial(itemEstoque.getMaterial());
 		itemPedido.setQuantidade(itemEstoque.getQuantidade());
-		boolean reservado = true;
+		SituacaoReservaEstoque situacaoReservaEstoque = null;
 		try {
-			reservado = estoqueService.reservarItemPedido(itemPedido);
+			situacaoReservaEstoque = estoqueService.reservarItemPedido(itemPedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertTrue("A quantidade do estoque eh inferior ao pedido, mas pode ser reservado", reservado);
+		assertEquals("A quantidade do estoque eh inferior ao pedido, mas pode ser reservado",
+				SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS, situacaoReservaEstoque);
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(itemEstoque.getId());
 
 		Integer quantidadeEstoque = 0;
@@ -570,15 +576,22 @@ public class EstoqueServiceTest extends AbstractTest {
 	@Test
 	public void testReservaItemEstoqueQuantidadeInferiorAoItemPedido() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
-		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		ItemPedido itemPedido = gerarItemPedidoRevenda();
+
+		// Garantindo que o material eh o mesmo para manter a consistencia dos dados
+		// entre item pedido e item estoque.
+		itemPedido.setFormaMaterial(itemEstoque.getFormaMaterial());
+		itemPedido.setMaterial(itemEstoque.getMaterial());
 		itemPedido.setQuantidade(itemEstoque.getQuantidade() + 1);
-		boolean reservado = true;
+
+		SituacaoReservaEstoque situacaoReservaEstoque = null;
 		try {
-			reservado = estoqueService.reservarItemPedido(itemPedido);
+			situacaoReservaEstoque = estoqueService.reservarItemPedido(itemPedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertTrue("A quantidade do estoque eh inferior ao pedido, mas pode ser reservado", reservado);
+		assertEquals("A quantidade do estoque eh inferior ao pedido, mas pode ser reservado",
+				SituacaoReservaEstoque.UNIDADES_PARCIALEMENTE_RESERVADAS, situacaoReservaEstoque);
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(itemEstoque.getId());
 
 		Integer quantidadeEstoque = 0;
@@ -589,15 +602,20 @@ public class EstoqueServiceTest extends AbstractTest {
 	@Test
 	public void testReservaItemEstoqueQuantidadeSuperiorAoItemPedido() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
-		ItemPedido itemPedido = eBuilder.buildItemPedido();
+
+		ItemPedido itemPedido = gerarItemPedidoRevenda();
+		// Os materiais devem ser o mesmo para manter a consistencia do negocio.
+		itemPedido.setMaterial(itemEstoque.getMaterial());
 		itemPedido.setQuantidade(itemEstoque.getQuantidade() - 1);
-		boolean reservado = true;
+
+		SituacaoReservaEstoque situacaoReservaEstoque = null;
 		try {
-			reservado = estoqueService.reservarItemPedido(itemPedido);
+			situacaoReservaEstoque = estoqueService.reservarItemPedido(itemPedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertTrue("A quantidade do estoque eh inferior ao pedido, mas pode ser reservado", reservado);
+		assertEquals("A quantidade do estoque eh superior ao pedido e deve ser reservado",
+				SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS, situacaoReservaEstoque);
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(itemEstoque.getId());
 
 		Integer quantidadeEstoque = 1;
@@ -624,7 +642,8 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testReservaPedidoComTodosItensExistentesEstoque() {
-		Pedido pedido = gerarPedido(TipoPedido.REVENDA);
+		Pedido pedido = gerarPedido(TipoPedido.COMPRA);
+		Representada representada = pedido.getRepresentada();
 		Material material = gerarMaterial(pedido.getRepresentada().getId());
 
 		ItemPedido item1 = eBuilder.buildItemPedido();
@@ -637,6 +656,8 @@ public class EstoqueServiceTest extends AbstractTest {
 			pedidoService.inserirItemPedido(pedido.getId(), item1);
 			pedidoService.inserirItemPedido(pedido.getId(), item2);
 
+			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+
 			// Inserindo apenas um dos itens para fazermos os testes de pendencia
 			estoqueService.inserirItemPedido(item1.getId());
 			estoqueService.inserirItemPedido(item2.getId());
@@ -644,20 +665,48 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 
-		boolean existe = false;
+		Pedido pedidoRevenda = gerarPedido(TipoPedido.REVENDA);
+		pedidoRevenda.setRepresentada(representada);
+		ItemPedido itemRevenda1 = eBuilder.buildItemPedido();
+		ItemPedido itemRevenda2 = eBuilder.buildItemPedidoPeca();
+
+		itemRevenda1.setMaterial(material);
+		itemRevenda2.setMaterial(material);
+
 		try {
-			existe = estoqueService.reservarItemPedido(pedido.getId());
-		} catch (BusinessException e) {
-			printMensagens(e);
+			pedidoService.inserirItemPedido(pedidoRevenda.getId(), itemRevenda1);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
 		}
-		assertTrue("Todos os itens desse pedido esxistem no estoque", existe);
+
+		try {
+			pedidoService.inserirItemPedido(pedidoRevenda.getId(), itemRevenda2);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(pedidoRevenda.getId(), new byte[] {});
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		assertEquals("Todos os itens desse pedido existem no estoque e deve estar pronto para o empacotamento",
+				SituacaoPedido.EMPACOTAMENTO, pedidoRevenda.getSituacaoPedido());
 	}
 
 	@Test
 	public void testReservaPedidoComUmDosItemNaoExistenteEstoque() {
 		Pedido pedido = gerarPedido(TipoPedido.REVENDA);
+		Material material = gerarMaterial(pedido.getRepresentada().getId());
+
 		ItemPedido item1 = eBuilder.buildItemPedido();
+		item1.setPedido(pedido);
+		item1.setMaterial(material);
+
 		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
+		item2.setPedido(pedido);
+		item2.setMaterial(material);
 
 		try {
 			final Integer idItemPedido = pedidoService.inserirItemPedido(pedido.getId(), item1);
@@ -703,16 +752,25 @@ public class EstoqueServiceTest extends AbstractTest {
 	public void testSituacaoPedidoAposInclusaoVariosItensNoEstoque() {
 		ItemPedido i1 = gerarItemPedidoCompra();
 		// Fabricando um segundo item para facilitar.
-		ItemPedido i2 = gerarItemPedidoRevenda();
+		ItemPedido i2 = gerarItemPedidoCompra();
+		i2.setPedido(i1.getPedido());
+		i2.setMaterial(i1.getMaterial());
 
 		try {
 			pedidoService.inserirItemPedido(i2);
+		} catch (BusinessException e2) {
+			printMensagens(e2);
+		}
+
+		try {
+			// Nesse ponto vamos popular o estoque com o pedido de compras
 			pedidoService.enviarPedido(i1.getPedido().getId(), new byte[] {});
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
 
 		try {
+			// Inserindo no estque o item do pedido de compras
 			estoqueService.inserirItemPedido(i1.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
@@ -724,7 +782,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO, i2.getPedido().getSituacaoPedido());
+		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, i2.getPedido().getSituacaoPedido());
 
 	}
 

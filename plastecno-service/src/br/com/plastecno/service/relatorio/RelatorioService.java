@@ -20,24 +20,26 @@ public interface RelatorioService {
 
 	RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) throws BusinessException;
 
-	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo);
+	List<Pedido> gerarRelatorioCompra(Periodo periodo) throws InformacaoInvalidaException;
+
+	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo);
 
 	RelatorioPedidoPeriodo gerarRelatorioCompraPeriodo(Periodo periodo) throws BusinessException;
+
+	List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException;
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemEncomenda(Integer idCliente, Periodo periodo);
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente, Periodo periodo);
 
+	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEncomendada(Integer idRepresentada, Periodo periodo);
+
+	List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException;
+	
 	RelatorioPedidoPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException;
 
 	RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,
 			Integer idVendedor) throws BusinessException;
 
 	List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor);
-
-	List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException;
-	
-	List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException;
-
-	List<Pedido> gerarRelatorioCompra(Periodo periodo) throws InformacaoInvalidaException;
 }

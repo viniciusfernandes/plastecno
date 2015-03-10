@@ -66,6 +66,14 @@ function empacotarItem(botao){
 	});
 };
 
+function enviarEncomenda(botao){
+	inicializarModalConfirmacao({
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REENVIAR esse item do pedido de ENCOMENDA?',
+		confirmar: function(){
+			submeterForm(botao);
+		}
+	});
+};
 </script>
 </head>
 <body>
@@ -143,7 +151,12 @@ function empacotarItem(botao){
 										<input type="button" value="" title="Incluir o Item no Pacote" 
 										onclick="empacotarItem(this);" class="botaoAdicionar_16" />
 									</form>
-									
+									<form action="<c:url value="/empacotamento/item/reencomenda"/>"
+											method="post">
+											<input type="hidden" name="idItemPedido" value="${item.id}"> 
+											<input type="button" title="Reenviar Item do Pedido para Encomenda" value="" class="botaoRemover"
+												onclick="enviarEncomenda(this);"/>
+										</form>
 								</div>
 							</td>
 						</tr>

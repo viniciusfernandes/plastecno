@@ -13,6 +13,7 @@ import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
 
@@ -119,7 +120,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("tipoPedido", TipoPedido.COMPRA);
-		query.setParameter("situacaoPedido", SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+		query.setParameter("situacaoPedido", SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		return query.getResultList();
 	}
 
@@ -230,9 +231,15 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						.setParameter("idPedido", idPedido), Double.class, 0d);
 	}
 
+	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
+		final String select = "select new Representada(r.id, r.nomeFantasia) from Pedido p inner join p.representada r where p.id = :idPedido";
+		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(select).setParameter("idPedido", idPedido),
+				Representada.class, null);
+	}
+
 	public List<SituacaoPedido> pesquisarSituacaoCompraEfetivada() {
 		List<SituacaoPedido> situacoes = new ArrayList<SituacaoPedido>();
-		situacoes.add(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+		situacoes.add(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		situacoes.add(SituacaoPedido.COMPRA_RECEBIDA);
 		return situacoes;
 	}
@@ -251,9 +258,9 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	public List<SituacaoPedido> pesquisarSituacaoVendaEfetivada() {
 		List<SituacaoPedido> situacoes = new ArrayList<SituacaoPedido>();
 		situacoes.add(SituacaoPedido.REVENDA_ENCOMENDADA);
-		situacoes.add(SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
+		situacoes.add(SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
 		situacoes.add(SituacaoPedido.EMPACOTADO);
-		situacoes.add(SituacaoPedido.EMPACOTAMENTO);
+		situacoes.add(SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO);
 		situacoes.add(SituacaoPedido.ENVIADO);
 		return situacoes;
 	}
@@ -270,15 +277,14 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
-		return (Long) this.entityManager.createQuery("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ")
-				.setParameter("idPedido", idPedido).getSingleResult();
+		return pesquisarTotalItemPedido(idPedido, null);
 	}
 
-	public Long pesquisarTotalItemPedido(Integer idPedido, Boolean isItemPendente) {
+	public Long pesquisarTotalItemPedido(Integer idPedido, Boolean recebido) {
 		StringBuilder select = new StringBuilder();
 		select.append("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ");
-		if (isItemPendente != null && !isItemPendente.booleanValue()) {
-			select.append("and i.recebido = false");
+		if (recebido != null) {
+			select.append("and i.recebido = ").append(recebido);
 		}
 		return (Long) this.entityManager.createQuery(select.toString()).setParameter("idPedido", idPedido)
 				.getSingleResult();

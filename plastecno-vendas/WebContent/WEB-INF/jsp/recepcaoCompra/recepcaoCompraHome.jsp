@@ -50,6 +50,9 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoInserirItemPedido').click(function () {
+		if(isEmpty($('#bloco_item_pedido #idItemPedido').val())){
+			return;
+		}
 		var parametros = $('#bloco_item_pedido').serialize();
 		parametros += '&' + $('#formPesquisa').serialize();
 		var form = $('#formVazio');

@@ -163,7 +163,7 @@ public class EntidadeBuilder {
 	}
 
 	public Representada buildRepresentada() {
-		Representada representada = new Representada(1, "COBEX");
+		Representada representada = new Representada(null, "COBEX");
 		representada.setAtivo(true);
 		representada.setRazaoSocial("COBEX LTDA");
 		representada.setEmail("vendas@cobex.com.br");

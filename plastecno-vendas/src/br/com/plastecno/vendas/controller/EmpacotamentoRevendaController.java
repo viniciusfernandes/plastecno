@@ -24,19 +24,19 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 @Resource
 public class EmpacotamentoRevendaController extends AbstractController {
     @Servico
-    private RepresentadaService representadaService;
-
-    @Servico
-    private RelatorioService relatorioService;
-
-    @Servico
-    private PedidoService pedidoService;
+    private ClienteService clienteService;
 
     @Servico
     private EstoqueService estoqueService;
 
     @Servico
-    private ClienteService clienteService;
+    private PedidoService pedidoService;
+
+    @Servico
+    private RelatorioService relatorioService;
+
+    @Servico
+    private RepresentadaService representadaService;
 
     public EmpacotamentoRevendaController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -82,4 +82,19 @@ public class EmpacotamentoRevendaController extends AbstractController {
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("cliente", cliente);
     }
+
+    @Post("empacotamento/item/reencomenda")
+    public void reencomendarItemPedido(Integer idItemPedido, Cliente cliente, Date dataInicial, Date dataFinal) {
+        try {
+            pedidoService.reencomendarItemPedido(idItemPedido);
+            gerarMensagemSucesso("O item foi enviado para ser reencomendado pelo setor de compras");
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+        addAtributo("permanecerTopo", true); addAtributo("dataInicial", formatarData(dataInicial));
+        addAtributo("dataFinal", formatarData(dataFinal));
+        redirecTo(this.getClass()).pesquisarRevendaEmpacotamento(dataInicial, dataFinal, cliente);
+       
+    }
+
 }

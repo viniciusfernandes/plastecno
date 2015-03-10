@@ -1,4 +1,24 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<script type="text/javascript">
+
+$(document).ready(function() {
+	$('#botaoLimparItemPedido').click(function () {
+		$('#bloco_item_pedido input').val('');
+		$('#formaMaterial').val('');
+		habilitarCamposEdicaoItem(true);
+	});
+});
+
+
+function habilitarCamposEdicaoItem(habilitado){
+	habilitar('#bloco_item_pedido #formaMaterial', habilitado);
+	habilitar('#bloco_item_pedido #descricao', habilitado);
+	habilitar('#bloco_item_pedido #material', habilitado);
+	habilitar('#bloco_item_pedido #medidaExterna', habilitado);
+	habilitar('#bloco_item_pedido #medidaInterna', habilitado);
+	habilitar('#bloco_item_pedido #comprimento', habilitado);
+};
+</script>
 <fieldset id="bloco_item_pedido">
 	<legend>::: Edição do Item de ${not isEstoque ? 'Compra': 'Estoque'} :::</legend>
 	<input type="hidden" id="idMaterial" name="itemPedido.material.id" value="${itemPedido.material.id}"/>

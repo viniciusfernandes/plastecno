@@ -41,6 +41,10 @@ public class ItemReservado {
 		this.itemPedido = itemPedido;
 	}
 
+	public ItemReservado(Integer id, Integer idItemPedido, Integer idItemEstoque) {
+		this(idItemEstoque, idItemPedido, null, idItemEstoque, null);
+	}
+
 	public ItemReservado(Integer id, Integer idItemPedido, Integer quantidadeReservada, Integer idItemEstoque,
 			Integer quantidadeEstoque) {
 		this.id = id;
@@ -51,10 +55,6 @@ public class ItemReservado {
 		itemEstoque = new ItemEstoque();
 		itemEstoque.setId(idItemEstoque);
 		itemEstoque.setQuantidade(quantidadeEstoque);
-	}
-
-	public ItemReservado(Integer id, Integer idItemPedido, Integer idItemEstoque) {
-		this(idItemEstoque, idItemPedido, null, idItemEstoque, null);
 	}
 
 	public Date getDataReserva() {
@@ -71,6 +71,14 @@ public class ItemReservado {
 
 	public ItemPedido getItemPedido() {
 		return itemPedido;
+	}
+
+	public Integer getQuantidadeItemEstoque() {
+		return itemEstoque != null ? itemEstoque.getQuantidade() : null;
+	}
+
+	public Integer getQuantidadeItemPedido() {
+		return itemPedido != null ? itemPedido.getQuantidade() : null;
 	}
 
 	public void setDataReserva(Date dataReserva) {

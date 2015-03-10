@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -19,6 +21,7 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ClienteWrapper;
@@ -98,14 +101,20 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraPendenteRecebimento(Integer idRepresentada,
+	@REVIEW(data = "10/03/2015", descricao = "Devemos implementar uma melhoria o esquema de consulta dos itens de estoque para recuperar apenas a informacao necessaria.")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
 			Periodo periodo) {
-		/*
-		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
-		 * estoque para recuperar apenas a informacao necessaria.
-		 */
-		return gerarRelatorioItensPorPedido("Recepção de Compras para Recebimento",
-				pedidoService.pesquisarCompraPendenteRecebimento(idRepresentada, periodo));
+		return gerarRelatorioItensPorPedido("Pedidos de Compras para Recebimento",
+				pedidoService.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo));
+	}
+
+	@Override
+	@REVIEW(data = "10/03/2015", descricao = "Devemos implementar uma melhoria o esquema de consulta dos itens de estoque para recuperar apenas a informacao necessaria.")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEncomendada(Integer idRepresentada, Periodo periodo) {
+		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Encomendados",
+				pedidoService.pesquisarRevendaEncomendada(idRepresentada, periodo));
 	}
 
 	@Override
@@ -152,6 +161,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		Pedido pedido = null;
 		for (ItemPedido item : listaItem) {
 			pedido = item.getPedido();
+			pedido.setRepresentada(pedidoService.pesquisarRepresentadaResumidaByIdPedido(pedido.getId()));
 
 			item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
 			item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));

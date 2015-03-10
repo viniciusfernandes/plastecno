@@ -32,6 +32,7 @@
 				<li><a href="javascript: void(0)" target="principal_frame">Vendas</a>
 					<ul>
 						<li><a href="pedido" target="principal_frame">Ped. Vendas</a></li>
+						<li><a href="revendaEncomendada" target="principal_frame">Revenda Encomendada</a></li>
 					</ul>
 				</li>
 				<c:if test="${acessoCompraPermitido}">

@@ -10,6 +10,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -18,9 +19,15 @@ import br.com.plastecno.service.wrapper.Periodo;
 @Local
 public interface PedidoService {
 
+	void alterarQuantidadeReservadaByIdItemPedido(Integer idItemPedido);
+
 	void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
 
+	void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido);
+
 	void alterarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido);
+
+	void alterarSituacaoPedidoEncomendadoByIdPedido(Integer idPedido);
 
 	Double calcularValorPedido(Integer idPedido) throws BusinessException;
 
@@ -62,11 +69,11 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
+	List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo);
+
 	Pedido pesquisarCompraById(Integer id);
 
 	List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador) throws BusinessException;
-
-	List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo);
 
 	Date pesquisarDataEnvio(Integer idPedido);
 
@@ -80,7 +87,9 @@ public interface PedidoService {
 
 	Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido);
 
-	List<Integer> pesquisarIdPedidoRevendaPendenteEncomenda();
+	List<Integer> pesquisarIdPedidoRevendaAguardandoEncomenda();
+
+	List<Integer> pesquisarIdPedidoRevendaEncomendada();
 
 	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
 
@@ -112,9 +121,17 @@ public interface PedidoService {
 
 	Usuario pesquisarProprietario(Integer idPedido);
 
+	int pesquisarQuantidadeItemPedido(Integer idItemPedido);
+
+	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
+
 	List<ItemPedido> pesquisarRevendaEmpacotamento();
 
 	List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo);
+
+	List<ItemPedido> pesquisarRevendaEncomendada(Integer idRepresentada, Periodo periodo);
+
+	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 
 	SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido);
 
@@ -124,13 +141,13 @@ public interface PedidoService {
 
 	List<Object[]> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo);
 
+	long pesquisarTotalItemCompradoNaoRecebido(Integer idPedido);
+
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
-	long pesquisarTotalItemPendente(Integer idPedido);
+	Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, boolean isCompra);
 
-	Long pesquisarTotalRegistros(Integer idCliente);
-
-	Long pesquisarTotalRegistros(Integer idCliente, Integer idVendedor);
+	Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente);
 
 	List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo);
 
@@ -143,10 +160,10 @@ public interface PedidoService {
 	List<Pedido> pesquisarVendaByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException;
 
+	void reencomendarItemPedido(Integer idItemPedido) throws BusinessException;
+
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
-
-	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 
 }

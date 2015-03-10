@@ -88,6 +88,13 @@ public class PedidoServiceImpl implements PedidoService {
 	@EJB
 	private UsuarioService usuarioService;
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarQuantidadeReservadaByIdItemPedido(Integer idItemPedido) {
+		entityManager.createQuery("update ItemPedido i set i.quantidadeReservada = 0 where i.id=:id")
+				.setParameter("id", idItemPedido).executeUpdate();
+	}
+
 	@SuppressWarnings("unchecked")
 	private void alterarSequencialItemPedido(Integer idPedido, Integer sequencial) {
 		if (sequencial != null && sequencial > 0) {
@@ -119,8 +126,20 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido) {
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido) {
 		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarSituacaoPedidoEncomendadoByIdPedido(Integer idPedido) {
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
 	}
 
 	@Override
@@ -165,6 +184,10 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean contemItemPedido(Integer idPedido) {
 		return this.pesquisarTotalItemPedido(idPedido) > 0;
+	}
+
+	public boolean contemPedidoItemRevendaAguardandoEncomenda(Integer idItemPedido) {
+		return pesquisarTotalItemRevendaAguardandoEncomenda(idItemPedido) > 0;
 	}
 
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
@@ -220,7 +243,8 @@ public class PedidoServiceImpl implements PedidoService {
 		pedido.setRepresentada(fornecedor);
 		pedido.setSituacaoPedido(SituacaoPedido.COMPRA_ENCOMENDADA);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
-
+		pedido.setTipoEntrega(TipoEntrega.CIF);
+		
 		pedido = inserir(pedido);
 		ItemPedido itemCadastrado = null;
 		ItemPedido itemClone = null;
@@ -231,6 +255,8 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 			itemClone = itemCadastrado.clone();
 			itemClone.setPedido(pedido);
+			itemClone.setQuantidade(itemCadastrado.getQuantidadeEncomendada());
+			itemClone.setQuantidadeReservada(0);
 			try {
 				inserirItemPedido(pedido.getId(), itemClone);
 			} catch (BusinessException e) {
@@ -240,7 +266,10 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 			itemCadastrado.setEncomendado(true);
 			inserirItemPedido(itemCadastrado);
-			alterarSituacaoPedidoEncomendadoByIdItem(itemCadastrado.getId());
+			if (!contemPedidoItemRevendaAguardandoEncomenda(idItemPedido)) {
+				alterarSituacaoPedidoEncomendadoByIdItem(itemCadastrado.getId());
+			}
+
 		}
 		return pedido.getId();
 	}
@@ -289,7 +318,7 @@ public class PedidoServiceImpl implements PedidoService {
 			enviarVenda(pedido, arquivoAnexado);
 		}
 		if (pedido.isCompra()) {
-			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		}
 
 		pedidoDAO.alterar(pedido);
@@ -490,13 +519,13 @@ public class PedidoServiceImpl implements PedidoService {
 		if (itemPedido.isNovo()) {
 			itemPedido.setSequencial(gerarSequencialItemPedido(idPedido));
 		}
-		
+
 		if (itemPedido.isNovo()) {
 			itemPedidoDAO.inserir(itemPedido);
 		} else {
 			itemPedido = itemPedidoDAO.alterar(itemPedido);
 		}
-		
+
 		ValidadorInformacao.validar(itemPedido);
 		/*
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao de
@@ -512,6 +541,10 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException {
 		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdItemPedido(itemPedido.getId());
+		if (idPedido == null) {
+			throw new BusinessException("Não existe pedido cadastrado para o item "
+					+ (itemPedido.isPeca() ? itemPedido.getDescricaoPeca() : itemPedido.getDescricao()));
+		}
 		return inserirItemPedido(idPedido, itemPedido);
 	}
 
@@ -554,7 +587,8 @@ public class PedidoServiceImpl implements PedidoService {
 		} else {
 			listaPedido = new ArrayList<Pedido>();
 		}
-		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalRegistros(idCliente, idVendedor), listaPedido);
+		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalPedidoByIdCliente(idCliente, idVendedor, isCompra),
+				listaPedido);
 	}
 
 	@Override
@@ -589,6 +623,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo) {
+		return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Pedido pesquisarCompraById(Integer id) {
 
 		if (id == null) {
@@ -601,12 +641,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador) throws BusinessException {
 		return pesquisarPedidoEnviadoByPeriodoEProprietario(false, periodo, idComprador, true);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo) {
-		return itemPedidoDAO.pesquisarCompraPendenteRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override
@@ -678,8 +712,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Integer> pesquisarIdPedidoRevendaPendenteEncomenda() {
-		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
+	public List<Integer> pesquisarIdPedidoRevendaAguardandoEncomenda() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdPedidoRevendaEncomendada() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_ENCOMENDADA);
 	}
 
 	@Override
@@ -806,7 +846,7 @@ public class PedidoServiceImpl implements PedidoService {
 		SituacaoPedido situacaoPedido = null;
 
 		if (isCompra) {
-			situacaoPedido = SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO;
+			situacaoPedido = SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO;
 		} else if (!isCompra && orcamento) {
 			situacaoPedido = SituacaoPedido.ORCAMENTO;
 		} else if (!isCompra && !orcamento) {
@@ -847,6 +887,17 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public int pesquisarQuantidadeItemPedido(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
+	}
+
+	@Override
+	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarRepresentadaResumidaByIdPedido(idPedido);
+	}
+
+	@Override
 	public List<ItemPedido> pesquisarRevendaEmpacotamento() {
 		return pesquisarRevendaEmpacotamento(null, null);
 	}
@@ -854,6 +905,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo) {
 		return itemPedidoDAO.pesquisarItemPedidoEmpacotamento(idCliente, periodo.getInicio(), periodo.getFim());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarRevendaEncomendada(Integer idRepresentada, Periodo periodo) {
+		return itemPedidoDAO.pesquisarRevendaEncomendada(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override
@@ -898,41 +955,52 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalItemPedido(Integer idPedido) {
-		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public long pesquisarTotalItemPendente(Integer idPedido) {
+	public long pesquisarTotalItemCompradoNaoRecebido(Integer idPedido) {
 		return pedidoDAO.pesquisarTotalItemPedido(idPedido, false);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalRegistros(Integer idCliente) {
-		return this.pesquisarTotalRegistros(idCliente, null);
+	public Long pesquisarTotalItemPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
+	}
+
+	public Long pesquisarTotalItemRevendaAguardandoEncomenda(Integer idItemPedido) {
+		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
+		return itemPedidoDAO.pesquisarTotalItemRevendaNaoEncomendado(idPedido);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalRegistros(Integer idCliente, Integer idVendedor) {
+	public Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, boolean isCompra) {
 		if (idCliente == null) {
 			return 0L;
 		}
 
 		StringBuilder select = new StringBuilder("select count(p.id) from Pedido p where p.cliente.id = :idCliente ");
 		if (idVendedor != null) {
-			select.append(" and p.proprietario.id = :idVendedor ");
+			select.append("and p.proprietario.id = :idVendedor ");
+		}
+
+		if (isCompra) {
+			select.append("and p.tipoPedido = :tipoPedido ");
+		} else {
+			select.append("and p.tipoPedido != :tipoPedido ");
 		}
 
 		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idCliente", idCliente);
+		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA);
 		if (idVendedor != null) {
 			query.setParameter("idVendedor", idVendedor);
 		}
 
 		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente) {
+		return this.pesquisarTotalPedidoByIdCliente(idCliente, null, false);
 	}
 
 	@Override
@@ -1087,5 +1155,15 @@ public class PedidoServiceImpl implements PedidoService {
 		if (exception.contemMensagem()) {
 			throw exception;
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void reencomendarItemPedido(Integer idItemPedido) throws BusinessException {
+		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
+		ItemPedido itemPedido = pesquisarItemPedido(idItemPedido);
+		itemPedido.setQuantidadeReservada(0);
+		itemPedido.setEncomendado(false);
+		inserirItemPedido(itemPedido);
 	}
 }

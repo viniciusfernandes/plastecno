@@ -5,7 +5,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import br.com.plastecno.service.entity.ItemReservado;
-import br.com.plastecno.service.impl.util.QueryUtil;
 
 public class ItemReservadoDAO extends GenericDAO<ItemReservado> {
 
@@ -21,13 +20,12 @@ public class ItemReservadoDAO extends GenericDAO<ItemReservado> {
 				.setParameter("idItemEstoque", idItemEstoque).getResultList();
 	}
 
-	public ItemReservado pesquisarItemReservadoByIdItemPedido(Integer idItemPedido) {
-		return QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select new ItemReservado(i.id, i.itemPedido.id, i.itemEstoque.id) from ItemReservado i where i.itemPedido.id =:idItemPedido")
-								.setParameter("idItemPedido", idItemPedido), ItemReservado.class, null);
+	@SuppressWarnings("unchecked")
+	public List<ItemReservado> pesquisarItemReservadoByIdItemPedido(Integer idItemPedido) {
+		return entityManager
+				.createQuery(
+						"select new ItemReservado(i.id, i.itemPedido.id, i.itemEstoque.id) from ItemReservado i where i.itemPedido.id =:idItemPedido")
+				.setParameter("idItemPedido", idItemPedido).getResultList();
 	}
 
 	@SuppressWarnings("unchecked")

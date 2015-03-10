@@ -623,8 +623,8 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals("Apos o envio do pedido de compra, seu estado deve ser como pendente",
-				SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO, pedido.getSituacaoPedido());
+		assertEquals("Apos o envio do pedido de compra, seu estado deve ser como aguardando recebimento",
+				SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, pedido.getSituacaoPedido());
 
 	}
 

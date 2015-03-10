@@ -14,7 +14,7 @@ ALTER TABLE vendas.tb_pedido ADD CONSTRAINT id_tipo_pedido FOREIGN KEY (id_tipo_
 insert into vendas.tb_perfil_acesso (id, descricao) values (nextval('vendas.seq_perfil_acesso_id'), 'CADASTRO_PEDIDO_COMPRA');
 
 ALTER TABLE vendas.tb_pedido RENAME id_vendedor TO id_proprietario;
-INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (4, 'COMPRA COM PENDÊNCIA DE RECEBIMENTO');
+INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (4, 'COMPRA AGUARDANDO RECEBIMENTO');
 INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (5, 'COMPRA RECEBIDA');
 ALTER TABLE vendas.tb_item_pedido add item_recebido boolean default false;
 
@@ -52,8 +52,8 @@ ALTER TABLE vendas.tb_representada ADD CONSTRAINT id_tipo_relacionamento FOREIGN
 
 update vendas.tb_representada set id_tipo_relacionamento = 3 where nome_fantasia = 'PLASTECNO MATRIZ';
 
-INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (6, 'PEDIDO PARA EMPACOTAR');
-INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (7, 'REVENDA COM PENDENCIA DE ENCOMENDA');
+INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (6, 'REVENDA AGUARDANDO EMPACOTAMENTO');
+INSERT INTO VENDAS.TB_SITUACAO_PEDIDO VALUES (7, 'REVENDA AGUARDANDO ENCOMENDA');
 
 
 create table vendas.tb_item_reservado (

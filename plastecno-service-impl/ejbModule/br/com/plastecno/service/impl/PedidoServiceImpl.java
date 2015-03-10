@@ -186,6 +186,10 @@ public class PedidoServiceImpl implements PedidoService {
 		return this.pesquisarTotalItemPedido(idPedido) > 0;
 	}
 
+	public boolean contemPedidoItemRevendaAguardandoEncomenda(Integer idItemPedido) {
+		return pesquisarTotalItemRevendaAguardandoEncomenda(idItemPedido) > 0;
+	}
+
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
 	private void definirTipoPedido(Pedido pedido) {
 		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
@@ -261,7 +265,10 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 			itemCadastrado.setEncomendado(true);
 			inserirItemPedido(itemCadastrado);
-			alterarSituacaoPedidoEncomendadoByIdItem(itemCadastrado.getId());
+			if (!contemPedidoItemRevendaAguardandoEncomenda(idItemPedido)) {
+				alterarSituacaoPedidoEncomendadoByIdItem(itemCadastrado.getId());
+			}
+
 		}
 		return pedido.getId();
 	}
@@ -310,7 +317,7 @@ public class PedidoServiceImpl implements PedidoService {
 			enviarVenda(pedido, arquivoAnexado);
 		}
 		if (pedido.isCompra()) {
-			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO);
+			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		}
 
 		pedidoDAO.alterar(pedido);
@@ -615,6 +622,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo) {
+		return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Pedido pesquisarCompraById(Integer id) {
 
 		if (id == null) {
@@ -627,12 +640,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador) throws BusinessException {
 		return pesquisarPedidoEnviadoByPeriodoEProprietario(false, periodo, idComprador, true);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo) {
-		return itemPedidoDAO.pesquisarCompraPendenteRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override
@@ -704,14 +711,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Integer> pesquisarIdPedidoRevendaEncomendada() {
-		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_ENCOMENDADA);
+	public List<Integer> pesquisarIdPedidoRevendaAguardandoEncomenda() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Integer> pesquisarIdPedidoRevendaPendenteEncomenda() {
-		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
+	public List<Integer> pesquisarIdPedidoRevendaEncomendada() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_ENCOMENDADA);
 	}
 
 	@Override
@@ -838,7 +845,7 @@ public class PedidoServiceImpl implements PedidoService {
 		SituacaoPedido situacaoPedido = null;
 
 		if (isCompra) {
-			situacaoPedido = SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO;
+			situacaoPedido = SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO;
 		} else if (!isCompra && orcamento) {
 			situacaoPedido = SituacaoPedido.ORCAMENTO;
 		} else if (!isCompra && !orcamento) {
@@ -885,6 +892,11 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarRepresentadaResumidaByIdPedido(idPedido);
+	}
+
+	@Override
 	public List<ItemPedido> pesquisarRevendaEmpacotamento() {
 		return pesquisarRevendaEmpacotamento(null, null);
 	}
@@ -892,6 +904,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo) {
 		return itemPedidoDAO.pesquisarItemPedidoEmpacotamento(idCliente, periodo.getInicio(), periodo.getFim());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarRevendaEncomendada(Integer idRepresentada, Periodo periodo) {
+		return itemPedidoDAO.pesquisarRevendaEncomendada(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override
@@ -936,14 +954,19 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalItemPedido(Integer idPedido) {
-		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
+	public long pesquisarTotalItemCompradoNaoRecebido(Integer idPedido) {
+		return pedidoDAO.pesquisarTotalItemPedido(idPedido, false);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public long pesquisarTotalItemCompradoNaoRecebido(Integer idPedido) {
-		return pedidoDAO.pesquisarTotalItemPedido(idPedido, false);
+	public Long pesquisarTotalItemPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
+	}
+
+	public Long pesquisarTotalItemRevendaAguardandoEncomenda(Integer idItemPedido) {
+		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
+		return itemPedidoDAO.pesquisarTotalItemRevendaNaoEncomendado(idPedido);
 	}
 
 	@Override

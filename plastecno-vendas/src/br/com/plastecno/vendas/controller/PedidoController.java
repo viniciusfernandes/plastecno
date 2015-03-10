@@ -361,13 +361,14 @@ public class PedidoController extends AbstractController {
         } else {
             SituacaoPedido situacao = pedido.getSituacaoPedido();
             boolean isCompraFinalizada = pedido.isCompra()
-                    && (SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
+                    && (SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
                             .equals(situacao));
             boolean isVendaFinalizada = pedido.isVenda()
                     && (SituacaoPedido.ENVIADO.equals(situacao)
-                            || SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA.equals(situacao)
-                            || SituacaoPedido.EMPACOTAMENTO.equals(situacao)
-                            || SituacaoPedido.EMPACOTADO.equals(situacao) || SituacaoPedido.COMPRA_ENCOMENDADA.equals(situacao) || SituacaoPedido.REVENDA_ENCOMENDADA
+                            || SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA.equals(situacao)
+                            || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao)
+                            || SituacaoPedido.EMPACOTADO.equals(situacao)
+                            || SituacaoPedido.COMPRA_ENCOMENDADA.equals(situacao) || SituacaoPedido.REVENDA_ENCOMENDADA
                                 .equals(situacao));
             return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
         }
@@ -533,21 +534,21 @@ public class PedidoController extends AbstractController {
 
             // Condicao indicadora para reenvio do pedido
             final boolean acessoReenvioPedidoPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO)
-                    && (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO
+                    && (SituacaoPedido.ENVIADO.equals(situacao) || SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO
                             .equals(situacao));
 
             // Condicao indicadora de que apenas o administrador podera cancelar
             // pedidos ja enviados
             final boolean acessoCancelamentoPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao)
-                    || SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacao)
-                    || SituacaoPedido.EMPACOTAMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
+                    || SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacao)
+                    || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
                         .equals(situacao))
                     && !SituacaoPedido.CANCELADO.equals(situacao)
                     && isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
 
             final boolean acessoRefazerPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao)
-                    || SituacaoPedido.EMPACOTAMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao)
-                    || SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO
+                    || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao)
+                    || SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO
                         .equals(situacao)) && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO);
 
             liberarAcesso("pedidoDesabilitado", isPedidoDesabilitado(pedido));

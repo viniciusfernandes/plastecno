@@ -321,7 +321,7 @@ public class Pedido implements Serializable, Cloneable {
 	}
 
 	public boolean isCompraEfetuada() {
-		return SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacaoPedido)
+		return SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)
 				|| SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido);
 	}
 
@@ -347,6 +347,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public boolean isVenda() {
 		return isRevenda() || isRepresentacao();
+	}
+
+	public boolean isRevendaEncomendada() {
+		return TipoPedido.REVENDA.equals(tipoPedido) && SituacaoPedido.REVENDA_ENCOMENDADA.equals(situacaoPedido);
 	}
 
 	public void setCliente(Cliente cliente) {

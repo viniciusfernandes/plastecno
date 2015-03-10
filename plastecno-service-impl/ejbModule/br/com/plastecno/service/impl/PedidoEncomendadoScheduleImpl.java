@@ -40,7 +40,7 @@ public class PedidoEncomendadoScheduleImpl implements PedidoEncomendadoSchedule 
 		logger.info("Inicializando o monitoramento dos itens de pedidos encomendados aguardando reserva");
 	}
 
-	@Schedule(second = "*/60", minute = "*", hour = "*")
+	@Schedule(hour = "*/1")
 	public void reservarItemPedidoEncomendadoEstoque() throws BusinessException {
 		List<Integer> listaItem = pedidoService.pesquisarIdPedidoRevendaEncomendada();
 		boolean todosItensReservados = false;
@@ -49,7 +49,7 @@ public class PedidoEncomendadoScheduleImpl implements PedidoEncomendadoSchedule 
 			// encomendado mesmo apos o processamento do agendamento, caso contrario
 			// teremos inconsistencia no estado do pedido podendo retornar ao fluxo de
 			// Aqui estamos garantindo que mesmo que o pedido permaneca como
-			// revenda pendente de encomenda, mas ele ja passou por essa etapa.
+			// revenda aguardando encomenda, mas ele ja passou por essa etapa.
 			if (!todosItensReservados) {
 				pedidoService.alterarSituacaoPedidoEncomendadoByIdPedido(idPedido);
 			}

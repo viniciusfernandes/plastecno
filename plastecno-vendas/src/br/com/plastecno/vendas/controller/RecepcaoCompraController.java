@@ -60,15 +60,15 @@ public class RecepcaoCompraController extends AbstractController {
             gerarListaMensagemErro(e);
         }
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarCompraPendenteRecebimento(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao/listagem")
-    public void pesquisarCompraPendenteRecebimento(Date dataInicial, Date dataFinal, Integer idRepresentada) {
+    public void pesquisarCompraAguardandoRecebimento(Date dataInicial, Date dataFinal, Integer idRepresentada) {
 
         try {
             Periodo periodo = new Periodo(dataInicial, dataFinal);
-            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraPendenteRecebimento(
+            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraAguardandoRecebimento(
                     idRepresentada, periodo);
 
             addAtributo("relatorio", relatorio);
@@ -100,7 +100,7 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("idRepresentadaSelecionada", idRepresentada);
-        redirecTo(this.getClass()).pesquisarCompraPendenteRecebimento(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao")
@@ -119,7 +119,7 @@ public class RecepcaoCompraController extends AbstractController {
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
-        redirecTo(this.getClass()).pesquisarCompraPendenteRecebimento(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Post("compra/item/remocao")
@@ -129,6 +129,6 @@ public class RecepcaoCompraController extends AbstractController {
         } catch (BusinessException e) {
             this.gerarListaMensagemErro(e);
         }
-        redirecTo(this.getClass()).pesquisarCompraPendenteRecebimento(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 }

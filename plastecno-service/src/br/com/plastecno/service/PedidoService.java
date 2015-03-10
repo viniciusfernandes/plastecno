@@ -10,6 +10,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -68,11 +69,11 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
+	List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo);
+
 	Pedido pesquisarCompraById(Integer id);
 
 	List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador) throws BusinessException;
-
-	List<ItemPedido> pesquisarCompraPendenteRecebimento(Integer idRepresentada, Periodo periodo);
 
 	Date pesquisarDataEnvio(Integer idPedido);
 
@@ -86,9 +87,9 @@ public interface PedidoService {
 
 	Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido);
 
-	List<Integer> pesquisarIdPedidoRevendaEncomendada();
+	List<Integer> pesquisarIdPedidoRevendaAguardandoEncomenda();
 
-	List<Integer> pesquisarIdPedidoRevendaPendenteEncomenda();
+	List<Integer> pesquisarIdPedidoRevendaEncomendada();
 
 	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
 
@@ -126,6 +127,8 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo);
 
+	List<ItemPedido> pesquisarRevendaEncomendada(Integer idRepresentada, Periodo periodo);
+
 	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 
 	SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido);
@@ -136,9 +139,9 @@ public interface PedidoService {
 
 	List<Object[]> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo);
 
-	Long pesquisarTotalItemPedido(Integer idPedido);
-
 	long pesquisarTotalItemCompradoNaoRecebido(Integer idPedido);
+
+	Long pesquisarTotalItemPedido(Integer idPedido);
 
 	Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, boolean isCompra);
 
@@ -158,5 +161,7 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
+
+	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
 
 }

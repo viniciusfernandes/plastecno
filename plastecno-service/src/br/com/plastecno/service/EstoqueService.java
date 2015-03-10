@@ -45,4 +45,6 @@ public interface EstoqueService {
 	boolean reservarItemPedido(Integer idPedido) throws BusinessException;
 
 	SituacaoReservaEstoque reservarItemPedido(ItemPedido itemPedido) throws BusinessException;
+
+	boolean enviarPedidoEmpacotamento(Integer idPedido) throws BusinessException;
 }

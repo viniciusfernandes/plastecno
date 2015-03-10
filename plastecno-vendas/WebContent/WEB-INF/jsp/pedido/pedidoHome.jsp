@@ -270,7 +270,7 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio" style="width: 11%">Representada:</div>
+			<div class="label obrigatorio" style="width: 11%">${not empty tipoPedido ? 'Fornecedor:': 'Representada:'}</div>
 			<div class="input" style="width: 50%">
 				<select id="representada" name="pedido.representada.id"
 					style="width: 80%">

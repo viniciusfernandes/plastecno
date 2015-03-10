@@ -83,7 +83,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public void devolverItemCompradoEstoqueByIdPedido(Integer idPedido) throws BusinessException {
 		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
 		if (!SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido)
-				&& !SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO.equals(situacaoPedido)) {
+				&& !SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
 			throw new BusinessException("A devolução é permitida apenas para os itens de pedido de compra já efetuados");
 		}
 		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
@@ -121,6 +121,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 			pedido.setSituacaoPedido(SituacaoPedido.EMPACOTADO);
 		}
 	}
+	
+	
 
 	private ItemEstoque gerarItemEstoque(ItemPedido itemPedido) {
 
@@ -373,7 +375,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())
 				&& !SituacaoPedido.REVENDA_ENCOMENDADA.equals(pedido.getSituacaoPedido())
-				&& !SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA.equals(pedido.getSituacaoPedido())) {
+				&& !SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA.equals(pedido.getSituacaoPedido())) {
 			throw new BusinessException(
 					"O pedido esta na situação de \""
 							+ pedido.getSituacaoPedido().getDescricao()
@@ -386,10 +388,20 @@ public class EstoqueServiceImpl implements EstoqueService {
 			situacaoReserva = reservarItemPedido(itemPedido);
 			todosReservados &= SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS.equals(situacaoReserva);
 		}
-		pedido
-				.setSituacaoPedido(todosReservados ? SituacaoPedido.EMPACOTAMENTO : SituacaoPedido.REVENDA_PENDENTE_ENCOMENDA);
+		pedido.setSituacaoPedido(todosReservados ? SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO
+				: SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
 		pedidoService.inserir(pedido);
 		return todosReservados;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public boolean enviarPedidoEmpacotamento(Integer idPedido) throws BusinessException {
+		boolean empacotamentoOk = reservarItemPedido(idPedido);
+		if (!empacotamentoOk) {
+			pedidoService.alterarSituacaoPedidoEncomendadoByIdPedido(idPedido);
+		}
+		return empacotamentoOk;
 	}
 
 	@Override

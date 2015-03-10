@@ -243,7 +243,8 @@ public class PedidoServiceImpl implements PedidoService {
 		pedido.setRepresentada(fornecedor);
 		pedido.setSituacaoPedido(SituacaoPedido.COMPRA_ENCOMENDADA);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
-
+		pedido.setTipoEntrega(TipoEntrega.CIF);
+		
 		pedido = inserir(pedido);
 		ItemPedido itemCadastrado = null;
 		ItemPedido itemClone = null;
@@ -1154,5 +1155,15 @@ public class PedidoServiceImpl implements PedidoService {
 		if (exception.contemMensagem()) {
 			throw exception;
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void reencomendarItemPedido(Integer idItemPedido) throws BusinessException {
+		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
+		ItemPedido itemPedido = pesquisarItemPedido(idItemPedido);
+		itemPedido.setQuantidadeReservada(0);
+		itemPedido.setEncomendado(false);
+		inserirItemPedido(itemPedido);
 	}
 }

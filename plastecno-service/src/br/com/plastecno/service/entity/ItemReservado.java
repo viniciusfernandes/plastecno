@@ -32,9 +32,6 @@ public class ItemReservado {
 	@JoinColumn(name = "id_item_pedido", referencedColumnName = "id", nullable = false)
 	private ItemPedido itemPedido;
 
-	@Column(name = "quantidade_reservada")
-	private int quantidadeReservada;
-
 	public ItemReservado() {
 	}
 
@@ -84,10 +81,6 @@ public class ItemReservado {
 		return itemPedido != null ? itemPedido.getQuantidade() : null;
 	}
 
-	public int getQuantidadeReservada() {
-		return quantidadeReservada;
-	}
-
 	public void setDataReserva(Date dataReserva) {
 		this.dataReserva = dataReserva;
 	}
@@ -102,10 +95,6 @@ public class ItemReservado {
 
 	public void setItemPedido(ItemPedido itemPedido) {
 		this.itemPedido = itemPedido;
-	}
-
-	public void setQuantidadeReservada(int quantidadeReservada) {
-		this.quantidadeReservada = quantidadeReservada;
 	}
 
 }

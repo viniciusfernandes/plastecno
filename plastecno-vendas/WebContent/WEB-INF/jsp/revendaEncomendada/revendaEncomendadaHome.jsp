@@ -120,7 +120,7 @@ function enviarEmpacotamento(botao){
 									</form>
 									<form action="<c:url value="/revendaEncomendada/empacotamento"/>" method="post" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
-										<input type="button" value="" title="Enviar Item para o Empacotamento" 
+										<input type="button" value="" title="Enviar Pedido para o Empacotamento" 
 										onclick="enviarEmpacotamento(this);" class="botaoAdicionar_16" />
 									</form>
 									<form action="<c:url value="/revendaEncomendada/edicao"/>" method="post">

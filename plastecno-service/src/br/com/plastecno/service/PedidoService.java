@@ -123,6 +123,8 @@ public interface PedidoService {
 
 	int pesquisarQuantidadeItemPedido(Integer idItemPedido);
 
+	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
+
 	List<ItemPedido> pesquisarRevendaEmpacotamento();
 
 	List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo);
@@ -158,10 +160,10 @@ public interface PedidoService {
 	List<Pedido> pesquisarVendaByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException;
 
+	void reencomendarItemPedido(Integer idItemPedido) throws BusinessException;
+
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
-
-	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
 
 }

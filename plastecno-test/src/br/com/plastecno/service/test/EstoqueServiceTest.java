@@ -775,7 +775,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals(SituacaoPedido.COMPRA_PENDENTE_RECEBIMENTO, i1.getPedido().getSituacaoPedido());
+		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, i1.getPedido().getSituacaoPedido());
 
 		try {
 			estoqueService.inserirItemPedido(i2.getId());

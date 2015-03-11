@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_6.xsd" id="Application_ID" version="6">
-  <display-name>teste</display-name>
+  <display-name>plastecno-sistema-teste</display-name>
   <module>
     <web>
       <web-uri>plastecno-vendas-teste.war</web-uri>

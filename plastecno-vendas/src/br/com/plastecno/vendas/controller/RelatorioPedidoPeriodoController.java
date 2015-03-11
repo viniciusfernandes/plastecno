@@ -6,6 +6,8 @@ import java.util.List;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.interceptor.download.Download;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
@@ -82,4 +84,10 @@ public class RelatorioPedidoPeriodoController extends AbstractController {
 
         configurarFiltroPediodoMensal();
     }
+
+    @Get("relatorio/pedido/pdf")
+    public Download downloadPedidoPDF(Integer idPedido, TipoPedido tipoPedido) {
+        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, tipoPedido);
+    }
+
 }

@@ -205,7 +205,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		if (idRepresentada != null) {
-			select.append("and r.id = :idRepresentada ");
+			select.append("and i.pedido.representada.id = :idRepresentada ");
 		}
 
 		select.append("order by i.pedido.dataEnvio asc ");

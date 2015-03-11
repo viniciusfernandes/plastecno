@@ -90,7 +90,7 @@ function inicializarBlocoItemPedido(urlTela) {
 
 				var request = $.ajax({
 					type : 'get',
-					url : '/vendas/pedido/item/' + linha.cells[0].innerHTML
+					url : '<c:url value="/pedido/item/"/>' + linha.cells[0].innerHTML
 				});
 
 				request.done(function(response) {
@@ -420,7 +420,7 @@ function habilitarIPI(idRepresentada) {
 	}
 	var request = $.ajax({
 		type : 'get',
-		url : '/vendas/pedido/representada/' + idRepresentada + '/aliquotaIPI/'
+		url : '<c:url value="/pedido/representada/"/>' + idRepresentada + '/aliquotaIPI/'
 	});
 
 	request.done(function(response) {

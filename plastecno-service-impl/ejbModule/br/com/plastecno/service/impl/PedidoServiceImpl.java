@@ -244,7 +244,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedido.setSituacaoPedido(SituacaoPedido.COMPRA_ENCOMENDADA);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
 		pedido.setTipoEntrega(TipoEntrega.CIF);
-		
+
 		pedido = inserir(pedido);
 		ItemPedido itemCadastrado = null;
 		ItemPedido itemClone = null;
@@ -833,7 +833,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		StringBuilder select = new StringBuilder()
-				.append("select p from Pedido p join fetch p.representada where p.situacaoPedido = :situacaoPedido and ")
+				.append("select p from Pedido p join fetch p.representada where p.situacaoPedido IN :situacoes and ")
 				.append("p.proprietario.id = :idProprietario and ").append(" p.dataEnvio >= :dataInicio and ")
 				.append(" p.dataEnvio <= :dataFim ");
 
@@ -843,16 +843,16 @@ public class PedidoServiceImpl implements PedidoService {
 			select.append(" and p.tipoPedido != :tipoPedido ");
 		}
 		select.append("order by p.dataEnvio desc ");
-		SituacaoPedido situacaoPedido = null;
+		List<SituacaoPedido> situacoes = new ArrayList<SituacaoPedido>();
 
 		if (isCompra) {
-			situacaoPedido = SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO;
+			situacoes.addAll(pesquisarSituacaoCompraEfetivada());
 		} else if (!isCompra && orcamento) {
-			situacaoPedido = SituacaoPedido.ORCAMENTO;
+			situacoes.add(SituacaoPedido.ORCAMENTO);
 		} else if (!isCompra && !orcamento) {
-			situacaoPedido = SituacaoPedido.ENVIADO;
+			situacoes.addAll(pesquisarSituacaoVendaEfetivada());
 		}
-		return this.entityManager.createQuery(select.toString()).setParameter("situacaoPedido", situacaoPedido)
+		return this.entityManager.createQuery(select.toString()).setParameter("situacoes", situacoes)
 				.setParameter("idProprietario", idProprietario).setParameter("dataInicio", periodo.getInicio())
 				.setParameter("dataFim", periodo.getFim()).setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
 	}

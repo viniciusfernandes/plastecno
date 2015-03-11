@@ -60,7 +60,7 @@ $(document).ready(function() {
 	});
 
 	$("#representada").change(function() {
-		habilitarIPI($(this).val());	
+		habilitarIPI('<c:url value="/pedido"/>', $(this).val());	
 	});
 	
 	$("#botaoImpressaoPedido").click(function() {

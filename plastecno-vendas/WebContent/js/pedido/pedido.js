@@ -90,7 +90,7 @@ function inicializarBlocoItemPedido(urlTela) {
 
 				var request = $.ajax({
 					type : 'get',
-					url : '<c:url value="/pedido/item/"/>' + linha.cells[0].innerHTML
+					url : tabelaItemHandler.urlTela + '/item/' + linha.cells[0].innerHTML
 				});
 
 				request.done(function(response) {
@@ -414,13 +414,13 @@ function preencherComboTransportadora(combo, listaTransportadora) {
 	}
 }
 
-function habilitarIPI(idRepresentada) {
+function habilitarIPI(urlTela, idRepresentada) {
 	if(isEmpty(idRepresentada)){
 		return;
 	}
 	var request = $.ajax({
 		type : 'get',
-		url : '<c:url value="/pedido/representada/"/>' + idRepresentada + '/aliquotaIPI/'
+		url : urlTela + '/representada/' + idRepresentada + '/aliquotaIPI/'
 	});
 
 	request.done(function(response) {

@@ -41,7 +41,7 @@ public class PedidoEncomendadoScheduleImpl implements PedidoEncomendadoSchedule 
 		logger.info("Inicializando o monitoramento dos itens de pedidos encomendados aguardando reserva");
 	}
 
-	@Schedule(hour = "*/1")
+	@Schedule(hour = "*")
 	public void reservarItemPedidoEncomendadoEstoque() throws BusinessException {
 		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoRevendaEncomendada();
 		logger.info("Monitor de itens de pedido encomendados disparou a reserva dos itens. Existem pedidos: "

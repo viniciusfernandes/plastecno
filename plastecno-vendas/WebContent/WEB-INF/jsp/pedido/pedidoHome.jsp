@@ -185,7 +185,7 @@ $(document).ready(function() {
 					<div class="label" style="width: 10%">Situação:</div>
 					<div class="input" style="width: 20%">
 						<input type="text" id="situacaoPedido" name="pedido.situacaoPedido"
-							value="${pedido.situacaoPedido.descricao}" class="desabilitado"/>
+							value="${pedido.situacaoPedido}" class="desabilitado"/>
 					</div>
 				</c:when>
 			</c:choose>

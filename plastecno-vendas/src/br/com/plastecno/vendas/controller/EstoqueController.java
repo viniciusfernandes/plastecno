@@ -123,4 +123,8 @@ public class EstoqueController extends AbstractController {
         }
         serializarJson(new SerializacaoJson("lista", lista));
     }
+
+    @Post("estoque/item/recorte")
+    public void recortarItemEstoque() {
+    }
 }

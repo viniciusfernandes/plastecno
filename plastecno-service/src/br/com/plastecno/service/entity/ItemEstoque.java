@@ -78,6 +78,18 @@ public class ItemEstoque extends Item {
 		return this.quantidade != null && this.precoMedio != null ? this.quantidade * this.precoMedio : 0d;
 	}
 
+	@Override
+	public ItemEstoque clone() {
+		ItemEstoque clone;
+		try {
+			clone = (ItemEstoque) super.clone();
+			clone.setId(null);
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new IllegalStateException("Falha ao clonar o item de estoque " + getId(), e);
+		}
+	}
+
 	public boolean contemLargura() {
 		return this.formaMaterial != null && this.formaMaterial.contemLargura();
 	}

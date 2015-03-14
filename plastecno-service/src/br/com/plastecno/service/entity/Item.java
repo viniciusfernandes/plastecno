@@ -104,6 +104,8 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public abstract FormaMaterial getFormaMaterial();
 
+	public abstract Integer getId();
+
 	public abstract Material getMaterial();
 
 	public abstract Double getMedidaExterna();
@@ -193,6 +195,8 @@ public abstract class Item implements Serializable, Cloneable {
 	public abstract void setDescricaoPeca(String descricaoPeca);
 
 	public abstract void setFormaMaterial(FormaMaterial formaMaterial);
+
+	public abstract void setId(Integer id);
 
 	public abstract void setMaterial(Material material);
 

@@ -112,30 +112,20 @@ public class ItemPedido extends Item {
 	public ItemPedido() {
 	}
 
-	public ItemPedido(Integer id) {
-		this.id = id;
-	}
-
 	public ItemPedido(FormaMaterial formaMaterial) {
 		this.formaMaterial = formaMaterial;
 	}
 
-	public double calcularPrecoTotal() {
-		return this.quantidade != null && this.precoVenda != null ? this.quantidade * this.precoVenda : 0d;
+	public ItemPedido(Integer id) {
+		this.id = id;
 	}
 
-	@Override
-	public ItemPedido clone() {
-		ItemPedido clone;
-		try {
-			clone = (ItemPedido) super.clone();
-			clone.setId(null);
-			clone.setPedido(null);
-			clone.setRecebido(false);
-			return clone;
-		} catch (CloneNotSupportedException e) {
-			throw new IllegalStateException("Falha ao clonar o item de pedido " + getId(), e);
-		}
+	public void addQuantidadeReservada(Integer quantidadeReservada) {
+		setQuantidadeReservada(getQuantidadeReservada() + quantidadeReservada);
+	}
+
+	public double calcularPrecoTotal() {
+		return this.quantidade != null && this.precoVenda != null ? this.quantidade * this.precoVenda : 0d;
 	}
 
 	public boolean contemAlgumaReserva() {
@@ -334,10 +324,6 @@ public class ItemPedido extends Item {
 		this.quantidadeReservada = quantidadeReservada;
 	}
 
-	public void addQuantidadeReservada(Integer quantidadeReservada) {
-		setQuantidadeReservada(getQuantidadeReservada() + quantidadeReservada);
-	}
-
 	public void setRecebido(boolean recebido) {
 		this.recebido = recebido;
 	}
@@ -348,5 +334,18 @@ public class ItemPedido extends Item {
 
 	public void setTipoVenda(TipoVenda tipoVenda) {
 		this.tipoVenda = tipoVenda;
+	}
+	@Override
+	public ItemPedido clone() {
+		ItemPedido clone;
+		try {
+			clone = (ItemPedido) super.clone();
+			clone.setId(null);
+			clone.setPedido(null);
+			clone.setRecebido(false);
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new IllegalStateException("Falha ao clonar o item de pedido " + getId(), e);
+		}
 	}
 }

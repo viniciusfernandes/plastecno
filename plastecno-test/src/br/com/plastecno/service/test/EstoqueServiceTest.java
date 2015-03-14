@@ -1,8 +1,10 @@
 package br.com.plastecno.service.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import javax.validation.constraints.AssertTrue;
 
 import org.junit.Test;
 
@@ -225,6 +227,149 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+	}
+
+	@Test
+	public void testRecortarPecaEstoque() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		itemEstoque.setFormaMaterial(FormaMaterial.PC);
+		boolean throwed = false;
+		try {
+			estoqueService.recortarItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Nao se pode recortar uma peca do estoque", throwed);
+	}
+
+	@Test
+	public void testRecortarItemEstoqueInexistente() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		ItemEstoque itemRecortado = new ItemEstoque();
+		// Alterando o ID para simular uma pesquisa de um item inexistente no
+		// estoque.
+		itemRecortado.setId(itemEstoque.getId() + 1);
+		boolean throwed = false;
+		try {
+			estoqueService.recortarItemEstoque(itemRecortado);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("Nao se pode recortar um item que nao existe no estoque", throwed);
+	}
+
+	@Test
+	public void testRecortarItemEstoqueMedidaExternaInvalida() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		ItemEstoque itemRecortado = itemEstoque.clone();
+
+		itemRecortado.setId(itemEstoque.getId());
+		itemRecortado.setMedidaExterna(itemEstoque.getMedidaExterna() + 1);
+
+		boolean throwed = false;
+		try {
+			estoqueService.recortarItemEstoque(itemRecortado);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A medida externa recortada eh superior a medida do estoque", throwed);
+	}
+
+	@Test
+	public void testRecortarItemEstoqueMedidaInternaInvalida() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		ItemEstoque itemRecortado = itemEstoque.clone();
+
+		itemRecortado.setId(itemEstoque.getId());
+		itemRecortado.setMedidaInterna(itemEstoque.getMedidaInterna() + 1);
+
+		boolean throwed = false;
+		try {
+			estoqueService.recortarItemEstoque(itemRecortado);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A medida interna recortada eh superior a medida do estoque", throwed);
+	}
+
+	@Test
+	public void testRecortarItemEstoqueComprimentoInvalido() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		ItemEstoque itemRecortado = itemEstoque.clone();
+
+		itemRecortado.setId(itemEstoque.getId());
+		itemRecortado.setComprimento(itemEstoque.getComprimento() + 1);
+
+		boolean throwed = false;
+		try {
+			estoqueService.recortarItemEstoque(itemRecortado);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A comprimento recortado eh superior ao comprimento do estoque", throwed);
+	}
+
+	@Test
+	public void testRecortarItemEstoqueQuantidadeInvalida() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		ItemEstoque itemRecortado = itemEstoque.clone();
+
+		itemRecortado.setId(itemEstoque.getId());
+		itemRecortado.setQuantidade(itemEstoque.getQuantidade() + 1);
+		boolean throwed = false;
+		try {
+			estoqueService.recortarItemEstoque(itemRecortado);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A quantidade do item recortado nao pode ser superior ao item do estoque", throwed);
+	}
+
+	@Test
+	public void testRecortarItemEstoque() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		ItemEstoque itemRecortado = itemEstoque.clone();
+
+		itemRecortado.setId(itemEstoque.getId());
+		itemRecortado.setQuantidade(itemEstoque.getQuantidade() - 1);
+		// Configurando a reducao ou recorte do item do estoque.
+		itemRecortado.setMedidaExterna(itemEstoque.getMedidaExterna() - 10);
+		itemRecortado.setMedidaInterna(itemEstoque.getMedidaInterna() - 2);
+		itemRecortado.setComprimento(itemEstoque.getComprimento() - 1);
+
+		Integer idItemNovo = null;
+		try {
+			idItemNovo = estoqueService.recortarItemEstoque(itemRecortado);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		ItemEstoque itemNovo = estoqueService.pesquisarItemEstoqueById(idItemNovo);
+		assertEquals("A quantidade do item novo deve ser a mesma que a do item recortado apos a inclusao no estoque",
+				itemNovo.getQuantidade(), itemRecortado.getQuantidade());
+	}
+	
+
+	@Test
+	public void testRecortarItemEstoqueDimensaoInvalida() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		ItemEstoque itemRecortado = itemEstoque.clone();
+
+		itemRecortado.setId(itemEstoque.getId());
+		itemRecortado.setQuantidade(itemEstoque.getQuantidade() - 1);
+		// Configurando a reducao ou recorte do item do estoque.
+		itemRecortado.setMedidaExterna(itemEstoque.getMedidaExterna() - 1);
+		itemRecortado.setMedidaInterna(itemEstoque.getMedidaInterna() - 1);
+		itemRecortado.setComprimento(itemEstoque.getComprimento() - 1);
+
+		Integer idItemNovo = null;
+		try {
+			idItemNovo = estoqueService.recortarItemEstoque(itemRecortado);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		ItemEstoque itemNovo = estoqueService.pesquisarItemEstoqueById(idItemNovo);
+		assertEquals("A quantidade do item novo deve ser a mesma que a do item recortado apos a inclusao no estoque",
+				itemNovo.getQuantidade(), itemRecortado.getQuantidade());
 	}
 
 	@Test
@@ -599,6 +744,23 @@ public class EstoqueServiceTest extends AbstractTest {
 				itemEstoque.getQuantidade());
 	}
 
+	/*
+	 * @Test public void testReservaPedidoCompraInvalido() { Pedido pedido =
+	 * gerarPedido(TipoPedido.COMPRA); ItemPedido item1 =
+	 * eBuilder.buildItemPedido();
+	 * 
+	 * try { final Integer idItemPedido =
+	 * pedidoService.inserirItemPedido(pedido.getId(), item1);
+	 * estoqueService.inserirItemPedido(idItemPedido); } catch (BusinessException
+	 * e1) { printMensagens(e1); }
+	 * 
+	 * boolean throwed = false; try {
+	 * estoqueService.reservarItemPedido(pedido.getId()); } catch
+	 * (BusinessException e) { throwed = true; }
+	 * assertTrue("Pedidos de compra nao pode fazer reserva de estoque", throwed);
+	 * }
+	 */
+
 	@Test
 	public void testReservaItemEstoqueQuantidadeSuperiorAoItemPedido() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
@@ -622,23 +784,6 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertEquals("A quantidade no estoque era superior ao pedido e foi toda reservada", quantidadeEstoque,
 				itemEstoque.getQuantidade());
 	}
-
-	/*
-	 * @Test public void testReservaPedidoCompraInvalido() { Pedido pedido =
-	 * gerarPedido(TipoPedido.COMPRA); ItemPedido item1 =
-	 * eBuilder.buildItemPedido();
-	 * 
-	 * try { final Integer idItemPedido =
-	 * pedidoService.inserirItemPedido(pedido.getId(), item1);
-	 * estoqueService.inserirItemPedido(idItemPedido); } catch (BusinessException
-	 * e1) { printMensagens(e1); }
-	 * 
-	 * boolean throwed = false; try {
-	 * estoqueService.reservarItemPedido(pedido.getId()); } catch
-	 * (BusinessException e) { throwed = true; }
-	 * assertTrue("Pedidos de compra nao pode fazer reserva de estoque", throwed);
-	 * }
-	 */
 
 	@Test
 	public void testReservaPedidoComTodosItensExistentesEstoque() {

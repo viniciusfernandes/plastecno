@@ -21,10 +21,12 @@ public interface EstoqueService {
 
 	void empacotarItemPedido(Integer idItemPedido);
 
+	boolean enviarPedidoEmpacotamento(Integer idPedido) throws BusinessException;
+
 	Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
-	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
+	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
@@ -40,11 +42,11 @@ public interface EstoqueService {
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
+	Integer recortarItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
+
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	boolean reservarItemPedido(Integer idPedido) throws BusinessException;
 
 	SituacaoReservaEstoque reservarItemPedido(ItemPedido itemPedido) throws BusinessException;
-
-	boolean enviarPedidoEmpacotamento(Integer idPedido) throws BusinessException;
 }

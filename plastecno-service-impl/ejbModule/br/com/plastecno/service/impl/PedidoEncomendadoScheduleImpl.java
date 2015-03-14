@@ -32,6 +32,7 @@ public class PedidoEncomendadoScheduleImpl implements PedidoEncomendadoSchedule 
 
 	@Resource
 	private SessionContext sessionContext;
+
 	@Resource
 	private TimerService timerService;
 
@@ -42,19 +43,18 @@ public class PedidoEncomendadoScheduleImpl implements PedidoEncomendadoSchedule 
 
 	@Schedule(hour = "*/1")
 	public void reservarItemPedidoEncomendadoEstoque() throws BusinessException {
-		List<Integer> listaItem = pedidoService.pesquisarIdPedidoRevendaEncomendada();
-		boolean todosItensReservados = false;
-		for (Integer idPedido : listaItem) {
-			todosItensReservados = estoqueService.reservarItemPedido(idPedido);
-			// encomendado mesmo apos o processamento do agendamento, caso contrario
+		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoRevendaEncomendada();
+		logger.info("Monitor de itens de pedido encomendados disparou a reserva dos itens. Existem pedidos: "
+				+ (listaIdPedido.isEmpty()));
+		boolean empacotamentoOk = false;
+		for (Integer idPedido : listaIdPedido) {
+			// Encomendado mesmo apos o processamento do agendamento, caso contrario
 			// teremos inconsistencia no estado do pedido podendo retornar ao fluxo de
 			// Aqui estamos garantindo que mesmo que o pedido permaneca como
 			// revenda aguardando encomenda, mas ele ja passou por essa etapa.
-			if (!todosItensReservados) {
-				pedidoService.alterarSituacaoPedidoEncomendadoByIdPedido(idPedido);
-			}
+			empacotamentoOk = estoqueService.enviarPedidoEmpacotamento(idPedido);
 			logger.info("Monitor de itens de pedido encomendados disparou a reserva dos itens do pedido No. " + idPedido
-					+ ". Resultado: " + (todosItensReservados ? "PRONTO PARA EMPACOTAR" : "ALGUM ITEM NAO EXISTE NO ESTOQUE"));
+					+ ". Resultado: " + (empacotamentoOk ? "PRONTO PARA EMPACOTAR" : "ALGUM ITEM NAO EXISTE NO ESTOQUE"));
 		}
 	}
 }

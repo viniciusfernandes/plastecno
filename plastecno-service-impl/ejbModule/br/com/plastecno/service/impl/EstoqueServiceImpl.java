@@ -126,16 +126,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 	}
 
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public boolean enviarPedidoEmpacotamento(Integer idPedido) throws BusinessException {
-		boolean empacotamentoOk = reservarItemPedido(idPedido);
-		if (!empacotamentoOk) {
-			pedidoService.alterarSituacaoPedidoEncomendadoByIdPedido(idPedido);
-		}
-		return empacotamentoOk;
-	}
-
 	private ItemEstoque gerarItemEstoque(ItemPedido itemPedido) {
 
 		ItemEstoque itemEstoque = new ItemEstoque();

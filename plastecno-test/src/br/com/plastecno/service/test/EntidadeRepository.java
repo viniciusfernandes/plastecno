@@ -71,6 +71,11 @@ class EntidadeRepository {
 			}
 
 			@Mock
+			Object remover(Object t) {
+				return mapaEntidades.get(t.getClass()).remove(t);
+			}
+
+			@Mock
 			Object inserir(Object t) {
 				try {
 					Method m = t.getClass().getMethod("setId", Integer.class);

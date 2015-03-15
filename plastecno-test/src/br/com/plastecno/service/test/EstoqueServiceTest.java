@@ -1,10 +1,8 @@
 package br.com.plastecno.service.test;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-
-import javax.validation.constraints.AssertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -230,17 +228,67 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 	}
 
-	@Test
-	public void testRecortarPecaEstoque() {
+	@TODO
+	public void testRecortarItemEstoque() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
-		itemEstoque.setFormaMaterial(FormaMaterial.PC);
+		ItemEstoque itemRecortado = itemEstoque.clone();
+
+		itemRecortado.setId(itemEstoque.getId());
+		itemRecortado.setQuantidade(itemEstoque.getQuantidade() - 1);
+		// Configurando a reducao ou recorte do item do estoque.
+		itemRecortado.setMedidaExterna(itemEstoque.getMedidaExterna() - 10);
+		itemRecortado.setMedidaInterna(itemEstoque.getMedidaInterna() - 2);
+		itemRecortado.setComprimento(itemEstoque.getComprimento() - 1);
+
+		Integer idItemNovo = null;
+		try {
+			idItemNovo = estoqueService.recortarItemEstoque(itemRecortado);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		ItemEstoque itemNovo = estoqueService.pesquisarItemEstoqueById(idItemNovo);
+		assertEquals("A quantidade do item novo deve ser a mesma que a do item recortado apos a inclusao no estoque",
+				itemNovo.getQuantidade(), itemRecortado.getQuantidade());
+	}
+
+	@Test
+	public void testRecortarItemEstoqueComprimentoInvalido() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		ItemEstoque itemRecortado = itemEstoque.clone();
+
+		itemRecortado.setId(itemEstoque.getId());
+		itemRecortado.setComprimento(itemEstoque.getComprimento() + 1);
+
 		boolean throwed = false;
 		try {
-			estoqueService.recortarItemEstoque(itemEstoque);
+			estoqueService.recortarItemEstoque(itemRecortado);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("Nao se pode recortar uma peca do estoque", throwed);
+		assertTrue("A comprimento recortado eh superior ao comprimento do estoque", throwed);
+	}
+
+	@TODO
+	public void testRecortarItemEstoqueDimensaoInvalida() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		ItemEstoque itemRecortado = itemEstoque.clone();
+
+		itemRecortado.setId(itemEstoque.getId());
+		itemRecortado.setQuantidade(itemEstoque.getQuantidade() - 1);
+		// Configurando a reducao ou recorte do item do estoque.
+		itemRecortado.setMedidaExterna(itemEstoque.getMedidaExterna() - 1);
+		itemRecortado.setMedidaInterna(itemEstoque.getMedidaInterna() - 1);
+		itemRecortado.setComprimento(itemEstoque.getComprimento() - 1);
+
+		Integer idItemNovo = null;
+		try {
+			idItemNovo = estoqueService.recortarItemEstoque(itemRecortado);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		ItemEstoque itemNovo = estoqueService.pesquisarItemEstoqueById(idItemNovo);
+		assertEquals("A quantidade do item novo deve ser a mesma que a do item recortado apos a inclusao no estoque",
+				itemNovo.getQuantidade(), itemRecortado.getQuantidade());
 	}
 
 	@Test
@@ -294,23 +342,6 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testRecortarItemEstoqueComprimentoInvalido() {
-		ItemEstoque itemEstoque = gerarItemEstoque();
-		ItemEstoque itemRecortado = itemEstoque.clone();
-
-		itemRecortado.setId(itemEstoque.getId());
-		itemRecortado.setComprimento(itemEstoque.getComprimento() + 1);
-
-		boolean throwed = false;
-		try {
-			estoqueService.recortarItemEstoque(itemRecortado);
-		} catch (BusinessException e) {
-			throwed = true;
-		}
-		assertTrue("A comprimento recortado eh superior ao comprimento do estoque", throwed);
-	}
-
-	@Test
 	public void testRecortarItemEstoqueQuantidadeInvalida() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
 		ItemEstoque itemRecortado = itemEstoque.clone();
@@ -326,50 +357,17 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertTrue("A quantidade do item recortado nao pode ser superior ao item do estoque", throwed);
 	}
 
-	@TODO
-	public void testRecortarItemEstoque() {
+	@Test
+	public void testRecortarPecaEstoque() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
-		ItemEstoque itemRecortado = itemEstoque.clone();
-
-		itemRecortado.setId(itemEstoque.getId());
-		itemRecortado.setQuantidade(itemEstoque.getQuantidade() - 1);
-		// Configurando a reducao ou recorte do item do estoque.
-		itemRecortado.setMedidaExterna(itemEstoque.getMedidaExterna() - 10);
-		itemRecortado.setMedidaInterna(itemEstoque.getMedidaInterna() - 2);
-		itemRecortado.setComprimento(itemEstoque.getComprimento() - 1);
-
-		Integer idItemNovo = null;
+		itemEstoque.setFormaMaterial(FormaMaterial.PC);
+		boolean throwed = false;
 		try {
-			idItemNovo = estoqueService.recortarItemEstoque(itemRecortado);
+			estoqueService.recortarItemEstoque(itemEstoque);
 		} catch (BusinessException e) {
-			printMensagens(e);
+			throwed = true;
 		}
-		ItemEstoque itemNovo = estoqueService.pesquisarItemEstoqueById(idItemNovo);
-		assertEquals("A quantidade do item novo deve ser a mesma que a do item recortado apos a inclusao no estoque",
-				itemNovo.getQuantidade(), itemRecortado.getQuantidade());
-	}
-
-	@TODO
-	public void testRecortarItemEstoqueDimensaoInvalida() {
-		ItemEstoque itemEstoque = gerarItemEstoque();
-		ItemEstoque itemRecortado = itemEstoque.clone();
-
-		itemRecortado.setId(itemEstoque.getId());
-		itemRecortado.setQuantidade(itemEstoque.getQuantidade() - 1);
-		// Configurando a reducao ou recorte do item do estoque.
-		itemRecortado.setMedidaExterna(itemEstoque.getMedidaExterna() - 1);
-		itemRecortado.setMedidaInterna(itemEstoque.getMedidaInterna() - 1);
-		itemRecortado.setComprimento(itemEstoque.getComprimento() - 1);
-
-		Integer idItemNovo = null;
-		try {
-			idItemNovo = estoqueService.recortarItemEstoque(itemRecortado);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		ItemEstoque itemNovo = estoqueService.pesquisarItemEstoqueById(idItemNovo);
-		assertEquals("A quantidade do item novo deve ser a mesma que a do item recortado apos a inclusao no estoque",
-				itemNovo.getQuantidade(), itemRecortado.getQuantidade());
+		assertTrue("Nao se pode recortar uma peca do estoque", throwed);
 	}
 
 	@Test
@@ -937,14 +935,4 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	}
 
-	public void testEnvioPedidoEmpacotamento() {
-		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoRevendaEncomendada();
-		for (Integer idPedido : listaIdPedido) {
-			try {
-				estoqueService.enviarPedidoEmpacotamento(idPedido);
-			} catch (BusinessException e) {
-				printMensagens(e);
-			}
-		}
-	}
 }

@@ -16,6 +16,7 @@ import mockit.MockUp;
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
@@ -42,10 +43,31 @@ import br.com.plastecno.service.exception.BusinessException;
 
 public class PedidoServiceTest extends AbstractTest {
 
+	private class PedidoRevendaECompra {
+		private final Pedido pedidoCompra;
+		private final Pedido pedidoRevenda;
+
+		public PedidoRevendaECompra(Pedido pedidoCompra, Pedido pedidoRevenda) {
+			this.pedidoCompra = pedidoCompra;
+			this.pedidoRevenda = pedidoRevenda;
+		}
+
+		public Pedido getPedidoCompra() {
+			return pedidoCompra;
+		}
+
+		public Pedido getPedidoRevenda() {
+			return pedidoRevenda;
+		}
+
+	}
+
 	private ClienteService clienteService;
+	private EstoqueService estoqueService;
 	private MaterialService materialService;
 	private PedidoService pedidoService;
 	private RepresentadaService representadaService;
+
 	private UsuarioService usuarioService;
 
 	private void associarVendedor(Cliente cliente) {
@@ -174,6 +196,69 @@ public class PedidoServiceTest extends AbstractTest {
 		return representada;
 	}
 
+	private PedidoRevendaECompra gerarRevendaEncomendada() {
+		Pedido pedidoRevenda = gerarPedidoRevenda();
+		ItemPedido item1 = gerarItemPedido();
+		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
+		item2.setMaterial(item1.getMaterial());
+
+		Integer idPedidoRevenda = pedidoRevenda.getId();
+		try {
+			pedidoService.inserirItemPedido(idPedidoRevenda, item1);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.inserirItemPedido(idPedidoRevenda, item2);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedidoRevenda, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
+		assertEquals(
+				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
+				SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA, situacaoPedido);
+
+		Representada fornecedor = pedidoRevenda.getRepresentada();
+		fornecedor.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+
+		Cliente revendedor = pedidoRevenda.getCliente();
+		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
+
+		Set<Integer> listaId = new HashSet<Integer>();
+		listaId.add(item1.getId());
+		listaId.add(item2.getId());
+		Integer idPedidoCompra = null;
+		try {
+			idPedidoCompra = pedidoService.encomendarItemPedido(pedidoRevenda.getComprador().getId(), fornecedor.getId(),
+					listaId);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
+		assertEquals("Os itens do pedido nao contem itens mas ja foram encomendados pelo setor de compras",
+				SituacaoPedido.REVENDA_ENCOMENDADA, situacaoPedido);
+
+		Pedido pedidoCompra = pedidoService.pesquisarCompraById(idPedidoCompra);
+		pedidoCompra.setFormaPagamento("A VISTA");
+		pedidoCompra.setDataEntrega(TestUtils.gerarDataPosterior());
+		try {
+			pedidoService.enviarPedido(idPedidoCompra, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		return new PedidoRevendaECompra(pedidoCompra, pedidoRevenda);
+	}
+
 	@Override
 	public void init() {
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
@@ -181,6 +266,7 @@ public class PedidoServiceTest extends AbstractTest {
 		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
+		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
 	}
 
 	private void initTestEnvioEmailPedidoCancelado() {
@@ -634,6 +720,59 @@ public class PedidoServiceTest extends AbstractTest {
 		assertEquals("Apos o envio do pedido de compra, seu estado deve ser como aguardando recebimento",
 				SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, pedido.getSituacaoPedido());
 
+	}
+
+	@Test
+	public void testEnvioRevendaEncomendadaEmpacotamento() {
+		PedidoRevendaECompra pedidoRevendaECompra = gerarRevendaEncomendada();
+		Integer idPedidoCompra = pedidoRevendaECompra.getPedidoCompra().getId();
+		Integer idPedidoRevenda = pedidoRevendaECompra.getPedidoRevenda().getId();
+
+		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoByIdPedido(idPedidoCompra);
+		for (ItemPedido itemComprado : listaItemComprado) {
+			// Recepcionando os itens comprados para preencher o estoque.
+			try {
+				estoqueService.inserirItemPedido(itemComprado.getId());
+			} catch (BusinessException e) {
+				printMensagens(e);
+			}
+		}
+
+		try {
+			pedidoService.enviarRevendaEncomendadaEmpacotamento(idPedidoRevenda);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
+		assertEquals(SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO, situacaoPedido);
+	}
+
+	@Test
+	public void testEnvioRevendaEncomendadaEmpacotamentoInvalido() {
+		PedidoRevendaECompra pedidoRevendaECompra = gerarRevendaEncomendada();
+		Integer idPedidoCompra = pedidoRevendaECompra.getPedidoCompra().getId();
+		Integer idPedidoRevenda = pedidoRevendaECompra.getPedidoRevenda().getId();
+
+		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoByIdPedido(idPedidoCompra);
+		for (ItemPedido itemComprado : listaItemComprado) {
+			// Recepcionando os itens comprados para preencher o estoque.
+			try {
+				estoqueService.inserirItemPedido(itemComprado.getId());
+				// Vamos inserir apenas 1 item do pedido para manter a revenda como
+				// encomendada.
+				break;
+			} catch (BusinessException e) {
+				printMensagens(e);
+			}
+		}
+
+		try {
+			pedidoService.enviarRevendaEncomendadaEmpacotamento(idPedidoRevenda);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
+		assertEquals(SituacaoPedido.REVENDA_ENCOMENDADA, situacaoPedido);
 	}
 
 	public void testInclusaoItemPedido() {
@@ -1424,44 +1563,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testRevendaEncomendada() {
-		Pedido pedido = gerarPedidoRevenda();
-		ItemPedido itemPedido = gerarItemPedido();
-		Integer idPedido = pedido.getId();
-		try {
-			pedidoService.inserirItemPedido(idPedido, itemPedido);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
-		assertEquals(
-				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
-				SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA, situacaoPedido);
-
-		Representada fornecedor = pedido.getRepresentada();
-		fornecedor.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
-
-		Cliente revendedor = pedido.getCliente();
-		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
-
-		Set<Integer> listaId = new HashSet<Integer>();
-		listaId.add(itemPedido.getId());
-		try {
-			pedidoService.encomendarItemPedido(pedido.getComprador().getId(), fornecedor.getId(), listaId);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
-		assertEquals("Os itens do pedido nao contem itens mas ja foram encomendados pelo setor de compras",
-				SituacaoPedido.REVENDA_ENCOMENDADA, situacaoPedido);
-
+		gerarRevendaEncomendada();
 	}
 
 	@Test
@@ -1542,6 +1644,49 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O fornecedor eh invalido eh nao pode enfetuar encomenda de itens para pedido de compras", throwed);
+	}
+
+	@Test
+	public void testRevendaEncomendadaItemPedidoInexistente() {
+		Pedido pedido = gerarPedidoRevenda();
+		ItemPedido item1 = gerarItemPedido();
+
+		Integer idPedido = pedido.getId();
+		try {
+			pedidoService.inserirItemPedido(idPedido, item1);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		assertEquals(
+				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
+				SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA, situacaoPedido);
+
+		Representada fornecedor = pedido.getRepresentada();
+		fornecedor.setTipoRelacionamento(TipoRelacionamento.FORNECIMENTO);
+
+		Cliente revendedor = pedido.getCliente();
+		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
+
+		Set<Integer> listaId = new HashSet<Integer>();
+		// Inncluindo um intem inexistente
+		listaId.add(-1);
+		try {
+			pedidoService.encomendarItemPedido(pedido.getComprador().getId(), fornecedor.getId(), listaId);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		assertEquals(
+				"O item encomendado nao existe no estoque, entao devemos cria-lo antes de encomendar, portanto o pedido deve estar na mesma situacao",
+				SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA, situacaoPedido);
 	}
 
 	@Test

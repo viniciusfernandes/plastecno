@@ -11,7 +11,6 @@ import javax.ejb.Singleton;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 
-import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MonitorPedidoEncomendadoService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.exception.BusinessException;
@@ -19,8 +18,6 @@ import br.com.plastecno.service.exception.BusinessException;
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 public class MonitorPedidoEncomendadoServiceImpl implements MonitorPedidoEncomendadoService {
-	@EJB
-	private EstoqueService estoqueService;
 
 	private Logger logger = Logger.getLogger(MonitorPedidoEncomendadoServiceImpl.class.getName());
 
@@ -43,7 +40,7 @@ public class MonitorPedidoEncomendadoServiceImpl implements MonitorPedidoEncomen
 			// teremos inconsistencia no estado do pedido podendo retornar ao fluxo de
 			// Aqui estamos garantindo que mesmo que o pedido permaneca como
 			// revenda aguardando encomenda, mas ele ja passou por essa etapa.
-			empacotamentoOk = estoqueService.enviarPedidoEmpacotamento(idPedido);
+			empacotamentoOk = pedidoService.enviarRevendaEncomendadaEmpacotamento(idPedido);
 			logger.info("Monitor de itens de pedido encomendados disparou a reserva dos itens do pedido No. " + idPedido
 					+ ". Resultado: " + (empacotamentoOk ? "PRONTO PARA EMPACOTAR" : "ALGUM ITEM NAO EXISTE NO ESTOQUE"));
 		}

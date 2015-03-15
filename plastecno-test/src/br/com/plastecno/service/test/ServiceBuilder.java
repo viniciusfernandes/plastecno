@@ -381,8 +381,17 @@ class ServiceBuilder {
 
 			@Mock
 			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
-				Pedido pedido = this.pesquisarById(idPedido, false);
-				return REPOSITORY.pesquisarEntidadeByRelacionamento(ItemPedido.class, "pedido", pedido);
+				// Pedido pedido = this.pesquisarById(idPedido, false);
+				// return REPOSITORY.pesquisarEntidadeByRelacionamento(ItemPedido.class,
+				// "pedido", pedido);
+				List<ItemPedido> lista = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				List<ItemPedido> itens = new ArrayList<ItemPedido>();
+				for (ItemPedido itemPedido : lista) {
+					if (itemPedido.getPedido() != null && itemPedido.getPedido().getId().equals(idPedido)) {
+						itens.add(itemPedido);
+					}
+				}
+				return itens;
 			}
 
 			@Mock

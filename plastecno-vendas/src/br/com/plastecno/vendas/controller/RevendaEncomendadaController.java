@@ -79,7 +79,7 @@ public class RevendaEncomendadaController extends AbstractController {
     @Post("revendaEncomendada/empacotamento")
     public void enviarPedidoEmpacotamento(Integer idPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         try {
-            estoqueService.enviarPedidoEmpacotamento(idPedido);
+            estoqueService.enviarRevendaEncomendadaEmpacotamento(idPedido);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }

@@ -21,10 +21,7 @@ public interface EstoqueService {
 
 	void empacotarItemPedido(Integer idItemPedido);
 
-	boolean enviarPedidoEmpacotamento(Integer idPedido) throws BusinessException;
-
 	Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
-
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 

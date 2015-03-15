@@ -5,6 +5,6 @@ import javax.ejb.Local;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Local
-public interface PedidoEncomendadoSchedule {
+public interface MonitorPedidoEncomendadoService {
 	void reservarItemPedidoEncomendadoEstoque() throws BusinessException;
 }

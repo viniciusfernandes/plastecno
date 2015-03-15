@@ -1,8 +1,8 @@
 package br.com.plastecno.service.test;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
+import java.util.List;
 
 import javax.validation.constraints.AssertTrue;
 
@@ -27,6 +27,7 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.impl.anotation.TODO;
 
 public class EstoqueServiceTest extends AbstractTest {
 	private ClienteService clienteService;
@@ -325,7 +326,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertTrue("A quantidade do item recortado nao pode ser superior ao item do estoque", throwed);
 	}
 
-	@Test
+	@TODO
 	public void testRecortarItemEstoque() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
 		ItemEstoque itemRecortado = itemEstoque.clone();
@@ -347,9 +348,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertEquals("A quantidade do item novo deve ser a mesma que a do item recortado apos a inclusao no estoque",
 				itemNovo.getQuantidade(), itemRecortado.getQuantidade());
 	}
-	
 
-	@Test
+	@TODO
 	public void testRecortarItemEstoqueDimensaoInvalida() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
 		ItemEstoque itemRecortado = itemEstoque.clone();
@@ -935,5 +935,16 @@ public class EstoqueServiceTest extends AbstractTest {
 		Integer quantidadeEstoque = pesquisarQuantidadeTotalItemEstoque(idItemEstoque);
 		assertEquals("As quantidades dos itens devem ser as mesmas apos inclusao no estoque", quantidade, quantidadeEstoque);
 
+	}
+
+	public void testEnvioPedidoEmpacotamento() {
+		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoRevendaEncomendada();
+		for (Integer idPedido : listaIdPedido) {
+			try {
+				estoqueService.enviarPedidoEmpacotamento(idPedido);
+			} catch (BusinessException e) {
+				printMensagens(e);
+			}
+		}
 	}
 }

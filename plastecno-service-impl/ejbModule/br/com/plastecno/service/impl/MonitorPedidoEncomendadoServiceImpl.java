@@ -3,45 +3,36 @@ package br.com.plastecno.service.impl;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
-import javax.ejb.SessionContext;
 import javax.ejb.Singleton;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
-import javax.ejb.TimerService;
 
 import br.com.plastecno.service.EstoqueService;
-import br.com.plastecno.service.PedidoEncomendadoSchedule;
+import br.com.plastecno.service.MonitorPedidoEncomendadoService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
-public class PedidoEncomendadoScheduleImpl implements PedidoEncomendadoSchedule {
+public class MonitorPedidoEncomendadoServiceImpl implements MonitorPedidoEncomendadoService {
 	@EJB
 	private EstoqueService estoqueService;
 
-	private Logger logger = Logger.getLogger(PedidoEncomendadoScheduleImpl.class.getName());
+	private Logger logger = Logger.getLogger(MonitorPedidoEncomendadoServiceImpl.class.getName());
 
 	@EJB
 	private PedidoService pedidoService;
-
-	@Resource
-	private SessionContext sessionContext;
-
-	@Resource
-	private TimerService timerService;
 
 	@Timeout
 	public void init(Timer timer) {
 		logger.info("Inicializando o monitoramento dos itens de pedidos encomendados aguardando reserva");
 	}
 
-	@Schedule(hour = "*")
+	@Schedule(minute = "*/60", hour = "*")
 	public void reservarItemPedidoEncomendadoEstoque() throws BusinessException {
 		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoRevendaEncomendada();
 		logger.info("Monitor de itens de pedido encomendados disparou a reserva dos itens. Existem pedidos: "

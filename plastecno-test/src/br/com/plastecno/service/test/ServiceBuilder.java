@@ -26,6 +26,7 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
+import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.ClienteDAO;
@@ -52,25 +53,6 @@ import br.com.plastecno.service.impl.EmailServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
 class ServiceBuilder {
-	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
-
-	/*
-	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
-	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
-	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
-	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
-	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
-	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
-	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
-	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
-	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
-	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
-	 */
-	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
-
-	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
-	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
-
 	@SuppressWarnings("unchecked")
 	static <T> T buildService(Class<T> classe) {
 		T service = (T) mapTemporarioServices.get(classe);
@@ -114,12 +96,12 @@ class ServiceBuilder {
 				mapTemporarioServices.remove(classe);
 				return service;
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new TestUtilException("Falha na execucao do metodo de inicializacao do servico \"" + "gerar"
+				throw new TestUtilException("Falha na execucao do metodo de inicializacao do servico \"" + "build"
 						+ classe.getSimpleName() + "\"", e);
 
 			}
 		} catch (SecurityException | NoSuchMethodException e) {
-			throw new TestUtilException("Falha na localizacao do metodo de inicializacao do servico \"" + "gerar"
+			throw new TestUtilException("Falha na localizacao do metodo de inicializacao do servico \"" + "build"
 					+ classe.getSimpleName() + "\"", e);
 		} finally {
 			if (method != null) {
@@ -127,6 +109,25 @@ class ServiceBuilder {
 			}
 		}
 	}
+
+	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
+
+	/*
+	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
+	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
+	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
+	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
+	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
+	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
+	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
+	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
+	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
+	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
+	 */
+	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
+	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
+
+	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
 
 	ServiceBuilder() {
 	}
@@ -146,12 +147,19 @@ class ServiceBuilder {
 			@Mock
 			public boolean isEmailExistente(Integer idCliente, String email) {
 				return REPOSITORY.contemEntidade(Cliente.class, "email", email, idCliente);
-			};
+			}
 
 			@Mock
 			public List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
 				Cliente cliente = REPOSITORY.pesquisarEntidadeById(Cliente.class, idCliente);
 				return cliente == null ? new ArrayList<LogradouroCliente>() : cliente.getListaLogradouro();
+			};
+
+			@Mock
+			Cliente pesquisarRevendedor() {
+				List<Cliente> l = REPOSITORY.pesquisarEntidadeByRelacionamento(Cliente.class, "tipoCliente",
+						TipoCliente.REVENDEDOR);
+				return !l.isEmpty() ? l.get(0) : null;
 			}
 		};
 		ClienteDAO d = new ClienteDAO(null);
@@ -288,7 +296,25 @@ class ServiceBuilder {
 		inject(pedidoService, buildService(RepresentadaService.class), "representadaService");
 		inject(pedidoService, buildService(EstoqueService.class), "estoqueService");
 
+		new MockUp<ItemPedidoDAO>() {
+			@Mock
+			public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {
+				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				long count = 0;
+				for (ItemPedido itemPedido : l) {
+					if (!itemPedido.isEncomendado() && itemPedido.getPedido().getId().equals(idPedido)) {
+						count++;
+					}
+				}
+				return count;
+			};
+		};
+
 		new MockUp<PedidoDAO>() {
+			@Mock
+			void alterarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
+				REPOSITORY.alterarEntidadeAtributoById(Pedido.class, idPedido, "situacaoPedido", situacaoPedido);
+			}
 
 			@Mock
 			void cancelar(Integer IdPedido) {
@@ -331,6 +357,16 @@ class ServiceBuilder {
 				}
 				Pedido p = i.getPedido();
 				return p != null ? p.getId() : null;
+			}
+
+			@Mock
+			List<Integer> pesquisarIdPedidoBySituacaoPedido(SituacaoPedido situacaoPedido) {
+				List<Pedido> l = REPOSITORY.pesquisarEntidadeByRelacionamento(Pedido.class, "situacaoPedido", situacaoPedido);
+				List<Integer> id = new ArrayList<Integer>();
+				for (Pedido pedido : l) {
+					id.add(pedido.getId());
+				}
+				return id;
 			}
 
 			@Mock

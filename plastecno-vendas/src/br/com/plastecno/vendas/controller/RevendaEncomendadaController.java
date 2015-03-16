@@ -8,6 +8,7 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.EstoqueService;
+import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -20,13 +21,16 @@ import br.com.plastecno.vendas.controller.anotacao.Servico;
 @Resource
 public class RevendaEncomendadaController extends AbstractController {
     @Servico
-    private RepresentadaService representadaService;
+    private EstoqueService estoqueService;
+
+    @Servico
+    private PedidoService pedidoService;
 
     @Servico
     private RelatorioService relatorioService;
 
     @Servico
-    private EstoqueService estoqueService;
+    private RepresentadaService representadaService;
 
     public RevendaEncomendadaController(Result result) {
         super(result);
@@ -35,6 +39,17 @@ public class RevendaEncomendadaController extends AbstractController {
     @Get("revendaEncomendada/pdf")
     public Download downloadPedidoPDF(Integer idPedido) {
         return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
+    }
+
+    @Post("revendaEncomendada/empacotamento")
+    public void enviarPedidoEmpacotamento(Integer idPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
+        try {
+            pedidoService.enviarRevendaEncomendadaEmpacotamento(idPedido);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+        addAtributo("permanecerTopo", true);
+        redirecTo(this.getClass()).pesquisarRevendaEncomendada(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("revendaEncomendada/listagem")
@@ -74,16 +89,5 @@ public class RevendaEncomendadaController extends AbstractController {
         // navegacao pois esse metodo eh reaproveitado.
         configurarFiltroPediodoMensal();
         addAtributo("listaRepresentada", representadaService.pesquisarRepresentada());
-    }
-
-    @Post("revendaEncomendada/empacotamento")
-    public void enviarPedidoEmpacotamento(Integer idPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
-        try {
-            estoqueService.enviarRevendaEncomendadaEmpacotamento(idPedido);
-        } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
-        }
-        addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarRevendaEncomendada(dataInicial, dataFinal, idRepresentada);
     }
 }

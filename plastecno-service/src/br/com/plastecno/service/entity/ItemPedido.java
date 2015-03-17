@@ -28,11 +28,11 @@ public class ItemPedido extends Item {
 	private static final long serialVersionUID = 3602081055672681943L;
 
 	@Column(name = "aliquota_icms")
-	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota ICMS")
+	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
 
 	@Column(name = "aliquota_ipi")
-	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota IPI")
+	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota IPI")
 	private Double aliquotaIPI;
 
 	private Double comprimento;
@@ -76,24 +76,24 @@ public class ItemPedido extends Item {
 	private Pedido pedido;
 
 	@Column(name = "preco_unidade")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = false, nomeExibicao = "Preço da unidade item do pedido")
 	private Double precoUnidade;
 
 	@Transient
 	private String precoUnidadeFormatado;
 
 	@Column(name = "preco_unidade_ipi")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido com IPI")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = false, nomeExibicao = "Preço da unidade item do pedido com IPI")
 	private Double precoUnidadeIPI;
 
 	@Transient
 	private String precoUnidadeIPIFormatado;
 
 	@Column(name = "preco_venda")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Preço de venda do item do pedido")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Preço de venda do item do pedido")
 	private Double precoVenda;
 
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do pedido")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Quantidade de itens do pedido")
 	private Integer quantidade;
 
 	@Column(name = "quantidade_reservada")
@@ -126,6 +126,20 @@ public class ItemPedido extends Item {
 
 	public double calcularPrecoTotal() {
 		return this.quantidade != null && this.precoVenda != null ? this.quantidade * this.precoVenda : 0d;
+	}
+
+	@Override
+	public ItemPedido clone() {
+		ItemPedido clone;
+		try {
+			clone = (ItemPedido) super.clone();
+			clone.setId(null);
+			clone.setPedido(null);
+			clone.setRecebido(false);
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new IllegalStateException("Falha ao clonar o item de pedido " + getId(), e);
+		}
 	}
 
 	public boolean contemAlgumaReserva() {
@@ -334,18 +348,5 @@ public class ItemPedido extends Item {
 
 	public void setTipoVenda(TipoVenda tipoVenda) {
 		this.tipoVenda = tipoVenda;
-	}
-	@Override
-	public ItemPedido clone() {
-		ItemPedido clone;
-		try {
-			clone = (ItemPedido) super.clone();
-			clone.setId(null);
-			clone.setPedido(null);
-			clone.setRecebido(false);
-			return clone;
-		} catch (CloneNotSupportedException e) {
-			throw new IllegalStateException("Falha ao clonar o item de pedido " + getId(), e);
-		}
 	}
 }

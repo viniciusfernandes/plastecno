@@ -62,7 +62,7 @@ public class Representada implements Serializable {
 
 	private boolean ativo = true;
 
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = true, nomeExibicao = "Comissão da representada")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = true, nomeExibicao = "Comissão da representada")
 	private double comissao = 0;
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da representada")

@@ -446,13 +446,11 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 		itemEstoque.setQuantidade(0);
-		boolean throwed = false;
 		try {
 			estoqueService.redefinirItemEstoque(itemEstoque);
 		} catch (BusinessException e) {
-			throwed = true;
+			printMensagens(e);
 		}
-		assertTrue("O item de estoque deve conter quantidade", throwed);
 	}
 
 	@Test
@@ -536,9 +534,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		try {
 			estoqueService.redefinirItemEstoque(itemEstoque);
 		} catch (BusinessException e) {
-			throwed = true;
+			printMensagens(e);
 		}
-		assertTrue("O item de estoque deve conter preco medio", throwed);
 	}
 
 	@Test

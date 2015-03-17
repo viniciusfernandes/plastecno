@@ -19,7 +19,7 @@ public abstract class AbstractTest {
 
 	public abstract void init();
 
-	void printMensagens(BusinessException exception) {
+	protected void printMensagens(BusinessException exception) {
 		Assert.fail("Falha em alguma regra de negocio. As mensagens sao: " + exception.getMensagemConcatenada());
 	}
 

@@ -27,11 +27,11 @@ public class ItemEstoque extends Item {
 	private static final long serialVersionUID = 589189336309859982L;
 
 	@Column(name = "aliquota_icms")
-	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota ICMS")
+	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
 
 	@Column(name = "aliquota_ipi")
-	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota IPI")
+	@InformacaoValidavel(numerico = true, positivo= true, nomeExibicao = "Alíquota IPI")
 	private Double aliquotaIPI;
 	private Double comprimento;
 
@@ -61,10 +61,10 @@ public class ItemEstoque extends Item {
 	private Double medidaInterna;
 
 	@Column(name = "preco_medio")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Preço de médio de compra do item de estoque")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Preço de médio de compra do item de estoque")
 	private Double precoMedio;
 
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do estoque")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Quantidade de itens do estoque")
 	private Integer quantidade = 0;
 
 	public ItemEstoque() {

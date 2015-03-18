@@ -155,7 +155,7 @@ function inicializarModalCancelamento(botao){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio" style="width: 10%">Comissão (%):</div>
+			<div class="label condicional" style="width: 10%">Comissão (%):</div>
 			<div class="input" style="width: 50%">
 				<input type="text" id="comissao" name="representada.comissao"
 					value="${representada.comissaoPercentual}" style="width: 10%" />

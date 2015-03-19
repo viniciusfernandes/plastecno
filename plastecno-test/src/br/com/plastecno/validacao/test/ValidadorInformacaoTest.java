@@ -18,6 +18,19 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		e.setInscricaoEstadual("123456789012");
 		e.setIdade(12);
 		e.setQuantidade(32);
+		e.setSenha("1234");
+		e.setFilha(new EntidadeValidacaoSimples(321, "N321"));
+		e.setEmail("vinicius@hotmail");
+		e.addFilho(new EntidadeValidacaoSimples(111, "N1"));
+		e.addFilho(new EntidadeValidacaoSimples(222, "N2"));
+		e.addFilho(new EntidadeValidacaoSimples(333, "N3"));
+
+		e.setSobrinho(new EntidadeValidacaoSimples(444, "N4"));
+
+		EntidadeValidacaoHeranca h = new EntidadeValidacaoHeranca(777, "entidade de validacao teste");
+		h.setValor(765d);
+
+		e.setHerdado(h);
 		return e;
 	}
 
@@ -105,6 +118,27 @@ public class ValidadorInformacaoTest extends AbstractTest {
 	}
 
 	@Test
+	public void testCascataInvalido() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.getSobrinho().setNome(null);
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+
+		}
+		assertTrue("O campo nome eh obrigatorio e deve ser validado em cascata", throwed);
+
+		e.getSobrinho().setNome("");
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			printMensagens(e1);
+		}
+	}
+
+	@Test
 	public void testCNPJNumeroDigitosInvalido() {
 		EntidadeValidacao e = gerarEntidadeValidacao();
 
@@ -132,21 +166,6 @@ public class ValidadorInformacaoTest extends AbstractTest {
 
 		}
 		assertTrue("O digito verificador do nao eh valido e deve ser validado", throwed);
-	}
-
-	@Test
-	public void testIncricaoEstadualInvalidoTamanhaExcesso() {
-		EntidadeValidacao e = gerarEntidadeValidacao();
-
-		boolean throwed = false;
-		e.setInscricaoEstadual(e.getInscricaoEstadual() + "1");
-		try {
-			ValidadorInformacao.validar(e);
-		} catch (InformacaoInvalidaException e1) {
-			throwed = true;
-
-		}
-		assertTrue("O numero de caracteres do nao eh valido e deve ser validado", throwed);
 	}
 
 	@Test
@@ -254,13 +273,50 @@ public class ValidadorInformacaoTest extends AbstractTest {
 	}
 
 	@Test
-	public void testValidacaoInformacao() {
+	public void testIncricaoEstadualInvalidoTamanhaExcesso() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+
+		boolean throwed = false;
+		e.setInscricaoEstadual(e.getInscricaoEstadual() + "1");
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+
+		}
+		assertTrue("O numero de caracteres do nao eh valido e deve ser validado", throwed);
+	}
+
+	@Test
+	public void testListaFilhoObrigatorioInvalido() {
 		EntidadeValidacao e = gerarEntidadeValidacao();
 		try {
 			ValidadorInformacao.validar(e);
 		} catch (InformacaoInvalidaException e1) {
 			printMensagens(e1);
 		}
+	}
+
+	@Test
+	public void testNumeroEstritamentoPositivo() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.setQuantidade(-1);
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+		}
+		assertTrue("O campo quantidade eh estritamente positivo e nao pode ser negativo", throwed);
+
+		e.setIdade(0);
+		throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+		}
+		assertTrue("O campo quantidade eh estritamente positivo e nao pode ser zero", throwed);
 	}
 
 	@Test
@@ -286,25 +342,103 @@ public class ValidadorInformacaoTest extends AbstractTest {
 	}
 
 	@Test
-	public void testNumeroEstritamentoPositivo() {
+	public void testRelacionamentoObrigatorioInvalido() {
 		EntidadeValidacao e = gerarEntidadeValidacao();
-		e.setQuantidade(-1);
+		e.setFilha(null);
 		boolean throwed = false;
 		try {
 			ValidadorInformacao.validar(e);
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
-		}
-		assertTrue("O campo quantidade eh estritamente positivo e nao pode ser negativo", throwed);
 
-		e.setIdade(0);
+		}
+		assertTrue("O relacionamento com a entidade filha esta nulo e deve ser validado", throwed);
+	}
+
+	@Test
+	public void testTamanhoInferiorInvalido() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.setSenha(e.getSenha().substring(0, 2));
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+
+		}
+		assertTrue("O tamanho do campo eh inferior ao definido e deve ser validado", throwed);
+	}
+
+	@Test
+	public void testTamanhoSuperiorInvalido() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.setSenha(e.getSenha() + "9");
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+
+		}
+		assertTrue("O tamanho do campo eh superior ao definido e deve ser validado", throwed);
+	}
+
+	@Test
+	public void testTextoNoPadraoInvalido() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.setEmail("123@hotmail.com");
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+
+		}
+		assertTrue("O campo possui um padrao invalido e deve ser validado", throwed);
+
+		e.setEmail(null);
 		throwed = false;
 		try {
 			ValidadorInformacao.validar(e);
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
+
 		}
-		assertTrue("O campo quantidade eh estritamente positivo e nao pode ser zero", throwed);
+		assertTrue("O campo possui um padrao invalido e deve ser validado", throwed);
 	}
 
+	@Test
+	public void testHerancaInvalido() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.getHerdado().setNome(null);
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+
+		}
+		assertTrue("O campo na heranca esta nulo e deve ser validado", throwed);
+	}
+
+	@Test
+	public void testValidacaoInformacao() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			printMensagens(e1);
+		}
+	}
+
+	@Test
+	public void testValidacaoInformacaoInvalidavel() {
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(new Object());
+		} catch (Exception e1) {
+			throwed = true;
+		}
+		assertTrue("O objeto desejado nao pode ser validavel", throwed);
+	}
 }

@@ -26,12 +26,6 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 		return super.pesquisarById(Usuario.class, id);
 	}
 
-	public Usuario pesquisarUsuarioResumidoById(Integer id) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select new Usuario(c.id, c.nome, c.sobrenome) from Usuario c where c.id = :id")
-						.setParameter("id", id), Usuario.class, null);
-	}
-
 	public Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {
 		Query query = this.entityManager
 				.createQuery("select c.id from Cliente c where c.id =:id and c.vendedor.id = :idVendedor ");

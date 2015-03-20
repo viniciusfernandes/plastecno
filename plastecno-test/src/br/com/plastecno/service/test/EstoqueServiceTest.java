@@ -93,7 +93,6 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		Cliente cliente = pedido.getCliente();
-		cliente.setProspeccaoFinalizada(true);
 		cliente.setVendedor(vendedor);
 		try {
 			clienteService.inserir(cliente);

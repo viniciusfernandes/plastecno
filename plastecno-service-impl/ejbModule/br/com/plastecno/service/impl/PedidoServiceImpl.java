@@ -331,6 +331,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 		pedidoDAO.alterar(pedido);
 	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public boolean enviarRevendaEncomendadaEmpacotamento(Integer idPedido) throws BusinessException {
@@ -348,7 +349,7 @@ public class PedidoServiceImpl implements PedidoService {
 			estoqueService.reservarItemPedido(pedido.getId());
 		}
 
-		logradouroService.verificarListaLogradouroObrigatorio(pedido.getListaLogradouro());
+		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
 		// Aqui estamos tratando o caso em que a situacao do pedido nao foi definida
 		// na reserva dos itens do pedido, pois la o pedido entre em pendecia de
 		// reserva.
@@ -569,14 +570,6 @@ public class PedidoServiceImpl implements PedidoService {
 	public boolean isCalculoIPIHabilitado(Integer idPedido) {
 		Integer idRepresentada = pesquisarIdRepresentadaByIdPedido(idPedido);
 		return representadaService.isCalculoIPIHabilitado(idRepresentada);
-	}
-
-	@Override
-	public boolean isClienteProspectado(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select c.prospeccaoFinalizada from Pedido p inner join p.cliente c where p.id = :idPedido").setParameter(
-						"idPedido", idPedido), Boolean.class, false);
 	}
 
 	@Override
@@ -1134,8 +1127,9 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	private void validarEnvio(Pedido pedido) throws BusinessException {
-		if (!pedido.getCliente().isProspectado()) {
-			throw new BusinessException("Não é possível enviar pedido para clientes em não propspectado");
+
+		if (!pedido.isOrcamento()) {
+			clienteService.validarListaLogradouroPreenchida(pedido.getCliente());
 		}
 
 		final BusinessException exception = new BusinessException();

@@ -22,8 +22,6 @@ public interface ClienteService {
 
 	void inserirComentario(Integer idCliente, String comentario) throws BusinessException;
 
-	boolean isClienteProspectado(Integer idCliente);
-
 	boolean isCNPJExistente(Integer idCliente, String cnpj);
 
 	boolean isCPFExistente(Integer idCliente, String cpf);
@@ -83,4 +81,6 @@ public interface ClienteService {
 	void removerLogradouro(Integer idLogradouro);
 
 	void removerLogradourosAusentes(Integer idCliente, Collection<LogradouroCliente> listaLogradouro);
+
+	void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException;
 }

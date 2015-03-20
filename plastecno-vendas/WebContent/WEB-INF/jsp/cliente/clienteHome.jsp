@@ -153,16 +153,6 @@ function remover(codigo, nome) {
 			<input type="hidden" id="id" name="cliente.vendedor.id"
 				value="${cliente.vendedor.id}" />
 
-			<c:if test="${empty cliente or not cliente.prospeccaoFinalizada}">
-				<div class="label">Prospectado:</div>
-				<div class="input" style="width: 80%;">
-					<input type="checkbox" id="prospeccaoFinalizada"
-						name="cliente.prospeccaoFinalizada"
-						<c:if test="${cliente.prospeccaoFinalizada}">checked</c:if>
-						class="checkbox" />
-				</div>
-			</c:if>
-			
 			<div class="label obrigatorio">Tipo Cliente:</div>
 			<div class="input">
 				<input type="radio" name="cliente.tipoCliente" 
@@ -300,7 +290,6 @@ function remover(codigo, nome) {
 			<table class="listrada">
 				<thead>
 					<tr>
-						<th style="width: 5%">Prospectado</th>
 						<th style="width: 25%">Nome</th>
 						<th style="width: 20%">Email</th>
 						<th style="width: 10%">CNPJ</th>
@@ -313,9 +302,6 @@ function remover(codigo, nome) {
 				<tbody>
 					<c:forEach var="cliente" items="${listaCliente}">
 						<tr>
-							<td><c:if test="${cliente.prospeccaoFinalizada}">
-									<div class="flagOK"></div>
-								</c:if></td>
 							<td>${cliente.nomeFantasia}</td>
 							<td>${cliente.email}</td>
 							<td>${cliente.cnpj}</td>

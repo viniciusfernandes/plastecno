@@ -102,16 +102,6 @@ function inicializarAutocompleteMaterial() {
 			$('#formPesquisa #idMaterial').val(itemLista.id);
 		}
 	});
-	
-	autocompletar({
-		url : '<c:url value="/estoque/material/listagem"/>',
-		campoPesquisavel : 'bloco_item_pedido #material',
-		parametro : 'sigla',
-		containerResultados : 'bloco_item_pedido #containerPesquisaMaterial',
-		selecionarItem : function(itemLista) {
-			$('#bloco_item_pedido #idMaterial').val(itemLista.id);
-		}
-	});
 };
 
 function inicializarFiltro() {

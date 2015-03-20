@@ -37,7 +37,6 @@ public class EntidadeBuilder {
 
 	public Cliente buildCliente() {
 		Cliente cliente = new Cliente();
-		cliente.setProspeccaoFinalizada(false);
 		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
 		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.ENTREGA));
 		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.COBRANCA));

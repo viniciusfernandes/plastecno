@@ -86,3 +86,5 @@ ALTER TABLE VENDAS.TB_CLIENTE ADD ID_TIPO_CLIENTE INTEGER DEFAULT 0;
 ALTER TABLE vendas.TB_CLIENTE ADD CONSTRAINT ID_TIPO_CLIENTE FOREIGN KEY (ID_TIPO_CLIENTE) REFERENCES vendas.TB_TIPO_CLIENTE (id);
 
 alter table vendas.tb_item_pedido add item_encomendado boolean default false;
+
+alter table vendas.tb_cliente drop prospeccao_finalizada;

@@ -39,55 +39,33 @@ public class Cliente implements Serializable {
 	 */
 	private static final long serialVersionUID = 4628886058991048859L;
 
-	@Id
-	@SequenceGenerator(name = "clienteSequence", sequenceName = "vendas.seq_cliente_id", allocationSize = 1, initialValue = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clienteSequence")
-	private Integer id;
-
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Nome fantasia do cliente")
-	@Column(name = "nome_fantasia")
-	private String nomeFantasia;
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Razao social do cliente")
-	@Column(name = "razao_social")
-	private String razaoSocial;
-
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
 	private String cnpj;
 
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF do cliente")
 	private String cpf;
 
-	@Column(name = "insc_estadual")
-	@InformacaoValidavel(intervalo = { 0, 15 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscrição estadual do Cliente")
-	private String inscricaoEstadual;
-
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_ultimo_contato ")
 	private Date dataUltimoContato;
 
-	@Column(name = "informacoes_adicionais")
-	private String informacoesAdicionais;
+	@Transient
+	private String dataUltimoContatoFormatada;
 
 	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email do cliente")
 	private String email;
 
-	private String site;
+	@Id
+	@SequenceGenerator(name = "clienteSequence", sequenceName = "vendas.seq_cliente_id", allocationSize = 1, initialValue = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clienteSequence")
+	private Integer id;
 
-	@Column(name = "prospeccao_finalizada")
-	private Boolean prospeccaoFinalizada;
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_ramo_atividade")
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Ramo de atividade do cliente")
-	private RamoAtividade ramoAtividade;
+	@Column(name = "informacoes_adicionais")
+	private String informacoesAdicionais;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_vendedor", referencedColumnName = "id", nullable = false)
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor do cliente")
-	private Usuario vendedor;
-
-	@OneToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "tb_cliente_tb_transportadora", schema = "vendas", joinColumns = { @JoinColumn(name = "id_cliente", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_transportadora", referencedColumnName = "id") })
-	private List<Transportadora> listaRedespacho;
+	@Column(name = "insc_estadual")
+	@InformacaoValidavel(intervalo = { 0, 15 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscrição estadual do Cliente")
+	private String inscricaoEstadual;
 
 	/*
 	 * Tivemos que implementar como um Set pois o hibernate tem uma limitacao em
@@ -102,13 +80,34 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de logradouro do cliente")
 	private List<LogradouroCliente> listaLogradouro;
 
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "tb_cliente_tb_transportadora", schema = "vendas", joinColumns = { @JoinColumn(name = "id_cliente", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_transportadora", referencedColumnName = "id") })
+	private List<Transportadora> listaRedespacho;
+
+	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Nome fantasia do cliente")
+	@Column(name = "nome_fantasia")
+	private String nomeFantasia;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_ramo_atividade")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Ramo de atividade do cliente")
+	private RamoAtividade ramoAtividade;
+
+	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Razao social do cliente")
+	@Column(name = "razao_social")
+	private String razaoSocial;
+
+	private String site;
+
 	@Enumerated
 	@Column(name = "id_tipo_cliente")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo de cliente")
 	private TipoCliente tipoCliente;
 
-	@Transient
-	private String dataUltimoContatoFormatada;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_vendedor", referencedColumnName = "id", nullable = false)
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor do cliente")
+	private Usuario vendedor;
 
 	public Cliente() {
 	}
@@ -243,10 +242,6 @@ public class Cliente implements Serializable {
 		return nomeFantasia;
 	}
 
-	public Boolean getProspeccaoFinalizada() {
-		return prospeccaoFinalizada;
-	}
-
 	public RamoAtividade getRamoAtividade() {
 		return ramoAtividade;
 	}
@@ -277,10 +272,6 @@ public class Cliente implements Serializable {
 
 	public boolean isListaLogradouroPreenchida() {
 		return this.listaLogradouro != null && !this.listaLogradouro.isEmpty();
-	}
-
-	public boolean isProspectado() {
-		return this.prospeccaoFinalizada != null && this.prospeccaoFinalizada.booleanValue();
 	}
 
 	public boolean isRevendedor() {
@@ -340,10 +331,6 @@ public class Cliente implements Serializable {
 
 	public void setNomeFantasia(String nomeFantasia) {
 		this.nomeFantasia = nomeFantasia;
-	}
-
-	public void setProspeccaoFinalizada(Boolean prospeccaoFinalizada) {
-		this.prospeccaoFinalizada = prospeccaoFinalizada;
 	}
 
 	public void setRamoAtividade(RamoAtividade ramoAtividade) {

@@ -70,6 +70,21 @@ $(document).ready(function() {
 			});
 		}
 	});
+	$('#botaoRecortarItemPedido').click(function (){
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja RECORTAR esse item, pois o estoque terá seu valor alterado?',
+			confirmar: function(){
+				$('#bloco_item_pedido #descricao').val($('#bloco_item_pedido #descricao').val().toUpperCase());
+				var parametros = $('#formPesquisa').serialize();
+				parametros += '&'+$('#bloco_item_pedido').serialize();
+				
+				var form = $('#formVazio');
+				$(form).attr('method', 'post');
+				$(form).attr('action', '<c:url value="/estoque/item/inclusao"/>?'+parametros);
+				$(form).submit();
+			}
+		});
+	});
 	
 	inicializarAutocompleteMaterial();
 	inicializarSelectFormaMaterial();
@@ -174,7 +189,6 @@ function inicializarFiltro() {
 									<form action="<c:url value="/estoque/item/${item.id}"/>" method="get">
 										<input type="hidden" name="material.id" value="${material.id}"/>
 										<input type="hidden" name="formaMaterial" value="${formaSelecionada}"/>
-						
 										<input type="submit" id="botaoEditarCliente" title="Editar Dados do Cliente" value="" class="botaoEditar"/>
 									</form>
 								</div>

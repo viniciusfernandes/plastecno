@@ -42,6 +42,8 @@ public interface PedidoService {
 
 	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
 
+	boolean enviarRevendaEncomendadaEmpacotamento(Integer idPedido) throws BusinessException;
+
 	Pedido inserir(Pedido pedido) throws BusinessException;
 
 	Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException;
@@ -49,8 +51,6 @@ public interface PedidoService {
 	Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException;
 
 	boolean isCalculoIPIHabilitado(Integer idPedido);
-
-	boolean isClienteProspectado(Integer idPedido);
 
 	boolean isPedidoEnviado(Integer idPedido);
 

@@ -40,17 +40,21 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	private ItemEstoqueDAO itemEstoqueDAO;
 	private ItemReservadoDAO itemReservadoDAO;
-
 	@EJB
 	private PedidoService pedidoService;
+
+	private final double tolerancia = 0.001d;
 
 	private void calcularValorMedio(ItemEstoque itemCadastrado, ItemEstoque itemIncluido) {
 		removerValoresNulos(itemCadastrado);
 		removerValoresNulos(itemIncluido);
 
+		final boolean contemPrecoMedio = itemIncluido.getPrecoMedio() > 0d;
+		final double quantidadeItem = contemPrecoMedio ? itemIncluido.getQuantidade() : 0;
+
 		final double valorEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getPrecoMedio();
 		final double valorItem = itemIncluido.getQuantidade() * itemIncluido.getPrecoMedio();
-		final double quantidadeTotal = itemCadastrado.getQuantidade() + itemIncluido.getQuantidade();
+		final double quantidadeTotal = itemCadastrado.getQuantidade() + quantidadeItem;
 		final double precoMedio = (valorEstoque + valorItem) / quantidadeTotal;
 
 		final double ipiEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getAliquotaIPI();
@@ -121,8 +125,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 			pedido.setSituacaoPedido(SituacaoPedido.EMPACOTADO);
 		}
 	}
-	
-	
 
 	private ItemEstoque gerarItemEstoque(ItemPedido itemPedido) {
 
@@ -196,7 +198,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if ((val1 != null && val2 == null) || (val1 == null && val2 != null)) {
 			return false;
 		}
-		final double tolerancia = 0.001;
 		return Math.abs(1 - val1 / val2) <= tolerancia;
 	}
 
@@ -277,6 +278,41 @@ public class EstoqueServiceImpl implements EstoqueService {
 				.createQuery("select distinct new Material(m.id, m.sigla, m.descricao) from ItemEstoque i inner join i.material m where m.sigla like :sigla order by m.sigla ");
 		query.setParameter("sigla", "%" + sigla + "%");
 		return query.getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer recortarItemEstoque(ItemEstoque itemRecortado) throws BusinessException {
+		if (itemRecortado.isPeca()) {
+			throw new BusinessException("Não é possível recortar uma peça do estoque");
+		}
+		ItemEstoque itemEstoque = pesquisarItemEstoqueById(itemRecortado.getId());
+		if (itemEstoque == null) {
+			throw new BusinessException("O item \""
+					+ (itemRecortado.isPeca() ? itemRecortado.getDescricaoPeca() : itemRecortado.getDescricao())
+					+ "\" não existe no estoque e não pode ser recortado");
+		}
+
+		if (itemRecortado.getMedidaExterna() > itemEstoque.getMedidaExterna()) {
+			throw new BusinessException("Não é possível que a medida externa recortada seja maior do que a medida no estoque");
+		}
+
+		if (itemRecortado.contemLargura() && itemRecortado.getMedidaInterna() > itemEstoque.getMedidaInterna()) {
+			throw new BusinessException("Não é possível que a medida interna recortada seja maior do que a medida no estoque");
+		}
+
+		if (itemRecortado.getComprimento() > itemEstoque.getComprimento()) {
+			throw new BusinessException(
+					"Não é possível que o comprimento recortado seja maior do que o comprimento no estoque");
+		}
+
+		Integer quantidadeEstoque = itemEstoque.getQuantidade() - itemRecortado.getQuantidade();
+
+		if (quantidadeEstoque < 0) {
+			throw new BusinessException("A quantidade recortada não pode ser superior a quantidade em estoque");
+		}
+
+		return null;
 	}
 
 	@Override
@@ -392,16 +428,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 				: SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
 		pedidoService.inserir(pedido);
 		return todosReservados;
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public boolean enviarPedidoEmpacotamento(Integer idPedido) throws BusinessException {
-		boolean empacotamentoOk = reservarItemPedido(idPedido);
-		if (!empacotamentoOk) {
-			pedidoService.alterarSituacaoPedidoEncomendadoByIdPedido(idPedido);
-		}
-		return empacotamentoOk;
 	}
 
 	@Override

@@ -4,8 +4,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import mockit.Mock;
 import mockit.MockUp;
@@ -16,7 +18,7 @@ class EntidadeRepository {
 		return repository;
 	}
 
-	private static final Map<Class<?>, List<Object>> mapaEntidades = new HashMap<Class<?>, List<Object>>();
+	private static final Map<Class<?>, Set<Object>> mapaEntidades = new HashMap<Class<?>, Set<Object>>();
 
 	private static final EntidadeRepository repository = new EntidadeRepository();
 
@@ -24,17 +26,27 @@ class EntidadeRepository {
 
 	}
 
-	void clear() {
-		mapaEntidades.clear();
-	}
-
-	void print() {
-		for (List<Object> lista : mapaEntidades.values()) {
-			for (Object object : lista) {
-				System.out.println("Entidade: " + object);
+	<T> void alterarEntidadeAtributoById(Class<T> classe, Integer id, String nomeAtributo, Object valorAtributo) {
+		T t = pesquisarEntidadeById(classe, id);
+		if (t == null) {
+			return;
+		}
+		Field f = null;
+		try {
+			f = classe.getDeclaredField(nomeAtributo);
+			f.setAccessible(true);
+			f.set(t, valorAtributo);
+		} catch (Exception e) {
+			throw new IllegalStateException("Falha na procura do " + classe.getName() + "." + nomeAtributo, e);
+		} finally {
+			if (f != null) {
+				f.setAccessible(false);
 			}
 		}
-		System.out.println();
+	}
+
+	void clear() {
+		mapaEntidades.clear();
 	}
 
 	<T> boolean contemEntidade(Class<T> classe, String nomeAtributo, Object valorAtributo, Object valorIdEntidade) {
@@ -56,6 +68,11 @@ class EntidadeRepository {
 			Object alterar(Object t) {
 				inserirEntidade(t);
 				return t;
+			}
+
+			@Mock
+			Object remover(Object t) {
+				return mapaEntidades.get(t.getClass()).remove(t);
 			}
 
 			@Mock
@@ -91,7 +108,7 @@ class EntidadeRepository {
 
 	void inserirEntidade(Object entidade) {
 		if (!mapaEntidades.containsKey(entidade.getClass())) {
-			mapaEntidades.put(entidade.getClass(), new ArrayList<Object>());
+			mapaEntidades.put(entidade.getClass(), new HashSet<Object>());
 		}
 		mapaEntidades.get(entidade.getClass()).add(entidade);
 	}
@@ -146,7 +163,7 @@ class EntidadeRepository {
 		}
 
 		Integer idObj = null;
-		List<Object> listaEntidade = mapaEntidades.get(classe);
+		Set<Object> listaEntidade = mapaEntidades.get(classe);
 		for (Object o : listaEntidade) {
 			try {
 				idObj = (Integer) o.getClass().getMethod("getId", (Class[]) null).invoke(o, (Object[]) null);
@@ -195,11 +212,20 @@ class EntidadeRepository {
 
 	@SuppressWarnings("unchecked")
 	<T> List<T> pesquisarTodos(Class<T> classe) {
-		List<T> l = (List<T>) mapaEntidades.get(classe);
-		if (l == null) {
-			l = new ArrayList<T>();
+		Set<T> s = (Set<T>) mapaEntidades.get(classe);
+		List<T> l = new ArrayList<T>();
+		if (s != null) {
+			l.addAll(s);
 		}
 		return l;
+	}
+
+	void print() {
+		for (Set<Object> lista : mapaEntidades.values()) {
+			for (Object object : lista) {
+				System.out.println("Entidade: " + object);
+			}
+		}
 	}
 
 }

@@ -233,32 +233,37 @@ public class PedidoServiceImpl implements PedidoService {
 		contato.setNome(comprador.getNome());
 		contato.setEmail(comprador.getEmail());
 
-		Pedido pedido = new Pedido();
-		pedido.setCliente(clienteService.pesquisarRevendedor());
-		pedido.setComprador(comprador);
-		pedido.setContato(contato);
-		pedido.setDataInclusao(new Date());
-		pedido.setFinalidadePedido(FinalidadePedido.REVENDA);
-		pedido.setProprietario(comprador);
-		pedido.setRepresentada(fornecedor);
-		pedido.setSituacaoPedido(SituacaoPedido.COMPRA_ENCOMENDADA);
-		pedido.setTipoPedido(TipoPedido.COMPRA);
-		pedido.setTipoEntrega(TipoEntrega.CIF);
+		Pedido pedidoCompra = new Pedido();
+		pedidoCompra.setCliente(clienteService.pesquisarRevendedor());
+		pedidoCompra.setComprador(comprador);
+		pedidoCompra.setContato(contato);
+		pedidoCompra.setDataInclusao(new Date());
+		pedidoCompra.setFinalidadePedido(FinalidadePedido.REVENDA);
+		pedidoCompra.setProprietario(comprador);
+		pedidoCompra.setRepresentada(fornecedor);
+		pedidoCompra.setSituacaoPedido(SituacaoPedido.COMPRA_ENCOMENDADA);
+		pedidoCompra.setTipoPedido(TipoPedido.COMPRA);
+		pedidoCompra.setTipoEntrega(TipoEntrega.CIF);
 
-		pedido = inserir(pedido);
+		pedidoCompra = inserir(pedidoCompra);
 		ItemPedido itemCadastrado = null;
 		ItemPedido itemClone = null;
+		boolean incluiAlgumItem = false;
 		for (Integer idItemPedido : listaIdItemPedido) {
 			itemCadastrado = pesquisarItemPedido(idItemPedido);
 			if (itemCadastrado == null) {
 				continue;
 			}
 			itemClone = itemCadastrado.clone();
-			itemClone.setPedido(pedido);
+			itemClone.setPedido(pedidoCompra);
 			itemClone.setQuantidade(itemCadastrado.getQuantidadeEncomendada());
 			itemClone.setQuantidadeReservada(0);
+
 			try {
-				inserirItemPedido(pedido.getId(), itemClone);
+				inserirItemPedido(pedidoCompra.getId(), itemClone);
+				if (!incluiAlgumItem) {
+					incluiAlgumItem = true;
+				}
 			} catch (BusinessException e) {
 				throw new BusinessException("Não foi possível cadastrar uma nova encomenda pois houve falha no item No. "
 						+ itemCadastrado.getSequencial() + " do pedido No. " + itemCadastrado.getPedido().getId()
@@ -271,7 +276,10 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 
 		}
-		return pedido.getId();
+		if (!incluiAlgumItem) {
+			pedidoDAO.remover(pedidoCompra);
+		}
+		return pedidoCompra.getId();
 	}
 
 	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
@@ -324,6 +332,16 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.alterar(pedido);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public boolean enviarRevendaEncomendadaEmpacotamento(Integer idPedido) throws BusinessException {
+		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
+		if (!empacotamentoOk) {
+			alterarSituacaoPedidoEncomendadoByIdPedido(idPedido);
+		}
+		return empacotamentoOk;
+	}
+
 	private void enviarVenda(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
 		this.validarEnvioVenda(pedido);
 
@@ -331,7 +349,7 @@ public class PedidoServiceImpl implements PedidoService {
 			estoqueService.reservarItemPedido(pedido.getId());
 		}
 
-		logradouroService.verificarListaLogradouroObrigatorio(pedido.getListaLogradouro());
+		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
 		// Aqui estamos tratando o caso em que a situacao do pedido nao foi definida
 		// na reserva dos itens do pedido, pois la o pedido entre em pendecia de
 		// reserva.
@@ -552,14 +570,6 @@ public class PedidoServiceImpl implements PedidoService {
 	public boolean isCalculoIPIHabilitado(Integer idPedido) {
 		Integer idRepresentada = pesquisarIdRepresentadaByIdPedido(idPedido);
 		return representadaService.isCalculoIPIHabilitado(idRepresentada);
-	}
-
-	@Override
-	public boolean isClienteProspectado(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select c.prospeccaoFinalizada from Pedido p inner join p.cliente c where p.id = :idPedido").setParameter(
-						"idPedido", idPedido), Boolean.class, false);
 	}
 
 	@Override
@@ -1041,6 +1051,16 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void reencomendarItemPedido(Integer idItemPedido) throws BusinessException {
+		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
+		ItemPedido itemPedido = pesquisarItemPedido(idItemPedido);
+		itemPedido.setQuantidadeReservada(0);
+		itemPedido.setEncomendado(false);
+		inserirItemPedido(itemPedido);
+	}
+
+	@Override
 	public Integer refazerPedido(Integer idPedido) throws BusinessException {
 		Pedido pedido = pesquisarPedidoById(idPedido);
 		Pedido pedidoClone = null;
@@ -1107,8 +1127,9 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	private void validarEnvio(Pedido pedido) throws BusinessException {
-		if (!pedido.getCliente().isProspectado()) {
-			throw new BusinessException("Não é possível enviar pedido para clientes em não propspectado");
+
+		if (!pedido.isOrcamento()) {
+			clienteService.validarListaLogradouroPreenchida(pedido.getCliente());
 		}
 
 		final BusinessException exception = new BusinessException();
@@ -1155,15 +1176,5 @@ public class PedidoServiceImpl implements PedidoService {
 		if (exception.contemMensagem()) {
 			throw exception;
 		}
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void reencomendarItemPedido(Integer idItemPedido) throws BusinessException {
-		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
-		ItemPedido itemPedido = pesquisarItemPedido(idItemPedido);
-		itemPedido.setQuantidadeReservada(0);
-		itemPedido.setEncomendado(false);
-		inserirItemPedido(itemPedido);
 	}
 }

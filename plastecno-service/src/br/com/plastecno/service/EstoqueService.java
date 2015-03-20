@@ -25,7 +25,6 @@ public interface EstoqueService {
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
-
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
 	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
@@ -40,11 +39,11 @@ public interface EstoqueService {
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
+	Integer recortarItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
+
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	boolean reservarItemPedido(Integer idPedido) throws BusinessException;
 
 	SituacaoReservaEstoque reservarItemPedido(ItemPedido itemPedido) throws BusinessException;
-
-	boolean enviarPedidoEmpacotamento(Integer idPedido) throws BusinessException;
 }

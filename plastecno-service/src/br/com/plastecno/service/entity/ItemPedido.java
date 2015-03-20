@@ -28,11 +28,11 @@ public class ItemPedido extends Item {
 	private static final long serialVersionUID = 3602081055672681943L;
 
 	@Column(name = "aliquota_icms")
-	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota ICMS")
+	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
 
 	@Column(name = "aliquota_ipi")
-	@InformacaoValidavel(numerico = true, valorNaoNegativo = false, nomeExibicao = "Alíquota IPI")
+	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota IPI")
 	private Double aliquotaIPI;
 
 	private Double comprimento;
@@ -76,24 +76,24 @@ public class ItemPedido extends Item {
 	private Pedido pedido;
 
 	@Column(name = "preco_unidade")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = false, nomeExibicao = "Preço da unidade item do pedido")
 	private Double precoUnidade;
 
 	@Transient
 	private String precoUnidadeFormatado;
 
 	@Column(name = "preco_unidade_ipi")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNaoNegativo = false, nomeExibicao = "Preço da unidade item do pedido com IPI")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = false, nomeExibicao = "Preço da unidade item do pedido com IPI")
 	private Double precoUnidadeIPI;
 
 	@Transient
 	private String precoUnidadeIPIFormatado;
 
 	@Column(name = "preco_venda")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Preço de venda do item do pedido")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Preço de venda do item do pedido")
 	private Double precoVenda;
 
-	@InformacaoValidavel(obrigatorio = true, numerico = true, valorNegativo = false, nomeExibicao = "Quantidade de itens do pedido")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Quantidade de itens do pedido")
 	private Integer quantidade;
 
 	@Column(name = "quantidade_reservada")
@@ -112,12 +112,16 @@ public class ItemPedido extends Item {
 	public ItemPedido() {
 	}
 
+	public ItemPedido(FormaMaterial formaMaterial) {
+		this.formaMaterial = formaMaterial;
+	}
+
 	public ItemPedido(Integer id) {
 		this.id = id;
 	}
 
-	public ItemPedido(FormaMaterial formaMaterial) {
-		this.formaMaterial = formaMaterial;
+	public void addQuantidadeReservada(Integer quantidadeReservada) {
+		setQuantidadeReservada(getQuantidadeReservada() + quantidadeReservada);
 	}
 
 	public double calcularPrecoTotal() {
@@ -332,10 +336,6 @@ public class ItemPedido extends Item {
 
 	public void setQuantidadeReservada(Integer quantidadeReservada) {
 		this.quantidadeReservada = quantidadeReservada;
-	}
-
-	public void addQuantidadeReservada(Integer quantidadeReservada) {
-		setQuantidadeReservada(getQuantidadeReservada() + quantidadeReservada);
 	}
 
 	public void setRecebido(boolean recebido) {

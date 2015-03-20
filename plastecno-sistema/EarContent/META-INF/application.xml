@@ -3,11 +3,11 @@
   <display-name>plastecno-sistema-teste</display-name>
   <module>
     <web>
-      <web-uri>plastecno-vendas.war</web-uri>
-      <context-root>vendas</context-root>
+      <web-uri>plastecno-vendas-teste.war</web-uri>
+      <context-root>teste</context-root>
     </web>
   </module>
   <module>
-    <ejb>plastecno-service-impl.jar</ejb>
+    <ejb>plastecno-service-impl-teste.jar</ejb>
   </module>
 </application>

@@ -131,7 +131,6 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		Cliente cliente = pedido.getCliente();
-		cliente.setProspeccaoFinalizada(true);
 		cliente.setVendedor(vendedor);
 		try {
 			clienteService.inserir(cliente);
@@ -159,7 +158,6 @@ public class PedidoServiceTest extends AbstractTest {
 	private Pedido gerarPedidoClienteProspectado() {
 		Pedido pedido = eBuilder.buildPedido();
 		Cliente cliente = pedido.getCliente();
-		cliente.setProspeccaoFinalizada(true);
 		try {
 			clienteService.inserir(cliente);
 		} catch (BusinessException e) {
@@ -277,7 +275,6 @@ public class PedidoServiceTest extends AbstractTest {
 				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
-				pedido.getCliente().setProspeccaoFinalizada(true);
 				pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
 				return pedido;
 			}
@@ -295,7 +292,6 @@ public class PedidoServiceTest extends AbstractTest {
 			Pedido pesquisarById(Integer idPedido) {
 				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
-				pedido.getCliente().setProspeccaoFinalizada(false);
 				return pedido;
 			}
 
@@ -313,7 +309,6 @@ public class PedidoServiceTest extends AbstractTest {
 				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
-				pedido.getCliente().setProspeccaoFinalizada(true);
 				pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
 				return pedido;
 			}
@@ -332,7 +327,6 @@ public class PedidoServiceTest extends AbstractTest {
 				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
-				pedido.getCliente().setProspeccaoFinalizada(true);
 				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 				pedido.setFormaPagamento("A VISTA");
 				pedido.setTipoEntrega(TipoEntrega.FOB);
@@ -356,7 +350,6 @@ public class PedidoServiceTest extends AbstractTest {
 				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
-				pedido.getCliente().setProspeccaoFinalizada(true);
 				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 				pedido.setFormaPagamento("A VISTA");
 				pedido.setTipoEntrega(TipoEntrega.FOB);
@@ -379,7 +372,6 @@ public class PedidoServiceTest extends AbstractTest {
 				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
-				pedido.getCliente().setProspeccaoFinalizada(true);
 				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 				pedido.setFormaPagamento("A VISTA");
 				pedido.setTipoEntrega(TipoEntrega.FOB);
@@ -404,7 +396,6 @@ public class PedidoServiceTest extends AbstractTest {
 				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
-				pedido.getCliente().setProspeccaoFinalizada(true);
 				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 				pedido.setFormaPagamento("A VISTA");
 				pedido.setTipoEntrega(TipoEntrega.FOB);
@@ -429,7 +420,6 @@ public class PedidoServiceTest extends AbstractTest {
 				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
-				pedido.getCliente().setProspeccaoFinalizada(true);
 				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 				pedido.setFormaPagamento("A VISTA");
 				pedido.setTipoEntrega(TipoEntrega.FOB);
@@ -454,7 +444,6 @@ public class PedidoServiceTest extends AbstractTest {
 				Pedido pedido = eBuilder.buildPedido();
 				pedido.setId(idPedido);
 				// Estamos supondo que o cliente ja foi prospectado
-				pedido.getCliente().setProspeccaoFinalizada(true);
 				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 				return pedido;
 			}

@@ -52,8 +52,6 @@ public interface PedidoService {
 
 	boolean isCalculoIPIHabilitado(Integer idPedido);
 
-	boolean isClienteProspectado(Integer idPedido);
-
 	boolean isPedidoEnviado(Integer idPedido);
 
 	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,

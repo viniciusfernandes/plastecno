@@ -88,9 +88,6 @@ public class Cliente implements Serializable {
 	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
 
-	@Column(name = "prospeccao_finalizada")
-	private Boolean prospeccaoFinalizada;
-
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_ramo_atividade")
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Ramo de atividade do cliente")
@@ -245,10 +242,6 @@ public class Cliente implements Serializable {
 		return nomeFantasia;
 	}
 
-	public Boolean getProspeccaoFinalizada() {
-		return prospeccaoFinalizada;
-	}
-
 	public RamoAtividade getRamoAtividade() {
 		return ramoAtividade;
 	}
@@ -279,10 +272,6 @@ public class Cliente implements Serializable {
 
 	public boolean isListaLogradouroPreenchida() {
 		return this.listaLogradouro != null && !this.listaLogradouro.isEmpty();
-	}
-
-	public boolean isProspectado() {
-		return this.prospeccaoFinalizada != null && this.prospeccaoFinalizada.booleanValue();
 	}
 
 	public boolean isRevendedor() {
@@ -342,10 +331,6 @@ public class Cliente implements Serializable {
 
 	public void setNomeFantasia(String nomeFantasia) {
 		this.nomeFantasia = nomeFantasia;
-	}
-
-	public void setProspeccaoFinalizada(Boolean prospeccaoFinalizada) {
-		this.prospeccaoFinalizada = prospeccaoFinalizada;
 	}
 
 	public void setRamoAtividade(RamoAtividade ramoAtividade) {

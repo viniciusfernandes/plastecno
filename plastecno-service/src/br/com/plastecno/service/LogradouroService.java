@@ -45,6 +45,6 @@ public interface LogradouroService {
      */
     <T extends Logradouro> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
 
-    void verificarListaLogradouroObrigatorio(Collection<? extends Logradouro> listaLogradouro) throws BusinessException;
+    void validarListaLogradouroPreenchida(Collection<? extends Logradouro> listaLogradouro) throws BusinessException;
 
 }

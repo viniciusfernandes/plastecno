@@ -40,11 +40,7 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @Stateless
 public class ClienteServiceImpl implements ClienteService {
 
-	@PersistenceContext(unitName = "plastecno")
-	private EntityManager entityManager;
-
-	@EJB
-	private LogradouroService logradouroService;
+	private ClienteDAO clienteDAO;
 
 	@EJB
 	private ConfiguracaoSistemaService configuracaoSistemaService;
@@ -55,10 +51,14 @@ public class ClienteServiceImpl implements ClienteService {
 	@EJB
 	private EnderecamentoService enderecamentoService;
 
+	@PersistenceContext(unitName = "plastecno")
+	private EntityManager entityManager;
+
+	@EJB
+	private LogradouroService logradouroService;
+
 	@EJB
 	private UsuarioService usuarioService;
-
-	private ClienteDAO clienteDAO;
 
 	@Override
 	public Integer contactarCliente(Integer id) {
@@ -117,13 +117,6 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	public Cliente inserir(Cliente cliente) throws BusinessException {
-		/*
-		 * Verificando se foi configurado a prospeccao do cliente, caso nao foi,
-		 * pegaremos a configuracao ja existente no sistema
-		 */
-		if (cliente.getProspeccaoFinalizada() == null) {
-			cliente.setProspeccaoFinalizada(this.isClienteProspectado(cliente.getId()));
-		}
 		ValidadorInformacao.validar(cliente);
 
 		if (isNomeFantasiaExistente(cliente.getId(), cliente.getNomeFantasia())) {
@@ -131,7 +124,6 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		validarDocumentosPreenchidos(cliente);
-		validarListaLogradouroPreenchida(cliente);
 		validarRevendedorExistente(cliente);
 		inserirEndereco(cliente);
 		return cliente.getId() == null ? clienteDAO.inserir(cliente) : clienteDAO.alterar(cliente);
@@ -158,15 +150,6 @@ public class ClienteServiceImpl implements ClienteService {
 				logradouro.addEndereco(this.enderecamentoService.inserir(logradouro.recuperarEndereco()));
 			}
 		}
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public boolean isClienteProspectado(Integer idCliente) {
-		Query query = this.entityManager
-				.createQuery("select c.prospeccaoFinalizada from Cliente c where c.id = :idCliente").setParameter("idCliente",
-						idCliente);
-		return QueryUtil.gerarRegistroUnico(query, Boolean.class, false);
 	}
 
 	@Override
@@ -494,10 +477,10 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 	}
 
-	private void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException {
-		if (cliente.isProspectado()) {
-			logradouroService.verificarListaLogradouroObrigatorio(cliente.getListaLogradouro());
-		}
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException {
+		logradouroService.validarListaLogradouroPreenchida(cliente.getListaLogradouro());
 	}
 
 	public void validarRevendedorExistente(Cliente cliente) throws BusinessException {

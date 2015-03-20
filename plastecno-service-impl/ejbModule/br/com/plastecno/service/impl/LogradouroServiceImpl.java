@@ -129,7 +129,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 	}
 	
 	@Override
-	public void verificarListaLogradouroObrigatorio(Collection<? extends Logradouro> listaLogradouro) throws BusinessException {
+	public void validarListaLogradouroPreenchida(Collection<? extends Logradouro> listaLogradouro) throws BusinessException {
 		Set<TipoLogradouro> listaTipoLogradouroNaoPreenchido = new HashSet<TipoLogradouro>();
 		listaTipoLogradouroNaoPreenchido.add(TipoLogradouro.COBRANCA);
 		listaTipoLogradouroNaoPreenchido.add(TipoLogradouro.ENTREGA);

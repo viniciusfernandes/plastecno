@@ -114,6 +114,7 @@ $(document).ready(function() {
 	habilitar('#representada', <c:out value="${empty pedido.id or not contemItem}"/>);
 	habilitar('#bloco_item_pedido #ipi', <c:out value="${not ipiDesabilitado}"/>);
 	habilitar('#idRepresentada', <c:out value="${not empty pedido.id and contemItem}"/>);
+	habilitar('#nomeCliente', <c:out value="${empty tipoPedido}"/>);
 	
 	$('#botaoRefazerPedido').click(function (){
 		inicializarModalConfirmacao({
@@ -231,10 +232,8 @@ $(document).ready(function() {
 			</div>
 			<div class="label obrigatorio">Cliente:</div>
 			<div class="input" style="width: 30%">
-				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}"
-					class="pesquisavel" />
-				<div class="suggestionsBox" id="containerPesquisaCliente"
-					style="display: none; width: 50%"></div>
+				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}" class="pesquisavel" />
+				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			<div class="label">Receber Email Ped.:</div>
 			<div class="input" style="width: 30%">

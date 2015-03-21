@@ -120,6 +120,11 @@ public class Cliente implements Serializable {
 		this.nomeFantasia = nomeFantasia;
 	}
 
+	public Cliente(Integer id, String nomeFantasia, String razaoSozial) {
+		this(id, nomeFantasia);
+		this.razaoSocial = razaoSozial;
+	}
+
 	public void addContato(ContatoCliente contatoCliente) {
 		if (this.listaContato == null) {
 			this.setListaContato(new HashSet<ContatoCliente>());

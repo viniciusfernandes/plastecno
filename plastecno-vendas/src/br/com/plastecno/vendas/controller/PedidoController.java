@@ -125,7 +125,7 @@ public class PedidoController extends AbstractController {
             this.pedidoService.cancelarPedido(idPedido);
             this.gerarMensagemSucesso("Pedido No. " + idPedido + " cancelado com sucesso");
             configurarTipoPedido(tipoPedido);
-            irTopoPagina();
+            redirectByTipoPedido(tipoPedido);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e.getListaMensagem());
             pesquisarPedidoById(idPedido, tipoPedido);
@@ -135,7 +135,9 @@ public class PedidoController extends AbstractController {
     private void configurarTipoPedido(TipoPedido tipoPedido) {
         if (TipoPedido.COMPRA.equals(tipoPedido)) {
             addAtributo("tipoPedido", tipoPedido);
-            addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
+            if (!contemAtributo("proprietario")) {
+                addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
+            }
         }
     }
 
@@ -172,8 +174,7 @@ public class PedidoController extends AbstractController {
                             + pedido.getRepresentada().getNomeFantasia();
 
             gerarMensagemSucesso(mensagem);
-
-            irTopoPagina();
+            redirectByTipoPedido(tipoPedido);
         } catch (NotificacaoException e) {
             gerarLogErro("envio de email do pedido No. " + idPedido, e);
         } catch (BusinessException e) {
@@ -376,8 +377,8 @@ public class PedidoController extends AbstractController {
 
     @Get("pedido/limpar")
     public void limpar(TipoPedido tipoPedido) {
-        redirecTo(this.getClass()).pedidoHome();
         configurarTipoPedido(tipoPedido);
+        redirectByTipoPedido(tipoPedido);
     }
 
     @Get("pedido/compra")
@@ -385,6 +386,7 @@ public class PedidoController extends AbstractController {
         configurarTipoPedido(TipoPedido.COMPRA);
         addAtributo("listaRepresentada", representadaService.pesquisarFornecedor(true));
         addAtributo("descricaoTipoPedido", TipoPedido.COMPRA.getDescricao());
+        addAtributo("cliente", clienteService.pesquisarRevendedor());
         redirecTo(this.getClass()).pedidoHome();
     }
 
@@ -541,13 +543,13 @@ public class PedidoController extends AbstractController {
             // pedidos ja enviados
             final boolean acessoCancelamentoPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao)
                     || SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacao)
-                    || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
-                        .equals(situacao))
-                    && !SituacaoPedido.CANCELADO.equals(situacao)
-                    && isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+                    || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao)
+                    || SituacaoPedido.EMPACOTADO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao))
+                    && !SituacaoPedido.CANCELADO.equals(situacao) && isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
 
             final boolean acessoRefazerPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao)
-                    || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao)
+                    || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao)
+                    || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao)
                     || SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO
                         .equals(situacao)) && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO);
 
@@ -558,7 +560,7 @@ public class PedidoController extends AbstractController {
             liberarAcesso("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
         }
         configurarTipoPedido(tipoPedido);
-        irTopoPagina();
+        redirectByTipoPedido(tipoPedido);
     }
 
     @Get("pedido/listagem")
@@ -600,6 +602,15 @@ public class PedidoController extends AbstractController {
             addAtributo("listaRedespacho", this.transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
         }
         configurarTipoPedido(tipoPedido);
+    }
+
+    private void redirectByTipoPedido(TipoPedido tipoPedido) {
+        if (TipoPedido.COMPRA.equals(tipoPedido)) {
+            redirecTo(this.getClass()).pedidoCompra();
+        } else {
+            redirecTo(this.getClass()).pedidoHome();
+        }
+        irTopoPagina();
     }
 
     @Post("pedido/refazer")

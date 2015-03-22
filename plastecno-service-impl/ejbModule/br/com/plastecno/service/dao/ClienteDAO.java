@@ -62,7 +62,7 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 	public Cliente pesquisarRevendedor() {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
-						"select new Cliente(c.id, c.nomeFantasia) from Cliente c where c.tipoCliente = :tipoCliente").setParameter(
+						"select new Cliente(c.id, c.nomeFantasia, c.razaoSocial) from Cliente c where c.tipoCliente = :tipoCliente").setParameter(
 						"tipoCliente", TipoCliente.REVENDEDOR), Cliente.class, null);
 	}
 }

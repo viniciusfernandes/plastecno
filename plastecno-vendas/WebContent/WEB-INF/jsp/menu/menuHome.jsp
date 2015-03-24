@@ -51,7 +51,7 @@
 					<ul>
 						<li><a href="ramo" target="principal_frame">Ramos
 								Atividades</a></li>
-						<li><a href="representada" target="principal_frame">Representadas</a></li>
+						<li><a href="representada" target="principal_frame">Represent. / Forneced.</a></li>
 						<li><a href="transportadora" target="principal_frame">Transportadoras</a></li>
 						<li><a href="material" target="principal_frame">Materiais</a></li>
 						<c:if test="${acessoAdministracaoPermitido}">

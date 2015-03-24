@@ -41,9 +41,9 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td class="label">Vendedor:</td>
-				<td colspan="2">{pedido.vendedor.nomeCompleto} -
-					{pedido.vendedor.email}</td>
+				<td class="label">{tipoProprietario}:</td>
+				<td colspan="2">{pedido.proprietario.nomeCompleto} -
+					{pedido.proprietario.email}</td>
 				<td class="label" style="width: 70px">Email Envio NFe:</td>
 				<td colspan="2">{pedido.cliente.email}</td>
 			</tr>
@@ -52,7 +52,7 @@
 				<td>{pedido.id}</td>
 				<td class="label">Ped. Cli.:</td>
 				<td>{pedido.numeroPedidoCliente}</td>
-				<td class="label">Represent.:</td>
+				<td class="label">{tipoRelacionamento}:</td>
 				<td>{pedido.representada.nomeFantasia}</td>
 			</tr>
 			<tr>
@@ -220,6 +220,24 @@
 					{pedido.valorPedidoIPIFormatado}</td>
 			</tr>
 		</tfoot>
+	</table>
+	<table class="listagem">
+		<thead>
+			<tr>
+				<th class="descricaoTabela" >Informações Adicionais</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="informacaoAdicional">Informar o número deste pedido de compras em sua nota fiscal eletrônica.</td>
+			</tr>
+			<tr>
+				<td class="informacaoAdicional">Enviar a nota fiscal eletrônica (XML e PDF) para <i style="text-decoration: underline;">plastecno@plastecno.com.br</i></td>
+			</tr>
+			<tr>
+				<td class="informacaoAdicional">Horário de recebimento de mercadorias : segundas as sextas feiras, das 8 às 17:30 horas (sem intervalo de almoço).</td>
+			</tr>
+		</tbody>
 	</table>
 </body>
 </html>

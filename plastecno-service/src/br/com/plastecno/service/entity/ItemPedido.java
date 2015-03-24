@@ -96,6 +96,9 @@ public class ItemPedido extends Item {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Quantidade de itens do pedido")
 	private Integer quantidade;
 
+	@Column(name = "quantidade_recepcionada")
+	private Integer quantidadeRecepcionada;
+
 	@Column(name = "quantidade_reservada")
 	private Integer quantidadeReservada;
 
@@ -226,6 +229,10 @@ public class ItemPedido extends Item {
 		return getQuantidade() - getQuantidadeReservada();
 	}
 
+	public Integer getQuantidadeRecepcionada() {
+		return quantidadeRecepcionada;
+	}
+
 	public Integer getQuantidadeReservada() {
 		return quantidadeReservada == null ? 0 : quantidadeReservada;
 	}
@@ -248,6 +255,10 @@ public class ItemPedido extends Item {
 
 	public boolean isRecebido() {
 		return recebido;
+	}
+
+	public boolean isTodasUnidadesRecepcionadas() {
+		return quantidade != null && quantidade.equals(quantidadeRecepcionada);
 	}
 
 	public boolean isTodasUnidadesReservadas() {
@@ -332,6 +343,10 @@ public class ItemPedido extends Item {
 
 	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
+	}
+
+	public void setQuantidadeRecepcionada(Integer quantidadeRecepcionada) {
+		this.quantidadeRecepcionada = quantidadeRecepcionada;
 	}
 
 	public void setQuantidadeReservada(Integer quantidadeReservada) {

@@ -90,6 +90,28 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada)
+			throws BusinessException {
+		if (quantidadeRecepcionada == null) {
+			return;
+		}
+		Integer quantidadeItem = itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
+		if (quantidadeItem == null) {
+			throw new BusinessException("O item de pedido de código " + idItemPedido + " pesquisado não existe no sistema");
+		}
+
+		if (quantidadeItem < quantidadeRecepcionada) {
+			Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
+			Integer sequencialItem = itemPedidoDAO.pesquisarSequencialItemPedido(idItemPedido);
+			throw new BusinessException(
+					"Não é possível recepcionar uma quantidade maior do que foi comprado para o item No. " + sequencialItem
+							+ " do pedido No. " + idPedido);
+		}
+		itemPedidoDAO.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarQuantidadeReservadaByIdItemPedido(Integer idItemPedido) {
 		entityManager.createQuery("update ItemPedido i set i.quantidadeReservada = 0 where i.id=:id")
 				.setParameter("id", idItemPedido).executeUpdate();
@@ -828,7 +850,7 @@ public class PedidoServiceImpl implements PedidoService {
 		select.append("p.dataEnvio >= :dataInicio and ");
 		select.append("p.dataEnvio <= :dataFim and ");
 		select.append("p.situacaoPedido in :situacoes ");
-		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
+		select.append("order by p.dataEntrega, p.id, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
 
 		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
 				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoCompraEfetivada())
@@ -878,7 +900,7 @@ public class PedidoServiceImpl implements PedidoService {
 		select.append(" p.dataEnvio >= :dataInicio and ");
 		select.append("p.dataEnvio <= :dataFim and ");
 		select.append("p.situacaoPedido in (:situacoes) ");
-		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
+		select.append("order by p.dataEntrega, p.id, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
 
 		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
 				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoVendaEfetivada())

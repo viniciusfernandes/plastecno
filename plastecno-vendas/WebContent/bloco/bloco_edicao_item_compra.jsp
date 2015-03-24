@@ -47,7 +47,14 @@ function habilitarCamposEdicaoItem(habilitado){
 	
 	<div class="label">Qtde:</div>
 	<div class="input" style="width: 7%">
-		<input type="text" id="quantidade" name="itemPedido.quantidade" value="${itemPedido.quantidade}"/>
+		<c:choose>
+			<c:when test="${isEstoque}">
+				<input type="text" id="quantidade" name="itemPedido.quantidade" value="${itemPedido.quantidade}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="text" id="quantidade" name="itemPedido.quantidadeRecepcionada" value="${itemPedido.quantidadeRecepcionada}"/>
+			</c:otherwise>
+		</c:choose>
 	</div>
 	<div class="label" style="width: 6%">Forma:</div>
 	<div class="input" style="width: 60%">

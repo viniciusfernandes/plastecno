@@ -88,3 +88,5 @@ ALTER TABLE vendas.TB_CLIENTE ADD CONSTRAINT ID_TIPO_CLIENTE FOREIGN KEY (ID_TIP
 alter table vendas.tb_item_pedido add item_encomendado boolean default false;
 
 alter table vendas.tb_cliente drop prospeccao_finalizada;
+
+alter table vendas.tb_item_pedido add quantidade_recepcionada integer default 0;

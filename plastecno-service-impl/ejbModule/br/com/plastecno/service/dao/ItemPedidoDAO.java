@@ -98,13 +98,6 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return query.getResultList();
 	}
 
-	public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select count(i.id) from ItemPedido i where  i.encomendado = false and i.pedido.id = :idPedido")
-						.setParameter("idPedido", idPedido), Long.class, null);
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemPedidoEmpacotamento(Integer idCliente, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
@@ -227,5 +220,24 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		return query.getResultList();
+	}
+
+	public Integer pesquisarSequencialItemPedido(Integer idItemPedido) {
+		return pesquisarCampoById(ItemPedido.class, idItemPedido, "sequencial", Integer.class);
+	}
+
+	public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada) {
+		entityManager
+				.createQuery(
+						"update ItemPedido i set i.quantidadeRecepcionada = :quantidadeRecepcionada where i.id = :idItemPedido")
+				.setParameter("idItemPedido", idItemPedido).setParameter("quantidadeRecepcionada", quantidadeRecepcionada)
+				.executeUpdate();
+	}
+
+	public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery(
+						"select count(i.id) from ItemPedido i where  i.encomendado = false and i.pedido.id = :idPedido")
+						.setParameter("idPedido", idPedido), Long.class, null);
 	}
 }

@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 
-<title>Plastecno - Cadastro de Representada</title>
+<title>Plastecno - Cadastro de Representada ou Fornecedores</title>
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
@@ -114,7 +114,7 @@ function inicializarModalCancelamento(botao){
 
 
 		<fieldset>
-			<legend>::: Dados de Representadas :::</legend>
+			<legend>::: Dados de Represent. / Forneced. :::</legend>
 			<div class="label">Ativo:</div>
 			<div class="input" style="width: 80%">
 				<input type="checkbox" id="ativo" name="representada.ativo"
@@ -222,7 +222,7 @@ function inicializarModalCancelamento(botao){
 	</form>
 	<a id="rodape"></a>
 	<fieldset>
-		<legend>::: Resultado da Pesquisa de Representadas :::</legend>
+		<legend>::: Resultado da Pesquisa de Represent. / Forneced. :::</legend>
 		<div id="paginador"></div>
 		<div>
 			<table id="tabela" class="listrada">

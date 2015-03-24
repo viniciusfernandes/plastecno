@@ -136,7 +136,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemEstoque.setMaterial(itemPedido.getMaterial());
 		itemEstoque.setMedidaExterna(itemPedido.getMedidaExterna());
 		itemEstoque.setMedidaInterna(itemPedido.getMedidaInterna());
-		itemEstoque.setQuantidade(itemPedido.getQuantidade());
+		itemEstoque.setQuantidade(itemPedido.getQuantidadeRecepcionada() == null ? 0 : itemPedido
+				.getQuantidadeRecepcionada());
 		itemEstoque.setPrecoMedio(itemPedido.getPrecoUnidade());
 		return itemEstoque;
 	}
@@ -182,10 +183,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Pedido pedido = itemPedido.getPedido();
 
 		long qtdePendente = pedidoService.pesquisarTotalItemCompradoNaoRecebido(pedido.getId());
-		if (qtdePendente <= 1) {
+		if (qtdePendente <= 0) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_RECEBIDA);
 		}
-		itemPedido.setRecebido(true);
+
+		if (itemPedido.isTodasUnidadesRecepcionadas()) {
+			itemPedido.setRecebido(true);
+		}
 
 		return inserirItemEstoque(gerarItemEstoque(itemPedido));
 	}

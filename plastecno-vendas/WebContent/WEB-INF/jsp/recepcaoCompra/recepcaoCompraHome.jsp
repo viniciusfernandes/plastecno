@@ -38,12 +38,12 @@ $(document).ready(function() {
 	habilitar('#bloco_item_pedido #formaMaterial', false);
 	habilitar('#bloco_item_pedido #descricao', false);
 	habilitar('#bloco_item_pedido #material', false);
-	
-	<c:if test="${itemPedido.peca}">
 	habilitar('#bloco_item_pedido #medidaExterna', false);
 	habilitar('#bloco_item_pedido #medidaInterna', false);
 	habilitar('#bloco_item_pedido #comprimento', false);
-	</c:if>
+	habilitar('#bloco_item_pedido #preco', false);
+	habilitar('#bloco_item_pedido #aliquotaIPI', false);
+	habilitar('#bloco_item_pedido #aliquotaICMS', false);
 	
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();
@@ -53,7 +53,7 @@ $(document).ready(function() {
 		if(isEmpty($('#bloco_item_pedido #idItemPedido').val())){
 			return;
 		}
-		var parametros = $('#bloco_item_pedido').serialize();
+		var parametros = 'idItemPedido='+$('#bloco_item_pedido #idItemPedido').val()+'&quantidadeRecepcionada='+$('#bloco_item_pedido #quantidade').val();
 		parametros += '&' + $('#formPesquisa').serialize();
 		var form = $('#formVazio');
 		$(form).attr('method', 'post');
@@ -134,7 +134,8 @@ function recepcionarItem(botao){
 					<th style="width: 10%">Num. Pedido</th>
 					<th style="width: 1%">Item</th>
 					<th style="width: 5%">Qtde</th>
-					<th style="width: 43%">Desc. Item</th>
+					<th style="width: 5%">Qtde Recep.</th>
+					<th style="width: 38%">Desc. Item</th>
 					<th style="width: 10%">Comprador</th>
 					<th style="width: 10%">Represent.</th>
 					<th style="width: 5%">Unid. (R$)</th>
@@ -151,6 +152,7 @@ function recepcionarItem(botao){
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeRecepcionada}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeProprietario}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeRepresentada}</td>

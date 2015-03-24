@@ -58,8 +58,8 @@ public final class ClienteController extends AbstractController {
         final boolean isInclusaoCliente = cliente == null || cliente.getId() == null;
         final boolean isVendedorIgual = cliente != null && cliente.getVendedor() != null
                 && getCodigoUsuario().equals(cliente.getVendedor().getId());
-
-        this.liberarAcesso("acessoInclusaoPermitido", isInclusaoCliente || isVendedorIgual);
+        final boolean isRevendedor = cliente != null && cliente.isRevendedor();
+        this.liberarAcesso("acessoInclusaoPermitido", isInclusaoCliente || isVendedorIgual || isRevendedor);
     }
 
     @Post("cliente/contactar")
@@ -74,8 +74,7 @@ public final class ClienteController extends AbstractController {
     }
 
     private String formatarComentarios(Integer idCliente) {
-        List<ComentarioCliente> listaComentario = this.clienteService
-                .pesquisarComentarioByIdCliente(idCliente);
+        List<ComentarioCliente> listaComentario = this.clienteService.pesquisarComentarioByIdCliente(idCliente);
         StringBuilder concat = new StringBuilder();
         for (ComentarioCliente comentarioCliente : listaComentario) {
             concat.append("\n");
@@ -169,7 +168,7 @@ public final class ClienteController extends AbstractController {
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaCliente");
         addAtributo("cliente", filtro);
     }
-    
+
     @Get("cliente/listagem/nome")
     public void pesquisarClienteByNomeFantasia(String nomeFantasia) {
         List<Autocomplete> lista = new ArrayList<Autocomplete>();

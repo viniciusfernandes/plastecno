@@ -17,23 +17,22 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
-import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class RecepcaoCompraController extends AbstractController {
     @Servico
-    private RepresentadaService representadaService;
-
-    @Servico
-    private RelatorioService relatorioService;
+    private EstoqueService estoqueService;
 
     @Servico
     private PedidoService pedidoService;
 
     @Servico
-    private EstoqueService estoqueService;
+    private RelatorioService relatorioService;
+
+    @Servico
+    private RepresentadaService representadaService;
 
     public RecepcaoCompraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -45,18 +44,13 @@ public class RecepcaoCompraController extends AbstractController {
     }
 
     @Post("compra/item/inclusao")
-    public void inserirItemPedido(ItemPedido itemPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
+    public void inserirItemPedido(Integer idItemPedido, Integer quantidadeRecepcionada, Date dataInicial,
+            Date dataFinal, Integer idRepresentada) {
         try {
-
-            if (itemPedido.getAliquotaIPI() != null) {
-                itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
-            }
-            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota((itemPedido.getAliquotaICMS())));
-
-            pedidoService.inserirItemPedido(itemPedido);
+            pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
             gerarMensagemSucesso("O item de compra foi alterado com sucesso. Essas alterações já podem ser incluidas no estoque.");
         } catch (BusinessException e) {
-            addAtributo("itemPedido", itemPedido);
+            addAtributo("itemPedido", pedidoService.pesquisarItemPedido(idItemPedido));
             gerarListaMensagemErro(e);
         }
         addAtributo("permanecerTopo", true);
@@ -68,8 +62,8 @@ public class RecepcaoCompraController extends AbstractController {
 
         try {
             Periodo periodo = new Periodo(dataInicial, dataFinal);
-            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraAguardandoRecebimento(
-                    idRepresentada, periodo);
+            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService
+                    .gerarRelatorioCompraAguardandoRecebimento(idRepresentada, periodo);
 
             addAtributo("relatorio", relatorio);
             if (contemAtributo("permanecerTopo")) {

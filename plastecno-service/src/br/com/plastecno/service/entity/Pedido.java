@@ -61,7 +61,7 @@ public class Pedido implements Serializable, Cloneable {
 	@Column(name = "data_entrega")
 	private Date dataEntrega;
 
-	@InformacaoValidavel(intervalo = { 0, 800 }, nomeExibicao = "Observacao do pedido")
+	@InformacaoValidavel(intervalo = { 0, 799 }, nomeExibicao = "Observação do pedido")
 	private String observacao;
 
 	/*

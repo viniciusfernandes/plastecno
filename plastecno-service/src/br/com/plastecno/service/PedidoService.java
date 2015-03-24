@@ -19,6 +19,8 @@ import br.com.plastecno.service.wrapper.Periodo;
 @Local
 public interface PedidoService {
 
+	void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada) throws BusinessException;
+
 	void alterarQuantidadeReservadaByIdItemPedido(Integer idItemPedido);
 
 	void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);

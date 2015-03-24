@@ -32,6 +32,11 @@ table tbody tr td label {
 	font-weight: bold;
 }
 
+.informacaoAdicional {
+	font-size: 12px;
+	text-align: center;
+}
+
 .label {
 	font-weight: bold;
 	text-align: right;

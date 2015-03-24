@@ -57,7 +57,7 @@ $(document).ready(function() {
 		parametros += '&' + $('#formPesquisa').serialize();
 		var form = $('#formVazio');
 		$(form).attr('method', 'post');
-		$(form).attr('action', '<c:url value="/compra/item/inclusao"/>?'+parametros);
+		$(form).attr('action', '<c:url value="/compra/item/quantidadeRecepcionada/alteracao"/>?'+parametros);
 		$(form).submit();
 	});
 });

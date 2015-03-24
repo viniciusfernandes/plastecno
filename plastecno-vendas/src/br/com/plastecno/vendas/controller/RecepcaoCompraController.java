@@ -43,8 +43,8 @@ public class RecepcaoCompraController extends AbstractController {
         return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.COMPRA);
     }
 
-    @Post("compra/item/inclusao")
-    public void inserirItemPedido(Integer idItemPedido, Integer quantidadeRecepcionada, Date dataInicial,
+    @Post("compra/item/quantidadeRecepcionada/alteracao")
+    public void alterarQuantidadeRecepcionadaItemPedido(Integer idItemPedido, Integer quantidadeRecepcionada, Date dataInicial,
             Date dataFinal, Integer idRepresentada) {
         try {
             pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);

@@ -182,13 +182,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		Pedido pedido = itemPedido.getPedido();
 
+		if (itemPedido.isTodasUnidadesRecepcionadas()) {
+			itemPedido.setRecebido(true);
+		}
+		
 		long qtdePendente = pedidoService.pesquisarTotalItemCompradoNaoRecebido(pedido.getId());
 		if (qtdePendente <= 0) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_RECEBIDA);
-		}
-
-		if (itemPedido.isTodasUnidadesRecepcionadas()) {
-			itemPedido.setRecebido(true);
 		}
 
 		return inserirItemEstoque(gerarItemEstoque(itemPedido));

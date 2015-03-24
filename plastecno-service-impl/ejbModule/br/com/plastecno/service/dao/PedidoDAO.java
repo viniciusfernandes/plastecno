@@ -206,7 +206,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		} else {
 			select.append(" and p.tipoPedido != :tipoPedido ");
 		}
-		select.append(" order by p.dataInclusao desc, p.cliente.nomeFantasia ");
+		select.append(" order by p.dataInclusao desc, p.id desc, p.cliente.nomeFantasia ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idCliente", idCliente);

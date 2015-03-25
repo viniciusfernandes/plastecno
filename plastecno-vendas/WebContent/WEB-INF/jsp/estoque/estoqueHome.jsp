@@ -93,6 +93,7 @@ $(document).ready(function() {
 });
 
 function inicializarAutocompleteMaterial() {
+	// Esse eh o autocomplete da area de filtros de pesquisa
 	autocompletar({
 		url : '<c:url value="/estoque/material/listagem"/>',
 		campoPesquisavel : 'formPesquisa #material',
@@ -100,6 +101,17 @@ function inicializarAutocompleteMaterial() {
 		containerResultados : 'formPesquisa #containerPesquisaMaterial',
 		selecionarItem : function(itemLista) {
 			$('#formPesquisa #idMaterial').val(itemLista.id);
+		}
+	});
+	
+	// Esse eh o autocomplete da campo de materiais no bloco de edicao dos itens
+	autocompletar({
+		url : '<c:url value="/estoque/material/listagem"/>',
+		campoPesquisavel : 'bloco_item_pedido #material',
+		parametro : 'sigla',
+		containerResultados : 'bloco_item_pedido #containerPesquisaMaterial',
+		selecionarItem : function(itemLista) {
+			$('#bloco_item_pedido #idMaterial').val(itemLista.id);
 		}
 	});
 };

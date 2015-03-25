@@ -56,4 +56,31 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 		return query.getResultList();
 	}
+
+	@SuppressWarnings("unchecked")
+	public List<Double[]> pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i.precoMedio, i.quantidade from ItemEstoque i ");
+		if (idMaterial != null || formaMaterial != null) {
+			select.append("where ");
+		}
+
+		if (idMaterial != null) {
+			select.append("i.material.id = :idMaterial and ");
+		}
+
+		if (formaMaterial != null) {
+			select.append("i.formaMaterial = :formaMaterial ");
+		}
+
+		Query query = entityManager.createQuery(select.toString());
+		if (idMaterial != null) {
+			query.setParameter("idMaterial", idMaterial);
+		}
+
+		if (formaMaterial != null) {
+			query.setParameter("formaMaterial", formaMaterial);
+		}
+		return query.getResultList();
+	}
 }

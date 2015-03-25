@@ -70,6 +70,7 @@ $(document).ready(function() {
 			});
 		}
 	});
+	
 	$('#botaoRecortarItemPedido').click(function (){
 		inicializarModalConfirmacao({
 			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja RECORTAR esse item, pois o estoque terá seu valor alterado?',
@@ -85,6 +86,15 @@ $(document).ready(function() {
 			}
 		});
 	});
+	
+	$('#botaoValorEstoque').click(function (){
+		var parametros = $('#formPesquisa').serialize();
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/estoque/valor"/>?'+parametros);
+		$(form).submit();
+	});
+	
 	
 	inicializarAutocompleteMaterial();
 	inicializarSelectFormaMaterial();
@@ -152,9 +162,16 @@ function inicializarFiltro() {
 				<input type="text" id="material" name="material.descricao" value="${material.descricao}" style="width: 60%" />
 				<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 			</div>
+			<div class="label" style="width: 30%">Valor total em estoque:</div>
+			<div class="input" style="width: 60%">
+				<input type="text" value="R$ ${empty valorEstoque ? '0,00' : valorEstoque}" disabled="disabled" 
+				class="desabilitado" style="width: 60%"/>
+			</div>
+			
 		</fieldset>
 		<div class="bloco_botoes">
-			<input type="submit" value="" class="botaoPesquisar" /> 
+			<input type="submit" value="" class="botaoPesquisar" />
+			<input id="botaoValorEstoque" type="button" value="" class="botaoDinheiro" title="Pesquisar Valor dos Itens no Estoque"/> 
 			<input id="botaoLimpar" type="button" value="" title="Limpar Dados do Item de Estoque" class="botaoLimpar" />
 		</div>
 	</form>

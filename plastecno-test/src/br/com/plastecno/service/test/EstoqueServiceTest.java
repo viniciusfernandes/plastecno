@@ -24,6 +24,7 @@ import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoRelacionamento;
+import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -73,6 +74,50 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		return itemPedido;
+	}
+
+	private List<ItemPedido> gerarListaItemPedido(TipoPedido tipoPedido) {
+		List<ItemPedido> listaItem = new ArrayList<ItemPedido>();
+		Pedido pedido = gerarPedido(tipoPedido);
+		Material material = gerarMaterial(pedido.getRepresentada().getId());
+
+		ItemPedido itemTB1 = eBuilder.buildItemPedido();
+		itemTB1.setMaterial(material);
+		itemTB1.setQuantidade(1);
+		itemTB1.setPrecoVenda(1d);
+		itemTB1.setTipoVenda(TipoVenda.PECA);
+
+		ItemPedido itemTB2 = eBuilder.buildItemPedido();
+		itemTB2.setMaterial(material);
+		itemTB2.setQuantidade(1);
+		itemTB2.setPrecoVenda(1d);
+		itemTB2.setTipoVenda(TipoVenda.PECA);
+
+		ItemPedido itemBQ = eBuilder.buildItemPedido();
+		itemBQ.setFormaMaterial(FormaMaterial.BQ);
+		itemBQ.setMaterial(material);
+		itemBQ.setQuantidade(1);
+		itemBQ.setPrecoVenda(1d);
+		itemBQ.setTipoVenda(TipoVenda.PECA);
+
+		listaItem.add(itemTB1);
+		listaItem.add(itemTB2);
+		listaItem.add(itemBQ);
+
+		try {
+			for (ItemPedido itemPedido : listaItem) {
+				pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
+			}
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		return listaItem;
 	}
 
 	private ItemPedido gerarItemPedidoCompra() {
@@ -1019,4 +1064,34 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	}
 
+	@Test
+	public void testValorTotalEstoque() {
+		List<ItemPedido> listaItemComprado = gerarListaItemPedido(TipoPedido.COMPRA);
+		for (ItemPedido itemPedido : listaItemComprado) {
+			try {
+				estoqueService.inserirItemPedido(itemPedido.getId());
+			} catch (BusinessException e) {
+				printMensagens(e);
+			}
+		}
+		Double totalEstoque = 3d;
+		assertEquals(totalEstoque, estoqueService.pesquisarValorEstoque(null, null));
+	}
+
+	@Test
+	public void testValorEstoqueFormaMaterial() {
+		List<ItemPedido> listaItemComprado = gerarListaItemPedido(TipoPedido.COMPRA);
+		for (ItemPedido itemPedido : listaItemComprado) {
+			try {
+				estoqueService.inserirItemPedido(itemPedido.getId());
+			} catch (BusinessException e) {
+				printMensagens(e);
+			}
+		}
+		Double totalEstoque = 1d;
+		assertEquals(totalEstoque, estoqueService.pesquisarValorEstoque(null, FormaMaterial.BQ));
+
+		totalEstoque = 2d;
+		assertEquals(totalEstoque, estoqueService.pesquisarValorEstoque(null, FormaMaterial.TB));
+	}
 }

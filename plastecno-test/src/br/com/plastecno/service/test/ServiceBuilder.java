@@ -222,6 +222,7 @@ class ServiceBuilder {
 		inject(estoqueService, buildService(PedidoService.class), "pedidoService");
 
 		new MockUp<ItemEstoqueDAO>() {
+
 			@Mock
 			public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
 					String descricaoPeca) {
@@ -247,6 +248,24 @@ class ServiceBuilder {
 					}
 				}
 				return itens;
+			}
+
+			@Mock
+			List<Double[]> pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
+				List<Double[]> listaValores = new ArrayList<Double[]>();
+				boolean isAmbosNulos = false;
+				boolean isMaterialIgual = false;
+				boolean isFormaIgual = false;
+				for (ItemEstoque i : l) {
+					isAmbosNulos = idMaterial == null && formaMaterial == null;
+					isMaterialIgual = idMaterial != null && idMaterial.equals(i.getMaterial().getId());
+					isFormaIgual = formaMaterial != null && formaMaterial.equals(i.getFormaMaterial());
+					if (isAmbosNulos || isMaterialIgual || isFormaIgual) {
+						listaValores.add(new Double[] { i.getPrecoUnidade(), (double) i.getQuantidade() });
+					}
+				}
+				return listaValores;
 			}
 
 		};

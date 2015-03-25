@@ -83,6 +83,14 @@
 	width: 24px;
 }
 
+.botaoDinheiro {
+	background: url("../images/money_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoEndereco {
 	background: url("../images/address_add_24.png") no-repeat scroll 0 0
 		transparent;
@@ -253,6 +261,14 @@
 	background: url("../images/phone_green_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
+}
+
+.botaoDinheiro:hover {
+	background: url("../images/money_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
 }
 
 .botaoImprimir:hover {

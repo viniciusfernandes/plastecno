@@ -37,6 +37,16 @@ public class EstoqueController extends AbstractController {
         verificarPermissaoAcesso("acessoRedefinicaoItemPermitido", TipoAcesso.ADMINISTRACAO);
     }
 
+    @Post("estoque/valor")
+    public void pesquisarValorEstoque(Material material, FormaMaterial formaMaterial) {
+        Double valorEstoque = estoqueService.pesquisarValorEstoque(material.getId(), formaMaterial);
+
+        addAtributo("valorEstoque", NumeroUtils.formatarValorMonetario(valorEstoque));
+        addAtributo("formaSelecionada", formaMaterial);
+        addAtributo("material", material);
+        irTopoPagina();
+    }
+
     @Post("estoque/item/edicao")
     public void redefinirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
             Double aliquotaICMS, Material material, FormaMaterial formaMaterial) {
@@ -122,9 +132,5 @@ public class EstoqueController extends AbstractController {
             }
         }
         serializarJson(new SerializacaoJson("lista", lista));
-    }
-
-    @Post("estoque/item/recorte")
-    public void recortarItemEstoque() {
     }
 }

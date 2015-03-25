@@ -240,8 +240,8 @@ class ServiceBuilder {
 						continue;
 					}
 
-					isPecaSelecionada = descricaoPeca == null || descricaoPeca.equals(item.getDescricaoPeca());
-					if (item.isPeca() && isMaterialSelecionado && isPecaSelecionada) {
+					isPecaSelecionada = item.isPeca() && descricaoPeca != null && descricaoPeca.equals(item.getDescricaoPeca());
+					if (isMaterialSelecionado && isPecaSelecionada) {
 						itens.add(item);
 						continue;
 					}
@@ -277,6 +277,18 @@ class ServiceBuilder {
 			@Mock
 			Material pesquisarById(Integer id) {
 				return REPOSITORY.pesquisarEntidadeById(Material.class, id);
+			}
+
+			@Mock
+			public List<Material> pesquisarBySigla(String sigla) {
+				List<Material> l = REPOSITORY.pesquisarTodos(Material.class);
+				List<Material> lista = new ArrayList<Material>();
+				for (Material material : l) {
+					if (material.getSigla().contains(sigla)) {
+						lista.add(material);
+					}
+				}
+				return lista;
 			}
 		};
 
@@ -485,6 +497,26 @@ class ServiceBuilder {
 			String pesquisarNomeFantasiaById(Integer idRepresentada) {
 				Representada r = REPOSITORY.pesquisarEntidadeById(Representada.class, idRepresentada);
 				return r != null ? r.getNomeFantasia() : null;
+			}
+
+			@Mock
+			public List<Representada> pesquisarRepresentadaByTipoRelacionamento(boolean ativo, TipoRelacionamento... tipos) {
+				List<Representada> l = REPOSITORY.pesquisarTodos(Representada.class);
+
+				if (tipos == null || tipos.length <= 0) {
+					return l;
+				}
+
+				List<Representada> lista = new ArrayList<Representada>();
+				for (Representada representada : l) {
+					for (int i = 0; i < tipos.length; i++) {
+						if (tipos[i].equals(representada.getTipoRelacionamento())) {
+							lista.add(representada);
+							break;
+						}
+					}
+				}
+				return lista;
 			}
 
 			@Mock

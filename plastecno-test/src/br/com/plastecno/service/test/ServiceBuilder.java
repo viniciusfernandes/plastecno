@@ -251,7 +251,7 @@ class ServiceBuilder {
 			}
 
 			@Mock
-			List<Double[]> pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+			Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				List<Double[]> listaValores = new ArrayList<Double[]>();
 				boolean isAmbosNulos = false;
@@ -265,7 +265,16 @@ class ServiceBuilder {
 						listaValores.add(new Double[] { i.getPrecoUnidade(), (double) i.getQuantidade() });
 					}
 				}
-				return listaValores;
+
+				double total = 0d;
+				double val = 0;
+				double quant = 0;
+				for (Double[] valor : listaValores) {
+					val = (Double) valor[0];
+					quant = (Double) valor[1];
+					total += val * quant;
+				}
+				return total;
 			}
 
 		};

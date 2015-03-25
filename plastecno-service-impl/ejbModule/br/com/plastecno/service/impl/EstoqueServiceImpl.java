@@ -299,16 +299,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	public Double pesquisarValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		List<Double[]> listaValores = itemEstoqueDAO.pesquisarValorEQuantidadeItemEstoque(idMaterial, formaMaterial);
-		double total = 0d;
-		double val = 0;
-		int quant = 0;
-		for (Object[] valor : listaValores) {
-			val = (Double) valor[0];
-			quant = (Integer) valor[1];
-			total += val * quant;
-		}
-		return total;
+		return itemEstoqueDAO.pesquisarValorEQuantidadeItemEstoque(idMaterial, formaMaterial);
 	}
 
 	@Override

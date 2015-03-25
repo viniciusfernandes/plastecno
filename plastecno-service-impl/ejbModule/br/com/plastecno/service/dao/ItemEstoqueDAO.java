@@ -7,6 +7,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
 
 public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
@@ -57,20 +58,19 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return query.getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Double[]> pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+	public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		StringBuilder select = new StringBuilder();
-		select.append("select i.precoMedio, i.quantidade from ItemEstoque i ");
-		if (idMaterial != null || formaMaterial != null) {
-			select.append("where ");
+		select.append("select SUM(i.precoMedio * i.quantidade) from ItemEstoque i ");
+		if (idMaterial != null && formaMaterial != null) {
+			select.append("where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
 		}
 
-		if (idMaterial != null) {
-			select.append("i.material.id = :idMaterial and ");
+		if (idMaterial != null && formaMaterial == null) {
+			select.append("where i.material.id = :idMaterial ");
 		}
 
-		if (formaMaterial != null) {
-			select.append("i.formaMaterial = :formaMaterial ");
+		if (idMaterial == null && formaMaterial != null) {
+			select.append("where i.formaMaterial = :formaMaterial ");
 		}
 
 		Query query = entityManager.createQuery(select.toString());
@@ -81,6 +81,6 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		if (formaMaterial != null) {
 			query.setParameter("formaMaterial", formaMaterial);
 		}
-		return query.getResultList();
+		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
 	}
 }

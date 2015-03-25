@@ -38,14 +38,9 @@ public class RecepcaoCompraController extends AbstractController {
         super(result, usuarioInfo);
     }
 
-    @Get("compra/pdf")
-    public Download downloadPedidoPDF(Integer idPedido) {
-        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.COMPRA);
-    }
-
     @Post("compra/item/quantidadeRecepcionada/alteracao")
-    public void alterarQuantidadeRecepcionadaItemPedido(Integer idItemPedido, Integer quantidadeRecepcionada, Date dataInicial,
-            Date dataFinal, Integer idRepresentada) {
+    public void alterarQuantidadeRecepcionadaItemPedido(Integer idItemPedido, Integer quantidadeRecepcionada,
+            Date dataInicial, Date dataFinal, Integer idRepresentada) {
         try {
             pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
             gerarMensagemSucesso("O item de compra foi alterado com sucesso. Essas alterações já podem ser incluidas no estoque.");
@@ -55,6 +50,11 @@ public class RecepcaoCompraController extends AbstractController {
         }
         addAtributo("permanecerTopo", true);
         redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+    }
+
+    @Get("compra/pdf")
+    public Download downloadPedidoPDF(Integer idPedido) {
+        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.COMPRA);
     }
 
     @Get("compra/recepcao/listagem")
@@ -109,7 +109,7 @@ public class RecepcaoCompraController extends AbstractController {
     @Post("compra/item/recepcao")
     public void recepcionarItemCompra(Date dataInicial, Date dataFinal, Integer idRepresentada, Integer idItemPedido) {
         try {
-            estoqueService.inserirItemPedido(idItemPedido);
+            estoqueService.recepcionarItemCompra(idItemPedido);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }

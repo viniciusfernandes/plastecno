@@ -95,6 +95,13 @@ public class PedidoServiceImpl implements PedidoService {
 		if (quantidadeRecepcionada == null) {
 			return;
 		}
+
+		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
+		if (!SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
+			throw new BusinessException("Não é possível alterar a quantidade recepcionada pois a situacao do pedido é \""
+					+ situacaoPedido.getDescricao() + "\"");
+		}
+
 		Integer quantidadeItem = itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
 		if (quantidadeItem == null) {
 			throw new BusinessException("O item de pedido de código " + idItemPedido + " pesquisado não existe no sistema");

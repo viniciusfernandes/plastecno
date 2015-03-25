@@ -127,18 +127,46 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	private ItemEstoque gerarItemEstoque(ItemPedido itemPedido) {
-
 		ItemEstoque itemEstoque = new ItemEstoque();
-
 		itemEstoque.setComprimento(itemPedido.getComprimento());
 		itemEstoque.setDescricaoPeca(itemPedido.getDescricaoPeca());
 		itemEstoque.setFormaMaterial(itemPedido.getFormaMaterial());
 		itemEstoque.setMaterial(itemPedido.getMaterial());
 		itemEstoque.setMedidaExterna(itemPedido.getMedidaExterna());
 		itemEstoque.setMedidaInterna(itemPedido.getMedidaInterna());
-		itemEstoque.setQuantidade(itemPedido.getQuantidadeRecepcionada() == null ? 0 : itemPedido
-				.getQuantidadeRecepcionada());
+		itemEstoque.setQuantidade(itemPedido.getQuantidade());
 		itemEstoque.setPrecoMedio(itemPedido.getPrecoUnidade());
+		return itemEstoque;
+	}
+
+	private ItemEstoque gerarItemEstoqueByIdItemPedido(Integer idItemPedido, boolean isRecepcaoItemCompra)
+			throws BusinessException {
+		ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
+		if (itemPedido == null) {
+			throw new BusinessException("O item de pedido No: " + idItemPedido + " não existe no sistema");
+		}
+
+		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
+		if (!SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
+			throw new BusinessException("Não é possível alterar a quantidade recepcionada pois a situacao do pedido é \""
+					+ situacaoPedido.getDescricao() + "\"");
+		}
+
+		// Aqui temos essa condicao pois o usuario pode incluir um item diretamento
+		// no estoque, sendo que ele nao passa pelo setor de compras.
+		itemPedido.setRecebido(isRecepcaoItemCompra ? itemPedido.isTodasUnidadesRecepcionadas() : true);
+
+		ItemEstoque itemEstoque = gerarItemEstoque(itemPedido);
+		if (isRecepcaoItemCompra) {
+			itemEstoque.setQuantidade(itemPedido.getQuantidadeRecepcionada() == null ? 0 : itemPedido
+					.getQuantidadeRecepcionada());
+		}
+
+		Pedido pedido = itemPedido.getPedido();
+		long qtdePendente = pedidoService.pesquisarTotalItemCompradoNaoRecebido(pedido.getId());
+		if (qtdePendente <= 0) {
+			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_RECEBIDA);
+		}
 		return itemEstoque;
 	}
 
@@ -176,22 +204,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(Integer idItemPedido) throws BusinessException {
-		ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
-		if (itemPedido == null) {
-			throw new BusinessException("O item de pedido No: " + idItemPedido + " não existe no sistema");
-		}
-		Pedido pedido = itemPedido.getPedido();
-
-		if (itemPedido.isTodasUnidadesRecepcionadas()) {
-			itemPedido.setRecebido(true);
-		}
-		
-		long qtdePendente = pedidoService.pesquisarTotalItemCompradoNaoRecebido(pedido.getId());
-		if (qtdePendente <= 0) {
-			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_RECEBIDA);
-		}
-
-		return inserirItemEstoque(gerarItemEstoque(itemPedido));
+		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, false));
 	}
 
 	private boolean isEquivalente(Double val1, Double val2) {
@@ -282,6 +295,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 				.createQuery("select distinct new Material(m.id, m.sigla, m.descricao) from ItemEstoque i inner join i.material m where m.sigla like :sigla order by m.sigla ");
 		query.setParameter("sigla", "%" + sigla + "%");
 		return query.getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer recepcionarItemCompra(Integer idItemPedido) throws BusinessException {
+		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, true));
 	}
 
 	@Override

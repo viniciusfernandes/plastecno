@@ -39,6 +39,8 @@ public interface EstoqueService {
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
+	Integer recepcionarItemCompra(Integer idItemPedido) throws BusinessException;
+
 	Integer recortarItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;

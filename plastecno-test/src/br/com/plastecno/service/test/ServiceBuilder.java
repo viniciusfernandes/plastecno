@@ -53,6 +53,25 @@ import br.com.plastecno.service.impl.EmailServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
 class ServiceBuilder {
+	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
+
+	/*
+	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
+	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
+	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
+	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
+	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
+	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
+	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
+	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
+	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
+	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
+	 */
+	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
+
+	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
+	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
+
 	@SuppressWarnings("unchecked")
 	static <T> T buildService(Class<T> classe) {
 		T service = (T) mapTemporarioServices.get(classe);
@@ -109,25 +128,6 @@ class ServiceBuilder {
 			}
 		}
 	}
-
-	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
-
-	/*
-	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
-	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
-	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
-	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
-	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
-	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
-	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
-	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
-	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
-	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
-	 */
-	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
-	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
-
-	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
 
 	ServiceBuilder() {
 	}
@@ -297,6 +297,13 @@ class ServiceBuilder {
 		inject(pedidoService, buildService(EstoqueService.class), "estoqueService");
 
 		new MockUp<ItemPedidoDAO>() {
+
+			@Mock
+			public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada) {
+				REPOSITORY.alterarEntidadeAtributoById(ItemPedido.class, idItemPedido, "quantidadeRecepcionada",
+						quantidadeRecepcionada);
+			}
+
 			@Mock
 			public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {
 				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
@@ -420,6 +427,12 @@ class ServiceBuilder {
 			}
 
 			@Mock
+			public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
+				ItemPedido i = pesquisarItemPedido(idItemPedido);
+				return i == null ? null : i.getPedido().getSituacaoPedido();
+			}
+
+			@Mock
 			Long pesquisarTotalItemPedido(Integer idPedido) {
 				return pesquisarTotalItemPedido(idPedido, false);
 			}
@@ -450,6 +463,7 @@ class ServiceBuilder {
 				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null ? pedido.getValorPedidoIPI() : null;
 			}
+
 		};
 
 		return pedidoService;

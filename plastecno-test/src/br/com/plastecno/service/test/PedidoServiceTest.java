@@ -64,11 +64,14 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	private ClienteService clienteService;
-	private EstoqueService estoqueService;
-	private MaterialService materialService;
-	private PedidoService pedidoService;
-	private RepresentadaService representadaService;
 
+	private EstoqueService estoqueService;
+
+	private MaterialService materialService;
+
+	private PedidoService pedidoService;
+
+	private RepresentadaService representadaService;
 	private UsuarioService usuarioService;
 
 	private void associarVendedor(Cliente cliente) {
@@ -104,6 +107,27 @@ public class PedidoServiceTest extends AbstractTest {
 		ItemPedido itemPedido = eBuilder.buildItemPedido();
 		itemPedido.setMaterial(material);
 		itemPedido.setAliquotaIPI(null);
+		return itemPedido;
+	}
+
+	private ItemPedido gerarItemPedidoCompra() {
+		Pedido pedido = gerarPedidoCompra();
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		pedido = pedidoService.pesquisarCompraById(idPedido);
+		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, pedido.getSituacaoPedido());
 		return itemPedido;
 	}
 
@@ -505,6 +529,48 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testAlteracaoQuantidadeRecepcionada() {
+		ItemPedido itemPedido = gerarItemPedidoCompra();
+
+		try {
+			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(), itemPedido.getQuantidade());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
+				pedidoService.pesquisarSituacaoPedidoById(itemPedido.getPedido().getId()));
+	}
+
+	@Test
+	public void testAlteracaoQuantidadeRecepcionadaInferiorQuantidadeComprada() {
+		ItemPedido itemPedido = gerarItemPedidoCompra();
+		Integer quantidadeRecepcionada = itemPedido.getQuantidade() - 1;
+		try {
+			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(), quantidadeRecepcionada);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
+				pedidoService.pesquisarSituacaoPedidoById(itemPedido.getPedido().getId()));
+	}
+
+	@Test
+	public void testAlteracaoQuantidadeRecepcionadaSuperiorQuantidadeComprada() {
+		ItemPedido itemPedido = gerarItemPedidoCompra();
+		Integer quantidadeRecepcionada = itemPedido.getQuantidade() + 1;
+		boolean throwed = false;
+		try {
+			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(), quantidadeRecepcionada);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue("A quantidade recepcionada e superior a quantidade comprada e deve ser validada", throwed);
+	}
+
+	@Test
 	public void testEfetuarEncomendaItemPedido() {
 		Pedido pedido = gerarPedidoRepresentacao();
 		Integer idPedido = pedido.getId();
@@ -722,6 +788,7 @@ public class PedidoServiceTest extends AbstractTest {
 		for (ItemPedido itemComprado : listaItemComprado) {
 			// Recepcionando os itens comprados para preencher o estoque.
 			try {
+				itemComprado.setQuantidadeRecepcionada(itemComprado.getQuantidade());
 				estoqueService.inserirItemPedido(itemComprado.getId());
 			} catch (BusinessException e) {
 				printMensagens(e);

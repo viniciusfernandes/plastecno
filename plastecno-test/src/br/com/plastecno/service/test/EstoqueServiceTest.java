@@ -59,6 +59,12 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
+
+		try {
+			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 		return itemPedido;
 	}
 
@@ -201,6 +207,13 @@ public class EstoqueServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoItemPedidoNoEstoque() {
 		ItemPedido i = gerarItemPedidoCompra();
+
+		try {
+			pedidoService.enviarPedido(i.getPedido().getId(), new byte[] {});
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
@@ -209,6 +222,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		verificarQuantidadeTotalItemEstoque(i.getQuantidade(), idItemEstoque);
+
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, i.getPedido().getSituacaoPedido());
 	}
 
@@ -225,6 +239,44 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+	}
+
+	@Test
+	public void testRecepcionarItemPedidoCompra() {
+		ItemPedido i = gerarItemPedidoCompra();
+		try {
+			pedidoService.alterarQuantidadeRecepcionada(i.getId(), i.getQuantidade());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			estoqueService.recepcionarItemCompra(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
+	}
+
+	@Test
+	public void testRecepcionarItemPedidoCompraQuantidadeInferior() {
+		ItemPedido i = gerarItemPedidoCompra();
+		Integer quantidadeRecepcionada = i.getQuantidade() - 1;
+		try {
+			pedidoService.alterarQuantidadeRecepcionada(i.getId(), quantidadeRecepcionada);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			estoqueService.recepcionarItemCompra(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
+				pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
 	}
 
 	@TODO
@@ -925,9 +977,10 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	}
 
-	private void verificarQuantidadeTotalItemEstoque(Integer quantidade, Integer idItemEstoque) {
-		Integer quantidadeEstoque = pesquisarQuantidadeTotalItemEstoque(idItemEstoque);
-		assertEquals("As quantidades dos itens devem ser as mesmas apos inclusao no estoque", quantidade, quantidadeEstoque);
+	private void verificarQuantidadeTotalItemEstoque(Integer quantidadeItemPedido, Integer idItemEstoque) {
+		Integer quantidadeItemEstoque = pesquisarQuantidadeTotalItemEstoque(idItemEstoque);
+		assertEquals("As quantidades dos itens devem ser as mesmas apos inclusao no estoque", quantidadeItemPedido,
+				quantidadeItemEstoque);
 
 	}
 

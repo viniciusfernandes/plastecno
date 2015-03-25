@@ -34,7 +34,9 @@ public class EstoqueController extends AbstractController {
     public void estoqueHome() {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("isEstoque", true);
-        verificarPermissaoAcesso("acessoRedefinicaoItemPermitido", TipoAcesso.ADMINISTRACAO);
+        verificarPermissaoAcesso("acessoManutencaoEstoquePermitido", TipoAcesso.ADMINISTRACAO,
+                TipoAcesso.MANUTENCAO_ESTOQUE);
+        verificarPermissaoAcesso("acessoValorEstoquePermitido", TipoAcesso.ADMINISTRACAO);
     }
 
     @Post("estoque/valor")

@@ -171,13 +171,17 @@ function inicializarFiltro() {
 		</fieldset>
 		<div class="bloco_botoes">
 			<input type="submit" value="" class="botaoPesquisar" />
-			<input id="botaoValorEstoque" type="button" value="" class="botaoDinheiro" title="Pesquisar Valor dos Itens no Estoque"/> 
+			<c:if test="${acessoValorEstoquePermitido}">
+				<input id="botaoValorEstoque" type="button" value="" class="botaoDinheiro" title="Pesquisar Valor dos Itens no Estoque"/> 
+			</c:if>
 			<input id="botaoLimpar" type="button" value="" title="Limpar Dados do Item de Estoque" class="botaoLimpar" />
 		</div>
 	</form>
 	
-	<jsp:include page="/bloco/bloco_edicao_item_compra.jsp"/>
-		
+	<c:if test="${acessoManutencaoEstoquePermitido}">
+		<jsp:include page="/bloco/bloco_edicao_item_compra.jsp"/>
+	</c:if>
+	
 	<a id="rodape"></a>
 	<fieldset>
 		<legend>::: Resultado da Pesquisa de Itens de Estoque :::</legend>
@@ -203,7 +207,7 @@ function inicializarFiltro() {
 							<td>${item.descricao}</td>
 							<td>${item.precoMedioFormatado}</td>
 							<td>
-								<c:if test="${acessoRedefinicaoItemPermitido}">
+								<c:if test="${acessoManutencaoEstoquePermitido}">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/estoque/item/${item.id}"/>" method="get">
 										<input type="hidden" name="material.id" value="${material.id}"/>

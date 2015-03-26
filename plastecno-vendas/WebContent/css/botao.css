@@ -188,6 +188,22 @@
 	width: 24px;
 }
 
+.botaoPesquisarEstatistica {
+	background: url("../images/chart_search_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoPesquisarMenos {
+	background: url("../images/search_minus_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoPesquisarPequeno {
 	background: url("../images/search_16.png") no-repeat scroll 0 0
 		transparent;
@@ -372,6 +388,19 @@
 
 .botaoPesquisar:hover {
 	background: url("../images/search_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
+.botaoPesquisarEstatistica:hover {
+	background: url("../images/chart_search_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
+
+.botaoPesquisarMenos:hover {
+	background: url("../images/search_minus_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 }

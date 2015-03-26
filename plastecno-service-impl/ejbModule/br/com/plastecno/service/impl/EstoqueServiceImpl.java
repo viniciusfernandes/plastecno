@@ -218,6 +218,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return Math.abs(1 - val1 / val2) <= tolerancia;
 	}
 
+	@Override
+	public List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+		return pesquisarEscassezItemEstoque(idMaterial, formaMaterial,0);
+	}
+
+	@Override
+	public List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
+			Integer quantidadeMinima) {
+		return itemEstoqueDAO.pesquisarEscassezItemEstoque(idMaterial, formaMaterial, quantidadeMinima);
+	}
+
 	private ItemEstoque pesquisarItemCadastradoEstoque(Item filtro) {
 		Integer idMaterial = filtro.getMaterial().getId();
 		FormaMaterial formaMaterial = filtro.getFormaMaterial();
@@ -286,7 +297,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public ItemEstoque pesquisarItemEstoqueByItemPedido(ItemPedido itemPedido) {
 		return pesquisarItemCadastradoEstoque(itemPedido);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -296,7 +307,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		query.setParameter("sigla", "%" + sigla + "%");
 		return query.getResultList();
 	}
-
+	
 	@Override
 	public Double pesquisarValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		return itemEstoqueDAO.pesquisarValorEQuantidadeItemEstoque(idMaterial, formaMaterial);

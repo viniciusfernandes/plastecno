@@ -21,6 +21,36 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	}
 
 	@SuppressWarnings("unchecked")
+	public List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
+			Integer quantidadeMinima) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i from ItemEstoque i where i.quantidade <= :quantidadeMinima ");
+		if (idMaterial != null && formaMaterial != null) {
+			select.append("i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
+		}
+
+		if (idMaterial != null && formaMaterial == null) {
+			select.append("and i.material.id = :idMaterial ");
+		}
+
+		if (idMaterial == null && formaMaterial != null) {
+			select.append("and i.formaMaterial = :formaMaterial ");
+		}
+		select.append("order by i.formaMaterial, i.material.descricao, i.descricaoPeca ");
+
+		Query query = entityManager.createQuery(select.toString());
+		query.setParameter("quantidadeMinima", quantidadeMinima);
+		if (idMaterial != null) {
+			query.setParameter("idMaterial", idMaterial);
+		}
+
+		if (formaMaterial != null) {
+			query.setParameter("formaMaterial", formaMaterial);
+		}
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca) {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemEstoque i ");
@@ -83,4 +113,5 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
 	}
+
 }

@@ -39,39 +39,6 @@ public class EstoqueController extends AbstractController {
         verificarPermissaoAcesso("acessoValorEstoquePermitido", TipoAcesso.ADMINISTRACAO);
     }
 
-    @Post("estoque/valor")
-    public void pesquisarValorEstoque(Material material, FormaMaterial formaMaterial) {
-        Double valorEstoque = estoqueService.pesquisarValorEstoque(material.getId(), formaMaterial);
-
-        addAtributo("valorEstoque", NumeroUtils.formatarValorMonetario(valorEstoque));
-        addAtributo("formaSelecionada", formaMaterial);
-        addAtributo("material", material);
-        irTopoPagina();
-    }
-
-    @Post("estoque/item/edicao")
-    public void redefinirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
-            Double aliquotaICMS, Material material, FormaMaterial formaMaterial) {
-        try {
-            ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
-            if (itemEstoque == null) {
-                gerarListaMensagemErro("O item de estoque não foi encontrado.");
-            } else {
-                itemEstoque.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
-                itemEstoque.setAliquotaICMS(NumeroUtils.gerarAliquota(aliquotaICMS));
-                itemEstoque.setQuantidade(quantidade);
-                itemEstoque.setPrecoMedio(preco);
-                estoqueService.redefinirItemEstoque(itemEstoque);
-                gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
-            }
-        } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
-
-        }
-        addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
-    }
-
     @Post("estoque/item/inclusao")
     public void inserirItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
         try {
@@ -87,14 +54,28 @@ public class EstoqueController extends AbstractController {
         redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
     }
 
+    @Post("estoque/escassez")
+    public void pesquisarEscassezItemEstoque(Material material, FormaMaterial formaMaterial) {
+        pesquisarItemEstoque(material, formaMaterial, true);
+    }
+
     @Get("estoque/item/listagem")
     public void pesquisarItemEstoque(Material material, FormaMaterial formaMaterial) {
-        if ((material == null || material.getId() == null) && formaMaterial == null) {
+        pesquisarItemEstoque(material, formaMaterial, false);
+    }
+
+    private void pesquisarItemEstoque(Material material, FormaMaterial formaMaterial, boolean isListagemEscassez) {
+        if (!isListagemEscassez && ((material == null || material.getId() == null) && formaMaterial == null)) {
             gerarListaMensagemErro("Escolha o material e/ou forma de material. Não é possível pesquisar o estoque inteiro.");
             addAtributo("permanecerTopo", true);
         } else {
             final Integer idMaterial = material != null ? material.getId() : null;
-            List<ItemEstoque> lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
+            List<ItemEstoque> lista = null;
+            if (isListagemEscassez) {
+                lista = estoqueService.pesquisarEscassezItemEstoque(idMaterial, formaMaterial);
+            } else {
+                lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
+            }
             formatarItemEstoque(lista);
 
             addAtributo("formaSelecionada", formaMaterial);
@@ -134,5 +115,38 @@ public class EstoqueController extends AbstractController {
             }
         }
         serializarJson(new SerializacaoJson("lista", lista));
+    }
+
+    @Post("estoque/valor")
+    public void pesquisarValorEstoque(Material material, FormaMaterial formaMaterial) {
+        Double valorEstoque = estoqueService.pesquisarValorEstoque(material.getId(), formaMaterial);
+
+        addAtributo("valorEstoque", NumeroUtils.formatarValorMonetario(valorEstoque));
+        addAtributo("formaSelecionada", formaMaterial);
+        addAtributo("material", material);
+        irTopoPagina();
+    }
+
+    @Post("estoque/item/edicao")
+    public void redefinirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
+            Double aliquotaICMS, Material material, FormaMaterial formaMaterial) {
+        try {
+            ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
+            if (itemEstoque == null) {
+                gerarListaMensagemErro("O item de estoque não foi encontrado.");
+            } else {
+                itemEstoque.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
+                itemEstoque.setAliquotaICMS(NumeroUtils.gerarAliquota(aliquotaICMS));
+                itemEstoque.setQuantidade(quantidade);
+                itemEstoque.setPrecoMedio(preco);
+                estoqueService.redefinirItemEstoque(itemEstoque);
+                gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
+            }
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+
+        }
+        addAtributo("permanecerTopo", true);
+        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
     }
 }

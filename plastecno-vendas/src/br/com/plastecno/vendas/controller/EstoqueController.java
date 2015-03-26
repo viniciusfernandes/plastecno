@@ -51,7 +51,11 @@ public class EstoqueController extends AbstractController {
             addAtributo("itemPedido", itemPedido);
         }
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        if (material != null && formaMaterial != null) {
+            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        } else {
+            irTopoPagina();
+        }
     }
 
     @Post("estoque/escassez")
@@ -102,7 +106,11 @@ public class EstoqueController extends AbstractController {
         }
         addAtributo("permanecerTopo", true);
         material = materialService.pesquisarById(material.getId());
-        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        if (material != null && formaMaterial != null) {
+            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        } else {
+            irTopoPagina();
+        }
     }
 
     @Get("estoque/material/listagem")
@@ -147,6 +155,10 @@ public class EstoqueController extends AbstractController {
 
         }
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        if (material != null && formaMaterial != null) {
+            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        } else {
+            irTopoPagina();
+        }
     }
 }

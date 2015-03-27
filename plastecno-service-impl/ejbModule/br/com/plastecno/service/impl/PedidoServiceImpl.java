@@ -1080,6 +1080,12 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pedido> pesquisarVendaClienteByPeriodo(Periodo periodo, Integer idCliente, boolean isOrcamento) {
+		return pedidoDAO.pesquisarVendaClienteByPeriodo(periodo.getInicio(), periodo.getFim(), idCliente, isOrcamento);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void reencomendarItemPedido(Integer idItemPedido) throws BusinessException {
 		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);

@@ -36,6 +36,9 @@ public interface RelatorioService {
 
 	List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException;
 	
+	RelatorioWrapper<String, Pedido> gerarRelatorioVendaCliente(boolean orcamento, Periodo periodo, Integer idCliente)
+			throws BusinessException;
+
 	RelatorioPedidoPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException;
 
 	RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,

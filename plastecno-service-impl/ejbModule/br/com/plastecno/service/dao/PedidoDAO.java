@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoPedido;
@@ -345,5 +346,51 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idPedido", idPedido);
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+	}
+
+	public List<Pedido> pesquisarVendaClienteByPeriodo(Date dataInicial, Date dataFinal, Integer idCliente,
+			boolean isOrcamento) {
+		StringBuilder select = new StringBuilder();
+		select
+				.append("select new Pedido(p.id, p.dataEnvio, p.valorPedido, p.cliente.nomeFantasia, p.proprietario.nome) from Pedido p ");
+		select.append("where ");
+		if (idCliente != null) {
+			select.append("p.cliente.id = :idCliente and ");
+		}
+
+		if (dataInicial != null) {
+			select.append("p.dataEnvio >= :dataInicial and ");
+		}
+
+		if (dataFinal != null) {
+			select.append("p.dataEnvio >= :dataFinal and ");
+		}
+
+		if (isOrcamento) {
+			select.append("p.situacaoPedido = :situacaoPedido ");
+		} else {
+			select.append("p.situacaoPedido in (:situacoes)");
+		}
+
+		TypedQuery<Pedido> query = entityManager.createQuery(select.toString(), Pedido.class);
+		if (idCliente != null) {
+			query.setParameter("idCliente", idCliente);
+		}
+
+		if (dataInicial != null) {
+			query.setParameter("dataInicial", dataInicial);
+		}
+
+		if (dataFinal != null) {
+			query.setParameter("dataFinal", dataFinal);
+		}
+
+		if (isOrcamento) {
+			query.setParameter("situacaoPedido", SituacaoPedido.ORCAMENTO);
+		} else {
+			query.setParameter("situacoes", pesquisarSituacaoVendaEfetivada());
+		}
+
+		return query.getResultList();
 	}
 }

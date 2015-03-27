@@ -162,6 +162,8 @@ public interface PedidoService {
 	List<Pedido> pesquisarVendaByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException;
 
+	List<Pedido> pesquisarVendaClienteByPeriodo(Periodo periodo, Integer idCliente, boolean isOrcamento);
+
 	void reencomendarItemPedido(Integer idItemPedido) throws BusinessException;
 
 	Integer refazerPedido(Integer idPedido) throws BusinessException;

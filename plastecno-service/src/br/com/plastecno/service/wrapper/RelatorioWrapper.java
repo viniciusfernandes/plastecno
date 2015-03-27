@@ -1,28 +1,30 @@
 package br.com.plastecno.service.wrapper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class RelatorioWrapper<T, K> {
-	private final String titulo;
 	private final List<GrupoWrapper<T, K>> listaGrupo = new ArrayList<GrupoWrapper<T, K>>();
+	private final HashMap<Object, GrupoWrapper<T, K>> mapaGrupo = new HashMap<Object, GrupoWrapper<T, K>>();
+	private final String titulo;
+	private Object valorTotal;
 
 	public RelatorioWrapper(String titulo) {
 		this.titulo = titulo;
 	}
 
 	public void addElemento(T idGrupo, K elemento) {
-
-		for (GrupoWrapper<T, K> grupo : listaGrupo) {
-			if (idGrupo != null && idGrupo.equals(grupo.getId())) {
-				grupo.addElemento(elemento);
-				return;
-			}
+		GrupoWrapper<T, K> grupo = mapaGrupo.get(idGrupo);
+		if (grupo != null) {
+			grupo.addElemento(elemento);
+			return;
 		}
 
-		GrupoWrapper<T, K> grupo = new GrupoWrapper<T, K>(idGrupo, new ArrayList<K>());
+		grupo = new GrupoWrapper<T, K>(idGrupo, new ArrayList<K>());
 		grupo.addElemento(elemento);
 		listaGrupo.add(grupo);
+		mapaGrupo.put(idGrupo, grupo);
 	}
 
 	public List<GrupoWrapper<T, K>> getListaGrupo() {
@@ -31,6 +33,14 @@ public class RelatorioWrapper<T, K> {
 
 	public String getTitulo() {
 		return titulo;
+	}
+
+	public Object getValorTotal() {
+		return valorTotal;
+	}
+
+	public void setValorTotal(Object valorTotal) {
+		this.valorTotal = valorTotal;
 	}
 
 }

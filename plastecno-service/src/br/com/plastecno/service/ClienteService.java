@@ -52,6 +52,8 @@ public interface ClienteService {
 
 	List<Cliente> pesquisarClienteByIdRegiao(Integer idRegiao) throws BusinessException;
 
+	Cliente pesquisarClienteResumidoById(Integer idCliente);
+
 	List<Cliente> pesquisarClientesAssociados(Integer idVendedor);
 
 	List<Cliente> pesquisarClientesById(List<Integer> listaIdCliente);

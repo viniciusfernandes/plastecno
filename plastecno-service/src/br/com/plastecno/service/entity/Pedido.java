@@ -41,53 +41,86 @@ public class Pedido implements Serializable, Cloneable {
 	 */
 	private static final long serialVersionUID = -7474382741231270790L;
 
-	@Id
-	@SequenceGenerator(name = "pedidoSequence", sequenceName = "vendas.seq_pedido_id", allocationSize = 1, initialValue = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pedidoSequence")
-	private Integer id;
-
-	@Column(name = "numero_pedido_cliente")
-	private String numeroPedidoCliente;
-
-	@Temporal(TemporalType.DATE)
-	@Column(name = "data_inclusao")
-	private Date dataInclusao;
-
-	@Temporal(TemporalType.DATE)
-	@Column(name = "data_envio")
-	private Date dataEnvio;
-
-	@Temporal(TemporalType.DATE)
-	@Column(name = "data_entrega")
-	private Date dataEntrega;
-
-	@InformacaoValidavel(intervalo = { 0, 799 }, nomeExibicao = "Observação do pedido")
-	private String observacao;
-
-	/*
-	 * Atributo criado para usar em relatorios evitando o calculo do pedido
-	 */
-	@Column(name = "valor_pedido")
-	private Double valorPedido;
-
-	@Column(name = "valor_pedido_ipi")
-	private Double valorPedidoIPI;
-
-	@Column(name = "forma_pagamento")
-	private String formaPagamento;
-
-	@Column(name = "cliente_notificado_venda")
-	private boolean clienteNotificadoVenda = false;
-
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_cliente")
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Cliente do pedido")
 	private Cliente cliente;
 
+	@Column(name = "cliente_notificado_venda")
+	private boolean clienteNotificadoVenda = false;
+
+	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
+	@JoinColumn(name = "id_contato")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Contato do pedido")
+	private Contato contato;
+
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_entrega")
+	private Date dataEntrega;
+
+	@Transient
+	private String dataEntregaFormatada;
+
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_envio")
+	private Date dataEnvio;
+
+	@Transient
+	private String dataEnvioFormatada;
+
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_inclusao")
+	private Date dataInclusao;
+
+	@Transient
+	private String dataInclusaoFormatada;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "id_finalidade_pedido")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Finalidade do pedido")
+	private FinalidadePedido finalidadePedido;
+
+	@Column(name = "forma_pagamento")
+	private String formaPagamento;
+
+	@Id
+	@SequenceGenerator(name = "pedidoSequence", sequenceName = "vendas.seq_pedido_id", allocationSize = 1, initialValue = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pedidoSequence")
+	private Integer id;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+	@JoinTable(name = "tb_pedido_tb_logradouro", schema = "vendas", joinColumns = { @JoinColumn(name = "id_pedido", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_logradouro", referencedColumnName = "id") })
+	private List<Logradouro> listaLogradouro;
+
+	@Column(name = "numero_pedido_cliente")
+	private String numeroPedidoCliente;
+
+	@InformacaoValidavel(intervalo = { 0, 799 }, nomeExibicao = "Observação do pedido")
+	private String observacao;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_proprietario")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor/Comprador do pedido")
+	private Usuario proprietario;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_representada")
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Representada do pedido")
 	private Representada representada;
+
+	@Column(name = "id_situacao_pedido")
+	@Enumerated(EnumType.ORDINAL)
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Situacao do pedido")
+	private SituacaoPedido situacaoPedido;
+
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "id_tipo_entrega")
+	private TipoEntrega tipoEntrega;
+
+	@Column(name = "id_tipo_pedido")
+	@Enumerated(EnumType.ORDINAL)
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo do pedido")
+	private TipoPedido tipoPedido;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_transportadora")
@@ -99,50 +132,17 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(nomeExibicao = "Redespacho do pedido")
 	private Transportadora transportadoraRedespacho;
 
-	@Enumerated(EnumType.ORDINAL)
-	@Column(name = "id_tipo_entrega")
-	private TipoEntrega tipoEntrega;
-
-	@Column(name = "id_situacao_pedido")
-	@Enumerated(EnumType.ORDINAL)
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Situacao do pedido")
-	private SituacaoPedido situacaoPedido;
-
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_proprietario")
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor/Comprador do pedido")
-	private Usuario proprietario;
-
-	@Enumerated(EnumType.STRING)
-	@Column(name = "id_finalidade_pedido")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Finalidade do pedido")
-	private FinalidadePedido finalidadePedido;
-
-	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
-	@JoinColumn(name = "id_contato")
-	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Contato do pedido")
-	private Contato contato;
-
-	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
-	@JoinTable(name = "tb_pedido_tb_logradouro", schema = "vendas", joinColumns = { @JoinColumn(name = "id_pedido", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_logradouro", referencedColumnName = "id") })
-	private List<Logradouro> listaLogradouro;
-
-	@Column(name = "id_tipo_pedido")
-	@Enumerated(EnumType.ORDINAL)
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo do pedido")
-	private TipoPedido tipoPedido;
-
-	@Transient
-	private String dataInclusaoFormatada;
-
-	@Transient
-	private String dataEnvioFormatada;
-
-	@Transient
-	private String dataEntregaFormatada;
+	/*
+	 * Atributo criado para usar em relatorios evitando o calculo do pedido
+	 */
+	@Column(name = "valor_pedido")
+	private Double valorPedido;
 
 	@Transient
 	private String valorPedidoFormatado;
+
+	@Column(name = "valor_pedido_ipi")
+	private Double valorPedidoIPI;
 
 	@Transient
 	private String valorPedidoIPIFormatado;
@@ -152,6 +152,18 @@ public class Pedido implements Serializable, Cloneable {
 
 	public Pedido(Integer id) {
 		this.id = id;
+	}
+
+	public Pedido(Integer id, Date dataEnvio, Double valorPedido, String nomeFantasiaCliente, String nomeProprietario) {
+		this.id = id;
+		this.dataEnvio = dataEnvio;
+		this.valorPedido = valorPedido;
+
+		this.cliente = new Cliente();
+		this.cliente.setNomeFantasia(nomeFantasiaCliente);
+
+		this.proprietario = new Usuario();
+		this.proprietario.setNome(nomeProprietario);
 	}
 
 	public Pedido(Integer id, Date dataEntrega, Double valorPedido, String nomeFantasiaCliente,
@@ -345,12 +357,12 @@ public class Pedido implements Serializable, Cloneable {
 		return TipoPedido.REVENDA.equals(tipoPedido);
 	}
 
-	public boolean isVenda() {
-		return isRevenda() || isRepresentacao();
-	}
-
 	public boolean isRevendaEncomendada() {
 		return TipoPedido.REVENDA.equals(tipoPedido) && SituacaoPedido.REVENDA_ENCOMENDADA.equals(situacaoPedido);
+	}
+
+	public boolean isVenda() {
+		return isRevenda() || isRepresentacao();
 	}
 
 	public void setCliente(Cliente cliente) {

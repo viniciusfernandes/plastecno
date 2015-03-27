@@ -77,12 +77,9 @@
 						<c:if test="${acessoRelatorioEntregaPermitido}">
 							<li><a href="relatorio/pedido?isCompra=true" target="principal_frame">Pedido Compra Período</a></li>
 						</c:if>
-						<c:if test="${acessoRelatorioComprasRepresentadaPermitido}">
-							<li><a href="relatorio/pedido/periodo?isCompra=true" target="principal_frame">Valor Estoque</a></li>
-						</c:if>
 						<c:if test="${acessoRelatorioPedidoRepresentadaPermitido}">
-							<li><a href="relatorio/venda/representada"
-								target="principal_frame">Venda Representada</a></li>
+							<li><a href="relatorio/venda/representada" target="principal_frame">Venda Representada</a></li>
+							<li><a href="relatorio/venda/cliente" target="principal_frame">Venda Cliente</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioEntregaPermitido}">
 							<li><a href="relatorio/pedido?isEntrega=true" target="principal_frame">Acompanhamento Entrega</a></li>

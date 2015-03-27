@@ -31,6 +31,7 @@ import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.service.wrapper.RepresentadaValorWrapper;
+import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.service.wrapper.VendaClienteWrapper;
 import br.com.plastecno.service.wrapper.exception.AgrupamentoException;
 import br.com.plastecno.util.NumeroUtils;
@@ -39,20 +40,20 @@ import br.com.plastecno.util.StringUtils;
 @Stateless
 public class RelatorioServiceImpl implements RelatorioService {
 
-	@PersistenceContext(name = "plastecno")
-	private EntityManager entityManager;
-
 	@EJB
 	private ClienteService clienteService;
+
+	@PersistenceContext(name = "plastecno")
+	private EntityManager entityManager;
 
 	@EJB
 	private PedidoService pedidoService;
 
 	@EJB
-	private RepresentadaService representadaService;
+	private RamoAtividadeService ramoAtividadeService;
 
 	@EJB
-	private RamoAtividadeService ramoAtividadeService;
+	private RepresentadaService representadaService;
 
 	@EJB
 	private UsuarioService usuarioService;
@@ -110,14 +111,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	@REVIEW(data = "10/03/2015", descricao = "Devemos implementar uma melhoria o esquema de consulta dos itens de estoque para recuperar apenas a informacao necessaria.")
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEncomendada(Integer idRepresentada, Periodo periodo) {
-		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Encomendados",
-				pedidoService.pesquisarRevendaEncomendada(idRepresentada, periodo));
-	}
-
-	@Override
 	public RelatorioPedidoPeriodo gerarRelatorioCompraPeriodo(Periodo periodo) throws BusinessException {
 
 		final List<Object[]> resultados = pedidoService.pesquisarTotalCompraResumidaByPeriodo(periodo);
@@ -140,6 +133,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 
 		return relatorio;
+	}
+
+	@Override
+	public List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException {
+		return pedidoService.pesquisarEntregaVendaByPeriodo(periodo);
 	}
 
 	@Override
@@ -187,8 +185,49 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	@REVIEW(data = "10/03/2015", descricao = "Devemos implementar uma melhoria o esquema de consulta dos itens de estoque para recuperar apenas a informacao necessaria.")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEncomendada(Integer idRepresentada, Periodo periodo) {
+		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Encomendados",
+				pedidoService.pesquisarRevendaEncomendada(idRepresentada, periodo));
+	}
+
+	@Override
 	public List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException {
 		return this.pedidoService.pesquisarPedidoVendaByPeriodo(periodo);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<String, TotalizacaoPedidoWrapper> gerarRelatorioVendaCliente(boolean orcamento,
+			Periodo periodo, Integer idCliente) throws BusinessException {
+		String nomeCliente = clienteService.pesquisarNomeFantasia(idCliente);
+
+		final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamento para " : "Vendas para ");
+		if (StringUtils.isNotEmpty(nomeCliente)) {
+			titulo.append("o Cliente ").append(nomeCliente).append(" ");
+		} else {
+			titulo.append("os Clientes ");
+		}
+		titulo.append(" de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
+				.append(StringUtils.formatarData(periodo.getFim()));
+
+		final RelatorioWrapper<String, TotalizacaoPedidoWrapper> relatorio = new RelatorioWrapper<String, TotalizacaoPedidoWrapper>(
+				titulo.toString());
+		List<TotalizacaoPedidoWrapper> listaPedido = this.pedidoService.pesquisarValorVendaClienteByPeriodo(periodo,
+				idCliente, orcamento);
+		double valorTotal = 0d;
+		for (TotalizacaoPedidoWrapper totalizacao : listaPedido) {
+			try {
+				totalizacao.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(totalizacao.getValorTotal()));
+				relatorio.addElemento(totalizacao.getNomeCliente(), totalizacao);
+				valorTotal += totalizacao.getValorTotal();
+			} catch (Exception e) {
+				throw new BusinessException("Falha na geracao do relatorio de vendas para o cliente " + idCliente, e);
+			}
+		}
+		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotal));
+		return relatorio;
 	}
 
 	@Override
@@ -246,10 +285,5 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@Override
 	public List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor) {
 		return this.clienteService.pesquisarByIdVendedor(idVendedor);
-	}
-
-	@Override
-	public List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException {
-		return pedidoService.pesquisarEntregaVendaByPeriodo(periodo);
 	}
 }

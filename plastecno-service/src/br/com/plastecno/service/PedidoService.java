@@ -15,6 +15,7 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 
 @Local
 public interface PedidoService {
@@ -161,6 +162,8 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarVendaByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException;
+
+	List<TotalizacaoPedidoWrapper> pesquisarValorVendaClienteByPeriodo(Periodo periodo, Integer idCliente, boolean isOrcamento);
 
 	void reencomendarItemPedido(Integer idItemPedido) throws BusinessException;
 

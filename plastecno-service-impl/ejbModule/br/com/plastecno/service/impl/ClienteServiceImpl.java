@@ -39,7 +39,6 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
 public class ClienteServiceImpl implements ClienteService {
-
 	private ClienteDAO clienteDAO;
 
 	@EJB
@@ -310,6 +309,12 @@ public class ClienteServiceImpl implements ClienteService {
 
 		return this.entityManager.createQuery(select.toString()).setParameter("listaIdBairro", listaIdBairro)
 				.setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO).getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Cliente pesquisarClienteResumidoById(Integer idCliente) {
+		return clienteDAO.pesquisarClienteResumidoById(idCliente);
 	}
 
 	@Override

@@ -51,6 +51,7 @@ import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.util.DateUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
@@ -1060,6 +1061,19 @@ public class PedidoServiceImpl implements PedidoService {
 	public Double pesquisarValorPedidoIPI(Integer idPedido) {
 		final Double valor = pedidoDAO.pesquisarValorPedidoIPI(idPedido);
 		return valor == null ? 0D : valor;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<TotalizacaoPedidoWrapper> pesquisarValorVendaClienteByPeriodo(Periodo periodo, Integer idCliente,
+			boolean isOrcamento) {
+		List<TotalizacaoPedidoWrapper> listaTotalizacao = new ArrayList<TotalizacaoPedidoWrapper>();
+		List<Object[]> resultado = pedidoDAO.pesquisarValorVendaClienteByPeriodo(periodo.getInicio(), periodo.getFim(),
+				idCliente, isOrcamento);
+		for (Object[] o : resultado) {
+			listaTotalizacao.add(new TotalizacaoPedidoWrapper((String) o[2], (Long) o[0], (Double) o[1]));
+		}
+		return listaTotalizacao;
 	}
 
 	@Override

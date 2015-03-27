@@ -51,6 +51,7 @@ import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.util.DateUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
@@ -1064,6 +1065,19 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<TotalizacaoPedidoWrapper> pesquisarValorVendaClienteByPeriodo(Periodo periodo, Integer idCliente,
+			boolean isOrcamento) {
+		List<TotalizacaoPedidoWrapper> listaTotalizacao = new ArrayList<TotalizacaoPedidoWrapper>();
+		List<Object[]> resultado = pedidoDAO.pesquisarValorVendaClienteByPeriodo(periodo.getInicio(), periodo.getFim(),
+				idCliente, isOrcamento);
+		for (Object[] o : resultado) {
+			listaTotalizacao.add(new TotalizacaoPedidoWrapper((String) o[2], (Long) o[0], (Double) o[1]));
+		}
+		return listaTotalizacao;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Pedido pesquisarVendaById(Integer id) {
 
 		if (id == null) {
@@ -1077,12 +1091,6 @@ public class PedidoServiceImpl implements PedidoService {
 	public List<Pedido> pesquisarVendaByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException {
 		return pesquisarPedidoEnviadoByPeriodoEProprietario(orcamento, periodo, idVendedor, false);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarVendaClienteByPeriodo(Periodo periodo, Integer idCliente, boolean isOrcamento) {
-		return pedidoDAO.pesquisarVendaClienteByPeriodo(periodo.getInicio(), periodo.getFim(), idCliente, isOrcamento);
 	}
 
 	@Override

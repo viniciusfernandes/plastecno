@@ -14,6 +14,7 @@ import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
+import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 
 @Local
 public interface RelatorioService {
@@ -36,7 +37,7 @@ public interface RelatorioService {
 
 	List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException;
 	
-	RelatorioWrapper<String, Pedido> gerarRelatorioVendaCliente(boolean orcamento, Periodo periodo, Integer idCliente)
+	RelatorioWrapper<String, TotalizacaoPedidoWrapper> gerarRelatorioVendaCliente(boolean orcamento, Periodo periodo, Integer idCliente)
 			throws BusinessException;
 
 	RelatorioPedidoPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException;

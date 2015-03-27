@@ -50,6 +50,10 @@ public class GrupoWrapper<T, K> {
 		return id != null ? id.hashCode() : super.hashCode();
 	}
 
+	public K getFirstElement() {
+		return listaElementos.get(0);
+	}
+
 	public void setPropriedade(String nome, Object valor) {
 		if (propriedades == null) {
 			propriedades = new HashMap<String, Object>();

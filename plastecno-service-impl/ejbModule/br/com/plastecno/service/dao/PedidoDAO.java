@@ -348,11 +348,10 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
 	}
 
-	public List<Pedido> pesquisarVendaClienteByPeriodo(Date dataInicial, Date dataFinal, Integer idCliente,
+	public List<Object[]> pesquisarValorVendaClienteByPeriodo(Date dataInicial, Date dataFinal, Integer idCliente,
 			boolean isOrcamento) {
 		StringBuilder select = new StringBuilder();
-		select
-				.append("select new Pedido(p.id, p.dataEnvio, p.valorPedido, p.cliente.nomeFantasia, p.proprietario.nome) from Pedido p ");
+		select.append("select count(p.id), sum(p.valorPedido), p.cliente.nomeFantasia from Pedido p ");
 		select.append("where ");
 		if (idCliente != null) {
 			select.append("p.cliente.id = :idCliente and ");
@@ -363,16 +362,17 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		}
 
 		if (dataFinal != null) {
-			select.append("p.dataEnvio >= :dataFinal and ");
+			select.append("p.dataEnvio <= :dataFinal and ");
 		}
 
 		if (isOrcamento) {
 			select.append("p.situacaoPedido = :situacaoPedido ");
 		} else {
-			select.append("p.situacaoPedido in (:situacoes)");
+			select.append("p.situacaoPedido in (:situacoes) ");
 		}
 
-		TypedQuery<Pedido> query = entityManager.createQuery(select.toString(), Pedido.class);
+		select.append("group BY p.cliente.nomeFantasia ORDER by count(p.id) desc ");
+		TypedQuery<Object[]> query = entityManager.createQuery(select.toString(), Object[].class);
 		if (idCliente != null) {
 			query.setParameter("idCliente", idCliente);
 		}

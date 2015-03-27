@@ -16,26 +16,26 @@ import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
-public class RelatorioVendaClienteController extends AbstractController {
+public class RelatorioValorVendaClienteController extends AbstractController {
 
     @Servico
     private UsuarioService usuarioService;
 
     @Servico
     private RelatorioService relatorioService;
-    
+
     @Servico
     private ClienteService clienteService;
 
-    public RelatorioVendaClienteController(Result result, UsuarioInfo usuarioInfo) {
+    public RelatorioValorVendaClienteController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
     }
 
     @Get("relatorio/venda/cliente/listagem")
-    public void gerarRelatorioPedidoVendedor(Date dataInicial, Date dataFinal, Cliente cliente, boolean orcamento) {
+    public void gerarRelatorioValorVendaCliente(Date dataInicial, Date dataFinal, Cliente cliente, boolean orcamento) {
         try {
             addAtributo("relatorio", this.relatorioService.gerarRelatorioVendaCliente(orcamento, new Periodo(
-                    dataInicial, dataInicial), cliente.getId()));
+                    dataInicial, dataFinal), cliente.getId()));
             irRodapePagina();
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
@@ -49,7 +49,7 @@ public class RelatorioVendaClienteController extends AbstractController {
     }
 
     @Get("relatorio/venda/cliente")
-    public void relatorioVendaClienteHome() {
+    public void relatorioValorVendaClienteHome() {
         configurarFiltroPediodoMensal();
         addAtributo("relatorioGerado", contemAtributo("relatorio"));
         boolean acessoPesquisaVendaClientePermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO,

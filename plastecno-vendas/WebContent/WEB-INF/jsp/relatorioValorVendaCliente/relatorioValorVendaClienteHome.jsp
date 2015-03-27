@@ -83,60 +83,25 @@
 			<caption>${relatorio.titulo}</caption>
 			<thead>
 				<tr>
-					<th style="width: 15%">Cliente</th>
-					<th style="width: 10%">Dt. Envio</th>
-					<th style="width: 10%">No. Pedido</th>
-					<th style="width: 40%">Vendedor</th>
-					<th style="width: 10%">Valor (R$)</th>
-					<th style="width: 5%">PDF</th>
+					<th style="width: 40%">Cliente</th>
+					<th style="width: 15%">Qtde.</th>
+					<th style="width: 35%">Valor (R$)</th>
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach items="${relatorio.listaGrupo}" var="cliente"
-					varStatus="iteracaoCliente">
-					<c:forEach items="${cliente.listaElemento}" var="venda"
-						varStatus="iteracaoVenda">
+				<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iteracaoTotalizacao">
 						<tr>
-							<c:if test="${iteracaoVenda.count eq 1}">
-								<td class="fundo${iteracaoCliente.index % 2 == 0 ? 1 : 2}"
-									rowspan="${cliente.totalElemento + 1}">${cliente.id}</td>
-							</c:if>
-							<td class="fundo${iteracaoCliente.index % 2 == 0 ? 1 : 2}">${venda.dataEnvioFormatada}</td>
-							<td class="fundo${iteracaoCliente.index % 2 == 0 ? 1 : 2}">${venda.id}</td>
-							<td class="fundo${iteracaoCliente.index % 2 == 0 ? 1 : 2}">${venda.proprietario.nome}</td>
-							<td class="fundo${iteracaoCliente.index % 2 == 0 ? 1 : 2}">${venda.valorPedidoFormatado}</td>
-							<td class="fundo${iteracaoCliente.index % 2 == 0 ? 1 : 2}">
-								<form action="<c:url value="/pedido/pdf"/>">
-									<input type="hidden" name="idPedido" value="${venda.id}" />
-									<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPDF" style="border: none;" />
-								</form>
-							</td>
-
+							<td class="fundo${iteracaoTotalizacao.index % 2 == 0 ? 1 : 2}">${grupo.firstElement.nomeCliente}</td>
+							<td class="fundo${iteracaoTotalizacao.index % 2 == 0 ? 1 : 2}">${grupo.firstElement.quantidade}</td>
+							<td class="fundo${iteracaoTotalizacao.index % 2 == 0 ? 1 : 2}">${grupo.firstElement.valorTotalFormatado}</td>
 						</tr>
-					</c:forEach>
-
-					<tr>
-						<td class="total${iteracaoCliente.index % 2 == 0 ? 1 : 2}"
-							style="border-right: none;"></td>
-						<td class="total${iteracaoCliente.index % 2 == 0 ? 1 : 2}"
-							style="border-left: none;"></td>
-						<td class="total${iteracaoCliente.index % 2 == 0 ? 1 : 2}"
-							style="font-weight: bold;">TOTAL (R$)</td>
-						<td class="total${iteracaoCliente.index % 2 == 0 ? 1 : 2}"
-							style="font-weight: bold;">${representada.valorPedidoFormatado}</td>
-						<td class="total${iteracaoCliente.index % 2 == 0 ? 1 : 2}"
-							style="border-left: none;"></td>
-					</tr>
 				</c:forEach>
 			</tbody>
 			<tfoot>
 				<tr>
 					<td></td>
-					<td></td>
-					<td></td>
 					<td>TOTAL GERAL (R$):</td>
 					<td>${relatorio.valorTotal}</td>
-					<td></td>
 				</tr>
 			</tfoot>
 		</table>

@@ -31,6 +31,7 @@ import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.service.wrapper.RepresentadaValorWrapper;
+import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.service.wrapper.VendaClienteWrapper;
 import br.com.plastecno.service.wrapper.exception.AgrupamentoException;
 import br.com.plastecno.util.NumeroUtils;
@@ -198,8 +199,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<String, Pedido> gerarRelatorioVendaCliente(boolean orcamento, Periodo periodo,
-			Integer idCliente) throws BusinessException {
+	public RelatorioWrapper<String, TotalizacaoPedidoWrapper> gerarRelatorioVendaCliente(boolean orcamento,
+			Periodo periodo, Integer idCliente) throws BusinessException {
 		String nomeCliente = clienteService.pesquisarNomeFantasia(idCliente);
 
 		final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamento para " : "Vendas para ");
@@ -211,17 +212,16 @@ public class RelatorioServiceImpl implements RelatorioService {
 		titulo.append(" de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
 				.append(StringUtils.formatarData(periodo.getFim()));
 
-		final RelatorioWrapper<String, Pedido> relatorio = new RelatorioWrapper<String, Pedido>(titulo.toString());
-		List<Pedido> listaPedido = this.pedidoService.pesquisarVendaClienteByPeriodo(periodo, idCliente, orcamento);
+		final RelatorioWrapper<String, TotalizacaoPedidoWrapper> relatorio = new RelatorioWrapper<String, TotalizacaoPedidoWrapper>(
+				titulo.toString());
+		List<TotalizacaoPedidoWrapper> listaPedido = this.pedidoService.pesquisarValorVendaClienteByPeriodo(periodo,
+				idCliente, orcamento);
 		double valorTotal = 0d;
-		for (Pedido pedido : listaPedido) {
+		for (TotalizacaoPedidoWrapper totalizacao : listaPedido) {
 			try {
-				pedido.setDataEnvioFormatada(StringUtils.formatarData(pedido.getDataEnvio()));
-				relatorio.addElemento(pedido.getCliente().getNomeFantasia(), pedido);
-				valorTotal += pedido.getValorPedido();
-
-				pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));
-				pedido.setDataEnvioFormatada(StringUtils.formatarData(pedido.getDataEnvio()));
+				totalizacao.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(totalizacao.getValorTotal()));
+				relatorio.addElemento(totalizacao.getNomeCliente(), totalizacao);
+				valorTotal += totalizacao.getValorTotal();
 			} catch (Exception e) {
 				throw new BusinessException("Falha na geracao do relatorio de vendas para o cliente " + idCliente, e);
 			}

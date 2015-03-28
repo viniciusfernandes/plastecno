@@ -106,7 +106,6 @@ public class Cliente implements Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_vendedor", referencedColumnName = "id", nullable = false)
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor do cliente")
 	private Usuario vendedor;
 
 	public Cliente() {

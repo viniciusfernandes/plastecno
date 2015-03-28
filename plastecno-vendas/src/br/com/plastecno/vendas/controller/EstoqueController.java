@@ -34,30 +34,9 @@ public class EstoqueController extends AbstractController {
     public void estoqueHome() {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("isEstoque", true);
-        verificarPermissaoAcesso("acessoRedefinicaoItemPermitido", TipoAcesso.ADMINISTRACAO);
-    }
-
-    @Post("estoque/item/edicao")
-    public void redefinirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
-            Double aliquotaICMS, Material material, FormaMaterial formaMaterial) {
-        try {
-            ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
-            if (itemEstoque == null) {
-                gerarListaMensagemErro("O item de estoque não foi encontrado.");
-            } else {
-                itemEstoque.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
-                itemEstoque.setAliquotaICMS(NumeroUtils.gerarAliquota(aliquotaICMS));
-                itemEstoque.setQuantidade(quantidade);
-                itemEstoque.setPrecoMedio(preco);
-                estoqueService.redefinirItemEstoque(itemEstoque);
-                gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
-            }
-        } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
-
-        }
-        addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        verificarPermissaoAcesso("acessoManutencaoEstoquePermitido", TipoAcesso.ADMINISTRACAO,
+                TipoAcesso.MANUTENCAO_ESTOQUE);
+        verificarPermissaoAcesso("acessoValorEstoquePermitido", TipoAcesso.ADMINISTRACAO);
     }
 
     @Post("estoque/item/inclusao")
@@ -72,17 +51,35 @@ public class EstoqueController extends AbstractController {
             addAtributo("itemPedido", itemPedido);
         }
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        if (material != null && formaMaterial != null) {
+            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        } else {
+            irTopoPagina();
+        }
+    }
+
+    @Post("estoque/escassez")
+    public void pesquisarEscassezItemEstoque(Material material, FormaMaterial formaMaterial) {
+        pesquisarItemEstoque(material, formaMaterial, true);
     }
 
     @Get("estoque/item/listagem")
     public void pesquisarItemEstoque(Material material, FormaMaterial formaMaterial) {
-        if ((material == null || material.getId() == null) && formaMaterial == null) {
+        pesquisarItemEstoque(material, formaMaterial, false);
+    }
+
+    private void pesquisarItemEstoque(Material material, FormaMaterial formaMaterial, boolean isListagemEscassez) {
+        if (!isListagemEscassez && ((material == null || material.getId() == null) && formaMaterial == null)) {
             gerarListaMensagemErro("Escolha o material e/ou forma de material. Não é possível pesquisar o estoque inteiro.");
             addAtributo("permanecerTopo", true);
         } else {
             final Integer idMaterial = material != null ? material.getId() : null;
-            List<ItemEstoque> lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
+            List<ItemEstoque> lista = null;
+            if (isListagemEscassez) {
+                lista = estoqueService.pesquisarEscassezItemEstoque(idMaterial, formaMaterial);
+            } else {
+                lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
+            }
             formatarItemEstoque(lista);
 
             addAtributo("formaSelecionada", formaMaterial);
@@ -109,7 +106,11 @@ public class EstoqueController extends AbstractController {
         }
         addAtributo("permanecerTopo", true);
         material = materialService.pesquisarById(material.getId());
-        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        if (material != null && formaMaterial != null) {
+            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        } else {
+            irTopoPagina();
+        }
     }
 
     @Get("estoque/material/listagem")
@@ -124,7 +125,40 @@ public class EstoqueController extends AbstractController {
         serializarJson(new SerializacaoJson("lista", lista));
     }
 
-    @Post("estoque/item/recorte")
-    public void recortarItemEstoque() {
+    @Post("estoque/valor")
+    public void pesquisarValorEstoque(Material material, FormaMaterial formaMaterial) {
+        Double valorEstoque = estoqueService.pesquisarValorEstoque(material.getId(), formaMaterial);
+
+        addAtributo("valorEstoque", NumeroUtils.formatarValorMonetario(valorEstoque));
+        addAtributo("formaSelecionada", formaMaterial);
+        addAtributo("material", material);
+        irTopoPagina();
+    }
+
+    @Post("estoque/item/edicao")
+    public void redefinirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
+            Double aliquotaICMS, Material material, FormaMaterial formaMaterial) {
+        try {
+            ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
+            if (itemEstoque == null) {
+                gerarListaMensagemErro("O item de estoque não foi encontrado.");
+            } else {
+                itemEstoque.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
+                itemEstoque.setAliquotaICMS(NumeroUtils.gerarAliquota(aliquotaICMS));
+                itemEstoque.setQuantidade(quantidade);
+                itemEstoque.setPrecoMedio(preco);
+                estoqueService.redefinirItemEstoque(itemEstoque);
+                gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
+            }
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+
+        }
+        addAtributo("permanecerTopo", true);
+        if (material != null && formaMaterial != null) {
+            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        } else {
+            irTopoPagina();
+        }
     }
 }

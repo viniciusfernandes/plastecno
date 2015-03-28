@@ -323,3 +323,11 @@ function submeterForm(botao){
 	var action = $(form).attr('action')+'?'+parametros;
 	$(form).attr('action', action).submit();
 };
+
+function serializarForm(idForm){
+	return $("#"+idForm+" :input[value!='']").serialize();
+}
+
+function serializarFormPesquisa(){
+	return serializarForm('formPesquisa');
+}

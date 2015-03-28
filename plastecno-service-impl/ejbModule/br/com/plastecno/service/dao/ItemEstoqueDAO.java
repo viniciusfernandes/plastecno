@@ -7,6 +7,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
 
 public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
@@ -17,6 +18,36 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 	public ItemEstoque pesquisarById(Integer idItemEstoque) {
 		return pesquisarById(ItemEstoque.class, idItemEstoque);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
+			Integer quantidadeMinima) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i from ItemEstoque i where i.quantidade <= :quantidadeMinima ");
+		if (idMaterial != null && formaMaterial != null) {
+			select.append("i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
+		}
+
+		if (idMaterial != null && formaMaterial == null) {
+			select.append("and i.material.id = :idMaterial ");
+		}
+
+		if (idMaterial == null && formaMaterial != null) {
+			select.append("and i.formaMaterial = :formaMaterial ");
+		}
+		select.append("order by i.formaMaterial, i.material.descricao, i.descricaoPeca ");
+
+		Query query = entityManager.createQuery(select.toString());
+		query.setParameter("quantidadeMinima", quantidadeMinima);
+		if (idMaterial != null) {
+			query.setParameter("idMaterial", idMaterial);
+		}
+
+		if (formaMaterial != null) {
+			query.setParameter("formaMaterial", formaMaterial);
+		}
+		return query.getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -56,4 +87,31 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 		return query.getResultList();
 	}
+
+	public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+		StringBuilder select = new StringBuilder();
+		select.append("select SUM(i.precoMedio * i.quantidade) from ItemEstoque i ");
+		if (idMaterial != null && formaMaterial != null) {
+			select.append("where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
+		}
+
+		if (idMaterial != null && formaMaterial == null) {
+			select.append("where i.material.id = :idMaterial ");
+		}
+
+		if (idMaterial == null && formaMaterial != null) {
+			select.append("where i.formaMaterial = :formaMaterial ");
+		}
+
+		Query query = entityManager.createQuery(select.toString());
+		if (idMaterial != null) {
+			query.setParameter("idMaterial", idMaterial);
+		}
+
+		if (formaMaterial != null) {
+			query.setParameter("formaMaterial", formaMaterial);
+		}
+		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+	}
+
 }

@@ -173,8 +173,7 @@ function remover(codigo, nome) {
 			<div class="label">Vendedor:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="vendedor"
-					value="${cliente.vendedor.nomeCompleto} - ${cliente.vendedor.email}"
-					disabled="disabled" class="uppercaseBloqueado desabilitado"
+					value="${cliente.vendedor.nomeCompleto} - ${cliente.vendedor.email}" disabled="disabled" class="uppercaseBloqueado desabilitado"
 					style="width: 80%" />
 			</div>
 
@@ -241,6 +240,7 @@ function remover(codigo, nome) {
 				onclick="contactarCliente(${cliente.id});" class="botaoContactar"></a>
 		</c:if>
 	</div>
+	<jsp:include page="/bloco/bloco_contato.jsp" />
 	<fieldset id="bloco_comentario">
 		<legend>::: Comentários :::</legend>
 		<form action="<c:url value="/cliente/inclusao/comentario"/>"
@@ -262,7 +262,6 @@ function remover(codigo, nome) {
 			</div>
 
 		</form>
-
 		<div class="label condicional">Histórico:</div>
 		<div class="input areatexto" style="width: 80%">
 			<textarea style="width: 100%;" disabled="disabled">
@@ -272,7 +271,7 @@ function remover(codigo, nome) {
 	</fieldset>
 	<jsp:include page="/bloco/bloco_logradouro.jsp" />
 	<jsp:include page="/bloco/bloco_picklist.jsp" />
-	<jsp:include page="/bloco/bloco_contato.jsp" />
+	
 
 	<div class="bloco_botoes">
 		<c:if test="${acessoInclusaoPermitido}">

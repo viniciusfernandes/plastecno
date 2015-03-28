@@ -39,7 +39,6 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
 public class ClienteServiceImpl implements ClienteService {
-
 	private ClienteDAO clienteDAO;
 
 	@EJB
@@ -117,6 +116,13 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	public Cliente inserir(Cliente cliente) throws BusinessException {
+		// Os revendedores nao deve estar associados a nenhum vendedor.
+		if (cliente.isRevendedor()) {
+			cliente.setVendedor(null);
+		} else if (!cliente.isRevendedor() && cliente.getVendedor() == null) {
+			throw new BusinessException("Vendedor do cliente é obrigatório");
+		}
+
 		ValidadorInformacao.validar(cliente);
 
 		if (isNomeFantasiaExistente(cliente.getId(), cliente.getNomeFantasia())) {
@@ -303,6 +309,12 @@ public class ClienteServiceImpl implements ClienteService {
 
 		return this.entityManager.createQuery(select.toString()).setParameter("listaIdBairro", listaIdBairro)
 				.setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO).getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Cliente pesquisarClienteResumidoById(Integer idCliente) {
+		return clienteDAO.pesquisarClienteResumidoById(idCliente);
 	}
 
 	@Override

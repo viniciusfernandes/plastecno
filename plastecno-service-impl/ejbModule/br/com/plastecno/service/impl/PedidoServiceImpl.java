@@ -51,6 +51,7 @@ import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.util.DateUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
@@ -87,6 +88,35 @@ public class PedidoServiceImpl implements PedidoService {
 	private TransportadoraService transportadoraService;
 	@EJB
 	private UsuarioService usuarioService;
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada)
+			throws BusinessException {
+		if (quantidadeRecepcionada == null) {
+			return;
+		}
+
+		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
+		if (!SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
+			throw new BusinessException("Não é possível alterar a quantidade recepcionada pois a situacao do pedido é \""
+					+ situacaoPedido.getDescricao() + "\"");
+		}
+
+		Integer quantidadeItem = itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
+		if (quantidadeItem == null) {
+			throw new BusinessException("O item de pedido de código " + idItemPedido + " pesquisado não existe no sistema");
+		}
+
+		if (quantidadeItem < quantidadeRecepcionada) {
+			Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
+			Integer sequencialItem = itemPedidoDAO.pesquisarSequencialItemPedido(idItemPedido);
+			throw new BusinessException(
+					"Não é possível recepcionar uma quantidade maior do que foi comprado para o item No. " + sequencialItem
+							+ " do pedido No. " + idPedido);
+		}
+		itemPedidoDAO.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
+	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -828,7 +858,7 @@ public class PedidoServiceImpl implements PedidoService {
 		select.append("p.dataEnvio >= :dataInicio and ");
 		select.append("p.dataEnvio <= :dataFim and ");
 		select.append("p.situacaoPedido in :situacoes ");
-		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
+		select.append("order by p.dataEntrega, p.id, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
 
 		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
 				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoCompraEfetivada())
@@ -878,7 +908,7 @@ public class PedidoServiceImpl implements PedidoService {
 		select.append(" p.dataEnvio >= :dataInicio and ");
 		select.append("p.dataEnvio <= :dataFim and ");
 		select.append("p.situacaoPedido in (:situacoes) ");
-		select.append("order by p.dataEntrega, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
+		select.append("order by p.dataEntrega, p.id, p.representada.nomeFantasia, p.cliente.nomeFantasia ");
 
 		return this.entityManager.createQuery(select.toString()).setParameter("dataInicio", periodo.getInicio())
 				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoVendaEfetivada())
@@ -1031,6 +1061,19 @@ public class PedidoServiceImpl implements PedidoService {
 	public Double pesquisarValorPedidoIPI(Integer idPedido) {
 		final Double valor = pedidoDAO.pesquisarValorPedidoIPI(idPedido);
 		return valor == null ? 0D : valor;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<TotalizacaoPedidoWrapper> pesquisarValorVendaClienteByPeriodo(Periodo periodo, Integer idCliente,
+			boolean isOrcamento) {
+		List<TotalizacaoPedidoWrapper> listaTotalizacao = new ArrayList<TotalizacaoPedidoWrapper>();
+		List<Object[]> resultado = pedidoDAO.pesquisarValorVendaClienteByPeriodo(periodo.getInicio(), periodo.getFim(),
+				idCliente, isOrcamento);
+		for (Object[] o : resultado) {
+			listaTotalizacao.add(new TotalizacaoPedidoWrapper((String) o[2], (Long) o[0], (Double) o[1]));
+		}
+		return listaTotalizacao;
 	}
 
 	@Override

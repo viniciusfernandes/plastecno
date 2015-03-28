@@ -17,26 +17,39 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
-import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class RecepcaoCompraController extends AbstractController {
     @Servico
-    private RepresentadaService representadaService;
-
-    @Servico
-    private RelatorioService relatorioService;
+    private EstoqueService estoqueService;
 
     @Servico
     private PedidoService pedidoService;
 
     @Servico
-    private EstoqueService estoqueService;
+    private RelatorioService relatorioService;
+
+    @Servico
+    private RepresentadaService representadaService;
 
     public RecepcaoCompraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
+    }
+
+    @Post("compra/item/quantidadeRecepcionada/alteracao")
+    public void alterarQuantidadeRecepcionadaItemPedido(Integer idItemPedido, Integer quantidadeRecepcionada,
+            Date dataInicial, Date dataFinal, Integer idRepresentada) {
+        try {
+            pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
+            gerarMensagemSucesso("O item de compra foi alterado com sucesso. Essas alterações já podem ser incluidas no estoque.");
+        } catch (BusinessException e) {
+            addAtributo("itemPedido", pedidoService.pesquisarItemPedido(idItemPedido));
+            gerarListaMensagemErro(e);
+        }
+        addAtributo("permanecerTopo", true);
+        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/pdf")
@@ -44,32 +57,13 @@ public class RecepcaoCompraController extends AbstractController {
         return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.COMPRA);
     }
 
-    @Post("compra/item/inclusao")
-    public void inserirItemPedido(ItemPedido itemPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
-        try {
-
-            if (itemPedido.getAliquotaIPI() != null) {
-                itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
-            }
-            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota((itemPedido.getAliquotaICMS())));
-
-            pedidoService.inserirItemPedido(itemPedido);
-            gerarMensagemSucesso("O item de compra foi alterado com sucesso. Essas alterações já podem ser incluidas no estoque.");
-        } catch (BusinessException e) {
-            addAtributo("itemPedido", itemPedido);
-            gerarListaMensagemErro(e);
-        }
-        addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
-    }
-
     @Get("compra/recepcao/listagem")
     public void pesquisarCompraAguardandoRecebimento(Date dataInicial, Date dataFinal, Integer idRepresentada) {
 
         try {
             Periodo periodo = new Periodo(dataInicial, dataFinal);
-            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraAguardandoRecebimento(
-                    idRepresentada, periodo);
+            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService
+                    .gerarRelatorioCompraAguardandoRecebimento(idRepresentada, periodo);
 
             addAtributo("relatorio", relatorio);
             if (contemAtributo("permanecerTopo")) {
@@ -115,7 +109,7 @@ public class RecepcaoCompraController extends AbstractController {
     @Post("compra/item/recepcao")
     public void recepcionarItemCompra(Date dataInicial, Date dataFinal, Integer idRepresentada, Integer idItemPedido) {
         try {
-            estoqueService.inserirItemPedido(idItemPedido);
+            estoqueService.recepcionarItemCompra(idItemPedido);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }

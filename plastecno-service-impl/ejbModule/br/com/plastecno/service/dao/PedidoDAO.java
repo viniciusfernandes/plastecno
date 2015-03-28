@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoPedido;
@@ -206,7 +207,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		} else {
 			select.append(" and p.tipoPedido != :tipoPedido ");
 		}
-		select.append(" order by p.dataInclusao desc, p.cliente.nomeFantasia ");
+		select.append(" order by p.dataInclusao desc, p.id desc, p.cliente.nomeFantasia ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idCliente", idCliente);
@@ -345,5 +346,51 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idPedido", idPedido);
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+	}
+
+	public List<Object[]> pesquisarValorVendaClienteByPeriodo(Date dataInicial, Date dataFinal, Integer idCliente,
+			boolean isOrcamento) {
+		StringBuilder select = new StringBuilder();
+		select.append("select count(p.id), sum(p.valorPedido), p.cliente.nomeFantasia from Pedido p ");
+		select.append("where ");
+		if (idCliente != null) {
+			select.append("p.cliente.id = :idCliente and ");
+		}
+
+		if (dataInicial != null) {
+			select.append("p.dataEnvio >= :dataInicial and ");
+		}
+
+		if (dataFinal != null) {
+			select.append("p.dataEnvio <= :dataFinal and ");
+		}
+
+		if (isOrcamento) {
+			select.append("p.situacaoPedido = :situacaoPedido ");
+		} else {
+			select.append("p.situacaoPedido in (:situacoes) ");
+		}
+
+		select.append("group BY p.cliente.nomeFantasia ORDER by count(p.id) desc ");
+		TypedQuery<Object[]> query = entityManager.createQuery(select.toString(), Object[].class);
+		if (idCliente != null) {
+			query.setParameter("idCliente", idCliente);
+		}
+
+		if (dataInicial != null) {
+			query.setParameter("dataInicial", dataInicial);
+		}
+
+		if (dataFinal != null) {
+			query.setParameter("dataFinal", dataFinal);
+		}
+
+		if (isOrcamento) {
+			query.setParameter("situacaoPedido", SituacaoPedido.ORCAMENTO);
+		} else {
+			query.setParameter("situacoes", pesquisarSituacaoVendaEfetivada());
+		}
+
+		return query.getResultList();
 	}
 }

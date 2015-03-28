@@ -25,6 +25,11 @@ public interface EstoqueService {
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
+	List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
+
+	List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
+			Integer quantidadeMinima);
+
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
 	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
@@ -38,6 +43,10 @@ public interface EstoqueService {
 	ItemEstoque pesquisarItemEstoqueByItemPedido(ItemPedido itemPedido);
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
+
+	Double pesquisarValorEstoque(Integer idMaterial, FormaMaterial formaMaterial);
+
+	Integer recepcionarItemCompra(Integer idItemPedido) throws BusinessException;
 
 	Integer recortarItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 

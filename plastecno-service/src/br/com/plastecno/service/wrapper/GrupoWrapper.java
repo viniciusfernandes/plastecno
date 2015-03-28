@@ -1,52 +1,64 @@
 package br.com.plastecno.service.wrapper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GrupoWrapper<T, K> extends ChaveValorWrapper<T, List<K>> {
-	private Map<String, Object> properties;
+public class GrupoWrapper<T, K> {
+	private T id;
+	private List<K> listaElementos;
+	private Map<String, Object> propriedades;
+
 	public GrupoWrapper(T id, List<K> listaValor) {
-		super(id, listaValor);
+		this.id = id;
 	}
 
 	public void addElemento(K elemento) {
-		valor.add(elemento);
+		if (listaElementos == null) {
+			listaElementos = new ArrayList<K>();
+		}
+		listaElementos.add(elemento);
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof GrupoWrapper && chave != null && chave.equals(((GrupoWrapper<?, ?>) o).chave);
+		return o instanceof GrupoWrapper && id != null && id.equals(((GrupoWrapper<?, ?>) o).id);
 	}
+
 	public Object getId() {
-		return chave;
+		return id;
 	}
 
 	public List<K> getListaElemento() {
-		return valor;
+		return listaElementos;
 	}
 
 	public Object getPropriedade(String nome) {
-		if (properties == null) {
+		if (propriedades == null) {
 			return null;
 		}
-		return properties.get(nome);
+		return propriedades.get(nome);
 	}
 
 	public int getTotalElemento() {
-		return valor.size();
+		return listaElementos.size();
 	}
 
 	@Override
 	public int hashCode() {
-		return chave != null ? chave.hashCode() : super.hashCode();
+		return id != null ? id.hashCode() : super.hashCode();
 	}
 
-	public void setProperty(String nome, Object valor) {
-		if (properties == null) {
-			properties = new HashMap<String, Object>();
+	public K getFirstElement() {
+		return listaElementos.get(0);
+	}
+
+	public void setPropriedade(String nome, Object valor) {
+		if (propriedades == null) {
+			propriedades = new HashMap<String, Object>();
 		}
-		properties.put(nome, valor);
+		propriedades.put(nome, valor);
 	}
 
 }

@@ -53,6 +53,25 @@ import br.com.plastecno.service.impl.EmailServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
 class ServiceBuilder {
+	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
+
+	/*
+	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
+	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
+	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
+	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
+	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
+	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
+	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
+	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
+	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
+	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
+	 */
+	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
+
+	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
+	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
+
 	@SuppressWarnings("unchecked")
 	static <T> T buildService(Class<T> classe) {
 		T service = (T) mapTemporarioServices.get(classe);
@@ -109,25 +128,6 @@ class ServiceBuilder {
 			}
 		}
 	}
-
-	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
-
-	/*
-	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
-	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
-	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
-	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
-	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
-	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
-	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
-	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
-	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
-	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
-	 */
-	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
-	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
-
-	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
 
 	ServiceBuilder() {
 	}
@@ -222,6 +222,7 @@ class ServiceBuilder {
 		inject(estoqueService, buildService(PedidoService.class), "pedidoService");
 
 		new MockUp<ItemEstoqueDAO>() {
+
 			@Mock
 			public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
 					String descricaoPeca) {
@@ -240,13 +241,40 @@ class ServiceBuilder {
 						continue;
 					}
 
-					isPecaSelecionada = descricaoPeca == null || descricaoPeca.equals(item.getDescricaoPeca());
-					if (item.isPeca() && isMaterialSelecionado && isPecaSelecionada) {
+					isPecaSelecionada = item.isPeca() && descricaoPeca != null && descricaoPeca.equals(item.getDescricaoPeca());
+					if (isMaterialSelecionado && isPecaSelecionada) {
 						itens.add(item);
 						continue;
 					}
 				}
 				return itens;
+			}
+
+			@Mock
+			Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
+				List<Double[]> listaValores = new ArrayList<Double[]>();
+				boolean isAmbosNulos = false;
+				boolean isMaterialIgual = false;
+				boolean isFormaIgual = false;
+				for (ItemEstoque i : l) {
+					isAmbosNulos = idMaterial == null && formaMaterial == null;
+					isMaterialIgual = idMaterial != null && idMaterial.equals(i.getMaterial().getId());
+					isFormaIgual = formaMaterial != null && formaMaterial.equals(i.getFormaMaterial());
+					if (isAmbosNulos || isMaterialIgual || isFormaIgual) {
+						listaValores.add(new Double[] { i.getPrecoUnidade(), (double) i.getQuantidade() });
+					}
+				}
+
+				double total = 0d;
+				double val = 0;
+				double quant = 0;
+				for (Double[] valor : listaValores) {
+					val = (Double) valor[0];
+					quant = (Double) valor[1];
+					total += val * quant;
+				}
+				return total;
 			}
 
 		};
@@ -278,6 +306,18 @@ class ServiceBuilder {
 			Material pesquisarById(Integer id) {
 				return REPOSITORY.pesquisarEntidadeById(Material.class, id);
 			}
+
+			@Mock
+			public List<Material> pesquisarBySigla(String sigla) {
+				List<Material> l = REPOSITORY.pesquisarTodos(Material.class);
+				List<Material> lista = new ArrayList<Material>();
+				for (Material material : l) {
+					if (material.getSigla().contains(sigla)) {
+						lista.add(material);
+					}
+				}
+				return lista;
+			}
 		};
 
 		return materialService;
@@ -297,6 +337,13 @@ class ServiceBuilder {
 		inject(pedidoService, buildService(EstoqueService.class), "estoqueService");
 
 		new MockUp<ItemPedidoDAO>() {
+
+			@Mock
+			public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada) {
+				REPOSITORY.alterarEntidadeAtributoById(ItemPedido.class, idItemPedido, "quantidadeRecepcionada",
+						quantidadeRecepcionada);
+			}
+
 			@Mock
 			public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {
 				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
@@ -420,6 +467,12 @@ class ServiceBuilder {
 			}
 
 			@Mock
+			public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
+				ItemPedido i = pesquisarItemPedido(idItemPedido);
+				return i == null ? null : i.getPedido().getSituacaoPedido();
+			}
+
+			@Mock
 			Long pesquisarTotalItemPedido(Integer idPedido) {
 				return pesquisarTotalItemPedido(idPedido, false);
 			}
@@ -450,6 +503,7 @@ class ServiceBuilder {
 				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null ? pedido.getValorPedidoIPI() : null;
 			}
+
 		};
 
 		return pedidoService;
@@ -471,6 +525,26 @@ class ServiceBuilder {
 			String pesquisarNomeFantasiaById(Integer idRepresentada) {
 				Representada r = REPOSITORY.pesquisarEntidadeById(Representada.class, idRepresentada);
 				return r != null ? r.getNomeFantasia() : null;
+			}
+
+			@Mock
+			public List<Representada> pesquisarRepresentadaByTipoRelacionamento(boolean ativo, TipoRelacionamento... tipos) {
+				List<Representada> l = REPOSITORY.pesquisarTodos(Representada.class);
+
+				if (tipos == null || tipos.length <= 0) {
+					return l;
+				}
+
+				List<Representada> lista = new ArrayList<Representada>();
+				for (Representada representada : l) {
+					for (int i = 0; i < tipos.length; i++) {
+						if (tipos[i].equals(representada.getTipoRelacionamento())) {
+							lista.add(representada);
+							break;
+						}
+					}
+				}
+				return lista;
 			}
 
 			@Mock

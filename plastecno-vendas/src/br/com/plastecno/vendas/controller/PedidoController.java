@@ -255,6 +255,9 @@ public class PedidoController extends AbstractController {
         final Logradouro logradouroCobranca = pedido.getLogradouro(TipoLogradouro.COBRANCA);
 
         String tipo = pedido.isVenda() ? "Venda" : "Compra";
+
+        geradorRelatorio.addAtributo("tipoRelacionamento", pedido.isVenda() ? "Represent." : "Forneced.");
+        geradorRelatorio.addAtributo("tipoProprietario", pedido.isVenda() ? "Vendedor" : "Comprador");
         geradorRelatorio.addAtributo("titulo", pedido.isOrcamento() ? "Orçamento de " + tipo : "Pedido de " + tipo);
         geradorRelatorio.addAtributo("tipoPedido", tipo);
         geradorRelatorio.addAtributo("pedido", pedido);
@@ -361,9 +364,7 @@ public class PedidoController extends AbstractController {
             return false;
         } else {
             SituacaoPedido situacao = pedido.getSituacaoPedido();
-            boolean isCompraFinalizada = pedido.isCompra()
-                    && (SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA
-                            .equals(situacao));
+            boolean isCompraFinalizada = pedido.isCompra() && SituacaoPedido.COMPRA_RECEBIDA.equals(situacao);
             boolean isVendaFinalizada = pedido.isVenda()
                     && (SituacaoPedido.ENVIADO.equals(situacao)
                             || SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA.equals(situacao)

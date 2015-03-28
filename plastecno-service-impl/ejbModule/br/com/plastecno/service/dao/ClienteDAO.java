@@ -47,6 +47,13 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 
 	}
 
+	public Cliente pesquisarClienteResumidoById(Integer idCliente) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select new Cliente(c.id, c.nomeFantasia, c.razaoSocial) from Cliente c where c.id = :idCliente")
+						.setParameter("idCliente", idCliente), Cliente.class, null);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
 		StringBuilder select = new StringBuilder().append("select l from Cliente c ")
@@ -60,9 +67,11 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 	}
 
 	public Cliente pesquisarRevendedor() {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery(
-						"select new Cliente(c.id, c.nomeFantasia, c.razaoSocial) from Cliente c where c.tipoCliente = :tipoCliente").setParameter(
-						"tipoCliente", TipoCliente.REVENDEDOR), Cliente.class, null);
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Cliente(c.id, c.nomeFantasia, c.razaoSocial) from Cliente c where c.tipoCliente = :tipoCliente")
+								.setParameter("tipoCliente", TipoCliente.REVENDEDOR), Cliente.class, null);
 	}
 }

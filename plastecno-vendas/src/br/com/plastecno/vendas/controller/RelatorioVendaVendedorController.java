@@ -60,6 +60,7 @@ public class RelatorioVendaVendedorController extends AbstractController {
 
     @Get("relatorio/venda/vendedor")
     public void relatorioVendaVendedorHome() {
+        configurarFiltroPediodoMensal();
         addAtributo("relatorioGerado", contemAtributo("relatorio"));
         addAtributo("titulo",
                 isAcessoPermitido(TipoAcesso.OPERACAO_CONTABIL) ? "Relatório de Orçamento do Vendedor"

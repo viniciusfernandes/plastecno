@@ -29,15 +29,16 @@ public final class GeradorRelatorioPDF {
     private static String limpar(String property) {
         return property.replace("{", "").replace("}", "");
     }
-    private final String regex = "\\{[a-zA-Z]+(\\.[a-zA-Z]+)*\\}";
-    private final PropertyResolver resolver;
-    private final ConversorHTML2PDF conversor;
-    private final Charset charset;
-    private StringBuilder html;
-    private StringBuilder css;
-    private StringBuilder cabecalho;
 
+    private StringBuilder cabecalho;
+    private final Charset charset;
+    private final ConversorHTML2PDF conversor;
+    private StringBuilder css;
+    private StringBuilder html;
     private boolean layoutConfigurado;
+    private final String regex = "\\{[a-zA-Z]+(\\.[a-zA-Z]+)*\\}";
+
+    private final PropertyResolver resolver;
 
     public GeradorRelatorioPDF() {
         charset = Charset.forName("UTF-8");

@@ -41,8 +41,8 @@ $(document).ready(function() {
 				mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ADICIONAR esse item, pois o estoque terá seu valor alterado?',
 				confirmar: function(){
 					$('#bloco_item_pedido #descricao').val($('#bloco_item_pedido #descricao').val().toUpperCase());
-					var parametros = $('#formPesquisa').serialize();
-					parametros += '&'+$('#bloco_item_pedido').serialize();
+					var parametros = serializarFormPesquisa();
+					parametros += '&'+serializarForm('bloco_item_pedido');
 					
 					var form = $('#formVazio');
 					$(form).attr('method', 'post');
@@ -55,7 +55,7 @@ $(document).ready(function() {
 				mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REDEFINIR esse item, pois o estoque terá seu valor alterado?',
 				confirmar: function(){
 					$('#bloco_item_pedido #descricao').val($('#bloco_item_pedido #descricao').val().toUpperCase());
-					var parametros = $('#formPesquisa').serialize();
+					var parametros = serializarFormPesquisa();
 					parametros += '&idItem='+$('#bloco_item_pedido #idItemPedido').val();
 					parametros += '&quantidade='+$('#bloco_item_pedido #quantidade').val();
 					parametros += '&aliquotaIPI='+$('#bloco_item_pedido #aliquotaIPI').val();
@@ -70,21 +70,23 @@ $(document).ready(function() {
 			});
 		}
 	});
-	$('#botaoRecortarItemPedido').click(function (){
-		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja RECORTAR esse item, pois o estoque terá seu valor alterado?',
-			confirmar: function(){
-				$('#bloco_item_pedido #descricao').val($('#bloco_item_pedido #descricao').val().toUpperCase());
-				var parametros = $('#formPesquisa').serialize();
-				parametros += '&'+$('#bloco_item_pedido').serialize();
-				
-				var form = $('#formVazio');
-				$(form).attr('method', 'post');
-				$(form).attr('action', '<c:url value="/estoque/item/inclusao"/>?'+parametros);
-				$(form).submit();
-			}
-		});
+	
+	$('#botaoValorEstoque').click(function (){
+		var parametros = serializarFormPesquisa();
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/estoque/valor"/>?'+parametros);
+		$(form).submit();
 	});
+	
+	$('#botaoEscassezEstoque').click(function (){
+		var parametros = serializarFormPesquisa();
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/estoque/escassez"/>?'+parametros);
+		$(form).submit();
+	});
+	
 	
 	inicializarAutocompleteMaterial();
 	inicializarSelectFormaMaterial();
@@ -93,6 +95,7 @@ $(document).ready(function() {
 });
 
 function inicializarAutocompleteMaterial() {
+	// Esse eh o autocomplete da area de filtros de pesquisa
 	autocompletar({
 		url : '<c:url value="/estoque/material/listagem"/>',
 		campoPesquisavel : 'formPesquisa #material',
@@ -100,6 +103,17 @@ function inicializarAutocompleteMaterial() {
 		containerResultados : 'formPesquisa #containerPesquisaMaterial',
 		selecionarItem : function(itemLista) {
 			$('#formPesquisa #idMaterial').val(itemLista.id);
+		}
+	});
+	
+	// Esse eh o autocomplete da campo de materiais no bloco de edicao dos itens
+	autocompletar({
+		url : '<c:url value="/estoque/material/listagem"/>',
+		campoPesquisavel : 'bloco_item_pedido #material',
+		parametro : 'sigla',
+		containerResultados : 'bloco_item_pedido #containerPesquisaMaterial',
+		selecionarItem : function(itemLista) {
+			$('#bloco_item_pedido #idMaterial').val(itemLista.id);
 		}
 	});
 };
@@ -140,15 +154,27 @@ function inicializarFiltro() {
 				<input type="text" id="material" name="material.descricao" value="${material.descricao}" style="width: 60%" />
 				<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 			</div>
+			<div class="label" style="width: 30%">Valor total em estoque:</div>
+			<div class="input" style="width: 60%">
+				<input type="text" value="R$ ${empty valorEstoque ? '0,00' : valorEstoque}" disabled="disabled" 
+				class="desabilitado" style="width: 60%"/>
+			</div>
+			
 		</fieldset>
 		<div class="bloco_botoes">
-			<input type="submit" value="" class="botaoPesquisar" /> 
+			<input type="submit" value="" class="botaoPesquisar" />
+			<input id="botaoEscassezEstoque" type="button" value="" class="botaoPesquisarEstatistica" title="Pesquisar Itens Esgotados Estoque"/>
+			<c:if test="${acessoValorEstoquePermitido}">
+				<input id="botaoValorEstoque" type="button" value="" class="botaoDinheiro" title="Pesquisar Valor dos Itens no Estoque"/> 
+			</c:if>
 			<input id="botaoLimpar" type="button" value="" title="Limpar Dados do Item de Estoque" class="botaoLimpar" />
 		</div>
 	</form>
 	
-	<jsp:include page="/bloco/bloco_edicao_item_compra.jsp"/>
-		
+	<c:if test="${acessoManutencaoEstoquePermitido}">
+		<jsp:include page="/bloco/bloco_edicao_item_compra.jsp"/>
+	</c:if>
+	
 	<a id="rodape"></a>
 	<fieldset>
 		<legend>::: Resultado da Pesquisa de Itens de Estoque :::</legend>
@@ -174,7 +200,7 @@ function inicializarFiltro() {
 							<td>${item.descricao}</td>
 							<td>${item.precoMedioFormatado}</td>
 							<td>
-								<c:if test="${acessoRedefinicaoItemPermitido}">
+								<c:if test="${acessoManutencaoEstoquePermitido}">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/estoque/item/${item.id}"/>" method="get">
 										<input type="hidden" name="material.id" value="${material.id}"/>

@@ -119,8 +119,8 @@ function enviarEncomenda(botao){
 					<th style="width: 1%">Item</th>
 					<th style="width: 5%">Qtde</th>
 					<th style="width: 43%">Desc. Item</th>
-					<th style="width: 10%">Comprador</th>
-					<th style="width: 10%">Represent.</th>
+					<th style="width: 10%">Vendedor</th>
+					<th style="width: 10%">Fornec.</th>
 					<th style="width: 5%">Unid. (R$)</th>
 					<th style="width: 5%">Total (R$)</th>
 					<th style="width: 11%">Ação</th>

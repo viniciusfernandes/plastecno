@@ -14,17 +14,18 @@ public class RelatorioWrapper<T, K> {
 		this.titulo = titulo;
 	}
 
-	public void addElemento(T idGrupo, K elemento) {
+	public GrupoWrapper<T, K> addElemento(T idGrupo, K elemento) {
 		GrupoWrapper<T, K> grupo = mapaGrupo.get(idGrupo);
 		if (grupo != null) {
 			grupo.addElemento(elemento);
-			return;
+			return grupo;
 		}
 
 		grupo = new GrupoWrapper<T, K>(idGrupo, new ArrayList<K>());
 		grupo.addElemento(elemento);
 		listaGrupo.add(grupo);
 		mapaGrupo.put(idGrupo, grupo);
+		return grupo;
 	}
 
 	public List<GrupoWrapper<T, K>> getListaGrupo() {

@@ -26,7 +26,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemEstoque i where i.quantidade <= :quantidadeMinima ");
 		if (idMaterial != null && formaMaterial != null) {
-			select.append("i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
+			select.append("and i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
 		}
 
 		if (idMaterial != null && formaMaterial == null) {

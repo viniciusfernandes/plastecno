@@ -169,7 +169,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 			item.setNomeProprietario(pedido.getProprietario().getNomeCompleto());
 			item.setNomeRepresentada(pedido.getRepresentada().getNomeFantasia());
-			relatorio.addElemento(pedido.getId(), item);
+			relatorio.addElemento(pedido.getId(), item).setPropriedade("dataEntrega",
+					StringUtils.formatarData(pedido.getDataEntrega()));
 		}
 		return relatorio;
 	}

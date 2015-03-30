@@ -26,6 +26,10 @@ public class GrupoWrapper<T, K> {
 		return o instanceof GrupoWrapper && id != null && id.equals(((GrupoWrapper<?, ?>) o).id);
 	}
 
+	public K getFirstElement() {
+		return listaElementos.get(0);
+	}
+
 	public Object getId() {
 		return id;
 	}
@@ -41,6 +45,10 @@ public class GrupoWrapper<T, K> {
 		return propriedades.get(nome);
 	}
 
+	public Map<String, Object> getPropriedades() {
+		return propriedades;
+	}
+
 	public int getTotalElemento() {
 		return listaElementos.size();
 	}
@@ -48,10 +56,6 @@ public class GrupoWrapper<T, K> {
 	@Override
 	public int hashCode() {
 		return id != null ? id.hashCode() : super.hashCode();
-	}
-
-	public K getFirstElement() {
-		return listaElementos.get(0);
 	}
 
 	public void setPropriedade(String nome, Object valor) {

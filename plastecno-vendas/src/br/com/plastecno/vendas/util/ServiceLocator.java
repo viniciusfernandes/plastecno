@@ -9,23 +9,9 @@ import javax.naming.NamingException;
 import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
 public final class ServiceLocator {
-    @SuppressWarnings("unchecked")
-    public static <T> T locate(Class<T> classe) throws ServiceLocatorException {
-
-        StringBuilder serviceName = new StringBuilder();
-
-        serviceName.append("java:global/plastecno-sistema-teste/plastecno-service-impl-teste/")
-                .append(classe.getSimpleName()).append("Impl!").append(classe.getName());
-        try {
-            return (T) context.lookup(serviceName.toString());
-        } catch (NamingException e) {
-            throw new ServiceLocatorException("Falha na localizacao do servico: " + serviceName, e);
-        }
-    }
+    private static InitialContext context;
 
     private static Properties properties;
-
-    private static InitialContext context;
 
     static {
         properties = new Properties();
@@ -35,6 +21,20 @@ public final class ServiceLocator {
         } catch (NamingException e) {
             throw new IllegalStateException("Falha na inicializacao do service locator. "
                     + "Nao foi possivel inicial o contexto para efetuar os lookups dos recursos.", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T locate(Class<T> classe) throws ServiceLocatorException {
+
+        StringBuilder serviceName = new StringBuilder();
+
+        serviceName.append("java:global/plastecno-sistema/plastecno-service-impl/").append(classe.getSimpleName())
+                .append("Impl!").append(classe.getName());
+        try {
+            return (T) context.lookup(serviceName.toString());
+        } catch (NamingException e) {
+            throw new ServiceLocatorException("Falha na localizacao do servico: " + serviceName, e);
         }
     }
 

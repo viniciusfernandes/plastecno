@@ -73,6 +73,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	public void cancelarReservaEstoqueByIdPedido(Integer idPedido) throws BusinessException {
+		pedidoService.alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.CANCELADO);
 		removerItemReservadoByIdPedido(idPedido);
 		reinserirItemPedidoEstoque(idPedido);
 	}
@@ -148,8 +149,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
 		if (!SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
-			throw new BusinessException("Não é possível alterar a quantidade recepcionada pois a situacao do pedido é \""
-					+ situacaoPedido.getDescricao() + "\"");
+			throw new BusinessException("Não é possível gerar um item de estoque pois a situacao do pedido é \""
+					+ situacaoPedido.getDescricao() + "\" e deve ser apenas \""
+					+ SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.getDescricao() + "\"");
 		}
 
 		// Aqui temos essa condicao pois o usuario pode incluir um item diretamento
@@ -220,7 +222,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	public List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return pesquisarEscassezItemEstoque(idMaterial, formaMaterial,0);
+		return pesquisarEscassezItemEstoque(idMaterial, formaMaterial, 0);
 	}
 
 	@Override
@@ -297,7 +299,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public ItemEstoque pesquisarItemEstoqueByItemPedido(ItemPedido itemPedido) {
 		return pesquisarItemCadastradoEstoque(itemPedido);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -307,7 +309,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		query.setParameter("sigla", "%" + sigla + "%");
 		return query.getResultList();
 	}
-	
+
 	@Override
 	public Double pesquisarValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		return itemEstoqueDAO.pesquisarValorEQuantidadeItemEstoque(idMaterial, formaMaterial);
@@ -317,6 +319,22 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer recepcionarItemCompra(Integer idItemPedido) throws BusinessException {
 		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, true));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer recepcionarParcialmenteItemCompra(Integer idItemPedido, Integer quantidadeParcial)
+			throws BusinessException {
+		if (quantidadeParcial == null) {
+			quantidadeParcial = 0;
+		}
+		Integer quantidadeRecepcionada = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemPedido);
+		quantidadeRecepcionada += quantidadeParcial;
+		pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
+
+		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido, true);
+		itemEstoque.setQuantidade(quantidadeParcial);
+		return inserirItemEstoque(itemEstoque);
 	}
 
 	@Override

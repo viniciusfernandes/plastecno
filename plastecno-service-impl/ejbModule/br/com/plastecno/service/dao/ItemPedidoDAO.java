@@ -180,6 +180,10 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return pesquisarCampoById(ItemPedido.class, idItemPedido, "quantidade", Integer.class);
 	}
 
+	public Integer pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido) {
+		return pesquisarCampoById(ItemPedido.class, idItemPedido, "quantidadeRecepcionada", Integer.class);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarRevendaEncomendada(Integer idRepresentada, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();

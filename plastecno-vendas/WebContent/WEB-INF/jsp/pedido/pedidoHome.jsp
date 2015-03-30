@@ -109,12 +109,12 @@ $(document).ready(function() {
 		}
 	});
 
-	habilitar('#nomeCliente', <c:out value="${empty pedido.id}"/>);
+	// A segunda condicao verifica quando o pedido eh do tipo de compra
+	habilitar('#nomeCliente', <c:out value="${empty pedido.id and empty tipoPedido}"/>);
 	habilitar('#numeroPedidoPesquisa', <c:out value="${empty pedido.id}"/>);
 	habilitar('#representada', <c:out value="${empty pedido.id or not contemItem}"/>);
 	habilitar('#bloco_item_pedido #ipi', <c:out value="${not ipiDesabilitado}"/>);
 	habilitar('#idRepresentada', <c:out value="${not empty pedido.id and contemItem}"/>);
-	habilitar('#nomeCliente', <c:out value="${empty tipoPedido}"/>);
 	
 	$('#botaoRefazerPedido').click(function (){
 		inicializarModalConfirmacao({

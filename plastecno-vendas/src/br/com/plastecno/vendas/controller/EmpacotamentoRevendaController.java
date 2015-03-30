@@ -11,6 +11,7 @@ import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
+import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -57,6 +58,16 @@ public class EmpacotamentoRevendaController extends AbstractController {
     @Post("empacotamento/item/inclusao")
     public void empacotarItem(Integer idItemPedido, Date dataInicial, Date dataFinal, Cliente cliente) {
         estoqueService.empacotarItemPedido(idItemPedido);
+        SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
+        Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
+        String mensagem = null;
+        if (SituacaoPedido.EMPACOTADO.equals(situacaoPedido)) {
+            mensagem = "O pedido No. " + idPedido
+                    + " não pussui outros itens para ser empacotado e pode ser enviado o cliente.";
+        } else {
+            mensagem = "Item do pedido No. " + idPedido + "empacotado com sucesso";
+        }
+        gerarMensagemSucesso(mensagem);
         pesquisarRevendaEmpacotamento(dataInicial, dataFinal, cliente);
     }
 
@@ -91,10 +102,11 @@ public class EmpacotamentoRevendaController extends AbstractController {
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
-        addAtributo("permanecerTopo", true); addAtributo("dataInicial", formatarData(dataInicial));
+        addAtributo("permanecerTopo", true);
+        addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
         redirecTo(this.getClass()).pesquisarRevendaEmpacotamento(dataInicial, dataFinal, cliente);
-       
+
     }
 
 }

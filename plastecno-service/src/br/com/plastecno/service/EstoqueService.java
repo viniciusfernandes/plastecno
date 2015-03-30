@@ -48,6 +48,8 @@ public interface EstoqueService {
 
 	Integer recepcionarItemCompra(Integer idItemPedido) throws BusinessException;
 
+	Integer recepcionarParcialmenteItemCompra(Integer idItemPedido, Integer quantidadeParcial) throws BusinessException;
+
 	Integer recortarItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;

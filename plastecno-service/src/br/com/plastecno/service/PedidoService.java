@@ -40,6 +40,8 @@ public interface PedidoService {
 
 	boolean contemItemPedido(Integer idPedido);
 
+	boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
+
 	Integer encomendarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
 			throws BusinessException;
 
@@ -126,6 +128,10 @@ public interface PedidoService {
 
 	int pesquisarQuantidadeItemPedido(Integer idItemPedido);
 
+	int pesquisarQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
+
+	int pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido);
+
 	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
 
 	List<ItemPedido> pesquisarRevendaEmpacotamento();
@@ -158,12 +164,12 @@ public interface PedidoService {
 
 	Double pesquisarValorPedidoIPI(Integer idPedido);
 
+	List<TotalizacaoPedidoWrapper> pesquisarValorVendaClienteByPeriodo(Periodo periodo, Integer idCliente, boolean isOrcamento);
+
 	Pedido pesquisarVendaById(Integer id);
 
 	List<Pedido> pesquisarVendaByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException;
-
-	List<TotalizacaoPedidoWrapper> pesquisarValorVendaClienteByPeriodo(Periodo periodo, Integer idCliente, boolean isOrcamento);
 
 	void reencomendarItemPedido(Integer idItemPedido) throws BusinessException;
 

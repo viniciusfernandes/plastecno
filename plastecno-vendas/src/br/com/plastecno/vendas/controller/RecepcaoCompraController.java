@@ -38,20 +38,6 @@ public class RecepcaoCompraController extends AbstractController {
         super(result, usuarioInfo);
     }
 
-    @Post("compra/item/quantidadeRecepcionada/alteracao")
-    public void alterarQuantidadeRecepcionadaItemPedido(Integer idItemPedido, Integer quantidadeRecepcionada,
-            Date dataInicial, Date dataFinal, Integer idRepresentada) {
-        try {
-            pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
-            gerarMensagemSucesso("O item de compra foi alterado com sucesso. Essas alterações já podem ser incluidas no estoque.");
-        } catch (BusinessException e) {
-            addAtributo("itemPedido", pedidoService.pesquisarItemPedido(idItemPedido));
-            gerarListaMensagemErro(e);
-        }
-        addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
-    }
-
     @Get("compra/pdf")
     public Download downloadPedidoPDF(Integer idPedido) {
         return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.COMPRA);
@@ -106,14 +92,37 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
     }
 
-    @Post("compra/item/recepcao")
-    public void recepcionarItemCompra(Date dataInicial, Date dataFinal, Integer idRepresentada, Integer idItemPedido) {
+    @Post("compra/item/recepcaoparcial")
+    public void recepcaoParcialItemPedido(Integer idItemPedido, Integer quantidadeRecepcionada, Date dataInicial,
+            Date dataFinal, Integer idRepresentada) {
         try {
-            estoqueService.recepcionarItemCompra(idItemPedido);
+            estoqueService.recepcionarParcialmenteItemCompra(idItemPedido, quantidadeRecepcionada);
+
+            boolean contemItem = pedidoService.contemQuantidadeNaoRecepcionadaItemPedido(idItemPedido);
+            Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
+            String mensagem = null;
+            if (contemItem) {
+                mensagem = "O pedido No. \""
+                        + idPedido
+                        + "\" teve item de compra foi recepcionado parcialmente e essas alterações já foram incluidas no estoque.";
+            } else {
+                mensagem = "O pedido No. \""
+                        + idPedido
+                        + "\" não contém outros itens para serem recepcionados e essas alterações já foram incluidas no estoque.";
+            }
+            gerarMensagemSucesso(mensagem);
         } catch (BusinessException e) {
+            addAtributo("itemPedido", pedidoService.pesquisarItemPedido(idItemPedido));
             gerarListaMensagemErro(e);
         }
+        addAtributo("permanecerTopo", true);
         redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+    }
+
+    @Post("compra/item/recepcao")
+    public void recepcionarItemCompra(Date dataInicial, Date dataFinal, Integer idRepresentada, Integer idItemPedido) {
+        Integer quantidadeNaoRecepcionada = pedidoService.pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido);
+        recepcaoParcialItemPedido(idItemPedido, quantidadeNaoRecepcionada, dataInicial, dataFinal, idRepresentada);
     }
 
     @Post("compra/item/remocao")

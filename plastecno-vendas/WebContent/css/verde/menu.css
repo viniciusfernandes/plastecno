@@ -87,7 +87,7 @@ nav ul li a:hover {
 }
 
 nav > ul li:not(:first-child) {
-	border-left: 1px solid white;
+	/* border-left: 1px solid white; */
 }
 
 nav ul li a {
@@ -110,8 +110,7 @@ nav ul ul {
 }
 
 nav ul ul li {
-	
-	border-top: 1px solid white;
+	/* border-top: 1px solid white; */
 	float: none;
 	position: relative;
 }

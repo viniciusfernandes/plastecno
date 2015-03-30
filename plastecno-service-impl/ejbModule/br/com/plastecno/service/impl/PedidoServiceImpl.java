@@ -58,7 +58,6 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
 public class PedidoServiceImpl implements PedidoService {
-
 	@EJB
 	private ClienteService clienteService;
 
@@ -86,9 +85,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private TransportadoraService transportadoraService;
+
 	@EJB
 	private UsuarioService usuarioService;
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada)
@@ -218,6 +217,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	public boolean contemPedidoItemRevendaAguardandoEncomenda(Integer idItemPedido) {
 		return pesquisarTotalItemRevendaAguardandoEncomenda(idItemPedido) > 0;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido) {
+		return pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido) > 0;
 	}
 
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
@@ -438,7 +443,7 @@ public class PedidoServiceImpl implements PedidoService {
 		 * Estamos proibindo que qualquer vendedor cadastre um NOVO pedido para um
 		 * cliente que nao esteja associado em sua carteira de clientes.
 		 */
-		if (isPedidoNovo
+		if (isPedidoNovo && pedido.isVenda()
 				&& !this.usuarioService.isVendaPermitida(pedido.getCliente().getId(), pedido.getVendedor().getId())) {
 
 			Cliente cliente = this.clienteService.pesquisarById(pedido.getCliente().getId());
@@ -448,16 +453,6 @@ public class PedidoServiceImpl implements PedidoService {
 					+ " não esta associado ao vendedor "
 					+ (proprietario != null ? proprietario.getNome() + " - " + proprietario.getEmail() : pedido.getCliente()
 							.getId()));
-		}
-
-		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());
-		if (dataEntrega != null && DateUtils.isAnteriorDataAtual(dataEntrega)) {
-			throw new InformacaoInvalidaException("Data de entrega deve ser posterior a data atual");
-		}
-
-		if (TipoEntrega.CIF_TRANS.equals(pedido.getTipoEntrega()) && pedido.getTransportadoraRedespacho() == null) {
-			throw new BusinessException("A transportadora de redespacho é obrigatória para o tipo de entrega "
-					+ TipoEntrega.CIF_TRANS.getDescricao());
 		}
 
 		if (pedido.isVenda()) {
@@ -473,6 +468,16 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 			pedido.setVendedor(vendedor);
 
+		}
+
+		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());
+		if (dataEntrega != null && DateUtils.isAnteriorDataAtual(dataEntrega)) {
+			throw new InformacaoInvalidaException("Data de entrega deve ser posterior a data atual");
+		}
+
+		if (TipoEntrega.CIF_TRANS.equals(pedido.getTipoEntrega()) && pedido.getTransportadoraRedespacho() == null) {
+			throw new BusinessException("A transportadora de redespacho é obrigatória para o tipo de entrega "
+					+ TipoEntrega.CIF_TRANS.getDescricao());
 		}
 		/*
 		 * Devemos sempre pesquisar pois o cliente pode ter alterado os dados de
@@ -929,7 +934,21 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public int pesquisarQuantidadeItemPedido(Integer idItemPedido) {
-		return itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
+		Integer q = itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
+		return q == null ? 0 : q;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public int pesquisarQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido) {
+		return pesquisarQuantidadeItemPedido(idItemPedido) - pesquisarQuantidadeRecepcionadaItemPedido(idItemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public int pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido) {
+		Integer q = itemPedidoDAO.pesquisarQuantidadeRecepcionadaItemPedido(idItemPedido);
+		return q == null ? 0 : q;
 	}
 
 	@Override

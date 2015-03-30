@@ -58,7 +58,6 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
 public class PedidoServiceImpl implements PedidoService {
-
 	@EJB
 	private ClienteService clienteService;
 
@@ -86,9 +85,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private TransportadoraService transportadoraService;
+
 	@EJB
 	private UsuarioService usuarioService;
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada)
@@ -218,6 +217,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	public boolean contemPedidoItemRevendaAguardandoEncomenda(Integer idItemPedido) {
 		return pesquisarTotalItemRevendaAguardandoEncomenda(idItemPedido) > 0;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido) {
+		return pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido) > 0;
 	}
 
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")

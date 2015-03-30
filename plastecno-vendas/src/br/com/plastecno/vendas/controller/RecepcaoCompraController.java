@@ -97,7 +97,20 @@ public class RecepcaoCompraController extends AbstractController {
             Date dataFinal, Integer idRepresentada) {
         try {
             estoqueService.recepcionarParcialmenteItemCompra(idItemPedido, quantidadeRecepcionada);
-            gerarMensagemSucesso("O item de compra foi recepcionado parcialmente e essas alterações já foram incluidas no estoque.");
+
+            boolean contemItem = pedidoService.contemQuantidadeNaoRecepcionadaItemPedido(idItemPedido);
+            Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
+            String mensagem = null;
+            if (contemItem) {
+                mensagem = "O pedido No. \""
+                        + idPedido
+                        + "\" teve item de compra foi recepcionado parcialmente e essas alterações já foram incluidas no estoque.";
+            } else {
+                mensagem = "O pedido No. \""
+                        + idPedido
+                        + "\" não contém outros itens para serem recepcionados e essas alterações já foram incluidas no estoque.";
+            }
+            gerarMensagemSucesso(mensagem);
         } catch (BusinessException e) {
             addAtributo("itemPedido", pedidoService.pesquisarItemPedido(idItemPedido));
             gerarListaMensagemErro(e);

@@ -40,6 +40,8 @@ public interface PedidoService {
 
 	boolean contemItemPedido(Integer idPedido);
 
+	boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
+
 	Integer encomendarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
 			throws BusinessException;
 

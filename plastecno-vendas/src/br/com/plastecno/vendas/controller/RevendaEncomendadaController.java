@@ -48,7 +48,7 @@ public class RevendaEncomendadaController extends AbstractController {
             pedidoService.enviarRevendaEncomendadaEmpacotamento(idPedido);
             SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
             if (SituacaoPedido.REVENDA_ENCOMENDADA.equals(situacaoPedido)) {
-                gerarMensagemSucesso("O pedido No. " + idPedido
+                gerarMensagemAlerta("O pedido No. " + idPedido
                         + " ainda possui alguns itens que não estão no estoque. Verifique com o setor de compras.");
             } else if (SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacaoPedido)) {
                 gerarMensagemSucesso("O pedido No. " + idPedido + " foi encaminhado para o empacotamento.");

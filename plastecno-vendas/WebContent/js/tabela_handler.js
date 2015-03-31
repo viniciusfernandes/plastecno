@@ -135,6 +135,9 @@ function BlocoTabelaHandler (urlTela, nomeBloco, idTabela, idBlocoInput) {
 	this.gerarListaParametro = function (nomeLista){
 		
 		var parametros = '';
+		if(this.tabela == null){
+			return parametros;
+		}
 		var linhas = this.tabela.rows;
 		
 		// Vamo iniciar de i=1 pois devemos pular o header da tabela

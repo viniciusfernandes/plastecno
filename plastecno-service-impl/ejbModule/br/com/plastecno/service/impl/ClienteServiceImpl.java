@@ -22,6 +22,7 @@ import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
+import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.entity.Cliente;
@@ -58,6 +59,17 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@EJB
 	private UsuarioService usuarioService;
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Cliente alterarRevendedor(Cliente cliente) throws BusinessException {
+		Cliente revendedor = pesquisarRevendedor();
+		if (revendedor != null) {
+			clienteDAO.alterarTipoCliente(revendedor.getId(), TipoCliente.NORMAL);
+		}
+		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
+		return inserir(cliente);
+	}
 
 	@Override
 	public Integer contactarCliente(Integer id) {
@@ -123,6 +135,9 @@ public class ClienteServiceImpl implements ClienteService {
 			throw new BusinessException("Vendedor do cliente é obrigatório");
 		}
 
+		if (cliente.getTipoCliente() == null) {
+			cliente.setTipoCliente(TipoCliente.NORMAL);
+		}
 		ValidadorInformacao.validar(cliente);
 
 		if (isNomeFantasiaExistente(cliente.getId(), cliente.getNomeFantasia())) {
@@ -305,7 +320,8 @@ public class ClienteServiceImpl implements ClienteService {
 				// o contato deve ser exibido no relatorio e usamos um let join
 				// pois um cliente pode nao ter contatos
 				.append("left join fetch c.listaContato lc ").append("inner join fetch c.listaLogradouro l ")
-				.append("where l.tipoLogradouro = :tipoLogradouro and l.endereco.bairro.id in (:listaIdBairro) ").append("order by c.nomeFantasia");
+				.append("where l.tipoLogradouro = :tipoLogradouro and l.endereco.bairro.id in (:listaIdBairro) ")
+				.append("order by c.nomeFantasia");
 
 		return this.entityManager.createQuery(select.toString()).setParameter("listaIdBairro", listaIdBairro)
 				.setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO).getResultList();
@@ -495,7 +511,7 @@ public class ClienteServiceImpl implements ClienteService {
 		logradouroService.validarListaLogradouroPreenchida(cliente.getListaLogradouro());
 	}
 
-	public void validarRevendedorExistente(Cliente cliente) throws BusinessException {
+	private void validarRevendedorExistente(Cliente cliente) throws BusinessException {
 		if (cliente.isRevendedor() && clienteDAO.isRevendedorExistente(cliente.getId())) {
 			Cliente revendedor = clienteDAO.pesquisarRevendedor();
 			throw new BusinessException("Não é possível mais de um cliente revendedor cadastrado. O cliente \""

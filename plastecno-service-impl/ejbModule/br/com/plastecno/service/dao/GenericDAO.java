@@ -16,6 +16,17 @@ public class GenericDAO<T> {
 		return entityManager.merge(t);
 	}
 
+	public void alterarPropriedade(Class<T> classe, Integer id, String nomePropriedade, Object valorPropriedade) {
+		if (id == null) {
+			return;
+		}
+		StringBuilder select = new StringBuilder();
+		select.append("update ").append(classe.getSimpleName()).append(" e ");
+		select.append(" set e.").append(nomePropriedade).append(" = :").append(nomePropriedade).append(" where e.id = :id");
+		entityManager.createQuery(select.toString()).setParameter(nomePropriedade, valorPropriedade).setParameter("id", id)
+				.executeUpdate();
+	}
+
 	public T inserir(T t) {
 		entityManager.persist(t);
 		return t;
@@ -68,7 +79,7 @@ public class GenericDAO<T> {
 		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id), retorno,
 				null);
 	}
-	
+
 	public T remover(T t) {
 		entityManager.remove(entityManager.merge(t));
 		return t;

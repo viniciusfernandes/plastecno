@@ -16,6 +16,10 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 		super(entityManager);
 	}
 
+	public void alterarTipoCliente(Integer idCliente, TipoCliente tipoCliente) {
+		super.alterarPropriedade(Cliente.class, idCliente, "tipoCliente", tipoCliente);
+	}
+
 	public boolean isEmailExistente(Integer idCliente, String email) {
 		Query query = null;
 		if (idCliente == null) {

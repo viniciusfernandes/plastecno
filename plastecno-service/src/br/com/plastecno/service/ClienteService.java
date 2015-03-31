@@ -16,6 +16,8 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 @Local
 public interface ClienteService {
 
+	Cliente alterarRevendedor(Cliente cliente) throws BusinessException;
+
 	Integer contactarCliente(Integer id);
 
 	Cliente inserir(Cliente cliente) throws BusinessException;

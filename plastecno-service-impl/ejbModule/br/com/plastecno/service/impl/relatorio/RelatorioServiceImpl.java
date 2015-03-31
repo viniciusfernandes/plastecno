@@ -125,7 +125,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		for (Object[] resultado : resultados) {
 
 			try {
-				relatorio.addVenda(resultado[0].toString(), new RepresentadaValorWrapper(resultado[1].toString(),
+				relatorio.addValor(resultado[0].toString(), new RepresentadaValorWrapper(resultado[1].toString(),
 						(Double) resultado[2]));
 			} catch (AgrupamentoException e) {
 				throw new BusinessException("Falha na construcao do relatorio de vendas da representada por vendedor", e);
@@ -246,7 +246,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		for (Object[] resultado : resultados) {
 
 			try {
-				relatorio.addVenda(resultado[0].toString(), new RepresentadaValorWrapper(resultado[1].toString(),
+				relatorio.addValor(resultado[0].toString(), new RepresentadaValorWrapper(resultado[1].toString(),
 						(Double) resultado[2]));
 			} catch (AgrupamentoException e) {
 				throw new BusinessException("Falha na construcao do relatorio de vendas da representada por vendedor", e);

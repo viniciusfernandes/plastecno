@@ -305,7 +305,7 @@ public class ClienteServiceImpl implements ClienteService {
 				// o contato deve ser exibido no relatorio e usamos um let join
 				// pois um cliente pode nao ter contatos
 				.append("left join fetch c.listaContato lc ").append("inner join fetch c.listaLogradouro l ")
-				.append("where l.tipoLogradouro = :tipoLogradouro and l.endereco.bairro.id in (:listaIdBairro) ");
+				.append("where l.tipoLogradouro = :tipoLogradouro and l.endereco.bairro.id in (:listaIdBairro) ").append("order by c.nomeFantasia");
 
 		return this.entityManager.createQuery(select.toString()).setParameter("listaIdBairro", listaIdBairro)
 				.setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO).getResultList();

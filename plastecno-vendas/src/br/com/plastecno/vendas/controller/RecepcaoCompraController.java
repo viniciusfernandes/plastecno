@@ -102,9 +102,9 @@ public class RecepcaoCompraController extends AbstractController {
             Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
             String mensagem = null;
             if (contemItem) {
-                mensagem = "O pedido No. \""
+                mensagem = "O pedido No. "
                         + idPedido
-                        + "\" teve item de compra foi recepcionado parcialmente e essas alterações já foram incluidas no estoque.";
+                        + " teve item de compra foi recepcionado parcialmente e essas alterações já foram incluidas no estoque.";
             } else {
                 mensagem = "O pedido No. \""
                         + idPedido

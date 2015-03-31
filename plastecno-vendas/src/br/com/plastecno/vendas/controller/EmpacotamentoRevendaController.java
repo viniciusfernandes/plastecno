@@ -63,7 +63,7 @@ public class EmpacotamentoRevendaController extends AbstractController {
         String mensagem = null;
         if (SituacaoPedido.EMPACOTADO.equals(situacaoPedido)) {
             mensagem = "O pedido No. " + idPedido
-                    + " não pussui outros itens para ser empacotado e pode ser enviado o cliente.";
+                    + " não possui outros itens para ser empacotado e pode ser enviado o cliente.";
         } else {
             mensagem = "Item do pedido No. " + idPedido + "empacotado com sucesso";
         }

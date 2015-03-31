@@ -77,7 +77,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			select.append("and i.pedido.cliente.id = :idCliente ");
 		}
 
-		select.append("order by i.pedido.dataEnvio asc ");
+		select.append("order by i.pedido.dataEntrega asc ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("tipoPedido", TipoPedido.REVENDA);
@@ -116,7 +116,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			select.append("and i.pedido.cliente.id = :idCliente ");
 		}
 
-		select.append("order by i.pedido.dataEnvio asc ");
+		select.append("order by i.pedido.dataEntrega desc ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("situacaoPedido", SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO);
@@ -191,7 +191,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
 		select.append("and i.recebido = false ");
 		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
-		select.append("and i.encomendado = true and quantidadeReservada <= 0");
+		select.append("and i.encomendado = true and i.quantidadeReservada < i.quantidade ");
 
 		if (dataInicial != null) {
 			select.append("and i.pedido.dataEnvio >= :dataInicial ");

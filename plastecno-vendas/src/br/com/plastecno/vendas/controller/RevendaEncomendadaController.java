@@ -10,6 +10,7 @@ import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
+import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.exception.BusinessException;
@@ -45,6 +46,13 @@ public class RevendaEncomendadaController extends AbstractController {
     public void enviarPedidoEmpacotamento(Integer idPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         try {
             pedidoService.enviarRevendaEncomendadaEmpacotamento(idPedido);
+            SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+            if (SituacaoPedido.REVENDA_ENCOMENDADA.equals(situacaoPedido)) {
+                gerarMensagemSucesso("O pedido No. " + idPedido
+                        + " ainda possui alguns itens que não estão no estoque. Verifique com o setor de compras.");
+            } else if (SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacaoPedido)) {
+                gerarMensagemSucesso("O pedido No. " + idPedido + " foi encaminhado para o empacotamento.");
+            }
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }

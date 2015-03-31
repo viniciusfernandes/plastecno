@@ -88,6 +88,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private UsuarioService usuarioService;
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada)
@@ -471,7 +472,8 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());
-		if (dataEntrega != null && DateUtils.isAnteriorDataAtual(dataEntrega)) {
+		if (SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido()) && dataEntrega != null
+				&& DateUtils.isAnteriorDataAtual(dataEntrega)) {
 			throw new InformacaoInvalidaException("Data de entrega deve ser posterior a data atual");
 		}
 

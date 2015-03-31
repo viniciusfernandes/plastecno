@@ -11,6 +11,7 @@ import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.TransportadoraService;
+import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ComentarioCliente;
 import br.com.plastecno.service.entity.ContatoCliente;
@@ -26,7 +27,7 @@ import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
-public final class ClienteController extends AbstractController {
+public class ClienteController extends AbstractController {
 
     @Servico
     private TransportadoraService transportadoraService;
@@ -58,8 +59,10 @@ public final class ClienteController extends AbstractController {
         final boolean isInclusaoCliente = cliente == null || cliente.getId() == null;
         final boolean isVendedorIgual = cliente != null && cliente.getVendedor() != null
                 && getCodigoUsuario().equals(cliente.getVendedor().getId());
-        final boolean isRevendedor = cliente != null && cliente.isRevendedor();
-        this.liberarAcesso("acessoInclusaoPermitido", isInclusaoCliente || isVendedorIgual || isRevendedor);
+        final boolean isAdministrador = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+        boolean isRevendedor = cliente != null && cliente.isRevendedor();
+        this.liberarAcesso("acessoInclusaoPermitido", isAdministrador || isInclusaoCliente || isVendedorIgual
+                || isRevendedor);
     }
 
     @Post("cliente/contactar")
@@ -91,8 +94,8 @@ public final class ClienteController extends AbstractController {
     }
 
     @Post("cliente/inclusao")
-    public void inserir(Cliente cliente, List<LogradouroCliente> listaLogradouro, List<ContatoCliente> listaContato,
-            List<Integer> listaIdTransportadoraAssociada) {
+    public void inserirCliente(Cliente cliente, List<LogradouroCliente> listaLogradouro,
+            List<ContatoCliente> listaContato, List<Integer> listaIdTransportadoraAssociada, boolean isRevendedor) {
         try {
             if (temElementos(listaLogradouro)) {
                 cliente.addLogradouro(listaLogradouro);
@@ -109,9 +112,17 @@ public final class ClienteController extends AbstractController {
             if (cliente.getId() == null) {
                 cliente.setVendedor(new Usuario(getCodigoUsuario()));
             }
-            this.clienteService.inserir(cliente);
 
-            this.gerarMensagemCadastroSucesso(cliente, "nomeFantasia");
+            StringBuilder mensagem = new StringBuilder();
+            if (isRevendedor) {
+                clienteService.alterarRevendedor(cliente);
+                mensagem.append("O revendedor ").append(cliente.getNomeCompleto()).append(" foi incluído com sucesso");
+            } else {
+                clienteService.inserir(cliente);
+                mensagem.append("O cliente ").append(cliente.getNomeCompleto()).append(" foi incluído com sucesso");
+            }
+
+            gerarMensagemSucesso(mensagem.toString());
         } catch (BusinessException e) {
             this.formatarDocumento(cliente);
             this.carregarVendedor(cliente);
@@ -133,12 +144,15 @@ public final class ClienteController extends AbstractController {
         } catch (Exception e) {
             gerarLogErro("inclusao/alteracao de cliente", e);
         }
-
-        irTopoPagina();
+        if (isRevendedor) {
+            redirecTo(this.getClass()).revendedorHome();
+        } else {
+            irTopoPagina();
+        }
     }
 
     @Post("cliente/inclusao/comentario")
-    public void inserirComentario(Integer idCliente, String comentario) {
+    public void inserirComentario(Integer idCliente, String comentario, boolean isRevendedor) {
 
         if (idCliente == null) {
             gerarListaMensagemErro("Para inserir um comentário é necessário escolher um cliente.");
@@ -151,7 +165,7 @@ public final class ClienteController extends AbstractController {
                 gerarListaMensagemErro(e);
                 addAtributo("comentario", comentario);
             }
-            pesquisarClienteById(idCliente);
+            pesquisarClienteById(idCliente, isRevendedor);
         }
     }
 
@@ -169,18 +183,8 @@ public final class ClienteController extends AbstractController {
         addAtributo("cliente", filtro);
     }
 
-    @Get("cliente/listagem/nome")
-    public void pesquisarClienteByNomeFantasia(String nomeFantasia) {
-        List<Autocomplete> lista = new ArrayList<Autocomplete>();
-        List<Cliente> listaCliente = this.clienteService.pesquisarByNomeFantasia(nomeFantasia);
-        for (Cliente cliente : listaCliente) {
-            lista.add(new Autocomplete(cliente.getId(), cliente.getNomeFantasia()));
-        }
-        serializarJson(new SerializacaoJson("lista", lista));
-    }
-
     @Get("cliente/{idCliente}")
-    public void pesquisarClienteById(Integer idCliente) {
+    public void pesquisarClienteById(Integer idCliente, boolean isRevendedor) {
         Cliente cliente = this.clienteService.pesquisarById(idCliente);
         this.carregarVendedor(cliente);
 
@@ -201,7 +205,21 @@ public final class ClienteController extends AbstractController {
         addAtributo("listaLogradouro", this.clienteService.pesquisarLogradouro(idCliente));
         addAtributo("listaContato", this.clienteService.pesquisarContato(idCliente));
         addAtributo("comentarios", formatarComentarios(idCliente));
-        irTopoPagina();
+        if (isRevendedor) {
+            redirecTo(this.getClass()).revendedorHome();
+        } else {
+            irTopoPagina();
+        }
+    }
+
+    @Get("cliente/listagem/nome")
+    public void pesquisarClienteByNomeFantasia(String nomeFantasia) {
+        List<Autocomplete> lista = new ArrayList<Autocomplete>();
+        List<Cliente> listaCliente = this.clienteService.pesquisarByNomeFantasia(nomeFantasia);
+        for (Cliente cliente : listaCliente) {
+            lista.add(new Autocomplete(cliente.getId(), cliente.getNomeFantasia()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
     }
 
     @Get("cliente/transportadora")
@@ -226,4 +244,11 @@ public final class ClienteController extends AbstractController {
         this.clienteService.removerLogradouro(idLogradouro);
         irTopoPagina();
     }
+
+    @Get("revendedor")
+    public void revendedorHome() {
+        addAtributo("isRevendedor", true);
+        irTopoPagina();
+    }
+
 }

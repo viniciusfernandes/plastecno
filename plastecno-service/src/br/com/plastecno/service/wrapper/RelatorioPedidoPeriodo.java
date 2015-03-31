@@ -16,7 +16,7 @@ public class RelatorioPedidoPeriodo {
         this.agrupamento = new Agrupamento<VendedorWrapper, RepresentadaValorWrapper>(titulo);
     }
 
-    public void addVenda(String nomeVendedor, RepresentadaValorWrapper venda) throws AgrupamentoException {
+    public void addValor(String nomeVendedor, RepresentadaValorWrapper venda) throws AgrupamentoException {
         this.agrupamento.addSubgrupo(nomeVendedor, venda, VendedorWrapper.class);
     }
 

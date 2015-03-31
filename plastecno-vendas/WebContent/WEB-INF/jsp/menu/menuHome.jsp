@@ -58,6 +58,7 @@
 						<c:if test="${acessoAdministracaoPermitido}">
 							<li><a href="usuario" target="principal_frame">Usuários</a></li>
 							<li><a href="vendedor" target="principal_frame">Vendedores</a></li>
+							<li><a href="revendedor" target="principal_frame">Revendedor</a></li>
 						</c:if>
 						<li><a href="regiao" target="principal_frame">Regiões</a></li>
 					</ul></li>

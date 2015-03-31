@@ -495,7 +495,7 @@ public abstract class AbstractController {
         this.irPaginaHome();
         this.result.include("ancora", "topo");
     }
-
+    
     boolean isAcessoPermitido(TipoAcesso... tipoAcesso) {
         return this.usuarioInfo.isAcessoPermitido(tipoAcesso);
     }

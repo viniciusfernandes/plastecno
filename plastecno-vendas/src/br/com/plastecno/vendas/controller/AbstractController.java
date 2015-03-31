@@ -320,6 +320,13 @@ public abstract class AbstractController {
                 + "Mensagem: " + e.getMessage());
     }
 
+    void gerarMensagemAlerta(String mensagem) {
+        List<String> mensagens = new ArrayList<String>();
+        mensagens.add(mensagem);
+        this.result.include("listaMensagem", mensagens);
+        this.result.include("cssMensagem", cssMensagemAlerta);
+    }
+
     void gerarMensagemCadastroSucesso(Object o, String nomeAtributoExibicao) throws ControllerException {
         this.gerarListaMensagemSucesso(o, nomeAtributoExibicao, TipoOperacao.CADASTRO);
     }
@@ -495,7 +502,7 @@ public abstract class AbstractController {
         this.irPaginaHome();
         this.result.include("ancora", "topo");
     }
-    
+
     boolean isAcessoPermitido(TipoAcesso... tipoAcesso) {
         return this.usuarioInfo.isAcessoPermitido(tipoAcesso);
     }

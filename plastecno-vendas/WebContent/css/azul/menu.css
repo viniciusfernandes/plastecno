@@ -63,13 +63,14 @@ body {
 	width: 100%;
 }
 
+
 nav {
 	height: 25px;
 	margin-bottom: 15px;
 }
 
 nav ul {
-	background: #277696;
+	background: #6B7A69;
 	height: 100%;
 	list-style: none;
 	position: relative;
@@ -87,15 +88,15 @@ nav ul li {
 }
 
 nav ul li a:hover {
-	/* box-shadow: 0 0 2px 1px #277696; */
+	/* box-shadow: 0 0 2px 1px #6B7A69; */
 }
 
 nav > ul li:not(:first-child) {
-	border-left: 1px solid white;
+	/* border-left: 1px solid white; */
 }
 
 nav ul li a {
-	background: #277696;
+	background: #6B7A69;
 	color: white;
 	font-weight: bold;
 	display: block;
@@ -114,16 +115,15 @@ nav ul ul {
 }
 
 nav ul ul li {
-	
-	border-top: 1px solid white;
+	/* border-top: 1px solid white; */
 	float: none;
 	position: relative;
 }
 
 nav ul ul li a {
-	background-color: #DBFBFF;
+	background-color: #D7F7C5;
 	padding: 5px 40px;
-	color: #277696;
+	color: #6B7A69;
 }
 
 nav ul ul ul {
@@ -139,14 +139,15 @@ nav ul ul li:hover a {
 }
 
 nav ul li a:hover {
-	background: #DBFBFF;
-	color: #277696;
+	background: #D7F7C5;
+	color: #6B7A69;
 }
 
 nav ul ul li a:hover {
-	background: #277696;
+	background: #6B7A69;
 	color: white;
 }
+
 
 nav ul li ul li:last-child a {
 	border-radius: 0 0 10px 10px;

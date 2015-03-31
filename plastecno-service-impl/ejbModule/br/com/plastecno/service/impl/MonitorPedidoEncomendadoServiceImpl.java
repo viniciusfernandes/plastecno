@@ -33,8 +33,6 @@ public class MonitorPedidoEncomendadoServiceImpl implements MonitorPedidoEncomen
 	@Schedule(hour = "*/1")
 	public void reservarItemPedidoEncomendadoEstoque() {
 		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoRevendaEncomendada();
-		logger.info("Monitor de itens de pedido encomendados disparou a reserva dos itens. Existem pedidos: "
-				+ (listaIdPedido.isEmpty()));
 		boolean empacotamentoOk = false;
 		for (Integer idPedido : listaIdPedido) {
 			try {

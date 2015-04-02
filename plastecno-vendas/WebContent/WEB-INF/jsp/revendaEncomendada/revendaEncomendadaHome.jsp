@@ -88,14 +88,14 @@ function enviarEmpacotamento(botao){
 			<thead>
 				<tr>
 					<th style="width: 10%">Num. Pedido</th>
-					<th style="width: 1%">Item</th>
+					<th style="width: 10%">Dt. Entrega</th>
+					<th style="width: 2%">Item</th>
 					<th style="width: 5%">Qtde</th>
-					<th style="width: 5%">Qtde. Reservada.</th>
-					<th style="width: 48%">Desc. Item</th>
+					<th style="width: 5%">Qtde. Reserv.</th>
+					<th style="width: 45%">Desc. Item</th>
 					<th style="width: 10%">Comprador</th>
-					<th style="width: 5%">Unid. (R$)</th>
 					<th style="width: 5%">Total (R$)</th>
-					<th style="width: 11%">Ação</th>
+					<th style="width: 8%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -104,13 +104,13 @@ function enviarEmpacotamento(botao){
 						<tr>
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.id}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.propriedades['dataEntrega']}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeReservada}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeProprietario}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoUnidadeFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">

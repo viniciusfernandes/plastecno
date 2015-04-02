@@ -63,10 +63,8 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
-	$("#botaoIncluirComentario").click(function () {
-		if(!isEmpty($("#comentario").val())) {
-			$(this).closest('form').submit();			
-		}
+	$("#botaoLimparComentario").click(function () {
+		$("#comentario").val("");	
 	});
 	
 	tabelaContatoHandler = inicializarBlocoContato('<c:url value="/representada"/>');

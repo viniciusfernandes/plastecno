@@ -69,13 +69,13 @@
 						<c:if test="${acessoRelatorioVendasRepresentadaPermitido}">
 							<li><a href="relatorio/pedido/periodo?isCompra=false" target="principal_frame">Valor Venda Período</a></li>
 						</c:if>
-						<c:if test="${acessoRelatorioComprasRepresentadaPermitido}">
+						<c:if test="${acessoCompraPermitido}">
 							<li><a href="relatorio/pedido/periodo?isCompra=true" target="principal_frame">Valor Compra Período</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioEntregaPermitido}">
 							<li><a href="relatorio/pedido?isCompra=false" target="principal_frame">Pedido Venda Período</a></li>
 						</c:if>
-						<c:if test="${acessoRelatorioEntregaPermitido}">
+						<c:if test="${acessoCompraPermitido}">
 							<li><a href="relatorio/pedido?isCompra=true" target="principal_frame">Pedido Compra Período</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioPedidoRepresentadaPermitido}">
@@ -88,12 +88,10 @@
 						<li><a href="relatorio/venda/vendedor"
 							target="principal_frame">Venda/Orçamto Vendedor</a></li>
 						<c:if test="${acessoRelatorioClienteRamoAtividadePermitido}">
-							<li><a href="relatorio/cliente/ramoAtividade"
-								target="principal_frame">Cliente Ramo Atividade</a></li>
+							<li><a href="relatorio/cliente/ramoAtividade" target="principal_frame">Cliente Ramo Atividade</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioClienteRegiaoPermitido}">
-							<li><a href="relatorio/cliente/regiao"
-								target="principal_frame">Cliente Região</a></li>
+							<li><a href="relatorio/cliente/regiao" target="principal_frame">Cliente Região</a></li>
 						</c:if>
 						<li><a href="relatorio/cliente/vendedor"
 							target="principal_frame">Cliente Vendedor</a></li>

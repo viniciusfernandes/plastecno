@@ -151,20 +151,33 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
+	public void inserirComentario(Integer idProprietario, Integer idCliente, String comentario) throws BusinessException {
+		Cliente cliente = pesquisarById(idCliente);
+		Usuario proprietario = usuarioService.pesquisarById(idProprietario);
+		inserirComentario(proprietario, cliente, comentario);
+	}
+
+	@Override
 	public void inserirComentario(Integer idCliente, String comentario) throws BusinessException {
 		Cliente cliente = pesquisarById(idCliente);
 		Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(idCliente);
-
+		inserirComentario(vendedor, cliente, comentario);
+	}
+	
+	
+	private void inserirComentario(Usuario proprietario, Cliente cliente, String comentario) throws BusinessException {
 		ComentarioCliente comentarioCliente = new ComentarioCliente();
 		comentarioCliente.setCliente(cliente);
-		comentarioCliente.setVendedor(vendedor);
+		comentarioCliente.setProprietario(proprietario);
 		comentarioCliente.setDataInclusao(new Date());
 		comentarioCliente.setConteudo(comentario);
 
 		ValidadorInformacao.validar(comentarioCliente);
 		entityManager.persist(comentarioCliente);
+		
 	}
 
+	
 	private void inserirEndereco(Cliente cliente) throws BusinessException {
 		if (cliente.isListaLogradouroPreenchida()) {
 			for (LogradouroCliente logradouro : cliente.getListaLogradouro()) {

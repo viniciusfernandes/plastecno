@@ -22,6 +22,8 @@ public interface ClienteService {
 
 	Cliente inserir(Cliente cliente) throws BusinessException;
 
+	void inserirComentario(Integer idProprietario, Integer idCliente, String comentario) throws BusinessException;
+
 	void inserirComentario(Integer idCliente, String comentario) throws BusinessException;
 
 	boolean isCNPJExistente(Integer idCliente, String cnpj);

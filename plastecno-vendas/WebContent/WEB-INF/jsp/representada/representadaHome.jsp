@@ -63,6 +63,12 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
+	$("#botaoIncluirComentario").click(function () {
+		if(!isEmpty($("#comentario").val())) {
+			$(this).closest('form').submit();			
+		}
+	});
+	
 	tabelaContatoHandler = inicializarBlocoContato('<c:url value="/representada"/>');
 	tabelaLogradouroHandler = new BlocoTabelaHandler('Logradouro', null, 'bloco_logradouro'); 
 	
@@ -71,6 +77,7 @@ $(document).ready(function() {
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
 	inserirMascaraNumerica('comissao', '99');
+	
 });
 
 function inicializarFiltro() {
@@ -203,15 +210,43 @@ function inicializarModalCancelamento(botao){
 					class="apenasLowerCase uppercaseBloqueado lowerCase" />
 			</div>
 		</fieldset>
+		
+	</form>
 		<div class="bloco_botoes">
 			<a id="botaoPesquisarRepresentada"
 				title="Pesquisar Dados da Representada" class="botaoPesquisar"></a>
 			<a id="botaoLimpar" title="Limpar Dados do Cliente"
 				class="botaoLimpar"></a>
 		</div>
-		<jsp:include page="/bloco/bloco_logradouro.jsp" />
-		<jsp:include page="/bloco/bloco_contato.jsp" />
+				
+		<fieldset id="bloco_comentario">
+			<legend>::: Comentários :::</legend>
+			<form action="<c:url value="/representada/inclusao/comentario"/>" method="post">
+				<input type="hidden" value="${representada.id}" name="idRepresentada" />
+				<div class="label condicional">Comentário:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="comentario" name="comentario" value="${comentario}" style="width: 100%" />
+				</div>
+	
+				<div class="bloco_botoes">
+					<c:if test="${acessoCadastroBasicoPermitido}">
+						<input type="submit" value="" class="botaoAdicionar" title="Adicionar Dados do Comentario" /> 
+						<a id="botaoLimparComentario" title="Limpar Dados do Comentario" class="botaoLimpar"></a>
+					</c:if>
+				</div>
+	
+			</form>
+			<div class="label condicional">Histórico:</div>
+			<div class="input areatexto" style="width: 80%">
+				<textarea style="width: 100%;" disabled="disabled">
+					${comentarios}
+					</textarea>
+			</div>
+		</fieldset>
 
+		<jsp:include page="/bloco/bloco_contato.jsp" />		
+		<jsp:include page="/bloco/bloco_logradouro.jsp" />
+		
 		<div class="bloco_botoes">
 			<c:if test="${acessoCadastroBasicoPermitido}">
 				<a id="botaoInserirRepresentada"
@@ -219,7 +254,6 @@ function inicializarModalCancelamento(botao){
 			</c:if>
 		</div>
 
-	</form>
 	<a id="rodape"></a>
 	<fieldset>
 		<legend>::: Resultado da Pesquisa de Represent. / Forneced. :::</legend>

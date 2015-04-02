@@ -1,11 +1,14 @@
 package br.com.plastecno.service.impl;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -17,9 +20,11 @@ import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.RepresentadaDAO;
+import br.com.plastecno.service.entity.ComentarioRepresentada;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
@@ -28,6 +33,7 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @Stateless
 public class RepresentadaServiceImpl implements RepresentadaService {
 
+	
 	@EJB
 	private ContatoService contatoService;
 
@@ -128,6 +134,22 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	public void inserirComentario(Integer idProprietario, Integer idRepresentada, String comentario) throws BusinessException {
+		Representada representada = new Representada();
+		representada.setId(idRepresentada);
+		Usuario usuario = new Usuario(idProprietario);
+
+		ComentarioRepresentada comentarioRepresentada = new ComentarioRepresentada();
+		comentarioRepresentada.setConteudo(comentario);
+		comentarioRepresentada.setDataInclusao(new Date());
+		comentarioRepresentada.setRepresentada(representada);
+		comentarioRepresentada.setUsuario(usuario);
+
+		ValidadorInformacao.validar(comentarioRepresentada);
+		entityManager.persist(comentarioRepresentada);
+	}
+
+	@Override
 	public Boolean isCalculoIPIHabilitado(Integer idRepresentada) {
 		return !TipoApresentacaoIPI.NUNCA.equals(representadaDAO.pesquisarTipoApresentacaoIPI(idRepresentada));
 	}
@@ -187,6 +209,16 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	public List<ComentarioRepresentada> pesquisarComentarioByIdRepresentada(Integer idRepresentada) {
+		return (List<ComentarioRepresentada>) entityManager
+				.createQuery(
+						"select new ComentarioRepresentada (c.dataInclusao, c.conteudo, v.nome, v.sobrenome) from ComentarioRepresentada c "
+								+ " inner join c.usuario v where c.representada.id = :idRepresentada order by c.dataInclusao desc")
+				.setParameter("idRepresentada", idRepresentada).getResultList();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
 	public List<ContatoRepresentada> pesquisarContato(Integer id) {
 		return (List<ContatoRepresentada>) this.contatoService.pesquisar(id, ContatoRepresentada.class);
 	}
@@ -210,6 +242,12 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("id", id);
 		return QueryUtil.gerarRegistroUnico(query, Logradouro.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public String pesquisarNomeFantasiaById(Integer idRepresentada) {
+		return representadaDAO.pesquisarNomeFantasiaById(idRepresentada);
 	}
 
 	@Override

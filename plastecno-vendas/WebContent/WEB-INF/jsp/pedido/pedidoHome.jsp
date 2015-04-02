@@ -368,9 +368,8 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_contato.jsp" />
 
 	<div class="bloco_botoes">
-		<c:if test="${not pedidoDesabilitado and acessoVendaPermitida}">
-			<a id="botaoInserirPedido" title="Incluir Dados do Pedido"
-				class="botaoInserir"></a>
+		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">
+			<a id="botaoInserirPedido" title="Incluir Dados do Pedido" class="botaoInserir"></a>
 		</c:if>
 	</div>
 	<jsp:include page="/bloco/bloco_item_pedido.jsp" />

@@ -232,7 +232,7 @@ function remover(codigo, nome) {
 	</div>
 	
 	<c:if test="${not isRevendedor}">
-	<jsp:include page="/bloco/bloco_contato.jsp" />
+	
 	<fieldset id="bloco_comentario">
 		<legend>::: Comentários :::</legend>
 		<form action="<c:url value="/cliente/inclusao/comentario?isRevendedor=${isRevendedor}"/>"
@@ -240,16 +240,13 @@ function remover(codigo, nome) {
 			<input type="hidden" value="${cliente.id}" name="idCliente" />
 			<div class="label condicional">Comentário:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="comentario" name="comentario"
-					value="${comentario}" style="width: 100%" />
+				<input type="text" id="comentario" name="comentario" value="${comentario}" style="width: 100%" />
 			</div>
 
 			<div class="bloco_botoes">
 				<c:if test="${acessoInclusaoPermitido}">
-					<a id="botaoIncluirComentario"
-						title="Adicionar Dados do Comentario" class="botaoAdicionar"></a>
-					<a id="botaoLimparComentario" title="Limpar Dados do Comentario"
-						class="botaoLimpar"></a>
+					<a id="botaoIncluirComentario" title="Adicionar Dados do Comentario" class="botaoAdicionar"></a>
+					<a id="botaoLimparComentario" title="Limpar Dados do Comentario" class="botaoLimpar"></a>
 				</c:if>
 			</div>
 
@@ -262,6 +259,8 @@ function remover(codigo, nome) {
 		</div>
 	</fieldset>
 	</c:if>
+	
+	<jsp:include page="/bloco/bloco_contato.jsp" />
 	<jsp:include page="/bloco/bloco_logradouro.jsp" />
 	<jsp:include page="/bloco/bloco_picklist.jsp" />
 	

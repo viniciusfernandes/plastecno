@@ -90,3 +90,21 @@ alter table vendas.tb_cliente drop prospeccao_finalizada;
 alter table vendas.tb_item_pedido add quantidade_recepcionada integer default 0;
 
 INSERT INTO vendas.tb_perfil_acesso values(14, 'MANUTENCAO_ESTOQUE');
+<!-- ULTIMA INSTRUCAO-->
+alter table vendas.tb_usuario drop vendedor;
+
+
+create table vendas.tb_comentario_representada (
+	id integer not null,
+	data_inclusao date not null,
+	conteudo varchar(800) not null,
+	id_usuario integer not null,
+	id_representada integer not null
+);
+
+ALTER TABLE vendas.tb_comentario_representada ADD PRIMARY KEY (id);
+ALTER TABLE vendas.tb_comentario_representada ADD CONSTRAINT id_usuario FOREIGN KEY (id_usuario) REFERENCES vendas.tb_usuario (id);
+ALTER TABLE vendas.tb_comentario_representada ADD CONSTRAINT id_representada FOREIGN KEY (id_representada) REFERENCES vendas.tb_representada (id);
+
+create sequence vendas.seq_comentario_representada_id increment by 1 minvalue 1 no maxvalue start with 1;
+<!-- ULTIMA INSTRUCAO-->

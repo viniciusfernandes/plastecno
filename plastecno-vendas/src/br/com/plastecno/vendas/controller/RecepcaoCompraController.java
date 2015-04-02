@@ -88,7 +88,7 @@ public class RecepcaoCompraController extends AbstractController {
         // Pode ser que essas datas ja tenham sido preenchidas em outra
         // navegacao pois esse metodo eh reaproveitado.
         configurarFiltroPediodoMensal();
-        addAtributo("listaRepresentada", representadaService.pesquisarRepresentada());
+        addAtributo("listaRepresentada", representadaService.pesquisarFornecedorAtivo());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
     }
 

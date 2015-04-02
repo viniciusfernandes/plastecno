@@ -168,7 +168,7 @@ public class ClienteServiceImpl implements ClienteService {
 	private void inserirComentario(Usuario proprietario, Cliente cliente, String comentario) throws BusinessException {
 		ComentarioCliente comentarioCliente = new ComentarioCliente();
 		comentarioCliente.setCliente(cliente);
-		comentarioCliente.setProprietario(proprietario);
+		comentarioCliente.setVendedor(proprietario);
 		comentarioCliente.setDataInclusao(new Date());
 		comentarioCliente.setConteudo(comentario);
 

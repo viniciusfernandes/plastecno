@@ -80,7 +80,7 @@
 			maxlength="2" />
 	</div>
 	<div class="bloco_botoes">
-		<c:if test="${not pedidoDesabilitado and acessoVendaPermitida}">
+		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">
 			<a id="botaoInserirItemPedido" title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>
 			<a id="botaoLimparItemPedido" title="Limpar Dados do Item do Pedido" class="botaoLimpar"></a>
 		</c:if>

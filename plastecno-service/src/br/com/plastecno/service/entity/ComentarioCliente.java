@@ -44,8 +44,8 @@ public class ComentarioCliente implements Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_vendedor")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Vendedor que fez o comentário")
-	private Usuario vendedor;
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Usuário que fez o comentário")
+	private Usuario proprietario;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_cliente")
@@ -98,8 +98,8 @@ public class ComentarioCliente implements Serializable {
 		return sobrenomeVendedor;
 	}
 
-	public Usuario getVendedor() {
-		return vendedor;
+	public Usuario getProprietario() {
+		return proprietario;
 	}
 
 	public void setCliente(Cliente cliente) {
@@ -126,7 +126,7 @@ public class ComentarioCliente implements Serializable {
 		this.sobrenomeVendedor = sobrenomeVendedor;
 	}
 
-	public void setVendedor(Usuario vendedor) {
-		this.vendedor = vendedor;
+	public void setProprietario(Usuario proprietario) {
+		this.proprietario = proprietario;
 	}
 }

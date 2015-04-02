@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -53,9 +52,6 @@ public class Usuario implements Serializable {
 	private String cpf;
 
 	private boolean ativo;
-
-	@Column(name = "vendedor")
-	boolean vendedorAtivo;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tb_usuario_tb_perfil_acesso", schema = "vendas", joinColumns = { @JoinColumn(name = "id_usuario") }, inverseJoinColumns = { @JoinColumn(name = "id_perfil_acesso") })
@@ -213,10 +209,6 @@ public class Usuario implements Serializable {
 		return ativo;
 	}
 
-	public boolean isVendedorAtivo() {
-		return vendedorAtivo;
-	}
-
 	public boolean isComprador() {
 		if (listaPerfilAcesso == null) {
 			return false;
@@ -287,9 +279,5 @@ public class Usuario implements Serializable {
 
 	public void setSobrenome(String sobrenome) {
 		this.sobrenome = sobrenome;
-	}
-
-	public void setVendedorAtivo(boolean vendedorAtivo) {
-		this.vendedorAtivo = vendedorAtivo;
 	}
 }

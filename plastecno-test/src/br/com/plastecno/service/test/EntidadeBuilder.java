@@ -179,7 +179,6 @@ public class EntidadeBuilder {
 
 	public Usuario buildVendedor() {
 		Usuario vendedor = new Usuario(gerarId(), "Vinicius", "Fernandes Vendedor");
-		vendedor.setVendedorAtivo(true);
 		vendedor.setEmail("vinicius@teste.com.br");
 		vendedor.setSenha("1234567");
 		return vendedor;

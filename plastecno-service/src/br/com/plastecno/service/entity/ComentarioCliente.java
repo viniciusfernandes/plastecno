@@ -28,7 +28,7 @@ public class ComentarioCliente implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 422899612343389268L;
-	
+
 	@Id
 	@SequenceGenerator(name = "clienteComentarioSequence", sequenceName = "vendas.seq_comentario_cliente_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clienteComentarioSequence")
@@ -45,7 +45,7 @@ public class ComentarioCliente implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_vendedor")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Usuário que fez o comentário")
-	private Usuario proprietario;
+	private Usuario vendedor;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_cliente")
@@ -53,8 +53,8 @@ public class ComentarioCliente implements Serializable {
 	private Cliente cliente;
 
 	/*
-	 * Atributo criado para ser exibido na tela de cliente de forma que nao
-	 * fosse necessario carregar todos os dados do vendedor.
+	 * Atributo criado para ser exibido na tela de cliente de forma que nao fosse
+	 * necessario carregar todos os dados do vendedor.
 	 */
 	@Transient
 	private String nomeVendedor;
@@ -66,8 +66,7 @@ public class ComentarioCliente implements Serializable {
 
 	}
 
-	public ComentarioCliente(Date dataInclusao, String conteudo,
-			String nomeVendedor, String sobrenomeVendedor) {
+	public ComentarioCliente(Date dataInclusao, String conteudo, String nomeVendedor, String sobrenomeVendedor) {
 		this.dataInclusao = dataInclusao;
 		this.conteudo = conteudo;
 		this.nomeVendedor = nomeVendedor;
@@ -98,8 +97,8 @@ public class ComentarioCliente implements Serializable {
 		return sobrenomeVendedor;
 	}
 
-	public Usuario getProprietario() {
-		return proprietario;
+	public Usuario getVendedor() {
+		return vendedor;
 	}
 
 	public void setCliente(Cliente cliente) {
@@ -126,7 +125,7 @@ public class ComentarioCliente implements Serializable {
 		this.sobrenomeVendedor = sobrenomeVendedor;
 	}
 
-	public void setProprietario(Usuario proprietario) {
-		this.proprietario = proprietario;
+	public void setVendedor(Usuario vendedor) {
+		this.vendedor = vendedor;
 	}
 }

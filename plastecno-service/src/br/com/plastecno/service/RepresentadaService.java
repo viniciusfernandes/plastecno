@@ -6,6 +6,7 @@ import javax.ejb.Local;
 
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoPedido;
+import br.com.plastecno.service.entity.ComentarioRepresentada;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
@@ -16,6 +17,8 @@ public interface RepresentadaService {
 	Integer desativar(Integer id);
 
 	Integer inserir(Representada representada) throws BusinessException;
+
+	void inserirComentario(Integer idProprietario, Integer idRepresentada, String comentario) throws BusinessException;
 
 	Boolean isCalculoIPIHabilitado(Integer idRepresentada);
 
@@ -32,6 +35,8 @@ public interface RepresentadaService {
 
 	List<Representada> pesquisarById(List<Integer> listaIdRepresentada);
 
+	List<ComentarioRepresentada> pesquisarComentarioByIdRepresentada(Integer idRepresentada);
+
 	List<ContatoRepresentada> pesquisarContato(Integer id);
 
 	List<Representada> pesquisarFornecedor(Boolean ativo);
@@ -39,6 +44,8 @@ public interface RepresentadaService {
 	List<Representada> pesquisarFornecedorAtivo();
 
 	Logradouro pesquisarLogradorouro(Integer id);
+
+	String pesquisarNomeFantasiaById(Integer idRepresentada);
 
 	List<Representada> pesquisarRepresentada();
 

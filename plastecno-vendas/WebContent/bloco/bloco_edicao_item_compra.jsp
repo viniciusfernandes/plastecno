@@ -112,9 +112,6 @@ function habilitarCamposEdicaoItem(habilitado){
 			value="${itemPedido.aliquotaICMSFormatado}" maxlength="2" />
 	</div>
 	<div class="bloco_botoes">
-		<c:if test="${false}">
-			<a id="botaoRecortarItemPedido" title="Recortar o Item" class="botaoRecortar"></a>
-		</c:if>
 		<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Refazer os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
 		<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
 	</div>

@@ -113,8 +113,8 @@ public class PedidoController extends AbstractController {
     public PedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF gerador,
             HttpServletRequest request) {
         super(result, usuarioInfo);
-        this.liberarAcesso("acessoVendaPermitida", usuarioInfo.isVendaPermitida());
-        this.verificarPermissaoAcesso("acessoCompraPermitido", TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+        this.verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS,
+                TipoAcesso.CADASTRO_PEDIDO_COMPRA);
         this.geradorRelatorio = gerador;
         this.diretorioTemplateRelatorio = request.getServletContext().getRealPath("/templates");
     }
@@ -552,7 +552,7 @@ public class PedidoController extends AbstractController {
                     || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao)
                     || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao)
                     || SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO
-                        .equals(situacao)) && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO);
+                        .equals(situacao)) && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_VENDAS);
 
             liberarAcesso("pedidoDesabilitado", isPedidoDesabilitado(pedido));
             liberarAcesso("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);

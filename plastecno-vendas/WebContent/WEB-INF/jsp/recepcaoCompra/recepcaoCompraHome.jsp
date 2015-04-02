@@ -105,7 +105,7 @@ function recepcionarItem(botao){
 				<input type="text" id="dataFinal" name="dataFinal"
 					value="${dataFinal}" maxlength="100" class="pesquisavel" />
 			</div>
-			<div class="label" style="width: 30%">Representada:</div>
+			<div class="label" style="width: 30%">Fornecedor:</div>
 			<div class="input" style="width: 50%">
 				<select name="idRepresentada" style="width: 30%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
@@ -137,7 +137,7 @@ function recepcionarItem(botao){
 					<th style="width: 5%">Qtde Recep.</th>
 					<th style="width: 38%">Desc. Item</th>
 					<th style="width: 10%">Comprador</th>
-					<th style="width: 10%">Represent.</th>
+					<th style="width: 10%">Forneced.</th>
 					<th style="width: 5%">Unid. (R$)</th>
 					<th style="width: 5%">Total (R$)</th>
 					<th style="width: 11%">Ação</th>

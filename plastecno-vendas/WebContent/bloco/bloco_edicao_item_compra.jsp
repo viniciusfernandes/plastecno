@@ -71,7 +71,7 @@ function habilitarCamposEdicaoItem(habilitado){
 	</div>
 	<div class="label">Material:</div>
 	<div class="input" style="width: 70%">
-		<input type="text" id="material" name="material.id" style="width: 50%" value="${itemPedido.material.descricao}"/>
+		<input type="text" id="material" name="itemPedido.material.descricao" style="width: 50%" value="${itemPedido.material.descricao}"/>
 		<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 	</div>
 	<div class="label">Med. Ext / Espessura:</div>

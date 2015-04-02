@@ -130,10 +130,6 @@ public abstract class AbstractController {
         }
     }
 
-    void configurarPaginacao() {
-
-    }
-
     boolean contemAtributo(String nomeAtributo) {
         return this.result.included().containsKey(nomeAtributo);
     }

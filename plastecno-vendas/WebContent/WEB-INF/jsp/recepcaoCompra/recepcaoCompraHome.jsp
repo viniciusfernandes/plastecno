@@ -136,11 +136,10 @@ function recepcionarItem(botao){
 					<th style="width: 1%">Item</th>
 					<th style="width: 5%">Qtde</th>
 					<th style="width: 5%">Qtde Recep.</th>
-					<th style="width: 38%">Desc. Item</th>
+					<th style="width: 40%">Desc. Item</th>
 					<th style="width: 10%">Comprador</th>
 					<th style="width: 10%">Forneced.</th>
-					<th style="width: 5%">Total (R$)</th>
-					<th style="width: 11%">Ação</th>
+					<th style="width: 15%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -157,7 +156,6 @@ function recepcionarItem(botao){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeProprietario}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeRepresentada}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/compra/pdf"/>" >

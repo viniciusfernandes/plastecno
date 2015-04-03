@@ -37,7 +37,7 @@ $(document).ready(function() {
 		var parametros = tabelaLogradouroHandler.gerarListaParametro('listaLogradouro');
 		parametros += tabelaContatoHandler.gerarListaParametro('listaContato');
 		parametros += pickListToParameter('listaIdTransportadoraAssociada');
-		
+	
 		$('#formCliente').attr("action",$('#formCliente').attr("action")+'?'+ parametros);
 		$('#formCliente').submit();
 						

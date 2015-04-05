@@ -54,7 +54,7 @@ $(document).ready(function() {
 		removerNaoDigitos(listaId);
 
 		var parametros = tabelaContatoHandler.gerarListaParametro('listaContato');
-		
+		parametros += serializarForm('bloco_logradouro');
 		$("#formRepresentada").attr("action", "<c:url value="/representada/inclusao"/>?"+parametros);
 		$('#formRepresentada').submit();
 	});

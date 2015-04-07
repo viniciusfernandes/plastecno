@@ -9,18 +9,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
 import mockit.Mock;
 import mockit.MockUp;
 import br.com.plastecno.service.AutenticacaoService;
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EmailService;
 import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.PerfilAcessoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
@@ -30,15 +30,18 @@ import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.ClienteDAO;
+import br.com.plastecno.service.dao.ComissaoDAO;
 import br.com.plastecno.service.dao.EnderecoDAO;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.ItemReservadoDAO;
 import br.com.plastecno.service.dao.MaterialDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
+import br.com.plastecno.service.dao.PerfilAcessoDAO;
 import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Comissao;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
@@ -53,25 +56,6 @@ import br.com.plastecno.service.impl.EmailServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
 class ServiceBuilder {
-	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
-
-	/*
-	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
-	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
-	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
-	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
-	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
-	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
-	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
-	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
-	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
-	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
-	 */
-	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
-
-	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
-	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
-
 	@SuppressWarnings("unchecked")
 	static <T> T buildService(Class<T> classe) {
 		T service = (T) mapTemporarioServices.get(classe);
@@ -129,6 +113,25 @@ class ServiceBuilder {
 		}
 	}
 
+	private static final EntidadeBuilder ENTIDADE_BUILDER = EntidadeBuilder.getInstance();
+
+	/*
+	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
+	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
+	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
+	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
+	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
+	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
+	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
+	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
+	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
+	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
+	 */
+	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
+	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
+
+	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
+
 	ServiceBuilder() {
 	}
 
@@ -170,6 +173,43 @@ class ServiceBuilder {
 		inject(clienteService, buildService(EnderecamentoService.class), "enderecamentoService");
 		clienteService.isEmailExistente(1, "");
 		return clienteService;
+	}
+
+	@SuppressWarnings("unused")
+	private ComissaoService buildComissaoService() {
+		ComissaoService comissaoService = getServiceImpl(ComissaoService.class);
+		inject(comissaoService, new ComissaoDAO(null), "comissaoDAO");
+		inject(comissaoService, buildService(UsuarioService.class), "usuarioService");
+		inject(comissaoService, buildService(MaterialService.class), "materialService");
+
+		new MockUp<ComissaoDAO>() {
+			@Mock
+			public Comissao pesquisarComissaoVigente(Integer idVendedor, Integer idMaterial, Integer idFormaMaterial) {
+				List<Comissao> lista = REPOSITORY.pesquisarTodos(Comissao.class);
+				boolean ok = false;
+				for (Comissao comissao : lista) {
+					if (comissao.getDataFim() != null) {
+						continue;
+					}
+					if (idVendedor != null) {
+						ok = idVendedor.equals(comissao.getIdVendedor());
+					}
+					if (idFormaMaterial != null) {
+						ok |= idFormaMaterial.equals(comissao.getIdFormaMaterial());
+					}
+
+					if (idMaterial != null) {
+						ok |= idMaterial.equals(comissao.getIdMaterial());
+					}
+
+					if (ok) {
+						return comissao;
+					}
+				}
+				return null;
+			}
+		};
+		return comissaoService;
 	}
 
 	@SuppressWarnings("unused")
@@ -510,6 +550,19 @@ class ServiceBuilder {
 	}
 
 	@SuppressWarnings("unused")
+	private PerfilAcessoService buildPerfilAcessoService() {
+		PerfilAcessoService perfilAcessoService = getServiceImpl(PerfilAcessoService.class);
+		inject(perfilAcessoService, new PerfilAcessoDAO(null), "perfilAcessoDAO");
+		new MockUp<PerfilAcessoDAO>() {
+			@Mock
+			public List<PerfilAcesso> pesquisarTodos() {
+				return REPOSITORY.pesquisarTodos(PerfilAcesso.class);
+			}
+		};
+		return perfilAcessoService;
+	}
+
+	@SuppressWarnings("unused")
 	private RepresentadaService buildRepresentadaService() {
 		RepresentadaService representadaService = getServiceImpl(RepresentadaService.class);
 		inject(representadaService, new RepresentadaDAO(null), "representadaDAO");
@@ -584,11 +637,6 @@ class ServiceBuilder {
 		inject(usuarioService, buildService(AutenticacaoService.class), "autenticacaoService");
 
 		new MockUp<UsuarioDAO>() {
-
-			@Mock
-			public void $init(EntityManager entityManager) {
-			}
-
 			@Mock
 			public Usuario pesquisarByEmailSenha(String email, String senha) {
 				List<Usuario> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(Usuario.class, "email", email);
@@ -613,6 +661,17 @@ class ServiceBuilder {
 			@Mock
 			public String pesquisarSenha(Integer idUsuario) {
 				return REPOSITORY.pesquisarEntidadeAtributoById(Usuario.class, idUsuario, "senha", String.class);
+			}
+
+			@Mock
+			public boolean pesquisarVendedorAtivo(Integer idVendedor) {
+				List<Usuario> listaUsuario = REPOSITORY.pesquisarTodos(Usuario.class);
+				for (Usuario usuario : listaUsuario) {
+					if (usuario.isVendedor()) {
+						return usuario.isAtivo();
+					}
+				}
+				return false;
 			}
 
 			@Mock

@@ -17,6 +17,8 @@ public interface MaterialService {
 
 	Integer inserir(Material material, List<Integer> listaIdRepresentadaAssociada) throws BusinessException;
 
+	boolean isMaterialExistente(Integer idMaterial);
+
 	boolean isMaterialExistente(String sigla, Integer idMaterial);
 
 	boolean isMaterialImportado(Integer idMaterial);

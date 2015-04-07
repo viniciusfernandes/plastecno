@@ -90,10 +90,8 @@ alter table vendas.tb_cliente drop prospeccao_finalizada;
 alter table vendas.tb_item_pedido add quantidade_recepcionada integer default 0;
 
 INSERT INTO vendas.tb_perfil_acesso values(14, 'MANUTENCAO_ESTOQUE');
-<!-- ULTIMA INSTRUCAO-->
+
 alter table vendas.tb_usuario drop vendedor;
-
-
 create table vendas.tb_comentario_representada (
 	id integer not null,
 	data_inclusao date not null,
@@ -107,4 +105,23 @@ ALTER TABLE vendas.tb_comentario_representada ADD CONSTRAINT id_usuario FOREIGN 
 ALTER TABLE vendas.tb_comentario_representada ADD CONSTRAINT id_representada FOREIGN KEY (id_representada) REFERENCES vendas.tb_representada (id);
 
 create sequence vendas.seq_comentario_representada_id increment by 1 minvalue 1 no maxvalue start with 1;
+<!-- ULTIMA INSTRUCAO-->
+drop table vendas.tb_remuneracao;
+drop sequence vendas.seq_remuneracao_id;
+
+create table vendas.tb_comissao (
+	id integer not null,
+	id_vendedor integer default null,
+	id_material integer default null,
+	id_forma_material integer default null,
+	valor numeric (5,5) default 0,
+	data_inicio timestamp not null,
+	data_fim timestamp default null
+);
+
+ALTER TABLE vendas.tb_comissao ADD PRIMARY KEY (id);
+create index idx_comissao_id_vendedor on vendas.tb_comissao (id_vendedor);
+create index idx_comissao_id_forma_material on vendas.tb_comissao (id_forma_material);
+create index idx_comissao_id_material on vendas.tb_comissao (id_material);
+
 <!-- ULTIMA INSTRUCAO-->

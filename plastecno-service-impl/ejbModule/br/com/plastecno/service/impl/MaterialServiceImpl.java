@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.persistence.EntityManager;
@@ -106,6 +108,14 @@ public class MaterialServiceImpl implements MaterialService {
 		return material.getId() != null ? materialDAO.alterar(material).getId() : materialDAO.inserir(material).getId();
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean isMaterialExistente(Integer idMaterial) {
+		return pesquisarById(idMaterial) != null;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isMaterialExistente(String sigla, Integer idMaterial) {
 		return materialDAO.isEntidadeExistente(Material.class, idMaterial, "sigla", sigla);
 	}

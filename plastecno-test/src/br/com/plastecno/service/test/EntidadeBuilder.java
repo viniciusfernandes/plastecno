@@ -1,8 +1,12 @@
 package br.com.plastecno.service.test;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
@@ -19,6 +23,7 @@ import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pais;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
@@ -104,6 +109,16 @@ public class EntidadeBuilder {
 		return itemPedido;
 	}
 
+	public List<PerfilAcesso> buildListaPerfilAcesso() {
+		List<PerfilAcesso> l = new LinkedList<PerfilAcesso>();
+		for (TipoAcesso tipoAcesso : TipoAcesso.values()) {
+			PerfilAcesso p = new PerfilAcesso();
+			p.setDescricao(tipoAcesso.toString());
+			l.add(p);
+		}
+		return l;
+	}
+
 	public Logradouro buildLogradouro(TipoLogradouro tipoLogradouro) {
 		Logradouro logradouro = new Logradouro(buildEndereco());
 		logradouro.setTipoLogradouro(tipoLogradouro);
@@ -170,7 +185,7 @@ public class EntidadeBuilder {
 		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
 		return representada;
 	}
-	
+
 	public Representada buildRepresentadaRevendedora() {
 		Representada representada = buildRepresentada();
 		representada.setTipoRelacionamento(TipoRelacionamento.REVENDA);
@@ -181,6 +196,8 @@ public class EntidadeBuilder {
 		Usuario vendedor = new Usuario(gerarId(), "Vinicius", "Fernandes Vendedor");
 		vendedor.setEmail("vinicius@teste.com.br");
 		vendedor.setSenha("1234567");
+		vendedor.setAtivo(true);
+		vendedor.addPerfilAcesso(buildListaPerfilAcesso());
 		return vendedor;
 	}
 

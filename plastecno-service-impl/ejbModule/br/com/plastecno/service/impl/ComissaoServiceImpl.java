@@ -1,6 +1,8 @@
 package br.com.plastecno.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -15,6 +17,7 @@ import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.dao.ComissaoDAO;
 import br.com.plastecno.service.entity.Comissao;
+import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Stateless
@@ -65,13 +68,45 @@ public class ComissaoServiceImpl implements ComissaoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer inserirComissaoVendedor(Integer idVendedor, Double valorComissao) throws BusinessException {
+		Comissao comissao = new Comissao(valorComissao, new Date());
+		comissao.setIdVendedor(idVendedor);
+		return inserir(comissao);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Comissao pesquisarById(Integer idComissao) {
 		return comissaoDAO.pesquisarById(idComissao);
 	}
 
 	@Override
+	public List<Comissao> pesquisarComissaoByIdVendedor(Integer idVendedor) {
+		if (idVendedor == null) {
+			return new ArrayList<Comissao>();
+		}
+		Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(idVendedor);
+		if (vendedor == null) {
+			return new ArrayList<Comissao>();
+		}
+		String nomeVendedor = vendedor.getNomeCompleto();
+		List<Comissao> l = comissaoDAO.pesquisarComissaoByIdVendedor(idVendedor);
+		for (Comissao comissao : l) {
+			comissao.setNomeVendedor(nomeVendedor);
+		}
+		return l;
+	}
+
+	@Override
 	public Comissao pesquisarComissaoVigente(Integer idVendedor, Integer idMaterial, Integer idFormaMaterial) {
 		return comissaoDAO.pesquisarComissaoVigente(idVendedor, idMaterial, idFormaMaterial);
+	}
+
+	@Override
+	public Double pesquisarValorComissaoVigenteVendedor(Integer idVendedor) {
+		Comissao comissao = comissaoDAO.pesquisarComissaoVigente(idVendedor, null, null);
+		return comissao == null ? 0d : comissao.getValor();
+
 	}
 }

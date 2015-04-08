@@ -114,7 +114,7 @@ create table vendas.tb_comissao (
 	id_vendedor integer default null,
 	id_material integer default null,
 	id_forma_material integer default null,
-	valor numeric (5,5) default 0,
+	valor numeric (2,2) default 0,
 	data_inicio timestamp not null,
 	data_fim timestamp default null
 );
@@ -123,5 +123,7 @@ ALTER TABLE vendas.tb_comissao ADD PRIMARY KEY (id);
 create index idx_comissao_id_vendedor on vendas.tb_comissao (id_vendedor);
 create index idx_comissao_id_forma_material on vendas.tb_comissao (id_forma_material);
 create index idx_comissao_id_material on vendas.tb_comissao (id_material);
+create sequence vendas.seq_comissao_id increment by 1 minvalue 1 no maxvalue start with 1;
 
+alter table vendas.tb_item_pedido add comissao numeric (5,5) default 0;
 <!-- ULTIMA INSTRUCAO-->

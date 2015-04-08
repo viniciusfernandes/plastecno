@@ -1,5 +1,7 @@
 package br.com.plastecno.service.dao;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -16,6 +18,12 @@ public class ComissaoDAO extends GenericDAO<Comissao> {
 		return super.pesquisarById(Comissao.class, idComissao);
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Comissao> pesquisarComissaoByIdVendedor(Integer idVendedor) {
+		return entityManager.createQuery("select c from Comissao c where c.idVendedor = :idVendedor order by c.dataInicio desc ")
+				.setParameter("idVendedor", idVendedor).getResultList();
+	}
+
 	public Comissao pesquisarComissaoVigente(Integer idVendedor, Integer idMaterial, Integer idFormaMaterial) {
 		if (idVendedor == null && idFormaMaterial == null && idMaterial == null) {
 			return null;
@@ -30,8 +38,11 @@ public class ComissaoDAO extends GenericDAO<Comissao> {
 		}
 
 		if (idMaterial != null) {
-			select.append(" c.idMaterial = :idMaterial ");
+			select.append(" c.idMaterial = :idMaterial and ");
 		}
+
+		select.append(" c.dataFim !=null ");
+
 		Query query = entityManager.createQuery(select.toString());
 		if (idVendedor != null) {
 			query.setParameter("idVendedor", idVendedor);

@@ -52,6 +52,42 @@ public class Comissao implements Serializable {
 	@Transient
 	private FormaMaterial formaMaterial;
 
+	@Transient
+	private String nomeVendedor;
+
+	@Transient
+	private String dataInicioFormatado;
+
+	@Transient
+	private String dataFimFormatado;
+
+	@Transient
+	private String valorFormatado;
+
+	public String getDataInicioFormatado() {
+		return dataInicioFormatado;
+	}
+
+	public void setDataInicioFormatado(String dataInicioFormatado) {
+		this.dataInicioFormatado = dataInicioFormatado;
+	}
+
+	public String getDataFimFormatado() {
+		return dataFimFormatado;
+	}
+
+	public void setDataFimFormatado(String dataFimFormatado) {
+		this.dataFimFormatado = dataFimFormatado;
+	}
+
+	public String getValorFormatado() {
+		return valorFormatado;
+	}
+
+	public void setValorFormatado(String valorFormatado) {
+		this.valorFormatado = valorFormatado;
+	}
+
 	public Comissao() {
 	}
 
@@ -88,6 +124,10 @@ public class Comissao implements Serializable {
 		return idVendedor;
 	}
 
+	public String getNomeVendedor() {
+		return nomeVendedor;
+	}
+
 	public Double getValor() {
 		return valor;
 	}
@@ -118,6 +158,10 @@ public class Comissao implements Serializable {
 
 	public void setIdVendedor(Integer idVendedor) {
 		this.idVendedor = idVendedor;
+	}
+
+	public void setNomeVendedor(String nomeVendedor) {
+		this.nomeVendedor = nomeVendedor;
 	}
 
 	public void setValor(Double valor) {

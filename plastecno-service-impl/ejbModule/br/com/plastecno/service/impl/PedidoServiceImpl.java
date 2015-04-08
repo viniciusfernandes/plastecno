@@ -201,7 +201,8 @@ public class PedidoServiceImpl implements PedidoService {
 						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
 						+ pedido.getId());
 			}
-			itemPedidoDAO.alterarComissao(itemPedido.getId(), comissao.getValor());
+			itemPedido.setComissao(comissao.getValor());
+			itemPedidoDAO.alterar(itemPedido);
 		}
 	}
 
@@ -392,13 +393,12 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido.isOrcamento()) {
 			enviarOrcamento(pedido, arquivoAnexado);
 		} else {
+			definirComissaoVenda(pedido);
 			enviarVenda(pedido, arquivoAnexado);
 		}
 		if (pedido.isCompra()) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		}
-
-		definirComissaoVenda(pedido);
 		pedidoDAO.alterar(pedido);
 	}
 

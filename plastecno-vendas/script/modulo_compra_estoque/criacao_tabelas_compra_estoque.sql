@@ -125,5 +125,5 @@ create index idx_comissao_id_forma_material on vendas.tb_comissao (id_forma_mate
 create index idx_comissao_id_material on vendas.tb_comissao (id_material);
 create sequence vendas.seq_comissao_id increment by 1 minvalue 1 no maxvalue start with 1;
 
-alter table vendas.tb_item_pedido add comissao numeric (5,5) default 0;
+alter table vendas.tb_item_pedido add comissao numeric (2,2) default 0;
 <!-- ULTIMA INSTRUCAO-->

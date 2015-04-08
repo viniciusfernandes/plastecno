@@ -19,6 +19,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EmailService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.LogradouroService;
@@ -35,6 +36,7 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Comissao;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
@@ -88,6 +90,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private UsuarioService usuarioService;
+
+	@EJB
+	private ComissaoService comissaoService;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -170,6 +175,34 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarSituacaoPedidoEncomendadoByIdPedido(Integer idPedido) {
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
+	}
+
+	private void definirComissaoVenda(Pedido pedido) throws BusinessException {
+		if (!pedido.isVenda()) {
+			return;
+		}
+		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
+		Comissao comissaoVendedor = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
+		Comissao comissao = null;
+		for (ItemPedido itemPedido : listaItem) {
+			if (pedido.isRevenda()) {
+				comissao = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
+						.getFormaMaterial().indexOf());
+				if (comissao == null) {
+					comissao = comissaoVendedor;
+				}
+			} else if (pedido.isRepresentacao()) {
+				comissao = comissaoVendedor;
+			}
+
+			if (comissao == null) {
+				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
+				throw new BusinessException("Não existe comissão configurada para o vendedor \"" + vendedor.getNomeCompleto()
+						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
+						+ pedido.getId());
+			}
+			itemPedidoDAO.alterarComissao(itemPedido.getId(), comissao.getValor());
+		}
 	}
 
 	@Override
@@ -365,6 +398,7 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		}
 
+		definirComissaoVenda(pedido);
 		pedidoDAO.alterar(pedido);
 	}
 
@@ -410,6 +444,7 @@ public class PedidoServiceImpl implements PedidoService {
 			e.addMensagem(e.getListaMensagem());
 			throw e;
 		}
+
 	}
 
 	private Integer gerarSequencialItemPedido(Integer idPedido) {

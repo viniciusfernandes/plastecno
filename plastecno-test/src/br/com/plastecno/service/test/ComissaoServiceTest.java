@@ -156,7 +156,7 @@ public class ComissaoServiceTest extends AbstractTest {
 		Assert.assertNotNull("A data final nao pode ser nula apos o versionamento", c1.getDataFim());
 		Assert.assertNull("A data final deve ser nula apos o versionamento", c2.getDataFim());
 
-		Comissao comissaoVigente = comissaoService.pesquisarComissaoVigente(idVendedor, null, null);
+		Comissao comissaoVigente = comissaoService.pesquisarComissaoVigenteVendedor(idVendedor);
 		Assert.assertEquals("As comissoes vigente deve ser a mesma que a ultima versao de comissao inserida",
 				comissaoVigente.getId(), c2.getId());
 

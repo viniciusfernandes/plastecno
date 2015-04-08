@@ -14,12 +14,18 @@ public enum FormaMaterial {
 		this.temlargura = temlargura;
 	}
 
-	public int indexOf() {
-		return ordinal() + 1;
-	}
-
 	public boolean contemLargura() {
 		return this.temlargura;
+	}
+
+	public static FormaMaterial get(Integer index) {
+		index -= 1;
+		for (int i = 0; i < values().length; i++) {
+			if (i == index) {
+				return values()[i];
+			}
+		}
+		return null;
 	}
 
 	public String getDescricao() {
@@ -32,6 +38,10 @@ public enum FormaMaterial {
 
 	public int getIpiPercentual() {
 		return (int) (this.getIpi() * 100);
+	}
+
+	public int indexOf() {
+		return ordinal() + 1;
 	}
 
 	public boolean isFormaMaterialVazada() {

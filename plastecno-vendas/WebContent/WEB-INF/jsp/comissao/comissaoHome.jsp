@@ -29,6 +29,12 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
+	$("#botaoPesquisarProduto").click(function() {
+		$('#formProduto').attr('method', 'get');
+		$('#formProduto').attr('action', '<c:url value="/comissao/produto/listagem"/>');
+		$('#formProduto').submit();
+	});
+	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	autocompletar({
@@ -105,13 +111,12 @@ function remover(codigo, sigla) {
 	</fieldset>
 	<div class="bloco_botoes">
 		<input type="submit" id="botaoInserirVendedor" title="Inserir Comissão do Vendedor" class="botaoInserir" value=""/>
-		<input type="button" id="botaoPesquisarVendedor" title="Pesquisar dados da Comissão do Vendedor" class="botaoPesquisar" value=""/>
+		<input type="button" id="botaoPesquisarVendedor" title="Pesquisar Comissão do Vendedor" class="botaoPesquisar" value=""/>
 		<input type="button" id="botaoLimpar" title="Limpar Dados da Comissão" class="botaoLimpar" value=""/>
 	</div>
 	</form>
 	
-	<form action="">
-	<input type="hidden" id="idMaterial" name="material.id" value="${vendedor.id}"/>
+	<form id="formProduto" action="<c:url value="/comissao/produto/inclusao"/>" method="post">
 	<fieldset>
 		<legend>::: Comissão do Produto :::</legend>
 			<div class="label condicional" >Forma Material:</div>
@@ -136,7 +141,8 @@ function remover(codigo, sigla) {
 			</div>
 	</fieldset>
 	<div class="bloco_botoes">
-		<a id="botaoPesquisarProduto" title="Pesquisar Dados do Vendedor" class="botaoPesquisar"></a> 
+		<input type="submit" id="botaoInserirProduto" title="Inserir Comissão do Produto" class="botaoInserir" value=""/>
+		<a id="botaoPesquisarProduto" title="Pesquisar Comissão do Produto" class="botaoPesquisar"></a> 
 		<a id="botaoLimpar" title="Limpar Dados da Comissão" class="botaoLimpar"></a>
 	</div>
 	</form>
@@ -149,6 +155,7 @@ function remover(codigo, sigla) {
 			<table class="listrada">
 				<thead>
 					<tr>
+						<th style="width: 5%">Vigente</th>
 						<th style="width: 30%">${isProduto ? 'Produto' : 'Vendedor'}</th>
 						<th style="width: 10%">Comissão(%)</th>
 						<th style="width: 10%">Inicio</th>
@@ -159,6 +166,14 @@ function remover(codigo, sigla) {
 				<tbody>
 					<c:forEach var="comissao" items="${listaComissao}">
 						<tr>
+							<c:choose>
+								<c:when test="${comissao.vigente}">
+									<td><div class="flagOK"></div></td>
+								</c:when>
+								<c:otherwise>
+									<td><div class="flagNaoOK"></div></td>
+								</c:otherwise>
+							</c:choose>
 							<td>${isProduto ? comissao.descricaoProduto : comissao.nomeVendedor}</td>
 							<td>${comissao.valorFormatado}</td>
 							<td>${comissao.dataInicioFormatado}</td>

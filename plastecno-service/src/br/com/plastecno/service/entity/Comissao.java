@@ -59,34 +59,13 @@ public class Comissao implements Serializable {
 	private String dataInicioFormatado;
 
 	@Transient
+	private String descricaoProduto;
+
+	@Transient
 	private String dataFimFormatado;
 
 	@Transient
 	private String valorFormatado;
-
-	public String getDataInicioFormatado() {
-		return dataInicioFormatado;
-	}
-
-	public void setDataInicioFormatado(String dataInicioFormatado) {
-		this.dataInicioFormatado = dataInicioFormatado;
-	}
-
-	public String getDataFimFormatado() {
-		return dataFimFormatado;
-	}
-
-	public void setDataFimFormatado(String dataFimFormatado) {
-		this.dataFimFormatado = dataFimFormatado;
-	}
-
-	public String getValorFormatado() {
-		return valorFormatado;
-	}
-
-	public void setValorFormatado(String valorFormatado) {
-		this.valorFormatado = valorFormatado;
-	}
 
 	public Comissao() {
 	}
@@ -100,8 +79,20 @@ public class Comissao implements Serializable {
 		return dataFim;
 	}
 
+	public String getDataFimFormatado() {
+		return dataFimFormatado;
+	}
+
 	public Date getDataInicio() {
 		return dataInicio;
+	}
+
+	public String getDataInicioFormatado() {
+		return dataInicioFormatado;
+	}
+
+	public String getDescricaoProduto() {
+		return descricaoProduto;
 	}
 
 	public FormaMaterial getFormaMaterial() {
@@ -132,12 +123,36 @@ public class Comissao implements Serializable {
 		return valor;
 	}
 
+	public String getValorFormatado() {
+		return valorFormatado;
+	}
+
+	public boolean isComissaoVendedor() {
+		return idVendedor != null;
+	}
+
+	public boolean isVigente() {
+		return dataFim == null;
+	}
+
 	public void setDataFim(Date dataFim) {
 		this.dataFim = dataFim;
 	}
 
+	public void setDataFimFormatado(String dataFimFormatado) {
+		this.dataFimFormatado = dataFimFormatado;
+	}
+
 	public void setDataInicio(Date dataInicio) {
 		this.dataInicio = dataInicio;
+	}
+
+	public void setDataInicioFormatado(String dataInicioFormatado) {
+		this.dataInicioFormatado = dataInicioFormatado;
+	}
+
+	public void setDescricaoProduto(String descricaoProduto) {
+		this.descricaoProduto = descricaoProduto;
 	}
 
 	public void setFormaMaterial(FormaMaterial formaMaterial) {
@@ -166,5 +181,9 @@ public class Comissao implements Serializable {
 
 	public void setValor(Double valor) {
 		this.valor = valor;
+	}
+
+	public void setValorFormatado(String valorFormatado) {
+		this.valorFormatado = valorFormatado;
 	}
 }

@@ -15,8 +15,10 @@ import javax.persistence.PersistenceContext;
 import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.dao.ComissaoDAO;
 import br.com.plastecno.service.entity.Comissao;
+import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 
@@ -58,13 +60,28 @@ public class ComissaoServiceImpl implements ComissaoService {
 			throw new BusinessException("É obrigatório o preenchimento do vendedor, forma de material ou material");
 		}
 
-		Comissao comissaoAnterior = pesquisarComissaoVigente(comissao.getIdVendedor(), comissao.getIdMaterial(),
-				comissao.getIdFormaMaterial());
+		Comissao comissaoAnterior = null;
+		if (comissao.isComissaoVendedor()) {
+			comissaoAnterior = pesquisarComissaoVigenteVendedor(comissao.getIdVendedor());
+		} else {
+			comissaoAnterior = pesquisarComissaoVigenteProduto(comissao.getIdMaterial(), comissao.getIdFormaMaterial());
+		}
+
 		if (comissaoAnterior != null) {
 			comissaoAnterior.setDataFim(new Date());
 			comissaoDAO.alterar(comissaoAnterior);
 		}
 		return comissaoDAO.inserir(comissao).getId();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer inserirComissaoProduto(FormaMaterial formaMaterial, Integer idMaterial, Double valorComissao)
+			throws BusinessException {
+		Comissao comissao = new Comissao(valorComissao, new Date());
+		comissao.setIdFormaMaterial(formaMaterial.indexOf());
+		comissao.setIdMaterial(idMaterial);
+		return inserir(comissao);
 	}
 
 	@Override
@@ -82,6 +99,7 @@ public class ComissaoServiceImpl implements ComissaoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Comissao> pesquisarComissaoByIdVendedor(Integer idVendedor) {
 		if (idVendedor == null) {
 			return new ArrayList<Comissao>();
@@ -99,13 +117,41 @@ public class ComissaoServiceImpl implements ComissaoService {
 	}
 
 	@Override
-	public Comissao pesquisarComissaoVigente(Integer idVendedor, Integer idMaterial, Integer idFormaMaterial) {
-		return comissaoDAO.pesquisarComissaoVigente(idVendedor, idMaterial, idFormaMaterial);
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Comissao> pesquisarComissaoByProduto(FormaMaterial formaMaterial, Integer idMaterial) {
+		List<Comissao> l = comissaoDAO.pesquisarComissaoByProduto(formaMaterial, idMaterial);
+		Material m = null;
+		StringBuilder descricao = null;
+		for (Comissao c : l) {
+			descricao = new StringBuilder();
+			if (c.getIdFormaMaterial() != null) {
+				descricao.append(FormaMaterial.get(c.getIdFormaMaterial()).getDescricao()).append(" - ");
+			}
+			if (c.getIdMaterial() != null) {
+				m = materialService.pesquisarById(c.getIdFormaMaterial());
+				descricao.append(m.getDescricaoFormatada());
+			}
+			c.setDescricaoProduto(descricao.toString());
+		}
+		return l;
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Comissao pesquisarComissaoVigenteProduto(Integer idMaterial, Integer idFormaMaterial) {
+		return comissaoDAO.pesquisarComissaoVigenteProduto(idMaterial, idFormaMaterial);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Comissao pesquisarComissaoVigenteVendedor(Integer idVendedor) {
+		return comissaoDAO.pesquisarComissaoVigenteVendedor(idVendedor);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double pesquisarValorComissaoVigenteVendedor(Integer idVendedor) {
-		Comissao comissao = comissaoDAO.pesquisarComissaoVigente(idVendedor, null, null);
+		Comissao comissao = comissaoDAO.pesquisarComissaoVigenteVendedor(idVendedor);
 		return comissao == null ? 0d : comissao.getValor();
 
 	}

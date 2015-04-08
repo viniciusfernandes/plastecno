@@ -10,7 +10,9 @@ import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.Comissao;
+import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.util.NumeroUtils;
@@ -36,7 +38,30 @@ public class ComissaoController extends AbstractController {
 
     @Get("comissao")
     public void comissaoHome() {
+        addAtributo("listaFormaMaterial", FormaMaterial.values());
+    }
 
+    private void formatarComissao(List<Comissao> listaComissao) {
+        for (Comissao comissao : listaComissao) {
+            comissao.setDataInicioFormatado(StringUtils.formatarDataHora(comissao.getDataInicio()));
+            comissao.setDataFimFormatado(StringUtils.formatarDataHora(comissao.getDataFim()));
+            comissao.setValorFormatado(NumeroUtils.gerarPercentual(comissao.getValor()).toString());
+        }
+    }
+
+    @Post("comissao/produto/inclusao")
+    public void inserirComissaoProduto(FormaMaterial formaMaterial, Material material, Double valorComissaoProduto) {
+        try {
+            comissaoService.inserirComissaoProduto(formaMaterial, material.getId(),
+                    NumeroUtils.gerarAliquota(valorComissaoProduto));
+            gerarMensagemSucesso("Comissão do produto \"" + formaMaterial.getDescricao() + " - "
+                    + material.getDescricao() + "\" foi incluída com sucesso");
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            addAtributo("material", material);
+            addAtributo("formaSelecionada", formaMaterial);
+        }
+        irTopoPagina();
     }
 
     @Post("comissao/vendedor/inclusao")
@@ -56,6 +81,16 @@ public class ComissaoController extends AbstractController {
     public void pesquisarComissaoByIdVendedor(Integer idVendedor) {
         List<Comissao> listaComissao = comissaoService.pesquisarComissaoByIdVendedor(idVendedor);
         formatarComissao(listaComissao);
+        addAtributo("isProduto", false);
+        addAtributo("listaComissao", listaComissao);
+        irRodapePagina();
+    }
+
+    @Get("comissao/produto/listagem")
+    public void pesquisarComissaoByProduto(FormaMaterial formaMaterial, Material material) {
+        List<Comissao> listaComissao = comissaoService.pesquisarComissaoByProduto(formaMaterial, material.getId());
+        formatarComissao(listaComissao);
+        addAtributo("isProduto", true);
         addAtributo("listaComissao", listaComissao);
         irRodapePagina();
     }
@@ -64,18 +99,9 @@ public class ComissaoController extends AbstractController {
     public void pesquisarVendedorById(Integer idVendedor) {
         Usuario vendedor = usuarioService.pesquisarVendedorById(idVendedor);
         addAtributo("vendedor", vendedor);
-        addAtributo("isProduto", false);
         addAtributo("valorComissaoVendedor",
                 NumeroUtils.gerarPercentual(comissaoService.pesquisarValorComissaoVigenteVendedor(idVendedor)));
         irTopoPagina();
-    }
-
-    private void formatarComissao(List<Comissao> listaComissao) {
-        for (Comissao comissao : listaComissao) {
-            comissao.setDataInicioFormatado(StringUtils.formatarDataHora(comissao.getDataInicio()));
-            comissao.setDataFimFormatado(StringUtils.formatarDataHora(comissao.getDataFim()));
-            comissao.setValorFormatado(NumeroUtils.gerarPercentual(comissao.getValor()).toString());
-        }
     }
 
     @Get("comissao/vendedor/listagem/nome")

@@ -184,18 +184,17 @@ class ServiceBuilder {
 
 		new MockUp<ComissaoDAO>() {
 			@Mock
-			public Comissao pesquisarComissaoVigente(Integer idVendedor, Integer idMaterial, Integer idFormaMaterial) {
+			public Comissao pesquisarComissaoVigenteProduto(Integer idMaterial, Integer idFormaMaterial) {
 				List<Comissao> lista = REPOSITORY.pesquisarTodos(Comissao.class);
 				boolean ok = false;
 				for (Comissao comissao : lista) {
+					ok = false;
 					if (comissao.getDataFim() != null) {
 						continue;
 					}
-					if (idVendedor != null) {
-						ok = idVendedor.equals(comissao.getIdVendedor());
-					}
+
 					if (idFormaMaterial != null) {
-						ok |= idFormaMaterial.equals(comissao.getIdFormaMaterial());
+						ok = idFormaMaterial.equals(comissao.getIdFormaMaterial());
 					}
 
 					if (idMaterial != null) {
@@ -203,6 +202,21 @@ class ServiceBuilder {
 					}
 
 					if (ok) {
+						return comissao;
+					}
+				}
+				return null;
+			}
+
+			@Mock
+			public Comissao pesquisarComissaoVigenteVendedor(Integer idVendedor) {
+				List<Comissao> lista = REPOSITORY.pesquisarTodos(Comissao.class);
+				for (Comissao comissao : lista) {
+					if (comissao.getDataFim() != null) {
+						continue;
+					}
+
+					if (idVendedor.equals(comissao.getIdVendedor())) {
 						return comissao;
 					}
 				}

@@ -79,7 +79,9 @@ public class ComissaoServiceImpl implements ComissaoService {
 	public Integer inserirComissaoProduto(FormaMaterial formaMaterial, Integer idMaterial, Double valorComissao)
 			throws BusinessException {
 		Comissao comissao = new Comissao(valorComissao, new Date());
-		comissao.setIdFormaMaterial(formaMaterial.indexOf());
+		if (formaMaterial != null) {
+			comissao.setIdFormaMaterial(formaMaterial.indexOf());
+		}
 		comissao.setIdMaterial(idMaterial);
 		return inserir(comissao);
 	}
@@ -128,8 +130,10 @@ public class ComissaoServiceImpl implements ComissaoService {
 				descricao.append(FormaMaterial.get(c.getIdFormaMaterial()).getDescricao()).append(" - ");
 			}
 			if (c.getIdMaterial() != null) {
-				m = materialService.pesquisarById(c.getIdFormaMaterial());
-				descricao.append(m.getDescricaoFormatada());
+				m = materialService.pesquisarById(c.getIdMaterial());
+				if (m != null) {
+					descricao.append(m.getDescricao());
+				}
 			}
 			c.setDescricaoProduto(descricao.toString());
 		}

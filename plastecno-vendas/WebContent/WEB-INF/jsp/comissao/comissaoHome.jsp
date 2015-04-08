@@ -20,10 +20,6 @@
 $(document).ready(function() {
 	scrollTo('${ancora}');
 
-	$("#botaoLimpar").click(function() {
-		$('#formVazio').submit();
-	});
-	
 	$("#botaoPesquisarVendedor").click(function() {
 		$('#formVazio').attr('action', '<c:url value="/comissao/vendedor/listagem"/>');
 		$('#formVazio').submit();
@@ -49,22 +45,23 @@ $(document).ready(function() {
 		}
 	});
 	
-	function inicializarAutocompleteMaterial() {
-		// Esse eh o autocomplete da area de filtros de pesquisa
-		autocompletar({
-			url : '<c:url value="/estoque/material/listagem"/>',
-			campoPesquisavel : 'formPesquisa #material',
-			parametro : 'sigla',
-			containerResultados : 'formPesquisa #containerPesquisaMaterial',
-			selecionarItem : function(itemLista) {
-				$('#formPesquisa #idMaterial').val(itemLista.id);
-			}
-		});
-	};
+	autocompletar({
+		url : '<c:url value="/estoque/material/listagem"/>',
+		campoPesquisavel : 'material',
+		parametro : 'sigla',
+		containerResultados : 'containerPesquisaMaterial',
+		selecionarItem : function(itemLista) {
+			$('#idMaterial').val(itemLista.id);
+		}
+	});
 	
 	inserirMascaraNumerica('valorComissaoVendedor', '99');
 	inserirMascaraNumerica('valorComissaoProdudo', '99');
 });
+
+function limpar(){
+	$('#formVazio').submit();
+};
 
 function inicializarFiltro(){
 	
@@ -112,7 +109,7 @@ function remover(codigo, sigla) {
 	<div class="bloco_botoes">
 		<input type="submit" id="botaoInserirVendedor" title="Inserir Comissão do Vendedor" class="botaoInserir" value=""/>
 		<input type="button" id="botaoPesquisarVendedor" title="Pesquisar Comissão do Vendedor" class="botaoPesquisar" value=""/>
-		<input type="button" id="botaoLimpar" title="Limpar Dados da Comissão" class="botaoLimpar" value=""/>
+		<input type="button" id="botaoLimpar" title="Limpar Dados da Comissão" class="botaoLimpar" value="" onclick="limpar()"/>
 	</div>
 	</form>
 	
@@ -142,8 +139,8 @@ function remover(codigo, sigla) {
 	</fieldset>
 	<div class="bloco_botoes">
 		<input type="submit" id="botaoInserirProduto" title="Inserir Comissão do Produto" class="botaoInserir" value=""/>
-		<a id="botaoPesquisarProduto" title="Pesquisar Comissão do Produto" class="botaoPesquisar"></a> 
-		<a id="botaoLimpar" title="Limpar Dados da Comissão" class="botaoLimpar"></a>
+		<input type="button" id="botaoPesquisarProduto" title="Pesquisar Comissão do Produto" class="botaoPesquisar"/> 
+		<input type="button" id="botaoLimpar" title="Limpar Dados da Comissão" class="botaoLimpar" value="" onclick="limpar()"/>
 	</div>
 	</form>
 

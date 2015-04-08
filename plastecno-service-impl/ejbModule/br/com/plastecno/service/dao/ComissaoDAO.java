@@ -81,7 +81,7 @@ public class ComissaoDAO extends GenericDAO<Comissao> {
 			return null;
 		}
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select c from Comissao c where  c.idVendedor = :idVendedor c.dataFim = null")
+				entityManager.createQuery("select c from Comissao c where  c.idVendedor = :idVendedor and c.dataFim = null")
 						.setParameter("idVendedor", idVendedor), Comissao.class, null);
 	}
 }

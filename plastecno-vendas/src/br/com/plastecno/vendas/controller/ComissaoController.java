@@ -54,8 +54,14 @@ public class ComissaoController extends AbstractController {
         try {
             comissaoService.inserirComissaoProduto(formaMaterial, material.getId(),
                     NumeroUtils.gerarAliquota(valorComissaoProduto));
-            gerarMensagemSucesso("Comissão do produto \"" + formaMaterial.getDescricao() + " - "
-                    + material.getDescricao() + "\" foi incluída com sucesso");
+            String descricao = "";
+            if (formaMaterial != null) {
+                descricao = formaMaterial.getDescricao();
+            }
+            if (material != null && material.getId() != null) {
+                descricao += " - " + material.getDescricao();
+            }
+            gerarMensagemSucesso("Comissão do produto \"" + descricao + "\" foi incluída com sucesso");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             addAtributo("material", material);
@@ -68,7 +74,7 @@ public class ComissaoController extends AbstractController {
     public void inserirComissaoVendedor(Usuario vendedor, Double valorComissaoVendedor) {
         try {
             comissaoService.inserirComissaoVendedor(vendedor.getId(), NumeroUtils.gerarAliquota(valorComissaoVendedor));
-            gerarMensagemSucesso("Comissão do vendedor \"" + vendedor.getNomeCompleto() + "\" foi incluída com sucesso");
+            gerarMensagemSucesso("Comissão do vendedor \"" + vendedor.getNome() + "\" foi incluída com sucesso");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             addAtributo("vendedor", vendedor);

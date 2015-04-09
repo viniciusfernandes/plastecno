@@ -183,10 +183,9 @@ function inicializarFiltro() {
 			<table class="listrada">
 				<thead>
 					<tr>
-						<th style="width: 5%">Cód.</th>
 						<th style="width: 10%">Qtde.</th>
 						<th style="width: 70%">Descrição</th>
-						<th style="width: 10%">Valor (R$)</th>
+						<th style="width: 10%">Valor Unid. (R$)</th>
 						<th style="width: 5%">Ações</th>
 					</tr>
 				</thead>
@@ -195,7 +194,6 @@ function inicializarFiltro() {
 					<c:forEach var="item" items="${listaItemEstoque}">
 						<tr>
 							
-							<td>${item.id}</td>
 							<td>${item.quantidade}</td>
 							<td>${item.descricao}</td>
 							<td>${item.precoMedioFormatado}</td>

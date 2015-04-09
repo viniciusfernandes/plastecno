@@ -177,35 +177,6 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
 	}
 
-	private void definirComissaoVenda(Pedido pedido) throws BusinessException {
-		if (!pedido.isVenda()) {
-			return;
-		}
-		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
-		Comissao comissaoVendedor = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
-		Comissao comissao = null;
-		for (ItemPedido itemPedido : listaItem) {
-			if (pedido.isRevenda()) {
-				comissao = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
-						.getFormaMaterial().indexOf());
-				if (comissao == null) {
-					comissao = comissaoVendedor;
-				}
-			} else if (pedido.isRepresentacao()) {
-				comissao = comissaoVendedor;
-			}
-
-			if (comissao == null) {
-				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
-				throw new BusinessException("Não existe comissão configurada para o vendedor \"" + vendedor.getNomeCompleto()
-						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
-						+ pedido.getId());
-			}
-			itemPedido.setComissao(comissao.getValor());
-			itemPedidoDAO.alterar(itemPedido);
-		}
-	}
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double calcularValorPedido(Integer idPedido) throws BusinessException {
@@ -260,6 +231,35 @@ public class PedidoServiceImpl implements PedidoService {
 		return pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido) > 0;
 	}
 
+	private void definirComissaoVenda(Pedido pedido) throws BusinessException {
+		if (!pedido.isVenda()) {
+			return;
+		}
+		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
+		Comissao comissaoVendedor = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
+		Comissao comissao = null;
+		for (ItemPedido itemPedido : listaItem) {
+			if (pedido.isRevenda()) {
+				comissao = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
+						.getFormaMaterial().indexOf());
+				if (comissao == null) {
+					comissao = comissaoVendedor;
+				}
+			} else if (pedido.isRepresentacao()) {
+				comissao = comissaoVendedor;
+			}
+
+			if (comissao == null) {
+				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
+				throw new BusinessException("Não existe comissão configurada para o vendedor \"" + vendedor.getNomeCompleto()
+						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
+						+ pedido.getId());
+			}
+			itemPedido.setComissao(comissao.getValor());
+			itemPedidoDAO.alterar(itemPedido);
+		}
+	}
+
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
 	private void definirTipoPedido(Pedido pedido) {
 		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
@@ -290,6 +290,8 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("A fornecedor \"" + fornecedor.getNomeFantasia()
 					+ "\" escolhido não esta cadastrado como fornecedor");
 		}
+
+		verificarMaterialAssociadoFornecedor(idRepresentadaFornecedora, listaIdItemPedido);
 
 		Cliente revendedor = clienteService.pesquisarRevendedor();
 		if (revendedor == null) {
@@ -1274,6 +1276,22 @@ public class PedidoServiceImpl implements PedidoService {
 
 		if (exception.contemMensagem()) {
 			throw exception;
+		}
+	}
+
+	private void verificarMaterialAssociadoFornecedor(Integer idRepresentadaFornecedora, Set<Integer> listaIdItemPedido)
+			throws BusinessException {
+		Integer idMaterial = null;
+		for (Integer idItemPedido : listaIdItemPedido) {
+
+			idMaterial = itemPedidoDAO.pesquisarIdMeterialByIdItemPedido(idItemPedido);
+			if (!materialService.isMaterialAssociadoRepresentada(idMaterial, idRepresentadaFornecedora)) {
+				Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
+				Integer sequencial = itemPedidoDAO.pesquisarSequencialItemPedido(idItemPedido);
+				String nomeFantasia = representadaService.pesquisarNomeFantasiaById(idRepresentadaFornecedora);
+				throw new BusinessException("Não é possível encomendar o item No. " + sequencial + " do pedido No. " + idPedido
+						+ " pois o fornecedor \"" + nomeFantasia + "\" não trabalha com o material do item");
+			}
 		}
 	}
 }

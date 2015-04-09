@@ -389,6 +389,7 @@ class ServiceBuilder {
 		inject(pedidoService, buildService(MaterialService.class), "materialService");
 		inject(pedidoService, buildService(RepresentadaService.class), "representadaService");
 		inject(pedidoService, buildService(EstoqueService.class), "estoqueService");
+		inject(pedidoService, buildService(ComissaoService.class), "comissaoService");
 
 		new MockUp<ItemPedidoDAO>() {
 
@@ -675,6 +676,11 @@ class ServiceBuilder {
 			@Mock
 			public String pesquisarSenha(Integer idUsuario) {
 				return REPOSITORY.pesquisarEntidadeAtributoById(Usuario.class, idUsuario, "senha", String.class);
+			}
+
+			@Mock
+			Usuario pesquisarUsuarioResumidoById(Integer idUsuario) {
+				return REPOSITORY.pesquisarEntidadeById(Usuario.class, idUsuario);
 			}
 
 			@Mock

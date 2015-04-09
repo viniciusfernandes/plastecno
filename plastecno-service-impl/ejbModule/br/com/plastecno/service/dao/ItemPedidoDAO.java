@@ -74,6 +74,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return query.getResultList();
 	}
 
+	public Integer pesquisarIdMeterialByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery("select i.material.id from ItemPedido i where i.id = :idItemPedido")
+						.setParameter("idItemPedido", idItemPedido), Integer.class, null);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemEncomenda(Integer idCliente, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();

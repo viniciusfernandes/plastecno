@@ -121,7 +121,6 @@ function enviarEncomenda(botao){
 					<th style="width: 5%">Qtde</th>
 					<th style="width: 43%">Desc. Item</th>
 					<th style="width: 10%">Vendedor</th>
-					<th style="width: 10%">Fornec.</th>
 					<th style="width: 11%">Ação</th>
 				</tr>
 			</thead>
@@ -137,7 +136,6 @@ function enviarEncomenda(botao){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeProprietario}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeRepresentada}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/empacotamento/pedido/pdf"/>" >

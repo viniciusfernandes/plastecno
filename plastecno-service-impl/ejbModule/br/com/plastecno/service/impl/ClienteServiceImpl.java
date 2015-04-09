@@ -115,7 +115,6 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		if (restricao.length() > 0) {
-
 			select.append(" WHERE ").append(restricao);
 			select.delete(select.lastIndexOf("AND"), select.length() - 1);
 		}

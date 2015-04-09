@@ -17,6 +17,22 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		super(entityManager);
 	}
 
+	public void alterarComissao(Integer idItemPedido, Double valorComissao) {
+		alterarPropriedade(ItemPedido.class, idItemPedido, "comissao", valorComissao);
+	}
+
+	public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada) {
+		entityManager
+				.createQuery(
+						"update ItemPedido i set i.quantidadeRecepcionada = :quantidadeRecepcionada where i.id = :idItemPedido")
+				.setParameter("idItemPedido", idItemPedido).setParameter("quantidadeRecepcionada", quantidadeRecepcionada)
+				.executeUpdate();
+	}
+
+	public void inserirComissao(Integer idItemPedido, Double valorComissao) {
+		super.alterarPropriedade(ItemPedido.class, idItemPedido, "comissao", valorComissao);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
@@ -56,6 +72,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		return query.getResultList();
+	}
+
+	public Integer pesquisarIdMeterialByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery("select i.material.id from ItemPedido i where i.id = :idItemPedido")
+						.setParameter("idItemPedido", idItemPedido), Integer.class, null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -228,14 +250,6 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	public Integer pesquisarSequencialItemPedido(Integer idItemPedido) {
 		return pesquisarCampoById(ItemPedido.class, idItemPedido, "sequencial", Integer.class);
-	}
-
-	public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada) {
-		entityManager
-				.createQuery(
-						"update ItemPedido i set i.quantidadeRecepcionada = :quantidadeRecepcionada where i.id = :idItemPedido")
-				.setParameter("idItemPedido", idItemPedido).setParameter("quantidadeRecepcionada", quantidadeRecepcionada)
-				.executeUpdate();
 	}
 
 	public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {

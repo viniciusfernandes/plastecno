@@ -67,9 +67,6 @@ public class Usuario implements Serializable {
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da usuario")
 	private Logradouro logradouro;
 
-	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = { CascadeType.MERGE })
-	private List<Remuneracao> listaRemuneracao;
-
 	@OneToMany(mappedBy = "vendedor", fetch = FetchType.LAZY, cascade = { CascadeType.MERGE })
 	private List<Cliente> listaCliente;
 
@@ -128,20 +125,6 @@ public class Usuario implements Serializable {
 		this.listaPerfilAcesso.add(perfilAcesso);
 	}
 
-	public void addRemuneracao(List<Remuneracao> listaRemuneracao) {
-		for (Remuneracao remuneracao : listaRemuneracao) {
-			this.addRemuneracao(remuneracao);
-		}
-	}
-
-	public void addRemuneracao(Remuneracao remuneracao) {
-		if (this.listaRemuneracao == null) {
-			this.listaRemuneracao = new ArrayList<Remuneracao>();
-		}
-		this.listaRemuneracao.add(remuneracao);
-		remuneracao.setUsuario(this);
-	}
-
 	public String getCpf() {
 		return cpf;
 	}
@@ -166,10 +149,6 @@ public class Usuario implements Serializable {
 		return listaPerfilAcesso;
 	}
 
-	List<Remuneracao> getListaRemuneracao() {
-		return listaRemuneracao;
-	}
-
 	public Logradouro getLogradouro() {
 		return logradouro;
 	}
@@ -182,21 +161,6 @@ public class Usuario implements Serializable {
 		return this.nome + " " + this.sobrenome;
 	}
 
-	public Remuneracao getRemuneracaoVigente() {
-		Remuneracao remuneracaoVigente = null;
-		if (this.listaRemuneracao == null) {
-			return remuneracaoVigente;
-		}
-
-		for (Remuneracao remuneracaoVendedor : this.listaRemuneracao) {
-			if (remuneracaoVendedor.getDataFimVigencia() == null) {
-				remuneracaoVigente = remuneracaoVendedor;
-				break;
-			}
-		}
-		return remuneracaoVigente;
-	}
-
 	public String getSenha() {
 		return senha;
 	}
@@ -205,20 +169,28 @@ public class Usuario implements Serializable {
 		return sobrenome;
 	}
 
+	private boolean isAcessoPermitido(TipoAcesso tipoAcesso) {
+		if (listaPerfilAcesso == null) {
+			return false;
+		}
+		for (PerfilAcesso perfilAcesso : listaPerfilAcesso) {
+			if (tipoAcesso.toString().equals(perfilAcesso.getDescricao())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public boolean isAtivo() {
 		return ativo;
 	}
 
 	public boolean isComprador() {
-		if (listaPerfilAcesso == null) {
-			return false;
-		}
-		for (PerfilAcesso perfilAcesso : listaPerfilAcesso) {
-			if (TipoAcesso.CADASTRO_PEDIDO_COMPRA.toString().equals(perfilAcesso.getDescricao())) {
-				return true;
-			}
-		}
-		return false;
+		return isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+	}
+
+	public boolean isVendedor() {
+		return isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_VENDAS);
 	}
 
 	public void limparListaCliente() {
@@ -259,10 +231,6 @@ public class Usuario implements Serializable {
 
 	public void setListaPerfilAcesso(List<PerfilAcesso> listaPerfilAcesso) {
 		this.listaPerfilAcesso = listaPerfilAcesso;
-	}
-
-	public void setListaRemuneracao(List<Remuneracao> listaRemuneracao) {
-		this.listaRemuneracao = listaRemuneracao;
 	}
 
 	public void setLogradouro(Logradouro logradouro) {

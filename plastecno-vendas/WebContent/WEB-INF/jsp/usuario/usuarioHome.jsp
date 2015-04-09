@@ -213,7 +213,7 @@ function inicializarModalCancelamento(botao){
 					<c:forEach var="usuario" items="${listaUsuario}">
 						<tr>
 							<c:choose>
-								<c:when test="${usuario.vendedorAtivo}">
+								<c:when test="${usuario.ativo}">
 									<td><div class="flagOK"></div></td>
 								</c:when>
 								<c:otherwise>

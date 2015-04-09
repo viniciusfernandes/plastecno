@@ -24,5 +24,4 @@ public class VendedorJson {
     public String getNome() {
         return nome;
     }
-
 }

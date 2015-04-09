@@ -108,6 +108,14 @@ public class Representada implements Serializable {
 		}
 	}
 
+	public void addMaterial(Material material) {
+		if (listaMaterial == null) {
+			setListaMaterial(new ArrayList<Material>());
+		}
+		listaMaterial.add(material);
+		material.setRepresentada(this);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		return o instanceof Representada && this.id != null && this.id.equals(((Representada) o).id);
@@ -178,17 +186,17 @@ public class Representada implements Serializable {
 		return ativo;
 	}
 
+	public boolean isFornecedor() {
+		return TipoRelacionamento.FORNECIMENTO.equals(tipoRelacionamento)
+				|| TipoRelacionamento.REPRESENTACAO_FORNECIMENTO.equals(tipoRelacionamento);
+	}
+
 	public boolean isIPIHabilitado() {
 		return !TipoApresentacaoIPI.NUNCA.equals(this.tipoApresentacaoIPI);
 	}
 
 	public boolean isRevendedor() {
 		return TipoRelacionamento.REVENDA.equals(tipoRelacionamento);
-	}
-
-	public boolean isFornecedor() {
-		return TipoRelacionamento.FORNECIMENTO.equals(tipoRelacionamento)
-				|| TipoRelacionamento.REPRESENTACAO_FORNECIMENTO.equals(tipoRelacionamento);
 	}
 
 	public void setAtivo(boolean ativo) {
@@ -225,6 +233,13 @@ public class Representada implements Serializable {
 
 	public void setLogradouro(Logradouro logradouro) {
 		this.logradouro = logradouro;
+	}
+
+	public void setMaterial(Material material) {
+		if (listaMaterial == null) {
+			setListaMaterial(new ArrayList<Material>());
+		}
+		listaMaterial.add(material);
 	}
 
 	public void setNomeFantasia(String nomeFantasia) {

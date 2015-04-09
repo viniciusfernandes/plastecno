@@ -58,6 +58,8 @@ public class ItemPedido extends Item {
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao pedido")
 	private Material material;
 
+	private Double comissao;
+
 	@Column(name = "medida_externa")
 	private Double medidaExterna;
 
@@ -161,6 +163,10 @@ public class ItemPedido extends Item {
 
 	public Double getAliquotaIPI() {
 		return aliquotaIPI;
+	}
+
+	public Double getComissao() {
+		return comissao;
 	}
 
 	public Double getComprimento() {
@@ -277,6 +283,10 @@ public class ItemPedido extends Item {
 
 	public void setAliquotaIPI(Double aliquotaIPI) {
 		this.aliquotaIPI = aliquotaIPI;
+	}
+
+	public void setComissao(Double comissao) {
+		this.comissao = comissao;
 	}
 
 	public void setComprimento(Double comprimento) {

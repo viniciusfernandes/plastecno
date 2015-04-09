@@ -11,6 +11,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
@@ -41,6 +42,7 @@ public class EstoqueServiceTest extends AbstractTest {
 	private PedidoService pedidoService;
 	private RepresentadaService representadaService;
 	private UsuarioService usuarioService;
+	private ComissaoService comissaoService;
 
 	private ItemPedido enviarItemPedido(Integer quantidade, TipoPedido tipoPedido) {
 		Pedido pedido = gerarPedido(tipoPedido);
@@ -92,6 +94,25 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		return estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+	}
+
+	private ItemPedido gerarItemPedidoClone(Integer quantidade, ItemPedido item1) {
+		// Garantindo que o material eh o mesmo para manter a consistencia dos dados
+		// entre item pedido e item estoque.
+		ItemPedido item2 = item1.clone();
+		if (quantidade != null) {
+			item2.setQuantidade(quantidade);
+		}
+		try {
+			pedidoService.inserirItemPedido(item1.getPedido().getId(), item2);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return item2;
+	}
+
+	private ItemPedido gerarItemPedidoClone(ItemPedido item1) {
+		return gerarItemPedidoClone(null, item1);
 	}
 
 	private List<ItemPedido> gerarListaItemPedido(TipoPedido tipoPedido) {
@@ -157,14 +178,7 @@ public class EstoqueServiceTest extends AbstractTest {
 	private Pedido gerarPedido(TipoPedido tipoPedido) {
 		Pedido pedido = eBuilder.buildPedido();
 		pedido.setTipoPedido(tipoPedido);
-
-		Usuario vendedor = eBuilder.buildVendedor();
-		try {
-			usuarioService.inserir(vendedor, true);
-		} catch (BusinessException e2) {
-			printMensagens(e2);
-		}
-
+		Usuario vendedor = gerarVendedor();
 		Cliente cliente = pedido.getCliente();
 		cliente.setVendedor(vendedor);
 		try {
@@ -191,6 +205,22 @@ public class EstoqueServiceTest extends AbstractTest {
 		return pedido;
 	}
 
+	private Usuario gerarVendedor() {
+		Usuario vendedor = eBuilder.buildVendedor();
+		try {
+			usuarioService.inserir(vendedor, true);
+		} catch (BusinessException e2) {
+			printMensagens(e2);
+		}
+
+		try {
+			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.9);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return vendedor;
+	}
+
 	@Override
 	public void init() {
 		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
@@ -199,6 +229,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		clienteService = ServiceBuilder.buildService(ClienteService.class);
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
+		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
 	}
 
 	private Integer pesquisarQuantidadeTotalItemEstoque(Integer idItemEstoque) {
@@ -802,25 +833,6 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 		assertEquals("Um item inexistente no estoque nao pode ser reservado", SituacaoReservaEstoque.NAO_CONTEM_ESTOQUE,
 				situacaoReservaEstoque);
-	}
-
-	private ItemPedido gerarItemPedidoClone(ItemPedido item1) {
-		return gerarItemPedidoClone(null, item1);
-	}
-
-	private ItemPedido gerarItemPedidoClone(Integer quantidade, ItemPedido item1) {
-		// Garantindo que o material eh o mesmo para manter a consistencia dos dados
-		// entre item pedido e item estoque.
-		ItemPedido item2 = item1.clone();
-		if (quantidade != null) {
-			item2.setQuantidade(quantidade);
-		}
-		try {
-			pedidoService.inserirItemPedido(item1.getPedido().getId(), item2);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		return item2;
 	}
 
 	@Test

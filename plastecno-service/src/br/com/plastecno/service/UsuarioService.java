@@ -7,7 +7,6 @@ import javax.ejb.Local;
 import br.com.plastecno.service.entity.ContatoUsuario;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.PerfilAcesso;
-import br.com.plastecno.service.entity.Remuneracao;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -15,66 +14,64 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 @Local
 public interface UsuarioService {
 
-    void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado) throws BusinessException;
+	void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado) throws BusinessException;
 
-    void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado,
-            List<Integer> listaIdClienteDesassociado) throws BusinessException;
+	void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado,
+			List<Integer> listaIdClienteDesassociado) throws BusinessException;
 
-    int desabilitar(Integer id) throws BusinessException;
+	int desabilitar(Integer id) throws BusinessException;
 
-    void desassociarCliente(Integer idVendedor, List<Integer> listaIdClienteDesassociado) throws BusinessException;
+	void desassociarCliente(Integer idVendedor, List<Integer> listaIdClienteDesassociado) throws BusinessException;
 
-    Integer inserir(Usuario usuario, boolean isAlteracaoSenha) throws BusinessException;
+	Integer inserir(Usuario usuario, boolean isAlteracaoSenha) throws BusinessException;
 
-    boolean isAdministrador(Integer idUsuario);
+	boolean isAdministrador(Integer idUsuario);
 
-    boolean isClienteAssociadoVendedor(Integer idCliente, Integer idVendedor);
+	boolean isClienteAssociadoVendedor(Integer idCliente, Integer idVendedor);
 
-    boolean isCPF(Integer id, String cpf);
+	boolean isCPF(Integer id, String cpf);
 
-    boolean isEmailExistente(Integer id, String email);
+	boolean isEmailExistente(Integer id, String email);
 
-    boolean isVendaPermitida(Integer idCliente, Integer idVendedor);
+	boolean isVendaPermitida(Integer idCliente, Integer idVendedor);
 
-    boolean isVendedorAtivo(Integer idVendedor);
+	boolean isVendedorAtivo(Integer idVendedor);
 
-    PaginacaoWrapper<Usuario> paginarUsuario(Usuario filtro, boolean isVendedor, Boolean apenasAtivos,
-            Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+	PaginacaoWrapper<Usuario> paginarUsuario(Usuario filtro, boolean isVendedor, Boolean apenasAtivos,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-    PaginacaoWrapper<Usuario> paginarVendedor(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+	PaginacaoWrapper<Usuario> paginarVendedor(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros);
 
-    List<Usuario> pesquisarBy(Usuario filtro);
+	List<Usuario> pesquisarBy(Usuario filtro);
 
-    List<Usuario> pesquisarBy(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+	List<Usuario> pesquisarBy(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros);
 
-    Usuario pesquisarById(Integer id);
+	Usuario pesquisarById(Integer id);
 
-    List<Usuario> pesquisarByNome(String nome);
+	List<Usuario> pesquisarByNome(String nome);
 
-    List<ContatoUsuario> pesquisarContatos(Integer id);
+	List<ContatoUsuario> pesquisarContatos(Integer id);
 
-    Logradouro pesquisarLogradouro(Integer id);
+	Logradouro pesquisarLogradouro(Integer id);
 
-    List<PerfilAcesso> pesquisarPerfisAssociados(Integer id);
+	List<PerfilAcesso> pesquisarPerfisAssociados(Integer id);
 
-    List<PerfilAcesso> pesquisarPerfisNaoAssociados(Integer id);
+	List<PerfilAcesso> pesquisarPerfisNaoAssociados(Integer id);
 
-    List<Remuneracao> pesquisarRemuneracaoById(Integer id);
+	String pesquisarSenhaByEmail(String email);
 
-    String pesquisarSenhaByEmail(String email);
+	Long pesquisarTotalRegistros(Usuario filtro, Boolean apenasAtivos, boolean isVendedor);
 
-    Long pesquisarTotalRegistros(Usuario filtro, Boolean apenasAtivos, boolean isVendedor);
+	Usuario pesquisarUsuarioResumidoById(Integer idUsuario);
 
-    Usuario pesquisarUsuarioResumidoById(Integer idUsuario);
+	Usuario pesquisarVendedorById(Integer idVendedor);
 
-    Usuario pesquisarVendedorById(Integer idVendedor);
-
-    Usuario pesquisarVendedorByIdCliente(Integer idCliente);
+	Usuario pesquisarVendedorByIdCliente(Integer idCliente);
 
 	List<Usuario> pesquisarVendedorByNome(String nome);
 
 	List<Usuario> pesquisarVendedores(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
-	        Integer numeroMaximoRegistros);
+			Integer numeroMaximoRegistros);
 }

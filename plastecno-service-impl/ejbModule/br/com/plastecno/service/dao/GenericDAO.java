@@ -27,6 +27,12 @@ public class GenericDAO<T> {
 				.executeUpdate();
 	}
 
+	public T flush(T t) {
+		t = entityManager.merge(t);
+		entityManager.flush();
+		return t;
+	}
+
 	public T inserir(T t) {
 		entityManager.persist(t);
 		return t;

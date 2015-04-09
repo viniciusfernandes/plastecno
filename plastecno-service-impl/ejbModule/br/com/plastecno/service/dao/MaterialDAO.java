@@ -14,16 +14,26 @@ public class MaterialDAO extends GenericDAO<Material> {
 		super(entityManager);
 	}
 
-	public boolean isMaterialImportado(Integer idMaterial) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select m.importado from Material m where m.id = :idMaterial").setParameter(
-						"idMaterial", idMaterial), Boolean.class, false);
-	}
-
 	public void desativar(Integer id) {
 		Query query = this.entityManager.createQuery("update Material r set r.ativo = false where r.id = :id");
 		query.setParameter("id", id);
 		query.executeUpdate();
+	}
+
+	public boolean isMaterialAssociadoRepresentada(Integer idMaterial, Integer idRepresentada) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						this.entityManager
+								.createQuery(
+										"select m.id from Material m inner join m.listaRepresentada r where  m.id = :idMaterial and r.id = :idRepresentada")
+								.setParameter("idMaterial", idMaterial).setParameter("idRepresentada", idRepresentada), Integer.class,
+						null) != null;
+	}
+
+	public boolean isMaterialImportado(Integer idMaterial) {
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery("select m.importado from Material m where m.id = :idMaterial").setParameter(
+						"idMaterial", idMaterial), Boolean.class, false);
 	}
 
 	public Material pesquisarById(Integer id) {
@@ -51,7 +61,6 @@ public class MaterialDAO extends GenericDAO<Material> {
 		select.append("m.sigla like :sigla order by m.sigla ");
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("sigla", "%" + sigla + "%");
-		
 
 		if (idRepresentada != null) {
 			query.setParameter("idRepresentada", idRepresentada);

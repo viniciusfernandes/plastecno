@@ -50,8 +50,7 @@
 				<li><a href="cliente" target="principal_frame">Clientes</a></li>
 				<li><a href="javascript: void(0)">Cadastros</a>
 					<ul>
-						<li><a href="ramo" target="principal_frame">Ramos
-								Atividades</a></li>
+						<li><a href="ramo" target="principal_frame">Ramos Atividades</a></li>
 						<li><a href="representada" target="principal_frame">Represent. / Forneced.</a></li>
 						<li><a href="transportadora" target="principal_frame">Transportadoras</a></li>
 						<li><a href="material" target="principal_frame">Materiais</a></li>
@@ -59,6 +58,7 @@
 							<li><a href="usuario" target="principal_frame">Usuários</a></li>
 							<li><a href="vendedor" target="principal_frame">Vendedores</a></li>
 							<li><a href="revendedor" target="principal_frame">Revendedor</a></li>
+							<li><a href="comissao" target="principal_frame">Comissão</a></li>
 						</c:if>
 						<li><a href="regiao" target="principal_frame">Regiões</a></li>
 					</ul></li>

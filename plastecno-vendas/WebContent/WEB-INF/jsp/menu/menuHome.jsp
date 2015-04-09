@@ -94,7 +94,7 @@
 							<li><a href="relatorio/cliente/regiao" target="principal_frame">Cliente Região</a></li>
 						</c:if>
 						<li><a href="relatorio/cliente/vendedor" target="principal_frame">Cliente Vendedor</a></li>
-						<c:if test="${acessoRelatorioVendasRepresentadaPermitido}">
+						<c:if test="${acessoRelatorioComissaoVendedor}">
 							<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Vendedor</a></li>
 						</c:if>
 					</ul></li>

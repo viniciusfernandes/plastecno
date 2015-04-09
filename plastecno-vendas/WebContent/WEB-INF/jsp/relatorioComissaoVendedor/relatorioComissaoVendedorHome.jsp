@@ -60,7 +60,8 @@
 			<div class="label" style="width: 30%">Vendedor:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="nome" name="vendedor.nome" value="${vendedor.nome}"
-					class="pesquisavel <c:if test="${not acessoPesquisaComissaoPermitido}">desabilitado</c:if>" style="width: 50%" />
+					class="pesquisavel <c:if test="${not acessoPesquisaComissaoPermitido}">desabilitado</c:if>" 
+					<c:if test="${not acessoPesquisaComissaoPermitido}">disabled="disabled"</c:if> style="width: 50%" />
 				<div class="suggestionsBox" id="containerPesquisaVendedor" style="display: none; width: 50%"></div>
 			</div>
 		</fieldset>
@@ -79,12 +80,13 @@
 					<th style="width: 10%">Pedido</th>
 					<th style="width: 2%">Item</th>
 					<th style="width: 3%">Qtde.</th>
-					<th style="width: 50%">Descrição</th>
+					<th style="width: 45%">Descrição</th>
 					<th style="width: 10%">Total (R$)</th>
 					<th style="width: 10%">IPI (%)</th>
 					<th style="width: 10%">ICMS (%)</th>
 					<th style="width: 5%">Comis.(%)</th>
 					<th style="width: 10%">Valor Comiss. (R$)</th>
+					<th style="width: 5%">Ações</th>
 				</tr>
 			</thead>
 
@@ -104,6 +106,14 @@
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaICMSFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.comissaoFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valorComissaoFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
+							<div class="coluna_acoes_listagem">
+								<form action="<c:url value="/relatorio/comissao/pedido/pdf"/>" method="get">
+									<input type="hidden" name="idPedido" value="${pedido.id}"/>
+									<input type="submit" title="Vizualizar Pedido PDF" value="" class="botaoPDF" />
+								</form>
+							</div>
+						</td>
 						</tr>
 					</c:forEach>
 				</c:forEach>

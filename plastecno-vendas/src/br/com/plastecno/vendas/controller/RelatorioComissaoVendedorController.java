@@ -5,8 +5,10 @@ import java.util.Date;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
@@ -26,10 +28,17 @@ public class RelatorioComissaoVendedorController extends AbstractController {
         super(result, usuarioInfo);
     }
 
+    @Get("relatorio/comissao/pedido/pdf")
+    public Download downloadPedidoPDF(Integer idPedido, TipoPedido tipoPedido) {
+        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, tipoPedido);
+    }
+
     @Get("relatorio/comissao/vendedor/listagem")
     public void gerarRelatorioComissaoVendedor(Date dataInicial, Date dataFinal, Usuario vendedor) {
         try {
-
+            if (!isAcessoPermitido(TipoAcesso.ADMINISTRACAO)) {
+                vendedor = usuarioService.pesquisarUsuarioResumidoById(vendedor.getId());
+            }
             addAtributo("relatorio", relatorioService.gerarRelatorioComissaoVendedor(vendedor.getId(), new Periodo(
                     dataInicial, dataFinal)));
             irRodapePagina();

@@ -98,6 +98,8 @@ public class PedidoServiceTest extends AbstractTest {
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}
+		} else {
+			representada = listaRepresentada.get(0);
 		}
 
 		Material material = eBuilder.buildMaterial();
@@ -172,7 +174,8 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		pedido.setRepresentada(gerarRepresentada());
+		Representada representada = gerarRepresentada();
+		pedido.setRepresentada(representada);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e1) {
@@ -180,7 +183,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		Material material = eBuilder.buildMaterial();
-		material.addRepresentada(gerarRepresentada());
+		material.addRepresentada(representada);
 		try {
 			material.setId(materialService.inserir(material));
 		} catch (BusinessException e2) {
@@ -191,6 +194,16 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private Pedido gerarPedidoClienteProspectado() {
 		Pedido pedido = eBuilder.buildPedido();
+
+		Usuario vendedor = eBuilder.buildVendedor();
+		try {
+			usuarioService.inserir(vendedor, true);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		pedido.setVendedor(vendedor);
+
 		Cliente cliente = pedido.getCliente();
 		try {
 			clienteService.inserir(cliente);
@@ -1763,13 +1776,16 @@ public class PedidoServiceTest extends AbstractTest {
 		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
 
 		Set<Integer> listaId = new HashSet<Integer>();
-		// Inncluindo um intem inexistente
+		// Inncluindo um item inexistente
 		listaId.add(-1);
+		boolean throwed = false;
 		try {
 			pedidoService.encomendarItemPedido(pedido.getComprador().getId(), fornecedor.getId(), listaId);
 		} catch (BusinessException e) {
-			printMensagens(e);
+			throwed = true;
 		}
+
+		assertTrue("Um item inexsitente nao pode ser encomendado, e portanto deve ser validado", throwed);
 		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(
 				"O item encomendado nao existe no estoque, entao devemos cria-lo antes de encomendar, portanto o pedido deve estar na mesma situacao",

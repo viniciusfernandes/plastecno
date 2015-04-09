@@ -356,9 +356,7 @@ class ServiceBuilder {
 				if (m == null) {
 					return false;
 				}
-				System.out.println("lista eh nula: " + m.getListaRepresentada().size());
 				for (Representada r : m.getListaRepresentada()) {
-					System.out.println("idrepresentada: " + idRepresentada + " represendata eh nula: " + (r == null));
 					if (idRepresentada != null && idRepresentada.equals(r.getId())) {
 						return true;
 					}

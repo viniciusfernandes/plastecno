@@ -21,6 +21,8 @@ public interface RelatorioService {
 
 	RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) throws BusinessException;
 
+	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioComissaoVendedor(Integer idVendedor, Periodo periodo);
+
 	List<Pedido> gerarRelatorioCompra(Periodo periodo) throws InformacaoInvalidaException;
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo);
@@ -34,9 +36,9 @@ public interface RelatorioService {
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente, Periodo periodo);
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEncomendada(Integer idRepresentada, Periodo periodo);
-
-	List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException;
 	
+	List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException;
+
 	RelatorioWrapper<String, TotalizacaoPedidoWrapper> gerarRelatorioVendaCliente(boolean orcamento, Periodo periodo, Integer idCliente)
 			throws BusinessException;
 

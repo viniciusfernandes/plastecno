@@ -58,6 +58,19 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@EJB
 	private UsuarioService usuarioService;
 
+	private double calcularValorComissoes(List<ItemPedido> listaItemPedido) {
+		double totalValorComissao = 0;
+		double valorComissao = 0;
+		for (ItemPedido itemPedido : listaItemPedido) {
+			valorComissao = itemPedido.getComissao() * itemPedido.getPrecoItem();
+			totalValorComissao += valorComissao;
+
+			itemPedido.setComissaoFormatado(NumeroUtils.formatarPercentual(itemPedido.getComissao()));
+			itemPedido.setValorComissaoFormatado(NumeroUtils.formatarValorMonetario(valorComissao));
+		}
+		return totalValorComissao;
+	}
+
 	@Override
 	public RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade)
 			throws BusinessException {
@@ -93,6 +106,20 @@ public class RelatorioServiceImpl implements RelatorioService {
 			descricaoContato.delete(0, descricaoContato.length());
 		}
 
+		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioComissaoVendedor(Integer idVendedor, Periodo periodo) {
+		
+		StringBuilder titulo = new StringBuilder();
+		titulo.append("Comissão do Vendedor de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
+				.append(StringUtils.formatarData(periodo.getFim()));
+		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor);
+		
+		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(titulo.toString(), listaItemPedido);
+		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(calcularValorComissoes(listaItemPedido)));
 		return relatorio;
 	}
 

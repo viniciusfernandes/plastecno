@@ -32,6 +32,12 @@ public abstract class Item implements Serializable, Cloneable {
 	private String precoItemFormatado;
 
 	@Transient
+	private String comissaoFormatado;
+
+	@Transient
+	private String valorComissaoFormatado;
+
+	@Transient
 	private String precoMedioFormatado;
 
 	@Transient
@@ -60,6 +66,10 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public String getAliquotaIPIFormatado() {
 		return aliquotaIPIFormatado;
+	}
+
+	public String getComissaoFormatado() {
+		return comissaoFormatado;
 	}
 
 	public abstract Double getComprimento();
@@ -160,6 +170,10 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public abstract Integer getQuantidade();
 
+	public String getValorComissaoFormatado() {
+		return valorComissaoFormatado;
+	}
+
 	public boolean isFormaMaterialVazada() {
 		return getFormaMaterial() != null && getFormaMaterial().isFormaMaterialVazada();
 	}
@@ -184,6 +198,10 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public void setAliquotaIPIFormatado(String aliquotaIPIFormatado) {
 		this.aliquotaIPIFormatado = aliquotaIPIFormatado;
+	}
+
+	public void setComissaoFormatado(String comissaoFormatado) {
+		this.comissaoFormatado = comissaoFormatado;
 	}
 
 	public abstract void setComprimento(Double comprimento);
@@ -237,4 +255,8 @@ public abstract class Item implements Serializable, Cloneable {
 	}
 
 	public abstract void setQuantidade(Integer quantidade);
+
+	public void setValorComissaoFormatado(String valorComissaoFormatado) {
+		this.valorComissaoFormatado = valorComissaoFormatado;
+	}
 }

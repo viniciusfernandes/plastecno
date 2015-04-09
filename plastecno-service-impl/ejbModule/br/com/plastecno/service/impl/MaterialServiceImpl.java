@@ -111,14 +111,7 @@ public class MaterialServiceImpl implements MaterialService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isMaterialAssociadoRepresentada(Integer idMaterial, Integer idRepresentada) {
-		idRepresentada = QueryUtil
-				.gerarRegistroUnico(
-						this.entityManager
-								.createQuery(
-										"select m.id from Material m inner join m.listaRepresentada r where  m.id = :idMaterial and r.id = :idRepresentada")
-								.setParameter("idMaterial", idMaterial).setParameter("idRepresentada", idRepresentada), Integer.class,
-						null);
-		return idRepresentada != null;
+		return materialDAO.isMaterialAssociadoRepresentada(idMaterial, idRepresentada);
 	}
 
 	@Override

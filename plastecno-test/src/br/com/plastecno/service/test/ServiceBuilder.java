@@ -351,6 +351,22 @@ class ServiceBuilder {
 
 		new MockUp<MaterialDAO>() {
 			@Mock
+			boolean isMaterialAssociadoRepresentada(Integer idMaterial, Integer idRepresentada) {
+				Material m = pesquisarById(idMaterial);
+				if (m == null) {
+					return false;
+				}
+				System.out.println("lista eh nula: " + m.getListaRepresentada().size());
+				for (Representada r : m.getListaRepresentada()) {
+					System.out.println("idrepresentada: " + idRepresentada + " represendata eh nula: " + (r == null));
+					if (idRepresentada != null && idRepresentada.equals(r.getId())) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			@Mock
 			boolean isMaterialImportado(Integer idMaterial) {
 				Material material = REPOSITORY.pesquisarEntidadeById(Material.class, idMaterial);
 				return material != null ? material.isImportado() : false;
@@ -392,11 +408,19 @@ class ServiceBuilder {
 		inject(pedidoService, buildService(ComissaoService.class), "comissaoService");
 
 		new MockUp<ItemPedidoDAO>() {
-
 			@Mock
 			public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada) {
 				REPOSITORY.alterarEntidadeAtributoById(ItemPedido.class, idItemPedido, "quantidadeRecepcionada",
 						quantidadeRecepcionada);
+			}
+
+			@Mock
+			public Integer pesquisarIdMeterialByIdItemPedido(Integer idItemPedido) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				if (i == null) {
+					return null;
+				}
+				return i.getMaterial().getId();
 			}
 
 			@Mock

@@ -17,6 +17,7 @@ import mockit.MockUp;
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
@@ -72,7 +73,10 @@ public class PedidoServiceTest extends AbstractTest {
 	private PedidoService pedidoService;
 
 	private RepresentadaService representadaService;
+
 	private UsuarioService usuarioService;
+
+	private ComissaoService comissaoService;
 
 	private void associarVendedor(Cliente cliente) {
 		cliente.setVendedor(eBuilder.buildVendedor());
@@ -152,6 +156,12 @@ public class PedidoServiceTest extends AbstractTest {
 			usuarioService.inserir(vendedor, true);
 		} catch (BusinessException e2) {
 			printMensagens(e2);
+		}
+
+		try {
+			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.6);
+		} catch (BusinessException e3) {
+			printMensagens(e3);
 		}
 
 		Cliente cliente = pedido.getCliente();
@@ -290,6 +300,7 @@ public class PedidoServiceTest extends AbstractTest {
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
 		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
+		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
 	}
 
 	private void initTestEnvioEmailPedidoCancelado() {

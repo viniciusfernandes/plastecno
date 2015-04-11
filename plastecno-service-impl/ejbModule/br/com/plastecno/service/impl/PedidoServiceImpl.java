@@ -797,6 +797,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido) {
+		return pedidoDAO.pesquisarIdPedidoByIdItemPedido(listaIdItemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoRevendaAguardandoEncomenda() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
 	}
@@ -819,7 +825,7 @@ public class PedidoServiceImpl implements PedidoService {
 			return null;
 		}
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select v.id from Pedido p inner join p.proprietario v where p.id = idPedido ")
+				this.entityManager.createQuery("select v.id from Pedido p inner join p.proprietario v where p.id = :idPedido ")
 						.setParameter("idPedido", idPedido), Integer.class, null);
 	}
 
@@ -851,6 +857,48 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal) {
 		return itemPedidoDAO.pesquisarItemPedidoEncomendado(idCliente, dataInicial, dataFinal);
+	}
+
+	@Override
+	public List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor) {
+		if (idVendedor == null) {
+			return new ArrayList<ItemPedido>();
+		}
+
+		StringBuilder select = new StringBuilder();
+		select.append("select i from ItemPedido i ");
+		select.append("where i.pedido.tipoPedido != :tipoPedido and ");
+		select.append("i.pedido.dataEnvio >= :dataInicio and ");
+		select.append("i.pedido.dataEnvio <= :dataFim and ");
+		select.append("i.pedido.situacaoPedido in (:situacoes) ");
+
+		select.append("and i.pedido.proprietario.id = :idVendedor ");
+		select.append("order by i.pedido.dataEnvio ");
+		TypedQuery<ItemPedido> query = this.entityManager.createQuery(select.toString(), ItemPedido.class)
+				.setParameter("dataInicio", periodo.getInicio()).setParameter("dataFim", periodo.getFim())
+				.setParameter("situacoes", pesquisarSituacaoVendaEfetivada()).setParameter("tipoPedido", TipoPedido.COMPRA)
+				.setParameter("idVendedor", idVendedor);
+
+		return query.getResultList();
+	}
+
+	@Override
+	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
+		StringBuilder select = new StringBuilder();
+		select
+				.append("select new ItemPedido(i.id, i.comissao, i.pedido.id, i.pedido.proprietario.id, i.pedido.proprietario.nome, i.pedido.proprietario.sobrenome, i.precoUnidade, i.quantidade) ");
+		select.append("from ItemPedido i ");
+		select.append("where i.pedido.tipoPedido != :tipoPedido and ");
+		select.append("i.pedido.dataEnvio >= :dataInicio and ");
+		select.append("i.pedido.dataEnvio <= :dataFim and ");
+		select.append("i.pedido.situacaoPedido in (:situacoes) ");
+
+		select.append("order by i.pedido.dataEnvio ");
+		TypedQuery<ItemPedido> query = this.entityManager.createQuery(select.toString(), ItemPedido.class)
+				.setParameter("dataInicio", periodo.getInicio()).setParameter("dataFim", periodo.getFim())
+				.setParameter("situacoes", pesquisarSituacaoVendaEfetivada()).setParameter("tipoPedido", TipoPedido.COMPRA);
+
+		return query.getResultList();
 	}
 
 	@Override
@@ -961,30 +1009,6 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemPedido i ");
-		select.append("where i.pedido.tipoPedido != :tipoPedido and ");
-		select.append("i.pedido.dataEnvio >= :dataInicio and ");
-		select.append("i.pedido.dataEnvio <= :dataFim and ");
-		select.append("i.pedido.situacaoPedido in (:situacoes) ");
-
-		if (idVendedor != null) {
-			select.append("and i.pedido.proprietario.id = :idVendedor ");
-		}
-		select.append("order by i.pedido.dataEnvio ");
-		TypedQuery<ItemPedido> query = this.entityManager.createQuery(select.toString(), ItemPedido.class)
-				.setParameter("dataInicio", periodo.getInicio()).setParameter("dataFim", periodo.getFim())
-				.setParameter("situacoes", pesquisarSituacaoVendaEfetivada()).setParameter("tipoPedido", TipoPedido.COMPRA);
-
-		if (idVendedor != null) {
-			query.setParameter("idVendedor", idVendedor);
-		}
-
-		return query.getResultList();
-	}
-
-	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Usuario pesquisarProprietario(Integer idPedido) {
 		StringBuilder select = new StringBuilder();
@@ -1073,7 +1097,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Object[]> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo) {
-		return pedidoDAO.pesquisarTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), true);
+		return pedidoDAO.pesquisarValorTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), true);
 	}
 
 	@Override
@@ -1129,7 +1153,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo) {
-		return pedidoDAO.pesquisarTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), false);
+		return pedidoDAO.pesquisarValorTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), false);
 	}
 
 	@Override
@@ -1174,6 +1198,20 @@ public class PedidoServiceImpl implements PedidoService {
 	public List<Pedido> pesquisarVendaByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException {
 		return pesquisarPedidoEnviadoByPeriodoEProprietario(orcamento, periodo, idVendedor, false);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Usuario pesquisarVendedorByIdItemPedido(Integer idItemPedido) {
+		if (idItemPedido == null) {
+			return null;
+		}
+		return QueryUtil
+				.gerarRegistroUnico(
+						this.entityManager
+								.createQuery(
+										"select new Usuario(v.id, v.nome, v.sobrenome) from ItemPedido i inner join i.pedido.proprietario v where i.id = :idItemPedido ")
+								.setParameter("idItemPedido", idItemPedido), Usuario.class, null);
 	}
 
 	@Override

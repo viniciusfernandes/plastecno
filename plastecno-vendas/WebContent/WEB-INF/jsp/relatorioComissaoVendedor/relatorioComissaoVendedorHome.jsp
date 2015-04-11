@@ -72,7 +72,8 @@
 	</form>
 
 	<a id="rodape"></a>
-		<c:if test="${not empty relatorio}">
+		<c:choose>
+		<c:when  test="${not empty relatorio and not isRelatorioVendedores}">
 		<table id="tabelaItemPedido" class="listrada">
 			<caption>${relatorio.titulo}</caption>
 			<thead>
@@ -129,6 +130,39 @@
 				</tr>
 			</tfoot>
 		</table>
-		</c:if>
+		</c:when>
+		<c:when test="${not empty relatorio and isRelatorioVendedores}">
+		<table id="tabelaItemPedido" class="listrada">
+			<caption>${relatorio.titulo}</caption>
+			<thead>
+				<tr>
+					<th style="width: 50%">Vendedor</th>
+					<th style="width: 10%">Qtde.</th>
+					<th style="width: 25%">Total (R$)</th>
+					<th style="width: 15%">Valor Comiss. (R$)</th>
+				</tr>
+			</thead>
+
+			<tbody>
+			
+				<c:forEach items="${relatorio.listaElemento}" var="comissao" varStatus="iGrupo">
+						<tr>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${comissao.nomeVendedor}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${comissao.quantidadeVendida}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${comissao.valorVendidoFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${comissao.valorComissaoFormatado}</td>
+						</tr>
+					</c:forEach>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="2"></td>
+					<td style="text-align: right;">TOTAL COMISSIONADO:</td>
+					<td ><div id="valorPedido" style="text-align: left;">R$ ${relatorio.valorTotal}</div></td>
+				</tr>
+			</tfoot>
+		</table>
+		</c:when>
+		</c:choose>
 </body>
 </html>

@@ -865,40 +865,41 @@ public class PedidoServiceImpl implements PedidoService {
 			return new ArrayList<ItemPedido>();
 		}
 
-		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemPedido i ");
-		select.append("where i.pedido.tipoPedido != :tipoPedido and ");
-		select.append("i.pedido.dataEnvio >= :dataInicio and ");
-		select.append("i.pedido.dataEnvio <= :dataFim and ");
-		select.append("i.pedido.situacaoPedido in (:situacoes) ");
-
-		select.append("and i.pedido.proprietario.id = :idVendedor ");
-		select.append("order by i.pedido.dataEnvio ");
-		TypedQuery<ItemPedido> query = this.entityManager.createQuery(select.toString(), ItemPedido.class)
-				.setParameter("dataInicio", periodo.getInicio()).setParameter("dataFim", periodo.getFim())
-				.setParameter("situacoes", pesquisarSituacaoVendaEfetivada()).setParameter("tipoPedido", TipoPedido.COMPRA)
-				.setParameter("idVendedor", idVendedor);
-
-		return query.getResultList();
+		return pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor, false);
 	}
 
-	@Override
-	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
+	private List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor,
+			boolean isContrutorResumido) {
 		StringBuilder select = new StringBuilder();
-		select
-				.append("select new ItemPedido(i.id, i.comissao, i.pedido.id, i.pedido.proprietario.id, i.pedido.proprietario.nome, i.pedido.proprietario.sobrenome, i.precoUnidade, i.quantidade) ");
+		if (isContrutorResumido) {
+			select
+					.append("select new ItemPedido(i.id, i.comissao, i.pedido.id, i.pedido.proprietario.id, i.pedido.proprietario.nome, i.pedido.proprietario.sobrenome, i.precoUnidade, i.quantidade) ");
+		} else {
+			select.append("select i ");
+		}
 		select.append("from ItemPedido i ");
 		select.append("where i.pedido.tipoPedido != :tipoPedido and ");
 		select.append("i.pedido.dataEnvio >= :dataInicio and ");
 		select.append("i.pedido.dataEnvio <= :dataFim and ");
 		select.append("i.pedido.situacaoPedido in (:situacoes) ");
-
+		if (idVendedor != null) {
+			select.append("and i.pedido.proprietario.id = :idVendedor ");
+		}
 		select.append("order by i.pedido.dataEnvio ");
+
 		TypedQuery<ItemPedido> query = this.entityManager.createQuery(select.toString(), ItemPedido.class)
 				.setParameter("dataInicio", periodo.getInicio()).setParameter("dataFim", periodo.getFim())
 				.setParameter("situacoes", pesquisarSituacaoVendaEfetivada()).setParameter("tipoPedido", TipoPedido.COMPRA);
 
+		if (idVendedor != null) {
+			query.setParameter("idVendedor", idVendedor);
+		}
 		return query.getResultList();
+	}
+
+	@Override
+	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
+		return pesquisarItemPedidoVendaByPeriodo(periodo, null, true);
 	}
 
 	@Override

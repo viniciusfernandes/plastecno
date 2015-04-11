@@ -195,15 +195,19 @@ public class PedidoServiceTest extends AbstractTest {
 	private Pedido gerarPedidoClienteProspectado() {
 		Pedido pedido = eBuilder.buildPedido();
 
-		Usuario vendedor = eBuilder.buildVendedor();
+		Usuario vendedor = pedido.getVendedor();
 		try {
 			usuarioService.inserir(vendedor, true);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
-
-		pedido.setVendedor(vendedor);
-
+		
+		try {
+			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.05);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		
 		Cliente cliente = pedido.getCliente();
 		try {
 			clienteService.inserir(cliente);

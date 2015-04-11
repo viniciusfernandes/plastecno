@@ -743,10 +743,11 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
 	public List<Pedido> pesquisarEntregaVendaByPeriodo(Periodo periodo) {
 		StringBuilder select = new StringBuilder();
-		select.append("select p from Pedido p join fetch p.representada ");
+		select
+				.append("select new Pedido(p.id, p.dataEntrega, p.valorPedido, p.cliente.nomeFantasia, p.cliente.razaoSocial, p.representada.nomeFantasia) ");
+		select.append("from Pedido p ");
 		select.append("where p.tipoPedido != :tipoPedido and ");
 		select.append(" p.dataEntrega >= :dataInicio and ");
 		select.append("p.dataEntrega <= :dataFim and ");
@@ -761,12 +762,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
 	public List<Pedido> pesquisarEnviadosByPeriodoERepresentada(Periodo periodo, Integer idRepresentada) {
 		StringBuilder select = new StringBuilder()
-				.append("select p from Pedido p where p.situacaoPedido in :situacoes and ")
-				.append(" p.dataEnvio >= :dataInicio and ").append(" p.dataEnvio <= :dataFim and ")
-				.append("p.tipoPedido != :tipoPedido ");
+
+		.append("select new Pedido(p.id, p.dataEnvio, p.valorPedido, p.cliente.razaoSocial) ")
+				.append("from Pedido p where p.situacaoPedido in :situacoes and ").append(" p.dataEnvio >= :dataInicio and ")
+				.append(" p.dataEnvio <= :dataFim and ").append("p.tipoPedido != :tipoPedido ");
 
 		if (idRepresentada != null) {
 			select.append("and p.representada.id = :idRepresentada ");
@@ -944,10 +945,11 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
 	public List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo) {
 		StringBuilder select = new StringBuilder();
-		select.append("select p from Pedido p join fetch p.representada ");
+		select
+				.append("select new Pedido(p.id, p.tipoPedido, p.dataEntrega, p.valorPedido, p.cliente.nomeFantasia, p.cliente.razaoSocial, p.representada.nomeFantasia) ");
+		select.append("from Pedido p ");
 		select.append("where p.tipoPedido = :tipoPedido and ");
 		select.append("p.dataEnvio >= :dataInicio and ");
 		select.append("p.dataEnvio <= :dataFim and ");
@@ -966,10 +968,14 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("O ID do vendedor é obrigatório");
 		}
 
-		StringBuilder select = new StringBuilder()
-				.append("select p from Pedido p join fetch p.representada where p.situacaoPedido IN :situacoes and ")
-				.append("p.proprietario.id = :idProprietario and ").append(" p.dataEnvio >= :dataInicio and ")
-				.append(" p.dataEnvio <= :dataFim ");
+		StringBuilder select = new StringBuilder();
+		select
+				.append(
+						"select new Pedido(p.id, p.tipoPedido, p.dataEntrega, p.dataEnvio, p.valorPedido, p.cliente.nomeFantasia, p.cliente.razaoSocial, p.representada.nomeFantasia) ")
+				.append("from Pedido p ")
+
+				.append("where p.situacaoPedido IN :situacoes and ").append("p.proprietario.id = :idProprietario and ")
+				.append(" p.dataEnvio >= :dataInicio and ").append(" p.dataEnvio <= :dataFim ");
 
 		if (isCompra) {
 			select.append(" and p.tipoPedido = :tipoPedido ");
@@ -994,10 +1000,11 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
 	public List<Pedido> pesquisarPedidoVendaByPeriodo(Periodo periodo) {
 		StringBuilder select = new StringBuilder();
-		select.append("select p from Pedido p join fetch p.representada ");
+		select
+				.append("select new Pedido(p.id, p.dataEntrega, p.valorPedido, p.cliente.nomeFantasia, p.cliente.razaoSocial, p.representada.nomeFantasia) ");
+		select.append("from Pedido p ");
 		select.append("where p.tipoPedido != :tipoPedido and ");
 		select.append(" p.dataEnvio >= :dataInicio and ");
 		select.append("p.dataEnvio <= :dataFim and ");

@@ -25,6 +25,7 @@ import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ClienteWrapper;
+import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
 import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
@@ -62,7 +63,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		double totalValorComissao = 0;
 		double valorComissao = 0;
 		for (ItemPedido itemPedido : listaItemPedido) {
-			valorComissao = itemPedido.getComissao() * itemPedido.getPrecoItem();
+			valorComissao = itemPedido.calcularValorComissionado();
 			totalValorComissao += valorComissao;
 
 			itemPedido.setComissaoFormatado(NumeroUtils.formatarPercentual(itemPedido.getComissao()));
@@ -112,14 +113,58 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioComissaoVendedor(Integer idVendedor, Periodo periodo) {
-		
+
 		StringBuilder titulo = new StringBuilder();
 		titulo.append("Comissão do Vendedor de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
 				.append(StringUtils.formatarData(periodo.getFim()));
 		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor);
-		
+
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(titulo.toString(), listaItemPedido);
 		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(calcularValorComissoes(listaItemPedido)));
+		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ComissaoVendaWrapper> gerarRelatorioComissaoVendedores(Periodo periodo) {
+
+		StringBuilder titulo = new StringBuilder();
+		titulo.append("Comissão das Vendas de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
+				.append(StringUtils.formatarData(periodo.getFim()));
+		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoVendaResumidaByPeriodo(periodo);
+
+		RelatorioWrapper<Integer, ComissaoVendaWrapper> relatorio = new RelatorioWrapper<Integer, ComissaoVendaWrapper>(
+				titulo.toString());
+
+		double valorComissao = 0;
+		double valorTotalComissao = 0;
+		ComissaoVendaWrapper comissao = null;
+		String nomeVendedor = null;
+		for (ItemPedido itemPedido : listaItemPedido) {
+			nomeVendedor = itemPedido.getNomeProprietario() + " " + itemPedido.getSobrenomeProprietario();
+			comissao = relatorio.getElemento(itemPedido.getIdProprietario());
+
+			if (comissao == null) {
+				comissao = new ComissaoVendaWrapper();
+				comissao.setIdVendedor(itemPedido.getIdProprietario());
+				comissao.setNomeVendedor(nomeVendedor);
+				relatorio.addElemento(itemPedido.getIdProprietario(), comissao);
+			}
+
+			valorComissao = itemPedido.calcularValorComissionado();
+			valorTotalComissao += valorComissao;
+		
+			comissao.addPedido(itemPedido.getIdPedido());
+			comissao.addValorComissionado(valorComissao);
+			comissao.addValorVendido(itemPedido.getPrecoItem());
+		}
+
+		for (ComissaoVendaWrapper c : relatorio.getListaElemento()) {
+			c.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(c.getValorVendido()));
+			c.setValorComissaoFormatado(NumeroUtils.formatarValorMonetario(c.getValorComissao()));
+		}
+
+		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotalComissao));
 		return relatorio;
 	}
 
@@ -196,7 +241,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 			item.setNomeProprietario(pedido.getProprietario().getNomeCompleto());
 			item.setNomeRepresentada(pedido.getRepresentada().getNomeFantasia());
-			relatorio.addElemento(pedido.getId(), item).setPropriedade("dataEntrega",
+			relatorio.addGrupo(pedido.getId(), item).setPropriedade("dataEntrega",
 					StringUtils.formatarData(pedido.getDataEntrega()));
 		}
 		return relatorio;
@@ -248,7 +293,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		for (TotalizacaoPedidoWrapper totalizacao : listaPedido) {
 			try {
 				totalizacao.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(totalizacao.getValorTotal()));
-				relatorio.addElemento(totalizacao.getNomeCliente(), totalizacao);
+				relatorio.addGrupo(totalizacao.getNomeCliente(), totalizacao);
 				valorTotal += totalizacao.getValorTotal();
 			} catch (Exception e) {
 				throw new BusinessException("Falha na geracao do relatorio de vendas para o cliente " + idCliente, e);

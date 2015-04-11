@@ -92,6 +92,8 @@ public interface PedidoService {
 
 	Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido);
 
+	List<Integer> pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido);
+
 	List<Integer> pesquisarIdPedidoRevendaAguardandoEncomenda();
 
 	List<Integer> pesquisarIdPedidoRevendaEncomendada();
@@ -111,6 +113,8 @@ public interface PedidoService {
 	List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal);
 
 	List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor);
+
+	List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo);
 
 	List<Logradouro> pesquisarLogradouro(Integer idPedido);
 
@@ -166,12 +170,15 @@ public interface PedidoService {
 
 	Double pesquisarValorPedidoIPI(Integer idPedido);
 
-	List<TotalizacaoPedidoWrapper> pesquisarValorVendaClienteByPeriodo(Periodo periodo, Integer idCliente, boolean isOrcamento);
+	List<TotalizacaoPedidoWrapper> pesquisarValorVendaClienteByPeriodo(Periodo periodo, Integer idCliente,
+			boolean isOrcamento);
 
 	Pedido pesquisarVendaById(Integer id);
 
 	List<Pedido> pesquisarVendaByPeriodoEVendedor(boolean orcamento, Periodo periodo, Integer idVendedor)
 			throws BusinessException;
+
+	Usuario pesquisarVendedorByIdItemPedido(Integer idItemPedido);
 
 	void reencomendarItemPedido(Integer idItemPedido) throws BusinessException;
 

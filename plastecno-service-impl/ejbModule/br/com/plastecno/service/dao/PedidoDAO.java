@@ -150,6 +150,13 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	@SuppressWarnings("unchecked")
+	public List<Integer>  pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select p.id from ItemPedido i inner join i.pedido p where i.id IN (:listaIdItemPedido)").setParameter(
+						"listaIdItemPedido", listaIdItemPedido), List.class, null);
+	}
+	@SuppressWarnings("unchecked")
 	public List<Integer> pesquisarIdPedidoBySituacaoPedido(SituacaoPedido situacaoPedido) {
 		return entityManager.createQuery("select p.id from Pedido p where p.situacaoPedido = :situacaoPedido ")
 				.setParameter("situacaoPedido", situacaoPedido).getResultList();
@@ -300,7 +307,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Object[]> pesquisarTotalPedidoByPeriodo(Date dataInicio, Date dataFim, boolean isCompra) {
+	public List<Object[]> pesquisarValorTotalPedidoByPeriodo(Date dataInicio, Date dataFim, boolean isCompra) {
 		StringBuilder select = new StringBuilder();
 		select.append("select v.nome, r.nomeFantasia, sum(p.valorPedido) from Pedido p ");
 		select.append("inner join p.representada r ");

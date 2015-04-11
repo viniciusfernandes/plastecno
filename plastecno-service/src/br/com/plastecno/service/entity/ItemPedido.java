@@ -40,6 +40,7 @@ public class ItemPedido extends Item {
 	@Column(name = "descricao_peca")
 	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
 	private String descricaoPeca;
+
 	@Column(name = "item_encomendado")
 	private boolean encomendado;
 
@@ -67,7 +68,16 @@ public class ItemPedido extends Item {
 	private Double medidaInterna;
 
 	@Transient
+	private Integer idProprietario;
+
+	@Transient
+	private Integer idPedido;
+
+	@Transient
 	private String nomeProprietario;
+
+	@Transient
+	private String sobrenomeProprietario;
 
 	@Transient
 	private String nomeRepresentada;
@@ -125,12 +135,28 @@ public class ItemPedido extends Item {
 		this.id = id;
 	}
 
+	public ItemPedido(Integer id, Double comissao, Integer idPedido, Integer idProprietario, String nomeProprietario,
+			String sobrenomeProprietario, Double precoUnidade, Integer quantidade) {
+		this.id = id;
+		this.comissao = comissao;
+		this.idPedido = idPedido;
+		this.idProprietario = idProprietario;
+		this.nomeProprietario = nomeProprietario;
+		this.sobrenomeProprietario = sobrenomeProprietario;
+		this.precoUnidade = precoUnidade;
+		this.quantidade = quantidade;
+	}
+
 	public void addQuantidadeReservada(Integer quantidadeReservada) {
 		setQuantidadeReservada(getQuantidadeReservada() + quantidadeReservada);
 	}
 
 	public double calcularPrecoTotal() {
 		return this.quantidade != null && this.precoVenda != null ? this.quantidade * this.precoVenda : 0d;
+	}
+
+	public double calcularValorComissionado() {
+		return getComissao() * getPrecoItem();
 	}
 
 	@Override
@@ -183,6 +209,14 @@ public class ItemPedido extends Item {
 
 	public Integer getId() {
 		return id;
+	}
+
+	public Integer getIdPedido() {
+		return idPedido;
+	}
+
+	public Integer getIdProprietario() {
+		return idProprietario;
 	}
 
 	public Material getMaterial() {
@@ -249,6 +283,10 @@ public class ItemPedido extends Item {
 		return sequencial;
 	}
 
+	public String getSobrenomeProprietario() {
+		return sobrenomeProprietario;
+	}
+
 	public TipoVenda getTipoVenda() {
 		return tipoVenda;
 	}
@@ -307,6 +345,14 @@ public class ItemPedido extends Item {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public void setIdPedido(Integer idPedido) {
+		this.idPedido = idPedido;
+	}
+
+	public void setIdProprietario(Integer idProprietario) {
+		this.idProprietario = idProprietario;
 	}
 
 	public void setMaterial(Material material) {
@@ -371,6 +417,10 @@ public class ItemPedido extends Item {
 
 	public void setSequencial(Integer sequencial) {
 		this.sequencial = sequencial;
+	}
+
+	public void setSobrenomeProprietario(String sobrenomeProprietario) {
+		this.sobrenomeProprietario = sobrenomeProprietario;
 	}
 
 	public void setTipoVenda(TipoVenda tipoVenda) {

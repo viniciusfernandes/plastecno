@@ -39,8 +39,15 @@ public class RelatorioComissaoVendedorController extends AbstractController {
             if (!isAcessoPermitido(TipoAcesso.ADMINISTRACAO)) {
                 vendedor = usuarioService.pesquisarUsuarioResumidoById(vendedor.getId());
             }
-            addAtributo("relatorio", relatorioService.gerarRelatorioComissaoVendedor(vendedor.getId(), new Periodo(
-                    dataInicial, dataFinal)));
+            if (vendedor == null || vendedor.getId() == null) {
+                addAtributo("relatorio",
+                        relatorioService.gerarRelatorioComissaoVendedores(new Periodo(dataInicial, dataFinal)));
+                addAtributo("isRelatorioVendedores", true);
+            } else {
+                addAtributo("relatorio", relatorioService.gerarRelatorioComissaoVendedor(vendedor.getId(), new Periodo(
+                        dataInicial, dataFinal)));
+                addAtributo("isRelatorioVendedores", false);
+            }
             irRodapePagina();
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

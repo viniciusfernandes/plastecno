@@ -6,7 +6,11 @@ import java.util.List;
 
 public class RelatorioWrapper<T, K> {
 	private final List<GrupoWrapper<T, K>> listaGrupo = new ArrayList<GrupoWrapper<T, K>>();
+	private final List<K> listaElemento = new ArrayList<K>();
+
 	private final HashMap<Object, GrupoWrapper<T, K>> mapaGrupo = new HashMap<Object, GrupoWrapper<T, K>>();
+	private final HashMap<T, K> mapaElemento = new HashMap<T, K>();
+
 	private final String titulo;
 	private Object valorTotal;
 
@@ -14,7 +18,12 @@ public class RelatorioWrapper<T, K> {
 		this.titulo = titulo;
 	}
 
-	public GrupoWrapper<T, K> addElemento(T idGrupo, K elemento) {
+	public void addElemento(T idElemento, K elemento) {
+		listaElemento.add(elemento);
+		mapaElemento.put(idElemento, elemento);
+	}
+
+	public GrupoWrapper<T, K> addGrupo(T idGrupo, K elemento) {
 		GrupoWrapper<T, K> grupo = mapaGrupo.get(idGrupo);
 		if (grupo != null) {
 			grupo.addElemento(elemento);
@@ -26,6 +35,18 @@ public class RelatorioWrapper<T, K> {
 		listaGrupo.add(grupo);
 		mapaGrupo.put(idGrupo, grupo);
 		return grupo;
+	}
+
+	public K getElemento(T idGrupo) {
+		return mapaElemento.get(idGrupo);
+	}
+
+	public GrupoWrapper<T, K> getGrupo(T idGrupo) {
+		return mapaGrupo.get(idGrupo);
+	}
+
+	public List<K> getListaElemento() {
+		return listaElemento;
 	}
 
 	public List<GrupoWrapper<T, K>> getListaGrupo() {

@@ -14,6 +14,7 @@ import javax.persistence.PersistenceContext;
 
 import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.MaterialService;
+import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.dao.ComissaoDAO;
@@ -30,10 +31,13 @@ public class ComissaoServiceImpl implements ComissaoService {
 	private EntityManager entityManager;
 
 	@EJB
-	private UsuarioService usuarioService;
+	private MaterialService materialService;
 
 	@EJB
-	private MaterialService materialService;
+	private PedidoService pedidoService;
+
+	@EJB
+	private UsuarioService usuarioService;
 
 	@PostConstruct
 	public void init() {

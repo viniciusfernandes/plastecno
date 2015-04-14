@@ -136,7 +136,7 @@ public abstract class Item implements Serializable, Cloneable {
 		return medidaInternaFomatada;
 	}
 
-	public double getPrecoItem() {
+	public double calcularPrecoItem() {
 		if (getPrecoUnidade() == null || getQuantidade() == null) {
 			return 0d;
 		}
@@ -256,7 +256,7 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public abstract void setQuantidade(Integer quantidade);
 
-	public void setValorComissaoFormatado(String valorComissaoFormatado) {
+	public void setValorComissionadoFormatado(String valorComissaoFormatado) {
 		this.valorComissaoFormatado = valorComissaoFormatado;
 	}
 }

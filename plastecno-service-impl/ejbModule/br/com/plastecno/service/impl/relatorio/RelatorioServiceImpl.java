@@ -26,6 +26,7 @@ import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ClienteWrapper;
 import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
+import br.com.plastecno.service.wrapper.FaturamentoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
 import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
@@ -59,17 +60,50 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@EJB
 	private UsuarioService usuarioService;
 
-	private double calcularValorComissoes(List<ItemPedido> listaItemPedido) {
-		double totalValorComissao = 0;
-		double valorComissao = 0;
-		for (ItemPedido itemPedido : listaItemPedido) {
-			valorComissao = itemPedido.calcularValorComissionado();
-			totalValorComissao += valorComissao;
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public FaturamentoWrapper gerarFaturamento(Periodo periodo) {
+		double valorComprado = 0;
+		double valorVendido = 0;
+		double valorICMS = 0;
+		double valorDebitoIPI = 0;
+		double valorCreditoIPI = 0;
+		double aliquota = 0;
+		double precoItem = 0;
 
-			itemPedido.setComissaoFormatado(NumeroUtils.formatarPercentual(itemPedido.getComissao()));
-			itemPedido.setValorComissaoFormatado(NumeroUtils.formatarValorMonetario(valorComissao));
+		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoCompradoResumidoByPeriodo(periodo);
+		for (ItemPedido itemPedido : listaItemComprado) {
+			precoItem = itemPedido.calcularPrecoItem();
+			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido.getAliquotaIPI();
+
+			valorComprado += precoItem;
+			valorCreditoIPI += precoItem * aliquota;
 		}
-		return totalValorComissao;
+
+		List<ItemPedido> listaItemVendido = pedidoService.pesquisarItemPedidoRevendaByPeriodo(periodo);
+		for (ItemPedido itemPedido : listaItemVendido) {
+			precoItem = itemPedido.calcularPrecoItem();
+			valorVendido += precoItem;
+
+			aliquota = itemPedido.getAliquotaICMS() == null ? 0 : itemPedido.getAliquotaICMS();
+			valorICMS += precoItem * aliquota;
+
+			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido.getAliquotaIPI();
+			valorDebitoIPI += precoItem * aliquota;
+		}
+
+		double valorIPI = valorDebitoIPI - valorCreditoIPI;
+		double valorFaturado = valorVendido - valorIPI - valorICMS;
+
+		FaturamentoWrapper faturamento = new FaturamentoWrapper();
+		faturamento.setValorCompradoFormatado(NumeroUtils.formatarValorMonetario(valorComprado));
+		faturamento.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(valorVendido));
+		faturamento.setValorCreditoIPIFormatado(NumeroUtils.formatarValorMonetario(valorCreditoIPI));
+		faturamento.setValorDebitoIPIFormatado(NumeroUtils.formatarValorMonetario(valorDebitoIPI));
+		faturamento.setValorICMSFormatado(NumeroUtils.formatarValorMonetario(valorICMS));
+		faturamento.setValorIPIFormatado(NumeroUtils.formatarValorMonetario(valorIPI));
+		faturamento.setValorFaturadoFormatado(NumeroUtils.formatarValorMonetario(valorFaturado));
+		return faturamento;
 	}
 
 	@Override
@@ -120,7 +154,12 @@ public class RelatorioServiceImpl implements RelatorioService {
 		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor);
 
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(titulo.toString(), listaItemPedido);
-		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(calcularValorComissoes(listaItemPedido)));
+		
+		double valorTotalComissionado = 0;
+		for (ItemPedido itemPedido : listaItemPedido) {
+			valorTotalComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
+		}
+		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotalComissionado));
 		return relatorio;
 	}
 
@@ -136,8 +175,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 		RelatorioWrapper<Integer, ComissaoVendaWrapper> relatorio = new RelatorioWrapper<Integer, ComissaoVendaWrapper>(
 				titulo.toString());
 
-		double valorComissao = 0;
-		double valorTotalComissao = 0;
+		double valorComissionado = 0;
+		double valorTotalComissionado = 0;
 		ComissaoVendaWrapper comissao = null;
 		String nomeVendedor = null;
 		for (ItemPedido itemPedido : listaItemPedido) {
@@ -151,12 +190,12 @@ public class RelatorioServiceImpl implements RelatorioService {
 				relatorio.addElemento(itemPedido.getIdProprietario(), comissao);
 			}
 
-			valorComissao = itemPedido.calcularValorComissionado();
-			valorTotalComissao += valorComissao;
-		
+			valorComissionado = itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
+			valorTotalComissionado += valorComissionado;
+
 			comissao.addPedido(itemPedido.getIdPedido());
-			comissao.addValorComissionado(valorComissao);
-			comissao.addValorVendido(itemPedido.getPrecoItem());
+			comissao.addValorComissionado(valorComissionado);
+			comissao.addValorVendido(itemPedido.calcularPrecoItem());
 		}
 
 		for (ComissaoVendaWrapper c : relatorio.getListaElemento()) {
@@ -164,7 +203,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 			c.setValorComissaoFormatado(NumeroUtils.formatarValorMonetario(c.getValorComissao()));
 		}
 
-		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotalComissao));
+		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotalComissionado));
 		return relatorio;
 	}
 
@@ -222,6 +261,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 				pedidoService.pesquisarItemEncomenda(idCliente, periodo));
 	}
 
+	@REVIEW(descricao = "Nem sempre eh necessario carregar as informacoes da representada")
 	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(String titulo, List<ItemPedido> listaItem) {
 		/*
 		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
@@ -237,10 +277,12 @@ public class RelatorioServiceImpl implements RelatorioService {
 			item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
 			item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
 			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
-			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoItem()));
-
+			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
+			item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
 			item.setNomeProprietario(pedido.getProprietario().getNomeCompleto());
 			item.setNomeRepresentada(pedido.getRepresentada().getNomeFantasia());
+			item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
+			
 			relatorio.addGrupo(pedido.getId(), item).setPropriedade("dataEntrega",
 					StringUtils.formatarData(pedido.getDataEntrega()));
 		}

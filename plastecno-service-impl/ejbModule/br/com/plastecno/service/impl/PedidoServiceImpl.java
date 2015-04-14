@@ -65,6 +65,9 @@ public class PedidoServiceImpl implements PedidoService {
 	private ClienteService clienteService;
 
 	@EJB
+	private ComissaoService comissaoService;
+
+	@EJB
 	private EmailService emailService;
 
 	@PersistenceContext(name = "plastecno")
@@ -91,9 +94,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private UsuarioService usuarioService;
-
-	@EJB
-	private ComissaoService comissaoService;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -232,35 +232,6 @@ public class PedidoServiceImpl implements PedidoService {
 		return pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido) > 0;
 	}
 
-	private void definirComissaoVenda(Pedido pedido) throws BusinessException {
-		if (!pedido.isVenda()) {
-			return;
-		}
-		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
-		Comissao comissaoVendedor = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
-		Comissao comissao = null;
-		for (ItemPedido itemPedido : listaItem) {
-			if (pedido.isRevenda()) {
-				comissao = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
-						.getFormaMaterial().indexOf());
-				if (comissao == null) {
-					comissao = comissaoVendedor;
-				}
-			} else if (pedido.isRepresentacao()) {
-				comissao = comissaoVendedor;
-			}
-
-			if (comissao == null) {
-				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
-				throw new BusinessException("Não existe comissão configurada para o vendedor \"" + vendedor.getNomeCompleto()
-						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
-						+ pedido.getId());
-			}
-			itemPedido.setComissao(comissao.getValor());
-			itemPedidoDAO.alterar(itemPedido);
-		}
-	}
-
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
 	private void definirTipoPedido(Pedido pedido) {
 		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
@@ -396,7 +367,7 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido.isOrcamento()) {
 			enviarOrcamento(pedido, arquivoAnexado);
 		} else {
-			definirComissaoVenda(pedido);
+			inserirComissaoVenda(pedido);
 			enviarVenda(pedido, arquivoAnexado);
 		}
 		if (pedido.isCompra()) {
@@ -543,6 +514,47 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		return pedido;
+	}
+
+	private void inserirComissaoVenda(Pedido pedido) throws BusinessException {
+		if (!pedido.isVenda()) {
+			return;
+		}
+		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
+		Comissao comissaoVendedor = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
+		Comissao comissao = null;
+		for (ItemPedido itemPedido : listaItem) {
+			if (pedido.isRevenda()) {
+				comissao = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
+						.getFormaMaterial().indexOf());
+				if (comissao == null) {
+					comissao = comissaoVendedor;
+				}
+			} else if (pedido.isRepresentacao()) {
+				comissao = comissaoVendedor;
+			}
+
+			if (comissao == null) {
+				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
+				throw new BusinessException("Não existe comissão configurada para o vendedor \"" + vendedor.getNomeCompleto()
+						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
+						+ pedido.getId());
+			}
+
+			double valorComissionado = 0;
+			double precoCusto = 0;
+			if (pedido.isRevenda()) {
+				precoCusto = estoqueService.pesquisarPrecoMedioItemEstoque(itemPedido);
+				valorComissionado = (itemPedido.calcularPrecoItem() - precoCusto) * comissao.getValor();
+			} else {
+				valorComissionado = itemPedido.calcularPrecoItem() * comissao.getValor();
+			}
+
+			itemPedido.setPrecoCusto(precoCusto);
+			itemPedido.setAliquotaComissao(comissao.getValor());
+			itemPedido.setValorComissionado(valorComissionado);
+			itemPedidoDAO.alterar(itemPedido);
+		}
 	}
 
 	@Override
@@ -849,6 +861,13 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@REVIEW
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo) {
+		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoCompraEfetivada(), TipoPedido.COMPRA);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoEncomendado() {
 		return pesquisarItemPedidoEncomendado(null, null, null);
@@ -861,20 +880,26 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoRevendaByPeriodo(Periodo periodo) {
+		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoVendaEfetivada(), TipoPedido.REVENDA);
+	}
+
+	@Override
 	public List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor) {
 		if (idVendedor == null) {
 			return new ArrayList<ItemPedido>();
 		}
 
-		return pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor, false);
+		return pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, idVendedor, false);
 	}
 
-	private List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor,
+	private List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,
 			boolean isContrutorResumido) {
 		StringBuilder select = new StringBuilder();
 		if (isContrutorResumido) {
 			select
-					.append("select new ItemPedido(i.id, i.comissao, i.pedido.id, i.pedido.proprietario.id, i.pedido.proprietario.nome, i.pedido.proprietario.sobrenome, i.precoUnidade, i.quantidade) ");
+					.append("select new ItemPedido(i.id, i.pedido.id, i.pedido.proprietario.id, i.pedido.proprietario.nome, i.pedido.proprietario.sobrenome, i.precoUnidade, i.quantidade, i.valorComissionado) ");
 		} else {
 			select.append("select i ");
 		}
@@ -900,7 +925,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
-		return pesquisarItemPedidoVendaByPeriodo(periodo, null, true);
+		return pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null, true);
 	}
 
 	@Override
@@ -1084,6 +1109,11 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	public List<SituacaoPedido> pesquisarSituacaoRevendaEfetivada() {
+		return pedidoDAO.pesquisarSituacaoRevendaEfetivada();
+	}
+
+	@Override
 	public List<SituacaoPedido> pesquisarSituacaoVendaEfetivada() {
 		return pedidoDAO.pesquisarSituacaoVendaEfetivada();
 	}
@@ -1162,6 +1192,21 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo) {
 		return pedidoDAO.pesquisarValorTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), false);
+	}
+
+	private List<ItemPedido> pesquisarValoresItemPedidoResumidoByPeriodo(Periodo periodo,
+			List<SituacaoPedido> listaSituacao, TipoPedido tipoPedido) {
+		StringBuilder select = new StringBuilder();
+		select
+				.append("select new ItemPedido(i.precoUnidade, i.quantidade, i.aliquotaIPI, i.aliquotaICMS) from ItemPedido i ");
+		select.append("where i.pedido.tipoPedido = :tipoPedido and ");
+		select.append("i.pedido.dataEnvio >= :dataInicio and ");
+		select.append("i.pedido.dataEnvio <= :dataFim and ");
+		select.append("i.pedido.situacaoPedido in :situacoes ");
+
+		return this.entityManager.createQuery(select.toString(), ItemPedido.class)
+				.setParameter("dataInicio", periodo.getInicio()).setParameter("dataFim", periodo.getFim())
+				.setParameter("situacoes", listaSituacao).setParameter("tipoPedido", tipoPedido).getResultList();
 	}
 
 	@Override

@@ -90,17 +90,23 @@ public class PedidoController extends AbstractController {
 
     @Servico
     private ClienteService clienteService;
+
     private String diretorioTemplateRelatorio;
+
     @Servico
     private FormaMaterialService formaMaterialService;
+
     private GeradorRelatorioPDF geradorRelatorio;
+
     @Servico
     private MaterialService materialService;
+
     @Servico
     private PedidoService pedidoService;
 
     @Servico
     private RepresentadaService representadaService;
+
     @Servico
     private TipoEntregaService tipoEntregaService;
 

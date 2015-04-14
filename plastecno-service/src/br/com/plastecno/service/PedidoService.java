@@ -108,9 +108,13 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
+	List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo);
+
 	List<ItemPedido> pesquisarItemPedidoEncomendado();
 
 	List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal);
+
+	List<ItemPedido> pesquisarItemPedidoRevendaByPeriodo(Periodo periodo);
 
 	List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor);
 
@@ -151,6 +155,8 @@ public interface PedidoService {
 	SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido);
 
 	SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido);
+
+	List<SituacaoPedido> pesquisarSituacaoRevendaEfetivada();
 
 	List<SituacaoPedido> pesquisarSituacaoVendaEfetivada();
 

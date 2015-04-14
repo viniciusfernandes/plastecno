@@ -61,7 +61,14 @@
 							<li><a href="comissao" target="principal_frame">Comissão</a></li>
 						</c:if>
 						<li><a href="regiao" target="principal_frame">Regiões</a></li>
-					</ul></li>
+					</ul>
+				</li>
+				<li><a href="javascript: void(0)">Faturamento</a>
+					<ul>
+						<li><a href="relatorio/faturamento" target="principal_frame">Faturamento</a></li>
+						<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Vendedor</a></li>
+					</ul>
+				</li>
 
 
 				<li><a href="javascript: void(0)">Relatórios</a>

@@ -154,6 +154,15 @@ public class Pedido implements Serializable, Cloneable {
 		this.id = id;
 	}
 
+	public Pedido(Integer id, Date dataEnvio, Double valorPedido, String razaoSocialCliente) {
+		this.id = id;
+		this.dataEnvio = dataEnvio;
+		this.valorPedido = valorPedido;
+
+		this.cliente = new Cliente();
+		this.cliente.setRazaoSocial(razaoSocialCliente);
+	}
+
 	public Pedido(Integer id, Date dataEnvio, Double valorPedido, String nomeFantasiaCliente, String nomeProprietario) {
 		this.id = id;
 		this.dataEnvio = dataEnvio;
@@ -177,7 +186,19 @@ public class Pedido implements Serializable, Cloneable {
 		this.cliente.setRazaoSocial(razaoSocialCliente);
 
 		this.representada = new Representada();
-		this.representada.setRazaoSocial(nomeFantasiaRepresentada);
+		this.representada.setNomeFantasia(nomeFantasiaRepresentada);
+	}
+
+	public Pedido(Integer id, TipoPedido tipoPedido, Date dataEntrega, Date dataEnvio, Double valorPedido,
+			String nomeFantasiaCliente, String razaoSocialCliente, String nomeFantasiaRepresentada) {
+		this(id, tipoPedido, dataEntrega, valorPedido, nomeFantasiaCliente, razaoSocialCliente, nomeFantasiaRepresentada);
+		this.dataEnvio = dataEnvio;
+	}
+
+	public Pedido(Integer id, TipoPedido tipoPedido, Date dataEntrega, Double valorPedido, String nomeFantasiaCliente,
+			String razaoSocialCliente, String nomeFantasiaRepresentada) {
+		this(id, dataEntrega, valorPedido, nomeFantasiaCliente, razaoSocialCliente, nomeFantasiaRepresentada);
+		this.tipoPedido = tipoPedido;
 	}
 
 	public void addLogradouro(List<? extends Logradouro> listaLogradouro) {

@@ -65,6 +65,9 @@ public class PedidoServiceImpl implements PedidoService {
 	private ClienteService clienteService;
 
 	@EJB
+	private ComissaoService comissaoService;
+
+	@EJB
 	private EmailService emailService;
 
 	@PersistenceContext(name = "plastecno")
@@ -91,9 +94,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private UsuarioService usuarioService;
-
-	@EJB
-	private ComissaoService comissaoService;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -151,6 +151,12 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarSituacaoPedidoAguardandoEncomendaByIdPedido(Integer idPedido) {
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
 	}
 
 	@Override
@@ -230,35 +236,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido) {
 		return pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido) > 0;
-	}
-
-	private void definirComissaoVenda(Pedido pedido) throws BusinessException {
-		if (!pedido.isVenda()) {
-			return;
-		}
-		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
-		Comissao comissaoVendedor = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
-		Comissao comissao = null;
-		for (ItemPedido itemPedido : listaItem) {
-			if (pedido.isRevenda()) {
-				comissao = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
-						.getFormaMaterial().indexOf());
-				if (comissao == null) {
-					comissao = comissaoVendedor;
-				}
-			} else if (pedido.isRepresentacao()) {
-				comissao = comissaoVendedor;
-			}
-
-			if (comissao == null) {
-				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
-				throw new BusinessException("Não existe comissão configurada para o vendedor \"" + vendedor.getNomeCompleto()
-						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
-						+ pedido.getId());
-			}
-			itemPedido.setComissao(comissao.getValor());
-			itemPedidoDAO.alterar(itemPedido);
-		}
 	}
 
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
@@ -396,13 +373,22 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido.isOrcamento()) {
 			enviarOrcamento(pedido, arquivoAnexado);
 		} else {
-			definirComissaoVenda(pedido);
+			inserirComissaoVenda(pedido);
 			enviarVenda(pedido, arquivoAnexado);
 		}
 		if (pedido.isCompra()) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		}
 		pedidoDAO.alterar(pedido);
+	}
+
+	@Override
+	public boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException {
+		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
+		if (!empacotamentoOk) {
+			alterarSituacaoPedidoAguardandoEncomendaByIdPedido(idPedido);
+		}
+		return empacotamentoOk;
 	}
 
 	@Override
@@ -543,6 +529,56 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		return pedido;
+	}
+
+	private void inserirComissaoVenda(Pedido pedido) throws BusinessException {
+		if (!pedido.isVenda()) {
+			return;
+		}
+		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
+		Comissao comissaoVendedor = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
+		Comissao comissao = null;
+		for (ItemPedido itemPedido : listaItem) {
+			if (pedido.isRevenda()) {
+				comissao = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
+						.getFormaMaterial().indexOf());
+				if (comissao == null) {
+					comissao = comissaoVendedor;
+				}
+			} else if (pedido.isRepresentacao()) {
+				comissao = comissaoVendedor;
+			}
+
+			if (comissao == null) {
+				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
+				throw new BusinessException("Não existe comissão configurada para o vendedor \"" + vendedor.getNomeCompleto()
+						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
+						+ pedido.getId());
+			}
+
+			double valorComissionado = 0;
+			double precoCusto = 0;
+			double aliquotaComissao = comissao.getValor();
+			double precoItem = itemPedido.calcularPrecoItem();
+			if (pedido.isRepresentacao()) {
+				double comissaoRepresentada = pesquisarComissaoRepresentadaByIdPedido(pedido.getId());
+				// Aqui estamos compondo a comissao pago pela representada com a
+				// comissao para para o vendedor.
+				aliquotaComissao *= comissaoRepresentada;
+			}
+
+			if (pedido.isRevenda()) {
+				precoCusto = estoqueService.calcularPrecoMedioItemEstoque(itemPedido);
+				precoItem -= precoCusto;
+			}
+
+			valorComissionado = precoItem * aliquotaComissao;
+
+			itemPedido.setPrecoCusto(precoCusto);
+			itemPedido.setAliquotaComissao(aliquotaComissao);
+			itemPedido.setValorComissionado(valorComissionado);
+			itemPedidoDAO.alterar(itemPedido);
+		}
 	}
 
 	@Override
@@ -708,6 +744,13 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido) {
+		Double comissao = pedidoDAO.pesquisarComissaoRepresentadaByIdPedido(idPedido);
+		return comissao == null ? 0 : comissao;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo) {
 		return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
@@ -743,10 +786,11 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
 	public List<Pedido> pesquisarEntregaVendaByPeriodo(Periodo periodo) {
 		StringBuilder select = new StringBuilder();
-		select.append("select p from Pedido p join fetch p.representada ");
+		select
+				.append("select new Pedido(p.id, p.dataEntrega, p.valorPedido, p.cliente.nomeFantasia, p.cliente.razaoSocial, p.representada.nomeFantasia) ");
+		select.append("from Pedido p ");
 		select.append("where p.tipoPedido != :tipoPedido and ");
 		select.append(" p.dataEntrega >= :dataInicio and ");
 		select.append("p.dataEntrega <= :dataFim and ");
@@ -761,12 +805,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
 	public List<Pedido> pesquisarEnviadosByPeriodoERepresentada(Periodo periodo, Integer idRepresentada) {
 		StringBuilder select = new StringBuilder()
-				.append("select p from Pedido p where p.situacaoPedido in :situacoes and ")
-				.append(" p.dataEnvio >= :dataInicio and ").append(" p.dataEnvio <= :dataFim and ")
-				.append("p.tipoPedido != :tipoPedido ");
+
+		.append("select new Pedido(p.id, p.dataEnvio, p.valorPedido, p.cliente.razaoSocial) ")
+				.append("from Pedido p where p.situacaoPedido in :situacoes and ").append(" p.dataEnvio >= :dataInicio and ")
+				.append(" p.dataEnvio <= :dataFim and ").append("p.tipoPedido != :tipoPedido ");
 
 		if (idRepresentada != null) {
 			select.append("and p.representada.id = :idRepresentada ");
@@ -848,6 +892,13 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@REVIEW
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo) {
+		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoCompraEfetivada(), TipoPedido.COMPRA);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoEncomendado() {
 		return pesquisarItemPedidoEncomendado(null, null, null);
@@ -860,20 +911,26 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoRevendaByPeriodo(Periodo periodo) {
+		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoVendaEfetivada(), TipoPedido.REVENDA);
+	}
+
+	@Override
 	public List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor) {
 		if (idVendedor == null) {
 			return new ArrayList<ItemPedido>();
 		}
 
-		return pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor, false);
+		return pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, idVendedor, false);
 	}
 
-	private List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor,
+	private List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,
 			boolean isContrutorResumido) {
 		StringBuilder select = new StringBuilder();
 		if (isContrutorResumido) {
 			select
-					.append("select new ItemPedido(i.id, i.comissao, i.pedido.id, i.pedido.proprietario.id, i.pedido.proprietario.nome, i.pedido.proprietario.sobrenome, i.precoUnidade, i.quantidade) ");
+					.append("select new ItemPedido(i.id, i.pedido.id, i.pedido.proprietario.id, i.pedido.proprietario.nome, i.pedido.proprietario.sobrenome, i.precoUnidade, i.quantidade, i.valorComissionado) ");
 		} else {
 			select.append("select i ");
 		}
@@ -899,7 +956,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
-		return pesquisarItemPedidoVendaByPeriodo(periodo, null, true);
+		return pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null, true);
 	}
 
 	@Override
@@ -944,10 +1001,11 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
 	public List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo) {
 		StringBuilder select = new StringBuilder();
-		select.append("select p from Pedido p join fetch p.representada ");
+		select
+				.append("select new Pedido(p.id, p.tipoPedido, p.dataEntrega, p.valorPedido, p.cliente.nomeFantasia, p.cliente.razaoSocial, p.representada.nomeFantasia) ");
+		select.append("from Pedido p ");
 		select.append("where p.tipoPedido = :tipoPedido and ");
 		select.append("p.dataEnvio >= :dataInicio and ");
 		select.append("p.dataEnvio <= :dataFim and ");
@@ -966,10 +1024,14 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("O ID do vendedor é obrigatório");
 		}
 
-		StringBuilder select = new StringBuilder()
-				.append("select p from Pedido p join fetch p.representada where p.situacaoPedido IN :situacoes and ")
-				.append("p.proprietario.id = :idProprietario and ").append(" p.dataEnvio >= :dataInicio and ")
-				.append(" p.dataEnvio <= :dataFim ");
+		StringBuilder select = new StringBuilder();
+		select
+				.append(
+						"select new Pedido(p.id, p.tipoPedido, p.dataEntrega, p.dataEnvio, p.valorPedido, p.cliente.nomeFantasia, p.cliente.razaoSocial, p.representada.nomeFantasia) ")
+				.append("from Pedido p ")
+
+				.append("where p.situacaoPedido IN :situacoes and ").append("p.proprietario.id = :idProprietario and ")
+				.append(" p.dataEnvio >= :dataInicio and ").append(" p.dataEnvio <= :dataFim ");
 
 		if (isCompra) {
 			select.append(" and p.tipoPedido = :tipoPedido ");
@@ -994,10 +1056,11 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@REVIEW(data = "19/02/2015", descricao = "Redefinir o conteudo retornado pela query para gerar apenas a informacao necessaria")
 	public List<Pedido> pesquisarPedidoVendaByPeriodo(Periodo periodo) {
 		StringBuilder select = new StringBuilder();
-		select.append("select p from Pedido p join fetch p.representada ");
+		select
+				.append("select new Pedido(p.id, p.dataEntrega, p.valorPedido, p.cliente.nomeFantasia, p.cliente.razaoSocial, p.representada.nomeFantasia) ");
+		select.append("from Pedido p ");
 		select.append("where p.tipoPedido != :tipoPedido and ");
 		select.append(" p.dataEnvio >= :dataInicio and ");
 		select.append("p.dataEnvio <= :dataFim and ");
@@ -1074,6 +1137,11 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
 		return pedidoDAO.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
+	}
+
+	@Override
+	public List<SituacaoPedido> pesquisarSituacaoRevendaEfetivada() {
+		return pedidoDAO.pesquisarSituacaoRevendaEfetivada();
 	}
 
 	@Override
@@ -1155,6 +1223,21 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo) {
 		return pedidoDAO.pesquisarValorTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), false);
+	}
+
+	private List<ItemPedido> pesquisarValoresItemPedidoResumidoByPeriodo(Periodo periodo,
+			List<SituacaoPedido> listaSituacao, TipoPedido tipoPedido) {
+		StringBuilder select = new StringBuilder();
+		select
+				.append("select new ItemPedido(i.precoUnidade, i.quantidade, i.aliquotaIPI, i.aliquotaICMS) from ItemPedido i ");
+		select.append("where i.pedido.tipoPedido = :tipoPedido and ");
+		select.append("i.pedido.dataEnvio >= :dataInicio and ");
+		select.append("i.pedido.dataEnvio <= :dataFim and ");
+		select.append("i.pedido.situacaoPedido in :situacoes ");
+
+		return this.entityManager.createQuery(select.toString(), ItemPedido.class)
+				.setParameter("dataInicio", periodo.getInicio()).setParameter("dataFim", periodo.getFim())
+				.setParameter("situacoes", listaSituacao).setParameter("tipoPedido", tipoPedido).getResultList();
 	}
 
 	@Override

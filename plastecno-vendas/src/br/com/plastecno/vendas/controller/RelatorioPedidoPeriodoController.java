@@ -25,7 +25,7 @@ public class RelatorioPedidoPeriodoController extends AbstractController {
     }
 
     @Get("relatorio/pedido/listagem")
-    public void pesquisarPediddoByPeriodo(Date dataInicial, Date dataFinal, boolean isCompra, boolean isEntrega) {
+    public void pesquisarPedidoByPeriodo(Date dataInicial, Date dataFinal, boolean isCompra, boolean isEntrega) {
         try {
             List<Pedido> listaPedido = null;
             if (isEntrega) {

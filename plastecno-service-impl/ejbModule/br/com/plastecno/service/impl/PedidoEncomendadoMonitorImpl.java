@@ -12,15 +12,15 @@ import javax.ejb.Singleton;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 
-import br.com.plastecno.service.MonitorPedidoEncomendadoService;
+import br.com.plastecno.service.PedidoEncomendadoMonitor;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
-public class MonitorPedidoEncomendadoServiceImpl implements MonitorPedidoEncomendadoService {
+public class PedidoEncomendadoMonitorImpl implements PedidoEncomendadoMonitor {
 
-	private Logger logger = Logger.getLogger(MonitorPedidoEncomendadoServiceImpl.class.getName());
+	private Logger logger = Logger.getLogger(PedidoEncomendadoMonitorImpl.class.getName());
 
 	@EJB
 	private PedidoService pedidoService;

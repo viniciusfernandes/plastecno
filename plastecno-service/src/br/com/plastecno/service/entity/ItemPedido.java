@@ -27,6 +27,12 @@ public class ItemPedido extends Item {
 	 */
 	private static final long serialVersionUID = 3602081055672681943L;
 
+	@Column(name = "aliquota_comissao")
+	private Double aliquotaComissao;
+
+	@Transient
+	private String aliquotaComissaoFormatado;
+
 	@Column(name = "aliquota_icms")
 	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
@@ -54,30 +60,24 @@ public class ItemPedido extends Item {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemPedidoSequence")
 	private Integer id;
 
+	@Transient
+	private Integer idPedido;
+
+	@Transient
+	private Integer idProprietario;
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao pedido")
 	private Material material;
 
-	private Double comissao;
-
 	@Column(name = "medida_externa")
 	private Double medidaExterna;
-
 	@Column(name = "medida_interna")
 	private Double medidaInterna;
 
 	@Transient
-	private Integer idProprietario;
-
-	@Transient
-	private Integer idPedido;
-
-	@Transient
 	private String nomeProprietario;
-
-	@Transient
-	private String sobrenomeProprietario;
 
 	@Transient
 	private String nomeRepresentada;
@@ -86,6 +86,13 @@ public class ItemPedido extends Item {
 	@JoinColumn(name = "id_pedido", referencedColumnName = "id", nullable = false)
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Pedido associado ao item")
 	private Pedido pedido;
+
+	@Column(name = "preco_custo")
+	@InformacaoValidavel(obrigatorio = false, numerico = true, positivo = true, nomeExibicao = "Preço de custo do item do pedido")
+	private Double precoCusto;
+
+	@Transient
+	private String precoCustoItemFormatado;
 
 	@Column(name = "preco_unidade")
 	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = false, nomeExibicao = "Preço da unidade item do pedido")
@@ -119,12 +126,27 @@ public class ItemPedido extends Item {
 
 	private Integer sequencial;
 
+	@Transient
+	private String sobrenomeProprietario;
+
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_tipo_venda")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo de venda do item do pedido")
 	private TipoVenda tipoVenda;
 
+	@Column(name = "valor_comissionado")
+	private Double valorComissionado;
+
+	@Transient
+	private String valorComissionadoFormatado;
+
 	public ItemPedido() {
+	}
+
+	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS) {
+		this(null, null, null, null, null, precoUnidade, quantidade, null);
+		this.aliquotaIPI = aliquotaIPI;
+		this.aliquotaICMS = aliquotaICMS;
 	}
 
 	public ItemPedido(FormaMaterial formaMaterial) {
@@ -135,16 +157,16 @@ public class ItemPedido extends Item {
 		this.id = id;
 	}
 
-	public ItemPedido(Integer id, Double comissao, Integer idPedido, Integer idProprietario, String nomeProprietario,
-			String sobrenomeProprietario, Double precoUnidade, Integer quantidade) {
+	public ItemPedido(Integer id, Integer idPedido, Integer idProprietario, String nomeProprietario,
+			String sobrenomeProprietario, Double precoUnidade, Integer quantidade, Double valorComissionado) {
 		this.id = id;
-		this.comissao = comissao;
 		this.idPedido = idPedido;
 		this.idProprietario = idProprietario;
 		this.nomeProprietario = nomeProprietario;
 		this.sobrenomeProprietario = sobrenomeProprietario;
 		this.precoUnidade = precoUnidade;
 		this.quantidade = quantidade;
+		this.valorComissionado = valorComissionado;
 	}
 
 	public void addQuantidadeReservada(Integer quantidadeReservada) {
@@ -153,10 +175,6 @@ public class ItemPedido extends Item {
 
 	public double calcularPrecoTotal() {
 		return this.quantidade != null && this.precoVenda != null ? this.quantidade * this.precoVenda : 0d;
-	}
-
-	public double calcularValorComissionado() {
-		return getComissao() * getPrecoItem();
 	}
 
 	@Override
@@ -183,16 +201,20 @@ public class ItemPedido extends Item {
 		return this.formaMaterial != null && this.formaMaterial.contemLargura();
 	}
 
+	public double getAliquotaComissao() {
+		return aliquotaComissao;
+	}
+
+	public String getAliquotaComissaoFormatado() {
+		return aliquotaComissaoFormatado;
+	}
+
 	public Double getAliquotaICMS() {
 		return aliquotaICMS;
 	}
 
 	public Double getAliquotaIPI() {
 		return aliquotaIPI;
-	}
-
-	public Double getComissao() {
-		return comissao;
 	}
 
 	public Double getComprimento() {
@@ -243,6 +265,18 @@ public class ItemPedido extends Item {
 		return pedido;
 	}
 
+	public double getPercentualComissao() {
+		return aliquotaComissao == null ? 0 : aliquotaComissao * 100;
+	}
+
+	public Double getPrecoCusto() {
+		return precoCusto;
+	}
+
+	public String getPrecoCustoItemFormatado() {
+		return precoCustoItemFormatado;
+	}
+
 	public Double getPrecoUnidade() {
 		return precoUnidade;
 	}
@@ -291,6 +325,14 @@ public class ItemPedido extends Item {
 		return tipoVenda;
 	}
 
+	public Double getValorComissionado() {
+		return valorComissionado;
+	}
+
+	public String getValorComissionadoFormatado() {
+		return valorComissionadoFormatado;
+	}
+
 	public boolean isEncomendado() {
 		return encomendado;
 	}
@@ -315,16 +357,20 @@ public class ItemPedido extends Item {
 		return TipoVenda.KILO.equals(this.tipoVenda);
 	}
 
+	public void setAliquotaComissao(Double aliquotaComissao) {
+		this.aliquotaComissao = aliquotaComissao;
+	}
+
+	public void setAliquotaComissaoFormatado(String aliquotaComissaoFormatado) {
+		this.aliquotaComissaoFormatado = aliquotaComissaoFormatado;
+	}
+
 	public void setAliquotaICMS(Double aliquotaICMS) {
 		this.aliquotaICMS = aliquotaICMS;
 	}
 
 	public void setAliquotaIPI(Double aliquotaIPI) {
 		this.aliquotaIPI = aliquotaIPI;
-	}
-
-	public void setComissao(Double comissao) {
-		this.comissao = comissao;
 	}
 
 	public void setComprimento(Double comprimento) {
@@ -379,6 +425,14 @@ public class ItemPedido extends Item {
 		this.pedido = pedido;
 	}
 
+	public void setPrecoCusto(Double precoCusto) {
+		this.precoCusto = precoCusto;
+	}
+
+	public void setPrecoCustoItemFormatado(String precoCustoFormatado) {
+		this.precoCustoItemFormatado = precoCustoFormatado;
+	}
+
 	public void setPrecoUnidade(Double precoUnidade) {
 		this.precoUnidade = precoUnidade;
 	}
@@ -426,4 +480,13 @@ public class ItemPedido extends Item {
 	public void setTipoVenda(TipoVenda tipoVenda) {
 		this.tipoVenda = tipoVenda;
 	}
+
+	public void setValorComissionado(Double valorComissionado) {
+		this.valorComissionado = valorComissionado;
+	}
+
+	public void setValorComissionadoFormatado(String valorComissionadoFormatado) {
+		this.valorComissionadoFormatado = valorComissionadoFormatado;
+	}
+
 }

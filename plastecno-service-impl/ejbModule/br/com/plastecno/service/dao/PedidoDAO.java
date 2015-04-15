@@ -111,6 +111,12 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Pedido.class, null);
 	}
 
+	public Double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery("select p.representada.comissao from Pedido p where p.id = :idPedido")
+						.setParameter("idPedido", idPedido), Double.class, 0d);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarCompraPendenteRecebimento() {
 		StringBuilder select = new StringBuilder();
@@ -150,12 +156,13 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer>  pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido) {
+	public List<Integer> pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
 						"select p.id from ItemPedido i inner join i.pedido p where i.id IN (:listaIdItemPedido)").setParameter(
 						"listaIdItemPedido", listaIdItemPedido), List.class, null);
 	}
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> pesquisarIdPedidoBySituacaoPedido(SituacaoPedido situacaoPedido) {
 		return entityManager.createQuery("select p.id from Pedido p where p.situacaoPedido = :situacaoPedido ")
@@ -263,6 +270,12 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						"idItemPedido", idItemPedido), SituacaoPedido.class, null);
 	}
 
+	public List<SituacaoPedido> pesquisarSituacaoRevendaEfetivada() {
+		List<SituacaoPedido> situacoes = pesquisarSituacaoVendaEfetivada();
+		situacoes.remove(SituacaoPedido.ENVIADO);
+		return situacoes;
+	}
+
 	public List<SituacaoPedido> pesquisarSituacaoVendaEfetivada() {
 		List<SituacaoPedido> situacoes = new ArrayList<SituacaoPedido>();
 		situacoes.add(SituacaoPedido.REVENDA_ENCOMENDADA);
@@ -306,6 +319,22 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Long.class, 0L);
 	}
 
+	public Double pesquisarValorPedido(Integer idPedido) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i.valorPedido from Pedido i where i.id = :idPedido ");
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("idPedido", idPedido);
+		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+	}
+
+	public Double pesquisarValorPedidoIPI(Integer idPedido) {
+		StringBuilder select = new StringBuilder();
+		select.append("select i.valorPedidoIPI from Pedido i where i.id = :idPedido ");
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("idPedido", idPedido);
+		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Object[]> pesquisarValorTotalPedidoByPeriodo(Date dataInicio, Date dataFim, boolean isCompra) {
 		StringBuilder select = new StringBuilder();
@@ -337,22 +366,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		}
 
 		return query.getResultList();
-	}
-
-	public Double pesquisarValorPedido(Integer idPedido) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i.valorPedido from Pedido i where i.id = :idPedido ");
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idPedido", idPedido);
-		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
-	}
-
-	public Double pesquisarValorPedidoIPI(Integer idPedido) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i.valorPedidoIPI from Pedido i where i.id = :idPedido ");
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idPedido", idPedido);
-		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
 	}
 
 	public List<Object[]> pesquisarValorVendaClienteByPeriodo(Date dataInicial, Date dataFinal, Integer idCliente,

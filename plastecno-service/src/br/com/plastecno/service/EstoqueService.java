@@ -6,6 +6,7 @@ import javax.ejb.Local;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoReservaEstoque;
+import br.com.plastecno.service.entity.Item;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
@@ -13,6 +14,8 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface EstoqueService {
+	double calcularPrecoMedioItemEstoque(Item filtro);
+
 	void cancelarReservaEstoqueByIdPedido(Integer idPedido) throws BusinessException;
 
 	boolean contemItemPedidoReservado(Integer idPedido);
@@ -38,11 +41,13 @@ public interface EstoqueService {
 	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca)
 			throws BusinessException;
 
+	ItemEstoque pesquisarItemEstoque(Item filtro);
+
 	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);
 
-	ItemEstoque pesquisarItemEstoqueByItemPedido(ItemPedido itemPedido);
-
 	List<Material> pesquisarMateriaEstoque(String sigla);
+
+	double pesquisarPrecoMedioItemEstoque(Item filtro);
 
 	Double pesquisarValorEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 

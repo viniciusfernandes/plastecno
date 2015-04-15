@@ -29,6 +29,7 @@ import br.com.plastecno.service.entity.ItemReservado;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.impl.calculo.CalculadoraVolume;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
@@ -44,6 +45,15 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private PedidoService pedidoService;
 
 	private final double tolerancia = 0.001d;
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public double calcularPrecoMedioItemEstoque(Item filtro) {
+		if (filtro.getQuantidade() == null) {
+			return 0;
+		}
+		return pesquisarPrecoMedioItemEstoque(filtro) * filtro.getQuantidade();
+	}
 
 	private void calcularValorMedio(ItemEstoque itemCadastrado, ItemEstoque itemIncluido) {
 		removerValoresNulos(itemCadastrado);
@@ -96,7 +106,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			if (!itemPedido.isRecebido()) {
 				continue;
 			}
-			ItemEstoque itemEstoque = pesquisarItemCadastradoEstoque(itemPedido);
+			ItemEstoque itemEstoque = pesquisarItemEstoque(itemPedido);
 
 			if (itemEstoque != null) {
 				Integer quantidadeEstoque = itemEstoque.getQuantidade();
@@ -192,7 +202,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		// Verificando se existe item equivalente no estoque, caso nao exista vamos
 		// criar um novo.
-		ItemEstoque itemCadastrado = pesquisarItemCadastradoEstoque(itemEstoque);
+		ItemEstoque itemCadastrado = pesquisarItemEstoque(itemEstoque);
 
 		boolean isNovo = itemCadastrado == null;
 		if (isNovo) {
@@ -229,24 +239,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
 			Integer quantidadeMinima) {
 		return itemEstoqueDAO.pesquisarEscassezItemEstoque(idMaterial, formaMaterial, quantidadeMinima);
-	}
-
-	private ItemEstoque pesquisarItemCadastradoEstoque(Item filtro) {
-		Integer idMaterial = filtro.getMaterial().getId();
-		FormaMaterial formaMaterial = filtro.getFormaMaterial();
-		Double medidaExt = filtro.getMedidaExterna();
-		Double medidaInt = filtro.getMedidaInterna();
-		Double comp = filtro.getComprimento();
-
-		// Verificando se existe item equivalente no estoque, caso nao exista vamos
-		// criar um novo.
-		ItemEstoque itemCadastrado = null;
-		if (filtro.isPeca()) {
-			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, filtro.getDescricaoPeca());
-		} else {
-			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, medidaExt, medidaInt, comp);
-		}
-		return itemCadastrado;
 	}
 
 	@Override
@@ -290,14 +282,28 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque) {
-		return itemEstoqueDAO.pesquisarById(idItemEstoque);
+	public ItemEstoque pesquisarItemEstoque(Item filtro) {
+		Integer idMaterial = filtro.getMaterial().getId();
+		FormaMaterial formaMaterial = filtro.getFormaMaterial();
+		Double medidaExt = filtro.getMedidaExterna();
+		Double medidaInt = filtro.getMedidaInterna();
+		Double comp = filtro.getComprimento();
+
+		// Verificando se existe item equivalente no estoque, caso nao exista vamos
+		// criar um novo.
+		ItemEstoque itemCadastrado = null;
+		if (filtro.isPeca()) {
+			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, filtro.getDescricaoPeca());
+		} else {
+			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, medidaExt, medidaInt, comp);
+		}
+		return itemCadastrado;
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public ItemEstoque pesquisarItemEstoqueByItemPedido(ItemPedido itemPedido) {
-		return pesquisarItemCadastradoEstoque(itemPedido);
+	public ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque) {
+		return itemEstoqueDAO.pesquisarById(idItemEstoque);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -308,6 +314,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 				.createQuery("select distinct new Material(m.id, m.sigla, m.descricao) from ItemEstoque i inner join i.material m where m.sigla like :sigla order by m.sigla ");
 		query.setParameter("sigla", "%" + sigla + "%");
 		return query.getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public double pesquisarPrecoMedioItemEstoque(Item filtro) {
+		ItemEstoque itemEstoque = pesquisarItemEstoque(filtro);
+		return itemEstoque == null ? 0 : itemEstoque.getPrecoMedio();
 	}
 
 	@Override
@@ -410,6 +423,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		// redefinirItemReservadoByItemEstoque(itemCadastrado.getId());
 	}
 
+	@TODO(data = "14/04/2015", descricao = "Esse metodo sera utilizado na execucao do metodo de redefinao de itens do estoque redefinirItemEstoque")
 	private void redefinirItemReservadoByItemEstoque(Integer idItemEstoque) throws BusinessException {
 
 		List<ItemReservado> listaItemReservado = itemReservadoDAO.pesquisarItemReservadoByIdItemEstoque(idItemEstoque);
@@ -494,14 +508,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 			return SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS;
 		}
 
-		ItemEstoque itemEstoque = null;
-		if (itemPedido.isPeca()) {
-			itemEstoque = pesquisarItemEstoque(itemPedido.getMaterial().getId(), itemPedido.getFormaMaterial(),
-					itemPedido.getDescricaoPeca());
-		} else {
-			itemEstoque = pesquisarItemEstoque(itemPedido.getMaterial().getId(), itemPedido.getFormaMaterial(),
-					itemPedido.getMedidaExterna(), itemPedido.getMedidaInterna(), itemPedido.getComprimento());
-		}
+		ItemEstoque itemEstoque = pesquisarItemEstoque(itemPedido);
+
 		Integer quantidadeReservada = 0;
 		Integer quantidadePedido = itemPedido.contemAlgumaReserva() ? itemPedido.getQuantidadeEncomendada() : itemPedido
 				.getQuantidade();
@@ -531,4 +539,5 @@ public class EstoqueServiceImpl implements EstoqueService {
 		pedidoService.inserirItemPedido(itemPedido);
 		return situacao;
 	}
+
 }

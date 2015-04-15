@@ -32,14 +32,14 @@
 				<li><a href="javascript: void(0)" target="principal_frame">Vendas</a>
 					<ul>
 						<li><a href="pedido" target="principal_frame">Ped. Vendas</a></li>
-						<li><a href="revendaEncomendada" target="principal_frame">Revenda Encomendada</a></li>
+						<li><a href="revendaEncomendada" target="principal_frame">Ped. Aguard. Material</a></li>
 						<li><a href="estoque" target="principal_frame">Estoque</a></li>
 					</ul>
 				</li>
 				<c:if test="${acessoCompraPermitido}">
 					<li><a href="javascript: void(0)" target="principal_frame">Compras</a>
 						<ul>
-							<li><a href="encomenda" target="principal_frame">Encomenda</a></li>
+							<li><a href="encomenda" target="principal_frame">Item Aguard. Compra</a></li>
 							<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a></li>
 							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
 							<li><a href="estoque" target="principal_frame">Estoque</a></li>
@@ -61,7 +61,14 @@
 							<li><a href="comissao" target="principal_frame">Comissão</a></li>
 						</c:if>
 						<li><a href="regiao" target="principal_frame">Regiões</a></li>
-					</ul></li>
+					</ul>
+				</li>
+				<li><a href="javascript: void(0)">Receita</a>
+					<ul>
+						<li><a href="relatorio/receita" target="principal_frame">Receita Estimada</a></li>
+						<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Estim. Vendedor</a></li>
+					</ul>
+				</li>
 
 
 				<li><a href="javascript: void(0)">Relatórios</a>

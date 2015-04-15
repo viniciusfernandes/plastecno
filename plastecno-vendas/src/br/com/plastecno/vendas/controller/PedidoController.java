@@ -90,17 +90,23 @@ public class PedidoController extends AbstractController {
 
     @Servico
     private ClienteService clienteService;
+
     private String diretorioTemplateRelatorio;
+
     @Servico
     private FormaMaterialService formaMaterialService;
+
     private GeradorRelatorioPDF geradorRelatorio;
+
     @Servico
     private MaterialService materialService;
+
     @Servico
     private PedidoService pedidoService;
 
     @Servico
     private RepresentadaService representadaService;
+
     @Servico
     private TipoEntregaService tipoEntregaService;
 
@@ -459,7 +465,7 @@ public class PedidoController extends AbstractController {
     public void pesquisarMaterial(String sigla, Integer idRepresentada) {
         List<Autocomplete> lista = new ArrayList<Autocomplete>();
         if (sigla != null && idRepresentada != null) {
-            List<Material> listaMaterial = this.materialService.pesquisarBySigla(sigla, idRepresentada);
+            List<Material> listaMaterial = this.materialService.pesquisarMaterialAtivoBySigla(sigla, idRepresentada);
             for (Material material : listaMaterial) {
                 lista.add(new MaterialAutocomplete(material.getId(), material.getDescricaoFormatada(), material
                         .isImportado()));

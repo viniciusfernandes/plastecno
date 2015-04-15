@@ -17,7 +17,7 @@ public class MenuController extends AbstractController {
     public MenuController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
         this.verificarPermissaoAcesso("acessoAdministracaoPermitido", TipoAcesso.ADMINISTRACAO);
-        this.verificarPermissaoAcesso("acessoManutencaoPermitido", TipoAcesso.MANUTENCAO);
+        //this.verificarPermissaoAcesso("acessoManutencaoPermitido", TipoAcesso.MANUTENCAO);
         this.verificarPermissaoAcesso("acessoRelatorioClienteRegiaoPermitido",
                 TipoAcesso.CONSULTA_RELATORIO_CLIENTE_REGIAO);
         this.verificarPermissaoAcesso("acessoRelatorioVendasRepresentadaPermitido",

@@ -40,22 +40,27 @@ public class MaterialDAO extends GenericDAO<Material> {
 		return super.pesquisarById(Material.class, id);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Material> pesquisarBySigla(String sigla) {
-		Query query = this.entityManager
-				.createQuery("select new Material(m.id, m.sigla, m.descricao) from Material m  where m.sigla like :sigla order by m.sigla ");
-		query.setParameter("sigla", "%" + sigla + "%");
-		return query.getResultList();
+		return pesquisarBySigla(sigla, null, null);
+	}
+
+	public List<Material> pesquisarBySigla(String sigla, Integer idRepresentada) {
+		return pesquisarBySigla(sigla, idRepresentada, null);
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Material> pesquisarBySigla(String sigla, Integer idRepresentada) {
+	public List<Material> pesquisarBySigla(String sigla, Integer idRepresentada, Boolean isAtivo) {
 		StringBuilder select = new StringBuilder();
-		select
-				.append("select new Material(m.id, m.sigla, m.descricao) from Material m inner join m.listaRepresentada r where ");
+		select.append("select new Material(m.id, m.sigla, m.descricao) from Material m ");
 
 		if (idRepresentada != null) {
-			select.append("r.id = :idRepresentada and ");
+			select.append(" inner join m.listaRepresentada r where r.id = :idRepresentada and ");
+		} else {
+			select.append("where ");
+		}
+
+		if (isAtivo != null) {
+			select.append("m.ativo = :isAtivo and ");
 		}
 
 		select.append("m.sigla like :sigla order by m.sigla ");
@@ -64,6 +69,10 @@ public class MaterialDAO extends GenericDAO<Material> {
 
 		if (idRepresentada != null) {
 			query.setParameter("idRepresentada", idRepresentada);
+		}
+
+		if (isAtivo != null) {
+			query.setParameter("isAtivo", isAtivo);
 		}
 		return query.getResultList();
 	}

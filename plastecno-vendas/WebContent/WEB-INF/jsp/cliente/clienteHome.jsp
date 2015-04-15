@@ -153,6 +153,7 @@ function remover(codigo, nome) {
 			<input type="hidden" id="id" name="cliente.id" value="${cliente.id}" />
 			<input type="hidden" id="idVendedor" name="cliente.vendedor.id" value="${cliente.vendedor.id}" />
 			<input type="hidden" id="isRevendedor" name="isRevendedor" value="${isRevendedor}" />
+			<input type="hidden" id="tipoCliente" name="cliente.tipoCliente" value="${cliente.tipoCliente}" />
 
 			<div class="label">Último Contato:</div>
 			<div class="input" style="width: 20%">

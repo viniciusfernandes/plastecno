@@ -6,6 +6,13 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 public final class NumeroUtils {
+	public static final int CEM = 100;
+
+	public static final int ESCALA_MONETARIA = 2;
+
+	public static final DecimalFormat FORMATADOR_DECIMAL = new DecimalFormat("#,##0.00", new DecimalFormatSymbols(
+			new Locale("pt", "BR")));
+
 	public static Double arredondar(Double valor, Integer escala) {
 		if (valor == null) {
 			return null;
@@ -28,6 +35,10 @@ public final class NumeroUtils {
 		return String.valueOf(gerarPercentual(decimal).intValue());
 	}
 
+	public static String formatarPercentual(Double decimal, int escala) {
+		return String.valueOf(gerarPercentual(decimal, escala));
+	}
+
 	public static String formatarValorMonetario(Double valor) {
 		return valor == null ? null : FORMATADOR_DECIMAL.format(valor);
 	}
@@ -40,10 +51,14 @@ public final class NumeroUtils {
 	}
 
 	public static Double gerarPercentual(Double decimal) {
+		return gerarPercentual(decimal, 0);
+	}
+
+	public static Double gerarPercentual(Double decimal, int escala) {
 		if (decimal == null) {
 			return 0.00;
 		}
-		return arredondar(decimal * CEM, 0);
+		return arredondar(decimal * CEM, escala);
 	}
 
 	public static double normalizarPercentual(Double percentual) {
@@ -52,13 +67,6 @@ public final class NumeroUtils {
 		}
 		return arredondar(percentual, ESCALA_MONETARIA);
 	}
-
-	public static final int ESCALA_MONETARIA = 2;
-
-	public static final int CEM = 100;
-
-	public static final DecimalFormat FORMATADOR_DECIMAL = new DecimalFormat("#,##0.00", new DecimalFormatSymbols(
-			new Locale("pt", "BR")));
 
 	private NumeroUtils() {
 	}

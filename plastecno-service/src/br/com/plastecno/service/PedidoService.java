@@ -24,6 +24,8 @@ public interface PedidoService {
 
 	void alterarQuantidadeReservadaByIdItemPedido(Integer idItemPedido);
 
+	void alterarSituacaoPedidoAguardandoEncomendaByIdPedido(Integer idPedido);
+
 	void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
 
 	void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido);
@@ -46,6 +48,8 @@ public interface PedidoService {
 			throws BusinessException;
 
 	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
+
+	boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException;
 
 	boolean enviarRevendaEncomendadaEmpacotamento(Integer idPedido) throws BusinessException;
 
@@ -73,6 +77,8 @@ public interface PedidoService {
 			Integer numeroMaximoRegistros);
 
 	List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+
+	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
 
 	List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo);
 
@@ -108,9 +114,13 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
+	List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo);
+
 	List<ItemPedido> pesquisarItemPedidoEncomendado();
 
 	List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal);
+
+	List<ItemPedido> pesquisarItemPedidoRevendaByPeriodo(Periodo periodo);
 
 	List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor);
 
@@ -151,6 +161,8 @@ public interface PedidoService {
 	SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido);
 
 	SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido);
+
+	List<SituacaoPedido> pesquisarSituacaoRevendaEfetivada();
 
 	List<SituacaoPedido> pesquisarSituacaoVendaEfetivada();
 

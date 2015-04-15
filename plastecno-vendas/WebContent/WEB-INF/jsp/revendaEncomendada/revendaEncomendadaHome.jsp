@@ -93,7 +93,7 @@ function enviarEmpacotamento(botao){
 					<th style="width: 5%">Qtde</th>
 					<th style="width: 5%">Qtde. Reserv.</th>
 					<th style="width: 45%">Desc. Item</th>
-					<th style="width: 10%">Comprador</th>
+					<th style="width: 10%">Vendedor</th>
 					<th style="width: 5%">Total (R$)</th>
 					<th style="width: 8%">Ação</th>
 				</tr>

@@ -63,10 +63,10 @@
 						<li><a href="regiao" target="principal_frame">Regiões</a></li>
 					</ul>
 				</li>
-				<li><a href="javascript: void(0)">Faturamento</a>
+				<li><a href="javascript: void(0)">Receita</a>
 					<ul>
-						<li><a href="relatorio/faturamento" target="principal_frame">Faturamento</a></li>
-						<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Vendedor</a></li>
+						<li><a href="relatorio/receita" target="principal_frame">Receita Estimada</a></li>
+						<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Estim. Vendedor</a></li>
 					</ul>
 				</li>
 

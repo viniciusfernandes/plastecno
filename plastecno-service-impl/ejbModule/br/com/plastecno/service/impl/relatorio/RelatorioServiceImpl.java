@@ -26,7 +26,7 @@ import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ClienteWrapper;
 import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
-import br.com.plastecno.service.wrapper.FaturamentoWrapper;
+import br.com.plastecno.service.wrapper.ReceitaWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
 import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
@@ -62,7 +62,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public FaturamentoWrapper gerarFaturamento(Periodo periodo) {
+	public ReceitaWrapper gerarReceitaEstimada(Periodo periodo) {
 		double valorComprado = 0;
 		double valorVendido = 0;
 		double valorICMS = 0;
@@ -93,17 +93,17 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 
 		double valorIPI = valorDebitoIPI - valorCreditoIPI;
-		double valorFaturado = valorVendido - valorIPI - valorICMS;
+		double valorReceita = valorVendido - valorIPI - valorICMS;
 
-		FaturamentoWrapper faturamento = new FaturamentoWrapper();
-		faturamento.setValorCompradoFormatado(NumeroUtils.formatarValorMonetario(valorComprado));
-		faturamento.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(valorVendido));
-		faturamento.setValorCreditoIPIFormatado(NumeroUtils.formatarValorMonetario(valorCreditoIPI));
-		faturamento.setValorDebitoIPIFormatado(NumeroUtils.formatarValorMonetario(valorDebitoIPI));
-		faturamento.setValorICMSFormatado(NumeroUtils.formatarValorMonetario(valorICMS));
-		faturamento.setValorIPIFormatado(NumeroUtils.formatarValorMonetario(valorIPI));
-		faturamento.setValorFaturadoFormatado(NumeroUtils.formatarValorMonetario(valorFaturado));
-		return faturamento;
+		ReceitaWrapper receita = new ReceitaWrapper();
+		receita.setValorCompradoFormatado(NumeroUtils.formatarValorMonetario(valorComprado));
+		receita.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(valorVendido));
+		receita.setValorCreditoIPIFormatado(NumeroUtils.formatarValorMonetario(valorCreditoIPI));
+		receita.setValorDebitoIPIFormatado(NumeroUtils.formatarValorMonetario(valorDebitoIPI));
+		receita.setValorICMSFormatado(NumeroUtils.formatarValorMonetario(valorICMS));
+		receita.setValorIPIFormatado(NumeroUtils.formatarValorMonetario(valorIPI));
+		receita.setValorReceitaFormatado(NumeroUtils.formatarValorMonetario(valorReceita));
+		return receita;
 	}
 
 	@Override
@@ -278,7 +278,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 			item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
 			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
 			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
-			item.setAliquotaComissaoFormatado(NumeroUtils.formatarValorMonetario(item.getAliquotaComissao() * 100));
+			item.setAliquotaComissaoFormatado(NumeroUtils.formatarValorMonetario(item.getPercentualComissao()));
 			item.setNomeProprietario(pedido.getProprietario().getNomeCompleto());
 			item.setNomeRepresentada(pedido.getRepresentada().getNomeFantasia());
 			item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));

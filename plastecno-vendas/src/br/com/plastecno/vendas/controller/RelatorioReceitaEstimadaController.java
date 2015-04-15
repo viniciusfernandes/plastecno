@@ -13,21 +13,21 @@ import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
-public class RelatorioFaturamentoController extends AbstractController {
+public class RelatorioReceitaEstimadaController extends AbstractController {
     @Servico
     private RelatorioService relatorioService;
 
     @Servico
     private UsuarioService usuarioService;
 
-    public RelatorioFaturamentoController(Result result, UsuarioInfo usuarioInfo) {
+    public RelatorioReceitaEstimadaController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
     }
 
-    @Get("relatorio/faturamento/listagem")
+    @Get("relatorio/receita/listagem")
     public void gerarRelatorioComissaoVendedor(Date dataInicial, Date dataFinal) {
         try {
-            addAtributo("faturamento", relatorioService.gerarFaturamento(new Periodo(dataInicial, dataFinal)));
+            addAtributo("receita", relatorioService.gerarReceitaEstimada(new Periodo(dataInicial, dataFinal)));
         } catch (InformacaoInvalidaException e) {
             gerarListaMensagemErro(e);
         }
@@ -36,8 +36,8 @@ public class RelatorioFaturamentoController extends AbstractController {
         irPaginaHome();
     }
 
-    @Get("relatorio/faturamento")
-    public void relatorioFaturamentoHome() {
+    @Get("relatorio/receita")
+    public void relatorioReceitaEstimadaHome() {
         configurarFiltroPediodoMensal();
     }
 }

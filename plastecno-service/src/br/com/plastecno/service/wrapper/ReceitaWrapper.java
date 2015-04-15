@@ -1,12 +1,12 @@
 package br.com.plastecno.service.wrapper;
 
-public class FaturamentoWrapper {
+public class ReceitaWrapper {
 	private double valorVendido;
 	private double valorComprado;
 	private double valorDebitoIPI;
 	private double valorCreditoIPI;
 	private double valorICMS;
-	private double valorFaturado;
+	private double valorReceita;
 	private double valorIPI;
 
 	private String valorVendidoFormatado;
@@ -14,7 +14,7 @@ public class FaturamentoWrapper {
 	private String valorDebitoIPIFormatado;
 	private String valorCreditoIPIFormatado;
 	private String valorICMSFormatado;
-	private String valorFaturadoFormatado;
+	private String valorReceitaFormatado;
 	private String valorIPIFormatado;
 
 	public double getValorComprado() {
@@ -41,12 +41,12 @@ public class FaturamentoWrapper {
 		return valorDebitoIPIFormatado;
 	}
 
-	public double getValorFaturado() {
-		return valorFaturado;
+	public double getValorReceita() {
+		return valorReceita;
 	}
 
-	public String getValorFaturadoFormatado() {
-		return valorFaturadoFormatado;
+	public String getValorReceitaFormatado() {
+		return valorReceitaFormatado;
 	}
 
 	public double getValorICMS() {
@@ -97,12 +97,12 @@ public class FaturamentoWrapper {
 		this.valorDebitoIPIFormatado = valorDebitoIPIFormatado;
 	}
 
-	public void setValorFaturado(double valorFaturado) {
-		this.valorFaturado = valorFaturado;
+	public void setValorReceita(double valorReceita) {
+		this.valorReceita = valorReceita;
 	}
 
-	public void setValorFaturadoFormatado(String valorFaturadoFormatado) {
-		this.valorFaturadoFormatado = valorFaturadoFormatado;
+	public void setValorReceitaFormatado(String valorReceitaFormatado) {
+		this.valorReceitaFormatado = valorReceitaFormatado;
 	}
 
 	public void setValorICMS(double valorICMS) {

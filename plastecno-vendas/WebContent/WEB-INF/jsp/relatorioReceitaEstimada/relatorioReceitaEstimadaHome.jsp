@@ -14,7 +14,7 @@
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 
-<title>Relatório de Faturamento</title>
+<title>Relatório de Receita</title>
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#botaoLimpar').click(function () {
@@ -32,13 +32,13 @@
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
-	<form id="formVazio" action="<c:url value="/relatorio/faturamento"/>">
+	<form id="formVazio" action="<c:url value="/relatorio/receita"/>">
 	</form>
 
 		<fieldset>
-			<legend>::: Relatório de Faturamento :::</legend>
+			<legend>::: Relatório de Receita :::</legend>
 	
-			<form id="formPesquisa" action="<c:url value="/relatorio/faturamento/listagem"/>" method="get">
+			<form id="formPesquisa" action="<c:url value="/relatorio/receita/listagem"/>" method="get">
 				<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
 				<div class="input" style="width: 15%">
 					<input type="text" id="dataInicial" name="dataInicial"
@@ -53,36 +53,36 @@
 			</form>
 			<div class="label" style="width: 30%">Valor Vendido (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" value="${faturamento.valorVendidoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+				<input type="text" value="${receita.valorVendidoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 			<div class="label" style="width: 15%">Valor Comprado (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" value="${faturamento.valorVendidoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+				<input type="text" value="${receita.valorVendidoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 			<div class="label" style="width: 30%">Débito IPI (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" value="${faturamento.valorDebitoIPIFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+				<input type="text" value="${receita.valorDebitoIPIFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 			<div class="label" style="width: 15%">Crédito IPI (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" value="${faturamento.valorCreditoIPIFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+				<input type="text" value="${receita.valorCreditoIPIFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 			<div class="label" style="width: 30%">Valor IPI (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" value="${faturamento.valorIPIFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+				<input type="text" value="${receita.valorIPIFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 			<div class="label" style="width: 15%">Valor ICMS (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" value="${faturamento.valorICMSFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+				<input type="text" value="${receita.valorICMSFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
-			<div class="label" style="width: 30%">Faturamento (R$):</div>
+			<div class="label" style="width: 30%">Receita (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" value="${faturamento.valorFaturadoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+				<input type="text" value="${receita.valorReceitaFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 		</fieldset>
 		<div class="bloco_botoes">
-			<input id="botaoPesquisar" type="button" value="" class="botaoPesquisar" title="Pesquisar Faturamento" /> 
-			<input id="botaoLimpar" type="button" value="" title="Limpar Faturamento" class="botaoLimpar" />
+			<input id="botaoPesquisar" type="button" value="" class="botaoPesquisar" title="Pesquisar Receita" /> 
+			<input id="botaoLimpar" type="button" value="" title="Limpar Receita" class="botaoLimpar" />
 		</div>
 </body>
 </html>

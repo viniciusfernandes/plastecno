@@ -265,6 +265,10 @@ public class ItemPedido extends Item {
 		return pedido;
 	}
 
+	public double getPercentualComissao() {
+		return aliquotaComissao == null ? 0 : aliquotaComissao * 100;
+	}
+
 	public Double getPrecoCusto() {
 		return precoCusto;
 	}

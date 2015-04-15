@@ -10,7 +10,7 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
-import br.com.plastecno.service.wrapper.FaturamentoWrapper;
+import br.com.plastecno.service.wrapper.ReceitaWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
@@ -54,5 +54,5 @@ public interface RelatorioService {
 
 	List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor);
 
-	FaturamentoWrapper gerarFaturamento(Periodo periodo);
+	ReceitaWrapper gerarReceitaEstimada(Periodo periodo);
 }

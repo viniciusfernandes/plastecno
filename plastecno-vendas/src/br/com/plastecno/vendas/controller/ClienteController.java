@@ -205,6 +205,7 @@ public class ClienteController extends AbstractController {
         addAtributo("listaLogradouro", this.clienteService.pesquisarLogradouro(idCliente));
         addAtributo("listaContato", this.clienteService.pesquisarContato(idCliente));
         addAtributo("comentarios", formatarComentarios(idCliente));
+        addAtributo("tipoCliente", cliente.getTipoCliente());
         if (isRevendedor) {
             redirecTo(this.getClass()).revendedorHome();
         } else {

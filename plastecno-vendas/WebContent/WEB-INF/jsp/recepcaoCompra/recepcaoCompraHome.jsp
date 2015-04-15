@@ -27,13 +27,6 @@ $(document).ready(function() {
 	inserirMascaraData('dataInicial');
 	inserirMascaraData('dataFinal');
 	
-	inserirMascaraMonetaria('preco', 7);
-	inserirMascaraNumerica('ipi', '99');
-	inserirMascaraNumerica('quantidade', '9999999');
-	inserirMascaraMonetaria('comprimento', 8);
-	inserirMascaraMonetaria('medidaExterna', 8);
-	inserirMascaraMonetaria('medidaInterna', 8);
-	
 	habilitar('#bloco_item_pedido input:radio', false);
 	habilitar('#bloco_item_pedido #formaMaterial', false);
 	habilitar('#bloco_item_pedido #descricao', false);
@@ -123,7 +116,7 @@ function recepcionarItem(botao){
 	</form>
 	
 	<c:if test="${not empty itemPedido}">
-		<jsp:include page="/bloco/bloco_edicao_item_compra.jsp"/>
+		<jsp:include page="/bloco/bloco_edicao_item.jsp"/>
 	</c:if>
 	
 	<c:if test="${not empty relatorio}">

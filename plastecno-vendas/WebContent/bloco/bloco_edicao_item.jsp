@@ -2,6 +2,14 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+
+	inserirMascaraMonetaria('preco', 7);
+	inserirMascaraNumerica('ipi', '99');
+	inserirMascaraNumerica('quantidade', '9999999');
+	inserirMascaraMonetaria('comprimento', 8);
+	inserirMascaraMonetaria('medidaExterna', 8);
+	inserirMascaraMonetaria('medidaInterna', 8);
+	
 	$('#botaoLimparItemPedido').click(function () {
 		$('#bloco_item_pedido input').val('');
 		$('#formaMaterial').val('');

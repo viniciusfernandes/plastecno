@@ -170,6 +170,11 @@ public class MaterialServiceImpl implements MaterialService {
 		return materialDAO.pesquisarBySigla(sigla, idRepresentada);
 	}
 
+	@Override
+	public List<Material> pesquisarMaterialAtivoBySigla(String sigla, Integer idRepresentada) {
+		return materialDAO.pesquisarBySigla(sigla, idRepresentada, true);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Representada> pesquisarRepresentadasAssociadas(Integer idMaterial) {

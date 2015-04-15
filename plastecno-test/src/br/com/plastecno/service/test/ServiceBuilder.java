@@ -406,6 +406,7 @@ class ServiceBuilder {
 		inject(pedidoService, buildService(ComissaoService.class), "comissaoService");
 
 		new MockUp<ItemPedidoDAO>() {
+
 			@Mock
 			public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada) {
 				REPOSITORY.alterarEntidadeAtributoById(ItemPedido.class, idItemPedido, "quantidadeRecepcionada",
@@ -462,6 +463,13 @@ class ServiceBuilder {
 			}
 
 			@Mock
+			public Double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido) {
+				Representada r = REPOSITORY.pesquisarEntidadeAtributoById(Pedido.class, idPedido, "representada",
+						Representada.class);
+				return r == null ? 0 : r.getComissao();
+			}
+
+			@Mock
 			Date pesquisarDataEnvioById(Integer idPedido) {
 				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null ? pedido.getDataEntrega() : null;
@@ -495,7 +503,9 @@ class ServiceBuilder {
 
 			@Mock
 			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
-				return REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido).getRepresentada().getId();
+				Representada r = REPOSITORY.pesquisarEntidadeAtributoById(Pedido.class, idPedido, "representada",
+						Representada.class);
+				return r == null ? null : r.getId();
 			}
 
 			@Mock

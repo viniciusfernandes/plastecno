@@ -465,7 +465,7 @@ public class PedidoController extends AbstractController {
     public void pesquisarMaterial(String sigla, Integer idRepresentada) {
         List<Autocomplete> lista = new ArrayList<Autocomplete>();
         if (sigla != null && idRepresentada != null) {
-            List<Material> listaMaterial = this.materialService.pesquisarBySigla(sigla, idRepresentada);
+            List<Material> listaMaterial = this.materialService.pesquisarMaterialAtivoBySigla(sigla, idRepresentada);
             for (Material material : listaMaterial) {
                 lista.add(new MaterialAutocomplete(material.getId(), material.getDescricaoFormatada(), material
                         .isImportado()));

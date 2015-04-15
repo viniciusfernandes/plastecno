@@ -304,7 +304,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@REVIEW(data = "10/03/2015", descricao = "Devemos implementar uma melhoria o esquema de consulta dos itens de estoque para recuperar apenas a informacao necessaria.")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEncomendada(Integer idRepresentada, Periodo periodo) {
-		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Encomendados",
+		return gerarRelatorioItensPorPedido("Pedidos de Revenda Aguardando Material",
 				pedidoService.pesquisarRevendaEncomendada(idRepresentada, periodo));
 	}
 

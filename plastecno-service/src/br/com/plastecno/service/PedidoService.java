@@ -24,6 +24,8 @@ public interface PedidoService {
 
 	void alterarQuantidadeReservadaByIdItemPedido(Integer idItemPedido);
 
+	void alterarSituacaoPedidoAguardandoEncomendaByIdPedido(Integer idPedido);
+
 	void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
 
 	void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido);
@@ -46,6 +48,8 @@ public interface PedidoService {
 			throws BusinessException;
 
 	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
+
+	boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException;
 
 	boolean enviarRevendaEncomendadaEmpacotamento(Integer idPedido) throws BusinessException;
 

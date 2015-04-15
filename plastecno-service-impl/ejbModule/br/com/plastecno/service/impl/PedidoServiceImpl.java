@@ -155,6 +155,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarSituacaoPedidoAguardandoEncomendaByIdPedido(Integer idPedido) {
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido) {
 		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
@@ -374,6 +380,15 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		}
 		pedidoDAO.alterar(pedido);
+	}
+
+	@Override
+	public boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException {
+		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
+		if (!empacotamentoOk) {
+			alterarSituacaoPedidoAguardandoEncomendaByIdPedido(idPedido);
+		}
+		return empacotamentoOk;
 	}
 
 	@Override

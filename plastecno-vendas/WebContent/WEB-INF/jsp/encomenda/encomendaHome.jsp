@@ -58,6 +58,15 @@ $(document).ready(function() {
 	inicializarAutocompleteCliente();
 });
 
+function enviarEmpacotamento(botao){
+	inicializarModalConfirmacao({
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ENVIAR esse PEDIDO INTEIRO para o EMPACOTAMENTO?',
+		confirmar: function(){
+			submeterForm(botao);
+		}
+	});
+};
+
 function inicializarAutocompleteCliente(){
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
@@ -89,7 +98,7 @@ function encomendarItem(campo){
 
 
 	<form id="formPesquisa" action="<c:url value="/encomenda/item/listagem"/>" method="get">
-		<input type="hidden" id="idCliente" name="idCliente"/>
+		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<fieldset>
 			<legend>::: Pesquisa de Encomendas :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
@@ -105,7 +114,7 @@ function encomendarItem(campo){
 			</div>
 			<div class="label" style="width: 30%">Cliente:</div>
 			<div class="input" style="width: 20%">
-				<input type="text" id="nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" />
+				<input type="text" id="nomeFantasia" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" />
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			<div class="bloco_botoes">
@@ -166,6 +175,11 @@ function encomendarItem(campo){
 									<form action="<c:url value="/encomenda/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
+									</form>
+									<form action="<c:url value="/encomenda/empacotamento"/>" method="post" >
+										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
+										<input type="button" value="" title="Enviar Pedido para o Empacotamento" 
+										onclick="enviarEmpacotamento(this);" class="botaoAdicionar_16" />
 									</form>
 								</div>
 							</td>

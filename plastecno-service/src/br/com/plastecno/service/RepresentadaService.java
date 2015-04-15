@@ -37,6 +37,8 @@ public interface RepresentadaService {
 
 	List<ComentarioRepresentada> pesquisarComentarioByIdRepresentada(Integer idRepresentada);
 
+	double pesquisarComissaoRepresentada(Integer idRepresentada);
+
 	List<ContatoRepresentada> pesquisarContato(Integer id);
 
 	List<Representada> pesquisarFornecedor(Boolean ativo);

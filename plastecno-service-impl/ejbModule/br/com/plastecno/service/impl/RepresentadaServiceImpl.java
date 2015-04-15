@@ -33,7 +33,6 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @Stateless
 public class RepresentadaServiceImpl implements RepresentadaService {
 
-	
 	@EJB
 	private ContatoService contatoService;
 
@@ -134,7 +133,8 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public void inserirComentario(Integer idProprietario, Integer idRepresentada, String comentario) throws BusinessException {
+	public void inserirComentario(Integer idProprietario, Integer idRepresentada, String comentario)
+			throws BusinessException {
 		Representada representada = new Representada();
 		representada.setId(idRepresentada);
 		Usuario usuario = new Usuario(idProprietario);
@@ -215,6 +215,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 						"select new ComentarioRepresentada (c.dataInclusao, c.conteudo, v.nome, v.sobrenome) from ComentarioRepresentada c "
 								+ " inner join c.usuario v where c.representada.id = :idRepresentada order by c.dataInclusao desc")
 				.setParameter("idRepresentada", idRepresentada).getResultList();
+	}
+
+	@Override
+	public double pesquisarComissaoRepresentada(Integer idRepresentada) {
+		return representadaDAO.pesquisarComissao(idRepresentada);
 	}
 
 	@Override

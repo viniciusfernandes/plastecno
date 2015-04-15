@@ -543,15 +543,24 @@ public class PedidoServiceImpl implements PedidoService {
 
 			double valorComissionado = 0;
 			double precoCusto = 0;
-			if (pedido.isRevenda()) {
-				precoCusto = estoqueService.pesquisarPrecoMedioItemEstoque(itemPedido);
-				valorComissionado = (itemPedido.calcularPrecoItem() - precoCusto) * comissao.getValor();
-			} else {
-				valorComissionado = itemPedido.calcularPrecoItem() * comissao.getValor();
+			double aliquotaComissao = comissao.getValor();
+			double precoItem = itemPedido.calcularPrecoItem();
+			if (pedido.isRepresentacao()) {
+				double comissaoRepresentada = pesquisarComissaoRepresentadaByIdPedido(pedido.getId());
+				// Aqui estamos compondo a comissao pago pela representada com a
+				// comissao para para o vendedor.
+				aliquotaComissao *= comissaoRepresentada;
 			}
 
+			if (pedido.isRevenda()) {
+				precoCusto = estoqueService.calcularPrecoMedioItemEstoque(itemPedido);
+				precoItem -= precoCusto;
+			}
+
+			valorComissionado = precoItem * aliquotaComissao;
+
 			itemPedido.setPrecoCusto(precoCusto);
-			itemPedido.setAliquotaComissao(comissao.getValor());
+			itemPedido.setAliquotaComissao(aliquotaComissao);
 			itemPedido.setValorComissionado(valorComissionado);
 			itemPedidoDAO.alterar(itemPedido);
 		}
@@ -716,6 +725,13 @@ public class PedidoServiceImpl implements PedidoService {
 	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 		return pesquisarByIdCliente(idCliente, false, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido) {
+		Double comissao = pedidoDAO.pesquisarComissaoRepresentadaByIdPedido(idPedido);
+		return comissao == null ? 0 : comissao;
 	}
 
 	@Override

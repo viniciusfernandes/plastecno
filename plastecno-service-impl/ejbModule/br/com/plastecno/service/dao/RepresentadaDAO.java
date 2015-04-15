@@ -20,6 +20,10 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 		return pesquisarById(Representada.class, idRepresentada);
 	}
 
+	public double pesquisarComissao(Integer idRepresentada) {
+		return super.pesquisarCampoById(Representada.class, idRepresentada, "comissao", double.class);
+	}
+
 	public String pesquisarNomeFantasiaById(Integer idRepresentada) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("SELECT r.nomeFantasia FROM Representada r where r.id = :idRepresentada")

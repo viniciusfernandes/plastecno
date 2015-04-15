@@ -111,6 +111,12 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Pedido.class, null);
 	}
 
+	public Double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery("select p.representada.comissao from Pedido p where p.id = :idPedido")
+						.setParameter("idPedido", idPedido), Double.class, 0d);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarCompraPendenteRecebimento() {
 		StringBuilder select = new StringBuilder();

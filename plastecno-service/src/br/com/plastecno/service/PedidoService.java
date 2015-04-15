@@ -74,6 +74,8 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
+	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
+
 	List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo);
 
 	Pedido pesquisarCompraById(Integer id);

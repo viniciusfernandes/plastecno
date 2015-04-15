@@ -91,6 +91,9 @@ public class ItemPedido extends Item {
 	@InformacaoValidavel(obrigatorio = false, numerico = true, positivo = true, nomeExibicao = "Preço de custo do item do pedido")
 	private Double precoCusto;
 
+	@Transient
+	private String precoCustoItemFormatado;
+
 	@Column(name = "preco_unidade")
 	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = false, nomeExibicao = "Preço da unidade item do pedido")
 	private Double precoUnidade;
@@ -266,6 +269,10 @@ public class ItemPedido extends Item {
 		return precoCusto;
 	}
 
+	public String getPrecoCustoItemFormatado() {
+		return precoCustoItemFormatado;
+	}
+
 	public Double getPrecoUnidade() {
 		return precoUnidade;
 	}
@@ -346,10 +353,6 @@ public class ItemPedido extends Item {
 		return TipoVenda.KILO.equals(this.tipoVenda);
 	}
 
-	public void setAliquotaComissao(double aliquotaComissao) {
-		this.aliquotaComissao = aliquotaComissao;
-	}
-
 	public void setAliquotaComissao(Double aliquotaComissao) {
 		this.aliquotaComissao = aliquotaComissao;
 	}
@@ -420,6 +423,10 @@ public class ItemPedido extends Item {
 
 	public void setPrecoCusto(Double precoCusto) {
 		this.precoCusto = precoCusto;
+	}
+
+	public void setPrecoCustoItemFormatado(String precoCustoFormatado) {
+		this.precoCustoItemFormatado = precoCustoFormatado;
 	}
 
 	public void setPrecoUnidade(Double precoUnidade) {

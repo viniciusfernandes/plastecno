@@ -82,9 +82,10 @@
 					<th style="width: 2%">Item</th>
 					<th style="width: 3%">Qtde.</th>
 					<th style="width: 50%">Descrição</th>
-					<th style="width: 20%">Total (R$)</th>
+					<th style="width: 15%">Venda (R$)</th>
+					<th style="width: 10%">Custo (R$)</th>
 					<th style="width: 5%">Comis.(%)</th>
-					<th style="width: 15%">Valor Comiss. (R$)</th>
+					<th style="width: 10%">Valor Comiss. (R$)</th>
 					<th style="width: 5%">Ações</th>
 				</tr>
 			</thead>
@@ -101,6 +102,7 @@
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoCustoItemFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaComissaoFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valorComissionadoFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">

@@ -128,10 +128,7 @@ create sequence vendas.seq_comissao_id increment by 1 minvalue 1 no maxvalue sta
 alter table vendas.tb_item_pedido add comissao numeric (2,2) default 0;
 update vendas.tb_perfil_acesso set descricao = 'CADASTRO_PEDIDO_VENDAS' WHERE ID = 9;
 
-<!-- ULTIMA INSTRUCAO-->
 alter table vendas.tb_item_pedido drop comissao;
-alter table vendas.tb_item_pedido add aliquota_comissao numeric (2,2) default 0;
+alter table vendas.tb_item_pedido add aliquota_comissao numeric (5,5) default 0;
 alter table vendas.tb_item_pedido add preco_custo numeric (9,2) default 0;
 alter table vendas.tb_item_pedido add valor_comissionado numeric (9,2) default 0;
-
-

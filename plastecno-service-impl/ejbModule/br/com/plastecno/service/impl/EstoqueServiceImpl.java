@@ -46,6 +46,15 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	private final double tolerancia = 0.001d;
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public double calcularPrecoMedioItemEstoque(Item filtro) {
+		if (filtro.getQuantidade() == null) {
+			return 0;
+		}
+		return pesquisarPrecoMedioItemEstoque(filtro) * filtro.getQuantidade();
+	}
+
 	private void calcularValorMedio(ItemEstoque itemCadastrado, ItemEstoque itemIncluido) {
 		removerValoresNulos(itemCadastrado);
 		removerValoresNulos(itemIncluido);
@@ -293,13 +302,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public double pesquisarPrecoMedioItemEstoque(Item filtro) {
-		ItemEstoque itemEstoque = pesquisarItemEstoque(filtro);
-		return itemEstoque == null ? 0 : itemEstoque.getPrecoMedio();
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque) {
 		return itemEstoqueDAO.pesquisarById(idItemEstoque);
 	}
@@ -312,6 +314,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 				.createQuery("select distinct new Material(m.id, m.sigla, m.descricao) from ItemEstoque i inner join i.material m where m.sigla like :sigla order by m.sigla ");
 		query.setParameter("sigla", "%" + sigla + "%");
 		return query.getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public double pesquisarPrecoMedioItemEstoque(Item filtro) {
+		ItemEstoque itemEstoque = pesquisarItemEstoque(filtro);
+		return itemEstoque == null ? 0 : itemEstoque.getPrecoMedio();
 	}
 
 	@Override

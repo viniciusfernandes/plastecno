@@ -154,7 +154,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor);
 
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(titulo.toString(), listaItemPedido);
-		
+
 		double valorTotalComissionado = 0;
 		for (ItemPedido itemPedido : listaItemPedido) {
 			valorTotalComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
@@ -278,11 +278,12 @@ public class RelatorioServiceImpl implements RelatorioService {
 			item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
 			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
 			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
-			item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
+			item.setAliquotaComissaoFormatado(NumeroUtils.formatarValorMonetario(item.getAliquotaComissao() * 100));
 			item.setNomeProprietario(pedido.getProprietario().getNomeCompleto());
 			item.setNomeRepresentada(pedido.getRepresentada().getNomeFantasia());
 			item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
-			
+			item.setPrecoCustoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoCusto()));
+
 			relatorio.addGrupo(pedido.getId(), item).setPropriedade("dataEntrega",
 					StringUtils.formatarData(pedido.getDataEntrega()));
 		}

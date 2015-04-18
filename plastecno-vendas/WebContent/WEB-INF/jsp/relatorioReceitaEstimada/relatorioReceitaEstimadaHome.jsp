@@ -51,13 +51,13 @@
 						value="${dataFinal}" maxlength="100" class="pesquisavel" />
 				</div>
 			</form>
-			<div class="label" style="width: 30%">Valor Vendido (R$):</div>
+			<div class="label" style="width: 30%">Receita (R$):</div>
 			<div class="input" style="width: 15%">
 				<input type="text" value="${receita.valorVendidoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 			<div class="label" style="width: 15%">Valor Comprado (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" value="${receita.valorVendidoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+				<input type="text" value="${receita.valorCompradoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 			<div class="label" style="width: 30%">Débito IPI (R$):</div>
 			<div class="input" style="width: 15%">
@@ -75,9 +75,13 @@
 			<div class="input" style="width: 15%">
 				<input type="text" value="${receita.valorICMSFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
-			<div class="label" style="width: 30%">Receita (R$):</div>
+			<div class="label" style="width: 30%">Comissão (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" value="${receita.valorReceitaFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+				<input type="text" value="${receita.valorComissionadoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+			</div>
+			<div class="label" style="width: 15%">Líquido (R$):</div>
+			<div class="input" style="width: 15%">
+				<input type="text" value="${receita.valorLiquidoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 		</fieldset>
 		<div class="bloco_botoes">

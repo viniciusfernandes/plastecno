@@ -6,16 +6,26 @@ public class ReceitaWrapper {
 	private double valorDebitoIPI;
 	private double valorCreditoIPI;
 	private double valorICMS;
-	private double valorReceita;
+	private double valorLiquido;
 	private double valorIPI;
+	private double valorComissionado;
 
 	private String valorVendidoFormatado;
 	private String valorCompradoFormatado;
 	private String valorDebitoIPIFormatado;
 	private String valorCreditoIPIFormatado;
 	private String valorICMSFormatado;
-	private String valorReceitaFormatado;
+	private String valorLiquidoFormatado;
 	private String valorIPIFormatado;
+	private String valorComissionadoFormatado;
+
+	public double getValorComissionado() {
+		return valorComissionado;
+	}
+
+	public String getValorComissionadoFormatado() {
+		return valorComissionadoFormatado;
+	}
 
 	public double getValorComprado() {
 		return valorComprado;
@@ -41,14 +51,6 @@ public class ReceitaWrapper {
 		return valorDebitoIPIFormatado;
 	}
 
-	public double getValorReceita() {
-		return valorReceita;
-	}
-
-	public String getValorReceitaFormatado() {
-		return valorReceitaFormatado;
-	}
-
 	public double getValorICMS() {
 		return valorICMS;
 	}
@@ -65,12 +67,28 @@ public class ReceitaWrapper {
 		return valorIPIFormatado;
 	}
 
+	public double getValorLiquido() {
+		return valorLiquido;
+	}
+
+	public String getValorLiquidoFormatado() {
+		return valorLiquidoFormatado;
+	}
+
 	public double getValorVendido() {
 		return valorVendido;
 	}
 
 	public String getValorVendidoFormatado() {
 		return valorVendidoFormatado;
+	}
+
+	public void setValorComissionado(double valorComissionado) {
+		this.valorComissionado = valorComissionado;
+	}
+
+	public void setValorComissionadoFormatado(String valorComissionadoFormatado) {
+		this.valorComissionadoFormatado = valorComissionadoFormatado;
 	}
 
 	public void setValorComprado(double valorComprado) {
@@ -97,14 +115,6 @@ public class ReceitaWrapper {
 		this.valorDebitoIPIFormatado = valorDebitoIPIFormatado;
 	}
 
-	public void setValorReceita(double valorReceita) {
-		this.valorReceita = valorReceita;
-	}
-
-	public void setValorReceitaFormatado(String valorReceitaFormatado) {
-		this.valorReceitaFormatado = valorReceitaFormatado;
-	}
-
 	public void setValorICMS(double valorICMS) {
 		this.valorICMS = valorICMS;
 	}
@@ -119,6 +129,14 @@ public class ReceitaWrapper {
 
 	public void setValorIPIFormatado(String valorIPIFormatado) {
 		this.valorIPIFormatado = valorIPIFormatado;
+	}
+
+	public void setValorLiquido(double valorLiquido) {
+		this.valorLiquido = valorLiquido;
+	}
+
+	public void setValorLiquidoFormatado(String valorLiquidoFormatado) {
+		this.valorLiquidoFormatado = valorLiquidoFormatado;
 	}
 
 	public void setValorVendido(double valorVendido) {

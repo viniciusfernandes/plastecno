@@ -126,6 +126,8 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo);
 
+	List<ItemPedido> pesquisarItemPedidoVendidoResumidoByPeriodo(Periodo periodo);
+
 	List<Logradouro> pesquisarLogradouro(Integer idPedido);
 
 	Pedido pesquisarPedidoById(Integer id);

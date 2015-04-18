@@ -70,6 +70,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		double valorCreditoIPI = 0;
 		double aliquota = 0;
 		double precoItem = 0;
+		double valorComissionado = 0;
 
 		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoCompradoResumidoByPeriodo(periodo);
 		for (ItemPedido itemPedido : listaItemComprado) {
@@ -80,20 +81,28 @@ public class RelatorioServiceImpl implements RelatorioService {
 			valorCreditoIPI += precoItem * aliquota;
 		}
 
+		// Acumulando os valores dos itens de revenda
 		List<ItemPedido> listaItemVendido = pedidoService.pesquisarItemPedidoRevendaByPeriodo(periodo);
 		for (ItemPedido itemPedido : listaItemVendido) {
 			precoItem = itemPedido.calcularPrecoItem();
 			valorVendido += precoItem;
-
 			aliquota = itemPedido.getAliquotaICMS() == null ? 0 : itemPedido.getAliquotaICMS();
 			valorICMS += precoItem * aliquota;
 
 			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido.getAliquotaIPI();
 			valorDebitoIPI += precoItem * aliquota;
+			valorComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
+		}
+
+		// Acumulando os valores dos itens de venda por representacao
+		listaItemVendido = pedidoService.pesquisarItemPedidoVendaResumidaByPeriodo(periodo);
+		for (ItemPedido itemPedido : listaItemVendido) {
+			valorVendido += itemPedido.calcularPrecoItem();
+			valorComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
 		}
 
 		double valorIPI = valorDebitoIPI - valorCreditoIPI;
-		double valorReceita = valorVendido - valorIPI - valorICMS;
+		double valorLiquido = valorVendido - valorIPI - valorICMS - valorComissionado;
 
 		ReceitaWrapper receita = new ReceitaWrapper();
 		receita.setValorCompradoFormatado(NumeroUtils.formatarValorMonetario(valorComprado));
@@ -102,7 +111,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 		receita.setValorDebitoIPIFormatado(NumeroUtils.formatarValorMonetario(valorDebitoIPI));
 		receita.setValorICMSFormatado(NumeroUtils.formatarValorMonetario(valorICMS));
 		receita.setValorIPIFormatado(NumeroUtils.formatarValorMonetario(valorIPI));
-		receita.setValorReceitaFormatado(NumeroUtils.formatarValorMonetario(valorReceita));
+		receita.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(valorComissionado));
+		receita.setValorLiquidoFormatado(NumeroUtils.formatarValorMonetario(valorLiquido));
 		return receita;
 	}
 

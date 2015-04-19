@@ -892,7 +892,6 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	@REVIEW
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo) {
 		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoCompraEfetivada(), TipoPedido.COMPRA);
@@ -957,6 +956,13 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
 		return pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null, true);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoVendidoResumidoByPeriodo(Periodo periodo) {
+		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoCompraEfetivada(),
+				TipoPedido.REPRESENTACAO);
 	}
 
 	@Override

@@ -14,7 +14,8 @@ public enum TipoAcesso {
 	GERENCIA_VENDAS, 
 	MANUTENCAO, 
 	OPERACAO_CONTABIL, 
-	MANUTENCAO_ESTOQUE;
+	MANUTENCAO_ESTOQUE,
+	RECEPCAO_COMPRA;
 	public static TipoAcesso valueOfBy(String descricao) {
 		try {
 			return valueOf(descricao);

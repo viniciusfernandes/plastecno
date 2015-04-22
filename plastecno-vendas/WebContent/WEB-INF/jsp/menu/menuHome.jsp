@@ -29,6 +29,7 @@
 
 		<nav class="flutuante_esquerda">
 			<ul>
+				<c:if test="${acessoVendaPermitido}">
 				<li><a href="javascript: void(0)" target="principal_frame">Vendas</a>
 					<ul>
 						<li><a href="pedido" target="principal_frame">Ped. Vendas</a></li>
@@ -36,6 +37,7 @@
 						<li><a href="estoque" target="principal_frame">Estoque</a></li>
 					</ul>
 				</li>
+				</c:if>
 				<c:if test="${acessoCompraPermitido}">
 					<li><a href="javascript: void(0)" target="principal_frame">Compras</a>
 						<ul>
@@ -44,6 +46,14 @@
 							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
 							<li><a href="estoque" target="principal_frame">Estoque</a></li>
 							<li><a href="empacotamento" target="principal_frame">Empacotamento</a></li>					
+						</ul>
+					</li>
+				</c:if>
+				<c:if test="${acessoRecepcaoCompraPermitido}">
+					<li><a href="javascript: void(0)" target="principal_frame">Recepção Compras</a>
+						<ul>
+							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
+							<li><a href="estoque" target="principal_frame">Estoque</a></li>
 						</ul>
 					</li>
 				</c:if>
@@ -63,13 +73,14 @@
 						<li><a href="regiao" target="principal_frame">Regiões</a></li>
 					</ul>
 				</li>
+				<c:if test="${acessoValorReceitaPermitido}">
 				<li><a href="javascript: void(0)">Receita</a>
 					<ul>
 						<li><a href="relatorio/receita" target="principal_frame">Receita Estimada</a></li>
 						<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Estim. Vendedor</a></li>
 					</ul>
 				</li>
-
+				</c:if>
 
 				<li><a href="javascript: void(0)">Relatórios</a>
 					<ul>
@@ -92,15 +103,16 @@
 						<c:if test="${acessoRelatorioEntregaPermitido}">
 							<li><a href="relatorio/pedido?isEntrega=true" target="principal_frame">Acompanhamento Entrega</a></li>
 						</c:if>
-						<li><a href="relatorio/venda/vendedor"
-							target="principal_frame">Venda/Orçamto Vendedor</a></li>
 						<c:if test="${acessoRelatorioClienteRamoAtividadePermitido}">
 							<li><a href="relatorio/cliente/ramoAtividade" target="principal_frame">Cliente Ramo Atividade</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioClienteRegiaoPermitido}">
 							<li><a href="relatorio/cliente/regiao" target="principal_frame">Cliente Região</a></li>
 						</c:if>
-						<li><a href="relatorio/cliente/vendedor" target="principal_frame">Cliente Vendedor</a></li>
+						<c:if test="${acessoVendaPermitido}">
+							<li><a href="relatorio/venda/vendedor" target="principal_frame">Venda/Orçamto Vendedor</a></li>
+							<li><a href="relatorio/cliente/vendedor" target="principal_frame">Cliente Vendedor</a></li>
+						</c:if>
 						<c:if test="${acessoRelatorioComissaoVendedor}">
 							<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Vendedor</a></li>
 						</c:if>

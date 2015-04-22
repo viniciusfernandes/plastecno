@@ -16,23 +16,25 @@ public class MenuController extends AbstractController {
 
     public MenuController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
-        this.verificarPermissaoAcesso("acessoAdministracaoPermitido", TipoAcesso.ADMINISTRACAO);
-        //this.verificarPermissaoAcesso("acessoManutencaoPermitido", TipoAcesso.MANUTENCAO);
-        this.verificarPermissaoAcesso("acessoRelatorioClienteRegiaoPermitido",
-                TipoAcesso.CONSULTA_RELATORIO_CLIENTE_REGIAO);
-        this.verificarPermissaoAcesso("acessoRelatorioVendasRepresentadaPermitido",
+        verificarPermissaoAcesso("acessoAdministracaoPermitido", TipoAcesso.ADMINISTRACAO);
+        // verificarPermissaoAcesso("acessoManutencaoPermitido",
+        // TipoAcesso.MANUTENCAO);
+        verificarPermissaoAcesso("acessoRelatorioClienteRegiaoPermitido", TipoAcesso.CONSULTA_RELATORIO_CLIENTE_REGIAO);
+        verificarPermissaoAcesso("acessoRelatorioVendasRepresentadaPermitido",
                 TipoAcesso.CONSULTA_RELATORIO_VENDAS_REPRESENTADA);
-        this.verificarPermissaoAcesso("acessoRelatorioEntregaPermitido", TipoAcesso.CONSULTA_RELATORIO_ENTREGA);
-        this.verificarPermissaoAcesso("acessoRelatorioPedidoRepresentadaPermitido", TipoAcesso.ADMINISTRACAO,
+        verificarPermissaoAcesso("acessoRelatorioEntregaPermitido", TipoAcesso.CONSULTA_RELATORIO_ENTREGA);
+        verificarPermissaoAcesso("acessoRelatorioPedidoRepresentadaPermitido", TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.OPERACAO_CONTABIL);
-        this.verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", TipoAcesso.ADMINISTRACAO,
+        verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.GERENCIA_VENDAS);
-        this.verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", TipoAcesso.ADMINISTRACAO);
-        this.verificarPermissaoAcesso("acessoCompraPermitido", TipoAcesso.ADMINISTRACAO,
-                TipoAcesso.CADASTRO_PEDIDO_COMPRA);
-        this.verificarPermissaoAcesso("acessoRelatorioComissaoVendedor", TipoAcesso.ADMINISTRACAO,
+        verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", TipoAcesso.ADMINISTRACAO);
+        verificarPermissaoAcesso("acessoVendaPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_PEDIDO_VENDAS);
+        verificarPermissaoAcesso("acessoCompraPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+        verificarPermissaoAcesso("acessoRelatorioComissaoVendedor", TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.CADASTRO_PEDIDO_VENDAS);
 
+        verificarPermissaoAcesso("acessoValorReceitaPermitido", TipoAcesso.ADMINISTRACAO);
+        verificarPermissaoAcesso("acessoRecepcaoCompraPermitido", TipoAcesso.RECEPCAO_COMPRA);
     }
 
     @Get("/")

@@ -53,7 +53,7 @@ function enviarEmpacotamento(botao){
 
 	<form id="formPesquisa" action="<c:url value="/revendaEncomendada/listagem"/>" method="get">
 		<fieldset>
-			<legend>::: Pedidos de Revenda Encomendada :::</legend>
+			<legend>::: Pesquisa de Itens Aguard. Material :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="dataInicial" name="dataInicial"

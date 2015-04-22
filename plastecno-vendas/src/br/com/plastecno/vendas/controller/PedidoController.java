@@ -487,10 +487,17 @@ public class PedidoController extends AbstractController {
         final Integer idUsuario = getCodigoUsuario();
         // Verificando se o usuario que esta tentando acessar os dados do pedido
         // eh o mesmo usuario que efetuou a venda.
-        final boolean pedidoPertenceAoUsuario = pedido != null && pedido.getVendedor() != null && idUsuario != null
+        final boolean isPedidoPertenceAoUsuario = pedido != null && pedido.getVendedor() != null && idUsuario != null
                 && idUsuario.equals(pedido.getVendedor().getId());
-        // Verificando se tem poderes para visualizar o pedido.
-        final boolean visualizacaoPermitida = pedidoPertenceAoUsuario || isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+        // Verificando se tem poderes para visualizar o pedido. No caso de
+        // compra
+
+        // Verificando se o usuario eh um comprador e esta acessando um pedido
+        // de compra.
+        final boolean isAcessoCompraPermitida = isCompra && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+
+        final boolean visualizacaoPermitida = isAcessoCompraPermitida || isPedidoPertenceAoUsuario
+                || isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
         return visualizacaoPermitida ? pedido : null;
     }
 

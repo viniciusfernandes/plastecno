@@ -568,7 +568,7 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 
 			if (pedido.isRevenda()) {
-				precoCusto = estoqueService.calcularPrecoMedioItemEstoque(itemPedido);
+				precoCusto = estoqueService.calcularPrecoCustoItemEstoque(itemPedido);
 				precoItem -= precoCusto;
 			}
 

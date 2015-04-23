@@ -48,11 +48,14 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public double calcularPrecoMedioItemEstoque(Item filtro) {
+	public double calcularPrecoCustoItemEstoque(Item filtro) {
 		if (filtro.getQuantidade() == null) {
 			return 0;
 		}
-		return pesquisarPrecoMedioItemEstoque(filtro) * filtro.getQuantidade();
+
+		final double precoMedio = pesquisarPrecoMedioItemEstoque(filtro);
+		final double aliquotaIPI = filtro.getAliquotaIPI() == null ? 0 : filtro.getAliquotaIPI();
+		return precoMedio * filtro.getQuantidade() * (1 + aliquotaIPI);
 	}
 
 	private void calcularValorMedio(ItemEstoque itemCadastrado, ItemEstoque itemIncluido) {
@@ -147,6 +150,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemEstoque.setMedidaInterna(itemPedido.getMedidaInterna());
 		itemEstoque.setQuantidade(itemPedido.getQuantidade());
 		itemEstoque.setPrecoMedio(itemPedido.getPrecoUnidade());
+		itemEstoque.setAliquotaIPI(itemPedido.getAliquotaIPI());
+		itemEstoque.setAliquotaICMS(itemPedido.getAliquotaICMS());
 		return itemEstoque;
 	}
 

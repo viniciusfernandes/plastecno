@@ -1227,7 +1227,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo) {
+	public List<Object[]> pesquisarTotalPedidoVendaResumidaByPeriodo(Periodo periodo) {
 		return pedidoDAO.pesquisarValorTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), false);
 	}
 

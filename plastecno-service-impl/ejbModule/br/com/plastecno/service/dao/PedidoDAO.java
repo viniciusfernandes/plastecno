@@ -338,7 +338,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	@SuppressWarnings("unchecked")
 	public List<Object[]> pesquisarValorTotalPedidoByPeriodo(Date dataInicio, Date dataFim, boolean isCompra) {
 		StringBuilder select = new StringBuilder();
-		select.append("select v.nome, r.nomeFantasia, sum(p.valorPedido) from Pedido p ");
+		select.append("select v.nome, r.nomeFantasia, sum(p.valorPedido), sum(p.valorPedidoIPI) from Pedido p ");
 		select.append("inner join p.representada r ");
 		select.append("inner join p.proprietario v ");
 		select.append("where p.dataEnvio >= :dataInicio and p.dataEnvio <= :dataFim ");

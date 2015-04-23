@@ -178,7 +178,7 @@ public interface PedidoService {
 
 	Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente);
 
-	List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo);
+	List<Object[]> pesquisarTotalPedidoVendaResumidaByPeriodo(Periodo periodo);
 
 	Double pesquisarValorPedido(Integer idPedido);
 

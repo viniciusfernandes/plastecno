@@ -232,7 +232,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioPedidoPeriodo gerarRelatorioCompraPeriodo(Periodo periodo) throws BusinessException {
+	public RelatorioPedidoPeriodo gerarRelatorioValorTotalPedidoCompraPeriodo(Periodo periodo) throws BusinessException {
 
 		final List<Object[]> resultados = pedidoService.pesquisarTotalCompraResumidaByPeriodo(periodo);
 
@@ -241,15 +241,24 @@ public class RelatorioServiceImpl implements RelatorioService {
 		titulo.append(StringUtils.formatarData(periodo.getInicio()));
 		titulo.append(" à ");
 		titulo.append(StringUtils.formatarData(periodo.getFim()));
-		final RelatorioPedidoPeriodo relatorio = new RelatorioPedidoPeriodo(titulo.toString());
 
+		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
+	}
+
+	private RelatorioPedidoPeriodo gerarRelatorioValorTotalPedidoPeriodo(List<Object[]> resultados, String titulo)
+			throws BusinessException {
+		final RelatorioPedidoPeriodo relatorio = new RelatorioPedidoPeriodo(titulo);
+
+		String nomeVendedor = null;
+		RepresentadaValorWrapper venda = null;
 		for (Object[] resultado : resultados) {
-
+			nomeVendedor = resultado[0].toString();
+			venda = new RepresentadaValorWrapper(resultado[1].toString(), (Double) resultado[2], (Double) resultado[3]);
 			try {
-				relatorio.addValor(resultado[0].toString(), new RepresentadaValorWrapper(resultado[1].toString(),
-						(Double) resultado[2]));
+				relatorio.addValor(nomeVendedor, venda);
 			} catch (AgrupamentoException e) {
-				throw new BusinessException("Falha na construcao do relatorio de vendas da representada por vendedor", e);
+				throw new BusinessException(
+						"Falha na construcao do relatorio de valor dos pedidos da representada por vendedor", e);
 			}
 		}
 
@@ -362,28 +371,17 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioPedidoPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException {
+	public RelatorioPedidoPeriodo gerarRelatorioValorTotalPedidoVendaPeriodo(Periodo periodo) throws BusinessException {
 
-		final List<Object[]> resultados = pedidoService.pesquisarTotalVendaResumidaByPeriodo(periodo);
+		final List<Object[]> resultados = pedidoService.pesquisarTotalPedidoVendaResumidaByPeriodo(periodo);
 
 		final StringBuilder titulo = new StringBuilder();
 		titulo.append("Relatório das Vendas do Período de ");
 		titulo.append(StringUtils.formatarData(periodo.getInicio()));
 		titulo.append(" à ");
 		titulo.append(StringUtils.formatarData(periodo.getFim()));
-		final RelatorioPedidoPeriodo relatorio = new RelatorioPedidoPeriodo(titulo.toString());
 
-		for (Object[] resultado : resultados) {
-
-			try {
-				relatorio.addValor(resultado[0].toString(), new RepresentadaValorWrapper(resultado[1].toString(),
-						(Double) resultado[2]));
-			} catch (AgrupamentoException e) {
-				throw new BusinessException("Falha na construcao do relatorio de vendas da representada por vendedor", e);
-			}
-		}
-
-		return relatorio;
+		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
 	}
 
 	@Override

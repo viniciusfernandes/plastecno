@@ -62,7 +62,8 @@
 				<tr>
 					<th style="width: 40%">${isCompra ? 'Comprador' : 'Vendedor'}</th>
 					<th style="width: 30%">${isCompra ? 'Fornecedor' : 'Representada'}</th>
-					<th>Valor ${isCompra ? 'Compras' : 'Vendas'} (R$)</th>
+					<th style="width: 15%">Valor (R$)</th>
+					<th style="width: 15%">Valor IPI (R$)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -77,12 +78,15 @@
 							</c:if>
 							<td class="fundo${iteracaoVendedor.index % 2 == 0 ? 1 : 2}">${representada.nome}</td>
 							<td class="fundo${iteracaoVendedor.index % 2 == 0 ? 1 : 2}">${representada.valorVendaFormatado}</td>
+							<td class="fundo${iteracaoVendedor.index % 2 == 0 ? 1 : 2}">${representada.valorVendaIPIFormatado}</td>
 						</tr>
 					</c:forEach>
 
 					<tr>
 						<td class="total${iteracaoVendedor.index % 2 == 0 ? 1 : 2}"
 							style="font-weight: bold;">TOTAL (R$)</td>
+						<td class="total${iteracaoVendedor.index % 2 == 0 ? 1 : 2}"
+							style="font-weight: bold;">${vendedor.totalVendidoFormatado}</td>
 						<td class="total${iteracaoVendedor.index % 2 == 0 ? 1 : 2}"
 							style="font-weight: bold;">${vendedor.totalVendidoFormatado}</td>
 					</tr>

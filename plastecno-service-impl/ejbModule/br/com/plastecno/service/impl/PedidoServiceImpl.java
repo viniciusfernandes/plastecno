@@ -215,7 +215,7 @@ public class PedidoServiceImpl implements PedidoService {
 		// Essas condicoes serao analisadas quando um pedido for cancelado a partir
 		// de um "refazer do pedido".
 		if (TipoPedido.COMPRA.equals(tipoPedido)) {
-			estoqueService.devolverItemCompradoEstoqueByIdPedido(idPedido);
+			//estoqueService.devolverItemCompradoEstoqueByIdPedido(idPedido);
 		} else if (TipoPedido.REVENDA.equals(tipoPedido)) {
 			estoqueService.cancelarReservaEstoqueByIdPedido(idPedido);
 		}

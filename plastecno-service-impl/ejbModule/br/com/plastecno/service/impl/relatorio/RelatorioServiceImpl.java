@@ -63,9 +63,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 	public ReceitaWrapper gerarReceitaEstimada(Periodo periodo) {
 		double valorComprado = 0;
 		double valorVendido = 0;
-		double valorICMS = 0;
+		double valorReceita = 0;
 		double valorDebitoIPI = 0;
 		double valorCreditoIPI = 0;
+		double valorDebitoICMS = 0;
+		double valorCreditoICMS = 0;
 		double aliquota = 0;
 		double precoItem = 0;
 		double valorComissionado = 0;
@@ -73,10 +75,14 @@ public class RelatorioServiceImpl implements RelatorioService {
 		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoCompradoResumidoByPeriodo(periodo);
 		for (ItemPedido itemPedido : listaItemComprado) {
 			precoItem = itemPedido.calcularPrecoItem();
+
+			aliquota = itemPedido.getAliquotaICMS() == null ? 0 : itemPedido.getAliquotaICMS();
+			valorCreditoIPI += precoItem * aliquota;
+
 			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido.getAliquotaIPI();
+			valorCreditoIPI += precoItem * aliquota;
 
 			valorComprado += precoItem;
-			valorCreditoIPI += precoItem * aliquota;
 		}
 
 		// Acumulando os valores dos itens de revenda
@@ -84,33 +90,45 @@ public class RelatorioServiceImpl implements RelatorioService {
 		for (ItemPedido itemPedido : listaItemVendido) {
 			precoItem = itemPedido.calcularPrecoItem();
 			valorVendido += precoItem;
+
 			aliquota = itemPedido.getAliquotaICMS() == null ? 0 : itemPedido.getAliquotaICMS();
-			valorICMS += precoItem * aliquota;
+			valorDebitoICMS += precoItem * aliquota;
 
 			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido.getAliquotaIPI();
 			valorDebitoIPI += precoItem * aliquota;
+
 			valorComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
 		}
+		valorReceita = valorVendido;
 
 		// Acumulando os valores dos itens de venda por representacao
 		listaItemVendido = pedidoService.pesquisarItemPedidoRepresentacaoByPeriodo(periodo);
+		double valorComissionadoRepresentacao = 0;
 		for (ItemPedido itemPedido : listaItemVendido) {
-			valorVendido += itemPedido.calcularPrecoItem();
-			valorComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
+			precoItem = itemPedido.calcularPrecoItem();
+			valorVendido += precoItem;
+			valorComissionado += itemPedido.getValorComissionado();
+			valorComissionadoRepresentacao += precoItem * itemPedido.getAliquotaComissaoPedido();
 		}
 
+		valorReceita += valorComissionadoRepresentacao;
+
 		double valorIPI = valorDebitoIPI - valorCreditoIPI;
-		double valorLiquido = valorVendido - valorIPI - valorICMS - valorComissionado;
+		double valorICMS = valorDebitoICMS - valorCreditoICMS;
+		double valorLiquido = valorReceita - valorIPI - valorICMS - valorComissionado;
 
 		ReceitaWrapper receita = new ReceitaWrapper();
 		receita.setValorCompradoFormatado(NumeroUtils.formatarValorMonetario(valorComprado));
 		receita.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(valorVendido));
+		receita.setValorCreditoICMSFormatado(NumeroUtils.formatarValorMonetario(valorCreditoICMS));
+		receita.setValorDebitoICMSFormatado(NumeroUtils.formatarValorMonetario(valorDebitoICMS));
 		receita.setValorCreditoIPIFormatado(NumeroUtils.formatarValorMonetario(valorCreditoIPI));
 		receita.setValorDebitoIPIFormatado(NumeroUtils.formatarValorMonetario(valorDebitoIPI));
 		receita.setValorICMSFormatado(NumeroUtils.formatarValorMonetario(valorICMS));
 		receita.setValorIPIFormatado(NumeroUtils.formatarValorMonetario(valorIPI));
 		receita.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(valorComissionado));
 		receita.setValorLiquidoFormatado(NumeroUtils.formatarValorMonetario(valorLiquido));
+		receita.setValorReceitaFormatado(NumeroUtils.formatarValorMonetario(valorReceita));
 		return receita;
 	}
 

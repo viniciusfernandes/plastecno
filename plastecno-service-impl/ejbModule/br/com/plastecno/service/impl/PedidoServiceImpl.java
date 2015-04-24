@@ -492,7 +492,7 @@ public class PedidoServiceImpl implements PedidoService {
 				throw new BusinessException("Não existe vendedor associado ao cliente " + nomeCliente);
 			}
 			pedido.setVendedor(vendedor);
-
+			pedido.setAliquotaComissao(representadaService.pesquisarComissaoRepresentada(pedido.getRepresentada().getId()));
 		}
 
 		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());
@@ -535,6 +535,12 @@ public class PedidoServiceImpl implements PedidoService {
 		if (!pedido.isVenda()) {
 			return;
 		}
+
+		if (pedido.isRepresentacao() && pedido.getAliquotaComissao() == null) {
+			throw new BusinessException("Não existe comissão configurada para o pedido pedido No. " + pedido.getId()
+					+ ". Veja as configurações da representada \"" + pedido.getRepresentada().getNomeFantasia() + "\"");
+		}
+
 		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
 		Comissao comissaoVendedor = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 		Comissao comissao = null;
@@ -561,7 +567,9 @@ public class PedidoServiceImpl implements PedidoService {
 			double aliquotaComissao = comissao.getValor();
 			double precoItem = itemPedido.calcularPrecoItem();
 			if (pedido.isRepresentacao()) {
-				double comissaoRepresentada = pesquisarComissaoRepresentadaByIdPedido(pedido.getId());
+				// Essa comissao eh proveniente da representada e configurada quando
+				// inserimos um pedido.
+				double comissaoRepresentada = pedido.getAliquotaComissao();
 				// Aqui estamos compondo a comissao pago pela representada com a
 				// comissao para para o vendedor.
 				aliquotaComissao *= comissaoRepresentada;
@@ -1235,7 +1243,7 @@ public class PedidoServiceImpl implements PedidoService {
 			List<SituacaoPedido> listaSituacao, TipoPedido tipoPedido) {
 		StringBuilder select = new StringBuilder();
 		select
-				.append("select new ItemPedido(i.precoUnidade, i.quantidade, i.aliquotaIPI, i.aliquotaICMS, i.valorComissionado) from ItemPedido i ");
+				.append("select new ItemPedido(i.precoUnidade, i.quantidade, i.aliquotaIPI, i.aliquotaICMS, i.valorComissionado, i.pedido.aliquotaComissao) from ItemPedido i ");
 		select.append("where i.pedido.tipoPedido = :tipoPedido and ");
 		select.append("i.pedido.dataEnvio >= :dataInicio and ");
 		select.append("i.pedido.dataEnvio <= :dataFim and ");

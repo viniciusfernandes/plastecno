@@ -41,6 +41,9 @@ public class Pedido implements Serializable, Cloneable {
 	 */
 	private static final long serialVersionUID = -7474382741231270790L;
 
+	@Column(name = "aliquota_comissao")
+	private Double aliquotaComissao;
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_cliente")
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Cliente do pedido")
@@ -64,7 +67,7 @@ public class Pedido implements Serializable, Cloneable {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_envio")
 	private Date dataEnvio;
-
+	
 	@Transient
 	private String dataEnvioFormatada;
 
@@ -228,6 +231,10 @@ public class Pedido implements Serializable, Cloneable {
 		return o instanceof Pedido && id != null && id.equals(((Pedido) o).id);
 	}
 
+	public Double getAliquotaComissao() {
+		return aliquotaComissao;
+	}
+
 	public Cliente getCliente() {
 		return cliente;
 	}
@@ -384,6 +391,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public boolean isVenda() {
 		return isRevenda() || isRepresentacao();
+	}
+
+	public void setAliquotaComissao(Double aliquotaComissao) {
+		this.aliquotaComissao = aliquotaComissao;
 	}
 
 	public void setCliente(Cliente cliente) {

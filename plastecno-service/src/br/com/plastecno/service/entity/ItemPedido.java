@@ -149,6 +149,12 @@ public class ItemPedido extends Item {
 		this.aliquotaICMS = aliquotaICMS;
 	}
 
+	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS,
+			Double valorComissionado) {
+		this(precoUnidade, quantidade, aliquotaIPI, aliquotaICMS);
+		this.valorComissionado = valorComissionado;
+	}
+
 	public ItemPedido(FormaMaterial formaMaterial) {
 		this.formaMaterial = formaMaterial;
 	}

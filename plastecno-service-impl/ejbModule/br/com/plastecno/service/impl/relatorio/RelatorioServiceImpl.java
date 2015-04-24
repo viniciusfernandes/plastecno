@@ -26,16 +26,14 @@ import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ClienteWrapper;
 import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
-import br.com.plastecno.service.wrapper.ReceitaWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.service.wrapper.ReceitaWrapper;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
-import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
+import br.com.plastecno.service.wrapper.RelatorioValorTotalPedidoWrapper;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
-import br.com.plastecno.service.wrapper.RepresentadaValorWrapper;
 import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.service.wrapper.VendaClienteWrapper;
-import br.com.plastecno.service.wrapper.exception.AgrupamentoException;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 
@@ -232,40 +230,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioPedidoPeriodo gerarRelatorioValorTotalPedidoCompraPeriodo(Periodo periodo) throws BusinessException {
-
-		final List<Object[]> resultados = pedidoService.pesquisarTotalCompraResumidaByPeriodo(periodo);
-
-		final StringBuilder titulo = new StringBuilder();
-		titulo.append("Relatório das Compras do Período de ");
-		titulo.append(StringUtils.formatarData(periodo.getInicio()));
-		titulo.append(" à ");
-		titulo.append(StringUtils.formatarData(periodo.getFim()));
-
-		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
-	}
-
-	private RelatorioPedidoPeriodo gerarRelatorioValorTotalPedidoPeriodo(List<Object[]> resultados, String titulo)
-			throws BusinessException {
-		final RelatorioPedidoPeriodo relatorio = new RelatorioPedidoPeriodo(titulo);
-
-		String nomeVendedor = null;
-		RepresentadaValorWrapper venda = null;
-		for (Object[] resultado : resultados) {
-			nomeVendedor = resultado[0].toString();
-			venda = new RepresentadaValorWrapper(resultado[1].toString(), (Double) resultado[2], (Double) resultado[3]);
-			try {
-				relatorio.addValor(nomeVendedor, venda);
-			} catch (AgrupamentoException e) {
-				throw new BusinessException(
-						"Falha na construcao do relatorio de valor dos pedidos da representada por vendedor", e);
-			}
-		}
-
-		return relatorio;
-	}
-
-	@Override
 	public List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException {
 		return pedidoService.pesquisarEntregaVendaByPeriodo(periodo);
 	}
@@ -333,6 +297,54 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoCompraPeriodo(Periodo periodo)
+			throws BusinessException {
+
+		final List<TotalizacaoPedidoWrapper> resultados = pedidoService.pesquisarTotalCompraResumidaByPeriodo(periodo);
+
+		final StringBuilder titulo = new StringBuilder();
+		titulo.append("Relatório das Compras do Período de ");
+		titulo.append(StringUtils.formatarData(periodo.getInicio()));
+		titulo.append(" à ");
+		titulo.append(StringUtils.formatarData(periodo.getFim()));
+
+		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
+	}
+
+	private RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoPeriodo(
+			List<TotalizacaoPedidoWrapper> resultados, String titulo) throws BusinessException {
+
+		RelatorioValorTotalPedidoWrapper relatorio = new RelatorioValorTotalPedidoWrapper(titulo);
+
+		// Criando os agrupamentos e acumulando os valores totais dos pedidos.
+		for (TotalizacaoPedidoWrapper totalizacao : resultados) {
+			// Criando os agrupamentos pelo ID do proprietario do pedido.
+			relatorio.addGrupo(totalizacao.getIdProprietario(), totalizacao);
+
+			// Armazenando o valor negociado com cada representada para efetuarmos a
+			// totalizacao logo abaixo.
+			relatorio.addElemento(totalizacao.getIdRepresentada(), totalizacao);
+
+		}
+		return relatorio.formatarValores();
+	}
+
+	@Override
+	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoVendaPeriodo(Periodo periodo)
+			throws BusinessException {
+
+		final List<TotalizacaoPedidoWrapper> resultados = pedidoService.pesquisarTotalPedidoVendaResumidaByPeriodo(periodo);
+
+		final StringBuilder titulo = new StringBuilder();
+		titulo.append("Relatório das Vendas do Período de ");
+		titulo.append(StringUtils.formatarData(periodo.getInicio()));
+		titulo.append(" à ");
+		titulo.append(StringUtils.formatarData(periodo.getFim()));
+
+		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
+	}
+
+	@Override
 	public List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException {
 		return this.pedidoService.pesquisarPedidoVendaByPeriodo(periodo);
 	}
@@ -368,20 +380,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotal));
 		return relatorio;
-	}
-
-	@Override
-	public RelatorioPedidoPeriodo gerarRelatorioValorTotalPedidoVendaPeriodo(Periodo periodo) throws BusinessException {
-
-		final List<Object[]> resultados = pedidoService.pesquisarTotalPedidoVendaResumidaByPeriodo(periodo);
-
-		final StringBuilder titulo = new StringBuilder();
-		titulo.append("Relatório das Vendas do Período de ");
-		titulo.append(StringUtils.formatarData(periodo.getInicio()));
-		titulo.append(" à ");
-		titulo.append(StringUtils.formatarData(periodo.getFim()));
-
-		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
 	}
 
 	@Override

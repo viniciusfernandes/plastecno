@@ -134,3 +134,6 @@ alter table vendas.tb_item_pedido add preco_custo numeric (9,2) default 0;
 alter table vendas.tb_item_pedido add valor_comissionado numeric (9,2) default 0;
 
 INSERT INTO vendas.tb_perfil_acesso values(15, 'RECEPCAO_COMPRA');
+
+<!--ultima alteracao -->
+alter table vendas.tb_pedido add aliquota_comissao numeric (5,5) default 0;

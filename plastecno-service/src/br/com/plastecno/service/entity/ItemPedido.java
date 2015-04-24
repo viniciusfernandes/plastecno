@@ -33,6 +33,9 @@ public class ItemPedido extends Item {
 	@Transient
 	private String aliquotaComissaoFormatado;
 
+	@Transient
+	private Double aliquotaComissaoPedido;
+
 	@Column(name = "aliquota_icms")
 	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
@@ -73,6 +76,7 @@ public class ItemPedido extends Item {
 
 	@Column(name = "medida_externa")
 	private Double medidaExterna;
+
 	@Column(name = "medida_interna")
 	private Double medidaInterna;
 
@@ -149,6 +153,13 @@ public class ItemPedido extends Item {
 		this.aliquotaICMS = aliquotaICMS;
 	}
 
+	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS,
+			Double valorComissionado, Double aliquotaComissaoPedido) {
+		this(precoUnidade, quantidade, aliquotaIPI, aliquotaICMS);
+		this.valorComissionado = valorComissionado;
+		this.aliquotaComissaoPedido = aliquotaComissaoPedido;
+	}
+
 	public ItemPedido(FormaMaterial formaMaterial) {
 		this.formaMaterial = formaMaterial;
 	}
@@ -207,6 +218,10 @@ public class ItemPedido extends Item {
 
 	public String getAliquotaComissaoFormatado() {
 		return aliquotaComissaoFormatado;
+	}
+
+	public Double getAliquotaComissaoPedido() {
+		return aliquotaComissaoPedido;
 	}
 
 	public Double getAliquotaICMS() {
@@ -325,6 +340,10 @@ public class ItemPedido extends Item {
 		return tipoVenda;
 	}
 
+	public Double getValorComissaoPedido() {
+		return aliquotaComissaoPedido;
+	}
+
 	public Double getValorComissionado() {
 		return valorComissionado;
 	}
@@ -363,6 +382,10 @@ public class ItemPedido extends Item {
 
 	public void setAliquotaComissaoFormatado(String aliquotaComissaoFormatado) {
 		this.aliquotaComissaoFormatado = aliquotaComissaoFormatado;
+	}
+
+	public void setAliquotaComissaoPedido(Double aliquotaComissaoPedido) {
+		this.aliquotaComissaoPedido = aliquotaComissaoPedido;
 	}
 
 	public void setAliquotaICMS(Double aliquotaICMS) {
@@ -479,6 +502,10 @@ public class ItemPedido extends Item {
 
 	public void setTipoVenda(TipoVenda tipoVenda) {
 		this.tipoVenda = tipoVenda;
+	}
+
+	public void setValorComissaoPedido(Double valorComissaoPedido) {
+		this.aliquotaComissaoPedido = valorComissaoPedido;
 	}
 
 	public void setValorComissionado(Double valorComissionado) {

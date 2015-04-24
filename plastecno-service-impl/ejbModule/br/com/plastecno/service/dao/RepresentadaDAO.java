@@ -21,7 +21,7 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 	}
 
 	public double pesquisarComissao(Integer idRepresentada) {
-		return super.pesquisarCampoById(Representada.class, idRepresentada, "comissao", double.class);
+		return super.pesquisarCampoById(Representada.class, idRepresentada, "comissao", Double.class);
 	}
 
 	public String pesquisarNomeFantasiaById(Integer idRepresentada) {

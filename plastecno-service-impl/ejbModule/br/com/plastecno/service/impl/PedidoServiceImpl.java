@@ -215,7 +215,7 @@ public class PedidoServiceImpl implements PedidoService {
 		// Essas condicoes serao analisadas quando um pedido for cancelado a partir
 		// de um "refazer do pedido".
 		if (TipoPedido.COMPRA.equals(tipoPedido)) {
-			estoqueService.devolverItemCompradoEstoqueByIdPedido(idPedido);
+			//estoqueService.devolverItemCompradoEstoqueByIdPedido(idPedido);
 		} else if (TipoPedido.REVENDA.equals(tipoPedido)) {
 			estoqueService.cancelarReservaEstoqueByIdPedido(idPedido);
 		}
@@ -492,7 +492,7 @@ public class PedidoServiceImpl implements PedidoService {
 				throw new BusinessException("Não existe vendedor associado ao cliente " + nomeCliente);
 			}
 			pedido.setVendedor(vendedor);
-
+			pedido.setAliquotaComissao(representadaService.pesquisarComissaoRepresentada(pedido.getRepresentada().getId()));
 		}
 
 		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());
@@ -535,6 +535,12 @@ public class PedidoServiceImpl implements PedidoService {
 		if (!pedido.isVenda()) {
 			return;
 		}
+
+		if (pedido.isRepresentacao() && pedido.getAliquotaComissao() == null) {
+			throw new BusinessException("Não existe comissão configurada para o pedido pedido No. " + pedido.getId()
+					+ ". Veja as configurações da representada \"" + pedido.getRepresentada().getNomeFantasia() + "\"");
+		}
+
 		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
 		Comissao comissaoVendedor = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 		Comissao comissao = null;
@@ -561,14 +567,16 @@ public class PedidoServiceImpl implements PedidoService {
 			double aliquotaComissao = comissao.getValor();
 			double precoItem = itemPedido.calcularPrecoItem();
 			if (pedido.isRepresentacao()) {
-				double comissaoRepresentada = pesquisarComissaoRepresentadaByIdPedido(pedido.getId());
+				// Essa comissao eh proveniente da representada e configurada quando
+				// inserimos um pedido.
+				double comissaoRepresentada = pedido.getAliquotaComissao();
 				// Aqui estamos compondo a comissao pago pela representada com a
 				// comissao para para o vendedor.
 				aliquotaComissao *= comissaoRepresentada;
 			}
 
 			if (pedido.isRevenda()) {
-				precoCusto = estoqueService.calcularPrecoMedioItemEstoque(itemPedido);
+				precoCusto = estoqueService.calcularPrecoCustoItemEstoque(itemPedido);
 				precoItem -= precoCusto;
 			}
 
@@ -911,6 +919,13 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoRepresentacaoByPeriodo(Periodo periodo) {
+		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoVendaEfetivada(),
+				TipoPedido.REPRESENTACAO);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoRevendaByPeriodo(Periodo periodo) {
 		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoVendaEfetivada(), TipoPedido.REVENDA);
 	}
@@ -956,13 +971,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
 		return pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null, true);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarItemPedidoVendidoResumidoByPeriodo(Periodo periodo) {
-		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoCompraEfetivada(),
-				TipoPedido.REPRESENTACAO);
 	}
 
 	@Override
@@ -1171,7 +1179,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Object[]> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo) {
+	public List<TotalizacaoPedidoWrapper> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo) {
 		return pedidoDAO.pesquisarValorTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), true);
 	}
 
@@ -1227,7 +1235,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo) {
+	public List<TotalizacaoPedidoWrapper> pesquisarTotalPedidoVendaResumidaByPeriodo(Periodo periodo) {
 		return pedidoDAO.pesquisarValorTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), false);
 	}
 
@@ -1235,7 +1243,7 @@ public class PedidoServiceImpl implements PedidoService {
 			List<SituacaoPedido> listaSituacao, TipoPedido tipoPedido) {
 		StringBuilder select = new StringBuilder();
 		select
-				.append("select new ItemPedido(i.precoUnidade, i.quantidade, i.aliquotaIPI, i.aliquotaICMS) from ItemPedido i ");
+				.append("select new ItemPedido(i.precoUnidade, i.quantidade, i.aliquotaIPI, i.aliquotaICMS, i.valorComissionado, i.pedido.aliquotaComissao) from ItemPedido i ");
 		select.append("where i.pedido.tipoPedido = :tipoPedido and ");
 		select.append("i.pedido.dataEnvio >= :dataInicio and ");
 		select.append("i.pedido.dataEnvio <= :dataFim and ");

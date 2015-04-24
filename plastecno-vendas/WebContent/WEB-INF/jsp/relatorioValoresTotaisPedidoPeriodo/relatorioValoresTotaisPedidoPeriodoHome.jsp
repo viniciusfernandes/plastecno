@@ -13,7 +13,7 @@
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 
 
-<title>Relatório de Vendas por Período</title>
+<title>Relatório de Valores Totais por Período</title>
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#botaoLimpar').click(function () {
@@ -62,32 +62,30 @@
 				<tr>
 					<th style="width: 40%">${isCompra ? 'Comprador' : 'Vendedor'}</th>
 					<th style="width: 30%">${isCompra ? 'Fornecedor' : 'Representada'}</th>
-					<th>Valor ${isCompra ? 'Compras' : 'Vendas'} (R$)</th>
+					<th style="width: 15%">Valor (R$)</th>
+					<th style="width: 15%">Valor IPI (R$)</th>
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach items="${relatorio.listaVendedor}" var="vendedor"
-					varStatus="iteracaoVendedor">
-					<c:forEach items="${vendedor.listaRepresentada}" var="representada"
-						varStatus="iteracaoRepresentada">
+			
+			<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iGrupo">
+					<c:forEach items="${grupo.listaElemento}" var="elemento" varStatus="iElemento">
 						<tr>
-							<c:if test="${iteracaoRepresentada.count eq 1}">
-								<td class="fundo${iteracaoVendedor.index % 2 == 0 ? 1 : 2}"
-									rowspan="${vendedor.numeroVendas + 1}">${vendedor.nomeVendedor}</td>
+							<c:if test="${iElemento.count le 1}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento + 1}">${elemento.nomeProprietario}</td>
 							</c:if>
-							<td class="fundo${iteracaoVendedor.index % 2 == 0 ? 1 : 2}">${representada.nome}</td>
-							<td class="fundo${iteracaoVendedor.index % 2 == 0 ? 1 : 2}">${representada.valorVendaFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeFantasiaRepresentada}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valorTotalFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valorTotalIPIFormatado}</td>
 						</tr>
 					</c:forEach>
-
 					<tr>
-						<td class="total${iteracaoVendedor.index % 2 == 0 ? 1 : 2}"
-							style="font-weight: bold;">TOTAL (R$)</td>
-						<td class="total${iteracaoVendedor.index % 2 == 0 ? 1 : 2}"
-							style="font-weight: bold;">${vendedor.totalVendidoFormatado}</td>
+						<td class="total${iGrupo.index % 2 == 0 ? 1 : 2}" style="font-weight: bold;">TOTAL (R$)</td>
+						<td class="total${iGrupo.index % 2 == 0 ? 1 : 2}" style="font-weight: bold;">${grupo.propriedades['valorTotalFormatado']}</td>
+						<td class="total${iGrupo.index % 2 == 0 ? 1 : 2}" style="font-weight: bold;">${grupo.propriedades['valorTotalIPIFormatado']}</td>
 					</tr>
-				</c:forEach>
-
+			</c:forEach>
+			
 			</tbody>
 
 		</table>
@@ -98,19 +96,27 @@
 				<tr>
 					<th>${isCompra ? 'Fornecedor' : 'Representada'}</th>
 					<th>Total (R$)</th>
+					<th>Total IPI (R$)</th>
 				</tr>
 			</thead>
-			<c:forEach items="${relatorio.listaVendaRepresentada}" var="venda">
+			<c:forEach items="${relatorio.listaElemento}" var="elemento">
 				<tr>
-					<td>${venda.nomeRepresentada}</td>
-					<td>${venda.valorVendaFormatado}</td>
+					<td>${elemento.nomeFantasiaRepresentada}</td>
+					<td>${elemento.valorTotalFormatado}</td>
+					<td>${elemento.valorTotalIPIFormatado}</td>
 				</tr>
 			</c:forEach>
 
 			<tfoot>
 				<tr>
 					<th>TOTAL GERAL (R$)</th>
-					<th>${relatorio.valorTotalVendido}</th>
+					<th>${relatorio.totalGeralFormatado}</th>
+					<th>${relatorio.totalGeralIPIFormatado}</th>
+				</tr>
+				<tr>
+					<th>VALOR IPI (R$)</th>
+					<th>${relatorio.valorIPIFormatado}</th>
+					<th></th>
 				</tr>
 			</tfoot>
 		</table>

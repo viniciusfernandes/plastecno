@@ -28,10 +28,10 @@ public class RelatorioValoresTotaisPedidoPeriodoController extends AbstractContr
         try {
             if (isCompra) {
                 addAtributo("relatorio",
-                        relatorioService.gerarRelatorioCompraPeriodo(new Periodo(dataInicial, dataFinal)));
+                        relatorioService.gerarRelatorioValorTotalPedidoCompraPeriodo(new Periodo(dataInicial, dataFinal)));
             } else {
                 addAtributo("relatorio",
-                        relatorioService.gerarRelatorioVendaPeriodo(new Periodo(dataInicial, dataFinal)));
+                        relatorioService.gerarRelatorioValorTotalPedidoVendaPeriodo(new Periodo(dataInicial, dataFinal)));
             }
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

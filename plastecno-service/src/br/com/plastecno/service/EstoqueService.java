@@ -14,7 +14,7 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface EstoqueService {
-	double calcularPrecoMedioItemEstoque(Item filtro);
+	double calcularPrecoCustoItemEstoque(Item filtro);
 
 	void cancelarReservaEstoqueByIdPedido(Integer idPedido) throws BusinessException;
 

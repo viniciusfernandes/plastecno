@@ -16,6 +16,7 @@ import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.impl.util.QueryUtil;
+import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.util.StringUtils;
 
 public class PedidoDAO extends GenericDAO<Pedido> {
@@ -336,9 +337,14 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Object[]> pesquisarValorTotalPedidoByPeriodo(Date dataInicio, Date dataFim, boolean isCompra) {
+	public List<TotalizacaoPedidoWrapper> pesquisarValorTotalPedidoByPeriodo(Date dataInicio, Date dataFim,
+			boolean isCompra) {
 		StringBuilder select = new StringBuilder();
-		select.append("select v.nome, r.nomeFantasia, sum(p.valorPedido) from Pedido p ");
+		// select
+		// .append("select new TotalizacaoPedidoWrapper(v.id, v.nome, v.sobrenome, r.nomeFantasia, sum(p.valorPedido), sum(p.valorPedidoIPI)) ");
+
+		select.append("select v.id, v.nome, v.sobrenome, r.id, r.nomeFantasia, sum(p.valorPedido), sum(p.valorPedidoIPI) ");
+		select.append("from Pedido p ");
 		select.append("inner join p.representada r ");
 		select.append("inner join p.proprietario v ");
 		select.append("where p.dataEnvio >= :dataInicio and p.dataEnvio <= :dataFim ");
@@ -351,8 +357,8 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 			select.append("and p.tipoPedido != :tipoPedido ");
 		}
 
-		select.append("group by v.nome, r.nomeFantasia ");
-		select.append("order by v.nome ");
+		select.append("group by v.id, v.nome, r.id, r.nomeFantasia ");
+		select.append("order by v.nome, r.nomeFantasia ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("dataInicio", dataInicio);
@@ -365,7 +371,22 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 			query.setParameter("situacoes", pesquisarSituacaoVendaEfetivada());
 		}
 
-		return query.getResultList();
+		List<TotalizacaoPedidoWrapper> lista = new ArrayList<TotalizacaoPedidoWrapper>();
+		List<Object[]> resultados = query.getResultList();
+
+		TotalizacaoPedidoWrapper totalizacao = null;
+		for (Object[] o : resultados) {
+			totalizacao = new TotalizacaoPedidoWrapper();
+			totalizacao.setIdProprietario((Integer) o[0]);
+			totalizacao.setNomeProprietario((String) o[1] + " " + (String) o[2]);
+			totalizacao.setIdRepresentada((Integer) o[3]);
+			totalizacao.setNomeFantasiaRepresentada((String) o[4]);
+			totalizacao.setValorTotal((Double) o[5]);
+			totalizacao.setValorTotalIPI((Double) o[6]);
+			lista.add(totalizacao);
+		}
+		return lista;
+
 	}
 
 	public List<Object[]> pesquisarValorVendaClienteByPeriodo(Date dataInicial, Date dataFinal, Integer idCliente,

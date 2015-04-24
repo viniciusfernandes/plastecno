@@ -1,23 +1,26 @@
 package br.com.plastecno.service.wrapper;
 
 public class ReceitaWrapper {
-	private double valorVendido;
-	private double valorComprado;
-	private double valorDebitoIPI;
-	private double valorCreditoIPI;
-	private double valorICMS;
-	private double valorLiquido;
-	private double valorIPI;
 	private double valorComissionado;
-
-	private String valorVendidoFormatado;
-	private String valorCompradoFormatado;
-	private String valorDebitoIPIFormatado;
-	private String valorCreditoIPIFormatado;
-	private String valorICMSFormatado;
-	private String valorLiquidoFormatado;
-	private String valorIPIFormatado;
 	private String valorComissionadoFormatado;
+	private double valorComprado;
+	private String valorCompradoFormatado;
+	private String valorCreditoICMSFormatado;
+	private double valorCreditoIPI;
+	private String valorCreditoIPIFormatado;
+	private String valorDebitoICMSFormatado;
+	private double valorDebitoIPI;
+	private String valorDebitoIPIFormatado;
+	private double valorICMS;
+	private String valorICMSFormatado;
+	private double valorIPI;
+	private String valorIPIFormatado;
+	private double valorLiquido;
+	private String valorLiquidoFormatado;
+	private double valorReceita;
+	private String valorReceitaFormatado;
+	private double valorVendido;
+	private String valorVendidoFormatado;
 
 	public double getValorComissionado() {
 		return valorComissionado;
@@ -35,12 +38,20 @@ public class ReceitaWrapper {
 		return valorCompradoFormatado;
 	}
 
+	public String getValorCreditoICMSFormatado() {
+		return valorCreditoICMSFormatado;
+	}
+
 	public double getValorCreditoIPI() {
 		return valorCreditoIPI;
 	}
 
 	public String getValorCreditoIPIFormatado() {
 		return valorCreditoIPIFormatado;
+	}
+
+	public String getValorDebitoICMSFormatado() {
+		return valorDebitoICMSFormatado;
 	}
 
 	public double getValorDebitoIPI() {
@@ -75,6 +86,14 @@ public class ReceitaWrapper {
 		return valorLiquidoFormatado;
 	}
 
+	public double getValorReceita() {
+		return valorReceita;
+	}
+
+	public String getValorReceitaFormatado() {
+		return valorReceitaFormatado;
+	}
+
 	public double getValorVendido() {
 		return valorVendido;
 	}
@@ -99,12 +118,20 @@ public class ReceitaWrapper {
 		this.valorCompradoFormatado = valorCompradoFormatado;
 	}
 
+	public void setValorCreditoICMSFormatado(String valorCreditoICMSFormatado) {
+		this.valorCreditoICMSFormatado = valorCreditoICMSFormatado;
+	}
+
 	public void setValorCreditoIPI(double valorCreditoIPI) {
 		this.valorCreditoIPI = valorCreditoIPI;
 	}
 
 	public void setValorCreditoIPIFormatado(String valorCreditoIPIFormatado) {
 		this.valorCreditoIPIFormatado = valorCreditoIPIFormatado;
+	}
+
+	public void setValorDebitoICMSFormatado(String valorDebitoICMSFormatado) {
+		this.valorDebitoICMSFormatado = valorDebitoICMSFormatado;
 	}
 
 	public void setValorDebitoIPI(double valorDebitoIPI) {
@@ -137,6 +164,14 @@ public class ReceitaWrapper {
 
 	public void setValorLiquidoFormatado(String valorLiquidoFormatado) {
 		this.valorLiquidoFormatado = valorLiquidoFormatado;
+	}
+
+	public void setValorReceita(double valorReceita) {
+		this.valorReceita = valorReceita;
+	}
+
+	public void setValorReceitaFormatado(String valorReceitaFormatado) {
+		this.valorReceitaFormatado = valorReceitaFormatado;
 	}
 
 	public void setValorVendido(double valorVendido) {

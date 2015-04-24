@@ -120,13 +120,13 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal);
 
+	List<ItemPedido> pesquisarItemPedidoRepresentacaoByPeriodo(Periodo periodo);
+
 	List<ItemPedido> pesquisarItemPedidoRevendaByPeriodo(Periodo periodo);
 
 	List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor);
 
 	List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo);
-
-	List<ItemPedido> pesquisarItemPedidoVendidoResumidoByPeriodo(Periodo periodo);
 
 	List<Logradouro> pesquisarLogradouro(Integer idPedido);
 
@@ -168,7 +168,7 @@ public interface PedidoService {
 
 	List<SituacaoPedido> pesquisarSituacaoVendaEfetivada();
 
-	List<Object[]> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo);
+	List<TotalizacaoPedidoWrapper> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo);
 
 	long pesquisarTotalItemCompradoNaoRecebido(Integer idPedido);
 
@@ -178,7 +178,7 @@ public interface PedidoService {
 
 	Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente);
 
-	List<Object[]> pesquisarTotalVendaResumidaByPeriodo(Periodo periodo);
+	List<TotalizacaoPedidoWrapper> pesquisarTotalPedidoVendaResumidaByPeriodo(Periodo periodo);
 
 	Double pesquisarValorPedido(Integer idPedido);
 

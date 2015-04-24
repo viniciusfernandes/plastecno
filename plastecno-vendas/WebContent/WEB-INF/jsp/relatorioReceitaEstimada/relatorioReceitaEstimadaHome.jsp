@@ -53,11 +53,27 @@
 			</form>
 			<div class="label" style="width: 30%">Receita (R$):</div>
 			<div class="input" style="width: 15%">
+				<input type="text" value="${receita.valorReceitaFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+			</div>
+			<div class="label" style="width: 15%">Líquido (R$):</div>
+			<div class="input" style="width: 15%">
+				<input type="text" value="${receita.valorLiquidoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+			</div>
+			<div class="label" style="width: 30%">Valor Vendido (R$):</div>
+			<div class="input" style="width: 15%">
 				<input type="text" value="${receita.valorVendidoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 			<div class="label" style="width: 15%">Valor Comprado (R$):</div>
 			<div class="input" style="width: 15%">
 				<input type="text" value="${receita.valorCompradoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+			</div>
+			<div class="label" style="width: 30%">Débito ICMS (R$):</div>
+			<div class="input" style="width: 15%">
+				<input type="text" value="${receita.valorDebitoICMSFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
+			</div>
+			<div class="label" style="width: 15%">Crédito ICMS (R$):</div>
+			<div class="input" style="width: 15%">
+				<input type="text" value="${receita.valorCreditoICMSFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
 			<div class="label" style="width: 30%">Débito IPI (R$):</div>
 			<div class="input" style="width: 15%">
@@ -67,6 +83,7 @@
 			<div class="input" style="width: 15%">
 				<input type="text" value="${receita.valorCreditoIPIFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
+			
 			<div class="label" style="width: 30%">Valor IPI (R$):</div>
 			<div class="input" style="width: 15%">
 				<input type="text" value="${receita.valorIPIFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
@@ -79,10 +96,7 @@
 			<div class="input" style="width: 15%">
 				<input type="text" value="${receita.valorComissionadoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
 			</div>
-			<div class="label" style="width: 15%">Líquido (R$):</div>
-			<div class="input" style="width: 15%">
-				<input type="text" value="${receita.valorLiquidoFormatado}" maxlength="10" class="desabilitado" disabled="disabled"/>
-			</div>
+			
 		</fieldset>
 		<div class="bloco_botoes">
 			<input id="botaoPesquisar" type="button" value="" class="botaoPesquisar" title="Pesquisar Receita" /> 

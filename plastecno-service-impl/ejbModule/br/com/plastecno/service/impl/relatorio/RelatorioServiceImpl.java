@@ -26,16 +26,14 @@ import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ClienteWrapper;
 import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
-import br.com.plastecno.service.wrapper.ReceitaWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.service.wrapper.ReceitaWrapper;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
-import br.com.plastecno.service.wrapper.RelatorioPedidoPeriodo;
+import br.com.plastecno.service.wrapper.RelatorioValorTotalPedidoWrapper;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
-import br.com.plastecno.service.wrapper.RepresentadaValorWrapper;
 import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.service.wrapper.VendaClienteWrapper;
-import br.com.plastecno.service.wrapper.exception.AgrupamentoException;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 
@@ -65,9 +63,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 	public ReceitaWrapper gerarReceitaEstimada(Periodo periodo) {
 		double valorComprado = 0;
 		double valorVendido = 0;
-		double valorICMS = 0;
+		double valorReceita = 0;
 		double valorDebitoIPI = 0;
 		double valorCreditoIPI = 0;
+		double valorDebitoICMS = 0;
+		double valorCreditoICMS = 0;
 		double aliquota = 0;
 		double precoItem = 0;
 		double valorComissionado = 0;
@@ -75,10 +75,14 @@ public class RelatorioServiceImpl implements RelatorioService {
 		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoCompradoResumidoByPeriodo(periodo);
 		for (ItemPedido itemPedido : listaItemComprado) {
 			precoItem = itemPedido.calcularPrecoItem();
+
+			aliquota = itemPedido.getAliquotaICMS() == null ? 0 : itemPedido.getAliquotaICMS();
+			valorCreditoIPI += precoItem * aliquota;
+
 			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido.getAliquotaIPI();
+			valorCreditoIPI += precoItem * aliquota;
 
 			valorComprado += precoItem;
-			valorCreditoIPI += precoItem * aliquota;
 		}
 
 		// Acumulando os valores dos itens de revenda
@@ -86,33 +90,45 @@ public class RelatorioServiceImpl implements RelatorioService {
 		for (ItemPedido itemPedido : listaItemVendido) {
 			precoItem = itemPedido.calcularPrecoItem();
 			valorVendido += precoItem;
+
 			aliquota = itemPedido.getAliquotaICMS() == null ? 0 : itemPedido.getAliquotaICMS();
-			valorICMS += precoItem * aliquota;
+			valorDebitoICMS += precoItem * aliquota;
 
 			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido.getAliquotaIPI();
 			valorDebitoIPI += precoItem * aliquota;
+
 			valorComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
 		}
+		valorReceita = valorVendido;
 
 		// Acumulando os valores dos itens de venda por representacao
-		listaItemVendido = pedidoService.pesquisarItemPedidoVendaResumidaByPeriodo(periodo);
+		listaItemVendido = pedidoService.pesquisarItemPedidoRepresentacaoByPeriodo(periodo);
+		double valorComissionadoRepresentacao = 0;
 		for (ItemPedido itemPedido : listaItemVendido) {
-			valorVendido += itemPedido.calcularPrecoItem();
-			valorComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
+			precoItem = itemPedido.calcularPrecoItem();
+			valorVendido += precoItem;
+			valorComissionado += itemPedido.getValorComissionado();
+			valorComissionadoRepresentacao += precoItem * itemPedido.getAliquotaComissaoPedido();
 		}
 
+		valorReceita += valorComissionadoRepresentacao;
+
 		double valorIPI = valorDebitoIPI - valorCreditoIPI;
-		double valorLiquido = valorVendido - valorIPI - valorICMS - valorComissionado;
+		double valorICMS = valorDebitoICMS - valorCreditoICMS;
+		double valorLiquido = valorReceita - valorIPI - valorICMS - valorComissionado;
 
 		ReceitaWrapper receita = new ReceitaWrapper();
 		receita.setValorCompradoFormatado(NumeroUtils.formatarValorMonetario(valorComprado));
 		receita.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(valorVendido));
+		receita.setValorCreditoICMSFormatado(NumeroUtils.formatarValorMonetario(valorCreditoICMS));
+		receita.setValorDebitoICMSFormatado(NumeroUtils.formatarValorMonetario(valorDebitoICMS));
 		receita.setValorCreditoIPIFormatado(NumeroUtils.formatarValorMonetario(valorCreditoIPI));
 		receita.setValorDebitoIPIFormatado(NumeroUtils.formatarValorMonetario(valorDebitoIPI));
 		receita.setValorICMSFormatado(NumeroUtils.formatarValorMonetario(valorICMS));
 		receita.setValorIPIFormatado(NumeroUtils.formatarValorMonetario(valorIPI));
 		receita.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(valorComissionado));
 		receita.setValorLiquidoFormatado(NumeroUtils.formatarValorMonetario(valorLiquido));
+		receita.setValorReceitaFormatado(NumeroUtils.formatarValorMonetario(valorReceita));
 		return receita;
 	}
 
@@ -232,31 +248,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioPedidoPeriodo gerarRelatorioCompraPeriodo(Periodo periodo) throws BusinessException {
-
-		final List<Object[]> resultados = pedidoService.pesquisarTotalCompraResumidaByPeriodo(periodo);
-
-		final StringBuilder titulo = new StringBuilder();
-		titulo.append("Relatório das Compras do Período de ");
-		titulo.append(StringUtils.formatarData(periodo.getInicio()));
-		titulo.append(" à ");
-		titulo.append(StringUtils.formatarData(periodo.getFim()));
-		final RelatorioPedidoPeriodo relatorio = new RelatorioPedidoPeriodo(titulo.toString());
-
-		for (Object[] resultado : resultados) {
-
-			try {
-				relatorio.addValor(resultado[0].toString(), new RepresentadaValorWrapper(resultado[1].toString(),
-						(Double) resultado[2]));
-			} catch (AgrupamentoException e) {
-				throw new BusinessException("Falha na construcao do relatorio de vendas da representada por vendedor", e);
-			}
-		}
-
-		return relatorio;
-	}
-
-	@Override
 	public List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException {
 		return pedidoService.pesquisarEntregaVendaByPeriodo(periodo);
 	}
@@ -324,6 +315,54 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoCompraPeriodo(Periodo periodo)
+			throws BusinessException {
+
+		final List<TotalizacaoPedidoWrapper> resultados = pedidoService.pesquisarTotalCompraResumidaByPeriodo(periodo);
+
+		final StringBuilder titulo = new StringBuilder();
+		titulo.append("Relatório das Compras do Período de ");
+		titulo.append(StringUtils.formatarData(periodo.getInicio()));
+		titulo.append(" à ");
+		titulo.append(StringUtils.formatarData(periodo.getFim()));
+
+		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
+	}
+
+	private RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoPeriodo(
+			List<TotalizacaoPedidoWrapper> resultados, String titulo) throws BusinessException {
+
+		RelatorioValorTotalPedidoWrapper relatorio = new RelatorioValorTotalPedidoWrapper(titulo);
+
+		// Criando os agrupamentos e acumulando os valores totais dos pedidos.
+		for (TotalizacaoPedidoWrapper totalizacao : resultados) {
+			// Criando os agrupamentos pelo ID do proprietario do pedido.
+			relatorio.addGrupo(totalizacao.getIdProprietario(), totalizacao);
+
+			// Armazenando o valor negociado com cada representada para efetuarmos a
+			// totalizacao logo abaixo.
+			relatorio.addElemento(totalizacao.getIdRepresentada(), totalizacao);
+
+		}
+		return relatorio.formatarValores();
+	}
+
+	@Override
+	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoVendaPeriodo(Periodo periodo)
+			throws BusinessException {
+
+		final List<TotalizacaoPedidoWrapper> resultados = pedidoService.pesquisarTotalPedidoVendaResumidaByPeriodo(periodo);
+
+		final StringBuilder titulo = new StringBuilder();
+		titulo.append("Relatório das Vendas do Período de ");
+		titulo.append(StringUtils.formatarData(periodo.getInicio()));
+		titulo.append(" à ");
+		titulo.append(StringUtils.formatarData(periodo.getFim()));
+
+		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
+	}
+
+	@Override
 	public List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException {
 		return this.pedidoService.pesquisarPedidoVendaByPeriodo(periodo);
 	}
@@ -358,31 +397,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 			}
 		}
 		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotal));
-		return relatorio;
-	}
-
-	@Override
-	public RelatorioPedidoPeriodo gerarRelatorioVendaPeriodo(Periodo periodo) throws BusinessException {
-
-		final List<Object[]> resultados = pedidoService.pesquisarTotalVendaResumidaByPeriodo(periodo);
-
-		final StringBuilder titulo = new StringBuilder();
-		titulo.append("Relatório das Vendas do Período de ");
-		titulo.append(StringUtils.formatarData(periodo.getInicio()));
-		titulo.append(" à ");
-		titulo.append(StringUtils.formatarData(periodo.getFim()));
-		final RelatorioPedidoPeriodo relatorio = new RelatorioPedidoPeriodo(titulo.toString());
-
-		for (Object[] resultado : resultados) {
-
-			try {
-				relatorio.addValor(resultado[0].toString(), new RepresentadaValorWrapper(resultado[1].toString(),
-						(Double) resultado[2]));
-			} catch (AgrupamentoException e) {
-				throw new BusinessException("Falha na construcao do relatorio de vendas da representada por vendedor", e);
-			}
-		}
-
 		return relatorio;
 	}
 

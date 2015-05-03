@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
@@ -341,7 +342,7 @@ $(document).ready(function() {
 			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 			<input type="submit" value="" title="Limpar Dados do Pedido" class="botaoLimpar" />
 		</form>
-		<form action="pedido/pdf" method="get">
+		<form action="pedido/pdf" method="get" accept-charset="utf-8">
 			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}" /> 
 			<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF" />

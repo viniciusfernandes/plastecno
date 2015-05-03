@@ -223,7 +223,7 @@ public abstract class AbstractController {
     }
 
     Download gerarDownload(byte[] bytesArquivo, String nomeArquivo) {
-        final String contentType = "application/pdf;charset=ISO-8859-1";
+        final String contentType = "application/pdf; charset=utf-8";
         return new ByteArrayDownload(bytesArquivo, contentType, nomeArquivo);
     }
 

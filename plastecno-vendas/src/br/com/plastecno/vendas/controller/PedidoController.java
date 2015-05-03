@@ -153,7 +153,7 @@ public class PedidoController extends AbstractController {
             PedidoPDFWrapper wrapper = this.gerarPDF(idPedido, tipoPedido);
             final Pedido pedido = wrapper.getPedido();
 
-            final StringBuilder titulo = new StringBuilder(pedido.isOrcamento() ? "Orçamento " : "Pedido ")
+            final StringBuilder titulo = new StringBuilder(pedido.isOrcamento() ? "Orcamento " : "Pedido ")
                     .append("No. ").append(idPedido).append(" - ").append(pedido.getCliente().getNomeFantasia())
                     .append(".pdf");
 

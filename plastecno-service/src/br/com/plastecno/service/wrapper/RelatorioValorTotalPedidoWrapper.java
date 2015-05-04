@@ -25,8 +25,7 @@ public class RelatorioValorTotalPedidoWrapper extends RelatorioWrapper<Integer, 
 			t.setValorTotal(t.getValorTotal() + totalizacao.getValorTotal());
 			t.setValorTotalIPI(t.getValorTotalIPI() + totalizacao.getValorTotalIPI());
 		}
-		totalGeral += t.getValorTotal();
-		totalGeralIPI += t.getValorTotalIPI();
+
 		return t;
 	}
 
@@ -54,6 +53,13 @@ public class RelatorioValorTotalPedidoWrapper extends RelatorioWrapper<Integer, 
 		return g;
 	}
 
+	public void calcularTotaisGerais() {
+		for (TotalizacaoPedidoWrapper t : getListaElemento()) {
+			totalGeral += t.getValorTotal();
+			totalGeralIPI += t.getValorTotalIPI();
+		}
+	}
+
 	public RelatorioValorTotalPedidoWrapper formatarValores() {
 		for (GrupoWrapper<Integer, TotalizacaoPedidoWrapper> g : super.getListaGrupo()) {
 			for (TotalizacaoPedidoWrapper t : g.getListaElemento()) {
@@ -71,6 +77,9 @@ public class RelatorioValorTotalPedidoWrapper extends RelatorioWrapper<Integer, 
 			t.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(t.getValorTotal()));
 			t.setValorTotalIPIFormatado(NumeroUtils.formatarValorMonetario(t.getValorTotalIPI()));
 		}
+
+		calcularTotaisGerais();
+
 		return this;
 	}
 
@@ -93,5 +102,4 @@ public class RelatorioValorTotalPedidoWrapper extends RelatorioWrapper<Integer, 
 	public String getValorIPIFormatado() {
 		return NumeroUtils.formatarValorMonetario(totalGeralIPI - totalGeral);
 	}
-
 }

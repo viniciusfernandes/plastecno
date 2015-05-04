@@ -78,7 +78,7 @@ public class EstoqueController extends AbstractController {
             if (isListagemEscassez) {
                 lista = estoqueService.pesquisarEscassezItemEstoque(idMaterial, formaMaterial);
             } else {
-                lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
+                lista = estoqueService.pesquisarItemEstoqueNaoZerados(idMaterial, formaMaterial);
             }
             formatarItemEstoque(lista);
 

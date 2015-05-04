@@ -45,6 +45,8 @@ public interface EstoqueService {
 
 	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);
 
+	List<ItemEstoque> pesquisarItemEstoqueNaoZerados(Integer idMaterial, FormaMaterial formaMaterial);
+
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
 	double pesquisarPrecoMedioItemEstoque(Item filtro);

@@ -50,8 +50,13 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return query.getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca) {
+		return pesquisarItemEstoque(idMaterial, formaMaterial, descricaoPeca, false);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca,
+			boolean zeradosExcluidos) {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemEstoque i ");
 		if (idMaterial != null || formaMaterial != null) {
@@ -70,6 +75,10 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 		if (StringUtils.isNotEmpty(descricaoPeca)) {
 			select.append("and i.descricaoPeca = :descricaoPeca ");
+		}
+
+		if (zeradosExcluidos) {
+			select.append("and i.quantidade > 0 ");
 		}
 
 		select

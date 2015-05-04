@@ -251,7 +251,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null);
 	}
-
+	
 	@Override
 	public ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
 			Double medidaInterna, Double comprimento) {
@@ -309,6 +309,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque) {
 		return itemEstoqueDAO.pesquisarById(idItemEstoque);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemEstoque> pesquisarItemEstoqueNaoZerados(Integer idMaterial, FormaMaterial formaMaterial) {
+		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null, true);
 	}
 
 	@SuppressWarnings("unchecked")

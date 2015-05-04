@@ -4,6 +4,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
+
 <title>Itens do Estoque</title>
 
 <jsp:include page="/bloco/bloco_css.jsp" />
@@ -16,7 +18,6 @@
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
@@ -92,7 +93,6 @@ $(document).ready(function() {
 	inicializarAutocompleteMaterial();
 	inicializarSelectFormaMaterial();
 	
-	<jsp:include page="/bloco/bloco_paginador.jsp" />
 });
 
 function inicializarAutocompleteMaterial() {
@@ -179,7 +179,6 @@ function inicializarFiltro() {
 	<a id="rodape"></a>
 	<fieldset>
 		<legend>::: Resultado da Pesquisa de Itens de Estoque :::</legend>
-		<div id="paginador"></div>
 		<div>
 			<table class="listrada">
 				<thead>

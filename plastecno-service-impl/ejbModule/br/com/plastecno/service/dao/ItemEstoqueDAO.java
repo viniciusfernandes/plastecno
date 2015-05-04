@@ -72,7 +72,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			select.append("and i.descricaoPeca = :descricaoPeca ");
 		}
 
-		select.append("order by i.formaMaterial, i.material.sigla , i.precoMedio asc");
+		select
+				.append("order by i.formaMaterial, i.material.sigla, i.medidaInterna asc, i.medidaExterna asc, i.comprimento asc ");
 		Query query = entityManager.createQuery(select.toString());
 		if (idMaterial != null) {
 			query.setParameter("idMaterial", idMaterial);

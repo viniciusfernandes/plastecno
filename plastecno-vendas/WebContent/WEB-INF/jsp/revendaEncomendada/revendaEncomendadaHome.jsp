@@ -65,7 +65,7 @@ function enviarEmpacotamento(botao){
 				<input type="text" id="dataFinal" name="dataFinal"
 					value="${dataFinal}" maxlength="100" class="pesquisavel" />
 			</div>
-			<div class="label" style="width: 30%">Representada:</div>
+			<div class="label" style="width: 30%">Fornecedor:</div>
 			<div class="input" style="width: 50%">
 				<select name="idRepresentada" style="width: 30%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>

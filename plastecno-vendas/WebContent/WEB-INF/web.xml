@@ -4,12 +4,14 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	id="WebApp_ID" version="2.5">
 	<display-name>plastecno-vendas</display-name>
+	<context-param>    
+	    <param-name>br.com.caelum.vraptor.encoding</param-name>    
+	    <param-value>UTF-8</param-value>    
+    </context-param> 
 	<context-param>
-		<param-name>auditor
-		iaHabilidata</param-name>
+		<param-name>auditoriaHabilidata</param-name>
 		<param-value>false</param-value>
 	</context-param>
-
 	<context-param>
 		<description>Aqui definimos a cor padrao para a identidade visual do sistema, sendo elas: azul, verde</description>
 		<param-name>padraoCSS</param-name>

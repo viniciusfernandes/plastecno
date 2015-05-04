@@ -3,6 +3,7 @@ package br.com.plastecno.service.wrapper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,9 +38,9 @@ public class RelatorioWrapper<T, K> {
 	 * Teremos uma lista de elementos que sera percorrida para exibir a listagem
 	 * das informacoes.
 	 */
-	private final HashMap<T, K> mapaElemento = new HashMap<T, K>();
+	private final Map<T, K> mapaElemento = new HashMap<T, K>();
 
-	private final HashMap<Object, GrupoWrapper<T, K>> mapaGrupo = new HashMap<Object, GrupoWrapper<T, K>>();
+	private final Map<Object, GrupoWrapper<T, K>> mapaGrupo = new LinkedHashMap<Object, GrupoWrapper<T, K>>();
 
 	private Map<String, Object> propriedades;
 	private final String titulo;

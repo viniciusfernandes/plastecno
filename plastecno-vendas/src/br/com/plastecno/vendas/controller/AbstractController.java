@@ -37,20 +37,20 @@ import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
 public abstract class AbstractController {
 
-    private final Integer numerRegistrosPorPagina = 10;
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
-    private final String possuiMultiplosLogradouros = "possuiMultiplosLogradouros";
-    private final String cssMensagemSucesso = "mensagemSucesso";
-    private final String cssMensagemErro = "mensagemErro";
     private final String cssMensagemAlerta = "mensagemAlerta";
-
-    private String nomeTela;
+    private final String cssMensagemErro = "mensagemErro";
+    private final String cssMensagemSucesso = "mensagemSucesso";
     private String homePath;
-    private Picklist picklist;
-    private Result result;
-    private UsuarioInfo usuarioInfo;
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private String nomeTela;
 
+    private final Integer numerRegistrosPorPagina = 10;
+    private Picklist picklist;
+    private final String possuiMultiplosLogradouros = "possuiMultiplosLogradouros";
+    private Result result;
     private TipoLogradouroService tipoLogradouroService;
+
+    private UsuarioInfo usuarioInfo;
     private UsuarioService usuarioService;
 
     public AbstractController(Result result) {
@@ -223,8 +223,8 @@ public abstract class AbstractController {
     }
 
     Download gerarDownload(byte[] bytesArquivo, String nomeArquivo) {
-        final String contentType = "application/pdf;charset=ISO-8859-1";
-        return new ByteArrayDownload(bytesArquivo, contentType, nomeArquivo);
+        final String contentType = "application/pdf;";
+        return new ByteArrayDownload(bytesArquivo, contentType, StringUtils.removerAcentuacao(nomeArquivo));
     }
 
     void gerarListaMensagemAjax(String mensagem, String categoria) {
@@ -601,8 +601,8 @@ public abstract class AbstractController {
 }
 
 class Autocomplete {
-    private Integer valor;
     private String label;
+    private Integer valor;
 
     public Autocomplete(Integer valor, String label) {
         this.valor = valor;
@@ -619,13 +619,13 @@ class Autocomplete {
 }
 
 class Picklist {
+    private final String associados = "listaElementosAssociados";
+    private List<PicklistElement> listaElementosAssociados;
+    private List<PicklistElement> listaElementosNaoAssociados;
+    private final String naoAssociados = "listaElementosNaoAssociados";
+
     private String nomeAtributoLabel;
     private String nomeAtributoValor;
-    private List<PicklistElement> listaElementosNaoAssociados;
-    private List<PicklistElement> listaElementosAssociados;
-
-    private final String associados = "listaElementosAssociados";
-    private final String naoAssociados = "listaElementosNaoAssociados";
 
     private final Result result;
 
@@ -732,7 +732,7 @@ class Picklist {
 }
 
 enum TipoOperacao {
-    CADASTRO("cadastro(a)"), REMOCAO("removido(a)"), ENVIO("Envio");
+    CADASTRO("cadastro(a)"), ENVIO("Envio"), REMOCAO("removido(a)");
     private final String descricao;
 
     private TipoOperacao(String descricao) {

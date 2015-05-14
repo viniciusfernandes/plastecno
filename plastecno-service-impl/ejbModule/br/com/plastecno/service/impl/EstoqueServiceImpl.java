@@ -251,7 +251,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null);
 	}
-	
+
 	@Override
 	public ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
 			Double medidaInterna, Double comprimento) {
@@ -457,8 +457,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	private void reinserirItemPedidoEstoque(Integer idPedido) throws BusinessException {
 		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		ItemEstoque itemEstoque = null;
 		for (ItemPedido itemPedido : listaItemPedido) {
-			inserirItemPedido(itemPedido.getId());
+			itemEstoque = pesquisarItemEstoque(itemPedido);
+			if (itemEstoque != null) {
+				itemEstoque.addQuantidade(itemPedido.getQuantidade());
+				itemEstoqueDAO.alterar(itemEstoque);
+			}
 		}
 	}
 

@@ -15,7 +15,7 @@
 	<context-param>
 		<description>Aqui definimos a cor padrao para a identidade visual do sistema, sendo elas: azul, verde</description>
 		<param-name>padraoCSS</param-name>
-		<param-value>azul</param-value>
+		<param-value>verde</param-value>
 	</context-param>
 
 	<filter>

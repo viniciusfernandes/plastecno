@@ -20,6 +20,9 @@ public abstract class Item implements Serializable, Cloneable {
 	private String aliquotaIPIFormatado;
 
 	@Transient
+	private String comissaoFormatado;
+
+	@Transient
 	private String comprimentoFormatado;
 
 	@Transient
@@ -30,12 +33,6 @@ public abstract class Item implements Serializable, Cloneable {
 
 	@Transient
 	private String precoItemFormatado;
-
-	@Transient
-	private String comissaoFormatado;
-
-	@Transient
-	private String valorComissaoFormatado;
 
 	@Transient
 	private String precoMedioFormatado;
@@ -49,7 +46,22 @@ public abstract class Item implements Serializable, Cloneable {
 	@Transient
 	private String precoVendaFormatado;
 
+	@Transient
+	private String valorComissaoFormatado;
+
 	public Item() {
+	}
+
+	public void addQuantidade(Integer quantidade) {
+		setQuantidade(getQuantidade() + quantidade);
+	}
+
+	public double calcularPrecoItem() {
+		if (getPrecoUnidade() == null || getQuantidade() == null) {
+			return 0d;
+		}
+
+		return getPrecoUnidade() * getQuantidade();
 	}
 
 	public boolean contemLargura() {
@@ -134,14 +146,6 @@ public abstract class Item implements Serializable, Cloneable {
 			return " _ ";
 		}
 		return medidaInternaFomatada;
-	}
-
-	public double calcularPrecoItem() {
-		if (getPrecoUnidade() == null || getQuantidade() == null) {
-			return 0d;
-		}
-
-		return getPrecoUnidade() * getQuantidade();
 	}
 
 	public String getPrecoItemFormatado() {

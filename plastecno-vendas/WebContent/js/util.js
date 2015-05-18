@@ -207,10 +207,12 @@ function serializar(listaCampos) {
 
 function serializarBloco(idBloco) {
 	var parametros = '';
-	$('#'+idBloco+' :input').each(function () {
+	idBloco = '#'+idBloco;
+	var inputs = $(idBloco+' :input[type=text], '+idBloco+' select, '+ idBloco+' :input[type=radio], '+ idBloco+' :input[type=checkbox], '+ idBloco+' :input[type=hidden]');
+	$(inputs).each(function () {
 		parametros += '&'+this.name+"="+this.value;
 	});
-	 
+	alert(parametros);
 	return parametros;
 };
 

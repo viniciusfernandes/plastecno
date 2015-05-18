@@ -2,8 +2,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-
 <title>Plastecno - Cadastro de Representada ou Fornecedores</title>
 
 <jsp:include page="/bloco/bloco_css.jsp" />
@@ -54,7 +52,7 @@ $(document).ready(function() {
 		removerNaoDigitos(listaId);
 
 		var parametros = tabelaContatoHandler.gerarListaParametro('listaContato');
-		parametros += '&'+serializarForm('bloco_logradouro');
+		parametros += serializarBloco('bloco_logradouro');
 		$("#formRepresentada").attr("action", "<c:url value="/representada/inclusao"/>?"+parametros);
 		$('#formRepresentada').submit();
 	});

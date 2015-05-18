@@ -358,10 +358,8 @@ $(document).ready(function() {
 		<c:if test="${acessoCancelamentoPedidoPermitido}">
 			<form action="pedido/cancelamento" method="post">
 				<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
-				<input type="hidden" name="idPedido" id="idPedidoCancelamento"
-					value="${pedido.id}" /> <input id="botaoCancelarPedido"
-					type="button" value="" title="Cancelar Pedido"
-					class="botaoCancelar" />
+				<input type="hidden" name="idPedido" id="idPedidoCancelamento" value="${pedido.id}" /> 
+				<input id="botaoCancelarPedido" type="button" value="" title="Cancelar Pedido" class="botaoCancelar" />
 			</form>
 		</c:if>
 	</div>

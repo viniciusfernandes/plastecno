@@ -45,8 +45,7 @@ $(document).ready(function() {
 				confirmar: function(){
 					$('#bloco_item_pedido #descricao').val($('#bloco_item_pedido #descricao').val().toUpperCase());
 					var parametros = serializarFormPesquisa();
-					parametros += '&'+serializarForm('bloco_item_pedido');
-					
+					parametros += serializarBloco('bloco_item_pedido');
 					var form = $('#formVazio');
 					$(form).attr('method', 'post');
 					$(form).attr('action', '<c:url value="/estoque/item/inclusao"/>?'+parametros);

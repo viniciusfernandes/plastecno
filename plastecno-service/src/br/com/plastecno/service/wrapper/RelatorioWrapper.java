@@ -2,6 +2,8 @@ package br.com.plastecno.service.wrapper;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -107,5 +109,11 @@ public class RelatorioWrapper<T, K> {
 
 	public void setValorTotal(Object valorTotal) {
 		this.valorTotal = valorTotal;
+	}
+
+	public void sortElementoByGrupo(Comparator<K> comparator) {
+		for (GrupoWrapper<T, K> grupoWrapper : listaGrupo) {
+			Collections.sort(grupoWrapper.getListaElemento(), comparator);
+		}
 	}
 }

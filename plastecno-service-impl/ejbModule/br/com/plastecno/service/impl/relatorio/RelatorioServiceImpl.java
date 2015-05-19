@@ -1,5 +1,6 @@
 package br.com.plastecno.service.impl.relatorio;
 
+import java.util.Comparator;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -288,6 +289,13 @@ public class RelatorioServiceImpl implements RelatorioService {
 			relatorio.addGrupo(pedido.getId(), item).setPropriedade("dataEntrega",
 					StringUtils.formatarData(pedido.getDataEntrega()));
 		}
+		// Reordenando os itens pelo numero de sequencia de inclusao no pedido.
+		relatorio.sortElementoByGrupo(new Comparator<ItemPedido>() {
+			@Override
+			public int compare(ItemPedido i1, ItemPedido i2) {
+				return i1.getSequencial().compareTo(i2.getSequencial());
+			}
+		});
 		return relatorio;
 	}
 
@@ -384,10 +392,10 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		final RelatorioWrapper<String, TotalizacaoPedidoWrapper> relatorio = new RelatorioWrapper<String, TotalizacaoPedidoWrapper>(
 				titulo.toString());
-		
+
 		List<TotalizacaoPedidoWrapper> listaPedido = this.pedidoService.pesquisarValorVendaClienteByPeriodo(periodo,
 				idCliente, orcamento);
-		
+
 		double valorTotal = 0d;
 		for (TotalizacaoPedidoWrapper totalizacao : listaPedido) {
 			try {

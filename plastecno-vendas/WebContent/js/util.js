@@ -210,9 +210,10 @@ function serializarBloco(idBloco) {
 	idBloco = '#'+idBloco;
 	var inputs = $(idBloco+' :input[type=text], '+idBloco+' select, '+ idBloco+' :input[type=radio], '+ idBloco+' :input[type=checkbox], '+ idBloco+' :input[type=hidden]');
 	$(inputs).each(function () {
-		parametros += '&'+this.name+"="+this.value;
+		if(!isEmpty(this.value) && !$(this).attr('disabled')){
+			parametros += '&'+this.name+"="+this.value;
+		}
 	});
-	alert(parametros);
 	return parametros;
 };
 
@@ -331,5 +332,5 @@ function serializarForm(idForm){
 }
 
 function serializarFormPesquisa(){
-	return serializarForm('formPesquisa');
+	return serializarBloco('formPesquisa');
 }

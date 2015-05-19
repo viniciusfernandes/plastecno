@@ -154,9 +154,9 @@ function inicializarFiltro() {
 				<input type="text" id="material" name="material.descricao" value="${material.descricao}" style="width: 60%" />
 				<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 			</div>
-			<div class="label" style="width: 30%">Valor total em estoque:</div>
+			<div class="label" style="width: 30%">Valor total em estoque (R$):</div>
 			<div class="input" style="width: 60%">
-				<input type="text" value="R$ ${empty valorEstoque ? '0,00' : valorEstoque}" disabled="disabled" 
+				<input type="text" value="${empty valorEstoque ? '0,00' : valorEstoque}" disabled="disabled" 
 				class="desabilitado" style="width: 60%"/>
 			</div>
 			

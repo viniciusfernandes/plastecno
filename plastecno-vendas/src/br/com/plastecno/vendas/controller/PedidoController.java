@@ -555,21 +555,13 @@ public class PedidoController extends AbstractController {
 
             // Condicao indicadora de que apenas o administrador podera cancelar
             // pedidos ja enviados
-            final boolean acessoCancelamentoPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao)
-                    || SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacao)
-                    || SituacaoPedido.COMPRA_ENCOMENDADA.equals(situacao)
-                    || SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA.equals(situacao)
-                    || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao)
-                    || SituacaoPedido.EMPACOTADO.equals(situacao) || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao))
-                    && !SituacaoPedido.CANCELADO.equals(situacao) && isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+            final boolean acessoCancelamentoPedidoPermitido = !SituacaoPedido.CANCELADO.equals(situacao)
+                    || pedido.isVendaEfetuada() || pedido.isRevendaEfetuada()
+                    || (pedido.isCompraEfetuada() && isAcessoPermitido(TipoAcesso.ADMINISTRACAO));
 
-            final boolean acessoRefazerPedidoPermitido = (SituacaoPedido.ENVIADO.equals(situacao)
-                    || SituacaoPedido.COMPRA_ENCOMENDADA.equals(situacao)
-                    || SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA.equals(situacao)
-                    || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao)
-                    || SituacaoPedido.COMPRA_RECEBIDA.equals(situacao)
-                    || SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacao) || SituacaoPedido.EMPACOTADO
-                        .equals(situacao)) && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_VENDAS);
+            final boolean acessoRefazerPedidoPermitido = (!SituacaoPedido.CANCELADO.equals(situacao)
+                    || pedido.isVendaEfetuada() || pedido.isRevendaEfetuada())
+                    && !SituacaoPedido.DIGITACAO.equals(situacao);
 
             liberarAcesso("pedidoDesabilitado", isPedidoDesabilitado(pedido));
             liberarAcesso("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);

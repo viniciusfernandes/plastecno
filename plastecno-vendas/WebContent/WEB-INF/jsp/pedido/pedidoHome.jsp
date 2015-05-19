@@ -392,11 +392,11 @@ $(document).ready(function() {
 				<thead>
 					<tr>
 						<th style="width: 10%">Situação</th>
-						<th style="width: 9%">Nr. Pedido</th>
-						<th style="width: 11%">Nr. Pedido Cliente</th>
-						<th style="width: 33%">Cliente / Vendedor</th>
+						<th style="width: 10%">Nr. Pedido</th>
+						<th style="width: 10%">Nr. Pedido Cliente</th>
+						<th style="width: 23%">${not empty tipoPedido ? 'Fornecedor': 'Representada'}</th>
+						<th style="width: 22%">Vendedor</th>
 						<th style="width: 10%">Data Incl.</th>
-						<th style="width: 12%; text-align: center">CNPJ/CPF</th>
 						<th style="width: 8%">Valor (R$)</th>
 						<th style="width: 7%">Ações</th>
 					</tr>
@@ -408,10 +408,9 @@ $(document).ready(function() {
 							<td style="text-align: center;">${pedido.situacaoPedido.descricao}</td>
 							<td>${pedido.id}</td>
 							<td>${pedido.numeroPedidoCliente}</td>
-							<td>${pedido.cliente.nomeFantasia}/
-								${pedido.proprietario.nomeCompleto}</td>
+							<td>${pedido.representada.nomeFantasia}</td>
+							<td>${pedido.proprietario.nomeCompleto}</td>
 							<td style="text-align: center;">${pedido.dataInclusaoFormatada}</td>
-							<td>${pedido.cliente.documento}</td>
 							<td style="text-align: right;">${pedido.valorPedido}</td>
 							<td>
 								<div class="coluna_acoes_listagem">

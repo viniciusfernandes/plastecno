@@ -212,7 +212,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idProprietario,
 			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		StringBuilder select = new StringBuilder(
-				"select p from Pedido p left join fetch p.proprietario where p.cliente.id = :idCliente ");
+				"select p from Pedido p join fetch p.representada left join fetch p.proprietario where p.cliente.id = :idCliente ");
 		if (idProprietario != null) {
 			select.append(" and p.proprietario.id = :idVendedor ");
 		}

@@ -67,7 +67,7 @@ public class Pedido implements Serializable, Cloneable {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_envio")
 	private Date dataEnvio;
-	
+
 	@Transient
 	private String dataEnvioFormatada;
 
@@ -385,12 +385,21 @@ public class Pedido implements Serializable, Cloneable {
 		return TipoPedido.REVENDA.equals(tipoPedido);
 	}
 
+	public boolean isRevendaEfetuada() {
+		return isRevenda() && !SituacaoPedido.CANCELADO.equals(situacaoPedido);
+	}
+
 	public boolean isRevendaEncomendada() {
 		return TipoPedido.REVENDA.equals(tipoPedido) && SituacaoPedido.REVENDA_ENCOMENDADA.equals(situacaoPedido);
 	}
 
 	public boolean isVenda() {
 		return isRevenda() || isRepresentacao();
+	}
+
+	public boolean isVendaEfetuada() {
+		return isRepresentacao() && !SituacaoPedido.CANCELADO.equals(situacaoPedido)
+				&& SituacaoPedido.ENVIADO.equals(situacaoPedido);
 	}
 
 	public void setAliquotaComissao(Double aliquotaComissao) {

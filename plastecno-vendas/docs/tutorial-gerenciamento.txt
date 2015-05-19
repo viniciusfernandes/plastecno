@@ -28,3 +28,9 @@ host=184.107.24.87, porta=22, usuario=root, senha=XnJ@!1uK
 	lembrando que o caminho do arquivo deve ser crescrito através de barras invertidas "/".
 7) E depois o comando para atualizar as tabelas \i <arquivo-vendas.sql> \encoding UTF-8
 8) sair
+9) EXEMPLO: 
+drop schema vendas cascade;
+drop schema enderecamento cascade;
+create schema vendas;
+create schema enderecamento;
+\i C:/Users/vinicius/ambiente_trabalho/backup/dump.sql \encoding UTF-8

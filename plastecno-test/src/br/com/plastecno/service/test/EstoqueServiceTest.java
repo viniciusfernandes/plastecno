@@ -1,6 +1,8 @@
 package br.com.plastecno.service.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -37,12 +39,12 @@ import br.com.plastecno.service.impl.anotation.TODO;
 
 public class EstoqueServiceTest extends AbstractTest {
 	private ClienteService clienteService;
+	private ComissaoService comissaoService;
 	private EstoqueService estoqueService;
 	private MaterialService materialService;
 	private PedidoService pedidoService;
 	private RepresentadaService representadaService;
 	private UsuarioService usuarioService;
-	private ComissaoService comissaoService;
 
 	private ItemPedido enviarItemPedido(Integer quantidade, TipoPedido tipoPedido) {
 		Pedido pedido = gerarPedido(tipoPedido);
@@ -332,6 +334,42 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+	}
+
+	@Test
+	public void testPesquisarItemEstoqueCadastrado() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		itemEstoque.setId(null);
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.inserirItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		ItemEstoque itemClone = itemEstoque.clone();
+		ItemEstoque itemCadastrado = estoqueService.pesquisarItemEstoque(itemClone);
+
+		assertNotNull(
+				"O item pesquisado eh identico ao cadastrado, portanto deve existir no sistema. Possivel falha na inclusao",
+				itemCadastrado);
+		assertEquals("O item pesquisado eh identico ao cadastrado, portanto deve existir no sistema com o mesmo ID",
+				idItemEstoque, itemCadastrado.getId());
+
+		final double tolerancia = 1d;
+		// Alterando o comprimento em 1mm para testar a tolerancia.
+		itemClone.setComprimento(itemEstoque.getComprimento() + tolerancia);
+
+		itemCadastrado = estoqueService.pesquisarItemEstoque(itemClone);
+		assertNull(
+				"Foi adicionado o valor de tolerancia ao item de estoque para verificar que ele nao existe no estoque e deve ser nulo",
+				itemCadastrado);
+		// Alterando o comprimento em 1mm para testar a tolerancia.
+		itemClone.setComprimento(itemEstoque.getComprimento() - tolerancia);
+
+		itemCadastrado = estoqueService.pesquisarItemEstoque(itemClone);
+		assertNull(
+				"Foi subtraido o valor de tolerancia ao item de estoque para verificar que ele nao existe no estoque e deve ser nulo",
+				itemCadastrado);
 	}
 
 	@Test

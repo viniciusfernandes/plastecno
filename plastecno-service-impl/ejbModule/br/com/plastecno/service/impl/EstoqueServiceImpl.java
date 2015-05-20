@@ -44,7 +44,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@EJB
 	private PedidoService pedidoService;
 
-	private final double tolerancia = 0.001d;
+	// Essa eh a tolerancia de 1mm
+	private final double tolerancia = 1d;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -232,7 +233,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if ((val1 != null && val2 == null) || (val1 == null && val2 != null)) {
 			return false;
 		}
-		return Math.abs(1 - val1 / val2) <= tolerancia;
+
+		return Math.abs(val1 - val2) < tolerancia;
 	}
 
 	@Override

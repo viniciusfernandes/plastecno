@@ -45,7 +45,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private PedidoService pedidoService;
 
 	// Essa eh a tolerancia de 1mm
-	private final double tolerancia = 1d;
+	private final double tolerancia = 0.01d;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)

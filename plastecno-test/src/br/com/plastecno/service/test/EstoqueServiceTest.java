@@ -355,7 +355,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertEquals("O item pesquisado eh identico ao cadastrado, portanto deve existir no sistema com o mesmo ID",
 				idItemEstoque, itemCadastrado.getId());
 
-		final double tolerancia = 0.01d;
+		final double tolerancia = 0.02d;
 		// Alterando o comprimento em 1mm para testar a tolerancia.
 		itemClone.setComprimento(itemEstoque.getComprimento() + tolerancia);
 

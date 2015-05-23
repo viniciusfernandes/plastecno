@@ -10,7 +10,10 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +33,7 @@ public final class GeradorRelatorioPDF {
         return property.replace("{", "").replace("}", "");
     }
 
+    private static Map<String, List<String>> LINHAS = new HashMap<String, List<String>>();
     private StringBuilder cabecalho;
     private final Charset charset;
     private final ConversorHTML2PDF conversor;
@@ -144,24 +148,21 @@ public final class GeradorRelatorioPDF {
         configurarLayout(arquivo);
 
         this.html = new StringBuilder();
-
         final Pattern p = Pattern.compile(regex);
-        String linha = null;
+        Matcher m = null;
         String lista = null;
         String grupo = null;
         boolean encontrou = false;
+        int numLinha = 1;
 
-        Matcher m = null;
+        final List<String> linhas = gerarLinhas(arquivo);
+
         List<String> listaGrupo = new ArrayList<String>();
-        BufferedReader reader = null;
         // Variavel utilizada para apontar qual eh o numero da linha que teve
         // problemas durante o processamento.
-        int numLinha = 1;
         try {
-            reader = gerarBufferedFileReader(arquivo, charset);
 
-            while ((linha = reader.readLine()) != null) {
-
+            for (String linha : linhas) {
                 encontrou = false;
                 lista = null;
                 listaGrupo.clear();
@@ -241,15 +242,38 @@ public final class GeradorRelatorioPDF {
         } catch (Exception e) {
             throw new ConversaoHTML2PDFException("Falha ao popular os valores do relatorio. Problemas na linha: "
                     + numLinha, e);
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException e) {
-                throw new ConversaoHTML2PDFException("Falha ao popular os valor do relatorio."
-                        + "Nao foi possivel liberar recursos de leitura do arquivo.", e);
-            }
         }
+    }
+
+    private List<String> gerarLinhas(File arquivo) throws ConversaoHTML2PDFException {
+        List<String> linhas = LINHAS.get(arquivo.getName());
+        if (linhas == null) {
+
+            int numLinha = 1;
+            linhas = new LinkedList<String>();
+            BufferedReader reader = null;
+            try {
+                reader = gerarBufferedFileReader(arquivo, charset);
+                String linha = null;
+                while ((linha = reader.readLine()) != null) {
+                    linhas.add(linha);
+                    numLinha++;
+                }
+            } catch (Exception e) {
+                throw new ConversaoHTML2PDFException("Falha na leitura do template HTML do relatorio\""
+                        + arquivo.getName() + "\". Problemas na linha: " + numLinha, e);
+            } finally {
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    throw new ConversaoHTML2PDFException("Falha ao encerrar a leitura do arquivo \""
+                            + arquivo.getName() + "\". Nao foi possivel liberar recursos de leitura do arquivo.", e);
+                }
+            }
+            LINHAS.put(arquivo.getName(), linhas);
+        }
+        return linhas;
     }
 }

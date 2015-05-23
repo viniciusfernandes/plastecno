@@ -20,13 +20,26 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.PerfilAcessoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.dao.ClienteDAO;
+import br.com.plastecno.service.dao.ComissaoDAO;
+import br.com.plastecno.service.dao.EnderecoDAO;
+import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
+import br.com.plastecno.service.dao.ItemReservadoDAO;
+import br.com.plastecno.service.dao.MaterialDAO;
+import br.com.plastecno.service.dao.PedidoDAO;
+import br.com.plastecno.service.dao.PerfilAcessoDAO;
+import br.com.plastecno.service.dao.RepresentadaDAO;
+import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.impl.EmailServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
+import br.com.plastecno.service.test.builder.DAOBuilder;
 
 class ServiceBuilder {
 
+	@SuppressWarnings("rawtypes")
+	private final static Map<Class<?>, DAOBuilder> mapDAO = new HashMap<Class<?>, DAOBuilder>();
 	/*
 	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
 	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
@@ -102,18 +115,17 @@ class ServiceBuilder {
 	ServiceBuilder() {
 	}
 
-
 	@SuppressWarnings("unused")
 	private AutenticacaoService buildAutenticacaoService() {
 		AutenticacaoService autenticacaoService = getServiceImpl(AutenticacaoService.class);
-		inject(autenticacaoService, buildDAO(UsuarioDAOBuilder.class), "usuarioDAO");
+		inject(autenticacaoService, buildDAO(UsuarioDAO.class), "usuarioDAO");
 		return autenticacaoService;
 	}
 
 	@SuppressWarnings("unused")
 	private ClienteService buildClienteService() {
 		ClienteService clienteService = getServiceImpl(ClienteService.class);
-		inject(clienteService, buildDAO(ClienteDAOBuilder.class), "clienteDAO");
+		inject(clienteService, buildDAO(ClienteDAO.class), "clienteDAO");
 		inject(clienteService, buildService(LogradouroService.class), "logradouroService");
 		inject(clienteService, buildService(EnderecamentoService.class), "enderecamentoService");
 		clienteService.isEmailExistente(1, "");
@@ -123,15 +135,23 @@ class ServiceBuilder {
 	@SuppressWarnings("unused")
 	private ComissaoService buildComissaoService() {
 		ComissaoService comissaoService = getServiceImpl(ComissaoService.class);
-		inject(comissaoService, buildDAO(ComissaoDAOBuilder.class), "comissaoDAO");
+		inject(comissaoService, buildDAO(ComissaoDAO.class), "comissaoDAO");
 		inject(comissaoService, buildService(UsuarioService.class), "usuarioService");
 		inject(comissaoService, buildService(MaterialService.class), "materialService");
 		return comissaoService;
 	}
 
-	private <T, K extends DAOBuilder<T>> T buildDAO(Class<K> daoClass) {
+	@SuppressWarnings("unchecked")
+	private <T> T buildDAO(Class<T> daoClass) {
 		try {
-			return daoClass.newInstance().build();
+			DAOBuilder<T> daoBuilder = mapDAO.get(daoClass);
+			if (daoBuilder == null) {
+				daoBuilder = (DAOBuilder<T>) Class.forName(
+						"br.com.plastecno.service.test.builder." + daoClass.getSimpleName() + "Builder").newInstance();
+				mapDAO.put(daoClass, daoBuilder);
+				return daoBuilder.build();
+			}
+			return daoBuilder.build();
 		} catch (Exception e) {
 			throw new IllegalStateException("Falha no build do DAO \"" + daoClass.getName() + "\"");
 		}
@@ -152,15 +172,15 @@ class ServiceBuilder {
 	@SuppressWarnings("unused")
 	private EnderecamentoService buildEnderecamentoService() {
 		EnderecamentoService enderecamentoService = getServiceImpl(EnderecamentoService.class);
-		inject(enderecamentoService, buildDAO(EnderecoDAOBuilder.class), "enderecoDAO");
+		inject(enderecamentoService, buildDAO(EnderecoDAO.class), "enderecoDAO");
 		return enderecamentoService;
 	}
 
 	@SuppressWarnings("unused")
 	private EstoqueService buildEstoqueService() {
 		EstoqueService estoqueService = getServiceImpl(EstoqueService.class);
-		inject(estoqueService, buildDAO(ItemEstoqueDAOBuilder.class), "itemEstoqueDAO");
-		inject(estoqueService, buildDAO(ItemReservadoDAOBuilder.class), "itemReservadoDAO");
+		inject(estoqueService, buildDAO(ItemEstoqueDAO.class), "itemEstoqueDAO");
+		inject(estoqueService, buildDAO(ItemReservadoDAO.class), "itemReservadoDAO");
 		inject(estoqueService, buildService(PedidoService.class), "pedidoService");
 		return estoqueService;
 	}
@@ -175,7 +195,7 @@ class ServiceBuilder {
 	@SuppressWarnings("unused")
 	private MaterialService buildMaterialService() {
 		MaterialService materialService = getServiceImpl(MaterialService.class);
-		inject(materialService, buildDAO(MaterialDAOBuilder.class), "materialDAO");
+		inject(materialService, buildDAO(MaterialDAO.class), "materialDAO");
 		inject(materialService, buildService(RepresentadaService.class), "representadaService");
 		return materialService;
 	}
@@ -183,8 +203,8 @@ class ServiceBuilder {
 	@SuppressWarnings("unused")
 	private PedidoService buildPedidoService() {
 		PedidoService pedidoService = getServiceImpl(PedidoService.class);
-		inject(pedidoService, buildDAO(PedidoDAOBuilder.class), "pedidoDAO");
-		inject(pedidoService, new ItemPedidoDAO(null), "itemPedidoDAO");
+		inject(pedidoService, buildDAO(PedidoDAO.class), "pedidoDAO");
+		inject(pedidoService, buildDAO(ItemPedidoDAO.class), "itemPedidoDAO");
 		inject(pedidoService, buildService(UsuarioService.class), "usuarioService");
 		inject(pedidoService, buildService(ClienteService.class), "clienteService");
 		inject(pedidoService, buildService(LogradouroService.class), "logradouroService");
@@ -199,14 +219,14 @@ class ServiceBuilder {
 	@SuppressWarnings("unused")
 	private PerfilAcessoService buildPerfilAcessoService() {
 		PerfilAcessoService perfilAcessoService = getServiceImpl(PerfilAcessoService.class);
-		inject(perfilAcessoService, buildDAO(PerfilAcessoDAOBuilder.class), "perfilAcessoDAO");
+		inject(perfilAcessoService, buildDAO(PerfilAcessoDAO.class), "perfilAcessoDAO");
 		return perfilAcessoService;
 	}
 
 	@SuppressWarnings("unused")
 	private RepresentadaService buildRepresentadaService() {
 		RepresentadaService representadaService = getServiceImpl(RepresentadaService.class);
-		inject(representadaService, buildDAO(RepresentadaDAOBuilder.class), "representadaDAO");
+		inject(representadaService, buildDAO(RepresentadaDAO.class), "representadaDAO");
 		inject(representadaService, buildService(LogradouroService.class), "logradouroService");
 		return representadaService;
 	}
@@ -214,7 +234,7 @@ class ServiceBuilder {
 	@SuppressWarnings("unused")
 	private UsuarioService buildUsuarioService() {
 		UsuarioService usuarioService = getServiceImpl(UsuarioService.class);
-		inject(usuarioService, buildDAO(UsuarioDAOBuilder.class), "usuarioDAO");
+		inject(usuarioService, buildDAO(UsuarioDAO.class), "usuarioDAO");
 		inject(usuarioService, buildService(LogradouroService.class), "logradouroService");
 		inject(usuarioService, buildService(AutenticacaoService.class), "autenticacaoService");
 

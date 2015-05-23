@@ -1,4 +1,4 @@
-package br.com.plastecno.service.test;
+package br.com.plastecno.service.test.builder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -13,14 +13,14 @@ import mockit.Mock;
 import mockit.MockUp;
 import br.com.plastecno.service.dao.GenericDAO;
 
-class EntidadeRepository {
-	public static EntidadeRepository getInstance() {
-		return repository;
-	}
-
+public class EntidadeRepository {
 	private static final Map<Class<?>, Set<Object>> mapaEntidades = new HashMap<Class<?>, Set<Object>>();
 
 	private static final EntidadeRepository repository = new EntidadeRepository();
+
+	public static EntidadeRepository getInstance() {
+		return repository;
+	}
 
 	private EntidadeRepository() {
 
@@ -45,7 +45,7 @@ class EntidadeRepository {
 		}
 	}
 
-	void clear() {
+	public void clear() {
 		mapaEntidades.clear();
 	}
 
@@ -57,7 +57,7 @@ class EntidadeRepository {
 		return (int) (9999 * Math.random());
 	}
 
-	void init() {
+	public void init() {
 		initGenericDAO();
 	}
 
@@ -68,11 +68,6 @@ class EntidadeRepository {
 			Object alterar(Object t) {
 				inserirEntidade(t);
 				return t;
-			}
-
-			@Mock
-			Object remover(Object t) {
-				return mapaEntidades.get(t.getClass()).remove(t);
 			}
 
 			@Mock
@@ -101,6 +96,11 @@ class EntidadeRepository {
 			@Mock
 			<K> K pesquisarCampoById(Class<Object> classe, Integer id, String nomeCampo, Class<K> retorno) {
 				return repository.pesquisarEntidadeAtributoById(classe, id, nomeCampo, retorno);
+			}
+
+			@Mock
+			Object remover(Object t) {
+				return mapaEntidades.get(t.getClass()).remove(t);
 			}
 		};
 

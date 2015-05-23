@@ -1,4 +1,4 @@
-package br.com.plastecno.service.test;
+package br.com.plastecno.service.test.builder;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +27,7 @@ import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
+import br.com.plastecno.service.test.TestUtils;
 
 public class EntidadeBuilder {
 	public static EntidadeBuilder getInstance() {

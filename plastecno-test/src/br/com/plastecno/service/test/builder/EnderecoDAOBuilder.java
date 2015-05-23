@@ -1,4 +1,4 @@
-package br.com.plastecno.service.test;
+package br.com.plastecno.service.test.builder;
 
 import mockit.Mock;
 import mockit.MockUp;

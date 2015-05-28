@@ -47,11 +47,11 @@ function enviarEmpacotamento(botao){
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 
-	<form id="formVazio" action="<c:url value="/revendaEncomendada"/>">
+	<form id="formVazio" action="<c:url value="/itemAguardandoMaterial"/>">
 	</form>
 
 
-	<form id="formPesquisa" action="<c:url value="/revendaEncomendada/listagem"/>" method="get">
+	<form id="formPesquisa" action="<c:url value="/itemAguardandoMaterial/listagem"/>" method="get">
 		<fieldset>
 			<legend>::: Pesquisa de Itens Aguard. Material :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
@@ -114,16 +114,16 @@ function enviarEmpacotamento(botao){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/revendaEncomendada/pdf"/>" >
+									<form action="<c:url value="/itemAguardandoMaterial/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 									</form>
-									<form action="<c:url value="/revendaEncomendada/empacotamento"/>" method="post" >
+									<form action="<c:url value="/itemAguardandoMaterial/empacotamento"/>" method="post" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="button" value="" title="Enviar Pedido para o Empacotamento" 
 										onclick="enviarEmpacotamento(this);" class="botaoAdicionar_16" />
 									</form>
-									<form action="<c:url value="/revendaEncomendada/edicao"/>" method="post">
+									<form action="<c:url value="/itemAguardandoMaterial/edicao"/>" method="post">
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="button" value="" title="Editar a Revenda Encomendada" class="botaoEditar" onclick="submeterForm(this);"/>
 									</form>

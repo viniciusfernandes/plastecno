@@ -295,7 +295,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
 		assertEquals("Os itens do pedido nao contem itens mas ja foram encomendados pelo setor de compras",
-				SituacaoPedido.REVENDA_ENCOMENDADA, situacaoPedido);
+				SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
 
 		Pedido pedidoCompra = pedidoService.pesquisarCompraById(idPedidoCompra);
 		pedidoCompra.setFormaPagamento("A VISTA");
@@ -824,7 +824,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarRevendaEncomendadaEmpacotamento(idPedidoRevenda);
+			pedidoService.empacotarItemAguardandoMaterial(idPedidoRevenda);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -833,7 +833,7 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testEnvioRevendaEncomendadaEmpacotamentoInvalido() {
+	public void testEnvioRevendaAguardandoMaterialEmpacotamentoInvalido() {
 		PedidoRevendaECompra pedidoRevendaECompra = gerarRevendaEncomendada();
 		Integer idPedidoCompra = pedidoRevendaECompra.getPedidoCompra().getId();
 		Integer idPedidoRevenda = pedidoRevendaECompra.getPedidoRevenda().getId();
@@ -850,12 +850,12 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarRevendaEncomendadaEmpacotamento(idPedidoRevenda);
+			pedidoService.empacotarItemAguardandoMaterial(idPedidoRevenda);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
-		assertEquals(SituacaoPedido.REVENDA_ENCOMENDADA, situacaoPedido);
+		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
 	}
 
 	public void testInclusaoItemPedido() {
@@ -1642,7 +1642,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals("O segundo item do pedido nao foi encomendado pelo setor de compras",
-				SituacaoPedido.REVENDA_ENCOMENDADA, situacaoPedido);
+				SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
 
 		Pedido pedidoCompra = pedidoService.pesquisarCompraById(idPedidoCompra);
 

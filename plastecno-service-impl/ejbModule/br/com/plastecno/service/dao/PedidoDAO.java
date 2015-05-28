@@ -279,7 +279,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	public List<SituacaoPedido> pesquisarSituacaoVendaEfetivada() {
 		List<SituacaoPedido> situacoes = new ArrayList<SituacaoPedido>();
-		situacoes.add(SituacaoPedido.REVENDA_ENCOMENDADA);
+		situacoes.add(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
 		situacoes.add(SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
 		situacoes.add(SituacaoPedido.EMPACOTADO);
 		situacoes.add(SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO);

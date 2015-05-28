@@ -40,7 +40,7 @@ public class PedidoEncomendadoMonitorImpl implements PedidoEncomendadoMonitor {
 				// teremos inconsistencia no estado do pedido podendo retornar ao fluxo.
 				// Aqui estamos garantindo que mesmo que o pedido permaneca como
 				// revenda aguardando encomenda, mas ele ja passou por essa etapa.
-				empacotamentoOk = pedidoService.enviarRevendaEncomendadaEmpacotamento(idPedido);
+				empacotamentoOk = pedidoService.empacotarItemAguardandoMaterial(idPedido);
 				logger.info("Monitor de itens de pedido encomendados disparou a reserva dos itens do pedido No. " + idPedido
 						+ ". Resultado: " + (empacotamentoOk ? "PRONTO PARA EMPACOTAR" : "ALGUM ITEM NAO EXISTE NO ESTOQUE"));
 			} catch (BusinessException e) {

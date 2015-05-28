@@ -499,7 +499,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			throw new BusinessException("O pedido não pode ter seus itens encomendados pois não é um pedido de revenda.");
 		}
 		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())
-				&& !SituacaoPedido.REVENDA_ENCOMENDADA.equals(pedido.getSituacaoPedido())
+				&& !SituacaoPedido.ITEM_AGUARDANDO_MATERIAL.equals(pedido.getSituacaoPedido())
 				&& !SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA.equals(pedido.getSituacaoPedido())) {
 			throw new BusinessException(
 					"O pedido esta na situação de \""

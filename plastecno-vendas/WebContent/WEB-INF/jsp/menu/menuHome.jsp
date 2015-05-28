@@ -33,7 +33,7 @@
 				<li><a href="javascript: void(0)" target="principal_frame">Vendas</a>
 					<ul>
 						<li><a href="pedido" target="principal_frame">Ped. Vendas</a></li>
-						<li><a href="revendaEncomendada" target="principal_frame">Ped. Aguard. Material</a></li>
+						<li><a href="itemAguardandoMaterial" target="principal_frame">Ped. Aguard. Material</a></li>
 						<li><a href="estoque" target="principal_frame">Estoque</a></li>
 					</ul>
 				</li>

@@ -30,9 +30,9 @@ public interface PedidoService {
 
 	void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido);
 
-	void alterarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido);
+	void alterarRevendaAguardandoMaterialByIdItem(Integer idItemPedido);
 
-	void alterarSituacaoPedidoEncomendadoByIdPedido(Integer idPedido);
+	void alterarItemAguardandoMaterialByIdPedido(Integer idPedido);
 
 	Double calcularValorPedido(Integer idPedido) throws BusinessException;
 
@@ -51,7 +51,7 @@ public interface PedidoService {
 
 	boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException;
 
-	boolean enviarRevendaEncomendadaEmpacotamento(Integer idPedido) throws BusinessException;
+	boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException;
 
 	Pedido inserir(Pedido pedido) throws BusinessException;
 
@@ -156,7 +156,7 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo);
 
-	List<ItemPedido> pesquisarRevendaEncomendada(Integer idRepresentada, Periodo periodo);
+	List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Periodo periodo);
 
 	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 

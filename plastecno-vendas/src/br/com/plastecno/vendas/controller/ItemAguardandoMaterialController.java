@@ -20,7 +20,7 @@ import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 
 @Resource
-public class RevendaEncomendadaController extends AbstractController {
+public class ItemAguardandoMaterialController extends AbstractController {
     @Servico
     private EstoqueService estoqueService;
 
@@ -33,21 +33,21 @@ public class RevendaEncomendadaController extends AbstractController {
     @Servico
     private RepresentadaService representadaService;
 
-    public RevendaEncomendadaController(Result result) {
+    public ItemAguardandoMaterialController(Result result) {
         super(result);
     }
 
-    @Get("revendaEncomendada/pdf")
+    @Get("itemAguardandoMaterial/pdf")
     public Download downloadPedidoPDF(Integer idPedido) {
         return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
     }
 
-    @Post("revendaEncomendada/empacotamento")
+    @Post("itemAguardandoMaterial/empacotamento")
     public void enviarPedidoEmpacotamento(Integer idPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         try {
-            pedidoService.enviarRevendaEncomendadaEmpacotamento(idPedido);
+            pedidoService.empacotarItemAguardandoMaterial(idPedido);
             SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
-            if (SituacaoPedido.REVENDA_ENCOMENDADA.equals(situacaoPedido)) {
+            if (SituacaoPedido.ITEM_AGUARDANDO_MATERIAL.equals(situacaoPedido)) {
                 gerarMensagemAlerta("O pedido No. " + idPedido
                         + " ainda possui alguns itens que não estão no estoque. Verifique com o setor de compras.");
             } else if (SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacaoPedido)) {
@@ -57,15 +57,15 @@ public class RevendaEncomendadaController extends AbstractController {
             gerarListaMensagemErro(e);
         }
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarRevendaEncomendada(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarItemAguardandoMaterial(dataInicial, dataFinal, idRepresentada);
     }
 
-    @Get("revendaEncomendada/listagem")
-    public void pesquisarRevendaEncomendada(Date dataInicial, Date dataFinal, Integer idRepresentada) {
+    @Get("itemAguardandoMaterial/listagem")
+    public void pesquisarItemAguardandoMaterial(Date dataInicial, Date dataFinal, Integer idRepresentada) {
 
         try {
             Periodo periodo = new Periodo(dataInicial, dataFinal);
-            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioRevendaEncomendada(
+            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioItemAguardandoMaterial(
                     idRepresentada, periodo);
 
             addAtributo("relatorio", relatorio);
@@ -85,14 +85,14 @@ public class RevendaEncomendadaController extends AbstractController {
         addAtributo("listaRepresentada", representadaService.pesquisarRepresentada());
     }
 
-    @Post("revendaEncomendada/edicao")
+    @Post("itemAguardandoMaterial/edicao")
     public void pesquisarRevendaEncomendadaById(Integer idPedido, Date dataInicial, Date dataFinal,
             Integer idRepresentada) {
         redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA);
     }
 
-    @Get("revendaEncomendada")
-    public void revendaEncomendadaHome() {
+    @Get("itemAguardandoMaterial")
+    public void itemAguardandoMaterialHome() {
         // Pode ser que essas datas ja tenham sido preenchidas em outra
         // navegacao pois esse metodo eh reaproveitado.
         configurarFiltroPediodoMensal();

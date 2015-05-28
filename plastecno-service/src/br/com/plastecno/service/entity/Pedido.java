@@ -389,8 +389,8 @@ public class Pedido implements Serializable, Cloneable {
 		return isRevenda() && !SituacaoPedido.CANCELADO.equals(situacaoPedido);
 	}
 
-	public boolean isRevendaEncomendada() {
-		return TipoPedido.REVENDA.equals(tipoPedido) && SituacaoPedido.REVENDA_ENCOMENDADA.equals(situacaoPedido);
+	public boolean isItemAguardandoMaterial() {
+		return TipoPedido.REVENDA.equals(tipoPedido) && SituacaoPedido.ITEM_AGUARDANDO_MATERIAL.equals(situacaoPedido);
 	}
 
 	public boolean isVenda() {

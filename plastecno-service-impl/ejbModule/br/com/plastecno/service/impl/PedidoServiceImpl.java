@@ -174,14 +174,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarSituacaoPedidoEncomendadoByIdItem(Integer idItemPedido) {
-		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
+	public void alterarRevendaAguardandoMaterialByIdItem(Integer idItemPedido) {
+		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarSituacaoPedidoEncomendadoByIdPedido(Integer idPedido) {
-		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.REVENDA_ENCOMENDADA);
+	public void alterarItemAguardandoMaterialByIdPedido(Integer idPedido) {
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
 	}
 
 	@Override
@@ -322,7 +322,7 @@ public class PedidoServiceImpl implements PedidoService {
 			itemCadastrado.setEncomendado(true);
 			inserirItemPedido(itemCadastrado);
 			if (!contemPedidoItemRevendaAguardandoEncomenda(idItemPedido)) {
-				alterarSituacaoPedidoEncomendadoByIdItem(itemCadastrado.getId());
+				alterarRevendaAguardandoMaterialByIdItem(itemCadastrado.getId());
 			}
 
 		}
@@ -393,10 +393,10 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public boolean enviarRevendaEncomendadaEmpacotamento(Integer idPedido) throws BusinessException {
+	public boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException {
 		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
 		if (!empacotamentoOk) {
-			alterarSituacaoPedidoEncomendadoByIdPedido(idPedido);
+			alterarItemAguardandoMaterialByIdPedido(idPedido);
 		}
 		return empacotamentoOk;
 	}
@@ -862,7 +862,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoRevendaEncomendada() {
-		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_ENCOMENDADA);
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
 	}
 
 	@Override
@@ -914,7 +914,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal) {
-		return itemPedidoDAO.pesquisarItemPedidoEncomendado(idCliente, dataInicial, dataFinal);
+		return itemPedidoDAO.pesquisarItemPedidoAguardandoMaterial(idCliente, dataInicial, dataFinal);
 	}
 
 	@Override
@@ -1134,8 +1134,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarRevendaEncomendada(Integer idRepresentada, Periodo periodo) {
-		return itemPedidoDAO.pesquisarRevendaEncomendada(idRepresentada, periodo.getInicio(), periodo.getFim());
+	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Periodo periodo) {
+		return itemPedidoDAO.pesquisarItemAguardandoMaterial(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override

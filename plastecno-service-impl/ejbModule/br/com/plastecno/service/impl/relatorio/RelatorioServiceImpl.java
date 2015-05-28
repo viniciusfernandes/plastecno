@@ -312,14 +312,14 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@Override
 	@REVIEW(data = "10/03/2015", descricao = "Devemos implementar uma melhoria o esquema de consulta dos itens de estoque para recuperar apenas a informacao necessaria.")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEncomendada(Integer idRepresentada, Periodo periodo) {
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(Integer idRepresentada, Periodo periodo) {
 		StringBuilder titulo = new StringBuilder();
 		titulo.append("Itens Aguardando Material de ");
 		titulo.append(StringUtils.formatarData(periodo.getInicio())).append(" à ");
 		titulo.append(StringUtils.formatarData(periodo.getFim()));
 
 		return gerarRelatorioItensPorPedido(titulo.toString(),
-				pedidoService.pesquisarRevendaEncomendada(idRepresentada, periodo));
+				pedidoService.pesquisarItemAguardandoMaterial(idRepresentada, periodo));
 	}
 
 	@Override

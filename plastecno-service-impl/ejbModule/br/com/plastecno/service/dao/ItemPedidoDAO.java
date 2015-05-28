@@ -159,7 +159,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal) {
+	public List<ItemPedido> pesquisarItemPedidoAguardandoMaterial(Integer idCliente, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemPedido i ");
 		select.append("where i.pedido.situacaoPedido = :situacaoPedido and i.pedido.tipoPedido = :tipoPedido ");
@@ -181,7 +181,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("tipoPedido", TipoPedido.REVENDA);
-		query.setParameter("situacaoPedido", SituacaoPedido.REVENDA_ENCOMENDADA);
+		query.setParameter("situacaoPedido", SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
 
 		if (dataInicial != null) {
 			query.setParameter("dataInicial", dataInicial);
@@ -207,7 +207,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarRevendaEncomendada(Integer idRepresentada, Date dataInicial, Date dataFinal) {
+	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Date dataInicial, Date dataFinal) {
 		StringBuilder select = new StringBuilder();
 		select.append("select i from ItemPedido i ");
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
@@ -231,7 +231,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("tipoPedido", TipoPedido.REVENDA);
-		query.setParameter("situacaoPedido", SituacaoPedido.REVENDA_ENCOMENDADA);
+		query.setParameter("situacaoPedido", SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
 
 		if (dataInicial != null) {
 			query.setParameter("dataInicial", dataInicial);

@@ -254,13 +254,13 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemEncomenda(Integer idCliente, Periodo periodo) {
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoCompra(Integer idCliente, Periodo periodo) {
 		/*
 		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
 		 * estoque para recuperar apenas a informacao necessaria.
 		 */
 		return gerarRelatorioItensPorPedido("Itens para Encomendar",
-				pedidoService.pesquisarItemEncomenda(idCliente, periodo));
+				pedidoService.pesquisarItemAguardandoCompra(idCliente, periodo));
 	}
 
 	@REVIEW(descricao = "Nem sempre eh necessario carregar as informacoes da representada")

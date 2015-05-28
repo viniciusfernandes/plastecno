@@ -1079,12 +1079,12 @@ public class EstoqueServiceTest extends AbstractTest {
 		Set<Integer> ids = new HashSet<Integer>();
 		ids.add(item1.getId());
 		try {
-			pedidoService.encomendarItemPedido(pedido.getProprietario().getId(), fornecedor.getId(), ids);
+			pedidoService.comprarItemPedido(pedido.getProprietario().getId(), fornecedor.getId(), ids);
 		} catch (BusinessException e2) {
 			printMensagens(e2);
 		}
 
-		assertEquals(SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA, pedidoService.pesquisarSituacaoPedidoById(pedido.getId()));
+		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_COMPRA, pedidoService.pesquisarSituacaoPedidoById(pedido.getId()));
 	}
 
 	@Test

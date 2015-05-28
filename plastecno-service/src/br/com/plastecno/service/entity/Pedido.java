@@ -365,8 +365,8 @@ public class Pedido implements Serializable, Cloneable {
 				|| SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido);
 	}
 
-	public boolean isEncomenda() {
-		return SituacaoPedido.COMPRA_ENCOMENDADA.equals(this.situacaoPedido);
+	public boolean isCompraAndamento() {
+		return SituacaoPedido.COMPRA_ANDAMENTO.equals(this.situacaoPedido);
 	}
 
 	public boolean isEnviado() {

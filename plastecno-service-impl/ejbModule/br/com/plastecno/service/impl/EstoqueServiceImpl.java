@@ -500,7 +500,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		if (!SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())
 				&& !SituacaoPedido.ITEM_AGUARDANDO_MATERIAL.equals(pedido.getSituacaoPedido())
-				&& !SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA.equals(pedido.getSituacaoPedido())) {
+				&& !SituacaoPedido.ITEM_AGUARDANDO_COMPRA.equals(pedido.getSituacaoPedido())) {
 			throw new BusinessException(
 					"O pedido esta na situação de \""
 							+ pedido.getSituacaoPedido().getDescricao()
@@ -514,7 +514,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			todosReservados &= SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS.equals(situacaoReserva);
 		}
 		pedido.setSituacaoPedido(todosReservados ? SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO
-				: SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
+				: SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
 		pedidoService.inserir(pedido);
 		return todosReservados;
 	}

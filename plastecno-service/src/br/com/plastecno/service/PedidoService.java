@@ -24,7 +24,7 @@ public interface PedidoService {
 
 	void alterarQuantidadeReservadaByIdItemPedido(Integer idItemPedido);
 
-	void alterarSituacaoPedidoAguardandoEncomendaByIdPedido(Integer idPedido);
+	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
 
 	void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
 
@@ -44,7 +44,7 @@ public interface PedidoService {
 
 	boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
 
-	Integer encomendarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
+	Integer comprarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
 			throws BusinessException;
 
 	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
@@ -100,7 +100,7 @@ public interface PedidoService {
 
 	List<Integer> pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido);
 
-	List<Integer> pesquisarIdPedidoRevendaAguardandoEncomenda();
+	List<Integer> pesquisarIdPedidoItemAguardandoCompra();
 
 	List<Integer> pesquisarIdPedidoRevendaEncomendada();
 
@@ -108,7 +108,7 @@ public interface PedidoService {
 
 	Integer pesquisarIdVendedorByIdPedido(Integer idPedido);
 
-	List<ItemPedido> pesquisarItemEncomenda(Integer idCliente, Periodo periodo);
+	List<ItemPedido> pesquisarItemAguardandoCompra(Integer idCliente, Periodo periodo);
 
 	ItemPedido pesquisarItemPedido(Integer idItemPedido);
 

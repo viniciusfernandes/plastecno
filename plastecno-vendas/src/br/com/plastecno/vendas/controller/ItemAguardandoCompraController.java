@@ -23,7 +23,7 @@ import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
-public class EncomendaController extends AbstractController {
+public class ItemAguardandoCompraController extends AbstractController {
 
     @Servico
     private RelatorioService relatorioService;
@@ -34,27 +34,27 @@ public class EncomendaController extends AbstractController {
     @Servico
     private PedidoService pedidoService;
 
-    public EncomendaController(Result result, UsuarioInfo usuarioInfo) {
+    public ItemAguardandoCompraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
     }
 
-    @Get("encomenda/pdf")
+    @Get("itemAguardandoCompra/pdf")
     public Download downloadPedidoPDF(Integer idPedido) {
         return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
     }
 
-    @Get("encomenda")
-    public void encomendaHome() {
+    @Get("itemAguardandoCompra")
+    public void itemAguardandoCompraHome() {
         configurarFiltroPediodoMensal();
         addAtributo("listaFornecedor", this.representadaService.pesquisarFornecedorAtivo());
     }
 
-    @Post("encomenda/item/compra")
+    @Post("itemAguardandoCompra/item/compra")
     public void encomendarItemPedido(Date dataInicial, Date dataFinal, Integer idRepresentadaFornecedora,
             Cliente cliente, List<Integer> listaIdItem) {
         try {
             final Set<Integer> ids = listaIdItem == null ? new HashSet<Integer>() : new HashSet<Integer>(listaIdItem);
-            Integer idPedidoCompra = pedidoService.encomendarItemPedido(getCodigoUsuario(), idRepresentadaFornecedora,
+            Integer idPedidoCompra = pedidoService.comprarItemPedido(getCodigoUsuario(), idRepresentadaFornecedora,
                     ids);
             addAtributo("dataInicial", formatarData(dataInicial));
             addAtributo("dataFinal", formatarData(dataFinal));
@@ -64,11 +64,11 @@ public class EncomendaController extends AbstractController {
         } catch (BusinessException e) {
             addAtributo("permanecerTopo", true);
             gerarListaMensagemErro(e);
-            pesquisarEncomenda(dataInicial, dataFinal, cliente);
+            pesquisarItemAguardandoCompra(dataInicial, dataFinal, cliente);
         }
     }
 
-    @Post("encomenda/empacotamento")
+    @Post("itemAguardandoCompra/empacotamento")
     public void enviarEncomendaEmpacotamento(Date dataInicial, Date dataFinal, Integer idPedido, Cliente cliente) {
         boolean empacotamentoOK;
         try {
@@ -83,14 +83,14 @@ public class EncomendaController extends AbstractController {
             gerarListaMensagemErro(e);
             addAtributo("permanecerTopo", true);
         }
-        redirecTo(this.getClass()).pesquisarEncomenda(dataInicial, dataFinal, cliente);
+        redirecTo(this.getClass()).pesquisarItemAguardandoCompra(dataInicial, dataFinal, cliente);
     }
 
-    @Get("encomenda/item/listagem")
-    public void pesquisarEncomenda(Date dataInicial, Date dataFinal, Cliente cliente) {
+    @Get("itemAguardandoCompra/item/listagem")
+    public void pesquisarItemAguardandoCompra(Date dataInicial, Date dataFinal, Cliente cliente) {
         try {
             Periodo periodo = new Periodo(dataInicial, dataFinal);
-            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioItemEncomenda(
+            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioItemAguardandoCompra(
                     cliente.getId(), periodo);
 
             addAtributo("relatorio", relatorio);

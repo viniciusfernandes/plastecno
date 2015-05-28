@@ -38,7 +38,7 @@ $(document).ready(function() {
 	$('#botaoEnviarEncomenda').click(function () {
 
 		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ENVIAR ESSES PEDIDOS PARA A ENCOMENDA?',
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ENVIAR ESSES PEDIDOS PARA COMPRAR?',
 			confirmar: function(){
 				var parametros = $('#formPesquisa').serialize();
 				parametros+='&idRepresentadaFornecedora='+$('#fornecedor').val();
@@ -48,7 +48,7 @@ $(document).ready(function() {
 						parametros+='&listaIdItem='+listaIdItem[i];
 					}
 				};
-				var action = '<c:url value="/encomenda/item/compra"/>'+'?'+parametros;
+				var action = '<c:url value="/itemAguardandoCompra/item/compra"/>'+'?'+parametros;
 				$('#formVazio').attr('method', 'post').attr('action', action);
 				$('#formVazio').submit();
 			}
@@ -97,7 +97,7 @@ function encomendarItem(campo){
 	</form>
 
 
-	<form id="formPesquisa" action="<c:url value="/encomenda/item/listagem"/>" method="get">
+	<form id="formPesquisa" action="<c:url value="/itemAguardandoCompra/item/listagem"/>" method="get">
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<fieldset>
 			<legend>::: Pesquisa de Itens para Comprar :::</legend>
@@ -172,11 +172,11 @@ function encomendarItem(campo){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/encomenda/pdf"/>" >
+									<form action="<c:url value="/itemAguardandoCompra/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 									</form>
-									<form action="<c:url value="/encomenda/empacotamento"/>" method="post" >
+									<form action="<c:url value="/itemAguardandoCompra/empacotamento"/>" method="post" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="button" value="" title="Enviar Pedido para o Empacotamento" 
 										onclick="enviarEmpacotamento(this);" class="botaoAdicionar_16" />

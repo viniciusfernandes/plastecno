@@ -41,7 +41,7 @@
 				<c:if test="${acessoCompraPermitido}">
 					<li><a href="javascript: void(0)" target="principal_frame">Compras</a>
 						<ul>
-							<li><a href="encomenda" target="principal_frame">Item Aguard. Compra</a></li>
+							<li><a href="itemAguardandoCompra" target="principal_frame">Item Aguard. Compra</a></li>
 							<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a></li>
 							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
 							<li><a href="estoque" target="principal_frame">Estoque</a></li>

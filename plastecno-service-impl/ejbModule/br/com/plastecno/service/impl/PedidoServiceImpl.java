@@ -155,8 +155,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarSituacaoPedidoAguardandoEncomendaByIdPedido(Integer idPedido) {
-		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
+	public void alterarItemAguardandoCompraByIdPedido(Integer idPedido) {
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
 	}
 
 	@Override
@@ -254,7 +254,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer encomendarItemPedido(Integer idComprador, Integer idRepresentadaFornecedora,
+	public Integer comprarItemPedido(Integer idComprador, Integer idRepresentadaFornecedora,
 			Set<Integer> listaIdItemPedido) throws BusinessException {
 		if (listaIdItemPedido == null || listaIdItemPedido.isEmpty()) {
 			throw new BusinessException("A lista de itens de pedido para encomendar não pode estar vazia");
@@ -291,7 +291,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoCompra.setFinalidadePedido(FinalidadePedido.REVENDA);
 		pedidoCompra.setProprietario(comprador);
 		pedidoCompra.setRepresentada(fornecedor);
-		pedidoCompra.setSituacaoPedido(SituacaoPedido.COMPRA_ENCOMENDADA);
+		pedidoCompra.setSituacaoPedido(SituacaoPedido.COMPRA_ANDAMENTO);
 		pedidoCompra.setTipoPedido(TipoPedido.COMPRA);
 		pedidoCompra.setTipoEntrega(TipoEntrega.CIF);
 
@@ -386,7 +386,7 @@ public class PedidoServiceImpl implements PedidoService {
 	public boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException {
 		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
 		if (!empacotamentoOk) {
-			alterarSituacaoPedidoAguardandoEncomendaByIdPedido(idPedido);
+			alterarItemAguardandoCompraByIdPedido(idPedido);
 		}
 		return empacotamentoOk;
 	}
@@ -513,7 +513,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 		if (isPedidoNovo) {
 			pedido.setDataInclusao(new Date());
-			if (!pedido.isEncomenda()) {
+			if (!pedido.isCompraAndamento()) {
 				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 			}
 			pedido = pedidoDAO.inserir(pedido);
@@ -855,8 +855,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Integer> pesquisarIdPedidoRevendaAguardandoEncomenda() {
-		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
+	public List<Integer> pesquisarIdPedidoItemAguardandoCompra() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
 	}
 
 	@Override
@@ -883,8 +883,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarItemEncomenda(Integer idCliente, Periodo periodo) {
-		return itemPedidoDAO.pesquisarItemEncomenda(idCliente, periodo.getInicio(), periodo.getFim());
+	public List<ItemPedido> pesquisarItemAguardandoCompra(Integer idCliente, Periodo periodo) {
+		return itemPedidoDAO.pesquisarItemAguardandoCompra(idCliente, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override
@@ -1315,7 +1315,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void reencomendarItemPedido(Integer idItemPedido) throws BusinessException {
-		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.REVENDA_AGUARDANDO_ENCOMENDA);
+		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
 		ItemPedido itemPedido = pesquisarItemPedido(idItemPedido);
 		itemPedido.setQuantidadeReservada(0);
 		itemPedido.setEncomendado(false);

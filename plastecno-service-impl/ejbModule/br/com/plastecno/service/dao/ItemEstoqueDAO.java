@@ -51,7 +51,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	}
 
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca) {
-		return pesquisarItemEstoque(idMaterial, formaMaterial, descricaoPeca, false);
+		return pesquisarItemEstoque(idMaterial, formaMaterial, descricaoPeca, true);
 	}
 
 	@SuppressWarnings("unchecked")

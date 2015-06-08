@@ -33,4 +33,4 @@ drop schema vendas cascade;
 drop schema enderecamento cascade;
 create schema vendas;
 create schema enderecamento;
-\i C:/Users/vinicius/ambiente_trabalho/backup/dump.sql \encoding UTF-8
+\i C:/Users/vinicius/ambiente_trabalho/temp/dump.sql \encoding UTF-8;

@@ -102,7 +102,7 @@ public interface PedidoService {
 
 	List<Integer> pesquisarIdPedidoItemAguardandoCompra();
 
-	List<Integer> pesquisarIdPedidoRevendaEncomendada();
+	List<Integer> pesquisarIdPedidoAguardandoMaterial();
 
 	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
 

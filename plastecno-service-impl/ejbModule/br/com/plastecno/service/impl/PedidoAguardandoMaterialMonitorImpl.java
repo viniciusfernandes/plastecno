@@ -12,15 +12,15 @@ import javax.ejb.Singleton;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 
-import br.com.plastecno.service.PedidoEncomendadoMonitor;
+import br.com.plastecno.service.PedidoAguardandoMaterialMonitor;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
-public class PedidoEncomendadoMonitorImpl implements PedidoEncomendadoMonitor {
+public class PedidoAguardandoMaterialMonitorImpl implements PedidoAguardandoMaterialMonitor {
 
-	private Logger logger = Logger.getLogger(PedidoEncomendadoMonitorImpl.class.getName());
+	private Logger logger = Logger.getLogger(PedidoAguardandoMaterialMonitorImpl.class.getName());
 
 	@EJB
 	private PedidoService pedidoService;
@@ -31,8 +31,8 @@ public class PedidoEncomendadoMonitorImpl implements PedidoEncomendadoMonitor {
 	}
 
 	@Schedule(hour = "*/1")
-	public void reservarItemPedidoEncomendadoEstoque() {
-		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoRevendaEncomendada();
+	public void reservarItemPedidoAguardandoMaterial() {
+		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoAguardandoMaterial();
 		boolean empacotamentoOk = false;
 		for (Integer idPedido : listaIdPedido) {
 			try {
@@ -41,7 +41,7 @@ public class PedidoEncomendadoMonitorImpl implements PedidoEncomendadoMonitor {
 				// Aqui estamos garantindo que mesmo que o pedido permaneca como
 				// revenda aguardando encomenda, mas ele ja passou por essa etapa.
 				empacotamentoOk = pedidoService.empacotarItemAguardandoMaterial(idPedido);
-				logger.info("Monitor de itens de pedido encomendados disparou a reserva dos itens do pedido No. " + idPedido
+				logger.info("Monitor de itens aguardando material disparou a reserva dos itens do pedido No. " + idPedido
 						+ ". Resultado: " + (empacotamentoOk ? "PRONTO PARA EMPACOTAR" : "ALGUM ITEM NAO EXISTE NO ESTOQUE"));
 			} catch (BusinessException e) {
 				logger.log(Level.SEVERE, "Falha no processamento e reenvio do pedido No. " + idPedido + ". Possivel causa: "

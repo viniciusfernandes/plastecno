@@ -1,5 +1,7 @@
 package br.com.plastecno.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +36,9 @@ public class PedidoAguardandoMaterialMonitorImpl implements PedidoAguardandoMate
 	public void reservarItemPedidoAguardandoMaterial() {
 		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoAguardandoMaterial();
 		boolean empacotamentoOk = false;
+
+		List<Integer> empacotados = new ArrayList<Integer>(20);
+		List<Integer> naoEmpacotados = new ArrayList<Integer>(20);
 		for (Integer idPedido : listaIdPedido) {
 			try {
 				// Encomendado mesmo apos o processamento do agendamento, caso contrario
@@ -41,12 +46,20 @@ public class PedidoAguardandoMaterialMonitorImpl implements PedidoAguardandoMate
 				// Aqui estamos garantindo que mesmo que o pedido permaneca como
 				// revenda aguardando encomenda, mas ele ja passou por essa etapa.
 				empacotamentoOk = pedidoService.empacotarItemAguardandoMaterial(idPedido);
-				logger.info("Monitor de itens aguardando material disparou a reserva dos itens do pedido No. " + idPedido
-						+ ". Resultado: " + (empacotamentoOk ? "PRONTO PARA EMPACOTAR" : "ALGUM ITEM NAO EXISTE NO ESTOQUE"));
+
+				if (empacotamentoOk) {
+					empacotados.add(idPedido);
+				} else {
+					naoEmpacotados.add(idPedido);
+				}
+
 			} catch (BusinessException e) {
 				logger.log(Level.SEVERE, "Falha no processamento e reenvio do pedido No. " + idPedido + ". Possivel causa: "
 						+ e.getMensagemConcatenada());
 			}
 		}
+		logger.info("Monitor enviou para o empacotamento os pedidos No.: " + Arrays.deepToString(empacotados.toArray()));
+		logger.info("Monitor nao encontrou itens para empacotar dos pedidos No.: "
+				+ Arrays.deepToString(naoEmpacotados.toArray()));
 	}
 }

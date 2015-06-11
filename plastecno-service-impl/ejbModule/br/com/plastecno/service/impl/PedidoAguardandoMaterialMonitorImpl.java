@@ -1,8 +1,9 @@
 package br.com.plastecno.service.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,8 +38,8 @@ public class PedidoAguardandoMaterialMonitorImpl implements PedidoAguardandoMate
 		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoAguardandoMaterial();
 		boolean empacotamentoOk = false;
 
-		List<Integer> empacotados = new ArrayList<Integer>(20);
-		List<Integer> naoEmpacotados = new ArrayList<Integer>(20);
+		Set<Integer> empacotados = new TreeSet<Integer>();
+		Set<Integer> naoEmpacotados = new TreeSet<Integer>();
 		for (Integer idPedido : listaIdPedido) {
 			try {
 				// Encomendado mesmo apos o processamento do agendamento, caso contrario

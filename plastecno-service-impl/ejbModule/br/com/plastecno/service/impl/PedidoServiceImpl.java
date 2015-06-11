@@ -392,7 +392,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException {
 		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
 		if (!empacotamentoOk) {

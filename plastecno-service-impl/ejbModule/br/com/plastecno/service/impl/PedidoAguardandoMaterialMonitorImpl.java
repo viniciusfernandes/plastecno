@@ -33,11 +33,11 @@ public class PedidoAguardandoMaterialMonitorImpl implements PedidoAguardandoMate
 		logger.info("Inicializando o monitoramento dos itens de pedidos encomendados aguardando reserva");
 	}
 
-	@Schedule(hour = "*/1")
+	@Schedule(second = "*/10", minute = "*", hour = "*")
 	public void reservarItemPedidoAguardandoMaterial() {
 		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoAguardandoMaterial();
 		boolean empacotamentoOk = false;
-
+		// Listas utilizadas para logar o que foi enviado para o empacotamento.
 		Set<Integer> empacotados = new TreeSet<Integer>();
 		Set<Integer> naoEmpacotados = new TreeSet<Integer>();
 		for (Integer idPedido : listaIdPedido) {
@@ -47,7 +47,6 @@ public class PedidoAguardandoMaterialMonitorImpl implements PedidoAguardandoMate
 				// Aqui estamos garantindo que mesmo que o pedido permaneca como
 				// revenda aguardando encomenda, mas ele ja passou por essa etapa.
 				empacotamentoOk = pedidoService.empacotarItemAguardandoMaterial(idPedido);
-
 				if (empacotamentoOk) {
 					empacotados.add(idPedido);
 				} else {

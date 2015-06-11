@@ -97,6 +97,18 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarItemAguardandoCompraByIdPedido(Integer idPedido) {
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarItemAguardandoMaterialByIdPedido(Integer idPedido) {
+		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada)
 			throws BusinessException {
 		if (quantidadeRecepcionada == null) {
@@ -131,6 +143,12 @@ public class PedidoServiceImpl implements PedidoService {
 				.setParameter("id", idItemPedido).executeUpdate();
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarRevendaAguardandoMaterialByIdItem(Integer idItemPedido) {
+		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
+	}
+
 	@SuppressWarnings("unchecked")
 	private void alterarSequencialItemPedido(Integer idPedido, Integer sequencial) {
 		if (sequencial != null && sequencial > 0) {
@@ -155,12 +173,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarItemAguardandoCompraByIdPedido(Integer idPedido) {
-		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido) {
 		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
@@ -170,18 +182,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido) {
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarRevendaAguardandoMaterialByIdItem(Integer idItemPedido) {
-		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarItemAguardandoMaterialByIdPedido(Integer idPedido) {
-		pedidoDAO.alterarSituacaoPedidoById(idPedido, SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
 	}
 
 	@Override
@@ -215,41 +215,11 @@ public class PedidoServiceImpl implements PedidoService {
 		// Essas condicoes serao analisadas quando um pedido for cancelado a partir
 		// de um "refazer do pedido".
 		if (TipoPedido.COMPRA.equals(tipoPedido)) {
-			//estoqueService.devolverItemCompradoEstoqueByIdPedido(idPedido);
+			// estoqueService.devolverItemCompradoEstoqueByIdPedido(idPedido);
 		} else if (TipoPedido.REVENDA.equals(tipoPedido)) {
 			estoqueService.cancelarReservaEstoqueByIdPedido(idPedido);
 		}
 		pedidoDAO.cancelar(idPedido);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public boolean contemItemPedido(Integer idPedido) {
-		return this.pesquisarTotalItemPedido(idPedido) > 0;
-	}
-
-	public boolean contemPedidoItemRevendaAguardandoEncomenda(Integer idItemPedido) {
-		return pesquisarTotalItemRevendaAguardandoEncomenda(idItemPedido) > 0;
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido) {
-		return pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido) > 0;
-	}
-
-	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
-	private void definirTipoPedido(Pedido pedido) {
-		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
-		// portanto, faremos uma consulta pelo nome da representada para decidir, ja
-		// que os pedidos de compra sempre serao configurados antes de inserir.
-		if (pedido.getTipoPedido() == null) {
-			if (representadaService.isRevendedor(pedido.getRepresentada().getId())) {
-				pedido.setTipoPedido(TipoPedido.REVENDA);
-			} else {
-				pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
-			}
-		}
 	}
 
 	@Override
@@ -332,6 +302,51 @@ public class PedidoServiceImpl implements PedidoService {
 		return pedidoCompra.getId();
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean contemItemPedido(Integer idPedido) {
+		return this.pesquisarTotalItemPedido(idPedido) > 0;
+	}
+
+	public boolean contemPedidoItemRevendaAguardandoEncomenda(Integer idItemPedido) {
+		return pesquisarTotalItemRevendaAguardandoEncomenda(idItemPedido) > 0;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido) {
+		return pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido) > 0;
+	}
+
+	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
+	private void definirTipoPedido(Pedido pedido) {
+		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
+		// portanto, faremos uma consulta pelo nome da representada para decidir, ja
+		// que os pedidos de compra sempre serao configurados antes de inserir.
+		if (pedido.getTipoPedido() == null) {
+			if (representadaService.isRevendedor(pedido.getRepresentada().getId())) {
+				pedido.setTipoPedido(TipoPedido.REVENDA);
+			} else {
+				pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
+			}
+		}
+	}
+
+	/**
+	 * Aqui estamos exigindo que sempre tenhamos uma nova transacao pois se um
+	 * pedido tiver problemas para ser enviado para o empacotamento, isso nao deve
+	 * interferir no empacotamento dos outros pedidos.
+	 */
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException {
+		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
+		if (!empacotamentoOk) {
+			alterarItemAguardandoMaterialByIdPedido(idPedido);
+		}
+		return empacotamentoOk;
+	}
+
 	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
 
 		if (StringUtils.isEmpty(pedido.getContato().getEmail())) {
@@ -387,16 +402,6 @@ public class PedidoServiceImpl implements PedidoService {
 		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
 		if (!empacotamentoOk) {
 			alterarItemAguardandoCompraByIdPedido(idPedido);
-		}
-		return empacotamentoOk;
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-	public boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException {
-		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
-		if (!empacotamentoOk) {
-			alterarItemAguardandoMaterialByIdPedido(idPedido);
 		}
 		return empacotamentoOk;
 	}
@@ -843,6 +848,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdPedidoAguardandoMaterial() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 		return pedidoDAO.pesquisarIdPedidoByIdItemPedido(idItemPedido);
 	}
@@ -857,12 +868,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoItemAguardandoCompra() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Integer> pesquisarIdPedidoAguardandoMaterial() {
-		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
 	}
 
 	@Override
@@ -885,6 +890,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemAguardandoCompra(Integer idCliente, Periodo periodo) {
 		return itemPedidoDAO.pesquisarItemAguardandoCompra(idCliente, periodo.getInicio(), periodo.getFim());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Periodo periodo) {
+		return itemPedidoDAO.pesquisarItemAguardandoMaterial(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override
@@ -1130,12 +1141,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo) {
 		return itemPedidoDAO.pesquisarItemPedidoEmpacotamento(idCliente, periodo.getInicio(), periodo.getFim());
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Periodo periodo) {
-		return itemPedidoDAO.pesquisarItemAguardandoMaterial(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override

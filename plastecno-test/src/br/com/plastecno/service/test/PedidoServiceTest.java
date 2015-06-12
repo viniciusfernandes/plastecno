@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import mockit.Mock;
 import mockit.MockUp;
@@ -66,6 +67,8 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private ClienteService clienteService;
 
+	private ComissaoService comissaoService;
+
 	private EstoqueService estoqueService;
 
 	private MaterialService materialService;
@@ -75,8 +78,6 @@ public class PedidoServiceTest extends AbstractTest {
 	private RepresentadaService representadaService;
 
 	private UsuarioService usuarioService;
-
-	private ComissaoService comissaoService;
 
 	private void associarVendedor(Cliente cliente) {
 		cliente.setVendedor(eBuilder.buildVendedor());
@@ -201,13 +202,13 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
-		
+
 		try {
 			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.05);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
-		
+
 		Cliente cliente = pedido.getCliente();
 		try {
 			clienteService.inserir(cliente);
@@ -807,32 +808,6 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testEnvioRevendaEncomendadaEmpacotamento() {
-		PedidoRevendaECompra pedidoRevendaECompra = gerarRevendaEncomendada();
-		Integer idPedidoCompra = pedidoRevendaECompra.getPedidoCompra().getId();
-		Integer idPedidoRevenda = pedidoRevendaECompra.getPedidoRevenda().getId();
-
-		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoByIdPedido(idPedidoCompra);
-		for (ItemPedido itemComprado : listaItemComprado) {
-			// Recepcionando os itens comprados para preencher o estoque.
-			try {
-				itemComprado.setQuantidadeRecepcionada(itemComprado.getQuantidade());
-				estoqueService.inserirItemPedido(itemComprado.getId());
-			} catch (BusinessException e) {
-				printMensagens(e);
-			}
-		}
-
-		try {
-			pedidoService.empacotarItemAguardandoMaterial(idPedidoRevenda);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
-		assertEquals(SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO, situacaoPedido);
-	}
-
-	@Test
 	public void testEnvioRevendaAguardandoMaterialEmpacotamentoInvalido() {
 		PedidoRevendaECompra pedidoRevendaECompra = gerarRevendaEncomendada();
 		Integer idPedidoCompra = pedidoRevendaECompra.getPedidoCompra().getId();
@@ -856,6 +831,32 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
 		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
+	}
+
+	@Test
+	public void testEnvioRevendaEncomendadaEmpacotamento() {
+		PedidoRevendaECompra pedidoRevendaECompra = gerarRevendaEncomendada();
+		Integer idPedidoCompra = pedidoRevendaECompra.getPedidoCompra().getId();
+		Integer idPedidoRevenda = pedidoRevendaECompra.getPedidoRevenda().getId();
+
+		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoByIdPedido(idPedidoCompra);
+		for (ItemPedido itemComprado : listaItemComprado) {
+			// Recepcionando os itens comprados para preencher o estoque.
+			try {
+				itemComprado.setQuantidadeRecepcionada(itemComprado.getQuantidade());
+				estoqueService.inserirItemPedido(itemComprado.getId());
+			} catch (BusinessException e) {
+				printMensagens(e);
+			}
+		}
+
+		try {
+			pedidoService.empacotarItemAguardandoMaterial(idPedidoRevenda);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
+		assertEquals(SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO, situacaoPedido);
 	}
 
 	public void testInclusaoItemPedido() {
@@ -1432,6 +1433,44 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O pedido foi incluido uma transportadora para redespacho.", throwed);
+	}
+
+	@Test
+	public void testItemPedidoAguardandoCompra() {
+		Pedido pedido = gerarPedidoRevenda();
+		ItemPedido item1 = gerarItemPedido();
+
+		Integer idPedido = pedido.getId();
+		try {
+			pedidoService.inserirItemPedido(idPedido, item1);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
+
+		Set<Integer> ids = new TreeSet<Integer>();
+		ids.add(idPedido);
+		try {
+			// Estamos alterando o tipo de relacionamento da representada para
+			// podermos efetuar a encomenda dos itens para o fornecedor.
+			Representada representada = pedido.getRepresentada();
+			representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+			
+			pedidoService.comprarItemPedido(pedido.getVendedor().getId(), pedido.getRepresentada().getId(), ids);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
 	}
 
 	@Test

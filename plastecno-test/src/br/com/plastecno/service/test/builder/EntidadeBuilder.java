@@ -144,6 +144,7 @@ public class EntidadeBuilder {
 		Usuario vendedor = buildVendedor();
 		Cliente cliente = buildCliente();
 		cliente.setVendedor(vendedor);
+		
 		Representada representada = buildRepresentada();
 		Contato contato = new Contato();
 		contato.setNome("Adriano");

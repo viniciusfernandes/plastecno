@@ -137,10 +137,6 @@ INSERT INTO vendas.tb_perfil_acesso values(15, 'RECEPCAO_COMPRA');
 
 alter table vendas.tb_pedido add aliquota_comissao numeric (5,5) default 0;
 
-
-<!--ultima alteracao -->
-
 insert into vendas.tb_situacao_pedido values (9, 'COMPRA EM ANDAMENTO');
 insert into vendas.tb_situacao_pedido values (10, 'ITEM AGUARDANDO MATERIAL');
-insert into vendas.tb_situacao_pedido values (11, 'REVENDA PARCIALMENTE RESERVADA');
-	
+insert into vendas.tb_situacao_pedido values (11, 'REVENDA PARCIALMENTE RESERVADA');	

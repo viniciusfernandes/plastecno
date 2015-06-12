@@ -293,6 +293,7 @@ public class PedidoServiceImpl implements PedidoService {
 			inserirItemPedido(itemCadastrado);
 			if (!contemPedidoItemRevendaAguardandoEncomenda(idItemPedido)) {
 				alterarRevendaAguardandoMaterialByIdItem(itemCadastrado.getId());
+				alterarItemAguardandoMaterialByIdPedido(itemCadastrado.getPedido().getId());
 			}
 
 		}

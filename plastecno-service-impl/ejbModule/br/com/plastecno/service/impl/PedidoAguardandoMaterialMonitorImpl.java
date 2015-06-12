@@ -33,7 +33,7 @@ public class PedidoAguardandoMaterialMonitorImpl implements PedidoAguardandoMate
 		logger.info("Inicializando o monitoramento dos itens de pedidos encomendados aguardando reserva");
 	}
 
-	@Schedule(second = "*/10", minute = "*", hour = "*")
+	@Schedule(hour = "*/1")
 	public void reservarItemPedidoAguardandoMaterial() {
 		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoAguardandoMaterial();
 		boolean empacotamentoOk = false;

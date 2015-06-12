@@ -56,6 +56,14 @@ public class EntidadeBuilder {
 		return cliente;
 	}
 
+	public Cliente buildRevendedor() {
+		Cliente cliente = buildCliente();
+		cliente.setNomeFantasia("Revendedor Plastico");
+		cliente.setRazaoSocial("Revendedor Plastico LTDA");
+		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
+		return cliente;
+	}
+
 	public Endereco buildEndereco() {
 		Bairro bairro = new Bairro();
 		bairro.setDescricao("Centro");
@@ -144,7 +152,7 @@ public class EntidadeBuilder {
 		Usuario vendedor = buildVendedor();
 		Cliente cliente = buildCliente();
 		cliente.setVendedor(vendedor);
-		
+
 		Representada representada = buildRepresentada();
 		Contato contato = new Contato();
 		contato.setNome("Adriano");

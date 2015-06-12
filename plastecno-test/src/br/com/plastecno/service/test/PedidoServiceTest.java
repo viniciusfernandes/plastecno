@@ -233,6 +233,12 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	private Pedido gerarPedidoRevenda() {
+		Cliente revendedor = eBuilder.buildRevendedor();
+		try {
+			clienteService.inserir(revendedor);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 		return gerarPedido(TipoPedido.REVENDA);
 	}
 
@@ -1457,14 +1463,15 @@ public class PedidoServiceTest extends AbstractTest {
 		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
 
 		Set<Integer> ids = new TreeSet<Integer>();
-		ids.add(idPedido);
+		ids.add(item1.getId());
 		try {
+
 			// Estamos alterando o tipo de relacionamento da representada para
 			// podermos efetuar a encomenda dos itens para o fornecedor.
 			Representada representada = pedido.getRepresentada();
 			representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
-			
 			pedidoService.comprarItemPedido(pedido.getVendedor().getId(), pedido.getRepresentada().getId(), ids);
+
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

@@ -12,8 +12,6 @@ import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
-import javax.ejb.Timeout;
-import javax.ejb.Timer;
 
 import br.com.plastecno.service.PedidoAguardandoMaterialMonitor;
 import br.com.plastecno.service.PedidoService;
@@ -27,11 +25,6 @@ public class PedidoAguardandoMaterialMonitorImpl implements PedidoAguardandoMate
 
 	@EJB
 	private PedidoService pedidoService;
-
-	@Timeout
-	public void init(Timer timer) {
-		logger.info("Inicializando o monitoramento dos itens de pedidos encomendados aguardando reserva");
-	}
 
 	@Schedule(hour = "*/1")
 	public void reservarItemPedidoAguardandoMaterial() {

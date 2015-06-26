@@ -73,6 +73,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		double precoItem = 0;
 		double valorComissionado = 0;
 
+		// Acumulando os valores dos itens comprados
 		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoCompradoResumidoByPeriodo(periodo);
 		for (ItemPedido itemPedido : listaItemComprado) {
 			precoItem = itemPedido.calcularPrecoItem();
@@ -104,15 +105,17 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		// Acumulando os valores dos itens de venda por representacao
 		listaItemVendido = pedidoService.pesquisarItemPedidoRepresentacaoByPeriodo(periodo);
-		double valorComissionadoRepresentacao = 0;
 		for (ItemPedido itemPedido : listaItemVendido) {
-			precoItem = itemPedido.calcularPrecoItem();
+			if (!itemPedido.contemValorComissionado()) {
+				continue;
+			}
+
+			precoItem = itemPedido.getValorComissionado();
 			valorVendido += precoItem;
-			valorComissionado += itemPedido.getValorComissionado();
-			valorComissionadoRepresentacao += precoItem * itemPedido.getAliquotaComissaoPedido();
+			valorComissionado += precoItem * itemPedido.getAliquotaComissao();
 		}
 
-		valorReceita += valorComissionadoRepresentacao;
+		valorReceita += valorVendido;
 
 		double valorIPI = valorDebitoIPI - valorCreditoIPI;
 		double valorICMS = valorDebitoICMS - valorCreditoICMS;
@@ -263,6 +266,20 @@ public class RelatorioServiceImpl implements RelatorioService {
 				pedidoService.pesquisarItemAguardandoCompra(idCliente, periodo));
 	}
 
+	@Override
+	@REVIEW(data = "10/03/2015", descricao = "Devemos implementar uma melhoria o esquema de consulta dos itens de estoque para recuperar apenas a informacao necessaria.")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(Integer idRepresentada,
+			Periodo periodo) {
+		StringBuilder titulo = new StringBuilder();
+		titulo.append("Itens Aguardando Material de ");
+		titulo.append(StringUtils.formatarData(periodo.getInicio())).append(" à ");
+		titulo.append(StringUtils.formatarData(periodo.getFim()));
+
+		return gerarRelatorioItensPorPedido(titulo.toString(),
+				pedidoService.pesquisarItemAguardandoMaterial(idRepresentada, periodo));
+	}
+
 	@REVIEW(descricao = "Nem sempre eh necessario carregar as informacoes da representada")
 	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(String titulo, List<ItemPedido> listaItem) {
 		/*
@@ -307,19 +324,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 		 */
 		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Empacotar",
 				pedidoService.pesquisarRevendaEmpacotamento(idCliente, periodo));
-	}
-
-	@Override
-	@REVIEW(data = "10/03/2015", descricao = "Devemos implementar uma melhoria o esquema de consulta dos itens de estoque para recuperar apenas a informacao necessaria.")
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(Integer idRepresentada, Periodo periodo) {
-		StringBuilder titulo = new StringBuilder();
-		titulo.append("Itens Aguardando Material de ");
-		titulo.append(StringUtils.formatarData(periodo.getInicio())).append(" à ");
-		titulo.append(StringUtils.formatarData(periodo.getFim()));
-
-		return gerarRelatorioItensPorPedido(titulo.toString(),
-				pedidoService.pesquisarItemAguardandoMaterial(idRepresentada, periodo));
 	}
 
 	@Override

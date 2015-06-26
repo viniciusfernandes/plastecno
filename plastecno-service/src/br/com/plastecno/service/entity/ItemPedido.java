@@ -212,7 +212,11 @@ public class ItemPedido extends Item {
 		return this.formaMaterial != null && this.formaMaterial.contemLargura();
 	}
 
-	public double getAliquotaComissao() {
+	public boolean contemValorComissionado() {
+		return valorComissionado != null && aliquotaComissao != null;
+	}
+
+	public Double getAliquotaComissao() {
 		return aliquotaComissao;
 	}
 

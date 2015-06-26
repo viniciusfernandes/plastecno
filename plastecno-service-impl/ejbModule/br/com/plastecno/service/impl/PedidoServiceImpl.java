@@ -612,9 +612,7 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Descrição da peca do item do pedido é obrigatório");
 		}
 
-		if (itemPedido.isMedidaExternaIgualInterna()) {
-			itemPedido.setMedidaInterna(itemPedido.getMedidaExterna());
-		}
+		itemPedido.configurarMedidaInterna();
 
 		final Pedido pedido = this.pesquisarPedidoById(idPedido);
 		itemPedido.setPedido(pedido);

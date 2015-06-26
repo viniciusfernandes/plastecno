@@ -81,8 +81,15 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			select.append("and i.quantidade > 0 ");
 		}
 
-		select
-				.append("order by i.formaMaterial, i.material.sigla, i.medidaInterna asc, i.medidaExterna asc, i.comprimento asc ");
+		if (FormaMaterial.CH.equals(formaMaterial) || FormaMaterial.TB.equals(formaMaterial)) {
+			select
+					.append("order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
+
+		} else {
+			select
+					.append("order by i.formaMaterial, i.material.sigla, i.medidaInterna asc, i.medidaExterna asc, i.comprimento asc ");
+		}
+		
 		Query query = entityManager.createQuery(select.toString());
 		if (idMaterial != null) {
 			query.setParameter("idMaterial", idMaterial);

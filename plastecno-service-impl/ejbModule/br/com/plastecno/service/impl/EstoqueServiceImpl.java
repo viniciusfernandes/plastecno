@@ -204,6 +204,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (!itemEstoque.isPeca() && StringUtils.isNotEmpty(itemEstoque.getDescricaoPeca())) {
 			throw new BusinessException("A descrição é apenas itens do tipo peças. Remova a descrição.");
 		}
+
+		itemEstoque.configurarMedidaInterna();
+
 		CalculadoraVolume.validarVolume(itemEstoque);
 
 		// Verificando se existe item equivalente no estoque, caso nao exista vamos
@@ -411,9 +414,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			throw new BusinessException("Descrição da peca do item do pedido é obrigatório");
 		}
 
-		if (itemEstoque.isMedidaExternaIgualInterna()) {
-			itemEstoque.setMedidaInterna(itemEstoque.getMedidaExterna());
-		}
+		itemEstoque.configurarMedidaInterna();
 
 		ItemEstoque itemCadastrado = pesquisarItemEstoqueById(itemEstoque.getId());
 		if (itemCadastrado == null) {

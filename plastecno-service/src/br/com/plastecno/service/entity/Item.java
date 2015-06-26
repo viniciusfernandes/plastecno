@@ -64,6 +64,12 @@ public abstract class Item implements Serializable, Cloneable {
 		return getPrecoUnidade() * getQuantidade();
 	}
 
+	public void configurarMedidaInterna() {
+		if (isMedidaExternaIgualInterna()) {
+			setMedidaInterna(getMedidaExterna());
+		}
+	}
+
 	public boolean contemLargura() {
 		return getFormaMaterial() != null && getFormaMaterial().contemLargura();
 	}

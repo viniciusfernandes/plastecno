@@ -1,8 +1,10 @@
 package br.com.plastecno.service;
 
+import java.util.Collection;
+
 import javax.ejb.Local;
 
 @Local
 public interface PedidoAguardandoMaterialMonitor {
-	void reservarItemPedidoAguardandoMaterial();
+	Collection<Integer> reservarItemPedidoAguardandoMaterial();
 }

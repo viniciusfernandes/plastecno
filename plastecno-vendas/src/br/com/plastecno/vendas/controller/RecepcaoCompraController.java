@@ -95,12 +95,12 @@ public class RecepcaoCompraController extends AbstractController {
     @Post("compra/item/recepcaoparcial")
     public void recepcaoParcialItemPedido(Integer idItemPedido, Integer quantidadeRecepcionada, Date dataInicial,
             Date dataFinal, Integer idRepresentada) {
+        String mensagem = null;
         try {
             estoqueService.recepcionarParcialmenteItemCompra(idItemPedido, quantidadeRecepcionada);
-
             boolean contemItem = pedidoService.contemQuantidadeNaoRecepcionadaItemPedido(idItemPedido);
             Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
-            String mensagem = null;
+
             if (contemItem) {
                 mensagem = "O pedido No. "
                         + idPedido
@@ -115,6 +115,9 @@ public class RecepcaoCompraController extends AbstractController {
             addAtributo("itemPedido", pedidoService.pesquisarItemPedido(idItemPedido));
             gerarListaMensagemErro(e);
         }
+
+        empacotarPedidoAguardandoMaterial(mensagem);
+
         addAtributo("permanecerTopo", true);
         redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }

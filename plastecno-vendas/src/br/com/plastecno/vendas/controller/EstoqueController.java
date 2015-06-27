@@ -41,15 +41,20 @@ public class EstoqueController extends AbstractController {
 
     @Post("estoque/item/inclusao")
     public void inserirItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
+        String mensagem = null;
         try {
             itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
             estoqueService.inserirItemEstoque(itemPedido);
-            gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
+            mensagem = "Item de estoque inserido/alterado com sucesso.";
+            gerarMensagemSucesso(mensagem);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             addAtributo("itemPedido", itemPedido);
         }
+
+        empacotarPedidoAguardandoMaterial(mensagem);
+
         addAtributo("permanecerTopo", true);
         if (material != null && formaMaterial != null) {
             redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
@@ -138,6 +143,7 @@ public class EstoqueController extends AbstractController {
     @Post("estoque/item/edicao")
     public void redefinirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
             Double aliquotaICMS, Material material, FormaMaterial formaMaterial) {
+        String mensagem = null;
         try {
             ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
             if (itemEstoque == null) {
@@ -148,13 +154,18 @@ public class EstoqueController extends AbstractController {
                 itemEstoque.setQuantidade(quantidade);
                 itemEstoque.setPrecoMedio(preco);
                 estoqueService.redefinirItemEstoque(itemEstoque);
-                gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
+                mensagem = "Item de estoque inserido/alterado com sucesso.";
+                gerarMensagemSucesso(mensagem);
             }
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
 
         }
+
+        empacotarPedidoAguardandoMaterial(mensagem);
+
         addAtributo("permanecerTopo", true);
+
         if (material != null && formaMaterial != null) {
             redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
         } else {

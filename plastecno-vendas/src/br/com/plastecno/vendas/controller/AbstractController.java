@@ -3,6 +3,7 @@ package br.com.plastecno.vendas.controller;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -16,6 +17,7 @@ import br.com.caelum.vraptor.interceptor.download.ByteArrayDownload;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.caelum.vraptor.serialization.Serializer;
 import br.com.caelum.vraptor.view.Results;
+import br.com.plastecno.service.PedidoAguardandoMaterialMonitor;
 import br.com.plastecno.service.TipoLogradouroService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
@@ -52,6 +54,28 @@ public abstract class AbstractController {
 
     private UsuarioInfo usuarioInfo;
     private UsuarioService usuarioService;
+
+    void empacotarPedidoAguardandoMaterial(String mensagem) {
+        PedidoAguardandoMaterialMonitor pedidoAguardandoMaterialMonitor;
+        try {
+            pedidoAguardandoMaterialMonitor = ServiceLocator.locate(PedidoAguardandoMaterialMonitor.class);
+            // Estamos forcando a execucao da reserva dos itens pelo monitor
+            // pois a execucao manual pode ser trabalhosa.
+            Collection<Integer> empacotados = pedidoAguardandoMaterialMonitor.reservarItemPedidoAguardandoMaterial();
+            if (!empacotados.isEmpty()) {
+                mensagem = "Os seguintes pedidos foram enviados automaticamente para o empacotamento: "
+                        + Arrays.deepToString(empacotados.toArray()) + ". " + mensagem;
+                gerarMensagemSucesso(mensagem);
+            }
+        } catch (ServiceLocatorException e) {
+            this.logger.log(Level.SEVERE, "Falha no lookup de algum servico", e);
+            this.result.include("erro",
+                    "Falha no localizacao de algum servico. Verifique o log do servidor para maiores detalhes. CAUSA: "
+                            + e.getMessage());
+            irTelaErro();
+        }
+
+    }
 
     public AbstractController(Result result) {
         this.result = result;

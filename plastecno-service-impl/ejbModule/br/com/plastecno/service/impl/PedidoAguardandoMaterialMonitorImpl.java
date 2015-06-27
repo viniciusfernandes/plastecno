@@ -1,6 +1,7 @@
 package br.com.plastecno.service.impl;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -27,7 +28,7 @@ public class PedidoAguardandoMaterialMonitorImpl implements PedidoAguardandoMate
 	private PedidoService pedidoService;
 
 	@Schedule(hour = "*/1")
-	public void reservarItemPedidoAguardandoMaterial() {
+	public Collection<Integer> reservarItemPedidoAguardandoMaterial() {
 		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoAguardandoMaterial();
 		boolean empacotamentoOk = false;
 		// Listas utilizadas para logar o que foi enviado para o empacotamento.
@@ -54,5 +55,6 @@ public class PedidoAguardandoMaterialMonitorImpl implements PedidoAguardandoMate
 		logger.info("Monitor enviou para o empacotamento os pedidos No.: " + Arrays.deepToString(empacotados.toArray()));
 		logger.info("Monitor nao encontrou itens para empacotar dos pedidos No.: "
 				+ Arrays.deepToString(naoEmpacotados.toArray()));
+		return empacotados;
 	}
 }

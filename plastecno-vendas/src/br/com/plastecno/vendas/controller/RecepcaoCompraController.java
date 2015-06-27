@@ -7,6 +7,7 @@ import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.download.Download;
+import br.com.plastecno.message.AlteracaoEstoquePublisher;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
@@ -22,6 +23,9 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class RecepcaoCompraController extends AbstractController {
+    @Servico
+    private AlteracaoEstoquePublisher alteracaoEstoquePublisher;
+
     @Servico
     private EstoqueService estoqueService;
 
@@ -116,7 +120,7 @@ public class RecepcaoCompraController extends AbstractController {
             gerarListaMensagemErro(e);
         }
 
-        empacotarPedidoAguardandoMaterial(mensagem);
+        alteracaoEstoquePublisher.publicar();
 
         addAtributo("permanecerTopo", true);
         redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);

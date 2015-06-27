@@ -7,6 +7,7 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.plastecno.message.AlteracaoEstoquePublisher;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.constante.FormaMaterial;
@@ -23,8 +24,12 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 public class EstoqueController extends AbstractController {
     @Servico
     private EstoqueService estoqueService;
+
     @Servico
     private MaterialService materialService;
+
+    @Servico
+    private AlteracaoEstoquePublisher alteracaoEstoquePublisher;
 
     public EstoqueController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -41,19 +46,17 @@ public class EstoqueController extends AbstractController {
 
     @Post("estoque/item/inclusao")
     public void inserirItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
-        String mensagem = null;
         try {
             itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
             estoqueService.inserirItemEstoque(itemPedido);
-            mensagem = "Item de estoque inserido/alterado com sucesso.";
-            gerarMensagemSucesso(mensagem);
+            gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             addAtributo("itemPedido", itemPedido);
         }
 
-        empacotarPedidoAguardandoMaterial(mensagem);
+        alteracaoEstoquePublisher.publicar();
 
         addAtributo("permanecerTopo", true);
         if (material != null && formaMaterial != null) {
@@ -143,7 +146,6 @@ public class EstoqueController extends AbstractController {
     @Post("estoque/item/edicao")
     public void redefinirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
             Double aliquotaICMS, Material material, FormaMaterial formaMaterial) {
-        String mensagem = null;
         try {
             ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
             if (itemEstoque == null) {
@@ -154,15 +156,14 @@ public class EstoqueController extends AbstractController {
                 itemEstoque.setQuantidade(quantidade);
                 itemEstoque.setPrecoMedio(preco);
                 estoqueService.redefinirItemEstoque(itemEstoque);
-                mensagem = "Item de estoque inserido/alterado com sucesso.";
-                gerarMensagemSucesso(mensagem);
+                gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
             }
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
 
         }
 
-        empacotarPedidoAguardandoMaterial(mensagem);
+        alteracaoEstoquePublisher.publicar();
 
         addAtributo("permanecerTopo", true);
 

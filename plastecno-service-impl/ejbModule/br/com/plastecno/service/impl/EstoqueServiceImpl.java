@@ -22,6 +22,7 @@ import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemReservadoDAO;
+import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Item;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -29,6 +30,7 @@ import br.com.plastecno.service.entity.ItemReservado;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.impl.calculo.CalculadoraVolume;
 import br.com.plastecno.util.StringUtils;
@@ -40,7 +42,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private EntityManager entityManager;
 
 	private ItemEstoqueDAO itemEstoqueDAO;
+
 	private ItemReservadoDAO itemReservadoDAO;
+
+	private PedidoDAO pedidoDAO;
+
 	@EJB
 	private PedidoService pedidoService;
 
@@ -192,6 +198,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public void init() {
 		itemEstoqueDAO = new ItemEstoqueDAO(entityManager);
 		itemReservadoDAO = new ItemReservadoDAO(entityManager);
+		pedidoDAO = new PedidoDAO(entityManager);
 	}
 
 	@Override
@@ -492,6 +499,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 	}
 
+	@REVIEW(data = "27/06/2015", descricao = "Na ultima linha do metodo estamos persistindo as alteracoes do pedido atraves do servico e esta consumindo muito tempo, podemos alterar para o pedidoDAO.")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public boolean reservarItemPedido(Integer idPedido) throws BusinessException {
@@ -516,7 +524,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		pedido.setSituacaoPedido(todosReservados ? SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO
 				: SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
-		pedidoService.inserir(pedido);
+
+		pedidoDAO.alterar(pedido);
 		return todosReservados;
 	}
 

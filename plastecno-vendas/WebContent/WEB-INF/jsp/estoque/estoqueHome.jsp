@@ -115,6 +115,17 @@ function inicializarAutocompleteMaterial() {
 			$('#bloco_item_pedido #idMaterial').val(itemLista.id);
 		}
 	});
+	
+	// Esse eh o autocomplete da campo de materiais no bloco de limite minimo de estoque
+	autocompletar({
+		url : '<c:url value="/estoque/material/listagem"/>',
+		campoPesquisavel : 'bloco_limite_minimo #material',
+		parametro : 'sigla',
+		containerResultados : 'bloco_limite_minimo #containerPesquisaMaterial',
+		selecionarItem : function(itemLista) {
+			$('#bloco_limite_minimo #idMaterial').val(itemLista.id);
+		}
+	});
 };
 
 function inicializarFiltro() {

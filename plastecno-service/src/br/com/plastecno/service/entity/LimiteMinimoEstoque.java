@@ -45,8 +45,8 @@ public class LimiteMinimoEstoque {
 	private Double medidaInterna;
 
 	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = true, nomeExibicao = "Quantidade do limite minimo")
-	@Column(name = "quantidade_minina")
-	private Integer quantidadeMinina;
+	@Column(name = "quantidade_minima")
+	private Integer quantidadeMinima;
 
 	public Double getComprimento() {
 		return comprimento;
@@ -72,8 +72,8 @@ public class LimiteMinimoEstoque {
 		return medidaInterna;
 	}
 
-	public Integer getQuantidadeMinina() {
-		return quantidadeMinina;
+	public Integer getQuantidadeMinima() {
+		return quantidadeMinima;
 	}
 
 	public void setComprimento(Double comprimento) {
@@ -100,8 +100,8 @@ public class LimiteMinimoEstoque {
 		this.medidaInterna = medidaInterna;
 	}
 
-	public void setQuantidadeMinina(Integer quantidadeMinina) {
-		this.quantidadeMinina = quantidadeMinina;
+	public void setQuantidadeMinima(Integer quantidadeMinima) {
+		this.quantidadeMinima = quantidadeMinima;
 	}
 
 }

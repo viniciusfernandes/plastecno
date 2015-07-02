@@ -66,10 +66,17 @@ public class EstoqueController extends AbstractController {
             irTopoPagina();
         }
     }
-    
+
     @Post("estoque/limiteminimo/inclusao")
-    public void inserirLimiteMinimo(LimiteMinimoEstoque limite){
-        
+    public void inserirLimiteMinimo(LimiteMinimoEstoque limite) {
+        try {
+            estoqueService.inserirLimiteMinimo(limite);
+            gerarMensagemSucesso("Limite mínimo de estoque inserido/alterado com sucesso.");
+        } catch (BusinessException e) {
+            addAtributo("limite", limite);
+            gerarListaMensagemErro(e);
+        }
+        irTopoPagina();
     }
 
     @Post("estoque/escassez")
@@ -90,7 +97,7 @@ public class EstoqueController extends AbstractController {
             final Integer idMaterial = material != null ? material.getId() : null;
             List<ItemEstoque> lista = null;
             if (isListagemEscassez) {
-                lista = estoqueService.pesquisarEscassezItemEstoque(idMaterial, formaMaterial);
+                lista = estoqueService.pesquisarEscassezItemEstoque(null);
             } else {
                 lista = estoqueService.pesquisarItemEstoqueNaoZerados(idMaterial, formaMaterial);
             }

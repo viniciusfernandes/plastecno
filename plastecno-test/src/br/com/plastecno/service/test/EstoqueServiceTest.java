@@ -360,10 +360,34 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoLimiteMinimoEstoqueSemMaterial() {
+		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
+		limite.setMaterial(null);
+
+		boolean throwed = false;
+		try {
+			estoqueService.inserirLimiteMinimo(limite);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O material nao pode ser nulo e deve ser validada", throwed);
+
+		limite.setMaterial(gerarMaterial());
+		limite.setFormaMaterial(null);
+		throwed = false;
+		try {
+			estoqueService.inserirLimiteMinimo(limite);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A forma de material nao pode ser nula e deve ser validada", throwed);
+	}
+
+	@Test
 	public void testInclusaoLimiteMinimoEstoqueSemQuantidade() {
 		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
 		limite.setMaterial(gerarMaterial());
-		limite.setQuantidadeMinina(null);
+		limite.setQuantidadeMinima(null);
 
 		boolean throwed = false;
 		try {
@@ -372,8 +396,8 @@ public class EstoqueServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("A quantidade minina nao pode ser nula e deve ser validada", throwed);
-		
-		limite.setQuantidadeMinina(0);
+
+		limite.setQuantidadeMinima(0);
 		throwed = false;
 		try {
 			estoqueService.inserirLimiteMinimo(limite);
@@ -381,8 +405,8 @@ public class EstoqueServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("A quantidade minina nao pode ser nula e deve ser validada", throwed);
-		
-		limite.setQuantidadeMinina(-1);
+
+		limite.setQuantidadeMinima(-1);
 		throwed = false;
 		try {
 			estoqueService.inserirLimiteMinimo(limite);

@@ -117,7 +117,7 @@ public class EntidadeBuilder {
 		limite.setComprimento(2000.0);
 		limite.setMedidaExterna(100.0);
 		limite.setMedidaInterna(80.0);
-		limite.setQuantidadeMinina(10);
+		limite.setQuantidadeMinima(10);
 		return limite;
 	}
 

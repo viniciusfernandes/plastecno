@@ -25,6 +25,8 @@ function habilitarCamposEdicaoItem(habilitado){
 	habilitar('#bloco_limite_minimo #comprimento', habilitado);
 };
 </script>
+
+<form action="estoque/limiteminimo/inclusao" method="post">
 <fieldset id="bloco_limite_minimo">
 	<legend>::: Limite Mínimo Item do Estoque :::</legend>
 	<input type="hidden" id="idMaterial" name="limite.material.id" value="${limite.material.id}"/>
@@ -36,7 +38,7 @@ function habilitarCamposEdicaoItem(habilitado){
 	
 	<div class="label">Qtde Mínima:</div>
 	<div class="input" style="width: 7%">
-		<input type="text" id="quantidade" name="limite.quantidade" value="${limite.quantidade}"/>
+		<input type="text" id="quantidade" name="limite.quantidadeMinima" value="${limite.quantidadeMinima}"/>
 	</div>
 	<div class="label" style="width: 6%">Forma:</div>
 	<div class="input" style="width: 60%">
@@ -46,10 +48,6 @@ function habilitarCamposEdicaoItem(habilitado){
 				<option value="${formaMaterial}" <c:if test="${formaMaterial eq limite.formaMaterial}">selected</c:if>>${formaMaterial.descricao}</option>
 			</c:forEach>
 		</select>
-	</div>
-	<div class="label">Descrição:</div>
-	<div class="input" style="width: 70%">
-		<input type="text" id="descricao" name="limite.descricaoPeca" value="${limite.descricaoPeca}" style="width: 50%" />
 	</div>
 	<div class="label">Material:</div>
 	<div class="input" style="width: 70%">
@@ -75,8 +73,9 @@ function habilitarCamposEdicaoItem(habilitado){
 	</div>
 	
 	<div class="bloco_botoes">
-		<a id="botaoInserirLimite" title="Editar o limite mínimo do estoque" class="botaoInserir"></a>
+		<input type="submit" id="botaoInserirLimite" value="" title="Editar o limite mínimo do estoque" class="botaoInserir"/>
 		<a id="botaoLimparLimite" title="Limpar Dados do Item" class="botaoLimpar"></a>
 	</div>
 
 </fieldset>
+</form>

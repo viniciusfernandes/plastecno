@@ -181,6 +181,7 @@ class ServiceBuilder {
 	private EstoqueService buildEstoqueService() {
 		EstoqueService estoqueService = getServiceImpl(EstoqueService.class);
 		inject(estoqueService, buildDAO(ItemEstoqueDAO.class), "itemEstoqueDAO");
+		inject(estoqueService, buildDAO(PedidoDAO.class), "pedidoDAO");
 		inject(estoqueService, buildDAO(ItemReservadoDAO.class), "itemReservadoDAO");
 		inject(estoqueService, buildDAO(LimiteMinimoEstoqueDAO.class), "limiteMinimoEstoqueDAO");
 		inject(estoqueService, buildService(PedidoService.class), "pedidoService");

@@ -26,6 +26,7 @@ import br.com.plastecno.service.dao.EnderecoDAO;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.ItemReservadoDAO;
+import br.com.plastecno.service.dao.LimiteMinimoEstoqueDAO;
 import br.com.plastecno.service.dao.MaterialDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.dao.PerfilAcessoDAO;
@@ -181,6 +182,7 @@ class ServiceBuilder {
 		EstoqueService estoqueService = getServiceImpl(EstoqueService.class);
 		inject(estoqueService, buildDAO(ItemEstoqueDAO.class), "itemEstoqueDAO");
 		inject(estoqueService, buildDAO(ItemReservadoDAO.class), "itemReservadoDAO");
+		inject(estoqueService, buildDAO(LimiteMinimoEstoqueDAO.class), "limiteMinimoEstoqueDAO");
 		inject(estoqueService, buildService(PedidoService.class), "pedidoService");
 		return estoqueService;
 	}

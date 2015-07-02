@@ -30,6 +30,7 @@ import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
@@ -161,11 +162,20 @@ public class EstoqueServiceTest extends AbstractTest {
 		return listaItem;
 	}
 
+	private Material gerarMaterial() {
+		return gerarMaterial(null);
+	}
+
 	private Material gerarMaterial(Integer idRepresentada) {
 		Material material = eBuilder.buildMaterial();
 		List<Material> lista = materialService.pesquisarBySigla(material.getSigla());
 		if (lista.isEmpty()) {
-			material.addRepresentada(representadaService.pesquisarById(idRepresentada));
+
+			Representada representada = representadaService.pesquisarById(idRepresentada);
+			if (representada == null) {
+				representada = gerarRepresentada();
+			}
+			material.addRepresentada(representada);
 			try {
 				material.setId(materialService.inserir(material));
 			} catch (BusinessException e) {
@@ -189,15 +199,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Representada representada = eBuilder.buildRepresentada();
-		representada.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
-		try {
-			representadaService.inserir(representada);
-		} catch (BusinessException e3) {
-			printMensagens(e3);
-		}
-
-		pedido.setRepresentada(representada);
+		pedido.setRepresentada(gerarRepresentada());
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e1) {
@@ -205,6 +207,17 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		return pedido;
+	}
+
+	private Representada gerarRepresentada() {
+		Representada representada = eBuilder.buildRepresentada();
+		representada.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
+		try {
+			representadaService.inserir(representada);
+		} catch (BusinessException e3) {
+			printMensagens(e3);
+		}
+		return representada;
 	}
 
 	private Usuario gerarVendedor() {
@@ -319,6 +332,64 @@ public class EstoqueServiceTest extends AbstractTest {
 		verificarQuantidadeTotalItemEstoque(i.getQuantidade(), idItemEstoque);
 
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, i.getPedido().getSituacaoPedido());
+	}
+
+	@Test
+	public void testInclusaoLimiteMinimoEstoque() {
+		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
+		limite.setMaterial(gerarMaterial());
+		try {
+			estoqueService.inserirLimiteMinimo(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
+	@Test
+	public void testInclusaoLimiteMinimoEstoqueSemMedidas() {
+		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
+		limite.setMaterial(gerarMaterial());
+		limite.setComprimento(null);
+		limite.setMedidaExterna(null);
+		limite.setMedidaInterna(null);
+		try {
+			estoqueService.inserirLimiteMinimo(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
+	@Test
+	public void testInclusaoLimiteMinimoEstoqueSemQuantidade() {
+		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
+		limite.setMaterial(gerarMaterial());
+		limite.setQuantidadeMinina(null);
+
+		boolean throwed = false;
+		try {
+			estoqueService.inserirLimiteMinimo(limite);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A quantidade minina nao pode ser nula e deve ser validada", throwed);
+		
+		limite.setQuantidadeMinina(0);
+		throwed = false;
+		try {
+			estoqueService.inserirLimiteMinimo(limite);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A quantidade minina nao pode ser nula e deve ser validada", throwed);
+		
+		limite.setQuantidadeMinina(-1);
+		throwed = false;
+		try {
+			estoqueService.inserirLimiteMinimo(limite);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A quantidade minina nao pode ser negativa e deve ser validada", throwed);
 	}
 
 	@Test

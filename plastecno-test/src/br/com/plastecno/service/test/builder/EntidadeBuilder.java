@@ -18,6 +18,7 @@ import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.Endereco;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Material;
@@ -30,13 +31,13 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.test.TestUtils;
 
 public class EntidadeBuilder {
+	private static final EntidadeBuilder builder = new EntidadeBuilder();
+
 	public static EntidadeBuilder getInstance() {
 		return builder;
 	}
 
 	private EntidadeRepository repositorio = EntidadeRepository.getInstance();
-
-	private static final EntidadeBuilder builder = new EntidadeBuilder();
 
 	private EntidadeBuilder() {
 	}
@@ -53,14 +54,6 @@ public class EntidadeBuilder {
 		cliente.setEmail("alex@gmail.com.br");
 		cliente.setId(gerarId());
 		cliente.setTipoCliente(TipoCliente.NORMAL);
-		return cliente;
-	}
-
-	public Cliente buildRevendedor() {
-		Cliente cliente = buildCliente();
-		cliente.setNomeFantasia("Revendedor Plastico");
-		cliente.setRazaoSocial("Revendedor Plastico LTDA");
-		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
 		return cliente;
 	}
 
@@ -116,6 +109,16 @@ public class EntidadeBuilder {
 		itemPedido.setDescricaoPeca("ENGRENAGEM DE TESTE");
 		itemPedido.setPrecoVenda(60d);
 		return itemPedido;
+	}
+
+	public LimiteMinimoEstoque buildLimiteMinimoEstoque() {
+		LimiteMinimoEstoque limite = new LimiteMinimoEstoque();
+		limite.setFormaMaterial(FormaMaterial.TB);
+		limite.setComprimento(2000.0);
+		limite.setMedidaExterna(100.0);
+		limite.setMedidaInterna(80.0);
+		limite.setQuantidadeMinina(10);
+		return limite;
 	}
 
 	public List<PerfilAcesso> buildListaPerfilAcesso() {
@@ -200,6 +203,14 @@ public class EntidadeBuilder {
 		Representada representada = buildRepresentada();
 		representada.setTipoRelacionamento(TipoRelacionamento.REVENDA);
 		return representada;
+	}
+
+	public Cliente buildRevendedor() {
+		Cliente cliente = buildCliente();
+		cliente.setNomeFantasia("Revendedor Plastico");
+		cliente.setRazaoSocial("Revendedor Plastico LTDA");
+		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
+		return cliente;
 	}
 
 	public Usuario buildVendedor() {

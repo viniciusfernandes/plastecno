@@ -9,6 +9,7 @@ import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.entity.Item;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.exception.BusinessException;
 
@@ -27,6 +28,8 @@ public interface EstoqueService {
 	Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
+
+	Integer inserirLimiteMinimo(LimiteMinimoEstoque limite) throws BusinessException;
 
 	List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 

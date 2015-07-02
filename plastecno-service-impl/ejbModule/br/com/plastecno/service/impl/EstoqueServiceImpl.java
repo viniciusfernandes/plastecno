@@ -22,11 +22,13 @@ import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemReservadoDAO;
+import br.com.plastecno.service.dao.LimiteMinimoEstoqueDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Item;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.ItemReservado;
+import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
@@ -44,6 +46,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private ItemEstoqueDAO itemEstoqueDAO;
 
 	private ItemReservadoDAO itemReservadoDAO;
+
+	private LimiteMinimoEstoqueDAO limiteMinimoEstoqueDAO;
 
 	private PedidoDAO pedidoDAO;
 
@@ -199,6 +203,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemEstoqueDAO = new ItemEstoqueDAO(entityManager);
 		itemReservadoDAO = new ItemReservadoDAO(entityManager);
 		pedidoDAO = new PedidoDAO(entityManager);
+		limiteMinimoEstoqueDAO = new LimiteMinimoEstoqueDAO(entityManager);
 	}
 
 	@Override
@@ -568,4 +573,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return situacao;
 	}
 
+	@Override
+	public Integer inserirLimiteMinimo(LimiteMinimoEstoque limite) throws BusinessException {
+		if (limite == null) {
+			throw new BusinessException("Limite minimo de estoque nulo");
+		}
+
+		ValidadorInformacao.validar(limite);
+		if (limite.getId() == null) {
+			return limiteMinimoEstoqueDAO.inserir(limite).getId();
+		} else {
+			return limiteMinimoEstoqueDAO.alterar(limite).getId();
+		}
+	}
 }

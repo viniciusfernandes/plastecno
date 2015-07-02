@@ -13,6 +13,7 @@ import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.util.NumeroUtils;
@@ -64,6 +65,11 @@ public class EstoqueController extends AbstractController {
         } else {
             irTopoPagina();
         }
+    }
+    
+    @Post("estoque/limiteminimo/inclusao")
+    public void inserirLimiteMinimo(LimiteMinimoEstoque limite){
+        
     }
 
     @Post("estoque/escassez")

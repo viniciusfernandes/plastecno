@@ -308,6 +308,18 @@ function inicializarAutomcompleteMaterial(url) {
 	});
 };
 
+function inicializarAutocompleteDescricaoPeca(url) {
+	autocompletar({
+		url : url,
+		campoPesquisavel : 'descricao',
+		parametro : 'descricao',
+		containerResultados : 'containerPesquisaDescricaoPeca',
+		selecionarItem : function(itemLista) {
+			$('#idPecaEstoque').val(itemLista.id);
+		}
+	});
+};
+
 function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 	if (!isEmpty(numeroPedido)) {
 		

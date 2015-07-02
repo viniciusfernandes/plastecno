@@ -39,6 +39,8 @@
 	<div class="input" style="width: 80%">
 		<input type="text" id="descricao" name="itemPedido.descricaoPeca"
 			style="width: 50%" />
+		<div class="suggestionsBox" id="containerPesquisaDescricaoPeca"
+			style="display: none; width: 50%"></div>
 	</div>
 	<div class="label">Material:</div>
 	<div class="input" style="width: 80%">

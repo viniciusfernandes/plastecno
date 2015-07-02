@@ -253,20 +253,22 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	public List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return pesquisarEscassezItemEstoque(idMaterial, formaMaterial, 0);
+	public List<ItemEstoque> pesquisarEscassezItemEstoque(LimiteMinimoEstoque limite) {
+		return null;
 	}
 
-	@Override
-	public List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
-			Integer quantidadeMinima) {
-		return itemEstoqueDAO.pesquisarEscassezItemEstoque(idMaterial, formaMaterial, quantidadeMinima);
-	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null);
+	}
+	
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemEstoque> pesquisarPecaByDescricao(String descricao) {
+		return itemEstoqueDAO.pesquisarItemEstoque(null, FormaMaterial.PC, descricao);
 	}
 
 	@Override

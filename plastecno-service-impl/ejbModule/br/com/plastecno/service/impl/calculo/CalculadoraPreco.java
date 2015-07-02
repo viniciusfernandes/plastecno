@@ -14,8 +14,9 @@ public class CalculadoraPreco {
 
 		AlgoritmoCalculo algoritmoCalculoPreco = mapaAlgoritmoPreco.get(itemPedido.getTipoVenda());
 		if (algoritmoCalculoPreco == null) {
-			throw new AlgoritmoCalculoException("Não existe algoritmo para o cálculo do valor do tipo de venda "
-					+ itemPedido.getTipoVenda());
+			String mensagem = itemPedido.getTipoVenda() == null ? "O tipo de venda esta em branco. Selecione um tipo de venda"
+					: "Não existe algoritmo para o cálculo do valor do tipo de venda " + itemPedido.getTipoVenda();
+			throw new AlgoritmoCalculoException(mensagem);
 		}
 		return algoritmoCalculoPreco.calcular(itemPedido);
 	}

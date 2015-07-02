@@ -1,8 +1,12 @@
 package br.com.plastecno.service.constante;
 
 public enum FormaMaterial {
-	BR("BARRA REDONDA", 0.1, false), BQ("BARRA QUADRADA", 0.1, true), BS("BARRA SEXTAVADA", 0.1, false), CH("CHAPA",
-			0.15, true), TB("TUBO", 0, true), PC("PEÇA", 0, false);
+	BR("BARRA REDONDA", 0.1, false), 
+	BQ("BARRA QUADRADA", 0.1, true), 
+	BS("BARRA SEXTAVADA", 0.1, false), 
+	CH("CHAPA", 0.15, true),
+	TB("TUBO", 0, true), 
+	PC("PEÇA", 0, false);
 
 	private String descricao;
 	private double ipi;

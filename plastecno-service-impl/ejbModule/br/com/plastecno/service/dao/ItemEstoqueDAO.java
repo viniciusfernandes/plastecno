@@ -7,6 +7,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.service.impl.anotation.WARNING;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
 
@@ -55,6 +56,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	}
 
 	@SuppressWarnings("unchecked")
+	@WARNING(data = "02/07/2015", descricao = "Aqui temos um like na descricao do material o que pode acarretar lentidao nas pesquisas caso existe um grande numero de pecas no estoque")
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca,
 			boolean zeradosExcluidos) {
 		StringBuilder select = new StringBuilder();
@@ -74,7 +76,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 
 		if (StringUtils.isNotEmpty(descricaoPeca)) {
-			select.append("and i.descricaoPeca = :descricaoPeca ");
+			select.append("and i.descricaoPeca like :descricaoPeca ");
 		}
 
 		if (zeradosExcluidos) {
@@ -100,7 +102,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 
 		if (StringUtils.isNotEmpty(descricaoPeca)) {
-			query.setParameter("descricaoPeca", descricaoPeca);
+			query.setParameter("descricaoPeca", "%" + descricaoPeca + "%");
 		}
 		return query.getResultList();
 	}

@@ -15,6 +15,8 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface EstoqueService {
+	Integer associarLimiteMinimoEstoque(LimiteMinimoEstoque limite) throws BusinessException;
+
 	double calcularPrecoCustoItemEstoque(Item filtro);
 
 	void cancelarReservaEstoqueByIdPedido(Integer idPedido) throws BusinessException;
@@ -31,7 +33,7 @@ public interface EstoqueService {
 
 	Integer inserirLimiteMinimo(LimiteMinimoEstoque limite) throws BusinessException;
 
-	List<ItemEstoque> pesquisarEscassezItemEstoque(LimiteMinimoEstoque limite);
+	List<ItemEstoque> pesquisarEscassezItemEstoque();
 
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 

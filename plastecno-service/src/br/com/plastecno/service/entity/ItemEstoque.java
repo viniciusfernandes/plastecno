@@ -31,8 +31,9 @@ public class ItemEstoque extends Item {
 	private Double aliquotaICMS;
 
 	@Column(name = "aliquota_ipi")
-	@InformacaoValidavel(numerico = true, positivo= true, nomeExibicao = "Alíquota IPI")
+	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota IPI")
 	private Double aliquotaIPI;
+
 	private Double comprimento;
 
 	@Column(name = "descricao_peca")
@@ -43,11 +44,14 @@ public class ItemEstoque extends Item {
 	@Column(name = "id_forma_material")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma do material do item do estoque")
 	private FormaMaterial formaMaterial;
-
 	@Id
 	@SequenceGenerator(name = "itemEstoqueSequence", sequenceName = "vendas.seq_item_estoque_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemEstoqueSequence")
 	private Integer id;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_limite_minimo_estoque", referencedColumnName = "id", nullable = false)
+	private LimiteMinimoEstoque limiteMinimoEstoque;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
@@ -72,6 +76,10 @@ public class ItemEstoque extends Item {
 
 	public ItemEstoque(FormaMaterial formaMaterial) {
 		this.formaMaterial = formaMaterial;
+	}
+
+	public ItemEstoque(Integer idItemEstoque) {
+		this.id = idItemEstoque;
 	}
 
 	public double calcularPrecoTotal() {
@@ -116,6 +124,10 @@ public class ItemEstoque extends Item {
 
 	public Integer getId() {
 		return id;
+	}
+
+	public LimiteMinimoEstoque getLimiteMinimoEstoque() {
+		return limiteMinimoEstoque;
 	}
 
 	public Material getMaterial() {
@@ -178,6 +190,10 @@ public class ItemEstoque extends Item {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public void setLimiteMinimoEstoque(LimiteMinimoEstoque limiteMinimoEstoque) {
+		this.limiteMinimoEstoque = limiteMinimoEstoque;
 	}
 
 	public void setMaterial(Material material) {

@@ -70,13 +70,26 @@ public class EstoqueController extends AbstractController {
     @Post("estoque/limiteminimo/inclusao")
     public void inserirLimiteMinimo(LimiteMinimoEstoque limite) {
         try {
-            estoqueService.inserirLimiteMinimo(limite);
-            gerarMensagemSucesso("Limite mínimo de estoque inserido/alterado com sucesso.");
+            Integer idLImite = estoqueService.associarLimiteMinimoEstoque(limite);
+            formatarLimiteMinimoEstoque(limite);
+            StringBuilder mensagem = new StringBuilder("Limite mínimo de estoque ").append(limite.getDescricao());
+            if (idLImite > 0) {
+                mensagem.append(" inserido/alterado com sucesso.");
+            } else {
+                mensagem.append(" removido com sucesso.");
+            }
+            gerarMensagemSucesso(mensagem.toString());
         } catch (BusinessException e) {
             addAtributo("limite", limite);
             gerarListaMensagemErro(e);
         }
         irTopoPagina();
+    }
+
+    private void formatarLimiteMinimoEstoque(LimiteMinimoEstoque limite) {
+        limite.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(limite.getMedidaExterna()));
+        limite.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(limite.getMedidaInterna()));
+        limite.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(limite.getComprimento()));
     }
 
     @Post("estoque/escassez")
@@ -97,7 +110,7 @@ public class EstoqueController extends AbstractController {
             final Integer idMaterial = material != null ? material.getId() : null;
             List<ItemEstoque> lista = null;
             if (isListagemEscassez) {
-                lista = estoqueService.pesquisarEscassezItemEstoque(null);
+                lista = estoqueService.pesquisarEscassezItemEstoque();
             } else {
                 lista = estoqueService.pesquisarItemEstoqueNaoZerados(idMaterial, formaMaterial);
             }

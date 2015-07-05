@@ -12,13 +12,18 @@ import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
 
 public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
-
 	public ItemEstoqueDAO(EntityManager entityManager) {
 		super(entityManager);
 	}
 
 	public ItemEstoque pesquisarById(Integer idItemEstoque) {
 		return pesquisarById(ItemEstoque.class, idItemEstoque);
+	}
+
+	public List<ItemEstoque> pesquisarEscassezItemEstoque() {
+		return entityManager
+				.createQuery("select i from ItemEstoque i inner join i.limiteMinimoEstoque ", ItemEstoque.class)
+				.getResultList();
 	}
 
 	@SuppressWarnings("unchecked")

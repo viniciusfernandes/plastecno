@@ -34,6 +34,7 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.impl.anotation.TODO;
+import br.com.plastecno.service.impl.anotation.WARNING;
 import br.com.plastecno.service.impl.calculo.CalculadoraVolume;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
@@ -56,6 +57,16 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	// Essa eh a tolerancia de 1mm
 	private final double tolerancia = 0.01d;
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer associarLimiteMinimoEstoque(LimiteMinimoEstoque limite) throws BusinessException {
+		if (limite.getId() != null && !limite.contemQuantidadeMinima()) {
+			limiteMinimoEstoqueDAO.remover(limite);
+			return -1;
+		}
+		return inserirLimiteMinimo(limite);
+	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -240,6 +251,31 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, false));
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@WARNING(data = "06/07/2015", descricao = "Aqui nao esta funcionando a associacao entre o item do estoque e o limite minimo atraves do metodo ADD do limite. Tivemos que construir um update.")
+	public Integer inserirLimiteMinimo(LimiteMinimoEstoque limite) throws BusinessException {
+		if (limite == null) {
+			throw new BusinessException("Limite minimo de estoque nulo");
+		}
+		ValidadorInformacao.validar(limite);
+
+		limite.setId(limiteMinimoEstoqueDAO.pesquisarIdLimiteMinimoEstoque(limite));
+
+		boolean isNovo = limite.getId() == null;
+
+		if (isNovo) {
+			limite = limiteMinimoEstoqueDAO.inserir(limite);
+		} else {
+			limite = limiteMinimoEstoqueDAO.alterar(limite);
+		}
+
+		List<Integer> listaIdItemEstoque = limiteMinimoEstoqueDAO.pesquisarIdItemEstoqueDentroLimiteMinimo(limite,
+				tolerancia);
+		limiteMinimoEstoqueDAO.associarLimiteMinimoItemEstoque(limite.getId(), listaIdItemEstoque);
+		return limite.getId();
+	}
+
 	private boolean isEquivalente(Double val1, Double val2) {
 		if (val1 == null && val2 == null) {
 			return true;
@@ -253,22 +289,14 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	public List<ItemEstoque> pesquisarEscassezItemEstoque(LimiteMinimoEstoque limite) {
-		return null;
+	public List<ItemEstoque> pesquisarEscassezItemEstoque() {
+		return itemEstoqueDAO.pesquisarEscassezItemEstoque();
 	}
-
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null);
-	}
-	
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemEstoque> pesquisarPecaByDescricao(String descricao) {
-		return itemEstoqueDAO.pesquisarItemEstoque(null, FormaMaterial.PC, descricao);
 	}
 
 	@Override
@@ -344,6 +372,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 				.createQuery("select distinct new Material(m.id, m.sigla, m.descricao) from ItemEstoque i inner join i.material m where m.sigla like :sigla order by m.sigla ");
 		query.setParameter("sigla", "%" + sigla + "%");
 		return query.getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemEstoque> pesquisarPecaByDescricao(String descricao) {
+		return itemEstoqueDAO.pesquisarItemEstoque(null, FormaMaterial.PC, descricao);
 	}
 
 	@Override
@@ -573,19 +607,5 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemPedido.addQuantidadeReservada(quantidadeReservada);
 		pedidoService.inserirItemPedido(itemPedido);
 		return situacao;
-	}
-
-	@Override
-	public Integer inserirLimiteMinimo(LimiteMinimoEstoque limite) throws BusinessException {
-		if (limite == null) {
-			throw new BusinessException("Limite minimo de estoque nulo");
-		}
-
-		ValidadorInformacao.validar(limite);
-		if (limite.getId() == null) {
-			return limiteMinimoEstoqueDAO.inserir(limite).getId();
-		} else {
-			return limiteMinimoEstoqueDAO.alterar(limite).getId();
-		}
 	}
 }

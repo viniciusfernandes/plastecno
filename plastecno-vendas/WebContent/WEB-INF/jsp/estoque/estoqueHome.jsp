@@ -128,6 +128,28 @@ function inicializarAutocompleteMaterial() {
 	});
 };
 
+function inicializarAutocompleteDescricaoPeca() {
+	autocompletar({
+		url : '<c:url value="/estoque/descricaopeca"/>',
+		campoPesquisavel : 'bloco_limite_minimo #descricao',
+		parametro : 'descricao',
+		containerResultados : 'bloco_limite_minimo #containerPesquisaDescricaoPeca',
+		selecionarItem : function(itemLista) {
+			$('#bloco_limite_minimo #idLimiteMinimo').val(itemLista.id);
+		}
+	});
+	
+	autocompletar({
+		url : '<c:url value="/estoque/descricaopeca"/>',
+		campoPesquisavel : 'bloco_item_pedido #descricao',
+		parametro : 'descricao',
+		containerResultados : 'bloco_item_pedido #containerPesquisaDescricaoPeca',
+		selecionarItem : function(itemLista) {
+			$('#bloco_item_pedido #idItemPedido').val(itemLista.id);
+		}
+	});
+};
+
 function inicializarFiltro() {
 	$("#filtro_nomeFantasia").val($("#nomeFantasia").val());
 	$("#filtro_cnpj").val($("#cnpj").val());

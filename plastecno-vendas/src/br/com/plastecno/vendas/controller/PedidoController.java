@@ -30,7 +30,6 @@ import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
-import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Material;
@@ -474,18 +473,6 @@ public class PedidoController extends AbstractController {
             for (Material material : listaMaterial) {
                 lista.add(new MaterialAutocomplete(material.getId(), material.getDescricaoFormatada(), material
                         .isImportado()));
-            }
-        }
-        serializarJson(new SerializacaoJson("lista", lista));
-    }
-
-    @Get("pedido/descricaopeca")
-    public void pesquisarPecaByDescricao(String descricao) {
-        List<Autocomplete> lista = new ArrayList<Autocomplete>();
-        if (descricao != null && !descricao.isEmpty()) {
-            List<ItemEstoque> listaPeca = estoqueService.pesquisarPecaByDescricao(descricao);
-            for (ItemEstoque peca : listaPeca) {
-                lista.add(new Autocomplete(peca.getId(), peca.getDescricaoPeca()));
             }
         }
         serializarJson(new SerializacaoJson("lista", lista));

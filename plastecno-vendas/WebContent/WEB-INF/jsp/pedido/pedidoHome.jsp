@@ -34,7 +34,7 @@ $(document).ready(function() {
 	scrollTo('${ancora}');
 
 	inicializarAutomcompleteMaterial('<c:url value="/pedido/material"/>');
-	inicializarAutocompleteDescricaoPeca('<c:url value="/pedido/descricaopeca"/>');
+	// inicializarAutocompleteDescricaoPeca('<c:url value="/estoque/descricaopeca"/>');
 	
 	habilitar('#bloco_item_pedido #descricao', false);
 	habilitar('#bloco_item_pedido #aliquotaIPI', <c:out value="${not empty pedido and pedido.representada.IPIHabilitado}"/>);

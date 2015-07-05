@@ -24,13 +24,13 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 @Resource
 public class EstoqueController extends AbstractController {
     @Servico
+    private AlteracaoEstoquePublisher alteracaoEstoquePublisher;
+
+    @Servico
     private EstoqueService estoqueService;
 
     @Servico
     private MaterialService materialService;
-
-    @Servico
-    private AlteracaoEstoquePublisher alteracaoEstoquePublisher;
 
     public EstoqueController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -141,6 +141,18 @@ public class EstoqueController extends AbstractController {
             List<Material> listaMaterial = materialService.pesquisarBySigla(sigla);
             for (Material material : listaMaterial) {
                 lista.add(new Autocomplete(material.getId(), material.getDescricaoFormatada()));
+            }
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
+    }
+
+    @Get("estoque/descricaopeca")
+    public void pesquisarPecaByDescricao(String descricao) {
+        List<Autocomplete> lista = new ArrayList<Autocomplete>();
+        if (descricao != null && !descricao.isEmpty()) {
+            List<ItemEstoque> listaPeca = estoqueService.pesquisarPecaByDescricao(descricao);
+            for (ItemEstoque peca : listaPeca) {
+                lista.add(new Autocomplete(peca.getId(), peca.getDescricaoPeca()));
             }
         }
         serializarJson(new SerializacaoJson("lista", lista));

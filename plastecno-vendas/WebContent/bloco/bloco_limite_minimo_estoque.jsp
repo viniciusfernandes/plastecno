@@ -34,7 +34,7 @@ function habilitarCamposEdicaoItem(habilitado){
 		<!-- INCLUI ESSE CAMPO OCULTO COM A FORMA DE MATERIAL POIS A EDICAO DESABILITA O CAMPO E NO SUBMIT TEMOS QUE MANTER A INFORMACAO -->
 		<input type="hidden" id="idFormaMaterial" name="limite.formaMaterial" value="${limite.formaMaterial}"/>
 	</c:if>
-	<input type="hidden" id="idItemPedido" name="limite.id" value="${limite.id}"/>
+	<input type="hidden" id="idLimiteMinimo" name="limite.id" value="${limite.id}"/>
 	
 	<div class="label">Qtde Mínima:</div>
 	<div class="input" style="width: 7%">

@@ -272,6 +272,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		List<Integer> listaIdItemEstoque = limiteMinimoEstoqueDAO.pesquisarIdItemEstoqueDentroLimiteMinimo(limite,
 				tolerancia);
+		
 		limiteMinimoEstoqueDAO.associarLimiteMinimoItemEstoque(limite.getId(), listaIdItemEstoque);
 		return limite.getId();
 	}

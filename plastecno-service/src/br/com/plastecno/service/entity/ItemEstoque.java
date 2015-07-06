@@ -164,6 +164,11 @@ public class ItemEstoque extends Item {
 		return quantidade;
 	}
 
+	// Metodo criado para facilitar teste unitario
+	public boolean isItemEscasso() {
+		return limiteMinimoEstoque != null && quantidade != null && quantidade < limiteMinimoEstoque.getQuantidadeMinima();
+	}
+
 	public boolean isNovo() {
 		return this.id == null;
 	}

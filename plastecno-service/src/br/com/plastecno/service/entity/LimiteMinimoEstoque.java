@@ -96,19 +96,19 @@ public class LimiteMinimoEstoque {
 		}
 
 		if (getMedidaExterna() != null) {
-			descricao.append(getMedidaExternaFomatada());
+			descricao.append(medidaExterna);
 			descricao.append(" X ");
 		}
 
 		if (getMedidaInterna() != null) {
-			descricao.append(getMedidaInternaFomatada());
+			descricao.append(medidaInterna);
 			descricao.append(" X ");
 		}
 
 		if (getComprimento() != null) {
-			descricao.append(getComprimentoFormatado());
+			descricao.append(comprimento);
 		}
-		
+
 		descricao.append(" mm");
 		return descricao.toString();
 	}

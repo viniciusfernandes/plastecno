@@ -24,6 +24,13 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 				.executeUpdate();
 	}
 
+	public void desassociarLimiteMinimoItemEstoque(Integer idLimiteMinimo) {
+		entityManager
+				.createQuery(
+						"update ItemEstoque i set i.limiteMinimoEstoque.id = null where limiteMinimoEstoque.id = :idLimiteMinimo")
+				.setParameter("idLimiteMinimo", idLimiteMinimo).executeUpdate();
+	}
+
 	public List<Integer> pesquisarIdItemEstoqueDentroLimiteMinimo(LimiteMinimoEstoque limite, double tolerancia) {
 		StringBuilder select = new StringBuilder("select i.id from ItemEstoque i ");
 		Double medidaExterna = limite.getMedidaExterna();
@@ -70,20 +77,44 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 
 	public Integer pesquisarIdLimiteMinimoEstoque(LimiteMinimoEstoque filtro) {
 		StringBuilder select = new StringBuilder("select l.id from LimiteMinimoEstoque l where ");
-		select.append("l.formaMaterial = :formaMaterial and l.material = :material and ");
-		select
-				.append("l.medidaExterna = :medidaExterna and l.medidaInterna = :medidaInterna and l.comprimento = :comprimento ");
+		select.append("l.formaMaterial = :formaMaterial and l.material = :material ");
+
+		if (filtro.getMedidaExterna() != null) {
+			select.append("and l.medidaExterna = :medidaExterna ");
+		} else {
+			select.append("and l.medidaExterna is null ");
+		}
+
+		if (filtro.getMedidaInterna() != null) {
+			select.append("and l.medidaInterna = :medidaInterna ");
+		} else {
+			select.append("and l.medidaInterna is null ");
+		}
+
+		if (filtro.getComprimento() != null) {
+			select.append("and l.comprimento = :comprimento ");
+		} else {
+			select.append("and l.comprimento is null ");
+		}
+
 		TypedQuery<Integer> query = entityManager.createQuery(select.toString(), Integer.class);
 		query.setParameter("formaMaterial", filtro.getFormaMaterial()).setParameter("material", filtro.getMaterial());
-		query.setParameter("medidaExterna", filtro.getMedidaExterna())
-				.setParameter("medidaInterna", filtro.getMedidaInterna()).setParameter("comprimento", filtro.getComprimento());
+
+		if (filtro.getMedidaExterna() != null) {
+			query.setParameter("medidaExterna", filtro.getMedidaExterna());
+		}
+		if (filtro.getMedidaInterna() != null) {
+			query.setParameter("medidaInterna", filtro.getMedidaInterna());
+		}
+		if (filtro.getComprimento() != null) {
+			query.setParameter("comprimento", filtro.getComprimento());
+		}
 
 		List<Integer> listaId = query.getResultList();
-		if (listaId.size() > 1) {
+		if (listaId.size() >= 2) {
 			logger.log(Level.WARNING, "Existem mais de 1 limite de estoque cadastrado. Total encontrado de " + listaId.size()
 					+ " para o Limite minimo \"" + filtro.getDescricao() + "\"");
-			return listaId.get(0);
 		}
-		return null;
+		return listaId.size() >= 1 ? listaId.get(0) : null;
 	}
 }

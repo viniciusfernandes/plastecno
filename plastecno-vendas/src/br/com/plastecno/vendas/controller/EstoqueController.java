@@ -71,8 +71,8 @@ public class EstoqueController extends AbstractController {
     public void inserirLimiteMinimo(LimiteMinimoEstoque limite) {
         try {
             Integer idLImite = estoqueService.associarLimiteMinimoEstoque(limite);
-            formatarLimiteMinimoEstoque(limite);
-            StringBuilder mensagem = new StringBuilder("Limite mínimo de estoque ").append(limite.getDescricao());
+            StringBuilder mensagem = new StringBuilder("Limite mínimo de estoque de quantidade \"")
+                    .append(limite.getQuantidadeMinima()).append("\" ").append(limite.getDescricao());
             if (idLImite > 0) {
                 mensagem.append(" inserido/alterado com sucesso.");
             } else {
@@ -84,12 +84,6 @@ public class EstoqueController extends AbstractController {
             gerarListaMensagemErro(e);
         }
         irTopoPagina();
-    }
-
-    private void formatarLimiteMinimoEstoque(LimiteMinimoEstoque limite) {
-        limite.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(limite.getMedidaExterna()));
-        limite.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(limite.getMedidaInterna()));
-        limite.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(limite.getComprimento()));
     }
 
     @Post("estoque/escassez")

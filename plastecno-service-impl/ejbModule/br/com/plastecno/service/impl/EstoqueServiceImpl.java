@@ -61,8 +61,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer associarLimiteMinimoEstoque(LimiteMinimoEstoque limite) throws BusinessException {
+		limite.setId(limiteMinimoEstoqueDAO.pesquisarIdLimiteMinimoEstoque(limite));
+
 		if (limite.getId() != null && !limite.contemQuantidadeMinima()) {
 			limiteMinimoEstoqueDAO.remover(limite);
+			limiteMinimoEstoqueDAO.desassociarLimiteMinimoItemEstoque(limite.getId());
 			return -1;
 		}
 		return inserirLimiteMinimo(limite);
@@ -251,16 +254,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, false));
 	}
 
-	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@WARNING(data = "06/07/2015", descricao = "Aqui nao esta funcionando a associacao entre o item do estoque e o limite minimo atraves do metodo ADD do limite. Tivemos que construir um update.")
-	public Integer inserirLimiteMinimo(LimiteMinimoEstoque limite) throws BusinessException {
+	private Integer inserirLimiteMinimo(LimiteMinimoEstoque limite) throws BusinessException {
 		if (limite == null) {
 			throw new BusinessException("Limite minimo de estoque nulo");
 		}
 		ValidadorInformacao.validar(limite);
-
-		limite.setId(limiteMinimoEstoqueDAO.pesquisarIdLimiteMinimoEstoque(limite));
 
 		boolean isNovo = limite.getId() == null;
 

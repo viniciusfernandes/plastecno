@@ -22,7 +22,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 	public List<ItemEstoque> pesquisarEscassezItemEstoque() {
 		return entityManager
-				.createQuery("select i from ItemEstoque i inner join i.limiteMinimoEstoque ", ItemEstoque.class)
+				.createQuery("select i from ItemEstoque i inner join i.limiteMinimoEstoque l where i.quantidade <= l.quantidadeMinima", ItemEstoque.class)
 				.getResultList();
 	}
 

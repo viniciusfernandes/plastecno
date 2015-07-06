@@ -4,8 +4,8 @@
 $(document).ready(function() {
 
 	inserirMascaraMonetaria('bloco_item_pedido #preco', 7);
-	inserirMascaraNumerica('bloco_item_pedido #ipi', '99');
-	inserirMascaraNumerica('bloco_item_pedido #quantidade', '9999999');
+	inserirMascaraNumerica('bloco_item_pedido #aliquotaIPI', '99');
+	inserirMascaraNumerica('bloco_item_pedido #aliquotaICMS', '9999999');
 	inserirMascaraMonetaria('bloco_item_pedido #comprimento', 8);
 	inserirMascaraMonetaria('bloco_item_pedido #medidaExterna', 8);
 	inserirMascaraMonetaria('bloco_item_pedido #medidaInterna', 8);

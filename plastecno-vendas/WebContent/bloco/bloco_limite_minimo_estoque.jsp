@@ -3,10 +3,10 @@
 
 $(document).ready(function() {
 
-	inserirMascaraNumerica('quantidade', '9999999');
-	inserirMascaraMonetaria('comprimento', 8);
-	inserirMascaraMonetaria('medidaExterna', 8);
-	inserirMascaraMonetaria('medidaInterna', 8);
+	inserirMascaraNumerica('bloco_limite_minimo #quantidade', '9999999');
+	inserirMascaraMonetaria('bloco_limite_minimo #comprimento', 8);
+	inserirMascaraMonetaria('bloco_limite_minimo #medidaExterna', 8);
+	inserirMascaraMonetaria('bloco_limite_minimo #medidaInterna', 8);
 	
 	$('#botaoLimparLimite').click(function () {
 		$('#bloco_limite_minimo input').val('');

@@ -3,12 +3,12 @@
 
 $(document).ready(function() {
 
-	inserirMascaraMonetaria('preco', 7);
-	inserirMascaraNumerica('ipi', '99');
-	inserirMascaraNumerica('quantidade', '9999999');
-	inserirMascaraMonetaria('comprimento', 8);
-	inserirMascaraMonetaria('medidaExterna', 8);
-	inserirMascaraMonetaria('medidaInterna', 8);
+	inserirMascaraMonetaria('bloco_item_pedido #preco', 7);
+	inserirMascaraNumerica('bloco_item_pedido #ipi', '99');
+	inserirMascaraNumerica('bloco_item_pedido #quantidade', '9999999');
+	inserirMascaraMonetaria('bloco_item_pedido #comprimento', 8);
+	inserirMascaraMonetaria('bloco_item_pedido #medidaExterna', 8);
+	inserirMascaraMonetaria('bloco_item_pedido #medidaInterna', 8);
 	
 	$('#botaoLimparItemPedido').click(function () {
 		$('#bloco_item_pedido input').val('');

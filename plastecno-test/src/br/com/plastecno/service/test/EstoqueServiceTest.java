@@ -339,21 +339,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
 		limite.setMaterial(gerarMaterial());
 		try {
-			estoqueService.inserirLimiteMinimo(limite);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-	}
-
-	@Test
-	public void testInclusaoLimiteMinimoEstoqueSemMedidas() {
-		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
-		limite.setMaterial(gerarMaterial());
-		limite.setComprimento(null);
-		limite.setMedidaExterna(null);
-		limite.setMedidaInterna(null);
-		try {
-			estoqueService.inserirLimiteMinimo(limite);
+			estoqueService.associarLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -366,7 +352,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			estoqueService.inserirLimiteMinimo(limite);
+			estoqueService.associarLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -376,11 +362,25 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setFormaMaterial(null);
 		throwed = false;
 		try {
-			estoqueService.inserirLimiteMinimo(limite);
+			estoqueService.associarLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
 		assertTrue("A forma de material nao pode ser nula e deve ser validada", throwed);
+	}
+
+	@Test
+	public void testInclusaoLimiteMinimoEstoqueSemMedidas() {
+		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
+		limite.setMaterial(gerarMaterial());
+		limite.setComprimento(null);
+		limite.setMedidaExterna(null);
+		limite.setMedidaInterna(null);
+		try {
+			estoqueService.associarLimiteMinimoEstoque(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test
@@ -391,7 +391,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			estoqueService.inserirLimiteMinimo(limite);
+			estoqueService.associarLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -400,7 +400,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setQuantidadeMinima(0);
 		throwed = false;
 		try {
-			estoqueService.inserirLimiteMinimo(limite);
+			estoqueService.associarLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -409,7 +409,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setQuantidadeMinima(-1);
 		throwed = false;
 		try {
-			estoqueService.inserirLimiteMinimo(limite);
+			estoqueService.associarLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}

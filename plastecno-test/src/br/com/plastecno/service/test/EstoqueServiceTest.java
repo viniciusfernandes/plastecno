@@ -118,6 +118,12 @@ public class EstoqueServiceTest extends AbstractTest {
 		return gerarItemPedidoClone(null, item1);
 	}
 
+	private LimiteMinimoEstoque gerarLimiteMinimoEstoque() {
+		LimiteMinimoEstoque l = eBuilder.buildLimiteMinimoEstoque();
+		l.setMaterial(gerarMaterial());
+		return l;
+	}
+
 	private List<ItemPedido> gerarListaItemPedido(TipoPedido tipoPedido) {
 		List<ItemPedido> listaItem = new ArrayList<ItemPedido>();
 		Pedido pedido = gerarPedido(tipoPedido);
@@ -275,6 +281,78 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 		quantidadeAntes += item2.getQuantidade();
 		verificarQuantidadeTotalItemEstoque(quantidadeAntes, idItemEstoque);
+	}
+
+	@Test
+	public void testAssociacaoLimiteMinimoEstoque() {
+		LimiteMinimoEstoque l1 = gerarLimiteMinimoEstoque();
+
+		// Apenas o primeiro elemento sera associado ao limite
+		ItemEstoque i1 = gerarItemEstoque();
+		i1.setQuantidade(l1.getQuantidadeMinima() - 1);
+		i1.setMedidaExterna(l1.getMedidaExterna());
+		i1.setMedidaInterna(l1.getMedidaInterna());
+		i1.setComprimento(l1.getComprimento());
+
+		ItemEstoque i2 = gerarItemEstoque();
+		i2.setQuantidade(l1.getQuantidadeMinima() - 2);
+		i2.setMedidaExterna(l1.getMedidaExterna() + 10);
+		i2.setMedidaInterna(l1.getMedidaInterna());
+		i2.setComprimento(l1.getComprimento());
+
+		ItemEstoque i3 = gerarItemEstoque();
+		i3.setQuantidade(l1.getQuantidadeMinima() - 2);
+		i3.setMedidaExterna(l1.getMedidaExterna() + 20);
+		i3.setMedidaInterna(l1.getMedidaInterna());
+		i3.setComprimento(l1.getComprimento());
+
+		try {
+			estoqueService.inserirItemEstoque(i1);
+			estoqueService.inserirItemEstoque(i2);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			// Aqui vamos associar os 2 itens criados anteriomente.
+			estoqueService.associarLimiteMinimoEstoque(l1);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<ItemEstoque> listaItemEscasso = estoqueService.pesquisarEscassezItemEstoque();
+		assertEquals(
+				"Foram incluidos 3 itens no estoque com quantidades abaixo do limite mas apenas o primeiro foi associado ao limite",
+				1, listaItemEscasso.size());
+
+		LimiteMinimoEstoque l2 = gerarLimiteMinimoEstoque();
+		// Criando uma nova medida
+		l2.setComprimento(l2.getComprimento() + 100);
+
+		ItemEstoque i4 = gerarItemEstoque();
+		i4.setQuantidade(l2.getQuantidadeMinima() - 1);
+		i4.setMedidaExterna(l2.getMedidaExterna());
+		i4.setMedidaInterna(l2.getMedidaInterna());
+		i4.setComprimento(l2.getComprimento());
+
+		try {
+			// Inserindo um item adicional para testar a escassez
+			estoqueService.inserirItemEstoque(i4);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			// Aqui vamos associar um segundo limite minimo
+			estoqueService.associarLimiteMinimoEstoque(l2);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		listaItemEscasso = estoqueService.pesquisarEscassezItemEstoque();
+		assertEquals(
+				"Foi incluido mais um item no estoque com quantidades abaixo do limite agora devemos ter apenas 2 item escassos",
+				2, listaItemEscasso.size());
 	}
 
 	@Test

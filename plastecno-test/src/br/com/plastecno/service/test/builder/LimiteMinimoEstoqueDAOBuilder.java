@@ -17,14 +17,17 @@ public class LimiteMinimoEstoqueDAOBuilder extends DAOBuilder<LimiteMinimoEstoqu
 
 			@Mock
 			public void associarLimiteMinimoItemEstoque(Integer idLimiteMinimo, List<Integer> listaIdItemEstoque) {
-				List<ItemEstoque> listaItem = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				LimiteMinimoEstoque limite = REPOSITORY.pesquisarEntidadeById(LimiteMinimoEstoque.class, idLimiteMinimo);
 				if (limite == null) {
 					return;
 				}
 
-				for (ItemEstoque i : listaItem) {
-					i.setLimiteMinimoEstoque(limite);
+				ItemEstoque i = null;
+				for (Integer idItemEstoque : listaIdItemEstoque) {
+					i = REPOSITORY.pesquisarEntidadeById(ItemEstoque.class, idItemEstoque);
+					if (i != null) {
+						i.setLimiteMinimoEstoque(limite);
+					}
 				}
 			}
 
@@ -32,35 +35,38 @@ public class LimiteMinimoEstoqueDAOBuilder extends DAOBuilder<LimiteMinimoEstoqu
 			public List<Integer> pesquisarIdItemEstoqueDentroLimiteMinimo(LimiteMinimoEstoque limite, double tolerancia) {
 				List<ItemEstoque> listaItem = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				List<Integer> listaId = new ArrayList<Integer>();
+				Double medidaExterna = limite.getMedidaExterna();
+				Double medidaInterna = limite.getMedidaInterna();
+				Double comprimento = limite.getComprimento();
+				final boolean contemMedida = medidaExterna != null || medidaInterna != null || comprimento != null;
 				for (ItemEstoque i : listaItem) {
-					Double medidaExterna = limite.getMedidaExterna();
-					Double medidaInterna = limite.getMedidaInterna();
-					Double comprimento = limite.getComprimento();
-					final boolean contemMedida = medidaExterna != null || medidaInterna != null || comprimento != null;
 
-					if (contemMedida) {
-						if (medidaExterna != null) {
-							medidaExterna -= i.getMedidaExterna() == null ? 0 : i.getMedidaExterna();
-							if (Math.abs(medidaExterna) > tolerancia) {
-								continue;
-							}
-						}
-
-						if (medidaInterna != null) {
-							medidaInterna -= i.getMedidaInterna() == null ? 0 : i.getMedidaInterna();
-							if (Math.abs(medidaInterna) > tolerancia) {
-								continue;
-							}
-						}
-
-						if (comprimento != null) {
-							comprimento -= i.getComprimento() == null ? 0 : i.getComprimento();
-							if (Math.abs(comprimento) > tolerancia) {
-								continue;
-							}
-						}
+					if (!contemMedida) {
 						listaId.add(i.getId());
+						continue;
 					}
+
+					if (medidaExterna != null) {
+						medidaExterna -= i.getMedidaExterna() == null ? 0 : i.getMedidaExterna();
+						if (Math.abs(medidaExterna) > tolerancia) {
+							continue;
+						}
+					}
+
+					if (medidaInterna != null) {
+						medidaInterna -= i.getMedidaInterna() == null ? 0 : i.getMedidaInterna();
+						if (Math.abs(medidaInterna) > tolerancia) {
+							continue;
+						}
+					}
+
+					if (comprimento != null) {
+						comprimento -= i.getComprimento() == null ? 0 : i.getComprimento();
+						if (Math.abs(comprimento) > tolerancia) {
+							continue;
+						}
+					}
+					listaId.add(i.getId());
 				}
 				return listaId;
 			}

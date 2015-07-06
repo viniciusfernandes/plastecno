@@ -14,6 +14,17 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 	@Override
 	public ItemEstoqueDAO build() {
 		new MockUp<ItemEstoqueDAO>() {
+			@Mock
+			public List<ItemEstoque> pesquisarEscassezItemEstoque() {
+				List<ItemEstoque> lista = REPOSITORY.pesquisarTodos(ItemEstoque.class);
+				List<ItemEstoque> listaItem = new ArrayList<ItemEstoque>();
+				for (ItemEstoque i : lista) {
+					if (i.isItemEscasso()) {
+						listaItem.add(i);
+					}
+				}
+				return listaItem;
+			}
 
 			@Mock
 			public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,

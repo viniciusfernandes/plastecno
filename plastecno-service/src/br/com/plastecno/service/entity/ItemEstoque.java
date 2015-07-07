@@ -83,7 +83,9 @@ public class ItemEstoque extends Item {
 	}
 
 	public double calcularPrecoTotal() {
-		return this.quantidade != null && this.precoMedio != null ? this.quantidade * this.precoMedio : 0d;
+		return this.quantidade != null && this.precoMedio != null ? this.quantidade
+				* this.precoMedio
+				: 0d;
 	}
 
 	@Override
@@ -94,7 +96,8 @@ public class ItemEstoque extends Item {
 			clone.setId(null);
 			return clone;
 		} catch (CloneNotSupportedException e) {
-			throw new IllegalStateException("Falha ao clonar o item de estoque " + getId(), e);
+			throw new IllegalStateException(
+					"Falha ao clonar o item de estoque " + getId(), e);
 		}
 	}
 
@@ -166,7 +169,8 @@ public class ItemEstoque extends Item {
 
 	// Metodo criado para facilitar teste unitario
 	public boolean isItemEscasso() {
-		return limiteMinimoEstoque != null && quantidade != null && quantidade < limiteMinimoEstoque.getQuantidadeMinima();
+		return limiteMinimoEstoque != null && quantidade != null
+				&& quantidade < limiteMinimoEstoque.getQuantidadeMinima();
 	}
 
 	public boolean isNovo() {

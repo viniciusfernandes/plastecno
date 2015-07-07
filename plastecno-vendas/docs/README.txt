@@ -1,3 +1,11 @@
+========== PAINEL DE GERENCIAMENTO NO SERVIDOR JAVA ==========================
+
+1) Para configurar serviços e datasource do servidor JBoss7 devemos acessar o painel de gerenciamento
+na URL http://plastecno.com:9990, com o usuario=fernando e senha=@jboss715
+
+2) Para criar um usuario novo deve-se ir ate o diretorio de instalacao do jboss <JBOSS_HOME>\bin 
+e executar o script add-user.bat. Para isso deve-se conectar via ftp. 
+
 ========== DEPLOY DA APLICACAO NO SERVIDOR JAVA ==========================
 
 1) Acessar o painel do jboss: http://174.142.42.90:8666/zp/appservermgr/

@@ -335,6 +335,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@WARNING(data="07/07/2015", descricao="Podemos levar o filtro das medidas para o banco de dados e evitar carregar tantos dados desnecessarios em memoria")
 	public ItemEstoque pesquisarItemEstoque(Item filtro) {
 		Integer idMaterial = filtro.getMaterial().getId();
 		FormaMaterial formaMaterial = filtro.getFormaMaterial();

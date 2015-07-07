@@ -194,7 +194,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 					+ SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.getDescricao() + "\"");
 		}
 
-		// Aqui temos essa condicao pois o usuario pode incluir um item diretamento
+		// Aqui temos essa condicao pois o usuario pode incluir um item
+		// diretamento
 		// no estoque, sendo que ele nao passa pelo setor de compras.
 		itemPedido.setRecebido(isRecepcaoItemCompra ? itemPedido.isTodasUnidadesRecepcionadas() : true);
 
@@ -235,7 +236,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		CalculadoraVolume.validarVolume(itemEstoque);
 
-		// Verificando se existe item equivalente no estoque, caso nao exista vamos
+		// Verificando se existe item equivalente no estoque, caso nao exista
+		// vamos
 		// criar um novo.
 		ItemEstoque itemCadastrado = pesquisarItemEstoque(itemEstoque);
 
@@ -272,21 +274,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		List<Integer> listaIdItemEstoque = limiteMinimoEstoqueDAO.pesquisarIdItemEstoqueDentroLimiteMinimo(limite,
 				tolerancia);
-		
+
 		limiteMinimoEstoqueDAO.associarLimiteMinimoItemEstoque(limite.getId(), listaIdItemEstoque);
 		return limite.getId();
-	}
-
-	private boolean isEquivalente(Double val1, Double val2) {
-		if (val1 == null && val2 == null) {
-			return true;
-		}
-
-		if ((val1 != null && val2 == null) || (val1 == null && val2 != null)) {
-			return false;
-		}
-
-		return Math.abs(val1 - val2) < tolerancia;
 	}
 
 	@Override
@@ -301,55 +291,18 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	public ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
-			Double medidaInterna, Double comprimento) {
-		List<ItemEstoque> listItem = pesquisarItemEstoque(idMaterial, formaMaterial);
-		for (ItemEstoque item : listItem) {
-			if (!isEquivalente(medidaExterna, item.getMedidaExterna())) {
-				continue;
-			}
-			if (!isEquivalente(medidaInterna, item.getMedidaInterna())) {
-				continue;
-			}
-			if (!isEquivalente(comprimento, item.getComprimento())) {
-				continue;
-			}
-			return item;
-		}
-		return null;
-	}
-
-	@Override
-	public ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca) {
-		List<ItemEstoque> listItem = itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, descricaoPeca);
-		if (listItem.isEmpty()) {
-			return null;
-		}
-		if (listItem.size() > 1) {
-			throw new IllegalStateException("Foi encontrado mais de um registro para o codigo de material \"" + idMaterial
-					+ "\", foma de material \"" + formaMaterial.getDescricao() + "\" e descrição de peça \"" + descricaoPeca
-					+ "\"");
-		}
-		return listItem.get(0);
-	}
-
-	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@WARNING(data="07/07/2015", descricao="Podemos levar o filtro das medidas para o banco de dados e evitar carregar tantos dados desnecessarios em memoria")
+	@WARNING(data = "07/07/2015", descricao = "Podemos levar o filtro das medidas para o banco de dados e evitar carregar tantos dados desnecessarios em memoria")
 	public ItemEstoque pesquisarItemEstoque(Item filtro) {
-		Integer idMaterial = filtro.getMaterial().getId();
-		FormaMaterial formaMaterial = filtro.getFormaMaterial();
-		Double medidaExt = filtro.getMedidaExterna();
-		Double medidaInt = filtro.getMedidaInterna();
-		Double comp = filtro.getComprimento();
-
-		// Verificando se existe item equivalente no estoque, caso nao exista vamos
+		// Verificando se existe item equivalente no estoque, caso nao exista
+		// vamos
 		// criar um novo.
 		ItemEstoque itemCadastrado = null;
 		if (filtro.isPeca()) {
-			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, filtro.getDescricaoPeca());
+			itemCadastrado = itemEstoqueDAO.pesquisarPecaByDescricao(filtro.getMaterial().getId(), filtro.getDescricaoPeca());
 		} else {
-			itemCadastrado = pesquisarItemEstoque(idMaterial, formaMaterial, medidaExt, medidaInt, comp);
+			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(tolerancia, filtro.getMaterial().getId(),
+					filtro.getFormaMaterial(), filtro.getMedidaExterna(), filtro.getMedidaInterna(), filtro.getComprimento());
 		}
 		return itemCadastrado;
 	}

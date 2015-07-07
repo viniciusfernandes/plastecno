@@ -96,7 +96,6 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			select.append("and i.comprimento is null ");
 		}
 
-		select.append("and i.quantidade > 0 ");
 		// A ordenacao desses tipos deve ser diferentes mesmo
 		if (FormaMaterial.CH.equals(formaMaterial) || FormaMaterial.TB.equals(formaMaterial)) {
 			select
@@ -128,7 +127,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	}
 
 	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca) {
-		if (StringUtils.isEmpty(descricaoPeca)) {
+		if (StringUtils.isEmpty(descricaoPeca) || idMaterial == null) {
 			return null;
 		}
 		TypedQuery<ItemEstoque> query = entityManager

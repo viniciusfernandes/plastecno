@@ -8,6 +8,7 @@ import mockit.MockUp;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.util.StringUtils;
 
 public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 
@@ -24,6 +25,60 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 					}
 				}
 				return escassos;
+			}
+
+			@Mock
+			public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca) {
+				if (StringUtils.isEmpty(descricaoPeca) || idMaterial == null) {
+					return null;
+				}
+				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
+				for (ItemEstoque i : l) {
+					if (!idMaterial.equals(i.getMaterial().getId())) {
+						continue;
+					}
+
+					if (!descricaoPeca.equals(i.getDescricaoPeca())) {
+						continue;
+					}
+					return i;
+				}
+				return null;
+			}
+
+			@Mock
+			public ItemEstoque pesquisarItemEstoqueByMedida(double tolerancia, Integer idMaterial,
+					FormaMaterial formaMaterial, Double medidaExterna, Double medidaInterna, Double comprimento) {
+
+				boolean conteMedida = medidaExterna != null || medidaInterna != null || comprimento != null;
+				boolean conteMaterial = idMaterial != null || formaMaterial != null;
+
+				// Pois sao parametros que todo item deve conter
+				if (!conteMaterial || !conteMedida) {
+					return null;
+				}
+
+				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
+				for (ItemEstoque i : l) {
+					if (!idMaterial.equals(i.getMaterial().getId()) || !formaMaterial.equals(i.getFormaMaterial())) {
+						continue;
+					}
+
+					if (medidaExterna != null && !medidaExterna.equals(i.getMedidaExterna())) {
+						continue;
+					}
+
+					if (medidaInterna != null && !medidaInterna.equals(i.getMedidaInterna())) {
+						continue;
+					}
+
+					if (comprimento != null && !comprimento.equals(i.getComprimento())) {
+						continue;
+					}
+
+					return i;
+				}
+				return null;
 			}
 
 			@Mock

@@ -35,12 +35,6 @@ public interface EstoqueService {
 
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
-	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, Double medidaExterna,
-			Double medidaInterna, Double comprimento);
-
-	ItemEstoque pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca)
-			throws BusinessException;
-
 	ItemEstoque pesquisarItemEstoque(Item filtro);
 
 	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);

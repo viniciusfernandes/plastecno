@@ -3,7 +3,6 @@ package br.com.plastecno.service.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
@@ -119,11 +118,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			query.setParameter("comprimento", comprimento);
 		}
 
-		try {
-			return query.getSingleResult();
-		} catch (Exception e) {
-			return null;
-		}
+		List<ItemEstoque> l = query.getResultList();
+		return l.size() >= 1 ? l.get(0) : null;
 	}
 
 	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca) {
@@ -134,12 +130,9 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 				.createQuery(
 						"select i from ItemEstoque i where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial and i.descricaoPeca = :descricaoPeca",
 						ItemEstoque.class);
-		try {
-			return query.setParameter("formaMaterial", FormaMaterial.PC).setParameter("idMaterial", idMaterial)
-					.setParameter("descricaoPeca", descricaoPeca).getSingleResult();
-		} catch (NoResultException e) {
-			return null;
-		}
+		List<ItemEstoque> l = query.setParameter("formaMaterial", FormaMaterial.PC).setParameter("idMaterial", idMaterial)
+				.setParameter("descricaoPeca", descricaoPeca).getResultList();
+		return l.size() >= 1 ? l.get(0) : null;
 	}
 
 	@SuppressWarnings("unchecked")

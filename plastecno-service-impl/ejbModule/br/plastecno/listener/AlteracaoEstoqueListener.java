@@ -6,7 +6,7 @@ import javax.ejb.MessageDriven;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-import br.com.plastecno.service.PedidoAguardandoMaterialMonitor;
+import br.com.plastecno.service.ItemAguardandoEmpacotamentoMonitor;
 
 @MessageDriven(name = "AlteracaoEstoqueListener", activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
@@ -15,11 +15,11 @@ import br.com.plastecno.service.PedidoAguardandoMaterialMonitor;
 public class AlteracaoEstoqueListener implements MessageListener {
 
 	@EJB
-	private PedidoAguardandoMaterialMonitor pedidoAguardandoMaterialMonitor;
+	private ItemAguardandoEmpacotamentoMonitor pedidoAguardandoMaterialMonitor;
 
 	@Override
 	public void onMessage(Message mensagem) {
-		pedidoAguardandoMaterialMonitor.reservarItemPedidoAguardandoMaterial();
+		pedidoAguardandoMaterialMonitor.monitorarItemPedidoAguardandoMaterial();
 	}
 
 }

@@ -7,7 +7,6 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.plastecno.message.AlteracaoEstoquePublisher;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.constante.FormaMaterial;
@@ -23,8 +22,6 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class EstoqueController extends AbstractController {
-    @Servico
-    private AlteracaoEstoquePublisher alteracaoEstoquePublisher;
 
     @Servico
     private EstoqueService estoqueService;
@@ -56,8 +53,6 @@ public class EstoqueController extends AbstractController {
             gerarListaMensagemErro(e);
             addAtributo("itemPedido", itemPedido);
         }
-
-        alteracaoEstoquePublisher.publicar();
 
         addAtributo("permanecerTopo", true);
         if (material != null && formaMaterial != null) {
@@ -194,8 +189,6 @@ public class EstoqueController extends AbstractController {
             gerarListaMensagemErro(e);
 
         }
-
-        alteracaoEstoquePublisher.publicar();
 
         addAtributo("permanecerTopo", true);
 

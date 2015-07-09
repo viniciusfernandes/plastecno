@@ -20,19 +20,19 @@ import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 @Local
 public interface PedidoService {
 
+	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
+
+	void alterarItemAguardandoMaterialByIdPedido(Integer idPedido);
+
 	void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada) throws BusinessException;
 
 	void alterarQuantidadeReservadaByIdItemPedido(Integer idItemPedido);
 
-	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
+	void alterarRevendaAguardandoMaterialByIdItem(Integer idItemPedido);
 
 	void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
 
 	void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido);
-
-	void alterarRevendaAguardandoMaterialByIdItem(Integer idItemPedido);
-
-	void alterarItemAguardandoMaterialByIdPedido(Integer idPedido);
 
 	Double calcularValorPedido(Integer idPedido) throws BusinessException;
 
@@ -40,18 +40,20 @@ public interface PedidoService {
 
 	void cancelarPedido(Integer idPedido) throws BusinessException;
 
+	Integer comprarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
+			throws BusinessException;
+
 	boolean contemItemPedido(Integer idPedido);
 
 	boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
 
-	Integer comprarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
-			throws BusinessException;
+	boolean empacotarItemAguardandoCompra(Integer idPedido) throws BusinessException;
+
+	boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException;
 
 	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
 
 	boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException;
-
-	boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException;
 
 	Pedido inserir(Pedido pedido) throws BusinessException;
 
@@ -96,19 +98,23 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException;
 
+	List<Integer> pesquisarIdPedidoAguardandoCompra();
+
+	List<Integer> pesquisarIdPedidoAguardandoMaterial();
+
 	Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido);
 
 	List<Integer> pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido);
 
 	List<Integer> pesquisarIdPedidoItemAguardandoCompra();
 
-	List<Integer> pesquisarIdPedidoAguardandoMaterial();
-
 	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
 
 	Integer pesquisarIdVendedorByIdPedido(Integer idPedido);
 
 	List<ItemPedido> pesquisarItemAguardandoCompra(Integer idCliente, Periodo periodo);
+
+	List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Periodo periodo);
 
 	ItemPedido pesquisarItemPedido(Integer idItemPedido);
 
@@ -155,8 +161,6 @@ public interface PedidoService {
 	List<ItemPedido> pesquisarRevendaEmpacotamento();
 
 	List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo);
-
-	List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Periodo periodo);
 
 	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 

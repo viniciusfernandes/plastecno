@@ -340,6 +340,21 @@ public class PedidoServiceImpl implements PedidoService {
 	 */
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public boolean empacotarItemAguardandoCompra(Integer idPedido) throws BusinessException {
+		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
+		if (!empacotamentoOk) {
+			alterarItemAguardandoCompraByIdPedido(idPedido);
+		}
+		return empacotamentoOk;
+	}
+	
+	/**
+	 * Aqui estamos exigindo que sempre tenhamos uma nova transacao pois se um
+	 * pedido tiver problemas para ser enviado para o empacotamento, isso nao deve
+	 * interferir no empacotamento dos outros pedidos.
+	 */
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException {
 		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
 		if (!empacotamentoOk) {
@@ -845,6 +860,12 @@ public class PedidoServiceImpl implements PedidoService {
 		return this.pesquisarVendaByPeriodoEVendedor(true, periodo, idVendedor);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdPedidoAguardandoCompra() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
+	}
+	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoAguardandoMaterial() {

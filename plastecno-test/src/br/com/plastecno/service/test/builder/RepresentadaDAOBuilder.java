@@ -49,10 +49,16 @@ public class RepresentadaDAOBuilder extends DAOBuilder<RepresentadaDAO> {
 			@Mock
 			List<Representada> pesquisarRepresentadaExcluindoRelacionamento(Boolean ativo,
 					TipoRelacionamento tipoRelacionamento) {
-				List<Representada> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(Representada.class, "ativo", true);
+				List<Representada> lista = null;
+				if (ativo == null && tipoRelacionamento == null) {
+					lista = REPOSITORY.pesquisarTodos(Representada.class);
+				} else if (ativo != null) {
+					lista = REPOSITORY.pesquisarEntidadeByRelacionamento(Representada.class, "ativo", ativo);
+				}
+
 				List<Representada> representadas = new ArrayList<Representada>();
 				for (Representada representada : lista) {
-					if (tipoRelacionamento != null && !tipoRelacionamento.equals(representada.getTipoRelacionamento())) {
+					if (tipoRelacionamento == null || !tipoRelacionamento.equals(representada.getTipoRelacionamento())) {
 						representadas.add(representada);
 					}
 				}

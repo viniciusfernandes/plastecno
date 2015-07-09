@@ -33,8 +33,6 @@ public interface EstoqueService {
 
 	List<ItemEstoque> pesquisarEscassezItemEstoque();
 
-	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
-
 	ItemEstoque pesquisarItemEstoque(Item filtro);
 
 	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);

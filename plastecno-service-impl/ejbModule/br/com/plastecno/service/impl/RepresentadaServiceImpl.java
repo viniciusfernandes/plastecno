@@ -256,8 +256,8 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public List<Representada> pesquisarRepresentada() {
-		return this.pesquisarRepresentada(null);
+	public List<Representada> pesquisarRepresentadaEFornecedor() {
+		return representadaDAO.pesquisarRepresentadaEFornecedor();
 	}
 
 	@Override
@@ -266,7 +266,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public List<Representada> pesquisarRepresentadaAtivo() {
+	public List<Representada> pesquisarRepresentadaAtiva() {
 		return this.pesquisarRepresentada(true);
 	}
 
@@ -275,7 +275,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 		if (TipoPedido.COMPRA.equals(tipoPedido)) {
 			return pesquisarFornecedorAtivo();
 		}
-		return pesquisarRepresentadaAtivo();
+		return pesquisarRepresentadaAtiva();
 	}
 
 	@Override

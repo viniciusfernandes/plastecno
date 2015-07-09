@@ -90,7 +90,7 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	private ItemPedido gerarItemPedido() {
-		List<Representada> listaRepresentada = representadaService.pesquisarRepresentada();
+		List<Representada> listaRepresentada = representadaService.pesquisarRepresentadaEFornecedor();
 		Representada representada = null;
 		if (listaRepresentada.isEmpty()) {
 			representada = eBuilder.buildRepresentada();

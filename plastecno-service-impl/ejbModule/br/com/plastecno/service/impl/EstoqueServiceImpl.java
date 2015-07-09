@@ -286,13 +286,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@WARNING(data = "07/07/2015", descricao = "Podemos levar o filtro das medidas para o banco de dados e evitar carregar tantos dados desnecessarios em memoria")
 	public ItemEstoque pesquisarItemEstoque(Item filtro) {
 		// Verificando se existe item equivalente no estoque, caso nao exista
 		// vamos
@@ -306,7 +299,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		return itemCadastrado;
 	}
-
+	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque) {

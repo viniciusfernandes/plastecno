@@ -69,7 +69,7 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("idRepresentadaSelecionada", idRepresentada);
-        addAtributo("listaRepresentada", representadaService.pesquisarRepresentada());
+        addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
     }
 
     @Post("compra/item/edicao")

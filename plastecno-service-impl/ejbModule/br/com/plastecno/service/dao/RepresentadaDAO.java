@@ -48,6 +48,10 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 		return query.getResultList();
 	}
 
+	public List<Representada> pesquisarRepresentadaEFornecedor() {
+		return pesquisarRepresentadaExcluindoRelacionamento(null, null);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Representada> pesquisarRepresentadaExcluindoRelacionamento(Boolean ativo,
 			TipoRelacionamento tipoRelacionamento) {

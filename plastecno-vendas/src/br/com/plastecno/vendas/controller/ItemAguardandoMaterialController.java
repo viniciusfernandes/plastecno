@@ -82,7 +82,7 @@ public class ItemAguardandoMaterialController extends AbstractController {
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("idRepresentadaSelecionada", idRepresentada);
-        addAtributo("listaRepresentada", representadaService.pesquisarRepresentada());
+        addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
     }
 
     @Post("itemAguardandoMaterial/edicao")
@@ -96,6 +96,6 @@ public class ItemAguardandoMaterialController extends AbstractController {
         // Pode ser que essas datas ja tenham sido preenchidas em outra
         // navegacao pois esse metodo eh reaproveitado.
         configurarFiltroPediodoMensal();
-        addAtributo("listaRepresentada", representadaService.pesquisarRepresentada());
+        addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
     }
 }

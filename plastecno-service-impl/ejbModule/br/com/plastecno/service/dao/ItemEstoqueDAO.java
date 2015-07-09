@@ -28,36 +28,6 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 				ItemEstoque.class).getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<ItemEstoque> pesquisarEscassezItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
-			Integer quantidadeMinima) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemEstoque i where i.quantidade <= :quantidadeMinima ");
-		if (idMaterial != null && formaMaterial != null) {
-			select.append("and i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
-		}
-
-		if (idMaterial != null && formaMaterial == null) {
-			select.append("and i.material.id = :idMaterial ");
-		}
-
-		if (idMaterial == null && formaMaterial != null) {
-			select.append("and i.formaMaterial = :formaMaterial ");
-		}
-		select.append("order by i.formaMaterial, i.material.descricao, i.descricaoPeca ");
-
-		Query query = entityManager.createQuery(select.toString());
-		query.setParameter("quantidadeMinima", quantidadeMinima);
-		if (idMaterial != null) {
-			query.setParameter("idMaterial", idMaterial);
-		}
-
-		if (formaMaterial != null) {
-			query.setParameter("formaMaterial", formaMaterial);
-		}
-		return query.getResultList();
-	}
-
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca) {
 		return pesquisarItemEstoque(idMaterial, formaMaterial, descricaoPeca, true);
 	}
@@ -119,7 +89,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 
 		List<ItemEstoque> l = query.getResultList();
-		return l.size() >= 1 ? l.get(0) : null;
+		return recuperarItemNaoZerado(l);
 	}
 
 	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca) {
@@ -132,7 +102,21 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 						ItemEstoque.class);
 		List<ItemEstoque> l = query.setParameter("formaMaterial", FormaMaterial.PC).setParameter("idMaterial", idMaterial)
 				.setParameter("descricaoPeca", descricaoPeca).getResultList();
-		return l.size() >= 1 ? l.get(0) : null;
+
+		return recuperarItemNaoZerado(l);
+	}
+
+	@WARNING(data = "08/07/2015", descricao = "Esse metodo foi criado pois no banco de dados foram incluido elementos com duplicidade, alguns zerado ou nao, entao vamos retornar o primeiro com quantidade")
+	private ItemEstoque recuperarItemNaoZerado(List<ItemEstoque> listaItem) {
+		if (listaItem == null || listaItem.size() == 0) {
+			return null;
+		}
+		for (ItemEstoque itemEstoque : listaItem) {
+			if (itemEstoque.getQuantidade() > 0) {
+				return itemEstoque;
+			}
+		}
+		return listaItem.get(0);
 	}
 
 	@SuppressWarnings("unchecked")

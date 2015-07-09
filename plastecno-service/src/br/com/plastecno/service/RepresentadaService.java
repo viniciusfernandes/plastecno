@@ -49,11 +49,11 @@ public interface RepresentadaService {
 
 	String pesquisarNomeFantasiaById(Integer idRepresentada);
 
-	List<Representada> pesquisarRepresentada();
+	List<Representada> pesquisarRepresentadaEFornecedor();
 
 	List<Representada> pesquisarRepresentada(Boolean ativo);
 
-	List<Representada> pesquisarRepresentadaAtivo();
+	List<Representada> pesquisarRepresentadaAtiva();
 
 	List<Representada> pesquisarRepresentadaAtivoByTipoPedido(TipoPedido tipoPedido);
 

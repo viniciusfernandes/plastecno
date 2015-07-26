@@ -6,14 +6,10 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
-import mockit.Mock;
-import mockit.MockUp;
 
 import org.junit.Test;
 
@@ -33,8 +29,6 @@ import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.constante.TipoVenda;
-import br.com.plastecno.service.dao.PedidoDAO;
-import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -43,6 +37,7 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.test.builder.ServiceBuilder;
 
 public class PedidoServiceTest extends AbstractTest {
 
@@ -78,6 +73,16 @@ public class PedidoServiceTest extends AbstractTest {
 	private RepresentadaService representadaService;
 
 	private UsuarioService usuarioService;
+
+	public PedidoServiceTest() {
+		pedidoService = ServiceBuilder.buildService(PedidoService.class);
+		clienteService = ServiceBuilder.buildService(ClienteService.class);
+		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
+		materialService = ServiceBuilder.buildService(MaterialService.class);
+		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
+		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
+		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
+	}
 
 	private void associarVendedor(Cliente cliente) {
 		cliente.setVendedor(eBuilder.buildVendedor());
@@ -228,6 +233,16 @@ public class PedidoServiceTest extends AbstractTest {
 		return gerarPedido(TipoPedido.COMPRA);
 	}
 
+	private Pedido gerarPedidoOrcamento() {
+		Pedido pedido = gerarPedidoRevenda();
+		pedido.setFormaPagamento("A VISTA");
+		pedido.setTipoEntrega(TipoEntrega.FOB);
+		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+		pedido.getContato().setEmail("vinicius@hotmail.com");
+		return pedido;
+	}
+
 	private Pedido gerarPedidoRepresentacao() {
 		return gerarPedido(TipoPedido.REPRESENTACAO);
 	}
@@ -316,253 +331,6 @@ public class PedidoServiceTest extends AbstractTest {
 		return new PedidoRevendaECompra(pedidoCompra, pedidoRevenda);
 	}
 
-	@Override
-	public void init() {
-		pedidoService = ServiceBuilder.buildService(PedidoService.class);
-		clienteService = ServiceBuilder.buildService(ClienteService.class);
-		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
-		materialService = ServiceBuilder.buildService(MaterialService.class);
-		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
-		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
-		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
-	}
-
-	private void initTestEnvioEmailPedidoCancelado() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = eBuilder.buildPedido();
-				pedido.setId(idPedido);
-				// Estamos supondo que o cliente ja foi prospectado
-				pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
-				return pedido;
-			}
-
-			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 12L;
-			}
-		};
-	}
-
-	private void initTestEnvioEmailPedidoClienteNaoPropspectado() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = eBuilder.buildPedido();
-				pedido.setId(idPedido);
-				return pedido;
-			}
-
-			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 12L;
-			}
-		};
-	}
-
-	private void initTestEnvioEmailPedidoJaEnviado() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = eBuilder.buildPedido();
-				pedido.setId(idPedido);
-				// Estamos supondo que o cliente ja foi prospectado
-				pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
-				return pedido;
-			}
-
-			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 12L;
-			}
-		};
-	}
-
-	private void initTestEnvioEmailPedidoOrcamento() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = eBuilder.buildPedido();
-				pedido.setId(idPedido);
-				// Estamos supondo que o cliente ja foi prospectado
-				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-				pedido.setFormaPagamento("A VISTA");
-				pedido.setTipoEntrega(TipoEntrega.FOB);
-				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
-				pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
-				pedido.getContato().setEmail("vinicius@hotmail.com");
-				return pedido;
-			}
-
-			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 12L;
-			}
-		};
-	}
-
-	private void initTestEnvioEmailPedidoOrcamentoSemEmailContato() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = eBuilder.buildPedido();
-				pedido.setId(idPedido);
-				// Estamos supondo que o cliente ja foi prospectado
-				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-				pedido.setFormaPagamento("A VISTA");
-				pedido.setTipoEntrega(TipoEntrega.FOB);
-				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
-				pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
-				return pedido;
-			}
-
-			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 12L;
-			}
-		};
-	}
-
-	private void initTestEnvioEmailPedidoSemEnderecoCobranca() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = eBuilder.buildPedido();
-				pedido.setId(idPedido);
-				// Estamos supondo que o cliente ja foi prospectado
-				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-				pedido.setFormaPagamento("A VISTA");
-				pedido.setTipoEntrega(TipoEntrega.FOB);
-				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
-
-				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.ENTREGA));
-				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.FATURAMENTO));
-				return pedido;
-			}
-
-			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 12L;
-			}
-		};
-	}
-
-	private void initTestEnvioEmailPedidoSemEnderecoEntrega() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = eBuilder.buildPedido();
-				pedido.setId(idPedido);
-				// Estamos supondo que o cliente ja foi prospectado
-				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-				pedido.setFormaPagamento("A VISTA");
-				pedido.setTipoEntrega(TipoEntrega.FOB);
-				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
-
-				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.FATURAMENTO));
-				return pedido;
-			}
-
-			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 12L;
-			}
-		};
-	}
-
-	private void initTestEnvioEmailPedidoSemEnderecoFaturamento() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = eBuilder.buildPedido();
-				pedido.setId(idPedido);
-				// Estamos supondo que o cliente ja foi prospectado
-				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-				pedido.setFormaPagamento("A VISTA");
-				pedido.setTipoEntrega(TipoEntrega.FOB);
-				pedido.setDataEntrega(TestUtils.gerarDataPosterior());
-
-				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.COBRANCA));
-				pedido.addLogradouro(eBuilder.buildLogradouro(TipoLogradouro.ENTREGA));
-				return pedido;
-			}
-
-			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 12L;
-			}
-		};
-	}
-
-	private void initTestEnvioEmailPedidoSemItens() {
-		new MockUp<PedidoDAO>() {
-			@Mock
-			Pedido pesquisarById(Integer idPedido) {
-				Pedido pedido = eBuilder.buildPedido();
-				pedido.setId(idPedido);
-				// Estamos supondo que o cliente ja foi prospectado
-				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-				return pedido;
-			}
-
-			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido) {
-				return 0L;
-			}
-		};
-	}
-
-	private void initTestInclusaoPedidoDigitadoSemVendedorAssociado() {
-		new MockUp<UsuarioDAO>() {
-			@Mock
-			Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {
-				return null;
-			}
-		};
-
-		/*
-		 * new MockUp<ClienteDAO>() {
-		 * 
-		 * @Mock Cliente pesquisarById(Integer id) { Cliente cliente = new
-		 * Cliente(id, "vinicius"); return cliente; } };
-		 */
-		new MockUp<UsuarioDAO>() {
-			@Mock
-			Usuario pesquisarById(Integer id) {
-				Usuario usuario = new Usuario(11, "vinicius", "fernandes");
-				return usuario;
-			}
-		};
-	}
-
-	private void initTestInclusaoPedidoOrcamento() {
-		new MockUp<PedidoDAO>() {
-
-			@Mock
-			Date pesquisarDataEnvioById(Integer idPedido) {
-				return new Date();
-			}
-
-			@Mock
-			Date pesquisarDataInclusaoById(Integer idPedido) {
-				return new Date();
-			}
-
-			@Mock
-			Double pesquisarValorPedido(Integer idPedido) {
-				return 1200d;
-			}
-
-			@Mock
-			Double pesquisarValorPedidoIPI(Integer idPedido) {
-				return 12d;
-			}
-		};
-
-	}
-
 	@Test
 	public void testAlteracaoQuantidadeRecepcionada() {
 		ItemPedido itemPedido = gerarItemPedidoCompra();
@@ -647,10 +415,13 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedidoCancelado() {
-		initTestEnvioEmailPedidoCancelado();
+		Pedido pedido = gerarPedidoRevenda();
+		pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
+
+		Integer idPedido = pedido.getId();
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(1, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -659,10 +430,10 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedidoClienteNaoPropspectado() {
-		initTestEnvioEmailPedidoClienteNaoPropspectado();
+		Pedido pedido = gerarPedidoRepresentacao();
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(1, new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -671,10 +442,11 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedidoJaEnviado() {
-		initTestEnvioEmailPedidoJaEnviado();
+		Pedido pedido = gerarPedidoRevenda();
+		pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(1, new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -683,9 +455,18 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedidoOrcamento() {
-		initTestEnvioEmailPedidoOrcamento();
+		Pedido pedido = gerarPedidoOrcamento();
+		ItemPedido itemPedido = gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
 		try {
-			pedidoService.enviarPedido(1, new byte[] {});
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -693,10 +474,21 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedidoOrcamentoSemEmailContato() {
-		initTestEnvioEmailPedidoOrcamentoSemEmailContato();
+		Pedido pedido = gerarPedidoOrcamento();
+		pedido.getContato().setEmail(null);
+
+		Integer idPedido = pedido.getId();
+		ItemPedido itemPedido = gerarItemPedido();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(1, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -733,10 +525,24 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedidoSemEnderecoCobranca() {
-		initTestEnvioEmailPedidoSemEnderecoCobranca();
+		Pedido pedido = gerarPedidoRevenda();
+		Cliente cliente = pedido.getCliente();
+		cliente.setListaLogradouro(null);
+		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.ENTREGA));
+		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
+
+		ItemPedido itemPedido = gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(1, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -745,10 +551,24 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedidoSemEnderecoEntrega() {
-		initTestEnvioEmailPedidoSemEnderecoEntrega();
+		Pedido pedido = gerarPedidoRevenda();
+		Cliente cliente = pedido.getCliente();
+		cliente.setListaLogradouro(null);
+		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.COBRANCA));
+		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
+
+		ItemPedido itemPedido = gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(1, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -757,10 +577,24 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedidoSemEnderecoFaturamento() {
-		initTestEnvioEmailPedidoSemEnderecoFaturamento();
+		Pedido pedido = gerarPedidoRevenda();
+		Cliente cliente = pedido.getCliente();
+		cliente.setListaLogradouro(null);
+		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.COBRANCA));
+		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.ENTREGA));
+
+		ItemPedido itemPedido = gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(1, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -769,10 +603,10 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedidoSemItens() {
-		initTestEnvioEmailPedidoSemItens();
+		Pedido pedido = gerarPedidoRevenda();
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(1, new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -1337,8 +1171,8 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoDigitadoSemVendedorAssociado() {
-		initTestInclusaoPedidoDigitadoSemVendedorAssociado();
-		Pedido pedido = eBuilder.buildPedido();
+		Pedido pedido = gerarPedidoRepresentacao();
+		pedido.setVendedor(new Usuario());
 		boolean throwed = false;
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -1367,8 +1201,6 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoOrcamento() {
-		initTestInclusaoPedidoOrcamento();
-
 		Pedido pedido = gerarPedidoRepresentacao();
 
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());

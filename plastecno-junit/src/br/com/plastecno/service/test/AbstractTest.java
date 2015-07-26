@@ -13,13 +13,9 @@ public abstract class AbstractTest {
 	private final EntidadeRepository repositorio = EntidadeRepository.getInstance();
 
 	@Before
-	public void clean() {
+	public void clear() {
 		repositorio.clear();
-		repositorio.init();
-		init();
 	}
-
-	public abstract void init();
 
 	protected void printMensagens(BusinessException exception) {
 		Assert.fail("Falha em alguma regra de negocio. As mensagens sao: " + exception.getMensagemConcatenada());

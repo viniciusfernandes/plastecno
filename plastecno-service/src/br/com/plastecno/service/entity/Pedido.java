@@ -205,6 +205,10 @@ public class Pedido implements Serializable, Cloneable {
 	}
 
 	public void addLogradouro(List<? extends Logradouro> listaLogradouro) {
+		if (listaLogradouro == null || listaLogradouro.isEmpty()) {
+			return;
+		}
+		
 		for (Logradouro logradouro : listaLogradouro) {
 			this.addLogradouro(logradouro);
 		}

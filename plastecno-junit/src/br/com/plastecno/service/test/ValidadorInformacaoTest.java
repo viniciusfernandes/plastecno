@@ -1,4 +1,4 @@
-package br.com.plastecno.validacao.test;
+package br.com.plastecno.service.test;
 
 import static org.junit.Assert.*;
 
@@ -32,11 +32,6 @@ public class ValidadorInformacaoTest extends AbstractTest {
 
 		e.setHerdado(h);
 		return e;
-	}
-
-	@Override
-	public void init() {
-
 	}
 
 	@Test
@@ -273,6 +268,20 @@ public class ValidadorInformacaoTest extends AbstractTest {
 	}
 
 	@Test
+	public void testHerancaInvalido() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.getHerdado().setNome(null);
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+
+		}
+		assertTrue("O campo na heranca esta nulo e deve ser validado", throwed);
+	}
+
+	@Test
 	public void testIncricaoEstadualInvalidoTamanhaExcesso() {
 		EntidadeValidacao e = gerarEntidadeValidacao();
 
@@ -405,20 +414,6 @@ public class ValidadorInformacaoTest extends AbstractTest {
 
 		}
 		assertTrue("O campo possui um padrao invalido e deve ser validado", throwed);
-	}
-
-	@Test
-	public void testHerancaInvalido() {
-		EntidadeValidacao e = gerarEntidadeValidacao();
-		e.getHerdado().setNome(null);
-		boolean throwed = false;
-		try {
-			ValidadorInformacao.validar(e);
-		} catch (InformacaoInvalidaException e1) {
-			throwed = true;
-
-		}
-		assertTrue("O campo na heranca esta nulo e deve ser validado", throwed);
 	}
 
 	@Test

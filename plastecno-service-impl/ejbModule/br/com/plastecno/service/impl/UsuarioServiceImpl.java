@@ -24,6 +24,7 @@ import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.CriptografiaException;
+import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.util.StringUtils;
@@ -183,6 +184,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return usuario.getId() == null ? usuarioDAO.inserir(usuario).getId() : usuarioDAO.alterar(usuario).getId();
 	}
 
+	@TODO(descricao="Remover o hardcoded administracao")
 	@Override
 	public boolean isAdministrador(Integer idUsuario) {
 		List<PerfilAcesso> l = pesquisarPerfisAssociados(idUsuario);

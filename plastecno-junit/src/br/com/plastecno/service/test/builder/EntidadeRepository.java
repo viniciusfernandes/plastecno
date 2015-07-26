@@ -14,16 +14,16 @@ import mockit.MockUp;
 import br.com.plastecno.service.dao.GenericDAO;
 
 public class EntidadeRepository {
-	private static final Map<Class<?>, Set<Object>> mapaEntidades = new HashMap<Class<?>, Set<Object>>();
-
-	private static final EntidadeRepository repository = new EntidadeRepository();
-
 	public static EntidadeRepository getInstance() {
 		return repository;
 	}
 
-	private EntidadeRepository() {
+	private static final Map<Class<?>, Set<Object>> mapaEntidades = new HashMap<Class<?>, Set<Object>>();
 
+	private static final EntidadeRepository repository = new EntidadeRepository();
+
+	private EntidadeRepository() {
+		initGenericDAO();
 	}
 
 	<T> void alterarEntidadeAtributoById(Class<T> classe, Integer id, String nomeAtributo, Object valorAtributo) {
@@ -55,10 +55,6 @@ public class EntidadeRepository {
 
 	private Integer gerarId() {
 		return (int) (9999 * Math.random());
-	}
-
-	public void init() {
-		initGenericDAO();
 	}
 
 	private void initGenericDAO() {

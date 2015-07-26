@@ -17,12 +17,20 @@ import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.test.builder.ServiceBuilder;
 
 public class ComissaoServiceTest extends AbstractTest {
 	private ComissaoService comissaoService;
 	private MaterialService materialService;
 	private UsuarioService usuarioService;
 	private PerfilAcessoService perfilAcessoService;
+
+	public ComissaoServiceTest() {
+		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
+		materialService = ServiceBuilder.buildService(MaterialService.class);
+		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
+		perfilAcessoService = ServiceBuilder.buildService(PerfilAcessoService.class);
+	}
 
 	private Material gerarMaterial() {
 		Representada representada = eBuilder.buildRepresentada();
@@ -53,14 +61,6 @@ public class ComissaoServiceTest extends AbstractTest {
 			perfilAcessoService.inserir(perfil);
 		}
 		return vendedor;
-	}
-
-	@Override
-	public void init() {
-		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
-		materialService = ServiceBuilder.buildService(MaterialService.class);
-		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
-		perfilAcessoService = ServiceBuilder.buildService(PerfilAcessoService.class);
 	}
 
 	@Test

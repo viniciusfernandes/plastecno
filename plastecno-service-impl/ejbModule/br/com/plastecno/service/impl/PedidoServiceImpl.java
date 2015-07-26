@@ -347,7 +347,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		return empacotamentoOk;
 	}
-	
+
 	/**
 	 * Aqui estamos exigindo que sempre tenhamos uma nova transacao pois se um
 	 * pedido tiver problemas para ser enviado para o empacotamento, isso nao deve
@@ -629,6 +629,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 		itemPedido.configurarMedidaInterna();
 
+		// Temos que recuperar o pedido pois os valores totais do pedido serao
+		// alterados sempre com a inclusao de item. Esses valores serao utilizados
+		// para facilitar a exibicao dos valores do pedido para o usuario.
 		final Pedido pedido = this.pesquisarPedidoById(idPedido);
 		itemPedido.setPedido(pedido);
 		/*
@@ -865,7 +868,7 @@ public class PedidoServiceImpl implements PedidoService {
 	public List<Integer> pesquisarIdPedidoAguardandoCompra() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
 	}
-	
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoAguardandoMaterial() {

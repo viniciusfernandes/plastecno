@@ -28,6 +28,16 @@ public class UsuarioDAOBuilder extends DAOBuilder<UsuarioDAO> {
 
 			@Mock
 			public Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {
+				if (idCliente == null || idVendedor == null) {
+					return idVendedor;
+				}
+				Cliente cliente = REPOSITORY.pesquisarEntidadeById(Cliente.class, idCliente);
+				Usuario vendedor = cliente.getVendedor();
+
+				if (vendedor != null && idVendedor.equals(vendedor.getId())) {
+					return idVendedor;
+				}
+
 				return idVendedor;
 			}
 

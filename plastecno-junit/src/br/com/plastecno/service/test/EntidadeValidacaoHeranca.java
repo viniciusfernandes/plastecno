@@ -1,4 +1,4 @@
-package br.com.plastecno.validacao.test;
+package br.com.plastecno.service.test;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 

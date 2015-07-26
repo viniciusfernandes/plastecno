@@ -1,4 +1,4 @@
-package br.com.plastecno.service.test;
+package br.com.plastecno.service.test.builder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -35,9 +35,10 @@ import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.impl.EmailServiceImpl;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
+import br.com.plastecno.service.test.TestUtilException;
 import br.com.plastecno.service.test.builder.DAOBuilder;
 
-class ServiceBuilder {
+public class ServiceBuilder {
 
 	@SuppressWarnings("rawtypes")
 	private final static Map<Class<?>, DAOBuilder> mapDAO = new HashMap<Class<?>, DAOBuilder>();
@@ -57,7 +58,7 @@ class ServiceBuilder {
 	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
 
 	@SuppressWarnings("unchecked")
-	static <T> T buildService(Class<T> classe) {
+	public static <T> T buildService(Class<T> classe) {
 		T service = (T) mapTemporarioServices.get(classe);
 		if (service != null) {
 			return service;
@@ -96,7 +97,7 @@ class ServiceBuilder {
 				 * IMPLEMENTACOES MOCKADAS DOS METODOS. ELAS VALEM APENAS EM CADA TESTE
 				 * UNITARIO.
 				 */
-				mapTemporarioServices.remove(classe);
+				//mapTemporarioServices.remove(classe);
 				return service;
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new TestUtilException("Falha na execucao do metodo de inicializacao do servico \"" + "build"

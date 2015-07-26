@@ -88,7 +88,7 @@ public class ItemPedido extends Item {
 
 	@ManyToOne
 	@JoinColumn(name = "id_pedido", referencedColumnName = "id", nullable = false)
-	@InformacaoValidavel(cascata = true, nomeExibicao = "Pedido associado ao item")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Pedido associado ao item")
 	private Pedido pedido;
 
 	@Column(name = "preco_custo")

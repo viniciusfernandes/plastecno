@@ -1,4 +1,4 @@
-package br.com.plastecno.validacao.test;
+package br.com.plastecno.service.test;
 
 import java.util.ArrayList;
 import java.util.List;

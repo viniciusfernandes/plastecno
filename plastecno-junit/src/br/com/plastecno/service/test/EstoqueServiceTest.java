@@ -206,9 +206,12 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	private Pedido gerarPedido(TipoPedido tipoPedido) {
+		Usuario vendedor = gerarVendedor();
+
 		Pedido pedido = eBuilder.buildPedido();
 		pedido.setTipoPedido(tipoPedido);
-		Usuario vendedor = gerarVendedor();
+		pedido.setVendedor(vendedor);
+		
 		Cliente cliente = pedido.getCliente();
 		cliente.setVendedor(vendedor);
 		try {

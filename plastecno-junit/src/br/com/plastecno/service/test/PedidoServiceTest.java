@@ -156,15 +156,16 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	private Pedido gerarPedido(TipoPedido tipoPedido) {
-		Pedido pedido = eBuilder.buildPedido();
-		pedido.setTipoPedido(tipoPedido);
-
 		Usuario vendedor = eBuilder.buildVendedor();
 		try {
 			usuarioService.inserir(vendedor, true);
 		} catch (BusinessException e2) {
 			printMensagens(e2);
 		}
+
+		Pedido pedido = eBuilder.buildPedido();
+		pedido.setVendedor(vendedor);
+		pedido.setTipoPedido(tipoPedido);
 
 		try {
 			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.6);
@@ -255,6 +256,40 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		return gerarPedido(TipoPedido.REVENDA);
+	}
+
+	private Pedido gerarPedidoSimples() {
+		Representada representada = eBuilder.buildRepresentadaRevendedora();
+		try {
+			representadaService.inserir(representada);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		Pedido pedido = eBuilder.buildPedido();
+
+		pedido.setRepresentada(representada);
+		Usuario vendedor = eBuilder.buildVendedor();
+		vendedor.setId(null);
+
+		try {
+			usuarioService.inserir(vendedor, false);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		Cliente cliente = eBuilder.buildCliente();
+		cliente.setVendedor(vendedor);
+		try {
+			clienteService.inserir(cliente);
+		} catch (BusinessException e2) {
+			printMensagens(e2);
+		}
+
+		pedido.setCliente(cliente);
+		pedido.setVendedor(vendedor);
+		pedido.getCliente().setVendedor(vendedor);
+		return pedido;
 	}
 
 	private Representada gerarRepresentada() {
@@ -1156,11 +1191,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoDigitado() {
-		Pedido pedido = eBuilder.buildPedido();
-		pedido.setId(null);
-		pedido.setRepresentada(gerarRepresentada());
-		associarVendedor(pedido.getCliente());
-
+		Pedido pedido = gerarPedidoSimples();
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -1240,17 +1271,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoRevenda() {
-		Representada representada = eBuilder.buildRepresentadaRevendedora();
-		try {
-			representadaService.inserir(representada);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		Pedido pedido = eBuilder.buildPedido();
-		pedido.setRepresentada(representada);
-		associarVendedor(pedido.getCliente());
-
+		Pedido pedido = gerarPedidoSimples();
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {

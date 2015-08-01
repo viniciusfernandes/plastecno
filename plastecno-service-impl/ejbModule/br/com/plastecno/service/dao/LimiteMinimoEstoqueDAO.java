@@ -75,30 +75,31 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 		return query.getResultList();
 	}
 
-	public Integer pesquisarIdLimiteMinimoEstoque(LimiteMinimoEstoque filtro) {
+	public Integer pesquisarIdLimiteMinimoEstoque(LimiteMinimoEstoque filtro, double tolerancia) {
 		StringBuilder select = new StringBuilder("select l.id from LimiteMinimoEstoque l where ");
 		select.append("l.formaMaterial = :formaMaterial and l.material = :material ");
 
 		if (filtro.getMedidaExterna() != null) {
-			select.append("and l.medidaExterna = :medidaExterna ");
+			select.append("and ABS(l.medidaExterna - :medidaExterna) <= :tolerancia ");
 		} else {
 			select.append("and l.medidaExterna is null ");
 		}
 
 		if (filtro.getMedidaInterna() != null) {
-			select.append("and l.medidaInterna = :medidaInterna ");
+			select.append("and ABS(l.medidaInterna - :medidaInterna) <= :tolerancia ");
 		} else {
 			select.append("and l.medidaInterna is null ");
 		}
 
 		if (filtro.getComprimento() != null) {
-			select.append("and l.comprimento = :comprimento ");
+			select.append("and ABS(l.comprimento - :comprimento) <= :tolerancia ");
 		} else {
 			select.append("and l.comprimento is null ");
 		}
 
 		TypedQuery<Integer> query = entityManager.createQuery(select.toString(), Integer.class);
-		query.setParameter("formaMaterial", filtro.getFormaMaterial()).setParameter("material", filtro.getMaterial());
+		query.setParameter("formaMaterial", filtro.getFormaMaterial()).setParameter("material", filtro.getMaterial())
+				.setParameter("tolerancia", tolerancia);
 
 		if (filtro.getMedidaExterna() != null) {
 			query.setParameter("medidaExterna", filtro.getMedidaExterna());

@@ -61,7 +61,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer associarLimiteMinimoEstoque(LimiteMinimoEstoque limite) throws BusinessException {
-		limite.setId(limiteMinimoEstoqueDAO.pesquisarIdLimiteMinimoEstoque(limite));
+		limite.setId(limiteMinimoEstoqueDAO.pesquisarIdLimiteMinimoEstoque(limite, tolerancia));
 
 		if (limite.getId() != null && !limite.contemQuantidadeMinima()) {
 			limiteMinimoEstoqueDAO.remover(limite);
@@ -275,7 +275,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 		List<Integer> listaIdItemEstoque = limiteMinimoEstoqueDAO.pesquisarIdItemEstoqueDentroLimiteMinimo(limite,
 				tolerancia);
 
-		limiteMinimoEstoqueDAO.associarLimiteMinimoItemEstoque(limite.getId(), listaIdItemEstoque);
+		if (!listaIdItemEstoque.isEmpty()) {
+			limiteMinimoEstoqueDAO.associarLimiteMinimoItemEstoque(limite.getId(), listaIdItemEstoque);
+		}
 		return limite.getId();
 	}
 
@@ -299,7 +301,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		return itemCadastrado;
 	}
-	
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque) {

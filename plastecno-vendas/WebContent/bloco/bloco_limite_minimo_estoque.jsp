@@ -10,7 +10,7 @@ $(document).ready(function() {
 	
 	$('#botaoLimparLimite').click(function () {
 		$('#bloco_limite_minimo input').val('');
-		$('#formaMaterial').val('');
+		$('#bloco_limite_minimo #formaMaterial').val('');
 		habilitarCamposEdicaoItem(true);
 	});
 });

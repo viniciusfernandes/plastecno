@@ -211,7 +211,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		Pedido pedido = eBuilder.buildPedido();
 		pedido.setTipoPedido(tipoPedido);
 		pedido.setVendedor(vendedor);
-		
+
 		Cliente cliente = pedido.getCliente();
 		cliente.setVendedor(vendedor);
 		try {
@@ -446,11 +446,14 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setComprimento(null);
 		limite.setMedidaExterna(null);
 		limite.setMedidaInterna(null);
+
+		boolean throwed = false;
 		try {
 			estoqueService.associarLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
-			printMensagens(e);
+			throwed = true;
 		}
+		assertTrue("O limite minimo de estoque nao contem medidas preenchidas e deve ser validado", throwed);
 	}
 
 	@Test

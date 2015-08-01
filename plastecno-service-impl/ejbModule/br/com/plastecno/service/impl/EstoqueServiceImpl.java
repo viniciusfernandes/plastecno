@@ -61,7 +61,18 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer associarLimiteMinimoEstoque(LimiteMinimoEstoque limite) throws BusinessException {
-		limite.setId(limiteMinimoEstoqueDAO.pesquisarIdLimiteMinimoEstoque(limite, tolerancia));
+		boolean contemMedida = limite.getMedidaExterna() != null || limite.getMedidaInterna() != null
+				|| limite.getComprimento() != null;
+
+		if (!contemMedida) {
+			throw new BusinessException("O limite minimo de estoque deve conter alguma medida, mas todas estão em branco");
+		}
+
+		LimiteMinimoEstoque limiteCadastrado = limiteMinimoEstoqueDAO.pesquisarLimiteMinimoEstoque(limite, tolerancia);
+		if (limiteCadastrado != null) {
+			limiteCadastrado.setQuantidadeMinima(limite.getQuantidadeMinima());
+			limite = limiteCadastrado;
+		}
 
 		if (limite.getId() != null && !limite.contemQuantidadeMinima()) {
 			limiteMinimoEstoqueDAO.remover(limite);

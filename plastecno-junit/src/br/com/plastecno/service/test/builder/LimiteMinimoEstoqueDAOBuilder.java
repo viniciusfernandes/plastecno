@@ -73,7 +73,7 @@ public class LimiteMinimoEstoqueDAOBuilder extends DAOBuilder<LimiteMinimoEstoqu
 			}
 
 			@Mock
-			public Integer pesquisarIdLimiteMinimoEstoque(LimiteMinimoEstoque filtro, double tolerancia) {
+			public LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro, double tolerancia) {
 				List<LimiteMinimoEstoque> listalimite = REPOSITORY.pesquisarTodos(LimiteMinimoEstoque.class);
 				boolean contemMedida = false;
 				for (LimiteMinimoEstoque limite : listalimite) {
@@ -100,7 +100,7 @@ public class LimiteMinimoEstoqueDAOBuilder extends DAOBuilder<LimiteMinimoEstoqu
 						continue;
 					}
 
-					return limite.getId();
+					return limite;
 				}
 				return null;
 			}

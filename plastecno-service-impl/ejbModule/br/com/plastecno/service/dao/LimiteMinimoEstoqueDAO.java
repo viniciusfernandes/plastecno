@@ -75,29 +75,35 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 		return query.getResultList();
 	}
 
-	public Integer pesquisarIdLimiteMinimoEstoque(LimiteMinimoEstoque filtro, double tolerancia) {
-		StringBuilder select = new StringBuilder("select l.id from LimiteMinimoEstoque l where ");
+	public LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro, double tolerancia) {
+		StringBuilder select = new StringBuilder("select l from LimiteMinimoEstoque l where ");
 		select.append("l.formaMaterial = :formaMaterial and l.material = :material ");
+
+		StringBuilder order = new StringBuilder("order by ");
 
 		if (filtro.getMedidaExterna() != null) {
 			select.append("and ABS(l.medidaExterna - :medidaExterna) <= :tolerancia ");
+			order.append("l.medidaExterna, ");
 		} else {
 			select.append("and l.medidaExterna is null ");
 		}
 
 		if (filtro.getMedidaInterna() != null) {
 			select.append("and ABS(l.medidaInterna - :medidaInterna) <= :tolerancia ");
+			order.append("l.medidaInterna, ");
 		} else {
 			select.append("and l.medidaInterna is null ");
 		}
 
 		if (filtro.getComprimento() != null) {
 			select.append("and ABS(l.comprimento - :comprimento) <= :tolerancia ");
+			order.append("l.comprimento, ");
 		} else {
 			select.append("and l.comprimento is null ");
 		}
 
-		TypedQuery<Integer> query = entityManager.createQuery(select.toString(), Integer.class);
+		select.append(order.substring(0, order.lastIndexOf(", "))).append(" desc");
+		TypedQuery<LimiteMinimoEstoque> query = entityManager.createQuery(select.toString(), LimiteMinimoEstoque.class);
 		query.setParameter("formaMaterial", filtro.getFormaMaterial()).setParameter("material", filtro.getMaterial())
 				.setParameter("tolerancia", tolerancia);
 
@@ -111,11 +117,11 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 			query.setParameter("comprimento", filtro.getComprimento());
 		}
 
-		List<Integer> listaId = query.getResultList();
-		if (listaId.size() >= 2) {
-			logger.log(Level.WARNING, "Existem mais de 1 limite de estoque cadastrado. Total encontrado de " + listaId.size()
-					+ " para o Limite minimo \"" + filtro.getDescricao() + "\"");
+		List<LimiteMinimoEstoque> listaLimiteMinimo = query.getResultList();
+		if (listaLimiteMinimo.size() >= 2) {
+			logger.log(Level.WARNING, "Existem mais de 1 limite de estoque cadastrado. Total encontrado de "
+					+ listaLimiteMinimo.size() + " para o Limite minimo \"" + filtro.getDescricao() + "\"");
 		}
-		return listaId.size() >= 1 ? listaId.get(0) : null;
+		return listaLimiteMinimo.size() >= 1 ? listaLimiteMinimo.get(0) : null;
 	}
 }

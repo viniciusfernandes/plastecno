@@ -160,7 +160,7 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarRevendaEmpacotamento();
 
-	List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo);
+	List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente);
 
 	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 

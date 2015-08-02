@@ -1,6 +1,8 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
@@ -11,13 +13,11 @@ import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
-import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
-import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -55,42 +55,26 @@ public class EmpacotamentoRevendaController extends AbstractController {
         configurarFiltroPediodoMensal();
     }
 
-    @Post("empacotamento/item/inclusao")
-    public void empacotarItem(Integer idItemPedido, Date dataInicial, Date dataFinal, Cliente cliente) {
-        estoqueService.empacotarItemPedido(idItemPedido);
-        SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
-        Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
-        String mensagem = null;
-        if (SituacaoPedido.EMPACOTADO.equals(situacaoPedido)) {
-            mensagem = "O pedido No. " + idPedido
-                    + " não possui outros itens para ser empacotado e pode ser enviado o cliente.";
-        } else {
-            mensagem = "Item do pedido No. " + idPedido + "empacotado com sucesso";
-        }
-        gerarMensagemSucesso(mensagem);
-        pesquisarRevendaEmpacotamento(dataInicial, dataFinal, cliente);
+    @Post("empacotamento/itens/inclusao")
+    public void empacotarItem(List<Integer> listaIdPedido, Date dataInicial, Date dataFinal, Cliente cliente) {
+        estoqueService.empacotarPedido(listaIdPedido);
+        gerarMensagemSucesso("Pedido(s) No. " + Arrays.deepToString(listaIdPedido.toArray())
+                + "empacotado(s) com sucesso");
+        pesquisarRevendaEmpacotamento(cliente);
     }
 
     @Get("empacotamento/revenda/listagem")
-    public void pesquisarRevendaEmpacotamento(Date dataInicial, Date dataFinal, Cliente cliente) {
-        try {
-            Periodo periodo = new Periodo(dataInicial, dataFinal);
-            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioRevendaEmpacotamento(
-                    cliente.getId(), periodo);
+    public void pesquisarRevendaEmpacotamento(Cliente cliente) {
+        RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioRevendaEmpacotamento(cliente
+                .getId());
 
-            addAtributo("relatorio", relatorio);
-            if (contemAtributo("permanecerTopo")) {
-                irTopoPagina();
-            } else {
-                irRodapePagina();
-            }
-        } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
+        addAtributo("relatorio", relatorio);
+        if (contemAtributo("permanecerTopo")) {
             irTopoPagina();
+        } else {
+            irRodapePagina();
         }
 
-        addAtributo("dataInicial", formatarData(dataInicial));
-        addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("cliente", cliente);
     }
 
@@ -105,7 +89,7 @@ public class EmpacotamentoRevendaController extends AbstractController {
         addAtributo("permanecerTopo", true);
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
-        redirecTo(this.getClass()).pesquisarRevendaEmpacotamento(dataInicial, dataFinal, cliente);
+        redirecTo(this.getClass()).pesquisarRevendaEmpacotamento(cliente);
 
     }
 

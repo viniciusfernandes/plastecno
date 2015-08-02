@@ -22,12 +22,11 @@
 
 <script type="text/javascript">
 
+var listaIdPedido = new Array();
+
 $(document).ready(function() {
 	
 	scrollTo('${ancora}');
-	
-	inserirMascaraData('dataInicial');
-	inserirMascaraData('dataFinal');
 	
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();	
@@ -40,6 +39,25 @@ $(document).ready(function() {
 		$(form).attr('method', 'post');
 		$(form).attr('action', '<c:url value="/compra/item/inclusao"/>?'+parametros);
 		$(form).submit();
+	});
+	
+	$('#botaoEmpacotamentarPedidos').click(function () {
+
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja EMPACOTAR ESSE(S) PEDIDO(S)?',
+			confirmar: function(){
+				var parametros = $('#formPesquisa').serialize();
+				for (var i = 0; i < listaIdItem.length; i++) {
+					// Estamos validando aqui pois no DELETE dos itens da lista o javascript mantem undefined.
+					if(listaIdItem[i] != undefined){
+						parametros+='&listaIdPedido='+listaIdItem[i];
+					}
+				};
+				var action = '<c:url value="/empacotamento/itens/inclusao"/>'+'?'+parametros;
+				$('#formVazio').attr('method', 'post').attr('action', action);
+				$('#formVazio').submit();
+			}
+		});
 	});
 	
 	inicializarAutocompleteCliente();
@@ -74,6 +92,15 @@ function enviarEncomenda(botao){
 		}
 	});
 };
+
+function empacotarPedido(campo){
+	if(campo.checked){
+		listaIdPedido.push(campo.value);	
+	} else {
+		var index = listaIdPedido.indexOf(campo.value);
+		delete listaIdPedido[index];
+	}
+};
 </script>
 </head>
 <body>
@@ -88,16 +115,6 @@ function enviarEncomenda(botao){
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<fieldset>
 			<legend>::: Pedidos de Revenda para Empacotamento :::</legend>
-			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
-			<div class="input" style="width: 15%">
-				<input type="text" id="dataInicial" name="dataInicial" value="${dataInicial}" maxlength="10" class="pesquisavel" />
-			</div>
-
-			<div class="label obrigatorio" style="width: 10%">Data Final:</div>
-			<div class="input" style="width: 15%">
-				<input type="text" id="dataFinal" name="dataFinal"
-					value="${dataFinal}" maxlength="100" class="pesquisavel" />
-			</div>
 			<div class="label" style="width: 30%">Cliente:</div>
 			<div class="input" style="width: 50%">
 				<input type="text" id="nomeFantasia" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" style="width: 40%"/>
@@ -111,17 +128,21 @@ function enviarEncomenda(botao){
 	</form>
 	
 	<c:if test="${not empty relatorio}">
+		<div class="bloco_botoes">
+			<input type="button" id="botaoEmpacotamentarPedidos" title="Empacotar Pedidos" value="" class="botaoInserir"/>
+		</div>
 		<table class="listrada">
 			<caption>${relatorio.titulo}</caption>
 			<thead>
 				<tr>
 					<th style="width: 10%">Num. Pedido</th>
 					<th style="width: 10%">Dt. Entrega</th>
+					<th style="width: 2%">Empc.</th>
 					<th style="width: 1%">Item</th>
 					<th style="width: 5%">Qtde</th>
 					<th style="width: 43%">Desc. Item</th>
 					<th style="width: 10%">Vendedor</th>
-					<th style="width: 11%">Ação</th>
+					<th style="width: 9%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -131,6 +152,7 @@ function enviarEncomenda(botao){
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.id}</td>
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.propriedades['dataEntrega']}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}"><input type="checkbox" name="idPedido" value="${pedido.id}" onclick="empacotarPedido(this)"/></td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
@@ -141,11 +163,6 @@ function enviarEncomenda(botao){
 									<form action="<c:url value="/empacotamento/pedido/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
-									</form>
-									<form action="<c:url value="/empacotamento/item/inclusao"/>" method="post" >
-										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
-										<input type="button" value="" title="Incluir o Item no Pacote" 
-										onclick="empacotarItem(this);" class="botaoAdicionar_16" />
 									</form>
 									<form action="<c:url value="/empacotamento/item/reencomenda"/>"
 											method="post">

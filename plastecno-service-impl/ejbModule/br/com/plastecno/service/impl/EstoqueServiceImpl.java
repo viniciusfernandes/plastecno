@@ -166,13 +166,15 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void empacotarItemPedido(Integer idItemPedido) {
-		itemReservadoDAO.removerByIdItemPedido(idItemPedido);
-		pedidoService.alterarQuantidadeReservadaByIdItemPedido(idItemPedido);
-		Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
-		if (!contemItemPedidoReservado(idPedido)) {
-			Pedido pedido = pedidoService.pesquisarPedidoById(idPedido);
-			pedido.setSituacaoPedido(SituacaoPedido.EMPACOTADO);
+	public void empacotarPedido(List<Integer> listaIdPedido) {
+		if (listaIdPedido == null || listaIdPedido.isEmpty()) {
+			return;
+		}
+
+		for (Integer idPedido : listaIdPedido) {
+			if (!contemItemPedidoReservado(idPedido)) {
+				pedidoService.alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.EMPACOTADO);
+			}
 		}
 	}
 

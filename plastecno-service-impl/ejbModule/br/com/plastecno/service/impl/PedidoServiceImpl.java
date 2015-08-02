@@ -1158,12 +1158,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public List<ItemPedido> pesquisarRevendaEmpacotamento() {
-		return pesquisarRevendaEmpacotamento(null, null);
+		return pesquisarRevendaEmpacotamento(null);
 	}
 
 	@Override
-	public List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente, Periodo periodo) {
-		return itemPedidoDAO.pesquisarItemPedidoEmpacotamento(idCliente, periodo.getInicio(), periodo.getFim());
+	public List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente) {
+		return itemPedidoDAO.pesquisarItemPedidoEmpacotamento(idCliente, null, null);
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public interface EstoqueService {
 
 	void devolverItemCompradoEstoqueByIdPedido(Integer idPedido) throws BusinessException;
 
-	void empacotarItemPedido(Integer idItemPedido);
+	void empacotarPedido(List<Integer> listaIdPedido);
 
 	Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 

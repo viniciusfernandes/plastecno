@@ -47,10 +47,10 @@ $(document).ready(function() {
 			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja EMPACOTAR ESSE(S) PEDIDO(S)?',
 			confirmar: function(){
 				var parametros = $('#formPesquisa').serialize();
-				for (var i = 0; i < listaIdItem.length; i++) {
+				for (var i = 0; i < listaIdPedido.length; i++) {
 					// Estamos validando aqui pois no DELETE dos itens da lista o javascript mantem undefined.
-					if(listaIdItem[i] != undefined){
-						parametros+='&listaIdPedido='+listaIdItem[i];
+					if(listaIdPedido[i] != undefined){
+						parametros+='&listaIdPedido='+listaIdPedido[i];
 					}
 				};
 				var action = '<c:url value="/empacotamento/itens/inclusao"/>'+'?'+parametros;

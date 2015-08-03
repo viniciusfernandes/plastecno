@@ -57,9 +57,15 @@ public class EmpacotamentoRevendaController extends AbstractController {
 
     @Post("empacotamento/itens/inclusao")
     public void empacotarItem(List<Integer> listaIdPedido, Date dataInicial, Date dataFinal, Cliente cliente) {
-        estoqueService.empacotarPedido(listaIdPedido);
-        gerarMensagemSucesso("Pedido(s) No. " + Arrays.deepToString(listaIdPedido.toArray())
-                + "empacotado(s) com sucesso");
+        if (listaIdPedido != null) {
+            estoqueService.empacotarPedido(listaIdPedido);
+            gerarMensagemSucesso("Pedido(s) No. " + Arrays.deepToString(listaIdPedido.toArray())
+                    + " empacotado(s) com sucesso");
+
+        } else {
+            gerarMensagemAlerta("Não há pedidos selecionados para serem empacotados. Selecione algum item novamente.");
+
+        }
         pesquisarRevendaEmpacotamento(cliente);
     }
 

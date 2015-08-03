@@ -171,9 +171,18 @@ public class EstoqueServiceImpl implements EstoqueService {
 			return;
 		}
 
+		List<Integer> listaIdItemPedido = null;
 		for (Integer idPedido : listaIdPedido) {
-			if (!contemItemPedidoReservado(idPedido)) {
-				pedidoService.alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.EMPACOTADO);
+			listaIdItemPedido = pedidoService.pesquisarIdItemPedidoByIdPedido(idPedido);
+
+			for (Integer idItemPedido : listaIdItemPedido) {
+
+				itemReservadoDAO.removerByIdItemPedido(idItemPedido);
+				pedidoService.alterarQuantidadeReservadaByIdItemPedido(idItemPedido);
+
+				if (!contemItemPedidoReservado(idPedido)) {
+					pedidoService.alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.EMPACOTADO);
+				}
 			}
 		}
 	}

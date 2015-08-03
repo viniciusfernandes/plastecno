@@ -865,6 +865,15 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido) {
+		if (idPedido == null) {
+			return new ArrayList<Integer>(1);
+		}
+		return itemPedidoDAO.pesquisarIdItemPedidoByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoAguardandoCompra() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
 	}

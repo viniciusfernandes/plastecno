@@ -7,6 +7,7 @@ $(document).ready(function() {
 	inserirMascaraMonetaria('bloco_limite_minimo #comprimento', 8);
 	inserirMascaraMonetaria('bloco_limite_minimo #medidaExterna', 8);
 	inserirMascaraMonetaria('bloco_limite_minimo #medidaInterna', 8);
+	inserirMascaraNumerica('bloco_limite_minimo #taxaMinima', '99');
 	
 	$('#botaoLimparLimite').click(function () {
 		$('#bloco_limite_minimo input').val('');
@@ -70,6 +71,10 @@ function habilitarCamposEdicaoItem(habilitado){
 	<div class="input" style="width: 30%">
 		<input type="text" id="comprimento" name="limite.comprimento"
 			value="${limite.comprimento}" maxlength="11" style="width: 30%" />
+	</div>
+	<div class="label">Taxa Mín.(%):</div>
+	<div class="input" style="width: 7%">
+		<input type="text" id="taxaMinima" name="limite.taxaMinima" value="${limite.taxaMinima}"/>
 	</div>
 	
 	<div class="bloco_botoes">

@@ -24,6 +24,7 @@ public class ItemPedidoJson {
     private final String aliquotaICMS;
     private final String aliquotaIPI;
     private final String descricaoItemPedido;
+    private final String precoSugerido;
 
     public ItemPedidoJson(ItemPedido itemPedido) {
         id = itemPedido.getId();
@@ -46,11 +47,12 @@ public class ItemPedidoJson {
         vendaKilo = itemPedido.isVendaKilo();
         valorPedido = itemPedido.getPedido() != null && itemPedido.getPedido().getValorPedido() != null ? itemPedido
                 .getPedido().getValorPedidoFormatado() : "";
-        valorPedidoIPI = itemPedido.getPedido() != null && itemPedido.getPedido().getValorPedidoIPI() != null
-                ? itemPedido.getPedido().getValorPedidoIPIFormatado() : "";
+        valorPedidoIPI = itemPedido.getPedido() != null && itemPedido.getPedido().getValorPedidoIPI() != null ? itemPedido
+                .getPedido().getValorPedidoIPIFormatado() : "";
         descricaoItemPedido = itemPedido.getDescricao();
         aliquotaICMS = itemPedido.getAliquotaICMSFormatado();
         aliquotaIPI = itemPedido.getAliquotaIPIFormatado();
+        precoSugerido = itemPedido.getPrecoSugeridoFormatado();
     }
 
     public String getAliquotaICMS() {
@@ -95,6 +97,10 @@ public class ItemPedidoJson {
 
     public String getPrecoItem() {
         return precoItem;
+    }
+
+    public String getPrecoSugerido() {
+        return precoSugerido;
     }
 
     public String getPrecoUnidade() {

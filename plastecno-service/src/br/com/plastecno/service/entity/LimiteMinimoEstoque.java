@@ -52,6 +52,10 @@ public class LimiteMinimoEstoque {
 	@Column(name = "medida_externa")
 	private Double medidaExterna;
 
+	@Column(name = "taxa_minima")
+	@InformacaoValidavel(positivo = true, nomeExibicao = "Taxa mínima de venda")
+	private Double taxaMinima;
+
 	@Transient
 	private String medidaExternaFomatada;
 
@@ -64,6 +68,13 @@ public class LimiteMinimoEstoque {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = true, nomeExibicao = "Quantidade do limite minimo")
 	@Column(name = "quantidade_minima")
 	private Integer quantidadeMinima;
+
+	public LimiteMinimoEstoque() {
+	}
+
+	public LimiteMinimoEstoque(Integer id) {
+		this.id = id;
+	}
 
 	public void addItemEstoque(ItemEstoque itemEstoque) {
 		if (listaItemEstoque == null) {
@@ -149,6 +160,10 @@ public class LimiteMinimoEstoque {
 		return quantidadeMinima;
 	}
 
+	public Double getTaxaMinima() {
+		return taxaMinima;
+	}
+
 	public void setComprimento(Double comprimento) {
 		this.comprimento = comprimento;
 	}
@@ -191,5 +206,9 @@ public class LimiteMinimoEstoque {
 
 	public void setQuantidadeMinima(Integer quantidadeMinima) {
 		this.quantidadeMinima = quantidadeMinima;
+	}
+
+	public void setTaxaMinima(Double taxaMinima) {
+		this.taxaMinima = taxaMinima;
 	}
 }

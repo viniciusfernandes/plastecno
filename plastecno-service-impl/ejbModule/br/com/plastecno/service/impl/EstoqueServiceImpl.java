@@ -94,6 +94,34 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * filtro.getQuantidade() * (1 + aliquotaIPI);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double calcularPrecoSugeridoItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
+		// Temos que pesquisar o ID pois o usuario pode estar inserindo um item novo
+		// e ele pode nao existir no estoque ainda.
+		Integer idItemEstoque = pesquisarIdItemEstoque(itemEstoque);
+		if (itemEstoque == null) {
+			return null;
+		}
+
+		Object[] valores = itemEstoqueDAO.pesquisarTaxaMininaEValorMedioItemEstoque(idItemEstoque);
+		Double taxaMinima = (Double) valores[0];
+		Double precoMedio = (Double) valores[1];
+
+		if (taxaMinima == null) {
+			return precoMedio;
+		}
+
+		FormaMaterial formaMaterial = itemEstoqueDAO.pesquisarFormaMaterialItemEstoque(idItemEstoque);
+		if (formaMaterial == null) {
+			throw new BusinessException(
+					"Não foi possível cálcular o preco sugerido para o item de estoque pois ele não tem forma de material associada");
+		}
+		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
+		// estoque.
+		return precoMedio * (1 + formaMaterial.getIpi()) * (1 + taxaMinima);
+	}
+
 	private void calcularValorMedio(ItemEstoque itemCadastrado, ItemEstoque itemIncluido) {
 		removerValoresNulos(itemCadastrado);
 		removerValoresNulos(itemIncluido);
@@ -308,6 +336,19 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return itemEstoqueDAO.pesquisarEscassezItemEstoque();
 	}
 
+	public Integer pesquisarIdItemEstoque(Item filtro) {
+		ItemEstoque itemCadastrado = null;
+		if (filtro.isPeca()) {
+			itemCadastrado = itemEstoqueDAO.pesquisarPecaByDescricao(filtro.getMaterial().getId(), filtro.getDescricaoPeca(),
+					true);
+		} else {
+			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(tolerancia, filtro.getMaterial().getId(),
+					filtro.getFormaMaterial(), filtro.getMedidaExterna(), filtro.getMedidaInterna(), filtro.getComprimento(),
+					true);
+		}
+		return itemCadastrado == null ? null : itemCadastrado.getId();
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemEstoque pesquisarItemEstoque(Item filtro) {
@@ -316,10 +357,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 		// criar um novo.
 		ItemEstoque itemCadastrado = null;
 		if (filtro.isPeca()) {
-			itemCadastrado = itemEstoqueDAO.pesquisarPecaByDescricao(filtro.getMaterial().getId(), filtro.getDescricaoPeca());
+			itemCadastrado = itemEstoqueDAO.pesquisarPecaByDescricao(filtro.getMaterial().getId(), filtro.getDescricaoPeca(),
+					false);
 		} else {
 			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(tolerancia, filtro.getMaterial().getId(),
-					filtro.getFormaMaterial(), filtro.getMedidaExterna(), filtro.getMedidaInterna(), filtro.getComprimento());
+					filtro.getFormaMaterial(), filtro.getMedidaExterna(), filtro.getMedidaInterna(), filtro.getComprimento(),
+					false);
 		}
 		return itemCadastrado;
 	}

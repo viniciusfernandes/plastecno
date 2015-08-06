@@ -462,7 +462,6 @@ public class PedidoController extends AbstractController {
             this.gerarRetornoErroAjax("Falha na pesquisa do item de pedido " + id
                     + ". Item do pedido não encontrado no sistema.");
         }
-
     }
 
     @Get("pedido/material")

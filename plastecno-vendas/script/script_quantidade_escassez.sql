@@ -15,3 +15,5 @@ create sequence vendas.seq_limite_minimo_estoque_id increment by 1 minvalue 1 no
 
 alter table vendas.tb_item_estoque add id_limite_minimo_estoque integer default null;
 alter table vendas.tb_item_estoque add constraint id_limite_minimo_estoque foreign key (id_limite_minimo_estoque) references vendas.tb_item_estoque (id);
+
+alter table vendas.tb_limite_minimo_estoque add taxa_minima numeric(2,2) default 0;

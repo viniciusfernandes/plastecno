@@ -13,7 +13,6 @@ import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
 
 public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
-
 	public ItemEstoqueDAO(EntityManager entityManager) {
 		super(entityManager);
 	}
@@ -28,95 +27,14 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 				ItemEstoque.class).getResultList();
 	}
 
+	public FormaMaterial pesquisarFormaMaterialItemEstoque(Integer idItemEstoque) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.formaMaterial from ItemEstoque i where i.id = :idItemEstoque")
+						.setParameter("idItemEstoque", idItemEstoque), FormaMaterial.class, null);
+	}
+
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca) {
 		return pesquisarItemEstoque(idMaterial, formaMaterial, descricaoPeca, true);
-	}
-
-	public ItemEstoque pesquisarItemEstoqueByMedida(double tolerancia, Integer idMaterial, FormaMaterial formaMaterial,
-			Double medidaExterna, Double medidaInterna, Double comprimento) {
-
-		boolean conteMedida = medidaExterna != null || medidaInterna != null || comprimento != null;
-		boolean conteMaterial = idMaterial != null || formaMaterial != null;
-
-		// Pois sao parametros que todo item deve conter
-		if (!conteMaterial || !conteMedida) {
-			return null;
-		}
-
-		StringBuilder select = new StringBuilder();
-		select
-				.append("select i from ItemEstoque i where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
-
-		if (medidaExterna != null) {
-			select.append("and ABS(i.medidaExterna - :medidaExterna) <= :tolerancia ");
-		} else {
-			select.append("and i.medidaExterna is null ");
-		}
-
-		if (medidaInterna != null) {
-			select.append("and ABS(i.medidaInterna - :medidaInterna) <= :tolerancia ");
-		} else {
-			select.append("and i.medidaInterna is null ");
-		}
-
-		if (comprimento != null) {
-			select.append("and ABS(i.comprimento - :comprimento) <= :tolerancia ");
-		} else {
-			select.append("and i.comprimento is null ");
-		}
-
-		// A ordenacao desses tipos deve ser diferentes mesmo
-		if (FormaMaterial.CH.equals(formaMaterial) || FormaMaterial.TB.equals(formaMaterial)) {
-			select
-					.append("order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
-		} else {
-			select
-					.append("order by i.formaMaterial, i.material.sigla, i.medidaInterna asc, i.medidaExterna asc, i.comprimento asc ");
-		}
-
-		TypedQuery<ItemEstoque> query = entityManager.createQuery(select.toString(), ItemEstoque.class)
-				.setParameter("tolerancia", tolerancia).setParameter("idMaterial", idMaterial)
-				.setParameter("formaMaterial", formaMaterial);
-
-		if (medidaExterna != null) {
-			query.setParameter("medidaExterna", medidaExterna);
-		}
-		if (medidaInterna != null) {
-			query.setParameter("medidaInterna", medidaInterna);
-		}
-		if (comprimento != null) {
-			query.setParameter("comprimento", comprimento);
-		}
-
-		List<ItemEstoque> l = query.getResultList();
-		return recuperarItemNaoZerado(l);
-	}
-
-	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca) {
-		if (StringUtils.isEmpty(descricaoPeca) || idMaterial == null) {
-			return null;
-		}
-		TypedQuery<ItemEstoque> query = entityManager
-				.createQuery(
-						"select i from ItemEstoque i where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial and i.descricaoPeca = :descricaoPeca",
-						ItemEstoque.class);
-		List<ItemEstoque> l = query.setParameter("formaMaterial", FormaMaterial.PC).setParameter("idMaterial", idMaterial)
-				.setParameter("descricaoPeca", descricaoPeca).getResultList();
-
-		return recuperarItemNaoZerado(l);
-	}
-
-	@WARNING(data = "08/07/2015", descricao = "Esse metodo foi criado pois no banco de dados foram incluido elementos com duplicidade, alguns zerado ou nao, entao vamos retornar o primeiro com quantidade")
-	private ItemEstoque recuperarItemNaoZerado(List<ItemEstoque> listaItem) {
-		if (listaItem == null || listaItem.size() == 0) {
-			return null;
-		}
-		for (ItemEstoque itemEstoque : listaItem) {
-			if (itemEstoque.getQuantidade() > 0) {
-				return itemEstoque;
-			}
-		}
-		return listaItem.get(0);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -171,6 +89,99 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return query.getResultList();
 	}
 
+	public ItemEstoque pesquisarItemEstoqueByMedida(double tolerancia, Integer idMaterial, FormaMaterial formaMaterial,
+			Double medidaExterna, Double medidaInterna, Double comprimento, boolean apenasID) {
+
+		boolean conteMedida = medidaExterna != null || medidaInterna != null || comprimento != null;
+		boolean conteMaterial = idMaterial != null || formaMaterial != null;
+
+		// Pois sao parametros que todo item deve conter
+		if (!conteMaterial || !conteMedida) {
+			return null;
+		}
+
+		StringBuilder select = new StringBuilder();
+		if (apenasID) {
+			select.append("select new ItemEstoque(i.id) ");
+		} else {
+			select.append("select i ");
+		}
+
+		select.append("from ItemEstoque i where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
+
+		if (medidaExterna != null) {
+			select.append("and ABS(i.medidaExterna - :medidaExterna) <= :tolerancia ");
+		} else {
+			select.append("and i.medidaExterna is null ");
+		}
+
+		if (medidaInterna != null) {
+			select.append("and ABS(i.medidaInterna - :medidaInterna) <= :tolerancia ");
+		} else {
+			select.append("and i.medidaInterna is null ");
+		}
+
+		if (comprimento != null) {
+			select.append("and ABS(i.comprimento - :comprimento) <= :tolerancia ");
+		} else {
+			select.append("and i.comprimento is null ");
+		}
+
+		// A ordenacao desses tipos deve ser diferentes mesmo
+		if (FormaMaterial.CH.equals(formaMaterial) || FormaMaterial.TB.equals(formaMaterial)) {
+			select
+					.append("order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
+		} else {
+			select
+					.append("order by i.formaMaterial, i.material.sigla, i.medidaInterna asc, i.medidaExterna asc, i.comprimento asc ");
+		}
+
+		TypedQuery<ItemEstoque> query = entityManager.createQuery(select.toString(), ItemEstoque.class)
+				.setParameter("tolerancia", tolerancia).setParameter("idMaterial", idMaterial)
+				.setParameter("formaMaterial", formaMaterial);
+
+		if (medidaExterna != null) {
+			query.setParameter("medidaExterna", medidaExterna);
+		}
+		if (medidaInterna != null) {
+			query.setParameter("medidaInterna", medidaInterna);
+		}
+		if (comprimento != null) {
+			query.setParameter("comprimento", comprimento);
+		}
+
+		List<ItemEstoque> l = query.getResultList();
+		return recuperarItemNaoZerado(l);
+	}
+
+	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {
+		if (StringUtils.isEmpty(descricaoPeca) || idMaterial == null) {
+			return null;
+		}
+		StringBuilder select = new StringBuilder();
+		if (apenasID) {
+			select.append("select new ItemEstoque(i.id) ");
+		} else {
+			select.append("select i ");
+		}
+		select
+				.append("from ItemEstoque i where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial and i.descricaoPeca = :descricaoPeca");
+		TypedQuery<ItemEstoque> query = entityManager.createQuery(select.toString(), ItemEstoque.class);
+		List<ItemEstoque> l = query.setParameter("formaMaterial", FormaMaterial.PC).setParameter("idMaterial", idMaterial)
+				.setParameter("descricaoPeca", descricaoPeca).getResultList();
+
+		return recuperarItemNaoZerado(l);
+	}
+
+	public Object[] pesquisarTaxaMininaEValorMedioItemEstoque(Integer idItemEstoque) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select l.taxaMinima, i.precoMedio from LimiteMinimoEstoque l inner join l.listaItemEstoque i where i.id= :idItemEstoque")
+								.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null });
+	}
+
 	public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		StringBuilder select = new StringBuilder();
 		select.append("select SUM(i.precoMedio * i.quantidade) from ItemEstoque i ");
@@ -195,6 +206,19 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			query.setParameter("formaMaterial", formaMaterial);
 		}
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+	}
+
+	@WARNING(data = "08/07/2015", descricao = "Esse metodo foi criado pois no banco de dados foram incluido elementos com duplicidade, alguns zerado ou nao, entao vamos retornar o primeiro com quantidade")
+	private ItemEstoque recuperarItemNaoZerado(List<ItemEstoque> listaItem) {
+		if (listaItem == null || listaItem.size() == 0) {
+			return null;
+		}
+		for (ItemEstoque itemEstoque : listaItem) {
+			if (itemEstoque.getQuantidade() > 0) {
+				return itemEstoque;
+			}
+		}
+		return listaItem.get(0);
 	}
 
 }

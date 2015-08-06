@@ -33,6 +33,20 @@ public class EstoqueController extends AbstractController {
         super(result, usuarioInfo);
     }
 
+    @Get("estoque/item/precosugerido")
+    public void calcularPrecoSugeridoItemEstoque(ItemEstoque itemEstoque) {
+        try {
+            Double precoSugerido = estoqueService.calcularPrecoSugeridoItemEstoque(itemEstoque);
+            String precoSugeridoFormatado = precoSugerido == null ? "" : NumeroUtils
+                    .formatarValorMonetario(precoSugerido);
+            serializarJson(new SerializacaoJson("precoSugerido", precoSugeridoFormatado));
+        } catch (BusinessException e) {
+            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
+        } catch (Exception e) {
+            gerarLogErroRequestAjax("cálculo do preço sugerido do item do pedido", e);
+        }
+    }
+
     @Get("estoque")
     public void estoqueHome() {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
@@ -65,6 +79,7 @@ public class EstoqueController extends AbstractController {
     @Post("estoque/limiteminimo/inclusao")
     public void inserirLimiteMinimo(LimiteMinimoEstoque limite) {
         try {
+            limite.setTaxaMinima(NumeroUtils.gerarAliquota(limite.getTaxaMinima()));
             Integer idLImite = estoqueService.associarLimiteMinimoEstoque(limite);
             StringBuilder mensagem = new StringBuilder("Limite mínimo de estoque de quantidade \"")
                     .append(limite.getQuantidadeMinima()).append("\" ").append(limite.getDescricao());

@@ -1,4 +1,36 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<script type="text/javascript">
+
+$(document).ready(function(){
+	$('#medidaExterna, #medidaInterna, #comprimento').blur(function (){
+		var parametro = 'itemEstoque.material.id='+$('#bloco_item_pedido #idMaterial').val();
+		parametro += '&itemEstoque.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
+		parametro += '&itemEstoque.medidaExterna='+$('#bloco_item_pedido #medidaExterna').val();
+		parametro += '&itemEstoque.medidaInterna='+$('#bloco_item_pedido #medidaInterna').val();
+		parametro += '&itemEstoque.comprimento='+$('#bloco_item_pedido #comprimento').val();
+		
+		var request = $.ajax({
+			type: 'get',
+			url: '<c:url value="/estoque/item/precosugerido"/>',
+			data: parametro 
+		});
+		
+		request.done(function (response){
+			$('#bloco_item_pedido #precoSugerido').val(response.precoSugerido);
+			alert(response.precoSugerido);
+		});
+		
+		request.fail(function(request, status, excecao) {
+			var mensagem = 'Falha no calculo do preco de venda sugerido: '+ idCampoPesquisavel;
+			mensagem += ' para a URL ' + url;
+			mensagem += ' contendo o valor de requisicao ' + parametro;
+			mensagem += ' => Excecao: ' + excecao;
+			gerarListaMensagemErro(new Array(mensagem));
+		});
+	});
+});
+
+</script>
 <fieldset id="bloco_item_pedido">
 	<legend>::: Itens do Pedido de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 
@@ -64,6 +96,10 @@
 	<div class="input" style="width: 30%">
 		<input type="text" id="comprimento" name="itemPedido.comprimento"
 			maxlength="11" style="width: 30%" />
+	</div>
+	<div class="label">Preço Sugerido:</div>
+	<div class="input" style="width: 70%">
+		<input type="text" id="precoSugerido" name="itemPedido.precoSugerido" maxlength="8" style="width: 7%" disabled="disabled"/>
 	</div>
 	<div class="label">Preço:</div>
 	<div class="input" style="width: 5%">

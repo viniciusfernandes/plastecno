@@ -19,6 +19,8 @@ public interface EstoqueService {
 
 	double calcularPrecoCustoItemEstoque(Item filtro);
 
+	Double calcularPrecoSugeridoItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
+
 	void cancelarReservaEstoqueByIdPedido(Integer idPedido) throws BusinessException;
 
 	boolean contemItemPedidoReservado(Integer idPedido);

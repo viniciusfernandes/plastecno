@@ -144,6 +144,9 @@ public class ItemPedido extends Item {
 	@Transient
 	private String valorComissionadoFormatado;
 
+	@Transient
+	private String precoSugeridoFormatado;
+
 	public ItemPedido() {
 	}
 
@@ -294,6 +297,10 @@ public class ItemPedido extends Item {
 
 	public String getPrecoCustoItemFormatado() {
 		return precoCustoItemFormatado;
+	}
+
+	public String getPrecoSugeridoFormatado() {
+		return precoSugeridoFormatado;
 	}
 
 	public Double getPrecoUnidade() {
@@ -458,6 +465,10 @@ public class ItemPedido extends Item {
 
 	public void setPrecoCustoItemFormatado(String precoCustoFormatado) {
 		this.precoCustoItemFormatado = precoCustoFormatado;
+	}
+
+	public void setPrecoSugeridoFormatado(String precoSugeridoFormatado) {
+		this.precoSugeridoFormatado = precoSugeridoFormatado;
 	}
 
 	public void setPrecoUnidade(Double precoUnidade) {

@@ -2,7 +2,12 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
-	$('#medidaExterna, #medidaInterna, #comprimento').blur(function (){
+	$('#precoVenda').focus(function (){
+		
+		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
+			return;			
+		}
+		
 		var parametro = 'itemEstoque.material.id='+$('#bloco_item_pedido #idMaterial').val();
 		parametro += '&itemEstoque.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
 		parametro += '&itemEstoque.medidaExterna='+$('#bloco_item_pedido #medidaExterna').val();
@@ -17,7 +22,6 @@ $(document).ready(function(){
 		
 		request.done(function (response){
 			$('#bloco_item_pedido #precoSugerido').val(response.precoSugerido);
-			alert(response.precoSugerido);
 		});
 		
 		request.fail(function(request, status, excecao) {

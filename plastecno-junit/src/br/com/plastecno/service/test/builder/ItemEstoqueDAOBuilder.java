@@ -28,7 +28,7 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca) {
+			public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {
 				if (StringUtils.isEmpty(descricaoPeca) || idMaterial == null) {
 					return null;
 				}
@@ -48,7 +48,7 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 
 			@Mock
 			public ItemEstoque pesquisarItemEstoqueByMedida(double tolerancia, Integer idMaterial,
-					FormaMaterial formaMaterial, Double medidaExterna, Double medidaInterna, Double comprimento) {
+					FormaMaterial formaMaterial, Double medidaExterna, Double medidaInterna, Double comprimento, boolean apenasID) {
 
 				boolean conteMedida = medidaExterna != null || medidaInterna != null || comprimento != null;
 				boolean conteMaterial = idMaterial != null || formaMaterial != null;

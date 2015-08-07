@@ -15,6 +15,7 @@ import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.SerializacaoJson;
@@ -54,6 +55,16 @@ public class EstoqueController extends AbstractController {
         verificarPermissaoAcesso("acessoManutencaoEstoquePermitido", TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.MANUTENCAO_ESTOQUE);
         verificarPermissaoAcesso("acessoValorEstoquePermitido", TipoAcesso.ADMINISTRACAO);
+    }
+
+    private void gerarRelatorioItemEstoque(List<ItemEstoque> lista) {
+        RelatorioWrapper<String, ItemEstoque> relatorio = new RelatorioWrapper<String, ItemEstoque>(
+                "Relatório de itens do estoque");
+        for (ItemEstoque item : lista) {
+            formatarItemEstoque(item);
+            relatorio.addGrupo(item.getDescricaoMaterial(), item);
+        }
+        addAtributo("relatorio", relatorio);
     }
 
     @Post("estoque/item/inclusao")
@@ -114,12 +125,13 @@ public class EstoqueController extends AbstractController {
             final Integer idMaterial = material != null ? material.getId() : null;
             List<ItemEstoque> lista = null;
             if (isListagemEscassez) {
-                lista = estoqueService.pesquisarEscassezItemEstoque();
+                lista = estoqueService.pesquisarItemEstoqueEscasso();
             } else {
-                lista = estoqueService.pesquisarItemEstoqueNaoZerados(idMaterial, formaMaterial);
+                lista = estoqueService.pesquisarItemEstoque(idMaterial, formaMaterial);
             }
-            formatarItemEstoque(lista);
 
+            gerarRelatorioItemEstoque(lista);
+            
             addAtributo("formaSelecionada", formaMaterial);
             addAtributo("listaItemEstoque", lista);
             addAtributo("material", material);

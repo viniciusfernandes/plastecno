@@ -100,7 +100,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		// Temos que pesquisar o ID pois o usuario pode estar inserindo um item novo
 		// e ele pode nao existir no estoque ainda.
 		Integer idItemEstoque = pesquisarIdItemEstoque(itemEstoque);
-		if (itemEstoque == null) {
+		if (idItemEstoque == null) {
 			return null;
 		}
 
@@ -331,11 +331,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return limite.getId();
 	}
 
-	@Override
-	public List<ItemEstoque> pesquisarEscassezItemEstoque() {
-		return itemEstoqueDAO.pesquisarEscassezItemEstoque();
-	}
-
 	public Integer pesquisarIdItemEstoque(Item filtro) {
 		ItemEstoque itemCadastrado = null;
 		if (filtro.isPeca()) {
@@ -347,6 +342,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 					true);
 		}
 		return itemCadastrado == null ? null : itemCadastrado.getId();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null, true);
 	}
 
 	@Override
@@ -374,9 +375,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemEstoque> pesquisarItemEstoqueNaoZerados(Integer idMaterial, FormaMaterial formaMaterial) {
-		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null, true);
+	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
+		return itemEstoqueDAO.pesquisarItemEstoqueEscasso();
 	}
 
 	@SuppressWarnings("unchecked")

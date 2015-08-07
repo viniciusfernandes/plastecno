@@ -33,13 +33,13 @@ public interface EstoqueService {
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
-	List<ItemEstoque> pesquisarEscassezItemEstoque();
+	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
 	ItemEstoque pesquisarItemEstoque(Item filtro);
 
 	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);
 
-	List<ItemEstoque> pesquisarItemEstoqueNaoZerados(Integer idMaterial, FormaMaterial formaMaterial);
+	List<ItemEstoque> pesquisarItemEstoqueEscasso();
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
 

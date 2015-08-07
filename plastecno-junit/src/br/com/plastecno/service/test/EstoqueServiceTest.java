@@ -319,7 +319,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		List<ItemEstoque> listaItemEscasso = estoqueService.pesquisarEscassezItemEstoque();
+		List<ItemEstoque> listaItemEscasso = estoqueService.pesquisarItemEstoqueEscasso();
 		assertEquals(
 				"Foram incluidos 3 itens no estoque com quantidades abaixo do limite mas apenas o primeiro foi associado ao limite",
 				1, listaItemEscasso.size());
@@ -341,7 +341,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		listaItemEscasso = estoqueService.pesquisarEscassezItemEstoque();
+		listaItemEscasso = estoqueService.pesquisarItemEstoqueEscasso();
 		assertEquals(
 				"Foi incluido mais um item no estoque com quantidades abaixo do limite agora devemos ter apenas 2 item escassos",
 				2, listaItemEscasso.size());

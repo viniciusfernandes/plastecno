@@ -215,21 +215,37 @@ function inicializarFiltro() {
 			<table class="listrada">
 				<thead>
 					<tr>
+						<th style="width: 20%">Material</th>
 						<th style="width: 10%">Qtde.</th>
-						<th style="width: 70%">Descrição</th>
+						<th style="width: 10%">Med. Externa</th>
+						<th style="width: 10%">Med. Interna</th>
+						<th style="width: 10%">Comprimento</th>
 						<th style="width: 10%">Valor Unid. (R$)</th>
 						<th style="width: 5%">Ações</th>
 					</tr>
 				</thead>
 
 				<tbody>
-					<c:forEach var="item" items="${listaItemEstoque}">
+				
+				<c:forEach items="${relatorio.listaGrupo}" var="material" varStatus="iGrupo">
+					<c:forEach items="${material.listaElemento}" var="item" varStatus="iElemento">
 						<tr>
-							
-							<td>${item.quantidade}</td>
-							<td>${item.descricao}</td>
-							<td>${item.precoMedioFormatado}</td>
-							<td>
+							<c:if test="${iElemento.count le 1}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${material.totalElemento}">${material.id}</td>
+							</c:if>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
+							<c:choose>
+								<c:when test="${item.peca}">
+									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" colspan="3">${item.descricaoPeca}</td>
+								</c:when>
+								<c:otherwise>
+									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.medidaExterna}</td>
+									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.medidaInterna}</td>
+									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.comprimento}</td>
+								</c:otherwise>
+							</c:choose>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMedio}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<c:if test="${acessoManutencaoEstoquePermitido}">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/estoque/item/${item.id}"/>" method="get">
@@ -241,8 +257,9 @@ function inicializarFiltro() {
 								</c:if>
 							</td>
 						</tr>
-
 					</c:forEach>
+				</c:forEach>
+				
 				</tbody>
 
 			</table>

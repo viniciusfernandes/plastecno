@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.EJB;
-import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 
 import br.com.plastecno.service.ItemAguardandoEmpacotamentoMonitor;
@@ -28,7 +27,7 @@ public class ItemAguardandoEmpacotamentoMonitorImpl implements ItemAguardandoEmp
 	private PedidoService pedidoService;
 
 	@Override
-	@Schedule(hour = "*/1")
+	// @Schedule(hour = "*/1")
 	public Collection<Integer> monitorarItemPedidoAguardandoCompra() {
 		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoAguardandoCompra();
 		boolean empacotamentoOk = false;
@@ -57,7 +56,7 @@ public class ItemAguardandoEmpacotamentoMonitorImpl implements ItemAguardandoEmp
 		return empacotados;
 	}
 
-	@Schedule(hour = "*/1")
+	// @Schedule(hour = "*/1")
 	public Collection<Integer> monitorarItemPedidoAguardandoMaterial() {
 		List<Integer> listaIdPedido = pedidoService.pesquisarIdPedidoAguardandoMaterial();
 		boolean empacotamentoOk = false;

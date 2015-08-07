@@ -21,7 +21,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return pesquisarById(ItemEstoque.class, idItemEstoque);
 	}
 
-	public List<ItemEstoque> pesquisarEscassezItemEstoque() {
+	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
 		return entityManager.createQuery(
 				"select i from ItemEstoque i inner join i.limiteMinimoEstoque l where i.quantidade <= l.quantidadeMinima",
 				ItemEstoque.class).getResultList();

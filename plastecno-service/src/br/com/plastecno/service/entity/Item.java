@@ -128,6 +128,18 @@ public abstract class Item implements Serializable, Cloneable {
 		return descricao.toString();
 	}
 
+	public String getDescricaoMaterial() {
+
+		StringBuilder descricao = new StringBuilder();
+		if (getMaterial() != null) {
+			descricao.append(getFormaMaterial());
+			descricao.append(" - ");
+			descricao.append(getMaterial().getDescricao());
+		}
+
+		return descricao.toString();
+	}
+
 	public abstract String getDescricaoPeca();
 
 	public abstract FormaMaterial getFormaMaterial();

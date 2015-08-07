@@ -134,7 +134,7 @@ public abstract class Item implements Serializable, Cloneable {
 		if (getMaterial() != null) {
 			descricao.append(getFormaMaterial());
 			descricao.append(" - ");
-			descricao.append(getMaterial().getDescricao());
+			descricao.append(getMaterial().getSigla());
 		}
 
 		return descricao.toString();

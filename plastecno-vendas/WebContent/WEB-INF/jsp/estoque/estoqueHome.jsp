@@ -183,7 +183,7 @@ function inicializarFiltro() {
 			<div class="label condicional" style="width: 30%">Material:</div>
 			<div class="input" style="width: 60%">
 				<input type="hidden" id="idMaterial" name="material.id" value="${material.id}"/>
-				<input type="text" id="material" name="material.descricao" value="${material.descricao}" style="width: 60%" />
+				<input type="text" id="material" name="material.descricao" value="${material.descricaoFormatada}" style="width: 60%" />
 				<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 			</div>
 			<div class="label" style="width: 30%">Valor total em estoque (R$):</div>
@@ -227,11 +227,11 @@ function inicializarFiltro() {
 
 				<tbody>
 				
-				<c:forEach items="${relatorio.listaGrupo}" var="material" varStatus="iGrupo">
-					<c:forEach items="${material.listaElemento}" var="item" varStatus="iElemento">
+				<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iGrupo">
+					<c:forEach items="${grupo.listaElemento}" var="item" varStatus="iElemento">
 						<tr>
 							<c:if test="${iElemento.count le 1}">
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${material.totalElemento}">${material.id}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
 							<c:choose>
@@ -248,10 +248,11 @@ function inicializarFiltro() {
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<c:if test="${acessoManutencaoEstoquePermitido}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/estoque/item/${item.id}"/>" method="get">
+									<form action="<c:url value="/estoque/item/${item.id}"/>" method="post">
+										<!-- Esse dados foram submetidos para manter o estado da tela durante o filtro  -->
 										<input type="hidden" name="material.id" value="${material.id}"/>
 										<input type="hidden" name="formaMaterial" value="${formaSelecionada}"/>
-										<input type="submit" id="botaoEditarCliente" title="Editar Dados do Cliente" value="" class="botaoEditar"/>
+										<input type="submit" title="Editar Item do Estoque" value="" class="botaoEditar"/>
 									</form>
 								</div>
 								</c:if>

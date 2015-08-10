@@ -122,6 +122,7 @@ public class EstoqueController extends AbstractController {
             gerarListaMensagemErro("Escolha o material e/ou forma de material. Não é possível pesquisar o estoque inteiro.");
             addAtributo("permanecerTopo", true);
         } else {
+            material = materialService.pesquisarById(material.getId());
             final Integer idMaterial = material != null ? material.getId() : null;
             List<ItemEstoque> lista = null;
             if (isListagemEscassez) {
@@ -145,7 +146,7 @@ public class EstoqueController extends AbstractController {
         estoqueHome();
     }
 
-    @Get("estoque/item/{idItemEstoque}")
+    @Post("estoque/item/{idItemEstoque}")
     public void pesquisarItemEstoqueById(Integer idItemEstoque, Material material, FormaMaterial formaMaterial) {
         ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
         if (itemEstoque == null) {
@@ -156,7 +157,7 @@ public class EstoqueController extends AbstractController {
         }
         addAtributo("permanecerTopo", true);
         material = materialService.pesquisarById(material.getId());
-        if (material != null && formaMaterial != null) {
+        if (material != null || formaMaterial != null) {
             redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
         } else {
             irTopoPagina();

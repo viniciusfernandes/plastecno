@@ -33,6 +33,8 @@ public interface EstoqueService {
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
+	Integer pesquisarIdItemEstoque(Item filtro);
+
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
 	ItemEstoque pesquisarItemEstoque(Item filtro);
@@ -40,6 +42,10 @@ public interface EstoqueService {
 	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);
 
 	List<ItemEstoque> pesquisarItemEstoqueEscasso();
+
+	LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro);
+
+	LimiteMinimoEstoque pesquisarLimiteMinimoEstoqueById(Integer idLimiteMinimo);
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
 

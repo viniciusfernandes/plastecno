@@ -194,8 +194,8 @@ function inicializarFiltro() {
 			
 		</fieldset>
 		<div class="bloco_botoes">
-			<input type="submit" value="" class="botaoPesquisar" />
-			<input id="botaoEscassezEstoque" type="button" value="" class="botaoPesquisarEstatistica" title="Pesquisar Itens Esgotados Estoque"/>
+			<input type="submit" value="" class="botaoPesquisar" title="Pesquisar Itens Estoque"/>
+			<input id="botaoEscassezEstoque" type="button" value="" class="botaoPesquisarEstatistica" title="Pesquisar Itens Escassos Estoque"/>
 			<c:if test="${acessoValorEstoquePermitido}">
 				<input id="botaoValorEstoque" type="button" value="" class="botaoDinheiro" title="Pesquisar Valor dos Itens no Estoque"/> 
 			</c:if>

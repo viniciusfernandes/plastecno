@@ -14,23 +14,29 @@ $(document).ready(function() {
 		$('#bloco_limite_minimo #formaMaterial').val('');
 		habilitarCamposEdicaoItem(true);
 	});
+	
+	$('#bloco_limite_minimo #botaoPesquisarLimite').click(function () {
+		var parametros = serializarForm('bloco_limite_minimo');
+		$('#formVazioLimite').attr('action', '<c:url value="estoque/limiteminimo"/>?'+parametros).attr('method', 'post').submit();
+	});
+	
+	$('#bloco_limite_minimo #botaoInserirLimite').click(function () {
+		var parametros = serializarForm('bloco_limite_minimo');
+		$('#formVazioLimite').attr('action', '<c:url value="estoque/limiteminimo/inclusao"/>?'+parametros).attr('method', 'post').submit();
+	});
+	
 });
 
-
-function habilitarCamposEdicaoItem(habilitado){
-	habilitar('#bloco_limite_minimo #formaMaterial', habilitado);
-	habilitar('#bloco_limite_minimo #descricao', habilitado);
-	habilitar('#bloco_limite_minimo #material', habilitado);
-	habilitar('#bloco_limite_minimo #medidaExterna', habilitado);
-	habilitar('#bloco_limite_minimo #medidaInterna', habilitado);
-	habilitar('#bloco_limite_minimo #comprimento', habilitado);
-};
 </script>
 
-<form action="estoque/limiteminimo/inclusao" method="post">
+<form id="formVazioLimite">
+</form>
+
+<form id="formPesquisaLimite" action="estoque/limiteminimo/inclusao" method="post">
 <fieldset id="bloco_limite_minimo">
 	<legend>::: Limite Mínimo Item do Estoque :::</legend>
 	<input type="hidden" id="idMaterial" name="limite.material.id" value="${limite.material.id}"/>
+	<input type="hidden" id="idLimite" name="limite.id" value="${limite.id}"/>
 	<c:if test="${not empty itemPedido}">
 		<!-- INCLUI ESSE CAMPO OCULTO COM A FORMA DE MATERIAL POIS A EDICAO DESABILITA O CAMPO E NO SUBMIT TEMOS QUE MANTER A INFORMACAO -->
 		<input type="hidden" id="idFormaMaterial" name="limite.formaMaterial" value="${limite.formaMaterial}"/>
@@ -52,7 +58,7 @@ function habilitarCamposEdicaoItem(habilitado){
 	</div>
 	<div class="label">Material:</div>
 	<div class="input" style="width: 70%">
-		<input type="text" id="material" name="limite.material.descricao" style="width: 50%" value="${limite.material.descricao}"/>
+		<input type="text" id="material" name="limite.material.descricaoFormatada" style="width: 50%" value="${limite.material.descricao}"/>
 		<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 	</div>
 	<div class="label">Med. Ext / Espessura:</div>
@@ -78,7 +84,8 @@ function habilitarCamposEdicaoItem(habilitado){
 	</div>
 	
 	<div class="bloco_botoes">
-		<input type="submit" id="botaoInserirLimite" value="" title="Editar o limite mínimo do estoque" class="botaoInserir"/>
+		<a id="botaoPesquisarLimite" class="botaoPesquisar" title="Pesquisar Limite Mínimo"/></a>
+		<a type="submit" id="botaoInserirLimite" title="Editar o limite mínimo do estoque" class="botaoInserir"></a>
 		<a id="botaoLimparLimite" title="Limpar Dados do Item" class="botaoLimpar"></a>
 	</div>
 

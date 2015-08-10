@@ -68,9 +68,15 @@ public class EstoqueServiceImpl implements EstoqueService {
 			throw new BusinessException("O limite minimo de estoque deve conter alguma medida, mas todas estão em branco");
 		}
 
-		LimiteMinimoEstoque limiteCadastrado = limiteMinimoEstoqueDAO.pesquisarLimiteMinimoEstoque(limite, tolerancia);
+		ValidadorInformacao.validar(limite);
+
+		LimiteMinimoEstoque limiteCadastrado = null;
+
+		limiteCadastrado = pesquisarLimiteMinimoEstoque(limite);
+
 		if (limiteCadastrado != null) {
 			limiteCadastrado.setQuantidadeMinima(limite.getQuantidadeMinima());
+			limiteCadastrado.setTaxaMinima(limite.getTaxaMinima());
 			limite = limiteCadastrado;
 		}
 
@@ -331,6 +337,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return limite.getId();
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer pesquisarIdItemEstoque(Item filtro) {
 		ItemEstoque itemCadastrado = null;
 		if (filtro.isPeca()) {
@@ -377,6 +385,27 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
 		return itemEstoqueDAO.pesquisarItemEstoqueEscasso();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro) {
+		boolean contemMedida = filtro.getMedidaExterna() != null || filtro.getMedidaInterna() != null
+				|| filtro.getComprimento() != null;
+
+		boolean contemMaterial = filtro.getFormaMaterial() != null && filtro.getMaterial() != null
+				&& filtro.getMaterial().getId() != null;
+
+		if (!contemMaterial || !contemMedida) {
+			return null;
+		}
+		return limiteMinimoEstoqueDAO.pesquisarLimiteMinimoEstoque(filtro, tolerancia);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public LimiteMinimoEstoque pesquisarLimiteMinimoEstoqueById(Integer idLimiteMinimo) {
+		return limiteMinimoEstoqueDAO.pesquisarLimiteById(idLimiteMinimo);
 	}
 
 	@SuppressWarnings("unchecked")

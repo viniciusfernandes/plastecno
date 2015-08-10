@@ -132,7 +132,7 @@ public class EstoqueController extends AbstractController {
             }
 
             gerarRelatorioItemEstoque(lista);
-            
+
             addAtributo("formaSelecionada", formaMaterial);
             addAtributo("listaItemEstoque", lista);
             addAtributo("material", material);
@@ -162,6 +162,16 @@ public class EstoqueController extends AbstractController {
         } else {
             irTopoPagina();
         }
+    }
+
+    @Post("estoque/limiteminimo")
+    public void pesquisarLimiteMinimo(LimiteMinimoEstoque limite) {
+        LimiteMinimoEstoque limiteCadastrado = estoqueService.pesquisarLimiteMinimoEstoque(limite);
+        if (limiteCadastrado != null) {
+            limite = limiteCadastrado;
+        }
+        addAtributo("limite", limite);
+        irTopoPagina();
     }
 
     @Get("estoque/material/listagem")

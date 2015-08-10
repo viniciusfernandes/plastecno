@@ -75,6 +75,10 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 		return query.getResultList();
 	}
 
+	public LimiteMinimoEstoque pesquisarLimiteById(Integer id) {
+		return super.pesquisarById(LimiteMinimoEstoque.class, id);
+	}
+
 	public LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro, double tolerancia) {
 		StringBuilder select = new StringBuilder("select l from LimiteMinimoEstoque l where ");
 		select.append("l.formaMaterial = :formaMaterial and l.material = :material ");

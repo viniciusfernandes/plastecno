@@ -40,23 +40,6 @@ import br.com.plastecno.service.test.builder.DAOBuilder;
 
 public class ServiceBuilder {
 
-	@SuppressWarnings("rawtypes")
-	private final static Map<Class<?>, DAOBuilder> mapDAO = new HashMap<Class<?>, DAOBuilder>();
-	/*
-	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
-	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
-	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
-	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
-	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
-	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
-	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
-	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
-	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
-	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
-	 */
-	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
-	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
-
 	@SuppressWarnings("unchecked")
 	public static <T> T buildService(Class<T> classe) {
 		T service = (T) mapTemporarioServices.get(classe);
@@ -81,7 +64,7 @@ public class ServiceBuilder {
 			mapTemporarioServices.put(classe, Class.forName(serviceNameImpl).newInstance());
 		} catch (Exception e1) {
 			throw new IllegalStateException("Nao foi possivel instanciar a implementacao do servico \"" + serviceNameImpl
-					+ "\"");
+					+ "\"", e1);
 		}
 
 		String metodoName = "build" + classe.getSimpleName();
@@ -91,13 +74,6 @@ public class ServiceBuilder {
 			try {
 				method.setAccessible(true);
 				service = (T) method.invoke(SERVICE_BUILDER, (Object[]) null);
-				/*
-				 * REMOVENDO OS OBJETOS EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER
-				 * EXECUTADO PARA CADA TESTE UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS
-				 * IMPLEMENTACOES MOCKADAS DOS METODOS. ELAS VALEM APENAS EM CADA TESTE
-				 * UNITARIO.
-				 */
-				//mapTemporarioServices.remove(classe);
 				return service;
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new TestUtilException("Falha na execucao do metodo de inicializacao do servico \"" + "build"
@@ -113,6 +89,23 @@ public class ServiceBuilder {
 			}
 		}
 	}
+	@SuppressWarnings("rawtypes")
+	private final static Map<Class<?>, DAOBuilder> mapDAO = new HashMap<Class<?>, DAOBuilder>();
+	/*
+	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
+	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
+	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
+	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
+	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
+	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
+	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
+	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
+	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
+	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
+	 */
+	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
+
+	private static final ServiceBuilder SERVICE_BUILDER = new ServiceBuilder();
 
 	ServiceBuilder() {
 	}
@@ -155,7 +148,7 @@ public class ServiceBuilder {
 			}
 			return daoBuilder.build();
 		} catch (Exception e) {
-			throw new IllegalStateException("Falha no build do DAO \"" + daoClass.getName() + "\"");
+			throw new IllegalStateException("Falha no build do DAO \"" + daoClass.getName() + "\"", e);
 		}
 	}
 

@@ -73,7 +73,7 @@ public class LimiteMinimoEstoqueDAOBuilder extends DAOBuilder<LimiteMinimoEstoqu
 			}
 
 			@Mock
-			public LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro, double tolerancia) {
+			public LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro) {
 				List<LimiteMinimoEstoque> listalimite = REPOSITORY.pesquisarTodos(LimiteMinimoEstoque.class);
 				boolean contemMedida = false;
 				for (LimiteMinimoEstoque limite : listalimite) {
@@ -86,17 +86,17 @@ public class LimiteMinimoEstoqueDAOBuilder extends DAOBuilder<LimiteMinimoEstoqu
 					}
 
 					contemMedida = limite.getMedidaExterna() != null && filtro.getMedidaExterna() != null;
-					if (contemMedida && limite.getMedidaExterna() <= filtro.getMedidaExterna()) {
+					if (contemMedida && limite.getMedidaExterna().equals(filtro.getMedidaExterna())) {
 						continue;
 					}
 
 					contemMedida = limite.getMedidaInterna() != null && filtro.getMedidaInterna() != null;
-					if (contemMedida && limite.getMedidaInterna() <= filtro.getMedidaInterna()) {
+					if (contemMedida && limite.getMedidaInterna().equals(filtro.getMedidaInterna())) {
 						continue;
 					}
 
 					contemMedida = limite.getComprimento() != null && filtro.getComprimento() != null;
-					if (contemMedida && limite.getComprimento() <= filtro.getComprimento()) {
+					if (contemMedida && limite.getComprimento().equals(filtro.getComprimento())) {
 						continue;
 					}
 

@@ -91,14 +91,14 @@ public class EstoqueController extends AbstractController {
     public void inserirLimiteMinimo(LimiteMinimoEstoque limite) {
         try {
             limite.setTaxaMinima(NumeroUtils.gerarAliquota(limite.getTaxaMinima()));
-            Integer idLImite = estoqueService.associarLimiteMinimoEstoque(limite);
+            estoqueService.associarLimiteMinimoEstoque(limite);
+
+            limite.setMaterial(materialService.pesquisarById(limite.getMaterial().getId()));
             StringBuilder mensagem = new StringBuilder("Limite mínimo de estoque de quantidade \"")
-                    .append(limite.getQuantidadeMinima()).append("\" ").append(limite.getDescricao());
-            if (idLImite > 0) {
-                mensagem.append(" inserido/alterado com sucesso.");
-            } else {
-                mensagem.append(" removido com sucesso.");
-            }
+                    .append(limite.getQuantidadeMinima() == null ? 0 : limite.getQuantidadeMinima()).append("\" ")
+                    .append(limite.getDescricao());
+            mensagem.append(" inserido/alterado com sucesso.");
+
             gerarMensagemSucesso(mensagem.toString());
         } catch (BusinessException e) {
             addAtributo("limite", limite);
@@ -168,6 +168,7 @@ public class EstoqueController extends AbstractController {
     public void pesquisarLimiteMinimo(LimiteMinimoEstoque limite) {
         LimiteMinimoEstoque limiteCadastrado = estoqueService.pesquisarLimiteMinimoEstoque(limite);
         if (limiteCadastrado != null) {
+            limiteCadastrado.setTaxaMinima(NumeroUtils.gerarPercentual(limiteCadastrado.getTaxaMinima()));
             limite = limiteCadastrado;
         }
         addAtributo("limite", limite);
@@ -199,12 +200,12 @@ public class EstoqueController extends AbstractController {
     }
 
     @Post("estoque/valor")
-    public void pesquisarValorEstoque(Material material, FormaMaterial formaMaterial) {
-        Double valorEstoque = estoqueService.pesquisarValorEstoque(material.getId(), formaMaterial);
+    public void calcularValorEstoque(Material material, FormaMaterial formaMaterial) {
+        Double valorEstoque = estoqueService.calcularValorEstoque(material.getId(), formaMaterial);
 
         addAtributo("valorEstoque", NumeroUtils.formatarValorMonetario(valorEstoque));
         addAtributo("formaSelecionada", formaMaterial);
-        addAtributo("material", material);
+        addAtributo("material", materialService.pesquisarById(material.getId()));
         irTopoPagina();
     }
 

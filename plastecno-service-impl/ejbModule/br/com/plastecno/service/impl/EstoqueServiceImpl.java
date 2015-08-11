@@ -68,23 +68,22 @@ public class EstoqueServiceImpl implements EstoqueService {
 			throw new BusinessException("O limite minimo de estoque deve conter alguma medida, mas todas estão em branco");
 		}
 
-		ValidadorInformacao.validar(limite);
-
-		LimiteMinimoEstoque limiteCadastrado = null;
-
-		limiteCadastrado = pesquisarLimiteMinimoEstoque(limite);
+		LimiteMinimoEstoque limiteCadastrado = pesquisarLimiteMinimoEstoque(limite);
 
 		if (limiteCadastrado != null) {
 			limiteCadastrado.setQuantidadeMinima(limite.getQuantidadeMinima());
 			limiteCadastrado.setTaxaMinima(limite.getTaxaMinima());
-			limite = limiteCadastrado;
+
+			if (!limite.contemQuantidadeMinima()) {
+				limiteMinimoEstoqueDAO.remover(limiteCadastrado);
+				limiteMinimoEstoqueDAO.desassociarLimiteMinimoItemEstoque(limiteCadastrado.getId());
+				return null;
+			}
+
+			return limiteCadastrado.getId();
 		}
 
-		if (limite.getId() != null && !limite.contemQuantidadeMinima()) {
-			limiteMinimoEstoqueDAO.remover(limite);
-			limiteMinimoEstoqueDAO.desassociarLimiteMinimoItemEstoque(limite.getId());
-			return -1;
-		}
+		ValidadorInformacao.validar(limite);
 		return inserirLimiteMinimo(limite);
 	}
 
@@ -126,6 +125,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
 		// estoque.
 		return precoMedio * (1 + formaMaterial.getIpi()) * (1 + taxaMinima);
+	}
+
+	@Override
+	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+		return itemEstoqueDAO.pesquisarValorEQuantidadeItemEstoque(idMaterial, formaMaterial);
 	}
 
 	private void calcularValorMedio(ItemEstoque itemCadastrado, ItemEstoque itemIncluido) {
@@ -399,7 +403,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (!contemMaterial || !contemMedida) {
 			return null;
 		}
-		return limiteMinimoEstoqueDAO.pesquisarLimiteMinimoEstoque(filtro, tolerancia);
+		return limiteMinimoEstoqueDAO.pesquisarLimiteMinimoEstoque(filtro);
 	}
 
 	@Override
@@ -429,11 +433,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public double pesquisarPrecoMedioItemEstoque(Item filtro) {
 		ItemEstoque itemEstoque = pesquisarItemEstoque(filtro);
 		return itemEstoque == null ? 0 : itemEstoque.getPrecoMedio();
-	}
-
-	@Override
-	public Double pesquisarValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return itemEstoqueDAO.pesquisarValorEQuantidadeItemEstoque(idMaterial, formaMaterial);
 	}
 
 	@Override

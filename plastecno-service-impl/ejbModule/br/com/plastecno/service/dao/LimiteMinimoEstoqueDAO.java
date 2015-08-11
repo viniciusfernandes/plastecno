@@ -1,16 +1,14 @@
 package br.com.plastecno.service.dao;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import br.com.plastecno.service.entity.LimiteMinimoEstoque;
+import br.com.plastecno.service.impl.util.QueryUtil;
 
 public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
-	private Logger logger = Logger.getLogger(LimiteMinimoEstoque.class.getName());
 
 	public LimiteMinimoEstoqueDAO(EntityManager entityManager) {
 		super(entityManager);
@@ -79,28 +77,28 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 		return super.pesquisarById(LimiteMinimoEstoque.class, id);
 	}
 
-	public LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro, double tolerancia) {
+	public LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro) {
 		StringBuilder select = new StringBuilder("select l from LimiteMinimoEstoque l where ");
 		select.append("l.formaMaterial = :formaMaterial and l.material = :material ");
 
 		StringBuilder order = new StringBuilder("order by ");
 
 		if (filtro.getMedidaExterna() != null) {
-			select.append("and ABS(l.medidaExterna - :medidaExterna) <= :tolerancia ");
+			select.append("and l.medidaExterna = :medidaExterna ");
 			order.append("l.medidaExterna, ");
 		} else {
 			select.append("and l.medidaExterna is null ");
 		}
 
 		if (filtro.getMedidaInterna() != null) {
-			select.append("and ABS(l.medidaInterna - :medidaInterna) <= :tolerancia ");
+			select.append("and l.medidaInterna = :medidaInterna ");
 			order.append("l.medidaInterna, ");
 		} else {
 			select.append("and l.medidaInterna is null ");
 		}
 
 		if (filtro.getComprimento() != null) {
-			select.append("and ABS(l.comprimento - :comprimento) <= :tolerancia ");
+			select.append("and l.comprimento = :comprimento ");
 			order.append("l.comprimento, ");
 		} else {
 			select.append("and l.comprimento is null ");
@@ -108,8 +106,7 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 
 		select.append(order.substring(0, order.lastIndexOf(", "))).append(" desc");
 		TypedQuery<LimiteMinimoEstoque> query = entityManager.createQuery(select.toString(), LimiteMinimoEstoque.class);
-		query.setParameter("formaMaterial", filtro.getFormaMaterial()).setParameter("material", filtro.getMaterial())
-				.setParameter("tolerancia", tolerancia);
+		query.setParameter("formaMaterial", filtro.getFormaMaterial()).setParameter("material", filtro.getMaterial());
 
 		if (filtro.getMedidaExterna() != null) {
 			query.setParameter("medidaExterna", filtro.getMedidaExterna());
@@ -121,11 +118,6 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 			query.setParameter("comprimento", filtro.getComprimento());
 		}
 
-		List<LimiteMinimoEstoque> listaLimiteMinimo = query.getResultList();
-		if (listaLimiteMinimo.size() >= 2) {
-			logger.log(Level.WARNING, "Existem mais de 1 limite de estoque cadastrado. Total encontrado de "
-					+ listaLimiteMinimo.size() + " para o Limite minimo \"" + filtro.getDescricao() + "\"");
-		}
-		return listaLimiteMinimo.size() >= 1 ? listaLimiteMinimo.get(0) : null;
+		return QueryUtil.gerarRegistroUnico(query, LimiteMinimoEstoque.class, null);
 	}
 }

@@ -53,7 +53,7 @@ public interface EstoqueService {
 
 	double pesquisarPrecoMedioItemEstoque(Item filtro);
 
-	Double pesquisarValorEstoque(Integer idMaterial, FormaMaterial formaMaterial);
+	Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
 	Integer recepcionarItemCompra(Integer idItemPedido) throws BusinessException;
 

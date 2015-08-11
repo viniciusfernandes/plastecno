@@ -1333,10 +1333,10 @@ public class EstoqueServiceTest extends AbstractTest {
 			}
 		}
 		Double totalEstoque = 1d;
-		assertEquals(totalEstoque, estoqueService.pesquisarValorEstoque(null, FormaMaterial.BQ));
+		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.BQ));
 
 		totalEstoque = 2d;
-		assertEquals(totalEstoque, estoqueService.pesquisarValorEstoque(null, FormaMaterial.TB));
+		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.TB));
 	}
 
 	@Test
@@ -1350,7 +1350,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			}
 		}
 		Double totalEstoque = 3d;
-		assertEquals(totalEstoque, estoqueService.pesquisarValorEstoque(null, null));
+		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, null));
 	}
 
 	private void verificarQuantidadeTotalItemEstoque(Integer quantidadeItemPedido, Integer idItemEstoque) {

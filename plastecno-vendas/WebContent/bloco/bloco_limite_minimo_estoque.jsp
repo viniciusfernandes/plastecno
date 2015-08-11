@@ -36,7 +36,6 @@ $(document).ready(function() {
 <fieldset id="bloco_limite_minimo">
 	<legend>::: Limite Mínimo Item do Estoque :::</legend>
 	<input type="hidden" id="idMaterial" name="limite.material.id" value="${limite.material.id}"/>
-	<input type="hidden" id="idLimite" name="limite.id" value="${limite.id}"/>
 	<c:if test="${not empty itemPedido}">
 		<!-- INCLUI ESSE CAMPO OCULTO COM A FORMA DE MATERIAL POIS A EDICAO DESABILITA O CAMPO E NO SUBMIT TEMOS QUE MANTER A INFORMACAO -->
 		<input type="hidden" id="idFormaMaterial" name="limite.formaMaterial" value="${limite.formaMaterial}"/>
@@ -58,7 +57,7 @@ $(document).ready(function() {
 	</div>
 	<div class="label">Material:</div>
 	<div class="input" style="width: 70%">
-		<input type="text" id="material" name="limite.material.descricaoFormatada" style="width: 50%" value="${limite.material.descricao}"/>
+		<input type="text" id="material" name="limite.material.descricaoFormatada" style="width: 50%" value="${limite.material.descricaoFormatada}"/>
 		<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 	</div>
 	<div class="label">Med. Ext / Espessura:</div>

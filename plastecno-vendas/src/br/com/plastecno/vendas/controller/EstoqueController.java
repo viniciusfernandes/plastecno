@@ -48,6 +48,16 @@ public class EstoqueController extends AbstractController {
         }
     }
 
+    @Post("estoque/valor")
+    public void calcularValorEstoque(Material material, FormaMaterial formaMaterial) {
+        Double valorEstoque = estoqueService.calcularValorEstoque(material.getId(), formaMaterial);
+
+        addAtributo("valorEstoque", NumeroUtils.formatarValorMonetario(valorEstoque));
+        addAtributo("formaSelecionada", formaMaterial);
+        addAtributo("material", materialService.pesquisarById(material.getId()));
+        irTopoPagina();
+    }
+
     @Get("estoque")
     public void estoqueHome() {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
@@ -171,6 +181,10 @@ public class EstoqueController extends AbstractController {
             limiteCadastrado.setTaxaMinima(NumeroUtils.gerarPercentual(limiteCadastrado.getTaxaMinima()));
             limite = limiteCadastrado;
         }
+
+        if (limite != null && limite.getMaterial() != null && limite.getMaterial().getDescricao() == null) {
+            limite.setMaterial(materialService.pesquisarById(limite.getMaterial().getId()));
+        }
         addAtributo("limite", limite);
         irTopoPagina();
     }
@@ -197,16 +211,6 @@ public class EstoqueController extends AbstractController {
             }
         }
         serializarJson(new SerializacaoJson("lista", lista));
-    }
-
-    @Post("estoque/valor")
-    public void calcularValorEstoque(Material material, FormaMaterial formaMaterial) {
-        Double valorEstoque = estoqueService.calcularValorEstoque(material.getId(), formaMaterial);
-
-        addAtributo("valorEstoque", NumeroUtils.formatarValorMonetario(valorEstoque));
-        addAtributo("formaSelecionada", formaMaterial);
-        addAtributo("material", materialService.pesquisarById(material.getId()));
-        irTopoPagina();
     }
 
     @Post("estoque/item/edicao")

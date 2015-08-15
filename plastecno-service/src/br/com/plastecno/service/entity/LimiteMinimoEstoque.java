@@ -24,7 +24,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Entity
 @Table(name = "tb_limite_minimo_estoque", schema = "vendas")
 @InformacaoValidavel
-public class LimiteMinimoEstoque {
+public class LimiteMinimoEstoque implements Cloneable {
 	private Double comprimento;
 
 	@Transient
@@ -82,6 +82,15 @@ public class LimiteMinimoEstoque {
 		}
 		listaItemEstoque.add(itemEstoque);
 		itemEstoque.setLimiteMinimoEstoque(this);
+	}
+
+	@Override
+	public LimiteMinimoEstoque clone() {
+		try {
+			return (LimiteMinimoEstoque) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new IllegalStateException("Falha ao clonar o item de estoque " + getId(), e);
+		}
 	}
 
 	public boolean contemQuantidadeMinima() {

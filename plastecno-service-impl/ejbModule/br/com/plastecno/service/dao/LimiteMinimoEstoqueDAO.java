@@ -14,6 +14,12 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 		super(entityManager);
 	}
 
+	public void associarLimiteMinimoItemEstoque(Integer idLimiteMinimo, Integer idItemEstoque) {
+		entityManager
+				.createQuery("update ItemEstoque i set i.limiteMinimoEstoque.id = :idLimiteMinimo where i.id = :idItemEstoque")
+				.setParameter("idLimiteMinimo", idLimiteMinimo).setParameter("idItemEstoque", idItemEstoque).executeUpdate();
+	}
+
 	public void associarLimiteMinimoItemEstoque(Integer idLimiteMinimo, List<Integer> listaIdItemEstoque) {
 		entityManager
 				.createQuery(

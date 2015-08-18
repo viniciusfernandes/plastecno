@@ -78,6 +78,7 @@ public class ItemEstoque extends Item {
 	@Transient
 	private String siglaMaterial;
 
+	@Transient
 	private Double precoSugerido;
 
 	public ItemEstoque() {

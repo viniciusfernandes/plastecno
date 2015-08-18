@@ -221,6 +221,7 @@ function inicializarFiltro() {
 						<th style="width: 10%">Med. Interna</th>
 						<th style="width: 10%">Comprimento</th>
 						<th style="width: 10%">Valor Unid. (R$)</th>
+						<th style="width: 10%">Preç. Sug. (R$)</th>
 						<th style="width: 5%">Ações</th>
 					</tr>
 				</thead>
@@ -245,6 +246,7 @@ function inicializarFiltro() {
 								</c:otherwise>
 							</c:choose>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMedio}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoSugerido}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<c:if test="${acessoManutencaoEstoquePermitido}">
 								<div class="coluna_acoes_listagem">

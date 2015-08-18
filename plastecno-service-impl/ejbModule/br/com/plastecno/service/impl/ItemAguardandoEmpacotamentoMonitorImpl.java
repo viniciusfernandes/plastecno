@@ -19,6 +19,7 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
+@Deprecated
 public class ItemAguardandoEmpacotamentoMonitorImpl implements ItemAguardandoEmpacotamentoMonitor {
 
 	private Logger logger = Logger.getLogger(ItemAguardandoEmpacotamentoMonitorImpl.class.getName());

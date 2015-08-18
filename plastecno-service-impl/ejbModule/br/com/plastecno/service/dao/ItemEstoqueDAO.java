@@ -17,6 +17,13 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		super(entityManager);
 	}
 
+	private void appendLimiteMinimoJoin(StringBuilder select) {
+		select
+				.append(
+						"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, l.taxaMinima, i.quantidade) from ItemEstoque i ")
+				.append(" left join i.limiteMinimoEstoque l ");
+	}
+
 	public boolean contemLimiteMinimoEstoque(Integer idItemEstoque) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select i.limiteMinimoEstoque.id from ItemEstoque i where i.id =: idItemEstoque")
@@ -42,7 +49,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca,
 			boolean zeradosExcluidos) {
 		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemEstoque i ");
+		appendLimiteMinimoJoin(select);
+
 		if (idMaterial != null || formaMaterial != null) {
 			select.append("where ");
 		}
@@ -155,9 +163,10 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	}
 
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
-		return entityManager.createQuery(
-				"select i from ItemEstoque i inner join i.limiteMinimoEstoque l where i.quantidade <= l.quantidadeMinima",
-				ItemEstoque.class).getResultList();
+		StringBuilder select = new StringBuilder();
+		appendLimiteMinimoJoin(select);
+		select.append(" inner join i.limiteMinimoEstoque l where i.quantidade <= l.quantidadeMinima");
+		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();
 	}
 
 	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {

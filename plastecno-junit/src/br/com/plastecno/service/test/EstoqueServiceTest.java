@@ -38,6 +38,7 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.test.builder.ServiceBuilder;
+import br.com.plastecno.util.NumeroUtils;
 
 public class EstoqueServiceTest extends AbstractTest {
 	private ClienteService clienteService;
@@ -471,6 +472,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		Double precoSugerido = itemEstoque.getPrecoMedio() * (1 + itemEstoque.getFormaMaterial().getIpi())
 				* (1 + limite.getTaxaMinima());
+		precoSugerido = NumeroUtils.arredondarValorMonetario(precoSugerido);
 
 		Double precoCalculado = null;
 		try {
@@ -506,6 +508,7 @@ public class EstoqueServiceTest extends AbstractTest {
 				itemEstoque.getLimiteMinimoEstoque());
 
 		Double precoSugerido = itemEstoque.getPrecoMedio() * (1 + itemEstoque.getFormaMaterial().getIpi());
+		precoSugerido = NumeroUtils.arredondarValorMonetario(precoSugerido);
 
 		Double precoCalculado = null;
 		try {

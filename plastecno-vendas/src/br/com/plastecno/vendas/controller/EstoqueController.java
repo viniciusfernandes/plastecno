@@ -70,9 +70,11 @@ public class EstoqueController extends AbstractController {
     private void gerarRelatorioItemEstoque(List<ItemEstoque> lista) {
         RelatorioWrapper<String, ItemEstoque> relatorio = new RelatorioWrapper<String, ItemEstoque>(
                 "Relatório de itens do estoque");
+        String id = null;
         for (ItemEstoque item : lista) {
             formatarItemEstoque(item);
-            relatorio.addGrupo(item.getDescricaoMaterial(), item);
+            id = item.getFormaMaterial() + " - " + item.getSiglaMaterial();
+            relatorio.addGrupo(id, item);
         }
         addAtributo("relatorio", relatorio);
     }

@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
@@ -68,8 +69,16 @@ public class ItemEstoque extends Item {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Preço de médio de compra do item de estoque")
 	private Double precoMedio;
 
+	@Transient
+	private Double taxaMinima;
+
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Quantidade de itens do estoque")
 	private Integer quantidade = 0;
+
+	@Transient
+	private String siglaMaterial;
+
+	private Double precoSugerido;
 
 	public ItemEstoque() {
 	}
@@ -80,6 +89,21 @@ public class ItemEstoque extends Item {
 
 	public ItemEstoque(Integer idItemEstoque) {
 		this.id = idItemEstoque;
+	}
+
+	public ItemEstoque(Integer id, FormaMaterial formaMaterial, String descricaoPeca, String siglaMaterial,
+			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double taxaMinima,
+			Integer quantidade) {
+		this.comprimento = comprimento;
+		this.descricaoPeca = descricaoPeca;
+		this.formaMaterial = formaMaterial;
+		this.id = id;
+		this.siglaMaterial = siglaMaterial;
+		this.medidaExterna = medidaExterna;
+		this.medidaInterna = medidaInterna;
+		this.precoMedio = precoMedio;
+		this.quantidade = quantidade;
+		this.taxaMinima = taxaMinima;
 	}
 
 	public double calcularPrecoTotal() {
@@ -146,6 +170,10 @@ public class ItemEstoque extends Item {
 		return precoMedio;
 	}
 
+	public Double getPrecoSugerido() {
+		return precoSugerido;
+	}
+
 	@Override
 	public Double getPrecoUnidade() {
 		return getPrecoMedio();
@@ -162,6 +190,14 @@ public class ItemEstoque extends Item {
 
 	public Integer getQuantidade() {
 		return quantidade;
+	}
+
+	public String getSiglaMaterial() {
+		return siglaMaterial;
+	}
+
+	public Double getTaxaMinima() {
+		return taxaMinima;
 	}
 
 	// Metodo criado para facilitar teste unitario
@@ -217,6 +253,10 @@ public class ItemEstoque extends Item {
 		this.precoMedio = precoMedio;
 	}
 
+	public void setPrecoSugerido(Double precoSugerido) {
+		this.precoSugerido = precoSugerido;
+	}
+
 	@Override
 	public void setPrecoUnidade(Double precoUnidade) {
 		setPrecoMedio(precoUnidade);
@@ -229,6 +269,14 @@ public class ItemEstoque extends Item {
 
 	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
+	}
+
+	public void setSiglaMaterial(String siglaMaterial) {
+		this.siglaMaterial = siglaMaterial;
+	}
+
+	public void setTaxaMinima(Double taxaMinima) {
+		this.taxaMinima = taxaMinima;
 	}
 
 }

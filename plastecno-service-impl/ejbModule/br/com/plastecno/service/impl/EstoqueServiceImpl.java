@@ -36,6 +36,7 @@ import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.impl.anotation.WARNING;
 import br.com.plastecno.service.impl.calculo.CalculadoraVolume;
+import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
 
@@ -122,6 +123,23 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * filtro.getQuantidade() * (1 + aliquotaIPI);
 	}
 
+	private Double calcularPrecoSugerido(Double precoMedio, FormaMaterial formaMaterial, Double taxaMinima) {
+		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
+		// estoque.
+
+		if (taxaMinima == null) {
+			taxaMinima = 0.0;
+		}
+
+		// Precisamos arredondar
+		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + formaMaterial.getIpi()) * (1 + taxaMinima));
+	}
+
+	private void calcularPrecoSugerido(ItemEstoque itemEstoque) {
+		itemEstoque.setPrecoSugerido(calcularPrecoSugerido(itemEstoque.getPrecoMedio(), itemEstoque.getFormaMaterial(),
+				itemEstoque.getTaxaMinima()));
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double calcularPrecoSugeridoItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
@@ -136,18 +154,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Double taxaMinima = (Double) valores[0];
 		Double precoMedio = (Double) valores[1];
 
-		if (taxaMinima == null) {
-			taxaMinima = 0.0;
-		}
-
 		FormaMaterial formaMaterial = itemEstoqueDAO.pesquisarFormaMaterialItemEstoque(idItemEstoque);
 		if (formaMaterial == null) {
 			throw new BusinessException(
 					"Não foi possível cálcular o preco sugerido para o item de estoque pois ele não tem forma de material associada");
 		}
-		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
-		// estoque.
-		return precoMedio * (1 + formaMaterial.getIpi()) * (1 + taxaMinima);
+
+		return calcularPrecoSugerido(precoMedio, formaMaterial, taxaMinima);
 	}
 
 	@Override
@@ -386,7 +399,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null, true);
+		List<ItemEstoque> listaItem = itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null, true);
+		for (ItemEstoque itemEstoque : listaItem) {
+			calcularPrecoSugerido(itemEstoque);
+		}
+		return listaItem;
 	}
 
 	@Override
@@ -415,7 +432,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
-		return itemEstoqueDAO.pesquisarItemEstoqueEscasso();
+		List<ItemEstoque> listaItem = itemEstoqueDAO.pesquisarItemEstoqueEscasso();
+		for (ItemEstoque itemEstoque : listaItem) {
+			calcularPrecoSugerido(itemEstoque);
+		}
+		return listaItem;
 	}
 
 	@Override

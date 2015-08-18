@@ -17,6 +17,7 @@ import br.com.plastecno.service.entity.Cidade;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.Endereco;
+import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Logradouro;
@@ -31,11 +32,11 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.test.TestUtils;
 
 public class EntidadeBuilder {
-	private static final EntidadeBuilder builder = new EntidadeBuilder();
-
 	public static EntidadeBuilder getInstance() {
 		return builder;
 	}
+
+	private static final EntidadeBuilder builder = new EntidadeBuilder();
 
 	private EntidadeRepository repositorio = EntidadeRepository.getInstance();
 
@@ -82,6 +83,16 @@ public class EntidadeBuilder {
 		return endereco;
 	}
 
+	public ItemEstoque buildItemEstoque() {
+		ItemEstoque item = new ItemEstoque();
+		item.setFormaMaterial(FormaMaterial.CH);
+		item.setMedidaExterna(200.0);
+		item.setMedidaInterna(100.0);
+		item.setComprimento(1000.0);
+		item.setPrecoMedio(100.0);
+		return item;
+	}
+
 	public ItemPedido buildItemPedido() {
 		ItemPedido itemPedido = new ItemPedido();
 		itemPedido.setAliquotaIPI(11.1d);
@@ -118,6 +129,7 @@ public class EntidadeBuilder {
 		limite.setMedidaExterna(100.0);
 		limite.setMedidaInterna(80.0);
 		limite.setQuantidadeMinima(10);
+		limite.setTaxaMinima(10.0);
 		return limite;
 	}
 

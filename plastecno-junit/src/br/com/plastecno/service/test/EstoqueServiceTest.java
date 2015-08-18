@@ -98,6 +98,18 @@ public class EstoqueServiceTest extends AbstractTest {
 		return enviarItemPedido(quantidade, TipoPedido.REVENDA);
 	}
 
+	private ItemEstoque gerarItemEstoque() {
+		ItemEstoque itemEstoque = eBuilder.buildItemEstoque();
+		itemEstoque.setMaterial(gerarMaterial());
+
+		try {
+			estoqueService.inserirItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return itemEstoque;
+	}
+
 	private ItemPedido gerarItemPedidoClone(Integer quantidade, ItemPedido item1) {
 		// Garantindo que o material eh o mesmo para manter a consistencia dos
 		// dados
@@ -133,6 +145,16 @@ public class EstoqueServiceTest extends AbstractTest {
 	private LimiteMinimoEstoque gerarLimiteMinimoEstoque() {
 		LimiteMinimoEstoque l = eBuilder.buildLimiteMinimoEstoque();
 		l.setMaterial(gerarMaterial());
+		return l;
+	}
+
+	private LimiteMinimoEstoque gerarLimiteMinimoEstoqueParaItemEstoque(ItemEstoque item) {
+		LimiteMinimoEstoque l = eBuilder.buildLimiteMinimoEstoque();
+		l.setFormaMaterial(item.getFormaMaterial());
+		l.setMaterial(item.getMaterial());
+		l.setMedidaExterna(item.getMedidaExterna());
+		l.setMedidaInterna(item.getMedidaInterna());
+		l.setComprimento(item.getComprimento());
 		return l;
 	}
 
@@ -426,6 +448,74 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertEquals(
 				"Foi incluido mais um item no estoque com quantidades abaixo do limite agora devemos ter apenas 2 item escassos",
 				2, listaItemEscasso.size());
+	}
+
+	@Test
+	public void testCalculoPrecoVendaSugerido() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		Integer idItem = itemEstoque.getId();
+
+		LimiteMinimoEstoque limite = gerarLimiteMinimoEstoqueParaItemEstoque(itemEstoque);
+		try {
+			estoqueService.associarLimiteMinimoEstoque(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
+		assertEquals("Os IDs do itens devem ser os mesmo pois estamos pesquisando um item que ja existe no sistema",
+				idItem, itemEstoque.getId());
+
+		assertNotNull("Deve existir um limite minimo para o item pois ja temos um limite cadastrado no sistema para ele",
+				itemEstoque.getLimiteMinimoEstoque());
+
+		Double precoSugerido = itemEstoque.getPrecoMedio() * (1 + itemEstoque.getFormaMaterial().getIpi())
+				* (1 + limite.getTaxaMinima());
+
+		Double precoCalculado = null;
+		try {
+			precoCalculado = estoqueService.calcularPrecoSugeridoItemEstoque(itemEstoque);
+
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertEquals("Os algoritmos de calculo do preco de venda sugerido possuem diferencas, isso esta errado",
+				precoSugerido, precoCalculado);
+	}
+
+	@Test
+	public void testCalculoPrecoVendaSugeridoSemTaxa() {
+		ItemEstoque itemEstoque = gerarItemEstoque();
+		Integer idItem = itemEstoque.getId();
+
+		LimiteMinimoEstoque limite = gerarLimiteMinimoEstoqueParaItemEstoque(itemEstoque);
+		// Anulando a taxa do limite minimo
+		limite.setTaxaMinima(null);
+
+		try {
+			estoqueService.associarLimiteMinimoEstoque(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
+		assertEquals("Os IDs do itens devem ser os mesmo pois estamos pesquisando um item que ja existe no sistema",
+				idItem, itemEstoque.getId());
+
+		assertNotNull("Deve existir um limite minimo para o item pois ja temos um limite cadastrado no sistema para ele",
+				itemEstoque.getLimiteMinimoEstoque());
+
+		Double precoSugerido = itemEstoque.getPrecoMedio() * (1 + itemEstoque.getFormaMaterial().getIpi());
+
+		Double precoCalculado = null;
+		try {
+			precoCalculado = estoqueService.calcularPrecoSugeridoItemEstoque(itemEstoque);
+
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertEquals("Os algoritmos de calculo do preco de venda sugerido possuem diferencas, isso esta errado",
+				precoSugerido, precoCalculado);
 	}
 
 	@Test

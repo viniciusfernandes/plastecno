@@ -137,7 +137,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Double precoMedio = (Double) valores[1];
 
 		if (taxaMinima == null) {
-			return precoMedio;
+			taxaMinima = 0.0;
 		}
 
 		FormaMaterial formaMaterial = itemEstoqueDAO.pesquisarFormaMaterialItemEstoque(idItemEstoque);

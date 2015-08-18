@@ -16,7 +16,6 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 	@Override
 	public ItemEstoqueDAO build() {
 		new MockUp<ItemEstoqueDAO>() {
-
 			@Mock
 			public boolean contemLimiteMinimoEstoque(Integer idItemEstoque) {
 				if (idItemEstoque == null) {
@@ -24,6 +23,7 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 				}
 				List<LimiteMinimoEstoque> l = REPOSITORY.pesquisarTodos(LimiteMinimoEstoque.class);
 				for (LimiteMinimoEstoque limite : l) {
+
 					if (limite.getListaItemEstoque() != null) {
 						for (ItemEstoque i : limite.getListaItemEstoque()) {
 							if (idItemEstoque.equals(i.getId())) {
@@ -31,8 +31,15 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 							}
 						}
 					}
+
 				}
 				return false;
+			}
+
+			@Mock
+			public FormaMaterial pesquisarFormaMaterialItemEstoque(Integer idItemEstoque) {
+				ItemEstoque i = REPOSITORY.pesquisarEntidadeById(ItemEstoque.class, idItemEstoque);
+				return i == null ? null : i.getFormaMaterial();
 			}
 
 			@Mock
@@ -125,6 +132,19 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 					}
 					return i;
 				}
+				return null;
+			}
+
+			@Mock
+			public Object[] pesquisarTaxaMininaEValorMedioItemEstoque(Integer idItemEstoque) {
+				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
+				for (ItemEstoque itemEstoque : l) {
+					if (idItemEstoque.equals(itemEstoque.getId())) {
+						LimiteMinimoEstoque limite = itemEstoque.getLimiteMinimoEstoque();
+						return new Object[] { limite.getTaxaMinima(), itemEstoque.getPrecoMedio() };
+					}
+				}
+
 				return null;
 			}
 

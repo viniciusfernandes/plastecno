@@ -14,7 +14,6 @@ public class LimiteMinimoEstoqueDAOBuilder extends DAOBuilder<LimiteMinimoEstoqu
 	@Override
 	public LimiteMinimoEstoqueDAO build() {
 		new MockUp<LimiteMinimoEstoqueDAO>() {
-
 			@Mock
 			public void associarLimiteMinimoItemEstoque(Integer idLimiteMinimo, List<Integer> listaIdItemEstoque) {
 				LimiteMinimoEstoque limite = REPOSITORY.pesquisarEntidadeById(LimiteMinimoEstoque.class, idLimiteMinimo);
@@ -29,6 +28,14 @@ public class LimiteMinimoEstoqueDAOBuilder extends DAOBuilder<LimiteMinimoEstoqu
 						limite.addItemEstoque(i);
 
 					}
+				}
+			}
+
+			@Mock
+			public void desassociarLimiteMinimoItemEstoque(Integer idLimiteMinimo) {
+				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
+				for (ItemEstoque itemEstoque : l) {
+					itemEstoque.setLimiteMinimoEstoque(null);
 				}
 			}
 
@@ -81,22 +88,22 @@ public class LimiteMinimoEstoqueDAOBuilder extends DAOBuilder<LimiteMinimoEstoqu
 						continue;
 					}
 
-					if (limite.getMaterial().getId().equals(filtro.getMaterial().getId())) {
+					if (!limite.getMaterial().getId().equals(filtro.getMaterial().getId())) {
 						continue;
 					}
 
 					contemMedida = limite.getMedidaExterna() != null && filtro.getMedidaExterna() != null;
-					if (contemMedida && limite.getMedidaExterna().equals(filtro.getMedidaExterna())) {
+					if (contemMedida && !limite.getMedidaExterna().equals(filtro.getMedidaExterna())) {
 						continue;
 					}
 
 					contemMedida = limite.getMedidaInterna() != null && filtro.getMedidaInterna() != null;
-					if (contemMedida && limite.getMedidaInterna().equals(filtro.getMedidaInterna())) {
+					if (contemMedida && !limite.getMedidaInterna().equals(filtro.getMedidaInterna())) {
 						continue;
 					}
 
 					contemMedida = limite.getComprimento() != null && filtro.getComprimento() != null;
-					if (contemMedida && limite.getComprimento().equals(filtro.getComprimento())) {
+					if (contemMedida && !limite.getComprimento().equals(filtro.getComprimento())) {
 						continue;
 					}
 

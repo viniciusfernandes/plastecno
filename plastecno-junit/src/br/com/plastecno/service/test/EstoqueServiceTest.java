@@ -288,6 +288,87 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testAlteracaoMedidaLimiteMinimoEstoque() {
+		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
+		limite.setMaterial(gerarMaterial());
+		Integer idLimite = null;
+		Integer idLimiteAlterado = null;
+
+		try {
+			idLimite = estoqueService.associarLimiteMinimoEstoque(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		LimiteMinimoEstoque limiteAlterado = limite.clone();
+
+		// ALTERANDO O COMPRIMENTO
+		limiteAlterado.setComprimento(limite.getComprimento() + 100);
+
+		try {
+			idLimiteAlterado = estoqueService.associarLimiteMinimoEstoque(limiteAlterado);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertTrue("O limite minimo com medida alterada deve ter um novo ID no sistema", idLimite != idLimiteAlterado);
+
+		limiteAlterado = limite.clone();
+
+		// ALTERANDO A MEDIDA EXTERNA
+		limiteAlterado.setMedidaExterna(limite.getMedidaExterna() + 100);
+
+		try {
+			idLimiteAlterado = estoqueService.associarLimiteMinimoEstoque(limiteAlterado);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertTrue("O limite minimo com medida alterada deve ter um novo ID no sistema", idLimite != idLimiteAlterado);
+
+		limiteAlterado = limite.clone();
+
+		// ALTERANDO A MEDIDA INTERNA
+		limiteAlterado.setMedidaInterna(limite.getMedidaInterna() - 10);
+
+		try {
+			idLimiteAlterado = estoqueService.associarLimiteMinimoEstoque(limiteAlterado);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertTrue("O limite minimo com medida alterada deve ter um novo ID no sistema", idLimite != idLimiteAlterado);
+
+	}
+
+	@Test
+	public void testAlteracaoQuantidadeLimiteMinimoEstoque() {
+		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
+		limite.setMaterial(gerarMaterial());
+		Integer idLimite = null;
+		Integer idLimiteAlterado = null;
+
+		try {
+			idLimite = estoqueService.associarLimiteMinimoEstoque(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		LimiteMinimoEstoque limiteAlterado = limite.clone();
+
+		limiteAlterado.setQuantidadeMinima(limite.getQuantidadeMinima() + 10);
+
+		try {
+			idLimiteAlterado = estoqueService.associarLimiteMinimoEstoque(limiteAlterado);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals("Os IDs dos limites devem ser os mesmos apos a alteracao da quantidade minima", idLimite,
+				idLimiteAlterado);
+	}
+
+	@Test
 	public void testAssociacaoLimiteMinimoEstoque() {
 		LimiteMinimoEstoque l1 = gerarLimiteMinimoEstoque();
 
@@ -1022,6 +1103,28 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 		assertEquals("As medidas externa e interna devem ser iguais para barra quadrada", itemEstoque.getMedidaExterna(),
 				itemEstoque.getMedidaInterna());
+	}
+
+	@Test
+	public void testRemocaoLimiteMinimoEstoque() {
+		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
+		limite.setMaterial(gerarMaterial());
+		Integer idLimite = null;
+		try {
+			idLimite = estoqueService.associarLimiteMinimoEstoque(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		// Esse eh a condicao para remocao do limite minimo
+		limite.setQuantidadeMinima(0);
+		try {
+			estoqueService.associarLimiteMinimoEstoque(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		limite = estoqueService.pesquisarLimiteMinimoEstoqueById(idLimite);
+		assertNull("O limite minimo foi removido do sistema e nao pode ser retornado na pesquisa", limite);
 	}
 
 	@Test

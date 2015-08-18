@@ -59,6 +59,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private final double tolerancia = 0.01d;
 
 	private void associarLimiteMinimoEstoque(ItemEstoque itemEstoque) throws BusinessException {
+
+		if (itemEstoque == null || itemEstoqueDAO.contemLimiteMinimoEstoque(itemEstoque.getId())) {
+			return;
+		}
+
 		// Temos que configurar o limite para que seja pesquisado pelas medidas e
 		// material
 		LimiteMinimoEstoque limite = new LimiteMinimoEstoque();

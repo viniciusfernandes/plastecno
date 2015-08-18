@@ -17,14 +17,14 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		super(entityManager);
 	}
 
-	public ItemEstoque pesquisarById(Integer idItemEstoque) {
-		return pesquisarById(ItemEstoque.class, idItemEstoque);
+	public boolean contemLimiteMinimoEstoque(Integer idItemEstoque) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.limiteMinimoEstoque.id from ItemEstoque i where i.id =: idItemEstoque")
+						.setParameter("idItemEstoque", idItemEstoque), Integer.class, null) != null;
 	}
 
-	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
-		return entityManager.createQuery(
-				"select i from ItemEstoque i inner join i.limiteMinimoEstoque l where i.quantidade <= l.quantidadeMinima",
-				ItemEstoque.class).getResultList();
+	public ItemEstoque pesquisarById(Integer idItemEstoque) {
+		return pesquisarById(ItemEstoque.class, idItemEstoque);
 	}
 
 	public FormaMaterial pesquisarFormaMaterialItemEstoque(Integer idItemEstoque) {
@@ -152,6 +152,12 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 		List<ItemEstoque> l = query.getResultList();
 		return recuperarItemNaoZerado(l);
+	}
+
+	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
+		return entityManager.createQuery(
+				"select i from ItemEstoque i inner join i.limiteMinimoEstoque l where i.quantidade <= l.quantidadeMinima",
+				ItemEstoque.class).getResultList();
 	}
 
 	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {

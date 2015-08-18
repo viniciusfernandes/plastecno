@@ -87,7 +87,9 @@ public class LimiteMinimoEstoque implements Cloneable {
 	@Override
 	public LimiteMinimoEstoque clone() {
 		try {
-			return (LimiteMinimoEstoque) super.clone();
+			LimiteMinimoEstoque clone = (LimiteMinimoEstoque) super.clone();
+			clone.setId(null);
+			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new IllegalStateException("Falha ao clonar o item de estoque " + getId(), e);
 		}

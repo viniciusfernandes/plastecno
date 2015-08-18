@@ -8,6 +8,7 @@ import mockit.MockUp;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.util.StringUtils;
 
 public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
@@ -15,35 +16,50 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 	@Override
 	public ItemEstoqueDAO build() {
 		new MockUp<ItemEstoqueDAO>() {
+
 			@Mock
-			public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
-				List<ItemEstoque> estoque = REPOSITORY.pesquisarTodos(ItemEstoque.class);
-				List<ItemEstoque> escassos = new ArrayList<ItemEstoque>();
-				for (ItemEstoque i : estoque) {
-					if (i.isItemEscasso()) {
-						escassos.add(i);
+			public boolean contemLimiteMinimoEstoque(Integer idItemEstoque) {
+				if (idItemEstoque == null) {
+					return false;
+				}
+				List<LimiteMinimoEstoque> l = REPOSITORY.pesquisarTodos(LimiteMinimoEstoque.class);
+				for (LimiteMinimoEstoque limite : l) {
+					if (limite.getListaItemEstoque() != null) {
+						for (ItemEstoque i : limite.getListaItemEstoque()) {
+							if (idItemEstoque.equals(i.getId())) {
+								return true;
+							}
+						}
 					}
 				}
-				return escassos;
+				return false;
 			}
 
 			@Mock
-			public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {
-				if (StringUtils.isEmpty(descricaoPeca) || idMaterial == null) {
-					return null;
-				}
-				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
-				for (ItemEstoque i : l) {
-					if (!idMaterial.equals(i.getMaterial().getId())) {
+			public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
+					String descricaoPeca) {
+				List<ItemEstoque> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(ItemEstoque.class, "formaMaterial",
+						formaMaterial);
+				List<ItemEstoque> itens = new ArrayList<ItemEstoque>();
+				boolean isMaterialSelecionado = false;
+				boolean isPecaSelecionada = false;
+				for (ItemEstoque item : lista) {
+					// A primeira condicao indica que se deseja todas as formas de
+					// materiais.
+					isMaterialSelecionado = idMaterial == null
+							|| (item.getMaterial() != null && idMaterial.equals(item.getMaterial().getId()));
+					if (!item.isPeca() && isMaterialSelecionado) {
+						itens.add(item);
 						continue;
 					}
 
-					if (!descricaoPeca.equals(i.getDescricaoPeca())) {
+					isPecaSelecionada = item.isPeca() && descricaoPeca != null && descricaoPeca.equals(item.getDescricaoPeca());
+					if (isMaterialSelecionado && isPecaSelecionada) {
+						itens.add(item);
 						continue;
 					}
-					return i;
 				}
-				return null;
+				return itens;
 			}
 
 			@Mock
@@ -82,30 +98,34 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
-					String descricaoPeca) {
-				List<ItemEstoque> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(ItemEstoque.class, "formaMaterial",
-						formaMaterial);
-				List<ItemEstoque> itens = new ArrayList<ItemEstoque>();
-				boolean isMaterialSelecionado = false;
-				boolean isPecaSelecionada = false;
-				for (ItemEstoque item : lista) {
-					// A primeira condicao indica que se deseja todas as formas de
-					// materiais.
-					isMaterialSelecionado = idMaterial == null
-							|| (item.getMaterial() != null && idMaterial.equals(item.getMaterial().getId()));
-					if (!item.isPeca() && isMaterialSelecionado) {
-						itens.add(item);
+			public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
+				List<ItemEstoque> estoque = REPOSITORY.pesquisarTodos(ItemEstoque.class);
+				List<ItemEstoque> escassos = new ArrayList<ItemEstoque>();
+				for (ItemEstoque i : estoque) {
+					if (i.isItemEscasso()) {
+						escassos.add(i);
+					}
+				}
+				return escassos;
+			}
+
+			@Mock
+			public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {
+				if (StringUtils.isEmpty(descricaoPeca) || idMaterial == null) {
+					return null;
+				}
+				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
+				for (ItemEstoque i : l) {
+					if (!idMaterial.equals(i.getMaterial().getId())) {
 						continue;
 					}
 
-					isPecaSelecionada = item.isPeca() && descricaoPeca != null && descricaoPeca.equals(item.getDescricaoPeca());
-					if (isMaterialSelecionado && isPecaSelecionada) {
-						itens.add(item);
+					if (!descricaoPeca.equals(i.getDescricaoPeca())) {
 						continue;
 					}
+					return i;
 				}
-				return itens;
+				return null;
 			}
 
 			@Mock

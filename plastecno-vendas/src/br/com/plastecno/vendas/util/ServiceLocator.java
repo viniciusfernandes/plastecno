@@ -29,7 +29,7 @@ public final class ServiceLocator {
 
         StringBuilder serviceName = new StringBuilder();
 
-        serviceName.append("java:global/plastecno-sistema/plastecno-service-impl/").append(classe.getSimpleName())
+        serviceName.append("java:global/plastecno-sistema-teste/plastecno-service-impl-teste/").append(classe.getSimpleName())
                 .append("Impl!").append(classe.getName());
         try {
             return (T) context.lookup(serviceName.toString());

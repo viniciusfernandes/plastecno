@@ -64,7 +64,7 @@ public class ItemAguardandoMaterialController extends AbstractController {
     public void pesquisarItemAguardandoMaterial(Date dataInicial, Date dataFinal, Integer idRepresentada) {
 
         try {
-            Periodo periodo = new Periodo(dataInicial, dataFinal);
+            Periodo periodo = Periodo.gerarPeriodo(dataInicial, dataFinal);
             RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioItemAguardandoMaterial(
                     idRepresentada, periodo);
 
@@ -93,9 +93,6 @@ public class ItemAguardandoMaterialController extends AbstractController {
 
     @Get("itemAguardandoMaterial")
     public void itemAguardandoMaterialHome() {
-        // Pode ser que essas datas ja tenham sido preenchidas em outra
-        // navegacao pois esse metodo eh reaproveitado.
-        configurarFiltroPediodoMensal();
         addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
     }
 }

@@ -343,7 +343,7 @@ $(document).ready(function() {
 			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 			<input type="submit" value="" title="Limpar Dados do Pedido" class="botaoLimpar" />
 		</form>
-		<form action="pedido/pdf" method="get" accept-charset="utf-8">
+		<form action="pedido/pdf" method="get">
 			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}" /> 
 			<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF" />

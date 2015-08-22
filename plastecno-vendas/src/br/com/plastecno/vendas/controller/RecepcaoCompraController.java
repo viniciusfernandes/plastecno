@@ -48,7 +48,7 @@ public class RecepcaoCompraController extends AbstractController {
     public void pesquisarCompraAguardandoRecebimento(Date dataInicial, Date dataFinal, Integer idRepresentada) {
 
         try {
-            Periodo periodo = new Periodo(dataInicial, dataFinal);
+            Periodo periodo = Periodo.gerarPeriodo(dataInicial, dataFinal);
             RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService
                     .gerarRelatorioCompraAguardandoRecebimento(idRepresentada, periodo);
 
@@ -86,9 +86,6 @@ public class RecepcaoCompraController extends AbstractController {
 
     @Get("compra/recepcao")
     public void recepcaoCompraHome() {
-        // Pode ser que essas datas ja tenham sido preenchidas em outra
-        // navegacao pois esse metodo eh reaproveitado.
-        configurarFiltroPediodoMensal();
         addAtributo("listaRepresentada", representadaService.pesquisarFornecedorAtivo());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
     }

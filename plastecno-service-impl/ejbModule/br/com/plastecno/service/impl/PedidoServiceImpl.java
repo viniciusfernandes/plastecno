@@ -782,7 +782,10 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo) {
-		return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
+		if (periodo != null) {
+			return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo.getInicio(), periodo.getFim());
+		}
+		return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, null, null);
 	}
 
 	@Override
@@ -921,13 +924,19 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemAguardandoCompra(Integer idCliente, Periodo periodo) {
-		return itemPedidoDAO.pesquisarItemAguardandoCompra(idCliente, periodo.getInicio(), periodo.getFim());
+		if (periodo != null) {
+			return itemPedidoDAO.pesquisarItemAguardandoCompra(idCliente, periodo.getInicio(), periodo.getFim());
+		}
+		return itemPedidoDAO.pesquisarItemAguardandoCompra(idCliente, null, null);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Periodo periodo) {
-		return itemPedidoDAO.pesquisarItemAguardandoMaterial(idRepresentada, periodo.getInicio(), periodo.getFim());
+		if (periodo != null) {
+			return itemPedidoDAO.pesquisarItemAguardandoMaterial(idRepresentada, periodo.getInicio(), periodo.getFim());
+		}
+		return itemPedidoDAO.pesquisarItemAguardandoMaterial(idRepresentada, null, null);
 	}
 
 	@Override

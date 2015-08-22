@@ -262,7 +262,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
 		 * estoque para recuperar apenas a informacao necessaria.
 		 */
-		return gerarRelatorioItensPorPedido("Itens para Encomendar",
+		return gerarRelatorioItensPorPedido("Itens para Comprar",
 				pedidoService.pesquisarItemAguardandoCompra(idCliente, periodo));
 	}
 
@@ -271,12 +271,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(Integer idRepresentada,
 			Periodo periodo) {
-		StringBuilder titulo = new StringBuilder();
-		titulo.append("Itens Aguardando Material de ");
-		titulo.append(StringUtils.formatarData(periodo.getInicio())).append(" à ");
-		titulo.append(StringUtils.formatarData(periodo.getFim()));
 
-		return gerarRelatorioItensPorPedido(titulo.toString(),
+		return gerarRelatorioItensPorPedido("Itens Aguardando Material",
 				pedidoService.pesquisarItemAguardandoMaterial(idRepresentada, periodo));
 	}
 

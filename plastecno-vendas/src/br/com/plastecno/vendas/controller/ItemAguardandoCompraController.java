@@ -40,13 +40,7 @@ public class ItemAguardandoCompraController extends AbstractController {
 
     @Get("itemAguardandoCompra/pdf")
     public Download downloadPedidoPDF(Integer idPedido) {
-        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
-    }
-
-    @Get("itemAguardandoCompra")
-    public void itemAguardandoCompraHome() {
-        configurarFiltroPediodoMensal();
-        addAtributo("listaFornecedor", this.representadaService.pesquisarFornecedorAtivo());
+        return forwardTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
     }
 
     @Post("itemAguardandoCompra/item/compra")
@@ -54,8 +48,8 @@ public class ItemAguardandoCompraController extends AbstractController {
             Cliente cliente, List<Integer> listaIdItem) {
         try {
             final Set<Integer> ids = listaIdItem == null ? new HashSet<Integer>() : new HashSet<Integer>(listaIdItem);
-            Integer idPedidoCompra = pedidoService.comprarItemPedido(getCodigoUsuario(), idRepresentadaFornecedora,
-                    ids);
+            Integer idPedidoCompra = pedidoService
+                    .comprarItemPedido(getCodigoUsuario(), idRepresentadaFornecedora, ids);
             addAtributo("dataInicial", formatarData(dataInicial));
             addAtributo("dataFinal", formatarData(dataFinal));
             addAtributo("cliente", cliente);
@@ -86,10 +80,15 @@ public class ItemAguardandoCompraController extends AbstractController {
         redirecTo(this.getClass()).pesquisarItemAguardandoCompra(dataInicial, dataFinal, cliente);
     }
 
+    @Get("itemAguardandoCompra")
+    public void itemAguardandoCompraHome() {
+        addAtributo("listaFornecedor", this.representadaService.pesquisarFornecedorAtivo());
+    }
+
     @Get("itemAguardandoCompra/item/listagem")
     public void pesquisarItemAguardandoCompra(Date dataInicial, Date dataFinal, Cliente cliente) {
         try {
-            Periodo periodo = new Periodo(dataInicial, dataFinal);
+            Periodo periodo = Periodo.gerarPeriodo(dataInicial, dataFinal);
             RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioItemAguardandoCompra(
                     cliente.getId(), periodo);
 

@@ -101,13 +101,13 @@ function encomendarItem(campo){
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<fieldset>
 			<legend>::: Pesquisa de Itens para Comprar :::</legend>
-			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
+			<div class="label" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="dataInicial" name="dataInicial"
 					value="${dataInicial}" maxlength="10" class="pesquisavel" />
 			</div>
 
-			<div class="label obrigatorio" style="width: 10%">Data Final:</div>
+			<div class="label" style="width: 10%">Data Final:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="dataFinal" name="dataFinal"
 					value="${dataFinal}" maxlength="100" class="pesquisavel" />

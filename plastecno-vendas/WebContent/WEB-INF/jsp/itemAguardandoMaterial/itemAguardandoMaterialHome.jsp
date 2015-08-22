@@ -54,13 +54,13 @@ function enviarEmpacotamento(botao){
 	<form id="formPesquisa" action="<c:url value="/itemAguardandoMaterial/listagem"/>" method="get">
 		<fieldset>
 			<legend>::: Pesquisa de Itens Aguard. Material :::</legend>
-			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
+			<div class="label" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="dataInicial" name="dataInicial"
 					value="${dataInicial}" maxlength="10" class="pesquisavel" />
 			</div>
 
-			<div class="label obrigatorio" style="width: 10%">Data Final:</div>
+			<div class="label" style="width: 10%">Data Final:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="dataFinal" name="dataFinal"
 					value="${dataFinal}" maxlength="100" class="pesquisavel" />

@@ -100,12 +100,13 @@ public class EstoqueController extends AbstractController {
     }
 
     @Post("estoque/limiteminimo/inclusao")
-    public void inserirLimiteMinimo(LimiteMinimoEstoque limite) {
+    public void inserirLimiteMinimo(ItemEstoque limite) {
         try {
-            limite.setTaxaMinima(NumeroUtils.gerarAliquota(limite.getTaxaMinima()));
-            estoqueService.associarLimiteMinimoEstoque(limite);
+            limite.setMargemMinimaLucro(NumeroUtils.gerarAliquota(limite.getMargemMinimaLucro()));
+            estoqueService.inserirLimiteMinimoEstoque(limite);
 
             limite.setMaterial(materialService.pesquisarById(limite.getMaterial().getId()));
+
             StringBuilder mensagem = new StringBuilder("Limite mínimo de estoque de quantidade \"")
                     .append(limite.getQuantidadeMinima() == null ? 0 : limite.getQuantidadeMinima()).append("\" ")
                     .append(limite.getDescricao());

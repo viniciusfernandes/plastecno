@@ -204,7 +204,6 @@ function inicializarFiltro() {
 	</form>
 	
 	<c:if test="${acessoManutencaoEstoquePermitido}">
-		<jsp:include page="/bloco/bloco_limite_minimo_estoque.jsp"/>	
 		<jsp:include page="/bloco/bloco_edicao_item.jsp"/>
 	</c:if>
 	

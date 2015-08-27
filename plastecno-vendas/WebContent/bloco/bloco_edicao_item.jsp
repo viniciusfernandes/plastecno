@@ -15,6 +15,11 @@ $(document).ready(function() {
 		$('#formaMaterial').val('');
 		habilitarCamposEdicaoItem(true);
 	});
+	
+	$('#bloco_limite_minimo #botaoInserirLimiteMinimo').click(function () {
+		var parametros = serializarForm('bloco_item_pedido');
+		$('#formVazio').attr('action', '<c:url value="estoque/limiteminimo/inclusao"/>?'+parametros).attr('method', 'post').submit();
+	});
 });
 
 
@@ -41,6 +46,7 @@ function habilitarCamposEdicaoItem(habilitado){
 		<input type="hidden" id="idTipoVenda" name="itemPedido.tipoVenda" value="${itemPedido.tipoVenda}"/>
 		<input type="hidden" id="idDescricaoPeca" name="itemPedido.descricaoPeca" value="${itemPedido.descricaoPeca}"/>
 		<input type="hidden" id="itemSequencial" name="itemPedido.sequencial" value="${itemPedido.sequencial}"/>
+		
 		<div class="label">Tipo de ${not empty tipoPedido ? 'Compra': 'Venda'}:</div>
 		<div class="input">
 			<input type="radio" id="tipoVendaKilo" name="itemPedido.tipoVenda"
@@ -111,16 +117,30 @@ function habilitarCamposEdicaoItem(habilitado){
 			</c:otherwise>
 		</c:choose>
 	</div>
+	
 	<div class="label" style="width: 8%">IPI (%) :</div>
 	<div class="input" style="width: 5%">
 		<input type="text" id="aliquotaIPI" name="itemPedido.aliquotaIPI" value="${itemPedido.aliquotaIPIFormatado}" maxlength="2" />
 	</div>
 	<div class="label" style="width: 10%">ICMS (%) :</div>
-	<div class="input" style="width: 5%">
+	<div class="input" style="width: 40%">
 		<input type="text" id="aliquotaICMS" name="itemPedido.aliquotaICMS"
-			value="${itemPedido.aliquotaICMSFormatado}" maxlength="2" />
+			value="${itemPedido.aliquotaICMSFormatado}" maxlength="2" style="width: 5%"/>
 	</div>
+	
+	<c:if test="${isEstoque and acessoManutencaoEstoquePermitido}">
+		<div class="label">Preço Mín.:</div>
+		<div class="input" style="width: 7%">
+			<input type="text" id="precoMinimo" name="itemPedido.precoMinimo" value="${itemPedido.precoMinimo}"/>
+		</div>
+		<div class="label">Margem Mín.(%):</div>
+		<div class="input" style="width: 7%">
+			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}"/>
+		</div>
+	</c:if>
+	
 	<div class="bloco_botoes">
+		<a id="botaoInserirLimiteMinimo" title="Inserir Limite Mínimo de Estoque" class="botaoInserir"></a>
 		<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Refazer os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
 		<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
 	</div>

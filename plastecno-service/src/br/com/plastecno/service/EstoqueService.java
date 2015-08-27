@@ -16,7 +16,7 @@ import br.com.plastecno.service.exception.BusinessException;
 @Local
 public interface EstoqueService {
 
-	void inserirLimiteMinimoEstoque(ItemEstoque parametro) throws BusinessException;
+	void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException;
 
 	Integer associarLimiteMinimoEstoque(LimiteMinimoEstoque limite) throws BusinessException;
 

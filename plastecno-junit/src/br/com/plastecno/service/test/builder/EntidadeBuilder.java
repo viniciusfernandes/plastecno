@@ -19,7 +19,6 @@ import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.Endereco;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Material;
@@ -120,17 +119,6 @@ public class EntidadeBuilder {
 		itemPedido.setDescricaoPeca("ENGRENAGEM DE TESTE");
 		itemPedido.setPrecoVenda(60d);
 		return itemPedido;
-	}
-
-	public LimiteMinimoEstoque buildLimiteMinimoEstoque() {
-		LimiteMinimoEstoque limite = new LimiteMinimoEstoque();
-		limite.setFormaMaterial(FormaMaterial.TB);
-		limite.setComprimento(2000.0);
-		limite.setMedidaExterna(100.0);
-		limite.setMedidaInterna(80.0);
-		limite.setQuantidadeMinima(10);
-		limite.setTaxaMinima(10.0);
-		return limite;
 	}
 
 	public List<PerfilAcesso> buildListaPerfilAcesso() {

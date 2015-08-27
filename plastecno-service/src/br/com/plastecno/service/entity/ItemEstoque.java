@@ -54,6 +54,9 @@ public class ItemEstoque extends Item {
 	@JoinColumn(name = "id_limite_minimo_estoque", referencedColumnName = "id", nullable = false)
 	private LimiteMinimoEstoque limiteMinimoEstoque;
 
+	@Column(name = "margem_minima_lucro")
+	private Double margemMinimaLucro;
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao item do estoque")
@@ -70,19 +73,17 @@ public class ItemEstoque extends Item {
 	private Double precoMedio;
 
 	@Transient
-	private Double taxaMinima;
+	private Double precoSugerido;
 
+	@Column(name = "taxa_minima_lucro")
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Quantidade de itens do estoque")
 	private Integer quantidade = 0;
 
+	@Column(name = "quantidade_minima")
+	private Integer quantidadeMinima;
+
 	@Transient
 	private String siglaMaterial;
-
-	@Transient
-	private Double precoSugerido;
-
-	@Transient
-	private Integer quantidadeMinima;
 
 	public ItemEstoque() {
 	}
@@ -96,7 +97,7 @@ public class ItemEstoque extends Item {
 	}
 
 	public ItemEstoque(Integer id, FormaMaterial formaMaterial, String descricaoPeca, String siglaMaterial,
-			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double taxaMinima,
+			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double margemMinimaLucro,
 			Integer quantidade, Integer quantidadeMinima) {
 		this.comprimento = comprimento;
 		this.descricaoPeca = descricaoPeca;
@@ -107,7 +108,7 @@ public class ItemEstoque extends Item {
 		this.medidaInterna = medidaInterna;
 		this.precoMedio = precoMedio;
 		this.quantidade = quantidade;
-		this.taxaMinima = taxaMinima;
+		this.margemMinimaLucro = margemMinimaLucro;
 		this.quantidadeMinima = quantidadeMinima;
 	}
 
@@ -159,6 +160,10 @@ public class ItemEstoque extends Item {
 		return limiteMinimoEstoque;
 	}
 
+	public Double getMargemMinimaLucro() {
+		return margemMinimaLucro;
+	}
+
 	public Material getMaterial() {
 		return material;
 	}
@@ -205,10 +210,6 @@ public class ItemEstoque extends Item {
 		return siglaMaterial;
 	}
 
-	public Double getTaxaMinima() {
-		return taxaMinima;
-	}
-
 	// Metodo criado para facilitar teste unitario
 	public boolean isItemEscasso() {
 		return limiteMinimoEstoque != null && quantidade != null && quantidade < limiteMinimoEstoque.getQuantidadeMinima();
@@ -244,6 +245,10 @@ public class ItemEstoque extends Item {
 
 	public void setLimiteMinimoEstoque(LimiteMinimoEstoque limiteMinimoEstoque) {
 		this.limiteMinimoEstoque = limiteMinimoEstoque;
+	}
+
+	public void setMargemMinimaLucro(Double margemMinimaLucro) {
+		this.margemMinimaLucro = margemMinimaLucro;
 	}
 
 	public void setMaterial(Material material) {
@@ -286,10 +291,6 @@ public class ItemEstoque extends Item {
 
 	public void setSiglaMaterial(String siglaMaterial) {
 		this.siglaMaterial = siglaMaterial;
-	}
-
-	public void setTaxaMinima(Double taxaMinima) {
-		this.taxaMinima = taxaMinima;
 	}
 
 }

@@ -74,6 +74,10 @@ public abstract class Item implements Serializable, Cloneable {
 		return getFormaMaterial() != null && getFormaMaterial().contemLargura();
 	}
 
+	public boolean contemMedida() {
+		return getMedidaExterna() != null || getMedidaInterna() != null || getComprimento() != null;
+	}
+
 	public abstract Double getAliquotaICMS();
 
 	public String getAliquotaICMSFormatado() {
@@ -194,6 +198,28 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public String getValorComissaoFormatado() {
 		return valorComissaoFormatado;
+	}
+
+	public boolean isCoincidente(Item item) {
+		boolean coincide = false;
+
+		coincide = (getFormaMaterial() == null && item.getFormaMaterial() == null)
+				|| (getFormaMaterial().equals(item.getFormaMaterial()));
+
+		coincide &= (getMaterial() == null && item.getMaterial() == null)
+				|| (getMaterial().getId() == null && item.getMaterial().getId() == null)
+				|| (getMaterial().getId().equals(item.getMaterial().getId()));
+
+		coincide &= (getMedidaExterna() == null && item.getMedidaExterna() == null)
+				|| (getMedidaExterna() != null && getMedidaExterna().equals(item.getMedidaExterna()));
+
+		coincide &= (getMedidaInterna() == null && item.getMedidaInterna() == null)
+				|| (getMedidaInterna() != null && getMedidaInterna().equals(item.getMedidaInterna()));
+
+		coincide &= (getComprimento() == null && item.getComprimento() == null)
+				|| (getComprimento() != null && getComprimento().equals(item.getComprimento()));
+
+		return coincide;
 	}
 
 	public boolean isFormaMaterialVazada() {

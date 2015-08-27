@@ -71,6 +71,11 @@ public class GenericDAO<T> {
 	}
 
 	T pesquisarById(Class<T> classe, Integer id) {
+
+		if (id == null) {
+			return null;
+		}
+
 		StringBuilder select = new StringBuilder();
 		select.append("select e from ").append(classe.getSimpleName());
 		select.append(" e where e.id = :id");

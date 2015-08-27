@@ -16,9 +16,15 @@ $(document).ready(function() {
 		habilitarCamposEdicaoItem(true);
 	});
 	
-	$('#bloco_limite_minimo #botaoInserirLimiteMinimo').click(function () {
+	$('#bloco_item_pedido #botaoInserirLimiteMinimo').click(function () {
 		var parametros = serializarForm('bloco_item_pedido');
-		$('#formVazio').attr('action', '<c:url value="estoque/limiteminimo/inclusao"/>?'+parametros).attr('method', 'post').submit();
+		// tivemos que fazer esse append pois esse campos esta disabled, entao nao serao serializados
+		parametros+='&itemPedido.medidaExterna='+$('#bloco_item_pedido #medidaExterna').val();
+		parametros+='&itemPedido.medidaInterna='+$('#bloco_item_pedido #medidaInterna').val();
+		parametros+='&itemPedido.comprimento='+$('#bloco_item_pedido #comprimento').val();
+		
+		alert(parametros);
+		$('#formPesquisa').attr('action', '<c:url value="estoque/limiteminimo/inclusao"/>?'+parametros).attr('method', 'post').submit();
 	});
 });
 
@@ -129,18 +135,21 @@ function habilitarCamposEdicaoItem(habilitado){
 	</div>
 	
 	<c:if test="${isEstoque and acessoManutencaoEstoquePermitido}">
-		<div class="label">Preço Mín.:</div>
+		<div class="label">Qtde. Mín.:</div>
 		<div class="input" style="width: 7%">
-			<input type="text" id="precoMinimo" name="itemPedido.precoMinimo" value="${itemPedido.precoMinimo}"/>
+			<input type="text" id="quantidadeMinima" name="itemPedido.quantidadeMinima" value="${itemPedido.quantidadeMinima}"/>
 		</div>
 		<div class="label">Margem Mín.(%):</div>
 		<div class="input" style="width: 7%">
 			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}"/>
 		</div>
+		<div class="input" style="width: 7%">
+			<div id="botaoInserirLimiteMinimo" title="Inserir Limite Mínimo de Estoque" class="botaoInserir"></div>
+		</div>
 	</c:if>
 	
 	<div class="bloco_botoes">
-		<a id="botaoInserirLimiteMinimo" title="Inserir Limite Mínimo de Estoque" class="botaoInserir"></a>
+		<!-- a id="botaoInserirLimiteMinimo" title="Inserir Limite Mínimo de Estoque" class="botaoInserir"></a -->
 		<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Refazer os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
 		<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
 	</div>

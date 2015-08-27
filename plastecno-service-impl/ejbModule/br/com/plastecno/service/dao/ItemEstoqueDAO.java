@@ -18,17 +18,9 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		super(entityManager);
 	}
 
-	private void appendLimiteMinimoJoin(StringBuilder select) {
+	private void appendConstrutorItemEstoque(StringBuilder select) {
 		select
-				.append(
-						"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, l.taxaMinima, i.quantidade, l.quantidadeMinima) from ItemEstoque i ")
-				.append(" left join i.limiteMinimoEstoque l ");
-	}
-
-	public boolean contemLimiteMinimoEstoque(Integer idItemEstoque) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i.limiteMinimoEstoque.id from ItemEstoque i where i.id = :idItemEstoque")
-						.setParameter("idItemEstoque", idItemEstoque), Integer.class, null) != null;
+				.append("select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima) from ItemEstoque i ");
 	}
 
 	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
@@ -98,7 +90,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca,
 			boolean zeradosExcluidos) {
 		StringBuilder select = new StringBuilder();
-		appendLimiteMinimoJoin(select);
+		appendConstrutorItemEstoque(select);
 
 		if (idMaterial != null || formaMaterial != null) {
 			select.append("where ");
@@ -213,7 +205,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
 		StringBuilder select = new StringBuilder();
-		appendLimiteMinimoJoin(select);
+		appendConstrutorItemEstoque(select);
 		select.append(" inner join i.limiteMinimoEstoque l where i.quantidade <= l.quantidadeMinima");
 		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();
 	}
@@ -237,7 +229,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return recuperarItemNaoZerado(l);
 	}
 
-	public Object[] pesquisarTaxaMininaEValorMedioItemEstoque(Integer idItemEstoque) {
+	public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
 						"select i.margemMinimaLicro, i.precoMedio, i.formaMaterial from ItemEstoque i where i.id= :idItemEstoque")

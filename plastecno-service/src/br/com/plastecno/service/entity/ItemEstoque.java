@@ -50,10 +50,6 @@ public class ItemEstoque extends Item {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemEstoqueSequence")
 	private Integer id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_limite_minimo_estoque", referencedColumnName = "id", nullable = false)
-	private LimiteMinimoEstoque limiteMinimoEstoque;
-
 	@Column(name = "margem_minima_lucro")
 	private Double margemMinimaLucro;
 
@@ -73,9 +69,9 @@ public class ItemEstoque extends Item {
 	private Double precoMedio;
 
 	@Transient
-	private Double precoSugerido;
+	private Double precoMinimo;
 
-	@Column(name = "taxa_minima_lucro")
+	@Column(name = "quantidade")
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Quantidade de itens do estoque")
 	private Integer quantidade = 0;
 
@@ -156,10 +152,6 @@ public class ItemEstoque extends Item {
 		return id;
 	}
 
-	public LimiteMinimoEstoque getLimiteMinimoEstoque() {
-		return limiteMinimoEstoque;
-	}
-
 	public Double getMargemMinimaLucro() {
 		return margemMinimaLucro;
 	}
@@ -180,8 +172,8 @@ public class ItemEstoque extends Item {
 		return precoMedio;
 	}
 
-	public Double getPrecoSugerido() {
-		return precoSugerido;
+	public Double getPrecoMinimo() {
+		return precoMinimo;
 	}
 
 	@Override
@@ -212,7 +204,7 @@ public class ItemEstoque extends Item {
 
 	// Metodo criado para facilitar teste unitario
 	public boolean isItemEscasso() {
-		return limiteMinimoEstoque != null && quantidade != null && quantidade < limiteMinimoEstoque.getQuantidadeMinima();
+		return quantidade != null && quantidadeMinima != null && quantidade < quantidadeMinima;
 	}
 
 	public boolean isNovo() {
@@ -243,10 +235,6 @@ public class ItemEstoque extends Item {
 		this.id = id;
 	}
 
-	public void setLimiteMinimoEstoque(LimiteMinimoEstoque limiteMinimoEstoque) {
-		this.limiteMinimoEstoque = limiteMinimoEstoque;
-	}
-
 	public void setMargemMinimaLucro(Double margemMinimaLucro) {
 		this.margemMinimaLucro = margemMinimaLucro;
 	}
@@ -267,8 +255,8 @@ public class ItemEstoque extends Item {
 		this.precoMedio = precoMedio;
 	}
 
-	public void setPrecoSugerido(Double precoSugerido) {
-		this.precoSugerido = precoSugerido;
+	public void setPrecoMinimo(Double precoMinimo) {
+		this.precoMinimo = precoMinimo;
 	}
 
 	@Override

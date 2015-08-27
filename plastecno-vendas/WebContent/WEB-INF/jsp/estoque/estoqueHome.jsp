@@ -247,7 +247,7 @@ function inicializarFiltro() {
 								</c:otherwise>
 							</c:choose>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMedio}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoSugerido}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMinimo}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<c:if test="${acessoManutencaoEstoquePermitido}">
 								<div class="coluna_acoes_listagem">

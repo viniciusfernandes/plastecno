@@ -8,7 +8,6 @@ import mockit.MockUp;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.entity.ItemEstoque;
-import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.util.StringUtils;
 
@@ -17,25 +16,6 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 	@Override
 	public ItemEstoqueDAO build() {
 		new MockUp<ItemEstoqueDAO>() {
-			@Mock
-			public boolean contemLimiteMinimoEstoque(Integer idItemEstoque) {
-				if (idItemEstoque == null) {
-					return false;
-				}
-				List<LimiteMinimoEstoque> l = REPOSITORY.pesquisarTodos(LimiteMinimoEstoque.class);
-				for (LimiteMinimoEstoque limite : l) {
-
-					if (limite.getListaItemEstoque() != null) {
-						for (ItemEstoque i : limite.getListaItemEstoque()) {
-							if (idItemEstoque.equals(i.getId())) {
-								return true;
-							}
-						}
-					}
-
-				}
-				return false;
-			}
 
 			@Mock
 			public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {

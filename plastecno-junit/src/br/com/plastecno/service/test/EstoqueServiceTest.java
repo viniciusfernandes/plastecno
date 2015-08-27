@@ -348,7 +348,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		Double precoMinimoCalculado = null;
 		try {
-			precoMinimoCalculado = estoqueService.calcularPrecoSugeridoItemEstoque(itemEstoque);
+			precoMinimoCalculado = estoqueService.calcularPrecoMinimoItemEstoque(itemEstoque);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -374,7 +374,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		Double precoMinimoCalculado = null;
 		try {
-			precoMinimoCalculado = estoqueService.calcularPrecoSugeridoItemEstoque(itemEstoque);
+			precoMinimoCalculado = estoqueService.calcularPrecoMinimoItemEstoque(itemEstoque);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

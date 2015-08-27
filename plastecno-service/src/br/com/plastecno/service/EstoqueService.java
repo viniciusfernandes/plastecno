@@ -9,20 +9,15 @@ import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.entity.Item;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface EstoqueService {
 
-	void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException;
-
-	Integer associarLimiteMinimoEstoque(LimiteMinimoEstoque limite) throws BusinessException;
-
 	double calcularPrecoCustoItemEstoque(Item filtro);
 
-	Double calcularPrecoSugeridoItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
+	Double calcularPrecoMinimoItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
@@ -38,6 +33,8 @@ public interface EstoqueService {
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
+	void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException;
+
 	Integer pesquisarIdItemEstoque(Item filtro);
 
 	List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
@@ -47,10 +44,6 @@ public interface EstoqueService {
 	ItemEstoque pesquisarItemEstoqueById(Integer idItemEstoque);
 
 	List<ItemEstoque> pesquisarItemEstoqueEscasso();
-
-	LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro);
-
-	LimiteMinimoEstoque pesquisarLimiteMinimoEstoqueById(Integer idLimiteMinimo);
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
 

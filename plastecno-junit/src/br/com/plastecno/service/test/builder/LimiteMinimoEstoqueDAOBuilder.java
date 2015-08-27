@@ -40,40 +40,22 @@ public class LimiteMinimoEstoqueDAOBuilder extends DAOBuilder<LimiteMinimoEstoqu
 			}
 
 			@Mock
-			public List<Integer> pesquisarIdItemEstoqueDentroLimiteMinimo(LimiteMinimoEstoque limite, double tolerancia) {
+			public List<Integer> pesquisarIdItemEstoqueDentroLimiteMinimo(LimiteMinimoEstoque limite) {
 				List<ItemEstoque> listaItem = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				List<Integer> listaId = new ArrayList<Integer>();
-				Double medidaExterna = limite.getMedidaExterna();
-				Double medidaInterna = limite.getMedidaInterna();
-				Double comprimento = limite.getComprimento();
-				double diferenca = 0;
-				final boolean contemMedida = medidaExterna != null || medidaInterna != null || comprimento != null;
+
+				final boolean contemMedida = limite.getMedidaExterna() != null || limite.getMedidaInterna() != null
+						|| limite.getComprimento() != null;
 				for (ItemEstoque i : listaItem) {
 					if (!contemMedida) {
 						listaId.add(i.getId());
 						continue;
 					}
 
-					if (medidaExterna != null) {
-						diferenca = medidaExterna - (i.getMedidaExterna() == null ? 0 : i.getMedidaExterna());
-						if (Math.abs(diferenca) > tolerancia) {
-							continue;
-						}
+					if (!limite.isCoincidente(i)) {
+						continue;
 					}
 
-					if (medidaInterna != null) {
-						diferenca = medidaInterna - (i.getMedidaInterna() == null ? 0 : i.getMedidaInterna());
-						if (Math.abs(diferenca) > tolerancia) {
-							continue;
-						}
-					}
-
-					if (comprimento != null) {
-						diferenca = comprimento - (i.getComprimento() == null ? 0 : i.getComprimento());
-						if (Math.abs(diferenca) > tolerancia) {
-							continue;
-						}
-					}
 					listaId.add(i.getId());
 				}
 				return listaId;

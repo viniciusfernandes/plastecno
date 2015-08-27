@@ -20,13 +20,13 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	private void appendLimiteMinimoJoin(StringBuilder select) {
 		select
 				.append(
-						"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, l.taxaMinima, i.quantidade) from ItemEstoque i ")
+						"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, l.taxaMinima, i.quantidade, l.quantidadeMinima) from ItemEstoque i ")
 				.append(" left join i.limiteMinimoEstoque l ");
 	}
 
 	public boolean contemLimiteMinimoEstoque(Integer idItemEstoque) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i.limiteMinimoEstoque.id from ItemEstoque i where i.id =: idItemEstoque")
+				entityManager.createQuery("select i.limiteMinimoEstoque.id from ItemEstoque i where i.id = :idItemEstoque")
 						.setParameter("idItemEstoque", idItemEstoque), Integer.class, null) != null;
 	}
 

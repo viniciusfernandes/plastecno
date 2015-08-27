@@ -8,7 +8,13 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 
+import mockit.Mock;
+import mockit.MockUp;
+import br.com.plastecno.service.EmailService;
 import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.exception.NotificacaoException;
+import br.com.plastecno.service.impl.EmailServiceImpl;
+import br.com.plastecno.service.mensagem.email.MensagemEmail;
 
 public class ServiceBuilder {
 
@@ -34,6 +40,9 @@ public class ServiceBuilder {
 		if (service != null) {
 			return service;
 		}
+		
+		buildEmailService();
+		
 		String serviceNameImpl = classe.getName().replace("service", "service.impl") + "Impl";
 		try {
 			/*
@@ -119,5 +128,16 @@ public class ServiceBuilder {
 	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
 
 	ServiceBuilder() {
+	}
+
+	private static void buildEmailService() {
+		new MockUp<EmailServiceImpl>() {
+
+			@Mock
+			public void enviar(MensagemEmail mensagemEmail) throws NotificacaoException {
+			}
+		};
+
+		mapTemporarioServices.put(EmailService.class, new EmailServiceImpl());
 	}
 }

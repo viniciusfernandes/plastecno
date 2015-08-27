@@ -81,6 +81,9 @@ public class ItemEstoque extends Item {
 	@Transient
 	private Double precoSugerido;
 
+	@Transient
+	private Integer quantidadeMinima;
+
 	public ItemEstoque() {
 	}
 
@@ -94,7 +97,7 @@ public class ItemEstoque extends Item {
 
 	public ItemEstoque(Integer id, FormaMaterial formaMaterial, String descricaoPeca, String siglaMaterial,
 			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double taxaMinima,
-			Integer quantidade) {
+			Integer quantidade, Integer quantidadeMinima) {
 		this.comprimento = comprimento;
 		this.descricaoPeca = descricaoPeca;
 		this.formaMaterial = formaMaterial;
@@ -105,6 +108,7 @@ public class ItemEstoque extends Item {
 		this.precoMedio = precoMedio;
 		this.quantidade = quantidade;
 		this.taxaMinima = taxaMinima;
+		this.quantidadeMinima = quantidadeMinima;
 	}
 
 	public double calcularPrecoTotal() {
@@ -193,6 +197,10 @@ public class ItemEstoque extends Item {
 		return quantidade;
 	}
 
+	public Integer getQuantidadeMinima() {
+		return quantidadeMinima;
+	}
+
 	public String getSiglaMaterial() {
 		return siglaMaterial;
 	}
@@ -270,6 +278,10 @@ public class ItemEstoque extends Item {
 
 	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
+	}
+
+	public void setQuantidadeMinima(Integer quantidadeMinima) {
+		this.quantidadeMinima = quantidadeMinima;
 	}
 
 	public void setSiglaMaterial(String siglaMaterial) {

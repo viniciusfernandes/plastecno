@@ -35,7 +35,7 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 				.setParameter("idLimiteMinimo", idLimiteMinimo).executeUpdate();
 	}
 
-	public List<Integer> pesquisarIdItemEstoqueDentroLimiteMinimo(LimiteMinimoEstoque limite, double tolerancia) {
+	public List<Integer> pesquisarIdItemEstoqueDentroLimiteMinimo(LimiteMinimoEstoque limite) {
 		StringBuilder select = new StringBuilder("select i.id from ItemEstoque i ");
 		Double medidaExterna = limite.getMedidaExterna();
 		Double medidaInterna = limite.getMedidaInterna();
@@ -45,15 +45,21 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 		if (contemMedida) {
 			select.append("where ");
 			if (medidaExterna != null) {
-				select.append(" ABS(i.medidaExterna - :medidaExterna) <= :tolerancia and ");
+				select.append(" i.medidaExterna = :medidaExterna and ");
+			} else {
+				select.append(" i.medidaExterna is null and ");
 			}
 
 			if (medidaInterna != null) {
-				select.append(" ABS(i.medidaInterna - :medidaInterna) <= :tolerancia and ");
+				select.append(" i.medidaInterna = :medidaInterna and ");
+			} else {
+				select.append(" i.medidaInterna is null and ");
 			}
 
 			if (comprimento != null) {
-				select.append(" ABS(i.comprimento - :comprimento) <= :tolerancia and ");
+				select.append(" i.comprimento = :comprimento and ");
+			} else {
+				select.append(" i.comprimento is null and ");
 			}
 
 		}
@@ -72,7 +78,6 @@ public class LimiteMinimoEstoqueDAO extends GenericDAO<LimiteMinimoEstoque> {
 				query.setParameter("comprimento", comprimento);
 			}
 
-			query.setParameter("tolerancia", tolerancia);
 		}
 
 		query.setParameter("formaMaterial", limite.getFormaMaterial()).setParameter("material", limite.getMaterial());

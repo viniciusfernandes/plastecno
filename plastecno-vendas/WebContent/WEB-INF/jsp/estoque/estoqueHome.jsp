@@ -216,12 +216,13 @@ function inicializarFiltro() {
 				<thead>
 					<tr>
 						<th style="width: 20%">Material</th>
-						<th style="width: 10%">Qtde.</th>
+						<th style="width: 5%">Qtde.</th>
+						<th style="width: 5%">Qtde Min.</th>
 						<th style="width: 10%">Med. Externa</th>
 						<th style="width: 10%">Med. Interna</th>
 						<th style="width: 10%">Comprimento</th>
 						<th style="width: 10%">Valor Unid. (R$)</th>
-						<th style="width: 10%">Preç. Sug. (R$)</th>
+						<th style="width: 10%">Preç. Min. (R$)</th>
 						<th style="width: 5%">Ações</th>
 					</tr>
 				</thead>
@@ -235,6 +236,7 @@ function inicializarFiltro() {
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeMinima}</td>
 							<c:choose>
 								<c:when test="${item.peca}">
 									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" colspan="3">${item.descricaoPeca}</td>

@@ -107,7 +107,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			return limiteCadastrado.getId();
 		}
 
-		ValidadorInformacao.validar(limite);
+		// So vamos inserir se o limite ainda nao existe no sistema.
 		return inserirLimiteMinimo(limite);
 	}
 
@@ -367,13 +367,15 @@ public class EstoqueServiceImpl implements EstoqueService {
 		boolean isNovo = limite.getId() == null;
 
 		if (isNovo) {
-			limite = limiteMinimoEstoqueDAO.inserir(limite);
+			// Aqui temos que ter um flush para enviar os dados para o banco para
+			// posteriormente associar o limite aos itens do estoque, ja que a
+			// associacao eh feita atraves de DML
+			limite = limiteMinimoEstoqueDAO.flush(limite);
 		} else {
 			limite = limiteMinimoEstoqueDAO.alterar(limite);
 		}
 
-		List<Integer> listaIdItemEstoque = limiteMinimoEstoqueDAO.pesquisarIdItemEstoqueDentroLimiteMinimo(limite,
-				tolerancia);
+		List<Integer> listaIdItemEstoque = limiteMinimoEstoqueDAO.pesquisarIdItemEstoqueDentroLimiteMinimo(limite);
 
 		if (!listaIdItemEstoque.isEmpty()) {
 			limiteMinimoEstoqueDAO.associarLimiteMinimoItemEstoque(limite.getId(), listaIdItemEstoque);

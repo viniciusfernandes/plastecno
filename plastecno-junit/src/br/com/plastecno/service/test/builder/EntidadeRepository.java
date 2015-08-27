@@ -67,6 +67,11 @@ public class EntidadeRepository {
 			}
 
 			@Mock
+			Object flush(Object t) {
+				return inserir(t);
+			}
+
+			@Mock
 			Object inserir(Object t) {
 				try {
 					Method m = t.getClass().getMethod("setId", Integer.class);

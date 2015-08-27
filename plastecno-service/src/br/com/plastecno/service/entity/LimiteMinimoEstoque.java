@@ -175,6 +175,20 @@ public class LimiteMinimoEstoque implements Cloneable {
 		return taxaMinima;
 	}
 
+	public boolean isCoincidente(ItemEstoque itemEstoque) {
+		boolean coincide = false;
+		coincide = (medidaExterna == null && itemEstoque.getMedidaExterna() == null)
+				|| (medidaExterna != null && medidaExterna.equals(itemEstoque.getMedidaExterna()));
+
+		coincide &= (medidaInterna == null && itemEstoque.getMedidaInterna() == null)
+				|| (medidaInterna != null && medidaInterna.equals(itemEstoque.getMedidaInterna()));
+
+		coincide &= (comprimento == null && itemEstoque.getComprimento() == null)
+				|| (comprimento != null && comprimento.equals(itemEstoque.getComprimento()));
+
+		return coincide;
+	}
+
 	public void setComprimento(Double comprimento) {
 		this.comprimento = comprimento;
 	}

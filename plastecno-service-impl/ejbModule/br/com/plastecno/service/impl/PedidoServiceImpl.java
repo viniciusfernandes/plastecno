@@ -56,6 +56,7 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.util.DateUtils;
+import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
 
@@ -668,7 +669,9 @@ public class PedidoServiceImpl implements PedidoService {
 				.getPrecoUnidade();
 
 		itemPedido.setPrecoUnidadeIPI(precoUnidadeIPI);
-
+		Double precoMinimo = estoqueService.calcularPrecoMinimoItemEstoque(itemPedido);
+		itemPedido.setPrecoMinimo(NumeroUtils.arredondarValorMonetario(precoMinimo));
+		
 		/*
 		 * O valor sequencial sera utilizado para que a representada identifique
 		 * rapidamento qual eh o item que deve ser customizado, assim o vendedor

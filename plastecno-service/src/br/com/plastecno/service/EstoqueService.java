@@ -17,7 +17,7 @@ public interface EstoqueService {
 
 	double calcularPrecoCustoItemEstoque(Item filtro);
 
-	Double calcularPrecoMinimoItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
+	Double calcularPrecoMinimoItemEstoque(Item filtro) throws BusinessException;
 
 	Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 

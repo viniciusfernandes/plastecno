@@ -63,16 +63,16 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * filtro.getQuantidade() * (1 + aliquotaIPI);
 	}
 
-	private Double calcularPrecoMinimo(Double precoMedio, FormaMaterial formaMaterial, Double taxaMinima) {
+	private Double calcularPrecoMinimo(Double precoMedio, FormaMaterial formaMaterial, Double margemMinimaLucro) {
 		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
 		// estoque.
 
-		if (taxaMinima == null) {
-			taxaMinima = 0.0;
+		if (margemMinimaLucro == null) {
+			margemMinimaLucro = 0.0;
 		}
 
 		// Precisamos arredondar
-		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + formaMaterial.getIpi()) * (1 + taxaMinima));
+		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + formaMaterial.getIpi()) * (1 + margemMinimaLucro));
 	}
 
 	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {
@@ -82,10 +82,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double calcularPrecoMinimoItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
+	public Double calcularPrecoMinimoItemEstoque(Item filtro) throws BusinessException {
 		// Temos que pesquisar o ID pois o usuario pode estar inserindo um item novo
 		// e ele pode nao existir no estoque ainda.
-		Integer idItemEstoque = pesquisarIdItemEstoque(itemEstoque);
+		Integer idItemEstoque = pesquisarIdItemEstoque(filtro);
 		if (idItemEstoque == null) {
 			return null;
 		}
@@ -475,7 +475,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemCadastrado.setMargemMinimaLucro(itemEstoque.getMargemMinimaLucro());
 
 		ValidadorInformacao.validar(itemCadastrado);
-		
+
 		itemEstoqueDAO.alterar(itemCadastrado);
 		// redefinirItemReservadoByItemEstoque(idItemEstoque);
 	}

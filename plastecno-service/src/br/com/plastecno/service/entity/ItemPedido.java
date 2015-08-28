@@ -98,6 +98,12 @@ public class ItemPedido extends Item {
 	@Transient
 	private String precoCustoItemFormatado;
 
+	@Column(name = "preco_minimo")
+	private Double precoMinimo;
+
+	@Transient
+	private String precoMinimoFormatado;
+
 	@Column(name = "preco_unidade")
 	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = false, nomeExibicao = "Preço da unidade item do pedido")
 	private Double precoUnidade;
@@ -143,9 +149,6 @@ public class ItemPedido extends Item {
 
 	@Transient
 	private String valorComissionadoFormatado;
-
-	@Transient
-	private String precoSugeridoFormatado;
 
 	public ItemPedido() {
 	}
@@ -299,8 +302,12 @@ public class ItemPedido extends Item {
 		return precoCustoItemFormatado;
 	}
 
-	public String getPrecoSugeridoFormatado() {
-		return precoSugeridoFormatado;
+	public Double getPrecoMinimo() {
+		return precoMinimo;
+	}
+
+	public String getPrecoMinimoFormatado() {
+		return precoMinimoFormatado;
 	}
 
 	public Double getPrecoUnidade() {
@@ -467,8 +474,12 @@ public class ItemPedido extends Item {
 		this.precoCustoItemFormatado = precoCustoFormatado;
 	}
 
-	public void setPrecoSugeridoFormatado(String precoSugeridoFormatado) {
-		this.precoSugeridoFormatado = precoSugeridoFormatado;
+	public void setPrecoMinimo(Double precoMinimo) {
+		this.precoMinimo = precoMinimo;
+	}
+
+	public void setPrecoMinimoFormatado(String precoMinimoFormatado) {
+		this.precoMinimoFormatado = precoMinimoFormatado;
 	}
 
 	public void setPrecoUnidade(Double precoUnidade) {

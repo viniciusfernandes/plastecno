@@ -30,7 +30,6 @@ import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
@@ -143,20 +142,12 @@ public class EstoqueServiceTest extends AbstractTest {
 		return estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 	}
 
-	private LimiteMinimoEstoque gerarLimiteMinimoEstoque() {
-		LimiteMinimoEstoque l = eBuilder.buildLimiteMinimoEstoque();
-		l.setMaterial(gerarMaterial());
-		return l;
-	}
-
-	private LimiteMinimoEstoque gerarLimiteMinimoEstoqueParaItemEstoque(ItemEstoque item) {
-		LimiteMinimoEstoque l = eBuilder.buildLimiteMinimoEstoque();
-		l.setFormaMaterial(item.getFormaMaterial());
-		l.setMaterial(item.getMaterial());
-		l.setMedidaExterna(item.getMedidaExterna());
-		l.setMedidaInterna(item.getMedidaInterna());
-		l.setComprimento(item.getComprimento());
-		return l;
+	private ItemEstoque gerarLimiteMinimoEstoque() {
+		ItemEstoque itemEstoque = eBuilder.buildItemEstoque();
+		itemEstoque.setMaterial(gerarMaterial());
+		itemEstoque.setMargemMinimaLucro(0.1d);
+		itemEstoque.setQuantidadeMinima(10);
+		return itemEstoque;
 	}
 
 	private List<ItemPedido> gerarListaItemPedido(TipoPedido tipoPedido) {
@@ -312,213 +303,83 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testAlteracaoMedidaLimiteMinimoEstoque() {
-		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
-		limite.setMaterial(gerarMaterial());
-		Integer idLimite = null;
-		Integer idLimiteAlterado = null;
+		ItemEstoque item1 = gerarItemEstoque();
+
+		ItemEstoque limite = gerarLimiteMinimoEstoque();
 
 		try {
-			idLimite = estoqueService.associarLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		LimiteMinimoEstoque limiteAlterado = limite.clone();
+		item1 = estoqueService.pesquisarItemEstoqueById(item1.getId());
+		Integer antes = item1.getQuantidadeMinima();
+		Integer depois = null;
 
-		// ALTERANDO O COMPRIMENTO
-		limiteAlterado.setComprimento(limite.getComprimento() + 100);
+		limite.setQuantidadeMinima(antes + 10);
 
 		try {
-			idLimiteAlterado = estoqueService.associarLimiteMinimoEstoque(limiteAlterado);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		assertTrue("O limite minimo com medida alterada deve ter um novo ID no sistema", idLimite != idLimiteAlterado);
-
-		limiteAlterado = limite.clone();
-
-		// ALTERANDO A MEDIDA EXTERNA
-		limiteAlterado.setMedidaExterna(limite.getMedidaExterna() + 100);
-
-		try {
-			idLimiteAlterado = estoqueService.associarLimiteMinimoEstoque(limiteAlterado);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		assertTrue("O limite minimo com medida alterada deve ter um novo ID no sistema", idLimite != idLimiteAlterado);
-
-		limiteAlterado = limite.clone();
-
-		// ALTERANDO A MEDIDA INTERNA
-		limiteAlterado.setMedidaInterna(limite.getMedidaInterna() - 10);
-
-		try {
-			idLimiteAlterado = estoqueService.associarLimiteMinimoEstoque(limiteAlterado);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		assertTrue("O limite minimo com medida alterada deve ter um novo ID no sistema", idLimite != idLimiteAlterado);
-
+		item1 = estoqueService.pesquisarItemEstoqueById(item1.getId());
+		depois = item1.getQuantidadeMinima();
+		assertTrue("A quantidade minima de estoque foi alterada e por isso os valores devem ser diferentes",
+				!antes.equals(depois));
 	}
 
 	@Test
-	public void testAlteracaoQuantidadeLimiteMinimoEstoque() {
-		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
-		limite.setMaterial(gerarMaterial());
-		Integer idLimite = null;
-		Integer idLimiteAlterado = null;
-
-		try {
-			idLimite = estoqueService.associarLimiteMinimoEstoque(limite);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		LimiteMinimoEstoque limiteAlterado = limite.clone();
-
-		limiteAlterado.setQuantidadeMinima(limite.getQuantidadeMinima() + 10);
-
-		try {
-			idLimiteAlterado = estoqueService.associarLimiteMinimoEstoque(limiteAlterado);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		assertEquals("Os IDs dos limites devem ser os mesmos apos a alteracao da quantidade minima", idLimite,
-				idLimiteAlterado);
-	}
-
-	@Test
-	public void testAssociacaoLimiteMinimoEstoque() {
-		LimiteMinimoEstoque l1 = gerarLimiteMinimoEstoque();
-
-		// Apenas o primeiro elemento sera associado ao limite. Como todos eles
-		// ja existem no repositorio, vamos apenas alterar suas medidas para que
-		// o algoritmo de escassez encontre-os no estoque.
-		ItemEstoque i1 = gerarItemPedidoNoEstoque();
-		i1.setQuantidade(l1.getQuantidadeMinima() - 1);
-		i1.setMedidaExterna(l1.getMedidaExterna());
-		i1.setMedidaInterna(l1.getMedidaInterna());
-		i1.setComprimento(l1.getComprimento());
-
-		ItemEstoque i2 = gerarItemPedidoNoEstoque();
-		i2.setQuantidade(l1.getQuantidadeMinima() - 2);
-		i2.setMedidaExterna(l1.getMedidaExterna() + 10);
-		i2.setMedidaInterna(l1.getMedidaInterna());
-		i2.setComprimento(l1.getComprimento());
-
-		ItemEstoque i3 = gerarItemPedidoNoEstoque();
-		i3.setQuantidade(l1.getQuantidadeMinima() - 2);
-		i3.setMedidaExterna(l1.getMedidaExterna() + 20);
-		i3.setMedidaInterna(l1.getMedidaInterna());
-		i3.setComprimento(l1.getComprimento());
-
-		try {
-			// Aqui vamos associar os 2 itens criados anteriomente.
-			estoqueService.associarLimiteMinimoEstoque(l1);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		List<ItemEstoque> listaItemEscasso = estoqueService.pesquisarItemEstoqueEscasso();
-		assertEquals(
-				"Foram incluidos 3 itens no estoque com quantidades abaixo do limite mas apenas o primeiro foi associado ao limite",
-				1, listaItemEscasso.size());
-
-		LimiteMinimoEstoque l2 = gerarLimiteMinimoEstoque();
-		// Criando uma nova medida
-		l2.setComprimento(l2.getComprimento() + 100);
-
-		ItemEstoque i4 = gerarItemPedidoNoEstoque();
-		i4.setQuantidade(l2.getQuantidadeMinima() - 1);
-		i4.setMedidaExterna(l2.getMedidaExterna());
-		i4.setMedidaInterna(l2.getMedidaInterna());
-		i4.setComprimento(l2.getComprimento());
-
-		try {
-			// Aqui vamos associar um segundo limite minimo
-			estoqueService.associarLimiteMinimoEstoque(l2);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		listaItemEscasso = estoqueService.pesquisarItemEstoqueEscasso();
-		assertEquals(
-				"Foi incluido mais um item no estoque com quantidades abaixo do limite agora devemos ter apenas 2 item escassos",
-				2, listaItemEscasso.size());
-	}
-
-	@Test
-	public void testCalculoPrecoVendaSugerido() {
+	public void testCalculoPrecoMinimo() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
-		Integer idItem = itemEstoque.getId();
 
-		LimiteMinimoEstoque limite = gerarLimiteMinimoEstoqueParaItemEstoque(itemEstoque);
+		ItemEstoque limite = gerarLimiteMinimoEstoque();
+
 		try {
-			estoqueService.associarLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
-		assertEquals("Os IDs do itens devem ser os mesmo pois estamos pesquisando um item que ja existe no sistema",
-				idItem, itemEstoque.getId());
+		Double precoMinimo = NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()
+				* (1 + itemEstoque.getFormaMaterial().getIpi()) * (1 + itemEstoque.getMargemMinimaLucro()));
 
-		assertNotNull("Deve existir um limite minimo para o item pois ja temos um limite cadastrado no sistema para ele",
-				itemEstoque.getLimiteMinimoEstoque());
-
-		Double precoSugerido = itemEstoque.getPrecoMedio() * (1 + itemEstoque.getFormaMaterial().getIpi())
-				* (1 + limite.getTaxaMinima());
-		precoSugerido = NumeroUtils.arredondarValorMonetario(precoSugerido);
-
-		Double precoCalculado = null;
+		Double precoMinimoCalculado = null;
 		try {
-			precoCalculado = estoqueService.calcularPrecoSugeridoItemEstoque(itemEstoque);
-
+			precoMinimoCalculado = estoqueService.calcularPrecoMinimoItemEstoque(itemEstoque);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals("Os algoritmos de calculo do preco de venda sugerido possuem diferencas, isso esta errado",
-				precoSugerido, precoCalculado);
+		assertEquals(precoMinimo, precoMinimoCalculado);
 	}
 
 	@Test
-	public void testCalculoPrecoVendaSugeridoSemTaxa() {
+	public void testCalculoPrecoMinimoSemTaxa() {
 		ItemEstoque itemEstoque = gerarItemEstoque();
-		Integer idItem = itemEstoque.getId();
 
-		LimiteMinimoEstoque limite = gerarLimiteMinimoEstoqueParaItemEstoque(itemEstoque);
-		// Anulando a taxa do limite minimo
-		limite.setTaxaMinima(null);
+		ItemEstoque limite = gerarLimiteMinimoEstoque();
+		limite.setMargemMinimaLucro(null);
 
 		try {
-			estoqueService.associarLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
-		assertEquals("Os IDs do itens devem ser os mesmo pois estamos pesquisando um item que ja existe no sistema",
-				idItem, itemEstoque.getId());
+		Double precoMinimo = NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()
+				* (1 + itemEstoque.getFormaMaterial().getIpi())
+				* (1 + (itemEstoque.getMargemMinimaLucro() == null ? 0 : itemEstoque.getMargemMinimaLucro())));
 
-		assertNotNull("Deve existir um limite minimo para o item pois ja temos um limite cadastrado no sistema para ele",
-				itemEstoque.getLimiteMinimoEstoque());
-
-		Double precoSugerido = itemEstoque.getPrecoMedio() * (1 + itemEstoque.getFormaMaterial().getIpi());
-		precoSugerido = NumeroUtils.arredondarValorMonetario(precoSugerido);
-
-		Double precoCalculado = null;
+		Double precoMinimoCalculado = null;
 		try {
-			precoCalculado = estoqueService.calcularPrecoSugeridoItemEstoque(itemEstoque);
-
+			precoMinimoCalculado = estoqueService.calcularPrecoMinimoItemEstoque(itemEstoque);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals("Os algoritmos de calculo do preco de venda sugerido possuem diferencas, isso esta errado",
-				precoSugerido, precoCalculado);
+		assertEquals(precoMinimo, precoMinimoCalculado);
+
 	}
 
 	@Test
@@ -580,10 +441,10 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoLimiteMinimoEstoque() {
-		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
-		limite.setMaterial(gerarMaterial());
+		ItemEstoque limite = gerarLimiteMinimoEstoque();
+
 		try {
-			estoqueService.associarLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -591,76 +452,100 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoLimiteMinimoEstoqueSemMaterial() {
-		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
+
+		ItemEstoque limite = gerarLimiteMinimoEstoque();
 		limite.setMaterial(null);
 
 		boolean throwed = false;
 		try {
-			estoqueService.associarLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O material nao pode ser nulo e deve ser validada", throwed);
 
-		limite.setMaterial(gerarMaterial());
-		limite.setFormaMaterial(null);
+		assertTrue("O material para inserir limite minimo nao exite, eh obrigatorio e deve ser validado", throwed);
+
+		limite = gerarLimiteMinimoEstoque();
+		limite.getMaterial().setId(null);
+
 		throwed = false;
 		try {
-			estoqueService.associarLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("A forma de material nao pode ser nula e deve ser validada", throwed);
+
+		assertTrue("O id do material para inserir limite minimo nao exite, eh obrigatorio e deve ser validado", throwed);
 	}
 
 	@Test
 	public void testInclusaoLimiteMinimoEstoqueSemMedidas() {
-		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
-		limite.setMaterial(gerarMaterial());
-		limite.setComprimento(null);
+
+		ItemEstoque item1 = gerarItemEstoque();
+		ItemEstoque item2 = gerarItemEstoque();
+
+		// Estmos alterando o item2 pois mesmo com medida diferente ele devera ter
+		// seu limite configurado.
+		item2.setMedidaExterna(item2.getMedidaExterna() + 20);
+		item2.setComprimento(item2.getComprimento() + 20);
+
+		try {
+			estoqueService.inserirItemEstoque(item2);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		ItemEstoque limite = gerarLimiteMinimoEstoque();
+		limite.setMaterial(item1.getMaterial());
 		limite.setMedidaExterna(null);
 		limite.setMedidaInterna(null);
+		limite.setComprimento(null);
 
-		boolean throwed = false;
 		try {
-			estoqueService.associarLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
-			throwed = true;
+			printMensagens(e);
 		}
-		assertTrue("O limite minimo de estoque nao contem medidas preenchidas e deve ser validado", throwed);
+
+		item1 = estoqueService.pesquisarItemEstoqueById(item1.getId());
+		item2 = estoqueService.pesquisarItemEstoqueById(item2.getId());
+
+		assertEquals("Os valores da margem minima de lucro devem ser as mesmas apos o cadastro do limite minimo",
+				item1.getMargemMinimaLucro(), limite.getMargemMinimaLucro());
+		assertEquals("Os valores da quantidade minima devem ser as mesmas apos o cadastro do limite minimo",
+				item1.getQuantidadeMinima(), limite.getQuantidadeMinima());
+
+		assertEquals("Os valores da margem minima de lucro devem ser as mesmas apos o cadastro do limite minimo",
+				item2.getMargemMinimaLucro(), limite.getMargemMinimaLucro());
+		assertEquals("Os valores da quantidade minima devem ser as mesmas apos o cadastro do limite minimo",
+				item2.getQuantidadeMinima(), limite.getQuantidadeMinima());
 	}
 
 	@Test
 	public void testInclusaoLimiteMinimoEstoqueSemQuantidade() {
-		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
-		limite.setMaterial(gerarMaterial());
-		limite.setQuantidadeMinima(null);
-
-		boolean throwed = false;
-		try {
-			estoqueService.associarLimiteMinimoEstoque(limite);
-		} catch (BusinessException e) {
-			throwed = true;
-		}
-		assertTrue("A quantidade minina nao pode ser nula e deve ser validada", throwed);
-
-		limite.setQuantidadeMinima(0);
-		throwed = false;
-		try {
-			estoqueService.associarLimiteMinimoEstoque(limite);
-		} catch (BusinessException e) {
-			throwed = true;
-		}
-		assertTrue("A quantidade minina nao pode ser nula e deve ser validada", throwed);
-
+		ItemEstoque limite = gerarLimiteMinimoEstoque();
 		limite.setQuantidadeMinima(-1);
-		throwed = false;
+
 		try {
-			estoqueService.associarLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
-			throwed = true;
+			printMensagens(e);
 		}
-		assertTrue("A quantidade minina nao pode ser negativa e deve ser validada", throwed);
+
+		assertNull("A quantidade minina de estoque deve ser nula no caso de valores menores ou iguais a zero",
+				limite.getQuantidadeMinima());
+
+		limite = gerarLimiteMinimoEstoque();
+		limite.setQuantidadeMinima(0);
+
+		try {
+			estoqueService.inserirLimiteMinimoEstoque(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertNull("A quantidade minina de estoque deve ser nula no caso de valores menores ou iguais a zero",
+				limite.getQuantidadeMinima());
 	}
 
 	@Test
@@ -1200,24 +1085,28 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRemocaoLimiteMinimoEstoque() {
-		LimiteMinimoEstoque limite = eBuilder.buildLimiteMinimoEstoque();
-		limite.setMaterial(gerarMaterial());
-		Integer idLimite = null;
+
+		ItemEstoque item1 = gerarItemEstoque();
+
+		ItemEstoque limite = gerarLimiteMinimoEstoque();
+
 		try {
-			idLimite = estoqueService.associarLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		// Esse eh a condicao para remocao do limite minimo
-		limite.setQuantidadeMinima(0);
+		limite.setQuantidadeMinima(null);
 		try {
-			estoqueService.associarLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoEstoque(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		limite = estoqueService.pesquisarLimiteMinimoEstoqueById(idLimite);
-		assertNull("O limite minimo foi removido do sistema e nao pode ser retornado na pesquisa", limite);
+
+		item1 = estoqueService.pesquisarItemEstoqueById(item1.getId());
+
+		assertNull("A quantidade minima de estoque foi anulada e esse item nao pode ter limite minimo",
+				item1.getQuantidadeMinima());
 	}
 
 	@Test

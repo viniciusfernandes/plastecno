@@ -8,7 +8,7 @@ import mockit.MockUp;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.entity.ItemEstoque;
-import br.com.plastecno.service.entity.LimiteMinimoEstoque;
+import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.util.StringUtils;
 
 public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
@@ -16,24 +16,27 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 	@Override
 	public ItemEstoqueDAO build() {
 		new MockUp<ItemEstoqueDAO>() {
-			@Mock
-			public boolean contemLimiteMinimoEstoque(Integer idItemEstoque) {
-				if (idItemEstoque == null) {
-					return false;
-				}
-				List<LimiteMinimoEstoque> l = REPOSITORY.pesquisarTodos(LimiteMinimoEstoque.class);
-				for (LimiteMinimoEstoque limite : l) {
 
-					if (limite.getListaItemEstoque() != null) {
-						for (ItemEstoque i : limite.getListaItemEstoque()) {
-							if (idItemEstoque.equals(i.getId())) {
-								return true;
-							}
-						}
+			@Mock
+			public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
+				List<ItemEstoque> lista = REPOSITORY.pesquisarTodos(ItemEstoque.class);
+
+				for (ItemEstoque i : lista) {
+
+					if (!limite.getFormaMaterial().equals(i.getFormaMaterial())
+							|| !limite.getMaterial().getId().equals(i.getMaterial().getId())) {
+						continue;
 					}
 
+					// Se nao contem medida isso indica que faremos atualizacao de todos
+					// os itens cujo material e forma coincidem, mas no caso em que contem
+					// medida, faremos atualizacao apenas dos itens que possuem medidas
+					// iguais.
+					if (!limite.contemMedida() || limite.isCoincidente(i)) {
+						i.setMargemMinimaLucro(limite.getMargemMinimaLucro());
+						i.setQuantidadeMinima(limite.getQuantidadeMinima());
+					}
 				}
-				return false;
 			}
 
 			@Mock
@@ -70,7 +73,7 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			public ItemEstoque pesquisarItemEstoqueByMedida(double tolerancia, Integer idMaterial,
+			public ItemEstoque pesquisarItemEstoqueByMedida(Integer idMaterial,
 					FormaMaterial formaMaterial, Double medidaExterna, Double medidaInterna, Double comprimento, boolean apenasID) {
 
 				boolean conteMedida = medidaExterna != null || medidaInterna != null || comprimento != null;
@@ -83,7 +86,8 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 
 				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				for (ItemEstoque i : l) {
-					if (!idMaterial.equals(i.getMaterial().getId()) || !formaMaterial.equals(i.getFormaMaterial())) {
+					if ((idMaterial != null && i.getMaterial() != null && !idMaterial.equals(i.getMaterial().getId()))
+							|| (formaMaterial != null && !formaMaterial.equals(i.getFormaMaterial()))) {
 						continue;
 					}
 
@@ -136,12 +140,12 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			public Object[] pesquisarTaxaMininaEValorMedioItemEstoque(Integer idItemEstoque) {
+			public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
 				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				for (ItemEstoque itemEstoque : l) {
 					if (idItemEstoque.equals(itemEstoque.getId())) {
-						LimiteMinimoEstoque limite = itemEstoque.getLimiteMinimoEstoque();
-						return new Object[] { limite.getTaxaMinima(), itemEstoque.getPrecoMedio() };
+						return new Object[] { itemEstoque.getMargemMinimaLucro(), itemEstoque.getPrecoMedio(),
+								itemEstoque.getFormaMaterial() };
 					}
 				}
 

@@ -22,19 +22,16 @@ import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
 import br.com.plastecno.service.dao.ItemReservadoDAO;
-import br.com.plastecno.service.dao.LimiteMinimoEstoqueDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Item;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.ItemReservado;
-import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.impl.anotation.TODO;
-import br.com.plastecno.service.impl.anotation.WARNING;
 import br.com.plastecno.service.impl.calculo.CalculadoraVolume;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
@@ -49,67 +46,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	private ItemReservadoDAO itemReservadoDAO;
 
-	private LimiteMinimoEstoqueDAO limiteMinimoEstoqueDAO;
-
 	private PedidoDAO pedidoDAO;
 
 	@EJB
 	private PedidoService pedidoService;
-
-	// Essa eh a tolerancia de 1mm
-	private final double tolerancia = 0.01d;
-
-	private void associarLimiteMinimoEstoque(ItemEstoque itemEstoque) throws BusinessException {
-
-		if (itemEstoque == null || itemEstoqueDAO.contemLimiteMinimoEstoque(itemEstoque.getId())) {
-			return;
-		}
-
-		// Temos que configurar o limite para que seja pesquisado pelas medidas e
-		// material
-		LimiteMinimoEstoque limite = new LimiteMinimoEstoque();
-		limite.setFormaMaterial(itemEstoque.getFormaMaterial());
-		limite.setMaterial(itemEstoque.getMaterial());
-		limite.setMedidaExterna(itemEstoque.getMedidaExterna());
-		limite.setMedidaInterna(itemEstoque.getMedidaInterna());
-		limite.setComprimento(itemEstoque.getComprimento());
-
-		limite = pesquisarLimiteMinimoEstoqueAssociado(limite);
-		if (limite == null) {
-			return;
-		}
-
-		limiteMinimoEstoqueDAO.associarLimiteMinimoItemEstoque(limite.getId(), itemEstoque.getId());
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer associarLimiteMinimoEstoque(LimiteMinimoEstoque limite) throws BusinessException {
-		boolean contemMedida = limite.getMedidaExterna() != null || limite.getMedidaInterna() != null
-				|| limite.getComprimento() != null;
-
-		if (!contemMedida) {
-			throw new BusinessException("O limite minimo de estoque deve conter alguma medida, mas todas estão em branco");
-		}
-
-		LimiteMinimoEstoque limiteCadastrado = pesquisarLimiteMinimoEstoque(limite);
-
-		if (limiteCadastrado != null) {
-			limiteCadastrado.setQuantidadeMinima(limite.getQuantidadeMinima());
-			limiteCadastrado.setTaxaMinima(limite.getTaxaMinima());
-
-			if (!limite.contemQuantidadeMinima()) {
-				limiteMinimoEstoqueDAO.remover(limiteCadastrado);
-				limiteMinimoEstoqueDAO.desassociarLimiteMinimoItemEstoque(limiteCadastrado.getId());
-				return null;
-			}
-
-			return limiteCadastrado.getId();
-		}
-
-		ValidadorInformacao.validar(limite);
-		return inserirLimiteMinimo(limite);
-	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -123,7 +63,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * filtro.getQuantidade() * (1 + aliquotaIPI);
 	}
 
-	private Double calcularPrecoSugerido(Double precoMedio, FormaMaterial formaMaterial, Double taxaMinima) {
+	private Double calcularPrecoMinimo(Double precoMedio, FormaMaterial formaMaterial, Double taxaMinima) {
 		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
 		// estoque.
 
@@ -135,14 +75,14 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + formaMaterial.getIpi()) * (1 + taxaMinima));
 	}
 
-	private void calcularPrecoSugerido(ItemEstoque itemEstoque) {
-		itemEstoque.setPrecoSugerido(calcularPrecoSugerido(itemEstoque.getPrecoMedio(), itemEstoque.getFormaMaterial(),
-				itemEstoque.getTaxaMinima()));
+	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {
+		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(itemEstoque.getPrecoMedio(), itemEstoque.getFormaMaterial(),
+				itemEstoque.getMargemMinimaLucro()));
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double calcularPrecoSugeridoItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
+	public Double calcularPrecoMinimoItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
 		// Temos que pesquisar o ID pois o usuario pode estar inserindo um item novo
 		// e ele pode nao existir no estoque ainda.
 		Integer idItemEstoque = pesquisarIdItemEstoque(itemEstoque);
@@ -150,17 +90,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 			return null;
 		}
 
-		Object[] valores = itemEstoqueDAO.pesquisarTaxaMininaEValorMedioItemEstoque(idItemEstoque);
+		Object[] valores = itemEstoqueDAO.pesquisarMargemMininaEValorMedioItemEstoque(idItemEstoque);
 		Double taxaMinima = (Double) valores[0];
 		Double precoMedio = (Double) valores[1];
+		FormaMaterial formaMaterial = (FormaMaterial) valores[2];
 
-		FormaMaterial formaMaterial = itemEstoqueDAO.pesquisarFormaMaterialItemEstoque(idItemEstoque);
 		if (formaMaterial == null) {
 			throw new BusinessException(
-					"Não foi possível cálcular o preco sugerido para o item de estoque pois ele não tem forma de material associada");
+					"Não foi possível cálcular o preco minimo para o item de estoque pois ele não tem forma de material associada");
 		}
 
-		return calcularPrecoSugerido(precoMedio, formaMaterial, taxaMinima);
+		return calcularPrecoMinimo(precoMedio, formaMaterial, taxaMinima);
 	}
 
 	@Override
@@ -314,7 +254,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemEstoqueDAO = new ItemEstoqueDAO(entityManager);
 		itemReservadoDAO = new ItemReservadoDAO(entityManager);
 		pedidoDAO = new PedidoDAO(entityManager);
-		limiteMinimoEstoqueDAO = new LimiteMinimoEstoqueDAO(entityManager);
 	}
 
 	@Override
@@ -346,7 +285,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 			itemEstoqueDAO.alterar(itemCadastrado);
 		}
 
-		associarLimiteMinimoEstoque(itemCadastrado);
 		return itemCadastrado.getId();
 	}
 
@@ -356,29 +294,18 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, false));
 	}
 
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@WARNING(data = "06/07/2015", descricao = "Aqui nao esta funcionando a associacao entre o item do estoque e o limite minimo atraves do metodo ADD do limite. Tivemos que construir um update.")
-	private Integer inserirLimiteMinimo(LimiteMinimoEstoque limite) throws BusinessException {
-		if (limite == null) {
-			throw new BusinessException("Limite minimo de estoque nulo");
-		}
-		ValidadorInformacao.validar(limite);
-
-		boolean isNovo = limite.getId() == null;
-
-		if (isNovo) {
-			limite = limiteMinimoEstoqueDAO.inserir(limite);
-		} else {
-			limite = limiteMinimoEstoqueDAO.alterar(limite);
+	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
+		if (limite.getMaterial() == null || limite.getMaterial().getId() == null || limite.getFormaMaterial() == null) {
+			throw new BusinessException("Forma item e material são obrigatórios para a criação do limite mínimo de estoque");
 		}
 
-		List<Integer> listaIdItemEstoque = limiteMinimoEstoqueDAO.pesquisarIdItemEstoqueDentroLimiteMinimo(limite,
-				tolerancia);
-
-		if (!listaIdItemEstoque.isEmpty()) {
-			limiteMinimoEstoqueDAO.associarLimiteMinimoItemEstoque(limite.getId(), listaIdItemEstoque);
+		if (limite.getQuantidadeMinima() != null && limite.getQuantidadeMinima() <= 0) {
+			limite.setQuantidadeMinima(null);
 		}
-		return limite.getId();
+
+		itemEstoqueDAO.inserirLimiteMinimoEstoque(limite);
 	}
 
 	@Override
@@ -389,7 +316,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			itemCadastrado = itemEstoqueDAO.pesquisarPecaByDescricao(filtro.getMaterial().getId(), filtro.getDescricaoPeca(),
 					true);
 		} else {
-			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(tolerancia, filtro.getMaterial().getId(),
+			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(filtro.getMaterial().getId(),
 					filtro.getFormaMaterial(), filtro.getMedidaExterna(), filtro.getMedidaInterna(), filtro.getComprimento(),
 					true);
 		}
@@ -401,7 +328,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		List<ItemEstoque> listaItem = itemEstoqueDAO.pesquisarItemEstoque(idMaterial, formaMaterial, null, true);
 		for (ItemEstoque itemEstoque : listaItem) {
-			calcularPrecoSugerido(itemEstoque);
+			calcularPrecoMinimo(itemEstoque);
 		}
 		return listaItem;
 	}
@@ -417,7 +344,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			itemCadastrado = itemEstoqueDAO.pesquisarPecaByDescricao(filtro.getMaterial().getId(), filtro.getDescricaoPeca(),
 					false);
 		} else {
-			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(tolerancia, filtro.getMaterial().getId(),
+			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(filtro.getMaterial().getId(),
 					filtro.getFormaMaterial(), filtro.getMedidaExterna(), filtro.getMedidaInterna(), filtro.getComprimento(),
 					false);
 		}
@@ -434,65 +361,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
 		List<ItemEstoque> listaItem = itemEstoqueDAO.pesquisarItemEstoqueEscasso();
 		for (ItemEstoque itemEstoque : listaItem) {
-			calcularPrecoSugerido(itemEstoque);
+			calcularPrecoMinimo(itemEstoque);
 		}
 		return listaItem;
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public LimiteMinimoEstoque pesquisarLimiteMinimoEstoque(LimiteMinimoEstoque filtro) {
-		boolean contemMedida = filtro.getMedidaExterna() != null || filtro.getMedidaInterna() != null
-				|| filtro.getComprimento() != null;
-
-		boolean contemMaterial = filtro.getFormaMaterial() != null && filtro.getMaterial() != null
-				&& filtro.getMaterial().getId() != null;
-
-		if (!contemMaterial || !contemMedida) {
-			return null;
-		}
-		return limiteMinimoEstoqueDAO.pesquisarLimiteMinimoEstoque(filtro);
-	}
-
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private LimiteMinimoEstoque pesquisarLimiteMinimoEstoqueAssociado(LimiteMinimoEstoque filtro) {
-		// Esse metodo tem uma ordem de prioridade na pesquisa dos limites, pois se
-		// o limite associado nao existe, vamos procurar se a medida interna, pois
-		// ela eh a de menos prioridade. Depois removemos a interna, e por fim, o
-		// comprimento.
-		LimiteMinimoEstoque limite = pesquisarLimiteMinimoEstoque(filtro);
-		if (limite == null) {
-			limite = pesquisarLimiteMinimoEstoqueByMedidaExternaEComprimento(filtro);
-		}
-
-		if (limite == null) {
-			limite = pesquisarLimiteMinimoEstoqueByComprimento(filtro);
-		}
-
-		return limite;
-	}
-
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private LimiteMinimoEstoque pesquisarLimiteMinimoEstoqueByComprimento(LimiteMinimoEstoque limite) {
-		LimiteMinimoEstoque filtro = limite.clone();
-		// Aqui deixamos apenas o comprimento
-		filtro.setMedidaExterna(null);
-		filtro.setMedidaInterna(null);
-		return pesquisarLimiteMinimoEstoque(filtro);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public LimiteMinimoEstoque pesquisarLimiteMinimoEstoqueById(Integer idLimiteMinimo) {
-		return limiteMinimoEstoqueDAO.pesquisarLimiteById(idLimiteMinimo);
-	}
-
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private LimiteMinimoEstoque pesquisarLimiteMinimoEstoqueByMedidaExternaEComprimento(LimiteMinimoEstoque limite) {
-		LimiteMinimoEstoque filtro = limite.clone();
-		// Aqui deixamos apenas a medida externa e comprimento
-		filtro.setMedidaInterna(null);
-		return pesquisarLimiteMinimoEstoque(filtro);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -577,10 +448,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@REVIEW(data = "27/08/2015", descricao = "Parece que a implementacao desse metodo faz o mesmo que a inclusao do item de estoque, por isso esta deprecated agora")
 	public void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
-		ValidadorInformacao.validar(itemEstoque);
-		CalculadoraVolume.validarVolume(itemEstoque);
-
 		if (itemEstoque.isNovo()) {
 			throw new BusinessException("Não é possivel realizar a redefinição de estoque para itens não existentes");
 		}
@@ -596,19 +465,19 @@ public class EstoqueServiceImpl implements EstoqueService {
 					+ "\" nao exite no estoque para ser redefinido.");
 		}
 
+		// Aqui estamos forcando a copia dos atributos para garantir que um item
+		// nunca ser alterado, por exemplo, as medidas nunca podem mudar
 		itemCadastrado.setAliquotaICMS(itemEstoque.getAliquotaICMS());
 		itemCadastrado.setAliquotaIPI(itemEstoque.getAliquotaIPI());
 		itemCadastrado.setPrecoMedio(itemEstoque.getPrecoMedio());
 		itemCadastrado.setQuantidade(itemEstoque.getQuantidade());
-		if (!itemCadastrado.isPeca()) {
-			itemCadastrado.setMedidaExterna(itemEstoque.getMedidaExterna());
-			itemCadastrado.setMedidaInterna(itemEstoque.getMedidaInterna());
-			itemCadastrado.setComprimento(itemEstoque.getComprimento());
-		}
+		itemCadastrado.setQuantidadeMinima(itemEstoque.getQuantidadeMinima());
+		itemCadastrado.setMargemMinimaLucro(itemEstoque.getMargemMinimaLucro());
 
+		ValidadorInformacao.validar(itemCadastrado);
+		
 		itemEstoqueDAO.alterar(itemCadastrado);
-		associarLimiteMinimoEstoque(itemEstoque);
-		// redefinirItemReservadoByItemEstoque(itemCadastrado.getId());
+		// redefinirItemReservadoByItemEstoque(idItemEstoque);
 	}
 
 	@TODO(data = "14/04/2015", descricao = "Esse metodo sera utilizado na execucao do metodo de redefinao de itens do estoque redefinirItemEstoque")

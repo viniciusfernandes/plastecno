@@ -3,18 +3,20 @@
 
 $(document).ready(function() {
 
-	inserirMascaraMonetaria('bloco_item_pedido #preco', 7);
+	inserirMascaraMonetaria('bloco_item_pedido #precoMedio', 7);
 	inserirMascaraNumerica('bloco_item_pedido #aliquotaIPI', '99');
 	inserirMascaraNumerica('bloco_item_pedido #aliquotaICMS', '9999999');
 	inserirMascaraMonetaria('bloco_item_pedido #comprimento', 8);
 	inserirMascaraMonetaria('bloco_item_pedido #medidaExterna', 8);
 	inserirMascaraMonetaria('bloco_item_pedido #medidaInterna', 8);
+	inserirMascaraNumerica('bloco_item_pedido #margemMinimaLucro', '99');
 	
 	$('#botaoLimparItemPedido').click(function () {
 		$('#bloco_item_pedido input').val('');
 		$('#formaMaterial').val('');
 		habilitarCamposEdicaoItem(true);
 	});
+	
 });
 
 
@@ -26,6 +28,7 @@ function habilitarCamposEdicaoItem(habilitado){
 	habilitar('#bloco_item_pedido #medidaInterna', habilitado);
 	habilitar('#bloco_item_pedido #comprimento', habilitado);
 };
+
 </script>
 <fieldset id="bloco_item_pedido">
 	<legend>::: Edição do Item de ${not isEstoque ? 'Compra': 'Estoque'} :::</legend>
@@ -41,6 +44,7 @@ function habilitarCamposEdicaoItem(habilitado){
 		<input type="hidden" id="idTipoVenda" name="itemPedido.tipoVenda" value="${itemPedido.tipoVenda}"/>
 		<input type="hidden" id="idDescricaoPeca" name="itemPedido.descricaoPeca" value="${itemPedido.descricaoPeca}"/>
 		<input type="hidden" id="itemSequencial" name="itemPedido.sequencial" value="${itemPedido.sequencial}"/>
+		
 		<div class="label">Tipo de ${not empty tipoPedido ? 'Compra': 'Venda'}:</div>
 		<div class="input">
 			<input type="radio" id="tipoVendaKilo" name="itemPedido.tipoVenda"
@@ -104,22 +108,35 @@ function habilitarCamposEdicaoItem(habilitado){
 	<div class="input" style="width: 5%">
 		<c:choose>
 			<c:when test="${isEstoque}">
-				<input type="text" id="preco" name="itemPedido.precoMedio" value="${itemPedido.precoMedio}" maxlength="8" />
+				<input type="text" id="precoMedio" name="itemPedido.precoMedio" value="${itemPedido.precoMedio}" maxlength="8" />
 			</c:when>
 			<c:otherwise>
-				<input type="text" id="preco" name="itemPedido.precoVenda" value="${itemPedido.precoVenda}" maxlength="8" />
+				<input type="text" id="precoMedio" name="itemPedido.precoVenda" value="${itemPedido.precoVenda}" maxlength="8" />
 			</c:otherwise>
 		</c:choose>
 	</div>
+	
 	<div class="label" style="width: 8%">IPI (%) :</div>
 	<div class="input" style="width: 5%">
 		<input type="text" id="aliquotaIPI" name="itemPedido.aliquotaIPI" value="${itemPedido.aliquotaIPIFormatado}" maxlength="2" />
 	</div>
 	<div class="label" style="width: 10%">ICMS (%) :</div>
-	<div class="input" style="width: 5%">
+	<div class="input" style="width: 40%">
 		<input type="text" id="aliquotaICMS" name="itemPedido.aliquotaICMS"
-			value="${itemPedido.aliquotaICMSFormatado}" maxlength="2" />
+			value="${itemPedido.aliquotaICMSFormatado}" maxlength="2" style="width: 5%"/>
 	</div>
+	
+	<c:if test="${isEstoque and acessoManutencaoEstoquePermitido}">
+		<div class="label">Qtde. Mín.:</div>
+		<div class="input" style="width: 7%">
+			<input type="text" id="quantidadeMinima" name="itemPedido.quantidadeMinima" value="${itemPedido.quantidadeMinima}"/>
+		</div>
+		<div class="label">Margem Mín.(%):</div>
+		<div class="input" style="width: 7%">
+			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}"/>
+		</div>
+	</c:if>
+	
 	<div class="bloco_botoes">
 		<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Refazer os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
 		<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>

@@ -8,6 +8,7 @@ import javax.persistence.TypedQuery;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.WARNING;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
@@ -17,17 +18,57 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		super(entityManager);
 	}
 
-	private void appendLimiteMinimoJoin(StringBuilder select) {
+	private void appendConstrutorItemEstoque(StringBuilder select) {
 		select
-				.append(
-						"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, l.taxaMinima, i.quantidade) from ItemEstoque i ")
-				.append(" left join i.limiteMinimoEstoque l ");
+				.append("select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima) from ItemEstoque i ");
 	}
 
-	public boolean contemLimiteMinimoEstoque(Integer idItemEstoque) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i.limiteMinimoEstoque.id from ItemEstoque i where i.id =: idItemEstoque")
-						.setParameter("idItemEstoque", idItemEstoque), Integer.class, null) != null;
+	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
+
+		StringBuilder update = new StringBuilder(
+				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima  where i.material = :material and i.formaMaterial = :formaMaterial ");
+		if (limite.contemMedida()) {
+
+			if (limite.getMedidaExterna() != null) {
+				update.append("and i.medidaExterna = :medidaExterna ");
+			} else {
+				update.append("and i.medidaExterna is null ");
+			}
+
+			if (limite.getMedidaInterna() != null) {
+				update.append("and i.medidaInterna = :medidaInterna ");
+			} else {
+				update.append("and i.medidaInterna is null ");
+			}
+
+			if (limite.getComprimento() != null) {
+				update.append("and i.comprimento = :comprimento ");
+			} else {
+				update.append("and i.comprimento is null ");
+			}
+		}
+
+		Query query = entityManager.createQuery(update.toString())
+				.setParameter("margemMinimaLucro", limite.getMargemMinimaLucro())
+				.setParameter("quantidadeMinima", limite.getQuantidadeMinima()).setParameter("material", limite.getMaterial())
+				.setParameter("formaMaterial", limite.getFormaMaterial());
+
+		if (limite.contemMedida()) {
+
+			if (limite.getMedidaExterna() != null) {
+				query.setParameter("medidaExterna", limite.getMedidaExterna());
+			}
+
+			if (limite.getMedidaInterna() != null) {
+				query.setParameter("medidaInterna", limite.getMedidaInterna());
+			}
+
+			if (limite.getComprimento() != null) {
+				query.setParameter("comprimento", limite.getComprimento());
+			}
+		}
+
+		query.executeUpdate();
 	}
 
 	public ItemEstoque pesquisarById(Integer idItemEstoque) {
@@ -49,7 +90,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca,
 			boolean zeradosExcluidos) {
 		StringBuilder select = new StringBuilder();
-		appendLimiteMinimoJoin(select);
+		appendConstrutorItemEstoque(select);
 
 		if (idMaterial != null || formaMaterial != null) {
 			select.append("where ");
@@ -97,7 +138,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return query.getResultList();
 	}
 
-	public ItemEstoque pesquisarItemEstoqueByMedida(double tolerancia, Integer idMaterial, FormaMaterial formaMaterial,
+	public ItemEstoque pesquisarItemEstoqueByMedida(Integer idMaterial, FormaMaterial formaMaterial,
 			Double medidaExterna, Double medidaInterna, Double comprimento, boolean apenasID) {
 
 		boolean conteMedida = medidaExterna != null || medidaInterna != null || comprimento != null;
@@ -118,19 +159,19 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		select.append("from ItemEstoque i where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
 
 		if (medidaExterna != null) {
-			select.append("and ABS(i.medidaExterna - :medidaExterna) <= :tolerancia ");
+			select.append("and i.medidaExterna = :medidaExterna ");
 		} else {
 			select.append("and i.medidaExterna is null ");
 		}
 
 		if (medidaInterna != null) {
-			select.append("and ABS(i.medidaInterna - :medidaInterna) <= :tolerancia ");
+			select.append("and i.medidaInterna = :medidaInterna ");
 		} else {
 			select.append("and i.medidaInterna is null ");
 		}
 
 		if (comprimento != null) {
-			select.append("and ABS(i.comprimento - :comprimento) <= :tolerancia ");
+			select.append("and i.comprimento = :comprimento ");
 		} else {
 			select.append("and i.comprimento is null ");
 		}
@@ -145,8 +186,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 
 		TypedQuery<ItemEstoque> query = entityManager.createQuery(select.toString(), ItemEstoque.class)
-				.setParameter("tolerancia", tolerancia).setParameter("idMaterial", idMaterial)
-				.setParameter("formaMaterial", formaMaterial);
+				.setParameter("idMaterial", idMaterial).setParameter("formaMaterial", formaMaterial);
 
 		if (medidaExterna != null) {
 			query.setParameter("medidaExterna", medidaExterna);
@@ -164,8 +204,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
 		StringBuilder select = new StringBuilder();
-		appendLimiteMinimoJoin(select);
-		select.append(" inner join i.limiteMinimoEstoque l where i.quantidade <= l.quantidadeMinima");
+		appendConstrutorItemEstoque(select);
+		select.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
 		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();
 	}
 
@@ -188,13 +228,11 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return recuperarItemNaoZerado(l);
 	}
 
-	public Object[] pesquisarTaxaMininaEValorMedioItemEstoque(Integer idItemEstoque) {
-		return QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select l.taxaMinima, i.precoMedio from LimiteMinimoEstoque l inner join l.listaItemEstoque i where i.id= :idItemEstoque")
-								.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null });
+	public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select i.margemMinimaLucro, i.precoMedio, i.formaMaterial from ItemEstoque i where i.id= :idItemEstoque")
+						.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null, null });
 	}
 
 	public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {

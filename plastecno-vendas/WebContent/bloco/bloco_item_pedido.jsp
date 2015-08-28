@@ -16,12 +16,12 @@ $(document).ready(function(){
 		
 		var request = $.ajax({
 			type: 'get',
-			url: '<c:url value="/estoque/item/precosugerido"/>',
+			url: '<c:url value="/estoque/item/precominimo"/>',
 			data: parametro 
 		});
 		
 		request.done(function (response){
-			$('#bloco_item_pedido #precoSugerido').val(response.precoSugerido);
+			$('#bloco_item_pedido #precoMinimo').val(response.precoMinimo);
 		});
 		
 		request.fail(function(request, status, excecao) {
@@ -101,9 +101,9 @@ $(document).ready(function(){
 		<input type="text" id="comprimento" name="itemPedido.comprimento"
 			maxlength="11" style="width: 30%" />
 	</div>
-	<div class="label">Preço Sugerido:</div>
+	<div class="label">Preço Mín.:</div>
 	<div class="input" style="width: 70%">
-		<input type="text" id="precoSugerido" name="itemPedido.precoSugerido" maxlength="8" style="width: 7%" disabled="disabled"/>
+		<input type="text" id="precoMinimo" name="itemPedido.precoMinimo" maxlength="8" style="width: 7%" disabled="disabled"/>
 	</div>
 	<div class="label">Preço:</div>
 	<div class="input" style="width: 5%">

@@ -57,11 +57,15 @@ $(document).ready(function() {
 				confirmar: function(){
 					$('#bloco_item_pedido #descricao').val($('#bloco_item_pedido #descricao').val().toUpperCase());
 					var parametros = serializarFormPesquisa();
-					parametros += '&idItem='+$('#bloco_item_pedido #idItemPedido').val();
-					parametros += '&quantidade='+$('#bloco_item_pedido #quantidade').val();
-					parametros += '&aliquotaIPI='+$('#bloco_item_pedido #aliquotaIPI').val();
-					parametros += '&aliquotaICMS='+$('#bloco_item_pedido #aliquotaICMS').val();
-					parametros += '&preco='+$('#bloco_item_pedido #preco').val();
+					parametros += '&itemEstoque.id='+$('#bloco_item_pedido #idItemPedido').val();
+					parametros += '&itemEstoque.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
+					parametros += '&itemEstoque.material.id='+$('#bloco_item_pedido #idMaterial').val();
+					parametros += '&itemEstoque.quantidade='+$('#bloco_item_pedido #quantidade').val();
+					parametros += '&itemEstoque.aliquotaIPI='+$('#bloco_item_pedido #aliquotaIPI').val();
+					parametros += '&itemEstoque.aliquotaICMS='+$('#bloco_item_pedido #aliquotaICMS').val();
+					parametros += '&itemEstoque.precoMedio='+$('#bloco_item_pedido #precoMedio').val();
+					parametros += '&itemEstoque.quantidadeMinima='+$('#bloco_item_pedido #quantidadeMinima').val();
+					parametros += '&itemEstoque.margemMinimaLucro='+$('#bloco_item_pedido #margemMinimaLucro').val();
 					
 					var form = $('#formVazio');
 					$(form).attr('method', 'post');
@@ -188,7 +192,7 @@ function inicializarFiltro() {
 			</div>
 			<div class="label" style="width: 30%">Valor total em estoque (R$):</div>
 			<div class="input" style="width: 60%">
-				<input type="text" value="${empty valorEstoque ? '0,00' : valorEstoque}" disabled="disabled" 
+				<input type="text" name="valorEstoque" value="${empty valorEstoque ? '0,00' : valorEstoque}" disabled="disabled" 
 				class="desabilitado" style="width: 60%"/>
 			</div>
 			
@@ -204,7 +208,6 @@ function inicializarFiltro() {
 	</form>
 	
 	<c:if test="${acessoManutencaoEstoquePermitido}">
-		<jsp:include page="/bloco/bloco_limite_minimo_estoque.jsp"/>	
 		<jsp:include page="/bloco/bloco_edicao_item.jsp"/>
 	</c:if>
 	
@@ -216,12 +219,13 @@ function inicializarFiltro() {
 				<thead>
 					<tr>
 						<th style="width: 20%">Material</th>
-						<th style="width: 10%">Qtde.</th>
+						<th style="width: 5%">Qtde.</th>
+						<th style="width: 5%">Qtde Min.</th>
 						<th style="width: 10%">Med. Externa</th>
 						<th style="width: 10%">Med. Interna</th>
 						<th style="width: 10%">Comprimento</th>
 						<th style="width: 10%">Valor Unid. (R$)</th>
-						<th style="width: 10%">Preç. Sug. (R$)</th>
+						<th style="width: 10%">Preç. Min. (R$)</th>
 						<th style="width: 5%">Ações</th>
 					</tr>
 				</thead>
@@ -235,6 +239,7 @@ function inicializarFiltro() {
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeMinima}</td>
 							<c:choose>
 								<c:when test="${item.peca}">
 									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" colspan="3">${item.descricaoPeca}</td>
@@ -246,7 +251,7 @@ function inicializarFiltro() {
 								</c:otherwise>
 							</c:choose>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMedio}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoSugerido}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMinimo}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<c:if test="${acessoManutencaoEstoquePermitido}">
 								<div class="coluna_acoes_listagem">

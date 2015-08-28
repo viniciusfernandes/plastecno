@@ -50,9 +50,8 @@ public class ItemEstoque extends Item {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemEstoqueSequence")
 	private Integer id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_limite_minimo_estoque", referencedColumnName = "id", nullable = false)
-	private LimiteMinimoEstoque limiteMinimoEstoque;
+	@Column(name = "margem_minima_lucro")
+	private Double margemMinimaLucro;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
@@ -70,16 +69,17 @@ public class ItemEstoque extends Item {
 	private Double precoMedio;
 
 	@Transient
-	private Double taxaMinima;
+	private Double precoMinimo;
 
+	@Column(name = "quantidade")
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Quantidade de itens do estoque")
 	private Integer quantidade = 0;
 
-	@Transient
-	private String siglaMaterial;
+	@Column(name = "quantidade_minima")
+	private Integer quantidadeMinima;
 
 	@Transient
-	private Double precoSugerido;
+	private String siglaMaterial;
 
 	public ItemEstoque() {
 	}
@@ -93,8 +93,8 @@ public class ItemEstoque extends Item {
 	}
 
 	public ItemEstoque(Integer id, FormaMaterial formaMaterial, String descricaoPeca, String siglaMaterial,
-			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double taxaMinima,
-			Integer quantidade) {
+			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double margemMinimaLucro,
+			Integer quantidade, Integer quantidadeMinima) {
 		this.comprimento = comprimento;
 		this.descricaoPeca = descricaoPeca;
 		this.formaMaterial = formaMaterial;
@@ -104,7 +104,8 @@ public class ItemEstoque extends Item {
 		this.medidaInterna = medidaInterna;
 		this.precoMedio = precoMedio;
 		this.quantidade = quantidade;
-		this.taxaMinima = taxaMinima;
+		this.margemMinimaLucro = margemMinimaLucro;
+		this.quantidadeMinima = quantidadeMinima;
 	}
 
 	public double calcularPrecoTotal() {
@@ -151,8 +152,8 @@ public class ItemEstoque extends Item {
 		return id;
 	}
 
-	public LimiteMinimoEstoque getLimiteMinimoEstoque() {
-		return limiteMinimoEstoque;
+	public Double getMargemMinimaLucro() {
+		return margemMinimaLucro;
 	}
 
 	public Material getMaterial() {
@@ -171,8 +172,8 @@ public class ItemEstoque extends Item {
 		return precoMedio;
 	}
 
-	public Double getPrecoSugerido() {
-		return precoSugerido;
+	public Double getPrecoMinimo() {
+		return precoMinimo;
 	}
 
 	@Override
@@ -193,17 +194,17 @@ public class ItemEstoque extends Item {
 		return quantidade;
 	}
 
+	public Integer getQuantidadeMinima() {
+		return quantidadeMinima;
+	}
+
 	public String getSiglaMaterial() {
 		return siglaMaterial;
 	}
 
-	public Double getTaxaMinima() {
-		return taxaMinima;
-	}
-
 	// Metodo criado para facilitar teste unitario
 	public boolean isItemEscasso() {
-		return limiteMinimoEstoque != null && quantidade != null && quantidade < limiteMinimoEstoque.getQuantidadeMinima();
+		return quantidade != null && quantidadeMinima != null && quantidade < quantidadeMinima;
 	}
 
 	public boolean isNovo() {
@@ -234,8 +235,8 @@ public class ItemEstoque extends Item {
 		this.id = id;
 	}
 
-	public void setLimiteMinimoEstoque(LimiteMinimoEstoque limiteMinimoEstoque) {
-		this.limiteMinimoEstoque = limiteMinimoEstoque;
+	public void setMargemMinimaLucro(Double margemMinimaLucro) {
+		this.margemMinimaLucro = margemMinimaLucro;
 	}
 
 	public void setMaterial(Material material) {
@@ -254,8 +255,8 @@ public class ItemEstoque extends Item {
 		this.precoMedio = precoMedio;
 	}
 
-	public void setPrecoSugerido(Double precoSugerido) {
-		this.precoSugerido = precoSugerido;
+	public void setPrecoMinimo(Double precoMinimo) {
+		this.precoMinimo = precoMinimo;
 	}
 
 	@Override
@@ -272,12 +273,12 @@ public class ItemEstoque extends Item {
 		this.quantidade = quantidade;
 	}
 
-	public void setSiglaMaterial(String siglaMaterial) {
-		this.siglaMaterial = siglaMaterial;
+	public void setQuantidadeMinima(Integer quantidadeMinima) {
+		this.quantidadeMinima = quantidadeMinima;
 	}
 
-	public void setTaxaMinima(Double taxaMinima) {
-		this.taxaMinima = taxaMinima;
+	public void setSiglaMaterial(String siglaMaterial) {
+		this.siglaMaterial = siglaMaterial;
 	}
 
 }

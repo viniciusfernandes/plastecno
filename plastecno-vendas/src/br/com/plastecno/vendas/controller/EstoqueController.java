@@ -12,7 +12,6 @@ import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.ItemEstoque;
-import br.com.plastecno.service.entity.LimiteMinimoEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
@@ -34,17 +33,16 @@ public class EstoqueController extends AbstractController {
         super(result, usuarioInfo);
     }
 
-    @Get("estoque/item/precosugerido")
-    public void calcularPrecoSugeridoItemEstoque(ItemEstoque itemEstoque) {
+    @Get("estoque/item/precominimo")
+    public void calcularPrecoMinimoItemEstoque(ItemEstoque itemEstoque) {
         try {
-            Double precoSugerido = estoqueService.calcularPrecoSugeridoItemEstoque(itemEstoque);
-            String precoSugeridoFormatado = precoSugerido == null ? "" : NumeroUtils
-                    .formatarValorMonetario(precoSugerido);
-            serializarJson(new SerializacaoJson("precoSugerido", precoSugeridoFormatado));
+            Double precoMinimo = estoqueService.calcularPrecoMinimoItemEstoque(itemEstoque);
+            String precoMinimoFormatado = precoMinimo == null ? "" : NumeroUtils.formatarValorMonetario(precoMinimo);
+            serializarJson(new SerializacaoJson("precoMinimo", precoMinimoFormatado));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
-            gerarLogErroRequestAjax("cálculo do preço sugerido do item do pedido", e);
+            gerarLogErroRequestAjax("cálculo do preço minimo do item do pedido", e);
         }
     }
 
@@ -84,7 +82,15 @@ public class EstoqueController extends AbstractController {
         try {
             itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
-            estoqueService.inserirItemEstoque(itemPedido);
+            itemPedido.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemPedido.getMargemMinimaLucro()));
+
+            // Essa eh uma condicao para definir limite minimo para os itens de
+            // um determinado material, formato e para todas as medidas.
+            if (itemPedido.getId() == null && !itemPedido.contemMedida()) {
+                estoqueService.inserirLimiteMinimoEstoque(itemPedido);
+            } else {
+                estoqueService.inserirItemEstoque(itemPedido);
+            }
             gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
@@ -97,26 +103,6 @@ public class EstoqueController extends AbstractController {
         } else {
             irTopoPagina();
         }
-    }
-
-    @Post("estoque/limiteminimo/inclusao")
-    public void inserirLimiteMinimo(LimiteMinimoEstoque limite) {
-        try {
-            limite.setTaxaMinima(NumeroUtils.gerarAliquota(limite.getTaxaMinima()));
-            estoqueService.associarLimiteMinimoEstoque(limite);
-
-            limite.setMaterial(materialService.pesquisarById(limite.getMaterial().getId()));
-            StringBuilder mensagem = new StringBuilder("Limite mínimo de estoque de quantidade \"")
-                    .append(limite.getQuantidadeMinima() == null ? 0 : limite.getQuantidadeMinima()).append("\" ")
-                    .append(limite.getDescricao());
-            mensagem.append(" inserido/alterado com sucesso.");
-
-            gerarMensagemSucesso(mensagem.toString());
-        } catch (BusinessException e) {
-            addAtributo("limite", limite);
-            gerarListaMensagemErro(e);
-        }
-        irTopoPagina();
     }
 
     @Post("estoque/escassez")
@@ -134,7 +120,7 @@ public class EstoqueController extends AbstractController {
             gerarListaMensagemErro("Escolha o material e/ou forma de material. Não é possível pesquisar o estoque inteiro.");
             addAtributo("permanecerTopo", true);
         } else {
-            material = materialService.pesquisarById(material.getId());
+            material = materialService.pesquisarById(material == null ? null : material.getId());
             final Integer idMaterial = material != null ? material.getId() : null;
             List<ItemEstoque> lista = null;
             if (isListagemEscassez) {
@@ -168,27 +154,13 @@ public class EstoqueController extends AbstractController {
             addAtributo("itemPedido", itemEstoque);
         }
         addAtributo("permanecerTopo", true);
-        material = materialService.pesquisarById(material.getId());
+
+        material = materialService.pesquisarById(material == null ? null : material.getId());
         if (material != null || formaMaterial != null) {
             redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
         } else {
             irTopoPagina();
         }
-    }
-
-    @Post("estoque/limiteminimo")
-    public void pesquisarLimiteMinimo(LimiteMinimoEstoque limite) {
-        LimiteMinimoEstoque limiteCadastrado = estoqueService.pesquisarLimiteMinimoEstoque(limite);
-        if (limiteCadastrado != null) {
-            limiteCadastrado.setTaxaMinima(NumeroUtils.gerarPercentual(limiteCadastrado.getTaxaMinima()));
-            limite = limiteCadastrado;
-        }
-
-        if (limite != null && limite.getMaterial() != null && limite.getMaterial().getDescricao() == null) {
-            limite.setMaterial(materialService.pesquisarById(limite.getMaterial().getId()));
-        }
-        addAtributo("limite", limite);
-        irTopoPagina();
     }
 
     @Get("estoque/material/listagem")
@@ -216,17 +188,14 @@ public class EstoqueController extends AbstractController {
     }
 
     @Post("estoque/item/edicao")
-    public void redefinirItemEstoque(Integer idItem, Integer quantidade, Double preco, Double aliquotaIPI,
-            Double aliquotaICMS, Material material, FormaMaterial formaMaterial) {
+    public void redefinirItemEstoque(ItemEstoque itemEstoque, Material material, FormaMaterial formaMaterial) {
         try {
-            ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
-            if (itemEstoque == null) {
+            if (estoqueService.pesquisarItemEstoqueById(itemEstoque.getId()) == null) {
                 gerarListaMensagemErro("O item de estoque não foi encontrado.");
             } else {
-                itemEstoque.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
-                itemEstoque.setAliquotaICMS(NumeroUtils.gerarAliquota(aliquotaICMS));
-                itemEstoque.setQuantidade(quantidade);
-                itemEstoque.setPrecoMedio(preco);
+                itemEstoque.setAliquotaIPI(NumeroUtils.gerarAliquota(itemEstoque.getAliquotaIPI()));
+                itemEstoque.setAliquotaICMS(NumeroUtils.gerarAliquota(itemEstoque.getAliquotaICMS()));
+                itemEstoque.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemEstoque.getMargemMinimaLucro()));
                 estoqueService.redefinirItemEstoque(itemEstoque);
                 gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
             }
@@ -235,12 +204,6 @@ public class EstoqueController extends AbstractController {
 
         }
 
-        addAtributo("permanecerTopo", true);
-
-        if (material != null && formaMaterial != null) {
-            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
-        } else {
-            irTopoPagina();
-        }
+        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
     }
 }

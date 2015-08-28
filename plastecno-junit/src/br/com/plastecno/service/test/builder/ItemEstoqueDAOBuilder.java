@@ -73,7 +73,7 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			public ItemEstoque pesquisarItemEstoqueByMedida(double tolerancia, Integer idMaterial,
+			public ItemEstoque pesquisarItemEstoqueByMedida(Integer idMaterial,
 					FormaMaterial formaMaterial, Double medidaExterna, Double medidaInterna, Double comprimento, boolean apenasID) {
 
 				boolean conteMedida = medidaExterna != null || medidaInterna != null || comprimento != null;
@@ -140,7 +140,7 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			public Object[] pesquisarTaxaMininaEValorMedioItemEstoque(Integer idItemEstoque) {
+			public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
 				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				for (ItemEstoque itemEstoque : l) {
 					if (idItemEstoque.equals(itemEstoque.getId())) {

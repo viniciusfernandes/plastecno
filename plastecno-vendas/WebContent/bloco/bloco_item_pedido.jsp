@@ -21,7 +21,7 @@ $(document).ready(function(){
 		});
 		
 		request.done(function (response){
-			$('#bloco_item_pedido #precominimo').val(response.precoMinimo);
+			$('#bloco_item_pedido #precoMinimo').val(response.precoMinimo);
 		});
 		
 		request.fail(function(request, status, excecao) {

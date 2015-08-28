@@ -137,6 +137,7 @@ public abstract class AbstractController {
     void formatarAliquotaItemEstoque(ItemEstoque item) {
         item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
         item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
+        item.setMargemMinimaLucro(NumeroUtils.gerarPercentual(item.getMargemMinimaLucro()));
     }
 
     void formatarAliquotaItemPedido(ItemPedido item) {

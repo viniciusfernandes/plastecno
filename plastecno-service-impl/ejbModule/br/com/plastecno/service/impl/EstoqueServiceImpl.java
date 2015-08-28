@@ -51,9 +51,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@EJB
 	private PedidoService pedidoService;
 
-	// Essa eh a tolerancia de 1mm
-	private final double tolerancia = 0.01d;
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double calcularPrecoCustoItemEstoque(Item filtro) {
@@ -319,7 +316,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			itemCadastrado = itemEstoqueDAO.pesquisarPecaByDescricao(filtro.getMaterial().getId(), filtro.getDescricaoPeca(),
 					true);
 		} else {
-			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(tolerancia, filtro.getMaterial().getId(),
+			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(filtro.getMaterial().getId(),
 					filtro.getFormaMaterial(), filtro.getMedidaExterna(), filtro.getMedidaInterna(), filtro.getComprimento(),
 					true);
 		}
@@ -347,7 +344,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 			itemCadastrado = itemEstoqueDAO.pesquisarPecaByDescricao(filtro.getMaterial().getId(), filtro.getDescricaoPeca(),
 					false);
 		} else {
-			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(tolerancia, filtro.getMaterial().getId(),
+			itemCadastrado = itemEstoqueDAO.pesquisarItemEstoqueByMedida(filtro.getMaterial().getId(),
 					filtro.getFormaMaterial(), filtro.getMedidaExterna(), filtro.getMedidaInterna(), filtro.getComprimento(),
 					false);
 		}
@@ -451,10 +448,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@REVIEW(data = "27/08/2015", descricao = "Parece que a implementacao desse metodo faz o mesmo que a inclusao do item de estoque, por isso esta deprecated agora")
 	public void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
-		ValidadorInformacao.validar(itemEstoque);
-		CalculadoraVolume.validarVolume(itemEstoque);
-
 		if (itemEstoque.isNovo()) {
 			throw new BusinessException("Não é possivel realizar a redefinição de estoque para itens não existentes");
 		}
@@ -470,18 +465,19 @@ public class EstoqueServiceImpl implements EstoqueService {
 					+ "\" nao exite no estoque para ser redefinido.");
 		}
 
+		// Aqui estamos forcando a copia dos atributos para garantir que um item
+		// nunca ser alterado, por exemplo, as medidas nunca podem mudar
 		itemCadastrado.setAliquotaICMS(itemEstoque.getAliquotaICMS());
 		itemCadastrado.setAliquotaIPI(itemEstoque.getAliquotaIPI());
 		itemCadastrado.setPrecoMedio(itemEstoque.getPrecoMedio());
 		itemCadastrado.setQuantidade(itemEstoque.getQuantidade());
-		if (!itemCadastrado.isPeca()) {
-			itemCadastrado.setMedidaExterna(itemEstoque.getMedidaExterna());
-			itemCadastrado.setMedidaInterna(itemEstoque.getMedidaInterna());
-			itemCadastrado.setComprimento(itemEstoque.getComprimento());
-		}
+		itemCadastrado.setQuantidadeMinima(itemEstoque.getQuantidadeMinima());
+		itemCadastrado.setMargemMinimaLucro(itemEstoque.getMargemMinimaLucro());
 
+		ValidadorInformacao.validar(itemCadastrado);
+		
 		itemEstoqueDAO.alterar(itemCadastrado);
-		// redefinirItemReservadoByItemEstoque(itemCadastrado.getId());
+		// redefinirItemReservadoByItemEstoque(idItemEstoque);
 	}
 
 	@TODO(data = "14/04/2015", descricao = "Esse metodo sera utilizado na execucao do metodo de redefinao de itens do estoque redefinirItemEstoque")

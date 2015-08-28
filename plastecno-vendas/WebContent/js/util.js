@@ -206,11 +206,19 @@ function serializar(listaCampos) {
 };
 
 function serializarBloco(idBloco) {
+	return serializarBlocoDisabled(idBloco, true);
+};
+
+function serializarBlocoDisabled(idBloco, verificarDisabled) {
 	var parametros = '';
 	idBloco = '#'+idBloco;
 	var inputs = $(idBloco+' :input[type=text], '+idBloco+' select, '+ idBloco+' :input[type=radio], '+ idBloco+' :input[type=checkbox], '+ idBloco+' :input[type=hidden]');
 	$(inputs).each(function () {
-		if(!isEmpty(this.value) && !$(this).attr('disabled')){
+		
+		if(verificarDisabled && !isEmpty(this.value) && !$(this).attr('disabled')){
+			parametros += '&'+this.name+"="+this.value;
+		}
+		else if(!isEmpty(this.value)){
 			parametros += '&'+this.name+"="+this.value;
 		}
 	});

@@ -30,7 +30,7 @@ public class CalculadoraPreco {
 		CalculadoraPreco.validarCalculoIPI(itemPedido);
 
 		if (aliquotaIPI == null) {
-			aliquotaIPI = itemPedido.getFormaMaterial().getIpi();
+			aliquotaIPI = 0d;
 		}
 		return calcularPorUnidade(itemPedido) * (1 + aliquotaIPI);
 	}

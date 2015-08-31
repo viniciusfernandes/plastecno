@@ -23,37 +23,31 @@ var autocompletar = function(configuracao) {
 			request.done(function(response) {
 						var resultado = response.lista;
 						var TOTAL_REGISTROS = resultado.length;
-
+						
+						
 						if (TOTAL_REGISTROS > 0) {
-							var conteudo = '<ul >';
-							for (var x = 0; x < TOTAL_REGISTROS; x++) {
-								conteudo += '<li class="conbgn" id="'
-										+ resultado[x].valor + '">'
-										+ resultado[x].label + '</li>';
+							
+							var idSelect = idCampoPesquisavel+'Autocomplete';
+							
+							$(idSelect).remove();
+							
+							var conteudo = '<select size="'+TOTAL_REGISTROS+'" id="'+idSelect.replace("#", '')+'">'
+							var array = new Array(); 
+							for (var i = 0; i < TOTAL_REGISTROS; i++) {
+								conteudo += '<option class="conbgn" value="'+resultado[i].valor+'">'+resultado[i].label+'</option>';
 							}
-
-							conteudo += '</ul>';
-
-							conteudo += '<div style="background-color: #BECEBE; text-align: center;" ">Lista de "'+ TOTAL_REGISTROS+ '" resultados resultados para "'+ valorPesquisa.toUpperCase()+ '" </br></div>';
-							$(idContainerResultados).html(conteudo);
-
-							$(idContainerResultados + ' ul li ').click(
-									function() {
-										var preencherCampo = function(itemSelecionado) {
-											$(idCampoPesquisavel).val(itemSelecionado.innerHTML);
-											$(idContainerResultados).hide();
-											selecionarItem(itemSelecionado);
-										};
-
-										preencherCampo(this);
-									});
-
-							$(idContainerResultados).show();
-
-						} else {
-							$(idContainerResultados).hide();
+							
+							conteudo += "</select>"
+							$(idCampoPesquisavel).after(conteudo);
+							
+							var posicao = $(idCampoPesquisavel).position();
+							 $(idSelect).css({
+							        position: "absolute",
+							        top:  "30%",
+							        left: "20%",
+							        width: $(idCampoPesquisavel).css('width')
+							 });
 						}
-						;
 					});
 
 			request.fail(function(request, status, excecao) {

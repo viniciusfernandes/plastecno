@@ -81,8 +81,6 @@ $(document).ready(function(){
 	<div class="label">Material:</div>
 	<div class="input" style="width: 80%">
 		<input type="text" id="material" name="material.id" style="width: 50%" />
-		<div class="suggestionsBox" id="containerPesquisaMaterial"
-			style="display: none; width: 50%"></div>
 	</div>
 	<div class="label">Med. Ext / Espessura:</div>
 	<div class="input" style="width: 10%">

@@ -5,6 +5,7 @@ var autocompletar = function(configuracao) {
 	var idContainerResultados = '#' + configuracao.containerResultados;
 	var selecionarItem = configuracao.selecionarItem;
 	var gerarVinculo = configuracao.gerarVinculo;
+	var idSelect = idCampoPesquisavel+'Autocomplete';
 	
 	var pesquisar = function() {
 		var valorPesquisa = $(idCampoPesquisavel).val();
@@ -23,13 +24,9 @@ var autocompletar = function(configuracao) {
 			request.done(function(response) {
 						var resultado = response.lista;
 						var TOTAL_REGISTROS = resultado.length;
-						
+						$(idSelect).remove();						
 						
 						if (TOTAL_REGISTROS > 0) {
-							
-							var idSelect = idCampoPesquisavel+'Autocomplete';
-							
-							$(idSelect).remove();
 							
 							var conteudo = '<select size="'+TOTAL_REGISTROS+'" id="'+idSelect.replace("#", '')+'">'
 							var array = new Array(); 
@@ -39,13 +36,13 @@ var autocompletar = function(configuracao) {
 							
 							conteudo += "</select>"
 							$(idCampoPesquisavel).after(conteudo);
+							$(idCampoPesquisavel).css('position', 'absolute');
 							
-							var posicao = $(idCampoPesquisavel).position();
+							var top = $(idCampoPesquisavel).position().top+$(idCampoPesquisavel).height() + 1;
 							 $(idSelect).css({
 							        position: "absolute",
-							        top:  "30%",
-							        left: "20%",
-							        width: $(idCampoPesquisavel).css('width')
+							        top:  top+'px',
+							        zIndex: 1
 							 });
 						}
 					});
@@ -62,4 +59,11 @@ var autocompletar = function(configuracao) {
 	};
 
 	$(idCampoPesquisavel).keyup(pesquisar);
+	
+	$(idCampoPesquisavel).keydown(function(e){
+		if(e.keyCode == 40){
+			$(idSelect).focus();
+			$(idSelect).select();
+		}
+	});
 };

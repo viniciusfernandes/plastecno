@@ -7,6 +7,7 @@ var autocompletar = function(configuracao) {
 	var gerarVinculo = configuracao.gerarVinculo;
 	
 	var pesquisar = function() {
+		
 		var valorPesquisa = $(idCampoPesquisavel).val();
 		var vinculo = gerarVinculo != undefined ? '&' + gerarVinculo() : '';
 		
@@ -47,13 +48,24 @@ var autocompletar = function(configuracao) {
 
 										preencherCampo(this);
 									});
-
+							
+							
+							$(idContainerResultados + ' ul li ').keydown(function (e){
+								if(e.keyCode == 40){
+									$(this).next().focus();
+								} else if (e.keyCode == 38){
+									$(this).prev().focus();
+								} else if (e.keyCode == 30) {
+									preencherCampo(this);
+								}
+								alert($(this).val());
+							});
+							
 							$(idContainerResultados).show();
 
 						} else {
 							$(idContainerResultados).hide();
-						}
-						;
+						};
 					});
 
 			request.fail(function(request, status, excecao) {
@@ -67,5 +79,13 @@ var autocompletar = function(configuracao) {
 		;
 	};
 
-	$(idCampoPesquisavel).keyup(pesquisar);
+	$(idCampoPesquisavel).keydown(function (e){
+		
+		if(e.keyCode == 40){
+			$(idContainerResultados+ ' ul li:first').css('background-color', 'black').css('color', 'white');
+			$(idContainerResultados + ' ul li:first').focus();
+		} else{
+			pesquisar();
+		}
+	});
 };

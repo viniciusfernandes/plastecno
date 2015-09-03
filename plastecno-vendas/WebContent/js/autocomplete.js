@@ -5,6 +5,8 @@ var autocompletar = function(configuracao) {
 	var idContainerResultados = '#' + configuracao.containerResultados;
 	var selecionarItem = configuracao.selecionarItem;
 	var gerarVinculo = configuracao.gerarVinculo;
+	var count = 0;
+	var TOTAL_REGISTROS = 0;
 	
 	var pesquisar = function() {
 		
@@ -23,13 +25,14 @@ var autocompletar = function(configuracao) {
 
 			request.done(function(response) {
 						var resultado = response.lista;
-						var TOTAL_REGISTROS = resultado.length;
-
+						TOTAL_REGISTROS = resultado.length;
+						count = 0;
+						
 						if (TOTAL_REGISTROS > 0) {
-							var conteudo = '<ul >';
+							var conteudo = '<ul>';
 							for (var x = 0; x < TOTAL_REGISTROS; x++) {
-								conteudo += '<li class="conbgn" id="'
-										+ resultado[x].valor + '">'
+								conteudo += '<li class="conbgn" id="suggestion'
+										+ (x+1) + '">'
 										+ resultado[x].label + '</li>';
 							}
 
@@ -48,18 +51,6 @@ var autocompletar = function(configuracao) {
 
 										preencherCampo(this);
 									});
-							
-							
-							$(idContainerResultados + ' ul li ').keydown(function (e){
-								if(e.keyCode == 40){
-									$(this).next().focus();
-								} else if (e.keyCode == 38){
-									$(this).prev().focus();
-								} else if (e.keyCode == 30) {
-									preencherCampo(this);
-								}
-								alert($(this).val());
-							});
 							
 							$(idContainerResultados).show();
 
@@ -80,12 +71,41 @@ var autocompletar = function(configuracao) {
 	};
 
 	$(idCampoPesquisavel).keydown(function (e){
+		var selecionar = function(){
+			for(var i = 1; i <= TOTAL_REGISTROS; i++){
+				if(i==count){
+					document.getElementById('suggestion'+i).style.color='white';
+					document.getElementById('suggestion'+i).style.background='black';
+				} 
+				else {
+					document.getElementById('suggestion'+i).style.color='black';
+					document.getElementById('suggestion'+i).style.background='white';
+				}
+			}
+		};
 		
 		if(e.keyCode == 40){
-			$(idContainerResultados+ ' ul li:first').css('background-color', 'black').css('color', 'white');
-			$(idContainerResultados + ' ul li:first').focus();
-		} else{
+			if(++count > TOTAL_REGISTROS){
+				count = TOTAL_REGISTROS;
+			}
+			
+			selecionar();
+		} 
+		else if(e.keyCode == 38){
+			
+			if(--count < 1){
+				count = 1;
+			}
+			
+			selecionar();
+		}
+		else if (e.keyCode == 13){
+			$('#suggestion'+count).click();
+			$(idContainerResultados).hide();
+		}
+		else {
 			pesquisar();
 		}
+		
 	});
 };

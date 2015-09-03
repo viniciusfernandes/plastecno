@@ -5,7 +5,7 @@ var autocompletar = function(configuracao) {
 	var idContainerResultados = '#' + configuracao.containerResultados;
 	var selecionarItem = configuracao.selecionarItem;
 	var gerarVinculo = configuracao.gerarVinculo;
-	var count = 0;
+	var count = -1;
 	
 	var pesquisar = function() {
 		
@@ -25,7 +25,8 @@ var autocompletar = function(configuracao) {
 			request.done(function(response) {
 						var resultado = response.lista;
 						var TOTAL_REGISTROS = resultado.length;
-						count = 0;
+						// Devemos concecar no -1 pois o primeiro elemento a ser selecionado sera o de indice zero da lista.
+						count = -1;
 						
 						if (TOTAL_REGISTROS > 0) {
 							var conteudo = '<ul id="'+idContainerResultados+'UL">';
@@ -40,16 +41,11 @@ var autocompletar = function(configuracao) {
 							conteudo += '<div style="background-color: #BECEBE; text-align: center;" ">Lista de "'+ TOTAL_REGISTROS+ '" resultados resultados para "'+ valorPesquisa.toUpperCase()+ '" </br></div>';
 							$(idContainerResultados).html(conteudo);
 
-							$(idContainerResultados + ' ul li ').click(
-									function() {
-										var preencherCampo = function(itemSelecionado) {
-											$(idCampoPesquisavel).val(itemSelecionado.innerHTML);
-											$(idContainerResultados).hide();
-											selecionarItem(itemSelecionado);
-										};
-
-										preencherCampo(this);
-									});
+							$(idContainerResultados + ' ul li ').click(function() {
+								$(idCampoPesquisavel).val($(this).html());
+								$(idContainerResultados).hide();
+								selecionarItem(this);
+							});
 							
 							$(idContainerResultados).show();
 
@@ -72,6 +68,14 @@ var autocompletar = function(configuracao) {
 	var selecionar = function(keyCode){
 		
 		var list = document.getElementById(idContainerResultados+'UL').getElementsByTagName('li');
+		
+		if(keyCode == 40 && ++count >= list.length){
+			count = list.length - 1;
+		} 
+		else if(keyCode == 38 && --count <= 0){
+			count = 0;
+		}
+		
 		for(var i = 0; i < list.length; i++){
 			if(keyCode == 13 && i == count){
 				list[i].click();
@@ -86,13 +90,6 @@ var autocompletar = function(configuracao) {
 				list[i].style.color='';
 				list[i].style.background='';
 			}
-		}
-		
-		if(keyCode == 40 && ++count >= list.length){
-			count = list.length - 1;
-		} 
-		else if(keyCode == 38 && --count <= 0){
-			count = 0;
 		}
 	};
 

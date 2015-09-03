@@ -6,7 +6,6 @@ var autocompletar = function(configuracao) {
 	var selecionarItem = configuracao.selecionarItem;
 	var gerarVinculo = configuracao.gerarVinculo;
 	var count = 0;
-	var TOTAL_REGISTROS = 0;
 	
 	var pesquisar = function() {
 		
@@ -25,14 +24,14 @@ var autocompletar = function(configuracao) {
 
 			request.done(function(response) {
 						var resultado = response.lista;
-						TOTAL_REGISTROS = resultado.length;
+						var TOTAL_REGISTROS = resultado.length;
 						count = 0;
 						
 						if (TOTAL_REGISTROS > 0) {
-							var conteudo = '<ul>';
+							var conteudo = '<ul id="'+idContainerResultados+'UL">';
 							for (var x = 0; x < TOTAL_REGISTROS; x++) {
-								conteudo += '<li class="conbgn" id="suggestion'
-										+ (x+1) + '">'
+								conteudo += '<li class="conbgn" id="'
+										+ resultado[x].valor + '">'
 										+ resultado[x].label + '</li>';
 							}
 
@@ -69,42 +68,40 @@ var autocompletar = function(configuracao) {
 		}
 		;
 	};
-
-	$(idCampoPesquisavel).keydown(function (e){
-		var selecionar = function(){
-			for(var i = 1; i <= TOTAL_REGISTROS; i++){
-				if(i==count){
-					document.getElementById('suggestion'+i).style.color='white';
-					document.getElementById('suggestion'+i).style.background='black';
-				} 
-				else {
-					document.getElementById('suggestion'+i).style.color='black';
-					document.getElementById('suggestion'+i).style.background='white';
-				}
-			}
-		};
+	
+	var selecionar = function(keyCode){
 		
-		if(e.keyCode == 40){
-			if(++count > TOTAL_REGISTROS){
-				count = TOTAL_REGISTROS;
+		var list = document.getElementById(idContainerResultados+'UL').getElementsByTagName('li');
+		for(var i = 0; i < list.length; i++){
+			if(keyCode == 13 && i == count){
+				list[i].click();
+				return;
 			}
 			
-			selecionar();
+			if(i == count){
+				list[i].style.color='white';
+				list[i].style.background='#DCDCDC';
+			} 
+			else {
+				list[i].style.color='';
+				list[i].style.background='';
+			}
+		}
+		
+		if(keyCode == 40 && ++count >= list.length){
+			count = list.length - 1;
 		} 
-		else if(e.keyCode == 38){
-			
-			if(--count < 1){
-				count = 1;
-			}
-			
-			selecionar();
+		else if(keyCode == 38 && --count <= 0){
+			count = 0;
 		}
-		else if (e.keyCode == 13){
-			$('#suggestion'+count).click();
-			$(idContainerResultados).hide();
-		}
-		else {
+	};
+
+	$(idCampoPesquisavel).keyup(function (e){
+		
+		if(e.keyCode != 40 && e.keyCode != 38 && e.keyCode != 13){
 			pesquisar();
+		} else {
+			selecionar(e.keyCode);
 		}
 		
 	});

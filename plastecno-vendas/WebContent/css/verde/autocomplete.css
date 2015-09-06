@@ -43,6 +43,7 @@ h3 {
 
 .suggestionList li:hover {
 	background-color: #659CD8;
+	color: #4B7931;
 }
 
 .footSuggestionBox {

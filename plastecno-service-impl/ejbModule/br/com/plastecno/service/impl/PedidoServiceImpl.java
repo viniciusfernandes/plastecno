@@ -651,22 +651,20 @@ public class PedidoServiceImpl implements PedidoService {
 		 */
 		Double aliquotaIPI = itemPedido.getAliquotaIPI();
 		final boolean ipiPreenchido = aliquotaIPI != null;
-		final boolean ipiPositivo = ipiPreenchido && aliquotaIPI > 0d;
 		final TipoApresentacaoIPI tipoApresentacaoIPI = pesquisarTipoApresentacaoIPI(itemPedido);
 		final boolean materialImportado = materialService.isMaterialImportado(itemPedido.getMaterial().getId());
-		final boolean ipiNecessario = TipoApresentacaoIPI.SEMPRE.equals(tipoApresentacaoIPI)
-				|| (!ipiPreenchido && TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI) && materialImportado);
+		final boolean ipiObrigatorio = TipoApresentacaoIPI.SEMPRE.equals(tipoApresentacaoIPI)
+				|| (TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI) && materialImportado);
 
-		if (ipiPositivo && TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
+		if (ipiPreenchido && TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
 			throw new BusinessException(
 					"Remova o valor do IPI do item pois representada escolhida não apresenta cáculo de IPI.");
-		} else if (!ipiPositivo && ipiNecessario) {
+		} else if (!ipiPreenchido && ipiObrigatorio) {
 			itemPedido.setAliquotaIPI(itemPedido.getFormaMaterial().getIpi());
-		}
+		} 
 
 		// No caso em que nao exista a cobranca de IPI os precos serao iguais
-		final Double precoUnidadeIPI = ipiNecessario ? CalculadoraPreco.calcularPorUnidadeIPI(itemPedido) : itemPedido
-				.getPrecoUnidade();
+		final Double precoUnidadeIPI = CalculadoraPreco.calcularPorUnidadeIPI(itemPedido);
 
 		itemPedido.setPrecoUnidadeIPI(precoUnidadeIPI);
 		Double precoMinimo = estoqueService.calcularPrecoMinimoItemEstoque(itemPedido);

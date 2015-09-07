@@ -94,7 +94,7 @@ public class ItemEstoque extends Item {
 
 	public ItemEstoque(Integer id, FormaMaterial formaMaterial, String descricaoPeca, String siglaMaterial,
 			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double margemMinimaLucro,
-			Integer quantidade, Integer quantidadeMinima) {
+			Integer quantidade, Integer quantidadeMinima, Double aliquotaIPI) {
 		this.comprimento = comprimento;
 		this.descricaoPeca = descricaoPeca;
 		this.formaMaterial = formaMaterial;
@@ -106,6 +106,7 @@ public class ItemEstoque extends Item {
 		this.quantidade = quantidade;
 		this.margemMinimaLucro = margemMinimaLucro;
 		this.quantidadeMinima = quantidadeMinima;
+		this.aliquotaIPI = aliquotaIPI;
 	}
 
 	public double calcularPrecoTotal() {
@@ -281,4 +282,12 @@ public class ItemEstoque extends Item {
 		this.siglaMaterial = siglaMaterial;
 	}
 
+	public void copiarValores(ItemEstoque item) {
+		setAliquotaICMS(item.getAliquotaICMS());
+		setAliquotaIPI(item.getAliquotaIPI());
+		setPrecoMedio(item.getPrecoMedio());
+		setQuantidade(item.getQuantidade());
+		setQuantidadeMinima(item.getQuantidadeMinima());
+		setMargemMinimaLucro(item.getMargemMinimaLucro());
+	}
 }

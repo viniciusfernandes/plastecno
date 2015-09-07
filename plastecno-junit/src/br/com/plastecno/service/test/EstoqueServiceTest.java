@@ -143,11 +143,12 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	private ItemEstoque gerarLimiteMinimoEstoque() {
-		ItemEstoque itemEstoque = eBuilder.buildItemEstoque();
-		itemEstoque.setMaterial(gerarMaterial());
-		itemEstoque.setMargemMinimaLucro(0.1d);
-		itemEstoque.setQuantidadeMinima(10);
-		return itemEstoque;
+		ItemEstoque limite = eBuilder.buildItemEstoque();
+		limite.setMaterial(gerarMaterial());
+		limite.setMargemMinimaLucro(0.1d);
+		limite.setQuantidadeMinima(10);
+		limite.setAliquotaIPI(0.1d);
+		return limite;
 	}
 
 	private List<ItemPedido> gerarListaItemPedido(TipoPedido tipoPedido) {
@@ -343,8 +344,8 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()
-				* (1 + itemEstoque.getFormaMaterial().getIpi()) * (1 + itemEstoque.getMargemMinimaLucro()));
+		Double precoMinimo = NumeroUtils.arredondarValorMonetario(limite.getPrecoMedio() * (1 + limite.getAliquotaIPI())
+				* (1 + limite.getMargemMinimaLucro()));
 
 		Double precoMinimoCalculado = null;
 		try {
@@ -369,7 +370,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		Double precoMinimo = NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()
-				* (1 + itemEstoque.getFormaMaterial().getIpi())
+				* (1 + (itemEstoque.getAliquotaIPI() == null ? 0 : itemEstoque.getAliquotaIPI()))
 				* (1 + (itemEstoque.getMargemMinimaLucro() == null ? 0 : itemEstoque.getMargemMinimaLucro())));
 
 		Double precoMinimoCalculado = null;
@@ -378,8 +379,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals(precoMinimo, precoMinimoCalculado);
 
+		assertEquals(precoMinimo, precoMinimoCalculado);
 	}
 
 	@Test

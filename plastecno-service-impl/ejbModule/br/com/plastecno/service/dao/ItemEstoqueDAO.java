@@ -20,7 +20,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 	private void appendConstrutorItemEstoque(StringBuilder select) {
 		select
-				.append("select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima) from ItemEstoque i ");
+				.append("select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
 	}
 
 	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
@@ -46,6 +46,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			} else {
 				update.append("and i.comprimento is null ");
 			}
+		} else {
+			update.append("and (i.quantidadeMinima = null or i.quantidadeMinima = 0) ");
 		}
 
 		Query query = entityManager.createQuery(update.toString())
@@ -205,7 +207,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
 		StringBuilder select = new StringBuilder();
 		appendConstrutorItemEstoque(select);
-		select.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
+		select
+				.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
 		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();
 	}
 
@@ -231,7 +234,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
-						"select i.margemMinimaLucro, i.precoMedio, i.formaMaterial from ItemEstoque i where i.id= :idItemEstoque")
+						"select i.margemMinimaLucro, i.precoMedio, i.aliquotaIPI from ItemEstoque i where i.id= :idItemEstoque")
 						.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null, null });
 	}
 

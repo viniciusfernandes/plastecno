@@ -63,7 +63,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * filtro.getQuantidade() * (1 + aliquotaIPI);
 	}
 
-	private Double calcularPrecoMinimo(Double precoMedio, FormaMaterial formaMaterial, Double margemMinimaLucro) {
+	private Double calcularPrecoMinimo(Double precoMedio, Double ipi, Double margemMinimaLucro) {
 		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
 		// estoque.
 
@@ -71,12 +71,16 @@ public class EstoqueServiceImpl implements EstoqueService {
 			margemMinimaLucro = 0.0;
 		}
 
+		if (ipi == null) {
+			ipi = 0.0;
+		}
+
 		// Precisamos arredondar
-		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + formaMaterial.getIpi()) * (1 + margemMinimaLucro));
+		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + ipi) * (1 + margemMinimaLucro));
 	}
 
 	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {
-		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(itemEstoque.getPrecoMedio(), itemEstoque.getFormaMaterial(),
+		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(itemEstoque.getPrecoMedio(), itemEstoque.getAliquotaIPI(),
 				itemEstoque.getMargemMinimaLucro()));
 	}
 
@@ -93,14 +97,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Object[] valores = itemEstoqueDAO.pesquisarMargemMininaEValorMedioItemEstoque(idItemEstoque);
 		Double taxaMinima = (Double) valores[0];
 		Double precoMedio = (Double) valores[1];
-		FormaMaterial formaMaterial = (FormaMaterial) valores[2];
+		Double ipi = (Double) valores[2];
 
-		if (formaMaterial == null) {
-			throw new BusinessException(
-					"Não foi possível cálcular o preco minimo para o item de estoque pois ele não tem forma de material associada");
-		}
-
-		return calcularPrecoMinimo(precoMedio, formaMaterial, taxaMinima);
+		return calcularPrecoMinimo(precoMedio, ipi, taxaMinima);
 	}
 
 	@Override
@@ -305,6 +304,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 			limite.setQuantidadeMinima(null);
 		}
 
+		if (limite.getMargemMinimaLucro() != null && limite.getMargemMinimaLucro() <= 0) {
+			limite.setMargemMinimaLucro(null);
+		}
+
 		itemEstoqueDAO.inserirLimiteMinimoEstoque(limite);
 	}
 
@@ -467,12 +470,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		// Aqui estamos forcando a copia dos atributos para garantir que um item
 		// nunca ser alterado, por exemplo, as medidas nunca podem mudar
-		itemCadastrado.setAliquotaICMS(itemEstoque.getAliquotaICMS());
-		itemCadastrado.setAliquotaIPI(itemEstoque.getAliquotaIPI());
-		itemCadastrado.setPrecoMedio(itemEstoque.getPrecoMedio());
-		itemCadastrado.setQuantidade(itemEstoque.getQuantidade());
-		itemCadastrado.setQuantidadeMinima(itemEstoque.getQuantidadeMinima());
-		itemCadastrado.setMargemMinimaLucro(itemEstoque.getMargemMinimaLucro());
+		itemCadastrado.copiarValores(itemEstoque);
 
 		ValidadorInformacao.validar(itemCadastrado);
 

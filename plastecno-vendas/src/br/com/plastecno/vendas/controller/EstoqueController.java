@@ -60,9 +60,11 @@ public class EstoqueController extends AbstractController {
     public void estoqueHome() {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("isEstoque", true);
+
         verificarPermissaoAcesso("acessoManutencaoEstoquePermitido", TipoAcesso.ADMINISTRACAO,
-                TipoAcesso.MANUTENCAO_ESTOQUE);
-        verificarPermissaoAcesso("acessoValorEstoquePermitido", TipoAcesso.ADMINISTRACAO);
+                TipoAcesso.MANUTENCAO_ESTOQUE, TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+
+        verificarPermissaoAcesso("acessoValorEstoquePermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.OPERACAO_CONTABIL);
     }
 
     private void gerarRelatorioItemEstoque(List<ItemEstoque> lista) {

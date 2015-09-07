@@ -64,7 +64,7 @@ public class EstoqueController extends AbstractController {
         verificarPermissaoAcesso("acessoManutencaoEstoquePermitido", TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.MANUTENCAO_ESTOQUE, TipoAcesso.CADASTRO_PEDIDO_COMPRA);
 
-        verificarPermissaoAcesso("acessoValorEstoquePermitido", TipoAcesso.ADMINISTRACAO);
+        verificarPermissaoAcesso("acessoValorEstoquePermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.OPERACAO_CONTABIL);
     }
 
     private void gerarRelatorioItemEstoque(List<ItemEstoque> lista) {

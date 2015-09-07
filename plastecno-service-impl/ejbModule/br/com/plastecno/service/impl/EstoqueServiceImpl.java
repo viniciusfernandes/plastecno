@@ -304,6 +304,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 			limite.setQuantidadeMinima(null);
 		}
 
+		if (limite.getMargemMinimaLucro() != null && limite.getMargemMinimaLucro() <= 0) {
+			limite.setMargemMinimaLucro(null);
+		}
+
 		itemEstoqueDAO.inserirLimiteMinimoEstoque(limite);
 	}
 
@@ -467,7 +471,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		// Aqui estamos forcando a copia dos atributos para garantir que um item
 		// nunca ser alterado, por exemplo, as medidas nunca podem mudar
 		itemCadastrado.copiarValores(itemEstoque);
-		
+
 		ValidadorInformacao.validar(itemCadastrado);
 
 		itemEstoqueDAO.alterar(itemCadastrado);

@@ -46,6 +46,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			} else {
 				update.append("and i.comprimento is null ");
 			}
+		} else {
+			update.append("and (i.quantidadeMinima = null or i.quantidadeMinima = 0) ");
 		}
 
 		Query query = entityManager.createQuery(update.toString())
@@ -205,7 +207,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
 		StringBuilder select = new StringBuilder();
 		appendConstrutorItemEstoque(select);
-		select.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
+		select
+				.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
 		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();
 	}
 

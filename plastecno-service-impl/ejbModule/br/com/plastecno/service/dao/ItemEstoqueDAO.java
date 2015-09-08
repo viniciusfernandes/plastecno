@@ -20,7 +20,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 	private void appendConstrutorItemEstoque(StringBuilder select) {
 		select
-				.append("select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima) from ItemEstoque i ");
+				.append("select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
 	}
 
 	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
@@ -205,8 +205,16 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
 		StringBuilder select = new StringBuilder();
 		appendConstrutorItemEstoque(select);
-		select.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
+		select
+				.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
 		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();
+	}
+
+	public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select i.margemMinimaLucro, i.precoMedio, i.aliquotaIPI from ItemEstoque i where i.id= :idItemEstoque")
+						.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null, null });
 	}
 
 	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {
@@ -226,13 +234,6 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 				.setParameter("descricaoPeca", descricaoPeca).getResultList();
 
 		return recuperarItemNaoZerado(l);
-	}
-
-	public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery(
-						"select i.margemMinimaLucro, i.precoMedio, i.formaMaterial from ItemEstoque i where i.id= :idItemEstoque")
-						.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null, null });
 	}
 
 	public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {

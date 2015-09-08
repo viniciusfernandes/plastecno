@@ -43,7 +43,7 @@ $(document).ready(function() {
 				mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ADICIONAR esse item, pois o estoque terá seu valor alterado?',
 				confirmar: function(){
 					$('#bloco_item_pedido #descricao').val($('#bloco_item_pedido #descricao').val().toUpperCase());
-					var parametros = serializarFormPesquisa();
+					var parametros = serializarPesquisa();
 					parametros += serializarBloco('bloco_item_pedido');
 					var form = $('#formVazio');
 					$(form).attr('method', 'post');
@@ -56,7 +56,7 @@ $(document).ready(function() {
 				mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REDEFINIR esse item, pois o estoque terá seu valor alterado?',
 				confirmar: function(){
 					$('#bloco_item_pedido #descricao').val($('#bloco_item_pedido #descricao').val().toUpperCase());
-					var parametros = serializarFormPesquisa();
+					var parametros = serializarPesquisa();
 					parametros += '&itemEstoque.id='+$('#bloco_item_pedido #idItemPedido').val();
 					parametros += '&itemEstoque.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
 					parametros += '&itemEstoque.material.id='+$('#bloco_item_pedido #idMaterial').val();
@@ -77,7 +77,7 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoValorEstoque').click(function (){
-		var parametros = serializarFormPesquisa();
+		var parametros = serializarPesquisa();
 		var form = $('#formVazio');
 		$(form).attr('method', 'post');
 		$(form).attr('action', '<c:url value="/estoque/valor"/>?'+parametros);
@@ -85,10 +85,18 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoEscassezEstoque').click(function (){
-		var parametros = serializarFormPesquisa();
+		var parametros = serializarPesquisa();
 		var form = $('#formVazio');
 		$(form).attr('method', 'post');
 		$(form).attr('action', '<c:url value="/estoque/escassez"/>?'+parametros);
+		$(form).submit();
+	});
+	
+	$('#botaoPesquisar').click(function (){
+		var parametros = serializarPesquisa();
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/estoque/item/listagem"/>?'+parametros);
 		$(form).submit();
 	});
 	
@@ -97,15 +105,31 @@ $(document).ready(function() {
 	
 });
 
+function serializarPesquisa(){
+	var parametros = '';
+	var val = $('#bloco_pesquisa #idMaterial').val();
+	
+	if(!isEmpty(val)){
+		parametros = 'material.id='+val;
+	}
+	
+	val = $('#bloco_pesquisa #formaMaterial').val();
+	if(!isEmpty(val)){
+		parametros += '&formaMaterial='+val;
+	}
+	return parametros;
+};
+
 function inicializarAutocompleteMaterial() {
 	// Esse eh o autocomplete da area de filtros de pesquisa
 	autocompletar({
 		url : '<c:url value="/estoque/material/listagem"/>',
-		campoPesquisavel : 'formPesquisa #material',
+		campoPesquisavel : 'bloco_pesquisa #material',
 		parametro : 'sigla',
-		containerResultados : 'formPesquisa #containerPesquisaMaterial',
+		containerResultados : 'bloco_pesquisa #containerPesquisaMaterial',
 		selecionarItem : function(itemLista) {
-			$('#formPesquisa #idMaterial').val(itemLista.id);
+			$('#bloco_pesquisa #idMaterial').val(itemLista.id);
+			$('#botaoPesquisar').click();
 		}
 	});
 	
@@ -170,13 +194,11 @@ function inicializarFiltro() {
 	<form id="formVazio" action="<c:url value="/estoque"/>">
 	</form>
 
-
-	<form id="formPesquisa" action="<c:url value="/estoque/item/listagem"/>" method="get">
-		<fieldset>
+		<fieldset id="bloco_pesquisa">
 			<legend>::: Pesquisa de Itens do Estoque :::</legend>
 			<div class="label condicional" style="width: 30%">Forma Material:</div>
 			<div class="input" style="width: 60%">
-				<select name="formaMaterial" style="width: 20%">
+				<select id="formaMaterial" name="formaMaterial" style="width: 20%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="forma" items="${listaFormaMaterial}">
 						<option value="${forma}"
@@ -198,14 +220,15 @@ function inicializarFiltro() {
 			
 		</fieldset>
 		<div class="bloco_botoes">
-			<input type="submit" value="" class="botaoPesquisar" title="Pesquisar Itens Estoque"/>
-			<input id="botaoEscassezEstoque" type="button" value="" class="botaoPesquisarEstatistica" title="Pesquisar Itens Escassos Estoque"/>
+			<input type="button" id="botaoPesquisar" value="" class="botaoPesquisar" title="Pesquisar Itens Estoque"/>
+			<c:if test="${acessoManutencaoEstoquePermitido}">
+				<input id="botaoEscassezEstoque" type="button" value="" class="botaoPesquisarEstatistica" title="Pesquisar Itens Escassos Estoque"/>
+			</c:if>
 			<c:if test="${acessoValorEstoquePermitido}">
 				<input id="botaoValorEstoque" type="button" value="" class="botaoDinheiro" title="Pesquisar Valor dos Itens no Estoque"/> 
 			</c:if>
 			<input id="botaoLimpar" type="button" value="" title="Limpar Dados do Item de Estoque" class="botaoLimpar" />
 		</div>
-	</form>
 	
 	<c:if test="${acessoManutencaoEstoquePermitido}">
 		<jsp:include page="/bloco/bloco_edicao_item.jsp"/>
@@ -220,11 +243,16 @@ function inicializarFiltro() {
 					<tr>
 						<th style="width: 20%">Material</th>
 						<th style="width: 5%">Qtde.</th>
+					<c:if test="${acessoManutencaoEstoquePermitido}">
 						<th style="width: 5%">Qtde Min.</th>
+					</c:if>
 						<th style="width: 10%">Med. Externa</th>
 						<th style="width: 10%">Med. Interna</th>
 						<th style="width: 10%">Comprimento</th>
+					<c:if test="${acessoManutencaoEstoquePermitido}">
 						<th style="width: 10%">Valor Unid. (R$)</th>
+						<th style="width: 10%">Marg. Min. (%)</th>
+					</c:if>
 						<th style="width: 10%">Preç. Min. (R$)</th>
 						<th style="width: 5%">Ações</th>
 					</tr>
@@ -239,7 +267,11 @@ function inicializarFiltro() {
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
+						
+						<c:if test="${acessoManutencaoEstoquePermitido}">
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeMinima}</td>
+						</c:if>
+						
 							<c:choose>
 								<c:when test="${item.peca}">
 									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" colspan="3">${item.descricaoPeca}</td>
@@ -250,7 +282,11 @@ function inicializarFiltro() {
 									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.comprimento}</td>
 								</c:otherwise>
 							</c:choose>
+							
+						<c:if test="${acessoManutencaoEstoquePermitido}">
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMedio}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.margemMinimaLucro}</td>
+						</c:if>	
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMinimo}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<c:if test="${acessoManutencaoEstoquePermitido}">

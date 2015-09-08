@@ -7,6 +7,8 @@ var autocompletar = function(configuracao) {
 	var gerarVinculo = configuracao.gerarVinculo;
 	var count = -1;
 	
+	$(idCampoPesquisavel).attr('autocomplete', 'off');
+	
 	var pesquisar = function() {
 		
 		var valorPesquisa = $(idCampoPesquisavel).val();

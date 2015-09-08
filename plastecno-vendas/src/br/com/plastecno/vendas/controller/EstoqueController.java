@@ -60,9 +60,11 @@ public class EstoqueController extends AbstractController {
     public void estoqueHome() {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("isEstoque", true);
+
         verificarPermissaoAcesso("acessoManutencaoEstoquePermitido", TipoAcesso.ADMINISTRACAO,
-                TipoAcesso.MANUTENCAO_ESTOQUE);
-        verificarPermissaoAcesso("acessoValorEstoquePermitido", TipoAcesso.ADMINISTRACAO);
+                TipoAcesso.MANUTENCAO_ESTOQUE, TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+
+        verificarPermissaoAcesso("acessoValorEstoquePermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.OPERACAO_CONTABIL);
     }
 
     private void gerarRelatorioItemEstoque(List<ItemEstoque> lista) {
@@ -99,7 +101,7 @@ public class EstoqueController extends AbstractController {
 
         addAtributo("permanecerTopo", true);
         if (material != null && formaMaterial != null) {
-            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+            pesquisarItemEstoque(material, formaMaterial);
         } else {
             irTopoPagina();
         }
@@ -110,7 +112,7 @@ public class EstoqueController extends AbstractController {
         pesquisarItemEstoque(material, formaMaterial, true);
     }
 
-    @Get("estoque/item/listagem")
+    @Post("estoque/item/listagem")
     public void pesquisarItemEstoque(Material material, FormaMaterial formaMaterial) {
         pesquisarItemEstoque(material, formaMaterial, false);
     }
@@ -157,7 +159,7 @@ public class EstoqueController extends AbstractController {
 
         material = materialService.pesquisarById(material == null ? null : material.getId());
         if (material != null || formaMaterial != null) {
-            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+            pesquisarItemEstoque(material, formaMaterial);
         } else {
             irTopoPagina();
         }
@@ -204,6 +206,6 @@ public class EstoqueController extends AbstractController {
 
         }
 
-        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        pesquisarItemEstoque(material, formaMaterial);
     }
 }

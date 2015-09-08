@@ -101,7 +101,7 @@ public class EstoqueController extends AbstractController {
 
         addAtributo("permanecerTopo", true);
         if (material != null && formaMaterial != null) {
-            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+            pesquisarItemEstoque(material, formaMaterial);
         } else {
             irTopoPagina();
         }
@@ -206,6 +206,6 @@ public class EstoqueController extends AbstractController {
 
         }
 
-        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        pesquisarItemEstoque(material, formaMaterial);
     }
 }

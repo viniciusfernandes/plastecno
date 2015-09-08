@@ -14,7 +14,7 @@ $(document).ready(function() {
 	
 	$('#botaoLimparItemPedido').click(function () {
 		$('#bloco_item_pedido input').val('');
-		$('#formaMaterial').val('');
+		$('#bloco_item_pedido #formaMaterial').val('');
 		habilitarCamposEdicaoItem(true);
 	});
 	

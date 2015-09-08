@@ -198,6 +198,11 @@ public class ItemPedido extends Item {
 	public ItemPedido clone() {
 		ItemPedido clone;
 		try {
+			// Note que ao clonar devemos cancelar o ID pois o clonagem representa uma
+			// regra de negocios, assim a entidade resultante sera incluida na sessao
+			// de persistencia e deve ser uma nova entidade. Ja as outras informacoes
+			// de quantidade devem ser anuladas pois elas nao devem refletir no banco
+			// de dados.
 			clone = (ItemPedido) super.clone();
 			clone.setId(null);
 			clone.setPedido(null);

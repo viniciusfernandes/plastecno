@@ -46,8 +46,6 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			} else {
 				update.append("and i.comprimento is null ");
 			}
-		} else {
-			update.append("and (i.quantidadeMinima = null or i.quantidadeMinima = 0) ");
 		}
 
 		Query query = entityManager.createQuery(update.toString())
@@ -212,6 +210,13 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();
 	}
 
+	public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select i.margemMinimaLucro, i.precoMedio, i.aliquotaIPI from ItemEstoque i where i.id= :idItemEstoque")
+						.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null, null });
+	}
+
 	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {
 		if (StringUtils.isEmpty(descricaoPeca) || idMaterial == null) {
 			return null;
@@ -229,13 +234,6 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 				.setParameter("descricaoPeca", descricaoPeca).getResultList();
 
 		return recuperarItemNaoZerado(l);
-	}
-
-	public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery(
-						"select i.margemMinimaLucro, i.precoMedio, i.aliquotaIPI from ItemEstoque i where i.id= :idItemEstoque")
-						.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null, null });
 	}
 
 	public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {

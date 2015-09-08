@@ -200,26 +200,26 @@ public abstract class Item implements Serializable, Cloneable {
 		return valorComissaoFormatado;
 	}
 
-	public boolean isCoincidente(Item item) {
-		boolean coincide = false;
+	public boolean isEqual(Item item) {
+		boolean igual = false;
 
-		coincide = (getFormaMaterial() == null && item.getFormaMaterial() == null)
+		igual = (getFormaMaterial() == null && item.getFormaMaterial() == null)
 				|| (getFormaMaterial().equals(item.getFormaMaterial()));
 
-		coincide &= (getMaterial() == null && item.getMaterial() == null)
+		igual &= (getMaterial() == null && item.getMaterial() == null)
 				|| (getMaterial().getId() == null && item.getMaterial().getId() == null)
 				|| (getMaterial().getId().equals(item.getMaterial().getId()));
 
-		coincide &= (getMedidaExterna() == null && item.getMedidaExterna() == null)
+		igual &= (getMedidaExterna() == null && item.getMedidaExterna() == null)
 				|| (getMedidaExterna() != null && getMedidaExterna().equals(item.getMedidaExterna()));
 
-		coincide &= (getMedidaInterna() == null && item.getMedidaInterna() == null)
+		igual &= (getMedidaInterna() == null && item.getMedidaInterna() == null)
 				|| (getMedidaInterna() != null && getMedidaInterna().equals(item.getMedidaInterna()));
 
-		coincide &= (getComprimento() == null && item.getComprimento() == null)
+		igual &= (getComprimento() == null && item.getComprimento() == null)
 				|| (getComprimento() != null && getComprimento().equals(item.getComprimento()));
 
-		return coincide;
+		return igual;
 	}
 
 	public boolean isFormaMaterialVazada() {

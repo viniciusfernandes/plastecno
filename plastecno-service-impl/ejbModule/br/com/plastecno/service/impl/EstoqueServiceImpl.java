@@ -470,7 +470,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		// Aqui estamos forcando a copia dos atributos para garantir que um item
 		// nunca ser alterado, por exemplo, as medidas nunca podem mudar
-		itemCadastrado.copiarValores(itemEstoque);
+		itemCadastrado.copiar(itemEstoque);
 
 		ValidadorInformacao.validar(itemCadastrado);
 

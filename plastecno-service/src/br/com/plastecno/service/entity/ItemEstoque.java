@@ -118,6 +118,9 @@ public class ItemEstoque extends Item {
 		ItemEstoque clone;
 		try {
 			clone = (ItemEstoque) super.clone();
+			// Note que ao clonar devemos cancelar o ID pois o clonagem representa uma
+			// regra de negocios, assim a entidade resultante sera incluida na sessao
+			// de persistencia e deve ser uma nova entidade
 			clone.setId(null);
 			return clone;
 		} catch (CloneNotSupportedException e) {
@@ -282,12 +285,16 @@ public class ItemEstoque extends Item {
 		this.siglaMaterial = siglaMaterial;
 	}
 
-	public void copiarValores(ItemEstoque item) {
+	public void copiar(ItemEstoque item) {
 		setAliquotaICMS(item.getAliquotaICMS());
 		setAliquotaIPI(item.getAliquotaIPI());
-		setPrecoMedio(item.getPrecoMedio());
 		setQuantidade(item.getQuantidade());
+		setPrecoMedio(item.getPrecoMedio());
 		setQuantidadeMinima(item.getQuantidadeMinima());
 		setMargemMinimaLucro(item.getMargemMinimaLucro());
+	}
+
+	public boolean contemLimiteMinimo() {
+		return quantidadeMinima != null && quantidadeMinima > 0 && margemMinimaLucro != null && margemMinimaLucro > 0;
 	}
 }

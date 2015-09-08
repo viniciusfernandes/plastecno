@@ -112,7 +112,7 @@ public class EstoqueController extends AbstractController {
         pesquisarItemEstoque(material, formaMaterial, true);
     }
 
-    @Get("estoque/item/listagem")
+    @Post("estoque/item/listagem")
     public void pesquisarItemEstoque(Material material, FormaMaterial formaMaterial) {
         pesquisarItemEstoque(material, formaMaterial, false);
     }
@@ -159,7 +159,7 @@ public class EstoqueController extends AbstractController {
 
         material = materialService.pesquisarById(material == null ? null : material.getId());
         if (material != null || formaMaterial != null) {
-            redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+            pesquisarItemEstoque(material, formaMaterial);
         } else {
             irTopoPagina();
         }

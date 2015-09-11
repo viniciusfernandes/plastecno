@@ -18,9 +18,9 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		super(entityManager);
 	}
 
-	private void appendConstrutorItemEstoque(StringBuilder select) {
-		select
-				.append("select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
+	private StringBuilder gerarConstrutorItemEstoque() {
+		return new StringBuilder(
+				"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
 	}
 
 	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
@@ -89,8 +89,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	@WARNING(data = "02/07/2015", descricao = "Aqui temos um like na descricao do material o que pode acarretar lentidao nas pesquisas caso existe um grande numero de pecas no estoque")
 	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca,
 			boolean zeradosExcluidos) {
-		StringBuilder select = new StringBuilder();
-		appendConstrutorItemEstoque(select);
+		StringBuilder select = gerarConstrutorItemEstoque();
 
 		if (idMaterial != null || formaMaterial != null) {
 			select.append("where ");
@@ -203,8 +202,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	}
 
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
-		StringBuilder select = new StringBuilder();
-		appendConstrutorItemEstoque(select);
+		StringBuilder select = gerarConstrutorItemEstoque();
+		
 		select
 				.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
 		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();

@@ -283,10 +283,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		 * estoque para recuperar apenas a informacao necessaria.
 		 */
 		RelatorioWrapper<Integer, ItemPedido> relatorio = new RelatorioWrapper<Integer, ItemPedido>(titulo);
-		Pedido pedido = null;
 		for (ItemPedido item : listaItem) {
-			pedido = item.getPedido();
-			pedido.setRepresentada(pedidoService.pesquisarRepresentadaResumidaByIdPedido(pedido.getId()));
 
 			item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
 			item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
@@ -294,13 +291,13 @@ public class RelatorioServiceImpl implements RelatorioService {
 			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
 			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
 			item.setAliquotaComissaoFormatado(NumeroUtils.formatarValorMonetario(item.getPercentualComissao()));
-			item.setNomeProprietario(pedido.getProprietario().getNomeCompleto());
-			item.setNomeRepresentada(pedido.getRepresentada().getNomeFantasia());
+			item.setNomeProprietario(item.getNomeProprietario());
+			item.setNomeRepresentada(item.getNomeRepresentada());
 			item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
 			item.setPrecoCustoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoCusto()));
 
-			relatorio.addGrupo(pedido.getId(), item).setPropriedade("dataEntrega",
-					StringUtils.formatarData(pedido.getDataEntrega()));
+			relatorio.addGrupo(item.getIdPedido(), item).setPropriedade("dataEntrega",
+					StringUtils.formatarData(item.getDataEntrega()));
 		}
 		// Reordenando os itens pelo numero de sequencia de inclusao no pedido.
 		relatorio.sortElementoByGrupo(new Comparator<ItemPedido>() {
@@ -319,7 +316,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		 * estoque para recuperar apenas a informacao necessaria.
 		 */
 		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Empacotar",
-				pedidoService.pesquisarRevendaEmpacotamento(idCliente));
+				pedidoService.pesquisarItemPedidoAguardandoEmpacotamento(idCliente));
 	}
 
 	@Override

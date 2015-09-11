@@ -17,7 +17,6 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ComissaoService;
@@ -661,7 +660,7 @@ public class PedidoServiceImpl implements PedidoService {
 					"Remova o valor do IPI do item pois representada escolhida não apresenta cáculo de IPI.");
 		} else if (!ipiPreenchido && ipiObrigatorio) {
 			itemPedido.setAliquotaIPI(itemPedido.getFormaMaterial().getIpi());
-		} 
+		}
 
 		// No caso em que nao exista a cobranca de IPI os precos serao iguais
 		final Double precoUnidadeIPI = CalculadoraPreco.calcularPorUnidadeIPI(itemPedido);
@@ -669,7 +668,7 @@ public class PedidoServiceImpl implements PedidoService {
 		itemPedido.setPrecoUnidadeIPI(precoUnidadeIPI);
 		Double precoMinimo = estoqueService.calcularPrecoMinimoItemEstoque(itemPedido);
 		itemPedido.setPrecoMinimo(NumeroUtils.arredondarValorMonetario(precoMinimo));
-		
+
 		/*
 		 * O valor sequencial sera utilizado para que a representada identifique
 		 * rapidamento qual eh o item que deve ser customizado, assim o vendedor
@@ -884,6 +883,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdPedidoAguardandoEmpacotamento() {
+		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoAguardandoMaterial() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
 	}
@@ -947,6 +952,16 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	public List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento() {
+		return pesquisarItemPedidoAguardandoEmpacotamento(null);
+	}
+
+	@Override
+	public List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente) {
+		return itemPedidoDAO.pesquisarItemPedidoAguardandoEmpacotamento(idCliente);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarItemPedidoByIdPedido(idPedido);
@@ -989,41 +1004,14 @@ public class PedidoServiceImpl implements PedidoService {
 			return new ArrayList<ItemPedido>();
 		}
 
-		return pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, idVendedor, false);
-	}
-
-	private List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,
-			boolean isContrutorResumido) {
-		StringBuilder select = new StringBuilder();
-		if (isContrutorResumido) {
-			select
-					.append("select new ItemPedido(i.id, i.pedido.id, i.pedido.proprietario.id, i.pedido.proprietario.nome, i.pedido.proprietario.sobrenome, i.precoUnidade, i.quantidade, i.valorComissionado) ");
-		} else {
-			select.append("select i ");
-		}
-		select.append("from ItemPedido i ");
-		select.append("where i.pedido.tipoPedido != :tipoPedido and ");
-		select.append("i.pedido.dataEnvio >= :dataInicio and ");
-		select.append("i.pedido.dataEnvio <= :dataFim and ");
-		select.append("i.pedido.situacaoPedido in (:situacoes) ");
-		if (idVendedor != null) {
-			select.append("and i.pedido.proprietario.id = :idVendedor ");
-		}
-		select.append("order by i.pedido.dataEnvio ");
-
-		TypedQuery<ItemPedido> query = this.entityManager.createQuery(select.toString(), ItemPedido.class)
-				.setParameter("dataInicio", periodo.getInicio()).setParameter("dataFim", periodo.getFim())
-				.setParameter("situacoes", pesquisarSituacaoVendaEfetivada()).setParameter("tipoPedido", TipoPedido.COMPRA);
-
-		if (idVendedor != null) {
-			query.setParameter("idVendedor", idVendedor);
-		}
-		return query.getResultList();
+		return itemPedidoDAO.pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, idVendedor,
+				pesquisarSituacaoVendaEfetivada());
 	}
 
 	@Override
 	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
-		return pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null, true);
+		return itemPedidoDAO.pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null,
+				pesquisarSituacaoVendaEfetivada());
 	}
 
 	@Override
@@ -1173,16 +1161,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarRepresentadaResumidaByIdPedido(idPedido);
-	}
-
-	@Override
-	public List<ItemPedido> pesquisarRevendaEmpacotamento() {
-		return pesquisarRevendaEmpacotamento(null);
-	}
-
-	@Override
-	public List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente) {
-		return itemPedidoDAO.pesquisarItemPedidoEmpacotamento(idCliente, null, null);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package br.com.plastecno.service.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -84,9 +86,12 @@ public class ItemPedido extends Item {
 	private String nomeProprietario;
 
 	@Transient
+	private Date dataEntrega;
+
+	@Transient
 	private String nomeRepresentada;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_pedido", referencedColumnName = "id", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Pedido associado ao item")
 	private Pedido pedido;
@@ -154,7 +159,8 @@ public class ItemPedido extends Item {
 	}
 
 	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS) {
-		this(null, null, null, null, null, precoUnidade, quantidade, null);
+		this.precoUnidade = precoUnidade;
+		this.quantidade = quantidade;
 		this.aliquotaIPI = aliquotaIPI;
 		this.aliquotaICMS = aliquotaICMS;
 	}
@@ -174,16 +180,37 @@ public class ItemPedido extends Item {
 		this.id = id;
 	}
 
-	public ItemPedido(Integer id, Integer idPedido, Integer idProprietario, String nomeProprietario,
-			String sobrenomeProprietario, Double precoUnidade, Integer quantidade, Double valorComissionado) {
+	// Construtor para relatorio de comissao
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario, Double precoUnidade,
+			Double precoCusto, Integer quantidade, Double valorComissionado, Double aliquotaComissiao,
+			FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial, String descricaoPeca,
+			Double medidaExterna, Double medidaInterna, Double comprimento) {
 		this.id = id;
+		this.sequencial = sequencial;
 		this.idPedido = idPedido;
 		this.idProprietario = idProprietario;
-		this.nomeProprietario = nomeProprietario;
-		this.sobrenomeProprietario = sobrenomeProprietario;
 		this.precoUnidade = precoUnidade;
+		this.precoCusto = precoCusto;
 		this.quantidade = quantidade;
 		this.valorComissionado = valorComissionado;
+		this.aliquotaComissao = aliquotaComissiao;
+		this.formaMaterial = formaMaterial;
+		this.material = new Material(null, siglaMaterial, descricaoMaterial);
+		this.descricaoPeca = descricaoPeca;
+		this.medidaExterna = medidaExterna;
+		this.medidaInterna = medidaInterna;
+		this.comprimento = comprimento;
+	}
+
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario, Double precoUnidade,
+			Integer quantidade, String nomeRepresentada, Date dataEntrega, FormaMaterial formaMaterial, String siglaMaterial,
+			String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
+
+		this(id, sequencial, idPedido, idProprietario, precoUnidade, null, quantidade, (Double) null, (Double) null,
+				formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
+
+		this.nomeRepresentada = nomeRepresentada;
+		this.dataEntrega = dataEntrega;
 	}
 
 	public void addQuantidadeReservada(Integer quantidadeReservada) {
@@ -249,6 +276,10 @@ public class ItemPedido extends Item {
 
 	public Double getComprimento() {
 		return comprimento;
+	}
+
+	public Date getDataEntrega() {
+		return dataEntrega;
 	}
 
 	public String getDescricaoPeca() {
@@ -421,6 +452,10 @@ public class ItemPedido extends Item {
 
 	public void setComprimento(Double comprimento) {
 		this.comprimento = comprimento;
+	}
+
+	public void setDataEntrega(Date dataEntrega) {
+		this.dataEntrega = dataEntrega;
 	}
 
 	public void setDescricaoPeca(String descricaoPeca) {

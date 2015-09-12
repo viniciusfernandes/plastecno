@@ -38,6 +38,7 @@
 			parametro : 'nome',
 			containerResultados : 'containerPesquisaVendedor',
 			selecionarItem: function(itemLista) {
+				$('#idVendedor').val(itemLista.id);
 				$('#botaoPesquisar').click();
 			}
 		});
@@ -49,9 +50,9 @@
 	<form id="formVazio" action="<c:url value="/relatorio/comissao/vendedor"/>">
 	</form>
 
-		<input type="hidden" id="idVendedor" name="vendedor.id" value="${vendedor.id}" />
-
 		<fieldset id="bloco_pesquisa">
+			<input type="hidden" id="idVendedor" name="vendedor.id" value="${vendedor.id}" />
+		
 			<legend>::: Relatório das Comissões do Vendedor :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">

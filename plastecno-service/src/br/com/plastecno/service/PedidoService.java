@@ -102,6 +102,8 @@ public interface PedidoService {
 
 	List<Integer> pesquisarIdPedidoAguardandoCompra();
 
+	List<Integer> pesquisarIdPedidoAguardandoEmpacotamento();
+
 	List<Integer> pesquisarIdPedidoAguardandoMaterial();
 
 	Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido);
@@ -160,9 +162,9 @@ public interface PedidoService {
 
 	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
 
-	List<ItemPedido> pesquisarRevendaEmpacotamento();
+	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento();
 
-	List<ItemPedido> pesquisarRevendaEmpacotamento(Integer idCliente);
+	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente);
 
 	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 

@@ -31,7 +31,6 @@
 			$('#formVazio').attr('action', action).attr('method', 'post').submit();
 		});
 		
-		
 		autocompletar({
 			url : '<c:url value="/vendedor/listagem/nome"/>',
 			campoPesquisavel : 'nome',

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.caelum.vraptor.Get;
+import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.UsuarioService;
@@ -30,7 +31,7 @@ public class RelatorioVendaVendedorController extends AbstractController {
         super(result, usuarioInfo);
     }
 
-    @Get("relatorio/venda/vendedor/listagem")
+    @Post("relatorio/venda/vendedor/listagem")
     public void gerarRelatorioPedidoVendedor(boolean orcamento, Date dataInicial, Date dataFinal, Integer idVendedor) {
         try {
 

@@ -214,9 +214,10 @@ function serializarBlocoDisabled(idBloco, verificarDisabled) {
 	idBloco = '#'+idBloco;
 	var inputs = $(idBloco+' :input[type=text], '+idBloco+' select, '+ idBloco+' :input[type=radio], '+ idBloco+' :input[type=checkbox], '+ idBloco+' :input[type=hidden]');
 	var valor = false;
+	var preenchido = 
 	$(inputs).each(function () {
-		
-		if(verificarDisabled && !isEmpty(this.value) && !$(this).attr('disabled')){
+		preenchido = !isEmpty(this.value) && !isEmpty(this.name);
+		if(verificarDisabled && preenchido && !$(this).attr('disabled')){
 						    
 			if($(this).is(":checkbox")) {
 				valor = $(this).is(':checked');
@@ -225,7 +226,7 @@ function serializarBlocoDisabled(idBloco, verificarDisabled) {
 			}
 			parametros += '&'+this.name+"="+valor;
 		}
-		else if(!isEmpty(this.value)){
+		else if(preenchido){
 			parametros += '&'+this.name+"="+this.value;
 		}
 	});

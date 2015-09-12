@@ -13,6 +13,8 @@
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+
 
 <title>Relatório das Comissões dos Vendedores</title>
 <script type="text/javascript">
@@ -23,13 +25,20 @@
 		inserirMascaraData('dataInicial');
 		inserirMascaraData('dataFinal');
 		
+		$('#botaoPesquisar').click(function () {
+			var parametros = serializarBloco('bloco_pesquisa');
+			var action = '<c:url value="/relatorio/comissao/vendedor/listagem"/>?'+parametros;
+			$('#formVazio').attr('action', action).attr('method', 'post').submit();
+		});
+		
+		
 		autocompletar({
 			url : '<c:url value="/vendedor/listagem/nome"/>',
 			campoPesquisavel : 'nome',
 			parametro : 'nome',
 			containerResultados : 'containerPesquisaVendedor',
 			selecionarItem: function(itemLista) {
-				$('#idVendedor').val(itemLista.id);
+				$('#botaoPesquisar').click();
 			}
 		});
 	});
@@ -40,10 +49,9 @@
 	<form id="formVazio" action="<c:url value="/relatorio/comissao/vendedor"/>">
 	</form>
 
-	<form action="<c:url value="/relatorio/comissao/vendedor/listagem"/>" method="get">
 		<input type="hidden" id="idVendedor" name="vendedor.id" value="${vendedor.id}" />
 
-		<fieldset>
+		<fieldset id="bloco_pesquisa">
 			<legend>::: Relatório das Comissões do Vendedor :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
@@ -66,10 +74,9 @@
 			</div>
 		</fieldset>
 		<div class="bloco_botoes">
-			<input type="submit" value="" class="botaoPesquisar" title="Pesquisar Dados da Comissão do Vendedor" /> 
+			<input id="botaoPesquisar" type="button" class="botaoPesquisar" title="Pesquisar Dados da Comissão do Vendedor" /> 
 			<input id="botaoLimpar" type="button" value="" title="Limpar Dados da Comissão do Vendedor" class="botaoLimpar" />
 		</div>
-	</form>
 
 	<a id="rodape"></a>
 		<c:choose>

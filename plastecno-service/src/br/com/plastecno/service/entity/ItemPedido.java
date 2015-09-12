@@ -181,10 +181,10 @@ public class ItemPedido extends Item {
 	}
 
 	// Construtor para relatorio de comissao
-	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario, Double precoUnidade,
-			Double precoCusto, Integer quantidade, Double valorComissionado, Double aliquotaComissiao,
-			FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial, String descricaoPeca,
-			Double medidaExterna, Double medidaInterna, Double comprimento) {
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario, String nomeProprietario,
+			String sobrenomeProprietario, Double precoUnidade, Double precoCusto, Integer quantidade,
+			Double valorComissionado, Double aliquotaComissiao, FormaMaterial formaMaterial, String siglaMaterial,
+			String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
 		this.id = id;
 		this.sequencial = sequencial;
 		this.idPedido = idPedido;
@@ -200,16 +200,18 @@ public class ItemPedido extends Item {
 		this.medidaExterna = medidaExterna;
 		this.medidaInterna = medidaInterna;
 		this.comprimento = comprimento;
+		this.nomeProprietario = nomeProprietario;
+		this.sobrenomeProprietario = sobrenomeProprietario;
 	}
 
 	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, String nomeProprietario, Integer quantidade,
-			Integer quantidadeRecepcionada, Double precoUnidade, String nomeRepresentada, Date dataEntrega, FormaMaterial formaMaterial,
-			String siglaMaterial, String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna,
-			Double comprimento) {
+			Integer quantidadeRecepcionada, Double precoUnidade, String nomeRepresentada, Date dataEntrega,
+			FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial, String descricaoPeca,
+			Double medidaExterna, Double medidaInterna, Double comprimento) {
 
-		this(id, sequencial, idPedido, null, precoUnidade, null , quantidade, (Double) null, (Double) null, formaMaterial,
-				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
-		this.nomeProprietario = nomeProprietario;
+		this(id, sequencial, idPedido, null, nomeProprietario, "", precoUnidade, null, quantidade, (Double) null,
+				(Double) null, formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna,
+				comprimento);
 		this.nomeRepresentada = nomeRepresentada;
 		this.dataEntrega = dataEntrega;
 		this.quantidadeRecepcionada = quantidadeRecepcionada;

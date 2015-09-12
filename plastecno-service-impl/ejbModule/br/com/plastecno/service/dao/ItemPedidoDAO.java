@@ -5,11 +5,13 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.impl.util.QueryUtil;
+import br.com.plastecno.service.wrapper.Periodo;
 
 public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
@@ -29,14 +31,18 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				.executeUpdate();
 	}
 
+	private StringBuilder gerarConstrutorItemPedidoComDataEntrega() {
+		return new StringBuilder(
+				"select new ItemPedido(i.id, i.sequencial, i.pedido.id, i.pedido.proprietario.nome, i.quantidade, i.quantidadeRecepcionada, i.precoUnidade, i.pedido.representada.nomeFantasia, i.pedido.dataEntrega, i.formaMaterial, i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento)  from ItemPedido i ");
+	}
+
 	public void inserirComissao(Integer idItemPedido, Double valorComissao) {
 		super.alterarPropriedade(ItemPedido.class, idItemPedido, "comissao", valorComissao);
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Date dataInicial, Date dataFinal) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemPedido i ");
+		StringBuilder select = gerarConstrutorItemPedidoComDataEntrega();
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
 		select.append("and i.recebido = false ");
 		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
@@ -87,8 +93,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemAguardandoCompra(Integer idCliente, Date dataInicial, Date dataFinal) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemPedido i ");
+		StringBuilder select = gerarConstrutorItemPedidoComDataEntrega();
+
 		select.append("where i.pedido.situacaoPedido = :situacaoPedido and i.pedido.tipoPedido = :tipoPedido ");
 		select.append("and i.encomendado = false and i.quantidade > i.quantidadeReservada ");
 
@@ -127,8 +133,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Date dataInicial, Date dataFinal) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i from ItemPedido i ");
+		StringBuilder select = gerarConstrutorItemPedidoComDataEntrega();
+
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
 		select.append("and i.recebido = false ");
 		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
@@ -162,6 +168,28 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 		if (idRepresentada != null) {
 			query.setParameter("idRepresentada", idRepresentada);
+		}
+
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente) {
+		StringBuilder select = gerarConstrutorItemPedidoComDataEntrega();
+
+		select.append("where i.pedido.situacaoPedido = :situacaoPedido and i.quantidadeReservada > 0 ");
+
+		if (idCliente != null) {
+			select.append("and i.pedido.cliente.id = :idCliente ");
+		}
+
+		select.append("order by i.pedido.id asc ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("situacaoPedido", SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO);
+
+		if (idCliente != null) {
+			query.setParameter("idCliente", idCliente);
 		}
 
 		return query.getResultList();
@@ -207,41 +235,27 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return query.getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarItemPedidoEmpacotamento(Integer idCliente, Date dataInicial, Date dataFinal) {
-		StringBuilder select = new StringBuilder();
-		select
-				.append("select i from ItemPedido i where i.pedido.situacaoPedido = :situacaoPedido and i.quantidadeReservada > 0 ");
-
-		if (dataInicial != null) {
-			select.append("and i.pedido.dataEnvio >= :dataInicial ");
+	public List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,
+			List<SituacaoPedido> listaSituacao) {
+		StringBuilder select = new StringBuilder(
+				"select new ItemPedido(i.id, i.sequencial, i.pedido.id, i.pedido.proprietario.id, i.precoUnidade, i.precoCusto, i.quantidade, i.valorComissionado, i.aliquotaComissao, i.formaMaterial, i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento) ");
+		select.append("from ItemPedido i ");
+		select.append("where i.pedido.tipoPedido != :tipoPedido and ");
+		select.append("i.pedido.dataEnvio >= :dataInicio and ");
+		select.append("i.pedido.dataEnvio <= :dataFim and ");
+		select.append("i.pedido.situacaoPedido in (:situacoes) ");
+		if (idVendedor != null) {
+			select.append("and i.pedido.proprietario.id = :idVendedor ");
 		}
+		select.append("order by i.pedido.dataEnvio ");
 
-		if (dataFinal != null) {
-			select.append("and i.pedido.dataEnvio <= :dataFinal ");
+		TypedQuery<ItemPedido> query = this.entityManager.createQuery(select.toString(), ItemPedido.class)
+				.setParameter("dataInicio", periodo.getInicio()).setParameter("dataFim", periodo.getFim())
+				.setParameter("situacoes", listaSituacao).setParameter("tipoPedido", TipoPedido.COMPRA);
+
+		if (idVendedor != null) {
+			query.setParameter("idVendedor", idVendedor);
 		}
-
-		if (idCliente != null) {
-			select.append("and i.pedido.cliente.id = :idCliente ");
-		}
-
-		select.append("order by i.pedido.id asc ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("situacaoPedido", SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO);
-
-		if (dataInicial != null) {
-			query.setParameter("dataInicial", dataInicial);
-		}
-
-		if (dataFinal != null) {
-			query.setParameter("dataFinal", dataFinal);
-		}
-
-		if (idCliente != null) {
-			query.setParameter("idCliente", idCliente);
-		}
-
 		return query.getResultList();
 	}
 

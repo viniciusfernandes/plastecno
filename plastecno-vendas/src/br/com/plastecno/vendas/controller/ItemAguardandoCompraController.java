@@ -40,7 +40,7 @@ public class ItemAguardandoCompraController extends AbstractController {
 
     @Get("itemAguardandoCompra/pdf")
     public Download downloadPedidoPDF(Integer idPedido) {
-        return forwardTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
+        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
     }
 
     @Post("itemAguardandoCompra/item/compra")

@@ -35,6 +35,12 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
+	$('#botaoPesquisar').click(function () {
+		var parametros = serializarBloco('bloco_pesquisa');
+		var action = '<c:url value="/itemAguardandoCompra/item/listagem"/>?'+parametros;
+		$('#formVazio').attr('action', action).attr('method', 'post').submit();
+	});
+	
 	$('#botaoEnviarEncomenda').click(function () {
 
 		inicializarModalConfirmacao({
@@ -75,6 +81,7 @@ function inicializarAutocompleteCliente(){
 		containerResultados : 'containerPesquisaCliente',
 		selecionarItem: function(itemLista) {
 			$('#formPesquisa #idCliente').val(itemLista.id);
+			$('#botaoPesquisar').click();
 		}
 	});
 };
@@ -96,10 +103,11 @@ function encomendarItem(campo){
 	<form id="formVazio" >
 	</form>
 
-
-	<form id="formPesquisa" action="<c:url value="/itemAguardandoCompra/item/listagem"/>" method="get">
-		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
-		<fieldset>
+		
+		<fieldset id="bloco_pesquisa">
+		
+			<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
+			
 			<legend>::: Pesquisa de Itens para Comprar :::</legend>
 			<div class="label" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
@@ -118,11 +126,10 @@ function encomendarItem(campo){
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			<div class="bloco_botoes">
-				<input type="submit" value="" class="botaoPesquisar" /> 
+				<input id="botaoPesquisar" type="button" value="" class="botaoPesquisar" /> 
 				<input id="botaoLimpar" type="button" value="" title="Limpar Dados de Geração do Relatório de Compras" class="botaoLimpar" />
 			</div>
 		</fieldset>
-	</form>
 	
 	<c:if test="${not empty relatorio}">
 		<fieldset>

@@ -127,6 +127,7 @@ function habilitarCamposEdicaoItem(habilitado){
 			value="${itemPedido.aliquotaICMSFormatado}" maxlength="2" style="width: 5%"/>
 	</div>
 	
+	<c:if test="${isEstoque}">
 	<div class="label">Qtde. Mín.:</div>
 		<div class="input" style="width: 7%">
 			<input type="text" id="quantidadeMinima" name="itemPedido.quantidadeMinima" value="${itemPedido.quantidadeMinima}"/>
@@ -135,7 +136,7 @@ function habilitarCamposEdicaoItem(habilitado){
 		<div class="input" style="width: 7%">
 			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}"/>
 	</div>
-	
+	</c:if>
 	
 	<div class="bloco_botoes">
 		<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Refazer os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>

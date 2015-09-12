@@ -243,7 +243,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	@REVIEW(data = "10/03/2015", descricao = "Devemos implementar uma melhoria o esquema de consulta dos itens de estoque para recuperar apenas a informacao necessaria.")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
 			Periodo periodo) {
@@ -258,16 +257,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoCompra(Integer idCliente, Periodo periodo) {
-		/*
-		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
-		 * estoque para recuperar apenas a informacao necessaria.
-		 */
 		return gerarRelatorioItensPorPedido("Itens para Comprar",
 				pedidoService.pesquisarItemAguardandoCompra(idCliente, periodo));
 	}
 
 	@Override
-	@REVIEW(data = "10/03/2015", descricao = "Devemos implementar uma melhoria o esquema de consulta dos itens de estoque para recuperar apenas a informacao necessaria.")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(Integer idRepresentada,
 			Periodo periodo) {
@@ -278,10 +272,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@REVIEW(descricao = "Nem sempre eh necessario carregar as informacoes da representada")
 	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(String titulo, List<ItemPedido> listaItem) {
-		/*
-		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
-		 * estoque para recuperar apenas a informacao necessaria.
-		 */
 		RelatorioWrapper<Integer, ItemPedido> relatorio = new RelatorioWrapper<Integer, ItemPedido>(titulo);
 		for (ItemPedido item : listaItem) {
 
@@ -291,8 +281,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
 			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
 			item.setAliquotaComissaoFormatado(NumeroUtils.formatarValorMonetario(item.getPercentualComissao()));
-			item.setNomeProprietario(item.getNomeProprietario());
-			item.setNomeRepresentada(item.getNomeRepresentada());
 			item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
 			item.setPrecoCustoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoCusto()));
 
@@ -311,10 +299,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente) {
-		/*
-		 * TODO: devemos implementar uma melhoria o esquema de consulta dos itens de
-		 * estoque para recuperar apenas a informacao necessaria.
-		 */
 		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Empacotar",
 				pedidoService.pesquisarItemPedidoAguardandoEmpacotamento(idCliente));
 	}

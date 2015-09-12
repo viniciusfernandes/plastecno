@@ -202,15 +202,17 @@ public class ItemPedido extends Item {
 		this.comprimento = comprimento;
 	}
 
-	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario, Double precoUnidade,
-			Integer quantidade, String nomeRepresentada, Date dataEntrega, FormaMaterial formaMaterial, String siglaMaterial,
-			String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, String nomeProprietario, Integer quantidade,
+			Integer quantidadeRecepcionada, Double precoUnidade, String nomeRepresentada, Date dataEntrega, FormaMaterial formaMaterial,
+			String siglaMaterial, String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna,
+			Double comprimento) {
 
-		this(id, sequencial, idPedido, idProprietario, precoUnidade, null, quantidade, (Double) null, (Double) null,
-				formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
-
+		this(id, sequencial, idPedido, null, precoUnidade, null , quantidade, (Double) null, (Double) null, formaMaterial,
+				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
+		this.nomeProprietario = nomeProprietario;
 		this.nomeRepresentada = nomeRepresentada;
 		this.dataEntrega = dataEntrega;
+		this.quantidadeRecepcionada = quantidadeRecepcionada;
 	}
 
 	public void addQuantidadeReservada(Integer quantidadeReservada) {

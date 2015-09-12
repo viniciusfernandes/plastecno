@@ -13,6 +13,7 @@
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 
 <title>Relatório de Vendas do Vendedor</title>
 <script type="text/javascript">
@@ -20,6 +21,13 @@
 		$('#botaoLimpar').click(function () {
 			$('#formVazio').submit();
 		});
+		
+		$('#botaoPesquisar').click(function () {
+			var parametros = serializarBloco('bloco_pesquisa');
+			var action = '<c:url value="/relatorio/venda/vendedor/listagem"/>?'+parametros;
+			$('#formVazio').attr('action', action).attr('method', 'post').submit();
+		});
+		
 		inserirMascaraData('dataInicial');
 		inserirMascaraData('dataFinal');
 		
@@ -31,6 +39,7 @@
 					containerResultados: 'containerPesquisaVendedor',
 					selecionarItem: function (itemSelecionado){
 						$('#idVendedor').val(itemSelecionado.id);
+						$('#botaoPesquisar').click();
 					}
 				}
 		);
@@ -42,12 +51,11 @@
 	<form id="formVazio" action="<c:url value="/relatorio/venda/vendedor"/>">
 	</form>
 
-	<form action="<c:url value="/relatorio/venda/vendedor/listagem"/>">
-		<input type="hidden" id="idVendedor" name="idVendedor"
-			value="${vendedor.id}" />
-
-		<fieldset>
+		<fieldset id="bloco_pesquisa">
 			<legend>::: ${titulo} :::</legend>
+			
+			<input type="hidden" id="idVendedor" name="idVendedor" value="${vendedor.id}" />
+			
 			<div class="label" style="width: 30%">Pesquisar Orçamentos:</div>
 			<div class="input" style="width: 60%">
 				<input type="checkbox" name="orcamento"
@@ -67,22 +75,18 @@
 			</div>
 			<div class="label obrigatorio" style="width: 30%">Vendedor:</div>
 			<div class="input" style="width: 40%">
-				<input type="text" id="nomeVendedor"
-					value="${vendedor.nomeCompleto}"
+				<input type="text" id="nomeVendedor" value="${vendedor.nomeCompleto}"
 					class="pesquisavel <c:if test="${not acessoPesquisaVendaVendedorPermitido}">desabilidado</c:if>"
-					<c:if test="${not acessoPesquisaVendaVendedorPermitido}">disabled="disabled"</c:if>
-					style="width: 50%" />
+					<c:if test="${not acessoPesquisaVendaVendedorPermitido}">disabled="disabled"</c:if> style="width: 50%" />
+				
 				<div class="suggestionsBox" id="containerPesquisaVendedor"
 					style="display: none; width: 50%"></div>
 			</div>
 		</fieldset>
 		<div class="bloco_botoes">
-			<input type="submit" value="" class="botaoPesquisar" /> <input
-				id="botaoLimpar" type="button" value=""
-				title="Limpar Dados de Geração do Relatório de Pedido do Vendedor"
-				class="botaoLimpar" />
+			<input id="botaoPesquisar" type="button" class="botaoPesquisar" /> 
+			<input id="botaoLimpar" type="button" title="Limpar Dados de Geração do Relatório de Pedido do Vendedor" class="botaoLimpar" />
 		</div>
-	</form>
 
 	<a id="rodape"></a>
 	<c:if test="${relatorioGerado}">

@@ -3,6 +3,7 @@ package br.com.plastecno.vendas.controller;
 import java.util.Date;
 
 import br.com.caelum.vraptor.Get;
+import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.download.Download;
@@ -33,7 +34,7 @@ public class RelatorioComissaoVendedorController extends AbstractController {
         return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, tipoPedido);
     }
 
-    @Get("relatorio/comissao/vendedor/listagem")
+    @Post("relatorio/comissao/vendedor/listagem")
     public void gerarRelatorioComissaoVendedor(Date dataInicial, Date dataFinal, Usuario vendedor) {
         try {
             if (!isAcessoPermitido(TipoAcesso.ADMINISTRACAO)) {

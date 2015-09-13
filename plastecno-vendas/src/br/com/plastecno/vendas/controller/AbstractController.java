@@ -176,6 +176,7 @@ public abstract class AbstractController {
         item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
         item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
         item.setPrecoMedioFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoMedio()));
+        item.setMargemMinimaLucro(NumeroUtils.gerarPercentual(item.getMargemMinimaLucro()));
     }
 
     void formatarItemEstoque(List<ItemEstoque> itens) {

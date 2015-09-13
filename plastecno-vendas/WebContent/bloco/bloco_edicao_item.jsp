@@ -10,7 +10,7 @@ $(document).ready(function() {
 	inserirMascaraMonetaria('bloco_item_pedido #medidaExterna', 8);
 	inserirMascaraMonetaria('bloco_item_pedido #medidaInterna', 8);
 	inserirMascaraNumerica('bloco_item_pedido #quantidadeMinima', '999');
-	inserirMascaraNumerica('bloco_item_pedido #margemMinimaLucro', '99');
+	inserirMascaraNumerica('bloco_item_pedido #margemMinimaLucro', '999');
 	
 	$('#botaoLimparItemPedido').click(function () {
 		$('#bloco_item_pedido input').val('');

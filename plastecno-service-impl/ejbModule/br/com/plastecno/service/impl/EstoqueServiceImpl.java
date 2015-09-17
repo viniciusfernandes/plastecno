@@ -456,10 +456,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (itemEstoque.isNovo()) {
 			throw new BusinessException("Não é possivel realizar a redefinição de estoque para itens não existentes");
 		}
-		if (itemEstoque.isPeca() && StringUtils.isEmpty(itemEstoque.getDescricaoPeca())) {
-			throw new BusinessException("Descrição da peca do item do pedido é obrigatório");
-		}
-
+		
 		itemEstoque.configurarMedidaInterna();
 
 		ItemEstoque itemCadastrado = pesquisarItemEstoqueById(itemEstoque.getId());

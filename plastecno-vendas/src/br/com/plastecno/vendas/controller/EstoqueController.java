@@ -86,9 +86,10 @@ public class EstoqueController extends AbstractController {
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
             itemPedido.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemPedido.getMargemMinimaLucro()));
 
+            boolean isLimiteMinimoParaTodosMateriais = itemPedido.getId() == null && !itemPedido.contemMedida();
             // Essa eh uma condicao para definir limite minimo para os itens de
             // um determinado material, formato e para todas as medidas.
-            if (itemPedido.getId() == null && !itemPedido.contemMedida()) {
+            if (isLimiteMinimoParaTodosMateriais) {
                 estoqueService.inserirLimiteMinimoEstoque(itemPedido);
             } else {
                 estoqueService.inserirItemEstoque(itemPedido);
@@ -203,9 +204,9 @@ public class EstoqueController extends AbstractController {
             }
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
-
+            addAtributo("permanecerTopo", true);
         }
 
-        redirecTo(this.getClass()).pesquisarItemEstoque(material, formaMaterial);
+        pesquisarItemEstoque(material, formaMaterial);
     }
 }

@@ -92,6 +92,22 @@ public class EntidadeBuilder {
 		return item;
 	}
 
+	public ItemEstoque buildItemEstoquePeca() {
+		ItemEstoque item = buildItemEstoque();
+		item.setFormaMaterial(FormaMaterial.PC);
+		
+		item.setDescricaoPeca("ENGRENAGEM PARA TRATOR");
+		
+		item.setMedidaExterna(null);
+		item.setMedidaInterna(null);
+		item.setComprimento(null);
+
+		item.setMaterial(buildMaterial());
+		item.setAliquotaIPI(0.1d);
+		return item;
+
+	}
+
 	public ItemPedido buildItemPedido() {
 		ItemPedido itemPedido = new ItemPedido();
 		itemPedido.setAliquotaIPI(11.1d);

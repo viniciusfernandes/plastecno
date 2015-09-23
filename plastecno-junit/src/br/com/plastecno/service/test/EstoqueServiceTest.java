@@ -279,7 +279,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.9);
+			comissaoService.inserirComissaoRevendaVendedor(vendedor.getId(), 0.9);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

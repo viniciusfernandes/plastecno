@@ -585,7 +585,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 			double valorComissionado = 0;
 			double precoCusto = 0;
-			double aliquotaComissao = comissao.getValor();
+			double aliquotaComissao = comissao.getAliquotaRevenda();
 			double precoItem = itemPedido.calcularPrecoItem();
 			if (pedido.isRepresentacao()) {
 				// Essa comissao eh proveniente da representada e configurada quando

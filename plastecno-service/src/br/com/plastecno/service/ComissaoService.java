@@ -16,7 +16,12 @@ public interface ComissaoService {
 	Integer inserirComissaoProduto(FormaMaterial formaMaterial, Integer idMaterial, Double valorComissao)
 			throws BusinessException;
 
-	Integer inserirComissaoVendedor(Integer idVendedor, Double valorComissao) throws BusinessException;
+	Integer inserirComissaoRevendaVendedor(Integer idVendedor, Double valorComissao) throws BusinessException;
+
+	Integer inserirComissaoVendedor(Integer idVendedor, Double comissaoRevenda, Double comissaoRepresentacao)
+			throws BusinessException;
+
+	Comissao pesquisarAliquotaComissaoVigenteVendedor(Integer idVendedor);
 
 	Comissao pesquisarById(Integer idComissao);
 
@@ -27,7 +32,5 @@ public interface ComissaoService {
 	Comissao pesquisarComissaoVigenteProduto(Integer idMaterial, Integer idFormaMaterial);
 
 	Comissao pesquisarComissaoVigenteVendedor(Integer idVendedor);
-
-	Double pesquisarValorComissaoVigenteVendedor(Integer idVendedor);
 
 }

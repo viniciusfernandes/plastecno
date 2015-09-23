@@ -80,9 +80,9 @@ public class ComissaoServiceImpl implements ComissaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer inserirComissaoProduto(FormaMaterial formaMaterial, Integer idMaterial, Double valorComissao)
+	public Integer inserirComissaoProduto(FormaMaterial formaMaterial, Integer idMaterial, Double comissaoRevenda)
 			throws BusinessException {
-		Comissao comissao = new Comissao(valorComissao, new Date());
+		Comissao comissao = new Comissao(comissaoRevenda, new Date());
 		if (formaMaterial != null) {
 			comissao.setIdFormaMaterial(formaMaterial.indexOf());
 		}
@@ -92,10 +92,23 @@ public class ComissaoServiceImpl implements ComissaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer inserirComissaoVendedor(Integer idVendedor, Double valorComissao) throws BusinessException {
-		Comissao comissao = new Comissao(valorComissao, new Date());
+	public Integer inserirComissaoRevendaVendedor(Integer idVendedor, Double comissaoRevenda) throws BusinessException {
+		return inserirComissaoVendedor(idVendedor, comissaoRevenda, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer inserirComissaoVendedor(Integer idVendedor, Double comissaoRevenda, Double comissaoRepresentacao)
+			throws BusinessException {
+		Comissao comissao = new Comissao(comissaoRevenda, comissaoRepresentacao, new Date());
 		comissao.setIdVendedor(idVendedor);
 		return inserir(comissao);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Comissao pesquisarAliquotaComissaoVigenteVendedor(Integer idVendedor) {
+		return comissaoDAO.pesquisarComissaoVigenteVendedor(idVendedor);
 	}
 
 	@Override
@@ -154,13 +167,5 @@ public class ComissaoServiceImpl implements ComissaoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Comissao pesquisarComissaoVigenteVendedor(Integer idVendedor) {
 		return comissaoDAO.pesquisarComissaoVigenteVendedor(idVendedor);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double pesquisarValorComissaoVigenteVendedor(Integer idVendedor) {
-		Comissao comissao = comissaoDAO.pesquisarComissaoVigenteVendedor(idVendedor);
-		return comissao == null ? 0d : comissao.getValor();
-
 	}
 }

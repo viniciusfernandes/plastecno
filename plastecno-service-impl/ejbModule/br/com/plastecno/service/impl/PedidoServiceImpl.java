@@ -948,7 +948,13 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemPedido pesquisarItemPedido(Integer idItemPedido) {
-		return pedidoDAO.pesquisarItemPedido(idItemPedido);
+		ItemPedido itemPedido = pedidoDAO.pesquisarItemPedido(idItemPedido);
+		if (itemPedido != null) {
+			Double[] valorPedido = pesquisarValorPedidoByItemPedido(idItemPedido);
+			itemPedido.setValorPedido(valorPedido[0]);
+			itemPedido.setValorPedidoIPI(valorPedido[1]);
+		}
+		return itemPedido;
 	}
 
 	@Override
@@ -1010,8 +1016,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
-		return itemPedidoDAO.pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null,
-				pesquisarSituacaoVendaEfetivada());
+		return itemPedidoDAO
+				.pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null, pesquisarSituacaoVendaEfetivada());
 	}
 
 	@Override
@@ -1284,6 +1290,11 @@ public class PedidoServiceImpl implements PedidoService {
 	public Double pesquisarValorPedido(Integer idPedido) {
 		final Double valor = pedidoDAO.pesquisarValorPedido(idPedido);
 		return valor == null ? 0D : valor;
+	}
+
+	@Override
+	public Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarValorPedidoByItemPedido(idItemPedido);
 	}
 
 	@Override

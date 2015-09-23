@@ -195,6 +195,8 @@ public abstract class AbstractController {
         item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
         item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
         item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
+        item.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedido()));
+        item.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedidoIPI()));
     }
 
     void formatarItemPedido(List<ItemPedido> itens) {

@@ -48,6 +48,9 @@ public class ItemPedido extends Item {
 
 	private Double comprimento;
 
+	@Transient
+	private Date dataEntrega;
+
 	@Column(name = "descricao_peca")
 	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
 	private String descricaoPeca;
@@ -84,9 +87,6 @@ public class ItemPedido extends Item {
 
 	@Transient
 	private String nomeProprietario;
-
-	@Transient
-	private Date dataEntrega;
 
 	@Transient
 	private String nomeRepresentada;
@@ -154,6 +154,18 @@ public class ItemPedido extends Item {
 
 	@Transient
 	private String valorComissionadoFormatado;
+
+	@Transient
+	private Double valorPedido;
+
+	@Transient
+	private String valorPedidoFormatado;
+
+	@Transient
+	private Double valorPedidoIPI;
+
+	@Transient
+	private String valorPedidoIPIFormatado;
 
 	public ItemPedido() {
 	}
@@ -410,6 +422,22 @@ public class ItemPedido extends Item {
 		return valorComissionadoFormatado;
 	}
 
+	public Double getValorPedido() {
+		return valorPedido;
+	}
+
+	public String getValorPedidoFormatado() {
+		return valorPedidoFormatado;
+	}
+
+	public Double getValorPedidoIPI() {
+		return valorPedidoIPI;
+	}
+
+	public String getValorPedidoIPIFormatado() {
+		return valorPedidoIPIFormatado;
+	}
+
 	public boolean isEncomendado() {
 		return encomendado;
 	}
@@ -584,6 +612,22 @@ public class ItemPedido extends Item {
 
 	public void setValorComissionadoFormatado(String valorComissionadoFormatado) {
 		this.valorComissionadoFormatado = valorComissionadoFormatado;
+	}
+
+	public void setValorPedido(Double valorPedido) {
+		this.valorPedido = valorPedido;
+	}
+
+	public void setValorPedidoFormatado(String valorPedidoFormatado) {
+		this.valorPedidoFormatado = valorPedidoFormatado;
+	}
+
+	public void setValorPedidoIPI(Double valorPedidoIPI) {
+		this.valorPedidoIPI = valorPedidoIPI;
+	}
+
+	public void setValorPedidoIPIFormatado(String valorPedidoIPIFormatado) {
+		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
 	}
 
 }

@@ -315,7 +315,10 @@ public class PedidoController extends AbstractController {
 
             final Integer idItemPedido = this.pedidoService.inserirItemPedido(numeroPedido, itemPedido);
             itemPedido.setId(idItemPedido);
-            itemPedido.getPedido().setValorPedido(this.pedidoService.pesquisarValorPedido(numeroPedido));
+
+            Double[] valorPedido = pedidoService.pesquisarValorPedidoByItemPedido(idItemPedido);
+            itemPedido.setValorPedido(valorPedido[0]);
+            itemPedido.setValorPedidoIPI(valorPedido[1]);
 
             formatarItemPedido(itemPedido);
             formatarPedido(itemPedido.getPedido());
@@ -454,7 +457,7 @@ public class PedidoController extends AbstractController {
 
     @Get("pedido/item/{id}")
     public void pesquisarItemPedidoById(Integer id) {
-        ItemPedido itemPedido = this.pedidoService.pesquisarItemPedido(id);
+        ItemPedido itemPedido = pedidoService.pesquisarItemPedido(id);
         if (itemPedido != null) {
             formatarItemPedido(itemPedido);
             serializarJson(new SerializacaoJson("itemPedido", new ItemPedidoJson(itemPedido)));

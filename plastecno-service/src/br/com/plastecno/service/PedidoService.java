@@ -122,6 +122,10 @@ public interface PedidoService {
 
 	ItemPedido pesquisarItemPedido(Integer idItemPedido);
 
+	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento();
+
+	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente);
+
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
 	List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo);
@@ -162,10 +166,6 @@ public interface PedidoService {
 
 	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
 
-	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento();
-
-	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente);
-
 	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 
 	SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido);
@@ -189,6 +189,8 @@ public interface PedidoService {
 	List<TotalizacaoPedidoWrapper> pesquisarTotalPedidoVendaResumidaByPeriodo(Periodo periodo);
 
 	Double pesquisarValorPedido(Integer idPedido);
+
+	Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido);
 
 	Double pesquisarValorPedidoIPI(Integer idPedido);
 

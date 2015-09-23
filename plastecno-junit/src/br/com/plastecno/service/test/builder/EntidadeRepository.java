@@ -62,6 +62,17 @@ public class EntidadeRepository {
 
 			@Mock
 			Object alterar(Object t) {
+				try {
+					Method m = t.getClass().getMethod("getId");
+					Object id = m.invoke(t, (Object[]) null);
+					if (id == null) {
+						inserir(t);
+					}
+				} catch (NoSuchMethodException e) {
+				} catch (Exception e) {
+					throw new IllegalArgumentException(e);
+				}
+
 				inserirEntidade(t);
 				return t;
 			}

@@ -63,6 +63,40 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * filtro.getQuantidade() * (1 + aliquotaIPI);
 	}
 
+	private void calcularPrecoMedioItemEstoque(ItemEstoque itemCadastrado, ItemEstoque itemEstoque) {
+		removerValoresNulos(itemCadastrado);
+		removerValoresNulos(itemEstoque);
+
+		if (itemCadastrado == null) {
+			itemEstoque.setPrecoMedio(itemEstoque.getPrecoMedio() * (1 + itemEstoque.getAliquotaIPI()));
+			return;
+		}
+
+		final boolean contemPrecoMedio = itemEstoque.getPrecoMedio() > 0d;
+		final double quantidadeItem = contemPrecoMedio ? itemEstoque.getQuantidade() : 0;
+
+		final double valorEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getPrecoMedio();
+
+		final double valorItem = itemEstoque.getQuantidade() * itemEstoque.getPrecoMedio()
+				* (1 + itemEstoque.getAliquotaIPI());
+
+		final double quantidadeTotal = itemCadastrado.getQuantidade() + quantidadeItem;
+		final double precoMedio = (valorEstoque + valorItem) / quantidadeTotal;
+
+		final double ipiEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getAliquotaIPI();
+		final double ipiItem = itemEstoque.getQuantidade() * itemEstoque.getAliquotaIPI();
+		final double ipiMedio = (ipiEstoque + ipiItem) / quantidadeTotal;
+
+		final double icmsEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getAliquotaICMS();
+		final double icmsItem = itemEstoque.getQuantidade() * itemEstoque.getAliquotaICMS();
+		final double icmsMedio = (icmsEstoque + icmsItem) / quantidadeTotal;
+
+		itemCadastrado.setPrecoMedio(precoMedio);
+		itemCadastrado.setAliquotaIPI(ipiMedio);
+		itemCadastrado.setAliquotaICMS(icmsMedio);
+		itemCadastrado.setQuantidade((int) quantidadeTotal);
+	}
+
 	private Double calcularPrecoMinimo(Double precoMedio, Double ipi, Double margemMinimaLucro) {
 		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
 		// estoque.
@@ -104,33 +138,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return itemEstoqueDAO.pesquisarValorEQuantidadeItemEstoque(idMaterial, formaMaterial);
-	}
-
-	private void calcularValorMedio(ItemEstoque itemCadastrado, ItemEstoque itemIncluido) {
-		removerValoresNulos(itemCadastrado);
-		removerValoresNulos(itemIncluido);
-
-		final boolean contemPrecoMedio = itemIncluido.getPrecoMedio() > 0d;
-		final double quantidadeItem = contemPrecoMedio ? itemIncluido.getQuantidade() : 0;
-
-		final double valorEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getPrecoMedio();
-		final double valorItem = itemIncluido.getQuantidade() * itemIncluido.getPrecoMedio();
-		final double quantidadeTotal = itemCadastrado.getQuantidade() + quantidadeItem;
-		final double precoMedio = (valorEstoque + valorItem) / quantidadeTotal;
-
-		final double ipiEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getAliquotaIPI();
-		final double ipiItem = itemIncluido.getQuantidade() * itemIncluido.getAliquotaIPI();
-		final double ipiMedio = (ipiEstoque + ipiItem) / quantidadeTotal;
-
-		final double icmsEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getAliquotaICMS();
-		final double icmsItem = itemIncluido.getQuantidade() * itemIncluido.getAliquotaICMS();
-		final double icmsMedio = (icmsEstoque + icmsItem) / quantidadeTotal;
-
-		itemCadastrado.setPrecoMedio(precoMedio);
-		itemCadastrado.setAliquotaIPI(ipiMedio);
-		itemCadastrado.setAliquotaICMS(icmsMedio);
-		itemCadastrado.setQuantidade((int) quantidadeTotal);
+		return NumeroUtils.arredondarValorMonetario(itemEstoqueDAO.pesquisarValorEQuantidadeItemEstoque(idMaterial,
+				formaMaterial));
 	}
 
 	@Override
@@ -273,18 +282,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 		// Verificando se existe item equivalente no estoque, caso nao exista
 		// vamos criar um novo.
 		ItemEstoque itemCadastrado = pesquisarItemEstoque(itemEstoque);
+		calcularPrecoMedioItemEstoque(itemCadastrado, itemEstoque);
 
-		boolean isNovo = itemCadastrado == null;
-		if (isNovo) {
-			// Nao precisamos calcular o valor medio para itens novos, pois o valor
-			// medio sera o proprio valor do item que esta sendo cadastrado.
-			itemCadastrado = itemEstoqueDAO.inserir(itemEstoque);
-		} else {
-			calcularValorMedio(itemCadastrado, itemEstoque);
-			itemEstoqueDAO.alterar(itemCadastrado);
+		if (itemCadastrado == null) {
+			itemCadastrado = itemEstoque;
 		}
 
-		return itemCadastrado.getId();
+		return itemEstoqueDAO.alterar(itemCadastrado).getId();
 	}
 
 	@Override
@@ -456,7 +460,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (itemEstoque.isNovo()) {
 			throw new BusinessException("Não é possivel realizar a redefinição de estoque para itens não existentes");
 		}
-		
+
 		itemEstoque.configurarMedidaInterna();
 
 		ItemEstoque itemCadastrado = pesquisarItemEstoqueById(itemEstoque.getId());
@@ -516,6 +520,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	private void removerValoresNulos(ItemEstoque itemEstoque) {
+		if (itemEstoque == null) {
+			return;
+		}
+
 		if (itemEstoque.getQuantidade() == null) {
 			itemEstoque.setQuantidade(0);
 		}

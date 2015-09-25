@@ -53,14 +53,14 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public double calcularPrecoCustoItemEstoque(Item filtro) {
-		if (filtro.getQuantidade() == null) {
+	public double calcularPrecoCustoItemEstoque(Item item) {
+		if (item.getQuantidade() == null) {
 			return 0;
 		}
 
-		final double precoMedio = pesquisarPrecoMedioItemEstoque(filtro);
-		final double aliquotaIPI = filtro.getAliquotaIPI() == null ? 0 : filtro.getAliquotaIPI();
-		return precoMedio * filtro.getQuantidade() * (1 + aliquotaIPI);
+		final double precoMedio = pesquisarPrecoMedioItemEstoque(item);
+		final double aliquotaIPI = item.getAliquotaIPI() == null ? 0 : item.getAliquotaIPI();
+		return precoMedio * item.getQuantidade() * (1 + aliquotaIPI);
 	}
 
 	private void calcularPrecoMedioItemEstoque(ItemEstoque itemCadastrado, ItemEstoque itemEstoque) {
@@ -110,7 +110,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		// Precisamos arredondar
-		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + ipi) * (1 + margemMinimaLucro));
+		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + ipi + margemMinimaLucro));
 	}
 
 	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {

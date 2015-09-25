@@ -7,3 +7,5 @@ alter table vendas.tb_item_pedido add preco_minimo numeric(9, 2) default null;
 
 alter table vendas.tb_comissao rename column valor to aliquota_revenda;
 alter table vendas.tb_comissao add aliquota_representacao numeric(2, 2) default null;
+
+alter table vendas.tb_item_pedido add valor_comissionado_representacao numeric(7,2) default null;

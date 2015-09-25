@@ -106,13 +106,10 @@ public class RelatorioServiceImpl implements RelatorioService {
 		// Acumulando os valores dos itens de venda por representacao
 		listaItemVendido = pedidoService.pesquisarItemPedidoRepresentacaoByPeriodo(periodo);
 		for (ItemPedido itemPedido : listaItemVendido) {
-			if (!itemPedido.contemValorComissionado()) {
-				continue;
-			}
 
 			precoItem = itemPedido.getValorComissionado();
 			valorVendido += precoItem;
-			valorComissionado += precoItem * itemPedido.getAliquotaComissao();
+			//valorComissionado += precoItem * itemPedido.getAliquotaComissao();
 		}
 
 		valorReceita += valorVendido;
@@ -280,7 +277,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 			item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
 			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
 			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
-			item.setAliquotaComissaoFormatado(NumeroUtils.formatarValorMonetario(item.getPercentualComissao()));
 			item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
 			item.setPrecoCustoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoCusto()));
 

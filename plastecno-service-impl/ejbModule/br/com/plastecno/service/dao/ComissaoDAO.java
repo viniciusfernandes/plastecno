@@ -54,7 +54,7 @@ public class ComissaoDAO extends GenericDAO<Comissao> {
 			return null;
 		}
 		StringBuilder select = new StringBuilder();
-		select.append("select c from Comissao c where ");
+		select.append("select new Comissao(c.id, c.idFormaMaterial, c.idMaterial, c.aliquotaRevenda, c.aliquotaRepresentacao, c.dataInicio) from Comissao c where ");
 		if (idFormaMaterial != null) {
 			select.append(" c.idFormaMaterial = :idFormaMaterial and ");
 		}
@@ -80,8 +80,11 @@ public class ComissaoDAO extends GenericDAO<Comissao> {
 		if (idVendedor == null) {
 			return null;
 		}
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select c from Comissao c where  c.idVendedor = :idVendedor and c.dataFim = null")
-						.setParameter("idVendedor", idVendedor), Comissao.class, null);
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Comissao(c.id, c.idVendedor, c.aliquotaRevenda, c.aliquotaRepresentacao, c.dataInicio) from Comissao c where  c.idVendedor = :idVendedor and c.dataFim = null")
+								.setParameter("idVendedor", idVendedor), Comissao.class, null);
 	}
 }

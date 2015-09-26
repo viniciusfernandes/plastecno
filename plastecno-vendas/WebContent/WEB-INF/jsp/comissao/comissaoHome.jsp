@@ -26,10 +26,29 @@ $(document).ready(function() {
 	});
 	
 	$("#botaoPesquisarProduto").click(function() {
-		$('#formProduto').attr('method', 'get');
-		$('#formProduto').attr('action', '<c:url value="/comissao/produto/listagem"/>');
-		$('#formProduto').submit();
+		var parametros = serializarBloco('bloco_comissao_produto');
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/comissao/produto/listagem"/>?'+parametros);
+		$(form).submit();
 	});
+	
+	$("#botaoInserirVendedor").click(function() {
+		var parametros = serializarBloco('bloco_comissao_vendedor');
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/comissao/vendedor/inclusao"/>?'+parametros);
+		$(form).submit();
+	});
+	
+	$("#botaoInserirProduto").click(function() {
+		var parametros = serializarBloco('bloco_comissao_produto');
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/comissao/produto/inclusao"/>?'+parametros);
+		$(form).submit();
+	});
+	
 	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
@@ -55,8 +74,9 @@ $(document).ready(function() {
 		}
 	});
 	
-	inserirMascaraNumerica('valorComissaoVendedor', '99');
-	inserirMascaraNumerica('valorComissaoProdudo', '99');
+	inserirMascaraNumerica('comissaoRevenda', '99');
+	inserirMascaraNumerica('comissaoRepresentacao', '99');
+	inserirMascaraNumerica('comissaoProduto', '99');
 });
 
 function limpar(){
@@ -86,8 +106,7 @@ function remover(codigo, sigla) {
 		<input id="idVendedor" type="hidden" name="idVendedor" value="${vendedor.id}"/>
 	</form>
 
-	<form id="formVendedor" action="<c:url value="/comissao/vendedor/inclusao"/>" method="post">
-	<fieldset>
+	<fieldset id="bloco_comissao_vendedor">
 		<legend>::: Comissão do Vendedor :::</legend>
 			<input type="hidden" id="idVendedor" name="vendedor.id" value="${vendedor.id}"/>
 			<div class="label">Nome:</div>
@@ -101,20 +120,22 @@ function remover(codigo, sigla) {
 					style="width: 50%"
 					class="uppercaseBloqueado pesquisavel desabilitado" disabled='disabled'/>
 			</div>
-			<div class="label">Comissão (%):</div>
-			<div class="input" style="width: 40%">
-				<input type="text" id="valorComissaoVendedor" name="valorComissaoVendedor" value="${valorComissaoVendedor}" style="width: 50%"/>
+			<div class="label">Revenda (%):</div>
+			<div class="input" style="width: 70%">
+				<input type="text" id="comissaoRevenda" name="comissaoRevenda" value="${comissao.aliquotaRevendaFormatada}" style="width: 5%"/>
+			</div>
+			<div class="label">Representação (%):</div>
+			<div class="input" style="width: 70%">
+				<input type="text" id="comissaoRepresentacao" name="comissaoRepresentacao" value="${comissao.aliquotaRepresentacaoFormatada}" style="width: 5%"/>
 			</div>
 	</fieldset>
 	<div class="bloco_botoes">
-		<input type="submit" id="botaoInserirVendedor" title="Inserir Comissão do Vendedor" class="botaoInserir" value=""/>
+		<input type="button" id="botaoInserirVendedor" title="Inserir Comissão do Vendedor" class="botaoInserir" value=""/>
 		<input type="button" id="botaoPesquisarVendedor" title="Pesquisar Comissão do Vendedor" class="botaoPesquisar" value=""/>
 		<input type="button" id="botaoLimpar" title="Limpar Dados da Comissão" class="botaoLimpar" value="" onclick="limpar()"/>
 	</div>
-	</form>
 	
-	<form id="formProduto" action="<c:url value="/comissao/produto/inclusao"/>" method="post">
-	<fieldset>
+	<fieldset id="bloco_comissao_produto">
 		<legend>::: Comissão do Produto :::</legend>
 			<div class="label condicional" >Forma Material:</div>
 			<div class="input" style="width: 80%">
@@ -129,20 +150,19 @@ function remover(codigo, sigla) {
 			<div class="label condicional" >Material:</div>
 			<div class="input" style="width: 80%">
 				<input type="hidden" id="idMaterial" name="material.id" value="${material.id}"/>
-				<input type="text" id="material" name="material.descricao" value="${material.descricao}" style="width: 60%" />
+				<input type="text" id="material" name="material.descricao" value="${material.descricao}" style="width: 40%" />
 				<div class="suggestionsBox" id="containerPesquisaMaterial" style="display: none; width: 50%"></div>
 			</div>
 			<div class="label">Comissão (%):</div>
-			<div class="input" style="width: 40%">
-				<input type="text" id="valorComissaoProduto" name="valorComissaoProduto" value="${valorComissaoProduto}" style="width: 50%"/>
+			<div class="input" style="width: 70%">
+				<input type="text" id="comissaoProduto" name="comissaoRevenda" value="${comissao.aliquotaRevendaFormatada}" style="width: 5%"/>
 			</div>
 	</fieldset>
 	<div class="bloco_botoes">
-		<input type="submit" id="botaoInserirProduto" title="Inserir Comissão do Produto" class="botaoInserir" value=""/>
+		<input type="button" id="botaoInserirProduto" title="Inserir Comissão do Produto" class="botaoInserir" value=""/>
 		<input type="button" id="botaoPesquisarProduto" title="Pesquisar Comissão do Produto" class="botaoPesquisar"/> 
 		<input type="button" id="botaoLimpar" title="Limpar Dados da Comissão" class="botaoLimpar" value="" onclick="limpar()"/>
 	</div>
-	</form>
 
 	<a id="rodape"></a>
 	<fieldset>
@@ -154,7 +174,8 @@ function remover(codigo, sigla) {
 					<tr>
 						<th style="width: 5%">Vigente</th>
 						<th style="width: 30%">${isProduto ? 'Produto' : 'Vendedor'}</th>
-						<th style="width: 10%">Comissão(%)</th>
+						<th style="width: 10%">Revenda(%)</th>
+						<th style="width: 10%">Represt.(%)</th>
 						<th style="width: 10%">Inicio</th>
 						<th style="width: 10%">Fim</th>
 					</tr>
@@ -172,7 +193,8 @@ function remover(codigo, sigla) {
 								</c:otherwise>
 							</c:choose>
 							<td>${isProduto ? comissao.descricaoProduto : comissao.nomeVendedor}</td>
-							<td>${comissao.valorFormatado}</td>
+							<td>${comissao.aliquotaRevendaFormatada}</td>
+							<td>${comissao.aliquotaRepresentacaoFormatada}</td>
 							<td>${comissao.dataInicioFormatado}</td>
 							<td>${comissao.dataFimFormatado}</td>
 						</tr>

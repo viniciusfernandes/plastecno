@@ -238,7 +238,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	public List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,
 			List<SituacaoPedido> listaSituacao) {
 		StringBuilder select = new StringBuilder(
-				"select new ItemPedido(i.id, i.sequencial, i.pedido.id, i.pedido.proprietario.id, i.pedido.proprietario.nome, i.pedido.proprietario.sobrenome, i.precoUnidade, i.precoCusto, i.quantidade, i.valorComissionado, i.aliquotaComissao, i.formaMaterial, i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento) ");
+				"select new ItemPedido(i.id, i.sequencial, i.pedido.id, i.pedido.proprietario.id, i.pedido.proprietario.nome, i.pedido.proprietario.sobrenome, i.precoUnidade, i.precoCusto, i.quantidade, i.valorComissionado, i.formaMaterial, i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento) ");
 		select.append("from ItemPedido i ");
 		select.append("where i.pedido.tipoPedido != :tipoPedido and ");
 		select.append("i.pedido.dataEnvio >= :dataInicio and ");
@@ -276,5 +276,13 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				this.entityManager.createQuery(
 						"select count(i.id) from ItemPedido i where  i.encomendado = false and i.pedido.id = :idPedido")
 						.setParameter("idPedido", idPedido), Long.class, null);
+	}
+
+	public Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido) {
+		Query query = this.entityManager
+				.createQuery("select i.pedido.valorPedido, i.pedido.valorPedidoIPI  from ItemPedido i where i.id = :idItemPedido");
+		query.setParameter("idItemPedido", idItemPedido);
+		Object[] valores = QueryUtil.gerarRegistroUnico(query, Object[].class, new Object[] { 0d, 0d });
+		return new Double[] { (Double) valores[0], (Double) valores[1] };
 	}
 }

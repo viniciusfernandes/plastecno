@@ -45,10 +45,8 @@ public class ItemPedidoJson {
         quantidade = itemPedido.getQuantidade();
         siglaMaterial = itemPedido.getMaterial() != null ? itemPedido.getMaterial().getSigla() : "";
         vendaKilo = itemPedido.isVendaKilo();
-        valorPedido = itemPedido.getPedido() != null && itemPedido.getPedido().getValorPedido() != null ? itemPedido
-                .getPedido().getValorPedidoFormatado() : "";
-        valorPedidoIPI = itemPedido.getPedido() != null && itemPedido.getPedido().getValorPedidoIPI() != null ? itemPedido
-                .getPedido().getValorPedidoIPIFormatado() : "";
+        valorPedido = itemPedido.getValorPedidoFormatado();
+        valorPedidoIPI = itemPedido.getValorPedidoIPIFormatado();
         descricaoItemPedido = itemPedido.getDescricao();
         aliquotaICMS = itemPedido.getAliquotaICMSFormatado();
         aliquotaIPI = itemPedido.getAliquotaIPIFormatado();

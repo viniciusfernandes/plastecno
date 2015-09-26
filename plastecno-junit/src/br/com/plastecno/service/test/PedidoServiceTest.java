@@ -168,7 +168,7 @@ public class PedidoServiceTest extends AbstractTest {
 		pedido.setTipoPedido(tipoPedido);
 
 		try {
-			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.6);
+			comissaoService.inserirComissaoRevendaVendedor(vendedor.getId(), 0.6);
 		} catch (BusinessException e3) {
 			printMensagens(e3);
 		}
@@ -210,7 +210,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.05);
+			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.05, 0.1d);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}

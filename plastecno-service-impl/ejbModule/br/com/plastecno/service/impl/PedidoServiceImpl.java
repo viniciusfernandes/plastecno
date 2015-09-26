@@ -563,49 +563,45 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
-		Comissao comissaoVendedor = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
-		Comissao comissao = null;
+		Comissao comissaoVenda = null;
+		Double valorComissionado = null;
+		Double valorComissionadoRepresentacao = null;
+		Double precoItem = null;
+
 		for (ItemPedido itemPedido : listaItem) {
 			if (pedido.isRevenda()) {
-				comissao = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
+				comissaoVenda = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
 						.getFormaMaterial().indexOf());
-				if (comissao == null) {
-					comissao = comissaoVendedor;
+
+				// Caso nao exista comissao configurada para o material, devemos
+				// utilizar a comissao configurada para o vendedor.
+				if (comissaoVenda == null) {
+					comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 				}
+
 			} else if (pedido.isRepresentacao()) {
-				comissao = comissaoVendedor;
+				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 			}
 
-			if (comissao == null) {
+			if (comissaoVenda == null) {
 				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
 				throw new BusinessException("Não existe comissão configurada para o vendedor \"" + vendedor.getNomeCompleto()
 						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
 						+ pedido.getId());
 			}
 
-			double valorComissionado = 0;
-			double precoCusto = 0;
-			double aliquotaComissao = comissao.getValor();
-			double precoItem = itemPedido.calcularPrecoItem();
-			if (pedido.isRepresentacao()) {
-				// Essa comissao eh proveniente da representada e configurada quando
-				// inserimos um pedido.
-				double comissaoRepresentada = pedido.getAliquotaComissao();
-				// Aqui estamos compondo a comissao pago pela representada com a
-				// comissao para para o vendedor.
-				aliquotaComissao *= comissaoRepresentada;
-			}
+			// Nos calculos do preco de venda do item nao pode haver o IPI de venda.
+			precoItem = itemPedido.calcularPrecoItem();
 
 			if (pedido.isRevenda()) {
-				precoCusto = estoqueService.calcularPrecoCustoItemEstoque(itemPedido);
-				precoItem -= precoCusto;
+				valorComissionado = precoItem * comissaoVenda.getAliquotaRevenda();
+			} else if (pedido.isRepresentacao()) {
+				valorComissionado = precoItem * comissaoVenda.getAliquotaRepresentacao();
+				valorComissionadoRepresentacao = precoItem * (pedido.getRepresentada().getComissao());
 			}
 
-			valorComissionado = precoItem * aliquotaComissao;
-
-			itemPedido.setPrecoCusto(precoCusto);
-			itemPedido.setAliquotaComissao(aliquotaComissao);
 			itemPedido.setValorComissionado(valorComissionado);
+			itemPedido.setValorComissionadoRepresentacao(valorComissionadoRepresentacao);
 			itemPedidoDAO.alterar(itemPedido);
 		}
 	}
@@ -666,8 +662,9 @@ public class PedidoServiceImpl implements PedidoService {
 		final Double precoUnidadeIPI = CalculadoraPreco.calcularPorUnidadeIPI(itemPedido);
 
 		itemPedido.setPrecoUnidadeIPI(precoUnidadeIPI);
-		Double precoMinimo = estoqueService.calcularPrecoMinimoItemEstoque(itemPedido);
-		itemPedido.setPrecoMinimo(NumeroUtils.arredondarValorMonetario(precoMinimo));
+		itemPedido.setPrecoMinimo(NumeroUtils.arredondarValorMonetario(estoqueService
+				.calcularPrecoMinimoItemEstoque(itemPedido)));
+		itemPedido.setPrecoCusto(estoqueService.calcularPrecoCustoItemEstoque(itemPedido));
 
 		/*
 		 * O valor sequencial sera utilizado para que a representada identifique
@@ -948,7 +945,13 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemPedido pesquisarItemPedido(Integer idItemPedido) {
-		return pedidoDAO.pesquisarItemPedido(idItemPedido);
+		ItemPedido itemPedido = pedidoDAO.pesquisarItemPedido(idItemPedido);
+		if (itemPedido != null) {
+			Double[] valorPedido = pesquisarValorPedidoByItemPedido(idItemPedido);
+			itemPedido.setValorPedido(valorPedido[0]);
+			itemPedido.setValorPedidoIPI(valorPedido[1]);
+		}
+		return itemPedido;
 	}
 
 	@Override
@@ -1010,8 +1013,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
-		return itemPedidoDAO.pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null,
-				pesquisarSituacaoVendaEfetivada());
+		return itemPedidoDAO
+				.pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null, pesquisarSituacaoVendaEfetivada());
 	}
 
 	@Override
@@ -1284,6 +1287,11 @@ public class PedidoServiceImpl implements PedidoService {
 	public Double pesquisarValorPedido(Integer idPedido) {
 		final Double valor = pedidoDAO.pesquisarValorPedido(idPedido);
 		return valor == null ? 0D : valor;
+	}
+
+	@Override
+	public Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarValorPedidoByItemPedido(idItemPedido);
 	}
 
 	@Override

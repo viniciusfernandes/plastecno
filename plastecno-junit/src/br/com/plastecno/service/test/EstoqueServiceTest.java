@@ -279,7 +279,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.9);
+			comissaoService.inserirComissaoRevendaVendedor(vendedor.getId(), 0.9);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -358,8 +358,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = NumeroUtils.arredondarValorMonetario(limite.getPrecoMedio() * (1 + limite.getAliquotaIPI())
-				* (1 + limite.getMargemMinimaLucro()));
+		Double precoMinimo = 120d;
 
 		Double precoMinimoCalculado = null;
 		try {
@@ -1418,10 +1417,10 @@ public class EstoqueServiceTest extends AbstractTest {
 				printMensagens(e);
 			}
 		}
-		Double totalEstoque = 1d;
+		Double totalEstoque = 1.11;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.BQ));
 
-		totalEstoque = 2d;
+		totalEstoque = 2.22;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.TB));
 	}
 
@@ -1435,7 +1434,7 @@ public class EstoqueServiceTest extends AbstractTest {
 				printMensagens(e);
 			}
 		}
-		Double totalEstoque = 3d;
+		Double totalEstoque = 3.33d;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, null));
 	}
 

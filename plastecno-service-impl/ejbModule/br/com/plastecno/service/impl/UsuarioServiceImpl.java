@@ -16,14 +16,15 @@ import br.com.plastecno.service.AutenticacaoService;
 import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.ContatoUsuario;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.PerfilAcesso;
-import br.com.plastecno.service.entity.Remuneracao;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.CriptografiaException;
+import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.util.StringUtils;
@@ -49,7 +50,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado) throws BusinessException {
-		this.verificarVendedorAtivo(idVendedor);
+		this.verificarPerfilVendedor(idVendedor);
 
 		this.entityManager
 				.createQuery("update Cliente c set c.vendedor.id = :idVendedor where c.id in (:listaIdClienteAssociado)")
@@ -84,7 +85,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public void desassociarCliente(Integer idVendedor, List<Integer> listaIdClienteDesassociado) throws BusinessException {
-		this.verificarVendedorAtivo(idVendedor);
+		this.verificarPerfilVendedor(idVendedor);
 
 		this.entityManager
 				.createQuery(
@@ -93,8 +94,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 				.executeUpdate();
 	}
 
-	private Query gerarQueryPesquisa(Usuario filtro, StringBuilder select) {
+	private Query gerarQueryPesquisa(Usuario filtro, boolean isVendedor, StringBuilder select) {
 		Query query = this.entityManager.createQuery(select.toString());
+		if (isVendedor) {
+			query.setParameter("idPerfilAcesso", TipoAcesso.CADASTRO_PEDIDO_VENDAS.indexOf());
+		}
 		if (StringUtils.isNotEmpty(filtro.getNome())) {
 			query.setParameter("nome", "%" + filtro.getNome() + "%");
 		}
@@ -117,7 +121,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	private void gerarRestricaoPesquisa(Usuario filtro, Boolean apenasAtivos, boolean isVendedor, StringBuilder select) {
 		StringBuilder restricao = new StringBuilder();
 		if (isVendedor) {
-			restricao.append(" u.vendedorAtivo = true AND ");
+			select.append("inner join u.listaPerfilAcesso p ");
+			restricao.append("p.id = :idPerfilAcesso AND ");
 		}
 
 		if (StringUtils.isNotEmpty(filtro.getNome())) {
@@ -155,9 +160,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public Integer inserir(Usuario usuario, boolean isAlteracaoSenha) throws BusinessException {
 
 		if (!isAlteracaoSenha && usuario.getId() != null) {
-			Query query = this.entityManager.createQuery("select u.senha from Usuario u where u.id = :id");
-			query.setParameter("id", usuario.getId());
-			usuario.setSenha(QueryUtil.gerarRegistroUnico(query, String.class, null));
+			usuario.setSenha(usuarioDAO.pesquisarSenha(usuario.getId()));
 		}
 
 		if (this.isEmailExistente(usuario.getId(), usuario.getEmail())) {
@@ -168,7 +171,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			throw new BusinessException("CPF enviado ja foi cadastrado para outro usuario");
 		}
 
-		usuario.setLogradouro(this.logradouroService.inserir(usuario.getLogradouro()));
+		usuario.setLogradouro(logradouroService.inserir(usuario.getLogradouro()));
 		ValidadorInformacao.validar(usuario);
 		if (isAlteracaoSenha) {
 			try {
@@ -181,6 +184,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return usuario.getId() == null ? usuarioDAO.inserir(usuario).getId() : usuarioDAO.alterar(usuario).getId();
 	}
 
+	@TODO(descricao="Remover o hardcoded administracao")
 	@Override
 	public boolean isAdministrador(Integer idUsuario) {
 		List<PerfilAcesso> l = pesquisarPerfisAssociados(idUsuario);
@@ -214,10 +218,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public boolean isVendedorAtivo(Integer idVendedor) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select v.ativo from Usuario v where v.id =:idVendedor and v.vendedorAtivo = true").setParameter(
-						"idVendedor", idVendedor), Boolean.class, false);
+		return usuarioDAO.pesquisarVendedorAtivo(idVendedor);
 	}
 
 	@Override
@@ -247,7 +248,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		this.gerarRestricaoPesquisa(filtro, apenasAtivos, isVendedor, select);
 		select.append(" order by u.nome ");
 
-		Query query = this.gerarQueryPesquisa(filtro, select);
+		Query query = this.gerarQueryPesquisa(filtro, isVendedor, select);
 		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
@@ -312,15 +313,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return query.getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Remuneracao> pesquisarRemuneracaoById(Integer id) {
-		Query query = this.entityManager
-				.createQuery("select r from Usuario v inner join v.listaRemuneracao r where v.id = :id");
-		query.setParameter("id", id);
-		return query.getResultList();
-	}
-
 	@Override
 	public String pesquisarSenhaByEmail(String email) {
 		return QueryUtil.gerarRegistroUnico(
@@ -335,37 +327,43 @@ public class UsuarioServiceImpl implements UsuarioService {
 		}
 
 		final StringBuilder select = new StringBuilder("SELECT count(u.id) FROM Usuario u ");
-		this.gerarRestricaoPesquisa(filtro, apenasAtivos, isVendedor, select);
-		Query query = this.gerarQueryPesquisa(filtro, select);
+		gerarRestricaoPesquisa(filtro, apenasAtivos, isVendedor, select);
+		Query query = gerarQueryPesquisa(filtro, isVendedor, select);
 
 		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
 	}
 
 	@SuppressWarnings({ "unchecked" })
 	private List<Usuario> pesquisarUsuarioByNome(String nome, boolean isVendedor) {
-		StringBuilder select = new StringBuilder("select new Usuario(u.id, u.nome, u.sobrenome) from Usuario u where ");
+		StringBuilder select = new StringBuilder("select new Usuario(u.id, u.nome, u.sobrenome) from Usuario u ");
 		if (isVendedor) {
-			select.append("vendedorAtivo=true and ");
+			select.append("inner join u.listaPerfilAcesso p where p.id = :idPerfilAcesso and u.nome like :nome ");
+		} else {
+			select.append("where u.nome like :nome ");
 		}
 
-		select.append("u.nome like :nome ");
-		return this.entityManager.createQuery(select.toString()).setParameter("nome", "%" + nome + "%").getResultList();
+		Query query = this.entityManager.createQuery(select.toString()).setParameter("nome", "%" + nome + "%");
+		if (isVendedor) {
+			query.setParameter("idPerfilAcesso", TipoAcesso.CADASTRO_PEDIDO_VENDAS.indexOf());
+		}
+		return query.getResultList();
 	}
 
 	@Override
 	public Usuario pesquisarUsuarioResumidoById(Integer idUsuario) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select new Usuario(u.id, u.nome, u.sobrenome) from Usuario u where u.id = :idUsuario ").setParameter(
-						"idUsuario", idUsuario), Usuario.class, null);
+		return usuarioDAO.pesquisarUsuarioResumidoById(idUsuario);
 	}
 
 	@Override
 	public Usuario pesquisarVendedorById(Integer idVendedor) {
 
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select c from Usuario c where c.id = :idVendedor and c.vendedorAtivo = true")
-						.setParameter("idVendedor", idVendedor), Usuario.class, null);
+		return QueryUtil
+				.gerarRegistroUnico(
+						this.entityManager
+								.createQuery(
+										"select c from Usuario c inner join c.listaPerfilAcesso p where c.id = :idVendedor and p.id = :idPerfilAcesso ")
+								.setParameter("idVendedor", idVendedor)
+								.setParameter("idPerfilAcesso", TipoAcesso.CADASTRO_PEDIDO_VENDAS.indexOf()), Usuario.class, null);
 	}
 
 	@Override
@@ -384,11 +382,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return this.pesquisar(filtro, true, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
-	private void verificarVendedorAtivo(Integer idVendedor) throws BusinessException {
-
-		if (!this.isVendedorAtivo(idVendedor)) {
-			throw new BusinessException("O usuário enviado não é um vendedor ou não é um vendedor ativo");
+	private void verificarPerfilVendedor(Integer idVendedor) throws BusinessException {
+		if (!isVendedorAtivo(idVendedor)) {
+			throw new BusinessException("O usuário enviado não existe ou não é tem um perfil de vendedor.");
 		}
-
 	}
 }

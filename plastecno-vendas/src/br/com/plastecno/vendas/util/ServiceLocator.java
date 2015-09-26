@@ -9,6 +9,21 @@ import javax.naming.NamingException;
 import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
 public final class ServiceLocator {
+    private static InitialContext context;
+
+    private static Properties properties;
+
+    static {
+        properties = new Properties();
+        properties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
+        try {
+            context = new InitialContext(properties);
+        } catch (NamingException e) {
+            throw new IllegalStateException("Falha na inicializacao do service locator. "
+                    + "Nao foi possivel inicial o contexto para efetuar os lookups dos recursos.", e);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T locate(Class<T> classe) throws ServiceLocatorException {
 
@@ -20,20 +35,6 @@ public final class ServiceLocator {
             return (T) context.lookup(serviceName.toString());
         } catch (NamingException e) {
             throw new ServiceLocatorException("Falha na localizacao do servico: " + serviceName, e);
-        }
-    }
-    private static Properties properties;
-
-    private static InitialContext context;
-
-    static {
-        properties = new Properties();
-        properties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
-        try {
-            context = new InitialContext(properties);
-        } catch (NamingException e) {
-            throw new IllegalStateException("Falha na inicializacao do service locator. "
-                    + "Nao foi possivel inicial o contexto para efetuar os lookups dos recursos.", e);
         }
     }
 

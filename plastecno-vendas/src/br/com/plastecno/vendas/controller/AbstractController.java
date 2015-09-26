@@ -3,6 +3,7 @@ package br.com.plastecno.vendas.controller;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,8 @@ import br.com.plastecno.service.TipoLogradouroService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemEstoque;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -34,20 +37,20 @@ import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
 public abstract class AbstractController {
 
-    private final Integer numerRegistrosPorPagina = 10;
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
-    private final String possuiMultiplosLogradouros = "possuiMultiplosLogradouros";
-    private final String cssMensagemSucesso = "mensagemSucesso";
-    private final String cssMensagemErro = "mensagemErro";
     private final String cssMensagemAlerta = "mensagemAlerta";
-
-    private String nomeTela;
+    private final String cssMensagemErro = "mensagemErro";
+    private final String cssMensagemSucesso = "mensagemSucesso";
     private String homePath;
-    private Picklist picklist;
-    private Result result;
-    private UsuarioInfo usuarioInfo;
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private String nomeTela;
 
+    private final Integer numerRegistrosPorPagina = 10;
+    private Picklist picklist;
+    private final String possuiMultiplosLogradouros = "possuiMultiplosLogradouros";
+    private Result result;
     private TipoLogradouroService tipoLogradouroService;
+
+    private UsuarioInfo usuarioInfo;
     private UsuarioService usuarioService;
 
     public AbstractController(Result result) {
@@ -116,12 +119,30 @@ public abstract class AbstractController {
         cliente.setVendedor(vendedor);
     }
 
-    void configurarPaginacao() {
+    void configurarFiltroPediodoMensal() {
+        if (!contemAtributo("dataInicial") && !contemAtributo("dataFinal")) {
+            Calendar dataInicial = Calendar.getInstance();
+            dataInicial.set(Calendar.DAY_OF_MONTH, 1);
 
+            addAtributo("dataInicial", StringUtils.formatarData(dataInicial.getTime()));
+            addAtributo("dataFinal", StringUtils.formatarData(new Date()));
+
+        }
     }
 
     boolean contemAtributo(String nomeAtributo) {
         return this.result.included().containsKey(nomeAtributo);
+    }
+
+    void formatarAliquotaItemEstoque(ItemEstoque item) {
+        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
+        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
+        item.setMargemMinimaLucro(NumeroUtils.gerarPercentual(item.getMargemMinimaLucro()));
+    }
+
+    void formatarAliquotaItemPedido(ItemPedido item) {
+        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
+        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
     }
 
     String formatarCNPJ(String conteudo) {
@@ -150,6 +171,40 @@ public abstract class AbstractController {
         return StringUtils.formatarInscricaoEstadual(conteudo);
     }
 
+    void formatarItemEstoque(ItemEstoque item) {
+        item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
+        item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
+        item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
+        item.setPrecoMedioFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoMedio()));
+        item.setMargemMinimaLucro(NumeroUtils.gerarPercentual(item.getMargemMinimaLucro()));
+    }
+
+    void formatarItemEstoque(List<ItemEstoque> itens) {
+        for (ItemEstoque item : itens) {
+            this.formatarItemEstoque(item);
+        }
+    }
+
+    void formatarItemPedido(ItemPedido item) {
+        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
+        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
+        item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
+        item.setPrecoUnidadeIPIFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidadeIPI()));
+        item.setPrecoVendaFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoVenda()));
+        item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
+        item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
+        item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
+        item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
+        item.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedido()));
+        item.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedidoIPI()));
+    }
+
+    void formatarItemPedido(List<ItemPedido> itens) {
+        for (ItemPedido item : itens) {
+            this.formatarItemPedido(item);
+        }
+    }
+
     void formatarPedido(Pedido pedido) {
         pedido.setDataInclusaoFormatada(this.formatarData(pedido.getDataInclusao()));
         pedido.setDataEnvioFormatada(this.formatarData(pedido.getDataEnvio()));
@@ -172,8 +227,8 @@ public abstract class AbstractController {
     }
 
     Download gerarDownload(byte[] bytesArquivo, String nomeArquivo) {
-        final String contentType = "application/pdf;charset=ISO-8859-1";
-        return new ByteArrayDownload(bytesArquivo, contentType, nomeArquivo);
+        final String contentType = "application/pdf;";
+        return new ByteArrayDownload(bytesArquivo, contentType, StringUtils.removerAcentuacao(nomeArquivo));
     }
 
     void gerarListaMensagemAjax(String mensagem, String categoria) {
@@ -263,6 +318,13 @@ public abstract class AbstractController {
         this.logger.log(Level.SEVERE, "Falha na operacao " + descricaoOperacao, e);
         this.gerarRetornoErroAjax("Não foi possível inserir o pedido. Veja o log para obter mais informações. "
                 + "Mensagem: " + e.getMessage());
+    }
+
+    void gerarMensagemAlerta(String mensagem) {
+        List<String> mensagens = new ArrayList<String>();
+        mensagens.add(mensagem);
+        this.result.include("listaMensagem", mensagens);
+        this.result.include("cssMensagem", cssMensagemAlerta);
     }
 
     void gerarMensagemCadastroSucesso(Object o, String nomeAtributoExibicao) throws ControllerException {
@@ -543,8 +605,8 @@ public abstract class AbstractController {
 }
 
 class Autocomplete {
-    private Integer valor;
     private String label;
+    private Integer valor;
 
     public Autocomplete(Integer valor, String label) {
         this.valor = valor;
@@ -561,13 +623,13 @@ class Autocomplete {
 }
 
 class Picklist {
+    private final String associados = "listaElementosAssociados";
+    private List<PicklistElement> listaElementosAssociados;
+    private List<PicklistElement> listaElementosNaoAssociados;
+    private final String naoAssociados = "listaElementosNaoAssociados";
+
     private String nomeAtributoLabel;
     private String nomeAtributoValor;
-    private List<PicklistElement> listaElementosNaoAssociados;
-    private List<PicklistElement> listaElementosAssociados;
-
-    private final String associados = "listaElementosAssociados";
-    private final String naoAssociados = "listaElementosNaoAssociados";
 
     private final Result result;
 
@@ -674,7 +736,7 @@ class Picklist {
 }
 
 enum TipoOperacao {
-    CADASTRO("cadastro(a)"), REMOCAO("removido(a)"), ENVIO("Envio");
+    CADASTRO("cadastro(a)"), ENVIO("Envio"), REMOCAO("removido(a)");
     private final String descricao;
 
     private TipoOperacao(String descricao) {

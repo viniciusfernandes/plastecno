@@ -7,11 +7,9 @@
 
 <jsp:include page="/bloco/bloco_css.jsp"></jsp:include>
 
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 
 <title>Relatório de Vendas por Representada</title>
@@ -64,8 +62,8 @@
 			</div>
 		</fieldset>
 		<div class="bloco_botoes">
-			<input id="botaoPesquisar" type="button" value=""
-				class="botaoPesquisar" /> <input id="botaoLimpar" type="button"
+			<input id="botaoPesquisar" type="button" value="" class="botaoPesquisar" /> 
+			<input id="botaoLimpar" type="button"
 				value="" title="Limpar Dados de Geração do Relatório de Vendas"
 				class="botaoLimpar" />
 		</div>

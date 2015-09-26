@@ -9,12 +9,9 @@
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
 
-<script type="text/javascript"
-	src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/jquery.paginate.js"/>"></script>
-<script type="text/javascript"
-	src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <style type="text/css">
 .listrada {
@@ -56,20 +53,15 @@ function inicializarAutomcompleteRegiao () {
 		<legend>::: Dados do Relatório dos Clientes da Região :::</legend>
 		<div class="label obrigatorio">Região:</div>
 		<div class="input" style="width: 40%">
-			<input type="text" id="nome" name="regiao.nome"
-				value="${regiao.nome}" class="pesquisavel" />
-			<div class="suggestionsBox" id="containerPesquisaRegiao"
-				style="display: none; width: 50%"></div>
+			<input type="text" id="nome" name="regiao.nome" value="${regiao.nome}" class="pesquisavel" />
+			<div class="suggestionsBox" id="containerPesquisaRegiao" style="display: none; width: 50%"></div>
 		</div>
 	</fieldset>
 	<div class="bloco_botoes">
-		<form id="formPesquisa"
-			action="<c:url value="/relatorio/cliente/regiao/listagem/cliente"/>"
-			method="get">
-			<input type="hidden" id="idRegiao" name="regiao.id" /> <input
-				type="hidden" id="nomeRegiao" name="regiao.nome" /> <input
-				type="submit" value="" title="Pesquisar Clientes da Região"
-				class="botaoPesquisar" />
+		<form id="formPesquisa" action="<c:url value="/relatorio/cliente/regiao/listagem/cliente"/>" method="get">
+			<input type="hidden" id="idRegiao" name="regiao.id" value="${regiao.id}"/>
+			<input type="hidden" id="nomeRegiao" name="regiao.nome" value="${regiao.nome}"/> 
+			<input type="submit" value="" title="Pesquisar Clientes da Região" class="botaoPesquisar" />
 		</form>
 		<form action="<c:url value="/relatorio/cliente/regiao"/>" method="get">
 			<input type="submit" value=""

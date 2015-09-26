@@ -66,7 +66,7 @@ public final class MaterialController extends AbstractController {
         // devemos popular o picklist
         if (!isElementosAssociadosPreenchidosPicklist()) {
             try {
-                popularPicklist(this.representadaService.pesquisar(), null);
+                popularPicklist(this.representadaService.pesquisarRepresentadaEFornecedor(), null);
             } catch (ControllerException e) {
                 gerarLogErroNavegacao("Material", e);
             }

@@ -6,15 +6,19 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.entity.ComentarioRepresentada;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.util.NumeroUtils;
+import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
@@ -25,6 +29,9 @@ public class RepresentadaController extends AbstractController {
 
     @Servico
     private ContatoService contatoService;
+
+    @Servico
+    private ClienteService clienteService;
 
     public RepresentadaController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -44,9 +51,26 @@ public class RepresentadaController extends AbstractController {
         representada.setInscricaoEstadual(this.formatarInscricaoEstadual(representada.getInscricaoEstadual()));
     }
 
+    private String formatarComentarios(Integer idRepresentada) {
+        List<ComentarioRepresentada> listaComentario = representadaService
+                .pesquisarComentarioByIdRepresentada(idRepresentada);
+        StringBuilder concat = new StringBuilder();
+        for (ComentarioRepresentada comentario : listaComentario) {
+            concat.append("\n");
+            concat.append(StringUtils.formatarData(comentario.getDataInclusao()));
+            concat.append(" - ");
+            concat.append(comentario.getNomeUsuario());
+            concat.append(" ");
+            concat.append(comentario.getSobrenomeUsuario());
+            concat.append(" - ");
+            concat.append(comentario.getConteudo());
+            concat.append("\n");
+        }
+        return concat.toString();
+    }
+
     @Post("representada/inclusao")
     public void inserir(Representada representada, Logradouro logradouro, List<ContatoRepresentada> listaContato) {
-        final int cem = 100;
         try {
 
             if (hasAtributo(logradouro)) {
@@ -58,7 +82,7 @@ public class RepresentadaController extends AbstractController {
                 representada.addContato(listaContato);
             }
 
-            representada.setComissao(representada.getComissao() / cem);
+            representada.setComissao(NumeroUtils.gerarAliquota(representada.getComissao()));
 
             this.representadaService.inserir(representada);
             this.gerarMensagemCadastroSucesso(representada, "nomeFantasia");
@@ -72,6 +96,26 @@ public class RepresentadaController extends AbstractController {
             gerarLogErroInclusao("Representada", e);
         }
         irTopoPagina();
+    }
+
+    @Post("representada/inclusao/comentario")
+    public void inserirComentario(Integer idRepresentada, String comentario) {
+
+        if (idRepresentada == null) {
+            gerarListaMensagemErro("Para inserir um comentário é necessário escolher uma representada/fornecedor.");
+            irTopoPagina();
+        } else {
+            try {
+                representadaService.inserirComentario(getCodigoUsuario(), idRepresentada, comentario);
+                String nomeFantasia = representadaService.pesquisarNomeFantasiaById(idRepresentada);
+                this.gerarMensagemSucesso("Comentário sobre o representada/fornecedor \"" + nomeFantasia
+                        + "\" inserido com sucesso.");
+            } catch (BusinessException e) {
+                gerarListaMensagemErro(e);
+                addAtributo("comentario", comentario);
+            }
+            redirecTo(this.getClass()).pesquisarRepresentadaById(idRepresentada);
+        }
     }
 
     @Get("representada/listagem")
@@ -91,7 +135,7 @@ public class RepresentadaController extends AbstractController {
     }
 
     @Get("representada/edicao")
-    public void pesquisarById(Integer id) {
+    public void pesquisarRepresentadaById(Integer id) {
         Representada representada = this.representadaService.pesquisarById(id);
         this.formataDocumentos(representada);
 
@@ -99,6 +143,8 @@ public class RepresentadaController extends AbstractController {
         addAtributo("listaContato", this.representadaService.pesquisarContato(id));
         addAtributo("logradouro", this.representadaService.pesquisarLogradorouro(id));
         addAtributo("tipoApresentacaoIPISelecionada", representada.getTipoApresentacaoIPI());
+        addAtributo("comentarios", formatarComentarios(id));
+
         irTopoPagina();
     }
 

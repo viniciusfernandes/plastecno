@@ -1,3 +1,9 @@
+.suggestionFocused {
+	background-color: #DCDCDC;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+
 .conbgn:hover {
 	background-color: #DCDCDC;
 	color: #FFFFFF;
@@ -43,6 +49,7 @@ h3 {
 
 .suggestionList li:hover {
 	background-color: #659CD8;
+	color: #107DA8;
 }
 
 .footSuggestionBox {

@@ -1,6 +1,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE html >
+<!DOCTYPE html>
 <html>
 <head>
 <jsp:include page="/bloco/bloco_header.jsp" />
@@ -29,51 +29,93 @@
 
 		<nav class="flutuante_esquerda">
 			<ul>
-				<li><a href="<c:url value="/"/>">Início</a></li>
-				<li><a href="pedido" target="principal_frame">Pedidos</a>
+				<c:if test="${acessoVendaPermitido}">
+				<li><a href="javascript: void(0)" target="principal_frame">Vendas</a>
+					<ul>
+						<li><a href="pedido" target="principal_frame">Ped. Vendas</a></li>
+						<li><a href="itemAguardandoMaterial" target="principal_frame">Ped. Aguard. Material</a></li>
+						<li><a href="estoque" target="principal_frame">Estoque</a></li>
+					</ul>
+				</li>
+				</c:if>
+				<c:if test="${acessoCompraPermitido}">
+					<li><a href="javascript: void(0)" target="principal_frame">Compras</a>
+						<ul>
+							<li><a href="itemAguardandoCompra" target="principal_frame">Item Aguard. Compra</a></li>
+							<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a></li>
+							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
+							<li><a href="estoque" target="principal_frame">Estoque</a></li>
+							<li><a href="empacotamento" target="principal_frame">Empacotamento</a></li>					
+						</ul>
+					</li>
+				</c:if>
+				<c:if test="${acessoRecepcaoCompraPermitido}">
+					<li><a href="javascript: void(0)" target="principal_frame">Recepção Compras</a>
+						<ul>
+							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
+							<li><a href="estoque" target="principal_frame">Estoque</a></li>
+						</ul>
+					</li>
+				</c:if>
 				<li><a href="cliente" target="principal_frame">Clientes</a></li>
 				<li><a href="javascript: void(0)">Cadastros</a>
 					<ul>
-						<li><a href="ramo" target="principal_frame">Ramos
-								Atividades</a></li>
-						<li><a href="representada" target="principal_frame">Representadas</a></li>
+						<li><a href="ramo" target="principal_frame">Ramos Atividades</a></li>
+						<li><a href="representada" target="principal_frame">Represent. / Forneced.</a></li>
 						<li><a href="transportadora" target="principal_frame">Transportadoras</a></li>
 						<li><a href="material" target="principal_frame">Materiais</a></li>
 						<c:if test="${acessoAdministracaoPermitido}">
 							<li><a href="usuario" target="principal_frame">Usuários</a></li>
 							<li><a href="vendedor" target="principal_frame">Vendedores</a></li>
+							<li><a href="revendedor" target="principal_frame">Revendedor</a></li>
+							<li><a href="comissao" target="principal_frame">Comissão</a></li>
 						</c:if>
 						<li><a href="regiao" target="principal_frame">Regiões</a></li>
-					</ul></li>
-
+					</ul>
+				</li>
+				<c:if test="${acessoValorReceitaPermitido}">
+				<li><a href="javascript: void(0)">Receita</a>
+					<ul>
+						<li><a href="relatorio/receita" target="principal_frame">Receita Estimada</a></li>
+						<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Estim. Vendedor</a></li>
+					</ul>
+				</li>
+				</c:if>
 
 				<li><a href="javascript: void(0)">Relatórios</a>
 					<ul>
-						<c:if test="${acessoRelatorioClienteRegiaoPermitido}">
-							<li><a href="relatorio/cliente/regiao"
-								target="principal_frame">Cliente Região</a></li>
-						</c:if>
-						<li><a href="relatorio/cliente/vendedor"
-							target="principal_frame">Cliente Vendedor</a></li>
 						<c:if test="${acessoRelatorioVendasRepresentadaPermitido}">
-							<li><a href="relatorio/venda/periodo"
-								target="principal_frame">Venda Período</a></li>
+							<li><a href="relatorio/pedido/periodo?isCompra=false" target="principal_frame">Valor Venda Período</a></li>
+						</c:if>
+						<c:if test="${acessoCompraPermitido}">
+							<li><a href="relatorio/pedido/periodo?isCompra=true" target="principal_frame">Valor Compra Período</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioEntregaPermitido}">
-							<li><a href="relatorio/entrega" target="principal_frame">Acompanhamento
-									Entrega</a></li>
+							<li><a href="relatorio/pedido?isCompra=false" target="principal_frame">Pedido Venda Período</a></li>
+						</c:if>
+						<c:if test="${acessoCompraPermitido}">
+							<li><a href="relatorio/pedido?isCompra=true" target="principal_frame">Pedido Compra Período</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioPedidoRepresentadaPermitido}">
-							<li><a href="relatorio/venda/representada"
-								target="principal_frame">Venda Representada</a></li>
+							<li><a href="relatorio/venda/representada" target="principal_frame">Venda Representada</a></li>
+							<li><a href="relatorio/venda/cliente" target="principal_frame">Venda Cliente</a></li>
 						</c:if>
-						<li><a href="relatorio/venda/vendedor"
-							target="principal_frame">Venda/Orçamto Vendedor</a></li>
+						<c:if test="${acessoRelatorioEntregaPermitido}">
+							<li><a href="relatorio/pedido?isEntrega=true" target="principal_frame">Acompanhamento Entrega</a></li>
+						</c:if>
 						<c:if test="${acessoRelatorioClienteRamoAtividadePermitido}">
-							<li><a href="relatorio/cliente/ramoAtividade"
-								target="principal_frame">Cliente Ramo Atividade</a></li>
+							<li><a href="relatorio/cliente/ramoAtividade" target="principal_frame">Cliente Ramo Atividade</a></li>
 						</c:if>
-
+						<c:if test="${acessoRelatorioClienteRegiaoPermitido}">
+							<li><a href="relatorio/cliente/regiao" target="principal_frame">Cliente Região</a></li>
+						</c:if>
+						<c:if test="${acessoVendaPermitido}">
+							<li><a href="relatorio/venda/vendedor" target="principal_frame">Venda/Orçamto Vendedor</a></li>
+							<li><a href="relatorio/cliente/vendedor" target="principal_frame">Cliente Vendedor</a></li>
+						</c:if>
+						<c:if test="${acessoRelatorioComissaoVendedor}">
+							<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Vendedor</a></li>
+						</c:if>
 					</ul></li>
 				<c:if test="${acessoManutencaoPermitido}">
 					<li><a href="javascript: void(0)">Manutenção</a>

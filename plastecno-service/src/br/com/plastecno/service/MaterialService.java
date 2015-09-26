@@ -17,6 +17,10 @@ public interface MaterialService {
 
 	Integer inserir(Material material, List<Integer> listaIdRepresentadaAssociada) throws BusinessException;
 
+	boolean isMaterialAssociadoRepresentada(Integer idMaterial, Integer idRepresentada);
+
+	boolean isMaterialExistente(Integer idMaterial);
+
 	boolean isMaterialExistente(String sigla, Integer idMaterial);
 
 	boolean isMaterialImportado(Integer idMaterial);
@@ -29,7 +33,11 @@ public interface MaterialService {
 
 	Material pesquisarById(Integer id);
 
+	List<Material> pesquisarBySigla(String sigla);
+
 	List<Material> pesquisarBySigla(String sigla, Integer idRepresentada);
+
+	List<Material> pesquisarMaterialAtivoBySigla(String sigla, Integer idRepresentada);
 
 	List<Representada> pesquisarRepresentadasAssociadas(Integer idMaterial);
 

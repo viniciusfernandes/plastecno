@@ -83,6 +83,14 @@
 	width: 24px;
 }
 
+.botaoDinheiro {
+	background: url("../images/money_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoEndereco {
 	background: url("../images/address_add_24.png") no-repeat scroll 0 0
 		transparent;
@@ -103,6 +111,15 @@
 .botaoEditar_24 {
 	background: url("../images/pencil_orange_24.png") no-repeat scroll 0 0
 		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoRecortar {
+	background: url("../images/scissor_24.png") no-repeat scroll 0 0
+		transparent;
+	border: none;
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
@@ -171,6 +188,22 @@
 	width: 24px;
 }
 
+.botaoPesquisarEstatistica {
+	background: url("../images/chart_search_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoPesquisarMenos {
+	background: url("../images/search_minus_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoPesquisarPequeno {
 	background: url("../images/search_16.png") no-repeat scroll 0 0
 		transparent;
@@ -232,10 +265,26 @@
 	background-position: center center;
 }
 
+.botaoAdicionar_16 {
+	background: url("../images/package_down_arrow_16.png") no-repeat scroll 0 0 transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
 .botaoContactar:hover {
 	background: url("../images/phone_green_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
+}
+
+.botaoDinheiro:hover {
+	background: url("../images/money_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
 }
 
 .botaoImprimir:hover {
@@ -311,6 +360,14 @@
 	width: 24px;
 }
 
+.botaoRecortar:hover {
+	background: url("../images/scissor_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoVoltar:hover {
 	background: url("../images/arrow_left_blue_16.png") no-repeat scroll 0 0
 		transparent;
@@ -331,6 +388,19 @@
 
 .botaoPesquisar:hover {
 	background: url("../images/search_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
+.botaoPesquisarEstatistica:hover {
+	background: url("../images/chart_search_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
+
+.botaoPesquisarMenos:hover {
+	background: url("../images/search_minus_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 }

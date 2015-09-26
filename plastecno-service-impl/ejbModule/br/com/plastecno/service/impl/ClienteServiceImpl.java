@@ -9,6 +9,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -20,6 +22,7 @@ import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
+import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.entity.Cliente;
@@ -37,12 +40,7 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
 public class ClienteServiceImpl implements ClienteService {
-
-	@PersistenceContext(unitName = "plastecno")
-	private EntityManager entityManager;
-
-	@EJB
-	private LogradouroService logradouroService;
+	private ClienteDAO clienteDAO;
 
 	@EJB
 	private ConfiguracaoSistemaService configuracaoSistemaService;
@@ -53,10 +51,25 @@ public class ClienteServiceImpl implements ClienteService {
 	@EJB
 	private EnderecamentoService enderecamentoService;
 
+	@PersistenceContext(unitName = "plastecno")
+	private EntityManager entityManager;
+
+	@EJB
+	private LogradouroService logradouroService;
+
 	@EJB
 	private UsuarioService usuarioService;
 
-	private ClienteDAO clienteDAO;
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Cliente alterarRevendedor(Cliente cliente) throws BusinessException {
+		Cliente revendedor = pesquisarRevendedor();
+		if (revendedor != null) {
+			clienteDAO.alterarTipoCliente(revendedor.getId(), TipoCliente.NORMAL);
+		}
+		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
+		return inserir(cliente);
+	}
 
 	@Override
 	public Integer contactarCliente(Integer id) {
@@ -102,7 +115,6 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		if (restricao.length() > 0) {
-
 			select.append(" WHERE ").append(restricao);
 			select.delete(select.lastIndexOf("AND"), select.length() - 1);
 		}
@@ -115,12 +127,15 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	public Cliente inserir(Cliente cliente) throws BusinessException {
-		/*
-		 * Verificando se foi configurado a prospeccao do cliente, caso nao foi,
-		 * pegaremos a configuracao ja existente no sistema
-		 */
-		if (cliente.getProspeccaoFinalizada() == null) {
-			cliente.setProspeccaoFinalizada(this.isClienteProspectado(cliente.getId()));
+		// Os revendedores nao deve estar associados a nenhum vendedor.
+		if (cliente.isRevendedor()) {
+			cliente.setVendedor(null);
+		} else if (!cliente.isRevendedor() && cliente.getVendedor() == null) {
+			throw new BusinessException("Vendedor do cliente é obrigatório");
+		}
+
+		if (cliente.getTipoCliente() == null) {
+			cliente.setTipoCliente(TipoCliente.NORMAL);
 		}
 		ValidadorInformacao.validar(cliente);
 
@@ -129,26 +144,39 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		validarDocumentosPreenchidos(cliente);
-		validarListaLogradouroPreenchida(cliente);
+		validarRevendedorExistente(cliente);
 		inserirEndereco(cliente);
 		return cliente.getId() == null ? clienteDAO.inserir(cliente) : clienteDAO.alterar(cliente);
+	}
+
+	@Override
+	public void inserirComentario(Integer idProprietario, Integer idCliente, String comentario) throws BusinessException {
+		Cliente cliente = pesquisarById(idCliente);
+		Usuario proprietario = usuarioService.pesquisarById(idProprietario);
+		inserirComentario(proprietario, cliente, comentario);
 	}
 
 	@Override
 	public void inserirComentario(Integer idCliente, String comentario) throws BusinessException {
 		Cliente cliente = pesquisarById(idCliente);
 		Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(idCliente);
-
+		inserirComentario(vendedor, cliente, comentario);
+	}
+	
+	
+	private void inserirComentario(Usuario proprietario, Cliente cliente, String comentario) throws BusinessException {
 		ComentarioCliente comentarioCliente = new ComentarioCliente();
 		comentarioCliente.setCliente(cliente);
-		comentarioCliente.setVendedor(vendedor);
+		comentarioCliente.setVendedor(proprietario);
 		comentarioCliente.setDataInclusao(new Date());
 		comentarioCliente.setConteudo(comentario);
 
 		ValidadorInformacao.validar(comentarioCliente);
 		entityManager.persist(comentarioCliente);
+		
 	}
 
+	
 	private void inserirEndereco(Cliente cliente) throws BusinessException {
 		if (cliente.isListaLogradouroPreenchida()) {
 			for (LogradouroCliente logradouro : cliente.getListaLogradouro()) {
@@ -158,44 +186,37 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
-	public boolean isClienteAtivo(Integer idCliente) {
-		return true;
-	}
-
-	@Override
-	public boolean isClienteProspectado(Integer idCliente) {
-		Query query = this.entityManager
-				.createQuery("select c.prospeccaoFinalizada from Cliente c where c.id = :idCliente").setParameter("idCliente",
-						idCliente);
-		return QueryUtil.gerarRegistroUnico(query, Boolean.class, false);
-	}
-
-	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isCNPJExistente(Integer idCliente, String cnpj) {
 		return clienteDAO.isEntidadeExistente(Cliente.class, idCliente, "cnpj", cnpj);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isCPFExistente(Integer idCliente, String cpf) {
 		return clienteDAO.isEntidadeExistente(Cliente.class, idCliente, "cpf", cpf);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isEmailExistente(Integer idCliente, String email) {
 		return clienteDAO.isEmailExistente(idCliente, email);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isInscricaoEstadualExistente(Integer idCliente, String inscricaoEstadual) {
 		return clienteDAO.isEntidadeExistente(Cliente.class, idCliente, "inscricaoEstadual", inscricaoEstadual);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isNomeFantasiaExistente(Integer id, String nomeFantasia) {
 		return clienteDAO.isEntidadeExistente(Cliente.class, id, "nomeFantasia", nomeFantasia);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public PaginacaoWrapper<Cliente> paginarCliente(Cliente filtro, boolean carregarVendedor,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		return new PaginacaoWrapper<Cliente>(this.pesquisarTotalRegistros(filtro), this.pesquisarBy(filtro, true,
@@ -204,6 +225,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarBy(Cliente filtro, boolean carregarVendedor, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 		if (filtro == null) {
@@ -228,17 +250,20 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarBy(Cliente filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		return this.pesquisarBy(filtro, false, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Cliente pesquisarById(Integer id) {
 		return clienteDAO.pesquisarById(id);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarByIdVendedor(Integer idVendedor) {
 		StringBuilder select = new StringBuilder("select c from Cliente c left join fetch c.listaContato ");
 		if (idVendedor != null) {
@@ -307,10 +332,17 @@ public class ClienteServiceImpl implements ClienteService {
 				// o contato deve ser exibido no relatorio e usamos um let join
 				// pois um cliente pode nao ter contatos
 				.append("left join fetch c.listaContato lc ").append("inner join fetch c.listaLogradouro l ")
-				.append("where l.tipoLogradouro = :tipoLogradouro and l.endereco.bairro.id in (:listaIdBairro) ");
+				.append("where l.tipoLogradouro = :tipoLogradouro and l.endereco.bairro.id in (:listaIdBairro) ")
+				.append("order by c.nomeFantasia");
 
 		return this.entityManager.createQuery(select.toString()).setParameter("listaIdBairro", listaIdBairro)
 				.setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO).getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Cliente pesquisarClienteResumidoById(Integer idCliente) {
+		return clienteDAO.pesquisarClienteResumidoById(idCliente);
 	}
 
 	@Override
@@ -402,6 +434,17 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
+	public String pesquisarNomeFantasia(Integer idCliente) {
+		return clienteDAO.pesquisarNomeFantasia(idCliente);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Cliente pesquisarRevendedor() {
+		return clienteDAO.pesquisarRevendedor();
+	}
+
+	@Override
 	public Long pesquisarTotalRegistros(Cliente filtro) {
 		if (filtro == null) {
 			return 0L;
@@ -474,9 +517,17 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 	}
 
-	private void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException {
-		if (cliente.isProspectado()) {
-			logradouroService.verificarListaLogradouroObrigatorio(cliente.getListaLogradouro());
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException {
+		logradouroService.validarListaLogradouroPreenchida(cliente.getListaLogradouro());
+	}
+
+	private void validarRevendedorExistente(Cliente cliente) throws BusinessException {
+		if (cliente.isRevendedor() && clienteDAO.isRevendedorExistente(cliente.getId())) {
+			Cliente revendedor = clienteDAO.pesquisarRevendedor();
+			throw new BusinessException("Não é possível mais de um cliente revendedor cadastrado. O cliente \""
+					+ revendedor.getNomeFantasia() + "\" já esta cadastrado como revendedor.");
 		}
 	}
 }

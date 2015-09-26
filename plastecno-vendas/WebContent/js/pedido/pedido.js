@@ -90,7 +90,7 @@ function inicializarBlocoItemPedido(urlTela) {
 
 				var request = $.ajax({
 					type : 'get',
-					url : '/vendas/pedido/item/' + linha.cells[0].innerHTML
+					url : tabelaItemHandler.urlTela + '/item/' + linha.cells[0].innerHTML
 				});
 
 				request.done(function(response) {
@@ -191,16 +191,19 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 			 * tela sera desabilitado e nao sera enviado no request.
 			 */
 			$('#numeroPedido').val(pedidoJson.id);
+			$('#tipoPedido').val(pedidoJson.tipoPedido);
 			$('#numeroPedidoPesquisa').val(pedidoJson.id);
 			$('#formEnvioPedido #idPedido').val(pedidoJson.id);
-
+			
+			$('#situacaoPedido').val(pedidoJson.situacaoPedido);
+			
 			// preenchendo esse campo caso o usuario queira cancelar o pedido
 			$('#idPedidoCancelamento').val(pedidoJson.id);
 			$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);
 			$('#vendedor').val(
-					pedidoJson.vendedor.nome + ' - '
-							+ pedidoJson.vendedor.email);
-			$('#idVendedor').val(pedidoJson.vendedor.id);
+					pedidoJson.proprietario.nome + ' - '
+							+ pedidoJson.proprietario.email);
+			$('#idVendedor').val(pedidoJson.proprietario.id);
 			$('#formEnvioPedido #botaoEnviarPedido').show();
 
 			habilitar('#numeroPedidoPesquisa', false);
@@ -266,7 +269,7 @@ function inicializarAutomcompleteCliente(url) {
 					$('#cpf').val(clienteJson.cpf);
 					$('#nomeCliente').val(clienteJson.nomeCompleto);
 					$('#idVendedor').val(clienteJson.vendedor.id);
-					$('#vendedor').val(clienteJson.vendedor.nome + ' - '+ clienteJson.vendedor.email);
+					$('#proprietario').val(clienteJson.vendedor.nome + ' - '+ clienteJson.vendedor.email);
 
 					limparComboBox('listaTransportadora');
 					limparComboBox('listaRedespacho');
@@ -301,6 +304,18 @@ function inicializarAutomcompleteMaterial(url) {
 		gerarVinculo : function () {return 'idRepresentada=' + $('#representada').val()},
 		selecionarItem : function(itemLista) {
 			$('#idMaterial').val(itemLista.id);
+		}
+	});
+};
+
+function inicializarAutocompleteDescricaoPeca(url) {
+	autocompletar({
+		url : url,
+		campoPesquisavel : 'descricao',
+		parametro : 'descricao',
+		containerResultados : 'containerPesquisaDescricaoPeca',
+		selecionarItem : function(itemLista) {
+			$('#idPecaEstoque').val(itemLista.id);
 		}
 	});
 };
@@ -411,13 +426,13 @@ function preencherComboTransportadora(combo, listaTransportadora) {
 	}
 }
 
-function habilitarIPI(idRepresentada) {
+function habilitarIPI(urlTela, idRepresentada) {
 	if(isEmpty(idRepresentada)){
 		return;
 	}
 	var request = $.ajax({
 		type : 'get',
-		url : '/vendas/pedido/representada/' + idRepresentada + '/aliquotaIPI/'
+		url : urlTela + '/representada/' + idRepresentada + '/aliquotaIPI/'
 	});
 
 	request.done(function(response) {

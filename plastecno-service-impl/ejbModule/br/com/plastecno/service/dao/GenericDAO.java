@@ -16,6 +16,23 @@ public class GenericDAO<T> {
 		return entityManager.merge(t);
 	}
 
+	public void alterarPropriedade(Class<T> classe, Integer id, String nomePropriedade, Object valorPropriedade) {
+		if (id == null) {
+			return;
+		}
+		StringBuilder select = new StringBuilder();
+		select.append("update ").append(classe.getSimpleName()).append(" e ");
+		select.append(" set e.").append(nomePropriedade).append(" = :").append(nomePropriedade).append(" where e.id = :id");
+		entityManager.createQuery(select.toString()).setParameter(nomePropriedade, valorPropriedade).setParameter("id", id)
+				.executeUpdate();
+	}
+
+	public T flush(T t) {
+		t = entityManager.merge(t);
+		entityManager.flush();
+		return t;
+	}
+
 	public T inserir(T t) {
 		entityManager.persist(t);
 		return t;
@@ -54,10 +71,28 @@ public class GenericDAO<T> {
 	}
 
 	T pesquisarById(Class<T> classe, Integer id) {
+
+		if (id == null) {
+			return null;
+		}
+
 		StringBuilder select = new StringBuilder();
 		select.append("select e from ").append(classe.getSimpleName());
 		select.append(" e where e.id = :id");
 		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id), classe,
 				null);
+	}
+
+	<K> K pesquisarCampoById(Class<T> classe, Integer id, String nomeCampo, Class<K> retorno) {
+		StringBuilder select = new StringBuilder();
+		select.append("select ").append("e.").append(nomeCampo).append(" from ").append(classe.getSimpleName());
+		select.append(" e where e.id = :id");
+		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id), retorno,
+				null);
+	}
+
+	public T remover(T t) {
+		entityManager.remove(entityManager.merge(t));
+		return t;
 	}
 }

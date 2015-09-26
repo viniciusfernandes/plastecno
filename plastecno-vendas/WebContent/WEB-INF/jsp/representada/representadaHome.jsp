@@ -2,9 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-
-<title>Plastecno - Cadastro de Representada</title>
+<title>Plastecno - Cadastro de Representada ou Fornecedores</title>
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
@@ -54,13 +52,17 @@ $(document).ready(function() {
 		removerNaoDigitos(listaId);
 
 		var parametros = tabelaContatoHandler.gerarListaParametro('listaContato');
-		
+		parametros += serializarBloco('bloco_logradouro');
 		$("#formRepresentada").attr("action", "<c:url value="/representada/inclusao"/>?"+parametros);
 		$('#formRepresentada').submit();
 	});
 
 	$("#botaoLimpar").click(function() {
 		$('#formVazio').submit();
+	});
+	
+	$("#botaoLimparComentario").click(function () {
+		$("#comentario").val("");	
 	});
 	
 	tabelaContatoHandler = inicializarBlocoContato('<c:url value="/representada"/>');
@@ -71,6 +73,7 @@ $(document).ready(function() {
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
 	inserirMascaraNumerica('comissao', '99');
+	
 });
 
 function inicializarFiltro() {
@@ -114,13 +117,36 @@ function inicializarModalCancelamento(botao){
 
 
 		<fieldset>
-			<legend>::: Dados de Representadas :::</legend>
+			<legend>::: Dados de Represent. / Forneced. :::</legend>
 			<div class="label">Ativo:</div>
 			<div class="input" style="width: 80%">
 				<input type="checkbox" id="ativo" name="representada.ativo"
 					<c:if test="${empty representada or representada.ativo}">checked="checked"</c:if>
 					class="checkbox" />
 			</div>
+			
+			<div class="label obrigatorio">Tipo de Relacionamento:</div>
+			<div class="input">
+				<input type="radio" name="representada.tipoRelacionamento" 
+					value="REVENDA" <c:if test="${not empty representada and representada.tipoRelacionamento == 'REVENDA'}">checked</c:if>/>
+			</div>
+			<div class="label label_radio_button" style="width: 5%">Revenda</div>
+			<div class="input">
+				<input type="radio" name="representada.tipoRelacionamento"
+					value="REPRESENTACAO" <c:if test="${not empty representada and representada.tipoRelacionamento == 'REPRESENTACAO'}">checked</c:if> />
+			</div>
+			<div class="label label_radio_button" style="width: 8%">Representação</div>
+			<div class="input">
+				<input type="radio" name="representada.tipoRelacionamento" 
+					value="FORNECIMENTO" <c:if test="${not empty representada and representada.tipoRelacionamento == 'FORNECIMENTO'}">checked</c:if>/>
+			</div>
+			<div class="label label_radio_button" style="width: 8%">Fornecimento</div>
+			<div class="input">
+				<input type="radio" name="representada.tipoRelacionamento" 
+					value="REPRESENTACAO_FORNECIMENTO" <c:if test="${not empty representada and representada.tipoRelacionamento == 'REPRESENTACAO_FORNECIMENTO'}">checked</c:if>/>
+			</div>
+			<div class="label label_radio_button" style="width: 40%">Represent. e Fornec.</div>
+					
 			<div class="label obrigatorio">Apresent. IPI:</div>
 			<div class="input" style="width: 20%">
 				<select id="tipoApresentacaoIPI"
@@ -132,7 +158,7 @@ function inicializarModalCancelamento(botao){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio" style="width: 10%">Comissão (%):</div>
+			<div class="label condicional" style="width: 10%">Comissão (%):</div>
 			<div class="input" style="width: 50%">
 				<input type="text" id="comissao" name="representada.comissao"
 					value="${representada.comissaoPercentual}" style="width: 10%" />
@@ -180,15 +206,43 @@ function inicializarModalCancelamento(botao){
 					class="apenasLowerCase uppercaseBloqueado lowerCase" />
 			</div>
 		</fieldset>
+		
+	</form>
 		<div class="bloco_botoes">
 			<a id="botaoPesquisarRepresentada"
 				title="Pesquisar Dados da Representada" class="botaoPesquisar"></a>
 			<a id="botaoLimpar" title="Limpar Dados do Cliente"
 				class="botaoLimpar"></a>
 		</div>
-		<jsp:include page="/bloco/bloco_logradouro.jsp" />
-		<jsp:include page="/bloco/bloco_contato.jsp" />
+				
+		<fieldset id="bloco_comentario">
+			<legend>::: Comentários :::</legend>
+			<form action="<c:url value="/representada/inclusao/comentario"/>" method="post">
+				<input type="hidden" value="${representada.id}" name="idRepresentada" />
+				<div class="label condicional">Comentário:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="comentario" name="comentario" value="${comentario}" style="width: 100%" />
+				</div>
+	
+				<div class="bloco_botoes">
+					<c:if test="${acessoCadastroBasicoPermitido}">
+						<input type="submit" value="" class="botaoAdicionar" title="Adicionar Dados do Comentario" /> 
+						<a id="botaoLimparComentario" title="Limpar Dados do Comentario" class="botaoLimpar"></a>
+					</c:if>
+				</div>
+	
+			</form>
+			<div class="label condicional">Histórico:</div>
+			<div class="input areatexto" style="width: 80%">
+				<textarea style="width: 100%;" disabled="disabled">
+					${comentarios}
+					</textarea>
+			</div>
+		</fieldset>
 
+		<jsp:include page="/bloco/bloco_contato.jsp" />		
+		<jsp:include page="/bloco/bloco_logradouro.jsp" />
+		
 		<div class="bloco_botoes">
 			<c:if test="${acessoCadastroBasicoPermitido}">
 				<a id="botaoInserirRepresentada"
@@ -196,17 +250,17 @@ function inicializarModalCancelamento(botao){
 			</c:if>
 		</div>
 
-	</form>
 	<a id="rodape"></a>
 	<fieldset>
-		<legend>::: Resultado da Pesquisa de Representadas :::</legend>
+		<legend>::: Resultado da Pesquisa de Represent. / Forneced. :::</legend>
 		<div id="paginador"></div>
 		<div>
 			<table id="tabela" class="listrada">
 				<thead>
 					<tr>
 						<th style="width: 5%">Ativo</th>
-						<th style="width: 30%">Nome</th>
+						<th style="width: 12%">Relação</th>
+						<th style="width: 15%">Nome</th>
 						<th style="width: 35%">Razão Social</th>
 						<th>CNPJ</th>
 						<th>Ações</th>
@@ -223,6 +277,7 @@ function inicializarModalCancelamento(botao){
 									<td><div class="flagNaoOK"></div></td>
 								</c:otherwise>
 							</c:choose>
+							<td>${representada.tipoRelacionamento.descricao}</td>
 							<td>${representada.nomeFantasia}</td>
 							<td>${representada.razaoSocial}</td>
 							<td>${representada.cnpj}</td>

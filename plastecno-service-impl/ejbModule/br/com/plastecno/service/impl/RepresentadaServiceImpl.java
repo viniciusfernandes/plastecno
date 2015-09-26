@@ -1,11 +1,14 @@
 package br.com.plastecno.service.impl;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -14,10 +17,14 @@ import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
+import br.com.plastecno.service.constante.TipoPedido;
+import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.RepresentadaDAO;
+import br.com.plastecno.service.entity.ComentarioRepresentada;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.util.StringUtils;
@@ -26,14 +33,14 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @Stateless
 public class RepresentadaServiceImpl implements RepresentadaService {
 
+	@EJB
+	private ContatoService contatoService;
+
 	@PersistenceContext(unitName = "plastecno")
 	private EntityManager entityManager;
 
 	@EJB
 	private LogradouroService logradouroService;
-
-	@EJB
-	private ContatoService contatoService;
 
 	private RepresentadaDAO representadaDAO;
 
@@ -106,12 +113,40 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 			throw new BusinessException("CNPJ enviado ja foi cadastrado para outra representada");
 		}
 
+		if (representada.isRevendedor() && isRevendedorExistente(representada.getId())) {
+			Representada revendedor = pesquisarRevendedor();
+			throw new BusinessException("Já existe um revendedor cadastrado no sistema. Remova o revendedor \""
+					+ revendedor.getNomeFantasia() + "\" para em seguida cadastrar um outro.");
+		}
+
+		if (!representada.isFornecedor() && representada.getComissao() == 0) {
+			throw new BusinessException("A comissão é obrigatorio no cadastro da representada");
+		}
+
 		representada.setLogradouro(this.logradouroService.inserir(representada.getLogradouro()));
+
 		if (representada.getId() == null) {
 			return representadaDAO.inserir(representada).getId();
 		} else {
 			return representadaDAO.alterar(representada).getId();
 		}
+	}
+
+	@Override
+	public void inserirComentario(Integer idProprietario, Integer idRepresentada, String comentario)
+			throws BusinessException {
+		Representada representada = new Representada();
+		representada.setId(idRepresentada);
+		Usuario usuario = new Usuario(idProprietario);
+
+		ComentarioRepresentada comentarioRepresentada = new ComentarioRepresentada();
+		comentarioRepresentada.setConteudo(comentario);
+		comentarioRepresentada.setDataInclusao(new Date());
+		comentarioRepresentada.setRepresentada(representada);
+		comentarioRepresentada.setUsuario(usuario);
+
+		ValidadorInformacao.validar(comentarioRepresentada);
+		entityManager.persist(comentarioRepresentada);
 	}
 
 	@Override
@@ -130,18 +165,13 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public List<Representada> pesquisar() {
-		return this.pesquisar(null);
+	public boolean isRevendedor(Integer idRepresentada) {
+		return TipoRelacionamento.REVENDA.equals(representadaDAO.pesquisarTipoRelacionamento(idRepresentada));
 	}
 
-	@Override
-	public List<Representada> pesquisar(Boolean ativo) {
-		return representadaDAO.pesquisar(ativo);
-	}
-
-	@Override
-	public List<Representada> pesquisarAtivo() {
-		return this.pesquisar(true);
+	private boolean isRevendedorExistente(Integer id) {
+		return this.representadaDAO.isEntidadeExistente(Representada.class, id, "tipoRelacionamento",
+				TipoRelacionamento.REVENDA);
 	}
 
 	@Override
@@ -179,8 +209,34 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	public List<ComentarioRepresentada> pesquisarComentarioByIdRepresentada(Integer idRepresentada) {
+		return (List<ComentarioRepresentada>) entityManager
+				.createQuery(
+						"select new ComentarioRepresentada (c.dataInclusao, c.conteudo, v.nome, v.sobrenome) from ComentarioRepresentada c "
+								+ " inner join c.usuario v where c.representada.id = :idRepresentada order by c.dataInclusao desc")
+				.setParameter("idRepresentada", idRepresentada).getResultList();
+	}
+
+	@Override
+	public double pesquisarComissaoRepresentada(Integer idRepresentada) {
+		return representadaDAO.pesquisarComissao(idRepresentada);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
 	public List<ContatoRepresentada> pesquisarContato(Integer id) {
 		return (List<ContatoRepresentada>) this.contatoService.pesquisar(id, ContatoRepresentada.class);
+	}
+
+	@Override
+	public List<Representada> pesquisarFornecedor(Boolean ativo) {
+		return representadaDAO.pesquisarRepresentadaByTipoRelacionamento(ativo, TipoRelacionamento.FORNECIMENTO,
+				TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+	}
+
+	@Override
+	public List<Representada> pesquisarFornecedorAtivo() {
+		return pesquisarFornecedor(true);
 	}
 
 	@Override
@@ -191,6 +247,40 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("id", id);
 		return QueryUtil.gerarRegistroUnico(query, Logradouro.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public String pesquisarNomeFantasiaById(Integer idRepresentada) {
+		return representadaDAO.pesquisarNomeFantasiaById(idRepresentada);
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentadaEFornecedor() {
+		return representadaDAO.pesquisarRepresentadaEFornecedor();
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentada(Boolean ativo) {
+		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.FORNECIMENTO);
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentadaAtiva() {
+		return this.pesquisarRepresentada(true);
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentadaAtivoByTipoPedido(TipoPedido tipoPedido) {
+		if (TipoPedido.COMPRA.equals(tipoPedido)) {
+			return pesquisarFornecedorAtivo();
+		}
+		return pesquisarRepresentadaAtiva();
+	}
+
+	@Override
+	public Representada pesquisarRevendedor() {
+		return representadaDAO.pesquisarRevendedor();
 	}
 
 	@Override

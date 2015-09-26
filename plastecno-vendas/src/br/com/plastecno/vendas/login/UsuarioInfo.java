@@ -19,7 +19,7 @@ public class UsuarioInfo {
     private Integer codigoUsuario;
     private boolean usuarioLogado = false;
     private List<TipoAcesso> listaTipoAcesso;
-    private boolean vendaPermitida;
+    private boolean compraPermitida;
     private String nomeCompleto;
 
     public Integer getCodigoUsuario() {
@@ -36,7 +36,7 @@ public class UsuarioInfo {
         }
 
         this.codigoUsuario = usuario.getId();
-        this.vendaPermitida = usuario.isVendedorAtivo();
+        this.compraPermitida = usuario.isComprador();
         this.nomeCompleto = usuario.getNomeCompleto();
         this.usuarioLogado = true;
         this.listaTipoAcesso = new ArrayList<TipoAcesso>();
@@ -73,12 +73,12 @@ public class UsuarioInfo {
         return false;
     }
 
-    public boolean isLogado() {
-        return usuarioLogado;
+    public boolean isCompraPermitida() {
+        return compraPermitida;
     }
 
-    public boolean isVendaPermitida() {
-        return vendaPermitida;
+    public boolean isLogado() {
+        return usuarioLogado;
     }
 
     public void limpar() {

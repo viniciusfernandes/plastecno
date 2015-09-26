@@ -67,7 +67,14 @@ public class ControleAcessoInterceptor implements Interceptor {
             }
             logger.log(Level.INFO, "Usuario " + usuarioInfo.getDescricaoLogin() + ". Acessando o recurso: " + recurso);
         }
-        stack.next(metodo, resourceInstance);
+        
+        try {
+            stack.next(metodo, resourceInstance);
+        } catch (RuntimeException e) {
+            logger.log(Level.SEVERE, "Falha na interceptacao do metodo \"" + metodo.getMethod().getName()
+                    + "\" efetuado pelo usuario: " + usuarioInfo.getDescricaoLogin());
+            throw e;
+        }
     }
 
 }

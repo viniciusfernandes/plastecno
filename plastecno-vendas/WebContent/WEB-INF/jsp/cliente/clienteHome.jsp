@@ -12,6 +12,8 @@
 <script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
@@ -35,7 +37,7 @@ $(document).ready(function() {
 		var parametros = tabelaLogradouroHandler.gerarListaParametro('listaLogradouro');
 		parametros += tabelaContatoHandler.gerarListaParametro('listaContato');
 		parametros += pickListToParameter('listaIdTransportadoraAssociada');
-		
+	
 		$('#formCliente').attr("action",$('#formCliente').attr("action")+'?'+ parametros);
 		$('#formCliente').submit();
 						
@@ -50,6 +52,9 @@ $(document).ready(function() {
 	});
 
 	$("#botaoLimpar").click(function() {
+		<c:if test="${isRevendedor}">
+		$('#formVazio').attr('action', '<c:url value="/revendedor"/>');
+		</c:if>		
 		$('#formVazio').submit();
 	});
 	
@@ -79,7 +84,7 @@ $(document).ready(function() {
 	tabelaContatoHandler = inicializarBlocoContato(urlTela);
 	
 	new PickList().initPickList();
-	
+	var urlCliente  = '';
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
 		campoPesquisavel : 'nomeFantasia',
@@ -122,43 +127,33 @@ function remover(codigo, nome) {
 <body>
 
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
+	<div id="modal"></div>
 
 	<form id="formPesquisa" action="cliente/listagem" method="get">
-		<input type="hidden" id="filtro_nomeFantasia"
-			name="filtro.nomeFantasia" /> <input type="hidden" id="filtro_email"
-			name="filtro.email" /> <input type="hidden" id="filtro_cnpj"
-			name="filtro.cnpj" /> <input type="hidden" id="filtro_cpf"
-			name="filtro.cpf" />
+		<input type="hidden" id="filtro_nomeFantasia" name="filtro.nomeFantasia" /> 
+		<input type="hidden" id="filtro_email" name="filtro.email" /> 
+		<input type="hidden" id="filtro_cnpj" name="filtro.cnpj" /> 
+		<input type="hidden" id="filtro_cpf" name="filtro.cpf" />
 	</form>
 
 
-	<form id="formContactarCliente" action="cliente/contactar"
-		method="post">
-		<input id="idClienteContactado" name="idClienteContactado"
-			type="hidden" />
+	<form id="formContactarCliente" action="cliente/contactar" method="post">
+		<input id="idClienteContactado" name="idClienteContactado" type="hidden" />
 	</form>
 
 	<form id="formVazio" action="cliente" method="get">
+		<input type="hidden" id="isRevendedor" name="isRevendedor" value="${isRevendedor}" />
 	</form>
 
 	<fieldset>
-		<legend>::: Dados do Cliente :::</legend>
+		<legend>::: Dados do ${isRevendedor ? 'Revendedor' : 'Cliente'} :::</legend>
 
 		<form id="formCliente" action="<c:url value="/cliente/inclusao"/>"
 			method="post">
 			<input type="hidden" id="id" name="cliente.id" value="${cliente.id}" />
-			<input type="hidden" id="id" name="cliente.vendedor.id"
-				value="${cliente.vendedor.id}" />
-
-			<c:if test="${empty cliente or not cliente.prospeccaoFinalizada}">
-				<div class="label">Prospectado:</div>
-				<div class="input" style="width: 80%;">
-					<input type="checkbox" id="prospeccaoFinalizada"
-						name="cliente.prospeccaoFinalizada"
-						<c:if test="${cliente.prospeccaoFinalizada}">checked</c:if>
-						class="checkbox" />
-				</div>
-			</c:if>
+			<input type="hidden" id="idVendedor" name="cliente.vendedor.id" value="${cliente.vendedor.id}" />
+			<input type="hidden" id="isRevendedor" name="isRevendedor" value="${isRevendedor}" />
+			<input type="hidden" id="tipoCliente" name="cliente.tipoCliente" value="${cliente.tipoCliente}" />
 
 			<div class="label">Último Contato:</div>
 			<div class="input" style="width: 20%">
@@ -168,8 +163,7 @@ function remover(codigo, nome) {
 			<div class="label">Vendedor:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="vendedor"
-					value="${cliente.vendedor.nomeCompleto} - ${cliente.vendedor.email}"
-					disabled="disabled" class="uppercaseBloqueado desabilitado"
+					value="${cliente.vendedor.nomeCompleto} - ${cliente.vendedor.email}" disabled="disabled" class="uppercaseBloqueado desabilitado"
 					style="width: 80%" />
 			</div>
 
@@ -228,36 +222,36 @@ function remover(codigo, nome) {
 		</form>
 	</fieldset>
 	<div class="bloco_botoes">
-		<a id="botaoPesquisarCliente" title="Pesquisar Dados do Cliente"
-			class="botaoPesquisar"></a> <a id="botaoLimpar"
-			title="Limpar Dados do Cliente" class="botaoLimpar"></a>
+		<c:if test="${not isRevendedor}">
+		<a id="botaoPesquisarCliente" title="Pesquisar Dados do Cliente" class="botaoPesquisar"></a> 
+		</c:if>
+		<a id="botaoLimpar" title="Limpar Dados do Cliente" class="botaoLimpar"></a>
 		<c:if test="${not empty cliente.id}">
 			<a id="botaoContactarCliente" title="Cliente Contactado"
 				onclick="contactarCliente(${cliente.id});" class="botaoContactar"></a>
 		</c:if>
 	</div>
+	
+	<c:if test="${not isRevendedor}">
+	
 	<fieldset id="bloco_comentario">
 		<legend>::: Comentários :::</legend>
-		<form action="<c:url value="/cliente/inclusao/comentario"/>"
+		<form action="<c:url value="/cliente/inclusao/comentario?isRevendedor=${isRevendedor}"/>"
 			method="post">
 			<input type="hidden" value="${cliente.id}" name="idCliente" />
 			<div class="label condicional">Comentário:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="comentario" name="comentario"
-					value="${comentario}" style="width: 100%" />
+				<input type="text" id="comentario" name="comentario" value="${comentario}" style="width: 100%" />
 			</div>
 
 			<div class="bloco_botoes">
 				<c:if test="${acessoInclusaoPermitido}">
-					<a id="botaoIncluirComentario"
-						title="Adicionar Dados do Comentario" class="botaoAdicionar"></a>
-					<a id="botaoLimparComentario" title="Limpar Dados do Comentario"
-						class="botaoLimpar"></a>
+					<a id="botaoIncluirComentario" title="Adicionar Dados do Comentario" class="botaoAdicionar"></a>
+					<a id="botaoLimparComentario" title="Limpar Dados do Comentario" class="botaoLimpar"></a>
 				</c:if>
 			</div>
 
 		</form>
-
 		<div class="label condicional">Histórico:</div>
 		<div class="input areatexto" style="width: 80%">
 			<textarea style="width: 100%;" disabled="disabled">
@@ -265,17 +259,20 @@ function remover(codigo, nome) {
 				</textarea>
 		</div>
 	</fieldset>
+	</c:if>
+	
+	<jsp:include page="/bloco/bloco_contato.jsp" />
 	<jsp:include page="/bloco/bloco_logradouro.jsp" />
 	<jsp:include page="/bloco/bloco_picklist.jsp" />
-	<jsp:include page="/bloco/bloco_contato.jsp" />
+	
 
 	<div class="bloco_botoes">
 		<c:if test="${acessoInclusaoPermitido}">
-			<a id="botaoInserirCliente" title="Incluir Dados do Cliente"
-				class="botaoInserir"></a>
+			<a id="botaoInserirCliente" title="${isRevendedor ? 'Definir como Revendedor' :'Incluir Dados do Cliente'}" class="botaoInserir"></a>
 		</c:if>
 	</div>
 
+	<c:if test="${not isRevendedor}">
 	<a id="rodape"></a>
 	<fieldset>
 		<legend>::: Resultado da Pesquisa de Clientes :::</legend>
@@ -285,7 +282,6 @@ function remover(codigo, nome) {
 			<table class="listrada">
 				<thead>
 					<tr>
-						<th style="width: 5%">Prospectado</th>
 						<th style="width: 25%">Nome</th>
 						<th style="width: 20%">Email</th>
 						<th style="width: 10%">CNPJ</th>
@@ -298,9 +294,6 @@ function remover(codigo, nome) {
 				<tbody>
 					<c:forEach var="cliente" items="${listaCliente}">
 						<tr>
-							<td><c:if test="${cliente.prospeccaoFinalizada}">
-									<div class="flagOK"></div>
-								</c:if></td>
 							<td>${cliente.nomeFantasia}</td>
 							<td>${cliente.email}</td>
 							<td>${cliente.cnpj}</td>
@@ -323,6 +316,7 @@ function remover(codigo, nome) {
 			</table>
 		</div>
 	</fieldset>
+	</c:if>
 </body>
 </html>
 

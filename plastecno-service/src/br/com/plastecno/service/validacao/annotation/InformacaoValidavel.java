@@ -21,6 +21,6 @@ public @interface InformacaoValidavel {
 	int tamanho() default -1;
 	TipoDocumento tipoDocumento() default TipoDocumento.NAO_EH_DOCUMENTO;
 	boolean validarHierarquia() default false;
-	boolean valorNaoNegativo() default true;
-	boolean valorNegativo() default true;
+	boolean estritamentePositivo() default false;
+	boolean positivo() default false;
 }

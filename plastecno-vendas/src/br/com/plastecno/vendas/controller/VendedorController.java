@@ -89,16 +89,6 @@ public class VendedorController extends AbstractController {
         addAtributo("vendedor", filtro);
     }
 
-    @Get("vendedor/listagem/nome")
-    public void pesquisarVendedorByNome(String nome) {
-        List<Autocomplete> lista = new ArrayList<Autocomplete>();
-        List<Usuario> listaVendedor = usuarioService.pesquisarVendedorByNome(nome);
-        for (Usuario vendedor : listaVendedor) {
-            lista.add(new Autocomplete(vendedor.getId(), vendedor.getNome()));
-        }
-        serializarJson(new SerializacaoJson("lista", lista));
-    }
-
     @Get("vendedor/edicao")
     public void pesquisarVendedor(Integer idVendedor) {
         Usuario vendedor = this.usuarioService.pesquisarById(idVendedor);
@@ -106,7 +96,6 @@ public class VendedorController extends AbstractController {
             this.gerarListaMensagemErro("Vendedor não existe no sistema");
         } else {
             vendedor.setCpf(formatarCPF(vendedor.getCpf()));
-            vendedor.addRemuneracao(this.usuarioService.pesquisarRemuneracaoById(idVendedor));
             addAtributo("vendedor", vendedor);
 
             try {
@@ -117,6 +106,16 @@ public class VendedorController extends AbstractController {
             }
         }
         irTopoPagina();
+    }
+
+    @Get("vendedor/listagem/nome")
+    public void pesquisarVendedorByNome(String nome) {
+        List<Autocomplete> lista = new ArrayList<Autocomplete>();
+        List<Usuario> listaVendedor = usuarioService.pesquisarVendedorByNome(nome);
+        for (Usuario vendedor : listaVendedor) {
+            lista.add(new Autocomplete(vendedor.getId(), vendedor.getNome()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
     }
 
     @Get("vendedor")

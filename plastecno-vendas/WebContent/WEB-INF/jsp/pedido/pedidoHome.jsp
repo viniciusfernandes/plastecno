@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 
@@ -10,6 +11,7 @@
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
@@ -19,7 +21,6 @@
 <script type="text/javascript" src="<c:url value="/js/pedido/pedido.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 
 <style type="text/css">
 .listrada td:last-child form input:first-child {
@@ -33,14 +34,11 @@ $(document).ready(function() {
 	scrollTo('${ancora}');
 
 	inicializarAutomcompleteMaterial('<c:url value="/pedido/material"/>');
-
+	// inicializarAutocompleteDescricaoPeca('<c:url value="/estoque/descricaopeca"/>');
+	
 	habilitar('#bloco_item_pedido #descricao', false);
 	habilitar('#bloco_item_pedido #aliquotaIPI', <c:out value="${not empty pedido and pedido.representada.IPIHabilitado}"/>);
 	
-	$("#botaoLimpar").click(function() {
-		$('#formVazio').submit();
-	});
-
 	var urlInclusaoPedido = '<c:url value="/pedido/inclusao"/>';
 	var urlInclusaoItemPedido = '<c:url value="/pedido/item/inclusao"/>';
 	$("#botaoInserirPedido").click(function() {
@@ -58,13 +56,13 @@ $(document).ready(function() {
 			return;
 		} 
 		var form = $('#formVazio'); 
-		form.attr('action', '<c:url value="/pedido/'+numeroPedido+'"/>');
+		form.attr('action', '<c:url value="/pedido/'+numeroPedido+'?tipoPedido=${tipoPedido}"/>');
 		form.submit();
 		
 	});
 
 	$("#representada").change(function() {
-		habilitarIPI($(this).val());	
+		habilitarIPI('<c:url value="/pedido"/>', $(this).val());	
 	});
 	
 	$("#botaoImpressaoPedido").click(function() {
@@ -86,11 +84,10 @@ $(document).ready(function() {
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
-	inserirMascaraNumerica('quantidade', '9999999');
 	inserirMascaraNumerica('numeroPedidoPesquisa', '9999999');
 	inserirMascaraMonetaria('precoVenda', 7);
 	inserirMascaraNumerica('ipi', '99');
-	
+	inserirMascaraNumerica('quantidade', '9999999');
 	inserirMascaraMonetaria('comprimento', 8);
 	inserirMascaraMonetaria('medidaExterna', 8);
 	inserirMascaraMonetaria('medidaInterna', 8);
@@ -114,7 +111,8 @@ $(document).ready(function() {
 		}
 	});
 
-	habilitar('#nomeCliente', <c:out value="${empty pedido.id}"/>);
+	// A segunda condicao verifica quando o pedido eh do tipo de compra
+	habilitar('#nomeCliente', <c:out value="${empty pedido.id and empty tipoPedido}"/>);
 	habilitar('#numeroPedidoPesquisa', <c:out value="${empty pedido.id}"/>);
 	habilitar('#representada', <c:out value="${empty pedido.id or not contemItem}"/>);
 	habilitar('#bloco_item_pedido #ipi', <c:out value="${not ipiDesabilitado}"/>);
@@ -148,7 +146,6 @@ $(document).ready(function() {
 	});
 });
 
-
 </script>
 
 </head>
@@ -156,43 +153,44 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 
-	<form id="formVazio" action="pedido" method="get"></form>
+	<form id="formVazio" action="pedido" method="get">
+		<input type="hidden" name="tipoPedido" value="${tipoPedido}" />
+	</form>
 
-	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>"
-		method="post">
+	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>" method="post">
 		<fieldset>
-			<legend>::: Dados do Pedido :::</legend>
+			<legend>::: Dados do Pedido de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 
 			<!-- O campo id do pedido eh hidden pois o input text nao eh enviado na edicao do formulario pois esta "disabled" -->
-			<input type="hidden" id="numeroPedido" name="pedido.id"
-				value="${pedido.id}" /> <input type="hidden" id="idCliente"
-				name="pedido.cliente.id" value="${cliente.id}" /> <input
-				type="hidden" id="idVendedor" name="pedido.vendedor.id"
-				value="${vendedor.id}" /> <input type="hidden" id="idRepresentada"
-				name="pedido.representada.id" value="${representadaSelecionada.id}" />
+			<input type="hidden" id="numeroPedido" name="pedido.id" value="${pedido.id}" /> 
+			<input type="hidden" id="idCliente" name="pedido.cliente.id" value="${cliente.id}" /> 
+			<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${proprietario.id}" /> 
+			<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${representadaSelecionada.id}" />
+			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
 
-			<div class="label">Vendedor:</div>
+			
+			<div class="label">${not empty tipoPedido ? 'Comprador:': 'Vendedor:'}</div>
 			<div class="input" style="width: 40%">
-				<input type="text" id="vendedor" name="vendedor.nome"
-					value="${vendedor.nome} - ${vendedor.email}" disabled="disabled"
+				<input type="text" id="proprietario" name="proprietario.nome"
+					value="${proprietario.nome} - ${proprietario.email}" disabled="disabled"
 					class="uppercaseBloqueado desabilitado" />
 			</div>
+			<!-- Verificamos se o tipo de pedido foi preenchido pois pedido de compra nao tera orcamento -->
 			<c:choose>
-				<c:when test="${not pedidoDesabilitado}">
+				<c:when test="${empty tipoPedido and not pedidoDesabilitado}">
 					<div class="label" style="width: 10%">Orçamento:</div>
 					<div class="input" style="width: 30%">
 						<input type="checkbox" id="orcamento" name="pedido.orcamento"
 							<c:if test="${pedido.orcamento}">checked</c:if> class="checkbox" />
 					</div>
 				</c:when>
-				<c:otherwise>
+				<c:when test="${not empty tipoPedido or pedidoDesabilitado}">
 					<div class="label" style="width: 10%">Situação:</div>
 					<div class="input" style="width: 20%">
-						<input type="text" id="situacaoPedido"
-							name="pedido.situacaoPedido"
-							value="${pedido.situacaoPedido.descricao}" />
+						<input type="text" id="situacaoPedido" name="pedido.situacaoPedido"
+							value="${pedido.situacaoPedido}" class="desabilitado"/>
 					</div>
-				</c:otherwise>
+				</c:when>
 			</c:choose>
 
 			<div class="label">Nr. Pedido:</div>
@@ -236,10 +234,8 @@ $(document).ready(function() {
 			</div>
 			<div class="label obrigatorio">Cliente:</div>
 			<div class="input" style="width: 30%">
-				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}"
-					class="pesquisavel" />
-				<div class="suggestionsBox" id="containerPesquisaCliente"
-					style="display: none; width: 50%"></div>
+				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}" class="pesquisavel" />
+				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			<div class="label">Receber Email Ped.:</div>
 			<div class="input" style="width: 30%">
@@ -275,7 +271,7 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio" style="width: 11%">Representada:</div>
+			<div class="label obrigatorio" style="width: 11%">${not empty tipoPedido ? 'Fornecedor:': 'Representada:'}</div>
 			<div class="input" style="width: 50%">
 				<select id="representada" name="pedido.representada.id"
 					style="width: 80%">
@@ -339,30 +335,32 @@ $(document).ready(function() {
 	</form>
 	<div class="bloco_botoes">
 		<form id="formPesquisa" action="pedido/listagem" method="get">
+			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 			<input type="hidden" name="idCliente" id="idClientePesquisa" value="${cliente.id}" /> 
 			<input type="submit" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
 		</form>
-		<form action="pedido" method="get">
-			<input type="submit" value="" title="Limpar Dados do Pedido"
-				class="botaoLimpar" />
+		<form action="pedido/limpar" method="get">
+			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
+			<input type="submit" value="" title="Limpar Dados do Pedido" class="botaoLimpar" />
 		</form>
 		<form action="pedido/pdf" method="get">
+			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}" /> 
 			<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF" />
 		</form>
 
 		<c:if test="${acessoRefazerPedidoPermitido}">
 			<form action="pedido/refazer" method="post">
+				<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
 				<input type="hidden" name="idPedido" id="idPedido" value="${pedido.id}" /> 
 				<input id="botaoRefazerPedido" type="button" value="" title="Refazer Pedido" class="botaoRefazer" />
 			</form>
 		</c:if>
 		<c:if test="${acessoCancelamentoPedidoPermitido}">
 			<form action="pedido/cancelamento" method="post">
-				<input type="hidden" name="idPedido" id="idPedidoCancelamento"
-					value="${pedido.id}" /> <input id="botaoCancelarPedido"
-					type="button" value="" title="Cancelar Pedido"
-					class="botaoCancelar" />
+				<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
+				<input type="hidden" name="idPedido" id="idPedidoCancelamento" value="${pedido.id}" /> 
+				<input id="botaoCancelarPedido" type="button" value="" title="Cancelar Pedido" class="botaoCancelar" />
 			</form>
 		</c:if>
 	</div>
@@ -370,41 +368,36 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_contato.jsp" />
 
 	<div class="bloco_botoes">
-		<c:if test="${not pedidoDesabilitado and acessoVendaPermitida}">
-			<a id="botaoInserirPedido" title="Incluir Dados do Pedido"
-				class="botaoInserir"></a>
+		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">
+			<a id="botaoInserirPedido" title="Incluir Dados do Pedido" class="botaoInserir"></a>
 		</c:if>
 	</div>
 	<jsp:include page="/bloco/bloco_item_pedido.jsp" />
 
-	<form id="formEnvioPedido" action="<c:url value="/pedido/envio"/>"
-		method="post">
+	<form id="formEnvioPedido" action="<c:url value="/pedido/envio"/>" method="post">
+		<input type="hidden" name="tipoPedido" value="${tipoPedido}"/>
 		<div class="bloco_botoes">
-
-			<input type="button" id="botaoEnviarPedido"
-				title="Enviar Dados do Pedido" value=""
-				class="botaoEnviarEmail"
-				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> />
-			<input type="hidden" id="idPedido" name="idPedido"
-				value="${pedido.id}" />
-
+			<input type="button" id="botaoEnviarPedido" title="Enviar Dados do Pedido" value="" class="botaoEnviarEmail"
+				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> 
+			/>
+			<input type="hidden" id="idPedido" name="idPedido" value="${pedido.id}" />
 		</div>
 	</form>
 
 	<a id="rodape"></a>
 	<fieldset>
-		<legend>::: Resultado da Pesquisa de Pedidos :::</legend>
+		<legend>::: Resultado da Pesquisa de Pedidos de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 		<div id="paginador"></div>
 		<div>
 			<table class="listrada">
 				<thead>
 					<tr>
 						<th style="width: 10%">Situação</th>
-						<th style="width: 9%">Nr. Pedido</th>
-						<th style="width: 11%">Nr. Pedido Cliente</th>
-						<th style="width: 33%">Cliente / Vendedor</th>
+						<th style="width: 10%">Nr. Pedido</th>
+						<th style="width: 10%">Nr. Pedido Cliente</th>
+						<th style="width: 23%">${not empty tipoPedido ? 'Fornecedor': 'Representada'}</th>
+						<th style="width: 22%">Vendedor</th>
 						<th style="width: 10%">Data Incl.</th>
-						<th style="width: 12%; text-align: center">CNPJ/CPF</th>
 						<th style="width: 8%">Valor (R$)</th>
 						<th style="width: 7%">Ações</th>
 					</tr>
@@ -413,25 +406,23 @@ $(document).ready(function() {
 				<tbody>
 					<c:forEach var="pedido" items="${listaPedido}">
 						<tr>
-							<td style="text-align: center;">${pedido.situacaoPedido}</td>
+							<td style="text-align: center;">${pedido.situacaoPedido.descricao}</td>
 							<td>${pedido.id}</td>
 							<td>${pedido.numeroPedidoCliente}</td>
-							<td>${pedido.cliente.nomeFantasia}/
-								${pedido.vendedor.nomeCompleto}</td>
+							<td>${pedido.representada.nomeFantasia}</td>
+							<td>${pedido.proprietario.nomeCompleto}</td>
 							<td style="text-align: center;">${pedido.dataInclusaoFormatada}</td>
-							<td>${pedido.cliente.documento}</td>
 							<td style="text-align: right;">${pedido.valorPedido}</td>
 							<td>
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/pedido/pdf"/>">
-										<input type="hidden" name="idPedido" value="${pedido.id}" /> <input
-											type="submit" value="" title="Visualizar Pedido PDF"
-											class="botaoPdf_16 botaoPdf_16_centro" />
+										<input type="hidden" name="tipoPedido" value="${pedido.tipoPedido}" /> 
+										<input type="hidden" name="idPedido" value="${pedido.id}" />
+										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
 									</form>
-									<form action="<c:url value="/pedido/${pedido.id}"/>"
-										method="get">
-										<input type="submit" id="botaoEditarPedido"
-											title="Editar Dados do Pedido" value="" class="botaoEditar" />
+									<form action="<c:url value="/pedido/${pedido.id}"/>" method="get">
+										<input type="hidden" name="tipoPedido" value="${pedido.tipoPedido}" /> 
+										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
 										<input type="hidden" name="id" value="${pedido.id}" />
 									</form>
 								</div>

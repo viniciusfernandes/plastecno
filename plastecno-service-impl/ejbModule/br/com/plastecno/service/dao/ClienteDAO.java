@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.impl.util.QueryUtil;
@@ -13,6 +14,10 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 
 	public ClienteDAO(EntityManager entityManager) {
 		super(entityManager);
+	}
+
+	public void alterarTipoCliente(Integer idCliente, TipoCliente tipoCliente) {
+		super.alterarPropriedade(Cliente.class, idCliente, "tipoCliente", tipoCliente);
 	}
 
 	public boolean isEmailExistente(Integer idCliente, String email) {
@@ -30,9 +35,12 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 		return QueryUtil.gerarRegistroUnico(query, Long.class, 0L) > 1;
 	}
 
+	public boolean isRevendedorExistente(Integer id) {
+		return isEntidadeExistente(Cliente.class, id, "tipoCliente", TipoCliente.REVENDEDOR);
+	}
+
 	public Cliente pesquisarById(Integer id) {
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery("select c from Cliente c where c.id = :id")
-				.setParameter("id", id), Cliente.class, null);
+		return super.pesquisarById(Cliente.class, id);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -43,6 +51,13 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 
 	}
 
+	public Cliente pesquisarClienteResumidoById(Integer idCliente) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select new Cliente(c.id, c.nomeFantasia, c.razaoSocial) from Cliente c where c.id = :idCliente")
+						.setParameter("idCliente", idCliente), Cliente.class, null);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
 		StringBuilder select = new StringBuilder().append("select l from Cliente c ")
@@ -51,4 +66,16 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 		return this.entityManager.createQuery(select.toString()).setParameter("idCliente", idCliente).getResultList();
 	}
 
+	public String pesquisarNomeFantasia(Integer idCliente) {
+		return super.pesquisarCampoById(Cliente.class, idCliente, "nomeFantasia", String.class);
+	}
+
+	public Cliente pesquisarRevendedor() {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Cliente(c.id, c.nomeFantasia, c.razaoSocial) from Cliente c where c.tipoCliente = :tipoCliente")
+								.setParameter("tipoCliente", TipoCliente.REVENDEDOR), Cliente.class, null);
+	}
 }

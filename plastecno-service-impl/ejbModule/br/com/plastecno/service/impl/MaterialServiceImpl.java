@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.persistence.EntityManager;
@@ -106,6 +108,20 @@ public class MaterialServiceImpl implements MaterialService {
 		return material.getId() != null ? materialDAO.alterar(material).getId() : materialDAO.inserir(material).getId();
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean isMaterialAssociadoRepresentada(Integer idMaterial, Integer idRepresentada) {
+		return materialDAO.isMaterialAssociadoRepresentada(idMaterial, idRepresentada);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean isMaterialExistente(Integer idMaterial) {
+		return pesquisarById(idMaterial) != null;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isMaterialExistente(String sigla, Integer idMaterial) {
 		return materialDAO.isEntidadeExistente(Material.class, idMaterial, "sigla", sigla);
 	}
@@ -144,14 +160,19 @@ public class MaterialServiceImpl implements MaterialService {
 		return materialDAO.pesquisarById(id);
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
+	public List<Material> pesquisarBySigla(String sigla) {
+		return materialDAO.pesquisarBySigla(sigla);
+	}
+
 	@Override
 	public List<Material> pesquisarBySigla(String sigla, Integer idRepresentada) {
-		Query query = this.entityManager
-				.createQuery("select new Material(m.id, m.sigla, m.descricao) from Material m inner join m.listaRepresentada r where r.id = :idRepresentada and m.sigla like :sigla order by m.sigla ");
-		query.setParameter("sigla", "%" + sigla + "%");
-		query.setParameter("idRepresentada", idRepresentada);
-		return query.getResultList();
+		return materialDAO.pesquisarBySigla(sigla, idRepresentada);
+	}
+
+	@Override
+	public List<Material> pesquisarMaterialAtivoBySigla(String sigla, Integer idRepresentada) {
+		return materialDAO.pesquisarBySigla(sigla, idRepresentada, true);
 	}
 
 	@SuppressWarnings("unchecked")

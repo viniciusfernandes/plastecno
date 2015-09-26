@@ -12,12 +12,13 @@ public class CalculadoraPreco {
 	public static double calcular(ItemPedido itemPedido) throws AlgoritmoCalculoException {
 		validarCalculo(itemPedido);
 
-		AlgoritmoCalculo algoritmoCalculo = mapaAlgoritmo.get(itemPedido.getTipoVenda());
-		if (algoritmoCalculo == null) {
-			throw new AlgoritmoCalculoException("Não existe algoritmo para o cálculo do valor do tipo de venda "
-					+ itemPedido.getTipoVenda());
+		AlgoritmoCalculo algoritmoCalculoPreco = mapaAlgoritmoPreco.get(itemPedido.getTipoVenda());
+		if (algoritmoCalculoPreco == null) {
+			String mensagem = itemPedido.getTipoVenda() == null ? "O tipo de venda esta em branco. Selecione um tipo de venda"
+					: "Não existe algoritmo para o cálculo do valor do tipo de venda " + itemPedido.getTipoVenda();
+			throw new AlgoritmoCalculoException(mensagem);
 		}
-		return algoritmoCalculo.calcular(itemPedido);
+		return algoritmoCalculoPreco.calcular(itemPedido);
 	}
 
 	public static double calcularPorUnidade(ItemPedido itemPedido) throws AlgoritmoCalculoException {
@@ -29,7 +30,7 @@ public class CalculadoraPreco {
 		CalculadoraPreco.validarCalculoIPI(itemPedido);
 
 		if (aliquotaIPI == null) {
-			aliquotaIPI = itemPedido.getFormaMaterial().getIpi();
+			aliquotaIPI = 0d;
 		}
 		return calcularPorUnidade(itemPedido) * (1 + aliquotaIPI);
 	}
@@ -53,11 +54,11 @@ public class CalculadoraPreco {
 		}
 	}
 
-	private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgoritmo;
+	private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgoritmoPreco;
 
 	static {
-		mapaAlgoritmo = new HashMap<TipoVenda, AlgoritmoCalculo>();
-		mapaAlgoritmo.put(TipoVenda.KILO, new AlgoritmoCalculoPrecoKilo());
-		mapaAlgoritmo.put(TipoVenda.PECA, new AlgoritmoCalculoPrecoPeca());
+		mapaAlgoritmoPreco = new HashMap<TipoVenda, AlgoritmoCalculo>();
+		mapaAlgoritmoPreco.put(TipoVenda.KILO, new AlgoritmoCalculoPrecoKilo());
+		mapaAlgoritmoPreco.put(TipoVenda.PECA, new AlgoritmoCalculoPrecoPeca());
 	}
 }

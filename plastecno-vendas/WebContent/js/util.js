@@ -206,11 +206,30 @@ function serializar(listaCampos) {
 };
 
 function serializarBloco(idBloco) {
+	return serializarBlocoDisabled(idBloco, true);
+};
+
+function serializarBlocoDisabled(idBloco, verificarDisabled) {
 	var parametros = '';
-	$('#'+idBloco+' :input').each(function () {
-		parametros += '&'+this.name+"="+this.value;
+	idBloco = '#'+idBloco;
+	var inputs = $(idBloco+' :input[type=text], '+idBloco+' select, '+ idBloco+' :input[type=radio], '+ idBloco+' :input[type=checkbox], '+ idBloco+' :input[type=hidden]');
+	var valor = false;
+	var preenchido = 
+	$(inputs).each(function () {
+		preenchido = !isEmpty(this.value) && !isEmpty(this.name);
+		if(verificarDisabled && preenchido && !$(this).attr('disabled')){
+						    
+			if($(this).is(":checkbox")) {
+				valor = $(this).is(':checked');
+			} else {
+				valor = this.value;
+			}
+			parametros += '&'+this.name+"="+valor;
+		}
+		else if(preenchido){
+			parametros += '&'+this.name+"="+this.value;
+		}
 	});
-	 
 	return parametros;
 };
 
@@ -316,3 +335,18 @@ function gerarListaParametroId (listaId, nomeLista){
 	}
 	return parametros;
 };
+
+function submeterForm(botao){
+	var parametros = $('#formPesquisa').serialize();
+	var form = $(botao).closest('form');
+	var action = $(form).attr('action')+'?'+parametros;
+	$(form).attr('action', action).submit();
+};
+
+function serializarForm(idForm){
+	return $("#"+idForm+" :input[value!='']").serialize();
+}
+
+function serializarFormPesquisa(){
+	return serializarBloco('formPesquisa');
+}

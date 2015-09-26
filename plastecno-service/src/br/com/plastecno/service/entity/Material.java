@@ -23,15 +23,12 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Table(name = "tb_material", schema = "vendas")
 @InformacaoValidavel
 public class Material implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 9196522865218486979L;
+
 	@Id
 	@SequenceGenerator(name = "materialSequence", sequenceName = "vendas.seq_material_id", initialValue = 1, allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "materialSequence")
 	private Integer id;
-
 	private boolean ativo = true;
 
 	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 10 }, nomeExibicao = "Sigla do Material")
@@ -76,6 +73,7 @@ public class Material implements Serializable {
 			setListaRepresentada(new ArrayList<Representada>());
 		}
 		this.listaRepresentada.add(representada);
+		representada.setMaterial(this);
 	}
 
 	public void clearListaRepresentada() {
@@ -84,8 +82,17 @@ public class Material implements Serializable {
 		}
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Material && id != null && id.equals(((Material) o).id);
+	}
+
 	public String getDescricao() {
 		return descricao;
+	}
+
+	public String getDescricaoFormatada() {
+		return descricao == null ? sigla : sigla + " - " + descricao;
 	}
 
 	public Integer getId() {
@@ -102,6 +109,11 @@ public class Material implements Serializable {
 
 	public String getSigla() {
 		return sigla;
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id : -1;
 	}
 
 	public boolean isAtivo() {
@@ -134,6 +146,13 @@ public class Material implements Serializable {
 
 	public void setPesoEspecifico(Double pesoEspecifico) {
 		this.pesoEspecifico = pesoEspecifico;
+	}
+
+	public void setRepresentada(Representada representada) {
+		if (listaRepresentada == null) {
+			setListaRepresentada(new ArrayList<Representada>());
+		}
+		listaRepresentada.add(representada);
 	}
 
 	public void setSigla(String sigla) {

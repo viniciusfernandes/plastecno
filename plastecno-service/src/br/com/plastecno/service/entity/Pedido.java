@@ -29,6 +29,7 @@ import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
@@ -40,52 +41,89 @@ public class Pedido implements Serializable, Cloneable {
 	 */
 	private static final long serialVersionUID = -7474382741231270790L;
 
-	@Id
-	@SequenceGenerator(name = "pedidoSequence", sequenceName = "vendas.seq_pedido_id", allocationSize = 1, initialValue = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pedidoSequence")
-	private Integer id;
-
-	@Column(name = "numero_pedido_cliente")
-	private String numeroPedidoCliente;
-
-	@Temporal(TemporalType.DATE)
-	@Column(name = "data_inclusao")
-	private Date dataInclusao;
-
-	@Temporal(TemporalType.DATE)
-	@Column(name = "data_envio")
-	private Date dataEnvio;
-
-	@Temporal(TemporalType.DATE)
-	@Column(name = "data_entrega")
-	private Date dataEntrega;
-
-	@InformacaoValidavel(intervalo = { 0, 800 }, nomeExibicao = "Observacao do pedido")
-	private String observacao;
-	/*
-	 * Atributo criado para usar em relatorios evitando o calculo do pedido
-	 */
-	@Column(name = "valor_pedido")
-	private Double valorPedido;
-
-	@Column(name = "valor_pedido_ipi")
-	private Double valorPedidoIPI;
-
-	@Column(name = "forma_pagamento")
-	private String formaPagamento;
-
-	@Column(name = "cliente_notificado_venda")
-	private boolean clienteNotificadoVenda = false;
+	@Column(name = "aliquota_comissao")
+	private Double aliquotaComissao;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_cliente")
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Cliente do pedido")
 	private Cliente cliente;
 
+	@Column(name = "cliente_notificado_venda")
+	private boolean clienteNotificadoVenda = false;
+
+	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
+	@JoinColumn(name = "id_contato")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Contato do pedido")
+	private Contato contato;
+
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_entrega")
+	private Date dataEntrega;
+
+	@Transient
+	private String dataEntregaFormatada;
+
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_envio")
+	private Date dataEnvio;
+
+	@Transient
+	private String dataEnvioFormatada;
+
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_inclusao")
+	private Date dataInclusao;
+
+	@Transient
+	private String dataInclusaoFormatada;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "id_finalidade_pedido")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Finalidade do pedido")
+	private FinalidadePedido finalidadePedido;
+
+	@Column(name = "forma_pagamento")
+	private String formaPagamento;
+
+	@Id
+	@SequenceGenerator(name = "pedidoSequence", sequenceName = "vendas.seq_pedido_id", allocationSize = 1, initialValue = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pedidoSequence")
+	private Integer id;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+	@JoinTable(name = "tb_pedido_tb_logradouro", schema = "vendas", joinColumns = { @JoinColumn(name = "id_pedido", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_logradouro", referencedColumnName = "id") })
+	private List<Logradouro> listaLogradouro;
+
+	@Column(name = "numero_pedido_cliente")
+	private String numeroPedidoCliente;
+
+	@InformacaoValidavel(intervalo = { 0, 799 }, nomeExibicao = "Observação do pedido")
+	private String observacao;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_proprietario")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor/Comprador do pedido")
+	private Usuario proprietario;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_representada")
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Representada do pedido")
 	private Representada representada;
+
+	@Column(name = "id_situacao_pedido")
+	@Enumerated(EnumType.ORDINAL)
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Situacao do pedido")
+	private SituacaoPedido situacaoPedido;
+
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "id_tipo_entrega")
+	private TipoEntrega tipoEntrega;
+
+	@Column(name = "id_tipo_pedido")
+	@Enumerated(EnumType.ORDINAL)
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo do pedido")
+	private TipoPedido tipoPedido;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_transportadora")
@@ -97,50 +135,80 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(nomeExibicao = "Redespacho do pedido")
 	private Transportadora transportadoraRedespacho;
 
-	@Enumerated(EnumType.ORDINAL)
-	@Column(name = "id_tipo_entrega")
-	private TipoEntrega tipoEntrega;
-
-	@Column(name = "id_situacao_pedido")
-	@Enumerated(EnumType.ORDINAL)
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Situacao do pedido")
-	private SituacaoPedido situacaoPedido;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_vendedor")
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor do pedido")
-	private Usuario vendedor;
-
-	@Enumerated(EnumType.STRING)
-	@Column(name = "id_finalidade_pedido")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Finalidade do pedido")
-	private FinalidadePedido finalidadePedido;
-
-	@OneToOne(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
-	@JoinColumn(name = "id_contato")
-	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Contato do pedido")
-	private Contato contato;
-
-	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
-	@JoinTable(name = "tb_pedido_tb_logradouro", schema = "vendas", joinColumns = { @JoinColumn(name = "id_pedido", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_logradouro", referencedColumnName = "id") })
-	private List<Logradouro> listaLogradouro;
-
-	@Transient
-	private String dataInclusaoFormatada;
-
-	@Transient
-	private String dataEnvioFormatada;
-
-	@Transient
-	private String dataEntregaFormatada;
+	/*
+	 * Atributo criado para usar em relatorios evitando o calculo do pedido
+	 */
+	@Column(name = "valor_pedido")
+	private Double valorPedido;
 
 	@Transient
 	private String valorPedidoFormatado;
 
+	@Column(name = "valor_pedido_ipi")
+	private Double valorPedidoIPI;
+
 	@Transient
 	private String valorPedidoIPIFormatado;
 
+	public Pedido() {
+	}
+
+	public Pedido(Integer id) {
+		this.id = id;
+	}
+
+	public Pedido(Integer id, Date dataEnvio, Double valorPedido, String razaoSocialCliente) {
+		this.id = id;
+		this.dataEnvio = dataEnvio;
+		this.valorPedido = valorPedido;
+
+		this.cliente = new Cliente();
+		this.cliente.setRazaoSocial(razaoSocialCliente);
+	}
+
+	public Pedido(Integer id, Date dataEnvio, Double valorPedido, String nomeFantasiaCliente, String nomeProprietario) {
+		this.id = id;
+		this.dataEnvio = dataEnvio;
+		this.valorPedido = valorPedido;
+
+		this.cliente = new Cliente();
+		this.cliente.setNomeFantasia(nomeFantasiaCliente);
+
+		this.proprietario = new Usuario();
+		this.proprietario.setNome(nomeProprietario);
+	}
+
+	public Pedido(Integer id, Date dataEntrega, Double valorPedido, String nomeFantasiaCliente,
+			String razaoSocialCliente, String nomeFantasiaRepresentada) {
+		this.id = id;
+		this.dataEntrega = dataEntrega;
+		this.valorPedido = valorPedido;
+
+		this.cliente = new Cliente();
+		this.cliente.setNomeFantasia(nomeFantasiaCliente);
+		this.cliente.setRazaoSocial(razaoSocialCliente);
+
+		this.representada = new Representada();
+		this.representada.setNomeFantasia(nomeFantasiaRepresentada);
+	}
+
+	public Pedido(Integer id, TipoPedido tipoPedido, Date dataEntrega, Date dataEnvio, Double valorPedido,
+			String nomeFantasiaCliente, String razaoSocialCliente, String nomeFantasiaRepresentada) {
+		this(id, tipoPedido, dataEntrega, valorPedido, nomeFantasiaCliente, razaoSocialCliente, nomeFantasiaRepresentada);
+		this.dataEnvio = dataEnvio;
+	}
+
+	public Pedido(Integer id, TipoPedido tipoPedido, Date dataEntrega, Double valorPedido, String nomeFantasiaCliente,
+			String razaoSocialCliente, String nomeFantasiaRepresentada) {
+		this(id, dataEntrega, valorPedido, nomeFantasiaCliente, razaoSocialCliente, nomeFantasiaRepresentada);
+		this.tipoPedido = tipoPedido;
+	}
+
 	public void addLogradouro(List<? extends Logradouro> listaLogradouro) {
+		if (listaLogradouro == null || listaLogradouro.isEmpty()) {
+			return;
+		}
+		
 		for (Logradouro logradouro : listaLogradouro) {
 			this.addLogradouro(logradouro);
 		}
@@ -162,8 +230,21 @@ public class Pedido implements Serializable, Cloneable {
 		return (Pedido) super.clone();
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Pedido && id != null && id.equals(((Pedido) o).id);
+	}
+
+	public Double getAliquotaComissao() {
+		return aliquotaComissao;
+	}
+
 	public Cliente getCliente() {
 		return cliente;
+	}
+
+	public Usuario getComprador() {
+		return proprietario;
 	}
 
 	public Contato getContato() {
@@ -222,6 +303,10 @@ public class Pedido implements Serializable, Cloneable {
 		return observacao;
 	}
 
+	public Usuario getProprietario() {
+		return proprietario;
+	}
+
 	public Representada getRepresentada() {
 		return representada;
 	}
@@ -232,6 +317,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public TipoEntrega getTipoEntrega() {
 		return tipoEntrega;
+	}
+
+	public TipoPedido getTipoPedido() {
+		return tipoPedido;
 	}
 
 	public Transportadora getTransportadora() {
@@ -259,11 +348,29 @@ public class Pedido implements Serializable, Cloneable {
 	}
 
 	public Usuario getVendedor() {
-		return vendedor;
+		return proprietario;
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id : -1;
 	}
 
 	public boolean isClienteNotificadoVenda() {
 		return this.clienteNotificadoVenda;
+	}
+
+	public boolean isCompra() {
+		return TipoPedido.COMPRA.equals(tipoPedido);
+	}
+
+	public boolean isCompraEfetuada() {
+		return SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)
+				|| SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido);
+	}
+
+	public boolean isCompraAndamento() {
+		return SituacaoPedido.COMPRA_ANDAMENTO.equals(this.situacaoPedido);
 	}
 
 	public boolean isEnviado() {
@@ -274,12 +381,45 @@ public class Pedido implements Serializable, Cloneable {
 		return SituacaoPedido.ORCAMENTO.equals(this.situacaoPedido);
 	}
 
+	public boolean isRepresentacao() {
+		return TipoPedido.REPRESENTACAO.equals(tipoPedido);
+	}
+
+	public boolean isRevenda() {
+		return TipoPedido.REVENDA.equals(tipoPedido);
+	}
+
+	public boolean isRevendaEfetuada() {
+		return isRevenda() && !SituacaoPedido.CANCELADO.equals(situacaoPedido);
+	}
+
+	public boolean isItemAguardandoMaterial() {
+		return TipoPedido.REVENDA.equals(tipoPedido) && SituacaoPedido.ITEM_AGUARDANDO_MATERIAL.equals(situacaoPedido);
+	}
+
+	public boolean isVenda() {
+		return isRevenda() || isRepresentacao();
+	}
+
+	public boolean isVendaEfetuada() {
+		return isRepresentacao() && !SituacaoPedido.CANCELADO.equals(situacaoPedido)
+				&& SituacaoPedido.ENVIADO.equals(situacaoPedido);
+	}
+
+	public void setAliquotaComissao(Double aliquotaComissao) {
+		this.aliquotaComissao = aliquotaComissao;
+	}
+
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}
 
 	public void setClienteNotificadoVenda(boolean clienteNotificadoVenda) {
 		this.clienteNotificadoVenda = clienteNotificadoVenda;
+	}
+
+	public void setComprador(Usuario comprador) {
+		proprietario = comprador;
 	}
 
 	public void setContato(Contato contato) {
@@ -340,6 +480,10 @@ public class Pedido implements Serializable, Cloneable {
 		}
 	}
 
+	public void setProprietario(Usuario proprietario) {
+		this.proprietario = proprietario;
+	}
+
 	public void setRepresentada(Representada representada) {
 		this.representada = representada;
 	}
@@ -350,6 +494,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setTipoEntrega(TipoEntrega tipoEntrega) {
 		this.tipoEntrega = tipoEntrega;
+	}
+
+	public void setTipoPedido(TipoPedido tipoPedido) {
+		this.tipoPedido = tipoPedido;
 	}
 
 	public void setTransportadora(Transportadora transportadora) {
@@ -377,16 +525,6 @@ public class Pedido implements Serializable, Cloneable {
 	}
 
 	public void setVendedor(Usuario vendedor) {
-		this.vendedor = vendedor;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return o instanceof Pedido && id != null && id.equals(((Pedido) o).id);
-	}
-
-	@Override
-	public int hashCode() {
-		return id != null ? id : -1;
+		this.proprietario = vendedor;
 	}
 }

@@ -133,13 +133,6 @@ function inicializarModalCancelamento(botao){
 				<input type="checkbox" id="ativo" name="usuario.ativo"
 					<c:if test="${usuario.ativo}">checked</c:if> class="checkbox" />
 			</div>
-			<div class="label">Vendedor:</div>
-			<div class="input" style="width: 80%">
-				<input type="checkbox" id="vendedorAtivo"
-					name="usuario.vendedorAtivo"
-					<c:if test="${usuario.vendedorAtivo}">checked</c:if>
-					class="checkbox" />
-			</div>
 			<div class="label obrigatorio">Nome:</div>
 			<div class="input" style="width: 20%">
 				<input type="text" id="nome" name="usuario.nome"
@@ -220,7 +213,7 @@ function inicializarModalCancelamento(botao){
 					<c:forEach var="usuario" items="${listaUsuario}">
 						<tr>
 							<c:choose>
-								<c:when test="${usuario.vendedorAtivo}">
+								<c:when test="${usuario.ativo}">
 									<td><div class="flagOK"></div></td>
 								</c:when>
 								<c:otherwise>

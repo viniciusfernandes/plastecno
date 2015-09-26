@@ -3,27 +3,28 @@ package br.com.plastecno.vendas.json;
 import br.com.plastecno.service.entity.ItemPedido;
 
 public class ItemPedidoJson {
-    private final Integer id;
-    private final Integer sequencial;
-    private final Integer idMaterial;
-    private final Integer quantidade;
-    private final String formaMaterial;
-    private final String descricaoPeca;
-    private final boolean peca;
-    private final boolean vendaKilo;
-    private final String siglaMaterial;
-    private final Double medidaExterna;
-    private final Double medidaInterna;
-    private final Double comprimento;
-    private final String precoUnidadeIPI;
-    private final String precoItem;
-    private final Double precoVenda;
-    private final String precoUnidade;
-    private final String valorPedido;
-    private final String valorPedidoIPI;
     private final String aliquotaICMS;
     private final String aliquotaIPI;
+    private final Double comprimento;
     private final String descricaoItemPedido;
+    private final String descricaoPeca;
+    private final String formaMaterial;
+    private final Integer id;
+    private final Integer idMaterial;
+    private final Double medidaExterna;
+    private final Double medidaInterna;
+    private final boolean peca;
+    private final String precoItem;
+    private final String precoMinimo;
+    private final String precoUnidade;
+    private final String precoUnidadeIPI;
+    private final Double precoVenda;
+    private final Integer quantidade;
+    private final Integer sequencial;
+    private final String siglaMaterial;
+    private final String valorPedido;
+    private final String valorPedidoIPI;
+    private final boolean vendaKilo;
 
     public ItemPedidoJson(ItemPedido itemPedido) {
         id = itemPedido.getId();
@@ -44,13 +45,12 @@ public class ItemPedidoJson {
         quantidade = itemPedido.getQuantidade();
         siglaMaterial = itemPedido.getMaterial() != null ? itemPedido.getMaterial().getSigla() : "";
         vendaKilo = itemPedido.isVendaKilo();
-        valorPedido = itemPedido.getPedido() != null && itemPedido.getPedido().getValorPedido() != null ? itemPedido
-                .getPedido().getValorPedidoFormatado() : "";
-        valorPedidoIPI = itemPedido.getPedido() != null && itemPedido.getPedido().getValorPedidoIPI() != null
-                ? itemPedido.getPedido().getValorPedidoIPIFormatado() : "";
+        valorPedido = itemPedido.getValorPedidoFormatado();
+        valorPedidoIPI = itemPedido.getValorPedidoIPIFormatado();
         descricaoItemPedido = itemPedido.getDescricao();
         aliquotaICMS = itemPedido.getAliquotaICMSFormatado();
         aliquotaIPI = itemPedido.getAliquotaIPIFormatado();
+        precoMinimo = itemPedido.getPrecoMinimoFormatado();
     }
 
     public String getAliquotaICMS() {
@@ -95,6 +95,10 @@ public class ItemPedidoJson {
 
     public String getPrecoItem() {
         return precoItem;
+    }
+
+    public String getPrecoMinimo() {
+        return precoMinimo;
     }
 
     public String getPrecoUnidade() {

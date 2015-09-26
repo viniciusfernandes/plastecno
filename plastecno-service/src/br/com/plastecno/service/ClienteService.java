@@ -16,69 +16,77 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 @Local
 public interface ClienteService {
 
-    Integer contactarCliente(Integer id);
+	Cliente alterarRevendedor(Cliente cliente) throws BusinessException;
 
-    Cliente inserir(Cliente cliente) throws BusinessException;
+	Integer contactarCliente(Integer id);
 
-    void inserirComentario(Integer idCliente, String comentario) throws BusinessException;
-    
-    boolean isClienteAtivo(Integer idCliente);
+	Cliente inserir(Cliente cliente) throws BusinessException;
 
-    boolean isClienteProspectado(Integer idCliente);
+	void inserirComentario(Integer idProprietario, Integer idCliente, String comentario) throws BusinessException;
 
-    boolean isCNPJExistente(Integer idCliente, String cnpj);
+	void inserirComentario(Integer idCliente, String comentario) throws BusinessException;
 
-    boolean isCPFExistente(Integer idCliente, String cpf);
+	boolean isCNPJExistente(Integer idCliente, String cnpj);
 
-    boolean isEmailExistente(Integer idCliente, String email);
+	boolean isCPFExistente(Integer idCliente, String cpf);
 
-    boolean isInscricaoEstadualExistente(Integer idCliente, String inscricaoEstadual);
+	boolean isEmailExistente(Integer idCliente, String email);
 
-    boolean isNomeFantasiaExistente(Integer id, String nomeFantasia);
+	boolean isInscricaoEstadualExistente(Integer idCliente, String inscricaoEstadual);
 
-    PaginacaoWrapper<Cliente> paginarCliente(Cliente filtro, boolean carregarVendedor, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+	boolean isNomeFantasiaExistente(Integer id, String nomeFantasia);
 
-    List<Cliente> pesquisarBy(Cliente filtro, boolean carregarVendedor, Integer indiceRegistroInicial,
-            Integer numeroMaximoRegistros);
+	PaginacaoWrapper<Cliente> paginarCliente(Cliente filtro, boolean carregarVendedor, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros);
 
-    List<Cliente> pesquisarBy(Cliente filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+	List<Cliente> pesquisarBy(Cliente filtro, boolean carregarVendedor, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros);
 
-    Cliente pesquisarById(Integer id);
+	List<Cliente> pesquisarBy(Cliente filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-    List<Cliente> pesquisarByIdVendedor(Integer idVendedor);
+	Cliente pesquisarById(Integer id);
 
-    List<Cliente> pesquisarByIdVendedor(Integer idVendedor, boolean isPesquisaClienteInativo) throws BusinessException;
+	List<Cliente> pesquisarByIdVendedor(Integer idVendedor);
 
-    List<Cliente> pesquisarByNomeFantasia(String nomeFantasia);
+	List<Cliente> pesquisarByIdVendedor(Integer idVendedor, boolean isPesquisaClienteInativo) throws BusinessException;
 
-    List<Cliente> pesquisarByRamoAtividade(Integer idRamoAtividade);
+	List<Cliente> pesquisarByNomeFantasia(String nomeFantasia);
 
-    List<Cliente> pesquisarClienteByIdRegiao(Integer idRegiao) throws BusinessException;
+	List<Cliente> pesquisarByRamoAtividade(Integer idRamoAtividade);
 
-    List<Cliente> pesquisarClientesAssociados(Integer idVendedor);
+	List<Cliente> pesquisarClienteByIdRegiao(Integer idRegiao) throws BusinessException;
 
-    List<Cliente> pesquisarClientesById(List<Integer> listaIdCliente);
+	Cliente pesquisarClienteResumidoById(Integer idCliente);
 
-    List<Cliente> pesquisarClientesDesassociados();
+	List<Cliente> pesquisarClientesAssociados(Integer idVendedor);
 
-    List<ComentarioCliente> pesquisarComentarioByIdCliente(Integer idCliente);
+	List<Cliente> pesquisarClientesById(List<Integer> listaIdCliente);
 
-    List<ContatoCliente> pesquisarContato(Integer idCliente);
+	List<Cliente> pesquisarClientesDesassociados();
 
-    List<Cliente> pesquisarInativosByIdVendedor(Integer idVendedor) throws BusinessException;
+	List<ComentarioCliente> pesquisarComentarioByIdCliente(Integer idCliente);
 
-    List<LogradouroCliente> pesquisarLogradouro(Integer idCliente);
+	List<ContatoCliente> pesquisarContato(Integer idCliente);
 
-    LogradouroCliente pesquisarLogradouroById(Integer idLogradouro);
+	List<Cliente> pesquisarInativosByIdVendedor(Integer idVendedor) throws BusinessException;
 
-    Long pesquisarTotalRegistros(Cliente filtro);
+	List<LogradouroCliente> pesquisarLogradouro(Integer idCliente);
 
-    List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente);
+	LogradouroCliente pesquisarLogradouroById(Integer idLogradouro);
 
-    List<Transportadora> pesquisarTransportadorasDesassociadas(Integer idCliente);
+	String pesquisarNomeFantasia(Integer idCliente);
+
+	Cliente pesquisarRevendedor();
+
+	Long pesquisarTotalRegistros(Cliente filtro);
+
+	List<Transportadora> pesquisarTransportadorasDesassociadas(Integer idCliente);
+
+	List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente);
 
 	void removerLogradouro(Integer idLogradouro);
 
 	void removerLogradourosAusentes(Integer idCliente, Collection<LogradouroCliente> listaLogradouro);
+
+	void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException;
 }

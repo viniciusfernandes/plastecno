@@ -358,8 +358,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = NumeroUtils.arredondarValorMonetario(limite.getPrecoMedio() * (1 + limite.getAliquotaIPI())
-				* (1 + limite.getMargemMinimaLucro()));
+		Double precoMinimo = 120d;
 
 		Double precoMinimoCalculado = null;
 		try {

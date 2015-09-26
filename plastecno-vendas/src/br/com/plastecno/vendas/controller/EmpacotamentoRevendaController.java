@@ -14,7 +14,6 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoPedido;
-import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
@@ -56,7 +55,7 @@ public class EmpacotamentoRevendaController extends AbstractController {
     }
 
     @Post("empacotamento/itens/inclusao")
-    public void empacotarItem(List<Integer> listaIdPedido, Date dataInicial, Date dataFinal, Cliente cliente) {
+    public void empacotarItem(List<Integer> listaIdPedido, Date dataInicial, Date dataFinal, Integer idCliente) {
         if (listaIdPedido != null) {
             estoqueService.empacotarPedido(listaIdPedido);
             gerarMensagemSucesso("Pedido(s) No. " + Arrays.deepToString(listaIdPedido.toArray())
@@ -66,13 +65,12 @@ public class EmpacotamentoRevendaController extends AbstractController {
             gerarMensagemAlerta("Não há pedidos selecionados para serem empacotados. Selecione algum item novamente.");
 
         }
-        pesquisarRevendaEmpacotamento(cliente);
+        pesquisarRevendaEmpacotamento(idCliente);
     }
 
-    @Get("empacotamento/revenda/listagem")
-    public void pesquisarRevendaEmpacotamento(Cliente cliente) {
-        RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioRevendaEmpacotamento(cliente
-                .getId());
+    @Post("empacotamento/revenda/listagem")
+    public void pesquisarRevendaEmpacotamento(Integer idCliente) {
+        RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioRevendaEmpacotamento(idCliente);
 
         addAtributo("relatorio", relatorio);
         if (contemAtributo("permanecerTopo")) {
@@ -81,11 +79,11 @@ public class EmpacotamentoRevendaController extends AbstractController {
             irRodapePagina();
         }
 
-        addAtributo("cliente", cliente);
+        addAtributo("cliente", clienteService.pesquisarClienteResumidoById(idCliente));
     }
 
     @Post("empacotamento/item/reencomenda")
-    public void reencomendarItemPedido(Integer idItemPedido, Cliente cliente, Date dataInicial, Date dataFinal) {
+    public void reencomendarItemPedido(Integer idItemPedido, Integer idCliente, Date dataInicial, Date dataFinal) {
         try {
             pedidoService.reencomendarItemPedido(idItemPedido);
             gerarMensagemSucesso("O item foi enviado para ser reencomendado pelo setor de compras");
@@ -95,8 +93,7 @@ public class EmpacotamentoRevendaController extends AbstractController {
         addAtributo("permanecerTopo", true);
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
-        redirecTo(this.getClass()).pesquisarRevendaEmpacotamento(cliente);
-
+        pesquisarRevendaEmpacotamento(idCliente);
     }
 
 }

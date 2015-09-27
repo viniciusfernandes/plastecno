@@ -583,11 +583,17 @@ public class PedidoServiceImpl implements PedidoService {
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 			}
 
-			if (comissaoVenda == null) {
+			if (comissaoVenda == null
+					|| (comissaoVenda.getAliquotaRepresentacao() == null && comissaoVenda.getAliquotaRevenda() == null)) {
 				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
-				throw new BusinessException("Não existe comissão configurada para o vendedor \"" + vendedor.getNomeCompleto()
-						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
-						+ pedido.getId());
+				throw new BusinessException(
+						"Não existe comissão configurada para o vendedor \""
+								+ vendedor.getNomeCompleto()
+								+ "\". Problema para calular a comissão do item No. "
+								+ itemPedido.getSequencial()
+								+ " do pedido No. "
+								+ pedido.getId()
+								+ ". Também pode não existir comissão padrão definida para o material desse item, verifique as configurações do sistema.");
 			}
 
 			// Nos calculos do preco de venda do item nao pode haver o IPI de venda.

@@ -358,7 +358,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = 120d;
+		Double precoMinimo = 121d;
 
 		Double precoMinimoCalculado = null;
 		try {

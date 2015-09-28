@@ -110,7 +110,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		// Precisamos arredondar
-		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + ipi + margemMinimaLucro));
+		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + ipi) * (1 + margemMinimaLucro));
 	}
 
 	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {

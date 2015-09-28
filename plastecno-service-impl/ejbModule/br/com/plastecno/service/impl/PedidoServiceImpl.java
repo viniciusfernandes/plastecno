@@ -404,7 +404,7 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido.isOrcamento()) {
 			enviarOrcamento(pedido, arquivoAnexado);
 		} else {
-			inserirComissaoVenda(pedido);
+			calcularComissaoVenda(pedido);
 			enviarVenda(pedido, arquivoAnexado);
 		}
 		if (pedido.isCompra()) {
@@ -552,7 +552,7 @@ public class PedidoServiceImpl implements PedidoService {
 		return pedido;
 	}
 
-	private void inserirComissaoVenda(Pedido pedido) throws BusinessException {
+	private void calcularComissaoVenda(Pedido pedido) throws BusinessException {
 		if (!pedido.isVenda()) {
 			return;
 		}
@@ -583,8 +583,15 @@ public class PedidoServiceImpl implements PedidoService {
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 			}
 
-			if (comissaoVenda == null
-					|| (comissaoVenda.getAliquotaRepresentacao() == null && comissaoVenda.getAliquotaRevenda() == null)) {
+			// Nos calculos do preco de venda do item nao pode haver o IPI de venda.
+			precoItem = itemPedido.calcularPrecoItem();
+
+			if (pedido.isRevenda() && comissaoVenda != null && comissaoVenda.getAliquotaRevenda() != null) {
+				valorComissionado = precoItem * comissaoVenda.getAliquotaRevenda();
+			} else if (pedido.isRepresentacao() && comissaoVenda != null && comissaoVenda.getAliquotaRepresentacao() != null) {
+				valorComissionado = precoItem * comissaoVenda.getAliquotaRepresentacao();
+				valorComissionadoRepresentacao = precoItem * (pedido.getRepresentada().getComissao());
+			} else {
 				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
 				throw new BusinessException(
 						"Não existe comissão configurada para o vendedor \""
@@ -593,17 +600,7 @@ public class PedidoServiceImpl implements PedidoService {
 								+ itemPedido.getSequencial()
 								+ " do pedido No. "
 								+ pedido.getId()
-								+ ". Também pode não existir comissão padrão definida para o material desse item, verifique as configurações do sistema.");
-			}
-
-			// Nos calculos do preco de venda do item nao pode haver o IPI de venda.
-			precoItem = itemPedido.calcularPrecoItem();
-
-			if (pedido.isRevenda()) {
-				valorComissionado = precoItem * comissaoVenda.getAliquotaRevenda();
-			} else if (pedido.isRepresentacao()) {
-				valorComissionado = precoItem * comissaoVenda.getAliquotaRepresentacao();
-				valorComissionadoRepresentacao = precoItem * (pedido.getRepresentada().getComissao());
+								+ ". Também pode não existir comissão padrão configurada para o material desse item, verifique as configurações do sistema.");
 			}
 
 			itemPedido.setValorComissionado(valorComissionado);

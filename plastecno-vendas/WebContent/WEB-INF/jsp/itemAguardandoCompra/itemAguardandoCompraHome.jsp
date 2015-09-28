@@ -80,7 +80,7 @@ function inicializarAutocompleteCliente(){
 		parametro : 'nomeFantasia',
 		containerResultados : 'containerPesquisaCliente',
 		selecionarItem: function(itemLista) {
-			$('#formPesquisa #idCliente').val(itemLista.id);
+			$('#bloco_pesquisa #idCliente').val(itemLista.id);
 			$('#botaoPesquisar').click();
 		}
 	});

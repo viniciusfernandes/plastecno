@@ -44,10 +44,14 @@ public final class NumeroUtils {
 	}
 
 	public static Double gerarAliquota(Double percentual) {
+		return gerarAliquota(percentual, 2);
+	}
+
+	public static Double gerarAliquota(Double percentual, int escala) {
 		if (percentual == null) {
 			return 0d;
 		}
-		return arredondar(percentual / CEM, 2);
+		return arredondar(percentual / CEM, escala);
 	}
 
 	public static Double gerarPercentual(Double decimal) {

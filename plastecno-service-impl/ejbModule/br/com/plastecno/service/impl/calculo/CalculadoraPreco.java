@@ -4,11 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
-import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.ItemPedido;
 
 public class CalculadoraPreco {
+	private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgoritmoPreco;
+
+	static {
+		mapaAlgoritmoPreco = new HashMap<TipoVenda, AlgoritmoCalculo>();
+		mapaAlgoritmoPreco.put(TipoVenda.KILO, new AlgoritmoCalculoPrecoKilo());
+		mapaAlgoritmoPreco.put(TipoVenda.PECA, new AlgoritmoCalculoPrecoPeca());
+	}
+
 	public static double calcular(ItemPedido itemPedido) throws AlgoritmoCalculoException {
 		validarCalculo(itemPedido);
 
@@ -27,7 +34,7 @@ public class CalculadoraPreco {
 
 	public static double calcularPorUnidadeIPI(ItemPedido itemPedido) throws AlgoritmoCalculoException {
 		Double aliquotaIPI = itemPedido.getAliquotaIPI();
-		CalculadoraPreco.validarCalculoIPI(itemPedido);
+		CalculadoraPreco.validarCalculo(itemPedido);
 
 		if (aliquotaIPI == null) {
 			aliquotaIPI = 0d;
@@ -44,21 +51,5 @@ public class CalculadoraPreco {
 		if (itemPedido != null && itemPedido.getFormaMaterial() == null) {
 			throw new AlgoritmoCalculoException("Forma do material é obrigatório para o cálculo do preço");
 		}
-	}
-
-	private static void validarCalculoIPI(ItemPedido itemPedido) throws AlgoritmoCalculoException {
-		validarCalculo(itemPedido);
-
-		if (itemPedido.getAliquotaIPI() == null && FormaMaterial.PC.equals(itemPedido.getFormaMaterial())) {
-			throw new AlgoritmoCalculoException("Toda peca deve ter aliquota de IPI");
-		}
-	}
-
-	private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgoritmoPreco;
-
-	static {
-		mapaAlgoritmoPreco = new HashMap<TipoVenda, AlgoritmoCalculo>();
-		mapaAlgoritmoPreco.put(TipoVenda.KILO, new AlgoritmoCalculoPrecoKilo());
-		mapaAlgoritmoPreco.put(TipoVenda.PECA, new AlgoritmoCalculoPrecoPeca());
 	}
 }

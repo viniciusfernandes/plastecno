@@ -650,14 +650,14 @@ public class PedidoServiceImpl implements PedidoService {
 		Double aliquotaIPI = itemPedido.getAliquotaIPI();
 		final boolean ipiPreenchido = aliquotaIPI != null;
 		final TipoApresentacaoIPI tipoApresentacaoIPI = pesquisarTipoApresentacaoIPI(itemPedido);
-		final boolean materialImportado = materialService.isMaterialImportado(itemPedido.getMaterial().getId());
-		final boolean ipiObrigatorio = TipoApresentacaoIPI.SEMPRE.equals(tipoApresentacaoIPI)
-				|| (TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI) && materialImportado);
+		final boolean ipiObrigatorio = TipoApresentacaoIPI.SEMPRE.equals(tipoApresentacaoIPI);
+		final boolean ipiImportado = TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI)
+				&& materialService.isMaterialImportado(itemPedido.getMaterial().getId());
 
 		if (ipiPreenchido && TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
 			throw new BusinessException(
 					"Remova o valor do IPI do item pois representada escolhida não apresenta cáculo de IPI.");
-		} else if (!ipiPreenchido && ipiObrigatorio) {
+		} else if (!ipiPreenchido && (ipiObrigatorio || ipiImportado)) {
 			itemPedido.setAliquotaIPI(itemPedido.getFormaMaterial().getIpi());
 		}
 

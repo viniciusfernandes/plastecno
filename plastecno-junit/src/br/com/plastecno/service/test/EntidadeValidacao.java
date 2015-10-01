@@ -38,7 +38,7 @@ public class EntidadeValidacao {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = true, nomeExibicao = "Quantidade")
 	private Integer quantidade;
 
-	@InformacaoValidavel(obrigatorio = false, intervalo = { 1, 10 }, nomeExibicao = "Razão Social")
+	@InformacaoValidavel(trim=true, obrigatorio = false, intervalo = { 1, 10 }, nomeExibicao = "Razão Social")
 	private String razaoSocial;
 
 	@InformacaoValidavel(obrigatorio = true, tamanho = 4, nomeExibicao = "Senha")

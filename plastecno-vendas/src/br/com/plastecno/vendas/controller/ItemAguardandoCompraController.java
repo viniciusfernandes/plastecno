@@ -77,7 +77,7 @@ public class ItemAguardandoCompraController extends AbstractController {
             gerarListaMensagemErro(e);
             addAtributo("permanecerTopo", true);
         }
-        redirecTo(this.getClass()).pesquisarItemAguardandoCompra(dataInicial, dataFinal, cliente);
+        pesquisarItemAguardandoCompra(dataInicial, dataFinal, cliente);
     }
 
     @Get("itemAguardandoCompra")

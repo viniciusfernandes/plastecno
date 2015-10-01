@@ -21,6 +21,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
+import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.ItemReservadoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Item;
@@ -44,8 +45,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	private ItemEstoqueDAO itemEstoqueDAO;
 
-	private ItemReservadoDAO itemReservadoDAO;
+	private ItemPedidoDAO itemPedidoDAO;
 
+	private ItemReservadoDAO itemReservadoDAO;
 	private PedidoDAO pedidoDAO;
 
 	@EJB
@@ -262,6 +264,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemEstoqueDAO = new ItemEstoqueDAO(entityManager);
 		itemReservadoDAO = new ItemReservadoDAO(entityManager);
 		pedidoDAO = new PedidoDAO(entityManager);
+		itemPedidoDAO = new ItemPedidoDAO(entityManager);
 	}
 
 	@Override
@@ -603,7 +606,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		itemPedido.addQuantidadeReservada(quantidadeReservada);
-		pedidoService.inserirItemPedido(itemPedido);
+		itemPedidoDAO.alterar(itemPedido);
 		return situacao;
 	}
 }

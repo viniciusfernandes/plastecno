@@ -216,15 +216,16 @@ public class ItemPedido extends Item {
 	}
 
 	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, String nomeProprietario, Integer quantidade,
-			Integer quantidadeRecepcionada, Double precoUnidade, String nomeRepresentada, Date dataEntrega,
-			FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial, String descricaoPeca,
-			Double medidaExterna, Double medidaInterna, Double comprimento) {
+			Integer quantidadeRecepcionada, Integer quantidadeReservada, Double precoUnidade, String nomeRepresentada,
+			Date dataEntrega, FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial,
+			String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
 
 		this(id, sequencial, idPedido, null, nomeProprietario, "", precoUnidade, null, quantidade, (Double) null,
 				formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
 		this.nomeRepresentada = nomeRepresentada;
 		this.dataEntrega = dataEntrega;
 		this.quantidadeRecepcionada = quantidadeRecepcionada;
+		this.quantidadeReservada = quantidadeReservada;
 	}
 
 	public void addQuantidadeReservada(Integer quantidadeReservada) {

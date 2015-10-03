@@ -18,6 +18,15 @@ $(document).ready(function() {
 		habilitarCamposEdicaoItem(true);
 	});
 	
+	$('#botaoLimiteMinimoPadrao').click(function () {
+		var parametros = serializarPesquisa();
+		parametros += serializarBloco('bloco_item_pedido');
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/estoque/item/inclusao/limiteminimopadrao"/>?'+parametros);
+		$(form).submit();
+	});
+	
 });
 
 
@@ -141,6 +150,9 @@ function habilitarCamposEdicaoItem(habilitado){
 	<div class="bloco_botoes">
 		<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Refazer os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
 		<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
+		<c:if test="${isEstoque}">
+			<a id="botaoLimiteMinimoPadrao" title="Inserir Limite Minimo Padrao" class="botaoManutencao"></a>
+		</c:if>
 	</div>
 
 </fieldset>

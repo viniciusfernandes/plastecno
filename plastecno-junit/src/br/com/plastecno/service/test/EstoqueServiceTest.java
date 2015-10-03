@@ -323,7 +323,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemEstoque limite = gerarLimiteMinimoEstoque();
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -335,7 +335,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setQuantidadeMinima(antes + 10);
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -353,7 +353,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemEstoque limite = gerarLimiteMinimoEstoque();
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -377,7 +377,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setMargemMinimaLucro(null);
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -475,7 +475,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemEstoque limite = gerarLimiteMinimoEstoque();
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -493,7 +493,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		ItemEstoque limite = gerarLimiteMinimoEstoquePeca();
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -510,7 +510,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -522,7 +522,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		throwed = false;
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -554,7 +554,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setComprimento(null);
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -579,7 +579,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setQuantidadeMinima(-1);
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -591,7 +591,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setQuantidadeMinima(0);
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1091,14 +1091,14 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemEstoque limite = gerarLimiteMinimoEstoque();
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
 		limite.setQuantidadeMinima(null);
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

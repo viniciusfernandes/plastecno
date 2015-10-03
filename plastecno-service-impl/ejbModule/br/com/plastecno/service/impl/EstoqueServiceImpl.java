@@ -302,7 +302,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
+	public void inserirLimiteMinimoPadrao(ItemEstoque limite) throws BusinessException {
 		if (limite.getMaterial() == null || limite.getMaterial().getId() == null || limite.getFormaMaterial() == null) {
 			throw new BusinessException("Forma item e material são obrigatórios para a criação do limite mínimo de estoque");
 		}

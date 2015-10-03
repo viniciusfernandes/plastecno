@@ -25,13 +25,13 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 public class EstoqueController extends AbstractController {
 
     @Servico
+    private AlteracaoEstoquePublisher alteracaoEstoquePublisher;
+
+    @Servico
     private EstoqueService estoqueService;
 
     @Servico
     private MaterialService materialService;
-
-    @Servico
-    private AlteracaoEstoquePublisher alteracaoEstoquePublisher;
 
     public EstoqueController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -90,14 +90,8 @@ public class EstoqueController extends AbstractController {
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
             itemPedido.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemPedido.getMargemMinimaLucro()));
 
-            boolean isLimiteMinimoParaTodosMateriais = itemPedido.getId() == null && !itemPedido.contemMedida();
-            // Essa eh uma condicao para definir limite minimo para os itens de
-            // um determinado material, formato e para todas as medidas.
-            if (isLimiteMinimoParaTodosMateriais) {
-                estoqueService.inserirLimiteMinimoEstoque(itemPedido);
-            } else {
-                estoqueService.inserirItemEstoque(itemPedido);
-            }
+            estoqueService.inserirItemEstoque(itemPedido);
+
             gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
@@ -105,6 +99,26 @@ public class EstoqueController extends AbstractController {
         }
 
         alteracaoEstoquePublisher.publicar();
+
+        addAtributo("permanecerTopo", true);
+        if (material != null && formaMaterial != null) {
+            pesquisarItemEstoque(material, formaMaterial);
+        } else {
+            irTopoPagina();
+        }
+    }
+
+    @Post("estoque/item/inclusao/limiteminimopadrao")
+    public void inserirLimiteMinimoPadrao(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
+        try {
+            itemPedido.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemPedido.getMargemMinimaLucro()));
+
+            estoqueService.inserirLimiteMinimoPadrao(itemPedido);
+            gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            addAtributo("itemPedido", itemPedido);
+        }
 
         addAtributo("permanecerTopo", true);
         if (material != null && formaMaterial != null) {

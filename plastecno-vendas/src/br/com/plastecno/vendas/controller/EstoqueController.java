@@ -140,7 +140,6 @@ public class EstoqueController extends AbstractController {
 
     private void pesquisarItemEstoque(Material material, FormaMaterial formaMaterial, boolean isListagemEscassez) {
         if (!isListagemEscassez && ((material == null || material.getId() == null) && formaMaterial == null)) {
-            gerarListaMensagemErro("Escolha o material e/ou forma de material. Não é possível pesquisar o estoque inteiro.");
             addAtributo("permanecerTopo", true);
         } else {
             material = materialService.pesquisarById(material == null ? null : material.getId());

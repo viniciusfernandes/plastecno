@@ -25,7 +25,7 @@ public final class QueryEditorController extends AbstractController {
         try {
             addAtributo("resultado", this.queryNativaService.executar(query));
         } catch (BusinessException e) {
-            this.gerarListaMensagemAltera(e);
+            this.gerarListaMensagemAlerta(e);
         }
         this.irPaginaHome();
     }

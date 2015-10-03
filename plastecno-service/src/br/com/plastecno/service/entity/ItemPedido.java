@@ -49,7 +49,7 @@ public class ItemPedido extends Item {
 	private Date dataEntrega;
 
 	@Column(name = "descricao_peca")
-	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
+	@InformacaoValidavel(trim = true, intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
 	private String descricaoPeca;
 
 	@Column(name = "item_encomendado")
@@ -152,6 +152,9 @@ public class ItemPedido extends Item {
 	@Transient
 	private String valorComissionadoFormatado;
 
+	@Column(name = "valor_comissionado_representacao")
+	private Double valorComissionadoRepresentacao;
+
 	@Transient
 	private Double valorPedido;
 
@@ -163,9 +166,6 @@ public class ItemPedido extends Item {
 
 	@Transient
 	private String valorPedidoIPIFormatado;
-
-	@Column(name = "valor_comissionado_representacao")
-	private Double valorComissionadoRepresentacao;
 
 	public ItemPedido() {
 	}
@@ -409,6 +409,10 @@ public class ItemPedido extends Item {
 		return valorComissionadoFormatado;
 	}
 
+	public Double getValorComissionadoRepresentacao() {
+		return valorComissionadoRepresentacao;
+	}
+
 	public Double getValorPedido() {
 		return valorPedido;
 	}
@@ -423,10 +427,6 @@ public class ItemPedido extends Item {
 
 	public String getValorPedidoIPIFormatado() {
 		return valorPedidoIPIFormatado;
-	}
-
-	public Double getValorComissionadoRepresentacao() {
-		return valorComissionadoRepresentacao;
 	}
 
 	public boolean isEncomendado() {
@@ -601,6 +601,10 @@ public class ItemPedido extends Item {
 		this.valorComissionadoFormatado = valorComissionadoFormatado;
 	}
 
+	public void setValorComissionadoRepresentacao(Double valorComissionadoRepresentacao) {
+		this.valorComissionadoRepresentacao = valorComissionadoRepresentacao;
+	}
+
 	public void setValorPedido(Double valorPedido) {
 		this.valorPedido = valorPedido;
 	}
@@ -615,10 +619,6 @@ public class ItemPedido extends Item {
 
 	public void setValorPedidoIPIFormatado(String valorPedidoIPIFormatado) {
 		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
-	}
-
-	public void setValorComissionadoRepresentacao(Double valorComissionadoRepresentacao) {
-		this.valorComissionadoRepresentacao = valorComissionadoRepresentacao;
 	}
 
 }

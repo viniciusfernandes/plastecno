@@ -40,10 +40,10 @@ public class LoginController extends AbstractController {
             Usuario usuario = this.autenticacaoService.autenticar(email, senha);
 
             if (usuario == null) {
-                this.gerarListaMensagemAltera("Falha na autenticação. Usuario/Senha inválido(s)");
+                this.gerarListaMensagemAlerta("Falha na autenticação. Usuario/Senha inválido(s)");
                 irPaginaHome();
             } else if (!usuario.isAtivo()) {
-                this.gerarListaMensagemAltera("Falha na autenticação. Usuario desativado.");
+                this.gerarListaMensagemAlerta("Falha na autenticação. Usuario desativado.");
                 irPaginaHome();
             } else {
                 inicializarUsuarioInfo(usuario);

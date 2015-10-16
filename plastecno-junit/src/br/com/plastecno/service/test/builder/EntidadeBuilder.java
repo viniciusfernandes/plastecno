@@ -110,7 +110,7 @@ public class EntidadeBuilder {
 
 	public ItemPedido buildItemPedido() {
 		ItemPedido itemPedido = new ItemPedido();
-		itemPedido.setAliquotaIPI(11.1d);
+		itemPedido.setAliquotaIPI(0.11d);
 		itemPedido.setMaterial(buildMaterial());
 		itemPedido.setFormaMaterial(FormaMaterial.TB);
 		itemPedido.setQuantidade(2);
@@ -212,6 +212,7 @@ public class EntidadeBuilder {
 		representada.setEmail("vendas@cobex.com.br");
 		representada.setComissao(0.05);
 		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
+		representada.setAliquotaIPI(0.18);
 		return representada;
 	}
 

@@ -71,6 +71,8 @@ public interface PedidoService {
 	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
+	double pesquisarAliquotaIPIRepresentadaByIdItemPedido(Integer idItemPedido);
+
 	List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
 	List<Pedido> pesquisarByIdCliente(Integer idCliente);
@@ -122,6 +124,10 @@ public interface PedidoService {
 
 	ItemPedido pesquisarItemPedido(Integer idItemPedido);
 
+	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento();
+
+	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente);
+
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
 	List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo);
@@ -161,10 +167,6 @@ public interface PedidoService {
 	int pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido);
 
 	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
-
-	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento();
-
-	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente);
 
 	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();
 

@@ -1,6 +1,7 @@
 package br.com.plastecno.service.dao;
 
 import java.util.Date;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -17,6 +18,17 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	public ItemPedidoDAO(EntityManager entityManager) {
 		super(entityManager);
+	}
+
+	public double pesquisarAliquotaIPIRepresentadaByIdItemPedido(Integer idItemPedido) {
+		if (idItemPedido == null) {
+			return 0;
+		}
+
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select i.pedido.representada.aliquotaIPI from ItemPedido i where i.id = :idItemPedido").setParameter(
+						"idItemPedido", idItemPedido), Double.class, 0d);
 	}
 
 	public void alterarComissao(Integer idItemPedido, Double valorComissao) {

@@ -212,6 +212,7 @@ public class EntidadeBuilder {
 		representada.setEmail("vendas@cobex.com.br");
 		representada.setComissao(0.05);
 		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
+		representada.setAliquotaIPI(0.18);
 		return representada;
 	}
 

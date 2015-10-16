@@ -6,10 +6,8 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
-import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
@@ -27,11 +25,6 @@ public class RelatorioComissaoVendedorController extends AbstractController {
 
     public RelatorioComissaoVendedorController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
-    }
-
-    @Get("relatorio/comissao/pedido/pdf")
-    public Download downloadPedidoPDF(Integer idPedido, TipoPedido tipoPedido) {
-        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, tipoPedido);
     }
 
     @Post("relatorio/comissao/vendedor/listagem")

@@ -83,7 +83,7 @@ $(document).ready(function() {
 						<td>${pedido.valorPedidoFormatado}</td>
 						<td>
 							<div class="coluna_acoes_listagem">
-								<form action="<c:url value="/relatorio/pedido/pdf"/>" method="get">
+								<form action="<c:url value="/pedido/pdf"/>">
 									<input type="hidden" name="idPedido" value="${pedido.id}"/>
 									<input type="hidden" name="tipoPedido" value="${pedido.tipoPedido}"/>
 									<input type="submit" title="Vizualizar Pedido PDF" value="" class="botaoPDF" />

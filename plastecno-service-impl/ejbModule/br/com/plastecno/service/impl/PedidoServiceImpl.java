@@ -707,6 +707,7 @@ public class PedidoServiceImpl implements PedidoService {
 		return inserirItemPedido(idPedido, itemPedido);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@Override
 	public boolean isCalculoIPIHabilitado(Integer idPedido) {
 		Integer idRepresentada = pesquisarIdRepresentadaByIdPedido(idPedido);
@@ -740,6 +741,12 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalPedidoByIdCliente(idCliente, idVendedor, isCompra),
 				listaPedido);
+	}
+
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@Override
+	public double pesquisarAliquotaIPIRepresentadaByIdItemPedido(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarAliquotaIPIRepresentadaByIdItemPedido(idItemPedido);
 	}
 
 	@Override

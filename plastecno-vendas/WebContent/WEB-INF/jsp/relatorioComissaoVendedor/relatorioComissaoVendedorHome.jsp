@@ -110,7 +110,7 @@
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valorComissionadoFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 							<div class="coluna_acoes_listagem">
-								<form action="<c:url value="/relatorio/comissao/pedido/pdf"/>" method="get">
+								<form action="<c:url value="/pedido/pdf"/>">
 									<input type="hidden" name="idPedido" value="${pedido.id}"/>
 									<input type="submit" title="Vizualizar Pedido PDF" value="" class="botaoPDF" />
 								</form>

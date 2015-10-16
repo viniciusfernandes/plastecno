@@ -9,7 +9,6 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.TipoPedido;
@@ -26,21 +25,16 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 public class ItemAguardandoCompraController extends AbstractController {
 
     @Servico
+    private PedidoService pedidoService;
+
+    @Servico
     private RelatorioService relatorioService;
 
     @Servico
     private RepresentadaService representadaService;
 
-    @Servico
-    private PedidoService pedidoService;
-
     public ItemAguardandoCompraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
-    }
-
-    @Get("itemAguardandoCompra/pdf")
-    public Download downloadPedidoPDF(Integer idPedido) {
-        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
     }
 
     @Post("itemAguardandoCompra/item/compra")

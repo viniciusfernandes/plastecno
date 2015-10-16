@@ -32,10 +32,42 @@ public class Representada implements Serializable {
 
 	private static final long serialVersionUID = -6187905223269978645L;
 
+	@InformacaoValidavel(positivo = true, nomeExibicao = "Aliquota de IPI")
+	@Column(name = "aliquota_ipi")
+	private Double aliquotaIPI;
+
+	private boolean ativo = true;
+
+	@InformacaoValidavel(tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ")
+	private String cnpj;
+
+	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Comissão da representada")
+	private double comissao = 0;
+
+	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Email para envio dos pedidos")
+	@Column(name = "email")
+	private String email;
+
 	@Id
 	@SequenceGenerator(name = "representadaSequence", sequenceName = "vendas.seq_representada_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "representadaSequence")
 	private Integer id;
+
+	@Column(name = "insc_estadual")
+	@InformacaoValidavel(intervalo = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual")
+	private String inscricaoEstadual;
+
+	@OneToMany(mappedBy = "representada", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de contato da representada")
+	private List<ContatoRepresentada> listaContato;
+
+	@ManyToMany(mappedBy = "listaRepresentada")
+	private List<Material> listaMaterial;
+
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da representada")
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "id_logradouro")
+	private Logradouro logradouro;
 
 	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Nome fantasia")
 	@Column(name = "nome_fantasia")
@@ -48,34 +80,6 @@ public class Representada implements Serializable {
 	@InformacaoValidavel(intervalo = { 1, 150 }, nomeExibicao = "Site da representada")
 	@Column(name = "site")
 	private String site;
-
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Email para envio dos pedidos")
-	@Column(name = "email")
-	private String email;
-
-	@InformacaoValidavel(tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ")
-	private String cnpj;
-
-	@Column(name = "insc_estadual")
-	@InformacaoValidavel(intervalo = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual")
-	private String inscricaoEstadual;
-
-	private boolean ativo = true;
-
-	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Comissão da representada")
-	private double comissao = 0;
-
-	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da representada")
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "id_logradouro")
-	private Logradouro logradouro;
-
-	@OneToMany(mappedBy = "representada", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
-	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de contato da representada")
-	private List<ContatoRepresentada> listaContato;
-
-	@ManyToMany(mappedBy = "listaRepresentada")
-	private List<Material> listaMaterial;
 
 	@Column(name = "id_tipo_apresentacao_ipi")
 	@Enumerated(EnumType.ORDINAL)
@@ -119,6 +123,10 @@ public class Representada implements Serializable {
 	@Override
 	public boolean equals(Object o) {
 		return o instanceof Representada && this.id != null && this.id.equals(((Representada) o).id);
+	}
+
+	public Double getAliquotaIPI() {
+		return aliquotaIPI;
 	}
 
 	public String getCnpj() {
@@ -197,6 +205,10 @@ public class Representada implements Serializable {
 
 	public boolean isRevendedor() {
 		return TipoRelacionamento.REVENDA.equals(tipoRelacionamento);
+	}
+
+	public void setAliquotaIPI(Double aliquotaIPI) {
+		this.aliquotaIPI = aliquotaIPI;
 	}
 
 	public void setAtivo(boolean ativo) {

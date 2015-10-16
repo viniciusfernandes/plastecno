@@ -449,7 +449,7 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testInclusaoItemPedidoNoEstoque() {
+	public void testInclusaoItemPedidoValidoNoEstoque() {
 		ItemPedido i = enviarItemPedidoCompra();
 
 		try {
@@ -652,7 +652,7 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testRecepcionarItemPedidoCompra() {
+	public void testRecepcaoItemPedidoCompraComAliquotaIPI() {
 		ItemPedido i = enviarItemPedidoCompra();
 		try {
 			pedidoService.alterarQuantidadeRecepcionada(i.getId(), i.getQuantidade());
@@ -660,17 +660,25 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
+		Integer idItemEstoque = null;
 		try {
-			estoqueService.recepcionarItemCompra(i.getId());
+			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		Double precoMedioComFatorIPI = 73.21;
+
+		assertEquals("O valor do preco medio apos a recepcao da compra deve conter o ipi. Os valores nao conferem",
+				precoMedioComFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
+
 	}
 
 	@Test
-	public void testRecepcionarItemPedidoCompraQuantidadeInferior() {
+	public void testRecepcaoItemPedidoCompraQuantidadeInferior() {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer quantidadeRecepcionada = i.getQuantidade() - 1;
 		try {
@@ -687,6 +695,33 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
 				pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
+	}
+
+	@Test
+	public void testRecepcaoItemPedidoCompraSemAliquotaIPI() {
+		ItemPedido i = enviarItemPedidoCompra();
+		i.setAliquotaIPI(null);
+
+		try {
+			pedidoService.alterarQuantidadeRecepcionada(i.getId(), i.getQuantidade());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		Double precoMedioSemFatorIPI = 80.74;
+
+		assertEquals(
+				"O item nao contem ipi entao o valor do preco medio apos a recepcao da compra deve ser o mesmo. Os valores nao conferem",
+				precoMedioSemFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
+
 	}
 
 	@TODO

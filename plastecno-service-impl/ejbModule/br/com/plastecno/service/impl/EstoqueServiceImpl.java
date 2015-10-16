@@ -99,6 +99,30 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemCadastrado.setQuantidade((int) quantidadeTotal);
 	}
 
+	/*
+	 * Esse eh o momento em que estamos embutindo o valor da diferenca do ipi no
+	 * custo dos itens do estoque. Essa rotina eh necessaria pois existe uma
+	 * legislacao de debito e credito de ipi para as empresas. Quando se compra,
+	 * temos um credito, ja quando vendemos temos um debito, entao essa diferenca
+	 * deve aparecer no custos dos produtos que serao vendidos, portanto, deve ser
+	 * executado sempre que recepcionarmos uma nova compra.
+	 */
+	private Double calcularPrecoMedioComFatorIPI(Integer idItemPedido, Double precoMedio, Double aliquotaIPI) {
+		if (precoMedio == null) {
+			return null;
+		}
+
+		if (aliquotaIPI == null) {
+			aliquotaIPI = 0d;
+		}
+		
+		double ipiRerepsentada = pedidoService.pesquisarAliquotaIPIRepresentadaByIdItemPedido(idItemPedido);
+
+		double fatorIPI = ipiRerepsentada - aliquotaIPI;
+
+		return precoMedio * (1 + fatorIPI);
+	}
+
 	private Double calcularPrecoMinimo(Double precoMedio, Double ipi, Double margemMinimaLucro) {
 		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
 		// estoque.
@@ -402,7 +426,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer recepcionarItemCompra(Integer idItemPedido) throws BusinessException {
-		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, true));
+		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido, true);
+		itemEstoque.setPrecoMedio(calcularPrecoMedioComFatorIPI(idItemPedido, itemEstoque.getPrecoMedio(),
+				itemEstoque.getAliquotaIPI()));
+		return inserirItemEstoque(itemEstoque);
 	}
 
 	@Override
@@ -418,6 +445,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido, true);
 		itemEstoque.setQuantidade(quantidadeParcial);
+
+		itemEstoque.setPrecoMedio(calcularPrecoMedioComFatorIPI(idItemPedido, itemEstoque.getPrecoMedio(),
+				itemEstoque.getAliquotaIPI()));
+
 		return inserirItemEstoque(itemEstoque);
 	}
 

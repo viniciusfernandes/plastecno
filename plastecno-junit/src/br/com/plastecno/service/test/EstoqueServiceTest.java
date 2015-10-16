@@ -670,7 +670,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
 
 		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
-		Double precoMedioComFatorIPI = 73.21;
+		Double precoMedioComFatorIPI = 81.27;
 
 		assertEquals("O valor do preco medio apos a recepcao da compra deve conter o ipi. Os valores nao conferem",
 				precoMedioComFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));

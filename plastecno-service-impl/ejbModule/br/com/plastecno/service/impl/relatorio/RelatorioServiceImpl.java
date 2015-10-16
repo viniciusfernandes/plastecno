@@ -15,6 +15,7 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -246,8 +247,12 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
 			Periodo periodo) {
-		return gerarRelatorioItensPorPedido("Pedidos de Compras para Recebimento",
+		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
+				"Pedidos de Compras para Recebimento",
 				pedidoService.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo));
+
+		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
+		return relatorio;
 	}
 
 	@Override

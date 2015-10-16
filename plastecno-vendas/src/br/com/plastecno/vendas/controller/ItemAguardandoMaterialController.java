@@ -6,7 +6,6 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
@@ -37,11 +36,6 @@ public class ItemAguardandoMaterialController extends AbstractController {
         super(result);
     }
 
-    @Get("itemAguardandoMaterial/pdf")
-    public Download downloadPedidoPDF(Integer idPedido) {
-        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
-    }
-
     @Post("itemAguardandoMaterial/empacotamento")
     public void enviarPedidoEmpacotamento(Integer idPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         try {
@@ -58,6 +52,11 @@ public class ItemAguardandoMaterialController extends AbstractController {
         }
         addAtributo("permanecerTopo", true);
         redirecTo(this.getClass()).pesquisarItemAguardandoMaterial(dataInicial, dataFinal, idRepresentada);
+    }
+
+    @Get("itemAguardandoMaterial")
+    public void itemAguardandoMaterialHome() {
+        addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
     }
 
     @Get("itemAguardandoMaterial/listagem")
@@ -89,10 +88,5 @@ public class ItemAguardandoMaterialController extends AbstractController {
     public void pesquisarRevendaEncomendadaById(Integer idPedido, Date dataInicial, Date dataFinal,
             Integer idRepresentada) {
         redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA);
-    }
-
-    @Get("itemAguardandoMaterial")
-    public void itemAguardandoMaterialHome() {
-        addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
     }
 }

@@ -481,6 +481,9 @@ public class PedidoController extends AbstractController {
         boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
 
         Pedido pedido = null;
+        // Temos que fazer essa distincao pois o usuario pode acessar pedidos de
+        // compra a partir da tela de pedidos de venda, e vice-versa. Temos que
+        // proibir isso.
         if (isCompra) {
             pedido = pedidoService.pesquisarCompraById(idPedido);
         } else {

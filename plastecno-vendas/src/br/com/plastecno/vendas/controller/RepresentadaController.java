@@ -25,13 +25,13 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 @Resource
 public class RepresentadaController extends AbstractController {
     @Servico
-    private RepresentadaService representadaService;
+    private ClienteService clienteService;
 
     @Servico
     private ContatoService contatoService;
 
     @Servico
-    private ClienteService clienteService;
+    private RepresentadaService representadaService;
 
     public RepresentadaController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -47,8 +47,10 @@ public class RepresentadaController extends AbstractController {
     }
 
     private void formataDocumentos(Representada representada) {
-        representada.setCnpj(this.formatarCNPJ(representada.getCnpj()));
-        representada.setInscricaoEstadual(this.formatarInscricaoEstadual(representada.getInscricaoEstadual()));
+        representada.setCnpj(formatarCNPJ(representada.getCnpj()));
+        representada.setInscricaoEstadual(formatarInscricaoEstadual(representada.getInscricaoEstadual()));
+        representada.setComissao(NumeroUtils.gerarPercentual(representada.getComissao()));
+        representada.setAliquotaIPI(NumeroUtils.gerarPercentual(representada.getAliquotaIPI()));
     }
 
     private String formatarComentarios(Integer idRepresentada) {
@@ -83,6 +85,7 @@ public class RepresentadaController extends AbstractController {
             }
 
             representada.setComissao(NumeroUtils.gerarAliquota(representada.getComissao()));
+            representada.setAliquotaIPI(NumeroUtils.gerarAliquota(representada.getAliquotaIPI()));
 
             this.representadaService.inserir(representada);
             this.gerarMensagemCadastroSucesso(representada, "nomeFantasia");
@@ -120,14 +123,14 @@ public class RepresentadaController extends AbstractController {
 
     @Get("representada/listagem")
     public void pesquisar(Representada filtro, Integer paginaSelecionada) {
-        filtro.setCnpj(this.removerMascaraDocumento(filtro.getCnpj()));
-        this.paginarPesquisa(paginaSelecionada, this.representadaService.pesquisarTotalRegistros(filtro, null));
+        filtro.setCnpj(removerMascaraDocumento(filtro.getCnpj()));
+        this.paginarPesquisa(paginaSelecionada, representadaService.pesquisarTotalRegistros(filtro, null));
 
-        List<Representada> lista = this.representadaService.pesquisarBy(filtro, null,
-                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+        List<Representada> lista = representadaService.pesquisarBy(filtro, null,
+                calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
 
         for (Representada representada : lista) {
-            this.formataDocumentos(representada);
+            formataDocumentos(representada);
         }
 
         addAtributo("representada", filtro);
@@ -137,7 +140,8 @@ public class RepresentadaController extends AbstractController {
     @Get("representada/edicao")
     public void pesquisarRepresentadaById(Integer id) {
         Representada representada = this.representadaService.pesquisarById(id);
-        this.formataDocumentos(representada);
+
+        formataDocumentos(representada);
 
         addAtributo("representada", representada);
         addAtributo("listaContato", this.representadaService.pesquisarContato(id));

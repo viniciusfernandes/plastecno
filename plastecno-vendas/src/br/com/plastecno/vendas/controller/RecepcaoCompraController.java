@@ -6,12 +6,10 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.FormaMaterial;
-import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
@@ -37,11 +35,6 @@ public class RecepcaoCompraController extends AbstractController {
 
     public RecepcaoCompraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
-    }
-
-    @Get("compra/pdf")
-    public Download downloadPedidoPDF(Integer idPedido) {
-        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.COMPRA);
     }
 
     @Get("compra/recepcao/listagem")

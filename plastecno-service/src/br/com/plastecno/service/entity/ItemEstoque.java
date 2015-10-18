@@ -72,7 +72,7 @@ public class ItemEstoque extends Item {
 	private Double precoMinimo;
 
 	@Column(name = "quantidade")
-	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = true, nomeExibicao = "Quantidade de itens do estoque")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Quantidade de itens do estoque")
 	private Integer quantidade = 0;
 
 	@Column(name = "quantidade_minima")

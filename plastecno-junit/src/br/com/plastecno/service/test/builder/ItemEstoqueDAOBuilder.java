@@ -169,7 +169,7 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 					isMaterialIgual = idMaterial != null && idMaterial.equals(i.getMaterial().getId());
 					isFormaIgual = formaMaterial != null && formaMaterial.equals(i.getFormaMaterial());
 					if (isAmbosNulos || isMaterialIgual || isFormaIgual) {
-						listaValores.add(new Double[] { i.getPrecoUnidade(), (double) i.getQuantidade() });
+						listaValores.add(new Double[] { i.getPrecoMedio(), (double) i.getQuantidade() });
 					}
 				}
 

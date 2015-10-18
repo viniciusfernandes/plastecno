@@ -101,9 +101,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		final double valorEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getPrecoMedio();
 
-		final double valorItem = itemEstoque.getQuantidade() * itemEstoque.getPrecoMedio()
-				* (1 + itemEstoque.getAliquotaIPI());
-
+		final double valorItem = itemEstoque.getQuantidade() * itemEstoque.getPrecoMedio();
 		final double quantidadeTotal = itemCadastrado.getQuantidade() + quantidadeItem;
 		final double precoMedio = (valorEstoque + valorItem) / quantidadeTotal;
 
@@ -424,8 +422,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer recepcionarItemCompra(Integer idItemPedido, Integer quantidadeRecepcionada)
-			throws BusinessException {
+	public Integer recepcionarItemCompra(Integer idItemPedido, Integer quantidadeRecepcionada) throws BusinessException {
 		if (quantidadeRecepcionada == null) {
 			quantidadeRecepcionada = 0;
 		}

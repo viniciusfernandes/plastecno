@@ -186,7 +186,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 		for (ItemPedido itemPedido : listaItem) {
-			if (!itemPedido.isRecebido()) {
+			if (!itemPedido.isItemRecebido()) {
 				continue;
 			}
 			ItemEstoque itemEstoque = pesquisarItemEstoque(itemPedido);
@@ -246,9 +246,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return itemEstoque;
 	}
 
-	@REVIEW(descricao = "A condicao de isREcepcaoCompra tem que ser completamente reanalisada. Nao da para entender o porque disso nesse metodo")
-	private ItemEstoque gerarItemEstoqueByIdItemPedido(Integer idItemPedido, boolean isRecepcaoItemCompra)
-			throws BusinessException {
+	private ItemEstoque gerarItemEstoqueByIdItemPedido(Integer idItemPedido) throws BusinessException {
 		ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
 		if (itemPedido == null) {
 			throw new BusinessException("O item de pedido No: " + idItemPedido + " não existe no sistema");
@@ -261,12 +259,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 					+ SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.getDescricao() + "\"");
 		}
 
-		// Aqui temos essa condicao pois o usuario pode incluir um item
-		// diretamente no estoque, sendo que ele nao passa pelo setor de compras.
-		itemPedido.setRecebido(isRecepcaoItemCompra ? itemPedido.isItemRecebido() : true);
-
 		ItemEstoque itemEstoque = gerarItemEstoque(itemPedido);
-		
+
 		Pedido pedido = itemPedido.getPedido();
 		long qtdePendente = pedidoService.pesquisarTotalItemCompradoNaoRecebido(pedido.getId());
 		if (qtdePendente <= 0) {
@@ -314,7 +308,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Deprecated
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(Integer idItemPedido) throws BusinessException {
-		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, false));
+		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido));
 	}
 
 	@Override
@@ -363,8 +357,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemEstoque pesquisarItemEstoque(Item filtro) {
-		// Verificando se existe item equivalente no estoque, caso nao exista
-		// vamos
+		// Verificando se existe item equivalente no estoque, caso nao exista vamos
 		// criar um novo.
 		ItemEstoque itemCadastrado = null;
 		if (filtro.isPeca()) {
@@ -426,7 +419,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		quantidadeItem += quantidadeRecepcionada;
 		pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeItem);
 
-		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido, true);
+		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido);
 		itemEstoque.setQuantidade(quantidadeRecepcionada);
 
 		itemEstoque.setPrecoMedio(calcularPrecoMedioComFatorIPI(idItemPedido, itemEstoque.getPrecoMedio(),
@@ -588,7 +581,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public SituacaoReservaEstoque reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
-		if (itemPedido.isTodasUnidadesReservadas()) {
+		if (itemPedido.isItemReservado()) {
 			return SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS;
 		}
 

@@ -1416,14 +1416,6 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, i1.getPedido().getSituacaoPedido());
-
-		try {
-			estoqueService.inserirItemPedido(i2.getId());
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, i2.getPedido().getSituacaoPedido());
-
 	}
 
 	@Test

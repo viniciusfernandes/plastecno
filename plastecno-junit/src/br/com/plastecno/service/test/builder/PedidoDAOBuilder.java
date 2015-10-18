@@ -189,7 +189,7 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 						continue;
 					}
 
-					if (!apenasNaoRecebido || !itemPedido.isRecebido()) {
+					if (!apenasNaoRecebido || !itemPedido.isItemRecebido()) {
 						count++;
 					}
 				}

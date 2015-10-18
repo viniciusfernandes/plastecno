@@ -133,9 +133,6 @@ public class ItemPedido extends Item {
 	@Column(name = "quantidade_reservada")
 	private Integer quantidadeReservada;
 
-	@Column(name = "item_recebido")
-	private boolean recebido;
-
 	private Integer sequencial;
 
 	@Transient
@@ -248,7 +245,6 @@ public class ItemPedido extends Item {
 			clone = (ItemPedido) super.clone();
 			clone.setId(null);
 			clone.setPedido(null);
-			clone.setRecebido(false);
 			clone.setQuantidadeReservada(0);
 			clone.setQuantidadeRecepcionada(0);
 			return clone;
@@ -433,16 +429,12 @@ public class ItemPedido extends Item {
 		return encomendado;
 	}
 
-	public boolean isNovo() {
-		return this.id == null;
-	}
-
-	public boolean isRecebido() {
-		return recebido;
-	}
-
 	public boolean isItemRecebido() {
 		return quantidade != null && quantidade.equals(quantidadeRecepcionada);
+	}
+
+	public boolean isNovo() {
+		return this.id == null;
 	}
 
 	public boolean isTodasUnidadesReservadas() {
@@ -571,10 +563,6 @@ public class ItemPedido extends Item {
 
 	public void setQuantidadeReservada(Integer quantidadeReservada) {
 		this.quantidadeReservada = quantidadeReservada;
-	}
-
-	public void setRecebido(boolean recebido) {
-		this.recebido = recebido;
 	}
 
 	public void setSequencial(Integer sequencial) {

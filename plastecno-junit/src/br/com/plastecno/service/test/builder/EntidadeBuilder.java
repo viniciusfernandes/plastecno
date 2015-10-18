@@ -89,6 +89,7 @@ public class EntidadeBuilder {
 		item.setMedidaInterna(100.0);
 		item.setComprimento(1000.0);
 		item.setPrecoMedio(100.0);
+		item.setQuantidade(10);
 		return item;
 	}
 

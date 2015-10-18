@@ -65,14 +65,36 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * item.getQuantidade() * (1 + aliquotaIPI);
 	}
 
-	private void calcularPrecoMedioItemEstoque(ItemEstoque itemCadastrado, ItemEstoque itemEstoque) {
-		removerValoresNulos(itemCadastrado);
-		removerValoresNulos(itemEstoque);
+	/*
+	 * Esse eh o momento em que estamos embutindo o valor da diferenca do ipi no
+	 * custo dos itens do estoque. Essa rotina eh necessaria pois existe uma
+	 * legislacao de debito e credito de ipi para as empresas. Quando se compra,
+	 * temos um credito, ja quando vendemos temos um debito, entao essa diferenca
+	 * deve aparecer no custos dos produtos que serao vendidos, portanto, deve ser
+	 * executado sempre que recepcionarmos uma nova compra.
+	 */
+	private Double calcularPrecoMedioComFatorIPI(Integer idItemPedido, Double precoMedio, Double aliquotaIPI) {
+		if (precoMedio == null) {
+			return null;
+		}
 
+		if (aliquotaIPI == null) {
+			aliquotaIPI = 0d;
+		}
+
+		double ipiRerepsentada = pedidoService.pesquisarAliquotaIPIRepresentadaByIdItemPedido(idItemPedido);
+
+		double fatorIPI = ipiRerepsentada - aliquotaIPI;
+
+		return precoMedio * (1 + fatorIPI);
+	}
+
+	private void calcularPrecoMedioItemEstoque(ItemEstoque itemCadastrado, ItemEstoque itemEstoque) {
 		if (itemCadastrado == null) {
-			itemEstoque.setPrecoMedio(itemEstoque.getPrecoMedio() * (1 + itemEstoque.getAliquotaIPI()));
 			return;
 		}
+		removerValoresNulos(itemCadastrado);
+		removerValoresNulos(itemEstoque);
 
 		final boolean contemPrecoMedio = itemEstoque.getPrecoMedio() > 0d;
 		final double quantidadeItem = contemPrecoMedio ? itemEstoque.getQuantidade() : 0;
@@ -97,30 +119,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemCadastrado.setAliquotaIPI(ipiMedio);
 		itemCadastrado.setAliquotaICMS(icmsMedio);
 		itemCadastrado.setQuantidade((int) quantidadeTotal);
-	}
-
-	/*
-	 * Esse eh o momento em que estamos embutindo o valor da diferenca do ipi no
-	 * custo dos itens do estoque. Essa rotina eh necessaria pois existe uma
-	 * legislacao de debito e credito de ipi para as empresas. Quando se compra,
-	 * temos um credito, ja quando vendemos temos um debito, entao essa diferenca
-	 * deve aparecer no custos dos produtos que serao vendidos, portanto, deve ser
-	 * executado sempre que recepcionarmos uma nova compra.
-	 */
-	private Double calcularPrecoMedioComFatorIPI(Integer idItemPedido, Double precoMedio, Double aliquotaIPI) {
-		if (precoMedio == null) {
-			return null;
-		}
-
-		if (aliquotaIPI == null) {
-			aliquotaIPI = 0d;
-		}
-		
-		double ipiRerepsentada = pedidoService.pesquisarAliquotaIPIRepresentadaByIdItemPedido(idItemPedido);
-
-		double fatorIPI = ipiRerepsentada - aliquotaIPI;
-
-		return precoMedio * (1 + fatorIPI);
 	}
 
 	private Double calcularPrecoMinimo(Double precoMedio, Double ipi, Double margemMinimaLucro) {
@@ -250,6 +248,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return itemEstoque;
 	}
 
+	@REVIEW(descricao = "A condicao de isREcepcaoCompra tem que ser completamente reanalisada. Nao da para entender o porque disso nesse metodo")
 	private ItemEstoque gerarItemEstoqueByIdItemPedido(Integer idItemPedido, boolean isRecepcaoItemCompra)
 			throws BusinessException {
 		ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
@@ -265,8 +264,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		// Aqui temos essa condicao pois o usuario pode incluir um item
-		// diretamento
-		// no estoque, sendo que ele nao passa pelo setor de compras.
+		// diretamente no estoque, sendo que ele nao passa pelo setor de compras.
 		itemPedido.setRecebido(isRecepcaoItemCompra ? itemPedido.isTodasUnidadesRecepcionadas() : true);
 
 		ItemEstoque itemEstoque = gerarItemEstoque(itemPedido);
@@ -319,6 +317,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
+	@Deprecated
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(Integer idItemPedido) throws BusinessException {
 		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, false));
@@ -425,26 +424,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer recepcionarItemCompra(Integer idItemPedido) throws BusinessException {
-		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido, true);
-		itemEstoque.setPrecoMedio(calcularPrecoMedioComFatorIPI(idItemPedido, itemEstoque.getPrecoMedio(),
-				itemEstoque.getAliquotaIPI()));
-		return inserirItemEstoque(itemEstoque);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer recepcionarParcialmenteItemCompra(Integer idItemPedido, Integer quantidadeParcial)
+	public Integer recepcionarItemCompra(Integer idItemPedido, Integer quantidadeRecepcionada)
 			throws BusinessException {
-		if (quantidadeParcial == null) {
-			quantidadeParcial = 0;
+		if (quantidadeRecepcionada == null) {
+			quantidadeRecepcionada = 0;
 		}
-		Integer quantidadeRecepcionada = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemPedido);
-		quantidadeRecepcionada += quantidadeParcial;
-		pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
+		Integer quantidadeItem = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemPedido);
+		quantidadeItem += quantidadeRecepcionada;
+		pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeItem);
 
 		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido, true);
-		itemEstoque.setQuantidade(quantidadeParcial);
+		itemEstoque.setQuantidade(quantidadeRecepcionada);
 
 		itemEstoque.setPrecoMedio(calcularPrecoMedioComFatorIPI(idItemPedido, itemEstoque.getPrecoMedio(),
 				itemEstoque.getAliquotaIPI()));

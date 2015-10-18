@@ -654,15 +654,10 @@ public class EstoqueServiceTest extends AbstractTest {
 	@Test
 	public void testRecepcaoItemPedidoCompraComAliquotaIPI() {
 		ItemPedido i = enviarItemPedidoCompra();
-		try {
-			pedidoService.alterarQuantidadeRecepcionada(i.getId(), i.getQuantidade());
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
 
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId());
+			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -681,14 +676,9 @@ public class EstoqueServiceTest extends AbstractTest {
 	public void testRecepcaoItemPedidoCompraQuantidadeInferior() {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer quantidadeRecepcionada = i.getQuantidade() - 1;
-		try {
-			pedidoService.alterarQuantidadeRecepcionada(i.getId(), quantidadeRecepcionada);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
 
 		try {
-			estoqueService.recepcionarItemCompra(i.getId());
+			estoqueService.recepcionarItemCompra(i.getId(), quantidadeRecepcionada);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -702,15 +692,9 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 		i.setAliquotaIPI(null);
 
-		try {
-			pedidoService.alterarQuantidadeRecepcionada(i.getId(), i.getQuantidade());
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId());
+			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1464,7 +1448,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		List<ItemPedido> listaItemComprado = gerarListaItemPedido(TipoPedido.COMPRA);
 		for (ItemPedido itemPedido : listaItemComprado) {
 			try {
-				estoqueService.inserirItemPedido(itemPedido.getId());
+				estoqueService.recepcionarItemCompra(itemPedido.getId(), itemPedido.getQuantidade());
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}

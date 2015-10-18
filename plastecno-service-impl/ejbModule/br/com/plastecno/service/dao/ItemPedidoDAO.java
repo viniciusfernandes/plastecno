@@ -56,7 +56,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Date dataInicial, Date dataFinal) {
 		StringBuilder select = gerarConstrutorItemPedidoComDataEntrega();
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
-		select.append("and i.recebido = false ");
+		select.append("and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada =null)");
 		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
 
 		if (dataInicial != null) {

@@ -441,7 +441,7 @@ public class ItemPedido extends Item {
 		return recebido;
 	}
 
-	public boolean isTodasUnidadesRecepcionadas() {
+	public boolean isItemRecebido() {
 		return quantidade != null && quantidade.equals(quantidadeRecepcionada);
 	}
 

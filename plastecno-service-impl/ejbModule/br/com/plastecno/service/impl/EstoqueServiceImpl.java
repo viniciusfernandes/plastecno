@@ -263,14 +263,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		// Aqui temos essa condicao pois o usuario pode incluir um item
 		// diretamente no estoque, sendo que ele nao passa pelo setor de compras.
-		itemPedido.setRecebido(isRecepcaoItemCompra ? itemPedido.isTodasUnidadesRecepcionadas() : true);
+		itemPedido.setRecebido(isRecepcaoItemCompra ? itemPedido.isItemRecebido() : true);
 
 		ItemEstoque itemEstoque = gerarItemEstoque(itemPedido);
-		if (isRecepcaoItemCompra) {
-			itemEstoque.setQuantidade(itemPedido.getQuantidadeRecepcionada() == null ? 0 : itemPedido
-					.getQuantidadeRecepcionada());
-		}
-
+		
 		Pedido pedido = itemPedido.getPedido();
 		long qtdePendente = pedidoService.pesquisarTotalItemCompradoNaoRecebido(pedido.getId());
 		if (qtdePendente <= 0) {

@@ -180,14 +180,16 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido, Boolean recebido) {
+			Long pesquisarTotalItemPedido(Integer idPedido, boolean apenasNaoRecebido) {
 				List<ItemPedido> lista = REPOSITORY.pesquisarTodos(ItemPedido.class);
 				long count = 0;
+
 				for (ItemPedido itemPedido : lista) {
-					if (recebido == null && itemPedido.getPedido() != null && itemPedido.getPedido().getId().equals(idPedido)) {
-						count++;
-					} else if (recebido != null && recebido == itemPedido.isRecebido() && itemPedido.getPedido() != null
-							&& itemPedido.getPedido().getId().equals(idPedido)) {
+					if (itemPedido.getPedido() == null || !itemPedido.getPedido().getId().equals(idPedido)) {
+						continue;
+					}
+
+					if (!apenasNaoRecebido || !itemPedido.isRecebido()) {
 						count++;
 					}
 				}

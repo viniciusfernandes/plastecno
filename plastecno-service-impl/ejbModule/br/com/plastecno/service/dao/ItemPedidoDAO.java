@@ -25,10 +25,11 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			return 0;
 		}
 
-		return QueryUtil.gerarRegistroUnico(
+		Double ipi = QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
 						"select i.pedido.representada.aliquotaIPI from ItemPedido i where i.id = :idItemPedido").setParameter(
 						"idItemPedido", idItemPedido), Double.class, 0d);
+		return ipi == null ? 0 : ipi;
 	}
 
 	public void alterarComissao(Integer idItemPedido, Double valorComissao) {

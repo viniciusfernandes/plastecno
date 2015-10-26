@@ -82,6 +82,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 			aliquotaIPI = 0d;
 		}
 
+		// Temos que imbutir o IPI pois esse impost eh considerado um custo para a
+		// empresa.
+		precoMedio *= (1 + aliquotaIPI);
+
 		double ipiRerepsentada = pedidoService.pesquisarAliquotaIPIRepresentadaByIdItemPedido(idItemPedido);
 
 		double fatorIPI = ipiRerepsentada - aliquotaIPI;

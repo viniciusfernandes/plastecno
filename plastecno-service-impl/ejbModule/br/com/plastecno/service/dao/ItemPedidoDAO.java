@@ -1,6 +1,7 @@
 package br.com.plastecno.service.dao;
 
 import java.util.Date;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -19,6 +20,17 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		super(entityManager);
 	}
 
+	public double pesquisarAliquotaIPIRepresentadaByIdItemPedido(Integer idItemPedido) {
+		if (idItemPedido == null) {
+			return 0;
+		}
+
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select i.pedido.representada.aliquotaIPI from ItemPedido i where i.id = :idItemPedido").setParameter(
+						"idItemPedido", idItemPedido), Double.class, 0d);
+	}
+
 	public void alterarComissao(Integer idItemPedido, Double valorComissao) {
 		alterarPropriedade(ItemPedido.class, idItemPedido, "comissao", valorComissao);
 	}
@@ -33,7 +45,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	private StringBuilder gerarConstrutorItemPedidoComDataEntrega() {
 		return new StringBuilder(
-				"select new ItemPedido(i.id, i.sequencial, i.pedido.id, i.pedido.proprietario.nome, i.quantidade, i.quantidadeRecepcionada, i.precoUnidade, i.pedido.representada.nomeFantasia, i.pedido.dataEntrega, i.formaMaterial, i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento)  from ItemPedido i ");
+				"select new ItemPedido(i.id, i.sequencial, i.pedido.id, i.pedido.proprietario.nome, i.quantidade, i.quantidadeRecepcionada, i.quantidadeReservada, i.precoUnidade, i.pedido.representada.nomeFantasia, i.pedido.dataEntrega, i.formaMaterial, i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento)  from ItemPedido i ");
 	}
 
 	public void inserirComissao(Integer idItemPedido, Double valorComissao) {
@@ -44,7 +56,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Date dataInicial, Date dataFinal) {
 		StringBuilder select = gerarConstrutorItemPedidoComDataEntrega();
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
-		select.append("and i.recebido = false ");
+		select.append("and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada =null)");
 		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
 
 		if (dataInicial != null) {

@@ -230,6 +230,19 @@ public class PedidoServiceTest extends AbstractTest {
 		return pedido;
 	}
 
+	public Pedido gerarPedidoComItem(TipoPedido tipoPedido) {
+		Pedido pedido = gerarPedido(tipoPedido);
+		ItemPedido item1 = gerarItemPedido();
+
+		Integer idPedido = pedido.getId();
+		try {
+			pedidoService.inserirItemPedido(idPedido, item1);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		return pedido;
+	}
+
 	private Pedido gerarPedidoCompra() {
 		return gerarPedido(TipoPedido.COMPRA);
 	}
@@ -248,6 +261,10 @@ public class PedidoServiceTest extends AbstractTest {
 		return gerarPedido(TipoPedido.REPRESENTACAO);
 	}
 
+	private Pedido gerarPedidoRepresentacaoComItem() {
+		return gerarPedidoComItem(TipoPedido.REPRESENTACAO);
+	}
+
 	private Pedido gerarPedidoRevenda() {
 		Cliente revendedor = eBuilder.buildRevendedor();
 		try {
@@ -256,6 +273,16 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		return gerarPedido(TipoPedido.REVENDA);
+	}
+
+	private Pedido gerarPedidoRevendaComItem() {
+		Cliente revendedor = eBuilder.buildRevendedor();
+		try {
+			clienteService.inserir(revendedor);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return gerarPedidoComItem(TipoPedido.REVENDA);
 	}
 
 	private Pedido gerarPedidoSimples() {
@@ -680,6 +707,72 @@ public class PedidoServiceTest extends AbstractTest {
 		assertEquals("Apos o envio do pedido de compra, seu estado deve ser como aguardando recebimento",
 				SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, pedido.getSituacaoPedido());
 
+	}
+
+	@Test
+	public void testEnvioPedidoRepresentacaoSemComissaoRepresentacao() {
+		Pedido pedido = gerarPedidoRepresentacaoComItem();
+		Integer idPedido = pedido.getId();
+		Integer idVendedor = pedido.getVendedor().getId();
+		boolean throwed = false;
+
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, null, null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O vendedor ainda nao possui comissao de representacao e deve ser validado no sistema", throwed);
+
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, null, 0.1);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
+	@Test
+	public void testEnvioPedidoRevendaSemComissaoRevenda() {
+		Pedido pedido = gerarPedidoRevendaComItem();
+		Integer idPedido = pedido.getId();
+		Integer idVendedor = pedido.getVendedor().getId();
+		boolean throwed = false;
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, null, null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue("O vendedor ainda nao possui comissao de revenda e deve ser validado no sistema", throwed);
+
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, 0.1, null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test

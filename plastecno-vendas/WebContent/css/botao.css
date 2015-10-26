@@ -180,6 +180,15 @@
 	width: 24px;
 }
 
+.botaoManutencao {
+	background: url("../images/maintenance_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+
 .botaoPesquisar {
 	background: url("../images/search_24.png") no-repeat scroll 0 0
 		transparent;
@@ -354,6 +363,14 @@
 
 .botaoLogout:hover {
 	background: url("../images/logout_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoManutencao:hover {
+	background: url("../images/maintenance_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 	height: 24px;

@@ -21,6 +21,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemEstoqueDAO;
+import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.ItemReservadoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Item;
@@ -44,8 +45,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	private ItemEstoqueDAO itemEstoqueDAO;
 
-	private ItemReservadoDAO itemReservadoDAO;
+	private ItemPedidoDAO itemPedidoDAO;
 
+	private ItemReservadoDAO itemReservadoDAO;
 	private PedidoDAO pedidoDAO;
 
 	@EJB
@@ -63,23 +65,47 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * item.getQuantidade() * (1 + aliquotaIPI);
 	}
 
-	private void calcularPrecoMedioItemEstoque(ItemEstoque itemCadastrado, ItemEstoque itemEstoque) {
-		removerValoresNulos(itemCadastrado);
-		removerValoresNulos(itemEstoque);
+	/*
+	 * Esse eh o momento em que estamos embutindo o valor da diferenca do ipi no
+	 * custo dos itens do estoque. Essa rotina eh necessaria pois existe uma
+	 * legislacao de debito e credito de ipi para as empresas. Quando se compra,
+	 * temos um credito, ja quando vendemos temos um debito, entao essa diferenca
+	 * deve aparecer no custos dos produtos que serao vendidos, portanto, deve ser
+	 * executado sempre que recepcionarmos uma nova compra.
+	 */
+	private Double calcularPrecoMedioComFatorIPI(Integer idItemPedido, Double precoMedio, Double aliquotaIPI) {
+		if (precoMedio == null) {
+			return null;
+		}
 
+		if (aliquotaIPI == null) {
+			aliquotaIPI = 0d;
+		}
+
+		// Temos que imbutir o IPI pois esse impost eh considerado um custo para a
+		// empresa.
+		precoMedio *= (1 + aliquotaIPI);
+
+		double ipiRerepsentada = pedidoService.pesquisarAliquotaIPIRepresentadaByIdItemPedido(idItemPedido);
+
+		double fatorIPI = ipiRerepsentada - aliquotaIPI;
+
+		return precoMedio * (1 + fatorIPI);
+	}
+
+	private void calcularPrecoMedioItemEstoque(ItemEstoque itemCadastrado, ItemEstoque itemEstoque) {
 		if (itemCadastrado == null) {
-			itemEstoque.setPrecoMedio(itemEstoque.getPrecoMedio() * (1 + itemEstoque.getAliquotaIPI()));
 			return;
 		}
+		removerValoresNulos(itemCadastrado);
+		removerValoresNulos(itemEstoque);
 
 		final boolean contemPrecoMedio = itemEstoque.getPrecoMedio() > 0d;
 		final double quantidadeItem = contemPrecoMedio ? itemEstoque.getQuantidade() : 0;
 
 		final double valorEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getPrecoMedio();
 
-		final double valorItem = itemEstoque.getQuantidade() * itemEstoque.getPrecoMedio()
-				* (1 + itemEstoque.getAliquotaIPI());
-
+		final double valorItem = itemEstoque.getQuantidade() * itemEstoque.getPrecoMedio();
 		final double quantidadeTotal = itemCadastrado.getQuantidade() + quantidadeItem;
 		final double precoMedio = (valorEstoque + valorItem) / quantidadeTotal;
 
@@ -110,7 +136,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		// Precisamos arredondar
-		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + ipi + margemMinimaLucro));
+		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + ipi) * (1 + margemMinimaLucro));
 	}
 
 	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {
@@ -164,7 +190,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 		for (ItemPedido itemPedido : listaItem) {
-			if (!itemPedido.isRecebido()) {
+			if (!itemPedido.isItemRecebido()) {
 				continue;
 			}
 			ItemEstoque itemEstoque = pesquisarItemEstoque(itemPedido);
@@ -224,8 +250,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return itemEstoque;
 	}
 
-	private ItemEstoque gerarItemEstoqueByIdItemPedido(Integer idItemPedido, boolean isRecepcaoItemCompra)
-			throws BusinessException {
+	private ItemEstoque gerarItemEstoqueByIdItemPedido(Integer idItemPedido) throws BusinessException {
 		ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
 		if (itemPedido == null) {
 			throw new BusinessException("O item de pedido No: " + idItemPedido + " não existe no sistema");
@@ -238,16 +263,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 					+ SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.getDescricao() + "\"");
 		}
 
-		// Aqui temos essa condicao pois o usuario pode incluir um item
-		// diretamento
-		// no estoque, sendo que ele nao passa pelo setor de compras.
-		itemPedido.setRecebido(isRecepcaoItemCompra ? itemPedido.isTodasUnidadesRecepcionadas() : true);
-
 		ItemEstoque itemEstoque = gerarItemEstoque(itemPedido);
-		if (isRecepcaoItemCompra) {
-			itemEstoque.setQuantidade(itemPedido.getQuantidadeRecepcionada() == null ? 0 : itemPedido
-					.getQuantidadeRecepcionada());
-		}
 
 		Pedido pedido = itemPedido.getPedido();
 		long qtdePendente = pedidoService.pesquisarTotalItemCompradoNaoRecebido(pedido.getId());
@@ -262,6 +278,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemEstoqueDAO = new ItemEstoqueDAO(entityManager);
 		itemReservadoDAO = new ItemReservadoDAO(entityManager);
 		pedidoDAO = new PedidoDAO(entityManager);
+		itemPedidoDAO = new ItemPedidoDAO(entityManager);
 	}
 
 	@Override
@@ -292,14 +309,15 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
+	@Deprecated
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(Integer idItemPedido) throws BusinessException {
-		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, false));
+		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido));
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
+	public void inserirLimiteMinimoPadrao(ItemEstoque limite) throws BusinessException {
 		if (limite.getMaterial() == null || limite.getMaterial().getId() == null || limite.getFormaMaterial() == null) {
 			throw new BusinessException("Forma item e material são obrigatórios para a criação do limite mínimo de estoque");
 		}
@@ -343,8 +361,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemEstoque pesquisarItemEstoque(Item filtro) {
-		// Verificando se existe item equivalente no estoque, caso nao exista
-		// vamos
+		// Verificando se existe item equivalente no estoque, caso nao exista vamos
 		// criar um novo.
 		ItemEstoque itemCadastrado = null;
 		if (filtro.isPeca()) {
@@ -398,23 +415,20 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer recepcionarItemCompra(Integer idItemPedido) throws BusinessException {
-		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido, true));
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer recepcionarParcialmenteItemCompra(Integer idItemPedido, Integer quantidadeParcial)
-			throws BusinessException {
-		if (quantidadeParcial == null) {
-			quantidadeParcial = 0;
+	public Integer recepcionarItemCompra(Integer idItemPedido, Integer quantidadeRecepcionada) throws BusinessException {
+		if (quantidadeRecepcionada == null) {
+			quantidadeRecepcionada = 0;
 		}
-		Integer quantidadeRecepcionada = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemPedido);
-		quantidadeRecepcionada += quantidadeParcial;
-		pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
+		Integer quantidadeItem = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemPedido);
+		quantidadeItem += quantidadeRecepcionada;
+		pedidoService.alterarQuantidadeRecepcionada(idItemPedido, quantidadeItem);
 
-		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido, true);
-		itemEstoque.setQuantidade(quantidadeParcial);
+		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido);
+		itemEstoque.setQuantidade(quantidadeRecepcionada);
+
+		itemEstoque.setPrecoMedio(calcularPrecoMedioComFatorIPI(idItemPedido, itemEstoque.getPrecoMedio(),
+				itemEstoque.getAliquotaIPI()));
+
 		return inserirItemEstoque(itemEstoque);
 	}
 
@@ -571,7 +585,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public SituacaoReservaEstoque reservarItemPedido(ItemPedido itemPedido) throws BusinessException {
-		if (itemPedido.isTodasUnidadesReservadas()) {
+		if (itemPedido.isItemReservado()) {
 			return SituacaoReservaEstoque.UNIDADES_TODAS_RESERVADAS;
 		}
 
@@ -603,7 +617,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		itemPedido.addQuantidadeReservada(quantidadeReservada);
-		pedidoService.inserirItemPedido(itemPedido);
+		itemPedidoDAO.alterar(itemPedido);
 		return situacao;
 	}
 }

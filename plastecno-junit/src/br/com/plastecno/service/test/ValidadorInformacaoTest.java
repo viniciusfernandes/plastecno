@@ -35,6 +35,34 @@ public class ValidadorInformacaoTest extends AbstractTest {
 	}
 
 	@Test
+	public void testCampoTextFinalEspacoEmBranco() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		String razao = e.getRazaoSocial() + "  ";
+		e.setRazaoSocial(razao);
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			printMensagens(e1);
+		}
+		assertEquals("O campo nao pode conter espacos em branco no final, entao isso deve ser validado", razao.trim(),
+				e.getRazaoSocial());
+	}
+
+	@Test
+	public void testCampoTextFinalEspacoEmBrancoNulo() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.setRazaoSocial(null);
+
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			printMensagens(e1);
+		}
+		assertEquals("O campo nao pode conter espacos em branco no final, entao isso deve ser validado", null,
+				e.getRazaoSocial());
+	}
+
+	@Test
 	public void testCampoTextoNaoObrigatorio() {
 		EntidadeValidacao e = gerarEntidadeValidacao();
 		e.setRazaoSocial(null);

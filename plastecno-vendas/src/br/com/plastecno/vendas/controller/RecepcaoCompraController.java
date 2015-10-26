@@ -6,12 +6,11 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.interceptor.download.Download;
+import br.com.plastecno.message.AlteracaoEstoquePublisher;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.FormaMaterial;
-import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
@@ -22,6 +21,9 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class RecepcaoCompraController extends AbstractController {
+
+    @Servico
+    private AlteracaoEstoquePublisher alteracaoEstoquePublisher;
 
     @Servico
     private EstoqueService estoqueService;
@@ -37,11 +39,6 @@ public class RecepcaoCompraController extends AbstractController {
 
     public RecepcaoCompraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
-    }
-
-    @Get("compra/pdf")
-    public Download downloadPedidoPDF(Integer idPedido) {
-        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.COMPRA);
     }
 
     @Get("compra/recepcao/listagem")
@@ -95,7 +92,7 @@ public class RecepcaoCompraController extends AbstractController {
             Date dataFinal, Integer idRepresentada) {
         String mensagem = null;
         try {
-            estoqueService.recepcionarParcialmenteItemCompra(idItemPedido, quantidadeRecepcionada);
+            estoqueService.recepcionarItemCompra(idItemPedido, quantidadeRecepcionada);
             boolean contemItem = pedidoService.contemQuantidadeNaoRecepcionadaItemPedido(idItemPedido);
             Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
 
@@ -113,6 +110,8 @@ public class RecepcaoCompraController extends AbstractController {
             addAtributo("itemPedido", pedidoService.pesquisarItemPedido(idItemPedido));
             gerarListaMensagemErro(e);
         }
+
+        alteracaoEstoquePublisher.publicar();
 
         addAtributo("permanecerTopo", true);
         redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);

@@ -8,19 +8,33 @@ import java.lang.annotation.Target;
 import br.com.plastecno.service.constante.TipoDocumento;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target({ ElementType.TYPE, ElementType.FIELD })
 public @interface InformacaoValidavel {
 	boolean cascata() default false;
-	int[] intervalo() default {};
-	boolean iteravel() default false;
-	String nomeExibicao() default "";
-	boolean numerico() default false;
-	boolean obrigatorio() default false;
-	String padrao() default "";
-	boolean relacionamentoObrigatorio() default false;
-	int tamanho() default -1;
-	TipoDocumento tipoDocumento() default TipoDocumento.NAO_EH_DOCUMENTO;
-	boolean validarHierarquia() default false;
+
 	boolean estritamentePositivo() default false;
+
+	int[] intervalo() default {};
+
+	boolean iteravel() default false;
+
+	String nomeExibicao() default "";
+
+	boolean numerico() default false;
+
+	boolean obrigatorio() default false;
+
+	String padrao() default "";
+
 	boolean positivo() default false;
+
+	boolean relacionamentoObrigatorio() default false;
+
+	int tamanho() default -1;
+
+	TipoDocumento tipoDocumento() default TipoDocumento.NAO_EH_DOCUMENTO;
+
+	boolean trim() default false;
+
+	boolean validarHierarquia() default false;
 }

@@ -21,6 +21,7 @@ public final class ValidadorInformacao {
 		// variavel sera utilizada tambem para verificar se o campo eh uma String
 		int COMPRIMENTO_STRING = -1;
 		Field[] camposValidaveis = recuperarCamposValidaveis(obj);
+		boolean isString = false;
 
 		for (Field campo : camposValidaveis) {
 			InformacaoValidavel informacao = campo.getAnnotation(InformacaoValidavel.class);
@@ -64,7 +65,13 @@ public final class ValidadorInformacao {
 
 			// Essa variavel sera sempre ZERO no caso em que o conteudo nao seja uma
 			// string
-			COMPRIMENTO_STRING = conteudoCampo instanceof String ? conteudoCampo.toString().trim().length() : -1;
+			isString = conteudoCampo instanceof String;
+
+			if (isString && informacao.trim()) {
+				conteudoCampo = trim(campo, obj, conteudoCampo);
+			}
+
+			COMPRIMENTO_STRING = isString ? conteudoCampo.toString().trim().length() : -1;
 			if (informacao.intervalo().length > 0 && COMPRIMENTO_STRING >= 0
 					&& (COMPRIMENTO_STRING < informacao.intervalo()[0] || COMPRIMENTO_STRING > informacao.intervalo()[1])) {
 				listaMensagem.add(informacao.nomeExibicao() + " deve conter de " + informacao.intervalo()[0] + " a "
@@ -125,11 +132,12 @@ public final class ValidadorInformacao {
 		try {
 			campo.setAccessible(true);
 			Object conteudoCampo = campo.get(obj);
-			campo.setAccessible(false);
 			return conteudoCampo;
 		} catch (Exception e) {
-			throw new IllegalStateException("O valor do campo " + campo.getType() + " do objecto " + obj.getClass()
-					+ " não pode ser acessado");
+			throw new IllegalStateException("O valor do campo " + campo.getName() + " do objeto " + obj.getClass()
+					+ " não pode ser acessado", e);
+		} finally {
+			campo.setAccessible(false);
 		}
 	}
 
@@ -143,6 +151,20 @@ public final class ValidadorInformacao {
 							+ " não possui um de acesso ao campo de identificação ID. Implementar um metodo de acesso getId(), mas no caso de ENUM, substitua pelo atributo \"obrigatório\"");
 		}
 
+	}
+
+	private static Object trim(Field campo, Object obj, Object conteudoCampo) {
+		conteudoCampo = conteudoCampo.toString().trim();
+		try {
+			campo.setAccessible(true);
+			campo.set(obj, conteudoCampo);
+		} catch (Exception e) {
+			throw new IllegalStateException("O valor do campo " + campo.getName() + " do objeto " + obj.getClass()
+					+ " nao pode ter os espacos em branco removidos cujo conteudo eh \"" + conteudoCampo + "\"", e);
+		} finally {
+			campo.setAccessible(false);
+		}
+		return conteudoCampo;
 	}
 
 	public static void validar(Object obj) throws InformacaoInvalidaException {

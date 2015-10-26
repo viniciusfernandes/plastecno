@@ -585,3 +585,12 @@ alter table vendas.tb_pedido add aliquota_comissao numeric (5,5) default 0;
 insert into vendas.tb_situacao_pedido values (9, 'COMPRA EM ANDAMENTO');
 insert into vendas.tb_situacao_pedido values (10, 'ITEM AGUARDANDO MATERIAL');
 insert into vendas.tb_situacao_pedido values (11, 'REVENDA PARCIALMENTE RESERVADA');	
+
+drop table IF EXISTS vendas.tb_limite_minimo_estoque cascade ;
+alter table vendas.tb_item_estoque drop column if exists id_limite_minimo_estoque;
+
+alter table vendas.tb_item_estoque add quantidade_minima integer default null;
+alter table vendas.tb_item_estoque add margem_minima_lucro numeric(5, 2) default null;
+alter table vendas.tb_item_pedido add preco_minimo numeric(9, 2) default null;
+
+alter table vendas.tb_representada add aliquota_ipi numeric(5, 2) default null;

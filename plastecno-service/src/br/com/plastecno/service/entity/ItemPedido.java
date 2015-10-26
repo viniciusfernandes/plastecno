@@ -49,7 +49,7 @@ public class ItemPedido extends Item {
 	private Date dataEntrega;
 
 	@Column(name = "descricao_peca")
-	@InformacaoValidavel(intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
+	@InformacaoValidavel(trim = true, intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
 	private String descricaoPeca;
 
 	@Column(name = "item_encomendado")
@@ -133,9 +133,6 @@ public class ItemPedido extends Item {
 	@Column(name = "quantidade_reservada")
 	private Integer quantidadeReservada;
 
-	@Column(name = "item_recebido")
-	private boolean recebido;
-
 	private Integer sequencial;
 
 	@Transient
@@ -152,6 +149,9 @@ public class ItemPedido extends Item {
 	@Transient
 	private String valorComissionadoFormatado;
 
+	@Column(name = "valor_comissionado_representacao")
+	private Double valorComissionadoRepresentacao;
+
 	@Transient
 	private Double valorPedido;
 
@@ -163,9 +163,6 @@ public class ItemPedido extends Item {
 
 	@Transient
 	private String valorPedidoIPIFormatado;
-
-	@Column(name = "valor_comissionado_representacao")
-	private Double valorComissionadoRepresentacao;
 
 	public ItemPedido() {
 	}
@@ -216,15 +213,16 @@ public class ItemPedido extends Item {
 	}
 
 	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, String nomeProprietario, Integer quantidade,
-			Integer quantidadeRecepcionada, Double precoUnidade, String nomeRepresentada, Date dataEntrega,
-			FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial, String descricaoPeca,
-			Double medidaExterna, Double medidaInterna, Double comprimento) {
+			Integer quantidadeRecepcionada, Integer quantidadeReservada, Double precoUnidade, String nomeRepresentada,
+			Date dataEntrega, FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial,
+			String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
 
 		this(id, sequencial, idPedido, null, nomeProprietario, "", precoUnidade, null, quantidade, (Double) null,
 				formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
 		this.nomeRepresentada = nomeRepresentada;
 		this.dataEntrega = dataEntrega;
 		this.quantidadeRecepcionada = quantidadeRecepcionada;
+		this.quantidadeReservada = quantidadeReservada;
 	}
 
 	public void addQuantidadeReservada(Integer quantidadeReservada) {
@@ -247,7 +245,6 @@ public class ItemPedido extends Item {
 			clone = (ItemPedido) super.clone();
 			clone.setId(null);
 			clone.setPedido(null);
-			clone.setRecebido(false);
 			clone.setQuantidadeReservada(0);
 			clone.setQuantidadeRecepcionada(0);
 			return clone;
@@ -408,6 +405,10 @@ public class ItemPedido extends Item {
 		return valorComissionadoFormatado;
 	}
 
+	public Double getValorComissionadoRepresentacao() {
+		return valorComissionadoRepresentacao;
+	}
+
 	public Double getValorPedido() {
 		return valorPedido;
 	}
@@ -424,27 +425,19 @@ public class ItemPedido extends Item {
 		return valorPedidoIPIFormatado;
 	}
 
-	public Double getValorComissionadoRepresentacao() {
-		return valorComissionadoRepresentacao;
-	}
-
 	public boolean isEncomendado() {
 		return encomendado;
+	}
+
+	public boolean isItemRecebido() {
+		return quantidade != null && quantidade.equals(quantidadeRecepcionada);
 	}
 
 	public boolean isNovo() {
 		return this.id == null;
 	}
 
-	public boolean isRecebido() {
-		return recebido;
-	}
-
-	public boolean isTodasUnidadesRecepcionadas() {
-		return quantidade != null && quantidade.equals(quantidadeRecepcionada);
-	}
-
-	public boolean isTodasUnidadesReservadas() {
+	public boolean isItemReservado() {
 		return quantidade != null && quantidade.equals(quantidadeReservada);
 	}
 
@@ -572,10 +565,6 @@ public class ItemPedido extends Item {
 		this.quantidadeReservada = quantidadeReservada;
 	}
 
-	public void setRecebido(boolean recebido) {
-		this.recebido = recebido;
-	}
-
 	public void setSequencial(Integer sequencial) {
 		this.sequencial = sequencial;
 	}
@@ -600,6 +589,10 @@ public class ItemPedido extends Item {
 		this.valorComissionadoFormatado = valorComissionadoFormatado;
 	}
 
+	public void setValorComissionadoRepresentacao(Double valorComissionadoRepresentacao) {
+		this.valorComissionadoRepresentacao = valorComissionadoRepresentacao;
+	}
+
 	public void setValorPedido(Double valorPedido) {
 		this.valorPedido = valorPedido;
 	}
@@ -614,10 +607,6 @@ public class ItemPedido extends Item {
 
 	public void setValorPedidoIPIFormatado(String valorPedidoIPIFormatado) {
 		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
-	}
-
-	public void setValorComissionadoRepresentacao(Double valorComissionadoRepresentacao) {
-		this.valorComissionadoRepresentacao = valorComissionadoRepresentacao;
 	}
 
 }

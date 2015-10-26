@@ -299,14 +299,14 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
-		return pesquisarTotalItemPedido(idPedido, null);
+		return pesquisarTotalItemPedido(idPedido, false);
 	}
 
-	public Long pesquisarTotalItemPedido(Integer idPedido, Boolean recebido) {
+	public Long pesquisarTotalItemPedido(Integer idPedido, boolean apenasNaoRecebido) {
 		StringBuilder select = new StringBuilder();
 		select.append("select count(i.id) from ItemPedido i where i.pedido.id = :idPedido ");
-		if (recebido != null) {
-			select.append("and i.recebido = ").append(recebido);
+		if (apenasNaoRecebido) {
+			select.append(" and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada = null)");
 		}
 		return (Long) this.entityManager.createQuery(select.toString()).setParameter("idPedido", idPedido)
 				.getSingleResult();

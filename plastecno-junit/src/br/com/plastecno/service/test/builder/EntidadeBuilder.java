@@ -89,6 +89,7 @@ public class EntidadeBuilder {
 		item.setMedidaInterna(100.0);
 		item.setComprimento(1000.0);
 		item.setPrecoMedio(100.0);
+		item.setQuantidade(10);
 		return item;
 	}
 
@@ -212,6 +213,7 @@ public class EntidadeBuilder {
 		representada.setEmail("vendas@cobex.com.br");
 		representada.setComissao(0.05);
 		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
+		representada.setAliquotaIPI(0.18);
 		return representada;
 	}
 

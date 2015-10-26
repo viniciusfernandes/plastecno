@@ -10,8 +10,9 @@
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 
 
@@ -75,7 +76,7 @@ $(document).ready(function() {
 	});
 	
 	inserirMascaraNumerica('comissaoRevenda', '99');
-	inserirMascaraNumerica('comissaoRepresentacao', '99');
+	inserirMascaraMonetaria('comissaoRepresentacao', 4);
 	inserirMascaraNumerica('comissaoProduto', '99');
 });
 

@@ -48,7 +48,7 @@ public class ComissaoController extends AbstractController {
         comissao.setDataInicioFormatado(StringUtils.formatarDataHora(comissao.getDataInicio()));
         comissao.setDataFimFormatado(StringUtils.formatarDataHora(comissao.getDataFim()));
         comissao.setAliquotaRevendaFormatada(NumeroUtils.gerarPercentual(comissao.getAliquotaRevenda()).toString());
-        comissao.setAliquotaRepresentacaoFormatada(NumeroUtils.gerarPercentual(comissao.getAliquotaRepresentacao())
+        comissao.setAliquotaRepresentacaoFormatada(NumeroUtils.gerarPercentual(comissao.getAliquotaRepresentacao(), 2)
                 .toString());
     }
 
@@ -83,7 +83,7 @@ public class ComissaoController extends AbstractController {
     public void inserirComissaoVendedor(Usuario vendedor, Double comissaoRevenda, Double comissaoRepresentacao) {
         try {
             comissaoService.inserirComissaoVendedor(vendedor.getId(), NumeroUtils.gerarAliquota(comissaoRevenda),
-                    NumeroUtils.gerarAliquota(comissaoRepresentacao));
+                    NumeroUtils.gerarAliquota(comissaoRepresentacao, 4));
             gerarMensagemSucesso("Comissão do vendedor \"" + vendedor.getNome() + "\" foi incluída com sucesso");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

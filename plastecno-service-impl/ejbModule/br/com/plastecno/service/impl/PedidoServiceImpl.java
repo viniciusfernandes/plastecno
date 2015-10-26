@@ -404,7 +404,7 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido.isOrcamento()) {
 			enviarOrcamento(pedido, arquivoAnexado);
 		} else {
-			inserirComissaoVenda(pedido);
+			calcularComissaoVenda(pedido);
 			enviarVenda(pedido, arquivoAnexado);
 		}
 		if (pedido.isCompra()) {
@@ -552,7 +552,7 @@ public class PedidoServiceImpl implements PedidoService {
 		return pedido;
 	}
 
-	private void inserirComissaoVenda(Pedido pedido) throws BusinessException {
+	private void calcularComissaoVenda(Pedido pedido) throws BusinessException {
 		if (!pedido.isVenda()) {
 			return;
 		}
@@ -583,21 +583,24 @@ public class PedidoServiceImpl implements PedidoService {
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 			}
 
-			if (comissaoVenda == null) {
-				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
-				throw new BusinessException("Não existe comissão configurada para o vendedor \"" + vendedor.getNomeCompleto()
-						+ "\". Problema para calular a comissão do item No. " + itemPedido.getSequencial() + " do pedido No. "
-						+ pedido.getId());
-			}
-
 			// Nos calculos do preco de venda do item nao pode haver o IPI de venda.
 			precoItem = itemPedido.calcularPrecoItem();
 
-			if (pedido.isRevenda()) {
+			if (pedido.isRevenda() && comissaoVenda != null && comissaoVenda.getAliquotaRevenda() != null) {
 				valorComissionado = precoItem * comissaoVenda.getAliquotaRevenda();
-			} else if (pedido.isRepresentacao()) {
+			} else if (pedido.isRepresentacao() && comissaoVenda != null && comissaoVenda.getAliquotaRepresentacao() != null) {
 				valorComissionado = precoItem * comissaoVenda.getAliquotaRepresentacao();
 				valorComissionadoRepresentacao = precoItem * (pedido.getRepresentada().getComissao());
+			} else {
+				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
+				throw new BusinessException(
+						"Não existe comissão configurada para o vendedor \""
+								+ vendedor.getNomeCompleto()
+								+ "\". Problema para calular a comissão do item No. "
+								+ itemPedido.getSequencial()
+								+ " do pedido No. "
+								+ pedido.getId()
+								+ ". Também pode não existir comissão padrão configurada para o material desse item, verifique as configurações do sistema.");
 			}
 
 			itemPedido.setValorComissionado(valorComissionado);
@@ -647,14 +650,14 @@ public class PedidoServiceImpl implements PedidoService {
 		Double aliquotaIPI = itemPedido.getAliquotaIPI();
 		final boolean ipiPreenchido = aliquotaIPI != null;
 		final TipoApresentacaoIPI tipoApresentacaoIPI = pesquisarTipoApresentacaoIPI(itemPedido);
-		final boolean materialImportado = materialService.isMaterialImportado(itemPedido.getMaterial().getId());
-		final boolean ipiObrigatorio = TipoApresentacaoIPI.SEMPRE.equals(tipoApresentacaoIPI)
-				|| (TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI) && materialImportado);
+		final boolean ipiObrigatorio = TipoApresentacaoIPI.SEMPRE.equals(tipoApresentacaoIPI);
+		final boolean ipiImportado = TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI)
+				&& materialService.isMaterialImportado(itemPedido.getMaterial().getId());
 
-		if (ipiPreenchido && TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
+		if (ipiPreenchido && aliquotaIPI > 0 && TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
 			throw new BusinessException(
 					"Remova o valor do IPI do item pois representada escolhida não apresenta cáculo de IPI.");
-		} else if (!ipiPreenchido && ipiObrigatorio) {
+		} else if (!ipiPreenchido && (ipiObrigatorio || ipiImportado)) {
 			itemPedido.setAliquotaIPI(itemPedido.getFormaMaterial().getIpi());
 		}
 
@@ -704,6 +707,7 @@ public class PedidoServiceImpl implements PedidoService {
 		return inserirItemPedido(idPedido, itemPedido);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@Override
 	public boolean isCalculoIPIHabilitado(Integer idPedido) {
 		Integer idRepresentada = pesquisarIdRepresentadaByIdPedido(idPedido);
@@ -737,6 +741,12 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalPedidoByIdCliente(idCliente, idVendedor, isCompra),
 				listaPedido);
+	}
+
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@Override
+	public double pesquisarAliquotaIPIRepresentadaByIdItemPedido(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarAliquotaIPIRepresentadaByIdItemPedido(idItemPedido);
 	}
 
 	@Override
@@ -1214,7 +1224,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public long pesquisarTotalItemCompradoNaoRecebido(Integer idPedido) {
-		return pedidoDAO.pesquisarTotalItemPedido(idPedido, false);
+		return pedidoDAO.pesquisarTotalItemPedido(idPedido, true);
 	}
 
 	@Override

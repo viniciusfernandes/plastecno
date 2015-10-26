@@ -323,7 +323,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemEstoque limite = gerarLimiteMinimoEstoque();
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -335,7 +335,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setQuantidadeMinima(antes + 10);
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -353,12 +353,12 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemEstoque limite = gerarLimiteMinimoEstoque();
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = 120d;
+		Double precoMinimo = 121d;
 
 		Double precoMinimoCalculado = null;
 		try {
@@ -377,7 +377,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setMargemMinimaLucro(null);
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -449,7 +449,7 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testInclusaoItemPedidoNoEstoque() {
+	public void testInclusaoItemPedidoValidoNoEstoque() {
 		ItemPedido i = enviarItemPedidoCompra();
 
 		try {
@@ -460,7 +460,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
+			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -475,7 +475,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemEstoque limite = gerarLimiteMinimoEstoque();
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -493,7 +493,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		ItemEstoque limite = gerarLimiteMinimoEstoquePeca();
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -510,7 +510,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -522,7 +522,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		throwed = false;
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -554,7 +554,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setComprimento(null);
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -579,7 +579,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setQuantidadeMinima(-1);
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -591,7 +591,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setQuantidadeMinima(0);
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -652,41 +652,60 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testRecepcionarItemPedidoCompra() {
+	public void testRecepcaoItemPedidoCompraComAliquotaIPI() {
 		ItemPedido i = enviarItemPedidoCompra();
-		try {
-			pedidoService.alterarQuantidadeRecepcionada(i.getId(), i.getQuantidade());
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
 
+		Integer idItemEstoque = null;
 		try {
-			estoqueService.recepcionarItemCompra(i.getId());
+			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		Double precoMedioComFatorIPI = 81.27;
+
+		assertEquals("O valor do preco medio apos a recepcao da compra deve conter o ipi. Os valores nao conferem",
+				precoMedioComFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
+
 	}
 
 	@Test
-	public void testRecepcionarItemPedidoCompraQuantidadeInferior() {
+	public void testRecepcaoItemPedidoCompraQuantidadeInferior() {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer quantidadeRecepcionada = i.getQuantidade() - 1;
-		try {
-			pedidoService.alterarQuantidadeRecepcionada(i.getId(), quantidadeRecepcionada);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
 
 		try {
-			estoqueService.recepcionarItemCompra(i.getId());
+			estoqueService.recepcionarItemCompra(i.getId(), quantidadeRecepcionada);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
 		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
 				pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
+	}
+
+	@Test
+	public void testRecepcaoItemPedidoCompraSemAliquotaIPI() {
+		ItemPedido i = enviarItemPedidoCompra();
+		i.setAliquotaIPI(null);
+
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		Double precoMedioSemFatorIPI = 80.74;
+
+		assertEquals(
+				"O item nao contem ipi entao o valor do preco medio apos a recepcao da compra deve ser o mesmo. Os valores nao conferem",
+				precoMedioSemFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
+
 	}
 
 	@TODO
@@ -896,25 +915,6 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testRedefinicaoEstoqueMaterialQuantidade() {
-		ItemPedido i = enviarItemPedidoCompra();
-		Integer idItemEstoque = null;
-		try {
-			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
-		itemEstoque.setQuantidade(0);
-		try {
-			estoqueService.redefinirItemEstoque(itemEstoque);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-	}
-
-	@Test
 	public void testRedefinicaoEstoqueMaterialQuantidadeNegativa() {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer idItemEstoque = null;
@@ -933,6 +933,25 @@ public class EstoqueServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O item de estoque deve conter quantidade positiva", throwed);
+	}
+
+	@Test
+	public void testRedefinicaoEstoqueMaterialQuantidadeZerada() {
+		ItemPedido i = enviarItemPedidoCompra();
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.inserirItemPedido(i.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		itemEstoque.setQuantidade(0);
+		try {
+			estoqueService.redefinirItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test
@@ -1091,14 +1110,14 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemEstoque limite = gerarLimiteMinimoEstoque();
 
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
 		limite.setQuantidadeMinima(null);
 		try {
-			estoqueService.inserirLimiteMinimoEstoque(limite);
+			estoqueService.inserirLimiteMinimoPadrao(limite);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1397,14 +1416,6 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, i1.getPedido().getSituacaoPedido());
-
-		try {
-			estoqueService.inserirItemPedido(i2.getId());
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, i2.getPedido().getSituacaoPedido());
-
 	}
 
 	@Test
@@ -1412,15 +1423,15 @@ public class EstoqueServiceTest extends AbstractTest {
 		List<ItemPedido> listaItemComprado = gerarListaItemPedido(TipoPedido.COMPRA);
 		for (ItemPedido itemPedido : listaItemComprado) {
 			try {
-				estoqueService.inserirItemPedido(itemPedido.getId());
+				estoqueService.recepcionarItemCompra(itemPedido.getId(), itemPedido.getQuantidade());
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}
 		}
-		Double totalEstoque = 1.11;
+		Double totalEstoque = 1.19;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.BQ));
 
-		totalEstoque = 2.22;
+		totalEstoque = 2.38;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.TB));
 	}
 
@@ -1429,12 +1440,12 @@ public class EstoqueServiceTest extends AbstractTest {
 		List<ItemPedido> listaItemComprado = gerarListaItemPedido(TipoPedido.COMPRA);
 		for (ItemPedido itemPedido : listaItemComprado) {
 			try {
-				estoqueService.inserirItemPedido(itemPedido.getId());
+				estoqueService.recepcionarItemCompra(itemPedido.getId(), itemPedido.getQuantidade());
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}
 		}
-		Double totalEstoque = 3.33d;
+		Double totalEstoque = 3.56d;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, null));
 	}
 

@@ -41,12 +41,20 @@ $(document).ready(function() {
 		$(form).submit();
 	});
 	
+	$('#botaoPesquisar').click(function () {
+		var parametros = serializarBloco('bloco_empacotamento');
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/empacotamento/revenda/listagem"/>?'+parametros);
+		$(form).submit();
+	});
+	
 	$('#botaoEmpacotamentarPedidos').click(function () {
 
 		inicializarModalConfirmacao({
 			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja EMPACOTAR ESSE(S) PEDIDO(S)?',
 			confirmar: function(){
-				var parametros = $('#formPesquisa').serialize();
+				var parametros = serializarBloco('bloco_empacotamento');
 				for (var i = 0; i < listaIdPedido.length; i++) {
 					// Estamos validando aqui pois no DELETE dos itens da lista o javascript mantem undefined.
 					if(listaIdPedido[i] != undefined){
@@ -70,7 +78,8 @@ function inicializarAutocompleteCliente(){
 		parametro : 'nomeFantasia',
 		containerResultados : 'containerPesquisaCliente',
 		selecionarItem: function(itemLista) {
-			$('#formPesquisa #idCliente').val(itemLista.id);
+			$('#bloco_empacotamento #idCliente').val(itemLista.id);
+			$('#botaoPesquisar').click();
 		}
 	});	
 }
@@ -111,21 +120,19 @@ function empacotarPedido(campo){
 	</form>
 
 
-	<form id="formPesquisa" action="<c:url value="/empacotamento/revenda/listagem"/>" method="get">
-		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
-		<fieldset>
+		<fieldset id="bloco_empacotamento">
+			<input type="hidden" id="idCliente" name="idCliente" value="${cliente.id}"/>
 			<legend>::: Pedidos de Revenda para Empacotamento :::</legend>
 			<div class="label" style="width: 30%">Cliente:</div>
 			<div class="input" style="width: 50%">
-				<input type="text" id="nomeFantasia" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" style="width: 40%"/>
+				<input type="text" id="nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" style="width: 40%"/>
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			<div class="bloco_botoes">
-				<input type="submit" value="" class="botaoPesquisar" /> 
+				<input id="botaoPesquisar" type="button" value="" class="botaoPesquisar" /> 
 				<input id="botaoLimpar" type="button" value="" title="Limpar Dados de Pesquisa dos Pedidos para Empacotamento" class="botaoLimpar" />
 			</div>
 		</fieldset>
-	</form>
 	
 	<c:if test="${not empty relatorio}">
 		<div class="bloco_botoes">
@@ -160,7 +167,7 @@ function empacotarPedido(campo){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.nomeProprietario}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/empacotamento/pedido/pdf"/>" >
+									<form action="<c:url value="/pedido/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 									</form>

@@ -237,12 +237,12 @@ public abstract class AbstractController {
         this.result.use(Results.json()).from(lista, categoria).serialize();
     }
 
-    void gerarListaMensagemAltera(BusinessException e) {
+    void gerarListaMensagemAlerta(BusinessException e) {
         this.result.include("listaMensagem", e.getListaMensagem());
         this.result.include("cssMensagem", cssMensagemAlerta);
     }
 
-    void gerarListaMensagemAltera(String mensagem) {
+    void gerarListaMensagemAlerta(String mensagem) {
         this.result.include("listaMensagem", new String[] {mensagem});
         this.result.include("cssMensagem", cssMensagemAlerta);
     }

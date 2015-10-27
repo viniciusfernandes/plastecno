@@ -112,6 +112,7 @@ public class EntidadeBuilder {
 	public ItemPedido buildItemPedido() {
 		ItemPedido itemPedido = new ItemPedido();
 		itemPedido.setAliquotaIPI(0.11d);
+		itemPedido.setAliquotaICMS(0.06d);
 		itemPedido.setMaterial(buildMaterial());
 		itemPedido.setFormaMaterial(FormaMaterial.TB);
 		itemPedido.setQuantidade(2);
@@ -126,6 +127,7 @@ public class EntidadeBuilder {
 	public ItemPedido buildItemPedidoPeca() {
 		ItemPedido itemPedido = new ItemPedido();
 		itemPedido.setAliquotaIPI(11.1d);
+		itemPedido.setAliquotaICMS(0.06d);
 		itemPedido.setMaterial(buildMaterial());
 		itemPedido.setFormaMaterial(FormaMaterial.PC);
 		itemPedido.setQuantidade(2);
@@ -213,7 +215,7 @@ public class EntidadeBuilder {
 		representada.setEmail("vendas@cobex.com.br");
 		representada.setComissao(0.05);
 		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
-		representada.setAliquotaIPI(0.18);
+		representada.setAliquotaICMS(0.18);
 		return representada;
 	}
 

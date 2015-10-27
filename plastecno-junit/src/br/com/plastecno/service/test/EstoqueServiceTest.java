@@ -154,6 +154,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setMargemMinimaLucro(0.1d);
 		limite.setQuantidadeMinima(10);
 		limite.setAliquotaIPI(0.1d);
+		limite.setAliquotaICMS(0.06d);
 		return limite;
 	}
 
@@ -162,6 +163,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		limite.setMargemMinimaLucro(0.1d);
 		limite.setQuantidadeMinima(10);
 		limite.setAliquotaIPI(0.1d);
+		limite.setAliquotaICMS(0.06d);
 		return limite;
 	}
 
@@ -358,7 +360,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = 121d;
+		Double precoMinimo = 110d;
 
 		Double precoMinimoCalculado = null;
 		try {
@@ -382,10 +384,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()
-				* (1 + (itemEstoque.getAliquotaIPI() == null ? 0 : itemEstoque.getAliquotaIPI()))
-				* (1 + (itemEstoque.getMargemMinimaLucro() == null ? 0 : itemEstoque.getMargemMinimaLucro())));
-
+		Double precoMinimo = 100d;
 		Double precoMinimoCalculado = null;
 		try {
 			precoMinimoCalculado = estoqueService.calcularPrecoMinimoItemEstoque(itemEstoque);
@@ -665,11 +664,10 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
 
 		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
-		Double precoMedioComFatorIPI = 81.27;
+		Double precoMedioComFatorIPI = 75.95;
 
 		assertEquals("O valor do preco medio apos a recepcao da compra deve conter o ipi. Os valores nao conferem",
 				precoMedioComFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
-
 	}
 
 	@Test
@@ -700,12 +698,11 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
-		Double precoMedioSemFatorIPI = 80.74;
+		Double precoMedioSemFatorIPI = 68.42;
 
 		assertEquals(
 				"O item nao contem ipi entao o valor do preco medio apos a recepcao da compra deve ser o mesmo. Os valores nao conferem",
 				precoMedioSemFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
-
 	}
 
 	@TODO
@@ -1428,10 +1425,10 @@ public class EstoqueServiceTest extends AbstractTest {
 				printMensagens(e);
 			}
 		}
-		Double totalEstoque = 1.19;
+		Double totalEstoque = 1.11;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.BQ));
 
-		totalEstoque = 2.38;
+		totalEstoque = 2.22;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.TB));
 	}
 
@@ -1445,7 +1442,7 @@ public class EstoqueServiceTest extends AbstractTest {
 				printMensagens(e);
 			}
 		}
-		Double totalEstoque = 3.56d;
+		Double totalEstoque = 3.33d;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, null));
 	}
 

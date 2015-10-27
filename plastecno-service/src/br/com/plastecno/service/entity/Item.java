@@ -64,6 +64,18 @@ public abstract class Item implements Serializable, Cloneable {
 		return getPrecoUnidade() * getQuantidade();
 	}
 
+	public Double calcularPrecoUnidadeIPI() {
+		if (getPrecoUnidade() == null) {
+			return null;
+		}
+
+		if (getAliquotaIPI() == null) {
+			return getPrecoUnidade();
+		}
+
+		return getPrecoUnidade() * (1 + getAliquotaIPI());
+	}
+
 	public void configurarMedidaInterna() {
 		if (isMedidaExternaIgualInterna()) {
 			setMedidaInterna(getMedidaExterna());

@@ -203,7 +203,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
 		StringBuilder select = gerarConstrutorItemEstoque();
-		
+
 		select
 				.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
 		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();
@@ -212,8 +212,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
-						"select i.margemMinimaLucro, i.precoMedio, i.aliquotaIPI from ItemEstoque i where i.id= :idItemEstoque")
-						.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null, null });
+						"select i.margemMinimaLucro, i.precoMedio from ItemEstoque i where i.id= :idItemEstoque").setParameter(
+						"idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null });
 	}
 
 	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {

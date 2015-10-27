@@ -73,7 +73,7 @@ $(document).ready(function() {
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
 	inserirMascaraNumerica('comissao', '99');
-	inserirMascaraNumerica('aliquotaIPI', '99');
+	inserirMascaraNumerica('aliquotaICMS', '99');
 });
 
 function inicializarFiltro() {
@@ -164,10 +164,10 @@ function inicializarModalCancelamento(botao){
 				<input type="text" id="comissao" name="representada.comissao"
 					value="${representada.comissaoPercentual}" />
 			</div>
-			<div class="label" style="width: 10%">IPI (%):</div>
+			<div class="label" style="width: 10%">ICMS (%):</div>
 			<div class="input" style="width: 30%">
-				<input type="text" id="aliquotaIPI" name="representada.aliquotaIPI"
-					value="${representada.aliquotaIPI}" style="width: 15%" />
+				<input type="text" id="aliquotaICMS" name="representada.aliquotaICMS"
+					value="${representada.aliquotaICMS}" style="width: 15%" />
 			</div>
 			
 			<div class="label obrigatorio">Nome Fantasia:</div>

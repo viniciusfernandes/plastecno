@@ -65,34 +65,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * item.getQuantidade() * (1 + aliquotaIPI);
 	}
 
-	/*
-	 * Esse eh o momento em que estamos embutindo o valor da diferenca do ipi no
-	 * custo dos itens do estoque. Essa rotina eh necessaria pois existe uma
-	 * legislacao de debito e credito de ipi para as empresas. Quando se compra,
-	 * temos um credito, ja quando vendemos temos um debito, entao essa diferenca
-	 * deve aparecer no custos dos produtos que serao vendidos, portanto, deve ser
-	 * executado sempre que recepcionarmos uma nova compra.
-	 */
-	private Double calcularPrecoMedioComFatorIPI(Integer idItemPedido, Double precoMedio, Double aliquotaIPI) {
-		if (precoMedio == null) {
-			return null;
-		}
-
-		if (aliquotaIPI == null) {
-			aliquotaIPI = 0d;
-		}
-
-		// Temos que imbutir o IPI pois esse impost eh considerado um custo para a
-		// empresa.
-		precoMedio *= (1 + aliquotaIPI);
-
-		double ipiRerepsentada = pedidoService.pesquisarAliquotaIPIRepresentadaByIdItemPedido(idItemPedido);
-
-		double fatorIPI = ipiRerepsentada - aliquotaIPI;
-
-		return precoMedio * (1 + fatorIPI);
-	}
-
 	private void calcularPrecoMedioItemEstoque(ItemEstoque itemCadastrado, ItemEstoque itemEstoque) {
 		if (itemCadastrado == null) {
 			return;
@@ -123,7 +95,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemCadastrado.setQuantidade((int) quantidadeTotal);
 	}
 
-	private Double calcularPrecoMinimo(Double precoMedio, Double ipi, Double margemMinimaLucro) {
+	private Double calcularPrecoMinimo(Double precoMedio, Double margemMinimaLucro) {
 		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
 		// estoque.
 
@@ -131,17 +103,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 			margemMinimaLucro = 0.0;
 		}
 
-		if (ipi == null) {
-			ipi = 0.0;
-		}
-
 		// Precisamos arredondar
-		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + ipi) * (1 + margemMinimaLucro));
+		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + margemMinimaLucro));
 	}
 
 	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {
-		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(itemEstoque.getPrecoMedio(), itemEstoque.getAliquotaIPI(),
-				itemEstoque.getMargemMinimaLucro()));
+		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(itemEstoque.getPrecoMedio(), itemEstoque.getMargemMinimaLucro()));
 	}
 
 	@Override
@@ -157,9 +124,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Object[] valores = itemEstoqueDAO.pesquisarMargemMininaEValorMedioItemEstoque(idItemEstoque);
 		Double taxaMinima = (Double) valores[0];
 		Double precoMedio = (Double) valores[1];
-		Double ipi = (Double) valores[2];
 
-		return calcularPrecoMinimo(precoMedio, ipi, taxaMinima);
+		return calcularPrecoMinimo(precoMedio, taxaMinima);
 	}
 
 	@Override
@@ -426,8 +392,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido);
 		itemEstoque.setQuantidade(quantidadeRecepcionada);
 
-		itemEstoque.setPrecoMedio(calcularPrecoMedioComFatorIPI(idItemPedido, itemEstoque.getPrecoMedio(),
-				itemEstoque.getAliquotaIPI()));
+		itemEstoque.setPrecoMedio(itemEstoque.calcularPrecoUnidadeIPI());
 
 		return inserirItemEstoque(itemEstoque);
 	}

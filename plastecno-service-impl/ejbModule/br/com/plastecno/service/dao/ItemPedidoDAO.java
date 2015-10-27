@@ -1,7 +1,6 @@
 package br.com.plastecno.service.dao;
 
 import java.util.Date;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -18,18 +17,6 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	public ItemPedidoDAO(EntityManager entityManager) {
 		super(entityManager);
-	}
-
-	public double pesquisarAliquotaIPIRepresentadaByIdItemPedido(Integer idItemPedido) {
-		if (idItemPedido == null) {
-			return 0;
-		}
-
-		Double ipi = QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery(
-						"select i.pedido.representada.aliquotaIPI from ItemPedido i where i.id = :idItemPedido").setParameter(
-						"idItemPedido", idItemPedido), Double.class, 0d);
-		return ipi == null ? 0 : ipi;
 	}
 
 	public void alterarComissao(Integer idItemPedido, Double valorComissao) {
@@ -51,6 +38,29 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	public void inserirComissao(Integer idItemPedido, Double valorComissao) {
 		super.alterarPropriedade(ItemPedido.class, idItemPedido, "comissao", valorComissao);
+	}
+
+	public double pesquisarAliquotaICMSRepresentadaByIdItemPedido(Integer idItemPedido) {
+		if (idItemPedido == null) {
+			return 0;
+		}
+
+		Double icms = QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select i.pedido.representada.aliquotaICMS from ItemPedido i where i.id = :idItemPedido").setParameter(
+						"idItemPedido", idItemPedido), Double.class, 0d);
+		return icms == null ? 0 : icms;
+	}
+
+	public double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido) {
+		if (idItemPedido == null) {
+			return 0;
+		}
+
+		Double ipi = QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.aliquotaIPI from ItemPedido i where i.id = :idItemPedido").setParameter(
+						"idItemPedido", idItemPedido), Double.class, 0d);
+		return ipi == null ? 0 : ipi;
 	}
 
 	@SuppressWarnings("unchecked")

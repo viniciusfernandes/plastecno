@@ -135,8 +135,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {
-		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(itemEstoque.getPrecoMedioFatorICMS(),
-				itemEstoque.getMargemMinimaLucro()));
+		Double preco = itemEstoque.getPrecoMedioFatorICMS() == null ? itemEstoque.getPrecoMedio() : itemEstoque
+				.getPrecoMedioFatorICMS();
+		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(preco, itemEstoque.getMargemMinimaLucro()));
 	}
 
 	@Override

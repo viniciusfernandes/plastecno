@@ -266,7 +266,7 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	private Pedido gerarPedidoRevenda() {
-		Cliente revendedor = eBuilder.buildRevendedor();
+		Cliente revendedor = eBuilder.buildClienteRevendedor();
 		try {
 			clienteService.inserir(revendedor);
 		} catch (BusinessException e) {
@@ -276,7 +276,7 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	private Pedido gerarPedidoRevendaComItem() {
-		Cliente revendedor = eBuilder.buildRevendedor();
+		Cliente revendedor = eBuilder.buildClienteRevendedor();
 		try {
 			clienteService.inserir(revendedor);
 		} catch (BusinessException e) {
@@ -410,6 +410,7 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testAlteracaoQuantidadeRecepcionadaInferiorQuantidadeComprada() {
 		ItemPedido itemPedido = gerarItemPedidoCompra();
+		
 		Integer quantidadeRecepcionada = itemPedido.getQuantidade() - 1;
 		try {
 			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(), quantidadeRecepcionada);
@@ -787,7 +788,7 @@ public class PedidoServiceTest extends AbstractTest {
 		ItemPedido itemComprado = listaItemComprado.get(0);
 		try {
 			// Recepcionando os itens comprados para preencher o estoque.
-			estoqueService.inserirItemPedido(itemComprado.getId());
+			estoqueService.recepcionarItemCompra(itemComprado.getId(), itemComprado.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -811,8 +812,7 @@ public class PedidoServiceTest extends AbstractTest {
 		for (ItemPedido itemComprado : listaItemComprado) {
 			// Recepcionando os itens comprados para preencher o estoque.
 			try {
-				itemComprado.setQuantidadeRecepcionada(itemComprado.getQuantidade());
-				estoqueService.inserirItemPedido(itemComprado.getId());
+				estoqueService.recepcionarItemCompra(itemComprado.getId(), itemComprado.getQuantidade());
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}

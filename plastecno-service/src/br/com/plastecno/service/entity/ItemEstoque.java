@@ -68,6 +68,10 @@ public class ItemEstoque extends Item {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Preço de médio de compra do item de estoque")
 	private Double precoMedio;
 
+	@Column(name = "preco_medio_fatoricms")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Preço de médio com fator ICMS")
+	private Double precoMedioFatorICMS;
+
 	@Transient
 	private Double precoMinimo;
 
@@ -93,7 +97,7 @@ public class ItemEstoque extends Item {
 	}
 
 	public ItemEstoque(Integer id, FormaMaterial formaMaterial, String descricaoPeca, String siglaMaterial,
-			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double margemMinimaLucro,
+			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double precoMedioFatorCIMS, Double margemMinimaLucro,
 			Integer quantidade, Integer quantidadeMinima, Double aliquotaIPI) {
 		this.comprimento = comprimento;
 		this.descricaoPeca = descricaoPeca;
@@ -107,6 +111,7 @@ public class ItemEstoque extends Item {
 		this.margemMinimaLucro = margemMinimaLucro;
 		this.quantidadeMinima = quantidadeMinima;
 		this.aliquotaIPI = aliquotaIPI;
+		this.precoMedioFatorICMS = precoMedioFatorCIMS;
 	}
 
 	public double calcularPrecoTotal() {
@@ -130,6 +135,19 @@ public class ItemEstoque extends Item {
 
 	public boolean contemLargura() {
 		return this.formaMaterial != null && this.formaMaterial.contemLargura();
+	}
+
+	public boolean contemLimiteMinimo() {
+		return quantidadeMinima != null && quantidadeMinima > 0 && margemMinimaLucro != null && margemMinimaLucro > 0;
+	}
+
+	public void copiar(ItemEstoque item) {
+		setAliquotaICMS(item.getAliquotaICMS());
+		setAliquotaIPI(item.getAliquotaIPI());
+		setQuantidade(item.getQuantidade());
+		setPrecoMedio(item.getPrecoMedio());
+		setQuantidadeMinima(item.getQuantidadeMinima());
+		setMargemMinimaLucro(item.getMargemMinimaLucro());
 	}
 
 	public Double getAliquotaICMS() {
@@ -174,6 +192,10 @@ public class ItemEstoque extends Item {
 
 	public Double getPrecoMedio() {
 		return precoMedio;
+	}
+
+	public Double getPrecoMedioFatorICMS() {
+		return precoMedioFatorICMS;
 	}
 
 	public Double getPrecoMinimo() {
@@ -259,6 +281,10 @@ public class ItemEstoque extends Item {
 		this.precoMedio = precoMedio;
 	}
 
+	public void setPrecoMedioFatorICMS(Double precoMedioFatorICMS) {
+		this.precoMedioFatorICMS = precoMedioFatorICMS;
+	}
+
 	public void setPrecoMinimo(Double precoMinimo) {
 		this.precoMinimo = precoMinimo;
 	}
@@ -283,18 +309,5 @@ public class ItemEstoque extends Item {
 
 	public void setSiglaMaterial(String siglaMaterial) {
 		this.siglaMaterial = siglaMaterial;
-	}
-
-	public void copiar(ItemEstoque item) {
-		setAliquotaICMS(item.getAliquotaICMS());
-		setAliquotaIPI(item.getAliquotaIPI());
-		setQuantidade(item.getQuantidade());
-		setPrecoMedio(item.getPrecoMedio());
-		setQuantidadeMinima(item.getQuantidadeMinima());
-		setMargemMinimaLucro(item.getMargemMinimaLucro());
-	}
-
-	public boolean contemLimiteMinimo() {
-		return quantidadeMinima != null && quantidadeMinima > 0 && margemMinimaLucro != null && margemMinimaLucro > 0;
 	}
 }

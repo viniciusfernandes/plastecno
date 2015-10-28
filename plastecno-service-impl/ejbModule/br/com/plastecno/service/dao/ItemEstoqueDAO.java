@@ -20,7 +20,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 	private StringBuilder gerarConstrutorItemEstoque() {
 		return new StringBuilder(
-				"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
+				"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.precoMedioFatorICMS, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
 	}
 
 	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
@@ -209,11 +209,13 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();
 	}
 
-	public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery(
-						"select i.margemMinimaLucro, i.precoMedio from ItemEstoque i where i.id= :idItemEstoque").setParameter(
-						"idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null });
+	public Object[] pesquisarMargemMininaEPrecoMedio(Integer idItemEstoque) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select i.margemMinimaLucro, i.precoMedioFatorICMS, i.precoMedio from ItemEstoque i where i.id= :idItemEstoque")
+								.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null, null });
 	}
 
 	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {

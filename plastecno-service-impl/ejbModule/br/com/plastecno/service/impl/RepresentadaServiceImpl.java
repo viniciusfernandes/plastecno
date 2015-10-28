@@ -175,6 +175,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	public double pesquisarAliquotaICMSRevendedor() {
+		return representadaDAO.pesquisarAliquotaICMSRevendedor();
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public List<Representada> pesquisarBy(Representada filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
@@ -256,11 +261,6 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public List<Representada> pesquisarRepresentadaEFornecedor() {
-		return representadaDAO.pesquisarRepresentadaEFornecedor();
-	}
-
-	@Override
 	public List<Representada> pesquisarRepresentada(Boolean ativo) {
 		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.FORNECIMENTO);
 	}
@@ -276,6 +276,11 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 			return pesquisarFornecedorAtivo();
 		}
 		return pesquisarRepresentadaAtiva();
+	}
+
+	@Override
+	public List<Representada> pesquisarRepresentadaEFornecedor() {
+		return representadaDAO.pesquisarRepresentadaEFornecedor();
 	}
 
 	@Override

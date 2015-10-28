@@ -16,6 +16,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.SituacaoReservaEstoque;
@@ -48,10 +49,14 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private ItemPedidoDAO itemPedidoDAO;
 
 	private ItemReservadoDAO itemReservadoDAO;
+
 	private PedidoDAO pedidoDAO;
 
 	@EJB
 	private PedidoService pedidoService;
+
+	@EJB
+	private RepresentadaService representadaService;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -65,6 +70,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * item.getQuantidade() * (1 + aliquotaIPI);
 	}
 
+	private void calcularPrecoMedioFatorICMS(ItemEstoque itemEstoque) {
+		if (itemEstoque.getPrecoMedio() == null) {
+			return;
+		}
+
+		double icmsRevendedor = representadaService.pesquisarAliquotaICMSRevendedor();
+		double icmsItem = itemEstoque.getAliquotaICMS() != null ? itemEstoque.getAliquotaICMS() : 0d;
+		double fatorICMS = icmsRevendedor - icmsItem;
+		itemEstoque.setPrecoMedioFatorICMS(itemEstoque.getPrecoMedio() * (1 + fatorICMS));
+	}
+
 	private void calcularPrecoMedioItemEstoque(ItemEstoque itemCadastrado, ItemEstoque itemEstoque) {
 		if (itemCadastrado == null) {
 			return;
@@ -75,11 +91,18 @@ public class EstoqueServiceImpl implements EstoqueService {
 		final boolean contemPrecoMedio = itemEstoque.getPrecoMedio() > 0d;
 		final double quantidadeItem = contemPrecoMedio ? itemEstoque.getQuantidade() : 0;
 
-		final double valorEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getPrecoMedio();
+		final double precoEstoque = itemCadastrado.getQuantidade()
+				* (itemCadastrado.getPrecoMedio() != null ? itemCadastrado.getPrecoMedio() : 0d);
 
-		final double valorItem = itemEstoque.getQuantidade() * itemEstoque.getPrecoMedio();
+		final double precoEstoqueFatorICMS = itemCadastrado.getQuantidade()
+				* (itemCadastrado.getPrecoMedioFatorICMS() != null ? itemCadastrado.getPrecoMedioFatorICMS() : 0d);
+
+		final double precoItem = itemEstoque.getQuantidade() * itemEstoque.getPrecoMedio();
+		final double precoItemFatorICMS = itemEstoque.getQuantidade() * itemEstoque.getPrecoMedioFatorICMS();
+
 		final double quantidadeTotal = itemCadastrado.getQuantidade() + quantidadeItem;
-		final double precoMedio = (valorEstoque + valorItem) / quantidadeTotal;
+		final double precoMedio = (precoEstoque + precoItem) / quantidadeTotal;
+		final double precoMedioFatorICMS = (precoEstoqueFatorICMS + precoItemFatorICMS) / quantidadeTotal;
 
 		final double ipiEstoque = itemCadastrado.getQuantidade() * itemCadastrado.getAliquotaIPI();
 		final double ipiItem = itemEstoque.getQuantidade() * itemEstoque.getAliquotaIPI();
@@ -90,6 +113,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		final double icmsMedio = (icmsEstoque + icmsItem) / quantidadeTotal;
 
 		itemCadastrado.setPrecoMedio(precoMedio);
+		itemCadastrado.setPrecoMedioFatorICMS(precoMedioFatorICMS);
 		itemCadastrado.setAliquotaIPI(ipiMedio);
 		itemCadastrado.setAliquotaICMS(icmsMedio);
 		itemCadastrado.setQuantidade((int) quantidadeTotal);
@@ -98,6 +122,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private Double calcularPrecoMinimo(Double precoMedio, Double margemMinimaLucro) {
 		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
 		// estoque.
+		if (precoMedio == null) {
+			return null;
+		}
 
 		if (margemMinimaLucro == null) {
 			margemMinimaLucro = 0.0;
@@ -108,7 +135,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {
-		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(itemEstoque.getPrecoMedio(), itemEstoque.getMargemMinimaLucro()));
+		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(itemEstoque.getPrecoMedioFatorICMS(),
+				itemEstoque.getMargemMinimaLucro()));
 	}
 
 	@Override
@@ -121,11 +149,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 			return null;
 		}
 
-		Object[] valores = itemEstoqueDAO.pesquisarMargemMininaEValorMedioItemEstoque(idItemEstoque);
-		Double taxaMinima = (Double) valores[0];
-		Double precoMedio = (Double) valores[1];
+		Object[] valores = itemEstoqueDAO.pesquisarMargemMininaEPrecoMedio(idItemEstoque);
+		Double margemMinimaLucro = (Double) valores[0];
+		Double precoMedioFatorICMS = (Double) valores[1];
 
-		return calcularPrecoMinimo(precoMedio, taxaMinima);
+		return calcularPrecoMinimo(precoMedioFatorICMS, margemMinimaLucro);
 	}
 
 	@Override
@@ -374,6 +402,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double pesquisarPrecoMedioByIdItemEstoque(Integer idItemEstoque) {
+		return (Double) itemEstoqueDAO.pesquisarMargemMininaEPrecoMedio(idItemEstoque)[2];
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double pesquisarPrecoMedioItemEstoque(Item filtro) {
 		ItemEstoque itemEstoque = pesquisarItemEstoque(filtro);
 		return itemEstoque == null ? 0 : itemEstoque.getPrecoMedio();
@@ -393,7 +427,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemEstoque.setQuantidade(quantidadeRecepcionada);
 
 		itemEstoque.setPrecoMedio(itemEstoque.calcularPrecoUnidadeIPI());
-
+		/*
+		 * O fator de correcao de icms deve ser gravado durante a inclusao do item
+		 * no estoque para que seja utilizado no calculo do preco minimo de venda
+		 * posteriormente, pois existe um esquema de debito/credito de icms em cada
+		 * item do estoque que deve ser repassado para o cliente.
+		 */
+		calcularPrecoMedioFatorICMS(itemEstoque);
 		return inserirItemEstoque(itemEstoque);
 	}
 
@@ -448,8 +488,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 					+ "\" nao exite no estoque para ser redefinido.");
 		}
 
+		boolean isPrecoRedefinido = itemCadastrado.getPrecoMedio() != null
+				&& !itemCadastrado.getPrecoMedio().equals(itemEstoque.getPrecoMedio());
+
+		// Temos que igualar o preco do fator com icms pois aqui nao temos como
+		// recuperar o fator icms para recalcular o preco medio com esse fator.
+		if (isPrecoRedefinido || itemCadastrado.getPrecoMedioFatorICMS() == null) {
+			itemCadastrado.setPrecoMedioFatorICMS(itemEstoque.getPrecoMedio());
+		}
+
 		// Aqui estamos forcando a copia dos atributos para garantir que um item
-		// nunca ser alterado, por exemplo, as medidas nunca podem mudar
+		// nunca ser alterado, por exemplo, as medidas nunca podem mudar.
 		itemCadastrado.copiar(itemEstoque);
 
 		ValidadorInformacao.validar(itemCadastrado);

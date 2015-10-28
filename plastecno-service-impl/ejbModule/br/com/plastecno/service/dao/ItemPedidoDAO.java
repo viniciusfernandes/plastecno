@@ -40,18 +40,6 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		super.alterarPropriedade(ItemPedido.class, idItemPedido, "comissao", valorComissao);
 	}
 
-	public double pesquisarAliquotaICMSRepresentadaByIdItemPedido(Integer idItemPedido) {
-		if (idItemPedido == null) {
-			return 0;
-		}
-
-		Double icms = QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery(
-						"select i.pedido.representada.aliquotaICMS from ItemPedido i where i.id = :idItemPedido").setParameter(
-						"idItemPedido", idItemPedido), Double.class, 0d);
-		return icms == null ? 0 : icms;
-	}
-
 	public double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido) {
 		if (idItemPedido == null) {
 			return 0;

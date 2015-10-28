@@ -594,3 +594,4 @@ alter table vendas.tb_item_estoque add margem_minima_lucro numeric(5, 2) default
 alter table vendas.tb_item_pedido add preco_minimo numeric(9, 2) default null;
 
 alter table vendas.tb_representada add aliquota_icms numeric(5, 2) default null;
+alter table vendas.tb_item_estoque add preco_medio_fatoricms numeric(9, 2) default null;

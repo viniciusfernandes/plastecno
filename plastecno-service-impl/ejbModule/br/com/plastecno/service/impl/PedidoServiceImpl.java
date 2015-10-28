@@ -743,12 +743,6 @@ public class PedidoServiceImpl implements PedidoService {
 				listaPedido);
 	}
 
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@Override
-	public double pesquisarAliquotaICMSRepresentadaByIdItemPedido(Integer idItemPedido) {
-		return itemPedidoDAO.pesquisarAliquotaICMSRepresentadaByIdItemPedido(idItemPedido);
-	}
-
 	@Override
 	public double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido) {
 		return itemPedidoDAO.pesquisarAliquotaIPIByIdItemPedido(idItemPedido);

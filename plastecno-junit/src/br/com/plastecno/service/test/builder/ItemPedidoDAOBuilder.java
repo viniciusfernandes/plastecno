@@ -11,14 +11,6 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 	public ItemPedidoDAO build() {
 		new MockUp<ItemPedidoDAO>() {
 
-			@Mock
-			public double pesquisarAliquotaICMSRepresentadaByIdItemPedido(Integer idItemPedido) {
-				ItemPedido itemPedido = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
-				if (itemPedido == null) {
-					return 0;
-				}
-				return itemPedido.getPedido().getRepresentada().getAliquotaICMS();
-			}
 
 			@Mock
 			public double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido) {

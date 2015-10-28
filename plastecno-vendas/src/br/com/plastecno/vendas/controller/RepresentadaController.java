@@ -50,7 +50,7 @@ public class RepresentadaController extends AbstractController {
         representada.setCnpj(formatarCNPJ(representada.getCnpj()));
         representada.setInscricaoEstadual(formatarInscricaoEstadual(representada.getInscricaoEstadual()));
         representada.setComissao(NumeroUtils.gerarPercentual(representada.getComissao()));
-        representada.setAliquotaIPI(NumeroUtils.gerarPercentual(representada.getAliquotaIPI()));
+        representada.setAliquotaICMS(NumeroUtils.gerarPercentual(representada.getAliquotaICMS()));
     }
 
     private String formatarComentarios(Integer idRepresentada) {
@@ -85,7 +85,7 @@ public class RepresentadaController extends AbstractController {
             }
 
             representada.setComissao(NumeroUtils.gerarAliquota(representada.getComissao()));
-            representada.setAliquotaIPI(NumeroUtils.gerarAliquota(representada.getAliquotaIPI()));
+            representada.setAliquotaICMS(NumeroUtils.gerarAliquota(representada.getAliquotaICMS()));
 
             this.representadaService.inserir(representada);
             this.gerarMensagemCadastroSucesso(representada, "nomeFantasia");

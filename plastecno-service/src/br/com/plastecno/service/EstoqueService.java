@@ -49,6 +49,8 @@ public interface EstoqueService {
 
 	List<ItemEstoque> pesquisarPecaByDescricao(String descricao);
 
+	Double pesquisarPrecoMedioByIdItemEstoque(Integer idItemEstoque);
+
 	double pesquisarPrecoMedioItemEstoque(Item filtro);
 
 	Integer recepcionarItemCompra(Integer idItemPedido, Integer quantidadeRecepcionada) throws BusinessException;

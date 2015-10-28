@@ -126,12 +126,12 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			public Object[] pesquisarMargemMininaEValorMedioItemEstoque(Integer idItemEstoque) {
+			public Object[] pesquisarMargemMininaEPrecoMedio(Integer idItemEstoque) {
 				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				for (ItemEstoque itemEstoque : l) {
 					if (idItemEstoque.equals(itemEstoque.getId())) {
-						return new Object[] { itemEstoque.getMargemMinimaLucro(), itemEstoque.getPrecoMedio(),
-								itemEstoque.getAliquotaIPI() };
+						return new Object[] { itemEstoque.getMargemMinimaLucro(), itemEstoque.getPrecoMedioFatorICMS(),
+								itemEstoque.getPrecoMedio() };
 					}
 				}
 
@@ -158,7 +158,7 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+			public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				List<Double[]> listaValores = new ArrayList<Double[]>();
 				boolean isAmbosNulos = false;

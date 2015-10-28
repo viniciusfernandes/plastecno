@@ -31,11 +31,11 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.test.TestUtils;
 
 public class EntidadeBuilder {
+	private static final EntidadeBuilder builder = new EntidadeBuilder();
+
 	public static EntidadeBuilder getInstance() {
 		return builder;
 	}
-
-	private static final EntidadeBuilder builder = new EntidadeBuilder();
 
 	private EntidadeRepository repositorio = EntidadeRepository.getInstance();
 
@@ -54,6 +54,14 @@ public class EntidadeBuilder {
 		cliente.setEmail("alex@gmail.com.br");
 		cliente.setId(gerarId());
 		cliente.setTipoCliente(TipoCliente.NORMAL);
+		return cliente;
+	}
+
+	public Cliente buildClienteRevendedor() {
+		Cliente cliente = buildCliente();
+		cliente.setNomeFantasia("Revendedor Plastico");
+		cliente.setRazaoSocial("Revendedor Plastico LTDA");
+		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
 		return cliente;
 	}
 
@@ -96,9 +104,9 @@ public class EntidadeBuilder {
 	public ItemEstoque buildItemEstoquePeca() {
 		ItemEstoque item = buildItemEstoque();
 		item.setFormaMaterial(FormaMaterial.PC);
-		
+
 		item.setDescricaoPeca("ENGRENAGEM PARA TRATOR");
-		
+
 		item.setMedidaExterna(null);
 		item.setMedidaInterna(null);
 		item.setComprimento(null);
@@ -112,6 +120,7 @@ public class EntidadeBuilder {
 	public ItemPedido buildItemPedido() {
 		ItemPedido itemPedido = new ItemPedido();
 		itemPedido.setAliquotaIPI(0.11d);
+		itemPedido.setAliquotaICMS(0.06d);
 		itemPedido.setMaterial(buildMaterial());
 		itemPedido.setFormaMaterial(FormaMaterial.TB);
 		itemPedido.setQuantidade(2);
@@ -126,6 +135,7 @@ public class EntidadeBuilder {
 	public ItemPedido buildItemPedidoPeca() {
 		ItemPedido itemPedido = new ItemPedido();
 		itemPedido.setAliquotaIPI(11.1d);
+		itemPedido.setAliquotaICMS(0.06d);
 		itemPedido.setMaterial(buildMaterial());
 		itemPedido.setFormaMaterial(FormaMaterial.PC);
 		itemPedido.setQuantidade(2);
@@ -213,22 +223,26 @@ public class EntidadeBuilder {
 		representada.setEmail("vendas@cobex.com.br");
 		representada.setComissao(0.05);
 		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
-		representada.setAliquotaIPI(0.18);
+		representada.setAliquotaICMS(0.18);
+		return representada;
+	}
+
+	public Representada buildRepresentadaFornecedor() {
+		Representada representada = buildRepresentada();
+		representada.setNomeFantasia("Fornecedor Plastico");
+		representada.setEmail("fornecedorplastico@cobex.com.br");
+		representada.setRazaoSocial("Fornecedor Plastico LTDA");
+		representada.setTipoRelacionamento(TipoRelacionamento.FORNECIMENTO);
 		return representada;
 	}
 
 	public Representada buildRepresentadaRevendedora() {
 		Representada representada = buildRepresentada();
+		representada.setNomeFantasia("Revendedor Plastico");
+		representada.setEmail("revendedorplastico@cobex.com.br");
+		representada.setRazaoSocial("Revendedor Plastico LTDA");
 		representada.setTipoRelacionamento(TipoRelacionamento.REVENDA);
 		return representada;
-	}
-
-	public Cliente buildRevendedor() {
-		Cliente cliente = buildCliente();
-		cliente.setNomeFantasia("Revendedor Plastico");
-		cliente.setRazaoSocial("Revendedor Plastico LTDA");
-		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
-		return cliente;
 	}
 
 	public Usuario buildVendedor() {

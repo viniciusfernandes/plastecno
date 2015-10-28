@@ -32,9 +32,9 @@ public class Representada implements Serializable {
 
 	private static final long serialVersionUID = -6187905223269978645L;
 
-	@InformacaoValidavel(positivo = true, nomeExibicao = "Aliquota de IPI")
-	@Column(name = "aliquota_ipi")
-	private Double aliquotaIPI;
+	@InformacaoValidavel(positivo = true, nomeExibicao = "Aliquota de ICMS")
+	@Column(name = "aliquota_icms")
+	private Double aliquotaICMS;
 
 	private boolean ativo = true;
 
@@ -125,8 +125,8 @@ public class Representada implements Serializable {
 		return o instanceof Representada && this.id != null && this.id.equals(((Representada) o).id);
 	}
 
-	public Double getAliquotaIPI() {
-		return aliquotaIPI;
+	public Double getAliquotaICMS() {
+		return aliquotaICMS;
 	}
 
 	public String getCnpj() {
@@ -207,8 +207,8 @@ public class Representada implements Serializable {
 		return TipoRelacionamento.REVENDA.equals(tipoRelacionamento);
 	}
 
-	public void setAliquotaIPI(Double aliquotaIPI) {
-		this.aliquotaIPI = aliquotaIPI;
+	public void setAliquotaICMS(Double aliquotaICMS) {
+		this.aliquotaICMS = aliquotaICMS;
 	}
 
 	public void setAtivo(boolean ativo) {

@@ -11,6 +11,16 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 	public ItemPedidoDAO build() {
 		new MockUp<ItemPedidoDAO>() {
 
+
+			@Mock
+			public double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido) {
+				ItemPedido itemPedido = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				if (itemPedido == null) {
+					return 0;
+				}
+				return itemPedido.getAliquotaIPI();
+			}
+
 			@Mock
 			public Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido) {
 				ItemPedido itemPedido = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
@@ -19,17 +29,6 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 				}
 
 				return new Double[] { itemPedido.getPedido().getValorPedido(), itemPedido.getPedido().getValorPedidoIPI() };
-			}
-		};
-
-		new MockUp<ItemPedidoDAO>() {
-			@Mock
-			public double pesquisarAliquotaIPIRepresentadaByIdItemPedido(Integer idItemPedido) {
-				ItemPedido itemPedido = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
-				if (itemPedido == null) {
-					return 0;
-				}
-				return itemPedido.getPedido().getRepresentada().getAliquotaIPI();
 			}
 		};
 

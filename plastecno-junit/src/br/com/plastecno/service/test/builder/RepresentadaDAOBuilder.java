@@ -16,12 +16,23 @@ public class RepresentadaDAOBuilder extends DAOBuilder<RepresentadaDAO> {
 	public RepresentadaDAO build() {
 		new MockUp<RepresentadaDAO>() {
 			@Mock
-			Representada pesquisarById(Integer id) {
+			public double pesquisarAliquotaICMSRevendedor() {
+				List<Representada> lista = REPOSITORY.pesquisarTodos(Representada.class);
+				for (Representada representada : lista) {
+					if (TipoRelacionamento.REVENDA.equals(representada.getTipoRelacionamento())) {
+						return representada.getAliquotaICMS() != null ? representada.getAliquotaICMS() : 0d;
+					}
+				}
+				return 0d;
+			}
+
+			@Mock
+			public Representada pesquisarById(Integer id) {
 				return REPOSITORY.pesquisarEntidadeById(Representada.class, id);
 			}
 
 			@Mock
-			String pesquisarNomeFantasiaById(Integer idRepresentada) {
+			public String pesquisarNomeFantasiaById(Integer idRepresentada) {
 				Representada r = REPOSITORY.pesquisarEntidadeById(Representada.class, idRepresentada);
 				return r != null ? r.getNomeFantasia() : null;
 			}

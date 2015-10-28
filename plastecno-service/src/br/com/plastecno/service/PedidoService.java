@@ -71,7 +71,7 @@ public interface PedidoService {
 	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-	double pesquisarAliquotaIPIRepresentadaByIdItemPedido(Integer idItemPedido);
+	double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido);
 
 	List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 

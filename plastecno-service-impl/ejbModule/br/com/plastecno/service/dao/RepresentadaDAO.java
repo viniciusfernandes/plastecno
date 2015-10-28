@@ -75,6 +75,14 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 		return query.getResultList();
 	}
 
+	public double pesquisarAliquotaICMSRevendedor() {
+		Double icms = QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select r.aliquotaICMS from Representada r where r.tipoRelacionamento = :tipoRelacionamento").setParameter(
+						"tipoRelacionamento", TipoRelacionamento.REVENDA), Double.class, null);
+		return icms == null ? 0 : icms;
+	}
+
 	public Representada pesquisarRevendedor() {
 		return QueryUtil
 				.gerarRegistroUnico(

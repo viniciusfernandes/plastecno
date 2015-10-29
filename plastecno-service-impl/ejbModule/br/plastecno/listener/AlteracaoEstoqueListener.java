@@ -20,6 +20,7 @@ public class AlteracaoEstoqueListener implements MessageListener {
 	@Override
 	public void onMessage(Message mensagem) {
 		pedidoAguardandoMaterialMonitor.monitorarItemPedidoAguardandoMaterial();
+		pedidoAguardandoMaterialMonitor.monitorarItemPedidoAguardandoCompra();
 	}
 
 }

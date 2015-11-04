@@ -147,7 +147,6 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		StringBuilder select = gerarConstrutorItemPedidoComDataEntrega();
 
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
-		select.append("and i.recebido = false ");
 		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
 		select.append("and i.encomendado = true and i.quantidadeReservada < i.quantidade ");
 

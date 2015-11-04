@@ -282,7 +282,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 			throw new BusinessException("Item de estoque nulo");
 		}
 
+		if (itemEstoque.getPrecoMedioFatorICMS() == null) {
+			itemEstoque.setPrecoMedioFatorICMS(itemEstoque.getPrecoMedio());
+		}
+
 		ValidadorInformacao.validar(itemEstoque);
+
 		if (!itemEstoque.isPeca() && StringUtils.isNotEmpty(itemEstoque.getDescricaoPeca())) {
 			throw new BusinessException("A descrição é apenas itens do tipo peças. Remova a descrição.");
 		}

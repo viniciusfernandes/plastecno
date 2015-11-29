@@ -444,6 +444,40 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testCalculoPrecoMinimoSemFatorICMS() {
+		Integer idItemEstoque = recepcionarItemCompra();
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		itemEstoque.setPrecoMedioFatorICMS(null);
+
+		try {
+			itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+			estoqueService.inserirItemEstoque(itemEstoque);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		ItemEstoque limite = gerarLimiteMinimoEstoque(itemEstoque);
+		limite.setMargemMinimaLucro(null);
+
+		try {
+			estoqueService.inserirLimiteMinimoPadrao(limite);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Double precoMinimo = NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio());
+		Double precoMinimoCalculado = null;
+		try {
+			precoMinimoCalculado = estoqueService.calcularPrecoMinimoItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals("O preco minimo de venda sem o fator icms deve ser o mesmo que o preco medio cadastrado. Verificar o algoritmo de calculo.",
+				precoMinimo, precoMinimoCalculado);
+	}
+
+	@Test
 	public void testCalculoPrecoMinimoSemTaxa() {
 		Integer idItemEstoque = recepcionarItemCompra();
 
@@ -465,8 +499,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-
-		assertEquals(precoMinimo, precoMinimoCalculado);
+		assertEquals("O preco minimo de venda do item de estoque nao esta correto. Verificar o algoritmo de calculo.",
+				precoMinimo, precoMinimoCalculado);
 	}
 
 	@Test

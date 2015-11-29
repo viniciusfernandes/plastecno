@@ -153,8 +153,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Object[] valores = itemEstoqueDAO.pesquisarMargemMininaEPrecoMedio(idItemEstoque);
 		Double margemMinimaLucro = (Double) valores[0];
 		Double precoMedioFatorICMS = (Double) valores[1];
-
-		return calcularPrecoMinimo(precoMedioFatorICMS, margemMinimaLucro);
+		Double precoMedio = (Double) valores[2];
+		boolean contemFatorICMS = precoMedioFatorICMS != null;
+		
+		return calcularPrecoMinimo(contemFatorICMS ? precoMedioFatorICMS : precoMedio, margemMinimaLucro);
 	}
 
 	@Override

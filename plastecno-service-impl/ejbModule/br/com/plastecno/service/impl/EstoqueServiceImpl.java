@@ -306,6 +306,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (itemCadastrado == null) {
 			itemCadastrado = itemEstoque;
 		}
+		
+		calcularPrecoMedioFatorICMS(itemCadastrado);
 
 		return itemEstoqueDAO.alterar(itemCadastrado).getId();
 	}
@@ -511,6 +513,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		ValidadorInformacao.validar(itemCadastrado);
 
+		calcularPrecoMedioFatorICMS(itemCadastrado);
+		
 		itemEstoqueDAO.alterar(itemCadastrado);
 		// redefinirItemReservadoByItemEstoque(idItemEstoque);
 	}

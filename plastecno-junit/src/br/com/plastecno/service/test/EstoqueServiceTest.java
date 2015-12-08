@@ -519,18 +519,27 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("Pecas nao podem ter medida interna e isso nao esta sendo validado", throwed);
 	}
 
 	@Test
 	public void testInclusaoItemInexistenteEstoque() {
 		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
 		itemEstoque.setId(null);
+
+		Integer idItem = null;
+
 		try {
-			estoqueService.inserirItemEstoque(itemEstoque);
+			idItem = estoqueService.inserirItemEstoque(itemEstoque);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+
+		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
+		Double precoFatorICMS = 85.06;
+
+		assertEquals(
+				"Apos a inclusao de um item novo deve-se aplicar o fator ICMS no preco de custo. Verifique o algoritmo de calculo",
+				precoFatorICMS, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedioFatorICMS()));
 	}
 
 	@Test
@@ -594,9 +603,8 @@ public class EstoqueServiceTest extends AbstractTest {
 	public void testInclusaoLimiteMinimoEstoquePeca() {
 		ItemPedido itemPeca = gerarItemPedidoPeca(TipoPedido.COMPRA);
 
-		Integer idItem = null;
 		try {
-			idItem = estoqueService.recepcionarItemCompra(itemPeca.getId(), itemPeca.getQuantidade());
+			estoqueService.recepcionarItemCompra(itemPeca.getId(), itemPeca.getQuantidade());
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -976,6 +984,25 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 		assertEquals("A quantidade de item do estoque nao pode ser a mesma apos sua redefinicao", quantidadeDepois,
 				pesquisarQuantidadeTotalItemEstoque(idItemEstoque));
+	}
+
+	@Test
+	public void testRedefinicaoEstoqueAlteracaoPrecoFatorICMS() {
+		Integer idItemEstoque = recepcionarItemCompra();
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+
+		Double precoFatorICMS = 197.06;
+
+		itemEstoque.setPrecoMedio(itemEstoque.getPrecoMedio() + 100);
+		try {
+			estoqueService.redefinirItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertEquals(
+				"Apos a redefinicao do item o deve-se incluir aplicar o fator ICMS no preco de custo. Verifique o algoritmo de calculo",
+				precoFatorICMS, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedioFatorICMS()));
 	}
 
 	@Test

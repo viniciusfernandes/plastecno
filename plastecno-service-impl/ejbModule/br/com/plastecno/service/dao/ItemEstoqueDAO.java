@@ -18,6 +18,25 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		super(entityManager);
 	}
 
+	public void alterarPrecoMedioFatorICMS(List<ItemEstoque> listaItem) {
+		StringBuilder update = new StringBuilder();
+		for (int i = 0; i < listaItem.size(); i++) {
+			update.append("update ItemEstoque i set i.precoMedio = :precoMedio_").append(i)
+					.append(", i.precoMedioFatorICMS =:precoMedioFatorICMS_").append(i).append(" where i.id = :idItemEstoque_")
+					.append(i).append("; ");
+		}
+
+		Query query = entityManager.createQuery(update.toString());
+		ItemEstoque item = null;
+		for (int i = 0; i < listaItem.size(); i++) {
+			item = listaItem.get(i);
+			query.setParameter("precoMedio_" + i, item.getPrecoMedio())
+					.setParameter("precoMedioFatorICMS_" + i, item.getPrecoMedioFatorICMS())
+					.setParameter("idItemEstoque_" + i, item.getId());
+		}
+		query.executeUpdate();
+	}
+
 	private StringBuilder gerarConstrutorItemEstoque() {
 		return new StringBuilder(
 				"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.precoMedioFatorICMS, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
@@ -237,6 +256,27 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return recuperarItemNaoZerado(l);
 	}
 
+	public List<ItemEstoque> pesquisarPrecoMedioAliquotaICMSItemEstoque(Integer idItemEstoque, Integer idMaterial,
+			FormaMaterial formaMaterial) {
+		StringBuilder select = new StringBuilder(
+				"select new ItemEstoque(i.id, i.precoMedio, i.aliquotaICMS) from ItemEstoque i ");
+
+		if (idItemEstoque != null) {
+			select.append("where i.id = :idItemEstoque ");
+		} else {
+			select.append("where i.formaMaterial = :formaMaterial and i.material.id = :idMaterial ");
+		}
+
+		TypedQuery<ItemEstoque> query = entityManager.createQuery(select.toString(), ItemEstoque.class);
+		if (idItemEstoque != null) {
+			query.setParameter("idItemEstoque", idItemEstoque);
+		} else {
+			query.setParameter("formaMaterial", formaMaterial).setParameter("idMaterial", idMaterial);
+		}
+
+		return query.getResultList();
+	}
+
 	public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		StringBuilder select = new StringBuilder();
 		select.append("select SUM(i.precoMedio * i.quantidade) from ItemEstoque i ");
@@ -261,29 +301,6 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			query.setParameter("formaMaterial", formaMaterial);
 		}
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
-	}
-
-	public void alterarPrecoMedioFatorICMS(Integer idItemEstoque, FormaMaterial formaMaterial, Integer idMaterial,
-			Double precoMedio, Double precoMedioFatorICMS) {
-		StringBuilder update = new StringBuilder(
-				"update ItemEstoque i set i.precoMedio = :precoMedio, i.precoMedioFatorICMS =:precoMedioFatorICMS ");
-
-		if (idItemEstoque != null) {
-			update.append("where i.id = :idItemEstoque ");
-		} else {
-			update.append("where i.formaMaterial = :formaMaterial and i.material.id = :idMaterial ");
-		}
-
-		Query query = entityManager.createQuery(update.toString()).setParameter("precoMedio", precoMedio)
-				.setParameter("precoMedioFatorICMS", precoMedioFatorICMS);
-
-		if (idItemEstoque != null) {
-			query.setParameter("idItemEstoque", idItemEstoque);
-		} else {
-			query.setParameter("formaMaterial", formaMaterial).setParameter("idMaterial", idMaterial);
-		}
-
-		query.executeUpdate();
 	}
 
 	@WARNING(data = "08/07/2015", descricao = "Esse metodo foi criado pois no banco de dados foram incluido elementos com duplicidade, alguns zerado ou nao, entao vamos retornar o primeiro com quantidade")

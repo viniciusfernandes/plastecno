@@ -99,6 +99,12 @@ public class ItemEstoque extends Item {
 		this.id = idItemEstoque;
 	}
 
+	public ItemEstoque(Integer id, Double precoMedio, Double aliquotaICMS) {
+		this.id = id;
+		this.precoMedio = precoMedio;
+		this.aliquotaICMS = aliquotaICMS;
+	}
+
 	public ItemEstoque(Integer id, FormaMaterial formaMaterial, String descricaoPeca, String siglaMaterial,
 			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double precoMedioFatorCIMS,
 			Double margemMinimaLucro, Integer quantidade, Integer quantidadeMinima, Double aliquotaIPI) {

@@ -230,7 +230,8 @@ function serializarBlocoDisabled(idBloco, verificarDisabled) {
 			parametros += '&'+this.name+"="+this.value;
 		}
 	});
-	return parametros;
+	// Essa substituicao eh necessaria para enviar o caracter de percentual na requisica HTTP para o servidor.
+	return parametros = parametros.replace(/%/g, '%25');
 };
 
 function inicializarCheckbox () {

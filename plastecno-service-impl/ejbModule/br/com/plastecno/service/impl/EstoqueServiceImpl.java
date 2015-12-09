@@ -449,10 +449,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void reajustarPrecoItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
-		if (itemEstoque == null || itemEstoque.getPrecoMedio() == null || itemEstoque.getPrecoMedio() == 0
-				|| itemEstoque.getAliquotaReajuste() == null || itemEstoque.getAliquotaReajuste() == 0) {
-			throw new BusinessException(
-					"Para o reajuste de precos de item de estoque o preço e a aliquota de reajuste são necessários.");
+		if (itemEstoque == null || itemEstoque.getAliquotaReajuste() == null || itemEstoque.getAliquotaReajuste() == 0) {
+			throw new BusinessException("A aliquota é obrigatória para o reajuste de precos de item de estoque.");
 		}
 
 		if (itemEstoque.getId() == null
@@ -470,7 +468,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		for (ItemEstoque item : listaItem) {
 
 			// Reajustando o preco medio do item
-			item.setPrecoMedio(itemEstoque.getPrecoMedio() * (1 + itemEstoque.getAliquotaReajuste()));
+			item.setPrecoMedio(item.getPrecoMedio() * (1 + itemEstoque.getAliquotaReajuste()));
 		}
 
 		calcularPrecoMedioFatorICMS(listaItem);

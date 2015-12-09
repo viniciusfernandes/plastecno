@@ -19,22 +19,15 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	}
 
 	public void alterarPrecoMedioFatorICMS(List<ItemEstoque> listaItem) {
-		StringBuilder update = new StringBuilder();
-		for (int i = 0; i < listaItem.size(); i++) {
-			update.append("update ItemEstoque i set i.precoMedio = :precoMedio_").append(i)
-					.append(", i.precoMedioFatorICMS =:precoMedioFatorICMS_").append(i).append(" where i.id = :idItemEstoque_")
-					.append(i).append("; ");
-		}
+		for (ItemEstoque item : listaItem) {
+			entityManager
+					.createQuery(
+							"update ItemEstoque i set i.precoMedio = :precoMedio, i.precoMedioFatorICMS =:precoMedioFatorICMS where i.id = :idItemEstoque ")
 
-		Query query = entityManager.createQuery(update.toString());
-		ItemEstoque item = null;
-		for (int i = 0; i < listaItem.size(); i++) {
-			item = listaItem.get(i);
-			query.setParameter("precoMedio_" + i, item.getPrecoMedio())
-					.setParameter("precoMedioFatorICMS_" + i, item.getPrecoMedioFatorICMS())
-					.setParameter("idItemEstoque_" + i, item.getId());
+					.setParameter("precoMedio", item.getPrecoMedio())
+					.setParameter("precoMedioFatorICMS", item.getPrecoMedioFatorICMS())
+					.setParameter("idItemEstoque", item.getId()).executeUpdate();
 		}
-		query.executeUpdate();
 	}
 
 	private StringBuilder gerarConstrutorItemEstoque() {

@@ -263,6 +263,29 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
 	}
 
+	public void alterarPrecoMedioFatorICMS(Integer idItemEstoque, FormaMaterial formaMaterial, Integer idMaterial,
+			Double precoMedio, Double precoMedioFatorICMS) {
+		StringBuilder update = new StringBuilder(
+				"update ItemEstoque i set i.precoMedio = :precoMedio, i.precoMedioFatorICMS =:precoMedioFatorICMS ");
+
+		if (idItemEstoque != null) {
+			update.append("where i.id = :idItemEstoque ");
+		} else {
+			update.append("where i.formaMaterial = :formaMaterial and i.material.id = :idMaterial ");
+		}
+
+		Query query = entityManager.createQuery(update.toString()).setParameter("precoMedio", precoMedio)
+				.setParameter("precoMedioFatorICMS", precoMedioFatorICMS);
+
+		if (idItemEstoque != null) {
+			query.setParameter("idItemEstoque", idItemEstoque);
+		} else {
+			query.setParameter("formaMaterial", formaMaterial).setParameter("idMaterial", idMaterial);
+		}
+
+		query.executeUpdate();
+	}
+
 	@WARNING(data = "08/07/2015", descricao = "Esse metodo foi criado pois no banco de dados foram incluido elementos com duplicidade, alguns zerado ou nao, entao vamos retornar o primeiro com quantidade")
 	private ItemEstoque recuperarItemNaoZerado(List<ItemEstoque> listaItem) {
 		if (listaItem == null || listaItem.size() == 0) {

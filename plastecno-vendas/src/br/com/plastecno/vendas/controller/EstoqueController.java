@@ -128,6 +128,34 @@ public class EstoqueController extends AbstractController {
         }
     }
 
+    @Post("estoque/item/reajustarpreco")
+    public void reajustarPrecoItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
+
+        itemPedido.setAliquotaReajuste(NumeroUtils.gerarAliquota(itemPedido.getAliquotaReajuste()));
+        try {
+            estoqueService.reajustarPrecoItemEstoque(itemPedido);
+
+            if (itemPedido.getId() != null) {
+                gerarMensagemSucesso("Item de estoque No. " + itemPedido.getId()
+                        + " teve seu preço reajustado com sucesso");
+            } else {
+                gerarMensagemSucesso("Itens de estoque da forma teve seu preço reajustado com sucesso");
+            }
+
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            addAtributo("permanecerTopo", true);
+            addAtributo("itemPedido", itemPedido);
+        }
+
+        addAtributo("permanecerTopo", true);
+        if (material != null && formaMaterial != null) {
+            pesquisarItemEstoque(material, formaMaterial);
+        } else {
+            irTopoPagina();
+        }
+    }
+
     @Post("estoque/escassez")
     public void pesquisarEscassezItemEstoque(Material material, FormaMaterial formaMaterial) {
         pesquisarItemEstoque(material, formaMaterial, true);

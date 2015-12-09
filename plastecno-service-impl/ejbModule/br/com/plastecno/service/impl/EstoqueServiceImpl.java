@@ -155,7 +155,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Double precoMedioFatorICMS = (Double) valores[1];
 		Double precoMedio = (Double) valores[2];
 		boolean contemFatorICMS = precoMedioFatorICMS != null;
-		
+
 		return calcularPrecoMinimo(contemFatorICMS ? precoMedioFatorICMS : precoMedio, margemMinimaLucro);
 	}
 
@@ -306,7 +306,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (itemCadastrado == null) {
 			itemCadastrado = itemEstoque;
 		}
-		
+
 		calcularPrecoMedioFatorICMS(itemCadastrado);
 
 		return itemEstoqueDAO.alterar(itemCadastrado).getId();
@@ -425,6 +425,36 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Double reajustarPrecoItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
+		if (itemEstoque == null || itemEstoque.getPrecoMedio() == null || itemEstoque.getPrecoMedio() == 0
+				|| itemEstoque.getAliquotaReajuste() == null || itemEstoque.getAliquotaReajuste() == 0) {
+			throw new BusinessException(
+					"Para o reajuste de precos de item de estoque o preço e a aliquota de reajuste são necessários.");
+		}
+
+		if (itemEstoque.getId() == null
+				&& (itemEstoque.getFormaMaterial() == null || itemEstoque.getMaterial() == null || itemEstoque.getMaterial()
+						.getId() == null)) {
+			throw new BusinessException(
+					"É necessário a forma do materia e o tipo do material para efetuar os reajuste de um grupo de itens");
+		}
+		// Reajustando o preco medio do item
+		itemEstoque.setPrecoMedio(itemEstoque.getPrecoMedio() * (1 + itemEstoque.getAliquotaReajuste()));
+		calcularPrecoMedioFatorICMS(itemEstoque);
+
+		Integer idItemEstoque = itemEstoque.getId();
+		FormaMaterial formaMaterial = itemEstoque.getFormaMaterial();
+		Integer idMaterial = itemEstoque.getMaterial() != null ? itemEstoque.getMaterial().getId() : null;
+		Double precoMedio = itemEstoque.getPrecoMedio();
+		Double precoMedioFatorICMS = itemEstoque.getPrecoMedioFatorICMS();
+
+		itemEstoqueDAO
+				.alterarPrecoMedioFatorICMS(idItemEstoque, formaMaterial, idMaterial, precoMedio, precoMedioFatorICMS);
+		return precoMedioFatorICMS;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer recepcionarItemCompra(Integer idItemPedido, Integer quantidadeRecepcionada) throws BusinessException {
 		if (quantidadeRecepcionada == null) {
 			quantidadeRecepcionada = 0;
@@ -484,7 +514,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@REVIEW(data = "27/08/2015", descricao = "Parece que a implementacao desse metodo faz o mesmo que a inclusao do item de estoque, por isso esta deprecated agora")
 	public void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
 		if (itemEstoque.isNovo()) {
 			throw new BusinessException("Não é possivel realizar a redefinição de estoque para itens não existentes");
@@ -514,7 +543,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		ValidadorInformacao.validar(itemCadastrado);
 
 		calcularPrecoMedioFatorICMS(itemCadastrado);
-		
+
 		itemEstoqueDAO.alterar(itemCadastrado);
 		// redefinirItemReservadoByItemEstoque(idItemEstoque);
 	}

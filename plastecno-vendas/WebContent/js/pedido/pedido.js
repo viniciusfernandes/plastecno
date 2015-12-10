@@ -323,7 +323,7 @@ function inicializarAutocompleteDescricaoPeca(url) {
 function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 	if (!isEmpty(numeroPedido)) {
 		
-		var parametros = $('#bloco_item_pedido').serialize();
+		var parametros = serializarBloco('bloco_item_pedido');
 		parametros += '&numeroPedido=' + numeroPedido;
 		var request = $.ajax({
 			type : 'post',

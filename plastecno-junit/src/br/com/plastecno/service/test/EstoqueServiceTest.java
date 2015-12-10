@@ -519,6 +519,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
+		assertTrue("Peca nao pode ter nenhuma medida e essa condicao nao foi validada", throwed);
 	}
 
 	@Test
@@ -771,6 +772,150 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertNull(
 				"Foi subtraido o valor de tolerancia ao item de estoque para verificar que ele nao existe no estoque e deve ser nulo",
 				itemCadastrado);
+	}
+
+	@Test
+	public void testReajustePrecoCategoriaItemEstoque() {
+		Integer idItemEstoque = recepcionarItemCompra();
+
+		ItemEstoque itemTB = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+
+		// Criando novo item
+		ItemEstoque itemCH = itemTB.clone();
+		itemCH.setFormaMaterial(FormaMaterial.CH);
+		itemCH.setPrecoMedio(100d);
+		Integer idCH = null;
+
+		try {
+			idCH = estoqueService.inserirItemEstoque(itemCH);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		itemCH = estoqueService.pesquisarItemEstoqueById(idCH);
+		itemCH.setAliquotaReajuste(0.1);
+
+		try {
+			estoqueService.reajustarPrecoItemEstoque(itemCH);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Double precoMedioReajustadoCH = 110d;
+		Double precoMedioFatorICMSReajustadoCH = 123.2d;
+
+		Double precoMedioReajustadoTB = 75.95d;
+		Double precoMedioFatorICMSReajustadoTB = 85.06d;
+
+		assertEquals("O preco medio de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
+				precoMedioReajustadoCH, NumeroUtils.arredondarValorMonetario(itemCH.getPrecoMedio()));
+
+		assertEquals(
+				"O preco medio com fator ICMS de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
+				precoMedioFatorICMSReajustadoCH, NumeroUtils.arredondarValorMonetario(itemCH.getPrecoMedioFatorICMS()));
+
+		assertEquals(
+				"O preco medio do tubo nao pode ter sido reajustado pois estamos reajustanto uma chapa. Verifique o algoritmo de reajuste",
+				precoMedioReajustadoTB, NumeroUtils.arredondarValorMonetario(itemTB.getPrecoMedio()));
+
+		assertEquals(
+				"O preco medio com fator ICMS do tubo nao pode ter sido reajustado pois estamos reajustanto uma chapa. Verifique o algoritmo de reajuste",
+				precoMedioFatorICMSReajustadoTB, NumeroUtils.arredondarValorMonetario(itemTB.getPrecoMedioFatorICMS()));
+
+		boolean throwed = false;
+		itemCH.setId(null);
+		itemCH.setFormaMaterial(null);
+		try {
+			estoqueService.reajustarPrecoItemEstoque(itemCH);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("A forma do material do item eh obrigatorio para o reajuste e essa condicao nao foi validada", throwed);
+
+		throwed = false;
+		itemCH.setId(null);
+		itemCH.setFormaMaterial(FormaMaterial.CH);
+		itemCH.getMaterial().setId(null);
+		try {
+			estoqueService.reajustarPrecoItemEstoque(itemCH);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O material do item eh obrigatorio para o reajuste e essa condicao nao foi validada", throwed);
+
+		throwed = false;
+		itemCH.setId(null);
+		itemCH.setFormaMaterial(FormaMaterial.CH);
+		itemCH.setMaterial(null);
+		try {
+			estoqueService.reajustarPrecoItemEstoque(itemCH);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O material do item eh obrigatorio para o reajuste e essa condicao nao foi validada", throwed);
+	}
+
+	@Test
+	public void testReajustePrecoItemEstoque() {
+		Integer idItemEstoque = recepcionarItemCompra();
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		itemEstoque.setAliquotaReajuste(0.1);
+
+		try {
+			estoqueService.reajustarPrecoItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Double precoMedioReajustado = 83.55d;
+		Double precoMedioFatorICMSReajustado = 93.57d;
+
+		// Pesquisando o item resjustado
+		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+
+		assertEquals("O preco medio de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
+				precoMedioReajustado, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
+
+		assertEquals(
+				"O preco medio com fator ICMS de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
+				precoMedioFatorICMSReajustado, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedioFatorICMS()));
+	}
+
+	@Test
+	public void testReajustePrecoItemEstoqueSemAliquota() {
+		Integer idItemEstoque = recepcionarItemCompra();
+
+		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		itemEstoque.setAliquotaReajuste(null);
+		boolean throwed = false;
+		try {
+			estoqueService.reajustarPrecoItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue("O reajuste de preco necessita de aliquota e essa condicao nao foi validada", throwed);
+
+		itemEstoque.setAliquotaReajuste(0d);
+		throwed = false;
+		try {
+			estoqueService.reajustarPrecoItemEstoque(itemEstoque);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue("O reajuste de preco necessita de aliquota positiva e essa condicao nao foi validada", throwed);
+
+		throwed = false;
+		try {
+			estoqueService.reajustarPrecoItemEstoque(null);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue("O reajuste de preco necessita de um item para ser efetuado e essa condicao nao foi validada", throwed);
+
 	}
 
 	@Test

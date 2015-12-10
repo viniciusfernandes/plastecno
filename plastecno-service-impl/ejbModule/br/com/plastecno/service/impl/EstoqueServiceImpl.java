@@ -448,32 +448,29 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void reajustarPrecoItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
-		if (itemEstoque == null || itemEstoque.getAliquotaReajuste() == null || itemEstoque.getAliquotaReajuste() == 0) {
+	public void reajustarPrecoItemEstoque(ItemEstoque itemReajustado) throws BusinessException {
+		if (itemReajustado == null || itemReajustado.getAliquotaReajuste() == null
+				|| itemReajustado.getAliquotaReajuste() == 0) {
 			throw new BusinessException("A aliquota é obrigatória para o reajuste de precos de item de estoque.");
 		}
 
-		if (itemEstoque.getId() == null
-				&& (itemEstoque.getFormaMaterial() == null || itemEstoque.getMaterial() == null || itemEstoque.getMaterial()
-						.getId() == null)) {
+		if (itemReajustado.getId() == null
+				&& (itemReajustado.getFormaMaterial() == null || itemReajustado.getMaterial() == null || itemReajustado
+						.getMaterial().getId() == null)) {
 			throw new BusinessException(
 					"É necessário a forma do materia e o tipo do material para efetuar os reajuste de um grupo de itens");
 		}
 
-		FormaMaterial formaMaterial = itemEstoque.getFormaMaterial();
-		Integer idMaterial = itemEstoque.getMaterial() != null ? itemEstoque.getMaterial().getId() : null;
-
-		List<ItemEstoque> listaItem = itemEstoqueDAO.pesquisarPrecoMedioAliquotaICMSItemEstoque(itemEstoque.getId(),
-				idMaterial, formaMaterial);
+		List<ItemEstoque> listaItem = itemEstoqueDAO.pesquisarPrecoMedioAliquotaICMSItemEstoque(itemReajustado.getId(),
+				itemReajustado.getMaterial().getId(), itemReajustado.getFormaMaterial());
 		for (ItemEstoque item : listaItem) {
 
 			// Reajustando o preco medio do item
-			item.setPrecoMedio(item.getPrecoMedio() * (1 + itemEstoque.getAliquotaReajuste()));
+			item.setPrecoMedio(item.getPrecoMedio() * (1 + itemReajustado.getAliquotaReajuste()));
 		}
 
 		calcularPrecoMedioFatorICMS(listaItem);
 		itemEstoqueDAO.alterarPrecoMedioFatorICMS(listaItem);
-
 	}
 
 	@Override

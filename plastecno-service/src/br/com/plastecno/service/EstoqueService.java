@@ -53,7 +53,7 @@ public interface EstoqueService {
 
 	double pesquisarPrecoMedioItemEstoque(Item filtro);
 
-	void reajustarPrecoItemEstoque(ItemEstoque filtro) throws BusinessException;
+	void reajustarPrecoItemEstoque(ItemEstoque itemReajustado) throws BusinessException;
 
 	Integer recepcionarItemCompra(Integer idItemPedido, Integer quantidadeRecepcionada) throws BusinessException;
 

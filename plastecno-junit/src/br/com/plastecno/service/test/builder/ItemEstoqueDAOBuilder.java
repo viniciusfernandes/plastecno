@@ -16,6 +16,11 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 	@Override
 	public ItemEstoqueDAO build() {
 		new MockUp<ItemEstoqueDAO>() {
+			@Mock
+			public void alterarPrecoMedioFatorICMS(List<ItemEstoque> listaItem) {
+				// Esse metodo executa apenas um update dos dados em banco e como as
+				// entidades estao em memoria, elas ja estao com os valores alterados.
+			}
 
 			@Mock
 			public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
@@ -158,6 +163,24 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
+			public List<ItemEstoque> pesquisarPrecoMedioAliquotaICMSItemEstoque(Integer idItemEstoque, Integer idMaterial,
+					FormaMaterial formaMaterial) {
+				List<ItemEstoque> lista = new ArrayList<ItemEstoque>();
+				if (idItemEstoque != null) {
+					lista.add(REPOSITORY.pesquisarEntidadeById(ItemEstoque.class, idItemEstoque));
+					return lista;
+				}
+
+				for (ItemEstoque i : lista) {
+					if (idMaterial != null && formaMaterial != null && i.getMaterial() != null
+							&& idMaterial.equals(i.getMaterial().getId()) && formaMaterial.equals(i.getFormaMaterial())) {
+						lista.add(i);
+					}
+				}
+				return lista;
+			}
+
+			@Mock
 			public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				List<Double[]> listaValores = new ArrayList<Double[]>();
@@ -187,5 +210,4 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 		};
 		return new ItemEstoqueDAO(null);
 	}
-
 }

@@ -18,6 +18,18 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		super(entityManager);
 	}
 
+	public void alterarPrecoMedioFatorICMS(List<ItemEstoque> listaItem) {
+		for (ItemEstoque item : listaItem) {
+			entityManager
+					.createQuery(
+							"update ItemEstoque i set i.precoMedio = :precoMedio, i.precoMedioFatorICMS =:precoMedioFatorICMS where i.id = :idItemEstoque ")
+
+					.setParameter("precoMedio", item.getPrecoMedio())
+					.setParameter("precoMedioFatorICMS", item.getPrecoMedioFatorICMS())
+					.setParameter("idItemEstoque", item.getId()).executeUpdate();
+		}
+	}
+
 	private StringBuilder gerarConstrutorItemEstoque() {
 		return new StringBuilder(
 				"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.precoMedioFatorICMS, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
@@ -235,6 +247,27 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 				.setParameter("descricaoPeca", descricaoPeca).getResultList();
 
 		return recuperarItemNaoZerado(l);
+	}
+
+	public List<ItemEstoque> pesquisarPrecoMedioAliquotaICMSItemEstoque(Integer idItemEstoque, Integer idMaterial,
+			FormaMaterial formaMaterial) {
+		StringBuilder select = new StringBuilder(
+				"select new ItemEstoque(i.id, i.precoMedio, i.aliquotaICMS) from ItemEstoque i ");
+
+		if (idItemEstoque != null) {
+			select.append("where i.id = :idItemEstoque ");
+		} else {
+			select.append("where i.formaMaterial = :formaMaterial and i.material.id = :idMaterial ");
+		}
+
+		TypedQuery<ItemEstoque> query = entityManager.createQuery(select.toString(), ItemEstoque.class);
+		if (idItemEstoque != null) {
+			query.setParameter("idItemEstoque", idItemEstoque);
+		} else {
+			query.setParameter("formaMaterial", formaMaterial).setParameter("idMaterial", idMaterial);
+		}
+
+		return query.getResultList();
 	}
 
 	public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {

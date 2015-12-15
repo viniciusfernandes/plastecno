@@ -35,16 +35,19 @@ public class ItemEstoque extends Item {
 	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota IPI")
 	private Double aliquotaIPI;
 
+	@Transient
+	private Double aliquotaReajuste;
+
 	private Double comprimento;
 
 	@Column(name = "descricao_peca")
 	@InformacaoValidavel(trim = true, intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do estoque")
 	private String descricaoPeca;
-
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_forma_material")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma do material do item do estoque")
 	private FormaMaterial formaMaterial;
+
 	@Id
 	@SequenceGenerator(name = "itemEstoqueSequence", sequenceName = "vendas.seq_item_estoque_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemEstoqueSequence")
@@ -96,9 +99,15 @@ public class ItemEstoque extends Item {
 		this.id = idItemEstoque;
 	}
 
+	public ItemEstoque(Integer id, Double precoMedio, Double aliquotaICMS) {
+		this.id = id;
+		this.precoMedio = precoMedio;
+		this.aliquotaICMS = aliquotaICMS;
+	}
+
 	public ItemEstoque(Integer id, FormaMaterial formaMaterial, String descricaoPeca, String siglaMaterial,
-			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double precoMedioFatorCIMS, Double margemMinimaLucro,
-			Integer quantidade, Integer quantidadeMinima, Double aliquotaIPI) {
+			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double precoMedioFatorCIMS,
+			Double margemMinimaLucro, Integer quantidade, Integer quantidadeMinima, Double aliquotaIPI) {
 		this.comprimento = comprimento;
 		this.descricaoPeca = descricaoPeca;
 		this.formaMaterial = formaMaterial;
@@ -156,6 +165,10 @@ public class ItemEstoque extends Item {
 
 	public Double getAliquotaIPI() {
 		return aliquotaIPI;
+	}
+
+	public Double getAliquotaReajuste() {
+		return aliquotaReajuste;
 	}
 
 	public Double getComprimento() {
@@ -243,6 +256,10 @@ public class ItemEstoque extends Item {
 
 	public void setAliquotaIPI(Double aliquotaIPI) {
 		this.aliquotaIPI = aliquotaIPI;
+	}
+
+	public void setAliquotaReajuste(Double aliquotaReajuste) {
+		this.aliquotaReajuste = aliquotaReajuste;
 	}
 
 	public void setComprimento(Double comprimento) {

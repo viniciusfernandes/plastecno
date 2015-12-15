@@ -235,6 +235,14 @@
 	margin-left: 2%;
 }
 
+.botaoPreco {
+	background: url("../images/price_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoRemover {
 	background: url("../images/minus_16.png") no-repeat scroll 0 0
 		transparent;
@@ -371,6 +379,14 @@
 
 .botaoManutencao:hover {
 	background: url("../images/maintenance_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoPreco:hover {
+	background: url("../images/price_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 	height: 24px;

@@ -70,15 +70,38 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return precoMedio * item.getQuantidade() * (1 + aliquotaIPI);
 	}
 
+	private Double calcularPrecoMedioFatorICMS(Double aliquotaICMSRevendedor, Double aliquotaICMSItem, Double precoMedio) {
+		if (precoMedio == null) {
+			return 0d;
+		}
+		aliquotaICMSRevendedor = aliquotaICMSRevendedor != null ? aliquotaICMSRevendedor : 0d;
+		aliquotaICMSItem = aliquotaICMSItem != null ? aliquotaICMSItem : 0d;
+
+		double fatorICMS = aliquotaICMSRevendedor - aliquotaICMSItem;
+		return precoMedio * (1 + fatorICMS);
+	}
+
 	private void calcularPrecoMedioFatorICMS(ItemEstoque itemEstoque) {
 		if (itemEstoque.getPrecoMedio() == null) {
 			return;
 		}
 
-		double icmsRevendedor = representadaService.pesquisarAliquotaICMSRevendedor();
-		double icmsItem = itemEstoque.getAliquotaICMS() != null ? itemEstoque.getAliquotaICMS() : 0d;
-		double fatorICMS = icmsRevendedor - icmsItem;
-		itemEstoque.setPrecoMedioFatorICMS(itemEstoque.getPrecoMedio() * (1 + fatorICMS));
+		itemEstoque.setPrecoMedioFatorICMS(calcularPrecoMedioFatorICMS(
+				representadaService.pesquisarAliquotaICMSRevendedor(), itemEstoque.getAliquotaICMS(),
+				itemEstoque.getPrecoMedio()));
+	}
+
+	private void calcularPrecoMedioFatorICMS(List<ItemEstoque> listaItemEstoque) {
+		if (listaItemEstoque == null || listaItemEstoque.isEmpty()) {
+			return;
+		}
+		Double aliquotaICMSRevendedor = representadaService.pesquisarAliquotaICMSRevendedor();
+		for (ItemEstoque itemEstoque : listaItemEstoque) {
+
+			itemEstoque.setPrecoMedioFatorICMS(calcularPrecoMedioFatorICMS(aliquotaICMSRevendedor,
+					itemEstoque.getAliquotaICMS(), itemEstoque.getPrecoMedio()));
+
+		}
 	}
 
 	private void calcularPrecoMedioItemEstoque(ItemEstoque itemCadastrado, ItemEstoque itemEstoque) {
@@ -153,8 +176,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Object[] valores = itemEstoqueDAO.pesquisarMargemMininaEPrecoMedio(idItemEstoque);
 		Double margemMinimaLucro = (Double) valores[0];
 		Double precoMedioFatorICMS = (Double) valores[1];
+		Double precoMedio = (Double) valores[2];
+		boolean contemFatorICMS = precoMedioFatorICMS != null;
 
-		return calcularPrecoMinimo(precoMedioFatorICMS, margemMinimaLucro);
+		return calcularPrecoMinimo(contemFatorICMS ? precoMedioFatorICMS : precoMedio, margemMinimaLucro);
 	}
 
 	@Override
@@ -305,6 +330,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 			itemCadastrado = itemEstoque;
 		}
 
+		calcularPrecoMedioFatorICMS(itemCadastrado);
+
 		return itemEstoqueDAO.alterar(itemCadastrado).getId();
 	}
 
@@ -421,6 +448,33 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void reajustarPrecoItemEstoque(ItemEstoque itemReajustado) throws BusinessException {
+		if (itemReajustado == null || itemReajustado.getAliquotaReajuste() == null
+				|| itemReajustado.getAliquotaReajuste() == 0) {
+			throw new BusinessException("A aliquota é obrigatória para o reajuste de precos de item de estoque.");
+		}
+
+		if (itemReajustado.getId() == null
+				&& (itemReajustado.getFormaMaterial() == null || itemReajustado.getMaterial() == null || itemReajustado
+						.getMaterial().getId() == null)) {
+			throw new BusinessException(
+					"É necessário a forma do materia e o tipo do material para efetuar os reajuste de um grupo de itens");
+		}
+
+		List<ItemEstoque> listaItem = itemEstoqueDAO.pesquisarPrecoMedioAliquotaICMSItemEstoque(itemReajustado.getId(),
+				itemReajustado.getMaterial().getId(), itemReajustado.getFormaMaterial());
+		for (ItemEstoque item : listaItem) {
+
+			// Reajustando o preco medio do item
+			item.setPrecoMedio(item.getPrecoMedio() * (1 + itemReajustado.getAliquotaReajuste()));
+		}
+
+		calcularPrecoMedioFatorICMS(listaItem);
+		itemEstoqueDAO.alterarPrecoMedioFatorICMS(listaItem);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer recepcionarItemCompra(Integer idItemPedido, Integer quantidadeRecepcionada) throws BusinessException {
 		if (quantidadeRecepcionada == null) {
 			quantidadeRecepcionada = 0;
@@ -480,7 +534,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@REVIEW(data = "27/08/2015", descricao = "Parece que a implementacao desse metodo faz o mesmo que a inclusao do item de estoque, por isso esta deprecated agora")
 	public void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
 		if (itemEstoque.isNovo()) {
 			throw new BusinessException("Não é possivel realizar a redefinição de estoque para itens não existentes");
@@ -508,6 +561,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemCadastrado.copiar(itemEstoque);
 
 		ValidadorInformacao.validar(itemCadastrado);
+
+		calcularPrecoMedioFatorICMS(itemCadastrado);
 
 		itemEstoqueDAO.alterar(itemCadastrado);
 		// redefinirItemReservadoByItemEstoque(idItemEstoque);

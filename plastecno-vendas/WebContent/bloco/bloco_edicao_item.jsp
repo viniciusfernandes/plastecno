@@ -5,6 +5,7 @@ $(document).ready(function() {
 
 	inserirMascaraMonetaria('bloco_item_pedido #precoMedio', 7);
 	inserirMascaraNumerica('bloco_item_pedido #aliquotaIPI', '99');
+	inserirMascaraNumerica('bloco_item_pedido #aliquotaReajuste', '99');
 	inserirMascaraNumerica('bloco_item_pedido #aliquotaICMS', '9999999');
 	inserirMascaraMonetaria('bloco_item_pedido #comprimento', 8);
 	inserirMascaraMonetaria('bloco_item_pedido #medidaExterna', 8);
@@ -27,6 +28,14 @@ $(document).ready(function() {
 		$(form).submit();
 	});
 	
+	$('#botaoReajustarPreco').click(function () {
+		var parametros = serializarPesquisa();
+		parametros += serializarBloco('bloco_item_pedido');
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/estoque/item/reajustarpreco"/>?'+parametros);
+		$(form).submit();
+	});
 });
 
 
@@ -137,7 +146,11 @@ function habilitarCamposEdicaoItem(habilitado){
 	</div>
 	
 	<c:if test="${isEstoque}">
-	<div class="label">Qtde. Mín.:</div>
+		<div class="label">Reajuste (%):</div>
+		<div class="input" style="width: 70%">
+			<input type="text" id="aliquotaReajuste" name="itemPedido.aliquotaReajuste" value="${itemPedido.aliquotaReajuste}" style="width: 5%"/>
+		</div>
+		<div class="label">Qtde. Mín.:</div>
 		<div class="input" style="width: 7%">
 			<input type="text" id="quantidadeMinima" name="itemPedido.quantidadeMinima" value="${itemPedido.quantidadeMinima}"/>
 		</div>
@@ -152,6 +165,7 @@ function habilitarCamposEdicaoItem(habilitado){
 		<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
 		<c:if test="${isEstoque}">
 			<a id="botaoLimiteMinimoPadrao" title="Inserir Limite Minimo Padrao" class="botaoManutencao"></a>
+			<a id="botaoReajustarPreco" title="Ajustar Preco" class="botaoDinheiro" ></a>
 		</c:if>
 	</div>
 

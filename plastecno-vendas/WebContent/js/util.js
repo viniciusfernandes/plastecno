@@ -218,8 +218,13 @@ function serializarBlocoDisabled(idBloco, verificarDisabled) {
 	$(inputs).each(function () {
 		preenchido = !isEmpty(this.value) && !isEmpty(this.name);
 		if(verificarDisabled && preenchido && !$(this).attr('disabled')){
-						    
-			if($(this).is(":checkbox")) {
+			if($(this).is(":radio")) {
+				// Essa condicao eh necessaria pois todos os radios estavam sendo incluido no parametro, mas devemos ter apenas os selecionados.
+				if(!$(this).is(':checked')){
+					return;
+				}
+				valor = $(this).val();
+			} else if($(this).is(":checkbox")) {
 				valor = $(this).is(':checked');
 			} else {
 				valor = this.value;
@@ -230,7 +235,8 @@ function serializarBlocoDisabled(idBloco, verificarDisabled) {
 			parametros += '&'+this.name+"="+this.value;
 		}
 	});
-	return parametros;
+	// Essa substituicao eh necessaria para enviar o caracter de percentual na requisica HTTP para o servidor.
+	return parametros.replace(/%/g, '%25').replace(/\s+/g, ' ');
 };
 
 function inicializarCheckbox () {

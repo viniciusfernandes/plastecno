@@ -38,9 +38,11 @@ import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Comissao;
 import br.com.plastecno.service.entity.Contato;
+import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -314,7 +316,6 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoCompra.setCliente(clienteService.pesquisarRevendedor());
 		pedidoCompra.setComprador(comprador);
 		pedidoCompra.setContato(contato);
-		pedidoCompra.setDataInclusao(new Date());
 		pedidoCompra.setFinalidadePedido(FinalidadePedido.REVENDA);
 		pedidoCompra.setProprietario(comprador);
 		pedidoCompra.setRepresentada(fornecedor);
@@ -590,7 +591,6 @@ public class PedidoServiceImpl implements PedidoService {
 		pedido.addLogradouro(this.clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
 
 		if (isPedidoNovo) {
-			pedido.setDataInclusao(new Date());
 			if (!pedido.isCompraAndamento()) {
 				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 			}
@@ -599,7 +599,6 @@ public class PedidoServiceImpl implements PedidoService {
 		} else {
 			// recuperando as informacoes do sistema que nao devem ser alteradas
 			// na edicao do pedido.
-			pedido.setDataInclusao(this.pesquisarDataInclusao(idPedido));
 			pedido.setDataEnvio(this.pesquisarDataEnvio(idPedido));
 			pedido.setValorPedido(this.pesquisarValorPedido(idPedido));
 			pedido.setValorPedidoIPI(this.pesquisarValorPedidoIPI(idPedido));
@@ -705,6 +704,26 @@ public class PedidoServiceImpl implements PedidoService {
 					+ (itemPedido.isPeca() ? itemPedido.getDescricaoPeca() : itemPedido.getDescricao()));
 		}
 		return inserirItemPedido(idPedido, itemPedido);
+	}
+
+	@Override
+	public Pedido inserirOrcamento(Pedido pedido) throws BusinessException {
+		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+		Cliente cliente = pedido.getCliente();
+
+		cliente.setRazaoSocial(cliente.getNomeFantasia());
+		cliente.addContato(new ContatoCliente(pedido.getContato()));
+		cliente.setVendedor(pedido.getVendedor());
+
+		RamoAtividade r = new RamoAtividade();
+		r.setId(1);
+
+		cliente.setRamoAtividade(r);
+
+		if (pedido.isClienteNovo()) {
+			pedido.setCliente(clienteService.inserir(cliente));
+		}
+		return inserir(pedido);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -814,12 +833,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Date pesquisarDataEnvio(Integer idPedido) {
 		return pedidoDAO.pesquisarDataEnvioById(idPedido);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Date pesquisarDataInclusao(Integer idPedido) {
-		return pedidoDAO.pesquisarDataInclusaoById(idPedido);
 	}
 
 	@Override

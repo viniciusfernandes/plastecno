@@ -61,6 +61,8 @@ public interface PedidoService {
 
 	Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException;
 
+	Pedido inserirOrcamento(Pedido pedido) throws BusinessException;
+
 	boolean isCalculoIPIHabilitado(Integer idPedido);
 
 	boolean isPedidoEnviado(Integer idPedido);
@@ -91,8 +93,6 @@ public interface PedidoService {
 	List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador) throws BusinessException;
 
 	Date pesquisarDataEnvio(Integer idPedido);
-
-	Date pesquisarDataInclusao(Integer idPedido);
 
 	List<Pedido> pesquisarEntregaVendaByPeriodo(Periodo periodo);
 

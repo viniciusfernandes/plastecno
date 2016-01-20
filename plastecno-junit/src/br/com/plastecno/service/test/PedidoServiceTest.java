@@ -410,7 +410,7 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testAlteracaoQuantidadeRecepcionadaInferiorQuantidadeComprada() {
 		ItemPedido itemPedido = gerarItemPedidoCompra();
-		
+
 		Integer quantidadeRecepcionada = itemPedido.getQuantidade() - 1;
 		try {
 			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(), quantidadeRecepcionada);
@@ -1326,24 +1326,18 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoPedidoOrcamento() {
 		Pedido pedido = gerarPedidoRepresentacao();
+		pedido.getCliente().setId(null);
 
-		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 		// Incluindo o pedido no sistema para, posteriormente, inclui-lo como
 		// orcamento.
 		try {
-			pedido = pedidoService.inserir(pedido);
+			pedido = pedidoService.inserirOrcamento(pedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
 		assertNotEquals("Pedido deve ser incluido no sistema antes de virar um orcamento", null, pedido.getId());
 
-		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
-		try {
-			pedido = pedidoService.inserir(pedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
 		assertEquals("Pedido incluido deve ir para orcamento e esta definido como: "
 				+ pedido.getSituacaoPedido().getDescricao(), SituacaoPedido.ORCAMENTO, pedido.getSituacaoPedido());
 

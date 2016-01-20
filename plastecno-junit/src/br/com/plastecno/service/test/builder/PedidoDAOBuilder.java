@@ -85,15 +85,9 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			Date pesquisarDataEnvioById(Integer idPedido) {
+			public Date pesquisarDataEnvioById(Integer idPedido) {
 				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null ? pedido.getDataEntrega() : null;
-			}
-
-			@Mock
-			Date pesquisarDataInclusaoById(Integer idPedido) {
-				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
-				return pedido != null ? pedido.getDataInclusao() : null;
 			}
 
 			@Mock

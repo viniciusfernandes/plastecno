@@ -16,6 +16,7 @@ import br.com.plastecno.service.entity.Bairro;
 import br.com.plastecno.service.entity.Cidade;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
+import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.Endereco;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -54,6 +55,24 @@ public class EntidadeBuilder {
 		cliente.setEmail("alex@gmail.com.br");
 		cliente.setId(gerarId());
 		cliente.setTipoCliente(TipoCliente.NORMAL);
+		return cliente;
+	}
+
+	public Cliente buildClienteOrcamento() {
+		Cliente cliente = new Cliente();
+		cliente.setNomeFantasia("Exercito Brasileiro");
+		cliente.setTipoCliente(TipoCliente.NORMAL);
+
+		ContatoCliente contato = new ContatoCliente();
+		contato.setNome("Andre Marcondes");
+		contato.setEmail("andre@gmail.com");
+		contato.setTelefone("999999999");
+		contato.setDdd("11");
+		contato.setRamal("4444");
+		contato.setFax("88888888");
+
+		cliente.addContato(contato);
+
 		return cliente;
 	}
 

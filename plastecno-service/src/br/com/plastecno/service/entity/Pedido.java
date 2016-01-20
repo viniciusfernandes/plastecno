@@ -71,10 +71,6 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private String dataEnvioFormatada;
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "data_inclusao")
-	private Date dataInclusao;
-
 	@Transient
 	private String dataInclusaoFormatada;
 
@@ -100,6 +96,9 @@ public class Pedido implements Serializable, Cloneable {
 
 	@InformacaoValidavel(intervalo = { 0, 799 }, nomeExibicao = "Observação do pedido")
 	private String observacao;
+
+	@Column(name = "prazo_entrega")
+	private Integer prazoEntrega;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_proprietario")
@@ -208,7 +207,7 @@ public class Pedido implements Serializable, Cloneable {
 		if (listaLogradouro == null || listaLogradouro.isEmpty()) {
 			return;
 		}
-		
+
 		for (Logradouro logradouro : listaLogradouro) {
 			this.addLogradouro(logradouro);
 		}
@@ -267,10 +266,6 @@ public class Pedido implements Serializable, Cloneable {
 		return dataEnvioFormatada;
 	}
 
-	public Date getDataInclusao() {
-		return dataInclusao;
-	}
-
 	public String getDataInclusaoFormatada() {
 		return dataInclusaoFormatada;
 	}
@@ -301,6 +296,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public String getObservacao() {
 		return observacao;
+	}
+
+	public Integer getPrazoEntrega() {
+		return prazoEntrega;
 	}
 
 	public Usuario getProprietario() {
@@ -360,8 +359,16 @@ public class Pedido implements Serializable, Cloneable {
 		return this.clienteNotificadoVenda;
 	}
 
+	public boolean isClienteNovo() {
+		return cliente != null && cliente.getId() == null;
+	}
+
 	public boolean isCompra() {
 		return TipoPedido.COMPRA.equals(tipoPedido);
+	}
+
+	public boolean isCompraAndamento() {
+		return SituacaoPedido.COMPRA_ANDAMENTO.equals(this.situacaoPedido);
 	}
 
 	public boolean isCompraEfetuada() {
@@ -369,12 +376,12 @@ public class Pedido implements Serializable, Cloneable {
 				|| SituacaoPedido.COMPRA_RECEBIDA.equals(situacaoPedido);
 	}
 
-	public boolean isCompraAndamento() {
-		return SituacaoPedido.COMPRA_ANDAMENTO.equals(this.situacaoPedido);
-	}
-
 	public boolean isEnviado() {
 		return SituacaoPedido.ENVIADO.equals(this.situacaoPedido);
+	}
+
+	public boolean isItemAguardandoMaterial() {
+		return TipoPedido.REVENDA.equals(tipoPedido) && SituacaoPedido.ITEM_AGUARDANDO_MATERIAL.equals(situacaoPedido);
 	}
 
 	public boolean isOrcamento() {
@@ -391,10 +398,6 @@ public class Pedido implements Serializable, Cloneable {
 
 	public boolean isRevendaEfetuada() {
 		return isRevenda() && !SituacaoPedido.CANCELADO.equals(situacaoPedido);
-	}
-
-	public boolean isItemAguardandoMaterial() {
-		return TipoPedido.REVENDA.equals(tipoPedido) && SituacaoPedido.ITEM_AGUARDANDO_MATERIAL.equals(situacaoPedido);
 	}
 
 	public boolean isVenda() {
@@ -442,10 +445,6 @@ public class Pedido implements Serializable, Cloneable {
 		this.dataEnvioFormatada = dataEnvioFormatada;
 	}
 
-	public void setDataInclusao(Date dataInclusao) {
-		this.dataInclusao = dataInclusao;
-	}
-
 	public void setDataInclusaoFormatada(String dataInclusaoFormatada) {
 		this.dataInclusaoFormatada = dataInclusaoFormatada;
 	}
@@ -478,6 +477,10 @@ public class Pedido implements Serializable, Cloneable {
 		if (isOrcamento) {
 			this.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 		}
+	}
+
+	public void setPrazoEntrega(Integer prazoEntrega) {
+		this.prazoEntrega = prazoEntrega;
 	}
 
 	public void setProprietario(Usuario proprietario) {

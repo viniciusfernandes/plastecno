@@ -362,7 +362,12 @@ public class PedidoController extends AbstractController {
                     .getId());
 
             pedido.setProprietario(proprietario);
-            pedidoService.inserir(pedido);
+            if (pedido.isOrcamento()) {
+                pedidoService.inserirOrcamento(pedido);
+            } else {
+                pedidoService.inserir(pedido);
+            }
+
             formatarPedido(pedido);
             serializarJson(new SerializacaoJson(pedido).incluirAtributo("situacaoPedido", "proprietario"));
         } catch (BusinessException e) {

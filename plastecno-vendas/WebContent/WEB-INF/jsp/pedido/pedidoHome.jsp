@@ -220,11 +220,9 @@ $(document).ready(function() {
 				<input type="text" id="dataEntrega" name="pedido.dataEntrega"
 					value="${pedido.dataEntregaFormatada}" />
 			</div>
-			<div class="label" style="width: 17%">Data Inclusão:</div>
+			<div class="label" style="width: 17%">Prazo Entrega:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="dataInclusao"
-					value="${pedido.dataInclusaoFormatada}" readonly="readonly"
-					class="desabilitado" />
+				<input type="text" id="prazoEntrega" value="${pedido.prazoEntrega}"/>
 			</div>
 			<div class="label" style="width: 12%">Data Envio:</div>
 			<div class="input" style="width: 30%">
@@ -397,7 +395,7 @@ $(document).ready(function() {
 						<th style="width: 10%">Nr. Pedido Cliente</th>
 						<th style="width: 23%">${not empty tipoPedido ? 'Fornecedor': 'Representada'}</th>
 						<th style="width: 22%">Vendedor</th>
-						<th style="width: 10%">Data Incl.</th>
+						<th style="width: 10%">Data Envio.</th>
 						<th style="width: 8%">Valor (R$)</th>
 						<th style="width: 7%">Ações</th>
 					</tr>
@@ -411,7 +409,7 @@ $(document).ready(function() {
 							<td>${pedido.numeroPedidoCliente}</td>
 							<td>${pedido.representada.nomeFantasia}</td>
 							<td>${pedido.proprietario.nomeCompleto}</td>
-							<td style="text-align: center;">${pedido.dataInclusaoFormatada}</td>
+							<td style="text-align: center;">${pedido.dataEvioFormatada}</td>
 							<td style="text-align: right;">${pedido.valorPedido}</td>
 							<td>
 								<div class="coluna_acoes_listagem">

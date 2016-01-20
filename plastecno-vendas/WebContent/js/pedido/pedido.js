@@ -167,7 +167,9 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 	
 	var parametros = $('#formPedido').serialize();
 	parametros += recuperarParametrosBlocoContato();
-
+	// Esse termo foi incluido para podermos recuperar o nome do cliente no caso em que temos um orcamento e o cliente nao exista.
+	parametros += '&pedido.cliente.nomeFantasia='+$('#formPedido #nomeCliente').val(); 
+	
 	var request = $.ajax({
 		type : "post",
 		url : urlInclusaoPedido,

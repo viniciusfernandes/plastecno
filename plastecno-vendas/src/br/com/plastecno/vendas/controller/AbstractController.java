@@ -206,7 +206,6 @@ public abstract class AbstractController {
     }
 
     void formatarPedido(Pedido pedido) {
-        pedido.setDataInclusaoFormatada(this.formatarData(pedido.getDataInclusao()));
         pedido.setDataEnvioFormatada(this.formatarData(pedido.getDataEnvio()));
         pedido.setDataEntregaFormatada(this.formatarData(pedido.getDataEntrega()));
         pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));

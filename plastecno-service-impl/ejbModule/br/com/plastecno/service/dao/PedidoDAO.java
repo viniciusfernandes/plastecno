@@ -141,15 +141,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
 	}
 
-	public Date pesquisarDataInclusaoById(Integer idPedido) {
-		StringBuilder select = new StringBuilder();
-		select.append("select p.dataInclusao from Pedido p where p.id = :id");
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("id", idPedido);
-
-		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
-	}
-
 	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select p.id from ItemPedido i inner join i.pedido p where i.id = :idItemPedido")
@@ -222,7 +213,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		} else {
 			select.append(" and p.tipoPedido != :tipoPedido ");
 		}
-		select.append(" order by p.dataInclusao desc, p.id desc, p.cliente.nomeFantasia ");
+		select.append(" order by p.dataEnvio desc, p.id desc, p.cliente.nomeFantasia ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idCliente", idCliente);

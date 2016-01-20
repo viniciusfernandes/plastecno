@@ -29,8 +29,18 @@ $(document).ready(function() {
 	scrollTo('${ancora}');
 	
 	$("#botaoInserirCliente").click(function() {
+		toUpperCaseInput();
+		toLowerCaseInput();
 		
-		$('#formCliente').attr("action",$('#formCliente').attr("action")+'?'+ gerarParametrosInclusaoCliente());
+		var listaId = ['cnpj', 'cpf', 'inscricaoEstadual'];
+		removerNaoDigitos(listaId);
+		var parametros = tabelaLogradouroHandler.gerarListaParametro('listaLogradouro');
+		parametros += tabelaContatoHandler.gerarListaParametro('listaContato');
+		parametros += pickListToParameter('listaIdTransportadoraAssociada');
+		parametros += '&comentario='+$('#bloco_comentario #comentario').val();
+		parametros += '&isRevendedor='+<c:out value="${isRevendedor}"/>
+		
+		$('#formCliente').attr("action",$('#formCliente').attr("action")+'?'+ parametros);
 		$('#formCliente').submit();
 						
 	});	
@@ -52,9 +62,7 @@ $(document).ready(function() {
 	
 	$("#botaoIncluirComentario").click(function () {
 		if(!isEmpty($("#comentario").val())) {
-			var form = $(this).closest('form');
-			$(form).attr("action",$(form).attr("action") + gerarParametrosInclusaoCliente() + serializarBloco('formCliente'));
-			form.submit();			
+			$('#botaoInserirCliente').click();		
 		}
 	});
 	
@@ -92,18 +100,6 @@ $(document).ready(function() {
 	});
 
 });
-
-function gerarParametrosInclusaoCliente(){
-	toUpperCaseInput();
-	toLowerCaseInput();
-	
-	var listaId = ['cnpj', 'cpf', 'inscricaoEstadual'];
-	removerNaoDigitos(listaId);
-	var parametros = tabelaLogradouroHandler.gerarListaParametro('listaLogradouro');
-	parametros += tabelaContatoHandler.gerarListaParametro('listaContato');
-	parametros += pickListToParameter('listaIdTransportadoraAssociada');
-	return parametros;
-}
 
 function inicializarFiltro() {
 	$("#filtro_nomeFantasia").val($("#nomeFantasia").val());
@@ -242,7 +238,6 @@ function remover(codigo, nome) {
 	
 	<fieldset id="bloco_comentario">
 		<legend>::: Comentários :::</legend>
-		<form action="<c:url value="/cliente/inclusao/comentario?isRevendedor=${isRevendedor}"/>" method="post">
 			<div class="label condicional">Comentário:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" id="comentario" name="comentario" value="${comentario}" style="width: 100%" />
@@ -255,7 +250,6 @@ function remover(codigo, nome) {
 				</c:if>
 			</div>
 
-		</form>
 		<div class="label condicional">Histórico:</div>
 		<div class="input areatexto" style="width: 80%">
 			<textarea style="width: 100%;" disabled="disabled">

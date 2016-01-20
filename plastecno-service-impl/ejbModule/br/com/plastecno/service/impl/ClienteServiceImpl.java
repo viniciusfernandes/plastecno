@@ -159,6 +159,9 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	public void inserirComentario(Integer idCliente, String comentario) throws BusinessException {
+		if (StringUtils.isEmpty(comentario)) {
+			return;
+		}
 		Cliente cliente = pesquisarById(idCliente);
 		Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(idCliente);
 		inserirComentario(vendedor, cliente, comentario);

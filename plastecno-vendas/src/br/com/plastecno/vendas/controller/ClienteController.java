@@ -94,7 +94,7 @@ public class ClienteController extends AbstractController {
     }
 
     @Post("cliente/inclusao")
-    public void inserirCliente(Cliente cliente, List<LogradouroCliente> listaLogradouro,
+    public void inserirCliente(Cliente cliente, String comentario, List<LogradouroCliente> listaLogradouro,
             List<ContatoCliente> listaContato, List<Integer> listaIdTransportadoraAssociada, boolean isRevendedor) {
         try {
             if (temElementos(listaLogradouro)) {
@@ -115,66 +115,41 @@ public class ClienteController extends AbstractController {
 
             StringBuilder mensagem = new StringBuilder();
             if (isRevendedor) {
-                clienteService.alterarRevendedor(cliente);
+                cliente = clienteService.alterarRevendedor(cliente);
                 mensagem.append("O revendedor ").append(cliente.getNomeCompleto()).append(" foi incluído com sucesso");
             } else {
-                clienteService.inserir(cliente);
+                cliente = clienteService.inserir(cliente);
                 mensagem.append("O cliente ").append(cliente.getNomeCompleto()).append(" foi incluído com sucesso");
             }
 
+            clienteService.inserirComentario(cliente.getId(), comentario);
+
             gerarMensagemSucesso(mensagem.toString());
         } catch (BusinessException e) {
-            this.formatarDocumento(cliente);
-            this.carregarVendedor(cliente);
-            addAtributo("cliente", cliente);
-            addAtributo("listaLogradouro", listaLogradouro);
-            addAtributo("listaContato", listaContato);
-            addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade()
-                    .getId() : null);
-
-            try {
-                // Temos que manter as transportadoras escolhidas na tela em
-                // caso excecao de negocios
-                popularPicklist(null, cliente.getListaRedespacho());
-                gerarListaMensagemErro(e);
-            } catch (ControllerException e1) {
-                gerarLogErroNavegacao("Cliente", e);
-            }
-
+            gerarListaMensagemErro(e);
         } catch (Exception e) {
             gerarLogErro("inclusao/alteracao de cliente", e);
         }
         if (isRevendedor) {
             redirecTo(this.getClass()).revendedorHome();
         } else {
+            formatarDocumento(cliente);
+            carregarVendedor(cliente);
+            addAtributo("cliente", cliente);
+            addAtributo("listaLogradouro", listaLogradouro);
+            addAtributo("listaContato", listaContato);
+            addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade()
+                    .getId() : null);
+            addAtributo("comentarios", formatarComentarios(cliente.getId()));
+            try {
+                // Temos que manter as transportadoras escolhidas na tela em
+                // caso excecao de negocios
+                popularPicklist(null, cliente.getListaRedespacho());
+            } catch (ControllerException e) {
+                gerarLogErroNavegacao("Cliente", e);
+            }
             irTopoPagina();
         }
-    }
-
-    @Post("cliente/inclusao/comentario")
-    public void inserirComentario(Cliente cliente, String comentario, boolean isRevendedor) {
-
-        if (cliente == null) {
-            gerarListaMensagemErro("Para inserir um comentário é necessário que um cliente exita.");
-        } else {
-            try {
-                
-                cliente.setVendedor(getUsuario());
-                
-                if (cliente.getId() == null) {
-                    cliente = clienteService.inserir(cliente);
-                }
-
-                clienteService.inserirComentario(cliente.getId(), comentario);
-                gerarMensagemSucesso("Comentário sonre o cliente No. " + cliente.getId() + " inserido com sucesso.");
-                pesquisarClienteById(cliente.getId(), isRevendedor);
-            } catch (BusinessException e) {
-                gerarListaMensagemErro(e);
-                addAtributo("comentario", comentario);
-            }
-            addAtributo("cliente", cliente);
-        }
-        irTopoPagina();
     }
 
     @Get("cliente/listagem")

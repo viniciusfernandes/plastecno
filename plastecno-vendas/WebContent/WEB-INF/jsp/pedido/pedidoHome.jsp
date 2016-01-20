@@ -173,7 +173,7 @@ $(document).ready(function() {
 			<input type="hidden" id="numeroPedido" name="pedido.id" value="${pedido.id}" /> 
 			<input type="hidden" id="idCliente" name="pedido.cliente.id" value="${cliente.id}" /> 
 			<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${proprietario.id}" /> 
-			<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${representadaSelecionada.id}" />
+			<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
 			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
 
 			

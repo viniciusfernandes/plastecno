@@ -753,7 +753,8 @@ public class PedidoServiceImpl implements PedidoService {
 		} else {
 			listaPedido = new ArrayList<Pedido>();
 		}
-		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalPedidoByIdCliente(idCliente, idVendedor, isCompra),
+		
+		return new PaginacaoWrapper<Pedido>(pesquisarTotalPedidoByIdCliente(idCliente, idVendedor, idFornecedor, isCompra),
 				listaPedido);
 	}
 
@@ -1247,7 +1248,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, boolean isCompra) {
+	public Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
+			boolean isCompra) {
 		if (idCliente == null) {
 			return 0L;
 		}
@@ -1255,6 +1257,10 @@ public class PedidoServiceImpl implements PedidoService {
 		StringBuilder select = new StringBuilder("select count(p.id) from Pedido p where p.cliente.id = :idCliente ");
 		if (idVendedor != null) {
 			select.append("and p.proprietario.id = :idVendedor ");
+		}
+
+		if (idFornecedor != null) {
+			select.append("and p.representada.id = :idFornecedor ");
 		}
 
 		if (isCompra) {
@@ -1265,8 +1271,13 @@ public class PedidoServiceImpl implements PedidoService {
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA);
+
 		if (idVendedor != null) {
 			query.setParameter("idVendedor", idVendedor);
+		}
+
+		if (idFornecedor != null) {
+			query.setParameter("idFornecedor", idFornecedor);
 		}
 
 		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
@@ -1275,7 +1286,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente) {
-		return this.pesquisarTotalPedidoByIdCliente(idCliente, null, false);
+		return this.pesquisarTotalPedidoByIdCliente(idCliente, null, null, false);
 	}
 
 	@Override

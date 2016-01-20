@@ -181,7 +181,7 @@ public interface PedidoService {
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
-	Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, boolean isCompra);
+	Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra);
 
 	Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente);
 

@@ -83,25 +83,11 @@
 			maxlength="2" />
 	</div>
 
-	<div class="label" style="width: 8%">Telefone:</div>
+	<div class="label" style="width: 8%">Celular:</div>
 	<div class="input" style="width: 15%">
 		<input type="text" id="contato_telefoneSecundario"
 			name="contato.telefoneSecundario"
 			value="${contato.telefoneSecundarioComHifen}" maxlength="9" />
-	</div>
-
-	<div class="label" style="width: 6%">Ramal:</div>
-	<div class="input" style="width: 10%">
-		<input type="text" id="contato_ramalSecundario"
-			name="contato.ramalSecundario" value="${contato.ramalSecundario}"
-			maxlength="5" />
-	</div>
-
-	<div class="label" style="width: 5%">FAX:</div>
-	<div class="input" style="width: 20%">
-		<input type="text" id="contato_faxSecundario"
-			name="contato.faxSecundario" value="${contato.faxSecundarioComHifen}"
-			maxlength="8" style="width: 90%" />
 	</div>
 
 	<c:if test="${!listaContatoDesabilitada}">

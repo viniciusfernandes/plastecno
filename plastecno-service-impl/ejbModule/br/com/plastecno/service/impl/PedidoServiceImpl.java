@@ -25,6 +25,7 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
@@ -42,7 +43,6 @@ import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
-import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -97,6 +97,9 @@ public class PedidoServiceImpl implements PedidoService {
 	@EJB
 	private UsuarioService usuarioService;
 
+	@EJB
+	private RamoAtividadeService ramoAtividadeService;
+	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarItemAguardandoCompraByIdPedido(Integer idPedido) {
@@ -715,10 +718,7 @@ public class PedidoServiceImpl implements PedidoService {
 		cliente.addContato(new ContatoCliente(pedido.getContato()));
 		cliente.setVendedor(pedido.getVendedor());
 
-		RamoAtividade r = new RamoAtividade();
-		r.setId(1);
-
-		cliente.setRamoAtividade(r);
+		cliente.setRamoAtividade(ramoAtividadeService.pesquisarRamoAtividadePadrao());
 
 		if (pedido.isClienteNovo()) {
 			pedido.setCliente(clienteService.inserir(cliente));

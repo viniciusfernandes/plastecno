@@ -202,7 +202,7 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 			// preenchendo esse campo caso o usuario queira cancelar o pedido
 			$('#idPedidoCancelamento').val(pedidoJson.id);
 			$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);
-			$('#vendedor').val(
+			$('#proprietario').val(
 					pedidoJson.proprietario.nome + ' - '
 							+ pedidoJson.proprietario.email);
 			$('#idVendedor').val(pedidoJson.proprietario.id);

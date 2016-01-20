@@ -409,7 +409,7 @@ $(document).ready(function() {
 							<td>${pedido.numeroPedidoCliente}</td>
 							<td>${pedido.representada.nomeFantasia}</td>
 							<td>${pedido.proprietario.nomeCompleto}</td>
-							<td style="text-align: center;">${pedido.dataEvioFormatada}</td>
+							<td style="text-align: center;">${pedido.dataEnvioFormatada}</td>
 							<td style="text-align: right;">${pedido.valorPedido}</td>
 							<td>
 								<div class="coluna_acoes_listagem">

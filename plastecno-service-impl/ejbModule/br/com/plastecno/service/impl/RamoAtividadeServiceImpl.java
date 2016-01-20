@@ -171,6 +171,19 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 		return lista.size() == 1 ? lista.get(0) : null;
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public RamoAtividade pesquisarRamoAtividadePadrao() throws BusinessException {
+		RamoAtividade r = ramoAtividadeDAO.pesquisarRamoAtividadePadrao();
+		if (r != null) {
+			return r;
+		}
+		r = new RamoAtividade();
+		r.setDescricao("A DEFINIR");
+		r.setSigla("NDEFINIDO");
+		return inserir(r);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Long pesquisarTotalRegistros(RamoAtividade filtro, Boolean apenasRamoAtividadeAtivo) {

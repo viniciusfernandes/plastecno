@@ -78,6 +78,14 @@ $(document).ready(function() {
 		
 	});
 	
+	$("#botaoPesquisaPedido").click(function() {
+		$('#formPesquisa #tipoPedidoPesquisa').val($('#formPedido #tipoPedido').val());
+		$('#formPesquisa #idFornecedorPesquisa').val($('#formPedido #idRepresentada').val());
+		$('#formPesquisa #idClientePesquisa').val($('#formPedido #idCliente').val());
+		var form = $(this).closest('form'); 
+		form.submit();
+	});
+	
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	
 	inserirMascaraData('dataEntrega');
@@ -333,9 +341,10 @@ $(document).ready(function() {
 	</form>
 	<div class="bloco_botoes">
 		<form id="formPesquisa" action="pedido/listagem" method="get">
-			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
-			<input type="hidden" name="idCliente" id="idClientePesquisa" value="${cliente.id}" /> 
-			<input type="submit" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
+			<input type="hidden" name="tipoPedido"  id="tipoPedidoPesquisa" /> 
+			<input type="hidden" name="idCliente" id="idClientePesquisa"  /> 
+			<input type="hidden" name="idFornecedor" id="idFornecedorPesquisa" /> 
+			<input type="button" id="botaoPesquisaPedido" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
 		</form>
 		<form action="pedido/limpar" method="get">
 			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 

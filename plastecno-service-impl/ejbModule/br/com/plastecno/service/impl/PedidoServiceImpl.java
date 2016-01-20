@@ -1074,7 +1074,7 @@ public class PedidoServiceImpl implements PedidoService {
 		if (idCliente == null) {
 			return Collections.emptyList();
 		}
-		return this.pedidoDAO.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, isCompra,
+		return this.pedidoDAO.pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, isCompra,
 				indiceRegistroInicial, numeroMaximoRegistros);
 	}
 

@@ -587,7 +587,8 @@ public class PedidoController extends AbstractController {
     }
 
     @Get("pedido/listagem")
-    public void pesquisarPedidoByIdCliente(Integer idCliente, TipoPedido tipoPedido, Integer paginaSelecionada) {
+    public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idFornecedor, TipoPedido tipoPedido,
+            Integer paginaSelecionada) {
         if (idCliente == null) {
             gerarListaMensagemErro("Cliente é obrigatório para a pesquisa de pedidos");
             irTopoPagina();

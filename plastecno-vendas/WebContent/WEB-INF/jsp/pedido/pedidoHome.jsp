@@ -91,7 +91,7 @@ $(document).ready(function() {
 	inserirMascaraMonetaria('comprimento', 8);
 	inserirMascaraMonetaria('medidaExterna', 8);
 	inserirMascaraMonetaria('medidaInterna', 8);
-	
+	inserirMascaraNumerica('prazoEntrega', '999');
 
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
@@ -222,7 +222,7 @@ $(document).ready(function() {
 			</div>
 			<div class="label" style="width: 17%">Prazo Entrega:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="prazoEntrega" value="${pedido.prazoEntrega}"/>
+				<input type="text" id="prazoEntrega" name="pedido.prazoEntrega" value="${pedido.prazoEntrega}"/>
 			</div>
 			<div class="label" style="width: 12%">Data Envio:</div>
 			<div class="input" style="width: 30%">

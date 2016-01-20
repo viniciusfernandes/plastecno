@@ -198,16 +198,21 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	public List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
-		return pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, false, indiceRegistroInicial, numeroMaximoRegistros);
+		return pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false,
+				indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@REVIEW(descricao = "Eh provavel que este metodo esteja retornando mais informacao do que o necessario e deve ser refatorado")
 	public List<Pedido> pesquisarPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idProprietario,
-			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		StringBuilder select = new StringBuilder(
 				"select p from Pedido p join fetch p.representada left join fetch p.proprietario where p.cliente.id = :idCliente ");
 		if (idProprietario != null) {
 			select.append(" and p.proprietario.id = :idVendedor ");
+		}
+
+		if (idFornecedor != null) {
+			select.append(" and p.representada.id = :idFornecedor ");
 		}
 
 		if (isCompra) {
@@ -219,9 +224,15 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idCliente", idCliente);
+
 		if (idProprietario != null) {
 			query.setParameter("idVendedor", idProprietario);
 		}
+
+		if (idFornecedor != null) {
+			query.setParameter("idFornecedor", idFornecedor);
+		}
+
 		query.setParameter("tipoPedido", TipoPedido.COMPRA);
 		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 	}

@@ -67,10 +67,7 @@ public interface PedidoService {
 
 	boolean isPedidoEnviado(Integer idPedido);
 
-	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros);
-
-	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, boolean isCompra,
+	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
 	double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido);
@@ -79,10 +76,10 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarByIdCliente(Integer idCliente);
 
-	List<Pedido> pesquisarByIdCliente(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros);
-
 	List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+
+	List<Pedido> pesquisarByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
 	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
 
@@ -151,8 +148,8 @@ public interface PedidoService {
 	List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros);
 
-	List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+	List<Pedido> pesquisarPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
 	List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo);
 

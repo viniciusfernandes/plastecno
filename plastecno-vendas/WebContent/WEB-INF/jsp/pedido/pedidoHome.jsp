@@ -80,7 +80,7 @@ $(document).ready(function() {
 	
 	$("#botaoPesquisaPedido").click(function() {
 		$('#formPesquisa #tipoPedidoPesquisa').val($('#formPedido #tipoPedido').val());
-		$('#formPesquisa #idFornecedorPesquisa').val($('#formPedido #idRepresentada').val());
+		$('#formPesquisa #idFornecedorPesquisa').val($('#formPedido #representada').val());
 		$('#formPesquisa #idClientePesquisa').val($('#formPedido #idCliente').val());
 		var form = $(this).closest('form'); 
 		form.submit();
@@ -284,7 +284,7 @@ $(document).ready(function() {
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="representada" items="${listaRepresentada}">
 						<option value="${representada.id}"
-							<c:if test="${representada eq representadaSelecionada}">selected</c:if>>${representada.nomeFantasia}</option>
+							<c:if test="${representada.id eq idRepresentadaSelecionada}">selected</c:if>>${representada.nomeFantasia}</option>
 					</c:forEach>
 				</select>
 			</div>

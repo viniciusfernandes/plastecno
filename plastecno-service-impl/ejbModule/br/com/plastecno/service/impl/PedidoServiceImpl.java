@@ -89,6 +89,9 @@ public class PedidoServiceImpl implements PedidoService {
 	private PedidoDAO pedidoDAO;
 
 	@EJB
+	private RamoAtividadeService ramoAtividadeService;
+
+	@EJB
 	private RepresentadaService representadaService;
 
 	@EJB
@@ -97,9 +100,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@EJB
 	private UsuarioService usuarioService;
 
-	@EJB
-	private RamoAtividadeService ramoAtividadeService;
-	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarItemAguardandoCompraByIdPedido(Integer idPedido) {
@@ -744,17 +744,12 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
-		return paginarPedido(idCliente, null, isCompra, indiceRegistroInicial, numeroMaximoRegistros);
-	}
-
-	@Override
-	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, boolean isCompra,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
+			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		List<Pedido> listaPedido = null;
 		if (usuarioService.isVendaPermitida(idCliente, idVendedor)) {
-			listaPedido = pesquisarByIdCliente(idCliente, isCompra, indiceRegistroInicial, numeroMaximoRegistros);
+			listaPedido = pesquisarByIdClienteIdFornecedor(idCliente, idFornecedor, isCompra, indiceRegistroInicial,
+					numeroMaximoRegistros);
 		} else {
 			listaPedido = new ArrayList<Pedido>();
 		}
@@ -784,17 +779,17 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarByIdCliente(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
+	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
-		return this.pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, isCompra, indiceRegistroInicial,
-				numeroMaximoRegistros);
+		return pesquisarByIdClienteIdFornecedor(idCliente, null, false, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
-		return pesquisarByIdCliente(idCliente, false, indiceRegistroInicial, numeroMaximoRegistros);
+	public List<Pedido> pesquisarByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		return this.pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, idFornecedor, isCompra,
+				indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
@@ -1068,14 +1063,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+	public List<Pedido> pesquisarPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 
 		if (idCliente == null) {
 			return Collections.emptyList();
 		}
-		return this.pedidoDAO.pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, isCompra,
-				indiceRegistroInicial, numeroMaximoRegistros);
+		return this.pedidoDAO.pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor,
+				isCompra, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override

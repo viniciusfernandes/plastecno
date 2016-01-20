@@ -207,7 +207,7 @@ public class PedidoController extends AbstractController {
         }
 
         if (pedido != null) {
-            addAtributo("representadaSelecionada", pedido.getRepresentada());
+            addAtributo("idRepresentadaSelecionada", pedido.getRepresentada().getId());
             addAtributo("ipiDesabilitado", !pedido.getRepresentada().isIPIHabilitado());
         }
     }
@@ -224,10 +224,11 @@ public class PedidoController extends AbstractController {
      * administrador, sendo assim, ele podera consultar os pedidos de todos os
      * vendedores
      */
-    private PaginacaoWrapper<Pedido> gerarPaginacaoPedido(Integer idCliente, boolean isCompra, Integer paginaSelecionada) {
+    private PaginacaoWrapper<Pedido> gerarPaginacaoPedido(Integer idCliente, Integer idFornecedor, boolean isCompra,
+            Integer paginaSelecionada) {
         final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
-        return this.pedidoService.paginarPedido(idCliente, getCodigoUsuario(), isCompra, indiceRegistroInicial,
-                getNumerRegistrosPorPagina());
+        return this.pedidoService.paginarPedido(idCliente, getCodigoUsuario(), idFornecedor, isCompra,
+                indiceRegistroInicial, getNumerRegistrosPorPagina());
     }
 
     private PedidoPDFWrapper gerarPDF(Integer idPedido, TipoPedido tipoPedido) throws BusinessException {
@@ -594,7 +595,8 @@ public class PedidoController extends AbstractController {
             irTopoPagina();
         } else {
             boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
-            final PaginacaoWrapper<Pedido> paginacao = gerarPaginacaoPedido(idCliente, isCompra, paginaSelecionada);
+            final PaginacaoWrapper<Pedido> paginacao = gerarPaginacaoPedido(idCliente, idFornecedor, isCompra,
+                    paginaSelecionada);
 
             final Collection<Pedido> listaPedido = paginacao.getLista();
             if (!listaPedido.isEmpty()) {
@@ -619,11 +621,13 @@ public class PedidoController extends AbstractController {
                 // comprador pois ele tem permissao para isso. E o campo com o
                 // nome do comprador deve sempre estar preenchido.
                 addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
+                addAtributo("listaRepresentada", representadaService.pesquisarFornecedor(true));
             } else {
                 addAtributo("vendedor", cliente.getVendedor());
             }
             addAtributo("listaTransportadora", this.transportadoraService.pesquisar());
             addAtributo("listaRedespacho", this.transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
+            addAtributo("idRepresentadaSelecionada", idFornecedor);
         }
         configurarTipoPedido(tipoPedido);
     }

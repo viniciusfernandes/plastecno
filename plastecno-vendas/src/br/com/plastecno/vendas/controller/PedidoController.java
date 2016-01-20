@@ -358,8 +358,8 @@ public class PedidoController extends AbstractController {
              * recuperamos o usuario que efetuou a venda. Precisamo recuperar o
              * vendedor, pois o JSON devera conter o nome e email do vendedor.
              */
-            final Usuario proprietario = pedido.getId() == null ? this.usuarioService
-                    .pesquisarUsuarioResumidoById(getCodigoUsuario()) : this.pedidoService.pesquisarProprietario(pedido
+            final Usuario proprietario = pedido.getId() == null ? usuarioService
+                    .pesquisarUsuarioResumidoById(getCodigoUsuario()) : pedidoService.pesquisarProprietario(pedido
                     .getId());
 
             pedido.setProprietario(proprietario);

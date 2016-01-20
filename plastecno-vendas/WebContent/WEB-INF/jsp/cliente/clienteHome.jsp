@@ -29,16 +29,8 @@ $(document).ready(function() {
 	scrollTo('${ancora}');
 	
 	$("#botaoInserirCliente").click(function() {
-		toUpperCaseInput();
-		toLowerCaseInput();
 		
-		var listaId = ['cnpj', 'cpf', 'inscricaoEstadual'];
-		removerNaoDigitos(listaId);
-		var parametros = tabelaLogradouroHandler.gerarListaParametro('listaLogradouro');
-		parametros += tabelaContatoHandler.gerarListaParametro('listaContato');
-		parametros += pickListToParameter('listaIdTransportadoraAssociada');
-	
-		$('#formCliente').attr("action",$('#formCliente').attr("action")+'?'+ parametros);
+		$('#formCliente').attr("action",$('#formCliente').attr("action")+'?'+ gerarParametrosInclusaoCliente());
 		$('#formCliente').submit();
 						
 	});	
@@ -60,7 +52,9 @@ $(document).ready(function() {
 	
 	$("#botaoIncluirComentario").click(function () {
 		if(!isEmpty($("#comentario").val())) {
-			$(this).closest('form').submit();			
+			var form = $(this).closest('form');
+			$(form).attr("action",$(form).attr("action") + gerarParametrosInclusaoCliente() + serializarBloco('formCliente'));
+			form.submit();			
 		}
 	});
 	
@@ -98,6 +92,18 @@ $(document).ready(function() {
 	});
 
 });
+
+function gerarParametrosInclusaoCliente(){
+	toUpperCaseInput();
+	toLowerCaseInput();
+	
+	var listaId = ['cnpj', 'cpf', 'inscricaoEstadual'];
+	removerNaoDigitos(listaId);
+	var parametros = tabelaLogradouroHandler.gerarListaParametro('listaLogradouro');
+	parametros += tabelaContatoHandler.gerarListaParametro('listaContato');
+	parametros += pickListToParameter('listaIdTransportadoraAssociada');
+	return parametros;
+}
 
 function inicializarFiltro() {
 	$("#filtro_nomeFantasia").val($("#nomeFantasia").val());
@@ -236,9 +242,7 @@ function remover(codigo, nome) {
 	
 	<fieldset id="bloco_comentario">
 		<legend>::: Comentários :::</legend>
-		<form action="<c:url value="/cliente/inclusao/comentario?isRevendedor=${isRevendedor}"/>"
-			method="post">
-			<input type="hidden" value="${cliente.id}" name="idCliente" />
+		<form action="<c:url value="/cliente/inclusao/comentario?isRevendedor=${isRevendedor}"/>" method="post">
 			<div class="label condicional">Comentário:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" id="comentario" name="comentario" value="${comentario}" style="width: 100%" />

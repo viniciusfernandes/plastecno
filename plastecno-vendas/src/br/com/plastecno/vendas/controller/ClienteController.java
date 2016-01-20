@@ -30,13 +30,13 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 public class ClienteController extends AbstractController {
 
     @Servico
-    private TransportadoraService transportadoraService;
-    @Servico
-    private RamoAtividadeService ramoAtividadeService;
-    @Servico
     private ClienteService clienteService;
     @Servico
     private ContatoService contatoService;
+    @Servico
+    private RamoAtividadeService ramoAtividadeService;
+    @Servico
+    private TransportadoraService transportadoraService;
 
     public ClienteController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -152,21 +152,29 @@ public class ClienteController extends AbstractController {
     }
 
     @Post("cliente/inclusao/comentario")
-    public void inserirComentario(Integer idCliente, String comentario, boolean isRevendedor) {
+    public void inserirComentario(Cliente cliente, String comentario, boolean isRevendedor) {
 
-        if (idCliente == null) {
-            gerarListaMensagemErro("Para inserir um comentário é necessário escolher um cliente.");
-            irTopoPagina();
+        if (cliente == null) {
+            gerarListaMensagemErro("Para inserir um comentário é necessário que um cliente exita.");
         } else {
             try {
-                clienteService.inserirComentario(idCliente, comentario);
-                this.gerarMensagemSucesso("Comentário sonre o cliente No. " + idCliente + " inserido com sucesso.");
+                
+                cliente.setVendedor(getUsuario());
+                
+                if (cliente.getId() == null) {
+                    cliente = clienteService.inserir(cliente);
+                }
+
+                clienteService.inserirComentario(cliente.getId(), comentario);
+                gerarMensagemSucesso("Comentário sonre o cliente No. " + cliente.getId() + " inserido com sucesso.");
+                pesquisarClienteById(cliente.getId(), isRevendedor);
             } catch (BusinessException e) {
                 gerarListaMensagemErro(e);
                 addAtributo("comentario", comentario);
             }
-            pesquisarClienteById(idCliente, isRevendedor);
+            addAtributo("cliente", cliente);
         }
+        irTopoPagina();
     }
 
     @Get("cliente/listagem")

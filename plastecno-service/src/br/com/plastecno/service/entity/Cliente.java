@@ -278,6 +278,10 @@ public class Cliente implements Serializable {
 		return this.listaLogradouro != null && !this.listaLogradouro.isEmpty();
 	}
 
+	public boolean isNovo() {
+		return id == null;
+	}
+
 	public boolean isRevendedor() {
 		return TipoCliente.REVENDEDOR.equals(tipoCliente);
 	}

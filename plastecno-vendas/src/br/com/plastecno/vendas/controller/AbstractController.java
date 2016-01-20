@@ -369,6 +369,10 @@ public abstract class AbstractController {
         return numerRegistrosPorPagina;
     }
 
+    Usuario getUsuario() {
+        return usuarioService.pesquisarById(getCodigoUsuario());
+    }
+
     void habilitarMultiplosLogradouros() {
         this.result.include(possuiMultiplosLogradouros, true);
     }

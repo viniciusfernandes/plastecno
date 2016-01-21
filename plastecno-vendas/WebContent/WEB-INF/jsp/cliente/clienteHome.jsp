@@ -85,9 +85,10 @@ $(document).ready(function() {
 	tabelaLogradouroHandler = inicializarBlocoLogradouro(urlTela);
 	tabelaLogradouroHandler.setNumeroLinhasCopiadas(3);
 	tabelaLogradouroHandler.ajustarLinhasCopiadas(function(linhas){
-		linhas[0].cells[1].innerHTML = 'COBRANCA';
-		linhas[1].cells[1].innerHTML = 'ENTREGA';
-		linhas[2].cells[1].innerHTML = 'FATURAMENTO';
+		var tipos = ['FATURAMENTO', 'ENTREGA', 'COBRANCA'];
+		tipos.splice(tipos.indexOf(linhas[0].cells[1].innerHTML), 1);
+		linhas[1].cells[1].innerHTML = tipos[0];
+		linhas[2].cells[1].innerHTML = tipos[1];
 	});
 	tabelaContatoHandler = inicializarBlocoContato(urlTela);
 	

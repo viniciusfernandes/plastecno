@@ -70,7 +70,7 @@ $(document).ready(function() {
 		$("#comentario").val("");	
 	});
 	
-	inserirMascaraCNPJ('cnpj');
+	inserirMascaraDinamicaCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
 	inicializarCampoPesquisaPicklist({
@@ -83,6 +83,7 @@ $(document).ready(function() {
 	
 	var urlTela = '<c:url value="/cliente"/>'; 
 	tabelaLogradouroHandler = inicializarBlocoLogradouro(urlTela);
+	tabelaLogradouroHandler.setNumeroLinhasCopiadas(3);
 	tabelaContatoHandler = inicializarBlocoContato(urlTela);
 	
 	new PickList().initPickList();

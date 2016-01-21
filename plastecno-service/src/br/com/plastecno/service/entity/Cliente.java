@@ -39,7 +39,7 @@ public class Cliente implements Serializable {
 	 */
 	private static final long serialVersionUID = 4628886058991048859L;
 
-	@InformacaoValidavel(tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
+	@InformacaoValidavel(intervalo = { 1, 15 }, tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
 	private String cnpj;
 
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF do cliente")

@@ -11,9 +11,13 @@ function BlocoTabelaHandler (urlTela, nomeBloco, idTabela, idBlocoInput) {
 	this.TOTAL_COLUNAS = null;
 	this.numeroLinhasCopiadas = 0;
 	
+	this.ajustarLinhasCopiadas = function (funcao){
+		this.ajustarLinhasCopiadas = funcao;
+	};
+	
 	this.setNumeroLinhasCopiadas= function (numeroLinhasCopiadas){
 		return this.numeroLinhasCopiadas = numeroLinhasCopiadas;
-	}
+	};
 	
 	this.removerRegistroCallback = function (funcaoCallback){
 		this.removerRegistroCallback = funcaoCallback;
@@ -80,8 +84,18 @@ function BlocoTabelaHandler (urlTela, nomeBloco, idTabela, idBlocoInput) {
 				linha.insertCell(this.TOTAL_COLUNAS).innerHTML = botoesAcoes;
 				
 				// Essa condicao surgiu para incluir um mesmo logradouro de uma unica vez, e depois o usuario edita, proporcionando agilidade no cadastro.
+				var linhas = new Array();
+				linhas[0] = linha;
+				
+				var clone = null;
 				for (var i = 1; i < this.numeroLinhasCopiadas; i++) {
-					this.tabela.appendChild(linha.cloneNode(true));
+					clone = linha.cloneNode(true);
+					this.tabela.appendChild(clone);
+					linhas[i] = clone;
+				}
+				
+				if(this.ajustarLinhasCopiadas != undefined){
+					this.ajustarLinhasCopiadas(linhas);
 				}
 			}	
 			

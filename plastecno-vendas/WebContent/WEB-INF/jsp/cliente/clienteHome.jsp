@@ -84,6 +84,11 @@ $(document).ready(function() {
 	var urlTela = '<c:url value="/cliente"/>'; 
 	tabelaLogradouroHandler = inicializarBlocoLogradouro(urlTela);
 	tabelaLogradouroHandler.setNumeroLinhasCopiadas(3);
+	tabelaLogradouroHandler.ajustarLinhasCopiadas(function(linhas){
+		linhas[0].cells[1].innerHTML = 'COBRANCA';
+		linhas[1].cells[1].innerHTML = 'ENTREGA';
+		linhas[2].cells[1].innerHTML = 'FATURAMENTO';
+	});
 	tabelaContatoHandler = inicializarBlocoContato(urlTela);
 	
 	new PickList().initPickList();

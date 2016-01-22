@@ -342,10 +342,10 @@ $(document).ready(function() {
 	</form>
 	<div class="bloco_botoes">
 		<form id="formPesquisa" action="pedido/listagem" method="get">
-			<input type="hidden" name="tipoPedido"  id="tipoPedidoPesquisa" /> 
-			<input type="hidden" name="idCliente" id="idClientePesquisa"  /> 
-			<input type="hidden" name="idFornecedor" id="idFornecedorPesquisa" />
-			<input type="hidden" name="idVendedor" id="idVendedorPesquisa" />  
+			<input type="hidden" name="tipoPedido"  id="tipoPedidoPesquisa" value="${tipoPedido}"/> 
+			<input type="hidden" name="idCliente" id="idClientePesquisa"  value="${cliente.id}"/> 
+			<input type="hidden" name="idFornecedor" id="idFornecedorPesquisa" value="${idRepresentadaSelecionada}"/>
+			<input type="hidden" name="idVendedor" id="idVendedorPesquisa" value="${proprietario.id}"/>  
 			<input type="button" id="botaoPesquisaPedido" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
 		</form>
 		<form action="pedido/limpar" method="get">

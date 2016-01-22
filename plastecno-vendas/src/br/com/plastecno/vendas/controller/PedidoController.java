@@ -620,9 +620,12 @@ public class PedidoController extends AbstractController {
              * permanecer na tela
              */
             Cliente cliente = this.clienteService.pesquisarById(idCliente);
-            this.formatarDocumento(cliente);
-            this.carregarVendedor(cliente);
+            
+            formatarDocumento(cliente);
+            carregarVendedor(cliente);
             addAtributo("cliente", cliente);
+            addAtributo("proprietario", cliente.getVendedor());
+            
             if (isCompra) {
                 // Aqui estamos supondo que o usuario que acessou a tela eh um
                 // comprador pois ele tem permissao para isso. E o campo com o

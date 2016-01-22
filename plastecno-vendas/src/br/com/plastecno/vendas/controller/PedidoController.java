@@ -224,10 +224,17 @@ public class PedidoController extends AbstractController {
      * administrador, sendo assim, ele podera consultar os pedidos de todos os
      * vendedores
      */
-    private PaginacaoWrapper<Pedido> gerarPaginacaoPedido(Integer idCliente, Integer idFornecedor, boolean isCompra,
-            Integer paginaSelecionada) {
+    private PaginacaoWrapper<Pedido> gerarPaginacaoPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
+            boolean isCompra, Integer paginaSelecionada) {
         final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
-        return this.pedidoService.paginarPedido(idCliente, getCodigoUsuario(), idFornecedor, isCompra,
+
+        // Essa variavel eh utilizada para decidirmos se queremos recuperar
+        // todos os pedidos de um determinado cliente independentemente do
+        // vendedor. Essa acao sera disparada por qualquer um que seja
+        // adiministrador do sistema, podendo ser um outro vendedor ou nao.
+        boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO) && !getCodigoUsuario().equals(idVendedor);
+
+        return this.pedidoService.paginarPedido(idCliente, pesquisarTodos ? null : idVendedor, idFornecedor, isCompra,
                 indiceRegistroInicial, getNumerRegistrosPorPagina());
     }
 
@@ -588,15 +595,15 @@ public class PedidoController extends AbstractController {
     }
 
     @Get("pedido/listagem")
-    public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idFornecedor, TipoPedido tipoPedido,
-            Integer paginaSelecionada) {
+    public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
+            TipoPedido tipoPedido, Integer paginaSelecionada) {
         if (idCliente == null) {
             gerarListaMensagemErro("Cliente é obrigatório para a pesquisa de pedidos");
             irTopoPagina();
         } else {
             boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
-            final PaginacaoWrapper<Pedido> paginacao = gerarPaginacaoPedido(idCliente, idFornecedor, isCompra,
-                    paginaSelecionada);
+            final PaginacaoWrapper<Pedido> paginacao = gerarPaginacaoPedido(idCliente, idVendedor, idFornecedor,
+                    isCompra, paginaSelecionada);
 
             final Collection<Pedido> listaPedido = paginacao.getLista();
             if (!listaPedido.isEmpty()) {

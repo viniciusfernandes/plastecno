@@ -747,13 +747,13 @@ public class PedidoServiceImpl implements PedidoService {
 	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
 			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		List<Pedido> listaPedido = null;
-		if (usuarioService.isVendaPermitida(idCliente, idVendedor)) {
+		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
 			listaPedido = pesquisarByIdClienteIdFornecedor(idCliente, idFornecedor, isCompra, indiceRegistroInicial,
 					numeroMaximoRegistros);
 		} else {
 			listaPedido = new ArrayList<Pedido>();
 		}
-		
+
 		return new PaginacaoWrapper<Pedido>(pesquisarTotalPedidoByIdCliente(idCliente, idVendedor, idFornecedor, isCompra),
 				listaPedido);
 	}

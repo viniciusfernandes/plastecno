@@ -82,6 +82,7 @@ $(document).ready(function() {
 		$('#formPesquisa #tipoPedidoPesquisa').val($('#formPedido #tipoPedido').val());
 		$('#formPesquisa #idFornecedorPesquisa').val($('#formPedido #representada').val());
 		$('#formPesquisa #idClientePesquisa').val($('#formPedido #idCliente').val());
+		$('#formPesquisa #idVendedorPesquisa').val($('#formPedido #idVendedor').val());
 		var form = $(this).closest('form'); 
 		form.submit();
 	});
@@ -343,7 +344,8 @@ $(document).ready(function() {
 		<form id="formPesquisa" action="pedido/listagem" method="get">
 			<input type="hidden" name="tipoPedido"  id="tipoPedidoPesquisa" /> 
 			<input type="hidden" name="idCliente" id="idClientePesquisa"  /> 
-			<input type="hidden" name="idFornecedor" id="idFornecedorPesquisa" /> 
+			<input type="hidden" name="idFornecedor" id="idFornecedorPesquisa" />
+			<input type="hidden" name="idVendedor" id="idVendedorPesquisa" />  
 			<input type="button" id="botaoPesquisaPedido" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
 		</form>
 		<form action="pedido/limpar" method="get">

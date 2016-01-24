@@ -232,7 +232,7 @@ public class PedidoController extends AbstractController {
         // todos os pedidos de um determinado cliente independentemente do
         // vendedor. Essa acao sera disparada por qualquer um que seja
         // adiministrador do sistema, podendo ser um outro vendedor ou nao.
-        boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO) && !getCodigoUsuario().equals(idVendedor);
+        boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
 
         return this.pedidoService.paginarPedido(idCliente, pesquisarTodos ? null : idVendedor, idFornecedor, isCompra,
                 indiceRegistroInicial, getNumerRegistrosPorPagina());
@@ -620,12 +620,12 @@ public class PedidoController extends AbstractController {
              * permanecer na tela
              */
             Cliente cliente = this.clienteService.pesquisarById(idCliente);
-            
+
             formatarDocumento(cliente);
             carregarVendedor(cliente);
             addAtributo("cliente", cliente);
             addAtributo("proprietario", cliente.getVendedor());
-            
+
             if (isCompra) {
                 // Aqui estamos supondo que o usuario que acessou a tela eh um
                 // comprador pois ele tem permissao para isso. E o campo com o

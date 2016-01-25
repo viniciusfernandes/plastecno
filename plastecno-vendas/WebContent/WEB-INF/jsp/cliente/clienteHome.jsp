@@ -105,7 +105,6 @@ $(document).ready(function() {
 			formVazio.submit();
 		}
 	});
-
 });
 
 function inicializarFiltro() {

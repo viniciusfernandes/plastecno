@@ -83,6 +83,14 @@
 	width: 24px;
 }
 
+.botaoCopiar {
+	background: url("../images/copy_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoDinheiro {
 	background: url("../images/money_24.png") no-repeat scroll 0 0
 		transparent;
@@ -293,6 +301,12 @@
 .botaoContactar:hover {
 	background: url("../images/phone_green_16.png") no-repeat scroll 0 0
 		transparent;
+	background-position: center center;
+}
+
+.botaoCopiar:hover {
+	background: url("../images/copy_16.png") no-repeat scroll
+		0 0 transparent;
 	background-position: center center;
 }
 

@@ -121,9 +121,8 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 	</div>
 	<c:if test="${possuiMultiplosLogradouros}">
 		<div class="bloco_botoes">
-			<a id="botaoIncluirLogradouro" title="Adicionar Dados do Logradouro"
-				class="botaoAdicionar"></a> <a id="botaoLimparLogradouro"
-				title="Limpar Dados do Logradouro" class="botaoLimpar"></a>
+			<a id="botaoIncluirLogradouro" title="Adicionar Dados do Logradouro" class="botaoAdicionar"></a>
+			<a id="botaoLimparLogradouro" title="Limpar Dados do Logradouro" class="botaoLimpar"></a>
 		</div>
 	</c:if>
 

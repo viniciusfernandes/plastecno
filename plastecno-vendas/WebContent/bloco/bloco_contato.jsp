@@ -92,9 +92,8 @@
 
 	<c:if test="${!listaContatoDesabilitada}">
 		<div class="bloco_botoes">
-			<a id="botaoIncluirContato" title="Adicionar Dados do Contato"
-				class="botaoAdicionar"></a> <a id="botaoLimparContato"
-				title="Limpar Dados do Contato" class="botaoLimpar"></a>
+			<a id="botaoIncluirContato" title="Adicionar Dados do Contato" class="botaoAdicionar"></a>
+			<a id="botaoLimparContato" title="Limpar Dados do Contato" class="botaoLimpar"></a>
 		</div>
 
 		<div style="width: 100%; margin-top: 15px;">

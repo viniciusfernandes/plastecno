@@ -153,6 +153,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 			margemMinimaLucro = 0.0;
 		}
 
+		if (aliquotaIPI == null) {
+			aliquotaIPI = 0d;
+		}
+
 		// Precisamos arredondar
 		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + margemMinimaLucro) * (1 + aliquotaIPI));
 	}
@@ -186,8 +190,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return NumeroUtils.arredondarValorMonetario(itemEstoqueDAO.calcularValorEstoque(idMaterial,
-				formaMaterial));
+		return NumeroUtils.arredondarValorMonetario(itemEstoqueDAO.calcularValorEstoque(idMaterial, formaMaterial));
 	}
 
 	@Override

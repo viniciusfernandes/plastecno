@@ -226,7 +226,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 				.gerarRegistroUnico(
 						entityManager
 								.createQuery(
-										"select i.margemMinimaLucro, i.precoMedioFatorICMS, i.precoMedio from ItemEstoque i where i.id= :idItemEstoque")
+										"select i.margemMinimaLucro, i.precoMedioFatorICMS, i.precoMedio, i.aliquotaIPI from ItemEstoque i where i.id= :idItemEstoque")
 								.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null, null });
 	}
 
@@ -270,9 +270,9 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return query.getResultList();
 	}
 
-	public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		StringBuilder select = new StringBuilder();
-		select.append("select SUM(i.precoMedio * i.quantidade) from ItemEstoque i ");
+		select.append("select SUM(i.precoMedio * i.quantidade * (1 + i.aliquotaIPI)) from ItemEstoque i ");
 		if (idMaterial != null && formaMaterial != null) {
 			select.append("where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
 		}

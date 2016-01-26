@@ -432,7 +432,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = 93.57d;
+		Double precoMinimo = 103.86;
 
 		Double precoMinimoCalculado = null;
 		try {
@@ -465,7 +465,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio());
+		Double precoMinimo = 84.31;
 		Double precoMinimoCalculado = null;
 		try {
 			itemEstoque.setPrecoMedioFatorICMS(null);
@@ -494,7 +494,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = 85.06;
+		Double precoMinimo = 94.42;
 		Double precoMinimoCalculado = null;
 		try {
 			precoMinimoCalculado = estoqueService.calcularPrecoMinimoItemEstoque(itemEstoque);

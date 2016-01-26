@@ -142,7 +142,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		itemCadastrado.setQuantidade((int) quantidadeTotal);
 	}
 
-	private Double calcularPrecoMinimo(Double precoMedio, Double margemMinimaLucro) {
+	private Double calcularPrecoMinimo(Double precoMedio, Double margemMinimaLucro, Double aliquotaIPI) {
 		// Esse eh o algoritmo para o preco sugerido de venda de cada item do
 		// estoque.
 		if (precoMedio == null) {
@@ -153,14 +153,19 @@ public class EstoqueServiceImpl implements EstoqueService {
 			margemMinimaLucro = 0.0;
 		}
 
+		if (aliquotaIPI == null) {
+			aliquotaIPI = 0d;
+		}
+
 		// Precisamos arredondar
-		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + margemMinimaLucro));
+		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + margemMinimaLucro) * (1 + aliquotaIPI));
 	}
 
 	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {
 		Double preco = itemEstoque.getPrecoMedioFatorICMS() == null ? itemEstoque.getPrecoMedio() : itemEstoque
 				.getPrecoMedioFatorICMS();
-		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(preco, itemEstoque.getMargemMinimaLucro()));
+		itemEstoque.setPrecoMinimo(calcularPrecoMinimo(preco, itemEstoque.getMargemMinimaLucro(),
+				itemEstoque.getAliquotaIPI()));
 	}
 
 	@Override
@@ -177,15 +182,15 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Double margemMinimaLucro = (Double) valores[0];
 		Double precoMedioFatorICMS = (Double) valores[1];
 		Double precoMedio = (Double) valores[2];
+		Double aliquotaIPI = (Double) valores[3];
 		boolean contemFatorICMS = precoMedioFatorICMS != null;
 
-		return calcularPrecoMinimo(contemFatorICMS ? precoMedioFatorICMS : precoMedio, margemMinimaLucro);
+		return calcularPrecoMinimo(contemFatorICMS ? precoMedioFatorICMS : precoMedio, margemMinimaLucro, aliquotaIPI);
 	}
 
 	@Override
 	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return NumeroUtils.arredondarValorMonetario(itemEstoqueDAO.pesquisarValorEQuantidadeItemEstoque(idMaterial,
-				formaMaterial));
+		return NumeroUtils.arredondarValorMonetario(itemEstoqueDAO.calcularValorEstoque(idMaterial, formaMaterial));
 	}
 
 	@Override

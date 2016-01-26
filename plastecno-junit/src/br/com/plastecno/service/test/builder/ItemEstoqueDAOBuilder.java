@@ -133,10 +133,10 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			@Mock
 			public Object[] pesquisarMargemMininaEPrecoMedio(Integer idItemEstoque) {
 				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
-				for (ItemEstoque itemEstoque : l) {
-					if (idItemEstoque.equals(itemEstoque.getId())) {
-						return new Object[] { itemEstoque.getMargemMinimaLucro(), itemEstoque.getPrecoMedioFatorICMS(),
-								itemEstoque.getPrecoMedio() };
+				for (ItemEstoque i : l) {
+					if (idItemEstoque.equals(i.getId())) {
+						return new Object[] { i.getMargemMinimaLucro(), i.getPrecoMedioFatorICMS(), i.getPrecoMedio(),
+								i.getAliquotaIPI() };
 					}
 				}
 
@@ -181,7 +181,7 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			public Double pesquisarValorEQuantidadeItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+			public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 				List<ItemEstoque> l = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 				List<Double[]> listaValores = new ArrayList<Double[]>();
 				boolean isAmbosNulos = false;
@@ -192,17 +192,18 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 					isMaterialIgual = idMaterial != null && idMaterial.equals(i.getMaterial().getId());
 					isFormaIgual = formaMaterial != null && formaMaterial.equals(i.getFormaMaterial());
 					if (isAmbosNulos || isMaterialIgual || isFormaIgual) {
-						listaValores.add(new Double[] { i.getPrecoMedio(), (double) i.getQuantidade() });
+						listaValores.add(new Double[] { i.getPrecoMedio(), (double) i.getQuantidade(), i.getAliquotaIPI() });
 					}
 				}
 
 				double total = 0d;
 				double val = 0;
 				double quant = 0;
+				double ipi = 0d;
 				for (Double[] valor : listaValores) {
 					val = (Double) valor[0];
 					quant = (Double) valor[1];
-					total += val * quant;
+					total += val * quant * (1 + ipi);
 				}
 				return total;
 			}

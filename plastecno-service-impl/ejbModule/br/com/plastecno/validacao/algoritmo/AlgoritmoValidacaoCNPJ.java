@@ -6,12 +6,6 @@ public class AlgoritmoValidacaoCNPJ implements AlgoritmoValidacaoDocumento {
 
 	@Override
 	public boolean isValido(String documento) {
-		// Essa eh a condicao necessaria para permitir cnpj de clientes estrangeiros
-		// pois nao sabemos o padrao dessa informacao.
-		if (!documento.isEmpty() && documento.length() != 14) {
-			return true;
-		}
-
 		// considera-se erro CNPJ's formados por uma sequencia de numeros iguais
 		if (documento.equals("00000000000000") || documento.equals("11111111111111") || documento.equals("22222222222222")
 				|| documento.equals("33333333333333") || documento.equals("44444444444444")

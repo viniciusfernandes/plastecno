@@ -59,6 +59,10 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email do cliente")
 	private String email;
 
+	@Column(name="email_cobranca")
+	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email de cobrança do cliente")
+	private String emailCobranca;
+
 	@Id
 	@SequenceGenerator(name = "clienteSequence", sequenceName = "vendas.seq_cliente_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clienteSequence")
@@ -214,6 +218,10 @@ public class Cliente implements Serializable {
 		return email;
 	}
 
+	public String getEmailCobranca() {
+		return emailCobranca;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -323,6 +331,10 @@ public class Cliente implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public void setEmailCobranca(String emailCobranca) {
+		this.emailCobranca = emailCobranca;
 	}
 
 	public void setId(Integer id) {

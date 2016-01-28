@@ -224,13 +224,16 @@ function remover(codigo, nome) {
 					value="${cliente.email}"
 					class="apenasLowerCase uppercaseBloqueado lowerCase pesquisavel" />
 			</div>
-
-			<div class="label">Site:</div>
+			<div class="label">Email Cobrança:</div>
 			<div class="input" style="width: 40%">
+				<input type="text" id="emailCobranca" name="cliente.emailCobranca"
+					value="${cliente.emailCobranca}" style="width: 80%" class="apenasLowerCase uppercaseBloqueado lowerCase"/>
+			</div>
+			<div class="label">Site:</div>
+			<div class="input" style="width: 20%">
 				<input type="text" id="site" name="cliente.site"
 					value="${cliente.site}"
-					class="apenasLowerCase uppercaseBloqueado lowerCase"
-					style="width: 80%" />
+					class="apenasLowerCase uppercaseBloqueado lowerCase" />
 			</div>
 		</form>
 	</fieldset>

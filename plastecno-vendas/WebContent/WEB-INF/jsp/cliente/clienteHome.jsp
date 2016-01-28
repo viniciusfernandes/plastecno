@@ -70,7 +70,7 @@ $(document).ready(function() {
 		$("#comentario").val("");	
 	});
 	
-	inserirMascaraDinamicaCNPJ('cnpj');
+	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
 	inicializarCampoPesquisaPicklist({
@@ -207,6 +207,11 @@ function remover(codigo, nome) {
 					name="cliente.inscricaoEstadual"
 					value="${cliente.inscricaoEstadual}"
 					style="width: 40%; text-align: right;" />
+			</div>
+			<div class="label">Doc. Estrang.:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" id="documentoEstrangeiro" name="cliente.documentoEstrangeiro" 
+				value="${cliente.documentoEstrangeiro}" maxlength="15" style="width: 25%" />
 			</div>
 			<div class="label">CPF:</div>
 			<div class="input" style="width: 80%">

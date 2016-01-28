@@ -11,24 +11,7 @@ function inserirMascaraCEP(idCampo) {
 
 function inserirMascaraCNPJ(idCampo) {
 	$('#'+idCampo).mask('99.999.999/9999-99');
-}
-
-function inserirMascaraDinamicaCNPJ(idCampo){
-	var mascara = '99.999.999/9999-99';
-	idCampo = '#'+idCampo;
-	var f = function(){
-		var valor = $(idCampo).val();
-		if(valor.length == 14){
-			$(idCampo).mask(mascara);
-		} else {
-			$(idCampo).unmask(mascara)
-		}
-	}
-	f();
-	$(idCampo).blur(function(){
-		f();
-	});
-}
+}rem
 
 function removerCaracteres(valor) {
 	return valor.replace(/\D/g, "");

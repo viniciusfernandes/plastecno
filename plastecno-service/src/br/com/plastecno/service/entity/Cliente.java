@@ -52,6 +52,10 @@ public class Cliente implements Serializable {
 	@Transient
 	private String dataUltimoContatoFormatada;
 
+	@Column(name = "documento_estrangeiro")
+	@InformacaoValidavel(intervalo = { 0, 15 }, nomeExibicao = "Documento Estrangeiro")
+	private String documentoEstrangeiro;
+
 	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email do cliente")
 	private String email;
 
@@ -202,6 +206,10 @@ public class Cliente implements Serializable {
 		return this.isJuridico() ? this.cnpj : this.cpf;
 	}
 
+	public String getDocumentoEstrangeiro() {
+		return documentoEstrangeiro;
+	}
+
 	public String getEmail() {
 		return email;
 	}
@@ -307,6 +315,10 @@ public class Cliente implements Serializable {
 
 	public void setDataUltimoContatoFormatada(String dataUltimoContatoFormatada) {
 		this.dataUltimoContatoFormatada = dataUltimoContatoFormatada;
+	}
+
+	public void setDocumentoEstrangeiro(String documentoEstrangeiro) {
+		this.documentoEstrangeiro = documentoEstrangeiro;
 	}
 
 	public void setEmail(String email) {

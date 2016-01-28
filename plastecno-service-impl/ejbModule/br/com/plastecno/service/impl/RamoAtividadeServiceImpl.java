@@ -86,7 +86,7 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 			throw new BusinessException("A sigla do ramo de atividade ja existe no sistema");
 		}
 
-		return this.entityManager.merge(ramoAtividade);
+		return ramoAtividadeDAO.alterar(ramoAtividade);
 	}
 
 	@Override

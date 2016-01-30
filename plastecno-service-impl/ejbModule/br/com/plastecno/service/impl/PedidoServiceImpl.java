@@ -331,6 +331,8 @@ public class PedidoServiceImpl implements PedidoService {
 		ItemPedido itemClone = null;
 		boolean incluiAlgumItem = false;
 		for (Integer idItemPedido : listaIdItemPedido) {
+			// Precisamos recuperar o item por completo para clonagem e criacao de um
+			// pedido de comprar contendo as mesmas informacoes.
 			itemCadastrado = pesquisarItemPedido(idItemPedido);
 			if (itemCadastrado == null) {
 				continue;
@@ -350,8 +352,12 @@ public class PedidoServiceImpl implements PedidoService {
 						+ itemCadastrado.getSequencial() + " do pedido No. " + itemCadastrado.getPedido().getId()
 						+ ". Possível problema: " + e.getMensagemEmpilhada());
 			}
+
 			itemCadastrado.setEncomendado(true);
-			inserirItemPedido(itemCadastrado);
+			itemCadastrado.setIdPedidoCompra(pedidoCompra.getId());
+			// inserirItemPedido(itemCadastrado);
+			itemPedidoDAO.alterar(itemCadastrado);
+			
 			if (!contemPedidoItemRevendaAguardandoEncomenda(idItemPedido)) {
 				alterarRevendaAguardandoMaterialByIdItem(itemCadastrado.getId());
 				alterarItemAguardandoMaterialByIdPedido(itemCadastrado.getPedido().getId());
@@ -475,7 +481,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException {
+	public boolean empacotarPedidoAguardandoCompra(Integer idPedido) throws BusinessException {
 		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
 		if (!empacotamentoOk) {
 			alterarItemAguardandoCompraByIdPedido(idPedido);

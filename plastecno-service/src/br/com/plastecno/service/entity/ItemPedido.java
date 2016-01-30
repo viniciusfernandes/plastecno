@@ -68,6 +68,9 @@ public class ItemPedido extends Item {
 	@Transient
 	private Integer idPedido;
 
+	@Column(name = "id_pedido_compra")
+	private Integer idPedidoCompra;
+
 	@Transient
 	private Integer idProprietario;
 
@@ -225,6 +228,17 @@ public class ItemPedido extends Item {
 		this.quantidadeReservada = quantidadeReservada;
 	}
 
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idPedidoCompra, String nomeProprietario,
+			Integer quantidade, Integer quantidadeRecepcionada, Integer quantidadeReservada, Double precoUnidade,
+			String nomeRepresentada, Date dataEntrega, FormaMaterial formaMaterial, String siglaMaterial,
+			String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
+		this(idPedido, sequencial, idPedido, nomeProprietario, quantidade, quantidadeRecepcionada,
+				quantidadeReservada, precoUnidade, nomeRepresentada, dataEntrega, formaMaterial, siglaMaterial,
+				descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
+
+		this.idPedidoCompra = idPedidoCompra;
+	}
+
 	public void addQuantidadeReservada(Integer quantidadeReservada) {
 		setQuantidadeReservada(getQuantidadeReservada() + quantidadeReservada);
 	}
@@ -299,6 +313,10 @@ public class ItemPedido extends Item {
 
 	public Integer getIdPedido() {
 		return idPedido;
+	}
+
+	public Integer getIdPedidoCompra() {
+		return idPedidoCompra;
 	}
 
 	public Integer getIdProprietario() {
@@ -433,12 +451,12 @@ public class ItemPedido extends Item {
 		return quantidade != null && quantidade.equals(quantidadeRecepcionada);
 	}
 
-	public boolean isNovo() {
-		return this.id == null;
-	}
-
 	public boolean isItemReservado() {
 		return quantidade != null && quantidade.equals(quantidadeReservada);
+	}
+
+	public boolean isNovo() {
+		return this.id == null;
 	}
 
 	public boolean isVendaKilo() {
@@ -487,6 +505,10 @@ public class ItemPedido extends Item {
 
 	public void setIdPedido(Integer idPedido) {
 		this.idPedido = idPedido;
+	}
+
+	public void setIdPedidoCompra(Integer idPedidoCompra) {
+		this.idPedidoCompra = idPedidoCompra;
 	}
 
 	public void setIdProprietario(Integer idProprietario) {

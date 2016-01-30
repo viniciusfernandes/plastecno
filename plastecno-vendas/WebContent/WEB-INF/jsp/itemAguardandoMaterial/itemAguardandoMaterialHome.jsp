@@ -87,15 +87,16 @@ function enviarEmpacotamento(botao){
 			<caption>${relatorio.titulo}</caption>
 			<thead>
 				<tr>
-					<th style="width: 10%">Num. Pedido</th>
+					<th style="width: 10%">Pedido</th>
 					<th style="width: 10%">Dt. Entrega</th>
+					<th style="width: 10%">Compra</th>
 					<th style="width: 2%">Item</th>
 					<th style="width: 5%">Qtde</th>
 					<th style="width: 5%">Qtde. Reserv.</th>
-					<th style="width: 45%">Desc. Item</th>
+					<th style="width: 38%">Desc. Item</th>
 					<th style="width: 10%">Vendedor</th>
 					<th style="width: 5%">Total (R$)</th>
-					<th style="width: 8%">Ação</th>
+					<th style="width: 5%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -106,6 +107,7 @@ function enviarEmpacotamento(botao){
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.id}</td>
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.propriedades['dataEntrega']}</td>
 							</c:if>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.idPedidoCompra}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeReservada}</td>
@@ -122,10 +124,6 @@ function enviarEmpacotamento(botao){
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="button" value="" title="Enviar Pedido para o Empacotamento" 
 										onclick="enviarEmpacotamento(this);" class="botaoAdicionar_16" />
-									</form>
-									<form action="<c:url value="/itemAguardandoMaterial/edicao"/>" method="post">
-										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
-										<input type="button" value="" title="Editar a Revenda Encomendada" class="botaoEditar" onclick="submeterForm(this);"/>
 									</form>
 								</div>
 							</td>

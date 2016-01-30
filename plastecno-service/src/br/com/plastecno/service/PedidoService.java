@@ -53,7 +53,7 @@ public interface PedidoService {
 
 	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
 
-	boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException;
+	boolean empacotarPedidoAguardandoCompra(Integer idPedido) throws BusinessException;
 
 	Pedido inserir(Pedido pedido) throws BusinessException;
 

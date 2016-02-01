@@ -491,7 +491,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido);
 		itemEstoque.setQuantidade(quantidadeRecepcionada);
 
-		itemEstoque.setPrecoMedio(itemEstoque.calcularPrecoUnidadeIPI());
+		//itemEstoque.setPrecoMedio(itemEstoque.calcularPrecoUnidadeIPI());
 		/*
 		 * O fator de correcao de icms deve ser gravado durante a inclusao do item
 		 * no estoque para que seja utilizado no calculo do preco minimo de venda

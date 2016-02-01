@@ -25,6 +25,15 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		super(entityManager);
 	}
 
+	public List<Integer> pesquisarIdPedidoRevedaByIdPedidoCompra(Integer idPedidoCompra) {
+
+		return entityManager
+				.createQuery(
+						"select p.id from Pedido p where p.tipoPedido = :tipoPedido and p.idPedidoCompra = :idPedidoCompra ",
+						Integer.class).setParameter("tipoPedido", TipoPedido.REVENDA)
+				.setParameter("idPedidoCompra", idPedidoCompra).getResultList();
+	}
+
 	public void alterarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
 		this.entityManager.createQuery("update Pedido p set p.situacaoPedido = :situacao where p.id = :idPedido")
 				.setParameter("situacao", situacaoPedido).setParameter("idPedido", idPedido).executeUpdate();
@@ -198,8 +207,8 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	public List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
-		return pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false,
-				indiceRegistroInicial, numeroMaximoRegistros);
+		return pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false, indiceRegistroInicial,
+				numeroMaximoRegistros);
 	}
 
 	@REVIEW(descricao = "Eh provavel que este metodo esteja retornando mais informacao do que o necessario e deve ser refatorado")

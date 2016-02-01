@@ -156,6 +156,10 @@ function recepcionarItem(botao){
 										<input type="hidden" name="tipoPedido" value="${relatorio.propriedades['tipoPedido']}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 									</form>
+									<form action="<c:url value="/compra/pedidorevenda/listagem"/>" method="get" >
+										<input type="hidden" name="idPedidoCompra" value="${pedido.id}" /> 
+										<input type="submit" value="" title="Visualizar Pedidos de Revenda" class="botaoDetalhar_16" />
+									</form>
 									<form action="<c:url value="/compra/item/recepcao"/>" method="post" >
 										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
 										<input type="button" value="" title="Recepcionar o Item do Pedido" 

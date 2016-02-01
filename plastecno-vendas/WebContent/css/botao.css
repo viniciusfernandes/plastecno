@@ -99,6 +99,15 @@
 	width: 24px;
 }
 
+.botaoDetalhar_16 {
+	background: url("../images/details_16.png") no-repeat scroll 0 0
+		transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
 .botaoEndereco {
 	background: url("../images/address_add_24.png") no-repeat scroll 0 0
 		transparent;

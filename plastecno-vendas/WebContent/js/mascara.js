@@ -11,7 +11,7 @@ function inserirMascaraCEP(idCampo) {
 
 function inserirMascaraCNPJ(idCampo) {
 	$('#'+idCampo).mask('99.999.999/9999-99');
-}rem
+}
 
 function removerCaracteres(valor) {
 	return valor.replace(/\D/g, "");

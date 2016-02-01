@@ -1,6 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.Date;
+import java.util.List;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
@@ -81,6 +82,11 @@ public class RecepcaoCompraController extends AbstractController {
         redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
+    @Get("compra/pedidorevenda/listagem")
+    public void pesquisarPedidoRevendaByIdPedidoCompra(Integer idPedidoCompra) {
+        List<Integer> listaID = pedidoService.pesquisarIdPedidoRevedaByIdPedidoCompra(idPedidoCompra);
+    }
+
     @Get("compra/recepcao")
     public void recepcaoCompraHome() {
         addAtributo("listaRepresentada", representadaService.pesquisarFornecedorAtivo());
@@ -114,7 +120,7 @@ public class RecepcaoCompraController extends AbstractController {
         alteracaoEstoquePublisher.publicar();
 
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Post("compra/item/recepcao")

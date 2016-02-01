@@ -357,7 +357,7 @@ public class PedidoServiceImpl implements PedidoService {
 			itemCadastrado.setIdPedidoCompra(pedidoCompra.getId());
 			// inserirItemPedido(itemCadastrado);
 			itemPedidoDAO.alterar(itemCadastrado);
-			
+
 			if (!contemPedidoItemRevendaAguardandoEncomenda(idItemPedido)) {
 				alterarRevendaAguardandoMaterialByIdItem(itemCadastrado.getId());
 				alterarItemAguardandoMaterialByIdPedido(itemCadastrado.getPedido().getId());
@@ -430,6 +430,15 @@ public class PedidoServiceImpl implements PedidoService {
 		return empacotamentoOk;
 	}
 
+	@Override
+	public boolean empacotarPedidoAguardandoCompra(Integer idPedido) throws BusinessException {
+		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
+		if (!empacotamentoOk) {
+			alterarItemAguardandoCompraByIdPedido(idPedido);
+		}
+		return empacotamentoOk;
+	}
+
 	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
 
 		if (StringUtils.isEmpty(pedido.getContato().getEmail())) {
@@ -478,15 +487,6 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		}
 		pedidoDAO.alterar(pedido);
-	}
-
-	@Override
-	public boolean empacotarPedidoAguardandoCompra(Integer idPedido) throws BusinessException {
-		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
-		if (!empacotamentoOk) {
-			alterarItemAguardandoCompraByIdPedido(idPedido);
-		}
-		return empacotamentoOk;
 	}
 
 	private void enviarVenda(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
@@ -930,6 +930,15 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoItemAguardandoCompra() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
+	}
+
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@Override
+	public List<Integer> pesquisarIdPedidoRevedaByIdPedidoCompra(Integer idPedidoCompra) {
+		if (idPedidoCompra == null) {
+			return new ArrayList<Integer>(0);
+		}
+		return pedidoDAO.pesquisarIdPedidoRevedaByIdPedidoCompra(idPedidoCompra);
 	}
 
 	@Override

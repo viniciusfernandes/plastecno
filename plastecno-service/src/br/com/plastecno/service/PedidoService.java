@@ -51,9 +51,9 @@ public interface PedidoService {
 
 	boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException;
 
-	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
-
 	boolean empacotarPedidoAguardandoCompra(Integer idPedido) throws BusinessException;
+
+	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
 
 	Pedido inserir(Pedido pedido) throws BusinessException;
 
@@ -110,6 +110,8 @@ public interface PedidoService {
 	List<Integer> pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido);
 
 	List<Integer> pesquisarIdPedidoItemAguardandoCompra();
+
+	List<Integer> pesquisarIdPedidoRevedaByIdPedidoCompra(Integer idPedidoCompra);
 
 	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
 

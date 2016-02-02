@@ -71,6 +71,11 @@ public class ItemPedido extends Item {
 	@Column(name = "id_pedido_compra")
 	private Integer idPedidoCompra;
 
+	// Essa campo foi criado para manter o historico de compra indicando a pedido
+	// de revenda esta vinculado o pedido de compra.
+	@Column(name = "id_pedido_venda")
+	private Integer idPedidoVenda;
+
 	@Transient
 	private Integer idProprietario;
 
@@ -192,6 +197,21 @@ public class ItemPedido extends Item {
 		this.id = id;
 	}
 
+	// Construtor utilizado na tela de recepcao de compras e itens aguardando
+	// material.
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idPedidoCompra, Integer idPedidoVenda,
+			String nomeProprietario, Integer quantidade, Integer quantidadeRecepcionada, Integer quantidadeReservada,
+			Double precoUnidade, String nomeRepresentada, Date dataEntrega, FormaMaterial formaMaterial,
+			String siglaMaterial, String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna,
+			Double comprimento) {
+		this(id, sequencial, idPedido, nomeProprietario, quantidade, quantidadeRecepcionada, quantidadeReservada,
+				precoUnidade, nomeRepresentada, dataEntrega, formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca,
+				medidaExterna, medidaInterna, comprimento);
+
+		this.idPedidoCompra = idPedidoCompra;
+		this.idPedidoVenda = idPedidoVenda;
+	}
+
 	// Construtor para relatorio de comissao
 	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario, String nomeProprietario,
 			String sobrenomeProprietario, Double precoUnidade, Double precoCusto, Integer quantidade,
@@ -226,17 +246,6 @@ public class ItemPedido extends Item {
 		this.dataEntrega = dataEntrega;
 		this.quantidadeRecepcionada = quantidadeRecepcionada;
 		this.quantidadeReservada = quantidadeReservada;
-	}
-
-	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idPedidoCompra, String nomeProprietario,
-			Integer quantidade, Integer quantidadeRecepcionada, Integer quantidadeReservada, Double precoUnidade,
-			String nomeRepresentada, Date dataEntrega, FormaMaterial formaMaterial, String siglaMaterial,
-			String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
-		this(idPedido, sequencial, idPedido, nomeProprietario, quantidade, quantidadeRecepcionada,
-				quantidadeReservada, precoUnidade, nomeRepresentada, dataEntrega, formaMaterial, siglaMaterial,
-				descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
-
-		this.idPedidoCompra = idPedidoCompra;
 	}
 
 	public void addQuantidadeReservada(Integer quantidadeReservada) {
@@ -317,6 +326,10 @@ public class ItemPedido extends Item {
 
 	public Integer getIdPedidoCompra() {
 		return idPedidoCompra;
+	}
+
+	public Integer getIdPedidoVenda() {
+		return idPedidoVenda;
 	}
 
 	public Integer getIdProprietario() {
@@ -509,6 +522,10 @@ public class ItemPedido extends Item {
 
 	public void setIdPedidoCompra(Integer idPedidoCompra) {
 		this.idPedidoCompra = idPedidoCompra;
+	}
+
+	public void setIdPedidoVenda(Integer idPedidoVenda) {
+		this.idPedidoVenda = idPedidoVenda;
 	}
 
 	public void setIdProprietario(Integer idProprietario) {

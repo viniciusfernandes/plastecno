@@ -111,8 +111,6 @@ public interface PedidoService {
 
 	List<Integer> pesquisarIdPedidoItemAguardandoCompra();
 
-	List<Integer> pesquisarIdPedidoRevedaByIdPedidoCompra(Integer idPedidoCompra);
-
 	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
 
 	Integer pesquisarIdVendedorByIdPedido(Integer idPedido);

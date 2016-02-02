@@ -1,7 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.Date;
-import java.util.List;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
@@ -81,11 +80,6 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("idRepresentadaSelecionada", idRepresentada);
         pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
         irTopoPagina();
-    }
-
-    @Get("compra/pedidorevenda/listagem")
-    public void pesquisarPedidoRevendaByIdPedidoCompra(Integer idPedidoCompra) {
-        List<Integer> listaID = pedidoService.pesquisarIdPedidoRevedaByIdPedidoCompra(idPedidoCompra);
     }
 
     @Get("compra/recepcao")

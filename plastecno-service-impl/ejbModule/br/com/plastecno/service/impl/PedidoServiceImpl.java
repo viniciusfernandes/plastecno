@@ -341,6 +341,7 @@ public class PedidoServiceImpl implements PedidoService {
 			itemClone.setPedido(pedidoCompra);
 			itemClone.setQuantidade(itemCadastrado.getQuantidadeEncomendada());
 			itemClone.setQuantidadeReservada(0);
+			itemClone.setIdPedidoVenda(pedidoDAO.pesquisarIdPedidoByIdItemPedido(idItemPedido));
 
 			try {
 				inserirItemPedido(pedidoCompra.getId(), itemClone);
@@ -355,6 +356,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 			itemCadastrado.setEncomendado(true);
 			itemCadastrado.setIdPedidoCompra(pedidoCompra.getId());
+			// A execucao desse metodo esta garantindo que o pedido que aguardava
+			// compra agora ira para aguardando material.
 			// inserirItemPedido(itemCadastrado);
 			itemPedidoDAO.alterar(itemCadastrado);
 
@@ -690,6 +693,16 @@ public class PedidoServiceImpl implements PedidoService {
 		if (itemPedido.isNovo()) {
 			itemPedidoDAO.inserir(itemPedido);
 		} else {
+			if (pedido.isCompra()) {
+				// Esse bloco de codigo foi criado para manter o historico dos pedidos
+				// de
+				// compra que estao associados a um pedido de venda que nao existe no
+				// estoque. Pois ao editarmos um pedido de compra os dados do
+				// idpedidovenda estavam desaparecendo.
+				Object[] idPedidoCompraEVenda = itemPedidoDAO.pesquisarIdPedidoCompraEVenda(itemPedido.getId());
+				itemPedido.setIdPedidoCompra((Integer) idPedidoCompraEVenda[0]);
+				itemPedido.setIdPedidoVenda((Integer) idPedidoCompraEVenda[1]);
+			}
 			itemPedido = itemPedidoDAO.alterar(itemPedido);
 		}
 
@@ -930,15 +943,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoItemAguardandoCompra() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
-	}
-
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@Override
-	public List<Integer> pesquisarIdPedidoRevedaByIdPedidoCompra(Integer idPedidoCompra) {
-		if (idPedidoCompra == null) {
-			return new ArrayList<Integer>(0);
-		}
-		return pedidoDAO.pesquisarIdPedidoRevedaByIdPedidoCompra(idPedidoCompra);
 	}
 
 	@Override

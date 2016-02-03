@@ -149,6 +149,18 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private String valorPedidoIPIFormatado;
 
+	// Campo criado para atualizar o id do cliente no envio do pedido via json.
+	@Transient
+	private Integer idCliente;
+
+	public Integer getIdCliente() {
+		return idCliente;
+	}
+
+	public void setIdCliente(Integer idCliente) {
+		this.idCliente = idCliente;
+	}
+
 	public Pedido() {
 	}
 

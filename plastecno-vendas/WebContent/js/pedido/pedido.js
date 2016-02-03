@@ -192,6 +192,7 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 			 * Temos que ter esse campo oculto pois o campo Numero do Pedido na
 			 * tela sera desabilitado e nao sera enviado no request.
 			 */
+			$('#idCliente').val(pedidoJson.idCliente);
 			$('#numeroPedido').val(pedidoJson.id);
 			$('#tipoPedido').val(pedidoJson.tipoPedido);
 			$('#numeroPedidoPesquisa').val(pedidoJson.id);
@@ -207,7 +208,7 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 							+ pedidoJson.proprietario.email);
 			$('#idVendedor').val(pedidoJson.proprietario.id);
 			$('#formEnvioPedido #botaoEnviarPedido').show();
-
+			
 			habilitar('#numeroPedidoPesquisa', false);
 
 			/*

@@ -168,7 +168,7 @@ $(document).ready(function() {
 
 	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>" method="post">
 		<fieldset>
-			<legend>::: Dados do Pedido de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
+			<legend>::: Dados do ${orcamento ? 'Orçamento': 'Pedido'} de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 
 			<!-- O campo id do pedido eh hidden pois o input text nao eh enviado na edicao do formulario pois esta "disabled" -->
 			<input type="hidden" id="numeroPedido" name="pedido.id" value="${pedido.id}" /> 
@@ -176,6 +176,7 @@ $(document).ready(function() {
 			<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${proprietario.id}" /> 
 			<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
 			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
+			<input type="hidden" id="orcamento" name="pedido.orcamento" value="${not empty orcamento ? orcamento : false}" />
 
 			
 			<div class="label">${not empty tipoPedido ? 'Comprador:': 'Vendedor:'}</div>
@@ -184,24 +185,12 @@ $(document).ready(function() {
 					value="${proprietario.nome} - ${proprietario.email}" disabled="disabled"
 					class="uppercaseBloqueado desabilitado" />
 			</div>
-			<!-- Verificamos se o tipo de pedido foi preenchido pois pedido de compra nao tera orcamento -->
-			<c:choose>
-				<c:when test="${empty tipoPedido and not pedidoDesabilitado}">
-					<div class="label" style="width: 10%">Orçamento:</div>
-					<div class="input" style="width: 30%">
-						<input type="checkbox" id="orcamento" name="pedido.orcamento"
-							<c:if test="${pedido.orcamento}">checked</c:if> class="checkbox" />
-					</div>
-				</c:when>
-				<c:when test="${not empty tipoPedido or pedidoDesabilitado}">
-					<div class="label" style="width: 10%">Situação:</div>
+			<div class="label" style="width: 10%">Situação:</div>
 					<div class="input" style="width: 20%">
 						<input type="text" id="situacaoPedido" name="pedido.situacaoPedido"
-							value="${pedido.situacaoPedido}" class="desabilitado"/>
-					</div>
-				</c:when>
-			</c:choose>
-
+							value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled"/>
+			</div>
+			
 			<div class="label">Nr. Pedido:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoPesquisa" value="${pedido.id}"

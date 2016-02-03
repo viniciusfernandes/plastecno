@@ -376,8 +376,14 @@ public class PedidoController extends AbstractController {
                 pedidoService.inserir(pedido);
             }
 
+            addAtributo("orcamento", pedido.isOrcamento());
             formatarPedido(pedido);
+            // Esse comando eh para configurar o id do cliente que sera
+            // serializado para o preenchimento do id na tela quando o cliente
+            // nao existe no caso do orcamento.
+            pedido.setIdCliente(pedido.getCliente().getId());
             serializarJson(new SerializacaoJson(pedido).incluirAtributo("situacaoPedido", "proprietario"));
+
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
@@ -406,6 +412,12 @@ public class PedidoController extends AbstractController {
     public void limpar(TipoPedido tipoPedido) {
         configurarTipoPedido(tipoPedido);
         redirectByTipoPedido(tipoPedido);
+    }
+
+    @Get("orcamento")
+    public void orcamento() {
+        addAtributo("orcamento", true);
+        redirecTo(this.getClass()).pedidoHome();
     }
 
     @Get("pedido/compra")

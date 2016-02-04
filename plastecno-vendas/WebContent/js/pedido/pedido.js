@@ -82,7 +82,7 @@ function inicializarBlocoItemPedido(urlTela) {
 						break;
 					
 					case 10:
-						celula.innerHTML = $("#bloco_item_pedido #prazoEntrega")
+						celula.innerHTML = $("#bloco_item_pedido #prazoEntregaItem")
 								.val();
 						break;
 					
@@ -123,7 +123,7 @@ function inicializarBlocoItemPedido(urlTela) {
 					$('#descricao').val(itemPedidoJson.descricaoPeca);
 					$('#aliquotaICMS').val(itemPedidoJson.aliquotaICMS);
 					$('#aliquotaIPI').val(itemPedidoJson.aliquotaIPI);
-					$('#prazoEntrega').val(itemPedidoJson.prazoEntrega);
+					$('#prazoEntregaItem').val(itemPedidoJson.prazoEntrega);
 					
 					habilitarPreenchimentoPeca(itemPedidoJson.peca);
 				});
@@ -382,8 +382,6 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 				 * fazer referencia a esse item no campo de observacao.
 				 */
 				$('#bloco_item_pedido #sequencial').val(itemPedido.sequencial);
-				
-				$('#bloco_item_pedido #prazoEntrega').val(itemPedido.prazoEntrega);
 				
 				/*
 				 * Aqui o campo de representada sera desabilitado e nao sera

@@ -123,7 +123,7 @@ $(document).ready(function(){
 	</div>
 	<div class="label">Prazo:</div>
 	<div class="input" style="width: 5%">
-		<input type="text" id="prazoEntrega" name="itemPedido.prazoEntrega" maxlength="3" />
+		<input type="text" id="prazoEntregaItem" name="itemPedido.prazoEntrega" maxlength="3" />
 	</div>
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">

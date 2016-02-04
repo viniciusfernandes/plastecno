@@ -101,6 +101,9 @@ public class ItemPedido extends Item {
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Pedido associado ao item")
 	private Pedido pedido;
 
+	@Column(name = "prazo_entrega")
+	private Integer prazoEntrega;
+
 	@Column(name = "preco_custo")
 	@InformacaoValidavel(obrigatorio = false, numerico = true, positivo = true, nomeExibicao = "Preço de custo do item do pedido")
 	private Double precoCusto;
@@ -360,6 +363,10 @@ public class ItemPedido extends Item {
 		return pedido;
 	}
 
+	public Integer getPrazoEntrega() {
+		return prazoEntrega;
+	}
+
 	public Double getPrecoCusto() {
 		return precoCusto;
 	}
@@ -554,6 +561,10 @@ public class ItemPedido extends Item {
 
 	public void setPedido(Pedido pedido) {
 		this.pedido = pedido;
+	}
+
+	public void setPrazoEntrega(Integer prazoEntrega) {
+		this.prazoEntrega = prazoEntrega;
 	}
 
 	public void setPrecoCusto(Double precoCusto) {

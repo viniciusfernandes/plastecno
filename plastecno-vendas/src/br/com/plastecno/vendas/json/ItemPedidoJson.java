@@ -14,6 +14,7 @@ public class ItemPedidoJson {
     private final Double medidaExterna;
     private final Double medidaInterna;
     private final boolean peca;
+    private final Integer prazoEntrega;
     private final String precoItem;
     private final String precoMinimo;
     private final String precoUnidade;
@@ -51,6 +52,7 @@ public class ItemPedidoJson {
         aliquotaICMS = itemPedido.getAliquotaICMSFormatado();
         aliquotaIPI = itemPedido.getAliquotaIPIFormatado();
         precoMinimo = itemPedido.getPrecoMinimoFormatado();
+        prazoEntrega = itemPedido.getPrazoEntrega();
     }
 
     public String getAliquotaICMS() {
@@ -91,6 +93,10 @@ public class ItemPedidoJson {
 
     public Double getMedidaInterna() {
         return medidaInterna;
+    }
+
+    public Integer getPrazoEntrega() {
+        return prazoEntrega;
     }
 
     public String getPrecoItem() {

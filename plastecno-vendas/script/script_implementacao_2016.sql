@@ -9,3 +9,5 @@ create index idx_item_pedido_id_pedido_compra on vendas.tb_item_pedido (id_pedid
 
 alter table vendas.tb_item_pedido add id_pedido_venda integer default null;
 
+alter table vendas.tb_item_pedido add prazo_entrega integer default null;
+

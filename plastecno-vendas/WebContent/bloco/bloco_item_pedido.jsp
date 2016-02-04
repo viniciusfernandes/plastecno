@@ -117,9 +117,13 @@ $(document).ready(function(){
 		<input type="text" id="aliquotaIPI" name="aliquotaIPI" maxlength="2" />
 	</div>
 	<div class="label" style="width: 10%">ICMS (%) :</div>
-	<div class="input" style="width: 5%">
+	<div class="input" style="width: 40%">
 		<input type="text" id="aliquotaICMS" name="itemPedido.aliquotaICMS"
-			maxlength="2" />
+			maxlength="2" style="width: 5%"/>
+	</div>
+	<div class="label">Prazo:</div>
+	<div class="input" style="width: 5%">
+		<input type="text" id="prazoEntrega" name="itemPedido.prazoEntrega" maxlength="3" />
 	</div>
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">
@@ -135,13 +139,14 @@ $(document).ready(function(){
 					<th style="display: none;">Item</th>
 					<th style="width: 2%">Item</th>
 					<th style="width: 5%">Qtde.</th>
-					<th style="width: 50%">Descrição</th>
+					<th style="width: 45%">Descrição</th>
 					<th style="width: 7%">${not empty tipoPedido ? 'Compra': 'Venda'}</th>
 					<th style="width: 10%">Preço (R$)</th>
 					<th style="width: 10%">Unid. (R$)</th>
 					<th style="width: 10%">Total Item (R$)</th>
 					<th style="width: 10%">IPI (%)</th>
 					<th style="width: 10%">ICMS (%)</th>
+					<th style="width: 5%">Prazo</th>
 					<th>Ações</th>
 				</tr>
 			</thead>
@@ -159,6 +164,7 @@ $(document).ready(function(){
 						<td class="valorNumerico">${itemPedido.precoItemFormatado}</td>
 						<td class="valorNumerico">${itemPedido.aliquotaIPIFormatado}</td>
 						<td class="valorNumerico">${itemPedido.aliquotaICMSFormatado}</td>
+						<td class="valorNumerico">${itemPedido.prazoEntrega}</td>
 						<td>
 							<c:if test="${not pedidoDesabilitado}">
 								<input type="button" id="botaoEditarPedido" title="Editar Dados do Item do Pedido" value=""
@@ -175,14 +181,14 @@ $(document).ready(function(){
 			<tfoot>
 				<tr>
 					<td></td>
-					<td colspan="3"></td>
+					<td colspan="4"></td>
 					<td colspan="2" style="text-align: right;">TOTAL SEM IPI:</td>
 					<td colspan="4"><div id="valorPedido"
 							style="text-align: left;">R$ ${not empty pedido.valorPedido ? pedido.valorPedidoFormatado : 0}</div></td>
 				</tr>
 				<tr>
 					<td></td>
-					<td colspan="3"></td>
+					<td colspan="4"></td>
 					<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
 					<td colspan="4"><div id="valorPedidoIPI"
 							style="text-align: left;">R$ ${not empty pedido.valorPedidoIPI ? pedido.valorPedidoIPIFormatado : 0}</div></td>

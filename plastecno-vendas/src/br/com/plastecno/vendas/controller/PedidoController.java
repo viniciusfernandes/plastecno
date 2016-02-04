@@ -409,9 +409,10 @@ public class PedidoController extends AbstractController {
     }
 
     @Get("pedido/limpar")
-    public void limpar(TipoPedido tipoPedido) {
+    public void limpar(TipoPedido tipoPedido, boolean orcamento) {
         configurarTipoPedido(tipoPedido);
         redirectByTipoPedido(tipoPedido);
+        addAtributo("orcamento", orcamento);
     }
 
     @Get("orcamento")
@@ -608,7 +609,7 @@ public class PedidoController extends AbstractController {
 
     @Get("pedido/listagem")
     public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-            TipoPedido tipoPedido, Integer paginaSelecionada) {
+            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada) {
         if (idCliente == null) {
             gerarListaMensagemErro("Cliente é obrigatório para a pesquisa de pedidos");
             irTopoPagina();
@@ -637,6 +638,7 @@ public class PedidoController extends AbstractController {
             carregarVendedor(cliente);
             addAtributo("cliente", cliente);
             addAtributo("proprietario", cliente.getVendedor());
+            addAtributo("orcamento", orcamento);
 
             if (isCompra) {
                 // Aqui estamos supondo que o usuario que acessou a tela eh um
@@ -664,12 +666,13 @@ public class PedidoController extends AbstractController {
     }
 
     @Post("pedido/refazer")
-    public void refazerPedido(Integer idPedido, TipoPedido tipoPedido) {
+    public void refazerPedido(Integer idPedido, TipoPedido tipoPedido, boolean orcamento) {
         try {
             Integer idPedidoClone = pedidoService.refazerPedido(idPedido);
             this.pesquisarPedidoById(idPedidoClone, tipoPedido);
             this.gerarMensagemSucesso("Pedido No. " + idPedidoClone + " inserido e refeito a partir do pedido No. "
                     + idPedido);
+            addAtributo("orcamento", orcamento);
 
         } catch (BusinessException e) {
             this.gerarListaMensagemErro(e);

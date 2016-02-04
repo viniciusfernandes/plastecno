@@ -176,7 +176,7 @@ $(document).ready(function() {
 			<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${proprietario.id}" /> 
 			<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
 			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
-			<input type="hidden" id="orcamento" name="pedido.orcamento" value="${not empty orcamento ? orcamento : false}" />
+			<input type="hidden" id="orcamento" name="pedido.orcamento" value="${empty orcamento ? false : orcamento}" />
 
 			
 			<div class="label">${not empty tipoPedido ? 'Comprador:': 'Vendedor:'}</div>
@@ -335,29 +335,32 @@ $(document).ready(function() {
 			<input type="hidden" name="idCliente" id="idClientePesquisa"  value="${cliente.id}"/> 
 			<input type="hidden" name="idFornecedor" id="idFornecedorPesquisa" value="${idRepresentadaSelecionada}"/>
 			<input type="hidden" name="idVendedor" id="idVendedorPesquisa" value="${proprietario.id}"/>  
+			<input type="hidden" name="orcamento" id="orcamento" value="${empty orcamento ? false : orcamento}"/>
 			<input type="button" id="botaoPesquisaPedido" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
 		</form>
 		<form action="pedido/limpar" method="get">
-			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
+			<input type="hidden" name="tipoPedido" value="${tipoPedido}" />
+			<input type="hidden" name="orcamento" id="orcamento" value="${empty orcamento ? false : orcamento}"/>
 			<input type="submit" value="" title="Limpar Dados do Pedido" class="botaoLimpar" />
 		</form>
 		<form action="pedido/pdf" method="get">
 			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
-			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}" /> 
+			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}" />
 			<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF" />
 		</form>
 
 		<c:if test="${acessoRefazerPedidoPermitido}">
 			<form action="pedido/refazer" method="post">
 				<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
-				<input type="hidden" name="idPedido" id="idPedido" value="${pedido.id}" /> 
+				<input type="hidden" name="idPedido" id="idPedido" value="${pedido.id}" />
+				<input type="hidden" name="orcamento" id="orcamento" value="${empty orcamento ? false : orcamento}"/>
 				<input id="botaoRefazerPedido" type="button" value="" title="Refazer Pedido" class="botaoRefazer" />
 			</form>
 		</c:if>
 		<c:if test="${acessoCancelamentoPedidoPermitido}">
 			<form action="pedido/cancelamento" method="post">
 				<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
-				<input type="hidden" name="idPedido" id="idPedidoCancelamento" value="${pedido.id}" /> 
+				<input type="hidden" name="idPedido" id="idPedidoCancelamento" value="${pedido.id}" />
 				<input id="botaoCancelarPedido" type="button" value="" title="Cancelar Pedido" class="botaoCancelar" />
 			</form>
 		</c:if>

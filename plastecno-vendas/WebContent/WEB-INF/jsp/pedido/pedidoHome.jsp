@@ -6,6 +6,7 @@
 <meta charset="utf-8">
 
 <jsp:include page="/bloco/bloco_css.jsp" />
+<jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
@@ -390,6 +391,51 @@ $(document).ready(function() {
 		<legend>::: Resultado da Pesquisa de Pedidos de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 		<div id="paginador"></div>
 		<div>
+			<table id="tabelaItemPedido" class="listrada">
+			<caption>${relatorio.titulo}</caption>
+			<thead>
+				<tr>
+					<th style="width: 10%">Pedido</th>
+					<th style="width: 2%">Item</th>
+					<th style="width: 5%">Qtde.</th>
+					<th style="width: 50%">Descrição</th>
+					<th style="width: 20%">Venda (R$)</th>
+					<th style="width: 10%">Valor Comiss. (R$)</th>
+					<th style="width: 5%">Ações</th>
+				</tr>
+			</thead>
+
+			<tbody>
+			
+			<c:forEach items="${relatorioItemPedido.listaGrupo}" var="grupo" varStatus="iGrupo">
+					<c:forEach items="${grupo.listaElemento}" var="item" varStatus="iElemento">
+						<tr>
+							<c:if test="${iElemento.count le 1}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.id}</td>
+							</c:if>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valorComissionadoFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
+							<div class="coluna_acoes_listagem">
+								<form action="<c:url value="/pedido/pdf"/>">
+									<input type="hidden" name="idPedido" value="${pedido.id}"/>
+									<input type="submit" title="Vizualizar Pedido PDF" value="" class="botaoPDF" />
+								</form>
+							</div>
+						</td>
+						</tr>
+					</c:forEach>
+				</c:forEach>
+
+			</tbody>
+			
+		</table>
+		
+		
+		
 			<table class="listrada">
 				<thead>
 					<tr>

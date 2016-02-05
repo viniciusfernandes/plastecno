@@ -2,7 +2,6 @@ package br.com.plastecno.vendas.controller;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +38,7 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.relatorio.RelatorioService;
+import br.com.plastecno.service.wrapper.GrupoWrapper;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
@@ -290,9 +290,19 @@ public class PedidoController extends AbstractController {
         // vendedor. Essa acao sera disparada por qualquer um que seja
         // adiministrador do sistema, podendo ser um outro vendedor ou nao.
         boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
-        return relatorioService.gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
-                pesquisarTodos ? null : idVendedor, idFornecedor, isCompra, indiceRegistroInicial,
-                getNumerRegistrosPorPagina());
+        RelatorioWrapper<Pedido, ItemPedido> relatorio = relatorioService
+                .gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, pesquisarTodos ? null
+                        : idVendedor, idFornecedor, isCompra, indiceRegistroInicial, getNumerRegistrosPorPagina());
+
+        for (GrupoWrapper<Pedido, ItemPedido> grupo : relatorio.getListaGrupo()) {
+            formatarPedido(grupo.getId());
+
+            for (ItemPedido itemPedido : grupo.getListaElemento()) {
+                formatarItemPedido(itemPedido);
+            }
+        }
+
+        return relatorio;
     }
 
     private void inicializarListaSituacaoPedido() {
@@ -622,11 +632,6 @@ public class PedidoController extends AbstractController {
 
             final RelatorioWrapper<Pedido, ItemPedido> relatorio = gerarRelatorioPaginadoItemPedido(idCliente,
                     idVendedor, idFornecedor, isCompra, paginaSelecionada);
-
-            final Collection<Pedido> listaPedido = relatorio.getGrupos();
-            for (Pedido pedido : listaPedido) {
-                formatarPedido(pedido);
-            }
 
             inicializarRelatorioPaginado(paginaSelecionada, relatorio, "relatorioItemPedido");
 

@@ -20,6 +20,8 @@ import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 @Local
 public interface RelatorioService {
 
+	ReceitaWrapper gerarReceitaEstimada(Periodo periodo);
+
 	RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) throws BusinessException;
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioComissaoVendedor(Integer idVendedor, Periodo periodo);
@@ -31,27 +33,29 @@ public interface RelatorioService {
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
 			Periodo periodo);
 
-	RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoCompraPeriodo(Periodo periodo) throws BusinessException;
-
 	List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException;
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoCompra(Integer idCliente, Periodo periodo);
 
+	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(Integer idRepresentada, Periodo periodo);
+
+	RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
+			Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros);
+
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente);
 
-	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(Integer idRepresentada, Periodo periodo);
+	RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoCompraPeriodo(Periodo periodo) throws BusinessException;
+
+	RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoVendaPeriodo(Periodo periodo) throws BusinessException;
 
 	List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException;
 
 	RelatorioWrapper<String, TotalizacaoPedidoWrapper> gerarRelatorioVendaCliente(boolean orcamento, Periodo periodo,
 			Integer idCliente) throws BusinessException;
 
-	RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoVendaPeriodo(Periodo periodo) throws BusinessException;
-
 	RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,
 			Integer idVendedor) throws BusinessException;
 
 	List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor);
-
-	ReceitaWrapper gerarReceitaEstimada(Periodo periodo);
 }

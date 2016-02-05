@@ -125,6 +125,9 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente);
 
+	List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
 	List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo);
@@ -181,9 +184,9 @@ public interface PedidoService {
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
-	Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra);
+	Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra);
 
-	Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente);
+	Long pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(Integer idCliente);
 
 	List<TotalizacaoPedidoWrapper> pesquisarTotalPedidoVendaResumidaByPeriodo(Periodo periodo);
 

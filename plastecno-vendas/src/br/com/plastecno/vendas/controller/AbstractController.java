@@ -26,6 +26,7 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
+import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
@@ -400,14 +401,20 @@ public abstract class AbstractController {
      * Esse metodo ja garante que o usuario sera navegado para o rodape da
      * pagina
      */
-    <T> void inicializarPaginacao(Integer paginaSelecionada, PaginacaoWrapper<T> paginacao, String nomeLista) {
+    private void inicializarPaginacao(Integer paginaSelecionada, Integer totalPaginas, Object objetoPaginado,
+            String nomeObjetoPaginado) {
         if (paginaSelecionada == null || paginaSelecionada <= 1) {
             paginaSelecionada = 1;
         }
         this.result.include("paginaSelecionada", paginaSelecionada);
-        this.result.include("totalPaginas", this.calcularTotalPaginas(paginacao.getTotalPaginado()));
-        this.result.include(nomeLista, paginacao.getLista());
+        this.result.include("totalPaginas", totalPaginas);
+        this.result.include(nomeObjetoPaginado, objetoPaginado);
         irRodapePagina();
+    }
+
+    <T> void inicializarPaginacao(Integer paginaSelecionada, PaginacaoWrapper<T> paginacao, String nomeLista) {
+        inicializarPaginacao(paginaSelecionada, calcularTotalPaginas(paginacao.getTotalPaginado()),
+                paginacao.getLista(), nomeLista);
     }
 
     /*
@@ -463,6 +470,12 @@ public abstract class AbstractController {
             String nomeAtributoValor, String nomeAtributoLabel, String tituloCampoPesquisa) {
         this.inicializarPicklist(tituloBloco, tituloElementosNaoAssociados, tituloElementosAssociados,
                 nomeAtributoValor, nomeAtributoLabel, true, tituloCampoPesquisa);
+    }
+
+    <T, K> void inicializarRelatorioPaginado(Integer paginaSelecionada, RelatorioWrapper<T, K> relatorio,
+            String nomeRelatorio) {
+        inicializarPaginacao(paginaSelecionada,
+                calcularTotalPaginas((Long) relatorio.getPropriedade("totalPesquisado")), relatorio, nomeRelatorio);
     }
 
     void init() throws ServiceLocatorException {

@@ -30,7 +30,10 @@ public class GrupoWrapper<T, K> {
 		return listaElementos.get(0);
 	}
 
-	public Object getId() {
+	// Aqui o tipo de retorno foi alterado para estar de acordo com o tipagem do
+	// grupo, porem, originalmente estava retornando um Obejct e nao sabemos a
+	// razao.
+	public T getId() {
 		return id;
 	}
 

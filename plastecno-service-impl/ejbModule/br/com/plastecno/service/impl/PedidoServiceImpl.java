@@ -773,7 +773,7 @@ public class PedidoServiceImpl implements PedidoService {
 			listaPedido = new ArrayList<Pedido>();
 		}
 
-		return new PaginacaoWrapper<Pedido>(pesquisarTotalPedidoByIdCliente(idCliente, idVendedor, idFornecedor, isCompra),
+		return new PaginacaoWrapper<Pedido>(pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor, isCompra),
 				listaPedido);
 	}
 
@@ -999,6 +999,18 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente) {
 		return itemPedidoDAO.pesquisarItemPedidoAguardandoEmpacotamento(idCliente);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+
+		if (idCliente == null) {
+			return Collections.emptyList();
+		}
+		return itemPedidoDAO.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor,
+				isCompra, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
@@ -1267,7 +1279,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
+	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor, Integer idFornecedor,
 			boolean isCompra) {
 		if (idCliente == null) {
 			return 0L;
@@ -1304,8 +1316,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente) {
-		return this.pesquisarTotalPedidoByIdCliente(idCliente, null, null, false);
+	public Long pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(Integer idCliente) {
+		return this.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false);
 	}
 
 	@Override

@@ -38,7 +38,8 @@ import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
-import br.com.plastecno.service.wrapper.PaginacaoWrapper;
+import br.com.plastecno.service.relatorio.RelatorioService;
+import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ClienteJson;
@@ -107,6 +108,9 @@ public class PedidoController extends AbstractController {
 
     @Servico
     private PedidoService pedidoService;
+
+    @Servico
+    private RelatorioService relatorioService;
 
     @Servico
     private RepresentadaService representadaService;
@@ -219,25 +223,6 @@ public class PedidoController extends AbstractController {
         return listaSituacao;
     }
 
-    /*
-     * Metodo dedicado a paginar os pedidos no caso em que o usuario seja um
-     * administrador, sendo assim, ele podera consultar os pedidos de todos os
-     * vendedores
-     */
-    private PaginacaoWrapper<Pedido> gerarPaginacaoPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-            boolean isCompra, Integer paginaSelecionada) {
-        final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
-
-        // Essa variavel eh utilizada para decidirmos se queremos recuperar
-        // todos os pedidos de um determinado cliente independentemente do
-        // vendedor. Essa acao sera disparada por qualquer um que seja
-        // adiministrador do sistema, podendo ser um outro vendedor ou nao.
-        boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
-
-        return this.pedidoService.paginarPedido(idCliente, pesquisarTodos ? null : idVendedor, idFornecedor, isCompra,
-                indiceRegistroInicial, getNumerRegistrosPorPagina());
-    }
-
     private PedidoPDFWrapper gerarPDF(Integer idPedido, TipoPedido tipoPedido) throws BusinessException {
         Pedido pedido = pesquisarPedido(idPedido, tipoPedido);
         if (pedido == null) {
@@ -289,6 +274,25 @@ public class PedidoController extends AbstractController {
 
         geradorRelatorio.processar(new File(diretorioTemplateRelatorio + "/pedido.html"));
         return new PedidoPDFWrapper(pedido, geradorRelatorio.gerarPDF());
+    }
+
+    /*
+     * Metodo dedicado a gerar relatorio paginado dos itens dos pedidos no caso
+     * em que o usuario seja um administrador, sendo assim, ele podera consultar
+     * os pedidos de todos os vendedores
+     */
+    private RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioPaginadoItemPedido(Integer idCliente,
+            Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer paginaSelecionada) {
+        final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
+
+        // Essa variavel eh utilizada para decidirmos se queremos recuperar
+        // todos os pedidos de um determinado cliente independentemente do
+        // vendedor. Essa acao sera disparada por qualquer um que seja
+        // adiministrador do sistema, podendo ser um outro vendedor ou nao.
+        boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+        return relatorioService.gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
+                pesquisarTodos ? null : idVendedor, idFornecedor, isCompra, indiceRegistroInicial,
+                getNumerRegistrosPorPagina());
     }
 
     private void inicializarListaSituacaoPedido() {
@@ -615,24 +619,23 @@ public class PedidoController extends AbstractController {
             irTopoPagina();
         } else {
             boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
-            final PaginacaoWrapper<Pedido> paginacao = gerarPaginacaoPedido(idCliente, idVendedor, idFornecedor,
-                    isCompra, paginaSelecionada);
 
-            final Collection<Pedido> listaPedido = paginacao.getLista();
-            if (!listaPedido.isEmpty()) {
-                for (Pedido pedido : listaPedido) {
-                    this.formatarPedido(pedido);
-                    this.formatarDocumento(pedido.getCliente());
-                }
+            final RelatorioWrapper<Pedido, ItemPedido> relatorio = gerarRelatorioPaginadoItemPedido(idCliente,
+                    idVendedor, idFornecedor, isCompra, paginaSelecionada);
+
+            final Collection<Pedido> listaPedido = relatorio.getGrupos();
+            for (Pedido pedido : listaPedido) {
+                formatarPedido(pedido);
             }
-            this.inicializarPaginacao(paginaSelecionada, paginacao, "listaPedido");
+
+            inicializarRelatorioPaginado(paginaSelecionada, relatorio, "relatorioItemPedido");
 
             /*
              * Recuperando os dados do cliente no caso em que nao tenhamos
              * resultado na pesquisa de pedido, entao os dados do cliente devem
              * permanecer na tela
              */
-            Cliente cliente = this.clienteService.pesquisarById(idCliente);
+            Cliente cliente = clienteService.pesquisarById(idCliente);
 
             formatarDocumento(cliente);
             carregarVendedor(cliente);
@@ -669,8 +672,8 @@ public class PedidoController extends AbstractController {
     public void refazerPedido(Integer idPedido, TipoPedido tipoPedido, boolean orcamento) {
         try {
             Integer idPedidoClone = pedidoService.refazerPedido(idPedido);
-            this.pesquisarPedidoById(idPedidoClone, tipoPedido);
-            this.gerarMensagemSucesso("Pedido No. " + idPedidoClone + " inserido e refeito a partir do pedido No. "
+            pesquisarPedidoById(idPedidoClone, tipoPedido);
+            gerarMensagemSucesso("Pedido No. " + idPedidoClone + " inserido e refeito a partir do pedido No. "
                     + idPedido);
             addAtributo("orcamento", orcamento);
 

@@ -109,8 +109,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	public Object[] pesquisarIdPedidoCompraEVenda(Integer idItemPedido) {
 		return entityManager
-				.createQuery("select i.idPedidoCompra, i.idPedidoVenda from ItemPedido i where i.id = :idItemPedido", Object[].class)
-				.setParameter("idItemPedido", idItemPedido).getSingleResult();
+				.createQuery("select i.idPedidoCompra, i.idPedidoVenda from ItemPedido i where i.id = :idItemPedido",
+						Object[].class).setParameter("idItemPedido", idItemPedido).getSingleResult();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -254,6 +254,46 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		return query.getResultList();
+	}
+
+	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idProprietario,
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		StringBuilder select = new StringBuilder();
+		select
+				.append("select new ItemPedido(i.pedido.id, i.pedido.situacaoPedido, i.pedido.dataEnvio, i.pedido.representada.nomeFantasia, i.id, i.sequencial, i.quantidade, i.precoUnidade, i.formaMaterial, ");
+
+		select
+				.append("i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento) from ItemPedido i ");
+		select.append("where i.pedido.cliente.id = :idCliente ");
+
+		if (idProprietario != null) {
+			select.append(" and i.pedido.proprietario.id = :idVendedor ");
+		}
+
+		if (idFornecedor != null) {
+			select.append(" and i.pedido.representada.id = :idFornecedor ");
+		}
+
+		if (isCompra) {
+			select.append(" and i.pedido.tipoPedido = :tipoPedido ");
+		} else {
+			select.append(" and i.pedido.tipoPedido != :tipoPedido ");
+		}
+		select.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc, i.pedido.cliente.nomeFantasia ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("idCliente", idCliente);
+
+		if (idProprietario != null) {
+			query.setParameter("idVendedor", idProprietario);
+		}
+
+		if (idFornecedor != null) {
+			query.setParameter("idFornecedor", idFornecedor);
+		}
+
+		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,

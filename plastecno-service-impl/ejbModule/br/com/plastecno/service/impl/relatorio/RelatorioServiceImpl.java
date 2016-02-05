@@ -41,7 +41,6 @@ import br.com.plastecno.util.StringUtils;
 
 @Stateless
 public class RelatorioServiceImpl implements RelatorioService {
-
 	@EJB
 	private ClienteService clienteService;
 
@@ -110,7 +109,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 			precoItem = itemPedido.getValorComissionado();
 			valorVendido += precoItem;
-			//valorComissionado += precoItem * itemPedido.getAliquotaComissao();
+			// valorComissionado += precoItem * itemPedido.getAliquotaComissao();
 		}
 
 		valorReceita += valorVendido;
@@ -270,6 +269,31 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		return gerarRelatorioItensPorPedido("Itens Aguardando Material",
 				pedidoService.pesquisarItemAguardandoMaterial(idRepresentada, periodo));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(
+			Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
+		RelatorioWrapper<Pedido, ItemPedido> relatorio = new RelatorioWrapper<Pedido, ItemPedido>("");
+		if (idCliente == null) {
+			return relatorio;
+		}
+
+		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
+			List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
+					null, idFornecedor, isCompra, indiceRegistroInicial, numeroMaximoRegistros);
+
+			for (ItemPedido i : listaItemPedido) {
+				relatorio.addGrupo(i.getPedido(), i);
+			}
+
+			relatorio.addPropriedade("totalPesquisado",
+					pedidoService.pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(idCliente));
+		}
+
+		return relatorio;
 	}
 
 	@REVIEW(descricao = "Nem sempre eh necessario carregar as informacoes da representada")

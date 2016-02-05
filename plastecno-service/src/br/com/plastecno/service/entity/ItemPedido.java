@@ -216,22 +216,6 @@ public class ItemPedido extends Item {
 		this.idPedidoVenda = idPedidoVenda;
 	}
 
-	// Construtor implementado para a consulta de itens dos pedidos de um
-	// determinado cliente que eh fornecida na tela de cliente.
-	public ItemPedido(Integer idPedido, SituacaoPedido situacaoPedido, Date dataEnvio, String nomeRepresentada,
-			Integer id, Integer sequencial, Integer quantidade, Double precoUnidade, FormaMaterial formaMaterial,
-			String siglaMaterial, String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna,
-			Double comprimento) {
-
-		this(id, sequencial, idPedido, null, quantidade, null, null, precoUnidade, nomeRepresentada, null, formaMaterial,
-				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
-
-		pedido = new Pedido();
-		pedido.setId(idPedido);
-		pedido.setSituacaoPedido(situacaoPedido);
-		pedido.setDataEnvio(dataEnvio);
-	}
-
 	// Construtor para relatorio de comissao
 	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario, String nomeProprietario,
 			String sobrenomeProprietario, Double precoUnidade, Double precoCusto, Integer quantidade,
@@ -266,6 +250,27 @@ public class ItemPedido extends Item {
 		this.dataEntrega = dataEntrega;
 		this.quantidadeRecepcionada = quantidadeRecepcionada;
 		this.quantidadeReservada = quantidadeReservada;
+	}
+
+	// Construtor implementado para o relatorio de itens dos pedidos de um
+	// determinado cliente que eh fornecida na tela de cliente.
+	public ItemPedido(Integer idPedido, SituacaoPedido situacaoPedido, Date dataEnvio, String nomeRepresentada,
+			Integer id, Integer sequencial, Integer quantidade, Double precoUnidade, FormaMaterial formaMaterial,
+			String siglaMaterial, String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna,
+			Double comprimento, TipoVenda tipoVenda, Double precoVenda, Double aliquotaIPI, Double aliquotaICMS) {
+
+		this(id, sequencial, idPedido, null, quantidade, null, null, precoUnidade, nomeRepresentada, null, formaMaterial,
+				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
+
+		pedido = new Pedido();
+		pedido.setId(idPedido);
+		pedido.setSituacaoPedido(situacaoPedido);
+		pedido.setDataEnvio(dataEnvio);
+
+		this.tipoVenda = tipoVenda;
+		this.precoVenda = precoVenda;
+		this.aliquotaIPI = aliquotaIPI;
+		this.aliquotaICMS = aliquotaICMS;
 	}
 
 	public void addQuantidadeReservada(Integer quantidadeReservada) {

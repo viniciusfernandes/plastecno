@@ -263,7 +263,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				.append("select new ItemPedido(i.pedido.id, i.pedido.situacaoPedido, i.pedido.dataEnvio, i.pedido.representada.nomeFantasia, i.id, i.sequencial, i.quantidade, i.precoUnidade, i.formaMaterial, ");
 
 		select
-				.append("i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento) from ItemPedido i ");
+				.append("i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento, i.tipoVenda, i.precoVenda, i.aliquotaIPI, i.aliquotaICMS) from ItemPedido i ");
 		select.append("where i.pedido.cliente.id = :idCliente ");
 
 		if (idProprietario != null) {

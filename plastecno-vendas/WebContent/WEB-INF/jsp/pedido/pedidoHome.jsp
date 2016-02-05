@@ -392,16 +392,20 @@ $(document).ready(function() {
 		<div id="paginador"></div>
 		<div>
 			<table id="tabelaItemPedido" class="listrada">
-			<caption>${relatorio.titulo}</caption>
 			<thead>
 				<tr>
+					<th style="width: 10%">Situaç.</th>
 					<th style="width: 10%">Pedido</th>
-					<th style="width: 2%">Item</th>
+					<th style="width: 5%">Item</th>
 					<th style="width: 5%">Qtde.</th>
-					<th style="width: 50%">Descrição</th>
-					<th style="width: 20%">Venda (R$)</th>
-					<th style="width: 10%">Valor Comiss. (R$)</th>
-					<th style="width: 5%">Ações</th>
+					<th style="width: 35%">Descrição</th>
+					<th style="width: 5%">Venda</th>
+					<th style="width: 5%">Preço (R$)</th>
+					<th style="width: 5%">Unid. (R$)</th>
+					<th style="width: 10%">Total (R$)</th>
+					<th style="width: 5%">IPI (%)</th>
+					<th style="width: 5%">ICMS (%)</th>
+					<th>Ações</th>
 				</tr>
 			</thead>
 
@@ -411,21 +415,26 @@ $(document).ready(function() {
 					<c:forEach items="${grupo.listaElemento}" var="item" varStatus="iElemento">
 						<tr>
 							<c:if test="${iElemento.count le 1}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.situacaoPedido}</td>
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.id}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" style="text-align: center;">${item.tipoVenda}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoVendaFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoUnidadeFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valorComissionadoFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaIPIFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaICMSFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
-							<div class="coluna_acoes_listagem">
-								<form action="<c:url value="/pedido/pdf"/>">
-									<input type="hidden" name="idPedido" value="${pedido.id}"/>
-									<input type="submit" title="Vizualizar Pedido PDF" value="" class="botaoPDF" />
-								</form>
-							</div>
-						</td>
+								<div class="coluna_acoes_listagem">
+									<form action="<c:url value="/pedido/pdf"/>">
+										<input type="hidden" name="idPedido" value="${grupo.id.id}"/>
+										<input type="submit" title="Vizualizar Pedido PDF" value="" class="botaoPDF" />
+									</form>
+								</div>
+							</td>
 						</tr>
 					</c:forEach>
 				</c:forEach>
@@ -433,54 +442,7 @@ $(document).ready(function() {
 			</tbody>
 			
 		</table>
-		
-		
-		
-			<table class="listrada">
-				<thead>
-					<tr>
-						<th style="width: 10%">Situação</th>
-						<th style="width: 10%">Nr. Pedido</th>
-						<th style="width: 10%">Nr. Pedido Cliente</th>
-						<th style="width: 23%">${not empty tipoPedido ? 'Fornecedor': 'Representada'}</th>
-						<th style="width: 22%">Vendedor</th>
-						<th style="width: 10%">Data Envio.</th>
-						<th style="width: 8%">Valor (R$)</th>
-						<th style="width: 7%">Ações</th>
-					</tr>
-				</thead>
-
-				<tbody>
-					<c:forEach var="pedido" items="${listaPedido}">
-						<tr>
-							<td style="text-align: center;">${pedido.situacaoPedido.descricao}</td>
-							<td>${pedido.id}</td>
-							<td>${pedido.numeroPedidoCliente}</td>
-							<td>${pedido.representada.nomeFantasia}</td>
-							<td>${pedido.proprietario.nomeCompleto}</td>
-							<td style="text-align: center;">${pedido.dataEnvioFormatada}</td>
-							<td style="text-align: right;">${pedido.valorPedido}</td>
-							<td>
-								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/pedido/pdf"/>">
-										<input type="hidden" name="tipoPedido" value="${pedido.tipoPedido}" /> 
-										<input type="hidden" name="idPedido" value="${pedido.id}" />
-										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
-									</form>
-									<form action="<c:url value="/pedido/${pedido.id}"/>" method="get">
-										<input type="hidden" name="tipoPedido" value="${pedido.tipoPedido}" /> 
-										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
-										<input type="hidden" name="id" value="${pedido.id}" />
-									</form>
-								</div>
-
-							</td>
-						</tr>
-
-					</c:forEach>
-				</tbody>
-
-			</table>
+			
 		</div>
 	</fieldset>
 	

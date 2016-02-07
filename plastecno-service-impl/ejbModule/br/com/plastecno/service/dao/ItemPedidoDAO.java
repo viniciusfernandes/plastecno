@@ -256,11 +256,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return query.getResultList();
 	}
 
-	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idProprietario,
-			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
+			Integer idProprietario, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
 		StringBuilder select = new StringBuilder();
 		select
-				.append("select new ItemPedido(i.pedido.id, i.pedido.situacaoPedido, i.pedido.dataEnvio, i.pedido.representada.nomeFantasia, i.id, i.sequencial, i.quantidade, i.precoUnidade, i.formaMaterial, ");
+				.append("select new ItemPedido(i.pedido.id, i.pedido.situacaoPedido, i.pedido.dataEnvio, i.pedido.tipoPedido, i.pedido.representada.nomeFantasia, i.id, i.sequencial, i.quantidade, i.precoUnidade, i.formaMaterial, ");
 
 		select
 				.append("i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento, i.tipoVenda, i.precoVenda, i.aliquotaIPI, i.aliquotaICMS) from ItemPedido i ");
@@ -279,7 +280,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		} else {
 			select.append(" and i.pedido.tipoPedido != :tipoPedido ");
 		}
-		select.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc, i.pedido.cliente.nomeFantasia ");
+		select.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idCliente", idCliente);

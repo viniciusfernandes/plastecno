@@ -415,7 +415,7 @@ $(document).ready(function() {
 					<c:forEach items="${grupo.listaElemento}" var="item" varStatus="iElemento">
 						<tr>
 							<c:if test="${iElemento.count le 1}">
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.situacaoPedido}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.situacaoPedido.descricao}</td>
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.id}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
@@ -430,8 +430,14 @@ $(document).ready(function() {
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/pedido/pdf"/>">
-										<input type="hidden" name="idPedido" value="${grupo.id.id}"/>
-										<input type="submit" title="Vizualizar Pedido PDF" value="" class="botaoPDF" />
+										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
+										<input type="hidden" name="idPedido" value="${grupo.id.id}" />
+										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
+									</form>
+									<form action="<c:url value="/pedido/${grupo.id.id}"/>" method="get">
+										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
+										<input type="hidden" name="id" value="${grupo.id.id}" />
+										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
 									</form>
 								</div>
 							</td>

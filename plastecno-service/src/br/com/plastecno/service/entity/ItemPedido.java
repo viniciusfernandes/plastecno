@@ -18,6 +18,7 @@ import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -254,10 +255,11 @@ public class ItemPedido extends Item {
 
 	// Construtor implementado para o relatorio de itens dos pedidos de um
 	// determinado cliente que eh fornecida na tela de cliente.
-	public ItemPedido(Integer idPedido, SituacaoPedido situacaoPedido, Date dataEnvio, String nomeRepresentada,
-			Integer id, Integer sequencial, Integer quantidade, Double precoUnidade, FormaMaterial formaMaterial,
-			String siglaMaterial, String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna,
-			Double comprimento, TipoVenda tipoVenda, Double precoVenda, Double aliquotaIPI, Double aliquotaICMS) {
+	public ItemPedido(Integer idPedido, SituacaoPedido situacaoPedido, Date dataEnvio, TipoPedido tipoPedido,
+			String nomeRepresentada, Integer id, Integer sequencial, Integer quantidade, Double precoUnidade,
+			FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial, String descricaoPeca,
+			Double medidaExterna, Double medidaInterna, Double comprimento, TipoVenda tipoVenda, Double precoVenda,
+			Double aliquotaIPI, Double aliquotaICMS) {
 
 		this(id, sequencial, idPedido, null, quantidade, null, null, precoUnidade, nomeRepresentada, null, formaMaterial,
 				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
@@ -266,6 +268,7 @@ public class ItemPedido extends Item {
 		pedido.setId(idPedido);
 		pedido.setSituacaoPedido(situacaoPedido);
 		pedido.setDataEnvio(dataEnvio);
+		pedido.setTipoPedido(tipoPedido);
 
 		this.tipoVenda = tipoVenda;
 		this.precoVenda = precoVenda;

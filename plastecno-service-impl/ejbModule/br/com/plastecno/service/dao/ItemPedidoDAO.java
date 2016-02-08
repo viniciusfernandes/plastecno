@@ -1,5 +1,7 @@
 package br.com.plastecno.service.dao;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -259,30 +261,30 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
 			Integer idProprietario, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
-		StringBuilder select = new StringBuilder();
-		select
-				.append("select new ItemPedido(i.pedido.id, i.pedido.situacaoPedido, i.pedido.dataEnvio, i.pedido.tipoPedido, i.pedido.representada.nomeFantasia, i.id, i.sequencial, i.quantidade, i.precoUnidade, i.formaMaterial, ");
 
-		select
-				.append("i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento, i.tipoVenda, i.precoVenda, i.aliquotaIPI, i.aliquotaICMS) from ItemPedido i ");
-		select.append("where i.pedido.cliente.id = :idCliente ");
+		// Tivemos que particionar a consulta em 2 etapas pois a paginacao deve ser
+		// feita na consulta de pedidos, mas estava sendo realizada na consulta de
+		// itens de pedidos, isto eh, retornavamos apenas 10 itens por consulta
+		// quando devemos na verdade retornar 10 pedidos por consulta.
+		StringBuilder selectPedido = new StringBuilder();
+		selectPedido.append("select p.id from Pedido p where p.cliente.id = :idCliente ");
 
 		if (idProprietario != null) {
-			select.append(" and i.pedido.proprietario.id = :idVendedor ");
+			selectPedido.append(" and p.proprietario.id = :idVendedor ");
 		}
 
 		if (idFornecedor != null) {
-			select.append(" and i.pedido.representada.id = :idFornecedor ");
+			selectPedido.append(" and p.representada.id = :idFornecedor ");
 		}
 
 		if (isCompra) {
-			select.append(" and i.pedido.tipoPedido = :tipoPedido ");
+			selectPedido.append(" and p.tipoPedido = :tipoPedido ) ");
 		} else {
-			select.append(" and i.pedido.tipoPedido != :tipoPedido ");
+			selectPedido.append(" and p.tipoPedido != :tipoPedido ) ");
 		}
-		select.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc");
+		selectPedido.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc");
 
-		Query query = this.entityManager.createQuery(select.toString());
+		Query query = this.entityManager.createQuery(selectPedido.toString());
 		query.setParameter("idCliente", idCliente);
 
 		if (idProprietario != null) {
@@ -294,7 +296,20 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		query.setParameter("tipoPedido", TipoPedido.COMPRA);
-		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
+
+		List<Object[]> listaIdPedido = QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
+		StringBuilder selectItem = new StringBuilder();
+
+		selectItem
+				.append("select new ItemPedido(i.pedido.id, i.pedido.situacaoPedido, i.pedido.dataEnvio, i.pedido.tipoPedido, i.pedido.representada.nomeFantasia, i.id, i.sequencial, i.quantidade, i.precoUnidade, i.formaMaterial, ");
+
+		selectItem
+				.append("i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento, i.tipoVenda, i.precoVenda, i.aliquotaIPI, i.aliquotaICMS) from ItemPedido i ");
+		selectItem.append("where i.pedido.id in (:listaIdPedido) ");
+		selectItem.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc");
+
+		return entityManager.createQuery(selectItem.toString(), ItemPedido.class)
+				.setParameter("listaIdPedido", Arrays.asList(listaIdPedido.toArray(new Integer[] {}))).getResultList();
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,

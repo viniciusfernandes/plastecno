@@ -595,3 +595,5 @@ alter table vendas.tb_item_pedido add preco_minimo numeric(9, 2) default null;
 
 alter table vendas.tb_representada add aliquota_icms numeric(5, 2) default null;
 alter table vendas.tb_item_estoque add preco_medio_fatoricms numeric(9, 2) default null;
+
+alter table vendas.tb_representada  ALTER COLUMN comissao SET DATA TYPE numeric(5, 3);

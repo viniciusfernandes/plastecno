@@ -6,6 +6,7 @@
 <meta charset="utf-8">
 
 <jsp:include page="/bloco/bloco_css.jsp" />
+<jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
@@ -78,6 +79,15 @@ $(document).ready(function() {
 		
 	});
 	
+	$("#botaoPesquisaPedido").click(function() {
+		$('#formPesquisa #tipoPedidoPesquisa').val($('#formPedido #tipoPedido').val());
+		$('#formPesquisa #idFornecedorPesquisa').val($('#formPedido #representada').val());
+		$('#formPesquisa #idClientePesquisa').val($('#formPedido #idCliente').val());
+		$('#formPesquisa #idVendedorPesquisa').val($('#formPedido #idVendedor').val());
+		var form = $(this).closest('form'); 
+		form.submit();
+	});
+	
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	
 	inserirMascaraData('dataEntrega');
@@ -91,7 +101,7 @@ $(document).ready(function() {
 	inserirMascaraMonetaria('comprimento', 8);
 	inserirMascaraMonetaria('medidaExterna', 8);
 	inserirMascaraMonetaria('medidaInterna', 8);
-	
+	inserirMascaraNumerica('prazoEntrega', '999');
 
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
@@ -159,14 +169,15 @@ $(document).ready(function() {
 
 	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>" method="post">
 		<fieldset>
-			<legend>::: Dados do Pedido de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
+			<legend>::: Dados do ${orcamento ? 'Orçamento': 'Pedido'} de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 
 			<!-- O campo id do pedido eh hidden pois o input text nao eh enviado na edicao do formulario pois esta "disabled" -->
 			<input type="hidden" id="numeroPedido" name="pedido.id" value="${pedido.id}" /> 
 			<input type="hidden" id="idCliente" name="pedido.cliente.id" value="${cliente.id}" /> 
 			<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${proprietario.id}" /> 
-			<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${representadaSelecionada.id}" />
+			<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
 			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
+			<input type="hidden" id="orcamento" name="pedido.orcamento" value="${empty orcamento ? false : orcamento}" />
 
 			
 			<div class="label">${not empty tipoPedido ? 'Comprador:': 'Vendedor:'}</div>
@@ -175,24 +186,12 @@ $(document).ready(function() {
 					value="${proprietario.nome} - ${proprietario.email}" disabled="disabled"
 					class="uppercaseBloqueado desabilitado" />
 			</div>
-			<!-- Verificamos se o tipo de pedido foi preenchido pois pedido de compra nao tera orcamento -->
-			<c:choose>
-				<c:when test="${empty tipoPedido and not pedidoDesabilitado}">
-					<div class="label" style="width: 10%">Orçamento:</div>
-					<div class="input" style="width: 30%">
-						<input type="checkbox" id="orcamento" name="pedido.orcamento"
-							<c:if test="${pedido.orcamento}">checked</c:if> class="checkbox" />
-					</div>
-				</c:when>
-				<c:when test="${not empty tipoPedido or pedidoDesabilitado}">
-					<div class="label" style="width: 10%">Situação:</div>
+			<div class="label" style="width: 10%">Situação:</div>
 					<div class="input" style="width: 20%">
 						<input type="text" id="situacaoPedido" name="pedido.situacaoPedido"
-							value="${pedido.situacaoPedido}" class="desabilitado"/>
-					</div>
-				</c:when>
-			</c:choose>
-
+							value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled"/>
+			</div>
+			
 			<div class="label">Nr. Pedido:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoPesquisa" value="${pedido.id}"
@@ -220,11 +219,9 @@ $(document).ready(function() {
 				<input type="text" id="dataEntrega" name="pedido.dataEntrega"
 					value="${pedido.dataEntregaFormatada}" />
 			</div>
-			<div class="label" style="width: 17%">Data Inclusão:</div>
+			<div class="label" style="width: 17%">Prazo Entrega:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="dataInclusao"
-					value="${pedido.dataInclusaoFormatada}" readonly="readonly"
-					class="desabilitado" />
+				<input type="text" id="prazoEntrega" name="pedido.prazoEntrega" value="${pedido.prazoEntrega}"/>
 			</div>
 			<div class="label" style="width: 12%">Data Envio:</div>
 			<div class="input" style="width: 30%">
@@ -278,7 +275,7 @@ $(document).ready(function() {
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="representada" items="${listaRepresentada}">
 						<option value="${representada.id}"
-							<c:if test="${representada eq representadaSelecionada}">selected</c:if>>${representada.nomeFantasia}</option>
+							<c:if test="${representada.id eq idRepresentadaSelecionada}">selected</c:if>>${representada.nomeFantasia}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -335,31 +332,36 @@ $(document).ready(function() {
 	</form>
 	<div class="bloco_botoes">
 		<form id="formPesquisa" action="pedido/listagem" method="get">
-			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
-			<input type="hidden" name="idCliente" id="idClientePesquisa" value="${cliente.id}" /> 
-			<input type="submit" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
+			<input type="hidden" name="tipoPedido"  id="tipoPedidoPesquisa" value="${tipoPedido}"/> 
+			<input type="hidden" name="idCliente" id="idClientePesquisa"  value="${cliente.id}"/> 
+			<input type="hidden" name="idFornecedor" id="idFornecedorPesquisa" value="${idRepresentadaSelecionada}"/>
+			<input type="hidden" name="idVendedor" id="idVendedorPesquisa" value="${proprietario.id}"/>  
+			<input type="hidden" name="orcamento" id="orcamento" value="${empty orcamento ? false : orcamento}"/>
+			<input type="button" id="botaoPesquisaPedido" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
 		</form>
 		<form action="pedido/limpar" method="get">
-			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
+			<input type="hidden" name="tipoPedido" value="${tipoPedido}" />
+			<input type="hidden" name="orcamento" id="orcamento" value="${empty orcamento ? false : orcamento}"/>
 			<input type="submit" value="" title="Limpar Dados do Pedido" class="botaoLimpar" />
 		</form>
 		<form action="pedido/pdf" method="get">
 			<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
-			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}" /> 
+			<input type="hidden" name="idPedido" id="idPedidoImpressao" value="${pedido.id}" />
 			<input type="button" id="botaoImpressaoPedido" value="" title="Imprimir Pedido" class="botaoPDF" />
 		</form>
 
 		<c:if test="${acessoRefazerPedidoPermitido}">
 			<form action="pedido/refazer" method="post">
 				<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
-				<input type="hidden" name="idPedido" id="idPedido" value="${pedido.id}" /> 
+				<input type="hidden" name="idPedido" id="idPedido" value="${pedido.id}" />
+				<input type="hidden" name="orcamento" id="orcamento" value="${empty orcamento ? false : orcamento}"/>
 				<input id="botaoRefazerPedido" type="button" value="" title="Refazer Pedido" class="botaoRefazer" />
 			</form>
 		</c:if>
 		<c:if test="${acessoCancelamentoPedidoPermitido}">
 			<form action="pedido/cancelamento" method="post">
 				<input type="hidden" name="tipoPedido" value="${tipoPedido}" /> 
-				<input type="hidden" name="idPedido" id="idPedidoCancelamento" value="${pedido.id}" /> 
+				<input type="hidden" name="idPedido" id="idPedidoCancelamento" value="${pedido.id}" />
 				<input id="botaoCancelarPedido" type="button" value="" title="Cancelar Pedido" class="botaoCancelar" />
 			</form>
 		</c:if>
@@ -389,51 +391,64 @@ $(document).ready(function() {
 		<legend>::: Resultado da Pesquisa de Pedidos de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
 		<div id="paginador"></div>
 		<div>
-			<table class="listrada">
-				<thead>
-					<tr>
-						<th style="width: 10%">Situação</th>
-						<th style="width: 10%">Nr. Pedido</th>
-						<th style="width: 10%">Nr. Pedido Cliente</th>
-						<th style="width: 23%">${not empty tipoPedido ? 'Fornecedor': 'Representada'}</th>
-						<th style="width: 22%">Vendedor</th>
-						<th style="width: 10%">Data Incl.</th>
-						<th style="width: 8%">Valor (R$)</th>
-						<th style="width: 7%">Ações</th>
-					</tr>
-				</thead>
+			<table id="tabelaItemPedido" class="listrada">
+			<thead>
+				<tr>
+					<th style="width: 10%">Situaç.</th>
+					<th style="width: 10%">Pedido</th>
+					<th style="width: 5%">Item</th>
+					<th style="width: 5%">Qtde.</th>
+					<th style="width: 35%">Descrição</th>
+					<th style="width: 5%">Venda</th>
+					<th style="width: 5%">Preço (R$)</th>
+					<th style="width: 5%">Unid. (R$)</th>
+					<th style="width: 10%">Total (R$)</th>
+					<th style="width: 5%">IPI (%)</th>
+					<th style="width: 5%">ICMS (%)</th>
+					<th>Ações</th>
+				</tr>
+			</thead>
 
-				<tbody>
-					<c:forEach var="pedido" items="${listaPedido}">
+			<tbody>
+			
+			<c:forEach items="${relatorioItemPedido.listaGrupo}" var="grupo" varStatus="iGrupo">
+					<c:forEach items="${grupo.listaElemento}" var="item" varStatus="iElemento">
 						<tr>
-							<td style="text-align: center;">${pedido.situacaoPedido.descricao}</td>
-							<td>${pedido.id}</td>
-							<td>${pedido.numeroPedidoCliente}</td>
-							<td>${pedido.representada.nomeFantasia}</td>
-							<td>${pedido.proprietario.nomeCompleto}</td>
-							<td style="text-align: center;">${pedido.dataInclusaoFormatada}</td>
-							<td style="text-align: right;">${pedido.valorPedido}</td>
-							<td>
+							<c:if test="${iElemento.count le 1}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.situacaoPedido.descricao}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.id}</td>
+							</c:if>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" style="text-align: center;">${item.tipoVenda}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoVendaFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoUnidadeFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaIPIFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaICMSFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/pedido/pdf"/>">
-										<input type="hidden" name="tipoPedido" value="${pedido.tipoPedido}" /> 
-										<input type="hidden" name="idPedido" value="${pedido.id}" />
+										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
+										<input type="hidden" name="idPedido" value="${grupo.id.id}" />
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
 									</form>
-									<form action="<c:url value="/pedido/${pedido.id}"/>" method="get">
-										<input type="hidden" name="tipoPedido" value="${pedido.tipoPedido}" /> 
+									<form action="<c:url value="/pedido/${grupo.id.id}"/>" method="get">
+										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
+										<input type="hidden" name="id" value="${grupo.id.id}" />
 										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
-										<input type="hidden" name="id" value="${pedido.id}" />
 									</form>
 								</div>
-
 							</td>
 						</tr>
-
 					</c:forEach>
-				</tbody>
+				</c:forEach>
 
-			</table>
+			</tbody>
+			
+		</table>
+			
 		</div>
 	</fieldset>
 	

@@ -78,7 +78,8 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("idRepresentadaSelecionada", idRepresentada);
-        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        irTopoPagina();
     }
 
     @Get("compra/recepcao")
@@ -114,7 +115,7 @@ public class RecepcaoCompraController extends AbstractController {
         alteracaoEstoquePublisher.publicar();
 
         addAtributo("permanecerTopo", true);
-        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Post("compra/item/recepcao")

@@ -41,10 +41,10 @@ $(document).ready(function() {
 		$('#formVazio').attr('action', action).attr('method', 'post').submit();
 	});
 	
-	$('#botaoEnviarEncomenda').click(function () {
+	$('#botaoComprar').click(function () {
 
 		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ENVIAR ESSES PEDIDOS PARA COMPRAR?',
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja COMPRAR OS ITEN(S) DO(S) PEDIDO(S)?',
 			confirmar: function(){
 				var parametros = $('#formPesquisa').serialize();
 				parametros+='&idRepresentadaFornecedora='+$('#fornecedor').val();
@@ -86,7 +86,7 @@ function inicializarAutocompleteCliente(){
 	});
 };
 
-function encomendarItem(campo){
+function selecionarItemPedido(campo){
 	if(campo.checked){
 		listaIdItem.push(campo.value);	
 	} else {
@@ -145,7 +145,7 @@ function encomendarItem(campo){
 			</select>
 		</div>
 		<div class="bloco_botoes">
-			<input type="button" id="botaoEnviarEncomenda" title="Enviar Itens para Compras" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoComprar" title="Comprar Itens" value="" class="botaoEnviarEmail"/>
 		</div>
 		<table id="tabelaItemEncomenda" class="listrada">
 			<thead>
@@ -170,7 +170,7 @@ function encomendarItem(campo){
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.id}</td>
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.propriedades['dataEntrega']}</td>
 							</c:if>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}"><input type="checkbox" name="idItemPedido" value="${item.id}" onclick="encomendarItem(this)"/></td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}"><input type="checkbox" name="idItemPedido" value="${item.id}" onclick="selecionarItemPedido(this)"/></td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeEncomendada}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>

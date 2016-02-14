@@ -49,7 +49,7 @@ public class RepresentadaController extends AbstractController {
     private void formataDocumentos(Representada representada) {
         representada.setCnpj(formatarCNPJ(representada.getCnpj()));
         representada.setInscricaoEstadual(formatarInscricaoEstadual(representada.getInscricaoEstadual()));
-        representada.setComissao(NumeroUtils.gerarPercentual(representada.getComissao()));
+        representada.setComissao(NumeroUtils.gerarPercentual(representada.getComissao(), 2));
         representada.setAliquotaICMS(NumeroUtils.gerarPercentual(representada.getAliquotaICMS()));
     }
 
@@ -84,7 +84,7 @@ public class RepresentadaController extends AbstractController {
                 representada.addContato(listaContato);
             }
 
-            representada.setComissao(NumeroUtils.gerarAliquota(representada.getComissao()));
+            representada.setComissao(NumeroUtils.gerarAliquota(representada.getComissao(), 3));
             representada.setAliquotaICMS(NumeroUtils.gerarAliquota(representada.getAliquotaICMS()));
 
             this.representadaService.inserir(representada);

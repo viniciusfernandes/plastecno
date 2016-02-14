@@ -432,7 +432,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = 93.57d;
+		Double precoMinimo = 93.57;
 
 		Double precoMinimoCalculado = null;
 		try {
@@ -465,7 +465,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMinimo = NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio());
+		Double precoMinimo = 75.95;
 		Double precoMinimoCalculado = null;
 		try {
 			itemEstoque.setPrecoMedioFatorICMS(null);
@@ -536,7 +536,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
-		Double precoFatorICMS = 85.06;
+		Double precoFatorICMS = 76.63;
 
 		assertEquals(
 				"Apos a inclusao de um item novo deve-se aplicar o fator ICMS no preco de custo. Verifique o algoritmo de calculo",
@@ -804,8 +804,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		Double precoMedioReajustadoCH = 110d;
 		Double precoMedioFatorICMSReajustadoCH = 123.2d;
 
-		Double precoMedioReajustadoTB = 75.95d;
-		Double precoMedioFatorICMSReajustadoTB = 85.06d;
+		Double precoMedioReajustadoTB = 68.42d;
+		Double precoMedioFatorICMSReajustadoTB = 76.63d;
 
 		assertEquals("O preco medio de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
 				precoMedioReajustadoCH, NumeroUtils.arredondarValorMonetario(itemCH.getPrecoMedio()));
@@ -868,8 +868,8 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMedioReajustado = 83.55d;
-		Double precoMedioFatorICMSReajustado = 93.57d;
+		Double precoMedioReajustado = 75.27d;
+		Double precoMedioFatorICMSReajustado = 84.3d;
 
 		// Pesquisando o item resjustado
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
@@ -932,7 +932,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
 
 		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
-		Double precoMedioComFatorIPI = 75.95;
+		Double precoMedioComFatorIPI = 68.42;
 
 		assertEquals("O valor do preco medio apos a recepcao da compra deve conter o ipi. Os valores nao conferem",
 				precoMedioComFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
@@ -1137,7 +1137,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 
-		Double precoFatorICMS = 197.06;
+		Double precoFatorICMS = 188.63;
 
 		itemEstoque.setPrecoMedio(itemEstoque.getPrecoMedio() + 100);
 		try {
@@ -1699,10 +1699,10 @@ public class EstoqueServiceTest extends AbstractTest {
 				printMensagens(e);
 			}
 		}
-		Double totalEstoque = 1.11;
+		Double totalEstoque = 1.0;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.BQ));
 
-		totalEstoque = 2.22;
+		totalEstoque = 2.0;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.TB));
 	}
 
@@ -1716,7 +1716,7 @@ public class EstoqueServiceTest extends AbstractTest {
 				printMensagens(e);
 			}
 		}
-		Double totalEstoque = 3.33d;
+		Double totalEstoque = 3.0d;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, null));
 	}
 

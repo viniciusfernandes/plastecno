@@ -37,7 +37,9 @@ $(document).ready(function() {
 		var parametros = tabelaLogradouroHandler.gerarListaParametro('listaLogradouro');
 		parametros += tabelaContatoHandler.gerarListaParametro('listaContato');
 		parametros += pickListToParameter('listaIdTransportadoraAssociada');
-	
+		parametros += '&comentario='+$('#bloco_comentario #comentario').val();
+		parametros += '&isRevendedor='+<c:out value="${isRevendedor}"/>
+		
 		$('#formCliente').attr("action",$('#formCliente').attr("action")+'?'+ parametros);
 		$('#formCliente').submit();
 						
@@ -60,7 +62,7 @@ $(document).ready(function() {
 	
 	$("#botaoIncluirComentario").click(function () {
 		if(!isEmpty($("#comentario").val())) {
-			$(this).closest('form').submit();			
+			$('#botaoInserirCliente').click();		
 		}
 	});
 	
@@ -81,6 +83,13 @@ $(document).ready(function() {
 	
 	var urlTela = '<c:url value="/cliente"/>'; 
 	tabelaLogradouroHandler = inicializarBlocoLogradouro(urlTela);
+	tabelaLogradouroHandler.setNumeroLinhasCopiadas(3);
+	tabelaLogradouroHandler.ajustarLinhasCopiadas(function(linhas){
+		var tipos = ['FATURAMENTO', 'ENTREGA', 'COBRANCA'];
+		tipos.splice(tipos.indexOf(linhas[0].cells[1].innerHTML), 1);
+		linhas[1].cells[1].innerHTML = tipos[0];
+		linhas[2].cells[1].innerHTML = tipos[1];
+	});
 	tabelaContatoHandler = inicializarBlocoContato(urlTela);
 	
 	new PickList().initPickList();
@@ -96,7 +105,6 @@ $(document).ready(function() {
 			formVazio.submit();
 		}
 	});
-
 });
 
 function inicializarFiltro() {
@@ -200,6 +208,11 @@ function remover(codigo, nome) {
 					value="${cliente.inscricaoEstadual}"
 					style="width: 40%; text-align: right;" />
 			</div>
+			<div class="label">Doc. Estrang.:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" id="documentoEstrangeiro" name="cliente.documentoEstrangeiro" 
+				value="${cliente.documentoEstrangeiro}" maxlength="15" style="width: 25%" />
+			</div>
 			<div class="label">CPF:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" id="cpf" name="cliente.cpf"
@@ -211,13 +224,16 @@ function remover(codigo, nome) {
 					value="${cliente.email}"
 					class="apenasLowerCase uppercaseBloqueado lowerCase pesquisavel" />
 			</div>
-
-			<div class="label">Site:</div>
+			<div class="label">Email Cobrança:</div>
 			<div class="input" style="width: 40%">
+				<input type="text" id="emailCobranca" name="cliente.emailCobranca"
+					value="${cliente.emailCobranca}" style="width: 80%" class="apenasLowerCase uppercaseBloqueado lowerCase"/>
+			</div>
+			<div class="label">Site:</div>
+			<div class="input" style="width: 20%">
 				<input type="text" id="site" name="cliente.site"
 					value="${cliente.site}"
-					class="apenasLowerCase uppercaseBloqueado lowerCase"
-					style="width: 80%" />
+					class="apenasLowerCase uppercaseBloqueado lowerCase" />
 			</div>
 		</form>
 	</fieldset>
@@ -236,9 +252,6 @@ function remover(codigo, nome) {
 	
 	<fieldset id="bloco_comentario">
 		<legend>::: Comentários :::</legend>
-		<form action="<c:url value="/cliente/inclusao/comentario?isRevendedor=${isRevendedor}"/>"
-			method="post">
-			<input type="hidden" value="${cliente.id}" name="idCliente" />
 			<div class="label condicional">Comentário:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" id="comentario" name="comentario" value="${comentario}" style="width: 100%" />
@@ -251,7 +264,6 @@ function remover(codigo, nome) {
 				</c:if>
 			</div>
 
-		</form>
 		<div class="label condicional">Histórico:</div>
 		<div class="input areatexto" style="width: 80%">
 			<textarea style="width: 100%;" disabled="disabled">

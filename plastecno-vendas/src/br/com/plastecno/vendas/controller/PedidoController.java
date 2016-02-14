@@ -2,7 +2,6 @@ package br.com.plastecno.vendas.controller;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +37,9 @@ import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
-import br.com.plastecno.service.wrapper.PaginacaoWrapper;
+import br.com.plastecno.service.relatorio.RelatorioService;
+import br.com.plastecno.service.wrapper.GrupoWrapper;
+import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ClienteJson;
@@ -107,6 +108,9 @@ public class PedidoController extends AbstractController {
 
     @Servico
     private PedidoService pedidoService;
+
+    @Servico
+    private RelatorioService relatorioService;
 
     @Servico
     private RepresentadaService representadaService;
@@ -207,7 +211,7 @@ public class PedidoController extends AbstractController {
         }
 
         if (pedido != null) {
-            addAtributo("representadaSelecionada", pedido.getRepresentada());
+            addAtributo("idRepresentadaSelecionada", pedido.getRepresentada().getId());
             addAtributo("ipiDesabilitado", !pedido.getRepresentada().isIPIHabilitado());
         }
     }
@@ -217,17 +221,6 @@ public class PedidoController extends AbstractController {
         listaSituacao.add(SituacaoPedido.DIGITACAO);
         listaSituacao.add(SituacaoPedido.ORCAMENTO);
         return listaSituacao;
-    }
-
-    /*
-     * Metodo dedicado a paginar os pedidos no caso em que o usuario seja um
-     * administrador, sendo assim, ele podera consultar os pedidos de todos os
-     * vendedores
-     */
-    private PaginacaoWrapper<Pedido> gerarPaginacaoPedido(Integer idCliente, boolean isCompra, Integer paginaSelecionada) {
-        final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
-        return this.pedidoService.paginarPedido(idCliente, getCodigoUsuario(), isCompra, indiceRegistroInicial,
-                getNumerRegistrosPorPagina());
     }
 
     private PedidoPDFWrapper gerarPDF(Integer idPedido, TipoPedido tipoPedido) throws BusinessException {
@@ -281,6 +274,35 @@ public class PedidoController extends AbstractController {
 
         geradorRelatorio.processar(new File(diretorioTemplateRelatorio + "/pedido.html"));
         return new PedidoPDFWrapper(pedido, geradorRelatorio.gerarPDF());
+    }
+
+    /*
+     * Metodo dedicado a gerar relatorio paginado dos itens dos pedidos no caso
+     * em que o usuario seja um administrador, sendo assim, ele podera consultar
+     * os pedidos de todos os vendedores
+     */
+    private RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioPaginadoItemPedido(Integer idCliente,
+            Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer paginaSelecionada) {
+        final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
+
+        // Essa variavel eh utilizada para decidirmos se queremos recuperar
+        // todos os pedidos de um determinado cliente independentemente do
+        // vendedor. Essa acao sera disparada por qualquer um que seja
+        // adiministrador do sistema, podendo ser um outro vendedor ou nao.
+        boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+        RelatorioWrapper<Pedido, ItemPedido> relatorio = relatorioService
+                .gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, pesquisarTodos ? null
+                        : idVendedor, idFornecedor, isCompra, indiceRegistroInicial, getNumerRegistrosPorPagina());
+
+        for (GrupoWrapper<Pedido, ItemPedido> grupo : relatorio.getListaGrupo()) {
+            formatarPedido(grupo.getId());
+
+            for (ItemPedido itemPedido : grupo.getListaElemento()) {
+                formatarItemPedido(itemPedido);
+            }
+        }
+
+        return relatorio;
     }
 
     private void inicializarListaSituacaoPedido() {
@@ -357,14 +379,25 @@ public class PedidoController extends AbstractController {
              * recuperamos o usuario que efetuou a venda. Precisamo recuperar o
              * vendedor, pois o JSON devera conter o nome e email do vendedor.
              */
-            final Usuario proprietario = pedido.getId() == null ? this.usuarioService
-                    .pesquisarUsuarioResumidoById(getCodigoUsuario()) : this.pedidoService.pesquisarProprietario(pedido
+            final Usuario proprietario = pedido.getId() == null ? usuarioService
+                    .pesquisarUsuarioResumidoById(getCodigoUsuario()) : pedidoService.pesquisarProprietario(pedido
                     .getId());
 
             pedido.setProprietario(proprietario);
-            pedidoService.inserir(pedido);
+            if (pedido.isOrcamento()) {
+                pedidoService.inserirOrcamento(pedido);
+            } else {
+                pedidoService.inserir(pedido);
+            }
+
+            addAtributo("orcamento", pedido.isOrcamento());
             formatarPedido(pedido);
+            // Esse comando eh para configurar o id do cliente que sera
+            // serializado para o preenchimento do id na tela quando o cliente
+            // nao existe no caso do orcamento.
+            pedido.setIdCliente(pedido.getCliente().getId());
             serializarJson(new SerializacaoJson(pedido).incluirAtributo("situacaoPedido", "proprietario"));
+
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
@@ -390,9 +423,16 @@ public class PedidoController extends AbstractController {
     }
 
     @Get("pedido/limpar")
-    public void limpar(TipoPedido tipoPedido) {
+    public void limpar(TipoPedido tipoPedido, boolean orcamento) {
         configurarTipoPedido(tipoPedido);
         redirectByTipoPedido(tipoPedido);
+        addAtributo("orcamento", orcamento);
+    }
+
+    @Get("orcamento")
+    public void orcamento() {
+        addAtributo("orcamento", true);
+        redirecTo(this.getClass()).pedidoHome();
     }
 
     @Get("pedido/compra")
@@ -582,42 +622,44 @@ public class PedidoController extends AbstractController {
     }
 
     @Get("pedido/listagem")
-    public void pesquisarPedidoByIdCliente(Integer idCliente, TipoPedido tipoPedido, Integer paginaSelecionada) {
+    public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
+            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada) {
         if (idCliente == null) {
             gerarListaMensagemErro("Cliente é obrigatório para a pesquisa de pedidos");
             irTopoPagina();
         } else {
             boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
-            final PaginacaoWrapper<Pedido> paginacao = gerarPaginacaoPedido(idCliente, isCompra, paginaSelecionada);
 
-            final Collection<Pedido> listaPedido = paginacao.getLista();
-            if (!listaPedido.isEmpty()) {
-                for (Pedido pedido : listaPedido) {
-                    this.formatarPedido(pedido);
-                    this.formatarDocumento(pedido.getCliente());
-                }
-            }
-            this.inicializarPaginacao(paginaSelecionada, paginacao, "listaPedido");
+            final RelatorioWrapper<Pedido, ItemPedido> relatorio = gerarRelatorioPaginadoItemPedido(idCliente,
+                    idVendedor, idFornecedor, isCompra, paginaSelecionada);
+
+            inicializarRelatorioPaginado(paginaSelecionada, relatorio, "relatorioItemPedido");
 
             /*
              * Recuperando os dados do cliente no caso em que nao tenhamos
              * resultado na pesquisa de pedido, entao os dados do cliente devem
              * permanecer na tela
              */
-            Cliente cliente = this.clienteService.pesquisarById(idCliente);
-            this.formatarDocumento(cliente);
-            this.carregarVendedor(cliente);
+            Cliente cliente = clienteService.pesquisarById(idCliente);
+
+            formatarDocumento(cliente);
+            carregarVendedor(cliente);
             addAtributo("cliente", cliente);
+            addAtributo("proprietario", cliente.getVendedor());
+            addAtributo("orcamento", orcamento);
+
             if (isCompra) {
                 // Aqui estamos supondo que o usuario que acessou a tela eh um
                 // comprador pois ele tem permissao para isso. E o campo com o
                 // nome do comprador deve sempre estar preenchido.
                 addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
+                addAtributo("listaRepresentada", representadaService.pesquisarFornecedor(true));
             } else {
                 addAtributo("vendedor", cliente.getVendedor());
             }
             addAtributo("listaTransportadora", this.transportadoraService.pesquisar());
             addAtributo("listaRedespacho", this.transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
+            addAtributo("idRepresentadaSelecionada", idFornecedor);
         }
         configurarTipoPedido(tipoPedido);
     }
@@ -632,12 +674,13 @@ public class PedidoController extends AbstractController {
     }
 
     @Post("pedido/refazer")
-    public void refazerPedido(Integer idPedido, TipoPedido tipoPedido) {
+    public void refazerPedido(Integer idPedido, TipoPedido tipoPedido, boolean orcamento) {
         try {
             Integer idPedidoClone = pedidoService.refazerPedido(idPedido);
-            this.pesquisarPedidoById(idPedidoClone, tipoPedido);
-            this.gerarMensagemSucesso("Pedido No. " + idPedidoClone + " inserido e refeito a partir do pedido No. "
+            pesquisarPedidoById(idPedidoClone, tipoPedido);
+            gerarMensagemSucesso("Pedido No. " + idPedidoClone + " inserido e refeito a partir do pedido No. "
                     + idPedido);
+            addAtributo("orcamento", orcamento);
 
         } catch (BusinessException e) {
             this.gerarListaMensagemErro(e);

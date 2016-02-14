@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -68,6 +70,14 @@ public class ItemPedido extends Item {
 	@Transient
 	private Integer idPedido;
 
+	@Column(name = "id_pedido_compra")
+	private Integer idPedidoCompra;
+
+	// Essa campo foi criado para manter o historico de compra indicando a pedido
+	// de revenda esta vinculado o pedido de compra.
+	@Column(name = "id_pedido_venda")
+	private Integer idPedidoVenda;
+
 	@Transient
 	private Integer idProprietario;
 
@@ -92,6 +102,9 @@ public class ItemPedido extends Item {
 	@JoinColumn(name = "id_pedido", referencedColumnName = "id", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Pedido associado ao item")
 	private Pedido pedido;
+
+	@Column(name = "prazo_entrega")
+	private Integer prazoEntrega;
 
 	@Column(name = "preco_custo")
 	@InformacaoValidavel(obrigatorio = false, numerico = true, positivo = true, nomeExibicao = "Preço de custo do item do pedido")
@@ -189,6 +202,21 @@ public class ItemPedido extends Item {
 		this.id = id;
 	}
 
+	// Construtor utilizado na tela de recepcao de compras e itens aguardando
+	// material.
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idPedidoCompra, Integer idPedidoVenda,
+			String nomeProprietario, Integer quantidade, Integer quantidadeRecepcionada, Integer quantidadeReservada,
+			Double precoUnidade, String nomeRepresentada, Date dataEntrega, FormaMaterial formaMaterial,
+			String siglaMaterial, String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna,
+			Double comprimento) {
+		this(id, sequencial, idPedido, nomeProprietario, quantidade, quantidadeRecepcionada, quantidadeReservada,
+				precoUnidade, nomeRepresentada, dataEntrega, formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca,
+				medidaExterna, medidaInterna, comprimento);
+
+		this.idPedidoCompra = idPedidoCompra;
+		this.idPedidoVenda = idPedidoVenda;
+	}
+
 	// Construtor para relatorio de comissao
 	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario, String nomeProprietario,
 			String sobrenomeProprietario, Double precoUnidade, Double precoCusto, Integer quantidade,
@@ -223,6 +251,29 @@ public class ItemPedido extends Item {
 		this.dataEntrega = dataEntrega;
 		this.quantidadeRecepcionada = quantidadeRecepcionada;
 		this.quantidadeReservada = quantidadeReservada;
+	}
+
+	// Construtor implementado para o relatorio de itens dos pedidos de um
+	// determinado cliente que eh fornecida na tela de cliente.
+	public ItemPedido(Integer idPedido, SituacaoPedido situacaoPedido, Date dataEnvio, TipoPedido tipoPedido,
+			String nomeRepresentada, Integer id, Integer sequencial, Integer quantidade, Double precoUnidade,
+			FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial, String descricaoPeca,
+			Double medidaExterna, Double medidaInterna, Double comprimento, TipoVenda tipoVenda, Double precoVenda,
+			Double aliquotaIPI, Double aliquotaICMS) {
+
+		this(id, sequencial, idPedido, null, quantidade, null, null, precoUnidade, nomeRepresentada, null, formaMaterial,
+				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
+
+		pedido = new Pedido();
+		pedido.setId(idPedido);
+		pedido.setSituacaoPedido(situacaoPedido);
+		pedido.setDataEnvio(dataEnvio);
+		pedido.setTipoPedido(tipoPedido);
+
+		this.tipoVenda = tipoVenda;
+		this.precoVenda = precoVenda;
+		this.aliquotaIPI = aliquotaIPI;
+		this.aliquotaICMS = aliquotaICMS;
 	}
 
 	public void addQuantidadeReservada(Integer quantidadeReservada) {
@@ -301,6 +352,14 @@ public class ItemPedido extends Item {
 		return idPedido;
 	}
 
+	public Integer getIdPedidoCompra() {
+		return idPedidoCompra;
+	}
+
+	public Integer getIdPedidoVenda() {
+		return idPedidoVenda;
+	}
+
 	public Integer getIdProprietario() {
 		return idProprietario;
 	}
@@ -327,6 +386,10 @@ public class ItemPedido extends Item {
 
 	public Pedido getPedido() {
 		return pedido;
+	}
+
+	public Integer getPrazoEntrega() {
+		return prazoEntrega;
 	}
 
 	public Double getPrecoCusto() {
@@ -433,12 +496,12 @@ public class ItemPedido extends Item {
 		return quantidade != null && quantidade.equals(quantidadeRecepcionada);
 	}
 
-	public boolean isNovo() {
-		return this.id == null;
-	}
-
 	public boolean isItemReservado() {
 		return quantidade != null && quantidade.equals(quantidadeReservada);
+	}
+
+	public boolean isNovo() {
+		return this.id == null;
 	}
 
 	public boolean isVendaKilo() {
@@ -489,6 +552,14 @@ public class ItemPedido extends Item {
 		this.idPedido = idPedido;
 	}
 
+	public void setIdPedidoCompra(Integer idPedidoCompra) {
+		this.idPedidoCompra = idPedidoCompra;
+	}
+
+	public void setIdPedidoVenda(Integer idPedidoVenda) {
+		this.idPedidoVenda = idPedidoVenda;
+	}
+
 	public void setIdProprietario(Integer idProprietario) {
 		this.idProprietario = idProprietario;
 	}
@@ -515,6 +586,10 @@ public class ItemPedido extends Item {
 
 	public void setPedido(Pedido pedido) {
 		this.pedido = pedido;
+	}
+
+	public void setPrazoEntrega(Integer prazoEntrega) {
+		this.prazoEntrega = prazoEntrega;
 	}
 
 	public void setPrecoCusto(Double precoCusto) {

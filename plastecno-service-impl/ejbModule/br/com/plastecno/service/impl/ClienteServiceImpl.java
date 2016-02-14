@@ -32,6 +32,7 @@ import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -158,12 +159,14 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	public void inserirComentario(Integer idCliente, String comentario) throws BusinessException {
+		if (StringUtils.isEmpty(comentario)) {
+			return;
+		}
 		Cliente cliente = pesquisarById(idCliente);
 		Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(idCliente);
 		inserirComentario(vendedor, cliente, comentario);
 	}
-	
-	
+
 	private void inserirComentario(Usuario proprietario, Cliente cliente, String comentario) throws BusinessException {
 		ComentarioCliente comentarioCliente = new ComentarioCliente();
 		comentarioCliente.setCliente(cliente);
@@ -173,10 +176,9 @@ public class ClienteServiceImpl implements ClienteService {
 
 		ValidadorInformacao.validar(comentarioCliente);
 		entityManager.persist(comentarioCliente);
-		
+
 	}
 
-	
 	private void inserirEndereco(Cliente cliente) throws BusinessException {
 		if (cliente.isListaLogradouroPreenchida()) {
 			for (LogradouroCliente logradouro : cliente.getListaLogradouro()) {
@@ -257,6 +259,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(descricao = "Esse metodo esta sendo chamado na tela de pedidos e estamos retornando mais informacao do que o necessario.")
 	public Cliente pesquisarById(Integer id) {
 		return clienteDAO.pesquisarById(id);
 	}

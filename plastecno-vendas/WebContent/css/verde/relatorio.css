@@ -7,14 +7,6 @@
 	background-color: white;
 }
 
-.listrada {
-	border-collapse: collapse;
-	margin-left: 5%;
-	margin-right: 5%;
-	margin-bottom: 60px;
-	width: 90%;
-}
-
 .listrada caption {
 	font-size: 20px;
 	font-weight: bold;

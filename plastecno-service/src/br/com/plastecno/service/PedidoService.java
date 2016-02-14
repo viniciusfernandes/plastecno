@@ -51,9 +51,9 @@ public interface PedidoService {
 
 	boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException;
 
-	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
+	boolean empacotarPedidoAguardandoCompra(Integer idPedido) throws BusinessException;
 
-	boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException;
+	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
 
 	Pedido inserir(Pedido pedido) throws BusinessException;
 
@@ -61,14 +61,13 @@ public interface PedidoService {
 
 	Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException;
 
+	Pedido inserirOrcamento(Pedido pedido) throws BusinessException;
+
 	boolean isCalculoIPIHabilitado(Integer idPedido);
 
 	boolean isPedidoEnviado(Integer idPedido);
 
-	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros);
-
-	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, boolean isCompra,
+	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
 	double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido);
@@ -77,10 +76,10 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarByIdCliente(Integer idCliente);
 
-	List<Pedido> pesquisarByIdCliente(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros);
-
 	List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+
+	List<Pedido> pesquisarByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
 	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
 
@@ -91,8 +90,6 @@ public interface PedidoService {
 	List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador) throws BusinessException;
 
 	Date pesquisarDataEnvio(Integer idPedido);
-
-	Date pesquisarDataInclusao(Integer idPedido);
 
 	List<Pedido> pesquisarEntregaVendaByPeriodo(Periodo periodo);
 
@@ -128,6 +125,9 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente);
 
+	List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
 	List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo);
@@ -151,8 +151,8 @@ public interface PedidoService {
 	List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros);
 
-	List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+	List<Pedido> pesquisarPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
 	List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo);
 
@@ -184,9 +184,9 @@ public interface PedidoService {
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
-	Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, boolean isCompra);
+	Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra);
 
-	Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente);
+	Long pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(Integer idCliente);
 
 	List<TotalizacaoPedidoWrapper> pesquisarTotalPedidoVendaResumidaByPeriodo(Periodo periodo);
 

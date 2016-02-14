@@ -16,6 +16,7 @@ body {
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
@@ -72,7 +73,7 @@ $(document).ready(function() {
 	
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
-	inserirMascaraNumerica('comissao', '99');
+	inserirMascaraMonetaria('comissao', 5);
 	inserirMascaraNumerica('aliquotaICMS', '99');
 });
 
@@ -162,7 +163,7 @@ function inicializarModalCancelamento(botao){
 			<div class="label" style="width: 10%">Comissão (%):</div>
 			<div class="input" style="width: 5%">
 				<input type="text" id="comissao" name="representada.comissao"
-					value="${representada.comissaoPercentual}" />
+					value="${representada.comissao}" />
 			</div>
 			<div class="label" style="width: 10%">ICMS (%):</div>
 			<div class="input" style="width: 30%">

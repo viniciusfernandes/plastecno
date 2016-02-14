@@ -63,8 +63,8 @@
 			<tr>
 				<td class="label">Tip. Entr.:</td>
 				<td>{pedido.tipoEntrega.descricao}</td>
-				<td class="label">Data Inclusão:</td>
-				<td>{pedido.dataInclusaoFormatada}</td>
+				<td class="label">Data Envio:</td>
+				<td>{pedido.dataEnvioFormatada}</td>
 				<td class="label">Data Entrega:</td>
 				<td>{pedido.dataEntregaFormatada}</td>
 			</tr>
@@ -110,12 +110,8 @@
 				<td>{pedido.contato.faxComHifen}</td>
 			</tr>
 			<tr>
-				<td class="label">Tel.:</td>
-				<td>{pedido.contato.dDDTelefoneSecundario}</td>
-				<td class="label">Ramal:</td>
-				<td>{pedido.contato.ramalSecundario}</td>
-				<td class="label">Fax:</td>
-				<td>{pedido.contato.faxSecundarioComHifen}</td>
+				<td class="label">Cel.:</td>
+				<td colspan="4" style="align: left">{pedido.contato.dDDTelefoneSecundario}</td>
 			</tr>
 		</tbody>
 	</table>
@@ -184,7 +180,7 @@
 	<table class="listagem">
 		<thead>
 			<tr>
-				<th class="descricaoTabela" colspan="9">Lista de Itens do
+				<th class="descricaoTabela" colspan="10">Lista de Itens do
 					Pedido</th>
 			</tr>
 		</thead>
@@ -199,21 +195,22 @@
 				<th>Total Item (R$)</th>
 				<th>IPI (%)</th>
 				<th>ICMS (%)</th>
+				<th>Prazo</th>
 			</tr>
 		</thead>
 		<tbody>
 			<!-- O ALGORITMO DE GERACAO DE RELATORIO ENTENDERA APENAS QUANDO AS COLUNAS ESTIVEREM ESCRITAS TODAS NA MESMA LINHA, CASO CONTRARIO TEREMOS PROBLEMAS NA GERACAO DO PDF -->
-			<tr{listaItem}><td style="text-align: center">{sequencial}</td><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoItemFormatado}</td><td style="text-align: center">{aliquotaIPIFormatado}</td><td style="text-align: center">{aliquotaICMSFormatado}</td></tr>
+			<tr{listaItem}><td style="text-align: center">{sequencial}</td><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoItemFormatado}</td><td style="text-align: center">{aliquotaIPIFormatado}</td><td style="text-align: center">{aliquotaICMSFormatado}</td><td style="text-align: center">{prazoEntrega}</td></tr>
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="4"></td>
+				<td colspan="5"></td>
 				<td colspan="2" style="text-align: right;">TOTAL SEM IPI:</td>
 				<td colspan="3" style="text-align: left;">R$
 					{pedido.valorPedidoFormatado}</td>
 			</tr>
 			<tr>
-				<td colspan="4"></td>
+				<td colspan="5"></td>
 				<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
 				<td colspan="3" style="text-align: left;">R$
 					{pedido.valorPedidoIPIFormatado}</td>

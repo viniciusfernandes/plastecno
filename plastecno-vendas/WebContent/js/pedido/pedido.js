@@ -2,7 +2,7 @@ var tabelaItemHandler = null;
 
 function inicializarBlocoItemPedido(urlTela) {
 	
-	var TOTAL_COLUNAS_ITEM_PEDIDO = 10;
+	var TOTAL_COLUNAS_ITEM_PEDIDO = 11;
 	
 	tabelaItemHandler = new BlocoTabelaHandler(urlTela, 'ItemPedido',
 			'tabelaItemPedido', 'bloco_item_pedido');
@@ -80,6 +80,12 @@ function inicializarBlocoItemPedido(urlTela) {
 						celula.innerHTML = $("#bloco_item_pedido #aliquotaICMS")
 								.val();
 						break;
+					
+					case 10:
+						celula.innerHTML = $("#bloco_item_pedido #prazoEntregaItem")
+								.val();
+						break;
+					
 					}
 
 				}
@@ -117,6 +123,7 @@ function inicializarBlocoItemPedido(urlTela) {
 					$('#descricao').val(itemPedidoJson.descricaoPeca);
 					$('#aliquotaICMS').val(itemPedidoJson.aliquotaICMS);
 					$('#aliquotaIPI').val(itemPedidoJson.aliquotaIPI);
+					$('#prazoEntregaItem').val(itemPedidoJson.prazoEntrega);
 					
 					habilitarPreenchimentoPeca(itemPedidoJson.peca);
 				});
@@ -167,7 +174,9 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 	
 	var parametros = $('#formPedido').serialize();
 	parametros += recuperarParametrosBlocoContato();
-
+	// Esse termo foi incluido para podermos recuperar o nome do cliente no caso em que temos um orcamento e o cliente nao exista.
+	parametros += '&pedido.cliente.nomeFantasia='+$('#formPedido #nomeCliente').val(); 
+	
 	var request = $.ajax({
 		type : "post",
 		url : urlInclusaoPedido,
@@ -190,6 +199,7 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 			 * Temos que ter esse campo oculto pois o campo Numero do Pedido na
 			 * tela sera desabilitado e nao sera enviado no request.
 			 */
+			$('#idCliente').val(pedidoJson.idCliente);
 			$('#numeroPedido').val(pedidoJson.id);
 			$('#tipoPedido').val(pedidoJson.tipoPedido);
 			$('#numeroPedidoPesquisa').val(pedidoJson.id);
@@ -200,12 +210,12 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 			// preenchendo esse campo caso o usuario queira cancelar o pedido
 			$('#idPedidoCancelamento').val(pedidoJson.id);
 			$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);
-			$('#vendedor').val(
+			$('#proprietario').val(
 					pedidoJson.proprietario.nome + ' - '
 							+ pedidoJson.proprietario.email);
 			$('#idVendedor').val(pedidoJson.proprietario.id);
 			$('#formEnvioPedido #botaoEnviarPedido').show();
-
+			
 			habilitar('#numeroPedidoPesquisa', false);
 
 			/*

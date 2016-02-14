@@ -86,7 +86,7 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 			throw new BusinessException("A sigla do ramo de atividade ja existe no sistema");
 		}
 
-		return this.entityManager.merge(ramoAtividade);
+		return ramoAtividadeDAO.alterar(ramoAtividade);
 	}
 
 	@Override
@@ -169,6 +169,19 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 		query.setParameter("id", id);
 		List<RamoAtividade> lista = query.getResultList();
 		return lista.size() == 1 ? lista.get(0) : null;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public RamoAtividade pesquisarRamoAtividadePadrao() throws BusinessException {
+		RamoAtividade r = ramoAtividadeDAO.pesquisarRamoAtividadePadrao();
+		if (r != null) {
+			return r;
+		}
+		r = new RamoAtividade();
+		r.setDescricao("A DEFINIR");
+		r.setSigla("NDEFINIDO");
+		return inserir(r);
 	}
 
 	@SuppressWarnings("unchecked")

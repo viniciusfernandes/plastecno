@@ -38,8 +38,8 @@ public class ItemAguardandoCompraController extends AbstractController {
     }
 
     @Post("itemAguardandoCompra/item/compra")
-    public void encomendarItemPedido(Date dataInicial, Date dataFinal, Integer idRepresentadaFornecedora,
-            Cliente cliente, List<Integer> listaIdItem) {
+    public void comprarItemPedido(Date dataInicial, Date dataFinal, Integer idRepresentadaFornecedora, Cliente cliente,
+            List<Integer> listaIdItem) {
         try {
             final Set<Integer> ids = listaIdItem == null ? new HashSet<Integer>() : new HashSet<Integer>(listaIdItem);
             Integer idPedidoCompra = pedidoService
@@ -57,10 +57,10 @@ public class ItemAguardandoCompraController extends AbstractController {
     }
 
     @Post("itemAguardandoCompra/empacotamento")
-    public void enviarEncomendaEmpacotamento(Date dataInicial, Date dataFinal, Integer idPedido, Cliente cliente) {
+    public void empacotarPedidoAguardandoCompra(Date dataInicial, Date dataFinal, Integer idPedido, Cliente cliente) {
         boolean empacotamentoOK;
         try {
-            empacotamentoOK = pedidoService.enviarRevendaAguardandoEncomendaEmpacotamento(idPedido);
+            empacotamentoOK = pedidoService.empacotarPedidoAguardandoCompra(idPedido);
             if (empacotamentoOK) {
                 gerarMensagemSucesso("O pedido No. " + idPedido + " foi enviado para o empacotamento com sucesso");
             } else {

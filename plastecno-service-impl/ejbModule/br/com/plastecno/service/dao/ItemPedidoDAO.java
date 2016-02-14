@@ -1,5 +1,7 @@
 package br.com.plastecno.service.dao;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +38,11 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				"select new ItemPedido(i.id, i.sequencial, i.pedido.id, i.pedido.proprietario.nome, i.quantidade, i.quantidadeRecepcionada, i.quantidadeReservada, i.precoUnidade, i.pedido.representada.nomeFantasia, i.pedido.dataEntrega, i.formaMaterial, i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento)  from ItemPedido i ");
 	}
 
+	private StringBuilder gerarConstrutorItemPedidoIdPedidoCompraEVenda() {
+		return new StringBuilder(
+				"select new ItemPedido(i.id, i.sequencial, i.pedido.id, i.idPedidoCompra, i.idPedidoVenda, i.pedido.proprietario.nome, i.quantidade, i.quantidadeRecepcionada, i.quantidadeReservada, i.precoUnidade, i.pedido.representada.nomeFantasia, i.pedido.dataEntrega, i.formaMaterial, i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento)  from ItemPedido i ");
+	}
+
 	public void inserirComissao(Integer idItemPedido, Double valorComissao) {
 		super.alterarPropriedade(ItemPedido.class, idItemPedido, "comissao", valorComissao);
 	}
@@ -53,7 +60,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Date dataInicial, Date dataFinal) {
-		StringBuilder select = gerarConstrutorItemPedidoComDataEntrega();
+		StringBuilder select = gerarConstrutorItemPedidoIdPedidoCompraEVenda();
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
 		select.append("and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada =null)");
 		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
@@ -102,6 +109,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 						.setParameter("idItemPedido", idItemPedido), Integer.class, null);
 	}
 
+	public Object[] pesquisarIdPedidoCompraEVenda(Integer idItemPedido) {
+		return entityManager
+				.createQuery("select i.idPedidoCompra, i.idPedidoVenda from ItemPedido i where i.id = :idItemPedido",
+						Object[].class).setParameter("idItemPedido", idItemPedido).getSingleResult();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemAguardandoCompra(Integer idCliente, Date dataInicial, Date dataFinal) {
 		StringBuilder select = gerarConstrutorItemPedidoComDataEntrega();
@@ -144,7 +157,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Date dataInicial, Date dataFinal) {
-		StringBuilder select = gerarConstrutorItemPedidoComDataEntrega();
+		StringBuilder select = gerarConstrutorItemPedidoIdPedidoCompraEVenda();
 
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
 		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
@@ -243,6 +256,64 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		return query.getResultList();
+	}
+
+	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
+			Integer idProprietario, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros) {
+
+		// Tivemos que particionar a consulta em 2 etapas pois a paginacao deve ser
+		// feita na consulta de pedidos, mas estava sendo realizada na consulta de
+		// itens de pedidos, isto eh, retornavamos apenas 10 itens por consulta
+		// quando devemos na verdade retornar 10 pedidos por consulta.
+		StringBuilder selectPedido = new StringBuilder();
+		selectPedido.append("select p.id from Pedido p where p.cliente.id = :idCliente ");
+
+		if (idProprietario != null) {
+			selectPedido.append(" and p.proprietario.id = :idVendedor ");
+		}
+
+		if (idFornecedor != null) {
+			selectPedido.append(" and p.representada.id = :idFornecedor ");
+		}
+
+		if (isCompra) {
+			selectPedido.append(" and p.tipoPedido = :tipoPedido ) ");
+		} else {
+			selectPedido.append(" and p.tipoPedido != :tipoPedido ) ");
+		}
+		selectPedido.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc");
+
+		Query query = this.entityManager.createQuery(selectPedido.toString());
+		query.setParameter("idCliente", idCliente);
+
+		if (idProprietario != null) {
+			query.setParameter("idVendedor", idProprietario);
+		}
+
+		if (idFornecedor != null) {
+			query.setParameter("idFornecedor", idFornecedor);
+		}
+
+		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+
+		List<Object[]> listaIdPedido = QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
+		if (listaIdPedido.isEmpty()) {
+			return new ArrayList<ItemPedido>();
+		}
+
+		StringBuilder selectItem = new StringBuilder();
+
+		selectItem
+				.append("select new ItemPedido(i.pedido.id, i.pedido.situacaoPedido, i.pedido.dataEnvio, i.pedido.tipoPedido, i.pedido.representada.nomeFantasia, i.id, i.sequencial, i.quantidade, i.precoUnidade, i.formaMaterial, ");
+
+		selectItem
+				.append("i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento, i.tipoVenda, i.precoVenda, i.aliquotaIPI, i.aliquotaICMS) from ItemPedido i ");
+		selectItem.append("where i.pedido.id in (:listaIdPedido) ");
+		selectItem.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc");
+
+		return entityManager.createQuery(selectItem.toString(), ItemPedido.class)
+				.setParameter("listaIdPedido", Arrays.asList(listaIdPedido.toArray(new Integer[] {}))).getResultList();
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,

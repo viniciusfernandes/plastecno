@@ -39,7 +39,7 @@ public class Cliente implements Serializable {
 	 */
 	private static final long serialVersionUID = 4628886058991048859L;
 
-	@InformacaoValidavel(tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
+	@InformacaoValidavel(intervalo = { 1, 15 }, tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
 	private String cnpj;
 
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF do cliente")
@@ -52,8 +52,16 @@ public class Cliente implements Serializable {
 	@Transient
 	private String dataUltimoContatoFormatada;
 
+	@Column(name = "documento_estrangeiro")
+	@InformacaoValidavel(intervalo = { 0, 15 }, nomeExibicao = "Documento Estrangeiro")
+	private String documentoEstrangeiro;
+
 	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email do cliente")
 	private String email;
+
+	@Column(name="email_cobranca")
+	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email de cobrança do cliente")
+	private String emailCobranca;
 
 	@Id
 	@SequenceGenerator(name = "clienteSequence", sequenceName = "vendas.seq_cliente_id", allocationSize = 1, initialValue = 1)
@@ -202,8 +210,16 @@ public class Cliente implements Serializable {
 		return this.isJuridico() ? this.cnpj : this.cpf;
 	}
 
+	public String getDocumentoEstrangeiro() {
+		return documentoEstrangeiro;
+	}
+
 	public String getEmail() {
 		return email;
+	}
+
+	public String getEmailCobranca() {
+		return emailCobranca;
 	}
 
 	public Integer getId() {
@@ -278,6 +294,10 @@ public class Cliente implements Serializable {
 		return this.listaLogradouro != null && !this.listaLogradouro.isEmpty();
 	}
 
+	public boolean isNovo() {
+		return id == null;
+	}
+
 	public boolean isRevendedor() {
 		return TipoCliente.REVENDEDOR.equals(tipoCliente);
 	}
@@ -305,8 +325,16 @@ public class Cliente implements Serializable {
 		this.dataUltimoContatoFormatada = dataUltimoContatoFormatada;
 	}
 
+	public void setDocumentoEstrangeiro(String documentoEstrangeiro) {
+		this.documentoEstrangeiro = documentoEstrangeiro;
+	}
+
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public void setEmailCobranca(String emailCobranca) {
+		this.emailCobranca = emailCobranca;
 	}
 
 	public void setId(Integer id) {

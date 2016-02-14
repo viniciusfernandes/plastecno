@@ -5,7 +5,7 @@ function inicializarBlocoLogradouro(urlTela) {
 	
 	tabelaLogradouroHandler.validarInclusaoRegistro(function (){
 		if(isEmpty(document.getElementById('cep').value)) {
-			throw "O CEP não pode estar em branco";
+			throw "O CEP nao pode estar em branco";
 		}
 	});
 	

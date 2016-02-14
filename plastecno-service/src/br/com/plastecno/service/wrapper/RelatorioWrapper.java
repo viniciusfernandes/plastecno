@@ -87,12 +87,24 @@ public class RelatorioWrapper<T, K> {
 		return mapaGrupo.get(idGrupo);
 	}
 
+	public List<T> getGrupos() {
+		List<T> grupos = new ArrayList<T>(listaGrupo.size());
+		for (GrupoWrapper<T, K> g : listaGrupo) {
+			grupos.add(g.getId());
+		}
+		return grupos;
+	}
+
 	public Collection<K> getListaElemento() {
 		return mapaElemento.values();
 	}
 
 	public List<GrupoWrapper<T, K>> getListaGrupo() {
 		return listaGrupo;
+	}
+
+	public Object getPropriedade(String nomePropriedade) {
+		return propriedades.get(nomePropriedade);
 	}
 
 	public Map<String, Object> getPropriedades() {

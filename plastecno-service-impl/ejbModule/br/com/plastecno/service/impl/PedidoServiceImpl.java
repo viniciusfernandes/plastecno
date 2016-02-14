@@ -25,6 +25,7 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
@@ -38,6 +39,7 @@ import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Comissao;
 import br.com.plastecno.service.entity.Contato;
+import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
@@ -85,6 +87,9 @@ public class PedidoServiceImpl implements PedidoService {
 	private MaterialService materialService;
 
 	private PedidoDAO pedidoDAO;
+
+	@EJB
+	private RamoAtividadeService ramoAtividadeService;
 
 	@EJB
 	private RepresentadaService representadaService;
@@ -314,7 +319,6 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoCompra.setCliente(clienteService.pesquisarRevendedor());
 		pedidoCompra.setComprador(comprador);
 		pedidoCompra.setContato(contato);
-		pedidoCompra.setDataInclusao(new Date());
 		pedidoCompra.setFinalidadePedido(FinalidadePedido.REVENDA);
 		pedidoCompra.setProprietario(comprador);
 		pedidoCompra.setRepresentada(fornecedor);
@@ -327,6 +331,8 @@ public class PedidoServiceImpl implements PedidoService {
 		ItemPedido itemClone = null;
 		boolean incluiAlgumItem = false;
 		for (Integer idItemPedido : listaIdItemPedido) {
+			// Precisamos recuperar o item por completo para clonagem e criacao de um
+			// pedido de comprar contendo as mesmas informacoes.
 			itemCadastrado = pesquisarItemPedido(idItemPedido);
 			if (itemCadastrado == null) {
 				continue;
@@ -335,6 +341,7 @@ public class PedidoServiceImpl implements PedidoService {
 			itemClone.setPedido(pedidoCompra);
 			itemClone.setQuantidade(itemCadastrado.getQuantidadeEncomendada());
 			itemClone.setQuantidadeReservada(0);
+			itemClone.setIdPedidoVenda(pedidoDAO.pesquisarIdPedidoByIdItemPedido(idItemPedido));
 
 			try {
 				inserirItemPedido(pedidoCompra.getId(), itemClone);
@@ -346,8 +353,14 @@ public class PedidoServiceImpl implements PedidoService {
 						+ itemCadastrado.getSequencial() + " do pedido No. " + itemCadastrado.getPedido().getId()
 						+ ". Possível problema: " + e.getMensagemEmpilhada());
 			}
+
 			itemCadastrado.setEncomendado(true);
-			inserirItemPedido(itemCadastrado);
+			itemCadastrado.setIdPedidoCompra(pedidoCompra.getId());
+			// A execucao desse metodo esta garantindo que o pedido que aguardava
+			// compra agora ira para aguardando material.
+			// inserirItemPedido(itemCadastrado);
+			itemPedidoDAO.alterar(itemCadastrado);
+
 			if (!contemPedidoItemRevendaAguardandoEncomenda(idItemPedido)) {
 				alterarRevendaAguardandoMaterialByIdItem(itemCadastrado.getId());
 				alterarItemAguardandoMaterialByIdPedido(itemCadastrado.getPedido().getId());
@@ -420,6 +433,15 @@ public class PedidoServiceImpl implements PedidoService {
 		return empacotamentoOk;
 	}
 
+	@Override
+	public boolean empacotarPedidoAguardandoCompra(Integer idPedido) throws BusinessException {
+		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
+		if (!empacotamentoOk) {
+			alterarItemAguardandoCompraByIdPedido(idPedido);
+		}
+		return empacotamentoOk;
+	}
+
 	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
 
 		if (StringUtils.isEmpty(pedido.getContato().getEmail())) {
@@ -468,15 +490,6 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		}
 		pedidoDAO.alterar(pedido);
-	}
-
-	@Override
-	public boolean enviarRevendaAguardandoEncomendaEmpacotamento(Integer idPedido) throws BusinessException {
-		boolean empacotamentoOk = estoqueService.reservarItemPedido(idPedido);
-		if (!empacotamentoOk) {
-			alterarItemAguardandoCompraByIdPedido(idPedido);
-		}
-		return empacotamentoOk;
 	}
 
 	private void enviarVenda(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
@@ -590,7 +603,6 @@ public class PedidoServiceImpl implements PedidoService {
 		pedido.addLogradouro(this.clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
 
 		if (isPedidoNovo) {
-			pedido.setDataInclusao(new Date());
 			if (!pedido.isCompraAndamento()) {
 				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 			}
@@ -599,7 +611,6 @@ public class PedidoServiceImpl implements PedidoService {
 		} else {
 			// recuperando as informacoes do sistema que nao devem ser alteradas
 			// na edicao do pedido.
-			pedido.setDataInclusao(this.pesquisarDataInclusao(idPedido));
 			pedido.setDataEnvio(this.pesquisarDataEnvio(idPedido));
 			pedido.setValorPedido(this.pesquisarValorPedido(idPedido));
 			pedido.setValorPedidoIPI(this.pesquisarValorPedidoIPI(idPedido));
@@ -682,6 +693,16 @@ public class PedidoServiceImpl implements PedidoService {
 		if (itemPedido.isNovo()) {
 			itemPedidoDAO.inserir(itemPedido);
 		} else {
+			if (pedido.isCompra()) {
+				// Esse bloco de codigo foi criado para manter o historico dos pedidos
+				// de
+				// compra que estao associados a um pedido de venda que nao existe no
+				// estoque. Pois ao editarmos um pedido de compra os dados do
+				// idpedidovenda estavam desaparecendo.
+				Object[] idPedidoCompraEVenda = itemPedidoDAO.pesquisarIdPedidoCompraEVenda(itemPedido.getId());
+				itemPedido.setIdPedidoCompra((Integer) idPedidoCompraEVenda[0]);
+				itemPedido.setIdPedidoVenda((Integer) idPedidoCompraEVenda[1]);
+			}
 			itemPedido = itemPedidoDAO.alterar(itemPedido);
 		}
 
@@ -707,6 +728,23 @@ public class PedidoServiceImpl implements PedidoService {
 		return inserirItemPedido(idPedido, itemPedido);
 	}
 
+	@Override
+	public Pedido inserirOrcamento(Pedido pedido) throws BusinessException {
+		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+		Cliente cliente = pedido.getCliente();
+
+		cliente.setRazaoSocial(cliente.getNomeFantasia());
+		cliente.addContato(new ContatoCliente(pedido.getContato()));
+		cliente.setVendedor(pedido.getVendedor());
+
+		cliente.setRamoAtividade(ramoAtividadeService.pesquisarRamoAtividadePadrao());
+
+		if (pedido.isClienteNovo()) {
+			pedido.setCliente(clienteService.inserir(cliente));
+		}
+		return inserir(pedido);
+	}
+
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@Override
 	public boolean isCalculoIPIHabilitado(Integer idPedido) {
@@ -725,21 +763,17 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
-		return paginarPedido(idCliente, null, isCompra, indiceRegistroInicial, numeroMaximoRegistros);
-	}
-
-	@Override
-	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, boolean isCompra,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
+			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		List<Pedido> listaPedido = null;
-		if (usuarioService.isVendaPermitida(idCliente, idVendedor)) {
-			listaPedido = pesquisarByIdCliente(idCliente, isCompra, indiceRegistroInicial, numeroMaximoRegistros);
+		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
+			listaPedido = pesquisarByIdClienteIdFornecedor(idCliente, idFornecedor, isCompra, indiceRegistroInicial,
+					numeroMaximoRegistros);
 		} else {
 			listaPedido = new ArrayList<Pedido>();
 		}
-		return new PaginacaoWrapper<Pedido>(this.pesquisarTotalPedidoByIdCliente(idCliente, idVendedor, isCompra),
+
+		return new PaginacaoWrapper<Pedido>(pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor, isCompra),
 				listaPedido);
 	}
 
@@ -765,17 +799,17 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarByIdCliente(Integer idCliente, boolean isCompra, Integer indiceRegistroInicial,
+	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
-		return this.pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, isCompra, indiceRegistroInicial,
-				numeroMaximoRegistros);
+		return pesquisarByIdClienteIdFornecedor(idCliente, null, false, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
-		return pesquisarByIdCliente(idCliente, false, indiceRegistroInicial, numeroMaximoRegistros);
+	public List<Pedido> pesquisarByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+		return this.pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, idFornecedor, isCompra,
+				indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
@@ -814,12 +848,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Date pesquisarDataEnvio(Integer idPedido) {
 		return pedidoDAO.pesquisarDataEnvioById(idPedido);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Date pesquisarDataInclusao(Integer idPedido) {
-		return pedidoDAO.pesquisarDataInclusaoById(idPedido);
 	}
 
 	@Override
@@ -975,6 +1003,18 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+
+		if (idCliente == null) {
+			return Collections.emptyList();
+		}
+		return itemPedidoDAO.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor,
+				isCompra, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarItemPedidoByIdPedido(idPedido);
 	}
@@ -1055,14 +1095,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idVendedor, boolean isCompra,
-			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+	public List<Pedido> pesquisarPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 
 		if (idCliente == null) {
 			return Collections.emptyList();
 		}
-		return this.pedidoDAO.pesquisarPedidoByIdClienteByIdVendedor(idCliente, idVendedor, isCompra,
-				indiceRegistroInicial, numeroMaximoRegistros);
+		return this.pedidoDAO.pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor,
+				isCompra, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
@@ -1239,7 +1279,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalPedidoByIdCliente(Integer idCliente, Integer idVendedor, boolean isCompra) {
+	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor, Integer idFornecedor,
+			boolean isCompra) {
 		if (idCliente == null) {
 			return 0L;
 		}
@@ -1247,6 +1288,10 @@ public class PedidoServiceImpl implements PedidoService {
 		StringBuilder select = new StringBuilder("select count(p.id) from Pedido p where p.cliente.id = :idCliente ");
 		if (idVendedor != null) {
 			select.append("and p.proprietario.id = :idVendedor ");
+		}
+
+		if (idFornecedor != null) {
+			select.append("and p.representada.id = :idFornecedor ");
 		}
 
 		if (isCompra) {
@@ -1257,8 +1302,13 @@ public class PedidoServiceImpl implements PedidoService {
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA);
+
 		if (idVendedor != null) {
 			query.setParameter("idVendedor", idVendedor);
+		}
+
+		if (idFornecedor != null) {
+			query.setParameter("idFornecedor", idFornecedor);
 		}
 
 		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
@@ -1266,8 +1316,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalPedidoVendaByIdCliente(Integer idCliente) {
-		return this.pesquisarTotalPedidoByIdCliente(idCliente, null, false);
+	public Long pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(Integer idCliente) {
+		return this.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false);
 	}
 
 	@Override

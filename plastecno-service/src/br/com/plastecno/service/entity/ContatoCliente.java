@@ -8,10 +8,10 @@ import javax.persistence.Table;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
-@Table(name="tb_contato_cliente", schema="vendas")
+@Table(name = "tb_contato_cliente", schema = "vendas")
 @InformacaoValidavel(validarHierarquia = true)
 public class ContatoCliente extends Contato {
-	
+
 	/**
 	 * 
 	 */
@@ -19,18 +19,28 @@ public class ContatoCliente extends Contato {
 	@ManyToOne
 	@JoinColumn(name = "id_cliente", referencedColumnName = "id", nullable = false)
 	private Cliente cliente;
-	@Override
-	public boolean equals (Object o) {
-		return o instanceof Contato && this.getId() != null && this.getId().equals(((Contato)o).getId());
+
+	public ContatoCliente() {
 	}
+
+	public ContatoCliente(Contato contato) {
+		super(contato);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Contato && this.getId() != null && this.getId().equals(((Contato) o).getId());
+	}
+
 	public Cliente getCliente() {
 		return cliente;
 	}
-	
+
 	@Override
-	public int hashCode () {
-		return this.getId()!= null ? this.getId().hashCode() : -1;
+	public int hashCode() {
+		return this.getId() != null ? this.getId().hashCode() : -1;
 	}
+
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}

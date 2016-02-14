@@ -15,6 +15,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.util.StringUtils;
@@ -141,15 +142,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
 	}
 
-	public Date pesquisarDataInclusaoById(Integer idPedido) {
-		StringBuilder select = new StringBuilder();
-		select.append("select p.dataInclusao from Pedido p where p.id = :id");
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("id", idPedido);
-
-		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
-	}
-
 	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select p.id from ItemPedido i inner join i.pedido p where i.id = :idItemPedido")
@@ -206,15 +198,21 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	public List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
-		return pesquisarPedidoByIdClienteByIdVendedor(idCliente, null, false, indiceRegistroInicial, numeroMaximoRegistros);
+		return pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false, indiceRegistroInicial,
+				numeroMaximoRegistros);
 	}
 
-	public List<Pedido> pesquisarPedidoByIdClienteByIdVendedor(Integer idCliente, Integer idProprietario,
-			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+	@REVIEW(descricao = "Eh provavel que este metodo esteja retornando mais informacao do que o necessario e deve ser refatorado")
+	public List<Pedido> pesquisarPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idProprietario,
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		StringBuilder select = new StringBuilder(
 				"select p from Pedido p join fetch p.representada left join fetch p.proprietario where p.cliente.id = :idCliente ");
 		if (idProprietario != null) {
 			select.append(" and p.proprietario.id = :idVendedor ");
+		}
+
+		if (idFornecedor != null) {
+			select.append(" and p.representada.id = :idFornecedor ");
 		}
 
 		if (isCompra) {
@@ -222,13 +220,19 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		} else {
 			select.append(" and p.tipoPedido != :tipoPedido ");
 		}
-		select.append(" order by p.dataInclusao desc, p.id desc, p.cliente.nomeFantasia ");
+		select.append(" order by p.dataEnvio desc, p.id desc, p.cliente.nomeFantasia ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("idCliente", idCliente);
+
 		if (idProprietario != null) {
 			query.setParameter("idVendedor", idProprietario);
 		}
+
+		if (idFornecedor != null) {
+			query.setParameter("idFornecedor", idFornecedor);
+		}
+
 		query.setParameter("tipoPedido", TipoPedido.COMPRA);
 		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 	}

@@ -120,19 +120,20 @@ function recepcionarItem(botao){
 	</c:if>
 	
 	<c:if test="${not empty relatorio}">
-		<table class="listrada">
+		<table class="listrada" >
 			<caption>${relatorio.titulo}</caption>
 			<thead>
 				<tr>
-					<th style="width: 10%">Num. Pedido</th>
+					<th style="width: 7%">Num. Pedido</th>
 					<th style="width: 5%">Dt. Entrega</th>
+					<th style="width: 7%">Num. Compra</th>
 					<th style="width: 1%">Item</th>
 					<th style="width: 5%">Qtde</th>
 					<th style="width: 5%">Qtde Recep.</th>
-					<th style="width: 40%">Desc. Item</th>
+					<th style="width: 38%">Desc. Item</th>
 					<th style="width: 10%">Comprador</th>
 					<th style="width: 10%">Forneced.</th>
-					<th style="width: 15%">Ação</th>
+					<th style="width: 13%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -143,6 +144,7 @@ function recepcionarItem(botao){
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.id}</td>
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.propriedades['dataEntrega']}</td>
 							</c:if>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.idPedidoVenda}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeRecepcionada}</td>

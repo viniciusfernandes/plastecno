@@ -322,7 +322,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoCompra.setFinalidadePedido(FinalidadePedido.REVENDA);
 		pedidoCompra.setProprietario(comprador);
 		pedidoCompra.setRepresentada(fornecedor);
-		pedidoCompra.setSituacaoPedido(SituacaoPedido.COMPRA_ANDAMENTO);
+		pedidoCompra.setSituacaoPedido(SituacaoPedido.DIGITACAO);
 		pedidoCompra.setTipoPedido(TipoPedido.COMPRA);
 		pedidoCompra.setTipoEntrega(TipoEntrega.CIF);
 
@@ -603,11 +603,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedido.addLogradouro(this.clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
 
 		if (isPedidoNovo) {
-			if (!pedido.isCompraAndamento()) {
-				pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-			}
 			pedido = pedidoDAO.inserir(pedido);
-
 		} else {
 			// recuperando as informacoes do sistema que nao devem ser alteradas
 			// na edicao do pedido.
@@ -773,8 +769,8 @@ public class PedidoServiceImpl implements PedidoService {
 			listaPedido = new ArrayList<Pedido>();
 		}
 
-		return new PaginacaoWrapper<Pedido>(pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor, isCompra),
-				listaPedido);
+		return new PaginacaoWrapper<Pedido>(pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor,
+				idFornecedor, isCompra), listaPedido);
 	}
 
 	@Override
@@ -1279,8 +1275,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-			boolean isCompra) {
+	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra) {
 		if (idCliente == null) {
 			return 0L;
 		}

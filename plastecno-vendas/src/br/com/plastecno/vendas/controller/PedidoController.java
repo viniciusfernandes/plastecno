@@ -370,7 +370,7 @@ public class PedidoController extends AbstractController {
         if (pedido.getTransportadoraRedespacho() != null && pedido.getTransportadoraRedespacho().getId() == null) {
             pedido.setTransportadoraRedespacho(null);
         }
-
+        
         try {
 
             /*
@@ -590,6 +590,7 @@ public class PedidoController extends AbstractController {
             addAtributo("cliente", pedido.getCliente());
             addAtributo("contato", pedido.getContato());
             addAtributo("situacaoPedidoSelecionada", pedido.getSituacaoPedido());
+            addAtributo("orcamento", pedido.isOrcamento());
             this.gerarListaRepresentada(pedido);
 
             SituacaoPedido situacao = pedido.getSituacaoPedido();

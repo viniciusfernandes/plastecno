@@ -1632,7 +1632,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		Pedido pedidoCompra = pedidoService.pesquisarCompraById(idPedidoCompra);
 
-		assertEquals("Apos compra dos itens do pedido a encomenda foi efetuada", SituacaoPedido.COMPRA_ANDAMENTO,
+		assertEquals("Apos compra dos itens do pedido a encomenda foi efetuada", SituacaoPedido.DIGITACAO,
 				pedidoCompra.getSituacaoPedido());
 
 		try {

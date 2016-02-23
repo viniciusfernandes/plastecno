@@ -75,7 +75,7 @@ $(document).ready(function() {
 		
 		var parametros = '?idCliente='+$('#bloco_empacotamento #idCliente').val(); 
 		var form =  $(this).closest('form');
-		$(form).attr('method', 'get');
+		$(form).attr('method', 'post');
 		$(form).attr('action', '<c:url value="/empacotamento/inclusaodadosnf"/>'+parametros);
 		$(form).submit();
 	});

@@ -189,6 +189,7 @@ function empacotarPedido(campo){
 									</form>
 									<form action="<c:url value="/empacotamento/item/pesquisadadosnf"/>" method="get">
 										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
+										<input type="hidden" name="idCliente" value="${cliente.id}" /> 
 										<input type="submit" value="" title="Editar o Item do Pedido" class="botaoEditar"/>
 									</form>
 									<form action="<c:url value="/empacotamento/item/reencomenda"/>" method="post">

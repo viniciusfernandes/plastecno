@@ -92,7 +92,6 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("idRepresentadaSelecionada", idRepresentada);
         pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
-        irTopoPagina();
     }
 
     @Get("compra/recepcao")

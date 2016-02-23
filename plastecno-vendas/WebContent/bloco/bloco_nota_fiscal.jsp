@@ -1,5 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 
 <script type="text/javascript">
 
@@ -8,6 +10,7 @@ $(document).ready(function() {
 	inserirMascaraData('dataVencimentoNF');
 	inserirMascaraMonetaria('valorTotalNF', 8);
 	inserirMascaraMonetaria('valorParcelaNF', 8);
+	inserirMascaraNumerica('numeroVolumes', '999');
 });
 
 </script>
@@ -15,7 +18,7 @@ $(document).ready(function() {
 <fieldset id="bloco_item_pedido">
 	<legend>Dados Nota Fiscal</legend>
 	<form action="" method="post">
-		<input type="hidden" name="pedido.id" value="${pedido.id}"/>
+		<input type="hidden" id="idPedido" name="pedido.id" value="${pedido.id}"/>
 	
 		<div class="label">Núm. NF</div>
 		<div class="input">
@@ -36,6 +39,14 @@ $(document).ready(function() {
 		<div class="label">Vl. Parcela</div>
 		<div class="input">
 			<input type="text" id="valorParcelaNF" name="pedido.valorParcelaNF" value="${pedido.valorParcelaNF}"/>
+		</div>
+		<div class="label">Núm. Coleta</div>
+		<div class="input">
+			<input type="text" id="numeroColeta" name="pedido.numeroColeta" value="${pedido.numeroColeta}" maxlength="8"/>
+		</div>
+		<div class="label">Núm. Volumes</div>
+		<div class="input">
+			<input type="text" id="numeroVolumes" name="pedido.numeroVolumes" value="${pedido.numeroVolumes}"/>
 		</div>
 		<div class="bloco_botoes">
 			<input type="submit" id="botaoInserirNF" value="" class="botaoInserir" title="Inserir Dados Nota Fiscal"/> 

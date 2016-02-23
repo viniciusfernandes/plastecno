@@ -63,7 +63,6 @@ public class Pedido implements Serializable, Cloneable {
 
 	@Transient
 	private String dataEmissaoNFFormatada;
-
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_entrega")
 	private Date dataEntrega;
@@ -109,11 +108,17 @@ public class Pedido implements Serializable, Cloneable {
 	@JoinTable(name = "tb_pedido_tb_logradouro", schema = "vendas", joinColumns = { @JoinColumn(name = "id_pedido", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_logradouro", referencedColumnName = "id") })
 	private List<Logradouro> listaLogradouro;
 
+	@Column(name = "numero_coleta")
+	private String numeroColeta;
+
 	@Column(name = "numero_nf")
 	private String numeroNF;
 
 	@Column(name = "numero_pedido_cliente")
 	private String numeroPedidoCliente;
+
+	@Column(name = "numero_volumes")
+	private Integer numeroVolumes;
 
 	@InformacaoValidavel(intervalo = { 0, 799 }, nomeExibicao = "Observação do pedido")
 	private String observacao;
@@ -220,13 +225,15 @@ public class Pedido implements Serializable, Cloneable {
 
 	// Construtor utilizado na pesquisa dos dados da nota fiscal.
 	public Pedido(Integer id, String numeroNF, Date dataEmissaoNF, Date dataVencimentoNF, Double valorParcelaNF,
-			Double valorTotalNF) {
+			Double valorTotalNF, String numeroColeta, Integer numeroVolumes) {
 		this.id = id;
 		this.numeroNF = numeroNF;
 		this.dataEmissaoNF = dataEmissaoNF;
 		this.dataVencimentoNF = dataVencimentoNF;
 		this.valorParcelaNF = valorParcelaNF;
 		this.valorTotalNF = valorTotalNF;
+		this.numeroColeta = numeroColeta;
+		this.numeroVolumes = numeroVolumes;
 	}
 
 	public Pedido(Integer id, TipoPedido tipoPedido, Date dataEntrega, Date dataEnvio, Double valorPedido,
@@ -348,12 +355,20 @@ public class Pedido implements Serializable, Cloneable {
 		return EntityUtils.getLogradouro(listaLogradouro, tipoLogradouro);
 	}
 
+	public String getNumeroColeta() {
+		return numeroColeta;
+	}
+
 	public String getNumeroNF() {
 		return numeroNF;
 	}
 
 	public String getNumeroPedidoCliente() {
 		return numeroPedidoCliente;
+	}
+
+	public Integer getNumeroVolumes() {
+		return numeroVolumes;
 	}
 
 	public String getObservacao() {
@@ -555,12 +570,20 @@ public class Pedido implements Serializable, Cloneable {
 		this.listaLogradouro = listaLogradouro;
 	}
 
+	public void setNumeroColeta(String numeroColeta) {
+		this.numeroColeta = numeroColeta;
+	}
+
 	public void setNumeroNF(String numeroNF) {
 		this.numeroNF = numeroNF;
 	}
 
 	public void setNumeroPedidoCliente(String numeroPedidoCliente) {
 		this.numeroPedidoCliente = numeroPedidoCliente;
+	}
+
+	public void setNumeroVolumes(Integer numeroVolumes) {
+		this.numeroVolumes = numeroVolumes;
 	}
 
 	public void setObservacao(String observacao) {

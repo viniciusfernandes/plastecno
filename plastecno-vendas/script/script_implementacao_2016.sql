@@ -16,3 +16,6 @@ alter table vendas.tb_pedido add data_emissao_nf date default null;
 alter table vendas.tb_pedido add data_vencimento_nf date default null;
 alter table vendas.tb_pedido add valor_total_nf numeric(9,2) default null;
 alter table vendas.tb_pedido add valor_parcela_nf numeric(9,2) default null;
+
+alter table vendas.tb_pedido add numero_coleta varchar(8) default null;
+alter table vendas.tb_pedido add numero_volumes integer default null;

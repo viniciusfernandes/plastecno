@@ -57,6 +57,8 @@ public interface PedidoService {
 
 	Pedido inserir(Pedido pedido) throws BusinessException;
 
+	void inserirDadosNotaFiscal(Pedido pedido);
+
 	Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException;
 
 	Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException;
@@ -88,6 +90,8 @@ public interface PedidoService {
 	Pedido pesquisarCompraById(Integer id);
 
 	List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador) throws BusinessException;
+
+	Pedido pesquisarDadosNotaFiscalByIdItemPedido(Integer idItemPedido);
 
 	Date pesquisarDataEnvio(Integer idPedido);
 

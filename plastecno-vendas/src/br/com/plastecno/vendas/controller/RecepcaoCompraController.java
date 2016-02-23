@@ -12,6 +12,7 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
@@ -39,6 +40,12 @@ public class RecepcaoCompraController extends AbstractController {
 
     public RecepcaoCompraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
+    }
+
+    @Get("compra/recepcao/inclusaodadosnf")
+    public void inserirDadosNotaFiscal(Pedido pedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
+        pedidoService.inserirDadosNotaFiscal(pedido);
+        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao/listagem")
@@ -69,10 +76,16 @@ public class RecepcaoCompraController extends AbstractController {
     @Post("compra/item/edicao")
     public void pesquisarItemCompraById(Integer idItemPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
+        Pedido pedido = pedidoService.pesquisarDadosNotaFiscalByIdItemPedido(idItemPedido);
+
         if (itemPedido == null) {
             gerarListaMensagemErro("Item de compra não existe no sistema");
         } else {
             formatarAliquotaItemPedido(itemPedido);
+            pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
+            pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));
+
+            addAtributo("pedido", pedido);
             addAtributo("itemPedido", itemPedido);
         }
         addAtributo("dataInicial", formatarData(dataInicial));

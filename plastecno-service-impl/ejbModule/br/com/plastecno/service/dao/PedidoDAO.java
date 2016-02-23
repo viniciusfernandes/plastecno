@@ -77,6 +77,25 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		}
 	}
 
+	public void inserirDadosNotaFiscal(Pedido pedido) {
+		entityManager
+				.createQuery(
+						"update Pedido p set p.numeroNF =:numeroNF, p.dataEmissaoNF =:dataEmissaoNF, p.dataVencimentoNF =:dataVencimentoNF, p.valorParcelaNF =:valorParcelaNF, p.valorTotalNF =:valorTotalNF where p.id =:id")
+				.setParameter("numeroNF", pedido.getNumeroNF()).setParameter("dataEmissaoNF", pedido.getDataEmissaoNF())
+				.setParameter("dataVencimentoNF", pedido.getDataVencimentoNF())
+				.setParameter("valorParcelaNF", pedido.getValorParcelaNF())
+				.setParameter("valorTotalNF", pedido.getValorTotalNF()).setParameter("id", pedido.getId()).executeUpdate();
+	}
+
+	public Pedido pesquisarDadosNotaFiscalByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Pedido(i.pedido.id, i.pedido.numeroNF, i.pedido.dataEmissaoNF, i.pedido.dataVencimentoNF, i.pedido.valorParcelaNF, i.pedido.valorTotalNF) from ItemPedido i where i.id = :idItemPedido")
+								.setParameter("idItemPedido", idItemPedido), Pedido.class, null);
+	}
+
 	public List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		StringBuilder select = null;
 		select = new StringBuilder("select p from Pedido p ");

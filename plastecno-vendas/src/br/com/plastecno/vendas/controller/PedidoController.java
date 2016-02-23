@@ -370,7 +370,7 @@ public class PedidoController extends AbstractController {
         if (pedido.getTransportadoraRedespacho() != null && pedido.getTransportadoraRedespacho().getId() == null) {
             pedido.setTransportadoraRedespacho(null);
         }
-        
+
         try {
 
             /*

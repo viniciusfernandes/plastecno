@@ -62,7 +62,7 @@ public class EmpacotamentoRevendaController extends AbstractController {
         pesquisarRevendaEmpacotamento(idCliente);
     }
 
-    @Get("empacotamento/inclusaodadosnf")
+    @Post("empacotamento/inclusaodadosnf")
     public void inserirDadosNotaFiscal(Pedido pedido, Integer idCliente) {
         pedidoService.inserirDadosNotaFiscal(pedido);
         pesquisarRevendaEmpacotamento(idCliente);

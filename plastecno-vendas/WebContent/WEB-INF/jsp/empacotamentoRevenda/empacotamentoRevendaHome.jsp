@@ -68,6 +68,18 @@ $(document).ready(function() {
 		});
 	});
 	
+	$('#botaoInserirNF').click(function () {
+		if(isEmpty($('#bloco_item_pedido #idPedido').val())){
+			return;
+		}
+		
+		var parametros = '?idCliente='+$('#bloco_empacotamento #idCliente').val(); 
+		var form =  $(this).closest('form');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/empacotamento/inclusaodadosnf"/>'+parametros);
+		$(form).submit();
+	});
+	
 	inicializarAutocompleteCliente();
 });
 
@@ -134,9 +146,13 @@ function empacotarPedido(campo){
 			</div>
 		</fieldset>
 	
+	<c:if test="${not empty pedido}">
+		<jsp:include page="/bloco/bloco_nota_fiscal.jsp"/>
+	</c:if>
+	
 	<c:if test="${not empty relatorio}">
 		<div class="bloco_botoes">
-			<input type="button" id="botaoEmpacotamentarPedidos" title="Empacotar Pedidos" value="" class="botaoInserir"/>
+			<input type="button" id="botaoEmpacotamentarPedidos" title="Empacotar Pedidos" value="" class="botaoAdicionar"/>
 		</div>
 		<table class="listrada">
 			<caption>${relatorio.titulo}</caption>
@@ -147,9 +163,9 @@ function empacotarPedido(campo){
 					<th style="width: 2%">Empc.</th>
 					<th style="width: 1%">Item</th>
 					<th style="width: 5%">Qtde</th>
-					<th style="width: 43%">Desc. Item</th>
+					<th style="width: 45%">Desc. Item</th>
 					<th style="width: 10%">Vendedor</th>
-					<th style="width: 9%">Ação</th>
+					<th style="width: 7%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -171,12 +187,15 @@ function empacotarPedido(campo){
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 									</form>
-									<form action="<c:url value="/empacotamento/item/reencomenda"/>"
-											method="post">
-											<input type="hidden" name="idItemPedido" value="${item.id}"> 
-											<input type="button" title="Reenviar Item do Pedido para Encomenda" value="" class="botaoRemover"
-												onclick="enviarEncomenda(this);"/>
-										</form>
+									<form action="<c:url value="/empacotamento/item/pesquisadadosnf"/>" method="get">
+										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
+										<input type="hidden" name="idCliente" value="${cliente.id}" /> 
+										<input type="submit" value="" title="Editar o Item do Pedido" class="botaoEditar"/>
+									</form>
+									<form action="<c:url value="/empacotamento/item/reencomenda"/>" method="post">
+										<input type="hidden" name="idItemPedido" value="${item.id}"> 
+										<input type="button" title="Reenviar Item do Pedido para Encomenda" value="" class="botaoRemover" onclick="enviarEncomenda(this);"/>
+									</form>
 								</div>
 							</td>
 						</tr>

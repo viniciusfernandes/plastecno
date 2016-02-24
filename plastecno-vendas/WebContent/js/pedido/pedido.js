@@ -173,10 +173,10 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 	toLowerCaseInput();
 	
 	var parametros = $('#formPedido').serialize();
+	parametros += serializarBloco('bloco_dados_nota_fiscal');
 	parametros += recuperarParametrosBlocoContato();
 	// Esse termo foi incluido para podermos recuperar o nome do cliente no caso em que temos um orcamento e o cliente nao exista.
 	parametros += '&pedido.cliente.nomeFantasia='+$('#formPedido #nomeCliente').val(); 
-	
 	var request = $.ajax({
 		type : "post",
 		url : urlInclusaoPedido,

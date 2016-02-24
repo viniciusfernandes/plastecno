@@ -13,6 +13,7 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
@@ -61,9 +62,27 @@ public class EmpacotamentoRevendaController extends AbstractController {
         pesquisarRevendaEmpacotamento(idCliente);
     }
 
+    @Post("empacotamento/inclusaodadosnf")
+    public void inserirDadosNotaFiscal(Pedido pedido, Integer idCliente) {
+        pedidoService.inserirDadosNotaFiscal(pedido);
+        pesquisarRevendaEmpacotamento(idCliente);
+    }
+
+    @Get("empacotamento/item/pesquisadadosnf")
+    public void pesquisarDadosNotaFiscal(Integer idItemPedido, Integer idCliente) {
+        Pedido pedido = pedidoService.pesquisarDadosNotaFiscalByIdItemPedido(idItemPedido);
+        if (pedido != null) {
+            formatarPedido(pedido);
+            addAtributo("pedido", pedido);
+        }
+        pesquisarRevendaEmpacotamento(idCliente);
+        irTopoPagina();
+    }
+
     @Post("empacotamento/revenda/listagem")
     public void pesquisarRevendaEmpacotamento(Integer idCliente) {
-        RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioRevendaEmpacotamento(idCliente);
+        RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService
+                .gerarRelatorioRevendaEmpacotamento(idCliente);
 
         addAtributo("relatorio", relatorio);
         if (contemAtributo("permanecerTopo")) {

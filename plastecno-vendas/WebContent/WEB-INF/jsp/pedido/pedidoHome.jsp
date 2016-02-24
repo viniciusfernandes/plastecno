@@ -367,6 +367,9 @@ $(document).ready(function() {
 		</c:if>
 	</div>
 
+	<c:if test="${not empty pedido.id}">
+		<jsp:include page="/bloco/bloco_nota_fiscal.jsp" />
+	</c:if>
 	<jsp:include page="/bloco/bloco_contato.jsp" />
 
 	<div class="bloco_botoes">

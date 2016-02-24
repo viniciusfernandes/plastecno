@@ -207,10 +207,12 @@ public abstract class AbstractController {
     }
 
     void formatarPedido(Pedido pedido) {
-        pedido.setDataEnvioFormatada(this.formatarData(pedido.getDataEnvio()));
-        pedido.setDataEntregaFormatada(this.formatarData(pedido.getDataEntrega()));
+        pedido.setDataEnvioFormatada(formatarData(pedido.getDataEnvio()));
+        pedido.setDataEntregaFormatada(formatarData(pedido.getDataEntrega()));
         pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));
         pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedidoIPI()));
+        pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
+        pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));
     }
 
     <T extends AbstractController> T forwardTo(Class<T> classe) {

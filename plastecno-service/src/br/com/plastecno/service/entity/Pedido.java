@@ -58,6 +58,12 @@ public class Pedido implements Serializable, Cloneable {
 	private Contato contato;
 
 	@Temporal(TemporalType.DATE)
+	@Column(name = "data_emissao_nf")
+	private Date dataEmissaoNF;
+
+	@Transient
+	private String dataEmissaoNFFormatada;
+	@Temporal(TemporalType.DATE)
 	@Column(name = "data_entrega")
 	private Date dataEntrega;
 
@@ -74,6 +80,13 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private String dataInclusaoFormatada;
 
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_vencimento_nf")
+	private Date dataVencimentoNF;
+
+	@Transient
+	private String dataVencimentoNFFormatada;
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "id_finalidade_pedido")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Finalidade do pedido")
@@ -87,12 +100,25 @@ public class Pedido implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pedidoSequence")
 	private Integer id;
 
+	// Campo criado para atualizar o id do cliente no envio do pedido via json.
+	@Transient
+	private Integer idCliente;
+
 	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@JoinTable(name = "tb_pedido_tb_logradouro", schema = "vendas", joinColumns = { @JoinColumn(name = "id_pedido", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_logradouro", referencedColumnName = "id") })
 	private List<Logradouro> listaLogradouro;
 
+	@Column(name = "numero_coleta")
+	private String numeroColeta;
+
+	@Column(name = "numero_nf")
+	private String numeroNF;
+
 	@Column(name = "numero_pedido_cliente")
 	private String numeroPedidoCliente;
+
+	@Column(name = "numero_volumes")
+	private Integer numeroVolumes;
 
 	@InformacaoValidavel(intervalo = { 0, 799 }, nomeExibicao = "Observação do pedido")
 	private String observacao;
@@ -134,6 +160,9 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(nomeExibicao = "Redespacho do pedido")
 	private Transportadora transportadoraRedespacho;
 
+	@Column(name = "valor_parcela_nf")
+	private Double valorParcelaNF;
+
 	/*
 	 * Atributo criado para usar em relatorios evitando o calculo do pedido
 	 */
@@ -149,17 +178,8 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private String valorPedidoIPIFormatado;
 
-	// Campo criado para atualizar o id do cliente no envio do pedido via json.
-	@Transient
-	private Integer idCliente;
-
-	public Integer getIdCliente() {
-		return idCliente;
-	}
-
-	public void setIdCliente(Integer idCliente) {
-		this.idCliente = idCliente;
-	}
+	@Column(name = "valor_total_nf")
+	private Double valorTotalNF;
 
 	public Pedido() {
 	}
@@ -201,6 +221,19 @@ public class Pedido implements Serializable, Cloneable {
 
 		this.representada = new Representada();
 		this.representada.setNomeFantasia(nomeFantasiaRepresentada);
+	}
+
+	// Construtor utilizado na pesquisa dos dados da nota fiscal.
+	public Pedido(Integer id, String numeroNF, Date dataEmissaoNF, Date dataVencimentoNF, Double valorParcelaNF,
+			Double valorTotalNF, String numeroColeta, Integer numeroVolumes) {
+		this.id = id;
+		this.numeroNF = numeroNF;
+		this.dataEmissaoNF = dataEmissaoNF;
+		this.dataVencimentoNF = dataVencimentoNF;
+		this.valorParcelaNF = valorParcelaNF;
+		this.valorTotalNF = valorTotalNF;
+		this.numeroColeta = numeroColeta;
+		this.numeroVolumes = numeroVolumes;
 	}
 
 	public Pedido(Integer id, TipoPedido tipoPedido, Date dataEntrega, Date dataEnvio, Double valorPedido,
@@ -262,6 +295,14 @@ public class Pedido implements Serializable, Cloneable {
 		return contato;
 	}
 
+	public Date getDataEmissaoNF() {
+		return dataEmissaoNF;
+	}
+
+	public String getDataEmissaoNFFormatada() {
+		return dataEmissaoNFFormatada;
+	}
+
 	public Date getDataEntrega() {
 		return dataEntrega;
 	}
@@ -282,6 +323,14 @@ public class Pedido implements Serializable, Cloneable {
 		return dataInclusaoFormatada;
 	}
 
+	public Date getDataVencimentoNF() {
+		return dataVencimentoNF;
+	}
+
+	public String getDataVencimentoNFFormatada() {
+		return dataVencimentoNFFormatada;
+	}
+
 	public FinalidadePedido getFinalidadePedido() {
 		return finalidadePedido;
 	}
@@ -294,6 +343,10 @@ public class Pedido implements Serializable, Cloneable {
 		return id;
 	}
 
+	public Integer getIdCliente() {
+		return idCliente;
+	}
+
 	public List<Logradouro> getListaLogradouro() {
 		return listaLogradouro;
 	}
@@ -302,8 +355,20 @@ public class Pedido implements Serializable, Cloneable {
 		return EntityUtils.getLogradouro(listaLogradouro, tipoLogradouro);
 	}
 
+	public String getNumeroColeta() {
+		return numeroColeta;
+	}
+
+	public String getNumeroNF() {
+		return numeroNF;
+	}
+
 	public String getNumeroPedidoCliente() {
 		return numeroPedidoCliente;
+	}
+
+	public Integer getNumeroVolumes() {
+		return numeroVolumes;
 	}
 
 	public String getObservacao() {
@@ -342,6 +407,10 @@ public class Pedido implements Serializable, Cloneable {
 		return transportadoraRedespacho;
 	}
 
+	public Double getValorParcelaNF() {
+		return valorParcelaNF;
+	}
+
 	public Double getValorPedido() {
 		return valorPedido;
 	}
@@ -356,6 +425,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public String getValorPedidoIPIFormatado() {
 		return valorPedidoIPIFormatado;
+	}
+
+	public Double getValorTotalNF() {
+		return valorTotalNF;
 	}
 
 	public Usuario getVendedor() {
@@ -441,6 +514,14 @@ public class Pedido implements Serializable, Cloneable {
 		this.contato = contato;
 	}
 
+	public void setDataEmissaoNF(Date dataEmissaoNF) {
+		this.dataEmissaoNF = dataEmissaoNF;
+	}
+
+	public void setDataEmissaoNFFormatada(String dataEmissaoNFFormatada) {
+		this.dataEmissaoNFFormatada = dataEmissaoNFFormatada;
+	}
+
 	public void setDataEntrega(Date dataEntrega) {
 		this.dataEntrega = dataEntrega;
 	}
@@ -461,6 +542,14 @@ public class Pedido implements Serializable, Cloneable {
 		this.dataInclusaoFormatada = dataInclusaoFormatada;
 	}
 
+	public void setDataVencimentoNF(Date dataVencimentoNF) {
+		this.dataVencimentoNF = dataVencimentoNF;
+	}
+
+	public void setDataVencimentoNFFormatada(String dataVencimentoNFFormatada) {
+		this.dataVencimentoNFFormatada = dataVencimentoNFFormatada;
+	}
+
 	public void setFinalidadePedido(FinalidadePedido finalidadePedido) {
 		this.finalidadePedido = finalidadePedido;
 	}
@@ -473,12 +562,28 @@ public class Pedido implements Serializable, Cloneable {
 		this.id = id;
 	}
 
+	public void setIdCliente(Integer idCliente) {
+		this.idCliente = idCliente;
+	}
+
 	public void setListaLogradouro(List<Logradouro> listaLogradouro) {
 		this.listaLogradouro = listaLogradouro;
 	}
 
+	public void setNumeroColeta(String numeroColeta) {
+		this.numeroColeta = numeroColeta;
+	}
+
+	public void setNumeroNF(String numeroNF) {
+		this.numeroNF = numeroNF;
+	}
+
 	public void setNumeroPedidoCliente(String numeroPedidoCliente) {
 		this.numeroPedidoCliente = numeroPedidoCliente;
+	}
+
+	public void setNumeroVolumes(Integer numeroVolumes) {
+		this.numeroVolumes = numeroVolumes;
 	}
 
 	public void setObservacao(String observacao) {
@@ -523,6 +628,10 @@ public class Pedido implements Serializable, Cloneable {
 		this.transportadoraRedespacho = transportadoraRedespacho;
 	}
 
+	public void setValorParcelaNF(Double valorParcelaNF) {
+		this.valorParcelaNF = valorParcelaNF;
+	}
+
 	public void setValorPedido(Double valorPedido) {
 		this.valorPedido = valorPedido;
 	}
@@ -537,6 +646,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setValorPedidoIPIFormatado(String valorPedidoIPIFormatado) {
 		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
+	}
+
+	public void setValorTotalNF(Double valorTotalNF) {
+		this.valorTotalNF = valorTotalNF;
 	}
 
 	public void setVendedor(Usuario vendedor) {

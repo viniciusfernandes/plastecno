@@ -53,6 +53,21 @@ $(document).ready(function() {
 		$(form).attr('action', '<c:url value="/compra/item/recepcaoparcial"/>?'+parametros);
 		$(form).submit();
 	});
+	
+	$('#botaoInserirNF').click(function () {
+		if(isEmpty($('#bloco_item_pedido #idItemPedido').val())){
+			return;
+		}
+		
+		var parametros = '?dataInicial='+$('#formPesquisa #dataInicial').val(); 
+		parametros += '&dataFinal='+$('#formPesquisa #dataFinal').val();
+		parametros += '&idRepresentada='+$('#formPesquisa #idRepresentada').val();
+		
+		var form =  $(this).closest('form');
+		$(form).attr('method', 'get');
+		$(form).attr('action', '<c:url value="/compra/recepcao/inclusaodadosnf"/>'+parametros);
+		$(form).submit();
+	});
 });
 
 function removerItem(botao){
@@ -116,6 +131,7 @@ function recepcionarItem(botao){
 	</form>
 	
 	<c:if test="${not empty itemPedido}">
+		<jsp:include page="/bloco/bloco_nota_fiscal.jsp"/>
 		<jsp:include page="/bloco/bloco_edicao_item.jsp"/>
 	</c:if>
 	

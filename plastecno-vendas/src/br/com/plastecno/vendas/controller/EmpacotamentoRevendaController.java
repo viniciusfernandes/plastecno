@@ -72,8 +72,7 @@ public class EmpacotamentoRevendaController extends AbstractController {
     public void pesquisarDadosNotaFiscal(Integer idItemPedido, Integer idCliente) {
         Pedido pedido = pedidoService.pesquisarDadosNotaFiscalByIdItemPedido(idItemPedido);
         if (pedido != null) {
-            pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
-            pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));
+            formatarPedido(pedido);
             addAtributo("pedido", pedido);
         }
         pesquisarRevendaEmpacotamento(idCliente);

@@ -459,6 +459,7 @@ public class PedidoController extends AbstractController {
         addAtributo("consumo", FinalidadePedido.CONSUMO);
         addAtributo("revenda", FinalidadePedido.REVENDA);
         addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
+        addAtributo("inclusaoDadosNFdesabilitado", false);
 
         // verificando se o parametro para desabilitar ja foi incluido em outro
         // fluxo
@@ -580,7 +581,7 @@ public class PedidoController extends AbstractController {
             List<ItemPedido> listaItem = this.pedidoService.pesquisarItemPedidoByIdPedido(pedido.getId());
 
             formatarItemPedido(listaItem);
-
+formatarPedido(pedido);
             addAtributo("listaTransportadora", listaTransportadora);
             addAtributo("listaRedespacho", listaRedespacho);
             addAtributo("listaItemPedido", listaItem);
@@ -667,9 +668,9 @@ public class PedidoController extends AbstractController {
 
     private void redirectByTipoPedido(TipoPedido tipoPedido) {
         if (TipoPedido.COMPRA.equals(tipoPedido)) {
-            redirecTo(this.getClass()).pedidoCompra();
+            pedidoCompra();
         } else {
-            redirecTo(this.getClass()).pedidoHome();
+            pedidoHome();
         }
         irTopoPagina();
     }
@@ -690,7 +691,6 @@ public class PedidoController extends AbstractController {
             gerarLogErroRequestAjax("copia do pedido de No. " + idPedido, e);
             pesquisarPedidoById(idPedido, tipoPedido);
         }
-
     }
 
     @Post("pedido/itempedido/remocao/{id}")

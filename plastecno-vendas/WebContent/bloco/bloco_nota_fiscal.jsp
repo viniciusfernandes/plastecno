@@ -15,7 +15,7 @@ $(document).ready(function() {
 
 </script>
 
-<fieldset id="bloco_item_pedido">
+<fieldset id="bloco_dados_nota_fiscal">
 	<legend>Dados Nota Fiscal</legend>
 	<form action="" method="post">
 		<input type="hidden" id="idPedido" name="pedido.id" value="${pedido.id}"/>
@@ -48,8 +48,10 @@ $(document).ready(function() {
 		<div class="input">
 			<input type="text" id="numeroVolumes" name="pedido.numeroVolumes" value="${pedido.numeroVolumes}"/>
 		</div>
-		<div class="bloco_botoes">
-			<input type="submit" id="botaoInserirNF" value="" class="botaoInserir" title="Inserir Dados Nota Fiscal"/> 
-		</div>
+		<c:if test="${empty inclusaoDadosNFdesabilitado}">
+			<div class="bloco_botoes">
+				<input type="submit" id="botaoInserirNF" value="" class="botaoInserir" title="Inserir Dados Nota Fiscal"/> 
+			</div>
+		</c:if>
 	</form>
 </fieldset>

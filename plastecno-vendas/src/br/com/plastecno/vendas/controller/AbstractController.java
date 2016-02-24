@@ -211,6 +211,8 @@ public abstract class AbstractController {
         pedido.setDataEntregaFormatada(formatarData(pedido.getDataEntrega()));
         pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));
         pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedidoIPI()));
+        pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
+        pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));
     }
 
     <T extends AbstractController> T forwardTo(Class<T> classe) {

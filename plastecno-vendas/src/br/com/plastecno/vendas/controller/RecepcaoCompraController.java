@@ -82,9 +82,7 @@ public class RecepcaoCompraController extends AbstractController {
             gerarListaMensagemErro("Item de compra não existe no sistema");
         } else {
             formatarAliquotaItemPedido(itemPedido);
-            pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
-            pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));
-
+            formatarPedido(pedido);
             addAtributo("pedido", pedido);
             addAtributo("itemPedido", itemPedido);
         }

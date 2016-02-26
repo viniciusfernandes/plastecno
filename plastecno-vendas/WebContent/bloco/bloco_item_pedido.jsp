@@ -125,6 +125,10 @@ $(document).ready(function(){
 	<div class="input" style="width: 5%">
 		<input type="text" id="prazoEntregaItem" name="itemPedido.prazoEntrega" maxlength="3" />
 	</div>
+	<div class="label" style="width: 8%">Comiss. (%):</div>
+	<div class="input" style="width: 5%">
+		<input type="text" id="aliquotaComissao" name="itemPedido.aliquotaComissao" maxlength="3" />
+	</div>
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">
 			<a id="botaoInserirItemPedido" title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>

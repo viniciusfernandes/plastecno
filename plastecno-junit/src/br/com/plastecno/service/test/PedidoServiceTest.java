@@ -777,6 +777,47 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testEnvioPedidoRevendaComissaoItemPedido() {
+		Pedido pedido = gerarPedidoRevendaComItem();
+
+		Integer idPedido = pedido.getId();
+
+		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		ItemPedido itemPedido = listaItem.get(0);
+		itemPedido.setAliquotaComissao(0.5d);
+
+		final Double valorComissionado = itemPedido.calcularPrecoItem() * itemPedido.getAliquotaComissao();
+		final Integer idItemPedido = itemPedido.getId();
+
+		try {
+			// Estamos inserindo a inclusao de uma aliquota de comissao do item para
+			// testar o algoritmo de calculo de comissoes disparado no envio do
+			// pedido. Essa informacao pode ser inputada pelo usuario e deve ter
+			// prioridade no calculo.
+			pedidoService.inserirItemPedido(itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		Integer idVendedor = pedido.getVendedor().getId();
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, 0.1, null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
+
+		assertEquals(valorComissionado, itemPedido.getValorComissionado());
+	}
+
+	@Test
 	public void testEnvioRevendaAguardandoMaterialEmpacotamentoInvalido() {
 		PedidoRevendaECompra pedidoRevendaECompra = gerarRevendaEncomendada();
 		Integer idPedidoCompra = pedidoRevendaECompra.getPedidoCompra().getId();

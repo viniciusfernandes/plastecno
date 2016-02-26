@@ -3,6 +3,7 @@ package br.com.plastecno.vendas.json;
 import br.com.plastecno.service.entity.ItemPedido;
 
 public class ItemPedidoJson {
+    private final String aliquotaComissao;
     private final String aliquotaICMS;
     private final String aliquotaIPI;
     private final Double comprimento;
@@ -53,6 +54,11 @@ public class ItemPedidoJson {
         aliquotaIPI = itemPedido.getAliquotaIPIFormatado();
         precoMinimo = itemPedido.getPrecoMinimoFormatado();
         prazoEntrega = itemPedido.getPrazoEntrega();
+        aliquotaComissao = itemPedido.getAliquotaComissaoFormatado();
+    }
+
+    public String getAliquotaComissao() {
+        return aliquotaComissao;
     }
 
     public String getAliquotaICMS() {

@@ -124,6 +124,7 @@ function inicializarBlocoItemPedido(urlTela) {
 					$('#aliquotaICMS').val(itemPedidoJson.aliquotaICMS);
 					$('#aliquotaIPI').val(itemPedidoJson.aliquotaIPI);
 					$('#prazoEntregaItem').val(itemPedidoJson.prazoEntrega);
+					$('#aliquotaComissao').val(itemPedidoJson.aliquotaComissao);
 					
 					habilitarPreenchimentoPeca(itemPedidoJson.peca);
 				});
@@ -382,6 +383,8 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 				 * fazer referencia a esse item no campo de observacao.
 				 */
 				$('#bloco_item_pedido #sequencial').val(itemPedido.sequencial);
+				
+				$('#bloco_item_pedido #aliquotaComissao').val(itemPedido.aliquotaComissao);
 				
 				/*
 				 * Aqui o campo de representada sera desabilitado e nao sera

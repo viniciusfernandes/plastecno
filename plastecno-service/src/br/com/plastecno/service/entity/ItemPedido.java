@@ -31,6 +31,9 @@ public class ItemPedido extends Item {
 	 */
 	private static final long serialVersionUID = 3602081055672681943L;
 
+	@Column(name = "aliquota_comissao")
+	private Double aliquotaComissao;
+
 	@Transient
 	private String aliquotaComissaoFormatado;
 
@@ -308,8 +311,16 @@ public class ItemPedido extends Item {
 		return quantidadeReservada != null && quantidadeReservada > 0;
 	}
 
+	public boolean contemAliquotaComissao() {
+		return aliquotaComissao != null && aliquotaComissao > 0;
+	}
+
 	public boolean contemLargura() {
 		return this.formaMaterial != null && this.formaMaterial.contemLargura();
+	}
+
+	public Double getAliquotaComissao() {
+		return aliquotaComissao;
 	}
 
 	public String getAliquotaComissaoFormatado() {
@@ -506,6 +517,10 @@ public class ItemPedido extends Item {
 
 	public boolean isVendaKilo() {
 		return TipoVenda.KILO.equals(this.tipoVenda);
+	}
+
+	public void setAliquotaComissao(Double aliquotaComissao) {
+		this.aliquotaComissao = aliquotaComissao;
 	}
 
 	public void setAliquotaComissaoFormatado(String aliquotaComissaoFormatado) {

@@ -206,7 +206,8 @@ public class PedidoServiceImpl implements PedidoService {
 		Double precoItem = null;
 
 		for (ItemPedido itemPedido : listaItem) {
-			if (pedido.isRevenda()) {
+			
+			if (pedido.isRevenda() && !itemPedido.contemAliquotaComissao()) {
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
 						.getFormaMaterial().indexOf());
 
@@ -216,6 +217,9 @@ public class PedidoServiceImpl implements PedidoService {
 					comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 				}
 
+			} else if (pedido.isRevenda() && itemPedido.contemAliquotaComissao()) {
+				comissaoVenda = new Comissao();
+				comissaoVenda.setAliquotaRevenda(itemPedido.getAliquotaComissao());
 			} else if (pedido.isRepresentacao()) {
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 			}
@@ -607,9 +611,9 @@ public class PedidoServiceImpl implements PedidoService {
 		} else {
 			// recuperando as informacoes do sistema que nao devem ser alteradas
 			// na edicao do pedido.
-			pedido.setDataEnvio(this.pesquisarDataEnvio(idPedido));
-			pedido.setValorPedido(this.pesquisarValorPedido(idPedido));
-			pedido.setValorPedidoIPI(this.pesquisarValorPedidoIPI(idPedido));
+			pedido.setDataEnvio(pesquisarDataEnvio(idPedido));
+			pedido.setValorPedido(pesquisarValorPedido(idPedido));
+			pedido.setValorPedidoIPI(pesquisarValorPedidoIPI(idPedido));
 			pedido = pedidoDAO.alterar(pedido);
 		}
 
@@ -732,7 +736,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		return inserirItemPedido(idPedido, itemPedido);
 	}
-	
+
 	@Override
 	public Pedido inserirOrcamento(Pedido pedido) throws BusinessException {
 		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);

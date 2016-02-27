@@ -13,3 +13,14 @@ alter table vendas.tb_pedido add valor_total_nf numeric(9,2) default null;
 alter table vendas.tb_pedido add valor_parcela_nf numeric(9,2) default null;
 alter table vendas.tb_pedido add numero_coleta varchar(8) default null;
 alter table vendas.tb_pedido add numero_volumes integer default null;
+
+create table vendas.tb_tipo_cfop (
+	id integer not null,
+	descricao varchar(50) not null
+);
+ALTER TABLE vendas.tb_tipo_cfop ADD PRIMARY KEY (id);
+insert into vendas.tb_tipo_cfop values (0, 'IMPORTADO DIRETAMENTE');
+insert into vendas.tb_tipo_cfop values (1, 'IMPORTADO ADQUIRIDO MERCADO INTERNO');
+alter table vendas.tb_item_estoque add id_tipo_cfop integer default null;
+create index idx_tipo_cfop on vendas.tb_item_estoque (id_tipo_cfop);
+alter table vendas.tb_item_estoque add ncm varchar(15) default null;

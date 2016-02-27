@@ -19,7 +19,7 @@ $(document).ready(function() {
 		habilitarCamposEdicaoItem(true);
 	});
 	
-	$('#botaoLimiteMinimoPadrao').click(function () {
+	$('#botaoInserirConfiguracoesEstoque').click(function () {
 		var parametros = serializarPesquisa();
 		parametros += serializarBloco('bloco_item_pedido');
 		var form = $('#formVazio');
@@ -50,7 +50,7 @@ function habilitarCamposEdicaoItem(habilitado){
 
 </script>
 <fieldset id="bloco_item_pedido">
-	<legend>::: Edição do Item de ${not isEstoque ? 'Compra': 'Estoque'} :::</legend>
+	<legend>::: ${isEstoque && empty itemPedido.id ? 'Configuração' : 'Edição'} do Item de ${not isEstoque ? 'Compra': 'Estoque'} :::</legend>
 	<input type="hidden" id="idMaterial" name="itemPedido.material.id" value="${itemPedido.material.id}"/>
 	
 	<c:if test="${not empty itemPedido}">
@@ -155,18 +155,36 @@ function habilitarCamposEdicaoItem(habilitado){
 			<input type="text" id="quantidadeMinima" name="itemPedido.quantidadeMinima" value="${itemPedido.quantidadeMinima}"/>
 		</div>
 		<div class="label">Margem Mín.(%):</div>
+		<div class="input" style="width: 60%">
+			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}" style="width: 20%"/>
+		</div>
+		<div class="label">NCM:</div>
+		<div class="input" >
+			<input type="text" id="NCM" name="itemPedido.NCM" value="${itemPedido.NCM}" />
+		</div>
+		<div class="label">CFOP:</div>
 		<div class="input" style="width: 7%">
-			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}"/>
-	</div>
+			<select id="CFOP" name="itemPedido.tipoCFOP" >
+				<option value="">&lt&lt SELECIONE &gt&gt</option>
+				<c:forEach var="CFOP" items="${listaCFOP}">
+					<option value="${CFOP}" <c:if test="${CFOP eq itemPedido.tipoCFOP}">selected</c:if>>${CFOP.descricao}</option>
+				</c:forEach>
+			</select>
+		</div>
+		
 	</c:if>
 	
 	<div class="bloco_botoes">
-		<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Refazer os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
-		<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
-		<c:if test="${isEstoque}">
-			<a id="botaoLimiteMinimoPadrao" title="Inserir Limite Minimo Padrao" class="botaoManutencao"></a>
-			<a id="botaoReajustarPreco" title="Ajustar Preco" class="botaoDinheiro" ></a>
-		</c:if>
+		<c:choose>
+			<c:when test="${!isEstoque or (isEstoque && not empty itemPedido.id)}">
+				<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Refazer os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
+				<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
+			</c:when>
+			<c:when test="${isEstoque && empty itemPedido.id}">
+				<a id="botaoInserirConfiguracoesEstoque" title="Inserir Configurações dos Itens do Estoque" class="botaoManutencao"></a>
+				<a id="botaoReajustarPreco" title="Ajustar Preco" class="botaoDinheiro" ></a>
+			</c:when>
+		</c:choose>
 	</div>
 
 </fieldset>

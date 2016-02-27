@@ -30,6 +30,32 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 	}
 
+	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+		StringBuilder select = new StringBuilder();
+		select.append("select SUM(i.precoMedio * i.quantidade * (1 + i.aliquotaIPI)) from ItemEstoque i ");
+		if (idMaterial != null && formaMaterial != null) {
+			select.append("where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
+		}
+
+		if (idMaterial != null && formaMaterial == null) {
+			select.append("where i.material.id = :idMaterial ");
+		}
+
+		if (idMaterial == null && formaMaterial != null) {
+			select.append("where i.formaMaterial = :formaMaterial ");
+		}
+
+		Query query = entityManager.createQuery(select.toString());
+		if (idMaterial != null) {
+			query.setParameter("idMaterial", idMaterial);
+		}
+
+		if (formaMaterial != null) {
+			query.setParameter("formaMaterial", formaMaterial);
+		}
+		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+	}
+
 	private StringBuilder gerarConstrutorItemEstoque() {
 		return new StringBuilder(
 				"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.precoMedioFatorICMS, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
@@ -38,7 +64,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
 
 		StringBuilder update = new StringBuilder(
-				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima  where i.material = :material and i.formaMaterial = :formaMaterial ");
+				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima, i.NCM = :NCM, i.tipoCFOP = :tipoCFOP  where i.material = :material and i.formaMaterial = :formaMaterial ");
 		if (limite.contemMedida()) {
 
 			if (limite.getMedidaExterna() != null) {
@@ -63,7 +89,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		Query query = entityManager.createQuery(update.toString())
 				.setParameter("margemMinimaLucro", limite.getMargemMinimaLucro())
 				.setParameter("quantidadeMinima", limite.getQuantidadeMinima()).setParameter("material", limite.getMaterial())
-				.setParameter("formaMaterial", limite.getFormaMaterial());
+				.setParameter("formaMaterial", limite.getFormaMaterial()).setParameter("NCM", limite.getNCM())
+				.setParameter("tipoCFOP", limite.getTipoCFOP());
 
 		if (limite.contemMedida()) {
 
@@ -79,7 +106,6 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 				query.setParameter("comprimento", limite.getComprimento());
 			}
 		}
-
 		query.executeUpdate();
 	}
 
@@ -268,32 +294,6 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 
 		return query.getResultList();
-	}
-
-	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		StringBuilder select = new StringBuilder();
-		select.append("select SUM(i.precoMedio * i.quantidade * (1 + i.aliquotaIPI)) from ItemEstoque i ");
-		if (idMaterial != null && formaMaterial != null) {
-			select.append("where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
-		}
-
-		if (idMaterial != null && formaMaterial == null) {
-			select.append("where i.material.id = :idMaterial ");
-		}
-
-		if (idMaterial == null && formaMaterial != null) {
-			select.append("where i.formaMaterial = :formaMaterial ");
-		}
-
-		Query query = entityManager.createQuery(select.toString());
-		if (idMaterial != null) {
-			query.setParameter("idMaterial", idMaterial);
-		}
-
-		if (formaMaterial != null) {
-			query.setParameter("formaMaterial", formaMaterial);
-		}
-		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
 	}
 
 	@WARNING(data = "08/07/2015", descricao = "Esse metodo foi criado pois no banco de dados foram incluido elementos com duplicidade, alguns zerado ou nao, entao vamos retornar o primeiro com quantidade")

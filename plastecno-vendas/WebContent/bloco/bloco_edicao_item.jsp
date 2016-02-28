@@ -12,11 +12,10 @@ $(document).ready(function() {
 	inserirMascaraMonetaria('bloco_item_pedido #medidaInterna', 8);
 	inserirMascaraNumerica('bloco_item_pedido #quantidadeMinima', '999');
 	inserirMascaraNumerica('bloco_item_pedido #margemMinimaLucro', '999');
+	inserirMascaraNCM('bloco_item_pedido #ncm');
 	
 	$('#botaoLimparItemPedido').click(function () {
-		$('#bloco_item_pedido input').val('');
-		$('#bloco_item_pedido #formaMaterial').val('');
-		habilitarCamposEdicaoItem(true);
+		$('#botaoPesquisar').click();
 	});
 	
 	$('#botaoInserirConfiguracoesEstoque').click(function () {
@@ -24,7 +23,7 @@ $(document).ready(function() {
 		parametros += serializarBloco('bloco_item_pedido');
 		var form = $('#formVazio');
 		$(form).attr('method', 'post');
-		$(form).attr('action', '<c:url value="/estoque/item/inclusao/limiteminimopadrao"/>?'+parametros);
+		$(form).attr('action', '<c:url value="/estoque/item/inclusao/configuracaoestoque"/>?'+parametros);
 		$(form).submit();
 	});
 	
@@ -151,18 +150,18 @@ function habilitarCamposEdicaoItem(habilitado){
 			<input type="text" id="aliquotaReajuste" name="itemPedido.aliquotaReajuste" value="${itemPedido.aliquotaReajuste}" style="width: 5%"/>
 		</div>
 		<div class="label">Qtde. Mín.:</div>
-		<div class="input" style="width: 7%">
+		<div class="input" style="width: 5%">
 			<input type="text" id="quantidadeMinima" name="itemPedido.quantidadeMinima" value="${itemPedido.quantidadeMinima}"/>
 		</div>
-		<div class="label">Margem Mín.(%):</div>
+		<div class="label" style="width: 13%">Marg. Mín.(%):</div>
 		<div class="input" style="width: 60%">
-			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}" style="width: 20%"/>
+			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}" style="width: 10%"/>
 		</div>
 		<div class="label">NCM:</div>
-		<div class="input" >
-			<input type="text" id="NCM" name="itemPedido.NCM" value="${itemPedido.NCM}" />
+		<div class="input" style="width: 8%">
+			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}"/>
 		</div>
-		<div class="label">CFOP:</div>
+		<div class="label" style="width: 10%">CFOP:</div>
 		<div class="input" style="width: 7%">
 			<select id="CFOP" name="itemPedido.tipoCFOP" >
 				<option value="">&lt&lt SELECIONE &gt&gt</option>

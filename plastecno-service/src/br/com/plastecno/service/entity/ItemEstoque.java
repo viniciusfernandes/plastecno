@@ -69,7 +69,7 @@ public class ItemEstoque extends Item {
 	private Double medidaInterna;
 
 	@Column(name = "ncm")
-	private String NCM;
+	private String ncm;
 
 	@Column(name = "preco_medio")
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Preço de médio de compra do item de estoque")
@@ -211,8 +211,8 @@ public class ItemEstoque extends Item {
 		return medidaInterna;
 	}
 
-	public String getNCM() {
-		return NCM;
+	public String getNcm() {
+		return ncm;
 	}
 
 	public Double getPrecoMedio() {
@@ -310,8 +310,8 @@ public class ItemEstoque extends Item {
 		this.medidaInterna = medidaInterna;
 	}
 
-	public void setNCM(String nCM) {
-		NCM = nCM;
+	public void setNcm(String ncm) {
+		this.ncm = ncm;
 	}
 
 	public void setPrecoMedio(Double precoMedio) {

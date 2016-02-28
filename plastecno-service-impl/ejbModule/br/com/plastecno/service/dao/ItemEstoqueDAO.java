@@ -61,25 +61,26 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 				"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.precoMedioFatorICMS, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
 	}
 
-	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
+	public void inserirConfiguracaoEstoque(ItemEstoque configuracao) throws BusinessException {
 
 		StringBuilder update = new StringBuilder(
-				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima, i.NCM = :NCM, i.tipoCFOP = :tipoCFOP  where i.material = :material and i.formaMaterial = :formaMaterial ");
-		if (limite.contemMedida()) {
+				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima, i.ncm = :ncm, i.tipoCFOP = :tipoCFOP where i.material = :material and i.formaMaterial = :formaMaterial ");
 
-			if (limite.getMedidaExterna() != null) {
+		if (configuracao.contemMedida()) {
+
+			if (configuracao.getMedidaExterna() != null) {
 				update.append("and i.medidaExterna = :medidaExterna ");
 			} else {
 				update.append("and i.medidaExterna is null ");
 			}
 
-			if (limite.getMedidaInterna() != null) {
+			if (configuracao.getMedidaInterna() != null) {
 				update.append("and i.medidaInterna = :medidaInterna ");
 			} else {
 				update.append("and i.medidaInterna is null ");
 			}
 
-			if (limite.getComprimento() != null) {
+			if (configuracao.getComprimento() != null) {
 				update.append("and i.comprimento = :comprimento ");
 			} else {
 				update.append("and i.comprimento is null ");
@@ -87,23 +88,25 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 
 		Query query = entityManager.createQuery(update.toString())
-				.setParameter("margemMinimaLucro", limite.getMargemMinimaLucro())
-				.setParameter("quantidadeMinima", limite.getQuantidadeMinima()).setParameter("material", limite.getMaterial())
-				.setParameter("formaMaterial", limite.getFormaMaterial()).setParameter("NCM", limite.getNCM())
-				.setParameter("tipoCFOP", limite.getTipoCFOP());
 
-		if (limite.contemMedida()) {
+		.setParameter("material", configuracao.getMaterial())
+				.setParameter("formaMaterial", configuracao.getFormaMaterial()).setParameter("ncm", configuracao.getNcm())
+				.setParameter("tipoCFOP", configuracao.getTipoCFOP())
+				.setParameter("margemMinimaLucro", configuracao.getMargemMinimaLucro())
+				.setParameter("quantidadeMinima", configuracao.getQuantidadeMinima());
 
-			if (limite.getMedidaExterna() != null) {
-				query.setParameter("medidaExterna", limite.getMedidaExterna());
+		if (configuracao.contemMedida()) {
+
+			if (configuracao.getMedidaExterna() != null) {
+				query.setParameter("medidaExterna", configuracao.getMedidaExterna());
 			}
 
-			if (limite.getMedidaInterna() != null) {
-				query.setParameter("medidaInterna", limite.getMedidaInterna());
+			if (configuracao.getMedidaInterna() != null) {
+				query.setParameter("medidaInterna", configuracao.getMedidaInterna());
 			}
 
-			if (limite.getComprimento() != null) {
-				query.setParameter("comprimento", limite.getComprimento());
+			if (configuracao.getComprimento() != null) {
+				query.setParameter("comprimento", configuracao.getComprimento());
 			}
 		}
 		query.executeUpdate();

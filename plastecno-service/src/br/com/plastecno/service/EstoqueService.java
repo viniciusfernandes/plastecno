@@ -33,7 +33,7 @@ public interface EstoqueService {
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
 
-	void inserirLimiteMinimoPadrao(ItemEstoque limite) throws BusinessException;
+	void inserirConfiguracaoEstoque(ItemEstoque limite) throws BusinessException;
 
 	Integer pesquisarIdItemEstoque(Item filtro);
 

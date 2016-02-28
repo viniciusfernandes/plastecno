@@ -98,6 +98,32 @@ public class EstoqueServiceTest extends AbstractTest {
 		return enviarItemPedido(quantidade, TipoPedido.REVENDA);
 	}
 
+	private ItemEstoque gerarConfiguracaoEstoque() {
+		ItemEstoque configuracao = eBuilder.buildItemEstoque();
+		configuracao.setMaterial(gerarMaterial());
+		configuracao.setMargemMinimaLucro(0.1d);
+		configuracao.setQuantidadeMinima(10);
+		configuracao.setAliquotaIPI(0.1d);
+		configuracao.setAliquotaICMS(0.06d);
+		return configuracao;
+	}
+
+	private ItemEstoque gerarConfiguracaoEstoque(ItemEstoque itemEstoque) {
+		ItemEstoque configuracao = itemEstoque.clone();
+		configuracao.setMargemMinimaLucro(0.1d);
+		configuracao.setQuantidadeMinima(10);
+		return configuracao;
+	}
+
+	private ItemEstoque gerarConfiguracaoEstoquePeca() {
+		ItemEstoque configuracao = gerarItemEstoquePeca();
+		configuracao.setMargemMinimaLucro(0.1d);
+		configuracao.setQuantidadeMinima(10);
+		configuracao.setAliquotaIPI(0.1d);
+		configuracao.setAliquotaICMS(0.06d);
+		return configuracao;
+	}
+
 	private Representada gerarFornecedor() {
 		Representada fornecedor = eBuilder.buildRepresentadaFornecedor();
 		fornecedor.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
@@ -111,9 +137,9 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	private ItemEstoque gerarItemEstoquePeca() {
-		ItemEstoque limite = eBuilder.buildItemEstoquePeca();
-		limite.setMaterial(gerarMaterial());
-		return limite;
+		ItemEstoque configuracao = eBuilder.buildItemEstoquePeca();
+		configuracao.setMaterial(gerarMaterial());
+		return configuracao;
 	}
 
 	private ItemPedido gerarItemPedidoClone(Integer quantidade, ItemPedido item1) {
@@ -170,32 +196,6 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 		return itemPedido;
-	}
-
-	private ItemEstoque gerarLimiteMinimoEstoque() {
-		ItemEstoque limite = eBuilder.buildItemEstoque();
-		limite.setMaterial(gerarMaterial());
-		limite.setMargemMinimaLucro(0.1d);
-		limite.setQuantidadeMinima(10);
-		limite.setAliquotaIPI(0.1d);
-		limite.setAliquotaICMS(0.06d);
-		return limite;
-	}
-
-	private ItemEstoque gerarLimiteMinimoEstoque(ItemEstoque itemEstoque) {
-		ItemEstoque limite = itemEstoque.clone();
-		limite.setMargemMinimaLucro(0.1d);
-		limite.setQuantidadeMinima(10);
-		return limite;
-	}
-
-	private ItemEstoque gerarLimiteMinimoEstoquePeca() {
-		ItemEstoque limite = gerarItemEstoquePeca();
-		limite.setMargemMinimaLucro(0.1d);
-		limite.setQuantidadeMinima(10);
-		limite.setAliquotaIPI(0.1d);
-		limite.setAliquotaICMS(0.06d);
-		return limite;
 	}
 
 	private List<ItemPedido> gerarListaItemPedido(TipoPedido tipoPedido) {
@@ -387,16 +387,16 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testAlteracaoMedidaLimiteMinimoEstoque() {
+	public void testAlteracaoMedidaConfiguracaoEstoque() {
 		Integer idItemEstoque = recepcionarItemCompra();
 		ItemEstoque item1 = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 
-		ItemEstoque limite = item1.clone();
-		limite.setQuantidadeMinima(10);
-		limite.setMargemMinimaLucro(0.1d);
+		ItemEstoque configuracao = item1.clone();
+		configuracao.setQuantidadeMinima(10);
+		configuracao.setMargemMinimaLucro(0.1d);
 
 		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -405,10 +405,10 @@ public class EstoqueServiceTest extends AbstractTest {
 		Integer antes = item1.getQuantidadeMinima();
 		Integer depois = null;
 
-		limite.setQuantidadeMinima(antes + 10);
+		configuracao.setQuantidadeMinima(antes + 10);
 
 		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -424,10 +424,10 @@ public class EstoqueServiceTest extends AbstractTest {
 		Integer idItemEstoque = recepcionarItemCompra();
 		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 
-		ItemEstoque limite = gerarLimiteMinimoEstoque(itemEstoque);
+		ItemEstoque configuracao = gerarConfiguracaoEstoque(itemEstoque);
 
 		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -456,11 +456,11 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 
-		ItemEstoque limite = gerarLimiteMinimoEstoque(itemEstoque);
-		limite.setMargemMinimaLucro(null);
+		ItemEstoque configuracao = gerarConfiguracaoEstoque(itemEstoque);
+		configuracao.setMargemMinimaLucro(null);
 
 		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -485,11 +485,11 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		ItemEstoque itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 
-		ItemEstoque limite = gerarLimiteMinimoEstoque(itemEstoque);
-		limite.setMargemMinimaLucro(null);
+		ItemEstoque configuracao = gerarConfiguracaoEstoque(itemEstoque);
+		configuracao.setMargemMinimaLucro(null);
 
 		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -503,6 +503,140 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 		assertEquals("O preco minimo de venda do item de estoque nao esta correto. Verificar o algoritmo de calculo.",
 				precoMinimo, precoMinimoCalculado);
+	}
+
+	@Test
+	public void testInclusaoConfiguracaoEstoque() {
+		ItemEstoque configuracao = gerarConfiguracaoEstoque();
+
+		try {
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
+	@Test
+	public void testInclusaoConfiguracaoEstoquePeca() {
+		ItemPedido itemPeca = gerarItemPedidoPeca(TipoPedido.COMPRA);
+
+		try {
+			estoqueService.recepcionarItemCompra(itemPeca.getId(), itemPeca.getQuantidade());
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		ItemEstoque configuracao = gerarConfiguracaoEstoquePeca();
+		try {
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		// Item peca = estoqueService.pesquisarItemEstoqueById(idPeca);
+		// assertEquals(peca.getQuantidadeMinima(), limite.getQuantidadeMinima());
+	}
+
+	@Test
+	public void testInclusaoConfiguracaoEstoqueSemMaterial() {
+
+		ItemEstoque configuracao = gerarConfiguracaoEstoque();
+		configuracao.setMaterial(null);
+
+		boolean throwed = false;
+		try {
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue("O material para inserir limite minimo nao exite, eh obrigatorio e deve ser validado", throwed);
+
+		configuracao = gerarConfiguracaoEstoque();
+		configuracao.getMaterial().setId(null);
+
+		throwed = false;
+		try {
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue("O id do material para inserir limite minimo nao exite, eh obrigatorio e deve ser validado", throwed);
+	}
+
+	@Test
+	public void testInclusaoConfiguracaoEstoqueSemMedidas() {
+
+		Integer idItem1 = recepcionarItemCompra();
+		Integer idItem2 = recepcionarItemCompra();
+
+		ItemEstoque item1 = estoqueService.pesquisarItemEstoqueById(idItem1);
+		ItemEstoque item2 = estoqueService.pesquisarItemEstoqueById(idItem2);
+
+		// Estmos alterando o item2 pois mesmo com medida diferente ele devera ter
+		// seu limite configurado.
+		item2.setMedidaExterna(item2.getMedidaExterna() + 20);
+		item2.setComprimento(item2.getComprimento() + 20);
+
+		try {
+			estoqueService.inserirItemEstoque(item2);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		ItemEstoque configuracao = gerarConfiguracaoEstoque();
+		configuracao.setMaterial(item1.getMaterial());
+		configuracao.setFormaMaterial(item1.getFormaMaterial());
+		configuracao.setMedidaExterna(null);
+		configuracao.setMedidaInterna(null);
+		configuracao.setComprimento(null);
+
+		try {
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		item1 = estoqueService.pesquisarItemEstoqueById(item1.getId());
+		item2 = estoqueService.pesquisarItemEstoqueById(item2.getId());
+
+		assertEquals("Os valores da margem minima de lucro devem ser as mesmas apos o cadastro do limite minimo",
+				item1.getMargemMinimaLucro(), configuracao.getMargemMinimaLucro());
+		assertEquals("Os valores da quantidade minima devem ser as mesmas apos o cadastro do limite minimo",
+				item1.getQuantidadeMinima(), configuracao.getQuantidadeMinima());
+
+		assertEquals("Os valores da margem minima de lucro devem ser as mesmas apos o cadastro do limite minimo",
+				item2.getMargemMinimaLucro(), configuracao.getMargemMinimaLucro());
+		assertEquals("Os valores da quantidade minima devem ser as mesmas apos o cadastro do limite minimo",
+				item2.getQuantidadeMinima(), configuracao.getQuantidadeMinima());
+	}
+
+	@Test
+	public void testInclusaoConfiguracaoEstoqueSemQuantidade() {
+		ItemEstoque configuracao = gerarConfiguracaoEstoque();
+		configuracao.setQuantidadeMinima(-1);
+
+		try {
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertNull("A quantidade minina de estoque deve ser nula no caso de valores menores ou iguais a zero",
+				configuracao.getQuantidadeMinima());
+
+		configuracao = gerarConfiguracaoEstoque();
+		configuracao.setQuantidadeMinima(0);
+
+		try {
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertNull("A quantidade minina de estoque deve ser nula no caso de valores menores ou iguais a zero",
+				configuracao.getQuantidadeMinima());
 	}
 
 	@Test
@@ -587,140 +721,6 @@ public class EstoqueServiceTest extends AbstractTest {
 		verificarQuantidadeTotalItemEstoque(i.getQuantidade(), idItemEstoque);
 
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, i.getPedido().getSituacaoPedido());
-	}
-
-	@Test
-	public void testInclusaoLimiteMinimoEstoque() {
-		ItemEstoque limite = gerarLimiteMinimoEstoque();
-
-		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-	}
-
-	@Test
-	public void testInclusaoLimiteMinimoEstoquePeca() {
-		ItemPedido itemPeca = gerarItemPedidoPeca(TipoPedido.COMPRA);
-
-		try {
-			estoqueService.recepcionarItemCompra(itemPeca.getId(), itemPeca.getQuantidade());
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		ItemEstoque limite = gerarLimiteMinimoEstoquePeca();
-		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		// Item peca = estoqueService.pesquisarItemEstoqueById(idPeca);
-		// assertEquals(peca.getQuantidadeMinima(), limite.getQuantidadeMinima());
-	}
-
-	@Test
-	public void testInclusaoLimiteMinimoEstoqueSemMaterial() {
-
-		ItemEstoque limite = gerarLimiteMinimoEstoque();
-		limite.setMaterial(null);
-
-		boolean throwed = false;
-		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
-		} catch (BusinessException e) {
-			throwed = true;
-		}
-
-		assertTrue("O material para inserir limite minimo nao exite, eh obrigatorio e deve ser validado", throwed);
-
-		limite = gerarLimiteMinimoEstoque();
-		limite.getMaterial().setId(null);
-
-		throwed = false;
-		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
-		} catch (BusinessException e) {
-			throwed = true;
-		}
-
-		assertTrue("O id do material para inserir limite minimo nao exite, eh obrigatorio e deve ser validado", throwed);
-	}
-
-	@Test
-	public void testInclusaoLimiteMinimoEstoqueSemMedidas() {
-
-		Integer idItem1 = recepcionarItemCompra();
-		Integer idItem2 = recepcionarItemCompra();
-
-		ItemEstoque item1 = estoqueService.pesquisarItemEstoqueById(idItem1);
-		ItemEstoque item2 = estoqueService.pesquisarItemEstoqueById(idItem2);
-
-		// Estmos alterando o item2 pois mesmo com medida diferente ele devera ter
-		// seu limite configurado.
-		item2.setMedidaExterna(item2.getMedidaExterna() + 20);
-		item2.setComprimento(item2.getComprimento() + 20);
-
-		try {
-			estoqueService.inserirItemEstoque(item2);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		ItemEstoque limite = gerarLimiteMinimoEstoque();
-		limite.setMaterial(item1.getMaterial());
-		limite.setFormaMaterial(item1.getFormaMaterial());
-		limite.setMedidaExterna(null);
-		limite.setMedidaInterna(null);
-		limite.setComprimento(null);
-
-		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		item1 = estoqueService.pesquisarItemEstoqueById(item1.getId());
-		item2 = estoqueService.pesquisarItemEstoqueById(item2.getId());
-
-		assertEquals("Os valores da margem minima de lucro devem ser as mesmas apos o cadastro do limite minimo",
-				item1.getMargemMinimaLucro(), limite.getMargemMinimaLucro());
-		assertEquals("Os valores da quantidade minima devem ser as mesmas apos o cadastro do limite minimo",
-				item1.getQuantidadeMinima(), limite.getQuantidadeMinima());
-
-		assertEquals("Os valores da margem minima de lucro devem ser as mesmas apos o cadastro do limite minimo",
-				item2.getMargemMinimaLucro(), limite.getMargemMinimaLucro());
-		assertEquals("Os valores da quantidade minima devem ser as mesmas apos o cadastro do limite minimo",
-				item2.getQuantidadeMinima(), limite.getQuantidadeMinima());
-	}
-
-	@Test
-	public void testInclusaoLimiteMinimoEstoqueSemQuantidade() {
-		ItemEstoque limite = gerarLimiteMinimoEstoque();
-		limite.setQuantidadeMinima(-1);
-
-		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		assertNull("A quantidade minina de estoque deve ser nula no caso de valores menores ou iguais a zero",
-				limite.getQuantidadeMinima());
-
-		limite = gerarLimiteMinimoEstoque();
-		limite.setQuantidadeMinima(0);
-
-		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		assertNull("A quantidade minina de estoque deve ser nula no caso de valores menores ou iguais a zero",
-				limite.getQuantidadeMinima());
 	}
 
 	@Test
@@ -1375,21 +1375,21 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testRemocaoLimiteMinimoEstoque() {
+	public void testRemocaoConfiguracaoEstoque() {
 		Integer idItemEstoque = recepcionarItemCompra();
 		ItemEstoque item1 = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 
-		ItemEstoque limite = gerarLimiteMinimoEstoque();
+		ItemEstoque configuracao = gerarConfiguracaoEstoque();
 
 		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		limite.setQuantidadeMinima(null);
+		configuracao.setQuantidadeMinima(null);
 		try {
-			estoqueService.inserirLimiteMinimoPadrao(limite);
+			estoqueService.inserirConfiguracaoEstoque(configuracao);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

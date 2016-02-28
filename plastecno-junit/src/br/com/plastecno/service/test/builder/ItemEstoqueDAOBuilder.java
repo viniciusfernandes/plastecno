@@ -23,16 +23,16 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
+			public void inserirConfiguracaoEstoque(ItemEstoque configuracao) throws BusinessException {
 				List<ItemEstoque> lista = REPOSITORY.pesquisarTodos(ItemEstoque.class);
 
-				boolean contemMedida = limite.contemMedida();
+				boolean contemMedida = configuracao.contemMedida();
 				boolean isIgual = false;
 
 				for (ItemEstoque i : lista) {
 
-					if (!limite.getFormaMaterial().equals(i.getFormaMaterial())
-							|| !limite.getMaterial().getId().equals(i.getMaterial().getId())) {
+					if (!configuracao.getFormaMaterial().equals(i.getFormaMaterial())
+							|| !configuracao.getMaterial().getId().equals(i.getMaterial().getId())) {
 						continue;
 					}
 
@@ -41,10 +41,10 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 					// medida, faremos atualizacao apenas dos itens que possuem medidas
 					// iguais.
 
-					isIgual = limite.isEqual(i);
+					isIgual = configuracao.isEqual(i);
 
 					if (!contemMedida || isIgual) {
-						i.copiar(limite);
+						i.copiar(configuracao);
 					}
 				}
 			}

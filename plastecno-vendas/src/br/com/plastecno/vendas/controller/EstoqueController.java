@@ -110,12 +110,12 @@ public class EstoqueController extends AbstractController {
         }
     }
 
-    @Post("estoque/item/inclusao/limiteminimopadrao")
-    public void inserirLimiteMinimoPadrao(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
+    @Post("estoque/item/inclusao/configuracaoestoque")
+    public void inserirConfiguracaoEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
         try {
             itemPedido.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemPedido.getMargemMinimaLucro()));
 
-            estoqueService.inserirLimiteMinimoPadrao(itemPedido);
+            estoqueService.inserirConfiguracaoEstoque(itemPedido);
             gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

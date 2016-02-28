@@ -30,30 +30,57 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 	}
 
+	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
+		StringBuilder select = new StringBuilder();
+		select.append("select SUM(i.precoMedio * i.quantidade * (1 + i.aliquotaIPI)) from ItemEstoque i ");
+		if (idMaterial != null && formaMaterial != null) {
+			select.append("where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
+		}
+
+		if (idMaterial != null && formaMaterial == null) {
+			select.append("where i.material.id = :idMaterial ");
+		}
+
+		if (idMaterial == null && formaMaterial != null) {
+			select.append("where i.formaMaterial = :formaMaterial ");
+		}
+
+		Query query = entityManager.createQuery(select.toString());
+		if (idMaterial != null) {
+			query.setParameter("idMaterial", idMaterial);
+		}
+
+		if (formaMaterial != null) {
+			query.setParameter("formaMaterial", formaMaterial);
+		}
+		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+	}
+
 	private StringBuilder gerarConstrutorItemEstoque() {
 		return new StringBuilder(
 				"select new ItemEstoque(i.id, i.formaMaterial, i.descricaoPeca, i.material.sigla, i.medidaExterna, i.medidaInterna, i.comprimento, i.precoMedio, i.precoMedioFatorICMS, i.margemMinimaLucro, i.quantidade, i.quantidadeMinima, i.aliquotaIPI) from ItemEstoque i ");
 	}
 
-	public void inserirLimiteMinimoEstoque(ItemEstoque limite) throws BusinessException {
+	public void inserirConfiguracaoEstoque(ItemEstoque configuracao) throws BusinessException {
 
 		StringBuilder update = new StringBuilder(
-				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima  where i.material = :material and i.formaMaterial = :formaMaterial ");
-		if (limite.contemMedida()) {
+				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima, i.ncm = :ncm, i.tipoCFOP = :tipoCFOP where i.material = :material and i.formaMaterial = :formaMaterial ");
 
-			if (limite.getMedidaExterna() != null) {
+		if (configuracao.contemMedida()) {
+
+			if (configuracao.getMedidaExterna() != null) {
 				update.append("and i.medidaExterna = :medidaExterna ");
 			} else {
 				update.append("and i.medidaExterna is null ");
 			}
 
-			if (limite.getMedidaInterna() != null) {
+			if (configuracao.getMedidaInterna() != null) {
 				update.append("and i.medidaInterna = :medidaInterna ");
 			} else {
 				update.append("and i.medidaInterna is null ");
 			}
 
-			if (limite.getComprimento() != null) {
+			if (configuracao.getComprimento() != null) {
 				update.append("and i.comprimento = :comprimento ");
 			} else {
 				update.append("and i.comprimento is null ");
@@ -61,25 +88,27 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 
 		Query query = entityManager.createQuery(update.toString())
-				.setParameter("margemMinimaLucro", limite.getMargemMinimaLucro())
-				.setParameter("quantidadeMinima", limite.getQuantidadeMinima()).setParameter("material", limite.getMaterial())
-				.setParameter("formaMaterial", limite.getFormaMaterial());
 
-		if (limite.contemMedida()) {
+		.setParameter("material", configuracao.getMaterial())
+				.setParameter("formaMaterial", configuracao.getFormaMaterial()).setParameter("ncm", configuracao.getNcm())
+				.setParameter("tipoCFOP", configuracao.getTipoCFOP())
+				.setParameter("margemMinimaLucro", configuracao.getMargemMinimaLucro())
+				.setParameter("quantidadeMinima", configuracao.getQuantidadeMinima());
 
-			if (limite.getMedidaExterna() != null) {
-				query.setParameter("medidaExterna", limite.getMedidaExterna());
+		if (configuracao.contemMedida()) {
+
+			if (configuracao.getMedidaExterna() != null) {
+				query.setParameter("medidaExterna", configuracao.getMedidaExterna());
 			}
 
-			if (limite.getMedidaInterna() != null) {
-				query.setParameter("medidaInterna", limite.getMedidaInterna());
+			if (configuracao.getMedidaInterna() != null) {
+				query.setParameter("medidaInterna", configuracao.getMedidaInterna());
 			}
 
-			if (limite.getComprimento() != null) {
-				query.setParameter("comprimento", limite.getComprimento());
+			if (configuracao.getComprimento() != null) {
+				query.setParameter("comprimento", configuracao.getComprimento());
 			}
 		}
-
 		query.executeUpdate();
 	}
 
@@ -268,32 +297,6 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 
 		return query.getResultList();
-	}
-
-	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		StringBuilder select = new StringBuilder();
-		select.append("select SUM(i.precoMedio * i.quantidade * (1 + i.aliquotaIPI)) from ItemEstoque i ");
-		if (idMaterial != null && formaMaterial != null) {
-			select.append("where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ");
-		}
-
-		if (idMaterial != null && formaMaterial == null) {
-			select.append("where i.material.id = :idMaterial ");
-		}
-
-		if (idMaterial == null && formaMaterial != null) {
-			select.append("where i.formaMaterial = :formaMaterial ");
-		}
-
-		Query query = entityManager.createQuery(select.toString());
-		if (idMaterial != null) {
-			query.setParameter("idMaterial", idMaterial);
-		}
-
-		if (formaMaterial != null) {
-			query.setParameter("formaMaterial", formaMaterial);
-		}
-		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
 	}
 
 	@WARNING(data = "08/07/2015", descricao = "Esse metodo foi criado pois no banco de dados foram incluido elementos com duplicidade, alguns zerado ou nao, entao vamos retornar o primeiro com quantidade")

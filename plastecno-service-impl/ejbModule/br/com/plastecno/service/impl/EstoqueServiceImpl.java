@@ -349,20 +349,20 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirLimiteMinimoPadrao(ItemEstoque limite) throws BusinessException {
-		if (limite.getMaterial() == null || limite.getMaterial().getId() == null || limite.getFormaMaterial() == null) {
+	public void inserirConfiguracaoEstoque(ItemEstoque itemEstoque) throws BusinessException {
+		if (itemEstoque.getMaterial() == null || itemEstoque.getMaterial().getId() == null || itemEstoque.getFormaMaterial() == null) {
 			throw new BusinessException("Forma item e material são obrigatórios para a criação do limite mínimo de estoque");
 		}
 
-		if (limite.getQuantidadeMinima() != null && limite.getQuantidadeMinima() <= 0) {
-			limite.setQuantidadeMinima(null);
+		if (itemEstoque.getQuantidadeMinima() != null && itemEstoque.getQuantidadeMinima() <= 0) {
+			itemEstoque.setQuantidadeMinima(null);
 		}
 
-		if (limite.getMargemMinimaLucro() != null && limite.getMargemMinimaLucro() <= 0) {
-			limite.setMargemMinimaLucro(null);
+		if (itemEstoque.getMargemMinimaLucro() != null && itemEstoque.getMargemMinimaLucro() <= 0) {
+			itemEstoque.setMargemMinimaLucro(null);
 		}
 
-		itemEstoqueDAO.inserirLimiteMinimoEstoque(limite);
+		itemEstoqueDAO.inserirConfiguracaoEstoque(itemEstoque);
 	}
 
 	@Override

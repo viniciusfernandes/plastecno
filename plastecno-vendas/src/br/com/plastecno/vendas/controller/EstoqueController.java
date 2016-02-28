@@ -12,6 +12,7 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoAcesso;
+import br.com.plastecno.service.constante.TipoCFOP;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.exception.BusinessException;
@@ -63,6 +64,7 @@ public class EstoqueController extends AbstractController {
     @Get("estoque")
     public void estoqueHome() {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
+        addAtributo("listaCFOP", TipoCFOP.values());
         addAtributo("isEstoque", true);
 
         verificarPermissaoAcesso("acessoManutencaoEstoquePermitido", TipoAcesso.ADMINISTRACAO,
@@ -108,12 +110,12 @@ public class EstoqueController extends AbstractController {
         }
     }
 
-    @Post("estoque/item/inclusao/limiteminimopadrao")
-    public void inserirLimiteMinimoPadrao(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
+    @Post("estoque/item/inclusao/configuracaoestoque")
+    public void inserirConfiguracaoEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
         try {
             itemPedido.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemPedido.getMargemMinimaLucro()));
 
-            estoqueService.inserirLimiteMinimoPadrao(itemPedido);
+            estoqueService.inserirConfiguracaoEstoque(itemPedido);
             gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

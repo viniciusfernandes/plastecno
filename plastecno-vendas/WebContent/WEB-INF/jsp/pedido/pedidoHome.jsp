@@ -97,6 +97,7 @@ $(document).ready(function() {
 	inserirMascaraNumerica('numeroPedidoPesquisa', '9999999');
 	inserirMascaraMonetaria('precoVenda', 7);
 	inserirMascaraNumerica('ipi', '99');
+	inserirMascaraNumerica('comissao', '99');
 	inserirMascaraNumerica('quantidade', '9999999');
 	inserirMascaraMonetaria('comprimento', 8);
 	inserirMascaraMonetaria('medidaExterna', 8);

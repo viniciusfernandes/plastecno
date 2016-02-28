@@ -48,3 +48,7 @@ function inserirMascaraData(idCampo) {
 		prevText: 'Anterior' 
 	});
 };
+
+function inserirMascaraNCM(idCampo) {
+	$('#'+idCampo).mask('99.99.99.99');
+}

@@ -334,6 +334,7 @@ public class PedidoController extends AbstractController {
                 itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
             }
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
+            itemPedido.setAliquotaComissao(NumeroUtils.gerarAliquota(itemPedido.getAliquotaComissao()));
 
             final Integer idItemPedido = this.pedidoService.inserirItemPedido(numeroPedido, itemPedido);
             itemPedido.setId(idItemPedido);
@@ -581,7 +582,8 @@ public class PedidoController extends AbstractController {
             List<ItemPedido> listaItem = this.pedidoService.pesquisarItemPedidoByIdPedido(pedido.getId());
 
             formatarItemPedido(listaItem);
-formatarPedido(pedido);
+            formatarPedido(pedido);
+
             addAtributo("listaTransportadora", listaTransportadora);
             addAtributo("listaRedespacho", listaRedespacho);
             addAtributo("listaItemPedido", listaItem);
@@ -592,7 +594,8 @@ formatarPedido(pedido);
             addAtributo("contato", pedido.getContato());
             addAtributo("situacaoPedidoSelecionada", pedido.getSituacaoPedido());
             addAtributo("orcamento", pedido.isOrcamento());
-            this.gerarListaRepresentada(pedido);
+
+            gerarListaRepresentada(pedido);
 
             SituacaoPedido situacao = pedido.getSituacaoPedido();
             // Condicao indicadora de pedido pronto para enviar
@@ -618,6 +621,8 @@ formatarPedido(pedido);
             liberarAcesso("acessoReenvioPedidoPermitido", acessoReenvioPedidoPermitido);
             liberarAcesso("acessoCancelamentoPedidoPermitido", acessoCancelamentoPedidoPermitido);
             liberarAcesso("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
+            verificarPermissaoAcesso("dadosNotaFiscalHabilitado", TipoAcesso.ADMINISTRACAO,
+                    TipoAcesso.CADASTRO_PEDIDO_COMPRA);
         }
         configurarTipoPedido(tipoPedido);
         redirectByTipoPedido(tipoPedido);

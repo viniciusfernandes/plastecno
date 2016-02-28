@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.TipoCFOP;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
@@ -39,10 +40,10 @@ public class ItemEstoque extends Item {
 	private Double aliquotaReajuste;
 
 	private Double comprimento;
-
 	@Column(name = "descricao_peca")
 	@InformacaoValidavel(trim = true, intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do estoque")
 	private String descricaoPeca;
+
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_forma_material")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma do material do item do estoque")
@@ -67,6 +68,9 @@ public class ItemEstoque extends Item {
 	@Column(name = "medida_interna")
 	private Double medidaInterna;
 
+	@Column(name = "ncm")
+	private String ncm;
+
 	@Column(name = "preco_medio")
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Preço de médio de compra do item de estoque")
 	private Double precoMedio;
@@ -87,6 +91,10 @@ public class ItemEstoque extends Item {
 
 	@Transient
 	private String siglaMaterial;
+
+	@Column(name = "id_tipo_cfop")
+	@Enumerated(EnumType.ORDINAL)
+	private TipoCFOP tipoCFOP;
 
 	public ItemEstoque() {
 	}
@@ -203,6 +211,10 @@ public class ItemEstoque extends Item {
 		return medidaInterna;
 	}
 
+	public String getNcm() {
+		return ncm;
+	}
+
 	public Double getPrecoMedio() {
 		return precoMedio;
 	}
@@ -239,6 +251,10 @@ public class ItemEstoque extends Item {
 
 	public String getSiglaMaterial() {
 		return siglaMaterial;
+	}
+
+	public TipoCFOP getTipoCFOP() {
+		return tipoCFOP;
 	}
 
 	// Metodo criado para facilitar teste unitario
@@ -294,6 +310,10 @@ public class ItemEstoque extends Item {
 		this.medidaInterna = medidaInterna;
 	}
 
+	public void setNcm(String ncm) {
+		this.ncm = ncm;
+	}
+
 	public void setPrecoMedio(Double precoMedio) {
 		this.precoMedio = precoMedio;
 	}
@@ -326,5 +346,9 @@ public class ItemEstoque extends Item {
 
 	public void setSiglaMaterial(String siglaMaterial) {
 		this.siglaMaterial = siglaMaterial;
+	}
+
+	public void setTipoCFOP(TipoCFOP tipoCFOP) {
+		this.tipoCFOP = tipoCFOP;
 	}
 }

@@ -180,7 +180,7 @@
 	<table class="listagem">
 		<thead>
 			<tr>
-				<th class="descricaoTabela" colspan="10">Lista de Itens do
+				<th class="descricaoTabela" colspan="11">Lista de Itens do
 					Pedido</th>
 			</tr>
 		</thead>
@@ -192,15 +192,16 @@
 				<th>{tipoPedido}</th>
 				<th>Preço (R$)</th>
 				<th>Unid. (R$)</th>
-				<th>Total Item (R$)</th>
+				<th>Total (R$)</th>
 				<th>IPI (%)</th>
 				<th>ICMS (%)</th>
 				<th>Prazo</th>
+				<th>NCM/CFOP</th>
 			</tr>
 		</thead>
 		<tbody>
 			<!-- O ALGORITMO DE GERACAO DE RELATORIO ENTENDERA APENAS QUANDO AS COLUNAS ESTIVEREM ESCRITAS TODAS NA MESMA LINHA, CASO CONTRARIO TEREMOS PROBLEMAS NA GERACAO DO PDF -->
-			<tr{listaItem}><td style="text-align: center">{sequencial}</td><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoItemFormatado}</td><td style="text-align: center">{aliquotaIPIFormatado}</td><td style="text-align: center">{aliquotaICMSFormatado}</td><td style="text-align: center">{prazoEntrega}</td></tr>
+			<tr{listaItem}><td style="text-align: center">{sequencial}</td><td style="text-align: center">{quantidade}</td><td style="text-align: left">{descricao}</td><td style="text-align: center">{tipoVenda}</td><td style="text-align: center">{precoVendaFormatado}</td><td style="text-align: center">{precoUnidadeFormatado}</td><td style="text-align: center">{precoItemFormatado}</td><td style="text-align: center">{aliquotaIPIFormatado}</td><td style="text-align: center">{aliquotaICMSFormatado}</td><td style="text-align: center">{prazoEntrega}</td><td style="text-align: center">{ncm}<br></br>{tipoCFOP.descricao}</td></tr>
 		</tbody>
 		<tfoot>
 			<tr>

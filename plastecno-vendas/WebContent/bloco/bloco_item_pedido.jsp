@@ -2,6 +2,9 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
+	
+	inserirMascaraNCM('bloco_item_pedido #ncm');
+	
 	$('#precoVenda').focus(function (){
 		
 		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
@@ -128,6 +131,19 @@ $(document).ready(function(){
 	<div class="label" style="width: 8%">Comiss. (%):</div>
 	<div class="input" style="width: 5%">
 		<input type="text" id="aliquotaComissao" name="itemPedido.aliquotaComissao" maxlength="3" />
+	</div>
+	<div class="label" style="width: 10%">NCM:</div>
+		<div class="input" style="width: 8%">
+			<input type="text" id="ncm" name="itemPedido.ncm"/>
+		</div>
+	<div class="label" style="width: 8%">CFOP:</div>
+	<div class="input" style="width: 7%">
+		<select id="cfop" name="itemPedido.tipoCFOP" >
+			<option value="">&lt&lt SELECIONE &gt&gt</option>
+			<c:forEach var="CFOP" items="${listaCFOP}">
+				<option value="${CFOP}">${CFOP.descricao}</option>
+			</c:forEach>
+		</select>
 	</div>
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">

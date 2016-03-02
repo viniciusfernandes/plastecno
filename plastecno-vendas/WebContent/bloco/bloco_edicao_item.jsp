@@ -12,7 +12,6 @@ $(document).ready(function() {
 	inserirMascaraMonetaria('bloco_item_pedido #medidaInterna', 8);
 	inserirMascaraNumerica('bloco_item_pedido #quantidadeMinima', '999');
 	inserirMascaraNumerica('bloco_item_pedido #margemMinimaLucro', '999');
-	inserirMascaraNCM('bloco_item_pedido #ncm');
 	
 	$('#botaoLimparItemPedido').click(function () {
 		$('#botaoPesquisar').click();
@@ -157,20 +156,6 @@ function habilitarCamposEdicaoItem(habilitado){
 		<div class="input" style="width: 60%">
 			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}" style="width: 10%"/>
 		</div>
-		<div class="label">NCM:</div>
-		<div class="input" style="width: 8%">
-			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}"/>
-		</div>
-		<div class="label" style="width: 10%">CFOP:</div>
-		<div class="input" style="width: 7%">
-			<select id="CFOP" name="itemPedido.tipoCFOP" >
-				<option value="">&lt&lt SELECIONE &gt&gt</option>
-				<c:forEach var="CFOP" items="${listaCFOP}">
-					<option value="${CFOP}" <c:if test="${CFOP eq itemPedido.tipoCFOP}">selected</c:if>>${CFOP.descricao}</option>
-				</c:forEach>
-			</select>
-		</div>
-		
 	</c:if>
 	
 	<div class="bloco_botoes">

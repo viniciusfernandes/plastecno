@@ -14,6 +14,7 @@ public class ItemPedidoJson {
     private final Integer idMaterial;
     private final Double medidaExterna;
     private final Double medidaInterna;
+    private final String ncm;
     private final boolean peca;
     private final Integer prazoEntrega;
     private final String precoItem;
@@ -24,6 +25,7 @@ public class ItemPedidoJson {
     private final Integer quantidade;
     private final Integer sequencial;
     private final String siglaMaterial;
+    private final String tipoCFOP;
     private final String valorPedido;
     private final String valorPedidoIPI;
     private final boolean vendaKilo;
@@ -55,6 +57,8 @@ public class ItemPedidoJson {
         precoMinimo = itemPedido.getPrecoMinimoFormatado();
         prazoEntrega = itemPedido.getPrazoEntrega();
         aliquotaComissao = itemPedido.getAliquotaComissaoFormatado();
+        ncm = itemPedido.getNcm();
+        tipoCFOP = itemPedido.getTipoCFOP() != null ? itemPedido.getTipoCFOP().toString() : "";
     }
 
     public String getAliquotaComissao() {
@@ -101,6 +105,10 @@ public class ItemPedidoJson {
         return medidaInterna;
     }
 
+    public String getNcm() {
+        return ncm;
+    }
+
     public Integer getPrazoEntrega() {
         return prazoEntrega;
     }
@@ -135,6 +143,10 @@ public class ItemPedidoJson {
 
     public String getSiglaMaterial() {
         return siglaMaterial;
+    }
+
+    public String getTipoCFOP() {
+        return tipoCFOP;
     }
 
     public String getValorPedido() {

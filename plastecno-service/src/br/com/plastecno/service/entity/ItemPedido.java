@@ -19,6 +19,7 @@ import javax.persistence.Transient;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoCFOP;
+import br.com.plastecno.service.constante.TipoDocumento;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
@@ -97,6 +98,7 @@ public class ItemPedido extends Item {
 	private Double medidaInterna;
 
 	@Column(name = "ncm")
+	@InformacaoValidavel(obrigatorio = false, tipoDocumento = TipoDocumento.NCM, nomeExibicao = "NCM do item do pedido")
 	private String ncm;
 
 	@Transient

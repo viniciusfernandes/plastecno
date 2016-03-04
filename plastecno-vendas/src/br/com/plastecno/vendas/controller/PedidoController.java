@@ -190,6 +190,8 @@ public class PedidoController extends AbstractController {
 
             gerarMensagemSucesso(mensagem);
             redirectByTipoPedido(tipoPedido);
+            
+            addAtributo("orcamento", true);
         } catch (NotificacaoException e) {
             gerarLogErro("envio de email do pedido No. " + idPedido, e);
         } catch (BusinessException e) {

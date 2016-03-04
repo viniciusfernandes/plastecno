@@ -254,6 +254,8 @@ public class PedidoServiceTest extends AbstractTest {
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
 		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 		pedido.getContato().setEmail("vinicius@hotmail.com");
+		pedido.getContato().setDdd("11");
+		pedido.getContato().setTelefone("43219999");
 		return pedido;
 	}
 
@@ -533,6 +535,11 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		assertEquals("A situacao do pedido deve ser ENVIADO apos o envio de email de orcamento", SituacaoPedido.ENVIADO,
+				pedido.getSituacaoPedido());
+
 	}
 
 	@Test

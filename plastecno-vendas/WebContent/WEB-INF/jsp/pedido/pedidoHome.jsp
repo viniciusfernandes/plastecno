@@ -193,7 +193,7 @@ $(document).ready(function() {
 							value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled"/>
 			</div>
 			
-			<div class="label">Nr. Pedido:</div>
+			<div class="label">Número:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoPesquisa" value="${pedido.id}"
 					class="pesquisavel" />

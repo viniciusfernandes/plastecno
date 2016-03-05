@@ -25,6 +25,7 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoAcesso;
+import br.com.plastecno.service.constante.TipoCFOP;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
@@ -189,6 +190,8 @@ public class PedidoController extends AbstractController {
 
             gerarMensagemSucesso(mensagem);
             redirectByTipoPedido(tipoPedido);
+            
+            addAtributo("orcamento", true);
         } catch (NotificacaoException e) {
             gerarLogErro("envio de email do pedido No. " + idPedido, e);
         } catch (BusinessException e) {
@@ -461,7 +464,8 @@ public class PedidoController extends AbstractController {
         addAtributo("revenda", FinalidadePedido.REVENDA);
         addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
         addAtributo("inclusaoDadosNFdesabilitado", false);
-
+        addAtributo("listaCFOP", TipoCFOP.values());
+        
         // verificando se o parametro para desabilitar ja foi incluido em outro
         // fluxo
         if (!contemAtributo("pedidoDesabilitado")) {

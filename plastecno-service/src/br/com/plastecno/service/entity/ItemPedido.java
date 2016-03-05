@@ -18,6 +18,8 @@ import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoCFOP;
+import br.com.plastecno.service.constante.TipoDocumento;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
@@ -95,6 +97,10 @@ public class ItemPedido extends Item {
 	@Column(name = "medida_interna")
 	private Double medidaInterna;
 
+	@Column(name = "ncm")
+	@InformacaoValidavel(obrigatorio = false, tipoDocumento = TipoDocumento.NCM, nomeExibicao = "NCM do item do pedido")
+	private String ncm;
+
 	@Transient
 	private String nomeProprietario;
 
@@ -153,6 +159,10 @@ public class ItemPedido extends Item {
 
 	@Transient
 	private String sobrenomeProprietario;
+
+	@Column(name = "id_tipo_cfop")
+	@Enumerated(EnumType.ORDINAL)
+	private TipoCFOP tipoCFOP;
 
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_tipo_venda")
@@ -387,6 +397,10 @@ public class ItemPedido extends Item {
 		return medidaInterna;
 	}
 
+	public String getNcm() {
+		return ncm;
+	}
+
 	public String getNomeProprietario() {
 		return nomeProprietario;
 	}
@@ -461,6 +475,10 @@ public class ItemPedido extends Item {
 
 	public String getSobrenomeProprietario() {
 		return sobrenomeProprietario;
+	}
+
+	public TipoCFOP getTipoCFOP() {
+		return tipoCFOP;
 	}
 
 	public TipoVenda getTipoVenda() {
@@ -591,6 +609,10 @@ public class ItemPedido extends Item {
 		this.medidaInterna = medidaInterna;
 	}
 
+	public void setNcm(String ncm) {
+		this.ncm = ncm;
+	}
+
 	public void setNomeProprietario(String nomeProprietario) {
 		this.nomeProprietario = nomeProprietario;
 	}
@@ -661,6 +683,10 @@ public class ItemPedido extends Item {
 
 	public void setSobrenomeProprietario(String sobrenomeProprietario) {
 		this.sobrenomeProprietario = sobrenomeProprietario;
+	}
+
+	public void setTipoCFOP(TipoCFOP tipoCFOP) {
+		this.tipoCFOP = tipoCFOP;
 	}
 
 	public void setTipoVenda(TipoVenda tipoVenda) {

@@ -84,7 +84,7 @@ $(document).ready(function() {
 	var urlTela = '<c:url value="/cliente"/>'; 
 	tabelaLogradouroHandler = inicializarBlocoLogradouro(urlTela);
 	tabelaLogradouroHandler.setNumeroLinhasCopiadas(3);
-	tabelaLogradouroHandler.ajustarLinhasCopiadas(function(linhas){
+	tabelaLogradouroHandler.ajustarLinhasCopiadasCallback(function(linhas){
 		var tipos = ['FATURAMENTO', 'ENTREGA', 'COBRANCA'];
 		tipos.splice(tipos.indexOf(linhas[0].cells[1].innerHTML), 1);
 		linhas[1].cells[1].innerHTML = tipos[0];

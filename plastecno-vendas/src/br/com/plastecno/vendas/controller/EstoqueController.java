@@ -12,7 +12,6 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoAcesso;
-import br.com.plastecno.service.constante.TipoCFOP;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.exception.BusinessException;
@@ -64,7 +63,6 @@ public class EstoqueController extends AbstractController {
     @Get("estoque")
     public void estoqueHome() {
         addAtributo("listaFormaMaterial", FormaMaterial.values());
-        addAtributo("listaCFOP", TipoCFOP.values());
         addAtributo("isEstoque", true);
 
         verificarPermissaoAcesso("acessoManutencaoEstoquePermitido", TipoAcesso.ADMINISTRACAO,

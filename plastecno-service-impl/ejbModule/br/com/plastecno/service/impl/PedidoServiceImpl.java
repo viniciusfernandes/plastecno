@@ -206,8 +206,12 @@ public class PedidoServiceImpl implements PedidoService {
 		Double precoItem = null;
 
 		for (ItemPedido itemPedido : listaItem) {
-			
-			if (pedido.isRevenda() && !itemPedido.contemAliquotaComissao()) {
+
+			if (itemPedido.contemAliquotaComissao()) {
+				comissaoVenda = new Comissao();
+				comissaoVenda.setAliquotaRevenda(itemPedido.getAliquotaComissao());
+				comissaoVenda.setAliquotaRepresentacao(itemPedido.getAliquotaComissao());
+			} else if (pedido.isRevenda() && !itemPedido.contemAliquotaComissao()) {
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(), itemPedido
 						.getFormaMaterial().indexOf());
 
@@ -217,9 +221,6 @@ public class PedidoServiceImpl implements PedidoService {
 					comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 				}
 
-			} else if (pedido.isRevenda() && itemPedido.contemAliquotaComissao()) {
-				comissaoVenda = new Comissao();
-				comissaoVenda.setAliquotaRevenda(itemPedido.getAliquotaComissao());
 			} else if (pedido.isRepresentacao()) {
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 			}
@@ -447,10 +448,19 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
-
-		if (StringUtils.isEmpty(pedido.getContato().getEmail())) {
+		Contato contato = pedido.getContato();
+		if (StringUtils.isEmpty(contato.getEmail())) {
 			throw new BusinessException("Email do contato é obrigatório para envio do orçamento");
 		}
+
+		if (StringUtils.isEmpty(contato.getDdd())) {
+			throw new BusinessException("DDD do telefone do contato é obrigatório para envio do orçamento");
+		}
+
+		if (StringUtils.isEmpty(contato.getTelefone())) {
+			throw new BusinessException("O telefone do contato é obrigatório para envio do orçamento");
+		}
+
 		try {
 			emailService.enviar(new GeradorPedidoEmail(pedido, arquivoAnexado).gerarMensagem(TipoMensagemPedido.ORCAMENTO));
 		} catch (NotificacaoException e) {
@@ -490,8 +500,17 @@ public class PedidoServiceImpl implements PedidoService {
 			calcularComissaoVenda(pedido);
 			enviarVenda(pedido, arquivoAnexado);
 		}
+
 		if (pedido.isCompra()) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
+		} else {
+			// Aqui estamos tratando o caso em que a situacao do pedido nao foi
+			// definida
+			// na reserva dos itens do pedido, pois la o pedido entre em pendecia de
+			// reserva.
+			if (pedido.isOrcamento() || SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
+				pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
+			}
 		}
 		pedidoDAO.alterar(pedido);
 	}
@@ -504,13 +523,6 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
-		// Aqui estamos tratando o caso em que a situacao do pedido nao foi definida
-		// na reserva dos itens do pedido, pois la o pedido entre em pendecia de
-		// reserva.
-		if (SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
-			pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
-		}
-
 		try {
 			GeradorPedidoEmail gerador = new GeradorPedidoEmail(pedido, arquivoAnexado);
 			emailService.enviar(gerador.gerarMensagem(TipoMensagemPedido.VENDA));
@@ -596,7 +608,8 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new InformacaoInvalidaException("Data de entrega deve ser posterior a data atual");
 		}
 
-		if (TipoEntrega.CIF_TRANS.equals(pedido.getTipoEntrega()) && pedido.getTransportadoraRedespacho() == null) {
+		if (!pedido.isOrcamento() && TipoEntrega.CIF_TRANS.equals(pedido.getTipoEntrega())
+				&& pedido.getTransportadoraRedespacho() == null) {
 			throw new BusinessException("A transportadora de redespacho é obrigatória para o tipo de entrega "
 					+ TipoEntrega.CIF_TRANS.getDescricao());
 		}

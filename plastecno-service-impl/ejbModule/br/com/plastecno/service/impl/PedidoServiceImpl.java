@@ -453,7 +453,7 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Email do contato é obrigatório para envio do orçamento");
 		}
 
-		if (StringUtils.isEmpty(contato.getDDDTelefone())) {
+		if (StringUtils.isEmpty(contato.getDdd())) {
 			throw new BusinessException("DDD do telefone do contato é obrigatório para envio do orçamento");
 		}
 

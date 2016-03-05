@@ -543,6 +543,41 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testEnvioEmailPedidoOrcamentoSemDDDContato() {
+		Pedido pedido = gerarPedidoOrcamento();
+		ItemPedido itemPedido = gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		Contato contato = pedido.getContato();
+		contato.setDdd(null);
+		try {
+			// Inserindo a alteracao do contato no sistema
+			pedidoService.inserir(pedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		boolean throwed = false;
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue("O DDD do contato do orcamento eh obrigatorio", throwed);
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		assertEquals("O pedido nao foi enviado e deve permanecer na situacao de orcamento", SituacaoPedido.ORCAMENTO,
+				pedido.getSituacaoPedido());
+
+	}
+
+	@Test
 	public void testEnvioEmailPedidoOrcamentoSemEmailContato() {
 		Pedido pedido = gerarPedidoOrcamento();
 		pedido.getContato().setEmail(null);
@@ -563,6 +598,41 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O email do contato eh obrigatorio para o envio do orcamento", throwed);
+	}
+
+	@Test
+	public void testEnvioEmailPedidoOrcamentoSemTelefoneContato() {
+		Pedido pedido = gerarPedidoOrcamento();
+		ItemPedido itemPedido = gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		Contato contato = pedido.getContato();
+		contato.setTelefone(null);
+		try {
+			// Inserindo a alteracao do contato no sistema
+			pedidoService.inserir(pedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		boolean throwed = false;
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue("O telefone  do contato do orcamento eh obrigatorio", throwed);
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		assertEquals("O pedido nao foi enviado e deve permanecer na situacao de orcamento", SituacaoPedido.ORCAMENTO,
+				pedido.getSituacaoPedido());
+
 	}
 
 	@Test
@@ -751,39 +821,6 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testEnvioPedidoRevendaSemComissaoRevenda() {
-		Pedido pedido = gerarPedidoRevendaComItem();
-		Integer idPedido = pedido.getId();
-		Integer idVendedor = pedido.getVendedor().getId();
-		boolean throwed = false;
-		try {
-			comissaoService.inserirComissaoVendedor(idVendedor, null, null);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
-		} catch (BusinessException e) {
-			throwed = true;
-		}
-
-		assertTrue("O vendedor ainda nao possui comissao de revenda e deve ser validado no sistema", throwed);
-
-		try {
-			comissaoService.inserirComissaoVendedor(idVendedor, 0.1, null);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-	}
-
-	@Test
 	public void testEnvioPedidoRevendaComissaoItemPedido() {
 		Pedido pedido = gerarPedidoRevendaComItem();
 
@@ -822,6 +859,39 @@ public class PedidoServiceTest extends AbstractTest {
 		itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
 
 		assertEquals(valorComissionado, itemPedido.getValorComissionado());
+	}
+
+	@Test
+	public void testEnvioPedidoRevendaSemComissaoRevenda() {
+		Pedido pedido = gerarPedidoRevendaComItem();
+		Integer idPedido = pedido.getId();
+		Integer idVendedor = pedido.getVendedor().getId();
+		boolean throwed = false;
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, null, null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue("O vendedor ainda nao possui comissao de revenda e deve ser validado no sistema", throwed);
+
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, 0.1, null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test

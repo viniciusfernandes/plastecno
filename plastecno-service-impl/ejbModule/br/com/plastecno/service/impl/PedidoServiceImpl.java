@@ -796,7 +796,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		return new PaginacaoWrapper<Pedido>(pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor,
-				idFornecedor, isCompra), listaPedido);
+				idFornecedor, isCompra, null), listaPedido);
 	}
 
 	@Override
@@ -1032,13 +1032,14 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros,
+			ItemPedido itemVendido) {
 
 		if (idCliente == null) {
 			return Collections.emptyList();
 		}
 		return itemPedidoDAO.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor,
-				isCompra, indiceRegistroInicial, numeroMaximoRegistros);
+				isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
 	}
 
 	@Override
@@ -1308,44 +1309,19 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra) {
+			Integer idFornecedor, boolean isCompra, ItemPedido itemVendido) {
 		if (idCliente == null) {
 			return 0L;
 		}
 
-		StringBuilder select = new StringBuilder("select count(p.id) from Pedido p where p.cliente.id = :idCliente ");
-		if (idVendedor != null) {
-			select.append("and p.proprietario.id = :idVendedor ");
-		}
-
-		if (idFornecedor != null) {
-			select.append("and p.representada.id = :idFornecedor ");
-		}
-
-		if (isCompra) {
-			select.append("and p.tipoPedido = :tipoPedido ");
-		} else {
-			select.append("and p.tipoPedido != :tipoPedido ");
-		}
-
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA);
-
-		if (idVendedor != null) {
-			query.setParameter("idVendedor", idVendedor);
-		}
-
-		if (idFornecedor != null) {
-			query.setParameter("idFornecedor", idFornecedor);
-		}
-
-		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
+		return itemPedidoDAO.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor,
+				isCompra, itemVendido);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(Integer idCliente) {
-		return this.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false);
+		return this.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false, null);
 	}
 
 	@Override

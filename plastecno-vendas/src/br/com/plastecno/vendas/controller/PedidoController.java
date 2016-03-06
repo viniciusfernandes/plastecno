@@ -190,7 +190,7 @@ public class PedidoController extends AbstractController {
 
             gerarMensagemSucesso(mensagem);
             redirectByTipoPedido(tipoPedido);
-            
+
             addAtributo("orcamento", true);
         } catch (NotificacaoException e) {
             gerarLogErro("envio de email do pedido No. " + idPedido, e);
@@ -285,7 +285,8 @@ public class PedidoController extends AbstractController {
      * os pedidos de todos os vendedores
      */
     private RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioPaginadoItemPedido(Integer idCliente,
-            Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer paginaSelecionada) {
+            Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer paginaSelecionada,
+            ItemPedido itemVendido) {
         final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
 
         // Essa variavel eh utilizada para decidirmos se queremos recuperar
@@ -295,7 +296,8 @@ public class PedidoController extends AbstractController {
         boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
         RelatorioWrapper<Pedido, ItemPedido> relatorio = relatorioService
                 .gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, pesquisarTodos ? null
-                        : idVendedor, idFornecedor, isCompra, indiceRegistroInicial, getNumerRegistrosPorPagina());
+                        : idVendedor, idFornecedor, isCompra, indiceRegistroInicial, getNumerRegistrosPorPagina(),
+                        itemVendido);
 
         for (GrupoWrapper<Pedido, ItemPedido> grupo : relatorio.getListaGrupo()) {
             formatarPedido(grupo.getId());
@@ -465,7 +467,7 @@ public class PedidoController extends AbstractController {
         addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
         addAtributo("inclusaoDadosNFdesabilitado", false);
         addAtributo("listaCFOP", TipoCFOP.values());
-        
+
         // verificando se o parametro para desabilitar ja foi incluido em outro
         // fluxo
         if (!contemAtributo("pedidoDesabilitado")) {
@@ -634,7 +636,7 @@ public class PedidoController extends AbstractController {
 
     @Get("pedido/listagem")
     public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada) {
+            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido) {
         if (idCliente == null) {
             gerarListaMensagemErro("Cliente é obrigatório para a pesquisa de pedidos");
             irTopoPagina();
@@ -642,8 +644,7 @@ public class PedidoController extends AbstractController {
             boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
 
             final RelatorioWrapper<Pedido, ItemPedido> relatorio = gerarRelatorioPaginadoItemPedido(idCliente,
-                    idVendedor, idFornecedor, isCompra, paginaSelecionada);
-
+                    idVendedor, idFornecedor, isCompra, paginaSelecionada, itemVendido);
             inicializarRelatorioPaginado(paginaSelecionada, relatorio, "relatorioItemPedido");
 
             /*
@@ -673,6 +674,7 @@ public class PedidoController extends AbstractController {
             addAtributo("idRepresentadaSelecionada", idFornecedor);
         }
         configurarTipoPedido(tipoPedido);
+        irRodapePagina();
     }
 
     private void redirectByTipoPedido(TipoPedido tipoPedido) {

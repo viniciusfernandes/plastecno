@@ -13,7 +13,6 @@ alter table vendas.tb_pedido add valor_total_nf numeric(9,2) default null;
 alter table vendas.tb_pedido add valor_parcela_nf numeric(9,2) default null;
 alter table vendas.tb_pedido add numero_coleta varchar(8) default null;
 alter table vendas.tb_pedido add numero_volumes integer default null;
-
 create table vendas.tb_tipo_cfop (
 	id integer not null,
 	descricao varchar(50) not null
@@ -24,3 +23,6 @@ insert into vendas.tb_tipo_cfop values (1, 'IMPORTADO ADQUIRIDO MERCADO INTERNO'
 alter table vendas.tb_item_pedido add id_tipo_cfop integer default null;
 create index idx_item_pedido_tipo_cfop on vendas.tb_item_pedido (id_tipo_cfop);
 alter table vendas.tb_item_pedido add ncm varchar(15) default null;
+
+
+alter table vendas.tb_material ALTER COLUMN sigla SET DATA TYPE varchar(20);

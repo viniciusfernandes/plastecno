@@ -41,7 +41,7 @@ public interface RelatorioService {
 
 	RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
 			Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros);
+			Integer numeroMaximoRegistros, ItemPedido itemVendido);
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente);
 

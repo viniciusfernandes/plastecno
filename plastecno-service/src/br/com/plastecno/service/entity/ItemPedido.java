@@ -329,6 +329,10 @@ public class ItemPedido extends Item {
 		return this.formaMaterial != null && this.formaMaterial.contemLargura();
 	}
 
+	public boolean contemMaterial() {
+		return formaMaterial != null && material != null && material.getId() != null;
+	}
+
 	public Double getAliquotaComissao() {
 		return aliquotaComissao;
 	}

@@ -47,6 +47,41 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		super.alterarPropriedade(ItemPedido.class, idItemPedido, "comissao", valorComissao);
 	}
 
+	private void inserirParametroPesquisaItemVendido(Query query, ItemPedido itemVendido) {
+		if (itemVendido != null && itemVendido.contemMaterial()) {
+			query.setParameter("formaMaterial", itemVendido.getFormaMaterial()).setParameter("idMaterial",
+					itemVendido.getMaterial().getId());
+			if (itemVendido.getMedidaExterna() != null) {
+				query.setParameter("medidaExterna", itemVendido.getMedidaExterna());
+			}
+
+			if (itemVendido.getMedidaInterna() != null) {
+				query.setParameter("medidaInterna", itemVendido.getMedidaInterna());
+			}
+
+			if (itemVendido.getComprimento() != null) {
+				query.setParameter("comprimento", itemVendido.getComprimento());
+			}
+		}
+	}
+
+	private void inserirPesquisaItemVendido(StringBuilder select, ItemPedido itemVendido) {
+		if (itemVendido != null && itemVendido.contemMaterial()) {
+			select.append("and i.formaMaterial =:formaMaterial and i.material.id =:idMaterial ");
+			if (itemVendido.getMedidaExterna() != null) {
+				select.append("and i.medidaExterna =:medidaExterna ");
+			}
+
+			if (itemVendido.getMedidaInterna() != null) {
+				select.append("and i.medidaInterna =:medidaInterna ");
+			}
+
+			if (itemVendido.getComprimento() != null) {
+				select.append("and i.comprimento =:comprimento ");
+			}
+		}
+	}
+
 	public double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido) {
 		if (idItemPedido == null) {
 			return 0;
@@ -260,7 +295,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
 			Integer idProprietario, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
+			Integer numeroMaximoRegistros, ItemPedido itemVendido) {
 
 		// Tivemos que particionar a consulta em 2 etapas pois a paginacao deve ser
 		// feita na consulta de pedidos, mas estava sendo realizada na consulta de
@@ -278,11 +313,10 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		if (isCompra) {
-			selectPedido.append(" and p.tipoPedido = :tipoPedido ) ");
+			selectPedido.append(" and p.tipoPedido = :tipoPedido ");
 		} else {
-			selectPedido.append(" and p.tipoPedido != :tipoPedido ) ");
+			selectPedido.append(" and p.tipoPedido != :tipoPedido ");
 		}
-		selectPedido.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc");
 
 		Query query = this.entityManager.createQuery(selectPedido.toString());
 		query.setParameter("idCliente", idCliente);
@@ -310,10 +344,17 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		selectItem
 				.append("i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento, i.tipoVenda, i.precoVenda, i.aliquotaIPI, i.aliquotaICMS) from ItemPedido i ");
 		selectItem.append("where i.pedido.id in (:listaIdPedido) ");
+
+		inserirPesquisaItemVendido(selectItem, itemVendido);
+
 		selectItem.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc");
 
-		return entityManager.createQuery(selectItem.toString(), ItemPedido.class)
-				.setParameter("listaIdPedido", Arrays.asList(listaIdPedido.toArray(new Integer[] {}))).getResultList();
+		TypedQuery<ItemPedido> queryItem = entityManager.createQuery(selectItem.toString(), ItemPedido.class).setParameter(
+				"listaIdPedido", Arrays.asList(listaIdPedido.toArray(new Integer[] {})));
+
+		inserirParametroPesquisaItemVendido(queryItem, itemVendido);
+
+		return queryItem.getResultList();
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,
@@ -357,6 +398,41 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				this.entityManager.createQuery(
 						"select count(i.id) from ItemPedido i where  i.encomendado = false and i.pedido.id = :idPedido")
 						.setParameter("idPedido", idPedido), Long.class, null);
+	}
+
+	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra, ItemPedido itemVendido) {
+		StringBuilder select = new StringBuilder("select count(p.id) from Pedido p where p.cliente.id = :idCliente ");
+		if (idVendedor != null) {
+			select.append("and p.proprietario.id = :idVendedor ");
+		}
+
+		if (idFornecedor != null) {
+			select.append("and p.representada.id = :idFornecedor ");
+		}
+
+		if (isCompra) {
+			select.append("and p.tipoPedido = :tipoPedido ");
+		} else {
+			select.append("and p.tipoPedido != :tipoPedido ");
+		}
+		
+		inserirPesquisaItemVendido(select, itemVendido);
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA);
+
+		if (idVendedor != null) {
+			query.setParameter("idVendedor", idVendedor);
+		}
+
+		if (idFornecedor != null) {
+			query.setParameter("idFornecedor", idFornecedor);
+		}
+
+		inserirParametroPesquisaItemVendido(query, itemVendido);
+		
+		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
 	}
 
 	public Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido) {

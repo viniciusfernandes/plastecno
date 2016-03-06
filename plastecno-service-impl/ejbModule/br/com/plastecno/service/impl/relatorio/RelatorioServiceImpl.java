@@ -275,7 +275,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(
 			Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
+			Integer numeroMaximoRegistros, ItemPedido itemVendido) {
 		RelatorioWrapper<Pedido, ItemPedido> relatorio = new RelatorioWrapper<Pedido, ItemPedido>("");
 		if (idCliente == null) {
 			return relatorio;
@@ -283,7 +283,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
 			List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
-					null, idFornecedor, isCompra, indiceRegistroInicial, numeroMaximoRegistros);
+					null, idFornecedor, isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
 
 			for (ItemPedido i : listaItemPedido) {
 				relatorio.addGrupo(i.getPedido(), i);

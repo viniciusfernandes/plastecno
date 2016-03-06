@@ -35,6 +35,18 @@ $(document).ready(function(){
 			gerarListaMensagemErro(new Array(mensagem));
 		});
 	});
+	
+	$('#botaoPesquisaItemPedidoVendido').click(function (){
+		// Aqui estamos enviando alguns dados do item que desejamos pesquisar e que ja foram vendidos.
+		// Alem disso estamos reaproveitando todo o codigo que mantem o estado da tela de pedidos atraves do botao de pesquisa ja existente.
+		$('<input>').attr('type','hidden').attr('name','itemVendido.formaMaterial').attr('value',$('#bloco_item_pedido #formaMaterial').val()).appendTo('#formPesquisa');
+		$('<input>').attr('type','hidden').attr('name','itemVendido.descricaoPeca').attr('value',$('#bloco_item_pedido #descricao').val()).appendTo('#formPesquisa');
+		$('<input>').attr('type','hidden').attr('name','itemVendido.material.id').attr('value',$('#bloco_item_pedido #idMaterial').val()).appendTo('#formPesquisa');
+		$('<input>').attr('type','hidden').attr('name','itemVendido.medidaExterna').attr('value',$('#bloco_item_pedido #medidaExterna').val()).appendTo('#formPesquisa');
+		$('<input>').attr('type','hidden').attr('name','itemVendido.medidaInterna').attr('value',$('#bloco_item_pedido #medidaInterna').val()).appendTo('#formPesquisa');
+		$('<input>').attr('type','hidden').attr('name','itemVendido.comprimento').attr('value',$('#bloco_item_pedido #comprimento').val()).appendTo('#formPesquisa');
+		$('#botaoPesquisaPedido').click();
+	});
 });
 
 </script>
@@ -148,6 +160,7 @@ $(document).ready(function(){
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">
 			<a id="botaoInserirItemPedido" title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>
+			<a type="button" id="botaoPesquisaItemPedidoVendido" title="Pesquisar Item de Pedido Vendidos" class="botaoPesquisar"></a>
 			<a id="botaoLimparItemPedido" title="Limpar Dados do Item do Pedido" class="botaoLimpar"></a>
 		</c:if>
 	</div>

@@ -83,31 +83,6 @@ public class EstoqueController extends AbstractController {
         addAtributo("relatorio", relatorio);
     }
 
-    @Post("estoque/item/inclusao")
-    public void inserirItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
-        try {
-            itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
-            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
-            itemPedido.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemPedido.getMargemMinimaLucro()));
-
-            estoqueService.inserirItemEstoque(itemPedido);
-
-            gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
-        } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
-            addAtributo("itemPedido", itemPedido);
-        }
-
-        alteracaoEstoquePublisher.publicar();
-
-        addAtributo("permanecerTopo", true);
-        if (material != null && formaMaterial != null) {
-            pesquisarItemEstoque(material, formaMaterial);
-        } else {
-            irTopoPagina();
-        }
-    }
-
     @Post("estoque/item/inclusao/configuracaoestoque")
     public void inserirConfiguracaoEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
         try {
@@ -128,25 +103,22 @@ public class EstoqueController extends AbstractController {
         }
     }
 
-    @Post("estoque/item/reajustarpreco")
-    public void reajustarPrecoItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
-
-        itemPedido.setAliquotaReajuste(NumeroUtils.gerarAliquota(itemPedido.getAliquotaReajuste()));
+    @Post("estoque/item/inclusao")
+    public void inserirItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
         try {
-            estoqueService.reajustarPrecoItemEstoque(itemPedido);
+            itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(itemPedido.getAliquotaIPI()));
+            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
+            itemPedido.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemPedido.getMargemMinimaLucro()));
 
-            if (itemPedido.getId() != null) {
-                gerarMensagemSucesso("Item de estoque No. " + itemPedido.getId()
-                        + " teve seu preço reajustado com sucesso");
-            } else {
-                gerarMensagemSucesso("Itens de estoque da forma teve seu preço reajustado com sucesso");
-            }
+            estoqueService.inserirItemEstoque(itemPedido);
 
+            gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
-            addAtributo("permanecerTopo", true);
             addAtributo("itemPedido", itemPedido);
         }
+
+        alteracaoEstoquePublisher.publicar();
 
         addAtributo("permanecerTopo", true);
         if (material != null && formaMaterial != null) {
@@ -225,6 +197,16 @@ public class EstoqueController extends AbstractController {
         serializarJson(new SerializacaoJson("lista", lista));
     }
 
+    @Get("estoque/item/ncm")
+    public void pesquisarNcmItemEstoque(ItemEstoque itemEstoque) {
+        try {
+            String ncm = estoqueService.pesquisarNcmItemEstoque(itemEstoque);
+            serializarJson(new SerializacaoJson("ncm", ncm == null ? "" : ncm));
+        } catch (Exception e) {
+            gerarLogErroRequestAjax("cálculo do preço minimo do item do pedido", e);
+        }
+    }
+
     @Get("estoque/descricaopeca")
     public void pesquisarPecaByDescricao(String descricao) {
         List<Autocomplete> lista = new ArrayList<Autocomplete>();
@@ -235,6 +217,34 @@ public class EstoqueController extends AbstractController {
             }
         }
         serializarJson(new SerializacaoJson("lista", lista));
+    }
+
+    @Post("estoque/item/reajustarpreco")
+    public void reajustarPrecoItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
+
+        itemPedido.setAliquotaReajuste(NumeroUtils.gerarAliquota(itemPedido.getAliquotaReajuste()));
+        try {
+            estoqueService.reajustarPrecoItemEstoque(itemPedido);
+
+            if (itemPedido.getId() != null) {
+                gerarMensagemSucesso("Item de estoque No. " + itemPedido.getId()
+                        + " teve seu preço reajustado com sucesso");
+            } else {
+                gerarMensagemSucesso("Itens de estoque da forma teve seu preço reajustado com sucesso");
+            }
+
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            addAtributo("permanecerTopo", true);
+            addAtributo("itemPedido", itemPedido);
+        }
+
+        addAtributo("permanecerTopo", true);
+        if (material != null && formaMaterial != null) {
+            pesquisarItemEstoque(material, formaMaterial);
+        } else {
+            irTopoPagina();
+        }
     }
 
     @Post("estoque/item/edicao")

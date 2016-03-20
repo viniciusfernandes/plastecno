@@ -29,11 +29,11 @@ public interface EstoqueService {
 
 	void empacotarPedido(List<Integer> listaIdPedido);
 
+	void inserirConfiguracaoEstoque(ItemEstoque limite) throws BusinessException;
+
 	Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
-
-	void inserirConfiguracaoEstoque(ItemEstoque limite) throws BusinessException;
 
 	Integer pesquisarIdItemEstoque(Item filtro);
 
@@ -46,6 +46,8 @@ public interface EstoqueService {
 	List<ItemEstoque> pesquisarItemEstoqueEscasso();
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
+
+	String pesquisarNcmItemEstoque(ItemEstoque configuracao);
 
 	List<ItemEstoque> pesquisarPecaByDescricao(String descricao);
 

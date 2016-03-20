@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.TipoDocumento;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
@@ -66,6 +67,10 @@ public class ItemEstoque extends Item {
 
 	@Column(name = "medida_interna")
 	private Double medidaInterna;
+
+	@Column(name = "ncm")
+	@InformacaoValidavel(obrigatorio = false, tipoDocumento = TipoDocumento.NCM)
+	private String ncm;
 
 	@Column(name = "preco_medio")
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Preço de médio de compra do item de estoque")
@@ -203,6 +208,10 @@ public class ItemEstoque extends Item {
 		return medidaInterna;
 	}
 
+	public String getNcm() {
+		return ncm;
+	}
+
 	public Double getPrecoMedio() {
 		return precoMedio;
 	}
@@ -292,6 +301,10 @@ public class ItemEstoque extends Item {
 
 	public void setMedidaInterna(Double medidaInterna) {
 		this.medidaInterna = medidaInterna;
+	}
+
+	public void setNcm(String ncm) {
+		this.ncm = ncm;
 	}
 
 	public void setPrecoMedio(Double precoMedio) {

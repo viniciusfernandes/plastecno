@@ -4,7 +4,6 @@
 $(document).ready(function(){
 	
 	inserirMascaraNCM('bloco_item_pedido #ncm');
-	
 	$('#precoVenda').focus(function (){
 		
 		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
@@ -17,23 +16,8 @@ $(document).ready(function(){
 		parametro += '&itemEstoque.medidaInterna='+$('#bloco_item_pedido #medidaInterna').val();
 		parametro += '&itemEstoque.comprimento='+$('#bloco_item_pedido #comprimento').val();
 		
-		var request = $.ajax({
-			type: 'get',
-			url: '<c:url value="/estoque/item/precominimo"/>',
-			data: parametro 
-		});
-		
-		request.done(function (response){
-			$('#bloco_item_pedido #precoMinimo').val(response.precoMinimo);
-		});
-		
-		request.fail(function(request, status, excecao) {
-			var mensagem = 'Falha no calculo do preco de venda sugerido: '+ idCampoPesquisavel;
-			mensagem += ' para a URL ' + url;
-			mensagem += ' contendo o valor de requisicao ' + parametro;
-			mensagem += ' => Excecao: ' + excecao;
-			gerarListaMensagemErro(new Array(mensagem));
-		});
+		pesquisarPrecoMinimo(parametro);
+		pesquisarNcm(parametro)
 	});
 	
 	$('#botaoPesquisaItemPedidoVendido').click(function (){
@@ -48,6 +32,46 @@ $(document).ready(function(){
 		$('#botaoPesquisaPedido').click();
 	});
 });
+
+function pesquisarPrecoMinimo(parametro){
+	var request = $.ajax({
+		type: 'get',
+		url: '<c:url value="/estoque/item/precominimo"/>',
+		data: parametro 
+	});
+	
+	request.done(function (response){
+		$('#bloco_item_pedido #precoMinimo').val(response.precoMinimo);
+	});
+	
+	request.fail(function(request, status, excecao) {
+		var mensagem = 'Falha no calculo do preco de venda sugerido: '+ idCampoPesquisavel;
+		mensagem += ' para a URL ' + url;
+		mensagem += ' contendo o valor de requisicao ' + parametro;
+		mensagem += ' => Excecao: ' + excecao;
+		gerarListaMensagemErro(new Array(mensagem));
+	});
+};
+
+function pesquisarNcm(parametro){
+	var request = $.ajax({
+		type: 'get',
+		url: '<c:url value="/estoque/item/ncm"/>',
+		data: parametro 
+	});
+	
+	request.done(function (response){
+		$('#bloco_item_pedido #ncm').val(response.ncm);
+	});
+	
+	request.fail(function(request, status, excecao) {
+		var mensagem = 'Falha na pesquisa do item de venda sugerido: '+ idCampoPesquisavel;
+		mensagem += ' para a URL ' + url;
+		mensagem += ' contendo o valor de requisicao ' + parametro;
+		mensagem += ' => Excecao: ' + excecao;
+		gerarListaMensagemErro(new Array(mensagem));
+	});
+};
 
 </script>
 <fieldset id="bloco_item_pedido">

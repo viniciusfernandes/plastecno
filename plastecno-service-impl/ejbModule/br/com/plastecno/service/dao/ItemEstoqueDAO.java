@@ -64,7 +64,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public void inserirConfiguracaoEstoque(ItemEstoque configuracao) throws BusinessException {
 
 		StringBuilder update = new StringBuilder(
-				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima where i.material = :material and i.formaMaterial = :formaMaterial ");
+				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima, i.ncm = :ncm where i.material = :material and i.formaMaterial = :formaMaterial ");
 
 		if (configuracao.contemMedida()) {
 
@@ -90,7 +90,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		Query query = entityManager.createQuery(update.toString())
 
 		.setParameter("material", configuracao.getMaterial())
-				.setParameter("formaMaterial", configuracao.getFormaMaterial())
+				.setParameter("formaMaterial", configuracao.getFormaMaterial()).setParameter("ncm", configuracao.getNcm())
 				.setParameter("margemMinimaLucro", configuracao.getMargemMinimaLucro())
 				.setParameter("quantidadeMinima", configuracao.getQuantidadeMinima());
 
@@ -109,6 +109,49 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 			}
 		}
 		query.executeUpdate();
+	}
+
+	public String pesquisarNcmItemEstoque(ItemEstoque configuracao) {
+
+		StringBuilder select = new StringBuilder(
+				"select i.ncm from ItemEstoque i where i.material = :material and i.formaMaterial = :formaMaterial ");
+
+		if (configuracao.getMedidaExterna() != null) {
+			select.append("and i.medidaExterna = :medidaExterna ");
+		} else {
+			select.append("and i.medidaExterna is null ");
+		}
+
+		if (configuracao.getMedidaInterna() != null) {
+			select.append("and i.medidaInterna = :medidaInterna ");
+		} else {
+			select.append("and i.medidaInterna is null ");
+		}
+
+		if (configuracao.getComprimento() != null) {
+			select.append("and i.comprimento = :comprimento ");
+		} else {
+			select.append("and i.comprimento is null ");
+		}
+
+		Query query = entityManager.createQuery(select.toString())
+
+		.setParameter("material", configuracao.getMaterial())
+				.setParameter("formaMaterial", configuracao.getFormaMaterial());
+
+		if (configuracao.getMedidaExterna() != null) {
+			query.setParameter("medidaExterna", configuracao.getMedidaExterna());
+		}
+
+		if (configuracao.getMedidaInterna() != null) {
+			query.setParameter("medidaInterna", configuracao.getMedidaInterna());
+		}
+
+		if (configuracao.getComprimento() != null) {
+			query.setParameter("comprimento", configuracao.getComprimento());
+		}
+
+		return QueryUtil.gerarRegistroUnico(query, String.class, null);
 	}
 
 	public ItemEstoque pesquisarById(Integer idItemEstoque) {

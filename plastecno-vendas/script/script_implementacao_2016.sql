@@ -26,3 +26,4 @@ alter table vendas.tb_item_pedido add ncm varchar(15) default null;
 
 
 alter table vendas.tb_material ALTER COLUMN sigla SET DATA TYPE varchar(20);
+alter table vendas.tb_item_estoque add ncm varchar(15) default null;

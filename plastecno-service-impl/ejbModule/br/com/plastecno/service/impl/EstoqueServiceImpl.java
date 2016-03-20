@@ -307,6 +307,25 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void inserirConfiguracaoEstoque(ItemEstoque itemEstoque) throws BusinessException {
+		if (itemEstoque.getMaterial() == null || itemEstoque.getMaterial().getId() == null
+				|| itemEstoque.getFormaMaterial() == null) {
+			throw new BusinessException("Forma item e material são obrigatórios para a criação do limite mínimo de estoque");
+		}
+
+		if (itemEstoque.getQuantidadeMinima() != null && itemEstoque.getQuantidadeMinima() <= 0) {
+			itemEstoque.setQuantidadeMinima(null);
+		}
+
+		if (itemEstoque.getMargemMinimaLucro() != null && itemEstoque.getMargemMinimaLucro() <= 0) {
+			itemEstoque.setMargemMinimaLucro(null);
+		}
+		
+		itemEstoqueDAO.inserirConfiguracaoEstoque(itemEstoque);
+	}
+
+	@Override
 	public Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
 		if (itemEstoque == null) {
 			throw new BusinessException("Item de estoque nulo");
@@ -345,24 +364,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(Integer idItemPedido) throws BusinessException {
 		return inserirItemEstoque(gerarItemEstoqueByIdItemPedido(idItemPedido));
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirConfiguracaoEstoque(ItemEstoque itemEstoque) throws BusinessException {
-		if (itemEstoque.getMaterial() == null || itemEstoque.getMaterial().getId() == null || itemEstoque.getFormaMaterial() == null) {
-			throw new BusinessException("Forma item e material são obrigatórios para a criação do limite mínimo de estoque");
-		}
-
-		if (itemEstoque.getQuantidadeMinima() != null && itemEstoque.getQuantidadeMinima() <= 0) {
-			itemEstoque.setQuantidadeMinima(null);
-		}
-
-		if (itemEstoque.getMargemMinimaLucro() != null && itemEstoque.getMargemMinimaLucro() <= 0) {
-			itemEstoque.setMargemMinimaLucro(null);
-		}
-
-		itemEstoqueDAO.inserirConfiguracaoEstoque(itemEstoque);
 	}
 
 	@Override
@@ -434,6 +435,12 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public String pesquisarNcmItemEstoque(ItemEstoque configuracao) {
+		return itemEstoqueDAO.pesquisarNcmItemEstoque(configuracao);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemEstoque> pesquisarPecaByDescricao(String descricao) {
 		return itemEstoqueDAO.pesquisarItemEstoque(null, FormaMaterial.PC, descricao);
 	}
@@ -491,7 +498,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedido);
 		itemEstoque.setQuantidade(quantidadeRecepcionada);
 
-		//itemEstoque.setPrecoMedio(itemEstoque.calcularPrecoUnidadeIPI());
+		// itemEstoque.setPrecoMedio(itemEstoque.calcularPrecoUnidadeIPI());
 		/*
 		 * O fator de correcao de icms deve ser gravado durante a inclusao do item
 		 * no estoque para que seja utilizado no calculo do preco minimo de venda

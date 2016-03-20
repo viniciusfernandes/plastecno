@@ -12,6 +12,7 @@ $(document).ready(function() {
 	inserirMascaraMonetaria('bloco_item_pedido #medidaInterna', 8);
 	inserirMascaraNumerica('bloco_item_pedido #quantidadeMinima', '999');
 	inserirMascaraNumerica('bloco_item_pedido #margemMinimaLucro', '999');
+	inserirMascaraNCM('bloco_item_pedido #ncm');
 	
 	$('#botaoLimparItemPedido').click(function () {
 		$('#botaoPesquisar').click();
@@ -155,6 +156,10 @@ function habilitarCamposEdicaoItem(habilitado){
 		<div class="label" style="width: 13%">Marg. Mín.(%):</div>
 		<div class="input" style="width: 60%">
 			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}" style="width: 10%"/>
+		</div>
+		<div class="label">NCM:</div>
+		<div class="input" style="width: 8%">
+			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}"/>
 		</div>
 	</c:if>
 	

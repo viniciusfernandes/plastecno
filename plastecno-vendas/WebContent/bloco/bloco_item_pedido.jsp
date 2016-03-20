@@ -136,7 +136,7 @@ $(document).ready(function(){
 		<input type="text" id="aliquotaICMS" name="itemPedido.aliquotaICMS"
 			maxlength="2" style="width: 5%"/>
 	</div>
-	<div class="label">Prazo:</div>
+	<div class="label">Prazo (dias):</div>
 	<div class="input" style="width: 5%">
 		<input type="text" id="prazoEntregaItem" name="itemPedido.prazoEntrega" maxlength="3" />
 	</div>
@@ -179,7 +179,7 @@ $(document).ready(function(){
 					<th style="width: 10%">Total Item (R$)</th>
 					<th style="width: 10%">IPI (%)</th>
 					<th style="width: 10%">ICMS (%)</th>
-					<th style="width: 5%">Prazo</th>
+					<th style="width: 5%">Prazo (dias)</th>
 					<th>Ações</th>
 				</tr>
 			</thead>

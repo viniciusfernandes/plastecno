@@ -156,6 +156,10 @@ function habilitarCamposEdicaoItem(habilitado){
 		<div class="input" style="width: 60%">
 			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}" style="width: 10%"/>
 		</div>
+		<div class="label">NCM:</div>
+		<div class="input" style="width: 8%">
+			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}"/>
+		</div>
 	</c:if>
 	
 	<div class="bloco_botoes">

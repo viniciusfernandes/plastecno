@@ -114,6 +114,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@REVIEW(descricao = "Aqui estamos realizando um update diretamente na base e temos um problema de roolback quando estourada uma excecao de negocios")
 	public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada)
 			throws BusinessException {
 		if (quantidadeRecepcionada == null) {
@@ -338,7 +339,7 @@ public class PedidoServiceImpl implements PedidoService {
 		for (Integer idItemPedido : listaIdItemPedido) {
 			// Precisamos recuperar o item por completo para clonagem e criacao de um
 			// pedido de comprar contendo as mesmas informacoes.
-			itemCadastrado = pesquisarItemPedido(idItemPedido);
+			itemCadastrado = pesquisarItemPedidoById(idItemPedido);
 			if (itemCadastrado == null) {
 				continue;
 			}
@@ -751,6 +752,21 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void inserirNcmItemAguardandoMaterialAssociadoByIdItemCompra(Integer idItemPedidoCompra, String ncm)
+			throws BusinessException {
+		if (idItemPedidoCompra == null || ncm == null || ncm.isEmpty()) {
+			return;
+		}
+		try {
+			itemPedidoDAO.inserirNcmItemAguardandoMaterialAssociadoItemCompra(idItemPedidoCompra, ncm);
+		} catch (Exception e) {
+			throw new BusinessException("Falha na inclusao do NCM nos item de revenda associados ao pedido No. "
+					+ pesquisarIdPedidoByIdItemPedido(idItemPedidoCompra), e);
+		}
+	}
+
+	@Override
 	public Pedido inserirOrcamento(Pedido pedido) throws BusinessException {
 		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 		Cliente cliente = pedido.getCliente();
@@ -939,6 +955,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarIdMaterialFormaMaterialItemPedido(idItemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoAguardandoCompra() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
 	}
@@ -1008,18 +1030,6 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public ItemPedido pesquisarItemPedido(Integer idItemPedido) {
-		ItemPedido itemPedido = pedidoDAO.pesquisarItemPedido(idItemPedido);
-		if (itemPedido != null) {
-			Double[] valorPedido = pesquisarValorPedidoByItemPedido(idItemPedido);
-			itemPedido.setValorPedido(valorPedido[0]);
-			itemPedido.setValorPedidoIPI(valorPedido[1]);
-		}
-		return itemPedido;
-	}
-
-	@Override
 	public List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento() {
 		return pesquisarItemPedidoAguardandoEmpacotamento(null);
 	}
@@ -1027,6 +1037,18 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente) {
 		return itemPedidoDAO.pesquisarItemPedidoAguardandoEmpacotamento(idCliente);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ItemPedido pesquisarItemPedidoById(Integer idItemPedido) {
+		ItemPedido itemPedido = pedidoDAO.pesquisarItemPedidoById(idItemPedido);
+		if (itemPedido != null) {
+			Double[] valorPedido = pesquisarValorPedidoByItemPedido(idItemPedido);
+			itemPedido.setValorPedido(valorPedido[0]);
+			itemPedido.setValorPedidoIPI(valorPedido[1]);
+		}
+		return itemPedido;
 	}
 
 	@Override
@@ -1412,7 +1434,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void reencomendarItemPedido(Integer idItemPedido) throws BusinessException {
 		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
-		ItemPedido itemPedido = pesquisarItemPedido(idItemPedido);
+		ItemPedido itemPedido = pesquisarItemPedidoById(idItemPedido);
 		itemPedido.setQuantidadeReservada(0);
 		itemPedido.setEncomendado(false);
 		inserirItemPedido(itemPedido);
@@ -1455,7 +1477,7 @@ public class PedidoServiceImpl implements PedidoService {
 	public Pedido removerItemPedido(Integer idItemPedido) throws BusinessException {
 		ItemPedido itemPedido = null;
 		try {
-			itemPedido = pesquisarItemPedido(idItemPedido);
+			itemPedido = pesquisarItemPedidoById(idItemPedido);
 
 			if (itemPedido == null) {
 				return null;

@@ -47,6 +47,8 @@ public interface EstoqueService {
 
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
+	String pesquisarNcmItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
+
 	String pesquisarNcmItemEstoque(ItemEstoque configuracao);
 
 	List<ItemEstoque> pesquisarPecaByDescricao(String descricao);
@@ -57,7 +59,10 @@ public interface EstoqueService {
 
 	void reajustarPrecoItemEstoque(ItemEstoque itemReajustado) throws BusinessException;
 
-	Integer recepcionarItemCompra(Integer idItemPedido, Integer quantidadeRecepcionada) throws BusinessException;
+	Integer recepcionarItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada) throws BusinessException;
+
+	Integer recepcionarItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada, String ncm)
+			throws BusinessException;
 
 	Integer recortarItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 

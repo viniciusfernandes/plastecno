@@ -454,11 +454,11 @@ public class PedidoController extends AbstractController {
     public void pedidoHome() {
         inicializarListaSituacaoPedido();
 
-        addAtributo("listaTipoEntrega", this.tipoEntregaService.pesquisar());
+        addAtributo("listaTipoEntrega", tipoEntregaService.pesquisar());
 
         gerarListaRepresentada(null);
 
-        addAtributo("listaFormaMaterial", this.formaMaterialService.pesquisar());
+        addAtributo("listaFormaMaterial", formaMaterialService.pesquisar());
         addAtributo("listaContatoDesabilitada", true);
 
         addAtributo("industrializacao", FinalidadePedido.INDUSTRIALIZACAO);
@@ -467,6 +467,9 @@ public class PedidoController extends AbstractController {
         addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
         addAtributo("inclusaoDadosNFdesabilitado", false);
         addAtributo("listaCFOP", TipoCFOP.values());
+
+        liberarAcesso("acessoDadosNotaFiscalPermitido",
+                isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_PEDIDO_COMPRA));
 
         // verificando se o parametro para desabilitar ja foi incluido em outro
         // fluxo
@@ -505,7 +508,7 @@ public class PedidoController extends AbstractController {
 
     @Get("pedido/item/{id}")
     public void pesquisarItemPedidoById(Integer id) {
-        ItemPedido itemPedido = pedidoService.pesquisarItemPedido(id);
+        ItemPedido itemPedido = pedidoService.pesquisarItemPedidoById(id);
         if (itemPedido != null) {
             formatarItemPedido(itemPedido);
             serializarJson(new SerializacaoJson("itemPedido", new ItemPedidoJson(itemPedido)));
@@ -627,8 +630,6 @@ public class PedidoController extends AbstractController {
             liberarAcesso("acessoReenvioPedidoPermitido", acessoReenvioPedidoPermitido);
             liberarAcesso("acessoCancelamentoPedidoPermitido", acessoCancelamentoPedidoPermitido);
             liberarAcesso("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
-            verificarPermissaoAcesso("dadosNotaFiscalHabilitado", TipoAcesso.ADMINISTRACAO,
-                    TipoAcesso.CADASTRO_PEDIDO_COMPRA);
         }
         configurarTipoPedido(tipoPedido);
         redirectByTipoPedido(tipoPedido);

@@ -75,7 +75,7 @@ public class RecepcaoCompraController extends AbstractController {
 
     @Post("compra/item/edicao")
     public void pesquisarItemCompraById(Integer idItemPedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
-        ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
+        ItemPedido itemPedido = pedidoService.pesquisarItemPedidoById(idItemPedido);
         Pedido pedido = pedidoService.pesquisarDadosNotaFiscalByIdItemPedido(idItemPedido);
 
         if (itemPedido == null) {
@@ -90,6 +90,7 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("idRepresentadaSelecionada", idRepresentada);
         pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        irTopoPagina();
     }
 
     @Get("compra/recepcao")
@@ -100,10 +101,10 @@ public class RecepcaoCompraController extends AbstractController {
 
     @Post("compra/item/recepcaoparcial")
     public void recepcaoParcialItemPedido(Integer idItemPedido, Integer quantidadeRecepcionada, Date dataInicial,
-            Date dataFinal, Integer idRepresentada) {
+            Date dataFinal, Integer idRepresentada, String ncm) {
         String mensagem = null;
         try {
-            estoqueService.recepcionarItemCompra(idItemPedido, quantidadeRecepcionada);
+            estoqueService.recepcionarItemCompra(idItemPedido, quantidadeRecepcionada, ncm);
             boolean contemItem = pedidoService.contemQuantidadeNaoRecepcionadaItemPedido(idItemPedido);
             Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
 
@@ -118,7 +119,7 @@ public class RecepcaoCompraController extends AbstractController {
             }
             gerarMensagemSucesso(mensagem);
         } catch (BusinessException e) {
-            addAtributo("itemPedido", pedidoService.pesquisarItemPedido(idItemPedido));
+            addAtributo("itemPedido", pedidoService.pesquisarItemPedidoById(idItemPedido));
             gerarListaMensagemErro(e);
         }
 
@@ -129,9 +130,10 @@ public class RecepcaoCompraController extends AbstractController {
     }
 
     @Post("compra/item/recepcao")
-    public void recepcionarItemCompra(Date dataInicial, Date dataFinal, Integer idRepresentada, Integer idItemPedido) {
+    public void recepcionarItemCompra(Date dataInicial, Date dataFinal, Integer idRepresentada, Integer idItemPedido,
+            String ncm) {
         Integer quantidadeNaoRecepcionada = pedidoService.pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido);
-        recepcaoParcialItemPedido(idItemPedido, quantidadeNaoRecepcionada, dataInicial, dataFinal, idRepresentada);
+        recepcaoParcialItemPedido(idItemPedido, quantidadeNaoRecepcionada, dataInicial, dataFinal, idRepresentada, ncm);
     }
 
     @Post("compra/item/remocao")

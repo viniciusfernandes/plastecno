@@ -35,8 +35,41 @@ $(document).ready(function() {
 		$(form).attr('action', '<c:url value="/estoque/item/reajustarpreco"/>?'+parametros);
 		$(form).submit();
 	});
+	
+	$('#ncm').focus(function (){
+		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
+			return;			
+		}
+		pesquisarNcm();
+	});
 });
 
+function pesquisarNcm(){
+	var parametro = 'itemEstoque.material.id='+$('#bloco_item_pedido #idMaterial').val();
+	parametro += '&itemEstoque.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
+	
+	var request = $.ajax({
+		type: 'get',
+		url: '<c:url value="/estoque/item/ncm"/>',
+		data: parametro 
+	});
+	
+	request.done(function (response){
+		if(isEmpty(response.ncm)){
+			return;
+		}
+		
+		$('#bloco_item_pedido #ncm').val(response.ncm);
+	});
+	
+	request.fail(function(request, status, excecao) {
+		var mensagem = 'Falha na pesquisa do item de venda sugerido: '+ idCampoPesquisavel;
+		mensagem += ' para a URL ' + url;
+		mensagem += ' contendo o valor de requisicao ' + parametro;
+		mensagem += ' => Excecao: ' + excecao;
+		gerarListaMensagemErro(new Array(mensagem));
+	});
+};
 
 function habilitarCamposEdicaoItem(habilitado){
 	habilitar('#bloco_item_pedido #formaMaterial', habilitado);
@@ -157,16 +190,16 @@ function habilitarCamposEdicaoItem(habilitado){
 		<div class="input" style="width: 60%">
 			<input type="text" id="margemMinimaLucro" name="itemPedido.margemMinimaLucro" value="${itemPedido.margemMinimaLucro}" style="width: 10%"/>
 		</div>
-		<div class="label">NCM:</div>
-		<div class="input" style="width: 8%">
-			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}"/>
-		</div>
 	</c:if>
-	
+	<div class="label" >NCM:</div>
+	<div class="input" style="width: 10%">
+		<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}"/>
+	</div>
+		
 	<div class="bloco_botoes">
 		<c:choose>
 			<c:when test="${!isEstoque or (isEstoque && not empty itemPedido.id)}">
-				<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Refazer os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
+				<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Inserir os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
 				<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
 			</c:when>
 			<c:when test="${isEstoque && empty itemPedido.id}">

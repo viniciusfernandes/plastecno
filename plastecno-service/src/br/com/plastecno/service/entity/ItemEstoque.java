@@ -128,6 +128,11 @@ public class ItemEstoque extends Item {
 		this.precoMedioFatorICMS = precoMedioFatorCIMS;
 	}
 
+	public ItemEstoque(Integer id, String ncm) {
+		this.id = id;
+		this.ncm = ncm;
+	}
+
 	public double calcularPrecoTotal() {
 		return this.quantidade != null && this.precoMedio != null ? this.quantidade * this.precoMedio : 0d;
 	}

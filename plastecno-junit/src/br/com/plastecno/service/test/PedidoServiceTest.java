@@ -856,7 +856,7 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
+		itemPedido = pedidoService.pesquisarItemPedidoById(idItemPedido);
 
 		assertEquals(valorComissionado, itemPedido.getValorComissionado());
 	}
@@ -1573,7 +1573,7 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		ItemPedido itemPedido = pedidoService.pesquisarItemPedido(idItemPedido);
+		ItemPedido itemPedido = pedidoService.pesquisarItemPedidoById(idItemPedido);
 		assertEquals("Apos a reencomenda a quantidade reservada deve ser zero", new Integer("0"),
 				itemPedido.getQuantidadeReservada());
 		assertFalse("Apos a reencomenda a o item nao pode estar encomendado", itemPedido.isEncomendado());

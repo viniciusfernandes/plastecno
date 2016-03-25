@@ -9,15 +9,14 @@ $(document).ready(function(){
 		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
 			return;			
 		}
-		
-		var parametro = 'itemEstoque.material.id='+$('#bloco_item_pedido #idMaterial').val();
-		parametro += '&itemEstoque.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
-		parametro += '&itemEstoque.medidaExterna='+$('#bloco_item_pedido #medidaExterna').val();
-		parametro += '&itemEstoque.medidaInterna='+$('#bloco_item_pedido #medidaInterna').val();
-		parametro += '&itemEstoque.comprimento='+$('#bloco_item_pedido #comprimento').val();
-		
-		pesquisarPrecoMinimo(parametro);
-		pesquisarNcm(parametro)
+		pesquisarPrecoMinimo();
+	});
+	
+	$('#ncm').focus(function (){
+		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
+			return;			
+		}
+		pesquisarNcm();
 	});
 	
 	$('#botaoPesquisaItemPedidoVendido').click(function (){
@@ -33,7 +32,17 @@ $(document).ready(function(){
 	});
 });
 
-function pesquisarPrecoMinimo(parametro){
+function gerarParametrosItemPedido(){
+	var parametro = 'itemEstoque.material.id='+$('#bloco_item_pedido #idMaterial').val();
+	parametro += '&itemEstoque.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
+	parametro += '&itemEstoque.medidaExterna='+$('#bloco_item_pedido #medidaExterna').val();
+	parametro += '&itemEstoque.medidaInterna='+$('#bloco_item_pedido #medidaInterna').val();
+	parametro += '&itemEstoque.comprimento='+$('#bloco_item_pedido #comprimento').val();
+	return parametro;
+}
+
+function pesquisarPrecoMinimo(){
+	var parametro = gerarParametrosItemPedido();
 	var request = $.ajax({
 		type: 'get',
 		url: '<c:url value="/estoque/item/precominimo"/>',
@@ -53,7 +62,8 @@ function pesquisarPrecoMinimo(parametro){
 	});
 };
 
-function pesquisarNcm(parametro){
+function pesquisarNcm(){
+	var parametro = gerarParametrosItemPedido();
 	var request = $.ajax({
 		type: 'get',
 		url: '<c:url value="/estoque/item/ncm"/>',
@@ -61,6 +71,10 @@ function pesquisarNcm(parametro){
 	});
 	
 	request.done(function (response){
+		if(isEmpty(response.ncm)){
+			return;
+		}
+		
 		$('#bloco_item_pedido #ncm').val(response.ncm);
 	});
 	
@@ -168,19 +182,22 @@ function pesquisarNcm(parametro){
 	<div class="input" style="width: 5%">
 		<input type="text" id="aliquotaComissao" name="itemPedido.aliquotaComissao" maxlength="3" />
 	</div>
-	<div class="label" style="width: 10%">NCM:</div>
-		<div class="input" style="width: 8%">
-			<input type="text" id="ncm" name="itemPedido.ncm"/>
-		</div>
-	<div class="label" style="width: 8%">CFOP:</div>
-	<div class="input" style="width: 7%">
-		<select id="cfop" name="itemPedido.tipoCFOP" >
+	<div class="label" style="width: 10%">CFOP:</div>
+	<div class="input" style="width: 50%">
+		<select id="cfop" name="itemPedido.tipoCFOP" style="width: 30%">
 			<option value="">&lt&lt SELECIONE &gt&gt</option>
 			<c:forEach var="CFOP" items="${listaCFOP}">
 				<option value="${CFOP}">${CFOP.descricao}</option>
 			</c:forEach>
 		</select>
 	</div>
+	<c:if test="${acessoDadosNotaFiscalPermitido}">
+		<div class="label" >NCM:</div>
+		<div class="input" style="width: 10%">
+			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}"/>
+		</div>
+	</c:if>
+	
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">
 			<a id="botaoInserirItemPedido" title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>

@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 import br.com.caelum.vraptor.Get;
+import br.com.caelum.vraptor.InterceptionException;
 import br.com.caelum.vraptor.Intercepts;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
@@ -67,9 +68,18 @@ public class ControleAcessoInterceptor implements Interceptor {
             }
             logger.log(Level.INFO, "Usuario " + usuarioInfo.getDescricaoLogin() + ". Acessando o recurso: " + recurso);
         }
-        
+
         try {
             stack.next(metodo, resourceInstance);
+        } catch (InterceptionException e) {
+            String mensagem = null;
+            if (usuarioInfo.isLogado()) {
+                mensagem = "Falha no redirecionamento do usuario \"" + usuarioInfo.getDescricaoLogin() + "\""
+                        + " que requisitou o metodo " + metodo.getMethod().getName();
+            } else {
+                mensagem = "Tentativa de acesso por usuario nao autenticado ou timeoute de sessao";
+            }
+            logger.log(Level.WARNING, mensagem);
         } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "Falha na interceptacao do metodo \"" + metodo.getMethod().getName()
                     + "\" efetuado pelo usuario: " + usuarioInfo.getDescricaoLogin());

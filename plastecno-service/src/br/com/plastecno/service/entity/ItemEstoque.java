@@ -160,13 +160,26 @@ public class ItemEstoque extends Item {
 		return quantidadeMinima != null && quantidadeMinima > 0 && margemMinimaLucro != null && margemMinimaLucro > 0;
 	}
 
-	public void copiar(ItemEstoque item) {
-		setAliquotaICMS(item.getAliquotaICMS());
-		setAliquotaIPI(item.getAliquotaIPI());
-		setQuantidade(item.getQuantidade());
-		setPrecoMedio(item.getPrecoMedio());
-		setQuantidadeMinima(item.getQuantidadeMinima());
-		setMargemMinimaLucro(item.getMargemMinimaLucro());
+	public void copiar(ItemEstoque itemEstoque) {
+		setAliquotaICMS(itemEstoque.getAliquotaICMS());
+		setAliquotaIPI(itemEstoque.getAliquotaIPI());
+		setQuantidade(itemEstoque.getQuantidade());
+		setPrecoMedio(itemEstoque.getPrecoMedio());
+		setQuantidadeMinima(itemEstoque.getQuantidadeMinima());
+		setMargemMinimaLucro(itemEstoque.getMargemMinimaLucro());
+	}
+
+	public void copiar(ItemPedido itemPedido) {
+		this.setComprimento(itemPedido.getComprimento());
+		this.setDescricaoPeca(itemPedido.getDescricaoPeca());
+		this.setFormaMaterial(itemPedido.getFormaMaterial());
+		this.setMaterial(itemPedido.getMaterial());
+		this.setMedidaExterna(itemPedido.getMedidaExterna());
+		this.setMedidaInterna(itemPedido.getMedidaInterna());
+		this.setQuantidade(itemPedido.getQuantidade());
+		this.setPrecoMedio(itemPedido.getPrecoUnidade());
+		this.setAliquotaIPI(itemPedido.getAliquotaIPI());
+		this.setAliquotaICMS(itemPedido.getAliquotaICMS());
 	}
 
 	public Double getAliquotaICMS() {

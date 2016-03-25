@@ -939,6 +939,80 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testRecepcaoItemPedidoCompraSemNCMItemEstoque() {
+		ItemPedido i = enviarItemPedidoCompra();
+		ItemEstoque itemEstoque = new ItemEstoque();
+		itemEstoque.copiar(i);
+		itemEstoque.setNcm(null);
+
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.inserirItemEstoque(itemEstoque);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		final String ncm = "11.11.11.11";
+
+		try {
+			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade(), ncm);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
+
+		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		i = pedidoService.pesquisarItemPedidoById(i.getId());
+
+		assertEquals(
+				"O item do estoque nao contem ncm e deve ser configurado apos a recepcao da compra. Verficique as regras de negocios.",
+				ncm, itemEstoque.getNcm());
+
+		assertEquals(
+				"O item do pedido teve o ncm configurado na recepcao da compra, mas as informacoes nao confere. Verficique as regras de negocios.",
+				ncm, i.getNcm());
+	}
+
+	@Test
+	public void testRecepcaoItemPedidoCompraComNCMItemEstoque() {
+		ItemPedido i = enviarItemPedidoCompra();
+		final String ncmAntes = "22.22.22.22";
+
+		ItemEstoque itemEstoque = new ItemEstoque();
+		itemEstoque.copiar(i);
+		itemEstoque.setNcm(ncmAntes);
+
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.inserirItemEstoque(itemEstoque);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		final String ncm = "11.11.11.11";
+
+		try {
+			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade(), ncm);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
+
+		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+
+		assertEquals(
+				"O item do estoque ja continha ncm configurado e nao deve ser alterado apos a recepcao da compra. Verficique as regras de negocios.",
+				ncmAntes, itemEstoque.getNcm());
+
+		assertEquals(
+				"O item do pedido teve o ncm configurado na recepcao da compra, mas ja existia um ncm no estoque e ambos devem ser iguais. Verficique as regras de negocios.",
+				ncmAntes, i.getNcm());
+
+	}
+
+	@Test
 	public void testRecepcaoItemPedidoCompraQuantidadeInferior() {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer quantidadeRecepcionada = i.getQuantidade() - 1;

@@ -260,21 +260,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 	}
 
-	private ItemEstoque gerarItemEstoque(ItemPedido itemPedido) {
-		ItemEstoque itemEstoque = new ItemEstoque();
-		itemEstoque.setComprimento(itemPedido.getComprimento());
-		itemEstoque.setDescricaoPeca(itemPedido.getDescricaoPeca());
-		itemEstoque.setFormaMaterial(itemPedido.getFormaMaterial());
-		itemEstoque.setMaterial(itemPedido.getMaterial());
-		itemEstoque.setMedidaExterna(itemPedido.getMedidaExterna());
-		itemEstoque.setMedidaInterna(itemPedido.getMedidaInterna());
-		itemEstoque.setQuantidade(itemPedido.getQuantidade());
-		itemEstoque.setPrecoMedio(itemPedido.getPrecoUnidade());
-		itemEstoque.setAliquotaIPI(itemPedido.getAliquotaIPI());
-		itemEstoque.setAliquotaICMS(itemPedido.getAliquotaICMS());
-		return itemEstoque;
-	}
-
 	private ItemEstoque gerarItemEstoqueByIdItemPedido(Integer idItemPedido) throws BusinessException {
 		ItemPedido itemPedido = pedidoService.pesquisarItemPedidoById(idItemPedido);
 		if (itemPedido == null) {
@@ -288,7 +273,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 					+ SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.getDescricao() + "\"");
 		}
 
-		ItemEstoque itemEstoque = gerarItemEstoque(itemPedido);
+		ItemEstoque itemEstoque = new ItemEstoque();
+		itemEstoque.copiar(itemPedido);
 
 		Pedido pedido = itemPedido.getPedido();
 		long qtdePendente = pedidoService.pesquisarTotalItemCompradoNaoRecebido(pedido.getId());

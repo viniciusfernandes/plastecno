@@ -14,13 +14,13 @@ import mockit.MockUp;
 import br.com.plastecno.service.dao.GenericDAO;
 
 public class EntidadeRepository {
-	public static EntidadeRepository getInstance() {
-		return repository;
-	}
-
 	private static final Map<Class<?>, Set<Object>> mapaEntidades = new HashMap<Class<?>, Set<Object>>();
 
 	private static final EntidadeRepository repository = new EntidadeRepository();
+
+	public static EntidadeRepository getInstance() {
+		return repository;
+	}
 
 	private EntidadeRepository() {
 		initGenericDAO();
@@ -145,6 +145,30 @@ public class EntidadeRepository {
 			}
 		}
 		return (K) valor;
+	}
+
+	<T> List<T> pesquisarEntidadeByAtributo(Class<T> classe, String nomeAtributo, Object valorAtributo) {
+		List<T> todos = pesquisarTodos(classe);
+		List<T> lista = new ArrayList<T>();
+		for (T t : todos) {
+			try {
+				Field field = classe.getDeclaredField(nomeAtributo);
+				field.setAccessible(true);
+				try {
+					Object valor = field.get(t);
+					if (valor != null && valor.equals(valorAtributo)) {
+						lista.add(t);
+					}
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					throw new IllegalArgumentException("Falha no acesso o valor do atributo \"" + nomeAtributo
+							+ "\" da entidade cujo valor eh \"" + valorAtributo + "\"", e);
+				}
+			} catch (NoSuchFieldException | SecurityException e) {
+				throw new IllegalArgumentException("A entidade do tipo " + classe + " nao possui o atributo \"" + nomeAtributo
+						+ "\"", e);
+			}
+		}
+		return lista;
 	}
 
 	<T> T pesquisarEntidadeByAtributo(Class<T> classe, String nomeAtributo, Object valorAtributo, Object valorIdEntidade) {

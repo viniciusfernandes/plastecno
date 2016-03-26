@@ -521,7 +521,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 					(FormaMaterial) materialFormaMaterial[1], ncm);
 		}
 
-		if (ncm == null || isNcmDiferente) {
+		if (ncm == null || (isNcmDiferente && !isNovoNcm)) {
 			ncm = ncmEstoque;
 		}
 

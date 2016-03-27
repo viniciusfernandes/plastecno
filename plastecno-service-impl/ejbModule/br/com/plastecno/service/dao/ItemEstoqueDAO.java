@@ -64,7 +64,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public void inserirConfiguracaoEstoque(ItemEstoque configuracao) throws BusinessException {
 
 		StringBuilder update = new StringBuilder(
-				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima, i.ncm = :ncm where i.material = :material and i.formaMaterial = :formaMaterial ");
+				"update ItemEstoque i set i.margemMinimaLucro = :margemMinimaLucro, i.quantidadeMinima = :quantidadeMinima where i.material = :material and i.formaMaterial = :formaMaterial ");
 
 		if (configuracao.contemMedida()) {
 
@@ -90,7 +90,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		Query query = entityManager.createQuery(update.toString())
 
 		.setParameter("material", configuracao.getMaterial())
-				.setParameter("formaMaterial", configuracao.getFormaMaterial()).setParameter("ncm", configuracao.getNcm())
+				.setParameter("formaMaterial", configuracao.getFormaMaterial())
 				.setParameter("margemMinimaLucro", configuracao.getMargemMinimaLucro())
 				.setParameter("quantidadeMinima", configuracao.getQuantidadeMinima());
 

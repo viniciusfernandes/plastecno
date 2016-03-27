@@ -47,7 +47,7 @@ $(document).ready(function() {
 			return;
 		}
 		var parametros = 'idItemPedido='+$('#bloco_item_pedido #idItemPedido').val()+'&quantidadeRecepcionada='+$('#bloco_item_pedido #quantidade').val();
-		parametros += '&' + $('#formPesquisa').serialize();
+		parametros += '&ncm='+$('#bloco_item_pedido #ncm').val()+'&' + $('#formPesquisa').serialize();
 		var form = $('#formVazio');
 		$(form).attr('method', 'post');
 		$(form).attr('action', '<c:url value="/compra/item/recepcaoparcial"/>?'+parametros);

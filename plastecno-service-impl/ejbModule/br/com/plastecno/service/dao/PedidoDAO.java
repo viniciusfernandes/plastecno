@@ -188,7 +188,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				Integer.class, null);
 	}
 
-	public ItemPedido pesquisarItemPedido(Integer idItemPedido) {
+	public ItemPedido pesquisarItemPedidoById(Integer idItemPedido) {
 		Query query = this.entityManager.createQuery("select i from ItemPedido i where i.id = :idItemPedido");
 		query.setParameter("idItemPedido", idItemPedido);
 		return QueryUtil.gerarRegistroUnico(query, ItemPedido.class, null);

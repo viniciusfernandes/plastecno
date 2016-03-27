@@ -1,5 +1,7 @@
 package br.com.plastecno.service.test.builder;
 
+import java.util.List;
+
 import mockit.Mock;
 import mockit.MockUp;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
@@ -11,14 +13,36 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 	public ItemPedidoDAO build() {
 		new MockUp<ItemPedidoDAO>() {
 
+			@Mock
+			public Integer inserirNcmItemAguardandoMaterialAssociadoItemCompra(Integer idItemPedidoCompra, String ncm) {
+				ItemPedido iCompra = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedidoCompra);
+				List<ItemPedido> lVenda = REPOSITORY.pesquisarEntidadeByAtributo(ItemPedido.class, "idPedidoCompra", iCompra
+						.getPedido().getId());
+				for (ItemPedido i : lVenda) {
+					if (i.getMaterial().getId().equals(iCompra.getMaterial().getId())
+							&& i.getFormaMaterial().equals(iCompra.getFormaMaterial())) {
+						i.setNcm(ncm);
+					}
+				}
+				return -1;
+			}
 
 			@Mock
 			public double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido) {
-				ItemPedido itemPedido = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
-				if (itemPedido == null) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				if (i == null) {
 					return 0;
 				}
-				return itemPedido.getAliquotaIPI();
+				return i.getAliquotaIPI();
+			}
+
+			@Mock
+			public Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				if (i == null) {
+					return new Object[] {};
+				}
+				return new Object[] { i.getMaterial().getId(), i.getFormaMaterial() };
 			}
 
 			@Mock

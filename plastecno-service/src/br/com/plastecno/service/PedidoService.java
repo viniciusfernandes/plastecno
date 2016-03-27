@@ -63,6 +63,9 @@ public interface PedidoService {
 
 	Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException;
 
+	void inserirNcmItemAguardandoMaterialAssociadoByIdItemCompra(Integer idItemPedidoCompra, String ncm)
+			throws BusinessException;
+
 	Pedido inserirOrcamento(Pedido pedido) throws BusinessException;
 
 	boolean isCalculoIPIHabilitado(Integer idPedido);
@@ -103,6 +106,8 @@ public interface PedidoService {
 
 	List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido);
 
+	Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido);
+
 	List<Integer> pesquisarIdPedidoAguardandoCompra();
 
 	List<Integer> pesquisarIdPedidoAguardandoEmpacotamento();
@@ -123,11 +128,11 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Periodo periodo);
 
-	ItemPedido pesquisarItemPedido(Integer idItemPedido);
-
 	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento();
 
 	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente);
+
+	ItemPedido pesquisarItemPedidoById(Integer idItemPedido);
 
 	List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
 			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido);

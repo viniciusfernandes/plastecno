@@ -47,6 +47,13 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		super.alterarPropriedade(ItemPedido.class, idItemPedido, "comissao", valorComissao);
 	}
 
+	public Integer inserirNcmItemAguardandoMaterialAssociadoItemCompra(Integer idItemPedidoCompra, String ncm) {
+		return entityManager
+				.createQuery(
+						"update ItemPedido iVenda set iVenda.ncm =:ncm where iVenda.pedido.id in (select iCompra.idPedidoVenda from ItemPedido iCompra where iCompra.id = :idItemPedidoCompra and iCompra.material.id = iVenda.material.id and iCompra.formaMaterial = iVenda.formaMaterial) ")
+				.setParameter("idItemPedidoCompra", idItemPedidoCompra).setParameter("ncm", ncm).executeUpdate();
+	}
+
 	private void inserirParametroPesquisaItemVendido(Query query, ItemPedido itemVendido) {
 		if (itemVendido != null && itemVendido.contemMaterial()) {
 			query.setParameter("formaMaterial", itemVendido.getFormaMaterial()).setParameter("idMaterial",
@@ -381,6 +388,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return query.getResultList();
 	}
 
+	public Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.material.id, i.formaMaterial from ItemPedido i where i.id = :idItemPedido")
+						.setParameter("idItemPedido", idItemPedido), Object[].class, new Object[] {});
+	}
+
 	public Integer pesquisarQuantidadeItemPedido(Integer idItemPedido) {
 		return pesquisarCampoById(ItemPedido.class, idItemPedido, "quantidade", Integer.class);
 	}
@@ -416,7 +429,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		} else {
 			select.append("and p.tipoPedido != :tipoPedido ");
 		}
-		
+
 		inserirPesquisaItemVendido(select, itemVendido);
 
 		Query query = this.entityManager.createQuery(select.toString());
@@ -431,7 +444,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		inserirParametroPesquisaItemVendido(query, itemVendido);
-		
+
 		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
 	}
 

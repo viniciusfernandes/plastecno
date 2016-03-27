@@ -103,6 +103,19 @@ public class EstoqueController extends AbstractController {
         }
     }
 
+    @Post("estoque/inclusao/configuracaoncm")
+    public void inserirConfiguracaoNcmEstoque(Material material, FormaMaterial formaMaterial, String ncm) {
+        boolean configurado = estoqueService.inserirConfiguracaoNcmEstoque(material == null ? null : material.getId(),
+                formaMaterial, ncm);
+        if (configurado) {
+            gerarMensagemSucesso("NCM alterado/incluído con sucesso.");
+        } else {
+            gerarMensagemAlerta("NCM não foi alterado/incluído no sistema.");
+        }
+        pesquisarItemEstoque(material, formaMaterial);
+        irTopoPagina();
+    }
+
     @Post("estoque/item/inclusao")
     public void inserirItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
         try {

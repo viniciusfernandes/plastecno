@@ -185,12 +185,12 @@ $(document).ready(function() {
 			<div class="input" style="width: 40%">
 				<input type="text" id="proprietario" name="proprietario.nome"
 					value="${proprietario.nome} - ${proprietario.email}" disabled="disabled"
-					class="uppercaseBloqueado desabilitado" />
+					class="uppercaseBloqueado desabilitado" style="width: 95%"/>
 			</div>
 			<div class="label" style="width: 10%">Situação:</div>
-					<div class="input" style="width: 20%">
-						<input type="text" id="situacaoPedido" name="pedido.situacaoPedido"
-							value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled"/>
+			<div class="input" style="width: 20%">
+				<input type="text" id="situacaoPedido" name="pedido.situacaoPedido" 
+					value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled" width="95%"/>
 			</div>
 			
 			<div class="label">Número:</div>
@@ -228,19 +228,19 @@ $(document).ready(function() {
 			<div class="input" style="width: 30%">
 				<input type="text" id="dataEnvio"
 					value="${pedido.dataEnvioFormatada}" readonly="readonly"
-					class="desabilitado" style="width: 30%" />
+					class="desabilitado" style="width: 25%" />
 			</div>
 			<div class="label obrigatorio">Cliente:</div>
 			<div class="input" style="width: 30%">
-				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}" class="pesquisavel" />
+				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}" class="pesquisavel" style="width: 85%"/>
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
-			<div class="label">Receber Email Ped.:</div>
+			<div class="label" style="width: 10%">Env. Email Ped.:</div>
 			<div class="input" style="width: 30%">
 				<input type="checkbox" id="clienteNotificadoVenda"
 					name="pedido.clienteNotificadoVenda"
 					<c:if test="${pedido.clienteNotificadoVenda}">checked</c:if>
-					class="checkbox" />
+					class="checkbox" style="width: 4%"/>
 			</div>
 			<div class="label">CNPJ:</div>
 			<div class="input" style="width: 10%">
@@ -250,12 +250,12 @@ $(document).ready(function() {
 			<div class="label" style="width: 5%">CPF:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="cpf" name="cliente.cpf"
-					value="${cliente.cpf}" class="desabilitado" disabled="disabled" />
+					value="${cliente.cpf}" class="desabilitado" disabled="disabled" style="width: 95%"/>
 			</div>
-			<div class="label" style="width: 15%">Email Envio NFe:</div>
+			<div class="label" style="width: 14%">Email NFe:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="email" name="cliente.email"
-					value="${cliente.email}" style="width: 80%"
+					value="${cliente.email}" style="width: 45%"
 					class="uppercaseBloqueado desabilitado" disabled="disabled" />
 			</div>
 			<div class="label" style="width: 15%">Tipo Entrega:</div>
@@ -269,10 +269,10 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio" style="width: 11%">${not empty tipoPedido ? 'Fornecedor:': 'Representada:'}</div>
-			<div class="input" style="width: 50%">
+			<div class="label obrigatorio" style="width: 20%">${not empty tipoPedido ? 'Fornecedor:': 'Representada:'}</div>
+			<div class="input" style="width: 40%">
 				<select id="representada" name="pedido.representada.id"
-					style="width: 80%">
+					style="width: 45%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="representada" items="${listaRepresentada}">
 						<option value="${representada.id}"
@@ -291,10 +291,10 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label" style="width: 11%">Redespacho:</div>
-			<div class="input" style="width: 50%">
+			<div class="label" style="width: 20%">Redespacho:</div>
+			<div class="input" style="width: 40%">
 				<select id="listaRedespacho"
-					name="pedido.transportadoraRedespacho.id" style="width: 80%">
+					name="pedido.transportadoraRedespacho.id" style="width: 45%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="redespacho" items="${listaRedespacho}">
 						<option value="${redespacho.id}"

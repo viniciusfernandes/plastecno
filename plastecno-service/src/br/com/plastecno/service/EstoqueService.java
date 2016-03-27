@@ -31,6 +31,8 @@ public interface EstoqueService {
 
 	void inserirConfiguracaoEstoque(ItemEstoque limite) throws BusinessException;
 
+	boolean inserirConfiguracaoNcmEstoque(Integer idMaterial, FormaMaterial formaMaterial, String ncm);
+
 	Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;

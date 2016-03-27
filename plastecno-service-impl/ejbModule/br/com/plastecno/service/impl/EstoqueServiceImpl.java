@@ -312,6 +312,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public boolean inserirConfiguracaoNcmEstoque(Integer idMaterial, FormaMaterial formaMaterial, String ncm) {
+		if (idMaterial == null || formaMaterial == null) {
+			return false;
+		}
+
+		itemEstoqueDAO.inserirConfiguracaoNcmEstoque(idMaterial, formaMaterial, ncm);
+		return true;
+	}
+
+	@Override
 	public Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException {
 		if (itemEstoque == null) {
 			throw new BusinessException("Item de estoque nulo");

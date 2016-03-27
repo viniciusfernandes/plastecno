@@ -36,6 +36,17 @@ $(document).ready(function() {
 		$(form).submit();
 	});
 	
+	$('#botaoInserirConfiguracaoNcm').click(function () {
+		var parametro = 'material.id='+$('#bloco_item_pedido #idMaterial').val();
+		parametro += '&formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
+		parametro += '&ncm='+$('#bloco_item_pedido #ncm').val();
+		
+		var form = $('#formVazio');
+		$(form).attr('method', 'post');
+		$(form).attr('action', '<c:url value="/estoque/inclusao/configuracaoncm"/>?'+parametro);
+		$(form).submit();
+	});
+	
 	$('#ncm').focus(function (){
 		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
 			return;			
@@ -195,7 +206,11 @@ function habilitarCamposEdicaoItem(habilitado){
 	<div class="input" style="width: 10%">
 		<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}"/>
 	</div>
-		
+	<div class="input" style="width: 2%">
+	<input type="button" id="botaoInserirConfiguracaoNcm"
+		title="Inserir Configuração NCM" value="" class="botaoInserirPequeno" />
+	</div>
+				
 	<div class="bloco_botoes">
 		<c:choose>
 			<c:when test="${!isEstoque or (isEstoque && not empty itemPedido.id)}">

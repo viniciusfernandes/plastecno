@@ -13,8 +13,8 @@ function BlocoTabelaHandler (urlTela, nomeBloco, idTabela, idBlocoInput) {
 	
 	this.ajustarLinhasCopiadas = undefined;
 	
-	function ajustarLinhasCopiadasCallback (funcaoCallback){
-		this.ajustarLinhasCopiadas = funcaoCallback;
+	this.setAjusteLinhasCopiadas = function (callback){
+		this.ajustarLinhasCopiadas = callback;
 	};
 	
 	this.setNumeroLinhasCopiadas= function (numeroLinhasCopiadas){

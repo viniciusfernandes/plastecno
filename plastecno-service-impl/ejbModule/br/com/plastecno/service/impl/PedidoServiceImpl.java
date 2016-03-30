@@ -688,7 +688,7 @@ public class PedidoServiceImpl implements PedidoService {
 		final boolean ipiImportado = TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI)
 				&& materialService.isMaterialImportado(itemPedido.getMaterial().getId());
 
-		if (ipiPreenchido && aliquotaIPI > 0 && TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
+		if (pedido.isVenda() && ipiPreenchido && aliquotaIPI > 0 && TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
 			throw new BusinessException(
 					"Remova o valor do IPI do item pois representada escolhida não apresenta cáculo de IPI.");
 		} else if (!ipiPreenchido && (ipiObrigatorio || ipiImportado)) {

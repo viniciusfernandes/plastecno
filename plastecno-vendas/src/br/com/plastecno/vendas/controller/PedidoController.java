@@ -574,10 +574,10 @@ public class PedidoController extends AbstractController {
             this.formatarPedido(pedido);
             this.formatarDocumento(pedido.getCliente());
 
-            List<Transportadora> listaRedespacho = this.clienteService.pesquisarTransportadorasRedespacho(pedido
+            List<Transportadora> listaRedespacho = clienteService.pesquisarTransportadorasRedespacho(pedido
                     .getCliente().getId());
 
-            List<Transportadora> listaTransportadora = this.clienteService.pesquisarTransportadorasDesassociadas(pedido
+            List<Transportadora> listaTransportadora = clienteService.pesquisarTransportadorasDesassociadas(pedido
                     .getCliente().getId());
 
             if (!listaRedespacho.contains(pedido.getTransportadoraRedespacho())) {
@@ -588,11 +588,13 @@ public class PedidoController extends AbstractController {
                 listaTransportadora.add(pedido.getTransportadora());
             }
 
-            List<ItemPedido> listaItem = this.pedidoService.pesquisarItemPedidoByIdPedido(pedido.getId());
+            List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(pedido.getId());
 
             formatarItemPedido(listaItem);
             formatarPedido(pedido);
 
+            addAtributo("listaIdPedidoAssociado",
+                    pedidoService.pesquisarIdPedidoAssociadoByIdPedidoOrigem(id, pedido.isCompra()));
             addAtributo("listaTransportadora", listaTransportadora);
             addAtributo("listaRedespacho", listaRedespacho);
             addAtributo("listaItemPedido", listaItem);

@@ -979,6 +979,15 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdPedidoAssociadoByIdPedidoOrigem(Integer idPedidoOrigem, boolean isCompra) {
+		if (idPedidoOrigem == null) {
+			return new ArrayList<Integer>();
+		}
+		return itemPedidoDAO.pesquisarIdPedidoAssociadoByIdPedidoOrigem(idPedidoOrigem, isCompra);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 		return pedidoDAO.pesquisarIdPedidoByIdItemPedido(idItemPedido);
 	}

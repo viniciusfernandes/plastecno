@@ -142,7 +142,7 @@ function recepcionarItem(botao){
 				<tr>
 					<th style="width: 7%">Num. Pedido</th>
 					<th style="width: 5%">Dt. Entrega</th>
-					<th style="width: 7%">Num. Compra</th>
+					<th style="width: 7%">Num. Venda</th>
 					<th style="width: 1%">Item</th>
 					<th style="width: 5%">Qtde</th>
 					<th style="width: 5%">Qtde Recep.</th>

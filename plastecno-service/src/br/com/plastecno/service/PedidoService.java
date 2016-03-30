@@ -114,6 +114,8 @@ public interface PedidoService {
 
 	List<Integer> pesquisarIdPedidoAguardandoMaterial();
 
+	List<Integer> pesquisarIdPedidoAssociadoByIdPedidoOrigem(Integer idPedidoOrigem, boolean isCompra);
+
 	Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido);
 
 	List<Integer> pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido);

@@ -135,7 +135,8 @@ public interface PedidoService {
 	ItemPedido pesquisarItemPedidoById(Integer idItemPedido);
 
 	List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido);
+			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros,
+			ItemPedido itemVendido);
 
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
@@ -193,7 +194,10 @@ public interface PedidoService {
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
-	Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra, ItemPedido itemVendido);
+	Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra);
+
+	Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
+			Integer idFornecedor, boolean isCompra, ItemPedido itemVendido);
 
 	Long pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(Integer idCliente);
 

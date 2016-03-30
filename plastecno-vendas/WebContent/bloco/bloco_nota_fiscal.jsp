@@ -17,7 +17,7 @@ $(document).ready(function() {
 
 <fieldset id="bloco_dados_nota_fiscal">
 	<legend>Dados Nota Fiscal</legend>
-	<form action="" method="post">
+	<form id="bloco_dados_nota_fiscal" action="<c:url value="/empacotamento/inclusaodadosnf"/>" method="post">
 		<input type="hidden" id="idPedido" name="pedido.id" value="${pedido.id}"/>
 	
 		<div class="label">Núm. NF</div>
@@ -50,7 +50,7 @@ $(document).ready(function() {
 		</div>
 		<c:if test="${empty inclusaoDadosNFdesabilitado}">
 			<div class="bloco_botoes">
-				<input type="submit" id="botaoInserirNF" value="" class="botaoInserir" title="Inserir Dados Nota Fiscal"/> 
+				<input type="submit" id="botaoInserirDadosNF" value="" class="botaoInserir" title="Inserir Dados Nota Fiscal"/> 
 			</div>
 		</c:if>
 	</form>

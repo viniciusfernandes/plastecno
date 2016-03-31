@@ -33,9 +33,9 @@ $(document).ready(function() {
 	tabelaLogradouroHandler.setNumeroLinhasCopiadas(3);
 	tabelaLogradouroHandler.setAjusteLinhasCopiadas(function(linhas){
 		var tipos = ['FATURAMENTO', 'ENTREGA', 'COBRANCA'];
-		tipos.splice(tipos.indexOf(linhas[0].cells[1].innerHTML), 1);
-		linhas[1].cells[1].innerHTML = tipos[0];
-		linhas[2].cells[1].innerHTML = tipos[1];
+		linhas[0].cells[1].innerHTML = tipos[0];
+		linhas[1].cells[1].innerHTML = tipos[1];
+		linhas[2].cells[1].innerHTML = tipos[2];
 	});
 	
 	tabelaContatoHandler = inicializarBlocoContato(urlTela);

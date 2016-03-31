@@ -61,8 +61,7 @@ public class ClienteController extends AbstractController {
                 && getCodigoUsuario().equals(cliente.getVendedor().getId());
         final boolean isAdministrador = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
         boolean isRevendedor = cliente != null && cliente.isRevendedor();
-        this.liberarAcesso("acessoInclusaoPermitido", isAdministrador || isInclusaoCliente || isVendedorIgual
-                || isRevendedor);
+        addAtributo("acessoInclusaoPermitido", isAdministrador || isInclusaoCliente || isVendedorIgual || isRevendedor);
     }
 
     @Post("cliente/contactar")

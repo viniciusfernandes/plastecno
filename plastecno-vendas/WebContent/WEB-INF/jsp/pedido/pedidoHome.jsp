@@ -88,6 +88,7 @@ $(document).ready(function() {
 		form.submit();
 	});
 	
+	<c:if test="${acessoCompraPermitido}">
 	$("#pedidoAssociado").change(function() {
 		if(isEmpty($(this).val())){
 			return;
@@ -95,6 +96,7 @@ $(document).ready(function() {
 		$('<input>').attr('type','hidden').attr('name','idPedido').attr('value',$(this).val()).appendTo('#formVazio');
 		$('#formVazio').attr('action', '<c:url value="/pedidoassociado/pdf"/>').submit();
 	});
+	</c:if>
 	
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	

@@ -474,7 +474,7 @@ public class PedidoController extends AbstractController {
         addAtributo("inclusaoDadosNFdesabilitado", false);
         addAtributo("listaCST", TipoCST.values());
 
-        liberarAcesso("acessoDadosNotaFiscalPermitido",
+        addAtributo("acessoDadosNotaFiscalPermitido",
                 isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_PEDIDO_COMPRA));
 
         // verificando se o parametro para desabilitar ja foi incluido em outro
@@ -633,11 +633,15 @@ public class PedidoController extends AbstractController {
             final boolean acessoRefazerPedidoPermitido = (pedido.isVendaEfetuada() || pedido.isRevendaEfetuada())
                     && !SituacaoPedido.CANCELADO.equals(situacao) && !SituacaoPedido.DIGITACAO.equals(situacao);
 
-            liberarAcesso("pedidoDesabilitado", isPedidoDesabilitado(pedido));
-            liberarAcesso("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);
-            liberarAcesso("acessoReenvioPedidoPermitido", acessoReenvioPedidoPermitido);
-            liberarAcesso("acessoCancelamentoPedidoPermitido", acessoCancelamentoPedidoPermitido);
-            liberarAcesso("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
+            final boolean acessoCompraPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO,
+                    TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+
+            addAtributo("pedidoDesabilitado", isPedidoDesabilitado(pedido));
+            addAtributo("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);
+            addAtributo("acessoReenvioPedidoPermitido", acessoReenvioPedidoPermitido);
+            addAtributo("acessoCancelamentoPedidoPermitido", acessoCancelamentoPedidoPermitido);
+            addAtributo("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
+            addAtributo("acessoCompraPermitido", acessoCompraPermitido);
         }
         configurarTipoPedido(tipoPedido);
         redirectByTipoPedido(tipoPedido);

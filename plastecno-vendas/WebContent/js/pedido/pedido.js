@@ -126,7 +126,7 @@ function inicializarBlocoItemPedido(urlTela) {
 					$('#prazoEntregaItem').val(itemPedidoJson.prazoEntrega);
 					$('#aliquotaComissao').val(itemPedidoJson.aliquotaComissao);
 					$('#ncm').val(itemPedidoJson.ncm);
-					$('#cfop').val(itemPedidoJson.tipoCFOP);
+					$('#cst').val(itemPedidoJson.tipoCST);
 					
 					habilitarPreenchimentoPeca(itemPedidoJson.peca);
 				});

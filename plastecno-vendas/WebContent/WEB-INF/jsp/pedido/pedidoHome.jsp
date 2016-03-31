@@ -88,6 +88,16 @@ $(document).ready(function() {
 		form.submit();
 	});
 	
+	<c:if test="${acessoCompraPermitido}">
+	$("#pedidoAssociado").change(function() {
+		if(isEmpty($(this).val())){
+			return;
+		}
+		$('<input>').attr('type','hidden').attr('name','idPedido').attr('value',$(this).val()).appendTo('#formVazio');
+		$('#formVazio').attr('action', '<c:url value="/pedidoassociado/pdf"/>').submit();
+	});
+	</c:if>
+	
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	
 	inserirMascaraData('dataEntrega');
@@ -109,7 +119,7 @@ $(document).ready(function() {
 	inicializarAutomcompleteCliente('<c:url value="/pedido/cliente"/>');
 
 	<c:if test="${pedidoDesabilitado}">
-		$('input[type=text], select, textarea').attr('disabled', true).addClass('desabilitado');
+		$('input[type=text]:not(.semprehabilitado), select:not(.semprehabilitado), textarea').attr('disabled', true).addClass('desabilitado');
 	</c:if>
 
 	<c:if test="${empty pedido.id}">
@@ -180,6 +190,18 @@ $(document).ready(function() {
 			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
 			<input type="hidden" id="orcamento" name="pedido.orcamento" value="${empty orcamento ? false : orcamento}" />
 
+			<c:if test="${not empty pedido.id}">
+			<div class="label">Pedido(s) de ${empty tipoPedido ? 'Compra:': 'Venda:'}</div>
+			<div class="input" style="width: 80%">
+				<select id="pedidoAssociado" name="idPedidoAssociado"
+					style="width: 13%" class="semprehabilitado">
+					<option value=""></option>
+					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
+						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+					</c:forEach>
+				</select>
+			</div>
+			</c:if>
 			
 			<div class="label">${not empty tipoPedido ? 'Comprador:': 'Vendedor:'}</div>
 			<div class="input" style="width: 40%">

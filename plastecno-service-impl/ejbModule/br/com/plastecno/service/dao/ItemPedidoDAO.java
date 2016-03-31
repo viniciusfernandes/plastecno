@@ -145,10 +145,35 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				.setParameter("idPedido", idPedido).getResultList();
 	}
 
+	public Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.material.id, i.formaMaterial from ItemPedido i where i.id = :idItemPedido")
+						.setParameter("idItemPedido", idItemPedido), Object[].class, new Object[] {});
+	}
+
 	public Integer pesquisarIdMeterialByIdItemPedido(Integer idItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery("select i.material.id from ItemPedido i where i.id = :idItemPedido")
 						.setParameter("idItemPedido", idItemPedido), Integer.class, null);
+	}
+
+	public List<Integer> pesquisarIdPedidoAssociadoByIdPedidoOrigem(Integer idPedidoOrigem, boolean isCompra) {
+		StringBuilder select = new StringBuilder("select ");
+		if (isCompra) {
+			select.append("i.idPedidoVenda ");
+		} else {
+			select.append("i.idPedidoCompra ");
+		}
+		select.append("from ItemPedido i where i.pedido.id = :idPedidoOrigem and ");
+
+		if (isCompra) {
+			select.append("i.idPedidoVenda != null ");
+		} else {
+			select.append("i.idPedidoCompra != null ");
+		}
+
+		return entityManager.createQuery(select.toString(), Integer.class).setParameter("idPedidoOrigem", idPedidoOrigem)
+				.getResultList();
 	}
 
 	public Object[] pesquisarIdPedidoCompraEVenda(Integer idItemPedido) {
@@ -386,12 +411,6 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			query.setParameter("idVendedor", idVendedor);
 		}
 		return query.getResultList();
-	}
-
-	public Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i.material.id, i.formaMaterial from ItemPedido i where i.id = :idItemPedido")
-						.setParameter("idItemPedido", idItemPedido), Object[].class, new Object[] {});
 	}
 
 	public Integer pesquisarQuantidadeItemPedido(Integer idItemPedido) {

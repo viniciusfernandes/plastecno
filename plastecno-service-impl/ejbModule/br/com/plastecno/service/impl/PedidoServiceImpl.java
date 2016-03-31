@@ -688,7 +688,7 @@ public class PedidoServiceImpl implements PedidoService {
 		final boolean ipiImportado = TipoApresentacaoIPI.OCASIONAL.equals(tipoApresentacaoIPI)
 				&& materialService.isMaterialImportado(itemPedido.getMaterial().getId());
 
-		if (ipiPreenchido && aliquotaIPI > 0 && TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
+		if (pedido.isVenda() && ipiPreenchido && aliquotaIPI > 0 && TipoApresentacaoIPI.NUNCA.equals(tipoApresentacaoIPI)) {
 			throw new BusinessException(
 					"Remova o valor do IPI do item pois representada escolhida não apresenta cáculo de IPI.");
 		} else if (!ipiPreenchido && (ipiObrigatorio || ipiImportado)) {
@@ -975,6 +975,15 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoAguardandoMaterial() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarIdPedidoAssociadoByIdPedidoOrigem(Integer idPedidoOrigem, boolean isCompra) {
+		if (idPedidoOrigem == null) {
+			return new ArrayList<Integer>();
+		}
+		return itemPedidoDAO.pesquisarIdPedidoAssociadoByIdPedidoOrigem(idPedidoOrigem, isCompra);
 	}
 
 	@Override
@@ -1326,6 +1335,12 @@ public class PedidoServiceImpl implements PedidoService {
 	public Long pesquisarTotalItemRevendaAguardandoEncomenda(Integer idItemPedido) {
 		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 		return itemPedidoDAO.pesquisarTotalItemRevendaNaoEncomendado(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra) {
+		return pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, idFornecedor, isCompra, null);
 	}
 
 	@Override

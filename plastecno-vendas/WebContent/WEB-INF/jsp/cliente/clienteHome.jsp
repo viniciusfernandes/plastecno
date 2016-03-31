@@ -28,6 +28,18 @@ var tabelaContatoHandler = null;
 $(document).ready(function() {
 	scrollTo('${ancora}');
 	
+	var urlTela = '<c:url value="/cliente"/>'; 
+	tabelaLogradouroHandler = inicializarBlocoLogradouro(urlTela);
+	tabelaLogradouroHandler.setNumeroLinhasCopiadas(3);
+	tabelaLogradouroHandler.setAjusteLinhasCopiadas(function(linhas){
+		var tipos = ['FATURAMENTO', 'ENTREGA', 'COBRANCA'];
+		linhas[0].cells[1].innerHTML = tipos[0];
+		linhas[1].cells[1].innerHTML = tipos[1];
+		linhas[2].cells[1].innerHTML = tipos[2];
+	});
+	
+	tabelaContatoHandler = inicializarBlocoContato(urlTela);
+	
 	$("#botaoInserirCliente").click(function() {
 		toUpperCaseInput();
 		toLowerCaseInput();
@@ -81,16 +93,6 @@ $(document).ready(function() {
 	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
-	var urlTela = '<c:url value="/cliente"/>'; 
-	tabelaLogradouroHandler = inicializarBlocoLogradouro(urlTela);
-	tabelaLogradouroHandler.setNumeroLinhasCopiadas(3);
-	tabelaLogradouroHandler.ajustarLinhasCopiadasCallback(function(linhas){
-		var tipos = ['FATURAMENTO', 'ENTREGA', 'COBRANCA'];
-		tipos.splice(tipos.indexOf(linhas[0].cells[1].innerHTML), 1);
-		linhas[1].cells[1].innerHTML = tipos[0];
-		linhas[2].cells[1].innerHTML = tipos[1];
-	});
-	tabelaContatoHandler = inicializarBlocoContato(urlTela);
 	
 	new PickList().initPickList();
 	var urlCliente  = '';

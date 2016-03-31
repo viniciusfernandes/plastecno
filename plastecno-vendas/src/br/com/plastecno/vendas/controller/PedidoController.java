@@ -25,7 +25,7 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoAcesso;
-import br.com.plastecno.service.constante.TipoCFOP;
+import br.com.plastecno.service.constante.TipoCST;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
@@ -156,8 +156,14 @@ public class PedidoController extends AbstractController {
         }
     }
 
+    @Get("pedidoassociado/pdf")
+    public Download downloadPedidoAssociadoPDF(Integer idPedido, TipoPedido tipoPedido) {
+        return downloadPedidoPDF(idPedido, tipoPedido != null ? null : TipoPedido.COMPRA);
+    }
+
     @Get("pedido/pdf")
     public Download downloadPedidoPDF(Integer idPedido, TipoPedido tipoPedido) {
+
         try {
             PedidoPDFWrapper wrapper = this.gerarPDF(idPedido, tipoPedido);
             final Pedido pedido = wrapper.getPedido();
@@ -466,9 +472,9 @@ public class PedidoController extends AbstractController {
         addAtributo("revenda", FinalidadePedido.REVENDA);
         addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
         addAtributo("inclusaoDadosNFdesabilitado", false);
-        addAtributo("listaCFOP", TipoCFOP.values());
+        addAtributo("listaCST", TipoCST.values());
 
-        liberarAcesso("acessoDadosNotaFiscalPermitido",
+        addAtributo("acessoDadosNotaFiscalPermitido",
                 isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_PEDIDO_COMPRA));
 
         // verificando se o parametro para desabilitar ja foi incluido em outro
@@ -574,10 +580,10 @@ public class PedidoController extends AbstractController {
             this.formatarPedido(pedido);
             this.formatarDocumento(pedido.getCliente());
 
-            List<Transportadora> listaRedespacho = this.clienteService.pesquisarTransportadorasRedespacho(pedido
+            List<Transportadora> listaRedespacho = clienteService.pesquisarTransportadorasRedespacho(pedido
                     .getCliente().getId());
 
-            List<Transportadora> listaTransportadora = this.clienteService.pesquisarTransportadorasDesassociadas(pedido
+            List<Transportadora> listaTransportadora = clienteService.pesquisarTransportadorasDesassociadas(pedido
                     .getCliente().getId());
 
             if (!listaRedespacho.contains(pedido.getTransportadoraRedespacho())) {
@@ -588,11 +594,13 @@ public class PedidoController extends AbstractController {
                 listaTransportadora.add(pedido.getTransportadora());
             }
 
-            List<ItemPedido> listaItem = this.pedidoService.pesquisarItemPedidoByIdPedido(pedido.getId());
+            List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(pedido.getId());
 
             formatarItemPedido(listaItem);
             formatarPedido(pedido);
 
+            addAtributo("listaIdPedidoAssociado",
+                    pedidoService.pesquisarIdPedidoAssociadoByIdPedidoOrigem(id, pedido.isCompra()));
             addAtributo("listaTransportadora", listaTransportadora);
             addAtributo("listaRedespacho", listaRedespacho);
             addAtributo("listaItemPedido", listaItem);
@@ -625,11 +633,15 @@ public class PedidoController extends AbstractController {
             final boolean acessoRefazerPedidoPermitido = (pedido.isVendaEfetuada() || pedido.isRevendaEfetuada())
                     && !SituacaoPedido.CANCELADO.equals(situacao) && !SituacaoPedido.DIGITACAO.equals(situacao);
 
-            liberarAcesso("pedidoDesabilitado", isPedidoDesabilitado(pedido));
-            liberarAcesso("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);
-            liberarAcesso("acessoReenvioPedidoPermitido", acessoReenvioPedidoPermitido);
-            liberarAcesso("acessoCancelamentoPedidoPermitido", acessoCancelamentoPedidoPermitido);
-            liberarAcesso("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
+            final boolean acessoCompraPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO,
+                    TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+
+            addAtributo("pedidoDesabilitado", isPedidoDesabilitado(pedido));
+            addAtributo("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);
+            addAtributo("acessoReenvioPedidoPermitido", acessoReenvioPedidoPermitido);
+            addAtributo("acessoCancelamentoPedidoPermitido", acessoCancelamentoPedidoPermitido);
+            addAtributo("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
+            addAtributo("acessoCompraPermitido", acessoCompraPermitido);
         }
         configurarTipoPedido(tipoPedido);
         redirectByTipoPedido(tipoPedido);

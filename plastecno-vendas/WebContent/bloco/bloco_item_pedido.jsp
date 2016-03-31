@@ -182,12 +182,12 @@ function pesquisarNcm(){
 	<div class="input" style="width: 5%">
 		<input type="text" id="aliquotaComissao" name="itemPedido.aliquotaComissao" maxlength="3" />
 	</div>
-	<div class="label" style="width: 10%">CFOP:</div>
+	<div class="label" style="width: 10%">C.S.T:</div>
 	<div class="input" style="width: 50%">
-		<select id="cfop" name="itemPedido.tipoCFOP" style="width: 30%">
+		<select id="cst" name="itemPedido.tipoCst" style="width: 30%">
 			<option value="">&lt&lt SELECIONE &gt&gt</option>
-			<c:forEach var="CFOP" items="${listaCFOP}">
-				<option value="${CFOP}">${CFOP.descricao}</option>
+			<c:forEach var="CST" items="${listaCST}">
+				<option value="${CST}">${CST.codigo} - ${CST.descricao}</option>
 			</c:forEach>
 		</select>
 	</div>

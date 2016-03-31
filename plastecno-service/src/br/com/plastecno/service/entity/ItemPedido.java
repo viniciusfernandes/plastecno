@@ -18,7 +18,7 @@ import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
-import br.com.plastecno.service.constante.TipoCFOP;
+import br.com.plastecno.service.constante.TipoCST;
 import br.com.plastecno.service.constante.TipoDocumento;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoVenda;
@@ -160,9 +160,9 @@ public class ItemPedido extends Item {
 	@Transient
 	private String sobrenomeProprietario;
 
-	@Column(name = "id_tipo_cfop")
+	@Column(name = "id_tipo_cst")
 	@Enumerated(EnumType.ORDINAL)
-	private TipoCFOP tipoCFOP;
+	private TipoCST tipoCst;
 
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_tipo_venda")
@@ -481,8 +481,8 @@ public class ItemPedido extends Item {
 		return sobrenomeProprietario;
 	}
 
-	public TipoCFOP getTipoCFOP() {
-		return tipoCFOP;
+	public TipoCST getTipoCst() {
+		return tipoCst;
 	}
 
 	public TipoVenda getTipoVenda() {
@@ -689,8 +689,8 @@ public class ItemPedido extends Item {
 		this.sobrenomeProprietario = sobrenomeProprietario;
 	}
 
-	public void setTipoCFOP(TipoCFOP tipoCFOP) {
-		this.tipoCFOP = tipoCFOP;
+	public void setTipoCst(TipoCST tipoCST) {
+		this.tipoCst = tipoCST;
 	}
 
 	public void setTipoVenda(TipoVenda tipoVenda) {

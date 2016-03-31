@@ -290,7 +290,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 			}
 
 			relatorio.addPropriedade("totalPesquisado",
-					pedidoService.pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(idCliente));
+					pedidoService.pesquisarTotalPedidoByIdClienteIdFornecedor(idCliente, idFornecedor, isCompra));
 		}
 
 		return relatorio;

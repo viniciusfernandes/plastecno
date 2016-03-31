@@ -534,9 +534,6 @@ public abstract class AbstractController {
         return this.picklist.isElementosNaoAssociadosPreenchidos();
     }
 
-    void liberarAcesso(String nomePermissaoAcesso, boolean acessoPermitido) {
-        this.result.include(nomePermissaoAcesso, acessoPermitido);
-    }
 
     /*
      * Esse metodo ja garante que o usuario sera navegado para o rodape da
@@ -615,7 +612,7 @@ public abstract class AbstractController {
         } else if (listaTipoAcesso != null) {
             for (TipoAcesso tipoAcesso : listaTipoAcesso) {
                 if (this.usuarioInfo.isAcessoPermitido(tipoAcesso)) {
-                    this.liberarAcesso(nomePermissaoAcesso, true);
+                    this.addAtributo(nomePermissaoAcesso, true);
                     break;
                 }
             }

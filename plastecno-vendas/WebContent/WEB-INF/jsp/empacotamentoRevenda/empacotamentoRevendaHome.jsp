@@ -68,15 +68,14 @@ $(document).ready(function() {
 		});
 	});
 	
-	$('#botaoInserirNF').click(function () {
+	$('#botaoInserirDadosNF').click(function () {
 		if(isEmpty($('#bloco_item_pedido #idPedido').val())){
 			return;
 		}
 		
 		var parametros = '?idCliente='+$('#bloco_empacotamento #idCliente').val(); 
-		var form =  $(this).closest('form');
-		$(form).attr('method', 'post');
-		$(form).attr('action', '<c:url value="/empacotamento/inclusaodadosnf"/>'+parametros);
+		var form =  $('#bloco_dados_nota_fiscal');
+		$(form).attr('action', $(form).attr('action')+parametros);
 		$(form).submit();
 	});
 	

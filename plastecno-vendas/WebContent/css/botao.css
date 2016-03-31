@@ -173,6 +173,16 @@
 	width: 24px;
 }
 
+.botaoPDFPequeno {
+	background: url("../images/pdf_16.png") no-repeat scroll 0 0
+		transparent;
+	border: 0;
+	cursor: pointer;
+	height: 16px;
+	margin-left: 5px;
+	width: 16px;
+}
+
 .botaoIncluir {
 	background: url("../images/disk_arrow_down_24.png") no-repeat scroll 0 0
 		transparent;

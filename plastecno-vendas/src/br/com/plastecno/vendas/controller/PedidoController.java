@@ -156,8 +156,14 @@ public class PedidoController extends AbstractController {
         }
     }
 
+    @Get("pedidoassociado/pdf")
+    public Download downloadPedidoAssociadoPDF(Integer idPedido, TipoPedido tipoPedido) {
+        return downloadPedidoPDF(idPedido, tipoPedido != null ? null : TipoPedido.COMPRA);
+    }
+
     @Get("pedido/pdf")
     public Download downloadPedidoPDF(Integer idPedido, TipoPedido tipoPedido) {
+
         try {
             PedidoPDFWrapper wrapper = this.gerarPDF(idPedido, tipoPedido);
             final Pedido pedido = wrapper.getPedido();

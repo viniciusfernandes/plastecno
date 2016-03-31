@@ -89,9 +89,11 @@ $(document).ready(function() {
 	});
 	
 	$("#pedidoAssociado").change(function() {
-		$('#formVazio #tipoPedido2').val('${empty tipoPedido ? "COMPRA" : ""}');
+		if(isEmpty($(this).val())){
+			return;
+		}
 		$('<input>').attr('type','hidden').attr('name','idPedido').attr('value',$(this).val()).appendTo('#formVazio');
-		$('#formVazio').attr('action', '<c:url value="/pedido/pdf"/>').submit();
+		$('#formVazio').attr('action', '<c:url value="/pedidoassociado/pdf"/>').submit();
 	});
 	
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
@@ -171,7 +173,7 @@ $(document).ready(function() {
 	<div id="modal"></div>
 
 	<form id="formVazio" action="pedido" method="get">
-		<input type="hidden" id="tipoPedido2" name="tipoPedido" value="${tipoPedido}" />
+		<input type="hidden" name="tipoPedido" value="${tipoPedido}" />
 	</form>
 
 	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>" method="post">

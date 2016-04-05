@@ -1606,8 +1606,14 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+
+		Pedido pedidoRefeito = pedidoService.pesquisarPedidoById(idPedidoRefeito);
+
 		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);
+
+		assertEquals("Apos o pedido ser refeito ele deve estar em digitacao. Verifique as regras de negocios.",
+				SituacaoPedido.DIGITACAO, pedidoRefeito.getSituacaoPedido());
 
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
 		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,

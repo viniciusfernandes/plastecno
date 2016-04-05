@@ -128,4 +128,8 @@ public class RelatorioWrapper<T, K> {
 			Collections.sort(grupoWrapper.getListaElemento(), comparator);
 		}
 	}
+
+	public void sortGrupo(Comparator<GrupoWrapper<T, K>> comparator) {
+		Collections.sort(listaGrupo, comparator);
+	}
 }

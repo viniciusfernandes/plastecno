@@ -1,6 +1,7 @@
 package br.com.plastecno.service.impl.relatorio;
 
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -28,6 +29,7 @@ import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ClienteWrapper;
 import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
+import br.com.plastecno.service.wrapper.GrupoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.ReceitaWrapper;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
@@ -293,6 +295,16 @@ public class RelatorioServiceImpl implements RelatorioService {
 					pedidoService.pesquisarTotalPedidoByIdClienteIdFornecedor(idCliente, idFornecedor, isCompra));
 		}
 
+		relatorio.sortGrupo(new Comparator<GrupoWrapper<Pedido, ItemPedido>>() {
+
+			@Override
+			public int compare(GrupoWrapper<Pedido, ItemPedido> o1, GrupoWrapper<Pedido, ItemPedido> o2) {
+				Date d1 = o1.getId().getDataEnvio();
+				Date d2 = o2.getId().getDataEnvio();
+				return d1 != null && d2 != null ? d2.compareTo(d1) : 0;
+			}
+		});
+		
 		return relatorio;
 	}
 

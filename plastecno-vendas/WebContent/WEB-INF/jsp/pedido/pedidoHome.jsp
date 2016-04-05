@@ -119,7 +119,7 @@ $(document).ready(function() {
 	inicializarAutomcompleteCliente('<c:url value="/pedido/cliente"/>');
 
 	<c:if test="${pedidoDesabilitado}">
-		$('input[type=text]:not(.semprehabilitado), select:not(.semprehabilitado), textarea').attr('disabled', true).addClass('desabilitado');
+		$('input[type=text], select:not(.semprehabilitado), textarea').attr('disabled', true).addClass('desabilitado');
 	</c:if>
 
 	<c:if test="${empty pedido.id}">
@@ -421,7 +421,7 @@ $(document).ready(function() {
 			<thead>
 				<tr>
 					<th style="width: 10%">Situaç.</th>
-					<th style="width: 10%">Pedido</th>
+					<th style="width: 10%">Ped./N. Cli.</th>
 					<th style="width: 5%">Item</th>
 					<th style="width: 5%">Qtde.</th>
 					<th style="width: 35%">Descrição</th>
@@ -442,7 +442,7 @@ $(document).ready(function() {
 						<tr>
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.situacaoPedido.descricao}</td>
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.id}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.id}/<br></br>${grupo.id.numeroPedidoCliente}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>

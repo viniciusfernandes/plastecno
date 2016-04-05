@@ -1468,7 +1468,8 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoClone.setId(null);
 		pedidoClone.setDataEntrega(new Date());
 		pedidoClone.setListaLogradouro(null);
-		pedidoClone = this.inserir(pedidoClone);
+		pedidoClone.setSituacaoPedido(SituacaoPedido.DIGITACAO);
+		pedidoClone = inserir(pedidoClone);
 
 		List<ItemPedido> listaItemPedido = pesquisarItemPedidoByIdPedido(idPedido);
 		ItemPedido itemPedidoClone = null;

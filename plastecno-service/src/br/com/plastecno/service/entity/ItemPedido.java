@@ -268,11 +268,11 @@ public class ItemPedido extends Item {
 
 	// Construtor implementado para o relatorio de itens dos pedidos de um
 	// determinado cliente que eh fornecida na tela de cliente.
-	public ItemPedido(Integer idPedido, SituacaoPedido situacaoPedido, Date dataEnvio, TipoPedido tipoPedido,
-			String nomeRepresentada, Integer id, Integer sequencial, Integer quantidade, Double precoUnidade,
-			FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial, String descricaoPeca,
-			Double medidaExterna, Double medidaInterna, Double comprimento, TipoVenda tipoVenda, Double precoVenda,
-			Double aliquotaIPI, Double aliquotaICMS) {
+	public ItemPedido(Integer idPedido, String numeroPedidoCliente, SituacaoPedido situacaoPedido, Date dataEnvio,
+			TipoPedido tipoPedido, String nomeRepresentada, Integer id, Integer sequencial, Integer quantidade,
+			Double precoUnidade, FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial,
+			String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento, TipoVenda tipoVenda,
+			Double precoVenda, Double aliquotaIPI, Double aliquotaICMS) {
 
 		this(id, sequencial, idPedido, null, quantidade, null, null, precoUnidade, nomeRepresentada, null, formaMaterial,
 				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
@@ -282,7 +282,8 @@ public class ItemPedido extends Item {
 		pedido.setSituacaoPedido(situacaoPedido);
 		pedido.setDataEnvio(dataEnvio);
 		pedido.setTipoPedido(tipoPedido);
-
+		pedido.setNumeroPedidoCliente(numeroPedidoCliente);
+		
 		this.tipoVenda = tipoVenda;
 		this.precoVenda = precoVenda;
 		this.aliquotaIPI = aliquotaIPI;

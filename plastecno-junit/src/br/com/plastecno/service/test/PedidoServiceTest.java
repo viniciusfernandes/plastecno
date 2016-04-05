@@ -537,7 +537,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
-		assertEquals("A situacao do pedido deve ser ENVIADO apos o envio de email de orcamento", SituacaoPedido.ENVIADO,
+		assertEquals("A situacao do pedido deve ser ENVIADO apos o envio de email de orcamento", SituacaoPedido.ORCAMENTO,
 				pedido.getSituacaoPedido());
 
 	}

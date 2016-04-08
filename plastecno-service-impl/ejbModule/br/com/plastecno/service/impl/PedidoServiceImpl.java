@@ -512,8 +512,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 		if (pedido.isCompra()) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
-		} else if (pedido.isOrcamento()) {
-			pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 		} else {
 			// Aqui estamos tratando o caso em que a situacao do pedido nao foi
 			// definida

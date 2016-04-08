@@ -301,10 +301,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 			public int compare(GrupoWrapper<Pedido, ItemPedido> o1, GrupoWrapper<Pedido, ItemPedido> o2) {
 				Date d1 = o1.getId().getDataEnvio();
 				Date d2 = o2.getId().getDataEnvio();
+
 				return d1 != null && d2 != null ? d2.compareTo(d1) : 0;
 			}
 		});
-		
+
 		return relatorio;
 	}
 

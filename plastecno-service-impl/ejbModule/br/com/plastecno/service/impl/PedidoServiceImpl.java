@@ -100,6 +100,14 @@ public class PedidoServiceImpl implements PedidoService {
 	@EJB
 	private UsuarioService usuarioService;
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@Override
+	public void aceitarOrcamento(Integer idOrcamento) {
+		// Para o aceite do orcamento devemos redirecionar o pedido para o inicio da
+		// digitacao do pedido
+		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.DIGITACAO);
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarItemAguardandoCompraByIdPedido(Integer idPedido) {

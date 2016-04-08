@@ -165,6 +165,16 @@ $(document).ready(function() {
 			}
 		});
 	});
+	
+	$('#botaoAceitarOrcamento').click(function (){
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ACEITAR esse orçamento para os pedidos?',
+			confirmar: function(){
+				var form = $('#botaoAceitarOrcamento').closest('form');
+				$(form).attr('action', '<c:url value="pedido/aceiteorcamento"/>').submit();
+			}
+		});
+	});
 });
 
 </script>
@@ -405,9 +415,12 @@ $(document).ready(function() {
 	<form id="formEnvioPedido" action="<c:url value="/pedido/envio"/>" method="post">
 		<input type="hidden" name="tipoPedido" value="${tipoPedido}"/>
 		<div class="bloco_botoes">
-			<input type="button" id="botaoEnviarPedido" title="Enviar Dados do Pedido" value="" class="botaoEnviarEmail"
+			<input type="button" id="botaoEnviarPedido" title="Enviar Email do ${orcamento ? 'Orcamento' : 'Pedido'}" value="" class="botaoEnviarEmail"
 				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> 
 			/>
+			<c:if test="${orcamento}">
+				<input type="button" id="botaoAceitarOrcamento" title="Aceitar do Orçamento" value="" class="botaoAceitar"/>
+			</c:if>
 			<input type="hidden" id="idPedido" name="idPedido" value="${pedido.id}" />
 		</div>
 	</form>

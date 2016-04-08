@@ -350,7 +350,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			selectPedido.append(" and p.tipoPedido != :tipoPedido ");
 		}
 
-		selectPedido.append("order by p.dataEnvio desc ");
+		selectPedido.append("order by p.id desc ");
 
 		Query query = this.entityManager.createQuery(selectPedido.toString());
 		query.setParameter("idCliente", idCliente);

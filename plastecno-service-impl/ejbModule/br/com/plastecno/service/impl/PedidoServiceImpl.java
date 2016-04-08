@@ -103,6 +103,10 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@Override
 	public void aceitarOrcamento(Integer idOrcamento) {
+		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoById(idOrcamento);
+		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)) {
+			return;
+		}
 		// Para o aceite do orcamento devemos redirecionar o pedido para o inicio da
 		// digitacao do pedido
 		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.DIGITACAO);

@@ -537,8 +537,63 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
-		assertEquals("A situacao do pedido deve ser ORCAMENTO apos o envio de email de orcamento", SituacaoPedido.ORCAMENTO,
+		assertEquals("A situacao do pedido deve ser ORCAMENTO apos o envio de email de orcamento",
+				SituacaoPedido.ORCAMENTO, pedido.getSituacaoPedido());
+
+	}
+
+	@Test
+	public void testAceiteOrcamento() {
+		Pedido pedido = gerarPedidoOrcamento();
+		ItemPedido itemPedido = gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		pedidoService.aceitarOrcamento(idPedido);
+
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		assertEquals("A situacao do pedido deve ser DIGITACAO apos o aceite do orcamento", SituacaoPedido.DIGITACAO,
 				pedido.getSituacaoPedido());
+
+	}
+
+	@Test
+	public void testAceiteOrcamentoSemModificarPedidoNaoOrcamento() {
+		Pedido pedido = gerarPedidoRevenda();
+
+		ItemPedido itemPedido = gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		SituacaoPedido situacaoPedidoAntes = pedido.getSituacaoPedido();
+
+		pedidoService.aceitarOrcamento(idPedido);
+
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		assertEquals("A situacao do pedido que nao seja um orcamento nao deve ser modificada apos o aceite do orcamento",
+				situacaoPedidoAntes, pedido.getSituacaoPedido());
 
 	}
 

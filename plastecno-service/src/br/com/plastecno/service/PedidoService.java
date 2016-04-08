@@ -20,6 +20,8 @@ import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 @Local
 public interface PedidoService {
 
+	void aceitarOrcamento(Integer idOrcamento);
+
 	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
 
 	void alterarItemAguardandoMaterialByIdPedido(Integer idPedido);

@@ -104,4 +104,8 @@ var autocompletar = function(configuracao) {
 		}
 		
 	});
+	
+	$(idCampoPesquisavel).click(function (e){
+		$(idContainerResultados).hide();
+	});
 };

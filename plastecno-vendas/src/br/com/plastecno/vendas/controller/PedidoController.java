@@ -134,6 +134,12 @@ public class PedidoController extends AbstractController {
         this.diretorioTemplateRelatorio = request.getServletContext().getRealPath("/templates");
     }
 
+    @Post("pedido/aceiteorcamento")
+    public void aceitarOcamento(Integer idPedido) {
+        pedidoService.aceitarOrcamento(idPedido);
+        redirecTo(this.getClass()).pesquisarPedidoById(idPedido, TipoPedido.REVENDA);
+    }
+
     @Post("pedido/cancelamento")
     public void cancelarPedido(Integer idPedido, TipoPedido tipoPedido) {
         try {

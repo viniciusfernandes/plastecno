@@ -59,6 +59,14 @@
 	left: 10%;
 }
 
+.botaoAceitar {
+	background: url("../images/accepted_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoAdicionar {
 	background: url("../images/package_down_arrow_24.png") no-repeat scroll
 		0 0 transparent;
@@ -309,6 +317,14 @@
 	background: url("../images/arrow_left_blue_24.png") no-repeat scroll 0 0
 		transparent;
 	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoAceitar:hover {
+	background: url("../images/accepted_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
 	height: 24px;
 	width: 24px;
 }

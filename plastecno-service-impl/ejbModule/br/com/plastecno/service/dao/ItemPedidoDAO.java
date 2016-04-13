@@ -158,7 +158,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	public List<Integer> pesquisarIdPedidoAssociadoByIdPedidoOrigem(Integer idPedidoOrigem, boolean isCompra) {
-		StringBuilder select = new StringBuilder("select ");
+		StringBuilder select = new StringBuilder("select distinct ");
 		if (isCompra) {
 			select.append("i.idPedidoVenda ");
 		} else {

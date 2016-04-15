@@ -223,7 +223,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Date dataInicial, Date dataFinal) {
+	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idFornecedor, Date dataInicial, Date dataFinal) {
 		StringBuilder select = gerarConstrutorItemPedidoIdPedidoCompraEVenda();
 
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
@@ -238,8 +238,15 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			select.append("and i.pedido.dataEnvio <= :dataFinal ");
 		}
 
-		if (idRepresentada != null) {
-			select.append("and i.pedido.representada.id = :idRepresentada ");
+		if (idFornecedor != null) {
+			select
+					.append("and i.idPedidoCompra in ( select p.id from Pedido p where p.tipoPedido = :tipoPedidoCompra and p.representada.id = :idFornecedor ");
+			// Essa condicao foi incluida apenas para melhorar o filtro do resultado
+			// dos pedidos de compra e nao tem relacao direta com o negocio.
+			if (dataInicial != null) {
+				select.append("and (p.dataEnvio is null or p.dataEnvio >= :dataInicial) ");
+			}
+			select.append(" ) ");
 		}
 
 		select.append("order by i.pedido.dataEntrega asc ");
@@ -256,8 +263,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			query.setParameter("dataFinal", dataFinal);
 		}
 
-		if (idRepresentada != null) {
-			query.setParameter("idRepresentada", idRepresentada);
+		if (idFornecedor != null) {
+			query.setParameter("tipoPedidoCompra", TipoPedido.COMPRA).setParameter("idFornecedor", idFornecedor);
 		}
 
 		return query.getResultList();

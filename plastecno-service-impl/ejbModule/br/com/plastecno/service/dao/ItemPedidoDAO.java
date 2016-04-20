@@ -172,6 +172,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			select.append("i.idPedidoCompra != null ");
 		}
 
+		if (isCompra) {
+			select.append("order by i.idPedidoVenda desc ");
+		} else {
+			select.append("order by i.idPedidoCompra desc ");
+		}
+
 		return entityManager.createQuery(select.toString(), Integer.class).setParameter("idPedidoOrigem", idPedidoOrigem)
 				.getResultList();
 	}

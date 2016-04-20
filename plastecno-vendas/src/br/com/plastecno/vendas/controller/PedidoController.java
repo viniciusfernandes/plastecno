@@ -691,9 +691,10 @@ public class PedidoController extends AbstractController {
             addAtributo("listaTransportadora", this.transportadoraService.pesquisar());
             addAtributo("listaRedespacho", this.transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
             addAtributo("idRepresentadaSelecionada", idFornecedor);
+            
+            irRodapePagina();
         }
         configurarTipoPedido(tipoPedido);
-        irRodapePagina();
     }
 
     private void redirectByTipoPedido(TipoPedido tipoPedido) {

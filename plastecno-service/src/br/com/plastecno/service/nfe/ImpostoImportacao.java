@@ -1,26 +1,16 @@
 package br.com.plastecno.service.nfe;
 
+import javax.xml.bind.annotation.XmlElement;
+
 public class ImpostoImportacao {
+	@XmlElement(name = "vBC")
 	private Double valorBaseCalculo;
+	@XmlElement(name = "vDespAdu")
 	private Double valorDespesaAduaneira;
+	@XmlElement(name = "vII")
 	private Double valorImpostoImportacao;
+	@XmlElement(name = "vIOF")
 	private Double valorIOF;
-
-	public Double getValorBaseCalculo() {
-		return valorBaseCalculo;
-	}
-
-	public Double getValorDespesaAduaneira() {
-		return valorDespesaAduaneira;
-	}
-
-	public Double getValorImpostoImportacao() {
-		return valorImpostoImportacao;
-	}
-
-	public Double getValorIOF() {
-		return valorIOF;
-	}
 
 	public void setValorBaseCalculo(Double valorBaseCalculo) {
 		this.valorBaseCalculo = valorBaseCalculo;

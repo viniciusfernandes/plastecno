@@ -1,6 +1,6 @@
 package br.com.plastecno.service.nfe;
 
-public class DestinatarioNFe {
+public class IdentificacaoDestinatarioNFe {
 	private String email;
 	private EnderecoNFe enderecoDestinatarioNFe;
 	private String inscricaoEstadual;

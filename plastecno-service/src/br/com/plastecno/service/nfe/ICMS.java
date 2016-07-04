@@ -1,39 +1,40 @@
 package br.com.plastecno.service.nfe;
 
+import javax.xml.bind.annotation.XmlElement;
+
+public class ICMS {
+	@XmlElement(name = "ICMS00")
+	private ICMSIntegral ICMSIntegral;
+	@XmlElement(name = "ICMS10")
+	private ICMSST ICMSST;
+
+	public void setICMSIntegral(ICMSIntegral iCMSIntegral) {
+		ICMSIntegral = iCMSIntegral;
+	}
+
+	public void setICMSST(ICMSST iCMSST) {
+		ICMSST = iCMSST;
+	}
+
+}
+
 class ICMSIntegral {
-	private Double aliquotaBC;
+
+	@XmlElement(name = "pICMS")
+	private Double aliquota;
+	@XmlElement(name = "modBC")
 	private Integer modalidadeDeterminacaoBC;
+	@XmlElement(name = "orig")
 	private Integer origemMercadoria;
+	@XmlElement(name = "CST")
 	private String tributacaoICMS;
+	@XmlElement(name = "vICMS")
 	private Double valor;
+	@XmlElement(name = "vBC")
 	private Double valorBC;
 
-	public Double getAliquotaBC() {
-		return aliquotaBC;
-	}
-
-	public Integer getModalidadeDeterminacaoBC() {
-		return modalidadeDeterminacaoBC;
-	}
-
-	public Integer getOrigemMercadoria() {
-		return origemMercadoria;
-	}
-
-	public String getTributacaoICMS() {
-		return tributacaoICMS;
-	}
-
-	public Double getValor() {
-		return valor;
-	}
-
-	public Double getValorBC() {
-		return valorBC;
-	}
-
-	public void setAliquotaBC(Double aliquotaBC) {
-		this.aliquotaBC = aliquotaBC;
+	public void setAliquota(Double aliquota) {
+		this.aliquota = aliquota;
 	}
 
 	public void setModalidadeDeterminacaoBC(Integer modalidadeDeterminacaoBC) {
@@ -55,16 +56,39 @@ class ICMSIntegral {
 	public void setValorBC(Double valorBC) {
 		this.valorBC = valorBC;
 	}
+
 }
 
-public class ICMS {
-	private ICMSIntegral icmsIntegral;
+class ICMSST extends ICMSIntegral {
+	@XmlElement(name = "pICMSST")
+	private Double aliquota;
+	@XmlElement(name = "pMVAST")
+	private Double percentualMargemAdicionadoST;
+	@XmlElement(name = "pRedBCST")
+	private Double percentualReducaoBC;
+	@XmlElement(name = "vICMSST")
+	private Double valor;
+	@XmlElement(name = "vBCST")
+	private Double valorBC;
 
-	public ICMSIntegral getIcmsIntegral() {
-		return icmsIntegral;
+	public void setAliquota(Double aliquota) {
+		this.aliquota = aliquota;
 	}
 
-	public void setIcmsIntegral(ICMSIntegral icmsIntegral) {
-		this.icmsIntegral = icmsIntegral;
+	public void setPercentualMargemAdicionadoST(Double percentualMargemAdicionadoST) {
+		this.percentualMargemAdicionadoST = percentualMargemAdicionadoST;
 	}
+
+	public void setPercentualReducaoBC(Double percentualReducaoBC) {
+		this.percentualReducaoBC = percentualReducaoBC;
+	}
+
+	public void setValor(Double valor) {
+		this.valor = valor;
+	}
+
+	public void setValorBC(Double valorBC) {
+		this.valorBC = valorBC;
+	}
+
 }

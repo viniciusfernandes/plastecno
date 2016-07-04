@@ -1,7 +1,5 @@
 package br.com.plastecno.service.nfe;
 
-import java.util.Date;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -21,9 +19,6 @@ public class Main {
 		NFe n = new NFe();
 		n.setId("432xx");
 		n.setVersao(2.00);
-		n.setDataHoraEmissao(new Date().toString());
-		n.setDestinoOperacao(0);
-		n.setConsumidorFinal(44);
 
 		IdentificacaoNFe i = new IdentificacaoNFe();
 		i.setChaveAcesso("fafdsadsafdsafdsafasdf");
@@ -32,9 +27,29 @@ public class Main {
 		i.setSerie("555");
 		i.setModelo("11");
 		n.setIdentificacaoNFe(i);
-		
+
 		DetalhamentoProdutoServicoNFe d1 = new DetalhamentoProdutoServicoNFe();
 		d1.setNumeroItem(43);
+
+		ICMSIntegral icmsIntegral = new ICMSIntegral();
+		icmsIntegral.setAliquota(432.88);
+		icmsIntegral.setValor(5444.66);
+		icmsIntegral.setOrigemMercadoria(111);
+
+		ICMSST icmsST = new ICMSST();
+		icmsST.setAliquota(432.88);
+		icmsST.setValor(5444.66);
+		icmsST.setValorBC(54.9);
+		icmsST.setOrigemMercadoria(66);
+
+		ICMS icms = new ICMS();
+		icms.setICMSIntegral(icmsIntegral);
+		icms.setICMSST(icmsST);
+
+		TributosProdutoServico t = new TributosProdutoServico();
+		t.setICMS(icms);
+
+		d1.setTributosProdutoServico(t);
 
 		DetalhamentoProdutoServicoNFe d2 = new DetalhamentoProdutoServicoNFe();
 		d2.setNumeroItem(55);

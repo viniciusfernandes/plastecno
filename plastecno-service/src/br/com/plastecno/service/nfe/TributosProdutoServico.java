@@ -1,34 +1,21 @@
 package br.com.plastecno.service.nfe;
 
-public class TributoProdutoServico {
-	private ICMS icms;
+import javax.xml.bind.annotation.XmlElement;
+
+public class TributosProdutoServico {
+	@XmlElement(name = "ICMS")
+	private ICMS ICMS;
+	@XmlElement(name = "II")
 	private ImpostoImportacao impostoImportacao;
+	@XmlElement(name = "ICMS")
 	private String informacaoAdicional;
+	@XmlElement(name = "IPI")
 	private IPI ipi;
+	@XmlElement(name = "PIS")
 	private PIS pis;
 
-	public ICMS getIcms() {
-		return icms;
-	}
-
-	public ImpostoImportacao getImpostoImportacao() {
-		return impostoImportacao;
-	}
-
-	public String getInformacaoAdicional() {
-		return informacaoAdicional;
-	}
-
-	public IPI getIpi() {
-		return ipi;
-	}
-
-	public PIS getPis() {
-		return pis;
-	}
-
-	public void setIcms(ICMS icms) {
-		this.icms = icms;
+	public void setICMS(ICMS iCMS) {
+		ICMS = iCMS;
 	}
 
 	public void setImpostoImportacao(ImpostoImportacao impostoImportacao) {
@@ -46,4 +33,5 @@ public class TributoProdutoServico {
 	public void setPis(PIS pis) {
 		this.pis = pis;
 	}
+
 }

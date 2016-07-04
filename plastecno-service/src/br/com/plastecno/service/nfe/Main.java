@@ -18,11 +18,21 @@ public class Main {
 		// for pretty-print XML in JAXB
 		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-		NFe nFe = new NFe();
-		nFe.setDataHoraEmissao(new Date().toString());
-		nFe.setDestinoOperacao(0);
-		nFe.setConsumidorFinal(44);
+		NFe n = new NFe();
+		n.setId("432xx");
+		n.setVersao(2.00);
+		n.setDataHoraEmissao(new Date().toString());
+		n.setDestinoOperacao(0);
+		n.setConsumidorFinal(44);
 
+		IdentificacaoNFe i = new IdentificacaoNFe();
+		i.setChaveAcesso("fafdsadsafdsafdsafasdf");
+		i.setMunicipioOcorrenciaFatorGerador("SP");
+		i.setTipoOperacao("66");
+		i.setSerie("555");
+		i.setModelo("11");
+		n.setIdentificacaoNFe(i);
+		
 		DetalhamentoProdutoServicoNFe d1 = new DetalhamentoProdutoServicoNFe();
 		d1.setNumeroItem(43);
 
@@ -40,10 +50,10 @@ public class Main {
 		d1.setProdutoServicoNFe(s1);
 		d2.setProdutoServicoNFe(s2);
 
-		nFe.addDetalhamentoProdutoServico(d1);
-		nFe.addDetalhamentoProdutoServico(d2);
+		n.addDetalhamentoProdutoServico(d1);
+		n.addDetalhamentoProdutoServico(d2);
 
-		m.marshal(nFe, System.out);
+		m.marshal(n, System.out);
 	}
 
 }

@@ -27,9 +27,11 @@ public class NFe {
 	private Integer tipoDocumento;
 	private String tipoImpressao;
 	private String UF;
-	
-	@XmlElement(name="total")
-	private ValorTotalNFe valorTotalNFe;
+	@XmlElement(name = "transp")
+	private TransporteNFe transporteNFe;
+
+	@XmlElement(name = "total")
+	private ValoresTotaisNFe valoresTotaisNFe;
 
 	public void addDetalhamentoProdutoServico(DetalhamentoProdutoServicoNFe detalhamento) {
 		if (listaDetalhamentoProdutoServicoNFe == null) {

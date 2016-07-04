@@ -2,7 +2,7 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class ValorTotalNFe {
+public class ValoresTotaisNFe {
 	@XmlElement(name = "ICMSTot")
 	private ValorTotalICMS valorTotalICMS;
 

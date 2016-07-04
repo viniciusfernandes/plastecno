@@ -1,18 +1,24 @@
 package br.com.plastecno.service.nfe;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "nfe")
 public class NFe {
+	@XmlElement(name = "gen")
 	private Integer consumidorFinal;
-	private Date dataHoraEmissao;
-	private Date dataHoraSaidaEntrada;
+	private String dataHoraEmissao;
+	private String dataHoraSaidaEntrada;
 	private DestinatarioNFe destinatarioNFe;
 	private Integer destinoOperacao;
 	private EmitenteNFe emitenteNFe;
 	private Integer finalidadeEmissao;
 	private String formaEmissao;
 	private Integer formaPagamento;
+	@XmlElement(name = "det")
 	private List<DetalhamentoProdutoServicoNFe> listaDetalhamentoProdutoServicoNFe;
 	private Integer modelo;
 	private String municipioOcorrencia;
@@ -21,80 +27,26 @@ public class NFe {
 	private Integer tipoDocumento;
 	private String tipoImpressao;
 	private String UF;
+	
+	@XmlElement(name="total")
+	private ValorTotalNFe valorTotalNFe;
 
-	public Integer getConsumidorFinal() {
-		return consumidorFinal;
-	}
-
-	public Date getDataHoraEmissao() {
-		return dataHoraEmissao;
-	}
-
-	public Date getDataHoraSaidaEntrada() {
-		return dataHoraSaidaEntrada;
-	}
-
-	public DestinatarioNFe getDestinatarioNFe() {
-		return destinatarioNFe;
-	}
-
-	public Integer getDestinoOperacao() {
-		return destinoOperacao;
-	}
-
-	public EmitenteNFe getEmitenteNFe() {
-		return emitenteNFe;
-	}
-
-	public Integer getFinalidadeEmissao() {
-		return finalidadeEmissao;
-	}
-
-	public String getFormaEmissao() {
-		return formaEmissao;
-	}
-
-	public Integer getFormaPagamento() {
-		return formaPagamento;
-	}
-
-	public Integer getModelo() {
-		return modelo;
-	}
-
-	public String getMunicipioOcorrencia() {
-		return municipioOcorrencia;
-	}
-
-	public Integer getSerie() {
-		return serie;
-	}
-
-	public Integer getTipoAtendimento() {
-		return tipoAtendimento;
-	}
-
-	public Integer getTipoDocumento() {
-		return tipoDocumento;
-	}
-
-	public String getTipoImpressao() {
-		return tipoImpressao;
-	}
-
-	public String getUF() {
-		return UF;
+	public void addDetalhamentoProdutoServico(DetalhamentoProdutoServicoNFe detalhamento) {
+		if (listaDetalhamentoProdutoServicoNFe == null) {
+			listaDetalhamentoProdutoServicoNFe = new ArrayList<DetalhamentoProdutoServicoNFe>();
+		}
+		listaDetalhamentoProdutoServicoNFe.add(detalhamento);
 	}
 
 	public void setConsumidorFinal(Integer consumidorFinal) {
 		this.consumidorFinal = consumidorFinal;
 	}
 
-	public void setDataHoraEmissao(Date dataHoraEmissao) {
+	public void setDataHoraEmissao(String dataHoraEmissao) {
 		this.dataHoraEmissao = dataHoraEmissao;
 	}
 
-	public void setDataHoraSaidaEntrada(Date dataHoraSaidaEntrada) {
+	public void setDataHoraSaidaEntrada(String dataHoraSaidaEntrada) {
 		this.dataHoraSaidaEntrada = dataHoraSaidaEntrada;
 	}
 
@@ -120,6 +72,11 @@ public class NFe {
 
 	public void setFormaPagamento(Integer formaPagamento) {
 		this.formaPagamento = formaPagamento;
+	}
+
+	public void setListaDetalhamentoProdutoServicoNFe(
+			List<DetalhamentoProdutoServicoNFe> listaDetalhamentoProdutoServicoNFe) {
+		this.listaDetalhamentoProdutoServicoNFe = listaDetalhamentoProdutoServicoNFe;
 	}
 
 	public void setModelo(Integer modelo) {
@@ -149,4 +106,5 @@ public class NFe {
 	public void setUF(String uF) {
 		UF = uF;
 	}
+
 }

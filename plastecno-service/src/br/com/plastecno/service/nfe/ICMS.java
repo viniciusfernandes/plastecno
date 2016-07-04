@@ -57,7 +57,7 @@ class ICMSIntegral {
 	}
 }
 
-public class ICSM {
+public class ICMS {
 	private ICMSIntegral icmsIntegral;
 
 	public ICMSIntegral getIcmsIntegral() {

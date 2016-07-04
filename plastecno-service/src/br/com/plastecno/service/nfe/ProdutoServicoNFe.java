@@ -1,91 +1,51 @@
 package br.com.plastecno.service.nfe;
 
+import javax.xml.bind.annotation.XmlElement;
+
 public class ProdutoServicoNFe {
+	@XmlElement(name = "CFOP")
 	private String CFOP;
+	@XmlElement(name = "cProd")
 	private String codigo;
+	@XmlElement(name = "xProd")
 	private String descricao;
+	@XmlElement(name = "cEAN")
 	private String EAN;
+	@XmlElement(name = "cEANTrib")
 	private String EANTributavel;
+	@XmlElement(name = "EXTIPI")
 	private String EXTIPI;
+	@XmlElement(name = "NCM")
 	private String NCM;
+	@XmlElement(name = "vOutro")
 	private Integer outrasDespesasAcessorias;
+	@XmlElement(name = "qCom")
 	private Integer quantidadeComercial;
+	@XmlElement(name = "qTrib")
 	private Integer quantidadeTributavel;
+	@XmlElement(name = "uCom")
 	private String unidadeComercial;
+
+	@XmlElement(name = "uTrib")
+	private String unidadeTributavel;
+
+	@XmlElement(name = "vDesc")
 	private Double valorDesconto;
+
+	@XmlElement(name = "vProd")
 	private Double valorTotalBruto;
+
+	@XmlElement(name = "vFrete")
 	private Double valorTotalFrete;
+
+	@XmlElement(name = "vSeg")
 	private Double valorTotalSeguro;
+
+	@XmlElement(name = "vUnCom")
 	private Double valorUnitarioComercializacao;
+
+	@XmlElement(name = "vUnTrib")
 	private Double valorUnitarioTributacao;
-
-	public String getCFOP() {
-		return CFOP;
-	}
-
-	public String getCodigo() {
-		return codigo;
-	}
-
-	public String getDescricao() {
-		return descricao;
-	}
-
-	public String getEAN() {
-		return EAN;
-	}
-
-	public String getEANTributavel() {
-		return EANTributavel;
-	}
-
-	public String getEXTIPI() {
-		return EXTIPI;
-	}
-
-	public String getNCM() {
-		return NCM;
-	}
-
-	public Integer getOutrasDespesasAcessorias() {
-		return outrasDespesasAcessorias;
-	}
-
-	public Integer getQuantidadeComercial() {
-		return quantidadeComercial;
-	}
-
-	public Integer getQuantidadeTributavel() {
-		return quantidadeTributavel;
-	}
-
-	public String getUnidadeComercial() {
-		return unidadeComercial;
-	}
-
-	public Double getValorDesconto() {
-		return valorDesconto;
-	}
-
-	public Double getValorTotalBruto() {
-		return valorTotalBruto;
-	}
-
-	public Double getValorTotalFrete() {
-		return valorTotalFrete;
-	}
-
-	public Double getValorTotalSeguro() {
-		return valorTotalSeguro;
-	}
-
-	public Double getValorUnitarioComercializacao() {
-		return valorUnitarioComercializacao;
-	}
-
-	public Double getValorUnitarioTributacao() {
-		return valorUnitarioTributacao;
-	}
 
 	public void setCFOP(String cFOP) {
 		CFOP = cFOP;
@@ -129,6 +89,10 @@ public class ProdutoServicoNFe {
 
 	public void setUnidadeComercial(String unidadeComercial) {
 		this.unidadeComercial = unidadeComercial;
+	}
+
+	public void setUnidadeTributavel(String unidadeTributavel) {
+		this.unidadeTributavel = unidadeTributavel;
 	}
 
 	public void setValorDesconto(Double valorDesconto) {

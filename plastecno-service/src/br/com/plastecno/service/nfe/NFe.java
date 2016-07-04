@@ -18,6 +18,8 @@ public class NFe {
 	private Integer finalidadeEmissao;
 	private String formaEmissao;
 	private Integer formaPagamento;
+	@XmlElement(name = "infAdic")
+	private InformacoesAdicionaisNFe informacoesAdicionaisNFe;
 	@XmlElement(name = "det")
 	private List<DetalhamentoProdutoServicoNFe> listaDetalhamentoProdutoServicoNFe;
 	private Integer modelo;
@@ -26,10 +28,9 @@ public class NFe {
 	private Integer tipoAtendimento;
 	private Integer tipoDocumento;
 	private String tipoImpressao;
-	private String UF;
 	@XmlElement(name = "transp")
 	private TransporteNFe transporteNFe;
-
+	private String UF;
 	@XmlElement(name = "total")
 	private ValoresTotaisNFe valoresTotaisNFe;
 

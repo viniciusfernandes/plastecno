@@ -76,77 +76,101 @@ public class RelatorioServiceImpl implements RelatorioService {
 		double valorComissionado = 0;
 
 		// Acumulando os valores dos itens comprados
-		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoCompradoResumidoByPeriodo(periodo);
+		List<ItemPedido> listaItemComprado = pedidoService
+				.pesquisarItemPedidoCompradoResumidoByPeriodo(periodo);
 		for (ItemPedido itemPedido : listaItemComprado) {
 			precoItem = itemPedido.calcularPrecoItem();
 
-			aliquota = itemPedido.getAliquotaICMS() == null ? 0 : itemPedido.getAliquotaICMS();
+			aliquota = itemPedido.getAliquotaICMS() == null ? 0 : itemPedido
+					.getAliquotaICMS();
 			valorCreditoIPI += precoItem * aliquota;
 
-			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido.getAliquotaIPI();
+			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido
+					.getAliquotaIPI();
 			valorCreditoIPI += precoItem * aliquota;
 
 			valorComprado += precoItem;
 		}
 
 		// Acumulando os valores dos itens de revenda
-		List<ItemPedido> listaItemVendido = pedidoService.pesquisarItemPedidoRevendaByPeriodo(periodo);
+		List<ItemPedido> listaItemVendido = pedidoService
+				.pesquisarItemPedidoRevendaByPeriodo(periodo);
 		for (ItemPedido itemPedido : listaItemVendido) {
 			precoItem = itemPedido.calcularPrecoItem();
 			valorVendido += precoItem;
 
-			aliquota = itemPedido.getAliquotaICMS() == null ? 0 : itemPedido.getAliquotaICMS();
+			aliquota = itemPedido.getAliquotaICMS() == null ? 0 : itemPedido
+					.getAliquotaICMS();
 			valorDebitoICMS += precoItem * aliquota;
 
-			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido.getAliquotaIPI();
+			aliquota = itemPedido.getAliquotaIPI() == null ? 0 : itemPedido
+					.getAliquotaIPI();
 			valorDebitoIPI += precoItem * aliquota;
 
-			valorComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
+			valorComissionado += itemPedido.getValorComissionado() == null ? 0
+					: itemPedido.getValorComissionado();
 		}
 		valorReceita = valorVendido;
 
 		// Acumulando os valores dos itens de venda por representacao
-		listaItemVendido = pedidoService.pesquisarItemPedidoRepresentacaoByPeriodo(periodo);
+		listaItemVendido = pedidoService
+				.pesquisarItemPedidoRepresentacaoByPeriodo(periodo);
 		for (ItemPedido itemPedido : listaItemVendido) {
 
 			precoItem = itemPedido.getValorComissionado();
 			valorVendido += precoItem;
-			// valorComissionado += precoItem * itemPedido.getAliquotaComissao();
+			// valorComissionado += precoItem *
+			// itemPedido.getAliquotaComissao();
 		}
 
 		valorReceita += valorVendido;
 
 		double valorIPI = valorDebitoIPI - valorCreditoIPI;
 		double valorICMS = valorDebitoICMS - valorCreditoICMS;
-		double valorLiquido = valorReceita - valorIPI - valorICMS - valorComissionado;
+		double valorLiquido = valorReceita - valorIPI - valorICMS
+				- valorComissionado;
 
 		ReceitaWrapper receita = new ReceitaWrapper();
-		receita.setValorCompradoFormatado(NumeroUtils.formatarValorMonetario(valorComprado));
-		receita.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(valorVendido));
-		receita.setValorCreditoICMSFormatado(NumeroUtils.formatarValorMonetario(valorCreditoICMS));
-		receita.setValorDebitoICMSFormatado(NumeroUtils.formatarValorMonetario(valorDebitoICMS));
-		receita.setValorCreditoIPIFormatado(NumeroUtils.formatarValorMonetario(valorCreditoIPI));
-		receita.setValorDebitoIPIFormatado(NumeroUtils.formatarValorMonetario(valorDebitoIPI));
-		receita.setValorICMSFormatado(NumeroUtils.formatarValorMonetario(valorICMS));
-		receita.setValorIPIFormatado(NumeroUtils.formatarValorMonetario(valorIPI));
-		receita.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(valorComissionado));
-		receita.setValorLiquidoFormatado(NumeroUtils.formatarValorMonetario(valorLiquido));
-		receita.setValorReceitaFormatado(NumeroUtils.formatarValorMonetario(valorReceita));
+		receita.setValorCompradoFormatado(NumeroUtils
+				.formatarValorMonetario(valorComprado));
+		receita.setValorVendidoFormatado(NumeroUtils
+				.formatarValorMonetario(valorVendido));
+		receita.setValorCreditoICMSFormatado(NumeroUtils
+				.formatarValorMonetario(valorCreditoICMS));
+		receita.setValorDebitoICMSFormatado(NumeroUtils
+				.formatarValorMonetario(valorDebitoICMS));
+		receita.setValorCreditoIPIFormatado(NumeroUtils
+				.formatarValorMonetario(valorCreditoIPI));
+		receita.setValorDebitoIPIFormatado(NumeroUtils
+				.formatarValorMonetario(valorDebitoIPI));
+		receita.setValorICMSFormatado(NumeroUtils
+				.formatarValorMonetario(valorICMS));
+		receita.setValorIPIFormatado(NumeroUtils
+				.formatarValorMonetario(valorIPI));
+		receita.setValorComissionadoFormatado(NumeroUtils
+				.formatarValorMonetario(valorComissionado));
+		receita.setValorLiquidoFormatado(NumeroUtils
+				.formatarValorMonetario(valorLiquido));
+		receita.setValorReceitaFormatado(NumeroUtils
+				.formatarValorMonetario(valorReceita));
 		return receita;
 	}
 
 	@Override
-	public RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade)
-			throws BusinessException {
+	public RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(
+			Integer idRamoAtividade) throws BusinessException {
 
 		if (idRamoAtividade == null) {
 			throw new BusinessException("O ramo de atividade é obrigatório");
 		}
 
-		RamoAtividade ramoAtividade = this.ramoAtividadeService.pesquisarById(idRamoAtividade);
-		List<Cliente> listaCliente = this.clienteService.pesquisarByRamoAtividade(idRamoAtividade);
+		RamoAtividade ramoAtividade = this.ramoAtividadeService
+				.pesquisarById(idRamoAtividade);
+		List<Cliente> listaCliente = this.clienteService
+				.pesquisarByRamoAtividade(idRamoAtividade);
 		RelatorioClienteRamoAtividade relatorio = new RelatorioClienteRamoAtividade(
-				"Relatório de Clientes com o ramo de atividades " + ramoAtividade.getSigla());
+				"Relatório de Clientes com o ramo de atividades "
+						+ ramoAtividade.getSigla());
 
 		StringBuilder descricaoContato = new StringBuilder();
 		for (Cliente cliente : listaCliente) {
@@ -160,11 +184,13 @@ public class RelatorioServiceImpl implements RelatorioService {
 				}
 
 				if (StringUtils.isNotEmpty(c.getTelefone())) {
-					descricaoContato.append(" - ").append(c.getTelefoneFormatado());
+					descricaoContato.append(" - ").append(
+							c.getTelefoneFormatado());
 				}
 			}
 
-			relatorio.addCliente(new ClienteWrapper(cliente.getVendedor().getNomeCompleto(), cliente.getRazaoSocial(),
+			relatorio.addCliente(new ClienteWrapper(cliente.getVendedor()
+					.getNomeCompleto(), cliente.getRazaoSocial(),
 					descricaoContato.toString()));
 
 			descricaoContato.delete(0, descricaoContato.length());
@@ -175,31 +201,42 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioComissaoVendedor(Integer idVendedor, Periodo periodo) {
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioComissaoVendedor(
+			Integer idVendedor, Periodo periodo) {
 
 		StringBuilder titulo = new StringBuilder();
-		titulo.append("Comissão do Vendedor de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
+		titulo.append("Comissão do Vendedor de ")
+				.append(StringUtils.formatarData(periodo.getInicio()))
+				.append(" à ")
 				.append(StringUtils.formatarData(periodo.getFim()));
-		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor);
+		List<ItemPedido> listaItemPedido = pedidoService
+				.pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor);
 
-		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(titulo.toString(), listaItemPedido);
+		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
+				titulo.toString(), listaItemPedido);
 
 		double valorTotalComissionado = 0;
 		for (ItemPedido itemPedido : listaItemPedido) {
-			valorTotalComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
+			valorTotalComissionado += itemPedido.getValorComissionado() == null ? 0
+					: itemPedido.getValorComissionado();
 		}
-		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotalComissionado));
+		relatorio.setValorTotal(NumeroUtils
+				.formatarValorMonetario(valorTotalComissionado));
 		return relatorio;
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, ComissaoVendaWrapper> gerarRelatorioComissaoVendedores(Periodo periodo) {
+	public RelatorioWrapper<Integer, ComissaoVendaWrapper> gerarRelatorioComissaoVendedores(
+			Periodo periodo) {
 
 		StringBuilder titulo = new StringBuilder();
-		titulo.append("Comissão das Vendas de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
+		titulo.append("Comissão das Vendas de ")
+				.append(StringUtils.formatarData(periodo.getInicio()))
+				.append(" à ")
 				.append(StringUtils.formatarData(periodo.getFim()));
-		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoVendaResumidaByPeriodo(periodo);
+		List<ItemPedido> listaItemPedido = pedidoService
+				.pesquisarItemPedidoVendaResumidaByPeriodo(periodo);
 
 		RelatorioWrapper<Integer, ComissaoVendaWrapper> relatorio = new RelatorioWrapper<Integer, ComissaoVendaWrapper>(
 				titulo.toString());
@@ -209,7 +246,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 		ComissaoVendaWrapper comissao = null;
 		String nomeVendedor = null;
 		for (ItemPedido itemPedido : listaItemPedido) {
-			nomeVendedor = itemPedido.getNomeProprietario() + " " + itemPedido.getSobrenomeProprietario();
+			nomeVendedor = itemPedido.getNomeProprietario() + " "
+					+ itemPedido.getSobrenomeProprietario();
 			comissao = relatorio.getElemento(itemPedido.getIdProprietario());
 
 			if (comissao == null) {
@@ -219,7 +257,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 				relatorio.addElemento(itemPedido.getIdProprietario(), comissao);
 			}
 
-			valorComissionado = itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
+			valorComissionado = itemPedido.getValorComissionado() == null ? 0
+					: itemPedido.getValorComissionado();
 			valorTotalComissionado += valorComissionado;
 
 			comissao.addPedido(itemPedido.getIdPedido());
@@ -228,79 +267,100 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 
 		for (ComissaoVendaWrapper c : relatorio.getListaElemento()) {
-			c.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(c.getValorVendido()));
-			c.setValorComissaoFormatado(NumeroUtils.formatarValorMonetario(c.getValorComissao()));
+			c.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(c
+					.getValorVendido()));
+			c.setValorComissaoFormatado(NumeroUtils.formatarValorMonetario(c
+					.getValorComissao()));
 		}
 
-		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotalComissionado));
+		relatorio.setValorTotal(NumeroUtils
+				.formatarValorMonetario(valorTotalComissionado));
 		return relatorio;
 	}
 
 	@Override
-	public List<Pedido> gerarRelatorioCompra(Periodo periodo) throws InformacaoInvalidaException {
+	public List<Pedido> gerarRelatorioCompra(Periodo periodo)
+			throws InformacaoInvalidaException {
 		return this.pedidoService.pesquisarPedidoCompraByPeriodo(periodo);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
-			Periodo periodo) {
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(
+			Integer idRepresentada, Periodo periodo) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
 				"Pedidos de Compras para Recebimento",
-				pedidoService.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo));
+				pedidoService.pesquisarCompraAguardandoRecebimento(
+						idRepresentada, periodo));
 
 		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
 	}
 
 	@Override
-	public List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException {
+	public List<Pedido> gerarRelatorioEntrega(Periodo periodo)
+			throws InformacaoInvalidaException {
 		return pedidoService.pesquisarEntregaVendaByPeriodo(periodo);
 	}
 
 	@Override
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoCompra(Integer idCliente, Periodo periodo) {
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoCompra(
+			Integer idCliente, Periodo periodo) {
 		return gerarRelatorioItensPorPedido("Itens para Comprar",
 				pedidoService.pesquisarItemAguardandoCompra(idCliente, periodo));
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(Integer idRepresentada,
-			Periodo periodo) {
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(
+			Integer idRepresentada, Periodo periodo) {
 
 		return gerarRelatorioItensPorPedido("Itens Aguardando Material",
-				pedidoService.pesquisarItemAguardandoMaterial(idRepresentada, periodo));
+				pedidoService.pesquisarItemAguardandoMaterial(idRepresentada,
+						periodo));
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(
-			Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
+			Integer idCliente, Integer idVendedor, Integer idFornecedor,
+			boolean isCompra, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros, ItemPedido itemVendido) {
-		RelatorioWrapper<Pedido, ItemPedido> relatorio = new RelatorioWrapper<Pedido, ItemPedido>("");
+		RelatorioWrapper<Pedido, ItemPedido> relatorio = new RelatorioWrapper<Pedido, ItemPedido>(
+				"");
 		if (idCliente == null) {
 			return relatorio;
+			
 		}
 
-		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
-			List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
-					null, idFornecedor, isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
+		if (idVendedor == null
+				|| usuarioService.isVendaPermitida(idCliente, idVendedor)) {
+			List<ItemPedido> listaItemPedido = pedidoService
+					.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(
+							idCliente, null, idFornecedor, isCompra,
+							indiceRegistroInicial, numeroMaximoRegistros,
+							itemVendido);
 
 			for (ItemPedido i : listaItemPedido) {
 				relatorio.addGrupo(i.getPedido(), i);
 			}
 
-			relatorio.addPropriedade("totalPesquisado",
-					pedidoService.pesquisarTotalPedidoByIdClienteIdFornecedor(idCliente, idFornecedor, isCompra));
+			relatorio.addPropriedade("totalPesquisado", pedidoService
+					.pesquisarTotalPedidoByIdClienteIdFornecedor(idCliente,
+							idFornecedor, isCompra));
 		}
 
 		relatorio.sortGrupo(new Comparator<GrupoWrapper<Pedido, ItemPedido>>() {
 
 			@Override
-			public int compare(GrupoWrapper<Pedido, ItemPedido> o1, GrupoWrapper<Pedido, ItemPedido> o2) {
+			public int compare(GrupoWrapper<Pedido, ItemPedido> o1,
+					GrupoWrapper<Pedido, ItemPedido> o2) {
 				Date d1 = o1.getId().getDataEnvio();
 				Date d2 = o2.getId().getDataEnvio();
+
+				if (d1 == null || d2 == null) {
+					return o2.getId().getId().compareTo(o1.getId().getId());
+				}
 
 				return d1 != null && d2 != null ? d2.compareTo(d1) : 0;
 			}
@@ -310,19 +370,29 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@REVIEW(descricao = "Nem sempre eh necessario carregar as informacoes da representada")
-	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(String titulo, List<ItemPedido> listaItem) {
-		RelatorioWrapper<Integer, ItemPedido> relatorio = new RelatorioWrapper<Integer, ItemPedido>(titulo);
+	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(
+			String titulo, List<ItemPedido> listaItem) {
+		RelatorioWrapper<Integer, ItemPedido> relatorio = new RelatorioWrapper<Integer, ItemPedido>(
+				titulo);
 		for (ItemPedido item : listaItem) {
 
-			item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
-			item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
-			item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
-			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
-			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
-			item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
-			item.setPrecoCustoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoCusto()));
+			item.setMedidaExternaFomatada(NumeroUtils
+					.formatarValorMonetario(item.getMedidaExterna()));
+			item.setMedidaInternaFomatada(NumeroUtils
+					.formatarValorMonetario(item.getMedidaInterna()));
+			item.setComprimentoFormatado(NumeroUtils
+					.formatarValorMonetario(item.getComprimento()));
+			item.setPrecoUnidadeFormatado(NumeroUtils
+					.formatarValorMonetario(item.getPrecoUnidade()));
+			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item
+					.calcularPrecoItem()));
+			item.setValorComissionadoFormatado(NumeroUtils
+					.formatarValorMonetario(item.getValorComissionado()));
+			item.setPrecoCustoItemFormatado(NumeroUtils
+					.formatarValorMonetario(item.getPrecoCusto()));
 
-			relatorio.addGrupo(item.getIdPedido(), item).setPropriedade("dataEntrega",
+			relatorio.addGrupo(item.getIdPedido(), item).setPropriedade(
+					"dataEntrega",
 					StringUtils.formatarData(item.getDataEntrega()));
 		}
 		// Reordenando os itens pelo numero de sequencia de inclusao no pedido.
@@ -336,16 +406,20 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente) {
-		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Empacotar",
-				pedidoService.pesquisarItemPedidoAguardandoEmpacotamento(idCliente));
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(
+			Integer idCliente) {
+		return gerarRelatorioItensPorPedido(
+				"Pedidos de Revenda para Empacotar",
+				pedidoService
+						.pesquisarItemPedidoAguardandoEmpacotamento(idCliente));
 	}
 
 	@Override
-	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoCompraPeriodo(Periodo periodo)
-			throws BusinessException {
+	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoCompraPeriodo(
+			Periodo periodo) throws BusinessException {
 
-		final List<TotalizacaoPedidoWrapper> resultados = pedidoService.pesquisarTotalCompraResumidaByPeriodo(periodo);
+		final List<TotalizacaoPedidoWrapper> resultados = pedidoService
+				.pesquisarTotalCompraResumidaByPeriodo(periodo);
 
 		final StringBuilder titulo = new StringBuilder();
 		titulo.append("Relatório das Compras do Período de ");
@@ -353,20 +427,24 @@ public class RelatorioServiceImpl implements RelatorioService {
 		titulo.append(" à ");
 		titulo.append(StringUtils.formatarData(periodo.getFim()));
 
-		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
+		return gerarRelatorioValorTotalPedidoPeriodo(resultados,
+				titulo.toString());
 	}
 
 	private RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoPeriodo(
-			List<TotalizacaoPedidoWrapper> resultados, String titulo) throws BusinessException {
+			List<TotalizacaoPedidoWrapper> resultados, String titulo)
+			throws BusinessException {
 
-		RelatorioValorTotalPedidoWrapper relatorio = new RelatorioValorTotalPedidoWrapper(titulo);
+		RelatorioValorTotalPedidoWrapper relatorio = new RelatorioValorTotalPedidoWrapper(
+				titulo);
 
 		// Criando os agrupamentos e acumulando os valores totais dos pedidos.
 		for (TotalizacaoPedidoWrapper totalizacao : resultados) {
 			// Criando os agrupamentos pelo ID do proprietario do pedido.
 			relatorio.addGrupo(totalizacao.getIdProprietario(), totalizacao);
 
-			// Armazenando o valor negociado com cada representada para efetuarmos a
+			// Armazenando o valor negociado com cada representada para
+			// efetuarmos a
 			// totalizacao logo abaixo.
 			relatorio.addElemento(totalizacao.getIdRepresentada(), totalizacao);
 
@@ -375,10 +453,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoVendaPeriodo(Periodo periodo)
-			throws BusinessException {
+	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoVendaPeriodo(
+			Periodo periodo) throws BusinessException {
 
-		final List<TotalizacaoPedidoWrapper> resultados = pedidoService.pesquisarTotalPedidoVendaResumidaByPeriodo(periodo);
+		final List<TotalizacaoPedidoWrapper> resultados = pedidoService
+				.pesquisarTotalPedidoVendaResumidaByPeriodo(periodo);
 
 		final StringBuilder titulo = new StringBuilder();
 		titulo.append("Relatório das Vendas do Período de ");
@@ -386,43 +465,53 @@ public class RelatorioServiceImpl implements RelatorioService {
 		titulo.append(" à ");
 		titulo.append(StringUtils.formatarData(periodo.getFim()));
 
-		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
+		return gerarRelatorioValorTotalPedidoPeriodo(resultados,
+				titulo.toString());
 	}
 
 	@Override
-	public List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException {
+	public List<Pedido> gerarRelatorioVenda(Periodo periodo)
+			throws InformacaoInvalidaException {
 		return this.pedidoService.pesquisarPedidoVendaByPeriodo(periodo);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<String, TotalizacaoPedidoWrapper> gerarRelatorioVendaCliente(boolean orcamento,
-			Periodo periodo, Integer idCliente) throws BusinessException {
+	public RelatorioWrapper<String, TotalizacaoPedidoWrapper> gerarRelatorioVendaCliente(
+			boolean orcamento, Periodo periodo, Integer idCliente)
+			throws BusinessException {
 		String nomeCliente = clienteService.pesquisarNomeFantasia(idCliente);
 
-		final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamento para " : "Vendas para ");
+		final StringBuilder titulo = new StringBuilder(
+				orcamento ? "Orçamento para " : "Vendas para ");
 		if (StringUtils.isNotEmpty(nomeCliente)) {
 			titulo.append("o Cliente ").append(nomeCliente).append(" ");
 		} else {
 			titulo.append("os Clientes ");
 		}
-		titulo.append(" de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
+		titulo.append(" de ")
+				.append(StringUtils.formatarData(periodo.getInicio()))
+				.append(" à ")
 				.append(StringUtils.formatarData(periodo.getFim()));
 
 		final RelatorioWrapper<String, TotalizacaoPedidoWrapper> relatorio = new RelatorioWrapper<String, TotalizacaoPedidoWrapper>(
 				titulo.toString());
 
-		List<TotalizacaoPedidoWrapper> listaPedido = this.pedidoService.pesquisarValorVendaClienteByPeriodo(periodo,
-				idCliente, orcamento);
+		List<TotalizacaoPedidoWrapper> listaPedido = this.pedidoService
+				.pesquisarValorVendaClienteByPeriodo(periodo, idCliente,
+						orcamento);
 
 		double valorTotal = 0d;
 		for (TotalizacaoPedidoWrapper totalizacao : listaPedido) {
 			try {
-				totalizacao.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(totalizacao.getValorTotal()));
+				totalizacao.setValorTotalFormatado(NumeroUtils
+						.formatarValorMonetario(totalizacao.getValorTotal()));
 				relatorio.addGrupo(totalizacao.getNomeCliente(), totalizacao);
 				valorTotal += totalizacao.getValorTotal();
 			} catch (Exception e) {
-				throw new BusinessException("Falha na geracao do relatorio de vendas para o cliente " + idCliente, e);
+				throw new BusinessException(
+						"Falha na geracao do relatorio de vendas para o cliente "
+								+ idCliente, e);
 			}
 		}
 		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotal));
@@ -430,26 +519,39 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,
-			Integer idVendedor) throws BusinessException {
-		Usuario vendedor = this.usuarioService.pesquisarVendedorById(idVendedor);
+	public RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(
+			boolean orcamento, Periodo periodo, Integer idVendedor)
+			throws BusinessException {
+		Usuario vendedor = this.usuarioService
+				.pesquisarVendedorById(idVendedor);
 
 		if (vendedor == null) {
-			throw new BusinessException("O vendedor é obrigatório para a geração do relatório");
+			throw new BusinessException(
+					"O vendedor é obrigatório para a geração do relatório");
 		}
 
-		final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamento " : "Vendas ").append(" do Vendedor ")
-				.append(vendedor.getNome()).append(" de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
+		final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamento "
+				: "Vendas ").append(" do Vendedor ").append(vendedor.getNome())
+				.append(" de ")
+				.append(StringUtils.formatarData(periodo.getInicio()))
+				.append(" à ")
 				.append(StringUtils.formatarData(periodo.getFim()));
 
-		final RelatorioVendaVendedorByRepresentada relatorio = new RelatorioVendaVendedorByRepresentada(titulo.toString());
-		List<Pedido> listaPedido = this.pedidoService.pesquisarVendaByPeriodoEVendedor(orcamento, periodo, idVendedor);
+		final RelatorioVendaVendedorByRepresentada relatorio = new RelatorioVendaVendedorByRepresentada(
+				titulo.toString());
+		List<Pedido> listaPedido = this.pedidoService
+				.pesquisarVendaByPeriodoEVendedor(orcamento, periodo,
+						idVendedor);
 		for (Pedido pedido : listaPedido) {
 			try {
-				pedido.setDataEnvioFormatada(StringUtils.formatarData(pedido.getDataEnvio()));
-				relatorio.addRepresentada(pedido.getRepresentada().getNomeFantasia(), new VendaClienteWrapper(pedido));
+				pedido.setDataEnvioFormatada(StringUtils.formatarData(pedido
+						.getDataEnvio()));
+				relatorio.addRepresentada(pedido.getRepresentada()
+						.getNomeFantasia(), new VendaClienteWrapper(pedido));
 			} catch (Exception e) {
-				throw new BusinessException("Falha na geracao do relatorio de vendas do vendedor " + idVendedor, e);
+				throw new BusinessException(
+						"Falha na geracao do relatorio de vendas do vendedor "
+								+ idVendedor, e);
 			}
 		}
 

@@ -122,7 +122,8 @@ public class Representada implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof Representada && this.id != null && this.id.equals(((Representada) o).id);
+		return o instanceof Representada && this.id != null
+				&& this.id.equals(((Representada) o).id);
 	}
 
 	public Double getAliquotaICMS() {
@@ -196,11 +197,16 @@ public class Representada implements Serializable {
 
 	public boolean isFornecedor() {
 		return TipoRelacionamento.FORNECIMENTO.equals(tipoRelacionamento)
-				|| TipoRelacionamento.REPRESENTACAO_FORNECIMENTO.equals(tipoRelacionamento);
+				|| TipoRelacionamento.REPRESENTACAO_FORNECIMENTO
+						.equals(tipoRelacionamento);
 	}
 
 	public boolean isIPIHabilitado() {
 		return !TipoApresentacaoIPI.NUNCA.equals(this.tipoApresentacaoIPI);
+	}
+
+	public boolean isPessoaJuridica() {
+		return cnpj != null && !cnpj.isEmpty();
 	}
 
 	public boolean isRevendedor() {

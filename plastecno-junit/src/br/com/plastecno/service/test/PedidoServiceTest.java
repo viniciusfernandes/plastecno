@@ -17,6 +17,7 @@ import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
+import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
@@ -37,6 +38,7 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.test.builder.ServiceBuilder;
 
 public class PedidoServiceTest extends AbstractTest {
@@ -68,20 +70,23 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private MaterialService materialService;
 
+	private NFeService nFeService;
+
 	private PedidoService pedidoService;
 
 	private RepresentadaService representadaService;
-
 	private UsuarioService usuarioService;
 
 	public PedidoServiceTest() {
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
 		clienteService = ServiceBuilder.buildService(ClienteService.class);
-		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
+		representadaService = ServiceBuilder
+				.buildService(RepresentadaService.class);
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
 		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
+		nFeService = ServiceBuilder.buildService(NFeService.class);
 	}
 
 	private void associarVendedor(Cliente cliente) {
@@ -95,7 +100,8 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	private ItemPedido gerarItemPedido() {
-		List<Representada> listaRepresentada = representadaService.pesquisarRepresentadaEFornecedor();
+		List<Representada> listaRepresentada = representadaService
+				.pesquisarRepresentadaEFornecedor();
 		Representada representada = null;
 		if (listaRepresentada.isEmpty()) {
 			representada = eBuilder.buildRepresentada();
@@ -139,7 +145,8 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		pedido = pedidoService.pesquisarCompraById(idPedido);
-		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, pedido.getSituacaoPedido());
+		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
+				pedido.getSituacaoPedido());
 		return itemPedido;
 	}
 
@@ -168,7 +175,8 @@ public class PedidoServiceTest extends AbstractTest {
 		pedido.setTipoPedido(tipoPedido);
 
 		try {
-			comissaoService.inserirComissaoRevendaVendedor(vendedor.getId(), 0.6);
+			comissaoService.inserirComissaoRevendaVendedor(vendedor.getId(),
+					0.6);
 		} catch (BusinessException e3) {
 			printMensagens(e3);
 		}
@@ -210,7 +218,8 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.05, 0.1d);
+			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.05,
+					0.1d);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -357,13 +366,15 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedidoRevenda);
 		assertEquals(
 				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
 
 		Representada fornecedor = pedidoRevenda.getRepresentada();
-		fornecedor.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+		fornecedor
+				.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
 
 		Cliente revendedor = pedidoRevenda.getCliente();
 		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
@@ -373,14 +384,16 @@ public class PedidoServiceTest extends AbstractTest {
 		listaId.add(item2.getId());
 		Integer idPedidoCompra = null;
 		try {
-			idPedidoCompra = pedidoService.comprarItemPedido(pedidoRevenda.getComprador().getId(), fornecedor.getId(),
-					listaId);
+			idPedidoCompra = pedidoService.comprarItemPedido(pedidoRevenda
+					.getComprador().getId(), fornecedor.getId(), listaId);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
-		assertEquals("Os itens do pedido nao contem itens mas ja foram encomendados pelo setor de compras",
+		situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedidoRevenda);
+		assertEquals(
+				"Os itens do pedido nao contem itens mas ja foram encomendados pelo setor de compras",
 				SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
 
 		Pedido pedidoCompra = pedidoService.pesquisarCompraById(idPedidoCompra);
@@ -396,17 +409,76 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testAceiteOrcamento() {
+		Pedido pedido = gerarPedidoOrcamento();
+		ItemPedido itemPedido = gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		pedidoService.aceitarOrcamento(idPedido);
+
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		assertEquals(
+				"A situacao do pedido deve ser DIGITACAO apos o aceite do orcamento",
+				SituacaoPedido.DIGITACAO, pedido.getSituacaoPedido());
+
+	}
+
+	@Test
+	public void testAceiteOrcamentoSemModificarPedidoNaoOrcamento() {
+		Pedido pedido = gerarPedidoRevenda();
+
+		ItemPedido itemPedido = gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		SituacaoPedido situacaoPedidoAntes = pedido.getSituacaoPedido();
+
+		pedidoService.aceitarOrcamento(idPedido);
+
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		assertEquals(
+				"A situacao do pedido que nao seja um orcamento nao deve ser modificada apos o aceite do orcamento",
+				situacaoPedidoAntes, pedido.getSituacaoPedido());
+
+	}
+
+	@Test
 	public void testAlteracaoQuantidadeRecepcionada() {
 		ItemPedido itemPedido = gerarItemPedidoCompra();
 
 		try {
-			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(), itemPedido.getQuantidade());
+			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(),
+					itemPedido.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
 		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
-				pedidoService.pesquisarSituacaoPedidoById(itemPedido.getPedido().getId()));
+				pedidoService.pesquisarSituacaoPedidoById(itemPedido
+						.getPedido().getId()));
 	}
 
 	@Test
@@ -415,13 +487,15 @@ public class PedidoServiceTest extends AbstractTest {
 
 		Integer quantidadeRecepcionada = itemPedido.getQuantidade() - 1;
 		try {
-			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(), quantidadeRecepcionada);
+			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(),
+					quantidadeRecepcionada);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
 		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
-				pedidoService.pesquisarSituacaoPedidoById(itemPedido.getPedido().getId()));
+				pedidoService.pesquisarSituacaoPedidoById(itemPedido
+						.getPedido().getId()));
 	}
 
 	@Test
@@ -430,12 +504,15 @@ public class PedidoServiceTest extends AbstractTest {
 		Integer quantidadeRecepcionada = itemPedido.getQuantidade() + 1;
 		boolean throwed = false;
 		try {
-			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(), quantidadeRecepcionada);
+			pedidoService.alterarQuantidadeRecepcionada(itemPedido.getId(),
+					quantidadeRecepcionada);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
 
-		assertTrue("A quantidade recepcionada e superior a quantidade comprada e deve ser validada", throwed);
+		assertTrue(
+				"A quantidade recepcionada e superior a quantidade comprada e deve ser validada",
+				throwed);
 	}
 
 	@Test
@@ -502,7 +579,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("Pedido com cliente nao propspectado nao pode ser enviado por email", throwed);
+		assertTrue(
+				"Pedido com cliente nao propspectado nao pode ser enviado por email",
+				throwed);
 	}
 
 	@Test
@@ -537,63 +616,9 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
-		assertEquals("A situacao do pedido deve ser ORCAMENTO apos o envio de email de orcamento",
+		assertEquals(
+				"A situacao do pedido deve ser ORCAMENTO apos o envio de email de orcamento",
 				SituacaoPedido.ORCAMENTO, pedido.getSituacaoPedido());
-
-	}
-
-	@Test
-	public void testAceiteOrcamento() {
-		Pedido pedido = gerarPedidoOrcamento();
-		ItemPedido itemPedido = gerarItemPedido();
-		Integer idPedido = pedido.getId();
-
-		try {
-			pedidoService.inserirItemPedido(idPedido, itemPedido);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		pedidoService.aceitarOrcamento(idPedido);
-
-		pedido = pedidoService.pesquisarPedidoById(idPedido);
-		assertEquals("A situacao do pedido deve ser DIGITACAO apos o aceite do orcamento", SituacaoPedido.DIGITACAO,
-				pedido.getSituacaoPedido());
-
-	}
-
-	@Test
-	public void testAceiteOrcamentoSemModificarPedidoNaoOrcamento() {
-		Pedido pedido = gerarPedidoRevenda();
-
-		ItemPedido itemPedido = gerarItemPedido();
-		Integer idPedido = pedido.getId();
-
-		try {
-			pedidoService.inserirItemPedido(idPedido, itemPedido);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		SituacaoPedido situacaoPedidoAntes = pedido.getSituacaoPedido();
-
-		pedidoService.aceitarOrcamento(idPedido);
-
-		pedido = pedidoService.pesquisarPedidoById(idPedido);
-		assertEquals("A situacao do pedido que nao seja um orcamento nao deve ser modificada apos o aceite do orcamento",
-				situacaoPedidoAntes, pedido.getSituacaoPedido());
 
 	}
 
@@ -627,8 +652,9 @@ public class PedidoServiceTest extends AbstractTest {
 
 		assertTrue("O DDD do contato do orcamento eh obrigatorio", throwed);
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
-		assertEquals("O pedido nao foi enviado e deve permanecer na situacao de orcamento", SituacaoPedido.ORCAMENTO,
-				pedido.getSituacaoPedido());
+		assertEquals(
+				"O pedido nao foi enviado e deve permanecer na situacao de orcamento",
+				SituacaoPedido.ORCAMENTO, pedido.getSituacaoPedido());
 
 	}
 
@@ -652,7 +678,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O email do contato eh obrigatorio para o envio do orcamento", throwed);
+		assertTrue(
+				"O email do contato eh obrigatorio para o envio do orcamento",
+				throwed);
 	}
 
 	@Test
@@ -683,10 +711,12 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 
-		assertTrue("O telefone  do contato do orcamento eh obrigatorio", throwed);
+		assertTrue("O telefone  do contato do orcamento eh obrigatorio",
+				throwed);
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
-		assertEquals("O pedido nao foi enviado e deve permanecer na situacao de orcamento", SituacaoPedido.ORCAMENTO,
-				pedido.getSituacaoPedido());
+		assertEquals(
+				"O pedido nao foi enviado e deve permanecer na situacao de orcamento",
+				SituacaoPedido.ORCAMENTO, pedido.getSituacaoPedido());
 
 	}
 
@@ -723,8 +753,10 @@ public class PedidoServiceTest extends AbstractTest {
 		Pedido pedido = gerarPedidoRevenda();
 		Cliente cliente = pedido.getCliente();
 		cliente.setListaLogradouro(null);
-		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.ENTREGA));
-		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
+		cliente.addLogradouro(eBuilder
+				.buildLogradouroCliente(TipoLogradouro.ENTREGA));
+		cliente.addLogradouro(eBuilder
+				.buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
 
 		ItemPedido itemPedido = gerarItemPedido();
 		Integer idPedido = pedido.getId();
@@ -741,7 +773,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O endereco de cobranca eh obrigatorio para o envio do pedido por email", throwed);
+		assertTrue(
+				"O endereco de cobranca eh obrigatorio para o envio do pedido por email",
+				throwed);
 	}
 
 	@Test
@@ -749,8 +783,10 @@ public class PedidoServiceTest extends AbstractTest {
 		Pedido pedido = gerarPedidoRevenda();
 		Cliente cliente = pedido.getCliente();
 		cliente.setListaLogradouro(null);
-		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.COBRANCA));
-		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
+		cliente.addLogradouro(eBuilder
+				.buildLogradouroCliente(TipoLogradouro.COBRANCA));
+		cliente.addLogradouro(eBuilder
+				.buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
 
 		ItemPedido itemPedido = gerarItemPedido();
 		Integer idPedido = pedido.getId();
@@ -767,7 +803,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O endereco de entrega eh obrigatorio para o envio do pedido por email", throwed);
+		assertTrue(
+				"O endereco de entrega eh obrigatorio para o envio do pedido por email",
+				throwed);
 	}
 
 	@Test
@@ -775,8 +813,10 @@ public class PedidoServiceTest extends AbstractTest {
 		Pedido pedido = gerarPedidoRevenda();
 		Cliente cliente = pedido.getCliente();
 		cliente.setListaLogradouro(null);
-		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.COBRANCA));
-		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.ENTREGA));
+		cliente.addLogradouro(eBuilder
+				.buildLogradouroCliente(TipoLogradouro.COBRANCA));
+		cliente.addLogradouro(eBuilder
+				.buildLogradouroCliente(TipoLogradouro.ENTREGA));
 
 		ItemPedido itemPedido = gerarItemPedido();
 		Integer idPedido = pedido.getId();
@@ -793,7 +833,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O endereco de faturamento eh obrigatorio para o envio do pedido por email", throwed);
+		assertTrue(
+				"O endereco de faturamento eh obrigatorio para o envio do pedido por email",
+				throwed);
 	}
 
 	@Test
@@ -829,16 +871,19 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		assertEquals("Antes do envio do pedido de compra ele deve estar como em digitacao", SituacaoPedido.DIGITACAO,
-				pedido.getSituacaoPedido());
+		assertEquals(
+				"Antes do envio do pedido de compra ele deve estar como em digitacao",
+				SituacaoPedido.DIGITACAO, pedido.getSituacaoPedido());
 
 		try {
 			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals("Apos o envio do pedido de compra, seu estado deve ser como aguardando recebimento",
-				SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, pedido.getSituacaoPedido());
+		assertEquals(
+				"Apos o envio do pedido de compra, seu estado deve ser como aguardando recebimento",
+				SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
+				pedido.getSituacaoPedido());
 
 	}
 
@@ -860,7 +905,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O vendedor ainda nao possui comissao de representacao e deve ser validado no sistema", throwed);
+		assertTrue(
+				"O vendedor ainda nao possui comissao de representacao e deve ser validado no sistema",
+				throwed);
 
 		try {
 			comissaoService.inserirComissaoVendedor(idVendedor, null, 0.1);
@@ -881,15 +928,18 @@ public class PedidoServiceTest extends AbstractTest {
 
 		Integer idPedido = pedido.getId();
 
-		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		List<ItemPedido> listaItem = pedidoService
+				.pesquisarItemPedidoByIdPedido(idPedido);
 		ItemPedido itemPedido = listaItem.get(0);
 		itemPedido.setAliquotaComissao(0.5d);
 
-		final Double valorComissionado = itemPedido.calcularPrecoItem() * itemPedido.getAliquotaComissao();
+		final Double valorComissionado = itemPedido.calcularPrecoItem()
+				* itemPedido.getAliquotaComissao();
 		final Integer idItemPedido = itemPedido.getId();
 
 		try {
-			// Estamos inserindo a inclusao de uma aliquota de comissao do item para
+			// Estamos inserindo a inclusao de uma aliquota de comissao do item
+			// para
 			// testar o algoritmo de calculo de comissoes disparado no envio do
 			// pedido. Essa informacao pode ser inputada pelo usuario e deve ter
 			// prioridade no calculo.
@@ -934,7 +984,9 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 
-		assertTrue("O vendedor ainda nao possui comissao de revenda e deve ser validado no sistema", throwed);
+		assertTrue(
+				"O vendedor ainda nao possui comissao de revenda e deve ser validado no sistema",
+				throwed);
 
 		try {
 			comissaoService.inserirComissaoVendedor(idVendedor, 0.1, null);
@@ -953,15 +1005,18 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testEnvioRevendaAguardandoMaterialEmpacotamentoInvalido() {
 		PedidoRevendaECompra pedidoRevendaECompra = gerarRevendaEncomendada();
 		Integer idPedidoCompra = pedidoRevendaECompra.getPedidoCompra().getId();
-		Integer idPedidoRevenda = pedidoRevendaECompra.getPedidoRevenda().getId();
+		Integer idPedidoRevenda = pedidoRevendaECompra.getPedidoRevenda()
+				.getId();
 
-		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoByIdPedido(idPedidoCompra);
+		List<ItemPedido> listaItemComprado = pedidoService
+				.pesquisarItemPedidoByIdPedido(idPedidoCompra);
 		// Vamos inserir apenas 1 item do pedido para manter a revenda como
 		// encomendada.
 		ItemPedido itemComprado = listaItemComprado.get(0);
 		try {
 			// Recepcionando os itens comprados para preencher o estoque.
-			estoqueService.recepcionarItemCompra(itemComprado.getId(), itemComprado.getQuantidade());
+			estoqueService.recepcionarItemCompra(itemComprado.getId(),
+					itemComprado.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -971,7 +1026,8 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedidoRevenda);
 		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
 	}
 
@@ -979,13 +1035,16 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testEnvioRevendaEncomendadaEmpacotamento() {
 		PedidoRevendaECompra pedidoRevendaECompra = gerarRevendaEncomendada();
 		Integer idPedidoCompra = pedidoRevendaECompra.getPedidoCompra().getId();
-		Integer idPedidoRevenda = pedidoRevendaECompra.getPedidoRevenda().getId();
+		Integer idPedidoRevenda = pedidoRevendaECompra.getPedidoRevenda()
+				.getId();
 
-		List<ItemPedido> listaItemComprado = pedidoService.pesquisarItemPedidoByIdPedido(idPedidoCompra);
+		List<ItemPedido> listaItemComprado = pedidoService
+				.pesquisarItemPedidoByIdPedido(idPedidoCompra);
 		for (ItemPedido itemComprado : listaItemComprado) {
 			// Recepcionando os itens comprados para preencher o estoque.
 			try {
-				estoqueService.recepcionarItemCompra(itemComprado.getId(), itemComprado.getQuantidade());
+				estoqueService.recepcionarItemCompra(itemComprado.getId(),
+						itemComprado.getQuantidade());
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}
@@ -996,8 +1055,21 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedidoRevenda);
-		assertEquals(SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO, situacaoPedido);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedidoRevenda);
+		assertEquals(SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO,
+				situacaoPedido);
+	}
+
+	@Test
+	public void testNfe() {
+		Pedido p = gerarPedidoRevendaComItem();
+		NFe n = nFeService.gerarNfe(p.getId());
+		try {
+			nFeService.gerarXMLNfe(n);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	public void testInclusaoItemPedido() {
@@ -1022,7 +1094,8 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoItemPedidoComIPIRepresentadaSemIPI() {
 		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.NUNCA);
+		pedido.getRepresentada().setTipoApresentacaoIPI(
+				TipoApresentacaoIPI.NUNCA);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -1036,7 +1109,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("A representada definida no pedido nao permite valores de IPI", throwed);
+		assertTrue(
+				"A representada definida no pedido nao permite valores de IPI",
+				throwed);
 	}
 
 	@Test
@@ -1065,7 +1140,8 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoItemPedidoIPINuloMaterialImportadoRepresentadaIPIOcasional() {
 		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		pedido.getRepresentada().setTipoApresentacaoIPI(
+				TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -1083,7 +1159,9 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		Double ipi = itemPedido.getFormaMaterial().getIpi();
-		assertEquals("O IPI nao foi enviado e deve ser o valor default apos a inclusao", ipi, itemPedido.getAliquotaIPI());
+		assertEquals(
+				"O IPI nao foi enviado e deve ser o valor default apos a inclusao",
+				ipi, itemPedido.getAliquotaIPI());
 	}
 
 	@Test
@@ -1112,14 +1190,17 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertTrue("O IPI do item nao confere com o IPI da forma de material escolhida",
-				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI().doubleValue());
+		assertTrue(
+				"O IPI do item nao confere com o IPI da forma de material escolhida",
+				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI()
+						.doubleValue());
 	}
 
 	@Test
 	public void testInclusaoItemPedidoIPIZeradoMaterialImportadoRepresentadaIPIOcasional() {
 		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		pedido.getRepresentada().setTipoApresentacaoIPI(
+				TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -1137,13 +1218,16 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		Double ipi = 0d;
-		assertEquals("O IPI foi enviado zerado e deve ser o mesmo apos a inclusao", ipi, itemPedido.getAliquotaIPI());
+		assertEquals(
+				"O IPI foi enviado zerado e deve ser o mesmo apos a inclusao",
+				ipi, itemPedido.getAliquotaIPI());
 	}
 
 	@Test
 	public void testInclusaoItemPedidoIPIZeradoRepresentadaComIPIObrigatorio() {
 		Pedido pedido = gerarPedidoRepresentacao();
-		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
+		pedido.getRepresentada().setTipoApresentacaoIPI(
+				TipoApresentacaoIPI.SEMPRE);
 
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -1159,14 +1243,17 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertTrue("O IPI do item nao confere com o IPI da forma de material escolhida",
-				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI().doubleValue());
+		assertTrue(
+				"O IPI do item nao confere com o IPI da forma de material escolhida",
+				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI()
+						.doubleValue());
 	}
 
 	@Test
 	public void testInclusaoItemPedidoMaterialImportadoRepresentadaIPIOcasional() {
 		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		pedido.getRepresentada().setTipoApresentacaoIPI(
+				TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -1184,14 +1271,16 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals("O IPI foi enviado e deve ser o mesmo apos a inclusao do item do pedido", ipi,
-				itemPedido.getAliquotaIPI());
+		assertEquals(
+				"O IPI foi enviado e deve ser o mesmo apos a inclusao do item do pedido",
+				ipi, itemPedido.getAliquotaIPI());
 	}
 
 	@Test
 	public void testInclusaoItemPedidoMaterialImportadoRepresentadaSemIPI() {
 		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.NUNCA);
+		pedido.getRepresentada().setTipoApresentacaoIPI(
+				TipoApresentacaoIPI.NUNCA);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -1209,13 +1298,16 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("A representada definida no pedido nao permite valores de IPI", throwed);
+		assertTrue(
+				"A representada definida no pedido nao permite valores de IPI",
+				throwed);
 	}
 
 	@Test
 	public void testInclusaoItemPedidoMaterialNacionalRepresentadaIPIOcasional() {
 		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		pedido.getRepresentada().setTipoApresentacaoIPI(
+				TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -1235,8 +1327,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals("O IPI foi enviado e deve ser o mesmo apos a inclusao do item do pedido", ipi,
-				itemPedido.getAliquotaIPI());
+		assertEquals(
+				"O IPI foi enviado e deve ser o mesmo apos a inclusao do item do pedido",
+				ipi, itemPedido.getAliquotaIPI());
 	}
 
 	@Test
@@ -1271,7 +1364,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("Nao eh possivel vender uma peca por kilo. A venda deve ser feita por peca", throwed);
+		assertTrue(
+				"Nao eh possivel vender uma peca por kilo. A venda deve ser feita por peca",
+				throwed);
 	}
 
 	@Test
@@ -1358,13 +1453,15 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertNull("O IPI nao foi configurado e deve ser nulo", itemPedido.getAliquotaIPI());
+		assertNull("O IPI nao foi configurado e deve ser nulo",
+				itemPedido.getAliquotaIPI());
 	}
 
 	@Test
 	public void testInclusaoItemPedidoSemIPIMaterialNacionalRepresentadaIPIOcasional() {
 		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		pedido.getRepresentada().setTipoApresentacaoIPI(
+				TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -1383,14 +1480,16 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertNull("O IPI foi nao foi enviado, portanto, nao deve existir apos a inclusao do item do pedido",
+		assertNull(
+				"O IPI foi nao foi enviado, portanto, nao deve existir apos a inclusao do item do pedido",
 				itemPedido.getAliquotaIPI());
 	}
 
 	@Test
 	public void testInclusaoItemSemIPIPedidoMaterialImportadoRepresentadaIPIOcasional() {
 		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
+		pedido.getRepresentada().setTipoApresentacaoIPI(
+				TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserir(pedido);
 		} catch (BusinessException e) {
@@ -1425,7 +1524,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O pedido deve conter um contato com informacoes preenchidas", throwed);
+		assertTrue(
+				"O pedido deve conter um contato com informacoes preenchidas",
+				throwed);
 	}
 
 	@Test
@@ -1438,8 +1539,10 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		assertEquals("Todo pedido incluido deve ir para a digitacao", SituacaoPedido.DIGITACAO, pedido.getSituacaoPedido());
-		assertEquals("O tipo do pedido deve ser de compra apos a inclusao", TipoPedido.COMPRA, pedido.getTipoPedido());
+		assertEquals("Todo pedido incluido deve ir para a digitacao",
+				SituacaoPedido.DIGITACAO, pedido.getSituacaoPedido());
+		assertEquals("O tipo do pedido deve ser de compra apos a inclusao",
+				TipoPedido.COMPRA, pedido.getTipoPedido());
 	}
 
 	@Test
@@ -1452,7 +1555,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("A data de entrega nao pode ser anterior a data atual na inclusao de pedidos", throwed);
+		assertTrue(
+				"A data de entrega nao pode ser anterior a data atual na inclusao de pedidos",
+				throwed);
 	}
 
 	@Test
@@ -1463,7 +1568,8 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals("Todo pedido incluido deve ir para a digitacao", SituacaoPedido.DIGITACAO, pedido.getSituacaoPedido());
+		assertEquals("Todo pedido incluido deve ir para a digitacao",
+				SituacaoPedido.DIGITACAO, pedido.getSituacaoPedido());
 	}
 
 	@Test
@@ -1476,7 +1582,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O Pedido a ser incluido nao esta associado ao vendedor do cliente", throwed);
+		assertTrue(
+				"O Pedido a ser incluido nao esta associado ao vendedor do cliente",
+				throwed);
 	}
 
 	@Test
@@ -1493,7 +1601,9 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O nome do contato eh obrigatorio para a inclusao do pedido", throwed);
+		assertTrue(
+				"O nome do contato eh obrigatorio para a inclusao do pedido",
+				throwed);
 	}
 
 	@Test
@@ -1509,10 +1619,14 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		assertNotEquals("Pedido deve ser incluido no sistema antes de virar um orcamento", null, pedido.getId());
+		assertNotEquals(
+				"Pedido deve ser incluido no sistema antes de virar um orcamento",
+				null, pedido.getId());
 
-		assertEquals("Pedido incluido deve ir para orcamento e esta definido como: "
-				+ pedido.getSituacaoPedido().getDescricao(), SituacaoPedido.ORCAMENTO, pedido.getSituacaoPedido());
+		assertEquals(
+				"Pedido incluido deve ir para orcamento e esta definido como: "
+						+ pedido.getSituacaoPedido().getDescricao(),
+				SituacaoPedido.ORCAMENTO, pedido.getSituacaoPedido());
 
 	}
 
@@ -1537,7 +1651,8 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals("Apos a inclusao de um pedido por revenda o tipo de pedido tem que ser configurado como revenda",
+		assertEquals(
+				"Apos a inclusao de um pedido por revenda o tipo de pedido tem que ser configurado como revenda",
 				TipoPedido.REVENDA, pedido.getTipoPedido());
 	}
 
@@ -1551,7 +1666,8 @@ public class PedidoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O pedido foi incluido uma transportadora para redespacho.", throwed);
+		assertTrue("O pedido foi incluido uma transportadora para redespacho.",
+				throwed);
 	}
 
 	@Test
@@ -1572,7 +1688,8 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
 
 		Set<Integer> ids = new TreeSet<Integer>();
@@ -1582,8 +1699,10 @@ public class PedidoServiceTest extends AbstractTest {
 			// Estamos alterando o tipo de relacionamento da representada para
 			// podermos efetuar a encomenda dos itens para o fornecedor.
 			Representada representada = pedido.getRepresentada();
-			representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
-			pedidoService.comprarItemPedido(pedido.getVendedor().getId(), pedido.getRepresentada().getId(), ids);
+			representada
+					.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+			pedidoService.comprarItemPedido(pedido.getVendedor().getId(),
+					pedido.getRepresentada().getId(), ids);
 
 		} catch (BusinessException e) {
 			printMensagens(e);
@@ -1621,21 +1740,27 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testReencomendaItemPedido() {
 		PedidoRevendaECompra pedidoRevendaECompra = gerarRevendaEncomendada();
 		Pedido pedidoRevenda = pedidoRevendaECompra.getPedidoRevenda();
-		List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(pedidoRevenda.getId());
+		List<ItemPedido> listaItem = pedidoService
+				.pesquisarItemPedidoByIdPedido(pedidoRevenda.getId());
 		Integer idItemPedido = listaItem.get(0).getId();
 		try {
 			pedidoService.reencomendarItemPedido(idItemPedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		ItemPedido itemPedido = pedidoService.pesquisarItemPedidoById(idItemPedido);
-		assertEquals("Apos a reencomenda a quantidade reservada deve ser zero", new Integer("0"),
-				itemPedido.getQuantidadeReservada());
-		assertFalse("Apos a reencomenda a o item nao pode estar encomendado", itemPedido.isEncomendado());
+		ItemPedido itemPedido = pedidoService
+				.pesquisarItemPedidoById(idItemPedido);
+		assertEquals("Apos a reencomenda a quantidade reservada deve ser zero",
+				new Integer("0"), itemPedido.getQuantidadeReservada());
+		assertFalse("Apos a reencomenda a o item nao pode estar encomendado",
+				itemPedido.isEncomendado());
 
-		pedidoRevenda = pedidoService.pesquisarPedidoById(pedidoRevenda.getId());
-		assertEquals("O pedido deve aguardar nova encomenda dos itens apos a reencomenda no empacotamento",
-				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, pedidoRevenda.getSituacaoPedido());
+		pedidoRevenda = pedidoService
+				.pesquisarPedidoById(pedidoRevenda.getId());
+		assertEquals(
+				"O pedido deve aguardar nova encomenda dos itens apos a reencomenda no empacotamento",
+				SituacaoPedido.ITEM_AGUARDANDO_COMPRA,
+				pedidoRevenda.getSituacaoPedido());
 	}
 
 	@Test
@@ -1662,17 +1787,22 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Pedido pedidoRefeito = pedidoService.pesquisarPedidoById(idPedidoRefeito);
+		Pedido pedidoRefeito = pedidoService
+				.pesquisarPedidoById(idPedidoRefeito);
 
-		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
+		assertNotEquals("O pedido " + idPedido
+				+ " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);
 
-		assertEquals("Apos o pedido ser refeito ele deve estar em digitacao. Verifique as regras de negocios.",
+		assertEquals(
+				"Apos o pedido ser refeito ele deve estar em digitacao. Verifique as regras de negocios.",
 				SituacaoPedido.DIGITACAO, pedidoRefeito.getSituacaoPedido());
 
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
-		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,
-				SituacaoPedido.CANCELADO, pedido.getSituacaoPedido());
+		assertEquals("O pedido " + idPedido
+				+ " foi refeito e deve estar na situacao "
+				+ SituacaoPedido.CANCELADO, SituacaoPedido.CANCELADO,
+				pedido.getSituacaoPedido());
 
 	}
 
@@ -1701,12 +1831,15 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		assertNotEquals("O pedido " + idPedido + " foi refeito e nao pode coincidir com o anterior", idPedido,
+		assertNotEquals("O pedido " + idPedido
+				+ " foi refeito e nao pode coincidir com o anterior", idPedido,
 				idPedidoRefeito);
 
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
-		assertEquals("O pedido " + idPedido + " foi refeito e deve estar na situacao " + SituacaoPedido.CANCELADO,
-				SituacaoPedido.CANCELADO, pedido.getSituacaoPedido());
+		assertEquals("O pedido " + idPedido
+				+ " foi refeito e deve estar na situacao "
+				+ SituacaoPedido.CANCELADO, SituacaoPedido.CANCELADO,
+				pedido.getSituacaoPedido());
 
 	}
 
@@ -1735,13 +1868,15 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(
 				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
 
 		Representada fornecedor = pedido.getRepresentada();
-		fornecedor.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+		fornecedor
+				.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
 
 		Cliente revendedor = pedido.getCliente();
 		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
@@ -1749,13 +1884,15 @@ public class PedidoServiceTest extends AbstractTest {
 		Set<Integer> listaId = new HashSet<Integer>();
 		listaId.add(item1.getId());
 		try {
-			pedidoService.comprarItemPedido(pedido.getComprador().getId(), fornecedor.getId(), listaId);
+			pedidoService.comprarItemPedido(pedido.getComprador().getId(),
+					fornecedor.getId(), listaId);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
 		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
-		assertEquals("O segundo item do pedido nao foi encomendado pelo setor de compras",
+		assertEquals(
+				"O segundo item do pedido nao foi encomendado pelo setor de compras",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
 	}
 
@@ -1784,13 +1921,15 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(
 				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
 
 		Representada fornecedor = pedido.getRepresentada();
-		fornecedor.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+		fornecedor
+				.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
 
 		Cliente revendedor = pedido.getCliente();
 		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
@@ -1800,19 +1939,22 @@ public class PedidoServiceTest extends AbstractTest {
 		listaId.add(item2.getId());
 		Integer idPedidoCompra = null;
 		try {
-			idPedidoCompra = pedidoService.comprarItemPedido(pedido.getComprador().getId(), fornecedor.getId(), listaId);
+			idPedidoCompra = pedidoService.comprarItemPedido(pedido
+					.getComprador().getId(), fornecedor.getId(), listaId);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
 		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
-		assertEquals("O segundo item do pedido nao foi encomendado pelo setor de compras",
+		assertEquals(
+				"O segundo item do pedido nao foi encomendado pelo setor de compras",
 				SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
 
 		Pedido pedidoCompra = pedidoService.pesquisarCompraById(idPedidoCompra);
 
-		assertEquals("Apos compra dos itens do pedido a encomenda foi efetuada", SituacaoPedido.DIGITACAO,
-				pedidoCompra.getSituacaoPedido());
+		assertEquals(
+				"Apos compra dos itens do pedido a encomenda foi efetuada",
+				SituacaoPedido.DIGITACAO, pedidoCompra.getSituacaoPedido());
 
 		try {
 			pedidoCompra.setFormaPagamento("A VISTA");
@@ -1822,11 +1964,15 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		assertEquals("Apos o envio da compra dos itens do pedido a compra deve aguardar o recebimento",
-				SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, pedidoCompra.getSituacaoPedido());
+		assertEquals(
+				"Apos o envio da compra dos itens do pedido a compra deve aguardar o recebimento",
+				SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
+				pedidoCompra.getSituacaoPedido());
 
-		long totalItemRevenda = pedidoService.pesquisarTotalItemPedido(idPedido);
-		long totalItemComprado = pedidoService.pesquisarTotalItemPedido(idPedidoCompra);
+		long totalItemRevenda = pedidoService
+				.pesquisarTotalItemPedido(idPedido);
+		long totalItemComprado = pedidoService
+				.pesquisarTotalItemPedido(idPedidoCompra);
 		assertEquals(totalItemRevenda, totalItemComprado);
 	}
 
@@ -1853,13 +1999,15 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(
 				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
 
 		Representada fornecedor = pedido.getRepresentada();
-		fornecedor.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+		fornecedor
+				.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
 
 		Cliente revendedor = pedido.getCliente();
 		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
@@ -1868,7 +2016,8 @@ public class PedidoServiceTest extends AbstractTest {
 		listaId.add(item1.getId());
 		boolean throwed = false;
 		try {
-			pedidoService.comprarItemPedido(pedido.getComprador().getId(), -1, listaId);
+			pedidoService.comprarItemPedido(pedido.getComprador().getId(), -1,
+					listaId);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -1893,7 +2042,8 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(
 				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
@@ -1908,11 +2058,14 @@ public class PedidoServiceTest extends AbstractTest {
 		listaId.add(item1.getId());
 		boolean throwed = false;
 		try {
-			pedidoService.comprarItemPedido(pedido.getComprador().getId(), fornecedor.getId(), listaId);
+			pedidoService.comprarItemPedido(pedido.getComprador().getId(),
+					fornecedor.getId(), listaId);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O fornecedor eh invalido eh nao pode enfetuar encomenda de itens para pedido de compras", throwed);
+		assertTrue(
+				"O fornecedor eh invalido eh nao pode enfetuar encomenda de itens para pedido de compras",
+				throwed);
 	}
 
 	@Test
@@ -1933,7 +2086,8 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(
 				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
@@ -1949,12 +2103,15 @@ public class PedidoServiceTest extends AbstractTest {
 		listaId.add(-1);
 		boolean throwed = false;
 		try {
-			pedidoService.comprarItemPedido(pedido.getComprador().getId(), fornecedor.getId(), listaId);
+			pedidoService.comprarItemPedido(pedido.getComprador().getId(),
+					fornecedor.getId(), listaId);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
 
-		assertTrue("Um item inexsitente nao pode ser encomendado, e portanto deve ser validado", throwed);
+		assertTrue(
+				"Um item inexsitente nao pode ser encomendado, e portanto deve ser validado",
+				throwed);
 		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(
 				"O item encomendado nao existe no estoque, entao devemos cria-lo antes de encomendar, portanto o pedido deve estar na mesma situacao",
@@ -1986,13 +2143,15 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(
 				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
 
 		Representada fornecedor = pedido.getRepresentada();
-		fornecedor.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+		fornecedor
+				.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
 
 		Cliente revendedor = pedido.getCliente();
 		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
@@ -2000,7 +2159,8 @@ public class PedidoServiceTest extends AbstractTest {
 		Set<Integer> listaId = new HashSet<Integer>();
 		boolean throwed = false;
 		try {
-			pedidoService.comprarItemPedido(pedido.getComprador().getId(), fornecedor.getId(), listaId);
+			pedidoService.comprarItemPedido(pedido.getComprador().getId(),
+					fornecedor.getId(), listaId);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -2025,7 +2185,8 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		SituacaoPedido situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		SituacaoPedido situacaoPedido = pedidoService
+				.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(
 				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
@@ -2037,10 +2198,13 @@ public class PedidoServiceTest extends AbstractTest {
 		listaId.add(item1.getId());
 		boolean throwed = false;
 		try {
-			pedidoService.comprarItemPedido(pedido.getComprador().getId(), fornecedor.getId(), listaId);
+			pedidoService.comprarItemPedido(pedido.getComprador().getId(),
+					fornecedor.getId(), listaId);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("O revendedor nao existe no sistemea para efetuar a encomenda de itens para pedido de compras", throwed);
+		assertTrue(
+				"O revendedor nao existe no sistemea para efetuar a encomenda de itens para pedido de compras",
+				throwed);
 	}
 }

@@ -1501,6 +1501,13 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Representada pesquisarRepresentadaIdPedido(Integer idPedido) {
+		return representadaService
+				.pesquisarById(pesquisarIdRepresentadaByIdPedido(idPedido));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarRepresentadaResumidaByIdPedido(idPedido);
 	}

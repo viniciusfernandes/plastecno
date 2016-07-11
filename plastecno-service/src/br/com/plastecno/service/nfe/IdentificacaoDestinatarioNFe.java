@@ -1,46 +1,22 @@
 package br.com.plastecno.service.nfe;
 
+import javax.xml.bind.annotation.XmlElement;
+
 public class IdentificacaoDestinatarioNFe {
+	@XmlElement(name = "email")
 	private String email;
+	@XmlElement(name = "enderDest")
 	private EnderecoNFe enderecoDestinatarioNFe;
+	@XmlElement(name = "IE")
 	private String inscricaoEstadual;
+	@XmlElement(name = "IM")
 	private String inscricaoMunicipal;
+	@XmlElement(name = "ISUF")
 	private String inscricaoSUFRAMA;
+	@XmlElement(name = "xNome")
 	private String nomeFantasia;
 	private Integer tipoContribuinte;
 	private Integer tipoDocumento;
-
-	public String getEmail() {
-		return email;
-	}
-
-	public EnderecoNFe getEnderecoDestinatarioNFe() {
-		return enderecoDestinatarioNFe;
-	}
-
-	public String getInscricaoEstadual() {
-		return inscricaoEstadual;
-	}
-
-	public String getInscricaoMunicipal() {
-		return inscricaoMunicipal;
-	}
-
-	public String getInscricaoSUFRAMA() {
-		return inscricaoSUFRAMA;
-	}
-
-	public String getNomeFantasia() {
-		return nomeFantasia;
-	}
-
-	public Integer getTipoContribuinte() {
-		return tipoContribuinte;
-	}
-
-	public Integer getTipoDocumento() {
-		return tipoDocumento;
-	}
 
 	public void setEmail(String email) {
 		this.email = email;
@@ -73,4 +49,5 @@ public class IdentificacaoDestinatarioNFe {
 	public void setTipoDocumento(Integer tipoDocumento) {
 		this.tipoDocumento = tipoDocumento;
 	}
+
 }

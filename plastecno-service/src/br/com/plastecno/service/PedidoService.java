@@ -209,6 +209,8 @@ public interface PedidoService {
 
 	int pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido);
 
+	Representada pesquisarRepresentadaIdPedido(Integer idPedido);
+
 	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
 
 	List<SituacaoPedido> pesquisarSituacaoCompraEfetivada();

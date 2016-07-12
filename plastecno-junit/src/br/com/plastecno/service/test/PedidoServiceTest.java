@@ -125,6 +125,7 @@ public class PedidoServiceTest extends AbstractTest {
 		ItemPedido itemPedido = eBuilder.buildItemPedido();
 		itemPedido.setMaterial(material);
 		itemPedido.setAliquotaIPI(null);
+		itemPedido.setNcm("36.39.90.90");
 		return itemPedido;
 	}
 
@@ -147,6 +148,36 @@ public class PedidoServiceTest extends AbstractTest {
 		pedido = pedidoService.pesquisarCompraById(idPedido);
 		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO,
 				pedido.getSituacaoPedido());
+		return itemPedido;
+	}
+
+	private ItemPedido gerarItemPedidoPeca() {
+		List<Representada> listaRepresentada = representadaService
+				.pesquisarRepresentadaEFornecedor();
+		Representada representada = null;
+		if (listaRepresentada.isEmpty()) {
+			representada = eBuilder.buildRepresentada();
+			try {
+				representadaService.inserir(representada);
+			} catch (BusinessException e) {
+				printMensagens(e);
+			}
+		} else {
+			representada = listaRepresentada.get(0);
+		}
+
+		Material material = eBuilder.buildMaterial();
+		material.addRepresentada(representada);
+		try {
+			materialService.inserir(material);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido itemPedido = eBuilder.buildItemPedidoPeca();
+		itemPedido.setMaterial(material);
+		itemPedido.setAliquotaIPI(null);
+		itemPedido.setQuantidade(44);
 		return itemPedido;
 	}
 
@@ -242,10 +273,15 @@ public class PedidoServiceTest extends AbstractTest {
 	public Pedido gerarPedidoComItem(TipoPedido tipoPedido) {
 		Pedido pedido = gerarPedido(tipoPedido);
 		ItemPedido item1 = gerarItemPedido();
-
+		ItemPedido item2 = gerarItemPedidoPeca();
 		Integer idPedido = pedido.getId();
 		try {
 			pedidoService.inserirItemPedido(idPedido, item1);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		try {
+			pedidoService.inserirItemPedido(idPedido, item2);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -1061,17 +1097,6 @@ public class PedidoServiceTest extends AbstractTest {
 				situacaoPedido);
 	}
 
-	@Test
-	public void testNfe() {
-		Pedido p = gerarPedidoRevendaComItem();
-		NFe n = nFeService.gerarNfe(p.getId());
-		try {
-			nFeService.gerarXMLNfe(n);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-	}
-
 	public void testInclusaoItemPedido() {
 		Pedido pedido = eBuilder.buildPedido();
 		associarVendedor(pedido.getCliente());
@@ -1710,6 +1735,17 @@ public class PedidoServiceTest extends AbstractTest {
 
 		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
+	}
+
+	@Test
+	public void testNfe() {
+		Pedido p = gerarPedidoRevendaComItem();
+		NFe n = nFeService.gerarNfe(p.getId());
+		try {
+			nFeService.gerarXMLNfe(n);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test

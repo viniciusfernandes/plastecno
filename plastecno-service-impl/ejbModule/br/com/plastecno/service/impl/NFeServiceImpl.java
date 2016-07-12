@@ -1,5 +1,7 @@
 package br.com.plastecno.service.impl;
 
+import java.util.List;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -11,13 +13,19 @@ import javax.xml.bind.Marshaller;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
+import br.com.plastecno.service.nfe.ICMS;
+import br.com.plastecno.service.nfe.ICMSIntegral;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.IdentificacaoEmitenteNFe;
 import br.com.plastecno.service.nfe.NFe;
+import br.com.plastecno.service.nfe.ProdutoServicoNFe;
+import br.com.plastecno.service.nfe.TributosProdutoServico;
 
 @Stateless
 public class NFeServiceImpl implements NFeService {
@@ -28,6 +36,57 @@ public class NFeServiceImpl implements NFeService {
 
 	@EJB
 	private PedidoService pedidoService;
+
+	private void carregarDetalhamentoProdutoServico(NFe nFe, Integer idPedido) {
+		List<ItemPedido> listaItem = pedidoService
+				.pesquisarItemPedidoByIdPedido(idPedido);
+		DetalhamentoProdutoServicoNFe d = null;
+		ProdutoServicoNFe p = null;
+		String descricao;
+		TributosProdutoServico t = null;
+
+		for (ItemPedido i : listaItem) {
+
+			d = new DetalhamentoProdutoServicoNFe();
+			p = new ProdutoServicoNFe();
+			t = new TributosProdutoServico();
+
+			descricao = i.getDescricaoSemFormatacao();
+
+			p.setCFOP(null);
+			p.setCodigo(descricao);
+			p.setDescricao(descricao);
+			p.setNCM(i.getNcm() != null ? i.getNcm().replaceAll("\\.", "")
+					: null);
+			p.setQuantidadeComercial(i.getQuantidade());
+			p.setQuantidadeTributavel(i.getQuantidade());
+			p.setUnidadeComercial(i.getTipoVenda().toString());
+			p.setUnidadeTributavel(i.getTipoVenda().toString());
+
+			carregarICMS(t, i);
+			carregarIPI(t, i);
+
+			d.setProdutoServicoNFe(p);
+			d.setTributosProdutoServico(t);
+
+			nFe.addDetalhamentoProdutoServico(d);
+		}
+	}
+
+	private void carregarIPI(TributosProdutoServico t, ItemPedido i) {
+	}
+
+	private void carregarICMS(TributosProdutoServico t, ItemPedido i) {
+		ICMS icms = null;
+		ICMSIntegral icms00 = new ICMSIntegral();
+		icms = new ICMS();
+		
+		icms00.setAliquota(i.getAliquotaICMS());
+		icms00.setValorBC(i.calcularPrecoTotal());
+		icms00.setValor(i.calcularValorICMS());
+		icms.setICMSIntegral(icms00);
+		t.setICMS(icms);
+	}
 
 	private void carregarIdentificacaoDestinatario(NFe nFe, Integer idPedido) {
 		Cliente destinatario = pedidoService
@@ -100,7 +159,7 @@ public class NFeServiceImpl implements NFeService {
 
 		carregarIdentificacaoEmitente(nFe, idPedido);
 		carregarIdentificacaoDestinatario(nFe, idPedido);
-
+		carregarDetalhamentoProdutoServico(nFe, idPedido);
 		return nFe;
 	}
 

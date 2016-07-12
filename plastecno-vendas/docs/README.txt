@@ -45,3 +45,11 @@ drop schema enderecamento cascade;
 create schema vendas;
 create schema enderecamento;
 \i C:/Users/vinicius/ambiente_trabalho/temp/dump.sql \encoding UTF-8;
+
+========== PROBLEMAS RECORRENTES =======================================
+1) Conflitos com versões do java: certifique-se de que os compiladores para exportar o projeto estão na versão 6 da jdk. Já o projeto com os testes
+	unitários devem ser compilados e executados com a versão 8 da jdk para que a API de Mock execute.
+2) Teste unitário: certifique-se que esse projeto contém a jdk na biblioteca, pois sua execução não ocorrerá se no lugar da 
+	jdk contiver a jre.
+2) O sistema não efetua login: em alguns momentos o banco de dados apresenta algum problema de socket e não conseguimos efetuar a comunicação 
+	com o banco, o que fica claro quando tentamos acessar o sistema via o browser. Temos que reiniciar ou reinstalar o banco.

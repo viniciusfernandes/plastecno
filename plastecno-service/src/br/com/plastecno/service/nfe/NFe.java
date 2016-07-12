@@ -11,10 +11,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class NFe {
 	@XmlAttribute(name = "Id")
 	private String id;
+
 	@XmlElement(name = "dest")
 	private IdentificacaoDestinatarioNFe identificacaoDestinatarioNFe;
+
 	@XmlElement(name = "emit")
 	private IdentificacaoEmitenteNFe identificacaoEmitenteNFe;
+
 	@XmlElement(name = "ide")
 	private IdentificacaoNFe identificacaoNFe;
 
@@ -30,14 +33,20 @@ public class NFe {
 	@XmlElement(name = "det")
 	private List<DetalhamentoProdutoServicoNFe> listaDetalhamentoProdutoServicoNFe;
 
+	@XmlElement(name = "NFref")
+	private NFeRerefenciada nFeRerefenciada;
+
 	@XmlElement(name = "transp")
 	private TransporteNFe transporteNFe;
+
 	@XmlElement(name = "total")
 	private ValoresTotaisNFe valoresTotaisNFe;
+
 	@XmlAttribute(name = "versao")
 	private Double versao;
 
-	public void addDetalhamentoProdutoServico(DetalhamentoProdutoServicoNFe detalhamento) {
+	public void addDetalhamentoProdutoServico(
+			DetalhamentoProdutoServicoNFe detalhamento) {
 		if (listaDetalhamentoProdutoServicoNFe == null) {
 			listaDetalhamentoProdutoServicoNFe = new ArrayList<DetalhamentoProdutoServicoNFe>();
 		}
@@ -48,11 +57,13 @@ public class NFe {
 		this.id = id;
 	}
 
-	public void setIdentificacaoDestinatarioNFe(IdentificacaoDestinatarioNFe identificacaoDestinatarioNFe) {
+	public void setIdentificacaoDestinatarioNFe(
+			IdentificacaoDestinatarioNFe identificacaoDestinatarioNFe) {
 		this.identificacaoDestinatarioNFe = identificacaoDestinatarioNFe;
 	}
 
-	public void setIdentificacaoEmitenteNFe(IdentificacaoEmitenteNFe identificacaoEmitenteNFe) {
+	public void setIdentificacaoEmitenteNFe(
+			IdentificacaoEmitenteNFe identificacaoEmitenteNFe) {
 		this.identificacaoEmitenteNFe = identificacaoEmitenteNFe;
 	}
 
@@ -64,17 +75,23 @@ public class NFe {
 		this.informacaoCompra = informacaoCompra;
 	}
 
-	public void setInformacaoExportacao(InformacaoExportacao informacaoExportacao) {
+	public void setInformacaoExportacao(
+			InformacaoExportacao informacaoExportacao) {
 		this.informacaoExportacao = informacaoExportacao;
 	}
 
-	public void setInformacoesAdicionaisNFe(InformacoesAdicionaisNFe informacoesAdicionaisNFe) {
+	public void setInformacoesAdicionaisNFe(
+			InformacoesAdicionaisNFe informacoesAdicionaisNFe) {
 		this.informacoesAdicionaisNFe = informacoesAdicionaisNFe;
 	}
 
 	public void setListaDetalhamentoProdutoServicoNFe(
 			List<DetalhamentoProdutoServicoNFe> listaDetalhamentoProdutoServicoNFe) {
 		this.listaDetalhamentoProdutoServicoNFe = listaDetalhamentoProdutoServicoNFe;
+	}
+
+	public void setnFeRerefenciada(NFeRerefenciada nFeRerefenciada) {
+		this.nFeRerefenciada = nFeRerefenciada;
 	}
 
 	public void setTransporteNFe(TransporteNFe transporteNFe) {

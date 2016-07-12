@@ -74,6 +74,11 @@
 						<li><a href="regiao" target="principal_frame">Regiões</a></li>
 					</ul>
 				</li>
+				<li><a href="javascript: void(0)">Financeiro</a>
+					<ul>
+						<li><a href="emissaoNFe" target="principal_frame">Emis. NFe</a></li>
+					</ul>
+				</li>
 				<!-- c:if test="${acessoValorReceitaPermitido}" -->
 				<c:if test="${false}">
 				<li><a href="javascript: void(0)">Receita</a>

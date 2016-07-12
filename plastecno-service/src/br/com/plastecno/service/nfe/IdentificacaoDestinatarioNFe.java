@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 public class IdentificacaoDestinatarioNFe {
 	@XmlElement(name = "email")
@@ -17,6 +18,11 @@ public class IdentificacaoDestinatarioNFe {
 	private String nomeFantasia;
 	private Integer tipoContribuinte;
 	private Integer tipoDocumento;
+
+	@XmlTransient
+	public String getEmail() {
+		return email;
+	}
 
 	public void setEmail(String email) {
 		this.email = email;

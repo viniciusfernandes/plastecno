@@ -67,25 +67,91 @@ function inicializarModalCancelamento(botao){
 			value="${ramoAtividade.id}">
 
 		<fieldset>
-			<legend>::: Dados do Ramo de Atividades :::</legend>
-			<div class="label">Ativo:</div>
+			<legend>::: Dados da NF-e :::</legend>
+			<div class="label obrigatorio">Tipo Documento:</div>
 			<div class="input" style="width: 80%">
-				<input type="checkbox" id="ativo" name="ramoAtividade.ativo"
-					<c:if test="${empty ramoAtividade or ramoAtividade.ativo}">checked="checked"</c:if>
-					class="checkbox" />
+				<select id="pedidoAssociado" name="nf.identificacaoNFe"
+					style="width: 13%" class="semprehabilitado">
+					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
+						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+					</c:forEach>
+				</select>
 			</div>
-			<div class="label obrigatorio">Sigla:</div>
+			<div class="label obrigatorio">Forma Pagamento:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="sigla" name="ramoAtividade.sigla"
-					value="${ramoAtividade.sigla}" maxlength="10" class="pesquisavel"
-					style="width: 30%" />
+				<select id="pedidoAssociado" name="nf.identificacaoNFe.indicadorFormaPagamento"
+					style="width: 13%" class="semprehabilitado">
+					<c:forEach var="formaPagamento" items="${listaTipoFormaPagamento}">
+						<option value="${formaPagamento.codigo}" <c:if test="${formaPagamento eq formaPagamentoPadrao}">selected</c:if>>${formaPagamento.descricao}</option>
+					</c:forEach>
+				</select>
 			</div>
-
-			<div class="label obrigatorio">Descrição:</div>
+			<div class="label obrigatorio">Forma Emissão:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="descricao" name="ramoAtividade.descricao"
-					value="${ramoAtividade.descricao}" maxlength="100"
-					class="pesquisavel" style="width: 30%" />
+				<select name="nf.identificacaoNFe.tipoEmissao"
+					style="width: 13%" class="semprehabilitado">
+					<c:forEach var="tipoEmissao" items="${listaTipoEmissao}">
+						<option value="${tipoEmissao.codigo}" <c:if test="${tipoEmissao eq tipoEmissaoPadrao}">selected</c:if>>${tipoEmissao.descricao}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label obrigatorio">Finalidade Emissão:</div>
+			<div class="input" style="width: 80%">
+				<select name="nf.finalidadeEmissao"
+					style="width: 13%" class="semprehabilitado">
+					<c:forEach var="finalidade" items="${listaTipoFinalidadeEmissao}">
+						<option value="${finalidade.codigo}" <c:if test="${finalidade eq finalidadeEmissaoPadrao}">selected</c:if>>${finalidade.descricao}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label obrigatorio">Tipo Impressão:</div>
+			<div class="input" style="width: 80%">
+				<select id="pedidoAssociado" name="idPedidoAssociado"
+					style="width: 13%" class="semprehabilitado">
+					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
+						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label obrigatorio">Consumidor Final:</div>
+			<div class="input" style="width: 80%">
+				<select id="pedidoAssociado" name="idPedidoAssociado"
+					style="width: 13%" class="semprehabilitado">
+					<option value=""></option>
+					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
+						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label obrigatorio">Destino Operação:</div>
+			<div class="input" style="width: 80%">
+				<select id="pedidoAssociado" name="idPedidoAssociado"
+					style="width: 13%" class="semprehabilitado">
+					<option value=""></option>
+					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
+						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label obrigatorio">Tipo Atendimento:</div>
+			<div class="input" style="width: 80%">
+				<select id="pedidoAssociado" name="idPedidoAssociado"
+					style="width: 13%" class="semprehabilitado">
+					<option value=""></option>
+					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
+						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label obrigatorio">Natureza Operação:</div>
+			<div class="input" style="width: 80%">
+				<select id="pedidoAssociado" name="idPedidoAssociado"
+					style="width: 13%" class="semprehabilitado">
+					<option value=""></option>
+					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
+						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+					</c:forEach>
+				</select>
 			</div>
 		</fieldset>
 		<div class="bloco_botoes">

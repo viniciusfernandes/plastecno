@@ -7,7 +7,6 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import br.com.plastecno.service.NFeService;
@@ -29,10 +28,6 @@ import br.com.plastecno.service.nfe.TributosProdutoServico;
 
 @Stateless
 public class NFeServiceImpl implements NFeService {
-	public static void main(String[] args) throws JAXBException {
-		NFeService n = new NFeServiceImpl();
-		n.gerarNfe(43);
-	}
 
 	@EJB
 	private PedidoService pedidoService;
@@ -53,6 +48,8 @@ public class NFeServiceImpl implements NFeService {
 
 			descricao = i.getDescricaoSemFormatacao();
 
+			p.setNumeroPedidoCompra(idPedido.toString());
+			p.setItemPedidoCompra(i.getSequencial());
 			p.setCFOP(null);
 			p.setCodigo(descricao);
 			p.setDescricao(descricao);

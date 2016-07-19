@@ -15,7 +15,7 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "cDV")
 	private String digitoVerificador;
 	@XmlElement(name = "finNFe")
-	private String finalidadeEmissao;
+	private Integer finalidadeEmissao;
 	@XmlElement(name = "dSaiEnt")
 	private String horaSaidaEntrada;
 	@XmlElement(name = "indPag")
@@ -68,7 +68,7 @@ public class IdentificacaoNFe {
 		this.digitoVerificador = digitoVerificador;
 	}
 
-	public void setFinalidadeEmissao(String finalidadeEmissao) {
+	public void setFinalidadeEmissao(Integer finalidadeEmissao) {
 		this.finalidadeEmissao = finalidadeEmissao;
 	}
 

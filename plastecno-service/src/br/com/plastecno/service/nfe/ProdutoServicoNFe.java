@@ -5,24 +5,40 @@ import javax.xml.bind.annotation.XmlElement;
 public class ProdutoServicoNFe {
 	@XmlElement(name = "CFOP")
 	private String CFOP;
+
 	@XmlElement(name = "cProd")
 	private String codigo;
+
 	@XmlElement(name = "xProd")
 	private String descricao;
+
 	@XmlElement(name = "cEAN")
 	private String EAN;
+
 	@XmlElement(name = "cEANTrib")
 	private String EANTributavel;
+
 	@XmlElement(name = "EXTIPI")
 	private String EXTIPI;
+
+	@XmlElement(name = "nItemPed")
+	private Integer itemPedidoCompra;
+
 	@XmlElement(name = "NCM")
 	private String NCM;
+
+	@XmlElement(name = "xPed")
+	private String numeroPedidoCompra;
+
 	@XmlElement(name = "vOutro")
 	private Integer outrasDespesasAcessorias;
+
 	@XmlElement(name = "qCom")
 	private Integer quantidadeComercial;
+
 	@XmlElement(name = "qTrib")
 	private Integer quantidadeTributavel;
+
 	@XmlElement(name = "uCom")
 	private String unidadeComercial;
 
@@ -71,8 +87,16 @@ public class ProdutoServicoNFe {
 		EXTIPI = eXTIPI;
 	}
 
+	public void setItemPedidoCompra(Integer itemPedidoCompra) {
+		this.itemPedidoCompra = itemPedidoCompra;
+	}
+
 	public void setNCM(String nCM) {
 		NCM = nCM;
+	}
+
+	public void setNumeroPedidoCompra(String numeroPedidoCompra) {
+		this.numeroPedidoCompra = numeroPedidoCompra;
 	}
 
 	public void setOutrasDespesasAcessorias(Integer outrasDespesasAcessorias) {
@@ -111,7 +135,8 @@ public class ProdutoServicoNFe {
 		this.valorTotalSeguro = valorTotalSeguro;
 	}
 
-	public void setValorUnitarioComercializacao(Double valorUnitarioComercializacao) {
+	public void setValorUnitarioComercializacao(
+			Double valorUnitarioComercializacao) {
 		this.valorUnitarioComercializacao = valorUnitarioComercializacao;
 	}
 

@@ -230,6 +230,10 @@ public abstract class Item implements Serializable, Cloneable {
 		return valorComissaoFormatado;
 	}
 
+	public double getValorICMS() {
+		return calcularValorICMS();
+	}
+
 	public boolean isEqual(Item item) {
 		boolean igual = false;
 

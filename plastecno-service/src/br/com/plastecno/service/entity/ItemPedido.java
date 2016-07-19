@@ -78,7 +78,8 @@ public class ItemPedido extends Item {
 	@Column(name = "id_pedido_compra")
 	private Integer idPedidoCompra;
 
-	// Essa campo foi criado para manter o historico de compra indicando a pedido
+	// Essa campo foi criado para manter o historico de compra indicando a
+	// pedido
 	// de revenda esta vinculado o pedido de compra.
 	@Column(name = "id_pedido_venda")
 	private Integer idPedidoVenda;
@@ -193,15 +194,17 @@ public class ItemPedido extends Item {
 	public ItemPedido() {
 	}
 
-	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS) {
+	public ItemPedido(Double precoUnidade, Integer quantidade,
+			Double aliquotaIPI, Double aliquotaICMS) {
 		this.precoUnidade = precoUnidade;
 		this.quantidade = quantidade;
 		this.aliquotaIPI = aliquotaIPI;
 		this.aliquotaICMS = aliquotaICMS;
 	}
 
-	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS,
-			Double valorComissionado, Double aliquotaComissaoPedido) {
+	public ItemPedido(Double precoUnidade, Integer quantidade,
+			Double aliquotaIPI, Double aliquotaICMS, Double valorComissionado,
+			Double aliquotaComissaoPedido) {
 		this(precoUnidade, quantidade, aliquotaIPI, aliquotaICMS);
 		this.valorComissionado = valorComissionado;
 		this.aliquotaComissaoPedido = aliquotaComissaoPedido;
@@ -217,24 +220,32 @@ public class ItemPedido extends Item {
 
 	// Construtor utilizado na tela de recepcao de compras e itens aguardando
 	// material.
-	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idPedidoCompra, Integer idPedidoVenda,
-			String nomeProprietario, Integer quantidade, Integer quantidadeRecepcionada, Integer quantidadeReservada,
-			Double precoUnidade, String nomeRepresentada, Date dataEntrega, FormaMaterial formaMaterial,
-			String siglaMaterial, String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna,
-			Double comprimento) {
-		this(id, sequencial, idPedido, nomeProprietario, quantidade, quantidadeRecepcionada, quantidadeReservada,
-				precoUnidade, nomeRepresentada, dataEntrega, formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca,
-				medidaExterna, medidaInterna, comprimento);
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido,
+			Integer idPedidoCompra, Integer idPedidoVenda,
+			String nomeProprietario, Integer quantidade,
+			Integer quantidadeRecepcionada, Integer quantidadeReservada,
+			Double precoUnidade, String nomeRepresentada, Date dataEntrega,
+			FormaMaterial formaMaterial, String siglaMaterial,
+			String descricaoMaterial, String descricaoPeca,
+			Double medidaExterna, Double medidaInterna, Double comprimento) {
+		this(id, sequencial, idPedido, nomeProprietario, quantidade,
+				quantidadeRecepcionada, quantidadeReservada, precoUnidade,
+				nomeRepresentada, dataEntrega, formaMaterial, siglaMaterial,
+				descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna,
+				comprimento);
 
 		this.idPedidoCompra = idPedidoCompra;
 		this.idPedidoVenda = idPedidoVenda;
 	}
 
 	// Construtor para relatorio de comissao
-	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario, String nomeProprietario,
-			String sobrenomeProprietario, Double precoUnidade, Double precoCusto, Integer quantidade,
-			Double valorComissionado, FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial,
-			String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido,
+			Integer idProprietario, String nomeProprietario,
+			String sobrenomeProprietario, Double precoUnidade,
+			Double precoCusto, Integer quantidade, Double valorComissionado,
+			FormaMaterial formaMaterial, String siglaMaterial,
+			String descricaoMaterial, String descricaoPeca,
+			Double medidaExterna, Double medidaInterna, Double comprimento) {
 		this.id = id;
 		this.sequencial = sequencial;
 		this.idPedido = idPedido;
@@ -253,13 +264,18 @@ public class ItemPedido extends Item {
 		this.sobrenomeProprietario = sobrenomeProprietario;
 	}
 
-	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, String nomeProprietario, Integer quantidade,
-			Integer quantidadeRecepcionada, Integer quantidadeReservada, Double precoUnidade, String nomeRepresentada,
-			Date dataEntrega, FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial,
-			String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido,
+			String nomeProprietario, Integer quantidade,
+			Integer quantidadeRecepcionada, Integer quantidadeReservada,
+			Double precoUnidade, String nomeRepresentada, Date dataEntrega,
+			FormaMaterial formaMaterial, String siglaMaterial,
+			String descricaoMaterial, String descricaoPeca,
+			Double medidaExterna, Double medidaInterna, Double comprimento) {
 
-		this(id, sequencial, idPedido, null, nomeProprietario, "", precoUnidade, null, quantidade, (Double) null,
-				formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
+		this(id, sequencial, idPedido, null, nomeProprietario, "",
+				precoUnidade, null, quantidade, (Double) null, formaMaterial,
+				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna,
+				medidaInterna, comprimento);
 		this.nomeRepresentada = nomeRepresentada;
 		this.dataEntrega = dataEntrega;
 		this.quantidadeRecepcionada = quantidadeRecepcionada;
@@ -268,14 +284,20 @@ public class ItemPedido extends Item {
 
 	// Construtor implementado para o relatorio de itens dos pedidos de um
 	// determinado cliente que eh fornecida na tela de cliente.
-	public ItemPedido(Integer idPedido, String numeroPedidoCliente, SituacaoPedido situacaoPedido, Date dataEnvio,
-			TipoPedido tipoPedido, String nomeRepresentada, Integer id, Integer sequencial, Integer quantidade,
-			Double precoUnidade, FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial,
-			String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento, TipoVenda tipoVenda,
-			Double precoVenda, Double aliquotaIPI, Double aliquotaICMS) {
+	public ItemPedido(Integer idPedido, String numeroPedidoCliente,
+			SituacaoPedido situacaoPedido, Date dataEnvio,
+			TipoPedido tipoPedido, String nomeRepresentada, Integer id,
+			Integer sequencial, Integer quantidade, Double precoUnidade,
+			FormaMaterial formaMaterial, String siglaMaterial,
+			String descricaoMaterial, String descricaoPeca,
+			Double medidaExterna, Double medidaInterna, Double comprimento,
+			TipoVenda tipoVenda, Double precoVenda, Double aliquotaIPI,
+			Double aliquotaICMS) {
 
-		this(id, sequencial, idPedido, null, quantidade, null, null, precoUnidade, nomeRepresentada, null, formaMaterial,
-				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna, comprimento);
+		this(id, sequencial, idPedido, null, quantidade, null, null,
+				precoUnidade, nomeRepresentada, null, formaMaterial,
+				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna,
+				medidaInterna, comprimento);
 
 		pedido = new Pedido();
 		pedido.setId(idPedido);
@@ -283,7 +305,7 @@ public class ItemPedido extends Item {
 		pedido.setDataEnvio(dataEnvio);
 		pedido.setTipoPedido(tipoPedido);
 		pedido.setNumeroPedidoCliente(numeroPedidoCliente);
-		
+
 		this.tipoVenda = tipoVenda;
 		this.precoVenda = precoVenda;
 		this.aliquotaIPI = aliquotaIPI;
@@ -295,17 +317,27 @@ public class ItemPedido extends Item {
 	}
 
 	public double calcularPrecoTotal() {
-		return this.quantidade != null && this.precoVenda != null ? this.quantidade * this.precoVenda : 0d;
+		return this.quantidade != null && this.precoVenda != null ? this.quantidade
+				* this.precoVenda
+				: 0d;
+	}
+
+	public double getValorTotal() {
+		return calcularPrecoTotal();
 	}
 
 	@Override
 	public ItemPedido clone() {
 		ItemPedido clone;
 		try {
-			// Note que ao clonar devemos cancelar o ID pois o clonagem representa uma
-			// regra de negocios, assim a entidade resultante sera incluida na sessao
-			// de persistencia e deve ser uma nova entidade. Ja as outras informacoes
-			// de quantidade devem ser anuladas pois elas nao devem refletir no banco
+			// Note que ao clonar devemos cancelar o ID pois o clonagem
+			// representa uma
+			// regra de negocios, assim a entidade resultante sera incluida na
+			// sessao
+			// de persistencia e deve ser uma nova entidade. Ja as outras
+			// informacoes
+			// de quantidade devem ser anuladas pois elas nao devem refletir no
+			// banco
 			// de dados.
 			clone = (ItemPedido) super.clone();
 			clone.setId(null);
@@ -314,7 +346,8 @@ public class ItemPedido extends Item {
 			clone.setQuantidadeRecepcionada(0);
 			return clone;
 		} catch (CloneNotSupportedException e) {
-			throw new IllegalStateException("Falha ao clonar o item de pedido " + getId(), e);
+			throw new IllegalStateException("Falha ao clonar o item de pedido "
+					+ getId(), e);
 		}
 	}
 
@@ -331,7 +364,8 @@ public class ItemPedido extends Item {
 	}
 
 	public boolean contemMaterial() {
-		return formaMaterial != null && material != null && material.getId() != null;
+		return formaMaterial != null && material != null
+				&& material.getId() != null;
 	}
 
 	public Double getAliquotaComissao() {
@@ -710,7 +744,8 @@ public class ItemPedido extends Item {
 		this.valorComissionadoFormatado = valorComissionadoFormatado;
 	}
 
-	public void setValorComissionadoRepresentacao(Double valorComissionadoRepresentacao) {
+	public void setValorComissionadoRepresentacao(
+			Double valorComissionadoRepresentacao) {
 		this.valorComissionadoRepresentacao = valorComissionadoRepresentacao;
 	}
 

@@ -148,6 +148,16 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	}
 
+	public Cliente pesquisarClienteResumidoEContatoByIdPedido(Integer idPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Cliente(p.cliente.id, p.cliente.nomeFantasia, p.cliente.razaoSocial, p.cliente.cnpj, p.cliente.cpf, p.cliente.inscricaoEstadual, p.cliente.email) from Pedido p where p.id = :idPedido")
+								.setParameter("idPedido", idPedido),
+						Cliente.class, null);
+	}
+
 	public Double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido) {
 		return QueryUtil
 				.gerarRegistroUnico(

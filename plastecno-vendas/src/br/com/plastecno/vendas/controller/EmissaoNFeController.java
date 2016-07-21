@@ -43,21 +43,25 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("tipoEmissaoPadrao", TipoEmissao.NORMAL);
         addAtributo("listaTipoTributacaoICMS", TipoTributacaoICMS.values());
         addAtributo("listaTipoOrigemMercadoria", TipoOrigemMercadoria.values());
-        
-        addAtributo("listaItem", pedidoService.pesquisarItemPedidoByIdPedido(12041));
-        addAtributo("idPedido", 12041);
-        
+
+        pesquisarPedidoById(12041);
     }
 
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(NFe nf, Integer idPedido) {
 
         try {
-            nf = nFeService.carregarIdentificacaoEmitenteDestinatario(nf, idPedido);
-            nFeService.gerarXMLNfe(nf);
+            nFeService.emitirNFe(nf, idPedido);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
         irTopoPagina();
+    }
+
+    @Get("emissaoNFe/pedido")
+    public void pesquisarPedidoById(Integer idPedido) {
+        addAtributo("cliente", pedidoService.pesquisarClienteResumidoEContatoByIdPedido(idPedido));
+        addAtributo("listaItem", pedidoService.pesquisarItemPedidoByIdPedido(idPedido));
+        addAtributo("idPedido", idPedido);
     }
 }

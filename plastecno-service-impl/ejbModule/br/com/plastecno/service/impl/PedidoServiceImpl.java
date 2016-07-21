@@ -1022,6 +1022,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Cliente pesquisarClienteResumidoEContatoByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarClienteResumidoEContatoByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido) {
 		Double comissao = pedidoDAO
 				.pesquisarComissaoRepresentadaByIdPedido(idPedido);

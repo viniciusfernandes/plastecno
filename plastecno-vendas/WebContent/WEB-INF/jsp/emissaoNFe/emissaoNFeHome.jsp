@@ -205,36 +205,36 @@ function inicializarModalCancelamento(botao){
 			<legend>::: Destinatário :::</legend>
 			<div class="label obrigatorio">Razão Social/Nome:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="nomeCliente" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" style="widows: 60%"/>
+				<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}" class="pesquisavel" style="widows: 60%"/>
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			
 			<div class="label">CNPJ:</div>
 			<div class="input" style="width: 15%">
-				<input type="text" id="cnpj" name="cliente.cnpj"
+				<input type="text" id="cnpj" name="nf.identificacaoDestinatarioNFe.cnpj"
 					value="${cliente.cnpj}" class="pesquisavel" />
 			</div>
 			<div class="label">Insc. Estadual:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="inscricaoEstadual"
-					name="cliente.inscricaoEstadual"
+					name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
 					value="${cliente.inscricaoEstadual}"
 					style="width: 40%; text-align: right;" />
 			</div>
 			<div class="label">CPF:</div>
 			<div class="input" style="width: 15%">
-				<input type="text" id="cpf" name="cliente.cpf"
+				<input type="text" id="cpf" name="nf.identificacaoDestinatarioNFe.cpf"
 					value="${cliente.cpf}" class="pesquisavel" />
 			</div>
 			<div class="label">Telefone:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="telefone" name="cliente.cpf"
-					value="${cliente.cpf}" class="pesquisavel" />
+					value="${cliente.contatoPrincipal.telefoneFormatado}" class="pesquisavel" />
 			</div>
 			<div class="label">Email:</div>
 			<div class="input" style="width: 20%">
-				<input type="text" id="email" name="cliente.cpf"
-					value="${cliente.cpf}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
+				<input type="text" id="email" name="nf.identificacaoDestinatarioNFe.email"
+					value="${cliente.email}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
 			</div>
 			<jsp:include page="/bloco/bloco_logradouro.jsp"></jsp:include>
 		</fieldset>
@@ -321,9 +321,9 @@ function inicializarModalCancelamento(botao){
 			</fieldset>
 		</fieldset>
 		
-			<div class="label obrigatorio">Situação Tribut.:</div>
+			<div class="label">Info. Adicionais.:</div>
 			<div class="input areatexto" style="width: 70%">
-				<textarea id="obervacao" style="width: 100%">${pedido.observacao}</textarea>
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%"></textarea>
 			</div>
 			
 			<table class="listrada">

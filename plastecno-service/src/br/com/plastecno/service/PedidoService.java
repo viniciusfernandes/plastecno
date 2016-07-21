@@ -102,6 +102,8 @@ public interface PedidoService {
 
 	Cliente pesquisarClienteByIdPedido(Integer idPedido);
 
+	Cliente pesquisarClienteResumidoEContatoByIdPedido(Integer idPedido);
+
 	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
 
 	List<ItemPedido> pesquisarCompraAguardandoRecebimento(

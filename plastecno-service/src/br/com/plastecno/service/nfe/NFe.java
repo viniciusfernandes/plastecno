@@ -53,6 +53,13 @@ public class NFe {
 		listaDetalhamentoProdutoServicoNFe.add(detalhamento);
 	}
 
+	/*
+	 * Metodo criado apenas para abreviar as marcacoes nos .jsp
+	 */
+	public void setDestinatario(IdentificacaoDestinatarioNFe destinatario) {
+		setIdentificacaoDestinatarioNFe(destinatario);
+	}
+
 	public void setId(String id) {
 		this.id = id;
 	}

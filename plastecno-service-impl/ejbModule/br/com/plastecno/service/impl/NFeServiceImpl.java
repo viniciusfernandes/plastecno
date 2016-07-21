@@ -90,7 +90,9 @@ public class NFeServiceImpl implements NFeService {
 		t.setICMS(icms);
 	}
 
-	private void carregarIdentificacaoDestinatario(NFe nFe, Integer idPedido) {
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public NFe carregarIdentificacaoDestinatario(NFe nFe, Integer idPedido) {
 		Cliente destinatario = pedidoService
 				.pesquisarClienteByIdPedido(idPedido);
 
@@ -123,9 +125,12 @@ public class NFeServiceImpl implements NFeService {
 		iDest.setEnderecoDestinatarioNFe(endDest);
 
 		nFe.setIdentificacaoDestinatarioNFe(iDest);
+		return nFe;
 	}
 
-	private void carregarIdentificacaoEmitente(NFe nFe, Integer idPedido) {
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public NFe carregarIdentificacaoEmitente(NFe nFe, Integer idPedido) {
 		Representada emitente = pedidoService
 				.pesquisarRepresentadaIdPedido(idPedido);
 
@@ -155,14 +160,6 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setEnderecoEmitenteNFe(endEmit);
 
 		nFe.setIdentificacaoEmitenteNFe(iEmit);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public NFe carregarIdentificacaoEmitenteDestinatario(NFe nFe,
-			Integer idPedido) {
-		carregarIdentificacaoEmitente(nFe, idPedido);
-		carregarIdentificacaoDestinatario(nFe, idPedido);
 		return nFe;
 	}
 
@@ -171,11 +168,17 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public void emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
+		carregarIdentificacaoEmitente(nFe, idPedido);
+		gerarXMLNfe(nFe);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NFe gerarNfe(Integer idPedido) {
 		NFe nFe = new NFe();
 
 		carregarIdentificacaoEmitente(nFe, idPedido);
-		carregarIdentificacaoDestinatario(nFe, idPedido);
 		carregarDetalhamentoProdutoServico(nFe, idPedido);
 		return nFe;
 	}

@@ -90,6 +90,14 @@ public class NFe {
 		this.listaDetalhamentoProdutoServicoNFe = listaDetalhamentoProdutoServicoNFe;
 	}
 
+	/*
+	 * Metodo criado apenas para simplificar a marcacao no .jsp
+	 */
+	public void setListaItem(List<DetalhamentoProdutoServicoNFe> listaItem) {
+		setListaDetalhamentoProdutoServicoNFe(listaItem);
+
+	}
+
 	public void setnFeRerefenciada(NFeRerefenciada nFeRerefenciada) {
 		this.nFeRerefenciada = nFeRerefenciada;
 	}

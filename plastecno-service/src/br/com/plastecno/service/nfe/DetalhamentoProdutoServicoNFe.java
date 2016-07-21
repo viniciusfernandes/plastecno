@@ -9,8 +9,10 @@ public class DetalhamentoProdutoServicoNFe {
 
 	@XmlElement(name = "prod")
 	private ProdutoServicoNFe produtoServicoNFe;
+	
 	@XmlElement(name = "imposto")
 	private TributosProdutoServico tributosProdutoServico;
+	
 	public void setNumeroItem(Integer numeroItem) {
 		this.numeroItem = numeroItem;
 	}

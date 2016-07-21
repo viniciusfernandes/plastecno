@@ -69,7 +69,7 @@ function inicializarModalCancelamento(botao){
 	</form>
 	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>"
 		method="post">
-
+		<input type="hidden" name="idPedido" value="${idPedido}"/>
 		<fieldset>
 			<legend>::: Dados da NF-e :::</legend>
 			<div class="label obrigatorio">Tipo Documento:</div>
@@ -163,26 +163,26 @@ function inicializarModalCancelamento(botao){
 				<div class="input" style="width: 10%">
 					<select id="pedidoAssociado" 
 						style="width: 100%" class="semprehabilitado">
-						<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-							<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+						<c:forEach var="icms" items="${listaRegime}">
+							<option value="${icms.codigo}">${icms.descricao}</option>
 						</c:forEach>
 					</select>
 				</div>
 				<div class="label obrigatorio">Situação Tribut.:</div>
-				<div class="input" style="width: 10%">
+				<div class="input" style="width: 50%">
 					<select id="pedidoAssociado" 
-						style="width: 100%" class="semprehabilitado">
-						<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-							<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+						style="width: 80%" class="semprehabilitado">
+						<c:forEach var="icms" items="${listaTipoTributacaoICMS}">
+							<option value="${icms.codigo}">${icms.descricao}</option>
 						</c:forEach>
 					</select>
 				</div>
 				<div class="label obrigatorio">Origem:</div>
-				<div class="input" style="width: 10%">
+				<div class="input" style="width: 30%">
 					<select id="pedidoAssociado" 
 						style="width: 100%" class="semprehabilitado">
-						<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-							<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+						<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
+							<option value="${origem.codigo}">${origem.descricao}</option>
 						</c:forEach>
 					</select>
 				</div>
@@ -239,7 +239,7 @@ function inicializarModalCancelamento(botao){
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="item" items="${listaItem}" varStatus="index">
+					<c:forEach var="item" items="${listaItem}" varStatus="count">
 						<tr>
 							<td>${item.sequencial}</td>
 							<td>${item.descricaoSemFormatacao}</td>
@@ -258,6 +258,19 @@ function inicializarModalCancelamento(botao){
 					</c:forEach>
 				</tbody>
 			</table>
+		
+		
+		<c:forEach var="item" items="${listaItem}" varStatus="count">
+			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].numeroItem"></c:out>" value="${item.sequencial}"/>
+			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.codigo"></c:out>" value="${item.descricaoSemFormatacao}"/>
+			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.descricao"></c:out>" value="${item.descricaoSemFormatacao}"/>
+			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.ncm"></c:out>" value="${item.ncm}"/>
+			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.CFOP"></c:out>" />
+			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.unidadeComercial"></c:out>" value="${item.tipoVenda}"/>
+			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.quantidadeComercial"></c:out>" value="${item.quantidade}"/>
+			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.quantidadeTributavel"></c:out>" value="${item.quantidade}"/>
+			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.valorUnitarioComercializacao"></c:out>" value="${item.precoUnidade}"/>
+		</c:forEach>
 		
 		<div class="bloco_botoes">
 			<input type="submit" id="botaoEnviarNF" title="Enviar Nota Fiscal" value="" class="botaoEnviarEmail"/>

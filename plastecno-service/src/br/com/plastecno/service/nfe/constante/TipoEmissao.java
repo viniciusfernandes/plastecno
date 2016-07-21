@@ -1,4 +1,4 @@
-package br.com.plastecno.service.nfe;
+package br.com.plastecno.service.nfe.constante;
 
 public enum TipoEmissao {
 	CONTIGENCIA_DPEC(

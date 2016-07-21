@@ -1,4 +1,4 @@
-package br.com.plastecno.service.nfe;
+package br.com.plastecno.service.nfe.constante;
 
 public enum TipoFinalidadeEmissao {
 	AJUSTE("AJUSTE", 3), COMPLEMENTAR("COMPLEMENTAR", 2), NORMAL("NORMAL", 1);

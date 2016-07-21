@@ -9,8 +9,10 @@ import javax.ejb.TransactionAttributeType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
+import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
@@ -30,7 +32,13 @@ import br.com.plastecno.service.nfe.TributosProdutoServico;
 public class NFeServiceImpl implements NFeService {
 
 	@EJB
+	private ClienteService clienteService;
+
+	@EJB
 	private PedidoService pedidoService;
+
+	@EJB
+	private RepresentadaService representadaService;
 
 	private void carregarDetalhamentoProdutoServico(NFe nFe, Integer idPedido) {
 		List<ItemPedido> listaItem = pedidoService
@@ -53,7 +61,7 @@ public class NFeServiceImpl implements NFeService {
 			p.setCFOP(null);
 			p.setCodigo(descricao);
 			p.setDescricao(descricao);
-			p.setNCM(i.getNcm() != null ? i.getNcm().replaceAll("\\.", "")
+			p.setNcm(i.getNcm() != null ? i.getNcm().replaceAll("\\.", "")
 					: null);
 			p.setQuantidadeComercial(i.getQuantidade());
 			p.setQuantidadeTributavel(i.getQuantidade());
@@ -70,14 +78,11 @@ public class NFeServiceImpl implements NFeService {
 		}
 	}
 
-	private void carregarIPI(TributosProdutoServico t, ItemPedido i) {
-	}
-
 	private void carregarICMS(TributosProdutoServico t, ItemPedido i) {
 		ICMS icms = null;
 		ICMSIntegral icms00 = new ICMSIntegral();
 		icms = new ICMS();
-		
+
 		icms00.setAliquota(i.getAliquotaICMS());
 		icms00.setValorBC(i.calcularPrecoTotal());
 		icms00.setValor(i.calcularValorICMS());
@@ -88,6 +93,9 @@ public class NFeServiceImpl implements NFeService {
 	private void carregarIdentificacaoDestinatario(NFe nFe, Integer idPedido) {
 		Cliente destinatario = pedidoService
 				.pesquisarClienteByIdPedido(idPedido);
+
+		destinatario.setListaLogradouro(clienteService
+				.pesquisarLogradouro(destinatario.getId()));
 
 		IdentificacaoDestinatarioNFe iDest = new IdentificacaoDestinatarioNFe();
 		iDest.setEmail(destinatario.getEmail());
@@ -129,7 +137,9 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setNomeFantasia(emitente.getNomeFantasia());
 		iEmit.setRazaoSocial(emitente.getRazaoSocial());
 
-		Logradouro logradouroEmit = emitente.getLogradouro();
+		Logradouro logradouroEmit = representadaService
+				.pesquisarLogradorouro(emitente.getId());
+
 		EnderecoNFe endEmit = new EnderecoNFe();
 		endEmit.setBairro(logradouroEmit.getBairro());
 		endEmit.setCep(logradouroEmit.getCep());
@@ -151,6 +161,18 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public NFe carregarIdentificacaoEmitenteDestinatario(NFe nFe,
+			Integer idPedido) {
+		carregarIdentificacaoEmitente(nFe, idPedido);
+		carregarIdentificacaoDestinatario(nFe, idPedido);
+		return nFe;
+	}
+
+	private void carregarIPI(TributosProdutoServico t, ItemPedido i) {
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NFe gerarNfe(Integer idPedido) {
 		NFe nFe = new NFe();
 
@@ -168,6 +190,7 @@ public class NFeServiceImpl implements NFeService {
 			Marshaller m = context.createMarshaller();
 			// for pretty-print XML in JAXB
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 			m.marshal(nFe, System.out);
 		} catch (Exception e) {
 			throw new BusinessException(

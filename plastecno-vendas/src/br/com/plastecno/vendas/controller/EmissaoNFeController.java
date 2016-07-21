@@ -9,9 +9,11 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.NFe;
-import br.com.plastecno.service.nfe.TipoEmissao;
-import br.com.plastecno.service.nfe.TipoFinalidadeEmissao;
-import br.com.plastecno.service.nfe.TipoFormaPagamento;
+import br.com.plastecno.service.nfe.constante.TipoEmissao;
+import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
+import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
+import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
+import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
@@ -39,12 +41,19 @@ public class EmissaoNFeController extends AbstractController {
 
         addAtributo("listaTipoEmissao", TipoEmissao.values());
         addAtributo("tipoEmissaoPadrao", TipoEmissao.NORMAL);
-        addAtributo("listaItem", pedidoService.pesquisarItemPedidoByIdPedido(11620));
+        addAtributo("listaTipoTributacaoICMS", TipoTributacaoICMS.values());
+        addAtributo("listaTipoOrigemMercadoria", TipoOrigemMercadoria.values());
+        
+        addAtributo("listaItem", pedidoService.pesquisarItemPedidoByIdPedido(12041));
+        addAtributo("idPedido", 12041);
+        
     }
 
     @Post("emissaoNFe/emitirNFe")
-    public void emitirNFe(NFe nf) {
+    public void emitirNFe(NFe nf, Integer idPedido) {
+
         try {
+            nf = nFeService.carregarIdentificacaoEmitenteDestinatario(nf, idPedido);
             nFeService.gerarXMLNfe(nf);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

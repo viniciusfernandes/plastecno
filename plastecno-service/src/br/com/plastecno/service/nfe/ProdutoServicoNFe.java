@@ -25,7 +25,7 @@ public class ProdutoServicoNFe {
 	private Integer itemPedidoCompra;
 
 	@XmlElement(name = "NCM")
-	private String NCM;
+	private String ncm;
 
 	@XmlElement(name = "xPed")
 	private String numeroPedidoCompra;
@@ -91,8 +91,8 @@ public class ProdutoServicoNFe {
 		this.itemPedidoCompra = itemPedidoCompra;
 	}
 
-	public void setNCM(String nCM) {
-		NCM = nCM;
+	public void setNcm(String ncm) {
+		this.ncm = ncm;
 	}
 
 	public void setNumeroPedidoCompra(String numeroPedidoCompra) {

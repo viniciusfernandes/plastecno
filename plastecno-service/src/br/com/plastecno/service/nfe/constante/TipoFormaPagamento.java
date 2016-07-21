@@ -1,11 +1,11 @@
-package br.com.plastecno.service.nfe;
+package br.com.plastecno.service.nfe.constante;
 
-public enum TipoImpressao {
-	PAISAGEM("PAISAGEM", 2), RETRATO("RETRATO", 1);
+public enum TipoFormaPagamento {
+	OUTROS("OUTROS", 2), PRAZO("À PRAZO", 1), VISTA("À VISTA", 0);
 	private final int codigo;
 	private final String descricao;
 
-	private TipoImpressao(String descricao, int codigo) {
+	private TipoFormaPagamento(String descricao, int codigo) {
 		this.descricao = descricao;
 		this.codigo = codigo;
 	}

@@ -4,24 +4,41 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 public class IdentificacaoDestinatarioNFe {
+	@XmlElement(name = "CNPJ")
+	private String cnpj;
+
+	@XmlElement(name = "CPF")
+	private String cpf;
+
 	@XmlElement(name = "email")
 	private String email;
+
 	@XmlElement(name = "enderDest")
 	private EnderecoNFe enderecoDestinatarioNFe;
+
 	@XmlElement(name = "IE")
 	private String inscricaoEstadual;
+
 	@XmlElement(name = "IM")
 	private String inscricaoMunicipal;
+
 	@XmlElement(name = "ISUF")
 	private String inscricaoSUFRAMA;
+
 	@XmlElement(name = "xNome")
 	private String nomeFantasia;
-	private Integer tipoContribuinte;
-	private Integer tipoDocumento;
 
 	@XmlTransient
 	public String getEmail() {
 		return email;
+	}
+
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
 	}
 
 	public void setEmail(String email) {
@@ -47,13 +64,4 @@ public class IdentificacaoDestinatarioNFe {
 	public void setNomeFantasia(String nomeFantasia) {
 		this.nomeFantasia = nomeFantasia;
 	}
-
-	public void setTipoContribuinte(Integer tipoContribuinte) {
-		this.tipoContribuinte = tipoContribuinte;
-	}
-
-	public void setTipoDocumento(Integer tipoDocumento) {
-		this.tipoDocumento = tipoDocumento;
-	}
-
 }

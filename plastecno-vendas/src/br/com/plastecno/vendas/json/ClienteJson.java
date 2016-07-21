@@ -11,24 +11,40 @@ import br.com.plastecno.service.entity.Transportadora;
  * para a tela de pedido, ja que os conteudos dessas listas sao diferentes
  */
 public class ClienteJson {
-    private final Integer id;
-    private final String site;
-    private final String email;
     private final String cnpj;
     private final String cpf;
-    private final String nomeCompleto;
-    private final VendedorJson vendedor;
-    private final List<TransportadoraJson> listaTransportadora;
+    private final String email;
+    private final Integer id;
+    private String inscricaoEstadual;
     private final List<TransportadoraJson> listaRedespacho;
+    private final List<TransportadoraJson> listaTransportadora;
+    private final String nomeCompleto;
+    private final String nomeFantasia;
+    private final String razaoSocial;
+    private final String site;
 
+    private final String telefone;
+
+    private final VendedorJson vendedor;
+
+    public ClienteJson(Cliente cliente) {
+        this(cliente, null);
+    }
     public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora) {
         id = cliente.getId();
+        nomeFantasia = cliente.getNomeFantasia();
+        razaoSocial = cliente.getRazaoSocial();
         site = cliente.getSite();
         email = cliente.getEmail();
         cnpj = cliente.getCnpj();
         cpf = cliente.getCpf();
+        inscricaoEstadual = cliente.getInscricaoEstadual();
         nomeCompleto = cliente.getNomeCompleto();
-        vendedor = new VendedorJson(cliente.getVendedor());
+        // telefone = cliente.getContatoPrincipal() != null ?
+        // cliente.getContatoPrincipal().getTelefoneFormatado() : "";
+        telefone = "9999-9999";
+        // vendedor = new VendedorJson(cliente.getVendedor());
+        vendedor = null;
         this.listaTransportadora = new ArrayList<TransportadoraJson>();
         this.listaRedespacho = new ArrayList<TransportadoraJson>();
 
@@ -61,6 +77,10 @@ public class ClienteJson {
         return id;
     }
 
+    public String getInscricaoEstadual() {
+        return inscricaoEstadual;
+    }
+
     public List<TransportadoraJson> getListaRedespacho() {
         return listaRedespacho;
     }
@@ -73,11 +93,27 @@ public class ClienteJson {
         return nomeCompleto;
     }
 
+    public String getNomeFantasia() {
+        return nomeFantasia;
+    }
+
+    public String getRazaoSocial() {
+        return razaoSocial;
+    }
+
     public String getSite() {
         return site;
     }
 
+    public String getTelefone() {
+        return telefone;
+    }
+
     public VendedorJson getVendedor() {
         return vendedor;
+    }
+
+    public void setInscricaoEstadual(String inscricaoEstadual) {
+        this.inscricaoEstadual = inscricaoEstadual;
     }
 }

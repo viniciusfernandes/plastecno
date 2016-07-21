@@ -23,6 +23,7 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.controller.exception.ControllerException;
+import br.com.plastecno.vendas.json.ClienteJson;
 import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
@@ -203,6 +204,12 @@ public class ClienteController extends AbstractController {
             lista.add(new Autocomplete(cliente.getId(), cliente.getNomeFantasia()));
         }
         serializarJson(new SerializacaoJson("lista", lista));
+    }
+
+    @Get("cliente/serializacao/{idCliente}")
+    public void pesquisarClienteSerializadoById(Integer idCliente) {
+        Cliente cliente = clienteService.pesquisarClienteResumidoEContatoById(idCliente);
+        serializarJson(new SerializacaoJson("cliente", new ClienteJson(cliente)));
     }
 
     @Get("cliente/transportadora")

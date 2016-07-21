@@ -103,8 +103,6 @@ public class NFeServiceImpl implements NFeService {
 		iDest.setInscricaoMunicipal(null);
 		iDest.setInscricaoSUFRAMA(null);
 		iDest.setNomeFantasia(destinatario.getNomeFantasia());
-		iDest.setTipoContribuinte(null);
-		iDest.setTipoDocumento(null);
 		iDest.setNomeFantasia(destinatario.getNomeFantasia());
 
 		EnderecoNFe endDest = new EnderecoNFe();

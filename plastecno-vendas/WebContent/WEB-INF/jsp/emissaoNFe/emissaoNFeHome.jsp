@@ -13,6 +13,8 @@
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+
 
 <style type="text/css">
 fieldset .fieldsetInterno {
@@ -38,7 +40,60 @@ $(document).ready(function() {
 		$('#formPesquisa').submit();
 	});
 	
+	$("#tipoTributacaoICMS").change(function() {
+		if("00" === $(this).val()){
+			$('.icms00').fadeIn();
+			$('.icms10').fadeOut();
+		} else if("10" === $(this).val()){
+			$('.icms10').fadeIn();
+			$('.icms00').fadeOut();
+		} 
+	});
+	
+	
+	$('#bloco_logradouro').addClass('fieldsetInterno');
 
+	autocompletar({
+		url : '<c:url value="/cliente/listagem/nome"/>',
+		campoPesquisavel : 'nomeCliente',
+		parametro : 'nomeFantasia',
+		containerResultados : 'containerPesquisaCliente',
+		selecionarItem : function(itemLista) {
+			// Vamos utilizar a conversao de pedido/cliente/1, onde o ultimo
+			// termo se refere ao ID do cliente
+			var request = $.ajax({
+				type : "get",
+				url : '<c:url value="/cliente/serializacao"/>'+ '/' + itemLista.id
+			});
+
+			request.done(function(response) {
+				var erros = response.erros;
+				var contemErro = erros != undefined;
+				if (!contemErro) {
+					var cliente = response.cliente;
+					$('#email').val(cliente.email);
+					$('#cnpj').val(cliente.cnpj);
+					$('#cpf').val(cliente.cpf);
+					$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
+					$('#telefone').val(cliente.telefone);
+					$('#nomeCliente').val(cliente.razaoSocial);
+
+				} else if (erros != undefined) {
+					gerarListaMensagemErro(erros);
+				}
+
+			});
+			
+			request.fail(function(request, status, excecao) {
+				var mensagem = 'Falha na pesquisa do autocomplete para o campo: '+ idCampoPesquisavel;
+				mensagem += ' para a URL ' + url;
+				mensagem += ' contendo o valor de requisicao ' + parametro;
+				mensagem += ' => Excecao: ' + excecao;
+				gerarListaMensagemErro(new Array(mensagem));
+			});
+		}
+	});
+	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 });
@@ -145,6 +200,45 @@ function inicializarModalCancelamento(botao){
 				</select>
 			</div>
 		</fieldset>
+		
+		<fieldset>
+			<legend>::: Destinatário :::</legend>
+			<div class="label obrigatorio">Razão Social/Nome:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" id="nomeCliente" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" style="widows: 60%"/>
+				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
+			</div>
+			
+			<div class="label">CNPJ:</div>
+			<div class="input" style="width: 15%">
+				<input type="text" id="cnpj" name="cliente.cnpj"
+					value="${cliente.cnpj}" class="pesquisavel" />
+			</div>
+			<div class="label">Insc. Estadual:</div>
+			<div class="input" style="width: 40%">
+				<input type="text" id="inscricaoEstadual"
+					name="cliente.inscricaoEstadual"
+					value="${cliente.inscricaoEstadual}"
+					style="width: 40%; text-align: right;" />
+			</div>
+			<div class="label">CPF:</div>
+			<div class="input" style="width: 15%">
+				<input type="text" id="cpf" name="cliente.cpf"
+					value="${cliente.cpf}" class="pesquisavel" />
+			</div>
+			<div class="label">Telefone:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="telefone" name="cliente.cpf"
+					value="${cliente.cpf}" class="pesquisavel" />
+			</div>
+			<div class="label">Email:</div>
+			<div class="input" style="width: 20%">
+				<input type="text" id="email" name="cliente.cpf"
+					value="${cliente.cpf}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
+			</div>
+			<jsp:include page="/bloco/bloco_logradouro.jsp"></jsp:include>
+		</fieldset>
+		
 		<fieldset>
 			<legend>::: Produtos e Serviços :::</legend>
 			<div class="label obrigatorio">CFOP:</div>
@@ -170,7 +264,7 @@ function inicializarModalCancelamento(botao){
 				</div>
 				<div class="label obrigatorio">Situação Tribut.:</div>
 				<div class="input" style="width: 50%">
-					<select id="pedidoAssociado" 
+					<select id="tipoTributacaoICMS" 
 						style="width: 80%" class="semprehabilitado">
 						<c:forEach var="icms" items="${listaTipoTributacaoICMS}">
 							<option value="${icms.codigo}">${icms.descricao}</option>
@@ -178,7 +272,7 @@ function inicializarModalCancelamento(botao){
 					</select>
 				</div>
 				<div class="label obrigatorio">Origem:</div>
-				<div class="input" style="width: 30%">
+				<div class="input" style="width: 70%">
 					<select id="pedidoAssociado" 
 						style="width: 100%" class="semprehabilitado">
 						<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
@@ -186,6 +280,18 @@ function inicializarModalCancelamento(botao){
 						</c:forEach>
 					</select>
 				</div>
+				
+				<div class="icms00 label obrigatorio">ICMS 00:</div>
+				<div class="icms00 input" style="width: 70%">
+					<select style="width: 100%" class="icms00 semprehabilitado">
+						<option value="00">icms 00</option>
+					</select>
+				</div>
+				<div  class="icms10 label obrigatorio">ICMS 10:</div>
+				<div class="icms10 input" style="width: 70%">
+					<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+				</div>
+				
 			</fieldset>
 			
 			<fieldset class="fieldsetInterno">

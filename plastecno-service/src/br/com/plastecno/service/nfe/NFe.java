@@ -10,6 +10,9 @@ import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name = "nfe")
 public class NFe {
+	@XmlElement(name = "cobr")
+	private CobrancaNFe cobrancaNFe;
+
 	@XmlAttribute(name = "Id")
 	private String id;
 
@@ -57,6 +60,10 @@ public class NFe {
 	@XmlTransient
 	public IdentificacaoDestinatarioNFe getIdentificacaoDestinatarioNFe() {
 		return identificacaoDestinatarioNFe;
+	}
+
+	public void setCobrancaNFe(CobrancaNFe cobrancaNFe) {
+		this.cobrancaNFe = cobrancaNFe;
 	}
 
 	/*

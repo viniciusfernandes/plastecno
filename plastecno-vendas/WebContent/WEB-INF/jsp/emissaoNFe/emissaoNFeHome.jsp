@@ -15,6 +15,8 @@
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 
 <style type="text/css">
 fieldset .fieldsetInterno {
@@ -98,6 +100,8 @@ $(document).ready(function() {
 	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
+	inserirMascaraDataAmericano('dataVencimentoDuplicata');
+
 });
 
 function inicializarFiltro() {
@@ -395,6 +399,58 @@ function inicializarModalCancelamento(botao){
 			<input type="submit" id="botaoEnviarNF" title="Enviar Nota Fiscal" value="" class="botaoEnviarEmail"/>
 		</div>
 		
+		<fieldset id="bloco_duplicata">
+			<legend>::: Cobrança :::</legend>
+			<div class="label">Número:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.numero" style="widows: 60%"/>
+			</div>
+			
+			<div class="label">Valor Original:</div>
+			<div class="input" style="width: 55%">
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorOriginal" style="width: 20%"/>
+			</div>
+			<div class="label">Valor Desconto:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorDesconto" />
+			</div>
+			<div class="label">Valor Líquido:</div>
+			<div class="input" style="width: 55%">
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorLiquido" style="width: 20%"/>
+			</div>
+			
+			<fieldset class="fieldsetInterno">
+				<legend>::: Duplicata :::</legend>
+				<div class="label">Número:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" style="widows: 60%"/>
+				</div>
+				
+				<div class="label">Dt. Vencimento:</div>
+				<div class="input" style="width: 10%">
+					<input id="dataVencimentoDuplicata" type="text" />
+				</div>
+				<div class="label">Valor:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" />
+				</div>
+				<div class="bloco_botoes">
+					<a id="botaoAdicionarDuplicata" title="Adicionar Dados da Duplicata" class="botaoAdicionar"></a>
+					<a id="botaoLimparDuplicata" title="Limpar Dados da Duplicata" class="botaoLimpar"></a>
+				</div>
+							
+				<table class="listrada" >
+					<thead>
+						<tr>
+							<th>Núm.</th>
+							<th>Dt. Venc.</th>
+							<th>Valor(R$)</th>
+							<th></th>
+						</tr>
+					</thead>
+				</table>
+			</fieldset>
+		</fieldset>
 	</form>
 
 	

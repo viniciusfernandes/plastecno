@@ -9,6 +9,7 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
@@ -22,13 +23,13 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 @Resource
 public class EmissaoNFeController extends AbstractController {
     @Servico
+    private ClienteService clienteService;
+
+    @Servico
     private NFeService nFeService;
 
     @Servico
     private PedidoService pedidoService;
-
-    @Servico
-    private ClienteService clienteService;
 
     public EmissaoNFeController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -51,9 +52,10 @@ public class EmissaoNFeController extends AbstractController {
     }
 
     @Post("emissaoNFe/emitirNFe")
-    public void emitirNFe(NFe nf, Integer idPedido) {
+    public void emitirNFe(NFe nf, Logradouro logradouro, Integer idPedido) {
 
         try {
+            nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(nFeService.gerarEnderecoNFe(logradouro));
             nFeService.emitirNFe(nf, idPedido);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

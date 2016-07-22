@@ -107,22 +107,8 @@ public class NFeServiceImpl implements NFeService {
 		iDest.setNomeFantasia(destinatario.getNomeFantasia());
 		iDest.setNomeFantasia(destinatario.getNomeFantasia());
 
-		EnderecoNFe endDest = new EnderecoNFe();
-		Logradouro logradouroEmit = destinatario.getLogradouroFaturamento();
-		endDest.setBairro(logradouroEmit.getBairro());
-		endDest.setCep(logradouroEmit.getCep());
-		endDest.setCodigoPais(String.valueOf(55));
-		endDest.setComplemento(logradouroEmit.getComplemento());
-		endDest.setLogradouro(logradouroEmit.getEndereco());
-		endDest.setNomeMunicipio(logradouroEmit.getCidade());
-		endDest.setNomePais(logradouroEmit.getPais());
-		endDest.setNumero(logradouroEmit.getNumero() == null ? "" : String
-				.valueOf(logradouroEmit.getNumero()));
-		endDest.setUF(logradouroEmit.getUf());
-		endDest.setNomePais(logradouroEmit.getPais());
-		endDest.setTelefone(null);
-
-		iDest.setEnderecoDestinatarioNFe(endDest);
+		iDest.setEnderecoDestinatarioNFe(gerarEnderecoNFe(destinatario
+				.getLogradouroFaturamento()));
 
 		nFe.setIdentificacaoDestinatarioNFe(iDest);
 		return nFe;
@@ -140,24 +126,8 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setNomeFantasia(emitente.getNomeFantasia());
 		iEmit.setRazaoSocial(emitente.getRazaoSocial());
 
-		Logradouro logradouroEmit = representadaService
-				.pesquisarLogradorouro(emitente.getId());
-
-		EnderecoNFe endEmit = new EnderecoNFe();
-		endEmit.setBairro(logradouroEmit.getBairro());
-		endEmit.setCep(logradouroEmit.getCep());
-		endEmit.setCodigoPais(String.valueOf(55));
-		endEmit.setComplemento(logradouroEmit.getComplemento());
-		endEmit.setLogradouro(logradouroEmit.getEndereco());
-		endEmit.setNomeMunicipio(logradouroEmit.getCidade());
-		endEmit.setNomePais(logradouroEmit.getPais());
-		endEmit.setNumero(logradouroEmit.getNumero() == null ? "" : String
-				.valueOf(logradouroEmit.getNumero()));
-		endEmit.setUF(logradouroEmit.getUf());
-		endEmit.setNomePais(logradouroEmit.getPais());
-		endEmit.setTelefone(null);
-
-		iEmit.setEnderecoEmitenteNFe(endEmit);
+		iEmit.setEnderecoEmitenteNFe(gerarEnderecoNFe(representadaService
+				.pesquisarLogradorouro(emitente.getId())));
 
 		nFe.setIdentificacaoEmitenteNFe(iEmit);
 		return nFe;
@@ -171,6 +141,30 @@ public class NFeServiceImpl implements NFeService {
 	public void emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
 		carregarIdentificacaoEmitente(nFe, idPedido);
 		gerarXMLNfe(nFe);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public EnderecoNFe gerarEnderecoNFe(Logradouro logradouro) {
+		if (logradouro == null) {
+			return null;
+		}
+		EnderecoNFe endereco = new EnderecoNFe();
+
+		endereco.setBairro(logradouro.getBairro());
+		endereco.setCep(logradouro.getCep());
+		endereco.setCodigoPais(String.valueOf(55));
+		endereco.setComplemento(logradouro.getComplemento());
+		endereco.setLogradouro(logradouro.getEndereco());
+		endereco.setNomeMunicipio(logradouro.getCidade());
+		endereco.setNomePais(logradouro.getPais());
+		endereco.setNumero(logradouro.getNumero() == null ? "" : String
+				.valueOf(logradouro.getNumero()));
+		endereco.setUF(logradouro.getUf());
+		endereco.setNomePais(logradouro.getPais());
+		endereco.setTelefone(null);
+
+		return endereco;
 	}
 
 	@Override

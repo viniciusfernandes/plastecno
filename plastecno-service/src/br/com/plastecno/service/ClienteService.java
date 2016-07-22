@@ -76,6 +76,8 @@ public interface ClienteService {
 
 	LogradouroCliente pesquisarLogradouroById(Integer idLogradouro);
 
+	LogradouroCliente pesquisarLogradouroFaturamentoById(Integer idCliente);
+
 	String pesquisarNomeFantasia(Integer idCliente);
 
 	Cliente pesquisarRevendedor();

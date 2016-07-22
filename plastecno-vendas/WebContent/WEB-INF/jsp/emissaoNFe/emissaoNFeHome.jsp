@@ -34,9 +34,11 @@ $(document).ready(function() {
 				
 	});
 	
-	$("#botaoPesquisarRamo").click(function() {
-		toUpperCaseInput();
-		inicializarFiltro();
+	$("#botaoPesquisaPedido").click(function() {
+		if(isEmpty($('#idPedido').val())){
+			return;
+		}
+		$('#formPesquisa #idPedidoPesquisa').val($('#idPedido').val());
 		$('#formPesquisa').submit();
 	});
 	
@@ -119,14 +121,25 @@ function inicializarModalCancelamento(botao){
 	<div id="modal"></div>
 	<form id="formVazio" ></form>
 
-	<form id="formPesquisa" action="<c:url value="/emissaoNFe/pesquisarpedido"/>"
+	<form id="formPesquisa" action="<c:url value="/emissaoNFe/pedido"/>"
 		method="get">
+		<input type="hidden" id="idPedidoPesquisa" name="idPedido" value="${idPedido}"/>
 	</form>
 	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>"
 		method="post">
-		<input type="hidden" name="idPedido" value="${idPedido}"/>
 		<fieldset>
 			<legend>::: Dados da NF-e :::</legend>
+			<div class="label">Pedido:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="idPedido" name="idPedido" value="${idPedido}"
+					class="pesquisavel" />
+			</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoPesquisaPedido"
+					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
+			</div>
+			<div class="input" style="width: 60%">
+			</div>
 			<div class="label obrigatorio">Tipo Documento:</div>
 			<div class="input" style="width: 10%">
 				<select id="pedidoAssociado"  class="semprehabilitado" style="width: 100%">

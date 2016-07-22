@@ -4,9 +4,11 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.TipoAcesso;
+import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
@@ -24,6 +26,9 @@ public class EmissaoNFeController extends AbstractController {
 
     @Servico
     private PedidoService pedidoService;
+
+    @Servico
+    private ClienteService clienteService;
 
     public EmissaoNFeController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -43,8 +48,6 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("tipoEmissaoPadrao", TipoEmissao.NORMAL);
         addAtributo("listaTipoTributacaoICMS", TipoTributacaoICMS.values());
         addAtributo("listaTipoOrigemMercadoria", TipoOrigemMercadoria.values());
-
-        pesquisarPedidoById(12041);
     }
 
     @Post("emissaoNFe/emitirNFe")
@@ -60,8 +63,13 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe/pedido")
     public void pesquisarPedidoById(Integer idPedido) {
-        addAtributo("cliente", pedidoService.pesquisarClienteResumidoEContatoByIdPedido(idPedido));
+        Cliente cliente = pedidoService.pesquisarClienteResumidoEContatoByIdPedido(idPedido);
+
+        addAtributo("cliente", cliente);
+        addAtributo("logradouro", clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()));
         addAtributo("listaItem", pedidoService.pesquisarItemPedidoByIdPedido(idPedido));
         addAtributo("idPedido", idPedido);
+
+        irTopoPagina();
     }
 }

@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.TipoCliente;
+import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.impl.util.QueryUtil;
@@ -85,6 +86,22 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 
 		return this.entityManager.createQuery(select.toString())
 				.setParameter("idCliente", idCliente).getResultList();
+	}
+
+	public LogradouroCliente pesquisarLogradouroFaturamentoById(
+			Integer idCliente) {
+		StringBuilder select = new StringBuilder()
+				.append("select l from Cliente c ")
+				.append("inner join c.listaLogradouro l where c.id = :idCliente and l.tipoLogradouro = :tipoLogradouro ")
+				.append(" and l.cancelado = false ");
+
+		return QueryUtil.gerarRegistroUnico(
+				entityManager
+						.createQuery(select.toString())
+						.setParameter("idCliente", idCliente)
+						.setParameter("tipoLogradouro",
+								TipoLogradouro.FATURAMENTO),
+				LogradouroCliente.class, null);
 	}
 
 	public String pesquisarNomeFantasia(Integer idCliente) {

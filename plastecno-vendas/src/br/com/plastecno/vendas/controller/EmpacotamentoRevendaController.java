@@ -41,11 +41,22 @@ public class EmpacotamentoRevendaController extends AbstractController {
         super(result, usuarioInfo);
     }
 
+    private void carregarRelatorioEmpacotamento(Integer idCliente) {
+        RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService
+                .gerarRelatorioRevendaEmpacotamento(idCliente);
+
+        addAtributo("relatorio", relatorio);
+    }
+
     @Get("empacotamento")
     public void empacotamentoRevendaHome() {
         // Pode ser que essas datas ja tenham sido preenchidas em outra
         // navegacao pois esse metodo eh reaproveitado.
         configurarFiltroPediodoMensal();
+
+        // Carregando os dados dos pedidos para empacotamento para que haja um
+        // acesso mais rapido a informacao
+        carregarRelatorioEmpacotamento(null);
     }
 
     @Post("empacotamento/itens/inclusao")
@@ -81,10 +92,7 @@ public class EmpacotamentoRevendaController extends AbstractController {
 
     @Post("empacotamento/revenda/listagem")
     public void pesquisarRevendaEmpacotamento(Integer idCliente) {
-        RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService
-                .gerarRelatorioRevendaEmpacotamento(idCliente);
-
-        addAtributo("relatorio", relatorio);
+        carregarRelatorioEmpacotamento(idCliente);
         if (contemAtributo("permanecerTopo")) {
             irTopoPagina();
         } else {

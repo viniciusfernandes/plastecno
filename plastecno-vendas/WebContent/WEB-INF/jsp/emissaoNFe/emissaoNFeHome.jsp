@@ -30,12 +30,6 @@ fieldset .fieldsetInterno legend {
 
 $(document).ready(function() {
 
-	$("#botaoInserirRamo").click(function() {
-		toUpperCaseInput();
-		$('#formRamo').submit();
-				
-	});
-	
 	$("#botaoPesquisaPedido").click(function() {
 		if(isEmpty($('#idPedido').val())){
 			return;
@@ -53,10 +47,18 @@ $(document).ready(function() {
 			$('.icms00').fadeOut();
 		} 
 	});
-	
+
+	$("#botaoInserirDuplicata").click(function() {
+		inserirDuplicata();
+	});
 	
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
+	$('#botaoEmitirNF').click(function(){
+		gerarInputDuplicataFormulario();
+		$('#formEmissao').submit();
+	});
+	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
 		campoPesquisavel : 'nomeCliente',
@@ -103,6 +105,64 @@ $(document).ready(function() {
 	inserirMascaraDataAmericano('dataVencimentoDuplicata');
 
 });
+
+function gerarInputDuplicataFormulario(){
+	var tabela = document.getElementById('tabela_duplicata');
+	var linhas = tabela.tBodies[0].rows;
+	if(linhas.length <= 0){
+		return;
+	}
+	
+	var form = document.getElementById('formEmissao');
+	var input = null;
+	var celulas = null;
+	for (var i = 0; i < linhas.length; i++) {
+		celulas = linhas[i].cells;
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.cobrancaNFe.listaDuplicata['+i+'].numero';
+		input.value = celulas[0].innerHTML;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.cobrancaNFe.listaDuplicata['+i+'].dataVencimento';
+		input.value = celulas[1].innerHTML;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.cobrancaNFe.listaDuplicata['+i+'].valor';
+		input.value = celulas[2].innerHTML;
+		form.appendChild(input);
+	}
+}
+
+function inserirDuplicata(){
+	var numero = $('#bloco_duplicata #numeroDuplicata').val();
+	var vencimento = $('#bloco_duplicata #dataVencimentoDuplicata').val();
+	var valor = $('#bloco_duplicata #valorDuplicata').val();
+	
+	if(isEmpty(numero) || isEmpty(vencimento) || isEmpty(valor)){
+		return;
+	}
+	
+	var tabela = document.getElementById('tabela_duplicata');
+	var linha = tabela.tBodies[0].insertRow(0);
+	
+	linha.insertCell(0).innerHTML = numero;
+	linha.insertCell(1).innerHTML = vencimento;
+	linha.insertCell(2).innerHTML = valor;
+	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerDuplicata(this);"/>';
+	
+	$('#bloco_duplicata input:text').val('');
+}
+
+function removerDuplicata(botao){
+	 var linha = $(botao).closest("tr")[0];
+	 document.getElementById('tabela_duplicata').deleteRow(linha.rowIndex);
+}
 
 function inicializarFiltro() {
 	$("#filtroSigla").val($("#sigla").val());
@@ -396,10 +456,10 @@ function inicializarModalCancelamento(botao){
 		</c:forEach>
 		
 		<div class="bloco_botoes">
-			<input type="submit" id="botaoEnviarNF" title="Enviar Nota Fiscal" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>
 		</div>
 		
-		<fieldset id="bloco_duplicata">
+		<fieldset>
 			<legend>::: Cobrança :::</legend>
 			<div class="label">Número:</div>
 			<div class="input" style="width: 10%">
@@ -419,11 +479,11 @@ function inicializarModalCancelamento(botao){
 				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorLiquido" style="width: 20%"/>
 			</div>
 			
-			<fieldset class="fieldsetInterno">
+			<fieldset id="bloco_duplicata" class="fieldsetInterno">
 				<legend>::: Duplicata :::</legend>
 				<div class="label">Número:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" style="widows: 60%"/>
+					<input type="text" id="numeroDuplicata"/>
 				</div>
 				
 				<div class="label">Dt. Vencimento:</div>
@@ -432,22 +492,26 @@ function inicializarModalCancelamento(botao){
 				</div>
 				<div class="label">Valor:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" />
+					<input type="text" id="valorDuplicata"/>
 				</div>
 				<div class="bloco_botoes">
-					<a id="botaoAdicionarDuplicata" title="Adicionar Dados da Duplicata" class="botaoAdicionar"></a>
+					<a id="botaoInserirDuplicata" title="Inserir Dados da Duplicata" class="botaoAdicionar"></a>
 					<a id="botaoLimparDuplicata" title="Limpar Dados da Duplicata" class="botaoLimpar"></a>
 				</div>
 							
-				<table class="listrada" >
+				<table id="tabela_duplicata" class="listrada" >
 					<thead>
 						<tr>
 							<th>Núm.</th>
 							<th>Dt. Venc.</th>
 							<th>Valor(R$)</th>
-							<th></th>
+							<th>Ações</th>
 						</tr>
 					</thead>
+					
+					<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+					<tbody>
+					</tbody>
 				</table>
 			</fieldset>
 		</fieldset>

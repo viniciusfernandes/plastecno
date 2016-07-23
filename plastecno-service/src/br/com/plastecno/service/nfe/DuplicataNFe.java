@@ -4,14 +4,14 @@ import javax.xml.bind.annotation.XmlElement;
 
 public class DuplicataNFe {
 	@XmlElement(name = "dVenc")
-	private String dataVendimento;
+	private String dataVencimento;
 	@XmlElement(name = "nDup")
 	private String numero;
 	@XmlElement(name = "vDup")
 	private Double valor;
 
-	public void setDataVendimento(String dataVendimento) {
-		this.dataVendimento = dataVendimento;
+	public void setDataVencimento(String dataVencimento) {
+		this.dataVencimento = dataVencimento;
 	}
 
 	public void setNumero(String numero) {

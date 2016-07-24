@@ -21,7 +21,7 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.ICMS;
-import br.com.plastecno.service.nfe.ICMSIntegral;
+import br.com.plastecno.service.nfe.ICMSGeral;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.IdentificacaoEmitenteNFe;
 import br.com.plastecno.service.nfe.NFe;
@@ -80,7 +80,7 @@ public class NFeServiceImpl implements NFeService {
 
 	private void carregarICMS(TributosProdutoServico t, ItemPedido i) {
 		ICMS icms = null;
-		ICMSIntegral icms00 = new ICMSIntegral();
+		ICMSGeral icms00 = new ICMSGeral();
 		icms = new ICMS();
 
 		icms00.setAliquota(i.getAliquotaICMS());

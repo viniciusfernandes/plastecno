@@ -28,7 +28,7 @@ fieldset .fieldsetInterno legend {
 </style>
 <script type="text/javascript">
 
-var linhaItemEditando = null;
+var numeroProdutoEdicao = null;
 
 $(document).ready(function() {
 	
@@ -63,6 +63,33 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoInserirTributos').click(function(){
+		
+		
+		var form = document.getElementById('formEmissao');
+		var input = null;
+		
+		<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
+		--numeroProdutoEdicao;
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.tributacaoICMS';
+		input.value = document.getElementById('tipoTributacaoICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.aliquota';
+		input.value = document.getElementById('aliquotaICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.valor';
+		input.value = document.getElementById('valorICMS').value;
+		form.appendChild(input);
+
+		numeroProdutoEdicao = null;
 		$('#bloco_tributos').fadeOut();
 		$('#bloco_tributos input:text').val('');
 	});
@@ -264,8 +291,10 @@ function inicializarModalCancelamento(botao){
 }
 
 function editarTributos(linha){
-	linhaItemEditando = linha;
 	var celulas = linha.cells;
+	<%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
+	numeroProdutoEdicao = celulas[0].innerHTML;
+	
 	$('#bloco_tributos #valorBCICMS').val(celulas[8].innerHTML);
 	$('#bloco_tributos #valorICMS').val(celulas[9].innerHTML);
 	$('#bloco_tributos #aliquotaICMS').val(celulas[11].innerHTML);

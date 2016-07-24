@@ -28,7 +28,7 @@ fieldset .fieldsetInterno legend {
 </style>
 <script type="text/javascript">
 
-var linhaItemEditando = null;
+var numeroProdutoEdicao = null;
 
 $(document).ready(function() {
 	
@@ -63,6 +63,83 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoInserirTributos').click(function(){
+		
+		
+		var form = document.getElementById('formEmissao');
+		var input = null;
+
+		<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
+		--numeroProdutoEdicao;
+		
+		var icms = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms';
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.tributacaoICMS';
+		input.value = document.getElementById('tipoTributacaoICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.aliquota';
+		input.value = document.getElementById('aliquotaICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.valor';
+		input.value = document.getElementById('valorICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.modalidadeDeterminacaoBC';
+		input.value = document.getElementById('modBCICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.modalidadeDeterminacaoBCST';
+		input.value = document.getElementById('modBCSTICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.percentualMargemValorAdicionadoICMSST';
+		input.value = document.getElementById('percValSTICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.percentualReducaoBC';
+		input.value = document.getElementById('percRedBCSTICMS').value;
+		form.appendChild(input);
+
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.valorBCST';
+		input.value = document.getElementById('valorBCSTICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.aliquotaST';
+		input.value = document.getElementById('aliquotaSTICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.valorST';
+		input.value = document.getElementById('valorSTICMS').value;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.motivoDesoneracao';
+		input.value = document.getElementById('motDesonerICMS').value;
+		form.appendChild(input);
+		
+		numeroProdutoEdicao = null;
 		$('#bloco_tributos').fadeOut();
 		$('#bloco_tributos input:text').val('');
 	});
@@ -264,8 +341,10 @@ function inicializarModalCancelamento(botao){
 }
 
 function editarTributos(linha){
-	linhaItemEditando = linha;
 	var celulas = linha.cells;
+	<%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
+	numeroProdutoEdicao = celulas[0].innerHTML;
+	
 	$('#bloco_tributos #valorBCICMS').val(celulas[8].innerHTML);
 	$('#bloco_tributos #valorICMS').val(celulas[9].innerHTML);
 	$('#bloco_tributos #aliquotaICMS').val(celulas[11].innerHTML);
@@ -500,7 +579,7 @@ function editarTributos(linha){
 					
 					<div class="icms00 label">Modalidade:</div>
 					<div class="icms00 input" style="width: 70%">
-						<select style="width: 100%" class="icms00 semprehabilitado">
+						<select id="modBCICMS" style="width: 100%" class="icms00 semprehabilitado">
 							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMS}">
 								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
 							</c:forEach>
@@ -520,7 +599,7 @@ function editarTributos(linha){
 					</div>
 					<div class="icms00 label">Modalidade ST:</div>
 					<div class="icms00 input" style="width: 70%">
-						<select style="width: 100%" class="icms00 semprehabilitado">
+						<select id="modBCSTICMS" style="width: 100%" class="icms00 semprehabilitado">
 							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMSST}">
 								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
 							</c:forEach>
@@ -528,27 +607,27 @@ function editarTributos(linha){
 					</div>
 					<div  class="icms10 label">Perc. Marg. Valor ST:</div>
 					<div class="icms10 input" style="width: 70%">
-						<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+						<input id="percValSTICMS" type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
 					</div>
 					<div  class="icms10 label">Perc. Redução BC ST:</div>
 					<div class="icms10 input" style="width: 70%">
-						<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+						<input id="percRedBCSTICMS" type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
 					</div>
 					<div  class="icms10 label">Valor BC ST:</div>
 					<div class="icms10 input" style="width: 70%">
-						<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+						<input id="valorBCSTICMS" type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
 					</div>
 					<div  class="icms10 label">Alíquota ST:</div>
 					<div class="icms10 input" style="width: 70%">
-						<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+						<input id="aliquotaSTICMS" type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
 					</div>
 					<div  class="icms10 label">Valor ST:</div>
 					<div class="icms10 input" style="width: 70%">
-						<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+						<input id="valorSTICMS" type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
 					</div>
 					<div class="icms00 label">Mot. Desoneração:</div>
 					<div class="icms00 input" style="width: 70%">
-						<select style="width: 100%" class="icms00 semprehabilitado">
+						<select id="motDesonerICMS" style="width: 100%" class="icms00 semprehabilitado">
 							<c:forEach var="motivo" items="${listaTipoMotivoDesoneracao}">
 								<option value="${motivo.codigo}">${motivo.descricao}</option>
 							</c:forEach>

@@ -1,8 +1,9 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
-public class ICMSIntegral {
+public class ICMSGeral {
 
 	@XmlElement(name = "pICMS")
 	private Double aliquota;
@@ -15,6 +16,9 @@ public class ICMSIntegral {
 
 	@XmlElement(name = "modBCST")
 	private Integer modalidadeDeterminacaoBCST;
+
+	@XmlElement(name = "motDesICMS")
+	private String motivoDesoneracao;
 
 	@XmlElement(name = "orig")
 	private Integer origemMercadoria;
@@ -40,11 +44,9 @@ public class ICMSIntegral {
 	@XmlElement(name = "vICMSST")
 	private Double valorST;
 
-	@XmlElement(name = "motDesICMS")
-	private String motivoDesoneracao;
-
-	public void setMotivoDesoneracao(String motivoDesoneracao) {
-		this.motivoDesoneracao = motivoDesoneracao;
+	@XmlTransient
+	public String getTributacaoICMS() {
+		return tributacaoICMS;
 	}
 
 	public void setAliquota(Double aliquota) {
@@ -61,6 +63,10 @@ public class ICMSIntegral {
 
 	public void setModalidadeDeterminacaoBCST(Integer modalidadeDeterminacaoBCST) {
 		this.modalidadeDeterminacaoBCST = modalidadeDeterminacaoBCST;
+	}
+
+	public void setMotivoDesoneracao(String motivoDesoneracao) {
+		this.motivoDesoneracao = motivoDesoneracao;
 	}
 
 	public void setOrigemMercadoria(Integer origemMercadoria) {

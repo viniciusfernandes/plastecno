@@ -6,7 +6,7 @@ public class TributosProdutoServico {
 	@XmlElement(name = "COFINS")
 	private COFINS cofins;
 	@XmlElement(name = "ICMS")
-	private ICMS ICMS;
+	private ICMS icms;
 	@XmlElement(name = "II")
 	private ImpostoImportacao impostoImportacao;
 	@XmlElement(name = "infAdProd")
@@ -20,8 +20,8 @@ public class TributosProdutoServico {
 		this.cofins = cofins;
 	}
 
-	public void setICMS(ICMS iCMS) {
-		ICMS = iCMS;
+	public void setIcms(ICMS icms) {
+		this.icms = icms;
 	}
 
 	public void setImpostoImportacao(ImpostoImportacao impostoImportacao) {

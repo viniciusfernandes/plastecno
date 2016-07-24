@@ -15,6 +15,9 @@ import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
+import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
+import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST;
+import br.com.plastecno.service.nfe.constante.TipoMotivoDesoneracaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
@@ -49,6 +52,10 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("tipoEmissaoPadrao", TipoEmissao.NORMAL);
         addAtributo("listaTipoTributacaoICMS", TipoTributacaoICMS.values());
         addAtributo("listaTipoOrigemMercadoria", TipoOrigemMercadoria.values());
+        addAtributo("listaTipoModalidadeDeterminacaoBCICMS", TipoModalidadeDeterminacaoBCICMS.values());
+        addAtributo("listaTipoModalidadeDeterminacaoBCICMSST", TipoModalidadeDeterminacaoBCICMSST.values());
+        addAtributo("listaTipoMotivoDesoneracao", TipoMotivoDesoneracaoICMS.values());
+
     }
 
     @Post("emissaoNFe/emitirNFe")

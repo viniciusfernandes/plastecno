@@ -107,6 +107,15 @@
 	width: 24px;
 }
 
+.botaoDinheiroPequeno {
+	background: url("../images/money_16.png") no-repeat scroll 0 0
+		transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
 .botaoDetalhar_16 {
 	background: url("../images/details_16.png") no-repeat scroll 0 0
 		transparent;

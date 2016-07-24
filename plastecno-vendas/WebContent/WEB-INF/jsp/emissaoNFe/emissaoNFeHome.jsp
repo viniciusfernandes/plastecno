@@ -28,8 +28,10 @@ fieldset .fieldsetInterno legend {
 </style>
 <script type="text/javascript">
 
-$(document).ready(function() {
+var linhaItemEditando = null;
 
+$(document).ready(function() {
+	
 	$("#botaoPesquisaPedido").click(function() {
 		if(isEmpty($('#idPedido').val())){
 			return;
@@ -55,9 +57,17 @@ $(document).ready(function() {
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
-		gerarInputDuplicataFormulario();
+		gerarInputDuplicata();
+		gerarInputProdutoServico();
 		$('#formEmissao').submit();
 	});
+	
+	$('#botaoInserirTributos').click(function(){
+		$('#bloco_tributos').fadeOut();
+		$('#bloco_tributos input:text').val('');
+	});
+	
+	$('#bloco_tributos').fadeOut();
 	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
@@ -106,7 +116,7 @@ $(document).ready(function() {
 
 });
 
-function gerarInputDuplicataFormulario(){
+function gerarInputDuplicata(){
 	var tabela = document.getElementById('tabela_duplicata');
 	var linhas = tabela.tBodies[0].rows;
 	if(linhas.length <= 0){
@@ -135,6 +145,81 @@ function gerarInputDuplicataFormulario(){
 		input.type = 'hidden';
 		input.name = 'nf.cobrancaNFe.listaDuplicata['+i+'].valor';
 		input.value = celulas[2].innerHTML;
+		form.appendChild(input);
+	}
+}
+
+function gerarInputProdutoServico(){
+	var tabela = document.getElementById('tabela_produtos');
+	var linhas = tabela.tBodies[0].rows;
+	if(linhas.length <= 0){
+		return;
+	}
+	
+	var form = document.getElementById('formEmissao');
+	var input = null;
+	var celulas = null;
+	for (var i = 0; i < linhas.length; i++) {
+		celulas = linhas[i].cells;
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+i+'].numeroItem';
+		input.value = celulas[0].innerHTML;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.codigo';
+		input.value = celulas[1].innerHTML;
+		form.appendChild(input);
+
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.descricao';
+		input.value = celulas[1].innerHTML;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.ncm';
+		input.value = celulas[2].innerHTML;
+		form.appendChild(input);
+
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.cfop';
+		input.value = celulas[3].innerHTML;
+		form.appendChild(input);
+
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.unidadeComercial';
+		input.value = celulas[4].innerHTML;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.quantidadeComercial';
+		input.value = celulas[5].innerHTML;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.quantidadeTributavel';
+		input.value = celulas[5].innerHTML;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.valorUnitarioComercializacao';
+		input.value = celulas[6].innerHTML;
+		form.appendChild(input);
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.valorTotalBruto';
+		input.value = celulas[7].innerHTML;
 		form.appendChild(input);
 	}
 }
@@ -177,6 +262,15 @@ function inicializarModalCancelamento(botao){
 		}
 	});
 }
+
+function editarTributos(linha){
+	linhaItemEditando = linha;
+	var celulas = linha.cells;
+	$('#bloco_tributos #valorBCICMS').val(celulas[8].innerHTML);
+	$('#bloco_tributos #valorICMS').val(celulas[9].innerHTML);
+	$('#bloco_tributos #aliquotaICMS').val(celulas[11].innerHTML);
+	$('#bloco_tributos').fadeIn();
+};
 </script>
 
 </head>
@@ -267,14 +361,18 @@ function inicializarModalCancelamento(botao){
 				</select>
 			</div>
 			<div class="label obrigatorio">Natureza Operação:</div>
-			<div class="input" style="width: 36%">
+			<div class="input" style="width: 50%">
 				<select id="pedidoAssociado"
-					style="width: 100%" class="semprehabilitado">
+					style="width: 80%" class="semprehabilitado">
 					<option value=""></option>
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
 						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
 					</c:forEach>
 				</select>
+			</div>
+			<div class="label">Info. Adicionais.:</div>
+			<div class="input areatexto" style="width: 70%">
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%"></textarea>
 			</div>
 		</fieldset>
 		
@@ -318,92 +416,8 @@ function inicializarModalCancelamento(botao){
 		
 		<fieldset>
 			<legend>::: Produtos e Serviços :::</legend>
-			<div class="label obrigatorio">CFOP:</div>
-			<div class="input" style="width: 80%">
-				<select id="pedidoAssociado" 
-					style="width: 10%" class="semprehabilitado">
-					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
-					</c:forEach>
-				</select>
-			</div>
 			
-			<fieldset class="fieldsetInterno">
-				<legend>::: ICMS :::</legend>
-				<div class="label obrigatorio">Regime:</div>
-				<div class="input" style="width: 10%">
-					<select id="pedidoAssociado" 
-						style="width: 100%" class="semprehabilitado">
-						<c:forEach var="icms" items="${listaRegime}">
-							<option value="${icms.codigo}">${icms.descricao}</option>
-						</c:forEach>
-					</select>
-				</div>
-				<div class="label obrigatorio">Situação Tribut.:</div>
-				<div class="input" style="width: 50%">
-					<select id="tipoTributacaoICMS" 
-						style="width: 80%" class="semprehabilitado">
-						<c:forEach var="icms" items="${listaTipoTributacaoICMS}">
-							<option value="${icms.codigo}">${icms.descricao}</option>
-						</c:forEach>
-					</select>
-				</div>
-				<div class="label obrigatorio">Origem:</div>
-				<div class="input" style="width: 70%">
-					<select id="pedidoAssociado" 
-						style="width: 100%" class="semprehabilitado">
-						<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
-							<option value="${origem.codigo}">${origem.descricao}</option>
-						</c:forEach>
-					</select>
-				</div>
-				
-				<div class="icms00 label obrigatorio">ICMS 00:</div>
-				<div class="icms00 input" style="width: 70%">
-					<select style="width: 100%" class="icms00 semprehabilitado">
-						<option value="00">icms 00</option>
-					</select>
-				</div>
-				<div  class="icms10 label obrigatorio">ICMS 10:</div>
-				<div class="icms10 input" style="width: 70%">
-					<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
-				</div>
-				
-			</fieldset>
-			
-			<fieldset class="fieldsetInterno">
-				<legend>::: IPI :::</legend>
-				<div class="label obrigatorio">Situação Tribut.:</div>
-				<div class="input" style="width: 10%">
-					<select id="pedidoAssociado" 
-						style="width: 100%" class="semprehabilitado">
-						<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-							<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
-						</c:forEach>
-					</select>
-				</div>
-			</fieldset>
-			
-			<fieldset class="fieldsetInterno">
-				<legend>::: COFINS :::</legend>
-				<div class="label obrigatorio">Situação Tribut.:</div>
-				<div class="input" style="width: 10%">
-					<select id="pedidoAssociado" 
-						style="width: 100%" class="semprehabilitado">
-						<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-							<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
-						</c:forEach>
-					</select>
-				</div>
-			</fieldset>
-		</fieldset>
-		
-			<div class="label">Info. Adicionais.:</div>
-			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%"></textarea>
-			</div>
-			
-			<table class="listrada">
+			<table id="tabela_produtos" class="listrada">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -419,6 +433,7 @@ function inicializarModalCancelamento(botao){
 						<th>V IPI.(R$)</th>
 						<th>Aliq. ICMS(R$)</th>
 						<th>Aliq. IPI(R$)</th>
+						<th style="width: 2%">Ações</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -437,23 +452,140 @@ function inicializarModalCancelamento(botao){
 							<td>null</td>
 							<td>${item.aliquotaICMS}</td>
 							<td>${item.aliquotaIPI}</td>
+							<td>
+								<input type="button" value="" title="Editar Tributos" class="botaoDinheiroPequeno" onclick="editarTributos(this.parentNode.parentNode);"/>
+							</td>
+							
 						</tr>
 					</c:forEach>
 				</tbody>
 			</table>
-		
-		
-		<c:forEach var="item" items="${listaItem}" varStatus="count">
-			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].numeroItem"></c:out>" value="${item.sequencial}"/>
-			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.codigo"></c:out>" value="${item.descricaoSemFormatacao}"/>
-			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.descricao"></c:out>" value="${item.descricaoSemFormatacao}"/>
-			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.ncm"></c:out>" value="${item.ncm}"/>
-			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.CFOP"></c:out>" />
-			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.unidadeComercial"></c:out>" value="${item.tipoVenda}"/>
-			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.quantidadeComercial"></c:out>" value="${item.quantidade}"/>
-			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.quantidadeTributavel"></c:out>" value="${item.quantidade}"/>
-			<input type="hidden" name="<c:out value="nf.listaItem[${count.index}].produtoServicoNFe.valorUnitarioComercializacao"></c:out>" value="${item.precoUnidade}"/>
-		</c:forEach>
+			
+			<fieldset id="bloco_tributos" class="fieldsetInterno">
+				<legend class="fieldsetInterno">::: Tributos :::</legend>
+				<div class="label">CFOP:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="cfop" style="width: 10%"/>
+				</div>
+				
+				<fieldset class="fieldsetInterno">
+					<legend>::: ICMS :::</legend>
+					<div class="label">Regime:</div>
+					<div class="input" style="width: 10%">
+						<select id="pedidoAssociado" 
+							style="width: 100%" class="semprehabilitado">
+							<c:forEach var="icms" items="${listaRegime}">
+								<option value="${icms.codigo}">${icms.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 50%">
+						<select id="tipoTributacaoICMS" 
+							style="width: 80%" class="semprehabilitado">
+							<c:forEach var="icms" items="${listaTipoTributacaoICMS}">
+								<option value="${icms.codigo}">${icms.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div class="label">Origem:</div>
+					<div class="input" style="width: 70%">
+						<select id="pedidoAssociado" 
+							style="width: 100%" class="semprehabilitado">
+							<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
+								<option value="${origem.codigo}">${origem.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					
+					<div class="icms00 label">Modalidade:</div>
+					<div class="icms00 input" style="width: 70%">
+						<select style="width: 100%" class="icms00 semprehabilitado">
+							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMS}">
+								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="icms10 label">Valor BC:</div>
+					<div class="icms10 input" style="width: 70%">
+						<input type="text" id="valorBCICMS" style="width: 100%" class="icms10 semprehabilitado"/>
+					</div>
+					<div  class="icms10 label">Alíquota:</div>
+					<div class="icms10 input" style="width: 70%">
+						<input type="text" id="aliquotaICMS" style="width: 100%" class="icms10 semprehabilitado"/>
+					</div>
+					<div  class="icms10 label">Valor:</div>
+					<div class="icms10 input" style="width: 70%">
+						<input type="text" id="valorICMS" style="width: 100%" class="icms10 semprehabilitado"/>
+					</div>
+					<div class="icms00 label">Modalidade ST:</div>
+					<div class="icms00 input" style="width: 70%">
+						<select style="width: 100%" class="icms00 semprehabilitado">
+							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMSST}">
+								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="icms10 label">Perc. Marg. Valor ST:</div>
+					<div class="icms10 input" style="width: 70%">
+						<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+					</div>
+					<div  class="icms10 label">Perc. Redução BC ST:</div>
+					<div class="icms10 input" style="width: 70%">
+						<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+					</div>
+					<div  class="icms10 label">Valor BC ST:</div>
+					<div class="icms10 input" style="width: 70%">
+						<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+					</div>
+					<div  class="icms10 label">Alíquota ST:</div>
+					<div class="icms10 input" style="width: 70%">
+						<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+					</div>
+					<div  class="icms10 label">Valor ST:</div>
+					<div class="icms10 input" style="width: 70%">
+						<input type="text" id="icms10" style="width: 100%" class="icms10 semprehabilitado"/>
+					</div>
+					<div class="icms00 label">Mot. Desoneração:</div>
+					<div class="icms00 input" style="width: 70%">
+						<select style="width: 100%" class="icms00 semprehabilitado">
+							<c:forEach var="motivo" items="${listaTipoMotivoDesoneracao}">
+								<option value="${motivo.codigo}">${motivo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</fieldset>
+				
+				<fieldset class="fieldsetInterno">
+					<legend>::: IPI :::</legend>
+					<div class="label obrigatorio">Situação Tribut.:</div>
+					<div class="input" style="width: 10%">
+						<select id="pedidoAssociado" 
+							style="width: 100%" class="semprehabilitado">
+							<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
+								<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</fieldset>
+				
+				<fieldset class="fieldsetInterno">
+					<legend>::: COFINS :::</legend>
+					<div class="label obrigatorio">Situação Tribut.:</div>
+					<div class="input" style="width: 10%">
+						<select id="pedidoAssociado" 
+							style="width: 100%" class="semprehabilitado">
+							<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
+								<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+							</c:forEach>
+						</select>
+					</div>
+				</fieldset>
+				<div class="bloco_botoes">
+			<input type="button" id="botaoInserirTributos" title="Inserir Tributos do Item" value="" class="botaoInserir"/>
+		</div>
+			</fieldset>
+		</fieldset>	
 		
 		<div class="bloco_botoes">
 			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>

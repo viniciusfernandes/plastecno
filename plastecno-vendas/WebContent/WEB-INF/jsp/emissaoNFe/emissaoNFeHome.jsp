@@ -70,8 +70,14 @@ $(document).ready(function() {
 
 		<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
 		--numeroProdutoEdicao;
-		
+		var produto = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe';
 		var icms = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms';
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = produto+'.cfop';
+		input.value = document.getElementById('cfop').value;
+		form.appendChild(input);
 		
 		input = document.createElement('input');
 		input.type = 'hidden';
@@ -114,7 +120,13 @@ $(document).ready(function() {
 		input.name = icms+'.percentualReducaoBC';
 		input.value = document.getElementById('percRedBCSTICMS').value;
 		form.appendChild(input);
-
+		
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = icms+'.valorBC';
+		input.value = document.getElementById('valorBCICMS').value;
+		form.appendChild(input);
+		
 		input = document.createElement('input');
 		input.type = 'hidden';
 		input.name = icms+'.valorBCST';
@@ -261,12 +273,6 @@ function gerarInputProdutoServico(){
 		input.type = 'hidden';
 		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.ncm';
 		input.value = celulas[2].innerHTML;
-		form.appendChild(input);
-
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.cfop';
-		input.value = celulas[3].innerHTML;
 		form.appendChild(input);
 
 		input = document.createElement('input');
@@ -544,7 +550,7 @@ function editarTributos(linha){
 				<legend class="fieldsetInterno">::: Tributos :::</legend>
 				<div class="label">CFOP:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" name="cfop" style="width: 10%"/>
+					<input id="cfop" type="text" name="cfop" style="width: 10%"/>
 				</div>
 				
 				<fieldset class="fieldsetInterno">

@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 public class ProdutoServicoNFe {
 	@XmlElement(name = "CFOP")
-	private String CFOP;
+	private String cfop;
 
 	@XmlElement(name = "cProd")
 	private String codigo;
@@ -63,8 +63,8 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "vUnTrib")
 	private Double valorUnitarioTributacao;
 
-	public void setCFOP(String cFOP) {
-		CFOP = cFOP;
+	public void setCfop(String cfop) {
+		this.cfop = cfop;
 	}
 
 	public void setCodigo(String codigo) {

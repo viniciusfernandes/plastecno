@@ -58,7 +58,7 @@ public class NFeServiceImpl implements NFeService {
 
 			p.setNumeroPedidoCompra(idPedido.toString());
 			p.setItemPedidoCompra(i.getSequencial());
-			p.setCFOP(null);
+			p.setCfop(null);
 			p.setCodigo(descricao);
 			p.setDescricao(descricao);
 			p.setNcm(i.getNcm() != null ? i.getNcm().replaceAll("\\.", "")

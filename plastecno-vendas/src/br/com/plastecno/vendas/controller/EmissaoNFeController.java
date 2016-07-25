@@ -20,6 +20,7 @@ import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST
 import br.com.plastecno.service.nfe.constante.TipoMotivoDesoneracaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
+import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
@@ -55,6 +56,7 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaTipoModalidadeDeterminacaoBCICMS", TipoModalidadeDeterminacaoBCICMS.values());
         addAtributo("listaTipoModalidadeDeterminacaoBCICMSST", TipoModalidadeDeterminacaoBCICMSST.values());
         addAtributo("listaTipoMotivoDesoneracao", TipoMotivoDesoneracaoICMS.values());
+        addAtributo("listaTipoTributacaoIPI", TipoTributacaoIPI.values());
 
     }
 

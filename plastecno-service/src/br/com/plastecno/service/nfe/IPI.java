@@ -1,41 +1,26 @@
 package br.com.plastecno.service.nfe;
 
+import javax.xml.bind.annotation.XmlElement;
+
 public class IPI {
+	@XmlElement(name = "clEnq")
 	private String classeEnquadramento;
-	private String CNPJProdutor;
+
+	@XmlElement(name = "CNPJProd")
+	private String cnpjProdutor;
+
+	@XmlElement(name = "cSelo")
 	private String codigoSeloControle;
+
+	@XmlElement(name = "qSelo")
 	private Integer quantidadeSeloControle;
 
-	public String getClasseEnquadramento() {
-		return classeEnquadramento;
-	}
+	@XmlElement(name = "cEnq")
+	private String codigoEnquadramento;
 
-	public String getCNPJProdutor() {
-		return CNPJProdutor;
-	}
-
-	public String getCodigoSeloControle() {
-		return codigoSeloControle;
-	}
-
-	public Integer getQuantidadeSeloControle() {
-		return quantidadeSeloControle;
-	}
-
-	public void setClasseEnquadramento(String classeEnquadramento) {
-		this.classeEnquadramento = classeEnquadramento;
-	}
-
-	public void setCNPJProdutor(String cNPJProdutor) {
-		CNPJProdutor = cNPJProdutor;
-	}
-
-	public void setCodigoSeloControle(String codigoSeloControle) {
-		this.codigoSeloControle = codigoSeloControle;
-	}
-
-	public void setQuantidadeSeloControle(Integer quantidadeSeloControle) {
-		this.quantidadeSeloControle = quantidadeSeloControle;
-	}
-
+	@XmlElement(name = "IPITrib")
+	private IPIGeral ipiTrib;
+	
+	@XmlElement(name = "IPINI")
+	private IPIGeral ipint;
 }

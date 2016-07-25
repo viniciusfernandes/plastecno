@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 public class IPIGeral {
 	@XmlElement(name = "pIPI")
@@ -20,6 +21,11 @@ public class IPIGeral {
 
 	@XmlElement(name = "vUnid")
 	private Double valorUnidadeTributavel;
+
+	@XmlTransient
+	public String getCodigoSituacaoTributaria() {
+		return codigoSituacaoTributaria;
+	}
 
 	public void setAliquota(Double aliquota) {
 		this.aliquota = aliquota;

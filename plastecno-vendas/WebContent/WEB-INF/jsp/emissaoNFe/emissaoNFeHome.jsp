@@ -63,115 +63,12 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoInserirICMS').click(function(){
-		
-		
-		var form = document.getElementById('formEmissao');
-		var input = null;
-
-		var produto = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe';
-		var icms = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms';
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = produto+'.cfop';
-		input.value = document.getElementById('cfop').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.tributacaoICMS';
-		input.value = document.getElementById('tipoTributacaoICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.aliquota';
-		input.value = document.getElementById('aliquotaICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.valor';
-		input.value = document.getElementById('valorICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.modalidadeDeterminacaoBC';
-		input.value = document.getElementById('modBCICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.modalidadeDeterminacaoBCST';
-		input.value = document.getElementById('modBCSTICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.percentualMargemValorAdicionadoICMSST';
-		input.value = document.getElementById('percValSTICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.percentualReducaoBC';
-		input.value = document.getElementById('percRedBCSTICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.valorBC';
-		input.value = document.getElementById('valorBCICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.valorBCST';
-		input.value = document.getElementById('valorBCSTICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.aliquotaST';
-		input.value = document.getElementById('aliquotaSTICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.valorST';
-		input.value = document.getElementById('valorSTICMS').value;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = icms+'.motivoDesoneracao';
-		input.value = document.getElementById('motDesonerICMS').value;
-		form.appendChild(input);
-		
-		numeroProdutoEdicao = null;
-		$('#bloco_tributos input:text').val('');
+		gerarInputICMS();
 		$('#bloco_tributos #bloco_icms').fadeOut();
 	});
 	
 	$('#botaoInserirIPI').click(function(){
-		
-		
-		var form = document.getElementById('formEmissao');
-		var input = null;
-
-		var produto = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe';
-		var icms = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms';
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = produto+'.cfop';
-		input.value = document.getElementById('cfop').value;
-		form.appendChild(input);
-		
-			
-		numeroProdutoEdicao = null;
-		$('#bloco_tributos input:text').val('');
+		gerarInputIPI();
 		$('#bloco_tributos #bloco_ipi').fadeOut();
 	});
 	
@@ -223,6 +120,166 @@ $(document).ready(function() {
 	inserirMascaraDataAmericano('dataVencimentoDuplicata');
 
 });
+
+function gerarInputICMS(){
+	var form = document.getElementById('formEmissao');
+	var input = null;
+
+	var produto = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe';
+	var icms = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms';
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = produto+'.cfop';
+	input.value = document.getElementById('cfop').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.tributacaoICMS';
+	input.value = document.getElementById('tipoTributacaoICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.aliquota';
+	input.value = document.getElementById('aliquotaICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.valor';
+	input.value = document.getElementById('valorICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.modalidadeDeterminacaoBC';
+	input.value = document.getElementById('modBCICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.modalidadeDeterminacaoBCST';
+	input.value = document.getElementById('modBCSTICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.percentualMargemValorAdicionadoICMSST';
+	input.value = document.getElementById('percValSTICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.percentualReducaoBC';
+	input.value = document.getElementById('percRedBCSTICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.valorBC';
+	input.value = document.getElementById('valorBCICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.valorBCST';
+	input.value = document.getElementById('valorBCSTICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.aliquotaST';
+	input.value = document.getElementById('aliquotaSTICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.valorST';
+	input.value = document.getElementById('valorSTICMS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = icms+'.motivoDesoneracao';
+	input.value = document.getElementById('motDesonerICMS').value;
+	form.appendChild(input);
+}
+
+function gerarInputIPI(){
+	var form = document.getElementById('formEmissao');
+	var input = null;
+
+	var ipi = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi';
+	var tipoIpi = ipi+'.tipoIpi';
+		
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoIpi+'.aliquota';
+	input.value = document.getElementById('aliquotaIPI').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoIpi+'.codigoSituacaoTributaria';
+	input.value = document.getElementById('codSitTribIPI').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoIpi+'.valor';
+	input.value = document.getElementById('valorBCIPI').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoIpi+'.valorBC';
+	input.value = document.getElementById('valorBCIPI').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoIpi+'.quantidadeUnidadeTributavel';
+	input.value = document.getElementById('qtdeUnidTribIPI').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoIpi+'.valorUnidadeTributavel';
+	input.value = document.getElementById('valorUnidTribIPI').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = ipi+'.classeEnquadramento';
+	input.value = document.getElementById('clEnquadramentoIPI').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = ipi+'.codigoEnquadramento';
+	input.value = document.getElementById('codEnquadramentoIPI').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = ipi+'.cnpjProdutor';
+	input.value = document.getElementById('cnpjProdIPI').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = ipi+'.codigoSeloControle';
+	input.value = document.getElementById('codSeloContrIPI').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = ipi+'.quantidadeSeloControle';
+	input.value = document.getElementById('qtdeSeloContrIPI').value;
+	form.appendChild(input);
+};
 
 function gerarInputDuplicata(){
 	var tabela = document.getElementById('tabela_duplicata');
@@ -674,7 +731,7 @@ function editarTributos(linha){
 					<legend>::: IPI :::</legend>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 70%">
-						<select id="sitTribIPI" style="width: 100%" >
+						<select id="codSitTribIPI" style="width: 100%" >
 							<c:forEach var="tipo" items="${listaTipoTributacaoIPI}">
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
 							</c:forEach>
@@ -698,7 +755,11 @@ function editarTributos(linha){
 					</div>
 					<div  class="label">Cl. Enquadramento:</div>
 					<div class="input" style="width: 70%">
-						<input id="enquadramentoIPI" type="text" style="width: 100%" />
+						<input id="clEnquadramentoIPI" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Cod. Enquadramento:</div>
+					<div class="input" style="width: 70%">
+						<input id="codEnquadramentoIPI" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">CNPJ Produtor:</div>
 					<div class="input" style="width: 70%">
@@ -729,7 +790,6 @@ function editarTributos(linha){
 						</select>
 					</div>
 				</fieldset>
-				
 			</fieldset>
 		</fieldset>	
 		

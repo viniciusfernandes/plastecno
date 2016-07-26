@@ -72,6 +72,11 @@ $(document).ready(function() {
 		$('#bloco_tributos #bloco_ipi').fadeOut();
 	});
 	
+	$('#botaoInserirPIS').click(function(){
+		gerarInputPIS();
+		$('#bloco_tributos #bloco_pis').fadeOut();
+	});
+	
 	$('#bloco_tributos').fadeOut();
 	
 	autocompletar({
@@ -278,6 +283,50 @@ function gerarInputIPI(){
 	input.type = 'hidden';
 	input.name = ipi+'.quantidadeSeloControle';
 	input.value = document.getElementById('qtdeSeloContrIPI').value;
+	form.appendChild(input);
+};
+
+function gerarInputPIS(){
+	var form = document.getElementById('formEmissao');
+	var input = null;
+
+	var pis = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis';
+	var tipoPis = pis+'.tipoPis';
+		
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoPis+'.aliquota';
+	input.value = document.getElementById('aliquotaPIS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoPis+'.codigoSituacaoTributaria';
+	input.value = document.getElementById('codSitTribPIS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoPis+'.quantidadeVendida';
+	input.value = document.getElementById('qtdeVendidaPIS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoPis+'.valor';
+	input.value = document.getElementById('valorPIS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoPis+'.valorBC';
+	input.value = document.getElementById('valorBCPIS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoPis+'.valorAliquota';
+	input.value = document.getElementById('valorAliquotaPIS').value;
 	form.appendChild(input);
 };
 
@@ -727,8 +776,9 @@ function editarTributos(linha){
 					</div>
 				</fieldset>
 				
-				<fieldset id="bloco_ipi" class="fieldsetInterno">
+				<fieldset class="fieldsetInterno">
 					<legend>::: IPI :::</legend>
+					<div id="bloco_ipi">
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 70%">
 						<select id="codSitTribIPI" style="width: 100%" >
@@ -775,6 +825,43 @@ function editarTributos(linha){
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirIPI" title="Inserir IPI do Produto" value="" class="botaoInserir"/>
+					</div>
+					</div>
+				</fieldset>
+				
+				<fieldset id="bloco_pis" class="fieldsetInterno">
+					<legend>::: PIS :::</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 70%">
+						<select id="codSitTribPIS" 
+							style="width: 100%">
+							<c:forEach var="tipo" items="${listaTipoTributacaoPIS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 70%">
+						<input id="valorBCPIS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 70%">
+						<input id="aliquotaPIS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Alíquota(R$):</div>
+					<div class="input" style="width: 70%">
+						<input id="valorAliquotaPIS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Qtde.Vendida:</div>
+					<div class="input" style="width: 70%">
+						<input id="qtdeVendidaPIS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor:</div>
+					<div class="input" style="width: 70%">
+						<input id="valorPIS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
 					</div>
 				</fieldset>
 				

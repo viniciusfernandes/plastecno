@@ -1,33 +1,35 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.*;
+import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
 
 public class COFINS {
 	@XmlElement(name = "COFINSAliq")
-	private COFINSAliquota cOFINSAliquota;
+	private COFINSGeral cofinsAliquota;
 
-	public void setcOFINSAliquota(COFINSAliquota cOFINSAliquota) {
-		this.cOFINSAliquota = cOFINSAliquota;
-	}
-}
+	@XmlElement(name = "COFINSNT")
+	private COFINSGeral cofinsNaoTributado;
 
-class COFINSAliquota {
-	@XmlElement(name = "pCOFINS")
-	private Double aliquota;
-	@XmlElement(name = "vCOFINS")
-	private Double valor;
-	@XmlElement(name = "vBC")
-	private Double valorBC;
+	@XmlElement(name = "COFINSOutr")
+	private COFINSGeral cofinsOutrasOperacoes;
 
-	public void setAliquota(Double aliquota) {
-		this.aliquota = aliquota;
-	}
+	@XmlElement(name = "COFINSQtde")
+	private COFINSGeral cofinsQuantidade;
 
-	public void setValor(Double valor) {
-		this.valor = valor;
-	}
+	public void setTipoCofins(COFINSGeral tipoCofins) {
+		TipoTributacaoCOFINS tribut = tipoCofins.getTipoTributacao();
 
-	public void setValorBC(Double valorBC) {
-		this.valorBC = valorBC;
+		if (COFINS_1.equals(tribut) || COFINS_2.equals(tribut)) {
+			cofinsAliquota = tipoCofins;
+		} else if (COFINS_3.equals(tribut)) {
+			cofinsQuantidade = tipoCofins;
+		} else if (COFINS_4.equals(tribut) || COFINS_6.equals(tribut)
+				|| COFINS_7.equals(tribut) || COFINS_8.equals(tribut)
+				|| COFINS_9.equals(tribut)) {
+			cofinsNaoTributado = tipoCofins;
+		} else if (COFINS_99.equals(tribut)) {
+			cofinsOutrasOperacoes = tipoCofins;
+		}
 	}
 }

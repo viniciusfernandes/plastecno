@@ -3,10 +3,10 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
+import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
 
-public class PISGeral {
-	@XmlElement(name = "pPIS")
+public class COFINSGeral {
+	@XmlElement(name = "pCOFINS")
 	private Double aliquota;
 
 	@XmlElement(name = "CST")
@@ -15,7 +15,7 @@ public class PISGeral {
 	@XmlElement(name = "qBCProd")
 	private Integer quantidadeVendida;
 
-	@XmlElement(name = "vPIS")
+	@XmlElement(name = "vCOFINS")
 	private Double valor;
 
 	@XmlElement(name = "vAliqProd")
@@ -25,8 +25,8 @@ public class PISGeral {
 	private Double valorBC;
 
 	@XmlTransient
-	public TipoTributacaoPIS getTipoTributacao() {
-		return TipoTributacaoPIS.getTipoTributacao(codigoSituacaoTributaria);
+	public TipoTributacaoCOFINS getTipoTributacao() {
+		return TipoTributacaoCOFINS.getTipoTributacao(codigoSituacaoTributaria);
 	}
 
 	public void setAliquota(Double aliquota) {

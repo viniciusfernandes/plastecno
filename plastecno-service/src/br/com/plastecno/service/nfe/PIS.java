@@ -1,6 +1,8 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.*;
+import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 
 public class PIS {
 
@@ -17,19 +19,20 @@ public class PIS {
 	private PISGeral pisQuantidade;
 
 	public void setTipoPis(PISGeral tipoPis) {
-		if (tipoPis == null || tipoPis.getCodigoSituacaoTributaria() == null) {
+		if (tipoPis == null) {
 			return;
 		}
 
-		Integer codigo = tipoPis.getCodigoSituacaoTributaria();
-		if (codigo.equals(1) || codigo.equals(2)) {
+		TipoTributacaoPIS tribut = tipoPis.getTipoTributacao();
+		if (PIS_1.equals(tribut) || PIS_2.equals(tribut)) {
 			this.pisAliquota = tipoPis;
-		} else if (codigo.equals(3)) {
+		} else if (PIS_3.equals(tribut)) {
 			this.pisQuantidade = tipoPis;
-		} else if (codigo.equals(4) || codigo.equals(6) || codigo.equals(7)
-				|| codigo.equals(8) || codigo.equals(9)) {
+		} else if (PIS_4.equals(tribut) || PIS_6.equals(tribut)
+				|| PIS_7.equals(tribut) || PIS_8.equals(tribut)
+				|| PIS_9.equals(tribut)) {
 			this.pisNaoTributado = tipoPis;
-		} else if (codigo.equals(99)) {
+		} else if (PIS_99.equals(tribut)) {
 			this.pisOutrasOperacoes = tipoPis;
 		}
 	}

@@ -3,6 +3,8 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
+
 public class IPIGeral {
 	@XmlElement(name = "pIPI")
 	private Double aliquota;
@@ -23,8 +25,8 @@ public class IPIGeral {
 	private Double valorUnidadeTributavel;
 
 	@XmlTransient
-	public String getCodigoSituacaoTributaria() {
-		return codigoSituacaoTributaria;
+	public TipoTributacaoIPI getTipoTributacao() {
+		return TipoTributacaoIPI.getTipoTributacao(codigoSituacaoTributaria);
 	}
 
 	public void setAliquota(Double aliquota) {

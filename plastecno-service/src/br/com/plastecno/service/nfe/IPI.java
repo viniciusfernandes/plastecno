@@ -2,6 +2,9 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.*;
+
 public class IPI {
 	@XmlElement(name = "clEnq")
 	private String classeEnquadramento;
@@ -56,21 +59,19 @@ public class IPI {
 	 * Esse metodo foi criado para abreviar as marcacoes no arquivo .jsp
 	 */
 	public void setTipoIpi(IPIGeral tipoIpi) {
-		if (tipoIpi == null || tipoIpi.getCodigoSituacaoTributaria() == null
-				|| tipoIpi.getCodigoSituacaoTributaria().isEmpty()) {
+		if (tipoIpi == null) {
 			return;
 
 		}
+		TipoTributacaoIPI t = tipoIpi.getTipoTributacao();
+		if (t == null) {
+			return;
+		}
 
-		String codigo = tipoIpi.getCodigoSituacaoTributaria();
-		if ("00".equals(codigo) || "49".equals(codigo) || "50".equals(codigo)
-				|| "99".equals(codigo)) {
+		if (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t)
+				|| IPI_99.equals(t)) {
 			this.ipiTrib = tipoIpi;
-		} else if ("01".equals(codigo) || "02".equals(codigo)
-				|| "03".equals(codigo) || "04".equals(codigo)
-				|| "51".equals(codigo) || "52".equals(codigo)
-				|| "53".equals(codigo) || "54".equals(codigo)
-				|| "55".equals(codigo)) {
+		} else {
 			this.ipiNt = tipoIpi;
 		}
 	}

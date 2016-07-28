@@ -77,6 +77,11 @@ $(document).ready(function() {
 		$('#bloco_tributos #bloco_pis').fadeOut();
 	});
 	
+	$('#botaoInserirCOFINS').click(function(){
+		gerarInputCOFINS();
+		$('#bloco_tributos #bloco_cofins').fadeOut();
+	});
+	
 	$('#bloco_tributos').fadeOut();
 	
 	autocompletar({
@@ -141,7 +146,7 @@ function gerarInputICMS(){
 	
 	input = document.createElement('input');
 	input.type = 'hidden';
-	input.name = icms+'.tributacaoICMS';
+	input.name = icms+'.codigoSituacaoTributaria';
 	input.value = document.getElementById('tipoTributacaoICMS').value;
 	form.appendChild(input);
 	
@@ -328,6 +333,51 @@ function gerarInputPIS(){
 	input.name = tipoPis+'.valorAliquota';
 	input.value = document.getElementById('valorAliquotaPIS').value;
 	form.appendChild(input);
+};
+
+function gerarInputCOFINS(){
+	var form = document.getElementById('formEmissao');
+	var input = null;
+
+	var cofins = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins';
+	var tipoCofins = cofins+'.tipoCofins';
+		
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoCofins+'.aliquota';
+	input.value = document.getElementById('aliquotaCOFINS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoCofins+'.codigoSituacaoTributaria';
+	input.value = document.getElementById('codSitTribCOFINS').value;
+	form.appendChild(input);
+
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoCofins+'.quantidadeVendida';
+	input.value = document.getElementById('qtdeVendidaCOFINS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoCofins+'.valor';
+	input.value = document.getElementById('valorCOFINS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoCofins+'.valorAliquota';
+	input.value = document.getElementById('valorAliquotaCOFINS').value;
+	form.appendChild(input);
+	
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = tipoCofins+'.valorBC';
+	input.value = document.getElementById('valorBCCOFINS').value;
+	form.appendChild(input);
+	
 };
 
 function gerarInputDuplicata(){
@@ -865,16 +915,38 @@ function editarTributos(linha){
 					</div>
 				</fieldset>
 				
-				<fieldset class="fieldsetInterno">
+				<fieldset id="bloco_cofins" class="fieldsetInterno">
 					<legend>::: COFINS :::</legend>
-					<div class="label obrigatorio">Situação Tribut.:</div>
-					<div class="input" style="width: 10%">
-						<select id="pedidoAssociado" 
-							style="width: 100%" class="semprehabilitado">
-							<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-								<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 70%">
+						<select id="codSitTribCOFINS" style="width: 100%">
+							<c:forEach var="tipo" items="${listaTipoTributacaoCOFINS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
 							</c:forEach>
 						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 70%">
+						<input id="valorBCCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 70%">
+						<input id="aliquotaCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Alíquota(R$):</div>
+					<div class="input" style="width: 70%">
+						<input id="valorAliquotaCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Qtde. Vendida:</div>
+					<div class="input" style="width: 70%">
+						<input id="qtdeVendidaCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor:</div>
+					<div class="input" style="width: 70%">
+						<input id="valorCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
 					</div>
 				</fieldset>
 			</fieldset>

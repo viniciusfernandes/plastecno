@@ -19,6 +19,7 @@ import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST;
 import br.com.plastecno.service.nfe.constante.TipoMotivoDesoneracaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
+import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
@@ -59,6 +60,7 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaTipoMotivoDesoneracao", TipoMotivoDesoneracaoICMS.values());
         addAtributo("listaTipoTributacaoIPI", TipoTributacaoIPI.values());
         addAtributo("listaTipoTributacaoPIS", TipoTributacaoPIS.values());
+        addAtributo("listaTipoTributacaoCOFINS", TipoTributacaoCOFINS.values());
 
     }
 

@@ -15,9 +15,20 @@ public enum TipoTributacaoIPI {
 	IPI_54("54 - Saída imune", "54"), 
 	IPI_55("55 - Saída com suspensão", "55"), 
 	IPI_99("99 - Outras saídas", "99");
+	
+	public static TipoTributacaoIPI getTipoTributacao(String codigo) {
+		for (TipoTributacaoIPI t : values()) {
+			if (t.codigo.equals(codigo)) {
+				return t;
+			}
+		}
+		return null;
+	}
+	
 	private String codigo;
-	private String descricao;
 
+	private String descricao;
+	
 	private TipoTributacaoIPI(String descricao, String codigo) {
 		this.descricao = descricao;
 		this.codigo = codigo;

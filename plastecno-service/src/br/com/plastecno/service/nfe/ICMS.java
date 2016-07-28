@@ -4,9 +4,11 @@ import java.lang.reflect.Field;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
+
 public class ICMS {
 	@XmlElement(name = "ICMS00")
-	private ICMSGeral icms00;
+	private ICMSGeral icms0;
 
 	@XmlElement(name = "ICMS10")
 	private ICMSGeral icms10;
@@ -41,13 +43,15 @@ public class ICMS {
 		}
 		Field campo = null;
 		try {
-			campo = this.getClass().getDeclaredField("icms" + icms.getTributacaoICMS());
+			TipoTributacaoICMS tribut = icms.getTipoTributacao();
+			campo = this.getClass().getDeclaredField(
+					"icms" + (tribut != null ? tribut.getCodigo() : null));
 			campo.setAccessible(true);
 			campo.set(this, icms);
 		} catch (Exception e) {
 			throw new RuntimeException(
 					"Falha no atribuicao dos valores do ICMS com o tipo de tributacao \""
-							+ icms.getTributacaoICMS() + "\"", e);
+							+ icms.getTipoTributacao() + "\"", e);
 		} finally {
 			if (campo != null) {
 				campo.setAccessible(false);

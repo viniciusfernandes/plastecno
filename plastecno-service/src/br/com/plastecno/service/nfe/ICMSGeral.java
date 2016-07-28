@@ -3,6 +3,8 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
+
 public class ICMSGeral {
 
 	@XmlElement(name = "pICMS")
@@ -10,6 +12,9 @@ public class ICMSGeral {
 
 	@XmlElement(name = "pICMSST")
 	private Double aliquotaST;
+
+	@XmlElement(name = "CST")
+	private Integer codigoSituacaoTributaria;
 
 	@XmlElement(name = "modBC")
 	private Integer modalidadeDeterminacaoBC;
@@ -29,9 +34,6 @@ public class ICMSGeral {
 	@XmlElement(name = "pRedBC")
 	private Double percentualReducaoBC;
 
-	@XmlElement(name = "CST")
-	private String tributacaoICMS;
-
 	@XmlElement(name = "vICMS")
 	private Double valor;
 
@@ -45,8 +47,8 @@ public class ICMSGeral {
 	private Double valorST;
 
 	@XmlTransient
-	public String getTributacaoICMS() {
-		return tributacaoICMS;
+	public TipoTributacaoICMS getTipoTributacao() {
+		return TipoTributacaoICMS.getTipoTributacao(codigoSituacaoTributaria);
 	}
 
 	public void setAliquota(Double aliquota) {
@@ -55,6 +57,10 @@ public class ICMSGeral {
 
 	public void setAliquotaST(Double aliquotaST) {
 		this.aliquotaST = aliquotaST;
+	}
+
+	public void setCodigoSituacaoTributaria(Integer codigoSituacaoTributaria) {
+		this.codigoSituacaoTributaria = codigoSituacaoTributaria;
 	}
 
 	public void setModalidadeDeterminacaoBC(Integer modalidadeDeterminacaoBC) {
@@ -80,10 +86,6 @@ public class ICMSGeral {
 
 	public void setPercentualReducaoBC(Double percentualReducaoBC) {
 		this.percentualReducaoBC = percentualReducaoBC;
-	}
-
-	public void setTributacaoICMS(String tributacaoICMS) {
-		this.tributacaoICMS = tributacaoICMS;
 	}
 
 	public void setValor(Double valor) {

@@ -150,210 +150,92 @@ function inicializarFadeInBlockImposto(nomeBloco){
 	});
 }
 
-function gerarInputICMS(){
+function gerarCamposICMS(){
+	
+}
+
+function gerarInputHidden(objeto){
 	var form = document.getElementById('formEmissao');
 	var input = null;
+	var campos = objeto.campos;
+	
+	for (var i = 0; i < campos.length; i++) {
+		input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = objeto.nomeObjeto +'.'+campos[i].nome;
+		
+		if(campos[i].valor == undefined) {
+			input.value = document.getElementById(campos[i].id).value;
+		} else {
+			input.value = campos[i].valor;
+		}
+		
+		form.appendChild(input)	
+	};
+}
 
-	var produto = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe';
-	var icms = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms';
+
+function gerarInputICMS(){
+	var tipoIcms = 
+		{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms',
+			'campos':[{'nome':'codigoSituacaoTributaria', 'id':'tipoTributacaoICMS'},
+			          {'nome':'aliquota', 'id':'aliquotaICMS'},
+			          {'nome':'valor', 'id':'valorICMS'},
+			          {'nome':'modalidadeDeterminacaoBC', 'id':'modBCICMS'},
+			          {'nome':'modalidadeDeterminacaoBCST', 'id':'modBCSTICMS'},
+			          {'nome':'percentualMargemValorAdicionadoICMSST', 'id':'percValSTICMS'},
+			          {'nome':'percentualReducaoBC', 'id':'percRedBCSTICMS'},
+			          {'nome':'valorBC', 'id':'valorBCICMS'},
+			          {'nome':'valorBCST', 'id':'valorBCSTICMS'},
+			          {'nome':'aliquotaST', 'id':'aliquotaSTICMS'},
+			          {'nome':'valorST', 'id':'valorSTICMS'},
+			          {'nome':'motivoDesoneracao', 'id':'motDesonerICMS'}
+				]};
 	
-	<%--
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = produto+'.cfop';
-	input.value = document.getElementById('cfop').value;
-	form.appendChild(input);
-	--%>
+	var produto = 
+	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe',
+		'campos':[{'nome':'cfop', 'id':'cfop'}]};
 	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.codigoSituacaoTributaria';
-	input.value = document.getElementById('tipoTributacaoICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.aliquota';
-	input.value = document.getElementById('aliquotaICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.valor';
-	input.value = document.getElementById('valorICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.modalidadeDeterminacaoBC';
-	input.value = document.getElementById('modBCICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.modalidadeDeterminacaoBCST';
-	input.value = document.getElementById('modBCSTICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.percentualMargemValorAdicionadoICMSST';
-	input.value = document.getElementById('percValSTICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.percentualReducaoBC';
-	input.value = document.getElementById('percRedBCSTICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.valorBC';
-	input.value = document.getElementById('valorBCICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.valorBCST';
-	input.value = document.getElementById('valorBCSTICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.aliquotaST';
-	input.value = document.getElementById('aliquotaSTICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.valorST';
-	input.value = document.getElementById('valorSTICMS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = icms+'.motivoDesoneracao';
-	input.value = document.getElementById('motDesonerICMS').value;
-	form.appendChild(input);
+	gerarInputHidden(tipoIcms);
+	gerarInputHidden(produto);
 }
 
 function gerarInputIPI(){
-	var form = document.getElementById('formEmissao');
-	var input = null;
-
-	var ipi = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi';
-	var tipoIpi = ipi+'.tipoIpi';
-		
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoIpi+'.aliquota';
-	input.value = document.getElementById('aliquotaIPI').value;
-	form.appendChild(input);
+	var tipoIpi = 
+	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi.tipoIcms',
+		'campos':[{'nome':'aliquota', 'id':'aliquotaIPI'},
+		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribIPI'},
+		          {'nome':'valor', 'id':'valorBCIPI'},
+		          {'nome':'valorBC', 'id':'valorBCIPI'},
+		          {'nome':'quantidadeUnidadeTributavel', 'id':'qtdeUnidTribIPI'},
+		          {'nome':'valorUnidadeTributavel', 'id':'valorUnidTribIPI'}
+			]};
 	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoIpi+'.codigoSituacaoTributaria';
-	input.value = document.getElementById('codSitTribIPI').value;
-	form.appendChild(input);
+	var ipi = 
+	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi',
+		'campos':[{'nome':'classeEnquadramento', 'id':'clEnquadramentoIPI'},
+		          {'nome':'codigoEnquadramento', 'id':'codEnquadramentoIPI'},
+		          {'nome':'cnpjProdutor', 'id':'cnpjProdIPI'},
+		          {'nome':'codigoSeloControle', 'id':'codSeloContrIPI'},
+		          {'nome':'quantidadeSeloControle', 'id':'qtdeSeloContrIPI'}
+			]};
 	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoIpi+'.valor';
-	input.value = document.getElementById('valorBCIPI').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoIpi+'.valorBC';
-	input.value = document.getElementById('valorBCIPI').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoIpi+'.quantidadeUnidadeTributavel';
-	input.value = document.getElementById('qtdeUnidTribIPI').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoIpi+'.valorUnidadeTributavel';
-	input.value = document.getElementById('valorUnidTribIPI').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = ipi+'.classeEnquadramento';
-	input.value = document.getElementById('clEnquadramentoIPI').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = ipi+'.codigoEnquadramento';
-	input.value = document.getElementById('codEnquadramentoIPI').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = ipi+'.cnpjProdutor';
-	input.value = document.getElementById('cnpjProdIPI').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = ipi+'.codigoSeloControle';
-	input.value = document.getElementById('codSeloContrIPI').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = ipi+'.quantidadeSeloControle';
-	input.value = document.getElementById('qtdeSeloContrIPI').value;
-	form.appendChild(input);
+	gerarInputHidden(tipoIpi);
+	gerarInputHidden(ipi);
 };
 
 function gerarInputPIS(){
-	var form = document.getElementById('formEmissao');
-	var input = null;
-
-	var pis = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis';
-	var tipoPis = pis+'.tipoPis';
-		
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoPis+'.aliquota';
-	input.value = document.getElementById('aliquotaPIS').value;
-	form.appendChild(input);
+	var tipoPis = 
+	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis',
+		'campos':[{'nome':'aliquota', 'id':'aliquotaPIS'},
+		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribPIS'},
+		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaPIS'},
+		          {'nome':'valor', 'id':'valorPIS'},
+		          {'nome':'valorBC', 'id':'valorBCPIS'},
+		          {'nome':'valorAliquota', 'id':'valorAliquotaPIS'}
+			]};
 	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoPis+'.codigoSituacaoTributaria';
-	input.value = document.getElementById('codSitTribPIS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoPis+'.quantidadeVendida';
-	input.value = document.getElementById('qtdeVendidaPIS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoPis+'.valor';
-	input.value = document.getElementById('valorPIS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoPis+'.valorBC';
-	input.value = document.getElementById('valorBCPIS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoPis+'.valorAliquota';
-	input.value = document.getElementById('valorAliquotaPIS').value;
-	form.appendChild(input);
+	gerarInputHidden(tipoPis);
 };
 
 function gerarInputCOFINS(){
@@ -363,42 +245,17 @@ function gerarInputCOFINS(){
 	var cofins = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins';
 	var tipoCofins = cofins+'.tipoCofins';
 		
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoCofins+'.aliquota';
-	input.value = document.getElementById('aliquotaCOFINS').value;
-	form.appendChild(input);
 	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoCofins+'.codigoSituacaoTributaria';
-	input.value = document.getElementById('codSitTribCOFINS').value;
-	form.appendChild(input);
-
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoCofins+'.quantidadeVendida';
-	input.value = document.getElementById('qtdeVendidaCOFINS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoCofins+'.valor';
-	input.value = document.getElementById('valorCOFINS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoCofins+'.valorAliquota';
-	input.value = document.getElementById('valorAliquotaCOFINS').value;
-	form.appendChild(input);
-	
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = tipoCofins+'.valorBC';
-	input.value = document.getElementById('valorBCCOFINS').value;
-	form.appendChild(input);
-	
+	var tipoPis = 
+	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi',
+		'campos':[{'nome':'aliquota', 'id':'aliquotaCOFINS'},
+		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribCOFINS'},
+		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaCOFINS'},
+		          {'nome':'valor', 'id':'valorCOFINS'},
+		          {'nome':'valorBC', 'id':'valorBCCOFINS'},
+		          {'nome':'valorAliquota', 'id':'valorAliquotaCOFINS'}
+			]};
+	gerarInputHidden(tipoCofins);	
 };
 
 function gerarInputDuplicata(){
@@ -408,29 +265,18 @@ function gerarInputDuplicata(){
 		return;
 	}
 	
-	var form = document.getElementById('formEmissao');
 	var input = null;
 	var celulas = null;
+	
+	var duplicata = null;
 	for (var i = 0; i < linhas.length; i++) {
 		celulas = linhas[i].cells;
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.cobrancaNFe.listaDuplicata['+i+'].numero';
-		input.value = celulas[0].innerHTML;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.cobrancaNFe.listaDuplicata['+i+'].dataVencimento';
-		input.value = celulas[1].innerHTML;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.cobrancaNFe.listaDuplicata['+i+'].valor';
-		input.value = celulas[2].innerHTML;
-		form.appendChild(input);
+		duplicata = {'nomeObjeto':'nf.cobrancaNFe.listaDuplicata['+i+']',
+			'campos':[{'nome':'numero', 'valor': celulas[0].innerHTML},
+			          {'nome':'dataVencimento', 'valor': celulas[1].innerHTML},
+			          {'nome':'valor', 'valor': celulas[2].innerHTML}
+				]};
+		gerarInputHidden(duplicata);
 	}
 }
 

@@ -58,37 +58,24 @@ $(document).ready(function() {
 	
 	$('#botaoInserirIPI').click(function(){
 		gerarInputIPI();
-		$('#bloco_tributos #bloco_ipi').fadeOut();
+		fecharBlocoImposto('bloco_ipi');
 	});
 	
 	$('#botaoInserirPIS').click(function(){
 		gerarInputPIS();
-		$('#bloco_tributos #bloco_pis').fadeOut();
+		fecharBlocoImposto('bloco_pis');
 	});
 	
 	$('#botaoInserirCOFINS').click(function(){
 		gerarInputCOFINS();
-		$('#bloco_tributos #bloco_cofins').fadeOut();
+		fecharBlocoImposto('bloco_cofins');
 	});
 	
 	$('#bloco_tributos').fadeOut();
 	
-	$('#bloco_tributos #bloco_icms legend').click(function(){
-		return;
-		var innerHTML = $(this).html();
-		if(innerHTML.indexOf('+') != -1){
-			innerHTML = innerHTML.replace(/\+/g, '-');
-			$('#bloco_tributos #bloco_icms div').fadeIn();
-		} else {
-			innerHTML = innerHTML.replace(/\-/g, '+');
-			$('#bloco_tributos #bloco_icms div').fadeOut();
-		}
-		$(this).html(innerHTML);
-	});
-	
 	$('#botaoInserirICMS').click(function(){
 		gerarInputICMS();
-		$('#bloco_tributos #bloco_icms legend').click();
+		fecharBlocoImposto('bloco_icms');
 	});
 	
 	autocompletar({
@@ -135,8 +122,33 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	inserirMascaraDataAmericano('dataVencimentoDuplicata');
-
+	inicializarFadeInBlockImposto('bloco_icms');
+	inicializarFadeInBlockImposto('bloco_ipi');
+	inicializarFadeInBlockImposto('bloco_pis');
+	inicializarFadeInBlockImposto('bloco_cofins');
 });
+
+function abrirBlocoImposto(nomeBloco){
+	$('#bloco_tributos #'+nomeBloco+' div').fadeIn();
+};
+
+function fecharBlocoImposto(nomeBloco){
+	$('#bloco_tributos #'+nomeBloco+' div').fadeOut();
+};
+
+function inicializarFadeInBlockImposto(nomeBloco){
+	$('#bloco_tributos #'+nomeBloco+' legend').click(function(){
+		var innerHTML = $(this).html();
+		if(innerHTML.indexOf('+') != -1){
+			innerHTML = innerHTML.replace(/\+/g, '-');
+			abrirBlocoImposto(nomeBloco);
+		} else {
+			innerHTML = innerHTML.replace(/\-/g, '+');
+			fecharBlocoImposto(nomeBloco);
+		}
+		$(this).html(innerHTML);
+	});
+}
 
 function gerarInputICMS(){
 	var form = document.getElementById('formEmissao');
@@ -145,11 +157,13 @@ function gerarInputICMS(){
 	var produto = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe';
 	var icms = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms';
 	
+	<%--
 	input = document.createElement('input');
 	input.type = 'hidden';
 	input.name = produto+'.cfop';
 	input.value = document.getElementById('cfop').value;
 	form.appendChild(input);
+	--%>
 	
 	input = document.createElement('input');
 	input.type = 'hidden';
@@ -544,7 +558,7 @@ function editarTributos(linha){
 	$('#bloco_tributos #aliquotaIPI').val(celulas[12].innerHTML);
 	
 	$('#bloco_tributos').fadeIn();
-	//$('#bloco_tributos .impostosFieldset div').fadeOut();
+	$('#bloco_tributos .impostosFieldset div').fadeIn();
 };
 </script>
 
@@ -738,10 +752,12 @@ function editarTributos(linha){
 			
 			<fieldset id="bloco_tributos" class="fieldsetInterno">
 				<legend class="fieldsetInterno">::: Tributos :::</legend>
+				<%-- 
 				<div class="label">CFOP:</div>
 				<div class="input" style="width: 80%">
 					<input id="cfop" type="text" name="cfop" style="width: 10%"/>
 				</div>
+				--%>
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
@@ -755,9 +771,9 @@ function editarTributos(linha){
 						</select>
 					</div>
 					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 80%">
 						<select id="tipoTributacaoICMS" 
-							style="width: 80%" class="semprehabilitado">
+							style="width: 77%" class="semprehabilitado">
 							<c:forEach var="icms" items="${listaTipoTributacaoICMS}">
 								<option value="${icms.codigo}">${icms.descricao}</option>
 							</c:forEach>
@@ -822,8 +838,8 @@ function editarTributos(linha){
 						<input id="valorSTICMS" type="text" style="width: 20%" class="semprehabilitado"/>
 					</div>
 					<div class="icms00 label">Mot. Desoneração:</div>
-					<div class="icms00 input" style="width: 70%">
-						<select id="motDesonerICMS" style="width: 60%" class="icms00 semprehabilitado">
+					<div class="icms00 input" style="width: 80%">
+						<select id="motDesonerICMS" style="width: 77%" class="icms00 semprehabilitado">
 							<c:forEach var="motivo" items="${listaTipoMotivoDesoneracao}">
 								<option value="${motivo.codigo}">${motivo.descricao}</option>
 							</c:forEach>
@@ -836,28 +852,27 @@ function editarTributos(linha){
 				</div>
 				
 				<div class="impostosFieldset">
-				<fieldset class="fieldsetInterno">
+				<fieldset id="bloco_ipi" class="fieldsetInterno">
 					<legend>::: IPI ::: +</legend>
-					<div id="bloco_ipi">
 					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 70%">
-						<select id="codSitTribIPI" style="width: 100%" >
+					<div class="input" style="width: 80%">
+						<select id="codSitTribIPI" style="width: 77%" >
 							<c:forEach var="tipo" items="${listaTipoTributacaoIPI}">
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
 							</c:forEach>
 						</select>
 					</div>
 					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="valorBCIPI" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Alíquota:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="aliquotaIPI" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Qtde. unid. Tributável:</div>
-					<div class="input" style="width: 70%">
-						<input id="qtdeUnidTribIPI" type="text" style="width: 100%" />
+					<div class="input" style="width: 30%">
+						<input id="qtdeUnidTribIPI" type="text" style="width: 30%" />
 					</div>
 					<div  class="label">valor Unid. Tributável:</div>
 					<div class="input" style="width: 70%">
@@ -885,7 +900,6 @@ function editarTributos(linha){
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirIPI" title="Inserir IPI do Produto" value="" class="botaoInserir"/>
-					</div>
 					</div>
 				</fieldset>
 				</div>

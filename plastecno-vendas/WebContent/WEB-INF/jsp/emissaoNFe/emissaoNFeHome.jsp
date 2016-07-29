@@ -25,6 +25,10 @@ fieldset .fieldsetInterno {
 fieldset .fieldsetInterno legend {
 	font-size: 10px;
 }
+
+.impostosFieldset {
+	width: 100%;
+}
 </style>
 <script type="text/javascript">
 
@@ -40,16 +44,6 @@ $(document).ready(function() {
 		$('#formPesquisa').submit();
 	});
 	
-	$("#tipoTributacaoICMS").change(function() {
-		if("00" === $(this).val()){
-			$('.icms00').fadeIn();
-			$('.icms10').fadeOut();
-		} else if("10" === $(this).val()){
-			$('.icms10').fadeIn();
-			$('.icms00').fadeOut();
-		} 
-	});
-
 	$("#botaoInserirDuplicata").click(function() {
 		inserirDuplicata();
 	});
@@ -60,11 +54,6 @@ $(document).ready(function() {
 		gerarInputDuplicata();
 		gerarInputProdutoServico();
 		$('#formEmissao').submit();
-	});
-	
-	$('#botaoInserirICMS').click(function(){
-		gerarInputICMS();
-		$('#bloco_tributos #bloco_icms').fadeOut();
 	});
 	
 	$('#botaoInserirIPI').click(function(){
@@ -83,6 +72,24 @@ $(document).ready(function() {
 	});
 	
 	$('#bloco_tributos').fadeOut();
+	
+	$('#bloco_tributos #bloco_icms legend').click(function(){
+		return;
+		var innerHTML = $(this).html();
+		if(innerHTML.indexOf('+') != -1){
+			innerHTML = innerHTML.replace(/\+/g, '-');
+			$('#bloco_tributos #bloco_icms div').fadeIn();
+		} else {
+			innerHTML = innerHTML.replace(/\-/g, '+');
+			$('#bloco_tributos #bloco_icms div').fadeOut();
+		}
+		$(this).html(innerHTML);
+	});
+	
+	$('#botaoInserirICMS').click(function(){
+		gerarInputICMS();
+		$('#bloco_tributos #bloco_icms legend').click();
+	});
 	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
@@ -537,6 +544,7 @@ function editarTributos(linha){
 	$('#bloco_tributos #aliquotaIPI').val(celulas[12].innerHTML);
 	
 	$('#bloco_tributos').fadeIn();
+	//$('#bloco_tributos .impostosFieldset div').fadeOut();
 };
 </script>
 
@@ -735,19 +743,19 @@ function editarTributos(linha){
 					<input id="cfop" type="text" name="cfop" style="width: 10%"/>
 				</div>
 				
+				<div class="impostosFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
-					<legend>::: ICMS :::</legend>
+					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS ::: +</legend>
 					<div class="label">Regime:</div>
-					<div class="input" style="width: 10%">
-						<select id="pedidoAssociado" 
-							style="width: 100%" class="semprehabilitado">
+					<div class="input" style="width: 80%">
+						<select style="width: 20%" class="semprehabilitado">
 							<c:forEach var="icms" items="${listaRegime}">
 								<option value="${icms.codigo}">${icms.descricao}</option>
 							</c:forEach>
 						</select>
 					</div>
 					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 50%">
+					<div class="input" style="width: 70%">
 						<select id="tipoTributacaoICMS" 
 							style="width: 80%" class="semprehabilitado">
 							<c:forEach var="icms" items="${listaTipoTributacaoICMS}">
@@ -756,7 +764,7 @@ function editarTributos(linha){
 						</select>
 					</div>
 					<div class="label">Origem:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 25%">
 						<select id="pedidoAssociado" 
 							style="width: 100%" class="semprehabilitado">
 							<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
@@ -766,56 +774,56 @@ function editarTributos(linha){
 					</div>
 					
 					<div class="icms00 label">Modalidade:</div>
-					<div class="icms00 input" style="width: 70%">
-						<select id="modBCICMS" style="width: 100%" class="icms00 semprehabilitado">
+					<div class="icms00 input" style="width: 30%">
+						<select id="modBCICMS" style="width: 65%" class="icms00 semprehabilitado">
 							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMS}">
 								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
 							</c:forEach>
 						</select>
 					</div>
 					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input type="text" id="valorBCICMS" style="width: 100%" class="semprehabilitado"/>
 					</div>
 					<div  class="label">Alíquota:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input type="text" id="aliquotaICMS" style="width: 100%" class="semprehabilitado"/>
 					</div>
 					<div  class="label">Valor:</div>
-					<div class="input" style="width: 70%">
-						<input type="text" id="valorICMS" style="width: 100%" class="semprehabilitado"/>
+					<div class="input" style="width: 30%">
+						<input type="text" id="valorICMS" style="width: 30%" class="semprehabilitado"/>
 					</div>
 					<div class="icms00 label">Modalidade ST:</div>
 					<div class="icms00 input" style="width: 70%">
-						<select id="modBCSTICMS" style="width: 100%" class="icms00 semprehabilitado">
+						<select id="modBCSTICMS" style="width: 30%" class="icms00 semprehabilitado">
 							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMSST}">
 								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
 							</c:forEach>
 						</select>
 					</div>
 					<div  class="label">Perc. Marg. Valor ST:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="percValSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
 					</div>
 					<div  class="label">Perc. Redução BC ST:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="percRedBCSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
 					</div>
 					<div  class="label">Valor BC ST:</div>
-					<div class="input" style="width: 70%">
-						<input id="valorBCSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
+					<div class="input" style="width: 30%">
+						<input id="valorBCSTICMS" type="text" style="width: 30%" class="semprehabilitado"/>
 					</div>
 					<div  class="label">Alíquota ST:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="aliquotaSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
 					</div>
 					<div  class="label">Valor ST:</div>
-					<div class="input" style="width: 70%">
-						<input id="valorSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
+					<div class="input" style="width: 50%">
+						<input id="valorSTICMS" type="text" style="width: 20%" class="semprehabilitado"/>
 					</div>
 					<div class="icms00 label">Mot. Desoneração:</div>
 					<div class="icms00 input" style="width: 70%">
-						<select id="motDesonerICMS" style="width: 100%" class="icms00 semprehabilitado">
+						<select id="motDesonerICMS" style="width: 60%" class="icms00 semprehabilitado">
 							<c:forEach var="motivo" items="${listaTipoMotivoDesoneracao}">
 								<option value="${motivo.codigo}">${motivo.descricao}</option>
 							</c:forEach>
@@ -825,9 +833,11 @@ function editarTributos(linha){
 						<input type="button" id="botaoInserirICMS" title="Inserir ICMS do Produto" value="" class="botaoInserir"/>
 					</div>
 				</fieldset>
+				</div>
 				
+				<div class="impostosFieldset">
 				<fieldset class="fieldsetInterno">
-					<legend>::: IPI :::</legend>
+					<legend>::: IPI ::: +</legend>
 					<div id="bloco_ipi">
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 70%">
@@ -878,9 +888,11 @@ function editarTributos(linha){
 					</div>
 					</div>
 				</fieldset>
+				</div>
 				
+				<div class="impostosFieldset">
 				<fieldset id="bloco_pis" class="fieldsetInterno">
-					<legend>::: PIS :::</legend>
+					<legend>::: PIS ::: +</legend>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 70%">
 						<select id="codSitTribPIS" 
@@ -914,9 +926,11 @@ function editarTributos(linha){
 						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
 					</div>
 				</fieldset>
+				</div>
 				
+				<div class="impostosFieldset">
 				<fieldset id="bloco_cofins" class="fieldsetInterno">
-					<legend>::: COFINS :::</legend>
+					<legend>::: COFINS ::: +</legend>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 70%">
 						<select id="codSitTribCOFINS" style="width: 100%">
@@ -949,6 +963,64 @@ function editarTributos(linha){
 						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
 					</div>
 				</fieldset>
+				</div>
+				
+				<fieldset class="fieldsetInterno">
+					<legend>::: Valores Totais :::</legend>
+					<div class="label">Valor BC:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorBCICMSTotal"/>
+					</div>
+					<div class="label">Valor Total:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorTotalICMS"/>
+					</div>
+					<div class="label">Valor BC ST:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorBCSTICMSTotal"/>
+					</div>
+					<div class="label">Valor Total ST:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorTotalICMSST"/>
+					</div>
+					<div class="label">Valor Total Prod. Serv.:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorProdServ"/>
+					</div>
+					<div class="label">Valor Total Frete:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorTotalFrete"/>
+					</div>
+					<div class="label">Valor Total Seguro:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorTotalSeguro"/>
+					</div>
+					<div class="label">Valor Total Desconto:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorTotalDesconto"/>
+					</div>
+					<div class="label">Valor Total Imp. Import.:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorTotalImpImport"/>
+					</div>
+					<div class="label">Valor Total IPI:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorTotalIPI"/>
+					</div>
+					<div class="label">Valor Total PIS:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorTotalPIS"/>
+					</div>
+					<div class="label">Valor Total COFINS:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorTotalCOFINS"/>
+					</div>
+					<div class="label">Outras Desp. Acessórias:</div>
+					<div class="input" style="width: 70%">
+						<input type="text" id="valorTotalOutrasDesp"/>
+					</div>
+				</fieldset>
+			
 			</fieldset>
 		</fieldset>	
 		

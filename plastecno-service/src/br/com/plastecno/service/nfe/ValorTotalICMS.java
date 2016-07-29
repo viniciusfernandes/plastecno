@@ -5,30 +5,43 @@ import javax.xml.bind.annotation.XmlElement;
 public class ValorTotalICMS {
 	@XmlElement(name = "vBC")
 	private Double valorBaseCalculo;
+
 	@XmlElement(name = "vBCST")
 	private Double valorBaseCalculoST;
+
 	@XmlElement(name = "vOutro")
 	private Double valorOutrasDespesasAcessorias;
+
 	@XmlElement(name = "vICMS")
 	private Double valorTotal;
+
 	@XmlElement(name = "vCOFINS")
 	private Double valorTotalCOFINS;
+
 	@XmlElement(name = "vDesc")
 	private Double valorTotalDesconto;
+
 	@XmlElement(name = "vFrete")
 	private Double valorTotalFrete;
+
 	@XmlElement(name = "vII")
 	private Double valorTotalII;
+
 	@XmlElement(name = "vIPI")
 	private Double valorTotalIPI;
+
 	@XmlElement(name = "vNF")
 	private Double valorTotalNF;
+
 	@XmlElement(name = "vPIS")
 	private Double valorTotalPIS;
+
 	@XmlElement(name = "vProd")
 	private Double valorTotalProdutosServicos;
+
 	@XmlElement(name = "vSeg")
 	private Double valorTotalSeguro;
+
 	@XmlElement(name = "vST")
 	private Double valorTotalST;
 
@@ -40,7 +53,8 @@ public class ValorTotalICMS {
 		this.valorBaseCalculoST = valorBaseCalculoST;
 	}
 
-	public void setValorOutrasDespesasAcessorias(Double valorOutrasDespesasAcessorias) {
+	public void setValorOutrasDespesasAcessorias(
+			Double valorOutrasDespesasAcessorias) {
 		this.valorOutrasDespesasAcessorias = valorOutrasDespesasAcessorias;
 	}
 

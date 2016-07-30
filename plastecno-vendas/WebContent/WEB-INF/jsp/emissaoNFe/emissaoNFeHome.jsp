@@ -78,6 +78,26 @@ $(document).ready(function() {
 		fecharBlocoImposto('bloco_icms');
 	});
 	
+	$('#botaoLimparICMS').click(function(){
+		removerInputHidden(gerarJsonTipoIcms());
+		fecharBlocoImposto('bloco_icms');
+	});
+	
+	$('#botaoLimparIPI').click(function(){
+		removerInputHidden(gerarJsonTipoIpi());
+		fecharBlocoImposto('bloco_ipi');
+	});
+	
+	$('#botaoLimparPIS').click(function(){
+		removerInputHidden(gerarJsonTipoPis());
+		fecharBlocoImposto('bloco_pis');
+	});
+	
+	$('#botaoLimparCOFINS').click(function(){
+		removerInputHidden(gerarJsonTipoCofins());
+		fecharBlocoImposto('bloco_cofins');
+	});
+	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
 		campoPesquisavel : 'nomeCliente',
@@ -122,87 +142,110 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	inserirMascaraDataAmericano('dataVencimentoDuplicata');
-	inicializarFadeInBlockImposto('bloco_icms');
-	inicializarFadeInBlockImposto('bloco_ipi');
-	inicializarFadeInBlockImposto('bloco_pis');
-	inicializarFadeInBlockImposto('bloco_cofins');
+	inicializarFadeInBlocoImposto('bloco_icms');
+	inicializarFadeInBlocoImposto('bloco_ipi');
+	inicializarFadeInBlocoImposto('bloco_pis');
+	inicializarFadeInBlocoImposto('bloco_cofins');
 });
 
+function gerarLegendaBloco(nomeBloco){
+	var legend = $('#bloco_tributos #'+nomeBloco+' legend');
+	var innerHTML = $(legend).html();
+	if(innerHTML.indexOf('+') != -1){
+		innerHTML = innerHTML.replace(/\+/g, '-');
+	} else {
+		innerHTML = innerHTML.replace(/\-/g, '+');
+	}
+	$(legend).html(innerHTML);
+};
+
 function abrirBlocoImposto(nomeBloco){
+	gerarLegendaBloco(nomeBloco);
 	$('#bloco_tributos #'+nomeBloco+' div').fadeIn();
 };
 
 function fecharBlocoImposto(nomeBloco){
+	gerarLegendaBloco(nomeBloco);
 	$('#bloco_tributos #'+nomeBloco+' div').fadeOut();
 };
 
-function inicializarFadeInBlockImposto(nomeBloco){
+function inicializarLegendaBlocoImposto(nomeBloco){
+	var legend = $('#bloco_tributos #'+nomeBloco+' legend');
+	legend.html(legend.html().replace(/\+/g, '-'));
+	$('#bloco_tributos #'+nomeBloco+' div').fadeIn();
+};
+
+function inicializarFadeInBlocoImposto(nomeBloco){
 	$('#bloco_tributos #'+nomeBloco+' legend').click(function(){
 		var innerHTML = $(this).html();
 		if(innerHTML.indexOf('+') != -1){
-			innerHTML = innerHTML.replace(/\+/g, '-');
 			abrirBlocoImposto(nomeBloco);
 		} else {
-			innerHTML = innerHTML.replace(/\-/g, '+');
 			fecharBlocoImposto(nomeBloco);
 		}
-		$(this).html(innerHTML);
 	});
-}
+};
 
-function gerarCamposICMS(){
-	
-}
+function removerInputHidden(objeto){
+	var form = document.getElementById('formEmissao');
+	var input = null;
+	var campos = objeto.campos;
+	var id = null;
+	for (var i = 0; i < campos.length; i++) {
+		id = objeto.nomeObjeto +'.'+campos[i].nome;
+		if((input = document.getElementById(id)) == undefined){
+			continue;
+		}
+		form.removeChild(input);	
+	};
+};
 
 function gerarInputHidden(objeto){
 	var form = document.getElementById('formEmissao');
 	var input = null;
 	var campos = objeto.campos;
-	
+	var nome = null;
 	for (var i = 0; i < campos.length; i++) {
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = objeto.nomeObjeto +'.'+campos[i].nome;
+		nome = objeto.nomeObjeto +'.'+campos[i].nome;
+		<%-- Devemos verificar  se o input ja foi criado pelo usuario, caso nao existe devemos cria-lo--%>
+		if((input = document.getElementById(nome)) == undefined){
+			input = document.createElement('input');
+			input.type = 'hidden';
+			input.name = nome;
+			<%-- Estamos usando o fato de que os parametros enviados ao servidor tem um unico nome, por exemplo o primeiro e o segundo elemento de uma lista 
+			contendo o atributo situacao tributaria sera enviado como nf.listaItem[0].situacaoTributaria e nf.listaItem[1].situacaoTributaria, e devem ser unicos 
+			para que os parametros da nfe sejam preenchidos corretamente, com isso podemos usar como id --%>
+			input.id = nome;
+			form.appendChild(input);
+		} 
 		
 		if(campos[i].valor == undefined) {
 			input.value = document.getElementById(campos[i].id).value;
 		} else {
 			input.value = campos[i].valor;
 		}
-		
-		form.appendChild(input)	
 	};
-}
+};
 
+function gerarJsonTipoIcms(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms',
+		'campos':[{'nome':'codigoSituacaoTributaria', 'id':'tipoTributacaoICMS'},
+		          {'nome':'aliquota', 'id':'aliquotaICMS'},
+		          {'nome':'valor', 'id':'valorICMS'},
+		          {'nome':'modalidadeDeterminacaoBC', 'id':'modBCICMS'},
+		          {'nome':'modalidadeDeterminacaoBCST', 'id':'modBCSTICMS'},
+		          {'nome':'percentualMargemValorAdicionadoICMSST', 'id':'percValSTICMS'},
+		          {'nome':'percentualReducaoBC', 'id':'percRedBCSTICMS'},
+		          {'nome':'valorBC', 'id':'valorBCICMS'},
+		          {'nome':'valorBCST', 'id':'valorBCSTICMS'},
+		          {'nome':'aliquotaST', 'id':'aliquotaSTICMS'},
+		          {'nome':'valorST', 'id':'valorSTICMS'},
+		          {'nome':'motivoDesoneracao', 'id':'motDesonerICMS'}
+			]};
+};
 
-function gerarInputICMS(){
-	var tipoIcms = 
-		{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms',
-			'campos':[{'nome':'codigoSituacaoTributaria', 'id':'tipoTributacaoICMS'},
-			          {'nome':'aliquota', 'id':'aliquotaICMS'},
-			          {'nome':'valor', 'id':'valorICMS'},
-			          {'nome':'modalidadeDeterminacaoBC', 'id':'modBCICMS'},
-			          {'nome':'modalidadeDeterminacaoBCST', 'id':'modBCSTICMS'},
-			          {'nome':'percentualMargemValorAdicionadoICMSST', 'id':'percValSTICMS'},
-			          {'nome':'percentualReducaoBC', 'id':'percRedBCSTICMS'},
-			          {'nome':'valorBC', 'id':'valorBCICMS'},
-			          {'nome':'valorBCST', 'id':'valorBCSTICMS'},
-			          {'nome':'aliquotaST', 'id':'aliquotaSTICMS'},
-			          {'nome':'valorST', 'id':'valorSTICMS'},
-			          {'nome':'motivoDesoneracao', 'id':'motDesonerICMS'}
-				]};
-	
-	var produto = 
-	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe',
-		'campos':[{'nome':'cfop', 'id':'cfop'}]};
-	
-	gerarInputHidden(tipoIcms);
-	gerarInputHidden(produto);
-}
-
-function gerarInputIPI(){
-	var tipoIpi = 
-	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi.tipoIcms',
+function gerarJsonTipoIpi(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi.tipoIpi',
 		'campos':[{'nome':'aliquota', 'id':'aliquotaIPI'},
 		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribIPI'},
 		          {'nome':'valor', 'id':'valorBCIPI'},
@@ -210,7 +253,42 @@ function gerarInputIPI(){
 		          {'nome':'quantidadeUnidadeTributavel', 'id':'qtdeUnidTribIPI'},
 		          {'nome':'valorUnidadeTributavel', 'id':'valorUnidTribIPI'}
 			]};
+};
+
+function gerarJsonTipoCofins(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins.tipoCofins',
+		'campos':[{'nome':'aliquota', 'id':'aliquotaCOFINS'},
+		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribCOFINS'},
+		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaCOFINS'},
+		          {'nome':'valor', 'id':'valorCOFINS'},
+		          {'nome':'valorBC', 'id':'valorBCCOFINS'},
+		          {'nome':'valorAliquota', 'id':'valorAliquotaCOFINS'}
+			]};
+};
+
+function gerarJsonTipoPis(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis',
+		'campos':[{'nome':'aliquota', 'id':'aliquotaPIS'},
+		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribPIS'},
+		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaPIS'},
+		          {'nome':'valor', 'id':'valorPIS'},
+		          {'nome':'valorBC', 'id':'valorBCPIS'},
+		          {'nome':'valorAliquota', 'id':'valorAliquotaPIS'}
+			]};
+};
+
+function gerarInputICMS(){
+	var tipoIcms = gerarJsonTipoIcms();
+	var produto = {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe',
+		'campos':[{'nome':'cfop', 'id':'cfop'}]};
 	
+	gerarInputHidden(tipoIcms);
+	//gerarInputHidden(produto);
+};
+
+
+function gerarInputIPI(){
+	var tipoIpi = gerarJsonTipoIpi();
 	var ipi = 
 	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi',
 		'campos':[{'nome':'classeEnquadramento', 'id':'clEnquadramentoIPI'},
@@ -225,36 +303,12 @@ function gerarInputIPI(){
 };
 
 function gerarInputPIS(){
-	var tipoPis = 
-	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis',
-		'campos':[{'nome':'aliquota', 'id':'aliquotaPIS'},
-		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribPIS'},
-		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaPIS'},
-		          {'nome':'valor', 'id':'valorPIS'},
-		          {'nome':'valorBC', 'id':'valorBCPIS'},
-		          {'nome':'valorAliquota', 'id':'valorAliquotaPIS'}
-			]};
-	
+	var tipoPis = gerarJsonTipoPis();
 	gerarInputHidden(tipoPis);
 };
 
 function gerarInputCOFINS(){
-	var form = document.getElementById('formEmissao');
-	var input = null;
-
-	var cofins = 'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins';
-	var tipoCofins = cofins+'.tipoCofins';
-		
-	
-	var tipoPis = 
-	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi',
-		'campos':[{'nome':'aliquota', 'id':'aliquotaCOFINS'},
-		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribCOFINS'},
-		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaCOFINS'},
-		          {'nome':'valor', 'id':'valorCOFINS'},
-		          {'nome':'valorBC', 'id':'valorBCCOFINS'},
-		          {'nome':'valorAliquota', 'id':'valorAliquotaCOFINS'}
-			]};
+	var tipoCofins = gerarJsonTipoCofins();
 	gerarInputHidden(tipoCofins);	
 };
 
@@ -278,7 +332,7 @@ function gerarInputDuplicata(){
 				]};
 		gerarInputHidden(duplicata);
 	}
-}
+};
 
 function gerarInputProdutoServico(){
 	var tabela = document.getElementById('tabela_produtos');
@@ -311,7 +365,7 @@ function gerarInputProdutoServico(){
 		gerarInputHidden(detalhamento);
 		gerarInputHidden(produto);
 	}
-}
+};
 
 function inserirDuplicata(){
 	var numero = $('#bloco_duplicata #numeroDuplicata').val();
@@ -331,17 +385,17 @@ function inserirDuplicata(){
 	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerDuplicata(this);"/>';
 	
 	$('#bloco_duplicata input:text').val('');
-}
+};
 
 function removerDuplicata(botao){
 	 var linha = $(botao).closest("tr")[0];
 	 document.getElementById('tabela_duplicata').deleteRow(linha.rowIndex);
-}
+};
 
 function inicializarFiltro() {
 	$("#filtroSigla").val($("#sigla").val());
 	$("#filtroDescricao").val($("#descricao").val());	
-}
+};
 
 function inicializarModalCancelamento(botao){
 	inicializarModalConfirmacao({
@@ -350,7 +404,7 @@ function inicializarModalCancelamento(botao){
 			$(botao).closest('form').submit();	
 		}
 	});
-}
+};
 
 function editarTributos(linha){
 	var celulas = linha.cells;
@@ -368,7 +422,10 @@ function editarTributos(linha){
 	$('#bloco_tributos #aliquotaIPI').val(celulas[12].innerHTML);
 	
 	$('#bloco_tributos').fadeIn();
-	$('#bloco_tributos .impostosFieldset div').fadeIn();
+	inicializarLegendaBlocoImposto('bloco_icms');
+	inicializarLegendaBlocoImposto('bloco_ipi');
+	inicializarLegendaBlocoImposto('bloco_pis');
+	inicializarLegendaBlocoImposto('bloco_cofins');
 };
 </script>
 
@@ -571,7 +628,7 @@ function editarTributos(linha){
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
-					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS ::: -</legend>
+					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS ::: +</legend>
 					<div class="label">Regime:</div>
 					<div class="input" style="width: 80%">
 						<select style="width: 20%" class="semprehabilitado">
@@ -657,13 +714,14 @@ function editarTributos(linha){
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirICMS" title="Inserir ICMS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparICMS" title="Limpar ICMS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
 				</div>
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_ipi" class="fieldsetInterno">
-					<legend>::: IPI ::: -</legend>
+					<legend>::: IPI ::: +</legend>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribIPI" style="width: 45%" >
@@ -710,13 +768,14 @@ function editarTributos(linha){
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirIPI" title="Inserir IPI do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparIPI" title="Limpar IPI do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
 				</div>
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_pis" class="fieldsetInterno">
-					<legend>::: PIS ::: -</legend>
+					<legend>::: PIS ::: +</legend>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribPIS" style="width: 45%">
@@ -747,13 +806,14 @@ function editarTributos(linha){
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparPIS" title="Limpar PIS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
 				</div>
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_cofins" class="fieldsetInterno">
-					<legend>::: COFINS ::: -</legend>
+					<legend>::: COFINS ::: +</legend>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribCOFINS" style="width: 45%">
@@ -784,6 +844,7 @@ function editarTributos(linha){
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
 				</div>

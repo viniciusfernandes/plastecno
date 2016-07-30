@@ -1,5 +1,6 @@
 package br.com.plastecno.service.impl;
 
+import java.io.File;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -181,11 +182,13 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public void gerarXMLNfe(NFe nFe) throws BusinessException {
 		try {
+			File xml = new File(System.getProperty("java.io.tmpdir")+"nfe.xml");
 			JAXBContext context = JAXBContext.newInstance(NFe.class);
 			Marshaller m = context.createMarshaller();
 			// for pretty-print XML in JAXB
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			m.marshal(nFe, xml);
 			m.marshal(nFe, System.out);
 		} catch (Exception e) {
 			throw new BusinessException(

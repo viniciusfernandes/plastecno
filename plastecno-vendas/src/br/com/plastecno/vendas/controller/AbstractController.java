@@ -229,9 +229,12 @@ public abstract class AbstractController {
         }
     }
 
-    Download gerarDownload(byte[] bytesArquivo, String nomeArquivo) {
-        final String contentType = "application/pdf;";
+    Download gerarDownload(byte[] bytesArquivo, String nomeArquivo, String contentType) {
         return new ByteArrayDownload(bytesArquivo, contentType, StringUtils.removerAcentuacao(nomeArquivo));
+    }
+
+    Download gerarDownloadPDF(byte[] bytesArquivo, String nomeArquivo) {
+        return gerarDownload(bytesArquivo, nomeArquivo, "application/pdf;");
     }
 
     void gerarListaMensagemAjax(String mensagem, String categoria) {
@@ -533,7 +536,6 @@ public abstract class AbstractController {
     boolean isElementosNaoAssociadosPreenchidosPicklist() {
         return this.picklist.isElementosNaoAssociadosPreenchidos();
     }
-
 
     /*
      * Esse metodo ja garante que o usuario sera navegado para o rodape da

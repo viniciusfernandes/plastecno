@@ -1,5 +1,9 @@
 package br.com.plastecno.vendas.controller;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
@@ -43,6 +47,10 @@ public class EmissaoNFeController extends AbstractController {
         this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
     }
 
+    public void nfexml(String xml) {
+        addAtributo("xml", xml);
+    }
+
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
         addAtributo("listaTipoFinalidadeEmissao", TipoFinalidadeEmissao.values());
@@ -73,7 +81,26 @@ public class EmissaoNFeController extends AbstractController {
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
+        // redirecTo(this.getClass()).nfexml(lerXML());
         irTopoPagina();
+    }
+
+    private String lerXML() {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(new File(System.getProperty("java.io.tmpdir")
+                    + "nfe.xml")));
+            String l = null;
+            StringBuilder xml = new StringBuilder();
+            while ((l = br.readLine()) != null) {
+                xml.append(l);
+            }
+            br.close();
+            return xml.toString();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Get("emissaoNFe/pedido")

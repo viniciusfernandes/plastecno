@@ -178,7 +178,7 @@ public class PedidoController extends AbstractController {
                     .append("No. ").append(idPedido).append(" - ").append(pedido.getCliente().getNomeFantasia())
                     .append(".pdf");
 
-            return gerarDownload(wrapper.getArquivoPDF(), titulo.toString());
+            return gerarDownloadPDF(wrapper.getArquivoPDF(), titulo.toString());
         } catch (Exception e) {
             this.gerarLogErro("geração do relatório de pedido", e);
             // Estamos retornando null porque no caso de falhas nao devemos

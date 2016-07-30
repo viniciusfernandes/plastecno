@@ -8,6 +8,7 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
@@ -47,8 +48,9 @@ public class EmissaoNFeController extends AbstractController {
         this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
     }
 
-    public void nfexml(String xml) {
-        addAtributo("xml", xml);
+    public Download nfexml(String xml) {
+        emissaoNFeHome();
+        return gerarDownload(xml.getBytes(), "nfe.xml", "application/octet-stream");
     }
 
     @Get("emissaoNFe")
@@ -81,8 +83,8 @@ public class EmissaoNFeController extends AbstractController {
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
-        // redirecTo(this.getClass()).nfexml(lerXML());
-        irTopoPagina();
+        redirecTo(this.getClass()).nfexml(lerXML());
+        // irTopoPagina();
     }
 
     private String lerXML() {
@@ -92,7 +94,7 @@ public class EmissaoNFeController extends AbstractController {
             String l = null;
             StringBuilder xml = new StringBuilder();
             while ((l = br.readLine()) != null) {
-                xml.append(l);
+                xml.append(l).append("\n");
             }
             br.close();
             return xml.toString();

@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.*;
@@ -26,6 +27,14 @@ public class IPI {
 
 	@XmlElement(name = "qSelo")
 	private Integer quantidadeSeloControle;
+
+	@XmlTransient
+	private IPIGeral tipoIpi;
+
+	@XmlTransient
+	public IPIGeral getTipoIpi() {
+		return tipoIpi;
+	}
 
 	public void setClasseEnquadramento(String classeEnquadramento) {
 		this.classeEnquadramento = classeEnquadramento;
@@ -70,9 +79,10 @@ public class IPI {
 
 		if (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t)
 				|| IPI_99.equals(t)) {
-			this.ipiTrib = tipoIpi;
+			ipiTrib = tipoIpi;
 		} else {
-			this.ipiNt = tipoIpi;
+			ipiNt = tipoIpi;
 		}
+		this.tipoIpi = tipoIpi;
 	}
 }

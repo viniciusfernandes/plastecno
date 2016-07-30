@@ -1,6 +1,8 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.*;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
 
@@ -17,6 +19,13 @@ public class COFINS {
 	@XmlElement(name = "COFINSQtde")
 	private COFINSGeral cofinsQuantidade;
 
+	@XmlTransient
+	private COFINSGeral tipoConfins;
+
+	public COFINSGeral getTipoConfins() {
+		return tipoConfins;
+	}
+
 	public void setTipoCofins(COFINSGeral tipoCofins) {
 		TipoTributacaoCOFINS tribut = tipoCofins.getTipoTributacao();
 
@@ -31,5 +40,10 @@ public class COFINS {
 		} else if (COFINS_99.equals(tribut)) {
 			cofinsOutrasOperacoes = tipoCofins;
 		}
+		this.tipoConfins = tipoCofins;
+	}
+
+	public void setTipoConfins(COFINSGeral tipoConfins) {
+		this.tipoConfins = tipoConfins;
 	}
 }

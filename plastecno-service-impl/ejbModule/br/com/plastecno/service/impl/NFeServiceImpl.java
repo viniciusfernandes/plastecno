@@ -15,19 +15,22 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.entity.Cliente;
-import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.COFINSGeral;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
-import br.com.plastecno.service.nfe.ICMS;
 import br.com.plastecno.service.nfe.ICMSGeral;
+import br.com.plastecno.service.nfe.IPIGeral;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.IdentificacaoEmitenteNFe;
 import br.com.plastecno.service.nfe.NFe;
+import br.com.plastecno.service.nfe.PISGeral;
 import br.com.plastecno.service.nfe.ProdutoServicoNFe;
 import br.com.plastecno.service.nfe.TributosProdutoServico;
+import br.com.plastecno.service.nfe.ValorTotalICMS;
+import br.com.plastecno.service.nfe.ValoresTotaisNFe;
 
 @Stateless
 public class NFeServiceImpl implements NFeService {
@@ -41,54 +44,78 @@ public class NFeServiceImpl implements NFeService {
 	@EJB
 	private RepresentadaService representadaService;
 
-	private void carregarDetalhamentoProdutoServico(NFe nFe, Integer idPedido) {
-		List<ItemPedido> listaItem = pedidoService
-				.pesquisarItemPedidoByIdPedido(idPedido);
-		DetalhamentoProdutoServicoNFe d = null;
-		ProdutoServicoNFe p = null;
-		String descricao;
-		TributosProdutoServico t = null;
+	private void calcularValoresTotaisICMS(NFe nFe) {
+		ValoresTotaisNFe valoresTotaisNFe = nFe.getValoresTotaisNFe();
+		ValorTotalICMS valorTotalICMS = new ValorTotalICMS();
+		List<DetalhamentoProdutoServicoNFe> listaItem = nFe
+				.getListaDetalhamentoProdutoServicoNFe();
 
-		for (ItemPedido i : listaItem) {
+		ICMSGeral tipoIcms = null;
+		IPIGeral tipoIpi = null;
+		PISGeral tipoPis = null;
+		COFINSGeral tipoCofins = null;
+		ProdutoServicoNFe produto = null;
+		TributosProdutoServico tributo = null;
+		double valorBC = 0;
+		double valorBCST = 0;
+		double valor = 0;
+		double valorSeguro = 0;
+		double valorFrete = 0;
+		double valorImportacao = 0;
+		double valorIPI = 0;
+		double valorPIS = 0;
+		double valorCOFINS = 0;
+		for (DetalhamentoProdutoServicoNFe item : listaItem) {
+			tributo = item.getTributosProdutoServico();
+			if (tributo != null && tributo.contemICMS()) {
+				tipoIcms = item.getTributosProdutoServico().getTipoIcms();
+				valorBC += tipoIcms.getValorBC() == null ? 0 : tipoIcms
+						.getValorBC();
+				valorBCST += tipoIcms.getValorBCST() == null ? 0 : tipoIcms
+						.getValorBCST();
+				valor += tipoIcms.getValor() == null ? 0 : tipoIcms.getValor();
+			}
 
-			d = new DetalhamentoProdutoServicoNFe();
-			p = new ProdutoServicoNFe();
-			t = new TributosProdutoServico();
+			if (tributo != null && tributo.contemIPI()) {
+				tipoIpi = tributo.getTipoIpi();
+				valorIPI += tipoIpi.getValor() == null ? 0 : tipoIpi.getValor();
+			}
 
-			descricao = i.getDescricaoSemFormatacao();
+			if (tributo != null && tributo.contemPIS()) {
+				tipoPis = tributo.getTipoPis();
+				valorPIS += tipoPis.getValor() == null ? 0 : tipoPis.getValor();
+			}
 
-			p.setNumeroPedidoCompra(idPedido.toString());
-			p.setItemPedidoCompra(i.getSequencial());
-			p.setCfop(null);
-			p.setCodigo(descricao);
-			p.setDescricao(descricao);
-			p.setNcm(i.getNcm() != null ? i.getNcm().replaceAll("\\.", "")
-					: null);
-			p.setQuantidadeComercial(i.getQuantidade());
-			p.setQuantidadeTributavel(i.getQuantidade());
-			p.setUnidadeComercial(i.getTipoVenda().toString());
-			p.setUnidadeTributavel(i.getTipoVenda().toString());
+			if (tributo != null && tributo.contemCOFINS()) {
+				tipoCofins = tributo.getTipoCofins();
+				valorPIS += tipoCofins.getValor() == null ? 0 : tipoCofins
+						.getValor();
+			}
 
-			carregarICMS(t, i);
-			carregarIPI(t, i);
+			produto = item.getProdutoServicoNFe();
+			valorSeguro += produto.getValorTotalSeguro() == null ? 0 : produto
+					.getValorTotalSeguro();
 
-			d.setProdutoServicoNFe(p);
-			d.setTributosProdutoServico(t);
-
-			nFe.addDetalhamentoProdutoServico(d);
+			valorFrete += produto.getValorTotalFrete() == null ? 0 : produto
+					.getValorTotalFrete();
+			if (tributo != null && tributo.contemImpostoImportacao()) {
+				valorImportacao += tributo.getImpostoImportacao()
+						.getValorImpostoImportacao() == null ? 0 : tributo
+						.getImpostoImportacao().getValorImpostoImportacao();
+			}
 		}
-	}
 
-	private void carregarICMS(TributosProdutoServico t, ItemPedido i) {
-		ICMS icms = null;
-		ICMSGeral icms00 = new ICMSGeral();
-		icms = new ICMS();
+		valorTotalICMS.setValorBaseCalculo(valorBC);
+		valorTotalICMS.setValorBaseCalculoST(valorBCST);
+		valorTotalICMS.setValorTotal(valor);
+		valorTotalICMS.setValorTotalFrete(valorFrete);
+		valorTotalICMS.setValorTotalII(valorImportacao);
+		valorTotalICMS.setValorTotalIPI(valorIPI);
+		valorTotalICMS.setValorTotalSeguro(valorSeguro);
+		valorTotalICMS.setValorTotalPIS(valorPIS);
+		valorTotalICMS.setValorTotalCOFINS(valorCOFINS);
 
-		icms00.setAliquota(i.getAliquotaICMS());
-		icms00.setValorBC(i.calcularPrecoTotal());
-		icms00.setValor(i.calcularValorICMS());
-		//icms.setICMSIntegral(icms00);
-		//t.setICMS(icms);
+		valoresTotaisNFe.setValorTotalICMS(valorTotalICMS);
 	}
 
 	@Override
@@ -134,12 +161,11 @@ public class NFeServiceImpl implements NFeService {
 		return nFe;
 	}
 
-	private void carregarIPI(TributosProdutoServico t, ItemPedido i) {
-	}
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public void emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
+		nFe.setValoresTotaisNFe(new ValoresTotaisNFe());
+		calcularValoresTotaisICMS(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
 		gerarXMLNfe(nFe);
 	}
@@ -174,7 +200,6 @@ public class NFeServiceImpl implements NFeService {
 		NFe nFe = new NFe();
 
 		carregarIdentificacaoEmitente(nFe, idPedido);
-		carregarDetalhamentoProdutoServico(nFe, idPedido);
 		return nFe;
 	}
 
@@ -182,14 +207,13 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public void gerarXMLNfe(NFe nFe) throws BusinessException {
 		try {
-			File xml = new File(System.getProperty("java.io.tmpdir")+"nfe.xml");
 			JAXBContext context = JAXBContext.newInstance(NFe.class);
 			Marshaller m = context.createMarshaller();
 			// for pretty-print XML in JAXB
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-			m.marshal(nFe, xml);
-			m.marshal(nFe, System.out);
+			m.marshal(nFe, new File(System.getProperty("java.io.tmpdir")
+					+ "nfe.xml"));
 		} catch (Exception e) {
 			throw new BusinessException(
 					"Falha na geracao do XML da NFe do pedido No. ", e);

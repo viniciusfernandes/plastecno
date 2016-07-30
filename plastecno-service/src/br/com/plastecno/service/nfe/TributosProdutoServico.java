@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 public class TributosProdutoServico {
 	@XmlElement(name = "COFINS")
@@ -23,6 +24,56 @@ public class TributosProdutoServico {
 
 	@XmlElement(name = "PISST")
 	private PISGeral pisSubstituicaoTributaria;
+
+	public boolean contemCOFINS() {
+		return cofins != null && cofins.getTipoConfins() != null;
+	}
+
+	public boolean contemICMS() {
+		return icms != null && icms.getTipoIcms() != null;
+	}
+
+	public boolean contemImpostoImportacao() {
+		return impostoImportacao != null;
+	}
+
+	public boolean contemIPI() {
+		return ipi != null && ipi.getTipoIpi() != null;
+	}
+
+	public boolean contemPIS() {
+		return pis != null && pis.getTipoPis() != null;
+	}
+
+	@XmlTransient
+	public ICMS getIcms() {
+		return icms;
+	}
+
+	@XmlTransient
+	public ImpostoImportacao getImpostoImportacao() {
+		return impostoImportacao;
+	}
+
+	@XmlTransient
+	public COFINSGeral getTipoCofins() {
+		return cofins != null ? cofins.getTipoConfins() : null;
+	}
+
+	@XmlTransient
+	public ICMSGeral getTipoIcms() {
+		return icms != null ? icms.getTipoIcms() : null;
+	}
+
+	@XmlTransient
+	public IPIGeral getTipoIpi() {
+		return ipi != null ? ipi.getTipoIpi() : null;
+	}
+
+	@XmlTransient
+	public PISGeral getTipoPis() {
+		return pis != null ? pis.getTipoPis() : null;
+	}
 
 	public void setCofins(COFINS cofins) {
 		this.cofins = cofins;

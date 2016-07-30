@@ -29,6 +29,11 @@ public class COFINSGeral {
 		return TipoTributacaoCOFINS.getTipoTributacao(codigoSituacaoTributaria);
 	}
 
+	@XmlTransient
+	public Double getValor() {
+		return valor;
+	}
+
 	public void setAliquota(Double aliquota) {
 		this.aliquota = aliquota;
 	}

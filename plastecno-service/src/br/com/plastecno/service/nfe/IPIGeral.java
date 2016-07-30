@@ -29,6 +29,11 @@ public class IPIGeral {
 		return TipoTributacaoIPI.getTipoTributacao(codigoSituacaoTributaria);
 	}
 
+	@XmlTransient
+	public Double getValor() {
+		return valor;
+	}
+
 	public void setAliquota(Double aliquota) {
 		this.aliquota = aliquota;
 	}

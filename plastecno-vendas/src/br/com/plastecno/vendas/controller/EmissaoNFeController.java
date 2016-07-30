@@ -49,7 +49,6 @@ public class EmissaoNFeController extends AbstractController {
     }
 
     public Download nfexml(String xml) {
-        emissaoNFeHome();
         return gerarDownload(xml.getBytes(), "nfe.xml", "application/octet-stream");
     }
 

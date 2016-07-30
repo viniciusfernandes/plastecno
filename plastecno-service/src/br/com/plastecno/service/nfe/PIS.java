@@ -1,6 +1,8 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.*;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 
@@ -17,6 +19,13 @@ public class PIS {
 
 	@XmlElement(name = "PISQtde")
 	private PISGeral pisQuantidade;
+
+	@XmlTransient
+	private PISGeral tipoPis;
+
+	public PISGeral getTipoPis() {
+		return tipoPis;
+	}
 
 	public void setTipoPis(PISGeral tipoPis) {
 		if (tipoPis == null) {
@@ -35,6 +44,7 @@ public class PIS {
 		} else if (PIS_99.equals(tribut)) {
 			this.pisOutrasOperacoes = tipoPis;
 		}
+		this.tipoPis = tipoPis;
 	}
 
 }

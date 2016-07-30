@@ -848,7 +848,7 @@ function editarTributos(linha){
 					</div>
 				</fieldset>
 				</div>
-				
+				<%--
 				<fieldset class="fieldsetInterno">
 					<legend>::: Valores Totais :::</legend>
 					<div class="label">Valor BC:</div>
@@ -904,13 +904,10 @@ function editarTributos(linha){
 						<input type="text" id="valorTotalOutrasDesp"/>
 					</div>
 				</fieldset>
-			
+				--%>
+				
 			</fieldset>
 		</fieldset>	
-		
-		<div class="bloco_botoes">
-			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>
-		</div>
 		
 		<fieldset>
 			<legend>::: Cobrança :::</legend>
@@ -968,6 +965,9 @@ function editarTributos(linha){
 				</table>
 			</fieldset>
 		</fieldset>
+		<div class="bloco_botoes">
+			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>
+		</div>
 	</form>
 
 	

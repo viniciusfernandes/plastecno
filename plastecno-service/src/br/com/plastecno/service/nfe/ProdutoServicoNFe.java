@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 public class ProdutoServicoNFe {
 	@XmlElement(name = "CFOP")
@@ -62,6 +63,21 @@ public class ProdutoServicoNFe {
 
 	@XmlElement(name = "vUnTrib")
 	private Double valorUnitarioTributacao;
+
+	@XmlTransient
+	public Double getValorTotalBruto() {
+		return valorTotalBruto;
+	}
+
+	@XmlTransient
+	public Double getValorTotalFrete() {
+		return valorTotalFrete;
+	}
+
+	@XmlTransient
+	public Double getValorTotalSeguro() {
+		return valorTotalSeguro;
+	}
 
 	public void setCfop(String cfop) {
 		this.cfop = cfop;

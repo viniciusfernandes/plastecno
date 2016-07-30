@@ -62,6 +62,16 @@ public class NFe {
 		return identificacaoDestinatarioNFe;
 	}
 
+	@XmlTransient
+	public List<DetalhamentoProdutoServicoNFe> getListaDetalhamentoProdutoServicoNFe() {
+		return listaDetalhamentoProdutoServicoNFe;
+	}
+
+	@XmlTransient
+	public ValoresTotaisNFe getValoresTotaisNFe() {
+		return valoresTotaisNFe;
+	}
+
 	public void setCobrancaNFe(CobrancaNFe cobrancaNFe) {
 		this.cobrancaNFe = cobrancaNFe;
 	}

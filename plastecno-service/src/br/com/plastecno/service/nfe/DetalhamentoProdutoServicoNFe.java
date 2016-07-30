@@ -2,6 +2,7 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 public class DetalhamentoProdutoServicoNFe {
 	@XmlAttribute(name = "nItem")
@@ -12,6 +13,21 @@ public class DetalhamentoProdutoServicoNFe {
 
 	@XmlElement(name = "imposto")
 	private TributosProdutoServico tributosProdutoServico;
+
+	public boolean contemICMS() {
+		return tributosProdutoServico != null
+				&& tributosProdutoServico.contemICMS();
+	}
+
+	@XmlTransient
+	public ProdutoServicoNFe getProdutoServicoNFe() {
+		return produtoServicoNFe;
+	}
+
+	@XmlTransient
+	public TributosProdutoServico getTributosProdutoServico() {
+		return tributosProdutoServico;
+	}
 
 	public void setNumeroItem(Integer numeroItem) {
 		this.numeroItem = numeroItem;

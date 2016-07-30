@@ -47,8 +47,38 @@ public class ICMSGeral {
 	private Double valorST;
 
 	@XmlTransient
+	public Double getAliquota() {
+		return aliquota;
+	}
+
+	@XmlTransient
+	public Double getAliquotaST() {
+		return aliquotaST;
+	}
+
+	@XmlTransient
 	public TipoTributacaoICMS getTipoTributacao() {
 		return TipoTributacaoICMS.getTipoTributacao(codigoSituacaoTributaria);
+	}
+
+	@XmlTransient
+	public Double getValor() {
+		return valor;
+	}
+
+	@XmlTransient
+	public Double getValorBC() {
+		return valorBC;
+	}
+
+	@XmlTransient
+	public Double getValorBCST() {
+		return valorBCST;
+	}
+
+	@XmlTransient
+	public Double getValorST() {
+		return valorST;
 	}
 
 	public void setAliquota(Double aliquota) {

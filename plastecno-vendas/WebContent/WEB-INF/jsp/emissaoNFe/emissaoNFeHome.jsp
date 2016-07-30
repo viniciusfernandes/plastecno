@@ -287,65 +287,29 @@ function gerarInputProdutoServico(){
 		return;
 	}
 	
-	var form = document.getElementById('formEmissao');
 	var input = null;
 	var celulas = null;
+	var produto = null;
+	var detalhamento = null;
 	for (var i = 0; i < linhas.length; i++) {
 		celulas = linhas[i].cells;
 		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.listaItem['+i+'].numeroItem';
-		input.value = celulas[0].innerHTML;
-		form.appendChild(input);
+		detalhamento = {'nomeObjeto':'nf.listaItem['+i+']',
+			'campos':[{'nome':'numeroItem', 'valor': celulas[0].innerHTML}]};
 		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.codigo';
-		input.value = celulas[1].innerHTML;
-		form.appendChild(input);
-
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.descricao';
-		input.value = celulas[1].innerHTML;
-		form.appendChild(input);
+		produto = {'nomeObjeto':'nf.listaItem['+i+'].produtoServicoNFe',
+				'campos':[{'nome':'codigo', 'valor': celulas[1].innerHTML},
+				          {'nome':'descricao', 'valor': celulas[1].innerHTML},
+				          {'nome':'ncm', 'valor': celulas[2].innerHTML},
+				          {'nome':'unidadeComercial', 'valor': celulas[4].innerHTML},
+				          {'nome':'quantidadeComercial', 'valor': celulas[5].innerHTML},
+				          {'nome':'quantidadeTributavel', 'valor': celulas[5].innerHTML},
+				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[6].innerHTML},
+				          {'nome':'valorTotalBruto', 'valor': celulas[7].innerHTML}
+					]};
 		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.ncm';
-		input.value = celulas[2].innerHTML;
-		form.appendChild(input);
-
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.unidadeComercial';
-		input.value = celulas[4].innerHTML;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.quantidadeComercial';
-		input.value = celulas[5].innerHTML;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.quantidadeTributavel';
-		input.value = celulas[5].innerHTML;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.valorUnitarioComercializacao';
-		input.value = celulas[6].innerHTML;
-		form.appendChild(input);
-		
-		input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'nf.listaItem['+i+'].produtoServicoNFe.valorTotalBruto';
-		input.value = celulas[7].innerHTML;
-		form.appendChild(input);
+		gerarInputHidden(detalhamento);
+		gerarInputHidden(produto);
 	}
 }
 

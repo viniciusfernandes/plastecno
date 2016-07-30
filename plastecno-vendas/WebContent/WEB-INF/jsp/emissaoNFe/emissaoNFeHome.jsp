@@ -571,7 +571,7 @@ function editarTributos(linha){
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
-					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS ::: +</legend>
+					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS ::: -</legend>
 					<div class="label">Regime:</div>
 					<div class="input" style="width: 80%">
 						<select style="width: 20%" class="semprehabilitado">
@@ -648,8 +648,8 @@ function editarTributos(linha){
 						<input id="valorSTICMS" type="text" style="width: 20%" class="semprehabilitado"/>
 					</div>
 					<div class="icms00 label">Mot. Desoneração:</div>
-					<div class="icms00 input" style="width: 80%">
-						<select id="motDesonerICMS" style="width: 77%" class="icms00 semprehabilitado">
+					<div class="icms00 input" style="width: 36%">
+						<select id="motDesonerICMS" style="width: 100%" class="icms00 semprehabilitado">
 							<c:forEach var="motivo" items="${listaTipoMotivoDesoneracao}">
 								<option value="${motivo.codigo}">${motivo.descricao}</option>
 							</c:forEach>
@@ -663,50 +663,50 @@ function editarTributos(linha){
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_ipi" class="fieldsetInterno">
-					<legend>::: IPI ::: +</legend>
+					<legend>::: IPI ::: -</legend>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
-						<select id="codSitTribIPI" style="width: 77%" >
+						<select id="codSitTribIPI" style="width: 45%" >
 							<c:forEach var="tipo" items="${listaTipoTributacaoIPI}">
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCIPI" type="text" style="width: 100%" />
-					</div>
 					<div  class="label">Alíquota:</div>
 					<div class="input" style="width: 10%">
 						<input id="aliquotaIPI" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Qtde. unid. Tributável:</div>
-					<div class="input" style="width: 30%">
-						<input id="qtdeUnidTribIPI" type="text" style="width: 30%" />
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 50%">
+						<input id="valorBCIPI" type="text" style="width: 20%" />
 					</div>
-					<div  class="label">valor Unid. Tributável:</div>
-					<div class="input" style="width: 70%">
-						<input id="valorUnidTribIPI" type="text" style="width: 100%" />
+					<div  class="label">Qtde. unid. Tributável:</div>
+					<div class="input" style="width: 10%">
+						<input id="qtdeUnidTribIPI" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Unid. Tributável:</div>
+					<div class="input" style="width: 50%">
+						<input id="valorUnidTribIPI" type="text" style="width: 20%" />
 					</div>
 					<div  class="label">Cl. Enquadramento:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="clEnquadramentoIPI" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Cod. Enquadramento:</div>
-					<div class="input" style="width: 70%">
-						<input id="codEnquadramentoIPI" type="text" style="width: 100%" />
+					<div class="input" style="width: 50%">
+						<input id="codEnquadramentoIPI" type="text" style="width: 20%" />
 					</div>
 					<div  class="label">CNPJ Produtor:</div>
 					<div class="input" style="width: 70%">
-						<input id="cnpjProdIPI" type="text" style="width: 100%" />
+						<input id="cnpjProdIPI" type="text" style="width: 20%" />
 					</div>
 					<div  class="label">Cod. Selo Controle:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="codSeloContrIPI" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Qtde. Selo Controle:</div>
-					<div class="input" style="width: 70%">
-						<input id="qtdeSeloContrIPI" type="text" style="width: 100%" />
+					<div class="input" style="width: 50%">
+						<input id="qtdeSeloContrIPI" type="text" style="width: 20%" />
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirIPI" title="Inserir IPI do Produto" value="" class="botaoInserir"/>
@@ -716,34 +716,33 @@ function editarTributos(linha){
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_pis" class="fieldsetInterno">
-					<legend>::: PIS ::: +</legend>
+					<legend>::: PIS ::: -</legend>
 					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 70%">
-						<select id="codSitTribPIS" 
-							style="width: 100%">
+					<div class="input" style="width: 80%">
+						<select id="codSitTribPIS" style="width: 45%">
 							<c:forEach var="tipo" items="${listaTipoTributacaoPIS}">
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
 							</c:forEach>
 						</select>
 					</div>
 					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="valorBCPIS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="aliquotaPIS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Valor Alíquota(R$):</div>
-					<div class="input" style="width: 70%">
-						<input id="valorAliquotaPIS" type="text" style="width: 100%" />
+					<div class="input" style="width: 20%">
+						<input id="valorAliquotaPIS" type="text" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde.Vendida:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="qtdeVendidaPIS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Valor:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="valorPIS" type="text" style="width: 100%" />
 					</div>
 					<div class="bloco_botoes">
@@ -754,33 +753,33 @@ function editarTributos(linha){
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_cofins" class="fieldsetInterno">
-					<legend>::: COFINS ::: +</legend>
+					<legend>::: COFINS ::: -</legend>
 					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 70%">
-						<select id="codSitTribCOFINS" style="width: 100%">
+					<div class="input" style="width: 80%">
+						<select id="codSitTribCOFINS" style="width: 45%">
 							<c:forEach var="tipo" items="${listaTipoTributacaoCOFINS}">
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
 							</c:forEach>
 						</select>
 					</div>
 					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="valorBCCOFINS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="aliquotaCOFINS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Valor Alíquota(R$):</div>
-					<div class="input" style="width: 70%">
-						<input id="valorAliquotaCOFINS" type="text" style="width: 100%" />
+					<div class="input" style="width: 20%">
+						<input id="valorAliquotaCOFINS" type="text" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde. Vendida:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="qtdeVendidaCOFINS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Valor:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input id="valorCOFINS" type="text" style="width: 100%" />
 					</div>
 					<div class="bloco_botoes">
@@ -792,55 +791,55 @@ function editarTributos(linha){
 				<fieldset class="fieldsetInterno">
 					<legend>::: Valores Totais :::</legend>
 					<div class="label">Valor BC:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input type="text" id="valorBCICMSTotal"/>
 					</div>
 					<div class="label">Valor Total:</div>
-					<div class="input" style="width: 70%">
-						<input type="text" id="valorTotalICMS"/>
+					<div class="input" style="width: 50%">
+						<input type="text" id="valorTotalICMS" style="width: 20%"/>
 					</div>
 					<div class="label">Valor BC ST:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input type="text" id="valorBCSTICMSTotal"/>
 					</div>
 					<div class="label">Valor Total ST:</div>
-					<div class="input" style="width: 70%">
-						<input type="text" id="valorTotalICMSST"/>
+					<div class="input" style="width: 50%">
+						<input type="text" id="valorTotalICMSST" style="width: 20%"/>
 					</div>
 					<div class="label">Valor Total Prod. Serv.:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input type="text" id="valorProdServ"/>
 					</div>
 					<div class="label">Valor Total Frete:</div>
-					<div class="input" style="width: 70%">
-						<input type="text" id="valorTotalFrete"/>
+					<div class="input" style="width: 50%">
+						<input type="text" id="valorTotalFrete" style="width: 20%"/>
 					</div>
 					<div class="label">Valor Total Seguro:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input type="text" id="valorTotalSeguro"/>
 					</div>
 					<div class="label">Valor Total Desconto:</div>
-					<div class="input" style="width: 70%">
-						<input type="text" id="valorTotalDesconto"/>
+					<div class="input" style="width: 50%">
+						<input type="text" id="valorTotalDesconto" style="width: 20%"/>
 					</div>
 					<div class="label">Valor Total Imp. Import.:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input type="text" id="valorTotalImpImport"/>
 					</div>
 					<div class="label">Valor Total IPI:</div>
-					<div class="input" style="width: 70%">
-						<input type="text" id="valorTotalIPI"/>
+					<div class="input" style="width: 50%">
+						<input type="text" id="valorTotalIPI" style="width: 20%"/>
 					</div>
 					<div class="label">Valor Total PIS:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input type="text" id="valorTotalPIS"/>
 					</div>
 					<div class="label">Valor Total COFINS:</div>
-					<div class="input" style="width: 70%">
-						<input type="text" id="valorTotalCOFINS"/>
+					<div class="input" style="width: 50%">
+						<input type="text" id="valorTotalCOFINS" style="width: 20%"/>
 					</div>
 					<div class="label">Outras Desp. Acessórias:</div>
-					<div class="input" style="width: 70%">
+					<div class="input" style="width: 10%">
 						<input type="text" id="valorTotalOutrasDesp"/>
 					</div>
 				</fieldset>

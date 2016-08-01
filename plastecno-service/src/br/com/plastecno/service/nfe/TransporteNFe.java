@@ -16,7 +16,7 @@ public class TransporteNFe {
 		this.modalidadeFrete = modalidadeFrete;
 	}
 
-	public void setTransportadorNFe(TransportadoraNFe transportadoraNFe) {
+	public void setTransportadoraNFe(TransportadoraNFe transportadoraNFe) {
 		this.transportadoraNFe = transportadoraNFe;
 	}
 

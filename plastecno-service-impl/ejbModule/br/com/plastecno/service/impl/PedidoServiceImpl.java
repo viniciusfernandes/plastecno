@@ -44,6 +44,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
@@ -1626,6 +1627,12 @@ public class PedidoServiceImpl implements PedidoService {
 			Periodo periodo) {
 		return pedidoDAO.pesquisarValorTotalPedidoByPeriodo(
 				periodo.getInicio(), periodo.getFim(), false);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarTransportadoraByIdPedido(idPedido);
 	}
 
 	private List<ItemPedido> pesquisarValoresItemPedidoResumidoByPeriodo(

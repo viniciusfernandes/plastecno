@@ -26,9 +26,6 @@ fieldset .fieldsetInterno legend {
 	font-size: 10px;
 }
 
-.impostosFieldset {
-	width: 100%;
-}
 </style>
 <script type="text/javascript">
 
@@ -653,7 +650,6 @@ function editarTributos(linha){
 				</div>
 				--%>
 				
-				<div class="impostosFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
 					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
 					<div class="label">Regime:</div>
@@ -744,9 +740,7 @@ function editarTributos(linha){
 						<input type="button" id="botaoLimparICMS" title="Limpar ICMS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
-				</div>
 				
-				<div class="impostosFieldset">
 				<fieldset id="bloco_ipi" class="fieldsetInterno">
 					<legend>::: IPI Prod.::: +</legend>
 					<div class="label">Situação Tribut.:</div>
@@ -798,9 +792,7 @@ function editarTributos(linha){
 						<input type="button" id="botaoLimparIPI" title="Limpar IPI do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
-				</div>
 				
-				<div class="impostosFieldset">
 				<fieldset id="bloco_pis" class="fieldsetInterno">
 					<legend>::: PIS Prod.::: +</legend>
 					<div class="label">Situação Tribut.:</div>
@@ -836,9 +828,7 @@ function editarTributos(linha){
 						<input type="button" id="botaoLimparPIS" title="Limpar PIS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
-				</div>
 				
-				<div class="impostosFieldset">
 				<fieldset id="bloco_cofins" class="fieldsetInterno">
 					<legend>::: COFINS Prod.::: +</legend>
 					<div class="label">Situação Tribut.:</div>
@@ -874,9 +864,7 @@ function editarTributos(linha){
 						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
-				</div>
 				
-				<div class="impostosFieldset">
 				<fieldset id="bloco_ii" class="fieldsetInterno">
 					<legend>::: Imp. Impor. Prod.::: +</legend>
 					<div  class="label">Valor:</div>
@@ -900,7 +888,6 @@ function editarTributos(linha){
 						<input type="button" id="botaoLimparII" title="Limpar Imp. Importação do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
-				</div>
 				<%--
 				<fieldset class="fieldsetInterno">
 					<legend>::: Valores Totais :::</legend>
@@ -958,9 +945,52 @@ function editarTributos(linha){
 					</div>
 				</fieldset>
 				--%>
-				
 			</fieldset>
 		</fieldset>	
+		
+		<fieldset>
+			<legend>::: Transporte :::</legend>
+			<div class="label">Modal. Frete:</div>
+			<div class="input" style="width: 80%">
+			<select id="modFrete" name="nf.transporteNFe.modalidadeFrete" style="width: 45%">
+				<c:forEach var="tipo" items="${listaTipoModalidadeFrete}">
+					<option value="${tipo.codigo}">${tipo.descricao}</option>
+				</c:forEach>
+			</select>
+			</div>
+			
+			<fieldset class="fieldsetInterno">
+					<legend>::: Transportadora :::</legend>
+					<div  class="label">Razão Soc./Nome:</div>
+					<div class="input" style="width: 80%">
+						<input type="text" name="nf.transporteNFe.transportadoraNFe.razaoSocial" value="${transportadora.razaoSocial}" style="width: 45%" />
+					</div>
+					<div  class="label">CNPJ:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" name="nf.transporteNFe.transportadoraNFe.cnpj" value="${transportadora.cnpj}" style="width: 100%" />
+					</div>
+					<div  class="label">CPF:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" name="nf.transporteNFe.transportadoraNFe.cpf" style="width: 100%" />
+					</div>
+					<div  class="label">Insc. Estadual:</div>
+					<div class="input" style="width: 30%">
+						<input type="text" name="nf.transporteNFe.transportadoraNFe.inscricaoEstadual" value="${transportadora.inscricaoEstadual}"  style="width: 50%" />
+					</div>
+					<div  class="label">Endereço:</div>
+					<div class="input" style="width: 80%">
+						<input type="text" name="nf.transporteNFe.transportadoraNFe.enderecoCompleto" value="${transportadora.enderecoCompleto}" style="width: 84%" />
+					</div>
+					<div  class="label">Município:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" name="nf.transporteNFe.transportadoraNFe.municipio" value="${transportadora.municipio}" style="width: 100%" />
+					</div>
+					<div  class="label">UF:</div>
+					<div class="input" style="width: 50%">
+						<input type="text" name="nf.transporteNFe.transportadoraNFe.uf" value="${transportadora.uf}" style="width: 20%" />
+					</div>
+				</fieldset>
+		</fieldset>
 		
 		<fieldset>
 			<legend>::: Cobrança :::</legend>

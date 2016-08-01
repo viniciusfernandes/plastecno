@@ -4,26 +4,32 @@ import javax.xml.bind.annotation.XmlElement;
 
 public class TransportadoraNFe {
 	@XmlElement(name = "CNPJ")
-	private String CNPJ;
+	private String cnpj;
+
 	@XmlElement(name = "CPF")
-	private String CPF;
+	private String cpf;
+
 	@XmlElement(name = "xEnder")
 	private String enderecoCompleto;
+
 	@XmlElement(name = "IE")
 	private String inscricaoEstadual;
+
 	@XmlElement(name = "xMun")
 	private String municipio;
+
 	@XmlElement(name = "xNome")
 	private String razaoSocial;
+
 	@XmlElement(name = "UF")
 	private String UF;
 
-	public void setCNPJ(String cNPJ) {
-		CNPJ = cNPJ;
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
 	}
 
-	public void setCPF(String cPF) {
-		CPF = cPF;
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
 	}
 
 	public void setEnderecoCompleto(String enderecoCompleto) {

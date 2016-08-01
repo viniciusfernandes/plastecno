@@ -12,6 +12,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -244,6 +245,8 @@ public interface PedidoService {
 
 	List<TotalizacaoPedidoWrapper> pesquisarTotalPedidoVendaResumidaByPeriodo(
 			Periodo periodo);
+
+	Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido);
 
 	Double pesquisarValorPedido(Integer idPedido);
 

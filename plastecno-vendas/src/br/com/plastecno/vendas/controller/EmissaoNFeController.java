@@ -18,6 +18,7 @@ import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST;
+import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.nfe.constante.TipoMotivoDesoneracaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
@@ -62,6 +63,7 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaTipoTributacaoIPI", TipoTributacaoIPI.values());
         addAtributo("listaTipoTributacaoPIS", TipoTributacaoPIS.values());
         addAtributo("listaTipoTributacaoCOFINS", TipoTributacaoCOFINS.values());
+        addAtributo("listaTipoModalidadeFrete", TipoModalidadeFrete.values());
 
     }
 
@@ -87,6 +89,7 @@ public class EmissaoNFeController extends AbstractController {
         Cliente cliente = pedidoService.pesquisarClienteResumidoEContatoByIdPedido(idPedido);
 
         addAtributo("cliente", cliente);
+        addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
         addAtributo("logradouro", clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()));
         addAtributo("listaItem", pedidoService.pesquisarItemPedidoByIdPedido(idPedido));
         addAtributo("idPedido", idPedido);

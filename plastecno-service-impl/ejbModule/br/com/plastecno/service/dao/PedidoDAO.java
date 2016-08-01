@@ -15,6 +15,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
@@ -418,6 +419,16 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				.setParameter("idPedido", idPedido);
 
 		return QueryUtil.gerarRegistroUnico(query, Long.class, 0L);
+	}
+
+	public Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select p.transportadora from Pedido p join fetch p.transportadora.logradouro where p.id = :idPedido")
+								.setParameter("idPedido", idPedido),
+						Transportadora.class, null);
 	}
 
 	public Double pesquisarValorPedido(Integer idPedido) {

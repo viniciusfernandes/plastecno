@@ -1,9 +1,5 @@
 package br.com.plastecno.vendas.controller;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
@@ -48,10 +44,6 @@ public class EmissaoNFeController extends AbstractController {
         this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
     }
 
-    public Download nfexml(String xml) {
-        return gerarDownload(xml.getBytes(), "nfe.xml", "application/octet-stream");
-    }
-
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
         addAtributo("listaTipoFinalidadeEmissao", TipoFinalidadeEmissao.values());
@@ -75,33 +67,19 @@ public class EmissaoNFeController extends AbstractController {
 
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(NFe nf, Logradouro logradouro, Integer idPedido) {
-
+        String xml = null;
         try {
             nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(nFeService.gerarEnderecoNFe(logradouro));
-            nFeService.emitirNFe(nf, idPedido);
+            xml = nFeService.emitirNFe(nf, idPedido);
         } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
+            gerarListaMensagemErroLogException(e);
         }
-        redirecTo(this.getClass()).nfexml(lerXML());
+        redirecTo(this.getClass()).nfexml(xml);
         // irTopoPagina();
     }
 
-    private String lerXML() {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(new File(System.getProperty("java.io.tmpdir")
-                    + "nfe.xml")));
-            String l = null;
-            StringBuilder xml = new StringBuilder();
-            while ((l = br.readLine()) != null) {
-                xml.append(l).append("\n");
-            }
-            br.close();
-            return xml.toString();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
+    public Download nfexml(String xml) {
+        return gerarDownload(xml.getBytes(), "nfe.xml", "application/octet-stream");
     }
 
     @Get("emissaoNFe/pedido")

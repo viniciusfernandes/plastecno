@@ -17,7 +17,6 @@ import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
-import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
@@ -38,7 +37,6 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
-import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.test.builder.ServiceBuilder;
 
 public class PedidoServiceTest extends AbstractTest {
@@ -70,8 +68,6 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private MaterialService materialService;
 
-	private NFeService nFeService;
-
 	private PedidoService pedidoService;
 
 	private RepresentadaService representadaService;
@@ -86,7 +82,6 @@ public class PedidoServiceTest extends AbstractTest {
 		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
 		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
-		nFeService = ServiceBuilder.buildService(NFeService.class);
 	}
 
 	private void associarVendedor(Cliente cliente) {
@@ -1735,17 +1730,6 @@ public class PedidoServiceTest extends AbstractTest {
 
 		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
-	}
-
-	@Test
-	public void testNfe() {
-		Pedido p = gerarPedidoRevendaComItem();
-		NFe n = nFeService.gerarNfe(p.getId());
-		try {
-			nFeService.gerarXMLNfe(n);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
 	}
 
 	@Test

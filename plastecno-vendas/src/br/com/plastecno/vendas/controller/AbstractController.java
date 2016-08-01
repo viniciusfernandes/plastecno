@@ -267,6 +267,11 @@ public abstract class AbstractController {
         this.result.include("cssMensagem", cssMensagemErro);
     }
 
+    void gerarListaMensagemErroLogException(BusinessException e) {
+        gerarListaMensagemErro(e);
+        logger.log(Level.SEVERE, e.getMensagemConcatenada(), e);
+    }
+
     void gerarListaMensagemSucesso(Object o, String nomeAtributoExibicao, TipoOperacao tipoOperacao)
             throws ControllerException {
         Method metodo = null;

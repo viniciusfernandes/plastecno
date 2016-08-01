@@ -2,7 +2,7 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class TransportadorNFe {
+public class TransportadoraNFe {
 	@XmlElement(name = "CNPJ")
 	private String CNPJ;
 	@XmlElement(name = "CPF")

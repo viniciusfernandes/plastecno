@@ -4,33 +4,38 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 public class ImpostoImportacao {
+	@XmlElement(name = "vII")
+	private Double valor;
+
 	@XmlElement(name = "vBC")
-	private Double valorBaseCalculo;
+	private Double valorBC;
 
 	@XmlElement(name = "vDespAdu")
 	private Double valorDespesaAduaneira;
-
-	@XmlElement(name = "vII")
-	private Double valorImpostoImportacao;
 
 	@XmlElement(name = "vIOF")
 	private Double valorIOF;
 
 	@XmlTransient
-	public Double getValorImpostoImportacao() {
-		return valorImpostoImportacao;
+	public Double getValor() {
+		return valor;
 	}
 
-	public void setValorBaseCalculo(Double valorBaseCalculo) {
-		this.valorBaseCalculo = valorBaseCalculo;
+	@XmlTransient
+	public Double getValorBC() {
+		return valorBC;
+	}
+
+	public void setValor(Double valor) {
+		this.valor = valor;
+	}
+
+	public void setValorBC(Double valorBC) {
+		this.valorBC = valorBC;
 	}
 
 	public void setValorDespesaAduaneira(Double valorDespesaAduaneira) {
 		this.valorDespesaAduaneira = valorDespesaAduaneira;
-	}
-
-	public void setValorImpostoImportacao(Double valorImpostoImportacao) {
-		this.valorImpostoImportacao = valorImpostoImportacao;
 	}
 
 	public void setValorIOF(Double valorIOF) {

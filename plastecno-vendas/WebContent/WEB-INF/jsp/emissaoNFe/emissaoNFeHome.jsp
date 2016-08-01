@@ -71,6 +71,11 @@ $(document).ready(function() {
 		fecharBlocoImposto('bloco_cofins');
 	});
 	
+	$('#botaoInserirII').click(function(){
+		gerarInputImpostoImportacao();
+		fecharBlocoImposto('bloco_II');
+	});
+	
 	$('#bloco_tributos').fadeOut();
 	
 	$('#botaoInserirICMS').click(function(){
@@ -96,6 +101,11 @@ $(document).ready(function() {
 	$('#botaoLimparCOFINS').click(function(){
 		removerInputHidden(gerarJsonTipoCofins());
 		fecharBlocoImposto('bloco_cofins');
+	});
+	
+	$('#botaoLimparII').click(function(){
+		removerInputHidden(gerarJsonImpostoImportacao());
+		fecharBlocoImposto('bloco_II');
 	});
 	
 	autocompletar({
@@ -266,6 +276,15 @@ function gerarJsonTipoCofins(){
 			]};
 };
 
+function gerarJsonImpostoImportacao(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.impostoImportacao',
+		'campos':[{'nome':'valor', 'id':'valorII'},
+		          {'nome':'valorBC', 'id':'valorBCII'},
+		          {'nome':'valorDespesaAduaneira', 'id':'valorDespAduaneirasII'},
+		          {'nome':'valorIOF', 'id':'valorIOFII'}
+			]};
+};
+
 function gerarJsonTipoPis(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis',
 		'campos':[{'nome':'aliquota', 'id':'aliquotaPIS'},
@@ -303,14 +322,17 @@ function gerarInputIPI(){
 };
 
 function gerarInputPIS(){
-	var tipoPis = gerarJsonTipoPis();
-	gerarInputHidden(tipoPis);
+	gerarInputHidden(gerarJsonTipoPis());
 };
 
 function gerarInputCOFINS(){
-	var tipoCofins = gerarJsonTipoCofins();
-	gerarInputHidden(tipoCofins);	
+	gerarInputHidden(gerarJsonTipoCofins());	
 };
+
+function gerarInputImpostoImportacao(){
+	gerarInputHidden(gerarJsonImpostoImportacao());	
+};
+
 
 function gerarInputDuplicata(){
 	var tabela = document.getElementById('tabela_duplicata');
@@ -845,6 +867,32 @@ function editarTributos(linha){
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
 						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="impostosFieldset">
+				<fieldset id="bloco_II" class="fieldsetInterno">
+					<legend>::: Imp. Importação ::: +</legend>
+					<div  class="label">Valor:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorII" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 50%">
+						<input id="valorBCII" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Valor IOF:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorIOFII" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Desp. Aduan.:</div>
+					<div class="input" style="width: 50%">
+						<input id="valorDespAduaneirasII" type="text" style="width: 20%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirII" title="Inserir Imp. Importação do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparII" title="Limpar Imp. Importação do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
 				</div>

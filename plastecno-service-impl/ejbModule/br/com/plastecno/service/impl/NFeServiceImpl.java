@@ -1,6 +1,6 @@
 package br.com.plastecno.service.impl;
 
-import java.io.File;
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -99,9 +99,8 @@ public class NFeServiceImpl implements NFeService {
 			valorFrete += produto.getValorTotalFrete() == null ? 0 : produto
 					.getValorTotalFrete();
 			if (tributo != null && tributo.contemImpostoImportacao()) {
-				valorImportacao += tributo.getImpostoImportacao()
-						.getValorImpostoImportacao() == null ? 0 : tributo
-						.getImpostoImportacao().getValorImpostoImportacao();
+				valorImportacao += tributo.getImpostoImportacao().getValor() == null ? 0
+						: tributo.getImpostoImportacao().getValor();
 			}
 		}
 
@@ -163,11 +162,11 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
+	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
 		nFe.setValoresTotaisNFe(new ValoresTotaisNFe());
 		calcularValoresTotaisICMS(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
-		gerarXMLNfe(nFe);
+		return gerarXMLNfe(nFe);
 	}
 
 	@Override
@@ -196,24 +195,16 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public NFe gerarNfe(Integer idPedido) {
-		NFe nFe = new NFe();
-
-		carregarIdentificacaoEmitente(nFe, idPedido);
-		return nFe;
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void gerarXMLNfe(NFe nFe) throws BusinessException {
+	public String gerarXMLNfe(NFe nFe) throws BusinessException {
 		try {
+			StringWriter writer = new StringWriter();
 			JAXBContext context = JAXBContext.newInstance(NFe.class);
 			Marshaller m = context.createMarshaller();
 			// for pretty-print XML in JAXB
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-			m.marshal(nFe, new File(System.getProperty("java.io.tmpdir")
-					+ "nfe.xml"));
+			m.marshal(nFe, writer);
+			return writer.toString();
 		} catch (Exception e) {
 			throw new BusinessException(
 					"Falha na geracao do XML da NFe do pedido No. ", e);

@@ -73,7 +73,7 @@ $(document).ready(function() {
 	
 	$('#botaoInserirII').click(function(){
 		gerarInputImpostoImportacao();
-		fecharBlocoImposto('bloco_II');
+		fecharBlocoImposto('bloco_ii');
 	});
 	
 	$('#bloco_tributos').fadeOut();
@@ -105,7 +105,7 @@ $(document).ready(function() {
 	
 	$('#botaoLimparII').click(function(){
 		removerInputHidden(gerarJsonImpostoImportacao());
-		fecharBlocoImposto('bloco_II');
+		fecharBlocoImposto('bloco_ii');
 	});
 	
 	autocompletar({
@@ -156,6 +156,7 @@ $(document).ready(function() {
 	inicializarFadeInBlocoImposto('bloco_ipi');
 	inicializarFadeInBlocoImposto('bloco_pis');
 	inicializarFadeInBlocoImposto('bloco_cofins');
+	inicializarFadeInBlocoImposto('bloco_ii');
 });
 
 function gerarLegendaBloco(nomeBloco){
@@ -181,6 +182,8 @@ function fecharBlocoImposto(nomeBloco){
 
 function inicializarLegendaBlocoImposto(nomeBloco){
 	var legend = $('#bloco_tributos #'+nomeBloco+' legend');
+	$(legend).html(legend.html().replace(/Prod.\s\d*/g, 'Prod. '+(numeroProdutoEdicao+1)));	
+
 	legend.html(legend.html().replace(/\+/g, '-'));
 	$('#bloco_tributos #'+nomeBloco+' div').fadeIn();
 };
@@ -448,6 +451,8 @@ function editarTributos(linha){
 	inicializarLegendaBlocoImposto('bloco_ipi');
 	inicializarLegendaBlocoImposto('bloco_pis');
 	inicializarLegendaBlocoImposto('bloco_cofins');
+	inicializarLegendaBlocoImposto('bloco_ii');
+	
 };
 </script>
 
@@ -639,7 +644,7 @@ function editarTributos(linha){
 				</tbody>
 			</table>
 			
-			<fieldset id="bloco_tributos" class="fieldsetInterno">
+			<fieldset id="bloco_tributos">
 				<legend class="fieldsetInterno">::: Tributos :::</legend>
 				<%-- 
 				<div class="label">CFOP:</div>
@@ -650,7 +655,7 @@ function editarTributos(linha){
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
-					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS ::: +</legend>
+					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: Prod. ICMS ::: +</legend>
 					<div class="label">Regime:</div>
 					<div class="input" style="width: 80%">
 						<select style="width: 20%" class="semprehabilitado">
@@ -743,7 +748,7 @@ function editarTributos(linha){
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_ipi" class="fieldsetInterno">
-					<legend>::: IPI ::: +</legend>
+					<legend>::: Prod. IPI ::: +</legend>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribIPI" style="width: 45%" >
@@ -797,7 +802,7 @@ function editarTributos(linha){
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_pis" class="fieldsetInterno">
-					<legend>::: PIS ::: +</legend>
+					<legend>::: Prod. PIS ::: +</legend>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribPIS" style="width: 45%">
@@ -835,7 +840,7 @@ function editarTributos(linha){
 				
 				<div class="impostosFieldset">
 				<fieldset id="bloco_cofins" class="fieldsetInterno">
-					<legend>::: COFINS ::: +</legend>
+					<legend>::: Prod. COFINS ::: +</legend>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribCOFINS" style="width: 45%">
@@ -872,8 +877,8 @@ function editarTributos(linha){
 				</div>
 				
 				<div class="impostosFieldset">
-				<fieldset id="bloco_II" class="fieldsetInterno">
-					<legend>::: Imp. Importação ::: +</legend>
+				<fieldset id="bloco_ii" class="fieldsetInterno">
+					<legend>::: Prod. Imp. Impor. ::: +</legend>
 					<div  class="label">Valor:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorII" type="text" style="width: 100%" />

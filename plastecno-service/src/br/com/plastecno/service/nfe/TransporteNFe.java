@@ -1,8 +1,13 @@
 package br.com.plastecno.service.nfe;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 
 public class TransporteNFe {
+	@XmlElement(name = "vol")
+	private List<VolumeTransportados> listaVolume;
+
 	@XmlElement(name = "modFrete")
 	private Integer modalidadeFrete;
 
@@ -12,9 +17,9 @@ public class TransporteNFe {
 	@XmlElement(name = "transportadora")
 	private TransportadoraNFe transportadoraNFe;
 
-
-	@XmlElement(name = "vol")
-	private VolumesTransportados volumesTransportados;
+	public void setListaVolume(List<VolumeTransportados> listaVolume) {
+		this.listaVolume = listaVolume;
+	}
 
 	public void setModalidadeFrete(Integer modalidadeFrete) {
 		this.modalidadeFrete = modalidadeFrete;
@@ -28,8 +33,4 @@ public class TransporteNFe {
 		this.transportadoraNFe = transportadoraNFe;
 	}
 
-	public void setVolumesTransportados(
-			VolumesTransportados volumesTransportados) {
-		this.volumesTransportados = volumesTransportados;
-	}
 }

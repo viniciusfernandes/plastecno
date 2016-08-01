@@ -45,11 +45,16 @@ $(document).ready(function() {
 		inserirDuplicata();
 	});
 	
+	$("#botaoInserirVolume").click(function() {
+		inserirVolume();
+	});
+	
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
 		gerarInputDuplicata();
 		gerarInputProdutoServico();
+		gerarInputVolume();
 		$('#formEmissao').submit();
 	});
 	
@@ -356,6 +361,31 @@ function gerarInputDuplicata(){
 	}
 };
 
+function gerarInputVolume(){
+	var tabela = document.getElementById('tabela_volume');
+	var linhas = tabela.tBodies[0].rows;
+	if(linhas.length <= 0){
+		return;
+	}
+	
+	var input = null;
+	var celulas = null;
+	
+	var volume = null;
+	for (var i = 0; i < linhas.length; i++) {
+		celulas = linhas[i].cells;
+		volume = {'nomeObjeto':'nf.transporteNFe.listaVolume['+i+']',
+			'campos':[{'nome':'quantidade', 'valor': celulas[0].innerHTML},
+			          {'nome':'especie', 'valor': celulas[1].innerHTML},
+			          {'nome':'marca', 'valor': celulas[2].innerHTML},
+			          {'nome':'numeracao', 'valor': celulas[3].innerHTML},
+			          {'nome':'pesoLiquido', 'valor': celulas[4].innerHTML},
+			          {'nome':'pesoBruto', 'valor': celulas[5].innerHTML},
+				]};
+		gerarInputHidden(volume);
+	}
+};
+
 function gerarInputProdutoServico(){
 	var tabela = document.getElementById('tabela_produtos');
 	var linhas = tabela.tBodies[0].rows;
@@ -404,15 +434,44 @@ function inserirDuplicata(){
 	linha.insertCell(0).innerHTML = numero;
 	linha.insertCell(1).innerHTML = vencimento;
 	linha.insertCell(2).innerHTML = valor;
-	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerDuplicata(this);"/>';
+	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
 	
 	$('#bloco_duplicata input:text').val('');
 };
 
-function removerDuplicata(botao){
-	 var linha = $(botao).closest("tr")[0];
-	 document.getElementById('tabela_duplicata').deleteRow(linha.rowIndex);
+function inserirVolume(){
+	var quantidade = $('#bloco_volume #quantidadeVolume').val();
+	var especie = $('#bloco_volume #especieVolume').val();
+	var marca = $('#bloco_volume #marcaVolume').val();
+	var numeracao = $('#bloco_volume #numeracaoVolume').val();
+	var pesoLiq = $('#bloco_volume #pesoLiquidoVolume').val();
+	var pesoBruto = $('#bloco_volume #pesoBrutoVolume').val();
+
+	if(isEmpty(quantidade) && isEmpty(especie) && isEmpty(marca)
+			&& isEmpty(numeracao) && isEmpty(pesoLiq) && isEmpty(pesoBruto)){
+		return;
+	}
+	
+	var tabela = document.getElementById('tabela_volume');
+	var linha = tabela.tBodies[0].insertRow(0);
+	
+	linha.insertCell(0).innerHTML = quantidade;
+	linha.insertCell(1).innerHTML = especie;
+	linha.insertCell(2).innerHTML = marca;
+	linha.insertCell(3).innerHTML = numeracao;
+	linha.insertCell(4).innerHTML = pesoLiq;
+	linha.insertCell(5).innerHTML = pesoBruto;
+	linha.insertCell(6).innerHTML = '<input type="button" title="Remover Volume" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
+	
+	$('#bloco_volume input:text').val('');
 };
+
+function removerLinhaTabela(botao){
+	 var linha = $(botao).closest("tr")[0];
+	 var tabela = $(botao).closest("table")[0];
+	 tabela.deleteRow(linha.rowIndex);
+};
+
 
 function inicializarFiltro() {
 	$("#filtroSigla").val($("#sigla").val());
@@ -1017,6 +1076,57 @@ function editarTributos(linha){
 					<div class="input" style="width: 50%">
 						<input type="text" name="nf.transporteNFe.retencaoICMS.valorServico.codigoMunicipioGerador" style="width: 20%" />
 					</div>
+				</fieldset>
+				
+				<fieldset id="bloco_volume" class="fieldsetInterno">
+					<legend>::: Volumes :::</legend>
+					<div class="label">Qtde.:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="quantidadeVolume"/>
+					</div>
+					
+					<div class="label">Espécie:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="especieVolume"/>
+					</div>
+					<div class="label">Marca:</div>
+					<div class="input" style="width: 30%">
+						<input type="text" id="marcaVolume" style="width: 50%"/>
+					</div>
+					<div class="label">Numeração:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="numeracaoVolume"/>
+					</div>
+					<div class="label">Peso Líq.(kg):</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="pesoLiquidoVolume"/>
+					</div>
+					<div class="label">Peso Bruto(kg):</div>
+					<div class="input" style="width: 30%">
+						<input type="text" id="pesoBrutoVolume" style="width: 50%"/>
+					</div>
+					<div class="bloco_botoes">
+						<a id="botaoInserirVolume" title="Inserir Dados da Volume" class="botaoAdicionar"></a>
+						<a id="botaoLimparVolume" title="Limpar Dados da Volume" class="botaoLimpar"></a>
+					</div>
+								
+					<table id="tabela_volume" class="listrada" >
+						<thead>
+							<tr>
+								<th>Qtde.</th>
+								<th>Espécie</th>
+								<th>Marca</th>
+								<th>Númeração</th>
+								<th>Peso Líq.(kg)</th>
+								<th>Peso Bruto(kg)</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						
+						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+						<tbody>
+						</tbody>
+					</table>
 				</fieldset>
 		</fieldset>
 		

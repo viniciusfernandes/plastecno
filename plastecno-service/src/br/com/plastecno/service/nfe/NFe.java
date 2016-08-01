@@ -1,6 +1,5 @@
 package br.com.plastecno.service.nfe;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -49,13 +48,7 @@ public class NFe {
 	@XmlAttribute(name = "versao")
 	private Double versao;
 
-	public void addDetalhamentoProdutoServico(
-			DetalhamentoProdutoServicoNFe detalhamento) {
-		if (listaDetalhamentoProdutoServicoNFe == null) {
-			listaDetalhamentoProdutoServicoNFe = new ArrayList<DetalhamentoProdutoServicoNFe>();
-		}
-		listaDetalhamentoProdutoServicoNFe.add(detalhamento);
-	}
+	
 
 	@XmlTransient
 	public IdentificacaoDestinatarioNFe getIdentificacaoDestinatarioNFe() {
@@ -125,7 +118,6 @@ public class NFe {
 	 */
 	public void setListaItem(List<DetalhamentoProdutoServicoNFe> listaItem) {
 		setListaDetalhamentoProdutoServicoNFe(listaItem);
-
 	}
 
 	public void setnFeRerefenciada(NFeRerefenciada nFeRerefenciada) {

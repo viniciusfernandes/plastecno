@@ -990,6 +990,34 @@ function editarTributos(linha){
 						<input type="text" name="nf.transporteNFe.transportadoraNFe.uf" value="${transportadora.uf}" style="width: 20%" />
 					</div>
 				</fieldset>
+				
+				<fieldset class="fieldsetInterno">
+					<legend>::: Retenção ICMS :::</legend>
+					<div  class="label">Valor Serviço:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" name="nf.transporteNFe.retencaoICMS.valorServico" style="width: 100%" />
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 50%">
+						<input type="text" name="nf.transporteNFe.retencaoICMS.valorBC" style="width: 20%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 10%">
+						<input type="text" name="nf.transporteNFe.retencaoICMS.aliquota" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Ret.:</div>
+					<div class="input" style="width: 50%">
+						<input type="text" name="nf.transporteNFe.retencaoICMS.valorRetido" style="width: 20%" />
+					</div>
+					<div  class="label">CFOP:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" name="nf.transporteNFe.retencaoICMS.cfop" style="width: 100%" />
+					</div>
+					<div  class="label">Município Gerador:</div>
+					<div class="input" style="width: 50%">
+						<input type="text" name="nf.transporteNFe.retencaoICMS.valorServico.codigoMunicipioGerador" style="width: 20%" />
+					</div>
+				</fieldset>
 		</fieldset>
 		
 		<fieldset>

@@ -53,3 +53,5 @@ create schema enderecamento;
 	jdk contiver a jre.
 2) O sistema não efetua login: em alguns momentos o banco de dados apresenta algum problema de socket e não conseguimos efetuar a comunicação 
 	com o banco, o que fica claro quando tentamos acessar o sistema via o browser. Temos que reiniciar ou reinstalar o banco.
+3) Problemas lançando exceção do tipo Spring, VRaptor, etc: Verificar se os projetos estão compilando ou com algum problema de configuração.
+Fechar os projetos e abri-los novamente. com.caelum.vraptor.proxy.ProxyInvocationException: org.springframework.beans.factory.BeanCurrentlyInCreationException

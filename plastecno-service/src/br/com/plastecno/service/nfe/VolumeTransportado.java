@@ -2,7 +2,7 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class VolumeTransportados {
+public class VolumeTransportado {
 	@XmlElement(name = "esp")
 	private String especie;
 

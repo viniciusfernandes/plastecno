@@ -50,6 +50,10 @@ public class NFeServiceImpl implements NFeService {
 		List<DetalhamentoProdutoServicoNFe> listaItem = nFe
 				.getListaDetalhamentoProdutoServicoNFe();
 
+		if (listaItem == null || listaItem.isEmpty()) {
+			return;
+		}
+
 		ICMSGeral tipoIcms = null;
 		IPIGeral tipoIpi = null;
 		PISGeral tipoPis = null;

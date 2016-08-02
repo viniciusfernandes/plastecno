@@ -49,12 +49,17 @@ $(document).ready(function() {
 		inserirVolume();
 	});
 	
+	$("#botaoInserirReboque").click(function() {
+		inserirReboque();
+	});
+	
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
 		gerarInputDuplicata();
 		gerarInputProdutoServico();
 		gerarInputVolume();
+		gerarInputReboque();
 		$('#formEmissao').submit();
 	});
 	
@@ -160,6 +165,30 @@ $(document).ready(function() {
 	inicializarFadeInBlocoImposto('bloco_cofins');
 	inicializarFadeInBlocoImposto('bloco_ii');
 });
+
+function gerarInputLinhasTabela(nomeTabela, parametroJson){
+	var tabela = document.getElementById(nomeTabela);
+	var linhas = tabela.tBodies[0].rows;
+	if(linhas.length <= 0){
+		return;
+	}
+	
+	var input = null;
+	var celulas = null;
+	var campos = null;
+	var max = null;
+	for (var i = 0; i < linhas.length; i++) {
+		campos = new Array();
+		celulas = linhas[i].cells;
+		<%-- devemos excluir a ultima celula da tabela pois eh a celula de botoes de acoes --%>
+		max = celulas.length - 1;
+		for (var j= 0; j < max; j++) {
+			campos[j] = {'nome':parametroJson.nomes[j], 'valor':celulas[j].innerHTML};
+		}
+		
+		gerarInputHidden({'nomeObjeto': parametroJson.nomeLista+'['+i+']', 'campos':campos});
+	}
+};
 
 function gerarLegendaBloco(nomeBloco){
 	var legend = $('#bloco_tributos #'+nomeBloco+' legend');
@@ -361,6 +390,13 @@ function gerarInputDuplicata(){
 	}
 };
 
+function gerarInputReboque(){
+	var parametros = {'nomeLista': 'nf.transporteNFe.listaReboque',
+					'nomes': ['placa', 'uf', 'registroNacionalTransportador']};
+	gerarInputLinhasTabela('tabela_reboque', parametros)
+};
+
+
 function gerarInputVolume(){
 	var tabela = document.getElementById('tabela_volume');
 	var linhas = tabela.tBodies[0].rows;
@@ -464,6 +500,26 @@ function inserirVolume(){
 	linha.insertCell(6).innerHTML = '<input type="button" title="Remover Volume" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
 	
 	$('#bloco_volume input:text').val('');
+};
+
+function inserirReboque(){
+	var placa = $('#bloco_reboque #placaReboque').val();
+	var uf = $('#bloco_reboque #ufReboque').val();
+	var registro = $('#bloco_reboque #registroReboque').val();
+
+	if(isEmpty(placa) || isEmpty(uf)){
+		return;
+	}
+	
+	var tabela = document.getElementById('tabela_reboque');
+	var linha = tabela.tBodies[0].insertRow(0);
+	
+	linha.insertCell(0).innerHTML = placa;
+	linha.insertCell(1).innerHTML = uf;
+	linha.insertCell(2).innerHTML = registro;
+	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Reboque" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
+	
+	$('#bloco_reboque input:text').val('');
 };
 
 function removerLinhaTabela(botao){
@@ -1048,6 +1104,56 @@ function editarTributos(linha){
 					<div class="input" style="width: 50%">
 						<input type="text" name="nf.transporteNFe.transportadoraNFe.uf" value="${transportadora.uf}" style="width: 20%" />
 					</div>
+				</fieldset>
+			
+				<fieldset class="fieldsetInterno">
+					<legend>::: Veículo :::</legend>
+					<div  class="label">Placa:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" name="nf.transporteNFe.veiculo.placa" value="${transportadora.cnpj}" style="width: 100%" />
+					</div>
+					<div  class="label">UF:</div>
+					<div class="input" style="width: 50%">
+						<input type="text" name="nf.transporteNFe.veiculo.uf" style="width: 20%" />
+					</div>
+					<div  class="label">Regist. Trans. Cargo:</div>
+					<div class="input" style="width: 30%">
+						<input type="text" name="nf.transporteNFe.veiculo.registroNacionalTransportador" value="${transportadora.inscricaoEstadual}"  style="width: 50%" />
+					</div>
+				</fieldset>
+				
+				<fieldset id="bloco_reboque" class="fieldsetInterno">
+					<legend>::: Reboque :::</legend>
+					<div  class="label">Placa:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="placaReboque" style="width: 100%" />
+					</div>
+					<div  class="label">UF:</div>
+					<div class="input" style="width: 50%">
+						<input type="text" id="ufReboque" style="width: 20%" />
+					</div>
+					<div  class="label">Regist. Trans. Cargo:</div>
+					<div class="input" style="width: 30%">
+						<input type="text" id="registroReboque" style="width: 50%" />
+					</div>
+					<div class="bloco_botoes">
+						<a id="botaoInserirReboque" title="Inserir Dados do Reboque" class="botaoAdicionar"></a>
+					</div>
+								
+					<table id="tabela_reboque" class="listrada" >
+						<thead>
+							<tr>
+								<th>Placa</th>
+								<th>UF</th>
+								<th>Registro</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						
+						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+						<tbody>
+						</tbody>
+					</table>
 				</fieldset>
 				
 				<fieldset class="fieldsetInterno">

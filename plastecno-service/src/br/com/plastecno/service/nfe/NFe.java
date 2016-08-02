@@ -12,6 +12,12 @@ public class NFe {
 	@XmlElement(name = "cobr")
 	private CobrancaNFe cobrancaNFe;
 
+	@XmlElement(name = "compra")
+	private CompraNFe compraNFe;
+
+	@XmlElement(name = "exporta")
+	private ExportacaoNfe exportacaoNfe;
+
 	@XmlAttribute(name = "Id")
 	private String id;
 
@@ -48,8 +54,6 @@ public class NFe {
 	@XmlAttribute(name = "versao")
 	private Double versao;
 
-	
-
 	@XmlTransient
 	public IdentificacaoDestinatarioNFe getIdentificacaoDestinatarioNFe() {
 		return identificacaoDestinatarioNFe;
@@ -69,11 +73,19 @@ public class NFe {
 		this.cobrancaNFe = cobrancaNFe;
 	}
 
+	public void setCompraNFe(CompraNFe compraNFe) {
+		this.compraNFe = compraNFe;
+	}
+
 	/*
 	 * Metodo criado apenas para abreviar as marcacoes nos .jsp
 	 */
 	public void setDestinatario(IdentificacaoDestinatarioNFe destinatario) {
 		setIdentificacaoDestinatarioNFe(destinatario);
+	}
+
+	public void setExportacaoNfe(ExportacaoNfe exportacaoNfe) {
+		this.exportacaoNfe = exportacaoNfe;
 	}
 
 	public void setId(String id) {

@@ -1074,7 +1074,7 @@ function editarTributos(linha){
 					</div>
 					<div  class="label">Município Gerador:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.valorServico.codigoMunicipioGerador" style="width: 20%" />
+						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" style="width: 20%" />
 					</div>
 				</fieldset>
 				

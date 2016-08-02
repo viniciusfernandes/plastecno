@@ -26,6 +26,11 @@ fieldset .fieldsetInterno legend {
 	font-size: 10px;
 }
 
+.divFieldset {
+	width: 100%;
+	float: left;
+}
+
 </style>
 <script type="text/javascript">
 
@@ -341,7 +346,7 @@ function gerarInputICMS(){
 		'campos':[{'nome':'cfop', 'id':'cfop'}]};
 	
 	gerarInputHidden(tipoIcms);
-	//gerarInputHidden(produto);
+	gerarInputHidden(produto);
 };
 
 
@@ -774,7 +779,10 @@ function editarTributos(linha){
 				<input type="text" id="email" name="nf.identificacaoDestinatarioNFe.email"
 					value="${cliente.email}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
 			</div>
+			
+			<div class="divFieldset">
 			<jsp:include page="/bloco/bloco_logradouro.jsp"></jsp:include>
+			</div>
 		</fieldset>
 		
 		<fieldset>
@@ -826,13 +834,12 @@ function editarTributos(linha){
 			
 			<fieldset id="bloco_tributos">
 				<legend class="fieldsetInterno">::: Tributos :::</legend>
-				<%-- 
 				<div class="label">CFOP:</div>
 				<div class="input" style="width: 80%">
 					<input id="cfop" type="text" name="cfop" style="width: 10%"/>
 				</div>
-				--%>
 				
+				<div class="divFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
 					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
 					<div class="label">Regime:</div>
@@ -923,7 +930,9 @@ function editarTributos(linha){
 						<input type="button" id="botaoLimparICMS" title="Limpar ICMS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
+				</div>
 				
+				<div class="divFieldset">
 				<fieldset id="bloco_ipi" class="fieldsetInterno">
 					<legend>::: IPI Prod.::: +</legend>
 					<div class="label">Situação Tribut.:</div>
@@ -975,7 +984,9 @@ function editarTributos(linha){
 						<input type="button" id="botaoLimparIPI" title="Limpar IPI do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
+				</div>
 				
+				<div class="divFieldset">
 				<fieldset id="bloco_pis" class="fieldsetInterno">
 					<legend>::: PIS Prod.::: +</legend>
 					<div class="label">Situação Tribut.:</div>
@@ -1011,7 +1022,9 @@ function editarTributos(linha){
 						<input type="button" id="botaoLimparPIS" title="Limpar PIS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
+				</div>
 				
+				<div class="divFieldset">
 				<fieldset id="bloco_cofins" class="fieldsetInterno">
 					<legend>::: COFINS Prod.::: +</legend>
 					<div class="label">Situação Tribut.:</div>
@@ -1047,7 +1060,9 @@ function editarTributos(linha){
 						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
+				</div>
 				
+				<div class="divFieldset">
 				<fieldset id="bloco_ii" class="fieldsetInterno">
 					<legend>::: Imp. Impor. Prod.::: +</legend>
 					<div  class="label">Valor:</div>
@@ -1071,63 +1086,8 @@ function editarTributos(linha){
 						<input type="button" id="botaoLimparII" title="Limpar Imp. Importação do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
-				<%--
-				<fieldset class="fieldsetInterno">
-					<legend>::: Valores Totais :::</legend>
-					<div class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valorBCICMSTotal"/>
-					</div>
-					<div class="label">Valor Total:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="valorTotalICMS" style="width: 20%"/>
-					</div>
-					<div class="label">Valor BC ST:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valorBCSTICMSTotal"/>
-					</div>
-					<div class="label">Valor Total ST:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="valorTotalICMSST" style="width: 20%"/>
-					</div>
-					<div class="label">Valor Total Prod. Serv.:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valorProdServ"/>
-					</div>
-					<div class="label">Valor Total Frete:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="valorTotalFrete" style="width: 20%"/>
-					</div>
-					<div class="label">Valor Total Seguro:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valorTotalSeguro"/>
-					</div>
-					<div class="label">Valor Total Desconto:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="valorTotalDesconto" style="width: 20%"/>
-					</div>
-					<div class="label">Valor Total Imp. Import.:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valorTotalImpImport"/>
-					</div>
-					<div class="label">Valor Total IPI:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="valorTotalIPI" style="width: 20%"/>
-					</div>
-					<div class="label">Valor Total PIS:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valorTotalPIS"/>
-					</div>
-					<div class="label">Valor Total COFINS:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="valorTotalCOFINS" style="width: 20%"/>
-					</div>
-					<div class="label">Outras Desp. Acessórias:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valorTotalOutrasDesp"/>
-					</div>
-				</fieldset>
-				--%>
+				</div>
+				
 			</fieldset>
 		</fieldset>	
 		
@@ -1142,6 +1102,7 @@ function editarTributos(linha){
 			</select>
 			</div>
 			
+			<div class="divFieldset">
 			<fieldset class="fieldsetInterno">
 					<legend>::: Transportadora :::</legend>
 					<div  class="label">Razão Soc./Nome:</div>
@@ -1173,7 +1134,9 @@ function editarTributos(linha){
 						<input type="text" name="nf.transporteNFe.transportadoraNFe.uf" value="${transportadora.uf}" style="width: 20%" />
 					</div>
 				</fieldset>
+				</div>
 			
+				<div class="divFieldset">
 				<fieldset class="fieldsetInterno">
 					<legend>::: Veículo :::</legend>
 					<div  class="label">Placa:</div>
@@ -1189,7 +1152,9 @@ function editarTributos(linha){
 						<input type="text" name="nf.transporteNFe.veiculo.registroNacionalTransportador" value="${transportadora.inscricaoEstadual}"  style="width: 50%" />
 					</div>
 				</fieldset>
+				</div>
 				
+				<div class="divFieldset">
 				<fieldset id="bloco_reboque" class="fieldsetInterno">
 					<legend>::: Reboque :::</legend>
 					<div  class="label">Placa:</div>
@@ -1223,7 +1188,9 @@ function editarTributos(linha){
 						</tbody>
 					</table>
 				</fieldset>
+				</div>
 				
+				<div class="divFieldset">
 				<fieldset class="fieldsetInterno">
 					<legend>::: Retenção ICMS :::</legend>
 					<div  class="label">Valor Serviço:</div>
@@ -1251,7 +1218,9 @@ function editarTributos(linha){
 						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" style="width: 20%" />
 					</div>
 				</fieldset>
+				</div>
 				
+				<div class="divFieldset">
 				<fieldset id="bloco_volume" class="fieldsetInterno">
 					<legend>::: Volumes :::</legend>
 					<div class="label">Qtde.:</div>
@@ -1302,6 +1271,7 @@ function editarTributos(linha){
 						</tbody>
 					</table>
 				</fieldset>
+				</div>
 		</fieldset>
 		
 		<fieldset>
@@ -1324,6 +1294,7 @@ function editarTributos(linha){
 				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorLiquido" style="width: 20%"/>
 			</div>
 			
+			<div class="divFieldset">
 			<fieldset id="bloco_duplicata" class="fieldsetInterno">
 				<legend>::: Duplicata :::</legend>
 				<div class="label">Número:</div>
@@ -1359,6 +1330,7 @@ function editarTributos(linha){
 					</tbody>
 				</table>
 			</fieldset>
+			</div>
 		</fieldset>
 		
 		<fieldset>

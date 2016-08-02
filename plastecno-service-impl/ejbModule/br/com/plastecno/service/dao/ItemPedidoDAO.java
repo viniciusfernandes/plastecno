@@ -158,7 +158,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	public List<Integer> pesquisarIdPedidoAssociadoByIdPedidoOrigem(Integer idPedidoOrigem, boolean isCompra) {
-		StringBuilder select = new StringBuilder("select ");
+		StringBuilder select = new StringBuilder("select distinct ");
 		if (isCompra) {
 			select.append("i.idPedidoVenda ");
 		} else {
@@ -170,6 +170,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			select.append("i.idPedidoVenda != null ");
 		} else {
 			select.append("i.idPedidoCompra != null ");
+		}
+
+		if (isCompra) {
+			select.append("order by i.idPedidoVenda desc ");
+		} else {
+			select.append("order by i.idPedidoCompra desc ");
 		}
 
 		return entityManager.createQuery(select.toString(), Integer.class).setParameter("idPedidoOrigem", idPedidoOrigem)
@@ -223,7 +229,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idRepresentada, Date dataInicial, Date dataFinal) {
+	public List<ItemPedido> pesquisarItemAguardandoMaterial(Integer idFornecedor, Date dataInicial, Date dataFinal) {
 		StringBuilder select = gerarConstrutorItemPedidoIdPedidoCompraEVenda();
 
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
@@ -238,8 +244,15 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			select.append("and i.pedido.dataEnvio <= :dataFinal ");
 		}
 
-		if (idRepresentada != null) {
-			select.append("and i.pedido.representada.id = :idRepresentada ");
+		if (idFornecedor != null) {
+			select
+					.append("and i.idPedidoCompra in ( select p.id from Pedido p where p.tipoPedido = :tipoPedidoCompra and p.representada.id = :idFornecedor ");
+			// Essa condicao foi incluida apenas para melhorar o filtro do resultado
+			// dos pedidos de compra e nao tem relacao direta com o negocio.
+			if (dataInicial != null) {
+				select.append("and (p.dataEnvio is null or p.dataEnvio >= :dataInicial) ");
+			}
+			select.append(" ) ");
 		}
 
 		select.append("order by i.pedido.dataEntrega asc ");
@@ -256,8 +269,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			query.setParameter("dataFinal", dataFinal);
 		}
 
-		if (idRepresentada != null) {
-			query.setParameter("idRepresentada", idRepresentada);
+		if (idFornecedor != null) {
+			query.setParameter("tipoPedidoCompra", TipoPedido.COMPRA).setParameter("idFornecedor", idFornecedor);
 		}
 
 		return query.getResultList();
@@ -350,6 +363,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			selectPedido.append(" and p.tipoPedido != :tipoPedido ");
 		}
 
+		selectPedido.append("order by p.id desc ");
+
 		Query query = this.entityManager.createQuery(selectPedido.toString());
 		query.setParameter("idCliente", idCliente);
 
@@ -371,7 +386,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		StringBuilder selectItem = new StringBuilder();
 
 		selectItem
-				.append("select new ItemPedido(i.pedido.id, i.pedido.situacaoPedido, i.pedido.dataEnvio, i.pedido.tipoPedido, i.pedido.representada.nomeFantasia, i.id, i.sequencial, i.quantidade, i.precoUnidade, i.formaMaterial, ");
+				.append("select new ItemPedido(i.pedido.id, i.pedido.numeroPedidoCliente, i.pedido.situacaoPedido, i.pedido.dataEnvio, i.pedido.tipoPedido, i.pedido.representada.nomeFantasia, i.id, i.sequencial, i.quantidade, i.precoUnidade, i.formaMaterial, ");
 
 		selectItem
 				.append("i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento, i.tipoVenda, i.precoVenda, i.aliquotaIPI, i.aliquotaICMS) from ItemPedido i ");
@@ -379,7 +394,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 		inserirPesquisaItemVendido(selectItem, itemVendido);
 
-		selectItem.append(" order by i.pedido.dataEnvio desc, i.pedido.id desc");
+		selectItem.append("order by i.pedido.dataEnvio asc ");
 
 		TypedQuery<ItemPedido> queryItem = entityManager.createQuery(selectItem.toString(), ItemPedido.class).setParameter(
 				"listaIdPedido", Arrays.asList(listaIdPedido.toArray(new Integer[] {})));

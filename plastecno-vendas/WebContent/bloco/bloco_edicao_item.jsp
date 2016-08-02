@@ -212,16 +212,12 @@ function habilitarCamposEdicaoItem(habilitado){
 	</div>
 				
 	<div class="bloco_botoes">
-		<c:choose>
-			<c:when test="${!isEstoque or (isEstoque && not empty itemPedido.id)}">
-				<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Inserir os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
-				<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
-			</c:when>
-			<c:when test="${isEstoque && empty itemPedido.id}">
-				<a id="botaoInserirConfiguracoesEstoque" title="Inserir Configurações dos Itens do Estoque" class="botaoManutencao"></a>
-				<a id="botaoReajustarPreco" title="Ajustar Preco" class="botaoDinheiro" ></a>
-			</c:when>
-		</c:choose>
+		<a id="botaoInserirItemPedido" title="${not empty itemPedido.id ? 'Inserir os Dados do Item' : 'Adicionar Dados do Item'}" class="botaoAdicionar"></a>
+		<a id="botaoLimparItemPedido" title="Limpar Dados do Item" class="botaoLimpar"></a>
+		<c:if test="${isEstoque && empty itemPedido.id}">
+			<a id="botaoInserirConfiguracoesEstoque" title="Inserir Configurações dos Itens do Estoque" class="botaoManutencao"></a>
+			<a id="botaoReajustarPreco" title="Ajustar Preco" class="botaoDinheiro" ></a>
+		</c:if>
 	</div>
 
 </fieldset>

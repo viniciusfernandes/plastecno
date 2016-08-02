@@ -59,7 +59,7 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email do cliente")
 	private String email;
 
-	@Column(name="email_cobranca")
+	@Column(name = "email_cobranca")
 	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email de cobrança do cliente")
 	private String emailCobranca;
 
@@ -132,6 +132,15 @@ public class Cliente implements Serializable {
 		this.razaoSocial = razaoSozial;
 	}
 
+	public Cliente(Integer id, String nomeFantasia, String razaoSozial,
+			String cnpj, String cpf, String inscricaoEstadual, String email) {
+		this(id, nomeFantasia, razaoSozial);
+		this.cnpj = cnpj;
+		this.cpf = cpf;
+		this.inscricaoEstadual = inscricaoEstadual;
+		this.email = email;
+	}
+
 	public void addContato(ContatoCliente contatoCliente) {
 		if (this.listaContato == null) {
 			this.setListaContato(new HashSet<ContatoCliente>());
@@ -191,7 +200,8 @@ public class Cliente implements Serializable {
 	}
 
 	public Contato getContatoPrincipal() {
-		return this.isListaContatoPreenchida() ? this.listaContato.iterator().next() : null;
+		return this.isListaContatoPreenchida() ? this.listaContato.iterator()
+				.next() : null;
 	}
 
 	public String getCpf() {

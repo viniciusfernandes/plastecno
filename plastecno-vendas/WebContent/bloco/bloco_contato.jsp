@@ -118,11 +118,10 @@
 							<td>${contato.email}</td>
 							<td>${contato.telefoneFormatado}</td>
 							<td>${contato.telefoneSecundarioFormatado}</td>
-							<td><input type="button" value=""
-								title="Editar Dados do Contato" onclick="editarContato(this);"
-								class="botaoEditar" /> <input type="button" value=""
-								title="Remover Dados do Contato" onclick="removerContato(this);"
-								class="botaoRemover" /></td>
+							<td>
+								<input type="button" value="" title="Editar Dados do Contato" onclick="editarContato(this);" class="botaoEditar" /> 
+								<input type="button" value="" title="Remover Dados do Contato" onclick="removerContato(this);" class="botaoRemover" />
+							</td>
 						</tr>
 					</c:forEach>
 

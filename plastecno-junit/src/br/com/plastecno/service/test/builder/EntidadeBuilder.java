@@ -183,7 +183,8 @@ public class EntidadeBuilder {
 		return logradouro;
 	}
 
-	public LogradouroCliente buildLogradouroCliente(TipoLogradouro tipoLogradouro) {
+	public LogradouroCliente buildLogradouroCliente(
+			TipoLogradouro tipoLogradouro) {
 		LogradouroCliente logradouro = new LogradouroCliente(buildEndereco());
 		logradouro.setTipoLogradouro(tipoLogradouro);
 		return logradouro;
@@ -243,6 +244,15 @@ public class EntidadeBuilder {
 		representada.setComissao(0.05);
 		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
 		representada.setAliquotaICMS(0.18);
+
+		Logradouro l = buildLogradouro(TipoLogradouro.FATURAMENTO);
+		l.setCep("09910345");
+		l.setEndereco("Rua Parnamirim");
+		l.setNumero(432);
+		l.setCidade("Diadema");
+		l.setComplemento("Conjunto 330");
+		representada.setLogradouro(l);
+
 		return representada;
 	}
 
@@ -265,7 +275,8 @@ public class EntidadeBuilder {
 	}
 
 	public Usuario buildVendedor() {
-		Usuario vendedor = new Usuario(gerarId(), "Vinicius", "Fernandes Vendedor");
+		Usuario vendedor = new Usuario(gerarId(), "Vinicius",
+				"Fernandes Vendedor");
 		vendedor.setEmail("vinicius@teste.com.br");
 		vendedor.setSenha("1234567");
 		vendedor.setAtivo(true);

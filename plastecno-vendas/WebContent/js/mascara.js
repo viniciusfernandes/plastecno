@@ -36,9 +36,9 @@ function inserirMascaraMonetaria(idCampo, digitos) {
 	$('#'+idCampo).maskMoney({thousands:'', decimal:'.'});
 }
 
-function inserirMascaraData(idCampo) {
+function mascaraData(idCampo, mascara){
 	$("#"+idCampo).datepicker({
-		dateFormat: 'dd/mm/yy',
+		dateFormat: mascara,
 		dayNames: ['Domingo','Segunda','Ter�a','Quarta','Quinta','Sexta','S�bado','Domingo'],
 		dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
 		dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','S�b','Dom'],
@@ -47,6 +47,14 @@ function inserirMascaraData(idCampo) {
 		nextText: 'Pr�ximo',
 		prevText: 'Anterior' 
 	});
+}
+
+function inserirMascaraData(idCampo) {
+	mascaraData(idCampo, 'dd/mm/yy');
+};
+
+function inserirMascaraDataAmericano(idCampo) {
+	mascaraData(idCampo, 'yy-mm-dd');
 };
 
 function inserirMascaraNCM(idCampo) {

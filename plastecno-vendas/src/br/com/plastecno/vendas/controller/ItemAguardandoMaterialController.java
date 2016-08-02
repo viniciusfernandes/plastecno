@@ -56,7 +56,9 @@ public class ItemAguardandoMaterialController extends AbstractController {
 
     @Get("itemAguardandoMaterial")
     public void itemAguardandoMaterialHome() {
-        addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
+        if (!contemAtributo("listaRepresentada")) {
+            addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
+        }
     }
 
     @Get("itemAguardandoMaterial/listagem")

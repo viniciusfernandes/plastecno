@@ -119,7 +119,7 @@ $(document).ready(function() {
 	inicializarAutomcompleteCliente('<c:url value="/pedido/cliente"/>');
 
 	<c:if test="${pedidoDesabilitado}">
-		$('input[type=text]:not(.semprehabilitado), select:not(.semprehabilitado), textarea').attr('disabled', true).addClass('desabilitado');
+		$('input[type=text], select:not(.semprehabilitado), textarea').attr('disabled', true).addClass('desabilitado');
 	</c:if>
 
 	<c:if test="${empty pedido.id}">
@@ -162,6 +162,16 @@ $(document).ready(function() {
 			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ENVIAR esse pedido?',
 			confirmar: function(){
 				$('#botaoEnviarPedido').closest('form').submit();	
+			}
+		});
+	});
+	
+	$('#botaoAceitarOrcamento').click(function (){
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ACEITAR esse orçamento para os pedidos?',
+			confirmar: function(){
+				var form = $('#botaoAceitarOrcamento').closest('form');
+				$(form).attr('action', '<c:url value="pedido/aceiteorcamento"/>').submit();
 			}
 		});
 	});
@@ -405,9 +415,12 @@ $(document).ready(function() {
 	<form id="formEnvioPedido" action="<c:url value="/pedido/envio"/>" method="post">
 		<input type="hidden" name="tipoPedido" value="${tipoPedido}"/>
 		<div class="bloco_botoes">
-			<input type="button" id="botaoEnviarPedido" title="Enviar Dados do Pedido" value="" class="botaoEnviarEmail"
+			<input type="button" id="botaoEnviarPedido" title="Enviar Email do ${orcamento ? 'Orcamento' : 'Pedido'}" value="" class="botaoEnviarEmail"
 				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> 
 			/>
+			<c:if test="${orcamento}">
+				<input type="button" id="botaoAceitarOrcamento" title="Aceitar do Orçamento" value="" class="botaoAceitar"/>
+			</c:if>
 			<input type="hidden" id="idPedido" name="idPedido" value="${pedido.id}" />
 		</div>
 	</form>
@@ -421,7 +434,7 @@ $(document).ready(function() {
 			<thead>
 				<tr>
 					<th style="width: 10%">Situaç.</th>
-					<th style="width: 10%">Pedido</th>
+					<th style="width: 10%">Ped./N. Cli.</th>
 					<th style="width: 5%">Item</th>
 					<th style="width: 5%">Qtde.</th>
 					<th style="width: 35%">Descrição</th>
@@ -442,7 +455,7 @@ $(document).ready(function() {
 						<tr>
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.situacaoPedido.descricao}</td>
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.id}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.id}/<br></br>${grupo.id.numeroPedidoCliente}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>

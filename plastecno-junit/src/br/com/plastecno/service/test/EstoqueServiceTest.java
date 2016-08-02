@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -134,6 +135,13 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e3);
 		}
 		return fornecedor;
+	}
+
+	private ItemEstoque gerarItemEstoqueComMedidaInterna(FormaMaterial formaMaterial) {
+		ItemEstoque item = eBuilder.buildItemEstoque();
+		item.setMaterial(gerarMaterial());
+		item.setFormaMaterial(formaMaterial);
+		return item;
 	}
 
 	private ItemEstoque gerarItemEstoquePeca() {
@@ -637,6 +645,53 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		assertNull("A quantidade minina de estoque deve ser nula no caso de valores menores ou iguais a zero",
 				configuracao.getQuantidadeMinima());
+	}
+
+	@Test
+	public void testInclusaoConfiguracaoNcm() {
+		ItemEstoque tubo = gerarItemEstoqueComMedidaInterna(FormaMaterial.TB);
+		ItemEstoque tubo2 = gerarItemEstoqueComMedidaInterna(FormaMaterial.TB);
+
+		ItemEstoque barra = gerarItemEstoqueComMedidaInterna(FormaMaterial.BQ);
+
+		Integer idTubo = null;
+		Integer idTubo2 = null;
+		Integer idBarra = null;
+		Integer idMaterial = tubo.getMaterial().getId();
+		try {
+			idTubo = estoqueService.inserirItemEstoque(tubo);
+			idTubo2 = estoqueService.inserirItemEstoque(tubo2);
+			idBarra = estoqueService.inserirItemEstoque(barra);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		String ncm = "11.11.11.11";
+		estoqueService.inserirConfiguracaoNcmEstoque(idMaterial, FormaMaterial.TB, ncm);
+
+		tubo = estoqueService.pesquisarItemEstoqueById(idTubo);
+		tubo2 = estoqueService.pesquisarItemEstoqueById(idTubo2);
+		barra = estoqueService.pesquisarItemEstoqueById(idBarra);
+
+		assertEquals("Foi configurado um ncm para os tubos e os valores nao esta identicos. Verifique a regra de negocio.",
+				ncm, tubo.getNcm());
+		assertEquals("Foi configurado um ncm para os tubos e os valores nao esta identicos. Verifique a regra de negocio.",
+				ncm, tubo2.getNcm());
+		assertNull(
+				"Nao foi configurado um ncm para as barras entao os valores devem estar nulos. Verifique a regra de negocio.",
+				barra.getNcm());
+
+		boolean configurou = false;
+
+		configurou = estoqueService.inserirConfiguracaoNcmEstoque(null, FormaMaterial.TB, ncm);
+		assertFalse("O item nao contem material e nao pode ter o ncm configurado.", configurou);
+
+		ItemEstoque itemSemForma = gerarItemEstoqueComMedidaInterna(null);
+		itemSemForma.setMaterial(null);
+
+		configurou = estoqueService.inserirConfiguracaoNcmEstoque(idMaterial, null, ncm);
+		assertFalse("O item nao contem material e nao pode ter o ncm configurado.", configurou);
+
 	}
 
 	@Test

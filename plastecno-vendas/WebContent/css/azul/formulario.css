@@ -45,6 +45,10 @@ legend {
 	margin-bottom: 5px;
 	padding: 5px;
 }
+
+fieldset .fieldsetInterno {
+	margin: 0 1% 1% 1%;
+}
 /* fim das definicoes do layout para o fieldset dos inputs de cadastro */
 
 .label, .input {

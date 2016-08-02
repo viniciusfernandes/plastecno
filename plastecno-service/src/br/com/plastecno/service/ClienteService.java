@@ -58,6 +58,8 @@ public interface ClienteService {
 
 	Cliente pesquisarClienteResumidoById(Integer idCliente);
 
+	Cliente pesquisarClienteResumidoEContatoById(Integer idCliente);
+
 	List<Cliente> pesquisarClientesAssociados(Integer idVendedor);
 
 	List<Cliente> pesquisarClientesById(List<Integer> listaIdCliente);
@@ -73,6 +75,8 @@ public interface ClienteService {
 	List<LogradouroCliente> pesquisarLogradouro(Integer idCliente);
 
 	LogradouroCliente pesquisarLogradouroById(Integer idLogradouro);
+
+	LogradouroCliente pesquisarLogradouroFaturamentoById(Integer idCliente);
 
 	String pesquisarNomeFantasia(Integer idCliente);
 

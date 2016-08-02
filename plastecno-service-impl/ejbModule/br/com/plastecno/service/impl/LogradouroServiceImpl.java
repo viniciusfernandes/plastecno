@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -16,6 +17,9 @@ import javax.persistence.Query;
 import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.dao.ItemPedidoDAO;
+import br.com.plastecno.service.dao.LogradouroDAO;
+import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
@@ -29,6 +33,12 @@ public class LogradouroServiceImpl implements LogradouroService {
 	
 	@EJB
 	private EnderecamentoService enderecamentoService;
+	
+	private LogradouroDAO logradouroDAO ;
+	@PostConstruct
+	public void init() {
+		logradouroDAO= new LogradouroDAO(entityManager);
+	}
 	
 	@Override
 	public <T extends Logradouro> List<T> inserir(List<T> listaLogradouro) throws BusinessException {
@@ -59,8 +69,8 @@ public class LogradouroServiceImpl implements LogradouroService {
 			 * Aqui vamos configuirar o endereco, pois o servico de inclusao de enderecos
 			 * recuperar os IDS do bairro, cidade e pais.
 			 */
-			logradouro.addEndereco(this.enderecamentoService.inserir(logradouro.recuperarEndereco()));
-			return this.entityManager.merge(logradouro);
+			logradouro.addEndereco(enderecamentoService.inserir(logradouro.recuperarEndereco()));
+			return  (T) logradouroDAO.alterar(logradouro);
 		}
 		return null;
 	}

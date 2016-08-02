@@ -59,6 +59,14 @@
 	left: 10%;
 }
 
+.botaoAceitar {
+	background: url("../images/accepted_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoAdicionar {
 	background: url("../images/package_down_arrow_24.png") no-repeat scroll
 		0 0 transparent;
@@ -97,6 +105,15 @@
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
+}
+
+.botaoDinheiroPequeno {
+	background: url("../images/money_16.png") no-repeat scroll 0 0
+		transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
 }
 
 .botaoDetalhar_16 {
@@ -225,6 +242,23 @@
 	width: 24px;
 }
 
+.botaoNF {
+	background: url("../images/nf_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoNFPequeno {
+	background: url("../images/nf_16.png") no-repeat scroll 0 0
+		transparent;
+	border: 0;
+	cursor: pointer;
+	height: 16px;
+	margin-left: 5px;
+	width: 16px;
+}
 
 .botaoPesquisar {
 	background: url("../images/search_24.png") no-repeat scroll 0 0
@@ -309,6 +343,14 @@
 	background: url("../images/arrow_left_blue_24.png") no-repeat scroll 0 0
 		transparent;
 	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoAceitar:hover {
+	background: url("../images/accepted_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
 	height: 24px;
 	width: 24px;
 }
@@ -422,6 +464,14 @@
 
 .botaoManutencao:hover {
 	background: url("../images/maintenance_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoNF:hover {
+	background: url("../images/nf_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 	height: 24px;

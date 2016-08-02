@@ -134,6 +134,12 @@ public class PedidoController extends AbstractController {
         this.diretorioTemplateRelatorio = request.getServletContext().getRealPath("/templates");
     }
 
+    @Post("pedido/aceiteorcamento")
+    public void aceitarOcamento(Integer idPedido, TipoPedido tipoPedido) {
+        pedidoService.aceitarOrcamento(idPedido);
+        redirecTo(this.getClass()).pesquisarPedidoById(idPedido, tipoPedido);
+    }
+
     @Post("pedido/cancelamento")
     public void cancelarPedido(Integer idPedido, TipoPedido tipoPedido) {
         try {
@@ -172,7 +178,7 @@ public class PedidoController extends AbstractController {
                     .append("No. ").append(idPedido).append(" - ").append(pedido.getCliente().getNomeFantasia())
                     .append(".pdf");
 
-            return gerarDownload(wrapper.getArquivoPDF(), titulo.toString());
+            return gerarDownloadPDF(wrapper.getArquivoPDF(), titulo.toString());
         } catch (Exception e) {
             this.gerarLogErro("geração do relatório de pedido", e);
             // Estamos retornando null porque no caso de falhas nao devemos
@@ -685,9 +691,10 @@ public class PedidoController extends AbstractController {
             addAtributo("listaTransportadora", this.transportadoraService.pesquisar());
             addAtributo("listaRedespacho", this.transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
             addAtributo("idRepresentadaSelecionada", idFornecedor);
+            
+            irRodapePagina();
         }
         configurarTipoPedido(tipoPedido);
-        irRodapePagina();
     }
 
     private void redirectByTipoPedido(TipoPedido tipoPedido) {

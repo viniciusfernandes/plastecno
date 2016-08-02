@@ -5,27 +5,28 @@ import javax.xml.bind.annotation.XmlElement;
 public class IdentificacaoNFeReferenciada {
 	@XmlElement(name = "AAMM")
 	private Integer anoMes;
+
 	@XmlElement(name = "CNPJ")
-	private String CNPJ;
-	@XmlElement(name = "cUF")
-	private Integer codigoUFEmitente;
+	private String cnpjEmitente;
+
 	@XmlElement(name = "mod")
 	private Integer modelo;
+
 	@XmlElement(name = "nNF")
 	private Integer numeroNF;
+
 	@XmlElement(name = "serie")
 	private Integer serie;
+
+	@XmlElement(name = "cUF")
+	private Integer ufEmitente;
 
 	public void setAnoMes(Integer anoMes) {
 		this.anoMes = anoMes;
 	}
 
-	public void setCNPJ(String cNPJ) {
-		CNPJ = cNPJ;
-	}
-
-	public void setCodigoUFEmitente(Integer codigoUFEmitente) {
-		this.codigoUFEmitente = codigoUFEmitente;
+	public void setCnpjEmitente(String cnpjEmitente) {
+		this.cnpjEmitente = cnpjEmitente;
 	}
 
 	public void setModelo(Integer modelo) {
@@ -38,6 +39,10 @@ public class IdentificacaoNFeReferenciada {
 
 	public void setSerie(Integer serie) {
 		this.serie = serie;
+	}
+
+	public void setUfEmitente(Integer ufEmitente) {
+		this.ufEmitente = ufEmitente;
 	}
 
 }

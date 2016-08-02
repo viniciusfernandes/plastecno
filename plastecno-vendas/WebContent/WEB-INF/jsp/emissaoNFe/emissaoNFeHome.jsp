@@ -53,6 +53,10 @@ $(document).ready(function() {
 		inserirReboque();
 	});
 	
+	$("#botaoInserirReferenciada").click(function() {
+		inserirReferenciada();
+	});
+	
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
@@ -60,6 +64,7 @@ $(document).ready(function() {
 		gerarInputProdutoServico();
 		gerarInputVolume();
 		gerarInputReboque();
+		gerarInputReferenciada();
 		$('#formEmissao').submit();
 	});
 	
@@ -369,25 +374,9 @@ function gerarInputImpostoImportacao(){
 
 
 function gerarInputDuplicata(){
-	var tabela = document.getElementById('tabela_duplicata');
-	var linhas = tabela.tBodies[0].rows;
-	if(linhas.length <= 0){
-		return;
-	}
-	
-	var input = null;
-	var celulas = null;
-	
-	var duplicata = null;
-	for (var i = 0; i < linhas.length; i++) {
-		celulas = linhas[i].cells;
-		duplicata = {'nomeObjeto':'nf.cobrancaNFe.listaDuplicata['+i+']',
-			'campos':[{'nome':'numero', 'valor': celulas[0].innerHTML},
-			          {'nome':'dataVencimento', 'valor': celulas[1].innerHTML},
-			          {'nome':'valor', 'valor': celulas[2].innerHTML}
-				]};
-		gerarInputHidden(duplicata);
-	}
+	var parametros = {'nomeLista': 'nf.cobrancaNFe.listaDuplicata',
+			'nomes': ['numero', 'dataVencimento', 'valor']};
+	gerarInputLinhasTabela('tabela_duplicata', parametros)
 };
 
 function gerarInputReboque(){
@@ -396,30 +385,22 @@ function gerarInputReboque(){
 	gerarInputLinhasTabela('tabela_reboque', parametros)
 };
 
+function gerarInputReferenciada(){
+	var parametros = {'nomeLista': 'nf.identificacaoNFe.listaNFeReferenciada',
+					'nomes': ['chaveAcessoReferenciada', 'identificacaoNFeReferenciada.numeroNF', 
+					          'identificacaoNFeReferenciada.serie', 'identificacaoNFeReferenciada.modelo',
+					          'identificacaoNFeReferenciada.cnpjEmitente', 'identificacaoNFeReferenciada.anoMes',
+					          'identificacaoNFeReferenciada.ufEmitente']};
+	
+	gerarInputLinhasTabela('tabela_referenciada', parametros);
+};
+
 
 function gerarInputVolume(){
-	var tabela = document.getElementById('tabela_volume');
-	var linhas = tabela.tBodies[0].rows;
-	if(linhas.length <= 0){
-		return;
-	}
+	var parametro = {'nomeLista':'nf.transporteNFe.listaVolume',
+			'nomes':['quantidade', 'especie', 'marca', 'numeracao', 'pesoLiquido', 'pesoBruto']};
 	
-	var input = null;
-	var celulas = null;
-	
-	var volume = null;
-	for (var i = 0; i < linhas.length; i++) {
-		celulas = linhas[i].cells;
-		volume = {'nomeObjeto':'nf.transporteNFe.listaVolume['+i+']',
-			'campos':[{'nome':'quantidade', 'valor': celulas[0].innerHTML},
-			          {'nome':'especie', 'valor': celulas[1].innerHTML},
-			          {'nome':'marca', 'valor': celulas[2].innerHTML},
-			          {'nome':'numeracao', 'valor': celulas[3].innerHTML},
-			          {'nome':'pesoLiquido', 'valor': celulas[4].innerHTML},
-			          {'nome':'pesoBruto', 'valor': celulas[5].innerHTML},
-				]};
-		gerarInputHidden(volume);
-	}
+	gerarInputLinhasTabela('tabela_volume', parametro);
 };
 
 function gerarInputProdutoServico(){
@@ -520,6 +501,40 @@ function inserirReboque(){
 	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Reboque" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
 	
 	$('#bloco_reboque input:text').val('');
+};
+
+function inserirLinhaTabela(linhaJson){
+	var tabela = document.getElementById(linhaJson.nomeTabela);
+	var linha = tabela.tBodies[0].insertRow(0);
+	var valores = linhaJson.valores;
+	for (var i = 0; i <= valores.length; i++) {
+		if(i < valores.length){
+			linha.insertCell(i).innerHTML = valores[i];
+		} else {
+			linha.insertCell(i).innerHTML = '<input type="button" title="Remover Registro" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
+		}
+	}
+	
+	$('#'+linhaJson.nomeBloco +' input:text').val('');
+};
+
+function inserirReferenciada(){
+	var chave = $('#bloco_referenciada #chaveReferenciada').val();
+	var numero = $('#bloco_referenciada #numeroReferenciada').val();
+	var serie = $('#bloco_referenciada #serieReferenciada').val();
+	var mod = $('#bloco_referenciada #modReferenciada').val();
+	var cnpj = $('#bloco_referenciada #cnpjReferenciada').val();
+	var anoMes = $('#bloco_referenciada #anoMesReferenciada').val();
+	var uf = $('#bloco_referenciada #ufReferenciada').val();
+	
+	if(isEmpty(chave) || isEmpty(numero) || isEmpty(serie) || 
+			isEmpty(mod) || isEmpty(cnpj) || isEmpty(anoMes) || isEmpty(uf)){
+		return;
+	}
+	
+	var linha = {'nomeBloco':'bloco_referenciada', 'nomeTabela': 'tabela_referenciada',
+			'valores':[chave, numero, serie, mod, cnpj, anoMes, uf]};
+	inserirLinhaTabela(linha);
 };
 
 function removerLinhaTabela(botao){
@@ -671,11 +686,64 @@ function editarTributos(linha){
 			</div>
 		</fieldset>
 		
+		<fieldset id="bloco_referenciada">
+			<legend>::: NF/NFe Referenciada :::</legend>
+			<div class="label">Chave Acesso:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" id="chaveReferenciada" style="width: 50%"/>
+			</div>
+			<div class="label">Núm. Doc. Fiscal:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="numeroReferenciada" />
+			</div>
+			<div class="label">Série. Doc. Fiscal:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="serieReferenciada" />
+			</div>
+			<div class="label">Mod. Doc. Fiscal:</div>
+			<div class="input" style="width: 30%">
+				<input type="text" id="modReferenciada" style="width: 30%"/>
+			</div>
+			<div class="label">CNPJ Emit.:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="cnpjReferenciada" />
+			</div>
+			<div class="label">Emis. Ano/Mês (AAMM):</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="anoMesReferenciada" />
+			</div>
+			<div class="label">UF Emit.:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="ufReferenciada"/>
+			</div>
+			<div class="bloco_botoes">
+				<a id="botaoInserirReferenciada" title="Inserir Dados da NF referenciada" class="botaoAdicionar"></a>
+			</div>
+			<table id="tabela_referenciada" class="listrada" >
+				<thead>
+					<tr>
+						<th>Chave</th>
+						<th>Núm. Doc. Fisc.</th>
+						<th>Série Doc. Fisc.</th>
+						<th>Mod. Doc. Fisc.</th>
+						<th>CNPJ Emit.</th>
+						<th>Emis. Ano/Mês</th>
+						<th>UF Emit.</th>
+						<th>Ações</th>
+					</tr>
+				</thead>
+						
+				<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+				<tbody>
+				</tbody>
+			</table>
+		</fieldset>
+		
 		<fieldset>
 			<legend>::: Destinatário :::</legend>
-			<div class="label obrigatorio">Razão Social/Nome:</div>
+			<div class="label">Razão Social/Nome:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}" class="pesquisavel" style="widows: 60%"/>
+				<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}" class="pesquisavel" style="width: 60%"/>
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			
@@ -1240,7 +1308,7 @@ function editarTributos(linha){
 			<legend>::: Cobrança :::</legend>
 			<div class="label">Número:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" name="nf.cobrancaNFe.faturaNFe.numero" style="widows: 60%"/>
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.numero"/>
 			</div>
 			
 			<div class="label">Valor Original:</div>
@@ -1291,6 +1359,33 @@ function editarTributos(linha){
 					</tbody>
 				</table>
 			</fieldset>
+		</fieldset>
+		
+		<fieldset>
+			<legend>::: Exportação :::</legend>
+			<div class="label">UF Embarque:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.exportacaoNFe.ufEmbarque" style="width: 5%"/>
+			</div>
+			<div class="label">Local Embarque:</div>
+			<div class="input" style="width: 60%">
+				<input type="text" name="nf.exportacaoNFe.localEmbarque"/>
+			</div>		
+		</fieldset>
+		<fieldset>
+			<legend>::: Compra :::</legend>
+			<div class="label">Nota Empenho:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.compraNFe.notaEmpenho" style="width: 10%"/>
+			</div>
+			<div class="label">Pedido:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.compraNFe.pedido" style="width: 50%"/>
+			</div>
+			<div class="label">Contrato:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.compraNFe.contrato" style="width: 50%"/>
+			</div>		
 		</fieldset>
 		<div class="bloco_botoes">
 			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>

@@ -3,7 +3,7 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 
 
-public class ExportacaoNfe {
+public class ExportacaoNFe {
 
 	@XmlElement(name = "xLocEmbarq")
 	private String localEmbarque;

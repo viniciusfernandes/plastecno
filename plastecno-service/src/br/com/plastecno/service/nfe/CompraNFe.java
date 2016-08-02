@@ -7,7 +7,7 @@ public class CompraNFe {
 	private String contrato;
 
 	@XmlElement(name = "xNEmp")
-	private String notaEmprenho;
+	private String notaEmpenho;
 
 	@XmlElement(name = "xPed")
 	private String pedido;
@@ -16,8 +16,8 @@ public class CompraNFe {
 		this.contrato = contrato;
 	}
 
-	public void setNotaEmprenho(String notaEmprenho) {
-		this.notaEmprenho = notaEmprenho;
+	public void setNotaEmpenho(String notaEmpenho) {
+		this.notaEmpenho = notaEmpenho;
 	}
 
 	public void setPedido(String pedido) {

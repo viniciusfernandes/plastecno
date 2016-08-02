@@ -16,8 +16,7 @@ public class NFe {
 	private CompraNFe compraNFe;
 
 	@XmlElement(name = "exporta")
-	private ExportacaoNfe exportacaoNfe;
-
+	private ExportacaoNFe exportacaoNFe;
 	@XmlAttribute(name = "Id")
 	private String id;
 
@@ -43,7 +42,7 @@ public class NFe {
 	private List<DetalhamentoProdutoServicoNFe> listaDetalhamentoProdutoServicoNFe;
 
 	@XmlElement(name = "NFref")
-	private NFeRerefenciada nFeRerefenciada;
+	private NFeReferenciada nFeRerefenciada;
 
 	@XmlElement(name = "transp")
 	private TransporteNFe transporteNFe;
@@ -84,8 +83,8 @@ public class NFe {
 		setIdentificacaoDestinatarioNFe(destinatario);
 	}
 
-	public void setExportacaoNfe(ExportacaoNfe exportacaoNfe) {
-		this.exportacaoNfe = exportacaoNfe;
+	public void setExportacaoNFe(ExportacaoNFe exportacaoNFe) {
+		this.exportacaoNFe = exportacaoNFe;
 	}
 
 	public void setId(String id) {
@@ -132,7 +131,7 @@ public class NFe {
 		setListaDetalhamentoProdutoServicoNFe(listaItem);
 	}
 
-	public void setnFeRerefenciada(NFeRerefenciada nFeRerefenciada) {
+	public void setnFeRerefenciada(NFeReferenciada nFeRerefenciada) {
 		this.nFeRerefenciada = nFeRerefenciada;
 	}
 

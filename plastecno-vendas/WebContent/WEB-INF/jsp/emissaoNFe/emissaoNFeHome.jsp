@@ -75,54 +75,54 @@ $(document).ready(function() {
 	
 	$('#botaoInserirIPI').click(function(){
 		gerarInputIPI();
-		fecharBlocoImposto('bloco_ipi');
+		fecharBloco('bloco_ipi');
 	});
 	
 	$('#botaoInserirPIS').click(function(){
 		gerarInputPIS();
-		fecharBlocoImposto('bloco_pis');
+		fecharBloco('bloco_pis');
 	});
 	
 	$('#botaoInserirCOFINS').click(function(){
 		gerarInputCOFINS();
-		fecharBlocoImposto('bloco_cofins');
+		fecharBloco('bloco_cofins');
 	});
 	
 	$('#botaoInserirII').click(function(){
 		gerarInputImpostoImportacao();
-		fecharBlocoImposto('bloco_ii');
+		fecharBloco('bloco_ii');
 	});
 	
-	$('#bloco_tributos').fadeOut();
+	$('#bloco_tributos').fadeOut('fast');
 	
 	$('#botaoInserirICMS').click(function(){
 		gerarInputICMS();
-		fecharBlocoImposto('bloco_icms');
+		fecharBloco('bloco_icms');
 	});
 	
 	$('#botaoLimparICMS').click(function(){
 		removerInputHidden(gerarJsonTipoIcms());
-		fecharBlocoImposto('bloco_icms');
+		fecharBloco('bloco_icms');
 	});
 	
 	$('#botaoLimparIPI').click(function(){
 		removerInputHidden(gerarJsonTipoIpi());
-		fecharBlocoImposto('bloco_ipi');
+		fecharBloco('bloco_ipi');
 	});
 	
 	$('#botaoLimparPIS').click(function(){
 		removerInputHidden(gerarJsonTipoPis());
-		fecharBlocoImposto('bloco_pis');
+		fecharBloco('bloco_pis');
 	});
 	
 	$('#botaoLimparCOFINS').click(function(){
 		removerInputHidden(gerarJsonTipoCofins());
-		fecharBlocoImposto('bloco_cofins');
+		fecharBloco('bloco_cofins');
 	});
 	
 	$('#botaoLimparII').click(function(){
 		removerInputHidden(gerarJsonImpostoImportacao());
-		fecharBlocoImposto('bloco_ii');
+		fecharBloco('bloco_ii');
 	});
 	
 	autocompletar({
@@ -169,11 +169,24 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	inserirMascaraDataAmericano('dataVencimentoDuplicata');
-	inicializarFadeInBlocoImposto('bloco_icms');
-	inicializarFadeInBlocoImposto('bloco_ipi');
-	inicializarFadeInBlocoImposto('bloco_pis');
-	inicializarFadeInBlocoImposto('bloco_cofins');
-	inicializarFadeInBlocoImposto('bloco_ii');
+	inicializarFadeInBloco('bloco_icms');
+	inicializarFadeInBloco('bloco_ipi');
+	inicializarFadeInBloco('bloco_pis');
+	inicializarFadeInBloco('bloco_cofins');
+	inicializarFadeInBloco('bloco_ii');
+	inicializarFadeInBloco('bloco_tributos');
+	
+	inicializarFadeInBloco('bloco_referenciada');
+	inicializarFadeInBloco('bloco_destinatario');
+	inicializarFadeInBloco('bloco_transporte');
+	inicializarFadeInBloco('bloco_exportacao');
+	inicializarFadeInBloco('bloco_compra');
+	
+	fecharBloco('bloco_referenciada');
+	fecharBloco('bloco_destinatario');
+	fecharBloco('bloco_transporte');
+	fecharBloco('bloco_exportacao');
+	fecharBloco('bloco_compra');
 });
 
 function gerarInputLinhasTabela(nomeTabela, parametroJson){
@@ -201,7 +214,7 @@ function gerarInputLinhasTabela(nomeTabela, parametroJson){
 };
 
 function gerarLegendaBloco(nomeBloco){
-	var legend = $('#bloco_tributos #'+nomeBloco+' legend');
+	var legend = $('#'+nomeBloco+' legend:first');
 	var innerHTML = $(legend).html();
 	if(innerHTML.indexOf('+') != -1){
 		innerHTML = innerHTML.replace(/\+/g, '-');
@@ -211,31 +224,33 @@ function gerarLegendaBloco(nomeBloco){
 	$(legend).html(innerHTML);
 };
 
-function abrirBlocoImposto(nomeBloco){
+function abrirBloco(nomeBloco){
 	gerarLegendaBloco(nomeBloco);
-	$('#bloco_tributos #'+nomeBloco+' div').fadeIn();
+	<%-- Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn --%>
+	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table').fadeIn('fast');
 };
 
-function fecharBlocoImposto(nomeBloco){
+function fecharBloco(nomeBloco){
 	gerarLegendaBloco(nomeBloco);
-	$('#bloco_tributos #'+nomeBloco+' div').fadeOut();
+	<%-- Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn --%>
+	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table').fadeOut('fast');
 };
 
 function inicializarLegendaBlocoImposto(nomeBloco){
-	var legend = $('#bloco_tributos #'+nomeBloco+' legend');
+	var legend = $('#bloco_tributos #'+nomeBloco+' legend:first');
 	$(legend).html(legend.html().replace(/Prod.\s*\d*/g, 'Prod. '+(numeroProdutoEdicao+1)+' '));	
 
 	legend.html(legend.html().replace(/\+/g, '-'));
-	$('#bloco_tributos #'+nomeBloco+' div').fadeIn();
+	$('#bloco_tributos #'+nomeBloco+' div:not(.suggestionsBox)').fadeIn('fast');
 };
 
-function inicializarFadeInBlocoImposto(nomeBloco){
-	$('#bloco_tributos #'+nomeBloco+' legend').click(function(){
+function inicializarFadeInBloco(nomeBloco){
+	$('#'+nomeBloco+' legend:first').click(function(){
 		var innerHTML = $(this).html();
 		if(innerHTML.indexOf('+') != -1){
-			abrirBlocoImposto(nomeBloco);
+			abrirBloco(nomeBloco);
 		} else {
-			fecharBlocoImposto(nomeBloco);
+			fecharBloco(nomeBloco);
 		}
 	});
 };
@@ -578,13 +593,13 @@ function editarTributos(linha){
 	$('#bloco_tributos #valorBCIPI').val(celulas[10].innerHTML);
 	$('#bloco_tributos #aliquotaIPI').val(celulas[12].innerHTML);
 	
-	$('#bloco_tributos').fadeIn();
+	$('#bloco_tributos').fadeIn('fast');
 	inicializarLegendaBlocoImposto('bloco_icms');
 	inicializarLegendaBlocoImposto('bloco_ipi');
 	inicializarLegendaBlocoImposto('bloco_pis');
 	inicializarLegendaBlocoImposto('bloco_cofins');
 	inicializarLegendaBlocoImposto('bloco_ii');
-	
+	inicializarLegendaBlocoImposto('bloco_tributos');
 };
 </script>
 
@@ -600,7 +615,7 @@ function editarTributos(linha){
 	</form>
 	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>"
 		method="post">
-		<fieldset>
+		<fieldset id="bloco_dados_nfe">
 			<legend>::: Dados da NF-e :::</legend>
 			<div class="label">Pedido:</div>
 			<div class="input" style="width: 10%">
@@ -692,7 +707,7 @@ function editarTributos(linha){
 		</fieldset>
 		
 		<fieldset id="bloco_referenciada">
-			<legend>::: NF/NFe Referenciada :::</legend>
+			<legend>::: NF/NFe Referenciada ::: -</legend>
 			<div class="label">Chave Acesso:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" id="chaveReferenciada" style="width: 50%"/>
@@ -744,8 +759,8 @@ function editarTributos(linha){
 			</table>
 		</fieldset>
 		
-		<fieldset>
-			<legend>::: Destinatário :::</legend>
+		<fieldset id="bloco_destinatario">
+			<legend>::: Destinatário ::: -</legend>
 			<div class="label">Razão Social/Nome:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}" class="pesquisavel" style="width: 60%"/>
@@ -833,7 +848,7 @@ function editarTributos(linha){
 			</table>
 			
 			<fieldset id="bloco_tributos">
-				<legend class="fieldsetInterno">::: Tributos :::</legend>
+				<legend class="fieldsetInterno">::: Tributos ::: -</legend>
 				<div class="label">CFOP:</div>
 				<div class="input" style="width: 80%">
 					<input id="cfop" type="text" name="cfop" style="width: 10%"/>
@@ -1091,8 +1106,8 @@ function editarTributos(linha){
 			</fieldset>
 		</fieldset>	
 		
-		<fieldset>
-			<legend>::: Transporte :::</legend>
+		<fieldset id="bloco_transporte">
+			<legend>::: Transporte ::: -</legend>
 			<div class="label">Modal. Frete:</div>
 			<div class="input" style="width: 80%">
 			<select id="modFrete" name="nf.transporteNFe.modalidadeFrete" style="width: 45%">
@@ -1333,8 +1348,8 @@ function editarTributos(linha){
 			</div>
 		</fieldset>
 		
-		<fieldset>
-			<legend>::: Exportação :::</legend>
+		<fieldset id="bloco_exportacao">
+			<legend>::: Exportação ::: -</legend>
 			<div class="label">UF Embarque:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" name="nf.exportacaoNFe.ufEmbarque" style="width: 5%"/>
@@ -1344,8 +1359,8 @@ function editarTributos(linha){
 				<input type="text" name="nf.exportacaoNFe.localEmbarque"/>
 			</div>		
 		</fieldset>
-		<fieldset>
-			<legend>::: Compra :::</legend>
+		<fieldset id="bloco_compra">
+			<legend>::: Compra ::: -</legend>
 			<div class="label">Nota Empenho:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" name="nf.compraNFe.notaEmpenho" style="width: 10%"/>

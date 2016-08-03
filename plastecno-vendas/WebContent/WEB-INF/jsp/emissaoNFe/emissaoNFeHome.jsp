@@ -724,9 +724,13 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Info. Adicionais.:</div>
+			<div class="label">Info. Adicionais Fisco:</div>
 			<div class="input areatexto" style="width: 70%">
 				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%"></textarea>
+			</div>
+			<div class="label">Info. Adicionais Contrib.:</div>
+			<div class="input areatexto" style="width: 70%">
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte" style="width: 100%"></textarea>
 			</div>
 		</fieldset>
 		

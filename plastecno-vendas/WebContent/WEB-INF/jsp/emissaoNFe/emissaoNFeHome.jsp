@@ -73,6 +73,11 @@ $(document).ready(function() {
 		$('#formEmissao').submit();
 	});
 	
+	$('#botaoInserirInfoProd').click(function(){
+		gerarInputInfoProduto();
+		fecharBloco('bloco_info_adicionais_prod');
+	});
+	
 	$('#botaoInserirIPI').click(function(){
 		gerarInputIPI();
 		fecharBloco('bloco_ipi');
@@ -93,8 +98,6 @@ $(document).ready(function() {
 		fecharBloco('bloco_ii');
 	});
 	
-	$('#bloco_tributos').fadeOut('fast');
-	
 	$('#botaoInserirICMS').click(function(){
 		gerarInputICMS();
 		fecharBloco('bloco_icms');
@@ -103,6 +106,12 @@ $(document).ready(function() {
 	$('#botaoLimparICMS').click(function(){
 		removerInputHidden(gerarJsonTipoIcms());
 		fecharBloco('bloco_icms');
+	});
+	
+	$('#botaoLimparInfoProd').click(function(){
+		removerInputHidden(gerarJsonInfoProduto());
+		fecharBloco('bloco_info_adicionais_prod');
+		$('#bloco_info_adicionais_prod #infoAdicionaisProd').val('');
 	});
 	
 	$('#botaoLimparIPI').click(function(){
@@ -175,6 +184,7 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_cofins');
 	inicializarFadeInBloco('bloco_ii');
 	inicializarFadeInBloco('bloco_tributos');
+	inicializarFadeInBloco('bloco_info_adicionais_prod');
 	
 	inicializarFadeInBloco('bloco_referenciada');
 	inicializarFadeInBloco('bloco_destinatario');
@@ -187,6 +197,9 @@ $(document).ready(function() {
 	fecharBloco('bloco_transporte');
 	fecharBloco('bloco_exportacao');
 	fecharBloco('bloco_compra');
+	
+	$('#bloco_tributos').fadeOut('fast');
+	$('#bloco_info_adicionais_prod').fadeOut('fast');
 });
 
 function gerarInputLinhasTabela(nomeTabela, parametroJson){
@@ -236,12 +249,12 @@ function fecharBloco(nomeBloco){
 	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table').fadeOut('fast');
 };
 
-function inicializarLegendaBlocoImposto(nomeBloco){
-	var legend = $('#bloco_tributos #'+nomeBloco+' legend:first');
+function inicializarLegendaBlocoProduto(nomeBloco){
+	var legend = $('#'+nomeBloco+' legend:first');
 	$(legend).html(legend.html().replace(/Prod.\s*\d*/g, 'Prod. '+(numeroProdutoEdicao+1)+' '));	
 
 	legend.html(legend.html().replace(/\+/g, '-'));
-	$('#bloco_tributos #'+nomeBloco+' div:not(.suggestionsBox)').fadeIn('fast');
+	$('#'+nomeBloco+' div:not(.suggestionsBox)').fadeIn('fast');
 };
 
 function inicializarFadeInBloco(nomeBloco){
@@ -344,6 +357,11 @@ function gerarJsonImpostoImportacao(){
 			]};
 };
 
+function gerarJsonInfoProduto(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+']',
+		'campos':[{'nome':'informacoesAdicionais', 'id':'infoAdicionaisProd'}]};
+};
+
 function gerarJsonTipoPis(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis',
 		'campos':[{'nome':'aliquota', 'id':'aliquotaPIS'},
@@ -364,6 +382,9 @@ function gerarInputICMS(){
 	gerarInputHidden(produto);
 };
 
+function gerarInputInfoProduto(){
+	gerarInputHidden(gerarJsonInfoProduto());
+};
 
 function gerarInputIPI(){
 	var tipoIpi = gerarJsonTipoIpi();
@@ -594,12 +615,15 @@ function editarTributos(linha){
 	$('#bloco_tributos #aliquotaIPI').val(celulas[12].innerHTML);
 	
 	$('#bloco_tributos').fadeIn('fast');
-	inicializarLegendaBlocoImposto('bloco_icms');
-	inicializarLegendaBlocoImposto('bloco_ipi');
-	inicializarLegendaBlocoImposto('bloco_pis');
-	inicializarLegendaBlocoImposto('bloco_cofins');
-	inicializarLegendaBlocoImposto('bloco_ii');
-	inicializarLegendaBlocoImposto('bloco_tributos');
+	$('#bloco_info_adicionais_prod').fadeIn('fast');
+	
+	inicializarLegendaBlocoProduto('bloco_icms');
+	inicializarLegendaBlocoProduto('bloco_ipi');
+	inicializarLegendaBlocoProduto('bloco_pis');
+	inicializarLegendaBlocoProduto('bloco_cofins');
+	inicializarLegendaBlocoProduto('bloco_ii');
+	inicializarLegendaBlocoProduto('bloco_tributos');
+	inicializarLegendaBlocoProduto('bloco_info_adicionais_prod');
 };
 </script>
 
@@ -847,8 +871,20 @@ function editarTributos(linha){
 				</tbody>
 			</table>
 			
-			<fieldset id="bloco_tributos">
-				<legend class="fieldsetInterno">::: Tributos ::: -</legend>
+			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
+				<legend>::: Info. Adicionais Prod. ::: +</legend>
+				<div class="label">Info. Produto:</div>
+				<div class="input areatexto" style="width: 70%">
+					<textarea id="infoAdicionaisProd" style="width: 100%"></textarea>
+				</div>
+				<div class="bloco_botoes">
+						<input type="button" id="botaoInserirInfoProd" title="Inserir Informações do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparInfoProd" title="Limpar Informações do Produto" value="" class="botaoLimpar"/>
+					</div>
+			</fieldset>
+			
+			<fieldset id="bloco_tributos" class="fieldsetInterno">
+				<legend class="fieldsetInterno">::: Tributos Prod.::: -</legend>
 				<div class="label">CFOP:</div>
 				<div class="input" style="width: 80%">
 					<input id="cfop" type="text" name="cfop" style="width: 10%"/>

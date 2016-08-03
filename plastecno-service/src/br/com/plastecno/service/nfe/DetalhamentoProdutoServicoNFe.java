@@ -5,6 +5,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 public class DetalhamentoProdutoServicoNFe {
+	@XmlElement(name = "infAdProd")
+	private String informacoesAdicionais;
+
 	@XmlAttribute(name = "nItem")
 	private Integer numeroItem;
 
@@ -27,6 +30,10 @@ public class DetalhamentoProdutoServicoNFe {
 	@XmlTransient
 	public TributosProdutoServico getTributosProdutoServico() {
 		return tributosProdutoServico;
+	}
+
+	public void setInformacoesAdicionais(String informacoesAdicionais) {
+		this.informacoesAdicionais = informacoesAdicionais;
 	}
 
 	public void setNumeroItem(Integer numeroItem) {

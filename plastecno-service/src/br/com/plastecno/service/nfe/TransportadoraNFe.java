@@ -20,7 +20,6 @@ public class TransportadoraNFe {
 
 	@XmlElement(name = "xNome")
 	private String razaoSocial;
-
 	@XmlElement(name = "UF")
 	private String UF;
 

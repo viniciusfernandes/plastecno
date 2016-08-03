@@ -12,6 +12,11 @@ public class NFe {
 	@XmlElement(name = "cobr")
 	private CobrancaNFe cobrancaNFe;
 
+	@XmlElement(name = "compra")
+	private CompraNFe compraNFe;
+
+	@XmlElement(name = "exporta")
+	private ExportacaoNFe exportacaoNFe;
 	@XmlAttribute(name = "Id")
 	private String id;
 
@@ -37,7 +42,7 @@ public class NFe {
 	private List<DetalhamentoProdutoServicoNFe> listaDetalhamentoProdutoServicoNFe;
 
 	@XmlElement(name = "NFref")
-	private NFeRerefenciada nFeRerefenciada;
+	private NFeReferenciada nFeRerefenciada;
 
 	@XmlElement(name = "transp")
 	private TransporteNFe transporteNFe;
@@ -47,8 +52,6 @@ public class NFe {
 
 	@XmlAttribute(name = "versao")
 	private Double versao;
-
-	
 
 	@XmlTransient
 	public IdentificacaoDestinatarioNFe getIdentificacaoDestinatarioNFe() {
@@ -69,11 +72,19 @@ public class NFe {
 		this.cobrancaNFe = cobrancaNFe;
 	}
 
+	public void setCompraNFe(CompraNFe compraNFe) {
+		this.compraNFe = compraNFe;
+	}
+
 	/*
 	 * Metodo criado apenas para abreviar as marcacoes nos .jsp
 	 */
 	public void setDestinatario(IdentificacaoDestinatarioNFe destinatario) {
 		setIdentificacaoDestinatarioNFe(destinatario);
+	}
+
+	public void setExportacaoNFe(ExportacaoNFe exportacaoNFe) {
+		this.exportacaoNFe = exportacaoNFe;
 	}
 
 	public void setId(String id) {
@@ -120,7 +131,7 @@ public class NFe {
 		setListaDetalhamentoProdutoServicoNFe(listaItem);
 	}
 
-	public void setnFeRerefenciada(NFeRerefenciada nFeRerefenciada) {
+	public void setnFeRerefenciada(NFeReferenciada nFeRerefenciada) {
 		this.nFeRerefenciada = nFeRerefenciada;
 	}
 

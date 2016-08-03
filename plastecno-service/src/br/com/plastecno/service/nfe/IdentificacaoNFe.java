@@ -1,41 +1,62 @@
 package br.com.plastecno.service.nfe;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 
 public class IdentificacaoNFe {
 
 	@XmlElement(name = "cNF")
 	private String chaveAcesso;
+
 	@XmlElement(name = "cUF")
 	private String codigoUFEmitente;
+
 	@XmlElement(name = "dEmi")
 	private String dataEmissao;
+
 	@XmlElement(name = "dhCont")
 	private String dataHoraContingencia;
+
 	@XmlElement(name = "cDV")
 	private String digitoVerificador;
+
 	@XmlElement(name = "finNFe")
 	private Integer finalidadeEmissao;
+
 	@XmlElement(name = "dSaiEnt")
 	private String horaSaidaEntrada;
+
 	@XmlElement(name = "indPag")
 	private Integer indicadorFormaPagamento;
+
 	@XmlElement(name = "xJust")
 	private String justificativaContigencia;
+
+	@XmlElement(name = "NFref")
+	private List<NFeReferenciada> listaNFeReferenciada;
+
 	@XmlElement(name = "mod")
 	private String modelo;
+
 	@XmlElement(name = "cMunFG")
 	private String municipioOcorrenciaFatorGerador;
+
 	@XmlElement(name = "natOp")
 	private String naturezaOperacao;
+
 	@XmlElement(name = "nNF")
 	private String numero;
+
 	@XmlElement(name = "procEmi")
 	private String processoEmissao;
+
 	@XmlElement(name = "serie")
 	private String serie;
+
 	@XmlElement(name = "tpAmb")
 	private String tipoAmbiente;
+
 	@XmlElement(name = "tpImp")
 	private String tipoEmissao;
 
@@ -50,6 +71,7 @@ public class IdentificacaoNFe {
 
 	public void setChaveAcesso(String chaveAcesso) {
 		this.chaveAcesso = chaveAcesso;
+
 	}
 
 	public void setCodigoUFEmitente(String codigoUFEmitente) {
@@ -84,11 +106,17 @@ public class IdentificacaoNFe {
 		this.justificativaContigencia = justificativaContigencia;
 	}
 
+	public void setListaNFeReferenciada(
+			List<NFeReferenciada> listaNFeReferenciada) {
+		this.listaNFeReferenciada = listaNFeReferenciada;
+	}
+
 	public void setModelo(String modelo) {
 		this.modelo = modelo;
 	}
 
-	public void setMunicipioOcorrenciaFatorGerador(String municipioOcorrenciaFatorGerador) {
+	public void setMunicipioOcorrenciaFatorGerador(
+			String municipioOcorrenciaFatorGerador) {
 		this.municipioOcorrenciaFatorGerador = municipioOcorrenciaFatorGerador;
 	}
 

@@ -2,14 +2,15 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class NFeRerefenciada {
+public class NFeReferenciada {
 	@XmlElement(name = "refNFe")
-	private Integer chaveAcessoNFeReferenciada;
+	private Integer chaveAcessoReferenciada;
+
 	@XmlElement(name = "refNF")
 	private IdentificacaoNFeReferenciada identificacaoNFeReferenciada;
 
-	public void setChaveAcessoNFeReferenciada(Integer chaveAcessoNFeReferenciada) {
-		this.chaveAcessoNFeReferenciada = chaveAcessoNFeReferenciada;
+	public void setChaveAcessoReferenciada(Integer chaveAcessoReferenciada) {
+		this.chaveAcessoReferenciada = chaveAcessoReferenciada;
 	}
 
 	public void setIdentificacaoNFeReferenciada(

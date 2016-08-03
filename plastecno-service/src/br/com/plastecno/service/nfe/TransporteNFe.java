@@ -5,8 +5,11 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 
 public class TransporteNFe {
+	@XmlElement(name = "reboque")
+	private List<VeiculoTransporte> listaReboque;
+
 	@XmlElement(name = "vol")
-	private List<VolumeTransportados> listaVolume;
+	private List<VolumeTransportado> listaVolume;
 
 	@XmlElement(name = "modFrete")
 	private Integer modalidadeFrete;
@@ -17,7 +20,14 @@ public class TransporteNFe {
 	@XmlElement(name = "transportadora")
 	private TransportadoraNFe transportadoraNFe;
 
-	public void setListaVolume(List<VolumeTransportados> listaVolume) {
+	@XmlElement(name = "veicTransp")
+	private VeiculoTransporte veiculo;
+
+	public void setListaReboque(List<VeiculoTransporte> listaReboque) {
+		this.listaReboque = listaReboque;
+	}
+
+	public void setListaVolume(List<VolumeTransportado> listaVolume) {
 		this.listaVolume = listaVolume;
 	}
 
@@ -31,6 +41,10 @@ public class TransporteNFe {
 
 	public void setTransportadoraNFe(TransportadoraNFe transportadoraNFe) {
 		this.transportadoraNFe = transportadoraNFe;
+	}
+
+	public void setVeiculo(VeiculoTransporte veiculo) {
+		this.veiculo = veiculo;
 	}
 
 }

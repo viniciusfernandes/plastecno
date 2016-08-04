@@ -1,5 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.List;
+
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
@@ -12,10 +14,12 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
+import br.com.plastecno.service.nfe.constante.TipoImpressaoNFe;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
@@ -64,7 +68,7 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaTipoTributacaoPIS", TipoTributacaoPIS.values());
         addAtributo("listaTipoTributacaoCOFINS", TipoTributacaoCOFINS.values());
         addAtributo("listaTipoModalidadeFrete", TipoModalidadeFrete.values());
-
+        addAtributo("listaTipoImpressao", TipoImpressaoNFe.values());
     }
 
     @Post("emissaoNFe/emitirNFe")
@@ -87,7 +91,9 @@ public class EmissaoNFeController extends AbstractController {
     @Get("emissaoNFe/pedido")
     public void pesquisarPedidoById(Integer idPedido) {
         Cliente cliente = pedidoService.pesquisarClienteResumidoEContatoByIdPedido(idPedido);
+        List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
 
+        addAtributo("listaDuplicata", listaDuplicata);
         addAtributo("cliente", cliente);
         addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
         addAtributo("logradouro", clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()));

@@ -203,6 +203,16 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
 	}
 
+	public Object[] pesquisarFormaPagamentoEDataByIdPedido(Integer idPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select p.formaPagamento, p.dataEnvio from Pedido p where p.id = :idPedido")
+								.setParameter("idPedido", idPedido),
+						Object[].class, new Object[] {});
+	}
+
 	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 		return QueryUtil
 				.gerarRegistroUnico(

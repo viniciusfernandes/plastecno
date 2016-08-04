@@ -63,17 +63,21 @@ public class ICMSGeral {
 
 	@XmlTransient
 	public Double getValor() {
-		return valor;
+		return valor == null ? 0 : valor;
+	}
+
+	public double calcularValorIcms() {
+		return valorBC != null && aliquota != null ? valorBC * aliquota : 0;
 	}
 
 	@XmlTransient
 	public Double getValorBC() {
-		return valorBC;
+		return valorBC == null ? 0 : valorBC;
 	}
 
 	@XmlTransient
 	public Double getValorBCST() {
-		return valorBCST;
+		return valorBCST == null ? 0 : valorBCST;
 	}
 
 	@XmlTransient

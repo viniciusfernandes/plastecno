@@ -31,7 +31,7 @@ public class PISGeral {
 
 	@XmlTransient
 	public Double getValor() {
-		return valor;
+		return valor == null ? 0 : valor;
 	}
 
 	public void setAliquota(Double aliquota) {

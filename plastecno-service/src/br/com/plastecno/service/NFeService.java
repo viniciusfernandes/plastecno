@@ -1,9 +1,12 @@
 package br.com.plastecno.service;
 
+import java.util.List;
+
 import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.NFe;
 
@@ -15,6 +18,8 @@ public interface NFeService {
 	NFe carregarIdentificacaoEmitente(NFe nFe, Integer idPedido);
 
 	String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException;
+
+	List<DuplicataNFe> gerarDuplicataByIdPedido(Integer idPedido);
 
 	EnderecoNFe gerarEnderecoNFe(Logradouro logradouro);
 

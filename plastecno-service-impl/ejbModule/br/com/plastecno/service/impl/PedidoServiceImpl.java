@@ -1,6 +1,7 @@
 package br.com.plastecno.service.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -302,6 +303,38 @@ public class PedidoServiceImpl implements PedidoService {
 					.setValorComissionadoRepresentacao(valorComissionadoRepresentacao);
 			itemPedidoDAO.alterar(itemPedido);
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Date> calcularDataPagamento(Integer idPedido) {
+		List<Date> lista = new ArrayList<Date>();
+		Object[] resultado = pedidoDAO
+				.pesquisarFormaPagamentoEDataByIdPedido(idPedido);
+		String formaPagamento = (String) resultado[0];
+		Date dataEnvio = (Date) resultado[1];
+		if (formaPagamento == null) {
+			return lista;
+		}
+		String[] dias = formaPagamento.split("\\D+");
+		if (dias.length == 0) {
+			lista.add(dataEnvio);
+			return lista;
+		}
+		
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dataEnvio);
+		Integer diaCorrido = null;
+		for (String dia : dias) {
+			diaCorrido = Integer.parseInt(dia);
+
+			cal.add(Calendar.DAY_OF_MONTH, diaCorrido);
+			lista.add(cal.getTime());
+
+			// Retornando a data atual para somar os outros dias corridos
+			cal.add(Calendar.DAY_OF_MONTH, -diaCorrido);
+		}
+		return lista;
 	}
 
 	@Override

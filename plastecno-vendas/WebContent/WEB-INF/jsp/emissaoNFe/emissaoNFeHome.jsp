@@ -685,12 +685,11 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Tipo Impressão:</div>
+			<div class="label">Tipo Impressão:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado"
-					style="width: 100%" class="semprehabilitado">
-					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+				<select style="width: 100%">
+					<c:forEach var="tipo" items="${listaTipoImpressao}">
+						<option value="${tipo.codigo}">${tipo.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -714,15 +713,9 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Natureza Operação:</div>
+			<div class="label">Natureza Operação:</div>
 			<div class="input" style="width: 50%">
-				<select id="pedidoAssociado"
-					style="width: 80%" class="semprehabilitado">
-					<option value=""></option>
-					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
-					</c:forEach>
-				</select>
+				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" style="width: 80%"/>
 			</div>
 			<div class="label">Info. Adicionais Fisco:</div>
 			<div class="input areatexto" style="width: 70%">
@@ -856,14 +849,14 @@ function editarTributos(linha){
 							<td>${item.sequencial}</td>
 							<td>${item.descricaoSemFormatacao}</td>
 							<td>${item.ncm}</td>
-							<td>null</td>
+							<td></td>
 							<td>${item.tipoVenda}</td>
 							<td>${item.quantidade}</td>
 							<td>${item.precoUnidade}</td>
 							<td>${item.valorTotal}</td>
 							<td>${item.valorTotal}</td>
 							<td>${item.valorICMS}</td>
-							<td>null</td>
+							<td>${item.precoUnidadeIPI}</td>
 							<td>${item.aliquotaICMS}</td>
 							<td>${item.aliquotaIPI}</td>
 							<td>
@@ -1382,6 +1375,14 @@ function editarTributos(linha){
 					
 					<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
 					<tbody>
+						<c:forEach var="dup" items="${listaDuplicata}">
+							<tr>
+								<td>${dup.numero}</td>
+								<td>${dup.dataVencimento}</td>
+								<td>${dup.valor}</td>
+								<td><input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+							</tr>
+						</c:forEach>
 					</tbody>
 				</table>
 			</fieldset>

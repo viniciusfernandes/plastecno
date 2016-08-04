@@ -32,7 +32,7 @@ public class ProdutoServicoNFe {
 	private String numeroPedidoCompra;
 
 	@XmlElement(name = "vOutro")
-	private Integer outrasDespesasAcessorias;
+	private Double outrasDespesasAcessorias;
 
 	@XmlElement(name = "qCom")
 	private Integer quantidadeComercial;
@@ -65,18 +65,28 @@ public class ProdutoServicoNFe {
 	private Double valorUnitarioTributacao;
 
 	@XmlTransient
+	public Double getOutrasDespesasAcessorias() {
+		return outrasDespesasAcessorias == null ? 0 : outrasDespesasAcessorias;
+	}
+
+	@XmlTransient
+	public double getValorDesconto() {
+		return valorDesconto == null ? 0 : valorDesconto;
+	}
+
+	@XmlTransient
 	public Double getValorTotalBruto() {
-		return valorTotalBruto;
+		return valorTotalBruto == null ? 0 : valorTotalBruto;
 	}
 
 	@XmlTransient
 	public Double getValorTotalFrete() {
-		return valorTotalFrete;
+		return valorTotalFrete == null ? 0 : valorTotalFrete;
 	}
 
 	@XmlTransient
 	public Double getValorTotalSeguro() {
-		return valorTotalSeguro;
+		return valorTotalSeguro == null ? 0 : valorTotalSeguro;
 	}
 
 	public void setCfop(String cfop) {
@@ -115,7 +125,7 @@ public class ProdutoServicoNFe {
 		this.numeroPedidoCompra = numeroPedidoCompra;
 	}
 
-	public void setOutrasDespesasAcessorias(Integer outrasDespesasAcessorias) {
+	public void setOutrasDespesasAcessorias(Double outrasDespesasAcessorias) {
 		this.outrasDespesasAcessorias = outrasDespesasAcessorias;
 	}
 

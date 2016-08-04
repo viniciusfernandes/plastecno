@@ -40,6 +40,8 @@ public interface PedidoService {
 	void alterarSituacaoPedidoByIdPedido(Integer idPedido,
 			SituacaoPedido situacaoPedido);
 
+	List<Date> calcularDataPagamento(Integer idPedido);
+
 	Double calcularValorPedido(Integer idPedido) throws BusinessException;
 
 	Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException;

@@ -1,6 +1,9 @@
 package br.com.plastecno.service.impl;
 
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -18,15 +21,13 @@ import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
-import br.com.plastecno.service.nfe.COFINSGeral;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
+import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.ICMSGeral;
-import br.com.plastecno.service.nfe.IPIGeral;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.IdentificacaoEmitenteNFe;
 import br.com.plastecno.service.nfe.NFe;
-import br.com.plastecno.service.nfe.PISGeral;
 import br.com.plastecno.service.nfe.ProdutoServicoNFe;
 import br.com.plastecno.service.nfe.TributosProdutoServico;
 import br.com.plastecno.service.nfe.ValorTotalICMS;
@@ -55,68 +56,70 @@ public class NFeServiceImpl implements NFeService {
 		}
 
 		ICMSGeral tipoIcms = null;
-		IPIGeral tipoIpi = null;
-		PISGeral tipoPis = null;
-		COFINSGeral tipoCofins = null;
 		ProdutoServicoNFe produto = null;
 		TributosProdutoServico tributo = null;
 		double valorBC = 0;
 		double valorBCST = 0;
-		double valor = 0;
 		double valorSeguro = 0;
 		double valorFrete = 0;
 		double valorImportacao = 0;
 		double valorIPI = 0;
 		double valorPIS = 0;
 		double valorCOFINS = 0;
+		double valorICMS = 0;
+		double valorProduto = 0;
+		double valorTotalDesconto = 0;
+		double valorDespAcessorias = 0;
+
 		for (DetalhamentoProdutoServicoNFe item : listaItem) {
 			tributo = item.getTributosProdutoServico();
 			if (tributo != null && tributo.contemICMS()) {
 				tipoIcms = item.getTributosProdutoServico().getTipoIcms();
-				valorBC += tipoIcms.getValorBC() == null ? 0 : tipoIcms
-						.getValorBC();
-				valorBCST += tipoIcms.getValorBCST() == null ? 0 : tipoIcms
-						.getValorBCST();
-				valor += tipoIcms.getValor() == null ? 0 : tipoIcms.getValor();
+
+				valorBC += tipoIcms.getValorBC();
+				valorBCST += tipoIcms.getValorBCST();
+				valorICMS += tipoIcms.getValor();
+
 			}
 
 			if (tributo != null && tributo.contemIPI()) {
-				tipoIpi = tributo.getTipoIpi();
-				valorIPI += tipoIpi.getValor() == null ? 0 : tipoIpi.getValor();
+				valorIPI += tributo.getTipoIpi().getValor();
 			}
 
 			if (tributo != null && tributo.contemPIS()) {
-				tipoPis = tributo.getTipoPis();
-				valorPIS += tipoPis.getValor() == null ? 0 : tipoPis.getValor();
+				valorPIS += tributo.getTipoPis().getValor();
 			}
 
 			if (tributo != null && tributo.contemCOFINS()) {
-				tipoCofins = tributo.getTipoCofins();
-				valorPIS += tipoCofins.getValor() == null ? 0 : tipoCofins
-						.getValor();
+				valorCOFINS += tributo.getTipoCofins().getValor();
+			}
+
+			if (tributo != null && tributo.contemImpostoImportacao()) {
+				valorImportacao += tributo.getImpostoImportacao().getValor();
 			}
 
 			produto = item.getProdutoServicoNFe();
-			valorSeguro += produto.getValorTotalSeguro() == null ? 0 : produto
-					.getValorTotalSeguro();
 
-			valorFrete += produto.getValorTotalFrete() == null ? 0 : produto
-					.getValorTotalFrete();
-			if (tributo != null && tributo.contemImpostoImportacao()) {
-				valorImportacao += tributo.getImpostoImportacao().getValor() == null ? 0
-						: tributo.getImpostoImportacao().getValor();
-			}
+			valorSeguro += produto.getValorTotalSeguro();
+			valorFrete += produto.getValorTotalFrete();
+			valorProduto += produto.getValorTotalBruto();
+			valorTotalDesconto += produto.getValorDesconto();
+			valorDespAcessorias += produto.getOutrasDespesasAcessorias();
 		}
 
 		valorTotalICMS.setValorBaseCalculo(valorBC);
 		valorTotalICMS.setValorBaseCalculoST(valorBCST);
-		valorTotalICMS.setValorTotal(valor);
+		valorTotalICMS.setValorTotalICMS(valorICMS);
 		valorTotalICMS.setValorTotalFrete(valorFrete);
 		valorTotalICMS.setValorTotalII(valorImportacao);
 		valorTotalICMS.setValorTotalIPI(valorIPI);
 		valorTotalICMS.setValorTotalSeguro(valorSeguro);
 		valorTotalICMS.setValorTotalPIS(valorPIS);
 		valorTotalICMS.setValorTotalCOFINS(valorCOFINS);
+		valorTotalICMS.setValorTotalProdutosServicos(valorProduto);
+		valorTotalICMS.setValorTotalDesconto(valorTotalDesconto);
+		valorTotalICMS.setValorTotalDespAcessorias(valorDespAcessorias);
+		valorTotalICMS.setValorTotalNF(valorProduto);
 
 		valoresTotaisNFe.setValorTotalICMS(valorTotalICMS);
 	}
@@ -171,6 +174,32 @@ public class NFeServiceImpl implements NFeService {
 		calcularValoresTotaisICMS(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
 		return gerarXMLNfe(nFe);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<DuplicataNFe> gerarDuplicataByIdPedido(Integer idPedido) {
+		List<Date> listaData = pedidoService.calcularDataPagamento(idPedido);
+		double totalParcelas = listaData.size();
+		if (totalParcelas == 0) {
+			return new ArrayList<DuplicataNFe>();
+		}
+		Double valorPedido = pedidoService.pesquisarValorPedido(idPedido);
+
+		Double valorDuplicata = valorPedido != null ? valorPedido
+				/ totalParcelas : 0;
+		List<DuplicataNFe> listaDuplicata = new ArrayList<DuplicataNFe>();
+		DuplicataNFe dup = null;
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		for (int i = 0; i < totalParcelas; i++) {
+			dup = new DuplicataNFe();
+			dup.setDataVencimento(df.format(listaData.get(i)));
+			dup.setNumero(String.valueOf(i+1));
+			dup.setValor(valorDuplicata);
+
+			listaDuplicata.add(dup);
+		}
+		return listaDuplicata;
 	}
 
 	@Override

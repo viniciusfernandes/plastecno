@@ -186,18 +186,23 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_tributos');
 	inicializarFadeInBloco('bloco_info_adicionais_prod');
 	
+	inicializarFadeInBloco('bloco_local_retirada');
+	inicializarFadeInBloco('bloco_local_entrega');
 	inicializarFadeInBloco('bloco_referenciada');
 	inicializarFadeInBloco('bloco_destinatario');
 	inicializarFadeInBloco('bloco_transporte');
 	inicializarFadeInBloco('bloco_exportacao');
 	inicializarFadeInBloco('bloco_compra');
 	
+	fecharBloco('bloco_local_retirada');
+	fecharBloco('bloco_local_entrega');
 	fecharBloco('bloco_referenciada');
 	fecharBloco('bloco_destinatario');
 	fecharBloco('bloco_transporte');
 	fecharBloco('bloco_exportacao');
 	fecharBloco('bloco_compra');
 	
+	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
 	$('#bloco_tributos').fadeOut('fast');
 	$('#bloco_info_adicionais_prod').fadeOut('fast');
 });
@@ -644,7 +649,7 @@ function editarTributos(linha){
 			<div class="label">Pedido:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="idPedido" name="idPedido" value="${idPedido}"
-					class="pesquisavel" />
+					 />
 			</div>
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoPesquisaPedido"
@@ -780,18 +785,90 @@ function editarTributos(linha){
 			</table>
 		</fieldset>
 		
+		<fieldset id="bloco_local_retirada">
+			<legend>::: Local Retirada ::: -</legend>
+			<div class="label">CNPJ:</div>
+			<div class="input" style="width: 15%">
+				<input type="text" name="nf.identificacaoLocalRetirada.cnpj"/>
+			</div>
+			<div class="label">CPF:</div>
+			<div class="input" style="width: 50%">
+				<input type="text" name="nf.identificacaoLocalRetirada.cpf" style="width: 30%"/>
+			</div>
+			<div class="label">Endereço:</div>
+			<div class="input" style="width: 40%">
+				<input type="text" name="nf.identificacaoLocalRetirada.logradouro"/>
+			</div>
+			<div class="label" style="width: 8%">Número:</div>
+			<div class="input" style="width: 30%">
+				<input type="text" name="nf.identificacaoLocalRetirada.numero" style="width: 20%"/>
+			</div>
+			<div class="label">Complemento:</div>
+			<div class="input" style="width: 70%">
+				<input type="text" name="nf.identificacaoLocalRetirada.complemento" style="width: 30%"/>
+			</div>
+			<div class="label">Cidade:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.identificacaoLocalRetirada.cidade" style="width: 40%" />
+			</div>
+			<div class="label">Bairro:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.identificacaoLocalRetirada.municipio" style="width: 40%"/>
+			</div>
+			<div class="label">UF:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.identificacaoLocalRetirada.uf" style="width: 5%"/>
+			</div>
+		</fieldset>
+		
+		<fieldset id="bloco_local_entrega">
+			<legend>::: Local Entrega ::: -</legend>
+			<div class="label">CNPJ:</div>
+			<div class="input" style="width: 15%">
+				<input type="text" name="nf.identificacaoLocalEntrega.cnpj"/>
+			</div>
+			<div class="label">CPF:</div>
+			<div class="input" style="width: 50%">
+				<input type="text" name="nf.identificacaoLocalEntrega.cpf" style="width: 30%"/>
+			</div>
+			<div class="label">Endereço:</div>
+			<div class="input" style="width: 40%">
+				<input type="text" name="nf.identificacaoLocalEntrega.logradouro"/>
+			</div>
+			<div class="label" style="width: 8%">Número:</div>
+			<div class="input" style="width: 30%">
+				<input type="text" name="nf.identificacaoLocalEntrega.numero" style="width: 20%"/>
+			</div>
+			<div class="label">Complemento:</div>
+			<div class="input" style="width: 70%">
+				<input type="text" name="nf.identificacaoLocalEntrega.complemento" style="width: 30%"/>
+			</div>
+			<div class="label">Cidade:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.identificacaoLocalEntrega.cidade" style="width: 40%" />
+			</div>
+			<div class="label">Bairro:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.identificacaoLocalEntrega.municipio" style="width: 40%"/>
+			</div>
+			<div class="label">UF:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.identificacaoLocalEntrega.uf" style="width: 5%"/>
+			</div>
+		</fieldset>
+		
 		<fieldset id="bloco_destinatario">
 			<legend>::: Destinatário ::: -</legend>
 			<div class="label">Razão Social/Nome:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}" class="pesquisavel" style="width: 60%"/>
+				<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}"  style="width: 60%"/>
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			
 			<div class="label">CNPJ:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="cnpj" name="nf.identificacaoDestinatarioNFe.cnpj"
-					value="${cliente.cnpj}" class="pesquisavel" />
+					value="${cliente.cnpj}"  />
 			</div>
 			<div class="label">Insc. Estadual:</div>
 			<div class="input" style="width: 40%">
@@ -803,12 +880,12 @@ function editarTributos(linha){
 			<div class="label">CPF:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="cpf" name="nf.identificacaoDestinatarioNFe.cpf"
-					value="${cliente.cpf}" class="pesquisavel" />
+					value="${cliente.cpf}"  />
 			</div>
 			<div class="label">Telefone:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="telefone" name="cliente.cpf"
-					value="${cliente.contatoPrincipal.telefoneFormatado}" class="pesquisavel" />
+				<input type="text" id="telefone" name="nf.identificacaoDestinatarioNFe.enderecoDestinatarioNFe.telefone"
+					value="${telefoneContatoPedido}" />
 			</div>
 			<div class="label">Email:</div>
 			<div class="input" style="width: 20%">

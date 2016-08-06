@@ -13,8 +13,6 @@ import br.com.plastecno.service.nfe.NFe;
 @Local
 public interface NFeService {
 
-	NFe carregarIdentificacaoDestinatario(NFe nFe, Integer idPedido);
-
 	NFe carregarIdentificacaoEmitente(NFe nFe, Integer idPedido);
 
 	String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException;

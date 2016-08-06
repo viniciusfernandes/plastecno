@@ -14,6 +14,7 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
@@ -72,11 +73,11 @@ public class EmissaoNFeController extends AbstractController {
     }
 
     @Post("emissaoNFe/emitirNFe")
-    public void emitirNFe(NFe nf, Logradouro logradouro, Integer idPedido) {
+    public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
         String xml = null;
         try {
             nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(nFeService.gerarEnderecoNFe(logradouro));
-            xml = nFeService.emitirNFe(nf, idPedido);
+            xml = nFeService.emitirNFe(new NFe(nf), idPedido);
         } catch (BusinessException e) {
             gerarListaMensagemErroLogException(e);
         }
@@ -90,9 +91,13 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe/pedido")
     public void pesquisarPedidoById(Integer idPedido) {
-        Cliente cliente = pedidoService.pesquisarClienteResumidoEContatoByIdPedido(idPedido);
+        Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
         List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
+        Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
 
+        addAtributo("telefoneContatoPedido",
+                telefone.length > 0 ? String.valueOf(telefone[0]) + String.valueOf(telefone[1]).replaceAll("\\D+", "")
+                        : "");
         addAtributo("listaDuplicata", listaDuplicata);
         addAtributo("cliente", cliente);
         addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));

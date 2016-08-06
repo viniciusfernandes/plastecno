@@ -309,21 +309,22 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Date> calcularDataPagamento(Integer idPedido) {
 		List<Date> lista = new ArrayList<Date>();
-		Object[] resultado = pedidoDAO
-				.pesquisarFormaPagamentoEDataByIdPedido(idPedido);
-		String formaPagamento = (String) resultado[0];
-		Date dataEnvio = (Date) resultado[1];
+		String formaPagamento = pedidoDAO
+				.pesquisarFormaPagamentoByIdPedido(idPedido);
 		if (formaPagamento == null) {
 			return lista;
 		}
+
+		// As datas de pagamentos sao sempre calculadas a partir da data de
+		// envio nda nota fiscal, ou seja, a data correte.
 		String[] dias = formaPagamento.split("\\D+");
 		if (dias.length == 0) {
-			lista.add(dataEnvio);
+			lista.add(new Date());
 			return lista;
 		}
-		
+
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(dataEnvio);
+		cal.setTime(new Date());
 		Integer diaCorrido = null;
 		for (String dia : dias) {
 			diaCorrido = Integer.parseInt(dia);
@@ -1056,10 +1057,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Cliente pesquisarClienteResumidoEContatoByIdPedido(Integer idPedido) {
-		return pedidoDAO.pesquisarClienteResumidoEContatoByIdPedido(idPedido);
+	public Cliente pesquisarClienteResumidoByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarClienteResumidoByIdPedido(idPedido);
 	}
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido) {
@@ -1576,6 +1576,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public List<SituacaoPedido> pesquisarSituacaoVendaEfetivada() {
 		return pedidoDAO.pesquisarSituacaoVendaEfetivada();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Object[] pesquisarTelefoneContatoByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarTelefoneContatoByIdPedido((idPedido));
 	}
 
 	private TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(

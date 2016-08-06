@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 public class DuplicataNFe {
 	@XmlElement(name = "dVenc")
@@ -12,14 +13,17 @@ public class DuplicataNFe {
 	@XmlElement(name = "vDup")
 	private Double valor;
 
+	@XmlTransient
 	public String getDataVencimento() {
 		return dataVencimento;
 	}
 
+	@XmlTransient
 	public String getNumero() {
 		return numero;
 	}
 
+	@XmlTransient
 	public Double getValor() {
 		return valor;
 	}

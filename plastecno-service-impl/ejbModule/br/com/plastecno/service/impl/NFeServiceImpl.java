@@ -17,15 +17,14 @@ import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
-import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.ICMSGeral;
-import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.IdentificacaoEmitenteNFe;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.ProdutoServicoNFe;
@@ -45,10 +44,10 @@ public class NFeServiceImpl implements NFeService {
 	@EJB
 	private RepresentadaService representadaService;
 
-	private void calcularValoresTotaisICMS(NFe nFe) {
-		ValoresTotaisNFe valoresTotaisNFe = nFe.getValoresTotaisNFe();
+	private void calcularValoresTotaisICMS(DadosNFe dadosNFe) {
+		ValoresTotaisNFe valoresTotaisNFe = dadosNFe.getValoresTotaisNFe();
 		ValorTotalICMS valorTotalICMS = new ValorTotalICMS();
-		List<DetalhamentoProdutoServicoNFe> listaItem = nFe
+		List<DetalhamentoProdutoServicoNFe> listaItem = dadosNFe
 				.getListaDetalhamentoProdutoServicoNFe();
 
 		if (listaItem == null || listaItem.isEmpty()) {
@@ -126,30 +125,6 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public NFe carregarIdentificacaoDestinatario(NFe nFe, Integer idPedido) {
-		Cliente destinatario = pedidoService
-				.pesquisarClienteByIdPedido(idPedido);
-
-		destinatario.setListaLogradouro(clienteService
-				.pesquisarLogradouro(destinatario.getId()));
-
-		IdentificacaoDestinatarioNFe iDest = new IdentificacaoDestinatarioNFe();
-		iDest.setEmail(destinatario.getEmail());
-		iDest.setInscricaoEstadual(destinatario.getInscricaoEstadual());
-		iDest.setInscricaoMunicipal(null);
-		iDest.setInscricaoSUFRAMA(null);
-		iDest.setNomeFantasia(destinatario.getNomeFantasia());
-		iDest.setNomeFantasia(destinatario.getNomeFantasia());
-
-		iDest.setEnderecoDestinatarioNFe(gerarEnderecoNFe(destinatario
-				.getLogradouroFaturamento()));
-
-		nFe.setIdentificacaoDestinatarioNFe(iDest);
-		return nFe;
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NFe carregarIdentificacaoEmitente(NFe nFe, Integer idPedido) {
 		Representada emitente = pedidoService
 				.pesquisarRepresentadaIdPedido(idPedido);
@@ -160,18 +135,21 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setNomeFantasia(emitente.getNomeFantasia());
 		iEmit.setRazaoSocial(emitente.getRazaoSocial());
 
-		iEmit.setEnderecoEmitenteNFe(gerarEnderecoNFe(representadaService
-				.pesquisarLogradorouro(emitente.getId())));
+		EnderecoNFe endEmit = gerarEnderecoNFe(representadaService
+				.pesquisarLogradorouro(emitente.getId()));
+		endEmit.setTelefone(emitente.getTelefone());
 
-		nFe.setIdentificacaoEmitenteNFe(iEmit);
+		iEmit.setEnderecoEmitenteNFe(endEmit);
+		nFe.getDadosNFe().setIdentificacaoEmitenteNFe(iEmit);
 		return nFe;
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
-		nFe.setValoresTotaisNFe(new ValoresTotaisNFe());
-		calcularValoresTotaisICMS(nFe);
+		DadosNFe dadosNFe = nFe.getDadosNFe();
+		dadosNFe.setValoresTotaisNFe(new ValoresTotaisNFe());
+		calcularValoresTotaisICMS(dadosNFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
 		return gerarXMLNfe(nFe);
 	}
@@ -194,7 +172,7 @@ public class NFeServiceImpl implements NFeService {
 		for (int i = 0; i < totalParcelas; i++) {
 			dup = new DuplicataNFe();
 			dup.setDataVencimento(df.format(listaData.get(i)));
-			dup.setNumero(String.valueOf(i+1));
+			dup.setNumero(String.valueOf(i + 1));
 			dup.setValor(valorDuplicata);
 
 			listaDuplicata.add(dup);
@@ -221,7 +199,6 @@ public class NFeServiceImpl implements NFeService {
 				.valueOf(logradouro.getNumero()));
 		endereco.setUF(logradouro.getUf());
 		endereco.setNomePais(logradouro.getPais());
-		endereco.setTelefone(null);
 
 		return endereco;
 	}

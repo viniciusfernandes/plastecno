@@ -199,7 +199,11 @@ function inicializarModalCancelamento(botao){
 					value="${representada.inscricaoEstadual}"
 					style="width: 40%; text-align: right;" />
 			</div>
-
+			<div class="label">Telefone:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" id="teleone" name="representada.telefone"
+					value="${representada.telefone}" style="width: 20%" />
+			</div>
 			<div class="label">Site:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" id="site" name="representada.site"

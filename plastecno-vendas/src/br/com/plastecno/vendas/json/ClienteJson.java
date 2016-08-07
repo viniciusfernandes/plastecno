@@ -30,6 +30,7 @@ public class ClienteJson {
     public ClienteJson(Cliente cliente) {
         this(cliente, null);
     }
+
     public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora) {
         id = cliente.getId();
         nomeFantasia = cliente.getNomeFantasia();
@@ -40,11 +41,9 @@ public class ClienteJson {
         cpf = cliente.getCpf();
         inscricaoEstadual = cliente.getInscricaoEstadual();
         nomeCompleto = cliente.getNomeCompleto();
-        // telefone = cliente.getContatoPrincipal() != null ?
-        // cliente.getContatoPrincipal().getTelefoneFormatado() : "";
-        telefone = "9999-9999";
-        // vendedor = new VendedorJson(cliente.getVendedor());
-        vendedor = null;
+        telefone = cliente.getContatoPrincipal() != null ? cliente.getContatoPrincipal().getTelefoneFormatado() : "";
+        vendedor = new VendedorJson(cliente.getVendedor());
+
         this.listaTransportadora = new ArrayList<TransportadoraJson>();
         this.listaRedespacho = new ArrayList<TransportadoraJson>();
 

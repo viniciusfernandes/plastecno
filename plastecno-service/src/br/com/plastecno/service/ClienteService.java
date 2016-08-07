@@ -56,6 +56,8 @@ public interface ClienteService {
 
 	List<Cliente> pesquisarClienteByIdRegiao(Integer idRegiao) throws BusinessException;
 
+	Cliente pesquisarClienteEContatoById(Integer idCliente);
+
 	Cliente pesquisarClienteResumidoById(Integer idCliente);
 
 	Cliente pesquisarClienteResumidoEContatoById(Integer idCliente);

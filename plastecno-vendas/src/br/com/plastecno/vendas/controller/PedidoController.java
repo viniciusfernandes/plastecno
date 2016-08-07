@@ -495,12 +495,13 @@ public class PedidoController extends AbstractController {
      */
     @Get("pedido/cliente/{id}")
     public void pesquisarClienteById(Integer id) {
-        Cliente cliente = this.clienteService.pesquisarById(id);
-        cliente.setListaRedespacho(this.clienteService.pesquisarTransportadorasRedespacho(id));
-        this.carregarVendedor(cliente);
-        this.formatarDocumento(cliente);
+        Cliente cliente = clienteService.pesquisarClienteEContatoById(id);
+        cliente.setListaRedespacho(clienteService.pesquisarTransportadorasRedespacho(id));
 
-        final ClienteJson json = new ClienteJson(cliente, this.transportadoraService.pesquisar());
+        carregarVendedor(cliente);
+        formatarDocumento(cliente);
+
+        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar());
 
         SerializacaoJson serializacaoJson = new SerializacaoJson("cliente", json)
                 .incluirAtributo("listaTransportadora").incluirAtributo("listaRedespacho").incluirAtributo("vendedor");
@@ -691,7 +692,7 @@ public class PedidoController extends AbstractController {
             addAtributo("listaTransportadora", this.transportadoraService.pesquisar());
             addAtributo("listaRedespacho", this.transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
             addAtributo("idRepresentadaSelecionada", idFornecedor);
-            
+
             irRodapePagina();
         }
         configurarTipoPedido(tipoPedido);

@@ -632,15 +632,17 @@ function recuperarValoresImpostos(valoresTabela){
 	impostos [4] = gerarJsonISS();
 	impostos [5] = gerarJsonImpostoImportacao();
 	impostos [6] = gerarJsonInfoProduto();
+	
 	var idInput = null;
 	var idBloco = null;
 	var valorInput = null;
 	var valorBloco = null;
 	var idIgual = null;
-	var camposTabela = null;
 	var camposImposto = null;
 	var criadoInput = null;
 	var nomeLista = null;
+	var camposTabela = valoresTabela.campos;
+	
 	for (var i = 0; i < impostos.length; i++) {
 		camposImposto = impostos[i].campos;
 		nomeLista = impostos[i].nomeObjeto;
@@ -648,17 +650,16 @@ function recuperarValoresImpostos(valoresTabela){
 		for (var k = 0; k < camposImposto.length; k++) {
 			idInput = nomeLista + '.' + camposImposto[k].nome;
 			idBloco = camposImposto[k].id;
-			camposTabela = valoresTabela.campos;
 			
 			for (var j = 0; j < camposTabela.length; j++) {
-				idIgual = idBloco == camposTabela.id;
+				idIgual = idBloco == camposTabela[j].id;
 				if(!idIgual){
 					continue;
 				}
 				
 				criadoInput = document.getElementById(idInput) != undefined;
 				if(!criadoInput || isEmpty(document.getElementById(idInput).value)){
-					document.getElementById(idBloco).value = campos.valorTabela;
+					document.getElementById(idBloco).value = camposTabela[j].valorTabela;
 					continue impostos;
 				} else {
 					document.getElementById(idBloco).value = document.getElementById(idInput).value;
@@ -668,6 +669,8 @@ function recuperarValoresImpostos(valoresTabela){
 			criadoInput = document.getElementById(idInput) != undefined;
 			if(criadoInput){
 				document.getElementById(idBloco).value = document.getElementById(idInput).value;
+			} else {
+				document.getElementById(idBloco).value = '';
 			}
 		}
 	}
@@ -868,7 +871,7 @@ function editarTributos(linha){
 		<fieldset id="bloco_local_mercadoria">
 			<legend>::: Local Mercadoria ::: -</legend>
 			<div class="divFieldset">
-			<fieldset>
+			<fieldset class="fieldsetInterno" style="width: 45%">
 				<legend>::: Local Retirada :::</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">
@@ -906,7 +909,7 @@ function editarTributos(linha){
 			</div>
 			
 			<div class="divFieldset">
-			<fieldset>
+			<fieldset class="fieldsetInterno" >
 				<legend>::: Local Entrega ::: -</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">

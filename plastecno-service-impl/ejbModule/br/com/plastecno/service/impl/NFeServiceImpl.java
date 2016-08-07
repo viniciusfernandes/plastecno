@@ -135,9 +135,9 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setNomeFantasia(emitente.getNomeFantasia());
 		iEmit.setRazaoSocial(emitente.getRazaoSocial());
 
-		EnderecoNFe endEmit = gerarEnderecoNFe(representadaService
-				.pesquisarLogradorouro(emitente.getId()));
-		endEmit.setTelefone(emitente.getTelefone());
+		EnderecoNFe endEmit = gerarEnderecoNFe(
+				representadaService.pesquisarLogradorouro(emitente.getId()),
+				emitente.getTelefone());
 
 		iEmit.setEnderecoEmitenteNFe(endEmit);
 		nFe.getDadosNFe().setIdentificacaoEmitenteNFe(iEmit);
@@ -182,7 +182,7 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public EnderecoNFe gerarEnderecoNFe(Logradouro logradouro) {
+	public EnderecoNFe gerarEnderecoNFe(Logradouro logradouro, String telefone) {
 		if (logradouro == null) {
 			return null;
 		}
@@ -199,7 +199,7 @@ public class NFeServiceImpl implements NFeService {
 				.valueOf(logradouro.getNumero()));
 		endereco.setUF(logradouro.getUf());
 		endereco.setNomePais(logradouro.getPais());
-
+		endereco.setTelefone(telefone);
 		return endereco;
 	}
 

@@ -12,6 +12,7 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DadosNFe;
@@ -29,6 +30,7 @@ import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
+import br.com.plastecno.service.nfe.constante.TipoTributacaoISS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -68,6 +70,7 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaTipoTributacaoIPI", TipoTributacaoIPI.values());
         addAtributo("listaTipoTributacaoPIS", TipoTributacaoPIS.values());
         addAtributo("listaTipoTributacaoCOFINS", TipoTributacaoCOFINS.values());
+        addAtributo("listaTipoTributacaoISS", TipoTributacaoISS.values());
         addAtributo("listaTipoModalidadeFrete", TipoModalidadeFrete.values());
         addAtributo("listaTipoImpressao", TipoImpressaoNFe.values());
     }
@@ -76,7 +79,9 @@ public class EmissaoNFeController extends AbstractController {
     public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
         String xml = null;
         try {
-            nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(nFeService.gerarEnderecoNFe(logradouro));
+            String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
+            nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
+                    nFeService.gerarEnderecoNFe(logradouro, telefone));
             xml = nFeService.emitirNFe(new NFe(nf), idPedido);
         } catch (BusinessException e) {
             gerarListaMensagemErroLogException(e);
@@ -94,17 +99,19 @@ public class EmissaoNFeController extends AbstractController {
         Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
         List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
         Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
+        List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 
-        addAtributo("telefoneContatoPedido",
-                telefone.length > 0 ? String.valueOf(telefone[0]) + String.valueOf(telefone[1]).replaceAll("\\D+", "")
-                        : "");
+        formatarItemPedido(listaItem);
+
         addAtributo("listaDuplicata", listaDuplicata);
         addAtributo("cliente", cliente);
         addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
         addAtributo("logradouro", clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()));
-        addAtributo("listaItem", pedidoService.pesquisarItemPedidoByIdPedido(idPedido));
+        addAtributo("listaItem", listaItem);
         addAtributo("idPedido", idPedido);
-
+        addAtributo("telefoneContatoPedido",
+                telefone.length > 0 ? String.valueOf(telefone[0]) + String.valueOf(telefone[1]).replaceAll("\\D+", "")
+                        : "");
         irTopoPagina();
     }
 }

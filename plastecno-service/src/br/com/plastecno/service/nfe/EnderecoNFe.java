@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 public class EnderecoNFe {
 	@XmlElement(name = "xBairro")
@@ -35,6 +36,11 @@ public class EnderecoNFe {
 
 	@XmlElement(name = "UF")
 	private String UF;
+
+	@XmlTransient
+	public String getTelefone() {
+		return telefone;
+	}
 
 	public void setBairro(String bairro) {
 		this.bairro = bairro;

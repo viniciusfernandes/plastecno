@@ -19,7 +19,7 @@ public interface NFeService {
 
 	List<DuplicataNFe> gerarDuplicataByIdPedido(Integer idPedido);
 
-	EnderecoNFe gerarEnderecoNFe(Logradouro logradouro);
+	EnderecoNFe gerarEnderecoNFe(Logradouro logradouro, String telefone);
 
 	String gerarXMLNfe(NFe nFe) throws BusinessException;
 

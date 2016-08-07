@@ -33,6 +33,11 @@ public class IdentificacaoDestinatarioNFe {
 		return email;
 	}
 
+	@XmlTransient
+	public EnderecoNFe getEnderecoDestinatarioNFe() {
+		return enderecoDestinatarioNFe;
+	}
+
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
@@ -64,4 +69,5 @@ public class IdentificacaoDestinatarioNFe {
 	public void setNomeFantasia(String nomeFantasia) {
 		this.nomeFantasia = nomeFantasia;
 	}
+
 }

@@ -98,6 +98,11 @@ $(document).ready(function() {
 		fecharBloco('bloco_ii');
 	});
 	
+	$('#botaoInserirISS').click(function(){
+		gerarInputISS();
+		fecharBloco('bloco_iss');
+	});
+	
 	$('#botaoInserirICMS').click(function(){
 		gerarInputICMS();
 		fecharBloco('bloco_icms');
@@ -183,19 +188,18 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_pis');
 	inicializarFadeInBloco('bloco_cofins');
 	inicializarFadeInBloco('bloco_ii');
+	inicializarFadeInBloco('bloco_iss');
 	inicializarFadeInBloco('bloco_tributos');
 	inicializarFadeInBloco('bloco_info_adicionais_prod');
 	
-	inicializarFadeInBloco('bloco_local_retirada');
-	inicializarFadeInBloco('bloco_local_entrega');
+	inicializarFadeInBloco('bloco_local_mercadoria');
 	inicializarFadeInBloco('bloco_referenciada');
 	inicializarFadeInBloco('bloco_destinatario');
 	inicializarFadeInBloco('bloco_transporte');
 	inicializarFadeInBloco('bloco_exportacao');
 	inicializarFadeInBloco('bloco_compra');
 	
-	fecharBloco('bloco_local_retirada');
-	fecharBloco('bloco_local_entrega');
+	fecharBloco('bloco_local_mercadoria');
 	fecharBloco('bloco_referenciada');
 	fecharBloco('bloco_destinatario');
 	fecharBloco('bloco_transporte');
@@ -353,6 +357,17 @@ function gerarJsonTipoCofins(){
 			]};
 };
 
+function gerarJsonISS(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.issqn',
+		'campos':[{'nome':'aliquota', 'id':'aliquotaISS'},
+		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribISS'},
+		          {'nome':'valor', 'id':'valorISS'},
+		          {'nome':'valorBC', 'id':'valorBCISS'},
+		          {'nome':'codigoMunicipioGerador', 'id':'codMunGeradorISS'},
+		          {'nome':'itemListaServicos', 'id':'codItemServicoISS'}
+			]};
+};
+
 function gerarJsonImpostoImportacao(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.impostoImportacao',
 		'campos':[{'nome':'valor', 'id':'valorII'},
@@ -412,6 +427,10 @@ function gerarInputPIS(){
 
 function gerarInputCOFINS(){
 	gerarInputHidden(gerarJsonTipoCofins());	
+};
+
+function gerarInputISS(){
+	gerarInputHidden(gerarJsonISS());	
 };
 
 function gerarInputImpostoImportacao(){
@@ -604,6 +623,56 @@ function inicializarModalCancelamento(botao){
 	});
 };
 
+function recuperarValoresImpostos(valoresTabela){
+	var impostos = new Array();
+	impostos [0] = gerarJsonTipoIcms();
+	impostos [1] = gerarJsonTipoIpi();
+	impostos [2] = gerarJsonTipoPis();
+	impostos [3] = gerarJsonTipoCofins();
+	impostos [4] = gerarJsonISS();
+	impostos [5] = gerarJsonImpostoImportacao();
+	impostos [6] = gerarJsonInfoProduto();
+	var idInput = null;
+	var idBloco = null;
+	var valorInput = null;
+	var valorBloco = null;
+	var idIgual = null;
+	var camposTabela = null;
+	var camposImposto = null;
+	var criadoInput = null;
+	var nomeLista = null;
+	for (var i = 0; i < impostos.length; i++) {
+		camposImposto = impostos[i].campos;
+		nomeLista = impostos[i].nomeObjeto;
+		impostos: 
+		for (var k = 0; k < camposImposto.length; k++) {
+			idInput = nomeLista + '.' + camposImposto[k].nome;
+			idBloco = camposImposto[k].id;
+			camposTabela = valoresTabela.campos;
+			
+			for (var j = 0; j < camposTabela.length; j++) {
+				idIgual = idBloco == camposTabela.id;
+				if(!idIgual){
+					continue;
+				}
+				
+				criadoInput = document.getElementById(idInput) != undefined;
+				if(!criadoInput || isEmpty(document.getElementById(idInput).value)){
+					document.getElementById(idBloco).value = campos.valorTabela;
+					continue impostos;
+				} else {
+					document.getElementById(idBloco).value = document.getElementById(idInput).value;
+					continue impostos;
+				}
+			}
+			criadoInput = document.getElementById(idInput) != undefined;
+			if(criadoInput){
+				document.getElementById(idBloco).value = document.getElementById(idInput).value;
+			}
+		}
+	}
+};
+
 function editarTributos(linha){
 	var celulas = linha.cells;
 	<%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
@@ -619,6 +688,15 @@ function editarTributos(linha){
 	$('#bloco_tributos #valorBCIPI').val(celulas[10].innerHTML);
 	$('#bloco_tributos #aliquotaIPI').val(celulas[12].innerHTML);
 	
+	var valoresTabela = {'campos':[
+	                               {'id': 'valorBCICMS', 'valorTabela': celulas[8].innerHTML},
+	                               {'id': 'valorICMS', 'valorTabela': celulas[9].innerHTML},
+	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[11].innerHTML},
+	                               {'id': 'valorBCIPI', 'valorTabela': celulas[10].innerHTML},
+	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[12].innerHTML}]};
+	
+	recuperarValoresImpostos(valoresTabela);
+	
 	$('#bloco_tributos').fadeIn('fast');
 	$('#bloco_info_adicionais_prod').fadeIn('fast');
 	
@@ -627,9 +705,11 @@ function editarTributos(linha){
 	inicializarLegendaBlocoProduto('bloco_pis');
 	inicializarLegendaBlocoProduto('bloco_cofins');
 	inicializarLegendaBlocoProduto('bloco_ii');
+	inicializarLegendaBlocoProduto('bloco_iss');
 	inicializarLegendaBlocoProduto('bloco_tributos');
 	inicializarLegendaBlocoProduto('bloco_info_adicionais_prod');
 };
+
 </script>
 
 </head>
@@ -785,76 +865,83 @@ function editarTributos(linha){
 			</table>
 		</fieldset>
 		
-		<fieldset id="bloco_local_retirada">
-			<legend>::: Local Retirada ::: -</legend>
-			<div class="label">CNPJ:</div>
-			<div class="input" style="width: 15%">
-				<input type="text" name="nf.identificacaoLocalRetirada.cnpj"/>
+		<fieldset id="bloco_local_mercadoria">
+			<legend>::: Local Mercadoria ::: -</legend>
+			<div class="divFieldset">
+			<fieldset>
+				<legend>::: Local Retirada :::</legend>
+				<div class="label">CNPJ:</div>
+				<div class="input" style="width: 15%">
+					<input type="text" name="nf.identificacaoLocalRetirada.cnpj"/>
+				</div>
+				<div class="label">CPF:</div>
+				<div class="input" style="width: 50%">
+					<input type="text" name="nf.identificacaoLocalRetirada.cpf" style="width: 30%"/>
+				</div>
+				<div class="label">Endereço:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" name="nf.identificacaoLocalRetirada.logradouro"/>
+				</div>
+				<div class="label" style="width: 8%">Número:</div>
+				<div class="input" style="width: 30%">
+					<input type="text" name="nf.identificacaoLocalRetirada.numero" style="width: 20%"/>
+				</div>
+				<div class="label">Complemento:</div>
+				<div class="input" style="width: 70%">
+					<input type="text" name="nf.identificacaoLocalRetirada.complemento" style="width: 30%"/>
+				</div>
+				<div class="label">Cidade:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalRetirada.cidade" style="width: 40%" />
+				</div>
+				<div class="label">Bairro:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalRetirada.municipio" style="width: 40%"/>
+				</div>
+				<div class="label">UF:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalRetirada.uf" style="width: 5%"/>
+				</div>
+			</fieldset>
 			</div>
-			<div class="label">CPF:</div>
-			<div class="input" style="width: 50%">
-				<input type="text" name="nf.identificacaoLocalRetirada.cpf" style="width: 30%"/>
-			</div>
-			<div class="label">Endereço:</div>
-			<div class="input" style="width: 40%">
-				<input type="text" name="nf.identificacaoLocalRetirada.logradouro"/>
-			</div>
-			<div class="label" style="width: 8%">Número:</div>
-			<div class="input" style="width: 30%">
-				<input type="text" name="nf.identificacaoLocalRetirada.numero" style="width: 20%"/>
-			</div>
-			<div class="label">Complemento:</div>
-			<div class="input" style="width: 70%">
-				<input type="text" name="nf.identificacaoLocalRetirada.complemento" style="width: 30%"/>
-			</div>
-			<div class="label">Cidade:</div>
-			<div class="input" style="width: 80%">
-				<input type="text" name="nf.identificacaoLocalRetirada.cidade" style="width: 40%" />
-			</div>
-			<div class="label">Bairro:</div>
-			<div class="input" style="width: 80%">
-				<input type="text" name="nf.identificacaoLocalRetirada.municipio" style="width: 40%"/>
-			</div>
-			<div class="label">UF:</div>
-			<div class="input" style="width: 80%">
-				<input type="text" name="nf.identificacaoLocalRetirada.uf" style="width: 5%"/>
-			</div>
-		</fieldset>
-		
-		<fieldset id="bloco_local_entrega">
-			<legend>::: Local Entrega ::: -</legend>
-			<div class="label">CNPJ:</div>
-			<div class="input" style="width: 15%">
-				<input type="text" name="nf.identificacaoLocalEntrega.cnpj"/>
-			</div>
-			<div class="label">CPF:</div>
-			<div class="input" style="width: 50%">
-				<input type="text" name="nf.identificacaoLocalEntrega.cpf" style="width: 30%"/>
-			</div>
-			<div class="label">Endereço:</div>
-			<div class="input" style="width: 40%">
-				<input type="text" name="nf.identificacaoLocalEntrega.logradouro"/>
-			</div>
-			<div class="label" style="width: 8%">Número:</div>
-			<div class="input" style="width: 30%">
-				<input type="text" name="nf.identificacaoLocalEntrega.numero" style="width: 20%"/>
-			</div>
-			<div class="label">Complemento:</div>
-			<div class="input" style="width: 70%">
-				<input type="text" name="nf.identificacaoLocalEntrega.complemento" style="width: 30%"/>
-			</div>
-			<div class="label">Cidade:</div>
-			<div class="input" style="width: 80%">
-				<input type="text" name="nf.identificacaoLocalEntrega.cidade" style="width: 40%" />
-			</div>
-			<div class="label">Bairro:</div>
-			<div class="input" style="width: 80%">
-				<input type="text" name="nf.identificacaoLocalEntrega.municipio" style="width: 40%"/>
-			</div>
-			<div class="label">UF:</div>
-			<div class="input" style="width: 80%">
-				<input type="text" name="nf.identificacaoLocalEntrega.uf" style="width: 5%"/>
-			</div>
+			
+			<div class="divFieldset">
+			<fieldset>
+				<legend>::: Local Entrega ::: -</legend>
+				<div class="label">CNPJ:</div>
+				<div class="input" style="width: 15%">
+					<input type="text" name="nf.identificacaoLocalEntrega.cnpj"/>
+				</div>
+				<div class="label">CPF:</div>
+				<div class="input" style="width: 50%">
+					<input type="text" name="nf.identificacaoLocalEntrega.cpf" style="width: 30%"/>
+				</div>
+				<div class="label">Endereço:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" name="nf.identificacaoLocalEntrega.logradouro"/>
+				</div>
+				<div class="label" style="width: 8%">Número:</div>
+				<div class="input" style="width: 30%">
+					<input type="text" name="nf.identificacaoLocalEntrega.numero" style="width: 20%"/>
+				</div>
+				<div class="label">Complemento:</div>
+				<div class="input" style="width: 70%">
+					<input type="text" name="nf.identificacaoLocalEntrega.complemento" style="width: 30%"/>
+				</div>
+				<div class="label">Cidade:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalEntrega.cidade" style="width: 40%" />
+				</div>
+				<div class="label">Bairro:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalEntrega.municipio" style="width: 40%"/>
+				</div>
+				<div class="label">UF:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalEntrega.uf" style="width: 5%"/>
+				</div>
+			</fieldset>
+			</div>			
 		</fieldset>
 		
 		<fieldset id="bloco_destinatario">
@@ -915,8 +1002,8 @@ function editarTributos(linha){
 						<th>BC ICMS</th>
 						<th>V. ICMS(R$)</th>
 						<th>V IPI.(R$)</th>
-						<th>Aliq. ICMS(R$)</th>
-						<th>Aliq. IPI(R$)</th>
+						<th>Aliq. ICMS(%)</th>
+						<th>Aliq. IPI(%)</th>
 						<th style="width: 2%">Ações</th>
 					</tr>
 				</thead>
@@ -932,10 +1019,10 @@ function editarTributos(linha){
 							<td>${item.precoUnidade}</td>
 							<td>${item.valorTotal}</td>
 							<td>${item.valorTotal}</td>
-							<td>${item.valorICMS}</td>
-							<td>${item.precoUnidadeIPI}</td>
-							<td>${item.aliquotaICMS}</td>
-							<td>${item.aliquotaIPI}</td>
+							<td>${item.valorICMSFormatado}</td>
+							<td>${item.valorIPIFormatado}</td>
+							<td>${item.aliquotaICMSFormatado}</td>
+							<td>${item.aliquotaIPIFormatado}</td>
 							<td>
 								<input type="button" value="" title="Editar Tributos" class="botaoDinheiroPequeno" onclick="editarTributos(this.parentNode.parentNode);"/>
 							</td>
@@ -1183,6 +1270,44 @@ function editarTributos(linha){
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
 						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_iss" class="fieldsetInterno">
+					<legend>::: ISSQN Prod.::: +</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="codSitTribISS" style="width: 45%">
+							<c:forEach var="tipo" items="${listaTipoTributacaoISS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCISS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 10%">
+						<input id="aliquotaISS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor(R$):</div>
+					<div class="input" style="width: 20%">
+						<input id="valorISS" type="text" style="width: 50%" />
+					</div>
+					<div  class="label">Qtde. Vendida:</div>
+					<div class="input" style="width: 10%">
+						<input id="codMunGeradorISS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Item Serviço:</div>
+					<div class="input" style="width: 10%">
+						<input id="codItemServicoISS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirISS" title="Inserir ISS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparISS" title="Limpar ISS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
 				</div>

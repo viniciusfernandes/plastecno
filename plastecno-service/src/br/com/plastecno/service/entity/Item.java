@@ -49,6 +49,12 @@ public abstract class Item implements Serializable, Cloneable {
 	@Transient
 	private String valorComissaoFormatado;
 
+	@Transient
+	private String valorICMSFormatado;
+
+	@Transient
+	private String valorIPIFormatado;
+
 	public Item() {
 	}
 
@@ -234,6 +240,14 @@ public abstract class Item implements Serializable, Cloneable {
 		return calcularValorICMS();
 	}
 
+	public String getValorICMSFormatado() {
+		return valorICMSFormatado;
+	}
+
+	public String getValorIPIFormatado() {
+		return valorIPIFormatado;
+	}
+
 	public boolean isEqual(Item item) {
 		boolean igual = false;
 
@@ -345,5 +359,13 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public void setValorComissionadoFormatado(String valorComissaoFormatado) {
 		this.valorComissaoFormatado = valorComissaoFormatado;
+	}
+
+	public void setValorICMSFormatado(String valorICMSFormatado) {
+		this.valorICMSFormatado = valorICMSFormatado;
+	}
+
+	public void setValorIPIFormatado(String valorIPIFormatado) {
+		this.valorIPIFormatado = valorIPIFormatado;
 	}
 }

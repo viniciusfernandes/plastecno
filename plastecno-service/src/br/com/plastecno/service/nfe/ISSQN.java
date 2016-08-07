@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 public class ISSQN {
 	@XmlElement(name = "vAliq")
@@ -20,6 +21,16 @@ public class ISSQN {
 
 	@XmlElement(name = "vBC")
 	private Double valorBC;
+
+	@XmlTransient
+	public Double getValor() {
+		return valor;
+	}
+
+	@XmlTransient
+	public Double getValorBC() {
+		return valorBC;
+	}
 
 	public void setAliquota(Double aliquota) {
 		this.aliquota = aliquota;

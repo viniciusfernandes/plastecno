@@ -44,6 +44,10 @@ public class TributosProdutoServico {
 		return ipi != null && ipi.getTipoIpi() != null;
 	}
 
+	public boolean contemISS() {
+		return issqn != null;
+	}
+
 	public boolean contemPIS() {
 		return pis != null && pis.getTipoPis() != null;
 	}
@@ -56,6 +60,11 @@ public class TributosProdutoServico {
 	@XmlTransient
 	public ImpostoImportacao getImpostoImportacao() {
 		return impostoImportacao;
+	}
+
+	@XmlTransient
+	public ISSQN getIssqn() {
+		return issqn;
 	}
 
 	@XmlTransient

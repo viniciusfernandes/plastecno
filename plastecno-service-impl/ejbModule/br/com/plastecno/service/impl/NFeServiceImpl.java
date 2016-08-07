@@ -29,7 +29,8 @@ import br.com.plastecno.service.nfe.IdentificacaoEmitenteNFe;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.ProdutoServicoNFe;
 import br.com.plastecno.service.nfe.TributosProdutoServico;
-import br.com.plastecno.service.nfe.ValorTotalICMS;
+import br.com.plastecno.service.nfe.ValoresTotaisICMS;
+import br.com.plastecno.service.nfe.ValoresTotaisISSQN;
 import br.com.plastecno.service.nfe.ValoresTotaisNFe;
 
 @Stateless
@@ -46,7 +47,9 @@ public class NFeServiceImpl implements NFeService {
 
 	private void calcularValoresTotaisICMS(DadosNFe dadosNFe) {
 		ValoresTotaisNFe valoresTotaisNFe = dadosNFe.getValoresTotaisNFe();
-		ValorTotalICMS valorTotalICMS = new ValorTotalICMS();
+		ValoresTotaisICMS totaisICMS = new ValoresTotaisICMS();
+		ValoresTotaisISSQN totaisISSQN = new ValoresTotaisISSQN();
+
 		List<DetalhamentoProdutoServicoNFe> listaItem = dadosNFe
 				.getListaDetalhamentoProdutoServicoNFe();
 
@@ -69,6 +72,8 @@ public class NFeServiceImpl implements NFeService {
 		double valorProduto = 0;
 		double valorTotalDesconto = 0;
 		double valorDespAcessorias = 0;
+		double valorBCISS = 0;
+		double valorISS = 0;
 
 		for (DetalhamentoProdutoServicoNFe item : listaItem) {
 			tributo = item.getTributosProdutoServico();
@@ -96,6 +101,11 @@ public class NFeServiceImpl implements NFeService {
 				valorImportacao += tributo.getImpostoImportacao().getValor();
 			}
 
+			if (tributo != null && tributo.contemISS()) {
+				valorBCISS += tributo.getIssqn().getValorBC();
+				valorISS += tributo.getIssqn().getValor();
+			}
+
 			produto = item.getProdutoServicoNFe();
 
 			valorSeguro += produto.getValorTotalSeguro();
@@ -105,21 +115,27 @@ public class NFeServiceImpl implements NFeService {
 			valorDespAcessorias += produto.getOutrasDespesasAcessorias();
 		}
 
-		valorTotalICMS.setValorBaseCalculo(valorBC);
-		valorTotalICMS.setValorBaseCalculoST(valorBCST);
-		valorTotalICMS.setValorTotalICMS(valorICMS);
-		valorTotalICMS.setValorTotalFrete(valorFrete);
-		valorTotalICMS.setValorTotalII(valorImportacao);
-		valorTotalICMS.setValorTotalIPI(valorIPI);
-		valorTotalICMS.setValorTotalSeguro(valorSeguro);
-		valorTotalICMS.setValorTotalPIS(valorPIS);
-		valorTotalICMS.setValorTotalCOFINS(valorCOFINS);
-		valorTotalICMS.setValorTotalProdutosServicos(valorProduto);
-		valorTotalICMS.setValorTotalDesconto(valorTotalDesconto);
-		valorTotalICMS.setValorTotalDespAcessorias(valorDespAcessorias);
-		valorTotalICMS.setValorTotalNF(valorProduto);
+		totaisICMS.setValorBaseCalculo(valorBC);
+		totaisICMS.setValorBaseCalculoST(valorBCST);
+		totaisICMS.setValorTotalICMS(valorICMS);
+		totaisICMS.setValorTotalFrete(valorFrete);
+		totaisICMS.setValorTotalII(valorImportacao);
+		totaisICMS.setValorTotalIPI(valorIPI);
+		totaisICMS.setValorTotalSeguro(valorSeguro);
+		totaisICMS.setValorTotalPIS(valorPIS);
+		totaisICMS.setValorTotalCOFINS(valorCOFINS);
+		totaisICMS.setValorTotalProdutosServicos(valorProduto);
+		totaisICMS.setValorTotalDesconto(valorTotalDesconto);
+		totaisICMS.setValorTotalDespAcessorias(valorDespAcessorias);
+		totaisICMS.setValorTotalNF(valorProduto);
 
-		valoresTotaisNFe.setValorTotalICMS(valorTotalICMS);
+		totaisISSQN.setValorBC(valorBCISS);
+		totaisISSQN.setValorIss(valorISS);
+		totaisISSQN.setValorPis(valorPIS);
+		totaisISSQN.setValorCofins(valorCOFINS);
+
+		valoresTotaisNFe.setValoresTotaisICMS(totaisICMS);
+		valoresTotaisNFe.setValoresTotaisISSQN(totaisISSQN);
 	}
 
 	@Override

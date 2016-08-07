@@ -339,7 +339,6 @@ function gerarJsonTipoIpi(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi.tipoIpi',
 		'campos':[{'nome':'aliquota', 'id':'aliquotaIPI'},
 		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribIPI'},
-		          {'nome':'valor', 'id':'valorBCIPI'},
 		          {'nome':'valorBC', 'id':'valorBCIPI'},
 		          {'nome':'quantidadeUnidadeTributavel', 'id':'qtdeUnidTribIPI'},
 		          {'nome':'valorUnidadeTributavel', 'id':'valorUnidTribIPI'}
@@ -352,8 +351,7 @@ function gerarJsonTipoCofins(){
 		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribCOFINS'},
 		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaCOFINS'},
 		          {'nome':'valor', 'id':'valorCOFINS'},
-		          {'nome':'valorBC', 'id':'valorBCCOFINS'},
-		          {'nome':'valorAliquota', 'id':'valorAliquotaCOFINS'}
+		          {'nome':'valorBC', 'id':'valorBCCOFINS'}
 			]};
 };
 
@@ -388,8 +386,7 @@ function gerarJsonTipoPis(){
 		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribPIS'},
 		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaPIS'},
 		          {'nome':'valor', 'id':'valorPIS'},
-		          {'nome':'valorBC', 'id':'valorBCPIS'},
-		          {'nome':'valorAliquota', 'id':'valorAliquotaPIS'}
+		          {'nome':'valorBC', 'id':'valorBCPIS'}
 			]};
 };
 
@@ -684,11 +681,17 @@ function editarTributos(linha){
 	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
 	--numeroProdutoEdicao;
 	
-	$('#bloco_tributos #valorBCICMS').val(celulas[8].innerHTML);
+	var valorBC = celulas[7].innerHTML;
+	
+	$('#bloco_tributos #valorBCICMS').val(valorBC);
+	$('#bloco_tributos #valorBCIPI').val(valorBC);
+	$('#bloco_tributos #valorBCPIS').val(valorBC);
+	$('#bloco_tributos #valorBCCOFINS').val(valorBC);
+	$('#bloco_tributos #valorBCISS').val(valorBC);
+	$('#bloco_tributos #valorBCII').val(valorBC);
+	
 	$('#bloco_tributos #valorICMS').val(celulas[9].innerHTML);
 	$('#bloco_tributos #aliquotaICMS').val(celulas[11].innerHTML);
-	
-	$('#bloco_tributos #valorBCIPI').val(celulas[10].innerHTML);
 	$('#bloco_tributos #aliquotaIPI').val(celulas[12].innerHTML);
 	
 	var valoresTabela = {'campos':[
@@ -1096,11 +1099,11 @@ function editarTributos(linha){
 					<div class="input" style="width: 10%">
 						<input type="text" id="valorBCICMS" style="width: 100%" class="semprehabilitado"/>
 					</div>
-					<div  class="label">Alíquota:</div>
+					<div  class="label">Alíquota(%):</div>
 					<div class="input" style="width: 10%">
 						<input type="text" id="aliquotaICMS" style="width: 100%" class="semprehabilitado"/>
 					</div>
-					<div  class="label">Valor:</div>
+					<div  class="label">Valor ICMS(R$):</div>
 					<div class="input" style="width: 30%">
 						<input type="text" id="valorICMS" style="width: 30%" class="semprehabilitado"/>
 					</div>
@@ -1158,13 +1161,13 @@ function editarTributos(linha){
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label">Alíquota:</div>
-					<div class="input" style="width: 10%">
-						<input id="aliquotaIPI" type="text" style="width: 100%" />
-					</div>
 					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCIPI" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota:</div>
 					<div class="input" style="width: 50%">
-						<input id="valorBCIPI" type="text" style="width: 20%" />
+						<input id="aliquotaIPI" type="text" style="width: 20%" />
 					</div>
 					<div  class="label">Qtde. unid. Tributável:</div>
 					<div class="input" style="width: 10%">
@@ -1220,17 +1223,13 @@ function editarTributos(linha){
 					<div class="input" style="width: 10%">
 						<input id="aliquotaPIS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Valor Alíquota(R$):</div>
+					<div  class="label">Valor PIS(R$):</div>
 					<div class="input" style="width: 20%">
-						<input id="valorAliquotaPIS" type="text" style="width: 50%" />
+						<input id="valorPIS" type="text" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde.Vendida:</div>
 					<div class="input" style="width: 10%">
 						<input id="qtdeVendidaPIS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Valor:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorPIS" type="text" style="width: 100%" />
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
@@ -1258,17 +1257,13 @@ function editarTributos(linha){
 					<div class="input" style="width: 10%">
 						<input id="aliquotaCOFINS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Valor Alíquota(R$):</div>
+					<div  class="label">Valor COFINS(R$):</div>
 					<div class="input" style="width: 20%">
-						<input id="valorAliquotaCOFINS" type="text" style="width: 50%" />
+						<input id="valorCOFINS" type="text" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde. Vendida:</div>
 					<div class="input" style="width: 10%">
 						<input id="qtdeVendidaCOFINS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Valor:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorCOFINS" type="text" style="width: 100%" />
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
@@ -1296,7 +1291,7 @@ function editarTributos(linha){
 					<div class="input" style="width: 10%">
 						<input id="aliquotaISS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Valor(R$):</div>
+					<div  class="label">Valor ISS(R$):</div>
 					<div class="input" style="width: 20%">
 						<input id="valorISS" type="text" style="width: 50%" />
 					</div>
@@ -1317,14 +1312,14 @@ function editarTributos(linha){
 				
 				<div class="divFieldset">
 				<fieldset id="bloco_ii" class="fieldsetInterno">
-					<legend>::: Imp. Impor. Prod.::: +</legend>
-					<div  class="label">Valor:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorII" type="text" style="width: 100%" />
-					</div>
+					<legend>::: Importação Prod.::: +</legend>
 					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCII" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Import.(R$):</div>
 					<div class="input" style="width: 50%">
-						<input id="valorBCII" type="text" style="width: 20%" />
+						<input id="valorII" type="text" style="width: 20%" />
 					</div>
 					<div  class="label">Valor IOF:</div>
 					<div class="input" style="width: 10%">

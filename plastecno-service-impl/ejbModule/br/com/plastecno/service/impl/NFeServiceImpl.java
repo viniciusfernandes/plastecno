@@ -78,7 +78,6 @@ public class NFeServiceImpl implements NFeService {
 				valorBC += tipoIcms.getValorBC();
 				valorBCST += tipoIcms.getValorBCST();
 				valorICMS += tipoIcms.getValor();
-
 			}
 
 			if (tributo != null && tributo.contemIPI()) {

@@ -34,6 +34,11 @@ public class COFINSGeral {
 		return valor == null ? 0 : valor;
 	}
 
+	@XmlTransient
+	public Double getValorBC() {
+		return valorBC == null ? 0 : valorBC;
+	}
+
 	public void setAliquota(Double aliquota) {
 		this.aliquota = aliquota;
 	}

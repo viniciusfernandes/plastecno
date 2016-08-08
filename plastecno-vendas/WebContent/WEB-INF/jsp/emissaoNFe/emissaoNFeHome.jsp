@@ -734,18 +734,26 @@ function editarTributos(linha){
 			<legend>::: Dados da NF-e :::</legend>
 			<div class="label">Pedido:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="idPedido" name="idPedido" value="${idPedido}"
-					 />
+				<input type="text" id="idPedido" name="idPedido" value="${idPedido}" />
 			</div>
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoPesquisaPedido"
 					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
 			</div>
+			<%--div para dar o correto alinhamento dos campos no formulario. Nao teve outra alternativa--%>
 			<div class="input" style="width: 60%">
+			</div>
+			<div class="label">Regime:</div>
+			<div class="input" style="width: 80%">
+				<select id="nf.identificacaoEmitenteNFe.regimeTributario" style="width: 20%" >
+					<c:forEach var="tipo" items="${listaTipoRegimeTributacao}">
+						<option value="${tipo.codigo}">${tipo.descricao}</option>
+					</c:forEach>
+				</select>
 			</div>
 			<div class="label obrigatorio">Tipo Documento:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado"  class="semprehabilitado" style="width: 100%">
+				<select id="pedidoAssociado"   style="width: 100%">
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
 						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
 					</c:forEach>
@@ -753,7 +761,7 @@ function editarTributos(linha){
 			</div>
 			<div class="label obrigatorio">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado" name="nf.identificacaoNFe.indicadorFormaPagamento" class="semprehabilitado" style="width: 100%">
+				<select id="pedidoAssociado" name="nf.identificacaoNFe.indicadorFormaPagamento"  style="width: 100%">
 					<c:forEach var="formaPagamento" items="${listaTipoFormaPagamento}">
 						<option value="${formaPagamento.codigo}" <c:if test="${formaPagamento eq formaPagamentoPadrao}">selected</c:if>>${formaPagamento.descricao}</option>
 					</c:forEach>
@@ -761,7 +769,7 @@ function editarTributos(linha){
 			</div>
 			<div class="label obrigatorio">Forma Emissão:</div>
 			<div class="input" style="width: 20%">
-				<select name="nf.identificacaoNFe.tipoEmissao" class="semprehabilitado" style="width: 50%">
+				<select name="nf.identificacaoNFe.tipoEmissao"  style="width: 50%">
 					<c:forEach var="tipoEmissao" items="${listaTipoEmissao}">
 						<option value="${tipoEmissao.codigo}" <c:if test="${tipoEmissao eq tipoEmissaoPadrao}">selected</c:if>>${tipoEmissao.descricao}</option>
 					</c:forEach>
@@ -770,7 +778,7 @@ function editarTributos(linha){
 			<div class="label obrigatorio">Finalidade Emissão:</div>
 			<div class="input" style="width: 10%">
 				<select name="nf.identificacaoNFe.finalidadeEmissao"
-					style="width: 100%" class="semprehabilitado">
+					style="width: 100%" >
 					<c:forEach var="finalidade" items="${listaTipoFinalidadeEmissao}">
 						<option value="${finalidade.codigo}" <c:if test="${finalidade eq finalidadeEmissaoPadrao}">selected</c:if>>${finalidade.descricao}</option>
 					</c:forEach>
@@ -787,7 +795,7 @@ function editarTributos(linha){
 			<div class="label obrigatorio">Consumidor Final:</div>
 			<div class="input" style="width: 20%">
 				<select id="pedidoAssociado" 
-					style="width: 50%" class="semprehabilitado">
+					style="width: 50%" >
 					<option value=""></option>
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
 						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
@@ -797,7 +805,7 @@ function editarTributos(linha){
 			<div class="label obrigatorio">Destino Operação:</div>
 			<div class="input" style="width: 10%">
 				<select id="pedidoAssociado" 
-					style="width: 100%" class="semprehabilitado">
+					style="width: 100%" >
 					<option value=""></option>
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
 						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
@@ -1060,18 +1068,10 @@ function editarTributos(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
 					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
-					<div class="label">Regime:</div>
-					<div class="input" style="width: 80%">
-						<select style="width: 20%" class="semprehabilitado">
-							<c:forEach var="icms" items="${listaRegime}">
-								<option value="${icms.codigo}">${icms.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="tipoTributacaoICMS" 
-							style="width: 77%" class="semprehabilitado">
+							style="width: 77%" >
 							<c:forEach var="icms" items="${listaTipoTributacaoICMS}">
 								<option value="${icms.codigo}">${icms.descricao}</option>
 							</c:forEach>
@@ -1080,7 +1080,7 @@ function editarTributos(linha){
 					<div class="label">Origem:</div>
 					<div class="input" style="width: 25%">
 						<select id="pedidoAssociado" 
-							style="width: 100%" class="semprehabilitado">
+							style="width: 100%" >
 							<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
 								<option value="${origem.codigo}">${origem.descricao}</option>
 							</c:forEach>
@@ -1097,15 +1097,15 @@ function editarTributos(linha){
 					</div>
 					<div  class="label">Valor BC:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="valorBCICMS" style="width: 100%" class="semprehabilitado"/>
+						<input type="text" id="valorBCICMS" style="width: 100%" />
 					</div>
 					<div  class="label">Alíquota(%):</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="aliquotaICMS" style="width: 100%" class="semprehabilitado"/>
+						<input type="text" id="aliquotaICMS" style="width: 100%" />
 					</div>
 					<div  class="label">Valor ICMS(R$):</div>
 					<div class="input" style="width: 30%">
-						<input type="text" id="valorICMS" style="width: 30%" class="semprehabilitado"/>
+						<input type="text" id="valorICMS" style="width: 30%" />
 					</div>
 					<div class="icms00 label">Modalidade ST:</div>
 					<div class="icms00 input" style="width: 70%">
@@ -1117,23 +1117,23 @@ function editarTributos(linha){
 					</div>
 					<div  class="label">Perc. Marg. Valor ST:</div>
 					<div class="input" style="width: 10%">
-						<input id="percValSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
+						<input id="percValSTICMS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Perc. Redução BC ST:</div>
 					<div class="input" style="width: 10%">
-						<input id="percRedBCSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
+						<input id="percRedBCSTICMS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Valor BC ST:</div>
 					<div class="input" style="width: 30%">
-						<input id="valorBCSTICMS" type="text" style="width: 30%" class="semprehabilitado"/>
+						<input id="valorBCSTICMS" type="text" style="width: 30%" />
 					</div>
 					<div  class="label">Alíquota ST:</div>
 					<div class="input" style="width: 10%">
-						<input id="aliquotaSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
+						<input id="aliquotaSTICMS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Valor ST:</div>
 					<div class="input" style="width: 50%">
-						<input id="valorSTICMS" type="text" style="width: 20%" class="semprehabilitado"/>
+						<input id="valorSTICMS" type="text" style="width: 20%" />
 					</div>
 					<div class="icms00 label">Mot. Desoneração:</div>
 					<div class="icms00 input" style="width: 36%">

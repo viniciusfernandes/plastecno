@@ -31,7 +31,7 @@ public class IdentificacaoEmitenteNFe {
 	private String razaoSocial;
 
 	@XmlElement(name = "CRT")
-	private String regimeTributario;
+	private Integer regimeTributario;
 
 	public void setCNAEFiscal(String cNAEFiscal) {
 		CNAEFiscal = cNAEFiscal;
@@ -70,7 +70,7 @@ public class IdentificacaoEmitenteNFe {
 		this.razaoSocial = razaoSocial;
 	}
 
-	public void setRegimeTributario(String regimeTributario) {
+	public void setRegimeTributario(Integer regimeTributario) {
 		this.regimeTributario = regimeTributario;
 	}
 }

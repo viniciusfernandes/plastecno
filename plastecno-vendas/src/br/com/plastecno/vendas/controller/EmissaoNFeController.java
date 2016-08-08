@@ -27,6 +27,7 @@ import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.nfe.constante.TipoMotivoDesoneracaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
+import br.com.plastecno.service.nfe.constante.TipoRegimeTributacao;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
@@ -73,6 +74,8 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaTipoTributacaoISS", TipoTributacaoISS.values());
         addAtributo("listaTipoModalidadeFrete", TipoModalidadeFrete.values());
         addAtributo("listaTipoImpressao", TipoImpressaoNFe.values());
+        addAtributo("listaTipoRegimeTributacao", TipoRegimeTributacao.values());
+
     }
 
     @Post("emissaoNFe/emitirNFe")

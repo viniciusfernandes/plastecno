@@ -24,6 +24,16 @@ public class PISGeral {
 	@XmlElement(name = "vBC")
 	private Double valorBC;
 
+	public double calcularValor() {
+		return valorBC != null && aliquota != null ? valorBC
+				* (aliquota / 100d) : 0;
+	}
+
+	public PISGeral carregarValoresAliquotas() {
+		valor = calcularValor();
+		return this;
+	}
+
 	@XmlTransient
 	public TipoTributacaoPIS getTipoTributacao() {
 		return TipoTributacaoPIS.getTipoTributacao(codigoSituacaoTributaria);

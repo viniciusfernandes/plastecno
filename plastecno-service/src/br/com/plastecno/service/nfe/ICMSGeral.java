@@ -46,6 +46,22 @@ public class ICMSGeral {
 	@XmlElement(name = "vICMSST")
 	private Double valorST;
 
+	public double calcularValor() {
+		return valorBC != null && aliquota != null ? valorBC
+				* (aliquota / 100d) : 0d;
+	}
+
+	public double calcularValorST() {
+		return valorBCST != null && aliquotaST != null ? valorBCST
+				* (aliquotaST / 100d) : 0d;
+	}
+
+	public ICMSGeral carregarValoresAliquotas() {
+		valor = calcularValor();
+		valorST = calcularValorST();
+		return this;
+	}
+
 	@XmlTransient
 	public Double getAliquota() {
 		return aliquota;
@@ -64,10 +80,6 @@ public class ICMSGeral {
 	@XmlTransient
 	public Double getValor() {
 		return valor == null ? 0 : valor;
-	}
-
-	public double calcularValorIcms() {
-		return valorBC != null && aliquota != null ? valorBC * aliquota : 0;
 	}
 
 	@XmlTransient

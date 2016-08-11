@@ -8,8 +8,10 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.ConfiguracaoSistemaService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -40,6 +42,9 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 public class EmissaoNFeController extends AbstractController {
     @Servico
     private ClienteService clienteService;
+
+    @Servico
+    private ConfiguracaoSistemaService configuracaoSistemaService;
 
     @Servico
     private NFeService nFeService;
@@ -75,7 +80,9 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaTipoModalidadeFrete", TipoModalidadeFrete.values());
         addAtributo("listaTipoImpressao", TipoImpressaoNFe.values());
         addAtributo("listaTipoRegimeTributacao", TipoRegimeTributacao.values());
-
+        addAtributo("percentualCofins",
+                configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.PERCENTUAL_COFINS));
+        addAtributo("percentualPis", configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.PERCENTUAL_PIS));
     }
 
     @Post("emissaoNFe/emitirNFe")

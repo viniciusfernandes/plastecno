@@ -22,9 +22,19 @@ public class ISSQN {
 	@XmlElement(name = "vBC")
 	private Double valorBC;
 
+	public double calcularValor() {
+		return valorBC != null && aliquota != null ? valorBC
+				* (aliquota / 100d) : 0;
+	}
+
+	public ISSQN carregarValoresAliquotas() {
+		valor = calcularValor();
+		return this;
+	}
+
 	@XmlTransient
 	public Double getValor() {
-		return valor;
+		return valor == null ? 0 : valor;
 	}
 
 	@XmlTransient

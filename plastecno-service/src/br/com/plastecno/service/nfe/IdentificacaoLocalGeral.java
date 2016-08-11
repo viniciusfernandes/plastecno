@@ -3,6 +3,9 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 
 public class IdentificacaoLocalGeral {
+	@XmlElement(name = "xBairro")
+	private String bairro;
+
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
@@ -26,6 +29,10 @@ public class IdentificacaoLocalGeral {
 
 	@XmlElement(name = "UF")
 	private String uf;
+
+	public void setBairro(String bairro) {
+		this.bairro = bairro;
+	}
 
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;

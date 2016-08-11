@@ -683,23 +683,28 @@ function editarTributos(linha){
 	
 	var valorBC = celulas[7].innerHTML;
 	
-	$('#bloco_tributos #valorBCICMS').val(valorBC);
-	$('#bloco_tributos #valorBCIPI').val(valorBC);
-	$('#bloco_tributos #valorBCPIS').val(valorBC);
-	$('#bloco_tributos #valorBCCOFINS').val(valorBC);
-	$('#bloco_tributos #valorBCISS').val(valorBC);
-	$('#bloco_tributos #valorBCII').val(valorBC);
+	$('#bloco_icms #valorBCICMS').val(valorBC);
+	$('#bloco_ipi #valorBCIPI').val(valorBC);
+	$('#bloco_pis #valorBCPIS').val(valorBC);
+	$('#bloco_cofins #valorBCCOFINS').val(valorBC);
+	$('#bloco_iss #valorBCISS').val(valorBC);
+	$('#bloco_ii #valorBCII').val(valorBC);
 	
-	$('#bloco_tributos #valorICMS').val(celulas[9].innerHTML);
-	$('#bloco_tributos #aliquotaICMS').val(celulas[11].innerHTML);
-	$('#bloco_tributos #aliquotaIPI').val(celulas[12].innerHTML);
+	$('#bloco_icms #valorICMS').val(celulas[9].innerHTML);
+	$('#bloco_icms #aliquotaICMS').val(celulas[11].innerHTML);
+	$('#bloco_ipi #aliquotaIPI').val(celulas[12].innerHTML);
 	
 	var valoresTabela = {'campos':[
-	                               {'id': 'valorBCICMS', 'valorTabela': celulas[8].innerHTML},
 	                               {'id': 'valorICMS', 'valorTabela': celulas[9].innerHTML},
 	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[11].innerHTML},
-	                               {'id': 'valorBCIPI', 'valorTabela': celulas[10].innerHTML},
-	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[12].innerHTML}]};
+	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[12].innerHTML},
+	                               {'id': 'valorBCPIS', 'valorTabela': valorBC},
+	                               {'id': 'valorBCISS', 'valorTabela': valorBC},
+	                               {'id': 'valorBCII', 'valorTabela': valorBC},
+	                               {'id': 'valorBCCOFINS', 'valorTabela': valorBC},
+	                               {'id': 'valorBCICMS', 'valorTabela': valorBC},
+	                               {'id': 'valorBCIPI', 'valorTabela': valorBC},
+	                               ]};
 	
 	recuperarValoresImpostos(valoresTabela);
 	
@@ -751,7 +756,7 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Tipo Documento:</div>
+			<div class="label">Tipo Documento:</div>
 			<div class="input" style="width: 10%">
 				<select id="pedidoAssociado"   style="width: 100%">
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
@@ -759,7 +764,7 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Forma Pagamento:</div>
+			<div class="label">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
 				<select id="pedidoAssociado" name="nf.identificacaoNFe.indicadorFormaPagamento"  style="width: 100%">
 					<c:forEach var="formaPagamento" items="${listaTipoFormaPagamento}">
@@ -767,7 +772,7 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Forma Emissão:</div>
+			<div class="label">Forma Emissão:</div>
 			<div class="input" style="width: 20%">
 				<select name="nf.identificacaoNFe.tipoEmissao"  style="width: 50%">
 					<c:forEach var="tipoEmissao" items="${listaTipoEmissao}">
@@ -775,7 +780,7 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Finalidade Emissão:</div>
+			<div class="label">Finalidade Emissão:</div>
 			<div class="input" style="width: 10%">
 				<select name="nf.identificacaoNFe.finalidadeEmissao"
 					style="width: 100%" >
@@ -792,7 +797,7 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Consumidor Final:</div>
+			<div class="label">Consumidor Final:</div>
 			<div class="input" style="width: 20%">
 				<select id="pedidoAssociado" 
 					style="width: 50%" >
@@ -802,7 +807,7 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Destino Operação:</div>
+			<div class="label">Destino Operação:</div>
 			<div class="input" style="width: 10%">
 				<select id="pedidoAssociado" 
 					style="width: 100%" >
@@ -882,7 +887,7 @@ function editarTributos(linha){
 		<fieldset id="bloco_local_mercadoria">
 			<legend>::: Local Mercadoria ::: -</legend>
 			<div class="divFieldset">
-			<fieldset class="fieldsetInterno" style="width: 45%">
+			<fieldset class="fieldsetInterno">
 				<legend>::: Local Retirada :::</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">

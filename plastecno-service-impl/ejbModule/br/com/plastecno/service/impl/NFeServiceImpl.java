@@ -20,7 +20,6 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
-import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
@@ -45,12 +44,12 @@ public class NFeServiceImpl implements NFeService {
 	@EJB
 	private RepresentadaService representadaService;
 
-	private void calcularValoresTotaisICMS(DadosNFe dadosNFe) {
-		ValoresTotaisNFe valoresTotaisNFe = dadosNFe.getValoresTotaisNFe();
+	private void carregarValoresTotaisNFe(NFe nFe) {
+		ValoresTotaisNFe valoresTotaisNFe = new ValoresTotaisNFe();
 		ValoresTotaisICMS totaisICMS = new ValoresTotaisICMS();
 		ValoresTotaisISSQN totaisISSQN = new ValoresTotaisISSQN();
 
-		List<DetalhamentoProdutoServicoNFe> listaItem = dadosNFe
+		List<DetalhamentoProdutoServicoNFe> listaItem = nFe.getDadosNFe()
 				.getListaDetalhamentoProdutoServicoNFe();
 
 		if (listaItem == null || listaItem.isEmpty()) {
@@ -136,6 +135,8 @@ public class NFeServiceImpl implements NFeService {
 
 		valoresTotaisNFe.setValoresTotaisICMS(totaisICMS);
 		valoresTotaisNFe.setValoresTotaisISSQN(totaisISSQN);
+
+		nFe.getDadosNFe().setValoresTotaisNFe(valoresTotaisNFe);
 	}
 
 	@Override
@@ -162,9 +163,7 @@ public class NFeServiceImpl implements NFeService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
-		DadosNFe dadosNFe = nFe.getDadosNFe();
-		dadosNFe.setValoresTotaisNFe(new ValoresTotaisNFe());
-		calcularValoresTotaisICMS(dadosNFe);
+		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
 		return gerarXMLNfe(nFe);
 	}

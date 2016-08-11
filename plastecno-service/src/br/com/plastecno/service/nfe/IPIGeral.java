@@ -24,6 +24,16 @@ public class IPIGeral {
 	@XmlElement(name = "vUnid")
 	private Double valorUnidadeTributavel;
 
+	public double calcularValor() {
+		return valorBC != null && aliquota != null ? valorBC
+				* (aliquota / 100d) : 0;
+	}
+
+	public IPIGeral carregarValoresAliquotas() {
+		valor = calcularValor();
+		return this;
+	}
+
 	@XmlTransient
 	public TipoTributacaoIPI getTipoTributacao() {
 		return TipoTributacaoIPI.getTipoTributacao(codigoSituacaoTributaria);

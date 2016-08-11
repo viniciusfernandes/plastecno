@@ -24,6 +24,16 @@ public class COFINSGeral {
 	@XmlElement(name = "vBC")
 	private Double valorBC;
 
+	public double calcularValor() {
+		return valorBC != null && aliquota != null ? valorBC
+				* (aliquota / 100d) : 0;
+	}
+
+	public COFINSGeral carregarValoresAliquotas() {
+		valor = calcularValor();
+		return this;
+	}
+
 	@XmlTransient
 	public TipoTributacaoCOFINS getTipoTributacao() {
 		return TipoTributacaoCOFINS.getTipoTributacao(codigoSituacaoTributaria);

@@ -81,6 +81,8 @@ public class Representada implements Serializable {
 	@Column(name = "site")
 	private String site;
 
+	private String telefone;
+
 	@Column(name = "id_tipo_apresentacao_ipi")
 	@Enumerated(EnumType.ORDINAL)
 	private TipoApresentacaoIPI tipoApresentacaoIPI = TipoApresentacaoIPI.NUNCA;
@@ -178,6 +180,10 @@ public class Representada implements Serializable {
 		return site;
 	}
 
+	public String getTelefone() {
+		return telefone;
+	}
+
 	public TipoApresentacaoIPI getTipoApresentacaoIPI() {
 		return tipoApresentacaoIPI;
 	}
@@ -270,6 +276,10 @@ public class Representada implements Serializable {
 
 	public void setSite(String site) {
 		this.site = site;
+	}
+
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
 	}
 
 	public void setTipoApresentacaoIPI(TipoApresentacaoIPI tipoApresentacaoIPI) {

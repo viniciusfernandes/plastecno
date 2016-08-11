@@ -19,6 +19,9 @@ public class COFINS {
 	@XmlElement(name = "COFINSQtde")
 	private COFINSGeral cofinsQuantidade;
 
+	@XmlElement(name = "COFINSST")
+	private COFINSGeral cofinsST;
+
 	@XmlTransient
 	private COFINSGeral tipoConfins;
 
@@ -37,6 +40,8 @@ public class COFINS {
 				|| COFINS_7.equals(tribut) || COFINS_8.equals(tribut)
 				|| COFINS_9.equals(tribut)) {
 			cofinsNaoTributado = tipoCofins;
+		} else if (COFINS_5.equals(tribut)) {
+			cofinsST = tipoCofins;
 		} else if (COFINS_99.equals(tribut)) {
 			cofinsOutrasOperacoes = tipoCofins;
 		}

@@ -1,5 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.List;
+
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
@@ -10,20 +12,26 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.DadosNFe;
+import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
+import br.com.plastecno.service.nfe.constante.TipoImpressaoNFe;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.nfe.constante.TipoMotivoDesoneracaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
+import br.com.plastecno.service.nfe.constante.TipoRegimeTributacao;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
+import br.com.plastecno.service.nfe.constante.TipoTributacaoISS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -63,16 +71,21 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaTipoTributacaoIPI", TipoTributacaoIPI.values());
         addAtributo("listaTipoTributacaoPIS", TipoTributacaoPIS.values());
         addAtributo("listaTipoTributacaoCOFINS", TipoTributacaoCOFINS.values());
+        addAtributo("listaTipoTributacaoISS", TipoTributacaoISS.values());
         addAtributo("listaTipoModalidadeFrete", TipoModalidadeFrete.values());
+        addAtributo("listaTipoImpressao", TipoImpressaoNFe.values());
+        addAtributo("listaTipoRegimeTributacao", TipoRegimeTributacao.values());
 
     }
 
     @Post("emissaoNFe/emitirNFe")
-    public void emitirNFe(NFe nf, Logradouro logradouro, Integer idPedido) {
+    public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
         String xml = null;
         try {
-            nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(nFeService.gerarEnderecoNFe(logradouro));
-            xml = nFeService.emitirNFe(nf, idPedido);
+            String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
+            nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
+                    nFeService.gerarEnderecoNFe(logradouro, telefone));
+            xml = nFeService.emitirNFe(new NFe(nf), idPedido);
         } catch (BusinessException e) {
             gerarListaMensagemErroLogException(e);
         }
@@ -86,14 +99,22 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe/pedido")
     public void pesquisarPedidoById(Integer idPedido) {
-        Cliente cliente = pedidoService.pesquisarClienteResumidoEContatoByIdPedido(idPedido);
+        Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
+        List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
+        Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
+        List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 
+        formatarItemPedido(listaItem);
+
+        addAtributo("listaDuplicata", listaDuplicata);
         addAtributo("cliente", cliente);
         addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
         addAtributo("logradouro", clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()));
-        addAtributo("listaItem", pedidoService.pesquisarItemPedidoByIdPedido(idPedido));
+        addAtributo("listaItem", listaItem);
         addAtributo("idPedido", idPedido);
-
+        addAtributo("telefoneContatoPedido",
+                telefone.length > 0 ? String.valueOf(telefone[0]) + String.valueOf(telefone[1]).replaceAll("\\D+", "")
+                        : "");
         irTopoPagina();
     }
 }

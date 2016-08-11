@@ -149,7 +149,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	}
 
-	public Cliente pesquisarClienteResumidoEContatoByIdPedido(Integer idPedido) {
+	public Cliente pesquisarClienteResumidoByIdPedido(Integer idPedido) {
 		return QueryUtil
 				.gerarRegistroUnico(
 						entityManager
@@ -201,6 +201,16 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		query.setParameter("id", idPedido);
 
 		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
+	}
+
+	public String pesquisarFormaPagamentoByIdPedido(Integer idPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select p.formaPagamento from Pedido p where p.id = :idPedido")
+								.setParameter("idPedido", idPedido),
+						String.class, null);
 	}
 
 	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
@@ -380,6 +390,16 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		situacoes.add(SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO);
 		situacoes.add(SituacaoPedido.ENVIADO);
 		return situacoes;
+	}
+
+	public Object[] pesquisarTelefoneContatoByIdPedido(Integer idPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select p.contato.ddd, p.contato.telefone from Pedido p where p.id = :idPedido")
+								.setParameter("idPedido", idPedido),
+						Object[].class, new Object[] {});
 	}
 
 	public TipoPedido pesquisarTipoPedidoById(Integer idPedido) {

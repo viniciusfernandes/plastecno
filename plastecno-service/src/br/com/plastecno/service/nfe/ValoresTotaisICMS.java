@@ -2,18 +2,12 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class ValorTotalICMS {
+public class ValoresTotaisICMS {
 	@XmlElement(name = "vBC")
 	private Double valorBaseCalculo;
 
 	@XmlElement(name = "vBCST")
 	private Double valorBaseCalculoST;
-
-	@XmlElement(name = "vOutro")
-	private Double valorOutrasDespesasAcessorias;
-
-	@XmlElement(name = "vICMS")
-	private Double valorTotal;
 
 	@XmlElement(name = "vCOFINS")
 	private Double valorTotalCOFINS;
@@ -21,8 +15,14 @@ public class ValorTotalICMS {
 	@XmlElement(name = "vDesc")
 	private Double valorTotalDesconto;
 
+	@XmlElement(name = "vOutro")
+	private Double valorTotalDespAcessorias;
+
 	@XmlElement(name = "vFrete")
 	private Double valorTotalFrete;
+
+	@XmlElement(name = "vICMS")
+	private Double valorTotalICMS;
 
 	@XmlElement(name = "vII")
 	private Double valorTotalII;
@@ -53,15 +53,6 @@ public class ValorTotalICMS {
 		this.valorBaseCalculoST = valorBaseCalculoST;
 	}
 
-	public void setValorOutrasDespesasAcessorias(
-			Double valorOutrasDespesasAcessorias) {
-		this.valorOutrasDespesasAcessorias = valorOutrasDespesasAcessorias;
-	}
-
-	public void setValorTotal(Double valorTotal) {
-		this.valorTotal = valorTotal;
-	}
-
 	public void setValorTotalCOFINS(Double valorTotalCOFINS) {
 		this.valorTotalCOFINS = valorTotalCOFINS;
 	}
@@ -70,8 +61,16 @@ public class ValorTotalICMS {
 		this.valorTotalDesconto = valorTotalDesconto;
 	}
 
+	public void setValorTotalDespAcessorias(Double valorTotalDespAcessorias) {
+		this.valorTotalDespAcessorias = valorTotalDespAcessorias;
+	}
+
 	public void setValorTotalFrete(Double valorTotalFrete) {
 		this.valorTotalFrete = valorTotalFrete;
+	}
+
+	public void setValorTotalICMS(Double valorTotalICMS) {
+		this.valorTotalICMS = valorTotalICMS;
 	}
 
 	public void setValorTotalII(Double valorTotalII) {

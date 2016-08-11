@@ -5,24 +5,33 @@ import javax.xml.bind.annotation.XmlElement;
 public class IdentificacaoEmitenteNFe {
 	@XmlElement(name = "CNAE")
 	private String CNAEFiscal;
+
 	@XmlElement(name = "CNPJ")
 	private String CNPJ;
+
 	@XmlElement(name = "CPF")
 	private String CPF;
+
 	@XmlElement(name = "enderEmit")
 	private EnderecoNFe enderecoEmitenteNFe;
+
 	@XmlElement(name = "IE")
 	private String inscricaoEstadual;
+
 	@XmlElement(name = "IEST")
 	private String inscricaoEstadualSubstitutoTributario;
+
 	@XmlElement(name = "IM")
 	private String inscricaoMunicipal;
+
 	@XmlElement(name = "xFant")
 	private String nomeFantasia;
+
 	@XmlElement(name = "xNome")
 	private String razaoSocial;
+
 	@XmlElement(name = "CRT")
-	private String regimeTributario;
+	private Integer regimeTributario;
 
 	public void setCNAEFiscal(String cNAEFiscal) {
 		CNAEFiscal = cNAEFiscal;
@@ -44,7 +53,8 @@ public class IdentificacaoEmitenteNFe {
 		this.inscricaoEstadual = inscricaoEstadual;
 	}
 
-	public void setInscricaoEstadualSubstitutoTributario(String inscricaoEstadualSubstitutoTributario) {
+	public void setInscricaoEstadualSubstitutoTributario(
+			String inscricaoEstadualSubstitutoTributario) {
 		this.inscricaoEstadualSubstitutoTributario = inscricaoEstadualSubstitutoTributario;
 	}
 
@@ -60,7 +70,7 @@ public class IdentificacaoEmitenteNFe {
 		this.razaoSocial = razaoSocial;
 	}
 
-	public void setRegimeTributario(String regimeTributario) {
+	public void setRegimeTributario(Integer regimeTributario) {
 		this.regimeTributario = regimeTributario;
 	}
 }

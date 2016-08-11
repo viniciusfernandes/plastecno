@@ -378,6 +378,19 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(descricao = "Esse metodo esta sendo chamado na tela de pedidos e estamos retornando mais informacao do que o necessario.")
+	public Cliente pesquisarClienteEContatoById(Integer idCliente) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select c from Cliente c join fetch c.listaContato where c.id = :idCliente")
+								.setParameter("idCliente", idCliente),
+						Cliente.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Cliente pesquisarClienteResumidoById(Integer idCliente) {
 		return clienteDAO.pesquisarClienteResumidoById(idCliente);
 	}

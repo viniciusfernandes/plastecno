@@ -18,7 +18,7 @@ public class ImpostoImportacao {
 
 	@XmlTransient
 	public Double getValor() {
-		return valor;
+		return valor == null ? 0 : valor;
 	}
 
 	@XmlTransient

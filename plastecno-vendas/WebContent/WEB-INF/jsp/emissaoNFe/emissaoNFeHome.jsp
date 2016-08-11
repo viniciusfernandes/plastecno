@@ -98,6 +98,11 @@ $(document).ready(function() {
 		fecharBloco('bloco_ii');
 	});
 	
+	$('#botaoInserirISS').click(function(){
+		gerarInputISS();
+		fecharBloco('bloco_iss');
+	});
+	
 	$('#botaoInserirICMS').click(function(){
 		gerarInputICMS();
 		fecharBloco('bloco_icms');
@@ -183,21 +188,25 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_pis');
 	inicializarFadeInBloco('bloco_cofins');
 	inicializarFadeInBloco('bloco_ii');
+	inicializarFadeInBloco('bloco_iss');
 	inicializarFadeInBloco('bloco_tributos');
 	inicializarFadeInBloco('bloco_info_adicionais_prod');
 	
+	inicializarFadeInBloco('bloco_local_mercadoria');
 	inicializarFadeInBloco('bloco_referenciada');
 	inicializarFadeInBloco('bloco_destinatario');
 	inicializarFadeInBloco('bloco_transporte');
 	inicializarFadeInBloco('bloco_exportacao');
 	inicializarFadeInBloco('bloco_compra');
 	
+	fecharBloco('bloco_local_mercadoria');
 	fecharBloco('bloco_referenciada');
 	fecharBloco('bloco_destinatario');
 	fecharBloco('bloco_transporte');
 	fecharBloco('bloco_exportacao');
 	fecharBloco('bloco_compra');
 	
+	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
 	$('#bloco_tributos').fadeOut('fast');
 	$('#bloco_info_adicionais_prod').fadeOut('fast');
 });
@@ -330,7 +339,6 @@ function gerarJsonTipoIpi(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi.tipoIpi',
 		'campos':[{'nome':'aliquota', 'id':'aliquotaIPI'},
 		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribIPI'},
-		          {'nome':'valor', 'id':'valorBCIPI'},
 		          {'nome':'valorBC', 'id':'valorBCIPI'},
 		          {'nome':'quantidadeUnidadeTributavel', 'id':'qtdeUnidTribIPI'},
 		          {'nome':'valorUnidadeTributavel', 'id':'valorUnidTribIPI'}
@@ -343,8 +351,18 @@ function gerarJsonTipoCofins(){
 		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribCOFINS'},
 		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaCOFINS'},
 		          {'nome':'valor', 'id':'valorCOFINS'},
-		          {'nome':'valorBC', 'id':'valorBCCOFINS'},
-		          {'nome':'valorAliquota', 'id':'valorAliquotaCOFINS'}
+		          {'nome':'valorBC', 'id':'valorBCCOFINS'}
+			]};
+};
+
+function gerarJsonISS(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.issqn',
+		'campos':[{'nome':'aliquota', 'id':'aliquotaISS'},
+		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribISS'},
+		          {'nome':'valor', 'id':'valorISS'},
+		          {'nome':'valorBC', 'id':'valorBCISS'},
+		          {'nome':'codigoMunicipioGerador', 'id':'codMunGeradorISS'},
+		          {'nome':'itemListaServicos', 'id':'codItemServicoISS'}
 			]};
 };
 
@@ -368,8 +386,7 @@ function gerarJsonTipoPis(){
 		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribPIS'},
 		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaPIS'},
 		          {'nome':'valor', 'id':'valorPIS'},
-		          {'nome':'valorBC', 'id':'valorBCPIS'},
-		          {'nome':'valorAliquota', 'id':'valorAliquotaPIS'}
+		          {'nome':'valorBC', 'id':'valorBCPIS'}
 			]};
 };
 
@@ -407,6 +424,10 @@ function gerarInputPIS(){
 
 function gerarInputCOFINS(){
 	gerarInputHidden(gerarJsonTipoCofins());	
+};
+
+function gerarInputISS(){
+	gerarInputHidden(gerarJsonISS());	
 };
 
 function gerarInputImpostoImportacao(){
@@ -599,6 +620,59 @@ function inicializarModalCancelamento(botao){
 	});
 };
 
+function recuperarValoresImpostos(valoresTabela){
+	var impostos = new Array();
+	impostos [0] = gerarJsonTipoIcms();
+	impostos [1] = gerarJsonTipoIpi();
+	impostos [2] = gerarJsonTipoPis();
+	impostos [3] = gerarJsonTipoCofins();
+	impostos [4] = gerarJsonISS();
+	impostos [5] = gerarJsonImpostoImportacao();
+	impostos [6] = gerarJsonInfoProduto();
+	
+	var idInput = null;
+	var idBloco = null;
+	var valorInput = null;
+	var valorBloco = null;
+	var idIgual = null;
+	var camposImposto = null;
+	var criadoInput = null;
+	var nomeLista = null;
+	var camposTabela = valoresTabela.campos;
+	
+	for (var i = 0; i < impostos.length; i++) {
+		camposImposto = impostos[i].campos;
+		nomeLista = impostos[i].nomeObjeto;
+		impostos: 
+		for (var k = 0; k < camposImposto.length; k++) {
+			idInput = nomeLista + '.' + camposImposto[k].nome;
+			idBloco = camposImposto[k].id;
+			
+			for (var j = 0; j < camposTabela.length; j++) {
+				idIgual = idBloco == camposTabela[j].id;
+				if(!idIgual){
+					continue;
+				}
+				
+				criadoInput = document.getElementById(idInput) != undefined;
+				if(!criadoInput || isEmpty(document.getElementById(idInput).value)){
+					document.getElementById(idBloco).value = camposTabela[j].valorTabela;
+					continue impostos;
+				} else {
+					document.getElementById(idBloco).value = document.getElementById(idInput).value;
+					continue impostos;
+				}
+			}
+			criadoInput = document.getElementById(idInput) != undefined;
+			if(criadoInput){
+				document.getElementById(idBloco).value = document.getElementById(idInput).value;
+			} else {
+				document.getElementById(idBloco).value = '';
+			}
+		}
+	}
+};
+
 function editarTributos(linha){
 	var celulas = linha.cells;
 	<%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
@@ -607,12 +681,32 @@ function editarTributos(linha){
 	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
 	--numeroProdutoEdicao;
 	
-	$('#bloco_tributos #valorBCICMS').val(celulas[8].innerHTML);
-	$('#bloco_tributos #valorICMS').val(celulas[9].innerHTML);
-	$('#bloco_tributos #aliquotaICMS').val(celulas[11].innerHTML);
+	var valorBC = celulas[7].innerHTML;
 	
-	$('#bloco_tributos #valorBCIPI').val(celulas[10].innerHTML);
-	$('#bloco_tributos #aliquotaIPI').val(celulas[12].innerHTML);
+	$('#bloco_icms #valorBCICMS').val(valorBC);
+	$('#bloco_ipi #valorBCIPI').val(valorBC);
+	$('#bloco_pis #valorBCPIS').val(valorBC);
+	$('#bloco_cofins #valorBCCOFINS').val(valorBC);
+	$('#bloco_iss #valorBCISS').val(valorBC);
+	$('#bloco_ii #valorBCII').val(valorBC);
+	
+	$('#bloco_icms #valorICMS').val(celulas[9].innerHTML);
+	$('#bloco_icms #aliquotaICMS').val(celulas[11].innerHTML);
+	$('#bloco_ipi #aliquotaIPI').val(celulas[12].innerHTML);
+	
+	var valoresTabela = {'campos':[
+	                               {'id': 'valorICMS', 'valorTabela': celulas[9].innerHTML},
+	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[11].innerHTML},
+	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[12].innerHTML},
+	                               {'id': 'valorBCPIS', 'valorTabela': valorBC},
+	                               {'id': 'valorBCISS', 'valorTabela': valorBC},
+	                               {'id': 'valorBCII', 'valorTabela': valorBC},
+	                               {'id': 'valorBCCOFINS', 'valorTabela': valorBC},
+	                               {'id': 'valorBCICMS', 'valorTabela': valorBC},
+	                               {'id': 'valorBCIPI', 'valorTabela': valorBC},
+	                               ]};
+	
+	recuperarValoresImpostos(valoresTabela);
 	
 	$('#bloco_tributos').fadeIn('fast');
 	$('#bloco_info_adicionais_prod').fadeIn('fast');
@@ -622,9 +716,11 @@ function editarTributos(linha){
 	inicializarLegendaBlocoProduto('bloco_pis');
 	inicializarLegendaBlocoProduto('bloco_cofins');
 	inicializarLegendaBlocoProduto('bloco_ii');
+	inicializarLegendaBlocoProduto('bloco_iss');
 	inicializarLegendaBlocoProduto('bloco_tributos');
 	inicializarLegendaBlocoProduto('bloco_info_adicionais_prod');
 };
+
 </script>
 
 </head>
@@ -643,86 +739,87 @@ function editarTributos(linha){
 			<legend>::: Dados da NF-e :::</legend>
 			<div class="label">Pedido:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="idPedido" name="idPedido" value="${idPedido}"
-					class="pesquisavel" />
+				<input type="text" id="idPedido" name="idPedido" value="${idPedido}" />
 			</div>
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoPesquisaPedido"
 					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
 			</div>
+			<%--div para dar o correto alinhamento dos campos no formulario. Nao teve outra alternativa--%>
 			<div class="input" style="width: 60%">
 			</div>
-			<div class="label obrigatorio">Tipo Documento:</div>
+			<div class="label">Regime:</div>
+			<div class="input" style="width: 80%">
+				<select id="nf.identificacaoEmitenteNFe.regimeTributario" style="width: 20%" >
+					<c:forEach var="tipo" items="${listaTipoRegimeTributacao}">
+						<option value="${tipo.codigo}">${tipo.descricao}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label">Tipo Documento:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado"  class="semprehabilitado" style="width: 100%">
+				<select id="pedidoAssociado"   style="width: 100%">
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
 						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Forma Pagamento:</div>
+			<div class="label">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado" name="nf.identificacaoNFe.indicadorFormaPagamento" class="semprehabilitado" style="width: 100%">
+				<select id="pedidoAssociado" name="nf.identificacaoNFe.indicadorFormaPagamento"  style="width: 100%">
 					<c:forEach var="formaPagamento" items="${listaTipoFormaPagamento}">
 						<option value="${formaPagamento.codigo}" <c:if test="${formaPagamento eq formaPagamentoPadrao}">selected</c:if>>${formaPagamento.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Forma Emissão:</div>
+			<div class="label">Forma Emissão:</div>
 			<div class="input" style="width: 20%">
-				<select name="nf.identificacaoNFe.tipoEmissao" class="semprehabilitado" style="width: 50%">
+				<select name="nf.identificacaoNFe.tipoEmissao"  style="width: 50%">
 					<c:forEach var="tipoEmissao" items="${listaTipoEmissao}">
 						<option value="${tipoEmissao.codigo}" <c:if test="${tipoEmissao eq tipoEmissaoPadrao}">selected</c:if>>${tipoEmissao.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Finalidade Emissão:</div>
+			<div class="label">Finalidade Emissão:</div>
 			<div class="input" style="width: 10%">
 				<select name="nf.identificacaoNFe.finalidadeEmissao"
-					style="width: 100%" class="semprehabilitado">
+					style="width: 100%" >
 					<c:forEach var="finalidade" items="${listaTipoFinalidadeEmissao}">
 						<option value="${finalidade.codigo}" <c:if test="${finalidade eq finalidadeEmissaoPadrao}">selected</c:if>>${finalidade.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Tipo Impressão:</div>
+			<div class="label">Tipo Impressão:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado"
-					style="width: 100%" class="semprehabilitado">
-					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+				<select style="width: 100%">
+					<c:forEach var="tipo" items="${listaTipoImpressao}">
+						<option value="${tipo.codigo}">${tipo.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Consumidor Final:</div>
+			<div class="label">Consumidor Final:</div>
 			<div class="input" style="width: 20%">
 				<select id="pedidoAssociado" 
-					style="width: 50%" class="semprehabilitado">
+					style="width: 50%" >
 					<option value=""></option>
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
 						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Destino Operação:</div>
+			<div class="label">Destino Operação:</div>
 			<div class="input" style="width: 10%">
 				<select id="pedidoAssociado" 
-					style="width: 100%" class="semprehabilitado">
+					style="width: 100%" >
 					<option value=""></option>
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
 						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label obrigatorio">Natureza Operação:</div>
+			<div class="label">Natureza Operação:</div>
 			<div class="input" style="width: 50%">
-				<select id="pedidoAssociado"
-					style="width: 80%" class="semprehabilitado">
-					<option value=""></option>
-					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
-					</c:forEach>
-				</select>
+				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" style="width: 80%"/>
 			</div>
 			<div class="label">Info. Adicionais Fisco:</div>
 			<div class="input areatexto" style="width: 70%">
@@ -787,18 +884,97 @@ function editarTributos(linha){
 			</table>
 		</fieldset>
 		
+		<fieldset id="bloco_local_mercadoria">
+			<legend>::: Local Mercadoria ::: -</legend>
+			<div class="divFieldset">
+			<fieldset class="fieldsetInterno">
+				<legend>::: Local Retirada :::</legend>
+				<div class="label">CNPJ:</div>
+				<div class="input" style="width: 15%">
+					<input type="text" name="nf.identificacaoLocalRetirada.cnpj"/>
+				</div>
+				<div class="label">CPF:</div>
+				<div class="input" style="width: 50%">
+					<input type="text" name="nf.identificacaoLocalRetirada.cpf" style="width: 30%"/>
+				</div>
+				<div class="label">Endereço:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" name="nf.identificacaoLocalRetirada.logradouro"/>
+				</div>
+				<div class="label" style="width: 8%">Número:</div>
+				<div class="input" style="width: 30%">
+					<input type="text" name="nf.identificacaoLocalRetirada.numero" style="width: 20%"/>
+				</div>
+				<div class="label">Complemento:</div>
+				<div class="input" style="width: 70%">
+					<input type="text" name="nf.identificacaoLocalRetirada.complemento" style="width: 30%"/>
+				</div>
+				<div class="label">Cidade:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalRetirada.cidade" style="width: 40%" />
+				</div>
+				<div class="label">Bairro:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalRetirada.municipio" style="width: 40%"/>
+				</div>
+				<div class="label">UF:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalRetirada.uf" style="width: 5%"/>
+				</div>
+			</fieldset>
+			</div>
+			
+			<div class="divFieldset">
+			<fieldset class="fieldsetInterno" >
+				<legend>::: Local Entrega ::: -</legend>
+				<div class="label">CNPJ:</div>
+				<div class="input" style="width: 15%">
+					<input type="text" name="nf.identificacaoLocalEntrega.cnpj"/>
+				</div>
+				<div class="label">CPF:</div>
+				<div class="input" style="width: 50%">
+					<input type="text" name="nf.identificacaoLocalEntrega.cpf" style="width: 30%"/>
+				</div>
+				<div class="label">Endereço:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" name="nf.identificacaoLocalEntrega.logradouro"/>
+				</div>
+				<div class="label" style="width: 8%">Número:</div>
+				<div class="input" style="width: 30%">
+					<input type="text" name="nf.identificacaoLocalEntrega.numero" style="width: 20%"/>
+				</div>
+				<div class="label">Complemento:</div>
+				<div class="input" style="width: 70%">
+					<input type="text" name="nf.identificacaoLocalEntrega.complemento" style="width: 30%"/>
+				</div>
+				<div class="label">Cidade:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalEntrega.cidade" style="width: 40%" />
+				</div>
+				<div class="label">Bairro:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalEntrega.municipio" style="width: 40%"/>
+				</div>
+				<div class="label">UF:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" name="nf.identificacaoLocalEntrega.uf" style="width: 5%"/>
+				</div>
+			</fieldset>
+			</div>			
+		</fieldset>
+		
 		<fieldset id="bloco_destinatario">
 			<legend>::: Destinatário ::: -</legend>
 			<div class="label">Razão Social/Nome:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}" class="pesquisavel" style="width: 60%"/>
+				<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}"  style="width: 60%"/>
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
 			
 			<div class="label">CNPJ:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="cnpj" name="nf.identificacaoDestinatarioNFe.cnpj"
-					value="${cliente.cnpj}" class="pesquisavel" />
+					value="${cliente.cnpj}"  />
 			</div>
 			<div class="label">Insc. Estadual:</div>
 			<div class="input" style="width: 40%">
@@ -810,12 +986,12 @@ function editarTributos(linha){
 			<div class="label">CPF:</div>
 			<div class="input" style="width: 15%">
 				<input type="text" id="cpf" name="nf.identificacaoDestinatarioNFe.cpf"
-					value="${cliente.cpf}" class="pesquisavel" />
+					value="${cliente.cpf}"  />
 			</div>
 			<div class="label">Telefone:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="telefone" name="cliente.cpf"
-					value="${cliente.contatoPrincipal.telefoneFormatado}" class="pesquisavel" />
+				<input type="text" id="telefone" name="nf.identificacaoDestinatarioNFe.enderecoDestinatarioNFe.telefone"
+					value="${telefoneContatoPedido}" />
 			</div>
 			<div class="label">Email:</div>
 			<div class="input" style="width: 20%">
@@ -845,8 +1021,8 @@ function editarTributos(linha){
 						<th>BC ICMS</th>
 						<th>V. ICMS(R$)</th>
 						<th>V IPI.(R$)</th>
-						<th>Aliq. ICMS(R$)</th>
-						<th>Aliq. IPI(R$)</th>
+						<th>Aliq. ICMS(%)</th>
+						<th>Aliq. IPI(%)</th>
 						<th style="width: 2%">Ações</th>
 					</tr>
 				</thead>
@@ -856,16 +1032,16 @@ function editarTributos(linha){
 							<td>${item.sequencial}</td>
 							<td>${item.descricaoSemFormatacao}</td>
 							<td>${item.ncm}</td>
-							<td>null</td>
+							<td></td>
 							<td>${item.tipoVenda}</td>
 							<td>${item.quantidade}</td>
 							<td>${item.precoUnidade}</td>
 							<td>${item.valorTotal}</td>
 							<td>${item.valorTotal}</td>
-							<td>${item.valorICMS}</td>
-							<td>null</td>
-							<td>${item.aliquotaICMS}</td>
-							<td>${item.aliquotaIPI}</td>
+							<td>${item.valorICMSFormatado}</td>
+							<td>${item.valorIPIFormatado}</td>
+							<td>${item.aliquotaICMSFormatado}</td>
+							<td>${item.aliquotaIPIFormatado}</td>
 							<td>
 								<input type="button" value="" title="Editar Tributos" class="botaoDinheiroPequeno" onclick="editarTributos(this.parentNode.parentNode);"/>
 							</td>
@@ -897,18 +1073,10 @@ function editarTributos(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
 					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
-					<div class="label">Regime:</div>
-					<div class="input" style="width: 80%">
-						<select style="width: 20%" class="semprehabilitado">
-							<c:forEach var="icms" items="${listaRegime}">
-								<option value="${icms.codigo}">${icms.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="tipoTributacaoICMS" 
-							style="width: 77%" class="semprehabilitado">
+							style="width: 77%" >
 							<c:forEach var="icms" items="${listaTipoTributacaoICMS}">
 								<option value="${icms.codigo}">${icms.descricao}</option>
 							</c:forEach>
@@ -917,7 +1085,7 @@ function editarTributos(linha){
 					<div class="label">Origem:</div>
 					<div class="input" style="width: 25%">
 						<select id="pedidoAssociado" 
-							style="width: 100%" class="semprehabilitado">
+							style="width: 100%" >
 							<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
 								<option value="${origem.codigo}">${origem.descricao}</option>
 							</c:forEach>
@@ -934,15 +1102,15 @@ function editarTributos(linha){
 					</div>
 					<div  class="label">Valor BC:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="valorBCICMS" style="width: 100%" class="semprehabilitado"/>
+						<input type="text" id="valorBCICMS" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota:</div>
+					<div  class="label">Alíquota(%):</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="aliquotaICMS" style="width: 100%" class="semprehabilitado"/>
+						<input type="text" id="aliquotaICMS" style="width: 100%" />
 					</div>
-					<div  class="label">Valor:</div>
+					<div  class="label">Valor ICMS(R$):</div>
 					<div class="input" style="width: 30%">
-						<input type="text" id="valorICMS" style="width: 30%" class="semprehabilitado"/>
+						<input type="text" id="valorICMS" style="width: 30%" />
 					</div>
 					<div class="icms00 label">Modalidade ST:</div>
 					<div class="icms00 input" style="width: 70%">
@@ -954,23 +1122,23 @@ function editarTributos(linha){
 					</div>
 					<div  class="label">Perc. Marg. Valor ST:</div>
 					<div class="input" style="width: 10%">
-						<input id="percValSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
+						<input id="percValSTICMS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Perc. Redução BC ST:</div>
 					<div class="input" style="width: 10%">
-						<input id="percRedBCSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
+						<input id="percRedBCSTICMS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Valor BC ST:</div>
 					<div class="input" style="width: 30%">
-						<input id="valorBCSTICMS" type="text" style="width: 30%" class="semprehabilitado"/>
+						<input id="valorBCSTICMS" type="text" style="width: 30%" />
 					</div>
 					<div  class="label">Alíquota ST:</div>
 					<div class="input" style="width: 10%">
-						<input id="aliquotaSTICMS" type="text" style="width: 100%" class="semprehabilitado"/>
+						<input id="aliquotaSTICMS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Valor ST:</div>
 					<div class="input" style="width: 50%">
-						<input id="valorSTICMS" type="text" style="width: 20%" class="semprehabilitado"/>
+						<input id="valorSTICMS" type="text" style="width: 20%" />
 					</div>
 					<div class="icms00 label">Mot. Desoneração:</div>
 					<div class="icms00 input" style="width: 36%">
@@ -998,13 +1166,13 @@ function editarTributos(linha){
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label">Alíquota:</div>
-					<div class="input" style="width: 10%">
-						<input id="aliquotaIPI" type="text" style="width: 100%" />
-					</div>
 					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCIPI" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota:</div>
 					<div class="input" style="width: 50%">
-						<input id="valorBCIPI" type="text" style="width: 20%" />
+						<input id="aliquotaIPI" type="text" style="width: 20%" />
 					</div>
 					<div  class="label">Qtde. unid. Tributável:</div>
 					<div class="input" style="width: 10%">
@@ -1060,17 +1228,13 @@ function editarTributos(linha){
 					<div class="input" style="width: 10%">
 						<input id="aliquotaPIS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Valor Alíquota(R$):</div>
+					<div  class="label">Valor PIS(R$):</div>
 					<div class="input" style="width: 20%">
-						<input id="valorAliquotaPIS" type="text" style="width: 50%" />
+						<input id="valorPIS" type="text" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde.Vendida:</div>
 					<div class="input" style="width: 10%">
 						<input id="qtdeVendidaPIS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Valor:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorPIS" type="text" style="width: 100%" />
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
@@ -1098,17 +1262,13 @@ function editarTributos(linha){
 					<div class="input" style="width: 10%">
 						<input id="aliquotaCOFINS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Valor Alíquota(R$):</div>
+					<div  class="label">Valor COFINS(R$):</div>
 					<div class="input" style="width: 20%">
-						<input id="valorAliquotaCOFINS" type="text" style="width: 50%" />
+						<input id="valorCOFINS" type="text" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde. Vendida:</div>
 					<div class="input" style="width: 10%">
 						<input id="qtdeVendidaCOFINS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Valor:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorCOFINS" type="text" style="width: 100%" />
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
@@ -1118,15 +1278,53 @@ function editarTributos(linha){
 				</div>
 				
 				<div class="divFieldset">
-				<fieldset id="bloco_ii" class="fieldsetInterno">
-					<legend>::: Imp. Impor. Prod.::: +</legend>
-					<div  class="label">Valor:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorII" type="text" style="width: 100%" />
+				<fieldset id="bloco_iss" class="fieldsetInterno">
+					<legend>::: ISSQN Prod.::: +</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="codSitTribISS" style="width: 45%">
+							<c:forEach var="tipo" items="${listaTipoTributacaoISS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
 					</div>
 					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCISS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 10%">
+						<input id="aliquotaISS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor ISS(R$):</div>
+					<div class="input" style="width: 20%">
+						<input id="valorISS" type="text" style="width: 50%" />
+					</div>
+					<div  class="label">Qtde. Vendida:</div>
+					<div class="input" style="width: 10%">
+						<input id="codMunGeradorISS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Item Serviço:</div>
+					<div class="input" style="width: 10%">
+						<input id="codItemServicoISS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirISS" title="Inserir ISS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparISS" title="Limpar ISS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_ii" class="fieldsetInterno">
+					<legend>::: Importação Prod.::: +</legend>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCII" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Import.(R$):</div>
 					<div class="input" style="width: 50%">
-						<input id="valorBCII" type="text" style="width: 20%" />
+						<input id="valorII" type="text" style="width: 20%" />
 					</div>
 					<div  class="label">Valor IOF:</div>
 					<div class="input" style="width: 10%">
@@ -1382,6 +1580,14 @@ function editarTributos(linha){
 					
 					<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
 					<tbody>
+						<c:forEach var="dup" items="${listaDuplicata}">
+							<tr>
+								<td>${dup.numero}</td>
+								<td>${dup.dataVencimento}</td>
+								<td>${dup.valor}</td>
+								<td><input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+							</tr>
+						</c:forEach>
 					</tbody>
 				</table>
 			</fieldset>

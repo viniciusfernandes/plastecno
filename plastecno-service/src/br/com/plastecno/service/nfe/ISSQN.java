@@ -3,63 +3,57 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
-
-public class PISGeral {
-	@XmlElement(name = "pPIS")
+public class ISSQN {
+	@XmlElement(name = "vAliq")
 	private Double aliquota;
 
-	@XmlElement(name = "CST")
+	@XmlElement(name = "cMunFG")
+	private Long codigoMunicipioGerador;
+
+	@XmlElement(name = "cSitTrib")
 	private Integer codigoSituacaoTributaria;
 
-	@XmlElement(name = "qBCProd")
-	private Integer quantidadeVendida;
+	@XmlElement(name = "cListServ")
+	private Integer itemListaServicos;
 
-	@XmlElement(name = "vPIS")
+	@XmlElement(name = "vISSQN")
 	private Double valor;
-
-	@XmlElement(name = "vAliqProd")
-	private Double valorAliquota;
 
 	@XmlElement(name = "vBC")
 	private Double valorBC;
 
 	@XmlTransient
-	public TipoTributacaoPIS getTipoTributacao() {
-		return TipoTributacaoPIS.getTipoTributacao(codigoSituacaoTributaria);
-	}
-
-	@XmlTransient
 	public Double getValor() {
-		return valor == null ? 0 : valor;
+		return valor;
 	}
 
 	@XmlTransient
 	public Double getValorBC() {
-		return valorBC == null ? 0 : valorBC;
+		return valorBC;
 	}
 
 	public void setAliquota(Double aliquota) {
 		this.aliquota = aliquota;
 	}
 
+	public void setCodigoMunicipioGerador(Long codigoMunicipioGerador) {
+		this.codigoMunicipioGerador = codigoMunicipioGerador;
+	}
+
 	public void setCodigoSituacaoTributaria(Integer codigoSituacaoTributaria) {
 		this.codigoSituacaoTributaria = codigoSituacaoTributaria;
 	}
 
-	public void setQuantidadeVendida(Integer quantidadeVendida) {
-		this.quantidadeVendida = quantidadeVendida;
+	public void setItemListaServicos(Integer itemListaServicos) {
+		this.itemListaServicos = itemListaServicos;
 	}
 
 	public void setValor(Double valor) {
 		this.valor = valor;
 	}
 
-	public void setValorAliquota(Double valorAliquota) {
-		this.valorAliquota = valorAliquota;
-	}
-
 	public void setValorBC(Double valorBC) {
 		this.valorBC = valorBC;
 	}
+
 }

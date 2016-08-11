@@ -40,6 +40,8 @@ public interface PedidoService {
 	void alterarSituacaoPedidoByIdPedido(Integer idPedido,
 			SituacaoPedido situacaoPedido);
 
+	List<Date> calcularDataPagamento(Integer idPedido);
+
 	Double calcularValorPedido(Integer idPedido) throws BusinessException;
 
 	Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException;
@@ -103,7 +105,7 @@ public interface PedidoService {
 
 	Cliente pesquisarClienteByIdPedido(Integer idPedido);
 
-	Cliente pesquisarClienteResumidoEContatoByIdPedido(Integer idPedido);
+	Cliente pesquisarClienteResumidoByIdPedido(Integer idPedido);
 
 	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
 
@@ -225,6 +227,8 @@ public interface PedidoService {
 	List<SituacaoPedido> pesquisarSituacaoRevendaEfetivada();
 
 	List<SituacaoPedido> pesquisarSituacaoVendaEfetivada();
+
+	Object[] pesquisarTelefoneContatoByIdPedido(Integer idPedido);
 
 	List<TotalizacaoPedidoWrapper> pesquisarTotalCompraResumidaByPeriodo(
 			Periodo periodo);

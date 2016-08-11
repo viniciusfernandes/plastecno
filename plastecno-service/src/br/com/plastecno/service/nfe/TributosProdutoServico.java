@@ -19,6 +19,9 @@ public class TributosProdutoServico {
 	@XmlElement(name = "IPI")
 	private IPI ipi;
 
+	@XmlElement(name = "ISSQN")
+	private ISSQN issqn;
+
 	@XmlElement(name = "PIS")
 	private PIS pis;
 
@@ -41,6 +44,10 @@ public class TributosProdutoServico {
 		return ipi != null && ipi.getTipoIpi() != null;
 	}
 
+	public boolean contemISS() {
+		return issqn != null;
+	}
+
 	public boolean contemPIS() {
 		return pis != null && pis.getTipoPis() != null;
 	}
@@ -53,6 +60,11 @@ public class TributosProdutoServico {
 	@XmlTransient
 	public ImpostoImportacao getImpostoImportacao() {
 		return impostoImportacao;
+	}
+
+	@XmlTransient
+	public ISSQN getIssqn() {
+		return issqn;
 	}
 
 	@XmlTransient
@@ -93,6 +105,10 @@ public class TributosProdutoServico {
 
 	public void setIpi(IPI ipi) {
 		this.ipi = ipi;
+	}
+
+	public void setIssqn(ISSQN issqn) {
+		this.issqn = issqn;
 	}
 
 	public void setPis(PIS pis) {

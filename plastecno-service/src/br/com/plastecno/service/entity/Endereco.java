@@ -27,7 +27,7 @@ public class Endereco implements Serializable {
 	private String cep;
 	
 	@Column(name="endereco")
-	@InformacaoValidavel(obrigatorio=true, intervalo={1, 150}, nomeExibicao="Endereco")
+	@InformacaoValidavel(obrigatorio=true, intervaloComprimento={1, 150}, nomeExibicao="Endereco")
 	private String descricao;
 	
 	@InformacaoValidavel(obrigatorio=true, cascata=true)

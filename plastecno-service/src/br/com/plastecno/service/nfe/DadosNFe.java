@@ -6,6 +6,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+
 public class DadosNFe {
 
 	@XmlElement(name = "cobr")
@@ -17,12 +19,14 @@ public class DadosNFe {
 	@XmlElement(name = "exporta")
 	private ExportacaoNFe exportacaoNFe;
 
+	@InformacaoValidavel(obrigatorio = true, tamanho = 47, nomeExibicao = "Id da NFe")
 	@XmlAttribute(name = "Id")
 	private String id;
 
 	@XmlElement(name = "dest")
 	private IdentificacaoDestinatarioNFe identificacaoDestinatarioNFe;
 
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Identificação do emitente")
 	@XmlElement(name = "emit")
 	private IdentificacaoEmitenteNFe identificacaoEmitenteNFe;
 
@@ -57,7 +61,8 @@ public class DadosNFe {
 	private ValoresTotaisNFe valoresTotaisNFe;
 
 	@XmlAttribute(name = "versao")
-	private Double versao;
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Versão da NFe")
+	private final Double versao = 2.0d;
 
 	@XmlTransient
 	public IdentificacaoDestinatarioNFe getIdentificacaoDestinatarioNFe() {
@@ -158,9 +163,4 @@ public class DadosNFe {
 	public void setValoresTotaisNFe(ValoresTotaisNFe valoresTotaisNFe) {
 		this.valoresTotaisNFe = valoresTotaisNFe;
 	}
-
-	public void setVersao(Double versao) {
-		this.versao = versao;
-	}
-
 }

@@ -22,7 +22,7 @@ public class UF implements Serializable {
 	private static final long serialVersionUID = 8857978914040973864L;
 	@Id
 	@Column(name="uf")
-	@InformacaoValidavel(obrigatorio=true, intervalo={1,2}, nomeExibicao="Sigla da UF")
+	@InformacaoValidavel(obrigatorio=true, intervaloComprimento={1,2}, nomeExibicao="Sigla da UF")
 	private String sigla;
 	@Column(name="estado")
 	private String descricao;

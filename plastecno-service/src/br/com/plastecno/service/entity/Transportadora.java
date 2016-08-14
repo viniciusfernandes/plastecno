@@ -30,7 +30,7 @@ public class Transportadora implements Serializable {
 	 */
 	private static final long serialVersionUID = 3798079109436664973L;
 	@Column(name = "area_atuacao")
-	@InformacaoValidavel(intervalo = { 0, 250 }, nomeExibicao = "Area de atuacao da transportadora")
+	@InformacaoValidavel(intervaloComprimento = { 0, 250 }, nomeExibicao = "Area de atuacao da transportadora")
 	private String areaAtuacao;
 
 	private boolean ativo = true;
@@ -44,7 +44,7 @@ public class Transportadora implements Serializable {
 	private Integer id;
 
 	@Column(name = "insc_estadual")
-	@InformacaoValidavel(intervalo = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual da transportadora")
+	@InformacaoValidavel(intervaloComprimento = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual da transportadora")
 	private String inscricaoEstadual;
 
 	@OneToMany(mappedBy = "transportadora", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
@@ -56,15 +56,15 @@ public class Transportadora implements Serializable {
 	@JoinColumn(name = "id_logradouro")
 	private Logradouro logradouro;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Nome fantasia da transportadora")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Nome fantasia da transportadora")
 	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Razao social da transportadora")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Razao social da transportadora")
 	@Column(name = "razao_social")
 	private String razaoSocial;
 
-	@InformacaoValidavel(intervalo = { 0, 250 })
+	@InformacaoValidavel(intervaloComprimento = { 0, 250 })
 	private String site;
 
 	public Transportadora() {

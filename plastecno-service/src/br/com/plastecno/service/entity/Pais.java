@@ -28,7 +28,7 @@ public class Pais implements Serializable {
 	private Integer id;
 	
 	@Column(name="pais")
-	@InformacaoValidavel(obrigatorio=true, intervalo={1, 50}, nomeExibicao="Pais")
+	@InformacaoValidavel(obrigatorio=true, intervaloComprimento={1, 50}, nomeExibicao="Pais")
 	private String descricao;
 	
 	public String getDescricao() {

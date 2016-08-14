@@ -36,16 +36,16 @@ public class Usuario implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usuarioSequence")
 	private Integer id;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 6, 30 }, nomeExibicao = "Senha do usuario")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 6, 30 }, nomeExibicao = "Senha do usuario")
 	private String senha;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 50 }, nomeExibicao = "Email do usuario")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 50 }, nomeExibicao = "Email do usuario")
 	private String email;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 20 }, nomeExibicao = "Nome do usuario")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Nome do usuario")
 	private String nome;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 40 }, nomeExibicao = "Sobrenome do usuario")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 40 }, nomeExibicao = "Sobrenome do usuario")
 	private String sobrenome;
 
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF")

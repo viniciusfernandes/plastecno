@@ -4,68 +4,96 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class IdentificacaoNFe {
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+public class IdentificacaoNFe {
+	@InformacaoValidavel(obrigatorio = true, tamanho = 8, nomeExibicao = "Código da chave de acesso")
 	@XmlElement(name = "cNF")
 	private String chaveAcesso;
 
+	@InformacaoValidavel(obrigatorio = true, tamanho = 2, nomeExibicao = "UF da identificação do emitente da NFe")
 	@XmlElement(name = "cUF")
 	private String codigoUFEmitente;
 
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data emissão da NFe")
 	@XmlElement(name = "dEmi")
 	private String dataEmissao;
+
+	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data entrada/saída produto")
+	@XmlElement(name = "dSaiEnt")
+	private String dataEntradaSaidaProduto;
 
 	@XmlElement(name = "dhCont")
 	private String dataHoraContingencia;
 
+	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{5}:\\d{2}:\\d{2}", nomeExibicao = "Dada/hora entrada em contigência")
+	@XmlElement(name = "verProc")
+	private String dataHoraEntradaContigencia;
+
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 9 }, nomeExibicao = "Dígito verificador da NFe")
 	@XmlElement(name = "cDV")
 	private String digitoVerificador;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 9 }, nomeExibicao = "Finalidade da emissão  da NFe")
 	@XmlElement(name = "finNFe")
 	private Integer finalidadeEmissao;
 
+	@InformacaoValidavel(padrao = "\\d{2}:\\d{2}:\\d{2}", nomeExibicao = "Hora entrada/saída produto")
 	@XmlElement(name = "dSaiEnt")
-	private String horaSaidaEntrada;
+	private String horaSaidaEntradaProduto;
 
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma de pagamento da NFe")
 	@XmlElement(name = "indPag")
 	private Integer indicadorFormaPagamento;
 
+	@InformacaoValidavel(intervaloComprimento = { 0, 256 }, nomeExibicao = "Justificativa de entrada em contigência")
 	@XmlElement(name = "xJust")
 	private String justificativaContigencia;
 
 	@XmlElement(name = "NFref")
 	private List<NFeReferenciada> listaNFeReferenciada;
 
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Modelo da NFe")
 	@XmlElement(name = "mod")
-	private String modelo;
+	private final String modelo = "55";
 
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 7 }, nomeExibicao = "Código município do fator gerador")
 	@XmlElement(name = "cMunFG")
 	private String municipioOcorrenciaFatorGerador;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 60 }, nomeExibicao = "Natureza da operação da NFe")
 	@XmlElement(name = "natOp")
 	private String naturezaOperacao;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 9 }, nomeExibicao = "Número da NFe")
 	@XmlElement(name = "nNF")
 	private String numero;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 9 }, nomeExibicao = "Processo de emissão da NFe")
 	@XmlElement(name = "procEmi")
 	private String processoEmissao;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 999 }, nomeExibicao = "Série da NFe")
 	@XmlElement(name = "serie")
 	private String serie;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 999 }, nomeExibicao = "Identificação do ambiente de emissão")
 	@XmlElement(name = "tpAmb")
 	private String tipoAmbiente;
 
-	@XmlElement(name = "tpImp")
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 9 }, nomeExibicao = "Tipo emissão da NFe")
+	@XmlElement(name = "tpEmis")
 	private String tipoEmissao;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 9 }, nomeExibicao = "Formato da impressão do DANFE")
 	@XmlElement(name = "tpImp")
 	private String tipoImpressao;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 1 }, nomeExibicao = "Tipo operação da NFe")
 	@XmlElement(name = "tpNF")
 	private String tipoOperacao;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Versão do processo de emissão da NFe")
 	@XmlElement(name = "verProc")
 	private String versaoProcessoEmissao;
 
@@ -82,8 +110,16 @@ public class IdentificacaoNFe {
 		this.dataEmissao = dataEmissao;
 	}
 
+	public void setDataEntradaSaidaProduto(String dataEntradaSaidaProduto) {
+		this.dataEntradaSaidaProduto = dataEntradaSaidaProduto;
+	}
+
 	public void setDataHoraContingencia(String dataHoraContingencia) {
 		this.dataHoraContingencia = dataHoraContingencia;
+	}
+
+	public void setDataHoraEntradaContigencia(String dataHoraEntradaContigencia) {
+		this.dataHoraEntradaContigencia = dataHoraEntradaContigencia;
 	}
 
 	public void setDigitoVerificador(String digitoVerificador) {
@@ -94,8 +130,8 @@ public class IdentificacaoNFe {
 		this.finalidadeEmissao = finalidadeEmissao;
 	}
 
-	public void setHoraSaidaEntrada(String horaSaidaEntrada) {
-		this.horaSaidaEntrada = horaSaidaEntrada;
+	public void setHoraSaidaEntradaProduto(String horaSaidaEntradaProduto) {
+		this.horaSaidaEntradaProduto = horaSaidaEntradaProduto;
 	}
 
 	public void setIndicadorFormaPagamento(Integer indicadorFormaPagamento) {
@@ -109,10 +145,6 @@ public class IdentificacaoNFe {
 	public void setListaNFeReferenciada(
 			List<NFeReferenciada> listaNFeReferenciada) {
 		this.listaNFeReferenciada = listaNFeReferenciada;
-	}
-
-	public void setModelo(String modelo) {
-		this.modelo = modelo;
 	}
 
 	public void setMunicipioOcorrenciaFatorGerador(

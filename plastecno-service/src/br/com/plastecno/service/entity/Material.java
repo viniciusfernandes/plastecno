@@ -31,10 +31,10 @@ public class Material implements Serializable {
 	private Integer id;
 	private boolean ativo = true;
 
-	@InformacaoValidavel(trim = true, obrigatorio = true, intervalo = { 1, 10 }, nomeExibicao = "Sigla do Material")
+	@InformacaoValidavel(trim = true, obrigatorio = true, intervaloComprimento = { 1, 10 }, nomeExibicao = "Sigla do Material")
 	private String sigla;
 
-	@InformacaoValidavel(trim = true, intervalo = { 0, 50 }, nomeExibicao = "Descrição do Material")
+	@InformacaoValidavel(trim = true, intervaloComprimento = { 0, 50 }, nomeExibicao = "Descrição do Material")
 	private String descricao;
 
 	@Column(name = "peso_especifico")

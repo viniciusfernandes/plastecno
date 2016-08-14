@@ -14,7 +14,9 @@ public @interface InformacaoValidavel {
 
 	boolean estritamentePositivo() default false;
 
-	int[] intervalo() default {};
+	int[] intervaloComprimento() default {};
+
+	double[] intervaloNumerico() default {};
 
 	boolean iteravel() default false;
 

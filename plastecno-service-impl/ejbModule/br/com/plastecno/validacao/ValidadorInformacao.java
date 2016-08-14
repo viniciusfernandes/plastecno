@@ -11,20 +11,25 @@ import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 
 public final class ValidadorInformacao {
 
-	public static void preencherListaMensagemValidacao(Object obj, List<String> listaMensagem) {
+	public static void preencherListaMensagemValidacao(Object obj,
+			List<String> listaMensagem) {
 		if (obj.getClass().getAnnotation(InformacaoValidavel.class) == null) {
-			throw new IllegalArgumentException("A classe " + obj.getClass()
-					+ " não pode ser validada pelo mecanismo de verificacão de preenchimento dos campos. "
-					+ "No caso em que o campo seja um ENUM, remova o atributo cascata = true");
+			throw new IllegalArgumentException(
+					"A classe "
+							+ obj.getClass()
+							+ " não pode ser validada pelo mecanismo de verificacão de preenchimento dos campos. "
+							+ "No caso em que o campo seja um ENUM, remova o atributo cascata = true");
 		}
 
-		// variavel sera utilizada tambem para verificar se o campo eh uma String
+		// variavel sera utilizada tambem para verificar se o campo eh uma
+		// String
 		int COMPRIMENTO_STRING = -1;
 		Field[] camposValidaveis = recuperarCamposValidaveis(obj);
 		boolean isString = false;
 
 		for (Field campo : camposValidaveis) {
-			InformacaoValidavel informacao = campo.getAnnotation(InformacaoValidavel.class);
+			InformacaoValidavel informacao = campo
+					.getAnnotation(InformacaoValidavel.class);
 
 			if (informacao == null) {
 				continue;
@@ -37,19 +42,40 @@ public final class ValidadorInformacao {
 			}
 
 			if ((informacao.relacionamentoObrigatorio() && (conteudoCampo == null || recuperarId(conteudoCampo) == null))) {
-				listaMensagem.add(informacao.nomeExibicao() + " deve ser associado");
+				listaMensagem.add(informacao.nomeExibicao()
+						+ " deve ser associado");
 				continue;
 			}
 
-			if (informacao.numerico() && informacao.estritamentePositivo()
-					&& (conteudoCampo != null && Double.valueOf(conteudoCampo.toString()) <= 0)) {
-				listaMensagem.add(informacao.nomeExibicao() + " deve ser positivo");
+			if (informacao.numerico()
+					&& informacao.estritamentePositivo()
+					&& (conteudoCampo != null && Double.valueOf(conteudoCampo
+							.toString()) <= 0)) {
+				listaMensagem.add(informacao.nomeExibicao()
+						+ " deve ser positivo");
 				continue;
 			}
 
-			if (informacao.numerico() && informacao.positivo()
-					&& (conteudoCampo != null && Double.valueOf(conteudoCampo.toString()) < 0)) {
-				listaMensagem.add(informacao.nomeExibicao() + " não deve ser negativo");
+			if (informacao.numerico()
+					&& informacao.intervaloNumerico().length > 0
+					&& (conteudoCampo != null
+							&& (Double) conteudoCampo >= informacao
+									.intervaloNumerico()[0] && (Double) conteudoCampo <= informacao
+							.intervaloNumerico()[1])) {
+				listaMensagem.add(informacao.nomeExibicao()
+						+ " deve estar dentro o intervalo "
+						+ informacao.intervaloNumerico()[0] + " à "
+						+ informacao.intervaloNumerico()[1]);
+				
+				continue;
+			}
+
+			if (informacao.numerico()
+					&& informacao.positivo()
+					&& (conteudoCampo != null && Double.valueOf(conteudoCampo
+							.toString()) < 0)) {
+				listaMensagem.add(informacao.nomeExibicao()
+						+ " não deve ser negativo");
 				continue;
 			}
 
@@ -63,7 +89,8 @@ public final class ValidadorInformacao {
 				continue;
 			}
 
-			// Essa variavel sera sempre ZERO no caso em que o conteudo nao seja uma
+			// Essa variavel sera sempre ZERO no caso em que o conteudo nao seja
+			// uma
 			// string
 			isString = conteudoCampo instanceof String;
 
@@ -71,29 +98,44 @@ public final class ValidadorInformacao {
 				conteudoCampo = trim(campo, obj, conteudoCampo);
 			}
 
-			COMPRIMENTO_STRING = isString ? conteudoCampo.toString().trim().length() : -1;
-			if (informacao.intervalo().length > 0 && COMPRIMENTO_STRING >= 0
-					&& (COMPRIMENTO_STRING < informacao.intervalo()[0] || COMPRIMENTO_STRING > informacao.intervalo()[1])) {
-				listaMensagem.add(informacao.nomeExibicao() + " deve conter de " + informacao.intervalo()[0] + " a "
-						+ informacao.intervalo()[1] + " caracteres. Foi enviado " + COMPRIMENTO_STRING + " caracteres");
+			COMPRIMENTO_STRING = isString ? conteudoCampo.toString().trim()
+					.length() : -1;
+			if (informacao.intervaloComprimento().length > 0
+					&& COMPRIMENTO_STRING >= 0
+					&& (COMPRIMENTO_STRING < informacao.intervaloComprimento()[0] || COMPRIMENTO_STRING > informacao
+							.intervaloComprimento()[1])) {
+				listaMensagem.add(informacao.nomeExibicao()
+						+ " deve conter de "
+						+ informacao.intervaloComprimento()[0] + " a "
+						+ informacao.intervaloComprimento()[1]
+						+ " caracteres. Foi enviado " + COMPRIMENTO_STRING
+						+ " caracteres");
 				continue;
 			}
 
-			if (informacao.tamanho() >= 0 && COMPRIMENTO_STRING != informacao.tamanho()) {
-				listaMensagem.add(informacao.nomeExibicao() + " deve conter apenas " + informacao.tamanho()
-						+ " caracteres. Foi enviado " + COMPRIMENTO_STRING + " caracteres");
+			if (informacao.tamanho() >= 0
+					&& COMPRIMENTO_STRING != informacao.tamanho()) {
+				listaMensagem.add(informacao.nomeExibicao()
+						+ " deve conter apenas " + informacao.tamanho()
+						+ " caracteres. Foi enviado " + COMPRIMENTO_STRING
+						+ " caracteres");
 				continue;
 			}
 
-			if (!TipoDocumento.NAO_EH_DOCUMENTO.equals(informacao.tipoDocumento()) && COMPRIMENTO_STRING > 0
-					&& !ValidadorDocumento.isValido(informacao.tipoDocumento(), conteudoCampo.toString())) {
+			if (!TipoDocumento.NAO_EH_DOCUMENTO.equals(informacao
+					.tipoDocumento())
+					&& COMPRIMENTO_STRING > 0
+					&& !ValidadorDocumento.isValido(informacao.tipoDocumento(),
+							conteudoCampo.toString())) {
 				listaMensagem.add(informacao.nomeExibicao() + " não é válido");
 				continue;
 			}
 
 			if (COMPRIMENTO_STRING > 0 && informacao.padrao().length() > 0
 					&& !conteudoCampo.toString().matches(informacao.padrao())) {
-				listaMensagem.add(informacao.nomeExibicao() + " não está no formato correto. Exemplo: teste@gmail.com");
+				listaMensagem
+						.add(informacao.nomeExibicao()
+								+ " não está no formato correto. Exemplo: teste@gmail.com");
 				continue;
 			}
 
@@ -104,12 +146,15 @@ public final class ValidadorInformacao {
 	}
 
 	private static Field[] recuperarCamposValidaveis(Object obj) {
-		final InformacaoValidavel informacao = obj.getClass().getAnnotation(InformacaoValidavel.class);
+		final InformacaoValidavel informacao = obj.getClass().getAnnotation(
+				InformacaoValidavel.class);
 		final Field[] camposClasse = obj.getClass().getDeclaredFields();
 
 		if (informacao.validarHierarquia()) {
-			Field[] camposSuperClasse = obj.getClass().getSuperclass().getDeclaredFields();
-			Field[] campos = new Field[camposClasse.length + camposSuperClasse.length];
+			Field[] camposSuperClasse = obj.getClass().getSuperclass()
+					.getDeclaredFields();
+			Field[] campos = new Field[camposClasse.length
+					+ camposSuperClasse.length];
 
 			for (int i = 0; i < camposClasse.length; i++) {
 				campos[i] = camposClasse[i];
@@ -134,7 +179,8 @@ public final class ValidadorInformacao {
 			Object conteudoCampo = campo.get(obj);
 			return conteudoCampo;
 		} catch (Exception e) {
-			throw new IllegalStateException("O valor do campo " + campo.getName() + " do objeto " + obj.getClass()
+			throw new IllegalStateException("O valor do campo "
+					+ campo.getName() + " do objeto " + obj.getClass()
 					+ " não pode ser acessado", e);
 		} finally {
 			campo.setAccessible(false);
@@ -143,7 +189,8 @@ public final class ValidadorInformacao {
 
 	private static Object recuperarId(Object conteudoCampo) {
 		try {
-			return conteudoCampo.getClass().getMethod("getId").invoke(conteudoCampo, (Object[]) null);
+			return conteudoCampo.getClass().getMethod("getId")
+					.invoke(conteudoCampo, (Object[]) null);
 		} catch (Exception e) {
 			throw new IllegalStateException(
 					"O objeto do tipo "
@@ -159,8 +206,13 @@ public final class ValidadorInformacao {
 			campo.setAccessible(true);
 			campo.set(obj, conteudoCampo);
 		} catch (Exception e) {
-			throw new IllegalStateException("O valor do campo " + campo.getName() + " do objeto " + obj.getClass()
-					+ " nao pode ter os espacos em branco removidos cujo conteudo eh \"" + conteudoCampo + "\"", e);
+			throw new IllegalStateException(
+					"O valor do campo "
+							+ campo.getName()
+							+ " do objeto "
+							+ obj.getClass()
+							+ " nao pode ter os espacos em branco removidos cujo conteudo eh \""
+							+ conteudoCampo + "\"", e);
 		} finally {
 			campo.setAccessible(false);
 		}

@@ -4,7 +4,9 @@ import javax.xml.bind.annotation.XmlElement;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel
 public class IdentificacaoEmitenteNFe {
+	@InformacaoValidavel(tamanho = 7, nomeExibicao = "CNAE fiscal do emitente")
 	@XmlElement(name = "CNAE")
 	private String CNAEFiscal;
 
@@ -12,7 +14,7 @@ public class IdentificacaoEmitenteNFe {
 	@XmlElement(name = "CNPJ")
 	private String CNPJ;
 
-	@InformacaoValidavel(obrigatorio = true, tamanho = 11, nomeExibicao = "CPF do retemente")
+	@InformacaoValidavel(obrigatorio = true, tamanho = 11, nomeExibicao = "CPF do remetente")
 	@XmlElement(name = "CPF")
 	private String CPF;
 
@@ -20,12 +22,15 @@ public class IdentificacaoEmitenteNFe {
 	@XmlElement(name = "enderEmit")
 	private EnderecoNFe enderecoEmitenteNFe;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 14 }, nomeExibicao = "Inscrição estadual do emitente")
 	@XmlElement(name = "IE")
 	private String inscricaoEstadual;
 
+	@InformacaoValidavel(intervaloComprimento = { 2, 14 }, nomeExibicao = "Inscrição estadual do substituto tributário do emitente")
 	@XmlElement(name = "IEST")
 	private String inscricaoEstadualSubstitutoTributario;
 
+	@InformacaoValidavel(intervaloComprimento = { 1, 15 }, nomeExibicao = "Inscrição municipal do emitente")
 	@XmlElement(name = "IM")
 	private String inscricaoMunicipal;
 
@@ -37,8 +42,9 @@ public class IdentificacaoEmitenteNFe {
 	@XmlElement(name = "xNome")
 	private String razaoSocial;
 
+	@InformacaoValidavel(obrigatorio = true, tamanho = 1, nomeExibicao = "Código do regime tributário do emitente")
 	@XmlElement(name = "CRT")
-	private Integer regimeTributario;
+	private String regimeTributario;
 
 	public void setCNAEFiscal(String cNAEFiscal) {
 		CNAEFiscal = cNAEFiscal;
@@ -77,7 +83,7 @@ public class IdentificacaoEmitenteNFe {
 		this.razaoSocial = razaoSocial;
 	}
 
-	public void setRegimeTributario(Integer regimeTributario) {
+	public void setRegimeTributario(String regimeTributario) {
 		this.regimeTributario = regimeTributario;
 	}
 }

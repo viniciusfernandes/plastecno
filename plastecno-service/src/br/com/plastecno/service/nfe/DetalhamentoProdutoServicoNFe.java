@@ -4,16 +4,22 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+
+@InformacaoValidavel
 public class DetalhamentoProdutoServicoNFe {
 	@XmlElement(name = "infAdProd")
 	private String informacoesAdicionais;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 990 }, nomeExibicao = "Número de produtos/serviços")
 	@XmlAttribute(name = "nItem")
 	private Integer numeroItem;
 
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Produto/serviço")
 	@XmlElement(name = "prod")
 	private ProdutoServicoNFe produtoServicoNFe;
 
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tributos do produtos/serviços")
 	@XmlElement(name = "imposto")
 	private TributosProdutoServico tributosProdutoServico;
 

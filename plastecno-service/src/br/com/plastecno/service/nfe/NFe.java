@@ -4,8 +4,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+
 @XmlRootElement(name = "nfe")
+@InformacaoValidavel
 public class NFe {
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Dados da NFe")
 	@XmlElement(name = "infNFe")
 	private DadosNFe dadosNFe;
 

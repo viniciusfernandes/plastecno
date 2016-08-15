@@ -3,10 +3,14 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+
+@InformacaoValidavel
 public class TributosProdutoServico {
 	@XmlElement(name = "COFINS")
 	private COFINS cofins;
 
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "ICMS do produtos/serviços")
 	@XmlElement(name = "ICMS")
 	private ICMS icms;
 

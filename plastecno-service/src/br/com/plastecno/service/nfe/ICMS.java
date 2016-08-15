@@ -6,7 +6,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel
 public class ICMS {
 	@XmlElement(name = "ICMS00")
 	private ICMSGeral icms0;

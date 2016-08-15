@@ -70,6 +70,13 @@ $(document).ready(function() {
 		gerarInputVolume();
 		gerarInputReboque();
 		gerarInputReferenciada();
+		
+		$( "#formEmissao input, #formEmissao textarea" ).each(function(i) {
+			if(isEmpty($(this).val())){
+				$(this).remove();
+			}
+		});
+		
 		$('#formEmissao').submit();
 	});
 	

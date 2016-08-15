@@ -2,12 +2,14 @@ package br.com.plastecno.validacao;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import br.com.plastecno.service.constante.TipoDocumento;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
+import br.com.plastecno.util.NumeroUtils;
 
 public final class ValidadorInformacao {
 
@@ -26,7 +28,8 @@ public final class ValidadorInformacao {
 		int COMPRIMENTO_STRING = -1;
 		Field[] camposValidaveis = recuperarCamposValidaveis(obj);
 		boolean isString = false;
-
+		int[] tamanhos = null;
+		boolean ok = false;
 		for (Field campo : camposValidaveis) {
 			InformacaoValidavel informacao = campo
 					.getAnnotation(InformacaoValidavel.class);
@@ -66,7 +69,7 @@ public final class ValidadorInformacao {
 						+ " deve estar dentro o intervalo "
 						+ informacao.intervaloNumerico()[0] + " à "
 						+ informacao.intervaloNumerico()[1]);
-				
+
 				continue;
 			}
 
@@ -119,6 +122,40 @@ public final class ValidadorInformacao {
 						+ " deve conter apenas " + informacao.tamanho()
 						+ " caracteres. Foi enviado " + COMPRIMENTO_STRING
 						+ " caracteres");
+				continue;
+			}
+
+			tamanhos = informacao.tamanhos();
+			if (tamanhos.length > 0) {
+				ok = false;
+				for (int i = 0; i < tamanhos.length; i++) {
+					if (COMPRIMENTO_STRING == tamanhos[i]) {
+						ok = true;
+						break;
+					}
+				}
+				if (!ok) {
+					listaMensagem.add(informacao.nomeExibicao()
+							+ " deve conter um dos tamanhos \""
+							+ Arrays.toString(tamanhos)
+							+ "\" mas contém o tamanho de \""
+							+ COMPRIMENTO_STRING + "\"");
+				}
+				continue;
+			}
+
+			if (informacao.decimal().length >= 2 && conteudoCampo != null) {
+				campo.setAccessible(true);
+				try {
+					campo.set(obj, NumeroUtils.arredondar(
+							(Double) conteudoCampo, informacao.decimal()[1]));
+				} catch (Exception e) {
+					listaMensagem
+							.add("Falha no arredondamento decimal do campo "
+									+ campo);
+				} finally {
+					campo.setAccessible(false);
+				}
 				continue;
 			}
 

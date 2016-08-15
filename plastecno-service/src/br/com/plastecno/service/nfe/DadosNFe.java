@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel
 public class DadosNFe {
 
 	@XmlElement(name = "cobr")
@@ -30,9 +31,11 @@ public class DadosNFe {
 	@XmlElement(name = "emit")
 	private IdentificacaoEmitenteNFe identificacaoEmitenteNFe;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Local de entrega do produto")
 	@XmlElement(name = "entrega")
 	private IdentificacaoLocalGeral identificacaoLocalEntrega;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Local de retirada do produto")
 	@XmlElement(name = "retirada")
 	private IdentificacaoLocalGeral identificacaoLocalRetirada;
 
@@ -48,6 +51,7 @@ public class DadosNFe {
 	@XmlElement(name = "infAdic")
 	private InformacoesAdicionaisNFe informacoesAdicionaisNFe;
 
+	@InformacaoValidavel(obrigatorio = true, iteravel = true, nomeExibicao = "Lista de produtos/serviços")
 	@XmlElement(name = "det")
 	private List<DetalhamentoProdutoServicoNFe> listaDetalhamentoProdutoServicoNFe;
 

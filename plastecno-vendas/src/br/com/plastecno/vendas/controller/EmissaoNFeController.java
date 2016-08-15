@@ -87,17 +87,17 @@ public class EmissaoNFeController extends AbstractController {
 
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
-        String xml = null;
         try {
             String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
             nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                     nFeService.gerarEnderecoNFe(logradouro, telefone));
-            xml = nFeService.emitirNFe(new NFe(nf), idPedido);
+            redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(new NFe(nf), idPedido));
         } catch (BusinessException e) {
-            gerarListaMensagemErroLogException(e);
+            gerarListaMensagemErro(e);
+        } catch (Exception e) {
+            gerarLogErro("Emissão da NFe", e);
         }
-        redirecTo(this.getClass()).nfexml(xml);
-        // irTopoPagina();
+      redirecTo(this.getClass()).emissaoNFeHome();
     }
 
     public Download nfexml(String xml) {

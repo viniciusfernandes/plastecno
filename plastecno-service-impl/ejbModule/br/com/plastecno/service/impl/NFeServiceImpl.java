@@ -14,6 +14,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
@@ -31,6 +32,7 @@ import br.com.plastecno.service.nfe.TributosProdutoServico;
 import br.com.plastecno.service.nfe.ValoresTotaisICMS;
 import br.com.plastecno.service.nfe.ValoresTotaisISSQN;
 import br.com.plastecno.service.nfe.ValoresTotaisNFe;
+import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
 public class NFeServiceImpl implements NFeService {
@@ -43,6 +45,9 @@ public class NFeServiceImpl implements NFeService {
 
 	@EJB
 	private RepresentadaService representadaService;
+
+	@EJB
+	private LogradouroService logradouroService;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -136,7 +141,7 @@ public class NFeServiceImpl implements NFeService {
 			}
 
 			produto = item.getProdutoServicoNFe();
-
+			
 			valorSeguro += produto.getValorTotalSeguro();
 			valorFrete += produto.getValorTotalFrete();
 			valorProduto += produto.getValorTotalBruto();
@@ -174,6 +179,7 @@ public class NFeServiceImpl implements NFeService {
 	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
 		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
+		ValidadorInformacao.validar(nFe);
 		return gerarXMLNfe(nFe);
 	}
 
@@ -223,6 +229,10 @@ public class NFeServiceImpl implements NFeService {
 		endereco.setUF(logradouro.getUf());
 		endereco.setNomePais(logradouro.getPais());
 		endereco.setTelefone(telefone);
+
+		endereco.setCodigoMunicipio(logradouroService
+				.pesquisarCodigoIBGEByIdCidade(logradouro.getIdCidade()));
+		
 		return endereco;
 	}
 

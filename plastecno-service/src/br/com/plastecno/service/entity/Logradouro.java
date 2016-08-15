@@ -155,6 +155,11 @@ public class Logradouro implements Serializable, Cloneable {
 		return id;
 	}
 
+	public Integer getIdCidade() {
+		return endereco.getCidade() != null ? endereco.getCidade().getId()
+				: null;
+	}
+
 	public Integer getNumero() {
 		return numero;
 	}

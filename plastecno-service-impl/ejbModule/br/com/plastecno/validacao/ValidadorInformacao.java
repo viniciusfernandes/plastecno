@@ -172,7 +172,7 @@ public final class ValidadorInformacao {
 					&& !conteudoCampo.toString().matches(informacao.padrao())) {
 				listaMensagem
 						.add(informacao.nomeExibicao()
-								+ " não está no formato correto. Exemplo: teste@gmail.com");
+								+ " não está no formato padronizado correto");
 				continue;
 			}
 

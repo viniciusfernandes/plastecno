@@ -31,6 +31,8 @@ public @interface InformacaoValidavel {
 
 	String padrao() default "";
 
+	String padraoExemplo() default "";
+
 	boolean positivo() default false;
 
 	RegexValidacao regex() default RegexValidacao.NENHUM;
@@ -46,4 +48,6 @@ public @interface InformacaoValidavel {
 	boolean trim() default false;
 
 	boolean validarHierarquia() default false;
+
+	double[] valores() default {};
 }

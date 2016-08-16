@@ -10,33 +10,43 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class ICMS {
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS00 do produto/serviço")
 	@XmlElement(name = "ICMS00")
 	private ICMSGeral icms0;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS10 do produto/serviço")
 	@XmlElement(name = "ICMS10")
 	private ICMSGeral icms10;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS20 do produto/serviço")
 	@XmlElement(name = "ICMS20")
 	private ICMSGeral icms20;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS30 do produto/serviço")
 	@XmlElement(name = "ICMS30")
 	private ICMSGeral icms30;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS40 do produto/serviço")
 	@XmlElement(name = "ICMS40")
 	private ICMSGeral icms40;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS51 do produto/serviço")
 	@XmlElement(name = "ICMS51")
 	private ICMSGeral icms51;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS60 do produto/serviço")
 	@XmlElement(name = "ICMS60")
 	private ICMSGeral icms60;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS70 do produto/serviço")
 	@XmlElement(name = "ICMS70")
 	private ICMSGeral icms70;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS90 do produto/serviço")
 	@XmlElement(name = "ICMS90")
 	private ICMSGeral icms90;
 
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo ICMS do produto/serviço")
 	@XmlTransient
 	private ICMSGeral tipoIcms;
 

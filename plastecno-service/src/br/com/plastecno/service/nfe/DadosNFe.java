@@ -11,12 +11,14 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @InformacaoValidavel
 public class DadosNFe {
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Cobrança da NFe")
 	@XmlElement(name = "cobr")
 	private CobrancaNFe cobrancaNFe;
 
 	@XmlElement(name = "compra")
 	private CompraNFe compraNFe;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Exportação da NFe")
 	@XmlElement(name = "exporta")
 	private ExportacaoNFe exportacaoNFe;
 
@@ -48,6 +50,7 @@ public class DadosNFe {
 	@XmlElement(name = "exporta")
 	private InformacaoExportacao informacaoExportacao;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Informações adicionais da NFe")
 	@XmlElement(name = "infAdic")
 	private InformacoesAdicionaisNFe informacoesAdicionaisNFe;
 
@@ -58,9 +61,11 @@ public class DadosNFe {
 	@XmlElement(name = "NFref")
 	private NFeReferenciada nFeRerefenciada;
 
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Transporte da NFe")
 	@XmlElement(name = "transp")
 	private TransporteNFe transporteNFe;
 
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Valores totais da NFe")
 	@XmlElement(name = "total")
 	private ValoresTotaisNFe valoresTotaisNFe;
 

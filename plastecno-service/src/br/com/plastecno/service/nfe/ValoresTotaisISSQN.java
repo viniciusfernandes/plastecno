@@ -2,28 +2,36 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class ValoresTotaisISSQN {
-	@XmlElement(name = "vServ")
-	private Double valorServico;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel
+public class ValoresTotaisISSQN {
+	@InformacaoValidavel(decimal = { 15, 2 }, nomeExibicao = "Valor total da base de cáculo de ISS")
 	@XmlElement(name = "vBC")
 	private Double valorBC;
 
-	@XmlElement(name = "vISS")
-	private Double valorIss;
-
-	@XmlElement(name = "vPIS")
-	private Double valorPis;
-
+	@InformacaoValidavel(decimal = { 15, 2 }, nomeExibicao = "Valor total de COFINS sobre ISS")
 	@XmlElement(name = "vCOFINS")
 	private Double valorCofins;
 
-	public void setValorServico(Double valorServico) {
-		this.valorServico = valorServico;
-	}
+	@InformacaoValidavel(decimal = { 15, 2 }, nomeExibicao = "Valor total de ISS")
+	@XmlElement(name = "vISS")
+	private Double valorIss;
+
+	@InformacaoValidavel(decimal = { 15, 2 }, nomeExibicao = "Valor total de PIS sobre ISS")
+	@XmlElement(name = "vPIS")
+	private Double valorPis;
+
+	@InformacaoValidavel(decimal = { 15, 2 }, nomeExibicao = "Valor total de serviço dos totais de ISS")
+	@XmlElement(name = "vServ")
+	private Double valorServico;
 
 	public void setValorBC(Double valorBC) {
 		this.valorBC = valorBC;
+	}
+
+	public void setValorCofins(Double valorCofins) {
+		this.valorCofins = valorCofins;
 	}
 
 	public void setValorIss(Double valorIss) {
@@ -34,7 +42,7 @@ public class ValoresTotaisISSQN {
 		this.valorPis = valorPis;
 	}
 
-	public void setValorCofins(Double valorCofins) {
-		this.valorCofins = valorCofins;
+	public void setValorServico(Double valorServico) {
+		this.valorServico = valorServico;
 	}
 }

@@ -29,6 +29,7 @@ public final class ValidadorInformacao {
 		Field[] camposValidaveis = recuperarCamposValidaveis(obj);
 		boolean isString = false;
 		int[] tamanhos = null;
+		double[] valores = null;
 		boolean ok = false;
 		for (Field campo : camposValidaveis) {
 			InformacaoValidavel informacao = campo
@@ -144,6 +145,25 @@ public final class ValidadorInformacao {
 				continue;
 			}
 
+			valores = informacao.valores();
+			if (valores.length > 0) {
+				ok = false;
+				for (int i = 0; i < valores.length; i++) {
+					if (conteudoCampo.equals(valores[i])) {
+						ok = true;
+						break;
+					}
+				}
+				if (!ok) {
+					listaMensagem.add(informacao.nomeExibicao()
+							+ " deve conter um dos valores \""
+							+ Arrays.toString(valores)
+							+ "\" mas contém o valores de \"" + conteudoCampo
+							+ "\"");
+				}
+				continue;
+			}
+
 			if (informacao.decimal().length >= 2 && conteudoCampo != null) {
 				campo.setAccessible(true);
 				try {
@@ -170,9 +190,11 @@ public final class ValidadorInformacao {
 
 			if (COMPRIMENTO_STRING > 0 && informacao.padrao().length() > 0
 					&& !conteudoCampo.toString().matches(informacao.padrao())) {
-				listaMensagem
-						.add(informacao.nomeExibicao()
-								+ " não está no formato padronizado correto");
+				listaMensagem.add(informacao.nomeExibicao()
+						+ " não está no formato padronizado correto"
+						+ (informacao.padraoExemplo().length() > 0 ? " \""
+								+ informacao.padraoExemplo() + "\"" : "")
+						+ ". Enviado \"" + conteudoCampo + "\"");
 				continue;
 			}
 

@@ -51,8 +51,14 @@ public class ICMSGeral {
 	@XmlElement(name = "vBCST")
 	private Double valorBCST;
 
+	@XmlElement(name = "vBCSTRet")
+	private Double valorBCSTRetido;
+
 	@XmlElement(name = "vICMSST")
 	private Double valorST;
+
+	@XmlElement(name = "vSTRet")
+	private Double valorSTRetido;
 
 	public double calcularValor() {
 		return valorBC != null && aliquota != null ? valorBC
@@ -158,13 +164,22 @@ public class ICMSGeral {
 		this.valorBCST = valorBCST;
 	}
 
+	public void setValorBCSTRetido(Double valorBCSTRetido) {
+		this.valorBCSTRetido = valorBCSTRetido;
+	}
+
 	public void setValorST(Double valorST) {
 		this.valorST = valorST;
+	}
+
+	public void setValorSTRetido(Double valorSTRetido) {
+		this.valorSTRetido = valorSTRetido;
 	}
 
 	public void validar() throws BusinessException {
 		TipoTributacaoICMS t = getTipoTributacao();
 		List<String> l = new ArrayList<String>();
+
 		if (origemMercadoria == null) {
 			l.add("Origem da mercadoria do ICMS do ICMS é obrigatório");
 		}
@@ -191,21 +206,25 @@ public class ICMSGeral {
 			l.add("Valor da base de cálculo do ICMS é obrigatório");
 		}
 
-		if (valorBCST == null && (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+		if (valorBCST == null
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
+						.equals(t))) {
 			l.add("Valor da base de cálculo ST do ICMS é obrigatório");
 		}
 
 		if (modalidadeDeterminacaoBCST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
+						.equals(t))) {
 			l.add("Modalidade de determinação do ST do ICMS é obrigatório");
 		}
 
 		if (percentualMargemValorAdicionadoICMSST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_90.equals(t))) {
 			l.add("Percentual de margem do valor adicionado do ST do ICMS é obrigatório");
 		}
 
-		if (percentualReducaoBC == null && (ICMS_51.equals(t))) {
+		if (percentualReducaoBC == null
+				&& (ICMS_51.equals(t) || ICMS_60.equals(t))) {
 			l.add("Percentual de redução de BC do ICMS é obrigatório");
 		}
 
@@ -214,16 +233,28 @@ public class ICMSGeral {
 			l.add("Percentual de redução de BC do ST do ICMS é obrigatório");
 		}
 
-		if (valorST == null && (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+		if (valorST == null
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
+						.equals(t))) {
 			l.add("Valor do ICMS ST é obrigatório");
 		}
 
-		if (aliquotaST == null && (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+		if (aliquotaST == null
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
+						.equals(t))) {
 			l.add("Alíquota do ICMS ST é obrigatório");
 		}
 
-		if (percentualReducaoBC == null && (ICMS_20.equals(t))) {
+		if (percentualReducaoBC == null && ICMS_20.equals(t)) {
 			l.add("Percentual de redução de BC do ICMS é obrigatório");
+		}
+
+		if (valorBCSTRetido == null && ICMS_60.equals(t)) {
+			l.add("Valor de BC do ICMS retido é obrigatório");
+		}
+
+		if (valorSTRetido == null && ICMS_60.equals(t)) {
+			l.add("Valor de ST do ICMS retido é obrigatório");
 		}
 
 		if (l.size() > 0) {

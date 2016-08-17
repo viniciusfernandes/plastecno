@@ -3,14 +3,16 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.*;
 
 public class PISGeral {
 	@XmlElement(name = "pPIS")
 	private Double aliquota;
 
 	@XmlElement(name = "CST")
-	private Integer codigoSituacaoTributaria;
+	private String codigoSituacaoTributaria;
 
 	@XmlElement(name = "qBCProd")
 	private Integer quantidadeVendida;
@@ -53,7 +55,7 @@ public class PISGeral {
 		this.aliquota = aliquota;
 	}
 
-	public void setCodigoSituacaoTributaria(Integer codigoSituacaoTributaria) {
+	public void setCodigoSituacaoTributaria(String codigoSituacaoTributaria) {
 		this.codigoSituacaoTributaria = codigoSituacaoTributaria;
 	}
 
@@ -71,5 +73,43 @@ public class PISGeral {
 
 	public void setValorBC(Double valorBC) {
 		this.valorBC = valorBC;
+	}
+
+	public void validar() throws BusinessException {
+		TipoTributacaoPIS t = getTipoTributacao();
+		if (t == null) {
+			throw new BusinessException("Situação tributária é obrigatório");
+		}
+
+		// Essas tributacoes sao isentas
+		if (PIS_4.equals(t) || PIS_6.equals(t) || PIS_7.equals(t)
+				|| PIS_8.equals(t) || PIS_9.equals(t)) {
+			return;
+		}
+
+		if (valorBC == null
+				&& (PIS_1.equals(t) || PIS_2.equals(t) || PIS_99.equals(t) || PIS_ST
+						.equals(t))) {
+			throw new BusinessException("Valor da BC do PIS é obrigatório");
+		}
+
+		if (aliquota == null) {
+			throw new BusinessException("Alíquota do PIS é obrigatório");
+		}
+
+		if (valor == null) {
+			throw new BusinessException("Valor do PIS é obrigatório");
+		}
+
+		if (quantidadeVendida == null && (PIS_3.equals(t) || PIS_99.equals(t))) {
+			throw new BusinessException(
+					"Quantidade vendida do PIS é obrigatório");
+		}
+
+		if (valorAliquota == null && (PIS_99.equals(t))) {
+			throw new BusinessException(
+					"Valor da alíquota do PIS é obrigatório");
+		}
+
 	}
 }

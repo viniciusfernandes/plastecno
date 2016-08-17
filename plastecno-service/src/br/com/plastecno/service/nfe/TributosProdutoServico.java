@@ -133,6 +133,10 @@ public class TributosProdutoServico {
 		if (contemIPI()) {
 			ipi.validar();
 		}
+
+		if (contemPIS()) {
+			pis.validar();
+		}
 	}
 
 }

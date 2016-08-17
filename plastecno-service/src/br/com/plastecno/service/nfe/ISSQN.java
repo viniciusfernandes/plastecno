@@ -3,22 +3,32 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+
+@InformacaoValidavel
 public class ISSQN {
+
+	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Alíquota do ISS")
 	@XmlElement(name = "vAliq")
 	private Double aliquota;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 999999 }, nomeExibicao = "Código do município do fato gerador do ISS")
 	@XmlElement(name = "cMunFG")
 	private Long codigoMunicipioGerador;
 
+	@InformacaoValidavel(obrigatorio = true, tamanho = 1, nomeExibicao = "Situação tributária do ISS")
 	@XmlElement(name = "cSitTrib")
-	private Integer codigoSituacaoTributaria;
+	private String codigoSituacaoTributaria;
 
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{3,4}", padraoExemplo = "999 ou 9999", nomeExibicao = "Código do item da lista de serviços do ISS")
 	@XmlElement(name = "cListServ")
-	private Integer itemListaServicos;
+	private String itemListaServicos;
 
+	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor do ISS")
 	@XmlElement(name = "vISSQN")
 	private Double valor;
 
+	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor da BC do ISS")
 	@XmlElement(name = "vBC")
 	private Double valorBC;
 
@@ -50,11 +60,11 @@ public class ISSQN {
 		this.codigoMunicipioGerador = codigoMunicipioGerador;
 	}
 
-	public void setCodigoSituacaoTributaria(Integer codigoSituacaoTributaria) {
+	public void setCodigoSituacaoTributaria(String codigoSituacaoTributaria) {
 		this.codigoSituacaoTributaria = codigoSituacaoTributaria;
 	}
 
-	public void setItemListaServicos(Integer itemListaServicos) {
+	public void setItemListaServicos(String itemListaServicos) {
 		this.itemListaServicos = itemListaServicos;
 	}
 

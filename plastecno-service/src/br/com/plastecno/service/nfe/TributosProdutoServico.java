@@ -25,6 +25,7 @@ public class TributosProdutoServico {
 	@XmlElement(name = "IPI")
 	private IPI ipi;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ISS do produtos/serviços")
 	@XmlElement(name = "ISSQN")
 	private ISSQN issqn;
 

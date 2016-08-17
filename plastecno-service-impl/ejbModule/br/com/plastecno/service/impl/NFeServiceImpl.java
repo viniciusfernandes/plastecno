@@ -257,7 +257,7 @@ public class NFeServiceImpl implements NFeService {
 
 	/*
 	 * Esse metodo foi criado pois nao havia modo de implementar as validacoes
-	 * via anotacoes ja que cada tipo de icms valida um campo diferente
+	 * via anotacoes ja que cada tipo de TRIBUTO valida um campo diferente
 	 */
 	private void validarTributos(NFe nFe) throws BusinessException {
 		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe()

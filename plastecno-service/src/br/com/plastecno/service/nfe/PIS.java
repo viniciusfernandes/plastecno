@@ -57,5 +57,7 @@ public class PIS {
 		if (tipoPis == null) {
 			throw new BusinessException("Tipo de PIS é obrigatório");
 		}
+
+		tipoPis.validar();
 	}
 }

@@ -137,6 +137,10 @@ public class TributosProdutoServico {
 		if (contemPIS()) {
 			pis.validar();
 		}
+
+		if (contemCOFINS()) {
+			cofins.validar();
+		}
 	}
 
 }

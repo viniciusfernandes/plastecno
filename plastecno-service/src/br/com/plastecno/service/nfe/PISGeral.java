@@ -84,6 +84,13 @@ public class PISGeral {
 		// Essas tributacoes sao isentas
 		if (PIS_4.equals(t) || PIS_6.equals(t) || PIS_7.equals(t)
 				|| PIS_8.equals(t) || PIS_9.equals(t)) {
+
+			aliquota = null;
+			quantidadeVendida = null;
+			valor = null;
+			valorAliquota = null;
+			valorBC = null;
+
 			return;
 		}
 

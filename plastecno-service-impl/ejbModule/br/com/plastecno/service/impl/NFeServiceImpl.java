@@ -41,13 +41,13 @@ public class NFeServiceImpl implements NFeService {
 	private ClienteService clienteService;
 
 	@EJB
+	private LogradouroService logradouroService;
+
+	@EJB
 	private PedidoService pedidoService;
 
 	@EJB
 	private RepresentadaService representadaService;
-
-	@EJB
-	private LogradouroService logradouroService;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -141,7 +141,7 @@ public class NFeServiceImpl implements NFeService {
 			}
 
 			produto = item.getProdutoServicoNFe();
-			
+
 			valorSeguro += produto.getValorTotalSeguro();
 			valorFrete += produto.getValorTotalFrete();
 			valorProduto += produto.getValorTotalBruto();
@@ -179,6 +179,7 @@ public class NFeServiceImpl implements NFeService {
 	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
 		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
+		validarTributos(nFe);
 		ValidadorInformacao.validar(nFe);
 		return gerarXMLNfe(nFe);
 	}
@@ -232,7 +233,7 @@ public class NFeServiceImpl implements NFeService {
 
 		endereco.setCodigoMunicipio(logradouroService
 				.pesquisarCodigoIBGEByIdCidade(logradouro.getIdCidade()));
-		
+
 		return endereco;
 	}
 
@@ -251,6 +252,19 @@ public class NFeServiceImpl implements NFeService {
 		} catch (Exception e) {
 			throw new BusinessException(
 					"Falha na geracao do XML da NFe do pedido No. ", e);
+		}
+	}
+
+	/*
+	 * Esse metodo foi criado pois nao havia modo de implementar as validacoes
+	 * via anotacoes ja que cada tipo de icms valida um campo diferente
+	 */
+	private void validarTributos(NFe nFe) throws BusinessException {
+		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe()
+				.getListaDetalhamentoProdutoServicoNFe()) {
+			if (d.contemICMS()) {
+				d.getTributosProdutoServico().validarICMS();
+			}
 		}
 	}
 }

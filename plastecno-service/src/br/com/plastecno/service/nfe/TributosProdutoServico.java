@@ -3,6 +3,7 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
@@ -121,6 +122,12 @@ public class TributosProdutoServico {
 
 	public void setPisSubstituicaoTributaria(PISGeral pisSubstituicaoTributaria) {
 		this.pisSubstituicaoTributaria = pisSubstituicaoTributaria;
+	}
+
+	public void validarICMS() throws BusinessException {
+		if (contemICMS()) {
+			icms.validar();
+		}
 	}
 
 }

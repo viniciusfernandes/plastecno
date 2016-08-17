@@ -15,6 +15,7 @@ public class DadosNFe {
 	@XmlElement(name = "cobr")
 	private CobrancaNFe cobrancaNFe;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Compra da NFe")
 	@XmlElement(name = "compra")
 	private CompraNFe compraNFe;
 

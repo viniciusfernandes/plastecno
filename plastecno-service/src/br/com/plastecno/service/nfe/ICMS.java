@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -12,7 +13,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 public class ICMS {
 	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS00 do produto/serviço")
 	@XmlElement(name = "ICMS00")
-	private ICMSGeral icms0;
+	private ICMSGeral icms00;
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS10 do produto/serviço")
 	@XmlElement(name = "ICMS10")
@@ -79,5 +80,9 @@ public class ICMS {
 			}
 			this.tipoIcms = tipoIcms;
 		}
+	}
+
+	public void validar() throws BusinessException {
+		tipoIcms.validar();
 	}
 }

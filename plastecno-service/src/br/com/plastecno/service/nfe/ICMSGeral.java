@@ -1,12 +1,15 @@
 package br.com.plastecno.service.nfe;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
-import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoICMS.*;
 
-@InformacaoValidavel
 public class ICMSGeral {
 
 	@XmlElement(name = "pICMS")
@@ -16,7 +19,7 @@ public class ICMSGeral {
 	private Double aliquotaST;
 
 	@XmlElement(name = "CST")
-	private Integer codigoSituacaoTributaria;
+	private String codigoSituacaoTributaria;
 
 	@XmlElement(name = "modBC")
 	private Integer modalidadeDeterminacaoBC;
@@ -35,6 +38,9 @@ public class ICMSGeral {
 
 	@XmlElement(name = "pRedBC")
 	private Double percentualReducaoBC;
+
+	@XmlElement(name = "pRedBCST")
+	private Double percentualReducaoBCST;
 
 	@XmlElement(name = "vICMS")
 	private Double valor;
@@ -107,7 +113,7 @@ public class ICMSGeral {
 		this.aliquotaST = aliquotaST;
 	}
 
-	public void setCodigoSituacaoTributaria(Integer codigoSituacaoTributaria) {
+	public void setCodigoSituacaoTributaria(String codigoSituacaoTributaria) {
 		this.codigoSituacaoTributaria = codigoSituacaoTributaria;
 	}
 
@@ -136,6 +142,10 @@ public class ICMSGeral {
 		this.percentualReducaoBC = percentualReducaoBC;
 	}
 
+	public void setPercentualReducaoBCST(Double percentualReducaoBCST) {
+		this.percentualReducaoBCST = percentualReducaoBCST;
+	}
+
 	public void setValor(Double valor) {
 		this.valor = valor;
 	}
@@ -150,6 +160,75 @@ public class ICMSGeral {
 
 	public void setValorST(Double valorST) {
 		this.valorST = valorST;
+	}
+
+	public void validar() throws BusinessException {
+		TipoTributacaoICMS t = getTipoTributacao();
+		List<String> l = new ArrayList<String>();
+		if (origemMercadoria == null) {
+			l.add("Origem da mercadoria do ICMS do ICMS é obrigatório");
+		}
+
+		if (t == null) {
+			l.add("Código da situação de tributação do ICMS é obrigatório");
+		}
+
+		if (modalidadeDeterminacaoBC == null) {
+			l.add("Modalidade de determinação da base de cálculo do ICMS é obrigatório");
+		}
+
+		if (aliquota == null) {
+			l.add("Alíquota do ICMS é obrigatório");
+		}
+
+		if (valor == null
+				&& (!ICMS_40.equals(t) && !ICMS_41.equals(t) && !ICMS_50
+						.equals(t))) {
+			l.add("Valor do ICMS do ICMS é obrigatório");
+		}
+
+		if (valorBC == null) {
+			l.add("Valor da base de cálculo do ICMS é obrigatório");
+		}
+
+		if (valorBCST == null && (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+			l.add("Valor da base de cálculo ST do ICMS é obrigatório");
+		}
+
+		if (modalidadeDeterminacaoBCST == null
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+			l.add("Modalidade de determinação do ST do ICMS é obrigatório");
+		}
+
+		if (percentualMargemValorAdicionadoICMSST == null
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+			l.add("Percentual de margem do valor adicionado do ST do ICMS é obrigatório");
+		}
+
+		if (percentualReducaoBC == null && (ICMS_51.equals(t))) {
+			l.add("Percentual de redução de BC do ICMS é obrigatório");
+		}
+
+		if (percentualReducaoBCST == null
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+			l.add("Percentual de redução de BC do ST do ICMS é obrigatório");
+		}
+
+		if (valorST == null && (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+			l.add("Valor do ICMS ST é obrigatório");
+		}
+
+		if (aliquotaST == null && (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+			l.add("Alíquota do ICMS ST é obrigatório");
+		}
+
+		if (percentualReducaoBC == null && (ICMS_20.equals(t))) {
+			l.add("Percentual de redução de BC do ICMS é obrigatório");
+		}
+
+		if (l.size() > 0) {
+			throw new BusinessException(l);
+		}
 	}
 
 }

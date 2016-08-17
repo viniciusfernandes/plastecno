@@ -15,6 +15,7 @@ public class TributosProdutoServico {
 	@XmlElement(name = "ICMS")
 	private ICMS icms;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Imposto de importação do produtos/serviços")
 	@XmlElement(name = "II")
 	private ImpostoImportacao impostoImportacao;
 

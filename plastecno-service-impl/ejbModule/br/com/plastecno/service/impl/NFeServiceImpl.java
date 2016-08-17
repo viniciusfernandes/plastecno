@@ -262,9 +262,7 @@ public class NFeServiceImpl implements NFeService {
 	private void validarTributos(NFe nFe) throws BusinessException {
 		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe()
 				.getListaDetalhamentoProdutoServicoNFe()) {
-			if (d.contemICMS()) {
-				d.getTributosProdutoServico().validarICMS();
-			}
+			d.getTributosProdutoServico().validarTributos();
 		}
 	}
 }

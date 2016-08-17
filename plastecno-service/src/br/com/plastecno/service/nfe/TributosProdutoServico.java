@@ -124,9 +124,13 @@ public class TributosProdutoServico {
 		this.pisSubstituicaoTributaria = pisSubstituicaoTributaria;
 	}
 
-	public void validarICMS() throws BusinessException {
+	public void validarTributos() throws BusinessException {
 		if (contemICMS()) {
 			icms.validar();
+		}
+
+		if (contemIPI()) {
+			ipi.validar();
 		}
 	}
 

@@ -3,12 +3,16 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.*;
 
 public class IPI {
-	@XmlElement(name = "clEnq")
+	@XmlElement(name = "cEnq")
 	private String classeEnquadramento;
+
+	@XmlElement(name = "clEnq")
+	private String classeEnquadramentoCigarrosBebidas;
 
 	@XmlElement(name = "CNPJProd")
 	private String cnpjProdutor;
@@ -84,5 +88,33 @@ public class IPI {
 			ipiNt = tipoIpi;
 		}
 		this.tipoIpi = tipoIpi;
+	}
+
+	public void validar() throws BusinessException {
+		if (tipoIpi == null) {
+			throw new BusinessException("Tipo IPI é obrigatório");
+		}
+
+		if (classeEnquadramentoCigarrosBebidas != null
+				&& classeEnquadramentoCigarrosBebidas.length() != 5) {
+			throw new BusinessException(
+					"Classe de enquadramento para cigarro e bebida do IPI é obrigatório");
+		}
+
+		if (cnpjProdutor != null && cnpjProdutor.length() != 14) {
+			throw new BusinessException(
+					"CNPJ do produto da mercadoria do IPI é obrigatório");
+		}
+
+		if (codigoSeloControle != null && codigoSeloControle.length() != 5) {
+			throw new BusinessException(
+					"Código do selo de controle do IPI é obrigatório");
+		}
+
+		if (classeEnquadramento != null) {
+			throw new BusinessException(
+					"Classe de enquadramento do IPI é obrigatório");
+		}
+
 	}
 }

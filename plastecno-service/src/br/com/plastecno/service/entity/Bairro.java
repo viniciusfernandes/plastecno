@@ -30,7 +30,7 @@ public class Bairro implements Serializable {
     private Integer id;
 
     @Column(name = "bairro")
-    @InformacaoValidavel(obrigatorio = true, intervalo = { 1, 40 }, nomeExibicao = "Bairro")
+    @InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 40 }, nomeExibicao = "Bairro")
     private String descricao;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })

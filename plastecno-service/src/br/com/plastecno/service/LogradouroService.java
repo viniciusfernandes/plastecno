@@ -28,6 +28,8 @@ public interface LogradouroService {
 
     <T extends Logradouro> T pesquisarById(Integer idLogradouro, Class<T> classe);
 
+    String pesquisarCodigoIBGEByIdCidade(Integer idCidade);
+
     /**
      * Metodo que remove todos os logradouros cadastrados no sistema que nao
      * esteja presentes na lista passada como parametro. Os logradouros que
@@ -45,6 +47,6 @@ public interface LogradouroService {
      */
     <T extends Logradouro> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
 
-    void validarListaLogradouroPreenchida(Collection<? extends Logradouro> listaLogradouro) throws BusinessException;
+	void validarListaLogradouroPreenchida(Collection<? extends Logradouro> listaLogradouro) throws BusinessException;
 
 }

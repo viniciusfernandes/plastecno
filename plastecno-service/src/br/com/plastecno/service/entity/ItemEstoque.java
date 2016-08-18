@@ -41,7 +41,7 @@ public class ItemEstoque extends Item {
 
 	private Double comprimento;
 	@Column(name = "descricao_peca")
-	@InformacaoValidavel(trim = true, intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do estoque")
+	@InformacaoValidavel(trim = true, intervaloComprimento = { 1, 100 }, nomeExibicao = "Descrição do item do estoque")
 	private String descricaoPeca;
 
 	@Enumerated(EnumType.ORDINAL)

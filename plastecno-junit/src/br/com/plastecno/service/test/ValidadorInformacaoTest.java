@@ -19,6 +19,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		e.setIdade(12);
 		e.setQuantidade(32);
 		e.setSenha("1234");
+		e.setTarifaLimite(33.333);
+		e.setIdadeLimite(18);
 		e.setFilha(new EntidadeValidacaoSimples(321, "N321"));
 		e.setEmail("vinicius@hotmail");
 		e.addFilho(new EntidadeValidacaoSimples(111, "N1"));
@@ -27,7 +29,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 
 		e.setSobrinho(new EntidadeValidacaoSimples(444, "N4"));
 
-		EntidadeValidacaoHeranca h = new EntidadeValidacaoHeranca(777, "entidade de validacao teste");
+		EntidadeValidacaoHeranca h = new EntidadeValidacaoHeranca(777,
+				"entidade de validacao teste");
 		h.setValor(765d);
 
 		e.setHerdado(h);
@@ -44,8 +47,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			printMensagens(e1);
 		}
-		assertEquals("O campo nao pode conter espacos em branco no final, entao isso deve ser validado", razao.trim(),
-				e.getRazaoSocial());
+		assertEquals(
+				"O campo nao pode conter espacos em branco no final, entao isso deve ser validado",
+				razao.trim(), e.getRazaoSocial());
 	}
 
 	@Test
@@ -58,8 +62,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			printMensagens(e1);
 		}
-		assertEquals("O campo nao pode conter espacos em branco no final, entao isso deve ser validado", null,
-				e.getRazaoSocial());
+		assertEquals(
+				"O campo nao pode conter espacos em branco no final, entao isso deve ser validado",
+				null, e.getRazaoSocial());
 	}
 
 	@Test
@@ -72,7 +77,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
 		}
-		assertFalse("O campo nao eh obrigatorio e nao precisa ser validado caso nao exista", throwed);
+		assertFalse(
+				"O campo nao eh obrigatorio e nao precisa ser validado caso nao exista",
+				throwed);
 	}
 
 	@Test
@@ -85,7 +92,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
 		}
-		assertTrue("O campo nao eh obrigatorio, mas excede o tamanho limite e deve ser validado", throwed);
+		assertTrue(
+				"O campo nao eh obrigatorio, mas excede o tamanho limite e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -98,7 +107,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
 		}
-		assertTrue("O campo nao eh obrigatorio e nao precisa ser validado caso nao exista", throwed);
+		assertTrue(
+				"O campo nao eh obrigatorio e nao precisa ser validado caso nao exista",
+				throwed);
 	}
 
 	@Test
@@ -111,7 +122,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
 		}
-		assertTrue("O campo foi definido como obrigatorio e deve ser preenchido", throwed);
+		assertTrue(
+				"O campo foi definido como obrigatorio e deve ser preenchido",
+				throwed);
 	}
 
 	@Test
@@ -124,7 +137,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
 		}
-		assertTrue("O campo excedeu o tamanho limite e deve ser validado", throwed);
+		assertTrue("O campo excedeu o tamanho limite e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -137,7 +151,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
 		}
-		assertTrue("O campo foi definido como obrigatorio e deve ser preenchido", throwed);
+		assertTrue(
+				"O campo foi definido como obrigatorio e deve ser preenchido",
+				throwed);
 	}
 
 	@Test
@@ -151,7 +167,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O campo nome eh obrigatorio e deve ser validado em cascata", throwed);
+		assertTrue(
+				"O campo nome eh obrigatorio e deve ser validado em cascata",
+				throwed);
 
 		e.getSobrinho().setNome("");
 		try {
@@ -173,7 +191,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O numero de digitos do CNPJ nao eh valido e deve ser validado", throwed);
+		assertTrue(
+				"O numero de digitos do CNPJ nao eh valido e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -188,7 +208,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O digito verificador do nao eh valido e deve ser validado", throwed);
+		assertTrue("O digito verificador do nao eh valido e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -203,7 +224,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O digito verificador do nao eh valido e deve ser validado", throwed);
+		assertTrue("O digito verificador do nao eh valido e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -223,7 +245,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			} catch (InformacaoInvalidaException e1) {
 				throwed = true;
 			}
-			assertTrue("O CNPJ \"" + CNPJ + "\" nao eh valido e deve ser validado", throwed);
+			assertTrue("O CNPJ \"" + CNPJ
+					+ "\" nao eh valido e deve ser validado", throwed);
 		}
 
 	}
@@ -240,7 +263,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O numero de digitos do cpf nao eh valido e deve ser validado", throwed);
+		assertTrue(
+				"O numero de digitos do cpf nao eh valido e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -255,7 +280,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O digito verificador do nao eh valido e deve ser validado", throwed);
+		assertTrue("O digito verificador do nao eh valido e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -270,7 +296,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O digito verificador do nao eh valido e deve ser validado", throwed);
+		assertTrue("O digito verificador do nao eh valido e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -290,7 +317,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			} catch (InformacaoInvalidaException e1) {
 				throwed = true;
 			}
-			assertTrue("O cpf \"" + cpf + "\" nao eh valido e deve ser validado", throwed);
+			assertTrue("O cpf \"" + cpf
+					+ "\" nao eh valido e deve ser validado", throwed);
 		}
 
 	}
@@ -321,7 +349,39 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O numero de caracteres do nao eh valido e deve ser validado", throwed);
+		assertTrue(
+				"O numero de caracteres do nao eh valido e deve ser validado",
+				throwed);
+	}
+
+	@Test
+	public void testIntervaloDouble() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.setTarifaLimite(90.99);
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+		}
+		assertFalse(
+				"O campo tarifa limite esta fora do limite e deve ser validado",
+				throwed);
+	}
+
+	@Test
+	public void testIntervaloInteiro() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.setIdadeLimite(19);
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+		}
+		assertFalse(
+				"O campo idade limite esta fora do limite e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -344,7 +404,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
 		}
-		assertTrue("O campo quantidade eh estritamente positivo e nao pode ser negativo", throwed);
+		assertTrue(
+				"O campo quantidade eh estritamente positivo e nao pode ser negativo",
+				throwed);
 
 		e.setIdade(0);
 		throwed = false;
@@ -353,7 +415,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
 		}
-		assertTrue("O campo quantidade eh estritamente positivo e nao pode ser zero", throwed);
+		assertTrue(
+				"O campo quantidade eh estritamente positivo e nao pode ser zero",
+				throwed);
 	}
 
 	@Test
@@ -375,7 +439,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		} catch (InformacaoInvalidaException e1) {
 			throwed = true;
 		}
-		assertFalse("O campo idade esta zerado e eh positivo e nao deve ser validado", throwed);
+		assertFalse(
+				"O campo idade esta zerado e eh positivo e nao deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -389,7 +455,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O relacionamento com a entidade filha esta nulo e deve ser validado", throwed);
+		assertTrue(
+				"O relacionamento com a entidade filha esta nulo e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -403,7 +471,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O tamanho do campo eh inferior ao definido e deve ser validado", throwed);
+		assertTrue(
+				"O tamanho do campo eh inferior ao definido e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -417,7 +487,9 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O tamanho do campo eh superior ao definido e deve ser validado", throwed);
+		assertTrue(
+				"O tamanho do campo eh superior ao definido e deve ser validado",
+				throwed);
 	}
 
 	@Test
@@ -431,7 +503,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O campo possui um padrao invalido e deve ser validado", throwed);
+		assertTrue("O campo possui um padrao invalido e deve ser validado",
+				throwed);
 
 		e.setEmail(null);
 		throwed = false;
@@ -441,7 +514,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 
 		}
-		assertTrue("O campo possui um padrao invalido e deve ser validado", throwed);
+		assertTrue("O campo possui um padrao invalido e deve ser validado",
+				throwed);
 	}
 
 	@Test

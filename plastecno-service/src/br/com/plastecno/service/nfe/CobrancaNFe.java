@@ -3,13 +3,28 @@ package br.com.plastecno.service.nfe;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+
+@InformacaoValidavel
 public class CobrancaNFe {
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Fatura da cobrança")
 	@XmlElement(name = "fat")
 	private FaturaNFe faturaNFe;
-	
-	@XmlElement(name="dup")
+
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Duplicatas da cobrança")
+	@XmlElement(name = "dup")
 	private List<DuplicataNFe> listaDuplicata;
+
+	public boolean contemDuplicata() {
+		return listaDuplicata != null && listaDuplicata.size() > 0;
+	}
+
+	@XmlTransient
+	public List<DuplicataNFe> getListaDuplicata() {
+		return listaDuplicata;
+	}
 
 	public void setFaturaNFe(FaturaNFe faturaNFe) {
 		this.faturaNFe = faturaNFe;

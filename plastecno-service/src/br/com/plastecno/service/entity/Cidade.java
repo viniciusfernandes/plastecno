@@ -30,7 +30,7 @@ public class Cidade implements Serializable {
     private Integer id;
 
     @Column(name = "cidade")
-    @InformacaoValidavel(obrigatorio = true, intervalo = { 1, 50 }, nomeExibicao = "Cidade")
+    @InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 50 }, nomeExibicao = "Cidade")
     private String descricao;
 
     @InformacaoValidavel(obrigatorio = true, tamanho = 2, nomeExibicao = "UF")

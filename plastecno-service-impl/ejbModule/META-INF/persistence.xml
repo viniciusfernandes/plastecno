@@ -27,6 +27,7 @@
 		<class>br.com.plastecno.service.entity.PerfilAcesso</class>
 		<class>br.com.plastecno.service.entity.Material</class>
 		<class>br.com.plastecno.service.entity.Pedido</class>
+		<class>br.com.plastecno.service.entity.PedidoNFe</class>
 		<class>br.com.plastecno.service.entity.RamoAtividade</class>
 		<class>br.com.plastecno.service.entity.Regiao</class>
 		<class>br.com.plastecno.service.entity.Representada</class>

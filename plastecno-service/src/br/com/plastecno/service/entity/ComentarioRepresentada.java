@@ -39,7 +39,7 @@ public class ComentarioRepresentada implements Serializable {
 	@Column(name = "data_inclusao")
 	private Date dataInclusao;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 300 }, nomeExibicao = "Conteúdo do comentário sobre a representada")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 300 }, nomeExibicao = "Conteúdo do comentário sobre a representada")
 	private String conteudo;
 
 	@ManyToOne(fetch = FetchType.LAZY)

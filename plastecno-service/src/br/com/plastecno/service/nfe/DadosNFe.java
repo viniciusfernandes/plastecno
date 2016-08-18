@@ -6,29 +6,39 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+
+@InformacaoValidavel
 public class DadosNFe {
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Cobrança da NFe")
 	@XmlElement(name = "cobr")
 	private CobrancaNFe cobrancaNFe;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Compra da NFe")
 	@XmlElement(name = "compra")
 	private CompraNFe compraNFe;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Exportação da NFe")
 	@XmlElement(name = "exporta")
 	private ExportacaoNFe exportacaoNFe;
 
+	@InformacaoValidavel(obrigatorio = true, tamanho = 47, nomeExibicao = "Id da NFe")
 	@XmlAttribute(name = "Id")
 	private String id;
 
 	@XmlElement(name = "dest")
 	private IdentificacaoDestinatarioNFe identificacaoDestinatarioNFe;
 
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Identificação do emitente")
 	@XmlElement(name = "emit")
 	private IdentificacaoEmitenteNFe identificacaoEmitenteNFe;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Local de entrega do produto")
 	@XmlElement(name = "entrega")
 	private IdentificacaoLocalGeral identificacaoLocalEntrega;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Local de retirada do produto")
 	@XmlElement(name = "retirada")
 	private IdentificacaoLocalGeral identificacaoLocalRetirada;
 
@@ -41,23 +51,28 @@ public class DadosNFe {
 	@XmlElement(name = "exporta")
 	private InformacaoExportacao informacaoExportacao;
 
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Informações adicionais da NFe")
 	@XmlElement(name = "infAdic")
 	private InformacoesAdicionaisNFe informacoesAdicionaisNFe;
 
+	@InformacaoValidavel(obrigatorio = true, iteravel = true, nomeExibicao = "Lista de produtos/serviços")
 	@XmlElement(name = "det")
 	private List<DetalhamentoProdutoServicoNFe> listaDetalhamentoProdutoServicoNFe;
 
 	@XmlElement(name = "NFref")
 	private NFeReferenciada nFeRerefenciada;
 
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Transporte da NFe")
 	@XmlElement(name = "transp")
 	private TransporteNFe transporteNFe;
 
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Valores totais da NFe")
 	@XmlElement(name = "total")
 	private ValoresTotaisNFe valoresTotaisNFe;
 
 	@XmlAttribute(name = "versao")
-	private Double versao;
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Versão da NFe")
+	private final Double versao = 2.0d;
 
 	@XmlTransient
 	public IdentificacaoDestinatarioNFe getIdentificacaoDestinatarioNFe() {
@@ -65,8 +80,18 @@ public class DadosNFe {
 	}
 
 	@XmlTransient
+	public IdentificacaoEmitenteNFe getIdentificacaoEmitenteNFe() {
+		return identificacaoEmitenteNFe;
+	}
+
+	@XmlTransient
 	public List<DetalhamentoProdutoServicoNFe> getListaDetalhamentoProdutoServicoNFe() {
 		return listaDetalhamentoProdutoServicoNFe;
+	}
+
+	@XmlTransient
+	public List<DuplicataNFe> getListaDuplicata() {
+		return cobrancaNFe != null ? cobrancaNFe.getListaDuplicata() : null;
 	}
 
 	@XmlTransient
@@ -158,9 +183,4 @@ public class DadosNFe {
 	public void setValoresTotaisNFe(ValoresTotaisNFe valoresTotaisNFe) {
 		this.valoresTotaisNFe = valoresTotaisNFe;
 	}
-
-	public void setVersao(Double versao) {
-		this.versao = versao;
-	}
-
 }

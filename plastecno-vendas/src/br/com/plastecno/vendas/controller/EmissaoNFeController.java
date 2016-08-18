@@ -1,6 +1,10 @@
 package br.com.plastecno.vendas.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
@@ -46,16 +50,19 @@ public class EmissaoNFeController extends AbstractController {
     @Servico
     private ConfiguracaoSistemaService configuracaoSistemaService;
 
+    private List<Object[]> listaCfop = null;
+
     @Servico
     private NFeService nFeService;
-
     @Servico
     private PedidoService pedidoService;
 
-    public EmissaoNFeController(Result result, UsuarioInfo usuarioInfo) {
+    public EmissaoNFeController(HttpServletRequest request, Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
         this.setNomeTela("Ramo de atividade");
         this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
+
+        inicializarListaCfop(request);
     }
 
     @Get("emissaoNFe")
@@ -83,21 +90,65 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("percentualCofins",
                 configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.PERCENTUAL_COFINS));
         addAtributo("percentualPis", configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.PERCENTUAL_PIS));
+
+        addAtributo("listaCfop", listaCfop);
     }
 
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
-        String xml = null;
         try {
             String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
             nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                     nFeService.gerarEnderecoNFe(logradouro, telefone));
-            xml = nFeService.emitirNFe(new NFe(nf), idPedido);
+
+            NFe nFe = new NFe(nf);
+            formatarDuplicata(nFe);
+
+            redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(nFe, idPedido));
         } catch (BusinessException e) {
-            gerarListaMensagemErroLogException(e);
+            gerarListaMensagemErro(e);
+        } catch (Exception e) {
+            gerarLogErro("Emissão da NFe", e);
         }
-        redirecTo(this.getClass()).nfexml(xml);
-        // irTopoPagina();
+        redirecTo(this.getClass()).emissaoNFeHome();
+    }
+
+    private void formatarDuplicata(NFe nFe) throws BusinessException {
+        List<DuplicataNFe> lista = null;
+        if ((lista = nFe.getDadosNFe().getListaDuplicata()) == null) {
+            return;
+        }
+        SimpleDateFormat antes = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat depois = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (DuplicataNFe d : lista) {
+            try {
+                d.setDataVencimento(depois.format(antes.parse(d.getDataVencimento())));
+            } catch (ParseException e) {
+                throw new BusinessException("Não foi possível formatar a data de vencimento da duplicata "
+                        + d.getNumero() + ". O valor enviado é \"" + d.getDataVencimento() + "\"");
+            }
+        }
+    }
+
+    private List<Object[]> gerarListaCfop() {
+        List<Object[]> l = nFeService.pesquisarCFOP();
+        for (Object[] cfop : l) {
+            cfop[1] = cfop[0] + " - " + cfop[1];
+            if (cfop[1].toString().length() > 150) {
+                cfop[1] = cfop[1].toString().substring(0, 150);
+            }
+        }
+        return l;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void inicializarListaCfop(HttpServletRequest request) {
+        if ((listaCfop = (List<Object[]>) request.getServletContext().getAttribute("listaCfop")) != null) {
+            return;
+        }
+        listaCfop = gerarListaCfop();
+        request.getServletContext().setAttribute("listaCfop", listaCfop);
     }
 
     public Download nfexml(String xml) {

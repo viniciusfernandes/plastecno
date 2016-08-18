@@ -30,7 +30,7 @@ public class Regiao implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "regiaoSequence")
 	private Integer id;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 50 }, nomeExibicao = "Nome da regiao")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 50 }, nomeExibicao = "Nome da regiao")
 	private String nome;
 
 	@OneToMany(fetch = FetchType.LAZY)

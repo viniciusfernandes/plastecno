@@ -70,6 +70,13 @@ $(document).ready(function() {
 		gerarInputVolume();
 		gerarInputReboque();
 		gerarInputReferenciada();
+		
+		$( "#formEmissao input, #formEmissao textarea" ).each(function(i) {
+			if(isEmpty($(this).val())){
+				$(this).remove();
+			}
+		});
+		
 		$('#formEmissao').submit();
 	});
 	
@@ -337,7 +344,8 @@ function gerarJsonTipoIcms(){
 		          {'nome':'valorBC', 'id':'valorBCICMS'},
 		          {'nome':'valorBCST', 'id':'valorBCSTICMS'},
 		          {'nome':'aliquotaST', 'id':'aliquotaSTICMS'},
-		          {'nome':'motivoDesoneracao', 'id':'motDesonerICMS'}
+		          {'nome':'motivoDesoneracao', 'id':'motDesonerICMS'},
+		          {'nome':'origemMercadoria', 'id':'origemMercadoriaICMS'},
 			]};
 };
 
@@ -396,7 +404,7 @@ function gerarJsonTipoPis(){
 function gerarInputICMS(){
 	var tipoIcms = gerarJsonTipoIcms();
 	var produto = {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe',
-		'campos':[{'nome':'cfop', 'id':'cfop'}]};
+		'campos':[{'nome':'cfop', 'id':'cfop'}, {'nome':'ncm', 'id':'ncm'}]};
 	
 	gerarInputHidden(tipoIcms);
 	gerarInputHidden(produto);
@@ -488,12 +496,13 @@ function gerarInputProdutoServico(){
 		produto = {'nomeObjeto':'nf.listaItem['+i+'].produtoServicoNFe',
 				'campos':[{'nome':'codigo', 'valor': celulas[1].innerHTML},
 				          {'nome':'descricao', 'valor': celulas[1].innerHTML},
-				          {'nome':'ncm', 'valor': celulas[2].innerHTML},
 				          {'nome':'unidadeComercial', 'valor': celulas[4].innerHTML},
 				          {'nome':'quantidadeComercial', 'valor': celulas[5].innerHTML},
 				          {'nome':'quantidadeTributavel', 'valor': celulas[5].innerHTML},
 				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[6].innerHTML},
-				          {'nome':'valorTotalBruto', 'valor': celulas[7].innerHTML}
+				          {'nome':'valorTotalBruto', 'valor': celulas[7].innerHTML},
+				          {'nome':'unidadeTributavel', 'valor': celulas[3].innerHTML},
+				          {'nome':'valorUnitarioTributacao', 'valor': celulas[5].innerHTML}
 					]};
 		
 		gerarInputHidden(detalhamento);
@@ -712,9 +721,9 @@ function editarTributos(linha){
 	
 	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
 	--numeroProdutoEdicao;
-	
 	var valorBC = celulas[6].innerHTML;
 	var valoresTabela = {'campos':[
+								   {'id': 'ncm', 'valorTabela': celulas[2].innerHTML},
 	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[10].innerHTML},
 	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[11].innerHTML},
 	                               {'id': 'valorBCPIS', 'valorTabela': valorBC},
@@ -769,14 +778,14 @@ function editarTributos(linha){
 			<%--div para dar o correto alinhamento dos campos no formulario. Nao teve outra alternativa--%>
 			<div class="input" style="width: 60%">
 			</div>
-			<div class="label">Regime:</div>
+			<%--div class="label">Regime:</div>
 			<div class="input" style="width: 80%">
-				<select id="nf.identificacaoEmitenteNFe.regimeTributario" style="width: 20%" >
+				<select name="nf.identificacaoEmitenteNFe.regimeTributario" style="width: 20%" >
 					<c:forEach var="tipo" items="${listaTipoRegimeTributacao}">
 						<option value="${tipo.codigo}">${tipo.descricao}</option>
 					</c:forEach>
 				</select>
-			</div>
+			</div --%>
 			<div class="label">Tipo Documento:</div>
 			<div class="input" style="width: 10%">
 				<select id="pedidoAssociado"   style="width: 100%">
@@ -1102,14 +1111,21 @@ function editarTributos(linha){
 			
 			<fieldset id="bloco_tributos" class="fieldsetInterno">
 				<legend class="fieldsetInterno">::: Tributos Prod.::: -</legend>
-				<div class="label">CFOP:</div>
-				<div class="input" style="width: 80%">
-					<input id="cfop" type="text" name="cfop" style="width: 10%"/>
-				</div>
-				
 				<div class="divFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
 					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
+					<div class="label">NCM:</div>
+					<div class="input" style="width: 80%">
+						<input type="text" id="ncm" name="ncm" style="width: 20%"/>
+					</div>
+					<div class="label">CFOP:</div>
+					<div class="input" style="width: 80%">
+						<select id="cfop" name="cfop" style="width: 80%">
+							<c:forEach var="cfop" items="${listaCfop}" >
+								<option value="${cfop[0]}">${cfop[1]}</option>
+							</c:forEach>
+						</select>
+					</div>
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="tipoTributacaoICMS" 
@@ -1121,7 +1137,7 @@ function editarTributos(linha){
 					</div>
 					<div class="label">Origem:</div>
 					<div class="input" style="width: 25%">
-						<select id="pedidoAssociado" 
+						<select id="origemMercadoriaICMS" 
 							style="width: 100%" >
 							<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
 								<option value="${origem.codigo}">${origem.descricao}</option>
@@ -1393,7 +1409,7 @@ function editarTributos(linha){
 					</div>
 					<div  class="label">Endereço:</div>
 					<div class="input" style="width: 80%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.enderecoCompleto" value="${transportadora.enderecoCompleto}" style="width: 84%" />
+						<input type="text" name="nf.transporteNFe.transportadoraNFe.enderecoCompleto" value="${transportadora.endereco}" style="width: 84%" />
 					</div>
 					<div  class="label">Município:</div>
 					<div class="input" style="width: 10%">
@@ -1411,7 +1427,7 @@ function editarTributos(linha){
 					<legend>::: Veículo :::</legend>
 					<div  class="label">Placa:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.veiculo.placa" value="${transportadora.cnpj}" style="width: 100%" />
+						<input type="text" name="nf.transporteNFe.veiculo.placa" style="width: 100%" />
 					</div>
 					<div  class="label">UF:</div>
 					<div class="input" style="width: 50%">
@@ -1419,7 +1435,7 @@ function editarTributos(linha){
 					</div>
 					<div  class="label">Regist. Trans. Cargo:</div>
 					<div class="input" style="width: 30%">
-						<input type="text" name="nf.transporteNFe.veiculo.registroNacionalTransportador" value="${transportadora.inscricaoEstadual}"  style="width: 50%" />
+						<input type="text" name="nf.transporteNFe.veiculo.registroNacionalTransportador" style="width: 50%" />
 					</div>
 				</fieldset>
 				</div>

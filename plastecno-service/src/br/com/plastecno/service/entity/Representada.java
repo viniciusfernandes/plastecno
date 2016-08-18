@@ -44,7 +44,7 @@ public class Representada implements Serializable {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Comissão da representada")
 	private double comissao = 0;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Email para envio dos pedidos")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Email para envio dos pedidos")
 	@Column(name = "email")
 	private String email;
 
@@ -54,7 +54,7 @@ public class Representada implements Serializable {
 	private Integer id;
 
 	@Column(name = "insc_estadual")
-	@InformacaoValidavel(intervalo = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual")
+	@InformacaoValidavel(intervaloComprimento = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual")
 	private String inscricaoEstadual;
 
 	@OneToMany(mappedBy = "representada", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
@@ -69,15 +69,15 @@ public class Representada implements Serializable {
 	@JoinColumn(name = "id_logradouro")
 	private Logradouro logradouro;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Nome fantasia")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Nome fantasia")
 	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Razao social")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Razao social")
 	@Column(name = "razao_social")
 	private String razaoSocial;
 
-	@InformacaoValidavel(intervalo = { 1, 150 }, nomeExibicao = "Site da representada")
+	@InformacaoValidavel(intervaloComprimento = { 1, 150 }, nomeExibicao = "Site da representada")
 	@Column(name = "site")
 	private String site;
 

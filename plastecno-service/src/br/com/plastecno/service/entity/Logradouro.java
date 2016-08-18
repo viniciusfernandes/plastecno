@@ -33,7 +33,7 @@ public class Logradouro implements Serializable, Cloneable {
 
 	private Boolean codificado = true;
 
-	@InformacaoValidavel(intervalo = { 1, 250 }, nomeExibicao = "Complemento do logradouro")
+	@InformacaoValidavel(intervaloComprimento = { 1, 250 }, nomeExibicao = "Complemento do logradouro")
 	private String complemento;
 
 	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE,
@@ -153,6 +153,11 @@ public class Logradouro implements Serializable, Cloneable {
 
 	public Integer getId() {
 		return id;
+	}
+
+	public Integer getIdCidade() {
+		return endereco.getCidade() != null ? endereco.getCidade().getId()
+				: null;
 	}
 
 	public Integer getNumero() {

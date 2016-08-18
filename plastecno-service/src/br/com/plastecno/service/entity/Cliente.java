@@ -39,7 +39,7 @@ public class Cliente implements Serializable {
 	 */
 	private static final long serialVersionUID = 4628886058991048859L;
 
-	@InformacaoValidavel(intervalo = { 1, 15 }, tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
+	@InformacaoValidavel(intervaloComprimento = { 1, 15 }, tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
 	private String cnpj;
 
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF do cliente")
@@ -53,7 +53,7 @@ public class Cliente implements Serializable {
 	private String dataUltimoContatoFormatada;
 
 	@Column(name = "documento_estrangeiro")
-	@InformacaoValidavel(intervalo = { 0, 15 }, nomeExibicao = "Documento Estrangeiro")
+	@InformacaoValidavel(intervaloComprimento = { 0, 15 }, nomeExibicao = "Documento Estrangeiro")
 	private String documentoEstrangeiro;
 
 	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email do cliente")
@@ -72,7 +72,7 @@ public class Cliente implements Serializable {
 	private String informacoesAdicionais;
 
 	@Column(name = "insc_estadual")
-	@InformacaoValidavel(intervalo = { 0, 15 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscrição estadual do Cliente")
+	@InformacaoValidavel(intervaloComprimento = { 0, 15 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscrição estadual do Cliente")
 	private String inscricaoEstadual;
 
 	/*
@@ -92,7 +92,7 @@ public class Cliente implements Serializable {
 	@JoinTable(name = "tb_cliente_tb_transportadora", schema = "vendas", joinColumns = { @JoinColumn(name = "id_cliente", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_transportadora", referencedColumnName = "id") })
 	private List<Transportadora> listaRedespacho;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Nome fantasia do cliente")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Nome fantasia do cliente")
 	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
 
@@ -101,7 +101,7 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Ramo de atividade do cliente")
 	private RamoAtividade ramoAtividade;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Razao social do cliente")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Razao social do cliente")
 	@Column(name = "razao_social")
 	private String razaoSocial;
 

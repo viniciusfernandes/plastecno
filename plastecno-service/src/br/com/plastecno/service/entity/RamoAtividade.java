@@ -24,10 +24,10 @@ public class RamoAtividade implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ramoAtividadeSequence")
 	private Integer id;
 	
-	@InformacaoValidavel(obrigatorio=true, intervalo={1, 10}, nomeExibicao="Siga do ramo de atividade")
+	@InformacaoValidavel(obrigatorio=true, intervaloComprimento={1, 10}, nomeExibicao="Siga do ramo de atividade")
 	private String sigla;
 	
-	@InformacaoValidavel(obrigatorio=true, intervalo={1, 100}, nomeExibicao="Descrição do ramo de atividade")
+	@InformacaoValidavel(obrigatorio=true, intervaloComprimento={1, 100}, nomeExibicao="Descrição do ramo de atividade")
 	private String descricao;
 	
 	private boolean ativo = true;

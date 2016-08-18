@@ -3,16 +3,24 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+
+@InformacaoValidavel
 public class ImpostoImportacao {
+
+	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor do imposto de importação")
 	@XmlElement(name = "vII")
 	private Double valor;
 
+	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor da BC do imposto de importação")
 	@XmlElement(name = "vBC")
 	private Double valorBC;
 
+	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor de despesa aduaneira do imposto de importação")
 	@XmlElement(name = "vDespAdu")
 	private Double valorDespesaAduaneira;
 
+	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor da IOF do imposto de importação")
 	@XmlElement(name = "vIOF")
 	private Double valorIOF;
 

@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.*;
+import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
 
 public class COFINS {
@@ -44,11 +45,21 @@ public class COFINS {
 			cofinsST = tipoCofins;
 		} else if (COFINS_99.equals(tribut)) {
 			cofinsOutrasOperacoes = tipoCofins;
+		} else if (COFINS_ST.equals(tribut)) {
+			cofinsST = tipoCofins;
 		}
 		this.tipoConfins = tipoCofins;
 	}
 
 	public void setTipoConfins(COFINSGeral tipoConfins) {
 		this.tipoConfins = tipoConfins;
+	}
+
+	public void validar() throws BusinessException {
+		if (tipoConfins == null) {
+			throw new BusinessException("Tipo de COFINS é obrigatório");
+		}
+
+		tipoConfins.validar();
 	}
 }

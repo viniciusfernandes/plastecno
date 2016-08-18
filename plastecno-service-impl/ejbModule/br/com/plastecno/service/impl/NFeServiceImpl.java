@@ -6,18 +6,26 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.ConfiguracaoSistemaService;
+import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
+import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
+import br.com.plastecno.service.dao.GenericDAO;
 import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.PedidoNFe;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
@@ -31,6 +39,7 @@ import br.com.plastecno.service.nfe.TributosProdutoServico;
 import br.com.plastecno.service.nfe.ValoresTotaisICMS;
 import br.com.plastecno.service.nfe.ValoresTotaisISSQN;
 import br.com.plastecno.service.nfe.ValoresTotaisNFe;
+import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
 public class NFeServiceImpl implements NFeService {
@@ -39,10 +48,36 @@ public class NFeServiceImpl implements NFeService {
 	private ClienteService clienteService;
 
 	@EJB
+	private ConfiguracaoSistemaService configuracaoSistemaService;
+
+	@PersistenceContext(name = "plastecno")
+	private EntityManager entityManager;
+
+	@EJB
+	private LogradouroService logradouroService;
+
+	private GenericDAO<PedidoNFe> pedidoNFeDAO = null;
+
+	@EJB
 	private PedidoService pedidoService;
 
 	@EJB
 	private RepresentadaService representadaService;
+
+	private void carregarConfiguracao(NFe nFe) {
+		nFe.getDadosNFe().setId(
+				"12345678901234567890123456789012345678901234567");
+		nFe.getDadosNFe().getIdentificacaoEmitenteNFe()
+				.setCNAEFiscal("1234567");
+		ProdutoServicoNFe p = null;
+		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe()
+				.getListaDetalhamentoProdutoServicoNFe()) {
+			p = d.getProdutoServicoNFe();
+			p.setEAN("EanTEste");
+			p.setEANTributavel("EanTEste");
+			p.setIndicadorValorTotal(1);
+		}
+	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -60,6 +95,8 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setInscricaoEstadual(emitente.getInscricaoEstadual());
 		iEmit.setNomeFantasia(emitente.getNomeFantasia());
 		iEmit.setRazaoSocial(emitente.getRazaoSocial());
+		iEmit.setRegimeTributario(configuracaoSistemaService
+				.pesquisar(ParametroConfiguracaoSistema.REGIME_TRIBUTACAO));
 
 		EnderecoNFe endEmit = gerarEnderecoNFe(
 				representadaService.pesquisarLogradorouro(emitente.getId()),
@@ -87,6 +124,7 @@ public class NFeServiceImpl implements NFeService {
 		TributosProdutoServico tributo = null;
 		double valorBC = 0;
 		double valorBCST = 0;
+		double valorST = 0;
 		double valorSeguro = 0;
 		double valorFrete = 0;
 		double valorImportacao = 0;
@@ -107,6 +145,7 @@ public class NFeServiceImpl implements NFeService {
 
 				valorBC += tipoIcms.getValorBC();
 				valorBCST += tipoIcms.getValorBCST();
+				valorST += tipoIcms.getValorST();
 				valorICMS += tipoIcms.carregarValoresAliquotas().getValor();
 			}
 
@@ -157,6 +196,7 @@ public class NFeServiceImpl implements NFeService {
 		totaisICMS.setValorTotalDesconto(valorTotalDesconto);
 		totaisICMS.setValorTotalDespAcessorias(valorDespAcessorias);
 		totaisICMS.setValorTotalNF(valorProduto);
+		totaisICMS.setValorTotalST(valorST);
 
 		totaisISSQN.setValorBC(valorBCISS);
 		totaisISSQN.setValorIss(valorISS);
@@ -170,11 +210,20 @@ public class NFeServiceImpl implements NFeService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
 		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
-		return gerarXMLNfe(nFe);
+
+		carregarConfiguracao(nFe);
+
+		ValidadorInformacao.validar(nFe);
+		validarTributos(nFe);
+
+		final String xml = gerarXMLNfe(nFe);
+		pedidoNFeDAO.alterar(new PedidoNFe(idPedido, xml));
+
+		return xml;
 	}
 
 	@Override
@@ -223,6 +272,10 @@ public class NFeServiceImpl implements NFeService {
 		endereco.setUF(logradouro.getUf());
 		endereco.setNomePais(logradouro.getPais());
 		endereco.setTelefone(telefone);
+
+		endereco.setCodigoMunicipio(logradouroService
+				.pesquisarCodigoIBGEByIdCidade(logradouro.getIdCidade()));
+
 		return endereco;
 	}
 
@@ -241,6 +294,32 @@ public class NFeServiceImpl implements NFeService {
 		} catch (Exception e) {
 			throw new BusinessException(
 					"Falha na geracao do XML da NFe do pedido No. ", e);
+		}
+	}
+
+	@PostConstruct
+	public void init() {
+		pedidoNFeDAO = new GenericDAO<PedidoNFe>(entityManager);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Object[]> pesquisarCFOP() {
+		return configuracaoSistemaService.pesquisarCFOP();
+	}
+
+	/*
+	 * Esse metodo foi criado pois nao havia modo de implementar as validacoes
+	 * via anotacoes ja que cada tipo de TRIBUTO valida um campo diferente
+	 */
+	private void validarTributos(NFe nFe) throws BusinessException {
+		TributosProdutoServico t = null;
+		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe()
+				.getListaDetalhamentoProdutoServicoNFe()) {
+			t = d.getTributosProdutoServico();
+			if (t != null) {
+				t.validarTributos();
+			}
 		}
 	}
 }

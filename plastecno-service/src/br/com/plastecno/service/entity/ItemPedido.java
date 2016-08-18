@@ -56,7 +56,7 @@ public class ItemPedido extends Item {
 	private Date dataEntrega;
 
 	@Column(name = "descricao_peca")
-	@InformacaoValidavel(trim = true, intervalo = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
+	@InformacaoValidavel(trim = true, intervaloComprimento = { 1, 100 }, nomeExibicao = "Descrição do item do pedido")
 	private String descricaoPeca;
 
 	@Column(name = "item_encomendado")

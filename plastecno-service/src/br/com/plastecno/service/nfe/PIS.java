@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.*;
+import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 
 public class PIS {
@@ -19,6 +20,9 @@ public class PIS {
 
 	@XmlElement(name = "PISQtde")
 	private PISGeral pisQuantidade;
+
+	@XmlElement(name = "PISST")
+	private PISGeral pisST;
 
 	@XmlTransient
 	private PISGeral tipoPis;
@@ -43,8 +47,17 @@ public class PIS {
 			this.pisNaoTributado = tipoPis;
 		} else if (PIS_99.equals(tribut)) {
 			this.pisOutrasOperacoes = tipoPis;
+		} else if (PIS_ST.equals(tribut)) {
+			this.pisST = tipoPis;
 		}
 		this.tipoPis = tipoPis;
 	}
 
+	public void validar() throws BusinessException {
+		if (tipoPis == null) {
+			throw new BusinessException("Tipo de PIS é obrigatório");
+		}
+
+		tipoPis.validar();
+	}
 }

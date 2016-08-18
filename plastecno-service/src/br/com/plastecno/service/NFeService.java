@@ -23,4 +23,6 @@ public interface NFeService {
 
 	String gerarXMLNfe(NFe nFe) throws BusinessException;
 
+	List<Object[]> pesquisarCFOP();
+
 }

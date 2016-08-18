@@ -1,16 +1,18 @@
 package br.com.plastecno.service.impl;
 
 import java.io.StringWriter;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
@@ -21,7 +23,9 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
+import br.com.plastecno.service.dao.GenericDAO;
 import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.PedidoNFe;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
@@ -46,8 +50,13 @@ public class NFeServiceImpl implements NFeService {
 	@EJB
 	private ConfiguracaoSistemaService configuracaoSistemaService;
 
+	@PersistenceContext(name = "plastecno")
+	private EntityManager entityManager;
+
 	@EJB
 	private LogradouroService logradouroService;
+
+	private GenericDAO<PedidoNFe> pedidoNFeDAO = null;
 
 	@EJB
 	private PedidoService pedidoService;
@@ -196,7 +205,7 @@ public class NFeServiceImpl implements NFeService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
 		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
@@ -205,7 +214,11 @@ public class NFeServiceImpl implements NFeService {
 
 		ValidadorInformacao.validar(nFe);
 		validarTributos(nFe);
-		return gerarXMLNfe(nFe);
+
+		final String xml = gerarXMLNfe(nFe);
+		pedidoNFeDAO.alterar(new PedidoNFe(idPedido, xml));
+
+		return xml;
 	}
 
 	@Override
@@ -277,6 +290,11 @@ public class NFeServiceImpl implements NFeService {
 			throw new BusinessException(
 					"Falha na geracao do XML da NFe do pedido No. ", e);
 		}
+	}
+
+	@PostConstruct
+	public void init() {
+		pedidoNFeDAO = new GenericDAO<PedidoNFe>(entityManager);
 	}
 
 	@Override

@@ -5,6 +5,11 @@ insert into vendas.tb_configuracao_sistema (parametro, valor) values ('PERCENTUA
 insert into vendas.tb_configuracao_sistema (parametro, valor) values ('PERCENTUAL_PIS', '0.65');
 insert into vendas.tb_configuracao_sistema (parametro, valor) values ('REGIME_TRIBUTACAO', '3');
 
+create table vendas.tb_pedido_nfe (
+	id_pedido integer not null,
+	xml_nfe text not null
+);
+ALTER TABLE vendas.tb_pedido_nfe ADD PRIMARY KEY (id_pedido);
 
 create table vendas.tb_cfop (
 	codigo integer not null,

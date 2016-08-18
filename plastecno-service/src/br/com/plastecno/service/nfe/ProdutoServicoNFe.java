@@ -31,6 +31,10 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "EXTIPI")
 	private String EXTIPI;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 0, 1 }, nomeExibicao = "Indicador de composição do valor total produtos/serviços")
+	@XmlElement(name = "indTot")
+	private Integer indicadorValorTotal;
+
 	@XmlElement(name = "nItemPed")
 	private Integer itemPedidoCompra;
 
@@ -44,10 +48,6 @@ public class ProdutoServicoNFe {
 	@InformacaoValidavel(decimal = { 15, 2 }, nomeExibicao = "Outras despesas acessórias do produtos/serviços")
 	@XmlElement(name = "vOutro")
 	private Double outrasDespesasAcessorias;
-
-	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 0, 1 }, nomeExibicao = "Indicador de composição do valor total produtos/serviços")
-	@XmlElement(name = "indTot")
-	private Integer indicadorValorTotal;
 
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,15}\\.{1}\\d{0,4}", nomeExibicao = "Quantidade comercial do produtos/serviços")
 	@XmlElement(name = "qCom")
@@ -93,6 +93,11 @@ public class ProdutoServicoNFe {
 	}
 
 	@XmlTransient
+	public String getUnidadeTributavel() {
+		return unidadeTributavel;
+	}
+
+	@XmlTransient
 	public double getValorDesconto() {
 		return valorDesconto == null ? 0 : valorDesconto;
 	}
@@ -134,6 +139,10 @@ public class ProdutoServicoNFe {
 
 	public void setEXTIPI(String eXTIPI) {
 		EXTIPI = eXTIPI;
+	}
+
+	public void setIndicadorValorTotal(Integer indicadorValorTotal) {
+		this.indicadorValorTotal = indicadorValorTotal;
 	}
 
 	public void setItemPedidoCompra(Integer itemPedidoCompra) {

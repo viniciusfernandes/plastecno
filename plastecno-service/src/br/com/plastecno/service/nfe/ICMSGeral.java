@@ -108,7 +108,7 @@ public class ICMSGeral {
 
 	@XmlTransient
 	public Double getValorST() {
-		return valorST;
+		return valorST == null ? 0 : valorST;
 	}
 
 	public void setAliquota(Double aliquota) {

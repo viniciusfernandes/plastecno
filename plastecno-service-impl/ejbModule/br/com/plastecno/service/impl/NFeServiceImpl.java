@@ -69,11 +69,13 @@ public class NFeServiceImpl implements NFeService {
 				"12345678901234567890123456789012345678901234567");
 		nFe.getDadosNFe().getIdentificacaoEmitenteNFe()
 				.setCNAEFiscal("1234567");
+		ProdutoServicoNFe p = null;
 		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe()
 				.getListaDetalhamentoProdutoServicoNFe()) {
-			d.getProdutoServicoNFe().setEAN("EanTEste");
-			d.getProdutoServicoNFe().setEANTributavel("EanTEste");
-
+			p = d.getProdutoServicoNFe();
+			p.setEAN("EanTEste");
+			p.setEANTributavel("EanTEste");
+			p.setIndicadorValorTotal(1);
 		}
 	}
 
@@ -122,6 +124,7 @@ public class NFeServiceImpl implements NFeService {
 		TributosProdutoServico tributo = null;
 		double valorBC = 0;
 		double valorBCST = 0;
+		double valorST = 0;
 		double valorSeguro = 0;
 		double valorFrete = 0;
 		double valorImportacao = 0;
@@ -142,6 +145,7 @@ public class NFeServiceImpl implements NFeService {
 
 				valorBC += tipoIcms.getValorBC();
 				valorBCST += tipoIcms.getValorBCST();
+				valorST += tipoIcms.getValorST();
 				valorICMS += tipoIcms.carregarValoresAliquotas().getValor();
 			}
 
@@ -192,6 +196,7 @@ public class NFeServiceImpl implements NFeService {
 		totaisICMS.setValorTotalDesconto(valorTotalDesconto);
 		totaisICMS.setValorTotalDespAcessorias(valorDespAcessorias);
 		totaisICMS.setValorTotalNF(valorProduto);
+		totaisICMS.setValorTotalST(valorST);
 
 		totaisISSQN.setValorBC(valorBCISS);
 		totaisISSQN.setValorIss(valorISS);

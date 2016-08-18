@@ -344,7 +344,8 @@ function gerarJsonTipoIcms(){
 		          {'nome':'valorBC', 'id':'valorBCICMS'},
 		          {'nome':'valorBCST', 'id':'valorBCSTICMS'},
 		          {'nome':'aliquotaST', 'id':'aliquotaSTICMS'},
-		          {'nome':'motivoDesoneracao', 'id':'motDesonerICMS'}
+		          {'nome':'motivoDesoneracao', 'id':'motDesonerICMS'},
+		          {'nome':'origemMercadoria', 'id':'origemMercadoriaICMS'},
 			]};
 };
 
@@ -499,7 +500,9 @@ function gerarInputProdutoServico(){
 				          {'nome':'quantidadeComercial', 'valor': celulas[5].innerHTML},
 				          {'nome':'quantidadeTributavel', 'valor': celulas[5].innerHTML},
 				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[6].innerHTML},
-				          {'nome':'valorTotalBruto', 'valor': celulas[7].innerHTML}
+				          {'nome':'valorTotalBruto', 'valor': celulas[7].innerHTML},
+				          {'nome':'unidadeTributavel', 'valor': celulas[3].innerHTML},
+				          {'nome':'valorUnitarioTributacao', 'valor': celulas[5].innerHTML}
 					]};
 		
 		gerarInputHidden(detalhamento);
@@ -1134,7 +1137,7 @@ function editarTributos(linha){
 					</div>
 					<div class="label">Origem:</div>
 					<div class="input" style="width: 25%">
-						<select id="pedidoAssociado" 
+						<select id="origemMercadoriaICMS" 
 							style="width: 100%" >
 							<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
 								<option value="${origem.codigo}">${origem.descricao}</option>

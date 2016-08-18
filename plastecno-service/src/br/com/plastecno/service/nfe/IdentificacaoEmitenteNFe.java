@@ -14,7 +14,7 @@ public class IdentificacaoEmitenteNFe {
 	@XmlElement(name = "CNPJ")
 	private String CNPJ;
 
-	@InformacaoValidavel(obrigatorio = true, tamanho = 11, nomeExibicao = "CPF do remetente")
+	@InformacaoValidavel(tamanho = 11, nomeExibicao = "CPF do emitente")
 	@XmlElement(name = "CPF")
 	private String CPF;
 

@@ -17,6 +17,8 @@ public @interface InformacaoValidavel {
 
 	boolean estritamentePositivo() default false;
 
+	String fromPadrao() default "";
+
 	int[] intervaloComprimento() default {};
 
 	double[] intervaloNumerico() default {};
@@ -30,6 +32,8 @@ public @interface InformacaoValidavel {
 	boolean obrigatorio() default false;
 
 	String padrao() default "";
+
+	String padraoData() default "";
 
 	String padraoExemplo() default "";
 
@@ -45,9 +49,11 @@ public @interface InformacaoValidavel {
 
 	TipoDocumento tipoDocumento() default TipoDocumento.NAO_EH_DOCUMENTO;
 
+	String toPadrao() default "";
+
 	boolean trim() default false;
 
 	boolean validarHierarquia() default false;
 
-	double[] valores() default {};
+	int[] valoresInteiros() default {};
 }

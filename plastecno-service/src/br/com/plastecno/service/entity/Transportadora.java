@@ -108,11 +108,11 @@ public class Transportadora implements Serializable {
 				.get(0) : null;
 	}
 
-	public String getEnderecoCompleto() {
+	public String getEndereco() {
 		if (logradouro == null) {
 			return "";
 		}
-		return logradouro.getDescricao();
+		return logradouro.getEndereco();
 	}
 
 	public Integer getId() {

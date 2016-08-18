@@ -16,7 +16,7 @@ public class TransporteNFe {
 	@XmlElement(name = "vol")
 	private List<VolumeTransportado> listaVolume;
 
-	@InformacaoValidavel(obrigatorio = true, valores = { 0, 1, 2, 9 }, nomeExibicao = "Modalidade do frete da transporte")
+	@InformacaoValidavel(obrigatorio = true, valoresInteiros = { 0, 1, 2, 9 }, nomeExibicao = "Modalidade do frete da transporte")
 	@XmlElement(name = "modFrete")
 	private Integer modalidadeFrete;
 

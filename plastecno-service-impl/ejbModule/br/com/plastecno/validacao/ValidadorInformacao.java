@@ -29,7 +29,7 @@ public final class ValidadorInformacao {
 		Field[] camposValidaveis = recuperarCamposValidaveis(obj);
 		boolean isString = false;
 		int[] tamanhos = null;
-		double[] valores = null;
+		int[] valores = null;
 		boolean ok = false;
 		for (Field campo : camposValidaveis) {
 			InformacaoValidavel informacao = campo
@@ -117,7 +117,7 @@ public final class ValidadorInformacao {
 				continue;
 			}
 
-			if (informacao.tamanho() >= 0
+			if (conteudoCampo != null && informacao.tamanho() >= 0
 					&& COMPRIMENTO_STRING != informacao.tamanho()) {
 				listaMensagem.add(informacao.nomeExibicao()
 						+ " deve conter apenas " + informacao.tamanho()
@@ -145,7 +145,7 @@ public final class ValidadorInformacao {
 				continue;
 			}
 
-			valores = informacao.valores();
+			valores = informacao.valoresInteiros();
 			if (valores.length > 0) {
 				ok = false;
 				for (int i = 0; i < valores.length; i++) {

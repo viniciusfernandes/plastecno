@@ -80,8 +80,18 @@ public class DadosNFe {
 	}
 
 	@XmlTransient
+	public IdentificacaoEmitenteNFe getIdentificacaoEmitenteNFe() {
+		return identificacaoEmitenteNFe;
+	}
+
+	@XmlTransient
 	public List<DetalhamentoProdutoServicoNFe> getListaDetalhamentoProdutoServicoNFe() {
 		return listaDetalhamentoProdutoServicoNFe;
+	}
+
+	@XmlTransient
+	public List<DuplicataNFe> getListaDuplicata() {
+		return cobrancaNFe != null ? cobrancaNFe.getListaDuplicata() : null;
 	}
 
 	@XmlTransient

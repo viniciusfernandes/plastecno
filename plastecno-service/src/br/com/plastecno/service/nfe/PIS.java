@@ -6,8 +6,9 @@ import javax.xml.bind.annotation.XmlTransient;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.*;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
+import br.com.plastecno.service.validacao.Validavel;
 
-public class PIS {
+public class PIS implements Validavel {
 
 	@XmlElement(name = "PISAliq")
 	private PISGeral pisAliquota;

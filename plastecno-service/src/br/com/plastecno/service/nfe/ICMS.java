@@ -7,10 +7,9 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
-import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+import br.com.plastecno.service.validacao.Validavel;
 
-@InformacaoValidavel
-public class ICMS {
+public class ICMS implements Validavel {
 	@XmlElement(name = "ICMS00")
 	private ICMSGeral icms00;
 
@@ -72,6 +71,7 @@ public class ICMS {
 		}
 	}
 
+	@Override
 	public void validar() throws BusinessException {
 		if (tipoIcms == null) {
 			throw new BusinessException("Tipo de ICMS é obrigatório");

@@ -1201,6 +1201,66 @@ function editarTributos(linha){
 				</div>
 				
 				<div class="divFieldset">
+				<fieldset id="bloco_cofins" class="fieldsetInterno">
+					<legend>::: COFINS Prod.::: +</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="codSitTribCOFINS" style="width: 45%">
+							<c:forEach var="tipo" items="${listaTipoTributacaoCOFINS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 50%">
+						<input id="aliquotaCOFINS" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Qtde. Vendida:</div>
+					<div class="input" style="width: 10%">
+						<input id="qtdeVendidaCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_pis" class="fieldsetInterno">
+					<legend>::: PIS Prod.::: +</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="codSitTribPIS" style="width: 45%">
+							<c:forEach var="tipo" items="${listaTipoTributacaoPIS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCPIS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 50%">
+						<input id="aliquotaPIS" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Qtde.Vendida:</div>
+					<div class="input" style="width: 10%">
+						<input id="qtdeVendidaPIS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparPIS" title="Limpar PIS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
 				<fieldset id="bloco_ipi" class="fieldsetInterno">
 					<legend>::: IPI Prod.::: +</legend>
 					<div class="label">Situação Tribut.:</div>
@@ -1250,66 +1310,6 @@ function editarTributos(linha){
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirIPI" title="Inserir IPI do Produto" value="" class="botaoInserir"/>
 						<input type="button" id="botaoLimparIPI" title="Limpar IPI do Produto" value="" class="botaoLimpar"/>
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_pis" class="fieldsetInterno">
-					<legend>::: PIS Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 80%">
-						<select id="codSitTribPIS" style="width: 45%">
-							<c:forEach var="tipo" items="${listaTipoTributacaoPIS}">
-								<option value="${tipo.codigo}">${tipo.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCPIS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaPIS" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Qtde.Vendida:</div>
-					<div class="input" style="width: 10%">
-						<input id="qtdeVendidaPIS" type="text" style="width: 100%" />
-					</div>
-					<div class="bloco_botoes">
-						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparPIS" title="Limpar PIS do Produto" value="" class="botaoLimpar"/>
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_cofins" class="fieldsetInterno">
-					<legend>::: COFINS Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 80%">
-						<select id="codSitTribCOFINS" style="width: 45%">
-							<c:forEach var="tipo" items="${listaTipoTributacaoCOFINS}">
-								<option value="${tipo.codigo}">${tipo.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCCOFINS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaCOFINS" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Qtde. Vendida:</div>
-					<div class="input" style="width: 10%">
-						<input id="qtdeVendidaCOFINS" type="text" style="width: 100%" />
-					</div>
-					<div class="bloco_botoes">
-						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
 				</div>

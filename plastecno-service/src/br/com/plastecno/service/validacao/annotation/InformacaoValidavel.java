@@ -13,6 +13,8 @@ import br.com.plastecno.service.constante.TipoDocumento;
 public @interface InformacaoValidavel {
 	boolean cascata() default false;
 
+	boolean customizado() default false;
+
 	int[] decimal() default {};
 
 	boolean estritamentePositivo() default false;
@@ -55,5 +57,6 @@ public @interface InformacaoValidavel {
 
 	boolean validarHierarquia() default false;
 
-	int[] valoresInteiros() default {};
+	int[] valores() default {};
+
 }

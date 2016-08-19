@@ -5,9 +5,10 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
+import br.com.plastecno.service.validacao.Validavel;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.*;
 
-public class IPI {
+public class IPI implements Validavel {
 	@XmlElement(name = "cEnq")
 	private String classeEnquadramento;
 

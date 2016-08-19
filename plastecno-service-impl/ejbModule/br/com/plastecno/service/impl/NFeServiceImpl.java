@@ -218,7 +218,6 @@ public class NFeServiceImpl implements NFeService {
 		carregarConfiguracao(nFe);
 
 		ValidadorInformacao.validar(nFe);
-		validarTributos(nFe);
 
 		final String xml = gerarXMLNfe(nFe);
 		pedidoNFeDAO.alterar(new PedidoNFe(idPedido, xml));
@@ -306,20 +305,5 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Object[]> pesquisarCFOP() {
 		return configuracaoSistemaService.pesquisarCFOP();
-	}
-
-	/*
-	 * Esse metodo foi criado pois nao havia modo de implementar as validacoes
-	 * via anotacoes ja que cada tipo de TRIBUTO valida um campo diferente
-	 */
-	private void validarTributos(NFe nFe) throws BusinessException {
-		TributosProdutoServico t = null;
-		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe()
-				.getListaDetalhamentoProdutoServicoNFe()) {
-			t = d.getTributosProdutoServico();
-			if (t != null) {
-				t.validarTributos();
-			}
-		}
 	}
 }

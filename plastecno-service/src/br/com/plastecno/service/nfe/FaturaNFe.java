@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -21,6 +22,26 @@ public class FaturaNFe {
 	@InformacaoValidavel(decimal = { 15, 2 }, nomeExibicao = "Valor original da fatura")
 	@XmlElement(name = "vOrig")
 	private Double valorOriginal;
+
+	@XmlTransient
+	public String getNumero() {
+		return numero;
+	}
+
+	@XmlTransient
+	public Double getValorDesconto() {
+		return valorDesconto;
+	}
+
+	@XmlTransient
+	public Double getValorLiquido() {
+		return valorLiquido;
+	}
+
+	@XmlTransient
+	public Double getValorOriginal() {
+		return valorOriginal;
+	}
 
 	public void setNumero(String numero) {
 		this.numero = numero;

@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -17,6 +18,21 @@ public class VeiculoTransporte {
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 8 }, nomeExibicao = "Placa do veículo")
 	@XmlElement(name = "UF")
 	private String uf;
+
+	@XmlTransient
+	public String getPlaca() {
+		return placa;
+	}
+
+	@XmlTransient
+	public String getRegistroNacionalTransportador() {
+		return registroNacionalTransportador;
+	}
+
+	@XmlTransient
+	public String getUf() {
+		return uf;
+	}
 
 	public void setPlaca(String placa) {
 		this.placa = placa;

@@ -20,12 +20,14 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.NFe;
+import br.com.plastecno.service.nfe.TransportadoraNFe;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
@@ -109,7 +111,7 @@ public class EmissaoNFeController extends AbstractController {
             redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(nFe, idPedido));
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
-            repopularNFe(nf, idPedido);
+            popularNFe(nf, idPedido);
             redirecTo(this.getClass()).emissaoNFeHome();
         } catch (Exception e) {
             gerarLogErro("Emissão da NFe", e);
@@ -180,25 +182,7 @@ public class EmissaoNFeController extends AbstractController {
         irTopoPagina();
     }
 
-    private void repopularNFe(DadosNFe nf, Integer idPedido) {
-        emissaoNFeHome();
-
-        repopularDestinatario(nf);
-
-        List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-        formatarItemPedido(listaItem);
-
-        addAtributo("idPedido", idPedido);
-        addAtributo("nf", nf);
-        addAtributo("listaItem", listaItem);
-
-        addAtributo("finalidadeEmissaoSelecionada", nf.getIdentificacaoNFe().getFinalidadeEmissao());
-        addAtributo("formaPagamentoSelecionada", nf.getIdentificacaoNFe().getIndicadorFormaPagamento());
-        addAtributo("tipoEmissaoSelecionada", nf.getIdentificacaoNFe().getTipoEmissao());
-        addAtributo("tipoImpressaoSelecionada", nf.getIdentificacaoNFe().getTipoImpressao());
-    }
-
-    private void repopularDestinatario(DadosNFe nf) {
+    private void popularDestinatario(DadosNFe nf) {
         IdentificacaoDestinatarioNFe d = nf.getIdentificacaoDestinatarioNFe();
         Cliente c = new Cliente();
         c.setRazaoSocial(d.getNomeFantasia());
@@ -222,5 +206,39 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("cliente", c);
         addAtributo("logradouro", l);
         addAtributo("telefoneContatoPedido", d.getEnderecoDestinatarioNFe().getTelefone());
+    }
+
+    private void popularNFe(DadosNFe nf, Integer idPedido) {
+        emissaoNFeHome();
+
+        popularDestinatario(nf);
+        popularTransporte(nf);
+
+        List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+        formatarItemPedido(listaItem);
+
+        addAtributo("idPedido", idPedido);
+        addAtributo("nf", nf);
+        addAtributo("listaItem", listaItem);
+
+        addAtributo("finalidadeEmissaoSelecionada", nf.getIdentificacaoNFe().getFinalidadeEmissao());
+        addAtributo("formaPagamentoSelecionada", nf.getIdentificacaoNFe().getIndicadorFormaPagamento());
+        addAtributo("tipoEmissaoSelecionada", nf.getIdentificacaoNFe().getTipoEmissao());
+        addAtributo("tipoImpressaoSelecionada", nf.getIdentificacaoNFe().getTipoImpressao());
+        addAtributo("listaDuplicata", nf.getCobrancaNFe().getListaDuplicata());
+    }
+
+    private void popularTransporte(DadosNFe nf) {
+        TransportadoraNFe tnfe = nf.getTransporteNFe().getTransportadoraNFe();
+        Transportadora t = new Transportadora();
+        t.setRazaoSocial(tnfe.getRazaoSocial());
+        t.setCnpj(tnfe.getCnpj());
+        t.setInscricaoEstadual(tnfe.getInscricaoEstadual());
+        t.setEndereco(tnfe.getEnderecoCompleto());
+        t.setCidade(tnfe.getMunicipio());
+        t.setUf(tnfe.getUf());
+
+        addAtributo("modalidadeFreteSelecionada", nf.getTransporteNFe().getModalidadeFrete());
+        addAtributo("transportadora", t);
     }
 }

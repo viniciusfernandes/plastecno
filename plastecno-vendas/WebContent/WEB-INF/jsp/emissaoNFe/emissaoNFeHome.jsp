@@ -1395,7 +1395,7 @@ function editarTributos(linha){
 			<div class="input" style="width: 80%">
 			<select id="modFrete" name="nf.transporteNFe.modalidadeFrete" style="width: 45%">
 				<c:forEach var="tipo" items="${listaTipoModalidadeFrete}">
-					<option value="${tipo.codigo}">${tipo.descricao}</option>
+					<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq modalidadeFreteSelecionada}">selected</c:if>>${tipo.descricao}</option>
 				</c:forEach>
 			</select>
 			</div>
@@ -1439,15 +1439,16 @@ function editarTributos(linha){
 					<legend>::: Veículo :::</legend>
 					<div  class="label">Placa:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.veiculo.placa" style="width: 100%" />
+						<input type="text" name="nf.transporteNFe.veiculo.placa" value="${nf.transporteNFe.veiculo.placa}" style="width: 100%" />
 					</div>
 					<div  class="label">UF:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.veiculo.uf" style="width: 20%" />
+						<input type="text" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" style="width: 20%" />
 					</div>
 					<div  class="label">Regist. Trans. Cargo:</div>
 					<div class="input" style="width: 30%">
-						<input type="text" name="nf.transporteNFe.veiculo.registroNacionalTransportador" style="width: 50%" />
+						<input type="text" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
+							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" style="width: 50%" />
 					</div>
 				</fieldset>
 				</div>
@@ -1483,6 +1484,14 @@ function editarTributos(linha){
 						
 						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
 						<tbody>
+							<c:forEach var="reboque" items="${nf.transporteNFe.listaReboque}">
+							<tr>
+								<td>${reboque.placa}</td>
+								<td>${reboque.uf}</td>
+								<td>${reboque.registroNacionalTransportador}</td>
+								<td><input type="button" title="Remover Reboque" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+							</tr>
+							</c:forEach>
 						</tbody>
 					</table>
 				</fieldset>
@@ -1576,20 +1585,20 @@ function editarTributos(linha){
 			<legend>::: Cobrança :::</legend>
 			<div class="label">Número:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" name="nf.cobrancaNFe.faturaNFe.numero"/>
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.numero" value="${nf.cobrancaNFe.faturaNFe.numero}"/>
 			</div>
 			
 			<div class="label">Valor Original:</div>
 			<div class="input" style="width: 55%">
-				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorOriginal" style="width: 20%"/>
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorOriginal" value="${nf.cobrancaNFe.faturaNFe.valorOriginal}" style="width: 20%"/>
 			</div>
 			<div class="label">Valor Desconto:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorDesconto" />
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorDesconto" value="${nf.cobrancaNFe.faturaNFe.valorDesconto}"/>
 			</div>
 			<div class="label">Valor Líquido:</div>
 			<div class="input" style="width: 55%">
-				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorLiquido" style="width: 20%"/>
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorLiquido" value="${nf.cobrancaNFe.faturaNFe.valorLiquido}" style="width: 20%"/>
 			</div>
 			
 			<div class="divFieldset">
@@ -1643,26 +1652,26 @@ function editarTributos(linha){
 			<legend>::: Exportação ::: -</legend>
 			<div class="label">UF Embarque:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.exportacaoNFe.ufEmbarque" style="width: 5%"/>
+				<input type="text" name="nf.exportacaoNFe.ufEmbarque" value="${nf.exportacaoNFe.ufEmbarque}" style="width: 5%"/>
 			</div>
 			<div class="label">Local Embarque:</div>
 			<div class="input" style="width: 60%">
-				<input type="text" name="nf.exportacaoNFe.localEmbarque"/>
+				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}"/>
 			</div>		
 		</fieldset>
 		<fieldset id="bloco_compra">
 			<legend>::: Compra ::: -</legend>
 			<div class="label">Nota Empenho:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.notaEmpenho" style="width: 10%"/>
+				<input type="text" name="nf.compraNFe.notaEmpenho" value="${nf.compraNFe.notaEmpenho}" style="width: 10%"/>
 			</div>
 			<div class="label">Pedido:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.pedido" style="width: 50%"/>
+				<input type="text" name="nf.compraNFe.pedido" value="${nf.compraNFe.pedido}" style="width: 50%"/>
 			</div>
 			<div class="label">Contrato:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.contrato" style="width: 50%"/>
+				<input type="text" name="nf.compraNFe.contrato" value="${nf.compraNFe.contrato}" style="width: 50%"/>
 			</div>		
 		</fieldset>
 		<div class="bloco_botoes">

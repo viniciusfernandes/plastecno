@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.constante.RegexValidacao;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
@@ -42,6 +43,51 @@ public class IdentificacaoLocalGeral {
 	@InformacaoValidavel(obrigatorio = true, tamanho = 2, nomeExibicao = "UF do local do produto")
 	@XmlElement(name = "UF")
 	private String uf;
+
+	@XmlTransient
+	public String getBairro() {
+		return bairro;
+	}
+
+	@XmlTransient
+	public String getCnpj() {
+		return cnpj;
+	}
+
+	@XmlTransient
+	public Integer getCodigoMunicipio() {
+		return codigoMunicipio;
+	}
+
+	@XmlTransient
+	public String getComplemento() {
+		return complemento;
+	}
+
+	@XmlTransient
+	public String getCpf() {
+		return cpf;
+	}
+
+	@XmlTransient
+	public String getLogradouro() {
+		return logradouro;
+	}
+
+	@XmlTransient
+	public String getMunicipio() {
+		return municipio;
+	}
+
+	@XmlTransient
+	public String getNumero() {
+		return numero;
+	}
+
+	@XmlTransient
+	public String getUf() {
+		return uf;
+	}
 
 	public void setBairro(String bairro) {
 		this.bairro = bairro;

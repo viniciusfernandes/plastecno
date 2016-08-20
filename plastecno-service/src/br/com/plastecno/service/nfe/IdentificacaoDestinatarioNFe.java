@@ -40,6 +40,16 @@ public class IdentificacaoDestinatarioNFe {
 	private String nomeFantasia;
 
 	@XmlTransient
+	public String getCnpj() {
+		return cnpj;
+	}
+
+	@XmlTransient
+	public String getCpf() {
+		return cpf;
+	}
+
+	@XmlTransient
 	public String getEmail() {
 		return email;
 	}
@@ -47,6 +57,26 @@ public class IdentificacaoDestinatarioNFe {
 	@XmlTransient
 	public EnderecoNFe getEnderecoDestinatarioNFe() {
 		return enderecoDestinatarioNFe;
+	}
+
+	@XmlTransient
+	public String getInscricaoEstadual() {
+		return inscricaoEstadual;
+	}
+
+	@XmlTransient
+	public String getInscricaoMunicipal() {
+		return inscricaoMunicipal;
+	}
+
+	@XmlTransient
+	public String getInscricaoSUFRAMA() {
+		return inscricaoSUFRAMA;
+	}
+
+	@XmlTransient
+	public String getNomeFantasia() {
+		return nomeFantasia;
 	}
 
 	public void setCnpj(String cnpj) {

@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -11,6 +12,16 @@ public class NFeReferenciada {
 
 	@XmlElement(name = "refNF")
 	private IdentificacaoNFeReferenciada identificacaoNFeReferenciada;
+
+	@XmlTransient
+	public Long getChaveAcessoReferenciada() {
+		return chaveAcessoReferenciada;
+	}
+
+	@XmlTransient
+	public IdentificacaoNFeReferenciada getIdentificacaoNFeReferenciada() {
+		return identificacaoNFeReferenciada;
+	}
 
 	public void setChaveAcessoReferenciada(Long chaveAcessoReferenciada) {
 		this.chaveAcessoReferenciada = chaveAcessoReferenciada;

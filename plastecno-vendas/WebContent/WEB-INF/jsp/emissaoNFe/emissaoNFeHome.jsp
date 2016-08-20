@@ -798,7 +798,7 @@ function editarTributos(linha){
 			<div class="input" style="width: 10%">
 				<select id="pedidoAssociado" name="nf.identificacaoNFe.indicadorFormaPagamento"  style="width: 100%">
 					<c:forEach var="formaPagamento" items="${listaTipoFormaPagamento}">
-						<option value="${formaPagamento.codigo}" <c:if test="${formaPagamento eq formaPagamentoPadrao}">selected</c:if>>${formaPagamento.descricao}</option>
+						<option value="${formaPagamento.codigo}" <c:if test="${formaPagamento.codigo eq formaPagamentoSelecionada}">selected</c:if>>${formaPagamento.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -806,7 +806,7 @@ function editarTributos(linha){
 			<div class="input" style="width: 20%">
 				<select name="nf.identificacaoNFe.tipoEmissao"  style="width: 50%">
 					<c:forEach var="tipoEmissao" items="${listaTipoEmissao}">
-						<option value="${tipoEmissao.codigo}" <c:if test="${tipoEmissao eq tipoEmissaoPadrao}">selected</c:if>>${tipoEmissao.descricao}</option>
+						<option value="${tipoEmissao.codigo}" <c:if test="${tipoEmissao.codigo eq tipoEmissaoSelecionada}">selected</c:if>>${tipoEmissao.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -815,15 +815,15 @@ function editarTributos(linha){
 				<select name="nf.identificacaoNFe.finalidadeEmissao"
 					style="width: 100%" >
 					<c:forEach var="finalidade" items="${listaTipoFinalidadeEmissao}">
-						<option value="${finalidade.codigo}" <c:if test="${finalidade eq finalidadeEmissaoPadrao}">selected</c:if>>${finalidade.descricao}</option>
+						<option value="${finalidade.codigo}" <c:if test="${finalidade.codigo eq finalidadeEmissaoSelecionada}">selected</c:if>>${finalidade.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
 			<div class="label">Tipo Impressão:</div>
 			<div class="input" style="width: 10%">
-				<select style="width: 100%">
+				<select name="nf.identificacaoNFe.tipoImpressao" style="width: 100%">
 					<c:forEach var="tipo" items="${listaTipoImpressao}">
-						<option value="${tipo.codigo}">${tipo.descricao}</option>
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoImpressaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -849,15 +849,15 @@ function editarTributos(linha){
 			</div>
 			<div class="label">Natureza Operação:</div>
 			<div class="input" style="width: 50%">
-				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" style="width: 80%"/>
+				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 80%"/>
 			</div>
 			<div class="label">Info. Adicionais Fisco:</div>
 			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%"></textarea>
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco}</textarea>
 			</div>
 			<div class="label">Info. Adicionais Contrib.:</div>
 			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte" style="width: 100%"></textarea>
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte}</textarea>
 			</div>
 		</fieldset>
 		
@@ -869,23 +869,23 @@ function editarTributos(linha){
 			</div>
 			<div class="label">Núm. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="numeroReferenciada" />
+				<input type="text" id="numeroReferenciada"/>
 			</div>
 			<div class="label">Série. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="serieReferenciada" />
+				<input type="text" id="serieReferenciada"/>
 			</div>
 			<div class="label">Mod. Doc. Fiscal:</div>
 			<div class="input" style="width: 30%">
-				<input type="text" id="modReferenciada" style="width: 30%"/>
+				<input type="text" id="modReferenciada"/>
 			</div>
 			<div class="label">CNPJ Emit.:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="cnpjReferenciada" />
+				<input type="text" id="cnpjReferenciada"/>
 			</div>
 			<div class="label">Emis. Ano/Mês (AAMM):</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="anoMesReferenciada" />
+				<input type="text" id="anoMesReferenciada"/>
 			</div>
 			<div class="label">UF Emit.:</div>
 			<div class="input" style="width: 10%">
@@ -910,6 +910,18 @@ function editarTributos(linha){
 						
 				<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
 				<tbody>
+					<c:forEach var="ref" items="${nf.identificacaoNFe.listaNFeReferenciada}">
+					<tr>
+						<td>${ref.chaveAcessoReferenciada}</td>
+						<td>${ref.identificacaoNFeReferenciada.numeroNF}</td>
+						<td>${ref.identificacaoNFeReferenciada.serie}</td>
+						<td>${ref.identificacaoNFeReferenciada.modelo}</td>
+						<td>${ref.identificacaoNFeReferenciada.cnpjEmitente}</td>
+						<td>${ref.identificacaoNFeReferenciada.anoMes}</td>
+						<td>${ref.identificacaoNFeReferenciada.ufEmitente}</td>
+						<td><input type="button" title="Remover Registro" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+					</tr>
+					</c:forEach>
 				</tbody>
 			</table>
 		</fieldset>
@@ -921,11 +933,11 @@ function editarTributos(linha){
 				<legend>::: Local Retirada :::</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">
-					<input type="text" name="nf.identificacaoLocalRetirada.cnpj"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.cnpj" value="${nf.identificacaoLocalRetirada.cnpj}"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 50%">
-					<input type="text" name="nf.identificacaoLocalRetirada.cpf" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.cpf" value="${nf.identificacaoLocalRetirada.cpf}" style="width: 30%"/>
 				</div>
 				<div class="label condicional">CEP:</div>
 				<div class="input" style="width: 10%">
@@ -938,27 +950,27 @@ function editarTributos(linha){
 				</div>
 				<div class="label">Endereço:</div>
 				<div class="input" style="width: 40%">
-					<input type="text" id="enderecoRetirada" name="nf.identificacaoLocalRetirada.logradouro"/>
+					<input type="text" id="enderecoRetirada" name="nf.identificacaoLocalRetirada.logradouro" value="${nf.identificacaoLocalRetirada.logradouro}"/>
 				</div>
 				<div class="label" style="width: 8%">Número:</div>
 				<div class="input" style="width: 30%">
-					<input type="text" name="nf.identificacaoLocalRetirada.numero" style="width: 20%"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.numero" value="${nf.identificacaoLocalRetirada.numero}" style="width: 20%"/>
 				</div>
 				<div class="label">Complemento:</div>
 				<div class="input" style="width: 70%">
-					<input type="text" name="nf.identificacaoLocalRetirada.complemento" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.complemento" value="${nf.identificacaoLocalRetirada.complemento}" style="width: 30%"/>
 				</div>
 				<div class="label">Cidade:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="cidadeRetirada" name="nf.identificacaoLocalRetirada.municipio" style="width: 40%" />
+					<input type="text" id="cidadeRetirada" name="nf.identificacaoLocalRetirada.municipio" value="${nf.identificacaoLocalRetirada.municipio}" style="width: 40%" />
 				</div>
 				<div class="label">Bairro:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="bairroRetirada" name="nf.identificacaoLocalRetirada.bairro" style="width: 40%"/>
+					<input type="text" id="bairroRetirada" name="nf.identificacaoLocalRetirada.bairro" value="${nf.identificacaoLocalRetirada.bairro}" style="width: 40%"/>
 				</div>
 				<div class="label">UF:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="ufRetirada" name="nf.identificacaoLocalRetirada.uf" style="width: 5%"/>
+					<input type="text" id="ufRetirada" name="nf.identificacaoLocalRetirada.uf" value="${nf.identificacaoLocalRetirada.uf}" style="width: 5%"/>
 				</div>
 			</fieldset>
 			</div>
@@ -968,11 +980,11 @@ function editarTributos(linha){
 				<legend>::: Local Entrega ::: -</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">
-					<input type="text" name="nf.identificacaoLocalEntrega.cnpj"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.cnpj" value="${nf.identificacaoLocalEntrega.cnpj}"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 50%">
-					<input type="text" name="nf.identificacaoLocalEntrega.cpf" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.cpf" value="${nf.identificacaoLocalEntrega.cpf}" style="width: 30%"/>
 				</div>
 				<div class="label condicional">CEP:</div>
 				<div class="input" style="width: 10%">
@@ -985,27 +997,27 @@ function editarTributos(linha){
 				</div>
 				<div class="label">Endereço:</div>
 				<div class="input" style="width: 40%">
-					<input type="text" id="enderecoEntrega" name="nf.identificacaoLocalEntrega.logradouro"/>
+					<input type="text" id="enderecoEntrega" name="nf.identificacaoLocalEntrega.logradouro" value="${nf.identificacaoLocalEntrega.logradouro}"/>
 				</div>
 				<div class="label" style="width: 8%">Número:</div>
 				<div class="input" style="width: 30%">
-					<input type="text" name="nf.identificacaoLocalEntrega.numero" style="width: 20%"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.numero" value="${nf.identificacaoLocalEntrega.numero}" style="width: 20%"/>
 				</div>
 				<div class="label">Complemento:</div>
 				<div class="input" style="width: 70%">
-					<input type="text" name="nf.identificacaoLocalEntrega.complemento" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.complemento" value="${nf.identificacaoLocalEntrega.complemento}" style="width: 30%"/>
 				</div>
 				<div class="label">Cidade:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="cidadeEntrega" name="nf.identificacaoLocalEntrega.municipio" style="width: 40%" />
+					<input type="text" id="cidadeEntrega" name="nf.identificacaoLocalEntrega.municipio" value="${nf.identificacaoLocalEntrega.municipio}" style="width: 40%" />
 				</div>
 				<div class="label">Bairro:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="bairroEntrega" name="nf.identificacaoLocalEntrega.bairro" style="width: 40%"/>
+					<input type="text" id="bairroEntrega" name="nf.identificacaoLocalEntrega.bairro" value="${nf.identificacaoLocalEntrega.bairro}" style="width: 40%"/>
 				</div>
 				<div class="label">UF:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="ufEntrega" name="nf.identificacaoLocalEntrega.uf" style="width: 5%"/>
+					<input type="text" id="ufEntrega" name="nf.identificacaoLocalEntrega.uf" value="${nf.identificacaoLocalEntrega.uf}" style="width: 5%"/>
 				</div>
 			</fieldset>
 			</div>			

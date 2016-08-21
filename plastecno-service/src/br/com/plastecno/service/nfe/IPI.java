@@ -37,12 +37,58 @@ public class IPI implements Validavel {
 	private IPIGeral tipoIpi;
 
 	@XmlTransient
+	public String getClasseEnquadramento() {
+		return classeEnquadramento;
+	}
+
+	@XmlTransient
+	public String getClasseEnquadramentoCigarrosBebidas() {
+		return classeEnquadramentoCigarrosBebidas;
+	}
+
+	@XmlTransient
+	public String getCnpjProdutor() {
+		return cnpjProdutor;
+	}
+
+	@XmlTransient
+	public String getCodigoEnquadramento() {
+		return codigoEnquadramento;
+	}
+
+	@XmlTransient
+	public String getCodigoSeloControle() {
+		return codigoSeloControle;
+	}
+
+	@XmlTransient
+	public IPIGeral getIpiNt() {
+		return ipiNt;
+	}
+
+	@XmlTransient
+	public IPIGeral getIpiTrib() {
+		return ipiTrib;
+	}
+
+	@XmlTransient
+	public Integer getQuantidadeSeloControle() {
+		return quantidadeSeloControle;
+	}
+
+	@XmlTransient
 	public IPIGeral getTipoIpi() {
 		return tipoIpi;
 	}
 
 	public void setClasseEnquadramento(String classeEnquadramento) {
 		this.classeEnquadramento = classeEnquadramento;
+	}
+
+	@XmlTransient
+	public void setClasseEnquadramentoCigarrosBebidas(
+			String classeEnquadramentoCigarrosBebidas) {
+		this.classeEnquadramentoCigarrosBebidas = classeEnquadramentoCigarrosBebidas;
 	}
 
 	public void setCnpjProdutor(String cnpjProdutor) {

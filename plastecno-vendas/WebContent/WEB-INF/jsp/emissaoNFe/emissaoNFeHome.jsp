@@ -354,6 +354,15 @@ function gerarJsonCfopNcm(){
 			'campos':[{'nome':'cfop', 'id':'cfop'}, {'nome':'ncm', 'id':'ncm'}]};
 };
 
+function gerarJsonEnquadramentoIpi(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi',
+		'campos':[{'nome':'classeEnquadramento', 'id':'clEnquadramentoIPI'},
+		          {'nome':'codigoEnquadramento', 'id':'codEnquadramentoIPI'},
+		          {'nome':'cnpjProdutor', 'id':'cnpjProdIPI'},
+		          {'nome':'codigoSeloControle', 'id':'codSeloContrIPI'},
+		          {'nome':'quantidadeSeloControle', 'id':'qtdeSeloContrIPI'}]};
+};
+
 function gerarJsonTipoIpi(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi.tipoIpi',
 		'campos':[{'nome':'aliquota', 'id':'aliquotaIPI'},
@@ -420,14 +429,7 @@ function gerarInputInfoProduto(){
 
 function gerarInputIPI(){
 	var tipoIpi = gerarJsonTipoIpi();
-	var ipi = 
-	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi',
-		'campos':[{'nome':'classeEnquadramento', 'id':'clEnquadramentoIPI'},
-		          {'nome':'codigoEnquadramento', 'id':'codEnquadramentoIPI'},
-		          {'nome':'cnpjProdutor', 'id':'cnpjProdIPI'},
-		          {'nome':'codigoSeloControle', 'id':'codSeloContrIPI'},
-		          {'nome':'quantidadeSeloControle', 'id':'qtdeSeloContrIPI'}
-			]};
+	var ipi = gerarJsonEnquadramentoIpi();
 	
 	gerarInputHidden(tipoIpi);
 	gerarInputHidden(ipi);
@@ -646,6 +648,7 @@ function recuperarValoresImpostos(valoresTabela){
 	impostos [5] = gerarJsonImpostoImportacao();
 	impostos [6] = gerarJsonInfoProduto();
 	impostos [7] = gerarJsonCfopNcm();
+	impostos [8] = gerarJsonEnquadramentoIpi();
 	
 	var idInput = null;
 	var idBloco = null;

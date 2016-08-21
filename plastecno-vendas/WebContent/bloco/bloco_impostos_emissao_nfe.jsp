@@ -22,6 +22,12 @@
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.valorBC" name="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.valorBC" value="${item.tributos.ipi.tipoIpi.valorBC}"/>
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.quantidadeUnidadeTributavel" name="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.quantidadeUnidadeTributavel" value="${item.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel}"/>
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.valorUnidadeTributavel" name="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.valorUnidadeTributavel" value="${item.tributos.ipi.tipoIpi.valorUnidadeTributavel}"/>
+
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.classeEnquadramento" name="nf.listaItem[${item.indiceItem}].tributos.ipi.classeEnquadramento" value="${item.tributos.ipi.classeEnquadramento}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.codigoEnquadramento" name="nf.listaItem[${item.indiceItem}].tributos.ipi.codigoEnquadramento" value="${item.tributos.ipi.codigoEnquadramento}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.cnpjProdutor" name="nf.listaItem[${item.indiceItem}].tributos.ipi.cnpjProdutor" value="${item.tributos.ipi.cnpjProdutor}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.codigoSeloControle" name="nf.listaItem[${item.indiceItem}].tributos.ipi.codigoSeloControle" value="${item.tributos.ipi.codigoSeloControle}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.quantidadeSeloControle" name="nf.listaItem[${item.indiceItem}].tributos.ipi.quantidadeSeloControle" value="${item.tributos.ipi.quantidadeSeloControle}"/>
 <%-- bloco de ipi --%>
 
 <%-- bloco de cofins --%>

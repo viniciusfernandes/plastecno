@@ -30,8 +30,7 @@ public class DetalhamentoProdutoServicoNFe {
 	private TributosProdutoServico tributosProdutoServico;
 
 	public boolean contemICMS() {
-		return tributosProdutoServico != null
-				&& tributosProdutoServico.contemICMS();
+		return tributosProdutoServico != null && tributosProdutoServico.contemICMS();
 	}
 
 	@XmlTransient
@@ -52,6 +51,7 @@ public class DetalhamentoProdutoServicoNFe {
 	/*
 	 * Metodo criado apenas para simplificar e abreviar a marcacao dos .jsp
 	 */
+	@XmlTransient
 	public ProdutoServicoNFe getProduto() {
 		return produtoServicoNFe;
 	}
@@ -64,6 +64,7 @@ public class DetalhamentoProdutoServicoNFe {
 	/*
 	 * Metodo criado apenas para simplificar e abreviar a marcacao dos .jsp
 	 */
+	@XmlTransient
 	public TributosProdutoServico getTributos() {
 		return tributosProdutoServico;
 	}
@@ -95,8 +96,7 @@ public class DetalhamentoProdutoServicoNFe {
 		setTributosProdutoServico(tributos);
 	}
 
-	public void setTributosProdutoServico(
-			TributosProdutoServico tributosProdutoServico) {
+	public void setTributosProdutoServico(TributosProdutoServico tributosProdutoServico) {
 		this.tributosProdutoServico = tributosProdutoServico;
 	}
 }

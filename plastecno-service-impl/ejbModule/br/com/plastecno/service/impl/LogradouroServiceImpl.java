@@ -140,6 +140,20 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public String pesquisarCodigoIBGEByCEP(String cep) {
+		if (cep == null) {
+			return null;
+		}
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createNativeQuery(
+										"select c.cod_ibge from enderecamento.tb_cidade c inner join enderecamento.tb_endereco e on e.id_cidade = c.id_cidade and e.cep = :cep")
+								.setParameter("cep", cep), String.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public String pesquisarCodigoIBGEByIdCidade(Integer idCidade) {
 		if (idCidade == null) {
 			return null;

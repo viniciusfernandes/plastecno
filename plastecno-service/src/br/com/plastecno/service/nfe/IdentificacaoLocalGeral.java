@@ -12,13 +12,20 @@ public class IdentificacaoLocalGeral {
 	@XmlElement(name = "xBairro")
 	private String bairro;
 
+	// Esse campo eh necessario apenas para recuperar o codigo do municipio pois
+	// nao eh garantido a unicidade da pesquisa pelo nome da cidade, mas esse
+	// campo nao sera incluido no xml
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "CEP do local do produto")
+	@XmlTransient
+	private String cep;
+
 	@InformacaoValidavel(obrigatorio = true, regex = RegexValidacao.CNPJ, nomeExibicao = "CNPJ do local do produto")
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
 	@InformacaoValidavel(obrigatorio = true, tamanho = 7, nomeExibicao = "Código do município do local do produto")
 	@XmlElement(name = "cMun")
-	private Integer codigoMunicipio;
+	private String codigoMunicipio;
 
 	@InformacaoValidavel(intervaloComprimento = { 1, 60 }, nomeExibicao = "Complemento do local do produto")
 	@XmlElement(name = "xCpl")
@@ -50,12 +57,17 @@ public class IdentificacaoLocalGeral {
 	}
 
 	@XmlTransient
+	public String getCep() {
+		return cep;
+	}
+
+	@XmlTransient
 	public String getCnpj() {
 		return cnpj;
 	}
 
 	@XmlTransient
-	public Integer getCodigoMunicipio() {
+	public String getCodigoMunicipio() {
 		return codigoMunicipio;
 	}
 
@@ -93,11 +105,15 @@ public class IdentificacaoLocalGeral {
 		this.bairro = bairro;
 	}
 
+	public void setCep(String cep) {
+		this.cep = cep;
+	}
+
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
 
-	public void setCodigoMunicipio(Integer codigoMunicipio) {
+	public void setCodigoMunicipio(String codigoMunicipio) {
 		this.codigoMunicipio = codigoMunicipio;
 	}
 

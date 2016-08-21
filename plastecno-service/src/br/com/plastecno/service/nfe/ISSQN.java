@@ -7,7 +7,6 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class ISSQN {
-	@XmlTransient
 	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Alíquota do ISS")
 	@XmlElement(name = "vAliq")
 	private Double aliquota;

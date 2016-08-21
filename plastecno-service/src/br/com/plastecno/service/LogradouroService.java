@@ -28,9 +28,11 @@ public interface LogradouroService {
 
     <T extends Logradouro> T pesquisarById(Integer idLogradouro, Class<T> classe);
 
+    String pesquisarCodigoIBGEByCEP(String cep);
+
     String pesquisarCodigoIBGEByIdCidade(Integer idCidade);
 
-    /**
+	/**
      * Metodo que remove todos os logradouros cadastrados no sistema que nao
      * esteja presentes na lista passada como parametro. Os logradouros que
      * serao removidos sao os que esta de acordo com o tipo parametro "classe",

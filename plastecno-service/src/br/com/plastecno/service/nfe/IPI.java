@@ -85,9 +85,7 @@ public class IPI implements Validavel {
 		this.classeEnquadramento = classeEnquadramento;
 	}
 
-	@XmlTransient
-	public void setClasseEnquadramentoCigarrosBebidas(
-			String classeEnquadramentoCigarrosBebidas) {
+	public void setClasseEnquadramentoCigarrosBebidas(String classeEnquadramentoCigarrosBebidas) {
 		this.classeEnquadramentoCigarrosBebidas = classeEnquadramentoCigarrosBebidas;
 	}
 
@@ -128,8 +126,7 @@ public class IPI implements Validavel {
 			return;
 		}
 
-		if (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t)
-				|| IPI_99.equals(t)) {
+		if (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t) || IPI_99.equals(t)) {
 			ipiTrib = tipoIpi;
 		} else {
 			ipiNt = tipoIpi;
@@ -142,25 +139,20 @@ public class IPI implements Validavel {
 			throw new BusinessException("Tipo IPI é obrigatório");
 		}
 
-		if (classeEnquadramentoCigarrosBebidas != null
-				&& classeEnquadramentoCigarrosBebidas.length() != 5) {
-			throw new BusinessException(
-					"Classe de enquadramento para cigarro e bebida do IPI é obrigatório");
+		if (classeEnquadramentoCigarrosBebidas != null && classeEnquadramentoCigarrosBebidas.length() != 5) {
+			throw new BusinessException("Classe de enquadramento para cigarro e bebida do IPI deve ter tamanho 5");
 		}
 
 		if (cnpjProdutor != null && cnpjProdutor.length() != 14) {
-			throw new BusinessException(
-					"CNPJ do produto da mercadoria do IPI é obrigatório");
+			throw new BusinessException("CNPJ do produto da mercadoria do IPI deve ter tamanho 14");
 		}
 
 		if (codigoSeloControle != null && codigoSeloControle.length() != 5) {
-			throw new BusinessException(
-					"Código do selo de controle do IPI é obrigatório");
+			throw new BusinessException("Código do selo de controle do IPI deve ter o tamanho de 5");
 		}
 
 		if (classeEnquadramento != null) {
-			throw new BusinessException(
-					"Classe de enquadramento do IPI é obrigatório");
+			throw new BusinessException("Classe de enquadramento do IPI é obrigatório");
 		}
 
 	}

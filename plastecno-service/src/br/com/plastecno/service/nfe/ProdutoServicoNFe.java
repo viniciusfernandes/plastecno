@@ -187,6 +187,7 @@ public class ProdutoServicoNFe {
 		return valorUnitarioComercializacao;
 	}
 
+	@XmlTransient
 	public Double getValorUnitarioTributacao() {
 		return valorUnitarioTributacao;
 	}
@@ -267,8 +268,7 @@ public class ProdutoServicoNFe {
 		this.valorTotalSeguro = valorTotalSeguro;
 	}
 
-	public void setValorUnitarioComercializacao(
-			String valorUnitarioComercializacao) {
+	public void setValorUnitarioComercializacao(String valorUnitarioComercializacao) {
 		this.valorUnitarioComercializacao = valorUnitarioComercializacao;
 	}
 

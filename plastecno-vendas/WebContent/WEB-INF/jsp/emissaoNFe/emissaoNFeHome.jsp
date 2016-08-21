@@ -735,8 +735,6 @@ function editarTributos(linha){
 	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[10].innerHTML},
 	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[11].innerHTML},
 	                               {'id': 'valorBCPIS', 'valorTabela': valorBC},
-	                               {'id': 'valorBCISS', 'valorTabela': valorBC},
-	                               {'id': 'valorBCII', 'valorTabela': valorBC},
 	                               {'id': 'valorBCCOFINS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCICMS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCIPI', 'valorTabela': valorBC},
@@ -949,7 +947,7 @@ function editarTributos(linha){
 				</div>
 				<div class="label condicional">CEP:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" id="cepRetirada" maxlength="8" />
+					<input type="text" id="cepRetirada" name="nf.identificacaoLocalRetirada.cep" value="${nf.identificacaoLocalRetirada.cep}" maxlength="8" />
 				</div>
 				<div class="input" style="width: 70%">
 					<input type="button" id="botaoCepRetirada"
@@ -996,7 +994,7 @@ function editarTributos(linha){
 				</div>
 				<div class="label condicional">CEP:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" id="cepEntrega" maxlength="8" />
+					<input type="text" id="cepEntrega" name="nf.identificacaoLocalEntrega.cep" value="${nf.identificacaoLocalEntrega.cep}" maxlength="8" />
 				</div>
 				<div class="input" style="width: 70%">
 					<input type="button" id="botaoCepEntrega"

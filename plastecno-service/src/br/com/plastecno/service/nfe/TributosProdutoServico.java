@@ -38,7 +38,7 @@ public class TributosProdutoServico {
 	private PISGeral pisSubstituicaoTributaria;
 
 	public boolean contemCOFINS() {
-		return cofins != null && cofins.getTipoConfins() != null;
+		return cofins != null && cofins.getTipoCofins() != null;
 	}
 
 	public boolean contemICMS() {
@@ -62,6 +62,11 @@ public class TributosProdutoServico {
 	}
 
 	@XmlTransient
+	public COFINS getCofins() {
+		return cofins;
+	}
+
+	@XmlTransient
 	public ICMS getIcms() {
 		return icms;
 	}
@@ -72,13 +77,33 @@ public class TributosProdutoServico {
 	}
 
 	@XmlTransient
+	public String getInformacaoAdicional() {
+		return informacaoAdicional;
+	}
+
+	@XmlTransient
+	public IPI getIpi() {
+		return ipi;
+	}
+
+	@XmlTransient
 	public ISSQN getIssqn() {
 		return issqn;
 	}
 
 	@XmlTransient
+	public PIS getPis() {
+		return pis;
+	}
+
+	@XmlTransient
+	public PISGeral getPisSubstituicaoTributaria() {
+		return pisSubstituicaoTributaria;
+	}
+
+	@XmlTransient
 	public COFINSGeral getTipoCofins() {
-		return cofins != null ? cofins.getTipoConfins() : null;
+		return cofins != null ? cofins.getTipoCofins() : null;
 	}
 
 	@XmlTransient

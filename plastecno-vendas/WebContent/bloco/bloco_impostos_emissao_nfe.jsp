@@ -1,8 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:forEach var="item" items="${nf.listaItem}" >
 <%-- bloco de icms --%>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].produto.ncm" name="nf.listaItem[${item.indiceItem}].produto.ncm" value="${item.produto.ncm}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].produto.cfop" name="nf.listaItem[${item.indiceItem}].produto.cfop" value="${item.produto.cfop}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].produtoServicoNFe.ncm" name="nf.listaItem[${item.indiceItem}].produtoServicoNFe.ncm" value="${item.produto.ncm}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].produtoServicoNFe.cfop" name="nf.listaItem[${item.indiceItem}].produtoServicoNFe.cfop" value="${item.produto.cfop}"/>
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.codigoSituacaoTributaria" name="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.codigoSituacaoTributaria" value="${item.tributos.icms.tipoIcms.codigoSituacaoTributaria}"/>
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.origemMercadoria" name="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.origemMercadoria" value="${item.tributos.icms.tipoIcms.origemMercadoria}"/>
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.motivoDesoneracao" name="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.motivoDesoneracao" value="${item.tributos.icms.tipoIcms.motivoDesoneracao}"/>
@@ -14,7 +14,47 @@
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.modalidadeDeterminacaoBCST" name="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.modalidadeDeterminacaoBCST" value="${item.tributos.icms.tipoIcms.modalidadeDeterminacaoBCST}"/>
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.modalidadeDeterminacaoBC" name="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.modalidadeDeterminacaoBC" value="${item.tributos.icms.tipoIcms.modalidadeDeterminacaoBC}"/>
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.aliquota" name="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.aliquota" value="${item.tributos.icms.tipoIcms.aliquota}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.aliquota" name="nf.listaItem[${item.indiceItem}].tributos.icms.tipoIcms.aliquota" value="${item.tributos.icms.tipoIcms.aliquota}"/>
 <%-- bloco de icms --%>
+
+<%-- bloco de ipi --%>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.aliquota" name="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.aliquota" value="${item.tributos.ipi.tipoIpi.aliquota}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.codigoSituacaoTributaria" name="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.codigoSituacaoTributaria" value="${item.tributos.ipi.tipoIpi.codigoSituacaoTributaria}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.valorBC" name="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.valorBC" value="${item.tributos.ipi.tipoIpi.valorBC}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.quantidadeUnidadeTributavel" name="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.quantidadeUnidadeTributavel" value="${item.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.valorUnidadeTributavel" name="nf.listaItem[${item.indiceItem}].tributos.ipi.tipoIpi.valorUnidadeTributavel" value="${item.tributos.ipi.tipoIpi.valorUnidadeTributavel}"/>
+<%-- bloco de ipi --%>
+
+<%-- bloco de cofins --%>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.cofins.tipoCofins.aliquota" name="nf.listaItem[${item.indiceItem}].tributos.cofins.tipoCofins.aliquota" value="${item.tributos.cofins.tipoCofins.aliquota}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.cofins.tipoCofins.codigoSituacaoTributaria" name="nf.listaItem[${item.indiceItem}].tributos.cofins.tipoCofins.codigoSituacaoTributaria" value="${item.tributos.cofins.tipoCofins.codigoSituacaoTributaria}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.cofins.tipoCofins.quantidadeVendida" name="nf.listaItem[${item.indiceItem}].tributos.cofins.tipoCofins.quantidadeVendida" value="${item.tributos.cofins.tipoCofins.quantidadeVendida}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.cofins.tipoCofins.valorBC" name="nf.listaItem[${item.indiceItem}].tributos.cofins.tipoCofins.valorBC" value="${item.tributos.cofins.tipoCofins.valorBC}"/>
+<%-- bloco de cofins --%>
+
+<%-- bloco de iss --%>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.issqn.aliquota" name="nf.listaItem[${item.indiceItem}].tributos.issqn.aliquota" value="${item.tributos.issqn.aliquota}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.issqn.codigoSituacaoTributaria" name="nf.listaItem[${item.indiceItem}].tributos.issqn.codigoSituacaoTributaria" value="${item.tributos.issqn.codigoSituacaoTributaria}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.issqn.valorBC" name="nf.listaItem[${item.indiceItem}].tributos.issqn.valorBC" value="${item.tributos.issqn.valorBC}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.issqn.codigoMunicipioGerador" name="nf.listaItem[${item.indiceItem}].tributos.issqn.codigoMunicipioGerador" value="${item.tributos.issqn.codigoMunicipioGerador}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.issqn.itemListaServicos" name="nf.listaItem[${item.indiceItem}].tributos.issqn.itemListaServicos" value="${item.tributos.issqn.itemListaServicos}"/>
+<%-- bloco de iss --%>
+
+<%-- bloco de ii --%>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.impostoImportacao.valor" name="nf.listaItem[${item.indiceItem}].tributos.impostoImportacao.valor" value="${item.tributos.impostoImportacao.valor}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.impostoImportacao.valorBC" name="nf.listaItem[${item.indiceItem}].tributos.impostoImportacao.valorBC" value="${item.tributos.impostoImportacao.valorBC}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.impostoImportacao.valorDespesaAduaneira" name="nf.listaItem[${item.indiceItem}].tributos.impostoImportacao.valorDespesaAduaneira" value="${item.tributos.impostoImportacao.valorDespesaAduaneira}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.impostoImportacao.valorIOF" name="nf.listaItem[${item.indiceItem}].tributos.impostoImportacao.valorIOF" value="${item.tributos.impostoImportacao.valorIOF}"/>
+<%-- bloco de ii --%>
+
+<%-- bloco de pis --%>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.pis.tipoPis.aliquota" name="nf.listaItem[${item.indiceItem}].tributos.pis.tipoPis.aliquota" value="${item.tributos.pis.tipoPis.aliquota}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.pis.tipoPis.codigoSituacaoTributaria" name="nf.listaItem[${item.indiceItem}].tributos.pis.tipoPis.codigoSituacaoTributaria" value="${item.tributos.pis.tipoPis.codigoSituacaoTributaria}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.pis.tipoPis.quantidadeVendida" name="nf.listaItem[${item.indiceItem}].tributos.pis.tipoPis.quantidadeVendida" value="${item.tributos.pis.tipoPis.quantidadeVendida}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].tributos.pis.tipoPis.valorBC" name="nf.listaItem[${item.indiceItem}].tributos.pis.tipoPis.valorBC" value="${item.tributos.pis.tipoPis.valorBC}"/>
+<%-- bloco de pis --%>
+
+<%-- bloco de informacoes --%>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].informacoesAdicionais" name="nf.listaItem[${item.indiceItem}].informacoesAdicionais" value="${item.informacoesAdicionais}"/>
+<%-- bloco de informacoes --%>
 
 </c:forEach>

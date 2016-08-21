@@ -349,6 +349,11 @@ function gerarJsonTipoIcms(){
 			]};
 };
 
+function gerarJsonCfopNcm(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe',
+			'campos':[{'nome':'cfop', 'id':'cfop'}, {'nome':'ncm', 'id':'ncm'}]};
+};
+
 function gerarJsonTipoIpi(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi.tipoIpi',
 		'campos':[{'nome':'aliquota', 'id':'aliquotaIPI'},
@@ -403,11 +408,10 @@ function gerarJsonTipoPis(){
 
 function gerarInputICMS(){
 	var tipoIcms = gerarJsonTipoIcms();
-	var produto = {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe',
-		'campos':[{'nome':'cfop', 'id':'cfop'}, {'nome':'ncm', 'id':'ncm'}]};
+	var cfop = gerarJsonCfopNcm();
 	
 	gerarInputHidden(tipoIcms);
-	gerarInputHidden(produto);
+	gerarInputHidden(cfop);
 };
 
 function gerarInputInfoProduto(){
@@ -641,6 +645,7 @@ function recuperarValoresImpostos(valoresTabela){
 	impostos [4] = gerarJsonISS();
 	impostos [5] = gerarJsonImpostoImportacao();
 	impostos [6] = gerarJsonInfoProduto();
+	impostos [7] = gerarJsonCfopNcm();
 	
 	var idInput = null;
 	var idBloco = null;

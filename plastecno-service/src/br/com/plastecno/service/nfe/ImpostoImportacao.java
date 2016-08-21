@@ -7,7 +7,6 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class ImpostoImportacao {
-
 	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor do imposto de importação")
 	@XmlElement(name = "vII")
 	private Double valor;
@@ -32,6 +31,16 @@ public class ImpostoImportacao {
 	@XmlTransient
 	public Double getValorBC() {
 		return valorBC;
+	}
+
+	@XmlTransient
+	public Double getValorDespesaAduaneira() {
+		return valorDespesaAduaneira;
+	}
+
+	@XmlTransient
+	public Double getValorIOF() {
+		return valorIOF;
 	}
 
 	public void setValor(Double valor) {

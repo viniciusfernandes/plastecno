@@ -79,7 +79,7 @@ public class DetalhamentoProdutoServicoNFe {
 
 	public void setNumeroItem(Integer numeroItem) {
 		this.numeroItem = numeroItem;
-		if (numeroItem != null && numeroItem > 0) {
+		if (numeroItem != null) {
 			indiceItem = numeroItem - 1;
 		}
 	}

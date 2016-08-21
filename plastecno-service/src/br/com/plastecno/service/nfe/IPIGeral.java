@@ -38,6 +38,21 @@ public class IPIGeral {
 	}
 
 	@XmlTransient
+	public Double getAliquota() {
+		return aliquota;
+	}
+
+	@XmlTransient
+	public String getCodigoSituacaoTributaria() {
+		return codigoSituacaoTributaria;
+	}
+
+	@XmlTransient
+	public Integer getQuantidadeUnidadeTributavel() {
+		return quantidadeUnidadeTributavel;
+	}
+
+	@XmlTransient
 	public TipoTributacaoIPI getTipoTributacao() {
 		return TipoTributacaoIPI.getTipoTributacao(codigoSituacaoTributaria);
 	}
@@ -50,6 +65,11 @@ public class IPIGeral {
 	@XmlTransient
 	public Double getValorBC() {
 		return valorBC == null ? 0 : valorBC;
+	}
+
+	@XmlTransient
+	public Double getValorUnidadeTributavel() {
+		return valorUnidadeTributavel;
 	}
 
 	public void setAliquota(Double aliquota) {

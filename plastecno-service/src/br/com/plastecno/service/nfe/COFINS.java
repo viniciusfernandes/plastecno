@@ -25,10 +25,10 @@ public class COFINS implements Validavel {
 	private COFINSGeral cofinsST;
 
 	@XmlTransient
-	private COFINSGeral tipoConfins;
+	private COFINSGeral tipoCofins;
 
-	public COFINSGeral getTipoConfins() {
-		return tipoConfins;
+	public COFINSGeral getTipoCofins() {
+		return tipoCofins;
 	}
 
 	public void setTipoCofins(COFINSGeral tipoCofins) {
@@ -49,19 +49,15 @@ public class COFINS implements Validavel {
 		} else if (COFINS_ST.equals(tribut)) {
 			cofinsST = tipoCofins;
 		}
-		this.tipoConfins = tipoCofins;
-	}
-
-	public void setTipoConfins(COFINSGeral tipoConfins) {
-		this.tipoConfins = tipoConfins;
+		this.tipoCofins = tipoCofins;
 	}
 
 	@Override
 	public void validar() throws BusinessException {
-		if (tipoConfins == null) {
+		if (tipoCofins == null) {
 			throw new BusinessException("Tipo de COFINS é obrigatório");
 		}
 
-		tipoConfins.validar();
+		tipoCofins.validar();
 	}
 }

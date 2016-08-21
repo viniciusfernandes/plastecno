@@ -1,12 +1,12 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class CompraNFe {
-
 	@InformacaoValidavel(intervaloComprimento = { 1, 60 }, nomeExibicao = "Número do contrato da compra")
 	@XmlElement(name = "xCont")
 	private String contrato;
@@ -18,6 +18,21 @@ public class CompraNFe {
 	@InformacaoValidavel(intervaloComprimento = { 1, 60 }, nomeExibicao = "Número do pedido da compra")
 	@XmlElement(name = "xPed")
 	private String pedido;
+
+	@XmlTransient
+	public String getContrato() {
+		return contrato;
+	}
+
+	@XmlTransient
+	public String getNotaEmpenho() {
+		return notaEmpenho;
+	}
+
+	@XmlTransient
+	public String getPedido() {
+		return pedido;
+	}
 
 	public void setContrato(String contrato) {
 		this.contrato = contrato;

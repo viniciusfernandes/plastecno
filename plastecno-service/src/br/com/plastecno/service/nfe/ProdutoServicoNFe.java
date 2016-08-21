@@ -88,8 +88,73 @@ public class ProdutoServicoNFe {
 	private Double valorUnitarioTributacao;
 
 	@XmlTransient
+	public String getCfop() {
+		return cfop;
+	}
+
+	@XmlTransient
+	public String getCodigo() {
+		return codigo;
+	}
+
+	@XmlTransient
+	public String getDescricao() {
+		return descricao;
+	}
+
+	@XmlTransient
+	public String getEAN() {
+		return EAN;
+	}
+
+	@XmlTransient
+	public String getEANTributavel() {
+		return EANTributavel;
+	}
+
+	@XmlTransient
+	public String getEXTIPI() {
+		return EXTIPI;
+	}
+
+	@XmlTransient
+	public Integer getIndicadorValorTotal() {
+		return indicadorValorTotal;
+	}
+
+	@XmlTransient
+	public Integer getItemPedidoCompra() {
+		return itemPedidoCompra;
+	}
+
+	@XmlTransient
+	public String getNcm() {
+		return ncm;
+	}
+
+	@XmlTransient
+	public String getNumeroPedidoCompra() {
+		return numeroPedidoCompra;
+	}
+
+	@XmlTransient
 	public Double getOutrasDespesasAcessorias() {
 		return outrasDespesasAcessorias == null ? 0 : outrasDespesasAcessorias;
+	}
+
+	@XmlTransient
+	public String getQuantidadeComercial() {
+		return quantidadeComercial;
+	}
+
+	@XmlTransient
+	public Integer getQuantidadeTributavel() {
+		return quantidadeTributavel;
+	}
+
+	@XmlTransient
+	public String getUnidadeComercial() {
+		return unidadeComercial;
 	}
 
 	@XmlTransient
@@ -115,6 +180,15 @@ public class ProdutoServicoNFe {
 	@XmlTransient
 	public Double getValorTotalSeguro() {
 		return valorTotalSeguro == null ? 0 : valorTotalSeguro;
+	}
+
+	@XmlTransient
+	public String getValorUnitarioComercializacao() {
+		return valorUnitarioComercializacao;
+	}
+
+	public Double getValorUnitarioTributacao() {
+		return valorUnitarioTributacao;
 	}
 
 	public void setCfop(String cfop) {

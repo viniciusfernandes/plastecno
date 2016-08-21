@@ -100,18 +100,25 @@ public class EmissaoNFeController extends AbstractController {
 
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
+        NFe nFe = null;
         try {
             String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
             nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                     nFeService.gerarEnderecoNFe(logradouro, telefone));
 
-            NFe nFe = new NFe(nf);
-            formatarDuplicata(nFe);
+            nFe = new NFe(nf);
+            formatarDuplicata(nFe, false);
 
             redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(nFe, idPedido));
         } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
+            try {
+                formatarDuplicata(nFe, true);
+            } catch (BusinessException e1) {
+                e.addMensagem(e1.getListaMensagem());
+            }
             popularNFe(nf, idPedido);
+
+            gerarListaMensagemErro(e);
             redirecTo(this.getClass()).emissaoNFeHome();
         } catch (Exception e) {
             gerarLogErro("Emissão da NFe", e);
@@ -119,17 +126,27 @@ public class EmissaoNFeController extends AbstractController {
 
     }
 
-    private void formatarDuplicata(NFe nFe) throws BusinessException {
+    private void formatarDuplicata(NFe nFe, boolean fromServidor) throws BusinessException {
         List<DuplicataNFe> lista = null;
         if ((lista = nFe.getDadosNFe().getListaDuplicata()) == null) {
             return;
         }
-        SimpleDateFormat antes = new SimpleDateFormat("dd/MM/yyyy");
-        SimpleDateFormat depois = new SimpleDateFormat("yyyy-MM-dd");
+
+        String pTo = null;
+        String pFrom = null;
+        if (fromServidor) {
+            pTo = "dd/MM/yyyy";
+            pFrom = "yyyy-MM-dd";
+        } else {
+            pTo = "yyyy-MM-dd";
+            pFrom = "dd/MM/yyyy";
+        }
+        SimpleDateFormat from = new SimpleDateFormat(pFrom);
+        SimpleDateFormat to = new SimpleDateFormat(pTo);
 
         for (DuplicataNFe d : lista) {
             try {
-                d.setDataVencimento(depois.format(antes.parse(d.getDataVencimento())));
+                d.setDataVencimento(to.format(from.parse(d.getDataVencimento())));
             } catch (ParseException e) {
                 throw new BusinessException("Não foi possível formatar a data de vencimento da duplicata "
                         + d.getNumero() + ". O valor enviado é \"" + d.getDataVencimento() + "\"");

@@ -8,6 +8,11 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class DetalhamentoProdutoServicoNFe {
+	// Campos criado para utilizar a indexacao dos itens da lista no arquivo
+	// .jsp
+	@XmlTransient
+	private Integer indiceItem;
+
 	@InformacaoValidavel(intervaloComprimento = { 1, 500 }, nomeExibicao = "Informações adicionais de produtos/serviços")
 	@XmlElement(name = "infAdProd")
 	private String informacoesAdicionais;
@@ -30,8 +35,37 @@ public class DetalhamentoProdutoServicoNFe {
 	}
 
 	@XmlTransient
+	public Integer getIndiceItem() {
+		return indiceItem;
+	}
+
+	@XmlTransient
+	public String getInformacoesAdicionais() {
+		return informacoesAdicionais;
+	}
+
+	@XmlTransient
+	public Integer getNumeroItem() {
+		return numeroItem;
+	}
+
+	/*
+	 * Metodo criado apenas para simplificar e abreviar a marcacao dos .jsp
+	 */
+	public ProdutoServicoNFe getProduto() {
+		return produtoServicoNFe;
+	}
+
+	@XmlTransient
 	public ProdutoServicoNFe getProdutoServicoNFe() {
 		return produtoServicoNFe;
+	}
+
+	/*
+	 * Metodo criado apenas para simplificar e abreviar a marcacao dos .jsp
+	 */
+	public TributosProdutoServico getTributos() {
+		return tributosProdutoServico;
 	}
 
 	@XmlTransient
@@ -45,6 +79,9 @@ public class DetalhamentoProdutoServicoNFe {
 
 	public void setNumeroItem(Integer numeroItem) {
 		this.numeroItem = numeroItem;
+		if (numeroItem != null && numeroItem > 0) {
+			indiceItem = numeroItem - 1;
+		}
 	}
 
 	public void setProdutoServicoNFe(ProdutoServicoNFe produtoServicoNFe) {

@@ -781,7 +781,7 @@ function editarTributos(linha){
 			<%--div class="label">Regime:</div>
 			<div class="input" style="width: 80%">
 				<select name="nf.identificacaoEmitenteNFe.regimeTributario" style="width: 20%" >
-					<c:forEach var="tipo" items="${listaTipoRegimeTributacao}">
+					<c:-ach var="tipo" items="${listaTipoRegimeTributacao}">
 						<option value="${tipo.codigo}">${tipo.descricao}</option>
 					</c:forEach>
 				</select>
@@ -796,7 +796,7 @@ function editarTributos(linha){
 			</div>
 			<div class="label">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado" name="nf.identificacaoNFe.indicadorFormaPagamento"  style="width: 100%">
+				<select name="nf.identificacaoNFe.indicadorFormaPagamento"  style="width: 100%">
 					<c:forEach var="formaPagamento" items="${listaTipoFormaPagamento}">
 						<option value="${formaPagamento.codigo}" <c:if test="${formaPagamento.codigo eq formaPagamentoSelecionada}">selected</c:if>>${formaPagamento.descricao}</option>
 					</c:forEach>
@@ -1385,7 +1385,6 @@ function editarTributos(linha){
 					</div>
 				</fieldset>
 				</div>
-				
 			</fieldset>
 		</fieldset>	
 		
@@ -1677,8 +1676,9 @@ function editarTributos(linha){
 		<div class="bloco_botoes">
 			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>
 		</div>
+
+		<jsp:include page="/bloco/bloco_impostos_emissao_nfe.jsp"></jsp:include>		
 	</form>
 
-	
 </body>
 </html>

@@ -141,6 +141,10 @@ public class DadosNFe {
 		return cobrancaNFe != null ? cobrancaNFe.getListaDuplicata() : null;
 	}
 
+	public List<DetalhamentoProdutoServicoNFe> getListaItem() {
+		return listaDetalhamentoProdutoServicoNFe;
+	}
+
 	@XmlTransient
 	public TransporteNFe getTransporteNFe() {
 		return transporteNFe;

@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.List;
 
 import br.com.plastecno.service.constante.TipoDocumento;
+import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.validacao.Validavel;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.util.NumeroUtils;
@@ -145,7 +147,7 @@ public final class ValidadorInformacao {
 				continue;
 			}
 
-			valores = informacao.valoresInteiros();
+			valores = informacao.valores();
 			if (valores.length > 0) {
 				ok = false;
 				for (int i = 0; i < valores.length; i++) {
@@ -195,6 +197,15 @@ public final class ValidadorInformacao {
 						+ (informacao.padraoExemplo().length() > 0 ? " \""
 								+ informacao.padraoExemplo() + "\"" : "")
 						+ ". Enviado \"" + conteudoCampo + "\"");
+				continue;
+			}
+
+			if (conteudoCampo != null && conteudoCampo instanceof Validavel) {
+				try {
+					((Validavel) conteudoCampo).validar();
+				} catch (BusinessException e) {
+					listaMensagem.addAll(e.getListaMensagem());
+				}
 				continue;
 			}
 

@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+
 @InformacaoValidavel
 public class EnderecoNFe {
 
@@ -52,8 +53,58 @@ public class EnderecoNFe {
 	private String UF;
 
 	@XmlTransient
+	public String getBairro() {
+		return bairro;
+	}
+
+	@XmlTransient
+	public String getCep() {
+		return cep;
+	}
+
+	@XmlTransient
+	public String getCodigoMunicipio() {
+		return codigoMunicipio;
+	}
+
+	@XmlTransient
+	public String getCodigoPais() {
+		return codigoPais;
+	}
+
+	@XmlTransient
+	public String getComplemento() {
+		return complemento;
+	}
+
+	@XmlTransient
+	public String getLogradouro() {
+		return logradouro;
+	}
+
+	@XmlTransient
+	public String getNomeMunicipio() {
+		return nomeMunicipio;
+	}
+
+	@XmlTransient
+	public String getNomePais() {
+		return nomePais;
+	}
+
+	@XmlTransient
+	public String getNumero() {
+		return numero;
+	}
+
+	@XmlTransient
 	public String getTelefone() {
 		return telefone;
+	}
+
+	@XmlTransient
+	public String getUF() {
+		return UF;
 	}
 
 	public void setBairro(String bairro) {

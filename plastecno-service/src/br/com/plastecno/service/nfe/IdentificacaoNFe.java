@@ -3,10 +3,12 @@ package br.com.plastecno.service.nfe;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 public class IdentificacaoNFe {
+
 	@InformacaoValidavel(obrigatorio = true, tamanho = 8, nomeExibicao = "Código da chave de acesso")
 	@XmlElement(name = "cNF")
 	private String chaveAcesso;
@@ -96,6 +98,121 @@ public class IdentificacaoNFe {
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Versão do processo de emissão da NFe")
 	@XmlElement(name = "verProc")
 	private String versaoProcessoEmissao;
+
+	@XmlTransient
+	public String getChaveAcesso() {
+		return chaveAcesso;
+	}
+
+	@XmlTransient
+	public String getCodigoUFEmitente() {
+		return codigoUFEmitente;
+	}
+
+	@XmlTransient
+	public String getDataEmissao() {
+		return dataEmissao;
+	}
+
+	@XmlTransient
+	public String getDataEntradaSaidaProduto() {
+		return dataEntradaSaidaProduto;
+	}
+
+	@XmlTransient
+	public String getDataHoraContingencia() {
+		return dataHoraContingencia;
+	}
+
+	@XmlTransient
+	public String getDataHoraEntradaContigencia() {
+		return dataHoraEntradaContigencia;
+	}
+
+	@XmlTransient
+	public String getDigitoVerificador() {
+		return digitoVerificador;
+	}
+
+	@XmlTransient
+	public Integer getFinalidadeEmissao() {
+		return finalidadeEmissao;
+	}
+
+	@XmlTransient
+	public String getHoraSaidaEntradaProduto() {
+		return horaSaidaEntradaProduto;
+	}
+
+	@XmlTransient
+	public Integer getIndicadorFormaPagamento() {
+		return indicadorFormaPagamento;
+	}
+
+	@XmlTransient
+	public String getJustificativaContigencia() {
+		return justificativaContigencia;
+	}
+
+	@XmlTransient
+	public List<NFeReferenciada> getListaNFeReferenciada() {
+		return listaNFeReferenciada;
+	}
+
+	@XmlTransient
+	public String getModelo() {
+		return modelo;
+	}
+
+	@XmlTransient
+	public String getMunicipioOcorrenciaFatorGerador() {
+		return municipioOcorrenciaFatorGerador;
+	}
+
+	@XmlTransient
+	public String getNaturezaOperacao() {
+		return naturezaOperacao;
+	}
+
+	@XmlTransient
+	public String getNumero() {
+		return numero;
+	}
+
+	@XmlTransient
+	public String getProcessoEmissao() {
+		return processoEmissao;
+	}
+
+	@XmlTransient
+	public String getSerie() {
+		return serie;
+	}
+
+	@XmlTransient
+	public String getTipoAmbiente() {
+		return tipoAmbiente;
+	}
+
+	@XmlTransient
+	public String getTipoEmissao() {
+		return tipoEmissao;
+	}
+
+	@XmlTransient
+	public String getTipoImpressao() {
+		return tipoImpressao;
+	}
+
+	@XmlTransient
+	public String getTipoOperacao() {
+		return tipoOperacao;
+	}
+
+	@XmlTransient
+	public String getVersaoProcessoEmissao() {
+		return versaoProcessoEmissao;
+	}
 
 	public void setChaveAcesso(String chaveAcesso) {
 		this.chaveAcesso = chaveAcesso;

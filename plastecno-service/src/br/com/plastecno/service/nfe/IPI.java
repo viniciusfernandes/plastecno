@@ -5,9 +5,10 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
+import br.com.plastecno.service.validacao.Validavel;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.*;
 
-public class IPI {
+public class IPI implements Validavel {
 	@XmlElement(name = "cEnq")
 	private String classeEnquadramento;
 
@@ -36,12 +37,56 @@ public class IPI {
 	private IPIGeral tipoIpi;
 
 	@XmlTransient
+	public String getClasseEnquadramento() {
+		return classeEnquadramento;
+	}
+
+	@XmlTransient
+	public String getClasseEnquadramentoCigarrosBebidas() {
+		return classeEnquadramentoCigarrosBebidas;
+	}
+
+	@XmlTransient
+	public String getCnpjProdutor() {
+		return cnpjProdutor;
+	}
+
+	@XmlTransient
+	public String getCodigoEnquadramento() {
+		return codigoEnquadramento;
+	}
+
+	@XmlTransient
+	public String getCodigoSeloControle() {
+		return codigoSeloControle;
+	}
+
+	@XmlTransient
+	public IPIGeral getIpiNt() {
+		return ipiNt;
+	}
+
+	@XmlTransient
+	public IPIGeral getIpiTrib() {
+		return ipiTrib;
+	}
+
+	@XmlTransient
+	public Integer getQuantidadeSeloControle() {
+		return quantidadeSeloControle;
+	}
+
+	@XmlTransient
 	public IPIGeral getTipoIpi() {
 		return tipoIpi;
 	}
 
 	public void setClasseEnquadramento(String classeEnquadramento) {
 		this.classeEnquadramento = classeEnquadramento;
+	}
+
+	public void setClasseEnquadramentoCigarrosBebidas(String classeEnquadramentoCigarrosBebidas) {
+		this.classeEnquadramentoCigarrosBebidas = classeEnquadramentoCigarrosBebidas;
 	}
 
 	public void setCnpjProdutor(String cnpjProdutor) {
@@ -81,8 +126,7 @@ public class IPI {
 			return;
 		}
 
-		if (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t)
-				|| IPI_99.equals(t)) {
+		if (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t) || IPI_99.equals(t)) {
 			ipiTrib = tipoIpi;
 		} else {
 			ipiNt = tipoIpi;
@@ -95,25 +139,20 @@ public class IPI {
 			throw new BusinessException("Tipo IPI é obrigatório");
 		}
 
-		if (classeEnquadramentoCigarrosBebidas != null
-				&& classeEnquadramentoCigarrosBebidas.length() != 5) {
-			throw new BusinessException(
-					"Classe de enquadramento para cigarro e bebida do IPI é obrigatório");
+		if (classeEnquadramentoCigarrosBebidas != null && classeEnquadramentoCigarrosBebidas.length() != 5) {
+			throw new BusinessException("Classe de enquadramento para cigarro e bebida do IPI deve ter tamanho 5");
 		}
 
 		if (cnpjProdutor != null && cnpjProdutor.length() != 14) {
-			throw new BusinessException(
-					"CNPJ do produto da mercadoria do IPI é obrigatório");
+			throw new BusinessException("CNPJ do produto da mercadoria do IPI deve ter tamanho 14");
 		}
 
 		if (codigoSeloControle != null && codigoSeloControle.length() != 5) {
-			throw new BusinessException(
-					"Código do selo de controle do IPI é obrigatório");
+			throw new BusinessException("Código do selo de controle do IPI deve ter o tamanho de 5");
 		}
 
 		if (classeEnquadramento != null) {
-			throw new BusinessException(
-					"Classe de enquadramento do IPI é obrigatório");
+			throw new BusinessException("Classe de enquadramento do IPI é obrigatório");
 		}
 
 	}

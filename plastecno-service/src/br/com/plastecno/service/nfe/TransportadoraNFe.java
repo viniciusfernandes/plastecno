@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.constante.RegexValidacao;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
@@ -33,7 +34,42 @@ public class TransportadoraNFe {
 
 	@InformacaoValidavel(tamanho = 2, nomeExibicao = "UF da transportadora")
 	@XmlElement(name = "UF")
-	private String UF;
+	private String uf;
+
+	@XmlTransient
+	public String getCnpj() {
+		return cnpj;
+	}
+
+	@XmlTransient
+	public String getCpf() {
+		return cpf;
+	}
+
+	@XmlTransient
+	public String getEnderecoCompleto() {
+		return enderecoCompleto;
+	}
+
+	@XmlTransient
+	public String getInscricaoEstadual() {
+		return inscricaoEstadual;
+	}
+
+	@XmlTransient
+	public String getMunicipio() {
+		return municipio;
+	}
+
+	@XmlTransient
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+
+	@XmlTransient
+	public String getUf() {
+		return uf;
+	}
 
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
@@ -59,8 +95,8 @@ public class TransportadoraNFe {
 		this.razaoSocial = razaoSocial;
 	}
 
-	public void setUF(String uF) {
-		UF = uF;
+	public void setUf(String uF) {
+		uf = uF;
 	}
 
 }

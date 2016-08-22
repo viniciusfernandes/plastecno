@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -28,6 +29,36 @@ public class IdentificacaoNFeReferenciada {
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 99 }, nomeExibicao = "Código UF do emitente")
 	@XmlElement(name = "cUF")
 	private Integer ufEmitente;
+
+	@XmlTransient
+	public Integer getAnoMes() {
+		return anoMes;
+	}
+
+	@XmlTransient
+	public String getCnpjEmitente() {
+		return cnpjEmitente;
+	}
+
+	@XmlTransient
+	public Integer getModelo() {
+		return modelo;
+	}
+
+	@XmlTransient
+	public Long getNumeroNF() {
+		return numeroNF;
+	}
+
+	@XmlTransient
+	public Integer getSerie() {
+		return serie;
+	}
+
+	@XmlTransient
+	public Integer getUfEmitente() {
+		return ufEmitente;
+	}
 
 	public void setAnoMes(Integer anoMes) {
 		this.anoMes = anoMes;

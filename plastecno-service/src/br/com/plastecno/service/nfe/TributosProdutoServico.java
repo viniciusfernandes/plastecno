@@ -3,15 +3,15 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class TributosProdutoServico {
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "COFINS do produtos/serviços")
 	@XmlElement(name = "COFINS")
 	private COFINS cofins;
 
-	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "ICMS do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "ICMS do produtos/serviços")
 	@XmlElement(name = "ICMS")
 	private ICMS icms;
 
@@ -22,6 +22,7 @@ public class TributosProdutoServico {
 	@XmlElement(name = "infAdProd")
 	private String informacaoAdicional;
 
+	@InformacaoValidavel(nomeExibicao = "IPI do produtos/serviços")
 	@XmlElement(name = "IPI")
 	private IPI ipi;
 
@@ -29,6 +30,7 @@ public class TributosProdutoServico {
 	@XmlElement(name = "ISSQN")
 	private ISSQN issqn;
 
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "PIS do produtos/serviços")
 	@XmlElement(name = "PIS")
 	private PIS pis;
 
@@ -36,7 +38,7 @@ public class TributosProdutoServico {
 	private PISGeral pisSubstituicaoTributaria;
 
 	public boolean contemCOFINS() {
-		return cofins != null && cofins.getTipoConfins() != null;
+		return cofins != null && cofins.getTipoCofins() != null;
 	}
 
 	public boolean contemICMS() {
@@ -60,6 +62,11 @@ public class TributosProdutoServico {
 	}
 
 	@XmlTransient
+	public COFINS getCofins() {
+		return cofins;
+	}
+
+	@XmlTransient
 	public ICMS getIcms() {
 		return icms;
 	}
@@ -70,13 +77,33 @@ public class TributosProdutoServico {
 	}
 
 	@XmlTransient
+	public String getInformacaoAdicional() {
+		return informacaoAdicional;
+	}
+
+	@XmlTransient
+	public IPI getIpi() {
+		return ipi;
+	}
+
+	@XmlTransient
 	public ISSQN getIssqn() {
 		return issqn;
 	}
 
 	@XmlTransient
+	public PIS getPis() {
+		return pis;
+	}
+
+	@XmlTransient
+	public PISGeral getPisSubstituicaoTributaria() {
+		return pisSubstituicaoTributaria;
+	}
+
+	@XmlTransient
 	public COFINSGeral getTipoCofins() {
-		return cofins != null ? cofins.getTipoConfins() : null;
+		return cofins != null ? cofins.getTipoCofins() : null;
 	}
 
 	@XmlTransient
@@ -124,24 +151,6 @@ public class TributosProdutoServico {
 
 	public void setPisSubstituicaoTributaria(PISGeral pisSubstituicaoTributaria) {
 		this.pisSubstituicaoTributaria = pisSubstituicaoTributaria;
-	}
-
-	public void validarTributos() throws BusinessException {
-		if (contemICMS()) {
-			icms.validar();
-		}
-
-		if (contemIPI()) {
-			ipi.validar();
-		}
-
-		if (contemPIS()) {
-			pis.validar();
-		}
-
-		if (contemCOFINS()) {
-			cofins.validar();
-		}
 	}
 
 }

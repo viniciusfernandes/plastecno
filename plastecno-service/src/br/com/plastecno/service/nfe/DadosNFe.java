@@ -59,9 +59,6 @@ public class DadosNFe {
 	@XmlElement(name = "det")
 	private List<DetalhamentoProdutoServicoNFe> listaDetalhamentoProdutoServicoNFe;
 
-	@XmlElement(name = "NFref")
-	private NFeReferenciada nFeRerefenciada;
-
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Transporte da NFe")
 	@XmlElement(name = "transp")
 	private TransporteNFe transporteNFe;
@@ -75,6 +72,26 @@ public class DadosNFe {
 	private final Double versao = 2.0d;
 
 	@XmlTransient
+	public CobrancaNFe getCobrancaNFe() {
+		return cobrancaNFe;
+	}
+
+	@XmlTransient
+	public CompraNFe getCompraNFe() {
+		return compraNFe;
+	}
+
+	@XmlTransient
+	public ExportacaoNFe getExportacaoNFe() {
+		return exportacaoNFe;
+	}
+
+	@XmlTransient
+	public String getId() {
+		return id;
+	}
+
+	@XmlTransient
 	public IdentificacaoDestinatarioNFe getIdentificacaoDestinatarioNFe() {
 		return identificacaoDestinatarioNFe;
 	}
@@ -82,6 +99,36 @@ public class DadosNFe {
 	@XmlTransient
 	public IdentificacaoEmitenteNFe getIdentificacaoEmitenteNFe() {
 		return identificacaoEmitenteNFe;
+	}
+
+	@XmlTransient
+	public IdentificacaoLocalGeral getIdentificacaoLocalEntrega() {
+		return identificacaoLocalEntrega;
+	}
+
+	@XmlTransient
+	public IdentificacaoLocalGeral getIdentificacaoLocalRetirada() {
+		return identificacaoLocalRetirada;
+	}
+
+	@XmlTransient
+	public IdentificacaoNFe getIdentificacaoNFe() {
+		return identificacaoNFe;
+	}
+
+	@XmlTransient
+	public InformacaoCompra getInformacaoCompra() {
+		return informacaoCompra;
+	}
+
+	@XmlTransient
+	public InformacaoExportacao getInformacaoExportacao() {
+		return informacaoExportacao;
+	}
+
+	@XmlTransient
+	public InformacoesAdicionaisNFe getInformacoesAdicionaisNFe() {
+		return informacoesAdicionaisNFe;
 	}
 
 	@XmlTransient
@@ -94,9 +141,23 @@ public class DadosNFe {
 		return cobrancaNFe != null ? cobrancaNFe.getListaDuplicata() : null;
 	}
 
+	public List<DetalhamentoProdutoServicoNFe> getListaItem() {
+		return listaDetalhamentoProdutoServicoNFe;
+	}
+
+	@XmlTransient
+	public TransporteNFe getTransporteNFe() {
+		return transporteNFe;
+	}
+
 	@XmlTransient
 	public ValoresTotaisNFe getValoresTotaisNFe() {
 		return valoresTotaisNFe;
+	}
+
+	@XmlTransient
+	public Double getVersao() {
+		return versao;
 	}
 
 	public void setCobrancaNFe(CobrancaNFe cobrancaNFe) {
@@ -170,10 +231,6 @@ public class DadosNFe {
 	 */
 	public void setListaItem(List<DetalhamentoProdutoServicoNFe> listaItem) {
 		setListaDetalhamentoProdutoServicoNFe(listaItem);
-	}
-
-	public void setnFeRerefenciada(NFeReferenciada nFeRerefenciada) {
-		this.nFeRerefenciada = nFeRerefenciada;
 	}
 
 	public void setTransporteNFe(TransporteNFe transporteNFe) {

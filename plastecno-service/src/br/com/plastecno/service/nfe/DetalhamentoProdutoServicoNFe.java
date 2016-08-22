@@ -8,6 +8,11 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class DetalhamentoProdutoServicoNFe {
+	// Campos criado para utilizar a indexacao dos itens da lista no arquivo
+	// .jsp
+	@XmlTransient
+	private Integer indiceItem;
+
 	@InformacaoValidavel(intervaloComprimento = { 1, 500 }, nomeExibicao = "Informações adicionais de produtos/serviços")
 	@XmlElement(name = "infAdProd")
 	private String informacoesAdicionais;
@@ -25,13 +30,43 @@ public class DetalhamentoProdutoServicoNFe {
 	private TributosProdutoServico tributosProdutoServico;
 
 	public boolean contemICMS() {
-		return tributosProdutoServico != null
-				&& tributosProdutoServico.contemICMS();
+		return tributosProdutoServico != null && tributosProdutoServico.contemICMS();
+	}
+
+	@XmlTransient
+	public Integer getIndiceItem() {
+		return indiceItem;
+	}
+
+	@XmlTransient
+	public String getInformacoesAdicionais() {
+		return informacoesAdicionais;
+	}
+
+	@XmlTransient
+	public Integer getNumeroItem() {
+		return numeroItem;
+	}
+
+	/*
+	 * Metodo criado apenas para simplificar e abreviar a marcacao dos .jsp
+	 */
+	@XmlTransient
+	public ProdutoServicoNFe getProduto() {
+		return produtoServicoNFe;
 	}
 
 	@XmlTransient
 	public ProdutoServicoNFe getProdutoServicoNFe() {
 		return produtoServicoNFe;
+	}
+
+	/*
+	 * Metodo criado apenas para simplificar e abreviar a marcacao dos .jsp
+	 */
+	@XmlTransient
+	public TributosProdutoServico getTributos() {
+		return tributosProdutoServico;
 	}
 
 	@XmlTransient
@@ -45,6 +80,9 @@ public class DetalhamentoProdutoServicoNFe {
 
 	public void setNumeroItem(Integer numeroItem) {
 		this.numeroItem = numeroItem;
+		if (numeroItem != null) {
+			indiceItem = numeroItem - 1;
+		}
 	}
 
 	public void setProdutoServicoNFe(ProdutoServicoNFe produtoServicoNFe) {
@@ -58,8 +96,7 @@ public class DetalhamentoProdutoServicoNFe {
 		setTributosProdutoServico(tributos);
 	}
 
-	public void setTributosProdutoServico(
-			TributosProdutoServico tributosProdutoServico) {
+	public void setTributosProdutoServico(TributosProdutoServico tributosProdutoServico) {
 		this.tributosProdutoServico = tributosProdutoServico;
 	}
 }

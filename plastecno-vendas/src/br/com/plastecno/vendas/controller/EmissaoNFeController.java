@@ -20,10 +20,14 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
+import br.com.plastecno.service.nfe.EnderecoNFe;
+import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.NFe;
+import br.com.plastecno.service.nfe.TransportadoraNFe;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
@@ -68,13 +72,8 @@ public class EmissaoNFeController extends AbstractController {
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
         addAtributo("listaTipoFinalidadeEmissao", TipoFinalidadeEmissao.values());
-        addAtributo("finalidadeEmissaoPadrao", TipoFinalidadeEmissao.NORMAL);
-
         addAtributo("listaTipoFormaPagamento", TipoFormaPagamento.values());
-        addAtributo("formaPagamentoPadrao", TipoFormaPagamento.PRAZO);
-
         addAtributo("listaTipoEmissao", TipoEmissao.values());
-        addAtributo("tipoEmissaoPadrao", TipoEmissao.NORMAL);
         addAtributo("listaTipoTributacaoICMS", TipoTributacaoICMS.values());
         addAtributo("listaTipoOrigemMercadoria", TipoOrigemMercadoria.values());
         addAtributo("listaTipoModalidadeDeterminacaoBCICMS", TipoModalidadeDeterminacaoBCICMS.values());
@@ -90,40 +89,64 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("percentualCofins",
                 configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.PERCENTUAL_COFINS));
         addAtributo("percentualPis", configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.PERCENTUAL_PIS));
-
         addAtributo("listaCfop", listaCfop);
+
+        addAtributo("finalidadeEmissaoSelecionada", TipoFinalidadeEmissao.NORMAL.getCodigo());
+        addAtributo("formaPagamentoSelecionada", TipoFormaPagamento.PRAZO.getCodigo());
+        addAtributo("tipoEmissaoSelecionada", TipoEmissao.NORMAL.getCodigo());
+        addAtributo("tipoImpressaoSelecionada", TipoImpressaoNFe.RETRATO.getCodigo());
+
     }
 
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
+        NFe nFe = null;
         try {
             String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
             nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                     nFeService.gerarEnderecoNFe(logradouro, telefone));
 
-            NFe nFe = new NFe(nf);
-            formatarDuplicata(nFe);
+            nFe = new NFe(nf);
+            formatarDuplicata(nFe, false);
 
             redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(nFe, idPedido));
         } catch (BusinessException e) {
+            try {
+                formatarDuplicata(nFe, true);
+            } catch (BusinessException e1) {
+                e.addMensagem(e1.getListaMensagem());
+            }
+            popularNFe(nf, idPedido);
+
             gerarListaMensagemErro(e);
+            redirecTo(this.getClass()).emissaoNFeHome();
         } catch (Exception e) {
             gerarLogErro("Emissão da NFe", e);
         }
-        redirecTo(this.getClass()).emissaoNFeHome();
+
     }
 
-    private void formatarDuplicata(NFe nFe) throws BusinessException {
+    private void formatarDuplicata(NFe nFe, boolean fromServidor) throws BusinessException {
         List<DuplicataNFe> lista = null;
         if ((lista = nFe.getDadosNFe().getListaDuplicata()) == null) {
             return;
         }
-        SimpleDateFormat antes = new SimpleDateFormat("dd/MM/yyyy");
-        SimpleDateFormat depois = new SimpleDateFormat("yyyy-MM-dd");
+
+        String pTo = null;
+        String pFrom = null;
+        if (fromServidor) {
+            pTo = "dd/MM/yyyy";
+            pFrom = "yyyy-MM-dd";
+        } else {
+            pTo = "yyyy-MM-dd";
+            pFrom = "dd/MM/yyyy";
+        }
+        SimpleDateFormat from = new SimpleDateFormat(pFrom);
+        SimpleDateFormat to = new SimpleDateFormat(pTo);
 
         for (DuplicataNFe d : lista) {
             try {
-                d.setDataVencimento(depois.format(antes.parse(d.getDataVencimento())));
+                d.setDataVencimento(to.format(from.parse(d.getDataVencimento())));
             } catch (ParseException e) {
                 throw new BusinessException("Não foi possível formatar a data de vencimento da duplicata "
                         + d.getNumero() + ". O valor enviado é \"" + d.getDataVencimento() + "\"");
@@ -174,5 +197,65 @@ public class EmissaoNFeController extends AbstractController {
                 telefone.length > 0 ? String.valueOf(telefone[0]) + String.valueOf(telefone[1]).replaceAll("\\D+", "")
                         : "");
         irTopoPagina();
+    }
+
+    private void popularDestinatario(DadosNFe nf) {
+        IdentificacaoDestinatarioNFe d = nf.getIdentificacaoDestinatarioNFe();
+        Cliente c = new Cliente();
+        c.setRazaoSocial(d.getNomeFantasia());
+        c.setCnpj(d.getCnpj());
+        c.setInscricaoEstadual(d.getInscricaoEstadual());
+        c.setCpf(d.getCpf());
+        c.setEmail(d.getEmail());
+
+        EnderecoNFe e = d.getEnderecoDestinatarioNFe();
+
+        Logradouro l = new Logradouro();
+        l.setBairro(e.getBairro());
+        l.setCep(e.getCep());
+        l.setComplemento(e.getComplemento());
+        l.setEndereco(e.getLogradouro());
+        l.setCidade(e.getNomeMunicipio());
+        l.setPais(e.getNomePais());
+        l.setNumero(e.getNumero() == null ? null : Integer.parseInt(e.getNumero()));
+        l.setUf(e.getUF());
+
+        addAtributo("cliente", c);
+        addAtributo("logradouro", l);
+        addAtributo("telefoneContatoPedido", d.getEnderecoDestinatarioNFe().getTelefone());
+    }
+
+    private void popularNFe(DadosNFe nf, Integer idPedido) {
+        emissaoNFeHome();
+
+        popularDestinatario(nf);
+        popularTransporte(nf);
+
+        List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+        formatarItemPedido(listaItem);
+
+        addAtributo("idPedido", idPedido);
+        addAtributo("nf", nf);
+        addAtributo("listaItem", listaItem);
+
+        addAtributo("finalidadeEmissaoSelecionada", nf.getIdentificacaoNFe().getFinalidadeEmissao());
+        addAtributo("formaPagamentoSelecionada", nf.getIdentificacaoNFe().getIndicadorFormaPagamento());
+        addAtributo("tipoEmissaoSelecionada", nf.getIdentificacaoNFe().getTipoEmissao());
+        addAtributo("tipoImpressaoSelecionada", nf.getIdentificacaoNFe().getTipoImpressao());
+        addAtributo("listaDuplicata", nf.getCobrancaNFe().getListaDuplicata());
+    }
+
+    private void popularTransporte(DadosNFe nf) {
+        TransportadoraNFe tnfe = nf.getTransporteNFe().getTransportadoraNFe();
+        Transportadora t = new Transportadora();
+        t.setRazaoSocial(tnfe.getRazaoSocial());
+        t.setCnpj(tnfe.getCnpj());
+        t.setInscricaoEstadual(tnfe.getInscricaoEstadual());
+        t.setEndereco(tnfe.getEnderecoCompleto());
+        t.setCidade(tnfe.getMunicipio());
+        t.setUf(tnfe.getUf());
+
+        addAtributo("modalidadeFreteSelecionada", nf.getTransporteNFe().getModalidadeFrete());
+        addAtributo("transportadora", t);
     }
 }

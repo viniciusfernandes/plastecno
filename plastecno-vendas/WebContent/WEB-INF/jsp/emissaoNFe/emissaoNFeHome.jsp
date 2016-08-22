@@ -349,6 +349,20 @@ function gerarJsonTipoIcms(){
 			]};
 };
 
+function gerarJsonCfopNcm(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe',
+			'campos':[{'nome':'cfop', 'id':'cfop'}, {'nome':'ncm', 'id':'ncm'}]};
+};
+
+function gerarJsonEnquadramentoIpi(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi',
+		'campos':[{'nome':'classeEnquadramento', 'id':'clEnquadramentoIPI'},
+		          {'nome':'codigoEnquadramento', 'id':'codEnquadramentoIPI'},
+		          {'nome':'cnpjProdutor', 'id':'cnpjProdIPI'},
+		          {'nome':'codigoSeloControle', 'id':'codSeloContrIPI'},
+		          {'nome':'quantidadeSeloControle', 'id':'qtdeSeloContrIPI'}]};
+};
+
 function gerarJsonTipoIpi(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi.tipoIpi',
 		'campos':[{'nome':'aliquota', 'id':'aliquotaIPI'},
@@ -403,11 +417,10 @@ function gerarJsonTipoPis(){
 
 function gerarInputICMS(){
 	var tipoIcms = gerarJsonTipoIcms();
-	var produto = {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe',
-		'campos':[{'nome':'cfop', 'id':'cfop'}, {'nome':'ncm', 'id':'ncm'}]};
+	var cfop = gerarJsonCfopNcm();
 	
 	gerarInputHidden(tipoIcms);
-	gerarInputHidden(produto);
+	gerarInputHidden(cfop);
 };
 
 function gerarInputInfoProduto(){
@@ -416,14 +429,7 @@ function gerarInputInfoProduto(){
 
 function gerarInputIPI(){
 	var tipoIpi = gerarJsonTipoIpi();
-	var ipi = 
-	{'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi',
-		'campos':[{'nome':'classeEnquadramento', 'id':'clEnquadramentoIPI'},
-		          {'nome':'codigoEnquadramento', 'id':'codEnquadramentoIPI'},
-		          {'nome':'cnpjProdutor', 'id':'cnpjProdIPI'},
-		          {'nome':'codigoSeloControle', 'id':'codSeloContrIPI'},
-		          {'nome':'quantidadeSeloControle', 'id':'qtdeSeloContrIPI'}
-			]};
+	var ipi = gerarJsonEnquadramentoIpi();
 	
 	gerarInputHidden(tipoIpi);
 	gerarInputHidden(ipi);
@@ -641,6 +647,8 @@ function recuperarValoresImpostos(valoresTabela){
 	impostos [4] = gerarJsonISS();
 	impostos [5] = gerarJsonImpostoImportacao();
 	impostos [6] = gerarJsonInfoProduto();
+	impostos [7] = gerarJsonCfopNcm();
+	impostos [8] = gerarJsonEnquadramentoIpi();
 	
 	var idInput = null;
 	var idBloco = null;
@@ -727,8 +735,6 @@ function editarTributos(linha){
 	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[10].innerHTML},
 	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[11].innerHTML},
 	                               {'id': 'valorBCPIS', 'valorTabela': valorBC},
-	                               {'id': 'valorBCISS', 'valorTabela': valorBC},
-	                               {'id': 'valorBCII', 'valorTabela': valorBC},
 	                               {'id': 'valorBCCOFINS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCICMS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCIPI', 'valorTabela': valorBC},
@@ -781,7 +787,7 @@ function editarTributos(linha){
 			<%--div class="label">Regime:</div>
 			<div class="input" style="width: 80%">
 				<select name="nf.identificacaoEmitenteNFe.regimeTributario" style="width: 20%" >
-					<c:forEach var="tipo" items="${listaTipoRegimeTributacao}">
+					<c:-ach var="tipo" items="${listaTipoRegimeTributacao}">
 						<option value="${tipo.codigo}">${tipo.descricao}</option>
 					</c:forEach>
 				</select>
@@ -796,9 +802,9 @@ function editarTributos(linha){
 			</div>
 			<div class="label">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado" name="nf.identificacaoNFe.indicadorFormaPagamento"  style="width: 100%">
+				<select name="nf.identificacaoNFe.indicadorFormaPagamento"  style="width: 100%">
 					<c:forEach var="formaPagamento" items="${listaTipoFormaPagamento}">
-						<option value="${formaPagamento.codigo}" <c:if test="${formaPagamento eq formaPagamentoPadrao}">selected</c:if>>${formaPagamento.descricao}</option>
+						<option value="${formaPagamento.codigo}" <c:if test="${formaPagamento.codigo eq formaPagamentoSelecionada}">selected</c:if>>${formaPagamento.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -806,7 +812,7 @@ function editarTributos(linha){
 			<div class="input" style="width: 20%">
 				<select name="nf.identificacaoNFe.tipoEmissao"  style="width: 50%">
 					<c:forEach var="tipoEmissao" items="${listaTipoEmissao}">
-						<option value="${tipoEmissao.codigo}" <c:if test="${tipoEmissao eq tipoEmissaoPadrao}">selected</c:if>>${tipoEmissao.descricao}</option>
+						<option value="${tipoEmissao.codigo}" <c:if test="${tipoEmissao.codigo eq tipoEmissaoSelecionada}">selected</c:if>>${tipoEmissao.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -815,15 +821,15 @@ function editarTributos(linha){
 				<select name="nf.identificacaoNFe.finalidadeEmissao"
 					style="width: 100%" >
 					<c:forEach var="finalidade" items="${listaTipoFinalidadeEmissao}">
-						<option value="${finalidade.codigo}" <c:if test="${finalidade eq finalidadeEmissaoPadrao}">selected</c:if>>${finalidade.descricao}</option>
+						<option value="${finalidade.codigo}" <c:if test="${finalidade.codigo eq finalidadeEmissaoSelecionada}">selected</c:if>>${finalidade.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
 			<div class="label">Tipo Impressão:</div>
 			<div class="input" style="width: 10%">
-				<select style="width: 100%">
+				<select name="nf.identificacaoNFe.tipoImpressao" style="width: 100%">
 					<c:forEach var="tipo" items="${listaTipoImpressao}">
-						<option value="${tipo.codigo}">${tipo.descricao}</option>
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoImpressaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -849,15 +855,15 @@ function editarTributos(linha){
 			</div>
 			<div class="label">Natureza Operação:</div>
 			<div class="input" style="width: 50%">
-				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" style="width: 80%"/>
+				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 80%"/>
 			</div>
 			<div class="label">Info. Adicionais Fisco:</div>
 			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%"></textarea>
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco}</textarea>
 			</div>
 			<div class="label">Info. Adicionais Contrib.:</div>
 			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte" style="width: 100%"></textarea>
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte}</textarea>
 			</div>
 		</fieldset>
 		
@@ -869,23 +875,23 @@ function editarTributos(linha){
 			</div>
 			<div class="label">Núm. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="numeroReferenciada" />
+				<input type="text" id="numeroReferenciada"/>
 			</div>
 			<div class="label">Série. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="serieReferenciada" />
+				<input type="text" id="serieReferenciada"/>
 			</div>
 			<div class="label">Mod. Doc. Fiscal:</div>
 			<div class="input" style="width: 30%">
-				<input type="text" id="modReferenciada" style="width: 30%"/>
+				<input type="text" id="modReferenciada"/>
 			</div>
 			<div class="label">CNPJ Emit.:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="cnpjReferenciada" />
+				<input type="text" id="cnpjReferenciada"/>
 			</div>
 			<div class="label">Emis. Ano/Mês (AAMM):</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="anoMesReferenciada" />
+				<input type="text" id="anoMesReferenciada"/>
 			</div>
 			<div class="label">UF Emit.:</div>
 			<div class="input" style="width: 10%">
@@ -910,6 +916,18 @@ function editarTributos(linha){
 						
 				<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
 				<tbody>
+					<c:forEach var="ref" items="${nf.identificacaoNFe.listaNFeReferenciada}">
+					<tr>
+						<td>${ref.chaveAcessoReferenciada}</td>
+						<td>${ref.identificacaoNFeReferenciada.numeroNF}</td>
+						<td>${ref.identificacaoNFeReferenciada.serie}</td>
+						<td>${ref.identificacaoNFeReferenciada.modelo}</td>
+						<td>${ref.identificacaoNFeReferenciada.cnpjEmitente}</td>
+						<td>${ref.identificacaoNFeReferenciada.anoMes}</td>
+						<td>${ref.identificacaoNFeReferenciada.ufEmitente}</td>
+						<td><input type="button" title="Remover Registro" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+					</tr>
+					</c:forEach>
 				</tbody>
 			</table>
 		</fieldset>
@@ -921,15 +939,15 @@ function editarTributos(linha){
 				<legend>::: Local Retirada :::</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">
-					<input type="text" name="nf.identificacaoLocalRetirada.cnpj"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.cnpj" value="${nf.identificacaoLocalRetirada.cnpj}"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 50%">
-					<input type="text" name="nf.identificacaoLocalRetirada.cpf" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.cpf" value="${nf.identificacaoLocalRetirada.cpf}" style="width: 30%"/>
 				</div>
 				<div class="label condicional">CEP:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" id="cepRetirada" maxlength="8" />
+					<input type="text" id="cepRetirada" name="nf.identificacaoLocalRetirada.cep" value="${nf.identificacaoLocalRetirada.cep}" maxlength="8" />
 				</div>
 				<div class="input" style="width: 70%">
 					<input type="button" id="botaoCepRetirada"
@@ -938,27 +956,27 @@ function editarTributos(linha){
 				</div>
 				<div class="label">Endereço:</div>
 				<div class="input" style="width: 40%">
-					<input type="text" id="enderecoRetirada" name="nf.identificacaoLocalRetirada.logradouro"/>
+					<input type="text" id="enderecoRetirada" name="nf.identificacaoLocalRetirada.logradouro" value="${nf.identificacaoLocalRetirada.logradouro}"/>
 				</div>
 				<div class="label" style="width: 8%">Número:</div>
 				<div class="input" style="width: 30%">
-					<input type="text" name="nf.identificacaoLocalRetirada.numero" style="width: 20%"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.numero" value="${nf.identificacaoLocalRetirada.numero}" style="width: 20%"/>
 				</div>
 				<div class="label">Complemento:</div>
 				<div class="input" style="width: 70%">
-					<input type="text" name="nf.identificacaoLocalRetirada.complemento" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.complemento" value="${nf.identificacaoLocalRetirada.complemento}" style="width: 30%"/>
 				</div>
 				<div class="label">Cidade:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="cidadeRetirada" name="nf.identificacaoLocalRetirada.municipio" style="width: 40%" />
+					<input type="text" id="cidadeRetirada" name="nf.identificacaoLocalRetirada.municipio" value="${nf.identificacaoLocalRetirada.municipio}" style="width: 40%" />
 				</div>
 				<div class="label">Bairro:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="bairroRetirada" name="nf.identificacaoLocalRetirada.bairro" style="width: 40%"/>
+					<input type="text" id="bairroRetirada" name="nf.identificacaoLocalRetirada.bairro" value="${nf.identificacaoLocalRetirada.bairro}" style="width: 40%"/>
 				</div>
 				<div class="label">UF:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="ufRetirada" name="nf.identificacaoLocalRetirada.uf" style="width: 5%"/>
+					<input type="text" id="ufRetirada" name="nf.identificacaoLocalRetirada.uf" value="${nf.identificacaoLocalRetirada.uf}" style="width: 5%"/>
 				</div>
 			</fieldset>
 			</div>
@@ -968,15 +986,15 @@ function editarTributos(linha){
 				<legend>::: Local Entrega ::: -</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">
-					<input type="text" name="nf.identificacaoLocalEntrega.cnpj"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.cnpj" value="${nf.identificacaoLocalEntrega.cnpj}"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 50%">
-					<input type="text" name="nf.identificacaoLocalEntrega.cpf" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.cpf" value="${nf.identificacaoLocalEntrega.cpf}" style="width: 30%"/>
 				</div>
 				<div class="label condicional">CEP:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" id="cepEntrega" maxlength="8" />
+					<input type="text" id="cepEntrega" name="nf.identificacaoLocalEntrega.cep" value="${nf.identificacaoLocalEntrega.cep}" maxlength="8" />
 				</div>
 				<div class="input" style="width: 70%">
 					<input type="button" id="botaoCepEntrega"
@@ -985,27 +1003,27 @@ function editarTributos(linha){
 				</div>
 				<div class="label">Endereço:</div>
 				<div class="input" style="width: 40%">
-					<input type="text" id="enderecoEntrega" name="nf.identificacaoLocalEntrega.logradouro"/>
+					<input type="text" id="enderecoEntrega" name="nf.identificacaoLocalEntrega.logradouro" value="${nf.identificacaoLocalEntrega.logradouro}"/>
 				</div>
 				<div class="label" style="width: 8%">Número:</div>
 				<div class="input" style="width: 30%">
-					<input type="text" name="nf.identificacaoLocalEntrega.numero" style="width: 20%"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.numero" value="${nf.identificacaoLocalEntrega.numero}" style="width: 20%"/>
 				</div>
 				<div class="label">Complemento:</div>
 				<div class="input" style="width: 70%">
-					<input type="text" name="nf.identificacaoLocalEntrega.complemento" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.complemento" value="${nf.identificacaoLocalEntrega.complemento}" style="width: 30%"/>
 				</div>
 				<div class="label">Cidade:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="cidadeEntrega" name="nf.identificacaoLocalEntrega.municipio" style="width: 40%" />
+					<input type="text" id="cidadeEntrega" name="nf.identificacaoLocalEntrega.municipio" value="${nf.identificacaoLocalEntrega.municipio}" style="width: 40%" />
 				</div>
 				<div class="label">Bairro:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="bairroEntrega" name="nf.identificacaoLocalEntrega.bairro" style="width: 40%"/>
+					<input type="text" id="bairroEntrega" name="nf.identificacaoLocalEntrega.bairro" value="${nf.identificacaoLocalEntrega.bairro}" style="width: 40%"/>
 				</div>
 				<div class="label">UF:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="ufEntrega" name="nf.identificacaoLocalEntrega.uf" style="width: 5%"/>
+					<input type="text" id="ufEntrega" name="nf.identificacaoLocalEntrega.uf" value="${nf.identificacaoLocalEntrega.uf}" style="width: 5%"/>
 				</div>
 			</fieldset>
 			</div>			
@@ -1201,6 +1219,66 @@ function editarTributos(linha){
 				</div>
 				
 				<div class="divFieldset">
+				<fieldset id="bloco_cofins" class="fieldsetInterno">
+					<legend>::: COFINS Prod.::: +</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="codSitTribCOFINS" style="width: 45%">
+							<c:forEach var="tipo" items="${listaTipoTributacaoCOFINS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 50%">
+						<input id="aliquotaCOFINS" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Qtde. Vendida:</div>
+					<div class="input" style="width: 10%">
+						<input id="qtdeVendidaCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_pis" class="fieldsetInterno">
+					<legend>::: PIS Prod.::: +</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="codSitTribPIS" style="width: 45%">
+							<c:forEach var="tipo" items="${listaTipoTributacaoPIS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCPIS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 50%">
+						<input id="aliquotaPIS" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Qtde.Vendida:</div>
+					<div class="input" style="width: 10%">
+						<input id="qtdeVendidaPIS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparPIS" title="Limpar PIS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
 				<fieldset id="bloco_ipi" class="fieldsetInterno">
 					<legend>::: IPI Prod.::: +</legend>
 					<div class="label">Situação Tribut.:</div>
@@ -1250,66 +1328,6 @@ function editarTributos(linha){
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirIPI" title="Inserir IPI do Produto" value="" class="botaoInserir"/>
 						<input type="button" id="botaoLimparIPI" title="Limpar IPI do Produto" value="" class="botaoLimpar"/>
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_pis" class="fieldsetInterno">
-					<legend>::: PIS Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 80%">
-						<select id="codSitTribPIS" style="width: 45%">
-							<c:forEach var="tipo" items="${listaTipoTributacaoPIS}">
-								<option value="${tipo.codigo}">${tipo.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCPIS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaPIS" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Qtde.Vendida:</div>
-					<div class="input" style="width: 10%">
-						<input id="qtdeVendidaPIS" type="text" style="width: 100%" />
-					</div>
-					<div class="bloco_botoes">
-						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparPIS" title="Limpar PIS do Produto" value="" class="botaoLimpar"/>
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_cofins" class="fieldsetInterno">
-					<legend>::: COFINS Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 80%">
-						<select id="codSitTribCOFINS" style="width: 45%">
-							<c:forEach var="tipo" items="${listaTipoTributacaoCOFINS}">
-								<option value="${tipo.codigo}">${tipo.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCCOFINS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaCOFINS" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Qtde. Vendida:</div>
-					<div class="input" style="width: 10%">
-						<input id="qtdeVendidaCOFINS" type="text" style="width: 100%" />
-					</div>
-					<div class="bloco_botoes">
-						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
 				</div>
@@ -1373,7 +1391,6 @@ function editarTributos(linha){
 					</div>
 				</fieldset>
 				</div>
-				
 			</fieldset>
 		</fieldset>	
 		
@@ -1383,7 +1400,7 @@ function editarTributos(linha){
 			<div class="input" style="width: 80%">
 			<select id="modFrete" name="nf.transporteNFe.modalidadeFrete" style="width: 45%">
 				<c:forEach var="tipo" items="${listaTipoModalidadeFrete}">
-					<option value="${tipo.codigo}">${tipo.descricao}</option>
+					<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq modalidadeFreteSelecionada}">selected</c:if>>${tipo.descricao}</option>
 				</c:forEach>
 			</select>
 			</div>
@@ -1427,15 +1444,16 @@ function editarTributos(linha){
 					<legend>::: Veículo :::</legend>
 					<div  class="label">Placa:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.veiculo.placa" style="width: 100%" />
+						<input type="text" name="nf.transporteNFe.veiculo.placa" value="${nf.transporteNFe.veiculo.placa}" style="width: 100%" />
 					</div>
 					<div  class="label">UF:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.veiculo.uf" style="width: 20%" />
+						<input type="text" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" style="width: 20%" />
 					</div>
 					<div  class="label">Regist. Trans. Cargo:</div>
 					<div class="input" style="width: 30%">
-						<input type="text" name="nf.transporteNFe.veiculo.registroNacionalTransportador" style="width: 50%" />
+						<input type="text" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
+							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" style="width: 50%" />
 					</div>
 				</fieldset>
 				</div>
@@ -1471,6 +1489,14 @@ function editarTributos(linha){
 						
 						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
 						<tbody>
+							<c:forEach var="reboque" items="${nf.transporteNFe.listaReboque}">
+							<tr>
+								<td>${reboque.placa}</td>
+								<td>${reboque.uf}</td>
+								<td>${reboque.registroNacionalTransportador}</td>
+								<td><input type="button" title="Remover Reboque" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+							</tr>
+							</c:forEach>
 						</tbody>
 					</table>
 				</fieldset>
@@ -1564,20 +1590,20 @@ function editarTributos(linha){
 			<legend>::: Cobrança :::</legend>
 			<div class="label">Número:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" name="nf.cobrancaNFe.faturaNFe.numero"/>
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.numero" value="${nf.cobrancaNFe.faturaNFe.numero}"/>
 			</div>
 			
 			<div class="label">Valor Original:</div>
 			<div class="input" style="width: 55%">
-				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorOriginal" style="width: 20%"/>
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorOriginal" value="${nf.cobrancaNFe.faturaNFe.valorOriginal}" style="width: 20%"/>
 			</div>
 			<div class="label">Valor Desconto:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorDesconto" />
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorDesconto" value="${nf.cobrancaNFe.faturaNFe.valorDesconto}"/>
 			</div>
 			<div class="label">Valor Líquido:</div>
 			<div class="input" style="width: 55%">
-				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorLiquido" style="width: 20%"/>
+				<input type="text" name="nf.cobrancaNFe.faturaNFe.valorLiquido" value="${nf.cobrancaNFe.faturaNFe.valorLiquido}" style="width: 20%"/>
 			</div>
 			
 			<div class="divFieldset">
@@ -1631,33 +1657,34 @@ function editarTributos(linha){
 			<legend>::: Exportação ::: -</legend>
 			<div class="label">UF Embarque:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.exportacaoNFe.ufEmbarque" style="width: 5%"/>
+				<input type="text" name="nf.exportacaoNFe.ufEmbarque" value="${nf.exportacaoNFe.ufEmbarque}" style="width: 5%"/>
 			</div>
 			<div class="label">Local Embarque:</div>
 			<div class="input" style="width: 60%">
-				<input type="text" name="nf.exportacaoNFe.localEmbarque"/>
+				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}"/>
 			</div>		
 		</fieldset>
 		<fieldset id="bloco_compra">
 			<legend>::: Compra ::: -</legend>
 			<div class="label">Nota Empenho:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.notaEmpenho" style="width: 10%"/>
+				<input type="text" name="nf.compraNFe.notaEmpenho" value="${nf.compraNFe.notaEmpenho}" style="width: 10%"/>
 			</div>
 			<div class="label">Pedido:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.pedido" style="width: 50%"/>
+				<input type="text" name="nf.compraNFe.pedido" value="${nf.compraNFe.pedido}" style="width: 50%"/>
 			</div>
 			<div class="label">Contrato:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.contrato" style="width: 50%"/>
+				<input type="text" name="nf.compraNFe.contrato" value="${nf.compraNFe.contrato}" style="width: 50%"/>
 			</div>		
 		</fieldset>
 		<div class="bloco_botoes">
 			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>
 		</div>
+
+		<jsp:include page="/bloco/bloco_impostos_emissao_nfe.jsp"></jsp:include>		
 	</form>
 
-	
 </body>
 </html>

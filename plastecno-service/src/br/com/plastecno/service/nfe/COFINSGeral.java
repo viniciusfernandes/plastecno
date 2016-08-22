@@ -37,6 +37,21 @@ public class COFINSGeral {
 	}
 
 	@XmlTransient
+	public Double getAliquota() {
+		return aliquota;
+	}
+
+	@XmlTransient
+	public String getCodigoSituacaoTributaria() {
+		return codigoSituacaoTributaria;
+	}
+
+	@XmlTransient
+	public Integer getQuantidadeVendida() {
+		return quantidadeVendida;
+	}
+
+	@XmlTransient
 	public TipoTributacaoCOFINS getTipoTributacao() {
 		return TipoTributacaoCOFINS.getTipoTributacao(codigoSituacaoTributaria);
 	}
@@ -44,6 +59,11 @@ public class COFINSGeral {
 	@XmlTransient
 	public Double getValor() {
 		return valor == null ? 0 : valor;
+	}
+
+	@XmlTransient
+	public Double getValorAliquota() {
+		return valorAliquota;
 	}
 
 	@XmlTransient
@@ -109,7 +129,8 @@ public class COFINSGeral {
 		}
 
 		if (valorAliquota == null
-				&& (COFINS_3.equals(t) || COFINS_99.equals(t)||COFINS_ST.equals(t))) {
+				&& (COFINS_3.equals(t) || COFINS_99.equals(t) || COFINS_ST
+						.equals(t))) {
 			throw new BusinessException(
 					"Valor alíquota do COFINS é obrigatório");
 		}

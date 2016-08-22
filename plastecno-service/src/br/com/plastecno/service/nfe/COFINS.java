@@ -6,8 +6,9 @@ import javax.xml.bind.annotation.XmlTransient;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.*;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
+import br.com.plastecno.service.validacao.Validavel;
 
-public class COFINS {
+public class COFINS implements Validavel {
 	@XmlElement(name = "COFINSAliq")
 	private COFINSGeral cofinsAliquota;
 
@@ -24,10 +25,10 @@ public class COFINS {
 	private COFINSGeral cofinsST;
 
 	@XmlTransient
-	private COFINSGeral tipoConfins;
+	private COFINSGeral tipoCofins;
 
-	public COFINSGeral getTipoConfins() {
-		return tipoConfins;
+	public COFINSGeral getTipoCofins() {
+		return tipoCofins;
 	}
 
 	public void setTipoCofins(COFINSGeral tipoCofins) {
@@ -48,18 +49,15 @@ public class COFINS {
 		} else if (COFINS_ST.equals(tribut)) {
 			cofinsST = tipoCofins;
 		}
-		this.tipoConfins = tipoCofins;
+		this.tipoCofins = tipoCofins;
 	}
 
-	public void setTipoConfins(COFINSGeral tipoConfins) {
-		this.tipoConfins = tipoConfins;
-	}
-
+	@Override
 	public void validar() throws BusinessException {
-		if (tipoConfins == null) {
+		if (tipoCofins == null) {
 			throw new BusinessException("Tipo de COFINS é obrigatório");
 		}
 
-		tipoConfins.validar();
+		tipoCofins.validar();
 	}
 }

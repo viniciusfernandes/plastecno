@@ -37,6 +37,21 @@ public class PISGeral {
 	}
 
 	@XmlTransient
+	public Double getAliquota() {
+		return aliquota;
+	}
+
+	@XmlTransient
+	public String getCodigoSituacaoTributaria() {
+		return codigoSituacaoTributaria;
+	}
+
+	@XmlTransient
+	public Integer getQuantidadeVendida() {
+		return quantidadeVendida;
+	}
+
+	@XmlTransient
 	public TipoTributacaoPIS getTipoTributacao() {
 		return TipoTributacaoPIS.getTipoTributacao(codigoSituacaoTributaria);
 	}
@@ -44,6 +59,11 @@ public class PISGeral {
 	@XmlTransient
 	public Double getValor() {
 		return valor == null ? 0 : valor;
+	}
+
+	@XmlTransient
+	public Double getValorAliquota() {
+		return valorAliquota;
 	}
 
 	@XmlTransient

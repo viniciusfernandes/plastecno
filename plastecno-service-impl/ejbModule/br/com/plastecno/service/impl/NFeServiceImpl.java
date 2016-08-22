@@ -33,6 +33,7 @@ import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.ICMSGeral;
 import br.com.plastecno.service.nfe.IdentificacaoEmitenteNFe;
+import br.com.plastecno.service.nfe.IdentificacaoLocalGeral;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.ProdutoServicoNFe;
 import br.com.plastecno.service.nfe.TributosProdutoServico;
@@ -65,13 +66,10 @@ public class NFeServiceImpl implements NFeService {
 	private RepresentadaService representadaService;
 
 	private void carregarConfiguracao(NFe nFe) {
-		nFe.getDadosNFe().setId(
-				"12345678901234567890123456789012345678901234567");
-		nFe.getDadosNFe().getIdentificacaoEmitenteNFe()
-				.setCNAEFiscal("1234567");
+		nFe.getDadosNFe().setId("12345678901234567890123456789012345678901234567");
+		nFe.getDadosNFe().getIdentificacaoEmitenteNFe().setCNAEFiscal("1234567");
 		ProdutoServicoNFe p = null;
-		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe()
-				.getListaDetalhamentoProdutoServicoNFe()) {
+		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
 			p = d.getProdutoServicoNFe();
 			p.setEAN("EanTEste");
 			p.setEANTributavel("EanTEste");
@@ -79,12 +77,23 @@ public class NFeServiceImpl implements NFeService {
 		}
 	}
 
+	private void carregarDadosLocalRetiradaEntrega(NFe nFe) {
+		IdentificacaoLocalGeral retirada = nFe.getDadosNFe().getIdentificacaoLocalRetirada();
+		IdentificacaoLocalGeral entrega = nFe.getDadosNFe().getIdentificacaoLocalEntrega();
+
+		if (retirada != null) {
+			retirada.setCodigoMunicipio(logradouroService.pesquisarCodigoIBGEByCEP(retirada.getCep()));
+		}
+		if (entrega != null) {
+			entrega.setCodigoMunicipio(logradouroService.pesquisarCodigoIBGEByCEP(entrega.getCep()));
+		}
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NFe carregarIdentificacaoEmitente(NFe nFe, Integer idPedido) {
 
-		Representada emitente = pedidoService
-				.pesquisarRepresentadaIdPedido(idPedido);
+		Representada emitente = pedidoService.pesquisarRepresentadaIdPedido(idPedido);
 
 		if (emitente == null) {
 			return nFe;
@@ -95,11 +104,9 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setInscricaoEstadual(emitente.getInscricaoEstadual());
 		iEmit.setNomeFantasia(emitente.getNomeFantasia());
 		iEmit.setRazaoSocial(emitente.getRazaoSocial());
-		iEmit.setRegimeTributario(configuracaoSistemaService
-				.pesquisar(ParametroConfiguracaoSistema.REGIME_TRIBUTACAO));
+		iEmit.setRegimeTributario(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.REGIME_TRIBUTACAO));
 
-		EnderecoNFe endEmit = gerarEnderecoNFe(
-				representadaService.pesquisarLogradorouro(emitente.getId()),
+		EnderecoNFe endEmit = gerarEnderecoNFe(representadaService.pesquisarLogradorouro(emitente.getId()),
 				emitente.getTelefone());
 
 		iEmit.setEnderecoEmitenteNFe(endEmit);
@@ -112,8 +119,7 @@ public class NFeServiceImpl implements NFeService {
 		ValoresTotaisICMS totaisICMS = new ValoresTotaisICMS();
 		ValoresTotaisISSQN totaisISSQN = new ValoresTotaisISSQN();
 
-		List<DetalhamentoProdutoServicoNFe> listaItem = nFe.getDadosNFe()
-				.getListaDetalhamentoProdutoServicoNFe();
+		List<DetalhamentoProdutoServicoNFe> listaItem = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 
 		if (listaItem == null || listaItem.isEmpty()) {
 			return;
@@ -150,18 +156,15 @@ public class NFeServiceImpl implements NFeService {
 			}
 
 			if (tributo != null && tributo.contemIPI()) {
-				valorIPI += tributo.getTipoIpi().carregarValoresAliquotas()
-						.getValor();
+				valorIPI += tributo.getTipoIpi().carregarValoresAliquotas().getValor();
 			}
 
 			if (tributo != null && tributo.contemPIS()) {
-				valorPIS += tributo.getTipoPis().carregarValoresAliquotas()
-						.getValor();
+				valorPIS += tributo.getTipoPis().carregarValoresAliquotas().getValor();
 			}
 
 			if (tributo != null && tributo.contemCOFINS()) {
-				valorCOFINS += tributo.getTipoCofins()
-						.carregarValoresAliquotas().getValor();
+				valorCOFINS += tributo.getTipoCofins().carregarValoresAliquotas().getValor();
 			}
 
 			if (tributo != null && tributo.contemImpostoImportacao()) {
@@ -170,8 +173,7 @@ public class NFeServiceImpl implements NFeService {
 
 			if (tributo != null && tributo.contemISS()) {
 				valorBCISS += tributo.getIssqn().getValorBC();
-				valorISS += tributo.getIssqn().carregarValoresAliquotas()
-						.getValor();
+				valorISS += tributo.getIssqn().carregarValoresAliquotas().getValor();
 			}
 
 			produto = item.getProdutoServicoNFe();
@@ -214,13 +216,12 @@ public class NFeServiceImpl implements NFeService {
 	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
 		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
-
+		carregarDadosLocalRetiradaEntrega(nFe);
 		carregarConfiguracao(nFe);
 
 		ValidadorInformacao.validar(nFe);
-		validarTributos(nFe);
 
-		final String xml = gerarXMLNfe(nFe);
+		final String xml = gerarXMLNfe(nFe, null);
 		pedidoNFeDAO.alterar(new PedidoNFe(idPedido, xml));
 
 		return xml;
@@ -236,8 +237,7 @@ public class NFeServiceImpl implements NFeService {
 		}
 		Double valorPedido = pedidoService.pesquisarValorPedido(idPedido);
 
-		Double valorDuplicata = valorPedido != null ? valorPedido
-				/ totalParcelas : 0;
+		Double valorDuplicata = valorPedido != null ? valorPedido / totalParcelas : 0;
 		List<DuplicataNFe> listaDuplicata = new ArrayList<DuplicataNFe>();
 		DuplicataNFe dup = null;
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -267,21 +267,19 @@ public class NFeServiceImpl implements NFeService {
 		endereco.setLogradouro(logradouro.getEndereco());
 		endereco.setNomeMunicipio(logradouro.getCidade());
 		endereco.setNomePais(logradouro.getPais());
-		endereco.setNumero(logradouro.getNumero() == null ? "" : String
-				.valueOf(logradouro.getNumero()));
+		endereco.setNumero(logradouro.getNumero() == null ? "" : String.valueOf(logradouro.getNumero()));
 		endereco.setUF(logradouro.getUf());
 		endereco.setNomePais(logradouro.getPais());
 		endereco.setTelefone(telefone);
 
-		endereco.setCodigoMunicipio(logradouroService
-				.pesquisarCodigoIBGEByIdCidade(logradouro.getIdCidade()));
+		endereco.setCodigoMunicipio(logradouroService.pesquisarCodigoIBGEByIdCidade(logradouro.getIdCidade()));
 
 		return endereco;
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public String gerarXMLNfe(NFe nFe) throws BusinessException {
+	public String gerarXMLNfe(NFe nFe, Integer idPedido) throws BusinessException {
 		try {
 			StringWriter writer = new StringWriter();
 			JAXBContext context = JAXBContext.newInstance(NFe.class);
@@ -292,8 +290,7 @@ public class NFeServiceImpl implements NFeService {
 			m.marshal(nFe, writer);
 			return writer.toString();
 		} catch (Exception e) {
-			throw new BusinessException(
-					"Falha na geracao do XML da NFe do pedido No. ", e);
+			throw new BusinessException("Falha na geracao do XML da NFe do pedido No. " + idPedido, e);
 		}
 	}
 
@@ -306,20 +303,5 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Object[]> pesquisarCFOP() {
 		return configuracaoSistemaService.pesquisarCFOP();
-	}
-
-	/*
-	 * Esse metodo foi criado pois nao havia modo de implementar as validacoes
-	 * via anotacoes ja que cada tipo de TRIBUTO valida um campo diferente
-	 */
-	private void validarTributos(NFe nFe) throws BusinessException {
-		TributosProdutoServico t = null;
-		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe()
-				.getListaDetalhamentoProdutoServicoNFe()) {
-			t = d.getTributosProdutoServico();
-			if (t != null) {
-				t.validarTributos();
-			}
-		}
 	}
 }

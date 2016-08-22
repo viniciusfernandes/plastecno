@@ -181,8 +181,22 @@ public class Transportadora implements Serializable {
 		this.ativo = ativo;
 	}
 
+	public void setCidade(String cidade) {
+		if (logradouro == null) {
+			logradouro = new Logradouro();
+		}
+		logradouro.setCidade(cidade);
+	}
+
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
+	}
+
+	public void setEndereco(String endereco) {
+		if (logradouro == null) {
+			logradouro = new Logradouro();
+		}
+		logradouro.setEndereco(endereco);
 	}
 
 	public void setId(Integer id) {
@@ -211,5 +225,12 @@ public class Transportadora implements Serializable {
 
 	public void setSite(String site) {
 		this.site = site;
+	}
+
+	public void setUf(String uf) {
+		if (logradouro == null) {
+			logradouro = new Logradouro();
+		}
+		logradouro.setUf(uf);
 	}
 }

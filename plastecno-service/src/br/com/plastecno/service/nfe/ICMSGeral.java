@@ -87,6 +87,46 @@ public class ICMSGeral {
 	}
 
 	@XmlTransient
+	public String getCodigoSituacaoTributaria() {
+		return codigoSituacaoTributaria;
+	}
+
+	@XmlTransient
+	public Integer getModalidadeDeterminacaoBC() {
+		return modalidadeDeterminacaoBC;
+	}
+
+	@XmlTransient
+	public Integer getModalidadeDeterminacaoBCST() {
+		return modalidadeDeterminacaoBCST;
+	}
+
+	@XmlTransient
+	public String getMotivoDesoneracao() {
+		return motivoDesoneracao;
+	}
+
+	@XmlTransient
+	public Integer getOrigemMercadoria() {
+		return origemMercadoria;
+	}
+
+	@XmlTransient
+	public Double getPercentualMargemValorAdicionadoICMSST() {
+		return percentualMargemValorAdicionadoICMSST;
+	}
+
+	@XmlTransient
+	public Double getPercentualReducaoBC() {
+		return percentualReducaoBC;
+	}
+
+	@XmlTransient
+	public Double getPercentualReducaoBCST() {
+		return percentualReducaoBCST;
+	}
+
+	@XmlTransient
 	public TipoTributacaoICMS getTipoTributacao() {
 		return TipoTributacaoICMS.getTipoTributacao(codigoSituacaoTributaria);
 	}
@@ -107,8 +147,18 @@ public class ICMSGeral {
 	}
 
 	@XmlTransient
+	public Double getValorBCSTRetido() {
+		return valorBCSTRetido;
+	}
+
+	@XmlTransient
 	public Double getValorST() {
 		return valorST == null ? 0 : valorST;
+	}
+
+	@XmlTransient
+	public Double getValorSTRetido() {
+		return valorSTRetido;
 	}
 
 	public void setAliquota(Double aliquota) {

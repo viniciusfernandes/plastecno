@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.constante.RegexValidacao;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
@@ -11,13 +12,20 @@ public class IdentificacaoLocalGeral {
 	@XmlElement(name = "xBairro")
 	private String bairro;
 
+	// Esse campo eh necessario apenas para recuperar o codigo do municipio pois
+	// nao eh garantido a unicidade da pesquisa pelo nome da cidade, mas esse
+	// campo nao sera incluido no xml
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "CEP do local do produto")
+	@XmlTransient
+	private String cep;
+
 	@InformacaoValidavel(obrigatorio = true, regex = RegexValidacao.CNPJ, nomeExibicao = "CNPJ do local do produto")
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
 	@InformacaoValidavel(obrigatorio = true, tamanho = 7, nomeExibicao = "Código do município do local do produto")
 	@XmlElement(name = "cMun")
-	private Integer codigoMunicipio;
+	private String codigoMunicipio;
 
 	@InformacaoValidavel(intervaloComprimento = { 1, 60 }, nomeExibicao = "Complemento do local do produto")
 	@XmlElement(name = "xCpl")
@@ -43,15 +51,69 @@ public class IdentificacaoLocalGeral {
 	@XmlElement(name = "UF")
 	private String uf;
 
+	@XmlTransient
+	public String getBairro() {
+		return bairro;
+	}
+
+	@XmlTransient
+	public String getCep() {
+		return cep;
+	}
+
+	@XmlTransient
+	public String getCnpj() {
+		return cnpj;
+	}
+
+	@XmlTransient
+	public String getCodigoMunicipio() {
+		return codigoMunicipio;
+	}
+
+	@XmlTransient
+	public String getComplemento() {
+		return complemento;
+	}
+
+	@XmlTransient
+	public String getCpf() {
+		return cpf;
+	}
+
+	@XmlTransient
+	public String getLogradouro() {
+		return logradouro;
+	}
+
+	@XmlTransient
+	public String getMunicipio() {
+		return municipio;
+	}
+
+	@XmlTransient
+	public String getNumero() {
+		return numero;
+	}
+
+	@XmlTransient
+	public String getUf() {
+		return uf;
+	}
+
 	public void setBairro(String bairro) {
 		this.bairro = bairro;
+	}
+
+	public void setCep(String cep) {
+		this.cep = cep;
 	}
 
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
 
-	public void setCodigoMunicipio(Integer codigoMunicipio) {
+	public void setCodigoMunicipio(String codigoMunicipio) {
 		this.codigoMunicipio = codigoMunicipio;
 	}
 

@@ -3,6 +3,7 @@ package br.com.plastecno.service.nfe;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -16,7 +17,7 @@ public class TransporteNFe {
 	@XmlElement(name = "vol")
 	private List<VolumeTransportado> listaVolume;
 
-	@InformacaoValidavel(obrigatorio = true, valoresInteiros = { 0, 1, 2, 9 }, nomeExibicao = "Modalidade do frete da transporte")
+	@InformacaoValidavel(obrigatorio = true, valores = { 0, 1, 2, 9 }, nomeExibicao = "Modalidade do frete da transporte")
 	@XmlElement(name = "modFrete")
 	private Integer modalidadeFrete;
 
@@ -30,6 +31,36 @@ public class TransporteNFe {
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Veículo de transporte")
 	@XmlElement(name = "veicTransp")
 	private VeiculoTransporte veiculo;
+
+	@XmlTransient
+	public List<VeiculoTransporte> getListaReboque() {
+		return listaReboque;
+	}
+
+	@XmlTransient
+	public List<VolumeTransportado> getListaVolume() {
+		return listaVolume;
+	}
+
+	@XmlTransient
+	public Integer getModalidadeFrete() {
+		return modalidadeFrete;
+	}
+
+	@XmlTransient
+	public RetencaoICMSTransporteNFe getRetencaoICMS() {
+		return retencaoICMS;
+	}
+
+	@XmlTransient
+	public TransportadoraNFe getTransportadoraNFe() {
+		return transportadoraNFe;
+	}
+
+	@XmlTransient
+	public VeiculoTransporte getVeiculo() {
+		return veiculo;
+	}
 
 	public void setListaReboque(List<VeiculoTransporte> listaReboque) {
 		this.listaReboque = listaReboque;

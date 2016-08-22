@@ -9,6 +9,10 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class CobrancaNFe {
+@XmlTransient	public FaturaNFe getFaturaNFe() {
+		return faturaNFe;
+	}
+
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Fatura da cobrança")
 	@XmlElement(name = "fat")
 	private FaturaNFe faturaNFe;

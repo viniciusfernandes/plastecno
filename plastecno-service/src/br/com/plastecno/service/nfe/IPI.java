@@ -145,11 +145,13 @@ public class IPI implements Validavel {
 	 */
 	public void setTipoIpi(IPIGeral tipoIpi) {
 		if (tipoIpi == null) {
+			this.tipoIpi = null;
 			return;
 
 		}
 		TipoTributacaoIPI t = tipoIpi.getTipoTributacao();
 		if (t == null) {
+			this.tipoIpi = null;
 			return;
 		}
 

@@ -217,6 +217,14 @@ public class NFeServiceImpl implements NFeService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
+		if (idPedido == null) {
+			throw new BusinessException("O número do pedido não pode estar em branco para emitir uma NFe");
+		}
+
+		if (nFe == null || nFe.getDadosNFe() == null) {
+			throw new BusinessException("A NFe emitida não pode estar em branco");
+		}
+
 		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
 		carregarDadosLocalRetiradaEntrega(nFe);

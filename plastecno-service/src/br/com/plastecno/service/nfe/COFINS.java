@@ -60,20 +60,29 @@ public class COFINS implements Validavel {
 	}
 
 	public void setTipoCofins(COFINSGeral tipoCofins) {
-		TipoTributacaoCOFINS tribut = tipoCofins.getTipoTributacao();
+		if (tipoCofins == null) {
+			this.tipoCofins = null;
+			return;
+		}
+		TipoTributacaoCOFINS t = tipoCofins.getTipoTributacao();
 
-		if (COFINS_1.equals(tribut) || COFINS_2.equals(tribut)) {
+		if (t == null) {
+			this.tipoCofins = null;
+			return;
+		}
+
+		if (COFINS_1.equals(t) || COFINS_2.equals(t)) {
 			cofinsAliquota = tipoCofins;
-		} else if (COFINS_3.equals(tribut)) {
+		} else if (COFINS_3.equals(t)) {
 			cofinsQuantidade = tipoCofins;
-		} else if (COFINS_4.equals(tribut) || COFINS_6.equals(tribut) || COFINS_7.equals(tribut)
-				|| COFINS_8.equals(tribut) || COFINS_9.equals(tribut)) {
+		} else if (COFINS_4.equals(t) || COFINS_6.equals(t) || COFINS_7.equals(t) || COFINS_8.equals(t)
+				|| COFINS_9.equals(t)) {
 			cofinsNaoTributado = tipoCofins;
-		} else if (COFINS_5.equals(tribut)) {
+		} else if (COFINS_5.equals(t)) {
 			cofinsST = tipoCofins;
-		} else if (COFINS_99.equals(tribut)) {
+		} else if (COFINS_99.equals(t)) {
 			cofinsOutrasOperacoes = tipoCofins;
-		} else if (COFINS_ST.equals(tribut)) {
+		} else if (COFINS_ST.equals(t)) {
 			cofinsST = tipoCofins;
 		}
 		this.tipoCofins = tipoCofins;

@@ -6,4 +6,8 @@ e ident. emissor e destinatario pois ele pode nao estar sendo recuperado do banc
 5) Ainda nao tenho ideia de como preencher os campos ean e cnae
 6) Faltando encontrar os campos que ainda estao vazios no primeiro bloco de=a nfe, por exemplo: tipo documento, 
 consumidor final e destino operacao
-7) Falta preencher os campos "indTot" em total dos produtos e "cListServ" em ISS 
+7) Falta preencher os campos "indTot" em total dos produtos e "cListServ" em ISS
+8) IMplementar tratamento de edicao dos impostos dos itens para que os combos aparecam preenchidos 
+pois esta dando nullpointer no servidor
+9) Ocultar os impostos facultativos quando editar o imposto do item e 
+popular as quantidades tributaveis de todos eles 

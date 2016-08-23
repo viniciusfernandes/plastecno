@@ -118,8 +118,11 @@ public final class ValidadorInformacao {
 			// ser validados, por isso esse condicional nao tem a instrucao de
 			// fim de execucao "continue"
 			if (COMPRIMENTO_STRING > 0 && informacao.substituicao().length > 1) {
-				configurarConteudo(campo, obj,
-						conteudoCampo.toString().replaceAll(informacao.substituicao()[0], informacao.substituicao()[1]));
+				conteudoCampo = conteudoCampo.toString().replaceAll(informacao.substituicao()[0],
+						informacao.substituicao()[1]);
+				COMPRIMENTO_STRING = conteudoCampo.toString().length();
+				
+				configurarConteudo(campo, obj, conteudoCampo);
 			}
 
 			if (conteudoCampo != null && informacao.tamanho() >= 0 && COMPRIMENTO_STRING != informacao.tamanho()) {

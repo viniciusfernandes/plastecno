@@ -71,6 +71,10 @@ public class DadosNFe {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Versão da NFe")
 	private final Double versao = 2.0d;
 
+	public boolean contemDuplicata() {
+		return cobrancaNFe != null && cobrancaNFe.contemDuplicata();
+	}
+
 	@XmlTransient
 	public CobrancaNFe getCobrancaNFe() {
 		return cobrancaNFe;
@@ -183,23 +187,19 @@ public class DadosNFe {
 		this.id = id;
 	}
 
-	public void setIdentificacaoDestinatarioNFe(
-			IdentificacaoDestinatarioNFe identificacaoDestinatarioNFe) {
+	public void setIdentificacaoDestinatarioNFe(IdentificacaoDestinatarioNFe identificacaoDestinatarioNFe) {
 		this.identificacaoDestinatarioNFe = identificacaoDestinatarioNFe;
 	}
 
-	public void setIdentificacaoEmitenteNFe(
-			IdentificacaoEmitenteNFe identificacaoEmitenteNFe) {
+	public void setIdentificacaoEmitenteNFe(IdentificacaoEmitenteNFe identificacaoEmitenteNFe) {
 		this.identificacaoEmitenteNFe = identificacaoEmitenteNFe;
 	}
 
-	public void setIdentificacaoLocalEntrega(
-			IdentificacaoLocalGeral identificacaoLocalEntrega) {
+	public void setIdentificacaoLocalEntrega(IdentificacaoLocalGeral identificacaoLocalEntrega) {
 		this.identificacaoLocalEntrega = identificacaoLocalEntrega;
 	}
 
-	public void setIdentificacaoLocalRetirada(
-			IdentificacaoLocalGeral identificacaoLocalRetirada) {
+	public void setIdentificacaoLocalRetirada(IdentificacaoLocalGeral identificacaoLocalRetirada) {
 		this.identificacaoLocalRetirada = identificacaoLocalRetirada;
 	}
 
@@ -211,13 +211,11 @@ public class DadosNFe {
 		this.informacaoCompra = informacaoCompra;
 	}
 
-	public void setInformacaoExportacao(
-			InformacaoExportacao informacaoExportacao) {
+	public void setInformacaoExportacao(InformacaoExportacao informacaoExportacao) {
 		this.informacaoExportacao = informacaoExportacao;
 	}
 
-	public void setInformacoesAdicionaisNFe(
-			InformacoesAdicionaisNFe informacoesAdicionaisNFe) {
+	public void setInformacoesAdicionaisNFe(InformacoesAdicionaisNFe informacoesAdicionaisNFe) {
 		this.informacoesAdicionaisNFe = informacoesAdicionaisNFe;
 	}
 

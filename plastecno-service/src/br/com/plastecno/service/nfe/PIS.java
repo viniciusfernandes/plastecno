@@ -62,20 +62,25 @@ public class PIS implements Validavel {
 
 	public void setTipoPis(PISGeral tipoPis) {
 		if (tipoPis == null) {
+			this.tipoPis = null;
 			return;
 		}
 
-		TipoTributacaoPIS tribut = tipoPis.getTipoTributacao();
-		if (PIS_1.equals(tribut) || PIS_2.equals(tribut)) {
+		TipoTributacaoPIS t = tipoPis.getTipoTributacao();
+		if (t == null) {
+			this.tipoPis = null;
+			return;
+		}
+
+		if (PIS_1.equals(t) || PIS_2.equals(t)) {
 			this.pisAliquota = tipoPis;
-		} else if (PIS_3.equals(tribut)) {
+		} else if (PIS_3.equals(t)) {
 			this.pisQuantidade = tipoPis;
-		} else if (PIS_4.equals(tribut) || PIS_6.equals(tribut) || PIS_7.equals(tribut) || PIS_8.equals(tribut)
-				|| PIS_9.equals(tribut)) {
+		} else if (PIS_4.equals(t) || PIS_6.equals(t) || PIS_7.equals(t) || PIS_8.equals(t) || PIS_9.equals(t)) {
 			this.pisNaoTributado = tipoPis;
-		} else if (PIS_99.equals(tribut)) {
+		} else if (PIS_99.equals(t)) {
 			this.pisOutrasOperacoes = tipoPis;
-		} else if (PIS_ST.equals(tribut)) {
+		} else if (PIS_ST.equals(t)) {
 			this.pisST = tipoPis;
 		}
 		this.tipoPis = tipoPis;

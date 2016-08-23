@@ -79,10 +79,15 @@ public class ICMS implements Validavel {
 		}
 		Field campo = null;
 		try {
-			TipoTributacaoICMS tribut = tipoIcms.getTipoTributacao();
-			campo = this.getClass().getDeclaredField("icms" + (tribut != null ? tribut.getCodigo() : null));
-			campo.setAccessible(true);
-			campo.set(this, tipoIcms);
+			TipoTributacaoICMS t = tipoIcms.getTipoTributacao();
+			if (t != null) {
+				campo = this.getClass().getDeclaredField("icms" + t.getCodigo());
+				campo.setAccessible(true);
+				campo.set(this, tipoIcms);
+				this.tipoIcms = tipoIcms;
+			} else {
+				this.tipoIcms = null;
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Falha no atribuicao dos valores do ICMS com o tipo de tributacao \""
 					+ tipoIcms.getTipoTributacao() + "\"", e);
@@ -90,7 +95,6 @@ public class ICMS implements Validavel {
 			if (campo != null) {
 				campo.setAccessible(false);
 			}
-			this.tipoIcms = tipoIcms;
 		}
 	}
 

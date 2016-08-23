@@ -26,8 +26,10 @@ import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
+import br.com.plastecno.service.nfe.IdentificacaoNFe;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.TransportadoraNFe;
+import br.com.plastecno.service.nfe.TransporteNFe;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
@@ -101,9 +103,13 @@ public class EmissaoNFeController extends AbstractController {
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
         try {
-            String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
-            nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
-                    nFeService.gerarEnderecoNFe(logradouro, telefone));
+            if (nf != null && nf.getIdentificacaoDestinatarioNFe() != null
+                    && nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe() != null) {
+
+                String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
+                nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
+                        nFeService.gerarEnderecoNFe(logradouro, telefone));
+            }
 
             formatarDuplicata(nf, false);
             redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(new NFe(nf), idPedido));
@@ -218,31 +224,38 @@ public class EmissaoNFeController extends AbstractController {
 
     private void popularDestinatario(DadosNFe nf) {
         IdentificacaoDestinatarioNFe d = nf.getIdentificacaoDestinatarioNFe();
-        Cliente c = new Cliente();
-        c.setRazaoSocial(d.getNomeFantasia());
-        c.setCnpj(d.getCnpj());
-        c.setInscricaoEstadual(d.getInscricaoEstadual());
-        c.setCpf(d.getCpf());
-        c.setEmail(d.getEmail());
+        if (d != null) {
+            Cliente c = new Cliente();
+            c.setRazaoSocial(d.getNomeFantasia());
+            c.setCnpj(d.getCnpj());
+            c.setInscricaoEstadual(d.getInscricaoEstadual());
+            c.setCpf(d.getCpf());
+            c.setEmail(d.getEmail());
 
-        EnderecoNFe e = d.getEnderecoDestinatarioNFe();
+            EnderecoNFe e = d.getEnderecoDestinatarioNFe();
 
-        Logradouro l = new Logradouro();
-        l.setBairro(e.getBairro());
-        l.setCep(e.getCep());
-        l.setComplemento(e.getComplemento());
-        l.setEndereco(e.getLogradouro());
-        l.setCidade(e.getNomeMunicipio());
-        l.setPais(e.getNomePais());
-        l.setNumero(e.getNumero() == null ? null : Integer.parseInt(e.getNumero()));
-        l.setUf(e.getUF());
+            Logradouro l = new Logradouro();
+            l.setBairro(e.getBairro());
+            l.setCep(e.getCep());
+            l.setComplemento(e.getComplemento());
+            l.setEndereco(e.getLogradouro());
+            l.setCidade(e.getNomeMunicipio());
+            l.setPais(e.getNomePais());
+            l.setNumero(e.getNumero() == null ? null : Integer.parseInt(e.getNumero()));
+            l.setUf(e.getUF());
 
-        addAtributo("cliente", c);
-        addAtributo("logradouro", l);
-        addAtributo("telefoneContatoPedido", d.getEnderecoDestinatarioNFe().getTelefone());
+            addAtributo("cliente", c);
+            addAtributo("logradouro", l);
+            addAtributo("telefoneContatoPedido", d.getEnderecoDestinatarioNFe().getTelefone());
+        }
     }
 
     private void popularNFe(DadosNFe nf, Integer idPedido) {
+
+        if (nf == null || idPedido == null) {
+            return;
+        }
+
         emissaoNFeHome();
 
         popularDestinatario(nf);
@@ -255,24 +268,36 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("nf", nf);
         addAtributo("listaItem", listaItem);
 
-        addAtributo("finalidadeEmissaoSelecionada", nf.getIdentificacaoNFe().getFinalidadeEmissao());
-        addAtributo("formaPagamentoSelecionada", nf.getIdentificacaoNFe().getIndicadorFormaPagamento());
-        addAtributo("tipoEmissaoSelecionada", nf.getIdentificacaoNFe().getTipoEmissao());
-        addAtributo("tipoImpressaoSelecionada", nf.getIdentificacaoNFe().getTipoImpressao());
-        addAtributo("listaDuplicata", nf.getCobrancaNFe().getListaDuplicata());
+        IdentificacaoNFe iNFe = null;
+        if ((iNFe = nf.getIdentificacaoNFe()) != null) {
+            addAtributo("finalidadeEmissaoSelecionada", iNFe.getFinalidadeEmissao());
+            addAtributo("formaPagamentoSelecionada", iNFe.getIndicadorFormaPagamento());
+            addAtributo("tipoEmissaoSelecionada", iNFe.getTipoEmissao());
+            addAtributo("tipoImpressaoSelecionada", iNFe.getTipoImpressao());
+        }
+
+        if (nf.contemDuplicata()) {
+            addAtributo("listaDuplicata", nf.getCobrancaNFe().getListaDuplicata());
+        }
     }
 
     private void popularTransporte(DadosNFe nf) {
-        TransportadoraNFe tnfe = nf.getTransporteNFe().getTransportadoraNFe();
-        Transportadora t = new Transportadora();
-        t.setRazaoSocial(tnfe.getRazaoSocial());
-        t.setCnpj(tnfe.getCnpj());
-        t.setInscricaoEstadual(tnfe.getInscricaoEstadual());
-        t.setEndereco(tnfe.getEnderecoCompleto());
-        t.setCidade(tnfe.getMunicipio());
-        t.setUf(tnfe.getUf());
+        TransporteNFe transporte = null;
+        TransportadoraNFe tnfe = null;
+        if (nf != null && (transporte = nf.getTransporteNFe()) != null) {
+            Transportadora t = null;
+            if ((tnfe = transporte.getTransportadoraNFe()) != null) {
+                t = new Transportadora();
+                t.setRazaoSocial(tnfe.getRazaoSocial());
+                t.setCnpj(tnfe.getCnpj());
+                t.setInscricaoEstadual(tnfe.getInscricaoEstadual());
+                t.setEndereco(tnfe.getEnderecoCompleto());
+                t.setCidade(tnfe.getMunicipio());
+                t.setUf(tnfe.getUf());
+            }
+            addAtributo("modalidadeFreteSelecionada", transporte.getModalidadeFrete());
+            addAtributo("transportadora", t);
+        }
 
-        addAtributo("modalidadeFreteSelecionada", nf.getTransporteNFe().getModalidadeFrete());
-        addAtributo("transportadora", t);
     }
 }

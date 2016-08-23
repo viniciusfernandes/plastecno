@@ -31,6 +31,7 @@ import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.PedidoNFe;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
@@ -69,9 +70,16 @@ public class NFeServiceImpl implements NFeService {
 	private RepresentadaService representadaService;
 
 	private void carregarConfiguracao(NFe nFe) {
-		nFe.getDadosNFe().setId("12345678901234567890123456789012345678901234567");
-		nFe.getDadosNFe().getIdentificacaoEmitenteNFe().setCNAEFiscal("1234567");
+		DadosNFe nf = nFe.getDadosNFe();
+
+		nf.setId("12345678901234567890123456789012345678901234567");
+		nf.getIdentificacaoEmitenteNFe().setCNAEFiscal("1234567");
 		ProdutoServicoNFe p = null;
+
+		if (nf.getListaDetalhamentoProdutoServicoNFe() == null) {
+			return;
+		}
+
 		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
 			p = d.getProdutoServicoNFe();
 			p.setEAN("EanTEste");

@@ -5,7 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import br.com.plastecno.service.constante.RegexValidacao;
 import br.com.plastecno.service.constante.TipoDocumento;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -41,9 +40,9 @@ public @interface InformacaoValidavel {
 
 	boolean positivo() default false;
 
-	RegexValidacao regex() default RegexValidacao.NENHUM;
-
 	boolean relacionamentoObrigatorio() default false;
+
+	String[] substituicao() default {};
 
 	int tamanho() default -1;
 

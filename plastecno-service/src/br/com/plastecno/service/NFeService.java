@@ -21,6 +21,8 @@ public interface NFeService {
 
 	EnderecoNFe gerarEnderecoNFe(Logradouro logradouro, String telefone);
 
+	NFe gerarNFeByIdPedido(Integer idPedido) throws BusinessException;
+
 	String gerarXMLNfe(NFe nFe, Integer idPedido) throws BusinessException;
 
 	List<Object[]> pesquisarCFOP();

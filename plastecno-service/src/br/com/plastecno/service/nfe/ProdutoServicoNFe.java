@@ -38,7 +38,7 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "nItemPed")
 	private Integer itemPedidoCompra;
 
-	@InformacaoValidavel(obrigatorio = true, tamanhos = { 2, 8 }, nomeExibicao = "NCM do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, tamanhos = { 2, 8 }, substituicao = { "\\D", "" }, nomeExibicao = "NCM do produtos/serviços")
 	@XmlElement(name = "NCM")
 	private String ncm;
 

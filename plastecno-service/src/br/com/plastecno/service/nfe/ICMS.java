@@ -42,7 +42,32 @@ public class ICMS implements Validavel {
 
 	@XmlTransient
 	public ICMSGeral getTipoIcms() {
+		if (tipoIcms == null) {
+			recuperarTipoIcms();
+		}
 		return tipoIcms;
+	}
+
+	private void recuperarTipoIcms() {
+		Field[] campos = this.getClass().getDeclaredFields();
+		Object conteudo = null;
+		for (Field campo : campos) {
+			campo.setAccessible(true);
+			try {
+				if ((conteudo = campo.get(this)) == null) {
+					campo.setAccessible(false);
+					continue;
+				}
+
+				setTipoIcms((ICMSGeral) conteudo);
+
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Nao foi possivel gerar o tipo de ICMS a partir do xml do servidor",
+						e);
+			} finally {
+				campo.setAccessible(false);
+			}
+		}
 	}
 
 	/*
@@ -55,14 +80,12 @@ public class ICMS implements Validavel {
 		Field campo = null;
 		try {
 			TipoTributacaoICMS tribut = tipoIcms.getTipoTributacao();
-			campo = this.getClass().getDeclaredField(
-					"icms" + (tribut != null ? tribut.getCodigo() : null));
+			campo = this.getClass().getDeclaredField("icms" + (tribut != null ? tribut.getCodigo() : null));
 			campo.setAccessible(true);
 			campo.set(this, tipoIcms);
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"Falha no atribuicao dos valores do ICMS com o tipo de tributacao \""
-							+ tipoIcms.getTipoTributacao() + "\"", e);
+			throw new RuntimeException("Falha no atribuicao dos valores do ICMS com o tipo de tributacao \""
+					+ tipoIcms.getTipoTributacao() + "\"", e);
 		} finally {
 			if (campo != null) {
 				campo.setAccessible(false);

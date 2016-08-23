@@ -1,5 +1,7 @@
 package br.com.plastecno.service.nfe;
 
+import java.lang.reflect.Field;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -78,7 +80,32 @@ public class IPI implements Validavel {
 
 	@XmlTransient
 	public IPIGeral getTipoIpi() {
+		if (tipoIpi == null) {
+			recuperarTipoIpi();
+		}
 		return tipoIpi;
+	}
+
+	private void recuperarTipoIpi() {
+		Field[] campos = this.getClass().getDeclaredFields();
+		Object conteudo = null;
+		for (Field campo : campos) {
+			campo.setAccessible(true);
+			try {
+				if ((conteudo = campo.get(this)) == null) {
+					campo.setAccessible(false);
+					continue;
+				}
+
+				setTipoIpi((IPIGeral) conteudo);
+
+			} catch (Exception e) {
+				throw new IllegalArgumentException(
+						"Nao foi possivel recuperar o tipo de IPI a partir do xml do servidor", e);
+			} finally {
+				campo.setAccessible(false);
+			}
+		}
 	}
 
 	public void setClasseEnquadramento(String classeEnquadramento) {
@@ -155,5 +182,8 @@ public class IPI implements Validavel {
 			throw new BusinessException("Classe de enquadramento do IPI é obrigatório");
 		}
 
+		if (cnpjProdutor != null) {
+			setCnpjProdutor(cnpjProdutor.replaceAll("\\D", ""));
+		}
 	}
 }

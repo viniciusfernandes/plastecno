@@ -1,5 +1,7 @@
 package br.com.plastecno.service.nfe;
 
+import java.lang.reflect.Field;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -28,8 +30,34 @@ public class PIS implements Validavel {
 	@XmlTransient
 	private PISGeral tipoPis;
 
+	@XmlTransient
 	public PISGeral getTipoPis() {
+		if (tipoPis == null) {
+			recuperarTipoPis();
+		}
 		return tipoPis;
+	}
+
+	private void recuperarTipoPis() {
+		Field[] campos = this.getClass().getDeclaredFields();
+		Object conteudo = null;
+		for (Field campo : campos) {
+			campo.setAccessible(true);
+			try {
+				if ((conteudo = campo.get(this)) == null) {
+					campo.setAccessible(false);
+					continue;
+				}
+
+				setTipoPis((PISGeral) conteudo);
+
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Nao foi possivel gerar o tipo de PIS a partir do xml do servidor",
+						e);
+			} finally {
+				campo.setAccessible(false);
+			}
+		}
 	}
 
 	public void setTipoPis(PISGeral tipoPis) {
@@ -42,8 +70,7 @@ public class PIS implements Validavel {
 			this.pisAliquota = tipoPis;
 		} else if (PIS_3.equals(tribut)) {
 			this.pisQuantidade = tipoPis;
-		} else if (PIS_4.equals(tribut) || PIS_6.equals(tribut)
-				|| PIS_7.equals(tribut) || PIS_8.equals(tribut)
+		} else if (PIS_4.equals(tribut) || PIS_6.equals(tribut) || PIS_7.equals(tribut) || PIS_8.equals(tribut)
 				|| PIS_9.equals(tribut)) {
 			this.pisNaoTributado = tipoPis;
 		} else if (PIS_99.equals(tribut)) {

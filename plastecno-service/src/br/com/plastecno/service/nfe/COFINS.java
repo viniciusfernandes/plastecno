@@ -1,5 +1,7 @@
 package br.com.plastecno.service.nfe;
 
+import java.lang.reflect.Field;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -27,8 +29,34 @@ public class COFINS implements Validavel {
 	@XmlTransient
 	private COFINSGeral tipoCofins;
 
+	@XmlTransient
 	public COFINSGeral getTipoCofins() {
+		if (tipoCofins == null) {
+			recuperarTipoCofins();
+		}
 		return tipoCofins;
+	}
+
+	private void recuperarTipoCofins() {
+		Field[] campos = this.getClass().getDeclaredFields();
+		Object conteudo = null;
+		for (Field campo : campos) {
+			campo.setAccessible(true);
+			try {
+				if ((conteudo = campo.get(this)) == null) {
+					campo.setAccessible(false);
+					continue;
+				}
+
+				setTipoCofins((COFINSGeral) conteudo);
+
+			} catch (Exception e) {
+				throw new IllegalArgumentException(
+						"Nao foi possivel gerar o tipo de COFINS a partir do xml do servidor", e);
+			} finally {
+				campo.setAccessible(false);
+			}
+		}
 	}
 
 	public void setTipoCofins(COFINSGeral tipoCofins) {
@@ -38,9 +66,8 @@ public class COFINS implements Validavel {
 			cofinsAliquota = tipoCofins;
 		} else if (COFINS_3.equals(tribut)) {
 			cofinsQuantidade = tipoCofins;
-		} else if (COFINS_4.equals(tribut) || COFINS_6.equals(tribut)
-				|| COFINS_7.equals(tribut) || COFINS_8.equals(tribut)
-				|| COFINS_9.equals(tribut)) {
+		} else if (COFINS_4.equals(tribut) || COFINS_6.equals(tribut) || COFINS_7.equals(tribut)
+				|| COFINS_8.equals(tribut) || COFINS_9.equals(tribut)) {
 			cofinsNaoTributado = tipoCofins;
 		} else if (COFINS_5.equals(tribut)) {
 			cofinsST = tipoCofins;

@@ -37,6 +37,7 @@ fieldset .fieldsetInterno legend {
 var numeroProdutoEdicao = null;
 
 $(document).ready(function() {
+	scrollTo('${ancora}');
 	
 	$("#botaoPesquisaPedido").click(function() {
 		if(isEmpty($('#idPedido').val())){

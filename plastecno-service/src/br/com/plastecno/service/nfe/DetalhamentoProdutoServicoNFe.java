@@ -33,8 +33,14 @@ public class DetalhamentoProdutoServicoNFe {
 		return tributosProdutoServico != null && tributosProdutoServico.contemICMS();
 	}
 
+	// Devemos fazer esse tratamento do indice do item pois ele esta sendo
+	// recuperado na pesquisa pelo numero do pedido e ele nao foi populado no
+	// banco de dados pois nao esta no xml
 	@XmlTransient
 	public Integer getIndiceItem() {
+		if (indiceItem == null && numeroItem != null) {
+			indiceItem = numeroItem - 1;
+		}
 		return indiceItem;
 	}
 

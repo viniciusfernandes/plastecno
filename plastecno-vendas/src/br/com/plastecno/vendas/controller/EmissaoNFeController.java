@@ -100,19 +100,16 @@ public class EmissaoNFeController extends AbstractController {
 
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
-        NFe nFe = null;
         try {
             String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
             nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                     nFeService.gerarEnderecoNFe(logradouro, telefone));
 
-            nFe = new NFe(nf);
-            formatarDuplicata(nFe, false);
-
-            redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(nFe, idPedido));
+            formatarDuplicata(nf, false);
+            redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(new NFe(nf), idPedido));
         } catch (BusinessException e) {
             try {
-                formatarDuplicata(nFe, true);
+                formatarDuplicata(nf, true);
             } catch (BusinessException e1) {
                 e.addMensagem(e1.getListaMensagem());
             }
@@ -120,15 +117,18 @@ public class EmissaoNFeController extends AbstractController {
 
             gerarListaMensagemErro(e);
             redirecTo(this.getClass()).emissaoNFeHome();
+            irTopoPagina();
         } catch (Exception e) {
             gerarLogErro("Emissão da NFe", e);
         }
 
     }
 
-    private void formatarDuplicata(NFe nFe, boolean fromServidor) throws BusinessException {
+    // Aqui uma excessao eh lancada pois devemos concatenar com as outras
+    // mensagens vindos do servidor, veja o metodo de missao de nfe
+    private void formatarDuplicata(DadosNFe nf, boolean fromServidor) throws BusinessException {
         List<DuplicataNFe> lista = null;
-        if ((lista = nFe.getDadosNFe().getListaDuplicata()) == null) {
+        if (nf != null && (lista = nf.getListaDuplicata()) == null) {
             return;
         }
 
@@ -180,22 +180,39 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe/pedido")
     public void pesquisarPedidoById(Integer idPedido) {
-        Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
-        List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
-        Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
-        List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+        NFe nFe = null;
+        try {
+            nFe = nFeService.gerarNFeByIdPedido(idPedido);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e.getListaMensagem());
+        }
 
-        formatarItemPedido(listaItem);
+        if (nFe != null) {
+            popularNFe(nFe.getDadosNFe(), idPedido);
+            try {
+                formatarDuplicata(nFe.getDadosNFe(), true);
+            } catch (BusinessException e) {
+                gerarListaMensagemErro(e);
+            }
+        } else {
+            Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
+            List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
+            Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
+            List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 
-        addAtributo("listaDuplicata", listaDuplicata);
-        addAtributo("cliente", cliente);
-        addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
-        addAtributo("logradouro", clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()));
-        addAtributo("listaItem", listaItem);
-        addAtributo("idPedido", idPedido);
-        addAtributo("telefoneContatoPedido",
-                telefone.length > 0 ? String.valueOf(telefone[0]) + String.valueOf(telefone[1]).replaceAll("\\D+", "")
-                        : "");
+            formatarItemPedido(listaItem);
+
+            addAtributo("listaDuplicata", listaDuplicata);
+            addAtributo("cliente", cliente);
+            addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
+            addAtributo("logradouro", clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()));
+            addAtributo("listaItem", listaItem);
+            addAtributo("idPedido", idPedido);
+            addAtributo(
+                    "telefoneContatoPedido",
+                    telefone.length > 0 ? String.valueOf(telefone[0])
+                            + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
+        }
         irTopoPagina();
     }
 

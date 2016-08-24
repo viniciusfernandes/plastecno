@@ -756,6 +756,10 @@ function editarTributos(linha){
 	inicializarLegendaBlocoProduto('bloco_iss');
 	inicializarLegendaBlocoProduto('bloco_tributos');
 	inicializarLegendaBlocoProduto('bloco_info_adicionais_prod');
+	
+	fecharBloco('bloco_ipi');
+	fecharBloco('bloco_ii');
+	fecharBloco('bloco_iss');
 };
 
 </script>

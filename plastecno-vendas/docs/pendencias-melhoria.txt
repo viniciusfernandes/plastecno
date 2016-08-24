@@ -8,6 +8,6 @@ e ident. emissor e destinatario pois ele pode nao estar sendo recuperado do banc
 consumidor final e destino operacao
 7) Falta preencher os campos "indTot" em total dos produtos e "cListServ" em ISS
 8) IMplementar tratamento de edicao dos impostos dos itens para que os combos aparecam preenchidos 
-pois esta dando nullpointer no servidor
+pois esta dando nullpointer no servidor - OK
 9) Ocultar os impostos facultativos quando editar o imposto do item e 
 popular as quantidades tributaveis de todos eles 

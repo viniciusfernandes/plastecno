@@ -241,7 +241,8 @@ public class EmissaoNFeController extends AbstractController {
             l.setEndereco(e.getLogradouro());
             l.setCidade(e.getNomeMunicipio());
             l.setPais(e.getNomePais());
-            l.setNumero(e.getNumero() == null ? null : Integer.parseInt(e.getNumero()));
+            l.setNumero(e.getNumero() == null || e.getNumero().trim().isEmpty() ? null
+                    : Integer.parseInt(e.getNumero()));
             l.setUf(e.getUF());
 
             addAtributo("cliente", c);

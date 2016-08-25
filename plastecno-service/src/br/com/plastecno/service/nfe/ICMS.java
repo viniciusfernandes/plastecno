@@ -37,6 +37,9 @@ public class ICMS implements Validavel {
 	@XmlElement(name = "ICMS90")
 	private ICMSGeral icms90;
 
+	@XmlElement(name = "ICMSPart")
+	private ICMSGeral icmsPart;
+
 	@XmlTransient
 	private ICMSGeral tipoIcms;
 

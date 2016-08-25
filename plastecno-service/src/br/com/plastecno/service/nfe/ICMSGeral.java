@@ -33,6 +33,9 @@ public class ICMSGeral {
 	@XmlElement(name = "orig")
 	private Integer origemMercadoria;
 
+	@XmlElement(name = "pBCOp")
+	private Double percentualBCOperacaoPropria;
+
 	@XmlElement(name = "pMVAST")
 	private Double percentualMargemValorAdicionadoICMSST;
 
@@ -41,6 +44,9 @@ public class ICMSGeral {
 
 	@XmlElement(name = "pRedBCST")
 	private Double percentualReducaoBCST;
+
+	@XmlElement(name = "UFST")
+	private String ufDividaST;
 
 	@XmlElement(name = "vICMS")
 	private Double valor;
@@ -54,6 +60,9 @@ public class ICMSGeral {
 	@XmlElement(name = "vBCSTRet")
 	private Double valorBCSTRetido;
 
+	@XmlElement(name = "vBCSTDest")
+	private Double valorBCSTUFDestino;
+
 	@XmlElement(name = "vICMSST")
 	private Double valorST;
 
@@ -61,13 +70,11 @@ public class ICMSGeral {
 	private Double valorSTRetido;
 
 	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC
-				* (aliquota / 100d) : 0d;
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0d;
 	}
 
 	public double calcularValorST() {
-		return valorBCST != null && aliquotaST != null ? valorBCST
-				* (aliquotaST / 100d) : 0d;
+		return valorBCST != null && aliquotaST != null ? valorBCST * (aliquotaST / 100d) : 0d;
 	}
 
 	public ICMSGeral carregarValoresAliquotas() {
@@ -109,6 +116,11 @@ public class ICMSGeral {
 	@XmlTransient
 	public Integer getOrigemMercadoria() {
 		return origemMercadoria;
+	}
+
+	@XmlTransient
+	public Double getPercentualBCOperacaoPropria() {
+		return percentualBCOperacaoPropria;
 	}
 
 	@XmlTransient
@@ -189,8 +201,11 @@ public class ICMSGeral {
 		this.origemMercadoria = origemMercadoria;
 	}
 
-	public void setPercentualMargemValorAdicionadoICMSST(
-			Double percentualMargemValorAdicionadoICMSST) {
+	public void setPercentualBCOperacaoPropria(Double percentualBCOperacaoPropria) {
+		this.percentualBCOperacaoPropria = percentualBCOperacaoPropria;
+	}
+
+	public void setPercentualMargemValorAdicionadoICMSST(Double percentualMargemValorAdicionadoICMSST) {
 		this.percentualMargemValorAdicionadoICMSST = percentualMargemValorAdicionadoICMSST;
 	}
 
@@ -246,9 +261,7 @@ public class ICMSGeral {
 			l.add("Alíquota do ICMS é obrigatório");
 		}
 
-		if (valor == null
-				&& (!ICMS_40.equals(t) && !ICMS_41.equals(t) && !ICMS_50
-						.equals(t))) {
+		if (valor == null && (!ICMS_40.equals(t) && !ICMS_41.equals(t) && !ICMS_50.equals(t))) {
 			l.add("Valor do ICMS do ICMS é obrigatório");
 		}
 
@@ -257,40 +270,37 @@ public class ICMSGeral {
 		}
 
 		if (valorBCST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90.equals(t) || ICMS_PART
 						.equals(t))) {
 			l.add("Valor da base de cálculo ST do ICMS é obrigatório");
 		}
 
 		if (modalidadeDeterminacaoBCST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90.equals(t) || ICMS_PART
 						.equals(t))) {
 			l.add("Modalidade de determinação do ST do ICMS é obrigatório");
 		}
 
-		if (percentualMargemValorAdicionadoICMSST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_90.equals(t))) {
+		if (percentualMargemValorAdicionadoICMSST == null && (ICMS_10.equals(t) || ICMS_30.equals(t))) {
 			l.add("Percentual de margem do valor adicionado do ST do ICMS é obrigatório");
 		}
 
-		if (percentualReducaoBC == null
-				&& (ICMS_51.equals(t) || ICMS_60.equals(t))) {
+		if (percentualReducaoBC == null && (ICMS_51.equals(t) || ICMS_60.equals(t))) {
 			l.add("Percentual de redução de BC do ICMS é obrigatório");
 		}
 
-		if (percentualReducaoBCST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t))) {
+		if (percentualReducaoBCST == null && (ICMS_10.equals(t) || ICMS_30.equals(t))) {
 			l.add("Percentual de redução de BC do ST do ICMS é obrigatório");
 		}
 
 		if (valorST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90.equals(t) || ICMS_PART
 						.equals(t))) {
 			l.add("Valor do ICMS ST é obrigatório");
 		}
 
 		if (aliquotaST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
+				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90.equals(t) || ICMS_PART
 						.equals(t))) {
 			l.add("Alíquota do ICMS ST é obrigatório");
 		}
@@ -305,6 +315,14 @@ public class ICMSGeral {
 
 		if (valorSTRetido == null && ICMS_60.equals(t)) {
 			l.add("Valor de ST do ICMS retido é obrigatório");
+		}
+
+		if (percentualBCOperacaoPropria == null && ICMS_PART.equals(t)) {
+			l.add("Percentual do ICMS de operação própria é obrigatório");
+		}
+
+		if ((ufDividaST == null || ufDividaST.isEmpty()) && ICMS_PART.equals(t)) {
+			l.add("UF de divida de ICMS ST é obrigatório");
 		}
 
 		if (l.size() > 0) {

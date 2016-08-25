@@ -11,7 +11,8 @@ public enum TipoTributacaoICMS {
 	ICMS_51("51 - Deferimento", "51"), 
 	ICMS_60("60 - Cobrado anteriormente por substituição tributária", "60"), 
 	ICMS_70("70 - Com Redução da base de cálculo e cobrança por substituição tributária", "70"), 
-	ICMS_90("90 - Outros", "90");
+	ICMS_90("90 - Outros", "90"),
+	ICMS_PART("Part - Operação interestadual - Partilha entre UF origem e UF destino", "Part");
 	
 	public static TipoTributacaoICMS getTipoTributacao(String codigo) {
 		for (TipoTributacaoICMS t : values()) {

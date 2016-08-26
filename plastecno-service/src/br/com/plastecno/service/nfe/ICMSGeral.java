@@ -8,8 +8,10 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoICMS.*;
 
+@InformacaoValidavel(campoCondicional="codigoSituacaoTributaria")
 public class ICMSGeral {
 
 	@XmlElement(name = "pICMS")

@@ -29,7 +29,8 @@ public final class ValidadorInformacao {
 	}
 
 	public static void preencherListaMensagemValidacao(Object obj, List<String> listaMensagem) {
-		if (obj.getClass().getAnnotation(InformacaoValidavel.class) == null) {
+		InformacaoValidavel informacao = null;
+		if ((informacao = obj.getClass().getAnnotation(InformacaoValidavel.class)) == null) {
 			throw new IllegalArgumentException("A classe " + obj.getClass()
 					+ " não pode ser validada pelo mecanismo de verificacão de preenchimento dos campos. "
 					+ "No caso em que o campo seja um ENUM, remova o atributo cascata = true");
@@ -43,14 +44,30 @@ public final class ValidadorInformacao {
 		int[] tamanhos = null;
 		int[] valores = null;
 		boolean ok = false;
+
+		Object valorCondicional = null;
+		if (!informacao.campoCondicional().isEmpty()) {
+			valorCondicional = recuperarConteudo(informacao.campoCondicional(), obj);
+		}
+
 		for (Field campo : camposValidaveis) {
-			InformacaoValidavel informacao = campo.getAnnotation(InformacaoValidavel.class);
+			informacao = campo.getAnnotation(InformacaoValidavel.class);
 
 			if (informacao == null) {
 				continue;
 			}
 
 			Object conteudoCampo = recuperarConteudo(campo, obj);
+			
+
+			if (valorCondicional != null && informacao.condicionaisNaoPermitidos().length > 0) {
+				for (String c : informacao.condicionaisNaoPermitidos()) {
+					if (valorCondicional.equals(c)) {
+						listaMensagem.add(informacao.nomeExibicao() + " é um campo condicional proibido");
+					}
+				}
+			}
+
 			if (informacao.obrigatorio() && conteudoCampo == null) {
 				listaMensagem.add(informacao.nomeExibicao() + " é obrigatório");
 				continue;
@@ -121,7 +138,7 @@ public final class ValidadorInformacao {
 				conteudoCampo = conteudoCampo.toString().replaceAll(informacao.substituicao()[0],
 						informacao.substituicao()[1]);
 				COMPRIMENTO_STRING = conteudoCampo.toString().length();
-				
+
 				configurarConteudo(campo, obj, conteudoCampo);
 			}
 
@@ -229,7 +246,6 @@ public final class ValidadorInformacao {
 	}
 
 	private static Object recuperarConteudo(Field campo, Object obj) {
-
 		try {
 			campo.setAccessible(true);
 			Object conteudoCampo = campo.get(obj);
@@ -239,6 +255,23 @@ public final class ValidadorInformacao {
 					+ " não pode ser acessado", e);
 		} finally {
 			campo.setAccessible(false);
+		}
+	}
+
+	private static Object recuperarConteudo(String nomeCampo, Object obj) {
+		Field campo = null;
+		try {
+			campo = obj.getClass().getDeclaredField(nomeCampo);
+			campo.setAccessible(true);
+			Object conteudoCampo = campo.get(obj);
+			return conteudoCampo;
+		} catch (Exception e) {
+			throw new IllegalStateException("O valor do campo pelo nome \"" + nomeCampo + "\" do objeto "
+					+ obj.getClass() + " não pode ser acessado", e);
+		} finally {
+			if (campo != null) {
+				campo.setAccessible(false);
+			}
 		}
 	}
 

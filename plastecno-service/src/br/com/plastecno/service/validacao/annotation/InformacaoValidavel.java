@@ -10,7 +10,15 @@ import br.com.plastecno.service.constante.TipoDocumento;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD })
 public @interface InformacaoValidavel {
+	String campoCondicional() default "";
+
+	String campoQualificador() default "";
+
 	boolean cascata() default false;
+
+	String[] condicionaisNaoPermitidos() default {};
+
+	String[] condicionaisPermitidos() default {};
 
 	boolean customizado() default false;
 

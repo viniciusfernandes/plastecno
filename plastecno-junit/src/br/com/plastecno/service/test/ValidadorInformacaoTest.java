@@ -528,4 +528,21 @@ public class ValidadorInformacaoTest extends AbstractTest {
 				"O tipo de entidade " + t.getTipo() + " deve conter o campo valor em braco e isso deve ser validado",
 				throwed);
 	}
+
+	@Test
+	public void testValidacaoPorTipoObrigatorio() {
+		EntidadeValidacao e = gerarEntidadeValidacaoComTipo();
+		EntidadeValidacaoTipo t = e.getTipoEntidade();
+		t.setTipo("4");
+		t.setValor(null);
+		boolean throwed = false;
+
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+		}
+		assertTrue("O tipo de entidade " + t.getTipo()
+				+ " deve conter o campo valor pois eh pbrigatorio e isso deve ser validado", throwed);
+	}
 }

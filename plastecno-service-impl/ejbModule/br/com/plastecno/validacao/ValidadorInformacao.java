@@ -45,9 +45,13 @@ public final class ValidadorInformacao {
 		int[] valores = null;
 		boolean ok = false;
 
-		Object valorCondicional = null;
+		Object tipo = null;
+		String nomeTipo = null;
+		String nomeClasse = null;
 		if (!informacao.campoCondicional().isEmpty()) {
-			valorCondicional = recuperarConteudo(informacao.campoCondicional(), obj);
+			tipo = recuperarConteudo(informacao.campoCondicional(), obj);
+			nomeTipo = informacao.nomeExibicaoCampoCondicional();
+			nomeClasse = informacao.nomeExibicao();
 		}
 
 		for (Field campo : camposValidaveis) {
@@ -58,14 +62,49 @@ public final class ValidadorInformacao {
 			}
 
 			Object conteudoCampo = recuperarConteudo(campo, obj);
-			
 
-			if (valorCondicional != null && informacao.condicionaisNaoPermitidos().length > 0) {
-				for (String c : informacao.condicionaisNaoPermitidos()) {
-					if (valorCondicional.equals(c)) {
-						listaMensagem.add(informacao.nomeExibicao() + " é um campo condicional proibido");
+			if (tipo != null) {
+				if (informacao.tiposNaoPermitidos().length > 0) {
+					for (String c : informacao.tiposNaoPermitidos()) {
+						if (conteudoCampo != null && tipo.equals(c)) {
+							listaMensagem.add("O campo \"" + informacao.nomeExibicao() + "\" da informação \""
+									+ nomeClasse + "\" não deve ser preenchido para o \"" + nomeTipo
+									+ "\" cujo valor é \"" + tipo + "\"");
+							break;
+						}
 					}
 				}
+
+				if (informacao.tiposObrigatorios().length > 0) {
+					for (String c : informacao.tiposObrigatorios()) {
+						if (conteudoCampo == null && tipo.equals(c)) {
+							listaMensagem.add("O campo \"" + informacao.nomeExibicao() + "\" da informação \""
+									+ nomeClasse + "\" é obrigatório e deve ser preenchido para o \"" + nomeTipo
+									+ "\" cujo valor é \"" + tipo + "\"");
+							break;
+						}
+					}
+				}
+
+				if (informacao.tiposPermitidos().length > 0) {
+					ok = true;
+					// Verificando se o tipo selecionado eh diferente de todos
+					// os tipos permitidos para depois invalidar
+					for (String c : informacao.tiposPermitidos()) {
+						// Condicao indicando que encontrou o tipo na lista de
+						// tipos permitidos
+						if (ok = tipo.equals(c)) {
+							break;
+						}
+					}
+
+					if (conteudoCampo != null && !ok) {
+						listaMensagem.add("O campo \"" + informacao.nomeExibicao() + "\" da informação \"" + nomeClasse
+								+ "\" não deve ser preenchido para o \"" + nomeTipo + "\" cujo valor é \"" + tipo
+								+ "\"");
+					}
+				}
+				continue;
 			}
 
 			if (informacao.obrigatorio() && conteudoCampo == null) {

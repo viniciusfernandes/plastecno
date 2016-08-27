@@ -12,13 +12,7 @@ import br.com.plastecno.service.constante.TipoDocumento;
 public @interface InformacaoValidavel {
 	String campoCondicional() default "";
 
-	String campoQualificador() default "";
-
 	boolean cascata() default false;
-
-	String[] condicionaisNaoPermitidos() default {};
-
-	String[] condicionaisPermitidos() default {};
 
 	boolean customizado() default false;
 
@@ -35,6 +29,8 @@ public @interface InformacaoValidavel {
 	boolean iteravel() default false;
 
 	String nomeExibicao() default "";
+
+	String nomeExibicaoCampoCondicional() default "";
 
 	boolean numerico() default false;
 
@@ -57,6 +53,12 @@ public @interface InformacaoValidavel {
 	int[] tamanhos() default {};
 
 	TipoDocumento tipoDocumento() default TipoDocumento.NAO_EH_DOCUMENTO;
+
+	String[] tiposNaoPermitidos() default {};
+
+	String[] tiposObrigatorios() default {};
+
+	String[] tiposPermitidos() default {};
 
 	String toPadrao() default "";
 

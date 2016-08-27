@@ -2,7 +2,7 @@ package br.com.plastecno.service.test;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-@InformacaoValidavel(campoCondicional = "tipo")
+@InformacaoValidavel(campoCondicional = "tipo", nomeExibicao = "Entidade de validação", nomeExibicaoCampoCondicional = "Tipo da entidade")
 public class EntidadeValidacaoTipo {
 
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Codigo")
@@ -11,7 +11,7 @@ public class EntidadeValidacaoTipo {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo")
 	private String tipo;
 
-	@InformacaoValidavel(condicionaisPermitidos = { "1", "2" }, condicionaisNaoPermitidos = { "3" }, nomeExibicao = "Valor")
+	@InformacaoValidavel(tiposObrigatorios = { "4" }, tiposPermitidos = { "1", "2" }, tiposNaoPermitidos = { "3" }, nomeExibicao = "Valor")
 	private Double valor;
 
 	public EntidadeValidacaoTipo(String codigo, String tipo, Double valor) {

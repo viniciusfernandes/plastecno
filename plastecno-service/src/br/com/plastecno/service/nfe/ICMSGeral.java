@@ -11,7 +11,7 @@ import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoICMS.*;
 
-@InformacaoValidavel(campoCondicional="codigoSituacaoTributaria")
+@InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Código de situação tributária")
 public class ICMSGeral {
 
 	@XmlElement(name = "pICMS")

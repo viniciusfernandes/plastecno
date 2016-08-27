@@ -5,14 +5,14 @@ public enum TipoTributacaoICMS {
 	ICMS_10("10 - Tributada  com cobrança por substituição tributária", "10"), 
 	ICMS_20("20 - Tributada com redução da base de cálculo", "20"), 
 	ICMS_30("30 - Isenta ou não tributada com cobrança por substituição tributária", "30"), 
-	ICMS_40("40, 41, 50 - Isenta, Não tributada ou Suspensão", "40"), 
+	ICMS_40("40 - Isenta", "40"), 
 	ICMS_41("41 - Não tributada", "41"), 
 	ICMS_50("50 - Suspensão", "50"), 
 	ICMS_51("51 - Deferimento", "51"), 
 	ICMS_60("60 - Cobrado anteriormente por substituição tributária", "60"), 
 	ICMS_70("70 - Com Redução da base de cálculo e cobrança por substituição tributária", "70"), 
 	ICMS_90("90 - Outros", "90"),
-	ICMS_PART("Part - Operação interestadual - Partilha entre UF origem e UF destino", "Part");
+	ICMS_PART("PART- Operação interestadual - Partilha entre UF origem e UF destino", "PART");
 	
 	public static TipoTributacaoICMS getTipoTributacao(String codigo) {
 		for (TipoTributacaoICMS t : values()) {

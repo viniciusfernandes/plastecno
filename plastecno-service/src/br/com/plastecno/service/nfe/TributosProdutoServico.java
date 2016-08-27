@@ -11,7 +11,7 @@ public class TributosProdutoServico {
 	@XmlElement(name = "COFINS")
 	private COFINS cofins;
 
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "ICMS do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "ICMS do produtos/serviços")
 	@XmlElement(name = "ICMS")
 	private ICMS icms;
 

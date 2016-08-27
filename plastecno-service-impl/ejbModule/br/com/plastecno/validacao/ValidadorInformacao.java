@@ -45,13 +45,11 @@ public final class ValidadorInformacao {
 		int[] valores = null;
 		boolean ok = false;
 
-		Object tipo = null;
-		String nomeTipo = null;
-		String nomeClasse = null;
+		Object valorCond = null;
+		String nomeCond = null;
 		if (!informacao.campoCondicional().isEmpty()) {
-			tipo = recuperarConteudo(informacao.campoCondicional(), obj);
-			nomeTipo = informacao.nomeExibicaoCampoCondicional();
-			nomeClasse = informacao.nomeExibicao();
+			valorCond = recuperarConteudo(informacao.campoCondicional(), obj);
+			nomeCond = informacao.nomeExibicaoCampoCondicional();
 		}
 
 		for (Field campo : camposValidaveis) {
@@ -63,13 +61,12 @@ public final class ValidadorInformacao {
 
 			Object conteudoCampo = recuperarConteudo(campo, obj);
 
-			if (tipo != null) {
+			if (valorCond != null) {
 				if (informacao.tiposNaoPermitidos().length > 0) {
 					for (String c : informacao.tiposNaoPermitidos()) {
-						if (conteudoCampo != null && tipo.equals(c)) {
-							listaMensagem.add("O campo \"" + informacao.nomeExibicao() + "\" da informação \""
-									+ nomeClasse + "\" não deve ser preenchido para o \"" + nomeTipo
-									+ "\" cujo valor é \"" + tipo + "\"");
+						if (conteudoCampo != null && valorCond.equals(c)) {
+							listaMensagem.add("\"" + informacao.nomeExibicao() + "\" não deve ser preenchido para o \""
+									+ nomeCond + " = " + valorCond + "\"");
 							break;
 						}
 					}
@@ -77,10 +74,9 @@ public final class ValidadorInformacao {
 
 				if (informacao.tiposObrigatorios().length > 0) {
 					for (String c : informacao.tiposObrigatorios()) {
-						if (conteudoCampo == null && tipo.equals(c)) {
-							listaMensagem.add("O campo \"" + informacao.nomeExibicao() + "\" da informação \""
-									+ nomeClasse + "\" é obrigatório e deve ser preenchido para o \"" + nomeTipo
-									+ "\" cujo valor é \"" + tipo + "\"");
+						if (conteudoCampo == null && valorCond.equals(c)) {
+							listaMensagem.add("\"" + informacao.nomeExibicao() + "\" é obrigatório para \"" + nomeCond
+									+ " = " + valorCond + "\"");
 							break;
 						}
 					}
@@ -93,15 +89,14 @@ public final class ValidadorInformacao {
 					for (String c : informacao.tiposPermitidos()) {
 						// Condicao indicando que encontrou o tipo na lista de
 						// tipos permitidos
-						if (ok = tipo.equals(c)) {
+						if (ok = valorCond.equals(c)) {
 							break;
 						}
 					}
 
 					if (conteudoCampo != null && !ok) {
-						listaMensagem.add("O campo \"" + informacao.nomeExibicao() + "\" da informação \"" + nomeClasse
-								+ "\" não deve ser preenchido para o \"" + nomeTipo + "\" cujo valor é \"" + tipo
-								+ "\"");
+						listaMensagem.add("\"" + informacao.nomeExibicao() + "\" não deve ser preenchido para o \""
+								+ nomeCond + " = " + valorCond + "\"");
 					}
 				}
 				continue;

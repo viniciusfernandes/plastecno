@@ -1,16 +1,27 @@
 package br.com.plastecno.service.nfe;
 
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_1;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_2;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_3;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_4;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_5;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_6;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_7;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_8;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_9;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_99;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_ST;
+
 import java.lang.reflect.Field;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.*;
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
-import br.com.plastecno.service.validacao.Validavel;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-public class COFINS implements Validavel {
+@InformacaoValidavel
+public class COFINS {
 	@XmlElement(name = "COFINSAliq")
 	private COFINSGeral cofinsAliquota;
 
@@ -27,6 +38,7 @@ public class COFINS implements Validavel {
 	private COFINSGeral cofinsST;
 
 	@XmlTransient
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo COFINS")
 	private COFINSGeral tipoCofins;
 
 	@XmlTransient
@@ -86,14 +98,5 @@ public class COFINS implements Validavel {
 			cofinsST = tipoCofins;
 		}
 		this.tipoCofins = tipoCofins;
-	}
-
-	@Override
-	public void validar() throws BusinessException {
-		if (tipoCofins == null) {
-			throw new BusinessException("Tipo de COFINS é obrigatório");
-		}
-
-		tipoCofins.validar();
 	}
 }

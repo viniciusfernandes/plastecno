@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-@InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicao = "Tipo ICMS", nomeExibicaoCampoCondicional = "Código de situação tributária")
+@InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Código de situação tributária")
 public class ICMSGeral {
 
 	@XmlElement(name = "pICMS")

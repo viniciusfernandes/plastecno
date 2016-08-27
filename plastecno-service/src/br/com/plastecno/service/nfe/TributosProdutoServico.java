@@ -7,7 +7,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class TributosProdutoServico {
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "COFINS do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, cascata=true, nomeExibicao = "COFINS do produtos/serviços")
 	@XmlElement(name = "COFINS")
 	private COFINS cofins;
 

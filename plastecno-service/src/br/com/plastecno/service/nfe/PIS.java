@@ -1,16 +1,26 @@
 package br.com.plastecno.service.nfe;
 
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_1;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_2;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_3;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_4;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_6;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_7;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_8;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_9;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_99;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_ST;
+
 import java.lang.reflect.Field;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.*;
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
-import br.com.plastecno.service.validacao.Validavel;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-public class PIS implements Validavel {
+@InformacaoValidavel
+public class PIS {
 
 	@XmlElement(name = "PISAliq")
 	private PISGeral pisAliquota;
@@ -28,6 +38,7 @@ public class PIS implements Validavel {
 	private PISGeral pisST;
 
 	@XmlTransient
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo PIS")
 	private PISGeral tipoPis;
 
 	@XmlTransient
@@ -84,13 +95,5 @@ public class PIS implements Validavel {
 			this.pisST = tipoPis;
 		}
 		this.tipoPis = tipoPis;
-	}
-
-	public void validar() throws BusinessException {
-		if (tipoPis == null) {
-			throw new BusinessException("Tipo de PIS é obrigatório");
-		}
-
-		tipoPis.validar();
 	}
 }

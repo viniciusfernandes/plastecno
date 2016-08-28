@@ -3,33 +3,37 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.*;
-
+@InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Código da situação tributária")
 public class IPIGeral {
 	@XmlElement(name = "pIPI")
+	@InformacaoValidavel(tiposObrigatorios = { "00", "49", "50", "99" }, nomeExibicao = "Alíquota do IPI")
 	private Double aliquota;
 
 	@XmlElement(name = "CST")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Código da situação tributária deo IPI")
 	private String codigoSituacaoTributaria;
 
 	@XmlElement(name = "qUnid")
+	@InformacaoValidavel(tiposObrigatorios = { "00", "49", "50", "99" }, nomeExibicao = "Quantidade de unidade tributável do IPI")
 	private Integer quantidadeUnidadeTributavel;
 
 	@XmlElement(name = "vIPI")
+	@InformacaoValidavel(tiposObrigatorios = { "00", "49", "50", "99" }, nomeExibicao = "Valor do IPI")
 	private Double valor;
 
 	@XmlElement(name = "vBC")
+	@InformacaoValidavel(tiposObrigatorios = { "00", "49", "50", "99" }, nomeExibicao = "Valor de base de cáculo do IPI")
 	private Double valorBC;
 
 	@XmlElement(name = "vUnid")
+	@InformacaoValidavel(tiposObrigatorios = { "00", "49", "50", "99" }, nomeExibicao = "Valor da unidade tributável do IPI")
 	private Double valorUnidadeTributavel;
 
 	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC
-				* (aliquota / 100d) : 0;
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
 	}
 
 	public IPIGeral carregarValoresAliquotas() {
@@ -80,8 +84,7 @@ public class IPIGeral {
 		this.codigoSituacaoTributaria = codigoSituacaoTributaria;
 	}
 
-	public void setQuantidadeUnidadeTributavel(
-			Integer quantidadeUnidadeTributavel) {
+	public void setQuantidadeUnidadeTributavel(Integer quantidadeUnidadeTributavel) {
 		this.quantidadeUnidadeTributavel = quantidadeUnidadeTributavel;
 	}
 
@@ -97,44 +100,4 @@ public class IPIGeral {
 		this.valorUnidadeTributavel = valorUnidadeTributavel;
 	}
 
-	public void validar() throws BusinessException {
-		TipoTributacaoIPI t = getTipoTributacao();
-
-		if (t == null) {
-			throw new BusinessException(
-					"Código de situação tributária do IPI é obrigatório");
-		}
-
-		if (valorBC == null
-				&& (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t) || IPI_99
-						.equals(t))) {
-			throw new BusinessException("Valor da BC do IPI é obrigatório");
-		}
-
-		if (aliquota == null
-				&& (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t) || IPI_99
-						.equals(t))) {
-			throw new BusinessException("Alíquota do IPI é obrigatório");
-		}
-
-		if (quantidadeUnidadeTributavel == null
-				&& (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t) || IPI_99
-						.equals(t))) {
-			throw new BusinessException(
-					"Quantidade de unidade tributável do IPI é obrigatório");
-		}
-
-		if (valorUnidadeTributavel == null
-				&& (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t) || IPI_99
-						.equals(t))) {
-			throw new BusinessException(
-					"Valor pr unidade tributável do IPI é obrigatório");
-		}
-
-		if (valor == null
-				&& (IPI_00.equals(t) || IPI_49.equals(t) || IPI_50.equals(t) || IPI_99
-						.equals(t))) {
-			throw new BusinessException("Valor do IPI é obrigatório");
-		}
-	}
 }

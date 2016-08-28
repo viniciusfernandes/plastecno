@@ -3,32 +3,37 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.*;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Códido da situação tributária")
 public class PISGeral {
 	@XmlElement(name = "pPIS")
+	@InformacaoValidavel(obrigatorio = true, tiposNaoPermitidos = { "4", "6", "7", "8", "9" }, nomeExibicao = "Alíquota do PIS")
 	private Double aliquota;
 
 	@XmlElement(name = "CST")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Códido da situação tributária do PIS")
 	private String codigoSituacaoTributaria;
 
 	@XmlElement(name = "qBCProd")
+	@InformacaoValidavel(tiposObrigatorios = { "3", "99" }, tiposNaoPermitidos = { "4", "6", "7", "8", "9" }, nomeExibicao = "Quantidade vendida do PIS")
 	private Integer quantidadeVendida;
 
 	@XmlElement(name = "vPIS")
+	@InformacaoValidavel(obrigatorio = true, tiposNaoPermitidos = { "4", "6", "7", "8", "9" }, nomeExibicao = "Valor do PIS")
 	private Double valor;
 
 	@XmlElement(name = "vAliqProd")
+	@InformacaoValidavel(tiposObrigatorios = { "99" }, tiposNaoPermitidos = { "4", "6", "7", "8", "9" }, nomeExibicao = "Valor da alíquota do PIS")
 	private Double valorAliquota;
 
 	@XmlElement(name = "vBC")
+	@InformacaoValidavel(tiposObrigatorios = { "1", "2", "99", "ST" }, tiposNaoPermitidos = { "4", "6", "7", "8", "9" }, nomeExibicao = "Valor de base de cáculo do PIS")
 	private Double valorBC;
 
 	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC
-				* (aliquota / 100d) : 0;
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
 	}
 
 	public PISGeral carregarValoresAliquotas() {
@@ -93,50 +98,5 @@ public class PISGeral {
 
 	public void setValorBC(Double valorBC) {
 		this.valorBC = valorBC;
-	}
-
-	public void validar() throws BusinessException {
-		TipoTributacaoPIS t = getTipoTributacao();
-		if (t == null) {
-			throw new BusinessException("Situação tributária é obrigatório");
-		}
-
-		// Essas tributacoes sao isentas
-		if (PIS_4.equals(t) || PIS_6.equals(t) || PIS_7.equals(t)
-				|| PIS_8.equals(t) || PIS_9.equals(t)) {
-
-			aliquota = null;
-			quantidadeVendida = null;
-			valor = null;
-			valorAliquota = null;
-			valorBC = null;
-
-			return;
-		}
-
-		if (valorBC == null
-				&& (PIS_1.equals(t) || PIS_2.equals(t) || PIS_99.equals(t) || PIS_ST
-						.equals(t))) {
-			throw new BusinessException("Valor da BC do PIS é obrigatório");
-		}
-
-		if (aliquota == null) {
-			throw new BusinessException("Alíquota do PIS é obrigatório");
-		}
-
-		if (valor == null) {
-			throw new BusinessException("Valor do PIS é obrigatório");
-		}
-
-		if (quantidadeVendida == null && (PIS_3.equals(t) || PIS_99.equals(t))) {
-			throw new BusinessException(
-					"Quantidade vendida do PIS é obrigatório");
-		}
-
-		if (valorAliquota == null && (PIS_99.equals(t))) {
-			throw new BusinessException(
-					"Valor da alíquota do PIS é obrigatório");
-		}
-
 	}
 }

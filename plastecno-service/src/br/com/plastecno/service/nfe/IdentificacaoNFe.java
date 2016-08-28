@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel
 public class IdentificacaoNFe {
 
 	@InformacaoValidavel(obrigatorio = true, tamanho = 8, nomeExibicao = "Código da chave de acesso")
@@ -32,11 +33,15 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "verProc")
 	private String dataHoraEntradaContigencia;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 9 }, nomeExibicao = "Dígito verificador da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Destino da operação da NFe")
+	@XmlElement(name = "idDest")
+	private String destinoOperacao;
+
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Dígito verificador da NFe")
 	@XmlElement(name = "cDV")
 	private String digitoVerificador;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 9 }, nomeExibicao = "Finalidade da emissão  da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Finalidade da emissão  da NFe")
 	@XmlElement(name = "finNFe")
 	private Integer finalidadeEmissao;
 
@@ -59,7 +64,7 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "mod")
 	private final String modelo = "55";
 
-	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 7 }, nomeExibicao = "Código município do fator gerador")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{7}", nomeExibicao = "Código município do fator gerador")
 	@XmlElement(name = "cMunFG")
 	private String municipioOcorrenciaFatorGerador;
 
@@ -67,19 +72,23 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "natOp")
 	private String naturezaOperacao;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 9 }, nomeExibicao = "Número da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,9}", nomeExibicao = "Número da NFe")
 	@XmlElement(name = "nNF")
 	private String numero;
+
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Operação com consumidor final da NFe")
+	@XmlElement(name = "indFinal")
+	private String operacaoConsumidorFinal;
 
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 9 }, nomeExibicao = "Processo de emissão da NFe")
 	@XmlElement(name = "procEmi")
 	private String processoEmissao;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 999 }, nomeExibicao = "Série da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,3}", nomeExibicao = "Série da NFe")
 	@XmlElement(name = "serie")
 	private String serie;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 999 }, nomeExibicao = "Identificação do ambiente de emissão")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Identificação do ambiente de emissão")
 	@XmlElement(name = "tpAmb")
 	private String tipoAmbiente;
 
@@ -87,11 +96,11 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "tpEmis")
 	private String tipoEmissao;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 9 }, nomeExibicao = "Formato da impressão do DANFE")
+	@InformacaoValidavel(obrigatorio = true, opcoes = { "0", "1", "2", "3", "4", "5" }, nomeExibicao = "Formato da impressão do DANFE")
 	@XmlElement(name = "tpImp")
 	private String tipoImpressao;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 1 }, nomeExibicao = "Tipo operação da NFe")
+	@InformacaoValidavel(obrigatorio = true, opcoes = { "0", "1" }, nomeExibicao = "Tipo operação da NFe")
 	@XmlElement(name = "tpNF")
 	private String tipoOperacao;
 
@@ -127,6 +136,11 @@ public class IdentificacaoNFe {
 	@XmlTransient
 	public String getDataHoraEntradaContigencia() {
 		return dataHoraEntradaContigencia;
+	}
+
+	@XmlTransient
+	public String getDestinoOperacao() {
+		return destinoOperacao;
 	}
 
 	@XmlTransient
@@ -177,6 +191,11 @@ public class IdentificacaoNFe {
 	@XmlTransient
 	public String getNumero() {
 		return numero;
+	}
+
+	@XmlTransient
+	public String getOperacaoConsumidorFinal() {
+		return operacaoConsumidorFinal;
 	}
 
 	@XmlTransient
@@ -239,6 +258,10 @@ public class IdentificacaoNFe {
 		this.dataHoraEntradaContigencia = dataHoraEntradaContigencia;
 	}
 
+	public void setDestinoOperacao(String destinoOperacao) {
+		this.destinoOperacao = destinoOperacao;
+	}
+
 	public void setDigitoVerificador(String digitoVerificador) {
 		this.digitoVerificador = digitoVerificador;
 	}
@@ -259,13 +282,11 @@ public class IdentificacaoNFe {
 		this.justificativaContigencia = justificativaContigencia;
 	}
 
-	public void setListaNFeReferenciada(
-			List<NFeReferenciada> listaNFeReferenciada) {
+	public void setListaNFeReferenciada(List<NFeReferenciada> listaNFeReferenciada) {
 		this.listaNFeReferenciada = listaNFeReferenciada;
 	}
 
-	public void setMunicipioOcorrenciaFatorGerador(
-			String municipioOcorrenciaFatorGerador) {
+	public void setMunicipioOcorrenciaFatorGerador(String municipioOcorrenciaFatorGerador) {
 		this.municipioOcorrenciaFatorGerador = municipioOcorrenciaFatorGerador;
 	}
 
@@ -275,6 +296,10 @@ public class IdentificacaoNFe {
 
 	public void setNumero(String numero) {
 		this.numero = numero;
+	}
+
+	public void setOperacaoConsumidorFinal(String operacaoConsumidorFinal) {
+		this.operacaoConsumidorFinal = operacaoConsumidorFinal;
 	}
 
 	public void setProcessoEmissao(String processoEmissao) {

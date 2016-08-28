@@ -40,7 +40,7 @@ public final class ValidadorInformacao {
 		Field[] camposValidaveis = recuperarCamposValidaveis(obj);
 		boolean isString = false;
 		int[] tamanhos = null;
-		int[] valores = null;
+		String[] opcoes = null;
 		boolean ok = false;
 
 		Object valorCond = null;
@@ -196,18 +196,18 @@ public final class ValidadorInformacao {
 				continue;
 			}
 
-			valores = informacao.valores();
-			if (valores.length > 0) {
+			opcoes = informacao.opcoes();
+			if (opcoes.length > 0) {
 				ok = false;
-				for (int i = 0; i < valores.length; i++) {
-					if (conteudoCampo.equals(valores[i])) {
+				for (int i = 0; i < opcoes.length; i++) {
+					if (conteudoCampo.equals(opcoes[i])) {
 						ok = true;
 						break;
 					}
 				}
 				if (!ok) {
 					listaMensagem.add(informacao.nomeExibicao() + " deve conter um dos valores \""
-							+ Arrays.toString(valores) + "\" mas contém o valores de \"" + conteudoCampo + "\"");
+							+ Arrays.toString(opcoes) + "\" mas contém o valores de \"" + conteudoCampo + "\"");
 				}
 				continue;
 			}

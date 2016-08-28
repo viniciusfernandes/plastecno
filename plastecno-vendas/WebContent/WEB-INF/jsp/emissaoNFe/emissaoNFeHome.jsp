@@ -214,15 +214,12 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_destinatario');
 	inicializarFadeInBloco('bloco_transporte');
 	inicializarFadeInBloco('bloco_exportacao');
-	inicializarFadeInBloco('bloco_compra');
 	
 	fecharBloco('bloco_local_mercadoria');
 	fecharBloco('bloco_referenciada');
 	fecharBloco('bloco_destinatario');
 	fecharBloco('bloco_transporte');
 	fecharBloco('bloco_exportacao');
-	fecharBloco('bloco_compra');
-	fecharBloco('bloco_info_adicionais_nfe');
 	
 	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
 	$('#bloco_tributos').fadeOut('fast');
@@ -567,9 +564,9 @@ function inserirVolume(){
 };
 
 function inserirReboque(){
-	var placa = $('#bloco_reboque #placaReboque').val();
-	var uf = $('#bloco_reboque #ufReboque').val();
-	var registro = $('#bloco_reboque #registroReboque').val();
+	var placa = $('#bloco_veiculo #placaVeiculo').val();
+	var uf = $('#bloco_veiculo #ufVeiculo').val();
+	var registro = $('#bloco_veiculo #registroVeiculo').val();
 
 	if(isEmpty(placa) || isEmpty(uf)){
 		return;
@@ -583,7 +580,7 @@ function inserirReboque(){
 	linha.insertCell(2).innerHTML = registro;
 	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Reboque" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
 	
-	$('#bloco_reboque input:text').val('');
+	$('#bloco_veiculo input:text').val('');
 };
 
 function inserirLinhaTabela(linhaJson){
@@ -840,23 +837,27 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Consumidor Final:</div>
+			<div class="label">Oper. Consum. Final:</div>
 			<div class="input" style="width: 20%">
-				<select id="pedidoAssociado" 
-					style="width: 50%" >
-					<option value=""></option>
-					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+				<select name="nf.identificacaoNFe.operacaoConsumidorFinal" style="width: 50%" >
+					<c:forEach var="tipo" items="${listaTipoOperacaoConsumidorFinal}">
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoOperacaoConsumidorSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Destino Operação:</div>
+			<div class="label">Tipo Operação:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado" 
-					style="width: 100%" >
-					<option value=""></option>
-					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+				<select name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
+					<c:forEach var="tipo" items="${listaTipoOperacao}">
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label">Dest. Operação:</div>
+			<div class="input" style="width: 50%">
+				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 40%" >
+					<c:forEach var="tipo" items="${listaTipoDestinoOperacao}">
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoDestinoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -1442,38 +1443,20 @@ function editarTributos(linha){
 				</div>
 			
 				<div class="divFieldset">
-				<fieldset class="fieldsetInterno">
-					<legend>::: Veículo :::</legend>
+				<fieldset id="bloco_veiculo" class="fieldsetInterno">
+					<legend>::: Veículo/Reboque/Balsa/Vagão :::</legend>
 					<div  class="label">Placa:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.veiculo.placa" value="${nf.transporteNFe.veiculo.placa}" style="width: 100%" />
+						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa" value="${nf.transporteNFe.veiculo.placa}" style="width: 100%" />
 					</div>
 					<div  class="label">UF:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" style="width: 20%" />
+						<input type="text" id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" style="width: 20%" />
 					</div>
 					<div  class="label">Regist. Trans. Cargo:</div>
 					<div class="input" style="width: 30%">
-						<input type="text" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
+						<input type="text" id="registroVeiculo" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
 							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" style="width: 50%" />
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_reboque" class="fieldsetInterno">
-					<legend>::: Reboque :::</legend>
-					<div  class="label">Placa:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="placaReboque" style="width: 100%" />
-					</div>
-					<div  class="label">UF:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="ufReboque" style="width: 20%" />
-					</div>
-					<div  class="label">Regist. Trans. Cargo:</div>
-					<div class="input" style="width: 30%">
-						<input type="text" id="registroReboque" style="width: 50%" />
 					</div>
 					<div class="bloco_botoes">
 						<a id="botaoInserirReboque" title="Inserir Dados do Reboque" class="botaoAdicionar"></a>
@@ -1666,18 +1649,15 @@ function editarTributos(linha){
 			</div>
 		</fieldset>
 		<fieldset id="bloco_exportacao">
-			<legend>::: Exportação ::: -</legend>
+			<legend>::: Exportação/Compra ::: -</legend>
 			<div class="label">UF Embarque:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" name="nf.exportacaoNFe.ufEmbarque" value="${nf.exportacaoNFe.ufEmbarque}" style="width: 5%"/>
 			</div>
 			<div class="label">Local Embarque:</div>
-			<div class="input" style="width: 60%">
-				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}"/>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}" style="width: 80%"/>
 			</div>		
-		</fieldset>
-		<fieldset id="bloco_compra">
-			<legend>::: Compra ::: -</legend>
 			<div class="label">Nota Empenho:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" name="nf.compraNFe.notaEmpenho" value="${nf.compraNFe.notaEmpenho}" style="width: 10%"/>

@@ -43,6 +43,7 @@ public class DadosNFe {
 	private IdentificacaoLocalGeral identificacaoLocalRetirada;
 
 	@XmlElement(name = "ide")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Dados de Identificação da NFe")
 	private IdentificacaoNFe identificacaoNFe;
 
 	@XmlElement(name = "compra")

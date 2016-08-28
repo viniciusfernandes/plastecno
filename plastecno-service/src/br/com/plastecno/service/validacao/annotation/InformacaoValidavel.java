@@ -36,6 +36,8 @@ public @interface InformacaoValidavel {
 
 	boolean obrigatorio() default false;
 
+	String[] opcoes() default {};
+
 	String padrao() default "";
 
 	String padraoData() default "";
@@ -65,7 +67,5 @@ public @interface InformacaoValidavel {
 	boolean trim() default false;
 
 	boolean validarHierarquia() default false;
-
-	int[] valores() default {};
 
 }

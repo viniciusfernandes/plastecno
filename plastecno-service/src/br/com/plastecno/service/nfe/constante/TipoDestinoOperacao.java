@@ -1,11 +1,14 @@
 package br.com.plastecno.service.nfe.constante;
 
-public enum TipoFormaPagamento {
-	OUTROS("2 - Outros", "2"), PRAZO("1 - À prazo", "1"), VISTA("0 - À vista", "0");
+public enum TipoDestinoOperacao {
+	NORMAL("1 - Operação Interna", "1"),
+	CONTIGENCIA_FS("2 - Operação Interestadual", "2"),
+	CONTIGENCIA_SCAN("3 - Operação com exterior", "3");
+	
 	private final String codigo;
 	private final String descricao;
 
-	private TipoFormaPagamento(String descricao, String codigo) {
+	private TipoDestinoOperacao(String descricao, String codigo) {
 		this.descricao = descricao;
 		this.codigo = codigo;
 	}

@@ -31,6 +31,7 @@ import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.PedidoNFe;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
@@ -69,11 +70,22 @@ public class NFeServiceImpl implements NFeService {
 	@EJB
 	private RepresentadaService representadaService;
 
+	@TODO
 	private void carregarConfiguracao(NFe nFe) {
 		DadosNFe nf = nFe.getDadosNFe();
 
 		nf.setId("12345678901234567890123456789012345678901234567");
 		nf.getIdentificacaoEmitenteNFe().setCNAEFiscal("1234567");
+		nf.getIdentificacaoNFe().setChaveAcesso("12345678");
+		nf.getIdentificacaoNFe().setDataEmissao("2016-11-11");
+		nf.getIdentificacaoNFe().setDigitoVerificador("4");
+		nf.getIdentificacaoNFe().setSerie("77");
+		nf.getIdentificacaoNFe().setTipoAmbiente("2");
+		nf.getIdentificacaoNFe().setTipoImpressao("2");
+		nf.getIdentificacaoNFe().setNumero("123412346");
+		nf.getIdentificacaoNFe().setProcessoEmissao("0");
+		nf.getIdentificacaoNFe().setVersaoProcessoEmissao("43214321");
+		nf.getIdentificacaoNFe().setMunicipioOcorrenciaFatorGerador("1234567");
 		ProdutoServicoNFe p = null;
 
 		if (nf.getListaDetalhamentoProdutoServicoNFe() == null) {
@@ -122,6 +134,8 @@ public class NFeServiceImpl implements NFeService {
 
 		iEmit.setEnderecoEmitenteNFe(endEmit);
 		nFe.getDadosNFe().setIdentificacaoEmitenteNFe(iEmit);
+		nFe.getDadosNFe().getIdentificacaoNFe().setCodigoUFEmitente(endEmit.getUF());
+
 		return nFe;
 	}
 

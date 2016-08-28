@@ -1,16 +1,16 @@
 package br.com.plastecno.service.nfe.constante;
 
-public enum TipoOperacao {
-	ENTRADA("ENTRADA", 0), SAIDA("SAÍDA", 1);
-	private final int codigo;
+public enum TipoOperacaoNFe {
+	ENTRADA("0 - Entrada", "0"), SAIDA("1 - Saída", "1");
+	private final String codigo;
 	private final String descricao;
 
-	private TipoOperacao(String descricao, int codigo) {
+	private TipoOperacaoNFe(String descricao, String codigo) {
 		this.descricao = descricao;
 		this.codigo = codigo;
 	}
 
-	public int getCodigo() {
+	public String getCodigo() {
 		return codigo;
 	}
 

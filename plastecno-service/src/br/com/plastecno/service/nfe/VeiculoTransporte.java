@@ -7,7 +7,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class VeiculoTransporte {
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 8 }, nomeExibicao = "Placa do veículo")
+	@InformacaoValidavel(obrigatorio = true, padrao="\\[A,Z]{2,4}\\d{3,4}", padraoExemplo="XX9999, XXX999, XXX9999, XXXX999", nomeExibicao = "Placa do veículo")
 	@XmlElement(name = "placa")
 	private String placa;
 

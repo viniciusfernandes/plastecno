@@ -30,6 +30,7 @@ import br.com.plastecno.service.nfe.IdentificacaoNFe;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.TransportadoraNFe;
 import br.com.plastecno.service.nfe.TransporteNFe;
+import br.com.plastecno.service.nfe.constante.TipoDestinoOperacao;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
@@ -38,6 +39,8 @@ import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.nfe.constante.TipoMotivoDesoneracaoICMS;
+import br.com.plastecno.service.nfe.constante.TipoOperacaoConsumidorFinal;
+import br.com.plastecno.service.nfe.constante.TipoOperacaoNFe;
 import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
 import br.com.plastecno.service.nfe.constante.TipoRegimeTributacao;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
@@ -73,6 +76,10 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
+
+        addAtributo("listaTipoDestinoOperacao", TipoDestinoOperacao.values());
+        addAtributo("listaTipoOperacaoConsumidorFinal", TipoOperacaoConsumidorFinal.values());
+        addAtributo("listaTipoOperacao", TipoOperacaoNFe.values());
         addAtributo("listaTipoFinalidadeEmissao", TipoFinalidadeEmissao.values());
         addAtributo("listaTipoFormaPagamento", TipoFormaPagamento.values());
         addAtributo("listaTipoEmissao", TipoEmissao.values());
@@ -275,6 +282,9 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("formaPagamentoSelecionada", iNFe.getIndicadorFormaPagamento());
             addAtributo("tipoEmissaoSelecionada", iNFe.getTipoEmissao());
             addAtributo("tipoImpressaoSelecionada", iNFe.getTipoImpressao());
+            addAtributo("tipoOperacaoConsumidorSelecionada", iNFe.getOperacaoConsumidorFinal());
+            addAtributo("tipoOperacaoSelecionada", iNFe.getTipoOperacao());
+            addAtributo("tipoDestinoOperacaoSelecionada", iNFe.getDestinoOperacao());
         }
 
         if (nf.contemDuplicata()) {

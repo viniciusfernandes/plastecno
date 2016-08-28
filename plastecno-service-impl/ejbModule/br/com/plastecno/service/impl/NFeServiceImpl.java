@@ -260,10 +260,11 @@ public class NFeServiceImpl implements NFeService {
 		List<DuplicataNFe> listaDuplicata = new ArrayList<DuplicataNFe>();
 		DuplicataNFe dup = null;
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-		for (int i = 0; i < totalParcelas; i++) {
+		for (Date d : listaData) {
 			dup = new DuplicataNFe();
-			dup.setDataVencimento(df.format(listaData.get(i)));
-			dup.setNumero(String.valueOf(i + 1));
+			dup.setDataVencimento(df.format(d));
+			// Valor padrao eh boleto pois eh o maior numero de ocorrencias
+			dup.setNumero("BOLETO");
 			dup.setValor(valorDuplicata);
 
 			listaDuplicata.add(dup);

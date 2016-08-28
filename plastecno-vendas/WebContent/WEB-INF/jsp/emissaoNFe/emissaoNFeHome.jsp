@@ -207,7 +207,8 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_iss');
 	inicializarFadeInBloco('bloco_tributos');
 	inicializarFadeInBloco('bloco_info_adicionais_prod');
-	
+	inicializarFadeInBloco('bloco_info_adicionais_nfe');
+
 	inicializarFadeInBloco('bloco_local_mercadoria');
 	inicializarFadeInBloco('bloco_referenciada');
 	inicializarFadeInBloco('bloco_destinatario');
@@ -221,6 +222,7 @@ $(document).ready(function() {
 	fecharBloco('bloco_transporte');
 	fecharBloco('bloco_exportacao');
 	fecharBloco('bloco_compra');
+	fecharBloco('bloco_info_adicionais_nfe');
 	
 	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
 	$('#bloco_tributos').fadeOut('fast');
@@ -862,14 +864,50 @@ function editarTributos(linha){
 			<div class="input" style="width: 50%">
 				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 80%"/>
 			</div>
-			<div class="label">Info. Adicionais Fisco:</div>
-			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco}</textarea>
+			
+			<div class="divFieldset">
+			<fieldset id="bloco_destinatario" class="fieldsetInterno">
+				<legend>::: Destinatário ::: -</legend>
+				<div class="label">Razão Social/Nome:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}"  style="width: 60%"/>
+					<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
+				</div>
+				
+				<div class="label">CNPJ:</div>
+				<div class="input" style="width: 15%">
+					<input type="text" id="cnpj" name="nf.identificacaoDestinatarioNFe.cnpj"
+						value="${cliente.cnpj}"  />
+				</div>
+				<div class="label">Insc. Estadual:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" id="inscricaoEstadual"
+						name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
+						value="${cliente.inscricaoEstadual}"
+						style="width: 40%; text-align: right;" />
+				</div>
+				<div class="label">CPF:</div>
+				<div class="input" style="width: 15%">
+					<input type="text" id="cpf" name="nf.identificacaoDestinatarioNFe.cpf"
+						value="${cliente.cpf}"  />
+				</div>
+				<div class="label">Telefone:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="telefone" name="nf.identificacaoDestinatarioNFe.enderecoDestinatarioNFe.telefone"
+						value="${telefoneContatoPedido}" />
+				</div>
+				<div class="label">Email:</div>
+				<div class="input" style="width: 20%">
+					<input type="text" id="email" name="nf.identificacaoDestinatarioNFe.email"
+						value="${cliente.email}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
+				</div>
+				
+				<div class="divFieldset">
+				<jsp:include page="/bloco/bloco_logradouro.jsp"></jsp:include>
+				</div>
+			</fieldset>
 			</div>
-			<div class="label">Info. Adicionais Contrib.:</div>
-			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte}</textarea>
-			</div>
+			
 		</fieldset>
 		
 		<fieldset id="bloco_referenciada">
@@ -1032,47 +1070,6 @@ function editarTributos(linha){
 				</div>
 			</fieldset>
 			</div>			
-		</fieldset>
-		
-		<fieldset id="bloco_destinatario">
-			<legend>::: Destinatário ::: -</legend>
-			<div class="label">Razão Social/Nome:</div>
-			<div class="input" style="width: 80%">
-				<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}"  style="width: 60%"/>
-				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
-			</div>
-			
-			<div class="label">CNPJ:</div>
-			<div class="input" style="width: 15%">
-				<input type="text" id="cnpj" name="nf.identificacaoDestinatarioNFe.cnpj"
-					value="${cliente.cnpj}"  />
-			</div>
-			<div class="label">Insc. Estadual:</div>
-			<div class="input" style="width: 40%">
-				<input type="text" id="inscricaoEstadual"
-					name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
-					value="${cliente.inscricaoEstadual}"
-					style="width: 40%; text-align: right;" />
-			</div>
-			<div class="label">CPF:</div>
-			<div class="input" style="width: 15%">
-				<input type="text" id="cpf" name="nf.identificacaoDestinatarioNFe.cpf"
-					value="${cliente.cpf}"  />
-			</div>
-			<div class="label">Telefone:</div>
-			<div class="input" style="width: 10%">
-				<input type="text" id="telefone" name="nf.identificacaoDestinatarioNFe.enderecoDestinatarioNFe.telefone"
-					value="${telefoneContatoPedido}" />
-			</div>
-			<div class="label">Email:</div>
-			<div class="input" style="width: 20%">
-				<input type="text" id="email" name="nf.identificacaoDestinatarioNFe.email"
-					value="${cliente.email}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
-			</div>
-			
-			<div class="divFieldset">
-			<jsp:include page="/bloco/bloco_logradouro.jsp"></jsp:include>
-			</div>
 		</fieldset>
 		
 		<fieldset>
@@ -1657,7 +1654,17 @@ function editarTributos(linha){
 			</fieldset>
 			</div>
 		</fieldset>
-		
+		<fieldset id="bloco_info_adicionais_nfe">
+			<legend>::: Info. Adicionais ::: -</legend>
+			<div class="label">Info. Adicionais Fisco:</div>
+			<div class="input areatexto" style="width: 70%">
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco}</textarea>
+			</div>
+			<div class="label">Info. Adicionais Contrib.:</div>
+			<div class="input areatexto" style="width: 70%">
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte}</textarea>
+			</div>
+		</fieldset>
 		<fieldset id="bloco_exportacao">
 			<legend>::: Exportação ::: -</legend>
 			<div class="label">UF Embarque:</div>

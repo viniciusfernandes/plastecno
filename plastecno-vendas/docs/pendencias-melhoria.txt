@@ -33,6 +33,6 @@ e cupons fiscais vinculados a nota
 17) Unir os campos de exportacao e compra em um mesmo bloco
 18) Incluir os campos de exportacao em produtos
 19) Implementar edicao de cobranca
-20) Em cobracao o valor padrao deve ser boleto
-21) reposicionar os dados adicionais do NFe no final da tela da nota logo antes de exportacao
-22) Incluir o destinatario no bloco de dados basicos da nfe
+20) Em cobracao o valor padrao deve ser boleto OK
+21) reposicionar os dados adicionais do NFe no final da tela da nota logo antes de exportacao OK
+22) Incluir o destinatario no bloco de dados basicos da nfe OK

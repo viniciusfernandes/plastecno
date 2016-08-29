@@ -17,6 +17,8 @@
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
+
 
 <style type="text/css">
 fieldset .fieldsetInterno {
@@ -35,9 +37,13 @@ fieldset .fieldsetInterno legend {
 <script type="text/javascript">
 
 var numeroProdutoEdicao = null;
+var tabelaDuplicataHandler = null;
 
 $(document).ready(function() {
 	scrollTo('${ancora}');
+	
+	tabelaDuplicataHandler = new BlocoTabelaHandler(null, 'Duplicata', 'tabela_duplicata', 'bloco_duplicata');
+	tabelaDuplicataHandler.setTotalColunas(4);
 	
 	$("#botaoPesquisaPedido").click(function() {
 		if(isEmpty($('#idPedido').val())){
@@ -46,11 +52,11 @@ $(document).ready(function() {
 		$('#formPesquisa #idPedidoPesquisa').val($('#idPedido').val());
 		$('#formPesquisa').submit();
 	});
-	
+	/*
 	$("#botaoInserirDuplicata").click(function() {
 		inserirDuplicata();
 	});
-	
+	*/
 	$("#botaoInserirVolume").click(function() {
 		inserirVolume();
 	});
@@ -224,7 +230,67 @@ $(document).ready(function() {
 	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
 	$('#bloco_tributos').fadeOut('fast');
 	$('#bloco_info_adicionais_prod').fadeOut('fast');
+
+	inicializarBlocoDuplicata();
 });
+
+function removerDuplicata(botao) {
+	tabelaDuplicataHandler.removerRegistro(botao);
+};
+
+function editarDuplicata(botao){
+	tabelaDuplicataHandler.editar(botao);
+};
+
+function inicializarBlocoDuplicata(){
+	
+	tabelaDuplicataHandler.incluirRegistro(function (ehEdicao, linha){
+		var celula = null;
+		var doc = document;
+		
+		for (var i = 0; i < this.TOTAL_COLUNAS; i++) {
+			celula = ehEdicao ? linha.cells[i] : linha.insertCell(i); 
+			switch (i) {
+				case 0:
+					celula.style.display = 'none';
+					break;	
+				case 1:
+					celula.innerHTML = $('#bloco_duplicata #numeroDuplicata').val();
+					break;
+				case 2:
+					celula.innerHTML = $('#bloco_duplicata #dataVencimentoDuplicata').val();
+					break;
+				case 3:
+					celula.innerHTML = $('#bloco_duplicata #valorDuplicata').val();
+					break;
+			}
+		}
+	});
+	
+	tabelaDuplicataHandler.editarRegistro(function(linha){
+		
+		var celula = null;
+		var doc = document;
+		
+		for (var i = 0; i < this.TOTAL_COLUNAS; i++) {
+			celula =  linha.cells[i];
+			
+			if (!isEmpty(celula.innerHTML)) {
+				switch (i) {
+					case 1:
+						doc.getElementById('numeroDuplicata').value = celula.innerHTML;
+						break;
+					case 2:
+						doc.getElementById('dataVencimentoDuplicata').value = celula.innerHTML;
+						break;
+					case 3:
+						doc.getElementById('valorDuplicata').value = celula.innerHTML;
+						break;
+				}
+			}
+		}
+	});
+};
 
 function gerarInputLinhasTabela(nomeTabela, parametroJson){
 	var tabela = document.getElementById(nomeTabela);
@@ -243,7 +309,7 @@ function gerarInputLinhasTabela(nomeTabela, parametroJson){
 		<%-- devemos excluir a ultima celula da tabela pois eh a celula de botoes de acoes --%>
 		max = celulas.length - 1;
 		for (var j= 0; j < max; j++) {
-			campos[j] = {'nome':parametroJson.nomes[j], 'valor':celulas[j].innerHTML};
+			campos[j] = {'nome':parametroJson.nomes[j] == null?'':parametroJson.nomes[j], 'valor':celulas[j].innerHTML};
 		}
 		
 		gerarInputHidden({'nomeObjeto': parametroJson.nomeLista+'['+i+']', 'campos':campos});
@@ -454,7 +520,7 @@ function gerarInputImpostoImportacao(){
 
 function gerarInputDuplicata(){
 	var parametros = {'nomeLista': 'nf.cobrancaNFe.listaDuplicata',
-			'nomes': ['numero', 'dataVencimento', 'valor']};
+			'nomes': [null, 'numero', 'dataVencimento', 'valor']};
 	gerarInputLinhasTabela('tabela_duplicata', parametros)
 };
 
@@ -1608,8 +1674,8 @@ function editarTributos(linha){
 					<input type="text" id="valorDuplicata"/>
 				</div>
 				<div class="bloco_botoes">
-					<a id="botaoInserirDuplicata" title="Inserir Dados da Duplicata" class="botaoAdicionar"></a>
-					<a id="botaoLimparDuplicata" title="Limpar Dados da Duplicata" class="botaoLimpar"></a>
+					<input type="button" id="botaoIncluirDuplicata" title="Inserir Dados da Duplicata" class="botaoAdicionar"/>
+					<input type="button" id="botaoLimparDuplicata" title="Limpar Dados da Duplicata" class="botaoLimpar"/>
 				</div>
 							
 				<table id="tabela_duplicata" class="listrada" >
@@ -1626,10 +1692,14 @@ function editarTributos(linha){
 					<tbody>
 						<c:forEach var="dup" items="${listaDuplicata}">
 							<tr>
+								<td style="display: none;"></td>
 								<td>${dup.numero}</td>
 								<td>${dup.dataVencimento}</td>
 								<td>${dup.valor}</td>
-								<td><input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+								<td>
+									<input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>
+									<input type="button" value="" title="Editar Duplicata" onclick="editarDuplicata(this);" class="botaoEditar" /> 
+								</td>
 							</tr>
 						</c:forEach>
 					</tbody>

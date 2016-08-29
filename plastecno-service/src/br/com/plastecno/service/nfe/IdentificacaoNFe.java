@@ -22,16 +22,16 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "dEmi")
 	private String dataEmissao;
 
-	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data entrada/saída produto")
-	@XmlElement(name = "dSaiEnt")
-	private String dataEntradaSaidaProduto;
-
 	@XmlElement(name = "dhCont")
 	private String dataHoraContingencia;
 
 	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{5}:\\d{2}:\\d{2}", nomeExibicao = "Dada/hora entrada em contigência")
 	@XmlElement(name = "verProc")
 	private String dataHoraEntradaContigencia;
+
+	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}[-^+]\\d{4}", nomeExibicao = "Data e hora entrada/saída produto")
+	@XmlElement(name = "dhSaiEnt")
+	private String dataHoraEntradaSaidaProduto;
 
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Destino da operação da NFe")
 	@XmlElement(name = "idDest")
@@ -124,11 +124,6 @@ public class IdentificacaoNFe {
 	}
 
 	@XmlTransient
-	public String getDataEntradaSaidaProduto() {
-		return dataEntradaSaidaProduto;
-	}
-
-	@XmlTransient
 	public String getDataHoraContingencia() {
 		return dataHoraContingencia;
 	}
@@ -136,6 +131,11 @@ public class IdentificacaoNFe {
 	@XmlTransient
 	public String getDataHoraEntradaContigencia() {
 		return dataHoraEntradaContigencia;
+	}
+
+	@XmlTransient
+	public String getDataHoraEntradaSaidaProduto() {
+		return dataHoraEntradaSaidaProduto;
 	}
 
 	@XmlTransient
@@ -246,16 +246,16 @@ public class IdentificacaoNFe {
 		this.dataEmissao = dataEmissao;
 	}
 
-	public void setDataEntradaSaidaProduto(String dataEntradaSaidaProduto) {
-		this.dataEntradaSaidaProduto = dataEntradaSaidaProduto;
-	}
-
 	public void setDataHoraContingencia(String dataHoraContingencia) {
 		this.dataHoraContingencia = dataHoraContingencia;
 	}
 
 	public void setDataHoraEntradaContigencia(String dataHoraEntradaContigencia) {
 		this.dataHoraEntradaContigencia = dataHoraEntradaContigencia;
+	}
+
+	public void setDataHoraEntradaSaidaProduto(String dataHoraEntradaSaidaProduto) {
+		this.dataHoraEntradaSaidaProduto = dataHoraEntradaSaidaProduto;
 	}
 
 	public void setDestinoOperacao(String destinoOperacao) {

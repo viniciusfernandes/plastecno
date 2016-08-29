@@ -40,8 +40,6 @@ public @interface InformacaoValidavel {
 
 	String padrao() default "";
 
-	String padraoData() default "";
-
 	String padraoExemplo() default "";
 
 	boolean positivo() default false;

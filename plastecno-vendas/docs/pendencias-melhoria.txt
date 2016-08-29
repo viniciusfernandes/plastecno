@@ -17,7 +17,7 @@ popular as quantidades tributaveis de todos eles
 2) o campo de destina da operacao "idDest" não esta na documentacao da sefaz OK
 3) o campo de tipo de atendimento "idPress" não esta na documentacao da sefaz OK
 4) o campo de finalida de emissao "finNFe" não esta na documentacao da sefaz OK
-5) o campo de data de saida "dtHrSaient" deve estar na tela 
+5) o campo de data de saida "dSaiEnt" deve estar na tela OK
 6) verificar como consultar a sequencia do numero da nfe na sefaz
 7) consultar o fernando sobre inclusão de nota referenciada de produtor rural e cana de acucar
 e cupons fiscais vinculados a nota
@@ -26,13 +26,13 @@ e cupons fiscais vinculados a nota
 10) Criar botao de salvar, validacao e pre-visualizacao do danfe e transmicao da nfe
 11) Remover os campos em branco dos campos de String pois a SEFAZ critica os espacos
 12) Incluir indicador de inscricao estadual do destinatario indIEDest
-13) Incluir campo de outras despesas acessoriais em produtos "vOutro" na tela
-14) Incluir na tela de pedido os campos de "item compra" e "numero do pedido de compra"
+13) Incluir campo de outras despesas acessoriais em produtos "vOutro" na tela OK
+14) Incluir na tela de pedido os campos de "item compra" e "numero do pedido de compra" OK
 15) Verificar na documentacao da sefaz o campo "nFCI" do produto
 16) Unir os campos de transporte veiculo/reboque/balsa/vagao OK
 17) Unir os campos de exportacao e compra em um mesmo bloco
 18) Incluir os campos de exportacao em produtos
-19) Implementar edicao de cobranca
+19) Implementar edicao de cobranca OK
 20) Em cobracao o valor padrao deve ser boleto OK
 21) reposicionar os dados adicionais do NFe no final da tela da nota logo antes de exportacao OK
 22) Incluir o destinatario no bloco de dados basicos da nfe OK

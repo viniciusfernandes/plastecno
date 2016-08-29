@@ -131,6 +131,7 @@ $(document).ready(function() {
 		removerInputHidden(gerarJsonInfoProduto());
 		fecharBloco('bloco_info_adicionais_prod');
 		$('#bloco_info_adicionais_prod #infoAdicionaisProd').val('');
+		$('#bloco_info_adicionais_prod input:text').val('');
 	});
 	
 	$('#botaoLimparIPI').click(function(){
@@ -205,6 +206,8 @@ $(document).ready(function() {
 		'idCidade': 'cidadeEntrega', 'idUf': 'ufEntrega', 'idPais': ''});
 	
 	inserirMascaraData('dataVencimentoDuplicata');
+	inserirMascaraData('dataHoraEntradaSaida');
+
 	inicializarFadeInBloco('bloco_icms');
 	inicializarFadeInBloco('bloco_ipi');
 	inicializarFadeInBloco('bloco_pis');
@@ -469,7 +472,10 @@ function gerarJsonImpostoImportacao(){
 
 function gerarJsonInfoProduto(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+']',
-		'campos':[{'nome':'informacoesAdicionais', 'id':'infoAdicionaisProd'}]};
+		'campos':[{'nome':'informacoesAdicionais', 'id':'infoAdicionaisProd'}, 
+		          {'nome': 'produtoServicoNFe.outrasDespesasAcessorias', 'id':'despesasAcessoriasProd'},
+		          {'nome': 'numeroPedidoCompra', 'id':'numeroPedidoCompraProd'},
+		          {'nome': 'itemPedidoCompra', 'id':'itemPedidoCompraProd'}]};
 };
 
 function gerarJsonTipoPis(){
@@ -927,9 +933,13 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
+			<div class="label">Dt. Ent./Saída:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="dataHoraEntradaSaida" name="nf.identificacaoNFe.dataHoraEntradaSaidaProduto" value="${nf.identificacaoNFe.dataHoraEntradaSaidaProduto}" style="width: 100%"/>
+			</div>
 			<div class="label">Natureza Operação:</div>
 			<div class="input" style="width: 50%">
-				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 80%"/>
+				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 100%"/>
 			</div>
 			
 			<div class="divFieldset">
@@ -1186,6 +1196,18 @@ function editarTributos(linha){
 			
 			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
 				<legend>::: Info. Adicionais Prod. ::: +</legend>
+				<div class="label">Num. Ped. Compra:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="numeroPedidoCompraProd" style="width: 100%"/>
+				</div>
+				<div class="label">Item Ped. Compra.:</div>
+				<div class="input" style="width: 50%">
+					<input type="text" id="itemPedidoCompraProd" style="width: 20%"/>
+				</div>
+				<div class="label">Valor Desp. Acess.:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="despesasAcessoriasProd" style="width: 20%"/>
+				</div>
 				<div class="label">Info. Produto:</div>
 				<div class="input areatexto" style="width: 70%">
 					<textarea id="infoAdicionaisProd" style="width: 100%"></textarea>

@@ -146,6 +146,7 @@ public class DadosNFe {
 		return cobrancaNFe != null ? cobrancaNFe.getListaDuplicata() : null;
 	}
 
+	@XmlTransient
 	public List<DetalhamentoProdutoServicoNFe> getListaItem() {
 		return listaDetalhamentoProdutoServicoNFe;
 	}

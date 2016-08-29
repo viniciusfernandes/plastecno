@@ -48,6 +48,7 @@ import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoISS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
+import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
@@ -118,11 +119,11 @@ public class EmissaoNFeController extends AbstractController {
                         nFeService.gerarEnderecoNFe(logradouro, telefone));
             }
 
-            formatarDuplicata(nf, false);
+            formatarDatas(nf, false);
             redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(new NFe(nf), idPedido));
         } catch (BusinessException e) {
             try {
-                formatarDuplicata(nf, true);
+                formatarDatas(nf, true);
             } catch (BusinessException e1) {
                 e.addMensagem(e1.getListaMensagem());
             }
@@ -139,7 +140,8 @@ public class EmissaoNFeController extends AbstractController {
 
     // Aqui uma excessao eh lancada pois devemos concatenar com as outras
     // mensagens vindos do servidor, veja o metodo de missao de nfe
-    private void formatarDuplicata(DadosNFe nf, boolean fromServidor) throws BusinessException {
+    private void formatarDatas(DadosNFe nf, boolean fromServidor) throws BusinessException {
+        // Formatando as duplicatas
         List<DuplicataNFe> lista = null;
         if (nf != null && (lista = nf.getListaDuplicata()) == null) {
             return;
@@ -165,6 +167,23 @@ public class EmissaoNFeController extends AbstractController {
                         + d.getNumero() + ". O valor enviado é \"" + d.getDataVencimento() + "\"");
             }
         }
+
+        // Formatando a data de hora/entrada do produto
+        if (!fromServidor) {
+            to = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        }
+        IdentificacaoNFe i = nf.getIdentificacaoNFe();
+        String dh = i.getDataHoraEntradaSaidaProduto();
+        if (!StringUtils.isEmpty(dh)) {
+            try {
+                i.setDataHoraEntradaSaidaProduto(to.format(from.parse(dh)));
+            } catch (ParseException e) {
+                throw new BusinessException(
+                        "Não foi possível formatar a data/hora de entrada/saida do produto. O valor enviado é \"" + dh
+                                + "\"");
+            }
+        }
+
     }
 
     private List<Object[]> gerarListaCfop() {
@@ -203,7 +222,7 @@ public class EmissaoNFeController extends AbstractController {
         if (nFe != null) {
             popularNFe(nFe.getDadosNFe(), idPedido);
             try {
-                formatarDuplicata(nFe.getDadosNFe(), true);
+                formatarDatas(nFe.getDadosNFe(), true);
             } catch (BusinessException e) {
                 gerarListaMensagemErro(e);
             }

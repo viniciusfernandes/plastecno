@@ -17,9 +17,17 @@ public class DetalhamentoProdutoServicoNFe {
 	@XmlElement(name = "infAdProd")
 	private String informacoesAdicionais;
 
+	@InformacaoValidavel(padrao = "\\d{6}", nomeExibicao = "Item de pedido de compra de produtos/serviços")
+	@XmlElement(name = "nItemPed")
+	private String itemPedidoCompra;
+
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 990 }, nomeExibicao = "Número de produtos/serviços")
 	@XmlAttribute(name = "nItem")
 	private Integer numeroItem;
+
+	@InformacaoValidavel(intervaloComprimento = { 1, 15 }, nomeExibicao = "Número de pedido de compra de produtos/serviços")
+	@XmlElement(name = "xPed")
+	private String numeroPedidoCompra;
 
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Produto/serviço")
 	@XmlElement(name = "prod")
@@ -50,8 +58,18 @@ public class DetalhamentoProdutoServicoNFe {
 	}
 
 	@XmlTransient
+	public String getItemPedidoCompra() {
+		return itemPedidoCompra;
+	}
+
+	@XmlTransient
 	public Integer getNumeroItem() {
 		return numeroItem;
+	}
+
+	@XmlTransient
+	public String getNumeroPedidoCompra() {
+		return numeroPedidoCompra;
 	}
 
 	/*
@@ -84,11 +102,19 @@ public class DetalhamentoProdutoServicoNFe {
 		this.informacoesAdicionais = informacoesAdicionais;
 	}
 
+	public void setItemPedidoCompra(String itemPedidoCompra) {
+		this.itemPedidoCompra = itemPedidoCompra;
+	}
+
 	public void setNumeroItem(Integer numeroItem) {
 		this.numeroItem = numeroItem;
 		if (numeroItem != null) {
 			indiceItem = numeroItem - 1;
 		}
+	}
+
+	public void setNumeroPedidoCompra(String numeroPedidoCompra) {
+		this.numeroPedidoCompra = numeroPedidoCompra;
 	}
 
 	public void setProdutoServicoNFe(ProdutoServicoNFe produtoServicoNFe) {

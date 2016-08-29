@@ -60,7 +60,10 @@
 <%-- bloco de pis --%>
 
 <%-- bloco de informacoes --%>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].produtoServicoNFe.outrasDespesasAcessorias" name="nf.listaItem[${item.indiceItem}].produtoServicoNFe.outrasDespesasAcessorias" value="${item.produto.outrasDespesasAcessorias}"/>
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].informacoesAdicionais" name="nf.listaItem[${item.indiceItem}].informacoesAdicionais" value="${item.informacoesAdicionais}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].numeroPedidoCompra" name="nf.listaItem[${item.indiceItem}].numeroPedidoCompra" value="${item.numeroPedidoCompra}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].itemPedidoCompra" name="nf.listaItem[${item.indiceItem}].itemPedidoCompra" value="${item.itemPedidoCompra}"/>
 <%-- bloco de informacoes --%>
 
 </c:forEach>

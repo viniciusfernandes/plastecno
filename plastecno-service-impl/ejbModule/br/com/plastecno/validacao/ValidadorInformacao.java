@@ -230,11 +230,21 @@ public final class ValidadorInformacao {
 				continue;
 			}
 
-			if (COMPRIMENTO_STRING > 0 && informacao.padrao().length() > 0
-					&& !conteudoCampo.toString().matches(informacao.padrao())) {
-				listaMensagem.add(informacao.nomeExibicao() + " não está no formato padronizado correto"
-						+ (informacao.padraoExemplo().length() > 0 ? " \"" + informacao.padraoExemplo() + "\"" : "")
-						+ ". Enviado \"" + conteudoCampo + "\"");
+			if (COMPRIMENTO_STRING > 0 && informacao.padrao().length > 0) {
+				ok = false;
+				for (String p : informacao.padrao()) {
+					if (ok = conteudoCampo.toString().matches(p)) {
+						break;
+					}
+				}
+
+				if (!ok) {
+					listaMensagem
+							.add(informacao.nomeExibicao()
+									+ " não está no formato padronizado correto"
+									+ (informacao.padraoExemplo().length() > 0 ? " \"" + informacao.padraoExemplo()
+											+ "\"" : "") + ". Enviado \"" + conteudoCampo + "\"");
+				}
 				continue;
 			}
 

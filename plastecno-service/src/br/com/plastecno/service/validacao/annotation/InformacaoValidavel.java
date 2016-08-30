@@ -38,7 +38,7 @@ public @interface InformacaoValidavel {
 
 	String[] opcoes() default {};
 
-	String padrao() default "";
+	String[] padrao() default {};
 
 	String padraoExemplo() default "";
 

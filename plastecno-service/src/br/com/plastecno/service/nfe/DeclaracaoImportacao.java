@@ -1,10 +1,13 @@
 package br.com.plastecno.service.nfe;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel
 public class DeclaracaoImportacao {
 	@InformacaoValidavel(padrao = "\\d{14}", nomeExibicao = "CNPJ encomendante de importação do produto/serviço")
 	@XmlElement(name = "CNPJ")
@@ -21,6 +24,10 @@ public class DeclaracaoImportacao {
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data de desembaraço de importação do produto/serviço")
 	@XmlElement(name = "dDesemb")
 	private String dataDesembaraco;
+
+	@InformacaoValidavel(obrigatorio = true, iteravel = true, nomeExibicao = "Lista de adição de importação")
+	@XmlElement(name = "adi")
+	private List<AdicaoImportacao> listaAdicao;
 
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 60 }, nomeExibicao = "Local de desembaraço de importação do produto/serviço")
 	@XmlElement(name = "xLocDesemb")
@@ -68,6 +75,11 @@ public class DeclaracaoImportacao {
 	@XmlTransient
 	public String getDataDesembaraco() {
 		return dataDesembaraco;
+	}
+
+	@XmlTransient
+	public List<AdicaoImportacao> getListaAdicao() {
+		return listaAdicao;
 	}
 
 	@XmlTransient
@@ -119,6 +131,10 @@ public class DeclaracaoImportacao {
 
 	public void setDataDesembaraco(String dataDesembaraco) {
 		this.dataDesembaraco = dataDesembaraco;
+	}
+
+	public void setListaAdicao(List<AdicaoImportacao> listaAdicao) {
+		this.listaAdicao = listaAdicao;
 	}
 
 	public void setLocalDesembaraco(String localDesembaraco) {

@@ -1,5 +1,7 @@
 package br.com.plastecno.service.nfe;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -8,6 +10,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class DetalhamentoProdutoServicoNFe {
+
 	@InformacaoValidavel(tamanho = 36, nomeExibicao = "FCI de produtos/serviços")
 	@XmlElement(name = "nFCI")
 	private String fichaConteudoImportacao;
@@ -24,6 +27,14 @@ public class DetalhamentoProdutoServicoNFe {
 	@InformacaoValidavel(padrao = "\\d{6}", nomeExibicao = "Item de pedido de compra de produtos/serviços")
 	@XmlElement(name = "nItemPed")
 	private String itemPedidoCompra;
+
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Declaração de exportação do produto/serviço")
+	@XmlElement(name = "detExport")
+	private List<DeclaracaoExportacao> listaDeclaracaoExportacao;
+
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Declaração de importação do produto/serviço")
+	@XmlElement(name = "DI")
+	private List<DeclaracaoImportacao> listaDeclaracaoImportacao;
 
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 990 }, nomeExibicao = "Número de produtos/serviços")
 	@XmlAttribute(name = "nItem")
@@ -72,6 +83,16 @@ public class DetalhamentoProdutoServicoNFe {
 	}
 
 	@XmlTransient
+	public List<DeclaracaoExportacao> getListaDeclaracaoExportacao() {
+		return listaDeclaracaoExportacao;
+	}
+
+	@XmlTransient
+	public List<DeclaracaoImportacao> getListaDeclaracaoImportacao() {
+		return listaDeclaracaoImportacao;
+	}
+
+	@XmlTransient
 	public Integer getNumeroItem() {
 		return numeroItem;
 	}
@@ -117,6 +138,14 @@ public class DetalhamentoProdutoServicoNFe {
 
 	public void setItemPedidoCompra(String itemPedidoCompra) {
 		this.itemPedidoCompra = itemPedidoCompra;
+	}
+
+	public void setListaDeclaracaoExportacao(List<DeclaracaoExportacao> listaDeclaracaoExportacao) {
+		this.listaDeclaracaoExportacao = listaDeclaracaoExportacao;
+	}
+
+	public void setListaDeclaracaoImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
+		this.listaDeclaracaoImportacao = listaDeclaracaoImportacao;
 	}
 
 	public void setNumeroItem(Integer numeroItem) {

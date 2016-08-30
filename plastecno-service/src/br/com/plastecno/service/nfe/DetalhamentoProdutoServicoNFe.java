@@ -8,6 +8,10 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class DetalhamentoProdutoServicoNFe {
+	@InformacaoValidavel(tamanho = 36, nomeExibicao = "FCI de produtos/serviços")
+	@XmlElement(name = "nFCI")
+	private String fichaConteudoImportacao;
+
 	// Campos criado para utilizar a indexacao dos itens da lista no arquivo
 	// .jsp
 	@XmlTransient
@@ -39,6 +43,11 @@ public class DetalhamentoProdutoServicoNFe {
 
 	public boolean contemICMS() {
 		return tributosProdutoServico != null && tributosProdutoServico.contemICMS();
+	}
+
+	@XmlTransient
+	public String getFichaConteudoImportacao() {
+		return fichaConteudoImportacao;
 	}
 
 	// Devemos fazer esse tratamento do indice do item pois ele esta sendo
@@ -96,6 +105,10 @@ public class DetalhamentoProdutoServicoNFe {
 	@XmlTransient
 	public TributosProdutoServico getTributosProdutoServico() {
 		return tributosProdutoServico;
+	}
+
+	public void setFichaConteudoImportacao(String fichaConteudoImportacao) {
+		this.fichaConteudoImportacao = fichaConteudoImportacao;
 	}
 
 	public void setInformacoesAdicionais(String informacoesAdicionais) {

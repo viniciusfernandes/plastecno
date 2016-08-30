@@ -475,7 +475,8 @@ function gerarJsonInfoProduto(){
 		'campos':[{'nome':'informacoesAdicionais', 'id':'infoAdicionaisProd'}, 
 		          {'nome': 'produtoServicoNFe.outrasDespesasAcessorias', 'id':'despesasAcessoriasProd'},
 		          {'nome': 'numeroPedidoCompra', 'id':'numeroPedidoCompraProd'},
-		          {'nome': 'itemPedidoCompra', 'id':'itemPedidoCompraProd'}]};
+		          {'nome': 'itemPedidoCompra', 'id':'itemPedidoCompraProd'},
+		          {'nome': 'fichaConteudoImportacao', 'id':'fciProd'}]};
 };
 
 function gerarJsonTipoPis(){
@@ -1207,6 +1208,10 @@ function editarTributos(linha){
 				<div class="label">Valor Desp. Acess.:</div>
 				<div class="input" style="width: 80%">
 					<input type="text" id="despesasAcessoriasProd" style="width: 20%"/>
+				</div>
+				<div class="label">Núm. FCI:</div>
+				<div class="input areatexto" style="width: 70%">
+					<textarea id="fciProd" style="width: 50%"></textarea>
 				</div>
 				<div class="label">Info. Produto:</div>
 				<div class="input areatexto" style="width: 70%">

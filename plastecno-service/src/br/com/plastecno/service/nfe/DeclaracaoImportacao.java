@@ -17,13 +17,13 @@ public class DeclaracaoImportacao {
 	@XmlElement(name = "cExportador")
 	private String codigoExportador;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data da declaração de importação do produto/serviço")
-	@XmlElement(name = "nDI")
-	private String data;
-
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data de desembaraço de importação do produto/serviço")
 	@XmlElement(name = "dDesemb")
 	private String dataDesembaraco;
+
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data da declaração de importação do produto/serviço")
+	@XmlElement(name = "nDI")
+	private String dataImportacao;
 
 	@InformacaoValidavel(obrigatorio = true, iteravel = true, nomeExibicao = "Lista de adição de importação")
 	@XmlElement(name = "adi")
@@ -68,13 +68,13 @@ public class DeclaracaoImportacao {
 	}
 
 	@XmlTransient
-	public String getData() {
-		return data;
+	public String getDataDesembaraco() {
+		return dataDesembaraco;
 	}
 
 	@XmlTransient
-	public String getDataDesembaraco() {
-		return dataDesembaraco;
+	public String getDataImportacao() {
+		return dataImportacao;
 	}
 
 	@XmlTransient
@@ -125,12 +125,12 @@ public class DeclaracaoImportacao {
 		this.codigoExportador = codigoExportador;
 	}
 
-	public void setData(String data) {
-		this.data = data;
-	}
-
 	public void setDataDesembaraco(String dataDesembaraco) {
 		this.dataDesembaraco = dataDesembaraco;
+	}
+
+	public void setDataImportacao(String dataImportacao) {
+		this.dataImportacao = dataImportacao;
 	}
 
 	public void setListaAdicao(List<AdicaoImportacao> listaAdicao) {

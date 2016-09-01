@@ -92,6 +92,12 @@ public class DetalhamentoProdutoServicoNFe {
 		return listaDeclaracaoImportacao;
 	}
 
+	// Metodo criado para simplificar a marcacao no .jsp
+	@XmlTransient
+	public List<DeclaracaoImportacao> getListaImportacao() {
+		return getListaDeclaracaoImportacao();
+	}
+
 	@XmlTransient
 	public Integer getNumeroItem() {
 		return numeroItem;

@@ -2,6 +2,7 @@ package br.com.plastecno.vendas.controller;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,8 @@ import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DadosNFe;
+import br.com.plastecno.service.nfe.DeclaracaoImportacao;
+import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
@@ -220,6 +223,16 @@ public class EmissaoNFeController extends AbstractController {
         }
 
         if (nFe != null) {
+            for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
+                List<DeclaracaoImportacao> l = new ArrayList<DeclaracaoImportacao>();
+                for (int i = 0; i < 2; i++) {
+                    DeclaracaoImportacao di1 = new DeclaracaoImportacao();
+                    di1.setCnpjEncomendante("declaracao " + i + " produto " + d.getIndiceItem());
+                    l.add(di1);
+                }
+                d.setListaDeclaracaoImportacao(l);
+            }
+
             popularNFe(nFe.getDadosNFe(), idPedido);
             try {
                 formatarDatas(nFe.getDadosNFe(), true);

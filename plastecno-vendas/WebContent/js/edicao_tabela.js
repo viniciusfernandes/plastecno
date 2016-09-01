@@ -43,8 +43,12 @@ function editarTabela(configJson){
 						linha = btEdit.parentNode.parentNode;
 						var celulas = linha.cells;
 						var campos = config.campos;
+						var campo = null;
 						for (var i = 0; i <= campos.length; i++) {
-							document.getElementById(campos[i]).value = celulas[i].innerHTML;
+							campo = document.getElementById(campos[i]);
+							if(campo != null && campo != undefined){
+								campo.value = celulas[i].innerHTML;
+							}
 						}
 					};
 					cel.appendChild(btRemove);

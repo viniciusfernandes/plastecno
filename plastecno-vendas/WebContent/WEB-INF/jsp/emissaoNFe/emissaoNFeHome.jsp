@@ -239,11 +239,15 @@ $(document).ready(function() {
 	inicializarTabelaImportacaoProd();
 });
 
+function gerarIdCamposImportacaoProd(){
+	return ['cnpjImportProd', 'exportadorImportProd', 'dtImportProd', 'dataDesembImportProd',
+	          'lcImportProd', 'numImportProd', 'tpImportProd', 'tpTranspImportProd', 'ufDesembImportProd',
+	          'ufEncomendImportProd', 'vlAFRMMImportProd'];
+};
+
 function inicializarTabelaImportacaoProd(){
 	var config = {'idTabela': 'tabela_importacao_prod', 'idBotaoInserir':'botaoInserirImportacaoProd',
-			'campos':['cnpjImportProd', 'exportadorImportProd', 'dtImportProd', 'dataDesembImportProd',
-			          'lcImportProd', 'numImportProd', 'tpImportProd', 'tpTranspImportProd', 'ufDesembImportProd',
-			          'ufEncomendImportProd', 'vlAFRMMImportProd'],
+			'campos': gerarIdCamposImportacaoProd(),
 			'onValidar': function(){
 				return numeroProdutoEdicao != null;
 			},
@@ -252,7 +256,7 @@ function inicializarTabelaImportacaoProd(){
 					return;
 				}
 				var celulas = linha.cells;
-				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+linha.rowIndex+']', 
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+(linha.rowIndex - 1)+']', 
 					  'campos':[{'nome':'cnpjEncomendante', 'valor':celulas[0].innerHTML},
 					            {'nome':'codigoExportador', 'valor':celulas[1].innerHTML},
 					            {'nome':'dataImportacao', 'valor':celulas[2].innerHTML},
@@ -416,7 +420,7 @@ function gerarInputHidden(objeto){
 	for (var i = 0; i < campos.length; i++) {
 		nome = objeto.nomeObjeto +'.'+campos[i].nome;
 		<%-- Devemos verificar  se o input ja foi criado pelo usuario, caso nao existe devemos cria-lo--%>
-		if((input = document.getElementById(nome)) == undefined){
+		if((input = document.getElementById(nome)) == undefined || input == null){
 			input = document.createElement('input');
 			input.type = 'hidden';
 			input.name = nome;
@@ -525,18 +529,6 @@ function recuperarImportacaoProduto(){
 	// limpando a tabela toda
 	$("#tabela_importacao_prod tbody tr").remove(); 
 	
-	var cnpjEncomendante = null;
-	var codigoExportador = null;
-	var dataImportacao = null;
-	var dataDesembaraco = null;
-	var localDesembaraco = null;
-	var numero = null;
-	var tipoIntermediacao = null;
-	var tipoTransporteInternacional = null;
-	var ufDesembaraco = null;
-	var ufEncomendante = null;
-	var valorAFRMM = null;
-	
 	var id = null;
 	var valor = null;
 	var total = 11;
@@ -546,46 +538,42 @@ function recuperarImportacaoProduto(){
 	 	valor = $(this).val();
 	 	
 		if(id.indexOf('cnpjEncomendante') != -1){
-			cnpjEncomendante = valor;
+			$('#bloco_importacao_prod #cnpjImportProd').val(valor);
 			total--;
 		} else if(id.indexOf('codigoExportador') != -1){
-			codigoExportador = valor;
+			$('#bloco_importacao_prod #exportadorImportProd').val(valor);
 			total--;
 		} else if(id.indexOf('dataImportacao') != -1){
-			dataImportacao = valor;
+			$('#bloco_importacao_prod #dtImportProd').val(valor);
 			total--;
 		} else if(id.indexOf('dataDesembaraco') != -1){
-			dataDesembaraco = valor;
+			$('#bloco_importacao_prod #dataDesembImportProd').val(valor);
 			total--;
 		} else if(id.indexOf('localDesembaraco') != -1){
-			localDesembaraco = valor;
+			$('#bloco_importacao_prod #lcImportProd').val(valor);
 			total--;
 		} else if(id.indexOf('numero') != -1){
-			numero = valor;
+			$('#bloco_importacao_prod #numImportProd').val(valor);
 			total--;
 		} else if(id.indexOf('tipoIntermediacao') != -1){
-			tipoIntermediacao = valor;
+			$('#bloco_importacao_prod #tpImportProd').val(valor);
 			total--;
 		} else if(id.indexOf('tipoTransporteInternacional') != -1){
-			tipoTransporteInternacional = valor;
+			$('#bloco_importacao_prod #tpTranspImportProd').val(valor);
 			total--;
 		} else if(id.indexOf('ufDesembaraco') != -1){
-			ufDesembaraco = valor;
+			$('#bloco_importacao_prod #ufDesembImportProd').val(valor);
 			total--;
 		} else if(id.indexOf('ufEncomendante') != -1){
-			ufEncomendante = valor;
+			$('#bloco_importacao_prod #ufEncomendImportProd').val(valor);
 			total--;
 		} else if(id.indexOf('valorAFRMM') != -1){
-			valorAFRMM = valor;
+			$('#bloco_importacao_prod #vlAFRMMImportProd').val(valor);
 			total--;
 		}
 		
 		if(total <= 0) {
-			var linhaJson = {'nomeBloco':'bloco_importacao_prod', 'nomeTabela': 'tabela_importacao_prod',
-					'valores':[cnpjEncomendante, codigoExportador, dataImportacao, dataDesembaraco,
-					           localDesembaraco, numero, tipoIntermediacao, tipoTransporteInternacional, 
-					           ufDesembaraco, ufEncomendante, valorAFRMM]};
-			inserirLinhaTabela(linhaJson);
+			$('#bloco_importacao_prod #botaoInserirImportacaoProd').click();
 			total = 11;
 		}
 	});

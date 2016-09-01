@@ -1,13 +1,17 @@
 function editarTabela(configJson){
 	var config = configJson;
 	var linha = null;
-
 	function init(){
 		var botaoInserir = document.getElementById(config.idBotaoInserir);
 		botaoInserir.onclick = function(){
+			
+			if(config.onValidar != undefined && config.onValidar != null && !config.onValidar()){
+				return;
+			}
+			
 			var isEdicao = linha != null;
 			var tabela = document.getElementById(config.idTabela);
-			linha = isEdicao ? linha : tabela.tBodies[0].insertRow(0);
+			linha = isEdicao ? linha : tabela.tBodies[0].insertRow(-1);
 			var campos = config.campos;
 			var campo = null;
 			var cel = null;
@@ -47,6 +51,11 @@ function editarTabela(configJson){
 					cel.appendChild(btEdit);
 				}
 			}
+			if(config.onInserir != undefined){
+				var indiceLinha = 
+				config.onInserir(linha);
+			}
+			
 			linha = null;
 		};
 	};

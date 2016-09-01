@@ -10,7 +10,6 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class DetalhamentoProdutoServicoNFe {
-
 	@InformacaoValidavel(tamanho = 36, nomeExibicao = "FCI de produtos/serviços")
 	@XmlElement(name = "nFCI")
 	private String fichaConteudoImportacao;
@@ -152,6 +151,11 @@ public class DetalhamentoProdutoServicoNFe {
 
 	public void setListaDeclaracaoImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
 		this.listaDeclaracaoImportacao = listaDeclaracaoImportacao;
+	}
+
+	// Metodo criado para simplificar marcacao do .jsp
+	public void setListaImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
+		this.setListaDeclaracaoImportacao(listaDeclaracaoImportacao);
 	}
 
 	public void setNumeroItem(Integer numeroItem) {

@@ -66,19 +66,19 @@
 <input type="hidden" id="nf.listaItem[${item.indiceItem}].itemPedidoCompra" name="nf.listaItem[${item.indiceItem}].itemPedidoCompra" value="${item.itemPedidoCompra}"/>
 <%-- bloco de informacoes --%>
 
-<c:forEach var="imp" items="${item.listaImportacao}" varStatus="index">
+<c:forEach var="imp" items="${item.listaImportacao}" varStatus="loop">
 <%-- bloco de importacoes --%>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].cnpjEncomendante" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].cnpjEncomendante" value="${imp.cnpjEncomendante}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].codigoExportador" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].codigoExportador" value="${imp.codigoExportador}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].dataImportacao" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].dataImportacao" value="${imp.dataImportacao}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].dataDesembaraco" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].dataDesembaraco" value="${imp.dataDesembaraco}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].localDesembaraco" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].localDesembaraco" value="${imp.localDesembaraco}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].numero" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].numero" value="${imp.numero}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].tipoIntermediacao" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].tipoIntermediacao" value="${imp.tipoIntermediacao}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].tipoTransporteInternacional" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].tipoTransporteInternacional" value="${imp.tipoTransporteInternacional}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].ufDesembaraco" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].ufDesembaraco" value="${imp.ufDesembaraco}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].ufEncomendante" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].ufEncomendante" value="${imp.ufEncomendante}"/>
-<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].valorAFRMM" name="nf.listaItem[${item.indiceItem}].listaImportacao[${index.count}].valorAFRMM" value="${imp.valorAFRMM}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].cnpjEncomendante" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].cnpjEncomendante" value="${imp.cnpjEncomendante}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].codigoExportador" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].codigoExportador" value="${imp.codigoExportador}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].dataImportacao" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].dataImportacao" value="${imp.dataImportacao}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].dataDesembaraco" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].dataDesembaraco" value="${imp.dataDesembaraco}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].localDesembaraco" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].localDesembaraco" value="${imp.localDesembaraco}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].numero" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].numero" value="${imp.numero}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].tipoIntermediacao" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].tipoIntermediacao" value="${imp.tipoIntermediacao}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].tipoTransporteInternacional" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].tipoTransporteInternacional" value="${imp.tipoTransporteInternacional}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].ufDesembaraco" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].ufDesembaraco" value="${imp.ufDesembaraco}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].ufEncomendante" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].ufEncomendante" value="${imp.ufEncomendante}"/>
+<input type="hidden" id="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].valorAFRMM" name="nf.listaItem[${item.indiceItem}].listaImportacao[${loop.index}].valorAFRMM" value="${imp.valorAFRMM}"/>
 <%-- bloco de importacoes --%>
 
 </c:forEach>

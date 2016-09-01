@@ -216,6 +216,7 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_tributos');
 	inicializarFadeInBloco('bloco_info_adicionais_prod');
 	inicializarFadeInBloco('bloco_info_adicionais_nfe');
+	inicializarFadeInBloco('bloco_importacao_prod');
 
 	inicializarFadeInBloco('bloco_local_mercadoria');
 	inicializarFadeInBloco('bloco_referenciada');
@@ -232,16 +233,41 @@ $(document).ready(function() {
 	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
 	$('#bloco_tributos').fadeOut('fast');
 	$('#bloco_info_adicionais_prod').fadeOut('fast');
+	$('#bloco_importacao_prod').fadeOut('fast');
 
 	inicializarBlocoDuplicata();
-	initTabelaImportacaoProd();
+	inicializarTabelaImportacaoProd();
 });
 
-function initTabelaImportacaoProd(){
+function inicializarTabelaImportacaoProd(){
 	var config = {'idTabela': 'tabela_importacao_prod', 'idBotaoInserir':'botaoInserirImportacaoProd',
 			'campos':['cnpjImportProd', 'exportadorImportProd', 'dtImportProd', 'dataDesembImportProd',
 			          'lcImportProd', 'numImportProd', 'tpImportProd', 'tpTranspImportProd', 'ufDesembImportProd',
-			          'ufEncomendImportProd', 'vlAFRMMImportProd']};
+			          'ufEncomendImportProd', 'vlAFRMMImportProd'],
+			'onValidar': function(){
+				return numeroProdutoEdicao != null;
+			},
+			'onInserir': function(linha){
+				if(numeroProdutoEdicao == null || linha == null){
+					return;
+				}
+				var celulas = linha.cells;
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+linha.rowIndex+']', 
+					  'campos':[{'nome':'cnpjEncomendante', 'valor':celulas[0].innerHTML},
+					            {'nome':'codigoExportador', 'valor':celulas[1].innerHTML},
+					            {'nome':'dataImportacao', 'valor':celulas[2].innerHTML},
+					            {'nome':'dataDesembaraco', 'valor':celulas[3].innerHTML},
+					            {'nome':'localDesembaraco', 'valor':celulas[4].innerHTML},
+					            {'nome':'numero', 'valor':celulas[5].innerHTML},
+					            {'nome':'tipoIntermediacao', 'valor':celulas[6].innerHTML},
+					            {'nome':'tipoTransporteInternacional', 'valor':celulas[7].innerHTML},
+					            {'nome':'ufDesembaraco', 'valor':celulas[8].innerHTML},
+					            {'nome':'ufEncomendante', 'valor':celulas[9].innerHTML},
+					            {'nome':'valorAFRMM', 'valor':celulas[10].innerHTML}]};
+					
+				gerarInputHidden(json);
+			 }};
+	
 	editarTabela(config);
 };
 
@@ -322,7 +348,6 @@ function gerarInputLinhasTabela(nomeTabela, parametroJson){
 		for (var j= 0; j < max; j++) {
 			campos[j] = {'nome':parametroJson.nomes[j] == null?'':parametroJson.nomes[j], 'valor':celulas[j].innerHTML};
 		}
-		
 		gerarInputHidden({'nomeObjeto': parametroJson.nomeLista+'['+i+']', 'campos':campos});
 	}
 };
@@ -496,10 +521,6 @@ function gerarJsonTipoPis(){
 			]};
 };
 
-function inserirImportacaoProduto(){
-	
-};
-
 function recuperarImportacaoProduto(){
 	// limpando a tabela toda
 	$("#tabela_importacao_prod tbody tr").remove(); 
@@ -606,17 +627,16 @@ function gerarInputImpostoImportacao(){
 	gerarInputHidden(gerarJsonImpostoImportacao());	
 };
 
-
 function gerarInputDuplicata(){
 	var parametros = {'nomeLista': 'nf.cobrancaNFe.listaDuplicata',
 			'nomes': [null, 'numero', 'dataVencimento', 'valor']};
-	gerarInputLinhasTabela('tabela_duplicata', parametros)
+	gerarInputLinhasTabela('tabela_duplicata', parametros);
 };
 
 function gerarInputReboque(){
 	var parametros = {'nomeLista': 'nf.transporteNFe.listaReboque',
 					'nomes': ['placa', 'uf', 'registroNacionalTransportador']};
-	gerarInputLinhasTabela('tabela_reboque', parametros)
+	gerarInputLinhasTabela('tabela_reboque', parametros);
 };
 
 function gerarInputReferenciada(){
@@ -880,9 +900,9 @@ function editarProduto(linha){
 	
 	recuperarImportacaoProduto();
 	
-	
 	$('#bloco_tributos').fadeIn('fast');
 	$('#bloco_info_adicionais_prod').fadeIn('fast');
+	$('#bloco_importacao_prod').fadeIn('fast');
 	
 	inicializarLegendaBlocoProduto('bloco_icms');
 	inicializarLegendaBlocoProduto('bloco_ipi');
@@ -892,10 +912,13 @@ function editarProduto(linha){
 	inicializarLegendaBlocoProduto('bloco_iss');
 	inicializarLegendaBlocoProduto('bloco_tributos');
 	inicializarLegendaBlocoProduto('bloco_info_adicionais_prod');
+	inicializarLegendaBlocoProduto('bloco_importacao_prod');
 	
 	fecharBloco('bloco_ipi');
 	fecharBloco('bloco_ii');
 	fecharBloco('bloco_iss');
+	fecharBloco('bloco_importacao_prod');
+
 };
 
 </script>

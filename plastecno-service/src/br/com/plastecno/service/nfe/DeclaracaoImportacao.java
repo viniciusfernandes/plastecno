@@ -22,10 +22,10 @@ public class DeclaracaoImportacao {
 	private String dataDesembaraco;
 
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data da declaração de importação do produto/serviço")
-	@XmlElement(name = "nDI")
+	@XmlElement(name = "dDI")
 	private String dataImportacao;
 
-	@InformacaoValidavel(obrigatorio = true, iteravel = true, nomeExibicao = "Lista de adição de importação")
+	//@InformacaoValidavel(obrigatorio = true, iteravel = true, nomeExibicao = "Lista de adição de importação")
 	@XmlElement(name = "adi")
 	private List<AdicaoImportacao> listaAdicao;
 

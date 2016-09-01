@@ -2,7 +2,6 @@ package br.com.plastecno.vendas.controller;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -171,6 +170,32 @@ public class EmissaoNFeController extends AbstractController {
             }
         }
 
+        for (DetalhamentoProdutoServicoNFe d : nf.getListaDetalhamentoProdutoServicoNFe()) {
+            if (d.getListaDeclaracaoImportacao() != null) {
+                for (DeclaracaoImportacao i : d.getListaDeclaracaoImportacao()) {
+                    try {
+                        if (i.getDataDesembaraco() != null) {
+                            i.setDataDesembaraco(to.format(from.parse(i.getDataDesembaraco())));
+                        }
+                    } catch (ParseException e) {
+                        throw new BusinessException(
+                                "Não foi possível formatar a data de desembaraço da importação do produto "
+                                        + d.getNumeroItem() + ". O valor enviado é \"" + i.getDataDesembaraco() + "\"");
+                    }
+
+                    try {
+                        if (i.getDataImportacao() != null) {
+                            i.setDataImportacao(to.format(from.parse(i.getDataImportacao())));
+                        }
+                    } catch (ParseException e) {
+                        throw new BusinessException("Não foi possível formatar a data da importação do produto "
+                                + d.getNumeroItem() + ". O valor enviado é \"" + i.getDataImportacao() + "\"");
+                    }
+                }
+            }
+
+        }
+
         // Formatando a data de hora/entrada do produto
         if (!fromServidor) {
             to = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -223,16 +248,6 @@ public class EmissaoNFeController extends AbstractController {
         }
 
         if (nFe != null) {
-            for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
-                List<DeclaracaoImportacao> l = new ArrayList<DeclaracaoImportacao>();
-                for (int i = 0; i < 2; i++) {
-                    DeclaracaoImportacao di1 = new DeclaracaoImportacao();
-                    di1.setCnpjEncomendante("declaracao " + i + " produto " + d.getIndiceItem());
-                    l.add(di1);
-                }
-                d.setListaDeclaracaoImportacao(l);
-            }
-
             popularNFe(nFe.getDadosNFe(), idPedido);
             try {
                 formatarDatas(nFe.getDadosNFe(), true);

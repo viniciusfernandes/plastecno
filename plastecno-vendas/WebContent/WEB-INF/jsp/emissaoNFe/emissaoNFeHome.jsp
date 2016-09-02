@@ -40,6 +40,7 @@ fieldset .fieldsetInterno legend {
 
 var numeroProdutoEdicao = null;
 var tabelaDuplicataHandler = null;
+var editorTabelaImportacao = null;
 $(document).ready(function() {
 	scrollTo('${ancora}');
 	
@@ -255,8 +256,23 @@ function inicializarTabelaImportacaoProd(){
 				if(numeroProdutoEdicao == null || linha == null){
 					return;
 				}
+				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+				if(isEmpty(linha.id)){
+					var linhas = document.getElementById('tabela_importacao_prod').rows;
+					var ids = new Array();
+					for (var i = 0; i < linhas.length; i++) {
+						ids[i] = linhas[i].id;
+					}
+					ids.sort();
+					var id = ids.length > 0 ? ids[ids.length -1] :0;
+					if(isEmpty(id)){
+						id = 0;
+					}
+					linha.id = id + 1;
+				}
 				var celulas = linha.cells;
-				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+(linha.rowIndex - 1)+']', 
+				
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+linha.id+']', 
 					  'campos':[{'nome':'cnpjEncomendante', 'valor':celulas[0].innerHTML},
 					            {'nome':'codigoExportador', 'valor':celulas[1].innerHTML},
 					            {'nome':'dataImportacao', 'valor':celulas[2].innerHTML},
@@ -270,9 +286,14 @@ function inicializarTabelaImportacaoProd(){
 					            {'nome':'valorAFRMM', 'valor':celulas[10].innerHTML}]};
 					
 				gerarInputHidden(json);
-			 }};
+			 },
+			'onRemover': function(linha){
+				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+linha.id+"]']").each(function(i){
+					$(this).remove();
+				});	
+			}};
 	
-	editarTabela(config);
+	editorTabelaImportacao  = new editarTabela(config);
 };
 
 function removerDuplicata(botao) {
@@ -573,7 +594,9 @@ function recuperarImportacaoProduto(){
 		}
 		
 		if(total <= 0) {
-			$('#bloco_importacao_prod #botaoInserirImportacaoProd').click();
+			// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+			var idLinha = id.match(/\d+/g)[1];
+			editorTabelaImportacao.inserirLinha(idLinha);
 			total = 11;
 		}
 	});

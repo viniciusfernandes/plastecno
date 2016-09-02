@@ -1,6 +1,8 @@
 function editarTabela(configJson){
 	var config = configJson;
 	var linha = null;
+	var idLinha = '';
+	
 	function init(){
 		var botaoInserir = document.getElementById(config.idBotaoInserir);
 		botaoInserir.onclick = function(){
@@ -12,6 +14,8 @@ function editarTabela(configJson){
 			var isEdicao = linha != null;
 			var tabela = document.getElementById(config.idTabela);
 			linha = isEdicao ? linha : tabela.tBodies[0].insertRow(-1);
+			linha.id = this.idLinha;
+			
 			var campos = config.campos;
 			var campo = null;
 			var cel = null;
@@ -31,8 +35,13 @@ function editarTabela(configJson){
 						var l = btRemove.parentNode.parentNode;
 						if(linha != null && linha.rowIndex == l.rowIndex){
 							linha = null;
+							this.idLinha = '';
 						}
 						tabela.deleteRow(l.rowIndex);
+						
+						if(config.onRemover != undefined){
+							config.onRemover(l);
+						}
 					};
 					
 					var btEdit = document.createElement('input');
@@ -61,8 +70,14 @@ function editarTabela(configJson){
 			}
 			
 			linha = null;
+			this.idLinha = '';
 		};
 	};
 	
 	init();
+	
+	this.inserirLinha = function (idLinha){
+		this.idLinha = idLinha;
+		document.getElementById(config.idBotaoInserir).click();
+	};
 };

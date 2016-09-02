@@ -39,8 +39,11 @@ fieldset .fieldsetInterno legend {
 <script type="text/javascript">
 
 var numeroProdutoEdicao = null;
+var numeroImportacaoProduto = null;
 var tabelaDuplicataHandler = null;
 var editorTabelaImportacao = null;
+var editorTabelaAdicao = null;
+
 $(document).ready(function() {
 	scrollTo('${ancora}');
 	
@@ -238,6 +241,7 @@ $(document).ready(function() {
 
 	inicializarBlocoDuplicata();
 	inicializarTabelaImportacaoProd();
+	inicializarTabelaAdicaoImportacao();
 });
 
 function gerarIdCamposImportacaoProd(){
@@ -249,6 +253,7 @@ function gerarIdCamposImportacaoProd(){
 function inicializarTabelaImportacaoProd(){
 	var config = {'idTabela': 'tabela_importacao_prod', 'idBotaoInserir':'botaoInserirImportacaoProd',
 			'campos': gerarIdCamposImportacaoProd(),
+			'idLinhaSequencial': true,
 			'onValidar': function(){
 				return numeroProdutoEdicao != null;
 			},
@@ -256,22 +261,8 @@ function inicializarTabelaImportacaoProd(){
 				if(numeroProdutoEdicao == null || linha == null){
 					return;
 				}
-				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
-				if(isEmpty(linha.id)){
-					var linhas = document.getElementById('tabela_importacao_prod').rows;
-					var ids = new Array();
-					for (var i = 0; i < linhas.length; i++) {
-						ids[i] = linhas[i].id;
-					}
-					ids.sort();
-					var id = ids.length > 0 ? ids[ids.length -1] :0;
-					if(isEmpty(id)){
-						id = 0;
-					}
-					linha.id = id + 1;
-				}
-				var celulas = linha.cells;
 				
+				var celulas = linha.cells;
 				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+linha.id+']', 
 					  'campos':[{'nome':'cnpjEncomendante', 'valor':celulas[0].innerHTML},
 					            {'nome':'codigoExportador', 'valor':celulas[1].innerHTML},
@@ -287,6 +278,10 @@ function inicializarTabelaImportacaoProd(){
 					
 				gerarInputHidden(json);
 			 },
+			 'onEditar': function(linha){
+				 numeroImportacaoProduto = linha.id;
+				 recuperarAdicaoImportacao();
+			 },
 			'onRemover': function(linha){
 				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+linha.id+"]']").each(function(i){
 					$(this).remove();
@@ -294,6 +289,36 @@ function inicializarTabelaImportacaoProd(){
 			}};
 	
 	editorTabelaImportacao  = new editarTabela(config);
+};
+
+function inicializarTabelaAdicaoImportacao(){
+	var ids = ['codFabricAdicao', 'numAdicao', 'numDrawbackAdicao', 'numSeqAdicao', 'valDescAdicao'];
+	var config = {'idTabela': 'tabela_adicao_import', 'idBotaoInserir':'botaoInserirAdicao',
+			'campos':ids,
+			'idLinhaSequencial': true,
+			'onInserir': function(linha){
+				if(numeroProdutoEdicao == null || numeroImportacaoProduto == null || linha == null){
+					return;
+				}
+				
+				var celulas = linha.cells;
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+numeroImportacaoProduto+'].listaAdicao['+linha.id+']', 
+					  'campos':[{'nome':'codigoFabricante', 'valor':celulas[0].innerHTML},
+					            {'nome':'numero', 'valor':celulas[1].innerHTML},
+					            {'nome':'numeroDrawback', 'valor':celulas[2].innerHTML},
+					            {'nome':'numeroSequencialItem', 'valor':celulas[3].innerHTML},
+					            {'nome':'valorDesconto', 'valor':celulas[4].innerHTML}
+					            ]};
+					
+				gerarInputHidden(json);
+			 },
+			 'onRemover': function(linha){
+					$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+numeroImportacaoProduto+"].listaAdicao["+linha.id+"]']").each(function(i){
+						$(this).remove();
+					});	
+			 }};
+	
+	editorTabelaAdicao = new editarTabela(config);
 };
 
 function removerDuplicata(botao) {
@@ -548,13 +573,12 @@ function gerarJsonTipoPis(){
 
 function recuperarImportacaoProduto(){
 	// limpando a tabela toda
-	$("#tabela_importacao_prod tbody tr").remove(); 
-	
+	$("#tabela_importacao_prod tbody tr").remove();
 	var id = null;
 	var valor = null;
 	var total = 11;
 	
-	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao[']").each(function(){
+	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao']").each(function(){
 	 	id = $(this).attr('id');
 	 	valor = $(this).val();
 	 	
@@ -598,6 +622,45 @@ function recuperarImportacaoProduto(){
 			var idLinha = id.match(/\d+/g)[1];
 			editorTabelaImportacao.inserirLinha(idLinha);
 			total = 11;
+		}
+	});
+	
+};
+
+function recuperarAdicaoImportacao(){
+	// limpando a tabela toda
+	$("#tabela_adicao_import tbody tr").remove(); 
+	
+	var id = null;
+	var valor = null;
+	var total = 5;
+	
+	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+numeroImportacaoProduto+"].listaAdicao']").each(function(){
+	 	id = $(this).attr('id');
+	 	valor = $(this).val();
+	 	
+		if(id.indexOf('codigoFabricante') != -1){
+			$('#bloco_importacao_prod #codFabricAdicao').val(valor);
+			total--;
+		} else if(id.indexOf('numero') != -1){
+			$('#bloco_importacao_prod #numAdicao').val(valor);
+			total--;
+		} else if(id.indexOf('numeroDrawback') != -1){
+			$('#bloco_importacao_prod #numDrawbackAdicao').val(valor);
+			total--;
+		} else if(id.indexOf('numeroSequencialItem') != -1){
+			$('#bloco_importacao_prod #numSeqAdicao').val(valor);
+			total--;
+		} else if(id.indexOf('valorDesconto') != -1){
+			$('#bloco_importacao_prod #valDescAdicao').val(valor);
+			total--;
+		}
+		
+		if(total <= 0) {
+			// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+			var idLinha = id.match(/\d+/g)[2];
+			editorTabelaAdicao.inserirLinha(idLinha);
+			total = 5;
 		}
 	});
 };
@@ -1335,7 +1398,6 @@ function editarProduto(linha){
 				<div class="bloco_botoes">
 					<a id="botaoInserirImportacaoProd" title="Inserir Importação de Produto" class="botaoAdicionar"></a>
 				</div>
-								
 				<table id="tabela_importacao_prod" class="listrada" >
 					<thead>
 						<tr>
@@ -1358,6 +1420,50 @@ function editarProduto(linha){
 					<tbody>
 					</tbody>
 				</table>
+				<fieldset id="bloco_adicao_import" class="fieldsetInterno">
+					<legend>::: Adição de Importação :::</legend>
+					<div class="label">Cód. Fabric.:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="codFabricAdicao" style="width: 100%"/>
+					</div>
+					<div class="label">Núm.:</div>
+					<div class="input" style="width: 40%">
+						<input type="text" id="numAdicao" style="width: 50%"/>
+					</div>
+					<div class="label">Núm. Drawback:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="numDrawbackAdicao" style="width: 100%"/>
+					</div>
+					<div class="label">Núm. Sequenc.:</div>
+					<div class="input" style="width: 40%">
+						<input type="text" id="numSeqAdicao" style="width: 50%"/>
+					</div>
+					<div class="label">Vl. Desc.:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="valDescAdicao" style="width: 100%"/>
+					</div>
+					
+					<div class="bloco_botoes">
+						<a id="botaoInserirAdicao" title="Inserir Adição de Importação" class="botaoAdicionar"></a>
+					</div>
+									
+					<table id="tabela_adicao_import" class="listrada" >
+						<thead>
+							<tr>
+								<th>Fabric.</th>
+								<th>Núm.</th>
+								<th>Núm. Drawback</th>
+								<th>Núm. Sequenc.</th>
+								<th>Vl. Desc.</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						
+						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+						<tbody>
+						</tbody>
+					</table>
+				</fieldset>
 			</fieldset>
 			
 			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">

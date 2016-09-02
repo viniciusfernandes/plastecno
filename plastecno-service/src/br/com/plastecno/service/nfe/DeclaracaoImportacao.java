@@ -25,7 +25,7 @@ public class DeclaracaoImportacao {
 	@XmlElement(name = "dDI")
 	private String dataImportacao;
 
-	//@InformacaoValidavel(obrigatorio = true, iteravel = true, nomeExibicao = "Lista de adição de importação")
+	@InformacaoValidavel(obrigatorio = true, iteravel = true, nomeExibicao = "Lista de adição de importação")
 	@XmlElement(name = "adi")
 	private List<AdicaoImportacao> listaAdicao;
 

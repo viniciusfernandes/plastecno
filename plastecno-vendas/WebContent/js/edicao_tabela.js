@@ -3,8 +3,28 @@ function editarTabela(configJson) {
 	var linha = null;
 	var idLinha = '';
 
-	var botaoInserir = document.getElementById(config.idBotaoInserir);
-	botaoInserir.onclick = function() {
+	function gerarIdLinhaSequencial(linha) {
+		// Gerando o id da linha que sera utilizado para gerar os inputs que
+		// serao enviados para o servidor
+		if (isEmpty(linha.id)) {
+			var linhas = document.getElementById(config.idTabela).rows;
+			var ids = new Array();
+			for (var i = 0; i < linhas.length; i++) {
+				ids[i] = linhas[i].id;
+			}
+			ids.sort();
+			var id = ids.length > 0 ? ids[ids.length - 1] : 0;
+			// Verificando condicao de existencia de algum id
+			if (isEmpty(id)) {
+				linha.id = 0;
+			} else {
+				linha.id = id + 1;
+			}
+		}
+	}
+	;
+
+	document.getElementById(config.idBotaoInserir).onclick = function() {
 
 		if (config.onValidar != undefined && config.onValidar != null
 				&& !config.onValidar()) {
@@ -22,11 +42,12 @@ function editarTabela(configJson) {
 		var max = campos.length;
 		for (var i = 0; i <= max; i++) {
 			cel = isEdicao ? linha.cells[i] : linha.insertCell(i);
+			// Bloco de inclusao dos valores das celulas
 			if (i < max) {
 				campo = document.getElementById(campos[i]);
 				cel.innerHTML = campo.value;
 				campo.value = '';
-			} else if (i == max && !isEdicao) {
+			} else if (i == max && !isEdicao) { // Bloco de inclusao dos botoes de acoes editar e remover
 				var btRemove = document.createElement('input');
 				btRemove.type = 'button';
 				btRemove.title = 'Remover Registro';
@@ -60,15 +81,23 @@ function editarTabela(configJson) {
 							campo.value = celulas[i].innerHTML;
 						}
 					}
+
+					if (config.onEditar != undefined) {
+						config.onEditar(linha);
+					}
 				};
 				cel.appendChild(btRemove);
 				cel.appendChild(btEdit);
 			}
 		}
+		// A geracao dos ids deve preceder onInserir para que o linha ja conteha o id
+		if (config.idLinhaSequencial != undefined && config.idLinhaSequencial) {
+			gerarIdLinhaSequencial(linha);
+		}
+		
 		if (config.onInserir != undefined) {
 			var indiceLinha = config.onInserir(linha);
 		}
-
 		linha = null;
 		idLinha = '';
 	};

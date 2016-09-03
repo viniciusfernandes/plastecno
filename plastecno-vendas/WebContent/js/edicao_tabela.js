@@ -18,7 +18,7 @@ function editarTabela(configJson) {
 			if (isEmpty(id)) {
 				linha.id = 0;
 			} else {
-				linha.id = id + 1;
+				linha.id = parseInt(id) + 1;
 			}
 		}
 	}

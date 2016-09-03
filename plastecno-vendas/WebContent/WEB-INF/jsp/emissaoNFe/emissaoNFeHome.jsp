@@ -84,7 +84,11 @@ $(document).ready(function() {
 				$(this).remove();
 			}
 		});
-		
+		var campos = '';
+		$( "#formEmissao input" ).each(function(i) {
+			campos += $(this).attr('name')+'\n';
+		});
+		alert(campos);
 		$('#formEmissao').submit();
 	});
 	
@@ -582,53 +586,55 @@ function recuperarImportacaoProduto(){
 	var total = 11;
 	
 	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao']").each(function(){
-		nome = $(this).attr('id');
-		if(id == null){
-			// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
-			id = nome.match(/\d+/g)[1];
-		}
-		nome = nome.substring(nome.lastIndexOf('.')+1);
-	 	valor = $(this).val();
-	 	
-		if(nome == 'cnpjEncomendante'){
-			$('#bloco_importacao_prod #cnpjImportProd').val(valor);
-			total--;
-		} else if(nome == 'codigoExportador'){
-			$('#bloco_importacao_prod #exportadorImportProd').val(valor);
-			total--;
-		} else if(nome == 'dataImportacao'){
-			$('#bloco_importacao_prod #dtImportProd').val(valor);
-			total--;
-		} else if(nome == 'dataDesembaraco'){
-			$('#bloco_importacao_prod #dataDesembImportProd').val(valor);
-			total--;
-		} else if(nome == 'localDesembaraco'){
-			$('#bloco_importacao_prod #lcImportProd').val(valor);
-			total--;
-		} else if(nome == 'numero'){
-			$('#bloco_importacao_prod #numImportProd').val(valor);
-			total--;
-		} else if(nome == 'tipoIntermediacao'){
-			$('#bloco_importacao_prod #tpImportProd').val(valor);
-			total--;
-		} else if(nome == 'tipoTransporteInternacional'){
-			$('#bloco_importacao_prod #tpTranspImportProd').val(valor);
-			total--;
-		} else if(nome == 'ufDesembaraco'){
-			$('#bloco_importacao_prod #ufDesembImportProd').val(valor);
-			total--;
-		} else if(nome == 'ufEncomendante'){
-			$('#bloco_importacao_prod #ufEncomendImportProd').val(valor);
-			total--;
-		} else if(nome == 'valorAFRMM'){
-			$('#bloco_importacao_prod #vlAFRMMImportProd').val(valor);
-			total--;
-		}
-		
-		if(total <= 0) {
-			editorTabelaImportacao.inserirLinha(id);
-			total = 11;
-			id = null;
+		nome = $(this).attr('name');
+		if(nome.split('.').length == 4){
+			if(id == null){
+				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+				id = nome.match(/\d+/g)[1];
+			}
+			nome = nome.substring(nome.lastIndexOf('.')+1);
+		 	valor = $(this).val();
+		 	
+			if(nome == 'cnpjEncomendante'){
+				$('#bloco_importacao_prod #cnpjImportProd').val(valor);
+				total--;
+			} else if(nome == 'codigoExportador'){
+				$('#bloco_importacao_prod #exportadorImportProd').val(valor);
+				total--;
+			} else if(nome == 'dataImportacao'){
+				$('#bloco_importacao_prod #dtImportProd').val(valor);
+				total--;
+			} else if(nome == 'dataDesembaraco'){
+				$('#bloco_importacao_prod #dataDesembImportProd').val(valor);
+				total--;
+			} else if(nome == 'localDesembaraco'){
+				$('#bloco_importacao_prod #lcImportProd').val(valor);
+				total--;
+			} else if(nome == 'numero'){
+				$('#bloco_importacao_prod #numImportProd').val(valor);
+				total--;
+			} else if(nome == 'tipoIntermediacao'){
+				$('#bloco_importacao_prod #tpImportProd').val(valor);
+				total--;
+			} else if(nome == 'tipoTransporteInternacional'){
+				$('#bloco_importacao_prod #tpTranspImportProd').val(valor);
+				total--;
+			} else if(nome == 'ufDesembaraco'){
+				$('#bloco_importacao_prod #ufDesembImportProd').val(valor);
+				total--;
+			} else if(nome == 'ufEncomendante'){
+				$('#bloco_importacao_prod #ufEncomendImportProd').val(valor);
+				total--;
+			} else if(nome == 'valorAFRMM'){
+				$('#bloco_importacao_prod #vlAFRMMImportProd').val(valor);
+				total--;
+			}
+			
+			if(total <= 0) {
+				editorTabelaImportacao.inserirLinha(id);
+				total = 11;
+				id = null;
+			}
 		}
 	});
 	
@@ -643,35 +649,37 @@ function recuperarAdicaoImportacao(){
 	var valor = null;
 	var total = 5;
 	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+numeroImportacaoProduto+"].listaAdicao']").each(function(){
-		nome = $(this).attr('id');
-		if(id == null){
-			// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
-			id = nome.match(/\d+/g)[1];
-		}
-		nome = nome.substring(nome.lastIndexOf('.')+1);
-	 	valor = $(this).val();
-	 	
-		if(nome == 'codigoFabricante'){
-			$('#bloco_importacao_prod #codFabricAdicao').val(valor);
-			total--;
-		} else if(nome == 'numero'){
-			$('#bloco_importacao_prod #numAdicao').val(valor);
-			total--;
-		} else if(nome == 'numeroDrawback'){
-			$('#bloco_importacao_prod #numDrawbackAdicao').val(valor);
-			total--;
-		} else if(nome == 'numeroSequencialItem'){
-			$('#bloco_importacao_prod #numSeqAdicao').val(valor);
-			total--;
-		} else if(nome == 'valorDesconto'){
-			$('#bloco_importacao_prod #valDescAdicao').val(valor);
-			total--;
-		}
-		
-		if(total <= 0) {
-			editorTabelaAdicao.inserirLinha(id);
-			total = 5;
-			id = null;
+		nome = $(this).attr('name');
+		if(nome.split('.').length == 5){
+			if(id == null){
+				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+				id = nome.match(/\d+/g)[2];
+			}
+			nome = nome.substring(nome.lastIndexOf('.')+1);
+		 	valor = $(this).val();
+		 	
+			if(nome == 'codigoFabricante'){
+				$('#bloco_importacao_prod #codFabricAdicao').val(valor);
+				total--;
+			} else if(nome == 'numero'){
+				$('#bloco_importacao_prod #numAdicao').val(valor);
+				total--;
+			} else if(nome == 'numeroDrawback'){
+				$('#bloco_importacao_prod #numDrawbackAdicao').val(valor);
+				total--;
+			} else if(nome == 'numeroSequencialItem'){
+				$('#bloco_importacao_prod #numSeqAdicao').val(valor);
+				total--;
+			} else if(nome == 'valorDesconto'){
+				$('#bloco_importacao_prod #valDescAdicao').val(valor);
+				total--;
+			}
+			
+			if(total <= 0) {
+				editorTabelaAdicao.inserirLinha(id);
+				total = 5;
+				id = null;
+			}
 		}
 	});
 };

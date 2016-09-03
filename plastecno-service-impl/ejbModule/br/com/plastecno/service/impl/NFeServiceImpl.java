@@ -272,7 +272,7 @@ public class NFeServiceImpl implements NFeService {
 		String path = configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.DIRETORIO_XML_NFE);
 		BufferedWriter bw = null;
 		try {
-			bw = new BufferedWriter(new FileWriter(new File(path+"\\\\"+nome+".xml")));
+			bw = new BufferedWriter(new FileWriter(new File(path + "\\\\" + nome + ".xml")));
 			bw.write(xml);
 		} catch (IOException e) {
 			throw new BusinessException("Falha na escrita do XML da NFe no diretorio do sistema", e);
@@ -282,7 +282,6 @@ public class NFeServiceImpl implements NFeService {
 					bw.close();
 				} catch (IOException e) {
 					throw new BusinessException("Falha no fechamento do XML da NFe gravado no diretorio do sistema", e);
-
 				}
 			}
 		}

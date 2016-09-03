@@ -90,7 +90,6 @@
 <input type="hidden" id="${listaAdicao}[${adLoop.index}].numeroDrawback" name="${listaAdicao}[${adLoop.index}].numeroDrawback" value="${ad.numeroDrawback}"/>
 <input type="hidden" id="${listaAdicao}[${adLoop.index}].numeroSequencialItem" name="${listaAdicao}[${adLoop.index}].numeroSequencialItem" value="${ad.numeroSequencialItem}"/>
 <input type="hidden" id="${listaAdicao}[${adLoop.index}].valorDesconto" name="${listaAdicao}[${adLoop.index}].valorDesconto" value="${ad.valorDesconto}"/>
-<input type="hidden" id="${listaAdicao}[${adLoop.index}].valorDesconto" name="${listaAdicao}[${adLoop.index}].valorDesconto" value="${ad.valorDesconto}"/>
 </c:forEach>
 <%-- bloco de adicoes --%>
 

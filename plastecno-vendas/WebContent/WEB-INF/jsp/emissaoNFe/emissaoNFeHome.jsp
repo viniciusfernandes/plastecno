@@ -577,53 +577,58 @@ function recuperarImportacaoProduto(){
 	// limpando a tabela toda
 	$("#tabela_importacao_prod tbody tr").remove();
 	var id = null;
+	var nome = null;
 	var valor = null;
 	var total = 11;
 	
 	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao']").each(function(){
-	 	id = $(this).attr('id');
+		nome = $(this).attr('id');
+		if(id == null){
+			// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+			id = nome.match(/\d+/g)[1];
+		}
+		nome = nome.substring(nome.lastIndexOf('.')+1);
 	 	valor = $(this).val();
 	 	
-		if(id.indexOf('cnpjEncomendante') != -1){
+		if(nome == 'cnpjEncomendante'){
 			$('#bloco_importacao_prod #cnpjImportProd').val(valor);
 			total--;
-		} else if(id.indexOf('codigoExportador') != -1){
+		} else if(nome == 'codigoExportador'){
 			$('#bloco_importacao_prod #exportadorImportProd').val(valor);
 			total--;
-		} else if(id.indexOf('dataImportacao') != -1){
+		} else if(nome == 'dataImportacao'){
 			$('#bloco_importacao_prod #dtImportProd').val(valor);
 			total--;
-		} else if(id.indexOf('dataDesembaraco') != -1){
+		} else if(nome == 'dataDesembaraco'){
 			$('#bloco_importacao_prod #dataDesembImportProd').val(valor);
 			total--;
-		} else if(id.indexOf('localDesembaraco') != -1){
+		} else if(nome == 'localDesembaraco'){
 			$('#bloco_importacao_prod #lcImportProd').val(valor);
 			total--;
-		} else if(id.indexOf('numero') != -1){
+		} else if(nome == 'numero'){
 			$('#bloco_importacao_prod #numImportProd').val(valor);
 			total--;
-		} else if(id.indexOf('tipoIntermediacao') != -1){
+		} else if(nome == 'tipoIntermediacao'){
 			$('#bloco_importacao_prod #tpImportProd').val(valor);
 			total--;
-		} else if(id.indexOf('tipoTransporteInternacional') != -1){
+		} else if(nome == 'tipoTransporteInternacional'){
 			$('#bloco_importacao_prod #tpTranspImportProd').val(valor);
 			total--;
-		} else if(id.indexOf('ufDesembaraco') != -1){
+		} else if(nome == 'ufDesembaraco'){
 			$('#bloco_importacao_prod #ufDesembImportProd').val(valor);
 			total--;
-		} else if(id.indexOf('ufEncomendante') != -1){
+		} else if(nome == 'ufEncomendante'){
 			$('#bloco_importacao_prod #ufEncomendImportProd').val(valor);
 			total--;
-		} else if(id.indexOf('valorAFRMM') != -1){
+		} else if(nome == 'valorAFRMM'){
 			$('#bloco_importacao_prod #vlAFRMMImportProd').val(valor);
 			total--;
 		}
 		
 		if(total <= 0) {
-			// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
-			var idLinha = id.match(/\d+/g)[1];
-			editorTabelaImportacao.inserirLinha(idLinha);
+			editorTabelaImportacao.inserirLinha(id);
 			total = 11;
+			id = null;
 		}
 	});
 	
@@ -634,35 +639,39 @@ function recuperarAdicaoImportacao(){
 	$("#tabela_adicao_import tbody tr").remove(); 
 	
 	var id = null;
+	var nome = null;
 	var valor = null;
 	var total = 5;
-	
 	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+numeroImportacaoProduto+"].listaAdicao']").each(function(){
-	 	id = $(this).attr('id');
+		nome = $(this).attr('id');
+		if(id == null){
+			// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+			id = nome.match(/\d+/g)[1];
+		}
+		nome = nome.substring(nome.lastIndexOf('.')+1);
 	 	valor = $(this).val();
 	 	
-		if(id.indexOf('codigoFabricante') != -1){
+		if(nome == 'codigoFabricante'){
 			$('#bloco_importacao_prod #codFabricAdicao').val(valor);
 			total--;
-		} else if(id.indexOf('numero') != -1){
+		} else if(nome == 'numero'){
 			$('#bloco_importacao_prod #numAdicao').val(valor);
 			total--;
-		} else if(id.indexOf('numeroDrawback') != -1){
+		} else if(nome == 'numeroDrawback'){
 			$('#bloco_importacao_prod #numDrawbackAdicao').val(valor);
 			total--;
-		} else if(id.indexOf('numeroSequencialItem') != -1){
+		} else if(nome == 'numeroSequencialItem'){
 			$('#bloco_importacao_prod #numSeqAdicao').val(valor);
 			total--;
-		} else if(id.indexOf('valorDesconto') != -1){
+		} else if(nome == 'valorDesconto'){
 			$('#bloco_importacao_prod #valDescAdicao').val(valor);
 			total--;
 		}
 		
 		if(total <= 0) {
-			// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
-			var idLinha = id.match(/\d+/g)[2];
-			editorTabelaAdicao.inserirLinha(idLinha);
+			editorTabelaAdicao.inserirLinha(id);
 			total = 5;
+			id = null;
 		}
 	});
 };

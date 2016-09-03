@@ -122,7 +122,8 @@ public class EmissaoNFeController extends AbstractController {
             }
 
             formatarDatas(nf, false);
-            redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(new NFe(nf), idPedido));
+            nFeService.emitirNFe(new NFe(nf), idPedido);
+            redirecTo(this.getClass()).emissaoNFeHome();
         } catch (BusinessException e) {
             try {
                 formatarDatas(nf, true);
@@ -137,7 +138,7 @@ public class EmissaoNFeController extends AbstractController {
         } catch (Exception e) {
             gerarLogErro("Emissão da NFe", e);
         }
-
+        irTopoPagina();
     }
 
     // Aqui uma excessao eh lancada pois devemos concatenar com as outras

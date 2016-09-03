@@ -8,8 +8,8 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @InformacaoValidavel
 public class DeclaracaoExportacaoIndireta {
 
-	@InformacaoValidavel(obrigatorio = true, padrao = { "\\d{44}" }, nomeExibicao = "Número de registro de exportação indireta")
-	@XmlElement(name = "nRE")
+	@InformacaoValidavel(obrigatorio = true, padrao = { "\\d{44}" }, nomeExibicao = "Chave de acesso de exportação indireta")
+	@XmlElement(name = "chNFe")
 	private String chaveAcessoRecebida;
 
 	@InformacaoValidavel(obrigatorio = true, padrao = { "\\d{12}" }, nomeExibicao = "Número de registro de exportação indireta")

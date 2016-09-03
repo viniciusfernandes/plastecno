@@ -91,6 +91,11 @@ public class DetalhamentoProdutoServicoNFe {
 		return listaDeclaracaoImportacao;
 	}
 
+	@XmlTransient
+	public List<DeclaracaoExportacao> getListaExportacao() {
+		return getListaDeclaracaoExportacao();
+	}
+
 	// Metodo criado para simplificar a marcacao no .jsp
 	@XmlTransient
 	public List<DeclaracaoImportacao> getListaImportacao() {
@@ -151,6 +156,10 @@ public class DetalhamentoProdutoServicoNFe {
 
 	public void setListaDeclaracaoImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
 		this.listaDeclaracaoImportacao = listaDeclaracaoImportacao;
+	}
+
+	public void setListaExportacao(List<DeclaracaoExportacao> listaDeclaracaoExportacao) {
+		setListaDeclaracaoExportacao(listaDeclaracaoExportacao);
 	}
 
 	// Metodo criado para simplificar marcacao do .jsp

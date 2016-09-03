@@ -96,4 +96,13 @@
 </c:forEach>
 <%-- bloco de importacoes --%>
 
+<%-- bloco de exportacao --%>
+<c:set var="listaExportacao" value="${detItem}.listaExportacao"/>
+<c:forEach var="exp" items="${item.listaExportacao}" varStatus="expLoop">
+<input type="hidden" id="${listaExportacao}[${expLoop.index}].numeroDrawback" name="${listaExportacao}[${expLoop.index}].numeroDrawback" value="${exp.numeroDrawback}"/>
+<input type="hidden" id="${listaExportacao}[${expLoop.index}].expIndireta.chaveAcessoRecebida" name="${listaExportacao}[${expLoop.index}].expIndireta.chaveAcessoRecebida" value="${exp.expIndireta.chaveAcessoRecebida}"/>
+<input type="hidden" id="${listaExportacao}[${expLoop.index}].expIndireta.numeroRegistro" name="${listaExportacao}[${expLoop.index}].expIndireta.numeroRegistro" value="${exp.expIndireta.numeroRegistro}"/>
+<input type="hidden" id="${listaExportacao}[${expLoop.index}].expIndireta.quantidadeItem" name="${listaExportacao}[${expLoop.index}].expIndireta.quantidadeItem" value="${exp.expIndireta.quantidadeItem}"/>
+</c:forEach>
+<%-- bloco de exportacao --%>
 </c:forEach>

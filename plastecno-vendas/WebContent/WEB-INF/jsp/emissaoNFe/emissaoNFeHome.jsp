@@ -43,7 +43,7 @@ var numeroImportacaoProduto = null;
 var tabelaDuplicataHandler = null;
 var editorTabelaImportacao = null;
 var editorTabelaAdicao = null;
-
+var editorTabelaExportacao = null;
 $(document).ready(function() {
 	scrollTo('${ancora}');
 	
@@ -84,11 +84,6 @@ $(document).ready(function() {
 				$(this).remove();
 			}
 		});
-		var campos = '';
-		$( "#formEmissao input" ).each(function(i) {
-			campos += $(this).attr('name')+'\n';
-		});
-		alert(campos);
 		$('#formEmissao').submit();
 	});
 	
@@ -246,6 +241,7 @@ $(document).ready(function() {
 	inicializarBlocoDuplicata();
 	inicializarTabelaImportacaoProd();
 	inicializarTabelaAdicaoImportacao();
+	inicializarTabelaExportacaoProd();
 });
 
 function gerarIdCamposImportacaoProd(){
@@ -325,6 +321,37 @@ function inicializarTabelaAdicaoImportacao(){
 			 }};
 	
 	editorTabelaAdicao = new editarTabela(config);
+};
+
+function inicializarTabelaExportacaoProd(){
+	var config = {'idTabela': 'tabela_exportacao_prod', 'idBotaoInserir':'botaoInserirExportacaoProd',
+			'campos': ['drawbackExportProd', 'chAcessoExportIndir', 'registroExportIndir', 'qtdeExportIndir'],
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return numeroProdutoEdicao != null;
+			},
+			'onInserir': function(linha){
+				if(numeroProdutoEdicao == null || linha == null){
+					return;
+				}
+				
+				var celulas = linha.cells;
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaExportacao['+linha.id+']', 
+					  'campos':[{'nome':'numeroDrawback', 'valor':celulas[0].innerHTML},
+					            {'nome':'expIndireta.chaveAcessoRecebida', 'valor':celulas[1].innerHTML},
+					            {'nome':'expIndireta.numeroRegistro', 'valor':celulas[2].innerHTML},
+					            {'nome':'expIndireta.quantidadeItem', 'valor':celulas[3].innerHTML},
+								]};
+					
+				gerarInputHidden(json);
+			 },
+			'onRemover': function(linha){
+				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaExportacao["+linha.id+"]']").each(function(i){
+					$(this).remove();
+				});
+			}};
+	
+	editorTabelaExportacao = new editarTabela(config);
 };
 
 function removerDuplicata(botao) {
@@ -684,6 +711,47 @@ function recuperarAdicaoImportacao(){
 	});
 };
 
+function recuperarExportacaoProduto(){
+	// limpando a tabela toda
+	$("#tabela_exportacao_prod tbody tr").remove(); 
+	
+	var id = null;
+	var nome = null;
+	var valor = null;
+	var total = 3;
+	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaExportacao']").each(function(){
+		nome = $(this).attr('name');
+		if(nome.split('.').length == 5){
+			if(id == null){
+				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+				id = nome.match(/\d+/g)[1];
+			}
+			nome = nome.substring(nome.lastIndexOf('.')+1);
+		 	valor = $(this).val();
+		 	
+			if(nome == 'chaveAcessoRecebida'){
+				$('#bloco_exportacao_prod #chAcessoExportIndir').val(valor);
+				total--;
+			} else if(nome == 'numero'){
+				$('#bloco_exportacao_prod #registroExportIndir').val(valor);
+				total--;
+			} else if(nome == 'numeroDrawback'){
+				$('#bloco_exportacao_prod #qtdeExportIndir').val(valor);
+				total--;
+			}
+			
+			if(total <= 0) {
+				valor = $('nf.listaItem['+numeroProdutoEdicao+'].listaExportacao['+numeroImportacaoProduto+'].numeroDrawback').val();
+				$('#bloco_exportacao_prod #drawbackExportProd').val(valor);
+				
+				editorTabelaExportacao.inserirLinha(id);
+				total = 3;
+				id = null;
+			}
+		}
+	});
+};
+
 function gerarInputICMS(){
 	var tipoIcms = gerarJsonTipoIcms();
 	var cfop = gerarJsonCfopNcm();
@@ -992,6 +1060,7 @@ function editarProduto(linha){
 	recuperarValoresImpostos(valoresTabela);
 	
 	recuperarImportacaoProduto();
+	recuperarExportacaoProduto();
 	
 	$('#bloco_tributos').fadeIn('fast');
 	$('#bloco_info_adicionais_prod').fadeIn('fast');
@@ -1484,6 +1553,45 @@ function editarProduto(linha){
 					</table>
 				</fieldset>
 			</fieldset>
+			<fieldset id="bloco_exportacao_prod" class="fieldsetInterno">
+					<legend>::: Exportação ::: +</legend>
+					<div class="label">Drawback:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="drawbackExportProd" style="width: 100%"/>
+					</div>
+					<div class="label">Ch Acesso:</div>
+					<div class="input" style="width: 40%">
+						<input type="text" id="chAcessoExportIndir" style="width: 50%"/>
+					</div>
+					<div class="label">Registro:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="registroExportIndir" style="width: 100%"/>
+					</div>
+					<div class="label">Quantidade:</div>
+					<div class="input" style="width: 40%">
+						<input type="text" id="qtdeExportIndir" style="width: 50%"/>
+					</div>
+					
+					<div class="bloco_botoes">
+						<a id="botaoInserirExportacaoProd" title="Inserir Exportação do Produto" class="botaoAdicionar"></a>
+					</div>
+									
+					<table id="tabela_exportacao_prod" class="listrada">
+						<thead>
+							<tr>
+								<th>Drawback</th>
+								<th>Ch Acesso</th>
+								<th>Registro</th>
+								<th>Qutde.</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						
+						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+						<tbody>
+						</tbody>
+					</table>
+				</fieldset>
 			
 			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
 				<legend>::: Info. Adicionais Prod. ::: +</legend>

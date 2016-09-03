@@ -30,7 +30,7 @@ e cupons fiscais vinculados a nota
 14) Incluir na tela de pedido os campos de "item compra" e "numero do pedido de compra" OK
 15) Verificar na documentacao da sefaz o campo "nFCI" do produto
 16) Unir os campos de transporte veiculo/reboque/balsa/vagao OK
-17) Unir os campos de exportacao e compra em um mesmo bloco
+17) Unir os campos de exportacao e compra em um mesmo bloco OK
 18) Incluir os campos de exportacao em produtos
 19) Implementar edicao de cobranca OK
 20) Em cobracao o valor padrao deve ser boleto OK

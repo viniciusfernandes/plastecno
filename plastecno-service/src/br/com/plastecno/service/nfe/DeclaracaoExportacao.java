@@ -12,7 +12,7 @@ public class DeclaracaoExportacao {
 	@XmlElement(name = "exportInd")
 	private DeclaracaoExportacaoIndireta declaracaoExportacaoIndireta;
 
-	@InformacaoValidavel(padrao = { "\\d{9}", "\\d{11}" }, nomeExibicao = "Número de dorwback da declaração de esxportação")
+	@InformacaoValidavel(padrao = { "\\d{9}", "\\d{11}" }, nomeExibicao = "Número de dorwback da declaração de exportação")
 	@XmlElement(name = "nDraw")
 	private String numeroDrawback;
 
@@ -22,11 +22,20 @@ public class DeclaracaoExportacao {
 	}
 
 	@XmlTransient
+	public DeclaracaoExportacaoIndireta getExpIndireta() {
+		return getDeclaracaoExportacaoIndireta();
+	}
+
+	@XmlTransient
 	public String getNumeroDrawback() {
 		return numeroDrawback;
 	}
 
 	public void setDeclaracaoExportacaoIndireta(DeclaracaoExportacaoIndireta declaracaoExportacaoIndireta) {
+		this.declaracaoExportacaoIndireta = declaracaoExportacaoIndireta;
+	}
+
+	public void setExpIndireta(DeclaracaoExportacaoIndireta declaracaoExportacaoIndireta) {
 		this.declaracaoExportacaoIndireta = declaracaoExportacaoIndireta;
 	}
 

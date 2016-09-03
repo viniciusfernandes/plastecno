@@ -281,11 +281,13 @@ function inicializarTabelaImportacaoProd(){
 			 'onEditar': function(linha){
 				 numeroImportacaoProduto = linha.id;
 				 recuperarAdicaoImportacao();
+				 $('#bloco_adicao_import').fadeIn('fast');
 			 },
 			'onRemover': function(linha){
 				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+linha.id+"]']").each(function(i){
 					$(this).remove();
-				});	
+				});
+				 $('#bloco_adicao_import').fadeOut('fast');
 			}};
 	
 	editorTabelaImportacao  = new editarTabela(config);
@@ -422,7 +424,7 @@ function abrirBloco(nomeBloco){
 function fecharBloco(nomeBloco){
 	gerarLegendaBloco(nomeBloco);
 	<%-- Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn --%>
-	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table').fadeOut('fast');
+	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table, #'+nomeBloco+' .fieldsetInterno').fadeOut('fast');
 };
 
 function inicializarLegendaBlocoProduto(nomeBloco){

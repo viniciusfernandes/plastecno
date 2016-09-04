@@ -220,6 +220,7 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_info_adicionais_prod');
 	inicializarFadeInBloco('bloco_info_adicionais_nfe');
 	inicializarFadeInBloco('bloco_importacao_prod');
+	inicializarFadeInBloco('bloco_exportacao_prod');
 
 	inicializarFadeInBloco('bloco_local_mercadoria');
 	inicializarFadeInBloco('bloco_referenciada');
@@ -237,6 +238,7 @@ $(document).ready(function() {
 	$('#bloco_tributos').fadeOut('fast');
 	$('#bloco_info_adicionais_prod').fadeOut('fast');
 	$('#bloco_importacao_prod').fadeOut('fast');
+	$('#bloco_exportacao_prod').fadeOut('fast');
 
 	inicializarBlocoDuplicata();
 	inicializarTabelaImportacaoProd();
@@ -717,37 +719,41 @@ function recuperarExportacaoProduto(){
 	
 	var id = null;
 	var nome = null;
-	var valor = null;
-	var total = 3;
+	var total = 4;
+	var indice = -1;
 	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaExportacao']").each(function(){
 		nome = $(this).attr('name');
-		if(nome.split('.').length == 5){
+		indice = nome.split('.').length;
+		
+		if(indice == 4){
+			nome = nome.substring(nome.lastIndexOf('.')+1);
+			if(nome == 'numeroDrawback'){
+				$('#bloco_exportacao_prod #drawbackExportProd').val($(this).val());
+				total--;
+			} 
+		}else if(indice == 5){
 			if(id == null){
 				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
 				id = nome.match(/\d+/g)[1];
 			}
 			nome = nome.substring(nome.lastIndexOf('.')+1);
-		 	valor = $(this).val();
 		 	
 			if(nome == 'chaveAcessoRecebida'){
-				$('#bloco_exportacao_prod #chAcessoExportIndir').val(valor);
+				$('#bloco_exportacao_prod #chAcessoExportIndir').val($(this).val());
 				total--;
-			} else if(nome == 'numero'){
-				$('#bloco_exportacao_prod #registroExportIndir').val(valor);
+			} else if(nome == 'numeroRegistro'){
+				$('#bloco_exportacao_prod #registroExportIndir').val($(this).val());
 				total--;
-			} else if(nome == 'numeroDrawback'){
-				$('#bloco_exportacao_prod #qtdeExportIndir').val(valor);
+			} else if(nome == 'quantidadeItem'){
+				$('#bloco_exportacao_prod #qtdeExportIndir').val($(this).val());
 				total--;
 			}
-			
-			if(total <= 0) {
-				valor = $('nf.listaItem['+numeroProdutoEdicao+'].listaExportacao['+numeroImportacaoProduto+'].numeroDrawback').val();
-				$('#bloco_exportacao_prod #drawbackExportProd').val(valor);
-				
-				editorTabelaExportacao.inserirLinha(id);
-				total = 3;
-				id = null;
-			}
+		}
+		
+		if(total <= 0) {
+			editorTabelaExportacao.inserirLinha(id);
+			total = 4;
+			id = null;
 		}
 	});
 };
@@ -1065,6 +1071,7 @@ function editarProduto(linha){
 	$('#bloco_tributos').fadeIn('fast');
 	$('#bloco_info_adicionais_prod').fadeIn('fast');
 	$('#bloco_importacao_prod').fadeIn('fast');
+	$('#bloco_exportacao_prod').fadeIn('fast');
 	
 	inicializarLegendaBlocoProduto('bloco_icms');
 	inicializarLegendaBlocoProduto('bloco_ipi');
@@ -1075,11 +1082,14 @@ function editarProduto(linha){
 	inicializarLegendaBlocoProduto('bloco_tributos');
 	inicializarLegendaBlocoProduto('bloco_info_adicionais_prod');
 	inicializarLegendaBlocoProduto('bloco_importacao_prod');
+	inicializarLegendaBlocoProduto('bloco_exportacao_prod');
+
 	
 	fecharBloco('bloco_ipi');
 	fecharBloco('bloco_ii');
 	fecharBloco('bloco_iss');
 	fecharBloco('bloco_importacao_prod');
+	fecharBloco('bloco_exportacao_prod');
 
 };
 

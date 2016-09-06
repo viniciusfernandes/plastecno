@@ -79,7 +79,6 @@ public class NFeServiceImpl implements NFeService {
 		DadosNFe nf = nFe.getDadosNFe();
 
 		nf.setId("12345678901234567890123456789012345678901234567");
-		nf.getIdentificacaoEmitenteNFe().setCNAEFiscal("1234567");
 		nf.getIdentificacaoNFe().setChaveAcesso("12345678");
 		nf.getIdentificacaoNFe().setDataEmissao("2016-11-11");
 		nf.getIdentificacaoNFe().setDigitoVerificador("4");
@@ -90,17 +89,13 @@ public class NFeServiceImpl implements NFeService {
 		nf.getIdentificacaoNFe().setProcessoEmissao("0");
 		nf.getIdentificacaoNFe().setVersaoProcessoEmissao("43214321");
 		nf.getIdentificacaoNFe().setMunicipioOcorrenciaFatorGerador("1234567");
-		ProdutoServicoNFe p = null;
 
 		if (nf.getListaDetalhamentoProdutoServicoNFe() == null) {
 			return;
 		}
 
 		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
-			p = d.getProdutoServicoNFe();
-			p.setEAN("EanTEste");
-			p.setEANTributavel("EanTEste");
-			p.setIndicadorValorTotal(1);
+			d.getProdutoServicoNFe().setIndicadorValorTotal(1);
 		}
 	}
 
@@ -132,7 +127,7 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setNomeFantasia(emitente.getNomeFantasia());
 		iEmit.setRazaoSocial(emitente.getRazaoSocial());
 		iEmit.setRegimeTributario(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.REGIME_TRIBUTACAO));
-
+		iEmit.setCNAEFiscal(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.CNAE));
 		EnderecoNFe endEmit = gerarEnderecoNFe(representadaService.pesquisarLogradorouro(emitente.getId()),
 				emitente.getTelefone());
 

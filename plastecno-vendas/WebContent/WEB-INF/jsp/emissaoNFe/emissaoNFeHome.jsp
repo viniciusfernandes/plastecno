@@ -1043,6 +1043,18 @@ function inicializarBotaoPesquisarCEP(config){
 	
 };
 
+function inicializarOpcoesSelect(json){
+	var campos = json.campos;
+	var opcao = null;
+	for (var i = 0; i < campos.length; i++) {
+		if(campos[i].idBloco != undefined){
+			opcao = "#"+campos[i].idBloco;
+		}
+		opcao = " #"+campos[i].idCampo + " option[value="+campos[i].opcao+"]";
+		$(opcao).attr('selected','selected');
+	}
+};
+
 function editarProduto(linha){
 	var celulas = linha.cells;
 	<%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
@@ -1090,7 +1102,16 @@ function editarProduto(linha){
 	fecharBloco('bloco_iss');
 	fecharBloco('bloco_importacao_prod');
 	fecharBloco('bloco_exportacao_prod');
-
+	
+	var opcoes = {'campos':
+		[{'idBloco': 'bloco_tributos', 'idCampo': 'cfop', 'opcao': '5102'},
+		 {'idBloco': 'bloco_tributos', 'idCampo': 'tipoTributacaoICMS', 'opcao': '00'},
+		 {'idBloco': 'bloco_tributos', 'idCampo': 'origemMercadoriaICMS', 'opcao': '0'},
+		 {'idBloco': 'bloco_tributos', 'idCampo': 'modBCICMS', 'opcao': '0'},
+		 {'idBloco': 'bloco_tributos', 'idCampo': 'codSitTribCOFINS', 'opcao': '1'},
+		 {'idBloco': 'bloco_tributos', 'idCampo': 'codSitTribPIS', 'opcao': '1'}]};
+	
+	inicializarOpcoesSelect(opcoes);
 };
 
 </script>
@@ -1446,6 +1467,302 @@ function editarProduto(linha){
 				</tbody>
 			</table>
 			
+			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
+				<legend>::: Info. Adicionais Prod. ::: +</legend>
+				<div class="label">Num. Ped. Compra:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="numeroPedidoCompraProd" style="width: 100%"/>
+				</div>
+				<div class="label">Item Ped. Compra.:</div>
+				<div class="input" style="width: 50%">
+					<input type="text" id="itemPedidoCompraProd" style="width: 20%"/>
+				</div>
+				<div class="label">Valor Desp. Acess.:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="despesasAcessoriasProd" style="width: 20%"/>
+				</div>
+				<div class="label">Núm. FCI:</div>
+				<div class="input areatexto" style="width: 70%">
+					<textarea id="fciProd" style="width: 50%"></textarea>
+				</div>
+				<div class="label">Info. Produto:</div>
+				<div class="input areatexto" style="width: 70%">
+					<textarea id="infoAdicionaisProd" style="width: 100%"></textarea>
+				</div>
+				<div class="bloco_botoes">
+						<input type="button" id="botaoInserirInfoProd" title="Inserir Informações do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparInfoProd" title="Limpar Informações do Produto" value="" class="botaoLimpar"/>
+					</div>
+			</fieldset>
+			
+			<fieldset id="bloco_tributos" class="fieldsetInterno">
+				<legend class="fieldsetInterno">::: Tributos Prod.::: -</legend>
+				<div class="divFieldset">
+				<fieldset id="bloco_icms" class="fieldsetInterno">
+					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
+					<div class="label">NCM:</div>
+					<div class="input" style="width: 80%">
+						<input type="text" id="ncm" name="ncm" style="width: 20%"/>
+					</div>
+					<div class="label">CFOP:</div>
+					<div class="input" style="width: 80%">
+						<select id="cfop" name="cfop" style="width: 80%">
+							<c:forEach var="cfop" items="${listaCfop}" >
+								<option value="${cfop[0]}">${cfop[1]}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="tipoTributacaoICMS" 
+							style="width: 77%" >
+							<c:forEach var="icms" items="${listaTipoTributacaoICMS}">
+								<option value="${icms.codigo}">${icms.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div class="label">Origem:</div>
+					<div class="input" style="width: 25%">
+						<select id="origemMercadoriaICMS" 
+							style="width: 100%" >
+							<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
+								<option value="${origem.codigo}">${origem.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					
+					<div class="icms00 label">Modalidade:</div>
+					<div class="icms00 input" style="width: 30%">
+						<select id="modBCICMS" style="width: 65%" class="icms00 semprehabilitado">
+							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMS}">
+								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="valorBCICMS" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 40%">
+						<input type="text" id="aliquotaICMS" style="width: 20%" />
+					</div>
+					<div class="icms00 label">Modalidade ST:</div>
+					<div class="icms00 input" style="width: 70%">
+						<select id="modBCSTICMS" style="width: 30%" class="icms00 semprehabilitado">
+							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMSST}">
+								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Perc. Marg. Valor ST:</div>
+					<div class="input" style="width: 10%">
+						<input id="percValSTICMS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Perc. Redução BC ST:</div>
+					<div class="input" style="width: 50%">
+						<input id="percRedBCSTICMS" type="text" style="width: 25%" />
+					</div>
+					<div  class="label">Valor BC ST:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCSTICMS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota ST:</div>
+					<div class="input" style="width: 50%">
+						<input id="aliquotaSTICMS" type="text" style="width: 25%" />
+					</div>
+					<div class="icms00 label">Mot. Desoneração:</div>
+					<div class="icms00 input" style="width: 36%">
+						<select id="motDesonerICMS" style="width: 100%" class="icms00 semprehabilitado">
+							<option value=""></option>
+							<c:forEach var="motivo" items="${listaTipoMotivoDesoneracao}">
+								<option value="${motivo.codigo}">${motivo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirICMS" title="Inserir ICMS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparICMS" title="Limpar ICMS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_cofins" class="fieldsetInterno">
+					<legend>::: COFINS Prod.::: +</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="codSitTribCOFINS" style="width: 45%">
+							<c:forEach var="tipo" items="${listaTipoTributacaoCOFINS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 50%">
+						<input id="aliquotaCOFINS" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Qtde. Vendida:</div>
+					<div class="input" style="width: 10%">
+						<input id="qtdeVendidaCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_pis" class="fieldsetInterno">
+					<legend>::: PIS Prod.::: +</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="codSitTribPIS" style="width: 45%">
+							<c:forEach var="tipo" items="${listaTipoTributacaoPIS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCPIS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 50%">
+						<input id="aliquotaPIS" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Qtde.Vendida:</div>
+					<div class="input" style="width: 10%">
+						<input id="qtdeVendidaPIS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparPIS" title="Limpar PIS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_ipi" class="fieldsetInterno">
+					<legend>::: IPI Prod.::: +</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="codSitTribIPI" style="width: 45%" >
+							<option value=""></option>
+							<c:forEach var="tipo" items="${listaTipoTributacaoIPI}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCIPI" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota:</div>
+					<div class="input" style="width: 50%">
+						<input id="aliquotaIPI" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Qtde. unid. Tributável:</div>
+					<div class="input" style="width: 10%">
+						<input id="qtdeUnidTribIPI" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Unid. Tributável:</div>
+					<div class="input" style="width: 50%">
+						<input id="valorUnidTribIPI" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Cl. Enquadramento:</div>
+					<div class="input" style="width: 10%">
+						<input id="clEnquadramentoIPI" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Cod. Enquadramento:</div>
+					<div class="input" style="width: 50%">
+						<input id="codEnquadramentoIPI" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">CNPJ Produtor:</div>
+					<div class="input" style="width: 70%">
+						<input id="cnpjProdIPI" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Cod. Selo Controle:</div>
+					<div class="input" style="width: 10%">
+						<input id="codSeloContrIPI" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Qtde. Selo Controle:</div>
+					<div class="input" style="width: 50%">
+						<input id="qtdeSeloContrIPI" type="text" style="width: 20%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirIPI" title="Inserir IPI do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparIPI" title="Limpar IPI do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_iss" class="fieldsetInterno">
+					<legend>::: ISSQN Prod.::: +</legend>
+					<div class="label">Situação Tribut.:</div>
+					<div class="input" style="width: 80%">
+						<select id="codSitTribISS" style="width: 45%">
+							<option value=""></option>
+							<c:forEach var="tipo" items="${listaTipoTributacaoISS}">
+								<option value="${tipo.codigo}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCISS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Alíquota(%):</div>
+					<div class="input" style="width: 50%">
+						<input id="aliquotaISS" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Qtde. Vendida:</div>
+					<div class="input" style="width: 10%">
+						<input id="codMunGeradorISS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Item Serviço:</div>
+					<div class="input" style="width: 10%">
+						<input id="codItemServicoISS" type="text" style="width: 100%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirISS" title="Inserir ISS do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparISS" title="Limpar ISS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_ii" class="fieldsetInterno">
+					<legend>::: Importação Prod.::: +</legend>
+					<div  class="label">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCII" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Import.(R$):</div>
+					<div class="input" style="width: 50%">
+						<input id="valorII" type="text" style="width: 20%" />
+					</div>
+					<div  class="label">Valor IOF:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorIOFII" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Desp. Aduan.:</div>
+					<div class="input" style="width: 50%">
+						<input id="valorDespAduaneirasII" type="text" style="width: 20%" />
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirII" title="Inserir Imp. Importação do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparII" title="Limpar Imp. Importação do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+			</fieldset>
 			<fieldset id="bloco_importacao_prod" class="fieldsetInterno">
 				<legend>::: Importação ::: +</legend>
 				<div class="label">CNPJ:</div>
@@ -1603,299 +1920,6 @@ function editarProduto(linha){
 					</table>
 				</fieldset>
 			
-			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
-				<legend>::: Info. Adicionais Prod. ::: +</legend>
-				<div class="label">Num. Ped. Compra:</div>
-				<div class="input" style="width: 10%">
-					<input type="text" id="numeroPedidoCompraProd" style="width: 100%"/>
-				</div>
-				<div class="label">Item Ped. Compra.:</div>
-				<div class="input" style="width: 50%">
-					<input type="text" id="itemPedidoCompraProd" style="width: 20%"/>
-				</div>
-				<div class="label">Valor Desp. Acess.:</div>
-				<div class="input" style="width: 80%">
-					<input type="text" id="despesasAcessoriasProd" style="width: 20%"/>
-				</div>
-				<div class="label">Núm. FCI:</div>
-				<div class="input areatexto" style="width: 70%">
-					<textarea id="fciProd" style="width: 50%"></textarea>
-				</div>
-				<div class="label">Info. Produto:</div>
-				<div class="input areatexto" style="width: 70%">
-					<textarea id="infoAdicionaisProd" style="width: 100%"></textarea>
-				</div>
-				<div class="bloco_botoes">
-						<input type="button" id="botaoInserirInfoProd" title="Inserir Informações do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparInfoProd" title="Limpar Informações do Produto" value="" class="botaoLimpar"/>
-					</div>
-			</fieldset>
-			
-			<fieldset id="bloco_tributos" class="fieldsetInterno">
-				<legend class="fieldsetInterno">::: Tributos Prod.::: -</legend>
-				<div class="divFieldset">
-				<fieldset id="bloco_icms" class="fieldsetInterno">
-					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
-					<div class="label">NCM:</div>
-					<div class="input" style="width: 80%">
-						<input type="text" id="ncm" name="ncm" style="width: 20%"/>
-					</div>
-					<div class="label">CFOP:</div>
-					<div class="input" style="width: 80%">
-						<select id="cfop" name="cfop" style="width: 80%">
-							<c:forEach var="cfop" items="${listaCfop}" >
-								<option value="${cfop[0]}">${cfop[1]}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 80%">
-						<select id="tipoTributacaoICMS" 
-							style="width: 77%" >
-							<c:forEach var="icms" items="${listaTipoTributacaoICMS}">
-								<option value="${icms.codigo}">${icms.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div class="label">Origem:</div>
-					<div class="input" style="width: 25%">
-						<select id="origemMercadoriaICMS" 
-							style="width: 100%" >
-							<c:forEach var="origem" items="${listaTipoOrigemMercadoria}">
-								<option value="${origem.codigo}">${origem.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					
-					<div class="icms00 label">Modalidade:</div>
-					<div class="icms00 input" style="width: 30%">
-						<select id="modBCICMS" style="width: 65%" class="icms00 semprehabilitado">
-							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMS}">
-								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 20%">
-						<input type="text" id="valorBCICMS" style="width: 100%" />
-					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 40%">
-						<input type="text" id="aliquotaICMS" style="width: 20%" />
-					</div>
-					<div class="icms00 label">Modalidade ST:</div>
-					<div class="icms00 input" style="width: 70%">
-						<select id="modBCSTICMS" style="width: 30%" class="icms00 semprehabilitado">
-							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMSST}">
-								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Perc. Marg. Valor ST:</div>
-					<div class="input" style="width: 10%">
-						<input id="percValSTICMS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Perc. Redução BC ST:</div>
-					<div class="input" style="width: 50%">
-						<input id="percRedBCSTICMS" type="text" style="width: 25%" />
-					</div>
-					<div  class="label">Valor BC ST:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCSTICMS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Alíquota ST:</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaSTICMS" type="text" style="width: 25%" />
-					</div>
-					<div class="icms00 label">Mot. Desoneração:</div>
-					<div class="icms00 input" style="width: 36%">
-						<select id="motDesonerICMS" style="width: 100%" class="icms00 semprehabilitado">
-							<c:forEach var="motivo" items="${listaTipoMotivoDesoneracao}">
-								<option value="${motivo.codigo}">${motivo.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div class="bloco_botoes">
-						<input type="button" id="botaoInserirICMS" title="Inserir ICMS do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparICMS" title="Limpar ICMS do Produto" value="" class="botaoLimpar"/>
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_cofins" class="fieldsetInterno">
-					<legend>::: COFINS Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 80%">
-						<select id="codSitTribCOFINS" style="width: 45%">
-							<c:forEach var="tipo" items="${listaTipoTributacaoCOFINS}">
-								<option value="${tipo.codigo}">${tipo.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCCOFINS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaCOFINS" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Qtde. Vendida:</div>
-					<div class="input" style="width: 10%">
-						<input id="qtdeVendidaCOFINS" type="text" style="width: 100%" />
-					</div>
-					<div class="bloco_botoes">
-						<input type="button" id="botaoInserirCOFINS" title="Inserir COFINS do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparCOFINS" title="Limpar COFINS do Produto" value="" class="botaoLimpar"/>
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_pis" class="fieldsetInterno">
-					<legend>::: PIS Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 80%">
-						<select id="codSitTribPIS" style="width: 45%">
-							<c:forEach var="tipo" items="${listaTipoTributacaoPIS}">
-								<option value="${tipo.codigo}">${tipo.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCPIS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaPIS" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Qtde.Vendida:</div>
-					<div class="input" style="width: 10%">
-						<input id="qtdeVendidaPIS" type="text" style="width: 100%" />
-					</div>
-					<div class="bloco_botoes">
-						<input type="button" id="botaoInserirPIS" title="Inserir PIS do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparPIS" title="Limpar PIS do Produto" value="" class="botaoLimpar"/>
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_ipi" class="fieldsetInterno">
-					<legend>::: IPI Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 80%">
-						<select id="codSitTribIPI" style="width: 45%" >
-							<c:forEach var="tipo" items="${listaTipoTributacaoIPI}">
-								<option value="${tipo.codigo}">${tipo.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCIPI" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Alíquota:</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaIPI" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Qtde. unid. Tributável:</div>
-					<div class="input" style="width: 10%">
-						<input id="qtdeUnidTribIPI" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Valor Unid. Tributável:</div>
-					<div class="input" style="width: 50%">
-						<input id="valorUnidTribIPI" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Cl. Enquadramento:</div>
-					<div class="input" style="width: 10%">
-						<input id="clEnquadramentoIPI" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Cod. Enquadramento:</div>
-					<div class="input" style="width: 50%">
-						<input id="codEnquadramentoIPI" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">CNPJ Produtor:</div>
-					<div class="input" style="width: 70%">
-						<input id="cnpjProdIPI" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Cod. Selo Controle:</div>
-					<div class="input" style="width: 10%">
-						<input id="codSeloContrIPI" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Qtde. Selo Controle:</div>
-					<div class="input" style="width: 50%">
-						<input id="qtdeSeloContrIPI" type="text" style="width: 20%" />
-					</div>
-					<div class="bloco_botoes">
-						<input type="button" id="botaoInserirIPI" title="Inserir IPI do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparIPI" title="Limpar IPI do Produto" value="" class="botaoLimpar"/>
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_iss" class="fieldsetInterno">
-					<legend>::: ISSQN Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
-					<div class="input" style="width: 80%">
-						<select id="codSitTribISS" style="width: 45%">
-							<c:forEach var="tipo" items="${listaTipoTributacaoISS}">
-								<option value="${tipo.codigo}">${tipo.descricao}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCISS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaISS" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Qtde. Vendida:</div>
-					<div class="input" style="width: 10%">
-						<input id="codMunGeradorISS" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Item Serviço:</div>
-					<div class="input" style="width: 10%">
-						<input id="codItemServicoISS" type="text" style="width: 100%" />
-					</div>
-					<div class="bloco_botoes">
-						<input type="button" id="botaoInserirISS" title="Inserir ISS do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparISS" title="Limpar ISS do Produto" value="" class="botaoLimpar"/>
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_ii" class="fieldsetInterno">
-					<legend>::: Importação Prod.::: +</legend>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorBCII" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Valor Import.(R$):</div>
-					<div class="input" style="width: 50%">
-						<input id="valorII" type="text" style="width: 20%" />
-					</div>
-					<div  class="label">Valor IOF:</div>
-					<div class="input" style="width: 10%">
-						<input id="valorIOFII" type="text" style="width: 100%" />
-					</div>
-					<div  class="label">Valor Desp. Aduan.:</div>
-					<div class="input" style="width: 50%">
-						<input id="valorDespAduaneirasII" type="text" style="width: 20%" />
-					</div>
-					<div class="bloco_botoes">
-						<input type="button" id="botaoInserirII" title="Inserir Imp. Importação do Produto" value="" class="botaoInserir"/>
-						<input type="button" id="botaoLimparII" title="Limpar Imp. Importação do Produto" value="" class="botaoLimpar"/>
-					</div>
-				</fieldset>
-				</div>
-			</fieldset>
 		</fieldset>	
 		
 		<fieldset id="bloco_transporte">

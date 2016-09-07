@@ -122,8 +122,8 @@ public class EmissaoNFeController extends AbstractController {
             }
 
             formatarDatas(nf, false);
-            nFeService.emitirNFe(new NFe(nf), idPedido);
-            redirecTo(this.getClass()).emissaoNFeHome();
+
+            redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(new NFe(nf), idPedido));
         } catch (BusinessException e) {
             try {
                 formatarDatas(nf, true);

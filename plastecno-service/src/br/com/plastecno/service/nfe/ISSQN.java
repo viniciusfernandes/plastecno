@@ -32,8 +32,7 @@ public class ISSQN {
 	private Double valorBC;
 
 	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC
-				* (aliquota / 100d) : 0;
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
 	}
 
 	public ISSQN carregarValoresAliquotas() {
@@ -68,7 +67,7 @@ public class ISSQN {
 
 	@XmlTransient
 	public Double getValorBC() {
-		return valorBC;
+		return valorBC == null ? 0 : valorBC;
 	}
 
 	public void setAliquota(Double aliquota) {

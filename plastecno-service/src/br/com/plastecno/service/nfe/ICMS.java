@@ -5,11 +5,11 @@ import java.lang.reflect.Field;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
-import br.com.plastecno.service.validacao.Validavel;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-public class ICMS implements Validavel {
+@InformacaoValidavel
+public class ICMS {
 	@XmlElement(name = "ICMS00")
 	private ICMSGeral icms00;
 
@@ -37,12 +37,41 @@ public class ICMS implements Validavel {
 	@XmlElement(name = "ICMS90")
 	private ICMSGeral icms90;
 
+	@XmlElement(name = "ICMSPart")
+	private ICMSGeral icmsPART;
+
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo ICMS")
 	@XmlTransient
 	private ICMSGeral tipoIcms;
 
 	@XmlTransient
 	public ICMSGeral getTipoIcms() {
+		if (tipoIcms == null) {
+			recuperarTipoIcms();
+		}
 		return tipoIcms;
+	}
+
+	private void recuperarTipoIcms() {
+		Field[] campos = this.getClass().getDeclaredFields();
+		Object conteudo = null;
+		for (Field campo : campos) {
+			campo.setAccessible(true);
+			try {
+				if ((conteudo = campo.get(this)) == null) {
+					campo.setAccessible(false);
+					continue;
+				}
+
+				setTipoIcms((ICMSGeral) conteudo);
+
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Nao foi possivel gerar o tipo de ICMS a partir do xml do servidor",
+						e);
+			} finally {
+				campo.setAccessible(false);
+			}
+		}
 	}
 
 	/*
@@ -54,28 +83,22 @@ public class ICMS implements Validavel {
 		}
 		Field campo = null;
 		try {
-			TipoTributacaoICMS tribut = tipoIcms.getTipoTributacao();
-			campo = this.getClass().getDeclaredField(
-					"icms" + (tribut != null ? tribut.getCodigo() : null));
-			campo.setAccessible(true);
-			campo.set(this, tipoIcms);
+			TipoTributacaoICMS t = tipoIcms.getTipoTributacao();
+			if (t != null) {
+				campo = this.getClass().getDeclaredField("icms" + t.getCodigo());
+				campo.setAccessible(true);
+				campo.set(this, tipoIcms);
+				this.tipoIcms = tipoIcms;
+			} else {
+				this.tipoIcms = null;
+			}
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"Falha no atribuicao dos valores do ICMS com o tipo de tributacao \""
-							+ tipoIcms.getTipoTributacao() + "\"", e);
+			throw new RuntimeException("Falha no atribuicao dos valores do ICMS com o tipo de tributacao \""
+					+ tipoIcms.getTipoTributacao() + "\"", e);
 		} finally {
 			if (campo != null) {
 				campo.setAccessible(false);
 			}
-			this.tipoIcms = tipoIcms;
 		}
-	}
-
-	@Override
-	public void validar() throws BusinessException {
-		if (tipoIcms == null) {
-			throw new BusinessException("Tipo de ICMS é obrigatório");
-		}
-		tipoIcms.validar();
 	}
 }

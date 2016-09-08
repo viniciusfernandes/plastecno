@@ -1,14 +1,26 @@
 package br.com.plastecno.service.nfe;
 
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_1;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_2;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_3;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_4;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_6;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_7;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_8;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_9;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_99;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_ST;
+
+import java.lang.reflect.Field;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.*;
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
-import br.com.plastecno.service.validacao.Validavel;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-public class PIS implements Validavel {
+@InformacaoValidavel
+public class PIS {
 
 	@XmlElement(name = "PISAliq")
 	private PISGeral pisAliquota;
@@ -26,39 +38,62 @@ public class PIS implements Validavel {
 	private PISGeral pisST;
 
 	@XmlTransient
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo PIS")
 	private PISGeral tipoPis;
 
+	@XmlTransient
 	public PISGeral getTipoPis() {
+		if (tipoPis == null) {
+			recuperarTipoPis();
+		}
 		return tipoPis;
+	}
+
+	private void recuperarTipoPis() {
+		Field[] campos = this.getClass().getDeclaredFields();
+		Object conteudo = null;
+		for (Field campo : campos) {
+			campo.setAccessible(true);
+			try {
+				if ((conteudo = campo.get(this)) == null) {
+					campo.setAccessible(false);
+					continue;
+				}
+
+				setTipoPis((PISGeral) conteudo);
+
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Nao foi possivel gerar o tipo de PIS a partir do xml do servidor",
+						e);
+			} finally {
+				campo.setAccessible(false);
+			}
+		}
 	}
 
 	public void setTipoPis(PISGeral tipoPis) {
 		if (tipoPis == null) {
+			this.tipoPis = null;
 			return;
 		}
 
-		TipoTributacaoPIS tribut = tipoPis.getTipoTributacao();
-		if (PIS_1.equals(tribut) || PIS_2.equals(tribut)) {
+		TipoTributacaoPIS t = tipoPis.getTipoTributacao();
+		if (t == null) {
+			this.tipoPis = null;
+			return;
+		}
+
+		if (PIS_1.equals(t) || PIS_2.equals(t)) {
 			this.pisAliquota = tipoPis;
-		} else if (PIS_3.equals(tribut)) {
+		} else if (PIS_3.equals(t)) {
 			this.pisQuantidade = tipoPis;
-		} else if (PIS_4.equals(tribut) || PIS_6.equals(tribut)
-				|| PIS_7.equals(tribut) || PIS_8.equals(tribut)
-				|| PIS_9.equals(tribut)) {
+		} else if (PIS_4.equals(t) || PIS_6.equals(t) || PIS_7.equals(t) || PIS_8.equals(t) || PIS_9.equals(t)) {
 			this.pisNaoTributado = tipoPis;
-		} else if (PIS_99.equals(tribut)) {
+		} else if (PIS_99.equals(t)) {
 			this.pisOutrasOperacoes = tipoPis;
-		} else if (PIS_ST.equals(tribut)) {
+		} else if (PIS_ST.equals(t)) {
 			this.pisST = tipoPis;
 		}
 		this.tipoPis = tipoPis;
-	}
-
-	public void validar() throws BusinessException {
-		if (tipoPis == null) {
-			throw new BusinessException("Tipo de PIS é obrigatório");
-		}
-
-		tipoPis.validar();
 	}
 }

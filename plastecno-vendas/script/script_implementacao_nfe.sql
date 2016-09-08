@@ -10,3 +10,7 @@ create table vendas.tb_pedido_nfe (
 	xml_nfe text not null
 );
 ALTER TABLE vendas.tb_pedido_nfe ADD PRIMARY KEY (id_pedido);
+
+insert into vendas.tb_configuracao_sistema (parametro, valor) values ('DIRETORIO_XML_NFE', 'C:\\Users\\vinicius\\AppData\\Local\\Temp');
+insert into vendas.tb_configuracao_sistema (parametro, valor) values ('CNAE', '4689399');
+

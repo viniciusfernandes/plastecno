@@ -41,8 +41,7 @@ public class EntidadeValidacao {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = true, nomeExibicao = "Quantidade")
 	private Integer quantidade;
 
-	@InformacaoValidavel(trim = true, obrigatorio = false, intervaloComprimento = {
-			1, 10 }, nomeExibicao = "Razão Social")
+	@InformacaoValidavel(trim = true, obrigatorio = false, intervaloComprimento = { 1, 10 }, nomeExibicao = "Razão Social")
 	private String razaoSocial;
 
 	@InformacaoValidavel(obrigatorio = true, tamanho = 4, nomeExibicao = "Senha")
@@ -53,6 +52,9 @@ public class EntidadeValidacao {
 
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1.11, 90 }, nomeExibicao = "Tarifa limite")
 	private Double tarifaLimite;
+
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Tipo da entidade")
+	private EntidadeValidacaoTipo tipoEntidade;
 
 	public void addFilho(EntidadeValidacaoSimples filho) {
 		listaFilho.add(filho);
@@ -118,6 +120,10 @@ public class EntidadeValidacao {
 		return tarifaLimite;
 	}
 
+	public EntidadeValidacaoTipo getTipoEntidade() {
+		return tipoEntidade;
+	}
+
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
@@ -176,6 +182,10 @@ public class EntidadeValidacao {
 
 	public void setTarifaLimite(Double tarifaLimite) {
 		this.tarifaLimite = tarifaLimite;
+	}
+
+	public void setTipoEntidade(EntidadeValidacaoTipo tipoEntidade) {
+		this.tipoEntidade = tipoEntidade;
 	}
 
 }

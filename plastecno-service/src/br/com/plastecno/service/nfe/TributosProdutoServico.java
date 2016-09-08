@@ -7,11 +7,11 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class TributosProdutoServico {
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "COFINS do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "COFINS do produtos/serviços")
 	@XmlElement(name = "COFINS")
 	private COFINS cofins;
 
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "ICMS do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "ICMS do produtos/serviços")
 	@XmlElement(name = "ICMS")
 	private ICMS icms;
 
@@ -22,7 +22,7 @@ public class TributosProdutoServico {
 	@XmlElement(name = "infAdProd")
 	private String informacaoAdicional;
 
-	@InformacaoValidavel(nomeExibicao = "IPI do produtos/serviços")
+	@InformacaoValidavel(cascata = true, nomeExibicao = "IPI do produtos/serviços")
 	@XmlElement(name = "IPI")
 	private IPI ipi;
 
@@ -30,7 +30,7 @@ public class TributosProdutoServico {
 	@XmlElement(name = "ISSQN")
 	private ISSQN issqn;
 
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "PIS do produtos/serviços")
+	@InformacaoValidavel(cascata = true, obrigatorio = true, nomeExibicao = "PIS do produtos/serviços")
 	@XmlElement(name = "PIS")
 	private PIS pis;
 

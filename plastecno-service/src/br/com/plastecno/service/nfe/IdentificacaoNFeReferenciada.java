@@ -10,7 +10,7 @@ public class IdentificacaoNFeReferenciada {
 	@XmlElement(name = "AAMM")
 	private Integer anoMes;
 
-	@InformacaoValidavel(obrigatorio = true, tamanho = 14, nomeExibicao = "CNPJ emitente")
+	@InformacaoValidavel(obrigatorio = true, tamanho = 14, substituicao = { "\\D", "" }, nomeExibicao = "CNPJ emitente")
 	@XmlElement(name = "CNPJ")
 	private String cnpjEmitente;
 

@@ -1,27 +1,37 @@
 package br.com.plastecno.service.nfe;
 
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.IPI_00;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.IPI_49;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.IPI_50;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.IPI_99;
+
+import java.lang.reflect.Field;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
-import br.com.plastecno.service.validacao.Validavel;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoIPI.*;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-public class IPI implements Validavel {
+@InformacaoValidavel
+public class IPI {
 	@XmlElement(name = "cEnq")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Classe de enquadramento do IPI")
 	private String classeEnquadramento;
 
 	@XmlElement(name = "clEnq")
+	@InformacaoValidavel(tamanho = 5, nomeExibicao = "Classe de enquadramento de cigarros/bebidas do IPI")
 	private String classeEnquadramentoCigarrosBebidas;
 
 	@XmlElement(name = "CNPJProd")
+	@InformacaoValidavel(substituicao = "\\D", padrao = "\\d{14}", nomeExibicao = "CNPJ do produtor do IPI")
 	private String cnpjProdutor;
 
 	@XmlElement(name = "cEnq")
 	private String codigoEnquadramento;
 
 	@XmlElement(name = "cSelo")
+	@InformacaoValidavel(tamanho = 5, nomeExibicao = "Código do selo de controle do IPI")
 	private String codigoSeloControle;
 
 	@XmlElement(name = "IPINT")
@@ -34,6 +44,7 @@ public class IPI implements Validavel {
 	private Integer quantidadeSeloControle;
 
 	@XmlTransient
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo IPI")
 	private IPIGeral tipoIpi;
 
 	@XmlTransient
@@ -78,7 +89,32 @@ public class IPI implements Validavel {
 
 	@XmlTransient
 	public IPIGeral getTipoIpi() {
+		if (tipoIpi == null) {
+			recuperarTipoIpi();
+		}
 		return tipoIpi;
+	}
+
+	private void recuperarTipoIpi() {
+		Field[] campos = this.getClass().getDeclaredFields();
+		Object conteudo = null;
+		for (Field campo : campos) {
+			campo.setAccessible(true);
+			try {
+				if ((conteudo = campo.get(this)) == null) {
+					campo.setAccessible(false);
+					continue;
+				}
+
+				setTipoIpi((IPIGeral) conteudo);
+
+			} catch (Exception e) {
+				throw new IllegalArgumentException(
+						"Nao foi possivel recuperar o tipo de IPI a partir do xml do servidor", e);
+			} finally {
+				campo.setAccessible(false);
+			}
+		}
 	}
 
 	public void setClasseEnquadramento(String classeEnquadramento) {
@@ -118,11 +154,13 @@ public class IPI implements Validavel {
 	 */
 	public void setTipoIpi(IPIGeral tipoIpi) {
 		if (tipoIpi == null) {
+			this.tipoIpi = null;
 			return;
 
 		}
 		TipoTributacaoIPI t = tipoIpi.getTipoTributacao();
 		if (t == null) {
+			this.tipoIpi = null;
 			return;
 		}
 
@@ -132,28 +170,5 @@ public class IPI implements Validavel {
 			ipiNt = tipoIpi;
 		}
 		this.tipoIpi = tipoIpi;
-	}
-
-	public void validar() throws BusinessException {
-		if (tipoIpi == null) {
-			throw new BusinessException("Tipo IPI é obrigatório");
-		}
-
-		if (classeEnquadramentoCigarrosBebidas != null && classeEnquadramentoCigarrosBebidas.length() != 5) {
-			throw new BusinessException("Classe de enquadramento para cigarro e bebida do IPI deve ter tamanho 5");
-		}
-
-		if (cnpjProdutor != null && cnpjProdutor.length() != 14) {
-			throw new BusinessException("CNPJ do produto da mercadoria do IPI deve ter tamanho 14");
-		}
-
-		if (codigoSeloControle != null && codigoSeloControle.length() != 5) {
-			throw new BusinessException("Código do selo de controle do IPI deve ter o tamanho de 5");
-		}
-
-		if (classeEnquadramento != null) {
-			throw new BusinessException("Classe de enquadramento do IPI é obrigatório");
-		}
-
 	}
 }

@@ -1,7 +1,7 @@
 package br.com.plastecno.service.nfe.constante;
 
 public enum TipoTributacaoCOFINS {
-	COFINS_ST(" - Oper. Tributável BC = valor operação alíquota normal", " "), 
+	COFINS_ST("ST - Oper. Tributável BC = valor operação alíquota normal", "ST"), 
 	COFINS_1("1 - Oper. Tributável BC = valor operação alíquota normal", "1"), 
 	COFINS_2("2 - Oper. Tributável BC = valor operação alíquota diferenciada", "2"), 
 	COFINS_3("3 - Oper. Tributável BC = qtde vendida X alíquota por unid. produto", "3"), 

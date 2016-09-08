@@ -43,6 +43,7 @@ public class DadosNFe {
 	private IdentificacaoLocalGeral identificacaoLocalRetirada;
 
 	@XmlElement(name = "ide")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Dados de Identificação da NFe")
 	private IdentificacaoNFe identificacaoNFe;
 
 	@XmlElement(name = "compra")
@@ -70,6 +71,10 @@ public class DadosNFe {
 	@XmlAttribute(name = "versao")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Versão da NFe")
 	private final Double versao = 2.0d;
+
+	public boolean contemDuplicata() {
+		return cobrancaNFe != null && cobrancaNFe.contemDuplicata();
+	}
 
 	@XmlTransient
 	public CobrancaNFe getCobrancaNFe() {
@@ -141,6 +146,7 @@ public class DadosNFe {
 		return cobrancaNFe != null ? cobrancaNFe.getListaDuplicata() : null;
 	}
 
+	@XmlTransient
 	public List<DetalhamentoProdutoServicoNFe> getListaItem() {
 		return listaDetalhamentoProdutoServicoNFe;
 	}
@@ -183,23 +189,19 @@ public class DadosNFe {
 		this.id = id;
 	}
 
-	public void setIdentificacaoDestinatarioNFe(
-			IdentificacaoDestinatarioNFe identificacaoDestinatarioNFe) {
+	public void setIdentificacaoDestinatarioNFe(IdentificacaoDestinatarioNFe identificacaoDestinatarioNFe) {
 		this.identificacaoDestinatarioNFe = identificacaoDestinatarioNFe;
 	}
 
-	public void setIdentificacaoEmitenteNFe(
-			IdentificacaoEmitenteNFe identificacaoEmitenteNFe) {
+	public void setIdentificacaoEmitenteNFe(IdentificacaoEmitenteNFe identificacaoEmitenteNFe) {
 		this.identificacaoEmitenteNFe = identificacaoEmitenteNFe;
 	}
 
-	public void setIdentificacaoLocalEntrega(
-			IdentificacaoLocalGeral identificacaoLocalEntrega) {
+	public void setIdentificacaoLocalEntrega(IdentificacaoLocalGeral identificacaoLocalEntrega) {
 		this.identificacaoLocalEntrega = identificacaoLocalEntrega;
 	}
 
-	public void setIdentificacaoLocalRetirada(
-			IdentificacaoLocalGeral identificacaoLocalRetirada) {
+	public void setIdentificacaoLocalRetirada(IdentificacaoLocalGeral identificacaoLocalRetirada) {
 		this.identificacaoLocalRetirada = identificacaoLocalRetirada;
 	}
 
@@ -211,13 +213,11 @@ public class DadosNFe {
 		this.informacaoCompra = informacaoCompra;
 	}
 
-	public void setInformacaoExportacao(
-			InformacaoExportacao informacaoExportacao) {
+	public void setInformacaoExportacao(InformacaoExportacao informacaoExportacao) {
 		this.informacaoExportacao = informacaoExportacao;
 	}
 
-	public void setInformacoesAdicionaisNFe(
-			InformacoesAdicionaisNFe informacoesAdicionaisNFe) {
+	public void setInformacoesAdicionaisNFe(InformacoesAdicionaisNFe informacoesAdicionaisNFe) {
 		this.informacoesAdicionaisNFe = informacoesAdicionaisNFe;
 	}
 

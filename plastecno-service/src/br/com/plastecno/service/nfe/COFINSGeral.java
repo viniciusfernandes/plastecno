@@ -3,32 +3,41 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.*;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Código de situação tributária")
 public class COFINSGeral {
 	@XmlElement(name = "pCOFINS")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Alíquota COFINS", tiposNaoPermitidos = { "4", "6", "7",
+			"8", "9" })
 	private Double aliquota;
 
 	@XmlElement(name = "CST")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Código da situação tributária do COFINS")
 	private String codigoSituacaoTributaria;
 
 	@XmlElement(name = "qBCProd")
+	@InformacaoValidavel(tiposObrigatorios = { "3", "9", "ST" }, nomeExibicao = "Quantidade vendida do COFINS", tiposNaoPermitidos = {
+			"4", "6", "7", "8", "9" })
 	private Integer quantidadeVendida;
 
 	@XmlElement(name = "vCOFINS")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Valor COFINS", tiposNaoPermitidos = { "4", "6", "7", "8",
+			"9" })
 	private Double valor;
 
 	@XmlElement(name = "vAliqProd")
+	@InformacaoValidavel(tiposObrigatorios = { "3", "9", "ST" }, nomeExibicao = "Valor da alíquota do COFINS")
 	private Double valorAliquota;
 
 	@XmlElement(name = "vBC")
+	@InformacaoValidavel(tiposObrigatorios = { "1", "2", "99", "ST" }, nomeExibicao = "Valor da base de cáculo do COFINS", tiposNaoPermitidos = {
+			"4", "6", "7", "8", "9" })
 	private Double valorBC;
 
 	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC
-				* (aliquota / 100d) : 0;
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
 	}
 
 	public COFINSGeral carregarValoresAliquotas() {
@@ -93,54 +102,5 @@ public class COFINSGeral {
 
 	public void setValorBC(Double valorBC) {
 		this.valorBC = valorBC;
-	}
-
-	public void validar() throws BusinessException {
-		TipoTributacaoCOFINS t = getTipoTributacao();
-		if (t == null) {
-			throw new BusinessException(
-					"Situação tributária do COFINS é obrigatório");
-		}
-
-		// Nao tributaveis
-		if (COFINS_4.equals(t) || COFINS_6.equals(t) || COFINS_7.equals(t)
-				|| COFINS_8.equals(t) || COFINS_9.equals(t)) {
-
-			aliquota = null;
-			valor = null;
-			valorBC = null;
-			quantidadeVendida = null;
-
-			return;
-		}
-
-		if (aliquota == null) {
-			throw new BusinessException("Alíquota do COFINS é obrigatório");
-		}
-
-		if (valor == null) {
-			throw new BusinessException("Valor do COFINS é obrigatório");
-		}
-
-		if (valorBC == null
-				&& (COFINS_1.equals(t) || COFINS_2.equals(t)
-						|| COFINS_99.equals(t) || COFINS_ST.equals(t))) {
-			throw new BusinessException("Valor do BC do COFINS é obrigatório");
-		}
-
-		if (valorAliquota == null
-				&& (COFINS_3.equals(t) || COFINS_99.equals(t) || COFINS_ST
-						.equals(t))) {
-			throw new BusinessException(
-					"Valor alíquota do COFINS é obrigatório");
-		}
-
-		if (quantidadeVendida == null
-				&& (COFINS_3.equals(t) || COFINS_99.equals(t) || COFINS_ST
-						.equals(t))) {
-			throw new BusinessException(
-					"Quantidade vendida do COFINS é obrigatório");
-		}
-
 	}
 }

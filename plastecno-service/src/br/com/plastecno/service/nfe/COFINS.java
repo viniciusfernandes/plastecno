@@ -1,14 +1,27 @@
 package br.com.plastecno.service.nfe;
 
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_1;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_2;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_3;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_4;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_5;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_6;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_7;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_8;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_9;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_99;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_ST;
+
+import java.lang.reflect.Field;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.*;
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
-import br.com.plastecno.service.validacao.Validavel;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-public class COFINS implements Validavel {
+@InformacaoValidavel
+public class COFINS {
 	@XmlElement(name = "COFINSAliq")
 	private COFINSGeral cofinsAliquota;
 
@@ -25,39 +38,65 @@ public class COFINS implements Validavel {
 	private COFINSGeral cofinsST;
 
 	@XmlTransient
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo COFINS")
 	private COFINSGeral tipoCofins;
 
+	@XmlTransient
 	public COFINSGeral getTipoCofins() {
+		if (tipoCofins == null) {
+			recuperarTipoCofins();
+		}
 		return tipoCofins;
 	}
 
-	public void setTipoCofins(COFINSGeral tipoCofins) {
-		TipoTributacaoCOFINS tribut = tipoCofins.getTipoTributacao();
+	private void recuperarTipoCofins() {
+		Field[] campos = this.getClass().getDeclaredFields();
+		Object conteudo = null;
+		for (Field campo : campos) {
+			campo.setAccessible(true);
+			try {
+				if ((conteudo = campo.get(this)) == null) {
+					campo.setAccessible(false);
+					continue;
+				}
 
-		if (COFINS_1.equals(tribut) || COFINS_2.equals(tribut)) {
+				setTipoCofins((COFINSGeral) conteudo);
+
+			} catch (Exception e) {
+				throw new IllegalArgumentException(
+						"Nao foi possivel gerar o tipo de COFINS a partir do xml do servidor", e);
+			} finally {
+				campo.setAccessible(false);
+			}
+		}
+	}
+
+	public void setTipoCofins(COFINSGeral tipoCofins) {
+		if (tipoCofins == null) {
+			this.tipoCofins = null;
+			return;
+		}
+		TipoTributacaoCOFINS t = tipoCofins.getTipoTributacao();
+
+		if (t == null) {
+			this.tipoCofins = null;
+			return;
+		}
+
+		if (COFINS_1.equals(t) || COFINS_2.equals(t)) {
 			cofinsAliquota = tipoCofins;
-		} else if (COFINS_3.equals(tribut)) {
+		} else if (COFINS_3.equals(t)) {
 			cofinsQuantidade = tipoCofins;
-		} else if (COFINS_4.equals(tribut) || COFINS_6.equals(tribut)
-				|| COFINS_7.equals(tribut) || COFINS_8.equals(tribut)
-				|| COFINS_9.equals(tribut)) {
+		} else if (COFINS_4.equals(t) || COFINS_6.equals(t) || COFINS_7.equals(t) || COFINS_8.equals(t)
+				|| COFINS_9.equals(t)) {
 			cofinsNaoTributado = tipoCofins;
-		} else if (COFINS_5.equals(tribut)) {
+		} else if (COFINS_5.equals(t)) {
 			cofinsST = tipoCofins;
-		} else if (COFINS_99.equals(tribut)) {
+		} else if (COFINS_99.equals(t)) {
 			cofinsOutrasOperacoes = tipoCofins;
-		} else if (COFINS_ST.equals(tribut)) {
+		} else if (COFINS_ST.equals(t)) {
 			cofinsST = tipoCofins;
 		}
 		this.tipoCofins = tipoCofins;
-	}
-
-	@Override
-	public void validar() throws BusinessException {
-		if (tipoCofins == null) {
-			throw new BusinessException("Tipo de COFINS é obrigatório");
-		}
-
-		tipoCofins.validar();
 	}
 }

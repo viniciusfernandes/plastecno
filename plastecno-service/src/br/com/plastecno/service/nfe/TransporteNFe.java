@@ -17,9 +17,9 @@ public class TransporteNFe {
 	@XmlElement(name = "vol")
 	private List<VolumeTransportado> listaVolume;
 
-	@InformacaoValidavel(obrigatorio = true, valores = { 0, 1, 2, 9 }, nomeExibicao = "Modalidade do frete da transporte")
+	@InformacaoValidavel(obrigatorio = true, opcoes = { "0", "1", "2", "9" }, nomeExibicao = "Modalidade do frete da transporte")
 	@XmlElement(name = "modFrete")
-	private Integer modalidadeFrete;
+	private String modalidadeFrete;
 
 	@XmlElement(name = "retTransp")
 	private RetencaoICMSTransporteNFe retencaoICMS;
@@ -43,7 +43,7 @@ public class TransporteNFe {
 	}
 
 	@XmlTransient
-	public Integer getModalidadeFrete() {
+	public String getModalidadeFrete() {
 		return modalidadeFrete;
 	}
 
@@ -70,7 +70,7 @@ public class TransporteNFe {
 		this.listaVolume = listaVolume;
 	}
 
-	public void setModalidadeFrete(Integer modalidadeFrete) {
+	public void setModalidadeFrete(String modalidadeFrete) {
 		this.modalidadeFrete = modalidadeFrete;
 	}
 

@@ -17,6 +17,10 @@
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/edicao_tabela.js"/>"></script>
+
+
 
 <style type="text/css">
 fieldset .fieldsetInterno {
@@ -35,8 +39,16 @@ fieldset .fieldsetInterno legend {
 <script type="text/javascript">
 
 var numeroProdutoEdicao = null;
-
+var numeroImportacaoProduto = null;
+var tabelaDuplicataHandler = null;
+var editorTabelaImportacao = null;
+var editorTabelaAdicao = null;
+var editorTabelaExportacao = null;
 $(document).ready(function() {
+	scrollTo('${ancora}');
+	
+	tabelaDuplicataHandler = new BlocoTabelaHandler(null, 'Duplicata', 'tabela_duplicata', 'bloco_duplicata');
+	tabelaDuplicataHandler.setTotalColunas(4);
 	
 	$("#botaoPesquisaPedido").click(function() {
 		if(isEmpty($('#idPedido').val())){
@@ -45,11 +57,7 @@ $(document).ready(function() {
 		$('#formPesquisa #idPedidoPesquisa').val($('#idPedido').val());
 		$('#formPesquisa').submit();
 	});
-	
-	$("#botaoInserirDuplicata").click(function() {
-		inserirDuplicata();
-	});
-	
+
 	$("#botaoInserirVolume").click(function() {
 		inserirVolume();
 	});
@@ -76,7 +84,6 @@ $(document).ready(function() {
 				$(this).remove();
 			}
 		});
-		
 		$('#formEmissao').submit();
 	});
 	
@@ -124,6 +131,7 @@ $(document).ready(function() {
 		removerInputHidden(gerarJsonInfoProduto());
 		fecharBloco('bloco_info_adicionais_prod');
 		$('#bloco_info_adicionais_prod #infoAdicionaisProd').val('');
+		$('#bloco_info_adicionais_prod input:text').val('');
 	});
 	
 	$('#botaoLimparIPI').click(function(){
@@ -198,6 +206,10 @@ $(document).ready(function() {
 		'idCidade': 'cidadeEntrega', 'idUf': 'ufEntrega', 'idPais': ''});
 	
 	inserirMascaraData('dataVencimentoDuplicata');
+	inserirMascaraData('dataHoraEntradaSaida');
+	inserirMascaraData('dtImportProd');
+	inserirMascaraData('dataDesembImportProd');
+
 	inicializarFadeInBloco('bloco_icms');
 	inicializarFadeInBloco('bloco_ipi');
 	inicializarFadeInBloco('bloco_pis');
@@ -206,25 +218,201 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_iss');
 	inicializarFadeInBloco('bloco_tributos');
 	inicializarFadeInBloco('bloco_info_adicionais_prod');
-	
+	inicializarFadeInBloco('bloco_info_adicionais_nfe');
+	inicializarFadeInBloco('bloco_importacao_prod');
+	inicializarFadeInBloco('bloco_exportacao_prod');
+
 	inicializarFadeInBloco('bloco_local_mercadoria');
 	inicializarFadeInBloco('bloco_referenciada');
 	inicializarFadeInBloco('bloco_destinatario');
 	inicializarFadeInBloco('bloco_transporte');
 	inicializarFadeInBloco('bloco_exportacao');
-	inicializarFadeInBloco('bloco_compra');
 	
 	fecharBloco('bloco_local_mercadoria');
 	fecharBloco('bloco_referenciada');
 	fecharBloco('bloco_destinatario');
 	fecharBloco('bloco_transporte');
 	fecharBloco('bloco_exportacao');
-	fecharBloco('bloco_compra');
 	
 	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
 	$('#bloco_tributos').fadeOut('fast');
 	$('#bloco_info_adicionais_prod').fadeOut('fast');
+	$('#bloco_importacao_prod').fadeOut('fast');
+	$('#bloco_exportacao_prod').fadeOut('fast');
+
+	inicializarBlocoDuplicata();
+	inicializarTabelaImportacaoProd();
+	inicializarTabelaAdicaoImportacao();
+	inicializarTabelaExportacaoProd();
 });
+
+function gerarIdCamposImportacaoProd(){
+	return ['cnpjImportProd', 'exportadorImportProd', 'dtImportProd', 'dataDesembImportProd',
+	          'lcImportProd', 'numImportProd', 'tpImportProd', 'tpTranspImportProd', 'ufDesembImportProd',
+	          'ufEncomendImportProd', 'vlAFRMMImportProd'];
+};
+
+function inicializarTabelaImportacaoProd(){
+	var config = {'idTabela': 'tabela_importacao_prod', 'idBotaoInserir':'botaoInserirImportacaoProd',
+			'campos': gerarIdCamposImportacaoProd(),
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return numeroProdutoEdicao != null;
+			},
+			'onInserir': function(linha){
+				if(numeroProdutoEdicao == null || linha == null){
+					return;
+				}
+				
+				var celulas = linha.cells;
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+linha.id+']', 
+					  'campos':[{'nome':'cnpjEncomendante', 'valor':celulas[0].innerHTML},
+					            {'nome':'codigoExportador', 'valor':celulas[1].innerHTML},
+					            {'nome':'dataImportacao', 'valor':celulas[2].innerHTML},
+					            {'nome':'dataDesembaraco', 'valor':celulas[3].innerHTML},
+					            {'nome':'localDesembaraco', 'valor':celulas[4].innerHTML},
+					            {'nome':'numero', 'valor':celulas[5].innerHTML},
+					            {'nome':'tipoIntermediacao', 'valor':celulas[6].innerHTML},
+					            {'nome':'tipoTransporteInternacional', 'valor':celulas[7].innerHTML},
+					            {'nome':'ufDesembaraco', 'valor':celulas[8].innerHTML},
+					            {'nome':'ufEncomendante', 'valor':celulas[9].innerHTML},
+					            {'nome':'valorAFRMM', 'valor':celulas[10].innerHTML}]};
+					
+				gerarInputHidden(json);
+			 },
+			 'onEditar': function(linha){
+				 numeroImportacaoProduto = linha.id;
+				 recuperarAdicaoImportacao();
+				 $('#bloco_adicao_import').fadeIn('fast');
+			 },
+			'onRemover': function(linha){
+				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+linha.id+"]']").each(function(i){
+					$(this).remove();
+				});
+				 $('#bloco_adicao_import').fadeOut('fast');
+			}};
+	
+	editorTabelaImportacao  = new editarTabela(config);
+};
+
+function inicializarTabelaAdicaoImportacao(){
+	var ids = ['codFabricAdicao', 'numAdicao', 'numDrawbackAdicao', 'numSeqAdicao', 'valDescAdicao'];
+	var config = {'idTabela': 'tabela_adicao_import', 'idBotaoInserir':'botaoInserirAdicao',
+			'campos':ids,
+			'idLinhaSequencial': true,
+			'onInserir': function(linha){
+				if(numeroProdutoEdicao == null || numeroImportacaoProduto == null || linha == null){
+					return;
+				}
+				
+				var celulas = linha.cells;
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+numeroImportacaoProduto+'].listaAdicao['+linha.id+']', 
+					  'campos':[{'nome':'codigoFabricante', 'valor':celulas[0].innerHTML},
+					            {'nome':'numero', 'valor':celulas[1].innerHTML},
+					            {'nome':'numeroDrawback', 'valor':celulas[2].innerHTML},
+					            {'nome':'numeroSequencialItem', 'valor':celulas[3].innerHTML},
+					            {'nome':'valorDesconto', 'valor':celulas[4].innerHTML}
+					            ]};
+					
+				gerarInputHidden(json);
+			 },
+			 'onRemover': function(linha){
+					$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+numeroImportacaoProduto+"].listaAdicao["+linha.id+"]']").each(function(i){
+						$(this).remove();
+					});	
+			 }};
+	
+	editorTabelaAdicao = new editarTabela(config);
+};
+
+function inicializarTabelaExportacaoProd(){
+	var config = {'idTabela': 'tabela_exportacao_prod', 'idBotaoInserir':'botaoInserirExportacaoProd',
+			'campos': ['drawbackExportProd', 'chAcessoExportIndir', 'registroExportIndir', 'qtdeExportIndir'],
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return numeroProdutoEdicao != null;
+			},
+			'onInserir': function(linha){
+				if(numeroProdutoEdicao == null || linha == null){
+					return;
+				}
+				
+				var celulas = linha.cells;
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaExportacao['+linha.id+']', 
+					  'campos':[{'nome':'numeroDrawback', 'valor':celulas[0].innerHTML},
+					            {'nome':'expIndireta.chaveAcessoRecebida', 'valor':celulas[1].innerHTML},
+					            {'nome':'expIndireta.numeroRegistro', 'valor':celulas[2].innerHTML},
+					            {'nome':'expIndireta.quantidadeItem', 'valor':celulas[3].innerHTML},
+								]};
+					
+				gerarInputHidden(json);
+			 },
+			'onRemover': function(linha){
+				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaExportacao["+linha.id+"]']").each(function(i){
+					$(this).remove();
+				});
+			}};
+	
+	editorTabelaExportacao = new editarTabela(config);
+};
+
+function removerDuplicata(botao) {
+	tabelaDuplicataHandler.removerRegistro(botao);
+};
+
+function editarDuplicata(botao){
+	tabelaDuplicataHandler.editar(botao);
+};
+
+function inicializarBlocoDuplicata(){
+	
+	tabelaDuplicataHandler.incluirRegistro(function (ehEdicao, linha){
+		var celula = null;
+		var doc = document;
+		
+		for (var i = 0; i < this.TOTAL_COLUNAS; i++) {
+			celula = ehEdicao ? linha.cells[i] : linha.insertCell(i); 
+			switch (i) {
+				case 0:
+					celula.style.display = 'none';
+					break;	
+				case 1:
+					celula.innerHTML = $('#bloco_duplicata #numeroDuplicata').val();
+					break;
+				case 2:
+					celula.innerHTML = $('#bloco_duplicata #dataVencimentoDuplicata').val();
+					break;
+				case 3:
+					celula.innerHTML = $('#bloco_duplicata #valorDuplicata').val();
+					break;
+			}
+		}
+	});
+	
+	tabelaDuplicataHandler.editarRegistro(function(linha){
+		
+		var celula = null;
+		var doc = document;
+		
+		for (var i = 0; i < this.TOTAL_COLUNAS; i++) {
+			celula =  linha.cells[i];
+			
+			if (!isEmpty(celula.innerHTML)) {
+				switch (i) {
+					case 1:
+						doc.getElementById('numeroDuplicata').value = celula.innerHTML;
+						break;
+					case 2:
+						doc.getElementById('dataVencimentoDuplicata').value = celula.innerHTML;
+						break;
+					case 3:
+						doc.getElementById('valorDuplicata').value = celula.innerHTML;
+						break;
+				}
+			}
+		}
+	});
+};
 
 function gerarInputLinhasTabela(nomeTabela, parametroJson){
 	var tabela = document.getElementById(nomeTabela);
@@ -243,9 +431,8 @@ function gerarInputLinhasTabela(nomeTabela, parametroJson){
 		<%-- devemos excluir a ultima celula da tabela pois eh a celula de botoes de acoes --%>
 		max = celulas.length - 1;
 		for (var j= 0; j < max; j++) {
-			campos[j] = {'nome':parametroJson.nomes[j], 'valor':celulas[j].innerHTML};
+			campos[j] = {'nome':parametroJson.nomes[j] == null?'':parametroJson.nomes[j], 'valor':celulas[j].innerHTML};
 		}
-		
 		gerarInputHidden({'nomeObjeto': parametroJson.nomeLista+'['+i+']', 'campos':campos});
 	}
 };
@@ -270,7 +457,7 @@ function abrirBloco(nomeBloco){
 function fecharBloco(nomeBloco){
 	gerarLegendaBloco(nomeBloco);
 	<%-- Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn --%>
-	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table').fadeOut('fast');
+	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table, #'+nomeBloco+' .fieldsetInterno').fadeOut('fast');
 };
 
 function inicializarLegendaBlocoProduto(nomeBloco){
@@ -314,7 +501,7 @@ function gerarInputHidden(objeto){
 	for (var i = 0; i < campos.length; i++) {
 		nome = objeto.nomeObjeto +'.'+campos[i].nome;
 		<%-- Devemos verificar  se o input ja foi criado pelo usuario, caso nao existe devemos cria-lo--%>
-		if((input = document.getElementById(nome)) == undefined){
+		if((input = document.getElementById(nome)) == undefined || input == null){
 			input = document.createElement('input');
 			input.type = 'hidden';
 			input.name = nome;
@@ -403,7 +590,11 @@ function gerarJsonImpostoImportacao(){
 
 function gerarJsonInfoProduto(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+']',
-		'campos':[{'nome':'informacoesAdicionais', 'id':'infoAdicionaisProd'}]};
+		'campos':[{'nome':'informacoesAdicionais', 'id':'infoAdicionaisProd'}, 
+		          {'nome': 'produtoServicoNFe.outrasDespesasAcessorias', 'id':'despesasAcessoriasProd'},
+		          {'nome': 'numeroPedidoCompra', 'id':'numeroPedidoCompraProd'},
+		          {'nome': 'itemPedidoCompra', 'id':'itemPedidoCompraProd'},
+		          {'nome': 'fichaConteudoImportacao', 'id':'fciProd'}]};
 };
 
 function gerarJsonTipoPis(){
@@ -413,6 +604,158 @@ function gerarJsonTipoPis(){
 		          {'nome':'quantidadeVendida', 'id':'qtdeVendidaPIS'},
 		          {'nome':'valorBC', 'id':'valorBCPIS'}
 			]};
+};
+
+function recuperarImportacaoProduto(){
+	// limpando a tabela toda
+	$("#tabela_importacao_prod tbody tr").remove();
+	var id = null;
+	var nome = null;
+	var valor = null;
+	var total = 11;
+	
+	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao']").each(function(){
+		nome = $(this).attr('name');
+		if(nome.split('.').length == 4){
+			if(id == null){
+				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+				id = nome.match(/\d+/g)[1];
+			}
+			nome = nome.substring(nome.lastIndexOf('.')+1);
+		 	valor = $(this).val();
+		 	
+			if(nome == 'cnpjEncomendante'){
+				$('#bloco_importacao_prod #cnpjImportProd').val(valor);
+				total--;
+			} else if(nome == 'codigoExportador'){
+				$('#bloco_importacao_prod #exportadorImportProd').val(valor);
+				total--;
+			} else if(nome == 'dataImportacao'){
+				$('#bloco_importacao_prod #dtImportProd').val(valor);
+				total--;
+			} else if(nome == 'dataDesembaraco'){
+				$('#bloco_importacao_prod #dataDesembImportProd').val(valor);
+				total--;
+			} else if(nome == 'localDesembaraco'){
+				$('#bloco_importacao_prod #lcImportProd').val(valor);
+				total--;
+			} else if(nome == 'numero'){
+				$('#bloco_importacao_prod #numImportProd').val(valor);
+				total--;
+			} else if(nome == 'tipoIntermediacao'){
+				$('#bloco_importacao_prod #tpImportProd').val(valor);
+				total--;
+			} else if(nome == 'tipoTransporteInternacional'){
+				$('#bloco_importacao_prod #tpTranspImportProd').val(valor);
+				total--;
+			} else if(nome == 'ufDesembaraco'){
+				$('#bloco_importacao_prod #ufDesembImportProd').val(valor);
+				total--;
+			} else if(nome == 'ufEncomendante'){
+				$('#bloco_importacao_prod #ufEncomendImportProd').val(valor);
+				total--;
+			} else if(nome == 'valorAFRMM'){
+				$('#bloco_importacao_prod #vlAFRMMImportProd').val(valor);
+				total--;
+			}
+			
+			if(total <= 0) {
+				editorTabelaImportacao.inserirLinha(id);
+				total = 11;
+				id = null;
+			}
+		}
+	});
+	
+};
+
+function recuperarAdicaoImportacao(){
+	// limpando a tabela toda
+	$("#tabela_adicao_import tbody tr").remove(); 
+	
+	var id = null;
+	var nome = null;
+	var valor = null;
+	var total = 5;
+	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+numeroImportacaoProduto+"].listaAdicao']").each(function(){
+		nome = $(this).attr('name');
+		if(nome.split('.').length == 5){
+			if(id == null){
+				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+				id = nome.match(/\d+/g)[2];
+			}
+			nome = nome.substring(nome.lastIndexOf('.')+1);
+		 	valor = $(this).val();
+		 	
+			if(nome == 'codigoFabricante'){
+				$('#bloco_importacao_prod #codFabricAdicao').val(valor);
+				total--;
+			} else if(nome == 'numero'){
+				$('#bloco_importacao_prod #numAdicao').val(valor);
+				total--;
+			} else if(nome == 'numeroDrawback'){
+				$('#bloco_importacao_prod #numDrawbackAdicao').val(valor);
+				total--;
+			} else if(nome == 'numeroSequencialItem'){
+				$('#bloco_importacao_prod #numSeqAdicao').val(valor);
+				total--;
+			} else if(nome == 'valorDesconto'){
+				$('#bloco_importacao_prod #valDescAdicao').val(valor);
+				total--;
+			}
+			
+			if(total <= 0) {
+				editorTabelaAdicao.inserirLinha(id);
+				total = 5;
+				id = null;
+			}
+		}
+	});
+};
+
+function recuperarExportacaoProduto(){
+	// limpando a tabela toda
+	$("#tabela_exportacao_prod tbody tr").remove(); 
+	
+	var id = null;
+	var nome = null;
+	var total = 4;
+	var indice = -1;
+	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaExportacao']").each(function(){
+		nome = $(this).attr('name');
+		indice = nome.split('.').length;
+		
+		if(indice == 4){
+			nome = nome.substring(nome.lastIndexOf('.')+1);
+			if(nome == 'numeroDrawback'){
+				$('#bloco_exportacao_prod #drawbackExportProd').val($(this).val());
+				total--;
+			} 
+		}else if(indice == 5){
+			if(id == null){
+				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
+				id = nome.match(/\d+/g)[1];
+			}
+			nome = nome.substring(nome.lastIndexOf('.')+1);
+		 	
+			if(nome == 'chaveAcessoRecebida'){
+				$('#bloco_exportacao_prod #chAcessoExportIndir').val($(this).val());
+				total--;
+			} else if(nome == 'numeroRegistro'){
+				$('#bloco_exportacao_prod #registroExportIndir').val($(this).val());
+				total--;
+			} else if(nome == 'quantidadeItem'){
+				$('#bloco_exportacao_prod #qtdeExportIndir').val($(this).val());
+				total--;
+			}
+		}
+		
+		if(total <= 0) {
+			editorTabelaExportacao.inserirLinha(id);
+			total = 4;
+			id = null;
+		}
+	});
 };
 
 function gerarInputICMS(){
@@ -451,17 +794,16 @@ function gerarInputImpostoImportacao(){
 	gerarInputHidden(gerarJsonImpostoImportacao());	
 };
 
-
 function gerarInputDuplicata(){
 	var parametros = {'nomeLista': 'nf.cobrancaNFe.listaDuplicata',
-			'nomes': ['numero', 'dataVencimento', 'valor']};
-	gerarInputLinhasTabela('tabela_duplicata', parametros)
+			'nomes': [null, 'numero', 'dataVencimento', 'valor']};
+	gerarInputLinhasTabela('tabela_duplicata', parametros);
 };
 
 function gerarInputReboque(){
 	var parametros = {'nomeLista': 'nf.transporteNFe.listaReboque',
 					'nomes': ['placa', 'uf', 'registroNacionalTransportador']};
-	gerarInputLinhasTabela('tabela_reboque', parametros)
+	gerarInputLinhasTabela('tabela_reboque', parametros);
 };
 
 function gerarInputReferenciada(){
@@ -516,26 +858,6 @@ function gerarInputProdutoServico(){
 	}
 };
 
-function inserirDuplicata(){
-	var numero = $('#bloco_duplicata #numeroDuplicata').val();
-	var vencimento = $('#bloco_duplicata #dataVencimentoDuplicata').val();
-	var valor = $('#bloco_duplicata #valorDuplicata').val();
-	
-	if(isEmpty(numero) || isEmpty(vencimento) || isEmpty(valor)){
-		return;
-	}
-	
-	var tabela = document.getElementById('tabela_duplicata');
-	var linha = tabela.tBodies[0].insertRow(0);
-	
-	linha.insertCell(0).innerHTML = numero;
-	linha.insertCell(1).innerHTML = vencimento;
-	linha.insertCell(2).innerHTML = valor;
-	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
-	
-	$('#bloco_duplicata input:text').val('');
-};
-
 function inserirVolume(){
 	var quantidade = $('#bloco_volume #quantidadeVolume').val();
 	var especie = $('#bloco_volume #especieVolume').val();
@@ -564,9 +886,9 @@ function inserirVolume(){
 };
 
 function inserirReboque(){
-	var placa = $('#bloco_reboque #placaReboque').val();
-	var uf = $('#bloco_reboque #ufReboque').val();
-	var registro = $('#bloco_reboque #registroReboque').val();
+	var placa = $('#bloco_veiculo #placaVeiculo').val();
+	var uf = $('#bloco_veiculo #ufVeiculo').val();
+	var registro = $('#bloco_veiculo #registroVeiculo').val();
 
 	if(isEmpty(placa) || isEmpty(uf)){
 		return;
@@ -580,7 +902,7 @@ function inserirReboque(){
 	linha.insertCell(2).innerHTML = registro;
 	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Reboque" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
 	
-	$('#bloco_reboque input:text').val('');
+	$('#bloco_veiculo input:text').val('');
 };
 
 function inserirLinhaTabela(linhaJson){
@@ -622,7 +944,6 @@ function removerLinhaTabela(botao){
 	 var tabela = $(botao).closest("table")[0];
 	 tabela.deleteRow(linha.rowIndex);
 };
-
 
 function inicializarFiltro() {
 	$("#filtroSigla").val($("#sigla").val());
@@ -722,7 +1043,19 @@ function inicializarBotaoPesquisarCEP(config){
 	
 };
 
-function editarTributos(linha){
+function inicializarOpcoesSelect(json){
+	var campos = json.campos;
+	var opcao = null;
+	for (var i = 0; i < campos.length; i++) {
+		if(campos[i].idBloco != undefined){
+			opcao = "#"+campos[i].idBloco;
+		}
+		opcao = " #"+campos[i].idCampo + " option[value="+campos[i].opcao+"]";
+		$(opcao).attr('selected','selected');
+	}
+};
+
+function editarProduto(linha){
 	var celulas = linha.cells;
 	<%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
 	numeroProdutoEdicao = celulas[0].innerHTML;
@@ -744,8 +1077,13 @@ function editarTributos(linha){
 	
 	recuperarValoresImpostos(valoresTabela);
 	
+	recuperarImportacaoProduto();
+	recuperarExportacaoProduto();
+	
 	$('#bloco_tributos').fadeIn('fast');
 	$('#bloco_info_adicionais_prod').fadeIn('fast');
+	$('#bloco_importacao_prod').fadeIn('fast');
+	$('#bloco_exportacao_prod').fadeIn('fast');
 	
 	inicializarLegendaBlocoProduto('bloco_icms');
 	inicializarLegendaBlocoProduto('bloco_ipi');
@@ -755,6 +1093,25 @@ function editarTributos(linha){
 	inicializarLegendaBlocoProduto('bloco_iss');
 	inicializarLegendaBlocoProduto('bloco_tributos');
 	inicializarLegendaBlocoProduto('bloco_info_adicionais_prod');
+	inicializarLegendaBlocoProduto('bloco_importacao_prod');
+	inicializarLegendaBlocoProduto('bloco_exportacao_prod');
+
+	
+	fecharBloco('bloco_ipi');
+	fecharBloco('bloco_ii');
+	fecharBloco('bloco_iss');
+	fecharBloco('bloco_importacao_prod');
+	fecharBloco('bloco_exportacao_prod');
+	
+	var opcoes = {'campos':
+		[{'idBloco': 'bloco_tributos', 'idCampo': 'cfop', 'opcao': '5102'},
+		 {'idBloco': 'bloco_tributos', 'idCampo': 'tipoTributacaoICMS', 'opcao': '00'},
+		 {'idBloco': 'bloco_tributos', 'idCampo': 'origemMercadoriaICMS', 'opcao': '0'},
+		 {'idBloco': 'bloco_tributos', 'idCampo': 'modBCICMS', 'opcao': '0'},
+		 {'idBloco': 'bloco_tributos', 'idCampo': 'codSitTribCOFINS', 'opcao': '1'},
+		 {'idBloco': 'bloco_tributos', 'idCampo': 'codSitTribPIS', 'opcao': '1'}]};
+	
+	inicializarOpcoesSelect(opcoes);
 };
 
 </script>
@@ -784,14 +1141,6 @@ function editarTributos(linha){
 			<%--div para dar o correto alinhamento dos campos no formulario. Nao teve outra alternativa--%>
 			<div class="input" style="width: 60%">
 			</div>
-			<%--div class="label">Regime:</div>
-			<div class="input" style="width: 80%">
-				<select name="nf.identificacaoEmitenteNFe.regimeTributario" style="width: 20%" >
-					<c:-ach var="tipo" items="${listaTipoRegimeTributacao}">
-						<option value="${tipo.codigo}">${tipo.descricao}</option>
-					</c:forEach>
-				</select>
-			</div --%>
 			<div class="label">Tipo Documento:</div>
 			<div class="input" style="width: 10%">
 				<select id="pedidoAssociado"   style="width: 100%">
@@ -833,38 +1182,82 @@ function editarTributos(linha){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Consumidor Final:</div>
+			<div class="label">Oper. Consum. Final:</div>
 			<div class="input" style="width: 20%">
-				<select id="pedidoAssociado" 
-					style="width: 50%" >
-					<option value=""></option>
-					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+				<select name="nf.identificacaoNFe.operacaoConsumidorFinal" style="width: 50%" >
+					<c:forEach var="tipo" items="${listaTipoOperacaoConsumidorFinal}">
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoOperacaoConsumidorSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Destino Operação:</div>
+			<div class="label">Tipo Operação:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado" 
-					style="width: 100%" >
-					<option value=""></option>
-					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+				<select name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
+					<c:forEach var="tipo" items="${listaTipoOperacao}">
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
+			</div>
+			<div class="label">Dest. Operação:</div>
+			<div class="input" style="width: 50%">
+				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 40%" >
+					<c:forEach var="tipo" items="${listaTipoDestinoOperacao}">
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoDestinoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label">Dt. Ent./Saída:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="dataHoraEntradaSaida" name="nf.identificacaoNFe.dataHoraEntradaSaidaProduto" value="${nf.identificacaoNFe.dataHoraEntradaSaidaProduto}" style="width: 100%"/>
 			</div>
 			<div class="label">Natureza Operação:</div>
 			<div class="input" style="width: 50%">
-				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 80%"/>
+				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 100%"/>
 			</div>
-			<div class="label">Info. Adicionais Fisco:</div>
-			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco}</textarea>
+			
+			<div class="divFieldset">
+			<fieldset id="bloco_destinatario" class="fieldsetInterno">
+				<legend>::: Destinatário ::: -</legend>
+				<div class="label">Razão Social/Nome:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}"  style="width: 60%"/>
+					<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
+				</div>
+				
+				<div class="label">CNPJ:</div>
+				<div class="input" style="width: 15%">
+					<input type="text" id="cnpj" name="nf.identificacaoDestinatarioNFe.cnpj"
+						value="${cliente.cnpj}"  />
+				</div>
+				<div class="label">Insc. Estadual:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" id="inscricaoEstadual"
+						name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
+						value="${cliente.inscricaoEstadual}"
+						style="width: 40%; text-align: right;" />
+				</div>
+				<div class="label">CPF:</div>
+				<div class="input" style="width: 15%">
+					<input type="text" id="cpf" name="nf.identificacaoDestinatarioNFe.cpf"
+						value="${cliente.cpf}"  />
+				</div>
+				<div class="label">Telefone:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="telefone" name="nf.identificacaoDestinatarioNFe.enderecoDestinatarioNFe.telefone"
+						value="${telefoneContatoPedido}" />
+				</div>
+				<div class="label">Email:</div>
+				<div class="input" style="width: 20%">
+					<input type="text" id="email" name="nf.identificacaoDestinatarioNFe.email"
+						value="${cliente.email}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
+				</div>
+				
+				<div class="divFieldset">
+				<jsp:include page="/bloco/bloco_logradouro.jsp"></jsp:include>
+				</div>
+			</fieldset>
 			</div>
-			<div class="label">Info. Adicionais Contrib.:</div>
-			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte}</textarea>
-			</div>
+			
 		</fieldset>
 		
 		<fieldset id="bloco_referenciada">
@@ -1029,47 +1422,6 @@ function editarTributos(linha){
 			</div>			
 		</fieldset>
 		
-		<fieldset id="bloco_destinatario">
-			<legend>::: Destinatário ::: -</legend>
-			<div class="label">Razão Social/Nome:</div>
-			<div class="input" style="width: 80%">
-				<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}"  style="width: 60%"/>
-				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
-			</div>
-			
-			<div class="label">CNPJ:</div>
-			<div class="input" style="width: 15%">
-				<input type="text" id="cnpj" name="nf.identificacaoDestinatarioNFe.cnpj"
-					value="${cliente.cnpj}"  />
-			</div>
-			<div class="label">Insc. Estadual:</div>
-			<div class="input" style="width: 40%">
-				<input type="text" id="inscricaoEstadual"
-					name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
-					value="${cliente.inscricaoEstadual}"
-					style="width: 40%; text-align: right;" />
-			</div>
-			<div class="label">CPF:</div>
-			<div class="input" style="width: 15%">
-				<input type="text" id="cpf" name="nf.identificacaoDestinatarioNFe.cpf"
-					value="${cliente.cpf}"  />
-			</div>
-			<div class="label">Telefone:</div>
-			<div class="input" style="width: 10%">
-				<input type="text" id="telefone" name="nf.identificacaoDestinatarioNFe.enderecoDestinatarioNFe.telefone"
-					value="${telefoneContatoPedido}" />
-			</div>
-			<div class="label">Email:</div>
-			<div class="input" style="width: 20%">
-				<input type="text" id="email" name="nf.identificacaoDestinatarioNFe.email"
-					value="${cliente.email}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
-			</div>
-			
-			<div class="divFieldset">
-			<jsp:include page="/bloco/bloco_logradouro.jsp"></jsp:include>
-			</div>
-		</fieldset>
-		
 		<fieldset>
 			<legend>::: Produtos e Serviços :::</legend>
 			
@@ -1107,7 +1459,7 @@ function editarTributos(linha){
 							<td>${item.aliquotaICMSFormatado}</td>
 							<td>${item.aliquotaIPIFormatado}</td>
 							<td>
-								<input type="button" value="" title="Editar Tributos" class="botaoDinheiroPequeno" onclick="editarTributos(this.parentNode.parentNode);"/>
+								<input type="button" value="" title="Editar Produto" class="botaoDinheiroPequeno" onclick="editarProduto(this.parentNode.parentNode);"/>
 							</td>
 							
 						</tr>
@@ -1117,6 +1469,22 @@ function editarTributos(linha){
 			
 			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
 				<legend>::: Info. Adicionais Prod. ::: +</legend>
+				<div class="label">Num. Ped. Compra:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="numeroPedidoCompraProd" style="width: 100%"/>
+				</div>
+				<div class="label">Item Ped. Compra.:</div>
+				<div class="input" style="width: 50%">
+					<input type="text" id="itemPedidoCompraProd" style="width: 20%"/>
+				</div>
+				<div class="label">Valor Desp. Acess.:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="despesasAcessoriasProd" style="width: 20%"/>
+				</div>
+				<div class="label">Núm. FCI:</div>
+				<div class="input areatexto" style="width: 70%">
+					<textarea id="fciProd" style="width: 50%"></textarea>
+				</div>
 				<div class="label">Info. Produto:</div>
 				<div class="input areatexto" style="width: 70%">
 					<textarea id="infoAdicionaisProd" style="width: 100%"></textarea>
@@ -1172,12 +1540,12 @@ function editarTributos(linha){
 						</select>
 					</div>
 					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="valorBCICMS" style="width: 20%" />
+					<div class="input" style="width: 20%">
+						<input type="text" id="valorBCICMS" style="width: 100%" />
 					</div>
 					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="aliquotaICMS" style="width: 100%" />
+					<div class="input" style="width: 40%">
+						<input type="text" id="aliquotaICMS" style="width: 20%" />
 					</div>
 					<div class="icms00 label">Modalidade ST:</div>
 					<div class="icms00 input" style="width: 70%">
@@ -1206,6 +1574,7 @@ function editarTributos(linha){
 					<div class="icms00 label">Mot. Desoneração:</div>
 					<div class="icms00 input" style="width: 36%">
 						<select id="motDesonerICMS" style="width: 100%" class="icms00 semprehabilitado">
+							<option value=""></option>
 							<c:forEach var="motivo" items="${listaTipoMotivoDesoneracao}">
 								<option value="${motivo.codigo}">${motivo.descricao}</option>
 							</c:forEach>
@@ -1284,6 +1653,7 @@ function editarTributos(linha){
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribIPI" style="width: 45%" >
+							<option value=""></option>
 							<c:forEach var="tipo" items="${listaTipoTributacaoIPI}">
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
 							</c:forEach>
@@ -1338,6 +1708,7 @@ function editarTributos(linha){
 					<div class="label">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribISS" style="width: 45%">
+							<option value=""></option>
 							<c:forEach var="tipo" items="${listaTipoTributacaoISS}">
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
 							</c:forEach>
@@ -1392,6 +1763,163 @@ function editarTributos(linha){
 				</fieldset>
 				</div>
 			</fieldset>
+			<fieldset id="bloco_importacao_prod" class="fieldsetInterno">
+				<legend>::: Importação ::: +</legend>
+				<div class="label">CNPJ:</div>
+				<div class="input" style="width: 20%">
+					<input type="text" id="cnpjImportProd" style="width: 100%"/>
+				</div>
+				<div class="label">Cód. Export.:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" id="exportadorImportProd" style="width: 50%"/>
+				</div>
+				<div class="label">Dt. Import.:</div>
+				<div class="input" style="width: 20%">
+					<input type="text" id="dtImportProd" style="width: 100%"/>
+				</div>
+				<div class="label">Dt. Desemb.:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" id="dataDesembImportProd" style="width: 50%"/>
+				</div>
+				<div class="label">Local:</div>
+				<div class="input" style="width: 20%">
+					<input type="text" id="lcImportProd" style="width: 100%"/>
+				</div>
+				<div class="label">Número:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" id="numImportProd" style="width: 50%"/>
+				</div>
+				<div class="label">Intermediação:</div>
+				<div class="input" style="width: 20%">
+					<input type="text" id="tpImportProd" style="width: 100%"/>
+				</div>
+				<div class="label">Transporte:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" id="tpTranspImportProd" style="width: 50%"/>
+				</div>
+				<div class="label">UF Desemb.:</div>
+				<div class="input" style="width: 20%">
+					<input type="text" id="ufDesembImportProd" style="width: 100%"/>
+				</div>
+				<div class="label">UF Encomendante:</div>
+				<div class="input" style="width: 40%">
+					<input type="text" id="ufEncomendImportProd" style="width: 50%"/>
+				</div>
+				<div class="label">Vl. AFRMM:</div>
+				<div class="input" style="width: 20%">
+					<input type="text" id="vlAFRMMImportProd" style="width: 100%"/>
+				</div>
+				
+				<div class="bloco_botoes">
+					<a id="botaoInserirImportacaoProd" title="Inserir Importação de Produto" class="botaoAdicionar"></a>
+				</div>
+				<table id="tabela_importacao_prod" class="listrada" >
+					<thead>
+						<tr>
+							<th>CNPJ</th>
+							<th>Cód. Export.</th>
+							<th>Dt. Import.</th>
+							<th>Dt. Desemb.</th>
+							<th>Local</th>
+							<th>Núm.</th>
+							<th>Intermed.</th>
+							<th>Transp.</th>
+							<th>UF Desemb.</th>
+							<th>UF Encomend.</th>
+							<th>Vl. AFRMM</th>
+							<th>Ações</th>
+						</tr>
+					</thead>
+					
+					<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+					<tbody>
+					</tbody>
+				</table>
+				<fieldset id="bloco_adicao_import" class="fieldsetInterno">
+					<legend>::: Adição de Importação :::</legend>
+					<div class="label">Cód. Fabric.:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="codFabricAdicao" style="width: 100%"/>
+					</div>
+					<div class="label">Núm.:</div>
+					<div class="input" style="width: 40%">
+						<input type="text" id="numAdicao" style="width: 50%"/>
+					</div>
+					<div class="label">Núm. Drawback:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="numDrawbackAdicao" style="width: 100%"/>
+					</div>
+					<div class="label">Núm. Sequenc.:</div>
+					<div class="input" style="width: 40%">
+						<input type="text" id="numSeqAdicao" style="width: 50%"/>
+					</div>
+					<div class="label">Vl. Desc.:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="valDescAdicao" style="width: 100%"/>
+					</div>
+					
+					<div class="bloco_botoes">
+						<a id="botaoInserirAdicao" title="Inserir Adição de Importação" class="botaoAdicionar"></a>
+					</div>
+									
+					<table id="tabela_adicao_import" class="listrada" >
+						<thead>
+							<tr>
+								<th>Fabric.</th>
+								<th>Núm.</th>
+								<th>Núm. Drawback</th>
+								<th>Núm. Sequenc.</th>
+								<th>Vl. Desc.</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						
+						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+						<tbody>
+						</tbody>
+					</table>
+				</fieldset>
+			</fieldset>
+			<fieldset id="bloco_exportacao_prod" class="fieldsetInterno">
+					<legend>::: Exportação ::: +</legend>
+					<div class="label">Drawback:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="drawbackExportProd" style="width: 100%"/>
+					</div>
+					<div class="label">Ch Acesso:</div>
+					<div class="input" style="width: 40%">
+						<input type="text" id="chAcessoExportIndir" style="width: 50%"/>
+					</div>
+					<div class="label">Registro:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="registroExportIndir" style="width: 100%"/>
+					</div>
+					<div class="label">Quantidade:</div>
+					<div class="input" style="width: 40%">
+						<input type="text" id="qtdeExportIndir" style="width: 50%"/>
+					</div>
+					
+					<div class="bloco_botoes">
+						<a id="botaoInserirExportacaoProd" title="Inserir Exportação do Produto" class="botaoAdicionar"></a>
+					</div>
+									
+					<table id="tabela_exportacao_prod" class="listrada">
+						<thead>
+							<tr>
+								<th>Drawback</th>
+								<th>Ch Acesso</th>
+								<th>Registro</th>
+								<th>Qutde.</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						
+						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+						<tbody>
+						</tbody>
+					</table>
+				</fieldset>
+			
 		</fieldset>	
 		
 		<fieldset id="bloco_transporte">
@@ -1440,38 +1968,20 @@ function editarTributos(linha){
 				</div>
 			
 				<div class="divFieldset">
-				<fieldset class="fieldsetInterno">
-					<legend>::: Veículo :::</legend>
+				<fieldset id="bloco_veiculo" class="fieldsetInterno">
+					<legend>::: Veículo/Reboque/Balsa/Vagão :::</legend>
 					<div  class="label">Placa:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.veiculo.placa" value="${nf.transporteNFe.veiculo.placa}" style="width: 100%" />
+						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa" value="${nf.transporteNFe.veiculo.placa}" style="width: 100%" />
 					</div>
 					<div  class="label">UF:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" style="width: 20%" />
+						<input type="text" id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" style="width: 20%" />
 					</div>
 					<div  class="label">Regist. Trans. Cargo:</div>
 					<div class="input" style="width: 30%">
-						<input type="text" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
+						<input type="text" id="registroVeiculo" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
 							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" style="width: 50%" />
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_reboque" class="fieldsetInterno">
-					<legend>::: Reboque :::</legend>
-					<div  class="label">Placa:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="placaReboque" style="width: 100%" />
-					</div>
-					<div  class="label">UF:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="ufReboque" style="width: 20%" />
-					</div>
-					<div  class="label">Regist. Trans. Cargo:</div>
-					<div class="input" style="width: 30%">
-						<input type="text" id="registroReboque" style="width: 50%" />
 					</div>
 					<div class="bloco_botoes">
 						<a id="botaoInserirReboque" title="Inserir Dados do Reboque" class="botaoAdicionar"></a>
@@ -1623,8 +2133,8 @@ function editarTributos(linha){
 					<input type="text" id="valorDuplicata"/>
 				</div>
 				<div class="bloco_botoes">
-					<a id="botaoInserirDuplicata" title="Inserir Dados da Duplicata" class="botaoAdicionar"></a>
-					<a id="botaoLimparDuplicata" title="Limpar Dados da Duplicata" class="botaoLimpar"></a>
+					<input type="button" id="botaoIncluirDuplicata" title="Inserir Dados da Duplicata" class="botaoAdicionar"/>
+					<input type="button" id="botaoLimparDuplicata" title="Limpar Dados da Duplicata" class="botaoLimpar"/>
 				</div>
 							
 				<table id="tabela_duplicata" class="listrada" >
@@ -1641,10 +2151,14 @@ function editarTributos(linha){
 					<tbody>
 						<c:forEach var="dup" items="${listaDuplicata}">
 							<tr>
+								<td style="display: none;"></td>
 								<td>${dup.numero}</td>
 								<td>${dup.dataVencimento}</td>
 								<td>${dup.valor}</td>
-								<td><input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+								<td>
+									<input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>
+									<input type="button" value="" title="Editar Duplicata" onclick="editarDuplicata(this);" class="botaoEditar" /> 
+								</td>
 							</tr>
 						</c:forEach>
 					</tbody>
@@ -1652,20 +2166,27 @@ function editarTributos(linha){
 			</fieldset>
 			</div>
 		</fieldset>
-		
+		<fieldset id="bloco_info_adicionais_nfe">
+			<legend>::: Info. Adicionais ::: -</legend>
+			<div class="label">Info. Adicionais Fisco:</div>
+			<div class="input areatexto" style="width: 70%">
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco}</textarea>
+			</div>
+			<div class="label">Info. Adicionais Contrib.:</div>
+			<div class="input areatexto" style="width: 70%">
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesComplementaresInteresseContribuinte}</textarea>
+			</div>
+		</fieldset>
 		<fieldset id="bloco_exportacao">
-			<legend>::: Exportação ::: -</legend>
+			<legend>::: Exportação/Compra ::: -</legend>
 			<div class="label">UF Embarque:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" name="nf.exportacaoNFe.ufEmbarque" value="${nf.exportacaoNFe.ufEmbarque}" style="width: 5%"/>
 			</div>
 			<div class="label">Local Embarque:</div>
-			<div class="input" style="width: 60%">
-				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}"/>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}" style="width: 80%"/>
 			</div>		
-		</fieldset>
-		<fieldset id="bloco_compra">
-			<legend>::: Compra ::: -</legend>
 			<div class="label">Nota Empenho:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" name="nf.compraNFe.notaEmpenho" value="${nf.compraNFe.notaEmpenho}" style="width: 10%"/>
@@ -1683,7 +2204,7 @@ function editarTributos(linha){
 			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>
 		</div>
 
-		<jsp:include page="/bloco/bloco_impostos_emissao_nfe.jsp"></jsp:include>		
+		<jsp:include page="/bloco/bloco_detalhe_items_nfe.jsp"></jsp:include>		
 	</form>
 
 </body>

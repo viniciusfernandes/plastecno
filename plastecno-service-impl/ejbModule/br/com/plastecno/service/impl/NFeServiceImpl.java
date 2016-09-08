@@ -1,5 +1,10 @@
 package br.com.plastecno.service.impl;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,7 +19,9 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ConfiguracaoSistemaService;
@@ -23,11 +30,13 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
-import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.PedidoNFeDAO;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.PedidoNFe;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.impl.anotation.TODO;
+import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
@@ -57,7 +66,7 @@ public class NFeServiceImpl implements NFeService {
 	@EJB
 	private LogradouroService logradouroService;
 
-	private GenericDAO<PedidoNFe> pedidoNFeDAO = null;
+	private PedidoNFeDAO pedidoNFeDAO = null;
 
 	@EJB
 	private PedidoService pedidoService;
@@ -65,15 +74,28 @@ public class NFeServiceImpl implements NFeService {
 	@EJB
 	private RepresentadaService representadaService;
 
+	@TODO
 	private void carregarConfiguracao(NFe nFe) {
-		nFe.getDadosNFe().setId("12345678901234567890123456789012345678901234567");
-		nFe.getDadosNFe().getIdentificacaoEmitenteNFe().setCNAEFiscal("1234567");
-		ProdutoServicoNFe p = null;
+		DadosNFe nf = nFe.getDadosNFe();
+
+		nf.setId("12345678901234567890123456789012345678901234567");
+		nf.getIdentificacaoNFe().setChaveAcesso("12345678");
+		nf.getIdentificacaoNFe().setDataEmissao("2016-11-11");
+		nf.getIdentificacaoNFe().setDigitoVerificador("4");
+		nf.getIdentificacaoNFe().setSerie("77");
+		nf.getIdentificacaoNFe().setTipoAmbiente("2");
+		nf.getIdentificacaoNFe().setTipoImpressao("2");
+		nf.getIdentificacaoNFe().setNumero("123412346");
+		nf.getIdentificacaoNFe().setProcessoEmissao("0");
+		nf.getIdentificacaoNFe().setVersaoProcessoEmissao("43214321");
+		nf.getIdentificacaoNFe().setMunicipioOcorrenciaFatorGerador("1234567");
+
+		if (nf.getListaDetalhamentoProdutoServicoNFe() == null) {
+			return;
+		}
+
 		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
-			p = d.getProdutoServicoNFe();
-			p.setEAN("EanTEste");
-			p.setEANTributavel("EanTEste");
-			p.setIndicadorValorTotal(1);
+			d.getProdutoServicoNFe().setIndicadorValorTotal(1);
 		}
 	}
 
@@ -105,12 +127,14 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setNomeFantasia(emitente.getNomeFantasia());
 		iEmit.setRazaoSocial(emitente.getRazaoSocial());
 		iEmit.setRegimeTributario(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.REGIME_TRIBUTACAO));
-
+		iEmit.setCNAEFiscal(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.CNAE));
 		EnderecoNFe endEmit = gerarEnderecoNFe(representadaService.pesquisarLogradorouro(emitente.getId()),
 				emitente.getTelefone());
 
 		iEmit.setEnderecoEmitenteNFe(endEmit);
 		nFe.getDadosNFe().setIdentificacaoEmitenteNFe(iEmit);
+		nFe.getDadosNFe().getIdentificacaoNFe().setCodigoUFEmitente(endEmit.getUF());
+
 		return nFe;
 	}
 
@@ -214,6 +238,14 @@ public class NFeServiceImpl implements NFeService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
+		if (idPedido == null) {
+			throw new BusinessException("O número do pedido não pode estar em branco para emitir uma NFe");
+		}
+
+		if (nFe == null || nFe.getDadosNFe() == null) {
+			throw new BusinessException("A NFe emitida não pode estar em branco");
+		}
+
 		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
 		carregarDadosLocalRetiradaEntrega(nFe);
@@ -223,8 +255,31 @@ public class NFeServiceImpl implements NFeService {
 
 		final String xml = gerarXMLNfe(nFe, null);
 		pedidoNFeDAO.alterar(new PedidoNFe(idPedido, xml));
+		escreverXMLNFe(xml, idPedido.toString());
 
 		return xml;
+	}
+
+	private void escreverXMLNFe(String xml, String nome) throws BusinessException {
+		if (xml == null) {
+			return;
+		}
+		String path = configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.DIRETORIO_XML_NFE);
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(new File(path + "\\\\" + nome + ".xml")));
+			bw.write(xml);
+		} catch (IOException e) {
+			throw new BusinessException("Falha na escrita do XML da NFe no diretorio do sistema", e);
+		} finally {
+			if (bw != null) {
+				try {
+					bw.close();
+				} catch (IOException e) {
+					throw new BusinessException("Falha no fechamento do XML da NFe gravado no diretorio do sistema", e);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -241,10 +296,11 @@ public class NFeServiceImpl implements NFeService {
 		List<DuplicataNFe> listaDuplicata = new ArrayList<DuplicataNFe>();
 		DuplicataNFe dup = null;
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-		for (int i = 0; i < totalParcelas; i++) {
+		for (Date d : listaData) {
 			dup = new DuplicataNFe();
-			dup.setDataVencimento(df.format(listaData.get(i)));
-			dup.setNumero(String.valueOf(i + 1));
+			dup.setDataVencimento(df.format(d));
+			// Valor padrao eh boleto pois eh o maior numero de ocorrencias
+			dup.setNumero("BOLETO");
 			dup.setValor(valorDuplicata);
 
 			listaDuplicata.add(dup);
@@ -279,6 +335,24 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public NFe gerarNFeByIdPedido(Integer idPedido) throws BusinessException {
+		String xmlNFe = pedidoNFeDAO.pesquisarXMLNFeByIdPedido(idPedido);
+		if (xmlNFe == null || xmlNFe.trim().isEmpty()) {
+			return null;
+		}
+
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(NFe.class);
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			StringReader reader = new StringReader(xmlNFe);
+			return (NFe) unmarshaller.unmarshal(reader);
+		} catch (JAXBException e) {
+			throw new BusinessException("Não foi possível gerar a NFe a partir XML do pedido No. " + idPedido);
+		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public String gerarXMLNfe(NFe nFe, Integer idPedido) throws BusinessException {
 		try {
 			StringWriter writer = new StringWriter();
@@ -296,7 +370,7 @@ public class NFeServiceImpl implements NFeService {
 
 	@PostConstruct
 	public void init() {
-		pedidoNFeDAO = new GenericDAO<PedidoNFe>(entityManager);
+		pedidoNFeDAO = new PedidoNFeDAO(entityManager);
 	}
 
 	@Override

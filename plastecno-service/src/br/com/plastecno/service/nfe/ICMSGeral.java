@@ -1,73 +1,94 @@
 package br.com.plastecno.service.nfe;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoICMS.*;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Código de situação tributária")
 public class ICMSGeral {
 
 	@XmlElement(name = "pICMS")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Alíquota do ICMS")
 	private Double aliquota;
 
 	@XmlElement(name = "pICMSST")
+	@InformacaoValidavel(tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Alíquota ICMS ST")
 	private Double aliquotaST;
 
 	@XmlElement(name = "CST")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Cógido da situação tribuária do ICMS")
 	private String codigoSituacaoTributaria;
 
 	@XmlElement(name = "modBC")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Modalidade de determinação da base de cálculo do ICMS")
 	private Integer modalidadeDeterminacaoBC;
 
 	@XmlElement(name = "modBCST")
+	@InformacaoValidavel(tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Modalidade de determinação do ST do ICMS é obrigatório")
 	private Integer modalidadeDeterminacaoBCST;
 
 	@XmlElement(name = "motDesICMS")
 	private String motivoDesoneracao;
 
 	@XmlElement(name = "orig")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Origem da mercadoria do ICMS")
 	private Integer origemMercadoria;
 
+	@XmlElement(name = "pBCOp")
+	@InformacaoValidavel(tiposObrigatorios = { "PART" }, nomeExibicao = "Percentual BC operação obrigatória")
+	private Double percentualBCOperacaoPropria;
+
 	@XmlElement(name = "pMVAST")
+	@InformacaoValidavel(tiposObrigatorios = { "10", "30" }, nomeExibicao = "Percentual de margem do valor adicionado do ST do ICMS")
 	private Double percentualMargemValorAdicionadoICMSST;
 
 	@XmlElement(name = "pRedBC")
+	@InformacaoValidavel(tiposObrigatorios = { "51", "60" }, nomeExibicao = "Percentual de redução de BC do ICMS")
 	private Double percentualReducaoBC;
 
 	@XmlElement(name = "pRedBCST")
+	@InformacaoValidavel(tiposObrigatorios = { "10", "30" }, nomeExibicao = "Percentual de redução de BC do ST do ICMS")
 	private Double percentualReducaoBCST;
 
+	@XmlElement(name = "UFST")
+	@InformacaoValidavel(tiposObrigatorios = { "PART" }, nomeExibicao = "UF de partilha do ICMS")
+	private String ufDividaST;
+
 	@XmlElement(name = "vICMS")
+	@InformacaoValidavel(tiposNaoPermitidos = { "40", "41", "50" }, nomeExibicao = "Modalidade de determinação da base de cálculo do ICMS")
 	private Double valor;
 
 	@XmlElement(name = "vBC")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Valor da base de cálculo do ICMS é obrigatório")
 	private Double valorBC;
 
 	@XmlElement(name = "vBCST")
+	@InformacaoValidavel(tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Valor da base de cálculo ST do ICMS")
 	private Double valorBCST;
 
 	@XmlElement(name = "vBCSTRet")
+	@InformacaoValidavel(tiposObrigatorios = { "60" }, nomeExibicao = "Valor BC ST retido")
 	private Double valorBCSTRetido;
 
+	@XmlElement(name = "vBCSTDest")
+	private Double valorBCSTUFDestino;
+
 	@XmlElement(name = "vICMSST")
+	@InformacaoValidavel(tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Valor ICMS ST")
 	private Double valorST;
 
 	@XmlElement(name = "vSTRet")
+	@InformacaoValidavel(tiposObrigatorios = { "60" }, nomeExibicao = "Valor ST retido")
 	private Double valorSTRetido;
 
 	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC
-				* (aliquota / 100d) : 0d;
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0d;
 	}
 
 	public double calcularValorST() {
-		return valorBCST != null && aliquotaST != null ? valorBCST
-				* (aliquotaST / 100d) : 0d;
+		return valorBCST != null && aliquotaST != null ? valorBCST * (aliquotaST / 100d) : 0d;
 	}
 
 	public ICMSGeral carregarValoresAliquotas() {
@@ -109,6 +130,11 @@ public class ICMSGeral {
 	@XmlTransient
 	public Integer getOrigemMercadoria() {
 		return origemMercadoria;
+	}
+
+	@XmlTransient
+	public Double getPercentualBCOperacaoPropria() {
+		return percentualBCOperacaoPropria;
 	}
 
 	@XmlTransient
@@ -189,8 +215,11 @@ public class ICMSGeral {
 		this.origemMercadoria = origemMercadoria;
 	}
 
-	public void setPercentualMargemValorAdicionadoICMSST(
-			Double percentualMargemValorAdicionadoICMSST) {
+	public void setPercentualBCOperacaoPropria(Double percentualBCOperacaoPropria) {
+		this.percentualBCOperacaoPropria = percentualBCOperacaoPropria;
+	}
+
+	public void setPercentualMargemValorAdicionadoICMSST(Double percentualMargemValorAdicionadoICMSST) {
 		this.percentualMargemValorAdicionadoICMSST = percentualMargemValorAdicionadoICMSST;
 	}
 
@@ -225,91 +254,4 @@ public class ICMSGeral {
 	public void setValorSTRetido(Double valorSTRetido) {
 		this.valorSTRetido = valorSTRetido;
 	}
-
-	public void validar() throws BusinessException {
-		TipoTributacaoICMS t = getTipoTributacao();
-		List<String> l = new ArrayList<String>();
-
-		if (origemMercadoria == null) {
-			l.add("Origem da mercadoria do ICMS do ICMS é obrigatório");
-		}
-
-		if (t == null) {
-			l.add("Código da situação de tributação do ICMS é obrigatório");
-		}
-
-		if (modalidadeDeterminacaoBC == null) {
-			l.add("Modalidade de determinação da base de cálculo do ICMS é obrigatório");
-		}
-
-		if (aliquota == null) {
-			l.add("Alíquota do ICMS é obrigatório");
-		}
-
-		if (valor == null
-				&& (!ICMS_40.equals(t) && !ICMS_41.equals(t) && !ICMS_50
-						.equals(t))) {
-			l.add("Valor do ICMS do ICMS é obrigatório");
-		}
-
-		if (valorBC == null) {
-			l.add("Valor da base de cálculo do ICMS é obrigatório");
-		}
-
-		if (valorBCST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
-						.equals(t))) {
-			l.add("Valor da base de cálculo ST do ICMS é obrigatório");
-		}
-
-		if (modalidadeDeterminacaoBCST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
-						.equals(t))) {
-			l.add("Modalidade de determinação do ST do ICMS é obrigatório");
-		}
-
-		if (percentualMargemValorAdicionadoICMSST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_90.equals(t))) {
-			l.add("Percentual de margem do valor adicionado do ST do ICMS é obrigatório");
-		}
-
-		if (percentualReducaoBC == null
-				&& (ICMS_51.equals(t) || ICMS_60.equals(t))) {
-			l.add("Percentual de redução de BC do ICMS é obrigatório");
-		}
-
-		if (percentualReducaoBCST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t))) {
-			l.add("Percentual de redução de BC do ST do ICMS é obrigatório");
-		}
-
-		if (valorST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
-						.equals(t))) {
-			l.add("Valor do ICMS ST é obrigatório");
-		}
-
-		if (aliquotaST == null
-				&& (ICMS_10.equals(t) || ICMS_30.equals(t) || ICMS_60.equals(t) || ICMS_90
-						.equals(t))) {
-			l.add("Alíquota do ICMS ST é obrigatório");
-		}
-
-		if (percentualReducaoBC == null && ICMS_20.equals(t)) {
-			l.add("Percentual de redução de BC do ICMS é obrigatório");
-		}
-
-		if (valorBCSTRetido == null && ICMS_60.equals(t)) {
-			l.add("Valor de BC do ICMS retido é obrigatório");
-		}
-
-		if (valorSTRetido == null && ICMS_60.equals(t)) {
-			l.add("Valor de ST do ICMS retido é obrigatório");
-		}
-
-		if (l.size() > 0) {
-			throw new BusinessException(l);
-		}
-	}
-
 }

@@ -1,18 +1,21 @@
 package br.com.plastecno.service.nfe.constante;
 
 public enum TipoEmissao {
-	CONTIGENCIA_DPEC(
-			"CONTIGÊNCIA DPEC", 4), CONTIGENCIA_FS("CONTIGÊNCIA FS", 2), CONTIGENCIA_FS_DA("CONTIGÊNCIA FS-DA", 5), CONTIGENCIA_SCAN(
-			"CONTIGÊNCIA SCAN", 3), NORMAL("NORMAL", 1);
-	private final int codigo;
+	NORMAL("1 - Normal", "1"),
+	CONTIGENCIA_FS("2 - Contingência FS", "2"),
+	CONTIGENCIA_SCAN("3 - Contingência SCAN", "3"),
+	CONTIGENCIA_DPEC("4 - Contingência DPEC", "4"),
+	CONTIGENCIA_FS_DA("5 - Contingência FS-DA", "5"), ;
+	
+	private final String codigo;
 	private final String descricao;
 
-	private TipoEmissao(String descricao, int codigo) {
+	private TipoEmissao(String descricao, String codigo) {
 		this.descricao = descricao;
 		this.codigo = codigo;
 	}
 
-	public int getCodigo() {
+	public String getCodigo() {
 		return codigo;
 	}
 

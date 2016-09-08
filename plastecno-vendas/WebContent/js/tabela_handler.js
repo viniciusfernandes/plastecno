@@ -184,12 +184,12 @@ function BlocoTabelaHandler (urlTela, nomeBloco, idTabela, idBlocoInput) {
 	
 	this.inicializarBotoes = function (){
 		var tabelaHandler = this;
-		var botaoIncluir = doc.getElementById('botaoIncluir'+this.nomeBloco);
+		var botaoIncluir = doc.getElementById('botaoIncluir'+tabelaHandler.nomeBloco);
 		if (botaoIncluir != null) {
 			botaoIncluir.onclick = function() { tabelaHandler.adicionar(); };	
 		}
 		
-		var botaoLimpar = doc.getElementById('botaoLimpar'+this.nomeBloco);
+		var botaoLimpar = doc.getElementById('botaoLimpar'+tabelaHandler.nomeBloco);
 		if (botaoLimpar != null) {
 			botaoLimpar.onclick = function() { tabelaHandler.limparBlocoInput(); };	
 		}

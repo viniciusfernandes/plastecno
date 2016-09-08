@@ -3,7 +3,6 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.constante.RegexValidacao;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
@@ -19,7 +18,7 @@ public class IdentificacaoLocalGeral {
 	@XmlTransient
 	private String cep;
 
-	@InformacaoValidavel(obrigatorio = true, regex = RegexValidacao.CNPJ, nomeExibicao = "CNPJ do local do produto")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{14}", substituicao = { "\\D", "" }, nomeExibicao = "CNPJ do local do produto")
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
@@ -31,7 +30,7 @@ public class IdentificacaoLocalGeral {
 	@XmlElement(name = "xCpl")
 	private String complemento;
 
-	@InformacaoValidavel(obrigatorio = true, regex = RegexValidacao.CPF, nomeExibicao = "CPF do local do produto")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{11}", substituicao = { "\\D", "" }, nomeExibicao = "CPF do local do produto")
 	@XmlElement(name = "CPF")
 	private String cpf;
 

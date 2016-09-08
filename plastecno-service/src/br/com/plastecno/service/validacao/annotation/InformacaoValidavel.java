@@ -5,12 +5,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import br.com.plastecno.service.constante.RegexValidacao;
 import br.com.plastecno.service.constante.TipoDocumento;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD })
 public @interface InformacaoValidavel {
+	String campoCondicional() default "";
+
 	boolean cascata() default false;
 
 	boolean customizado() default false;
@@ -29,21 +30,23 @@ public @interface InformacaoValidavel {
 
 	String nomeExibicao() default "";
 
+	String nomeExibicaoCampoCondicional() default "";
+
 	boolean numerico() default false;
 
 	boolean obrigatorio() default false;
 
-	String padrao() default "";
+	String[] opcoes() default {};
 
-	String padraoData() default "";
+	String[] padrao() default {};
 
 	String padraoExemplo() default "";
 
 	boolean positivo() default false;
 
-	RegexValidacao regex() default RegexValidacao.NENHUM;
-
 	boolean relacionamentoObrigatorio() default false;
+
+	String[] substituicao() default {};
 
 	int tamanho() default -1;
 
@@ -51,12 +54,16 @@ public @interface InformacaoValidavel {
 
 	TipoDocumento tipoDocumento() default TipoDocumento.NAO_EH_DOCUMENTO;
 
+	String[] tiposNaoPermitidos() default {};
+
+	String[] tiposObrigatorios() default {};
+
+	String[] tiposPermitidos() default {};
+
 	String toPadrao() default "";
 
 	boolean trim() default false;
 
 	boolean validarHierarquia() default false;
-
-	int[] valores() default {};
 
 }

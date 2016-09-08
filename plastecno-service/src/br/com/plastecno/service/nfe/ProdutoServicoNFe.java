@@ -19,11 +19,13 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "xProd")
 	private String descricao;
 
-	@InformacaoValidavel(obrigatorio = true, tamanhos = { 0, 8, 12, 13, 14 }, nomeExibicao = "Código EAN ou de barras do produto/serviço")
+	// @InformacaoValidavel(obrigatorio = true, tamanhos = { 0, 8, 12, 13, 14 },
+	// nomeExibicao = "Código EAN ou de barras do produto/serviço")
 	@XmlElement(name = "cEAN")
 	private String EAN;
 
-	@InformacaoValidavel(obrigatorio = true, tamanhos = { 1, 8, 12, 13, 14 }, nomeExibicao = "EAN tributável do produtos/serviços")
+	// @InformacaoValidavel(obrigatorio = true, tamanhos = { 1, 8, 12, 13, 14 },
+	// nomeExibicao = "EAN tributável do produtos/serviços")
 	@XmlElement(name = "cEANTrib")
 	private String EANTributavel;
 
@@ -38,7 +40,7 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "nItemPed")
 	private Integer itemPedidoCompra;
 
-	@InformacaoValidavel(obrigatorio = true, tamanhos = { 2, 8 }, nomeExibicao = "NCM do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, tamanhos = { 2, 8 }, substituicao = { "\\D", "" }, nomeExibicao = "NCM do produtos/serviços")
 	@XmlElement(name = "NCM")
 	private String ncm;
 

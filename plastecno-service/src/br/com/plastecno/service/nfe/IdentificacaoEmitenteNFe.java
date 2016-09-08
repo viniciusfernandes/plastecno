@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -10,11 +11,11 @@ public class IdentificacaoEmitenteNFe {
 	@XmlElement(name = "CNAE")
 	private String CNAEFiscal;
 
-	@InformacaoValidavel(obrigatorio = true, tamanho = 14, nomeExibicao = "CNPJ do emitente")
+	@InformacaoValidavel(obrigatorio = true, tamanho = 14, substituicao = { "\\D", "" }, nomeExibicao = "CNPJ do emitente")
 	@XmlElement(name = "CNPJ")
 	private String CNPJ;
 
-	@InformacaoValidavel(tamanho = 11, nomeExibicao = "CPF do emitente")
+	@InformacaoValidavel(tamanho = 11, substituicao = { "\\D", "" }, nomeExibicao = "CPF do emitente")
 	@XmlElement(name = "CPF")
 	private String CPF;
 
@@ -46,6 +47,56 @@ public class IdentificacaoEmitenteNFe {
 	@XmlElement(name = "CRT")
 	private String regimeTributario;
 
+	@XmlTransient
+	public String getCNAEFiscal() {
+		return CNAEFiscal;
+	}
+
+	@XmlTransient
+	public String getCNPJ() {
+		return CNPJ;
+	}
+
+	@XmlTransient
+	public String getCPF() {
+		return CPF;
+	}
+
+	@XmlTransient
+	public EnderecoNFe getEnderecoEmitenteNFe() {
+		return enderecoEmitenteNFe;
+	}
+
+	@XmlTransient
+	public String getInscricaoEstadual() {
+		return inscricaoEstadual;
+	}
+
+	@XmlTransient
+	public String getInscricaoEstadualSubstitutoTributario() {
+		return inscricaoEstadualSubstitutoTributario;
+	}
+
+	@XmlTransient
+	public String getInscricaoMunicipal() {
+		return inscricaoMunicipal;
+	}
+
+	@XmlTransient
+	public String getNomeFantasia() {
+		return nomeFantasia;
+	}
+
+	@XmlTransient
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+
+	@XmlTransient
+	public String getRegimeTributario() {
+		return regimeTributario;
+	}
+
 	public void setCNAEFiscal(String cNAEFiscal) {
 		CNAEFiscal = cNAEFiscal;
 	}
@@ -66,8 +117,7 @@ public class IdentificacaoEmitenteNFe {
 		this.inscricaoEstadual = inscricaoEstadual;
 	}
 
-	public void setInscricaoEstadualSubstitutoTributario(
-			String inscricaoEstadualSubstitutoTributario) {
+	public void setInscricaoEstadualSubstitutoTributario(String inscricaoEstadualSubstitutoTributario) {
 		this.inscricaoEstadualSubstitutoTributario = inscricaoEstadualSubstitutoTributario;
 	}
 

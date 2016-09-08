@@ -3,16 +3,15 @@ package br.com.plastecno.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.plastecno.service.constante.RegexValidacao;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 public class IdentificacaoDestinatarioNFe {
 
-	@InformacaoValidavel(obrigatorio = true, regex = RegexValidacao.CNPJ, nomeExibicao = "CNPJ do destinatário")
+	@InformacaoValidavel(obrigatorio = true, padrao="\\d{14}", substituicao = { "\\D", "" }, nomeExibicao = "CNPJ do destinatário")
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
-	@InformacaoValidavel(obrigatorio = true, regex = RegexValidacao.CPF, nomeExibicao = "CPF do destinatário")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{11}", substituicao = { "\\D", "" }, nomeExibicao = "CPF do destinatário")
 	@XmlElement(name = "CPF")
 	private String cpf;
 

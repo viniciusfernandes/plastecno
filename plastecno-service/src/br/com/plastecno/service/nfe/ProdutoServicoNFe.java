@@ -7,7 +7,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class ProdutoServicoNFe {
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}", nomeExibicao = "CFOP do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}", padraoExemplo = "4 digitos", nomeExibicao = "CFOP do produtos/serviços")
 	@XmlElement(name = "CFOP")
 	private String cfop;
 
@@ -51,7 +51,7 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "vOutro")
 	private Double outrasDespesasAcessorias;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,15}\\.{1}\\d{0,4}", nomeExibicao = "Quantidade comercial do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,15}\\.{1}\\d{0,4}", padraoExemplo = "0 a 4 decimais", nomeExibicao = "Quantidade comercial do produtos/serviços")
 	@XmlElement(name = "qCom")
 	private String quantidadeComercial;
 
@@ -81,11 +81,11 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "vSeg")
 	private Double valorTotalSeguro;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,21}\\.{1}\\d{1,10}", nomeExibicao = "Valor unitário comercial do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,21}\\.{1}\\d{1,10}", padraoExemplo = "1 a 10 decimais", nomeExibicao = "Valor unitário comercial do produtos/serviços")
 	@XmlElement(name = "vUnCom")
 	private String valorUnitarioComercializacao;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,21}\\.{1}\\d{1,10}", nomeExibicao = "Valor unitário tributação do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,21}\\.{1}\\d{1,10}", padraoExemplo = "1 a 10 decimais", nomeExibicao = "Valor unitário tributação do produtos/serviços")
 	@XmlElement(name = "vUnTrib")
 	private Double valorUnitarioTributacao;
 

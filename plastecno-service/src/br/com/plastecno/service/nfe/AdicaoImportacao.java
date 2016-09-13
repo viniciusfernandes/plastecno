@@ -8,19 +8,19 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @InformacaoValidavel
 public class AdicaoImportacao {
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,60}", nomeExibicao = "Cógido do fabricante da adição de importação")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,60}", padraoExemplo = "de 1 a 60 digitos", nomeExibicao = "Cógido do fabricante da adição de importação")
 	@XmlElement(name = "cFabricante")
 	private String codigoFabricante;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,3}", nomeExibicao = "Número da adição de importação")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,3}", padraoExemplo = "de 1 a 3 digitos", nomeExibicao = "Número da adição de importação")
 	@XmlElement(name = "nAdicao")
 	private String numero;
 
-	@InformacaoValidavel(padrao = "\\d{1,3}", nomeExibicao = "Número da adição de importação")
+	@InformacaoValidavel(padrao = "\\d{1,3}", padraoExemplo = "de 1 a 3 digitos", nomeExibicao = "Número da adição de importação")
 	@XmlElement(name = "nDraw")
 	private String numeroDrawback;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,3}", nomeExibicao = "Número da adição de importação")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,3}", padraoExemplo = "de 1 a 3 digitos", nomeExibicao = "Número da adição de importação")
 	@XmlElement(name = "nSeqAdic")
 	private String numeroSequencialItem;
 

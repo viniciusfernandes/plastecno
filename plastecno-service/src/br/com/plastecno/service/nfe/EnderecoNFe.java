@@ -44,7 +44,7 @@ public class EnderecoNFe {
 	@XmlElement(name = "nro")
 	private String numero;
 
-	@InformacaoValidavel(padrao = "\\d{6,14}", nomeExibicao = "telefone do endereço")
+	@InformacaoValidavel(padrao = "\\d{6,14}", padraoExemplo = "6 a 14 digitos", nomeExibicao = "telefone do endereço")
 	@XmlElement(name = "fone")
 	private String telefone;
 

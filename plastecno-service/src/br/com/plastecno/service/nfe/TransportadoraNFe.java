@@ -7,11 +7,11 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class TransportadoraNFe {
-	@InformacaoValidavel(padrao = "\\d{14}", substituicao = { "\\D", "" }, nomeExibicao = "CNPJ da transportadora")
+	@InformacaoValidavel(padrao = "\\d{14}", padraoExemplo = "14 digitos", substituicao = { "\\D", "" }, nomeExibicao = "CNPJ da transportadora")
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
-	@InformacaoValidavel(padrao = "\\d{11}", substituicao = { "\\D", "" }, nomeExibicao = "CPF da transportadora")
+	@InformacaoValidavel(padrao = "\\d{11}", padraoExemplo = "11 digitos", substituicao = { "\\D", "" }, nomeExibicao = "CPF da transportadora")
 	@XmlElement(name = "CPF")
 	private String cpf;
 

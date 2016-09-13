@@ -63,6 +63,7 @@
 <%-- bloco de informacoes --%>
 <input type="hidden" id="${detItem}.produtoServicoNFe.outrasDespesasAcessorias" name="${detItem}.produtoServicoNFe.outrasDespesasAcessorias" value="${item.produto.outrasDespesasAcessorias}"/>
 <input type="hidden" id="${detItem}.informacoesAdicionais" name="${detItem}.informacoesAdicionais" value="${item.informacoesAdicionais}"/>
+<input type="hidden" id="${detItem}.fichaConteudoImportacao" name="${detItem}.fichaConteudoImportacao" value="${item.fichaConteudoImportacao}"/>
 <input type="hidden" id="${detItem}.numeroPedidoCompra" name="${detItem}.numeroPedidoCompra" value="${item.numeroPedidoCompra}"/>
 <input type="hidden" id="${detItem}.itemPedidoCompra" name="${detItem}.itemPedidoCompra" value="${item.itemPedidoCompra}"/>
 <%-- bloco de informacoes --%>

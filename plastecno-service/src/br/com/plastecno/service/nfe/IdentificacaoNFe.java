@@ -88,7 +88,7 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "serie")
 	private String serie;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", padraoExemplo = "1 digito",nomeExibicao = "Identificação do ambiente de emissão")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", padraoExemplo = "1 digito", nomeExibicao = "Identificação do ambiente de emissão")
 	@XmlElement(name = "tpAmb")
 	private String tipoAmbiente;
 
@@ -103,6 +103,10 @@ public class IdentificacaoNFe {
 	@InformacaoValidavel(obrigatorio = true, opcoes = { "0", "1" }, nomeExibicao = "Tipo operação da NFe")
 	@XmlElement(name = "tpNF")
 	private String tipoOperacao;
+
+	@InformacaoValidavel(obrigatorio = true, opcoes = { "0", "1", "2", "3", "4", "9" }, nomeExibicao = "Tipo de presença do comprador")
+	@XmlElement(name = "indPres")
+	private String tipoPresencaComprador;
 
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Versão do processo de emissão da NFe")
 	@XmlElement(name = "verProc")
@@ -229,6 +233,11 @@ public class IdentificacaoNFe {
 	}
 
 	@XmlTransient
+	public String getTipoPresencaComprador() {
+		return tipoPresencaComprador;
+	}
+
+	@XmlTransient
 	public String getVersaoProcessoEmissao() {
 		return versaoProcessoEmissao;
 	}
@@ -324,6 +333,10 @@ public class IdentificacaoNFe {
 
 	public void setTipoOperacao(String tipoOperacao) {
 		this.tipoOperacao = tipoOperacao;
+	}
+
+	public void setTipoPresencaComprador(String tipoPresencaComprador) {
+		this.tipoPresencaComprador = tipoPresencaComprador;
 	}
 
 	public void setVersaoProcessoEmissao(String versaoProcessoEmissao) {

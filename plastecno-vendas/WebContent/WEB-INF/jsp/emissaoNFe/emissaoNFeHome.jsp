@@ -1185,6 +1185,14 @@ function editarProduto(linha){
 					</c:forEach>
 				</select>
 			</div>
+			<div class="label">Presen. Comprador:</div>
+			<div class="input" style="width: 10%">
+				<select name="nf.identificacaoNFe.tipoImpressao" style="width: 100%">
+					<c:forEach var="tipo" items="${listaTipoPresencaComprador}">
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoPresencaSelecionada}">selected</c:if>>${tipo.descricao}</option>
+					</c:forEach>
+				</select>
+			</div>
 			<div class="label">Tipo Impressão:</div>
 			<div class="input" style="width: 10%">
 				<select name="nf.identificacaoNFe.tipoImpressao" style="width: 100%">

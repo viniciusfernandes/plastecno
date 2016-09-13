@@ -42,6 +42,7 @@ public class COFINSGeral {
 
 	public COFINSGeral carregarValoresAliquotas() {
 		valor = calcularValor();
+		valorAliquota = valor;
 		return this;
 	}
 

@@ -235,6 +235,21 @@ public class NFeServiceImpl implements NFeService {
 		nFe.getDadosNFe().setValoresTotaisNFe(valoresTotaisNFe);
 	}
 
+	private void configurarSubistituicaoTributariaPosValidacao(NFe nFe) {
+		List<DetalhamentoProdutoServicoNFe> l = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
+		TributosProdutoServico t = null;
+		for (DetalhamentoProdutoServicoNFe d : l) {
+			t = d.getTributos();
+			if (t.contemCOFINS()) {
+				t.getCofins().configurarSubstituicaoTributaria();
+			}
+
+			if (t.contemPIS()) {
+				t.getPis().configurarSubstituicaoTributaria();
+			}
+		}
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
@@ -252,6 +267,8 @@ public class NFeServiceImpl implements NFeService {
 		carregarConfiguracao(nFe);
 
 		ValidadorInformacao.validar(nFe);
+
+		configurarSubistituicaoTributariaPosValidacao(nFe);
 
 		final String xml = gerarXMLNfe(nFe, null);
 		pedidoNFeDAO.alterar(new PedidoNFe(idPedido, xml));

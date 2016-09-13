@@ -38,6 +38,7 @@ public class PISGeral {
 
 	public PISGeral carregarValoresAliquotas() {
 		valor = calcularValor();
+		valorAliquota = valor;
 		return this;
 	}
 

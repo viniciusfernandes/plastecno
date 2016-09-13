@@ -18,7 +18,8 @@ public class IdentificacaoLocalGeral {
 	@XmlTransient
 	private String cep;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{14}", substituicao = { "\\D", "" }, nomeExibicao = "CNPJ do local do produto")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{14}", padraoExemplo = "14 digitos", substituicao = { "\\D",
+			"" }, nomeExibicao = "CNPJ do local do produto")
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
@@ -30,7 +31,8 @@ public class IdentificacaoLocalGeral {
 	@XmlElement(name = "xCpl")
 	private String complemento;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{11}", substituicao = { "\\D", "" }, nomeExibicao = "CPF do local do produto")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{11}", padraoExemplo = "11 digitos", substituicao = { "\\D",
+			"" }, nomeExibicao = "CPF do local do produto")
 	@XmlElement(name = "CPF")
 	private String cpf;
 

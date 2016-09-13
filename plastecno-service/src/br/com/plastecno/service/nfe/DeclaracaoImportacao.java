@@ -9,7 +9,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class DeclaracaoImportacao {
-	@InformacaoValidavel(padrao = "\\d{14}", nomeExibicao = "CNPJ encomendante de importação do produto/serviço")
+	@InformacaoValidavel(padrao = "\\d{14}", padraoExemplo = "14 digitos", nomeExibicao = "CNPJ encomendante de importação do produto/serviço")
 	@XmlElement(name = "CNPJ")
 	private String cnpjEncomendante;
 
@@ -17,11 +17,11 @@ public class DeclaracaoImportacao {
 	@XmlElement(name = "cExportador")
 	private String codigoExportador;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data de desembaraço de importação do produto/serviço")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Data de desembaraço de importação do produto/serviço")
 	@XmlElement(name = "dDesemb")
 	private String dataDesembaraco;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data da declaração de importação do produto/serviço")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Data da declaração de importação do produto/serviço")
 	@XmlElement(name = "dDI")
 	private String dataImportacao;
 

@@ -130,6 +130,7 @@ $(document).ready(function() {
 	$('#botaoLimparInfoProd').click(function(){
 		removerInputHidden(gerarJsonInfoProduto());
 		fecharBloco('bloco_info_adicionais_prod');
+		$('#bloco_info_adicionais_prod #fciProd').val('');
 		$('#bloco_info_adicionais_prod #infoAdicionaisProd').val('');
 		$('#bloco_info_adicionais_prod input:text').val('');
 	});
@@ -194,8 +195,6 @@ $(document).ready(function() {
 			});
 		}
 	});
-	
-	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	inicializarBotaoPesquisarCEP({'idBotao':'botaoCepRetirada',
 		'idCep': 'cepRetirada', 'idEndereco': 'enderecoRetirada', 'idBairro': 'bairroRetirada', 
@@ -451,7 +450,7 @@ function gerarLegendaBloco(nomeBloco){
 function abrirBloco(nomeBloco){
 	gerarLegendaBloco(nomeBloco);
 	<%-- Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn --%>
-	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table').fadeIn('fast');
+	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table, #'+nomeBloco+' .fieldsetInterno').fadeIn('fast');
 };
 
 function fecharBloco(nomeBloco){
@@ -1141,13 +1140,25 @@ function editarProduto(linha){
 			<%--div para dar o correto alinhamento dos campos no formulario. Nao teve outra alternativa--%>
 			<div class="input" style="width: 60%">
 			</div>
-			<div class="label">Tipo Documento:</div>
+			<div class="label">Tipo Operação:</div>
 			<div class="input" style="width: 10%">
-				<select id="pedidoAssociado"   style="width: 100%">
-					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
-						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+				<select name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
+					<c:forEach var="tipo" items="${listaTipoOperacao}">
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
+			</div>
+			<div class="label">Dest. Operação:</div>
+			<div class="input" style="width: 20%">
+				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 100%" >
+					<c:forEach var="tipo" items="${listaTipoDestinoOperacao}">
+						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoDestinoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label">Dt. Ent./Saída:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="dataHoraEntradaSaida" name="nf.identificacaoNFe.dataHoraEntradaSaidaProduto" value="${nf.identificacaoNFe.dataHoraEntradaSaidaProduto}" style="width: 100%"/>
 			</div>
 			<div class="label">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
@@ -1183,32 +1194,12 @@ function editarProduto(linha){
 				</select>
 			</div>
 			<div class="label">Oper. Consum. Final:</div>
-			<div class="input" style="width: 20%">
-				<select name="nf.identificacaoNFe.operacaoConsumidorFinal" style="width: 50%" >
+			<div class="input" style="width: 50%">
+				<select name="nf.identificacaoNFe.operacaoConsumidorFinal" style="width: 20%" >
 					<c:forEach var="tipo" items="${listaTipoOperacaoConsumidorFinal}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoOperacaoConsumidorSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
-			</div>
-			<div class="label">Tipo Operação:</div>
-			<div class="input" style="width: 10%">
-				<select name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
-					<c:forEach var="tipo" items="${listaTipoOperacao}">
-						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
-					</c:forEach>
-				</select>
-			</div>
-			<div class="label">Dest. Operação:</div>
-			<div class="input" style="width: 50%">
-				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 40%" >
-					<c:forEach var="tipo" items="${listaTipoDestinoOperacao}">
-						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoDestinoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
-					</c:forEach>
-				</select>
-			</div>
-			<div class="label">Dt. Ent./Saída:</div>
-			<div class="input" style="width: 10%">
-				<input type="text" id="dataHoraEntradaSaida" name="nf.identificacaoNFe.dataHoraEntradaSaidaProduto" value="${nf.identificacaoNFe.dataHoraEntradaSaidaProduto}" style="width: 100%"/>
 			</div>
 			<div class="label">Natureza Operação:</div>
 			<div class="input" style="width: 50%">

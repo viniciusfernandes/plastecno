@@ -19,7 +19,7 @@ public class ISSQN {
 	@XmlElement(name = "cSitTrib")
 	private String codigoSituacaoTributaria;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{3,4}", padraoExemplo = "999 ou 9999", nomeExibicao = "Código do item da lista de serviços do ISS")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{3,4}", padraoExemplo = "3 a 4 digitos", nomeExibicao = "Código do item da lista de serviços do ISS")
 	@XmlElement(name = "cListServ")
 	private String itemListaServicos;
 

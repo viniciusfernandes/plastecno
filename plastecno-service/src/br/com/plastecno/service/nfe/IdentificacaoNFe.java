@@ -18,30 +18,30 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "cUF")
 	private String codigoUFEmitente;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", nomeExibicao = "Data emissão da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Data emissão da NFe")
 	@XmlElement(name = "dEmi")
 	private String dataEmissao;
 
 	@XmlElement(name = "dhCont")
 	private String dataHoraContingencia;
 
-	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{5}:\\d{2}:\\d{2}", nomeExibicao = "Dada/hora entrada em contigência")
+	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{5}:\\d{2}:\\d{2}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Dada/hora entrada em contigência")
 	@XmlElement(name = "verProc")
 	private String dataHoraEntradaContigencia;
 
-	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}[-^+]\\d{4}", nomeExibicao = "Data e hora entrada/saída produto")
+	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}[-^+]\\d{4}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Data e hora entrada/saída produto")
 	@XmlElement(name = "dhSaiEnt")
 	private String dataHoraEntradaSaidaProduto;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Destino da operação da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", padraoExemplo = "1 digito", nomeExibicao = "Destino da operação da NFe")
 	@XmlElement(name = "idDest")
 	private String destinoOperacao;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Dígito verificador da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", padraoExemplo = "1 digito", nomeExibicao = "Dígito verificador da NFe")
 	@XmlElement(name = "cDV")
 	private String digitoVerificador;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Finalidade da emissão  da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", padraoExemplo = "1 digito", nomeExibicao = "Finalidade da emissão  da NFe")
 	@XmlElement(name = "finNFe")
 	private Integer finalidadeEmissao;
 
@@ -64,7 +64,7 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "mod")
 	private final String modelo = "55";
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{7}", nomeExibicao = "Código município do fator gerador")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{7}", padraoExemplo = "7 digitos", nomeExibicao = "Código município do fator gerador")
 	@XmlElement(name = "cMunFG")
 	private String municipioOcorrenciaFatorGerador;
 
@@ -72,11 +72,11 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "natOp")
 	private String naturezaOperacao;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,9}", nomeExibicao = "Número da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,9}", padraoExemplo = "1 a 9 digitos", nomeExibicao = "Número da NFe")
 	@XmlElement(name = "nNF")
 	private String numero;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Operação com consumidor final da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", padraoExemplo = "1 digito", nomeExibicao = "Operação com consumidor final da NFe")
 	@XmlElement(name = "indFinal")
 	private String operacaoConsumidorFinal;
 
@@ -84,11 +84,11 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "procEmi")
 	private String processoEmissao;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,3}", nomeExibicao = "Série da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,3}", padraoExemplo = "1 a 3 digitos", nomeExibicao = "Série da NFe")
 	@XmlElement(name = "serie")
 	private String serie;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", nomeExibicao = "Identificação do ambiente de emissão")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", padraoExemplo = "1 digito",nomeExibicao = "Identificação do ambiente de emissão")
 	@XmlElement(name = "tpAmb")
 	private String tipoAmbiente;
 

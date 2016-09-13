@@ -12,7 +12,7 @@ public class DeclaracaoExportacao {
 	@XmlElement(name = "exportInd")
 	private DeclaracaoExportacaoIndireta declaracaoExportacaoIndireta;
 
-	@InformacaoValidavel(padrao = { "\\d{9}", "\\d{11}" }, nomeExibicao = "Número de dorwback da declaração de exportação")
+	@InformacaoValidavel(padrao = { "\\d{9}", "\\d{11}" }, padraoExemplo="9 ou 11 digitos",nomeExibicao = "Número de dorwback da declaração de exportação")
 	@XmlElement(name = "nDraw")
 	private String numeroDrawback;
 

@@ -14,7 +14,7 @@ popular as quantidades tributaveis de todos eles OK
 1) inserir o tipo de operacao tpNF na tela OK
 2) o campo de consumidor final "indFinal" não esta na documentacao da sefaz OK
 2) o campo de destina da operacao "idDest" não esta na documentacao da sefaz OK
-3) o campo de tipo de atendimento "idPress" não esta na documentacao da sefaz OK
+3) o campo de tipo de atendimento "idPress" não esta na documentacao da sefaz NAO ENCONTREI
 4) o campo de finalida de emissao "finNFe" não esta na documentacao da sefaz OK
 5) o campo de data de saida "dSaiEnt" deve estar na tela OK
 6) verificar como consultar a sequencia do numero da nfe na sefaz

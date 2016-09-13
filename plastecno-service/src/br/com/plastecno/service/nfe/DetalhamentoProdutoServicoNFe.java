@@ -23,7 +23,7 @@ public class DetalhamentoProdutoServicoNFe {
 	@XmlElement(name = "infAdProd")
 	private String informacoesAdicionais;
 
-	@InformacaoValidavel(padrao = "\\d{6}", nomeExibicao = "Item de pedido de compra de produtos/serviços")
+	@InformacaoValidavel(padrao = "\\d{6}", padraoExemplo = "6 digitos", nomeExibicao = "Item de pedido de compra de produtos/serviços")
 	@XmlElement(name = "nItemPed")
 	private String itemPedidoCompra;
 

@@ -24,7 +24,7 @@ public class IPI {
 	private String classeEnquadramentoCigarrosBebidas;
 
 	@XmlElement(name = "CNPJProd")
-	@InformacaoValidavel(substituicao = "\\D", padrao = "\\d{14}", nomeExibicao = "CNPJ do produtor do IPI")
+	@InformacaoValidavel(substituicao = "\\D", padrao = "\\d{14}", padraoExemplo = "14 digitos", nomeExibicao = "CNPJ do produtor do IPI")
 	private String cnpjProdutor;
 
 	@XmlElement(name = "cEnq")

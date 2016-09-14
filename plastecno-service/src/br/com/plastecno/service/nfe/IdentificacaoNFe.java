@@ -58,6 +58,7 @@ public class IdentificacaoNFe {
 	private String justificativaContigencia;
 
 	@XmlElement(name = "NFref")
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de NFe referenciada")
 	private List<NFeReferenciada> listaNFeReferenciada;
 
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Modelo da NFe")

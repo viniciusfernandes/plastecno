@@ -229,7 +229,7 @@ public final class ValidadorInformacao {
 				listaMensagem.add(informacao.nomeExibicao() + " não é válido");
 				continue;
 			}
-
+			
 			if (COMPRIMENTO_STRING > 0 && informacao.padrao().length > 0) {
 				ok = false;
 				for (String p : informacao.padrao()) {

@@ -16,6 +16,7 @@
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/edicao_tabela.js"/>"></script>
@@ -64,10 +65,6 @@ $(document).ready(function() {
 	
 	$("#botaoInserirReboque").click(function() {
 		inserirReboque();
-	});
-	
-	$("#botaoInserirReferenciada").click(function() {
-		inserirReferenciada();
 	});
 	
 	$('#bloco_logradouro').addClass('fieldsetInterno');
@@ -243,7 +240,41 @@ $(document).ready(function() {
 	inicializarTabelaImportacaoProd();
 	inicializarTabelaAdicaoImportacao();
 	inicializarTabelaExportacaoProd();
+	inicializarTabelaReferenciada();
+	
+	inicializarMascaraImpostos();
 });
+
+function inicializarMascaraImpostos(){
+	inserirMascaraDecimal('valorBCICMS', 15, 2);
+	inserirMascaraDecimal('valorBCSTICMS', 15, 2);
+	inserirMascaraDecimal('aliquotaICMS', 7, 4);
+	inserirMascaraDecimal('aliquotaSTICMS', 7, 4);
+	inserirMascaraDecimal('percValSTICMS', 7, 4);
+	inserirMascaraDecimal('percRedBCSTICMS', 7, 4);
+
+	inserirMascaraDecimal('valorBCCOFINS', 15, 2);
+	inserirMascaraDecimal('aliquotaCOFINS', 7, 4);
+	inserirMascaraDecimal('qtdeVendidaCOFINS', 16, 4);
+
+	inserirMascaraMonetaria('valorBCPIS', 15, 2);
+	inserirMascaraMonetaria('aliquotaPIS', 7, 4);
+	inserirMascaraMonetaria('qtdeVendidaPIS', 14, 4);
+	
+	inserirMascaraMonetaria('valorBCIPI', 15, 2);
+	inserirMascaraMonetaria('aliquotaIPI', 7, 4);
+	inserirMascaraMonetaria('qtdeUnidTribIPI', 16, 4);
+	inserirMascaraMonetaria('valorUnidTribIPI', 15, 4);
+	
+	inserirMascaraMonetaria('valorBCISS', 15, 2);
+	inserirMascaraMonetaria('aliquotaISS', 7, 4);
+	inserirMascaraMonetaria('qtdeVendidaPIS', 14, 4);
+	
+	inserirMascaraMonetaria('valorBCII', 15, 2);
+	inserirMascaraMonetaria('valorII', 15, 2);
+	inserirMascaraMonetaria('valorIOFII', 15, 2);
+	inserirMascaraMonetaria('valorDespAduaneirasII', 15, 2);
+};
 
 function gerarIdCamposImportacaoProd(){
 	return ['cnpjImportProd', 'exportadorImportProd', 'dtImportProd', 'dataDesembImportProd',
@@ -353,6 +384,23 @@ function inicializarTabelaExportacaoProd(){
 			}};
 	
 	editorTabelaExportacao = new editarTabela(config);
+};
+
+function inicializarTabelaReferenciada(){
+	var campos = ['chaveReferenciada', 'numeroReferenciada', 'serieReferenciada', 'modReferenciada', 'cnpjReferenciada', 'anoMesReferenciada', 'ufReferenciada'];
+	var config = {'idTabela': 'tabela_referenciada', 'idBotaoInserir':'botaoInserirReferenciada',
+			'campos': campos,
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				for (var i = 0; i < campos.length; i++) {
+					if(isEmpty(campos[i])){
+						return false;
+					}
+				}
+				return true;
+				},
+			'idLinhaSequencial':true};
+	editarTabela(config);
 };
 
 function removerDuplicata(botao) {
@@ -919,25 +967,6 @@ function inserirLinhaTabela(linhaJson){
 	$('#'+linhaJson.nomeBloco +' input:text').val('');
 };
 
-function inserirReferenciada(){
-	var chave = $('#bloco_referenciada #chaveReferenciada').val();
-	var numero = $('#bloco_referenciada #numeroReferenciada').val();
-	var serie = $('#bloco_referenciada #serieReferenciada').val();
-	var mod = $('#bloco_referenciada #modReferenciada').val();
-	var cnpj = $('#bloco_referenciada #cnpjReferenciada').val();
-	var anoMes = $('#bloco_referenciada #anoMesReferenciada').val();
-	var uf = $('#bloco_referenciada #ufReferenciada').val();
-	
-	if(isEmpty(chave) || isEmpty(numero) || isEmpty(serie) || 
-			isEmpty(mod) || isEmpty(cnpj) || isEmpty(anoMes) || isEmpty(uf)){
-		return;
-	}
-	
-	var linha = {'nomeBloco':'bloco_referenciada', 'nomeTabela': 'tabela_referenciada',
-			'valores':[chave, numero, serie, mod, cnpj, anoMes, uf]};
-	inserirLinhaTabela(linha);
-};
-
 function removerLinhaTabela(botao){
 	 var linha = $(botao).closest("tr")[0];
 	 var tabela = $(botao).closest("table")[0];
@@ -1261,33 +1290,33 @@ function editarProduto(linha){
 		
 		<fieldset id="bloco_referenciada">
 			<legend>::: NF/NFe Referenciada ::: -</legend>
-			<div class="label">Chave Acesso:</div>
+			<div class="label obrigatorio">Chave Acesso:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="chaveReferenciada" style="width: 50%"/>
+				<input type="text" id="chaveReferenciada" maxlength="44" style="width: 50%"/>
 			</div>
-			<div class="label">Núm. Doc. Fiscal:</div>
+			<div class="label obrigatorio">Núm. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="numeroReferenciada"/>
+				<input type="text" id="numeroReferenciada" maxlength="9"/>
 			</div>
-			<div class="label">Série. Doc. Fiscal:</div>
+			<div class="label obrigatorio">Série. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="serieReferenciada"/>
+				<input type="text" id="serieReferenciada" maxlength="3"/>
 			</div>
-			<div class="label">Mod. Doc. Fiscal:</div>
+			<div class="label obrigatorio">Mod. Doc. Fiscal:</div>
 			<div class="input" style="width: 30%">
-				<input type="text" id="modReferenciada"/>
+				<input type="text" id="modReferenciada" maxlength="2"/>
 			</div>
-			<div class="label">CNPJ Emit.:</div>
+			<div class="label obrigatorio">CNPJ Emit.:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="cnpjReferenciada"/>
+				<input type="text" id="cnpjReferenciada" maxlength="14"/>
 			</div>
-			<div class="label">Emis. Ano/Mês (AAMM):</div>
+			<div class="label obrigatorio">Emis. Ano/Mês (AAMM):</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="anoMesReferenciada"/>
+				<input type="text" id="anoMesReferenciada" maxlength="4"/>
 			</div>
-			<div class="label">UF Emit.:</div>
+			<div class="label obrigatorio">UF Emit.:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="ufReferenciada"/>
+				<input type="text" id="ufReferenciada" maxlength="2"/>
 			</div>
 			<div class="bloco_botoes">
 				<a id="botaoInserirReferenciada" title="Inserir Dados da NF referenciada" class="botaoAdicionar"></a>
@@ -1317,7 +1346,7 @@ function editarProduto(linha){
 						<td>${ref.identificacaoNFeReferenciada.cnpjEmitente}</td>
 						<td>${ref.identificacaoNFeReferenciada.anoMes}</td>
 						<td>${ref.identificacaoNFeReferenciada.ufEmitente}</td>
-						<td><input type="button" title="Remover Registro" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+						<td></td>
 					</tr>
 					</c:forEach>
 				</tbody>
@@ -1470,11 +1499,11 @@ function editarProduto(linha){
 				<legend>::: Info. Adicionais Prod. ::: +</legend>
 				<div class="label">Num. Ped. Compra:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" id="numeroPedidoCompraProd" style="width: 100%"/>
+					<input type="text" id="numeroPedidoCompraProd" maxlength="15" style="width: 100%"/>
 				</div>
 				<div class="label">Item Ped. Compra.:</div>
 				<div class="input" style="width: 50%">
-					<input type="text" id="itemPedidoCompraProd" style="width: 20%"/>
+					<input type="text" id="itemPedidoCompraProd"  maxlength="6" style="width: 20%"/>
 				</div>
 				<div class="label">Valor Desp. Acess.:</div>
 				<div class="input" style="width: 80%">
@@ -1499,11 +1528,11 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
 					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
-					<div class="label">NCM:</div>
+					<div class="label obrigatorio">NCM:</div>
 					<div class="input" style="width: 80%">
-						<input type="text" id="ncm" name="ncm" style="width: 20%"/>
+						<input type="text" id="ncm" name="ncm"  maxlength="8" style="width: 20%"/>
 					</div>
-					<div class="label">CFOP:</div>
+					<div class="label obrigatorio">CFOP:</div>
 					<div class="input" style="width: 80%">
 						<select id="cfop" name="cfop" style="width: 80%">
 							<c:forEach var="cfop" items="${listaCfop}" >
@@ -1511,7 +1540,7 @@ function editarProduto(linha){
 							</c:forEach>
 						</select>
 					</div>
-					<div class="label">Situação Tribut.:</div>
+					<div class="label obrigatorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="tipoTributacaoICMS" 
 							style="width: 77%" >
@@ -1520,7 +1549,7 @@ function editarProduto(linha){
 							</c:forEach>
 						</select>
 					</div>
-					<div class="label">Origem:</div>
+					<div class="label obrigatorio">Origem:</div>
 					<div class="input" style="width: 25%">
 						<select id="origemMercadoriaICMS" 
 							style="width: 100%" >
@@ -1530,24 +1559,24 @@ function editarProduto(linha){
 						</select>
 					</div>
 					
-					<div class="icms00 label">Modalidade:</div>
-					<div class="icms00 input" style="width: 30%">
+					<div class="label  obrigatorio">Modalidade:</div>
+					<div class="input" style="width: 30%">
 						<select id="modBCICMS" style="width: 65%" class="icms00 semprehabilitado">
 							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMS}">
 								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label">Valor BC:</div>
+					<div  class="label obrigatorio">Valor BC:</div>
 					<div class="input" style="width: 20%">
 						<input type="text" id="valorBCICMS" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota(%):</div>
+					<div  class="label obrigatorio">Alíquota(%):</div>
 					<div class="input" style="width: 40%">
 						<input type="text" id="aliquotaICMS" style="width: 20%" />
 					</div>
-					<div class="icms00 label">Modalidade ST:</div>
-					<div class="icms00 input" style="width: 70%">
+					<div class="label">Modalidade ST:</div>
+					<div class="input" style="width: 70%">
 						<select id="modBCSTICMS" style="width: 30%" class="icms00 semprehabilitado">
 							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMSST}">
 								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
@@ -1589,7 +1618,7 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_cofins" class="fieldsetInterno">
 					<legend>::: COFINS Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
+					<div class="label obrigatorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribCOFINS" style="width: 45%">
 							<c:forEach var="tipo" items="${listaTipoTributacaoCOFINS}">
@@ -1597,11 +1626,11 @@ function editarProduto(linha){
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label">Valor BC:</div>
+					<div  class="label obrigatorio">Valor BC:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorBCCOFINS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota(%):</div>
+					<div  class="label obrigatorio">Alíquota(%):</div>
 					<div class="input" style="width: 50%">
 						<input id="aliquotaCOFINS" type="text" style="width: 20%" />
 					</div>
@@ -1619,7 +1648,7 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_pis" class="fieldsetInterno">
 					<legend>::: PIS Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
+					<div class="label obrigatorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribPIS" style="width: 45%">
 							<c:forEach var="tipo" items="${listaTipoTributacaoPIS}">
@@ -1631,7 +1660,7 @@ function editarProduto(linha){
 					<div class="input" style="width: 10%">
 						<input id="valorBCPIS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota(%):</div>
+					<div  class="label obrigatorio">Alíquota(%):</div>
 					<div class="input" style="width: 50%">
 						<input id="aliquotaPIS" type="text" style="width: 20%" />
 					</div>
@@ -1649,7 +1678,7 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_ipi" class="fieldsetInterno">
 					<legend>::: IPI Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
+					<div class="label obrigatorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribIPI" style="width: 45%" >
 							<option value=""></option>
@@ -1721,7 +1750,7 @@ function editarProduto(linha){
 					<div class="input" style="width: 50%">
 						<input id="aliquotaISS" type="text" style="width: 20%" />
 					</div>
-					<div  class="label">Qtde. Vendida:</div>
+					<div  class="label">Mun. Gerador:</div>
 					<div class="input" style="width: 10%">
 						<input id="codMunGeradorISS" type="text" style="width: 100%" />
 					</div>

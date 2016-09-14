@@ -33,8 +33,8 @@ public class ICMSGeral {
 	private String motivoDesoneracao;
 
 	@XmlElement(name = "orig")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Origem da mercadoria do ICMS")
-	private Integer origemMercadoria;
+	@InformacaoValidavel(obrigatorio = true, padrao = { "\\d" }, padraoExemplo = "1 digito", nomeExibicao = "Origem da mercadoria do ICMS")
+	private String origemMercadoria;
 
 	@XmlElement(name = "pBCOp")
 	@InformacaoValidavel(tiposObrigatorios = { "PART" }, nomeExibicao = "Percentual BC operação obrigatória")
@@ -128,7 +128,7 @@ public class ICMSGeral {
 	}
 
 	@XmlTransient
-	public Integer getOrigemMercadoria() {
+	public String getOrigemMercadoria() {
 		return origemMercadoria;
 	}
 
@@ -211,7 +211,7 @@ public class ICMSGeral {
 		this.motivoDesoneracao = motivoDesoneracao;
 	}
 
-	public void setOrigemMercadoria(Integer origemMercadoria) {
+	public void setOrigemMercadoria(String origemMercadoria) {
 		this.origemMercadoria = origemMercadoria;
 	}
 

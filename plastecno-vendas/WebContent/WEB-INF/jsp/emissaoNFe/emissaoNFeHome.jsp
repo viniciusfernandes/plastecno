@@ -1091,7 +1091,7 @@ function editarProduto(linha){
 	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
 	--numeroProdutoEdicao;
 	var valorBC = celulas[6].innerHTML;
-	var valoresTabela = {'campos':[
+	var valoresTabela = {'campos':[{'id': 'itemPedidoCompraProd', 'valorTabela':celulas[0].innerHTML},
 								   {'id': 'ncm', 'valorTabela': celulas[2].innerHTML},
 	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[10].innerHTML},
 	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[11].innerHTML},

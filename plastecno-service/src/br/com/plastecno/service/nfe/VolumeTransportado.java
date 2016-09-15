@@ -27,9 +27,9 @@ public class VolumeTransportado {
 	@XmlElement(name = "pesoL")
 	private Double pesoLiquido;
 
-	@InformacaoValidavel(intervaloNumerico = { 1, 999999 }, nomeExibicao = "Quantidade de volumes transportados")
+	@InformacaoValidavel(padrao = "\\d{1,15}", padraoExemplo = "1 a 15 digitos", nomeExibicao = "Quantidade de volumes transportados")
 	@XmlElement(name = "qVol")
-	private Integer quantidade;
+	private String quantidade;
 
 	public void setEspecie(String especie) {
 		this.especie = especie;
@@ -51,7 +51,7 @@ public class VolumeTransportado {
 		this.pesoLiquido = pesoLiquido;
 	}
 
-	public void setQuantidade(Integer quantidade) {
+	public void setQuantidade(String quantidade) {
 		this.quantidade = quantidade;
 	}
 

@@ -282,8 +282,9 @@ function inicializarMascaraImpostos(){
 	inserirMascaraDecimal('valServRetICMSTransp', 15, 2);
 	inserirMascaraDecimal('valBCRetICMSTransp', 15, 2);
 	inserirMascaraDecimal('aliqRetICMSTransp', 7, 4);
-	inserirMascaraDecimal('valRetICMSTransp', 15, 2);
-	inserirMascaraDecimal('valRetICMSTransp', 15, 2);
+	
+	inserirMascaraDecimal('pesoLiquidoVolume', 15, 3);
+	inserirMascaraDecimal('pesoBrutoVolume', 15, 3);
 };
 
 function inicializarTabelaImportacaoProd(){
@@ -2070,27 +2071,23 @@ function editarProduto(linha){
 					<legend>::: Retenção ICMS :::</legend>
 					<div  class="label obrigatorio">Valor Serviço:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="valServRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorServico" style="width: 100%" />
+						<input type="text" id="valServRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorServico" value="${nf.transporteNFe.retencaoICMS.valorServico}" style="width: 100%" />
 					</div>
 					<div  class="label obrigatorio">Valor BC:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="valBCRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorBC" style="width: 20%" />
+					<div class="input" style="width: 10%">
+						<input type="text" id="valBCRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorBC" value="${nf.transporteNFe.retencaoICMS.valorBC}" style="width: 100%" />
 					</div>
 					<div  class="label obrigatorio">Alíquota(%):</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="aliqRetICMSTransp" name="nf.transporteNFe.retencaoICMS.aliquota" style="width: 100%" />
-					</div>
-					<div  class="label obrigatorio">Valor Ret.:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" id="valRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorRetido" style="width: 20%" />
+					<div class="input" style="width: 30%">
+						<input type="text" id="aliqRetICMSTransp" name="nf.transporteNFe.retencaoICMS.aliquota" value="${nf.transporteNFe.retencaoICMS.aliquota}" style="width: 20%" />
 					</div>
 					<div  class="label obrigatorio">CFOP:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.cfop" style="width: 100%" />
+						<input type="text" name="nf.transporteNFe.retencaoICMS.cfop" value="${nf.transporteNFe.retencaoICMS.cfop}" maxlength="4" style="width: 100%" />
 					</div>
 					<div  class="label obrigatorio">Município Gerador:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" style="width: 20%" />
+						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" value="${nf.transporteNFe.retencaoICMS.codigoMunicipioGerador}" maxlength="7" style="width: 20%" />
 					</div>
 				</fieldset>
 				</div>
@@ -2100,20 +2097,20 @@ function editarProduto(linha){
 					<legend>::: Volumes :::</legend>
 					<div class="label">Qtde.:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="quantidadeVolume"/>
+						<input type="text" id="quantidadeVolume" maxlength="15"/>
 					</div>
 					
 					<div class="label">Espécie:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="especieVolume"/>
+						<input type="text" id="especieVolume" maxlength="60"/>
 					</div>
 					<div class="label">Marca:</div>
 					<div class="input" style="width: 30%">
-						<input type="text" id="marcaVolume" style="width: 50%"/>
+						<input type="text" id="marcaVolume" maxlength="60" style="width: 50%"/>
 					</div>
 					<div class="label">Numeração:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="numeracaoVolume"/>
+						<input type="text" id="numeracaoVolume" maxlength="60"/>
 					</div>
 					<div class="label">Peso Líq.(kg):</div>
 					<div class="input" style="width: 10%">

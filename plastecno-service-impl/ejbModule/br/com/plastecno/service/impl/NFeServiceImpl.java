@@ -45,6 +45,7 @@ import br.com.plastecno.service.nfe.IdentificacaoEmitenteNFe;
 import br.com.plastecno.service.nfe.IdentificacaoLocalGeral;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.ProdutoServicoNFe;
+import br.com.plastecno.service.nfe.TransporteNFe;
 import br.com.plastecno.service.nfe.TributosProdutoServico;
 import br.com.plastecno.service.nfe.ValoresTotaisICMS;
 import br.com.plastecno.service.nfe.ValoresTotaisISSQN;
@@ -235,6 +236,13 @@ public class NFeServiceImpl implements NFeService {
 		nFe.getDadosNFe().setValoresTotaisNFe(valoresTotaisNFe);
 	}
 
+	private void carregarValoresTransporte(NFe nFe) {
+		TransporteNFe t = nFe.getDadosNFe().getTransporteNFe();
+		if (t != null && t.getRetencaoICMS() != null) {
+			t.getRetencaoICMS().carregarValorRetido();
+		}
+	}
+
 	private void configurarSubistituicaoTributariaPosValidacao(NFe nFe) {
 		List<DetalhamentoProdutoServicoNFe> l = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 		TributosProdutoServico t = null;
@@ -261,6 +269,7 @@ public class NFeServiceImpl implements NFeService {
 			throw new BusinessException("A NFe emitida não pode estar em branco");
 		}
 
+		carregarValoresTransporte(nFe);
 		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
 		carregarDadosLocalRetiradaEntrega(nFe);

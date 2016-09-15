@@ -18,10 +18,7 @@
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/edicao_tabela.js"/>"></script>
-
-
 
 <style type="text/css">
 fieldset .fieldsetInterno {
@@ -41,15 +38,11 @@ fieldset .fieldsetInterno legend {
 
 var numeroProdutoEdicao = null;
 var numeroImportacaoProduto = null;
-var tabelaDuplicataHandler = null;
 var editorTabelaImportacao = null;
 var editorTabelaAdicao = null;
 var editorTabelaExportacao = null;
 $(document).ready(function() {
 	scrollTo('${ancora}');
-	
-	tabelaDuplicataHandler = new BlocoTabelaHandler(null, 'Duplicata', 'tabela_duplicata', 'bloco_duplicata');
-	tabelaDuplicataHandler.setTotalColunas(4);
 	
 	$("#botaoPesquisaPedido").click(function() {
 		if(isEmpty($('#idPedido').val())){
@@ -228,12 +221,13 @@ $(document).ready(function() {
 	$('#bloco_importacao_prod').fadeOut('fast');
 	$('#bloco_exportacao_prod').fadeOut('fast');
 
-	inicializarBlocoDuplicata();
 	inicializarTabelaImportacaoProd();
 	inicializarTabelaAdicaoImportacao();
 	inicializarTabelaExportacaoProd();
 	inicializarTabelaReferenciada();
 	inicializarTabelaVolumes();
+	inicializarTabelaReboque();
+	inicializarTabelaDuplicata();
 	
 	inicializarMascaraImpostos();
 });
@@ -278,6 +272,8 @@ function inicializarMascaraImpostos(){
 	
 	inserirMascaraDecimal('pesoLiquidoVolume', 15, 3);
 	inserirMascaraDecimal('pesoBrutoVolume', 15, 3);
+	
+	inserirMascaraDecimal('valorDuplicata', 15, 2);
 };
 
 function inicializarTabelaImportacaoProd(){
@@ -428,62 +424,16 @@ function inicializarTabelaVolumes(){
 	editarTabela(config);
 };
 
-function removerDuplicata(botao) {
-	tabelaDuplicataHandler.removerRegistro(botao);
-};
-
-function editarDuplicata(botao){
-	tabelaDuplicataHandler.editar(botao);
-};
-
-function inicializarBlocoDuplicata(){
-	
-	tabelaDuplicataHandler.incluirRegistro(function (ehEdicao, linha){
-		var celula = null;
-		var doc = document;
-		
-		for (var i = 0; i < this.TOTAL_COLUNAS; i++) {
-			celula = ehEdicao ? linha.cells[i] : linha.insertCell(i); 
-			switch (i) {
-				case 0:
-					celula.style.display = 'none';
-					break;	
-				case 1:
-					celula.innerHTML = $('#bloco_duplicata #numeroDuplicata').val();
-					break;
-				case 2:
-					celula.innerHTML = $('#bloco_duplicata #dataVencimentoDuplicata').val();
-					break;
-				case 3:
-					celula.innerHTML = $('#bloco_duplicata #valorDuplicata').val();
-					break;
-			}
-		}
-	});
-	
-	tabelaDuplicataHandler.editarRegistro(function(linha){
-		
-		var celula = null;
-		var doc = document;
-		
-		for (var i = 0; i < this.TOTAL_COLUNAS; i++) {
-			celula =  linha.cells[i];
-			
-			if (!isEmpty(celula.innerHTML)) {
-				switch (i) {
-					case 1:
-						doc.getElementById('numeroDuplicata').value = celula.innerHTML;
-						break;
-					case 2:
-						doc.getElementById('dataVencimentoDuplicata').value = celula.innerHTML;
-						break;
-					case 3:
-						doc.getElementById('valorDuplicata').value = celula.innerHTML;
-						break;
-				}
-			}
-		}
-	});
+function inicializarTabelaDuplicata(){
+	var campos = ['numeroDuplicata', 'dataVencimentoDuplicata', 'valorDuplicata'];
+	var config = {'idTabela': 'tabela_duplicata', 'idBotaoInserir':'botaoInserirDuplicata',
+			'campos': campos,
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return obrigatorioPreenchido(campos, ['numeroDuplicata', 'dataVencimentoDuplicata']);
+			},
+			'idLinhaSequencial':true};
+	editarTabela(config);
 };
 
 function gerarInputLinhasTabela(nomeTabela, parametroJson){
@@ -868,7 +818,7 @@ function gerarInputImpostoImportacao(){
 
 function gerarInputDuplicata(){
 	var parametros = {'nomeLista': 'nf.cobrancaNFe.listaDuplicata',
-			'nomes': [null, 'numero', 'dataVencimento', 'valor']};
+			'nomes': ['numero', 'dataVencimento', 'valor']};
 	gerarInputLinhasTabela('tabela_duplicata', parametros);
 };
 
@@ -928,33 +878,6 @@ function gerarInputProdutoServico(){
 		gerarInputHidden(detalhamento);
 		gerarInputHidden(produto);
 	}
-};
-
-function inserirVolume(){
-	var quantidade = $('#bloco_volume #quantidadeVolume').val();
-	var especie = $('#bloco_volume #especieVolume').val();
-	var marca = $('#bloco_volume #marcaVolume').val();
-	var numeracao = $('#bloco_volume #numeracaoVolume').val();
-	var pesoLiq = $('#bloco_volume #pesoLiquidoVolume').val();
-	var pesoBruto = $('#bloco_volume #pesoBrutoVolume').val();
-
-	if(isEmpty(quantidade) && isEmpty(especie) && isEmpty(marca)
-			&& isEmpty(numeracao) && isEmpty(pesoLiq) && isEmpty(pesoBruto)){
-		return;
-	}
-	
-	var tabela = document.getElementById('tabela_volume');
-	var linha = tabela.tBodies[0].insertRow(0);
-	
-	linha.insertCell(0).innerHTML = quantidade;
-	linha.insertCell(1).innerHTML = especie;
-	linha.insertCell(2).innerHTML = marca;
-	linha.insertCell(3).innerHTML = numeracao;
-	linha.insertCell(4).innerHTML = pesoLiq;
-	linha.insertCell(5).innerHTML = pesoBruto;
-	linha.insertCell(6).innerHTML = '<input type="button" title="Remover Volume" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
-	
-	$('#bloco_volume input:text').val('');
 };
 
 function inicializarTabelaReboque(){
@@ -2177,20 +2100,19 @@ function editarProduto(linha){
 				<legend>::: Duplicata :::</legend>
 				<div class="label">Número:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" id="numeroDuplicata"/>
+					<input type="text" id="numeroDuplicata" maxlength="60"/>
 				</div>
 				
 				<div class="label">Dt. Vencimento:</div>
 				<div class="input" style="width: 10%">
 					<input id="dataVencimentoDuplicata" type="text" />
 				</div>
-				<div class="label">Valor:</div>
+				<div class="label obrigatorio">Valor:</div>
 				<div class="input" style="width: 10%">
 					<input type="text" id="valorDuplicata"/>
 				</div>
 				<div class="bloco_botoes">
-					<input type="button" id="botaoIncluirDuplicata" title="Inserir Dados da Duplicata" class="botaoAdicionar"/>
-					<input type="button" id="botaoLimparDuplicata" title="Limpar Dados da Duplicata" class="botaoLimpar"/>
+					<input type="button" id="botaoInserirDuplicata" title="Inserir Dados da Duplicata" class="botaoAdicionar"/>
 				</div>
 							
 				<table id="tabela_duplicata" class="listrada" >
@@ -2207,14 +2129,10 @@ function editarProduto(linha){
 					<tbody>
 						<c:forEach var="dup" items="${listaDuplicata}">
 							<tr>
-								<td style="display: none;"></td>
 								<td>${dup.numero}</td>
 								<td>${dup.dataVencimento}</td>
 								<td>${dup.valor}</td>
-								<td>
-									<input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>
-									<input type="button" value="" title="Editar Duplicata" onclick="editarDuplicata(this);" class="botaoEditar" /> 
-								</td>
+								<td></td>
 							</tr>
 						</c:forEach>
 					</tbody>

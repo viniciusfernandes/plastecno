@@ -167,6 +167,9 @@ public class EmissaoNFeController extends AbstractController {
 
         for (DuplicataNFe d : lista) {
             try {
+                if (d.getDataVencimento() == null) {
+                    continue;
+                }
                 d.setDataVencimento(to.format(from.parse(d.getDataVencimento())));
             } catch (ParseException e) {
                 throw new BusinessException("Não foi possível formatar a data de vencimento da duplicata "

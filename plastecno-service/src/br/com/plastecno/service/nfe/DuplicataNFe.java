@@ -7,11 +7,11 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class DuplicataNFe {
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Data de vencimento da duplicata")
+	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Data de vencimento da duplicata")
 	@XmlElement(name = "dVenc")
 	private String dataVencimento;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 60 }, nomeExibicao = "Número da duplicata")
+	@InformacaoValidavel(intervaloComprimento = { 1, 60 }, nomeExibicao = "Número da duplicata")
 	@XmlElement(name = "nDup")
 	private String numero;
 

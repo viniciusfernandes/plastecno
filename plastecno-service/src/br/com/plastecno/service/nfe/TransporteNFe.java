@@ -22,6 +22,7 @@ public class TransporteNFe {
 	private String modalidadeFrete;
 
 	@XmlElement(name = "retTransp")
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Retenção do ICMS do transporte")
 	private RetencaoICMSTransporteNFe retencaoICMS;
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Transportadora da NFe")

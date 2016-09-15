@@ -257,26 +257,33 @@ function inicializarMascaraImpostos(){
 	inserirMascaraDecimal('aliquotaCOFINS', 7, 4);
 	inserirMascaraDecimal('qtdeVendidaCOFINS', 16, 4);
 
-	inserirMascaraMonetaria('valorBCPIS', 15, 2);
-	inserirMascaraMonetaria('aliquotaPIS', 7, 4);
-	inserirMascaraMonetaria('qtdeVendidaPIS', 14, 4);
+	inserirMascaraDecimal('valorBCPIS', 15, 2);
+	inserirMascaraDecimal('aliquotaPIS', 7, 4);
+	inserirMascaraDecimal('qtdeVendidaPIS', 14, 4);
 	
-	inserirMascaraMonetaria('valorBCIPI', 15, 2);
-	inserirMascaraMonetaria('aliquotaIPI', 7, 4);
-	inserirMascaraMonetaria('qtdeUnidTribIPI', 16, 4);
-	inserirMascaraMonetaria('valorUnidTribIPI', 15, 4);
+	inserirMascaraDecimal('valorBCIPI', 15, 2);
+	inserirMascaraDecimal('aliquotaIPI', 7, 4);
+	inserirMascaraDecimal('qtdeUnidTribIPI', 16, 4);
+	inserirMascaraDecimal('valorUnidTribIPI', 15, 4);
 	
-	inserirMascaraMonetaria('valorBCISS', 15, 2);
-	inserirMascaraMonetaria('aliquotaISS', 7, 4);
-	inserirMascaraMonetaria('qtdeVendidaPIS', 14, 4);
+	inserirMascaraDecimal('valorBCISS', 15, 2);
+	inserirMascaraDecimal('aliquotaISS', 7, 4);
+	inserirMascaraDecimal('qtdeVendidaPIS', 14, 4);
 	
-	inserirMascaraMonetaria('valorBCII', 15, 2);
-	inserirMascaraMonetaria('valorII', 15, 2);
-	inserirMascaraMonetaria('valorIOFII', 15, 2);
-	inserirMascaraMonetaria('valorDespAduaneirasII', 15, 2);
+	inserirMascaraDecimal('valorBCII', 15, 2);
+	inserirMascaraDecimal('valorII', 15, 2);
+	inserirMascaraDecimal('valorIOFII', 15, 2);
+	inserirMascaraDecimal('valorDespAduaneirasII', 15, 2);
 	
-	inserirMascaraMonetaria('despesasAcessoriasProd', 15, 2);
-
+	inserirMascaraDecimal('despesasAcessoriasProd', 15, 2);
+	
+	inserirMascaraDecimal('qExport', 15, 2);
+	
+	inserirMascaraDecimal('valServRetICMSTransp', 15, 2);
+	inserirMascaraDecimal('valBCRetICMSTransp', 15, 2);
+	inserirMascaraDecimal('aliqRetICMSTransp', 7, 4);
+	inserirMascaraDecimal('valRetICMSTransp', 15, 2);
+	inserirMascaraDecimal('valRetICMSTransp', 15, 2);
 };
 
 function inicializarTabelaImportacaoProd(){
@@ -359,11 +366,12 @@ function inicializarTabelaAdicaoImportacao(){
 };
 
 function inicializarTabelaExportacaoProd(){
+	var campos = ['drawbackExportProd', 'chAcessoExportIndir', 'registroExportIndir', 'qtdeExportIndir'];
 	var config = {'idTabela': 'tabela_exportacao_prod', 'idBotaoInserir':'botaoInserirExportacaoProd',
-			'campos': ['drawbackExportProd', 'chAcessoExportIndir', 'registroExportIndir', 'qtdeExportIndir'],
+			'campos': campos,
 			'idLinhaSequencial': true,
 			'onValidar': function(){
-				return numeroProdutoEdicao != null;
+				return numeroProdutoEdicao != null && obrigatorioPreenchido(campos, ['drawbackExportProd']);
 			},
 			'onInserir': function(linha){
 				if(numeroProdutoEdicao == null || linha == null){
@@ -1142,6 +1150,7 @@ function editarProduto(linha){
 	fecharBloco('bloco_iss');
 	fecharBloco('bloco_importacao_prod');
 	fecharBloco('bloco_exportacao_prod');
+	fecharBloco('bloco_adicao_import');
 	
 	var opcoes = {'campos':
 		[{'idBloco': 'bloco_tributos', 'idCampo': 'cfop', 'opcao': '5102'},
@@ -1928,17 +1937,17 @@ function editarProduto(linha){
 					<legend>::: Exportação ::: +</legend>
 					<div class="label">Drawback:</div>
 					<div class="input" style="width: 20%">
-						<input type="text" id="drawbackExportProd" style="width: 100%"/>
+						<input type="text" id="drawbackExportProd" maxlength="11" style="width: 100%"/>
 					</div>
-					<div class="label">Ch Acesso:</div>
+					<div class="label obrigatorio">Ch Acesso:</div>
 					<div class="input" style="width: 40%">
-						<input type="text" id="chAcessoExportIndir" style="width: 50%"/>
+						<input type="text" id="chAcessoExportIndir" maxlength="44" style="width: 100%"/>
 					</div>
-					<div class="label">Registro:</div>
+					<div class="label obrigatorio">Registro:</div>
 					<div class="input" style="width: 20%">
-						<input type="text" id="registroExportIndir" style="width: 100%"/>
+						<input type="text" id="registroExportIndir" maxlength="12" style="width: 100%"/>
 					</div>
-					<div class="label">Quantidade:</div>
+					<div class="label obrigatorio">Quantidade:</div>
 					<div class="input" style="width: 40%">
 						<input type="text" id="qtdeExportIndir" style="width: 50%"/>
 					</div>
@@ -1968,7 +1977,7 @@ function editarProduto(linha){
 		
 		<fieldset id="bloco_transporte">
 			<legend>::: Transporte ::: -</legend>
-			<div class="label">Modal. Frete:</div>
+			<div class="label obrigatorio">Modal. Frete:</div>
 			<div class="input" style="width: 80%">
 			<select id="modFrete" name="nf.transporteNFe.modalidadeFrete" style="width: 45%">
 				<c:forEach var="tipo" items="${listaTipoModalidadeFrete}">
@@ -2014,18 +2023,18 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_veiculo" class="fieldsetInterno">
 					<legend>::: Veículo/Reboque/Balsa/Vagão :::</legend>
-					<div  class="label">Placa:</div>
+					<div  class="label obrigatorio">Placa:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa" value="${nf.transporteNFe.veiculo.placa}" style="width: 100%" />
+						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa"  value="${nf.transporteNFe.veiculo.placa}" maxlength="7" style="width: 100%" />
 					</div>
-					<div  class="label">UF:</div>
+					<div  class="label obrigatorio">UF:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" style="width: 20%" />
+						<input type="text" id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" maxlength="2" style="width: 20%" />
 					</div>
 					<div  class="label">Regist. Trans. Cargo:</div>
 					<div class="input" style="width: 30%">
 						<input type="text" id="registroVeiculo" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
-							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" style="width: 50%" />
+							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" maxlength="2" style="width: 50%" />
 					</div>
 					<div class="bloco_botoes">
 						<a id="botaoInserirReboque" title="Inserir Dados do Reboque" class="botaoAdicionar"></a>
@@ -2034,9 +2043,9 @@ function editarProduto(linha){
 					<table id="tabela_reboque" class="listrada" >
 						<thead>
 							<tr>
-								<th>Placa</th>
-								<th>UF</th>
-								<th>Registro</th>
+								<th>Placa Reboq.</th>
+								<th>UF Reboq.</th>
+								<th>Registro Reboq.</th>
 								<th>Ações</th>
 							</tr>
 						</thead>
@@ -2059,27 +2068,27 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset class="fieldsetInterno">
 					<legend>::: Retenção ICMS :::</legend>
-					<div  class="label">Valor Serviço:</div>
+					<div  class="label obrigatorio">Valor Serviço:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.valorServico" style="width: 100%" />
+						<input type="text" id="valServRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorServico" style="width: 100%" />
 					</div>
-					<div  class="label">Valor BC:</div>
+					<div  class="label obrigatorio">Valor BC:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.valorBC" style="width: 20%" />
+						<input type="text" id="valBCRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorBC" style="width: 20%" />
 					</div>
-					<div  class="label">Alíquota(%):</div>
+					<div  class="label obrigatorio">Alíquota(%):</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.aliquota" style="width: 100%" />
+						<input type="text" id="aliqRetICMSTransp" name="nf.transporteNFe.retencaoICMS.aliquota" style="width: 100%" />
 					</div>
-					<div  class="label">Valor Ret.:</div>
+					<div  class="label obrigatorio">Valor Ret.:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.valorRetido" style="width: 20%" />
+						<input type="text" id="valRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorRetido" style="width: 20%" />
 					</div>
-					<div  class="label">CFOP:</div>
+					<div  class="label obrigatorio">CFOP:</div>
 					<div class="input" style="width: 10%">
 						<input type="text" name="nf.transporteNFe.retencaoICMS.cfop" style="width: 100%" />
 					</div>
-					<div  class="label">Município Gerador:</div>
+					<div  class="label obrigatorio">Município Gerador:</div>
 					<div class="input" style="width: 50%">
 						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" style="width: 20%" />
 					</div>

@@ -274,20 +274,20 @@ function inicializarMascaraImpostos(){
 	inserirMascaraMonetaria('valorII', 15, 2);
 	inserirMascaraMonetaria('valorIOFII', 15, 2);
 	inserirMascaraMonetaria('valorDespAduaneirasII', 15, 2);
-};
+	
+	inserirMascaraMonetaria('despesasAcessoriasProd', 15, 2);
 
-function gerarIdCamposImportacaoProd(){
-	return ['cnpjImportProd', 'exportadorImportProd', 'dtImportProd', 'dataDesembImportProd',
-	          'lcImportProd', 'numImportProd', 'tpImportProd', 'tpTranspImportProd', 'ufDesembImportProd',
-	          'ufEncomendImportProd', 'vlAFRMMImportProd'];
 };
 
 function inicializarTabelaImportacaoProd(){
+	var campos = ['cnpjImportProd', 'exportadorImportProd', 'dtImportProd', 'dataDesembImportProd',
+		          'lcImportProd', 'numImportProd', 'tpImportProd', 'tpTranspImportProd', 'ufDesembImportProd',
+		          'ufEncomendImportProd', 'vlAFRMMImportProd'];
 	var config = {'idTabela': 'tabela_importacao_prod', 'idBotaoInserir':'botaoInserirImportacaoProd',
-			'campos': gerarIdCamposImportacaoProd(),
+			'campos': campos,
 			'idLinhaSequencial': true,
 			'onValidar': function(){
-				return numeroProdutoEdicao != null;
+				return numeroProdutoEdicao != null && obrigatorioPreenchido(campos, ['cnpjImportProd', 'ufEncomendImportProd', 'vlAFRMMImportProd']);
 			},
 			'onInserir': function(linha){
 				if(numeroProdutoEdicao == null || linha == null){
@@ -326,10 +326,13 @@ function inicializarTabelaImportacaoProd(){
 };
 
 function inicializarTabelaAdicaoImportacao(){
-	var ids = ['codFabricAdicao', 'numAdicao', 'numDrawbackAdicao', 'numSeqAdicao', 'valDescAdicao'];
+	var campos = ['codFabricAdicao', 'numAdicao', 'numDrawbackAdicao', 'numSeqAdicao', 'valDescAdicao'];
 	var config = {'idTabela': 'tabela_adicao_import', 'idBotaoInserir':'botaoInserirAdicao',
-			'campos':ids,
+			'campos':campos,
 			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return obrigatorioPreenchido(campos, ['numDrawbackAdicao', 'valDescAdicao']);
+			},
 			'onInserir': function(linha){
 				if(numeroProdutoEdicao == null || numeroImportacaoProduto == null || linha == null){
 					return;
@@ -386,19 +389,27 @@ function inicializarTabelaExportacaoProd(){
 	editorTabelaExportacao = new editarTabela(config);
 };
 
+function obrigatorioPreenchido(ids, idExcl){
+	for (var i = 0; i < ids.length; i++) {
+		if(idExcl != null && idExcl.indexOf(ids[i]) >= 0){
+			continue;
+		}
+		
+		if(isEmpty(document.getElementById(ids[i]).value)){
+			return false;
+		}
+	}
+	return true;
+};
+
 function inicializarTabelaReferenciada(){
 	var campos = ['chaveReferenciada', 'numeroReferenciada', 'serieReferenciada', 'modReferenciada', 'cnpjReferenciada', 'anoMesReferenciada', 'ufReferenciada'];
 	var config = {'idTabela': 'tabela_referenciada', 'idBotaoInserir':'botaoInserirReferenciada',
 			'campos': campos,
 			'idLinhaSequencial': true,
 			'onValidar': function(){
-				for (var i = 0; i < campos.length; i++) {
-					if(isEmpty(campos[i])){
-						return false;
-					}
-				}
-				return true;
-				},
+				return obrigatorioPreenchido(campos, null);
+			},
 			'idLinhaSequencial':true};
 	editarTabela(config);
 };
@@ -1091,6 +1102,7 @@ function editarProduto(linha){
 	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
 	--numeroProdutoEdicao;
 	var valorBC = celulas[6].innerHTML;
+	
 	var valoresTabela = {'campos':[{'id': 'itemPedidoCompraProd', 'valorTabela':celulas[0].innerHTML},
 								   {'id': 'ncm', 'valorTabela': celulas[2].innerHTML},
 	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[10].innerHTML},
@@ -1733,7 +1745,7 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_iss" class="fieldsetInterno">
 					<legend>::: ISSQN Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
+					<div class="label obribagorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribISS" style="width: 45%">
 							<option value=""></option>
@@ -1742,19 +1754,19 @@ function editarProduto(linha){
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label">Valor BC:</div>
+					<div  class="label obribagorio">Valor BC:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorBCISS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota(%):</div>
+					<div  class="label obribagorio">Alíquota(%):</div>
 					<div class="input" style="width: 50%">
 						<input id="aliquotaISS" type="text" style="width: 20%" />
 					</div>
-					<div  class="label">Mun. Gerador:</div>
+					<div  class="label obribagorio">Mun. Gerador:</div>
 					<div class="input" style="width: 10%">
 						<input id="codMunGeradorISS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Item Serviço:</div>
+					<div  class="label obribagorio">Item Serviço:</div>
 					<div class="input" style="width: 10%">
 						<input id="codItemServicoISS" type="text" style="width: 100%" />
 					</div>
@@ -1768,19 +1780,19 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_ii" class="fieldsetInterno">
 					<legend>::: Importação Prod.::: +</legend>
-					<div  class="label">Valor BC:</div>
+					<div  class="label obribagorio">Valor BC:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorBCII" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Valor Import.(R$):</div>
+					<div  class="label obribagorio">Valor Import.(R$):</div>
 					<div class="input" style="width: 50%">
 						<input id="valorII" type="text" style="width: 20%" />
 					</div>
-					<div  class="label">Valor IOF:</div>
+					<div  class="label obribagorio">Valor IOF:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorIOFII" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Valor Desp. Aduan.:</div>
+					<div  class="label obribagorio">Valor Desp. Aduan.:</div>
 					<div class="input" style="width: 50%">
 						<input id="valorDespAduaneirasII" type="text" style="width: 20%" />
 					</div>
@@ -1795,37 +1807,41 @@ function editarProduto(linha){
 				<legend>::: Importação ::: +</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 20%">
-					<input type="text" id="cnpjImportProd" style="width: 100%"/>
+					<input type="text" id="cnpjImportProd" maxlength="14" style="width: 100%"/>
 				</div>
-				<div class="label">Cód. Export.:</div>
+				<div class="label obrigatorio">Cód. Export.:</div>
 				<div class="input" style="width: 40%">
-					<input type="text" id="exportadorImportProd" style="width: 50%"/>
+					<input type="text" id="exportadorImportProd" maxlength="60" style="width: 50%"/>
 				</div>
-				<div class="label">Dt. Import.:</div>
+				<div class="label obrigatorio">Dt. Import.:</div>
 				<div class="input" style="width: 20%">
 					<input type="text" id="dtImportProd" style="width: 100%"/>
 				</div>
-				<div class="label">Dt. Desemb.:</div>
+				<div class="label obrigatorio">Dt. Desemb.:</div>
 				<div class="input" style="width: 40%">
 					<input type="text" id="dataDesembImportProd" style="width: 50%"/>
 				</div>
-				<div class="label">Local:</div>
+				<div class="label obrigatorio">Local:</div>
 				<div class="input" style="width: 20%">
-					<input type="text" id="lcImportProd" style="width: 100%"/>
+					<input type="text" id="lcImportProd" maxlength="60" style="width: 100%"/>
 				</div>
-				<div class="label">Número:</div>
+				<div class="label obrigatorio">Número:</div>
 				<div class="input" style="width: 40%">
-					<input type="text" id="numImportProd" style="width: 50%"/>
+					<input type="text" id="numImportProd" maxlength="12" style="width: 50%"/>
 				</div>
-				<div class="label">Intermediação:</div>
+				<div class="label obrigatorio">Intermediação:</div>
 				<div class="input" style="width: 20%">
-					<input type="text" id="tpImportProd" style="width: 100%"/>
+					<select id="tpImportProd" style="width: 100%">
+						<c:forEach var="tipo" items="${listaTipoIntermediacaoImportacao}">
+							<option value="${tipo.codigo}">${tipo.descricao}</option>
+						</c:forEach>
+					</select>
 				</div>
-				<div class="label">Transporte:</div>
+				<div class="label obrigatorio">Transporte:</div>
 				<div class="input" style="width: 40%">
 					<input type="text" id="tpTranspImportProd" style="width: 50%"/>
 				</div>
-				<div class="label">UF Desemb.:</div>
+				<div class="label obrigatorio">UF Desemb.:</div>
 				<div class="input" style="width: 20%">
 					<input type="text" id="ufDesembImportProd" style="width: 100%"/>
 				</div>
@@ -1865,11 +1881,11 @@ function editarProduto(linha){
 				</table>
 				<fieldset id="bloco_adicao_import" class="fieldsetInterno">
 					<legend>::: Adição de Importação :::</legend>
-					<div class="label">Cód. Fabric.:</div>
+					<div class="label obrigatorio">Cód. Fabric.:</div>
 					<div class="input" style="width: 20%">
 						<input type="text" id="codFabricAdicao" style="width: 100%"/>
 					</div>
-					<div class="label">Núm.:</div>
+					<div class="label obrigatorio">Núm.:</div>
 					<div class="input" style="width: 40%">
 						<input type="text" id="numAdicao" style="width: 50%"/>
 					</div>
@@ -1877,7 +1893,7 @@ function editarProduto(linha){
 					<div class="input" style="width: 20%">
 						<input type="text" id="numDrawbackAdicao" style="width: 100%"/>
 					</div>
-					<div class="label">Núm. Sequenc.:</div>
+					<div class="label obrigatorio">Núm. Sequenc.:</div>
 					<div class="input" style="width: 40%">
 						<input type="text" id="numSeqAdicao" style="width: 50%"/>
 					</div>

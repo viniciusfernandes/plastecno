@@ -37,9 +37,6 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "indTot")
 	private Integer indicadorValorTotal;
 
-	@XmlElement(name = "nItemPed")
-	private Integer itemPedidoCompra;
-
 	@InformacaoValidavel(obrigatorio = true, tamanhos = { 2, 8 }, substituicao = { "\\D", "" }, nomeExibicao = "NCM do produtos/serviços")
 	@XmlElement(name = "NCM")
 	private String ncm;
@@ -122,11 +119,6 @@ public class ProdutoServicoNFe {
 	@XmlTransient
 	public Integer getIndicadorValorTotal() {
 		return indicadorValorTotal;
-	}
-
-	@XmlTransient
-	public Integer getItemPedidoCompra() {
-		return itemPedidoCompra;
 	}
 
 	@XmlTransient
@@ -220,10 +212,6 @@ public class ProdutoServicoNFe {
 
 	public void setIndicadorValorTotal(Integer indicadorValorTotal) {
 		this.indicadorValorTotal = indicadorValorTotal;
-	}
-
-	public void setItemPedidoCompra(Integer itemPedidoCompra) {
-		this.itemPedidoCompra = itemPedidoCompra;
 	}
 
 	public void setNcm(String ncm) {

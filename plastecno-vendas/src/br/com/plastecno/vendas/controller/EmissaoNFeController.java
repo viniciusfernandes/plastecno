@@ -37,6 +37,7 @@ import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
 import br.com.plastecno.service.nfe.constante.TipoImpressaoNFe;
+import br.com.plastecno.service.nfe.constante.TipoIntermediacaoImportacao;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
@@ -80,6 +81,7 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
+        addAtributo("listaTipoIntermediacaoImportacao", TipoIntermediacaoImportacao.values());
         addAtributo("listaTipoPresencaComprador", TipoPresencaComprador.values());
         addAtributo("listaTipoDestinoOperacao", TipoDestinoOperacao.values());
         addAtributo("listaTipoOperacaoConsumidorFinal", TipoOperacaoConsumidorFinal.values());

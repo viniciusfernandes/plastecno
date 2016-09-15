@@ -13,19 +13,6 @@ import br.com.plastecno.util.NumeroUtils;
 
 public final class ValidadorInformacao {
 
-	private static void configurarConteudo(Field campo, Object obj, Object valor) {
-
-		try {
-			campo.setAccessible(true);
-			campo.set(obj, valor);
-		} catch (Exception e) {
-			throw new IllegalStateException("O campo " + campo.getName() + " do objeto " + obj.getClass()
-					+ " não pode ter seu novo valor configurado", e);
-		} finally {
-			campo.setAccessible(false);
-		}
-	}
-
 	public static void preencherListaMensagemValidacao(Object obj, List<String> listaMensagem) {
 		InformacaoValidavel informacao = null;
 		if ((informacao = obj.getClass().getAnnotation(InformacaoValidavel.class)) == null) {
@@ -152,6 +139,20 @@ public final class ValidadorInformacao {
 			}
 
 			COMPRIMENTO_STRING = isString ? conteudoCampo.toString().trim().length() : -1;
+			// Esse bloco deve anteceder a validacao do comprimento da String
+			// pois ele complementa seu conteudo com prefixos
+			if (COMPRIMENTO_STRING > 0 && informacao.prefixo().length() > 0 && informacao.tamanho() > 0
+					&& COMPRIMENTO_STRING < informacao.tamanho()) {
+				int qtde = informacao.tamanho() - COMPRIMENTO_STRING;
+				StringBuilder s = new StringBuilder();
+				for (int i = 0; i < qtde; i++) {
+					s.append(informacao.prefixo());
+				}
+				conteudoCampo = s.append(conteudoCampo.toString()).toString();
+				COMPRIMENTO_STRING = conteudoCampo.toString().length();
+				setConteudo(campo, obj, conteudoCampo);
+			}
+
 			if (informacao.intervaloComprimento().length > 0
 					&& COMPRIMENTO_STRING >= 0
 					&& (COMPRIMENTO_STRING < informacao.intervaloComprimento()[0] || COMPRIMENTO_STRING > informacao
@@ -171,7 +172,7 @@ public final class ValidadorInformacao {
 						informacao.substituicao()[1]);
 				COMPRIMENTO_STRING = conteudoCampo.toString().length();
 
-				configurarConteudo(campo, obj, conteudoCampo);
+				setConteudo(campo, obj, conteudoCampo);
 			}
 
 			if (conteudoCampo != null && informacao.tamanho() >= 0 && COMPRIMENTO_STRING != informacao.tamanho()) {
@@ -229,7 +230,7 @@ public final class ValidadorInformacao {
 				listaMensagem.add(informacao.nomeExibicao() + " não é válido");
 				continue;
 			}
-			
+
 			if (COMPRIMENTO_STRING > 0 && informacao.padrao().length > 0) {
 				ok = false;
 				for (String p : informacao.padrao()) {
@@ -318,6 +319,18 @@ public final class ValidadorInformacao {
 							+ " não possui um de acesso ao campo de identificação ID. Implementar um metodo de acesso getId(), mas no caso de ENUM, substitua pelo atributo \"obrigatório\"");
 		}
 
+	}
+
+	private static void setConteudo(Field campo, Object obj, Object valor) {
+		try {
+			campo.setAccessible(true);
+			campo.set(obj, valor);
+		} catch (Exception e) {
+			throw new IllegalStateException("O campo " + campo.getName() + " do objeto " + obj.getClass()
+					+ " não pode ter seu novo valor configurado", e);
+		} finally {
+			campo.setAccessible(false);
+		}
 	}
 
 	private static Object trim(Field campo, Object obj, Object conteudoCampo) {

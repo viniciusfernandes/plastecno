@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -30,6 +31,36 @@ public class VolumeTransportado {
 	@InformacaoValidavel(padrao = "\\d{1,15}", padraoExemplo = "1 a 15 digitos", nomeExibicao = "Quantidade de volumes transportados")
 	@XmlElement(name = "qVol")
 	private String quantidade;
+
+	@XmlTransient
+	public String getEspecie() {
+		return especie;
+	}
+
+	@XmlTransient
+	public String getMarca() {
+		return marca;
+	}
+
+	@XmlTransient
+	public String getNumeracao() {
+		return numeracao;
+	}
+
+	@XmlTransient
+	public Double getPesoBruto() {
+		return pesoBruto;
+	}
+
+	@XmlTransient
+	public Double getPesoLiquido() {
+		return pesoLiquido;
+	}
+
+	@XmlTransient
+	public String getQuantidade() {
+		return quantidade;
+	}
 
 	public void setEspecie(String especie) {
 		this.especie = especie;

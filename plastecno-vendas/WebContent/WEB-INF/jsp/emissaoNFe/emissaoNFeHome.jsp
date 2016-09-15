@@ -59,10 +59,6 @@ $(document).ready(function() {
 		$('#formPesquisa').submit();
 	});
 
-	$("#botaoInserirVolume").click(function() {
-		inserirVolume();
-	});
-	
 	$("#botaoInserirReboque").click(function() {
 		inserirReboque();
 	});
@@ -241,6 +237,7 @@ $(document).ready(function() {
 	inicializarTabelaAdicaoImportacao();
 	inicializarTabelaExportacaoProd();
 	inicializarTabelaReferenciada();
+	inicializarTabelaVolumes();
 	
 	inicializarMascaraImpostos();
 });
@@ -414,6 +411,18 @@ function obrigatorioPreenchido(ids, idExcl){
 function inicializarTabelaReferenciada(){
 	var campos = ['chaveReferenciada', 'numeroReferenciada', 'serieReferenciada', 'modReferenciada', 'cnpjReferenciada', 'anoMesReferenciada', 'ufReferenciada'];
 	var config = {'idTabela': 'tabela_referenciada', 'idBotaoInserir':'botaoInserirReferenciada',
+			'campos': campos,
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return obrigatorioPreenchido(campos, null);
+			},
+			'idLinhaSequencial':true};
+	editarTabela(config);
+};
+
+function inicializarTabelaVolumes(){
+	var campos = ['quantidadeVolume', 'especieVolume', 'marcaVolume', 'numeracaoVolume', 'pesoLiquidoVolume', 'pesoBrutoVolume'];
+	var config = {'idTabela': 'tabela_volume', 'idBotaoInserir':'botaoInserirVolume',
 			'campos': campos,
 			'idLinhaSequencial': true,
 			'onValidar': function(){
@@ -2122,7 +2131,6 @@ function editarProduto(linha){
 					</div>
 					<div class="bloco_botoes">
 						<a id="botaoInserirVolume" title="Inserir Dados da Volume" class="botaoAdicionar"></a>
-						<a id="botaoLimparVolume" title="Limpar Dados da Volume" class="botaoLimpar"></a>
 					</div>
 								
 					<table id="tabela_volume" class="listrada" >
@@ -2137,9 +2145,19 @@ function editarProduto(linha){
 								<th>Ações</th>
 							</tr>
 						</thead>
-						
 						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
 						<tbody>
+						<c:forEach var="vol" items="${nf.transporteNFe.listaVolume}">
+							<tr>
+								<td>${vol.quantidade}</td>
+								<td>${vol.especie}</td>
+								<td>${vol.marca}</td>
+								<td>${vol.numeracao}</td>
+								<td>${vol.pesoLiquido}</td>
+								<td>${vol.pesoBruto}</td>
+								<td></td>
+							</tr>
+						</c:forEach>
 						</tbody>
 					</table>
 				</fieldset>

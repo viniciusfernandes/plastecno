@@ -59,10 +59,6 @@ $(document).ready(function() {
 		$('#formPesquisa').submit();
 	});
 
-	$("#botaoInserirReboque").click(function() {
-		inserirReboque();
-	});
-	
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
@@ -961,24 +957,16 @@ function inserirVolume(){
 	$('#bloco_volume input:text').val('');
 };
 
-function inserirReboque(){
-	var placa = $('#bloco_veiculo #placaVeiculo').val();
-	var uf = $('#bloco_veiculo #ufVeiculo').val();
-	var registro = $('#bloco_veiculo #registroVeiculo').val();
-
-	if(isEmpty(placa) || isEmpty(uf)){
-		return;
-	}
-	
-	var tabela = document.getElementById('tabela_reboque');
-	var linha = tabela.tBodies[0].insertRow(0);
-	
-	linha.insertCell(0).innerHTML = placa;
-	linha.insertCell(1).innerHTML = uf;
-	linha.insertCell(2).innerHTML = registro;
-	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Reboque" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
-	
-	$('#bloco_veiculo input:text').val('');
+function inicializarTabelaReboque(){
+	var campos = ['placaVeiculo', 'ufVeiculo', 'registroVeiculo'];
+	var config = {'idTabela': 'tabela_reboque', 'idBotaoInserir':'botaoInserirReboque',
+			'campos': campos,
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return obrigatorioPreenchido(campos, ['registroVeiculo']);
+			},
+			'idLinhaSequencial':true};
+	editarTabela(config);
 };
 
 function inserirLinhaTabela(linhaJson){
@@ -2067,7 +2055,7 @@ function editarProduto(linha){
 								<td>${reboque.placa}</td>
 								<td>${reboque.uf}</td>
 								<td>${reboque.registroNacionalTransportador}</td>
-								<td><input type="button" title="Remover Reboque" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+								<td></td>
 							</tr>
 							</c:forEach>
 						</tbody>

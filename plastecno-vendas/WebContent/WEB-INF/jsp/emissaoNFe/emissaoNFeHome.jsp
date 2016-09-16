@@ -230,6 +230,7 @@ $(document).ready(function() {
 	inicializarTabelaDuplicata();
 	
 	inicializarMascaraImpostos();
+	inicializarCalculoImpostos();
 });
 
 function inicializarMascaraImpostos(){
@@ -1082,8 +1083,40 @@ function editarProduto(linha){
 		 {'idBloco': 'bloco_tributos', 'idCampo': 'codSitTribPIS', 'opcao': '1'}]};
 	
 	inicializarOpcoesSelect(opcoes);
+	
+	calcularValoresImpostos();
 };
 
+function gerarJsonCalculoImpostos(){
+	return [{'idVl':'valorBCICMS', 'idAliq':'aliquotaICMS', 'idImp':'valorICMS'},
+			{'idVl':'valorBCCOFINS', 'idAliq':'aliquotaCOFINS', 'idImp':'valorCOFINS'},
+	    	{'idVl':'valorBCPIS', 'idAliq':'aliquotaPIS', 'idImp':'valorPIS'},
+	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI'},
+	    	{'idVl':'valorBCISS', 'idAliq':'aliquotaISS', 'idImp':'valorISS'}];	
+};
+
+function calcularValoresImpostos(){
+	var campos = gerarJsonCalculoImpostos();
+	var vl=null; 
+	var aliq=null; 
+	var idImp=null;
+	for (var i = 0; i < campos.length; i++) {
+		vl = document.getElementById(campos[i].idVl).value;
+		aliq = document.getElementById(campos[i].idAliq).value;
+		if(isEmpty(vl) || isEmpty(aliq)){
+			continue;
+		}
+		document.getElementById(campos[i].idImp).value = Math.round(vl*(aliq/100) * 100)/100;
+	}
+};
+
+function inicializarCalculoImpostos(){
+	var campos = gerarJsonCalculoImpostos();
+	for (var i = 0; i < campos.length; i++) {
+		document.getElementById(campos[i].idVl).onblur = calcularValoresImpostos;
+		document.getElementById(campos[i].idAliq).onblur = calcularValoresImpostos;
+	}
+};
 </script>
 
 </head>
@@ -1452,8 +1485,8 @@ function editarProduto(linha){
 					<input type="text" id="despesasAcessoriasProd" style="width: 20%"/>
 				</div>
 				<div class="label">Núm. FCI:</div>
-				<div class="input areatexto" style="width: 70%">
-					<textarea id="fciProd" style="width: 50%"></textarea>
+				<div class="input" style="width: 70%">
+					<input type="text" id="fciProd" maxlength="36" style="width: 50%"/>
 				</div>
 				<div class="label">Info. Produto:</div>
 				<div class="input areatexto" style="width: 70%">
@@ -1510,12 +1543,16 @@ function editarProduto(linha){
 						</select>
 					</div>
 					<div  class="label obrigatorio">Valor BC:</div>
-					<div class="input" style="width: 20%">
+					<div class="input" style="width: 10%">
 						<input type="text" id="valorBCICMS" style="width: 100%" />
 					</div>
 					<div  class="label obrigatorio">Alíquota(%):</div>
-					<div class="input" style="width: 40%">
-						<input type="text" id="aliquotaICMS" style="width: 20%" />
+					<div class="input" style="width: 10%">
+						<input type="text" id="aliquotaICMS" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Cal.:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="valorICMS" readonly="readonly" style="width: 50%" />
 					</div>
 					<div class="label">Modalidade ST:</div>
 					<div class="input" style="width: 70%">
@@ -1573,8 +1610,12 @@ function editarProduto(linha){
 						<input id="valorBCCOFINS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label obrigatorio">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaCOFINS" type="text" style="width: 20%" />
+					<div class="input" style="width: 10%">
+						<input id="aliquotaCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Cal.:</div>
+					<div class="input" style="width: 20%">
+						<input id="valorCOFINS" type="text" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde. Vendida:</div>
 					<div class="input" style="width: 10%">
@@ -1603,8 +1644,12 @@ function editarProduto(linha){
 						<input id="valorBCPIS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label obrigatorio">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaPIS" type="text" style="width: 20%" />
+					<div class="input" style="width: 10%">
+						<input id="aliquotaPIS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Cal.:</div>
+					<div class="input" style="width: 20%">
+						<input id="valorPIS" type="text" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde.Vendida:</div>
 					<div class="input" style="width: 10%">
@@ -1634,8 +1679,12 @@ function editarProduto(linha){
 						<input id="valorBCIPI" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Alíquota:</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaIPI" type="text" style="width: 20%" />
+					<div class="input" style="width: 10%">
+						<input id="aliquotaIPI" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Cal.:</div>
+					<div class="input" style="width: 20%">
+						<input id="valorIPI" type="text" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde. unid. Tributável:</div>
 					<div class="input" style="width: 10%">
@@ -1689,8 +1738,12 @@ function editarProduto(linha){
 						<input id="valorBCISS" type="text" style="width: 100%" />
 					</div>
 					<div  class="label obribagorio">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaISS" type="text" style="width: 20%" />
+					<div class="input" style="width: 10%">
+						<input id="aliquotaISS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Cal.:</div>
+					<div class="input" style="width: 20%">
+						<input id="valorISS" type="text" style="width: 50%" />
 					</div>
 					<div  class="label obribagorio">Mun. Gerador:</div>
 					<div class="input" style="width: 10%">
@@ -2155,23 +2208,23 @@ function editarProduto(linha){
 			<legend>::: Exportação/Compra ::: -</legend>
 			<div class="label">UF Embarque:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.exportacaoNFe.ufEmbarque" value="${nf.exportacaoNFe.ufEmbarque}" style="width: 5%"/>
+				<input type="text" name="nf.exportacaoNFe.ufEmbarque" value="${nf.exportacaoNFe.ufEmbarque}" maxlength="2" style="width: 5%"/>
 			</div>
 			<div class="label">Local Embarque:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}" style="width: 80%"/>
+				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}" maxlength="60" style="width: 60%"/>
 			</div>		
 			<div class="label">Nota Empenho:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.notaEmpenho" value="${nf.compraNFe.notaEmpenho}" style="width: 10%"/>
+				<input type="text" name="nf.compraNFe.notaEmpenho" value="${nf.compraNFe.notaEmpenho}" maxlength="17" style="width: 20%"/>
 			</div>
 			<div class="label">Pedido:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.pedido" value="${nf.compraNFe.pedido}" style="width: 50%"/>
+				<input type="text" name="nf.compraNFe.pedido" value="${nf.compraNFe.pedido}" maxlength="60" style="width: 60%"/>
 			</div>
 			<div class="label">Contrato:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.contrato" value="${nf.compraNFe.contrato}" style="width: 50%"/>
+				<input type="text" name="nf.compraNFe.contrato" value="${nf.compraNFe.contrato}" maxlength="60" style="width: 60%"/>
 			</div>		
 		</fieldset>
 		<div class="bloco_botoes">

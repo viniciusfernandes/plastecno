@@ -10,11 +10,11 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 public class ICMSGeral {
 
 	@XmlElement(name = "pICMS")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Alíquota do ICMS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, nomeExibicao = "Alíquota do ICMS")
 	private Double aliquota;
 
 	@XmlElement(name = "pICMSST")
-	@InformacaoValidavel(tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Alíquota ICMS ST")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Alíquota ICMS ST")
 	private Double aliquotaST;
 
 	@XmlElement(name = "CST")
@@ -37,19 +37,19 @@ public class ICMSGeral {
 	private String origemMercadoria;
 
 	@XmlElement(name = "pBCOp")
-	@InformacaoValidavel(tiposObrigatorios = { "PART" }, nomeExibicao = "Percentual BC operação obrigatória")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "PART" }, nomeExibicao = "Percentual BC operação obrigatória")
 	private Double percentualBCOperacaoPropria;
 
 	@XmlElement(name = "pMVAST")
-	@InformacaoValidavel(tiposObrigatorios = { "10", "30" }, nomeExibicao = "Percentual de margem do valor adicionado do ST do ICMS")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "10", "30" }, nomeExibicao = "Percentual de margem do valor adicionado do ST do ICMS")
 	private Double percentualMargemValorAdicionadoICMSST;
 
 	@XmlElement(name = "pRedBC")
-	@InformacaoValidavel(tiposObrigatorios = { "51", "60" }, nomeExibicao = "Percentual de redução de BC do ICMS")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "51", "60" }, nomeExibicao = "Percentual de redução de BC do ICMS")
 	private Double percentualReducaoBC;
 
 	@XmlElement(name = "pRedBCST")
-	@InformacaoValidavel(tiposObrigatorios = { "10", "30" }, nomeExibicao = "Percentual de redução de BC do ST do ICMS")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "10", "30" }, nomeExibicao = "Percentual de redução de BC do ST do ICMS")
 	private Double percentualReducaoBCST;
 
 	@XmlElement(name = "UFST")
@@ -57,30 +57,31 @@ public class ICMSGeral {
 	private String ufDividaST;
 
 	@XmlElement(name = "vICMS")
-	@InformacaoValidavel(tiposNaoPermitidos = { "40", "41", "50" }, nomeExibicao = "Modalidade de determinação da base de cálculo do ICMS")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposNaoPermitidos = { "40", "41", "50" }, nomeExibicao = "Valor calculado do ICMS")
 	private Double valor;
 
 	@XmlElement(name = "vBC")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Valor da base de cálculo do ICMS é obrigatório")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor da base de cálculo do ICMS é obrigatório")
 	private Double valorBC;
 
 	@XmlElement(name = "vBCST")
-	@InformacaoValidavel(tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Valor da base de cálculo ST do ICMS")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Valor da base de cálculo ST do ICMS")
 	private Double valorBCST;
 
 	@XmlElement(name = "vBCSTRet")
-	@InformacaoValidavel(tiposObrigatorios = { "60" }, nomeExibicao = "Valor BC ST retido")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "60" }, nomeExibicao = "Valor BC ST retido")
 	private Double valorBCSTRetido;
 
 	@XmlElement(name = "vBCSTDest")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "PART" }, nomeExibicao = "Valor BC ST retido")
 	private Double valorBCSTUFDestino;
 
 	@XmlElement(name = "vICMSST")
-	@InformacaoValidavel(tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Valor ICMS ST")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Valor ICMS ST")
 	private Double valorST;
 
 	@XmlElement(name = "vSTRet")
-	@InformacaoValidavel(tiposObrigatorios = { "60" }, nomeExibicao = "Valor ST retido")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "60" }, nomeExibicao = "Valor ST retido")
 	private Double valorSTRetido;
 
 	public double calcularValor() {

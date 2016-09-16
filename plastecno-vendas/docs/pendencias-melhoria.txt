@@ -35,3 +35,8 @@ e cupons fiscais vinculados a nota
 20) Em cobracao o valor padrao deve ser boleto OK
 21) reposicionar os dados adicionais do NFe no final da tela da nota logo antes de exportacao OK
 22) Incluir o destinatario no bloco de dados basicos da nfe OK
+
+================ MELHORIAS ==========================
+1) Cache da lista do CFOP
+2) Arquivo .js da emissao da nfe
+3) compactacao do .js da emissao da nfe e pedido

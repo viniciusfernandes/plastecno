@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 import br.com.plastecno.service.constante.TipoDocumento;
+import br.com.plastecno.service.nfe.ICMSGeral;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.util.NumeroUtils;
@@ -211,6 +212,10 @@ public final class ValidadorInformacao {
 							+ Arrays.toString(opcoes) + "\" mas contém o valores de \"" + conteudoCampo + "\"");
 				}
 				continue;
+			}
+			
+			if(obj instanceof ICMSGeral){
+				System.out.println("ssssssssss");
 			}
 
 			if (informacao.decimal().length >= 2 && conteudoCampo != null) {

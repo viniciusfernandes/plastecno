@@ -119,6 +119,7 @@ $(document).ready(function() {
 	
 	$('#botaoLimparIPI').click(function(){
 		removerInputHidden(gerarJsonTipoIpi());
+		removerInputHidden(gerarJsonEnquadramentoIpi());
 		fecharBloco('bloco_ipi');
 	});
 	
@@ -130,6 +131,11 @@ $(document).ready(function() {
 	$('#botaoLimparCOFINS').click(function(){
 		removerInputHidden(gerarJsonTipoCofins());
 		fecharBloco('bloco_cofins');
+	});
+	
+	$('#botaoLimparISS').click(function(){
+		removerInputHidden(gerarJsonISS());
+		fecharBloco('bloco_iss');
 	});
 	
 	$('#botaoLimparII').click(function(){
@@ -512,7 +518,8 @@ function removerInputHidden(objeto){
 		if((input = document.getElementById(id)) == undefined){
 			continue;
 		}
-		form.removeChild(input);	
+		form.removeChild(input);
+		document.getElementById(campos[i].id).value = '';
 	};
 };
 
@@ -1615,7 +1622,7 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Valor Cal.:</div>
 					<div class="input" style="width: 20%">
-						<input id="valorCOFINS" type="text" style="width: 50%" />
+						<input id="valorCOFINS" type="text" readonly="readonly" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde. Vendida:</div>
 					<div class="input" style="width: 10%">
@@ -1649,7 +1656,7 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Valor Cal.:</div>
 					<div class="input" style="width: 20%">
-						<input id="valorPIS" type="text" style="width: 50%" />
+						<input id="valorPIS" type="text" readonly="readonly" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde.Vendida:</div>
 					<div class="input" style="width: 10%">
@@ -1667,7 +1674,7 @@ function inicializarCalculoImpostos(){
 					<legend>::: IPI Prod.::: +</legend>
 					<div class="label obrigatorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
-						<select id="codSitTribIPI" style="width: 45%" >
+						<select id="codSitTribIPI" style="width: 45%">
 							<option value=""></option>
 							<c:forEach var="tipo" items="${listaTipoTributacaoIPI}">
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
@@ -1684,7 +1691,7 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Valor Cal.:</div>
 					<div class="input" style="width: 20%">
-						<input id="valorIPI" type="text" style="width: 50%" />
+						<input id="valorIPI" type="text" readonly="readonly" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde. unid. Tributável:</div>
 					<div class="input" style="width: 10%">
@@ -1743,7 +1750,7 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Valor Cal.:</div>
 					<div class="input" style="width: 20%">
-						<input id="valorISS" type="text" style="width: 50%" />
+						<input id="valorISS" type="text" readonly="readonly" style="width: 50%" />
 					</div>
 					<div  class="label obribagorio">Mun. Gerador:</div>
 					<div class="input" style="width: 10%">

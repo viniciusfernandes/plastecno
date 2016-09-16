@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -13,7 +15,7 @@ import javax.persistence.Query;
 import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.TransportadoraService;
-import br.com.plastecno.service.dao.GenericDAO;
+import br.com.plastecno.service.dao.TransportadoraDAO;
 import br.com.plastecno.service.entity.ContatoTransportadora;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Transportadora;
@@ -26,16 +28,16 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @Stateless
 public class TransportadoraServiceImpl implements TransportadoraService {
 
+	@EJB
+	private ContatoService contatoService;
+
 	@PersistenceContext(unitName = "plastecno")
 	private EntityManager entityManager;
 
 	@EJB
 	private LogradouroService logradouroService;
 
-	@EJB
-	private ContatoService contatoService;
-
-	private GenericDAO<Transportadora> genericDAO;
+	private TransportadoraDAO transportadoraDAO;
 
 	@Override
 	public Integer desativar(Integer id) {
@@ -84,7 +86,7 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 
 	@PostConstruct
 	public void init() {
-		this.genericDAO = new GenericDAO<Transportadora>(entityManager);
+		transportadoraDAO = new TransportadoraDAO(entityManager);
 	}
 
 	@Override
@@ -104,29 +106,36 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isCNPJExistente(Integer idTransportadora, String cnpj) {
-		return this.genericDAO.isEntidadeExistente(Transportadora.class, idTransportadora, "cnpj", cnpj);
+		return transportadoraDAO.isEntidadeExistente(Transportadora.class, idTransportadora, "cnpj", cnpj);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isNomeFantasiaExistente(Integer idTransportadora, String nomeFantasia) {
-		return this.genericDAO.isEntidadeExistente(Transportadora.class, idTransportadora, "nomeFantasia", nomeFantasia);
+		return transportadoraDAO.isEntidadeExistente(Transportadora.class, idTransportadora, "nomeFantasia",
+				nomeFantasia);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public PaginacaoWrapper<Transportadora> paginarTransportadora(Transportadora filtro, Boolean apenasAtivos,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-		return new PaginacaoWrapper<Transportadora>(this.pesquisarTotalRegistros(filtro, apenasAtivos), this.pesquisarBy(
-				filtro, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
+		return new PaginacaoWrapper<Transportadora>(this.pesquisarTotalRegistros(filtro, apenasAtivos),
+				this.pesquisarBy(filtro, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Transportadora> pesquisar() {
-		return this.entityManager.createQuery("select t from Transportadora t order by t.nomeFantasia ").getResultList();
+		return this.entityManager.createQuery("select t from Transportadora t order by t.nomeFantasia ")
+				.getResultList();
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Transportadora> pesquisarBy(Transportadora filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 		if (filtro == null) {
@@ -142,14 +151,25 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Transportadora pesquisarByCnpj(String cnpj) {
+		if (cnpj == null || cnpj.isEmpty()) {
+			return null;
+		}
+		return transportadoraDAO.pesquisarByCNPJ(cnpj);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Transportadora pesquisarById(Integer id) {
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select m from Transportadora m where m.id =:id ").setParameter("id", id),
-				Transportadora.class, null);
+				this.entityManager.createQuery("select m from Transportadora m where m.id =:id ")
+						.setParameter("id", id), Transportadora.class, null);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Transportadora> pesquisarById(List<Integer> listaId) {
 		return this.entityManager
 				.createQuery("select m from Transportadora m where m.id in (:listaId) order by m.nomeFantasia asc")
@@ -158,6 +178,7 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Transportadora> pesquisarByNomeFantasia(String nomeFantasia) {
 		Query query = this.entityManager
 				.createQuery("select new Transportadora(c.id, c.nomeFantasia) from Transportadora c where c.nomeFantasia like :nomeFantasia order by c.nomeFantasia asc ");
@@ -167,11 +188,13 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ContatoTransportadora> pesquisarContato(Integer id) {
 		return (List<ContatoTransportadora>) this.contatoService.pesquisar(id, ContatoTransportadora.class);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Logradouro pesquisarLogradorouro(Integer id) {
 		StringBuilder select = new StringBuilder("select t.logradouro from Transportadora t  ");
 		select.append(" INNER JOIN t.logradouro where t.id = :id ");
@@ -182,6 +205,7 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalRegistros(Transportadora filtro, Boolean apenasAtivos) {
 		if (filtro == null) {
 			return 0L;
@@ -195,6 +219,7 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Transportadora> pesquisarTransportadoraByIdCliente(Integer idCliente) {
 		return this.entityManager
 				.createQuery(

@@ -3,19 +3,63 @@ package br.com.plastecno.vendas.json;
 import br.com.plastecno.service.entity.Transportadora;
 
 public class TransportadoraJson {
-    private final Integer id;
-    private final String nomeFantasia;
+    private final String cidade;
+    private final String cnpj;
+    private final String endereco;
 
-    public TransportadoraJson(Transportadora transporadora) {
-        id = transporadora.getId();
-        nomeFantasia = transporadora.getNomeFantasia();
+    private final Integer id;
+    private final String inscricaoEstadual;
+    private final String nomeFantasia;
+    private final String razaoSocial;
+    private final String uf;
+
+    public TransportadoraJson(Transportadora transp) {
+        id = transp == null ? 0 : transp.getId();
+        nomeFantasia = transp == null ? "" : transp.getNomeFantasia();
+        razaoSocial = transp == null ? "" : transp.getRazaoSocial();
+        cnpj = transp == null ? "" : transp.getCnpj();
+        inscricaoEstadual = transp == null ? "" : transp.getInscricaoEstadual();
+
+        if (transp != null && transp.getLogradouro() != null) {
+            endereco = transp.getLogradouro().getEndereco();
+            cidade = transp.getLogradouro().getCidade();
+            uf = transp.getLogradouro().getUf();
+        } else {
+            endereco = "";
+            cidade = "";
+            uf = "";
+        }
+    }
+
+    public String getCidade() {
+        return cidade;
+    }
+
+    public String getCnpj() {
+        return cnpj;
+    }
+
+    public String getEndereco() {
+        return endereco;
     }
 
     public Integer getId() {
         return id;
     }
 
+    public String getInscricaoEstadual() {
+        return inscricaoEstadual;
+    }
+
     public String getNomeFantasia() {
         return nomeFantasia;
+    }
+
+    public String getRazaoSocial() {
+        return razaoSocial;
+    }
+
+    public String getUf() {
+        return uf;
     }
 }

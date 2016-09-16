@@ -143,6 +143,31 @@ $(document).ready(function() {
 		fecharBloco('bloco_ii');
 	});
 	
+	$('#botaoPesquisarCnpjTransp').click(function () {
+		var cnpj = $('#cnpjTransportadora').val(); 
+		if (cnpj == undefined || isEmpty(cnpj)) {
+			return;
+		}
+		
+		var request = $.ajax({
+							type: "get",
+							url: '<c:url value="/transportadora/cnpj"/>',
+							data: 'cnpj='+cnpj,
+						});
+		request.done(function(response) {
+			var transportadora = response.transportadora;
+			$('#nomeTransportadora').val(transportadora.razaoSocial);
+			$('#ieTransportadora').val(transportadora.inscricaoEstadual);
+			$('#endTransportadora').val(transportadora.endereco);
+			$('#munTransportadora').val(transportadora.cidade);
+			$('#ufTransportadora').val(transportadora.uf);
+		});
+		
+		request.fail(function(request, status) {
+			alert('Falha na busca da transportadora de CNPJ: ' + cnpj+' => Status da requisicao: '+status);
+		});
+	});	
+	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
 		campoPesquisavel : 'nomeCliente',
@@ -1953,7 +1978,6 @@ function inicializarCalculoImpostos(){
 						</tbody>
 					</table>
 				</fieldset>
-			
 		</fieldset>	
 		
 		<fieldset id="bloco_transporte">
@@ -1972,11 +1996,15 @@ function inicializarCalculoImpostos(){
 					<legend>::: Transportadora :::</legend>
 					<div  class="label">Razão Soc./Nome:</div>
 					<div class="input" style="width: 80%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.razaoSocial" value="${transportadora.razaoSocial}" style="width: 45%" />
+						<input type="text" id="nomeTransportadora" name="nf.transporteNFe.transportadoraNFe.razaoSocial" value="${transportadora.razaoSocial}" style="width: 45%" />
 					</div>
 					<div  class="label">CNPJ:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.cnpj" value="${transportadora.cnpj}" style="width: 100%" />
+						<input type="text" id="cnpjTransportadora" name="nf.transporteNFe.transportadoraNFe.cnpj" value="${transportadora.cnpj}" style="width: 100%" />
+					</div>
+					<div class="input" style="width: 2%">
+						<input type="button" id="botaoPesquisarCnpjTransp"
+							title="Pesquisar CNPJ Transportadora" value="" class="botaoPesquisarPequeno" />
 					</div>
 					<div  class="label">CPF:</div>
 					<div class="input" style="width: 10%">
@@ -1984,19 +2012,19 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Insc. Estadual:</div>
 					<div class="input" style="width: 30%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.inscricaoEstadual" value="${transportadora.inscricaoEstadual}"  style="width: 50%" />
+						<input type="text" id="ieTransportadora" name="nf.transporteNFe.transportadoraNFe.inscricaoEstadual" value="${transportadora.inscricaoEstadual}"  style="width: 50%" />
 					</div>
 					<div  class="label">Endereço:</div>
 					<div class="input" style="width: 80%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.enderecoCompleto" value="${transportadora.endereco}" style="width: 84%" />
+						<input type="text" id="endTransportadora" name="nf.transporteNFe.transportadoraNFe.enderecoCompleto" value="${transportadora.endereco}" style="width: 84%" />
 					</div>
 					<div  class="label">Município:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.municipio" value="${transportadora.municipio}" style="width: 100%" />
+						<input type="text" id="munTransportadora" name="nf.transporteNFe.transportadoraNFe.municipio" value="${transportadora.municipio}" style="width: 100%" />
 					</div>
 					<div  class="label">UF:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.uf" value="${transportadora.uf}" style="width: 20%" />
+						<input type="text" id="ufTransportadora" name="nf.transporteNFe.transportadoraNFe.uf" value="${transportadora.uf}" style="width: 20%" />
 					</div>
 				</fieldset>
 				</div>

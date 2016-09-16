@@ -29,6 +29,8 @@ public interface TransportadoraService {
     List<Transportadora> pesquisarBy(Transportadora filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
             Integer numeroMaximoRegistros);
 
+    Transportadora pesquisarByCnpj(String cnpj);
+
     Transportadora pesquisarById(Integer id);
 
     List<Transportadora> pesquisarById(List<Integer> listaId);
@@ -41,6 +43,6 @@ public interface TransportadoraService {
 
     Long pesquisarTotalRegistros(Transportadora filtro, Boolean apenasAtivos);
 
-    List<Transportadora> pesquisarTransportadoraByIdCliente(Integer idCliente);
+	List<Transportadora> pesquisarTransportadoraByIdCliente(Integer idCliente);
 
 }

@@ -1,7 +1,7 @@
 package br.com.plastecno.service.nfe.constante;
 
 public enum TipoTributacaoPIS {
-	PIS_ST(" - Oper. Tributável por substituição", " "), 
+	PIS_ST("ST - Oper. Tributável por substituição", "ST"), 
 	PIS_1("1 - Oper. Tributável BC = valor operação alíquota normal", "1"), 
 	PIS_2("2 - Oper. Tributável BC = valor operação alíquota diferenciada", "2"),
 	PIS_3("3 - Oper. Tributável BC = qtde vendida X alíquota por unid. produto", "3"),

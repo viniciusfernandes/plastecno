@@ -7,15 +7,16 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class VeiculoTransporte {
-	@InformacaoValidavel(obrigatorio = true, padrao ="\\[A,Z]{2,4}\\d{3,4}", padraoExemplo="XX9999, XXX999, XXX9999, XXXX999", nomeExibicao = "Placa do veículo")
+	@InformacaoValidavel(obrigatorio = true, padrao = { "[a-zA-Z]{2}\\d{4}", "[a-zA-Z]{3}\\d{3}", "[a-zA-Z]{3}\\d{4}",
+			"[a-zA-Z]{4}\\d{3}" }, padraoExemplo = "XX9999, XXX999, XXX9999, XXXX999", nomeExibicao = "Placa do veículo de transporte")
 	@XmlElement(name = "placa")
 	private String placa;
 
-	@InformacaoValidavel(intervaloComprimento = { 1, 20 }, nomeExibicao = "Registro nacional de transportador de carga")
+	@InformacaoValidavel(intervaloComprimento = { 1, 20 }, nomeExibicao = "Registro nacional de transportador de carga do veículo de transporte")
 	@XmlElement(name = "RNTC")
 	private String registroNacionalTransportador;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 8 }, nomeExibicao = "Placa do veículo")
+	@InformacaoValidavel(obrigatorio = true, tamanho = 2, nomeExibicao = "UF do veículo de transporte")
 	@XmlElement(name = "UF")
 	private String uf;
 
@@ -38,8 +39,7 @@ public class VeiculoTransporte {
 		this.placa = placa;
 	}
 
-	public void setRegistroNacionalTransportador(
-			String registroNacionalTransportador) {
+	public void setRegistroNacionalTransportador(String registroNacionalTransportador) {
 		this.registroNacionalTransportador = registroNacionalTransportador;
 	}
 

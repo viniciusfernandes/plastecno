@@ -1,7 +1,9 @@
 package br.com.plastecno.service.nfe.constante;
 
 public enum TipoFormaPagamento {
-	OUTROS("2 - Outros", "2"), PRAZO("1 - À prazo", "1"), VISTA("0 - À vista", "0");
+	VISTA("0 - À vista", "0"),
+	PRAZO("1 - À prazo", "1"),
+	OUTROS("2 - Outros", "2") ;
 	private final String codigo;
 	private final String descricao;
 

@@ -41,6 +41,15 @@ public class COFINS {
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo COFINS")
 	private COFINSGeral tipoCofins;
 
+	public void configurarSubstituicaoTributaria() {
+		if (tipoCofins == null) {
+			return;
+		}
+		if (TipoTributacaoCOFINS.COFINS_ST.equals(tipoCofins.getTipoTributacao())) {
+			tipoCofins.setCodigoSituacaoTributaria(null);
+		}
+	}
+	
 	@XmlTransient
 	public COFINSGeral getTipoCofins() {
 		if (tipoCofins == null) {

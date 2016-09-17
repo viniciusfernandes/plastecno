@@ -16,11 +16,9 @@
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/edicao_tabela.js"/>"></script>
-
-
 
 <style type="text/css">
 fieldset .fieldsetInterno {
@@ -40,15 +38,11 @@ fieldset .fieldsetInterno legend {
 
 var numeroProdutoEdicao = null;
 var numeroImportacaoProduto = null;
-var tabelaDuplicataHandler = null;
 var editorTabelaImportacao = null;
 var editorTabelaAdicao = null;
 var editorTabelaExportacao = null;
 $(document).ready(function() {
 	scrollTo('${ancora}');
-	
-	tabelaDuplicataHandler = new BlocoTabelaHandler(null, 'Duplicata', 'tabela_duplicata', 'bloco_duplicata');
-	tabelaDuplicataHandler.setTotalColunas(4);
 	
 	$("#botaoPesquisaPedido").click(function() {
 		if(isEmpty($('#idPedido').val())){
@@ -58,18 +52,6 @@ $(document).ready(function() {
 		$('#formPesquisa').submit();
 	});
 
-	$("#botaoInserirVolume").click(function() {
-		inserirVolume();
-	});
-	
-	$("#botaoInserirReboque").click(function() {
-		inserirReboque();
-	});
-	
-	$("#botaoInserirReferenciada").click(function() {
-		inserirReferenciada();
-	});
-	
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
@@ -137,6 +119,7 @@ $(document).ready(function() {
 	
 	$('#botaoLimparIPI').click(function(){
 		removerInputHidden(gerarJsonTipoIpi());
+		removerInputHidden(gerarJsonEnquadramentoIpi());
 		fecharBloco('bloco_ipi');
 	});
 	
@@ -150,10 +133,40 @@ $(document).ready(function() {
 		fecharBloco('bloco_cofins');
 	});
 	
+	$('#botaoLimparISS').click(function(){
+		removerInputHidden(gerarJsonISS());
+		fecharBloco('bloco_iss');
+	});
+	
 	$('#botaoLimparII').click(function(){
 		removerInputHidden(gerarJsonImpostoImportacao());
 		fecharBloco('bloco_ii');
 	});
+	
+	$('#botaoPesquisarCnpjTransp').click(function () {
+		var cnpj = $('#cnpjTransportadora').val(); 
+		if (cnpj == undefined || isEmpty(cnpj)) {
+			return;
+		}
+		
+		var request = $.ajax({
+							type: "get",
+							url: '<c:url value="/transportadora/cnpj"/>',
+							data: 'cnpj='+cnpj,
+						});
+		request.done(function(response) {
+			var transportadora = response.transportadora;
+			$('#nomeTransportadora').val(transportadora.razaoSocial);
+			$('#ieTransportadora').val(transportadora.inscricaoEstadual);
+			$('#endTransportadora').val(transportadora.endereco);
+			$('#munTransportadora').val(transportadora.cidade);
+			$('#ufTransportadora').val(transportadora.uf);
+		});
+		
+		request.fail(function(request, status) {
+			alert('Falha na busca da transportadora de CNPJ: ' + cnpj+' => Status da requisicao: '+status);
+		});
+	});	
 	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
@@ -239,24 +252,71 @@ $(document).ready(function() {
 	$('#bloco_importacao_prod').fadeOut('fast');
 	$('#bloco_exportacao_prod').fadeOut('fast');
 
-	inicializarBlocoDuplicata();
 	inicializarTabelaImportacaoProd();
 	inicializarTabelaAdicaoImportacao();
 	inicializarTabelaExportacaoProd();
+	inicializarTabelaReferenciada();
+	inicializarTabelaVolumes();
+	inicializarTabelaReboque();
+	inicializarTabelaDuplicata();
+	
+	inicializarMascaraImpostos();
+	inicializarCalculoImpostos();
 });
 
-function gerarIdCamposImportacaoProd(){
-	return ['cnpjImportProd', 'exportadorImportProd', 'dtImportProd', 'dataDesembImportProd',
-	          'lcImportProd', 'numImportProd', 'tpImportProd', 'tpTranspImportProd', 'ufDesembImportProd',
-	          'ufEncomendImportProd', 'vlAFRMMImportProd'];
+function inicializarMascaraImpostos(){
+	inserirMascaraDecimal('valorBCICMS', 15, 2);
+	inserirMascaraDecimal('valorBCSTICMS', 15, 2);
+	inserirMascaraDecimal('aliquotaICMS', 7, 4);
+	inserirMascaraDecimal('aliquotaSTICMS', 7, 4);
+	inserirMascaraDecimal('percValSTICMS', 7, 4);
+	inserirMascaraDecimal('percRedBCSTICMS', 7, 4);
+
+	inserirMascaraDecimal('valorBCCOFINS', 15, 2);
+	inserirMascaraDecimal('aliquotaCOFINS', 7, 4);
+	inserirMascaraDecimal('qtdeVendidaCOFINS', 16, 4);
+
+	inserirMascaraDecimal('valorBCPIS', 15, 2);
+	inserirMascaraDecimal('aliquotaPIS', 7, 4);
+	inserirMascaraDecimal('qtdeVendidaPIS', 14, 4);
+	
+	inserirMascaraDecimal('valorBCIPI', 15, 2);
+	inserirMascaraDecimal('aliquotaIPI', 7, 4);
+	inserirMascaraDecimal('qtdeUnidTribIPI', 16, 4);
+	inserirMascaraDecimal('valorUnidTribIPI', 15, 4);
+	
+	inserirMascaraDecimal('valorBCISS', 15, 2);
+	inserirMascaraDecimal('aliquotaISS', 7, 4);
+	inserirMascaraDecimal('qtdeVendidaPIS', 14, 4);
+	
+	inserirMascaraDecimal('valorBCII', 15, 2);
+	inserirMascaraDecimal('valorII', 15, 2);
+	inserirMascaraDecimal('valorIOFII', 15, 2);
+	inserirMascaraDecimal('valorDespAduaneirasII', 15, 2);
+	
+	inserirMascaraDecimal('despesasAcessoriasProd', 15, 2);
+	
+	inserirMascaraDecimal('qExport', 15, 2);
+	
+	inserirMascaraDecimal('valServRetICMSTransp', 15, 2);
+	inserirMascaraDecimal('valBCRetICMSTransp', 15, 2);
+	inserirMascaraDecimal('aliqRetICMSTransp', 7, 4);
+	
+	inserirMascaraDecimal('pesoLiquidoVolume', 15, 3);
+	inserirMascaraDecimal('pesoBrutoVolume', 15, 3);
+	
+	inserirMascaraDecimal('valorDuplicata', 15, 2);
 };
 
 function inicializarTabelaImportacaoProd(){
+	var campos = ['cnpjImportProd', 'exportadorImportProd', 'dtImportProd', 'dataDesembImportProd',
+		          'lcImportProd', 'numImportProd', 'tpImportProd', 'tpTranspImportProd', 'ufDesembImportProd',
+		          'ufEncomendImportProd', 'vlAFRMMImportProd'];
 	var config = {'idTabela': 'tabela_importacao_prod', 'idBotaoInserir':'botaoInserirImportacaoProd',
-			'campos': gerarIdCamposImportacaoProd(),
+			'campos': campos,
 			'idLinhaSequencial': true,
 			'onValidar': function(){
-				return numeroProdutoEdicao != null;
+				return numeroProdutoEdicao != null && obrigatorioPreenchido(campos, ['cnpjImportProd', 'ufEncomendImportProd', 'vlAFRMMImportProd']);
 			},
 			'onInserir': function(linha){
 				if(numeroProdutoEdicao == null || linha == null){
@@ -295,10 +355,13 @@ function inicializarTabelaImportacaoProd(){
 };
 
 function inicializarTabelaAdicaoImportacao(){
-	var ids = ['codFabricAdicao', 'numAdicao', 'numDrawbackAdicao', 'numSeqAdicao', 'valDescAdicao'];
+	var campos = ['codFabricAdicao', 'numAdicao', 'numDrawbackAdicao', 'numSeqAdicao', 'valDescAdicao'];
 	var config = {'idTabela': 'tabela_adicao_import', 'idBotaoInserir':'botaoInserirAdicao',
-			'campos':ids,
+			'campos':campos,
 			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return obrigatorioPreenchido(campos, ['numDrawbackAdicao', 'valDescAdicao']);
+			},
 			'onInserir': function(linha){
 				if(numeroProdutoEdicao == null || numeroImportacaoProduto == null || linha == null){
 					return;
@@ -325,11 +388,12 @@ function inicializarTabelaAdicaoImportacao(){
 };
 
 function inicializarTabelaExportacaoProd(){
+	var campos = ['drawbackExportProd', 'chAcessoExportIndir', 'registroExportIndir', 'qtdeExportIndir'];
 	var config = {'idTabela': 'tabela_exportacao_prod', 'idBotaoInserir':'botaoInserirExportacaoProd',
-			'campos': ['drawbackExportProd', 'chAcessoExportIndir', 'registroExportIndir', 'qtdeExportIndir'],
+			'campos': campos,
 			'idLinhaSequencial': true,
 			'onValidar': function(){
-				return numeroProdutoEdicao != null;
+				return numeroProdutoEdicao != null && obrigatorioPreenchido(campos, ['drawbackExportProd']);
 			},
 			'onInserir': function(linha){
 				if(numeroProdutoEdicao == null || linha == null){
@@ -355,62 +419,53 @@ function inicializarTabelaExportacaoProd(){
 	editorTabelaExportacao = new editarTabela(config);
 };
 
-function removerDuplicata(botao) {
-	tabelaDuplicataHandler.removerRegistro(botao);
+function obrigatorioPreenchido(ids, idExcl){
+	for (var i = 0; i < ids.length; i++) {
+		if(idExcl != null && idExcl.indexOf(ids[i]) >= 0){
+			continue;
+		}
+		
+		if(isEmpty(document.getElementById(ids[i]).value)){
+			return false;
+		}
+	}
+	return true;
 };
 
-function editarDuplicata(botao){
-	tabelaDuplicataHandler.editar(botao);
+function inicializarTabelaReferenciada(){
+	var campos = ['chaveReferenciada', 'numeroReferenciada', 'serieReferenciada', 'modReferenciada', 'cnpjReferenciada', 'anoMesReferenciada', 'ufReferenciada'];
+	var config = {'idTabela': 'tabela_referenciada', 'idBotaoInserir':'botaoInserirReferenciada',
+			'campos': campos,
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return obrigatorioPreenchido(campos, null);
+			},
+			'idLinhaSequencial':true};
+	editarTabela(config);
 };
 
-function inicializarBlocoDuplicata(){
-	
-	tabelaDuplicataHandler.incluirRegistro(function (ehEdicao, linha){
-		var celula = null;
-		var doc = document;
-		
-		for (var i = 0; i < this.TOTAL_COLUNAS; i++) {
-			celula = ehEdicao ? linha.cells[i] : linha.insertCell(i); 
-			switch (i) {
-				case 0:
-					celula.style.display = 'none';
-					break;	
-				case 1:
-					celula.innerHTML = $('#bloco_duplicata #numeroDuplicata').val();
-					break;
-				case 2:
-					celula.innerHTML = $('#bloco_duplicata #dataVencimentoDuplicata').val();
-					break;
-				case 3:
-					celula.innerHTML = $('#bloco_duplicata #valorDuplicata').val();
-					break;
-			}
-		}
-	});
-	
-	tabelaDuplicataHandler.editarRegistro(function(linha){
-		
-		var celula = null;
-		var doc = document;
-		
-		for (var i = 0; i < this.TOTAL_COLUNAS; i++) {
-			celula =  linha.cells[i];
-			
-			if (!isEmpty(celula.innerHTML)) {
-				switch (i) {
-					case 1:
-						doc.getElementById('numeroDuplicata').value = celula.innerHTML;
-						break;
-					case 2:
-						doc.getElementById('dataVencimentoDuplicata').value = celula.innerHTML;
-						break;
-					case 3:
-						doc.getElementById('valorDuplicata').value = celula.innerHTML;
-						break;
-				}
-			}
-		}
-	});
+function inicializarTabelaVolumes(){
+	var campos = ['quantidadeVolume', 'especieVolume', 'marcaVolume', 'numeracaoVolume', 'pesoLiquidoVolume', 'pesoBrutoVolume'];
+	var config = {'idTabela': 'tabela_volume', 'idBotaoInserir':'botaoInserirVolume',
+			'campos': campos,
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return obrigatorioPreenchido(campos, null);
+			},
+			'idLinhaSequencial':true};
+	editarTabela(config);
+};
+
+function inicializarTabelaDuplicata(){
+	var campos = ['numeroDuplicata', 'dataVencimentoDuplicata', 'valorDuplicata'];
+	var config = {'idTabela': 'tabela_duplicata', 'idBotaoInserir':'botaoInserirDuplicata',
+			'campos': campos,
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return obrigatorioPreenchido(campos, ['numeroDuplicata', 'dataVencimentoDuplicata']);
+			},
+			'idLinhaSequencial':true};
+	editarTabela(config);
 };
 
 function gerarInputLinhasTabela(nomeTabela, parametroJson){
@@ -488,7 +543,8 @@ function removerInputHidden(objeto){
 		if((input = document.getElementById(id)) == undefined){
 			continue;
 		}
-		form.removeChild(input);	
+		form.removeChild(input);
+		document.getElementById(campos[i].id).value = '';
 	};
 };
 
@@ -795,7 +851,7 @@ function gerarInputImpostoImportacao(){
 
 function gerarInputDuplicata(){
 	var parametros = {'nomeLista': 'nf.cobrancaNFe.listaDuplicata',
-			'nomes': [null, 'numero', 'dataVencimento', 'valor']};
+			'nomes': ['numero', 'dataVencimento', 'valor']};
 	gerarInputLinhasTabela('tabela_duplicata', parametros);
 };
 
@@ -857,51 +913,16 @@ function gerarInputProdutoServico(){
 	}
 };
 
-function inserirVolume(){
-	var quantidade = $('#bloco_volume #quantidadeVolume').val();
-	var especie = $('#bloco_volume #especieVolume').val();
-	var marca = $('#bloco_volume #marcaVolume').val();
-	var numeracao = $('#bloco_volume #numeracaoVolume').val();
-	var pesoLiq = $('#bloco_volume #pesoLiquidoVolume').val();
-	var pesoBruto = $('#bloco_volume #pesoBrutoVolume').val();
-
-	if(isEmpty(quantidade) && isEmpty(especie) && isEmpty(marca)
-			&& isEmpty(numeracao) && isEmpty(pesoLiq) && isEmpty(pesoBruto)){
-		return;
-	}
-	
-	var tabela = document.getElementById('tabela_volume');
-	var linha = tabela.tBodies[0].insertRow(0);
-	
-	linha.insertCell(0).innerHTML = quantidade;
-	linha.insertCell(1).innerHTML = especie;
-	linha.insertCell(2).innerHTML = marca;
-	linha.insertCell(3).innerHTML = numeracao;
-	linha.insertCell(4).innerHTML = pesoLiq;
-	linha.insertCell(5).innerHTML = pesoBruto;
-	linha.insertCell(6).innerHTML = '<input type="button" title="Remover Volume" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
-	
-	$('#bloco_volume input:text').val('');
-};
-
-function inserirReboque(){
-	var placa = $('#bloco_veiculo #placaVeiculo').val();
-	var uf = $('#bloco_veiculo #ufVeiculo').val();
-	var registro = $('#bloco_veiculo #registroVeiculo').val();
-
-	if(isEmpty(placa) || isEmpty(uf)){
-		return;
-	}
-	
-	var tabela = document.getElementById('tabela_reboque');
-	var linha = tabela.tBodies[0].insertRow(0);
-	
-	linha.insertCell(0).innerHTML = placa;
-	linha.insertCell(1).innerHTML = uf;
-	linha.insertCell(2).innerHTML = registro;
-	linha.insertCell(3).innerHTML = '<input type="button" title="Remover Reboque" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>';
-	
-	$('#bloco_veiculo input:text').val('');
+function inicializarTabelaReboque(){
+	var campos = ['placaVeiculo', 'ufVeiculo', 'registroVeiculo'];
+	var config = {'idTabela': 'tabela_reboque', 'idBotaoInserir':'botaoInserirReboque',
+			'campos': campos,
+			'idLinhaSequencial': true,
+			'onValidar': function(){
+				return obrigatorioPreenchido(campos, ['registroVeiculo']);
+			},
+			'idLinhaSequencial':true};
+	editarTabela(config);
 };
 
 function inserirLinhaTabela(linhaJson){
@@ -917,25 +938,6 @@ function inserirLinhaTabela(linhaJson){
 	}
 	
 	$('#'+linhaJson.nomeBloco +' input:text').val('');
-};
-
-function inserirReferenciada(){
-	var chave = $('#bloco_referenciada #chaveReferenciada').val();
-	var numero = $('#bloco_referenciada #numeroReferenciada').val();
-	var serie = $('#bloco_referenciada #serieReferenciada').val();
-	var mod = $('#bloco_referenciada #modReferenciada').val();
-	var cnpj = $('#bloco_referenciada #cnpjReferenciada').val();
-	var anoMes = $('#bloco_referenciada #anoMesReferenciada').val();
-	var uf = $('#bloco_referenciada #ufReferenciada').val();
-	
-	if(isEmpty(chave) || isEmpty(numero) || isEmpty(serie) || 
-			isEmpty(mod) || isEmpty(cnpj) || isEmpty(anoMes) || isEmpty(uf)){
-		return;
-	}
-	
-	var linha = {'nomeBloco':'bloco_referenciada', 'nomeTabela': 'tabela_referenciada',
-			'valores':[chave, numero, serie, mod, cnpj, anoMes, uf]};
-	inserirLinhaTabela(linha);
 };
 
 function removerLinhaTabela(botao){
@@ -1062,7 +1064,8 @@ function editarProduto(linha){
 	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
 	--numeroProdutoEdicao;
 	var valorBC = celulas[6].innerHTML;
-	var valoresTabela = {'campos':[
+	
+	var valoresTabela = {'campos':[{'id': 'itemPedidoCompraProd', 'valorTabela':celulas[0].innerHTML},
 								   {'id': 'ncm', 'valorTabela': celulas[2].innerHTML},
 	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[10].innerHTML},
 	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[11].innerHTML},
@@ -1101,6 +1104,7 @@ function editarProduto(linha){
 	fecharBloco('bloco_iss');
 	fecharBloco('bloco_importacao_prod');
 	fecharBloco('bloco_exportacao_prod');
+	fecharBloco('bloco_adicao_import');
 	
 	var opcoes = {'campos':
 		[{'idBloco': 'bloco_tributos', 'idCampo': 'cfop', 'opcao': '5102'},
@@ -1111,8 +1115,40 @@ function editarProduto(linha){
 		 {'idBloco': 'bloco_tributos', 'idCampo': 'codSitTribPIS', 'opcao': '1'}]};
 	
 	inicializarOpcoesSelect(opcoes);
+	
+	calcularValoresImpostos();
 };
 
+function gerarJsonCalculoImpostos(){
+	return [{'idVl':'valorBCICMS', 'idAliq':'aliquotaICMS', 'idImp':'valorICMS'},
+			{'idVl':'valorBCCOFINS', 'idAliq':'aliquotaCOFINS', 'idImp':'valorCOFINS'},
+	    	{'idVl':'valorBCPIS', 'idAliq':'aliquotaPIS', 'idImp':'valorPIS'},
+	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI'},
+	    	{'idVl':'valorBCISS', 'idAliq':'aliquotaISS', 'idImp':'valorISS'}];	
+};
+
+function calcularValoresImpostos(){
+	var campos = gerarJsonCalculoImpostos();
+	var vl=null; 
+	var aliq=null; 
+	var idImp=null;
+	for (var i = 0; i < campos.length; i++) {
+		vl = document.getElementById(campos[i].idVl).value;
+		aliq = document.getElementById(campos[i].idAliq).value;
+		if(isEmpty(vl) || isEmpty(aliq)){
+			continue;
+		}
+		document.getElementById(campos[i].idImp).value = Math.round(vl*(aliq/100) * 100)/100;
+	}
+};
+
+function inicializarCalculoImpostos(){
+	var campos = gerarJsonCalculoImpostos();
+	for (var i = 0; i < campos.length; i++) {
+		document.getElementById(campos[i].idVl).onblur = calcularValoresImpostos;
+		document.getElementById(campos[i].idAliq).onblur = calcularValoresImpostos;
+	}
+};
 </script>
 
 </head>
@@ -1186,8 +1222,8 @@ function editarProduto(linha){
 				</select>
 			</div>
 			<div class="label">Presen. Comprador:</div>
-			<div class="input" style="width: 10%">
-				<select name="nf.identificacaoNFe.tipoImpressao" style="width: 100%">
+			<div class="input" style="width: 80%">
+				<select name="nf.identificacaoNFe.tipoPresencaComprador" style="width: 20%">
 					<c:forEach var="tipo" items="${listaTipoPresencaComprador}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoPresencaSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
@@ -1261,33 +1297,33 @@ function editarProduto(linha){
 		
 		<fieldset id="bloco_referenciada">
 			<legend>::: NF/NFe Referenciada ::: -</legend>
-			<div class="label">Chave Acesso:</div>
+			<div class="label obrigatorio">Chave Acesso:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="chaveReferenciada" style="width: 50%"/>
+				<input type="text" id="chaveReferenciada" maxlength="44" style="width: 50%"/>
 			</div>
-			<div class="label">Núm. Doc. Fiscal:</div>
+			<div class="label obrigatorio">Núm. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="numeroReferenciada"/>
+				<input type="text" id="numeroReferenciada" maxlength="9"/>
 			</div>
-			<div class="label">Série. Doc. Fiscal:</div>
+			<div class="label obrigatorio">Série. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="serieReferenciada"/>
+				<input type="text" id="serieReferenciada" maxlength="3"/>
 			</div>
-			<div class="label">Mod. Doc. Fiscal:</div>
+			<div class="label obrigatorio">Mod. Doc. Fiscal:</div>
 			<div class="input" style="width: 30%">
-				<input type="text" id="modReferenciada"/>
+				<input type="text" id="modReferenciada" maxlength="2"/>
 			</div>
-			<div class="label">CNPJ Emit.:</div>
+			<div class="label obrigatorio">CNPJ Emit.:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="cnpjReferenciada"/>
+				<input type="text" id="cnpjReferenciada" maxlength="14"/>
 			</div>
-			<div class="label">Emis. Ano/Mês (AAMM):</div>
+			<div class="label obrigatorio">Emis. Ano/Mês (AAMM):</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="anoMesReferenciada"/>
+				<input type="text" id="anoMesReferenciada" maxlength="4"/>
 			</div>
-			<div class="label">UF Emit.:</div>
+			<div class="label obrigatorio">UF Emit.:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="ufReferenciada"/>
+				<input type="text" id="ufReferenciada" maxlength="2"/>
 			</div>
 			<div class="bloco_botoes">
 				<a id="botaoInserirReferenciada" title="Inserir Dados da NF referenciada" class="botaoAdicionar"></a>
@@ -1317,7 +1353,7 @@ function editarProduto(linha){
 						<td>${ref.identificacaoNFeReferenciada.cnpjEmitente}</td>
 						<td>${ref.identificacaoNFeReferenciada.anoMes}</td>
 						<td>${ref.identificacaoNFeReferenciada.ufEmitente}</td>
-						<td><input type="button" title="Remover Registro" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+						<td></td>
 					</tr>
 					</c:forEach>
 				</tbody>
@@ -1470,19 +1506,19 @@ function editarProduto(linha){
 				<legend>::: Info. Adicionais Prod. ::: +</legend>
 				<div class="label">Num. Ped. Compra:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" id="numeroPedidoCompraProd" style="width: 100%"/>
+					<input type="text" id="numeroPedidoCompraProd" maxlength="15" style="width: 100%"/>
 				</div>
 				<div class="label">Item Ped. Compra.:</div>
 				<div class="input" style="width: 50%">
-					<input type="text" id="itemPedidoCompraProd" style="width: 20%"/>
+					<input type="text" id="itemPedidoCompraProd"  maxlength="6" style="width: 20%"/>
 				</div>
 				<div class="label">Valor Desp. Acess.:</div>
 				<div class="input" style="width: 80%">
 					<input type="text" id="despesasAcessoriasProd" style="width: 20%"/>
 				</div>
 				<div class="label">Núm. FCI:</div>
-				<div class="input areatexto" style="width: 70%">
-					<textarea id="fciProd" style="width: 50%"></textarea>
+				<div class="input" style="width: 70%">
+					<input type="text" id="fciProd" maxlength="36" style="width: 50%"/>
 				</div>
 				<div class="label">Info. Produto:</div>
 				<div class="input areatexto" style="width: 70%">
@@ -1499,11 +1535,11 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
 					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
-					<div class="label">NCM:</div>
+					<div class="label obrigatorio">NCM:</div>
 					<div class="input" style="width: 80%">
-						<input type="text" id="ncm" name="ncm" style="width: 20%"/>
+						<input type="text" id="ncm" name="ncm"  maxlength="8" style="width: 20%"/>
 					</div>
-					<div class="label">CFOP:</div>
+					<div class="label obrigatorio">CFOP:</div>
 					<div class="input" style="width: 80%">
 						<select id="cfop" name="cfop" style="width: 80%">
 							<c:forEach var="cfop" items="${listaCfop}" >
@@ -1511,7 +1547,7 @@ function editarProduto(linha){
 							</c:forEach>
 						</select>
 					</div>
-					<div class="label">Situação Tribut.:</div>
+					<div class="label obrigatorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="tipoTributacaoICMS" 
 							style="width: 77%" >
@@ -1520,7 +1556,7 @@ function editarProduto(linha){
 							</c:forEach>
 						</select>
 					</div>
-					<div class="label">Origem:</div>
+					<div class="label obrigatorio">Origem:</div>
 					<div class="input" style="width: 25%">
 						<select id="origemMercadoriaICMS" 
 							style="width: 100%" >
@@ -1530,24 +1566,28 @@ function editarProduto(linha){
 						</select>
 					</div>
 					
-					<div class="icms00 label">Modalidade:</div>
-					<div class="icms00 input" style="width: 30%">
+					<div class="label  obrigatorio">Modalidade:</div>
+					<div class="input" style="width: 30%">
 						<select id="modBCICMS" style="width: 65%" class="icms00 semprehabilitado">
 							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMS}">
 								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 20%">
+					<div  class="label obrigatorio">Valor BC:</div>
+					<div class="input" style="width: 10%">
 						<input type="text" id="valorBCICMS" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 40%">
-						<input type="text" id="aliquotaICMS" style="width: 20%" />
+					<div  class="label obrigatorio">Alíquota(%):</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="aliquotaICMS" style="width: 100%" />
 					</div>
-					<div class="icms00 label">Modalidade ST:</div>
-					<div class="icms00 input" style="width: 70%">
+					<div  class="label">Valor Cal.:</div>
+					<div class="input" style="width: 20%">
+						<input type="text" id="valorICMS" readonly="readonly" style="width: 50%" />
+					</div>
+					<div class="label">Modalidade ST:</div>
+					<div class="input" style="width: 70%">
 						<select id="modBCSTICMS" style="width: 30%" class="icms00 semprehabilitado">
 							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMSST}">
 								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
@@ -1589,7 +1629,7 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_cofins" class="fieldsetInterno">
 					<legend>::: COFINS Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
+					<div class="label obrigatorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribCOFINS" style="width: 45%">
 							<c:forEach var="tipo" items="${listaTipoTributacaoCOFINS}">
@@ -1597,13 +1637,17 @@ function editarProduto(linha){
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label">Valor BC:</div>
+					<div  class="label obrigatorio">Valor BC:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorBCCOFINS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaCOFINS" type="text" style="width: 20%" />
+					<div  class="label obrigatorio">Alíquota(%):</div>
+					<div class="input" style="width: 10%">
+						<input id="aliquotaCOFINS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Cal.:</div>
+					<div class="input" style="width: 20%">
+						<input id="valorCOFINS" type="text" readonly="readonly" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde. Vendida:</div>
 					<div class="input" style="width: 10%">
@@ -1619,7 +1663,7 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_pis" class="fieldsetInterno">
 					<legend>::: PIS Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
+					<div class="label obrigatorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribPIS" style="width: 45%">
 							<c:forEach var="tipo" items="${listaTipoTributacaoPIS}">
@@ -1631,9 +1675,13 @@ function editarProduto(linha){
 					<div class="input" style="width: 10%">
 						<input id="valorBCPIS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaPIS" type="text" style="width: 20%" />
+					<div  class="label obrigatorio">Alíquota(%):</div>
+					<div class="input" style="width: 10%">
+						<input id="aliquotaPIS" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Cal.:</div>
+					<div class="input" style="width: 20%">
+						<input id="valorPIS" type="text" readonly="readonly" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde.Vendida:</div>
 					<div class="input" style="width: 10%">
@@ -1649,9 +1697,9 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_ipi" class="fieldsetInterno">
 					<legend>::: IPI Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
+					<div class="label obrigatorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
-						<select id="codSitTribIPI" style="width: 45%" >
+						<select id="codSitTribIPI" style="width: 45%">
 							<option value=""></option>
 							<c:forEach var="tipo" items="${listaTipoTributacaoIPI}">
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
@@ -1663,8 +1711,12 @@ function editarProduto(linha){
 						<input id="valorBCIPI" type="text" style="width: 100%" />
 					</div>
 					<div  class="label">Alíquota:</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaIPI" type="text" style="width: 20%" />
+					<div class="input" style="width: 10%">
+						<input id="aliquotaIPI" type="text" style="width: 100%" />
+					</div>
+					<div  class="label">Valor Cal.:</div>
+					<div class="input" style="width: 20%">
+						<input id="valorIPI" type="text" readonly="readonly" style="width: 50%" />
 					</div>
 					<div  class="label">Qtde. unid. Tributável:</div>
 					<div class="input" style="width: 10%">
@@ -1704,7 +1756,7 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_iss" class="fieldsetInterno">
 					<legend>::: ISSQN Prod.::: +</legend>
-					<div class="label">Situação Tribut.:</div>
+					<div class="label obribagorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribISS" style="width: 45%">
 							<option value=""></option>
@@ -1713,19 +1765,23 @@ function editarProduto(linha){
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label">Valor BC:</div>
+					<div  class="label obribagorio">Valor BC:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorBCISS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota(%):</div>
-					<div class="input" style="width: 50%">
-						<input id="aliquotaISS" type="text" style="width: 20%" />
+					<div  class="label obribagorio">Alíquota(%):</div>
+					<div class="input" style="width: 10%">
+						<input id="aliquotaISS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Qtde. Vendida:</div>
+					<div  class="label">Valor Cal.:</div>
+					<div class="input" style="width: 20%">
+						<input id="valorISS" type="text" readonly="readonly" style="width: 50%" />
+					</div>
+					<div  class="label obribagorio">Mun. Gerador:</div>
 					<div class="input" style="width: 10%">
 						<input id="codMunGeradorISS" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Item Serviço:</div>
+					<div  class="label obribagorio">Item Serviço:</div>
 					<div class="input" style="width: 10%">
 						<input id="codItemServicoISS" type="text" style="width: 100%" />
 					</div>
@@ -1739,19 +1795,19 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_ii" class="fieldsetInterno">
 					<legend>::: Importação Prod.::: +</legend>
-					<div  class="label">Valor BC:</div>
+					<div  class="label obribagorio">Valor BC:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorBCII" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Valor Import.(R$):</div>
+					<div  class="label obribagorio">Valor Import.(R$):</div>
 					<div class="input" style="width: 50%">
 						<input id="valorII" type="text" style="width: 20%" />
 					</div>
-					<div  class="label">Valor IOF:</div>
+					<div  class="label obribagorio">Valor IOF:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorIOFII" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Valor Desp. Aduan.:</div>
+					<div  class="label obribagorio">Valor Desp. Aduan.:</div>
 					<div class="input" style="width: 50%">
 						<input id="valorDespAduaneirasII" type="text" style="width: 20%" />
 					</div>
@@ -1766,37 +1822,41 @@ function editarProduto(linha){
 				<legend>::: Importação ::: +</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 20%">
-					<input type="text" id="cnpjImportProd" style="width: 100%"/>
+					<input type="text" id="cnpjImportProd" maxlength="14" style="width: 100%"/>
 				</div>
-				<div class="label">Cód. Export.:</div>
+				<div class="label obrigatorio">Cód. Export.:</div>
 				<div class="input" style="width: 40%">
-					<input type="text" id="exportadorImportProd" style="width: 50%"/>
+					<input type="text" id="exportadorImportProd" maxlength="60" style="width: 50%"/>
 				</div>
-				<div class="label">Dt. Import.:</div>
+				<div class="label obrigatorio">Dt. Import.:</div>
 				<div class="input" style="width: 20%">
 					<input type="text" id="dtImportProd" style="width: 100%"/>
 				</div>
-				<div class="label">Dt. Desemb.:</div>
+				<div class="label obrigatorio">Dt. Desemb.:</div>
 				<div class="input" style="width: 40%">
 					<input type="text" id="dataDesembImportProd" style="width: 50%"/>
 				</div>
-				<div class="label">Local:</div>
+				<div class="label obrigatorio">Local:</div>
 				<div class="input" style="width: 20%">
-					<input type="text" id="lcImportProd" style="width: 100%"/>
+					<input type="text" id="lcImportProd" maxlength="60" style="width: 100%"/>
 				</div>
-				<div class="label">Número:</div>
+				<div class="label obrigatorio">Número:</div>
 				<div class="input" style="width: 40%">
-					<input type="text" id="numImportProd" style="width: 50%"/>
+					<input type="text" id="numImportProd" maxlength="12" style="width: 50%"/>
 				</div>
-				<div class="label">Intermediação:</div>
+				<div class="label obrigatorio">Intermediação:</div>
 				<div class="input" style="width: 20%">
-					<input type="text" id="tpImportProd" style="width: 100%"/>
+					<select id="tpImportProd" style="width: 100%">
+						<c:forEach var="tipo" items="${listaTipoIntermediacaoImportacao}">
+							<option value="${tipo.codigo}">${tipo.descricao}</option>
+						</c:forEach>
+					</select>
 				</div>
-				<div class="label">Transporte:</div>
+				<div class="label obrigatorio">Transporte:</div>
 				<div class="input" style="width: 40%">
 					<input type="text" id="tpTranspImportProd" style="width: 50%"/>
 				</div>
-				<div class="label">UF Desemb.:</div>
+				<div class="label obrigatorio">UF Desemb.:</div>
 				<div class="input" style="width: 20%">
 					<input type="text" id="ufDesembImportProd" style="width: 100%"/>
 				</div>
@@ -1836,11 +1896,11 @@ function editarProduto(linha){
 				</table>
 				<fieldset id="bloco_adicao_import" class="fieldsetInterno">
 					<legend>::: Adição de Importação :::</legend>
-					<div class="label">Cód. Fabric.:</div>
+					<div class="label obrigatorio">Cód. Fabric.:</div>
 					<div class="input" style="width: 20%">
 						<input type="text" id="codFabricAdicao" style="width: 100%"/>
 					</div>
-					<div class="label">Núm.:</div>
+					<div class="label obrigatorio">Núm.:</div>
 					<div class="input" style="width: 40%">
 						<input type="text" id="numAdicao" style="width: 50%"/>
 					</div>
@@ -1848,7 +1908,7 @@ function editarProduto(linha){
 					<div class="input" style="width: 20%">
 						<input type="text" id="numDrawbackAdicao" style="width: 100%"/>
 					</div>
-					<div class="label">Núm. Sequenc.:</div>
+					<div class="label obrigatorio">Núm. Sequenc.:</div>
 					<div class="input" style="width: 40%">
 						<input type="text" id="numSeqAdicao" style="width: 50%"/>
 					</div>
@@ -1883,17 +1943,17 @@ function editarProduto(linha){
 					<legend>::: Exportação ::: +</legend>
 					<div class="label">Drawback:</div>
 					<div class="input" style="width: 20%">
-						<input type="text" id="drawbackExportProd" style="width: 100%"/>
+						<input type="text" id="drawbackExportProd" maxlength="11" style="width: 100%"/>
 					</div>
-					<div class="label">Ch Acesso:</div>
+					<div class="label obrigatorio">Ch Acesso:</div>
 					<div class="input" style="width: 40%">
-						<input type="text" id="chAcessoExportIndir" style="width: 50%"/>
+						<input type="text" id="chAcessoExportIndir" maxlength="44" style="width: 100%"/>
 					</div>
-					<div class="label">Registro:</div>
+					<div class="label obrigatorio">Registro:</div>
 					<div class="input" style="width: 20%">
-						<input type="text" id="registroExportIndir" style="width: 100%"/>
+						<input type="text" id="registroExportIndir" maxlength="12" style="width: 100%"/>
 					</div>
-					<div class="label">Quantidade:</div>
+					<div class="label obrigatorio">Quantidade:</div>
 					<div class="input" style="width: 40%">
 						<input type="text" id="qtdeExportIndir" style="width: 50%"/>
 					</div>
@@ -1918,12 +1978,11 @@ function editarProduto(linha){
 						</tbody>
 					</table>
 				</fieldset>
-			
 		</fieldset>	
 		
 		<fieldset id="bloco_transporte">
 			<legend>::: Transporte ::: -</legend>
-			<div class="label">Modal. Frete:</div>
+			<div class="label obrigatorio">Modal. Frete:</div>
 			<div class="input" style="width: 80%">
 			<select id="modFrete" name="nf.transporteNFe.modalidadeFrete" style="width: 45%">
 				<c:forEach var="tipo" items="${listaTipoModalidadeFrete}">
@@ -1937,11 +1996,15 @@ function editarProduto(linha){
 					<legend>::: Transportadora :::</legend>
 					<div  class="label">Razão Soc./Nome:</div>
 					<div class="input" style="width: 80%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.razaoSocial" value="${transportadora.razaoSocial}" style="width: 45%" />
+						<input type="text" id="nomeTransportadora" name="nf.transporteNFe.transportadoraNFe.razaoSocial" value="${transportadora.razaoSocial}" style="width: 45%" />
 					</div>
 					<div  class="label">CNPJ:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.cnpj" value="${transportadora.cnpj}" style="width: 100%" />
+						<input type="text" id="cnpjTransportadora" name="nf.transporteNFe.transportadoraNFe.cnpj" value="${transportadora.cnpj}" style="width: 100%" />
+					</div>
+					<div class="input" style="width: 2%">
+						<input type="button" id="botaoPesquisarCnpjTransp"
+							title="Pesquisar CNPJ Transportadora" value="" class="botaoPesquisarPequeno" />
 					</div>
 					<div  class="label">CPF:</div>
 					<div class="input" style="width: 10%">
@@ -1949,19 +2012,19 @@ function editarProduto(linha){
 					</div>
 					<div  class="label">Insc. Estadual:</div>
 					<div class="input" style="width: 30%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.inscricaoEstadual" value="${transportadora.inscricaoEstadual}"  style="width: 50%" />
+						<input type="text" id="ieTransportadora" name="nf.transporteNFe.transportadoraNFe.inscricaoEstadual" value="${transportadora.inscricaoEstadual}"  style="width: 50%" />
 					</div>
 					<div  class="label">Endereço:</div>
 					<div class="input" style="width: 80%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.enderecoCompleto" value="${transportadora.endereco}" style="width: 84%" />
+						<input type="text" id="endTransportadora" name="nf.transporteNFe.transportadoraNFe.enderecoCompleto" value="${transportadora.endereco}" style="width: 84%" />
 					</div>
 					<div  class="label">Município:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.municipio" value="${transportadora.municipio}" style="width: 100%" />
+						<input type="text" id="munTransportadora" name="nf.transporteNFe.transportadoraNFe.municipio" value="${transportadora.municipio}" style="width: 100%" />
 					</div>
 					<div  class="label">UF:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.transportadoraNFe.uf" value="${transportadora.uf}" style="width: 20%" />
+						<input type="text" id="ufTransportadora" name="nf.transporteNFe.transportadoraNFe.uf" value="${transportadora.uf}" style="width: 20%" />
 					</div>
 				</fieldset>
 				</div>
@@ -1969,18 +2032,18 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset id="bloco_veiculo" class="fieldsetInterno">
 					<legend>::: Veículo/Reboque/Balsa/Vagão :::</legend>
-					<div  class="label">Placa:</div>
+					<div  class="label obrigatorio">Placa:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa" value="${nf.transporteNFe.veiculo.placa}" style="width: 100%" />
+						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa"  value="${nf.transporteNFe.veiculo.placa}" maxlength="7" style="width: 100%" />
 					</div>
-					<div  class="label">UF:</div>
+					<div  class="label obrigatorio">UF:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" style="width: 20%" />
+						<input type="text" id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" maxlength="2" style="width: 20%" />
 					</div>
 					<div  class="label">Regist. Trans. Cargo:</div>
 					<div class="input" style="width: 30%">
 						<input type="text" id="registroVeiculo" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
-							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" style="width: 50%" />
+							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" maxlength="2" style="width: 50%" />
 					</div>
 					<div class="bloco_botoes">
 						<a id="botaoInserirReboque" title="Inserir Dados do Reboque" class="botaoAdicionar"></a>
@@ -1989,9 +2052,9 @@ function editarProduto(linha){
 					<table id="tabela_reboque" class="listrada" >
 						<thead>
 							<tr>
-								<th>Placa</th>
-								<th>UF</th>
-								<th>Registro</th>
+								<th>Placa Reboq.</th>
+								<th>UF Reboq.</th>
+								<th>Registro Reboq.</th>
 								<th>Ações</th>
 							</tr>
 						</thead>
@@ -2003,7 +2066,7 @@ function editarProduto(linha){
 								<td>${reboque.placa}</td>
 								<td>${reboque.uf}</td>
 								<td>${reboque.registroNacionalTransportador}</td>
-								<td><input type="button" title="Remover Reboque" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/></td>
+								<td></td>
 							</tr>
 							</c:forEach>
 						</tbody>
@@ -2014,29 +2077,25 @@ function editarProduto(linha){
 				<div class="divFieldset">
 				<fieldset class="fieldsetInterno">
 					<legend>::: Retenção ICMS :::</legend>
-					<div  class="label">Valor Serviço:</div>
+					<div  class="label obrigatorio">Valor Serviço:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.valorServico" style="width: 100%" />
+						<input type="text" id="valServRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorServico" value="${nf.transporteNFe.retencaoICMS.valorServico}" style="width: 100%" />
 					</div>
-					<div  class="label">Valor BC:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.valorBC" style="width: 20%" />
-					</div>
-					<div  class="label">Alíquota(%):</div>
+					<div  class="label obrigatorio">Valor BC:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.aliquota" style="width: 100%" />
+						<input type="text" id="valBCRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorBC" value="${nf.transporteNFe.retencaoICMS.valorBC}" style="width: 100%" />
 					</div>
-					<div  class="label">Valor Ret.:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.valorRetido" style="width: 20%" />
+					<div  class="label obrigatorio">Alíquota(%):</div>
+					<div class="input" style="width: 30%">
+						<input type="text" id="aliqRetICMSTransp" name="nf.transporteNFe.retencaoICMS.aliquota" value="${nf.transporteNFe.retencaoICMS.aliquota}" style="width: 20%" />
 					</div>
-					<div  class="label">CFOP:</div>
+					<div  class="label obrigatorio">CFOP:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.cfop" style="width: 100%" />
+						<input type="text" name="nf.transporteNFe.retencaoICMS.cfop" value="${nf.transporteNFe.retencaoICMS.cfop}" maxlength="4" style="width: 100%" />
 					</div>
-					<div  class="label">Município Gerador:</div>
+					<div  class="label obrigatorio">Município Gerador:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" style="width: 20%" />
+						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" value="${nf.transporteNFe.retencaoICMS.codigoMunicipioGerador}" maxlength="7" style="width: 20%" />
 					</div>
 				</fieldset>
 				</div>
@@ -2046,20 +2105,20 @@ function editarProduto(linha){
 					<legend>::: Volumes :::</legend>
 					<div class="label">Qtde.:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="quantidadeVolume"/>
+						<input type="text" id="quantidadeVolume" maxlength="15"/>
 					</div>
 					
 					<div class="label">Espécie:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="especieVolume"/>
+						<input type="text" id="especieVolume" maxlength="60"/>
 					</div>
 					<div class="label">Marca:</div>
 					<div class="input" style="width: 30%">
-						<input type="text" id="marcaVolume" style="width: 50%"/>
+						<input type="text" id="marcaVolume" maxlength="60" style="width: 50%"/>
 					</div>
 					<div class="label">Numeração:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="numeracaoVolume"/>
+						<input type="text" id="numeracaoVolume" maxlength="60"/>
 					</div>
 					<div class="label">Peso Líq.(kg):</div>
 					<div class="input" style="width: 10%">
@@ -2071,7 +2130,6 @@ function editarProduto(linha){
 					</div>
 					<div class="bloco_botoes">
 						<a id="botaoInserirVolume" title="Inserir Dados da Volume" class="botaoAdicionar"></a>
-						<a id="botaoLimparVolume" title="Limpar Dados da Volume" class="botaoLimpar"></a>
 					</div>
 								
 					<table id="tabela_volume" class="listrada" >
@@ -2086,9 +2144,19 @@ function editarProduto(linha){
 								<th>Ações</th>
 							</tr>
 						</thead>
-						
 						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
 						<tbody>
+						<c:forEach var="vol" items="${nf.transporteNFe.listaVolume}">
+							<tr>
+								<td>${vol.quantidade}</td>
+								<td>${vol.especie}</td>
+								<td>${vol.marca}</td>
+								<td>${vol.numeracao}</td>
+								<td>${vol.pesoLiquido}</td>
+								<td>${vol.pesoBruto}</td>
+								<td></td>
+							</tr>
+						</c:forEach>
 						</tbody>
 					</table>
 				</fieldset>
@@ -2120,20 +2188,19 @@ function editarProduto(linha){
 				<legend>::: Duplicata :::</legend>
 				<div class="label">Número:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" id="numeroDuplicata"/>
+					<input type="text" id="numeroDuplicata" maxlength="60"/>
 				</div>
 				
 				<div class="label">Dt. Vencimento:</div>
 				<div class="input" style="width: 10%">
 					<input id="dataVencimentoDuplicata" type="text" />
 				</div>
-				<div class="label">Valor:</div>
+				<div class="label obrigatorio">Valor:</div>
 				<div class="input" style="width: 10%">
 					<input type="text" id="valorDuplicata"/>
 				</div>
 				<div class="bloco_botoes">
-					<input type="button" id="botaoIncluirDuplicata" title="Inserir Dados da Duplicata" class="botaoAdicionar"/>
-					<input type="button" id="botaoLimparDuplicata" title="Limpar Dados da Duplicata" class="botaoLimpar"/>
+					<input type="button" id="botaoInserirDuplicata" title="Inserir Dados da Duplicata" class="botaoAdicionar"/>
 				</div>
 							
 				<table id="tabela_duplicata" class="listrada" >
@@ -2150,14 +2217,10 @@ function editarProduto(linha){
 					<tbody>
 						<c:forEach var="dup" items="${listaDuplicata}">
 							<tr>
-								<td style="display: none;"></td>
 								<td>${dup.numero}</td>
 								<td>${dup.dataVencimento}</td>
 								<td>${dup.valor}</td>
-								<td>
-									<input type="button" title="Remover Duplicata" value="" class="botaoRemover" onclick="removerLinhaTabela(this);"/>
-									<input type="button" value="" title="Editar Duplicata" onclick="editarDuplicata(this);" class="botaoEditar" /> 
-								</td>
+								<td></td>
 							</tr>
 						</c:forEach>
 					</tbody>
@@ -2180,23 +2243,23 @@ function editarProduto(linha){
 			<legend>::: Exportação/Compra ::: -</legend>
 			<div class="label">UF Embarque:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.exportacaoNFe.ufEmbarque" value="${nf.exportacaoNFe.ufEmbarque}" style="width: 5%"/>
+				<input type="text" name="nf.exportacaoNFe.ufEmbarque" value="${nf.exportacaoNFe.ufEmbarque}" maxlength="2" style="width: 5%"/>
 			</div>
 			<div class="label">Local Embarque:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}" style="width: 80%"/>
+				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}" maxlength="60" style="width: 60%"/>
 			</div>		
 			<div class="label">Nota Empenho:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.notaEmpenho" value="${nf.compraNFe.notaEmpenho}" style="width: 10%"/>
+				<input type="text" name="nf.compraNFe.notaEmpenho" value="${nf.compraNFe.notaEmpenho}" maxlength="17" style="width: 20%"/>
 			</div>
 			<div class="label">Pedido:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.pedido" value="${nf.compraNFe.pedido}" style="width: 50%"/>
+				<input type="text" name="nf.compraNFe.pedido" value="${nf.compraNFe.pedido}" maxlength="60" style="width: 60%"/>
 			</div>
 			<div class="label">Contrato:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.compraNFe.contrato" value="${nf.compraNFe.contrato}" style="width: 50%"/>
+				<input type="text" name="nf.compraNFe.contrato" value="${nf.compraNFe.contrato}" maxlength="60" style="width: 60%"/>
 			</div>		
 		</fieldset>
 		<div class="bloco_botoes">

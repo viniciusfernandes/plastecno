@@ -16,16 +16,18 @@ import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
+import br.com.plastecno.vendas.json.SerializacaoJson;
+import br.com.plastecno.vendas.json.TransportadoraJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class TransportadoraController extends AbstractController {
 
     @Servico
-    private TransportadoraService transportadoraService;
+    private ContatoService contatoService;
 
     @Servico
-    private ContatoService contatoService;
+    private TransportadoraService transportadoraService;
 
     public TransportadoraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -97,6 +99,12 @@ public class TransportadoraController extends AbstractController {
 
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaTransportadora");
         addAtributo("transportadora", filtro);
+    }
+
+    @Get("transportadora/cnpj")
+    public void pesquisarTransportadoraByCnpj(String cnpj) {
+        Transportadora t = transportadoraService.pesquisarByCnpj(cnpj);
+        serializarJson(new SerializacaoJson("transportadora", new TransportadoraJson(t)));
     }
 
     @Post("transportadora/contato/remocao/{idContato}")

@@ -5,16 +5,18 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel
 public class NFeReferenciada {
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Chave acesso  da NFe Referenciada")
+	@InformacaoValidavel(obrigatorio = true, padrao = { "\\d{44}" }, padraoExemplo = "44 digitos", nomeExibicao = "Chave acesso  da NFe Referenciada")
 	@XmlElement(name = "refNFe")
-	private Long chaveAcessoReferenciada;
+	private String chaveAcessoReferenciada;
 
 	@XmlElement(name = "refNF")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Identificação da NFe referenciada")
 	private IdentificacaoNFeReferenciada identificacaoNFeReferenciada;
 
 	@XmlTransient
-	public Long getChaveAcessoReferenciada() {
+	public String getChaveAcessoReferenciada() {
 		return chaveAcessoReferenciada;
 	}
 
@@ -23,12 +25,11 @@ public class NFeReferenciada {
 		return identificacaoNFeReferenciada;
 	}
 
-	public void setChaveAcessoReferenciada(Long chaveAcessoReferenciada) {
+	public void setChaveAcessoReferenciada(String chaveAcessoReferenciada) {
 		this.chaveAcessoReferenciada = chaveAcessoReferenciada;
 	}
 
-	public void setIdentificacaoNFeReferenciada(
-			IdentificacaoNFeReferenciada identificacaoNFeReferenciada) {
+	public void setIdentificacaoNFeReferenciada(IdentificacaoNFeReferenciada identificacaoNFeReferenciada) {
 		this.identificacaoNFeReferenciada = identificacaoNFeReferenciada;
 	}
 }

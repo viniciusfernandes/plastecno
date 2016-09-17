@@ -20,7 +20,7 @@ public class COFINSGeral {
 	@XmlElement(name = "qBCProd")
 	@InformacaoValidavel(tiposObrigatorios = { "3", "9", "ST" }, nomeExibicao = "Quantidade vendida do COFINS", tiposNaoPermitidos = {
 			"4", "6", "7", "8", "9" })
-	private Integer quantidadeVendida;
+	private Double quantidadeVendida;
 
 	@XmlElement(name = "vCOFINS")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Valor COFINS", tiposNaoPermitidos = { "4", "6", "7", "8",
@@ -42,6 +42,7 @@ public class COFINSGeral {
 
 	public COFINSGeral carregarValoresAliquotas() {
 		valor = calcularValor();
+		valorAliquota = valor;
 		return this;
 	}
 
@@ -56,7 +57,7 @@ public class COFINSGeral {
 	}
 
 	@XmlTransient
-	public Integer getQuantidadeVendida() {
+	public Double getQuantidadeVendida() {
 		return quantidadeVendida;
 	}
 
@@ -88,7 +89,7 @@ public class COFINSGeral {
 		this.codigoSituacaoTributaria = codigoSituacaoTributaria;
 	}
 
-	public void setQuantidadeVendida(Integer quantidadeVendida) {
+	public void setQuantidadeVendida(Double quantidadeVendida) {
 		this.quantidadeVendida = quantidadeVendida;
 	}
 

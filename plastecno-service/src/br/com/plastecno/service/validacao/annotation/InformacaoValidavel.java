@@ -44,6 +44,8 @@ public @interface InformacaoValidavel {
 
 	boolean positivo() default false;
 
+	String prefixo() default "";
+
 	boolean relacionamentoObrigatorio() default false;
 
 	String[] substituicao() default {};

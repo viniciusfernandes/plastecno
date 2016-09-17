@@ -90,6 +90,12 @@ public abstract class AbstractController {
         this.result.include(nomeAtributo, valorAtributo);
     }
 
+    void addAtributoPadrao(String nomeAtributo, Object valorAtributo) {
+        if (!contemAtributo(nomeAtributo)) {
+            addAtributo(nomeAtributo, valorAtributo);
+        }
+    }
+
     int calcularIndiceRegistroInicial(Integer paginaSelecionada) {
         if (paginaSelecionada == null || paginaSelecionada <= 1) {
             return 0;
@@ -199,7 +205,7 @@ public abstract class AbstractController {
         item.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedido()));
         item.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedidoIPI()));
         item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
-        
+
         item.setValorICMSFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getValorICMS())));
         item.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getPrecoUnidadeIPI())));
     }

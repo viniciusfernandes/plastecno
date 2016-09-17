@@ -37,6 +37,7 @@ import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
 import br.com.plastecno.service.nfe.constante.TipoImpressaoNFe;
+import br.com.plastecno.service.nfe.constante.TipoIntermediacaoImportacao;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
@@ -80,6 +81,7 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
+        addAtributo("listaTipoIntermediacaoImportacao", TipoIntermediacaoImportacao.values());
         addAtributo("listaTipoPresencaComprador", TipoPresencaComprador.values());
         addAtributo("listaTipoDestinoOperacao", TipoDestinoOperacao.values());
         addAtributo("listaTipoOperacaoConsumidorFinal", TipoOperacaoConsumidorFinal.values());
@@ -104,12 +106,11 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("percentualPis", configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.PERCENTUAL_PIS));
         addAtributo("listaCfop", listaCfop);
 
-        addAtributo("finalidadeEmissaoSelecionada", TipoFinalidadeEmissao.NORMAL.getCodigo());
-        addAtributo("formaPagamentoSelecionada", TipoFormaPagamento.PRAZO.getCodigo());
-        addAtributo("tipoEmissaoSelecionada", TipoEmissao.NORMAL.getCodigo());
-        addAtributo("tipoImpressaoSelecionada", TipoImpressaoNFe.RETRATO.getCodigo());
-        addAtributo("tipoPresencaSelecionada", TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
-
+        addAtributoPadrao("finalidadeEmissaoSelecionada", TipoFinalidadeEmissao.NORMAL.getCodigo());
+        addAtributoPadrao("formaPagamentoSelecionada", TipoFormaPagamento.PRAZO.getCodigo());
+        addAtributoPadrao("tipoEmissaoSelecionada", TipoEmissao.NORMAL.getCodigo());
+        addAtributoPadrao("tipoImpressaoSelecionada", TipoImpressaoNFe.RETRATO.getCodigo());
+        addAtributoPadrao("tipoPresencaSelecionada", TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
     }
 
     @Post("emissaoNFe/emitirNFe")
@@ -166,6 +167,9 @@ public class EmissaoNFeController extends AbstractController {
 
         for (DuplicataNFe d : lista) {
             try {
+                if (d.getDataVencimento() == null) {
+                    continue;
+                }
                 d.setDataVencimento(to.format(from.parse(d.getDataVencimento())));
             } catch (ParseException e) {
                 throw new BusinessException("Não foi possível formatar a data de vencimento da duplicata "

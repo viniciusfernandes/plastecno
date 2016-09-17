@@ -23,6 +23,52 @@ function editarTabela(configJson) {
 		}
 	}
 	;
+	
+	function gerarBotaoRemover(){
+		var tabela = document.getElementById(config.idTabela);
+		var btRemove = document.createElement('input');
+		btRemove.type = 'button';
+		btRemove.title = 'Remover Registro';
+		btRemove.classList.add('botaoRemover');
+		btRemove.onclick = function() {
+			var l = btRemove.parentNode.parentNode;
+			if (linha != null && linha.rowIndex == l.rowIndex) {
+				linha = null;
+				idLinha = '';
+			}
+			tabela.deleteRow(l.rowIndex);
+
+			if (config.onRemover != undefined) {
+				config.onRemover(l);
+			}
+		};
+		return btRemove;
+	};
+	
+	function gerarBotaoEditar(){
+		var btEdit = document.createElement('input');
+		btEdit.type = 'button';
+		btEdit.title = 'Editar Registro';
+		btEdit.classList.add('botaoEditar');
+		btEdit.onclick = function() {
+			linha = btEdit.parentNode.parentNode;
+			idLinha = linha.id;
+			var celulas = linha.cells;
+			var campos = config.campos;
+			var campo = null;
+			for (var i = 0; i <= campos.length; i++) {
+				campo = document.getElementById(campos[i]);
+				if (campo != null && campo != undefined) {
+					campo.value = celulas[i].innerHTML;
+				}
+			}
+
+			if (config.onEditar != undefined) {
+				config.onEditar(linha);
+			}
+		};
+		return btEdit;
+	};
 
 	document.getElementById(config.idBotaoInserir).onclick = function() {
 
@@ -48,46 +94,11 @@ function editarTabela(configJson) {
 				cel.innerHTML = campo.value;
 				campo.value = '';
 			} else if (i == max && !isEdicao) { // Bloco de inclusao dos botoes de acoes editar e remover
-				var btRemove = document.createElement('input');
-				btRemove.type = 'button';
-				btRemove.title = 'Remover Registro';
-				btRemove.classList.add('botaoRemover');
-				btRemove.onclick = function() {
-					var l = btRemove.parentNode.parentNode;
-					if (linha != null && linha.rowIndex == l.rowIndex) {
-						linha = null;
-						idLinha = '';
-					}
-					tabela.deleteRow(l.rowIndex);
-
-					if (config.onRemover != undefined) {
-						config.onRemover(l);
-					}
-				};
-
-				var btEdit = document.createElement('input');
-				btEdit.type = 'button';
-				btEdit.title = 'Editar Registro';
-				btEdit.classList.add('botaoEditar');
-				btEdit.onclick = function() {
-					linha = btEdit.parentNode.parentNode;
-					idLinha = linha.id;
-					var celulas = linha.cells;
-					var campos = config.campos;
-					var campo = null;
-					for (var i = 0; i <= campos.length; i++) {
-						campo = document.getElementById(campos[i]);
-						if (campo != null && campo != undefined) {
-							campo.value = celulas[i].innerHTML;
-						}
-					}
-
-					if (config.onEditar != undefined) {
-						config.onEditar(linha);
-					}
-				};
-				cel.appendChild(btRemove);
+				
+				var btRemove = gerarBotaoRemover(linha);
+				var btEdit = gerarBotaoEditar(linha);
 				cel.appendChild(btEdit);
+				cel.appendChild(btRemove);
 			}
 		}
 		// A geracao dos ids deve preceder onInserir para que o linha ja conteha o id
@@ -106,4 +117,19 @@ function editarTabela(configJson) {
 		idLinha = id;
 		document.getElementById(config.idBotaoInserir).click();
 	};
+	
+	function gerarBotaoEditarLinhaExistente(){
+		var linhas = document.getElementById(config.idTabela).rows;
+		if(linhas.length <= 1){
+			return;
+		}
+		var last = linhas[0].cells.length-1;
+		var c = null;
+		for (var i = 1; i < linhas.length; i++) {
+			c = linhas[i].cells[last]; 
+			c.appendChild(gerarBotaoEditar());
+			c.appendChild(gerarBotaoRemover());
+		}
+	};
+	gerarBotaoEditarLinhaExistente();
 };

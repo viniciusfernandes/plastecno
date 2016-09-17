@@ -41,6 +41,15 @@ public class PIS {
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo PIS")
 	private PISGeral tipoPis;
 
+	public void configurarSubstituicaoTributaria() {
+		if (tipoPis == null) {
+			return;
+		}
+		if (TipoTributacaoPIS.PIS_ST.equals(tipoPis.getTipoTributacao())) {
+			tipoPis.setCodigoSituacaoTributaria(null);
+		}
+	}
+
 	@XmlTransient
 	public PISGeral getTipoPis() {
 		if (tipoPis == null) {

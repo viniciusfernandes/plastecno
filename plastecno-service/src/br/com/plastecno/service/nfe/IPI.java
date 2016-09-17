@@ -101,7 +101,7 @@ public class IPI {
 		for (Field campo : campos) {
 			campo.setAccessible(true);
 			try {
-				if ((conteudo = campo.get(this)) == null) {
+				if ((conteudo = campo.get(this)) == null || !(conteudo instanceof IPIGeral)) {
 					campo.setAccessible(false);
 					continue;
 				}

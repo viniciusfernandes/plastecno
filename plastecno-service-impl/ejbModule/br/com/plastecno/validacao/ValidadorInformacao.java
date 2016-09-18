@@ -46,13 +46,26 @@ public final class ValidadorInformacao {
 			}
 
 			Object conteudoCampo = recuperarConteudo(campo, obj);
-
+			// Esse bloco deve preceder todos os outros pois eh uma
+			// pre-avaliacao do conteudo dos campos e podera alterar o conteudo
+			// de acordo com a marcacao, sendo que esse novo conteudo sera
+			// revalidado posteiormente
 			if (valorCond != null) {
 				if (informacao.tiposNaoPermitidos().length > 0) {
 					for (String c : informacao.tiposNaoPermitidos()) {
 						if (conteudoCampo != null && valorCond.equals(c)) {
-							listaMensagem.add("\"" + informacao.nomeExibicao() + "\" não deve ser preenchido para o \""
-									+ nomeCond + " = " + valorCond + "\"");
+							// listaMensagem.add("\"" +
+							// informacao.nomeExibicao() +
+							// "\" não deve ser preenchido para o \"" + nomeCond
+							// + " = " + valorCond + "\"");
+
+							// No caso em que um determinado tipo nao for
+							// permitido iremos anular o conteudo para facilitar
+							// a implementacao de regras de negocio, evitando
+							// assim novas verificacoes de nulidade do conteudo
+							// evitando uma quantidade de if/else
+							conteudoCampo = null;
+							setConteudo(campo, obj, null);
 							break;
 						}
 					}
@@ -213,8 +226,8 @@ public final class ValidadorInformacao {
 				}
 				continue;
 			}
-			
-			if(obj instanceof ICMSGeral){
+
+			if (obj instanceof ICMSGeral) {
 				System.out.println("ssssssssss");
 			}
 

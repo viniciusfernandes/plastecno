@@ -2,8 +2,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Plastecno - Cadastro de Representada ou Fornecedores</title>
-
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <style type="text/css">

@@ -136,10 +136,6 @@
 			<iframe name="principal_frame"
 				style="border: 0; height: 95%; width: 100%;"></iframe>
 		</div>
-
-
-		<!--  >div id="footer">Fone: (55)(11)3021-9600  plastecno@plastecno.com.br</div-->
 	</div>
-
 </body>
 </html>

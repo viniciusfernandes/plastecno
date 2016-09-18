@@ -582,7 +582,7 @@ function gerarJsonTipoIcms(){
 		          {'nome':'modalidadeDeterminacaoBC', 'id':'modBCICMS'},
 		          {'nome':'modalidadeDeterminacaoBCST', 'id':'modBCSTICMS'},
 		          {'nome':'percentualMargemValorAdicionadoICMSST', 'id':'percValSTICMS'},
-		          {'nome':'percentualReducaoBC', 'id':'percRedBCSTICMS'},
+		          {'nome':'percentualReducaoBCST', 'id':'percRedBCSTICMS'},
 		          {'nome':'valorBC', 'id':'valorBCICMS'},
 		          {'nome':'valorBCST', 'id':'valorBCSTICMS'},
 		          {'nome':'aliquotaST', 'id':'aliquotaSTICMS'},
@@ -1046,13 +1046,15 @@ function inicializarBotaoPesquisarCEP(config){
 
 function inicializarOpcoesSelect(json){
 	var campos = json.campos;
-	var opcao = null;
+	var id = null;
+	var sel = null;
 	for (var i = 0; i < campos.length; i++) {
-		if(campos[i].idBloco != undefined){
-			opcao = "#"+campos[i].idBloco;
+		if(document.getElementById(campos[i].idHidden) != undefined){
+			continue;
 		}
-		opcao = " #"+campos[i].idCampo + " option[value="+campos[i].opcao+"]";
-		$(opcao).attr('selected','selected');
+		sel = document.getElementById(campos[i].idSelect);
+		sel.value = campos[i].valor;
+		sel.selected='selected';
 	}
 };
 
@@ -1107,12 +1109,12 @@ function editarProduto(linha){
 	fecharBloco('bloco_adicao_import');
 	
 	var opcoes = {'campos':
-		[{'idBloco': 'bloco_tributos', 'idCampo': 'cfop', 'opcao': '5102'},
-		 {'idBloco': 'bloco_tributos', 'idCampo': 'tipoTributacaoICMS', 'opcao': '00'},
-		 {'idBloco': 'bloco_tributos', 'idCampo': 'origemMercadoriaICMS', 'opcao': '0'},
-		 {'idBloco': 'bloco_tributos', 'idCampo': 'modBCICMS', 'opcao': '0'},
-		 {'idBloco': 'bloco_tributos', 'idCampo': 'codSitTribCOFINS', 'opcao': '1'},
-		 {'idBloco': 'bloco_tributos', 'idCampo': 'codSitTribPIS', 'opcao': '1'}]};
+		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idSelect': 'cfop', 'valor': '5102'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.codigoSituacaoTributaria', 'idSelect': 'tipoTributacaoICMS', 'valor': '00'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.origemMercadoria', 'idSelect': 'origemMercadoriaICMS', 'valor': '0'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.modalidadeDeterminacaoBC', 'idSelect': 'modBCICMS', 'valor': '0'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins.tipoCofins.codigoSituacaoTributaria', 'idSelect': 'codSitTribCOFINS', 'valor': '1'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis.codigoSituacaoTributaria', 'idSelect': 'codSitTribPIS', 'valor': '1'}]};
 	
 	inicializarOpcoesSelect(opcoes);
 	
@@ -1589,6 +1591,7 @@ function inicializarCalculoImpostos(){
 					<div class="label">Modalidade ST:</div>
 					<div class="input" style="width: 70%">
 						<select id="modBCSTICMS" style="width: 30%" class="icms00 semprehabilitado">
+							<option value=""></option>
 							<c:forEach var="modalidade" items="${listaTipoModalidadeDeterminacaoBCICMSST}">
 								<option value="${modalidade.codigo}">${modalidade.descricao}</option>
 							</c:forEach>

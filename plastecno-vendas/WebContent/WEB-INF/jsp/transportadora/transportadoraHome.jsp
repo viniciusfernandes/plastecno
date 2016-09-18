@@ -4,9 +4,6 @@
 <head>
 <meta charset="utf-8">
 
-
-<title>Plastecno - Cadastro de Transportadoras</title>
-
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <style type="text/css">

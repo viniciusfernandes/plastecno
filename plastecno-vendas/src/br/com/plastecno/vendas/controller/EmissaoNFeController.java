@@ -273,7 +273,8 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("listaDuplicata", listaDuplicata);
             addAtributo("cliente", cliente);
             addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
-            addAtributo("logradouro", clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()));
+            addAtributo("logradouro",
+                    cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
             addAtributo("listaItem", listaItem);
             addAtributo("idPedido", idPedido);
             addAtributo(
@@ -307,6 +308,7 @@ public class EmissaoNFeController extends AbstractController {
                 l.setNumero(e.getNumero() == null || e.getNumero().trim().isEmpty() ? null : Integer.parseInt(e
                         .getNumero()));
                 l.setUf(e.getUF());
+                l.setCodigoMunicipio(e.getCodigoMunicipio());
                 addAtributo("telefoneContatoPedido", e.getTelefone());
             }
             addAtributo("cliente", c);

@@ -50,6 +50,7 @@ import br.com.plastecno.service.nfe.TributosProdutoServico;
 import br.com.plastecno.service.nfe.ValoresTotaisICMS;
 import br.com.plastecno.service.nfe.ValoresTotaisISSQN;
 import br.com.plastecno.service.nfe.ValoresTotaisNFe;
+import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
@@ -327,7 +328,7 @@ public class NFeServiceImpl implements NFeService {
 			dup.setDataVencimento(df.format(d));
 			// Valor padrao eh boleto pois eh o maior numero de ocorrencias
 			dup.setNumero("BOLETO");
-			dup.setValor(valorDuplicata);
+			dup.setValor(NumeroUtils.arredondarValorMonetario(valorDuplicata));
 
 			listaDuplicata.add(dup);
 		}
@@ -354,7 +355,8 @@ public class NFeServiceImpl implements NFeService {
 		endereco.setNomePais(logradouro.getPais());
 		endereco.setTelefone(telefone);
 
-		endereco.setCodigoMunicipio(logradouroService.pesquisarCodigoIBGEByIdCidade(logradouro.getIdCidade()));
+		endereco.setCodigoMunicipio(logradouro.getCodigoMunicipio() != null ? logradouro.getCodigoMunicipio()
+				: logradouroService.pesquisarCodigoIBGEByIdCidade(logradouro.getIdCidade()));
 
 		return endereco;
 	}

@@ -17,8 +17,8 @@ public class IPIGeral {
 	private String codigoSituacaoTributaria;
 
 	@XmlElement(name = "qUnid")
-	@InformacaoValidavel(tiposObrigatorios = { "00", "49", "50", "99" }, nomeExibicao = "Quantidade de unidade tributável do IPI")
-	private Integer quantidadeUnidadeTributavel;
+	@InformacaoValidavel(decimal = { 13, 4 }, tiposObrigatorios = { "00", "49", "50", "99" }, nomeExibicao = "Quantidade de unidade tributável do IPI")
+	private Double quantidadeUnidadeTributavel;
 
 	@XmlElement(name = "vIPI")
 	@InformacaoValidavel(tiposObrigatorios = { "00", "49", "50", "99" }, nomeExibicao = "Valor do IPI")
@@ -52,7 +52,7 @@ public class IPIGeral {
 	}
 
 	@XmlTransient
-	public Integer getQuantidadeUnidadeTributavel() {
+	public Double getQuantidadeUnidadeTributavel() {
 		return quantidadeUnidadeTributavel;
 	}
 
@@ -84,7 +84,7 @@ public class IPIGeral {
 		this.codigoSituacaoTributaria = codigoSituacaoTributaria;
 	}
 
-	public void setQuantidadeUnidadeTributavel(Integer quantidadeUnidadeTributavel) {
+	public void setQuantidadeUnidadeTributavel(Double quantidadeUnidadeTributavel) {
 		this.quantidadeUnidadeTributavel = quantidadeUnidadeTributavel;
 	}
 

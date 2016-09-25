@@ -51,6 +51,7 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 	<legend>::: Endereço :::</legend>
 	<input type="hidden" id="idLogradouro" name="logradouro.id" value="${logradouro.id}" />
 	<input type="hidden" id="idCidade" name="logradouro.idCidade" value="${logradouro.idCidade}" />
+	<input type="hidden" id="codigoMunicipio" name="logradouro.codigoMunicipio" value="${logradouro.codigoMunicipio}" />
 
 	<c:if test="${tipoLogradouroRenderizado}">
 		<div class="label">Tipo End.:</div>

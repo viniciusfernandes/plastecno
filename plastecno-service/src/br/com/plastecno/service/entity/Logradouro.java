@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
@@ -32,6 +33,9 @@ public class Logradouro implements Serializable, Cloneable {
 	private static final long serialVersionUID = -9088499085002422043L;
 
 	private Boolean codificado = true;
+
+	@Transient
+	private String codigoMunicipio;
 
 	@InformacaoValidavel(intervaloComprimento = { 1, 250 }, nomeExibicao = "Complemento do logradouro")
 	private String complemento;
@@ -124,6 +128,10 @@ public class Logradouro implements Serializable, Cloneable {
 		return codificado;
 	}
 
+	public String getCodigoMunicipio() {
+		return codigoMunicipio;
+	}
+
 	public String getComplemento() {
 		return complemento;
 	}
@@ -191,6 +199,10 @@ public class Logradouro implements Serializable, Cloneable {
 
 	public void setCodificado(Boolean codificado) {
 		this.codificado = codificado;
+	}
+
+	public void setCodigoMunicipio(String codigoMunicipio) {
+		this.codigoMunicipio = codigoMunicipio;
 	}
 
 	public void setComplemento(String complemento) {

@@ -147,7 +147,6 @@ public final class ValidadorInformacao {
 			// uma
 			// string
 			isString = conteudoCampo instanceof String;
-
 			if (isString && informacao.trim()) {
 				conteudoCampo = trim(campo, obj, conteudoCampo);
 			}

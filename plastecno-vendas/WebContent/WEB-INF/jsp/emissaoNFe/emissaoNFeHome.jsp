@@ -164,7 +164,31 @@ $(document).ready(function() {
 		});
 		
 		request.fail(function(request, status) {
-			alert('Falha na busca da transportadora de CNPJ: ' + cnpj+' => Status da requisicao: '+status);
+			alert('Falha na busca da transportadora por CNPJ: ' + cnpj+' => Status da requisicao: '+status);
+		});
+	});	
+	
+	$('#botaoPesquisarCnpjDest').click(function () {
+		var cnpj = $('#cnpj').val();
+		if (cnpj == undefined || isEmpty(cnpj)) {
+			return;
+		}
+		
+		var request = $.ajax({
+							type: "get",
+							url: '<c:url value="/cliente/cnpj"/>',
+							data: 'cnpj='+cnpj,
+						});
+		request.done(function(response) {
+			var cliente = response.cliente;
+			$('#nomeCliente').val(cliente.razaoSocial);
+			$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
+			$('#telefone').val(cliente.telefone);
+			$('#email').val(cliente.email);
+		});
+		
+		request.fail(function(request, status) {
+			alert('Falha na busca da destinatário por CNPJ: ' + cnpj+' => Status da requisicao: '+status);
 		});
 	});	
 	
@@ -1266,6 +1290,10 @@ function inicializarCalculoImpostos(){
 					<input type="text" id="cnpj" name="nf.identificacaoDestinatarioNFe.cnpj"
 						value="${cliente.cnpj}"  />
 				</div>
+				<div class="input" style="width: 2%">
+						<input type="button" id="botaoPesquisarCnpjDest"
+							title="Pesquisar CNPJ Destinatário" value="" class="botaoPesquisarPequeno" />
+					</div>
 				<div class="label">Insc. Estadual:</div>
 				<div class="input" style="width: 40%">
 					<input type="text" id="inscricaoEstadual"

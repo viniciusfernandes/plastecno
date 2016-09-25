@@ -42,7 +42,7 @@ public class ClienteJson {
         inscricaoEstadual = cliente.getInscricaoEstadual();
         nomeCompleto = cliente.getNomeCompleto();
         telefone = cliente.getContatoPrincipal() != null ? cliente.getContatoPrincipal().getTelefoneFormatado() : "";
-        vendedor = new VendedorJson(cliente.getVendedor());
+        vendedor = cliente.getVendedor() == null ? null : new VendedorJson(cliente.getVendedor());
 
         this.listaTransportadora = new ArrayList<TransportadoraJson>();
         this.listaRedespacho = new ArrayList<TransportadoraJson>();

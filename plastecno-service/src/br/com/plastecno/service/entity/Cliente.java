@@ -132,8 +132,8 @@ public class Cliente implements Serializable {
 		this.razaoSocial = razaoSozial;
 	}
 
-	public Cliente(Integer id, String nomeFantasia, String razaoSozial,
-			String cnpj, String cpf, String inscricaoEstadual, String email) {
+	public Cliente(Integer id, String nomeFantasia, String razaoSozial, String cnpj, String cpf,
+			String inscricaoEstadual, String email) {
 		this(id, nomeFantasia, razaoSozial);
 		this.cnpj = cnpj;
 		this.cpf = cpf;
@@ -200,8 +200,7 @@ public class Cliente implements Serializable {
 	}
 
 	public Contato getContatoPrincipal() {
-		return this.isListaContatoPreenchida() ? this.listaContato.iterator()
-				.next() : null;
+		return this.isListaContatoPreenchida() ? this.listaContato.iterator().next() : null;
 	}
 
 	public String getCpf() {

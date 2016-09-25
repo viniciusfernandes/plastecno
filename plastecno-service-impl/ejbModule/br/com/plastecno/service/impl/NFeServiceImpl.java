@@ -373,7 +373,7 @@ public class NFeServiceImpl implements NFeService {
 			StringReader reader = new StringReader(xmlNFe);
 			return (NFe) unmarshaller.unmarshal(reader);
 		} catch (JAXBException e) {
-			throw new BusinessException("Não foi possível gerar a NFe a partir XML do pedido No. " + idPedido);
+			throw new BusinessException("Não foi possível gerar a NFe a partir XML do pedido No. " + idPedido, e);
 		}
 	}
 

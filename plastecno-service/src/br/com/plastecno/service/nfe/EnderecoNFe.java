@@ -16,7 +16,7 @@ public class EnderecoNFe {
 	@XmlElement(name = "CEP")
 	private String cep;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 99999999 }, nomeExibicao = "Código do município")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{7}", padraoExemplo = "7 digitos", tamanho = 7, prefixo = "0", nomeExibicao = "Código do município")
 	@XmlElement(name = "cMun")
 	private String codigoMunicipio;
 
@@ -44,7 +44,7 @@ public class EnderecoNFe {
 	@XmlElement(name = "nro")
 	private String numero;
 
-	@InformacaoValidavel(padrao = "\\d{6,14}", padraoExemplo = "6 a 14 digitos", nomeExibicao = "telefone do endereço")
+	@InformacaoValidavel(substituicao = { "\\D", "" }, padrao = "\\d{6,14}", padraoExemplo = "6 a 14 digitos", nomeExibicao = "telefone do endereço")
 	@XmlElement(name = "fone")
 	private String telefone;
 

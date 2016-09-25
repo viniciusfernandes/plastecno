@@ -194,6 +194,8 @@ public interface PedidoService {
 
 	Pedido pesquisarPedidoById(Integer id);
 
+	Pedido pesquisarPedidoById(Integer idPedido, boolean isCompra);
+
 	List<Pedido> pesquisarPedidoByIdCliente(Integer idCliente,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 

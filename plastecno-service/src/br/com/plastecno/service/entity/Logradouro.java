@@ -36,8 +36,7 @@ public class Logradouro implements Serializable, Cloneable {
 	@InformacaoValidavel(intervaloComprimento = { 1, 250 }, nomeExibicao = "Complemento do logradouro")
 	private String complemento;
 
-	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE,
-			CascadeType.PERSIST })
+	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@JoinColumn(name = "id_endereco")
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Endereço do Logradouro")
 	private Endereco endereco;
@@ -77,23 +76,19 @@ public class Logradouro implements Serializable, Cloneable {
 
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof Logradouro && this.id != null
-				&& this.id.equals(((Logradouro) o).id);
+		return o instanceof Logradouro && this.id != null && this.id.equals(((Logradouro) o).id);
 	}
 
 	private String gerarDescricaoLogradouroCodificado() {
 
-		StringBuilder logradouro = new StringBuilder().append(" CEP: ")
-				.append(this.getCep()).append(" - ")
+		StringBuilder logradouro = new StringBuilder().append(" CEP: ").append(this.getCep()).append(" - ")
 				.append(this.endereco.getDescricao());
 		if (this.numero != null) {
 			logradouro.append(", No. ").append(this.numero);
 		}
 
-		logradouro.append(" - ")
-				.append(this.complemento != null ? this.complemento : "")
-				.append(" - ").append(getBairro()).append(" - ")
-				.append(this.getCidade()).append(" - ").append(this.getUf())
+		logradouro.append(" - ").append(this.complemento != null ? this.complemento : "").append(" - ")
+				.append(getBairro()).append(" - ").append(this.getCidade()).append(" - ").append(this.getUf())
 				.append(" - ").append(this.getPais());
 
 		return logradouro.toString();
@@ -101,16 +96,14 @@ public class Logradouro implements Serializable, Cloneable {
 
 	private String gerarDescricaoLogradouroNaoCodificado() {
 
-		StringBuilder logradouro = new StringBuilder().append(" CEP: ")
-				.append(this.getCep()).append(" - ")
+		StringBuilder logradouro = new StringBuilder().append(" CEP: ").append(this.getCep()).append(" - ")
 				.append(this.complemento != null ? this.complemento : "");
 		if (this.numero != null) {
 			logradouro.append(", No. ").append(this.numero);
 		}
 
-		logradouro.append(" - ").append(getBairro()).append(" - ")
-				.append(this.getCidade()).append(" - ").append(this.getUf())
-				.append(" - ").append(this.getPais());
+		logradouro.append(" - ").append(getBairro()).append(" - ").append(this.getCidade()).append(" - ")
+				.append(this.getUf()).append(" - ").append(this.getPais());
 
 		return logradouro.toString();
 	}
@@ -136,8 +129,8 @@ public class Logradouro implements Serializable, Cloneable {
 	}
 
 	public String getDescricao() {
-		return this.codificado ? this.gerarDescricaoLogradouroCodificado()
-				: this.gerarDescricaoLogradouroNaoCodificado();
+		return this.codificado ? this.gerarDescricaoLogradouroCodificado() : this
+				.gerarDescricaoLogradouroNaoCodificado();
 	}
 
 	public String getEndereco() {
@@ -156,8 +149,7 @@ public class Logradouro implements Serializable, Cloneable {
 	}
 
 	public Integer getIdCidade() {
-		return endereco.getCidade() != null ? endereco.getCidade().getId()
-				: null;
+		return endereco.getCidade() != null ? endereco.getCidade().getId() : null;
 	}
 
 	public Integer getNumero() {
@@ -211,6 +203,10 @@ public class Logradouro implements Serializable, Cloneable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public void setIdCidade(Integer idCidade) {
+		endereco.getCidade().setId(idCidade);
 	}
 
 	public void setNumero(Integer numero) {

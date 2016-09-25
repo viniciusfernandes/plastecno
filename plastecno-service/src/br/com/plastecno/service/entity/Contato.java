@@ -126,9 +126,20 @@ public class Contato implements Serializable {
 	private String formatarTelefone(String ddi, String ddd, String telefone, String ramal, String fax) {
 
 		StringBuilder telefoneFormatado = new StringBuilder();
-		telefoneFormatado.append("(").append(ddi == null ? "" : ddi).append(" / ").append(ddd == null ? "" : ddd)
-				.append(") ").append(telefone == null ? "" : formatarTelefoneComHifen(telefone)).append(" / ")
-				.append(ramal == null ? "" : ramal).append(" / ").append(fax == null ? "" : formatarTelefoneComHifen(fax));
+
+		if (ddi != null && !ddi.isEmpty()) {
+			telefoneFormatado.append(ddi).append(" ");
+		}
+		
+		if (ddd != null && !ddd.isEmpty()) {
+			telefoneFormatado.append("(").append(ddd).append(") ");
+		}
+		
+
+		//telefoneFormatado.append("(").append(ddi == null ? "" : ddi).append(" / ").append(ddd == null ? "" : ddd).append(") ")
+		telefoneFormatado.append(telefone == null ? "" : formatarTelefoneComHifen(telefone)).append(" / ")
+				.append(ramal == null ? "" : ramal).append(" / ")
+				.append(fax == null ? "" : formatarTelefoneComHifen(fax));
 
 		return telefoneFormatado.toString();
 	}
@@ -282,8 +293,8 @@ public class Contato implements Serializable {
 		if (this.isTelefoneSecundarioVazio()) {
 			return "";
 		}
-		return this.formatarTelefone(this.ddiSecundario, this.dddSecundario, this.telefoneSecundario, this.ramalSecundario,
-				this.faxSecundario);
+		return this.formatarTelefone(this.ddiSecundario, this.dddSecundario, this.telefoneSecundario,
+				this.ramalSecundario, this.faxSecundario);
 	}
 
 	@Override

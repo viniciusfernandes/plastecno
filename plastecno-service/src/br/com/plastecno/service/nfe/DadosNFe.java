@@ -28,6 +28,7 @@ public class DadosNFe {
 	private String id;
 
 	@XmlElement(name = "dest")
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Identificação do destinatário")
 	private IdentificacaoDestinatarioNFe identificacaoDestinatarioNFe;
 
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Identificação do emitente")

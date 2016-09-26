@@ -105,10 +105,10 @@ public class NFeServiceImpl implements NFeService {
 		IdentificacaoLocalGeral retirada = nFe.getDadosNFe().getIdentificacaoLocalRetirada();
 		IdentificacaoLocalGeral entrega = nFe.getDadosNFe().getIdentificacaoLocalEntrega();
 
-		if (retirada != null) {
+		if (retirada != null && retirada.getCodigoMunicipio() == null) {
 			retirada.setCodigoMunicipio(logradouroService.pesquisarCodigoIBGEByCEP(retirada.getCep()));
 		}
-		if (entrega != null) {
+		if (entrega != null && entrega.getCodigoMunicipio() == null) {
 			entrega.setCodigoMunicipio(logradouroService.pesquisarCodigoIBGEByCEP(entrega.getCep()));
 		}
 	}

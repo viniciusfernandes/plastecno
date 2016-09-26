@@ -14,7 +14,6 @@ public class IdentificacaoLocalGeral {
 	// Esse campo eh necessario apenas para recuperar o codigo do municipio pois
 	// nao eh garantido a unicidade da pesquisa pelo nome da cidade, mas esse
 	// campo nao sera incluido no xml
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "CEP do local do produto")
 	@XmlTransient
 	private String cep;
 
@@ -23,7 +22,7 @@ public class IdentificacaoLocalGeral {
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
-	@InformacaoValidavel(obrigatorio = true, tamanho = 7, nomeExibicao = "Código do município do local do produto")
+	@InformacaoValidavel(obrigatorio = true, tamanho = 7, nomeExibicao = "Código do município do local do produto, para isso recarregue o cep")
 	@XmlElement(name = "cMun")
 	private String codigoMunicipio;
 

@@ -17,6 +17,7 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
 import br.com.plastecno.service.constante.TipoAcesso;
+import br.com.plastecno.service.constante.TipoUF;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
@@ -81,6 +82,7 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
+        addAtributo("listaTipoUF", TipoUF.values());
         addAtributo("listaTipoIntermediacaoImportacao", TipoIntermediacaoImportacao.values());
         addAtributo("listaTipoPresencaComprador", TipoPresencaComprador.values());
         addAtributo("listaTipoDestinoOperacao", TipoDestinoOperacao.values());
@@ -111,6 +113,7 @@ public class EmissaoNFeController extends AbstractController {
         addAtributoPadrao("tipoEmissaoSelecionada", TipoEmissao.NORMAL.getCodigo());
         addAtributoPadrao("tipoImpressaoSelecionada", TipoImpressaoNFe.RETRATO.getCodigo());
         addAtributoPadrao("tipoPresencaSelecionada", TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
+        addAtributoPadrao("tipoOperacaoSelecionada", TipoOperacaoNFe.SAIDA.getCodigo());
     }
 
     @Post("emissaoNFe/emitirNFe")

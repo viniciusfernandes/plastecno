@@ -47,12 +47,6 @@ public class DadosNFe {
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Dados de Identificação da NFe")
 	private IdentificacaoNFe identificacaoNFe;
 
-	@XmlElement(name = "compra")
-	private InformacaoCompra informacaoCompra;
-
-	@XmlElement(name = "exporta")
-	private InformacaoExportacao informacaoExportacao;
-
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Informações adicionais da NFe")
 	@XmlElement(name = "infAdic")
 	private InformacoesAdicionaisNFe informacoesAdicionaisNFe;
@@ -120,16 +114,6 @@ public class DadosNFe {
 	@XmlTransient
 	public IdentificacaoNFe getIdentificacaoNFe() {
 		return identificacaoNFe;
-	}
-
-	@XmlTransient
-	public InformacaoCompra getInformacaoCompra() {
-		return informacaoCompra;
-	}
-
-	@XmlTransient
-	public InformacaoExportacao getInformacaoExportacao() {
-		return informacaoExportacao;
 	}
 
 	@XmlTransient
@@ -208,14 +192,6 @@ public class DadosNFe {
 
 	public void setIdentificacaoNFe(IdentificacaoNFe identificacaoNFe) {
 		this.identificacaoNFe = identificacaoNFe;
-	}
-
-	public void setInformacaoCompra(InformacaoCompra informacaoCompra) {
-		this.informacaoCompra = informacaoCompra;
-	}
-
-	public void setInformacaoExportacao(InformacaoExportacao informacaoExportacao) {
-		this.informacaoExportacao = informacaoExportacao;
 	}
 
 	public void setInformacoesAdicionaisNFe(InformacoesAdicionaisNFe informacoesAdicionaisNFe) {

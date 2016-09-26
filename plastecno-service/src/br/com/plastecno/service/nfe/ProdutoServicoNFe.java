@@ -42,6 +42,7 @@ public class ProdutoServicoNFe {
 	private String ncm;
 
 	@XmlElement(name = "xPed")
+	@InformacaoValidavel(intervaloComprimento = { 1, 15 }, nomeExibicao = "Número de pedido de compra")
 	private String numeroPedidoCompra;
 
 	@InformacaoValidavel(decimal = { 15, 2 }, nomeExibicao = "Outras despesas acessórias do produtos/serviços")

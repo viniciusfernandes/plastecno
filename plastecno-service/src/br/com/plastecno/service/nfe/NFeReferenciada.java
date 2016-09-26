@@ -7,7 +7,8 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class NFeReferenciada {
-	@InformacaoValidavel(obrigatorio = true, padrao = { "\\d{44}" }, padraoExemplo = "44 digitos", nomeExibicao = "Chave acesso  da NFe Referenciada")
+	@InformacaoValidavel(obrigatorio = true, padrao = { "\\d{44}" }, padraoExemplo = "44 digitos", substituicao = {
+			"\\D", "" }, nomeExibicao = "Chave acesso  da NFe Referenciada")
 	@XmlElement(name = "refNFe")
 	private String chaveAcessoReferenciada;
 

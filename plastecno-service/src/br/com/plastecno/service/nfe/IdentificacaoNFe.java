@@ -10,7 +10,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @InformacaoValidavel
 public class IdentificacaoNFe {
 
-	@InformacaoValidavel(obrigatorio = true, tamanho = 8, nomeExibicao = "Código da chave de acesso")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{8}", padraoExemplo = "8 digitos", nomeExibicao = "Código da chave de acesso")
 	@XmlElement(name = "cNF")
 	private String chaveAcesso;
 

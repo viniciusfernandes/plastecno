@@ -1,5 +1,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="u" tagdir="/WEB-INF/tags" %>
+
 <!DOCTYPE html >
 <html>
 <head>
@@ -8,17 +10,19 @@
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${tempoInicial}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${tempoInicial}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${tempoInicial}"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/edicao_tabela.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${tempoInicial}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/edicao_tabela.js?${tempoInicial}"/>"></script>
+
+
 
 <style type="text/css">
 fieldset .fieldsetInterno {
@@ -1183,12 +1187,13 @@ function inicializarCalculoImpostos(){
 	<div id="modal"></div>
 	<form id="formVazio" ></form>
 
-	<form id="formPesquisa" action="<c:url value="/emissaoNFe/pedido"/>"
-		method="get">
+	<form id="formPesquisa" action="<c:url value="/emissaoNFe/pedido"/>" method="get">
 		<input type="hidden" id="idPedidoPesquisa" name="idPedido" value="${idPedido}"/>
 	</form>
-	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>"
-		method="post">
+	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>" method="post">
+		<input type="hidden" name="nf.identificacaoLocalEntrega.codigoMunicipio" value="${nf.identificacaoLocalEntrega.codigoMunicipio}"/>
+		<input type="hidden" name="nf.identificacaoLocalRetirada.codigoMunicipio" value="${nf.identificacaoLocalRetirada.codigoMunicipio}"/>
+		
 		<fieldset id="bloco_dados_nfe">
 			<legend>::: Dados da NF-e :::</legend>
 			<div class="label">Pedido:</div>
@@ -1397,11 +1402,11 @@ function inicializarCalculoImpostos(){
 				<legend>::: Local Retirada :::</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">
-					<input type="text" name="nf.identificacaoLocalRetirada.cnpj" value="${nf.identificacaoLocalRetirada.cnpj}"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.cnpj" maxlength="14" value="${nf.identificacaoLocalRetirada.cnpj}"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 50%">
-					<input type="text" name="nf.identificacaoLocalRetirada.cpf" value="${nf.identificacaoLocalRetirada.cpf}" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.cpf" maxlength="11" value="${nf.identificacaoLocalRetirada.cpf}" style="width: 30%"/>
 				</div>
 				<div class="label condicional">CEP:</div>
 				<div class="input" style="width: 10%">
@@ -1444,11 +1449,11 @@ function inicializarCalculoImpostos(){
 				<legend>::: Local Entrega ::: -</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">
-					<input type="text" name="nf.identificacaoLocalEntrega.cnpj" value="${nf.identificacaoLocalEntrega.cnpj}"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.cnpj" maxlength="14" value="${nf.identificacaoLocalEntrega.cnpj}"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 50%">
-					<input type="text" name="nf.identificacaoLocalEntrega.cpf" value="${nf.identificacaoLocalEntrega.cpf}" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.cpf" maxlength="11" value="${nf.identificacaoLocalEntrega.cpf}" style="width: 30%"/>
 				</div>
 				<div class="label condicional">CEP:</div>
 				<div class="input" style="width: 10%">

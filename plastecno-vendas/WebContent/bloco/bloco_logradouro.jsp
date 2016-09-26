@@ -25,6 +25,7 @@ $(document).ready(function(){
 			$('#cidade').val(endereco.cidade.descricao);
 			$('#uf').val(endereco.cidade.uf);
 			$('#pais').val(endereco.cidade.pais.descricao);
+			$('#idCidade').val(endereco.cidade.id);
 			
 			//var isEnderecoExistente = endereco.cidade.id != null;
 			//desabilitarCamposEndereco(isEnderecoExistente);
@@ -48,8 +49,9 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 </script>
 <fieldset id="bloco_logradouro">
 	<legend>::: Endereço :::</legend>
-	<input type="hidden" id="idLogradouro" name="logradouro.id"
-		value="${logradouro.id}" />
+	<input type="hidden" id="idLogradouro" name="logradouro.id" value="${logradouro.id}" />
+	<input type="hidden" id="idCidade" name="logradouro.idCidade" value="${logradouro.idCidade}" />
+	<input type="hidden" id="codigoMunicipio" name="logradouro.codigoMunicipio" value="${logradouro.codigoMunicipio}" />
 
 	<c:if test="${tipoLogradouroRenderizado}">
 		<div class="label">Tipo End.:</div>

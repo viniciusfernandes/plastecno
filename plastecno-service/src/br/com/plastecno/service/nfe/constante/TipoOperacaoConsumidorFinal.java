@@ -1,8 +1,8 @@
 package br.com.plastecno.service.nfe.constante;
 
 public enum TipoOperacaoConsumidorFinal {
-	NORMAL("0 - Normal", "0"), 
-	CONSUMIDOR_FINAL("1 - Consum. Final", "1");
+	NORMAL("0 - Não", "0"), 
+	CONSUMIDOR_FINAL("1 - Sim", "1");
 
 	private final String descricao;
 	private final String codigo;

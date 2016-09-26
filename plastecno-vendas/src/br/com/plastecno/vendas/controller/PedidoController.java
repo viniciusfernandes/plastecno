@@ -551,11 +551,7 @@ public class PedidoController extends AbstractController {
         // Temos que fazer essa distincao pois o usuario pode acessar pedidos de
         // compra a partir da tela de pedidos de venda, e vice-versa. Temos que
         // proibir isso.
-        if (isCompra) {
-            pedido = pedidoService.pesquisarCompraById(idPedido);
-        } else {
-            pedido = pedidoService.pesquisarVendaById(idPedido);
-        }
+        pedido = pedidoService.pesquisarPedidoById(idPedido, isCompra);
 
         final Integer idUsuario = getCodigoUsuario();
         // Verificando se o usuario que esta tentando acessar os dados do pedido

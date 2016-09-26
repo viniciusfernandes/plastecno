@@ -17,6 +17,7 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
 import br.com.plastecno.service.constante.TipoAcesso;
+import br.com.plastecno.service.constante.TipoUF;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
@@ -81,6 +82,7 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
+        addAtributo("listaTipoUF", TipoUF.values());
         addAtributo("listaTipoIntermediacaoImportacao", TipoIntermediacaoImportacao.values());
         addAtributo("listaTipoPresencaComprador", TipoPresencaComprador.values());
         addAtributo("listaTipoDestinoOperacao", TipoDestinoOperacao.values());
@@ -111,11 +113,14 @@ public class EmissaoNFeController extends AbstractController {
         addAtributoPadrao("tipoEmissaoSelecionada", TipoEmissao.NORMAL.getCodigo());
         addAtributoPadrao("tipoImpressaoSelecionada", TipoImpressaoNFe.RETRATO.getCodigo());
         addAtributoPadrao("tipoPresencaSelecionada", TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
+        addAtributoPadrao("tipoOperacaoSelecionada", TipoOperacaoNFe.SAIDA.getCodigo());
     }
 
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
         try {
+            // Verificando condicao para gerar o endereco do destinatario a
+            // partir do logradouro
             if (nf != null && nf.getIdentificacaoDestinatarioNFe() != null
                     && nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe() != null) {
 
@@ -123,7 +128,6 @@ public class EmissaoNFeController extends AbstractController {
                 nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                         nFeService.gerarEnderecoNFe(logradouro, telefone));
             }
-
             formatarDatas(nf, false);
 
             redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(new NFe(nf), idPedido));
@@ -272,7 +276,8 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("listaDuplicata", listaDuplicata);
             addAtributo("cliente", cliente);
             addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
-            addAtributo("logradouro", clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()));
+            addAtributo("logradouro",
+                    cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
             addAtributo("listaItem", listaItem);
             addAtributo("idPedido", idPedido);
             addAtributo(
@@ -296,19 +301,21 @@ public class EmissaoNFeController extends AbstractController {
             EnderecoNFe e = d.getEnderecoDestinatarioNFe();
 
             Logradouro l = new Logradouro();
-            l.setBairro(e.getBairro());
-            l.setCep(e.getCep());
-            l.setComplemento(e.getComplemento());
-            l.setEndereco(e.getLogradouro());
-            l.setCidade(e.getNomeMunicipio());
-            l.setPais(e.getNomePais());
-            l.setNumero(e.getNumero() == null || e.getNumero().trim().isEmpty() ? null
-                    : Integer.parseInt(e.getNumero()));
-            l.setUf(e.getUF());
-
+            if (e != null) {
+                l.setBairro(e.getBairro());
+                l.setCep(e.getCep());
+                l.setComplemento(e.getComplemento());
+                l.setEndereco(e.getLogradouro());
+                l.setCidade(e.getNomeMunicipio());
+                l.setPais(e.getNomePais());
+                l.setNumero(e.getNumero() == null || e.getNumero().trim().isEmpty() ? null : Integer.parseInt(e
+                        .getNumero()));
+                l.setUf(e.getUF());
+                l.setCodigoMunicipio(e.getCodigoMunicipio());
+                addAtributo("telefoneContatoPedido", e.getTelefone());
+            }
             addAtributo("cliente", c);
             addAtributo("logradouro", l);
-            addAtributo("telefoneContatoPedido", d.getEnderecoDestinatarioNFe().getTelefone());
         }
     }
 

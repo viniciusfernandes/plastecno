@@ -38,27 +38,32 @@ import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
 public abstract class AbstractController {
 
+    private final static Long TEMPO_INICIAL = new Date().getTime();
     private final String cssMensagemAlerta = "mensagemAlerta";
     private final String cssMensagemErro = "mensagemErro";
     private final String cssMensagemSucesso = "mensagemSucesso";
     private String homePath;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
-    private String nomeTela;
 
+    private String nomeTela;
     private final Integer numerRegistrosPorPagina = 10;
     private Picklist picklist;
     private final String possuiMultiplosLogradouros = "possuiMultiplosLogradouros";
     private Result result;
     private TipoLogradouroService tipoLogradouroService;
-
     private UsuarioInfo usuarioInfo;
     private UsuarioService usuarioService;
 
     public AbstractController(Result result) {
         this.result = result;
         try {
-            this.init();
-
+            init();
+            // Esse atributo foi criado para implementar o esquema para
+            // sinalizar o navegador a carregar os arquivos em cache, sendo que
+            // para isso vamos concatenar o nome do arquivo .css, .js, etc com o
+            // valor desse atributo, assim o navegador entendera que eh um novo
+            // recurso a ser carregado.
+            addAtributoPadrao("tempoInicial", TEMPO_INICIAL);
         } catch (ServiceLocatorException e) {
             this.logger.log(Level.SEVERE, "Falha no lookup de algum servico", e);
             this.result.include("erro",

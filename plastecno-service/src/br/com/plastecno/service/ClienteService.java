@@ -58,6 +58,8 @@ public interface ClienteService {
 
 	Cliente pesquisarClienteEContatoById(Integer idCliente);
 
+	Cliente pesquisarClienteResumidoByCnpj(String cnpj);
+
 	Cliente pesquisarClienteResumidoById(Integer idCliente);
 
 	Cliente pesquisarClienteResumidoEContatoById(Integer idCliente);

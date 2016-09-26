@@ -147,7 +147,6 @@ public final class ValidadorInformacao {
 			// uma
 			// string
 			isString = conteudoCampo instanceof String;
-
 			if (isString && informacao.trim()) {
 				conteudoCampo = trim(campo, obj, conteudoCampo);
 			}
@@ -167,16 +166,6 @@ public final class ValidadorInformacao {
 				setConteudo(campo, obj, conteudoCampo);
 			}
 
-			if (informacao.intervaloComprimento().length > 0
-					&& COMPRIMENTO_STRING >= 0
-					&& (COMPRIMENTO_STRING < informacao.intervaloComprimento()[0] || COMPRIMENTO_STRING > informacao
-							.intervaloComprimento()[1])) {
-				listaMensagem.add(informacao.nomeExibicao() + " deve conter de " + informacao.intervaloComprimento()[0]
-						+ " a " + informacao.intervaloComprimento()[1] + " caracteres. Foi enviado "
-						+ COMPRIMENTO_STRING + " caracteres");
-				continue;
-			}
-
 			// Muito importante que essa validacao seja feita antes das outras
 			// pois apos a remocao do caracteres invalidos esses valores deverao
 			// ser validados, por isso esse condicional nao tem a instrucao de
@@ -187,6 +176,16 @@ public final class ValidadorInformacao {
 				COMPRIMENTO_STRING = conteudoCampo.toString().length();
 
 				setConteudo(campo, obj, conteudoCampo);
+			}
+
+			if (informacao.intervaloComprimento().length > 0
+					&& COMPRIMENTO_STRING >= 0
+					&& (COMPRIMENTO_STRING < informacao.intervaloComprimento()[0] || COMPRIMENTO_STRING > informacao
+							.intervaloComprimento()[1])) {
+				listaMensagem.add(informacao.nomeExibicao() + " deve conter de " + informacao.intervaloComprimento()[0]
+						+ " a " + informacao.intervaloComprimento()[1] + " caracteres. Foi enviado "
+						+ COMPRIMENTO_STRING + " caracteres");
+				continue;
 			}
 
 			if (conteudoCampo != null && informacao.tamanho() >= 0 && COMPRIMENTO_STRING != informacao.tamanho()) {

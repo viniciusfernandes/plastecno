@@ -32,31 +32,46 @@ public class ClienteJson {
     }
 
     public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora) {
-        id = cliente.getId();
-        nomeFantasia = cliente.getNomeFantasia();
-        razaoSocial = cliente.getRazaoSocial();
-        site = cliente.getSite();
-        email = cliente.getEmail();
-        cnpj = cliente.getCnpj();
-        cpf = cliente.getCpf();
-        inscricaoEstadual = cliente.getInscricaoEstadual();
-        nomeCompleto = cliente.getNomeCompleto();
-        telefone = cliente.getContatoPrincipal() != null ? cliente.getContatoPrincipal().getTelefoneFormatado() : "";
-        vendedor = new VendedorJson(cliente.getVendedor());
-
         this.listaTransportadora = new ArrayList<TransportadoraJson>();
         this.listaRedespacho = new ArrayList<TransportadoraJson>();
 
-        if (cliente.getListaRedespacho() != null) {
-            for (Transportadora redespacho : cliente.getListaRedespacho()) {
-                this.listaRedespacho.add(new TransportadoraJson(redespacho));
-            }
-        }
+        if (cliente != null) {
+            id = cliente.getId();
+            nomeFantasia = cliente.getNomeFantasia();
+            razaoSocial = cliente.getRazaoSocial();
+            site = cliente.getSite();
+            email = cliente.getEmail();
+            cnpj = cliente.getCnpj();
+            cpf = cliente.getCpf();
+            inscricaoEstadual = cliente.getInscricaoEstadual();
+            nomeCompleto = cliente.getNomeCompleto();
+            telefone = cliente.getContatoPrincipal() != null ? cliente.getContatoPrincipal().getTelefoneFormatado()
+                    : "";
+            vendedor = cliente.getVendedor() == null ? null : new VendedorJson(cliente.getVendedor());
 
-        if (listaTransportadora != null) {
-            for (Transportadora transportadora : listaTransportadora) {
-                this.listaTransportadora.add(new TransportadoraJson(transportadora));
+            if (cliente.getListaRedespacho() != null) {
+                for (Transportadora redespacho : cliente.getListaRedespacho()) {
+                    this.listaRedespacho.add(new TransportadoraJson(redespacho));
+                }
             }
+
+            if (listaTransportadora != null) {
+                for (Transportadora transportadora : listaTransportadora) {
+                    this.listaTransportadora.add(new TransportadoraJson(transportadora));
+                }
+            }
+        } else {
+            id = null;
+            nomeFantasia = "";
+            razaoSocial = "";
+            site = "";
+            email = "";
+            cnpj = "";
+            cpf = "";
+            inscricaoEstadual = "";
+            nomeCompleto = "";
+            telefone = "";
+            vendedor = null;
         }
     }
 

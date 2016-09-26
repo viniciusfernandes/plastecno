@@ -1,5 +1,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html >
 <html>
 <head>
@@ -8,17 +9,20 @@
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${tempoInicial}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${tempoInicial}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${tempoInicial}"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/edicao_tabela.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${tempoInicial}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/edicao_tabela.js?${tempoInicial}"/>"></script>
+
+
 
 <style type="text/css">
 fieldset .fieldsetInterno {
@@ -164,7 +168,31 @@ $(document).ready(function() {
 		});
 		
 		request.fail(function(request, status) {
-			alert('Falha na busca da transportadora de CNPJ: ' + cnpj+' => Status da requisicao: '+status);
+			alert('Falha na busca da transportadora por CNPJ: ' + cnpj+' => Status da requisicao: '+status);
+		});
+	});	
+	
+	$('#botaoPesquisarCnpjDest').click(function () {
+		var cnpj = $('#cnpj').val();
+		if (cnpj == undefined || isEmpty(cnpj)) {
+			return;
+		}
+		
+		var request = $.ajax({
+							type: "get",
+							url: '<c:url value="/cliente/cnpj"/>',
+							data: 'cnpj='+cnpj,
+						});
+		request.done(function(response) {
+			var cliente = response.cliente;
+			$('#nomeCliente').val(cliente.razaoSocial);
+			$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
+			$('#telefone').val(cliente.telefone);
+			$('#email').val(cliente.email);
+		});
+		
+		request.fail(function(request, status) {
+			alert('Falha na busca da destinatário por CNPJ: ' + cnpj+' => Status da requisicao: '+status);
 		});
 	});	
 	
@@ -262,7 +290,12 @@ $(document).ready(function() {
 	
 	inicializarMascaraImpostos();
 	inicializarCalculoImpostos();
+	
+	inicializarMascaraReferenciada();
 });
+function inicializarMascaraReferenciada(){
+	$('#chaveReferenciada').mask('9999.9999.9999.9999.9999.9999.9999.9999.9999.9999.9999');
+};
 
 function inicializarMascaraImpostos(){
 	inserirMascaraDecimal('valorBCICMS', 15, 2);
@@ -1159,12 +1192,13 @@ function inicializarCalculoImpostos(){
 	<div id="modal"></div>
 	<form id="formVazio" ></form>
 
-	<form id="formPesquisa" action="<c:url value="/emissaoNFe/pedido"/>"
-		method="get">
+	<form id="formPesquisa" action="<c:url value="/emissaoNFe/pedido"/>" method="get">
 		<input type="hidden" id="idPedidoPesquisa" name="idPedido" value="${idPedido}"/>
 	</form>
-	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>"
-		method="post">
+	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>" method="post">
+		<input type="hidden" name="nf.identificacaoLocalEntrega.codigoMunicipio" value="${nf.identificacaoLocalEntrega.codigoMunicipio}"/>
+		<input type="hidden" name="nf.identificacaoLocalRetirada.codigoMunicipio" value="${nf.identificacaoLocalRetirada.codigoMunicipio}"/>
+		
 		<fieldset id="bloco_dados_nfe">
 			<legend>::: Dados da NF-e :::</legend>
 			<div class="label">Pedido:</div>
@@ -1177,6 +1211,18 @@ function inicializarCalculoImpostos(){
 			</div>
 			<%--div para dar o correto alinhamento dos campos no formulario. Nao teve outra alternativa--%>
 			<div class="input" style="width: 60%">
+			</div>
+			<div class="label">Núm. NFe:</div>
+			<div class="input" style="width: 25%">
+				<input type="text" name="nf.identificacaoNFe.numero" value="${nf.identificacaoNFe.numero}" maxlength="9" style="width: 100%" />
+			</div>
+			<div class="label">Mod. NFe:</div>
+			<div class="input" style="width: 5%">
+				<input type="text" name="nf.identificacaoNFe.modelo" value="${nf.identificacaoNFe.modelo}" maxlength="2" style="width: 100%" />
+			</div>
+			<div class="label">Série NFe:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" name="nf.identificacaoNFe.serie" value="${nf.identificacaoNFe.serie}" maxlength="3" style="width: 100%" />
 			</div>
 			<div class="label">Tipo Operação:</div>
 			<div class="input" style="width: 10%">
@@ -1266,6 +1312,10 @@ function inicializarCalculoImpostos(){
 					<input type="text" id="cnpj" name="nf.identificacaoDestinatarioNFe.cnpj"
 						value="${cliente.cnpj}"  />
 				</div>
+				<div class="input" style="width: 2%">
+						<input type="button" id="botaoPesquisarCnpjDest"
+							title="Pesquisar CNPJ Destinatário" value="" class="botaoPesquisarPequeno" />
+					</div>
 				<div class="label">Insc. Estadual:</div>
 				<div class="input" style="width: 40%">
 					<input type="text" id="inscricaoEstadual"
@@ -1294,14 +1344,13 @@ function inicializarCalculoImpostos(){
 				</div>
 			</fieldset>
 			</div>
-			
 		</fieldset>
 		
 		<fieldset id="bloco_referenciada">
 			<legend>::: NF/NFe Referenciada ::: -</legend>
 			<div class="label obrigatorio">Chave Acesso:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="chaveReferenciada" maxlength="44" style="width: 50%"/>
+				<input type="text" id="chaveReferenciada" style="width: 50%"/>
 			</div>
 			<div class="label obrigatorio">Núm. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
@@ -1312,8 +1361,8 @@ function inicializarCalculoImpostos(){
 				<input type="text" id="serieReferenciada" maxlength="3"/>
 			</div>
 			<div class="label obrigatorio">Mod. Doc. Fiscal:</div>
-			<div class="input" style="width: 30%">
-				<input type="text" id="modReferenciada" maxlength="2"/>
+			<div class="input" style="width: 20%">
+				<input type="text" id="modReferenciada" maxlength="2" style="width: 50%"/>
 			</div>
 			<div class="label obrigatorio">CNPJ Emit.:</div>
 			<div class="input" style="width: 10%">
@@ -1369,11 +1418,11 @@ function inicializarCalculoImpostos(){
 				<legend>::: Local Retirada :::</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">
-					<input type="text" name="nf.identificacaoLocalRetirada.cnpj" value="${nf.identificacaoLocalRetirada.cnpj}"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.cnpj" maxlength="14" value="${nf.identificacaoLocalRetirada.cnpj}"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 50%">
-					<input type="text" name="nf.identificacaoLocalRetirada.cpf" value="${nf.identificacaoLocalRetirada.cpf}" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalRetirada.cpf" maxlength="11" value="${nf.identificacaoLocalRetirada.cpf}" style="width: 30%"/>
 				</div>
 				<div class="label condicional">CEP:</div>
 				<div class="input" style="width: 10%">
@@ -1416,11 +1465,11 @@ function inicializarCalculoImpostos(){
 				<legend>::: Local Entrega ::: -</legend>
 				<div class="label">CNPJ:</div>
 				<div class="input" style="width: 15%">
-					<input type="text" name="nf.identificacaoLocalEntrega.cnpj" value="${nf.identificacaoLocalEntrega.cnpj}"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.cnpj" maxlength="14" value="${nf.identificacaoLocalEntrega.cnpj}"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 50%">
-					<input type="text" name="nf.identificacaoLocalEntrega.cpf" value="${nf.identificacaoLocalEntrega.cpf}" style="width: 30%"/>
+					<input type="text" name="nf.identificacaoLocalEntrega.cpf" maxlength="11" value="${nf.identificacaoLocalEntrega.cpf}" style="width: 30%"/>
 				</div>
 				<div class="label condicional">CEP:</div>
 				<div class="input" style="width: 10%">
@@ -2027,7 +2076,12 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">UF:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" id="ufTransportadora" name="nf.transporteNFe.transportadoraNFe.uf" value="${transportadora.uf}" style="width: 20%" />
+						<select id="ufTransportadora" name="nf.transporteNFe.transportadoraNFe.uf" style="width: 20%">
+							<option value=""></option>
+							<c:forEach var="tipo" items="${listaTipoUF}">
+								<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq transportadora.uf}">selected</c:if>>${tipo.codigo}</option>
+							</c:forEach>
+						</select>
 					</div>
 				</fieldset>
 				</div>
@@ -2041,7 +2095,12 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label obrigatorio">UF:</div>
 					<div class="input" style="width: 50%">
-						<input type="text" id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" value="${nf.transporteNFe.veiculo.uf}" maxlength="2" style="width: 20%" />
+						<select id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" style="width: 20%">
+							<option value=""></option>
+							<c:forEach var="tipo" items="${listaTipoUF}">
+								<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq nf.transporteNFe.veiculo.uf}">selected</c:if>>${tipo.codigo}</option>
+							</c:forEach>
+						</select>
 					</div>
 					<div  class="label">Regist. Trans. Cargo:</div>
 					<div class="input" style="width: 30%">

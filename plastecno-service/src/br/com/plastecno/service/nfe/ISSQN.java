@@ -7,27 +7,27 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class ISSQN {
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Alíquota do ISS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, nomeExibicao = "Alíquota do ISS")
 	@XmlElement(name = "vAliq")
 	private Double aliquota;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 999999 }, nomeExibicao = "Código do município do fato gerador do ISS")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{7}", padraoExemplo = "7 dígitos", nomeExibicao = "Código do município do fato gerador do ISS")
 	@XmlElement(name = "cMunFG")
-	private Long codigoMunicipioGerador;
+	private String codigoMunicipioGerador;
 
 	@InformacaoValidavel(obrigatorio = true, tamanho = 1, nomeExibicao = "Situação tributária do ISS")
 	@XmlElement(name = "cSitTrib")
 	private String codigoSituacaoTributaria;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{3,4}", padraoExemplo = "3 a 4 digitos", nomeExibicao = "Código do item da lista de serviços do ISS")
+	@InformacaoValidavel(obrigatorio = true, tamanho = 5, nomeExibicao = "Código do item da lista de serviços do ISS")
 	@XmlElement(name = "cListServ")
 	private String itemListaServicos;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor do ISS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor do ISS")
 	@XmlElement(name = "vISSQN")
 	private Double valor;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor da BC do ISS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor da BC do ISS")
 	@XmlElement(name = "vBC")
 	private Double valorBC;
 
@@ -46,7 +46,7 @@ public class ISSQN {
 	}
 
 	@XmlTransient
-	public Long getCodigoMunicipioGerador() {
+	public String getCodigoMunicipioGerador() {
 		return codigoMunicipioGerador;
 	}
 
@@ -74,7 +74,7 @@ public class ISSQN {
 		this.aliquota = aliquota;
 	}
 
-	public void setCodigoMunicipioGerador(Long codigoMunicipioGerador) {
+	public void setCodigoMunicipioGerador(String codigoMunicipioGerador) {
 		this.codigoMunicipioGerador = codigoMunicipioGerador;
 	}
 

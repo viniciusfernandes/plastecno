@@ -321,6 +321,7 @@ function inicializarMascaraImpostos(){
 	inserirMascaraDecimal('valorBCISS', 15, 2);
 	inserirMascaraDecimal('aliquotaISS', 7, 4);
 	inserirMascaraDecimal('qtdeVendidaPIS', 14, 4);
+	$('#codItemServicoISS').mask('99.99');
 	
 	inserirMascaraDecimal('valorBCII', 15, 2);
 	inserirMascaraDecimal('valorII', 15, 2);

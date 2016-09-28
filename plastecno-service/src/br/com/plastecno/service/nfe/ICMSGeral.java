@@ -14,7 +14,7 @@ public class ICMSGeral {
 	private Double aliquota;
 
 	@XmlElement(name = "pICMSST")
-	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Alíquota ICMS ST")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "10", "30", "60", "70", "90", "PART" }, nomeExibicao = "Alíquota ICMS ST")
 	private Double aliquotaST;
 
 	@XmlElement(name = "CST")
@@ -26,10 +26,11 @@ public class ICMSGeral {
 	private Integer modalidadeDeterminacaoBC;
 
 	@XmlElement(name = "modBCST")
-	@InformacaoValidavel(tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Modalidade de determinação do ST do ICMS é obrigatório")
+	@InformacaoValidavel(tiposObrigatorios = { "10", "30", "60", "70", "90", "PART" }, nomeExibicao = "Modalidade de determinação do ST do ICMS é obrigatório")
 	private Integer modalidadeDeterminacaoBCST;
 
 	@XmlElement(name = "motDesICMS")
+	@InformacaoValidavel(intervaloComprimento = 2, nomeExibicao = "Motivo de desoneração do ICMS")
 	private String motivoDesoneracao;
 
 	@XmlElement(name = "orig")
@@ -40,16 +41,20 @@ public class ICMSGeral {
 	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "PART" }, nomeExibicao = "Percentual BC operação obrigatória")
 	private Double percentualBCOperacaoPropria;
 
+	@XmlElement(name = "pDif")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposPermitidos = { "51" }, nomeExibicao = "Percentual de diferimento do ICMS")
+	private Double percentualDiferimento;
+
 	@XmlElement(name = "pMVAST")
-	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "10", "30" }, nomeExibicao = "Percentual de margem do valor adicionado do ST do ICMS")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "30" }, nomeExibicao = "Percentual de margem do valor adicionado do ST do ICMS")
 	private Double percentualMargemValorAdicionadoICMSST;
 
 	@XmlElement(name = "pRedBC")
-	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "51", "60" }, nomeExibicao = "Percentual de redução de BC do ICMS")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "20", "51", "60", "70" }, nomeExibicao = "Percentual de redução de BC do ICMS")
 	private Double percentualReducaoBC;
 
 	@XmlElement(name = "pRedBCST")
-	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "10", "30" }, nomeExibicao = "Percentual de redução de BC do ST do ICMS")
+	@InformacaoValidavel(decimal = { 3, 4 }, nomeExibicao = "Percentual de redução de BC do ST do ICMS")
 	private Double percentualReducaoBCST;
 
 	@XmlElement(name = "UFST")
@@ -57,7 +62,7 @@ public class ICMSGeral {
 	private String ufDividaST;
 
 	@XmlElement(name = "vICMS")
-	@InformacaoValidavel(decimal = { 13, 2 }, tiposNaoPermitidos = { "40", "41", "50" }, nomeExibicao = "Valor calculado do ICMS")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposNaoPermitidos = { "40", "41", "50", "70" }, nomeExibicao = "Valor calculado do ICMS")
 	private Double valor;
 
 	@XmlElement(name = "vBC")
@@ -65,7 +70,7 @@ public class ICMSGeral {
 	private Double valorBC;
 
 	@XmlElement(name = "vBCST")
-	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Valor da base de cálculo ST do ICMS")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "10", "30", "60", "70", "90", "PART" }, nomeExibicao = "Valor da base de cálculo ST do ICMS")
 	private Double valorBCST;
 
 	@XmlElement(name = "vBCSTRet")
@@ -76,11 +81,23 @@ public class ICMSGeral {
 	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "PART" }, nomeExibicao = "Valor BC ST retido")
 	private Double valorBCSTUFDestino;
 
+	@XmlElement(name = "vICMSDeson")
+	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor desonerado do ICMS")
+	private Double valorDesonerado;
+
+	@XmlElement(name = "vICMSDif")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposPermitidos = { "51" }, nomeExibicao = "Valor de diferimento do ICMS")
+	private Double valorDiferimento;
+
+	@XmlElement(name = "vICMSOp")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposPermitidos = { "51" }, nomeExibicao = "Valor da operação do ICMS")
+	private Double valorOperacao;
+
 	@XmlElement(name = "vICMSST")
-	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "10", "30", "60", "90", "PART" }, nomeExibicao = "Valor ICMS ST")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "10", "30", "60", "70", "90", "PART" }, nomeExibicao = "Valor ICMS ST")
 	private Double valorST;
 
-	@XmlElement(name = "vSTRet")
+	@XmlElement(name = "vICMSSTRet")
 	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "60" }, nomeExibicao = "Valor ST retido")
 	private Double valorSTRetido;
 
@@ -139,6 +156,11 @@ public class ICMSGeral {
 	}
 
 	@XmlTransient
+	public Double getPercentualDiferimento() {
+		return percentualDiferimento;
+	}
+
+	@XmlTransient
 	public Double getPercentualMargemValorAdicionadoICMSST() {
 		return percentualMargemValorAdicionadoICMSST;
 	}
@@ -159,6 +181,11 @@ public class ICMSGeral {
 	}
 
 	@XmlTransient
+	public String getUfDividaST() {
+		return ufDividaST;
+	}
+
+	@XmlTransient
 	public Double getValor() {
 		return valor == null ? 0 : valor;
 	}
@@ -176,6 +203,26 @@ public class ICMSGeral {
 	@XmlTransient
 	public Double getValorBCSTRetido() {
 		return valorBCSTRetido;
+	}
+
+	@XmlTransient
+	public Double getValorBCSTUFDestino() {
+		return valorBCSTUFDestino;
+	}
+
+	@XmlTransient
+	public Double getValorDesonerado() {
+		return valorDesonerado;
+	}
+
+	@XmlTransient
+	public Double getValorDiferimento() {
+		return valorDiferimento;
+	}
+
+	@XmlTransient
+	public Double getValorOperacao() {
+		return valorOperacao;
 	}
 
 	@XmlTransient
@@ -220,6 +267,10 @@ public class ICMSGeral {
 		this.percentualBCOperacaoPropria = percentualBCOperacaoPropria;
 	}
 
+	public void setPercentualDiferimento(Double percentualDiferimento) {
+		this.percentualDiferimento = percentualDiferimento;
+	}
+
 	public void setPercentualMargemValorAdicionadoICMSST(Double percentualMargemValorAdicionadoICMSST) {
 		this.percentualMargemValorAdicionadoICMSST = percentualMargemValorAdicionadoICMSST;
 	}
@@ -230,6 +281,10 @@ public class ICMSGeral {
 
 	public void setPercentualReducaoBCST(Double percentualReducaoBCST) {
 		this.percentualReducaoBCST = percentualReducaoBCST;
+	}
+
+	public void setUfDividaST(String ufDividaST) {
+		this.ufDividaST = ufDividaST;
 	}
 
 	public void setValor(Double valor) {
@@ -246,6 +301,22 @@ public class ICMSGeral {
 
 	public void setValorBCSTRetido(Double valorBCSTRetido) {
 		this.valorBCSTRetido = valorBCSTRetido;
+	}
+
+	public void setValorBCSTUFDestino(Double valorBCSTUFDestino) {
+		this.valorBCSTUFDestino = valorBCSTUFDestino;
+	}
+
+	public void setValorDesonerado(Double valorDesonerado) {
+		this.valorDesonerado = valorDesonerado;
+	}
+
+	public void setValorDiferimento(Double valorDiferimento) {
+		this.valorDiferimento = valorDiferimento;
+	}
+
+	public void setValorOperacao(Double valorOperacao) {
+		this.valorOperacao = valorOperacao;
 	}
 
 	public void setValorST(Double valorST) {

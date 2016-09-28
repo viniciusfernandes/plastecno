@@ -25,6 +25,12 @@ public class ICMS {
 	@XmlElement(name = "ICMS40")
 	private ICMSGeral icms40;
 
+	@XmlElement(name = "ICMS41")
+	private ICMSGeral icms41;
+
+	@XmlElement(name = "ICMS50")
+	private ICMSGeral icms50;
+
 	@XmlElement(name = "ICMS51")
 	private ICMSGeral icms51;
 

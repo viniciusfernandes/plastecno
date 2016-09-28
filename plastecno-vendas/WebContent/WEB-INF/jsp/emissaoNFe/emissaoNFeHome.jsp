@@ -1666,7 +1666,7 @@ function inicializarCalculoImpostos(){
 					<div class="icms00 input" style="width: 36%">
 						<select id="motDesonerICMS" style="width: 100%" class="icms00 semprehabilitado">
 							<option value=""></option>
-							<c:forEach var="motivo" items="${listaTipoMotivoDesoneracao}">
+							<c:forEach var="motivo" items="${listaTipoDesoneracao}">
 								<option value="${motivo.codigo}">${motivo.descricao}</option>
 							</c:forEach>
 						</select>

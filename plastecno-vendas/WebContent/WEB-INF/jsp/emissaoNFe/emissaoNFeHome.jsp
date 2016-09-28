@@ -300,6 +300,7 @@ function inicializarMascaraReferenciada(){
 function inicializarMascaraImpostos(){
 	inserirMascaraDecimal('valorBCICMS', 15, 2);
 	inserirMascaraDecimal('valorBCSTICMS', 15, 2);
+	inserirMascaraDecimal('valDesonICMS', 15, 2);
 	inserirMascaraDecimal('aliquotaICMS', 7, 4);
 	inserirMascaraDecimal('aliquotaSTICMS', 7, 4);
 	inserirMascaraDecimal('percValSTICMS', 7, 4);
@@ -619,6 +620,7 @@ function gerarJsonTipoIcms(){
 		          {'nome':'percentualReducaoBCST', 'id':'percRedBCSTICMS'},
 		          {'nome':'valorBC', 'id':'valorBCICMS'},
 		          {'nome':'valorBCST', 'id':'valorBCSTICMS'},
+		          {'nome':'valorDesonerado', 'id':'valDesonICMS'},
 		          {'nome':'aliquotaST', 'id':'aliquotaSTICMS'},
 		          {'nome':'motivoDesoneracao', 'id':'motDesonerICMS'},
 		          {'nome':'origemMercadoria', 'id':'origemMercadoriaICMS'},
@@ -1663,9 +1665,13 @@ function inicializarCalculoImpostos(){
 					<div class="input" style="width: 50%">
 						<input id="aliquotaSTICMS" type="text" style="width: 25%" />
 					</div>
+					<div  class="label">Val. Desoneração:</div>
+					<div class="input" style="width: 10%">
+						<input id="valDesonICMS" type="text" style="width: 100%" />
+					</div>
 					<div class="icms00 label">Mot. Desoneração:</div>
-					<div class="icms00 input" style="width: 36%">
-						<select id="motDesonerICMS" style="width: 100%" class="icms00 semprehabilitado">
+					<div class="icms00 input" style="width: 50%">
+						<select id="motDesonerICMS" style="width: 50%" class="icms00 semprehabilitado">
 							<option value=""></option>
 							<c:forEach var="motivo" items="${listaTipoDesoneracao}">
 								<option value="${motivo.codigo}">${motivo.descricao}</option>
@@ -1832,11 +1838,11 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label obribagorio">Mun. Gerador:</div>
 					<div class="input" style="width: 10%">
-						<input id="codMunGeradorISS" type="text" style="width: 100%" />
+						<input id="codMunGeradorISS" type="text" maxlength="7" style="width: 100%" />
 					</div>
 					<div  class="label obribagorio">Item Serviço:</div>
 					<div class="input" style="width: 10%">
-						<input id="codItemServicoISS" type="text" style="width: 100%" />
+						<input id="codItemServicoISS" type="text" maxlength="5" style="width: 100%" />
 					</div>
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirISS" title="Inserir ISS do Produto" value="" class="botaoInserir"/>

@@ -41,6 +41,7 @@ import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.ICMSGeral;
+import br.com.plastecno.service.nfe.ICMSInterestadual;
 import br.com.plastecno.service.nfe.IdentificacaoEmitenteNFe;
 import br.com.plastecno.service.nfe.IdentificacaoLocalGeral;
 import br.com.plastecno.service.nfe.NFe;
@@ -152,6 +153,7 @@ public class NFeServiceImpl implements NFeService {
 		}
 
 		ICMSGeral tipoIcms = null;
+		ICMSInterestadual icmsInter = null;
 		ProdutoServicoNFe produto = null;
 		TributosProdutoServico tributo = null;
 		double valorBC = 0;
@@ -169,16 +171,27 @@ public class NFeServiceImpl implements NFeService {
 		double valorDespAcessorias = 0;
 		double valorBCISS = 0;
 		double valorISS = 0;
+		double valorICMSFundoProbeza = 0;
+		double valorICMSInterestadualDest = 0;
+		double valorICMSInterestadualRemet = 0;
 
 		for (DetalhamentoProdutoServicoNFe item : listaItem) {
 			tributo = item.getTributosProdutoServico();
 			if (tributo != null && tributo.contemICMS()) {
-				tipoIcms = item.getTributosProdutoServico().getTipoIcms();
+				tipoIcms = tributo.getTipoIcms();
 
 				valorBC += tipoIcms.getValorBC();
 				valorBCST += tipoIcms.getValorBCST();
 				valorST += tipoIcms.getValorST();
 				valorICMS += tipoIcms.carregarValoresAliquotas().getValor();
+			}
+
+			if (tributo != null && tributo.contemICMSInterestadual()) {
+				icmsInter = tributo.getIcmsInterestadual().carregarValoresAliquotas();
+
+				valorICMSFundoProbeza += icmsInter.getValorFCPDestino();
+				valorICMSInterestadualDest += icmsInter.getValorUFDestino();
+				valorICMSInterestadualRemet += icmsInter.getValorUFRemetente();
 			}
 
 			if (tributo != null && tributo.contemIPI()) {
@@ -225,7 +238,10 @@ public class NFeServiceImpl implements NFeService {
 		totaisICMS.setValorTotalDespAcessorias(valorDespAcessorias);
 		totaisICMS.setValorTotalNF(valorProduto);
 		totaisICMS.setValorTotalST(valorST);
-
+		totaisICMS.setValorTotalICMSFundoProbeza(valorICMSFundoProbeza);
+		totaisICMS.setValorTotalICMSInterestadualDestino(valorICMSInterestadualDest);
+		totaisICMS.setValorTotalICMSInterestadualRemetente(valorICMSInterestadualRemet);
+		
 		totaisISSQN.setValorBC(valorBCISS);
 		totaisISSQN.setValorIss(valorISS);
 		totaisISSQN.setValorPis(valorPIS);

@@ -45,6 +45,10 @@ public class TributosProdutoServico {
 		return icms != null && icms.getTipoIcms() != null;
 	}
 
+	public boolean contemICMSInterestadual() {
+		return icms != null && icms.getIcmsInterestadual() != null;
+	}
+
 	public boolean contemImpostoImportacao() {
 		return impostoImportacao != null;
 	}
@@ -69,6 +73,11 @@ public class TributosProdutoServico {
 	@XmlTransient
 	public ICMS getIcms() {
 		return icms;
+	}
+
+	@XmlTransient
+	public ICMSInterestadual getIcmsInterestadual() {
+		return icms != null ? icms.getIcmsInterestadual() : null;
 	}
 
 	@XmlTransient

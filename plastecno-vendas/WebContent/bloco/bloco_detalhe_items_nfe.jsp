@@ -6,6 +6,7 @@
 <input type="hidden" id="${detItem}.produtoServicoNFe.cfop" name="${detItem}.produtoServicoNFe.cfop" value="${item.produto.cfop}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.codigoSituacaoTributaria" name="${detItem}.tributos.icms.tipoIcms.codigoSituacaoTributaria" value="${item.tributos.icms.tipoIcms.codigoSituacaoTributaria}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.origemMercadoria" name="${detItem}.tributos.icms.tipoIcms.origemMercadoria" value="${item.tributos.icms.tipoIcms.origemMercadoria}"/>
+<input type="hidden" id="${detItem}.tributos.icms.tipoIcms.valorDesonerado" name="${detItem}.tributos.icms.tipoIcms.valorDesonerado" value="${item.tributos.icms.tipoIcms.valorDesonerado}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.motivoDesoneracao" name="${detItem}.tributos.icms.tipoIcms.motivoDesoneracao" value="${item.tributos.icms.tipoIcms.motivoDesoneracao}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.aliquotaST" name="${detItem}.tributos.icms.tipoIcms.aliquotaST" value="${item.tributos.icms.tipoIcms.aliquotaST}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.valorBCST" name="${detItem}.tributos.icms.tipoIcms.valorBCST" value="${item.tributos.icms.tipoIcms.valorBCST}"/>

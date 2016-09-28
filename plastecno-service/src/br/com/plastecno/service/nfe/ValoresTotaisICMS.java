@@ -6,59 +6,71 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class ValoresTotaisICMS {
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de base de calculo do total de ICMS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de base de calculo do total de ICMS")
 	@XmlElement(name = "vBC")
 	private Double valorBaseCalculo;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de base de ST de calculo do total de ICMS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de base de ST de calculo do total de ICMS")
 	@XmlElement(name = "vBCST")
 	private Double valorBaseCalculoST;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de COFINS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de COFINS")
 	@XmlElement(name = "vCOFINS")
 	private Double valorTotalCOFINS;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de desconto")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de desconto")
 	@XmlElement(name = "vDesc")
 	private Double valorTotalDesconto;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de despesas acessórias")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de despesas acessórias")
 	@XmlElement(name = "vOutro")
 	private Double valorTotalDespAcessorias;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de frete")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de frete")
 	@XmlElement(name = "vFrete")
 	private Double valorTotalFrete;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de ICMS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de ICMS")
 	@XmlElement(name = "vICMS")
 	private Double valorTotalICMS;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de Imposto de Importação")
+	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor total fundo de probeza do ICMS Interestadual")
+	@XmlElement(name = "vFCPUFDest")
+	private Double valorTotalICMSFundoProbeza;
+
+	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor total do ICMS Interestadual de destino")
+	@XmlElement(name = "vICMSUFDest")
+	private Double valorTotalICMSInterestadualDestino;
+
+	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor total do ICMS Interestadual do remetente")
+	@XmlElement(name = "vICMSUFRemet")
+	private Double valorTotalICMSInterestadualRemetente;
+
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de Imposto de Importação")
 	@XmlElement(name = "vII")
 	private Double valorTotalII;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de IPI")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de IPI")
 	@XmlElement(name = "vIPI")
 	private Double valorTotalIPI;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total da nota fiscal")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total da nota fiscal")
 	@XmlElement(name = "vNF")
 	private Double valorTotalNF;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de PIS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de PIS")
 	@XmlElement(name = "vPIS")
 	private Double valorTotalPIS;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de produtos/serviços")
 	@XmlElement(name = "vProd")
 	private Double valorTotalProdutosServicos;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de seguro")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de seguro")
 	@XmlElement(name = "vSeg")
 	private Double valorTotalSeguro;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 15, 2 }, nomeExibicao = "Valor total de substituição tributária")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de substituição tributária")
 	@XmlElement(name = "vST")
 	private Double valorTotalST;
 
@@ -88,6 +100,18 @@ public class ValoresTotaisICMS {
 
 	public void setValorTotalICMS(Double valorTotalICMS) {
 		this.valorTotalICMS = valorTotalICMS;
+	}
+
+	public void setValorTotalICMSFundoProbeza(Double valorTotalICMSFundoProbeza) {
+		this.valorTotalICMSFundoProbeza = valorTotalICMSFundoProbeza;
+	}
+
+	public void setValorTotalICMSInterestadualDestino(Double valorTotalICMSInterestadualDestino) {
+		this.valorTotalICMSInterestadualDestino = valorTotalICMSInterestadualDestino;
+	}
+
+	public void setValorTotalICMSInterestadualRemetente(Double valorTotalICMSInterestadualRemetente) {
+		this.valorTotalICMSInterestadualRemetente = valorTotalICMSInterestadualRemetente;
 	}
 
 	public void setValorTotalII(Double valorTotalII) {

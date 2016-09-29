@@ -33,6 +33,8 @@ import br.com.plastecno.service.nfe.IdentificacaoNFe;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.TransportadoraNFe;
 import br.com.plastecno.service.nfe.TransporteNFe;
+import br.com.plastecno.service.nfe.constante.TipoAliquotaICMSInterestadual;
+import br.com.plastecno.service.nfe.constante.TipoAliquotaICMSPartilha;
 import br.com.plastecno.service.nfe.constante.TipoDestinoOperacao;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
@@ -82,6 +84,8 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
+        addAtributo("listaTipoAliquotaICMSInterestadual", TipoAliquotaICMSInterestadual.values());
+        addAtributo("listaTipoAliquotaICMSPartilha", TipoAliquotaICMSPartilha.values());
         addAtributo("listaTipoUF", TipoUF.values());
         addAtributo("listaTipoIntermediacaoImportacao", TipoIntermediacaoImportacao.values());
         addAtributo("listaTipoPresencaComprador", TipoPresencaComprador.values());

@@ -108,9 +108,19 @@ $(document).ready(function() {
 		fecharBloco('bloco_icms');
 	});
 	
+	$('#botaoInserirICMSInter').click(function(){
+		gerarInputICMSInter();
+		fecharBloco('bloco_icms_interestadual');
+	});
+	
 	$('#botaoLimparICMS').click(function(){
 		removerInputHidden(gerarJsonTipoIcms());
 		fecharBloco('bloco_icms');
+	});
+	
+	$('#botaoLimparICMSInter').click(function(){
+		removerInputHidden(gerarJsonIcmsInterestadual());
+		fecharBloco('bloco_icms_interestadual');
 	});
 	
 	$('#botaoLimparInfoProd').click(function(){
@@ -251,6 +261,7 @@ $(document).ready(function() {
 	inserirMascaraData('dataDesembImportProd');
 
 	inicializarFadeInBloco('bloco_icms');
+	inicializarFadeInBloco('bloco_icms_interestadual');
 	inicializarFadeInBloco('bloco_ipi');
 	inicializarFadeInBloco('bloco_pis');
 	inicializarFadeInBloco('bloco_cofins');
@@ -627,6 +638,15 @@ function gerarJsonTipoIcms(){
 			]};
 };
 
+function gerarJsonIcmsInterestadual(){
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.icmsInterestadual',
+		'campos':[{'nome':'percentualFCPDestino', 'id':'percFCPDestICMSInter'},
+		          {'nome':'valorBCUFDestino', 'id':'valorBCICMSInter'},
+		          {'nome':'percentualPartilha', 'id':'aliquotaUFDestICMSInter'},
+		          {'nome':'aliquotaUFDestino', 'id':'aliquotaICMSInter'},
+			]};
+};
+
 function gerarJsonCfopNcm(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe',
 			'campos':[{'nome':'cfop', 'id':'cfop'}, {'nome':'ncm', 'id':'ncm'}]};
@@ -857,6 +877,11 @@ function gerarInputICMS(){
 	gerarInputHidden(cfop);
 };
 
+function gerarInputICMSInter(){
+	var icmsInterestadual = gerarJsonIcmsInterestadual();
+	gerarInputHidden(icmsInterestadual);
+};
+
 function gerarInputInfoProduto(){
 	gerarInputHidden(gerarJsonInfoProduto());
 };
@@ -1007,6 +1032,7 @@ function recuperarValoresImpostos(valoresTabela){
 	impostos [6] = gerarJsonInfoProduto();
 	impostos [7] = gerarJsonCfopNcm();
 	impostos [8] = gerarJsonEnquadramentoIpi();
+	impostos [9] = gerarJsonIcmsInterestadual();
 	
 	var idInput = null;
 	var idBloco = null;
@@ -1126,6 +1152,7 @@ function editarProduto(linha){
 	$('#bloco_exportacao_prod').fadeIn('fast');
 	
 	inicializarLegendaBlocoProduto('bloco_icms');
+	inicializarLegendaBlocoProduto('bloco_icms_interestadual');
 	inicializarLegendaBlocoProduto('bloco_ipi');
 	inicializarLegendaBlocoProduto('bloco_pis');
 	inicializarLegendaBlocoProduto('bloco_cofins');
@@ -1588,7 +1615,7 @@ function inicializarCalculoImpostos(){
 				<legend class="fieldsetInterno">::: Tributos Prod.::: -</legend>
 				<div class="divFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
-					<legend id="legendICMS" title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
+					<legend title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>
 					<div class="label obrigatorio">NCM:</div>
 					<div class="input" style="width: 80%">
 						<input type="text" id="ncm" name="ncm"  maxlength="8" style="width: 20%"/>
@@ -1681,6 +1708,46 @@ function inicializarCalculoImpostos(){
 					<div class="bloco_botoes">
 						<input type="button" id="botaoInserirICMS" title="Inserir ICMS do Produto" value="" class="botaoInserir"/>
 						<input type="button" id="botaoLimparICMS" title="Limpar ICMS do Produto" value="" class="botaoLimpar"/>
+					</div>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_icms_interestadual" class="fieldsetInterno">
+				<legend>::: ICMS Interestadual Prod.::: +</legend>
+					<div  class="label obrigatorio">Perc. FCP UF Dest.:</div>
+					<div class="input" style="width: 10%">
+						<input id="percFCPDestICMSInter" type="text" style="width: 100%" />
+					</div>
+					<div  class="label obrigatorio">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input id="valorBCICMSInter" type="text" style="width: 100%" />
+					</div>
+					<div  class="label obrigatorio">Alíquota Interna UF Dest.:</div>
+					<div class="input" style="width: 20%">
+						<input id="aliquotaUFDestICMSInter" type="text" style="width: 50%" />
+					</div>
+					<div  class="label obrigatorio">Alíquota Inter.:</div>
+					<div class="input" style="width: 80%">
+						<select id="aliquotaICMSInter" style="width: 20%">
+							<option value=""></option>
+							<c:forEach var="tipo" items="${listaTipoAliquotaICMSInterestadual}">
+								<option value="${tipo.aliquota}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label obrigatorio">Perc. Proviário Partilha:</div>
+					<div class="input" style="width: 80%">
+						<select id="percPartilhaICMSInter" style="width: 20%">
+							<option value=""></option>
+							<c:forEach var="tipo" items="${listaTipoAliquotaICMSPartilha}">
+								<option value="${tipo.aliquota}">${tipo.descricao}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div class="bloco_botoes">
+						<input type="button" id="botaoInserirICMSInter" title="Inserir ICMS Interestadual do Produto" value="" class="botaoInserir"/>
+						<input type="button" id="botaoLimparICMSInter" title="Limpar ICMS Interestadual do Produto" value="" class="botaoLimpar"/>
 					</div>
 				</fieldset>
 				</div>

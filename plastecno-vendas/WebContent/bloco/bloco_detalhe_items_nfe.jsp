@@ -16,7 +16,13 @@
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.modalidadeDeterminacaoBCST" name="${detItem}.tributos.icms.tipoIcms.modalidadeDeterminacaoBCST" value="${item.tributos.icms.tipoIcms.modalidadeDeterminacaoBCST}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.modalidadeDeterminacaoBC" name="${detItem}.tributos.icms.tipoIcms.modalidadeDeterminacaoBC" value="${item.tributos.icms.tipoIcms.modalidadeDeterminacaoBC}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.aliquota" name="${detItem}.tributos.icms.tipoIcms.aliquota" value="${item.tributos.icms.tipoIcms.aliquota}"/>
-<%-- bloco de icms --%>
+
+<%-- bloco de icms interestadual --%>
+<input type="hidden" id="${detItem}.tributos.icms.icmsInterestadual.aliquotaInterestadual" name="${detItem}.tributos.icms.icmsInterestadual.aliquotaInterestadual" value="${item.tributos.icms.icmsInterestadual.aliquotaInterestadual}"/>
+<input type="hidden" id="${detItem}.tributos.icms.icmsInterestadual.aliquotaUFDestino" name="${detItem}.tributos.icms.icmsInterestadual.aliquotaUFDestino" value="${item.tributos.icms.icmsInterestadual.aliquotaUFDestino}"/>
+<input type="hidden" id="${detItem}.tributos.icms.icmsInterestadual.percentualFCPDestino" name="${detItem}.tributos.icms.icmsInterestadual.percentualFCPDestino" value="${item.tributos.icms.icmsInterestadual.percentualFCPDestino}"/>
+<input type="hidden" id="${detItem}.tributos.icms.icmsInterestadual.percentualPartilha" name="${detItem}.tributos.icms.icmsInterestadual.percentualPartilha" value="${item.tributos.icms.icmsInterestadual.percentualPartilha}"/>
+<input type="hidden" id="${detItem}.tributos.icms.icmsInterestadual.valorBCUFDestino" name="${detItem}.tributos.icms.icmsInterestadual.valorBCUFDestino" value="${item.tributos.icms.icmsInterestadual.valorBCUFDestino}"/>
 
 <%-- bloco de ipi --%>
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.aliquota" name="${detItem}.tributos.ipi.tipoIpi.aliquota" value="${item.tributos.ipi.tipoIpi.aliquota}"/>
@@ -24,20 +30,17 @@
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.valorBC" name="${detItem}.tributos.ipi.tipoIpi.valorBC" value="${item.tributos.ipi.tipoIpi.valorBC}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel" name="${detItem}.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel" value="${item.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.valorUnidadeTributavel" name="${detItem}.tributos.ipi.tipoIpi.valorUnidadeTributavel" value="${item.tributos.ipi.tipoIpi.valorUnidadeTributavel}"/>
-
 <input type="hidden" id="${detItem}.tributos.ipi.classeEnquadramento" name="${detItem}.tributos.ipi.classeEnquadramento" value="${item.tributos.ipi.classeEnquadramento}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.codigoEnquadramento" name="${detItem}.tributos.ipi.codigoEnquadramento" value="${item.tributos.ipi.codigoEnquadramento}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.cnpjProdutor" name="${detItem}.tributos.ipi.cnpjProdutor" value="${item.tributos.ipi.cnpjProdutor}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.codigoSeloControle" name="${detItem}.tributos.ipi.codigoSeloControle" value="${item.tributos.ipi.codigoSeloControle}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.quantidadeSeloControle" name="${detItem}.tributos.ipi.quantidadeSeloControle" value="${item.tributos.ipi.quantidadeSeloControle}"/>
-<%-- bloco de ipi --%>
 
 <%-- bloco de cofins --%>
 <input type="hidden" id="${detItem}.tributos.cofins.tipoCofins.aliquota" name="${detItem}.tributos.cofins.tipoCofins.aliquota" value="${item.tributos.cofins.tipoCofins.aliquota}"/>
 <input type="hidden" id="${detItem}.tributos.cofins.tipoCofins.codigoSituacaoTributaria" name="${detItem}.tributos.cofins.tipoCofins.codigoSituacaoTributaria" value="${item.tributos.cofins.tipoCofins.codigoSituacaoTributaria}"/>
 <input type="hidden" id="${detItem}.tributos.cofins.tipoCofins.quantidadeVendida" name="${detItem}.tributos.cofins.tipoCofins.quantidadeVendida" value="${item.tributos.cofins.tipoCofins.quantidadeVendida}"/>
 <input type="hidden" id="${detItem}.tributos.cofins.tipoCofins.valorBC" name="${detItem}.tributos.cofins.tipoCofins.valorBC" value="${item.tributos.cofins.tipoCofins.valorBC}"/>
-<%-- bloco de cofins --%>
 
 <%-- bloco de iss --%>
 <input type="hidden" id="${detItem}.tributos.issqn.aliquota" name="${detItem}.tributos.issqn.aliquota" value="${item.tributos.issqn.aliquota}"/>
@@ -45,21 +48,18 @@
 <input type="hidden" id="${detItem}.tributos.issqn.valorBC" name="${detItem}.tributos.issqn.valorBC" value="${item.tributos.issqn.valorBC}"/>
 <input type="hidden" id="${detItem}.tributos.issqn.codigoMunicipioGerador" name="${detItem}.tributos.issqn.codigoMunicipioGerador" value="${item.tributos.issqn.codigoMunicipioGerador}"/>
 <input type="hidden" id="${detItem}.tributos.issqn.itemListaServicos" name="${detItem}.tributos.issqn.itemListaServicos" value="${item.tributos.issqn.itemListaServicos}"/>
-<%-- bloco de iss --%>
 
 <%-- bloco de ii --%>
 <input type="hidden" id="${detItem}.tributos.impostoImportacao.valor" name="${detItem}.tributos.impostoImportacao.valor" value="${item.tributos.impostoImportacao.valor}"/>
 <input type="hidden" id="${detItem}.tributos.impostoImportacao.valorBC" name="${detItem}.tributos.impostoImportacao.valorBC" value="${item.tributos.impostoImportacao.valorBC}"/>
 <input type="hidden" id="${detItem}.tributos.impostoImportacao.valorDespesaAduaneira" name="${detItem}.tributos.impostoImportacao.valorDespesaAduaneira" value="${item.tributos.impostoImportacao.valorDespesaAduaneira}"/>
 <input type="hidden" id="${detItem}.tributos.impostoImportacao.valorIOF" name="${detItem}.tributos.impostoImportacao.valorIOF" value="${item.tributos.impostoImportacao.valorIOF}"/>
-<%-- bloco de ii --%>
 
 <%-- bloco de pis --%>
 <input type="hidden" id="${detItem}.tributos.pis.tipoPis.aliquota" name="${detItem}.tributos.pis.tipoPis.aliquota" value="${item.tributos.pis.tipoPis.aliquota}"/>
 <input type="hidden" id="${detItem}.tributos.pis.tipoPis.codigoSituacaoTributaria" name="${detItem}.tributos.pis.tipoPis.codigoSituacaoTributaria" value="${item.tributos.pis.tipoPis.codigoSituacaoTributaria}"/>
 <input type="hidden" id="${detItem}.tributos.pis.tipoPis.quantidadeVendida" name="${detItem}.tributos.pis.tipoPis.quantidadeVendida" value="${item.tributos.pis.tipoPis.quantidadeVendida}"/>
 <input type="hidden" id="${detItem}.tributos.pis.tipoPis.valorBC" name="${detItem}.tributos.pis.tipoPis.valorBC" value="${item.tributos.pis.tipoPis.valorBC}"/>
-<%-- bloco de pis --%>
 
 <%-- bloco de informacoes --%>
 <input type="hidden" id="${detItem}.produtoServicoNFe.outrasDespesasAcessorias" name="${detItem}.produtoServicoNFe.outrasDespesasAcessorias" value="${item.produto.outrasDespesasAcessorias}"/>
@@ -67,7 +67,6 @@
 <input type="hidden" id="${detItem}.fichaConteudoImportacao" name="${detItem}.fichaConteudoImportacao" value="${item.fichaConteudoImportacao}"/>
 <input type="hidden" id="${detItem}.numeroPedidoCompra" name="${detItem}.numeroPedidoCompra" value="${item.numeroPedidoCompra}"/>
 <input type="hidden" id="${detItem}.itemPedidoCompra" name="${detItem}.itemPedidoCompra" value="${item.itemPedidoCompra}"/>
-<%-- bloco de informacoes --%>
 
 <%-- bloco de importacoes --%>
 <c:set var="listaImportacao" value="${detItem}.listaImportacao"/>
@@ -93,10 +92,8 @@
 <input type="hidden" id="${listaAdicao}[${adLoop.index}].numeroSequencialItem" name="${listaAdicao}[${adLoop.index}].numeroSequencialItem" value="${ad.numeroSequencialItem}"/>
 <input type="hidden" id="${listaAdicao}[${adLoop.index}].valorDesconto" name="${listaAdicao}[${adLoop.index}].valorDesconto" value="${ad.valorDesconto}"/>
 </c:forEach>
-<%-- bloco de adicoes --%>
 
 </c:forEach>
-<%-- bloco de importacoes --%>
 
 <%-- bloco de exportacao --%>
 <c:set var="listaExportacao" value="${detItem}.listaExportacao"/>
@@ -106,5 +103,4 @@
 <input type="hidden" id="${listaExportacao}[${expLoop.index}].expIndireta.numeroRegistro" name="${listaExportacao}[${expLoop.index}].expIndireta.numeroRegistro" value="${exp.expIndireta.numeroRegistro}"/>
 <input type="hidden" id="${listaExportacao}[${expLoop.index}].expIndireta.quantidadeItem" name="${listaExportacao}[${expLoop.index}].expIndireta.quantidadeItem" value="${exp.expIndireta.quantidadeItem}"/>
 </c:forEach>
-<%-- bloco de exportacao --%>
 </c:forEach>

@@ -20,8 +20,8 @@ public class ICMSInterestadual {
 	private Double percentualFCPDestino;
 
 	@XmlElement(name = "pICMSInterPart")
-	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, nomeExibicao = "Percentual de partilha do ICMS interestadual")
-	private Double percentualPartilha;
+	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, nomeExibicao = "Percentual Provisorio de Partilha do ICMS interestadual")
+	private Double percentualProvisorioPartilha;
 
 	@XmlElement(name = "vBCUFDest")
 	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor da BC do ICMS interestadual")
@@ -65,8 +65,8 @@ public class ICMSInterestadual {
 	}
 
 	@XmlTransient
-	public Double getPercentualPartilha() {
-		return percentualPartilha;
+	public Double getPercentualProvisorioPartilha() {
+		return percentualProvisorioPartilha;
 	}
 
 	@XmlTransient
@@ -101,8 +101,8 @@ public class ICMSInterestadual {
 		this.percentualFCPDestino = percentualFCPDestino;
 	}
 
-	public void setPercentualPartilha(Double percentualPartilha) {
-		this.percentualPartilha = percentualPartilha;
+	public void setPercentualProvisorioPartilha(Double percentualProvisorioPartilha) {
+		this.percentualProvisorioPartilha = percentualProvisorioPartilha;
 	}
 
 	public void setValorBCUFDestino(Double valorBCUFDestino) {

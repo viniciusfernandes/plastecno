@@ -640,10 +640,11 @@ function gerarJsonTipoIcms(){
 
 function gerarJsonIcmsInterestadual(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.icmsInterestadual',
-		'campos':[{'nome':'percentualFCPDestino', 'id':'percFCPDestICMSInter'},
-		          {'nome':'valorBCUFDestino', 'id':'valorBCICMSInter'},
-		          {'nome':'percentualPartilha', 'id':'aliquotaUFDestICMSInter'},
-		          {'nome':'aliquotaUFDestino', 'id':'aliquotaICMSInter'},
+		'campos':[{'nome':'valorBCUFDestino', 'id':'valorBCICMSInter'},
+		          {'nome':'percentualFCPDestino', 'id':'percFCPDestICMSInter'},
+		          {'nome':'aliquotaUFDestino', 'id':'aliquotaUFDestICMSInter'},
+		          {'nome':'percentualProvisorioPartilha', 'id':'percProvPartilhaICMSInter'},
+		          {'nome':'aliquotaInterestadual', 'id':'aliquotaICMSInter'}
 			]};
 };
 
@@ -1736,9 +1737,9 @@ function inicializarCalculoImpostos(){
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label obrigatorio">Perc. Proviário Partilha:</div>
+					<div  class="label obrigatorio">Perc. Provisório Partilha:</div>
 					<div class="input" style="width: 80%">
-						<select id="percPartilhaICMSInter" style="width: 20%">
+						<select id="percProvPartilhaICMSInter" style="width: 20%">
 							<option value=""></option>
 							<c:forEach var="tipo" items="${listaTipoAliquotaICMSPartilha}">
 								<option value="${tipo.aliquota}">${tipo.descricao}</option>

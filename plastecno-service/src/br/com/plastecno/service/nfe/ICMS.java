@@ -73,7 +73,7 @@ public class ICMS {
 		for (Field campo : campos) {
 			campo.setAccessible(true);
 			try {
-				if ((conteudo = campo.get(this)) == null) {
+				if ((conteudo = campo.get(this)) == null || !(conteudo instanceof ICMSGeral)) {
 					campo.setAccessible(false);
 					continue;
 				}

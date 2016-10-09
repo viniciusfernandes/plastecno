@@ -7,6 +7,10 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 public class ProdutoServicoNFe {
+	@XmlElement(name = "CEST")
+	@InformacaoValidavel(padrao = "\\d{7}", padraoExemplo = "7 dígitos", nomeExibicao = "CEST do produtos/serviços")
+	private String cest;
+
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}", padraoExemplo = "4 digitos", nomeExibicao = "CFOP do produtos/serviços")
 	@XmlElement(name = "CFOP")
 	private String cfop;
@@ -79,13 +83,18 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "vSeg")
 	private Double valorTotalSeguro;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,21}\\.{1}\\d{1,10}", padraoExemplo = "1 a 10 decimais", nomeExibicao = "Valor unitário comercial do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 21, 10 }, nomeExibicao = "Valor unitário comercial do produtos/serviços")
 	@XmlElement(name = "vUnCom")
-	private String valorUnitarioComercializacao;
+	private Double valorUnitarioComercializacao;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,21}\\.{1}\\d{1,10}", padraoExemplo = "1 a 10 decimais", nomeExibicao = "Valor unitário tributação do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 21, 10 }, nomeExibicao = "Valor unitário tributação do produtos/serviços")
 	@XmlElement(name = "vUnTrib")
 	private Double valorUnitarioTributacao;
+
+	@XmlTransient
+	public String getCest() {
+		return cest;
+	}
 
 	@XmlTransient
 	public String getCfop() {
@@ -178,13 +187,17 @@ public class ProdutoServicoNFe {
 	}
 
 	@XmlTransient
-	public String getValorUnitarioComercializacao() {
+	public Double getValorUnitarioComercializacao() {
 		return valorUnitarioComercializacao;
 	}
 
 	@XmlTransient
 	public Double getValorUnitarioTributacao() {
 		return valorUnitarioTributacao;
+	}
+
+	public void setCest(String cest) {
+		this.cest = cest;
 	}
 
 	public void setCfop(String cfop) {
@@ -259,7 +272,7 @@ public class ProdutoServicoNFe {
 		this.valorTotalSeguro = valorTotalSeguro;
 	}
 
-	public void setValorUnitarioComercializacao(String valorUnitarioComercializacao) {
+	public void setValorUnitarioComercializacao(Double valorUnitarioComercializacao) {
 		this.valorUnitarioComercializacao = valorUnitarioComercializacao;
 	}
 

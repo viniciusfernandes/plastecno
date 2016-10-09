@@ -55,6 +55,9 @@ public abstract class Item implements Serializable, Cloneable {
 	@Transient
 	private String valorIPIFormatado;
 
+	@Transient
+	private String valorTotalFormatado;
+
 	public Item() {
 	}
 
@@ -97,8 +100,7 @@ public abstract class Item implements Serializable, Cloneable {
 	}
 
 	public boolean contemMedida() {
-		return getMedidaExterna() != null || getMedidaInterna() != null
-				|| getComprimento() != null;
+		return getMedidaExterna() != null || getMedidaInterna() != null || getComprimento() != null;
 	}
 
 	private String gerarDescricaoItem(boolean isCompleto, boolean isFormatado) {
@@ -109,25 +111,21 @@ public abstract class Item implements Serializable, Cloneable {
 			descricao.append(getMaterial().getSigla());
 			descricao.append(" - ");
 			if (isCompleto) {
-				descricao.append(getMaterial().getDescricao() == null ? " "
-						: getMaterial().getDescricao());
+				descricao.append(getMaterial().getDescricao() == null ? " " : getMaterial().getDescricao());
 				descricao.append(" - ");
 			}
 		}
 
 		if (!this.isPeca()) {
-			descricao.append(isFormatado ? getMedidaExternaFomatada()
-					: getMedidaExterna());
+			descricao.append(isFormatado ? getMedidaExternaFomatada() : getMedidaExterna());
 			descricao.append(" X ");
 
 			if (getMedidaInterna() != null) {
-				descricao.append(isFormatado ? getMedidaInternaFomatada()
-						: getMedidaInterna());
+				descricao.append(isFormatado ? getMedidaInternaFomatada() : getMedidaInterna());
 				descricao.append(" X ");
 			}
 
-			descricao.append(isFormatado ? getComprimentoFormatado()
-					: getComprimento());
+			descricao.append(isFormatado ? getComprimentoFormatado() : getComprimento());
 			descricao.append(" mm");
 		} else {
 			descricao.append(getDescricaoPeca());
@@ -248,6 +246,10 @@ public abstract class Item implements Serializable, Cloneable {
 		return valorIPIFormatado;
 	}
 
+	public String getValorTotalFormatado() {
+		return valorTotalFormatado;
+	}
+
 	public boolean isEqual(Item item) {
 		boolean igual = false;
 
@@ -259,28 +261,23 @@ public abstract class Item implements Serializable, Cloneable {
 				|| (getMaterial().getId().equals(item.getMaterial().getId()));
 
 		igual &= (getMedidaExterna() == null && item.getMedidaExterna() == null)
-				|| (getMedidaExterna() != null && getMedidaExterna().equals(
-						item.getMedidaExterna()));
+				|| (getMedidaExterna() != null && getMedidaExterna().equals(item.getMedidaExterna()));
 
 		igual &= (getMedidaInterna() == null && item.getMedidaInterna() == null)
-				|| (getMedidaInterna() != null && getMedidaInterna().equals(
-						item.getMedidaInterna()));
+				|| (getMedidaInterna() != null && getMedidaInterna().equals(item.getMedidaInterna()));
 
 		igual &= (getComprimento() == null && item.getComprimento() == null)
-				|| (getComprimento() != null && getComprimento().equals(
-						item.getComprimento()));
+				|| (getComprimento() != null && getComprimento().equals(item.getComprimento()));
 
 		return igual;
 	}
 
 	public boolean isFormaMaterialVazada() {
-		return getFormaMaterial() != null
-				&& getFormaMaterial().isFormaMaterialVazada();
+		return getFormaMaterial() != null && getFormaMaterial().isFormaMaterialVazada();
 	}
 
 	public boolean isMedidaExternaIgualInterna() {
-		return getFormaMaterial() != null
-				&& getFormaMaterial().isMedidaExternaIgualInterna();
+		return getFormaMaterial() != null && getFormaMaterial().isMedidaExternaIgualInterna();
 	}
 
 	public abstract boolean isNovo();
@@ -367,5 +364,9 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public void setValorIPIFormatado(String valorIPIFormatado) {
 		this.valorIPIFormatado = valorIPIFormatado;
+	}
+
+	public void setValorTotalFormatado(String valorTotalFormatado) {
+		this.valorTotalFormatado = valorTotalFormatado;
 	}
 }

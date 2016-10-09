@@ -40,12 +40,17 @@ public class ICMSInterestadual {
 	private Double valorUFRemetente;
 
 	public ICMSInterestadual carregarValoresAliquotas() {
+		double aliquotaDif = ((aliquotaUFDestino != null ? aliquotaUFDestino : 0) - (aliquotaInterestadual != null ? aliquotaInterestadual
+				: 0)) / 100d;
 		valorFCPDestino = valorBCUFDestino != null && percentualFCPDestino != null ? valorBCUFDestino
 				* (percentualFCPDestino / 100d) : 0d;
-		valorUFDestino = valorBCUFDestino != null && aliquotaUFDestino != null ? valorBCUFDestino
-				* (aliquotaUFDestino / 100d) : 0d;
-		valorUFRemetente = valorBCUFDestino != null && aliquotaInterestadual != null ? valorBCUFDestino
-				* (aliquotaInterestadual / 100d) : 0d;
+
+		valorUFDestino = valorBCUFDestino != null && aliquotaUFDestino != null ? valorBCUFDestino * aliquotaDif : 0d;
+		valorUFDestino *= (percentualProvisorioPartilha != null ? percentualProvisorioPartilha : 0d) / 100d;
+
+		valorUFRemetente = valorBCUFDestino != null && aliquotaInterestadual != null ? valorBCUFDestino * aliquotaDif
+				: 0d;
+		valorUFRemetente -= valorUFDestino;
 		return this;
 	}
 

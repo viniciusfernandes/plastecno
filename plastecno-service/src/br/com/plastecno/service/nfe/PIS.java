@@ -1,15 +1,6 @@
 package br.com.plastecno.service.nfe;
 
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_1;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_2;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_3;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_4;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_6;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_7;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_8;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_9;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_99;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.PIS_ST;
+import static br.com.plastecno.service.nfe.constante.TipoTributacaoPIS.*;
 
 import java.lang.reflect.Field;
 
@@ -96,12 +87,13 @@ public class PIS {
 			this.pisAliquota = tipoPis;
 		} else if (PIS_3.equals(t)) {
 			this.pisQuantidade = tipoPis;
-		} else if (PIS_4.equals(t) || PIS_6.equals(t) || PIS_7.equals(t) || PIS_8.equals(t) || PIS_9.equals(t)) {
+		} else if (PIS_4.equals(t) || PIS_5.equals(t) || PIS_6.equals(t) || PIS_7.equals(t) || PIS_8.equals(t)
+				|| PIS_9.equals(t)) {
 			this.pisNaoTributado = tipoPis;
-		} else if (PIS_99.equals(t)) {
-			this.pisOutrasOperacoes = tipoPis;
 		} else if (PIS_ST.equals(t)) {
 			this.pisST = tipoPis;
+		} else {
+			this.pisOutrasOperacoes = tipoPis;
 		}
 		this.tipoPis = tipoPis;
 	}

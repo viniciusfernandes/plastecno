@@ -28,11 +28,15 @@ import br.com.plastecno.service.nfe.DeclaracaoImportacao;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
+import br.com.plastecno.service.nfe.ICMSInterestadual;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.IdentificacaoNFe;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.TransportadoraNFe;
 import br.com.plastecno.service.nfe.TransporteNFe;
+import br.com.plastecno.service.nfe.constante.TipoAliquotaICMSInterestadual;
+import br.com.plastecno.service.nfe.constante.TipoAliquotaICMSPartilha;
+import br.com.plastecno.service.nfe.constante.TipoDesoneracaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoDestinoOperacao;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
@@ -42,7 +46,6 @@ import br.com.plastecno.service.nfe.constante.TipoIntermediacaoImportacao;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
-import br.com.plastecno.service.nfe.constante.TipoMotivoDesoneracaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoOperacaoConsumidorFinal;
 import br.com.plastecno.service.nfe.constante.TipoOperacaoNFe;
 import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
@@ -53,8 +56,10 @@ import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoISS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
+import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
+import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
@@ -80,8 +85,33 @@ public class EmissaoNFeController extends AbstractController {
         inicializarListaCfop(request);
     }
 
+    private void arredondarValoresItemPedido(List<ItemPedido> listaItem) {
+        if (listaItem == null || listaItem.isEmpty()) {
+            return;
+        }
+        for (ItemPedido i : listaItem) {
+            i.setPrecoUnidadeFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade())));
+            i.setValorTotalFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(i.calcularPrecoTotal())));
+            i.setValorICMSFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(i.calcularValorICMS())));
+            i.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(i.calcularPrecoUnidadeIPI())));
+            i.setAliquotaICMS(NumeroUtils.gerarPercentual(i.getAliquotaICMS()));
+            i.setAliquotaIPI(NumeroUtils.gerarPercentual(i.getAliquotaIPI()));
+        }
+    }
+
+    @Get("emissaoNFe/valorICMSInterestadual")
+    public void calcularValorICMSInterestadual(ICMSInterestadual icms) {
+        icms.carregarValoresAliquotas();
+        icms.setValorFCPDestino(NumeroUtils.arredondarValorMonetario(icms.getValorFCPDestino()));
+        icms.setValorUFDestino(NumeroUtils.arredondarValorMonetario(icms.getValorUFDestino()));
+        icms.setValorUFRemetente(NumeroUtils.arredondarValorMonetario(icms.getValorUFRemetente()));
+        serializarJson(new SerializacaoJson("icms", icms));
+    };
+
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
+        addAtributo("listaTipoAliquotaICMSInterestadual", TipoAliquotaICMSInterestadual.values());
+        addAtributo("listaTipoAliquotaICMSPartilha", TipoAliquotaICMSPartilha.values());
         addAtributo("listaTipoUF", TipoUF.values());
         addAtributo("listaTipoIntermediacaoImportacao", TipoIntermediacaoImportacao.values());
         addAtributo("listaTipoPresencaComprador", TipoPresencaComprador.values());
@@ -95,7 +125,7 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaTipoOrigemMercadoria", TipoOrigemMercadoria.values());
         addAtributo("listaTipoModalidadeDeterminacaoBCICMS", TipoModalidadeDeterminacaoBCICMS.values());
         addAtributo("listaTipoModalidadeDeterminacaoBCICMSST", TipoModalidadeDeterminacaoBCICMSST.values());
-        addAtributo("listaTipoMotivoDesoneracao", TipoMotivoDesoneracaoICMS.values());
+        addAtributo("listaTipoDesoneracao", TipoDesoneracaoICMS.values());
         addAtributo("listaTipoTributacaoIPI", TipoTributacaoIPI.values());
         addAtributo("listaTipoTributacaoPIS", TipoTributacaoPIS.values());
         addAtributo("listaTipoTributacaoCOFINS", TipoTributacaoCOFINS.values());
@@ -271,7 +301,7 @@ public class EmissaoNFeController extends AbstractController {
             Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
             List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 
-            formatarItemPedido(listaItem);
+            arredondarValoresItemPedido(listaItem);
 
             addAtributo("listaDuplicata", listaDuplicata);
             addAtributo("cliente", cliente);
@@ -331,7 +361,7 @@ public class EmissaoNFeController extends AbstractController {
         popularTransporte(nf);
 
         List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-        formatarItemPedido(listaItem);
+        arredondarValoresItemPedido(listaItem);
 
         addAtributo("idPedido", idPedido);
         addAtributo("nf", nf);

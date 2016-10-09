@@ -9,7 +9,6 @@ import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_7;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_8;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_9;
-import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_99;
 import static br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS.COFINS_ST;
 
 import java.lang.reflect.Field;
@@ -49,7 +48,7 @@ public class COFINS {
 			tipoCofins.setCodigoSituacaoTributaria(null);
 		}
 	}
-	
+
 	@XmlTransient
 	public COFINSGeral getTipoCofins() {
 		if (tipoCofins == null) {
@@ -101,10 +100,10 @@ public class COFINS {
 			cofinsNaoTributado = tipoCofins;
 		} else if (COFINS_5.equals(t)) {
 			cofinsST = tipoCofins;
-		} else if (COFINS_99.equals(t)) {
-			cofinsOutrasOperacoes = tipoCofins;
 		} else if (COFINS_ST.equals(t)) {
 			cofinsST = tipoCofins;
+		} else {
+			cofinsOutrasOperacoes = tipoCofins;
 		}
 		this.tipoCofins = tipoCofins;
 	}

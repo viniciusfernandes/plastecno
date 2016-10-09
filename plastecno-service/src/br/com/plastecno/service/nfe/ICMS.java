@@ -25,6 +25,12 @@ public class ICMS {
 	@XmlElement(name = "ICMS40")
 	private ICMSGeral icms40;
 
+	@XmlElement(name = "ICMS41")
+	private ICMSGeral icms41;
+
+	@XmlElement(name = "ICMS50")
+	private ICMSGeral icms50;
+
 	@XmlElement(name = "ICMS51")
 	private ICMSGeral icms51;
 
@@ -37,12 +43,21 @@ public class ICMS {
 	@XmlElement(name = "ICMS90")
 	private ICMSGeral icms90;
 
+	@XmlElement(name = "ICMSUFDest")
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS interestadual")
+	private ICMSInterestadual icmsInterestadual;
+
 	@XmlElement(name = "ICMSPart")
 	private ICMSGeral icmsPART;
 
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo ICMS")
 	@XmlTransient
 	private ICMSGeral tipoIcms;
+
+	@XmlTransient
+	public ICMSInterestadual getIcmsInterestadual() {
+		return icmsInterestadual;
+	}
 
 	@XmlTransient
 	public ICMSGeral getTipoIcms() {
@@ -58,7 +73,7 @@ public class ICMS {
 		for (Field campo : campos) {
 			campo.setAccessible(true);
 			try {
-				if ((conteudo = campo.get(this)) == null) {
+				if ((conteudo = campo.get(this)) == null || !(conteudo instanceof ICMSGeral)) {
 					campo.setAccessible(false);
 					continue;
 				}
@@ -72,6 +87,10 @@ public class ICMS {
 				campo.setAccessible(false);
 			}
 		}
+	}
+
+	public void setIcmsInterestadual(ICMSInterestadual icmsInterestadual) {
+		this.icmsInterestadual = icmsInterestadual;
 	}
 
 	/*

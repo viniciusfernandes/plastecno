@@ -9,8 +9,8 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Código de situação tributária")
 public class COFINSGeral {
 	@XmlElement(name = "pCOFINS")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Alíquota COFINS", tiposNaoPermitidos = { "4", "6", "7",
-			"8", "9" })
+	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, nomeExibicao = "Alíquota COFINS", tiposNaoPermitidos = {
+			"04", "05", "06", "07", "08", "09" })
 	private Double aliquota;
 
 	@XmlElement(name = "CST")
@@ -18,22 +18,27 @@ public class COFINSGeral {
 	private String codigoSituacaoTributaria;
 
 	@XmlElement(name = "qBCProd")
-	@InformacaoValidavel(tiposObrigatorios = { "3", "9", "ST" }, nomeExibicao = "Quantidade vendida do COFINS", tiposNaoPermitidos = {
-			"4", "6", "7", "8", "9" })
+	@InformacaoValidavel(decimal = { 12, 4 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
+			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "09", "ST" }, nomeExibicao = "Quantidade vendida do COFINS", tiposNaoPermitidos = {
+			"04", "05", "06", "07", "08", "09" })
 	private Double quantidadeVendida;
 
 	@XmlElement(name = "vCOFINS")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Valor COFINS", tiposNaoPermitidos = { "4", "6", "7", "8",
-			"9" })
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor COFINS", tiposNaoPermitidos = {
+			"04", "05", "06", "07", "08", "09" })
 	private Double valor;
 
 	@XmlElement(name = "vAliqProd")
-	@InformacaoValidavel(tiposObrigatorios = { "3", "9", "ST" }, nomeExibicao = "Valor da alíquota do COFINS")
+	@InformacaoValidavel(decimal = { 11, 4 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
+			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "09", "ST" }, tiposNaoPermitidos = {
+			"04", "05", "06", "07", "08", "09" }, nomeExibicao = "Valor da alíquota do COFINS")
 	private Double valorAliquota;
 
 	@XmlElement(name = "vBC")
-	@InformacaoValidavel(tiposObrigatorios = { "1", "2", "99", "ST" }, nomeExibicao = "Valor da base de cáculo do COFINS", tiposNaoPermitidos = {
-			"4", "6", "7", "8", "9" })
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "01", "02", "49", "50", "51", "52", "53", "54",
+			"55", "56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99",
+			"ST" }, nomeExibicao = "Valor da base de cáculo do COFINS", tiposNaoPermitidos = { "04", "05", "06", "07",
+			"08", "09" })
 	private Double valorBC;
 
 	public double calcularValor() {

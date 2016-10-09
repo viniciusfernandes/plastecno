@@ -9,27 +9,35 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Códido da situação tributária")
 public class PISGeral {
 	@XmlElement(name = "pPIS")
-	@InformacaoValidavel(obrigatorio = true, tiposNaoPermitidos = { "4", "6", "7", "8", "9" }, nomeExibicao = "Alíquota do PIS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, tiposNaoPermitidos = { "04", "05", "06", "07", "08",
+			"09" }, nomeExibicao = "Alíquota do PIS")
 	private Double aliquota;
 
 	@XmlElement(name = "CST")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Códido da situação tributária do PIS")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{2}", padraoExemplo = "2 dígitos", nomeExibicao = "Códido da situação tributária do PIS")
 	private String codigoSituacaoTributaria;
 
 	@XmlElement(name = "qBCProd")
-	@InformacaoValidavel(tiposObrigatorios = { "3", "99" }, tiposNaoPermitidos = { "4", "6", "7", "8", "9" }, nomeExibicao = "Quantidade vendida do PIS")
+	@InformacaoValidavel(decimal = { 12, 4 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
+			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99","ST" }, tiposNaoPermitidos = {
+			"04", "05", "06", "07", "08", "09" }, nomeExibicao = "Quantidade vendida do PIS")
 	private Integer quantidadeVendida;
 
 	@XmlElement(name = "vPIS")
-	@InformacaoValidavel(obrigatorio = true, tiposNaoPermitidos = { "4", "6", "7", "8", "9" }, nomeExibicao = "Valor do PIS")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, tiposNaoPermitidos = { "04", "05", "06", "07", "08",
+			"09" }, nomeExibicao = "Valor do PIS")
 	private Double valor;
 
 	@XmlElement(name = "vAliqProd")
-	@InformacaoValidavel(tiposObrigatorios = { "99" }, tiposNaoPermitidos = { "4", "6", "7", "8", "9" }, nomeExibicao = "Valor da alíquota do PIS")
+	@InformacaoValidavel(decimal = { 11, 4 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
+			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99","ST" }, tiposNaoPermitidos = {
+			"04", "05", "06", "07", "08", "09" }, nomeExibicao = "Valor da alíquota do PIS")
 	private Double valorAliquota;
 
 	@XmlElement(name = "vBC")
-	@InformacaoValidavel(tiposObrigatorios = { "1", "2", "99", "ST" }, tiposNaoPermitidos = { "4", "6", "7", "8", "9" }, nomeExibicao = "Valor de base de cáculo do PIS")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "01", "02", "49", "50", "51", "52", "53", "54",
+			"55", "56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99",
+			"ST" }, tiposNaoPermitidos = { "04", "05", "06", "07", "08", "09" }, nomeExibicao = "Valor de base de cáculo do PIS")
 	private Double valorBC;
 
 	public double calcularValor() {

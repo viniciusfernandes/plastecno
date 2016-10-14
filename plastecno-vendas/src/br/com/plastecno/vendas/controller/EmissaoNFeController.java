@@ -158,9 +158,10 @@ public class EmissaoNFeController extends AbstractController {
                 nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                         nFeService.gerarEnderecoNFe(logradouro, telefone));
             }
-            formatarDatas(nf, false);
 
-            redirecTo(this.getClass()).nfexml(nFeService.emitirNFe(new NFe(nf), idPedido));
+            formatarDatas(nf, false);
+            nFeService.emitirNFe(new NFe(nf), idPedido);
+            gerarMensagemSucesso("A NFe do pedido No. "+idPedido+" foi gerado com sucesso.");
         } catch (BusinessException e) {
             try {
                 formatarDatas(nf, true);

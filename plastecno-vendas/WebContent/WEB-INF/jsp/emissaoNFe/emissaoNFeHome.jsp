@@ -65,7 +65,8 @@ $(document).ready(function() {
 		gerarInputReboque();
 		gerarInputReferenciada();
 		
-		$( "#formEmissao input, #formEmissao textarea" ).each(function(i) {
+		$("#formEmissao input, #formEmissao textarea, #formEmissao select" ).each(function(i) {
+			<%-- A remocao dos campos em branco eh necessaria para que o vraptor nao popule os beans com seus atributos todos nulos --%>
 			if(isEmpty($(this).val())){
 				$(this).remove();
 			}
@@ -351,6 +352,7 @@ function inicializarMascaraImpostos(){
 	inserirMascaraDecimal('valorDespAduaneirasII', 15, 2);
 	
 	inserirMascaraDecimal('despesasAcessoriasProd', 15, 2);
+	inserirMascaraDecimal('valorFreteProd', 15, 2);
 	
 	inserirMascaraDecimal('qExport', 15, 2);
 	
@@ -506,7 +508,12 @@ function inicializarTabelaVolumes(){
 			'campos': campos,
 			'idLinhaSequencial': true,
 			'onValidar': function(){
-				return obrigatorioPreenchido(campos, null);
+				for (var i = 0; i < campos.length; i++) {
+					if(!isEmpty(document.getElementById(campos[i]).value)){
+						return true;
+					}
+				}
+				return false;
 			},
 			'idLinhaSequencial':true};
 	editarTabela(config);
@@ -714,6 +721,7 @@ function gerarJsonInfoProduto(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+']',
 		'campos':[{'nome':'informacoesAdicionais', 'id':'infoAdicionaisProd'}, 
 		          {'nome': 'produtoServicoNFe.outrasDespesasAcessorias', 'id':'despesasAcessoriasProd'},
+		          {'nome': 'produtoServicoNFe.valorTotalFrete', 'id':'valorFreteProd'},
 		          {'nome': 'numeroPedidoCompra', 'id':'numeroPedidoCompraProd'},
 		          {'nome': 'itemPedidoCompra', 'id':'itemPedidoCompraProd'},
 		          {'nome': 'fichaConteudoImportacao', 'id':'fciProd'}]};
@@ -1190,8 +1198,8 @@ function editarProduto(linha){
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.codigoSituacaoTributaria', 'idSelect': 'tipoTributacaoICMS', 'valor': '00'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.origemMercadoria', 'idSelect': 'origemMercadoriaICMS', 'valor': '0'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.modalidadeDeterminacaoBC', 'idSelect': 'modBCICMS', 'valor': '0'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins.tipoCofins.codigoSituacaoTributaria', 'idSelect': 'codSitTribCOFINS', 'valor': '1'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis.codigoSituacaoTributaria', 'idSelect': 'codSitTribPIS', 'valor': '1'}]};
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins.tipoCofins.codigoSituacaoTributaria', 'idSelect': 'codSitTribCOFINS', 'valor': '01'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis.codigoSituacaoTributaria', 'idSelect': 'codSitTribPIS', 'valor': '01'}]};
 	
 	inicializarOpcoesSelect(opcoes);
 	
@@ -1643,8 +1651,12 @@ function inicializarCalculoImpostos(){
 					<input type="text" id="itemPedidoCompraProd"  maxlength="6" style="width: 20%"/>
 				</div>
 				<div class="label">Valor Desp. Acess.:</div>
-				<div class="input" style="width: 80%">
-					<input type="text" id="despesasAcessoriasProd" style="width: 20%"/>
+				<div class="input" style="width: 10%">
+					<input type="text" id="despesasAcessoriasProd" />
+				</div>
+				<div class="label">Valor Frete:</div>
+				<div class="input" style="width: 50%">
+					<input type="text" id="valorFreteProd" style="width: 20%"/>
 				</div>
 				<div class="label">Núm. FCI:</div>
 				<div class="input" style="width: 70%">
@@ -1671,7 +1683,7 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div class="label obrigatorio">CEST:</div>
 					<div class="input" style="width: 40%">
-						<input type="text" id="cest" name="cest"  maxlength="8" style="width: 50%"/>
+						<input type="text" id="cest" name="cest"  maxlength="7" style="width: 50%"/>
 					</div>
 					<div class="label obrigatorio">CFOP:</div>
 					<div class="input" style="width: 80%">

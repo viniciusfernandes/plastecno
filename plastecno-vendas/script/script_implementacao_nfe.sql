@@ -12,6 +12,4 @@ insert into vendas.tb_configuracao_sistema (parametro, valor) values ('DIRETORIO
 insert into vendas.tb_configuracao_sistema (parametro, valor) values ('CNAE', '4689399');
 ALTER TABLE vendas.tb_configuracao_sistema ADD PRIMARY KEY (parametro);
 create index idx_transportadora_cnpj on vendas.tb_transportadora (cnpj);
-
-===============================================================
 create index idx_cliente_cnpj on vendas.tb_cliente (cnpj);

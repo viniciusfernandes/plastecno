@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.json;
 
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Transportadora;
 
 public class TransportadoraJson {
@@ -14,16 +15,20 @@ public class TransportadoraJson {
     private final String uf;
 
     public TransportadoraJson(Transportadora transp) {
+      this(transp, null);
+    }
+    
+    public TransportadoraJson(Transportadora transp, Logradouro logr) {
         id = transp == null ? 0 : transp.getId();
         nomeFantasia = transp == null ? "" : transp.getNomeFantasia();
         razaoSocial = transp == null ? "" : transp.getRazaoSocial();
         cnpj = transp == null ? "" : transp.getCnpj();
         inscricaoEstadual = transp == null ? "" : transp.getInscricaoEstadual();
 
-        if (transp != null && transp.getLogradouro() != null) {
-            endereco = transp.getLogradouro().getEndereco();
-            cidade = transp.getLogradouro().getCidade();
-            uf = transp.getLogradouro().getUf();
+        if (logr != null ) {
+            endereco = logr.getEndereco();
+            cidade = logr.getCidade();
+            uf = logr.getUf();
         } else {
             endereco = "";
             cidade = "";

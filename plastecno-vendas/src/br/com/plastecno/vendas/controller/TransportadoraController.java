@@ -104,7 +104,7 @@ public class TransportadoraController extends AbstractController {
     @Get("transportadora/cnpj")
     public void pesquisarTransportadoraByCnpj(String cnpj) {
         Transportadora t = transportadoraService.pesquisarByCnpj(cnpj);
-        serializarJson(new SerializacaoJson("transportadora", new TransportadoraJson(t)));
+        serializarJson(new SerializacaoJson("transportadora", new TransportadoraJson(t, t.getLogradouro())));
     }
 
     @Post("transportadora/contato/remocao/{idContato}")

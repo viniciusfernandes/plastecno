@@ -869,6 +869,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@Override
+	public boolean isPedidoVendaExistente(Integer idPedido) {
+		return pesquisarPedidoById(idPedido, false) != null;
+	}
+
 	@Override
 	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
 			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {

@@ -2,8 +2,9 @@ package br.com.plastecno.service.impl;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -241,7 +242,7 @@ public class NFeServiceImpl implements NFeService {
 		totaisICMS.setValorTotalICMSFundoProbeza(valorICMSFundoProbeza);
 		totaisICMS.setValorTotalICMSInterestadualDestino(valorICMSInterestadualDest);
 		totaisICMS.setValorTotalICMSInterestadualRemetente(valorICMSInterestadualRemet);
-		
+
 		totaisISSQN.setValorBC(valorBCISS);
 		totaisISSQN.setValorIss(valorISS);
 		totaisISSQN.setValorPis(valorPIS);
@@ -286,6 +287,8 @@ public class NFeServiceImpl implements NFeService {
 			throw new BusinessException("A NFe emitida não pode estar em branco");
 		}
 
+		validarEmissaoNFePedido(idPedido);
+
 		carregarValoresTransporte(nFe);
 		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
@@ -310,7 +313,13 @@ public class NFeServiceImpl implements NFeService {
 		String path = configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.DIRETORIO_XML_NFE);
 		BufferedWriter bw = null;
 		try {
-			bw = new BufferedWriter(new FileWriter(new File(path + "\\\\" + nome + ".xml")));
+			/*
+			 * MUITO IMPORTANTE: utilizamos aqui um OutputStreamWriter pois o
+			 * FileWriter utiliza o encoding do sistema operacional e nao
+			 * permite alteracoes do mesmo.
+			 */
+			bw = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(new File(path + "\\\\" + nome + ".xml")), "UTF-8"));
 			bw.write(xml);
 		} catch (IOException e) {
 			throw new BusinessException("Falha na escrita do XML da NFe no diretorio do sistema", e);
@@ -380,6 +389,9 @@ public class NFeServiceImpl implements NFeService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NFe gerarNFeByIdPedido(Integer idPedido) throws BusinessException {
+
+		validarEmissaoNFePedido(idPedido);
+
 		String xmlNFe = pedidoNFeDAO.pesquisarXMLNFeByIdPedido(idPedido);
 		if (xmlNFe == null || xmlNFe.trim().isEmpty()) {
 			return null;
@@ -421,5 +433,18 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Object[]> pesquisarCFOP() {
 		return configuracaoSistemaService.pesquisarCFOP();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public void validarEmissaoNFePedido(Integer idPedido) throws BusinessException {
+		if (!pedidoService.isPedidoVendaExistente(idPedido)) {
+			throw new BusinessException("O pedido de venda No. " + idPedido + " não existe no sistema");
+		}
+		Integer idRepresentada = pedidoService.pesquisarIdRepresentadaByIdPedido(idPedido);
+		if (!representadaService.isRevendedor(idRepresentada)) {
+			throw new BusinessException("O pedido de venda No. " + idPedido
+					+ " não esta associado a um revendedor cadastrado no sistema");
+		}
 	}
 }

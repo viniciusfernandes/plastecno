@@ -65,7 +65,7 @@ public class DadosNFe {
 
 	@XmlAttribute(name = "versao")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Versão da NFe")
-	private final Double versao = 2.0d;
+	private final Double versao = 3.10d;
 
 	public boolean contemDuplicata() {
 		return cobrancaNFe != null && cobrancaNFe.contemDuplicata();

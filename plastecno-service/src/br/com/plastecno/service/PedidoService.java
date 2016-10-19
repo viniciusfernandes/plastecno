@@ -276,4 +276,6 @@ public interface PedidoService {
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
 
+	boolean isPedidoVendaExistente(Integer idPedido);
+
 }

@@ -161,7 +161,7 @@ public class EmissaoNFeController extends AbstractController {
 
             formatarDatas(nf, false);
             nFeService.emitirNFe(new NFe(nf), idPedido);
-            gerarMensagemSucesso("A NFe do pedido No. "+idPedido+" foi gerado com sucesso.");
+            gerarMensagemSucesso("A NFe do pedido No. " + idPedido + " foi gerado com sucesso.");
         } catch (BusinessException e) {
             try {
                 formatarDatas(nf, true);
@@ -339,8 +339,7 @@ public class EmissaoNFeController extends AbstractController {
                 l.setEndereco(e.getLogradouro());
                 l.setCidade(e.getNomeMunicipio());
                 l.setPais(e.getNomePais());
-                l.setNumero(e.getNumero() == null || e.getNumero().trim().isEmpty() ? null : Integer.parseInt(e
-                        .getNumero()));
+                l.setNumero(e.getNumero() == null || e.getNumero().trim().isEmpty() ? null : e.getNumero());
                 l.setUf(e.getUF());
                 l.setCodigoMunicipio(e.getCodigoMunicipio());
                 addAtributo("telefoneContatoPedido", e.getTelefone());

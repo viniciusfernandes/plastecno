@@ -27,4 +27,6 @@ public interface NFeService {
 
 	List<Object[]> pesquisarCFOP();
 
+	void validarEmissaoNFePedido(Integer idPedido) throws BusinessException;
+
 }

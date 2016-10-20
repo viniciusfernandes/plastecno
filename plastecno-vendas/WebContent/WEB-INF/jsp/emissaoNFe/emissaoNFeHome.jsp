@@ -310,7 +310,32 @@ $(document).ready(function() {
 	inicializarCalculoImpostos();
 	
 	inicializarMascaraReferenciada();
+	inicializarAlteracaoTabelaProdutos();
 });
+
+function inicializarAlteracaoTabelaProdutos(){
+	var alterarColuna = function(indice, valor){
+		if(numeroProdutoEdicao == null || numeroProdutoEdicao < 0){
+			return;
+		}
+		var linhas = document.getElementById('tabela_produtos').rows;
+		var item = numeroProdutoEdicao + 1;
+		for (var i = 0; i < linhas.length; i++) {
+			if(item == linhas[i].cells[0].innerHTML){
+				linhas[i].cells[indice].innerHTML = valor;
+			}
+		}
+	};
+	
+	$('#bloco_tributos #cfop').change(function (){
+		alterarColuna(12, $(this).val());
+	});
+	
+	$('#bloco_tributos #ncm').keyup(function (){
+		alterarColuna(11, $(this).val());
+	});
+};
+
 function inicializarMascaraReferenciada(){
 	$('#chaveReferenciada').mask('9999.9999.9999.9999.9999.9999.9999.9999.9999.9999.9999');
 };
@@ -1151,12 +1176,13 @@ function editarProduto(linha){
 	
 	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
 	--numeroProdutoEdicao;
-	var valorBC = celulas[6].innerHTML;
+	var valorBC = celulas[5].innerHTML;
 	
 	var valoresTabela = {'campos':[{'id': 'itemPedidoCompraProd', 'valorTabela':celulas[0].innerHTML},
-								   {'id': 'ncm', 'valorTabela': celulas[2].innerHTML},
-	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[10].innerHTML},
-	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[11].innerHTML},
+								   {'id': 'ncm', 'valorTabela': celulas[11].innerHTML},
+								   {'id': 'cfop', 'valorTabela': celulas[12].innerHTML},
+	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[9].innerHTML},
+	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[10].innerHTML},
 	                               {'id': 'valorBCPIS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCCOFINS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCICMS', 'valorTabela': valorBC},
@@ -1605,7 +1631,6 @@ function inicializarCalculoImpostos(){
 					<tr>
 						<th>Item</th>
 						<th>Desc.</th>
-						<th>NCM</th>
 						<th>Venda</th>
 						<th>Qtde.</th>
 						<th>Unid.(R$)</th>
@@ -1615,6 +1640,8 @@ function inicializarCalculoImpostos(){
 						<th>V IPI.(R$)</th>
 						<th>Aliq. ICMS(%)</th>
 						<th>Aliq. IPI(%)</th>
+						<th>NCM</th>
+						<th>CFOP</th>
 						<th style="width: 2%">Ações</th>
 					</tr>
 				</thead>
@@ -1623,7 +1650,6 @@ function inicializarCalculoImpostos(){
 						<tr>
 							<td>${item.sequencial}</td>
 							<td>${item.descricaoSemFormatacao}</td>
-							<td>${item.ncm}</td>
 							<td>${item.tipoVenda}</td>
 							<td>${item.quantidade}</td>
 							<td>${item.precoUnidadeFormatado}</td>
@@ -1633,6 +1659,8 @@ function inicializarCalculoImpostos(){
 							<td>${item.valorIPIFormatado}</td>
 							<td>${item.aliquotaICMS}</td>
 							<td>${item.aliquotaIPI}</td>
+							<td>${item.ncm}</td>
+							<td></td>
 							<td>
 								<input type="button" value="" title="Editar Produto" class="botaoDinheiroPequeno" onclick="editarProduto(this.parentNode.parentNode);"/>
 							</td>

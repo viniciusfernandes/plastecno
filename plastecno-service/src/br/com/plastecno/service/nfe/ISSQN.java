@@ -35,7 +35,7 @@ public class ISSQN {
 		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
 	}
 
-	public ISSQN carregarValoresAliquotas() {
+	public ISSQN carregarValores() {
 		valor = calcularValor();
 		return this;
 	}

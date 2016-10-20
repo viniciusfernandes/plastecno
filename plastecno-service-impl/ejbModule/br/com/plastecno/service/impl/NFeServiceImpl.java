@@ -184,11 +184,11 @@ public class NFeServiceImpl implements NFeService {
 				valorBC += tipoIcms.getValorBC();
 				valorBCST += tipoIcms.getValorBCST();
 				valorST += tipoIcms.getValorST();
-				valorICMS += tipoIcms.carregarValoresAliquotas().getValor();
+				valorICMS += tipoIcms.carregarValores().getValor();
 			}
 
 			if (tributo != null && tributo.contemICMSInterestadual()) {
-				icmsInter = tributo.getIcmsInterestadual().carregarValoresAliquotas();
+				icmsInter = tributo.getIcmsInterestadual().carregarValores();
 
 				valorICMSFundoProbeza += icmsInter.getValorFCPDestino();
 				valorICMSInterestadualDest += icmsInter.getValorUFDestino();
@@ -196,24 +196,24 @@ public class NFeServiceImpl implements NFeService {
 			}
 
 			if (tributo != null && tributo.contemIPI()) {
-				valorIPI += tributo.getTipoIpi().carregarValoresAliquotas().getValor();
+				valorIPI += tributo.getTipoIpi().carregarValores().getValor();
 			}
 
 			if (tributo != null && tributo.contemPIS()) {
-				valorPIS += tributo.getTipoPis().carregarValoresAliquotas().getValor();
+				valorPIS += tributo.getTipoPis().carregarValores().getValor();
 			}
 
 			if (tributo != null && tributo.contemCOFINS()) {
-				valorCOFINS += tributo.getTipoCofins().carregarValoresAliquotas().getValor();
-			}
-
-			if (tributo != null && tributo.contemImpostoImportacao()) {
-				valorImportacao += tributo.getImpostoImportacao().getValor();
+				valorCOFINS += tributo.getTipoCofins().carregarValores().getValor();
 			}
 
 			if (tributo != null && tributo.contemISS()) {
 				valorBCISS += tributo.getIssqn().getValorBC();
-				valorISS += tributo.getIssqn().carregarValoresAliquotas().getValor();
+				valorISS += tributo.getIssqn().carregarValores().getValor();
+			}
+
+			if (tributo != null && tributo.contemImpostoImportacao()) {
+				valorImportacao += tributo.getImpostoImportacao().getValor();
 			}
 
 			produto = item.getProdutoServicoNFe();
@@ -389,9 +389,6 @@ public class NFeServiceImpl implements NFeService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NFe gerarNFeByIdPedido(Integer idPedido) throws BusinessException {
-
-		validarEmissaoNFePedido(idPedido);
-
 		String xmlNFe = pedidoNFeDAO.pesquisarXMLNFeByIdPedido(idPedido);
 		if (xmlNFe == null || xmlNFe.trim().isEmpty()) {
 			return null;

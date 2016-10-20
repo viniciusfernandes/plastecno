@@ -490,13 +490,21 @@ function obrigatorioPreenchido(ids, idExcl){
 	return true;
 };
 
+function algumPreenchido(ids){
+	for (var i = 0; i < ids.length; i++) {
+		if(!isEmpty(document.getElementById(ids[i]).value)){
+			return true;
+		}
+	}
+	return false;
+};
+
 function inicializarTabelaReferenciada(){
 	var campos = ['chaveReferenciada', 'numeroReferenciada', 'serieReferenciada', 'modReferenciada', 'cnpjReferenciada', 'anoMesReferenciada', 'ufReferenciada'];
 	var config = {'idTabela': 'tabela_referenciada', 'idBotaoInserir':'botaoInserirReferenciada',
 			'campos': campos,
-			'idLinhaSequencial': true,
 			'onValidar': function(){
-				return obrigatorioPreenchido(campos, null);
+				return algumPreenchido(campos);
 			},
 			'idLinhaSequencial':true};
 	editarTabela(config);
@@ -506,14 +514,8 @@ function inicializarTabelaVolumes(){
 	var campos = ['quantidadeVolume', 'especieVolume', 'marcaVolume', 'numeracaoVolume', 'pesoLiquidoVolume', 'pesoBrutoVolume'];
 	var config = {'idTabela': 'tabela_volume', 'idBotaoInserir':'botaoInserirVolume',
 			'campos': campos,
-			'idLinhaSequencial': true,
 			'onValidar': function(){
-				for (var i = 0; i < campos.length; i++) {
-					if(!isEmpty(document.getElementById(campos[i]).value)){
-						return true;
-					}
-				}
-				return false;
+				return algumPreenchido(campos);
 			},
 			'idLinhaSequencial':true};
 	editarTabela(config);
@@ -1390,7 +1392,7 @@ function inicializarCalculoImpostos(){
 				<legend>::: Destinatário ::: -</legend>
 				<div class="label">Razão Social/Nome:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}"  style="width: 60%"/>
+					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}"  maxlength="70" style="width: 60%"/>
 					<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 				</div>
 				
@@ -1435,31 +1437,31 @@ function inicializarCalculoImpostos(){
 		
 		<fieldset id="bloco_referenciada">
 			<legend>::: NF/NFe Referenciada ::: -</legend>
-			<div class="label obrigatorio">Chave Acesso:</div>
+			<div class="label">Chave Acesso:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" id="chaveReferenciada" style="width: 50%"/>
 			</div>
-			<div class="label obrigatorio">Núm. Doc. Fiscal:</div>
+			<div class="label">Núm. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroReferenciada" maxlength="9"/>
 			</div>
-			<div class="label obrigatorio">Série. Doc. Fiscal:</div>
+			<div class="label">Série. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="serieReferenciada" maxlength="3"/>
 			</div>
-			<div class="label obrigatorio">Mod. Doc. Fiscal:</div>
+			<div class="label">Mod. Doc. Fiscal:</div>
 			<div class="input" style="width: 20%">
 				<input type="text" id="modReferenciada" maxlength="2" style="width: 50%"/>
 			</div>
-			<div class="label obrigatorio">CNPJ Emit.:</div>
+			<div class="label">CNPJ Emit.:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="cnpjReferenciada" maxlength="14"/>
 			</div>
-			<div class="label obrigatorio">Emis. Ano/Mês (AAMM):</div>
+			<div class="label">Emis. Ano/Mês (AAMM):</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="anoMesReferenciada" maxlength="4"/>
 			</div>
-			<div class="label obrigatorio">UF Emit.:</div>
+			<div class="label">UF Emit.:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="ufReferenciada" maxlength="2"/>
 			</div>

@@ -101,7 +101,7 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe/valorICMSInterestadual")
     public void calcularValorICMSInterestadual(ICMSInterestadual icms) {
-        icms.carregarValoresAliquotas();
+        icms.carregarValores();
         icms.setValorFCPDestino(NumeroUtils.arredondarValorMonetario(icms.getValorFCPDestino()));
         icms.setValorUFDestino(NumeroUtils.arredondarValorMonetario(icms.getValorUFDestino()));
         icms.setValorUFRemetente(NumeroUtils.arredondarValorMonetario(icms.getValorUFRemetente()));
@@ -149,33 +149,40 @@ public class EmissaoNFeController extends AbstractController {
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
         try {
-            // Verificando condicao para gerar o endereco do destinatario a
-            // partir do logradouro
-            if (nf != null && nf.getIdentificacaoDestinatarioNFe() != null
-                    && nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe() != null) {
-
-                String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
-                nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
-                        nFeService.gerarEnderecoNFe(logradouro, telefone));
-            }
-
-            formatarDatas(nf, false);
-            nFeService.emitirNFe(new NFe(nf), idPedido);
-            gerarMensagemSucesso("A NFe do pedido No. " + idPedido + " foi gerado com sucesso.");
-        } catch (BusinessException e) {
+            nFeService.validarEmissaoNFePedido(idPedido);
             try {
-                formatarDatas(nf, true);
-            } catch (BusinessException e1) {
-                e.addMensagem(e1.getListaMensagem());
-            }
-            popularNFe(nf, idPedido);
+                // Verificando condicao para gerar o endereco do destinatario a
+                // partir do logradouro
+                if (nf != null && nf.getIdentificacaoDestinatarioNFe() != null
+                        && nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe() != null) {
 
-            gerarListaMensagemErro(e);
-            redirecTo(this.getClass()).emissaoNFeHome();
-            irTopoPagina();
-        } catch (Exception e) {
-            gerarLogErro("Emissão da NFe", e);
+                    String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
+                    nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
+                            nFeService.gerarEnderecoNFe(logradouro, telefone));
+                }
+
+                formatarDatas(nf, false);
+                nFeService.emitirNFe(new NFe(nf), idPedido);
+                gerarMensagemSucesso("A NFe do pedido No. " + idPedido + " foi gerado com sucesso.");
+            } catch (BusinessException e) {
+                try {
+                    formatarDatas(nf, true);
+                } catch (BusinessException e1) {
+                    e.addMensagem(e1.getListaMensagem());
+                }
+                popularNFe(nf, idPedido);
+
+                gerarListaMensagemErro(e);
+                redirecTo(this.getClass()).emissaoNFeHome();
+                irTopoPagina();
+            } catch (Exception e) {
+                gerarLogErro("Emissão da NFe", e);
+            }
+        } catch (BusinessException e2) {
+            gerarListaMensagemErro(e2.getListaMensagem());
+            addAtributo("idPedido", idPedido);
         }
+
         irTopoPagina();
     }
 
@@ -284,38 +291,43 @@ public class EmissaoNFeController extends AbstractController {
     public void pesquisarPedidoById(Integer idPedido) {
         NFe nFe = null;
         try {
-            nFe = nFeService.gerarNFeByIdPedido(idPedido);
-        } catch (BusinessException e) {
-            gerarListaMensagemErro(e.getListaMensagem());
-        }
-
-        if (nFe != null) {
-            popularNFe(nFe.getDadosNFe(), idPedido);
+            nFeService.validarEmissaoNFePedido(idPedido);
             try {
-                formatarDatas(nFe.getDadosNFe(), true);
+                nFe = nFeService.gerarNFeByIdPedido(idPedido);
             } catch (BusinessException e) {
-                gerarListaMensagemErro(e);
+                gerarListaMensagemErro(e.getListaMensagem());
             }
-        } else {
-            Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
-            List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
-            Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
-            List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 
-            arredondarValoresItemPedido(listaItem);
+            if (nFe != null) {
+                popularNFe(nFe.getDadosNFe(), idPedido);
+                try {
+                    formatarDatas(nFe.getDadosNFe(), true);
+                } catch (BusinessException e) {
+                    gerarListaMensagemErro(e);
+                }
+            } else {
+                Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
+                List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
+                Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
+                List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 
-            addAtributo("listaDuplicata", listaDuplicata);
-            addAtributo("cliente", cliente);
-            addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
-            addAtributo("logradouro",
-                    cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
-            addAtributo("listaItem", listaItem);
+                arredondarValoresItemPedido(listaItem);
+
+                addAtributo("listaDuplicata", listaDuplicata);
+                addAtributo("cliente", cliente);
+                addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
+                addAtributo("logradouro",
+                        cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
+                addAtributo("listaItem", listaItem);
+                addAtributo("idPedido", idPedido);
+                addAtributo("telefoneContatoPedido", telefone.length > 0 ? String.valueOf(telefone[0])
+                        + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
+            }
+        } catch (BusinessException e1) {
+            gerarListaMensagemErro(e1.getListaMensagem());
             addAtributo("idPedido", idPedido);
-            addAtributo(
-                    "telefoneContatoPedido",
-                    telefone.length > 0 ? String.valueOf(telefone[0])
-                            + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
         }
+
         irTopoPagina();
     }
 

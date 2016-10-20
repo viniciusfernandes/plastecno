@@ -39,18 +39,24 @@ public class ICMSInterestadual {
 	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, nomeExibicao = "Valor de destino do remetente do ICMS interestadual")
 	private Double valorUFRemetente;
 
-	public ICMSInterestadual carregarValoresAliquotas() {
-		double aliquotaDif = ((aliquotaUFDestino != null ? aliquotaUFDestino : 0) - (aliquotaInterestadual != null ? aliquotaInterestadual
-				: 0)) / 100d;
-		valorFCPDestino = valorBCUFDestino != null && percentualFCPDestino != null ? valorBCUFDestino
-				* (percentualFCPDestino / 100d) : 0d;
+	public ICMSInterestadual carregarValores() {
+		if (valorBCUFDestino != null && percentualFCPDestino != null) {
+			valorFCPDestino = valorBCUFDestino * percentualFCPDestino / 100d;
+		} else {
+			valorFCPDestino = 0d;
+		}
 
-		valorUFDestino = valorBCUFDestino != null && aliquotaUFDestino != null ? valorBCUFDestino * aliquotaDif : 0d;
-		valorUFDestino *= (percentualProvisorioPartilha != null ? percentualProvisorioPartilha : 0d) / 100d;
+		if (valorBCUFDestino != null && aliquotaUFDestino != null && percentualProvisorioPartilha != null) {
+			valorUFDestino = valorBCUFDestino * aliquotaUFDestino * percentualProvisorioPartilha / 10000d;
+		} else {
+			valorUFDestino = 0d;
+		}
 
-		valorUFRemetente = valorBCUFDestino != null && aliquotaInterestadual != null ? valorBCUFDestino * aliquotaDif
-				: 0d;
-		valorUFRemetente -= valorUFDestino;
+		if (valorBCUFDestino != null && aliquotaUFDestino != null) {
+			valorUFRemetente = valorBCUFDestino * aliquotaUFDestino / 100d - valorUFDestino;
+		} else {
+			valorFCPDestino = 0d;
+		}
 		return this;
 	}
 

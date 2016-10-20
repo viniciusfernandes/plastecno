@@ -109,7 +109,7 @@ public class ICMSGeral {
 		return valorBCST != null && aliquotaST != null ? valorBCST * (aliquotaST / 100d) : 0d;
 	}
 
-	public ICMSGeral carregarValoresAliquotas() {
+	public ICMSGeral carregarValores() {
 		valor = calcularValor();
 		valorST = calcularValorST();
 		return this;

@@ -13,8 +13,7 @@ public class IdentificacaoDestinatarioNFe {
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
-	@InformacaoValidavel(padrao = "\\d{11}", padraoExemplo = "11 digitos", substituicao = { "\\D",
-			"" }, nomeExibicao = "CPF do destinatário")
+	@InformacaoValidavel(padrao = "\\d{11}", padraoExemplo = "11 digitos", substituicao = { "\\D", "" }, nomeExibicao = "CPF do destinatário")
 	@XmlElement(name = "CPF")
 	private String cpf;
 
@@ -37,7 +36,7 @@ public class IdentificacaoDestinatarioNFe {
 	@XmlElement(name = "ISUF")
 	private String inscricaoSUFRAMA;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 2, 60 }, nomeExibicao = "Nome do destinatário")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 2, 70 }, nomeExibicao = "Nome do destinatário")
 	@XmlElement(name = "xNome")
 	private String nomeFantasia;
 

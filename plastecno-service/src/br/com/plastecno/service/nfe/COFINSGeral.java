@@ -45,7 +45,7 @@ public class COFINSGeral {
 		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
 	}
 
-	public COFINSGeral carregarValoresAliquotas() {
+	public COFINSGeral carregarValores() {
 		valor = calcularValor();
 		valorAliquota = valor;
 		return this;

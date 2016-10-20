@@ -44,7 +44,7 @@ public class PISGeral {
 		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
 	}
 
-	public PISGeral carregarValoresAliquotas() {
+	public PISGeral carregarValores() {
 		valor = calcularValor();
 		valorAliquota = valor;
 		return this;

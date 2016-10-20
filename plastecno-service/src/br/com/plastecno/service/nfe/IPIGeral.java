@@ -36,7 +36,7 @@ public class IPIGeral {
 		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
 	}
 
-	public IPIGeral carregarValoresAliquotas() {
+	public IPIGeral carregarValores() {
 		valor = calcularValor();
 		return this;
 	}

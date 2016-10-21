@@ -1844,11 +1844,11 @@ function inicializarCalculoImpostos(){
 					<div class="input" style="width: 10%">
 						<input id="valorFCPICMSInter" type="text" readonly="readonly" style="width: 100%" />
 					</div>
-					<div  class="label">Val. ICMS:</div>
+					<div  class="label">Val. ICMS Destino:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorICMSInter" type="text" readonly="readonly" style="width: 100%" />
 					</div>
-					<div  class="label">Val. Part:</div>
+					<div  class="label">Val. ICMS Remetente:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorPartICMSInter" type="text" readonly="readonly" style="width: 100%" />
 					</div>

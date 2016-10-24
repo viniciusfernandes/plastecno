@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-@InformacaoValidavel
+@InformacaoValidavel(campoIdentificacao = "numeroItem")
 public class DetalhamentoProdutoServicoNFe {
 	@InformacaoValidavel(tamanho = 36, nomeExibicao = "FCI de produtos/serviços")
 	@XmlElement(name = "nFCI")

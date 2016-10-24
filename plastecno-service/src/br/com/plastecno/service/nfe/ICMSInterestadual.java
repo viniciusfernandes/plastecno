@@ -87,17 +87,17 @@ public class ICMSInterestadual {
 
 	@XmlTransient
 	public Double getValorFCPDestino() {
-		return valorFCPDestino;
+		return valorFCPDestino == null ? 0 : valorFCPDestino;
 	}
 
 	@XmlTransient
 	public Double getValorUFDestino() {
-		return valorUFDestino;
+		return valorUFDestino == null ? 0 : valorUFDestino;
 	}
 
 	@XmlTransient
 	public Double getValorUFRemetente() {
-		return valorUFRemetente;
+		return valorUFRemetente == null ? 0 : valorUFRemetente;
 	}
 
 	public void setAliquotaInterestadual(Double aliquotaInterestadual) {

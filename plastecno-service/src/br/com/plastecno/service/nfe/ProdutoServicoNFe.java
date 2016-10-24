@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-@InformacaoValidavel
+@InformacaoValidavel(campoIdentificacao = "codigo")
 public class ProdutoServicoNFe {
 	@XmlElement(name = "CEST")
 	@InformacaoValidavel(padrao = "\\d{7}", padraoExemplo = "7 dígitos", nomeExibicao = "CEST do produtos/serviços")

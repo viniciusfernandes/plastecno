@@ -2,10 +2,13 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "logradouro", "numero", "complemento", "bairro", "codigoMunicipio", "nomeMunicipio", "UF",
+		"cep", "codigoPais", "nomePais", "telefone" })
 public class EnderecoNFe {
 
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 2, 60 }, nomeExibicao = "Bairro do endereço")

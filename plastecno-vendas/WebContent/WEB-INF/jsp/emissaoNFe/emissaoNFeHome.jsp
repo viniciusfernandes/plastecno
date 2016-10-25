@@ -1006,13 +1006,13 @@ function gerarInputProdutoServico(){
 		produto = {'nomeObjeto':'nf.listaItem['+i+'].produtoServicoNFe',
 				'campos':[{'nome':'codigo', 'valor': celulas[1].innerHTML},
 				          {'nome':'descricao', 'valor': celulas[1].innerHTML},
-				          {'nome':'unidadeComercial', 'valor': celulas[4].innerHTML},
+				          {'nome':'unidadeComercial', 'valor': celulas[2].innerHTML},
 				          {'nome':'quantidadeComercial', 'valor': celulas[5].innerHTML},
-				          {'nome':'quantidadeTributavel', 'valor': celulas[5].innerHTML},
-				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[6].innerHTML},
+				          {'nome':'quantidadeTributavel', 'valor': celulas[3].innerHTML},
+				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[4].innerHTML},
 				          {'nome':'valorTotalBruto', 'valor': celulas[7].innerHTML},
-				          {'nome':'unidadeTributavel', 'valor': celulas[3].innerHTML},
-				          {'nome':'valorUnitarioTributacao', 'valor': celulas[5].innerHTML}
+				          {'nome':'unidadeTributavel', 'valor': celulas[2].innerHTML},
+				          {'nome':'valorUnitarioTributacao', 'valor': celulas[4].innerHTML}
 					]};
 		
 		gerarInputHidden(detalhamento);
@@ -1646,21 +1646,21 @@ function inicializarCalculoImpostos(){
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="item" items="${listaItem}" varStatus="count">
+					<c:forEach var="p" items="${listaProduto}" varStatus="count">
 						<tr>
-							<td>${item.sequencial}</td>
-							<td>${item.descricaoSemFormatacao}</td>
-							<td>${item.tipoVenda}</td>
-							<td>${item.quantidade}</td>
-							<td>${item.precoUnidadeFormatado}</td>
-							<td>${item.valorTotalFormatado}</td>
-							<td>${item.valorTotalFormatado}</td>
-							<td>${item.valorICMSFormatado}</td>
-							<td>${item.valorIPIFormatado}</td>
-							<td>${item.aliquotaICMS}</td>
-							<td>${item.aliquotaIPI}</td>
-							<td>${item.ncm}</td>
-							<td></td>
+							<td>${p.numeroItem}</td>
+							<td>${p.descricao}</td>
+							<td>${p.unidadeComercial}</td>
+							<td>${p.quantidade}</td>
+							<td>${p.valorUnitarioComercializacao}</td>
+							<td>${p.valorTotalBruto}</td>
+							<td>${p.valorTotalBruto}</td>
+							<td>${p.valorICMS}</td>
+							<td>${p.valorIPI}</td>
+							<td>${p.aliquotaICMS}</td>
+							<td>${p.aliquotaIPI}</td>
+							<td>${p.ncm}</td>
+							<td>${p.cfop}</td>
 							<td>
 								<input type="button" value="" title="Editar Produto" class="botaoDinheiroPequeno" onclick="editarProduto(this.parentNode.parentNode);"/>
 							</td>

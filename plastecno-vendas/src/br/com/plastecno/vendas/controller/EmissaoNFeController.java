@@ -2,6 +2,7 @@ package br.com.plastecno.vendas.controller;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +33,7 @@ import br.com.plastecno.service.nfe.ICMSInterestadual;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.IdentificacaoNFe;
 import br.com.plastecno.service.nfe.NFe;
+import br.com.plastecno.service.nfe.ProdutoServicoNFe;
 import br.com.plastecno.service.nfe.TransportadoraNFe;
 import br.com.plastecno.service.nfe.TransporteNFe;
 import br.com.plastecno.service.nfe.constante.TipoAliquotaICMSInterestadual;
@@ -59,6 +61,7 @@ import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
+import br.com.plastecno.vendas.json.ProdutoServicoJson;
 import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
@@ -274,6 +277,98 @@ public class EmissaoNFeController extends AbstractController {
         return l;
     }
 
+    private List<ProdutoServicoJson> gerarListaProduto(List<Object[]> listaValores) {
+        List<ProdutoServicoJson> l = new ArrayList<ProdutoServicoJson>();
+
+        if (listaValores == null || listaValores.size() <= 0) {
+            return l;
+        }
+        ProdutoServicoJson p = null;
+        for (Object[] val : listaValores) {
+            p = new ProdutoServicoJson();
+            p.setAliquotaICMS(NumeroUtils.arredondarValorMonetario((Double) val[0]));
+            p.setAliquotaIPI(NumeroUtils.arredondarValorMonetario((Double) val[1]));
+            p.setCfop((String) val[2]);
+            p.setDescricao((String) val[3]);
+            p.setNcm((String) val[4]);
+            p.setNumeroItem((Integer) val[5]);
+            p.setQuantidade((Integer) val[6]);
+            p.setUnidadeComercial((String) val[7]);
+            p.setValorTotalBruto(NumeroUtils.arredondarValorMonetario((Double) val[8]));
+            p.setValorUnitarioComercializacao(NumeroUtils.arredondarValorMonetario((Double) val[9]));
+            p.setValorUnitarioTributavel(NumeroUtils.arredondarValorMonetario((Double) val[10]));
+            p.setValorICMS(NumeroUtils.arredondarValorMonetario((Double) val[11]));
+            p.setValorIPI(NumeroUtils.arredondarValorMonetario((Double) val[12]));
+            l.add(p);
+        }
+        return l;
+    }
+
+    private List<ProdutoServicoJson> gerarListaProdutoDetalhamento(List<DetalhamentoProdutoServicoNFe> listaDetalhamento) {
+        return gerarListaProduto(gerarListaValoresDetalhamento(listaDetalhamento));
+    }
+
+    private List<ProdutoServicoJson> gerarListaProdutoItemPedido(List<ItemPedido> listaItem) {
+        return gerarListaProduto(gerarListaValoresItemPedido(listaItem));
+    }
+
+    private List<Object[]> gerarListaValoresDetalhamento(List<DetalhamentoProdutoServicoNFe> lista) {
+        if (lista == null || lista.isEmpty()) {
+            return null;
+        }
+        List<Object[]> l = new ArrayList<Object[]>();
+        Object[] val = null;
+        ProdutoServicoNFe p = null;
+        for (DetalhamentoProdutoServicoNFe i : lista) {
+            p = i.getProduto();
+            val = new Object[13];
+            val[0] = i.contemICMS() ? i.getTributos().getIcms().getTipoIcms().getAliquota() : 0;
+            val[1] = i.contemIPI() ? i.getTributos().getIpi().getTipoIpi().getAliquota() : 0;
+            val[2] = p.getCfop();
+            val[3] = p.getDescricao();
+            val[4] = p.getNcm();
+            val[5] = i.getNumeroItem();
+            val[6] = p.getQuantidadeTributavel();
+            val[7] = p.getUnidadeComercial();
+            val[8] = p.getValorTotalBruto();
+            val[9] = p.getValorUnitarioComercializacao();
+            val[10] = p.getValorUnitarioComercializacao();
+            val[11] = i.contemICMS() ? i.getTributos().getIcms().getTipoIcms().getValor() : 0d;
+            val[12] = i.contemIPI() ? i.getTributos().getIpi().getTipoIpi().getValor() : 0d;
+
+            l.add(val);
+        }
+        return l;
+    }
+
+    private List<Object[]> gerarListaValoresItemPedido(List<ItemPedido> lista) {
+        if (lista == null || lista.isEmpty()) {
+            return null;
+        }
+        List<Object[]> l = new ArrayList<Object[]>();
+
+        Object[] val = null;
+        for (ItemPedido i : lista) {
+            val = new Object[13];
+            val[0] = i.getAliquotaICMS();
+            val[1] = i.getAliquotaIPI();
+            val[2] = "";
+            val[3] = i.getDescricaoSemFormatacao();
+            val[4] = i.getNcm();
+            val[5] = i.getSequencial();
+            val[6] = i.getQuantidade();
+            val[7] = i.getTipoVenda().toString();
+            val[8] = i.getValorTotal();
+            val[9] = i.getPrecoUnidade();
+            val[10] = i.getPrecoUnidade();
+            val[11] = i.getValorICMS();
+            val[12] = i.getPrecoUnidadeIPI();
+
+            l.add(val);
+        }
+        return l;
+    }
+
     @SuppressWarnings("unchecked")
     private void inicializarListaCfop(HttpServletRequest request) {
         if ((listaCfop = (List<Object[]>) request.getServletContext().getAttribute("listaCfop")) != null) {
@@ -291,6 +386,10 @@ public class EmissaoNFeController extends AbstractController {
     public void pesquisarPedidoById(Integer idPedido) {
         NFe nFe = null;
         try {
+            /*
+             * Essa validacao eh necessaria pois o usuario nao pode aessar um
+             * pedido que nao podera ser emitido
+             */
             nFeService.validarEmissaoNFePedido(idPedido);
             try {
                 nFe = nFeService.gerarNFeByIdPedido(idPedido);
@@ -310,15 +409,14 @@ public class EmissaoNFeController extends AbstractController {
                 List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
                 Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
                 List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-
                 arredondarValoresItemPedido(listaItem);
 
+                addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
                 addAtributo("listaDuplicata", listaDuplicata);
                 addAtributo("cliente", cliente);
                 addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
                 addAtributo("logradouro",
                         cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
-                addAtributo("listaItem", listaItem);
                 addAtributo("idPedido", idPedido);
                 addAtributo("telefoneContatoPedido", telefone.length > 0 ? String.valueOf(telefone[0])
                         + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
@@ -372,12 +470,9 @@ public class EmissaoNFeController extends AbstractController {
         popularDestinatario(nf);
         popularTransporte(nf);
 
-        List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-        arredondarValoresItemPedido(listaItem);
-
         addAtributo("idPedido", idPedido);
         addAtributo("nf", nf);
-        addAtributo("listaItem", listaItem);
+        addAtributo("listaProduto", gerarListaProdutoDetalhamento(nf.getListaDetalhamentoProdutoServicoNFe()));
 
         IdentificacaoNFe iNFe = null;
         if ((iNFe = nf.getIdentificacaoNFe()) != null) {

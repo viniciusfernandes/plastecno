@@ -11,9 +11,11 @@ public final class StringUtils {
 	private static final String DATA_HORA_PATTERN = "dd/MM/yyyy HH:mm:ss";
 
 	private static final String DATA_PATTERN = "dd/MM/yyyy";
+	private static final String DATA_PATTERN_AMERICANO = "yyyy-MM-dd";
 
 	private static final SimpleDateFormat FORMATADOR_DATA = new SimpleDateFormat(DATA_PATTERN);
 
+	private static final SimpleDateFormat FORMATADOR_DATA_AMERICANO = new SimpleDateFormat(DATA_PATTERN_AMERICANO);
 	private static final SimpleDateFormat FORMATADOR_DATA_HORA = new SimpleDateFormat(DATA_HORA_PATTERN);
 
 	public static String formatarCNPJ(String conteudo) {
@@ -83,6 +85,10 @@ public final class StringUtils {
 
 	public static String formatarData(Date date) {
 		return date == null ? "" : FORMATADOR_DATA.format(date);
+	}
+
+	public static String formatarDataAmericana(Date date) {
+		return date == null ? "" : FORMATADOR_DATA_AMERICANO.format(date);
 	}
 
 	public static String formatarDataHora(Date date) {

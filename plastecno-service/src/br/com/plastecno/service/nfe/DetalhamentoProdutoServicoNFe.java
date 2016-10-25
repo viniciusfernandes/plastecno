@@ -55,6 +55,10 @@ public class DetalhamentoProdutoServicoNFe {
 		return tributosProdutoServico != null && tributosProdutoServico.contemICMS();
 	}
 
+	public boolean contemIPI() {
+		return tributosProdutoServico != null && tributosProdutoServico.contemIPI();
+	}
+
 	@XmlTransient
 	public String getFichaConteudoImportacao() {
 		return fichaConteudoImportacao;

@@ -53,6 +53,7 @@ import br.com.plastecno.service.nfe.ValoresTotaisICMS;
 import br.com.plastecno.service.nfe.ValoresTotaisISSQN;
 import br.com.plastecno.service.nfe.ValoresTotaisNFe;
 import br.com.plastecno.util.NumeroUtils;
+import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
@@ -84,12 +85,13 @@ public class NFeServiceImpl implements NFeService {
 
 		nf.setId("12345678901234567890123456789012345678901234567");
 		nf.getIdentificacaoNFe().setChaveAcesso("12345678");
-		nf.getIdentificacaoNFe().setDataEmissao("2016-11-11");
+		nf.getIdentificacaoNFe().setDataHoraEmissao(StringUtils.formatarDataAmericana(new Date()));
 		nf.getIdentificacaoNFe().setDigitoVerificador("4");
 		nf.getIdentificacaoNFe().setSerie("77");
 		nf.getIdentificacaoNFe().setTipoAmbiente("2");
 		nf.getIdentificacaoNFe().setTipoImpressao("2");
 		nf.getIdentificacaoNFe().setNumero("123412346");
+		nf.getIdentificacaoNFe().setModelo("55");
 		nf.getIdentificacaoNFe().setProcessoEmissao("0");
 		nf.getIdentificacaoNFe().setVersaoProcessoEmissao("43214321");
 		nf.getIdentificacaoNFe().setMunicipioOcorrenciaFatorGerador("1234567");

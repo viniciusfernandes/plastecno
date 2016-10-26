@@ -24,7 +24,7 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "cUF")
 	private String codigoUFEmitente;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}[-^+]\\d{4}", padraoExemplo = "data e hora", nomeExibicao = "Data emissão da NFe")
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}[-^+]\\d{2}:\\d{2}", padraoExemplo = "yyyy-MM-ddTHH:mm:ss+HH:mm", nomeExibicao = "Data emissão da NFe")
 	@XmlElement(name = "dhEmi")
 	private String dataHoraEmissao;
 
@@ -32,7 +32,7 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "dhCont")
 	private String dataHoraEntradaContigencia;
 
-	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}[-^+]\\d{4}", padraoExemplo = "data e hora", nomeExibicao = "Data e hora entrada/saída produto")
+	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}[-^+]\\d{2}:\\d{2}", padraoExemplo = "yyyy-MM-ddTHH:mm:ss+HH:mm", nomeExibicao = "Data e hora entrada/saída produto")
 	@XmlElement(name = "dhSaiEnt")
 	private String dataHoraEntradaSaidaProduto;
 

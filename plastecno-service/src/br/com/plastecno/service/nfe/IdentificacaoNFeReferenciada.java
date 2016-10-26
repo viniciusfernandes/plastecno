@@ -2,10 +2,12 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "ufEmitente", "anoMes", "cnpjEmitente", "modelo", "serie", "numeroNF" })
 public class IdentificacaoNFeReferenciada {
 	@InformacaoValidavel(padrao = { "\\d{4}" }, padraoExemplo = "4 digitos", nomeExibicao = "Ano/Mês de emissão da NFe referenciada")
 	@XmlElement(name = "AAMM")

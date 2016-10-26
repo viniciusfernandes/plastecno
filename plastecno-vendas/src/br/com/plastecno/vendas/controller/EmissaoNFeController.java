@@ -433,7 +433,7 @@ public class EmissaoNFeController extends AbstractController {
         IdentificacaoDestinatarioNFe d = nf.getIdentificacaoDestinatarioNFe();
         if (d != null) {
             Cliente c = new Cliente();
-            c.setRazaoSocial(d.getNomeFantasia());
+            c.setRazaoSocial(d.getRazaoSocial());
             c.setCnpj(d.getCnpj());
             c.setInscricaoEstadual(d.getInscricaoEstadual());
             c.setCpf(d.getCpf());

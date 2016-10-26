@@ -85,7 +85,7 @@ public class NFeServiceImpl implements NFeService {
 
 		nf.setId("12345678901234567890123456789012345678901234567");
 		nf.getIdentificacaoNFe().setChaveAcesso("12345678");
-		nf.getIdentificacaoNFe().setDataHoraEmissao(StringUtils.formatarDataAmericana(new Date()));
+		nf.getIdentificacaoNFe().setDataHoraEmissao(StringUtils.formatarDataHoraTimezone(new Date()));
 		nf.getIdentificacaoNFe().setDigitoVerificador("4");
 		nf.getIdentificacaoNFe().setSerie("77");
 		nf.getIdentificacaoNFe().setTipoAmbiente("2");

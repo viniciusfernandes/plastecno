@@ -2,10 +2,12 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "placa", "uf", "registroNacionalTransportador" })
 public class VeiculoTransporte {
 	@InformacaoValidavel(obrigatorio = true, padrao = { "[a-zA-Z]{2}\\d{4}", "[a-zA-Z]{3}\\d{3}", "[a-zA-Z]{3}\\d{4}",
 			"[a-zA-Z]{4}\\d{3}" }, padraoExemplo = "XX9999, XXX999, XXX9999, XXXX999", nomeExibicao = "Placa do veículo de transporte")

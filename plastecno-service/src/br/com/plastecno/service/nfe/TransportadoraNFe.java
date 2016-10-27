@@ -2,10 +2,12 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "cnpj", "cpf", "razaoSocial", "inscricaoEstadual", "enderecoCompleto", "municipio", "uf" })
 public class TransportadoraNFe {
 	@InformacaoValidavel(padrao = "\\d{14}", padraoExemplo = "14 digitos", substituicao = { "\\D", "" }, nomeExibicao = "CNPJ da transportadora")
 	@XmlElement(name = "CNPJ")

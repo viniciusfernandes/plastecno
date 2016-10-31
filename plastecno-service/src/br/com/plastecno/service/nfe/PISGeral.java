@@ -2,11 +2,13 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Códido da situação tributária")
+@XmlType(propOrder = { "codigoSituacaoTributaria", "valorBC", "aliquota", "quantidadeVendida", "valorAliquota", "valor" })
 public class PISGeral {
 	@XmlElement(name = "pPIS")
 	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, tiposNaoPermitidos = { "04", "05", "06", "07", "08",
@@ -19,7 +21,7 @@ public class PISGeral {
 
 	@XmlElement(name = "qBCProd")
 	@InformacaoValidavel(decimal = { 12, 4 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
-			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99","ST" }, tiposNaoPermitidos = {
+			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99", "ST" }, tiposNaoPermitidos = {
 			"04", "05", "06", "07", "08", "09" }, nomeExibicao = "Quantidade vendida do PIS")
 	private Integer quantidadeVendida;
 
@@ -30,7 +32,7 @@ public class PISGeral {
 
 	@XmlElement(name = "vAliqProd")
 	@InformacaoValidavel(decimal = { 11, 4 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
-			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99","ST" }, tiposNaoPermitidos = {
+			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99", "ST" }, tiposNaoPermitidos = {
 			"04", "05", "06", "07", "08", "09" }, nomeExibicao = "Valor da alíquota do PIS")
 	private Double valorAliquota;
 

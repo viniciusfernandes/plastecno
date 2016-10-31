@@ -394,7 +394,7 @@ public class EmissaoNFeController extends AbstractController {
             try {
                 nFe = nFeService.gerarNFeByIdPedido(idPedido);
             } catch (BusinessException e) {
-                gerarListaMensagemErro(e.getListaMensagem());
+                gerarListaMensagemErroLogException(e);
             }
 
             if (nFe != null) {

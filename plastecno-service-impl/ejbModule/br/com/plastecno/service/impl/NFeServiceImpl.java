@@ -96,6 +96,9 @@ public class NFeServiceImpl implements NFeService {
 		nf.getIdentificacaoNFe().setVersaoProcessoEmissao("43214321");
 		nf.getIdentificacaoNFe().setMunicipioOcorrenciaFatorGerador("1234567");
 
+		// remover essa linha
+		nf.getIdentificacaoDestinatarioNFe().setIndicadorIEDestinatario("1");
+		
 		if (nf.getListaDetalhamentoProdutoServicoNFe() == null) {
 			return;
 		}

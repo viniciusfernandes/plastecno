@@ -699,7 +699,7 @@ function gerarJsonCfopNcm(){
 
 function gerarJsonEnquadramentoIpi(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi',
-		'campos':[{'nome':'classeEnquadramento', 'id':'clEnquadramentoIPI'},
+		'campos':[{'nome':'classeEnquadramentoCigarrosBebidas', 'id':'clEnquadramentoIPI'},
 		          {'nome':'codigoEnquadramento', 'id':'codEnquadramentoIPI'},
 		          {'nome':'cnpjProdutor', 'id':'cnpjProdIPI'},
 		          {'nome':'codigoSeloControle', 'id':'codSeloContrIPI'},
@@ -728,7 +728,6 @@ function gerarJsonTipoCofins(){
 function gerarJsonISS(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.issqn',
 		'campos':[{'nome':'aliquota', 'id':'aliquotaISS'},
-		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribISS'},
 		          {'nome':'valorBC', 'id':'valorBCISS'},
 		          {'nome':'codigoMunicipioGerador', 'id':'codMunGeradorISS'},
 		          {'nome':'itemListaServicos', 'id':'codItemServicoISS'}
@@ -1418,7 +1417,7 @@ function inicializarCalculoImpostos(){
 				<legend>::: Destinatário ::: -</legend>
 				<div class="label">Razão Social/Nome:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}"  maxlength="70" style="width: 60%"/>
+					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.razaoSocial" value="${cliente.razaoSocial}"  maxlength="70" style="width: 60%"/>
 					<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 				</div>
 				
@@ -1989,7 +1988,8 @@ function inicializarCalculoImpostos(){
 				<div class="divFieldset">
 				<fieldset id="bloco_iss" class="fieldsetInterno">
 					<legend>::: ISSQN Prod.::: +</legend>
-					<div class="label obribagorio">Situação Tribut.:</div>
+					<%-- Acredito que esse campo tenha sido removido da versao 3.10 --%>
+					<%--div class="label obribagorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribISS" style="width: 45%">
 							<option value=""></option>
@@ -1997,7 +1997,7 @@ function inicializarCalculoImpostos(){
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
 							</c:forEach>
 						</select>
-					</div>
+					</div --%>
 					<div  class="label obribagorio">Valor BC:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorBCISS" type="text" style="width: 100%" />

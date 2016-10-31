@@ -2,11 +2,17 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Código de situação tributária")
+@XmlType(propOrder = { "origemMercadoria", "valorBCSTRetido", "valorSTRetido", "valorBCSTUFDestino",
+		"valorSTUFDestino", "codigoSituacaoTributaria", "modalidadeDeterminacaoBC", "percentualReducaoBC", "valorBC",
+		"aliquota", "valorOperacao", "percentualDiferimento", "valorDiferimento", "valor", "valorDesonerado",
+		"motivoDesoneracao", "modalidadeDeterminacaoBCST", "percentualMargemValorAdicionadoICMSST",
+		"percentualReducaoBCST", "valorBCST", "aliquotaST", "valorST", "percentualBCOperacaoPropria", "ufDividaST" })
 public class ICMSGeral {
 
 	@XmlElement(name = "pICMS")
@@ -100,6 +106,10 @@ public class ICMSGeral {
 	@XmlElement(name = "vICMSSTRet")
 	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "60" }, nomeExibicao = "Valor ST retido")
 	private Double valorSTRetido;
+
+	@XmlElement(name = "vICMSSTDest")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "PART" }, nomeExibicao = "Valor ICMS ST da UF de destino")
+	private Double valorSTUFDestino;
 
 	public double calcularValor() {
 		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0d;
@@ -235,6 +245,11 @@ public class ICMSGeral {
 		return valorSTRetido;
 	}
 
+	@XmlTransient
+	public Double getValorSTUFDestino() {
+		return valorSTUFDestino;
+	}
+
 	public void setAliquota(Double aliquota) {
 		this.aliquota = aliquota;
 	}
@@ -325,5 +340,9 @@ public class ICMSGeral {
 
 	public void setValorSTRetido(Double valorSTRetido) {
 		this.valorSTRetido = valorSTRetido;
+	}
+
+	public void setValorSTUFDestino(Double valorSTUFDestino) {
+		this.valorSTUFDestino = valorSTUFDestino;
 	}
 }

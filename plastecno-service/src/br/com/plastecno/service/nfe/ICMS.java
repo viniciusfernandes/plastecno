@@ -4,11 +4,14 @@ import java.lang.reflect.Field;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "icms00", "icms10", "icms20", "icms30", "icms40", "icms41", "icms50", "icms51", "icms60",
+		"icms70", "icms90", "icmsPART", "icmsInterestadual" })
 public class ICMS {
 	@XmlElement(name = "ICMS00")
 	private ICMSGeral icms00;

@@ -6,11 +6,13 @@ import java.lang.reflect.Field;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "pisAliquota", "pisQuantidade", "pisNaoTributado", "pisOutrasOperacoes", "pisST" })
 public class PIS {
 
 	@XmlElement(name = "PISAliq")

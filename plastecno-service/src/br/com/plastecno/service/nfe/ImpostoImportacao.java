@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlType;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
-@XmlType(propOrder = { "valorBC", "valorDespesaAduaneira", "valor", "valorIOF", })
+@XmlType(propOrder = { "valorBC", "valorDespesaAduaneira", "valor", "valorIOF" })
 public class ImpostoImportacao {
 	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor do imposto de importação")
 	@XmlElement(name = "vII")

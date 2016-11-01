@@ -1,10 +1,16 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "valorBaseCalculo", "valorTotalICMS", "valorTotalICMSDesonerado", "valorTotalICMSFundoPobreza",
+		"valorTotalICMSInterestadualDestino", "valorTotalICMSInterestadualRemetente", "valorBaseCalculoST",
+		"valorTotalST", "valorTotalProdutosServicos", "valorTotalFrete", "valorTotalSeguro", "valorTotalDesconto",
+		"valorTotalII", "valorTotalIPI", "valorTotalPIS", "valorTotalCOFINS", "valorTotalDespAcessorias",
+		"valorTotalNF" })
 public class ValoresTotaisICMS {
 	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de base de calculo do total de ICMS")
 	@XmlElement(name = "vBC")
@@ -34,9 +40,13 @@ public class ValoresTotaisICMS {
 	@XmlElement(name = "vICMS")
 	private Double valorTotalICMS;
 
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total ICMS desonerador")
+	@XmlElement(name = "vICMSDeson")
+	private Double valorTotalICMSDesonerado;
+
 	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor total fundo de probeza do ICMS Interestadual")
 	@XmlElement(name = "vFCPUFDest")
-	private Double valorTotalICMSFundoProbeza;
+	private Double valorTotalICMSFundoPobreza;
 
 	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor total do ICMS Interestadual de destino")
 	@XmlElement(name = "vICMSUFDest")
@@ -102,8 +112,12 @@ public class ValoresTotaisICMS {
 		this.valorTotalICMS = valorTotalICMS;
 	}
 
-	public void setValorTotalICMSFundoProbeza(Double valorTotalICMSFundoProbeza) {
-		this.valorTotalICMSFundoProbeza = valorTotalICMSFundoProbeza;
+	public void setValorTotalICMSDesonerado(Double valorTotalICMSDesonerado) {
+		this.valorTotalICMSDesonerado = valorTotalICMSDesonerado;
+	}
+
+	public void setValorTotalICMSFundoPobreza(Double valorTotalICMSFundoPobreza) {
+		this.valorTotalICMSFundoPobreza = valorTotalICMSFundoPobreza;
 	}
 
 	public void setValorTotalICMSInterestadualDestino(Double valorTotalICMSInterestadualDestino) {

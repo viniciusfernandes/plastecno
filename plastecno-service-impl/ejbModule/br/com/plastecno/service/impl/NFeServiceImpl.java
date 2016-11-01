@@ -244,7 +244,7 @@ public class NFeServiceImpl implements NFeService {
 		totaisICMS.setValorTotalDespAcessorias(valorDespAcessorias);
 		totaisICMS.setValorTotalNF(valorProduto);
 		totaisICMS.setValorTotalST(valorST);
-		totaisICMS.setValorTotalICMSFundoProbeza(valorICMSFundoProbeza);
+		totaisICMS.setValorTotalICMSFundoPobreza(valorICMSFundoProbeza);
 		totaisICMS.setValorTotalICMSInterestadualDestino(valorICMSInterestadualDest);
 		totaisICMS.setValorTotalICMSInterestadualRemetente(valorICMSInterestadualRemet);
 

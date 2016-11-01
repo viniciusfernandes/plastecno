@@ -222,9 +222,11 @@ public class EmissaoNFeController extends AbstractController {
             }
         }
 
+        ProdutoServicoNFe p = null;
         for (DetalhamentoProdutoServicoNFe d : nf.getListaDetalhamentoProdutoServicoNFe()) {
-            if (d.getListaDeclaracaoImportacao() != null) {
-                for (DeclaracaoImportacao i : d.getListaDeclaracaoImportacao()) {
+            p = d.getProduto();
+            if (p.contemImportacao()) {
+                for (DeclaracaoImportacao i : p.getListaDeclaracaoImportacao()) {
                     try {
                         if (i.getDataDesembaraco() != null) {
                             i.setDataDesembaraco(to.format(from.parse(i.getDataDesembaraco())));

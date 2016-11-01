@@ -5,10 +5,14 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "identificacaoNFe", "identificacaoEmitenteNFe", "identificacaoDestinatarioNFe",
+		"identificacaoLocalRetirada", "identificacaoLocalEntrega", "listaDetalhamentoProdutoServicoNFe",
+		"valoresTotaisNFe", "transporteNFe", "cobrancaNFe", "informacoesAdicionaisNFe", "exportacaoNFe", "compraNFe" })
 public class DadosNFe {
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Cobrança da NFe")

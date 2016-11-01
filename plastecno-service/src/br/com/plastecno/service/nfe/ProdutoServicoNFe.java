@@ -1,11 +1,18 @@
 package br.com.plastecno.service.nfe;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel(campoIdentificacao = "codigo")
+@XmlType(propOrder = { "codigo", "descricao", "ncm", "cest", "EXTIPI", "cfop", "unidadeComercial",
+		"quantidadeComercial", "valorUnitarioComercializacao", "valorTotalBruto", "unidadeTributavel",
+		"quantidadeTributavel", "valorUnitarioTributacao", "valorTotalFrete", "valorTotalSeguro", "valorDesconto",
+		"outrasDespesasAcessorias", "indicadorValorTotal", "listaDeclaracaoImportacao", "numeroPedidoCompra" })
 public class ProdutoServicoNFe {
 	@XmlElement(name = "CEST")
 	@InformacaoValidavel(padrao = "\\d{7}", padraoExemplo = "7 dígitos", nomeExibicao = "CEST do produtos/serviços")
@@ -23,16 +30,6 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "xProd")
 	private String descricao;
 
-	// @InformacaoValidavel(obrigatorio = true, tamanhos = { 0, 8, 12, 13, 14 },
-	// nomeExibicao = "Código EAN ou de barras do produto/serviço")
-	@XmlElement(name = "cEAN")
-	private String EAN;
-
-	// @InformacaoValidavel(obrigatorio = true, tamanhos = { 1, 8, 12, 13, 14 },
-	// nomeExibicao = "EAN tributável do produtos/serviços")
-	@XmlElement(name = "cEANTrib")
-	private String EANTributavel;
-
 	@InformacaoValidavel(intervaloComprimento = { 2, 3 }, nomeExibicao = "EXTIPI do produtos/serviços")
 	@XmlElement(name = "EXTIPI")
 	private String EXTIPI;
@@ -40,6 +37,10 @@ public class ProdutoServicoNFe {
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 0, 1 }, nomeExibicao = "Indicador de composição do valor total produtos/serviços")
 	@XmlElement(name = "indTot")
 	private Integer indicadorValorTotal;
+
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Declaração de importação do produto/serviço")
+	@XmlElement(name = "DI")
+	private List<DeclaracaoImportacao> listaDeclaracaoImportacao;
 
 	@InformacaoValidavel(obrigatorio = true, tamanhos = { 2, 8 }, substituicao = { "\\D", "" }, nomeExibicao = "NCM do produtos/serviços")
 	@XmlElement(name = "NCM")
@@ -91,6 +92,10 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "vUnTrib")
 	private Double valorUnitarioTributacao;
 
+	public boolean contemImportacao() {
+		return listaDeclaracaoImportacao != null && !listaDeclaracaoImportacao.isEmpty();
+	}
+
 	@XmlTransient
 	public String getCest() {
 		return cest;
@@ -112,16 +117,6 @@ public class ProdutoServicoNFe {
 	}
 
 	@XmlTransient
-	public String getEAN() {
-		return EAN;
-	}
-
-	@XmlTransient
-	public String getEANTributavel() {
-		return EANTributavel;
-	}
-
-	@XmlTransient
 	public String getEXTIPI() {
 		return EXTIPI;
 	}
@@ -129,6 +124,17 @@ public class ProdutoServicoNFe {
 	@XmlTransient
 	public Integer getIndicadorValorTotal() {
 		return indicadorValorTotal;
+	}
+
+	@XmlTransient
+	public List<DeclaracaoImportacao> getListaDeclaracaoImportacao() {
+		return listaDeclaracaoImportacao;
+	}
+
+	// Metodo criado para simplificar a marcacao no .jsp
+	@XmlTransient
+	public List<DeclaracaoImportacao> getListaImportacao() {
+		return getListaDeclaracaoImportacao();
 	}
 
 	@XmlTransient
@@ -212,20 +218,21 @@ public class ProdutoServicoNFe {
 		this.descricao = descricao;
 	}
 
-	public void setEAN(String eAN) {
-		EAN = eAN;
-	}
-
-	public void setEANTributavel(String eANTributavel) {
-		EANTributavel = eANTributavel;
-	}
-
 	public void setEXTIPI(String eXTIPI) {
 		EXTIPI = eXTIPI;
 	}
 
 	public void setIndicadorValorTotal(Integer indicadorValorTotal) {
 		this.indicadorValorTotal = indicadorValorTotal;
+	}
+
+	public void setListaDeclaracaoImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
+		this.listaDeclaracaoImportacao = listaDeclaracaoImportacao;
+	}
+
+	// Metodo criado para simplificar marcacao do .jsp
+	public void setListaImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
+		this.setListaDeclaracaoImportacao(listaDeclaracaoImportacao);
 	}
 
 	public void setNcm(String ncm) {

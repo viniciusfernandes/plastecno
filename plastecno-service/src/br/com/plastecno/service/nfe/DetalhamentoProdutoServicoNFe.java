@@ -31,10 +31,6 @@ public class DetalhamentoProdutoServicoNFe {
 	@XmlElement(name = "detExport")
 	private List<DeclaracaoExportacao> listaDeclaracaoExportacao;
 
-	@InformacaoValidavel(iteravel = true, nomeExibicao = "Declaração de importação do produto/serviço")
-	@XmlElement(name = "DI")
-	private List<DeclaracaoImportacao> listaDeclaracaoImportacao;
-
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 990 }, nomeExibicao = "Número de produtos/serviços")
 	@XmlAttribute(name = "nItem")
 	private Integer numeroItem;
@@ -91,19 +87,8 @@ public class DetalhamentoProdutoServicoNFe {
 	}
 
 	@XmlTransient
-	public List<DeclaracaoImportacao> getListaDeclaracaoImportacao() {
-		return listaDeclaracaoImportacao;
-	}
-
-	@XmlTransient
 	public List<DeclaracaoExportacao> getListaExportacao() {
 		return getListaDeclaracaoExportacao();
-	}
-
-	// Metodo criado para simplificar a marcacao no .jsp
-	@XmlTransient
-	public List<DeclaracaoImportacao> getListaImportacao() {
-		return getListaDeclaracaoImportacao();
 	}
 
 	@XmlTransient
@@ -158,17 +143,8 @@ public class DetalhamentoProdutoServicoNFe {
 		this.listaDeclaracaoExportacao = listaDeclaracaoExportacao;
 	}
 
-	public void setListaDeclaracaoImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
-		this.listaDeclaracaoImportacao = listaDeclaracaoImportacao;
-	}
-
 	public void setListaExportacao(List<DeclaracaoExportacao> listaDeclaracaoExportacao) {
 		setListaDeclaracaoExportacao(listaDeclaracaoExportacao);
-	}
-
-	// Metodo criado para simplificar marcacao do .jsp
-	public void setListaImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
-		this.setListaDeclaracaoImportacao(listaDeclaracaoImportacao);
 	}
 
 	public void setNumeroItem(Integer numeroItem) {

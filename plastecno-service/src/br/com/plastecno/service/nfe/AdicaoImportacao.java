@@ -2,10 +2,12 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "numero", "numeroSequencialItem", "codigoFabricante", "valorDesconto", "numeroDrawback" })
 public class AdicaoImportacao {
 
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,60}", padraoExemplo = "de 1 a 60 digitos", nomeExibicao = "Cógido do fabricante da adição de importação")

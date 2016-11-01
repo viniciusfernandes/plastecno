@@ -2,10 +2,13 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "valorBCUFDestino", "percentualFCPDestino", "aliquotaUFDestino", "aliquotaInterestadual",
+		"percentualProvisorioPartilha", "valorFCPDestino", "valorUFDestino", "valorUFRemetente" })
 public class ICMSInterestadual {
 	@XmlElement(name = "pICMSInter")
 	@InformacaoValidavel(obrigatorio = true, decimal = { 2, 2 }, nomeExibicao = "Alíquota interestadual do ICMS interestadual")

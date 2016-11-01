@@ -1,10 +1,12 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "valorServico", "valorBC", "valorIss", "valorPis", "valorCofins" })
 public class ValoresTotaisISSQN {
 	@InformacaoValidavel(decimal = { 15, 2 }, nomeExibicao = "Valor total da base de cáculo de ISS")
 	@XmlElement(name = "vBC")

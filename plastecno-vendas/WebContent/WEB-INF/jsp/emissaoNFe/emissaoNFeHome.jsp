@@ -2484,13 +2484,17 @@ function inicializarCalculoImpostos(){
 		</fieldset>
 		<fieldset id="bloco_exportacao">
 			<legend>::: Exportação/Compra ::: -</legend>
-			<div class="label">UF Embarque:</div>
+			<div class="label">UF Saída:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.exportacaoNFe.ufEmbarque" value="${nf.exportacaoNFe.ufEmbarque}" maxlength="2" style="width: 5%"/>
+				<input type="text" name="nf.exportacaoNFe.ufSaida" value="${nf.exportacaoNFe.ufSaida}" maxlength="2" style="width: 5%"/>
 			</div>
-			<div class="label">Local Embarque:</div>
+			<div class="label">Local Export.:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}" maxlength="60" style="width: 60%"/>
+				<input type="text" name="nf.exportacaoNFe.localExportacao" value="${nf.exportacaoNFe.localExportacao}" maxlength="60" style="width: 60%"/>
+			</div>
+			<div class="label">Local Despach.:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.exportacaoNFe.localDespacho" value="${nf.exportacaoNFe.localDespacho}" maxlength="60" style="width: 60%"/>
 			</div>		
 			<div class="label">Nota Empenho:</div>
 			<div class="input" style="width: 80%">

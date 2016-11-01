@@ -2,10 +2,12 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "numero", "valorOriginal", "valorDesconto", "valorLiquido" })
 public class FaturaNFe {
 	@InformacaoValidavel(intervaloComprimento = { 1, 60 }, nomeExibicao = "Número da fatura")
 	@XmlElement(name = "nFat")

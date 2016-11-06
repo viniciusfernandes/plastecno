@@ -55,6 +55,14 @@ $(document).ready(function() {
 		$('#formPesquisa #idPedidoPesquisa').val($('#idPedido').val());
 		$('#formPesquisa').submit();
 	});
+	
+	$("#botaoPedidoPDF").click(function() {
+		if(isEmpty($('#idPedido').val())){
+			return;
+		}
+		$('#formPesquisa #idPedidoPesquisa').val($('#idPedido').val());
+		$('#formPesquisa').attr('action', '<c:url value="/pedido/pdf"/>').submit();
+	});
 
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
@@ -1158,8 +1166,9 @@ function inicializarOpcoesSelect(json){
 	var campos = json.campos;
 	var id = null;
 	var sel = null;
+	var hidden = null;
 	for (var i = 0; i < campos.length; i++) {
-		if(document.getElementById(campos[i].idHidden) != undefined){
+		if((hidden = document.getElementById(campos[i].idHidden)) != undefined && !isEmpty(hidden.value)){
 			continue;
 		}
 		sel = document.getElementById(campos[i].idSelect);
@@ -1309,6 +1318,7 @@ function inicializarCalculoImpostos(){
 	<form id="formPesquisa" action="<c:url value="/emissaoNFe/pedido"/>" method="get">
 		<input type="hidden" id="idPedidoPesquisa" name="idPedido" value="${idPedido}"/>
 	</form>
+	
 	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>" method="post">
 		<input type="hidden" name="nf.identificacaoLocalEntrega.codigoMunicipio" value="${nf.identificacaoLocalEntrega.codigoMunicipio}"/>
 		<input type="hidden" name="nf.identificacaoLocalRetirada.codigoMunicipio" value="${nf.identificacaoLocalRetirada.codigoMunicipio}"/>
@@ -1320,8 +1330,10 @@ function inicializarCalculoImpostos(){
 				<input type="text" id="idPedido" name="idPedido" value="${idPedido}" />
 			</div>
 			<div class="input" style="width: 2%">
-				<input type="button" id="botaoPesquisaPedido"
-					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
+				<input type="button" id="botaoPesquisaPedido" title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
+			</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoPedidoPDF" value="" title="Visualizar Pedido PDF" class="botaoPdf_16" />
 			</div>
 			<%--div para dar o correto alinhamento dos campos no formulario. Nao teve outra alternativa--%>
 			<div class="input" style="width: 60%">

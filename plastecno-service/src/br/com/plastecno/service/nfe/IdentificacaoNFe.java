@@ -15,7 +15,6 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 		"finalidadeEmissao", "operacaoConsumidorFinal", "tipoPresencaComprador", "processoEmissao",
 		"versaoProcessoEmissao", "dataHoraEntradaContigencia", "justificativaContigencia", "listaNFeReferenciada" })
 public class IdentificacaoNFe {
-
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{8}", padraoExemplo = "8 digitos", nomeExibicao = "Código da chave de acesso")
 	@XmlElement(name = "cNF")
 	private String chaveAcesso;
@@ -111,6 +110,10 @@ public class IdentificacaoNFe {
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Versão do processo de emissão da NFe")
 	@XmlElement(name = "verProc")
 	private String versaoProcessoEmissao;
+
+	public boolean contemNumeroSerieModelo() {
+		return numero != null && serie != null && modelo != null;
+	}
 
 	@XmlTransient
 	public String getChaveAcesso() {

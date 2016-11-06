@@ -422,6 +422,15 @@ public class EmissaoNFeController extends AbstractController {
                 addAtributo("idPedido", idPedido);
                 addAtributo("telefoneContatoPedido", telefone.length > 0 ? String.valueOf(telefone[0])
                         + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
+                try {
+                    Object[] numNFe = nFeService.gerarNumeroSerieModeloNFe();
+                    addAtributo("numeroNFe", numNFe[0]);
+                    addAtributo("serieNFe", numNFe[1]);
+                    addAtributo("modeloNFe", numNFe[2]);
+                } catch (BusinessException e) {
+                    gerarListaMensagemAlerta(e);
+                }
+
             }
         } catch (BusinessException e1) {
             gerarListaMensagemErro(e1.getListaMensagem());
@@ -486,6 +495,9 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("tipoOperacaoSelecionada", iNFe.getTipoOperacao());
             addAtributo("tipoDestinoOperacaoSelecionada", iNFe.getDestinoOperacao());
             addAtributo("tipoPresencaSelecionada", iNFe.getTipoPresencaComprador());
+            addAtributo("numeroNFe", iNFe.getNumero());
+            addAtributo("serieNFe", iNFe.getSerie());
+            addAtributo("modeloNFe", iNFe.getModelo());
         }
 
         if (nf.contemDuplicata()) {

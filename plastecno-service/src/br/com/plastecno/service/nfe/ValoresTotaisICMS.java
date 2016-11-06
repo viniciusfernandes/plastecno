@@ -40,7 +40,7 @@ public class ValoresTotaisICMS {
 	@XmlElement(name = "vICMS")
 	private Double valorTotalICMS;
 
-	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total ICMS desonerador")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total ICMS desonerado")
 	@XmlElement(name = "vICMSDeson")
 	private Double valorTotalICMSDesonerado;
 

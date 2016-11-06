@@ -23,6 +23,8 @@ public interface NFeService {
 
 	NFe gerarNFeByIdPedido(Integer idPedido) throws BusinessException;
 
+	Object[] gerarNumeroSerieModeloNFe() throws BusinessException;
+
 	String gerarXMLNfe(NFe nFe, Integer idPedido) throws BusinessException;
 
 	List<Object[]> pesquisarCFOP();

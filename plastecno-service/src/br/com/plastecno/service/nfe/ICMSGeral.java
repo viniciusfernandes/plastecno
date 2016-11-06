@@ -222,7 +222,7 @@ public class ICMSGeral {
 
 	@XmlTransient
 	public Double getValorDesonerado() {
-		return valorDesonerado;
+		return valorDesonerado == null ? 0 : valorDesonerado;
 	}
 
 	@XmlTransient

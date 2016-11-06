@@ -37,6 +37,7 @@ import br.com.plastecno.service.entity.PedidoNFe;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.TODO;
+import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
@@ -45,6 +46,7 @@ import br.com.plastecno.service.nfe.ICMSGeral;
 import br.com.plastecno.service.nfe.ICMSInterestadual;
 import br.com.plastecno.service.nfe.IdentificacaoEmitenteNFe;
 import br.com.plastecno.service.nfe.IdentificacaoLocalGeral;
+import br.com.plastecno.service.nfe.IdentificacaoNFe;
 import br.com.plastecno.service.nfe.NFe;
 import br.com.plastecno.service.nfe.ProdutoServicoNFe;
 import br.com.plastecno.service.nfe.TransporteNFe;
@@ -80,25 +82,29 @@ public class NFeServiceImpl implements NFeService {
 	private RepresentadaService representadaService;
 
 	@TODO
-	private void carregarConfiguracao(NFe nFe) {
+	private void carregarConfiguracao(NFe nFe) throws BusinessException {
 		DadosNFe nf = nFe.getDadosNFe();
+		IdentificacaoNFe ide = nf.getIdentificacaoNFe();
 
 		nf.setId("12345678901234567890123456789012345678901234567");
-		nf.getIdentificacaoNFe().setChaveAcesso("12345678");
-		nf.getIdentificacaoNFe().setDataHoraEmissao(StringUtils.formatarDataHoraTimezone(new Date()));
-		nf.getIdentificacaoNFe().setDigitoVerificador("4");
-		nf.getIdentificacaoNFe().setSerie("77");
-		nf.getIdentificacaoNFe().setTipoAmbiente("2");
-		nf.getIdentificacaoNFe().setTipoImpressao("2");
-		nf.getIdentificacaoNFe().setNumero("123412346");
-		nf.getIdentificacaoNFe().setModelo("55");
-		nf.getIdentificacaoNFe().setProcessoEmissao("0");
-		nf.getIdentificacaoNFe().setVersaoProcessoEmissao("43214321");
-		nf.getIdentificacaoNFe().setMunicipioOcorrenciaFatorGerador("1234567");
+		ide.setChaveAcesso("12345678");
+		ide.setDataHoraEmissao(StringUtils.formatarDataHoraTimezone(new Date()));
+		ide.setDigitoVerificador("4");
+		ide.setTipoAmbiente("2");
+		ide.setTipoImpressao("2");
+		ide.setProcessoEmissao("0");
+		ide.setVersaoProcessoEmissao("43214321");
+
+		if (!ide.contemNumeroSerieModelo()) {
+			Object[] numNFe = gerarNumeroSerieModeloNFe();
+			ide.setNumero(String.valueOf(numNFe[0]));
+			ide.setSerie(String.valueOf(numNFe[1]));
+			ide.setModelo(String.valueOf(numNFe[2]));
+		}
 
 		// remover essa linha
 		nf.getIdentificacaoDestinatarioNFe().setIndicadorIEDestinatario("1");
-		
+
 		if (nf.getListaDetalhamentoProdutoServicoNFe() == null) {
 			return;
 		}
@@ -137,13 +143,18 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setRazaoSocial(emitente.getRazaoSocial());
 		iEmit.setRegimeTributario(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.REGIME_TRIBUTACAO));
 		iEmit.setCNAEFiscal(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.CNAE));
-		EnderecoNFe endEmit = gerarEnderecoNFe(representadaService.pesquisarLogradorouro(emitente.getId()),
-				emitente.getTelefone());
+
+		Logradouro logradouro = representadaService.pesquisarLogradorouro(emitente.getId());
+		EnderecoNFe endEmit = gerarEnderecoNFe(logradouro, emitente.getTelefone());
 
 		iEmit.setEnderecoEmitenteNFe(endEmit);
 		nFe.getDadosNFe().setIdentificacaoEmitenteNFe(iEmit);
 		nFe.getDadosNFe().getIdentificacaoNFe().setCodigoUFEmitente(endEmit.getUF());
-
+		nFe.getDadosNFe()
+				.getIdentificacaoNFe()
+				.setMunicipioOcorrenciaFatorGerador(
+						configuracaoSistemaService
+								.pesquisar(ParametroConfiguracaoSistema.CODIGO_MUNICIPIO_GERADOR_ICMS));
 		return nFe;
 	}
 
@@ -180,6 +191,7 @@ public class NFeServiceImpl implements NFeService {
 		double valorICMSFundoProbeza = 0;
 		double valorICMSInterestadualDest = 0;
 		double valorICMSInterestadualRemet = 0;
+		double valorICMSDesonerado = 0;
 
 		for (DetalhamentoProdutoServicoNFe item : listaItem) {
 			tributo = item.getTributosProdutoServico();
@@ -189,6 +201,7 @@ public class NFeServiceImpl implements NFeService {
 				valorBC += tipoIcms.getValorBC();
 				valorBCST += tipoIcms.getValorBCST();
 				valorST += tipoIcms.getValorST();
+				valorICMSDesonerado += tipoIcms.getValorDesonerado();
 				valorICMS += tipoIcms.carregarValores().getValor();
 			}
 
@@ -232,6 +245,7 @@ public class NFeServiceImpl implements NFeService {
 
 		totaisICMS.setValorBaseCalculo(valorBC);
 		totaisICMS.setValorBaseCalculoST(valorBCST);
+		totaisICMS.setValorTotalICMSDesonerado(valorICMSDesonerado);
 		totaisICMS.setValorTotalICMS(valorICMS);
 		totaisICMS.setValorTotalFrete(valorFrete);
 		totaisICMS.setValorTotalII(valorImportacao);
@@ -304,8 +318,11 @@ public class NFeServiceImpl implements NFeService {
 
 		configurarSubistituicaoTributariaPosValidacao(nFe);
 
+		IdentificacaoNFe ide = nFe.getDadosNFe().getIdentificacaoNFe();
+
 		final String xml = gerarXMLNfe(nFe, null);
-		pedidoNFeDAO.alterar(new PedidoNFe(idPedido, xml));
+		pedidoNFeDAO.alterar(new PedidoNFe(idPedido, Integer.parseInt(ide.getNumero()),
+				Integer.parseInt(ide.getSerie()), Integer.parseInt(ide.getModelo()), xml));
 		escreverXMLNFe(xml, idPedido.toString());
 
 		return xml;
@@ -407,6 +424,38 @@ public class NFeServiceImpl implements NFeService {
 		} catch (JAXBException e) {
 			throw new BusinessException("Não foi possível gerar a NFe a partir XML do pedido No. " + idPedido, e);
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Object[] gerarNumeroSerieModeloNFe() throws BusinessException {
+		Object[] o = QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery("select p.numero, p.serie, p.modelo from PedidoNFe p where p.numero = (select max(p1.numero) from PedidoNFe p1 )"),
+						Object[].class, null);
+
+		if (o == null || o.length < 3 || (o[0] == null && o[1] == null && o[2] == null)) {
+			throw new BusinessException(
+					"Não foi possível gerar o número, série e modelo da NFe. É necessário inseri-lo manualmente");
+		}
+
+		if (o[0] == null) {
+			throw new BusinessException(
+					"Não foi possível gerar o número sequencial da NFe. É necessário inseri-lo manualmente");
+		}
+
+		if (o[1] == null) {
+			throw new BusinessException("Não foi possível gerar a série da NFe. É necessário inseri-la manualmente");
+		}
+
+		if (o[2] == null) {
+			throw new BusinessException("Não foi possível gerar o modelo da NFe. É necessário inseri-lo manualmente");
+		}
+
+		// Gerando o proximo numero da NFe
+		o[0] = (Integer) o[0] + 1;
+		return o;
 	}
 
 	@Override

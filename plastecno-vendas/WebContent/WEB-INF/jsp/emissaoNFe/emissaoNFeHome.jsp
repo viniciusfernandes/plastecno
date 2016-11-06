@@ -1328,15 +1328,15 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label">Núm. NFe:</div>
 			<div class="input" style="width: 25%">
-				<input type="text" name="nf.identificacaoNFe.numero" value="${nf.identificacaoNFe.numero}" maxlength="9" style="width: 100%" />
+				<input type="text" name="nf.identificacaoNFe.numero" value="${numeroNFe}" maxlength="9" style="width: 100%" />
 			</div>
 			<div class="label">Mod. NFe:</div>
 			<div class="input" style="width: 5%">
-				<input type="text" name="nf.identificacaoNFe.modelo" value="${nf.identificacaoNFe.modelo}" maxlength="2" style="width: 100%" />
+				<input type="text" name="nf.identificacaoNFe.modelo" value="${modeloNFe}" maxlength="2" style="width: 100%" />
 			</div>
 			<div class="label">Série NFe:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" name="nf.identificacaoNFe.serie" value="${nf.identificacaoNFe.serie}" maxlength="3" style="width: 100%" />
+				<input type="text" name="nf.identificacaoNFe.serie" value="${serieNFe}" maxlength="3" style="width: 100%" />
 			</div>
 			<div class="label">Tipo Operação:</div>
 			<div class="input" style="width: 10%">

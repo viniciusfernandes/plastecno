@@ -242,6 +242,22 @@
 	width: 24px;
 }
 
+.botaoProximo {
+	background: url("../images/next_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoAnterior {
+	background: url("../images/previous_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoNF {
 	background: url("../images/nf_24.png") no-repeat scroll 0 0
 		transparent;
@@ -508,6 +524,18 @@
 
 .botaoRemover:hover {
 	background: url("../images/minus_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
+.botaoProximo:hover {
+	background: url("../images/next_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
+.botaoAnterior:hover {
+	background: url("../images/previous_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 }

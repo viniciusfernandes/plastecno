@@ -45,6 +45,7 @@ var numeroImportacaoProduto = null;
 var editorTabelaImportacao = null;
 var editorTabelaAdicao = null;
 var editorTabelaExportacao = null;
+var btProduto = null;
 $(document).ready(function() {
 	scrollTo('${ancora}');
 	
@@ -80,6 +81,14 @@ $(document).ready(function() {
 			}
 		});
 		$('#formEmissao').submit();
+	});
+	
+	$('#botaoProximoProduto').click(function(){
+		encontrarBotaoEdicaoProduto(true);
+	});
+	
+	$('#botaoAnteriorProduto').click(function(){
+		encontrarBotaoEdicaoProduto(false);
 	});
 	
 	$('#botaoInserirInfoProd').click(function(){
@@ -320,6 +329,28 @@ $(document).ready(function() {
 	inicializarMascaraReferenciada();
 	inicializarAlteracaoTabelaProdutos();
 });
+
+function encontrarBotaoEdicaoProduto(proximo){
+	var linha = null;
+	if(btProduto != null){
+		if(proximo){
+			linha = btProduto.parentNode.parentNode.nextElementSibling;
+		} else {
+			linha = btProduto.parentNode.parentNode.previousElementSibling;
+		}
+		if(linha != null){
+			var nodes = linha.cells[13].childNodes;
+			for (var i = 0; i < nodes.length; i++) {
+				if(nodes[i].nodeType == 1){
+					btProduto = nodes[i];
+					btProduto.onclick();
+					break;
+				}					
+			}
+			scrollTo('produtosInfo');
+		}
+	}
+};
 
 function inicializarAlteracaoTabelaProdutos(){
 	var alterarColuna = function(indice, valor){
@@ -1177,7 +1208,9 @@ function inicializarOpcoesSelect(json){
 	}
 };
 
-function editarProduto(linha){
+function editarProduto(botao){
+	btProduto = botao;
+	var linha = botao.parentNode.parentNode;
 	var celulas = linha.cells;
 	<%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
 	numeroProdutoEdicao = celulas[0].innerHTML;
@@ -1221,7 +1254,6 @@ function editarProduto(linha){
 	inicializarLegendaBlocoProduto('bloco_importacao_prod');
 	inicializarLegendaBlocoProduto('bloco_exportacao_prod');
 
-	
 	fecharBloco('bloco_ipi');
 	fecharBloco('bloco_ii');
 	fecharBloco('bloco_iss');
@@ -1636,7 +1668,6 @@ function inicializarCalculoImpostos(){
 		
 		<fieldset>
 			<legend>::: Produtos e Serviços :::</legend>
-			
 			<table id="tabela_produtos" class="listrada">
 				<thead>
 					<tr>
@@ -1673,7 +1704,7 @@ function inicializarCalculoImpostos(){
 							<td>${p.ncm}</td>
 							<td>${p.cfop}</td>
 							<td>
-								<input type="button" value="" title="Editar Produto" class="botaoDinheiroPequeno" onclick="editarProduto(this.parentNode.parentNode);"/>
+								<input type="button" value="" title="Editar Produto" class="botaoDinheiroPequeno" onclick="editarProduto(this);"/>
 							</td>
 							
 						</tr>
@@ -1681,6 +1712,7 @@ function inicializarCalculoImpostos(){
 				</tbody>
 			</table>
 			
+			<a id="produtosInfo"></a>
 			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
 				<legend>::: Info. Adicionais Prod. ::: +</legend>
 				<div class="label">Num. Ped. Compra:</div>
@@ -2223,6 +2255,10 @@ function inicializarCalculoImpostos(){
 						</tbody>
 					</table>
 				</fieldset>
+				<div class="bloco_botoes">
+					<a id="botaoProximoProduto" title="Próximo Produto" class="botaoProximo"></a>
+					<a id="botaoAnteriorProduto" title="Produto Anterior" class="botaoAnterior"></a>
+				</div>
 		</fieldset>	
 		
 		<fieldset id="bloco_transporte">

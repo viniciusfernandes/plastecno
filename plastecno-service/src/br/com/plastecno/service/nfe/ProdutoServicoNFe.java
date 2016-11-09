@@ -12,7 +12,8 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @XmlType(propOrder = { "codigo", "descricao", "ncm", "cest", "EXTIPI", "cfop", "unidadeComercial",
 		"quantidadeComercial", "valorUnitarioComercializacao", "valorTotalBruto", "unidadeTributavel",
 		"quantidadeTributavel", "valorUnitarioTributacao", "valorTotalFrete", "valorTotalSeguro", "valorDesconto",
-		"outrasDespesasAcessorias", "indicadorValorTotal", "listaDeclaracaoImportacao", "numeroPedidoCompra" })
+		"outrasDespesasAcessorias", "indicadorValorTotal", "listaDeclaracaoImportacao", "numeroPedidoCompra",
+		"itemPedidoCompra" })
 public class ProdutoServicoNFe {
 	@XmlElement(name = "CEST")
 	@InformacaoValidavel(padrao = "\\d{7}", padraoExemplo = "7 dígitos", nomeExibicao = "CEST do produtos/serviços")
@@ -37,6 +38,10 @@ public class ProdutoServicoNFe {
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 0, 1 }, nomeExibicao = "Indicador de composição do valor total produtos/serviços")
 	@XmlElement(name = "indTot")
 	private Integer indicadorValorTotal;
+
+	@InformacaoValidavel(padrao = "\\d{6}", padraoExemplo = "6 digitos", prefixo = "0", tamanho = 6, nomeExibicao = "Item de pedido de compra de produtos/serviços")
+	@XmlElement(name = "nItemPed")
+	private String itemPedidoCompra;
 
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Declaração de importação do produto/serviço")
 	@XmlElement(name = "DI")
@@ -124,6 +129,11 @@ public class ProdutoServicoNFe {
 	@XmlTransient
 	public Integer getIndicadorValorTotal() {
 		return indicadorValorTotal;
+	}
+
+	@XmlTransient
+	public String getItemPedidoCompra() {
+		return itemPedidoCompra;
 	}
 
 	@XmlTransient
@@ -224,6 +234,10 @@ public class ProdutoServicoNFe {
 
 	public void setIndicadorValorTotal(Integer indicadorValorTotal) {
 		this.indicadorValorTotal = indicadorValorTotal;
+	}
+
+	public void setItemPedidoCompra(String itemPedidoCompra) {
+		this.itemPedidoCompra = itemPedidoCompra;
 	}
 
 	public void setListaDeclaracaoImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {

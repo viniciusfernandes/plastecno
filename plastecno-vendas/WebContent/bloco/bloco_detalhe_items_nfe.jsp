@@ -67,8 +67,8 @@
 <input type="hidden" id="${detItem}.produtoServicoNFe.valorTotalFrete" name="${detItem}.produtoServicoNFe.valorTotalFrete" value="${item.produto.valorTotalFrete}"/>
 <input type="hidden" id="${detItem}.informacoesAdicionais" name="${detItem}.informacoesAdicionais" value="${item.informacoesAdicionais}"/>
 <input type="hidden" id="${detItem}.fichaConteudoImportacao" name="${detItem}.fichaConteudoImportacao" value="${item.fichaConteudoImportacao}"/>
-<input type="hidden" id="${detItem}.numeroPedidoCompra" name="${detItem}.numeroPedidoCompra" value="${item.numeroPedidoCompra}"/>
-<input type="hidden" id="${detItem}.itemPedidoCompra" name="${detItem}.itemPedidoCompra" value="${item.itemPedidoCompra}"/>
+<input type="hidden" id="${detItem}.produtoServicoNFe.numeroPedidoCompra" name="${detItem}.produtoServicoNFe.numeroPedidoCompra" value="${item.produto.numeroPedidoCompra}"/>
+<input type="hidden" id="${detItem}.produtoServicoNFe.itemPedidoCompra" name="${detItem}.produtoServicoNFe.itemPedidoCompra" value="${item.produto.itemPedidoCompra}"/>
 
 <%-- bloco de importacoes --%>
 <c:set var="itemImportacao" value="${item.produto}.listaImportacao"/>

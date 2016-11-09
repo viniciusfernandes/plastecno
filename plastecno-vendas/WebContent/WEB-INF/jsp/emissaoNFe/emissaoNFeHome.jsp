@@ -787,8 +787,8 @@ function gerarJsonInfoProduto(){
 		'campos':[{'nome':'informacoesAdicionais', 'id':'infoAdicionaisProd'}, 
 		          {'nome': 'produtoServicoNFe.outrasDespesasAcessorias', 'id':'despesasAcessoriasProd'},
 		          {'nome': 'produtoServicoNFe.valorTotalFrete', 'id':'valorFreteProd'},
-		          {'nome': 'numeroPedidoCompra', 'id':'numeroPedidoCompraProd'},
-		          {'nome': 'itemPedidoCompra', 'id':'itemPedidoCompraProd'},
+		          {'nome': 'produtoServicoNFe.numeroPedidoCompra', 'id':'numeroPedidoCompraProd'},
+		          {'nome': 'produtoServicoNFe.itemPedidoCompra', 'id':'itemPedidoCompraProd'},
 		          {'nome': 'fichaConteudoImportacao', 'id':'fciProd'}]};
 };
 

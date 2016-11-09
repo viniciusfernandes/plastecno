@@ -28,7 +28,7 @@ public class TransporteNFe {
 	private RetencaoICMSTransporteNFe retencaoICMS;
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Transportadora da NFe")
-	@XmlElement(name = "transportadora")
+	@XmlElement(name = "transporta")
 	private TransportadoraNFe transportadoraNFe;
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Veículo de transporte")

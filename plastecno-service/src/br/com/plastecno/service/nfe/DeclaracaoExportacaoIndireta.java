@@ -2,10 +2,12 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "numeroRegistro", "chaveAcessoRecebida", "quantidadeItem" })
 public class DeclaracaoExportacaoIndireta {
 
 	@InformacaoValidavel(obrigatorio = true, padrao = { "\\d{44}" }, padraoExemplo = "44 digitos", nomeExibicao = "Chave de acesso de exportação indireta")

@@ -373,6 +373,16 @@ function inicializarAlteracaoTabelaProdutos(){
 	$('#bloco_tributos #ncm').keyup(function (){
 		alterarColuna(11, $(this).val());
 	});
+	
+	$('#bloco_tributos #aliquotaICMS').keyup(function (){
+		alterarColuna(9, $(this).val());
+		alterarColuna(7, $('#bloco_tributos #valorICMS').val());
+	});
+	
+	$('#bloco_tributos #aliquotaIPI').keyup(function (){
+		alterarColuna(10, $(this).val());
+		alterarColuna(8, $('#bloco_tributos #valorIPI').val());
+	});
 };
 
 function inicializarMascaraReferenciada(){
@@ -523,7 +533,7 @@ function inicializarTabelaExportacaoProd(){
 				}
 				
 				var celulas = linha.cells;
-				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaExportacao['+linha.id+']', 
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].produto.listaExportacao['+linha.id+']', 
 					  'campos':[{'nome':'numeroDrawback', 'valor':celulas[0].innerHTML},
 					            {'nome':'expIndireta.chaveAcessoRecebida', 'valor':celulas[1].innerHTML},
 					            {'nome':'expIndireta.numeroRegistro', 'valor':celulas[2].innerHTML},
@@ -533,7 +543,7 @@ function inicializarTabelaExportacaoProd(){
 				gerarInputHidden(json);
 			 },
 			'onRemover': function(linha){
-				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaExportacao["+linha.id+"]']").each(function(i){
+				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].produto.listaExportacao["+linha.id+"]']").each(function(i){
 					$(this).remove();
 				});
 			}};
@@ -789,7 +799,7 @@ function gerarJsonInfoProduto(){
 		          {'nome': 'produtoServicoNFe.valorTotalFrete', 'id':'valorFreteProd'},
 		          {'nome': 'produtoServicoNFe.numeroPedidoCompra', 'id':'numeroPedidoCompraProd'},
 		          {'nome': 'produtoServicoNFe.itemPedidoCompra', 'id':'itemPedidoCompraProd'},
-		          {'nome': 'fichaConteudoImportacao', 'id':'fciProd'}]};
+		          {'nome': 'produtoServicoNFe.fichaConteudoImportacao', 'id':'fciProd'}]};
 };
 
 function gerarJsonTipoPis(){
@@ -916,7 +926,7 @@ function recuperarExportacaoProduto(){
 	var nome = null;
 	var total = 4;
 	var indice = -1;
-	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaExportacao']").each(function(){
+	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].produto.listaExportacao']").each(function(){
 		nome = $(this).attr('name');
 		indice = nome.split('.').length;
 		
@@ -1328,8 +1338,8 @@ function calcularValoresImpostos(){
 function inicializarCalculoImpostos(){
 	var campos = gerarJsonCalculoImpostos();
 	for (var i = 0; i < campos.length; i++) {
-		document.getElementById(campos[i].idVl).onblur = calcularValoresImpostos;
-		document.getElementById(campos[i].idAliq).onblur = calcularValoresImpostos;
+		document.getElementById(campos[i].idVl).onkeyup = calcularValoresImpostos;
+		document.getElementById(campos[i].idAliq).onkeyup = calcularValoresImpostos;
 	}
 	
 	campos = gerarJsonIcmsInterestadual().campos;

@@ -1,18 +1,15 @@
 package br.com.plastecno.service.nfe;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel(campoIdentificacao = "numeroItem")
+@XmlType(propOrder = { "numeroItem", "produtoServicoNFe", "tributosProdutoServico", "informacoesAdicionais" })
 public class DetalhamentoProdutoServicoNFe {
-	@InformacaoValidavel(tamanho = 36, nomeExibicao = "FCI de produtos/serviços")
-	@XmlElement(name = "nFCI")
-	private String fichaConteudoImportacao;
 
 	// Campos criado para utilizar a indexacao dos itens da lista no arquivo
 	// .jsp
@@ -22,10 +19,6 @@ public class DetalhamentoProdutoServicoNFe {
 	@InformacaoValidavel(intervaloComprimento = { 1, 500 }, nomeExibicao = "Informações adicionais de produtos/serviços")
 	@XmlElement(name = "infAdProd")
 	private String informacoesAdicionais;
-
-	@InformacaoValidavel(iteravel = true, nomeExibicao = "Declaração de exportação do produto/serviço")
-	@XmlElement(name = "detExport")
-	private List<DeclaracaoExportacao> listaDeclaracaoExportacao;
 
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1, 990 }, nomeExibicao = "Número de produtos/serviços")
 	@XmlAttribute(name = "nItem")
@@ -47,11 +40,6 @@ public class DetalhamentoProdutoServicoNFe {
 		return tributosProdutoServico != null && tributosProdutoServico.contemIPI();
 	}
 
-	@XmlTransient
-	public String getFichaConteudoImportacao() {
-		return fichaConteudoImportacao;
-	}
-
 	// Devemos fazer esse tratamento do indice do item pois ele esta sendo
 	// recuperado na pesquisa pelo numero do pedido e ele nao foi populado no
 	// banco de dados pois nao esta no xml
@@ -66,16 +54,6 @@ public class DetalhamentoProdutoServicoNFe {
 	@XmlTransient
 	public String getInformacoesAdicionais() {
 		return informacoesAdicionais;
-	}
-
-	@XmlTransient
-	public List<DeclaracaoExportacao> getListaDeclaracaoExportacao() {
-		return listaDeclaracaoExportacao;
-	}
-
-	@XmlTransient
-	public List<DeclaracaoExportacao> getListaExportacao() {
-		return getListaDeclaracaoExportacao();
 	}
 
 	@XmlTransient
@@ -109,20 +87,8 @@ public class DetalhamentoProdutoServicoNFe {
 		return tributosProdutoServico;
 	}
 
-	public void setFichaConteudoImportacao(String fichaConteudoImportacao) {
-		this.fichaConteudoImportacao = fichaConteudoImportacao;
-	}
-
 	public void setInformacoesAdicionais(String informacoesAdicionais) {
 		this.informacoesAdicionais = informacoesAdicionais;
-	}
-
-	public void setListaDeclaracaoExportacao(List<DeclaracaoExportacao> listaDeclaracaoExportacao) {
-		this.listaDeclaracaoExportacao = listaDeclaracaoExportacao;
-	}
-
-	public void setListaExportacao(List<DeclaracaoExportacao> listaDeclaracaoExportacao) {
-		setListaDeclaracaoExportacao(listaDeclaracaoExportacao);
 	}
 
 	public void setNumeroItem(Integer numeroItem) {

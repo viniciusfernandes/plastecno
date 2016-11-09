@@ -12,8 +12,8 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @XmlType(propOrder = { "codigo", "descricao", "ncm", "cest", "EXTIPI", "cfop", "unidadeComercial",
 		"quantidadeComercial", "valorUnitarioComercializacao", "valorTotalBruto", "unidadeTributavel",
 		"quantidadeTributavel", "valorUnitarioTributacao", "valorTotalFrete", "valorTotalSeguro", "valorDesconto",
-		"outrasDespesasAcessorias", "indicadorValorTotal", "listaDeclaracaoImportacao", "numeroPedidoCompra",
-		"itemPedidoCompra" })
+		"outrasDespesasAcessorias", "indicadorValorTotal", "listaDeclaracaoImportacao", "listaDeclaracaoExportacao",
+		"numeroPedidoCompra", "itemPedidoCompra", "fichaConteudoImportacao" })
 public class ProdutoServicoNFe {
 	@XmlElement(name = "CEST")
 	@InformacaoValidavel(padrao = "\\d{7}", padraoExemplo = "7 dígitos", nomeExibicao = "CEST do produtos/serviços")
@@ -35,6 +35,10 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "EXTIPI")
 	private String EXTIPI;
 
+	@InformacaoValidavel(tamanho = 36, nomeExibicao = "FCI de produtos/serviços")
+	@XmlElement(name = "nFCI")
+	private String fichaConteudoImportacao;
+
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 0, 1 }, nomeExibicao = "Indicador de composição do valor total produtos/serviços")
 	@XmlElement(name = "indTot")
 	private Integer indicadorValorTotal;
@@ -42,6 +46,10 @@ public class ProdutoServicoNFe {
 	@InformacaoValidavel(padrao = "\\d{6}", padraoExemplo = "6 digitos", prefixo = "0", tamanho = 6, nomeExibicao = "Item de pedido de compra de produtos/serviços")
 	@XmlElement(name = "nItemPed")
 	private String itemPedidoCompra;
+
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Declaração de exportação do produto/serviço")
+	@XmlElement(name = "detExport")
+	private List<DeclaracaoExportacao> listaDeclaracaoExportacao;
 
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Declaração de importação do produto/serviço")
 	@XmlElement(name = "DI")
@@ -127,6 +135,11 @@ public class ProdutoServicoNFe {
 	}
 
 	@XmlTransient
+	public String getFichaConteudoImportacao() {
+		return fichaConteudoImportacao;
+	}
+
+	@XmlTransient
 	public Integer getIndicadorValorTotal() {
 		return indicadorValorTotal;
 	}
@@ -137,8 +150,18 @@ public class ProdutoServicoNFe {
 	}
 
 	@XmlTransient
+	public List<DeclaracaoExportacao> getListaDeclaracaoExportacao() {
+		return listaDeclaracaoExportacao;
+	}
+
+	@XmlTransient
 	public List<DeclaracaoImportacao> getListaDeclaracaoImportacao() {
 		return listaDeclaracaoImportacao;
+	}
+
+	@XmlTransient
+	public List<DeclaracaoExportacao> getListaExportacao() {
+		return getListaDeclaracaoExportacao();
 	}
 
 	// Metodo criado para simplificar a marcacao no .jsp
@@ -232,6 +255,10 @@ public class ProdutoServicoNFe {
 		EXTIPI = eXTIPI;
 	}
 
+	public void setFichaConteudoImportacao(String fichaConteudoImportacao) {
+		this.fichaConteudoImportacao = fichaConteudoImportacao;
+	}
+
 	public void setIndicadorValorTotal(Integer indicadorValorTotal) {
 		this.indicadorValorTotal = indicadorValorTotal;
 	}
@@ -240,8 +267,16 @@ public class ProdutoServicoNFe {
 		this.itemPedidoCompra = itemPedidoCompra;
 	}
 
+	public void setListaDeclaracaoExportacao(List<DeclaracaoExportacao> listaDeclaracaoExportacao) {
+		this.listaDeclaracaoExportacao = listaDeclaracaoExportacao;
+	}
+
 	public void setListaDeclaracaoImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
 		this.listaDeclaracaoImportacao = listaDeclaracaoImportacao;
+	}
+
+	public void setListaExportacao(List<DeclaracaoExportacao> listaDeclaracaoExportacao) {
+		setListaDeclaracaoExportacao(listaDeclaracaoExportacao);
 	}
 
 	// Metodo criado para simplificar marcacao do .jsp

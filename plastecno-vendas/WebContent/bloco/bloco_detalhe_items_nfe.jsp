@@ -71,7 +71,7 @@
 <input type="hidden" id="${detItem}.produtoServicoNFe.itemPedidoCompra" name="${detItem}.produtoServicoNFe.itemPedidoCompra" value="${item.produto.itemPedidoCompra}"/>
 
 <%-- bloco de importacoes --%>
-<c:set var="itemImportacao" value="${item.produto}.listaImportacao"/>
+<c:set var="itemImportacao" value="${detItem}.produtoServicoNFe.listaImportacao"/>
 <c:forEach var="imp" items="${item.produto.listaImportacao}" varStatus="loop">
 <input type="hidden" id="${itemImportacao}[${loop.index}].cnpjEncomendante" name="${itemImportacao}[${loop.index}].cnpjEncomendante" value="${imp.cnpjEncomendante}"/>
 <input type="hidden" id="${itemImportacao}[${loop.index}].codigoExportador" name="${itemImportacao}[${loop.index}].codigoExportador" value="${imp.codigoExportador}"/>
@@ -98,7 +98,7 @@
 </c:forEach>
 
 <%-- bloco de exportacao --%>
-<c:set var="itemExportacao" value="${detItem}.produto.listaExportacao"/>
+<c:set var="itemExportacao" value="${detItem}.produtoServicoNFe.listaExportacao"/>
 <c:forEach var="exp" items="${item.produto.listaExportacao}" varStatus="expLoop">
 <input type="hidden" id="${itemExportacao}[${expLoop.index}].numeroDrawback" name="${itemExportacao}[${expLoop.index}].numeroDrawback" value="${exp.numeroDrawback}"/>
 <input type="hidden" id="${itemExportacao}[${expLoop.index}].expIndireta.chaveAcessoRecebida" name="${itemExportacao}[${expLoop.index}].expIndireta.chaveAcessoRecebida" value="${exp.expIndireta.chaveAcessoRecebida}"/>

@@ -454,9 +454,15 @@ function inicializarTabelaImportacaoProd(){
 				if(numeroProdutoEdicao == null || linha == null){
 					return;
 				}
-				
+				<%-- EStamos definindo qual o numero de importacao aqui para que o usuario possa inserir as adicoes em sequencia pois la temos que saber qua eh a importacao associada --%>
+				var isNovo = numeroImportacaoProduto == null || numeroImportacaoProduto != linha.id;
+				if(isNovo){
+					numeroImportacaoProduto = linha.id;
+				}
+				recuperarAdicaoImportacao();
+				 $('#bloco_adicao_import').fadeIn('fast');
 				var celulas = linha.cells;
-				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+linha.id+']', 
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaImportacao['+linha.id+']', 
 					  'campos':[{'nome':'cnpjEncomendante', 'valor':celulas[0].innerHTML},
 					            {'nome':'codigoExportador', 'valor':celulas[1].innerHTML},
 					            {'nome':'dataImportacao', 'valor':celulas[2].innerHTML},
@@ -477,7 +483,7 @@ function inicializarTabelaImportacaoProd(){
 				 $('#bloco_adicao_import').fadeIn('fast');
 			 },
 			'onRemover': function(linha){
-				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+linha.id+"]']").each(function(i){
+				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].produtoServicoNFe.listaImportacao["+linha.id+"]']").each(function(i){
 					$(this).remove();
 				});
 				 $('#bloco_adicao_import').fadeOut('fast');
@@ -492,7 +498,7 @@ function inicializarTabelaAdicaoImportacao(){
 			'campos':campos,
 			'idLinhaSequencial': true,
 			'onValidar': function(){
-				return obrigatorioPreenchido(campos, ['numDrawbackAdicao', 'valDescAdicao']);
+				return numeroProdutoEdicao != null && numeroImportacaoProduto != null && obrigatorioPreenchido(campos, ['numDrawbackAdicao', 'valDescAdicao']);
 			},
 			'onInserir': function(linha){
 				if(numeroProdutoEdicao == null || numeroImportacaoProduto == null || linha == null){
@@ -500,7 +506,7 @@ function inicializarTabelaAdicaoImportacao(){
 				}
 				
 				var celulas = linha.cells;
-				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+numeroImportacaoProduto+'].listaAdicao['+linha.id+']', 
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaImportacao['+numeroImportacaoProduto+'].listaAdicao['+linha.id+']', 
 					  'campos':[{'nome':'codigoFabricante', 'valor':celulas[0].innerHTML},
 					            {'nome':'numero', 'valor':celulas[1].innerHTML},
 					            {'nome':'numeroDrawback', 'valor':celulas[2].innerHTML},
@@ -511,7 +517,7 @@ function inicializarTabelaAdicaoImportacao(){
 				gerarInputHidden(json);
 			 },
 			 'onRemover': function(linha){
-					$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+numeroImportacaoProduto+"].listaAdicao["+linha.id+"]']").each(function(i){
+					$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].produtoServicoNFe.listaImportacao["+numeroImportacaoProduto+"].listaAdicao["+linha.id+"]']").each(function(i){
 						$(this).remove();
 					});	
 			 }};
@@ -533,7 +539,7 @@ function inicializarTabelaExportacaoProd(){
 				}
 				
 				var celulas = linha.cells;
-				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].produto.listaExportacao['+linha.id+']', 
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaExportacao['+linha.id+']', 
 					  'campos':[{'nome':'numeroDrawback', 'valor':celulas[0].innerHTML},
 					            {'nome':'expIndireta.chaveAcessoRecebida', 'valor':celulas[1].innerHTML},
 					            {'nome':'expIndireta.numeroRegistro', 'valor':celulas[2].innerHTML},
@@ -543,7 +549,7 @@ function inicializarTabelaExportacaoProd(){
 				gerarInputHidden(json);
 			 },
 			'onRemover': function(linha){
-				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].produto.listaExportacao["+linha.id+"]']").each(function(i){
+				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].produtoServicoNFe.listaExportacao["+linha.id+"]']").each(function(i){
 					$(this).remove();
 				});
 			}};
@@ -818,10 +824,10 @@ function recuperarImportacaoProduto(){
 	var nome = null;
 	var valor = null;
 	var total = 11;
-	
-	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao']").each(function(){
+	var nome = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaImportacao[';
+	$("input[name^='"+nome+"']").each(function(){
 		nome = $(this).attr('name');
-		if(nome.split('.').length == 4){
+		if(nome.split('.').length == 5){
 			if(id == null){
 				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
 				id = nome.match(/\d+/g)[1];
@@ -882,9 +888,10 @@ function recuperarAdicaoImportacao(){
 	var nome = null;
 	var valor = null;
 	var total = 5;
-	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+numeroImportacaoProduto+"].listaAdicao']").each(function(){
+	var nome = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaImportacao['+numeroImportacaoProduto+'].listaAdicao[';
+	$("input[name^='"+nome+"']").each(function(){
 		nome = $(this).attr('name');
-		if(nome.split('.').length == 5){
+		if(nome.split('.').length == 6){
 			if(id == null){
 				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
 				id = nome.match(/\d+/g)[2];
@@ -926,17 +933,17 @@ function recuperarExportacaoProduto(){
 	var nome = null;
 	var total = 4;
 	var indice = -1;
-	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].produto.listaExportacao']").each(function(){
+	var nome = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaExportacao[';
+	$("input[name^='"+nome+"']").each(function(){
 		nome = $(this).attr('name');
 		indice = nome.split('.').length;
-		
-		if(indice == 4){
+		if(indice == 5){
 			nome = nome.substring(nome.lastIndexOf('.')+1);
 			if(nome == 'numeroDrawback'){
 				$('#bloco_exportacao_prod #drawbackExportProd').val($(this).val());
 				total--;
 			} 
-		}else if(indice == 5){
+		} else if(indice == 6){
 			if(id == null){
 				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
 				id = nome.match(/\d+/g)[1];

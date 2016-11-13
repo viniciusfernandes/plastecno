@@ -279,8 +279,10 @@ $(document).ready(function() {
 		'idCep': 'cepEntrega', 'idEndereco': 'enderecoEntrega', 'idBairro': 'bairroEntrega', 
 		'idCidade': 'cidadeEntrega', 'idUf': 'ufEntrega', 'idPais': ''});
 	
+	inserirMascaraHora('horaSaida');
+	
 	inserirMascaraData('dataVencimentoDuplicata');
-	inserirMascaraData('dataHoraEntradaSaida');
+	inserirMascaraData('dataSaida');
 	inserirMascaraData('dtImportProd');
 	inserirMascaraData('dataDesembImportProd');
 
@@ -1408,8 +1410,8 @@ function inicializarCalculoImpostos(){
 				</select>
 			</div>
 			<div class="label">Dest. Operação:</div>
-			<div class="input" style="width: 20%">
-				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 100%" >
+			<div class="input" style="width: 50%">
+				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 40%" >
 					<c:forEach var="tipo" items="${listaTipoDestinoOperacao}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoDestinoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
@@ -1417,7 +1419,11 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label">Dt. Ent./Saída:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="dataHoraEntradaSaida" name="nf.identificacaoNFe.dataHoraEntradaSaidaProduto" value="${nf.identificacaoNFe.dataHoraEntradaSaidaProduto}" style="width: 100%"/>
+				<input type="text" id="dataSaida" name="nf.identificacaoNFe.dataSaida" value="${nf.identificacaoNFe.dataSaida}" style="width: 100%"/>
+			</div>
+			<div class="label">Hr. Ent./Saída:</div>
+			<div class="input" style="width: 50%">
+				<input type="text" id="horaSaida" name="nf.identificacaoNFe.horaSaida" value="${nf.identificacaoNFe.horaSaida}" style="width: 10%"/>
 			</div>
 			<div class="label">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
@@ -1437,8 +1443,7 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label">Finalidade Emissão:</div>
 			<div class="input" style="width: 10%">
-				<select name="nf.identificacaoNFe.finalidadeEmissao"
-					style="width: 100%" >
+				<select name="nf.identificacaoNFe.finalidadeEmissao" style="width: 100%" >
 					<c:forEach var="finalidade" items="${listaTipoFinalidadeEmissao}">
 						<option value="${finalidade.codigo}" <c:if test="${finalidade.codigo eq finalidadeEmissaoSelecionada}">selected</c:if>>${finalidade.descricao}</option>
 					</c:forEach>

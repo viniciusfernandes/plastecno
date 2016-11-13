@@ -35,6 +35,9 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "dhSaiEnt")
 	private String dataHoraEntradaSaidaProduto;
 
+	@XmlTransient
+	private String dataSaida;
+
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", padraoExemplo = "1 digito", nomeExibicao = "Destino da operação da NFe")
 	@XmlElement(name = "idDest")
 	private String destinoOperacao;
@@ -46,6 +49,9 @@ public class IdentificacaoNFe {
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", padraoExemplo = "1 digito", nomeExibicao = "Finalidade da emissão  da NFe")
 	@XmlElement(name = "finNFe")
 	private Integer finalidadeEmissao;
+
+	@XmlTransient
+	private String horaSaida;
 
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma de pagamento da NFe")
 	@XmlElement(name = "indPag")
@@ -141,6 +147,11 @@ public class IdentificacaoNFe {
 	}
 
 	@XmlTransient
+	public String getDataSaida() {
+		return dataSaida;
+	}
+
+	@XmlTransient
 	public String getDestinoOperacao() {
 		return destinoOperacao;
 	}
@@ -153,6 +164,11 @@ public class IdentificacaoNFe {
 	@XmlTransient
 	public Integer getFinalidadeEmissao() {
 		return finalidadeEmissao;
+	}
+
+	@XmlTransient
+	public String getHoraSaida() {
+		return horaSaida;
 	}
 
 	@XmlTransient
@@ -256,6 +272,10 @@ public class IdentificacaoNFe {
 		this.dataHoraEntradaSaidaProduto = dataHoraEntradaSaidaProduto;
 	}
 
+	public void setDataSaida(String dataSaida) {
+		this.dataSaida = dataSaida;
+	}
+
 	public void setDestinoOperacao(String destinoOperacao) {
 		this.destinoOperacao = destinoOperacao;
 	}
@@ -266,6 +286,10 @@ public class IdentificacaoNFe {
 
 	public void setFinalidadeEmissao(Integer finalidadeEmissao) {
 		this.finalidadeEmissao = finalidadeEmissao;
+	}
+
+	public void setHoraSaida(String horaSaida) {
+		this.horaSaida = horaSaida;
 	}
 
 	public void setIndicadorFormaPagamento(Integer indicadorFormaPagamento) {

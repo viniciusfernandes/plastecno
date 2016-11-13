@@ -15,8 +15,10 @@ public final class StringUtils {
 	private static final SimpleDateFormat FORMATADOR_DATA = new SimpleDateFormat(DATA_PATTERN);
 
 	private static final SimpleDateFormat FORMATADOR_DATA_HORA = new SimpleDateFormat(DATA_HORA_PATTERN);
+
 	private static final SimpleDateFormat FORMATADOR_DATA_HORA_TIMEZONE = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ssXXX");
+	private static final SimpleDateFormat FORMATADOR_HORA = new SimpleDateFormat("hh:mm");
 
 	public static String formatarCNPJ(String conteudo) {
 		if (conteudo == null) {
@@ -95,6 +97,10 @@ public final class StringUtils {
 		return date == null ? "" : FORMATADOR_DATA_HORA_TIMEZONE.format(date);
 	}
 
+	public static String formatarHora(Date date) {
+		return date == null ? "" : FORMATADOR_HORA.format(date);
+	}
+
 	public static String formatarInscricaoEstadual(String conteudo) {
 		if (conteudo == null) {
 			return "";
@@ -127,6 +133,14 @@ public final class StringUtils {
 			}
 		}
 		return documento.toString();
+	}
+
+	public static Date gerarDataHoraTimezone(String date) {
+		try {
+			return isNotEmpty(date) ? FORMATADOR_DATA_HORA_TIMEZONE.parse(date) : null;
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Falha na formatacao da data/hora e timezone", e);
+		}
 	}
 
 	public static boolean isEmpty(String string) {

@@ -3,6 +3,8 @@ package br.com.plastecno.vendas.controller;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -250,22 +252,28 @@ public class EmissaoNFeController extends AbstractController {
 
         }
 
-        // Formatando a data de hora/entrada do produto
-        if (!fromServidor) {
-            to = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        }
         IdentificacaoNFe i = nf.getIdentificacaoNFe();
-        String dh = i.getDataHoraEntradaSaidaProduto();
-        if (!StringUtils.isEmpty(dh)) {
+        String dh = null;
+        if (!fromServidor && (StringUtils.isNotEmpty(dh = i.getDataSaida()))) {
             try {
-                i.setDataHoraEntradaSaidaProduto(to.format(from.parse(dh)));
+                Calendar c = Calendar.getInstance();
+                c.setTime(from.parse(dh));
+                String[] hora = null;
+                if (StringUtils.isNotEmpty(i.getHoraSaida()) && (hora = i.getHoraSaida().split(":")).length > 0) {
+                    c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hora[0]));
+                    c.set(Calendar.MINUTE, Integer.parseInt(hora[1]));
+                }
+                i.setDataHoraEntradaSaidaProduto(StringUtils.formatarDataHoraTimezone(c.getTime()));
             } catch (ParseException e) {
                 throw new BusinessException(
                         "Não foi possível formatar a data/hora de entrada/saida do produto. O valor enviado é \"" + dh
                                 + "\"");
             }
+        } else if (fromServidor && StringUtils.isNotEmpty(dh = i.getDataHoraEntradaSaidaProduto())) {
+            Date dt = StringUtils.gerarDataHoraTimezone(dh);
+            i.setDataSaida(StringUtils.formatarData(dt));
+            i.setHoraSaida(StringUtils.formatarHora(dt));
         }
-
     }
 
     private List<Object[]> gerarListaCfop() {

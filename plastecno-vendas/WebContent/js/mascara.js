@@ -57,6 +57,10 @@ function mascaraData(idCampo, mascara){
 	});
 }
 
+function inserirMascaraHora(idCampo) {
+	$('#'+idCampo).mask('99:99');
+};
+
 function inserirMascaraData(idCampo) {
 	mascaraData(idCampo, 'dd/mm/yy');
 };

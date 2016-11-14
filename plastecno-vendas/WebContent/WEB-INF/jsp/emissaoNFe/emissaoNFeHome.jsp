@@ -238,6 +238,29 @@ $(document).ready(function() {
 		});
 	});	
 	
+	$('#isTriangulacao').click(function (){
+		var idPedido = $('#idPedido').val();
+		if (idPedido == undefined || isEmpty(idPedido)) {
+			return;
+		}
+		var request = $.ajax({
+			type: "get",
+			url: '<c:url value="/emissaoNFe/numeroNFe"/>',
+			data: {'isTriangulacao':$(this).prop('checked'), 'idPedido':idPedido}
+		});
+		request.done(function(response) {
+			var numeroNFe = response.int;
+			if(numeroNFe == undefined){
+				return;
+			}
+			$('#formEmissao #numeroNFe').val(numeroNFe);
+		});
+		
+		request.fail(function(request, status) {
+			alert('Falha na busca numero da NFe: ' + numeroNFe +' => Status da requisicao: '+status);
+		});
+	});
+	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
 		campoPesquisavel : 'nomeCliente',
@@ -437,6 +460,8 @@ function inicializarMascaraImpostos(){
 	
 	inserirMascaraDecimal('despesasAcessoriasProd', 15, 2);
 	inserirMascaraDecimal('valorFreteProd', 15, 2);
+	inserirMascaraDecimal('valorTotaltributosProd', 15, 2);
+
 	
 	inserirMascaraDecimal('qExport', 15, 2);
 	
@@ -811,6 +836,7 @@ function gerarJsonImpostoImportacao(){
 function gerarJsonInfoProduto(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+']',
 		'campos':[{'nome':'informacoesAdicionais', 'id':'infoAdicionaisProd'}, 
+		          {'nome': 'tributos.valorTotalTributos', 'id':'valorTotaltributosProd'},
 		          {'nome': 'produtoServicoNFe.outrasDespesasAcessorias', 'id':'despesasAcessoriasProd'},
 		          {'nome': 'produtoServicoNFe.valorTotalFrete', 'id':'valorFreteProd'},
 		          {'nome': 'produtoServicoNFe.numeroPedidoCompra', 'id':'numeroPedidoCompraProd'},
@@ -1072,7 +1098,7 @@ function gerarInputProdutoServico(){
 				'campos':[{'nome':'codigo', 'valor': celulas[1].innerHTML},
 				          {'nome':'descricao', 'valor': celulas[1].innerHTML},
 				          {'nome':'unidadeComercial', 'valor': celulas[2].innerHTML},
-				          {'nome':'quantidadeComercial', 'valor': celulas[5].innerHTML},
+				          {'nome':'quantidadeComercial', 'valor': celulas[3].innerHTML},
 				          {'nome':'quantidadeTributavel', 'valor': celulas[3].innerHTML},
 				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[4].innerHTML},
 				          {'nome':'valorTotalBruto', 'valor': celulas[7].innerHTML},
@@ -1418,7 +1444,7 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label" style="width: 10%">Triang.:</div>
 			<div class="input" style="width: 20%">
-				<input type="checkbox" name="isTriangulacao" <c:if test="${isTriangulacao}">checked</c:if>
+				<input type="checkbox" id="isTriangulacao" name="isTriangulacao" <c:if test="${isTriangulacao}">checked</c:if>
 					class="checkbox" style="width: 10%"/>
 			</div>
 			<div class="label">Tipo Operação:</div>
@@ -1770,8 +1796,12 @@ function inicializarCalculoImpostos(){
 					<input type="text" id="despesasAcessoriasProd" />
 				</div>
 				<div class="label">Valor Frete:</div>
-				<div class="input" style="width: 50%">
-					<input type="text" id="valorFreteProd" style="width: 20%"/>
+				<div class="input" style="width: 10%">
+					<input type="text" id="valorFreteProd" style="width: 100%"/>
+				</div>
+				<div class="label">Tot. Tributos:</div>
+				<div class="input" style="width: 30%">
+					<input type="text" id="valorTotaltributosProd" style="width: 30%"/>
 				</div>
 				<div class="label">Núm. FCI:</div>
 				<div class="input" style="width: 70%">

@@ -31,6 +31,8 @@ public interface NFeService {
 
 	Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe, boolean isTriangulacao);
 
+	Integer pesquisarNumeroNFe(Integer idPedido, boolean isTriangulacao);
+
 	void validarEmissaoNFePedido(Integer idPedido) throws BusinessException;
 
 }

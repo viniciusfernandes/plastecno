@@ -440,6 +440,12 @@ public class EmissaoNFeController extends AbstractController {
         irTopoPagina();
     }
 
+    @Get("emissaoNFe/numeroNFe")
+    public void pesquisarNumeroNFe(Integer idPedido, boolean isTriangulacao) {
+        Integer numeroNFe = nFeService.pesquisarNumeroNFe(idPedido, isTriangulacao);
+        serializarJson(new SerializacaoJson("numeroNFe", numeroNFe));
+    }
+
     @Get("emissaoNFe/pedido")
     public void pesquisarPedidoById(Integer idPedido) {
 

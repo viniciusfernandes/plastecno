@@ -67,9 +67,9 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "vOutro")
 	private Double outrasDespesasAcessorias;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,15}\\.{1}\\d{0,4}", padraoExemplo = "0 a 4 decimais", nomeExibicao = "Quantidade comercial do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 4 }, nomeExibicao = "Quantidade comercial do produtos/serviços")
 	@XmlElement(name = "qCom")
-	private String quantidadeComercial;
+	private Double quantidadeComercial;
 
 	@XmlElement(name = "qTrib")
 	private Integer quantidadeTributavel;
@@ -186,7 +186,7 @@ public class ProdutoServicoNFe {
 	}
 
 	@XmlTransient
-	public String getQuantidadeComercial() {
+	public Double getQuantidadeComercial() {
 		return quantidadeComercial;
 	}
 
@@ -296,7 +296,7 @@ public class ProdutoServicoNFe {
 		this.outrasDespesasAcessorias = outrasDespesasAcessorias;
 	}
 
-	public void setQuantidadeComercial(String quantidadeComercial) {
+	public void setQuantidadeComercial(Double quantidadeComercial) {
 		this.quantidadeComercial = quantidadeComercial;
 	}
 

@@ -31,7 +31,7 @@
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.valorBC" name="${detItem}.tributos.ipi.tipoIpi.valorBC" value="${item.tributos.ipi.tipoIpi.valorBC}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel" name="${detItem}.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel" value="${item.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.valorUnidadeTributavel" name="${detItem}.tributos.ipi.tipoIpi.valorUnidadeTributavel" value="${item.tributos.ipi.tipoIpi.valorUnidadeTributavel}"/>
-<input type="hidden" id="${detItem}.tributos.ipi.classeEnquadramentoCigarrosBebidas" name="${detItem}.tributos.ipi.classeEnquadramentoCigarrosBebidas" value="${item.tributos.ipi.classeEnquadramento}"/>
+<input type="hidden" id="${detItem}.tributos.ipi.classeEnquadramentoCigarrosBebidas" name="${detItem}.tributos.ipi.classeEnquadramentoCigarrosBebidas" value="${item.tributos.ipi.classeEnquadramentoCigarrosBebidas}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.codigoEnquadramento" name="${detItem}.tributos.ipi.codigoEnquadramento" value="${item.tributos.ipi.codigoEnquadramento}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.cnpjProdutor" name="${detItem}.tributos.ipi.cnpjProdutor" value="${item.tributos.ipi.cnpjProdutor}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.codigoSeloControle" name="${detItem}.tributos.ipi.codigoSeloControle" value="${item.tributos.ipi.codigoSeloControle}"/>

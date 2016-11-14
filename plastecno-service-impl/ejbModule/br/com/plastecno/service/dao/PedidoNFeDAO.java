@@ -75,6 +75,18 @@ public class PedidoNFeDAO extends GenericDAO<PedidoNFe> {
 		return QueryUtil.gerarRegistroUnico(q, Integer.class, null);
 	}
 
+	public Integer pesquisarNumeroNFe(Integer idPedido, boolean isTriangulacao) {
+		StringBuilder s = new StringBuilder();
+		if (isTriangulacao) {
+			s.append("select p.numeroTriangulacao ");
+		} else {
+			s.append("select p.numero ");
+		}
+		s.append("from PedidoNFe p where p.idPedido = :idPedido ");
+		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(s.toString()).setParameter("idPedido", idPedido),
+				Integer.class, null);
+	}
+
 	public String pesquisarXMLNFeByIdPedido(Integer idPedido, boolean isTriangulacao) {
 		StringBuilder s = new StringBuilder();
 		if (isTriangulacao) {

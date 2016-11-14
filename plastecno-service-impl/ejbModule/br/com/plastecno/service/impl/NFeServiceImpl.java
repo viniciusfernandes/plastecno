@@ -493,6 +493,23 @@ public class NFeServiceImpl implements NFeService {
 		return pedidoNFeDAO.pesquisarIdPedidoByNumeroNFe(numeroNFe, isTriangulacao);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@Override
+	public Integer pesquisarNumeroNFe(Integer idPedido, boolean isTriangulacao) {
+		if (idPedido == null) {
+			return null;
+		}
+		Integer numero = pedidoNFeDAO.pesquisarNumeroNFe(idPedido, isTriangulacao);
+		if (isTriangulacao && numero == null) {
+			try {
+				numero = (Integer) gerarNumeroSerieModeloNFe()[0];
+			} catch (BusinessException e) {
+				numero = null;
+			}
+		}
+		return numero;
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public void validarEmissaoNFePedido(Integer idPedido) throws BusinessException {

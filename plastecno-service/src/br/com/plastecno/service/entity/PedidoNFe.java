@@ -14,21 +14,35 @@ public class PedidoNFe {
 	private Integer idPedido;
 
 	private Integer modelo;
+
 	private Integer numero;
+
+	@Column(name = "numero_triang")
+	private Integer numeroTriangulacao;
+
 	private Integer serie;
 
 	@Column(name = "xml_nfe")
 	private String xmlNFe;
 
+	@Column(name = "xml_nfe_triang")
+	private String xmlNFeTriangulacao;
+
 	public PedidoNFe() {
 	}
 
-	public PedidoNFe(Integer idPedido, Integer numero, Integer serie, Integer modelo, String xmlNFe) {
+	public PedidoNFe(Integer idPedido, Integer numero, Integer serie, Integer modelo, String xmlNFe,
+			boolean isTriangularizacao) {
 		this.idPedido = idPedido;
-		this.numero = numero;
 		this.serie = serie;
 		this.modelo = modelo;
-		this.xmlNFe = xmlNFe;
+		if (isTriangularizacao) {
+			this.numeroTriangulacao = numero;
+			this.xmlNFeTriangulacao = xmlNFe;
+		} else {
+			this.numero = numero;
+			this.xmlNFe = xmlNFe;
+		}
 	}
 
 	public Integer getIdPedido() {
@@ -43,12 +57,20 @@ public class PedidoNFe {
 		return numero;
 	}
 
+	public Integer getNumeroTriangulacao() {
+		return numeroTriangulacao;
+	}
+
 	public Integer getSerie() {
 		return serie;
 	}
 
 	public String getXmlNFe() {
 		return xmlNFe;
+	}
+
+	public String getXmlNFeTriangulacao() {
+		return xmlNFeTriangulacao;
 	}
 
 	public void setIdPedido(Integer idPedido) {
@@ -63,6 +85,10 @@ public class PedidoNFe {
 		this.numero = numero;
 	}
 
+	public void setNumeroTriangulacao(Integer numeroTriangulacao) {
+		this.numeroTriangulacao = numeroTriangulacao;
+	}
+
 	public void setSerie(Integer serie) {
 		this.serie = serie;
 	}
@@ -70,4 +96,9 @@ public class PedidoNFe {
 	public void setXmlNFe(String xmlNFe) {
 		this.xmlNFe = xmlNFe;
 	}
+
+	public void setXmlNFeTriangulacao(String xmlNFeTriangulacao) {
+		this.xmlNFeTriangulacao = xmlNFeTriangulacao;
+	}
+
 }

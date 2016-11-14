@@ -18,7 +18,7 @@ public final class StringUtils {
 
 	private static final SimpleDateFormat FORMATADOR_DATA_HORA_TIMEZONE = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ssXXX");
-	private static final SimpleDateFormat FORMATADOR_HORA = new SimpleDateFormat("hh:mm");
+	private static final SimpleDateFormat FORMATADOR_HORA = new SimpleDateFormat("HH:mm");
 
 	public static String formatarCNPJ(String conteudo) {
 		if (conteudo == null) {

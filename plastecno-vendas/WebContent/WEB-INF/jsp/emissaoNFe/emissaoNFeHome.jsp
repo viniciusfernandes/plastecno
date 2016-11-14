@@ -57,6 +57,14 @@ $(document).ready(function() {
 		$('#formPesquisa').submit();
 	});
 	
+	$("#botaoPesquisaNFe").click(function() {
+		if(isEmpty($('#numeroNFe').val())){
+			return;
+		}
+		$('#formPesquisaNFe #numeroNFePesquisa').val($('#numeroNFe').val());
+		$('#formPesquisaNFe').submit();
+	});
+	
 	$("#botaoPedidoPDF").click(function() {
 		if(isEmpty($('#idPedido').val())){
 			return;
@@ -1370,6 +1378,10 @@ function inicializarCalculoImpostos(){
 		<input type="hidden" id="idPedidoPesquisa" name="idPedido" value="${idPedido}"/>
 	</form>
 	
+	<form id="formPesquisaNFe" action="<c:url value="/emissaoNFe/NFe"/>" method="get">
+		<input type="hidden" id="numeroNFePesquisa" name="numeroNFe" value="${idPedido}"/>
+	</form>
+	
 	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>" method="post">
 		<input type="hidden" name="nf.identificacaoLocalEntrega.codigoMunicipio" value="${nf.identificacaoLocalEntrega.codigoMunicipio}"/>
 		<input type="hidden" name="nf.identificacaoLocalRetirada.codigoMunicipio" value="${nf.identificacaoLocalRetirada.codigoMunicipio}"/>
@@ -1390,16 +1402,24 @@ function inicializarCalculoImpostos(){
 			<div class="input" style="width: 60%">
 			</div>
 			<div class="label">Núm. NFe:</div>
-			<div class="input" style="width: 25%">
-				<input type="text" name="nf.identificacaoNFe.numero" value="${numeroNFe}" maxlength="9" style="width: 100%" />
+			<div class="input" style="width: 10%">
+				<input type="text" id="numeroNFe" name="nf.identificacaoNFe.numero" value="${numeroNFe}" maxlength="9" style="width: 100%" />
 			</div>
-			<div class="label">Mod. NFe:</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoPesquisaNFe" title="Pesquisar NFe" value="" class="botaoPesquisarPequeno" />
+			</div>
+			<div class="label" style="width: 10%">Mod. NFe:</div>
 			<div class="input" style="width: 5%">
 				<input type="text" name="nf.identificacaoNFe.modelo" value="${modeloNFe}" maxlength="2" style="width: 100%" />
 			</div>
-			<div class="label">Série NFe:</div>
+			<div class="label" style="width: 10%">Série NFe:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" name="nf.identificacaoNFe.serie" value="${serieNFe}" maxlength="3" style="width: 100%" />
+			</div>
+			<div class="label" style="width: 10%">Triang.:</div>
+			<div class="input" style="width: 20%">
+				<input type="checkbox" name="isTriangulacao" <c:if test="${isTriangulacao}">checked</c:if>
+					class="checkbox" style="width: 10%"/>
 			</div>
 			<div class="label">Tipo Operação:</div>
 			<div class="input" style="width: 10%">

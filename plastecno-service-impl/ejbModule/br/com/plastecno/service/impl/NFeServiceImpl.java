@@ -297,7 +297,7 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public String emitirNFe(NFe nFe, Integer idPedido) throws BusinessException {
+	public String emitirNFe(NFe nFe, Integer idPedido, boolean isTriangularizacao) throws BusinessException {
 		if (idPedido == null) {
 			throw new BusinessException("O número do pedido não pode estar em branco para emitir uma NFe");
 		}
@@ -321,9 +321,10 @@ public class NFeServiceImpl implements NFeService {
 		IdentificacaoNFe ide = nFe.getDadosNFe().getIdentificacaoNFe();
 
 		final String xml = gerarXMLNfe(nFe, null);
-		pedidoNFeDAO.alterar(new PedidoNFe(idPedido, Integer.parseInt(ide.getNumero()),
-				Integer.parseInt(ide.getSerie()), Integer.parseInt(ide.getModelo()), xml));
-		escreverXMLNFe(xml, idPedido.toString());
+		pedidoNFeDAO.inserirPedidoNFe(new PedidoNFe(idPedido, Integer.parseInt(ide.getNumero()), Integer.parseInt(ide
+				.getSerie()), Integer.parseInt(ide.getModelo()), xml, isTriangularizacao));
+
+		escreverXMLNFe(xml, idPedido.toString() + "_" + ide.getNumero());
 
 		return xml;
 	}
@@ -410,8 +411,8 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public NFe gerarNFeByIdPedido(Integer idPedido) throws BusinessException {
-		String xmlNFe = pedidoNFeDAO.pesquisarXMLNFeByIdPedido(idPedido);
+	public NFe gerarNFeByIdPedido(Integer idPedido, boolean isTriangulacao) throws BusinessException {
+		String xmlNFe = pedidoNFeDAO.pesquisarXMLNFeByIdPedido(idPedido, isTriangulacao);
 		if (xmlNFe == null || xmlNFe.trim().isEmpty()) {
 			return null;
 		}
@@ -484,6 +485,12 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Object[]> pesquisarCFOP() {
 		return configuracaoSistemaService.pesquisarCFOP();
+	}
+
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@Override
+	public Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe, boolean isTriangulacao) {
+		return pedidoNFeDAO.pesquisarIdPedidoByNumeroNFe(numeroNFe, isTriangulacao);
 	}
 
 	@Override

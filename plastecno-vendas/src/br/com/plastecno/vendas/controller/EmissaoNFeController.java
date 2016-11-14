@@ -13,7 +13,6 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ConfiguracaoSistemaService;
 import br.com.plastecno.service.NFeService;
@@ -113,6 +112,52 @@ public class EmissaoNFeController extends AbstractController {
         serializarJson(new SerializacaoJson("icms", icms));
     };
 
+    public void carregarNFe(Integer idPedido, boolean isTriangulacao) {
+
+        NFe nFe = null;
+        try {
+            nFe = nFeService.gerarNFeByIdPedido(idPedido, isTriangulacao);
+        } catch (BusinessException e) {
+            gerarListaMensagemErroLogException(e);
+        }
+
+        if (nFe != null) {
+            popularNFe(nFe.getDadosNFe(), idPedido);
+            try {
+                formatarDatas(nFe.getDadosNFe(), true);
+            } catch (BusinessException e) {
+                gerarListaMensagemErro(e);
+            }
+        } else {
+            Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
+            List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
+            Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
+            List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+            arredondarValoresItemPedido(listaItem);
+
+            addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
+            addAtributo("listaDuplicata", listaDuplicata);
+            addAtributo("cliente", cliente);
+            addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
+            addAtributo("logradouro",
+                    cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
+            addAtributo("idPedido", idPedido);
+            addAtributo(
+                    "telefoneContatoPedido",
+                    telefone.length > 0 ? String.valueOf(telefone[0])
+                            + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
+            try {
+                Object[] numNFe = nFeService.gerarNumeroSerieModeloNFe();
+                addAtributo("numeroNFe", numNFe[0]);
+                addAtributo("serieNFe", numNFe[1]);
+                addAtributo("modeloNFe", numNFe[2]);
+            } catch (BusinessException e) {
+                gerarListaMensagemAlerta(e);
+            }
+
+        }
+    }
+
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
         addAtributo("listaTipoAliquotaICMSInterestadual", TipoAliquotaICMSInterestadual.values());
@@ -152,7 +197,7 @@ public class EmissaoNFeController extends AbstractController {
     }
 
     @Post("emissaoNFe/emitirNFe")
-    public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido) {
+    public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido, boolean isTriangulacao) {
         try {
             nFeService.validarEmissaoNFePedido(idPedido);
             try {
@@ -167,7 +212,7 @@ public class EmissaoNFeController extends AbstractController {
                 }
 
                 formatarDatas(nf, false);
-                nFeService.emitirNFe(new NFe(nf), idPedido);
+                nFeService.emitirNFe(new NFe(nf), idPedido, isTriangulacao);
                 gerarMensagemSucesso("A NFe do pedido No. " + idPedido + " foi gerado com sucesso.");
             } catch (BusinessException e) {
                 try {
@@ -388,58 +433,24 @@ public class EmissaoNFeController extends AbstractController {
         request.getServletContext().setAttribute("listaCfop", listaCfop);
     }
 
-    public Download nfexml(String xml) {
-        return gerarDownload(xml.getBytes(), "nfe.xml", "application/octet-stream");
+    @Get("emissaoNFe/NFe")
+    public void pesquisarNFe(Integer numeroNFe, boolean isTriangulacao) {
+        carregarNFe(nFeService.pesquisarIdPedidoByNumeroNFe(numeroNFe, isTriangulacao), isTriangulacao);
+        addAtributo("isTriangulacao", isTriangulacao);
+        irTopoPagina();
     }
 
     @Get("emissaoNFe/pedido")
     public void pesquisarPedidoById(Integer idPedido) {
-        NFe nFe = null;
+
         try {
             /*
-             * Essa validacao eh necessaria pois o usuario nao pode aessar um
+             * Essa validacao eh necessaria pois o usuario nao pode acessar um
              * pedido que nao podera ser emitido
              */
             nFeService.validarEmissaoNFePedido(idPedido);
-            try {
-                nFe = nFeService.gerarNFeByIdPedido(idPedido);
-            } catch (BusinessException e) {
-                gerarListaMensagemErroLogException(e);
-            }
+            carregarNFe(idPedido, false);
 
-            if (nFe != null) {
-                popularNFe(nFe.getDadosNFe(), idPedido);
-                try {
-                    formatarDatas(nFe.getDadosNFe(), true);
-                } catch (BusinessException e) {
-                    gerarListaMensagemErro(e);
-                }
-            } else {
-                Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
-                List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
-                Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
-                List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-                arredondarValoresItemPedido(listaItem);
-
-                addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
-                addAtributo("listaDuplicata", listaDuplicata);
-                addAtributo("cliente", cliente);
-                addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
-                addAtributo("logradouro",
-                        cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
-                addAtributo("idPedido", idPedido);
-                addAtributo("telefoneContatoPedido", telefone.length > 0 ? String.valueOf(telefone[0])
-                        + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
-                try {
-                    Object[] numNFe = nFeService.gerarNumeroSerieModeloNFe();
-                    addAtributo("numeroNFe", numNFe[0]);
-                    addAtributo("serieNFe", numNFe[1]);
-                    addAtributo("modeloNFe", numNFe[2]);
-                } catch (BusinessException e) {
-                    gerarListaMensagemAlerta(e);
-                }
-
-            }
         } catch (BusinessException e1) {
             gerarListaMensagemErro(e1.getListaMensagem());
             addAtributo("idPedido", idPedido);

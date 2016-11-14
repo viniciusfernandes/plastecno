@@ -5,6 +5,8 @@
 <input type="hidden" id="${detItem}.produtoServicoNFe.ncm" name="${detItem}.produtoServicoNFe.ncm" value="${item.produto.ncm}"/>
 <input type="hidden" id="${detItem}.produtoServicoNFe.cest" name="${detItem}.produtoServicoNFe.cest" value="${item.produto.cest}"/>
 <input type="hidden" id="${detItem}.produtoServicoNFe.cfop" name="${detItem}.produtoServicoNFe.cfop" value="${item.produto.cfop}"/>
+<input type="hidden" id="${detItem}.tributos.valorTotalTributos" name="${detItem}.tributos.valorTotalTributos" value="${item.tributos.valorTotalTributos}"/>
+
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.codigoSituacaoTributaria" name="${detItem}.tributos.icms.tipoIcms.codigoSituacaoTributaria" value="${item.tributos.icms.tipoIcms.codigoSituacaoTributaria}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.origemMercadoria" name="${detItem}.tributos.icms.tipoIcms.origemMercadoria" value="${item.tributos.icms.tipoIcms.origemMercadoria}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.valorDesonerado" name="${detItem}.tributos.icms.tipoIcms.valorDesonerado" value="${item.tributos.icms.tipoIcms.valorDesonerado}"/>

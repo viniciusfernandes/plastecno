@@ -22,3 +22,5 @@ create index idx_pedido_nfe_numero on vendas.tb_pedido_nfe (numero);
 
 alter table vendas.tb_pedido_nfe add numero_triang integer default null;
 alter table vendas.tb_pedido_nfe add xml_nfe_triang text default null;
+create index idx_pedido_nfe_numero_triang on vendas.tb_pedido_nfe (numero_triang);
+

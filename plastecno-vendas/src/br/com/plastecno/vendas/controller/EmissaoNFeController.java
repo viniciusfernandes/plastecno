@@ -112,8 +112,7 @@ public class EmissaoNFeController extends AbstractController {
         serializarJson(new SerializacaoJson("icms", icms));
     };
 
-    public void carregarNFe(Integer idPedido, boolean isTriangulacao) {
-
+    private void carregarNFe(Integer idPedido, boolean isTriangulacao) {
         NFe nFe = null;
         try {
             nFe = nFeService.gerarNFeByIdPedido(idPedido, isTriangulacao);
@@ -147,7 +146,7 @@ public class EmissaoNFeController extends AbstractController {
                     telefone.length > 0 ? String.valueOf(telefone[0])
                             + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
             try {
-                Object[] numNFe = nFeService.gerarNumeroSerieModeloNFe();
+                Integer[] numNFe = nFeService.gerarNumeroSerieModeloNFe();
                 addAtributo("numeroNFe", numNFe[0]);
                 addAtributo("serieNFe", numNFe[1]);
                 addAtributo("modeloNFe", numNFe[2]);
@@ -434,16 +433,19 @@ public class EmissaoNFeController extends AbstractController {
     }
 
     @Get("emissaoNFe/NFe")
-    public void pesquisarNFe(Integer numeroNFe, boolean isTriangulacao) {
-        carregarNFe(nFeService.pesquisarIdPedidoByNumeroNFe(numeroNFe, isTriangulacao), isTriangulacao);
-        addAtributo("isTriangulacao", isTriangulacao);
-        irTopoPagina();
-    }
+    public void pesquisarNFe(Integer numeroNFe) {
+        Integer idPedido = null;
+        // Primeiro estamos verificando se existe uma NFe sem tringulacao para,
+        // posteriormente pesquisar a existencia de triangulacao. Essa
+        // estrategia nao tera impacto na performance pois a grande maioria das
+        // NFes nao possui triangulacao
+        if ((idPedido = nFeService.pesquisarIdPedidoByNumeroNFe(numeroNFe, false)) != null) {
+            carregarNFe(idPedido, false);
+        } else if ((idPedido = nFeService.pesquisarIdPedidoByNumeroNFe(numeroNFe, true)) != null) {
+            carregarNFe(idPedido, true);
+        }
 
-    @Get("emissaoNFe/numeroNFe")
-    public void pesquisarNumeroNFe(Integer idPedido, boolean isTriangulacao) {
-        Integer numeroNFe = nFeService.pesquisarNumeroNFe(idPedido, isTriangulacao);
-        serializarJson(new SerializacaoJson("numeroNFe", numeroNFe));
+        irTopoPagina();
     }
 
     @Get("emissaoNFe/pedido")

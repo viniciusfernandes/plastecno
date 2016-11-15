@@ -76,19 +76,11 @@ $(document).ready(function() {
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
-		gerarInputDuplicata();
-		gerarInputProdutoServico();
-		gerarInputVolume();
-		gerarInputReboque();
-		gerarInputReferenciada();
-		
-		$("#formEmissao input, #formEmissao textarea, #formEmissao select" ).each(function(i) {
-			<%-- A remocao dos campos em branco eh necessaria para que o vraptor nao popule os beans com seus atributos todos nulos --%>
-			if(isEmpty($(this).val())){
-				$(this).remove();
-			}
-		});
-		$('#formEmissao').submit();
+		emitirNFe(false);
+	});
+	
+	$('#botaoTriangularNF').click(function(){
+		emitirNFe(true);
 	});
 	
 	$('#botaoProximoProduto').click(function(){
@@ -237,29 +229,6 @@ $(document).ready(function() {
 			alert('Falha na busca da destinatário por CNPJ: ' + cnpj+' => Status da requisicao: '+status);
 		});
 	});	
-	
-	$('#isTriangulacao').click(function (){
-		var idPedido = $('#idPedido').val();
-		if (idPedido == undefined || isEmpty(idPedido)) {
-			return;
-		}
-		var request = $.ajax({
-			type: "get",
-			url: '<c:url value="/emissaoNFe/numeroNFe"/>',
-			data: {'isTriangulacao':$(this).prop('checked'), 'idPedido':idPedido}
-		});
-		request.done(function(response) {
-			var numeroNFe = response.int;
-			if(numeroNFe == undefined){
-				return;
-			}
-			$('#formEmissao #numeroNFe').val(numeroNFe);
-		});
-		
-		request.fail(function(request, status) {
-			alert('Falha na busca numero da NFe: ' + numeroNFe +' => Status da requisicao: '+status);
-		});
-	});
 	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
@@ -416,6 +385,24 @@ function inicializarAlteracaoTabelaProdutos(){
 		alterarColuna(10, $(this).val());
 		alterarColuna(8, $('#bloco_tributos #valorIPI').val());
 	});
+};
+
+function emitirNFe(isTriangulacao){
+	gerarInputDuplicata();
+	gerarInputProdutoServico();
+	gerarInputVolume();
+	gerarInputReboque();
+	gerarInputReferenciada();
+	$('#formEmissao #isTriangulacao').val(isTriangulacao);
+	
+	$("#formEmissao input, #formEmissao textarea, #formEmissao select" ).each(function(i) {
+		<%-- A remocao dos campos em branco eh necessaria para que o vraptor nao popule os beans com seus atributos todos nulos --%>
+		if(isEmpty($(this).val())){
+			$(this).remove();
+		}
+	});
+	
+	$('#formEmissao').submit();
 };
 
 function inicializarMascaraReferenciada(){
@@ -1411,6 +1398,7 @@ function inicializarCalculoImpostos(){
 	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>" method="post">
 		<input type="hidden" name="nf.identificacaoLocalEntrega.codigoMunicipio" value="${nf.identificacaoLocalEntrega.codigoMunicipio}"/>
 		<input type="hidden" name="nf.identificacaoLocalRetirada.codigoMunicipio" value="${nf.identificacaoLocalRetirada.codigoMunicipio}"/>
+		<input type="hidden" id="isTriangulacao" name="isTriangulacao"/>
 		
 		<fieldset id="bloco_dados_nfe">
 			<legend>::: Dados da NF-e :::</legend>
@@ -1442,11 +1430,6 @@ function inicializarCalculoImpostos(){
 			<div class="input" style="width: 10%">
 				<input type="text" name="nf.identificacaoNFe.serie" value="${serieNFe}" maxlength="3" style="width: 100%" />
 			</div>
-			<div class="label" style="width: 10%">Triang.:</div>
-			<div class="input" style="width: 20%">
-				<input type="checkbox" id="isTriangulacao" name="isTriangulacao" <c:if test="${isTriangulacao}">checked</c:if>
-					class="checkbox" style="width: 10%"/>
-			</div>
 			<div class="label">Tipo Operação:</div>
 			<div class="input" style="width: 10%">
 				<select name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
@@ -1456,8 +1439,8 @@ function inicializarCalculoImpostos(){
 				</select>
 			</div>
 			<div class="label">Dest. Operação:</div>
-			<div class="input" style="width: 50%">
-				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 40%" >
+			<div class="input" style="width: 23%">
+				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 100%" >
 					<c:forEach var="tipo" items="${listaTipoDestinoOperacao}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoDestinoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
@@ -1468,8 +1451,8 @@ function inicializarCalculoImpostos(){
 				<input type="text" id="dataSaida" name="nf.identificacaoNFe.dataSaida" value="${nf.identificacaoNFe.dataSaida}" style="width: 100%"/>
 			</div>
 			<div class="label">Hr. Ent./Saída:</div>
-			<div class="input" style="width: 50%">
-				<input type="text" id="horaSaida" name="nf.identificacaoNFe.horaSaida" value="${nf.identificacaoNFe.horaSaida}" style="width: 10%"/>
+			<div class="input" style="width: 10%">
+				<input type="text" id="horaSaida" name="nf.identificacaoNFe.horaSaida" value="${nf.identificacaoNFe.horaSaida}" style="width: 100%"/>
 			</div>
 			<div class="label">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
@@ -2631,6 +2614,7 @@ function inicializarCalculoImpostos(){
 		</fieldset>
 		<div class="bloco_botoes">
 			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoTriangularNF" title="Triangular Nota Fiscal" value="" class="botaoTriangulo"/>
 		</div>
 
 		<jsp:include page="/bloco/bloco_detalhe_items_nfe.jsp"></jsp:include>		

@@ -300,8 +300,26 @@
 	width: 24px;
 }
 
+.botaoTriangulo {
+	background: url("../images/triangle_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoPesquisarPequeno {
 	background: url("../images/search_16.png") no-repeat scroll 0 0
+		transparent;
+	border: 0;
+	cursor: pointer;
+	height: 16px;
+	margin-left: 5px;
+	width: 16px;
+}
+
+.botaoTrianguloPequeno {
+	background: url("../images/triangle_16.png") no-repeat scroll 0 0
 		transparent;
 	border: 0;
 	cursor: pointer;
@@ -542,6 +560,12 @@
 
 .botaoPesquisar:hover {
 	background: url("../images/search_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
+.botaoTriangulo:hover {
+	background: url("../images/triangle_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 }

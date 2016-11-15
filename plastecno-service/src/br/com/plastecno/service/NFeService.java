@@ -23,7 +23,7 @@ public interface NFeService {
 
 	NFe gerarNFeByIdPedido(Integer idPedido, boolean isTriangulacao) throws BusinessException;
 
-	Object[] gerarNumeroSerieModeloNFe() throws BusinessException;
+	Integer[] gerarNumeroSerieModeloNFe() throws BusinessException;
 
 	String gerarXMLNfe(NFe nFe, Integer idPedido) throws BusinessException;
 

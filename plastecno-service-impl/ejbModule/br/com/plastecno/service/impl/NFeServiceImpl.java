@@ -192,46 +192,51 @@ public class NFeServiceImpl implements NFeService {
 		double valorICMSInterestadualDest = 0;
 		double valorICMSInterestadualRemet = 0;
 		double valorICMSDesonerado = 0;
+		double valorTotalTributos = 0;
 
 		for (DetalhamentoProdutoServicoNFe item : listaItem) {
 			tributo = item.getTributosProdutoServico();
-			if (tributo != null && tributo.contemICMS()) {
-				tipoIcms = tributo.getTipoIcms();
+			if (tributo != null) {
 
-				valorBC += tipoIcms.getValorBC();
-				valorBCST += tipoIcms.getValorBCST();
-				valorST += tipoIcms.getValorST();
-				valorICMSDesonerado += tipoIcms.getValorDesonerado();
-				valorICMS += tipoIcms.carregarValores().getValor();
-			}
+				valorTotalTributos += tributo.getValorTotalTributos();
+				if (tributo.contemICMS()) {
+					tipoIcms = tributo.getTipoIcms();
 
-			if (tributo != null && tributo.contemICMSInterestadual()) {
-				icmsInter = tributo.getIcmsInterestadual().carregarValores();
+					valorBC += tipoIcms.getValorBC();
+					valorBCST += tipoIcms.getValorBCST();
+					valorST += tipoIcms.getValorST();
+					valorICMSDesonerado += tipoIcms.getValorDesonerado();
+					valorICMS += tipoIcms.carregarValores().getValor();
+				}
 
-				valorICMSFundoProbeza += icmsInter.getValorFCPDestino();
-				valorICMSInterestadualDest += icmsInter.getValorUFDestino();
-				valorICMSInterestadualRemet += icmsInter.getValorUFRemetente();
-			}
+				if (tributo.contemICMSInterestadual()) {
+					icmsInter = tributo.getIcmsInterestadual().carregarValores();
 
-			if (tributo != null && tributo.contemIPI()) {
-				valorIPI += tributo.getTipoIpi().carregarValores().getValor();
-			}
+					valorICMSFundoProbeza += icmsInter.getValorFCPDestino();
+					valorICMSInterestadualDest += icmsInter.getValorUFDestino();
+					valorICMSInterestadualRemet += icmsInter.getValorUFRemetente();
+				}
 
-			if (tributo != null && tributo.contemPIS()) {
-				valorPIS += tributo.getTipoPis().carregarValores().getValor();
-			}
+				if (tributo.contemIPI()) {
+					valorIPI += tributo.getTipoIpi().carregarValores().getValor();
+				}
 
-			if (tributo != null && tributo.contemCOFINS()) {
-				valorCOFINS += tributo.getTipoCofins().carregarValores().getValor();
-			}
+				if (tributo.contemPIS()) {
+					valorPIS += tributo.getTipoPis().carregarValores().getValor();
+				}
 
-			if (tributo != null && tributo.contemISS()) {
-				valorBCISS += tributo.getIssqn().getValorBC();
-				valorISS += tributo.getIssqn().carregarValores().getValor();
-			}
+				if (tributo.contemCOFINS()) {
+					valorCOFINS += tributo.getTipoCofins().carregarValores().getValor();
+				}
 
-			if (tributo != null && tributo.contemImpostoImportacao()) {
-				valorImportacao += tributo.getImpostoImportacao().getValor();
+				if (tributo.contemISS()) {
+					valorBCISS += tributo.getIssqn().getValorBC();
+					valorISS += tributo.getIssqn().carregarValores().getValor();
+				}
+
+				if (tributo.contemImpostoImportacao()) {
+					valorImportacao += tributo.getImpostoImportacao().getValor();
+				}
 			}
 
 			produto = item.getProdutoServicoNFe();
@@ -241,6 +246,7 @@ public class NFeServiceImpl implements NFeService {
 			valorProduto += produto.getValorTotalBruto();
 			valorTotalDesconto += produto.getValorDesconto();
 			valorDespAcessorias += produto.getOutrasDespesasAcessorias();
+
 		}
 
 		totaisICMS.setValorBaseCalculo(valorBC);
@@ -261,6 +267,7 @@ public class NFeServiceImpl implements NFeService {
 		totaisICMS.setValorTotalICMSFundoPobreza(valorICMSFundoProbeza);
 		totaisICMS.setValorTotalICMSInterestadualDestino(valorICMSInterestadualDest);
 		totaisICMS.setValorTotalICMSInterestadualRemetente(valorICMSInterestadualRemet);
+		totaisICMS.setValorTotalTributos(valorTotalTributos);
 
 		totaisISSQN.setValorBC(valorBCISS);
 		totaisISSQN.setValorIss(valorISS);
@@ -459,7 +466,7 @@ public class NFeServiceImpl implements NFeService {
 		}
 
 		// Comparando para verificar qual das NFe tem o maior numero
-		if ((Integer) o[0] < (Integer) o[3]) {
+		if (o[3] != null && (Integer) o[0] < (Integer) o[3]) {
 			o[0] = o[3];
 		}
 		// Gerando o proximo numero da NFe

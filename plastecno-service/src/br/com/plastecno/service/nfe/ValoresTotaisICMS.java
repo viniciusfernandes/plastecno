@@ -10,7 +10,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 		"valorTotalICMSInterestadualDestino", "valorTotalICMSInterestadualRemetente", "valorBaseCalculoST",
 		"valorTotalST", "valorTotalProdutosServicos", "valorTotalFrete", "valorTotalSeguro", "valorTotalDesconto",
 		"valorTotalII", "valorTotalIPI", "valorTotalPIS", "valorTotalCOFINS", "valorTotalDespAcessorias",
-		"valorTotalNF" })
+		"valorTotalNF", "valorTotalTributos" })
 public class ValoresTotaisICMS {
 	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de base de calculo do total de ICMS")
 	@XmlElement(name = "vBC")
@@ -84,6 +84,10 @@ public class ValoresTotaisICMS {
 	@XmlElement(name = "vST")
 	private Double valorTotalST;
 
+	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor total dos tributos")
+	@XmlElement(name = "vTotTrib")
+	private Double valorTotalTributos;
+
 	public void setValorBaseCalculo(Double valorBaseCalculo) {
 		this.valorBaseCalculo = valorBaseCalculo;
 	}
@@ -154,6 +158,10 @@ public class ValoresTotaisICMS {
 
 	public void setValorTotalST(Double valorTotalST) {
 		this.valorTotalST = valorTotalST;
+	}
+
+	public void setValorTotalTributos(Double valorTotalTributos) {
+		this.valorTotalTributos = valorTotalTributos;
 	}
 
 }

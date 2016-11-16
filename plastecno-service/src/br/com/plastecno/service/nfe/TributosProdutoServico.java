@@ -139,7 +139,7 @@ public class TributosProdutoServico {
 
 	@XmlTransient
 	public Double getValorTotalTributos() {
-		return valorTotalTributos;
+		return valorTotalTributos == null ? 0 : valorTotalTributos;
 	}
 
 	public void setCofins(COFINS cofins) {

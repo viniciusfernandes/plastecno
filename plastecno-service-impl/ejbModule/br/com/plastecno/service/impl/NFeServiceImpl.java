@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -80,6 +82,8 @@ public class NFeServiceImpl implements NFeService {
 
 	@EJB
 	private RepresentadaService representadaService;
+
+	private Logger log = Logger.getLogger(this.getClass().getName());
 
 	@TODO
 	private void carregarConfiguracao(NFe nFe) throws BusinessException {
@@ -356,12 +360,14 @@ public class NFeServiceImpl implements NFeService {
 					new FileOutputStream(new File(path + "\\\\" + nome + ".xml")), "UTF-8"));
 			bw.write(xml);
 		} catch (IOException e) {
+			log.log(Level.WARNING, "Falha na escrita do XML da NFe no diretorio do sistema", e);
 			throw new BusinessException("Falha na escrita do XML da NFe no diretorio do sistema", e);
 		} finally {
 			if (bw != null) {
 				try {
 					bw.close();
 				} catch (IOException e) {
+					log.log(Level.WARNING, "Falha na escrita do XML da NFe no diretorio do sistema", e);
 					throw new BusinessException("Falha no fechamento do XML da NFe gravado no diretorio do sistema", e);
 				}
 			}

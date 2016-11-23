@@ -85,6 +85,8 @@ public interface PedidoService {
 
 	boolean isPedidoEnviado(Integer idPedido);
 
+	boolean isPedidoVendaExistente(Integer idPedido);
+
 	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente,
 			Integer idVendedor, Integer idFornecedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
@@ -192,6 +194,8 @@ public interface PedidoService {
 
 	List<Logradouro> pesquisarLogradouro(Integer idPedido);
 
+	String pesquisarNomeVendedorByIdPedido(Integer idPedido);
+
 	Pedido pesquisarPedidoById(Integer id);
 
 	Pedido pesquisarPedidoById(Integer idPedido, boolean isCompra);
@@ -275,7 +279,5 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
-
-	boolean isPedidoVendaExistente(Integer idPedido);
 
 }

@@ -134,11 +134,13 @@ $(document).ready(function() {
 	$('#botaoLimparICMS').click(function(){
 		removerInputHidden(gerarJsonTipoIcms());
 		fecharBloco('bloco_icms');
+		calcularValoresImpostos();
 	});
 	
 	$('#botaoLimparICMSInter').click(function(){
 		removerInputHidden(gerarJsonIcmsInterestadual());
 		fecharBloco('bloco_icms_interestadual');
+		calcularValoresImpostos();
 	});
 	
 	$('#botaoLimparInfoProd').click(function(){
@@ -153,26 +155,31 @@ $(document).ready(function() {
 		removerInputHidden(gerarJsonTipoIpi());
 		removerInputHidden(gerarJsonEnquadramentoIpi());
 		fecharBloco('bloco_ipi');
+		calcularValoresImpostos();
 	});
 	
 	$('#botaoLimparPIS').click(function(){
 		removerInputHidden(gerarJsonTipoPis());
 		fecharBloco('bloco_pis');
+		calcularValoresImpostos();
 	});
 	
 	$('#botaoLimparCOFINS').click(function(){
 		removerInputHidden(gerarJsonTipoCofins());
 		fecharBloco('bloco_cofins');
+		calcularValoresImpostos();
 	});
 	
 	$('#botaoLimparISS').click(function(){
 		removerInputHidden(gerarJsonISS());
 		fecharBloco('bloco_iss');
+		calcularValoresImpostos();
 	});
 	
 	$('#botaoLimparII').click(function(){
 		removerInputHidden(gerarJsonImpostoImportacao());
 		fecharBloco('bloco_ii');
+		calcularValoresImpostos();
 	});
 	
 	$('#botaoPesquisarCnpjTransp').click(function () {
@@ -303,13 +310,17 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_referenciada');
 	inicializarFadeInBloco('bloco_destinatario');
 	inicializarFadeInBloco('bloco_transporte');
+	inicializarFadeInBloco('bloco_rentecao_icms');
 	inicializarFadeInBloco('bloco_exportacao');
+	inicializarFadeInBloco('bloco_veiculo');
 	
 	fecharBloco('bloco_local_mercadoria');
 	fecharBloco('bloco_referenciada');
 	fecharBloco('bloco_destinatario');
 	fecharBloco('bloco_transporte');
+	fecharBloco('bloco_rentecao_icms');
 	fecharBloco('bloco_exportacao');
+	fecharBloco('bloco_veiculo');
 	
 	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
 	$('#bloco_tributos').fadeOut('fast');
@@ -1355,14 +1366,18 @@ function calcularValoresImpostos(){
 	var vl=null; 
 	var aliq=null; 
 	var idImp=null;
+	var tot = 0;
 	for (var i = 0; i < campos.length; i++) {
 		vl = document.getElementById(campos[i].idVl).value;
 		aliq = document.getElementById(campos[i].idAliq).value;
 		if(isEmpty(vl) || isEmpty(aliq)){
 			continue;
 		}
-		document.getElementById(campos[i].idImp).value = Math.round(vl*(aliq/100) * 100)/100;
+		vl = Math.round(vl*(aliq/100) * 100)/100;
+		tot += vl;
+		document.getElementById(campos[i].idImp).value = vl;
 	}
+	document.getElementById('valorTotaltributosProd').value = tot;
 };
 
 function inicializarCalculoImpostos(){
@@ -2372,7 +2387,7 @@ function inicializarCalculoImpostos(){
 			
 				<div class="divFieldset">
 				<fieldset id="bloco_veiculo" class="fieldsetInterno">
-					<legend>::: Veículo/Reboque/Balsa/Vagão :::</legend>
+					<legend>::: Veículo/Reboque/Balsa/Vagão ::: -</legend>
 					<div  class="label obrigatorio">Placa:</div>
 					<div class="input" style="width: 10%">
 						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa"  value="${nf.transporteNFe.veiculo.placa}" maxlength="7" style="width: 100%" />
@@ -2421,8 +2436,8 @@ function inicializarCalculoImpostos(){
 				</div>
 				
 				<div class="divFieldset">
-				<fieldset class="fieldsetInterno">
-					<legend>::: Retenção ICMS :::</legend>
+				<fieldset id="bloco_rentecao_icms" class="fieldsetInterno">
+					<legend>::: Retenção ICMS ::: -</legend>
 					<div  class="label obrigatorio">Valor Serviço:</div>
 					<div class="input" style="width: 10%">
 						<input type="text" id="valServRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorServico" value="${nf.transporteNFe.retencaoICMS.valorServico}" style="width: 100%" />
@@ -2578,7 +2593,7 @@ function inicializarCalculoImpostos(){
 			<legend>::: Info. Adicionais ::: -</legend>
 			<div class="label">Info. Adicionais Fisco:</div>
 			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco}</textarea>
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%">${infoAdFisco}</textarea>
 			</div>
 			<div class="label">Info. Adicionais Contrib.:</div>
 			<div class="input areatexto" style="width: 70%">

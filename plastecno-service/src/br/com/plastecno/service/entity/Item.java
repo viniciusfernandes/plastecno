@@ -86,7 +86,11 @@ public abstract class Item implements Serializable, Cloneable {
 	}
 
 	public double calcularValorICMS() {
-		return calcularPrecoItem() * getAliquotaICMS();
+		return calcularPrecoItem() * (getAliquotaICMS() == null ? 0 : getAliquotaICMS());
+	}
+
+	public double calcularValorIPI() {
+		return calcularPrecoItem() * (getAliquotaIPI() == null ? 0 : getAliquotaIPI());
 	}
 
 	public void configurarMedidaInterna() {

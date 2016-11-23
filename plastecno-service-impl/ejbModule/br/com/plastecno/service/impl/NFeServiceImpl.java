@@ -72,6 +72,8 @@ public class NFeServiceImpl implements NFeService {
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
 
+	private Logger log = Logger.getLogger(this.getClass().getName());
+
 	@EJB
 	private LogradouroService logradouroService;
 
@@ -82,8 +84,6 @@ public class NFeServiceImpl implements NFeService {
 
 	@EJB
 	private RepresentadaService representadaService;
-
-	private Logger log = Logger.getLogger(this.getClass().getName());
 
 	@TODO
 	private void carregarConfiguracao(NFe nFe) throws BusinessException {
@@ -313,14 +313,16 @@ public class NFeServiceImpl implements NFeService {
 			throw new BusinessException("O número do pedido não pode estar em branco para emitir uma NFe");
 		}
 
-		if (nFe == null || nFe.getDadosNFe() == null) {
+		IdentificacaoNFe ide = null;
+		if (nFe == null || nFe.getDadosNFe() == null || (ide = nFe.getDadosNFe().getIdentificacaoNFe()) == null) {
 			throw new BusinessException("A NFe emitida não pode estar em branco");
 		}
 
 		validarEmissaoNFePedido(idPedido);
+		validarNumeroNFePedido(idPedido, ide.getNumero() != null ? Integer.parseInt(ide.getNumero()) : null);
 
 		if (isTriangularizacao) {
-			nFe.getDadosNFe().getIdentificacaoNFe().setNumero(String.valueOf(gerarNumeroTriangulacao(idPedido)));
+			ide.setNumero(String.valueOf(gerarNumeroTriangulacao(idPedido)));
 		}
 
 		carregarValoresTransporte(nFe);
@@ -333,15 +335,13 @@ public class NFeServiceImpl implements NFeService {
 
 		configurarSubistituicaoTributariaPosValidacao(nFe);
 
-		IdentificacaoNFe ide = nFe.getDadosNFe().getIdentificacaoNFe();
-
 		final String xml = gerarXMLNfe(nFe, null);
 		pedidoNFeDAO.inserirPedidoNFe(new PedidoNFe(idPedido, Integer.parseInt(ide.getNumero()), Integer.parseInt(ide
 				.getSerie()), Integer.parseInt(ide.getModelo()), xml, isTriangularizacao));
 
 		escreverXMLNFe(xml, idPedido.toString() + "_" + ide.getNumero());
 
-		return xml;
+		return ide.getNumero();
 	}
 
 	private void escreverXMLNFe(String xml, String nome) throws BusinessException {
@@ -561,6 +561,25 @@ public class NFeServiceImpl implements NFeService {
 		if (!representadaService.isRevendedor(idRepresentada)) {
 			throw new BusinessException("O pedido de venda No. " + idPedido
 					+ " não esta associado a um revendedor cadastrado no sistema");
+		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public void validarNumeroNFePedido(Integer idPedido, Integer numeroNFe) throws BusinessException {
+		if (idPedido == null || numeroNFe == null) {
+			return;
+		}
+
+		Integer id = QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select p.idPedido from PedidoNFe p where :numeroNFe = p.numero or :numeroNFe = p.numeroTriangulacao ")
+								.setParameter("numeroNFe", numeroNFe), Integer.class, null);
+		if (id != null && !id.equals(idPedido)) {
+			throw new BusinessException("O número " + numeroNFe
+					+ " da NFe já exite no sistema e foi emitida para o pedido No. " + id);
 		}
 	}
 }

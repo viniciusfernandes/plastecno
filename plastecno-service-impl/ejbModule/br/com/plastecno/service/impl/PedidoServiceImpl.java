@@ -1107,7 +1107,7 @@ public class PedidoServiceImpl implements PedidoService {
 						"select v.id from Pedido p inner join p.proprietario v where p.id = :idPedido ").setParameter(
 						"idPedido", idPedido), Integer.class, null);
 	}
-
+	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemAguardandoCompra(Integer idCliente, Periodo periodo) {
@@ -1220,6 +1220,18 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Logradouro> pesquisarLogradouro(Integer idPedido) {
 		return pedidoDAO.pesquisarLogradouro(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public String pesquisarNomeVendedorByIdPedido(Integer idPedido) {
+		if (idPedido == null) {
+			return null;
+		}
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery(
+						"select v.nome from Pedido p inner join p.proprietario v where p.id = :idPedido ").setParameter(
+						"idPedido", idPedido), String.class, null);
 	}
 
 	@Override

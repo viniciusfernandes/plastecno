@@ -35,4 +35,6 @@ public interface NFeService {
 
 	void validarEmissaoNFePedido(Integer idPedido) throws BusinessException;
 
+	void validarNumeroNFePedido(Integer idPedido, Integer numeroNFe) throws BusinessException;
+
 }

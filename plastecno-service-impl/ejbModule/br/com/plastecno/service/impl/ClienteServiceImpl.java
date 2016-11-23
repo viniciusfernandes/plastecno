@@ -362,11 +362,11 @@ public class ClienteServiceImpl implements ClienteService {
 		if (c != null) {
 			c.addLogradouro(pesquisarLogradouro(c.getId()));
 			c.addContato(pesquisarContato(c.getId()));
-		}
-		// Estamos anulando oconteudo desses campos para evitar
-		// lazyloadException
-		c.setVendedor(null);
-		c.setListaRedespacho(null);
+			// Estamos anulando oconteudo desses campos para evitar
+			// lazyloadException
+			c.setVendedor(null);
+			c.setListaRedespacho(null);
+		} 
 		return c;
 	}
 

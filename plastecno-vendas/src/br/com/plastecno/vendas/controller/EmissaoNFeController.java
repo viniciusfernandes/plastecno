@@ -89,20 +89,6 @@ public class EmissaoNFeController extends AbstractController {
         inicializarListaCfop(request);
     }
 
-    private void arredondarValoresItemPedido(List<ItemPedido> listaItem) {
-        if (listaItem == null || listaItem.isEmpty()) {
-            return;
-        }
-        for (ItemPedido i : listaItem) {
-            i.setPrecoUnidadeFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade())));
-            i.setValorTotalFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(i.calcularPrecoTotal())));
-            i.setValorICMSFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(i.calcularValorICMS())));
-            i.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(i.calcularPrecoUnidadeIPI())));
-            i.setAliquotaICMS(NumeroUtils.gerarPercentual(i.getAliquotaICMS()));
-            i.setAliquotaIPI(NumeroUtils.gerarPercentual(i.getAliquotaIPI()));
-        }
-    }
-
     @Get("emissaoNFe/valorICMSInterestadual")
     public void calcularValorICMSInterestadual(ICMSInterestadual icms) {
         icms.carregarValores();
@@ -132,7 +118,11 @@ public class EmissaoNFeController extends AbstractController {
             List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
             Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
             List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-            arredondarValoresItemPedido(listaItem);
+
+            String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
+            addAtributo("infoAdFisco",
+                    "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO No. "
+                            + idPedido + ". VENDEDORA: " + nomeVend);
 
             addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
             addAtributo("listaDuplicata", listaDuplicata);
@@ -199,6 +189,7 @@ public class EmissaoNFeController extends AbstractController {
     public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido, boolean isTriangulacao) {
         try {
             nFeService.validarEmissaoNFePedido(idPedido);
+            String numeroNFe = null;
             try {
                 // Verificando condicao para gerar o endereco do destinatario a
                 // partir do logradouro
@@ -211,8 +202,9 @@ public class EmissaoNFeController extends AbstractController {
                 }
 
                 formatarDatas(nf, false);
-                nFeService.emitirNFe(new NFe(nf), idPedido, isTriangulacao);
-                gerarMensagemSucesso("A NFe do pedido No. " + idPedido + " foi gerado com sucesso.");
+                numeroNFe = nFeService.emitirNFe(new NFe(nf), idPedido, isTriangulacao);
+                gerarMensagemSucesso("A NFe de número " + numeroNFe + " do pedido No. " + idPedido
+                        + " foi gerada com sucesso.");
             } catch (BusinessException e) {
                 try {
                     formatarDatas(nf, true);
@@ -400,23 +392,22 @@ public class EmissaoNFeController extends AbstractController {
             return null;
         }
         List<Object[]> l = new ArrayList<Object[]>();
-
         Object[] val = null;
         for (ItemPedido i : lista) {
             val = new Object[13];
-            val[0] = i.getAliquotaICMS();
-            val[1] = i.getAliquotaIPI();
+            val[0] = NumeroUtils.gerarPercentual(i.getAliquotaICMS());
+            val[1] = NumeroUtils.gerarPercentual(i.getAliquotaIPI());
             val[2] = "";
             val[3] = i.getDescricaoSemFormatacao();
             val[4] = i.getNcm();
             val[5] = i.getSequencial();
             val[6] = i.getQuantidade();
             val[7] = i.getTipoVenda().toString();
-            val[8] = i.getValorTotal();
-            val[9] = i.getPrecoUnidade();
-            val[10] = i.getPrecoUnidade();
-            val[11] = i.getValorICMS();
-            val[12] = i.getPrecoUnidadeIPI();
+            val[8] = NumeroUtils.arredondarValorMonetario(i.calcularPrecoTotal());
+            val[9] = NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade());
+            val[10] = NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade());
+            val[11] = NumeroUtils.arredondarValorMonetario(i.calcularValorICMS());
+            val[12] = NumeroUtils.arredondarValorMonetario(i.calcularValorIPI());
 
             l.add(val);
         }
@@ -511,6 +502,8 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("idPedido", idPedido);
         addAtributo("nf", nf);
         addAtributo("listaProduto", gerarListaProdutoDetalhamento(nf.getListaDetalhamentoProdutoServicoNFe()));
+        addAtributo("infoAdFisco", nf.getInformacoesAdicionaisNFe() != null ? nf.getInformacoesAdicionaisNFe()
+                .getInformacoesAdicionaisInteresseFisco() : null);
 
         IdentificacaoNFe iNFe = null;
         if ((iNFe = nf.getIdentificacaoNFe()) != null) {

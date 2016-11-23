@@ -1099,7 +1099,7 @@ function gerarInputProdutoServico(){
 				          {'nome':'quantidadeComercial', 'valor': celulas[3].innerHTML},
 				          {'nome':'quantidadeTributavel', 'valor': celulas[3].innerHTML},
 				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[4].innerHTML},
-				          {'nome':'valorTotalBruto', 'valor': celulas[7].innerHTML},
+				          {'nome':'valorTotalBruto', 'valor': celulas[5].innerHTML},
 				          {'nome':'unidadeTributavel', 'valor': celulas[2].innerHTML},
 				          {'nome':'valorUnitarioTributacao', 'valor': celulas[4].innerHTML}
 					]};
@@ -1156,7 +1156,7 @@ function inicializarModalCancelamento(botao){
 	});
 };
 
-function recuperarValoresImpostos(valoresTabela){
+function recuperarValoresProduto(valoresTabela){
 	var impostos = new Array();
 	impostos [0] = gerarJsonTipoIcms();
 	impostos [1] = gerarJsonTipoIpi();
@@ -1244,18 +1244,20 @@ function inicializarBotaoPesquisarCEP(config){
 	
 };
 
-function inicializarOpcoesSelect(json){
-	var campos = json.campos;
+function inicializarValoresDefaultProduto(valDefault){
+	var campos = valDefault.campos;
 	var id = null;
-	var sel = null;
+	var campo = null;
 	var hidden = null;
 	for (var i = 0; i < campos.length; i++) {
 		if((hidden = document.getElementById(campos[i].idHidden)) != undefined && !isEmpty(hidden.value)){
 			continue;
 		}
-		sel = document.getElementById(campos[i].idSelect);
-		sel.value = campos[i].valor;
-		sel.selected='selected';
+		campo = document.getElementById(campos[i].idCampo);
+		campo.value = campos[i].valor;
+		if($(campo).is('select')){
+			campo.selected='selected';
+		}
 	}
 };
 
@@ -1283,7 +1285,7 @@ function editarProduto(botao){
 	                               {'id': 'aliquotaCOFINS', 'valorTabela': '<c:out value="${percentualCofins}"/>'}
 	                               ]};
 	
-	recuperarValoresImpostos(valoresTabela);
+	recuperarValoresProduto(valoresTabela);
 	
 	recuperarImportacaoProduto();
 	recuperarExportacaoProduto();
@@ -1312,17 +1314,17 @@ function editarProduto(botao){
 	fecharBloco('bloco_exportacao_prod');
 	fecharBloco('bloco_adicao_import');
 	
-	var opcoes = {'campos':
-		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idSelect': 'cfop', 'valor': '5102'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.codigoSituacaoTributaria', 'idSelect': 'tipoTributacaoICMS', 'valor': '00'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.origemMercadoria', 'idSelect': 'origemMercadoriaICMS', 'valor': '0'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.modalidadeDeterminacaoBC', 'idSelect': 'modBCICMS', 'valor': '0'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins.tipoCofins.codigoSituacaoTributaria', 'idSelect': 'codSitTribCOFINS', 'valor': '01'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis.codigoSituacaoTributaria', 'idSelect': 'codSitTribPIS', 'valor': '01'}]};
-	
-	inicializarOpcoesSelect(opcoes);
-	
 	calcularValoresImpostos();
+	
+	var valDefault = {'campos':
+		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idCampo': 'cfop', 'valor': '5102'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.codigoSituacaoTributaria', 'idCampo': 'tipoTributacaoICMS', 'valor': '00'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.origemMercadoria', 'idCampo': 'origemMercadoriaICMS', 'valor': '0'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.modalidadeDeterminacaoBC', 'idCampo': 'modBCICMS', 'valor': '0'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins.tipoCofins.codigoSituacaoTributaria', 'idCampo': 'codSitTribCOFINS', 'valor': '01'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis.codigoSituacaoTributaria', 'idCampo': 'codSitTribPIS', 'valor': '01'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].informacoesAdicionais', 'idCampo': 'infoAdicionaisProd', 'valor': 'Total aproximado de tributos federais, estaduais e municipais: '+$('#valorTotaltributosProd').val()}]};
+	inicializarValoresDefaultProduto(valDefault);
 };
 
 function gerarJsonCalculoImpostos(){

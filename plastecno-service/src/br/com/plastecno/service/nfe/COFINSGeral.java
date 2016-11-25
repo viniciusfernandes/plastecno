@@ -43,8 +43,8 @@ public class COFINSGeral {
 			"08", "09" })
 	private Double valorBC;
 
-	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
+	public Double calcularValor() {
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : null;
 	}
 
 	public COFINSGeral carregarValores() {

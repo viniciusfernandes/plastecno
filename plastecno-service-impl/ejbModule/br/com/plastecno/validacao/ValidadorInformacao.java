@@ -108,7 +108,6 @@ public final class ValidadorInformacao {
 								valIdentif);
 					}
 				}
-				continue;
 			}
 
 			if (informacao.obrigatorio() && conteudoCampo == null) {

@@ -67,8 +67,8 @@ public class ICMSGeral {
 	@InformacaoValidavel(tiposObrigatorios = { "PART" }, nomeExibicao = "UF de partilha do ICMS")
 	private String ufDividaST;
 
-	@XmlElement(name = "vICMS")
 	@InformacaoValidavel(decimal = { 13, 2 }, tiposNaoPermitidos = { "40", "41", "50", "70" }, nomeExibicao = "Valor calculado do ICMS")
+	@XmlElement(name = "vICMS")
 	private Double valor;
 
 	@XmlElement(name = "vBC")
@@ -111,12 +111,12 @@ public class ICMSGeral {
 	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "PART" }, nomeExibicao = "Valor ICMS ST da UF de destino")
 	private Double valorSTUFDestino;
 
-	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0d;
+	public Double calcularValor() {
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : null;
 	}
 
-	public double calcularValorST() {
-		return valorBCST != null && aliquotaST != null ? valorBCST * (aliquotaST / 100d) : 0d;
+	public Double calcularValorST() {
+		return valorBCST != null && aliquotaST != null ? valorBCST * (aliquotaST / 100d) : null;
 	}
 
 	public ICMSGeral carregarValores() {
@@ -345,4 +345,5 @@ public class ICMSGeral {
 	public void setValorSTUFDestino(Double valorSTUFDestino) {
 		this.valorSTUFDestino = valorSTUFDestino;
 	}
+
 }

@@ -32,8 +32,8 @@ public class IPIGeral {
 	@InformacaoValidavel(tiposObrigatorios = { "00", "49", "50", "99" }, nomeExibicao = "Valor da unidade tributável do IPI")
 	private Double valorUnidadeTributavel;
 
-	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
+	public Double calcularValor() {
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : null;
 	}
 
 	public IPIGeral carregarValores() {

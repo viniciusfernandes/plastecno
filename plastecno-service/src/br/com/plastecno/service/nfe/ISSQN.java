@@ -30,7 +30,7 @@ public class ISSQN {
 	private Double valorBC;
 
 	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : null;
 	}
 
 	public ISSQN carregarValores() {

@@ -46,19 +46,19 @@ public class ICMSInterestadual {
 		if (valorBCUFDestino != null && percentualFCPDestino != null) {
 			valorFCPDestino = valorBCUFDestino * percentualFCPDestino / 100d;
 		} else {
-			valorFCPDestino = 0d;
+			valorFCPDestino = null;
 		}
 
 		if (valorBCUFDestino != null && aliquotaUFDestino != null && percentualProvisorioPartilha != null) {
 			valorUFDestino = valorBCUFDestino * aliquotaUFDestino * percentualProvisorioPartilha / 10000d;
 		} else {
-			valorUFDestino = 0d;
+			valorUFDestino = null;
 		}
 
 		if (valorBCUFDestino != null && aliquotaUFDestino != null) {
 			valorUFRemetente = valorBCUFDestino * aliquotaUFDestino / 100d - valorUFDestino;
 		} else {
-			valorFCPDestino = 0d;
+			valorFCPDestino = null;
 		}
 		return this;
 	}

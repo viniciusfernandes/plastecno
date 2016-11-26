@@ -79,7 +79,7 @@ public class PISGeral {
 
 	@XmlTransient
 	public Double getValorAliquota() {
-		return valorAliquota;
+		return valorAliquota == null ? 0 : valorAliquota;
 	}
 
 	@XmlTransient

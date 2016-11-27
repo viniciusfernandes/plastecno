@@ -309,17 +309,15 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_local_mercadoria');
 	inicializarFadeInBloco('bloco_referenciada');
 	inicializarFadeInBloco('bloco_destinatario');
-	inicializarFadeInBloco('bloco_transporte');
-	inicializarFadeInBloco('bloco_rentecao_icms');
+	inicializarFadeInBloco('bloco_retencao_icms');
 	inicializarFadeInBloco('bloco_exportacao');
 	inicializarFadeInBloco('bloco_veiculo');
+	inicializarFadeInBloco('bloco_transporte', ['bloco_retencao_icms' ,'bloco_veiculo']);
 	
 	fecharBloco('bloco_local_mercadoria');
 	fecharBloco('bloco_referenciada');
-	fecharBloco('bloco_destinatario');
-	fecharBloco('bloco_transporte');
-	fecharBloco('bloco_rentecao_icms');
 	fecharBloco('bloco_exportacao');
+	fecharBloco('bloco_retencao_icms');
 	fecharBloco('bloco_veiculo');
 	
 	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
@@ -680,10 +678,16 @@ function gerarLegendaBloco(nomeBloco){
 	$(legend).html(innerHTML);
 };
 
-function abrirBloco(nomeBloco){
+function abrirBloco(nomeBloco, blocosFechados){
 	gerarLegendaBloco(nomeBloco);
 	<%-- Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn --%>
 	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table, #'+nomeBloco+' .fieldsetInterno').fadeIn('fast');
+	if(blocosFechados == undefined || blocosFechados == null){
+		return;
+	}
+	for (var i = 0; i < blocosFechados.length; i++) {
+		fecharBloco(blocosFechados[i]);
+	}
 };
 
 function fecharBloco(nomeBloco){
@@ -700,11 +704,11 @@ function inicializarLegendaBlocoProduto(nomeBloco){
 	$('#'+nomeBloco+' div:not(.suggestionsBox)').fadeIn('fast');
 };
 
-function inicializarFadeInBloco(nomeBloco){
+function inicializarFadeInBloco(nomeBloco, blocosFechados){
 	$('#'+nomeBloco+' legend:first').click(function(){
 		var innerHTML = $(this).html();
 		if(innerHTML.indexOf('+') != -1){
-			abrirBloco(nomeBloco);
+			abrirBloco(nomeBloco, blocosFechados);
 		} else {
 			fecharBloco(nomeBloco);
 		}
@@ -2388,82 +2392,6 @@ function inicializarCalculoImpostos(){
 				</div>
 			
 				<div class="divFieldset">
-				<fieldset id="bloco_veiculo" class="fieldsetInterno">
-					<legend>::: Veículo/Reboque/Balsa/Vagão ::: -</legend>
-					<div  class="label obrigatorio">Placa:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa"  value="${nf.transporteNFe.veiculo.placa}" maxlength="7" style="width: 100%" />
-					</div>
-					<div  class="label obrigatorio">UF:</div>
-					<div class="input" style="width: 50%">
-						<select id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" style="width: 20%">
-							<option value=""></option>
-							<c:forEach var="tipo" items="${listaTipoUF}">
-								<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq nf.transporteNFe.veiculo.uf}">selected</c:if>>${tipo.codigo}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Regist. Trans. Cargo:</div>
-					<div class="input" style="width: 30%">
-						<input type="text" id="registroVeiculo" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
-							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" maxlength="2" style="width: 50%" />
-					</div>
-					<div class="bloco_botoes">
-						<a id="botaoInserirReboque" title="Inserir Dados do Reboque" class="botaoAdicionar"></a>
-					</div>
-								
-					<table id="tabela_reboque" class="listrada" >
-						<thead>
-							<tr>
-								<th>Placa Reboq.</th>
-								<th>UF Reboq.</th>
-								<th>Registro Reboq.</th>
-								<th>Ações</th>
-							</tr>
-						</thead>
-						
-						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
-						<tbody>
-							<c:forEach var="reboque" items="${nf.transporteNFe.listaReboque}">
-							<tr>
-								<td>${reboque.placa}</td>
-								<td>${reboque.uf}</td>
-								<td>${reboque.registroNacionalTransportador}</td>
-								<td></td>
-							</tr>
-							</c:forEach>
-						</tbody>
-					</table>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset id="bloco_rentecao_icms" class="fieldsetInterno">
-					<legend>::: Retenção ICMS ::: -</legend>
-					<div  class="label obrigatorio">Valor Serviço:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valServRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorServico" value="${nf.transporteNFe.retencaoICMS.valorServico}" style="width: 100%" />
-					</div>
-					<div  class="label obrigatorio">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valBCRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorBC" value="${nf.transporteNFe.retencaoICMS.valorBC}" style="width: 100%" />
-					</div>
-					<div  class="label obrigatorio">Alíquota(%):</div>
-					<div class="input" style="width: 30%">
-						<input type="text" id="aliqRetICMSTransp" name="nf.transporteNFe.retencaoICMS.aliquota" value="${nf.transporteNFe.retencaoICMS.aliquota}" style="width: 20%" />
-					</div>
-					<div  class="label obrigatorio">CFOP:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.cfop" value="${nf.transporteNFe.retencaoICMS.cfop}" maxlength="4" style="width: 100%" />
-					</div>
-					<div  class="label obrigatorio">Município Gerador:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" value="${nf.transporteNFe.retencaoICMS.codigoMunicipioGerador}" maxlength="7" style="width: 20%" />
-					</div>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
 				<fieldset id="bloco_volume" class="fieldsetInterno">
 					<legend>::: Volumes :::</legend>
 					<div class="label">Qtde.:</div>
@@ -2522,6 +2450,82 @@ function inicializarCalculoImpostos(){
 						</c:forEach>
 						</tbody>
 					</table>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_veiculo" class="fieldsetInterno fieldsetFechado">
+					<legend>::: Veículo/Reboque/Balsa/Vagão ::: -</legend>
+					<div  class="label obrigatorio">Placa:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa"  value="${nf.transporteNFe.veiculo.placa}" maxlength="7" style="width: 100%" />
+					</div>
+					<div  class="label obrigatorio">UF:</div>
+					<div class="input" style="width: 50%">
+						<select id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" style="width: 20%">
+							<option value=""></option>
+							<c:forEach var="tipo" items="${listaTipoUF}">
+								<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq nf.transporteNFe.veiculo.uf}">selected</c:if>>${tipo.codigo}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Regist. Trans. Cargo:</div>
+					<div class="input" style="width: 30%">
+						<input type="text" id="registroVeiculo" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
+							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" maxlength="2" style="width: 50%" />
+					</div>
+					<div class="bloco_botoes">
+						<a id="botaoInserirReboque" title="Inserir Dados do Reboque" class="botaoAdicionar"></a>
+					</div>
+								
+					<table id="tabela_reboque" class="listrada" >
+						<thead>
+							<tr>
+								<th>Placa Reboq.</th>
+								<th>UF Reboq.</th>
+								<th>Registro Reboq.</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						
+						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+						<tbody>
+							<c:forEach var="reboque" items="${nf.transporteNFe.listaReboque}">
+							<tr>
+								<td>${reboque.placa}</td>
+								<td>${reboque.uf}</td>
+								<td>${reboque.registroNacionalTransportador}</td>
+								<td></td>
+							</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_retencao_icms" class="fieldsetInterno fieldsetFechado">
+					<legend>::: Retenção ICMS ::: -</legend>
+					<div  class="label obrigatorio">Valor Serviço:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="valServRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorServico" value="${nf.transporteNFe.retencaoICMS.valorServico}" style="width: 100%" />
+					</div>
+					<div  class="label obrigatorio">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="valBCRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorBC" value="${nf.transporteNFe.retencaoICMS.valorBC}" style="width: 100%" />
+					</div>
+					<div  class="label obrigatorio">Alíquota(%):</div>
+					<div class="input" style="width: 30%">
+						<input type="text" id="aliqRetICMSTransp" name="nf.transporteNFe.retencaoICMS.aliquota" value="${nf.transporteNFe.retencaoICMS.aliquota}" style="width: 20%" />
+					</div>
+					<div  class="label obrigatorio">CFOP:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" name="nf.transporteNFe.retencaoICMS.cfop" value="${nf.transporteNFe.retencaoICMS.cfop}" maxlength="4" style="width: 100%" />
+					</div>
+					<div  class="label obrigatorio">Município Gerador:</div>
+					<div class="input" style="width: 50%">
+						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" value="${nf.transporteNFe.retencaoICMS.codigoMunicipioGerador}" maxlength="7" style="width: 20%" />
+					</div>
 				</fieldset>
 				</div>
 		</fieldset>

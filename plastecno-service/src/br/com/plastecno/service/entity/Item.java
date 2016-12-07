@@ -121,15 +121,18 @@ public abstract class Item implements Serializable, Cloneable {
 		}
 
 		if (!this.isPeca()) {
-			descricao.append(isFormatado ? getMedidaExternaFomatada() : getMedidaExterna());
+			descricao.append(isFormatado && getMedidaExternaFomatada() != null ? getMedidaExternaFomatada()
+					: getMedidaExterna());
 			descricao.append(" X ");
 
 			if (getMedidaInterna() != null) {
-				descricao.append(isFormatado ? getMedidaInternaFomatada() : getMedidaInterna());
+				descricao.append(isFormatado && getMedidaInternaFomatada() != null ? getMedidaInternaFomatada()
+						: getMedidaInterna());
 				descricao.append(" X ");
 			}
 
-			descricao.append(isFormatado ? getComprimentoFormatado() : getComprimento());
+			descricao.append(isFormatado && getComprimentoFormatado() != null ? getComprimentoFormatado()
+					: getComprimento());
 			descricao.append(" mm");
 		} else {
 			descricao.append(getDescricaoPeca());
@@ -157,7 +160,7 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public String getComprimentoFormatado() {
 		if (comprimentoFormatado == null) {
-			return " _ ";
+			return null;
 		}
 		return comprimentoFormatado;
 	}
@@ -194,7 +197,7 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public String getMedidaExternaFomatada() {
 		if (medidaExternaFomatada == null) {
-			return " _ ";
+			return null;
 		}
 		return medidaExternaFomatada;
 	}
@@ -203,7 +206,7 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public String getMedidaInternaFomatada() {
 		if (medidaInternaFomatada == null) {
-			return " _ ";
+			return null;
 		}
 		return medidaInternaFomatada;
 	}

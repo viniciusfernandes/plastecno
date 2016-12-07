@@ -56,7 +56,8 @@ public final class ValidadorInformacao {
 
 			Object conteudoCampo = recuperarConteudo(campo, obj);
 			// Esse bloco deve preceder todos os outros pois eh uma
-			// pre-avaliacao do conteudo dos campos e podera alterar o conteudo
+			// pre-avaliacao do conteudo dos campos e podera alterar o
+			// conteudo
 			// de acordo com a marcacao, sendo que esse novo conteudo sera
 			// revalidado posteiormente
 			if (valorCond != null) {
@@ -65,13 +66,17 @@ public final class ValidadorInformacao {
 						if (conteudoCampo != null && valorCond.equals(c)) {
 							// listaMensagem.add("\"" +
 							// informacao.nomeExibicao() +
-							// "\" não deve ser preenchido para o \"" + nomeCond
+							// "\" não deve ser preenchido para o \"" +
+							// nomeCond
 							// + " = " + valorCond + "\"");
 
 							// No caso em que um determinado tipo nao for
-							// permitido iremos anular o conteudo para facilitar
-							// a implementacao de regras de negocio, evitando
-							// assim novas verificacoes de nulidade do conteudo
+							// permitido iremos anular o conteudo para
+							// facilitar
+							// a implementacao de regras de negocio,
+							// evitando
+							// assim novas verificacoes de nulidade do
+							// conteudo
 							// evitando uma quantidade de if/else
 							conteudoCampo = null;
 							setConteudo(campo, obj, null);
@@ -92,10 +97,12 @@ public final class ValidadorInformacao {
 
 				if (informacao.tiposPermitidos().length > 0) {
 					ok = true;
-					// Verificando se o tipo selecionado eh diferente de todos
+					// Verificando se o tipo selecionado eh diferente de
+					// todos
 					// os tipos permitidos para depois invalidar
 					for (String c : informacao.tiposPermitidos()) {
-						// Condicao indicando que encontrou o tipo na lista de
+						// Condicao indicando que encontrou o tipo na lista
+						// de
 						// tipos permitidos
 						if (ok = valorCond.equals(c)) {
 							break;
@@ -154,7 +161,8 @@ public final class ValidadorInformacao {
 				continue;
 			}
 
-			// Essa variavel sera sempre ZERO no caso em que o conteudo nao seja
+			// Essa variavel sera sempre ZERO no caso em que o conteudo nao
+			// seja
 			// uma
 			// string
 			isString = conteudoCampo instanceof String;
@@ -163,7 +171,8 @@ public final class ValidadorInformacao {
 			}
 
 			COMPRIMENTO_STRING = isString ? conteudoCampo.toString().trim().length() : -1;
-			// Esse bloco deve anteceder a validacao do comprimento da String
+			// Esse bloco deve anteceder a validacao do comprimento da
+			// String
 			// pois ele complementa seu conteudo com prefixos
 			if (COMPRIMENTO_STRING > 0 && informacao.prefixo().length() > 0 && informacao.tamanho() > 0
 					&& COMPRIMENTO_STRING < informacao.tamanho()) {
@@ -177,9 +186,12 @@ public final class ValidadorInformacao {
 				setConteudo(campo, obj, conteudoCampo);
 			}
 
-			// Muito importante que essa validacao seja feita antes das outras
-			// pois apos a remocao do caracteres invalidos esses valores deverao
-			// ser validados, por isso esse condicional nao tem a instrucao de
+			// Muito importante que essa validacao seja feita antes das
+			// outras
+			// pois apos a remocao do caracteres invalidos esses valores
+			// deverao
+			// ser validados, por isso esse condicional nao tem a instrucao
+			// de
 			// fim de execucao "continue"
 			if (COMPRIMENTO_STRING > 0 && informacao.substituicao().length > 1) {
 				conteudoCampo = conteudoCampo.toString().replaceAll(informacao.substituicao()[0],

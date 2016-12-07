@@ -42,7 +42,7 @@ public class PISGeral {
 			"ST" }, tiposNaoPermitidos = { "04", "05", "06", "07", "08", "09" }, nomeExibicao = "Valor de base de cáculo do PIS")
 	private Double valorBC;
 
-	public double calcularValor() {
+	public Double calcularValor() {
 		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : null;
 	}
 

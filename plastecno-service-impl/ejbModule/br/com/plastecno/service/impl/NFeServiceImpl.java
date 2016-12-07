@@ -504,7 +504,7 @@ public class NFeServiceImpl implements NFeService {
 			JAXBContext context = JAXBContext.newInstance(NFe.class);
 			Marshaller m = context.createMarshaller();
 			// for pretty-print XML in JAXB
-			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
 			m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 			m.marshal(nFe, writer);
 			return writer.toString();

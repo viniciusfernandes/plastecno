@@ -368,8 +368,8 @@ public class EmissaoNFeController extends AbstractController {
         for (DetalhamentoProdutoServicoNFe i : lista) {
             p = i.getProduto();
             val = new Object[13];
-            val[0] = i.contemICMS() ? i.getTributos().getIcms().getTipoIcms().getAliquota() : 0;
-            val[1] = i.contemIPI() ? i.getTributos().getIpi().getTipoIpi().getAliquota() : 0;
+            val[0] = i.contemICMS() ? i.getTributos().getIcms().getTipoIcms().getAliquota() : (Double) 0.0;
+            val[1] = i.contemIPI() ? i.getTributos().getIpi().getTipoIpi().getAliquota() : (Double) 0.0;
             val[2] = p.getCfop();
             val[3] = p.getDescricao();
             val[4] = p.getNcm();
@@ -379,8 +379,8 @@ public class EmissaoNFeController extends AbstractController {
             val[8] = p.getValorTotalBruto();
             val[9] = p.getValorUnitarioComercializacao();
             val[10] = p.getValorUnitarioComercializacao();
-            val[11] = i.contemICMS() ? i.getTributos().getIcms().getTipoIcms().getValor() : 0d;
-            val[12] = i.contemIPI() ? i.getTributos().getIpi().getTipoIpi().getValor() : 0d;
+            val[11] = i.contemICMS() ? i.getTributos().getIcms().getTipoIcms().getValor() : (Double) 0.0;
+            val[12] = i.contemIPI() ? i.getTributos().getIpi().getTipoIpi().getValor() : (Double) 0.0;
 
             l.add(val);
         }

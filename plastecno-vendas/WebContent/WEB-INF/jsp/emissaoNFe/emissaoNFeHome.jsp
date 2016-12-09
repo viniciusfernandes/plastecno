@@ -235,7 +235,7 @@ $(document).ready(function() {
 		request.fail(function(request, status) {
 			alert('Falha na busca da destinatário por CNPJ: ' + cnpj+' => Status da requisicao: '+status);
 		});
-	});	
+	});
 	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
@@ -376,6 +376,14 @@ function inicializarAlteracaoTabelaProdutos(){
 			}
 		}
 	};
+	
+	$('#bloco_info_adicionais_prod #codigoProduto').keyup(function (){
+		alterarColuna(1, $(this).val());
+	});
+	
+	$('#bloco_info_adicionais_prod #descricaoProduto').keyup(function (){
+		alterarColuna(2, $(this).val());
+	});
 	
 	$('#bloco_tributos #cfop').change(function (){
 		alterarColuna(12, $(this).val());
@@ -1288,8 +1296,11 @@ function editarProduto(botao){
 	                               {'id': 'aliquotaPIS', 'valorTabela': '<c:out value="${percentualPis}"/>'},
 	                               {'id': 'aliquotaCOFINS', 'valorTabela': '<c:out value="${percentualCofins}"/>'}
 	                               ]};
+	<%-- Aqui estamos apenas dando condicao ao usuario para alterar a descricao dos produtos da tabela que serao enviados para gerar a NFe --%>
+	$('#bloco_info_adicionais_prod #codigoProduto').val(celulas[1].innerHTML);
+    $('#bloco_info_adicionais_prod #descricaoProduto').val(celulas[2].innerHTML);
 	
-	recuperarValoresProduto(valoresTabela);
+    recuperarValoresProduto(valoresTabela);
 	
 	recuperarImportacaoProduto();
 	recuperarExportacaoProduto();
@@ -1789,6 +1800,14 @@ function inicializarCalculoImpostos(){
 			<a id="produtosInfo"></a>
 			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
 				<legend>::: Info. Adicionais Prod. ::: +</legend>
+				<div class="label">Código:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="codigoProduto" maxlength="20" style="width: 20%"/>
+				</div>
+				<div class="label">Descrição:</div>
+				<div class="input" style="width: 70%">
+					<input type="text" id="descricaoProduto" maxlength="120" style="width: 100%"/>
+				</div>
 				<div class="label">Num. Ped. Compra:</div>
 				<div class="input" style="width: 10%">
 					<input type="text" id="numeroPedidoCompraProd" maxlength="15" style="width: 100%"/>

@@ -40,7 +40,7 @@ function inserirMascaraDecimal(idCampo, digitos, precisao) {
 	// Aqui adicionamos um caracter referente ao ponto da casa decimal
 	$('#'+idCampo).attr('maxlength', digitos + 1);
 	// A separacao entre os milhares nao pode ter simbolos de sepadas casas
-	$('#'+idCampo).maskMoney({thousands:'', decimal:'.', precision: precisao});
+	$('#'+idCampo).maskMoney({thousands:'', decimal:'.', allowZero: true, precision: precisao});
 };
 
 function mascaraData(idCampo, mascara){

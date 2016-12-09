@@ -207,7 +207,7 @@ public class NFeServiceImpl implements NFeService {
 					tipoIcms = tributo.getTipoIcms();
 
 					valorBC += tipoIcms.getValorBC();
-					valorBCST += tipoIcms.getValorBCST();
+					valorBCST += tipoIcms.getValorBCST() == null ? (Double) 0d : tipoIcms.getValorBCST();
 					valorST += tipoIcms.getValorST();
 					valorICMSDesonerado += tipoIcms.getValorDesonerado();
 					valorICMS += tipoIcms.carregarValores().getValor();

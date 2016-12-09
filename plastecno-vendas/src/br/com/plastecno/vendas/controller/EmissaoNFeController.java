@@ -345,6 +345,7 @@ public class EmissaoNFeController extends AbstractController {
             p.setValorUnitarioTributavel(NumeroUtils.arredondarValorMonetario((Double) val[10]));
             p.setValorICMS(NumeroUtils.arredondarValorMonetario((Double) val[11]));
             p.setValorIPI(NumeroUtils.arredondarValorMonetario((Double) val[12]));
+            p.setCodigo((String) val[13]);
             l.add(p);
         }
         return l;
@@ -367,7 +368,7 @@ public class EmissaoNFeController extends AbstractController {
         ProdutoServicoNFe p = null;
         for (DetalhamentoProdutoServicoNFe i : lista) {
             p = i.getProduto();
-            val = new Object[13];
+            val = new Object[14];
             val[0] = i.contemICMS() ? i.getTributos().getIcms().getTipoIcms().getAliquota() : (Double) 0.0;
             val[1] = i.contemIPI() ? i.getTributos().getIpi().getTipoIpi().getAliquota() : (Double) 0.0;
             val[2] = p.getCfop();
@@ -381,7 +382,7 @@ public class EmissaoNFeController extends AbstractController {
             val[10] = p.getValorUnitarioComercializacao();
             val[11] = i.contemICMS() ? i.getTributos().getIcms().getTipoIcms().getValor() : (Double) 0.0;
             val[12] = i.contemIPI() ? i.getTributos().getIpi().getTipoIpi().getValor() : (Double) 0.0;
-
+            val[13] = p.getCodigo();
             l.add(val);
         }
         return l;
@@ -394,7 +395,7 @@ public class EmissaoNFeController extends AbstractController {
         List<Object[]> l = new ArrayList<Object[]>();
         Object[] val = null;
         for (ItemPedido i : lista) {
-            val = new Object[13];
+            val = new Object[14];
             val[0] = NumeroUtils.gerarPercentual(i.getAliquotaICMS());
             val[1] = NumeroUtils.gerarPercentual(i.getAliquotaIPI());
             val[2] = "";
@@ -408,7 +409,7 @@ public class EmissaoNFeController extends AbstractController {
             val[10] = NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade());
             val[11] = NumeroUtils.arredondarValorMonetario(i.calcularValorICMS());
             val[12] = NumeroUtils.arredondarValorMonetario(i.calcularValorIPI());
-
+            val[13] = i.gerarCodigo();
             l.add(val);
         }
         return l;

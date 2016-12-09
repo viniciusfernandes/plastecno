@@ -1098,14 +1098,14 @@ function gerarInputProdutoServico(){
 		
 		produto = {'nomeObjeto':'nf.listaItem['+i+'].produtoServicoNFe',
 				'campos':[{'nome':'codigo', 'valor': celulas[1].innerHTML},
-				          {'nome':'descricao', 'valor': celulas[1].innerHTML},
-				          {'nome':'unidadeComercial', 'valor': celulas[2].innerHTML},
-				          {'nome':'quantidadeComercial', 'valor': celulas[3].innerHTML},
-				          {'nome':'quantidadeTributavel', 'valor': celulas[3].innerHTML},
-				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[4].innerHTML},
-				          {'nome':'valorTotalBruto', 'valor': celulas[5].innerHTML},
-				          {'nome':'unidadeTributavel', 'valor': celulas[2].innerHTML},
-				          {'nome':'valorUnitarioTributacao', 'valor': celulas[4].innerHTML}
+				          {'nome':'descricao', 'valor': celulas[2].innerHTML},
+				          {'nome':'unidadeComercial', 'valor': celulas[3].innerHTML},
+				          {'nome':'quantidadeComercial', 'valor': celulas[4].innerHTML},
+				          {'nome':'quantidadeTributavel', 'valor': celulas[4].innerHTML},
+				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[5].innerHTML},
+				          {'nome':'valorTotalBruto', 'valor': celulas[6].innerHTML},
+				          {'nome':'unidadeTributavel', 'valor': celulas[3].innerHTML},
+				          {'nome':'valorUnitarioTributacao', 'valor': celulas[5].innerHTML}
 					]};
 		
 		gerarInputHidden(detalhamento);
@@ -1274,13 +1274,13 @@ function editarProduto(botao){
 	
 	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
 	--numeroProdutoEdicao;
-	var valorBC = celulas[5].innerHTML;
+	var valorBC = celulas[6].innerHTML;
 	
 	var valoresTabela = {'campos':[{'id': 'itemPedidoCompraProd', 'valorTabela':celulas[0].innerHTML},
-								   {'id': 'ncm', 'valorTabela': celulas[11].innerHTML},
-								   {'id': 'cfop', 'valorTabela': celulas[12].innerHTML},
-	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[9].innerHTML},
-	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[10].innerHTML},
+								   {'id': 'ncm', 'valorTabela': celulas[12].innerHTML},
+								   {'id': 'cfop', 'valorTabela': celulas[13].innerHTML},
+	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[10].innerHTML},
+	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[11].innerHTML},
 	                               {'id': 'valorBCPIS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCCOFINS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCICMS', 'valorTabela': valorBC},
@@ -1744,6 +1744,7 @@ function inicializarCalculoImpostos(){
 				<thead>
 					<tr>
 						<th>Item</th>
+						<th>Cod.</th>
 						<th>Desc.</th>
 						<th>Venda</th>
 						<th>Qtde.</th>
@@ -1763,6 +1764,7 @@ function inicializarCalculoImpostos(){
 					<c:forEach var="p" items="${listaProduto}" varStatus="count">
 						<tr>
 							<td>${p.numeroItem}</td>
+							<td>${p.codigo}</td>
 							<td>${p.descricao}</td>
 							<td>${p.unidadeComercial}</td>
 							<td>${p.quantidade}</td>

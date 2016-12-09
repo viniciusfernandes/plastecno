@@ -107,14 +107,24 @@ public abstract class Item implements Serializable, Cloneable {
 		return getMedidaExterna() != null || getMedidaInterna() != null || getComprimento() != null;
 	}
 
+	public String gerarCodigo() {
+		FormaMaterial f = getFormaMaterial();
+		String s = getMaterial() != null ? getMaterial().getSigla() : null;
+		return f != null && s != null ? f.toString() + s : null;
+	}
+
 	private String gerarDescricaoItem(boolean isCompleto, boolean isFormatado) {
 		StringBuilder descricao = new StringBuilder();
 		if (getMaterial() != null) {
 			descricao.append(getFormaMaterial());
 			descricao.append(" - ");
-			descricao.append(getMaterial().getSigla());
-			descricao.append(" - ");
+
 			if (isCompleto) {
+				descricao.append(getMaterial().getSigla());
+				descricao.append(" - ");
+				descricao.append(getMaterial().getDescricao() == null ? " " : getMaterial().getDescricao());
+				descricao.append(" - ");
+			} else {
 				descricao.append(getMaterial().getDescricao() == null ? " " : getMaterial().getDescricao());
 				descricao.append(" - ");
 			}

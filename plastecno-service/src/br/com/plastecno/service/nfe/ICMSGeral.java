@@ -207,7 +207,11 @@ public class ICMSGeral {
 
 	@XmlTransient
 	public Double getValorBCST() {
-		return valorBCST == null ? 0 : valorBCST;
+		// Nao podemos verificar se o valor eh null e retornar zero como nos
+		// outros campos pois, no caso de ICMS em que nao eh substituicao
+		// tributaria, o valor de aliquota zero esta sendo serializado no CML da
+		// Nfe e isso nao deve ocorrer.
+		return valorBCST;
 	}
 
 	@XmlTransient

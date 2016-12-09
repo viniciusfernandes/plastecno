@@ -4,6 +4,7 @@ public class ProdutoServicoJson {
     private Double aliquotaICMS;
     private Double aliquotaIPI;
     private String cfop;
+    private String codigo;
     private String descricao;
     private String ncm;
     private Integer numeroItem;
@@ -25,6 +26,10 @@ public class ProdutoServicoJson {
 
     public String getCfop() {
         return cfop;
+    }
+
+    public String getCodigo() {
+        return codigo;
     }
 
     public String getDescricao() {
@@ -77,6 +82,10 @@ public class ProdutoServicoJson {
 
     public void setCfop(String cfop) {
         this.cfop = cfop;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     public void setDescricao(String descricao) {

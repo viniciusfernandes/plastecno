@@ -11,8 +11,9 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @XmlType(propOrder = { "codigoSituacaoTributaria", "valorBC", "aliquota", "quantidadeVendida", "valorAliquota", "valor" })
 public class PISGeral {
 	@XmlElement(name = "pPIS")
-	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, tiposNaoPermitidos = { "04", "05", "06", "07", "08",
-			"09" }, nomeExibicao = "Alíquota do PIS")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "01", "02", "03", "49", "50", "51", "52", "53",
+			"54", "55", "56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98",
+			"99", "ST" }, tiposNaoPermitidos = { "04", "05", "06", "07", "08", "09" }, nomeExibicao = "Alíquota do PIS")
 	private Double aliquota;
 
 	@XmlElement(name = "CST")

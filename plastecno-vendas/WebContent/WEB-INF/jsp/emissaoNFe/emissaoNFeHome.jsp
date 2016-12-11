@@ -364,18 +364,42 @@ function encontrarBotaoEdicaoProduto(proximo){
 };
 
 function inicializarAlteracaoTabelaProdutos(){
+	var linhas = document.getElementById('tabela_produtos').rows;
 	var alterarColuna = function(indice, valor){
 		if(numeroProdutoEdicao == null || numeroProdutoEdicao < 0){
-			return;
+			return null;
 		}
-		var linhas = document.getElementById('tabela_produtos').rows;
+		
 		var item = numeroProdutoEdicao + 1;
 		for (var i = 0; i < linhas.length; i++) {
 			if(item == linhas[i].cells[0].innerHTML){
 				linhas[i].cells[indice].innerHTML = valor;
+				return linhas[i];
 			}
 		}
+		return null;
 	};
+	
+	$('#bloco_info_adicionais_prod #quantidadeProduto').keyup(function (){
+		var qtde = $(this).val();
+		var linha  = alterarColuna(4, qtde);
+		if(linha != null){
+			var vu = linha.cells[5].innerHTML;
+			var pICMS = linha.cells[10].innerHTML;
+			var pIPI = linha.cells[11].innerHTML;
+			var vTot = vu*qtde;
+			var cells = linha.cells;
+			cells[6].innerHTML = vTot.toFixed(2);
+			cells[8].innerHTML = (vTot*pICMS/100).toFixed(2);
+			cells[9].innerHTML = (vTot*pIPI/100).toFixed(2);
+			var campos = gerarJsonCalculoImpostos();
+			
+			for (var i = 0; i < campos.length; i++) {
+				document.getElementById(campos[i].idVl).value = cells[6].innerHTML;
+			}
+			calcularValoresImpostos();
+		}
+	});
 	
 	$('#bloco_info_adicionais_prod #codigoProduto').keyup(function (){
 		alterarColuna(1, $(this).val());
@@ -427,6 +451,8 @@ function inicializarMascaraReferenciada(){
 };
 
 function inicializarMascaraImpostos(){
+	inserirMascaraDecimal('quantidadeProduto', 5, 0);
+
 	inserirMascaraDecimal('valorBCICMS', 15, 2);
 	inserirMascaraDecimal('valorBCSTICMS', 15, 2);
 	inserirMascaraDecimal('valDesonICMS', 15, 2);
@@ -1277,13 +1303,18 @@ function editarProduto(botao){
 	btProduto = botao;
 	var linha = botao.parentNode.parentNode;
 	var celulas = linha.cells;
-	<%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
-	numeroProdutoEdicao = celulas[0].innerHTML;
 	
+	<%-- Aqui estamos apenas dando condicao ao usuario para alterar a descricao dos produtos da tabela que serao enviados para gerar a NFe --%>
+	$('#bloco_info_adicionais_prod #quantidadeProduto').val(celulas[4].innerHTML);
+	$('#bloco_info_adicionais_prod #codigoProduto').val(celulas[1].innerHTML);
+    $('#bloco_info_adicionais_prod #descricaoProduto').val(celulas[2].innerHTML);
+    
+    <%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
+	numeroProdutoEdicao = celulas[0].innerHTML;
 	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
 	--numeroProdutoEdicao;
-	var valorBC = celulas[6].innerHTML;
-	
+	<%-- A execucao dos metodos abaixo dependem da definicao do numero do produto que esta sendo editado --%>
+    var valorBC = celulas[6].innerHTML;
 	var valoresTabela = {'campos':[{'id': 'itemPedidoCompraProd', 'valorTabela':celulas[0].innerHTML},
 								   {'id': 'ncm', 'valorTabela': celulas[12].innerHTML},
 								   {'id': 'cfop', 'valorTabela': celulas[13].innerHTML},
@@ -1296,12 +1327,13 @@ function editarProduto(botao){
 	                               {'id': 'aliquotaPIS', 'valorTabela': '<c:out value="${percentualPis}"/>'},
 	                               {'id': 'aliquotaCOFINS', 'valorTabela': '<c:out value="${percentualCofins}"/>'}
 	                               ]};
+	recuperarValoresProduto(valoresTabela);
+	calcularValoresImpostos();
+	
 	<%-- Aqui estamos apenas dando condicao ao usuario para alterar a descricao dos produtos da tabela que serao enviados para gerar a NFe --%>
+	$('#bloco_info_adicionais_prod #quantidadeProduto').val(celulas[4].innerHTML);
 	$('#bloco_info_adicionais_prod #codigoProduto').val(celulas[1].innerHTML);
     $('#bloco_info_adicionais_prod #descricaoProduto').val(celulas[2].innerHTML);
-	
-    recuperarValoresProduto(valoresTabela);
-	
 	recuperarImportacaoProduto();
 	recuperarExportacaoProduto();
 	
@@ -1328,8 +1360,6 @@ function editarProduto(botao){
 	fecharBloco('bloco_importacao_prod');
 	fecharBloco('bloco_exportacao_prod');
 	fecharBloco('bloco_adicao_import');
-	
-	calcularValoresImpostos();
 	
 	var valDefault = {'campos':
 		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idCampo': 'cfop', 'valor': '5102'},
@@ -1800,6 +1830,10 @@ function inicializarCalculoImpostos(){
 			<a id="produtosInfo"></a>
 			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
 				<legend>::: Info. Adicionais Prod. ::: +</legend>
+				<div class="label">Quantidade:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="quantidadeProduto" maxlength="20" style="width: 10%"/>
+				</div>
 				<div class="label">Código:</div>
 				<div class="input" style="width: 80%">
 					<input type="text" id="codigoProduto" maxlength="20" style="width: 20%"/>

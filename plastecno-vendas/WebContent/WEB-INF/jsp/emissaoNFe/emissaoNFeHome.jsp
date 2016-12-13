@@ -1486,7 +1486,7 @@ function inicializarCalculoImpostos(){
 			<div class="input" style="width: 70%">
 				<select id="listaNumeroNFe" style="width: 15%" >
 					<c:forEach var="numero" items="${listaNumeroNFe}">
-						<option value="${numero}">${numero}</option>
+						<option value="${numero}" <c:if test="${numero eq numeroNFe}">selected</c:if>>${numero}</option>
 					</c:forEach>
 				</select>
 			</div>

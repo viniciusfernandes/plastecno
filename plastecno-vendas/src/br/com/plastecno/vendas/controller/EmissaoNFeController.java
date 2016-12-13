@@ -404,49 +404,36 @@ public class EmissaoNFeController extends AbstractController {
              * pedido que nao podera ser emitido
              */
             nFeService.validarEmissaoNFePedido(idPedido);
-            NFe nFe = null;
+
+            Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
+            List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
+            Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
+            List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+
+            String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
+            addAtributo("infoAdFisco",
+                    "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO No. "
+                            + idPedido + ". VENDEDORA: " + nomeVend);
+
+            addAtributo("listaNumeroNFe", nFeService.pesquisarNumeroNFeByIdPedido(idPedido));
+            addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
+            addAtributo("listaDuplicata", listaDuplicata);
+            addAtributo("cliente", cliente);
+            addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
+            addAtributo("logradouro",
+                    cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
+            addAtributo("idPedido", idPedido);
+            addAtributo(
+                    "telefoneContatoPedido",
+                    telefone.length > 0 ? String.valueOf(telefone[0])
+                            + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
             try {
-                nFe = nFeService.gerarNFeByIdPedido(idPedido);
+                Integer[] numNFe = nFeService.gerarNumeroSerieModeloNFe();
+                addAtributo("numeroNFe", numNFe[0]);
+                addAtributo("serieNFe", numNFe[1]);
+                addAtributo("modeloNFe", numNFe[2]);
             } catch (BusinessException e) {
-                gerarListaMensagemErroLogException(e);
-            }
-
-            if (nFe != null) {
-                popularNFe(nFe.getDadosNFe(), idPedido);
-                try {
-                    formatarDatas(nFe.getDadosNFe(), true);
-                } catch (BusinessException e) {
-                    gerarListaMensagemErro(e);
-                }
-            } else {
-                Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
-                List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
-                Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
-                List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-
-                String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
-                addAtributo("infoAdFisco",
-                        "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO No. "
-                                + idPedido + ". VENDEDORA: " + nomeVend);
-
-                addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
-                addAtributo("listaDuplicata", listaDuplicata);
-                addAtributo("cliente", cliente);
-                addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
-                addAtributo("logradouro",
-                        cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
-                addAtributo("idPedido", idPedido);
-                addAtributo("telefoneContatoPedido", telefone.length > 0 ? String.valueOf(telefone[0])
-                        + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
-                try {
-                    Integer[] numNFe = nFeService.gerarNumeroSerieModeloNFe();
-                    addAtributo("numeroNFe", numNFe[0]);
-                    addAtributo("serieNFe", numNFe[1]);
-                    addAtributo("modeloNFe", numNFe[2]);
-                } catch (BusinessException e) {
-                    gerarListaMensagemAlerta(e);
-                }
-
+                gerarListaMensagemAlerta(e);
             }
 
         } catch (BusinessException e1) {

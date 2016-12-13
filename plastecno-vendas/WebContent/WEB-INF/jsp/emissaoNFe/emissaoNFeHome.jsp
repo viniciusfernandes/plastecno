@@ -9,18 +9,18 @@
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js?${tempoInicial}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${tempoInicial}"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${tempoInicial}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js?${tempoInicial}"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/edicao_tabela.js?${tempoInicial}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/edicao_tabela.js?${versaoCache}"/>"></script>
 
 
 

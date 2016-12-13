@@ -38,7 +38,7 @@ import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
 public abstract class AbstractController {
 
-    private final static Long TEMPO_INICIAL = new Date().getTime();
+    private final static Long VERSAO_CACHE = new Date().getTime();
     private final String cssMensagemAlerta = "mensagemAlerta";
     private final String cssMensagemErro = "mensagemErro";
     private final String cssMensagemSucesso = "mensagemSucesso";
@@ -63,7 +63,7 @@ public abstract class AbstractController {
             // para isso vamos concatenar o nome do arquivo .css, .js, etc com o
             // valor desse atributo, assim o navegador entendera que eh um novo
             // recurso a ser carregado.
-            addAtributoPadrao("tempoInicial", TEMPO_INICIAL);
+            addAtributoPadrao("versaoCache", VERSAO_CACHE);
         } catch (ServiceLocatorException e) {
             this.logger.log(Level.SEVERE, "Falha no lookup de algum servico", e);
             this.result.include("erro",

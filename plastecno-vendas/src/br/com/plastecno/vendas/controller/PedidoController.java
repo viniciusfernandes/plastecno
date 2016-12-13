@@ -424,7 +424,7 @@ public class PedidoController extends AbstractController {
     }
 
     private boolean isPedidoDesabilitado(Pedido pedido) {
-        if (pedido == null) {
+        if (pedido == null || isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS)) {
             return false;
         } else {
             SituacaoPedido situacao = pedido.getSituacaoPedido();

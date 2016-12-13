@@ -117,7 +117,7 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	inicializarAutomcompleteCliente('<c:url value="/pedido/cliente"/>');
-
+	<%--Desabilitando toda a tela de pedidos --%>
 	<c:if test="${pedidoDesabilitado}">
 		$('input[type=text], select:not(.semprehabilitado), textarea').attr('disabled', true).addClass('desabilitado');
 	</c:if>

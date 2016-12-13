@@ -6,43 +6,36 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "tb_pedido_nfe", schema = "vendas")
-public class PedidoNFe {
+@Table(name = "tb_nfe_pedido", schema = "vendas")
+public class NFePedido {
 
 	@Column(name = "id_pedido")
-	@Id
 	private Integer idPedido;
 
 	private Integer modelo;
 
+	@Id
 	private Integer numero;
 
 	@Column(name = "numero_triang")
-	private Integer numeroTriangulacao;
+	private Integer numeroTriangularizado;
 
 	private Integer serie;
 
 	@Column(name = "xml_nfe")
 	private String xmlNFe;
 
-	@Column(name = "xml_nfe_triang")
-	private String xmlNFeTriangulacao;
-
-	public PedidoNFe() {
+	public NFePedido() {
 	}
 
-	public PedidoNFe(Integer idPedido, Integer numero, Integer serie, Integer modelo, String xmlNFe,
-			boolean isTriangularizacao) {
-		this.idPedido = idPedido;
+	public NFePedido(Integer numero, Integer serie, Integer modelo, String xmlNFe, Integer idPedido,
+			Integer numeroTriangularizado) {
+		this.numero = numero;
 		this.serie = serie;
 		this.modelo = modelo;
-		if (isTriangularizacao) {
-			this.numeroTriangulacao = numero;
-			this.xmlNFeTriangulacao = xmlNFe;
-		} else {
-			this.numero = numero;
-			this.xmlNFe = xmlNFe;
-		}
+		this.idPedido = idPedido;
+		this.xmlNFe = xmlNFe;
+		this.numeroTriangularizado = numeroTriangularizado;
 	}
 
 	public Integer getIdPedido() {
@@ -57,8 +50,8 @@ public class PedidoNFe {
 		return numero;
 	}
 
-	public Integer getNumeroTriangulacao() {
-		return numeroTriangulacao;
+	public Integer getNumeroTriangularizado() {
+		return numeroTriangularizado;
 	}
 
 	public Integer getSerie() {
@@ -67,10 +60,6 @@ public class PedidoNFe {
 
 	public String getXmlNFe() {
 		return xmlNFe;
-	}
-
-	public String getXmlNFeTriangulacao() {
-		return xmlNFeTriangulacao;
 	}
 
 	public void setIdPedido(Integer idPedido) {
@@ -85,8 +74,8 @@ public class PedidoNFe {
 		this.numero = numero;
 	}
 
-	public void setNumeroTriangulacao(Integer numeroTriangulacao) {
-		this.numeroTriangulacao = numeroTriangulacao;
+	public void setNumeroTriangularizado(Integer numeroTriangularizado) {
+		this.numeroTriangularizado = numeroTriangularizado;
 	}
 
 	public void setSerie(Integer serie) {
@@ -95,10 +84,6 @@ public class PedidoNFe {
 
 	public void setXmlNFe(String xmlNFe) {
 		this.xmlNFe = xmlNFe;
-	}
-
-	public void setXmlNFeTriangulacao(String xmlNFeTriangulacao) {
-		this.xmlNFeTriangulacao = xmlNFeTriangulacao;
 	}
 
 }

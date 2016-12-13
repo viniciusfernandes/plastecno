@@ -98,55 +98,6 @@ public class EmissaoNFeController extends AbstractController {
         serializarJson(new SerializacaoJson("icms", icms));
     };
 
-    private void carregarNFe(Integer idPedido, boolean isTriangulacao) {
-        NFe nFe = null;
-        try {
-            nFe = nFeService.gerarNFeByIdPedido(idPedido, isTriangulacao);
-        } catch (BusinessException e) {
-            gerarListaMensagemErroLogException(e);
-        }
-
-        if (nFe != null) {
-            popularNFe(nFe.getDadosNFe(), idPedido);
-            try {
-                formatarDatas(nFe.getDadosNFe(), true);
-            } catch (BusinessException e) {
-                gerarListaMensagemErro(e);
-            }
-        } else {
-            Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
-            List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
-            Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
-            List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-
-            String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
-            addAtributo("infoAdFisco",
-                    "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO No. "
-                            + idPedido + ". VENDEDORA: " + nomeVend);
-
-            addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
-            addAtributo("listaDuplicata", listaDuplicata);
-            addAtributo("cliente", cliente);
-            addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
-            addAtributo("logradouro",
-                    cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
-            addAtributo("idPedido", idPedido);
-            addAtributo(
-                    "telefoneContatoPedido",
-                    telefone.length > 0 ? String.valueOf(telefone[0])
-                            + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
-            try {
-                Integer[] numNFe = nFeService.gerarNumeroSerieModeloNFe();
-                addAtributo("numeroNFe", numNFe[0]);
-                addAtributo("serieNFe", numNFe[1]);
-                addAtributo("modeloNFe", numNFe[2]);
-            } catch (BusinessException e) {
-                gerarListaMensagemAlerta(e);
-            }
-
-        }
-    }
-
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
         addAtributo("listaTipoAliquotaICMSInterestadual", TipoAliquotaICMSInterestadual.values());
@@ -426,17 +377,21 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe/NFe")
     public void pesquisarNFe(Integer numeroNFe) {
-        Integer idPedido = null;
-        // Primeiro estamos verificando se existe uma NFe sem tringulacao para,
-        // posteriormente pesquisar a existencia de triangulacao. Essa
-        // estrategia nao tera impacto na performance pois a grande maioria das
-        // NFes nao possui triangulacao
-        if ((idPedido = nFeService.pesquisarIdPedidoByNumeroNFe(numeroNFe, false)) != null) {
-            carregarNFe(idPedido, false);
-        } else if ((idPedido = nFeService.pesquisarIdPedidoByNumeroNFe(numeroNFe, true)) != null) {
-            carregarNFe(idPedido, true);
+        NFe nFe = null;
+        try {
+            nFe = nFeService.gerarNFeByNumero(numeroNFe);
+        } catch (BusinessException e) {
+            gerarListaMensagemErroLogException(e);
         }
 
+        if (nFe != null) {
+            popularNFe(nFe.getDadosNFe(), nFeService.pesquisarIdPedidoByNumeroNFe(numeroNFe));
+            try {
+                formatarDatas(nFe.getDadosNFe(), true);
+            } catch (BusinessException e) {
+                gerarListaMensagemErro(e);
+            }
+        }
         irTopoPagina();
     }
 
@@ -449,7 +404,50 @@ public class EmissaoNFeController extends AbstractController {
              * pedido que nao podera ser emitido
              */
             nFeService.validarEmissaoNFePedido(idPedido);
-            carregarNFe(idPedido, false);
+            NFe nFe = null;
+            try {
+                nFe = nFeService.gerarNFeByIdPedido(idPedido);
+            } catch (BusinessException e) {
+                gerarListaMensagemErroLogException(e);
+            }
+
+            if (nFe != null) {
+                popularNFe(nFe.getDadosNFe(), idPedido);
+                try {
+                    formatarDatas(nFe.getDadosNFe(), true);
+                } catch (BusinessException e) {
+                    gerarListaMensagemErro(e);
+                }
+            } else {
+                Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
+                List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
+                Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
+                List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+
+                String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
+                addAtributo("infoAdFisco",
+                        "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO No. "
+                                + idPedido + ". VENDEDORA: " + nomeVend);
+
+                addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
+                addAtributo("listaDuplicata", listaDuplicata);
+                addAtributo("cliente", cliente);
+                addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
+                addAtributo("logradouro",
+                        cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
+                addAtributo("idPedido", idPedido);
+                addAtributo("telefoneContatoPedido", telefone.length > 0 ? String.valueOf(telefone[0])
+                        + String.valueOf(telefone[1]).replaceAll("\\D+", "") : "");
+                try {
+                    Integer[] numNFe = nFeService.gerarNumeroSerieModeloNFe();
+                    addAtributo("numeroNFe", numNFe[0]);
+                    addAtributo("serieNFe", numNFe[1]);
+                    addAtributo("modeloNFe", numNFe[2]);
+                } catch (BusinessException e) {
+                    gerarListaMensagemAlerta(e);
+                }
+
+            }
 
         } catch (BusinessException e1) {
             gerarListaMensagemErro(e1.getListaMensagem());
@@ -501,6 +499,7 @@ public class EmissaoNFeController extends AbstractController {
         popularTransporte(nf);
 
         addAtributo("idPedido", idPedido);
+        addAtributo("listaNumeroNFe", nFeService.pesquisarNumeroNFeByIdPedido(idPedido));
         addAtributo("nf", nf);
         addAtributo("listaProduto", gerarListaProdutoDetalhamento(nf.getListaDetalhamentoProdutoServicoNFe()));
         addAtributo("infoAdFisco", nf.getInformacoesAdicionaisNFe() != null ? nf.getInformacoesAdicionaisNFe()

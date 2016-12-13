@@ -33,9 +33,9 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
-import br.com.plastecno.service.dao.PedidoNFeDAO;
+import br.com.plastecno.service.dao.NFePedidoDAO;
 import br.com.plastecno.service.entity.Logradouro;
-import br.com.plastecno.service.entity.PedidoNFe;
+import br.com.plastecno.service.entity.NFePedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.TODO;
@@ -77,7 +77,7 @@ public class NFeServiceImpl implements NFeService {
 	@EJB
 	private LogradouroService logradouroService;
 
-	private PedidoNFeDAO pedidoNFeDAO = null;
+	private NFePedidoDAO nFePedidoDAO = null;
 
 	@EJB
 	private PedidoService pedidoService;
@@ -321,8 +321,12 @@ public class NFeServiceImpl implements NFeService {
 		validarEmissaoNFePedido(idPedido);
 		validarNumeroNFePedido(idPedido, ide.getNumero() != null ? Integer.parseInt(ide.getNumero()) : null);
 
+		Integer numeroTriangularizado = null;
 		if (isTriangularizacao) {
-			ide.setNumero(String.valueOf(gerarNumeroTriangulacao(idPedido)));
+			// Armazenando o numero da nfe que foi triangularizada
+			numeroTriangularizado = Integer.parseInt(ide.getNumero());
+			// Gerando um novo numero para a nfe triangular
+			ide.setNumero(String.valueOf(gerarNumeroSerieModeloNFe()[0]));
 		}
 
 		carregarValoresTransporte(nFe);
@@ -336,8 +340,9 @@ public class NFeServiceImpl implements NFeService {
 		configurarSubistituicaoTributariaPosValidacao(nFe);
 
 		final String xml = gerarXMLNfe(nFe, null);
-		pedidoNFeDAO.inserirPedidoNFe(new PedidoNFe(idPedido, Integer.parseInt(ide.getNumero()), Integer.parseInt(ide
-				.getSerie()), Integer.parseInt(ide.getModelo()), xml, isTriangularizacao));
+		nFePedidoDAO.inserirNFePedido(new NFePedido(Integer.parseInt(ide.getNumero()),
+				Integer.parseInt(ide.getSerie()), Integer.parseInt(ide.getModelo()), xml, idPedido,
+				numeroTriangularizado));
 
 		escreverXMLNFe(xml, idPedido.toString() + "_" + ide.getNumero());
 
@@ -426,10 +431,7 @@ public class NFeServiceImpl implements NFeService {
 		return endereco;
 	}
 
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public NFe gerarNFeByIdPedido(Integer idPedido, boolean isTriangulacao) throws BusinessException {
-		String xmlNFe = pedidoNFeDAO.pesquisarXMLNFeByIdPedido(idPedido, isTriangulacao);
+	private NFe gerarNFe(String xmlNFe) throws BusinessException {
 		if (xmlNFe == null || xmlNFe.trim().isEmpty()) {
 			return null;
 		}
@@ -440,8 +442,21 @@ public class NFeServiceImpl implements NFeService {
 			StringReader reader = new StringReader(xmlNFe);
 			return (NFe) unmarshaller.unmarshal(reader);
 		} catch (JAXBException e) {
-			throw new BusinessException("Não foi possível gerar a NFe a partir XML do pedido No. " + idPedido, e);
+			throw new BusinessException("Não foi possível gerar a NFe a partir XML", e);
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public NFe gerarNFeByIdPedido(Integer idPedido) throws BusinessException {
+		return gerarNFe(nFePedidoDAO.pesquisarXMLNFeByIdPedido(idPedido));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public NFe gerarNFeByNumero(Integer numero) throws BusinessException {
+		return gerarNFe(nFePedidoDAO.pesquisarXMLNFeByNumero(numero));
+
 	}
 
 	@Override
@@ -450,7 +465,7 @@ public class NFeServiceImpl implements NFeService {
 		Object[] o = QueryUtil
 				.gerarRegistroUnico(
 						entityManager
-								.createQuery("select p.numero, p.serie, p.modelo, (select max(p2.numeroTriangulacao) from PedidoNFe p2) from PedidoNFe p where p.numero = (select max(p1.numero) from PedidoNFe p1 ) "),
+								.createQuery("select p.numero, p.serie, p.modelo, (select max(p2.numeroTriangularizado) from NFePedido p2) from NFePedido p where p.numero = (select max(p1.numero) from NFePedido p1 ) "),
 						Object[].class, null);
 
 		if (o == null || o.length < 3 || (o[0] == null && o[1] == null && o[2] == null)) {
@@ -479,23 +494,6 @@ public class NFeServiceImpl implements NFeService {
 		return new Integer[] { (Integer) o[0] + 1, (Integer) o[1], (Integer) o[2] };
 	}
 
-	private Integer gerarNumeroTriangulacao(Integer idPedido) throws BusinessException {
-		Integer numero = pesquisarNumeroNFe(idPedido, false);
-		if (numero == null) {
-			throw new BusinessException("Não é possível triangulação pois o pedido No. " + idPedido + " não possui NFe");
-		}
-
-		Integer triangulacao = pesquisarNumeroNFe(idPedido, true);
-		if (triangulacao == null) {
-			triangulacao = gerarNumeroSerieModeloNFe()[0];
-		}
-		if (numero != null && triangulacao != null && Math.abs(numero - triangulacao) != 1) {
-			throw new BusinessException("Os número so da NFe " + numero + " e da NFe de triangulação " + triangulacao
-					+ "não são compatíveis pois eles não estão em sequência");
-		}
-		return triangulacao;
-	}
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public String gerarXMLNfe(NFe nFe, Integer idPedido) throws BusinessException {
@@ -515,7 +513,7 @@ public class NFeServiceImpl implements NFeService {
 
 	@PostConstruct
 	public void init() {
-		pedidoNFeDAO = new PedidoNFeDAO(entityManager);
+		nFePedidoDAO = new NFePedidoDAO(entityManager);
 	}
 
 	@Override
@@ -526,25 +524,16 @@ public class NFeServiceImpl implements NFeService {
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@Override
-	public Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe, boolean isTriangulacao) {
-		return pedidoNFeDAO.pesquisarIdPedidoByNumeroNFe(numeroNFe, isTriangulacao);
+	public Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe) {
+		return nFePedidoDAO.pesquisarIdPedidoByNumeroNFe(numeroNFe);
 	}
 
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@Override
-	public Integer pesquisarNumeroNFe(Integer idPedido, boolean isTriangulacao) {
-		if (idPedido == null) {
-			return null;
-		}
-		Integer numero = pedidoNFeDAO.pesquisarNumeroNFe(idPedido, isTriangulacao);
-		if (isTriangulacao && numero == null) {
-			try {
-				numero = gerarNumeroSerieModeloNFe()[0];
-			} catch (BusinessException e) {
-				numero = null;
-			}
-		}
-		return numero;
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer> pesquisarNumeroNFeByIdPedido(Integer idPedido) {
+		return entityManager
+				.createQuery("select p.numero from NFePedido p where p.idPedido = :idPedido", Integer.class)
+				.setParameter("idPedido", idPedido).getResultList();
 	}
 
 	@Override
@@ -571,12 +560,9 @@ public class NFeServiceImpl implements NFeService {
 			return;
 		}
 
-		Integer id = QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select p.idPedido from PedidoNFe p where :numeroNFe = p.numero or :numeroNFe = p.numeroTriangulacao ")
-								.setParameter("numeroNFe", numeroNFe), Integer.class, null);
+		Integer id = QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.idPedido from NFePedido p where :numeroNFe = p.numero ")
+						.setParameter("numeroNFe", numeroNFe), Integer.class, null);
 		if (id != null && !id.equals(idPedido)) {
 			throw new BusinessException("O número " + numeroNFe
 					+ " da NFe já exite no sistema e foi emitida para o pedido No. " + id);

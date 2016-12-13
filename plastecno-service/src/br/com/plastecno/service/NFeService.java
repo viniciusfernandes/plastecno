@@ -21,7 +21,9 @@ public interface NFeService {
 
 	EnderecoNFe gerarEnderecoNFe(Logradouro logradouro, String telefone);
 
-	NFe gerarNFeByIdPedido(Integer idPedido, boolean isTriangulacao) throws BusinessException;
+	NFe gerarNFeByIdPedido(Integer idPedido) throws BusinessException;
+
+	NFe gerarNFeByNumero(Integer numero) throws BusinessException;
 
 	Integer[] gerarNumeroSerieModeloNFe() throws BusinessException;
 
@@ -29,9 +31,9 @@ public interface NFeService {
 
 	List<Object[]> pesquisarCFOP();
 
-	Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe, boolean isTriangulacao);
+	Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe);
 
-	Integer pesquisarNumeroNFe(Integer idPedido, boolean isTriangulacao);
+	List<Integer> pesquisarNumeroNFeByIdPedido(Integer idPedido);
 
 	void validarEmissaoNFePedido(Integer idPedido) throws BusinessException;
 

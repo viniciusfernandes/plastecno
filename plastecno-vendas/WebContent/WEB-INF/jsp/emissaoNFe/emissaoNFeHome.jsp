@@ -182,6 +182,11 @@ $(document).ready(function() {
 		calcularValoresImpostos();
 	});
 	
+	$('#listaNumeroNFe').change(function(){
+		$('#numeroNFe').val($(this).val());
+		$('#botaoPesquisaNFe').click();
+	});
+	
 	$('#botaoPesquisarCnpjTransp').click(function () {
 		var cnpj = $('#cnpjTransportadora').val(); 
 		if (cnpj == undefined || isEmpty(cnpj)) {
@@ -1474,12 +1479,20 @@ function inicializarCalculoImpostos(){
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoPedidoPDF" value="" title="Visualizar Pedido PDF" class="botaoPdf_16" />
 			</div>
-			<%--div para dar o correto alinhamento dos campos no formulario. Nao teve outra alternativa--%>
+			<%--div para dar o correto alinhamento dos campos no formulario por causa do botao de PDF. Nao teve outra alternativa--%>
 			<div class="input" style="width: 60%">
+			</div>
+			<div class="label">NFes:</div>
+			<div class="input" style="width: 70%">
+				<select id="listaNumeroNFe" style="width: 15%" >
+					<c:forEach var="numero" items="${listaNumeroNFe}">
+						<option value="${numero}">${numero}</option>
+					</c:forEach>
+				</select>
 			</div>
 			<div class="label">Núm. NFe:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="numeroNFe" name="nf.identificacaoNFe.numero" value="${numeroNFe}" maxlength="9" style="width: 100%" />
+				<input type="text" id="numeroNFe" name="nf.identificacaoNFe.numero" value="${numeroNFe}" maxlength="9" style="width: 100%"/>
 			</div>
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoPesquisaNFe" title="Pesquisar NFe" value="" class="botaoPesquisarPequeno" />

@@ -355,7 +355,8 @@ function encontrarBotaoEdicaoProduto(proximo){
 			linha = btProduto.parentNode.parentNode.previousElementSibling;
 		}
 		if(linha != null){
-			var nodes = linha.cells[13].childNodes;
+			var last = linha.cells.length-1;
+			var nodes = linha.cells[last].childNodes;
 			for (var i = 0; i < nodes.length; i++) {
 				if(nodes[i].nodeType == 1){
 					btProduto = nodes[i];

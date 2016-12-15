@@ -1107,7 +1107,7 @@ public class PedidoServiceImpl implements PedidoService {
 						"select v.id from Pedido p inner join p.proprietario v where p.id = :idPedido ").setParameter(
 						"idPedido", idPedido), Integer.class, null);
 	}
-	
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemAguardandoCompra(Integer idCliente, Periodo periodo) {
@@ -1201,6 +1201,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor) {
 		if (idVendedor == null) {
 			return new ArrayList<ItemPedido>();
@@ -1211,6 +1212,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo) {
 		return itemPedidoDAO.pesquisarItemPedidoVendaComissionadaByPeriodo(periodo, null,
 				pesquisarSituacaoVendaEfetivada());
@@ -1230,8 +1232,8 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery(
-						"select v.nome from Pedido p inner join p.proprietario v where p.id = :idPedido ").setParameter(
-						"idPedido", idPedido), String.class, null);
+						"select v.nome from Pedido p inner join p.proprietario v where p.id = :idPedido ")
+						.setParameter("idPedido", idPedido), String.class, null);
 	}
 
 	@Override
@@ -1365,6 +1367,12 @@ public class PedidoServiceImpl implements PedidoService {
 	public int pesquisarQuantidadeItemPedido(Integer idItemPedido) {
 		Integer q = itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
 		return q == null ? 0 : q;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer[]> pesquisarQuantidadeItemPedidoByIdPedido(Integer idPedido) {
+		return itemPedidoDAO.pesquisarQuantidadeItemPedidoByIdPedido(idPedido);
 	}
 
 	@Override

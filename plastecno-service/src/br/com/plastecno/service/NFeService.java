@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
@@ -32,6 +33,8 @@ public interface NFeService {
 	List<Object[]> pesquisarCFOP();
 
 	Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe);
+
+	List<NFeItemFracionado> pesquisarItemFracionado();
 
 	List<Integer> pesquisarNumeroNFeByIdPedido(Integer idPedido);
 

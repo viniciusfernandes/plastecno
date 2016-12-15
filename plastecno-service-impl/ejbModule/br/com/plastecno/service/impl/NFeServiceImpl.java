@@ -33,8 +33,10 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
+import br.com.plastecno.service.dao.NFeItemFracionadoDAO;
 import br.com.plastecno.service.dao.NFePedidoDAO;
 import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.NFePedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
@@ -76,6 +78,8 @@ public class NFeServiceImpl implements NFeService {
 
 	@EJB
 	private LogradouroService logradouroService;
+
+	private NFeItemFracionadoDAO nFeItemFracionadoDAO = null;
 
 	private NFePedidoDAO nFePedidoDAO = null;
 
@@ -346,6 +350,9 @@ public class NFeServiceImpl implements NFeService {
 
 		escreverXMLNFe(xml, idPedido.toString() + "_" + ide.getNumero());
 
+		// Inserindo os itens emitidos em cada nota para que possamos efetuar o
+		// controle das quantidades fracionadas dos itens emitidos.
+		inserirNFeItemFracionado(nFe, idPedido);
 		return ide.getNumero();
 	}
 
@@ -514,6 +521,61 @@ public class NFeServiceImpl implements NFeService {
 	@PostConstruct
 	public void init() {
 		nFePedidoDAO = new NFePedidoDAO(entityManager);
+		nFeItemFracionadoDAO = new NFeItemFracionadoDAO(entityManager);
+	}
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	private void inserirNFeItemFracionado(NFe nFe, Integer idPedido) throws BusinessException {
+		List<DetalhamentoProdutoServicoNFe> listaDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
+		List<Integer[]> listaQtde = pedidoService.pesquisarQuantidadeItemPedidoByIdPedido(idPedido);
+		Integer idItem = null;
+		Integer idItemFrac = null;
+		Integer numItem = 0;
+		Integer qtdeItem = 0;
+		Integer numeroNFe = Integer.parseInt(nFe.getDadosNFe().getIdentificacaoNFe().getNumero());
+		Integer qtdeFrac = 0;
+		Integer totalFrac = null;
+		ProdutoServicoNFe p = null;
+
+		for (DetalhamentoProdutoServicoNFe d : listaDet) {
+			p = d.getProduto();
+			idItem = null;
+			qtdeItem = 0;
+			numItem = 0;
+			qtdeFrac = p.getQuantidadeComercial() != null ? p.getQuantidadeComercial().intValue() : 0;
+			for (Integer[] qtde : listaQtde) {
+				if (d.getNumeroItem() != null && d.getNumeroItem().equals(qtde[2])) {
+					idItem = qtde[0];
+					qtdeItem = qtde[1];
+					numItem = qtde[2];
+					idItemFrac = nFeItemFracionadoDAO.pesquisarIdItemFracionado(idItem, numeroNFe);
+					break;
+				}
+			}
+
+			totalFrac = nFeItemFracionadoDAO.pesqusisarSomaQuantidadeFracionada(idItem, numeroNFe)  ;
+			totalFrac += qtdeFrac;
+			if (totalFrac > qtdeItem) {
+				throw new BusinessException(
+						"Não é possível fracionar uma quantidade maior do que a quantidade vendida para o item no. "
+								+ numItem + " do pedido no." + idPedido + ". Esse item contém apenas " + qtdeItem
+								+ " unidades.");
+			}
+			// Caso ainda existam itens do pedido para serem fracionado iremos
+			// inserir o registro no banco, caso contrario, vamos remover todos
+			// os registros de um determinado item do banco por questoes de
+			// performance, ja que nao eh necessario manter essa informacao no
+			// sistema.
+			if (totalFrac < qtdeItem) {
+				// Aqui estamos configurando o ID do item fracionado para casa
+				// tenhamos uma edicao da NFe evitando a duplicacao de registro
+				// que poderia surgir no relatorio de itens fracionados.
+				nFeItemFracionadoDAO.alterar(new NFeItemFracionado(idItemFrac, idItem, idPedido, p.getDescricao(),
+						numItem, numeroNFe, qtdeItem, qtdeFrac, p.getValorTotalBruto()));
+			} else if (totalFrac.equals(qtdeItem)) {
+				nFeItemFracionadoDAO.removerItemFracionado(idItem);
+			}
+		}
 	}
 
 	@Override
@@ -526,6 +588,12 @@ public class NFeServiceImpl implements NFeService {
 	@Override
 	public Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe) {
 		return nFePedidoDAO.pesquisarIdPedidoByNumeroNFe(numeroNFe);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<NFeItemFracionado> pesquisarItemFracionado() {
+		return nFeItemFracionadoDAO.pesquisarItemFracionado();
 	}
 
 	@Override

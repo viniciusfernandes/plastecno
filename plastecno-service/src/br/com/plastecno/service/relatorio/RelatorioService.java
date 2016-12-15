@@ -4,17 +4,17 @@ import java.util.List;
 
 import javax.ejb.Local;
 
-import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
-import br.com.plastecno.service.wrapper.ReceitaWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.service.wrapper.ReceitaWrapper;
 import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
-import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
+import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 
 @Local
@@ -43,11 +43,15 @@ public interface RelatorioService {
 			Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros, ItemPedido itemVendido);
 
+	RelatorioWrapper<Integer, NFeItemFracionado> gerarRelatorioPedidoFracionado();
+
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente);
 
-	RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoCompraPeriodo(Periodo periodo) throws BusinessException;
+	RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoCompraPeriodo(Periodo periodo)
+			throws BusinessException;
 
-	RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoVendaPeriodo(Periodo periodo) throws BusinessException;
+	RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoVendaPeriodo(Periodo periodo)
+			throws BusinessException;
 
 	List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException;
 
@@ -57,5 +61,4 @@ public interface RelatorioService {
 	RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,
 			Integer idVendedor) throws BusinessException;
 
-	List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor);
 }

@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
@@ -20,6 +21,7 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Usuario;
@@ -48,6 +50,9 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
+
+	@EJB
+	private NFeService nFeService;
 
 	@EJB
 	private PedidoService pedidoService;
@@ -111,7 +116,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 			precoItem = itemPedido.getValorComissionado();
 			valorVendido += precoItem;
-			// valorComissionado += precoItem * itemPedido.getAliquotaComissao();
+			// valorComissionado += precoItem *
+			// itemPedido.getAliquotaComissao();
 		}
 
 		valorReceita += valorVendido;
@@ -136,6 +142,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade)
 			throws BusinessException {
 
@@ -182,7 +189,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 				.append(StringUtils.formatarData(periodo.getFim()));
 		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor);
 
-		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(titulo.toString(), listaItemPedido);
+		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(titulo.toString(),
+				listaItemPedido);
 
 		double valorTotalComissionado = 0;
 		for (ItemPedido itemPedido : listaItemPedido) {
@@ -237,6 +245,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> gerarRelatorioCompra(Periodo periodo) throws InformacaoInvalidaException {
 		return this.pedidoService.pesquisarPedidoCompraByPeriodo(periodo);
 	}
@@ -254,11 +263,13 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException {
 		return pedidoService.pesquisarEntregaVendaByPeriodo(periodo);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoCompra(Integer idCliente, Periodo periodo) {
 		return gerarRelatorioItensPorPedido("Itens para Comprar",
 				pedidoService.pesquisarItemAguardandoCompra(idCliente, periodo));
@@ -276,16 +287,16 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(
-			Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros, ItemPedido itemVendido) {
+			Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido) {
 		RelatorioWrapper<Pedido, ItemPedido> relatorio = new RelatorioWrapper<Pedido, ItemPedido>("");
 		if (idCliente == null) {
 			return relatorio;
 		}
 
 		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
-			List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
-					null, idFornecedor, isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
+			List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(
+					idCliente, null, idFornecedor, isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
 
 			for (ItemPedido i : listaItemPedido) {
 				relatorio.addGrupo(i.getPedido(), i);
@@ -310,6 +321,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@REVIEW(descricao = "Nem sempre eh necessario carregar as informacoes da representada")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(String titulo, List<ItemPedido> listaItem) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = new RelatorioWrapper<Integer, ItemPedido>(titulo);
 		for (ItemPedido item : listaItem) {
@@ -336,14 +348,28 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, NFeItemFracionado> gerarRelatorioPedidoFracionado() {
+		RelatorioWrapper<Integer, NFeItemFracionado> relatorio = new RelatorioWrapper<Integer, NFeItemFracionado>(
+				"Relatório Pedido Fracionado NFe");
+		List<NFeItemFracionado> lista = nFeService.pesquisarItemFracionado();
+		for (NFeItemFracionado i : lista) {
+			relatorio.addGrupo(i.getIdPedido(), i);
+		}
+		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente) {
 		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Empacotar",
 				pedidoService.pesquisarItemPedidoAguardandoEmpacotamento(idCliente));
 	}
 
 	@Override
-	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoCompraPeriodo(Periodo periodo)
-			throws BusinessException {
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoCompraPeriodo(
+			Periodo periodo) throws BusinessException {
 
 		final List<TotalizacaoPedidoWrapper> resultados = pedidoService.pesquisarTotalCompraResumidaByPeriodo(periodo);
 
@@ -356,6 +382,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		return gerarRelatorioValorTotalPedidoPeriodo(resultados, titulo.toString());
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoPeriodo(
 			List<TotalizacaoPedidoWrapper> resultados, String titulo) throws BusinessException {
 
@@ -366,7 +393,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 			// Criando os agrupamentos pelo ID do proprietario do pedido.
 			relatorio.addGrupo(totalizacao.getIdProprietario(), totalizacao);
 
-			// Armazenando o valor negociado com cada representada para efetuarmos a
+			// Armazenando o valor negociado com cada representada para
+			// efetuarmos a
 			// totalizacao logo abaixo.
 			relatorio.addElemento(totalizacao.getIdRepresentada(), totalizacao);
 
@@ -375,10 +403,12 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
-	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoVendaPeriodo(Periodo periodo)
-			throws BusinessException {
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, TotalizacaoPedidoWrapper> gerarRelatorioValorTotalPedidoVendaPeriodo(
+			Periodo periodo) throws BusinessException {
 
-		final List<TotalizacaoPedidoWrapper> resultados = pedidoService.pesquisarTotalPedidoVendaResumidaByPeriodo(periodo);
+		final List<TotalizacaoPedidoWrapper> resultados = pedidoService
+				.pesquisarTotalPedidoVendaResumidaByPeriodo(periodo);
 
 		final StringBuilder titulo = new StringBuilder();
 		titulo.append("Relatório das Vendas do Período de ");
@@ -390,6 +420,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> gerarRelatorioVenda(Periodo periodo) throws InformacaoInvalidaException {
 		return this.pedidoService.pesquisarPedidoVendaByPeriodo(periodo);
 	}
@@ -430,6 +461,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioVendaVendedorByRepresentada gerarRelatorioVendaVendedor(boolean orcamento, Periodo periodo,
 			Integer idVendedor) throws BusinessException {
 		Usuario vendedor = this.usuarioService.pesquisarVendedorById(idVendedor);
@@ -439,10 +471,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 
 		final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamento " : "Vendas ").append(" do Vendedor ")
-				.append(vendedor.getNome()).append(" de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
-				.append(StringUtils.formatarData(periodo.getFim()));
+				.append(vendedor.getNome()).append(" de ").append(StringUtils.formatarData(periodo.getInicio()))
+				.append(" à ").append(StringUtils.formatarData(periodo.getFim()));
 
-		final RelatorioVendaVendedorByRepresentada relatorio = new RelatorioVendaVendedorByRepresentada(titulo.toString());
+		final RelatorioVendaVendedorByRepresentada relatorio = new RelatorioVendaVendedorByRepresentada(
+				titulo.toString());
 		List<Pedido> listaPedido = this.pedidoService.pesquisarVendaByPeriodoEVendedor(orcamento, periodo, idVendedor);
 		for (Pedido pedido : listaPedido) {
 			try {
@@ -454,10 +487,5 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 
 		return relatorio;
-	}
-
-	@Override
-	public List<Cliente> pesquisarClienteByIdVendedor(Integer idVendedor) {
-		return this.clienteService.pesquisarByIdVendedor(idVendedor);
 	}
 }

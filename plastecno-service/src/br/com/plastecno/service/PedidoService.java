@@ -216,6 +216,8 @@ public interface PedidoService {
 
 	int pesquisarQuantidadeItemPedido(Integer idItemPedido);
 
+	List<Integer[]> pesquisarQuantidadeItemPedidoByIdPedido(Integer idPedido);
+
 	int pesquisarQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
 
 	int pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido);

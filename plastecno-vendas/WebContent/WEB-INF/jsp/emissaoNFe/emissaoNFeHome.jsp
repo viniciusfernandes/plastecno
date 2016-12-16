@@ -451,6 +451,19 @@ function emitirNFe(isTriangulacao){
 	$('#formEmissao').submit();
 };
 
+function removerProduto(botao){
+	var tabela = document.getElementById('tabela_produtos');
+	var l = botao.parentNode.parentNode;
+	tabela.deleteRow(l.rowIndex);
+	var nome = 'nf.listaItem[2]';
+	$("input[name^='"+nome+"']").each(function(){
+		$(this).remove();
+	});
+	numeroImportacaoProduto = null;
+	numeroProdutoEdicao = null;
+	btProduto = null;
+};
+
 function inicializarMascaraReferenciada(){
 	$('#chaveReferenciada').mask('9999.9999.9999.9999.9999.9999.9999.9999.9999.9999.9999');
 };
@@ -1833,6 +1846,7 @@ function inicializarCalculoImpostos(){
 							<td>${p.cfop}</td>
 							<td>
 								<input type="button" value="" title="Editar Produto" class="botaoDinheiroPequeno" onclick="editarProduto(this);"/>
+								<input type="button" value="" title="Remover Produto" class="botaoRemover" onclick="removerProduto(this);"/>
 							</td>
 							
 						</tr>

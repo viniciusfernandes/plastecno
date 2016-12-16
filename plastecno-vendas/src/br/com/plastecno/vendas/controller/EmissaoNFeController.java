@@ -89,6 +89,18 @@ public class EmissaoNFeController extends AbstractController {
         inicializarListaCfop(request);
     }
 
+    private void ajustarQuantidadeFracionada(List<ItemPedido> listaItem, Integer idPedido) {
+        List<Integer[]> listaTotal = nFeService.pesquisarTotalItemFracionado(idPedido);
+        for (ItemPedido i : listaItem) {
+            for (Integer[] val : listaTotal) {
+                if (i.getSequencial().equals(val[0])) {
+                    i.setQuantidade(i.getQuantidade() - val[1]);
+                    break;
+                }
+            }
+        }
+    };
+
     @Get("emissaoNFe/valorICMSInterestadual")
     public void calcularValorICMSInterestadual(ICMSInterestadual icms) {
         icms.carregarValores();
@@ -96,7 +108,7 @@ public class EmissaoNFeController extends AbstractController {
         icms.setValorUFDestino(NumeroUtils.arredondarValorMonetario(icms.getValorUFDestino()));
         icms.setValorUFRemetente(NumeroUtils.arredondarValorMonetario(icms.getValorUFRemetente()));
         serializarJson(new SerializacaoJson("icms", icms));
-    };
+    }
 
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
@@ -410,7 +422,13 @@ public class EmissaoNFeController extends AbstractController {
             Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
             List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
             Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
+
+            /*
+             * Acho que podemos usar um metodo que carregue menos informacoes
+             * dos itens. Estamos trazendo tudo do banco de dados
+             */
             List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+            ajustarQuantidadeFracionada(listaItem, idPedido);
 
             String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
             addAtributo("infoAdFisco",

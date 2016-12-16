@@ -1,5 +1,6 @@
 package br.com.plastecno.service.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -27,6 +28,14 @@ public class NFeItemFracionadoDAO extends GenericDAO<NFeItemFracionado> {
 		return entityManager.createQuery("select i from NFeItemFracionado i", NFeItemFracionado.class).getResultList();
 	}
 
+	public Long pesquisarNumeroItemFracionado(Integer idPedido) {
+		Long tot = QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select count(i.idPedido) from NFeItemFracionado i where i.idPedido = :idPedido").setParameter(
+						"idPedido", idPedido), Long.class, 0l);
+		return tot == null ? 0l : tot;
+	}
+
 	public Integer pesquisarQuantidadeFracionada(Integer idItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
@@ -34,12 +43,17 @@ public class NFeItemFracionadoDAO extends GenericDAO<NFeItemFracionado> {
 						.setParameter("idItemPedido", idItemPedido), Integer.class, 0);
 	}
 
-	public Long pesquisarTotalItemFracionado(Integer idPedido) {
-		Long tot = QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery(
-						"select count(i.idPedido) from NFeItemFracionado i where i.idPedido = :idPedido").setParameter(
-						"idPedido", idPedido), Long.class, 0l);
-		return tot == null ? 0l : tot;
+	public List<Integer[]> pesquisarTotalFracionado(Integer idPedido) {
+		List<Object[]> listaTot = entityManager
+				.createQuery(
+						"select i.numeroItem, sum(i.quantidadeFracionada) from NFeItemFracionado i where i.idPedido =:idPedido group by i.numeroItem",
+						Object[].class).setParameter("idPedido", idPedido).getResultList();
+
+		List<Integer[]> l = new ArrayList<Integer[]>();
+		for (Object[] o : listaTot) {
+			l.add(new Integer[] { o != null ? (Integer) o[0] : 0, o != null ? ((Long) o[1]).intValue() : 0 });
+		}
+		return l;
 	}
 
 	public Integer pesqusisarSomaQuantidadeFracionada(Integer idItemPedido, Integer numeroNFe) {

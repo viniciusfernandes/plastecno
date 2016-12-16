@@ -529,8 +529,8 @@ public class NFeServiceImpl implements NFeService {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	private void inserirDataEmissaoNFe(Integer idPedido) {
-		Long total = nFeItemFracionadoDAO.pesquisarTotalItemFracionado(idPedido);
-		if (total <= 0) {
+		Long num = nFeItemFracionadoDAO.pesquisarNumeroItemFracionado(idPedido);
+		if (num <= 0) {
 			pedidoService.inserirDataEmissaoNFe(idPedido, new Date());
 		}
 	}
@@ -619,6 +619,12 @@ public class NFeServiceImpl implements NFeService {
 		return entityManager
 				.createQuery("select p.numero from NFePedido p where p.idPedido = :idPedido", Integer.class)
 				.setParameter("idPedido", idPedido).getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer[]> pesquisarTotalItemFracionado(Integer idPedido) {
+		return nFeItemFracionadoDAO.pesquisarTotalFracionado(idPedido);
 	}
 
 	@Override

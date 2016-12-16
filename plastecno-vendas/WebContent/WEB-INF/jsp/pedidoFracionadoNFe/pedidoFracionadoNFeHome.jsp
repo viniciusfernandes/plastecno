@@ -31,7 +31,7 @@ $(document).ready(function() {
 					<th style="width: 50%">Descrição</th>
 					<th style="width: 15%">NFe</th>
 					<th style="width: 5%">Valor</th>
-					<th style="width: 5%">Ação</th>
+					<th>Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -49,10 +49,15 @@ $(document).ready(function() {
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valorBruto}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
+									<form action="<c:url value="pedidoFracionado/emissaoNFe"/>" >
+										<input type="hidden" name="idPedido" value="${grupo.id}" /> 
+										<input type="submit" value="" title="Emissão de Pedido" class="botaoEditar"/>
+									</form>
 									<form action="<c:url value="/pedido/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${grupo.id}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 									</form>
+									
 								</div>
 							</td>
 						</tr>

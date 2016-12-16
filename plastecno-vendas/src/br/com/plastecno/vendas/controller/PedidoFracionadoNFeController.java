@@ -17,6 +17,11 @@ public class PedidoFracionadoNFeController extends AbstractController {
         super(result, usuarioInfo);
     }
 
+    @Get("pedidoFracionado/emissaoNFe")
+    public void pedidoFracionadoEmissaoNFe(Integer idPedido) {
+        redirecTo(EmissaoNFeController.class).pesquisarPedidoById(idPedido);
+    }
+
     @Get("pedidoFracionadoNFe")
     public void pedidoFracionadoNFeHome() {
         addAtributo("relatorio", relatorioService.gerarRelatorioPedidoFracionado());

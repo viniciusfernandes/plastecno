@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:forEach var="item" items="${nf.listaItem}" >
-<c:set var="detItem" value="nf.listaItem[${item.indiceItem}]"/>
+<c:set var="detItem" value="nf.listaItem[${item.numeroItem}]"/>
 <%-- bloco de icms --%>
 <input type="hidden" id="${detItem}.produtoServicoNFe.ncm" name="${detItem}.produtoServicoNFe.ncm" value="${item.produto.ncm}"/>
 <input type="hidden" id="${detItem}.produtoServicoNFe.cest" name="${detItem}.produtoServicoNFe.cest" value="${item.produto.cest}"/>

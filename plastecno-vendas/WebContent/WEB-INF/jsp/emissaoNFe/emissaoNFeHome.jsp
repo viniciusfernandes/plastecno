@@ -376,9 +376,8 @@ function inicializarAlteracaoTabelaProdutos(){
 			return null;
 		}
 		
-		var item = numeroProdutoEdicao + 1;
 		for (var i = 0; i < linhas.length; i++) {
-			if(item == linhas[i].cells[0].innerHTML){
+			if(numeroProdutoEdicao == linhas[i].cells[0].innerHTML){
 				linhas[i].cells[indice].innerHTML = valor;
 				return linhas[i];
 			}
@@ -738,7 +737,7 @@ function fecharBloco(nomeBloco){
 
 function inicializarLegendaBlocoProduto(nomeBloco){
 	var legend = $('#'+nomeBloco+' legend:first');
-	$(legend).html(legend.html().replace(/Prod.\s*\d*/g, 'Prod. '+(numeroProdutoEdicao+1)+' '));	
+	$(legend).html(legend.html().replace(/Prod.\s*\d*/g, 'Prod. '+(numeroProdutoEdicao)+' '));	
 
 	legend.html(legend.html().replace(/\+/g, '-'));
 	$('#'+nomeBloco+' div:not(.suggestionsBox)').fadeIn('fast');
@@ -1130,13 +1129,14 @@ function gerarInputProdutoServico(){
 	var celulas = null;
 	var produto = null;
 	var detalhamento = null;
+	var numItem = null;
 	for (var i = 0; i < linhas.length; i++) {
 		celulas = linhas[i].cells;
+		numItem = celulas[0].innerHTML;
+		detalhamento = {'nomeObjeto':'nf.listaItem['+numItem+']',
+			'campos':[{'nome':'numeroItem', 'valor': numItem}]};
 		
-		detalhamento = {'nomeObjeto':'nf.listaItem['+i+']',
-			'campos':[{'nome':'numeroItem', 'valor': celulas[0].innerHTML}]};
-		
-		produto = {'nomeObjeto':'nf.listaItem['+i+'].produtoServicoNFe',
+		produto = {'nomeObjeto':'nf.listaItem['+numItem+'].produtoServicoNFe',
 				'campos':[{'nome':'codigo', 'valor': celulas[1].innerHTML},
 				          {'nome':'descricao', 'valor': celulas[2].innerHTML},
 				          {'nome':'unidadeComercial', 'valor': celulas[3].innerHTML},
@@ -1317,8 +1317,6 @@ function editarProduto(botao){
     
     <%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
 	numeroProdutoEdicao = celulas[0].innerHTML;
-	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
-	--numeroProdutoEdicao;
 	<%-- A execucao dos metodos abaixo dependem da definicao do numero do produto que esta sendo editado --%>
     var valorBC = celulas[6].innerHTML;
 	var valoresTabela = {'campos':[{'id': 'itemPedidoCompraProd', 'valorTabela':celulas[0].innerHTML},

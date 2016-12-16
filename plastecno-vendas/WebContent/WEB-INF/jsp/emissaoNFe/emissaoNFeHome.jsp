@@ -416,21 +416,21 @@ function inicializarAlteracaoTabelaProdutos(){
 	});
 	
 	$('#bloco_tributos #cfop').change(function (){
-		alterarColuna(12, $(this).val());
+		alterarColuna(13, $(this).val());
 	});
 	
 	$('#bloco_tributos #ncm').keyup(function (){
-		alterarColuna(11, $(this).val());
+		alterarColuna(12, $(this).val());
 	});
 	
 	$('#bloco_tributos #aliquotaICMS').keyup(function (){
-		alterarColuna(9, $(this).val());
-		alterarColuna(7, $('#bloco_tributos #valorICMS').val());
+		alterarColuna(10, $(this).val());
+		alterarColuna(8, $('#bloco_tributos #valorICMS').val());
 	});
 	
 	$('#bloco_tributos #aliquotaIPI').keyup(function (){
-		alterarColuna(10, $(this).val());
-		alterarColuna(8, $('#bloco_tributos #valorIPI').val());
+		alterarColuna(11, $(this).val());
+		alterarColuna(9, $('#bloco_tributos #valorIPI').val());
 	});
 };
 
@@ -1797,6 +1797,7 @@ function inicializarCalculoImpostos(){
 			<legend>::: Produtos e Serviços :::</legend>
 			<table id="tabela_produtos" class="listrada">
 				<thead>
+					<%-- Muito cuidado ao alterar o numero de colunas dessa tabela pois varios eventos de campos e botoes estao indexados pela ordem das colunas das tabelas --%>
 					<tr>
 						<th>Item</th>
 						<th>Cod.</th>

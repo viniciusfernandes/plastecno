@@ -708,6 +708,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void inserirDataEmissaoNFe(Integer idPedido, Date dataEmissaoNFe) {
+		pedidoDAO.inserirDataEmissaoNFe(idPedido, dataEmissaoNFe);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException {
 		// configurando o material para efetuar o calculo usando o peso
 		// especifico
@@ -891,6 +897,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido) {
 		return itemPedidoDAO.pesquisarAliquotaIPIByIdItemPedido(idItemPedido);
 	}
@@ -971,6 +978,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Pedido pesquisarDadosNotaFiscalByIdItemPedido(Integer idItemPedido) {
 		return pedidoDAO.pesquisarDadosNotaFiscalByIdItemPedido(idItemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Date pesquisarDataEmissaoNFe(Integer idPedido) {
+		return pedidoDAO.pesquisarDataEmissaoNFe(idPedido);
 	}
 
 	@Override

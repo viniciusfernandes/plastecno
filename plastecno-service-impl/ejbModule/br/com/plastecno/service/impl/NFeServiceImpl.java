@@ -257,6 +257,8 @@ public class NFeServiceImpl implements NFeService {
 
 		}
 
+		valorProduto += valorFrete;
+
 		totaisICMS.setValorBaseCalculo(valorBC);
 		totaisICMS.setValorBaseCalculoST(valorBCST);
 		totaisICMS.setValorTotalICMSDesonerado(valorICMSDesonerado);
@@ -353,6 +355,7 @@ public class NFeServiceImpl implements NFeService {
 		// Inserindo os itens emitidos em cada nota para que possamos efetuar o
 		// controle das quantidades fracionadas dos itens emitidos.
 		inserirNFeItemFracionado(nFe, idPedido);
+		inserirDataEmissaoNFe(idPedido);
 		return ide.getNumero();
 	}
 
@@ -525,6 +528,14 @@ public class NFeServiceImpl implements NFeService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	private void inserirDataEmissaoNFe(Integer idPedido) {
+		Long total = nFeItemFracionadoDAO.pesquisarTotalItemFracionado(idPedido);
+		if (total <= 0) {
+			pedidoService.inserirDataEmissaoNFe(idPedido, new Date());
+		}
+	}
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	private void inserirNFeItemFracionado(NFe nFe, Integer idPedido) throws BusinessException {
 		List<DetalhamentoProdutoServicoNFe> listaDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 		List<Integer[]> listaQtde = pedidoService.pesquisarQuantidadeItemPedidoByIdPedido(idPedido);
@@ -553,7 +564,7 @@ public class NFeServiceImpl implements NFeService {
 				}
 			}
 
-			totalFrac = nFeItemFracionadoDAO.pesqusisarSomaQuantidadeFracionada(idItem, numeroNFe)  ;
+			totalFrac = nFeItemFracionadoDAO.pesqusisarSomaQuantidadeFracionada(idItem, numeroNFe);
 			totalFrac += qtdeFrac;
 			if (totalFrac > qtdeItem) {
 				throw new BusinessException(
@@ -576,6 +587,12 @@ public class NFeServiceImpl implements NFeService {
 				nFeItemFracionadoDAO.removerItemFracionado(idItem);
 			}
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean isNFeEmissaoFinalizada(Integer idPedido) {
+		return pedidoService.pesquisarDataEmissaoNFe(idPedido) != null;
 	}
 
 	@Override

@@ -71,6 +71,8 @@ public interface PedidoService {
 
 	void inserirDadosNotaFiscal(Pedido pedido);
 
+	void inserirDataEmissaoNFe(Integer idPedido, Date dataEmissaoNFe);
+
 	Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido)
 			throws BusinessException;
 
@@ -120,6 +122,8 @@ public interface PedidoService {
 			Integer idComprador) throws BusinessException;
 
 	Pedido pesquisarDadosNotaFiscalByIdItemPedido(Integer idItemPedido);
+
+	Date pesquisarDataEmissaoNFe(Integer idPedido);
 
 	Date pesquisarDataEnvio(Integer idPedido);
 

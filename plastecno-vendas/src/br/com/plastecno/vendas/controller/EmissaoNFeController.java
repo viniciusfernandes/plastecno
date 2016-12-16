@@ -152,6 +152,7 @@ public class EmissaoNFeController extends AbstractController {
                             nFeService.gerarEnderecoNFe(logradouro, telefone));
                 }
 
+                removerProdutoSemQuantidade(nf);
                 formatarDatas(nf, false);
                 numeroNFe = nFeService.emitirNFe(new NFe(nf), idPedido, isTriangulacao);
                 gerarMensagemSucesso("A NFe de número " + numeroNFe + " do pedido No. " + idPedido
@@ -211,32 +212,34 @@ public class EmissaoNFeController extends AbstractController {
             }
         }
 
-        ProdutoServicoNFe p = null;
-        for (DetalhamentoProdutoServicoNFe d : nf.getListaDetalhamentoProdutoServicoNFe()) {
-            p = d.getProduto();
-            if (p.contemImportacao()) {
-                for (DeclaracaoImportacao i : p.getListaDeclaracaoImportacao()) {
-                    try {
-                        if (i.getDataDesembaraco() != null) {
-                            i.setDataDesembaraco(to.format(from.parse(i.getDataDesembaraco())));
+        if (nf.getListaDetalhamentoProdutoServicoNFe() != null) {
+            ProdutoServicoNFe p = null;
+            for (DetalhamentoProdutoServicoNFe d : nf.getListaDetalhamentoProdutoServicoNFe()) {
+                p = d.getProduto();
+                if (p.contemImportacao()) {
+                    for (DeclaracaoImportacao i : p.getListaDeclaracaoImportacao()) {
+                        try {
+                            if (i.getDataDesembaraco() != null) {
+                                i.setDataDesembaraco(to.format(from.parse(i.getDataDesembaraco())));
+                            }
+                        } catch (ParseException e) {
+                            throw new BusinessException(
+                                    "Não foi possível formatar a data de desembaraço da importação do produto "
+                                            + d.getNumeroItem() + ". O valor enviado é \"" + i.getDataDesembaraco()
+                                            + "\"");
                         }
-                    } catch (ParseException e) {
-                        throw new BusinessException(
-                                "Não foi possível formatar a data de desembaraço da importação do produto "
-                                        + d.getNumeroItem() + ". O valor enviado é \"" + i.getDataDesembaraco() + "\"");
-                    }
 
-                    try {
-                        if (i.getDataImportacao() != null) {
-                            i.setDataImportacao(to.format(from.parse(i.getDataImportacao())));
+                        try {
+                            if (i.getDataImportacao() != null) {
+                                i.setDataImportacao(to.format(from.parse(i.getDataImportacao())));
+                            }
+                        } catch (ParseException e) {
+                            throw new BusinessException("Não foi possível formatar a data da importação do produto "
+                                    + d.getNumeroItem() + ". O valor enviado é \"" + i.getDataImportacao() + "\"");
                         }
-                    } catch (ParseException e) {
-                        throw new BusinessException("Não foi possível formatar a data da importação do produto "
-                                + d.getNumeroItem() + ". O valor enviado é \"" + i.getDataImportacao() + "\"");
                     }
                 }
             }
-
         }
 
         IdentificacaoNFe i = nf.getIdentificacaoNFe();
@@ -436,6 +439,10 @@ public class EmissaoNFeController extends AbstractController {
                 gerarListaMensagemAlerta(e);
             }
 
+            if (nFeService.isNFeEmissaoFinalizada(idPedido)) {
+                gerarMensagemAlerta("O pedido No." + idPedido + " já foi emitido em outras NFe");
+            }
+
         } catch (BusinessException e1) {
             gerarListaMensagemErro(e1.getListaMensagem());
             addAtributo("idPedido", idPedido);
@@ -530,5 +537,24 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("transportadora", t);
         }
 
+    }
+
+    // Esse metodo foi criado para simular a remocao de um item da nfe quando o
+    // usuario configuarar a quantidade como zero, pois esta dificil remover da
+    // tela via javascript ja que temos muitos campos para serem removidos
+    private void removerProdutoSemQuantidade(DadosNFe nf) {
+        List<DetalhamentoProdutoServicoNFe> lista = nf.getListaDetalhamentoProdutoServicoNFe();
+        List<DetalhamentoProdutoServicoNFe> listaOk = new ArrayList<DetalhamentoProdutoServicoNFe>();
+        ProdutoServicoNFe p = null;
+        if (lista == null) {
+            return;
+        }
+        for (DetalhamentoProdutoServicoNFe d : lista) {
+            p = d.getProduto();
+            if (p.getQuantidadeComercial() != null && 0d != p.getQuantidadeComercial().doubleValue()) {
+                listaOk.add(d);
+            }
+        }
+        nf.setListaDetalhamentoProdutoServicoNFe(listaOk);
     }
 }

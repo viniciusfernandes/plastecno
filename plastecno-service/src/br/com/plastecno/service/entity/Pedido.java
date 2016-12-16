@@ -63,6 +63,7 @@ public class Pedido implements Serializable, Cloneable {
 
 	@Transient
 	private String dataEmissaoNFFormatada;
+	
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_entrega")
 	private Date dataEntrega;

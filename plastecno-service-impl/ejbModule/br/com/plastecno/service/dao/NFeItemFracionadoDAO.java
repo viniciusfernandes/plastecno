@@ -34,6 +34,14 @@ public class NFeItemFracionadoDAO extends GenericDAO<NFeItemFracionado> {
 						.setParameter("idItemPedido", idItemPedido), Integer.class, 0);
 	}
 
+	public Long pesquisarTotalItemFracionado(Integer idPedido) {
+		Long tot = QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select count(i.idPedido) from NFeItemFracionado i where i.idPedido = :idPedido").setParameter(
+						"idPedido", idPedido), Long.class, 0l);
+		return tot == null ? 0l : tot;
+	}
+
 	public Integer pesqusisarSomaQuantidadeFracionada(Integer idItemPedido, Integer numeroNFe) {
 		Long tot = QueryUtil
 				.gerarRegistroUnico(

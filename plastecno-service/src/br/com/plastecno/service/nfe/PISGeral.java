@@ -27,8 +27,9 @@ public class PISGeral {
 	private Integer quantidadeVendida;
 
 	@XmlElement(name = "vPIS")
-	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, tiposNaoPermitidos = { "04", "05", "06", "07", "08",
-			"09" }, nomeExibicao = "Valor do PIS")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
+			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99", "ST" }, tiposNaoPermitidos = {
+			"04", "05", "06", "07", "08", "09" }, nomeExibicao = "Valor do PIS")
 	private Double valor;
 
 	@XmlElement(name = "vAliqProd")

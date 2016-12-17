@@ -353,9 +353,12 @@ public class NFeServiceImpl implements NFeService {
 		escreverXMLNFe(xml, idPedido.toString() + "_" + ide.getNumero());
 
 		// Inserindo os itens emitidos em cada nota para que possamos efetuar o
-		// controle das quantidades fracionadas dos itens emitidos.
-		inserirNFeItemFracionado(nFe, idPedido);
-		inserirDataEmissaoNFe(idPedido);
+		// controle das quantidades fracionadas dos itens emitidos. No caso de
+		// triangulacao nao devemos fracionar os itens da nfe
+		if (!isTriangularizacao) {
+			inserirNFeItemFracionado(nFe, idPedido);
+			inserirDataEmissaoNFe(idPedido);
+		}
 		return ide.getNumero();
 	}
 

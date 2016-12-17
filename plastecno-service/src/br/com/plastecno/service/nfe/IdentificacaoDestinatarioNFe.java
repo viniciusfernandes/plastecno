@@ -11,8 +11,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 		"indicadorIEDestinatario", "inscricaoEstadual", "inscricaoSUFRAMA", "inscricaoMunicipal", "email" })
 public class IdentificacaoDestinatarioNFe {
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{14}", padraoExemplo = "14 digitos", substituicao = { "\\D",
-			"" }, nomeExibicao = "CNPJ do destinatário")
+	@InformacaoValidavel(padrao = "\\d{14}", padraoExemplo = "14 digitos", substituicao = { "\\D", "" }, nomeExibicao = "CNPJ do destinatário")
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
@@ -36,7 +35,7 @@ public class IdentificacaoDestinatarioNFe {
 	@XmlElement(name = "indIEDest")
 	private String indicadorIEDestinatario;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 2, 14 }, nomeExibicao = "Inscrição estadual do destinatário")
+	@InformacaoValidavel(intervaloComprimento = { 2, 14 }, nomeExibicao = "Inscrição estadual do destinatário")
 	@XmlElement(name = "IE")
 	private String inscricaoEstadual;
 

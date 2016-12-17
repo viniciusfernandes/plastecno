@@ -242,6 +242,24 @@ $(document).ready(function() {
 		});
 	});
 	
+	$('#bloco_info_adicionais_prod #valorFreteProd').keyup(function(){
+		var vBC = 0;
+		if(btProduto != null){
+			linha = btProduto.parentNode.parentNode;
+			vBC = linha.cells[6].innerHTML;
+		} else {
+			return;
+		}
+		var campos = gerarJsonCalculoImpostos();
+		var frete = $(this).val();
+		for (var j = 0; j < campos.length; j++) {
+			if(campos[j] !=undefined && !isEmpty(campos[j])){
+				document.getElementById(campos[j].idVl).value = (parseFloat(vBC)+parseFloat(frete)).toFixed(2);
+			}
+		}
+		calcularValoresImpostos();
+	});
+	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
 		campoPesquisavel : 'nomeCliente',

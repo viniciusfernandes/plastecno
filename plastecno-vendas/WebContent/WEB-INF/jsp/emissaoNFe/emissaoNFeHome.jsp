@@ -243,20 +243,6 @@ $(document).ready(function() {
 	});
 	
 	$('#bloco_info_adicionais_prod #valorFreteProd').keyup(function(){
-		var vBC = 0;
-		if(btProduto != null){
-			linha = btProduto.parentNode.parentNode;
-			vBC = linha.cells[6].innerHTML;
-		} else {
-			return;
-		}
-		var campos = gerarJsonCalculoImpostos();
-		var frete = $(this).val();
-		for (var j = 0; j < campos.length; j++) {
-			if(campos[j] !=undefined && !isEmpty(campos[j])){
-				document.getElementById(campos[j].idVl).value = (parseFloat(vBC)+parseFloat(frete)).toFixed(2);
-			}
-		}
 		calcularValoresImpostos();
 	});
 	
@@ -415,11 +401,7 @@ function inicializarAlteracaoTabelaProdutos(){
 			cells[6].innerHTML = vTot.toFixed(2);
 			cells[8].innerHTML = (vTot*pICMS/100).toFixed(2);
 			cells[9].innerHTML = (vTot*pIPI/100).toFixed(2);
-			var campos = gerarJsonCalculoImpostos();
 			
-			for (var i = 0; i < campos.length; i++) {
-				document.getElementById(campos[i].idVl).value = cells[6].innerHTML;
-			}
 			calcularValoresImpostos();
 		}
 	});
@@ -1445,21 +1427,38 @@ function calcularValorICMSInterestadual(){
 
 function calcularValoresImpostos(){
 	var campos = gerarJsonCalculoImpostos();
-	var vl=null; 
 	var aliq=null; 
 	var idImp=null;
 	var tot = 0;
+	var vBC = 0;
+	var vl = 0;
+	if(btProduto != null){
+		linha = btProduto.parentNode.parentNode;
+		vBC = linha.cells[6].innerHTML;
+	} else {
+		return;
+	}
+	if(isEmpty(vBC)){
+		return;
+	}
+	
+	var frete = document.getElementById('valorFreteProd').value;
+	if(isEmpty(frete)){
+		frete = 0;
+	}
+
+	vBC = parseFloat(vBC)+parseFloat(frete);
 	for (var i = 0; i < campos.length; i++) {
-		vl = document.getElementById(campos[i].idVl).value;
 		aliq = document.getElementById(campos[i].idAliq).value;
-		if(isEmpty(vl) || isEmpty(aliq)){
+		if(isEmpty(aliq)){
 			continue;
 		}
-		vl = Math.round(vl*(aliq/100) * 100)/100;
+		vl = Math.round(vBC*(aliq/100) * 100)/100;
 		tot += vl;
 		document.getElementById(campos[i].idImp).value = vl;
+		document.getElementById(campos[i].idVl).value = vBC;
 	}
-	document.getElementById('valorTotaltributosProd').value = tot;
+	document.getElementById('valorTotaltributosProd').value = tot.toFixed(2);
 };
 
 function inicializarCalculoImpostos(){

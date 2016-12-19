@@ -134,13 +134,13 @@ $(document).ready(function() {
 	$('#botaoLimparICMS').click(function(){
 		removerInputHidden(gerarJsonTipoIcms());
 		fecharBloco('bloco_icms');
-		calcularValoresImpostos();
+		zerarImposto('valorBCICMS');
 	});
 	
 	$('#botaoLimparICMSInter').click(function(){
 		removerInputHidden(gerarJsonIcmsInterestadual());
 		fecharBloco('bloco_icms_interestadual');
-		calcularValoresImpostos();
+		calcularValoresImpostos(null, false);
 	});
 	
 	$('#botaoLimparInfoProd').click(function(){
@@ -155,31 +155,31 @@ $(document).ready(function() {
 		removerInputHidden(gerarJsonTipoIpi());
 		removerInputHidden(gerarJsonEnquadramentoIpi());
 		fecharBloco('bloco_ipi');
-		calcularValoresImpostos();
+		zerarImposto('valorBCIPI');
 	});
 	
 	$('#botaoLimparPIS').click(function(){
 		removerInputHidden(gerarJsonTipoPis());
 		fecharBloco('bloco_pis');
-		calcularValoresImpostos();
+		zerarImposto('valorBCPIS');
 	});
 	
 	$('#botaoLimparCOFINS').click(function(){
 		removerInputHidden(gerarJsonTipoCofins());
 		fecharBloco('bloco_cofins');
-		calcularValoresImpostos();
+		zerarImposto('valorBCCOFINS');
 	});
 	
 	$('#botaoLimparISS').click(function(){
 		removerInputHidden(gerarJsonISS());
 		fecharBloco('bloco_iss');
-		calcularValoresImpostos();
+		zerarImposto('valorBCISS');
 	});
 	
 	$('#botaoLimparII').click(function(){
 		removerInputHidden(gerarJsonImpostoImportacao());
 		fecharBloco('bloco_ii');
-		calcularValoresImpostos();
+		zerarImposto('valorBCII');
 	});
 	
 	$('#listaNumeroNFe').change(function(){
@@ -243,7 +243,7 @@ $(document).ready(function() {
 	});
 	
 	$('#bloco_info_adicionais_prod #valorFreteProd').keyup(function(){
-		calcularValoresImpostos();
+		calcularValoresImpostos(null, false);
 	});
 	
 	autocompletar({
@@ -402,7 +402,7 @@ function inicializarAlteracaoTabelaProdutos(){
 			cells[8].innerHTML = (vTot*pICMS/100).toFixed(2);
 			cells[9].innerHTML = (vTot*pIPI/100).toFixed(2);
 			
-			calcularValoresImpostos();
+			calcularValoresImpostos(null, false);
 		}
 	});
 	
@@ -1345,7 +1345,7 @@ function editarProduto(botao){
 	                               {'id': 'aliquotaCOFINS', 'valorTabela': '<c:out value="${percentualCofins}"/>'}
 	                               ]};
 	recuperarValoresProduto(valoresTabela);
-	calcularValoresImpostos();
+	calcularValoresImpostos(null, false);
 	
 	<%-- Aqui estamos apenas dando condicao ao usuario para alterar a descricao dos produtos da tabela que serao enviados para gerar a NFe --%>
 	$('#bloco_info_adicionais_prod #quantidadeProduto').val(celulas[4].innerHTML);
@@ -1425,7 +1425,7 @@ function calcularValorICMSInterestadual(){
 	});	
 };
 
-function calcularValoresImpostos(){
+function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	var campos = gerarJsonCalculoImpostos();
 	var aliq=null; 
 	var idImp=null;
@@ -1453,19 +1453,37 @@ function calcularValoresImpostos(){
 		if(isEmpty(aliq)){
 			continue;
 		}
-		vl = Math.round(vBC*(aliq/100) * 100)/100;
+		
+		if(isAlteracaoAliq){
+			vBC = document.getElementById(campos[i].idVl).value;
+		} else {
+			document.getElementById(campos[i].idVl).value = vBC;
+		}
+		
+		if(idValorRemovido != undefined && idValorRemovido == campos[i].idVl){
+			vl = 0;
+		} else {
+			vl = Math.round(vBC*(aliq/100) * 100)/100;
+		}
 		tot += vl;
 		document.getElementById(campos[i].idImp).value = vl;
-		document.getElementById(campos[i].idVl).value = vBC;
 	}
 	document.getElementById('valorTotaltributosProd').value = tot.toFixed(2);
+};
+
+function zerarImposto(idImposto){
+	return calcularValoresImpostos(idImposto, false);
+};
+
+function calcularAlteracaoAliquota(){
+	return calcularValoresImpostos(null, true);
 };
 
 function inicializarCalculoImpostos(){
 	var campos = gerarJsonCalculoImpostos();
 	for (var i = 0; i < campos.length; i++) {
-		document.getElementById(campos[i].idVl).onkeyup = calcularValoresImpostos;
-		document.getElementById(campos[i].idAliq).onkeyup = calcularValoresImpostos;
+		document.getElementById(campos[i].idVl).onkeyup = calcularAlteracaoAliquota;
+		document.getElementById(campos[i].idAliq).onkeyup = calcularAlteracaoAliquota;
 	}
 	
 	campos = gerarJsonIcmsInterestadual().campos;

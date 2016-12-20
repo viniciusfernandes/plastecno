@@ -587,7 +587,7 @@ public class NFeServiceImpl implements NFeService {
 				nFeItemFracionadoDAO.alterar(new NFeItemFracionado(idItemFrac, idItem, idPedido, p.getDescricao(),
 						numItem, numeroNFe, qtdeItem, qtdeFrac, p.getValorTotalBruto()));
 			} else if (totalFrac.equals(qtdeItem)) {
-				nFeItemFracionadoDAO.removerItemFracionado(idItem);
+				nFeItemFracionadoDAO.removerItemFracionadoNyIdItemPedido(idItem);
 			}
 		}
 	}
@@ -620,14 +620,22 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarNumeroNFeByIdPedido(Integer idPedido) {
 		return entityManager
-				.createQuery("select p.numero from NFePedido p where p.idPedido = :idPedido order by p.numero asc", Integer.class)
-				.setParameter("idPedido", idPedido).getResultList();
+				.createQuery("select p.numero from NFePedido p where p.idPedido = :idPedido order by p.numero asc",
+						Integer.class).setParameter("idPedido", idPedido).getResultList();
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer[]> pesquisarTotalItemFracionado(Integer idPedido) {
 		return nFeItemFracionadoDAO.pesquisarTotalFracionado(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerItemFracionadoNFe(Integer idItemFracionado) {
+		NFeItemFracionado item = new NFeItemFracionado();
+		item.setId(idItemFracionado);
+		nFeItemFracionadoDAO.remover(item);
 	}
 
 	@Override

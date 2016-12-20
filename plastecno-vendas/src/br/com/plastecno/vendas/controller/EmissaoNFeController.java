@@ -457,7 +457,7 @@ public class EmissaoNFeController extends AbstractController {
             }
 
             if (nFeService.isNFeEmissaoFinalizada(idPedido)) {
-                gerarMensagemAlerta("O pedido No." + idPedido + " já foi emitido em outras NFe");
+                gerarMensagemAlerta("O pedido No." + idPedido + " já foi emitido em outras NFes");
             }
 
         } catch (BusinessException e1) {

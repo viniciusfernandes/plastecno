@@ -172,28 +172,6 @@ public class PedidoServiceImpl implements PedidoService {
 		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.ITEM_AGUARDANDO_MATERIAL);
 	}
 
-	@SuppressWarnings("unchecked")
-	private void alterarSequencialItemPedido(Integer idPedido, Integer sequencial) {
-		if (sequencial != null && sequencial > 0) {
-
-			List<Object[]> resultados = entityManager
-					.createQuery("select i.id, i.sequencial from ItemPedido i where i.pedido.id = :idPedido")
-					.setParameter("idPedido", idPedido).getResultList();
-			Integer novaSeq = null;
-			Integer id = null;
-			for (Object[] array : resultados) {
-				id = (Integer) array[0];
-				novaSeq = (Integer) array[1];
-				entityManager
-						.createQuery(
-								"update ItemPedido i set i.sequencial = :novaSeq where i.id = :id and i.sequencial >= :sequencial")
-						.setParameter("novaSeq", --novaSeq).setParameter("id", id)
-						.setParameter("sequencial", sequencial).executeUpdate();
-			}
-
-		}
-	}
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido) {
@@ -1638,15 +1616,14 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public Pedido removerItemPedido(Integer idItemPedido) throws BusinessException {
 		ItemPedido itemPedido = null;
+		Pedido pedido = null;
 		try {
 			itemPedido = pesquisarItemPedidoById(idItemPedido);
 
 			if (itemPedido == null) {
 				return null;
 			}
-			Pedido pedido = itemPedido.getPedido();
-
-			alterarSequencialItemPedido(pedido.getId(), itemPedido.getSequencial());
+			pedido = itemPedido.getPedido();
 
 			itemPedidoDAO.remover(itemPedido);
 
@@ -1665,6 +1642,9 @@ public class PedidoServiceImpl implements PedidoService {
 		} catch (NoResultException e) {
 			throw new BusinessException("Não foi possivel remover o item pois não existe item com o codigo "
 					+ idItemPedido);
+		} catch (Exception e) {
+			throw new IllegalStateException("Falha na remocao do item No. " + itemPedido.getSequencial()
+					+ " do pedido No. " + pedido.getId());
 		}
 
 	}

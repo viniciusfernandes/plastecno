@@ -728,6 +728,8 @@ public class PedidoController extends AbstractController {
             serializarJson(new SerializacaoJson("pedido", json));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
+        } catch (Exception e) {
+            gerarLogErroRequestAjax("Remoção do item do pedido", e);
         }
     }
 

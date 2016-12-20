@@ -12,6 +12,9 @@ function inicializarBlocoItemPedido(urlTela) {
 	// valor do pedido atualizado
 	tabelaItemHandler.removerRegistroCallback(function(response) {
 		var pedido = response.pedido;
+		if(pedido == undefined || pedido == null){
+			return;
+		}
 		$('#tabelaItemPedido tfoot #valorPedido').html(pedido.valorPedido);
 		$('#tabelaItemPedido tfoot #valorPedidoIPI')
 				.html(pedido.valorPedidoIPI);

@@ -24,14 +24,14 @@ $(document).ready(function() {
 		<table class="listrada">
 			<thead>
 				<tr>
-					<th style="width: 15%">Pedido</th>
+					<th style="width: 10%">Pedido</th>
 					<th style="width: 5%">Item</th>
 					<th style="width: 5%">Qtde. Frac.</th>
 					<th style="width: 5%">Qtde.</th>
-					<th style="width: 50%">Descrição</th>
-					<th style="width: 15%">NFe</th>
+					<th style="width: 40%">Descrição</th>
+					<th style="width: 12%">NFe</th>
 					<th style="width: 5%">Valor</th>
-					<th>Ação</th>
+					<th style="width: 8%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -57,7 +57,10 @@ $(document).ready(function() {
 										<input type="hidden" name="idPedido" value="${grupo.id}" /> 
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 									</form>
-									
+									<form action="<c:url value="pedidoFracionado/remocao"/>" method="post">
+										<input type="hidden" name="idItemFracionado" value="${item.id}" /> 
+										<input type="submit" value="" title="Remover Item Fracionado" class="botaoRemover"/>
+									</form>
 								</div>
 							</td>
 						</tr>

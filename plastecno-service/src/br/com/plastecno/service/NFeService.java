@@ -42,6 +42,8 @@ public interface NFeService {
 
 	List<Integer[]> pesquisarTotalItemFracionado(Integer idPedido);
 
+	void removerItemFracionadoNFe(Integer idItemFracionado);
+
 	void validarEmissaoNFePedido(Integer idPedido) throws BusinessException;
 
 	void validarNumeroNFePedido(Integer idPedido, Integer numeroNFe) throws BusinessException;

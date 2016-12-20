@@ -3,7 +3,7 @@ UPDATE vendas.tb_representada SET telefone = '1130219600' where nome_fantasia = 
 insert into vendas.tb_configuracao_sistema (parametro, valor) values ('PERCENTUAL_COFINS', '3');
 insert into vendas.tb_configuracao_sistema (parametro, valor) values ('PERCENTUAL_PIS', '0.65');
 insert into vendas.tb_configuracao_sistema (parametro, valor) values ('REGIME_TRIBUTACAO', '3');
-insert into vendas.tb_configuracao_sistema (parametro, valor) values ('DIRETORIO_XML_NFE', 'C:\\Users\\vinicius\\AppData\\Local\\Temp');
+insert into vendas.tb_configuracao_sistema (parametro, valor) values ('DIRETORIO_XML_NFE', 'C:\\NFe');
 insert into vendas.tb_configuracao_sistema (parametro, valor) values ('CNAE', '4689399');
 ALTER TABLE vendas.tb_configuracao_sistema ADD PRIMARY KEY (parametro);
 create index idx_transportadora_cnpj on vendas.tb_transportadora (cnpj);

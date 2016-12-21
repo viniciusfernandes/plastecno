@@ -1270,6 +1270,12 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Pedido pesquisarPedidoByIdItemPedido(Integer idItemPedido) {
+		return pedidoDAO.pesquisarPedidoByIdItemPedido(idItemPedido);
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo) {
@@ -1615,22 +1621,17 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public Pedido removerItemPedido(Integer idItemPedido) throws BusinessException {
-		ItemPedido itemPedido = null;
+		ItemPedido itemPedido = new ItemPedido();
+		itemPedido.setId(idItemPedido);
 		Pedido pedido = null;
 		try {
-			itemPedido = pesquisarItemPedidoById(idItemPedido);
-
-			if (itemPedido == null) {
-				return null;
-			}
-			pedido = itemPedido.getPedido();
-
+			pedido = pesquisarPedidoByIdItemPedido(idItemPedido);
 			itemPedidoDAO.remover(itemPedido);
 
 			// Efetuando novamente o calculo pois na remocao o valor do pedido
 			// deve ser atualizado
-			pedido.setValorPedido(this.calcularValorPedido(pedido.getId()));
-			pedido.setValorPedidoIPI(this.calcularValorPedidoIPI(pedido.getId()));
+			pedido.setValorPedido(calcularValorPedido(pedido.getId()));
+			pedido.setValorPedidoIPI(calcularValorPedidoIPI(pedido.getId()));
 
 			if (pedido.isCompraEfetuada() && pesquisarTotalItemPedido(pedido.getId()) <= 0L) {
 				pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
@@ -1643,8 +1644,9 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Não foi possivel remover o item pois não existe item com o codigo "
 					+ idItemPedido);
 		} catch (Exception e) {
-			throw new IllegalStateException("Falha na remocao do item No. " + itemPedido.getSequencial()
-					+ " do pedido No. " + pedido.getId());
+			Integer seq = itemPedidoDAO.pesquisarSequencialItemPedido(idItemPedido);
+			throw new IllegalStateException("Falha na remocao do item No. " + seq + " do pedido No. " + pedido.getId(),
+					e);
 		}
 
 	}

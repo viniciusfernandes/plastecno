@@ -212,6 +212,8 @@ public interface PedidoService {
 			boolean isCompra, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros);
 
+	Pedido pesquisarPedidoByIdItemPedido(Integer idItemPedido);
+
 	List<Pedido> pesquisarPedidoCompraByPeriodo(Periodo periodo);
 
 	List<Pedido> pesquisarPedidoVendaByPeriodo(Periodo periodo);

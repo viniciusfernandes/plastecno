@@ -25,13 +25,13 @@ import br.com.plastecno.util.StringUtils;
 public class EmailServiceImpl implements EmailService {
 
 	@EJB
+	private AutenticacaoService autenticacaoService;
+
+	@EJB
 	private ConfiguracaoSistemaService configuracaoSistemaService;
 
 	@EJB
 	private UsuarioService usuarioService;
-
-	@EJB
-	private AutenticacaoService autenticacaoService;
 
 	public void enviar(MensagemEmail mensagemEmail) throws NotificacaoException {
 
@@ -39,11 +39,12 @@ public class EmailServiceImpl implements EmailService {
 			final String REMETENTE = mensagemEmail.getRemetente();
 			final String DESTINATARIO = mensagemEmail.getDestinatario();
 
-			final String SENHA = this.autenticacaoService
-					.decriptografar(this.usuarioService.pesquisarSenhaByEmail(REMETENTE));
+			final String SENHA = this.autenticacaoService.decriptografar(this.usuarioService
+					.pesquisarSenhaByEmail(REMETENTE));
 
 			MultiPartEmail email = new HtmlEmail();
-			email.setHostName(this.configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.NOME_SERVIDOR_SMTP));
+			email.setHostName(this.configuracaoSistemaService
+					.pesquisar(ParametroConfiguracaoSistema.NOME_SERVIDOR_SMTP));
 			email.setSmtpPort(Integer.parseInt(this.configuracaoSistemaService
 					.pesquisar(ParametroConfiguracaoSistema.PORTA_SERVIDOR_SMTP)));
 			email.setAuthenticator(new DefaultAuthenticator(REMETENTE, SENHA));
@@ -69,7 +70,7 @@ public class EmailServiceImpl implements EmailService {
 
 			this.gerarAnexo(mensagemEmail, email);
 
-//			email.send();
+			email.send();
 		} catch (Exception e) {
 			StringBuilder mensagem = new StringBuilder();
 			mensagem.append("Falha no envio de email de ");

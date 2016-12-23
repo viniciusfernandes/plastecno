@@ -351,7 +351,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@REVIEW(descricao = "Esse metodo esta sendo chamado na tela de pedidos e estamos retornando mais informacao do que o necessario.")
 	public Cliente pesquisarClienteEContatoById(Integer idCliente) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select c from Cliente c join fetch c.listaContato where c.id = :idCliente")
+				entityManager.createQuery("select c from Cliente c left join fetch c.listaContato where c.id = :idCliente")
 						.setParameter("idCliente", idCliente), Cliente.class, null);
 	}
 

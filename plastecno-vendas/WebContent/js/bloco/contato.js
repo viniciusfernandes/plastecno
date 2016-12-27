@@ -204,7 +204,8 @@ function inicializarBlocoContato(urlTela) {
 	});
 		
 	return tabelaContatoHandler;
-}
+};
+
 function editarContato(botao) {
 	tabelaContatoHandler.editar(botao);
 };

@@ -26,19 +26,22 @@ public class EntidadeValidacao {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Idade")
 	private Integer idade;
 
-	@InformacaoValidavel(intervalo = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual")
+	@InformacaoValidavel(intervaloNumerico = { 1, 18 }, nomeExibicao = "Idade limite")
+	private Integer idadeLimite;
+
+	@InformacaoValidavel(intervaloComprimento = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual")
 	private String inscricaoEstadual;
 
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de filhos")
 	private List<EntidadeValidacaoSimples> listaFilho = new ArrayList<EntidadeValidacaoSimples>();
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 20 }, nomeExibicao = "Nome fantasia")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Nome fantasia")
 	private String nomeFantasia;
 
 	@InformacaoValidavel(obrigatorio = true, numerico = true, estritamentePositivo = true, nomeExibicao = "Quantidade")
 	private Integer quantidade;
 
-	@InformacaoValidavel(trim=true, obrigatorio = false, intervalo = { 1, 10 }, nomeExibicao = "Razão Social")
+	@InformacaoValidavel(trim = true, obrigatorio = false, intervaloComprimento = { 1, 10 }, nomeExibicao = "Razão Social")
 	private String razaoSocial;
 
 	@InformacaoValidavel(obrigatorio = true, tamanho = 4, nomeExibicao = "Senha")
@@ -46,6 +49,12 @@ public class EntidadeValidacao {
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Entidade sobrinho")
 	private EntidadeValidacaoSimples sobrinho;
+
+	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 1.11, 90 }, nomeExibicao = "Tarifa limite")
+	private Double tarifaLimite;
+
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Tipo da entidade")
+	private EntidadeValidacaoTipo tipoEntidade;
 
 	public void addFilho(EntidadeValidacaoSimples filho) {
 		listaFilho.add(filho);
@@ -73,6 +82,10 @@ public class EntidadeValidacao {
 
 	public Integer getIdade() {
 		return idade;
+	}
+
+	public Integer getIdadeLimite() {
+		return idadeLimite;
 	}
 
 	public String getInscricaoEstadual() {
@@ -103,6 +116,14 @@ public class EntidadeValidacao {
 		return sobrinho;
 	}
 
+	public Double getTarifaLimite() {
+		return tarifaLimite;
+	}
+
+	public EntidadeValidacaoTipo getTipoEntidade() {
+		return tipoEntidade;
+	}
+
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
@@ -125,6 +146,10 @@ public class EntidadeValidacao {
 
 	public void setIdade(Integer idade) {
 		this.idade = idade;
+	}
+
+	public void setIdadeLimite(Integer idadeLimite) {
+		this.idadeLimite = idadeLimite;
 	}
 
 	public void setInscricaoEstadual(String inscricaoEstadual) {
@@ -153,6 +178,14 @@ public class EntidadeValidacao {
 
 	public void setSobrinho(EntidadeValidacaoSimples sobrinho) {
 		this.sobrinho = sobrinho;
+	}
+
+	public void setTarifaLimite(Double tarifaLimite) {
+		this.tarifaLimite = tarifaLimite;
+	}
+
+	public void setTipoEntidade(EntidadeValidacaoTipo tipoEntidade) {
+		this.tipoEntidade = tipoEntidade;
 	}
 
 }

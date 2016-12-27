@@ -7,15 +7,15 @@
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/picklist.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bloco/contato.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/tabela_handler.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/logradouro.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>

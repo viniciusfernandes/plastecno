@@ -82,7 +82,7 @@ public class RelatorioVendaRepresentadaController extends AbstractController {
             geradorRelatorio.addAtributo("dataFinal", dataFinalFormatada);
             geradorRelatorio.processar(new File(diretorioTemplateRelatorio + "/relatorioPedido.html"));
 
-            return this.gerarDownload(geradorRelatorio.gerarPDF(), "Vendas " + representada.getNomeFantasia() + " "
+            return this.gerarDownloadPDF(geradorRelatorio.gerarPDF(), "Vendas " + representada.getNomeFantasia() + " "
                     + dataInicialFormatada + " a " + dataFinalFormatada + ".pdf");
 
         } catch (Exception e) {

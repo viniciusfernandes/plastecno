@@ -178,7 +178,7 @@ public class PedidoController extends AbstractController {
                     .append("No. ").append(idPedido).append(" - ").append(pedido.getCliente().getNomeFantasia())
                     .append(".pdf");
 
-            return gerarDownload(wrapper.getArquivoPDF(), titulo.toString());
+            return gerarDownloadPDF(wrapper.getArquivoPDF(), titulo.toString());
         } catch (Exception e) {
             this.gerarLogErro("geração do relatório de pedido", e);
             // Estamos retornando null porque no caso de falhas nao devemos
@@ -424,7 +424,7 @@ public class PedidoController extends AbstractController {
     }
 
     private boolean isPedidoDesabilitado(Pedido pedido) {
-        if (pedido == null) {
+        if (pedido == null || isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS)) {
             return false;
         } else {
             SituacaoPedido situacao = pedido.getSituacaoPedido();
@@ -495,12 +495,13 @@ public class PedidoController extends AbstractController {
      */
     @Get("pedido/cliente/{id}")
     public void pesquisarClienteById(Integer id) {
-        Cliente cliente = this.clienteService.pesquisarById(id);
-        cliente.setListaRedespacho(this.clienteService.pesquisarTransportadorasRedespacho(id));
-        this.carregarVendedor(cliente);
-        this.formatarDocumento(cliente);
+        Cliente cliente = clienteService.pesquisarClienteEContatoById(id);
+        cliente.setListaRedespacho(clienteService.pesquisarTransportadorasRedespacho(id));
 
-        final ClienteJson json = new ClienteJson(cliente, this.transportadoraService.pesquisar());
+        carregarVendedor(cliente);
+        formatarDocumento(cliente);
+
+        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar());
 
         SerializacaoJson serializacaoJson = new SerializacaoJson("cliente", json)
                 .incluirAtributo("listaTransportadora").incluirAtributo("listaRedespacho").incluirAtributo("vendedor");
@@ -550,11 +551,7 @@ public class PedidoController extends AbstractController {
         // Temos que fazer essa distincao pois o usuario pode acessar pedidos de
         // compra a partir da tela de pedidos de venda, e vice-versa. Temos que
         // proibir isso.
-        if (isCompra) {
-            pedido = pedidoService.pesquisarCompraById(idPedido);
-        } else {
-            pedido = pedidoService.pesquisarVendaById(idPedido);
-        }
+        pedido = pedidoService.pesquisarPedidoById(idPedido, isCompra);
 
         final Integer idUsuario = getCodigoUsuario();
         // Verificando se o usuario que esta tentando acessar os dados do pedido
@@ -691,7 +688,7 @@ public class PedidoController extends AbstractController {
             addAtributo("listaTransportadora", this.transportadoraService.pesquisar());
             addAtributo("listaRedespacho", this.transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
             addAtributo("idRepresentadaSelecionada", idFornecedor);
-            
+
             irRodapePagina();
         }
         configurarTipoPedido(tipoPedido);
@@ -731,6 +728,8 @@ public class PedidoController extends AbstractController {
             serializarJson(new SerializacaoJson("pedido", json));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
+        } catch (Exception e) {
+            gerarLogErro("Remoção do item do pedido", e);
         }
     }
 

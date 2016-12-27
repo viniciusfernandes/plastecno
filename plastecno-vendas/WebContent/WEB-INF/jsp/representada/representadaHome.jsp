@@ -2,8 +2,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Plastecno - Cadastro de Representada ou Fornecedores</title>
-
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <style type="text/css">
@@ -13,14 +11,14 @@ body {
 </style>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/tabela_handler.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/logradouro.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bloco/contato.js?${versaoCache}"/>"></script>
 
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
@@ -199,7 +197,11 @@ function inicializarModalCancelamento(botao){
 					value="${representada.inscricaoEstadual}"
 					style="width: 40%; text-align: right;" />
 			</div>
-
+			<div class="label">Telefone:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" id="teleone" name="representada.telefone"
+					value="${representada.telefone}" style="width: 20%" />
+			</div>
 			<div class="label">Site:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" id="site" name="representada.site"

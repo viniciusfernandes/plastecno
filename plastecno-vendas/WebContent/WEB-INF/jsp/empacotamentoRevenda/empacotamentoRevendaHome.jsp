@@ -191,6 +191,10 @@ function empacotarPedido(campo){
 										<input type="hidden" name="idCliente" value="${cliente.id}" /> 
 										<input type="submit" value="" title="Editar o Item do Pedido" class="botaoEditar"/>
 									</form>
+									<form action="<c:url value="/emissaoNFe/pedido"/>" method="get">
+										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
+										<input type="submit" value="" title="Emitir Nota Fiscal do Pedido" class="botaoNFPequeno"/>
+									</form>
 									<form action="<c:url value="/empacotamento/item/reencomenda"/>" method="post">
 										<input type="hidden" name="idItemPedido" value="${item.id}"> 
 										<input type="button" title="Reenviar Item do Pedido para Encomenda" value="" class="botaoRemover" onclick="enviarEncomenda(this);"/>

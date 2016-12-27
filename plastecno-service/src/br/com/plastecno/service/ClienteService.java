@@ -56,7 +56,13 @@ public interface ClienteService {
 
 	List<Cliente> pesquisarClienteByIdRegiao(Integer idRegiao) throws BusinessException;
 
+	Cliente pesquisarClienteEContatoById(Integer idCliente);
+
+	Cliente pesquisarClienteResumidoByCnpj(String cnpj);
+
 	Cliente pesquisarClienteResumidoById(Integer idCliente);
+
+	Cliente pesquisarClienteResumidoEContatoById(Integer idCliente);
 
 	List<Cliente> pesquisarClientesAssociados(Integer idVendedor);
 
@@ -73,6 +79,8 @@ public interface ClienteService {
 	List<LogradouroCliente> pesquisarLogradouro(Integer idCliente);
 
 	LogradouroCliente pesquisarLogradouroById(Integer idLogradouro);
+
+	LogradouroCliente pesquisarLogradouroFaturamentoById(Integer idCliente);
 
 	String pesquisarNomeFantasia(Integer idCliente);
 

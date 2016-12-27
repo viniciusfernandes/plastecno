@@ -49,6 +49,15 @@ public abstract class Item implements Serializable, Cloneable {
 	@Transient
 	private String valorComissaoFormatado;
 
+	@Transient
+	private String valorICMSFormatado;
+
+	@Transient
+	private String valorIPIFormatado;
+
+	@Transient
+	private String valorTotalFormatado;
+
 	public Item() {
 	}
 
@@ -76,6 +85,14 @@ public abstract class Item implements Serializable, Cloneable {
 		return getPrecoUnidade() * (1 + getAliquotaIPI());
 	}
 
+	public double calcularValorICMS() {
+		return calcularPrecoItem() * (getAliquotaICMS() == null ? 0 : getAliquotaICMS());
+	}
+
+	public double calcularValorIPI() {
+		return calcularPrecoItem() * (getAliquotaIPI() == null ? 0 : getAliquotaIPI());
+	}
+
 	public void configurarMedidaInterna() {
 		if (isMedidaExternaIgualInterna()) {
 			setMedidaInterna(getMedidaExterna());
@@ -88,6 +105,49 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public boolean contemMedida() {
 		return getMedidaExterna() != null || getMedidaInterna() != null || getComprimento() != null;
+	}
+
+	public String gerarCodigo() {
+		FormaMaterial f = getFormaMaterial();
+		String s = getMaterial() != null ? getMaterial().getSigla() : null;
+		return f != null && s != null ? f.toString() + s : null;
+	}
+
+	private String gerarDescricaoItem(boolean isCompleto, boolean isFormatado) {
+		StringBuilder descricao = new StringBuilder();
+		if (getMaterial() != null) {
+			descricao.append(getFormaMaterial());
+			descricao.append(" - ");
+
+			if (isCompleto) {
+				descricao.append(getMaterial().getSigla());
+				descricao.append(" - ");
+				descricao.append(getMaterial().getDescricao() == null ? " " : getMaterial().getDescricao());
+				descricao.append(" - ");
+			} else {
+				descricao.append(getMaterial().getDescricao() == null ? " " : getMaterial().getDescricao());
+				descricao.append(" - ");
+			}
+		}
+
+		if (!this.isPeca()) {
+			descricao.append(isFormatado && getMedidaExternaFomatada() != null ? getMedidaExternaFomatada()
+					: getMedidaExterna());
+			descricao.append(" X ");
+
+			if (getMedidaInterna() != null) {
+				descricao.append(isFormatado && getMedidaInternaFomatada() != null ? getMedidaInternaFomatada()
+						: getMedidaInterna());
+				descricao.append(" X ");
+			}
+
+			descricao.append(isFormatado && getComprimentoFormatado() != null ? getComprimentoFormatado()
+					: getComprimento());
+			descricao.append(" mm");
+		} else {
+			descricao.append(getDescricaoPeca());
+		}
+		return descricao.toString();
 	}
 
 	public abstract Double getAliquotaICMS();
@@ -110,38 +170,13 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public String getComprimentoFormatado() {
 		if (comprimentoFormatado == null) {
-			return " _ ";
+			return null;
 		}
 		return comprimentoFormatado;
 	}
 
 	public String getDescricao() {
-
-		StringBuilder descricao = new StringBuilder();
-		if (getMaterial() != null) {
-			descricao.append(getFormaMaterial());
-			descricao.append(" - ");
-			descricao.append(getMaterial().getSigla());
-			descricao.append(" - ");
-			descricao.append(getMaterial().getDescricao() == null ? " " : getMaterial().getDescricao());
-			descricao.append(" - ");
-		}
-
-		if (!this.isPeca()) {
-			descricao.append(getMedidaExternaFomatada());
-			descricao.append(" X ");
-
-			if (getMedidaInterna() != null) {
-				descricao.append(getMedidaInternaFomatada());
-				descricao.append(" X ");
-			}
-
-			descricao.append(getComprimentoFormatado());
-			descricao.append(" mm");
-		} else {
-			descricao.append(getDescricaoPeca());
-		}
-		return descricao.toString();
+		return gerarDescricaoItem(true, true);
 	}
 
 	public String getDescricaoMaterial() {
@@ -158,6 +193,10 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public abstract String getDescricaoPeca();
 
+	public String getDescricaoSemFormatacao() {
+		return gerarDescricaoItem(false, false);
+	}
+
 	public abstract FormaMaterial getFormaMaterial();
 
 	public abstract Integer getId();
@@ -168,7 +207,7 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public String getMedidaExternaFomatada() {
 		if (medidaExternaFomatada == null) {
-			return " _ ";
+			return null;
 		}
 		return medidaExternaFomatada;
 	}
@@ -177,7 +216,7 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public String getMedidaInternaFomatada() {
 		if (medidaInternaFomatada == null) {
-			return " _ ";
+			return null;
 		}
 		return medidaInternaFomatada;
 	}
@@ -210,6 +249,22 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public String getValorComissaoFormatado() {
 		return valorComissaoFormatado;
+	}
+
+	public double getValorICMS() {
+		return calcularValorICMS();
+	}
+
+	public String getValorICMSFormatado() {
+		return valorICMSFormatado;
+	}
+
+	public String getValorIPIFormatado() {
+		return valorIPIFormatado;
+	}
+
+	public String getValorTotalFormatado() {
+		return valorTotalFormatado;
 	}
 
 	public boolean isEqual(Item item) {
@@ -318,5 +373,17 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public void setValorComissionadoFormatado(String valorComissaoFormatado) {
 		this.valorComissaoFormatado = valorComissaoFormatado;
+	}
+
+	public void setValorICMSFormatado(String valorICMSFormatado) {
+		this.valorICMSFormatado = valorICMSFormatado;
+	}
+
+	public void setValorIPIFormatado(String valorIPIFormatado) {
+		this.valorIPIFormatado = valorIPIFormatado;
+	}
+
+	public void setValorTotalFormatado(String valorTotalFormatado) {
+		this.valorTotalFormatado = valorTotalFormatado;
 	}
 }

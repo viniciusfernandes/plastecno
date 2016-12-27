@@ -15,6 +15,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
@@ -81,20 +82,20 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		entityManager
 				.createQuery(
 						"update Pedido p set p.numeroNF =:numeroNF, p.dataEmissaoNF =:dataEmissaoNF, p.dataVencimentoNF =:dataVencimentoNF, p.valorParcelaNF =:valorParcelaNF, p.valorTotalNF =:valorTotalNF, p.numeroColeta =:numeroColeta, p.numeroVolumes =:numeroVolumes where p.id =:id")
-				.setParameter("numeroNF", pedido.getNumeroNF()).setParameter("dataEmissaoNF", pedido.getDataEmissaoNF())
+				.setParameter("numeroNF", pedido.getNumeroNF())
+				.setParameter("dataEmissaoNF", pedido.getDataEmissaoNF())
 				.setParameter("dataVencimentoNF", pedido.getDataVencimentoNF())
 				.setParameter("valorParcelaNF", pedido.getValorParcelaNF())
-				.setParameter("valorTotalNF", pedido.getValorTotalNF()).setParameter("numeroColeta", pedido.getNumeroColeta())
-				.setParameter("numeroVolumes", pedido.getNumeroVolumes()).setParameter("id", pedido.getId()).executeUpdate();
+				.setParameter("valorTotalNF", pedido.getValorTotalNF())
+				.setParameter("numeroColeta", pedido.getNumeroColeta())
+				.setParameter("numeroVolumes", pedido.getNumeroVolumes()).setParameter("id", pedido.getId())
+				.executeUpdate();
 	}
 
-	public Pedido pesquisarDadosNotaFiscalByIdItemPedido(Integer idItemPedido) {
-		return QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select new Pedido(i.pedido.id, i.pedido.numeroNF, i.pedido.dataEmissaoNF, i.pedido.dataVencimentoNF, i.pedido.valorParcelaNF, i.pedido.valorTotalNF, i.pedido.numeroColeta, i.pedido.numeroVolumes) from ItemPedido i where i.id = :idItemPedido")
-								.setParameter("idItemPedido", idItemPedido), Pedido.class, null);
+	public void inserirDataEmissaoNFe(Integer idPedido, Date dataEmissaoNFe) {
+		this.entityManager.createQuery("update Pedido p set p.dataEmissaoNF= :dataEmissaoNFe where p.id = :idPedido")
+				.setParameter("dataEmissaoNFe", dataEmissaoNFe).setParameter("idPedido", idPedido).executeUpdate();
+
 	}
 
 	public List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
@@ -133,6 +134,22 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Pedido.class, null);
 	}
 
+	public Cliente pesquisarClienteByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.cliente from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), Cliente.class, null);
+
+	}
+
+	public Cliente pesquisarClienteResumidoByIdPedido(Integer idPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Cliente(p.cliente.id, p.cliente.nomeFantasia, p.cliente.razaoSocial, p.cliente.cnpj, p.cliente.cpf, p.cliente.inscricaoEstadual, p.cliente.email) from Pedido p where p.id = :idPedido")
+								.setParameter("idPedido", idPedido), Cliente.class, null);
+	}
+
 	public Double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery("select p.representada.comissao from Pedido p where p.id = :idPedido")
@@ -153,6 +170,21 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return query.getResultList();
 	}
 
+	public Pedido pesquisarDadosNotaFiscalByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Pedido(i.pedido.id, i.pedido.numeroNF, i.pedido.dataEmissaoNF, i.pedido.dataVencimentoNF, i.pedido.valorParcelaNF, i.pedido.valorTotalNF, i.pedido.numeroColeta, i.pedido.numeroVolumes) from ItemPedido i where i.id = :idItemPedido")
+								.setParameter("idItemPedido", idItemPedido), Pedido.class, null);
+	}
+
+	public Date pesquisarDataEmissaoNFe(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.dataEmissaoNF from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), Date.class, null);
+	}
+
 	public Date pesquisarDataEnvioById(Integer idPedido) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p.dataEnvio from Pedido p where p.id = :id");
@@ -162,18 +194,25 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.gerarRegistroUnico(query, Date.class, null);
 	}
 
+	public String pesquisarFormaPagamentoByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.formaPagamento from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), String.class, null);
+	}
+
 	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select p.id from ItemPedido i inner join i.pedido p where i.id = :idItemPedido")
-						.setParameter("idItemPedido", idItemPedido), Integer.class, null);
+				entityManager.createQuery(
+						"select p.id from ItemPedido i inner join i.pedido p where i.id = :idItemPedido").setParameter(
+						"idItemPedido", idItemPedido), Integer.class, null);
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
-						"select p.id from ItemPedido i inner join i.pedido p where i.id IN (:listaIdItemPedido)").setParameter(
-						"listaIdItemPedido", listaIdItemPedido), List.class, null);
+						"select p.id from ItemPedido i inner join i.pedido p where i.id IN (:listaIdItemPedido)")
+						.setParameter("listaIdItemPedido", listaIdItemPedido), List.class, null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -257,18 +296,26 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
+	public Pedido pesquisarPedidoByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.pedido from ItemPedido i where i.id = :idItemPedido").setParameter(
+						"idItemPedido", idItemPedido), Pedido.class, null);
+	}
+
 	public Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery(
-						"select SUM(i.quantidade * i.precoUnidade) from ItemPedido i where i.pedido.id = :idPedido ").setParameter(
-						"idPedido", idPedido), Double.class, 0d);
+						"select SUM(i.quantidade * i.precoUnidade) from ItemPedido i where i.pedido.id = :idPedido ")
+						.setParameter("idPedido", idPedido), Double.class, 0d);
 	}
 
 	public Double pesquisarQuantidadePrecoUnidadeIPI(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ")
-						.setParameter("idPedido", idPedido), Double.class, 0d);
+		return QueryUtil
+				.gerarRegistroUnico(
+						this.entityManager
+								.createQuery(
+										"select SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ")
+								.setParameter("idPedido", idPedido), Double.class, 0d);
 	}
 
 	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
@@ -291,8 +338,8 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
-						"select p.situacaoPedido from ItemPedido i inner join i.pedido p where i.id = :idItemPedido").setParameter(
-						"idItemPedido", idItemPedido), SituacaoPedido.class, null);
+						"select p.situacaoPedido from ItemPedido i inner join i.pedido p where i.id = :idItemPedido")
+						.setParameter("idItemPedido", idItemPedido), SituacaoPedido.class, null);
 	}
 
 	public List<SituacaoPedido> pesquisarSituacaoRevendaEfetivada() {
@@ -311,6 +358,13 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return situacoes;
 	}
 
+	public Object[] pesquisarTelefoneContatoByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select p.contato.ddd, p.contato.telefone from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), Object[].class, new Object[] {});
+	}
+
 	public TipoPedido pesquisarTipoPedidoById(Integer idPedido) {
 		return pesquisarCampoById(Pedido.class, idPedido, "tipoPedido", TipoPedido.class);
 	}
@@ -318,8 +372,8 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	public SituacaoPedido pesquisarTipoPedidoByIdItemPedido(Integer idItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
-						"select p.tipoPedido from ItemPedido i inner join i.pedido p where i.id = :idItemPedido").setParameter(
-						"idItemPedido", idItemPedido), SituacaoPedido.class, null);
+						"select p.tipoPedido from ItemPedido i inner join i.pedido p where i.id = :idItemPedido")
+						.setParameter("idItemPedido", idItemPedido), SituacaoPedido.class, null);
 	}
 
 	public Long pesquisarTotalItemPedido(Integer idPedido) {
@@ -342,6 +396,15 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		Query query = entityManager.createQuery(select.toString()).setParameter("idPedido", idPedido);
 
 		return QueryUtil.gerarRegistroUnico(query, Long.class, 0L);
+	}
+
+	public Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select p.transportadora from Pedido p join fetch p.transportadora.logradouro where p.id = :idPedido")
+								.setParameter("idPedido", idPedido), Transportadora.class, null);
 	}
 
 	public Double pesquisarValorPedido(Integer idPedido) {

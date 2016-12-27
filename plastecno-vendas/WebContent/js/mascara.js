@@ -34,19 +34,39 @@ function inserirMascaraMonetaria(idCampo, digitos) {
 	$('#'+idCampo).attr('maxlength', digitos + 1);
 	// A separacao entre os milhares nao pode ter simbolos de sepadas casas
 	$('#'+idCampo).maskMoney({thousands:'', decimal:'.'});
+};
+
+function inserirMascaraDecimal(idCampo, digitos, precisao) {
+	// Aqui adicionamos um caracter referente ao ponto da casa decimal
+	$('#'+idCampo).attr('maxlength', digitos + 1);
+	// A separacao entre os milhares nao pode ter simbolos de sepadas casas
+	$('#'+idCampo).maskMoney({thousands:'', decimal:'.', allowZero: true, precision: precisao});
+};
+
+function mascaraData(idCampo, mascara){
+	$("#"+idCampo).datepicker({
+		dateFormat: mascara,
+		dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'],
+		dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+		dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+		monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+		monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+		nextText: 'Próximo',
+		prevText: 'Anterior',
+		timeFormat:  "hh:mm:ss"
+	});
 }
 
+function inserirMascaraHora(idCampo) {
+	$('#'+idCampo).mask('99:99');
+};
+
 function inserirMascaraData(idCampo) {
-	$("#"+idCampo).datepicker({
-		dateFormat: 'dd/mm/yy',
-		dayNames: ['Domingo','Segunda','Ter�a','Quarta','Quinta','Sexta','S�bado','Domingo'],
-		dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
-		dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','S�b','Dom'],
-		monthNames: ['Janeiro','Fevereiro','Mar�o','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-		monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
-		nextText: 'Pr�ximo',
-		prevText: 'Anterior' 
-	});
+	mascaraData(idCampo, 'dd/mm/yy');
+};
+
+function inserirMascaraDataAmericano(idCampo) {
+	mascaraData(idCampo, 'yy-mm-dd');
 };
 
 function inserirMascaraNCM(idCampo) {

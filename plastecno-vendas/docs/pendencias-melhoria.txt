@@ -1,10 +1,46 @@
-1) Cabecalho do relatorio de venda por representada ainda exibe o problema de "encoding" com o ser vidor da integrator.
-ok 2) Inserir autocomplete no campo "nome" no cadastro de clientes
-ok 3) Inserir autocomplete no campo "nome" no cadastro de vendedores
-ok 4) Inserir autocomplete no campo "nome" no cadastro de usuarios
-ok 5) O icone "inicio e fim" da paginacao nao funciona corretamente, primeiro temos que clicar em algum numero para 
-paginar para somente depois navegarmos para a primeira e ultimas paginas.
-6) Corpo do email de envio de pedido esta com problema de codificação.
-ok 7) Implementar uma tela de "modal" contendo a identidade visual do sistema para substituir o "consele" do browser.
-8) Colocar o foco no autocomplete apos a pesquisa utilizando o tecka tab ou "seta down"
-9) Criar um esquema sequencial em que os scripts de criacao do banco devem ser executados.
+1) Popular as quantidades dos itens tributados nos blocos de impostos
+2) Ocultar os tributos que nao sao obrigatorios OK
+3) Devemos revisar a estrategia de preenchimento do codigo do municipio dos locais de entrega e retirada 
+e ident. emissor e destinatario pois ele pode nao estar sendo recuperado do banco de dados
+4) Implementar ICMS interestadual OK
+5) Ainda nao tenho ideia de como preencher os campos ean e cnae
+6) Faltando encontrar os campos que ainda estao vazios no primeiro bloco de=a nfe, por exemplo: tipo documento, 
+consumidor final e destino operacao OK
+8) IMplementar tratamento de edicao dos impostos dos itens para que os combos aparecam preenchidos 
+pois esta dando nullpointer no servidor - OK
+9) Ocultar os impostos facultativos quando editar o imposto do item e 
+popular as quantidades tributaveis de todos eles OK
+
+1) inserir o tipo de operacao tpNF na tela OK
+2) o campo de consumidor final "indFinal" não esta na documentacao da sefaz OK
+2) o campo de destina da operacao "idDest" não esta na documentacao da sefaz OK
+3) o campo de tipo de atendimento "idPress" não esta na documentacao da sefaz NAO ENCONTREI
+4) o campo de finalida de emissao "finNFe" não esta na documentacao da sefaz OK
+5) o campo de data de saida "dSaiEnt" deve estar na tela OK
+6) verificar como consultar a sequencia do numero da nfe na sefaz
+7) consultar o fernando sobre inclusão de nota referenciada de produtor rural e cana de acucar
+e cupons fiscais vinculados a nota
+8) os campos de nota referenciada estao sendo preenchidos e nao deveria OK
+9) estudar um mecanismo de pre-visualizacao do DANFE
+10) Criar botao de salvar, validacao e pre-visualizacao do danfe e transmicao da nfe
+11) Remover os campos em branco dos campos de String pois a SEFAZ critica os espacos
+12) Incluir indicador de inscricao estadual do destinatario indIEDest
+13) Incluir campo de outras despesas acessoriais em produtos "vOutro" na tela OK
+14) Incluir na tela de pedido os campos de "item compra" e "numero do pedido de compra" OK
+15) Verificar na documentacao da sefaz o campo "nFCI" do produto OK
+16) Unir os campos de transporte veiculo/reboque/balsa/vagao OK
+17) Unir os campos de exportacao e compra em um mesmo bloco OK
+18) Incluir os campos de exportacao em produtos OK
+19) Implementar edicao de cobranca OK
+20) Em cobracao o valor padrao deve ser boleto OK
+21) reposicionar os dados adicionais do NFe no final da tela da nota logo antes de exportacao OK
+22) Incluir o destinatario no bloco de dados basicos da nfe OK
+
+================ BUGS ==========================
+1) Implementar uma condicao para remover os valores do camposm marcados com InformacaoValidavel.tiposNaoPermitidos
+
+================ MELHORIAS ==========================
+1) Cache da lista do CFOP
+2) Arquivo .js da emissao da nfe
+3) compactacao do .js da emissao da nfe e pedido
+

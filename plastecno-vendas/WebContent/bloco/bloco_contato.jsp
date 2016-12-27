@@ -103,8 +103,8 @@
 						<th style="width: 19%">Nome</th>
 						<th style="width: 19%">Departamento</th>
 						<th style="width: 19%">Email</th>
-						<th style="width: 19%">Pri. (DDI / DDD) Tel. / Ram. / Fax</th>
-						<th style="width: 19%">Sec. (DDI / DDD) Tel. / Ram. / Fax</th>
+						<th style="width: 19%">DDI (DDD) Tel. / Ram. / Fax</th>
+						<th style="width: 19%">DDI (DDD) Tel. / Ram. / Fax</th>
 						<th>Ações</th>
 					</tr>
 				</thead>

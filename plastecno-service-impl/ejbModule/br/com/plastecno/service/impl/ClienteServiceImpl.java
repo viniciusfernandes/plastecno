@@ -42,7 +42,6 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @Stateless
 public class ClienteServiceImpl implements ClienteService {
 	private ClienteDAO clienteDAO;
-
 	@EJB
 	private ConfiguracaoSistemaService configuracaoSistemaService;
 
@@ -151,7 +150,8 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
-	public void inserirComentario(Integer idProprietario, Integer idCliente, String comentario) throws BusinessException {
+	public void inserirComentario(Integer idProprietario, Integer idCliente, String comentario)
+			throws BusinessException {
 		Cliente cliente = pesquisarById(idCliente);
 		Usuario proprietario = usuarioService.pesquisarById(idProprietario);
 		inserirComentario(proprietario, cliente, comentario);
@@ -283,6 +283,7 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarByIdVendedor(Integer idVendedor, boolean isPesquisaClienteInativo)
 			throws BusinessException {
 		return isPesquisaClienteInativo ? this.pesquisarInativosByIdVendedor(idVendedor) : this
@@ -291,6 +292,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarByNomeFantasia(String nomeFantasia) {
 		Query query = this.entityManager
 				.createQuery("select new Cliente(c.id, c.nomeFantasia) from Cliente c where c.nomeFantasia like :nomeFantasia order by c.nomeFantasia ");
@@ -300,12 +302,14 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarByRamoAtividade(Integer idRamoAtividade) {
 		if (idRamoAtividade == null) {
 			return Collections.emptyList();
 		}
-		StringBuilder select = new StringBuilder("SELECT u FROM Cliente u ").append("left join fetch u.listaContato l ")
-				.append("left join fetch u.vendedor ").append("where u.ramoAtividade.id = :idRamoAtividade ");
+		StringBuilder select = new StringBuilder("SELECT u FROM Cliente u ")
+				.append("left join fetch u.listaContato l ").append("left join fetch u.vendedor ")
+				.append("where u.ramoAtividade.id = :idRamoAtividade ");
 
 		select.append("order by u.vendedor.nome, u.nomeFantasia ");
 
@@ -315,6 +319,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarClienteByIdRegiao(Integer idRegiao) throws BusinessException {
 
 		if (idRegiao == null) {
@@ -330,8 +335,7 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		StringBuilder select = new StringBuilder();
-		select
-				.append("select c from Cliente c ")
+		select.append("select c from Cliente c ")
 				// o contato deve ser exibido no relatorio e usamos um let join
 				// pois um cliente pode nao ter contatos
 				.append("left join fetch c.listaContato lc ").append("inner join fetch c.listaLogradouro l ")
@@ -344,12 +348,43 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(descricao = "Esse metodo esta sendo chamado na tela de pedidos e estamos retornando mais informacao do que o necessario.")
+	public Cliente pesquisarClienteEContatoById(Integer idCliente) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select c from Cliente c left join fetch c.listaContato where c.id = :idCliente")
+						.setParameter("idCliente", idCliente), Cliente.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Cliente pesquisarClienteResumidoByCnpj(String cnpj) {
+		Cliente c = clienteDAO.pesquisarClienteResumidoByCnpj(cnpj);
+		if (c != null) {
+			c.addLogradouro(pesquisarLogradouro(c.getId()));
+			c.addContato(pesquisarContato(c.getId()));
+			// Estamos anulando oconteudo desses campos para evitar
+			// lazyloadException
+			c.setVendedor(null);
+			c.setListaRedespacho(null);
+		} 
+		return c;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Cliente pesquisarClienteResumidoById(Integer idCliente) {
 		return clienteDAO.pesquisarClienteResumidoById(idCliente);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Cliente pesquisarClienteResumidoEContatoById(Integer idCliente) {
+		return clienteDAO.pesquisarClienteResumidoEContatoById(idCliente);
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarClientesAssociados(Integer idVendedor) {
 		return this.entityManager
 				.createQuery(
@@ -360,6 +395,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarClientesById(List<Integer> listaIdCliente) {
 		return this.entityManager.createQuery("select c from Cliente c where c.id in (:listaIdCliente)")
 				.setParameter("listaIdCliente", listaIdCliente).getResultList();
@@ -368,14 +404,16 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Cliente> pesquisarClientesDesassociados() {
-		return this.entityManager.createQuery(
-				"select new Cliente(c.id, c.nomeFantasia) from Cliente c where c.vendedor = null order by c.nomeFantasia asc")
+		return this.entityManager
+				.createQuery(
+						"select new Cliente(c.id, c.nomeFantasia) from Cliente c where c.vendedor = null order by c.nomeFantasia asc")
 				.getResultList();
 
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ComentarioCliente> pesquisarComentarioByIdCliente(Integer idCliente) {
 		return (List<ComentarioCliente>) entityManager
 				.createQuery(
@@ -386,6 +424,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ContatoCliente> pesquisarContato(Integer idCliente) {
 		return this.entityManager
 				.createQuery("select l from Cliente c inner join c.listaContato l where c.id = :idCliente ")
@@ -394,6 +433,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarInativosByIdVendedor(Integer idVendedor) throws BusinessException {
 		final String PARAMETRO = this.configuracaoSistemaService
 				.pesquisar(ParametroConfiguracaoSistema.DIAS_INATIVIDADE_CLIENTE);
@@ -427,16 +467,26 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<LogradouroCliente> pesquisarLogradouro(Integer idCliente) {
 		return clienteDAO.pesquisarLogradouroById(idCliente);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public LogradouroCliente pesquisarLogradouroById(Integer idLogradouro) {
 		return this.logradouroService.pesquisarById(idLogradouro, LogradouroCliente.class);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public LogradouroCliente pesquisarLogradouroFaturamentoById(Integer idCliente) {
+		List<LogradouroCliente> l = clienteDAO.pesquisarLogradouroFaturamentoById(idCliente);
+		return l.isEmpty() ? null : l.get(0);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public String pesquisarNomeFantasia(Integer idCliente) {
 		return clienteDAO.pesquisarNomeFantasia(idCliente);
 	}
@@ -448,6 +498,7 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalRegistros(Cliente filtro) {
 		if (filtro == null) {
 			return 0L;
@@ -460,6 +511,7 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@SuppressWarnings("unchecked")
 	public List<Transportadora> pesquisarTransportadorasDesassociadas(Integer idCliente) {
 		List<Transportadora> listaTransportadora = this.pesquisarTransportadorasRedespacho(idCliente);
@@ -477,6 +529,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente) {
 		return this.entityManager
 				.createQuery(

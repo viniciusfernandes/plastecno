@@ -44,7 +44,7 @@ public class Representada implements Serializable {
 	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Comissão da representada")
 	private double comissao = 0;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Email para envio dos pedidos")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Email para envio dos pedidos")
 	@Column(name = "email")
 	private String email;
 
@@ -54,7 +54,7 @@ public class Representada implements Serializable {
 	private Integer id;
 
 	@Column(name = "insc_estadual")
-	@InformacaoValidavel(intervalo = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual")
+	@InformacaoValidavel(intervaloComprimento = { 0, 12 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscricao estadual")
 	private String inscricaoEstadual;
 
 	@OneToMany(mappedBy = "representada", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
@@ -69,17 +69,19 @@ public class Representada implements Serializable {
 	@JoinColumn(name = "id_logradouro")
 	private Logradouro logradouro;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Nome fantasia")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Nome fantasia")
 	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 150 }, nomeExibicao = "Razao social")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Razao social")
 	@Column(name = "razao_social")
 	private String razaoSocial;
 
-	@InformacaoValidavel(intervalo = { 1, 150 }, nomeExibicao = "Site da representada")
+	@InformacaoValidavel(intervaloComprimento = { 1, 150 }, nomeExibicao = "Site da representada")
 	@Column(name = "site")
 	private String site;
+
+	private String telefone;
 
 	@Column(name = "id_tipo_apresentacao_ipi")
 	@Enumerated(EnumType.ORDINAL)
@@ -122,7 +124,8 @@ public class Representada implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof Representada && this.id != null && this.id.equals(((Representada) o).id);
+		return o instanceof Representada && this.id != null
+				&& this.id.equals(((Representada) o).id);
 	}
 
 	public Double getAliquotaICMS() {
@@ -177,6 +180,10 @@ public class Representada implements Serializable {
 		return site;
 	}
 
+	public String getTelefone() {
+		return telefone;
+	}
+
 	public TipoApresentacaoIPI getTipoApresentacaoIPI() {
 		return tipoApresentacaoIPI;
 	}
@@ -196,11 +203,16 @@ public class Representada implements Serializable {
 
 	public boolean isFornecedor() {
 		return TipoRelacionamento.FORNECIMENTO.equals(tipoRelacionamento)
-				|| TipoRelacionamento.REPRESENTACAO_FORNECIMENTO.equals(tipoRelacionamento);
+				|| TipoRelacionamento.REPRESENTACAO_FORNECIMENTO
+						.equals(tipoRelacionamento);
 	}
 
 	public boolean isIPIHabilitado() {
 		return !TipoApresentacaoIPI.NUNCA.equals(this.tipoApresentacaoIPI);
+	}
+
+	public boolean isPessoaJuridica() {
+		return cnpj != null && !cnpj.isEmpty();
 	}
 
 	public boolean isRevendedor() {
@@ -264,6 +276,10 @@ public class Representada implements Serializable {
 
 	public void setSite(String site) {
 		this.site = site;
+	}
+
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
 	}
 
 	public void setTipoApresentacaoIPI(TipoApresentacaoIPI tipoApresentacaoIPI) {

@@ -29,8 +29,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		entityManager
 				.createQuery(
 						"update ItemPedido i set i.quantidadeRecepcionada = :quantidadeRecepcionada where i.id = :idItemPedido")
-				.setParameter("idItemPedido", idItemPedido).setParameter("quantidadeRecepcionada", quantidadeRecepcionada)
-				.executeUpdate();
+				.setParameter("idItemPedido", idItemPedido)
+				.setParameter("quantidadeRecepcionada", quantidadeRecepcionada).executeUpdate();
 	}
 
 	private StringBuilder gerarConstrutorItemPedidoComDataEntrega() {
@@ -95,13 +95,14 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		Double ipi = QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i.aliquotaIPI from ItemPedido i where i.id = :idItemPedido").setParameter(
-						"idItemPedido", idItemPedido), Double.class, 0d);
+				entityManager.createQuery("select i.aliquotaIPI from ItemPedido i where i.id = :idItemPedido")
+						.setParameter("idItemPedido", idItemPedido), Double.class, 0d);
 		return ipi == null ? 0 : ipi;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Date dataInicial, Date dataFinal) {
+	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Date dataInicial,
+			Date dataFinal) {
 		StringBuilder select = gerarConstrutorItemPedidoIdPedidoCompraEVenda();
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
 		select.append("and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada =null)");
@@ -147,7 +148,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	public Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i.material.id, i.formaMaterial from ItemPedido i where i.id = :idItemPedido")
+				entityManager.createQuery(
+						"select i.material.id, i.formaMaterial from ItemPedido i where i.id = :idItemPedido")
 						.setParameter("idItemPedido", idItemPedido), Object[].class, new Object[] {});
 	}
 
@@ -178,8 +180,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			select.append("order by i.idPedidoCompra desc ");
 		}
 
-		return entityManager.createQuery(select.toString(), Integer.class).setParameter("idPedidoOrigem", idPedidoOrigem)
-				.getResultList();
+		return entityManager.createQuery(select.toString(), Integer.class)
+				.setParameter("idPedidoOrigem", idPedidoOrigem).getResultList();
 	}
 
 	public Object[] pesquisarIdPedidoCompraEVenda(Integer idItemPedido) {
@@ -245,9 +247,9 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		if (idFornecedor != null) {
-			select
-					.append("and i.idPedidoCompra in ( select p.id from Pedido p where p.tipoPedido = :tipoPedidoCompra and p.representada.id = :idFornecedor ");
-			// Essa condicao foi incluida apenas para melhorar o filtro do resultado
+			select.append("and i.idPedidoCompra in ( select p.id from Pedido p where p.tipoPedido = :tipoPedidoCompra and p.representada.id = :idFornecedor ");
+			// Essa condicao foi incluida apenas para melhorar o filtro do
+			// resultado
 			// dos pedidos de compra e nao tem relacao direta com o negocio.
 			if (dataInicial != null) {
 				select.append("and (p.dataEnvio is null or p.dataEnvio >= :dataInicial) ");
@@ -342,8 +344,10 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			Integer idProprietario, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros, ItemPedido itemVendido) {
 
-		// Tivemos que particionar a consulta em 2 etapas pois a paginacao deve ser
-		// feita na consulta de pedidos, mas estava sendo realizada na consulta de
+		// Tivemos que particionar a consulta em 2 etapas pois a paginacao deve
+		// ser
+		// feita na consulta de pedidos, mas estava sendo realizada na consulta
+		// de
 		// itens de pedidos, isto eh, retornavamos apenas 10 itens por consulta
 		// quando devemos na verdade retornar 10 pedidos por consulta.
 		StringBuilder selectPedido = new StringBuilder();
@@ -396,8 +400,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 		selectItem.append("order by i.pedido.dataEnvio asc ");
 
-		TypedQuery<ItemPedido> queryItem = entityManager.createQuery(selectItem.toString(), ItemPedido.class).setParameter(
-				"listaIdPedido", Arrays.asList(listaIdPedido.toArray(new Integer[] {})));
+		TypedQuery<ItemPedido> queryItem = entityManager.createQuery(selectItem.toString(), ItemPedido.class)
+				.setParameter("listaIdPedido", Arrays.asList(listaIdPedido.toArray(new Integer[] {})));
 
 		inserirParametroPesquisaItemVendido(queryItem, itemVendido);
 
@@ -432,6 +436,18 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return pesquisarCampoById(ItemPedido.class, idItemPedido, "quantidade", Integer.class);
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Integer[]> pesquisarQuantidadeItemPedidoByIdPedido(Integer idPedido) {
+		List<Object[]> qtdes = entityManager
+				.createQuery("select i.id, i.quantidade, i.sequencial from ItemPedido i where i.pedido.id =:idPedido")
+				.setParameter("idPedido", idPedido).getResultList();
+		List<Integer[]> l = new ArrayList<Integer[]>();
+		for (Object[] q : qtdes) {
+			l.add(new Integer[] { (Integer) q[0], (Integer) q[1], (Integer) q[2] });
+		}
+		return l;
+	}
+
 	public Integer pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido) {
 		return pesquisarCampoById(ItemPedido.class, idItemPedido, "quantidadeRecepcionada", Integer.class);
 	}
@@ -441,10 +457,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select count(i.id) from ItemPedido i where  i.encomendado = false and i.pedido.id = :idPedido")
-						.setParameter("idPedido", idPedido), Long.class, null);
+		return QueryUtil
+				.gerarRegistroUnico(
+						this.entityManager
+								.createQuery(
+										"select count(i.id) from ItemPedido i where  i.encomendado = false and i.pedido.id = :idPedido")
+								.setParameter("idPedido", idPedido), Long.class, null);
 	}
 
 	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,

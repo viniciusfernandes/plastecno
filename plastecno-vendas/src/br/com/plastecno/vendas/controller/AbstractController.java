@@ -38,27 +38,32 @@ import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
 public abstract class AbstractController {
 
+    private final static Long VERSAO_CACHE = new Date().getTime();
     private final String cssMensagemAlerta = "mensagemAlerta";
     private final String cssMensagemErro = "mensagemErro";
     private final String cssMensagemSucesso = "mensagemSucesso";
     private String homePath;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
-    private String nomeTela;
 
+    private String nomeTela;
     private final Integer numerRegistrosPorPagina = 10;
     private Picklist picklist;
     private final String possuiMultiplosLogradouros = "possuiMultiplosLogradouros";
     private Result result;
     private TipoLogradouroService tipoLogradouroService;
-
     private UsuarioInfo usuarioInfo;
     private UsuarioService usuarioService;
 
     public AbstractController(Result result) {
         this.result = result;
         try {
-            this.init();
-
+            init();
+            // Esse atributo foi criado para implementar o esquema para
+            // sinalizar o navegador a carregar os arquivos em cache, sendo que
+            // para isso vamos concatenar o nome do arquivo .css, .js, etc com o
+            // valor desse atributo, assim o navegador entendera que eh um novo
+            // recurso a ser carregado.
+            addAtributoPadrao("versaoCache", VERSAO_CACHE);
         } catch (ServiceLocatorException e) {
             this.logger.log(Level.SEVERE, "Falha no lookup de algum servico", e);
             this.result.include("erro",
@@ -88,6 +93,12 @@ public abstract class AbstractController {
 
     void addAtributo(String nomeAtributo, Object valorAtributo) {
         this.result.include(nomeAtributo, valorAtributo);
+    }
+
+    void addAtributoPadrao(String nomeAtributo, Object valorAtributo) {
+        if (!contemAtributo(nomeAtributo)) {
+            addAtributo(nomeAtributo, valorAtributo);
+        }
     }
 
     int calcularIndiceRegistroInicial(Integer paginaSelecionada) {
@@ -199,11 +210,14 @@ public abstract class AbstractController {
         item.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedido()));
         item.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedidoIPI()));
         item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
+
+        item.setValorICMSFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getValorICMS())));
+        item.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getPrecoUnidadeIPI())));
     }
 
     void formatarItemPedido(List<ItemPedido> itens) {
         for (ItemPedido item : itens) {
-            this.formatarItemPedido(item);
+            formatarItemPedido(item);
         }
     }
 
@@ -229,9 +243,12 @@ public abstract class AbstractController {
         }
     }
 
-    Download gerarDownload(byte[] bytesArquivo, String nomeArquivo) {
-        final String contentType = "application/pdf;";
+    Download gerarDownload(byte[] bytesArquivo, String nomeArquivo, String contentType) {
         return new ByteArrayDownload(bytesArquivo, contentType, StringUtils.removerAcentuacao(nomeArquivo));
+    }
+
+    Download gerarDownloadPDF(byte[] bytesArquivo, String nomeArquivo) {
+        return gerarDownload(bytesArquivo, nomeArquivo, "application/pdf;");
     }
 
     void gerarListaMensagemAjax(String mensagem, String categoria) {
@@ -262,6 +279,11 @@ public abstract class AbstractController {
     void gerarListaMensagemErro(String mensagem) {
         this.result.include("listaMensagem", new String[] {mensagem});
         this.result.include("cssMensagem", cssMensagemErro);
+    }
+
+    void gerarListaMensagemErroLogException(BusinessException e) {
+        gerarListaMensagemErro(e);
+        logger.log(Level.SEVERE, e.getMensagemConcatenada(), e);
     }
 
     void gerarListaMensagemSucesso(Object o, String nomeAtributoExibicao, TipoOperacao tipoOperacao)
@@ -533,7 +555,6 @@ public abstract class AbstractController {
     boolean isElementosNaoAssociadosPreenchidosPicklist() {
         return this.picklist.isElementosNaoAssociadosPreenchidos();
     }
-
 
     /*
      * Esse metodo ja garante que o usuario sera navegado para o rodape da

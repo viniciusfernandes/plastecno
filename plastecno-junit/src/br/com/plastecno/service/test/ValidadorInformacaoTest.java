@@ -1,10 +1,11 @@
 package br.com.plastecno.service.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import br.com.plastecno.service.test.AbstractTest;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.validacao.ValidadorInformacao;
 
@@ -19,6 +20,8 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		e.setIdade(12);
 		e.setQuantidade(32);
 		e.setSenha("1234");
+		e.setTarifaLimite(33.333);
+		e.setIdadeLimite(18);
 		e.setFilha(new EntidadeValidacaoSimples(321, "N321"));
 		e.setEmail("vinicius@hotmail");
 		e.addFilho(new EntidadeValidacaoSimples(111, "N1"));
@@ -31,6 +34,13 @@ public class ValidadorInformacaoTest extends AbstractTest {
 		h.setValor(765d);
 
 		e.setHerdado(h);
+		return e;
+	}
+
+	private EntidadeValidacao gerarEntidadeValidacaoComTipo() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		EntidadeValidacaoTipo t = new EntidadeValidacaoTipo("cod1", "1", 1000d);
+		e.setTipoEntidade(t);
 		return e;
 	}
 
@@ -325,6 +335,32 @@ public class ValidadorInformacaoTest extends AbstractTest {
 	}
 
 	@Test
+	public void testIntervaloDouble() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.setTarifaLimite(90.99);
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+		}
+		assertFalse("O campo tarifa limite esta fora do limite e deve ser validado", throwed);
+	}
+
+	@Test
+	public void testIntervaloInteiro() {
+		EntidadeValidacao e = gerarEntidadeValidacao();
+		e.setIdadeLimite(19);
+		boolean throwed = false;
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+		}
+		assertFalse("O campo idade limite esta fora do limite e deve ser validado", throwed);
+	}
+
+	@Test
 	public void testListaFilhoObrigatorioInvalido() {
 		EntidadeValidacao e = gerarEntidadeValidacao();
 		try {
@@ -463,5 +499,51 @@ public class ValidadorInformacaoTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O objeto desejado nao pode ser validavel", throwed);
+	}
+
+	@Test
+	public void testValidacaoPorTipo() {
+		EntidadeValidacao e = gerarEntidadeValidacaoComTipo();
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			printMensagens(e1);
+		}
+	}
+
+	@Test
+	public void testValidacaoPorTipoNaoPermitido() {
+		EntidadeValidacao e = gerarEntidadeValidacaoComTipo();
+		EntidadeValidacaoTipo t = e.getTipoEntidade();
+		t.setTipo("3");
+		t.setValor(777d);
+		boolean throwed = false;
+
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+
+		}
+		assertTrue(
+				"O tipo de entidade " + t.getTipo() + " deve conter o campo valor em braco e isso deve ser validado",
+				throwed);
+	}
+
+	@Test
+	public void testValidacaoPorTipoObrigatorio() {
+		EntidadeValidacao e = gerarEntidadeValidacaoComTipo();
+		EntidadeValidacaoTipo t = e.getTipoEntidade();
+		t.setTipo("4");
+		t.setValor(null);
+		boolean throwed = false;
+
+		try {
+			ValidadorInformacao.validar(e);
+		} catch (InformacaoInvalidaException e1) {
+			throwed = true;
+		}
+		assertTrue("O tipo de entidade " + t.getTipo()
+				+ " deve conter o campo valor pois eh pbrigatorio e isso deve ser validado", throwed);
 	}
 }

@@ -25,13 +25,13 @@ import br.com.plastecno.util.StringUtils;
 public class EmailServiceImpl implements EmailService {
 
 	@EJB
+	private AutenticacaoService autenticacaoService;
+
+	@EJB
 	private ConfiguracaoSistemaService configuracaoSistemaService;
 
 	@EJB
 	private UsuarioService usuarioService;
-
-	@EJB
-	private AutenticacaoService autenticacaoService;
 
 	public void enviar(MensagemEmail mensagemEmail) throws NotificacaoException {
 

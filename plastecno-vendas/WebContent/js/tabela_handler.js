@@ -11,10 +11,10 @@ function BlocoTabelaHandler (urlTela, nomeBloco, idTabela, idBlocoInput) {
 	this.TOTAL_COLUNAS = null;
 	this.numeroLinhasCopiadas = 0;
 	
-	this.ajustarLinhasCopiadas = undefined;
+	this.clonarLinha = undefined;
 	
-	this.setAjusteLinhasCopiadas = function (callback){
-		this.ajustarLinhasCopiadas = callback;
+	this.setClonarLinha = function (callback){
+		this.clonarLinha = callback;
 	};
 	
 	this.setNumeroLinhasCopiadas= function (numeroLinhasCopiadas){
@@ -85,19 +85,8 @@ function BlocoTabelaHandler (urlTela, nomeBloco, idTabela, idBlocoInput) {
 				botoesAcoes += '<input type="button" title="Remover Dados do '+this.nomeBloco+ '" value="" class="botaoRemover" onclick="remover'+this.nomeBloco+'(this);"/>';
 				linha.insertCell(this.TOTAL_COLUNAS).innerHTML = botoesAcoes;
 				
-				// Essa condicao surgiu para incluir um mesmo logradouro de uma unica vez, e depois o usuario edita, proporcionando agilidade no cadastro.
-				var linhas = new Array();
-				linhas[0] = linha;
-				
-				var clone = null;
-				for (var i = 1; i < this.numeroLinhasCopiadas; i++) {
-					clone = linha.cloneNode(true);
-					this.tabela.appendChild(clone);
-					linhas[i] = clone;
-				}
-				
-				if(this.ajustarLinhasCopiadas != undefined){
-					this.ajustarLinhasCopiadas(linhas);
+				if(this.clonarLinha != undefined && typeof this.clonarLinha === 'function'){
+					this.clonarLinha(linha, this.tabela);
 				}
 			}	
 			
@@ -141,7 +130,7 @@ function BlocoTabelaHandler (urlTela, nomeBloco, idTabela, idBlocoInput) {
 					handler.tabela.deleteRow(linha.rowIndex);
 					handler.limparBlocoInput();
 					
-					if (handler.removerRegistroCallback != undefined) {
+					if (handler.removerRegistroCallback != undefined && typeof handler.removerRegistroCallback === 'function') {
 						handler.removerRegistroCallback(resposta);
 					}
 				}
@@ -184,12 +173,12 @@ function BlocoTabelaHandler (urlTela, nomeBloco, idTabela, idBlocoInput) {
 	
 	this.inicializarBotoes = function (){
 		var tabelaHandler = this;
-		var botaoIncluir = doc.getElementById('botaoIncluir'+this.nomeBloco);
+		var botaoIncluir = doc.getElementById('botaoIncluir'+tabelaHandler.nomeBloco);
 		if (botaoIncluir != null) {
 			botaoIncluir.onclick = function() { tabelaHandler.adicionar(); };	
 		}
 		
-		var botaoLimpar = doc.getElementById('botaoLimpar'+this.nomeBloco);
+		var botaoLimpar = doc.getElementById('botaoLimpar'+tabelaHandler.nomeBloco);
 		if (botaoLimpar != null) {
 			botaoLimpar.onclick = function() { tabelaHandler.limparBlocoInput(); };	
 		}

@@ -79,10 +79,12 @@ public class ControleAcessoInterceptor implements Interceptor {
             } else {
                 mensagem = "Tentativa de acesso por usuario nao autenticado ou timeoute de sessao";
             }
+            mensagem += ". Possivel causa: " + e.getMessage();
             logger.log(Level.WARNING, mensagem);
         } catch (RuntimeException e) {
-            logger.log(Level.SEVERE, "Falha na interceptacao do metodo \"" + metodo.getMethod().getName()
-                    + "\" efetuado pelo usuario: " + usuarioInfo.getDescricaoLogin());
+            logger.log(Level.SEVERE,
+                    "Falha na interceptacao do metodo \"" + metodo.getMethod().getName() + "\" efetuado pelo usuario: "
+                            + usuarioInfo.getDescricaoLogin() + ". Possivel causa: " + e.getMessage());
             throw e;
         }
     }

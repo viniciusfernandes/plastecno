@@ -31,34 +31,34 @@ public class Contato implements Serializable {
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF")
 	private String cpf;
 
-	@InformacaoValidavel(intervalo = { 0, 3 }, nomeExibicao = "DDD do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 3 }, nomeExibicao = "DDD do contato")
 	@Column(name = "ddd_1")
 	private String ddd;
 
-	@InformacaoValidavel(intervalo = { 0, 3 }, nomeExibicao = "DDD secundario do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 3 }, nomeExibicao = "DDD secundario do contato")
 	@Column(name = "ddd_2")
 	private String dddSecundario;
 
-	@InformacaoValidavel(intervalo = { 0, 3 }, nomeExibicao = "DDI do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 3 }, nomeExibicao = "DDI do contato")
 	@Column(name = "ddi_1")
 	private String ddi;
 
-	@InformacaoValidavel(intervalo = { 0, 3 }, nomeExibicao = "DDI secundario do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 3 }, nomeExibicao = "DDI secundario do contato")
 	@Column(name = "ddi_2")
 	private String ddiSecundario;
 
-	@InformacaoValidavel(intervalo = { 0, 50 }, nomeExibicao = "Departamento do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 50 }, nomeExibicao = "Departamento do contato")
 	@Column(name = "departamento")
 	private String departamento;
 
-	@InformacaoValidavel(intervalo = { 0, 200 }, nomeExibicao = "Email do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 200 }, nomeExibicao = "Email do contato")
 	private String email;
 
-	@InformacaoValidavel(intervalo = { 0, 9 }, nomeExibicao = "FAX do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 9 }, nomeExibicao = "FAX do contato")
 	@Column(name = "fax_1")
 	private String fax;
 
-	@InformacaoValidavel(intervalo = { 0, 9 }, nomeExibicao = "FAX secundario do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 9 }, nomeExibicao = "FAX secundario do contato")
 	@Column(name = "fax_2")
 	private String faxSecundario;
 
@@ -72,7 +72,7 @@ public class Contato implements Serializable {
 	@JoinColumn(name = "id_logradouro")
 	private Logradouro logradouro;
 
-	@InformacaoValidavel(obrigatorio = true, intervalo = { 1, 20 }, nomeExibicao = "Nome do contato")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Nome do contato")
 	private String nome;
 
 	@InformacaoValidavel(nomeExibicao = "Ramal do contato")
@@ -83,14 +83,14 @@ public class Contato implements Serializable {
 	@Column(name = "ramal_2")
 	private String ramalSecundario;
 
-	@InformacaoValidavel(intervalo = { 0, 100 })
+	@InformacaoValidavel(intervaloComprimento = { 0, 100 })
 	private String sobrenome;
 
-	@InformacaoValidavel(intervalo = { 0, 10 }, nomeExibicao = "Telefone do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 10 }, nomeExibicao = "Telefone do contato")
 	@Column(name = "telefone_1")
 	private String telefone;
 
-	@InformacaoValidavel(intervalo = { 0, 10 }, nomeExibicao = "Telefone secundario do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 10 }, nomeExibicao = "Telefone secundario do contato")
 	@Column(name = "telefone_2")
 	private String telefoneSecundario;
 
@@ -126,9 +126,20 @@ public class Contato implements Serializable {
 	private String formatarTelefone(String ddi, String ddd, String telefone, String ramal, String fax) {
 
 		StringBuilder telefoneFormatado = new StringBuilder();
-		telefoneFormatado.append("(").append(ddi == null ? "" : ddi).append(" / ").append(ddd == null ? "" : ddd)
-				.append(") ").append(telefone == null ? "" : formatarTelefoneComHifen(telefone)).append(" / ")
-				.append(ramal == null ? "" : ramal).append(" / ").append(fax == null ? "" : formatarTelefoneComHifen(fax));
+
+		if (ddi != null && !ddi.isEmpty()) {
+			telefoneFormatado.append(ddi).append(" ");
+		}
+		
+		if (ddd != null && !ddd.isEmpty()) {
+			telefoneFormatado.append("(").append(ddd).append(") ");
+		}
+		
+
+		//telefoneFormatado.append("(").append(ddi == null ? "" : ddi).append(" / ").append(ddd == null ? "" : ddd).append(") ")
+		telefoneFormatado.append(telefone == null ? "" : formatarTelefoneComHifen(telefone)).append(" / ")
+				.append(ramal == null ? "" : ramal).append(" / ")
+				.append(fax == null ? "" : formatarTelefoneComHifen(fax));
 
 		return telefoneFormatado.toString();
 	}
@@ -282,8 +293,8 @@ public class Contato implements Serializable {
 		if (this.isTelefoneSecundarioVazio()) {
 			return "";
 		}
-		return this.formatarTelefone(this.ddiSecundario, this.dddSecundario, this.telefoneSecundario, this.ramalSecundario,
-				this.faxSecundario);
+		return this.formatarTelefone(this.ddiSecundario, this.dddSecundario, this.telefoneSecundario,
+				this.ramalSecundario, this.faxSecundario);
 	}
 
 	@Override

@@ -1513,7 +1513,11 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 		tot += vl;
 		document.getElementById(campos[i].idImp).value = vl;
 	}
-	document.getElementById('valorTotaltributosProd').value = tot.toFixed(2);
+	tot = tot.toFixed(2);
+	document.getElementById('valorTotaltributosProd').value = tot;
+	
+	var info = document.getElementById('infoAdicionaisProd');
+	info.value = info.value.split(':')[0]+': '+tot;
 };
 
 function zerarImposto(idImposto){

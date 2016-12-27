@@ -408,11 +408,9 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	public Double pesquisarValorPedido(Integer idPedido) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i.valorPedido from Pedido i where i.id = :idPedido ");
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idPedido", idPedido);
-		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.valorPedido from Pedido i where i.id = :idPedido").setParameter(
+						"idPedido", idPedido), Double.class, 0d);
 	}
 
 	public Double pesquisarValorPedidoIPI(Integer idPedido) {

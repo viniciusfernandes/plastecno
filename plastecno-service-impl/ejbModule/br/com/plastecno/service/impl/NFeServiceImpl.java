@@ -9,6 +9,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -350,7 +351,7 @@ public class NFeServiceImpl implements NFeService {
 				Integer.parseInt(ide.getSerie()), Integer.parseInt(ide.getModelo()), xml, idPedido,
 				numeroTriangularizado));
 
-		escreverXMLNFe(xml, idPedido.toString() + "_" + ide.getNumero());
+		escreverXMLNFe(xml, new Date(), idPedido.toString() + "_" + ide.getNumero());
 
 		// Inserindo os itens emitidos em cada nota para que possamos efetuar o
 		// controle das quantidades fracionadas dos itens emitidos. No caso de
@@ -362,11 +363,20 @@ public class NFeServiceImpl implements NFeService {
 		return ide.getNumero();
 	}
 
-	private void escreverXMLNFe(String xml, String nome) throws BusinessException {
+	private void escreverXMLNFe(String xml, Date dataEmissao, String nome) throws BusinessException {
 		if (xml == null) {
 			return;
 		}
+		Calendar c = Calendar.getInstance();
+		c.setTime(dataEmissao);
+
 		String path = configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.DIRETORIO_XML_NFE);
+		path += "\\\\" + c.get(Calendar.YEAR) + "\\\\" + (c.get(Calendar.MONTH) + 1);
+		File arq = null;
+		if (!(arq = new File(path)).exists()) {
+		    // Escrevendo todos os diretorios parents
+			arq.mkdirs();
+		}
 		BufferedWriter bw = null;
 		try {
 			/*

@@ -50,6 +50,14 @@ public class IdentificacaoDestinatarioNFe {
 	@XmlElement(name = "xNome")
 	private String razaoSocial;
 
+	public boolean contemEndereco() {
+		return enderecoDestinatarioNFe != null && enderecoDestinatarioNFe.getCep() != null
+				&& !enderecoDestinatarioNFe.getCep().isEmpty() && enderecoDestinatarioNFe.getLogradouro() != null
+				&& !enderecoDestinatarioNFe.getLogradouro().isEmpty()
+				&& enderecoDestinatarioNFe.getNomeMunicipio() != null
+				&& !enderecoDestinatarioNFe.getNomeMunicipio().isEmpty();
+	}
+
 	@XmlTransient
 	public String getCnpj() {
 		return cnpj;

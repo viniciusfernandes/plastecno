@@ -93,6 +93,7 @@ $(document).ready(function() {
 	
 	$('#botaoInserirInfoProd').click(function(){
 		gerarInputInfoProduto();
+		alterarValorDuplicata();
 		fecharBloco('bloco_info_adicionais_prod');
 	});
 	
@@ -145,6 +146,7 @@ $(document).ready(function() {
 	
 	$('#botaoLimparInfoProd').click(function(){
 		removerInputHidden(gerarJsonInfoProduto());
+		alterarValorDuplicata();
 		fecharBloco('bloco_info_adicionais_prod');
 		$('#bloco_info_adicionais_prod #fciProd').val('');
 		$('#bloco_info_adicionais_prod #infoAdicionaisProd').val('');
@@ -287,6 +289,8 @@ $(document).ready(function() {
 		}
 	});
 	
+	alterarValorDuplicata();
+	
 	inicializarBotaoPesquisarCEP({'idBotao':'botaoCepRetirada',
 		'idCep': 'cepRetirada', 'idEndereco': 'enderecoRetirada', 'idBairro': 'bairroRetirada', 
 		'idCidade': 'cidadeRetirada', 'idUf': 'ufRetirada', 'idPais': ''});
@@ -350,6 +354,35 @@ $(document).ready(function() {
 	inicializarAlteracaoTabelaProdutos();
 });
 
+function alterarValorDuplicata(){
+	var vlTot = calcularValorTotalProdutos();
+	if(!isEmpty(vlTot)){
+		vlTot = parseFloat(vlTot);
+	} else {
+		vlTot = 0;
+	}
+	var vlFrete = 0;
+	var vlDesp= 0;
+	var vl = 0;
+	$("input[name*='produtoServicoNFe.outrasDespesasAcessorias']").each(function(){
+		if(!isEmpty(vl = $(this).val())){
+			vlDesp += parseFloat(vl);
+		}
+	});
+	
+	$("input[name*='produtoServicoNFe.valorTotalFrete']").each(function(){
+		if(!isEmpty(vl = $(this).val())){
+			vlFrete += parseFloat(vl);
+		}
+	});
+	
+	vl = (vlTot+vlFrete+vlDesp).toFixed(2);
+	var linhas = document.getElementById('tabela_duplicata').rows;
+	for (var i = 1; i < linhas.length; i++) {
+		linhas[i].cells[2].innerHTML = vl;
+	}
+};
+
 function encontrarBotaoEdicaoProduto(proximo){
 	var linha = null;
 	if(btProduto != null){
@@ -403,6 +436,7 @@ function inicializarAlteracaoTabelaProdutos(){
 			cells[9].innerHTML = (vTot*pIPI/100).toFixed(2);
 			
 			calcularValoresImpostos(null, false);
+			alterarValorDuplicata();
 		}
 	});
 	
@@ -433,6 +467,15 @@ function inicializarAlteracaoTabelaProdutos(){
 	});
 };
 
+function calcularValorTotalProdutos(){
+	var linhas = document.getElementById('tabela_produtos').rows;
+	var tot = 0;
+	for (var i = 1; i < linhas.length; i++) {
+		tot += parseFloat(linhas[i].cells[6].innerHTML);
+	}
+	return tot;
+};
+
 function emitirNFe(isTriangulacao){
 	gerarInputDuplicata();
 	gerarInputProdutoServico();
@@ -454,11 +497,13 @@ function emitirNFe(isTriangulacao){
 function removerProduto(botao){
 	var tabela = document.getElementById('tabela_produtos');
 	var l = botao.parentNode.parentNode;
+	var indice = l.cells[0].innerHTML;
 	tabela.deleteRow(l.rowIndex);
-	var nome = 'nf.listaItem[2]';
+	var nome = 'nf.listaItem['+indice+']';
 	$("input[name^='"+nome+"']").each(function(){
 		$(this).remove();
 	});
+	alterarValorDuplicata();
 	numeroImportacaoProduto = null;
 	numeroProdutoEdicao = null;
 	btProduto = null;
@@ -1500,6 +1545,8 @@ function inicializarCalculoImpostos(){
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 	<form id="formVazio" ></form>
+	<%-- O valor do pedido sera utilizado para efetuar o recalculo do valor das duplicatas quando incluir o valor do frete --%>
+	<input type="hidden" id="valorTotalProdutos"/>
 
 	<form id="formPesquisa" action="<c:url value="/emissaoNFe/pedido"/>" method="get">
 		<input type="hidden" id="idPedidoPesquisa" name="idPedido" value="${idPedido}"/>
@@ -1661,7 +1708,7 @@ function inicializarCalculoImpostos(){
 				</div>
 				<div class="label">Telefone:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" id="telefone" name="nf.identificacaoDestinatarioNFe.enderecoDestinatarioNFe.telefone"
+					<input type="text" id="telefone" name="telefoneDestinatario"
 						value="${telefoneContatoPedido}" />
 				</div>
 				<div class="label">Email:</div>

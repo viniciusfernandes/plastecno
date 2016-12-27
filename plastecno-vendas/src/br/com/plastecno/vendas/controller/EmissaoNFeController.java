@@ -149,21 +149,15 @@ public class EmissaoNFeController extends AbstractController {
     }
 
     @Post("emissaoNFe/emitirNFe")
-    public void emitirNFe(DadosNFe nf, Logradouro logradouro, Integer idPedido, boolean isTriangulacao) {
+    public void emitirNFe(DadosNFe nf, Logradouro logradouro, String telefoneDestinatario, Integer idPedido,
+            boolean isTriangulacao) {
         try {
             nFeService.validarEmissaoNFePedido(idPedido);
             String numeroNFe = null;
             try {
-                // Verificando condicao para gerar o endereco do destinatario a
-                // partir do logradouro
-                if (nf != null && nf.getIdentificacaoDestinatarioNFe() != null
-                        && nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe() != null) {
 
-                    String telefone = nf.getIdentificacaoDestinatarioNFe().getEnderecoDestinatarioNFe().getTelefone();
-                    nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
-                            nFeService.gerarEnderecoNFe(logradouro, telefone));
-                }
-
+                nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
+                        nFeService.gerarEnderecoNFe(logradouro, telefoneDestinatario));
                 formatarDatas(nf, false);
                 numeroNFe = nFeService.emitirNFe(new NFe(nf), idPedido, isTriangulacao);
                 gerarMensagemSucesso("A NFe de número " + numeroNFe + " do pedido No. " + idPedido
@@ -431,6 +425,7 @@ public class EmissaoNFeController extends AbstractController {
             ajustarQuantidadeFracionada(listaItem, idPedido);
 
             String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
+            addAtributo("idPedido", idPedido);
             addAtributo("infoAdFisco",
                     "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO No. "
                             + idPedido + ". VENDEDORA: " + nomeVend);
@@ -442,7 +437,6 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
             addAtributo("logradouro",
                     cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
-            addAtributo("idPedido", idPedido);
             addAtributo(
                     "telefoneContatoPedido",
                     telefone.length > 0 ? String.valueOf(telefone[0])

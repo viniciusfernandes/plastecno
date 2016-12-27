@@ -75,6 +75,10 @@ public class DadosNFe {
 		return cobrancaNFe != null && cobrancaNFe.contemDuplicata();
 	}
 
+	public boolean contemEnderecoDestinatario() {
+		return identificacaoDestinatarioNFe != null && identificacaoDestinatarioNFe.contemEndereco();
+	}
+
 	@XmlTransient
 	public CobrancaNFe getCobrancaNFe() {
 		return cobrancaNFe;

@@ -741,6 +741,9 @@ function inicializarTabelaDuplicata(){
 			'onValidar': function(){
 				return obrigatorioPreenchido(campos, ['numeroDuplicata', 'dataVencimentoDuplicata']);
 			},
+			'onRemover':function(linha){
+				alterarValorDuplicata();
+			},
 			'idLinhaSequencial':true};
 	editarTabela(config);
 };

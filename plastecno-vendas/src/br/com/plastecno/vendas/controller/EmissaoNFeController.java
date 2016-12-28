@@ -537,18 +537,17 @@ public class EmissaoNFeController extends AbstractController {
         TransporteNFe transporte = null;
         TransportadoraNFe tnfe = null;
         if (nf != null && (transporte = nf.getTransporteNFe()) != null) {
-            Transportadora t = null;
             if ((tnfe = transporte.getTransportadoraNFe()) != null) {
-                t = new Transportadora();
+                Transportadora t = new Transportadora();
                 t.setRazaoSocial(tnfe.getRazaoSocial());
                 t.setCnpj(tnfe.getCnpj());
                 t.setInscricaoEstadual(tnfe.getInscricaoEstadual());
                 t.setEndereco(tnfe.getEnderecoCompleto());
                 t.setCidade(tnfe.getMunicipio());
                 t.setUf(tnfe.getUf());
+                addAtributo("transportadora", new TransportadoraJson(t, t.getLogradouro()));
             }
             addAtributo("modalidadeFreteSelecionada", transporte.getModalidadeFrete());
-            addAtributo("transportadora", t);
         }
 
     }

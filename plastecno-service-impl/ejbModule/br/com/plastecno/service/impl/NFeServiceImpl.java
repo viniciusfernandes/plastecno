@@ -9,7 +9,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -367,16 +366,8 @@ public class NFeServiceImpl implements NFeService {
 		if (xml == null) {
 			return;
 		}
-		Calendar c = Calendar.getInstance();
-		c.setTime(dataEmissao);
 
 		String path = configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.DIRETORIO_XML_NFE);
-		path += "\\\\" + c.get(Calendar.YEAR) + "\\\\" + (c.get(Calendar.MONTH) + 1);
-		File arq = null;
-		if (!(arq = new File(path)).exists()) {
-		    // Escrevendo todos os diretorios parents
-			arq.mkdirs();
-		}
 		BufferedWriter bw = null;
 		try {
 			/*

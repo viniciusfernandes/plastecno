@@ -375,9 +375,13 @@ function alterarValorDuplicata(){
 			vlFrete += parseFloat(vl);
 		}
 	});
-	
-	vl = (vlTot+vlFrete+vlDesp).toFixed(2);
+
 	var linhas = document.getElementById('tabela_duplicata').rows;
+	var numDuplic = linhas.length -1;
+	if(numDuplic<=0){
+		return;
+	}
+	vl = ((vlTot+vlFrete+vlDesp)/numDuplic).toFixed(2);
 	for (var i = 1; i < linhas.length; i++) {
 		linhas[i].cells[2].innerHTML = vl;
 	}
@@ -736,6 +740,9 @@ function inicializarTabelaDuplicata(){
 			'idLinhaSequencial': true,
 			'onValidar': function(){
 				return obrigatorioPreenchido(campos, ['numeroDuplicata', 'dataVencimentoDuplicata']);
+			},
+			'onRemover':function(linha){
+				alterarValorDuplicata();
 			},
 			'idLinhaSequencial':true};
 	editarTabela(config);

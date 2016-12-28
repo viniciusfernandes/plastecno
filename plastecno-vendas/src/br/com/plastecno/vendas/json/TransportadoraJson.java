@@ -2,6 +2,7 @@ package br.com.plastecno.vendas.json;
 
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Transportadora;
+import br.com.plastecno.util.StringUtils;
 
 public class TransportadoraJson {
     private final String cidade;
@@ -18,7 +19,7 @@ public class TransportadoraJson {
     }
 
     public TransportadoraJson(Transportadora transp, Logradouro logr) {
-        id = transp == null ? 0 : transp.getId();
+        id = transp == null || transp.getId() == null ? 0 : transp.getId();
         nomeFantasia = transp == null ? "" : transp.getNomeFantasia();
         razaoSocial = transp == null ? "" : transp.getRazaoSocial();
         cnpj = transp == null ? "" : transp.getCnpj();
@@ -26,7 +27,16 @@ public class TransportadoraJson {
 
         if (logr != null) {
             StringBuilder end = new StringBuilder();
-            end.append(logr.getEndereco()).append(" - ").append(logr.getNumero()).append(" - ").append(logr.getBairro());
+            if (StringUtils.isNotEmpty(logr.getEndereco())) {
+                end.append(logr.getEndereco());
+            }
+            if (StringUtils.isNotEmpty(logr.getNumero())) {
+                end.append(" - ").append(logr.getNumero());
+            }
+            if (StringUtils.isNotEmpty(logr.getBairro())) {
+                end.append(" - ").append(logr.getBairro());
+            }
+
             endereco = end.toString();
             cidade = logr.getCidade();
             uf = logr.getUf();

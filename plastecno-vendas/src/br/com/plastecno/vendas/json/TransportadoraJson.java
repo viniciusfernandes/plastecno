@@ -7,7 +7,6 @@ public class TransportadoraJson {
     private final String cidade;
     private final String cnpj;
     private final String endereco;
-
     private final Integer id;
     private final String inscricaoEstadual;
     private final String nomeFantasia;
@@ -15,9 +14,9 @@ public class TransportadoraJson {
     private final String uf;
 
     public TransportadoraJson(Transportadora transp) {
-      this(transp, null);
+        this(transp, null);
     }
-    
+
     public TransportadoraJson(Transportadora transp, Logradouro logr) {
         id = transp == null ? 0 : transp.getId();
         nomeFantasia = transp == null ? "" : transp.getNomeFantasia();
@@ -25,8 +24,10 @@ public class TransportadoraJson {
         cnpj = transp == null ? "" : transp.getCnpj();
         inscricaoEstadual = transp == null ? "" : transp.getInscricaoEstadual();
 
-        if (logr != null ) {
-            endereco = logr.getEndereco();
+        if (logr != null) {
+            StringBuilder end = new StringBuilder();
+            end.append(logr.getEndereco()).append(" - ").append(logr.getNumero()).append(" - ").append(logr.getBairro());
+            endereco = end.toString();
             cidade = logr.getCidade();
             uf = logr.getUf();
         } else {

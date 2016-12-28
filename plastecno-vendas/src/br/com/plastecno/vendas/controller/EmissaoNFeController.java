@@ -64,6 +64,7 @@ import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ProdutoServicoJson;
 import br.com.plastecno.vendas.json.SerializacaoJson;
+import br.com.plastecno.vendas.json.TransportadoraJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
@@ -434,7 +435,9 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
             addAtributo("listaDuplicata", listaDuplicata);
             addAtributo("cliente", cliente);
-            addAtributo("transportadora", pedidoService.pesquisarTransportadoraByIdPedido(idPedido));
+
+            Transportadora t = pedidoService.pesquisarTransportadoraByIdPedido(idPedido);
+            addAtributo("transportadora", t != null ? new TransportadoraJson(t, t.getLogradouro()) : null);
             addAtributo("logradouro",
                     cliente != null ? clienteService.pesquisarLogradouroFaturamentoById(cliente.getId()) : null);
             addAtributo(

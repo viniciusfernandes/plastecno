@@ -2545,7 +2545,7 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Município:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="munTransportadora" name="nf.transporteNFe.transportadoraNFe.municipio" value="${transportadora.municipio}" style="width: 100%" />
+						<input type="text" id="munTransportadora" name="nf.transporteNFe.transportadoraNFe.municipio" value="${transportadora.cidade}" style="width: 100%" />
 					</div>
 					<div  class="label">UF:</div>
 					<div class="input" style="width: 50%">

@@ -344,7 +344,7 @@ public class PedidoController extends AbstractController {
     @Post("pedido/item/inclusao")
     public void inserirItemPedido(Integer numeroPedido, ItemPedido itemPedido, Double aliquotaIPI) {
         try {
-            if (itemPedido.getMaterial().getId() == null) {
+            if (itemPedido.getMaterial() != null && itemPedido.getMaterial().getId() == null) {
                 itemPedido.setMaterial(null);
             }
             if (aliquotaIPI != null) {

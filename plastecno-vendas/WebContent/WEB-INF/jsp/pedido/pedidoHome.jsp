@@ -61,7 +61,11 @@ $(document).ready(function() {
 		form.submit();
 		
 	});
-
+	
+	$("#botaoLimparNumeroPedido").click(function() {
+		 $('#formLimparPedido').submit();
+	});
+	
 	$("#representada").change(function() {
 		habilitarIPI('<c:url value="/pedido"/>', $(this).val());	
 	});
@@ -234,7 +238,11 @@ $(document).ready(function() {
 				<input type="button" id="botaoPesquisaNumeroPedido"
 					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
 			</div>
-			<div class="label">Nr. Pedido Cliente:</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoLimparNumeroPedido"
+					title="Limpar Pedido" value="" class="botaoLimparPequeno" />
+			</div>
+			<div class="label" style="width: 13%">Nr. Pedido Cliente:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoCliente"
 					name="pedido.numeroPedidoCliente"
@@ -372,7 +380,7 @@ $(document).ready(function() {
 			<input type="hidden" name="orcamento" id="orcamento" value="${empty orcamento ? false : orcamento}"/>
 			<input type="button" id="botaoPesquisaPedido" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
 		</form>
-		<form action="pedido/limpar" method="get">
+		<form id="formLimparPedido" action="pedido/limpar" method="get">
 			<input type="hidden" name="tipoPedido" value="${tipoPedido}" />
 			<input type="hidden" name="orcamento" id="orcamento" value="${empty orcamento ? false : orcamento}"/>
 			<input type="submit" value="" title="Limpar Dados do Pedido" class="botaoLimpar" />

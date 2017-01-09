@@ -31,44 +31,44 @@ public class Usuario implements Serializable {
 	 */
 	private static final long serialVersionUID = -1885114358725849134L;
 
+	private boolean ativo;
+
+	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF")
+	private String cpf;
+
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 50 }, nomeExibicao = "Email do usuario")
+	private String email;
+
 	@Id
 	@SequenceGenerator(name = "usuarioSequence", sequenceName = "vendas.seq_usuario_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usuarioSequence")
 	private Integer id;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 6, 30 }, nomeExibicao = "Senha do usuario")
-	private String senha;
+	@OneToMany(mappedBy = "vendedor", fetch = FetchType.LAZY, cascade = { CascadeType.MERGE })
+	private List<Cliente> listaCliente;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 50 }, nomeExibicao = "Email do usuario")
-	private String email;
-
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Nome do usuario")
-	private String nome;
-
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 40 }, nomeExibicao = "Sobrenome do usuario")
-	private String sobrenome;
-
-	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF")
-	private String cpf;
-
-	private boolean ativo;
+	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de contato do usuario")
+	private List<ContatoUsuario> listaContato;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tb_usuario_tb_perfil_acesso", schema = "vendas", joinColumns = { @JoinColumn(name = "id_usuario") }, inverseJoinColumns = { @JoinColumn(name = "id_perfil_acesso") })
 	@InformacaoValidavel(nomeExibicao = "Perfil do usuario")
 	private List<PerfilAcesso> listaPerfilAcesso;
 
-	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
-	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de contato do usuario")
-	private List<ContatoUsuario> listaContato;
-
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "id_logradouro")
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da usuario")
 	private Logradouro logradouro;
 
-	@OneToMany(mappedBy = "vendedor", fetch = FetchType.LAZY, cascade = { CascadeType.MERGE })
-	private List<Cliente> listaCliente;
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Nome do usuario")
+	private String nome;
+
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 6, 30 }, nomeExibicao = "Senha do usuario")
+	private String senha;
+
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 40 }, nomeExibicao = "Sobrenome do usuario")
+	private String sobrenome;
 
 	public Usuario() {
 	}
@@ -85,6 +85,11 @@ public class Usuario implements Serializable {
 	public Usuario(Integer id, String nome, String sobrenome) {
 		this(id, nome);
 		this.sobrenome = sobrenome;
+	}
+
+	public Usuario(Integer id, String nome, String sobrenome, String email) {
+		this(id, nome, sobrenome);
+		this.email = email;
 	}
 
 	public void addCliente(Cliente cliente) {

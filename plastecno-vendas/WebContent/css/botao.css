@@ -234,6 +234,16 @@
 	width: 24px;
 }
 
+.botaoLimparPequeno {
+	background: url("../images/broom_16.png") no-repeat scroll 0 0
+		transparent;
+	border: 0;
+	cursor: pointer;
+	height: 16px;
+	margin-left: 5px;
+	width: 16px;
+}
+
 .botaoManutencao {
 	background: url("../images/maintenance_24.png") no-repeat scroll 0 0
 		transparent;

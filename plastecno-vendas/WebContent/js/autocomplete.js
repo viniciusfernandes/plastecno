@@ -25,7 +25,11 @@ var autocompletar = function(configuracao) {
 			});
 
 			request.done(function(response) {
-						var resultado = response.lista;
+					var resultado = response.lista;
+					var erros = response.erros;
+					var contemErros = erros != undefined && erros !=null;
+					var contemLista = resultado != undefined && resultado !=null;
+					if(!contemErros && contemLista){
 						var TOTAL_REGISTROS = resultado.length;
 						// Devemos concecar no -1 pois o primeiro elemento a ser selecionado sera o de indice zero da lista.
 						count = -1;
@@ -53,8 +57,13 @@ var autocompletar = function(configuracao) {
 
 						} else {
 							$(idContainerResultados).hide();
-						};
-					});
+						}
+					} else if(!contemErros && !contemLista){
+						gerarListaMensagemAlerta(['Usuario pode nao estar logado no sistema']);
+					} else if(contemErros){
+						gerarListaMensagemErro(erros);
+					}
+			});
 
 			request.fail(function(request, status, excecao) {
 				var mensagem = 'Falha no AUTOCOMPLETE do campo: '+ idCampoPesquisavel;

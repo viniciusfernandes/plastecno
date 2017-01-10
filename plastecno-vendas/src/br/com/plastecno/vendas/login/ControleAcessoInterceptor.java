@@ -47,11 +47,11 @@ public class ControleAcessoInterceptor implements Interceptor {
     public void intercept(InterceptorStack stack, ResourceMethod metodo, Object resourceInstance) {
         /*
          * Caso o usuario nao esteja logado no sistema, vamos direciona-lo a
-         * tela de login. Apos configurarmos o redirecionamento, chamamos o
-         * stack.next para dar sequencia na executar do metodo.
+         * tela de login.
          */
         if (!usuarioInfo.isLogado()) {
-            this.result.forwardTo(LoginController.class).redirecionarLogin();
+            result.forwardTo(LoginController.class).redirecionarLogin();
+            return;
         }
 
         if (auditoriaHabilidata) {

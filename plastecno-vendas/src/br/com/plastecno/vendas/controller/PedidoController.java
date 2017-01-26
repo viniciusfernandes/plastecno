@@ -724,7 +724,7 @@ public class PedidoController extends AbstractController {
     @Post("pedido/itempedido/remocao/{id}")
     public void removerItemPedido(Integer id) {
         try {
-            final PedidoJson json = new PedidoJson(this.pedidoService.removerItemPedido(id));
+            final PedidoJson json = new PedidoJson(pedidoService.removerItemPedido(id));
             serializarJson(new SerializacaoJson("pedido", json));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));

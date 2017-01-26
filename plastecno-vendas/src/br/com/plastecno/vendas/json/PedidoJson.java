@@ -7,8 +7,8 @@ public class PedidoJson {
     private final Double valorPedidoIPI;
 
     public PedidoJson(Pedido pedido) {
-        this.valorPedido = pedido.getValorPedido();
-        this.valorPedidoIPI = pedido.getValorPedidoIPI();
+        this.valorPedido = pedido == null ? (Double) 0d : pedido.getValorPedido();
+        this.valorPedidoIPI = pedido == null ? (Double) 0d : pedido.getValorPedidoIPI();
     }
 
     public Double getValorPedido() {

@@ -1621,6 +1621,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public Pedido removerItemPedido(Integer idItemPedido) throws BusinessException {
+		if (idItemPedido == null) {
+			return null;
+		}
 		ItemPedido itemPedido = new ItemPedido();
 		itemPedido.setId(idItemPedido);
 		Pedido pedido = null;

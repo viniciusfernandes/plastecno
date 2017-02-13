@@ -56,7 +56,8 @@ public class ICMSInterestadual {
 		}
 
 		if (valorBCUFDestino != null && aliquotaUFDestino != null) {
-			valorUFRemetente = valorBCUFDestino * aliquotaUFDestino / 100d - valorUFDestino;
+			valorUFRemetente = valorBCUFDestino * aliquotaUFDestino / 100d
+					- (valorUFDestino == null ? 0d : valorUFDestino);
 		} else {
 			valorFCPDestino = null;
 		}

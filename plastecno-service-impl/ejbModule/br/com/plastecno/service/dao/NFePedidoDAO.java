@@ -72,4 +72,9 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 				entityManager.createQuery("select p.xmlNFe from NFePedido p where p.numero = :numero").setParameter(
 						"numero", numero), String.class, null);
 	}
+
+	public void removerNFe(Integer numeroNFe) {
+		entityManager.createQuery("delete NFePedido n where n.numero = :numeroNFe")
+				.setParameter("numeroNFe", numeroNFe).executeUpdate();
+	}
 }

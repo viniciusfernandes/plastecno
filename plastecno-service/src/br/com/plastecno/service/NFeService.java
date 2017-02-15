@@ -30,8 +30,6 @@ public interface NFeService {
 
 	String gerarXMLNfe(NFe nFe, Integer idPedido) throws BusinessException;
 
-	boolean isNFeEmissaoFinalizada(Integer idPedido);
-
 	List<Object[]> pesquisarCFOP();
 
 	Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe);
@@ -43,6 +41,8 @@ public interface NFeService {
 	List<Integer[]> pesquisarTotalItemFracionado(Integer idPedido);
 
 	void removerItemFracionadoNFe(Integer idItemFracionado);
+
+	void removerNFe(Integer numeroNFe);
 
 	void validarEmissaoNFePedido(Integer idPedido) throws BusinessException;
 

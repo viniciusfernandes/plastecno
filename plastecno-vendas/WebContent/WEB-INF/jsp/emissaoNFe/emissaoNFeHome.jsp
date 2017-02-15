@@ -65,6 +65,14 @@ $(document).ready(function() {
 		$('#formPesquisaNFe').submit();
 	});
 	
+	$("#botaoRemoverNFe").click(function() {
+		if(isEmpty($('#numeroNFe').val())){
+			return;
+		}
+		$('#formPesquisaNFe #numeroNFePesquisa').val($('#numeroNFe').val());
+		$('#formPesquisaNFe').attr('action', '<c:url value="/emissaoNFe/remocao"/>').attr('method', 'post').submit();
+	});
+	
 	$("#botaoPedidoPDF").click(function() {
 		if(isEmpty($('#idPedido').val())){
 			return;
@@ -1601,6 +1609,9 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoPesquisaNFe" title="Pesquisar NFe" value="" class="botaoPesquisarPequeno" />
+			</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoRemoverNFe" title="Remover NFe" value="" class="botaoRemover" />
 			</div>
 			<div class="label" style="width: 10%">Mod. NFe:</div>
 			<div class="input" style="width: 5%">

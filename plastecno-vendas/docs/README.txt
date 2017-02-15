@@ -1,3 +1,7 @@
+========== TEAM VIEWER SERVIDOR1 PLASTECNO ==========================
+IP 158137142
+SENHA 3039
+
 ========== PAINEL DE GERENCIAMENTO NO SERVIDOR JAVA ==========================
 
 1) Para configurar serviços e datasource do servidor JBoss7 devemos acessar o painel de gerenciamento

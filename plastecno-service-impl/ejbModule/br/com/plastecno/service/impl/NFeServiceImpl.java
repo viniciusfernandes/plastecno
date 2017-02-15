@@ -357,7 +357,6 @@ public class NFeServiceImpl implements NFeService {
 		// triangulacao nao devemos fracionar os itens da nfe
 		if (!isTriangularizacao) {
 			inserirNFeItemFracionado(nFe, idPedido);
-			inserirDataEmissaoNFe(idPedido);
 		}
 		return ide.getNumero();
 	}
@@ -532,14 +531,6 @@ public class NFeServiceImpl implements NFeService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	private void inserirDataEmissaoNFe(Integer idPedido) {
-		Long num = nFeItemFracionadoDAO.pesquisarNumeroItemFracionado(idPedido);
-		if (num <= 0) {
-			pedidoService.inserirDataEmissaoNFe(idPedido, new Date());
-		}
-	}
-
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	private void inserirNFeItemFracionado(NFe nFe, Integer idPedido) throws BusinessException {
 		List<DetalhamentoProdutoServicoNFe> listaDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 		List<Integer[]> listaQtde = pedidoService.pesquisarQuantidadeItemPedidoByIdPedido(idPedido);
@@ -595,12 +586,6 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public boolean isNFeEmissaoFinalizada(Integer idPedido) {
-		return pedidoService.pesquisarDataEmissaoNFe(idPedido) != null;
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Object[]> pesquisarCFOP() {
 		return configuracaoSistemaService.pesquisarCFOP();
 	}
@@ -637,6 +622,15 @@ public class NFeServiceImpl implements NFeService {
 		NFeItemFracionado item = new NFeItemFracionado();
 		item.setId(idItemFracionado);
 		nFeItemFracionadoDAO.remover(item);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerNFe(Integer numeroNFe) {
+		if (numeroNFe == null) {
+			return;
+		}
+		nFePedidoDAO.removerNFe(numeroNFe);
 	}
 
 	@Override

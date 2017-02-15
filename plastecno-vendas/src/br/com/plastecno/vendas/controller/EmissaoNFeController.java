@@ -111,6 +111,11 @@ public class EmissaoNFeController extends AbstractController {
         serializarJson(new SerializacaoJson("icms", icms));
     }
 
+    @Post("emissaoNFe/remocao")
+    public void removerNFe(Integer numeroNFe){
+        nFeService.removerNFe(numeroNFe);
+    }
+    
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
         addAtributo("listaTipoAliquotaICMSInterestadual", TipoAliquotaICMSInterestadual.values());
@@ -451,10 +456,6 @@ public class EmissaoNFeController extends AbstractController {
                 addAtributo("modeloNFe", numNFe[2]);
             } catch (BusinessException e) {
                 gerarListaMensagemAlerta(e);
-            }
-
-            if (nFeService.isNFeEmissaoFinalizada(idPedido)) {
-                gerarMensagemAlerta("O pedido No." + idPedido + " já foi emitido em outras NFes");
             }
 
         } catch (BusinessException e1) {

@@ -29,7 +29,8 @@ public class CalculadoraPreco {
 	}
 
 	public static double calcularPorUnidade(ItemPedido itemPedido) throws AlgoritmoCalculoException {
-		return itemPedido.getQuantidade() != null ? calcular(itemPedido) / itemPedido.getQuantidade() : 0d;
+		return itemPedido.getQuantidade() != null && itemPedido.getQuantidade() > 0d ? calcular(itemPedido)
+				/ itemPedido.getQuantidade() : 0d;
 	}
 
 	public static double calcularPorUnidadeIPI(ItemPedido itemPedido) throws AlgoritmoCalculoException {

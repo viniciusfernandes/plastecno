@@ -350,7 +350,7 @@ public class NFeServiceImpl implements NFeService {
 				Integer.parseInt(ide.getSerie()), Integer.parseInt(ide.getModelo()), xml, idPedido,
 				numeroTriangularizado));
 
-		escreverXMLNFe(xml, new Date(), idPedido.toString() + "_" + ide.getNumero());
+		escreverXMLNFe(xml, new Date(), gerarNomeXMLNFe(String.valueOf(idPedido), ide.getNumero()));
 
 		// Inserindo os itens emitidos em cada nota para que possamos efetuar o
 		// controle das quantidades fracionadas dos itens emitidos. No caso de
@@ -366,7 +366,6 @@ public class NFeServiceImpl implements NFeService {
 			return;
 		}
 
-		String path = configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.DIRETORIO_XML_NFE);
 		BufferedWriter bw = null;
 		try {
 			/*
@@ -374,8 +373,7 @@ public class NFeServiceImpl implements NFeService {
 			 * FileWriter utiliza o encoding do sistema operacional e nao
 			 * permite alteracoes do mesmo.
 			 */
-			bw = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(new File(path + "\\\\" + nome + ".xml")), "UTF-8"));
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(nome)), "UTF-8"));
 			bw.write(xml);
 		} catch (IOException e) {
 			log.log(Level.WARNING, "Falha na escrita do XML da NFe no diretorio do sistema", e);
@@ -470,6 +468,11 @@ public class NFeServiceImpl implements NFeService {
 	public NFe gerarNFeByNumero(Integer numero) throws BusinessException {
 		return gerarNFe(nFePedidoDAO.pesquisarXMLNFeByNumero(numero));
 
+	}
+
+	private String gerarNomeXMLNFe(String idPedido, String numeroNFe) {
+		String path = configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.DIRETORIO_XML_NFE);
+		return path + "\\\\" + idPedido + "_" + numeroNFe + ".xml";
 	}
 
 	@Override
@@ -630,7 +633,22 @@ public class NFeServiceImpl implements NFeService {
 		if (numeroNFe == null) {
 			return;
 		}
-		nFePedidoDAO.removerNFe(numeroNFe);
+
+		Integer idPedido = nFePedidoDAO.pesquisarIdPedidoByNumeroNFe(numeroNFe);
+		if (idPedido == null) {
+			return;
+		}
+
+		nFeItemFracionadoDAO.removerItemFracionadoByNumeroNFe(numeroNFe);
+		nFePedidoDAO.removerNFePedido(numeroNFe);
+		removerXMLNFe(String.valueOf(idPedido), String.valueOf(numeroNFe));
+	}
+
+	private void removerXMLNFe(String idPedido, String numeroNFe) {
+		File xml = new File(gerarNomeXMLNFe(idPedido, numeroNFe));
+		if (xml.isFile()) {
+			xml.delete();
+		}
 	}
 
 	@Override

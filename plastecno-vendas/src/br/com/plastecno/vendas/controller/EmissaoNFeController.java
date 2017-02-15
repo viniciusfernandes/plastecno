@@ -114,6 +114,7 @@ public class EmissaoNFeController extends AbstractController {
     @Post("emissaoNFe/remocao")
     public void removerNFe(Integer numeroNFe){
         nFeService.removerNFe(numeroNFe);
+        irTopoPagina();
     }
     
     @Get("emissaoNFe")

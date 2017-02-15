@@ -67,6 +67,12 @@ public class NFeItemFracionadoDAO extends GenericDAO<NFeItemFracionado> {
 		return tot == null ? 0 : tot.intValue();
 	}
 
+	public void removerItemFracionadoByNumeroNFe(Integer numeroNFe) {
+		entityManager.createQuery("delete NFeItemFracionado n where n.numeroNFe = :numeroNFe")
+				.setParameter("numeroNFe", numeroNFe).executeUpdate();
+	}
+	
+
 	public void removerItemFracionadoNyIdItemPedido(Integer idItemPedido) {
 		entityManager.createQuery("delete from NFeItemFracionado i where i.idItemPedido =:idItemPedido ")
 				.setParameter("idItemPedido", idItemPedido).executeUpdate();

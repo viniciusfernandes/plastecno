@@ -65,6 +65,7 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
 public class PedidoServiceImpl implements PedidoService {
+
 	@EJB
 	private ClienteService clienteService;
 
@@ -270,8 +271,11 @@ public class PedidoServiceImpl implements PedidoService {
 		cal.setTime(new Date());
 		Integer diaCorrido = null;
 		for (String dia : dias) {
-			diaCorrido = Integer.parseInt(dia);
-
+			try {
+				diaCorrido = Integer.parseInt(dia);
+			} catch (NumberFormatException e) {
+				continue;
+			}
 			cal.add(Calendar.DAY_OF_MONTH, diaCorrido);
 			lista.add(cal.getTime());
 

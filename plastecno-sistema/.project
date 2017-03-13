@@ -3,9 +3,9 @@
 	<name>plastecno-sistema</name>
 	<comment></comment>
 	<projects>
-		<project>plastecno-vendas</project>
 		<project>plastecno-utils</project>
 		<project>plastecno-service</project>
+		<project>plastecno-vendas</project>
 		<project>plastecno-service-impl</project>
 	</projects>
 	<buildSpec>

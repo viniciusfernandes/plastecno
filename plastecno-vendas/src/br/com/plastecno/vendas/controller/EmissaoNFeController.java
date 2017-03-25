@@ -375,7 +375,7 @@ public class EmissaoNFeController extends AbstractController {
             val[0] = NumeroUtils.gerarPercentual(i.getAliquotaICMS());
             val[1] = NumeroUtils.gerarPercentual(i.getAliquotaIPI());
             val[2] = "";
-            val[3] = i.getDescricaoSemFormatacao();
+            val[3] = i.getDescricaoItemMaterial();
             val[4] = StringUtils.removerMascaraDocumento(i.getNcm());
             val[5] = i.getSequencial();
             val[6] = i.getQuantidade();

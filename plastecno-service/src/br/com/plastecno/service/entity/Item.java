@@ -113,10 +113,10 @@ public abstract class Item implements Serializable, Cloneable {
 		return f != null && s != null ? f.toString() + s : null;
 	}
 
-	private String gerarDescricaoItem(boolean isCompleto, boolean isFormatado) {
+	private String gerarDescricaoItem(boolean isCompleto, boolean isDescricaoMaterial, boolean isFormatado) {
 		StringBuilder descricao = new StringBuilder();
 		if (getMaterial() != null) {
-			descricao.append(getFormaMaterial());
+			descricao.append(isDescricaoMaterial ? getFormaMaterial().getDescricao() : getFormaMaterial());
 			descricao.append(" - ");
 
 			if (isCompleto) {
@@ -176,7 +176,11 @@ public abstract class Item implements Serializable, Cloneable {
 	}
 
 	public String getDescricao() {
-		return gerarDescricaoItem(true, true);
+		return gerarDescricaoItem(true, false, true);
+	}
+
+	public String getDescricaoItemMaterial() {
+		return gerarDescricaoItem(true, true, true);
 	}
 
 	public String getDescricaoMaterial() {
@@ -194,7 +198,7 @@ public abstract class Item implements Serializable, Cloneable {
 	public abstract String getDescricaoPeca();
 
 	public String getDescricaoSemFormatacao() {
-		return gerarDescricaoItem(false, false);
+		return gerarDescricaoItem(false, false, false);
 	}
 
 	public abstract FormaMaterial getFormaMaterial();

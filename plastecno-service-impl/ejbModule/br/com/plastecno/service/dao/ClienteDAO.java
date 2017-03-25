@@ -71,7 +71,7 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 								.setParameter("idCliente", idCliente), Cliente.class, null);
 	}
 
-	public Cliente pesquisarClienteResumidoEContatoById(Integer idCliente) {
+	public Cliente pesquisarClienteResumidoLogradouroById(Integer idCliente) {
 		return QueryUtil
 				.gerarRegistroUnico(
 						entityManager

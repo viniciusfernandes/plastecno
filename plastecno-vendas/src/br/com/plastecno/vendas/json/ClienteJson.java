@@ -18,13 +18,12 @@ public class ClienteJson {
     private String inscricaoEstadual;
     private final List<TransportadoraJson> listaRedespacho;
     private final List<TransportadoraJson> listaTransportadora;
+    private final LogradouroJson logradouroFaturamento;
     private final String nomeCompleto;
     private final String nomeFantasia;
     private final String razaoSocial;
     private final String site;
-
     private final String telefone;
-
     private final VendedorJson vendedor;
 
     public ClienteJson(Cliente cliente) {
@@ -49,6 +48,8 @@ public class ClienteJson {
                     : "";
             vendedor = cliente.getVendedor() == null ? null : new VendedorJson(cliente.getVendedor());
 
+            logradouroFaturamento = new LogradouroJson(cliente.getLogradouroFaturamento());
+
             if (cliente.getListaRedespacho() != null) {
                 for (Transportadora redespacho : cliente.getListaRedespacho()) {
                     this.listaRedespacho.add(new TransportadoraJson(redespacho));
@@ -72,6 +73,7 @@ public class ClienteJson {
             nomeCompleto = "";
             telefone = "";
             vendedor = null;
+            logradouroFaturamento = new LogradouroJson(null);
         }
     }
 
@@ -101,6 +103,10 @@ public class ClienteJson {
 
     public List<TransportadoraJson> getListaTransportadora() {
         return listaTransportadora;
+    }
+
+    public LogradouroJson getLogradouroFaturamento() {
+        return logradouroFaturamento;
     }
 
     public String getNomeCompleto() {

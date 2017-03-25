@@ -233,18 +233,11 @@ $(document).ready(function() {
 		
 		var request = $.ajax({
 							type: "get",
-							url: '<c:url value="/cliente/cnpj"/>',
+							url: '<c:url value="/cliente/serializacao/cnpj"/>',
 							data: 'cnpj='+cnpj,
 						});
 		request.done(function(response) {
-			var cliente = response.cliente;
-			if(cliente == undefined){
-				return;
-			}
-			$('#nomeCliente').val(cliente.razaoSocial);
-			$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
-			$('#telefone').val(cliente.telefone);
-			$('#email').val(cliente.email);
+			popularCliente(response.cliente);
 		});
 		
 		request.fail(function(request, status) {
@@ -273,14 +266,7 @@ $(document).ready(function() {
 				var erros = response.erros;
 				var contemErro = erros != undefined;
 				if (!contemErro) {
-					var cliente = response.cliente;
-					$('#email').val(cliente.email);
-					$('#cnpj').val(cliente.cnpj);
-					$('#cpf').val(cliente.cpf);
-					$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
-					$('#telefone').val(cliente.telefone);
-					$('#nomeCliente').val(cliente.razaoSocial);
-
+					popularCliente(response.cliente);
 				} else if (erros != undefined) {
 					gerarListaMensagemErro(erros);
 				}
@@ -310,7 +296,7 @@ $(document).ready(function() {
 			
 			request.done(function(response) {
 				var t = response.transportadora;
-				if(t== undefined || t==null){
+				if(t == undefined || t == null){
 					return;
 				}
 				document.getElementById('nomeTransportadora').value = t.razaoSocial;
@@ -391,6 +377,29 @@ $(document).ready(function() {
 	inicializarMascaraReferenciada();
 	inicializarAlteracaoTabelaProdutos();
 });
+
+function popularCliente(cliente){
+	if(cliente != undefined && cliente != null){
+		$('#nomeCliente').val(cliente.razaoSocial);
+		$('#cnpj').val(cliente.cnpj);
+		$('#cpf').val(cliente.cpf);
+		$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
+		$('#telefone').val(cliente.telefone);
+		$('#email').val(cliente.email);
+		
+		var l = cliente.logradouroFaturamento; 
+		if(l != undefined && l != null){
+			$('#cep').val(l.cep);
+			$('#endereco').val(l.endereco);
+			$('#numero').val(l.numero);
+			$('#complemento').val(l.complemento);
+			$('#bairro').val(l.bairro);
+			$('#cidade').val(l.cidade);
+			$('#uf').val(l.uf);
+			$('#pais').val(l.pais);
+		}
+	}
+};
 
 function alterarValorDuplicata(){
 	var vlTot = calcularValorTotalProdutos();
@@ -1462,6 +1471,7 @@ function editarProduto(botao){
 	inicializarLegendaBlocoProduto('bloco_exportacao_prod');
 
 	fecharBloco('bloco_ipi');
+	fecharBloco('bloco_icms_interestadual');
 	fecharBloco('bloco_ii');
 	fecharBloco('bloco_iss');
 	fecharBloco('bloco_importacao_prod');

@@ -33,6 +33,7 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
+import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.dao.NFeItemFracionadoDAO;
 import br.com.plastecno.service.dao.NFePedidoDAO;
 import br.com.plastecno.service.entity.Logradouro;
@@ -658,6 +659,13 @@ public class NFeServiceImpl implements NFeService {
 		if (!pedidoService.isPedidoVendaExistente(idPedido)) {
 			throw new BusinessException("O pedido de venda No. " + idPedido + " não existe no sistema");
 		}
+
+		SituacaoPedido sPed = pedidoService.pesquisarSituacaoPedidoById(idPedido);
+		if (SituacaoPedido.DIGITACAO.equals(sPed) || SituacaoPedido.ORCAMENTO.equals(sPed)) {
+			throw new BusinessException("Não é possível emitir NFe para o pedido No. " + idPedido + " pois esta em "
+					+ sPed.getDescricao());
+		}
+
 		Integer idRepresentada = pedidoService.pesquisarIdRepresentadaByIdPedido(idPedido);
 		if (!representadaService.isRevendedor(idRepresentada)) {
 			throw new BusinessException("O pedido de venda No. " + idPedido

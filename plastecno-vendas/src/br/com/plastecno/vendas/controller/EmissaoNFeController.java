@@ -460,7 +460,7 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("idPedido", idPedido);
             addAtributo("infoAdFisco",
                     "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO NÚMERO "
-                            + idPedido + ". VENDEDORA: " + nomeVend);
+                            + idPedido + ". VENDEDOR: " + nomeVend);
 
             Date dtAtual = new Date();
             addAtributo("dataSaida", StringUtils.formatarData(dtAtual));

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Transportadora;
 
 /*
@@ -27,10 +28,14 @@ public class ClienteJson {
     private final VendedorJson vendedor;
 
     public ClienteJson(Cliente cliente) {
-        this(cliente, null);
+        this(cliente, (List<Transportadora>) null);
     }
 
     public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora) {
+        this(cliente, listaTransportadora, null);
+    }
+
+    public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora, Logradouro logradouro) {
         this.listaTransportadora = new ArrayList<TransportadoraJson>();
         this.listaRedespacho = new ArrayList<TransportadoraJson>();
 
@@ -48,7 +53,7 @@ public class ClienteJson {
                     : "";
             vendedor = cliente.getVendedor() == null ? null : new VendedorJson(cliente.getVendedor());
 
-            logradouroFaturamento = new LogradouroJson(cliente.getLogradouroFaturamento());
+            logradouroFaturamento = new LogradouroJson(logradouro);
 
             if (cliente.getListaRedespacho() != null) {
                 for (Transportadora redespacho : cliente.getListaRedespacho()) {
@@ -75,6 +80,10 @@ public class ClienteJson {
             vendedor = null;
             logradouroFaturamento = new LogradouroJson(null);
         }
+    }
+
+    public ClienteJson(Cliente cliente, Logradouro logradouro) {
+        this(cliente, null, logradouro);
     }
 
     public String getCnpj() {

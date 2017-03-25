@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.caelum.vraptor.Get;
@@ -77,8 +78,8 @@ public class TransportadoraController extends AbstractController {
     @Get("transportadora/{idTransportadora}")
     public void pesquisar(Integer idTransportadora) {
 
-        Transportadora transportadora = this.transportadoraService.pesquisarById(idTransportadora);
-        this.formatarDocumentos(transportadora);
+        Transportadora transportadora = transportadoraService.pesquisarById(idTransportadora);
+        formatarDocumentos(transportadora);
 
         addAtributo("transportadora", transportadora);
         addAtributo("listaContato", this.transportadoraService.pesquisarContato(idTransportadora));
@@ -105,6 +106,16 @@ public class TransportadoraController extends AbstractController {
     public void pesquisarTransportadoraByCnpj(String cnpj) {
         Transportadora t = transportadoraService.pesquisarByCnpj(cnpj);
         serializarJson(new SerializacaoJson("transportadora", new TransportadoraJson(t, t.getLogradouro())));
+    }
+
+    @Get("transportadora/listagem/nome")
+    public void pesquisarTransportadoraByNomeFantasia(String nomeFantasia) {
+        List<Autocomplete> lista = new ArrayList<Autocomplete>();
+        List<Transportadora> l = transportadoraService.pesquisarByNomeFantasia(nomeFantasia);
+        for (Transportadora t : l) {
+            lista.add(new Autocomplete(t.getId(), t.getNomeFantasia()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
     }
 
     @Post("transportadora/contato/remocao/{idContato}")

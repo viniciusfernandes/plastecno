@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.TipoDocumento;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
@@ -38,6 +39,9 @@ public class Transportadora implements Serializable {
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ da transportadora")
 	private String cnpj;
 
+	@Transient
+	private String enderecoFormatado;
+
 	@Id
 	@SequenceGenerator(name = "transportadoraSequence", sequenceName = "vendas.seq_transportadora_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transportadoraSequence")
@@ -56,6 +60,9 @@ public class Transportadora implements Serializable {
 	@JoinColumn(name = "id_logradouro")
 	private Logradouro logradouro;
 
+	@Transient
+	private String municipioFormatado;
+
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Nome fantasia da transportadora")
 	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
@@ -67,12 +74,24 @@ public class Transportadora implements Serializable {
 	@InformacaoValidavel(intervaloComprimento = { 0, 250 })
 	private String site;
 
+	@Transient
+	private String ufFormatado;
+
 	public Transportadora() {
 	}
 
 	public Transportadora(Integer id, String nomeFantasia) {
 		this.id = id;
 		this.nomeFantasia = nomeFantasia;
+	}
+
+	public Transportadora(Integer id, String nomeFantasia, String razaoSocial, String cnpj, String inscricaoEstadual,
+			Logradouro logradouro) {
+		this(id, nomeFantasia);
+		setRazaoSocial(razaoSocial);
+		setLogradouro(logradouro);
+		setInscricaoEstadual(inscricaoEstadual);
+		setCnpj(cnpj);
 	}
 
 	public void addContato(ContatoTransportadora contato) {
@@ -91,8 +110,7 @@ public class Transportadora implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof Transportadora && this.id != null
-				&& this.id.equals(((Transportadora) o).id);
+		return o instanceof Transportadora && this.id != null && this.id.equals(((Transportadora) o).id);
 	}
 
 	public String getAreaAtuacao() {
@@ -104,8 +122,7 @@ public class Transportadora implements Serializable {
 	}
 
 	public Contato getContatoPrincipal() {
-		return this.listaContato != null && !this.listaContato.isEmpty() ? listaContato
-				.get(0) : null;
+		return this.listaContato != null && !this.listaContato.isEmpty() ? listaContato.get(0) : null;
 	}
 
 	public String getEndereco() {
@@ -113,6 +130,17 @@ public class Transportadora implements Serializable {
 			return "";
 		}
 		return logradouro.getEndereco();
+	}
+
+	public String getEnderecoFormatado() {
+		return enderecoFormatado;
+	}
+
+	public String getEnderecoNumeroBairro() {
+		if (logradouro == null) {
+			return "";
+		}
+		return logradouro.getEnderecoNumeroBairro();
 	}
 
 	public Integer getId() {
@@ -138,6 +166,10 @@ public class Transportadora implements Serializable {
 		return logradouro.getCidade();
 	}
 
+	public String getMunicipioFormatado() {
+		return municipioFormatado;
+	}
+
 	public String getNomeFantasia() {
 		return nomeFantasia;
 	}
@@ -157,6 +189,10 @@ public class Transportadora implements Serializable {
 		return logradouro.getUf();
 	}
 
+	public String getUfFormatado() {
+		return ufFormatado;
+	}
+
 	@Override
 	public int hashCode() {
 		return this.id != null ? this.id.hashCode() : -1;
@@ -167,8 +203,7 @@ public class Transportadora implements Serializable {
 	}
 
 	public List<ContatoTransportadora> limparContato() {
-		final List<ContatoTransportadora> lista = new ArrayList<ContatoTransportadora>(
-				this.listaContato);
+		final List<ContatoTransportadora> lista = new ArrayList<ContatoTransportadora>(this.listaContato);
 		this.listaContato.clear();
 		return lista;
 	}
@@ -199,6 +234,10 @@ public class Transportadora implements Serializable {
 		logradouro.setEndereco(endereco);
 	}
 
+	public void setEnderecoFormatado(String enderecoFormatado) {
+		this.enderecoFormatado = enderecoFormatado;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -213,6 +252,10 @@ public class Transportadora implements Serializable {
 
 	public void setLogradouro(Logradouro logradouro) {
 		this.logradouro = logradouro;
+	}
+
+	public void setMunicipioFormatado(String municipioFormatado) {
+		this.municipioFormatado = municipioFormatado;
 	}
 
 	public void setNomeFantasia(String nomeFantasia) {
@@ -232,5 +275,9 @@ public class Transportadora implements Serializable {
 			logradouro = new Logradouro();
 		}
 		logradouro.setUf(uf);
+	}
+
+	public void setUfFormatado(String ufFormatado) {
+		this.ufFormatado = ufFormatado;
 	}
 }

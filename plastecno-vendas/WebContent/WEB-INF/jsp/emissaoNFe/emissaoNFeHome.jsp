@@ -297,6 +297,36 @@ $(document).ready(function() {
 		}
 	});
 	
+	autocompletar({
+		url : '<c:url value="/transportadora/listagem/nome"/>',
+		campoPesquisavel : 'nomeTransportadora',
+		parametro : 'nomeFantasia',
+		containerResultados : 'containerPesquisaTransportadora',
+		selecionarItem: function(itemLista) {
+			var request = $.ajax({
+				type : 'get',
+				url : '<c:url value="emissaoNFe/transportadora/id"/>?id=' + itemLista.id
+			});
+			
+			request.done(function(response) {
+				var t = response.transportadora;
+				if(t== undefined || t==null){
+					return;
+				}
+				document.getElementById('nomeTransportadora').value = t.razaoSocial;
+				document.getElementById('cnpjTransportadora').value = t.cnpj;
+				document.getElementById('ieTransportadora').value = t.inscricaoEstadual;
+				document.getElementById('endTransportadora').value = t.enderecoFormatado;
+				document.getElementById('munTransportadora').value = t.municipioFormatado;
+				document.getElementById('ufTransportadora').value = t.ufFormatado;
+			});
+			request.fail(function(request, status) {
+				alert('Falha na pesquisa da transportadora => Status da requisicao: '
+						+ status);
+			});
+		}
+	});
+	
 	alterarValorDuplicata();
 	
 	inicializarBotaoPesquisarCEP({'idBotao':'botaoCepRetirada',
@@ -1639,11 +1669,11 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label">Dt. Ent./Saída:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="dataSaida" name="nf.identificacaoNFe.dataSaida" value="${nf.identificacaoNFe.dataSaida}" style="width: 100%"/>
+				<input type="text" id="dataSaida" name="nf.identificacaoNFe.dataSaida" value="${dataSaida}" style="width: 100%"/>
 			</div>
 			<div class="label">Hr. Ent./Saída:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="horaSaida" name="nf.identificacaoNFe.horaSaida" value="${nf.identificacaoNFe.horaSaida}" style="width: 100%"/>
+				<input type="text" id="horaSaida" name="nf.identificacaoNFe.horaSaida" value="${horaSaida}" style="width: 100%"/>
 			</div>
 			<div class="label">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
@@ -1949,7 +1979,7 @@ function inicializarCalculoImpostos(){
 							<td>${p.ncm}</td>
 							<td>${p.cfop}</td>
 							<td>
-								<input type="button" value="" title="Editar Produto" class="botaoDinheiroPequeno" onclick="editarProduto(this);"/>
+								<input type="button" value="" title="Editar Produto" class="botaoEditar" onclick="editarProduto(this);"/>
 								<input type="button" value="" title="Remover Produto" class="botaoRemover" onclick="removerProduto(this);"/>
 							</td>
 							
@@ -2540,6 +2570,7 @@ function inicializarCalculoImpostos(){
 					<div  class="label">Razão Soc./Nome:</div>
 					<div class="input" style="width: 80%">
 						<input type="text" id="nomeTransportadora" name="nf.transporteNFe.transportadoraNFe.razaoSocial" value="${transportadora.razaoSocial}" style="width: 45%" />
+						<div class="suggestionsBox" id="containerPesquisaTransportadora" style="display: none; width: 50%"></div>
 					</div>
 					<div  class="label">CNPJ:</div>
 					<div class="input" style="width: 10%">

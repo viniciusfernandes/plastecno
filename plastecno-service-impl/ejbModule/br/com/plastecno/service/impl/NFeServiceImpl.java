@@ -563,7 +563,6 @@ public class NFeServiceImpl implements NFeService {
 			}
 
 			totalFrac = nFeItemFracionadoDAO.pesqusisarSomaQuantidadeFracionada(idItem, numeroNFe);
-			totalFrac += qtdeFrac;
 			if (totalFrac > qtdeItem) {
 				throw new BusinessException(
 						"Não é possível fracionar uma quantidade maior do que a quantidade vendida para o item no. "
@@ -575,14 +574,12 @@ public class NFeServiceImpl implements NFeService {
 			// os registros de um determinado item do banco por questoes de
 			// performance, ja que nao eh necessario manter essa informacao no
 			// sistema.
-			if (totalFrac < qtdeItem) {
+			if (totalFrac <= qtdeItem) {
 				// Aqui estamos configurando o ID do item fracionado para casa
 				// tenhamos uma edicao da NFe evitando a duplicacao de registro
 				// que poderia surgir no relatorio de itens fracionados.
 				nFeItemFracionadoDAO.alterar(new NFeItemFracionado(idItemFrac, idItem, idPedido, p.getDescricao(),
 						numItem, numeroNFe, qtdeItem, qtdeFrac, p.getValorTotalBruto()));
-			} else if (totalFrac.equals(qtdeItem)) {
-				nFeItemFracionadoDAO.removerItemFracionadoNyIdItemPedido(idItem);
 			}
 		}
 	}

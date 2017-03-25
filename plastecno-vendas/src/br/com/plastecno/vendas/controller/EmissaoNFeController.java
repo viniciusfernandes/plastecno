@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +19,7 @@ import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ConfiguracaoSistemaService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoUF;
@@ -81,6 +84,8 @@ public class EmissaoNFeController extends AbstractController {
     private NFeService nFeService;
     @Servico
     private PedidoService pedidoService;
+    @Servico
+    private TransportadoraService transportadoraService;
 
     public EmissaoNFeController(HttpServletRequest request, Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -92,10 +97,20 @@ public class EmissaoNFeController extends AbstractController {
 
     private void ajustarQuantidadeFracionada(List<ItemPedido> listaItem, Integer idPedido) {
         List<Integer[]> listaTotal = nFeService.pesquisarTotalItemFracionado(idPedido);
-        for (ItemPedido i : listaItem) {
+        List<ItemPedido> listaItemRestante = new ArrayList<ItemPedido>(listaItem);
+        Integer qRestante = null;
+        for (ItemPedido i : listaItemRestante) {
             for (Integer[] val : listaTotal) {
                 if (i.getSequencial().equals(val[0])) {
-                    i.setQuantidade(i.getQuantidade() - val[1]);
+                    qRestante = i.getQuantidade() - val[1];
+                    // Aqui estamos removendo da lista todos os itens que ja
+                    // foram totalmente fracionados para que eles nao aparecam
+                    // para o usuario com quantidade zerada.
+                    if (qRestante == null || qRestante == 0) {
+                        listaItem.remove(i);
+                        break;
+                    }
+                    i.setQuantidade(qRestante);
                     break;
                 }
             }
@@ -111,12 +126,6 @@ public class EmissaoNFeController extends AbstractController {
         serializarJson(new SerializacaoJson("icms", icms));
     }
 
-    @Post("emissaoNFe/remocao")
-    public void removerNFe(Integer numeroNFe){
-        nFeService.removerNFe(numeroNFe);
-        irTopoPagina();
-    }
-    
     @Get("emissaoNFe")
     public void emissaoNFeHome() {
         addAtributo("listaTipoAliquotaICMSInterestadual", TipoAliquotaICMSInterestadual.values());
@@ -166,6 +175,8 @@ public class EmissaoNFeController extends AbstractController {
                 nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                         nFeService.gerarEnderecoNFe(logradouro, telefoneDestinatario));
                 formatarDatas(nf, false);
+                ordenarListaDetalhamentoProduto(nf);
+
                 numeroNFe = nFeService.emitirNFe(new NFe(nf), idPedido, isTriangulacao);
                 gerarMensagemSucesso("A NFe de número " + numeroNFe + " do pedido No. " + idPedido
                         + " foi gerada com sucesso.");
@@ -176,7 +187,6 @@ public class EmissaoNFeController extends AbstractController {
                     e.addMensagem(e1.getListaMensagem());
                 }
                 popularNFe(nf, idPedido);
-
                 gerarListaMensagemErro(e);
                 redirecTo(this.getClass()).emissaoNFeHome();
                 irTopoPagina();
@@ -390,6 +400,21 @@ public class EmissaoNFeController extends AbstractController {
         request.getServletContext().setAttribute("listaCfop", listaCfop);
     }
 
+    private void ordenarListaDetalhamentoProduto(DadosNFe nf) {
+        if (nf == null || nf.getListaDetalhamentoProdutoServicoNFe() == null) {
+            return;
+        }
+        Collections.sort(nf.getListaDetalhamentoProdutoServicoNFe(), new Comparator<DetalhamentoProdutoServicoNFe>() {
+            @Override
+            public int compare(DetalhamentoProdutoServicoNFe d1, DetalhamentoProdutoServicoNFe d2) {
+                Integer n1 = d1.getNumeroItem();
+                Integer n2 = d2.getNumeroItem();
+                return n1 != null ? n1.compareTo(n2) : -1;
+            }
+        });
+
+    }
+
     @Get("emissaoNFe/NFe")
     public void pesquisarNFe(Integer numeroNFe) {
         NFe nFe = null;
@@ -434,9 +459,12 @@ public class EmissaoNFeController extends AbstractController {
             String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
             addAtributo("idPedido", idPedido);
             addAtributo("infoAdFisco",
-                    "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO No. "
+                    "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO NÚMERO "
                             + idPedido + ". VENDEDORA: " + nomeVend);
 
+            Date dtAtual = new Date();
+            addAtributo("dataSaida", StringUtils.formatarData(dtAtual));
+            addAtributo("horaSaida", StringUtils.formatarHora(dtAtual));
             addAtributo("listaNumeroNFe", nFeService.pesquisarNumeroNFeByIdPedido(idPedido));
             addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
             addAtributo("listaDuplicata", listaDuplicata);
@@ -465,6 +493,15 @@ public class EmissaoNFeController extends AbstractController {
         }
 
         irTopoPagina();
+    }
+
+    @Get("emissaoNFe/transportadora/id")
+    public void pesquisarTransportadoraById(Integer id) {
+        Transportadora t = transportadoraService.pesquisarById(id);
+        t.setEnderecoFormatado(t.getEnderecoNumeroBairro());
+        t.setMunicipioFormatado(t.getMunicipio());
+        t.setUfFormatado(t.getUf());
+        serializarJson(new SerializacaoJson("transportadora", t));
     }
 
     private void popularDestinatario(DadosNFe nf) {
@@ -517,6 +554,8 @@ public class EmissaoNFeController extends AbstractController {
 
         IdentificacaoNFe iNFe = null;
         if ((iNFe = nf.getIdentificacaoNFe()) != null) {
+            addAtributo("dataSaida", iNFe.getDataSaida());
+            addAtributo("horaSaida", iNFe.getHoraSaida());
             addAtributo("finalidadeEmissaoSelecionada", iNFe.getFinalidadeEmissao());
             addAtributo("formaPagamentoSelecionada", iNFe.getIndicadorFormaPagamento());
             addAtributo("tipoEmissaoSelecionada", iNFe.getTipoEmissao());
@@ -552,5 +591,11 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("modalidadeFreteSelecionada", transporte.getModalidadeFrete());
         }
 
+    }
+
+    @Post("emissaoNFe/remocao")
+    public void removerNFe(Integer numeroNFe) {
+        nFeService.removerNFe(numeroNFe);
+        irTopoPagina();
     }
 }

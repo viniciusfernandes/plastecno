@@ -54,6 +54,14 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@EJB
 	private NFeService nFeService;
 
+	private Comparator<ItemPedido> ordenacaoItemPedido = new Comparator<ItemPedido>() {
+		@Override
+		public int compare(ItemPedido i1, ItemPedido i2) {
+			return i1.getSequencial().compareTo(i2.getSequencial());
+		}
+
+	};
+
 	@EJB
 	private PedidoService pedidoService;
 
@@ -317,6 +325,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 			}
 		});
 
+		relatorio.sortElementoByGrupo(ordenacaoItemPedido);
 		return relatorio;
 	}
 
@@ -338,12 +347,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 					StringUtils.formatarData(item.getDataEntrega()));
 		}
 		// Reordenando os itens pelo numero de sequencia de inclusao no pedido.
-		relatorio.sortElementoByGrupo(new Comparator<ItemPedido>() {
-			@Override
-			public int compare(ItemPedido i1, ItemPedido i2) {
-				return i1.getSequencial().compareTo(i2.getSequencial());
-			}
-		});
+		relatorio.sortElementoByGrupo(ordenacaoItemPedido);
 		return relatorio;
 	}
 

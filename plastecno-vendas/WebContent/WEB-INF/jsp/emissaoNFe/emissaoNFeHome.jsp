@@ -87,6 +87,11 @@ $(document).ready(function() {
 		emitirNFe(false);
 	});
 	
+	$('#botaoDevolverNF').click(function(){
+		adicionarInputHiddenFormulario({'nome': 'tipoNFe', 'valor': 'DEVOLUCAO'});
+		emitirNFe(false);
+	});
+	
 	$('#botaoTriangularNF').click(function(){
 		emitirNFe(true);
 	});
@@ -906,6 +911,17 @@ function gerarInputHidden(objeto){
 			input.value = campos[i].valor;
 		}
 	};
+};
+
+function adicionarInputHiddenFormulario(json){
+	if(json == null){
+		return;
+	}
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = json.nome;
+	input.value = json.valor;
+	document.getElementById('formEmissao').appendChild(input);
 };
 
 function gerarJsonTipoIcms(){
@@ -2861,8 +2877,9 @@ function inicializarCalculoImpostos(){
 			</div>		
 		</fieldset>
 		<div class="bloco_botoes">
-			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>
-			<input type="button" id="botaoTriangularNF" title="Triangular Nota Fiscal" value="" class="botaoTriangulo"/>
+			<input type="button" id="botaoEmitirNF" title="Emitir NFe Saída" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoTriangularNF" title="Triangularizar NFe" value="" class="botaoTriangulo"/>
+			<input type="button" id="botaoDevolverNF" title="Emitir NFe Devolução" value="" class="botaoRefazer"/>
 		</div>
 
 		<jsp:include page="/bloco/bloco_detalhe_items_nfe.jsp"></jsp:include>		

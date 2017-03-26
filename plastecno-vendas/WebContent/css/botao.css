@@ -160,7 +160,7 @@
 }
 
 .botaoRefazer {
-	background: url("../images/redo_black_24.png") no-repeat scroll 0 0
+	background: url("../images/go_back_24.png") no-repeat scroll 0 0
 		transparent;
 	cursor: pointer;
 	height: 24px;
@@ -461,7 +461,7 @@
 }
 
 .botaoRefazer:hover {
-	background: url("../images/redo_black_16.png") no-repeat scroll 0 0
+	background: url("../images/go_back_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 	height: 24px;

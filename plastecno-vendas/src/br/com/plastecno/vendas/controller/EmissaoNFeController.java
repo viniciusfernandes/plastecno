@@ -52,6 +52,7 @@ import br.com.plastecno.service.nfe.constante.TipoIntermediacaoImportacao;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMSST;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
+import br.com.plastecno.service.nfe.constante.TipoNFe;
 import br.com.plastecno.service.nfe.constante.TipoOperacaoConsumidorFinal;
 import br.com.plastecno.service.nfe.constante.TipoOperacaoNFe;
 import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
@@ -165,8 +166,8 @@ public class EmissaoNFeController extends AbstractController {
     }
 
     @Post("emissaoNFe/emitirNFe")
-    public void emitirNFe(DadosNFe nf, Logradouro logradouro, String telefoneDestinatario, Integer idPedido,
-            boolean isTriangulacao) {
+    public void emitirNFe(DadosNFe nf, TipoNFe tipoNFe, Logradouro logradouro, String telefoneDestinatario,
+            Integer idPedido, boolean isTriangulacao) {
         try {
             nFeService.validarEmissaoNFePedido(idPedido);
             String numeroNFe = null;
@@ -177,7 +178,18 @@ public class EmissaoNFeController extends AbstractController {
                 formatarDatas(nf, false);
                 ordenarListaDetalhamentoProduto(nf);
 
-                numeroNFe = nFeService.emitirNFe(new NFe(nf), idPedido, isTriangulacao);
+                if (tipoNFe == null) {
+                    tipoNFe = TipoNFe.ENTRADA;
+                }
+
+                // REFATORAR ESSA IMPLEMENTACAO POIS AQUI EH UM PONTO DE
+                // COMPLEXIDADE ACICLOMATIA. UTILIZAR LAMBDA EXPESSIONS.
+                if (TipoNFe.DEVOLUCAO.equals(tipoNFe)) {
+                    numeroNFe = nFeService.emitirNFeDevolucao(new NFe(nf), idPedido);
+                } else if (TipoNFe.ENTRADA.equals(tipoNFe)) {
+                    numeroNFe = nFeService.emitirNFeEntrada(new NFe(nf), idPedido, isTriangulacao);
+                }
+
                 gerarMensagemSucesso("A NFe de número " + numeroNFe + " do pedido No. " + idPedido
                         + " foi gerada com sucesso.");
             } catch (BusinessException e) {

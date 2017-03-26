@@ -2,8 +2,12 @@ package br.com.plastecno.service.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import br.com.plastecno.service.nfe.constante.TipoNFe;
+import br.com.plastecno.service.nfe.constante.TipoSituacaoNFe;
 
 @Entity
 @Table(name = "tb_nfe_pedido", schema = "vendas")
@@ -22,6 +26,15 @@ public class NFePedido {
 
 	private Integer serie;
 
+	@Column(name = "id_tipo_nfe")
+	private TipoNFe tipoNFe;
+
+	@Enumerated
+	@Column(name = "id_situacao_nfe")
+	private TipoSituacaoNFe tipoSituacaoNFe;
+
+	
+
 	@Column(name = "xml_nfe")
 	private String xmlNFe;
 
@@ -29,13 +42,15 @@ public class NFePedido {
 	}
 
 	public NFePedido(Integer numero, Integer serie, Integer modelo, String xmlNFe, Integer idPedido,
-			Integer numeroTriangularizado) {
+			Integer numeroTriangularizado, TipoNFe tipoNFe, TipoSituacaoNFe tipoSituacaoNFe) {
 		this.numero = numero;
 		this.serie = serie;
 		this.modelo = modelo;
 		this.idPedido = idPedido;
 		this.xmlNFe = xmlNFe;
 		this.numeroTriangularizado = numeroTriangularizado;
+		this.tipoNFe = tipoNFe;
+		this.tipoSituacaoNFe = tipoSituacaoNFe;
 	}
 
 	public Integer getIdPedido() {
@@ -56,6 +71,14 @@ public class NFePedido {
 
 	public Integer getSerie() {
 		return serie;
+	}
+
+	public TipoNFe getTipoNFe() {
+		return tipoNFe;
+	}
+
+	public TipoSituacaoNFe getTipoSituacaoNFe() {
+		return tipoSituacaoNFe;
 	}
 
 	public String getXmlNFe() {
@@ -80,6 +103,14 @@ public class NFePedido {
 
 	public void setSerie(Integer serie) {
 		this.serie = serie;
+	}
+
+	public void setTipoNFe(TipoNFe tipoNFe) {
+		this.tipoNFe = tipoNFe;
+	}
+
+	public void setTipoSituacaoNFe(TipoSituacaoNFe tipoSituacaoNFe) {
+		this.tipoSituacaoNFe = tipoSituacaoNFe;
 	}
 
 	public void setXmlNFe(String xmlNFe) {

@@ -59,6 +59,8 @@ import br.com.plastecno.service.nfe.TributosProdutoServico;
 import br.com.plastecno.service.nfe.ValoresTotaisICMS;
 import br.com.plastecno.service.nfe.ValoresTotaisISSQN;
 import br.com.plastecno.service.nfe.ValoresTotaisNFe;
+import br.com.plastecno.service.nfe.constante.TipoNFe;
+import br.com.plastecno.service.nfe.constante.TipoSituacaoNFe;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
@@ -313,11 +315,15 @@ public class NFeServiceImpl implements NFeService {
 		}
 	}
 
-	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public String emitirNFe(NFe nFe, Integer idPedido, boolean isTriangularizacao) throws BusinessException {
+	private String emitirNFe(NFe nFe, TipoNFe tipoNFe, Integer idPedido, boolean isTriangularizacao)
+			throws BusinessException {
 		if (idPedido == null) {
 			throw new BusinessException("O número do pedido não pode estar em branco para emitir uma NFe");
+		}
+
+		if (tipoNFe == null) {
+			throw new BusinessException("O tipo de NFe a ser emitida não pode estar em branco.");
 		}
 
 		IdentificacaoNFe ide = null;
@@ -347,19 +353,51 @@ public class NFeServiceImpl implements NFeService {
 		configurarSubistituicaoTributariaPosValidacao(nFe);
 
 		final String xml = gerarXMLNfe(nFe, null);
+		// Devemos inserir o registro no banco de dados antes de gravar o
+		// arquivo no diretorio pois nao podemos ter um xml sem um registro na
+		// base de dados
 		nFePedidoDAO.inserirNFePedido(new NFePedido(Integer.parseInt(ide.getNumero()),
 				Integer.parseInt(ide.getSerie()), Integer.parseInt(ide.getModelo()), xml, idPedido,
-				numeroTriangularizado));
+				numeroTriangularizado, tipoNFe, TipoSituacaoNFe.EMITIDA));
 
 		escreverXMLNFe(xml, new Date(), gerarNomeXMLNFe(String.valueOf(idPedido), ide.getNumero()));
 
+		return ide.getNumero();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public String emitirNFeDevolucao(NFe nFe, Integer idPedido) throws BusinessException {
+		String numEntrada = null;
+		if (nFe == null || nFe.getDadosNFe() == null || nFe.getDadosNFe().getIdentificacaoNFe() == null
+				|| (numEntrada = nFe.getDadosNFe().getIdentificacaoNFe().getNumero()) == null) {
+			return null;
+		}
+		nFe.getDadosNFe().getIdentificacaoNFe().setNumero(gerarNumeroSerieModeloNFe()[0].toString());
+		String numDevol = emitirNFe(nFe, TipoNFe.DEVOLUCAO, idPedido, false);
+		List<Integer[]> listaItem = new ArrayList<Integer[]>();
+		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
+			if (d.getProduto().getQuantidadeComercial() == null) {
+				continue;
+			}
+			listaItem.add(new Integer[] { d.getNumeroItem(), d.getProduto().getQuantidadeComercial().intValue() });
+		}
+		
+		removerQuantidadeFracionada(listaItem, Integer.parseInt(numEntrada));
+		return numDevol;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public String emitirNFeEntrada(NFe nFe, Integer idPedido, boolean isTriangularizacao) throws BusinessException {
+		String num = emitirNFe(nFe, TipoNFe.ENTRADA, idPedido, isTriangularizacao);
 		// Inserindo os itens emitidos em cada nota para que possamos efetuar o
 		// controle das quantidades fracionadas dos itens emitidos. No caso de
 		// triangulacao nao devemos fracionar os itens da nfe
 		if (!isTriangularizacao) {
 			inserirNFeItemFracionado(nFe, idPedido);
 		}
-		return ide.getNumero();
+		return num;
 	}
 
 	private void escreverXMLNFe(String xml, Date dataEmissao, String nome) throws BusinessException {
@@ -537,7 +575,7 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	private void inserirNFeItemFracionado(NFe nFe, Integer idPedido) throws BusinessException {
 		List<DetalhamentoProdutoServicoNFe> listaDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
-		List<Integer[]> listaQtde = pedidoService.pesquisarQuantidadeItemPedidoByIdPedido(idPedido);
+		List<Integer[]> listaItem = pedidoService.pesquisarQuantidadeItemPedidoByIdPedido(idPedido);
 		Integer idItem = null;
 		Integer idItemFrac = null;
 		Integer numItem = 0;
@@ -553,7 +591,7 @@ public class NFeServiceImpl implements NFeService {
 			qtdeItem = 0;
 			numItem = 0;
 			qtdeFrac = p.getQuantidadeComercial() != null ? p.getQuantidadeComercial().intValue() : 0;
-			for (Integer[] qtde : listaQtde) {
+			for (Integer[] qtde : listaItem) {
 				if (d.getNumeroItem() != null && d.getNumeroItem().equals(qtde[2])) {
 					idItem = qtde[0];
 					qtdeItem = qtde[1];
@@ -563,7 +601,7 @@ public class NFeServiceImpl implements NFeService {
 				}
 			}
 
-			totalFrac = nFeItemFracionadoDAO.pesqusisarSomaQuantidadeFracionada(idItem, numeroNFe);
+			totalFrac = nFeItemFracionadoDAO.pesqusisarQuantidadeTotalFracionadoByIdItemPedido(idItem, numeroNFe);
 			if (totalFrac > qtdeItem) {
 				throw new BusinessException(
 						"Não é possível fracionar uma quantidade maior do que a quantidade vendida para o item no. "
@@ -597,6 +635,7 @@ public class NFeServiceImpl implements NFeService {
 		return nFePedidoDAO.pesquisarIdPedidoByNumeroNFe(numeroNFe);
 	}
 
+	@TODO(descricao = "ESSE METODO DEVE SER MODIFICADO PARA EFETUAR BUSCA POR PAGINACAO URGENTEMENTE")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<NFeItemFracionado> pesquisarItemFracionado() {
@@ -614,7 +653,7 @@ public class NFeServiceImpl implements NFeService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer[]> pesquisarTotalItemFracionado(Integer idPedido) {
-		return nFeItemFracionadoDAO.pesquisarTotalFracionado(idPedido);
+		return nFeItemFracionadoDAO.pesquisarQuantidadeTotalItemFracionado(idPedido);
 	}
 
 	@Override
@@ -640,6 +679,41 @@ public class NFeServiceImpl implements NFeService {
 		nFeItemFracionadoDAO.removerItemFracionadoByNumeroNFe(numeroNFe);
 		nFePedidoDAO.removerNFePedido(numeroNFe);
 		removerXMLNFe(String.valueOf(idPedido), String.valueOf(numeroNFe));
+	}
+
+	private void removerQuantidadeFracionada(List<Integer[]> listaQtdRemovida, Integer numeroNFe)
+			throws BusinessException {
+
+		if (listaQtdRemovida == null || listaQtdRemovida.isEmpty()) {
+			return;
+		}
+
+		Integer qRemovida;
+		Integer qFracionada;
+		List<Integer> listaNumeroItem = new ArrayList<Integer>();
+		for (Integer[] q : listaQtdRemovida) {
+			listaNumeroItem.add(q[0]);
+		}
+		List<Integer[]> listaFrac = nFeItemFracionadoDAO.pesquisarQuantidadeFracionadaByNumeroItem(listaNumeroItem, numeroNFe);
+		for (Integer[] qFrac : listaFrac) {
+			for (Integer[] q : listaQtdRemovida) {
+				// Aqui estamos verificando se os itens das duas listas sao os
+				// mesmos, isto eh, possuem o mesmo numero
+				if (!q[0].equals(qFrac[0])) {
+					continue;
+				}
+				qFracionada = qFrac[1];
+				qRemovida = q[1];
+				if (qRemovida > qFracionada) {
+					throw new BusinessException("Não é possível remover a quantidade " + qRemovida + " do item No. "
+							+ q[0] + "da NFe " + numeroNFe + " pois é maior do que a quantidade fracionada de "
+							+ qFracionada);
+				}
+				qFrac[1] = qFracionada - qRemovida;
+			}
+		}
+
+		nFeItemFracionadoDAO.alterarQuantidadeFracionadaByNumeroItem(listaFrac, numeroNFe);
 	}
 
 	private void removerXMLNFe(String idPedido, String numeroNFe) {

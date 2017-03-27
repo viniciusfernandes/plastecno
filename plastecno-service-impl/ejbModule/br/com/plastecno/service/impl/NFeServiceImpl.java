@@ -480,7 +480,7 @@ public class NFeServiceImpl implements NFeService {
 	public List<DuplicataNFe> gerarDuplicataByIdPedido(Integer idPedido) {
 		List<Date> listaData = pedidoService.calcularDataPagamento(idPedido);
 		double totalParcelas = listaData.size();
-		if (totalParcelas == 0) {
+		if (totalParcelas <= 0) {
 			return new ArrayList<DuplicataNFe>();
 		}
 		Double valorPedido = pedidoService.pesquisarValorPedido(idPedido);

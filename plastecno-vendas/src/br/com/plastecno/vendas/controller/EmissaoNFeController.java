@@ -157,12 +157,14 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("percentualPis", configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.PERCENTUAL_PIS));
         addAtributo("listaCfop", listaCfop);
 
+        // DEfinindo os valores padrao de pre-preenchimento da tela
         addAtributoPadrao("finalidadeEmissaoSelecionada", TipoFinalidadeEmissao.NORMAL.getCodigo());
         addAtributoPadrao("formaPagamentoSelecionada", TipoFormaPagamento.PRAZO.getCodigo());
         addAtributoPadrao("tipoEmissaoSelecionada", TipoEmissao.NORMAL.getCodigo());
         addAtributoPadrao("tipoImpressaoSelecionada", TipoImpressaoNFe.RETRATO.getCodigo());
         addAtributoPadrao("tipoPresencaSelecionada", TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
         addAtributoPadrao("tipoOperacaoSelecionada", TipoOperacaoNFe.SAIDA.getCodigo());
+        addAtributoPadrao("modalidadeFreteSelecionada", TipoModalidadeFrete.DESTINATARIO_REMETENTE.getCodigo());
     }
 
     @Post("emissaoNFe/emitirNFe")
@@ -405,6 +407,16 @@ public class EmissaoNFeController extends AbstractController {
         return l;
     }
 
+    private TipoFormaPagamento gerarTipoFormaPagamento(int numeroDuplicata) {
+        if (numeroDuplicata <= 0) {
+            return TipoFormaPagamento.OUTROS;
+        }
+        if (numeroDuplicata == 1) {
+            return TipoFormaPagamento.VISTA;
+        }
+        return TipoFormaPagamento.PRAZO;
+    }
+
     @SuppressWarnings("unchecked")
     private void inicializarListaCfop(HttpServletRequest request) {
         if ((listaCfop = (List<Object[]>) request.getServletContext().getAttribute("listaCfop")) != null) {
@@ -483,6 +495,7 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
             addAtributo("listaDuplicata", listaDuplicata);
             addAtributo("cliente", cliente);
+            addAtributo("formaPagamentoSelecionada", gerarTipoFormaPagamento(listaDuplicata.size()).getCodigo());
 
             Transportadora t = pedidoService.pesquisarTransportadoraByIdPedido(idPedido);
             addAtributo("transportadora", t != null ? new TransportadoraJson(t, t.getLogradouro()) : null);

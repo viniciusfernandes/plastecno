@@ -2321,11 +2321,11 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Cl. Enquadramento:</div>
 					<div class="input" style="width: 10%">
-						<input id="clEnquadramentoIPI" type="text" style="width: 100%" />
+						<input id="clEnquadramentoIPI" type="text" style="width: 100%" maxlength="5"/>
 					</div>
 					<div  class="label">Cod. Enquadramento:</div>
 					<div class="input" style="width: 50%">
-						<input id="codEnquadramentoIPI" type="text" style="width: 20%" />
+						<input id="codEnquadramentoIPI" type="text" style="width: 20%" maxlength="3"/>
 					</div>
 					<div  class="label">CNPJ Produtor:</div>
 					<div class="input" style="width: 70%">

@@ -1,9 +1,11 @@
 package br.com.plastecno.service.nfe.constante;
 
 public enum TipoNFe {
+	INDEFINIDO(0, "INDEFINIDO"),
 	SAIDA(1, "SAÍDA"),
 	ENTRADA(2, "ENTRADA"),
-	DEVOLUCAO(2, "DEVOLUÇÃO"),;
+	DEVOLUCAO(3, "DEVOLUÇÃO"),
+	TRIANGULARIZACAO(4, "TRIANGULARIZAÇÃO");
 	private final Integer codigo;
 	private final String descricao;
 

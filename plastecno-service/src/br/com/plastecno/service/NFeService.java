@@ -18,7 +18,9 @@ public interface NFeService {
 
 	String emitirNFeDevolucao(NFe nFe, Integer idPedido) throws BusinessException;
 
-	String emitirNFeEntrada(NFe nFe, Integer idPedido, boolean isTriangularizacao) throws BusinessException;
+	String emitirNFeEntrada(NFe nFe, Integer idPedido) throws BusinessException;
+
+	String emitirNFeTriangularizacao(NFe nFe, Integer idPedido) throws BusinessException;
 
 	List<DuplicataNFe> gerarDuplicataByIdPedido(Integer idPedido);
 

@@ -84,16 +84,15 @@ $(document).ready(function() {
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
-		emitirNFe(false);
+		emitirNFe('ENTRADA');
 	});
 	
 	$('#botaoDevolverNF').click(function(){
-		adicionarInputHiddenFormulario({'nome': 'tipoNFe', 'valor': 'DEVOLUCAO'});
-		emitirNFe(false);
+		emitirNFe('DEVOLUCAO');
 	});
 	
 	$('#botaoTriangularNF').click(function(){
-		emitirNFe(true);
+		emitirNFe('TRIANGULARIZACAO');
 	});
 	
 	$('#botaoProximoProduto').click(function(){
@@ -532,13 +531,13 @@ function calcularValorTotalProdutos(){
 	return tot;
 };
 
-function emitirNFe(isTriangulacao){
+function emitirNFe(tipoNFe){
 	gerarInputDuplicata();
 	gerarInputProdutoServico();
 	gerarInputVolume();
 	gerarInputReboque();
 	gerarInputReferenciada();
-	$('#formEmissao #isTriangulacao').val(isTriangulacao);
+	$('#formEmissao #tipoNFe').val(tipoNFe);
 	
 	$("#formEmissao input, #formEmissao textarea, #formEmissao select" ).each(function(i) {
 		<%-- A remocao dos campos em branco eh necessaria para que o vraptor nao popule os beans com seus atributos todos nulos --%>
@@ -1634,7 +1633,7 @@ function inicializarCalculoImpostos(){
 	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>" method="post">
 		<input type="hidden" name="nf.identificacaoLocalEntrega.codigoMunicipio" value="${nf.identificacaoLocalEntrega.codigoMunicipio}"/>
 		<input type="hidden" name="nf.identificacaoLocalRetirada.codigoMunicipio" value="${nf.identificacaoLocalRetirada.codigoMunicipio}"/>
-		<input type="hidden" id="isTriangulacao" name="isTriangulacao"/>
+		<input type="hidden" id="tipoNFe" name="tipoNFe"/>
 		
 		<fieldset id="bloco_dados_nfe">
 			<legend>::: Dados da NF-e :::</legend>

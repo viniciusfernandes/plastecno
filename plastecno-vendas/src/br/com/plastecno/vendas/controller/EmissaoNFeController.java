@@ -167,7 +167,7 @@ public class EmissaoNFeController extends AbstractController {
 
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, TipoNFe tipoNFe, Logradouro logradouro, String telefoneDestinatario,
-            Integer idPedido, boolean isTriangulacao) {
+            Integer idPedido) {
         try {
             nFeService.validarEmissaoNFePedido(idPedido);
             String numeroNFe = null;
@@ -187,7 +187,9 @@ public class EmissaoNFeController extends AbstractController {
                 if (TipoNFe.DEVOLUCAO.equals(tipoNFe)) {
                     numeroNFe = nFeService.emitirNFeDevolucao(new NFe(nf), idPedido);
                 } else if (TipoNFe.ENTRADA.equals(tipoNFe)) {
-                    numeroNFe = nFeService.emitirNFeEntrada(new NFe(nf), idPedido, isTriangulacao);
+                    numeroNFe = nFeService.emitirNFeEntrada(new NFe(nf), idPedido);
+                } else if (TipoNFe.TRIANGULARIZACAO.equals(tipoNFe)) {
+                    numeroNFe = nFeService.emitirNFeTriangularizacao(new NFe(nf), idPedido);
                 }
 
                 gerarMensagemSucesso("A NFe de número " + numeroNFe + " do pedido No. " + idPedido

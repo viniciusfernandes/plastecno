@@ -2,6 +2,7 @@ package br.com.plastecno.service.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -21,19 +22,18 @@ public class NFePedido {
 	@Id
 	private Integer numero;
 
-	@Column(name = "numero_triang")
-	private Integer numeroTriangularizado;
+	@Column(name = "numero_associado")
+	private Integer numeroAssociado;
 
 	private Integer serie;
 
+	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_tipo_nfe")
 	private TipoNFe tipoNFe;
 
-	@Enumerated
+	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_situacao_nfe")
 	private TipoSituacaoNFe tipoSituacaoNFe;
-
-	
 
 	@Column(name = "xml_nfe")
 	private String xmlNFe;
@@ -42,13 +42,13 @@ public class NFePedido {
 	}
 
 	public NFePedido(Integer numero, Integer serie, Integer modelo, String xmlNFe, Integer idPedido,
-			Integer numeroTriangularizado, TipoNFe tipoNFe, TipoSituacaoNFe tipoSituacaoNFe) {
+			Integer numeroAssociado, TipoNFe tipoNFe, TipoSituacaoNFe tipoSituacaoNFe) {
 		this.numero = numero;
 		this.serie = serie;
 		this.modelo = modelo;
 		this.idPedido = idPedido;
 		this.xmlNFe = xmlNFe;
-		this.numeroTriangularizado = numeroTriangularizado;
+		this.numeroAssociado = numeroAssociado;
 		this.tipoNFe = tipoNFe;
 		this.tipoSituacaoNFe = tipoSituacaoNFe;
 	}
@@ -65,8 +65,8 @@ public class NFePedido {
 		return numero;
 	}
 
-	public Integer getNumeroTriangularizado() {
-		return numeroTriangularizado;
+	public Integer getNumeroAssociado() {
+		return numeroAssociado;
 	}
 
 	public Integer getSerie() {
@@ -85,6 +85,10 @@ public class NFePedido {
 		return xmlNFe;
 	}
 
+	public boolean isTriangularizacao() {
+		return TipoNFe.TRIANGULARIZACAO.equals(tipoNFe);
+	}
+
 	public void setIdPedido(Integer idPedido) {
 		this.idPedido = idPedido;
 	}
@@ -97,8 +101,8 @@ public class NFePedido {
 		this.numero = numero;
 	}
 
-	public void setNumeroTriangularizado(Integer numeroTriangularizado) {
-		this.numeroTriangularizado = numeroTriangularizado;
+	public void setNumeroAssociado(Integer numeroAssociado) {
+		this.numeroAssociado = numeroAssociado;
 	}
 
 	public void setSerie(Integer serie) {

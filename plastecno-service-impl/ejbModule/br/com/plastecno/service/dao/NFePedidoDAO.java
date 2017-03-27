@@ -16,8 +16,8 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 		if (isEntidadeExistente(NFePedido.class, "numero", p.getNumero())) {
 			s.append("update NFePedido p set p.serie = :serie, p.modelo = :modelo, p.xmlNFe = :xmlNFe, p.idPedido = :idPedido ");
 
-			if (p.getNumeroTriangularizado() != null) {
-				s.append(", p.numeroTriangularizado = :numeroTriangularizado ");
+			if (p.getNumeroAssociado() != null) {
+				s.append(", p.numeroAssociado = :numeroAssociado ");
 			}
 
 			s.append("where p.numero =:numero ");
@@ -26,8 +26,8 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 					.setParameter("serie", p.getSerie()).setParameter("modelo", p.getModelo())
 					.setParameter("xmlNFe", p.getXmlNFe()).setParameter("idPedido", p.getIdPedido());
 
-			if (p.getNumeroTriangularizado() != null) {
-				q.setParameter("numeroTriangularizado", p.getNumeroTriangularizado());
+			if (p.getNumeroAssociado() != null) {
+				q.setParameter("numeroAssociado", p.getNumeroAssociado());
 			}
 
 			q.executeUpdate();
@@ -63,7 +63,7 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 				.gerarRegistroUnico(
 						entityManager
 								.createQuery(
-										"select p.xmlNFe from NFePedido p where p.numero = (select min(p2.numero) from NFePedido p2 where p2.idPedido =:idPedido and p2.numeroTriangularizado = null)")
+										"select p.xmlNFe from NFePedido p where p.numero = (select min(p2.numero) from NFePedido p2 where p2.idPedido =:idPedido and p2.numeroAssociado = null)")
 								.setParameter("idPedido", idPedido), String.class, null);
 	}
 

@@ -356,7 +356,7 @@ public class NFeServiceImpl implements NFeService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	private String emitirNFe(NFe nFe, TipoNFe tipoNFe, Integer idPedido, boolean isTriangularizacao)
+	private String emitirNFe(NFe nFe, TipoNFe tipoNFe, Integer numeroAssociado, Integer idPedido)
 			throws BusinessException {
 		if (idPedido == null) {
 			throw new BusinessException("O número do pedido não pode estar em branco para emitir uma NFe");
@@ -374,14 +374,6 @@ public class NFeServiceImpl implements NFeService {
 		validarEmissaoNFePedido(idPedido);
 		validarNumeroNFePedido(idPedido, ide.getNumero() != null ? Integer.parseInt(ide.getNumero()) : null);
 
-		Integer numeroTriangularizado = null;
-		if (isTriangularizacao) {
-			// Armazenando o numero da nfe que foi triangularizada
-			numeroTriangularizado = Integer.parseInt(ide.getNumero());
-			// Gerando um novo numero para a nfe triangular
-			ide.setNumero(String.valueOf(gerarNumeroSerieModeloNFe()[0]));
-		}
-
 		carregarValoresTransporte(nFe);
 		carregarValoresTotaisNFe(nFe);
 		carregarIdentificacaoEmitente(nFe, idPedido);
@@ -397,8 +389,8 @@ public class NFeServiceImpl implements NFeService {
 		// arquivo no diretorio pois nao podemos ter um xml sem um registro na
 		// base de dados
 		nFePedidoDAO.inserirNFePedido(new NFePedido(Integer.parseInt(ide.getNumero()),
-				Integer.parseInt(ide.getSerie()), Integer.parseInt(ide.getModelo()), xml, idPedido,
-				numeroTriangularizado, tipoNFe, TipoSituacaoNFe.EMITIDA));
+				Integer.parseInt(ide.getSerie()), Integer.parseInt(ide.getModelo()), xml, idPedido, numeroAssociado,
+				tipoNFe, TipoSituacaoNFe.EMITIDA));
 
 		escreverXMLNFe(xml, new Date(), gerarNomeXMLNFe(String.valueOf(idPedido), ide.getNumero()));
 
@@ -413,8 +405,9 @@ public class NFeServiceImpl implements NFeService {
 				|| (numEntrada = nFe.getDadosNFe().getIdentificacaoNFe().getNumero()) == null) {
 			return null;
 		}
+		Integer numeroDevolvido = Integer.parseInt(nFe.getDadosNFe().getIdentificacaoNFe().getNumero());
 		nFe.getDadosNFe().getIdentificacaoNFe().setNumero(gerarNumeroSerieModeloNFe()[0].toString());
-		String numDevol = emitirNFe(nFe, TipoNFe.DEVOLUCAO, idPedido, false);
+		String numDevol = emitirNFe(nFe, TipoNFe.DEVOLUCAO, numeroDevolvido, idPedido);
 
 		List<Integer[]> listaDevolucao = new ArrayList<Integer[]>();
 		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
@@ -431,14 +424,25 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public String emitirNFeEntrada(NFe nFe, Integer idPedido, boolean isTriangularizacao) throws BusinessException {
-		String num = emitirNFe(nFe, TipoNFe.ENTRADA, idPedido, isTriangularizacao);
+	public String emitirNFeEntrada(NFe nFe, Integer idPedido) throws BusinessException {
+		return emitirNFe(nFe, TipoNFe.ENTRADA, null, idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public String emitirNFeTriangularizacao(NFe nFe, Integer idPedido) throws BusinessException {
+		IdentificacaoNFe ide = nFe.getDadosNFe().getIdentificacaoNFe();
+
+		// Armazenando o numero da nfe que foi triangularizada
+		Integer numeroTriangularizado = Integer.parseInt(ide.getNumero());
+		// Gerando um novo numero para a nfe triangular
+		ide.setNumero(String.valueOf(gerarNumeroSerieModeloNFe()[0]));
+
+		String num = emitirNFe(nFe, TipoNFe.TRIANGULARIZACAO, numeroTriangularizado, idPedido);
 		// Inserindo os itens emitidos em cada nota para que possamos efetuar o
 		// controle das quantidades fracionadas dos itens emitidos. No caso de
 		// triangulacao nao devemos fracionar os itens da nfe
-		if (!isTriangularizacao) {
-			inserirNFeItemFracionado(nFe, idPedido);
-		}
+		inserirNFeItemFracionado(nFe, idPedido);
 		return num;
 	}
 
@@ -562,7 +566,7 @@ public class NFeServiceImpl implements NFeService {
 		Object[] o = QueryUtil
 				.gerarRegistroUnico(
 						entityManager
-								.createQuery("select p.numero, p.serie, p.modelo, (select max(p2.numeroTriangularizado) from NFePedido p2) from NFePedido p where p.numero = (select max(p1.numero) from NFePedido p1 ) "),
+								.createQuery("select p.numero, p.serie, p.modelo, (select max(p2.numeroAssociado) from NFePedido p2) from NFePedido p where p.numero = (select max(p1.numero) from NFePedido p1 ) "),
 						Object[].class, null);
 
 		if (o == null || o.length < 3 || (o[0] == null && o[1] == null && o[2] == null)) {

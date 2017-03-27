@@ -1,6 +1,7 @@
 package br.com.plastecno.service.nfe.constante;
 
 public enum TipoSituacaoNFe {
+	INDEFINIDO(0, "INDEFINIDO"),
 	EMITIDA(1, "EMITIDA"),
 	CANCELADA(2, "CANCELADA");
 	private final Integer codigo;

@@ -910,6 +910,16 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarCaracteristicaItemPedidoByNumeroItem(List<Integer> listaNumeroItem,
+			Integer idPedido) {
+		if (idPedido == null || listaNumeroItem == null || listaNumeroItem.isEmpty()) {
+			return new ArrayList<ItemPedido>();
+		}
+		return itemPedidoDAO.pesquisarCaracteristicaItemPedidoByNumeroItem(listaNumeroItem, idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Cliente pesquisarClienteByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarClienteByIdPedido(idPedido);
 	}

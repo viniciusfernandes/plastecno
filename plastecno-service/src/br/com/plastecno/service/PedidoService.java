@@ -93,6 +93,8 @@ public interface PedidoService {
 	List<Pedido> pesquisarByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
+	List<ItemPedido> pesquisarCaracteristicaItemPedidoByNumeroItem(List<Integer> listaNumeroItem, Integer idPedido);
+
 	Cliente pesquisarClienteByIdPedido(Integer idPedido);
 
 	Cliente pesquisarClienteResumidoByIdPedido(Integer idPedido);

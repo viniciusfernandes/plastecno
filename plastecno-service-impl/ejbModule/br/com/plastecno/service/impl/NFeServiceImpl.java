@@ -28,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ConfiguracaoSistemaService;
+import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
@@ -77,6 +78,9 @@ public class NFeServiceImpl implements NFeService {
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
 
+	@EJB
+	private EstoqueService estoqueService;
+
 	private Logger log = Logger.getLogger(this.getClass().getName());
 
 	@EJB
@@ -91,6 +95,42 @@ public class NFeServiceImpl implements NFeService {
 
 	@EJB
 	private RepresentadaService representadaService;
+
+	private void alterandoQuantidadeFracionada(List<Integer[]> listaQtdDevolvida, Integer numeroNFe)
+			throws BusinessException {
+
+		if (listaQtdDevolvida == null || listaQtdDevolvida.isEmpty()) {
+			return;
+		}
+
+		Integer qDevolvida;
+		Integer qFracionada;
+		List<Integer> listaNumeroItem = new ArrayList<Integer>();
+		for (Integer[] q : listaQtdDevolvida) {
+			listaNumeroItem.add(q[0]);
+		}
+		List<Integer[]> listaFrac = nFeItemFracionadoDAO.pesquisarQuantidadeFracionadaByNumeroItem(listaNumeroItem,
+				numeroNFe);
+		for (Integer[] qFrac : listaFrac) {
+			for (Integer[] q : listaQtdDevolvida) {
+				// Aqui estamos verificando se os itens das duas listas sao os
+				// mesmos, isto eh, possuem o mesmo numero
+				if (!q[0].equals(qFrac[0])) {
+					continue;
+				}
+				qFracionada = qFrac[1];
+				qDevolvida = q[1];
+				if (qDevolvida > qFracionada) {
+					throw new BusinessException("Não é possível devolver a quantidade " + qDevolvida + " do item No. "
+							+ q[0] + "da NFe " + numeroNFe + " pois é maior do que a quantidade fracionada de "
+							+ qFracionada);
+				}
+				qFrac[1] = qFracionada - qDevolvida;
+			}
+		}
+
+		nFeItemFracionadoDAO.alterarQuantidadeFracionadaByNumeroItem(listaFrac, numeroNFe);
+	}
 
 	@TODO
 	private void carregarConfiguracao(NFe nFe) throws BusinessException {
@@ -375,15 +415,17 @@ public class NFeServiceImpl implements NFeService {
 		}
 		nFe.getDadosNFe().getIdentificacaoNFe().setNumero(gerarNumeroSerieModeloNFe()[0].toString());
 		String numDevol = emitirNFe(nFe, TipoNFe.DEVOLUCAO, idPedido, false);
-		List<Integer[]> listaItem = new ArrayList<Integer[]>();
+
+		List<Integer[]> listaDevolucao = new ArrayList<Integer[]>();
 		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
 			if (d.getProduto().getQuantidadeComercial() == null) {
 				continue;
 			}
-			listaItem.add(new Integer[] { d.getNumeroItem(), d.getProduto().getQuantidadeComercial().intValue() });
+			listaDevolucao.add(new Integer[] { d.getNumeroItem(), d.getProduto().getQuantidadeComercial().intValue() });
 		}
-		
-		removerQuantidadeFracionada(listaItem, Integer.parseInt(numEntrada));
+
+		alterandoQuantidadeFracionada(listaDevolucao, Integer.parseInt(numEntrada));
+		estoqueService.devolverEstoqueItemPedido(listaDevolucao, idPedido);
 		return numDevol;
 	}
 
@@ -679,41 +721,6 @@ public class NFeServiceImpl implements NFeService {
 		nFeItemFracionadoDAO.removerItemFracionadoByNumeroNFe(numeroNFe);
 		nFePedidoDAO.removerNFePedido(numeroNFe);
 		removerXMLNFe(String.valueOf(idPedido), String.valueOf(numeroNFe));
-	}
-
-	private void removerQuantidadeFracionada(List<Integer[]> listaQtdRemovida, Integer numeroNFe)
-			throws BusinessException {
-
-		if (listaQtdRemovida == null || listaQtdRemovida.isEmpty()) {
-			return;
-		}
-
-		Integer qRemovida;
-		Integer qFracionada;
-		List<Integer> listaNumeroItem = new ArrayList<Integer>();
-		for (Integer[] q : listaQtdRemovida) {
-			listaNumeroItem.add(q[0]);
-		}
-		List<Integer[]> listaFrac = nFeItemFracionadoDAO.pesquisarQuantidadeFracionadaByNumeroItem(listaNumeroItem, numeroNFe);
-		for (Integer[] qFrac : listaFrac) {
-			for (Integer[] q : listaQtdRemovida) {
-				// Aqui estamos verificando se os itens das duas listas sao os
-				// mesmos, isto eh, possuem o mesmo numero
-				if (!q[0].equals(qFrac[0])) {
-					continue;
-				}
-				qFracionada = qFrac[1];
-				qRemovida = q[1];
-				if (qRemovida > qFracionada) {
-					throw new BusinessException("Não é possível remover a quantidade " + qRemovida + " do item No. "
-							+ q[0] + "da NFe " + numeroNFe + " pois é maior do que a quantidade fracionada de "
-							+ qFracionada);
-				}
-				qFrac[1] = qFracionada - qRemovida;
-			}
-		}
-
-		nFeItemFracionadoDAO.alterarQuantidadeFracionadaByNumeroItem(listaFrac, numeroNFe);
 	}
 
 	private void removerXMLNFe(String idPedido, String numeroNFe) {

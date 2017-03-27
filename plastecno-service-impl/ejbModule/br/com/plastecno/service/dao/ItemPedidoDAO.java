@@ -100,6 +100,15 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return ipi == null ? 0 : ipi;
 	}
 
+	public List<ItemPedido> pesquisarCaracteristicaItemPedidoByNumeroItem(List<Integer> listaNumeroItem,
+			Integer idPedido) {
+		return entityManager
+				.createQuery(
+						"select new ItemPedido(i.id, i.sequencial, i.formaMaterial, i.material.id, i.material.sigla, i.material.descricao, i.medidaExterna, i.medidaInterna, i.comprimento, i.pedido.id) from ItemPedido i where i.pedido.id =:idPedido and i.sequencial in (:listaNumeroItem)",
+						ItemPedido.class).setParameter("idPedido", idPedido)
+				.setParameter("listaNumeroItem", listaNumeroItem).getResultList();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Date dataInicial,
 			Date dataFinal) {

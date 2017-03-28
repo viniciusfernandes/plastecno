@@ -198,27 +198,38 @@ public class PedidoServiceImpl implements PedidoService {
 
 		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
 		Comissao comissaoVenda = null;
+
+		Double aliqComissao = null;
+		Double aliqRepresentada = null;
 		Double valorComissionado = null;
-		Double valorComissionadoRepresentacao = null;
+		Double valorComissionadoRepresentada = null;
 		Double precoItem = null;
 
 		for (ItemPedido itemPedido : listaItem) {
 
-			if (itemPedido.contemAliquotaComissao()) {
+			// Aqui estamos priorizando a aliquota que foi inputada pelo
+			// usuario. Usado em casos de vendas especiais, caso contrario sera
+			// usada a comissao cadastrada no sistema. Essa situacao eh
+			// utilizada apenas na revenda.
+			if (pedido.isRevenda() && itemPedido.contemAliquotaComissao()) {
 				comissaoVenda = new Comissao();
 				comissaoVenda.setAliquotaRevenda(itemPedido.getAliquotaComissao());
 				comissaoVenda.setAliquotaRepresentacao(itemPedido.getAliquotaComissao());
 			} else if (pedido.isRevenda() && !itemPedido.contemAliquotaComissao()) {
+				// A comissao cadastrada para o material tem prioridade a
+				// comissao configurada para o vendedor.
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(),
 						itemPedido.getFormaMaterial().indexOf());
 
-				// Caso nao exista comissao configurada para o material, devemos
+				// Caso nao exista comissao configurada para o material devemos
 				// utilizar a comissao configurada para o vendedor.
 				if (comissaoVenda == null) {
 					comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 				}
 
-			} else if (pedido.isRepresentacao()) {
+			} // O caso de venda por representacao tem uma comissao diferente da
+				// revenda.
+			else if (pedido.isRepresentacao()) {
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
 			}
 
@@ -227,11 +238,15 @@ public class PedidoServiceImpl implements PedidoService {
 			precoItem = itemPedido.calcularPrecoItem();
 
 			if (pedido.isRevenda() && comissaoVenda != null && comissaoVenda.getAliquotaRevenda() != null) {
-				valorComissionado = precoItem * comissaoVenda.getAliquotaRevenda();
+				aliqComissao = comissaoVenda.getAliquotaRevenda();
+				valorComissionado = precoItem * aliqComissao;
 			} else if (pedido.isRepresentacao() && comissaoVenda != null
 					&& comissaoVenda.getAliquotaRepresentacao() != null) {
-				valorComissionado = precoItem * comissaoVenda.getAliquotaRepresentacao();
-				valorComissionadoRepresentacao = precoItem * (pedido.getRepresentada().getComissao());
+				aliqComissao = comissaoVenda.getAliquotaRepresentacao();
+				aliqRepresentada = pedido.getRepresentada().getComissao();
+
+				valorComissionado = precoItem * aliqComissao;
+				valorComissionadoRepresentada = precoItem * (aliqRepresentada);
 			} else {
 				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
 				throw new BusinessException(
@@ -243,9 +258,10 @@ public class PedidoServiceImpl implements PedidoService {
 								+ pedido.getId()
 								+ ". Também pode não existir comissão padrão configurada para o material desse item, verifique as configurações do sistema.");
 			}
-
+			itemPedido.setAliquotaComissao(aliqComissao);
+			itemPedido.setAliquotaComissaoRepresentada(aliqRepresentada);
 			itemPedido.setValorComissionado(valorComissionado);
-			itemPedido.setValorComissionadoRepresentacao(valorComissionadoRepresentacao);
+			itemPedido.setValorComissionadoRepresentada(valorComissionadoRepresentada);
 			itemPedidoDAO.alterar(itemPedido);
 		}
 	}

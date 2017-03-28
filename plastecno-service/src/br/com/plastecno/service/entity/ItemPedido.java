@@ -42,6 +42,12 @@ public class ItemPedido extends Item {
 	@Transient
 	private Double aliquotaComissaoPedido;
 
+	@Column(name = "aliquota_comissao_representada")
+	private Double aliquotaComissaoRepresentada;
+
+	@Transient
+	private String aliquotaComissaoRepresentadaFormatado;
+
 	@Column(name = "aliquota_icms")
 	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
@@ -176,8 +182,11 @@ public class ItemPedido extends Item {
 	@Transient
 	private String valorComissionadoFormatado;
 
-	@Column(name = "valor_comissionado_representacao")
-	private Double valorComissionadoRepresentacao;
+	@Column(name = "valor_comissionado_representada")
+	private Double valorComissionadoRepresentada;
+
+	@Transient
+	private String valorComissionadoRepresentadaFormatado;
 
 	@Transient
 	private Double valorPedido;
@@ -249,7 +258,8 @@ public class ItemPedido extends Item {
 	// Construtor para relatorio de comissao
 	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario,
 			String nomeProprietario, String sobrenomeProprietario, Double precoUnidade, Double precoCusto,
-			Integer quantidade, Double valorComissionado, FormaMaterial formaMaterial, String siglaMaterial,
+			Integer quantidade, Double aliquotaComissao, Double aliquotaComissaoRepresentada, Double valorComissionado,
+			Double valorComissionadoRepresentada, FormaMaterial formaMaterial, String siglaMaterial,
 			String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna,
 			Double comprimento) {
 		this.id = id;
@@ -259,7 +269,10 @@ public class ItemPedido extends Item {
 		this.precoUnidade = precoUnidade;
 		this.precoCusto = precoCusto;
 		this.quantidade = quantidade;
+		this.aliquotaComissao = aliquotaComissao;
+		this.aliquotaComissaoRepresentada = aliquotaComissaoRepresentada;
 		this.valorComissionado = valorComissionado;
+		this.valorComissionadoRepresentada = valorComissionadoRepresentada;
 		this.formaMaterial = formaMaterial;
 		this.material = new Material(null, siglaMaterial, descricaoMaterial);
 		this.descricaoPeca = descricaoPeca;
@@ -276,8 +289,8 @@ public class ItemPedido extends Item {
 			String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
 
 		this(id, sequencial, idPedido, null, nomeProprietario, "", precoUnidade, null, quantidade, (Double) null,
-				formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna,
-				comprimento);
+				(Double) null, (Double) null, (Double) null, formaMaterial, siglaMaterial, descricaoMaterial,
+				descricaoPeca, medidaExterna, medidaInterna, comprimento);
 		this.nomeRepresentada = nomeRepresentada;
 		this.dataEntrega = dataEntrega;
 		this.quantidadeRecepcionada = quantidadeRecepcionada;
@@ -367,6 +380,14 @@ public class ItemPedido extends Item {
 
 	public Double getAliquotaComissaoPedido() {
 		return aliquotaComissaoPedido;
+	}
+
+	public Double getAliquotaComissaoRepresentada() {
+		return aliquotaComissaoRepresentada;
+	}
+
+	public String getAliquotaComissaoRepresentadaFormatado() {
+		return aliquotaComissaoRepresentadaFormatado;
 	}
 
 	public Double getAliquotaICMS() {
@@ -525,8 +546,12 @@ public class ItemPedido extends Item {
 		return valorComissionadoFormatado;
 	}
 
-	public Double getValorComissionadoRepresentacao() {
-		return valorComissionadoRepresentacao;
+	public Double getValorComissionadoRepresentada() {
+		return valorComissionadoRepresentada;
+	}
+
+	public String getValorComissionadoRepresentadaFormatado() {
+		return valorComissionadoRepresentadaFormatado;
 	}
 
 	public Double getValorPedido() {
@@ -579,6 +604,14 @@ public class ItemPedido extends Item {
 
 	public void setAliquotaComissaoPedido(Double aliquotaComissaoPedido) {
 		this.aliquotaComissaoPedido = aliquotaComissaoPedido;
+	}
+
+	public void setAliquotaComissaoRepresentada(Double aliquotaComissaoRepresentada) {
+		this.aliquotaComissaoRepresentada = aliquotaComissaoRepresentada;
+	}
+
+	public void setAliquotaComissaoRepresentadaFormatado(String aliquotaComissaoRepresentadaFormatado) {
+		this.aliquotaComissaoRepresentadaFormatado = aliquotaComissaoRepresentadaFormatado;
 	}
 
 	public void setAliquotaICMS(Double aliquotaICMS) {
@@ -737,8 +770,12 @@ public class ItemPedido extends Item {
 		this.valorComissionadoFormatado = valorComissionadoFormatado;
 	}
 
-	public void setValorComissionadoRepresentacao(Double valorComissionadoRepresentacao) {
-		this.valorComissionadoRepresentacao = valorComissionadoRepresentacao;
+	public void setValorComissionadoRepresentada(Double valorComissionadoRepresentada) {
+		this.valorComissionadoRepresentada = valorComissionadoRepresentada;
+	}
+
+	public void setValorComissionadoRepresentadaFormatado(String valorComissionadoRepresentadaFormatado) {
+		this.valorComissionadoRepresentadaFormatado = valorComissionadoRepresentadaFormatado;
 	}
 
 	public void setValorPedido(Double valorPedido) {

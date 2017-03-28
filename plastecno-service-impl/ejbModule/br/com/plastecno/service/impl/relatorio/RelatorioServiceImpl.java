@@ -198,7 +198,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoVendaByPeriodo(periodo, idVendedor);
 
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(titulo.toString(),
-				listaItemPedido);
+				listaItemPedido, true);
 
 		double valorTotalComissionado = 0;
 		for (ItemPedido itemPedido : listaItemPedido) {
@@ -264,7 +264,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 			Periodo periodo) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
 				"Pedidos de Compras para Recebimento",
-				pedidoService.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo));
+				pedidoService.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo), false);
 
 		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
@@ -280,7 +280,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoCompra(Integer idCliente, Periodo periodo) {
 		return gerarRelatorioItensPorPedido("Itens para Comprar",
-				pedidoService.pesquisarItemAguardandoCompra(idCliente, periodo));
+				pedidoService.pesquisarItemAguardandoCompra(idCliente, periodo), false);
 	}
 
 	@Override
@@ -289,7 +289,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 			Periodo periodo) {
 
 		return gerarRelatorioItensPorPedido("Itens Aguardando Material",
-				pedidoService.pesquisarItemAguardandoMaterial(idRepresentada, periodo));
+				pedidoService.pesquisarItemAguardandoMaterial(idRepresentada, periodo), false);
 	}
 
 	@Override
@@ -331,7 +331,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@REVIEW(descricao = "Nem sempre eh necessario carregar as informacoes da representada")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(String titulo, List<ItemPedido> listaItem) {
+	private RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItensPorPedido(String titulo,
+			List<ItemPedido> listaItem, boolean isComissaoFormatado) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = new RelatorioWrapper<Integer, ItemPedido>(titulo);
 		for (ItemPedido item : listaItem) {
 
@@ -340,9 +341,17 @@ public class RelatorioServiceImpl implements RelatorioService {
 			item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
 			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
 			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
-			item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
 			item.setPrecoCustoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoCusto()));
 
+			if (isComissaoFormatado) {
+				item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
+				item.setAliquotaComissaoRepresentadaFormatado(NumeroUtils.formatarPercentual(item
+						.getAliquotaComissaoRepresentada()));
+				
+				item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
+				item.setValorComissionadoRepresentadaFormatado(NumeroUtils.formatarValorMonetario(item
+						.getValorComissionadoRepresentada()));
+			}
 			relatorio.addGrupo(item.getIdPedido(), item).setPropriedade("dataEntrega",
 					StringUtils.formatarData(item.getDataEntrega()));
 		}
@@ -367,7 +376,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente) {
 		return gerarRelatorioItensPorPedido("Pedidos de Revenda para Empacotar",
-				pedidoService.pesquisarItemPedidoAguardandoEmpacotamento(idCliente));
+				pedidoService.pesquisarItemPedidoAguardandoEmpacotamento(idCliente), false);
 	}
 
 	@Override

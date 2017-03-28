@@ -203,7 +203,8 @@ $(document).ready(function() {
 			<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
 			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
 			<input type="hidden" id="orcamento" name="pedido.orcamento" value="${empty orcamento ? false : orcamento}" />
-
+			<input type="hidden" id="situacaoPedido" name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
+			
 			<c:if test="${not empty pedido.id}">
 			<div class="label">Pedido(s) de ${empty tipoPedido ? 'Compra:': 'Venda:'}</div>
 			<div class="input" style="width: 80%">
@@ -225,7 +226,7 @@ $(document).ready(function() {
 			</div>
 			<div class="label" style="width: 10%">Situação:</div>
 			<div class="input" style="width: 20%">
-				<input type="text" id="situacaoPedido" name="pedido.situacaoPedido" 
+				<input type="text" name="pedido.situacaoPedido" 
 					value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled" width="95%"/>
 			</div>
 			

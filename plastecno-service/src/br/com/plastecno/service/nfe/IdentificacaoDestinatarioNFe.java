@@ -42,7 +42,7 @@ public class IdentificacaoDestinatarioNFe {
 	@XmlElement(name = "IM")
 	private String inscricaoMunicipal;
 
-	@InformacaoValidavel(intervaloComprimento = { 8, 9 }, nomeExibicao = "Inscrição na SUFRAMA do destinatário")
+	@InformacaoValidavel(padrao = "\\d{8,9}", padraoExemplo = "8 a 9 dígitos", nomeExibicao = "Inscrição na SUFRAMA do destinatário")
 	@XmlElement(name = "ISUF")
 	private String inscricaoSUFRAMA;
 

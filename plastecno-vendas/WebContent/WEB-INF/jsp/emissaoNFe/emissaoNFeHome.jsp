@@ -388,6 +388,7 @@ function popularCliente(cliente){
 		$('#cnpj').val(cliente.cnpj);
 		$('#cpf').val(cliente.cpf);
 		$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
+		$('#inscricaoSUFRAMA').val(cliente.inscricaoSUFRAMA);
 		$('#telefone').val(cliente.telefone);
 		$('#email').val(cliente.email);
 		
@@ -1777,6 +1778,11 @@ function inicializarCalculoImpostos(){
 						name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
 						value="${cliente.inscricaoEstadual}"
 						style="width: 40%; text-align: right;" />
+				</div>
+				<div class="label">SUFRAMA:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="inscricaoSUFRAMA" name="nf.identificacaoDestinatarioNFe.inscricaoSUFRAMA"
+						value="${cliente.inscricaoSUFRAMA}"  style="width: 20%" maxlength="9"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 15%">

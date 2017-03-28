@@ -93,6 +93,7 @@ $(document).ready(function() {
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
+	inserirMascaraNumerica('inscricaoSUFRAMA', '999999999');
 	inicializarCampoPesquisaPicklist({
 		url: '<c:url value="/cliente/transportadora"/>', 
 		mensagemEspera: 'CARREGANDO AS TRANSPORTADORAS ...',
@@ -216,12 +217,17 @@ function remover(codigo, nome) {
 				<input type="text" id="inscricaoEstadual"
 					name="cliente.inscricaoEstadual"
 					value="${cliente.inscricaoEstadual}"
-					style="width: 40%; text-align: right;" />
+					style="width: 40%;" />
+			</div>
+			<div class="label">Insc. SUFRAMA:</div>
+			<div class="input" style="width: 20%">
+				<input type="text" id="inscricaoSUFRAMA" name="cliente.inscricaoSUFRAMA" value="${cliente.inscricaoSUFRAMA}"
+					style="width: 100%;" maxlength="9"/>
 			</div>
 			<div class="label">Doc. Estrang.:</div>
-			<div class="input" style="width: 80%">
+			<div class="input" style="width: 40%">
 				<input type="text" id="documentoEstrangeiro" name="cliente.documentoEstrangeiro" 
-				value="${cliente.documentoEstrangeiro}" maxlength="15" style="width: 25%" />
+				value="${cliente.documentoEstrangeiro}" maxlength="15" style="width: 40%" />
 			</div>
 			<div class="label">CPF:</div>
 			<div class="input" style="width: 80%">

@@ -32,3 +32,6 @@ alter table vendas.tb_nfe_pedido add constraint id_situacao_nfe foreign key (id_
 
 alter table vendas.tb_item_pedido add aliquota_comissao_representada numeric(5,5) default 0;
 ALTER TABLE vendas.tb_item_pedido RENAME column valor_comissionado_representacao TO valor_comissionado_representada;
+
+alter table vendas.tb_cliente add inscricao_suframa varchar(10) default null;
+

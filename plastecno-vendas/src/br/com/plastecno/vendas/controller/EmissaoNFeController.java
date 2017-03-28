@@ -538,6 +538,7 @@ public class EmissaoNFeController extends AbstractController {
             c.setRazaoSocial(d.getRazaoSocial());
             c.setCnpj(d.getCnpj());
             c.setInscricaoEstadual(d.getInscricaoEstadual());
+            c.setInscricaoSUFRAMA(d.getInscricaoSUFRAMA());
             c.setCpf(d.getCpf());
             c.setEmail(d.getEmail());
 

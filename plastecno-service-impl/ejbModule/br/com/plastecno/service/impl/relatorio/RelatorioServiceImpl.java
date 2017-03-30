@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RamoAtividadeService;
@@ -21,6 +22,7 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.RamoAtividade;
@@ -47,6 +49,9 @@ import br.com.plastecno.util.StringUtils;
 public class RelatorioServiceImpl implements RelatorioService {
 	@EJB
 	private ClienteService clienteService;
+
+	@EJB
+	private DuplicataService duplicataService;
 
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
@@ -272,6 +277,28 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicata(Periodo periodo) throws BusinessException {
+		if (periodo == null) {
+			throw new BusinessException("Não é possível gerar relatório de duplicatas pois o período esta nulo.");
+		}
+
+		StringBuilder titulo = new StringBuilder();
+		titulo.append("Duplicatas de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
+				.append(StringUtils.formatarData(periodo.getFim()));
+
+		RelatorioWrapper<Integer, NFeDuplicata> relatorio = new RelatorioWrapper<Integer, NFeDuplicata>(
+				titulo.toString());
+		List<NFeDuplicata> lDuplic = duplicataService.pesquisarDuplicataByPeriodo(periodo);
+
+		for (NFeDuplicata d : lDuplic) {
+			relatorio.addGrupo(d.getNumeroNFe(), d);
+		}
+
+		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException {
 		return pedidoService.pesquisarEntregaVendaByPeriodo(periodo);
 	}
@@ -347,7 +374,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 				item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
 				item.setAliquotaComissaoRepresentadaFormatado(NumeroUtils.formatarPercentual(item
 						.getAliquotaComissaoRepresentada()));
-				
+
 				item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
 				item.setValorComissionadoRepresentadaFormatado(NumeroUtils.formatarValorMonetario(item
 						.getValorComissionadoRepresentada()));

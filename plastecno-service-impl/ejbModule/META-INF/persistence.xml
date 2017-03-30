@@ -27,6 +27,7 @@
 		<class>br.com.plastecno.service.entity.PerfilAcesso</class>
 		<class>br.com.plastecno.service.entity.Material</class>
 		<class>br.com.plastecno.service.entity.Pedido</class>
+		<class>br.com.plastecno.service.entity.NFeDuplicata</class>
 		<class>br.com.plastecno.service.entity.NFePedido</class>
 		<class>br.com.plastecno.service.entity.NFeItemFracionado</class>
 		<class>br.com.plastecno.service.entity.RamoAtividade</class>

@@ -2,10 +2,12 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "valorServico", "valorBC", "aliquota", "valor", "cfop", "codigoMunicipioGerador" })
 public class RetencaoICMSTransporteNFe {
 	@XmlElement(name = "pICMSRet")
 	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, nomeExibicao = "Alíquota de retenção do ICMS do transporte")

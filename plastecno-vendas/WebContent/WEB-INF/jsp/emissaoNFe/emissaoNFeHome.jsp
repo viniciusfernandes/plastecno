@@ -9,18 +9,18 @@
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js?${tempoInicial}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${tempoInicial}"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${tempoInicial}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js?${tempoInicial}"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/edicao_tabela.js?${tempoInicial}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/edicao_tabela.js?${versaoCache}"/>"></script>
 
 
 
@@ -45,6 +45,7 @@ var numeroImportacaoProduto = null;
 var editorTabelaImportacao = null;
 var editorTabelaAdicao = null;
 var editorTabelaExportacao = null;
+var btProduto = null;
 $(document).ready(function() {
 	scrollTo('${ancora}');
 	
@@ -55,26 +56,56 @@ $(document).ready(function() {
 		$('#formPesquisa #idPedidoPesquisa').val($('#idPedido').val());
 		$('#formPesquisa').submit();
 	});
+	
+	$("#botaoPesquisaNFe").click(function() {
+		if(isEmpty($('#numeroNFe').val())){
+			return;
+		}
+		$('#formPesquisaNFe #numeroNFePesquisa').val($('#numeroNFe').val());
+		$('#formPesquisaNFe').submit();
+	});
+	
+	$("#botaoRemoverNFe").click(function() {
+		if(isEmpty($('#numeroNFe').val())){
+			return;
+		}
+		$('#formPesquisaNFe #numeroNFePesquisa').val($('#numeroNFe').val());
+		$('#formPesquisaNFe').attr('action', '<c:url value="/emissaoNFe/remocao"/>').attr('method', 'post').submit();
+	});
+	
+	$("#botaoPedidoPDF").click(function() {
+		if(isEmpty($('#idPedido').val())){
+			return;
+		}
+		$('#formPesquisa #idPedidoPesquisa').val($('#idPedido').val());
+		$('#formPesquisa').attr('action', '<c:url value="/pedido/pdf"/>').submit();
+	});
 
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
-		gerarInputDuplicata();
-		gerarInputProdutoServico();
-		gerarInputVolume();
-		gerarInputReboque();
-		gerarInputReferenciada();
-		
-		$( "#formEmissao input, #formEmissao textarea" ).each(function(i) {
-			if(isEmpty($(this).val())){
-				$(this).remove();
-			}
-		});
-		$('#formEmissao').submit();
+		emitirNFe('ENTRADA');
+	});
+	
+	$('#botaoDevolverNF').click(function(){
+		emitirNFe('DEVOLUCAO');
+	});
+	
+	$('#botaoTriangularNF').click(function(){
+		emitirNFe('TRIANGULARIZACAO');
+	});
+	
+	$('#botaoProximoProduto').click(function(){
+		encontrarBotaoEdicaoProduto(true);
+	});
+	
+	$('#botaoAnteriorProduto').click(function(){
+		encontrarBotaoEdicaoProduto(false);
 	});
 	
 	$('#botaoInserirInfoProd').click(function(){
 		gerarInputInfoProduto();
+		alterarValorDuplicata();
 		fecharBloco('bloco_info_adicionais_prod');
 	});
 	
@@ -116,15 +147,18 @@ $(document).ready(function() {
 	$('#botaoLimparICMS').click(function(){
 		removerInputHidden(gerarJsonTipoIcms());
 		fecharBloco('bloco_icms');
+		zerarImposto('valorBCICMS');
 	});
 	
 	$('#botaoLimparICMSInter').click(function(){
 		removerInputHidden(gerarJsonIcmsInterestadual());
 		fecharBloco('bloco_icms_interestadual');
+		calcularValoresImpostos(null, false);
 	});
 	
 	$('#botaoLimparInfoProd').click(function(){
 		removerInputHidden(gerarJsonInfoProduto());
+		alterarValorDuplicata();
 		fecharBloco('bloco_info_adicionais_prod');
 		$('#bloco_info_adicionais_prod #fciProd').val('');
 		$('#bloco_info_adicionais_prod #infoAdicionaisProd').val('');
@@ -135,26 +169,36 @@ $(document).ready(function() {
 		removerInputHidden(gerarJsonTipoIpi());
 		removerInputHidden(gerarJsonEnquadramentoIpi());
 		fecharBloco('bloco_ipi');
+		zerarImposto('valorBCIPI');
 	});
 	
 	$('#botaoLimparPIS').click(function(){
 		removerInputHidden(gerarJsonTipoPis());
 		fecharBloco('bloco_pis');
+		zerarImposto('valorBCPIS');
 	});
 	
 	$('#botaoLimparCOFINS').click(function(){
 		removerInputHidden(gerarJsonTipoCofins());
 		fecharBloco('bloco_cofins');
+		zerarImposto('valorBCCOFINS');
 	});
 	
 	$('#botaoLimparISS').click(function(){
 		removerInputHidden(gerarJsonISS());
 		fecharBloco('bloco_iss');
+		zerarImposto('valorBCISS');
 	});
 	
 	$('#botaoLimparII').click(function(){
 		removerInputHidden(gerarJsonImpostoImportacao());
 		fecharBloco('bloco_ii');
+		zerarImposto('valorBCII');
+	});
+	
+	$('#listaNumeroNFe').change(function(){
+		$('#numeroNFe').val($(this).val());
+		$('#botaoPesquisaNFe').click();
 	});
 	
 	$('#botaoPesquisarCnpjTransp').click(function () {
@@ -193,24 +237,21 @@ $(document).ready(function() {
 		
 		var request = $.ajax({
 							type: "get",
-							url: '<c:url value="/cliente/cnpj"/>',
+							url: '<c:url value="/cliente/serializacao/cnpj"/>',
 							data: 'cnpj='+cnpj,
 						});
 		request.done(function(response) {
-			var cliente = response.cliente;
-			if(cliente == undefined){
-				return;
-			}
-			$('#nomeCliente').val(cliente.razaoSocial);
-			$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
-			$('#telefone').val(cliente.telefone);
-			$('#email').val(cliente.email);
+			popularCliente(response.cliente);
 		});
 		
 		request.fail(function(request, status) {
 			alert('Falha na busca da destinatário por CNPJ: ' + cnpj+' => Status da requisicao: '+status);
 		});
-	});	
+	});
+	
+	$('#bloco_info_adicionais_prod #valorFreteProd').keyup(function(){
+		calcularValoresImpostos(null, false);
+	});
 	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
@@ -229,14 +270,7 @@ $(document).ready(function() {
 				var erros = response.erros;
 				var contemErro = erros != undefined;
 				if (!contemErro) {
-					var cliente = response.cliente;
-					$('#email').val(cliente.email);
-					$('#cnpj').val(cliente.cnpj);
-					$('#cpf').val(cliente.cpf);
-					$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
-					$('#telefone').val(cliente.telefone);
-					$('#nomeCliente').val(cliente.razaoSocial);
-
+					popularCliente(response.cliente);
 				} else if (erros != undefined) {
 					gerarListaMensagemErro(erros);
 				}
@@ -253,6 +287,38 @@ $(document).ready(function() {
 		}
 	});
 	
+	autocompletar({
+		url : '<c:url value="/transportadora/listagem/nome"/>',
+		campoPesquisavel : 'nomeTransportadora',
+		parametro : 'nomeFantasia',
+		containerResultados : 'containerPesquisaTransportadora',
+		selecionarItem: function(itemLista) {
+			var request = $.ajax({
+				type : 'get',
+				url : '<c:url value="emissaoNFe/transportadora/id"/>?id=' + itemLista.id
+			});
+			
+			request.done(function(response) {
+				var t = response.transportadora;
+				if(t == undefined || t == null){
+					return;
+				}
+				document.getElementById('nomeTransportadora').value = t.razaoSocial;
+				document.getElementById('cnpjTransportadora').value = t.cnpj;
+				document.getElementById('ieTransportadora').value = t.inscricaoEstadual;
+				document.getElementById('endTransportadora').value = t.enderecoFormatado;
+				document.getElementById('munTransportadora').value = t.municipioFormatado;
+				document.getElementById('ufTransportadora').value = t.ufFormatado;
+			});
+			request.fail(function(request, status) {
+				alert('Falha na pesquisa da transportadora => Status da requisicao: '
+						+ status);
+			});
+		}
+	});
+	
+	alterarValorDuplicata();
+	
 	inicializarBotaoPesquisarCEP({'idBotao':'botaoCepRetirada',
 		'idCep': 'cepRetirada', 'idEndereco': 'enderecoRetirada', 'idBairro': 'bairroRetirada', 
 		'idCidade': 'cidadeRetirada', 'idUf': 'ufRetirada', 'idPais': ''});
@@ -261,8 +327,10 @@ $(document).ready(function() {
 		'idCep': 'cepEntrega', 'idEndereco': 'enderecoEntrega', 'idBairro': 'bairroEntrega', 
 		'idCidade': 'cidadeEntrega', 'idUf': 'ufEntrega', 'idPais': ''});
 	
+	inserirMascaraHora('horaSaida');
+	
 	inserirMascaraData('dataVencimentoDuplicata');
-	inserirMascaraData('dataHoraEntradaSaida');
+	inserirMascaraData('dataSaida');
 	inserirMascaraData('dtImportProd');
 	inserirMascaraData('dataDesembImportProd');
 
@@ -282,14 +350,16 @@ $(document).ready(function() {
 	inicializarFadeInBloco('bloco_local_mercadoria');
 	inicializarFadeInBloco('bloco_referenciada');
 	inicializarFadeInBloco('bloco_destinatario');
-	inicializarFadeInBloco('bloco_transporte');
+	inicializarFadeInBloco('bloco_retencao_icms');
 	inicializarFadeInBloco('bloco_exportacao');
+	inicializarFadeInBloco('bloco_veiculo');
+	inicializarFadeInBloco('bloco_transporte', ['bloco_retencao_icms' ,'bloco_veiculo']);
 	
 	fecharBloco('bloco_local_mercadoria');
 	fecharBloco('bloco_referenciada');
-	fecharBloco('bloco_destinatario');
-	fecharBloco('bloco_transporte');
 	fecharBloco('bloco_exportacao');
+	fecharBloco('bloco_retencao_icms');
+	fecharBloco('bloco_veiculo');
 	
 	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
 	$('#bloco_tributos').fadeOut('fast');
@@ -309,12 +379,199 @@ $(document).ready(function() {
 	inicializarCalculoImpostos();
 	
 	inicializarMascaraReferenciada();
+	inicializarAlteracaoTabelaProdutos();
 });
+
+function popularCliente(cliente){
+	if(cliente != undefined && cliente != null){
+		$('#nomeCliente').val(cliente.razaoSocial);
+		$('#cnpj').val(cliente.cnpj);
+		$('#cpf').val(cliente.cpf);
+		$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
+		$('#inscricaoSUFRAMA').val(cliente.inscricaoSUFRAMA);
+		$('#telefone').val(cliente.telefone);
+		$('#email').val(cliente.email);
+		
+		var l = cliente.logradouroFaturamento; 
+		if(l != undefined && l != null){
+			$('#cep').val(l.cep);
+			$('#endereco').val(l.endereco);
+			$('#numero').val(l.numero);
+			$('#complemento').val(l.complemento);
+			$('#bairro').val(l.bairro);
+			$('#cidade').val(l.cidade);
+			$('#uf').val(l.uf);
+			$('#pais').val(l.pais);
+		}
+	}
+};
+
+function alterarValorDuplicata(){
+	var vlTot = calcularValorTotalProdutos();
+	if(!isEmpty(vlTot)){
+		vlTot = parseFloat(vlTot);
+	} else {
+		vlTot = 0;
+	}
+	var vlFrete = 0;
+	var vlDesp= 0;
+	var vl = 0;
+	$("input[name*='produtoServicoNFe.outrasDespesasAcessorias']").each(function(){
+		if(!isEmpty(vl = $(this).val())){
+			vlDesp += parseFloat(vl);
+		}
+	});
+	
+	$("input[name*='produtoServicoNFe.valorTotalFrete']").each(function(){
+		if(!isEmpty(vl = $(this).val())){
+			vlFrete += parseFloat(vl);
+		}
+	});
+
+	var linhas = document.getElementById('tabela_duplicata').rows;
+	var numDuplic = linhas.length -1;
+	if(numDuplic<=0){
+		return;
+	}
+	vl = ((vlTot+vlFrete+vlDesp)/numDuplic).toFixed(2);
+	for (var i = 1; i < linhas.length; i++) {
+		linhas[i].cells[2].innerHTML = vl;
+	}
+};
+
+function encontrarBotaoEdicaoProduto(proximo){
+	var linha = null;
+	if(btProduto != null){
+		if(proximo){
+			linha = btProduto.parentNode.parentNode.nextElementSibling;
+		} else {
+			linha = btProduto.parentNode.parentNode.previousElementSibling;
+		}
+		if(linha != null){
+			var last = linha.cells.length-1;
+			var nodes = linha.cells[last].childNodes;
+			for (var i = 0; i < nodes.length; i++) {
+				if(nodes[i].nodeType == 1){
+					btProduto = nodes[i];
+					btProduto.onclick();
+					break;
+				}					
+			}
+			scrollTo('produtosInfo');
+		}
+	}
+};
+
+function inicializarAlteracaoTabelaProdutos(){
+	var linhas = document.getElementById('tabela_produtos').rows;
+	var alterarColuna = function(indice, valor){
+		if(numeroProdutoEdicao == null || numeroProdutoEdicao < 0){
+			return null;
+		}
+		
+		for (var i = 0; i < linhas.length; i++) {
+			if(numeroProdutoEdicao == linhas[i].cells[0].innerHTML){
+				linhas[i].cells[indice].innerHTML = valor;
+				return linhas[i];
+			}
+		}
+		return null;
+	};
+	
+	$('#bloco_info_adicionais_prod #quantidadeProduto').keyup(function (){
+		var qtde = $(this).val();
+		var linha  = alterarColuna(4, qtde);
+		if(linha != null){
+			var vu = linha.cells[5].innerHTML;
+			var pICMS = linha.cells[10].innerHTML;
+			var pIPI = linha.cells[11].innerHTML;
+			var vTot = vu*qtde;
+			var cells = linha.cells;
+			cells[6].innerHTML = vTot.toFixed(2);
+			cells[8].innerHTML = (vTot*pICMS/100).toFixed(2);
+			cells[9].innerHTML = (vTot*pIPI/100).toFixed(2);
+			
+			calcularValoresImpostos(null, false);
+			alterarValorDuplicata();
+		}
+	});
+	
+	$('#bloco_info_adicionais_prod #codigoProduto').keyup(function (){
+		alterarColuna(1, $(this).val());
+	});
+	
+	$('#bloco_info_adicionais_prod #descricaoProduto').keyup(function (){
+		alterarColuna(2, $(this).val());
+	});
+	
+	$('#bloco_tributos #cfop').change(function (){
+		alterarColuna(13, $(this).val());
+	});
+	
+	$('#bloco_tributos #ncm').keyup(function (){
+		alterarColuna(12, $(this).val());
+	});
+	
+	$('#bloco_tributos #aliquotaICMS').keyup(function (){
+		alterarColuna(10, $(this).val());
+		alterarColuna(8, $('#bloco_tributos #valorICMS').val());
+	});
+	
+	$('#bloco_tributos #aliquotaIPI').keyup(function (){
+		alterarColuna(11, $(this).val());
+		alterarColuna(9, $('#bloco_tributos #valorIPI').val());
+	});
+};
+
+function calcularValorTotalProdutos(){
+	var linhas = document.getElementById('tabela_produtos').rows;
+	var tot = 0;
+	for (var i = 1; i < linhas.length; i++) {
+		tot += parseFloat(linhas[i].cells[6].innerHTML);
+	}
+	return tot;
+};
+
+function emitirNFe(tipoNFe){
+	gerarInputDuplicata();
+	gerarInputProdutoServico();
+	gerarInputVolume();
+	gerarInputReboque();
+	gerarInputReferenciada();
+	$('#formEmissao #tipoNFe').val(tipoNFe);
+	
+	$("#formEmissao input, #formEmissao textarea, #formEmissao select" ).each(function(i) {
+		<%-- A remocao dos campos em branco eh necessaria para que o vraptor nao popule os beans com seus atributos todos nulos --%>
+		if(isEmpty($(this).val())){
+			$(this).remove();
+		}
+	});
+	
+	$('#formEmissao').submit();
+};
+
+function removerProduto(botao){
+	var tabela = document.getElementById('tabela_produtos');
+	var l = botao.parentNode.parentNode;
+	var indice = l.cells[0].innerHTML;
+	tabela.deleteRow(l.rowIndex);
+	var nome = 'nf.listaItem['+indice+']';
+	$("input[name^='"+nome+"']").each(function(){
+		$(this).remove();
+	});
+	alterarValorDuplicata();
+	numeroImportacaoProduto = null;
+	numeroProdutoEdicao = null;
+	btProduto = null;
+};
+
 function inicializarMascaraReferenciada(){
 	$('#chaveReferenciada').mask('9999.9999.9999.9999.9999.9999.9999.9999.9999.9999.9999');
 };
 
 function inicializarMascaraImpostos(){
+	inserirMascaraDecimal('quantidadeProduto', 5, 0);
+
 	inserirMascaraDecimal('valorBCICMS', 15, 2);
 	inserirMascaraDecimal('valorBCSTICMS', 15, 2);
 	inserirMascaraDecimal('valDesonICMS', 15, 2);
@@ -351,6 +608,9 @@ function inicializarMascaraImpostos(){
 	inserirMascaraDecimal('valorDespAduaneirasII', 15, 2);
 	
 	inserirMascaraDecimal('despesasAcessoriasProd', 15, 2);
+	inserirMascaraDecimal('valorFreteProd', 15, 2);
+	inserirMascaraDecimal('valorTotaltributosProd', 15, 2);
+
 	
 	inserirMascaraDecimal('qExport', 15, 2);
 	
@@ -378,9 +638,15 @@ function inicializarTabelaImportacaoProd(){
 				if(numeroProdutoEdicao == null || linha == null){
 					return;
 				}
-				
+				<%-- EStamos definindo qual o numero de importacao aqui para que o usuario possa inserir as adicoes em sequencia pois la temos que saber qua eh a importacao associada --%>
+				var isNovo = numeroImportacaoProduto == null || numeroImportacaoProduto != linha.id;
+				if(isNovo){
+					numeroImportacaoProduto = linha.id;
+				}
+				recuperarAdicaoImportacao();
+				 $('#bloco_adicao_import').fadeIn('fast');
 				var celulas = linha.cells;
-				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+linha.id+']', 
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaImportacao['+linha.id+']', 
 					  'campos':[{'nome':'cnpjEncomendante', 'valor':celulas[0].innerHTML},
 					            {'nome':'codigoExportador', 'valor':celulas[1].innerHTML},
 					            {'nome':'dataImportacao', 'valor':celulas[2].innerHTML},
@@ -401,7 +667,7 @@ function inicializarTabelaImportacaoProd(){
 				 $('#bloco_adicao_import').fadeIn('fast');
 			 },
 			'onRemover': function(linha){
-				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+linha.id+"]']").each(function(i){
+				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].produtoServicoNFe.listaImportacao["+linha.id+"]']").each(function(i){
 					$(this).remove();
 				});
 				 $('#bloco_adicao_import').fadeOut('fast');
@@ -416,7 +682,7 @@ function inicializarTabelaAdicaoImportacao(){
 			'campos':campos,
 			'idLinhaSequencial': true,
 			'onValidar': function(){
-				return obrigatorioPreenchido(campos, ['numDrawbackAdicao', 'valDescAdicao']);
+				return numeroProdutoEdicao != null && numeroImportacaoProduto != null && obrigatorioPreenchido(campos, ['numDrawbackAdicao', 'valDescAdicao']);
 			},
 			'onInserir': function(linha){
 				if(numeroProdutoEdicao == null || numeroImportacaoProduto == null || linha == null){
@@ -424,7 +690,7 @@ function inicializarTabelaAdicaoImportacao(){
 				}
 				
 				var celulas = linha.cells;
-				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaImportacao['+numeroImportacaoProduto+'].listaAdicao['+linha.id+']', 
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaImportacao['+numeroImportacaoProduto+'].listaAdicao['+linha.id+']', 
 					  'campos':[{'nome':'codigoFabricante', 'valor':celulas[0].innerHTML},
 					            {'nome':'numero', 'valor':celulas[1].innerHTML},
 					            {'nome':'numeroDrawback', 'valor':celulas[2].innerHTML},
@@ -435,7 +701,7 @@ function inicializarTabelaAdicaoImportacao(){
 				gerarInputHidden(json);
 			 },
 			 'onRemover': function(linha){
-					$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+numeroImportacaoProduto+"].listaAdicao["+linha.id+"]']").each(function(i){
+					$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].produtoServicoNFe.listaImportacao["+numeroImportacaoProduto+"].listaAdicao["+linha.id+"]']").each(function(i){
 						$(this).remove();
 					});	
 			 }};
@@ -457,7 +723,7 @@ function inicializarTabelaExportacaoProd(){
 				}
 				
 				var celulas = linha.cells;
-				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].listaExportacao['+linha.id+']', 
+				var json = {'nomeObjeto': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaExportacao['+linha.id+']', 
 					  'campos':[{'nome':'numeroDrawback', 'valor':celulas[0].innerHTML},
 					            {'nome':'expIndireta.chaveAcessoRecebida', 'valor':celulas[1].innerHTML},
 					            {'nome':'expIndireta.numeroRegistro', 'valor':celulas[2].innerHTML},
@@ -467,7 +733,7 @@ function inicializarTabelaExportacaoProd(){
 				gerarInputHidden(json);
 			 },
 			'onRemover': function(linha){
-				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaExportacao["+linha.id+"]']").each(function(i){
+				$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].produtoServicoNFe.listaExportacao["+linha.id+"]']").each(function(i){
 					$(this).remove();
 				});
 			}};
@@ -488,13 +754,21 @@ function obrigatorioPreenchido(ids, idExcl){
 	return true;
 };
 
+function algumPreenchido(ids){
+	for (var i = 0; i < ids.length; i++) {
+		if(!isEmpty(document.getElementById(ids[i]).value)){
+			return true;
+		}
+	}
+	return false;
+};
+
 function inicializarTabelaReferenciada(){
 	var campos = ['chaveReferenciada', 'numeroReferenciada', 'serieReferenciada', 'modReferenciada', 'cnpjReferenciada', 'anoMesReferenciada', 'ufReferenciada'];
 	var config = {'idTabela': 'tabela_referenciada', 'idBotaoInserir':'botaoInserirReferenciada',
 			'campos': campos,
-			'idLinhaSequencial': true,
 			'onValidar': function(){
-				return obrigatorioPreenchido(campos, null);
+				return algumPreenchido(campos);
 			},
 			'idLinhaSequencial':true};
 	editarTabela(config);
@@ -504,9 +778,8 @@ function inicializarTabelaVolumes(){
 	var campos = ['quantidadeVolume', 'especieVolume', 'marcaVolume', 'numeracaoVolume', 'pesoLiquidoVolume', 'pesoBrutoVolume'];
 	var config = {'idTabela': 'tabela_volume', 'idBotaoInserir':'botaoInserirVolume',
 			'campos': campos,
-			'idLinhaSequencial': true,
 			'onValidar': function(){
-				return obrigatorioPreenchido(campos, null);
+				return algumPreenchido(campos);
 			},
 			'idLinhaSequencial':true};
 	editarTabela(config);
@@ -519,6 +792,9 @@ function inicializarTabelaDuplicata(){
 			'idLinhaSequencial': true,
 			'onValidar': function(){
 				return obrigatorioPreenchido(campos, ['numeroDuplicata', 'dataVencimentoDuplicata']);
+			},
+			'onRemover':function(linha){
+				alterarValorDuplicata();
 			},
 			'idLinhaSequencial':true};
 	editarTabela(config);
@@ -558,10 +834,16 @@ function gerarLegendaBloco(nomeBloco){
 	$(legend).html(innerHTML);
 };
 
-function abrirBloco(nomeBloco){
+function abrirBloco(nomeBloco, blocosFechados){
 	gerarLegendaBloco(nomeBloco);
 	<%-- Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn --%>
 	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table, #'+nomeBloco+' .fieldsetInterno').fadeIn('fast');
+	if(blocosFechados == undefined || blocosFechados == null){
+		return;
+	}
+	for (var i = 0; i < blocosFechados.length; i++) {
+		fecharBloco(blocosFechados[i]);
+	}
 };
 
 function fecharBloco(nomeBloco){
@@ -572,17 +854,17 @@ function fecharBloco(nomeBloco){
 
 function inicializarLegendaBlocoProduto(nomeBloco){
 	var legend = $('#'+nomeBloco+' legend:first');
-	$(legend).html(legend.html().replace(/Prod.\s*\d*/g, 'Prod. '+(numeroProdutoEdicao+1)+' '));	
+	$(legend).html(legend.html().replace(/Prod.\s*\d*/g, 'Prod. '+(numeroProdutoEdicao)+' '));	
 
 	legend.html(legend.html().replace(/\+/g, '-'));
 	$('#'+nomeBloco+' div:not(.suggestionsBox)').fadeIn('fast');
 };
 
-function inicializarFadeInBloco(nomeBloco){
+function inicializarFadeInBloco(nomeBloco, blocosFechados){
 	$('#'+nomeBloco+' legend:first').click(function(){
 		var innerHTML = $(this).html();
 		if(innerHTML.indexOf('+') != -1){
-			abrirBloco(nomeBloco);
+			abrirBloco(nomeBloco, blocosFechados);
 		} else {
 			fecharBloco(nomeBloco);
 		}
@@ -631,6 +913,17 @@ function gerarInputHidden(objeto){
 	};
 };
 
+function adicionarInputHiddenFormulario(json){
+	if(json == null){
+		return;
+	}
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = json.nome;
+	input.value = json.valor;
+	document.getElementById('formEmissao').appendChild(input);
+};
+
 function gerarJsonTipoIcms(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms',
 		'campos':[{'nome':'codigoSituacaoTributaria', 'id':'tipoTributacaoICMS'},
@@ -665,7 +958,7 @@ function gerarJsonCfopNcm(){
 
 function gerarJsonEnquadramentoIpi(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.ipi',
-		'campos':[{'nome':'classeEnquadramento', 'id':'clEnquadramentoIPI'},
+		'campos':[{'nome':'classeEnquadramentoCigarrosBebidas', 'id':'clEnquadramentoIPI'},
 		          {'nome':'codigoEnquadramento', 'id':'codEnquadramentoIPI'},
 		          {'nome':'cnpjProdutor', 'id':'cnpjProdIPI'},
 		          {'nome':'codigoSeloControle', 'id':'codSeloContrIPI'},
@@ -694,7 +987,6 @@ function gerarJsonTipoCofins(){
 function gerarJsonISS(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.issqn',
 		'campos':[{'nome':'aliquota', 'id':'aliquotaISS'},
-		          {'nome':'codigoSituacaoTributaria', 'id':'codSitTribISS'},
 		          {'nome':'valorBC', 'id':'valorBCISS'},
 		          {'nome':'codigoMunicipioGerador', 'id':'codMunGeradorISS'},
 		          {'nome':'itemListaServicos', 'id':'codItemServicoISS'}
@@ -713,10 +1005,12 @@ function gerarJsonImpostoImportacao(){
 function gerarJsonInfoProduto(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+']',
 		'campos':[{'nome':'informacoesAdicionais', 'id':'infoAdicionaisProd'}, 
+		          {'nome': 'tributos.valorTotalTributos', 'id':'valorTotaltributosProd'},
 		          {'nome': 'produtoServicoNFe.outrasDespesasAcessorias', 'id':'despesasAcessoriasProd'},
-		          {'nome': 'numeroPedidoCompra', 'id':'numeroPedidoCompraProd'},
-		          {'nome': 'itemPedidoCompra', 'id':'itemPedidoCompraProd'},
-		          {'nome': 'fichaConteudoImportacao', 'id':'fciProd'}]};
+		          {'nome': 'produtoServicoNFe.valorTotalFrete', 'id':'valorFreteProd'},
+		          {'nome': 'produtoServicoNFe.numeroPedidoCompra', 'id':'numeroPedidoCompraProd'},
+		          {'nome': 'produtoServicoNFe.itemPedidoCompra', 'id':'itemPedidoCompraProd'},
+		          {'nome': 'produtoServicoNFe.fichaConteudoImportacao', 'id':'fciProd'}]};
 };
 
 function gerarJsonTipoPis(){
@@ -735,10 +1029,10 @@ function recuperarImportacaoProduto(){
 	var nome = null;
 	var valor = null;
 	var total = 11;
-	
-	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao']").each(function(){
+	var nome = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaImportacao[';
+	$("input[name^='"+nome+"']").each(function(){
 		nome = $(this).attr('name');
-		if(nome.split('.').length == 4){
+		if(nome.split('.').length == 5){
 			if(id == null){
 				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
 				id = nome.match(/\d+/g)[1];
@@ -799,9 +1093,10 @@ function recuperarAdicaoImportacao(){
 	var nome = null;
 	var valor = null;
 	var total = 5;
-	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaImportacao["+numeroImportacaoProduto+"].listaAdicao']").each(function(){
+	var nome = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaImportacao['+numeroImportacaoProduto+'].listaAdicao[';
+	$("input[name^='"+nome+"']").each(function(){
 		nome = $(this).attr('name');
-		if(nome.split('.').length == 5){
+		if(nome.split('.').length == 6){
 			if(id == null){
 				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
 				id = nome.match(/\d+/g)[2];
@@ -843,17 +1138,17 @@ function recuperarExportacaoProduto(){
 	var nome = null;
 	var total = 4;
 	var indice = -1;
-	$("input[name^='nf.listaItem["+numeroProdutoEdicao+"].listaExportacao']").each(function(){
+	var nome = 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.listaExportacao[';
+	$("input[name^='"+nome+"']").each(function(){
 		nome = $(this).attr('name');
 		indice = nome.split('.').length;
-		
-		if(indice == 4){
+		if(indice == 5){
 			nome = nome.substring(nome.lastIndexOf('.')+1);
 			if(nome == 'numeroDrawback'){
 				$('#bloco_exportacao_prod #drawbackExportProd').val($(this).val());
 				total--;
 			} 
-		}else if(indice == 5){
+		} else if(indice == 6){
 			if(id == null){
 				// Gerando o id da linha que sera utilizado para gerar os inputs que serao enviados para o servidor
 				id = nome.match(/\d+/g)[1];
@@ -962,20 +1257,21 @@ function gerarInputProdutoServico(){
 	var celulas = null;
 	var produto = null;
 	var detalhamento = null;
+	var numItem = null;
 	for (var i = 0; i < linhas.length; i++) {
 		celulas = linhas[i].cells;
+		numItem = celulas[0].innerHTML;
+		detalhamento = {'nomeObjeto':'nf.listaItem['+numItem+']',
+			'campos':[{'nome':'numeroItem', 'valor': numItem}]};
 		
-		detalhamento = {'nomeObjeto':'nf.listaItem['+i+']',
-			'campos':[{'nome':'numeroItem', 'valor': celulas[0].innerHTML}]};
-		
-		produto = {'nomeObjeto':'nf.listaItem['+i+'].produtoServicoNFe',
+		produto = {'nomeObjeto':'nf.listaItem['+numItem+'].produtoServicoNFe',
 				'campos':[{'nome':'codigo', 'valor': celulas[1].innerHTML},
-				          {'nome':'descricao', 'valor': celulas[1].innerHTML},
-				          {'nome':'unidadeComercial', 'valor': celulas[4].innerHTML},
-				          {'nome':'quantidadeComercial', 'valor': celulas[5].innerHTML},
-				          {'nome':'quantidadeTributavel', 'valor': celulas[5].innerHTML},
-				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[6].innerHTML},
-				          {'nome':'valorTotalBruto', 'valor': celulas[7].innerHTML},
+				          {'nome':'descricao', 'valor': celulas[2].innerHTML},
+				          {'nome':'unidadeComercial', 'valor': celulas[3].innerHTML},
+				          {'nome':'quantidadeComercial', 'valor': celulas[4].innerHTML},
+				          {'nome':'quantidadeTributavel', 'valor': celulas[4].innerHTML},
+				          {'nome':'valorUnitarioComercializacao', 'valor': celulas[5].innerHTML},
+				          {'nome':'valorTotalBruto', 'valor': celulas[6].innerHTML},
 				          {'nome':'unidadeTributavel', 'valor': celulas[3].innerHTML},
 				          {'nome':'valorUnitarioTributacao', 'valor': celulas[5].innerHTML}
 					]};
@@ -1032,7 +1328,7 @@ function inicializarModalCancelamento(botao){
 	});
 };
 
-function recuperarValoresImpostos(valoresTabela){
+function recuperarValoresProduto(valoresTabela){
 	var impostos = new Array();
 	impostos [0] = gerarJsonTipoIcms();
 	impostos [1] = gerarJsonTipoIpi();
@@ -1120,31 +1416,40 @@ function inicializarBotaoPesquisarCEP(config){
 	
 };
 
-function inicializarOpcoesSelect(json){
-	var campos = json.campos;
+function inicializarValoresDefaultProduto(valDefault){
+	var campos = valDefault.campos;
 	var id = null;
-	var sel = null;
+	var campo = null;
+	var hidden = null;
 	for (var i = 0; i < campos.length; i++) {
-		if(document.getElementById(campos[i].idHidden) != undefined){
+		if((hidden = document.getElementById(campos[i].idHidden)) != undefined && !isEmpty(hidden.value)){
 			continue;
 		}
-		sel = document.getElementById(campos[i].idSelect);
-		sel.value = campos[i].valor;
-		sel.selected='selected';
+		campo = document.getElementById(campos[i].idCampo);
+		campo.value = campos[i].valor;
+		if($(campo).is('select')){
+			campo.selected='selected';
+		}
 	}
 };
 
-function editarProduto(linha){
+function editarProduto(botao){
+	btProduto = botao;
+	var linha = botao.parentNode.parentNode;
 	var celulas = linha.cells;
-	<%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
+	
+	<%-- Aqui estamos apenas dando condicao ao usuario para alterar a descricao dos produtos da tabela que serao enviados para gerar a NFe --%>
+	$('#bloco_info_adicionais_prod #quantidadeProduto').val(celulas[4].innerHTML);
+	$('#bloco_info_adicionais_prod #codigoProduto').val(celulas[1].innerHTML);
+    $('#bloco_info_adicionais_prod #descricaoProduto').val(celulas[2].innerHTML);
+    
+    <%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
 	numeroProdutoEdicao = celulas[0].innerHTML;
-	
-	<%-- Aqui estamos diminuindo o valor da numero do item pois a indexacao das listas comecam do  zero --%>
-	--numeroProdutoEdicao;
-	var valorBC = celulas[6].innerHTML;
-	
+	<%-- A execucao dos metodos abaixo dependem da definicao do numero do produto que esta sendo editado --%>
+    var valorBC = celulas[6].innerHTML;
 	var valoresTabela = {'campos':[{'id': 'itemPedidoCompraProd', 'valorTabela':celulas[0].innerHTML},
-								   {'id': 'ncm', 'valorTabela': celulas[2].innerHTML},
+								   {'id': 'ncm', 'valorTabela': celulas[12].innerHTML},
+								   {'id': 'cfop', 'valorTabela': celulas[13].innerHTML},
 	                               {'id': 'aliquotaICMS', 'valorTabela': celulas[10].innerHTML},
 	                               {'id': 'aliquotaIPI', 'valorTabela': celulas[11].innerHTML},
 	                               {'id': 'valorBCPIS', 'valorTabela': valorBC},
@@ -1154,9 +1459,13 @@ function editarProduto(linha){
 	                               {'id': 'aliquotaPIS', 'valorTabela': '<c:out value="${percentualPis}"/>'},
 	                               {'id': 'aliquotaCOFINS', 'valorTabela': '<c:out value="${percentualCofins}"/>'}
 	                               ]};
+	recuperarValoresProduto(valoresTabela);
+	calcularValoresImpostos(null, false);
 	
-	recuperarValoresImpostos(valoresTabela);
-	
+	<%-- Aqui estamos apenas dando condicao ao usuario para alterar a descricao dos produtos da tabela que serao enviados para gerar a NFe --%>
+	$('#bloco_info_adicionais_prod #quantidadeProduto').val(celulas[4].innerHTML);
+	$('#bloco_info_adicionais_prod #codigoProduto').val(celulas[1].innerHTML);
+    $('#bloco_info_adicionais_prod #descricaoProduto').val(celulas[2].innerHTML);
 	recuperarImportacaoProduto();
 	recuperarExportacaoProduto();
 	
@@ -1177,25 +1486,23 @@ function editarProduto(linha){
 	inicializarLegendaBlocoProduto('bloco_importacao_prod');
 	inicializarLegendaBlocoProduto('bloco_exportacao_prod');
 
-	
 	fecharBloco('bloco_ipi');
+	fecharBloco('bloco_icms_interestadual');
 	fecharBloco('bloco_ii');
 	fecharBloco('bloco_iss');
 	fecharBloco('bloco_importacao_prod');
 	fecharBloco('bloco_exportacao_prod');
 	fecharBloco('bloco_adicao_import');
 	
-	var opcoes = {'campos':
-		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idSelect': 'cfop', 'valor': '5102'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.codigoSituacaoTributaria', 'idSelect': 'tipoTributacaoICMS', 'valor': '00'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.origemMercadoria', 'idSelect': 'origemMercadoriaICMS', 'valor': '0'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.modalidadeDeterminacaoBC', 'idSelect': 'modBCICMS', 'valor': '0'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins.tipoCofins.codigoSituacaoTributaria', 'idSelect': 'codSitTribCOFINS', 'valor': '1'},
-		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis.codigoSituacaoTributaria', 'idSelect': 'codSitTribPIS', 'valor': '1'}]};
-	
-	inicializarOpcoesSelect(opcoes);
-	
-	calcularValoresImpostos();
+	var valDefault = {'campos':
+		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idCampo': 'cfop', 'valor': '5102'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.codigoSituacaoTributaria', 'idCampo': 'tipoTributacaoICMS', 'valor': '00'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.origemMercadoria', 'idCampo': 'origemMercadoriaICMS', 'valor': '0'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.modalidadeDeterminacaoBC', 'idCampo': 'modBCICMS', 'valor': '0'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.cofins.tipoCofins.codigoSituacaoTributaria', 'idCampo': 'codSitTribCOFINS', 'valor': '01'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis.codigoSituacaoTributaria', 'idCampo': 'codSitTribPIS', 'valor': '01'},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].informacoesAdicionais', 'idCampo': 'infoAdicionaisProd', 'valor': 'Total aproximado de tributos federais, estaduais e municipais: '+$('#valorTotaltributosProd').val()}]};
+	inicializarValoresDefaultProduto(valDefault);
 };
 
 function gerarJsonCalculoImpostos(){
@@ -1234,26 +1541,69 @@ function calcularValorICMSInterestadual(){
 	});	
 };
 
-function calcularValoresImpostos(){
+function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	var campos = gerarJsonCalculoImpostos();
-	var vl=null; 
 	var aliq=null; 
 	var idImp=null;
+	var tot = 0;
+	var vBC = 0;
+	var vl = 0;
+	if(btProduto != null){
+		linha = btProduto.parentNode.parentNode;
+		vBC = linha.cells[6].innerHTML;
+	} else {
+		return;
+	}
+	if(isEmpty(vBC)){
+		return;
+	}
+	
+	var frete = document.getElementById('valorFreteProd').value;
+	if(isEmpty(frete)){
+		frete = 0;
+	}
+
+	vBC = parseFloat(vBC)+parseFloat(frete);
 	for (var i = 0; i < campos.length; i++) {
-		vl = document.getElementById(campos[i].idVl).value;
 		aliq = document.getElementById(campos[i].idAliq).value;
-		if(isEmpty(vl) || isEmpty(aliq)){
+		if(isEmpty(aliq)){
 			continue;
 		}
-		document.getElementById(campos[i].idImp).value = Math.round(vl*(aliq/100) * 100)/100;
+		
+		if(isAlteracaoAliq){
+			vBC = document.getElementById(campos[i].idVl).value;
+		} else {
+			document.getElementById(campos[i].idVl).value = vBC;
+		}
+		
+		if(idValorRemovido != undefined && idValorRemovido == campos[i].idVl){
+			vl = 0;
+		} else {
+			vl = Math.round(vBC*(aliq/100) * 100)/100;
+		}
+		tot += vl;
+		document.getElementById(campos[i].idImp).value = vl;
 	}
+	tot = tot.toFixed(2);
+	document.getElementById('valorTotaltributosProd').value = tot;
+	
+	var info = document.getElementById('infoAdicionaisProd');
+	info.value = info.value.split(':')[0]+': '+tot;
+};
+
+function zerarImposto(idImposto){
+	return calcularValoresImpostos(idImposto, false);
+};
+
+function calcularAlteracaoAliquota(){
+	return calcularValoresImpostos(null, true);
 };
 
 function inicializarCalculoImpostos(){
 	var campos = gerarJsonCalculoImpostos();
 	for (var i = 0; i < campos.length; i++) {
-		document.getElementById(campos[i].idVl).onblur = calcularValoresImpostos;
-		document.getElementById(campos[i].idAliq).onblur = calcularValoresImpostos;
+		document.getElementById(campos[i].idVl).onkeyup = calcularAlteracaoAliquota;
+		document.getElementById(campos[i].idAliq).onkeyup = calcularAlteracaoAliquota;
 	}
 	
 	campos = gerarJsonIcmsInterestadual().campos;
@@ -1270,13 +1620,21 @@ function inicializarCalculoImpostos(){
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 	<form id="formVazio" ></form>
+	<%-- O valor do pedido sera utilizado para efetuar o recalculo do valor das duplicatas quando incluir o valor do frete --%>
+	<input type="hidden" id="valorTotalProdutos"/>
 
 	<form id="formPesquisa" action="<c:url value="/emissaoNFe/pedido"/>" method="get">
 		<input type="hidden" id="idPedidoPesquisa" name="idPedido" value="${idPedido}"/>
 	</form>
+	
+	<form id="formPesquisaNFe" action="<c:url value="/emissaoNFe/NFe"/>" method="get">
+		<input type="hidden" id="numeroNFePesquisa" name="numeroNFe" value="${idPedido}"/>
+	</form>
+	
 	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>" method="post">
 		<input type="hidden" name="nf.identificacaoLocalEntrega.codigoMunicipio" value="${nf.identificacaoLocalEntrega.codigoMunicipio}"/>
 		<input type="hidden" name="nf.identificacaoLocalRetirada.codigoMunicipio" value="${nf.identificacaoLocalRetirada.codigoMunicipio}"/>
+		<input type="hidden" id="tipoNFe" name="tipoNFe"/>
 		
 		<fieldset id="bloco_dados_nfe">
 			<legend>::: Dados da NF-e :::</legend>
@@ -1285,23 +1643,39 @@ function inicializarCalculoImpostos(){
 				<input type="text" id="idPedido" name="idPedido" value="${idPedido}" />
 			</div>
 			<div class="input" style="width: 2%">
-				<input type="button" id="botaoPesquisaPedido"
-					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
+				<input type="button" id="botaoPesquisaPedido" title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
 			</div>
-			<%--div para dar o correto alinhamento dos campos no formulario. Nao teve outra alternativa--%>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoPedidoPDF" value="" title="Visualizar Pedido PDF" class="botaoPdf_16" />
+			</div>
+			<%--div para dar o correto alinhamento dos campos no formulario por causa do botao de PDF. Nao teve outra alternativa--%>
 			<div class="input" style="width: 60%">
 			</div>
+			<div class="label">NFes:</div>
+			<div class="input" style="width: 70%">
+				<select id="listaNumeroNFe" style="width: 15%" >
+					<c:forEach var="numero" items="${listaNumeroNFe}">
+						<option value="${numero}" <c:if test="${numero eq numeroNFe}">selected</c:if>>${numero}</option>
+					</c:forEach>
+				</select>
+			</div>
 			<div class="label">Núm. NFe:</div>
-			<div class="input" style="width: 25%">
-				<input type="text" name="nf.identificacaoNFe.numero" value="${nf.identificacaoNFe.numero}" maxlength="9" style="width: 100%" />
-			</div>
-			<div class="label">Mod. NFe:</div>
-			<div class="input" style="width: 5%">
-				<input type="text" name="nf.identificacaoNFe.modelo" value="${nf.identificacaoNFe.modelo}" maxlength="2" style="width: 100%" />
-			</div>
-			<div class="label">Série NFe:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" name="nf.identificacaoNFe.serie" value="${nf.identificacaoNFe.serie}" maxlength="3" style="width: 100%" />
+				<input type="text" id="numeroNFe" name="nf.identificacaoNFe.numero" value="${numeroNFe}" maxlength="9" style="width: 100%"/>
+			</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoPesquisaNFe" title="Pesquisar NFe" value="" class="botaoPesquisarPequeno" />
+			</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoRemoverNFe" title="Remover NFe" value="" class="botaoRemover" />
+			</div>
+			<div class="label" style="width: 10%">Mod. NFe:</div>
+			<div class="input" style="width: 5%">
+				<input type="text" name="nf.identificacaoNFe.modelo" value="${modeloNFe}" maxlength="2" style="width: 100%" />
+			</div>
+			<div class="label" style="width: 10%">Série NFe:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" name="nf.identificacaoNFe.serie" value="${serieNFe}" maxlength="3" style="width: 100%" />
 			</div>
 			<div class="label">Tipo Operação:</div>
 			<div class="input" style="width: 10%">
@@ -1312,7 +1686,7 @@ function inicializarCalculoImpostos(){
 				</select>
 			</div>
 			<div class="label">Dest. Operação:</div>
-			<div class="input" style="width: 20%">
+			<div class="input" style="width: 23%">
 				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 100%" >
 					<c:forEach var="tipo" items="${listaTipoDestinoOperacao}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoDestinoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
@@ -1321,7 +1695,11 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label">Dt. Ent./Saída:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="dataHoraEntradaSaida" name="nf.identificacaoNFe.dataHoraEntradaSaidaProduto" value="${nf.identificacaoNFe.dataHoraEntradaSaidaProduto}" style="width: 100%"/>
+				<input type="text" id="dataSaida" name="nf.identificacaoNFe.dataSaida" value="${dataSaida}" style="width: 100%"/>
+			</div>
+			<div class="label">Hr. Ent./Saída:</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="horaSaida" name="nf.identificacaoNFe.horaSaida" value="${horaSaida}" style="width: 100%"/>
 			</div>
 			<div class="label">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
@@ -1341,8 +1719,7 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label">Finalidade Emissão:</div>
 			<div class="input" style="width: 10%">
-				<select name="nf.identificacaoNFe.finalidadeEmissao"
-					style="width: 100%" >
+				<select name="nf.identificacaoNFe.finalidadeEmissao" style="width: 100%" >
 					<c:forEach var="finalidade" items="${listaTipoFinalidadeEmissao}">
 						<option value="${finalidade.codigo}" <c:if test="${finalidade.codigo eq finalidadeEmissaoSelecionada}">selected</c:if>>${finalidade.descricao}</option>
 					</c:forEach>
@@ -1382,7 +1759,7 @@ function inicializarCalculoImpostos(){
 				<legend>::: Destinatário ::: -</legend>
 				<div class="label">Razão Social/Nome:</div>
 				<div class="input" style="width: 80%">
-					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.nomeFantasia" value="${cliente.razaoSocial}"  style="width: 60%"/>
+					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.razaoSocial" value="${cliente.razaoSocial}"  maxlength="70" style="width: 60%"/>
 					<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 				</div>
 				
@@ -1402,6 +1779,11 @@ function inicializarCalculoImpostos(){
 						value="${cliente.inscricaoEstadual}"
 						style="width: 40%; text-align: right;" />
 				</div>
+				<div class="label">SUFRAMA:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="inscricaoSUFRAMA" name="nf.identificacaoDestinatarioNFe.inscricaoSUFRAMA"
+						value="${cliente.inscricaoSUFRAMA}"  style="width: 20%" maxlength="9"/>
+				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 15%">
 					<input type="text" id="cpf" name="nf.identificacaoDestinatarioNFe.cpf"
@@ -1409,7 +1791,7 @@ function inicializarCalculoImpostos(){
 				</div>
 				<div class="label">Telefone:</div>
 				<div class="input" style="width: 10%">
-					<input type="text" id="telefone" name="nf.identificacaoDestinatarioNFe.enderecoDestinatarioNFe.telefone"
+					<input type="text" id="telefone" name="telefoneDestinatario"
 						value="${telefoneContatoPedido}" />
 				</div>
 				<div class="label">Email:</div>
@@ -1427,31 +1809,31 @@ function inicializarCalculoImpostos(){
 		
 		<fieldset id="bloco_referenciada">
 			<legend>::: NF/NFe Referenciada ::: -</legend>
-			<div class="label obrigatorio">Chave Acesso:</div>
+			<div class="label">Chave Acesso:</div>
 			<div class="input" style="width: 80%">
 				<input type="text" id="chaveReferenciada" style="width: 50%"/>
 			</div>
-			<div class="label obrigatorio">Núm. Doc. Fiscal:</div>
+			<div class="label">Núm. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroReferenciada" maxlength="9"/>
 			</div>
-			<div class="label obrigatorio">Série. Doc. Fiscal:</div>
+			<div class="label">Série. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="serieReferenciada" maxlength="3"/>
 			</div>
-			<div class="label obrigatorio">Mod. Doc. Fiscal:</div>
+			<div class="label">Mod. Doc. Fiscal:</div>
 			<div class="input" style="width: 20%">
 				<input type="text" id="modReferenciada" maxlength="2" style="width: 50%"/>
 			</div>
-			<div class="label obrigatorio">CNPJ Emit.:</div>
+			<div class="label">CNPJ Emit.:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="cnpjReferenciada" maxlength="14"/>
 			</div>
-			<div class="label obrigatorio">Emis. Ano/Mês (AAMM):</div>
+			<div class="label">Emis. Ano/Mês (AAMM):</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="anoMesReferenciada" maxlength="4"/>
 			</div>
-			<div class="label obrigatorio">UF Emit.:</div>
+			<div class="label">UF Emit.:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="ufReferenciada" maxlength="2"/>
 			</div>
@@ -1589,13 +1971,13 @@ function inicializarCalculoImpostos(){
 		
 		<fieldset>
 			<legend>::: Produtos e Serviços :::</legend>
-			
 			<table id="tabela_produtos" class="listrada">
 				<thead>
+					<%-- Muito cuidado ao alterar o numero de colunas dessa tabela pois varios eventos de campos e botoes estao indexados pela ordem das colunas das tabelas --%>
 					<tr>
 						<th>Item</th>
+						<th>Cod.</th>
 						<th>Desc.</th>
-						<th>NCM</th>
 						<th>Venda</th>
 						<th>Qtde.</th>
 						<th>Unid.(R$)</th>
@@ -1605,26 +1987,31 @@ function inicializarCalculoImpostos(){
 						<th>V IPI.(R$)</th>
 						<th>Aliq. ICMS(%)</th>
 						<th>Aliq. IPI(%)</th>
+						<th>NCM</th>
+						<th>CFOP</th>
 						<th style="width: 2%">Ações</th>
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="item" items="${listaItem}" varStatus="count">
+					<c:forEach var="p" items="${listaProduto}" varStatus="count">
 						<tr>
-							<td>${item.sequencial}</td>
-							<td>${item.descricaoSemFormatacao}</td>
-							<td>${item.ncm}</td>
-							<td>${item.tipoVenda}</td>
-							<td>${item.quantidade}</td>
-							<td>${item.precoUnidadeFormatado}</td>
-							<td>${item.valorTotalFormatado}</td>
-							<td>${item.valorTotalFormatado}</td>
-							<td>${item.valorICMSFormatado}</td>
-							<td>${item.valorIPIFormatado}</td>
-							<td>${item.aliquotaICMS}</td>
-							<td>${item.aliquotaIPI}</td>
+							<td>${p.numeroItem}</td>
+							<td>${p.codigo}</td>
+							<td>${p.descricao}</td>
+							<td>${p.unidadeComercial}</td>
+							<td>${p.quantidade}</td>
+							<td>${p.valorUnitarioComercializacao}</td>
+							<td>${p.valorTotalBruto}</td>
+							<td>${p.valorTotalBruto}</td>
+							<td>${p.valorICMS}</td>
+							<td>${p.valorIPI}</td>
+							<td>${p.aliquotaICMS}</td>
+							<td>${p.aliquotaIPI}</td>
+							<td>${p.ncm}</td>
+							<td>${p.cfop}</td>
 							<td>
-								<input type="button" value="" title="Editar Produto" class="botaoDinheiroPequeno" onclick="editarProduto(this.parentNode.parentNode);"/>
+								<input type="button" value="" title="Editar Produto" class="botaoEditar" onclick="editarProduto(this);"/>
+								<input type="button" value="" title="Remover Produto" class="botaoRemover" onclick="removerProduto(this);"/>
 							</td>
 							
 						</tr>
@@ -1632,8 +2019,21 @@ function inicializarCalculoImpostos(){
 				</tbody>
 			</table>
 			
+			<a id="produtosInfo"></a>
 			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
 				<legend>::: Info. Adicionais Prod. ::: +</legend>
+				<div class="label">Quantidade:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="quantidadeProduto" maxlength="20" style="width: 10%"/>
+				</div>
+				<div class="label">Código:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="codigoProduto" maxlength="20" style="width: 20%"/>
+				</div>
+				<div class="label">Descrição:</div>
+				<div class="input" style="width: 70%">
+					<input type="text" id="descricaoProduto" maxlength="120" style="width: 100%"/>
+				</div>
 				<div class="label">Num. Ped. Compra:</div>
 				<div class="input" style="width: 10%">
 					<input type="text" id="numeroPedidoCompraProd" maxlength="15" style="width: 100%"/>
@@ -1643,8 +2043,16 @@ function inicializarCalculoImpostos(){
 					<input type="text" id="itemPedidoCompraProd"  maxlength="6" style="width: 20%"/>
 				</div>
 				<div class="label">Valor Desp. Acess.:</div>
-				<div class="input" style="width: 80%">
-					<input type="text" id="despesasAcessoriasProd" style="width: 20%"/>
+				<div class="input" style="width: 10%">
+					<input type="text" id="despesasAcessoriasProd" />
+				</div>
+				<div class="label">Valor Frete:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="valorFreteProd" style="width: 100%"/>
+				</div>
+				<div class="label">Tot. Tributos:</div>
+				<div class="input" style="width: 30%">
+					<input type="text" id="valorTotaltributosProd" style="width: 30%"/>
 				</div>
 				<div class="label">Núm. FCI:</div>
 				<div class="input" style="width: 70%">
@@ -1671,7 +2079,7 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div class="label obrigatorio">CEST:</div>
 					<div class="input" style="width: 40%">
-						<input type="text" id="cest" name="cest"  maxlength="8" style="width: 50%"/>
+						<input type="text" id="cest" name="cest"  maxlength="7" style="width: 50%"/>
 					</div>
 					<div class="label obrigatorio">CFOP:</div>
 					<div class="input" style="width: 80%">
@@ -1802,11 +2210,11 @@ function inicializarCalculoImpostos(){
 					<div class="input" style="width: 10%">
 						<input id="valorFCPICMSInter" type="text" readonly="readonly" style="width: 100%" />
 					</div>
-					<div  class="label">Val. ICMS:</div>
+					<div  class="label">Val. ICMS Destino:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorICMSInter" type="text" readonly="readonly" style="width: 100%" />
 					</div>
-					<div  class="label">Val. Part:</div>
+					<div  class="label">Val. ICMS Remetente:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorPartICMSInter" type="text" readonly="readonly" style="width: 100%" />
 					</div>
@@ -1919,11 +2327,11 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Cl. Enquadramento:</div>
 					<div class="input" style="width: 10%">
-						<input id="clEnquadramentoIPI" type="text" style="width: 100%" />
+						<input id="clEnquadramentoIPI" type="text" style="width: 100%" maxlength="5"/>
 					</div>
 					<div  class="label">Cod. Enquadramento:</div>
 					<div class="input" style="width: 50%">
-						<input id="codEnquadramentoIPI" type="text" style="width: 20%" />
+						<input id="codEnquadramentoIPI" type="text" style="width: 20%" maxlength="3"/>
 					</div>
 					<div  class="label">CNPJ Produtor:</div>
 					<div class="input" style="width: 70%">
@@ -1947,7 +2355,8 @@ function inicializarCalculoImpostos(){
 				<div class="divFieldset">
 				<fieldset id="bloco_iss" class="fieldsetInterno">
 					<legend>::: ISSQN Prod.::: +</legend>
-					<div class="label obribagorio">Situação Tribut.:</div>
+					<%-- Acredito que esse campo tenha sido removido da versao 3.10 --%>
+					<%--div class="label obribagorio">Situação Tribut.:</div>
 					<div class="input" style="width: 80%">
 						<select id="codSitTribISS" style="width: 45%">
 							<option value=""></option>
@@ -1955,7 +2364,7 @@ function inicializarCalculoImpostos(){
 								<option value="${tipo.codigo}">${tipo.descricao}</option>
 							</c:forEach>
 						</select>
-					</div>
+					</div --%>
 					<div  class="label obribagorio">Valor BC:</div>
 					<div class="input" style="width: 10%">
 						<input id="valorBCISS" type="text" style="width: 100%" />
@@ -2169,6 +2578,10 @@ function inicializarCalculoImpostos(){
 						</tbody>
 					</table>
 				</fieldset>
+				<div class="bloco_botoes">
+					<a id="botaoProximoProduto" title="Próximo Produto" class="botaoProximo"></a>
+					<a id="botaoAnteriorProduto" title="Produto Anterior" class="botaoAnterior"></a>
+				</div>
 		</fieldset>	
 		
 		<fieldset id="bloco_transporte">
@@ -2188,6 +2601,7 @@ function inicializarCalculoImpostos(){
 					<div  class="label">Razão Soc./Nome:</div>
 					<div class="input" style="width: 80%">
 						<input type="text" id="nomeTransportadora" name="nf.transporteNFe.transportadoraNFe.razaoSocial" value="${transportadora.razaoSocial}" style="width: 45%" />
+						<div class="suggestionsBox" id="containerPesquisaTransportadora" style="display: none; width: 50%"></div>
 					</div>
 					<div  class="label">CNPJ:</div>
 					<div class="input" style="width: 10%">
@@ -2211,7 +2625,7 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Município:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="munTransportadora" name="nf.transporteNFe.transportadoraNFe.municipio" value="${transportadora.municipio}" style="width: 100%" />
+						<input type="text" id="munTransportadora" name="nf.transporteNFe.transportadoraNFe.municipio" value="${transportadora.cidade}" style="width: 100%" />
 					</div>
 					<div  class="label">UF:</div>
 					<div class="input" style="width: 50%">
@@ -2225,82 +2639,6 @@ function inicializarCalculoImpostos(){
 				</fieldset>
 				</div>
 			
-				<div class="divFieldset">
-				<fieldset id="bloco_veiculo" class="fieldsetInterno">
-					<legend>::: Veículo/Reboque/Balsa/Vagão :::</legend>
-					<div  class="label obrigatorio">Placa:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa"  value="${nf.transporteNFe.veiculo.placa}" maxlength="7" style="width: 100%" />
-					</div>
-					<div  class="label obrigatorio">UF:</div>
-					<div class="input" style="width: 50%">
-						<select id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" style="width: 20%">
-							<option value=""></option>
-							<c:forEach var="tipo" items="${listaTipoUF}">
-								<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq nf.transporteNFe.veiculo.uf}">selected</c:if>>${tipo.codigo}</option>
-							</c:forEach>
-						</select>
-					</div>
-					<div  class="label">Regist. Trans. Cargo:</div>
-					<div class="input" style="width: 30%">
-						<input type="text" id="registroVeiculo" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
-							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" maxlength="2" style="width: 50%" />
-					</div>
-					<div class="bloco_botoes">
-						<a id="botaoInserirReboque" title="Inserir Dados do Reboque" class="botaoAdicionar"></a>
-					</div>
-								
-					<table id="tabela_reboque" class="listrada" >
-						<thead>
-							<tr>
-								<th>Placa Reboq.</th>
-								<th>UF Reboq.</th>
-								<th>Registro Reboq.</th>
-								<th>Ações</th>
-							</tr>
-						</thead>
-						
-						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
-						<tbody>
-							<c:forEach var="reboque" items="${nf.transporteNFe.listaReboque}">
-							<tr>
-								<td>${reboque.placa}</td>
-								<td>${reboque.uf}</td>
-								<td>${reboque.registroNacionalTransportador}</td>
-								<td></td>
-							</tr>
-							</c:forEach>
-						</tbody>
-					</table>
-				</fieldset>
-				</div>
-				
-				<div class="divFieldset">
-				<fieldset class="fieldsetInterno">
-					<legend>::: Retenção ICMS :::</legend>
-					<div  class="label obrigatorio">Valor Serviço:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valServRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorServico" value="${nf.transporteNFe.retencaoICMS.valorServico}" style="width: 100%" />
-					</div>
-					<div  class="label obrigatorio">Valor BC:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" id="valBCRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorBC" value="${nf.transporteNFe.retencaoICMS.valorBC}" style="width: 100%" />
-					</div>
-					<div  class="label obrigatorio">Alíquota(%):</div>
-					<div class="input" style="width: 30%">
-						<input type="text" id="aliqRetICMSTransp" name="nf.transporteNFe.retencaoICMS.aliquota" value="${nf.transporteNFe.retencaoICMS.aliquota}" style="width: 20%" />
-					</div>
-					<div  class="label obrigatorio">CFOP:</div>
-					<div class="input" style="width: 10%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.cfop" value="${nf.transporteNFe.retencaoICMS.cfop}" maxlength="4" style="width: 100%" />
-					</div>
-					<div  class="label obrigatorio">Município Gerador:</div>
-					<div class="input" style="width: 50%">
-						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" value="${nf.transporteNFe.retencaoICMS.codigoMunicipioGerador}" maxlength="7" style="width: 20%" />
-					</div>
-				</fieldset>
-				</div>
-				
 				<div class="divFieldset">
 				<fieldset id="bloco_volume" class="fieldsetInterno">
 					<legend>::: Volumes :::</legend>
@@ -2360,6 +2698,82 @@ function inicializarCalculoImpostos(){
 						</c:forEach>
 						</tbody>
 					</table>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_veiculo" class="fieldsetInterno fieldsetFechado">
+					<legend>::: Veículo/Reboque/Balsa/Vagão ::: -</legend>
+					<div  class="label obrigatorio">Placa:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="placaVeiculo" name="nf.transporteNFe.veiculo.placa"  value="${nf.transporteNFe.veiculo.placa}" maxlength="7" style="width: 100%" />
+					</div>
+					<div  class="label obrigatorio">UF:</div>
+					<div class="input" style="width: 50%">
+						<select id="ufVeiculo" name="nf.transporteNFe.veiculo.uf" style="width: 20%">
+							<option value=""></option>
+							<c:forEach var="tipo" items="${listaTipoUF}">
+								<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq nf.transporteNFe.veiculo.uf}">selected</c:if>>${tipo.codigo}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div  class="label">Regist. Trans. Cargo:</div>
+					<div class="input" style="width: 30%">
+						<input type="text" id="registroVeiculo" name="nf.transporteNFe.veiculo.registroNacionalTransportador" 
+							value="${nf.transporteNFe.veiculo.registroNacionalTransportador}" maxlength="2" style="width: 50%" />
+					</div>
+					<div class="bloco_botoes">
+						<a id="botaoInserirReboque" title="Inserir Dados do Reboque" class="botaoAdicionar"></a>
+					</div>
+								
+					<table id="tabela_reboque" class="listrada" >
+						<thead>
+							<tr>
+								<th>Placa Reboq.</th>
+								<th>UF Reboq.</th>
+								<th>Registro Reboq.</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						
+						<%-- Devemos ter um tbody pois eh nele que sao aplicados os estilos em cascata, por exemplo, tbody tr td. --%>
+						<tbody>
+							<c:forEach var="reboque" items="${nf.transporteNFe.listaReboque}">
+							<tr>
+								<td>${reboque.placa}</td>
+								<td>${reboque.uf}</td>
+								<td>${reboque.registroNacionalTransportador}</td>
+								<td></td>
+							</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</fieldset>
+				</div>
+				
+				<div class="divFieldset">
+				<fieldset id="bloco_retencao_icms" class="fieldsetInterno fieldsetFechado">
+					<legend>::: Retenção ICMS ::: -</legend>
+					<div  class="label obrigatorio">Valor Serviço:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="valServRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorServico" value="${nf.transporteNFe.retencaoICMS.valorServico}" style="width: 100%" />
+					</div>
+					<div  class="label obrigatorio">Valor BC:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" id="valBCRetICMSTransp" name="nf.transporteNFe.retencaoICMS.valorBC" value="${nf.transporteNFe.retencaoICMS.valorBC}" style="width: 100%" />
+					</div>
+					<div  class="label obrigatorio">Alíquota(%):</div>
+					<div class="input" style="width: 30%">
+						<input type="text" id="aliqRetICMSTransp" name="nf.transporteNFe.retencaoICMS.aliquota" value="${nf.transporteNFe.retencaoICMS.aliquota}" style="width: 20%" />
+					</div>
+					<div  class="label obrigatorio">CFOP:</div>
+					<div class="input" style="width: 10%">
+						<input type="text" name="nf.transporteNFe.retencaoICMS.cfop" value="${nf.transporteNFe.retencaoICMS.cfop}" maxlength="4" style="width: 100%" />
+					</div>
+					<div  class="label obrigatorio">Município Gerador:</div>
+					<div class="input" style="width: 50%">
+						<input type="text" name="nf.transporteNFe.retencaoICMS.codigoMunicipioGerador" value="${nf.transporteNFe.retencaoICMS.codigoMunicipioGerador}" maxlength="7" style="width: 20%" />
+					</div>
 				</fieldset>
 				</div>
 		</fieldset>
@@ -2433,7 +2847,7 @@ function inicializarCalculoImpostos(){
 			<legend>::: Info. Adicionais ::: -</legend>
 			<div class="label">Info. Adicionais Fisco:</div>
 			<div class="input areatexto" style="width: 70%">
-				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%">${nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco}</textarea>
+				<textarea name="nf.informacoesAdicionaisNFe.informacoesAdicionaisInteresseFisco" style="width: 100%">${infoAdFisco}</textarea>
 			</div>
 			<div class="label">Info. Adicionais Contrib.:</div>
 			<div class="input areatexto" style="width: 70%">
@@ -2442,13 +2856,17 @@ function inicializarCalculoImpostos(){
 		</fieldset>
 		<fieldset id="bloco_exportacao">
 			<legend>::: Exportação/Compra ::: -</legend>
-			<div class="label">UF Embarque:</div>
+			<div class="label">UF Saída:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.exportacaoNFe.ufEmbarque" value="${nf.exportacaoNFe.ufEmbarque}" maxlength="2" style="width: 5%"/>
+				<input type="text" name="nf.exportacaoNFe.ufSaida" value="${nf.exportacaoNFe.ufSaida}" maxlength="2" style="width: 5%"/>
 			</div>
-			<div class="label">Local Embarque:</div>
+			<div class="label">Local Export.:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" name="nf.exportacaoNFe.localEmbarque" value="${nf.exportacaoNFe.localEmbarque}" maxlength="60" style="width: 60%"/>
+				<input type="text" name="nf.exportacaoNFe.localExportacao" value="${nf.exportacaoNFe.localExportacao}" maxlength="60" style="width: 60%"/>
+			</div>
+			<div class="label">Local Despach.:</div>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.exportacaoNFe.localDespacho" value="${nf.exportacaoNFe.localDespacho}" maxlength="60" style="width: 60%"/>
 			</div>		
 			<div class="label">Nota Empenho:</div>
 			<div class="input" style="width: 80%">
@@ -2464,7 +2882,9 @@ function inicializarCalculoImpostos(){
 			</div>		
 		</fieldset>
 		<div class="bloco_botoes">
-			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoEmitirNF" title="Emitir NFe Saída" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoTriangularNF" title="Triangularizar NFe" value="" class="botaoTriangulo"/>
+			<input type="button" id="botaoDevolverNF" title="Emitir NFe Devolução" value="" class="botaoRefazer"/>
 		</div>
 
 		<jsp:include page="/bloco/bloco_detalhe_items_nfe.jsp"></jsp:include>		

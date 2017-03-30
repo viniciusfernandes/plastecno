@@ -21,6 +21,7 @@ import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+import br.com.plastecno.util.StringUtils;
 
 @Entity
 @Table(name = "tb_logradouro", schema = "vendas")
@@ -50,7 +51,7 @@ public class Logradouro implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "logradouroSequence")
 	private Integer id;
 
-	private Integer numero;
+	private String numero;
 
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_tipo_logradouro")
@@ -152,6 +153,20 @@ public class Logradouro implements Serializable, Cloneable {
 		return this.endereco.getDescricao();
 	}
 
+	public String getEnderecoNumeroBairro() {
+		StringBuilder end = new StringBuilder();
+		if (StringUtils.isNotEmpty(getEndereco())) {
+			end.append(getEndereco());
+		}
+		if (StringUtils.isNotEmpty(getNumero())) {
+			end.append(" - ").append(getNumero());
+		}
+		if (StringUtils.isNotEmpty(getBairro())) {
+			end.append(" - ").append(getBairro());
+		}
+		return end.toString();
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -160,7 +175,7 @@ public class Logradouro implements Serializable, Cloneable {
 		return endereco.getCidade() != null ? endereco.getCidade().getId() : null;
 	}
 
-	public Integer getNumero() {
+	public String getNumero() {
 		return numero;
 	}
 
@@ -221,7 +236,7 @@ public class Logradouro implements Serializable, Cloneable {
 		endereco.getCidade().setId(idCidade);
 	}
 
-	public void setNumero(Integer numero) {
+	public void setNumero(String numero) {
 		this.numero = numero;
 	}
 

@@ -1,10 +1,16 @@
 package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "valorBaseCalculo", "valorTotalICMS", "valorTotalICMSDesonerado", "valorTotalICMSFundoPobreza",
+		"valorTotalICMSInterestadualDestino", "valorTotalICMSInterestadualRemetente", "valorBaseCalculoST",
+		"valorTotalST", "valorTotalProdutosServicos", "valorTotalFrete", "valorTotalSeguro", "valorTotalDesconto",
+		"valorTotalII", "valorTotalIPI", "valorTotalPIS", "valorTotalCOFINS", "valorTotalDespAcessorias",
+		"valorTotalNF", "valorTotalTributos" })
 public class ValoresTotaisICMS {
 	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total de base de calculo do total de ICMS")
 	@XmlElement(name = "vBC")
@@ -34,9 +40,13 @@ public class ValoresTotaisICMS {
 	@XmlElement(name = "vICMS")
 	private Double valorTotalICMS;
 
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, nomeExibicao = "Valor total ICMS desonerado")
+	@XmlElement(name = "vICMSDeson")
+	private Double valorTotalICMSDesonerado;
+
 	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor total fundo de probeza do ICMS Interestadual")
 	@XmlElement(name = "vFCPUFDest")
-	private Double valorTotalICMSFundoProbeza;
+	private Double valorTotalICMSFundoPobreza;
 
 	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor total do ICMS Interestadual de destino")
 	@XmlElement(name = "vICMSUFDest")
@@ -74,6 +84,10 @@ public class ValoresTotaisICMS {
 	@XmlElement(name = "vST")
 	private Double valorTotalST;
 
+	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor total dos tributos")
+	@XmlElement(name = "vTotTrib")
+	private Double valorTotalTributos;
+
 	public void setValorBaseCalculo(Double valorBaseCalculo) {
 		this.valorBaseCalculo = valorBaseCalculo;
 	}
@@ -102,8 +116,12 @@ public class ValoresTotaisICMS {
 		this.valorTotalICMS = valorTotalICMS;
 	}
 
-	public void setValorTotalICMSFundoProbeza(Double valorTotalICMSFundoProbeza) {
-		this.valorTotalICMSFundoProbeza = valorTotalICMSFundoProbeza;
+	public void setValorTotalICMSDesonerado(Double valorTotalICMSDesonerado) {
+		this.valorTotalICMSDesonerado = valorTotalICMSDesonerado;
+	}
+
+	public void setValorTotalICMSFundoPobreza(Double valorTotalICMSFundoPobreza) {
+		this.valorTotalICMSFundoPobreza = valorTotalICMSFundoPobreza;
 	}
 
 	public void setValorTotalICMSInterestadualDestino(Double valorTotalICMSInterestadualDestino) {
@@ -140,6 +158,10 @@ public class ValoresTotaisICMS {
 
 	public void setValorTotalST(Double valorTotalST) {
 		this.valorTotalST = valorTotalST;
+	}
+
+	public void setValorTotalTributos(Double valorTotalTributos) {
+		this.valorTotalTributos = valorTotalTributos;
 	}
 
 }

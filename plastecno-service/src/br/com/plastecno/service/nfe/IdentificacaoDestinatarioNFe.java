@@ -2,19 +2,20 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "cnpj", "cpf", "identificacaoDestinatarioEstrangeiro", "razaoSocial", "enderecoDestinatarioNFe",
+		"indicadorIEDestinatario", "inscricaoEstadual", "inscricaoSUFRAMA", "inscricaoMunicipal", "email" })
 public class IdentificacaoDestinatarioNFe {
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{14}", padraoExemplo = "14 digitos", substituicao = { "\\D",
-			"" }, nomeExibicao = "CNPJ do destinatário")
+	@InformacaoValidavel(padrao = "\\d{14}", padraoExemplo = "14 digitos", substituicao = { "\\D", "" }, nomeExibicao = "CNPJ do destinatário")
 	@XmlElement(name = "CNPJ")
 	private String cnpj;
 
-	@InformacaoValidavel(padrao = "\\d{11}", padraoExemplo = "11 digitos", substituicao = { "\\D",
-			"" }, nomeExibicao = "CPF do destinatário")
+	@InformacaoValidavel(padrao = "\\d{11}", padraoExemplo = "11 digitos", substituicao = { "\\D", "" }, nomeExibicao = "CPF do destinatário")
 	@XmlElement(name = "CPF")
 	private String cpf;
 
@@ -26,20 +27,36 @@ public class IdentificacaoDestinatarioNFe {
 	@XmlElement(name = "enderDest")
 	private EnderecoNFe enderecoDestinatarioNFe;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 2, 14 }, nomeExibicao = "Inscrição estadual do destinatário")
+	@InformacaoValidavel(intervaloComprimento = { 5, 20 }, nomeExibicao = "Identificação do destinatário estrangeiro")
+	@XmlElement(name = "idEstrangeiro")
+	private String identificacaoDestinatarioEstrangeiro;
+
+	@InformacaoValidavel(obrigatorio = true, opcoes = { "1", "2", "9" }, nomeExibicao = "Indicador da IE do destinatário")
+	@XmlElement(name = "indIEDest")
+	private String indicadorIEDestinatario;
+
+	@InformacaoValidavel(intervaloComprimento = { 2, 14 }, nomeExibicao = "Inscrição estadual do destinatário")
 	@XmlElement(name = "IE")
 	private String inscricaoEstadual;
 
 	@XmlElement(name = "IM")
 	private String inscricaoMunicipal;
 
-	@InformacaoValidavel(intervaloComprimento = { 8, 9 }, nomeExibicao = "Inscrição na SUFRAMA do destinatário")
+	@InformacaoValidavel(padrao = "\\d{8,9}", padraoExemplo = "8 a 9 dígitos", nomeExibicao = "Inscrição na SUFRAMA do destinatário")
 	@XmlElement(name = "ISUF")
 	private String inscricaoSUFRAMA;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 2, 60 }, nomeExibicao = "Nome do destinatário")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 2, 70 }, nomeExibicao = "Razão social do destinatário")
 	@XmlElement(name = "xNome")
-	private String nomeFantasia;
+	private String razaoSocial;
+
+	public boolean contemEndereco() {
+		return enderecoDestinatarioNFe != null && enderecoDestinatarioNFe.getCep() != null
+				&& !enderecoDestinatarioNFe.getCep().isEmpty() && enderecoDestinatarioNFe.getLogradouro() != null
+				&& !enderecoDestinatarioNFe.getLogradouro().isEmpty()
+				&& enderecoDestinatarioNFe.getNomeMunicipio() != null
+				&& !enderecoDestinatarioNFe.getNomeMunicipio().isEmpty();
+	}
 
 	@XmlTransient
 	public String getCnpj() {
@@ -62,6 +79,16 @@ public class IdentificacaoDestinatarioNFe {
 	}
 
 	@XmlTransient
+	public String getIdentificacaoDestinatarioEstrangeiro() {
+		return identificacaoDestinatarioEstrangeiro;
+	}
+
+	@XmlTransient
+	public String getIndicadorIEDestinatario() {
+		return indicadorIEDestinatario;
+	}
+
+	@XmlTransient
 	public String getInscricaoEstadual() {
 		return inscricaoEstadual;
 	}
@@ -77,8 +104,8 @@ public class IdentificacaoDestinatarioNFe {
 	}
 
 	@XmlTransient
-	public String getNomeFantasia() {
-		return nomeFantasia;
+	public String getRazaoSocial() {
+		return razaoSocial;
 	}
 
 	public void setCnpj(String cnpj) {
@@ -97,6 +124,14 @@ public class IdentificacaoDestinatarioNFe {
 		this.enderecoDestinatarioNFe = enderecoDestinatarioNFe;
 	}
 
+	public void setIdentificacaoDestinatarioEstrangeiro(String identificacaoDestinatarioEstrangeiro) {
+		this.identificacaoDestinatarioEstrangeiro = identificacaoDestinatarioEstrangeiro;
+	}
+
+	public void setIndicadorIEDestinatario(String indicadorIEDestinatario) {
+		this.indicadorIEDestinatario = indicadorIEDestinatario;
+	}
+
 	public void setInscricaoEstadual(String inscricaoEstadual) {
 		this.inscricaoEstadual = inscricaoEstadual;
 	}
@@ -109,8 +144,8 @@ public class IdentificacaoDestinatarioNFe {
 		this.inscricaoSUFRAMA = inscricaoSUFRAMA;
 	}
 
-	public void setNomeFantasia(String nomeFantasia) {
-		this.nomeFantasia = nomeFantasia;
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
 	}
 
 }

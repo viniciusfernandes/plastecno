@@ -1,10 +1,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:forEach var="item" items="${nf.listaItem}" >
-<c:set var="detItem" value="nf.listaItem[${item.indiceItem}]"/>
+<c:set var="detItem" value="nf.listaItem[${item.numeroItem}]"/>
 <%-- bloco de icms --%>
 <input type="hidden" id="${detItem}.produtoServicoNFe.ncm" name="${detItem}.produtoServicoNFe.ncm" value="${item.produto.ncm}"/>
 <input type="hidden" id="${detItem}.produtoServicoNFe.cest" name="${detItem}.produtoServicoNFe.cest" value="${item.produto.cest}"/>
 <input type="hidden" id="${detItem}.produtoServicoNFe.cfop" name="${detItem}.produtoServicoNFe.cfop" value="${item.produto.cfop}"/>
+<input type="hidden" id="${detItem}.tributos.valorTotalTributos" name="${detItem}.tributos.valorTotalTributos" value="${item.tributos.valorTotalTributos}"/>
+
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.codigoSituacaoTributaria" name="${detItem}.tributos.icms.tipoIcms.codigoSituacaoTributaria" value="${item.tributos.icms.tipoIcms.codigoSituacaoTributaria}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.origemMercadoria" name="${detItem}.tributos.icms.tipoIcms.origemMercadoria" value="${item.tributos.icms.tipoIcms.origemMercadoria}"/>
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.valorDesonerado" name="${detItem}.tributos.icms.tipoIcms.valorDesonerado" value="${item.tributos.icms.tipoIcms.valorDesonerado}"/>
@@ -31,7 +33,7 @@
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.valorBC" name="${detItem}.tributos.ipi.tipoIpi.valorBC" value="${item.tributos.ipi.tipoIpi.valorBC}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel" name="${detItem}.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel" value="${item.tributos.ipi.tipoIpi.quantidadeUnidadeTributavel}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.valorUnidadeTributavel" name="${detItem}.tributos.ipi.tipoIpi.valorUnidadeTributavel" value="${item.tributos.ipi.tipoIpi.valorUnidadeTributavel}"/>
-<input type="hidden" id="${detItem}.tributos.ipi.classeEnquadramento" name="${detItem}.tributos.ipi.classeEnquadramento" value="${item.tributos.ipi.classeEnquadramento}"/>
+<input type="hidden" id="${detItem}.tributos.ipi.classeEnquadramentoCigarrosBebidas" name="${detItem}.tributos.ipi.classeEnquadramentoCigarrosBebidas" value="${item.tributos.ipi.classeEnquadramentoCigarrosBebidas}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.codigoEnquadramento" name="${detItem}.tributos.ipi.codigoEnquadramento" value="${item.tributos.ipi.codigoEnquadramento}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.cnpjProdutor" name="${detItem}.tributos.ipi.cnpjProdutor" value="${item.tributos.ipi.cnpjProdutor}"/>
 <input type="hidden" id="${detItem}.tributos.ipi.codigoSeloControle" name="${detItem}.tributos.ipi.codigoSeloControle" value="${item.tributos.ipi.codigoSeloControle}"/>
@@ -64,44 +66,45 @@
 
 <%-- bloco de informacoes --%>
 <input type="hidden" id="${detItem}.produtoServicoNFe.outrasDespesasAcessorias" name="${detItem}.produtoServicoNFe.outrasDespesasAcessorias" value="${item.produto.outrasDespesasAcessorias}"/>
+<input type="hidden" id="${detItem}.produtoServicoNFe.valorTotalFrete" name="${detItem}.produtoServicoNFe.valorTotalFrete" value="${item.produto.valorTotalFrete}"/>
 <input type="hidden" id="${detItem}.informacoesAdicionais" name="${detItem}.informacoesAdicionais" value="${item.informacoesAdicionais}"/>
-<input type="hidden" id="${detItem}.fichaConteudoImportacao" name="${detItem}.fichaConteudoImportacao" value="${item.fichaConteudoImportacao}"/>
-<input type="hidden" id="${detItem}.numeroPedidoCompra" name="${detItem}.numeroPedidoCompra" value="${item.numeroPedidoCompra}"/>
-<input type="hidden" id="${detItem}.itemPedidoCompra" name="${detItem}.itemPedidoCompra" value="${item.itemPedidoCompra}"/>
+<input type="hidden" id="${detItem}.produtoServicoNFe.fichaConteudoImportacao" name="${detItem}.produtoServicoNFe.fichaConteudoImportacao" value="${item.produto.fichaConteudoImportacao}"/>
+<input type="hidden" id="${detItem}.produtoServicoNFe.numeroPedidoCompra" name="${detItem}.produtoServicoNFe.numeroPedidoCompra" value="${item.produto.numeroPedidoCompra}"/>
+<input type="hidden" id="${detItem}.produtoServicoNFe.itemPedidoCompra" name="${detItem}.produtoServicoNFe.itemPedidoCompra" value="${item.produto.itemPedidoCompra}"/>
 
 <%-- bloco de importacoes --%>
-<c:set var="listaImportacao" value="${detItem}.listaImportacao"/>
-<c:forEach var="imp" items="${item.listaImportacao}" varStatus="loop">
-<input type="hidden" id="${listaImportacao}[${loop.index}].cnpjEncomendante" name="${listaImportacao}[${loop.index}].cnpjEncomendante" value="${imp.cnpjEncomendante}"/>
-<input type="hidden" id="${listaImportacao}[${loop.index}].codigoExportador" name="${listaImportacao}[${loop.index}].codigoExportador" value="${imp.codigoExportador}"/>
-<input type="hidden" id="${listaImportacao}[${loop.index}].dataImportacao" name="${listaImportacao}[${loop.index}].dataImportacao" value="${imp.dataImportacao}"/>
-<input type="hidden" id="${listaImportacao}[${loop.index}].dataDesembaraco" name="${listaImportacao}[${loop.index}].dataDesembaraco" value="${imp.dataDesembaraco}"/>
-<input type="hidden" id="${listaImportacao}[${loop.index}].localDesembaraco" name="${listaImportacao}[${loop.index}].localDesembaraco" value="${imp.localDesembaraco}"/>
-<input type="hidden" id="${listaImportacao}[${loop.index}].numero" name="${listaImportacao}[${loop.index}].numero" value="${imp.numero}"/>
-<input type="hidden" id="${listaImportacao}[${loop.index}].tipoIntermediacao" name="${listaImportacao}[${loop.index}].tipoIntermediacao" value="${imp.tipoIntermediacao}"/>
-<input type="hidden" id="${listaImportacao}[${loop.index}].tipoTransporteInternacional" name="${listaImportacao}[${loop.index}].tipoTransporteInternacional" value="${imp.tipoTransporteInternacional}"/>
-<input type="hidden" id="${listaImportacao}[${loop.index}].ufDesembaraco" name="${listaImportacao}[${loop.index}].ufDesembaraco" value="${imp.ufDesembaraco}"/>
-<input type="hidden" id="${listaImportacao}[${loop.index}].ufEncomendante" name="${listaImportacao}[${loop.index}].ufEncomendante" value="${imp.ufEncomendante}"/>
-<input type="hidden" id="${listaImportacao}[${loop.index}].valorAFRMM" name="${listaImportacao}[${loop.index}].valorAFRMM" value="${imp.valorAFRMM}"/>
+<c:set var="itemImportacao" value="${detItem}.produtoServicoNFe.listaImportacao"/>
+<c:forEach var="imp" items="${item.produto.listaImportacao}" varStatus="loop">
+<input type="hidden" id="${itemImportacao}[${loop.index}].cnpjEncomendante" name="${itemImportacao}[${loop.index}].cnpjEncomendante" value="${imp.cnpjEncomendante}"/>
+<input type="hidden" id="${itemImportacao}[${loop.index}].codigoExportador" name="${itemImportacao}[${loop.index}].codigoExportador" value="${imp.codigoExportador}"/>
+<input type="hidden" id="${itemImportacao}[${loop.index}].dataImportacao" name="${itemImportacao}[${loop.index}].dataImportacao" value="${imp.dataImportacao}"/>
+<input type="hidden" id="${itemImportacao}[${loop.index}].dataDesembaraco" name="${itemImportacao}[${loop.index}].dataDesembaraco" value="${imp.dataDesembaraco}"/>
+<input type="hidden" id="${itemImportacao}[${loop.index}].localDesembaraco" name="${itemImportacao}[${loop.index}].localDesembaraco" value="${imp.localDesembaraco}"/>
+<input type="hidden" id="${itemImportacao}[${loop.index}].numero" name="${itemImportacao}[${loop.index}].numero" value="${imp.numero}"/>
+<input type="hidden" id="${itemImportacao}[${loop.index}].tipoIntermediacao" name="${itemImportacao}[${loop.index}].tipoIntermediacao" value="${imp.tipoIntermediacao}"/>
+<input type="hidden" id="${itemImportacao}[${loop.index}].tipoTransporteInternacional" name="${itemImportacao}[${loop.index}].tipoTransporteInternacional" value="${imp.tipoTransporteInternacional}"/>
+<input type="hidden" id="${itemImportacao}[${loop.index}].ufDesembaraco" name="${itemImportacao}[${loop.index}].ufDesembaraco" value="${imp.ufDesembaraco}"/>
+<input type="hidden" id="${itemImportacao}[${loop.index}].ufEncomendante" name="${itemImportacao}[${loop.index}].ufEncomendante" value="${imp.ufEncomendante}"/>
+<input type="hidden" id="${itemImportacao}[${loop.index}].valorAFRMM" name="${itemImportacao}[${loop.index}].valorAFRMM" value="${imp.valorAFRMM}"/>
 
 <%-- bloco de adicoes --%>
-<c:set var="listaAdicao" value="${listaImportacao}[${loop.index}].listaAdicao"/>
+<c:set var="itemAdicao" value="${itemImportacao}[${loop.index}].listaAdicao"/>
 <c:forEach var="ad" items="${imp.listaAdicao}" varStatus="adLoop">
-<input type="hidden" id="${listaAdicao}[${adLoop.index}].codigoFabricante" name="${listaAdicao}[${adLoop.index}].codigoFabricante" value="${ad.codigoFabricante}"/>
-<input type="hidden" id="${listaAdicao}[${adLoop.index}].numero" name="${listaAdicao}[${adLoop.index}].numero" value="${ad.numero}"/>
-<input type="hidden" id="${listaAdicao}[${adLoop.index}].numeroDrawback" name="${listaAdicao}[${adLoop.index}].numeroDrawback" value="${ad.numeroDrawback}"/>
-<input type="hidden" id="${listaAdicao}[${adLoop.index}].numeroSequencialItem" name="${listaAdicao}[${adLoop.index}].numeroSequencialItem" value="${ad.numeroSequencialItem}"/>
-<input type="hidden" id="${listaAdicao}[${adLoop.index}].valorDesconto" name="${listaAdicao}[${adLoop.index}].valorDesconto" value="${ad.valorDesconto}"/>
+<input type="hidden" id="${itemAdicao}[${adLoop.index}].codigoFabricante" name="${itemAdicao}[${adLoop.index}].codigoFabricante" value="${ad.codigoFabricante}"/>
+<input type="hidden" id="${itemAdicao}[${adLoop.index}].numero" name="${itemAdicao}[${adLoop.index}].numero" value="${ad.numero}"/>
+<input type="hidden" id="${itemAdicao}[${adLoop.index}].numeroDrawback" name="${itemAdicao}[${adLoop.index}].numeroDrawback" value="${ad.numeroDrawback}"/>
+<input type="hidden" id="${itemAdicao}[${adLoop.index}].numeroSequencialItem" name="${itemAdicao}[${adLoop.index}].numeroSequencialItem" value="${ad.numeroSequencialItem}"/>
+<input type="hidden" id="${itemAdicao}[${adLoop.index}].valorDesconto" name="${itemAdicao}[${adLoop.index}].valorDesconto" value="${ad.valorDesconto}"/>
 </c:forEach>
 
 </c:forEach>
 
 <%-- bloco de exportacao --%>
-<c:set var="listaExportacao" value="${detItem}.listaExportacao"/>
-<c:forEach var="exp" items="${item.listaExportacao}" varStatus="expLoop">
-<input type="hidden" id="${listaExportacao}[${expLoop.index}].numeroDrawback" name="${listaExportacao}[${expLoop.index}].numeroDrawback" value="${exp.numeroDrawback}"/>
-<input type="hidden" id="${listaExportacao}[${expLoop.index}].expIndireta.chaveAcessoRecebida" name="${listaExportacao}[${expLoop.index}].expIndireta.chaveAcessoRecebida" value="${exp.expIndireta.chaveAcessoRecebida}"/>
-<input type="hidden" id="${listaExportacao}[${expLoop.index}].expIndireta.numeroRegistro" name="${listaExportacao}[${expLoop.index}].expIndireta.numeroRegistro" value="${exp.expIndireta.numeroRegistro}"/>
-<input type="hidden" id="${listaExportacao}[${expLoop.index}].expIndireta.quantidadeItem" name="${listaExportacao}[${expLoop.index}].expIndireta.quantidadeItem" value="${exp.expIndireta.quantidadeItem}"/>
+<c:set var="itemExportacao" value="${detItem}.produtoServicoNFe.listaExportacao"/>
+<c:forEach var="exp" items="${item.produto.listaExportacao}" varStatus="expLoop">
+<input type="hidden" id="${itemExportacao}[${expLoop.index}].numeroDrawback" name="${itemExportacao}[${expLoop.index}].numeroDrawback" value="${exp.numeroDrawback}"/>
+<input type="hidden" id="${itemExportacao}[${expLoop.index}].expIndireta.chaveAcessoRecebida" name="${itemExportacao}[${expLoop.index}].expIndireta.chaveAcessoRecebida" value="${exp.expIndireta.chaveAcessoRecebida}"/>
+<input type="hidden" id="${itemExportacao}[${expLoop.index}].expIndireta.numeroRegistro" name="${itemExportacao}[${expLoop.index}].expIndireta.numeroRegistro" value="${exp.expIndireta.numeroRegistro}"/>
+<input type="hidden" id="${itemExportacao}[${expLoop.index}].expIndireta.quantidadeItem" name="${itemExportacao}[${expLoop.index}].expIndireta.quantidadeItem" value="${exp.expIndireta.quantidadeItem}"/>
 </c:forEach>
 </c:forEach>

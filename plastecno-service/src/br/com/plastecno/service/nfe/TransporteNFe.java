@@ -4,10 +4,12 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "modalidadeFrete", "transportadoraNFe", "retencaoICMS", "veiculo", "listaReboque", "listaVolume" })
 public class TransporteNFe {
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Reboque")
 	@XmlElement(name = "reboque")
@@ -26,7 +28,7 @@ public class TransporteNFe {
 	private RetencaoICMSTransporteNFe retencaoICMS;
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Transportadora da NFe")
-	@XmlElement(name = "transportadora")
+	@XmlElement(name = "transporta")
 	private TransportadoraNFe transportadoraNFe;
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Veículo de transporte")

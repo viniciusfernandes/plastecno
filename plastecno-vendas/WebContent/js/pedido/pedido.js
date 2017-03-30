@@ -12,6 +12,9 @@ function inicializarBlocoItemPedido(urlTela) {
 	// valor do pedido atualizado
 	tabelaItemHandler.removerRegistroCallback(function(response) {
 		var pedido = response.pedido;
+		if(pedido == undefined || pedido == null){
+			return;
+		}
 		$('#tabelaItemPedido tfoot #valorPedido').html(pedido.valorPedido);
 		$('#tabelaItemPedido tfoot #valorPedidoIPI')
 				.html(pedido.valorPedidoIPI);
@@ -101,34 +104,43 @@ function inicializarBlocoItemPedido(urlTela) {
 
 				request.done(function(response) {
 					var itemPedidoJson = response.itemPedido;
-					$('#idItemPedido').val(itemPedidoJson.id);
-					$('#sequencial').val(itemPedidoJson.sequencial);
-					
-					$('#formaMaterial').val(itemPedidoJson.formaMaterial);
-
-					if (itemPedidoJson.vendaKilo) {
-						$('#tipoVendaKilo').prop('checked', true);
-					} else {
-						$('#tipoVendaPeca').prop('checked', true);
+					var erros = response.erros;
+					var contemErros = erros != undefined && erros !=null;
+					var contemItem = itemPedidoJson != undefined && itemPedidoJson !=null;
+					if(!contemErros && contemItem){
+						$('#idItemPedido').val(itemPedidoJson.id);
+						$('#sequencial').val(itemPedidoJson.sequencial);
+						
+						$('#formaMaterial').val(itemPedidoJson.formaMaterial);
+	
+						if (itemPedidoJson.vendaKilo) {
+							$('#tipoVendaKilo').prop('checked', true);
+						} else {
+							$('#tipoVendaPeca').prop('checked', true);
+						}
+	
+						$('#quantidade').val(itemPedidoJson.quantidade);
+						$('#material').val(itemPedidoJson.siglaMaterial);
+						$('#idMaterial').val(itemPedidoJson.idMaterial);
+						$('#medidaExterna').val(itemPedidoJson.medidaExterna);
+						$('#medidaInterna').val(itemPedidoJson.medidaInterna);
+						$('#comprimento').val(itemPedidoJson.comprimento);
+						$('#precoVenda').val(itemPedidoJson.precoVenda);
+						$('#precoUnidade').val(itemPedidoJson.precoUnidade);
+						$('#descricao').val(itemPedidoJson.descricaoPeca);
+						$('#aliquotaICMS').val(itemPedidoJson.aliquotaICMS);
+						$('#aliquotaIPI').val(itemPedidoJson.aliquotaIPI);
+						$('#prazoEntregaItem').val(itemPedidoJson.prazoEntrega);
+						$('#aliquotaComissao').val(itemPedidoJson.aliquotaComissao);
+						$('#ncm').val(itemPedidoJson.ncm);
+						$('#cst').val(itemPedidoJson.tipoCST);
+						
+						habilitarPreenchimentoPeca(itemPedidoJson.peca);
+					} else if(!contemErros && !contemItem){
+						gerarListaMensagemAlerta(['Usuario pode nao estar logado no sistema']);
+					} else if(contemErros){
+						gerarListaMensagemErro(erros);
 					}
-
-					$('#quantidade').val(itemPedidoJson.quantidade);
-					$('#material').val(itemPedidoJson.siglaMaterial);
-					$('#idMaterial').val(itemPedidoJson.idMaterial);
-					$('#medidaExterna').val(itemPedidoJson.medidaExterna);
-					$('#medidaInterna').val(itemPedidoJson.medidaInterna);
-					$('#comprimento').val(itemPedidoJson.comprimento);
-					$('#precoVenda').val(itemPedidoJson.precoVenda);
-					$('#precoUnidade').val(itemPedidoJson.precoUnidade);
-					$('#descricao').val(itemPedidoJson.descricaoPeca);
-					$('#aliquotaICMS').val(itemPedidoJson.aliquotaICMS);
-					$('#aliquotaIPI').val(itemPedidoJson.aliquotaIPI);
-					$('#prazoEntregaItem').val(itemPedidoJson.prazoEntrega);
-					$('#aliquotaComissao').val(itemPedidoJson.aliquotaComissao);
-					$('#ncm').val(itemPedidoJson.ncm);
-					$('#cst').val(itemPedidoJson.tipoCST);
-					
-					habilitarPreenchimentoPeca(itemPedidoJson.peca);
 				});
 
 				request
@@ -196,8 +208,9 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 		 */
 		$('#bloco_mensagem').hide();
 
-		if (!contemErro) {
-			var pedidoJson = response.pedido;
+		var pedidoJson = response.pedido;
+		var contemPedido =pedidoJson != undefined && pedidoJson != null;
+		if (!contemErro && contemPedido) {
 			/*
 			 * Temos que ter esse campo oculto pois o campo Numero do Pedido na
 			 * tela sera desabilitado e nao sera enviado no request.
@@ -230,7 +243,9 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 						+ pedidoJson.id + ' foi incluido com sucesso.'));
 			}
 
-		} else {
+		} else if(!contemErro && !contemPedido) {
+			gerarListaMensagemAlerta(['O usuario pode nao estar logado no sistema']);
+		} else if(contemErro) {
 			gerarListaMensagemErro(erros);
 		}
 	});
@@ -238,8 +253,9 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 	request.always(function(response) {
 		// se nao contem erro e foi clicao o botao de inclusao de item de
 		// pedidos
-		if (itemPedidoAcionado && response.erros == undefined) {
-			inserirItemPedido(response.pedido.id, urlInclusaoItemPedido);
+		var pedido = response.pedido;
+		if (itemPedidoAcionado && response.erros == undefined && pedido != undefined && pedido != null) {
+			inserirItemPedido(pedido.id, urlInclusaoItemPedido);
 		}
 	});
 
@@ -274,6 +290,9 @@ function inicializarAutomcompleteCliente(url) {
 				var contemErro = erros != undefined;
 				if (!contemErro) {
 					var clienteJson = response.cliente;
+					if(clienteJson==undefined || clienteJson==null){
+						return;
+					}
 					$('#idCliente').val(clienteJson.id);
 					$('#formPesquisa #idClientePesquisa').val(clienteJson.id);
 					$('#site').val(clienteJson.site);
@@ -352,7 +371,9 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 			$('#bloco_mensagem').fadeOut();
 
 			// Verificando se existe algum erro no processo de inclusao
-			if (!contemErro) {
+			var itemPedido = response.itemPedido;
+			var contemItem = itemPedido != undefined && itemPedido !=null;
+			if (!contemErro && contemItem) {
 				var itemPedido = response.itemPedido;
 				// Esses valore de campos hidden serao utilizados na inclusao do
 				// novo item na tabela de itens do pedido
@@ -404,7 +425,9 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 				habilitar('#representada', false);
 
 				tabelaItemHandler.adicionar();
-			} else {
+			} else if(!contemErro && !contemItem) {
+				gerarListaMensagemAlerta(['O usuário pode não estar logado no sistema']);
+			} else if(contemErro) {
 				gerarListaMensagemErro(erros);
 			}
 		});

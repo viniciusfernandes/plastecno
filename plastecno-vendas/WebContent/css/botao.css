@@ -160,7 +160,7 @@
 }
 
 .botaoRefazer {
-	background: url("../images/redo_black_24.png") no-repeat scroll 0 0
+	background: url("../images/go_back_24.png") no-repeat scroll 0 0
 		transparent;
 	cursor: pointer;
 	height: 24px;
@@ -234,8 +234,34 @@
 	width: 24px;
 }
 
+.botaoLimparPequeno {
+	background: url("../images/broom_16.png") no-repeat scroll 0 0
+		transparent;
+	border: 0;
+	cursor: pointer;
+	height: 16px;
+	margin-left: 5px;
+	width: 16px;
+}
+
 .botaoManutencao {
 	background: url("../images/maintenance_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoProximo {
+	background: url("../images/next_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoAnterior {
+	background: url("../images/previous_24.png") no-repeat scroll 0 0
 		transparent;
 	cursor: pointer;
 	height: 24px;
@@ -284,8 +310,26 @@
 	width: 24px;
 }
 
+.botaoTriangulo {
+	background: url("../images/triangle_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoPesquisarPequeno {
 	background: url("../images/search_16.png") no-repeat scroll 0 0
+		transparent;
+	border: 0;
+	cursor: pointer;
+	height: 16px;
+	margin-left: 5px;
+	width: 16px;
+}
+
+.botaoTrianguloPequeno {
+	background: url("../images/triangle_16.png") no-repeat scroll 0 0
 		transparent;
 	border: 0;
 	cursor: pointer;
@@ -417,7 +461,7 @@
 }
 
 .botaoRefazer:hover {
-	background: url("../images/redo_black_16.png") no-repeat scroll 0 0
+	background: url("../images/go_back_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 	height: 24px;
@@ -512,8 +556,26 @@
 	background-position: center center;
 }
 
+.botaoProximo:hover {
+	background: url("../images/next_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
+.botaoAnterior:hover {
+	background: url("../images/previous_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
 .botaoPesquisar:hover {
 	background: url("../images/search_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
+.botaoTriangulo:hover {
+	background: url("../images/triangle_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 }

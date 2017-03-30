@@ -344,7 +344,7 @@ public class PedidoController extends AbstractController {
     @Post("pedido/item/inclusao")
     public void inserirItemPedido(Integer numeroPedido, ItemPedido itemPedido, Double aliquotaIPI) {
         try {
-            if (itemPedido.getMaterial().getId() == null) {
+            if (itemPedido.getMaterial() != null && itemPedido.getMaterial().getId() == null) {
                 itemPedido.setMaterial(null);
             }
             if (aliquotaIPI != null) {
@@ -424,7 +424,7 @@ public class PedidoController extends AbstractController {
     }
 
     private boolean isPedidoDesabilitado(Pedido pedido) {
-        if (pedido == null) {
+        if (pedido == null || isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS)) {
             return false;
         } else {
             SituacaoPedido situacao = pedido.getSituacaoPedido();
@@ -724,10 +724,12 @@ public class PedidoController extends AbstractController {
     @Post("pedido/itempedido/remocao/{id}")
     public void removerItemPedido(Integer id) {
         try {
-            final PedidoJson json = new PedidoJson(this.pedidoService.removerItemPedido(id));
+            final PedidoJson json = new PedidoJson(pedidoService.removerItemPedido(id));
             serializarJson(new SerializacaoJson("pedido", json));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
+        } catch (Exception e) {
+            gerarLogErro("Remoção do item do pedido", e);
         }
     }
 

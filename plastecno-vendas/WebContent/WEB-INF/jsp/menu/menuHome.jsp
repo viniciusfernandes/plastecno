@@ -74,8 +74,15 @@
 						<li><a href="regiao" target="principal_frame">Regiões</a></li>
 					</ul>
 				</li>
-				<li><a href="emissaoNFe" target="principal_frame">Emis. NFe</a>
+				<c:if test="${acessoNFePermitido}">
+				<li><a href="javascript: void(0)">NFe</a>
+					<ul>
+						<li><a href="emissaoNFe" target="principal_frame">Emis. NFe</a></li>
+						<li><a href="pedidoFracionadoNFe" target="principal_frame">Ped. Fracionado</a></li>
+					</ul>
 				</li>
+				</c:if>
+				
 				<!-- c:if test="${acessoValorReceitaPermitido}" -->
 				<c:if test="${false}">
 				<li><a href="javascript: void(0)">Receita</a>

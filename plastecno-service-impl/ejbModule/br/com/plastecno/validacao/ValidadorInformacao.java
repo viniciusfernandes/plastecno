@@ -7,12 +7,19 @@ import java.util.Collection;
 import java.util.List;
 
 import br.com.plastecno.service.constante.TipoDocumento;
-import br.com.plastecno.service.nfe.ICMSGeral;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.util.NumeroUtils;
 
 public final class ValidadorInformacao {
+
+	public static void addMensagem(List<String> listaMensagem, String mensagem, Object valIdentif) {
+		if (valIdentif == null) {
+			listaMensagem.add(mensagem);
+		} else {
+			listaMensagem.add("Item " + valIdentif + ". " + mensagem);
+		}
+	}
 
 	public static void preencherListaMensagemValidacao(Object obj, List<String> listaMensagem) {
 		InformacaoValidavel informacao = null;
@@ -30,6 +37,8 @@ public final class ValidadorInformacao {
 		int[] tamanhos = null;
 		String[] opcoes = null;
 		boolean ok = false;
+		Object valIdentif = !informacao.campoIdentificacao().isEmpty() ? recuperarConteudo(
+				informacao.campoIdentificacao(), obj) : null;
 
 		Object valorCond = null;
 		String nomeCond = null;
@@ -47,7 +56,8 @@ public final class ValidadorInformacao {
 
 			Object conteudoCampo = recuperarConteudo(campo, obj);
 			// Esse bloco deve preceder todos os outros pois eh uma
-			// pre-avaliacao do conteudo dos campos e podera alterar o conteudo
+			// pre-avaliacao do conteudo dos campos e podera alterar o
+			// conteudo
 			// de acordo com a marcacao, sendo que esse novo conteudo sera
 			// revalidado posteiormente
 			if (valorCond != null) {
@@ -56,13 +66,17 @@ public final class ValidadorInformacao {
 						if (conteudoCampo != null && valorCond.equals(c)) {
 							// listaMensagem.add("\"" +
 							// informacao.nomeExibicao() +
-							// "\" não deve ser preenchido para o \"" + nomeCond
+							// "\" não deve ser preenchido para o \"" +
+							// nomeCond
 							// + " = " + valorCond + "\"");
 
 							// No caso em que um determinado tipo nao for
-							// permitido iremos anular o conteudo para facilitar
-							// a implementacao de regras de negocio, evitando
-							// assim novas verificacoes de nulidade do conteudo
+							// permitido iremos anular o conteudo para
+							// facilitar
+							// a implementacao de regras de negocio,
+							// evitando
+							// assim novas verificacoes de nulidade do
+							// conteudo
 							// evitando uma quantidade de if/else
 							conteudoCampo = null;
 							setConteudo(campo, obj, null);
@@ -74,8 +88,8 @@ public final class ValidadorInformacao {
 				if (informacao.tiposObrigatorios().length > 0) {
 					for (String c : informacao.tiposObrigatorios()) {
 						if (conteudoCampo == null && valorCond.equals(c)) {
-							listaMensagem.add("\"" + informacao.nomeExibicao() + "\" é obrigatório para \"" + nomeCond
-									+ " = " + valorCond + "\"");
+							addMensagem(listaMensagem, "\"" + informacao.nomeExibicao() + "\" é obrigatório para \""
+									+ nomeCond + " = " + valorCond + "\"", valIdentif);
 							break;
 						}
 					}
@@ -83,10 +97,12 @@ public final class ValidadorInformacao {
 
 				if (informacao.tiposPermitidos().length > 0) {
 					ok = true;
-					// Verificando se o tipo selecionado eh diferente de todos
+					// Verificando se o tipo selecionado eh diferente de
+					// todos
 					// os tipos permitidos para depois invalidar
 					for (String c : informacao.tiposPermitidos()) {
-						// Condicao indicando que encontrou o tipo na lista de
+						// Condicao indicando que encontrou o tipo na lista
+						// de
 						// tipos permitidos
 						if (ok = valorCond.equals(c)) {
 							break;
@@ -94,26 +110,26 @@ public final class ValidadorInformacao {
 					}
 
 					if (conteudoCampo != null && !ok) {
-						listaMensagem.add("\"" + informacao.nomeExibicao() + "\" não deve ser preenchido para o \""
-								+ nomeCond + " = " + valorCond + "\"");
+						addMensagem(listaMensagem, "\"" + informacao.nomeExibicao()
+								+ "\" não deve ser preenchido para o \"" + nomeCond + " = " + valorCond + "\"",
+								valIdentif);
 					}
 				}
-				continue;
 			}
 
 			if (informacao.obrigatorio() && conteudoCampo == null) {
-				listaMensagem.add(informacao.nomeExibicao() + " é obrigatório");
+				addMensagem(listaMensagem, informacao.nomeExibicao() + " é obrigatório", valIdentif);
 				continue;
 			}
 
 			if ((informacao.relacionamentoObrigatorio() && (conteudoCampo == null || recuperarId(conteudoCampo) == null))) {
-				listaMensagem.add(informacao.nomeExibicao() + " deve ser associado");
+				addMensagem(listaMensagem, informacao.nomeExibicao() + " deve ser associado", valIdentif);
 				continue;
 			}
 
 			if (informacao.numerico() && informacao.estritamentePositivo()
 					&& (conteudoCampo != null && Double.valueOf(conteudoCampo.toString()) <= 0)) {
-				listaMensagem.add(informacao.nomeExibicao() + " deve ser positivo");
+				addMensagem(listaMensagem, informacao.nomeExibicao() + " deve ser positivo", valIdentif);
 				continue;
 			}
 
@@ -121,15 +137,17 @@ public final class ValidadorInformacao {
 					&& informacao.intervaloNumerico().length > 0
 					&& (conteudoCampo != null && (Double) conteudoCampo >= informacao.intervaloNumerico()[0] && (Double) conteudoCampo <= informacao
 							.intervaloNumerico()[1])) {
-				listaMensagem.add(informacao.nomeExibicao() + " deve estar dentro o intervalo "
-						+ informacao.intervaloNumerico()[0] + " à " + informacao.intervaloNumerico()[1]);
+				addMensagem(listaMensagem,
+						informacao.nomeExibicao() + " deve estar dentro o intervalo "
+								+ informacao.intervaloNumerico()[0] + " à " + informacao.intervaloNumerico()[1],
+						valIdentif);
 
 				continue;
 			}
 
 			if (informacao.numerico() && informacao.positivo()
 					&& (conteudoCampo != null && Double.valueOf(conteudoCampo.toString()) < 0)) {
-				listaMensagem.add(informacao.nomeExibicao() + " não deve ser negativo");
+				addMensagem(listaMensagem, informacao.nomeExibicao() + " não deve ser negativo", valIdentif);
 				continue;
 			}
 
@@ -143,7 +161,8 @@ public final class ValidadorInformacao {
 				continue;
 			}
 
-			// Essa variavel sera sempre ZERO no caso em que o conteudo nao seja
+			// Essa variavel sera sempre ZERO no caso em que o conteudo nao
+			// seja
 			// uma
 			// string
 			isString = conteudoCampo instanceof String;
@@ -152,7 +171,8 @@ public final class ValidadorInformacao {
 			}
 
 			COMPRIMENTO_STRING = isString ? conteudoCampo.toString().trim().length() : -1;
-			// Esse bloco deve anteceder a validacao do comprimento da String
+			// Esse bloco deve anteceder a validacao do comprimento da
+			// String
 			// pois ele complementa seu conteudo com prefixos
 			if (COMPRIMENTO_STRING > 0 && informacao.prefixo().length() > 0 && informacao.tamanho() > 0
 					&& COMPRIMENTO_STRING < informacao.tamanho()) {
@@ -166,9 +186,12 @@ public final class ValidadorInformacao {
 				setConteudo(campo, obj, conteudoCampo);
 			}
 
-			// Muito importante que essa validacao seja feita antes das outras
-			// pois apos a remocao do caracteres invalidos esses valores deverao
-			// ser validados, por isso esse condicional nao tem a instrucao de
+			// Muito importante que essa validacao seja feita antes das
+			// outras
+			// pois apos a remocao do caracteres invalidos esses valores
+			// deverao
+			// ser validados, por isso esse condicional nao tem a instrucao
+			// de
 			// fim de execucao "continue"
 			if (COMPRIMENTO_STRING > 0 && informacao.substituicao().length > 1) {
 				conteudoCampo = conteudoCampo.toString().replaceAll(informacao.substituicao()[0],
@@ -182,15 +205,17 @@ public final class ValidadorInformacao {
 					&& COMPRIMENTO_STRING >= 0
 					&& (COMPRIMENTO_STRING < informacao.intervaloComprimento()[0] || COMPRIMENTO_STRING > informacao
 							.intervaloComprimento()[1])) {
-				listaMensagem.add(informacao.nomeExibicao() + " deve conter de " + informacao.intervaloComprimento()[0]
-						+ " a " + informacao.intervaloComprimento()[1] + " caracteres. Foi enviado "
-						+ COMPRIMENTO_STRING + " caracteres");
+
+				addMensagem(listaMensagem,
+						informacao.nomeExibicao() + " deve conter de " + informacao.intervaloComprimento()[0] + " a "
+								+ informacao.intervaloComprimento()[1] + " caracteres. Foi enviado "
+								+ COMPRIMENTO_STRING + " caracteres", valIdentif);
 				continue;
 			}
 
 			if (conteudoCampo != null && informacao.tamanho() >= 0 && COMPRIMENTO_STRING != informacao.tamanho()) {
-				listaMensagem.add(informacao.nomeExibicao() + " deve conter apenas " + informacao.tamanho()
-						+ " caracteres. Foi enviado " + COMPRIMENTO_STRING + " caracteres");
+				addMensagem(listaMensagem, informacao.nomeExibicao() + " deve conter apenas " + informacao.tamanho()
+						+ " caracteres. Foi enviado " + COMPRIMENTO_STRING + " caracteres", valIdentif);
 				continue;
 			}
 
@@ -204,8 +229,9 @@ public final class ValidadorInformacao {
 					}
 				}
 				if (!ok) {
-					listaMensagem.add(informacao.nomeExibicao() + " deve conter um dos tamanhos \""
-							+ Arrays.toString(tamanhos) + "\" mas contém o tamanho de \"" + COMPRIMENTO_STRING + "\"");
+					addMensagem(listaMensagem,
+							informacao.nomeExibicao() + " deve conter um dos tamanhos \"" + Arrays.toString(tamanhos)
+									+ "\" mas contém o tamanho de \"" + COMPRIMENTO_STRING + "\"", valIdentif);
 				}
 				continue;
 			}
@@ -220,14 +246,11 @@ public final class ValidadorInformacao {
 					}
 				}
 				if (!ok) {
-					listaMensagem.add(informacao.nomeExibicao() + " deve conter um dos valores \""
-							+ Arrays.toString(opcoes) + "\" mas contém o valores de \"" + conteudoCampo + "\"");
+					addMensagem(listaMensagem,
+							informacao.nomeExibicao() + " deve conter um dos valores \"" + Arrays.toString(opcoes)
+									+ "\" mas contém o valores de \"" + conteudoCampo + "\"", valIdentif);
 				}
 				continue;
-			}
-
-			if (obj instanceof ICMSGeral) {
-				System.out.println("ssssssssss");
 			}
 
 			if (informacao.decimal().length >= 2 && conteudoCampo != null) {
@@ -235,7 +258,7 @@ public final class ValidadorInformacao {
 				try {
 					campo.set(obj, NumeroUtils.arredondar((Double) conteudoCampo, informacao.decimal()[1]));
 				} catch (Exception e) {
-					listaMensagem.add("Falha no arredondamento decimal do campo " + campo);
+					addMensagem(listaMensagem, "Falha no arredondamento decimal do campo " + campo, valIdentif);
 				} finally {
 					campo.setAccessible(false);
 				}
@@ -244,7 +267,7 @@ public final class ValidadorInformacao {
 
 			if (!TipoDocumento.NAO_EH_DOCUMENTO.equals(informacao.tipoDocumento()) && COMPRIMENTO_STRING > 0
 					&& !ValidadorDocumento.isValido(informacao.tipoDocumento(), conteudoCampo.toString())) {
-				listaMensagem.add(informacao.nomeExibicao() + " não é válido");
+				addMensagem(listaMensagem, informacao.nomeExibicao() + " não é válido", valIdentif);
 				continue;
 			}
 
@@ -257,11 +280,12 @@ public final class ValidadorInformacao {
 				}
 
 				if (!ok) {
-					listaMensagem
-							.add(informacao.nomeExibicao()
+					addMensagem(listaMensagem,
+							informacao.nomeExibicao()
 									+ " não está no formato padronizado correto"
 									+ (informacao.padraoExemplo().length() > 0 ? " \"" + informacao.padraoExemplo()
-											+ "\"" : "") + ". Enviado \"" + conteudoCampo + "\"");
+											+ "\"" : "") + ". Enviado \"" + conteudoCampo + "\"", valIdentif);
+
 				}
 				continue;
 			}

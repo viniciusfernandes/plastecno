@@ -2,10 +2,12 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "valorBC", "aliquota", "valor", "codigoMunicipioGerador", "itemListaServicos" })
 public class ISSQN {
 	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, nomeExibicao = "Alíquota do ISS")
 	@XmlElement(name = "vAliq")
@@ -14,10 +16,6 @@ public class ISSQN {
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{7}", padraoExemplo = "7 dígitos", nomeExibicao = "Código do município do fato gerador do ISS")
 	@XmlElement(name = "cMunFG")
 	private String codigoMunicipioGerador;
-
-	@InformacaoValidavel(obrigatorio = true, tamanho = 1, nomeExibicao = "Situação tributária do ISS")
-	@XmlElement(name = "cSitTrib")
-	private String codigoSituacaoTributaria;
 
 	@InformacaoValidavel(obrigatorio = true, tamanho = 5, nomeExibicao = "Código do item da lista de serviços do ISS")
 	@XmlElement(name = "cListServ")
@@ -32,10 +30,10 @@ public class ISSQN {
 	private Double valorBC;
 
 	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : null;
 	}
 
-	public ISSQN carregarValoresAliquotas() {
+	public ISSQN carregarValores() {
 		valor = calcularValor();
 		return this;
 	}
@@ -48,11 +46,6 @@ public class ISSQN {
 	@XmlTransient
 	public String getCodigoMunicipioGerador() {
 		return codigoMunicipioGerador;
-	}
-
-	@XmlTransient
-	public String getCodigoSituacaoTributaria() {
-		return codigoSituacaoTributaria;
 	}
 
 	@XmlTransient
@@ -76,10 +69,6 @@ public class ISSQN {
 
 	public void setCodigoMunicipioGerador(String codigoMunicipioGerador) {
 		this.codigoMunicipioGerador = codigoMunicipioGerador;
-	}
-
-	public void setCodigoSituacaoTributaria(String codigoSituacaoTributaria) {
-		this.codigoSituacaoTributaria = codigoSituacaoTributaria;
 	}
 
 	public void setItemListaServicos(String itemListaServicos) {

@@ -2,10 +2,13 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "valorTotalTributos", "icms", "ipi", "impostoImportacao", "pis", "pisSubstituicaoTributaria",
+		"cofins", "issqn", "informacaoAdicional" })
 public class TributosProdutoServico {
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "COFINS do produtos/serviços")
 	@XmlElement(name = "COFINS")
@@ -36,6 +39,10 @@ public class TributosProdutoServico {
 
 	@XmlElement(name = "PISST")
 	private PISGeral pisSubstituicaoTributaria;
+
+	@InformacaoValidavel(decimal = { 13, 2 }, nomeExibicao = "Valor total dos tributos do produto/serviço")
+	@XmlElement(name = "vTotTrib")
+	private Double valorTotalTributos;
 
 	public boolean contemCOFINS() {
 		return cofins != null && cofins.getTipoCofins() != null;
@@ -130,6 +137,11 @@ public class TributosProdutoServico {
 		return pis != null ? pis.getTipoPis() : null;
 	}
 
+	@XmlTransient
+	public Double getValorTotalTributos() {
+		return valorTotalTributos == null ? 0 : valorTotalTributos;
+	}
+
 	public void setCofins(COFINS cofins) {
 		this.cofins = cofins;
 	}
@@ -160,6 +172,10 @@ public class TributosProdutoServico {
 
 	public void setPisSubstituicaoTributaria(PISGeral pisSubstituicaoTributaria) {
 		this.pisSubstituicaoTributaria = pisSubstituicaoTributaria;
+	}
+
+	public void setValorTotalTributos(Double valorTotalTributos) {
+		this.valorTotalTributos = valorTotalTributos;
 	}
 
 }

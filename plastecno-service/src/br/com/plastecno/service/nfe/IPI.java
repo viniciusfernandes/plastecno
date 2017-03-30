@@ -9,18 +9,17 @@ import java.lang.reflect.Field;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.nfe.constante.TipoTributacaoIPI;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "classeEnquadramentoCigarrosBebidas", "cnpjProdutor", "codigoSeloControle",
+		"quantidadeSeloControle", "codigoEnquadramento", "ipiTrib", "ipiNt" })
 public class IPI {
-	@XmlElement(name = "cEnq")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Classe de enquadramento do IPI")
-	private String classeEnquadramento;
-
 	@XmlElement(name = "clEnq")
-	@InformacaoValidavel(tamanho = 5, nomeExibicao = "Classe de enquadramento de cigarros/bebidas do IPI")
+	@InformacaoValidavel(intervaloComprimento = { 1, 5 }, nomeExibicao = "Classe de enquadramento de cigarros/bebidas do IPI")
 	private String classeEnquadramentoCigarrosBebidas;
 
 	@XmlElement(name = "CNPJProd")
@@ -28,6 +27,7 @@ public class IPI {
 	private String cnpjProdutor;
 
 	@XmlElement(name = "cEnq")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 3 }, nomeExibicao = "Código de enquadramento do IPI")
 	private String codigoEnquadramento;
 
 	@XmlElement(name = "cSelo")
@@ -46,11 +46,6 @@ public class IPI {
 	@XmlTransient
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo IPI")
 	private IPIGeral tipoIpi;
-
-	@XmlTransient
-	public String getClasseEnquadramento() {
-		return classeEnquadramento;
-	}
 
 	@XmlTransient
 	public String getClasseEnquadramentoCigarrosBebidas() {
@@ -115,10 +110,6 @@ public class IPI {
 				campo.setAccessible(false);
 			}
 		}
-	}
-
-	public void setClasseEnquadramento(String classeEnquadramento) {
-		this.classeEnquadramento = classeEnquadramento;
 	}
 
 	public void setClasseEnquadramentoCigarrosBebidas(String classeEnquadramentoCigarrosBebidas) {

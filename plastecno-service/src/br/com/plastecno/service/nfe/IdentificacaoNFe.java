@@ -4,12 +4,17 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "codigoUFEmitente", "chaveAcesso", "naturezaOperacao", "indicadorFormaPagamento", "modelo",
+		"serie", "numero", "dataHoraEmissao", "dataHoraEntradaSaidaProduto", "tipoOperacao", "destinoOperacao",
+		"municipioOcorrenciaFatorGerador", "tipoImpressao", "tipoEmissao", "digitoVerificador", "tipoAmbiente",
+		"finalidadeEmissao", "operacaoConsumidorFinal", "tipoPresencaComprador", "processoEmissao",
+		"versaoProcessoEmissao", "dataHoraEntradaContigencia", "justificativaContigencia", "listaNFeReferenciada" })
 public class IdentificacaoNFe {
-
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{8}", padraoExemplo = "8 digitos", nomeExibicao = "Código da chave de acesso")
 	@XmlElement(name = "cNF")
 	private String chaveAcesso;
@@ -18,20 +23,20 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "cUF")
 	private String codigoUFEmitente;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Data emissão da NFe")
-	@XmlElement(name = "dEmi")
-	private String dataEmissao;
-
-	@XmlElement(name = "dhCont")
-	private String dataHoraContingencia;
+	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}[-^+]\\d{2}:\\d{2}", padraoExemplo = "yyyy-MM-ddTHH:mm:ss+HH:mm", nomeExibicao = "Data emissão da NFe")
+	@XmlElement(name = "dhEmi")
+	private String dataHoraEmissao;
 
 	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{5}:\\d{2}:\\d{2}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Dada/hora entrada em contigência")
-	@XmlElement(name = "verProc")
+	@XmlElement(name = "dhCont")
 	private String dataHoraEntradaContigencia;
 
-	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}[-^+]\\d{4}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Data e hora entrada/saída produto")
+	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}[-^+]\\d{2}:\\d{2}", padraoExemplo = "yyyy-MM-ddTHH:mm:ss+HH:mm", nomeExibicao = "Data e hora entrada/saída produto")
 	@XmlElement(name = "dhSaiEnt")
 	private String dataHoraEntradaSaidaProduto;
+
+	@XmlTransient
+	private String dataSaida;
 
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d", padraoExemplo = "1 digito", nomeExibicao = "Destino da operação da NFe")
 	@XmlElement(name = "idDest")
@@ -45,9 +50,8 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "finNFe")
 	private Integer finalidadeEmissao;
 
-	@InformacaoValidavel(padrao = "\\d{2}:\\d{2}:\\d{2}", nomeExibicao = "Hora entrada/saída produto")
-	@XmlElement(name = "dSaiEnt")
-	private String horaSaidaEntradaProduto;
+	@XmlTransient
+	private String horaSaida;
 
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Forma de pagamento da NFe")
 	@XmlElement(name = "indPag")
@@ -63,7 +67,7 @@ public class IdentificacaoNFe {
 
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Modelo da NFe")
 	@XmlElement(name = "mod")
-	private final String modelo = "55";
+	private String modelo;
 
 	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{7}", padraoExemplo = "7 digitos", nomeExibicao = "Código município do fator gerador")
 	@XmlElement(name = "cMunFG")
@@ -113,6 +117,10 @@ public class IdentificacaoNFe {
 	@XmlElement(name = "verProc")
 	private String versaoProcessoEmissao;
 
+	public boolean contemNumeroSerieModelo() {
+		return numero != null && serie != null && modelo != null;
+	}
+
 	@XmlTransient
 	public String getChaveAcesso() {
 		return chaveAcesso;
@@ -124,13 +132,8 @@ public class IdentificacaoNFe {
 	}
 
 	@XmlTransient
-	public String getDataEmissao() {
-		return dataEmissao;
-	}
-
-	@XmlTransient
-	public String getDataHoraContingencia() {
-		return dataHoraContingencia;
+	public String getDataHoraEmissao() {
+		return dataHoraEmissao;
 	}
 
 	@XmlTransient
@@ -141,6 +144,11 @@ public class IdentificacaoNFe {
 	@XmlTransient
 	public String getDataHoraEntradaSaidaProduto() {
 		return dataHoraEntradaSaidaProduto;
+	}
+
+	@XmlTransient
+	public String getDataSaida() {
+		return dataSaida;
 	}
 
 	@XmlTransient
@@ -159,8 +167,8 @@ public class IdentificacaoNFe {
 	}
 
 	@XmlTransient
-	public String getHoraSaidaEntradaProduto() {
-		return horaSaidaEntradaProduto;
+	public String getHoraSaida() {
+		return horaSaida;
 	}
 
 	@XmlTransient
@@ -252,12 +260,8 @@ public class IdentificacaoNFe {
 		this.codigoUFEmitente = codigoUFEmitente;
 	}
 
-	public void setDataEmissao(String dataEmissao) {
-		this.dataEmissao = dataEmissao;
-	}
-
-	public void setDataHoraContingencia(String dataHoraContingencia) {
-		this.dataHoraContingencia = dataHoraContingencia;
+	public void setDataHoraEmissao(String dataEmissao) {
+		this.dataHoraEmissao = dataEmissao;
 	}
 
 	public void setDataHoraEntradaContigencia(String dataHoraEntradaContigencia) {
@@ -266,6 +270,10 @@ public class IdentificacaoNFe {
 
 	public void setDataHoraEntradaSaidaProduto(String dataHoraEntradaSaidaProduto) {
 		this.dataHoraEntradaSaidaProduto = dataHoraEntradaSaidaProduto;
+	}
+
+	public void setDataSaida(String dataSaida) {
+		this.dataSaida = dataSaida;
 	}
 
 	public void setDestinoOperacao(String destinoOperacao) {
@@ -280,8 +288,8 @@ public class IdentificacaoNFe {
 		this.finalidadeEmissao = finalidadeEmissao;
 	}
 
-	public void setHoraSaidaEntradaProduto(String horaSaidaEntradaProduto) {
-		this.horaSaidaEntradaProduto = horaSaidaEntradaProduto;
+	public void setHoraSaida(String horaSaida) {
+		this.horaSaida = horaSaida;
 	}
 
 	public void setIndicadorFormaPagamento(Integer indicadorFormaPagamento) {
@@ -294,6 +302,10 @@ public class IdentificacaoNFe {
 
 	public void setListaNFeReferenciada(List<NFeReferenciada> listaNFeReferenciada) {
 		this.listaNFeReferenciada = listaNFeReferenciada;
+	}
+
+	public void setModelo(String modelo) {
+		this.modelo = modelo;
 	}
 
 	public void setMunicipioOcorrenciaFatorGerador(String municipioOcorrenciaFatorGerador) {

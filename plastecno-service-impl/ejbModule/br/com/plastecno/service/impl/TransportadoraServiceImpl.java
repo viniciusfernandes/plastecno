@@ -1,5 +1,6 @@
 package br.com.plastecno.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -162,9 +163,12 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Transportadora pesquisarById(Integer id) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select m from Transportadora m where m.id =:id ")
-						.setParameter("id", id), Transportadora.class, null);
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select t from Transportadora t left join fetch t.logradouro where t.id =:id ")
+								.setParameter("id", id), Transportadora.class, null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -176,14 +180,13 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 				.setParameter("listaId", listaId).getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Transportadora> pesquisarByNomeFantasia(String nomeFantasia) {
-		Query query = this.entityManager
-				.createQuery("select new Transportadora(c.id, c.nomeFantasia) from Transportadora c where c.nomeFantasia like :nomeFantasia order by c.nomeFantasia asc ");
-		query.setParameter("nomeFantasia", "%" + nomeFantasia + "%");
-		return query.getResultList();
+		if (nomeFantasia == null || nomeFantasia.isEmpty()) {
+			return new ArrayList<Transportadora>();
+		}
+		return transportadoraDAO.pesquisarByNomeFantasia(nomeFantasia);
 	}
 
 	@Override

@@ -7,17 +7,17 @@
 <jsp:include page="/bloco/bloco_css.jsp"></jsp:include>
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/picklist.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/picklist.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/tabela_handler.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/logradouro.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bloco/contato.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
 
 <script type="text/javascript">
 
@@ -31,11 +31,19 @@ $(document).ready(function() {
 	var urlTela = '<c:url value="/cliente"/>'; 
 	tabelaLogradouroHandler = inicializarBlocoLogradouro(urlTela);
 	tabelaLogradouroHandler.setNumeroLinhasCopiadas(3);
-	tabelaLogradouroHandler.setAjusteLinhasCopiadas(function(linhas){
+	tabelaLogradouroHandler.setClonarLinha(function(linha, tabela){
+		if(tabela.rows.length >=3){
+			return;
+		}
+		var clone = null;
 		var tipos = ['FATURAMENTO', 'ENTREGA', 'COBRANCA'];
-		linhas[0].cells[1].innerHTML = tipos[0];
-		linhas[1].cells[1].innerHTML = tipos[1];
-		linhas[2].cells[1].innerHTML = tipos[2];
+		for (var j = 0; j < tipos.length; j++) {
+			if(linha.cells[1].innerHTML != tipos[j]){
+				clone = linha.cloneNode(true);
+				clone.cells[1].innerHTML = tipos[j];					
+				tabela.appendChild(clone);
+			}
+		}
 	});
 	
 	tabelaContatoHandler = inicializarBlocoContato(urlTela);
@@ -85,6 +93,7 @@ $(document).ready(function() {
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
+	inserirMascaraNumerica('inscricaoSUFRAMA', '999999999');
 	inicializarCampoPesquisaPicklist({
 		url: '<c:url value="/cliente/transportadora"/>', 
 		mensagemEspera: 'CARREGANDO AS TRANSPORTADORAS ...',
@@ -208,12 +217,17 @@ function remover(codigo, nome) {
 				<input type="text" id="inscricaoEstadual"
 					name="cliente.inscricaoEstadual"
 					value="${cliente.inscricaoEstadual}"
-					style="width: 40%; text-align: right;" />
+					style="width: 40%;" />
+			</div>
+			<div class="label">Insc. SUFRAMA:</div>
+			<div class="input" style="width: 20%">
+				<input type="text" id="inscricaoSUFRAMA" name="cliente.inscricaoSUFRAMA" value="${cliente.inscricaoSUFRAMA}"
+					style="width: 100%;" maxlength="9"/>
 			</div>
 			<div class="label">Doc. Estrang.:</div>
-			<div class="input" style="width: 80%">
+			<div class="input" style="width: 40%">
 				<input type="text" id="documentoEstrangeiro" name="cliente.documentoEstrangeiro" 
-				value="${cliente.documentoEstrangeiro}" maxlength="15" style="width: 25%" />
+				value="${cliente.documentoEstrangeiro}" maxlength="15" style="width: 40%" />
 			</div>
 			<div class="label">CPF:</div>
 			<div class="input" style="width: 80%">

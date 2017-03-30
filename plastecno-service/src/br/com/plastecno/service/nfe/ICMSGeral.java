@@ -2,11 +2,17 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Código de situação tributária")
+@XmlType(propOrder = { "origemMercadoria", "valorBCSTRetido", "valorSTRetido", "valorBCSTUFDestino",
+		"valorSTUFDestino", "codigoSituacaoTributaria", "modalidadeDeterminacaoBC", "percentualReducaoBC", "valorBC",
+		"aliquota", "valorOperacao", "percentualDiferimento", "valorDiferimento", "valor", "valorDesonerado",
+		"motivoDesoneracao", "modalidadeDeterminacaoBCST", "percentualMargemValorAdicionadoICMSST",
+		"percentualReducaoBCST", "valorBCST", "aliquotaST", "valorST", "percentualBCOperacaoPropria", "ufDividaST" })
 public class ICMSGeral {
 
 	@XmlElement(name = "pICMS")
@@ -61,8 +67,8 @@ public class ICMSGeral {
 	@InformacaoValidavel(tiposObrigatorios = { "PART" }, nomeExibicao = "UF de partilha do ICMS")
 	private String ufDividaST;
 
-	@XmlElement(name = "vICMS")
 	@InformacaoValidavel(decimal = { 13, 2 }, tiposNaoPermitidos = { "40", "41", "50", "70" }, nomeExibicao = "Valor calculado do ICMS")
+	@XmlElement(name = "vICMS")
 	private Double valor;
 
 	@XmlElement(name = "vBC")
@@ -101,15 +107,19 @@ public class ICMSGeral {
 	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "60" }, nomeExibicao = "Valor ST retido")
 	private Double valorSTRetido;
 
-	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0d;
+	@XmlElement(name = "vICMSSTDest")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "PART" }, nomeExibicao = "Valor ICMS ST da UF de destino")
+	private Double valorSTUFDestino;
+
+	public Double calcularValor() {
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : null;
 	}
 
-	public double calcularValorST() {
-		return valorBCST != null && aliquotaST != null ? valorBCST * (aliquotaST / 100d) : 0d;
+	public Double calcularValorST() {
+		return valorBCST != null && aliquotaST != null ? valorBCST * (aliquotaST / 100d) : null;
 	}
 
-	public ICMSGeral carregarValoresAliquotas() {
+	public ICMSGeral carregarValores() {
 		valor = calcularValor();
 		valorST = calcularValorST();
 		return this;
@@ -197,7 +207,11 @@ public class ICMSGeral {
 
 	@XmlTransient
 	public Double getValorBCST() {
-		return valorBCST == null ? 0 : valorBCST;
+		// Nao podemos verificar se o valor eh null e retornar zero como nos
+		// outros campos pois, no caso de ICMS em que nao eh substituicao
+		// tributaria, o valor de aliquota zero esta sendo serializado no CML da
+		// Nfe e isso nao deve ocorrer.
+		return valorBCST;
 	}
 
 	@XmlTransient
@@ -212,7 +226,7 @@ public class ICMSGeral {
 
 	@XmlTransient
 	public Double getValorDesonerado() {
-		return valorDesonerado;
+		return valorDesonerado == null ? 0 : valorDesonerado;
 	}
 
 	@XmlTransient
@@ -233,6 +247,11 @@ public class ICMSGeral {
 	@XmlTransient
 	public Double getValorSTRetido() {
 		return valorSTRetido;
+	}
+
+	@XmlTransient
+	public Double getValorSTUFDestino() {
+		return valorSTUFDestino;
 	}
 
 	public void setAliquota(Double aliquota) {
@@ -326,4 +345,9 @@ public class ICMSGeral {
 	public void setValorSTRetido(Double valorSTRetido) {
 		this.valorSTRetido = valorSTRetido;
 	}
+
+	public void setValorSTUFDestino(Double valorSTUFDestino) {
+		this.valorSTUFDestino = valorSTUFDestino;
+	}
+
 }

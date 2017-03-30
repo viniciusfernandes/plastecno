@@ -42,8 +42,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 	}
 
 	@Override
-	public <T extends Logradouro> List<T> inserir(List<T> listaLogradouro)
-			throws BusinessException {
+	public <T extends Logradouro> List<T> inserir(List<T> listaLogradouro) throws BusinessException {
 		if (listaLogradouro == null) {
 			return null;
 		}
@@ -67,16 +66,14 @@ public class LogradouroServiceImpl implements LogradouroService {
 	 * .entity.Logradouro)
 	 */
 	@Override
-	public <T extends Logradouro> T inserir(T logradouro)
-			throws BusinessException {
+	public <T extends Logradouro> T inserir(T logradouro) throws BusinessException {
 		if (logradouro != null) {
 
 			/*
 			 * Aqui vamos configuirar o endereco, pois o servico de inclusao de
 			 * enderecos recuperar os IDS do bairro, cidade e pais.
 			 */
-			logradouro.addEndereco(enderecamentoService.inserir(logradouro
-					.recuperarEndereco()));
+			logradouro.addEndereco(enderecamentoService.inserir(logradouro.recuperarEndereco()));
 			return (T) logradouroDAO.alterar(logradouro);
 		}
 		return null;
@@ -85,39 +82,29 @@ public class LogradouroServiceImpl implements LogradouroService {
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<? extends Logradouro> pesquisar(Integer id,
-			Class<? extends Logradouro> classe) {
+	public List<? extends Logradouro> pesquisar(Integer id, Class<? extends Logradouro> classe) {
 		String nomeTipoLogradouro = classe.getSimpleName();
 		StringBuilder select = new StringBuilder();
-		select.append("select c from ")
-				.append(nomeTipoLogradouro)
-				.append(" c inner join c.")
-				.append(nomeTipoLogradouro.replace("Logradouro", "")
-						.toLowerCase()).append(" l where l.id =:id");
+		select.append("select c from ").append(nomeTipoLogradouro).append(" c inner join c.")
+				.append(nomeTipoLogradouro.replace("Logradouro", "").toLowerCase()).append(" l where l.id =:id");
 
-		return this.entityManager.createQuery(select.toString())
-				.setParameter("id", id).getResultList();
+		return this.entityManager.createQuery(select.toString()).setParameter("id", id).getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public <T extends Logradouro> List<T> pesquisarAusentes(Integer id,
-			Collection<T> listaLogradouro, Class<T> classe) {
+	public <T extends Logradouro> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe) {
 		String nomeTipoLogradouro = classe.getSimpleName();
 		StringBuilder select = new StringBuilder();
-		select.append("select l from ")
-				.append(nomeTipoLogradouro)
-				.append(" l where l.")
-				.append(nomeTipoLogradouro.replace("Logradouro", "")
-						.toLowerCase()).append(".id =:id ");
+		select.append("select l from ").append(nomeTipoLogradouro).append(" l where l.")
+				.append(nomeTipoLogradouro.replace("Logradouro", "").toLowerCase()).append(".id =:id ");
 
 		if (listaLogradouro != null && !listaLogradouro.isEmpty()) {
 			select.append(" and l not in (:listaLogradouro) ");
 		}
 
-		final Query query = this.entityManager.createQuery(select.toString())
-				.setParameter("id", id);
+		final Query query = this.entityManager.createQuery(select.toString()).setParameter("id", id);
 
 		if (listaLogradouro != null && !listaLogradouro.isEmpty()) {
 			query.setParameter("listaLogradouro", listaLogradouro);
@@ -127,15 +114,13 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public <T extends Logradouro> T pesquisarById(Integer idLogradouro,
-			Class<T> classe) {
+	public <T extends Logradouro> T pesquisarById(Integer idLogradouro, Class<T> classe) {
 		String nomeTipoLogradouro = classe.getSimpleName();
 		StringBuilder select = new StringBuilder();
-		select.append("select c from ").append(nomeTipoLogradouro)
-				.append(" c where c.id = :idLogradouro ");
+		select.append("select c from ").append(nomeTipoLogradouro).append(" c where c.id = :idLogradouro ");
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(select.toString()).setParameter(
-						"idLogradouro", idLogradouro), classe, null);
+				this.entityManager.createQuery(select.toString()).setParameter("idLogradouro", idLogradouro), classe,
+				null);
 	}
 
 	@Override
@@ -158,13 +143,10 @@ public class LogradouroServiceImpl implements LogradouroService {
 		if (idCidade == null) {
 			return null;
 		}
-		return QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createNativeQuery(
-										"select c.cod_ibge from enderecamento.tb_cidade as c where c.id_cidade = :idCidade")
-								.setParameter("idCidade", idCidade),
-						String.class, "");
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createNativeQuery(
+						"select c.cod_ibge from enderecamento.tb_cidade as c where c.id_cidade = :idCidade")
+						.setParameter("idCidade", idCidade), String.class, "");
 	}
 
 	/*
@@ -175,10 +157,8 @@ public class LogradouroServiceImpl implements LogradouroService {
 	 * Integer, java.util.Collection, java.lang.Class)
 	 */
 	@Override
-	public <T extends Logradouro> void removerAusentes(Integer id,
-			Collection<T> listaLogradouro, Class<T> classe) {
-		List<? extends Logradouro> listaLogradouroCadastrado = this
-				.pesquisarAusentes(id, listaLogradouro, classe);
+	public <T extends Logradouro> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe) {
+		List<? extends Logradouro> listaLogradouroCadastrado = this.pesquisarAusentes(id, listaLogradouro, classe);
 		for (Logradouro logradouro : listaLogradouroCadastrado) {
 			this.entityManager.remove(logradouro);
 		}
@@ -187,8 +167,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void validarListaLogradouroPreenchida(
-			Collection<? extends Logradouro> listaLogradouro)
+	public void validarListaLogradouroPreenchida(Collection<? extends Logradouro> listaLogradouro)
 			throws BusinessException {
 		Set<TipoLogradouro> listaTipoLogradouroNaoPreenchido = new HashSet<TipoLogradouro>();
 		listaTipoLogradouroNaoPreenchido.add(TipoLogradouro.COBRANCA);
@@ -197,8 +176,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 		if (listaLogradouro != null) {
 			for (Logradouro logradouro : listaLogradouro) {
-				listaTipoLogradouroNaoPreenchido.remove(logradouro
-						.getTipoLogradouro());
+				listaTipoLogradouroNaoPreenchido.remove(logradouro.getTipoLogradouro());
 			}
 		}
 

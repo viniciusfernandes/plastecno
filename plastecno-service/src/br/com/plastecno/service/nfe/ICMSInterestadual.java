@@ -2,10 +2,13 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "valorBCUFDestino", "percentualFCPDestino", "aliquotaUFDestino", "aliquotaInterestadual",
+		"percentualProvisorioPartilha", "valorFCPDestino", "valorUFDestino", "valorUFRemetente" })
 public class ICMSInterestadual {
 	@XmlElement(name = "pICMSInter")
 	@InformacaoValidavel(obrigatorio = true, decimal = { 2, 2 }, nomeExibicao = "Alíquota interestadual do ICMS interestadual")
@@ -39,18 +42,25 @@ public class ICMSInterestadual {
 	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, nomeExibicao = "Valor de destino do remetente do ICMS interestadual")
 	private Double valorUFRemetente;
 
-	public ICMSInterestadual carregarValoresAliquotas() {
-		double aliquotaDif = ((aliquotaUFDestino != null ? aliquotaUFDestino : 0) - (aliquotaInterestadual != null ? aliquotaInterestadual
-				: 0)) / 100d;
-		valorFCPDestino = valorBCUFDestino != null && percentualFCPDestino != null ? valorBCUFDestino
-				* (percentualFCPDestino / 100d) : 0d;
+	public ICMSInterestadual carregarValores() {
+		if (valorBCUFDestino != null && percentualFCPDestino != null) {
+			valorFCPDestino = valorBCUFDestino * percentualFCPDestino / 100d;
+		} else {
+			valorFCPDestino = null;
+		}
 
-		valorUFDestino = valorBCUFDestino != null && aliquotaUFDestino != null ? valorBCUFDestino * aliquotaDif : 0d;
-		valorUFDestino *= (percentualProvisorioPartilha != null ? percentualProvisorioPartilha : 0d) / 100d;
+		if (valorBCUFDestino != null && aliquotaUFDestino != null && percentualProvisorioPartilha != null) {
+			valorUFDestino = valorBCUFDestino * aliquotaUFDestino * percentualProvisorioPartilha / 10000d;
+		} else {
+			valorUFDestino = null;
+		}
 
-		valorUFRemetente = valorBCUFDestino != null && aliquotaInterestadual != null ? valorBCUFDestino * aliquotaDif
-				: 0d;
-		valorUFRemetente -= valorUFDestino;
+		if (valorBCUFDestino != null && aliquotaUFDestino != null) {
+			valorUFRemetente = valorBCUFDestino * aliquotaUFDestino / 100d
+					- (valorUFDestino == null ? 0d : valorUFDestino);
+		} else {
+			valorFCPDestino = null;
+		}
 		return this;
 	}
 
@@ -81,17 +91,17 @@ public class ICMSInterestadual {
 
 	@XmlTransient
 	public Double getValorFCPDestino() {
-		return valorFCPDestino;
+		return valorFCPDestino == null ? 0 : valorFCPDestino;
 	}
 
 	@XmlTransient
 	public Double getValorUFDestino() {
-		return valorUFDestino;
+		return valorUFDestino == null ? 0 : valorUFDestino;
 	}
 
 	@XmlTransient
 	public Double getValorUFRemetente() {
-		return valorUFRemetente;
+		return valorUFRemetente == null ? 0 : valorUFRemetente;
 	}
 
 	public void setAliquotaInterestadual(Double aliquotaInterestadual) {

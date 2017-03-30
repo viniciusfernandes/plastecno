@@ -47,11 +47,11 @@ public class ControleAcessoInterceptor implements Interceptor {
     public void intercept(InterceptorStack stack, ResourceMethod metodo, Object resourceInstance) {
         /*
          * Caso o usuario nao esteja logado no sistema, vamos direciona-lo a
-         * tela de login. Apos configurarmos o redirecionamento, chamamos o
-         * stack.next para dar sequencia na executar do metodo.
+         * tela de login.
          */
         if (!usuarioInfo.isLogado()) {
-            this.result.forwardTo(LoginController.class).redirecionarLogin();
+            result.forwardTo(LoginController.class).redirecionarLogin();
+            return;
         }
 
         if (auditoriaHabilidata) {
@@ -80,11 +80,11 @@ public class ControleAcessoInterceptor implements Interceptor {
                 mensagem = "Tentativa de acesso por usuario nao autenticado ou timeoute de sessao";
             }
             mensagem += ". Possivel causa: " + e.getMessage();
-            logger.log(Level.WARNING, mensagem);
+            logger.log(Level.WARNING, mensagem, e);
         } catch (RuntimeException e) {
             logger.log(Level.SEVERE,
                     "Falha na interceptacao do metodo \"" + metodo.getMethod().getName() + "\" efetuado pelo usuario: "
-                            + usuarioInfo.getDescricaoLogin() + ". Possivel causa: " + e.getMessage());
+                            + usuarioInfo.getDescricaoLogin() + ". Possivel causa: " + e.getMessage(), e);
             throw e;
         }
     }

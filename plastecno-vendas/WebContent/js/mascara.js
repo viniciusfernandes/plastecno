@@ -40,7 +40,7 @@ function inserirMascaraDecimal(idCampo, digitos, precisao) {
 	// Aqui adicionamos um caracter referente ao ponto da casa decimal
 	$('#'+idCampo).attr('maxlength', digitos + 1);
 	// A separacao entre os milhares nao pode ter simbolos de sepadas casas
-	$('#'+idCampo).maskMoney({thousands:'', decimal:'.', precision: precisao});
+	$('#'+idCampo).maskMoney({thousands:'', decimal:'.', allowZero: true, precision: precisao});
 };
 
 function mascaraData(idCampo, mascara){
@@ -52,9 +52,14 @@ function mascaraData(idCampo, mascara){
 		monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
 		monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
 		nextText: 'Próximo',
-		prevText: 'Anterior' 
+		prevText: 'Anterior',
+		timeFormat:  "hh:mm:ss"
 	});
 }
+
+function inserirMascaraHora(idCampo) {
+	$('#'+idCampo).mask('99:99');
+};
 
 function inserirMascaraData(idCampo) {
 	mascaraData(idCampo, 'dd/mm/yy');

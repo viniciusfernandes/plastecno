@@ -75,6 +75,10 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(intervaloComprimento = { 0, 15 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscrição estadual do Cliente")
 	private String inscricaoEstadual;
 
+	@Column(name = "inscricao_suframa")
+	@InformacaoValidavel(padrao = "\\d{8,9}", padraoExemplo = "de 8 a 9 digitos", nomeExibicao = "Inscrição na SUFRAMA")
+	private String inscricaoSUFRAMA;
+
 	/*
 	 * Tivemos que implementar como um Set pois o hibernate tem uma limitacao em
 	 * fazer multiplos fetchs com o tipo list e collection. Isso apareceu na
@@ -139,6 +143,12 @@ public class Cliente implements Serializable {
 		this.cpf = cpf;
 		this.inscricaoEstadual = inscricaoEstadual;
 		this.email = email;
+	}
+
+	public Cliente(Integer id, String nomeFantasia, String razaoSozial, String cnpj, String cpf,
+			String inscricaoEstadual, String inscricaoSUFRAMA, String email) {
+		this(id, nomeFantasia, razaoSozial, cnpj, cpf, inscricaoEstadual, email);
+		this.inscricaoSUFRAMA = inscricaoSUFRAMA;
 	}
 
 	public void addContato(ContatoCliente contatoCliente) {
@@ -241,6 +251,10 @@ public class Cliente implements Serializable {
 
 	public String getInscricaoEstadual() {
 		return inscricaoEstadual;
+	}
+
+	public String getInscricaoSUFRAMA() {
+		return inscricaoSUFRAMA;
 	}
 
 	public Set<ContatoCliente> getListaContato() {
@@ -356,6 +370,10 @@ public class Cliente implements Serializable {
 
 	public void setInscricaoEstadual(String inscricaoEstadual) {
 		this.inscricaoEstadual = inscricaoEstadual;
+	}
+
+	public void setInscricaoSUFRAMA(String inscricaoSUFRAMA) {
+		this.inscricaoSUFRAMA = inscricaoSUFRAMA;
 	}
 
 	public void setListaContato(Set<ContatoCliente> listaContato) {

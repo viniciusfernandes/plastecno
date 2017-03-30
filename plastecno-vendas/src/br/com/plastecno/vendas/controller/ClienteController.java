@@ -206,16 +206,16 @@ public class ClienteController extends AbstractController {
         serializarJson(new SerializacaoJson("lista", lista));
     }
 
-    @Get("cliente/cnpj")
-    public void pesquisarClienteResumidoByCnpj(String cnpj) {
+    @Get("cliente/serializacao/cnpj")
+    public void pesquisarClienteSerializadoByCnpj(String cnpj) {
         Cliente c = clienteService.pesquisarClienteResumidoByCnpj(cnpj);
-        serializarJson(new SerializacaoJson("cliente", new ClienteJson(c)));
+        serializarJson(new SerializacaoJson("cliente", new ClienteJson(c, c.getLogradouroFaturamento()), true));
     }
 
     @Get("cliente/serializacao/{idCliente}")
     public void pesquisarClienteSerializadoById(Integer idCliente) {
-        Cliente cliente = clienteService.pesquisarClienteResumidoEContatoById(idCliente);
-        serializarJson(new SerializacaoJson("cliente", new ClienteJson(cliente)));
+        Cliente c = clienteService.pesquisarClienteResumidoLogradouroById(idCliente);
+        serializarJson(new SerializacaoJson("cliente", new ClienteJson(c, c.getLogradouroFaturamento()), true));
     }
 
     @Get("cliente/transportadora")

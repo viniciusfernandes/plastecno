@@ -351,10 +351,12 @@ public class ClienteServiceImpl implements ClienteService {
 	@REVIEW(descricao = "Esse metodo esta sendo chamado na tela de pedidos e estamos retornando mais informacao do que o necessario.")
 	public Cliente pesquisarClienteEContatoById(Integer idCliente) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select c from Cliente c join fetch c.listaContato where c.id = :idCliente")
-						.setParameter("idCliente", idCliente), Cliente.class, null);
+				entityManager.createQuery(
+						"select c from Cliente c left join fetch c.listaContato where c.id = :idCliente").setParameter(
+						"idCliente", idCliente), Cliente.class, null);
 	}
 
+	@REVIEW(descricao = "Acredito que nesse servico nao precisamos carregar todos os logradouros e os contatos.")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Cliente pesquisarClienteResumidoByCnpj(String cnpj) {
@@ -362,11 +364,12 @@ public class ClienteServiceImpl implements ClienteService {
 		if (c != null) {
 			c.addLogradouro(pesquisarLogradouro(c.getId()));
 			c.addContato(pesquisarContato(c.getId()));
+			// Estamos anulando oconteudo desses campos para evitar
+			// lazyloadException que estava acontecedendo em algumas requisicoes
+			// ajax.
+			c.setVendedor(null);
+			c.setListaRedespacho(null);
 		}
-		// Estamos anulando oconteudo desses campos para evitar
-		// lazyloadException
-		c.setVendedor(null);
-		c.setListaRedespacho(null);
 		return c;
 	}
 
@@ -378,8 +381,12 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Cliente pesquisarClienteResumidoEContatoById(Integer idCliente) {
-		return clienteDAO.pesquisarClienteResumidoEContatoById(idCliente);
+	public Cliente pesquisarClienteResumidoLogradouroById(Integer idCliente) {
+		Cliente c = clienteDAO.pesquisarClienteResumidoLogradouroById(idCliente);
+		if (c != null) {
+			c.addLogradouro(pesquisarLogradouro(idCliente));
+		}
+		return c;
 	}
 
 	@Override

@@ -248,7 +248,7 @@ public class EntidadeBuilder {
 		Logradouro l = buildLogradouro(TipoLogradouro.FATURAMENTO);
 		l.setCep("09910345");
 		l.setEndereco("Rua Parnamirim");
-		l.setNumero(432);
+		l.setNumero("432");
 		l.setCidade("Diadema");
 		l.setComplemento("Conjunto 330");
 		representada.setLogradouro(l);

@@ -2,15 +2,18 @@ package br.com.plastecno.service.nfe;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Códido da situação tributária")
+@XmlType(propOrder = { "codigoSituacaoTributaria", "valorBC", "aliquota", "quantidadeVendida", "valorAliquota", "valor" })
 public class PISGeral {
 	@XmlElement(name = "pPIS")
-	@InformacaoValidavel(obrigatorio = true, decimal = { 3, 4 }, tiposNaoPermitidos = { "04", "05", "06", "07", "08",
-			"09" }, nomeExibicao = "Alíquota do PIS")
+	@InformacaoValidavel(decimal = { 3, 4 }, tiposObrigatorios = { "01", "02", "03", "49", "50", "51", "52", "53",
+			"54", "55", "56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98",
+			"99", "ST" }, tiposNaoPermitidos = { "04", "05", "06", "07", "08", "09" }, nomeExibicao = "Alíquota do PIS")
 	private Double aliquota;
 
 	@XmlElement(name = "CST")
@@ -19,18 +22,19 @@ public class PISGeral {
 
 	@XmlElement(name = "qBCProd")
 	@InformacaoValidavel(decimal = { 12, 4 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
-			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99","ST" }, tiposNaoPermitidos = {
+			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99", "ST" }, tiposNaoPermitidos = {
 			"04", "05", "06", "07", "08", "09" }, nomeExibicao = "Quantidade vendida do PIS")
 	private Integer quantidadeVendida;
 
 	@XmlElement(name = "vPIS")
-	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 2 }, tiposNaoPermitidos = { "04", "05", "06", "07", "08",
-			"09" }, nomeExibicao = "Valor do PIS")
+	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
+			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99", "ST" }, tiposNaoPermitidos = {
+			"04", "05", "06", "07", "08", "09" }, nomeExibicao = "Valor do PIS")
 	private Double valor;
 
 	@XmlElement(name = "vAliqProd")
 	@InformacaoValidavel(decimal = { 11, 4 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
-			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99","ST" }, tiposNaoPermitidos = {
+			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99", "ST" }, tiposNaoPermitidos = {
 			"04", "05", "06", "07", "08", "09" }, nomeExibicao = "Valor da alíquota do PIS")
 	private Double valorAliquota;
 
@@ -40,11 +44,11 @@ public class PISGeral {
 			"ST" }, tiposNaoPermitidos = { "04", "05", "06", "07", "08", "09" }, nomeExibicao = "Valor de base de cáculo do PIS")
 	private Double valorBC;
 
-	public double calcularValor() {
-		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : 0;
+	public Double calcularValor() {
+		return valorBC != null && aliquota != null ? valorBC * (aliquota / 100d) : null;
 	}
 
-	public PISGeral carregarValoresAliquotas() {
+	public PISGeral carregarValores() {
 		valor = calcularValor();
 		valorAliquota = valor;
 		return this;
@@ -77,7 +81,7 @@ public class PISGeral {
 
 	@XmlTransient
 	public Double getValorAliquota() {
-		return valorAliquota;
+		return valorAliquota == null ? 0 : valorAliquota;
 	}
 
 	@XmlTransient

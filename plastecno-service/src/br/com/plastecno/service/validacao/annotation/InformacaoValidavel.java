@@ -12,6 +12,8 @@ import br.com.plastecno.service.constante.TipoDocumento;
 public @interface InformacaoValidavel {
 	String campoCondicional() default "";
 
+	String campoIdentificacao() default "";
+
 	boolean cascata() default false;
 
 	boolean customizado() default false;

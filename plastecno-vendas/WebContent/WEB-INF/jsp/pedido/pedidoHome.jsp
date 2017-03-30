@@ -9,17 +9,17 @@
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/tabela_handler.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/logradouro.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/bloco/contato.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/tabela_handler.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/logradouro.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/bloco/contato.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/pedido/pedido.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/pedido/pedido.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 
@@ -61,7 +61,11 @@ $(document).ready(function() {
 		form.submit();
 		
 	});
-
+	
+	$("#botaoLimparNumeroPedido").click(function() {
+		 $('#formLimparPedido').submit();
+	});
+	
 	$("#representada").change(function() {
 		habilitarIPI('<c:url value="/pedido"/>', $(this).val());	
 	});
@@ -117,7 +121,7 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	inicializarAutomcompleteCliente('<c:url value="/pedido/cliente"/>');
-
+	<%--Desabilitando toda a tela de pedidos --%>
 	<c:if test="${pedidoDesabilitado}">
 		$('input[type=text], select:not(.semprehabilitado), textarea').attr('disabled', true).addClass('desabilitado');
 	</c:if>
@@ -199,7 +203,8 @@ $(document).ready(function() {
 			<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
 			<input type="hidden" id="tipoPedido" name="pedido.tipoPedido" value="${tipoPedido}" />
 			<input type="hidden" id="orcamento" name="pedido.orcamento" value="${empty orcamento ? false : orcamento}" />
-
+			<input type="hidden" id="situacaoPedido" name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
+			
 			<c:if test="${not empty pedido.id}">
 			<div class="label">Pedido(s) de ${empty tipoPedido ? 'Compra:': 'Venda:'}</div>
 			<div class="input" style="width: 80%">
@@ -221,7 +226,7 @@ $(document).ready(function() {
 			</div>
 			<div class="label" style="width: 10%">Situação:</div>
 			<div class="input" style="width: 20%">
-				<input type="text" id="situacaoPedido" name="pedido.situacaoPedido" 
+				<input type="text" name="pedido.situacaoPedido" 
 					value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled" width="95%"/>
 			</div>
 			
@@ -234,7 +239,11 @@ $(document).ready(function() {
 				<input type="button" id="botaoPesquisaNumeroPedido"
 					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
 			</div>
-			<div class="label">Nr. Pedido Cliente:</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoLimparNumeroPedido"
+					title="Limpar Pedido" value="" class="botaoLimparPequeno" />
+			</div>
+			<div class="label" style="width: 13%">Nr. Pedido Cliente:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoCliente"
 					name="pedido.numeroPedidoCliente"
@@ -372,7 +381,7 @@ $(document).ready(function() {
 			<input type="hidden" name="orcamento" id="orcamento" value="${empty orcamento ? false : orcamento}"/>
 			<input type="button" id="botaoPesquisaPedido" value="" title="Pesquisar Dados do Pedido" class="botaoPesquisar" />
 		</form>
-		<form action="pedido/limpar" method="get">
+		<form id="formLimparPedido" action="pedido/limpar" method="get">
 			<input type="hidden" name="tipoPedido" value="${tipoPedido}" />
 			<input type="hidden" name="orcamento" id="orcamento" value="${empty orcamento ? false : orcamento}"/>
 			<input type="submit" value="" title="Limpar Dados do Pedido" class="botaoLimpar" />

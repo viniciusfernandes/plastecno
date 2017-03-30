@@ -4,10 +4,14 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
+@XmlType(propOrder = { "numero", "dataImportacao", "localDesembaraco", "ufDesembaraco", "dataDesembaraco",
+		"tipoTransporteInternacional", "valorAFRMM", "tipoIntermediacao", "cnpjEncomendante", "ufEncomendante",
+		"codigoExportador", "listaAdicao" })
 public class DeclaracaoImportacao {
 	@InformacaoValidavel(padrao = "\\d{14}", padraoExemplo = "14 digitos", nomeExibicao = "CNPJ encomendante de importação do produto/serviço")
 	@XmlElement(name = "CNPJ")

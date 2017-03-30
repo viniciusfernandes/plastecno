@@ -1,11 +1,19 @@
 package br.com.plastecno.service.nfe;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
-@InformacaoValidavel
+@InformacaoValidavel(campoIdentificacao = "codigo")
+@XmlType(propOrder = { "codigo", "descricao", "ncm", "cest", "EXTIPI", "cfop", "unidadeComercial",
+		"quantidadeComercial", "valorUnitarioComercializacao", "valorTotalBruto", "unidadeTributavel",
+		"quantidadeTributavel", "valorUnitarioTributacao", "valorTotalFrete", "valorTotalSeguro", "valorDesconto",
+		"outrasDespesasAcessorias", "indicadorValorTotal", "listaDeclaracaoImportacao", "listaDeclaracaoExportacao",
+		"numeroPedidoCompra", "itemPedidoCompra", "fichaConteudoImportacao" })
 public class ProdutoServicoNFe {
 	@XmlElement(name = "CEST")
 	@InformacaoValidavel(padrao = "\\d{7}", padraoExemplo = "7 dígitos", nomeExibicao = "CEST do produtos/serviços")
@@ -23,23 +31,29 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "xProd")
 	private String descricao;
 
-	// @InformacaoValidavel(obrigatorio = true, tamanhos = { 0, 8, 12, 13, 14 },
-	// nomeExibicao = "Código EAN ou de barras do produto/serviço")
-	@XmlElement(name = "cEAN")
-	private String EAN;
-
-	// @InformacaoValidavel(obrigatorio = true, tamanhos = { 1, 8, 12, 13, 14 },
-	// nomeExibicao = "EAN tributável do produtos/serviços")
-	@XmlElement(name = "cEANTrib")
-	private String EANTributavel;
-
 	@InformacaoValidavel(intervaloComprimento = { 2, 3 }, nomeExibicao = "EXTIPI do produtos/serviços")
 	@XmlElement(name = "EXTIPI")
 	private String EXTIPI;
 
+	@InformacaoValidavel(tamanho = 36, nomeExibicao = "FCI de produtos/serviços")
+	@XmlElement(name = "nFCI")
+	private String fichaConteudoImportacao;
+
 	@InformacaoValidavel(obrigatorio = true, intervaloNumerico = { 0, 1 }, nomeExibicao = "Indicador de composição do valor total produtos/serviços")
 	@XmlElement(name = "indTot")
 	private Integer indicadorValorTotal;
+
+	@InformacaoValidavel(padrao = "\\d{6}", padraoExemplo = "6 digitos", prefixo = "0", tamanho = 6, nomeExibicao = "Item de pedido de compra de produtos/serviços")
+	@XmlElement(name = "nItemPed")
+	private String itemPedidoCompra;
+
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Declaração de exportação do produto/serviço")
+	@XmlElement(name = "detExport")
+	private List<DeclaracaoExportacao> listaDeclaracaoExportacao;
+
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Declaração de importação do produto/serviço")
+	@XmlElement(name = "DI")
+	private List<DeclaracaoImportacao> listaDeclaracaoImportacao;
 
 	@InformacaoValidavel(obrigatorio = true, tamanhos = { 2, 8 }, substituicao = { "\\D", "" }, nomeExibicao = "NCM do produtos/serviços")
 	@XmlElement(name = "NCM")
@@ -53,9 +67,9 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "vOutro")
 	private Double outrasDespesasAcessorias;
 
-	@InformacaoValidavel(obrigatorio = true, padrao = "\\d{1,15}\\.{1}\\d{0,4}", padraoExemplo = "0 a 4 decimais", nomeExibicao = "Quantidade comercial do produtos/serviços")
+	@InformacaoValidavel(obrigatorio = true, decimal = { 13, 4 }, nomeExibicao = "Quantidade comercial do produtos/serviços")
 	@XmlElement(name = "qCom")
-	private String quantidadeComercial;
+	private Double quantidadeComercial;
 
 	@XmlElement(name = "qTrib")
 	private Integer quantidadeTributavel;
@@ -91,6 +105,10 @@ public class ProdutoServicoNFe {
 	@XmlElement(name = "vUnTrib")
 	private Double valorUnitarioTributacao;
 
+	public boolean contemImportacao() {
+		return listaDeclaracaoImportacao != null && !listaDeclaracaoImportacao.isEmpty();
+	}
+
 	@XmlTransient
 	public String getCest() {
 		return cest;
@@ -112,23 +130,44 @@ public class ProdutoServicoNFe {
 	}
 
 	@XmlTransient
-	public String getEAN() {
-		return EAN;
-	}
-
-	@XmlTransient
-	public String getEANTributavel() {
-		return EANTributavel;
-	}
-
-	@XmlTransient
 	public String getEXTIPI() {
 		return EXTIPI;
 	}
 
 	@XmlTransient
+	public String getFichaConteudoImportacao() {
+		return fichaConteudoImportacao;
+	}
+
+	@XmlTransient
 	public Integer getIndicadorValorTotal() {
 		return indicadorValorTotal;
+	}
+
+	@XmlTransient
+	public String getItemPedidoCompra() {
+		return itemPedidoCompra;
+	}
+
+	@XmlTransient
+	public List<DeclaracaoExportacao> getListaDeclaracaoExportacao() {
+		return listaDeclaracaoExportacao;
+	}
+
+	@XmlTransient
+	public List<DeclaracaoImportacao> getListaDeclaracaoImportacao() {
+		return listaDeclaracaoImportacao;
+	}
+
+	@XmlTransient
+	public List<DeclaracaoExportacao> getListaExportacao() {
+		return getListaDeclaracaoExportacao();
+	}
+
+	// Metodo criado para simplificar a marcacao no .jsp
+	@XmlTransient
+	public List<DeclaracaoImportacao> getListaImportacao() {
+		return getListaDeclaracaoImportacao();
 	}
 
 	@XmlTransient
@@ -147,7 +186,7 @@ public class ProdutoServicoNFe {
 	}
 
 	@XmlTransient
-	public String getQuantidadeComercial() {
+	public Double getQuantidadeComercial() {
 		return quantidadeComercial;
 	}
 
@@ -212,20 +251,37 @@ public class ProdutoServicoNFe {
 		this.descricao = descricao;
 	}
 
-	public void setEAN(String eAN) {
-		EAN = eAN;
-	}
-
-	public void setEANTributavel(String eANTributavel) {
-		EANTributavel = eANTributavel;
-	}
-
 	public void setEXTIPI(String eXTIPI) {
 		EXTIPI = eXTIPI;
 	}
 
+	public void setFichaConteudoImportacao(String fichaConteudoImportacao) {
+		this.fichaConteudoImportacao = fichaConteudoImportacao;
+	}
+
 	public void setIndicadorValorTotal(Integer indicadorValorTotal) {
 		this.indicadorValorTotal = indicadorValorTotal;
+	}
+
+	public void setItemPedidoCompra(String itemPedidoCompra) {
+		this.itemPedidoCompra = itemPedidoCompra;
+	}
+
+	public void setListaDeclaracaoExportacao(List<DeclaracaoExportacao> listaDeclaracaoExportacao) {
+		this.listaDeclaracaoExportacao = listaDeclaracaoExportacao;
+	}
+
+	public void setListaDeclaracaoImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
+		this.listaDeclaracaoImportacao = listaDeclaracaoImportacao;
+	}
+
+	public void setListaExportacao(List<DeclaracaoExportacao> listaDeclaracaoExportacao) {
+		setListaDeclaracaoExportacao(listaDeclaracaoExportacao);
+	}
+
+	// Metodo criado para simplificar marcacao do .jsp
+	public void setListaImportacao(List<DeclaracaoImportacao> listaDeclaracaoImportacao) {
+		this.setListaDeclaracaoImportacao(listaDeclaracaoImportacao);
 	}
 
 	public void setNcm(String ncm) {
@@ -240,7 +296,7 @@ public class ProdutoServicoNFe {
 		this.outrasDespesasAcessorias = outrasDespesasAcessorias;
 	}
 
-	public void setQuantidadeComercial(String quantidadeComercial) {
+	public void setQuantidadeComercial(Double quantidadeComercial) {
 		this.quantidadeComercial = quantidadeComercial;
 	}
 

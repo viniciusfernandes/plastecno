@@ -62,7 +62,7 @@ public interface ClienteService {
 
 	Cliente pesquisarClienteResumidoById(Integer idCliente);
 
-	Cliente pesquisarClienteResumidoEContatoById(Integer idCliente);
+	Cliente pesquisarClienteResumidoLogradouroById(Integer idCliente);
 
 	List<Cliente> pesquisarClientesAssociados(Integer idVendedor);
 

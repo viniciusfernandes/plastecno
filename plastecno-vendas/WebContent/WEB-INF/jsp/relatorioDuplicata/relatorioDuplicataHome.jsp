@@ -10,6 +10,8 @@
 
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
@@ -24,6 +26,7 @@
 		inserirMascaraData('dataInicial');
 		inserirMascaraData('dataFinal');
 		inserirMascaraData('dataVencimento');
+		inserirMascaraMonetaria('valor', 10);
 		
 		$('#botaoPesquisar').click(function () {
 			adicionarInputHiddenFormulario('formVazio', 'dataInicial', document.getElementById('dataInicial').value);
@@ -32,9 +35,11 @@
 		});
 	});
 </script>
+
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
+	<div id="modal"></div>
 	<form id="formVazio" action="<c:url value="/relatorio/duplicata"/>">
 	</form>
 
@@ -71,7 +76,7 @@
 			</div>
 			<div class="label">Vl. (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" value="${valor}" readonly="readonly" class="desabilitado"/>
+				<input type="text" id="valor" name="valor" value="${valor}"/>
 			</div>
 			<div class="bloco_botoes">
 				<input type="submit" value="" class="botaoInserir" title="Alterar Data da Duplicata"/>
@@ -109,10 +114,20 @@
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.tipoSituacaoDuplicata.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/duplicata/${elemento.id}"/>">
+									<form action="<c:url value="/duplicata/${elemento.id}"/>" method="get">
 										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 										<input type="submit" title="Editar Duplicata" value="" class="botaoEditar" />
+									</form>
+									<form action="<c:url value="/duplicata/liquidacao/${elemento.id}"/>" method="post">
+										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+										<input type="submit" title="Liquidar Duplicata" value="" class="botaoVerificarPequeno" />
+									</form>
+									<form action="<c:url value="/duplicata/remocao/${elemento.id}"/>" method="post">
+										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+										<input type="submit" title="Remover Duplicata" value="" class="botaoRemover" />
 									</form>
 								</div>
 							</td>

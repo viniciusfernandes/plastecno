@@ -14,6 +14,7 @@ import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.dao.NFeDuplicataDAO;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.wrapper.Periodo;
 
 @Stateless
@@ -26,14 +27,28 @@ public class DuplicataServiceImpl implements DuplicataService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarDataVendimentoById(Integer idDuplicata, Date dataVencimento) throws BusinessException {
+	public void alterarDataVendimentoValorById(Integer idDuplicata, Date dataVencimento, Double valor)
+			throws BusinessException {
 		if (idDuplicata == null) {
 			return;
 		}
 		if (dataVencimento == null) {
 			throw new BusinessException("A data de vencimento da duplicata não pode ser nula.");
 		}
-		nFeDuplicataDAO.alterarDataVendimentoById(idDuplicata, dataVencimento);
+		if (valor == null) {
+			throw new BusinessException("O valor da duplicata não pode ser nulo.");
+		}
+		nFeDuplicataDAO.alterarDataVendimentoById(idDuplicata, dataVencimento, valor);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void atualizarSituacaoDuplicataVencida() {
+		entityManager
+				.createQuery(
+						"update NFeDuplicata d set d.tipoSituacaoDuplicata =:tipoVencida where d.dataVencimento >= :dataAtual and d.tipoSituacaoDuplicata =:tipoAVencer")
+				.setParameter("tipoVencida", TipoSituacaoDuplicata.VENCIDO)
+				.setParameter("tipoAVencer", TipoSituacaoDuplicata.A_VENCER).setParameter("dataAtual", new Date());
 	}
 
 	@PostConstruct
@@ -56,14 +71,32 @@ public class DuplicataServiceImpl implements DuplicataService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<NFeDuplicata> pesquisarDuplicataByPeriodo(Periodo periodo) {
-		return nFeDuplicataDAO.pesquisarDuplicataByPeriodo(periodo);
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void liquidarDuplicataById(Integer idDuplicata) throws BusinessException {
+		if (idDuplicata == null) {
+			return;
+		}
+		nFeDuplicataDAO.alterarSituacaoById(idDuplicata, TipoSituacaoDuplicata.LIQUIDADO);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NFeDuplicata pesquisarDuplicataById(Integer idDuplicata) {
 		return nFeDuplicataDAO.pesquisarDuplicataById(idDuplicata);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<NFeDuplicata> pesquisarDuplicataByPeriodo(Periodo periodo) {
+		return nFeDuplicataDAO.pesquisarDuplicataByPeriodo(periodo);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerDuplicataById(Integer idDuplicata) throws BusinessException {
+		if (idDuplicata == null) {
+			return;
+		}
+		nFeDuplicataDAO.removerDuplicataById(idDuplicata);
 	}
 }

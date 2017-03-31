@@ -383,6 +383,22 @@
 	width: 24px;
 }
 
+.botaoVerificar {
+	background: url("../images/checked_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoVerificarPequeno {
+	background: url("../images/checked_16.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
 .botaoVoltar {
 	background: url("../images/arrow_left_blue_24.png") no-repeat scroll 0 0
 		transparent;
@@ -542,6 +558,14 @@
 	background: url("../images/arrow_left_blue_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
+}
+
+.botaoVerificar:hover {
+	background: url("../images/checked_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
 }
 
 .botaoVoltar:click {

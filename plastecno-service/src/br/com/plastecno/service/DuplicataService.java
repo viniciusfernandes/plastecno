@@ -12,12 +12,18 @@ import br.com.plastecno.service.wrapper.Periodo;
 @Local
 public interface DuplicataService {
 
-	void alterarDataVendimentoById(Integer idDuplicata, Date dataVencimento) throws BusinessException;
+	void alterarDataVendimentoValorById(Integer idDuplicata, Date dataVencimento, Double valor) throws BusinessException;
+
+	void atualizarSituacaoDuplicataVencida();
 
 	void inserirDuplicata(Integer numeroNFe, List<NFeDuplicata> listaDuplicata);
 
-	List<NFeDuplicata> pesquisarDuplicataByPeriodo(Periodo periodo);
+	void liquidarDuplicataById(Integer idDuplicata) throws BusinessException;
 
 	NFeDuplicata pesquisarDuplicataById(Integer idDuplicata);
+
+	List<NFeDuplicata> pesquisarDuplicataByPeriodo(Periodo periodo);
+
+	void removerDuplicataById(Integer idDuplicata) throws BusinessException;
 
 }

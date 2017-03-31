@@ -29,6 +29,7 @@ import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
+import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ClienteWrapper;
@@ -290,8 +291,14 @@ public class RelatorioServiceImpl implements RelatorioService {
 				titulo.toString());
 		List<NFeDuplicata> lDuplic = duplicataService.pesquisarDuplicataByPeriodo(periodo);
 
+		Date dtAtual =  new Date();
 		for (NFeDuplicata d : lDuplic) {
+			// Vamos definir a situação da duplicata 
+			if(!d.isLiquidado()&&dtAtual.before(d.getDataVencimento())){
+				d.setTipoSituacaoDuplicata(TipoSituacaoDuplicata.VENCIDO);
+			}
 			d.setDataVencimentoFormatada(StringUtils.formatarData(d.getDataVencimento()));
+			
 			relatorio.addGrupo(d.getNumeroNFe(), d).setPropriedade("nomeCliente", d.getNomeCliente());
 		}
 

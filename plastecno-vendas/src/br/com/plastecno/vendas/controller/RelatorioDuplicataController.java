@@ -29,9 +29,10 @@ public class RelatorioDuplicataController extends AbstractController {
     }
 
     @Post("duplicata/alteracaodata")
-    public void alterarDuplicata(Integer idDuplicata, Date dataVencimento, Date dataInicial, Date dataFinal) {
+    public void alterarDuplicata(Integer idDuplicata, Date dataVencimento, Double valor, Date dataInicial,
+            Date dataFinal) {
         try {
-            duplicataService.alterarDataVendimentoById(idDuplicata, dataVencimento);
+            duplicataService.alterarDataVendimentoValorById(idDuplicata, dataVencimento, valor);
             redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
@@ -54,6 +55,17 @@ public class RelatorioDuplicataController extends AbstractController {
         addAtributo("dataFinal", formatarData(dataFinal));
     }
 
+    @Post("duplicata/liquidacao/{idDuplicata}")
+    public void liquidarDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
+        try {
+            duplicataService.liquidarDuplicataById(idDuplicata);
+            redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
+    }
+
     @Get("duplicata/{idDuplicata}")
     public void pesquisarDuplicataById(Integer idDuplicata, Date dataInicial, Date dataFinal) {
         NFeDuplicata d = duplicataService.pesquisarDuplicataById(idDuplicata);
@@ -69,5 +81,16 @@ public class RelatorioDuplicataController extends AbstractController {
     @Get("relatorio/duplicata")
     public void relatorioDuplicataHome() {
         configurarFiltroPediodoMensal();
+    }
+
+    @Post("duplicata/remocao/{idDuplicata}")
+    public void removerDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
+        try {
+            duplicataService.removerDuplicataById(idDuplicata);
+            redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
     }
 }

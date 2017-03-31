@@ -115,6 +115,10 @@ public class NFeDuplicata {
 		return valor;
 	}
 
+	public boolean isLiquidado() {
+		return TipoSituacaoDuplicata.LIQUIDADO.equals(tipoSituacaoDuplicata);
+	}
+
 	public void setDataVencimento(Date dataVencimento) {
 		this.dataVencimento = dataVencimento;
 	}

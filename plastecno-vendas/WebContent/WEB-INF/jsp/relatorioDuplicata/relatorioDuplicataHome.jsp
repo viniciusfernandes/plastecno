@@ -4,18 +4,17 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-
-<jsp:include page="/bloco/bloco_css.jsp" />
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
-
+<jsp:include page="/bloco/bloco_css.jsp" />
+<jsp:include page="/bloco/bloco_modal_js.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
 
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 
 <title>Relatório das Duplicatas</title>
 <script type="text/javascript">
@@ -34,8 +33,11 @@
 			$('#formVazio').attr('action', '<c:url value="/relatorio/duplicata/listagem"/>').attr('method', 'get').submit();
 		});
 	});
-</script>
 
+function alterarDuplicata(botao, metodo, acao, tipo){
+	$(botao).closest('form').attr('action', acao).attr('method', metodo).submit();	
+};
+</script>
 </head>
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
@@ -92,11 +94,11 @@
 			<thead>
 				<tr>
 					<th style="width: 10%">NFe</th>
-					<th style="width: 35%">Cliente</th>
+					<th style="width: 40%">Cliente</th>
 					<th style="width: 15%">Data Venc.</th>
 					<th style="width: 10%">Vl. (R$)</th>
 					<th style="width: 15%">Situação</th>
-					<th style="width: 5%">Ações</th>
+					<th style="width: 10%">Ações</th>
 				</tr>
 			</thead>
 			
@@ -114,20 +116,16 @@
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.tipoSituacaoDuplicata.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/duplicata/${elemento.id}"/>" method="get">
+									<form>
 										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-										<input type="submit" title="Editar Duplicata" value="" class="botaoEditar" />
-									</form>
-									<form action="<c:url value="/duplicata/liquidacao/${elemento.id}"/>" method="post">
-										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-										<input type="submit" title="Liquidar Duplicata" value="" class="botaoVerificarPequeno" />
-									</form>
-									<form action="<c:url value="/duplicata/remocao/${elemento.id}"/>" method="post">
-										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-										<input type="submit" title="Remover Duplicata" value="" class="botaoRemover" />
+										
+										<input type="button" title="Editar Duplicata" value="" class="botaoEditar" 
+											onclick="alterarDuplicata(this, 'get', '<c:url value="/duplicata/${elemento.id}"/>','ALTERAR')"/>
+										<input type="button" title="Liquidar Duplicata" value="" class="botaoVerificarPequeno" 
+											onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/liquidacao/${elemento.id}"/>','LIQUIDAR')"/>
+										<input type="button" title="Remover Duplicata" value="" class="botaoRemover" 
+											onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/remocao/${elemento.id}"/>','REMOVER')"/>
 									</form>
 								</div>
 							</td>

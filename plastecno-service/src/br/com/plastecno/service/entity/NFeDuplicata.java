@@ -7,9 +7,12 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -23,13 +26,24 @@ public class NFeDuplicata {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Data de vencimento da duplicata")
 	private Date dataVencimento;
 
+	@Transient
+	private String dataVencimentoFormatada;
+
 	@Id
+	@SequenceGenerator(name = "nFeDuplicataSequence", sequenceName = "vendas.seq_nfe_duplicata_id", allocationSize = 1, initialValue = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "nFeDuplicataSequence")
 	private Integer id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_nfe_pedido", referencedColumnName = "numero", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Número da NFe da duplicata")
 	private NFePedido nFe;
+
+	// Esse campo foi criado para otimizar a pesquisa das duplicatas pois temos
+	// que recuperar o nome do cliente do pedido.
+	@Column(name = "nome_cliente")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 })
+	private String nomeCliente;
 
 	@Transient
 	private Integer numeroNFe;
@@ -47,17 +61,34 @@ public class NFeDuplicata {
 	}
 
 	// Construtor utilizado no relatorio de duplicatas
-	public NFeDuplicata(Date dataVencimento, Integer id, Integer numeroNFe,
+	public NFeDuplicata(Date dataVencimento, Integer id, String nomeCliente, Integer numeroNFe,
 			TipoSituacaoDuplicata tipoSituacaoDuplicata, Double valor) {
 		this.dataVencimento = dataVencimento;
 		this.id = id;
+		this.nomeCliente = nomeCliente;
+		this.nFe = new NFePedido(numeroNFe);
 		this.numeroNFe = numeroNFe;
 		this.tipoSituacaoDuplicata = tipoSituacaoDuplicata;
 		this.valor = valor;
 	}
 
+	// Construtor utilizado na pesquisa de duplicatas
+	public NFeDuplicata(Date dataVencimento, Integer id, TipoSituacaoDuplicata tipoSituacaoDuplicata, Double valor) {
+		this(dataVencimento, id, null, null, tipoSituacaoDuplicata, valor);
+	}
+
+	public NFeDuplicata(Date dataVencimento, String nomeCliente, Integer numeroNFe,
+			TipoSituacaoDuplicata tipoSituacaoDuplicata, Double valor) {
+		this(dataVencimento, null, nomeCliente, numeroNFe, tipoSituacaoDuplicata, valor);
+
+	}
+
 	public Date getDataVencimento() {
 		return dataVencimento;
+	}
+
+	public String getDataVencimentoFormatada() {
+		return dataVencimentoFormatada;
 	}
 
 	public Integer getId() {
@@ -66,6 +97,10 @@ public class NFeDuplicata {
 
 	public NFePedido getnFe() {
 		return nFe;
+	}
+
+	public String getNomeCliente() {
+		return nomeCliente;
 	}
 
 	public Integer getNumeroNFe() {
@@ -84,12 +119,20 @@ public class NFeDuplicata {
 		this.dataVencimento = dataVencimento;
 	}
 
+	public void setDataVencimentoFormatada(String dataVencimentoFormatada) {
+		this.dataVencimentoFormatada = dataVencimentoFormatada;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
 	public void setnFe(NFePedido nFe) {
 		this.nFe = nFe;
+	}
+
+	public void setNomeCliente(String nomeCliente) {
+		this.nomeCliente = nomeCliente;
 	}
 
 	public void setNumeroNFe(Integer numeroNFe) {

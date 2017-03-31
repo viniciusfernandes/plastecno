@@ -10,9 +10,9 @@
 
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
 
 
 <title>Relatório das Duplicatas</title>
@@ -23,11 +23,12 @@
 		});
 		inserirMascaraData('dataInicial');
 		inserirMascaraData('dataFinal');
+		inserirMascaraData('dataVencimento');
 		
 		$('#botaoPesquisar').click(function () {
-			var parametros = serializarBloco('bloco_pesquisa');
-			var action = '<c:url value="/relatorio/duplicata/listagem"/>?'+parametros;
-			$('#formVazio').attr('action', action).attr('method', 'post').submit();
+			adicionarInputHiddenFormulario('formVazio', 'dataInicial', document.getElementById('dataInicial').value);
+			adicionarInputHiddenFormulario('formVazio', 'dataFinal', document.getElementById('dataFinal').value);
+			$('#formVazio').attr('action', '<c:url value="/relatorio/duplicata/listagem"/>').attr('method', 'get').submit();
 		});
 	});
 </script>
@@ -38,7 +39,6 @@
 	</form>
 
 		<fieldset id="bloco_pesquisa">
-		
 			<legend>::: Relatório das Duplicatas :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
 			<div class="input" style="width: 15%">
@@ -58,6 +58,28 @@
 			<input id="botaoLimpar" type="button" value="" title="Limpar Dados das Duplicatas no Período" class="botaoLimpar" />
 		</div>
 
+	<c:if test="${not empty idDuplicata}">
+	<fieldset id="bloco_edicao_duplicata">
+		<legend>::: Relatório das Duplicatas :::</legend>
+		<form action="<c:url value="/duplicata/alteracaodata"/>" method="post">
+			<input type="hidden" name="idDuplicata" value="${idDuplicata}"/>
+			<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+			<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+			<div class="label">Dt Venc.:</div>
+			<div class="input" style="width: 15%">
+				<input type="text" id="dataVencimento" name="dataVencimento" value="${dataVencimento}" />
+			</div>
+			<div class="label">Vl. (R$):</div>
+			<div class="input" style="width: 15%">
+				<input type="text" value="${valor}" readonly="readonly" class="desabilitado"/>
+			</div>
+			<div class="bloco_botoes">
+				<input type="submit" value="" class="botaoInserir" title="Alterar Data da Duplicata"/>
+			</div>
+		</form>
+	</fieldset>
+	</c:if>
+	
 	<a id="rodape"></a>
 		<c:if test="${not empty relatorio}">
 		<table id="tabelaItemPedido" class="listrada">
@@ -65,6 +87,7 @@
 			<thead>
 				<tr>
 					<th style="width: 10%">NFe</th>
+					<th style="width: 35%">Cliente</th>
 					<th style="width: 15%">Data Venc.</th>
 					<th style="width: 10%">Vl. (R$)</th>
 					<th style="width: 15%">Situação</th>
@@ -75,19 +98,21 @@
 			<tbody>
 			
 			<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iGrupo">
-					<c:forEach items="${pedido.listaElemento}" var="item" varStatus="iElemento">
+					<c:forEach items="${grupo.listaElemento}" var="elemento" varStatus="iElemento">
 						<tr>
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.propriedades['nomeCliente']}</td>
 							</c:if>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.dataVencimentoFormatada}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valor}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.tipoSituacaoDuplicata}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.dataVencimentoFormatada}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.tipoSituacaoDuplicata.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/pedido/pdf"/>">
-										<input type="hidden" name="idPedido" value="${pedido.id}"/>
-										<input type="submit" title="Vizualizar Pedido PDF" value="" class="botaoPDF" />
+									<form action="<c:url value="/duplicata/${elemento.id}"/>">
+										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+										<input type="submit" title="Editar Duplicata" value="" class="botaoEditar" />
 									</form>
 								</div>
 							</td>
@@ -96,15 +121,6 @@
 				</c:forEach>
 
 			</tbody>
-			<tfoot>
-				<tr>
-					<td></td>
-					<td colspan="1"></td>
-					<td  style="text-align: right;">TOTAL COMISSIONADO:</td>
-					<td colspan="2"><div id="valorPedido"
-							style="text-align: left;">R$ ${relatorio.valorTotal}</div></td>
-				</tr>
-			</tfoot>
 		</table>
 		</c:if>
 </body>

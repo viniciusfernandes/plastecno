@@ -57,6 +57,11 @@ public class NFePedido {
 		this.tipoSituacaoNFe = tipoSituacaoNFe;
 	}
 
+	public NFePedido(Integer idPedido, Integer modelo, String nomeCliente, Integer numero, Integer numeroAssociado,
+			Integer serie, TipoNFe tipoNFe, TipoSituacaoNFe tipoSituacaoNFe, String xmlNFe) {
+		this(numero, serie, modelo, xmlNFe, idPedido, numeroAssociado, tipoNFe, tipoSituacaoNFe);
+	}
+
 	public Integer getIdPedido() {
 		return idPedido;
 	}

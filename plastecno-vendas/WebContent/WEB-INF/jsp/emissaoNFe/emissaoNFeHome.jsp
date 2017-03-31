@@ -913,17 +913,6 @@ function gerarInputHidden(objeto){
 	};
 };
 
-function adicionarInputHiddenFormulario(json){
-	if(json == null){
-		return;
-	}
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = json.nome;
-	input.value = json.valor;
-	document.getElementById('formEmissao').appendChild(input);
-};
-
 function gerarJsonTipoIcms(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms',
 		'campos':[{'nome':'codigoSituacaoTributaria', 'id':'tipoTributacaoICMS'},

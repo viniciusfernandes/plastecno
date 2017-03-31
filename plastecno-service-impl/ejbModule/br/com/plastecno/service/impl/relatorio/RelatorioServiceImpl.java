@@ -291,7 +291,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 		List<NFeDuplicata> lDuplic = duplicataService.pesquisarDuplicataByPeriodo(periodo);
 
 		for (NFeDuplicata d : lDuplic) {
-			relatorio.addGrupo(d.getNumeroNFe(), d);
+			d.setDataVencimentoFormatada(StringUtils.formatarData(d.getDataVencimento()));
+			relatorio.addGrupo(d.getNumeroNFe(), d).setPropriedade("nomeCliente", d.getNomeCliente());
 		}
 
 		return relatorio;

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,6 +29,7 @@ import javax.xml.bind.Unmarshaller;
 
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ConfiguracaoSistemaService;
+import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.NFeService;
@@ -38,6 +40,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.dao.NFeItemFracionadoDAO;
 import br.com.plastecno.service.dao.NFePedidoDAO;
 import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.NFePedido;
 import br.com.plastecno.service.entity.Representada;
@@ -61,6 +64,7 @@ import br.com.plastecno.service.nfe.ValoresTotaisICMS;
 import br.com.plastecno.service.nfe.ValoresTotaisISSQN;
 import br.com.plastecno.service.nfe.ValoresTotaisNFe;
 import br.com.plastecno.service.nfe.constante.TipoNFe;
+import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoNFe;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
@@ -74,6 +78,9 @@ public class NFeServiceImpl implements NFeService {
 
 	@EJB
 	private ConfiguracaoSistemaService configuracaoSistemaService;
+
+	@EJB
+	private DuplicataService duplicataService;
 
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
@@ -388,9 +395,9 @@ public class NFeServiceImpl implements NFeService {
 		// Devemos inserir o registro no banco de dados antes de gravar o
 		// arquivo no diretorio pois nao podemos ter um xml sem um registro na
 		// base de dados
-		nFePedidoDAO.inserirNFePedido(new NFePedido(Integer.parseInt(ide.getNumero()),
-				Integer.parseInt(ide.getSerie()), Integer.parseInt(ide.getModelo()), xml, idPedido, numeroAssociado,
-				tipoNFe, TipoSituacaoNFe.EMITIDA));
+		nFePedidoDAO.inserirNFePedido(new NFePedido(idPedido, Integer.parseInt(ide.getModelo()), nFe.getDadosNFe()
+				.getIdentificacaoDestinatarioNFe().getRazaoSocial(), Integer.parseInt(ide.getNumero()),
+				numeroAssociado, Integer.parseInt(ide.getSerie()), tipoNFe, TipoSituacaoNFe.EMITIDA, xml));
 
 		escreverXMLNFe(xml, new Date(), gerarNomeXMLNFe(String.valueOf(idPedido), ide.getNumero()));
 
@@ -425,7 +432,31 @@ public class NFeServiceImpl implements NFeService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public String emitirNFeEntrada(NFe nFe, Integer idPedido) throws BusinessException {
-		return emitirNFe(nFe, TipoNFe.ENTRADA, null, idPedido);
+		String num = emitirNFe(nFe, TipoNFe.ENTRADA, null, idPedido);
+
+		// Incluindo as duplicatas apenas das notas fiscais de entrada
+		DadosNFe dados = nFe.getDadosNFe();
+		List<DuplicataNFe> lDuplicata = dados.getListaDuplicata();
+
+		if (lDuplicata == null || lDuplicata.isEmpty()) {
+			return num;
+		}
+
+		Integer numeroNFe = Integer.parseInt(dados.getIdentificacaoNFe().getNumero());
+		List<NFeDuplicata> lista = new ArrayList<NFeDuplicata>();
+		for (DuplicataNFe dNFe : lDuplicata) {
+			try {
+				lista.add(new NFeDuplicata(StringUtils.parsearDataAmericano(dNFe.getDataVencimento()), dados
+						.getIdentificacaoDestinatarioNFe().getRazaoSocial(), numeroNFe, TipoSituacaoDuplicata.A_VENCER,
+						dNFe.getValor()));
+			} catch (ParseException e) {
+				throw new BusinessException(
+						"O campo de data de vendimento de uma das duplicatas não esta no formato correto. O valor enviado foi "
+								+ dNFe.getDataVencimento());
+			}
+		}
+		duplicataService.inserirDuplicata(numeroNFe, lista);
+		return num;
 	}
 
 	@Override

@@ -55,6 +55,34 @@ public class RelatorioDuplicataController extends AbstractController {
         addAtributo("dataFinal", formatarData(dataFinal));
     }
 
+    @Get("relatorio/duplicata/listagem/pedido")
+    public void gerarRelatorioDuplicataByIdPedido(Integer idPedido) {
+        try {
+            addAtributo("relatorio", relatorioService.gerarRelatorioDuplicataByIdPedido(idPedido));
+            addAtributo("idPedido", idPedido);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+
+        // Aqui estamos indo para o topo da pagina pois o formulario de pesquisa
+        // eh pequeno e nao ha a necessidade de rolar a pagina para baixo
+        irTopoPagina();
+    }
+
+    @Get("relatorio/duplicata/listagem/nfe")
+    public void gerarRelatorioDuplicataByNumeroNFe(Integer numeroNFe) {
+        try {
+            addAtributo("relatorio", relatorioService.gerarRelatorioDuplicataByNumeroNFe(numeroNFe));
+            addAtributo("numeroNFe", numeroNFe);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+
+        // Aqui estamos indo para o topo da pagina pois o formulario de pesquisa
+        // eh pequeno e nao ha a necessidade de rolar a pagina para baixo
+        irTopoPagina();
+    }
+
     @Post("duplicata/liquidacao/{idDuplicata}")
     public void liquidarDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
         try {

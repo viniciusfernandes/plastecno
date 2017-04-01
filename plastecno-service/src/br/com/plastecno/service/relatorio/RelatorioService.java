@@ -36,6 +36,12 @@ public interface RelatorioService {
 
 	RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicata(Periodo periodo) throws BusinessException;
 
+	RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicataByIdPedido(Integer idPedido)
+			throws BusinessException;
+
+	RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicataByNumeroNFe(Integer numeroNFe)
+			throws BusinessException;
+
 	List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException;
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoCompra(Integer idCliente, Periodo periodo);

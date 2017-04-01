@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.impl.util.QueryUtil;
@@ -38,6 +39,32 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 								.createQuery(
 										"select new NFeDuplicata(d.dataVencimento, d.id, d.tipoSituacaoDuplicata, d.valor) from NFeDuplicata d where d.id =:idDuplicata")
 								.setParameter("idDuplicata", idDuplicata), NFeDuplicata.class, null);
+	}
+
+	public List<NFeDuplicata> pesquisarDuplicataByIdPedido(Integer idPedido) {
+		return pesquisarDuplicataByNumeroNFeOuPedido(idPedido, false);
+	}
+
+	public List<NFeDuplicata> pesquisarDuplicataByNumeroNFe(Integer numeroNFe) {
+		return pesquisarDuplicataByNumeroNFeOuPedido(numeroNFe, true);
+	}
+
+	private List<NFeDuplicata> pesquisarDuplicataByNumeroNFeOuPedido(Integer numero, boolean isByNfe) {
+		StringBuilder s = new StringBuilder();
+		s.append("select new NFeDuplicata(d.dataVencimento, d.id, d.nomeCliente, d.nFe.numero, d.tipoSituacaoDuplicata, d.valor) from NFeDuplicata d ");
+		if (isByNfe) {
+			s.append("where d.nFe.numero =:numeroNFe ");
+		} else {
+			s.append("where d.nFe.idPedido =:idPedido ");
+		}
+
+		TypedQuery<NFeDuplicata> q = entityManager.createQuery(s.toString(), NFeDuplicata.class);
+		if (isByNfe) {
+			q.setParameter("numeroNFe", numero);
+		} else {
+			q.setParameter("idPedido", numero);
+		}
+		return q.getResultList();
 	}
 
 	public List<NFeDuplicata> pesquisarDuplicataByPeriodo(Periodo periodo) {

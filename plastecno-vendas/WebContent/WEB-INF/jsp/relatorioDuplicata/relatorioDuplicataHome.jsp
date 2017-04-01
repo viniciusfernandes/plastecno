@@ -26,12 +26,6 @@
 		inserirMascaraData('dataFinal');
 		inserirMascaraData('dataVencimento');
 		inserirMascaraMonetaria('valor', 10);
-		
-		$('#botaoPesquisar').click(function () {
-			adicionarInputHiddenFormulario('formVazio', 'dataInicial', document.getElementById('dataInicial').value);
-			adicionarInputHiddenFormulario('formVazio', 'dataFinal', document.getElementById('dataFinal').value);
-			$('#formVazio').attr('action', '<c:url value="/relatorio/duplicata/listagem"/>').attr('method', 'get').submit();
-		});
 	});
 
 function alterarDuplicata(botao, metodo, acao, tipo){
@@ -47,23 +41,47 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 
 		<fieldset id="bloco_pesquisa">
 			<legend>::: Relatório das Duplicatas :::</legend>
-			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
-			<div class="input" style="width: 15%">
-				<input type="text" id="dataInicial" name="dataInicial"
-					value="${dataInicial}" maxlength="10" class="pesquisavel" />
-			</div>
-
-			<div class="label obrigatorio" style="width: 10%">Data Final:</div>
-			<div class="input" style="width: 35%">
-				<input type="text" id="dataFinal" name="dataFinal"
-					value="${dataFinal}" maxlength="100" class="pesquisavel"
-					style="width: 45%" />
-			</div>
+			<form action="<c:url value="/relatorio/duplicata/listagem"/>" method="get">
+				<div class="label" style="width: 30%">Data Inícial:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="dataInicial" name="dataInicial"
+						value="${dataInicial}" maxlength="10" class="pesquisavel" />
+				</div>
+				<div class="label" style="width: 10%">Data Final:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="dataFinal" name="dataFinal"
+						value="${dataFinal}" maxlength="100" class="pesquisavel"
+						style="width: 100%" />
+				</div>
+				<div class="input" style="width: 2%">
+					<input type="submit" id="botaoPesquisarPeriodo" title="Pesquisar Duplicatas por Período" value="" class="botaoPesquisarPequeno" style="width: 100%"/>
+				</div>
+				<div class="input" style="width: 10%">
+					<input type="button" id="botaoLimpar" value="" title="Limpar Dados das Duplicatas no Período" class="botaoLimparPequeno" />
+				</div>
+			</form>
+			<form action="<c:url value="/relatorio/duplicata/listagem/pedido"/>">
+				<div class="label" style="width: 30%">Pedido:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="idPedido" name="idPedido"
+						value="${idPedido}" maxlength="10" class="pesquisavel" style="width: 100%"/>
+				</div>
+				<div class="input" style="width: 50%">
+					<input type="submit" id="botaoPesquisaPedido" title="Pesquisar Duplicatas do Pedido" value="" class="botaoPesquisarPequeno" style="width: 5%"/>
+				</div>
+			</form>
+			
+			<form action="<c:url value="/relatorio/duplicata/listagem/nfe"/>">
+				<div class="label" style="width: 30%">NFe:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="numeroNFe" name="numeroNFe"
+						value="${numeroNFe}" maxlength="10" class="pesquisavel" style="width: 100%"/>
+				</div>
+				<div class="input" style="width: 50%">
+					<input type="submit" id="botaoPesquisaNFe" title="Pesquisar Duplicatas da NFe" value="" class="botaoPesquisarPequeno" style="width: 5%"/>
+				</div>
+			</form>
 		</fieldset>
-		<div class="bloco_botoes">
-			<input id="botaoPesquisar" type="button" class="botaoPesquisar" title="Pesquisar Dados das Duplicatas no Período" /> 
-			<input id="botaoLimpar" type="button" value="" title="Limpar Dados das Duplicatas no Período" class="botaoLimpar" />
-		</div>
 
 	<c:if test="${not empty idDuplicata}">
 	<fieldset id="bloco_edicao_duplicata">

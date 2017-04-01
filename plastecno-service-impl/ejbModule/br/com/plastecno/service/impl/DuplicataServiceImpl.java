@@ -87,6 +87,18 @@ public class DuplicataServiceImpl implements DuplicataService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<NFeDuplicata> pesquisarDuplicataByIdPedido(Integer idPedido) {
+		return nFeDuplicataDAO.pesquisarDuplicataByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<NFeDuplicata> pesquisarDuplicataByNumeroNFe(Integer numeroNFe) {
+		return nFeDuplicataDAO.pesquisarDuplicataByNumeroNFe(numeroNFe);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<NFeDuplicata> pesquisarDuplicataByPeriodo(Periodo periodo) {
 		return nFeDuplicataDAO.pesquisarDuplicataByPeriodo(periodo);
 	}

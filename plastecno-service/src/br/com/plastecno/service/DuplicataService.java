@@ -22,6 +22,10 @@ public interface DuplicataService {
 
 	NFeDuplicata pesquisarDuplicataById(Integer idDuplicata);
 
+	List<NFeDuplicata> pesquisarDuplicataByIdPedido(Integer idPedido);
+
+	List<NFeDuplicata> pesquisarDuplicataByNumeroNFe(Integer numeroNFe);
+
 	List<NFeDuplicata> pesquisarDuplicataByPeriodo(Periodo periodo);
 
 	void removerDuplicataById(Integer idDuplicata) throws BusinessException;

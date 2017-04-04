@@ -143,10 +143,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 		if (idCidade == null) {
 			return null;
 		}
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createNativeQuery(
-						"select c.cod_ibge from enderecamento.tb_cidade as c where c.id_cidade = :idCidade")
-						.setParameter("idCidade", idCidade), String.class, "");
+		return logradouroDAO.pesquisarCodigoIBGEByIdCidade(idCidade);
 	}
 
 	/*

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.exception.BusinessException;
@@ -41,6 +42,8 @@ public interface NFeService {
 	List<NFeItemFracionado> pesquisarItemFracionado();
 
 	List<Integer> pesquisarNumeroNFeByIdPedido(Integer idPedido);
+
+	List<ItemPedido> pesquisarQuantitadeItemRestanteByIdPedido(Integer idPedido);
 
 	List<Integer[]> pesquisarTotalItemFracionado(Integer idPedido);
 

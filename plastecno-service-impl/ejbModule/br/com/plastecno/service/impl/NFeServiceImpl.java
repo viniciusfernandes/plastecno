@@ -39,6 +39,7 @@ import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.dao.NFeItemFracionadoDAO;
 import br.com.plastecno.service.dao.NFePedidoDAO;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
@@ -63,6 +64,7 @@ import br.com.plastecno.service.nfe.TributosProdutoServico;
 import br.com.plastecno.service.nfe.ValoresTotaisICMS;
 import br.com.plastecno.service.nfe.ValoresTotaisISSQN;
 import br.com.plastecno.service.nfe.ValoresTotaisNFe;
+import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
 import br.com.plastecno.service.nfe.constante.TipoNFe;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoNFe;
@@ -74,7 +76,7 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 public class NFeServiceImpl implements NFeService {
 
 	@EJB
-	private ClienteService clienteService;
+	private ClienteService clienteService;;
 
 	@EJB
 	private ConfiguracaoSistemaService configuracaoSistemaService;
@@ -378,6 +380,7 @@ public class NFeServiceImpl implements NFeService {
 			throw new BusinessException("A NFe emitida não pode estar em branco");
 		}
 
+		validarFormaPagamento(nFe);
 		validarEmissaoNFePedido(idPedido);
 		validarNumeroNFePedido(idPedido, ide.getNumero() != null ? Integer.parseInt(ide.getNumero()) : null);
 
@@ -412,6 +415,9 @@ public class NFeServiceImpl implements NFeService {
 				|| (numEntrada = nFe.getDadosNFe().getIdentificacaoNFe().getNumero()) == null) {
 			return null;
 		}
+
+		validarEmissaoNFePedido(idPedido);
+
 		Integer numeroDevolvido = Integer.parseInt(nFe.getDadosNFe().getIdentificacaoNFe().getNumero());
 		nFe.getDadosNFe().getIdentificacaoNFe().setNumero(gerarNumeroSerieModeloNFe()[0].toString());
 		String numDevol = emitirNFe(nFe, TipoNFe.DEVOLUCAO, numeroDevolvido, idPedido);
@@ -433,13 +439,21 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public String emitirNFeEntrada(NFe nFe, Integer idPedido) throws BusinessException {
 		String num = emitirNFe(nFe, TipoNFe.ENTRADA, null, idPedido);
+		// Inserindo os itens emitidos em cada nota para que possamos efetuar o
+		// controle das quantidades fracionadas dos itens emitidos. No caso de
+		// triangulacao nao devemos fracionar os itens da nfe
+		inserirNFeItemFracionado(nFe, idPedido);
 
 		// Incluindo as duplicatas apenas das notas fiscais de entrada
 		DadosNFe dados = nFe.getDadosNFe();
 		List<DuplicataNFe> lDuplicata = dados.getListaDuplicata();
 
+		boolean isAvista = TipoFormaPagamento.VISTA.getCodigo().equals(
+				dados.getIdentificacaoNFe().getIndicadorFormaPagamento());
 		if (lDuplicata == null || lDuplicata.isEmpty()) {
 			return num;
+		} else if (!lDuplicata.isEmpty() && isAvista) {
+			throw new BusinessException("O pagamento da NFe foi efetuado à vista e não pode ter duplicatas");
 		}
 
 		Integer numeroNFe = Integer.parseInt(dados.getIdentificacaoNFe().getNumero());
@@ -470,10 +484,6 @@ public class NFeServiceImpl implements NFeService {
 		ide.setNumero(String.valueOf(gerarNumeroSerieModeloNFe()[0]));
 
 		String num = emitirNFe(nFe, TipoNFe.TRIANGULARIZACAO, numeroTriangularizado, idPedido);
-		// Inserindo os itens emitidos em cada nota para que possamos efetuar o
-		// controle das quantidades fracionadas dos itens emitidos. No caso de
-		// triangulacao nao devemos fracionar os itens da nfe
-		inserirNFeItemFracionado(nFe, idPedido);
 		return num;
 	}
 
@@ -594,11 +604,7 @@ public class NFeServiceImpl implements NFeService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer[] gerarNumeroSerieModeloNFe() throws BusinessException {
-		Object[] o = QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery("select p.numero, p.serie, p.modelo, (select max(p2.numeroAssociado) from NFePedido p2) from NFePedido p where p.numero = (select max(p1.numero) from NFePedido p1 ) "),
-						Object[].class, null);
+		Object[] o = nFePedidoDAO.pesquisarNumeroSerieModeloNFe();
 
 		if (o == null || o.length < 3 || (o[0] == null && o[1] == null && o[2] == null)) {
 			throw new BusinessException(
@@ -729,6 +735,40 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarQuantitadeItemRestanteByIdPedido(Integer idPedido) {
+		List<ItemPedido> lFracionado = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		if (lFracionado.isEmpty()) {
+			return lFracionado;
+		}
+
+		// Pesquisando a quantidade total ja fracionada de cada item
+		List<Integer[]> lTotal = pesquisarTotalItemFracionado(idPedido);
+
+		// Aqui estamos criando uma nova lista pois o Java nao permite remover
+		// um item da lista que esta sendo iterada.
+		List<ItemPedido> lRestante = new ArrayList<ItemPedido>(lFracionado);
+		Integer qRestante = null;
+		for (ItemPedido i : lRestante) {
+			for (Integer[] val : lTotal) {
+				if (i.getSequencial().equals(val[0])) {
+					qRestante = i.getQuantidade() - val[1];
+					// Aqui estamos removendo da lista todos os itens que ja
+					// foram totalmente fracionados para que eles nao aparecam
+					// para o usuario com quantidade zerada.
+					if (qRestante == null || qRestante == 0) {
+						lFracionado.remove(i);
+						break;
+					}
+					i.setQuantidade(qRestante);
+					break;
+				}
+			}
+		}
+		return lFracionado;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer[]> pesquisarTotalItemFracionado(Integer idPedido) {
 		return nFeItemFracionadoDAO.pesquisarQuantidadeTotalItemFracionado(idPedido);
 	}
@@ -786,6 +826,23 @@ public class NFeServiceImpl implements NFeService {
 		if (!representadaService.isRevendedor(idRepresentada)) {
 			throw new BusinessException("O pedido de venda No. " + idPedido
 					+ " não esta associado a um revendedor cadastrado no sistema");
+		}
+	}
+
+	private void validarFormaPagamento(NFe nfe) throws BusinessException {
+		DadosNFe d = nfe.getDadosNFe();
+		boolean isAvista = TipoFormaPagamento.VISTA.getCodigo().equals(
+				d.getIdentificacaoNFe().getIndicadorFormaPagamento());
+		boolean isAprazo = TipoFormaPagamento.PRAZO.getCodigo().equals(
+				d.getIdentificacaoNFe().getIndicadorFormaPagamento());
+
+		boolean contemDupl = d.getListaDuplicata() != null && !d.getListaDuplicata().isEmpty();
+		if (isAvista && contemDupl) {
+			throw new BusinessException("A forma de pagamento A VISTA não pode gerar duplicatas.");
+		}
+
+		if (isAprazo && !contemDupl) {
+			throw new BusinessException("A forma de pagamento A PRAZO não contém duplicatas.");
 		}
 	}
 

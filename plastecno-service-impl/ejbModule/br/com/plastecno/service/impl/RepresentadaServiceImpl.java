@@ -246,12 +246,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@Override
 	public Logradouro pesquisarLogradorouro(Integer id) {
-		StringBuilder select = new StringBuilder("select t.logradouro from Representada t  ");
-		select.append(" INNER JOIN t.logradouro where t.id = :id ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("id", id);
-		return QueryUtil.gerarRegistroUnico(query, Logradouro.class, null);
+		return representadaDAO.pesquisarLogradorouro(id);
 	}
 
 	@Override

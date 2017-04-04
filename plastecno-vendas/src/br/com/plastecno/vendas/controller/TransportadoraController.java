@@ -78,7 +78,7 @@ public class TransportadoraController extends AbstractController {
     @Get("transportadora/{idTransportadora}")
     public void pesquisar(Integer idTransportadora) {
 
-        Transportadora transportadora = transportadoraService.pesquisarById(idTransportadora);
+        Transportadora transportadora = transportadoraService.pesquisarTransportadoraLogradouroById(idTransportadora);
         formatarDocumentos(transportadora);
 
         addAtributo("transportadora", transportadora);

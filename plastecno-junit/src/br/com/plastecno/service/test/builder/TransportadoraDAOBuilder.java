@@ -12,6 +12,7 @@ public class TransportadoraDAOBuilder extends DAOBuilder<TransportadoraDAO> {
 	@Override
 	public TransportadoraDAO build() {
 		new MockUp<TransportadoraDAO>() {
+
 			@Mock
 			public Transportadora pesquisarByCNPJ(String cnpj) {
 				if (cnpj == null) {
@@ -25,6 +26,13 @@ public class TransportadoraDAOBuilder extends DAOBuilder<TransportadoraDAO> {
 					}
 				}
 				return null;
+			}
+
+			@Mock
+			public Transportadora pesquisarTransportadoraLogradouroById(Integer idTransportadora) {
+				// aqui ja estamos assumindo que a transportadora tem um
+				// logradouro associado
+				return REPOSITORY.pesquisarEntidadeById(Transportadora.class, idTransportadora);
 			}
 		};
 		return new TransportadoraDAO(null);

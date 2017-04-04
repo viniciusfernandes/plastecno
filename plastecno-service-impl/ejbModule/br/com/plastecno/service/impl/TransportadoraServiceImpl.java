@@ -103,7 +103,7 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 		}
 
 		transportadora.setLogradouro(this.logradouroService.inserir(transportadora.getLogradouro()));
-		return this.entityManager.merge(transportadora).getId();
+		return transportadoraDAO.alterar(transportadora).getId();
 	}
 
 	@Override
@@ -158,17 +158,6 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 			return null;
 		}
 		return transportadoraDAO.pesquisarByCNPJ(cnpj);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Transportadora pesquisarById(Integer id) {
-		return QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select t from Transportadora t left join fetch t.logradouro where t.id =:id ")
-								.setParameter("id", id), Transportadora.class, null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -228,5 +217,11 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 				.createQuery(
 						"select new Transportadora(t.id, t.nomeFantasia) from Cliente c inner join c.listaRedespacho t where c.id = :idCliente order by t.nomeFantasia asc ")
 				.setParameter("idCliente", idCliente).getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Transportadora pesquisarTransportadoraLogradouroById(Integer idTransportadora) {
+		return transportadoraDAO.pesquisarTransportadoraLogradouroById(idTransportadora);
 	}
 }

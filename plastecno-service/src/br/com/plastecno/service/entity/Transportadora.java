@@ -84,6 +84,10 @@ public class Transportadora implements Serializable {
 		this.id = id;
 		this.nomeFantasia = nomeFantasia;
 	}
+	
+	public Transportadora(Integer id, Logradouro logradouro){
+		
+	}
 
 	public Transportadora(Integer id, String nomeFantasia, String razaoSocial, String cnpj, String inscricaoEstadual,
 			Logradouro logradouro) {

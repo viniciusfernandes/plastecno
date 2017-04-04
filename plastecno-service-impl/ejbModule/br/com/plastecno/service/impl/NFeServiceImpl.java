@@ -190,6 +190,7 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NFe carregarIdentificacaoEmitente(NFe nFe, Integer idPedido) {
 
+		// No caso de revenda a representada eh a propria revendedora do produto
 		Representada emitente = pedidoService.pesquisarRepresentadaIdPedido(idPedido);
 
 		if (emitente == null) {

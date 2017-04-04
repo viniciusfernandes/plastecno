@@ -19,7 +19,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 		"quantidadeSeloControle", "codigoEnquadramento", "ipiTrib", "ipiNt" })
 public class IPI {
 	@XmlElement(name = "clEnq")
-	@InformacaoValidavel(intervaloComprimento = { 1, 5 }, nomeExibicao = "Classe de enquadramento de cigarros/bebidas do IPI")
+	@InformacaoValidavel(intervaloComprimento = { 1, 3 }, nomeExibicao = "Classe de enquadramento de cigarros/bebidas do IPI")
 	private String classeEnquadramentoCigarrosBebidas;
 
 	@XmlElement(name = "CNPJProd")

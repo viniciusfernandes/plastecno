@@ -15,6 +15,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Transportadora;
 
 public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
@@ -52,7 +53,6 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 		};
 
 		new MockUp<PedidoDAO>() {
-
 			@Mock
 			void alterarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
 				REPOSITORY.alterarEntidadeAtributoById(Pedido.class, idPedido, "situacaoPedido", situacaoPedido);
@@ -228,6 +228,12 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 					}
 				}
 				return count;
+			}
+
+			@Mock
+			public Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return p == null ? null : p.getTransportadora();
 			}
 
 			@Mock

@@ -497,7 +497,7 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe/transportadora/id")
     public void pesquisarTransportadoraById(Integer id) {
-        Transportadora t = transportadoraService.pesquisarById(id);
+        Transportadora t = transportadoraService.pesquisarTransportadoraLogradouroById(id);
         t.setEnderecoFormatado(t.getEnderecoNumeroBairro());
         t.setMunicipioFormatado(t.getMunicipio());
         t.setUfFormatado(t.getUf());

@@ -19,6 +19,7 @@ import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
+import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
@@ -35,6 +36,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.test.builder.ServiceBuilder;
@@ -72,6 +74,8 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private RepresentadaService representadaService;
 
+	private TransportadoraService transportadoraService;
+
 	private UsuarioService usuarioService;
 
 	public PedidoServiceTest() {
@@ -82,6 +86,7 @@ public class PedidoServiceTest extends AbstractTest {
 		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
 		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
+		transportadoraService = ServiceBuilder.buildService(TransportadoraService.class);
 	}
 
 	private void associarVendedor(Cliente cliente) {
@@ -193,7 +198,10 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e2);
 		}
 
+		Transportadora transp = gerarTransportadora();
+
 		Pedido pedido = eBuilder.buildPedido();
+		pedido.setTransportadora(transp);
 		pedido.setVendedor(vendedor);
 		pedido.setTipoPedido(tipoPedido);
 
@@ -434,6 +442,16 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		return new PedidoRevendaECompra(pedidoCompra, pedidoRevenda);
+	}
+
+	private Transportadora gerarTransportadora() {
+		Integer idTransportadora = null;
+		try {
+			idTransportadora = transportadoraService.inserir(eBuilder.buildTransportadora());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return transportadoraService.pesquisarTransportadoraLogradouroById(idTransportadora);
 	}
 
 	@Test

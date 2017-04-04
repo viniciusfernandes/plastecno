@@ -8,13 +8,16 @@ import mockit.MockUp;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.RepresentadaDAO;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Transportadora;
 
 public class RepresentadaDAOBuilder extends DAOBuilder<RepresentadaDAO> {
 
 	@Override
 	public RepresentadaDAO build() {
 		new MockUp<RepresentadaDAO>() {
+
 			@Mock
 			public double pesquisarAliquotaICMSRevendedor() {
 				List<Representada> lista = REPOSITORY.pesquisarTodos(Representada.class);
@@ -32,13 +35,20 @@ public class RepresentadaDAOBuilder extends DAOBuilder<RepresentadaDAO> {
 			}
 
 			@Mock
+			public Logradouro pesquisarLogradorouro(Integer id) {
+				Representada r = REPOSITORY.pesquisarEntidadeById(Representada.class, id);
+				return r == null ? null : r.getLogradouro();
+			}
+
+			@Mock
 			public String pesquisarNomeFantasiaById(Integer idRepresentada) {
 				Representada r = REPOSITORY.pesquisarEntidadeById(Representada.class, idRepresentada);
 				return r != null ? r.getNomeFantasia() : null;
 			}
 
 			@Mock
-			public List<Representada> pesquisarRepresentadaByTipoRelacionamento(boolean ativo, TipoRelacionamento... tipos) {
+			public List<Representada> pesquisarRepresentadaByTipoRelacionamento(boolean ativo,
+					TipoRelacionamento... tipos) {
 				List<Representada> l = REPOSITORY.pesquisarTodos(Representada.class);
 
 				if (tipos == null || tipos.length <= 0) {
@@ -84,8 +94,8 @@ public class RepresentadaDAOBuilder extends DAOBuilder<RepresentadaDAO> {
 
 			@Mock
 			TipoRelacionamento pesquisarTipoRelacionamento(Integer idRepresentada) {
-				return REPOSITORY.pesquisarEntidadeAtributoById(Representada.class, idRepresentada, "tipoRelacionamento",
-						TipoRelacionamento.class);
+				Representada r = REPOSITORY.pesquisarEntidadeById(Representada.class, idRepresentada);
+				return r == null ? null : r.getTipoRelacionamento();
 			}
 		};
 		return new RepresentadaDAO(null);

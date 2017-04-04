@@ -8,11 +8,15 @@ import java.util.Date;
 
 public final class StringUtils {
 
+	private static final String DATA_AMERICANO_PATTERN = "yyyy-MM-dd";
+
 	private static final String DATA_HORA_PATTERN = "dd/MM/yyyy HH:mm:ss";
 
 	private static final String DATA_PATTERN = "dd/MM/yyyy";
 
 	private static final SimpleDateFormat FORMATADOR_DATA = new SimpleDateFormat(DATA_PATTERN);
+
+	private static final SimpleDateFormat FORMATADOR_DATA_AMERICANO = new SimpleDateFormat(DATA_AMERICANO_PATTERN);
 
 	private static final SimpleDateFormat FORMATADOR_DATA_HORA = new SimpleDateFormat(DATA_HORA_PATTERN);
 
@@ -153,6 +157,10 @@ public final class StringUtils {
 
 	public static Date parsearData(String date) throws ParseException {
 		return isEmpty(date) ? null : FORMATADOR_DATA.parse(date);
+	}
+
+	public static Date parsearDataAmericano(String date) throws ParseException {
+		return isEmpty(date) ? null : FORMATADOR_DATA_AMERICANO.parse(date);
 	}
 
 	public static Date parsearDataHora(String date) throws ParseException {

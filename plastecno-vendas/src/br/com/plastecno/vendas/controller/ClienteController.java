@@ -15,6 +15,7 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ComentarioCliente;
 import br.com.plastecno.service.entity.ContatoCliente;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
@@ -209,7 +210,8 @@ public class ClienteController extends AbstractController {
     @Get("cliente/serializacao/cnpj")
     public void pesquisarClienteSerializadoByCnpj(String cnpj) {
         Cliente c = clienteService.pesquisarClienteResumidoByCnpj(cnpj);
-        serializarJson(new SerializacaoJson("cliente", new ClienteJson(c, c.getLogradouroFaturamento()), true));
+        Logradouro l = c != null ? c.getLogradouroFaturamento() : null;
+        serializarJson(new SerializacaoJson("cliente", new ClienteJson(c, l), true));
     }
 
     @Get("cliente/serializacao/{idCliente}")

@@ -96,28 +96,6 @@ public class EmissaoNFeController extends AbstractController {
         inicializarListaCfop(request);
     }
 
-    private void ajustarQuantidadeFracionada(List<ItemPedido> listaItem, Integer idPedido) {
-        List<Integer[]> listaTotal = nFeService.pesquisarTotalItemFracionado(idPedido);
-        List<ItemPedido> listaItemRestante = new ArrayList<ItemPedido>(listaItem);
-        Integer qRestante = null;
-        for (ItemPedido i : listaItemRestante) {
-            for (Integer[] val : listaTotal) {
-                if (i.getSequencial().equals(val[0])) {
-                    qRestante = i.getQuantidade() - val[1];
-                    // Aqui estamos removendo da lista todos os itens que ja
-                    // foram totalmente fracionados para que eles nao aparecam
-                    // para o usuario com quantidade zerada.
-                    if (qRestante == null || qRestante == 0) {
-                        listaItem.remove(i);
-                        break;
-                    }
-                    i.setQuantidade(qRestante);
-                    break;
-                }
-            }
-        }
-    };
-
     @Get("emissaoNFe/valorICMSInterestadual")
     public void calcularValorICMSInterestadual(ICMSInterestadual icms) {
         icms.carregarValores();
@@ -170,48 +148,42 @@ public class EmissaoNFeController extends AbstractController {
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, TipoNFe tipoNFe, Logradouro logradouro, String telefoneDestinatario,
             Integer idPedido) {
+        String numeroNFe = null;
         try {
-            nFeService.validarEmissaoNFePedido(idPedido);
-            String numeroNFe = null;
-            try {
 
-                nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
-                        nFeService.gerarEnderecoNFe(logradouro, telefoneDestinatario));
-                formatarDatas(nf, false);
-                ordenarListaDetalhamentoProduto(nf);
+            nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
+                    nFeService.gerarEnderecoNFe(logradouro, telefoneDestinatario));
+            formatarDatas(nf, false);
+            ordenarListaDetalhamentoProduto(nf);
 
-                if (tipoNFe == null) {
-                    tipoNFe = TipoNFe.ENTRADA;
-                }
-
-                // REFATORAR ESSA IMPLEMENTACAO POIS AQUI EH UM PONTO DE
-                // COMPLEXIDADE ACICLOMATIA. UTILIZAR LAMBDA EXPESSIONS.
-                if (TipoNFe.DEVOLUCAO.equals(tipoNFe)) {
-                    numeroNFe = nFeService.emitirNFeDevolucao(new NFe(nf), idPedido);
-                } else if (TipoNFe.ENTRADA.equals(tipoNFe)) {
-                    numeroNFe = nFeService.emitirNFeEntrada(new NFe(nf), idPedido);
-                } else if (TipoNFe.TRIANGULARIZACAO.equals(tipoNFe)) {
-                    numeroNFe = nFeService.emitirNFeTriangularizacao(new NFe(nf), idPedido);
-                }
-
-                gerarMensagemSucesso("A NFe de número " + numeroNFe + " do pedido No. " + idPedido
-                        + " foi gerada com sucesso.");
-            } catch (BusinessException e) {
-                try {
-                    formatarDatas(nf, true);
-                } catch (BusinessException e1) {
-                    e.addMensagem(e1.getListaMensagem());
-                }
-                popularNFe(nf, idPedido);
-                gerarListaMensagemErro(e);
-                redirecTo(this.getClass()).emissaoNFeHome();
-                irTopoPagina();
-            } catch (Exception e) {
-                gerarLogErro("Emissão da NFe", e);
+            if (tipoNFe == null) {
+                tipoNFe = TipoNFe.ENTRADA;
             }
-        } catch (BusinessException e2) {
-            gerarListaMensagemErro(e2.getListaMensagem());
-            addAtributo("idPedido", idPedido);
+
+            // REFATORAR ESSA IMPLEMENTACAO POIS AQUI EH UM PONTO DE
+            // COMPLEXIDADE ACICLOMATIA. UTILIZAR LAMBDA EXPESSIONS.
+            if (TipoNFe.DEVOLUCAO.equals(tipoNFe)) {
+                numeroNFe = nFeService.emitirNFeDevolucao(new NFe(nf), idPedido);
+            } else if (TipoNFe.ENTRADA.equals(tipoNFe)) {
+                numeroNFe = nFeService.emitirNFeEntrada(new NFe(nf), idPedido);
+            } else if (TipoNFe.TRIANGULARIZACAO.equals(tipoNFe)) {
+                numeroNFe = nFeService.emitirNFeTriangularizacao(new NFe(nf), idPedido);
+            }
+
+            gerarMensagemSucesso("A NFe de número " + numeroNFe + " do pedido No. " + idPedido
+                    + " foi gerada com sucesso.");
+        } catch (BusinessException e) {
+            try {
+                formatarDatas(nf, true);
+            } catch (BusinessException e1) {
+                e.addMensagem(e1.getListaMensagem());
+            }
+            popularNFe(nf, idPedido);
+            gerarListaMensagemErro(e);
+            redirecTo(this.getClass()).emissaoNFeHome();
+            irTopoPagina();
+        } catch (Exception e) {
+            gerarLogErro("Emissão da NFe", e);
         }
 
         irTopoPagina();
@@ -409,9 +381,6 @@ public class EmissaoNFeController extends AbstractController {
 
     private TipoFormaPagamento gerarTipoFormaPagamento(int numeroDuplicata) {
         if (numeroDuplicata <= 0) {
-            return TipoFormaPagamento.OUTROS;
-        }
-        if (numeroDuplicata == 1) {
             return TipoFormaPagamento.VISTA;
         }
         return TipoFormaPagamento.PRAZO;
@@ -457,6 +426,9 @@ public class EmissaoNFeController extends AbstractController {
             } catch (BusinessException e) {
                 gerarListaMensagemErro(e);
             }
+            IdentificacaoNFe i = nFe.getDadosNFe().getIdentificacaoNFe();
+            addAtributo("dataSaida", i.getDataSaida());
+            addAtributo("horaSaida", i.getHoraSaida());
         }
         irTopoPagina();
     }
@@ -479,8 +451,9 @@ public class EmissaoNFeController extends AbstractController {
              * Acho que podemos usar um metodo que carregue menos informacoes
              * dos itens. Estamos trazendo tudo do banco de dados
              */
-            List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-            ajustarQuantidadeFracionada(listaItem, idPedido);
+            // Pesquisando apenas os itens que tem quantidade para ser
+            // fracionada
+            List<ItemPedido> listaItem = nFeService.pesquisarQuantitadeItemRestanteByIdPedido(idPedido);
 
             String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
             addAtributo("idPedido", idPedido);
@@ -524,7 +497,7 @@ public class EmissaoNFeController extends AbstractController {
 
     @Get("emissaoNFe/transportadora/id")
     public void pesquisarTransportadoraById(Integer id) {
-        Transportadora t = transportadoraService.pesquisarById(id);
+        Transportadora t = transportadoraService.pesquisarTransportadoraLogradouroById(id);
         t.setEnderecoFormatado(t.getEnderecoNumeroBairro());
         t.setMunicipioFormatado(t.getMunicipio());
         t.setUfFormatado(t.getUf());

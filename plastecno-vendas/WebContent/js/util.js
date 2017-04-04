@@ -356,3 +356,14 @@ function serializarForm(idForm){
 function serializarFormPesquisa(){
 	return serializarBloco('formPesquisa');
 }
+
+function adicionarInputHiddenFormulario(formId, name, value){
+	if(isEmpty(formId) || isEmpty(name) || isEmpty(value)){
+		return;
+	}
+	input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = name;
+	input.value = value;
+	document.getElementById(formId).appendChild(input);
+};

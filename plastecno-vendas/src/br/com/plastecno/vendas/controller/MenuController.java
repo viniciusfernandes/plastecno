@@ -30,12 +30,14 @@ public class MenuController extends AbstractController {
         verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", TipoAcesso.ADMINISTRACAO);
         verificarPermissaoAcesso("acessoVendaPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_PEDIDO_VENDAS);
         verificarPermissaoAcesso("acessoCompraPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_PEDIDO_COMPRA);
-        verificarPermissaoAcesso("acessoRelatorioComissaoVendedor", TipoAcesso.ADMINISTRACAO,
+        verificarPermissaoAcesso("acessoRelatorioComissaoVendedorPermitido", TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.CADASTRO_PEDIDO_VENDAS);
         verificarPermissaoAcesso("acessoValorReceitaPermitido", TipoAcesso.ADMINISTRACAO);
         verificarPermissaoAcesso("acessoRecepcaoCompraPermitido", TipoAcesso.RECEPCAO_COMPRA);
         verificarPermissaoAcesso("acessoNFePermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS,
                 TipoAcesso.FATURAMENTO);
+
+        verificarPermissaoAcesso("acessoRelatorioDuplicataPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.FATURAMENTO);
     }
 
     @Get("/")

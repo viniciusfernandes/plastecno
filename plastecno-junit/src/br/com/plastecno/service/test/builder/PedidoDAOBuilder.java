@@ -15,27 +15,24 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Transportadora;
 
 public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
-	private static final EntidadeRepository REPOSITORY = EntidadeRepository
-			.getInstance();
+	private static final EntidadeRepository REPOSITORY = EntidadeRepository.getInstance();
 
 	public PedidoDAO build() {
 
 		new MockUp<ItemPedidoDAO>() {
+
 			@Mock
-			public void alterarQuantidadeRecepcionada(Integer idItemPedido,
-					Integer quantidadeRecepcionada) {
-				REPOSITORY.alterarEntidadeAtributoById(ItemPedido.class,
-						idItemPedido, "quantidadeRecepcionada",
+			public void alterarQuantidadeRecepcionada(Integer idItemPedido, Integer quantidadeRecepcionada) {
+				REPOSITORY.alterarEntidadeAtributoById(ItemPedido.class, idItemPedido, "quantidadeRecepcionada",
 						quantidadeRecepcionada);
 			}
 
 			@Mock
-			public Integer pesquisarIdMeterialByIdItemPedido(
-					Integer idItemPedido) {
-				ItemPedido i = REPOSITORY.pesquisarEntidadeById(
-						ItemPedido.class, idItemPedido);
+			public Integer pesquisarIdMeterialByIdItemPedido(Integer idItemPedido) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 				if (i == null) {
 					return null;
 				}
@@ -44,12 +41,10 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {
-				List<ItemPedido> l = REPOSITORY
-						.pesquisarTodos(ItemPedido.class);
+				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
 				long count = 0;
 				for (ItemPedido itemPedido : l) {
-					if (!itemPedido.isEncomendado()
-							&& itemPedido.getPedido().getId().equals(idPedido)) {
+					if (!itemPedido.isEncomendado() && itemPedido.getPedido().getId().equals(idPedido)) {
 						count++;
 					}
 				}
@@ -59,16 +54,13 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 		new MockUp<PedidoDAO>() {
 			@Mock
-			void alterarSituacaoPedidoById(Integer idPedido,
-					SituacaoPedido situacaoPedido) {
-				REPOSITORY.alterarEntidadeAtributoById(Pedido.class, idPedido,
-						"situacaoPedido", situacaoPedido);
+			void alterarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
+				REPOSITORY.alterarEntidadeAtributoById(Pedido.class, idPedido, "situacaoPedido", situacaoPedido);
 			}
 
 			@Mock
 			void cancelar(Integer IdPedido) {
-				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class,
-						IdPedido);
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, IdPedido);
 				if (pedido != null) {
 					pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
 				}
@@ -83,39 +75,45 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			Pedido pesquisarById(Integer idPedido, boolean isCompra) {
-				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class,
-						idPedido);
-				return pedido != null && pedido.isCompra() == isCompra ? pedido
-						: null;
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return pedido != null && pedido.isCompra() == isCompra ? pedido : null;
 			}
 
 			@Mock
 			public Cliente pesquisarClienteByIdPedido(Integer idPedido) {
-				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class,
-						idPedido);
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return p.getCliente();
 			}
 
 			@Mock
-			public Double pesquisarComissaoRepresentadaByIdPedido(
-					Integer idPedido) {
-				Representada r = REPOSITORY.pesquisarEntidadeAtributoById(
-						Pedido.class, idPedido, "representada",
+			public Cliente pesquisarClienteResumidoByIdPedido(Integer idPedido) {
+				Pedido p = this.pesquisarById(idPedido, false);
+
+				return p == null ? null : p.getCliente();
+			}
+
+			@Mock
+			public Double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido) {
+				Representada r = REPOSITORY.pesquisarEntidadeAtributoById(Pedido.class, idPedido, "representada",
 						Representada.class);
 				return r == null ? 0 : r.getComissao();
 			}
 
 			@Mock
 			public Date pesquisarDataEnvioById(Integer idPedido) {
-				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class,
-						idPedido);
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null ? pedido.getDataEntrega() : null;
 			}
 
 			@Mock
+			public String pesquisarFormaPagamentoByIdPedido(Integer idPedido) {
+				Pedido p = pesquisarById(idPedido, false);
+				return p == null ? null : p.getFormaPagamento();
+			}
+
+			@Mock
 			public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
-				ItemPedido i = REPOSITORY.pesquisarEntidadeById(
-						ItemPedido.class, idItemPedido);
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 				if (i == null) {
 					return null;
 				}
@@ -124,10 +122,9 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			List<Integer> pesquisarIdPedidoBySituacaoPedido(
-					SituacaoPedido situacaoPedido) {
-				List<Pedido> l = REPOSITORY.pesquisarEntidadeByRelacionamento(
-						Pedido.class, "situacaoPedido", situacaoPedido);
+			List<Integer> pesquisarIdPedidoBySituacaoPedido(SituacaoPedido situacaoPedido) {
+				List<Pedido> l = REPOSITORY.pesquisarEntidadeByRelacionamento(Pedido.class, "situacaoPedido",
+						situacaoPedido);
 				List<Integer> id = new ArrayList<Integer>();
 				for (Pedido pedido : l) {
 					id.add(pedido.getId());
@@ -137,16 +134,14 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido) {
-				Representada r = REPOSITORY.pesquisarEntidadeAtributoById(
-						Pedido.class, idPedido, "representada",
+				Representada r = REPOSITORY.pesquisarEntidadeAtributoById(Pedido.class, idPedido, "representada",
 						Representada.class);
 				return r == null ? null : r.getId();
 			}
 
 			@Mock
 			public ItemPedido pesquisarItemPedidoById(Integer idItemPedido) {
-				return REPOSITORY.pesquisarEntidadeById(ItemPedido.class,
-						idItemPedido);
+				return REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 			}
 
 			@Mock
@@ -155,12 +150,10 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 				// return
 				// REPOSITORY.pesquisarEntidadeByRelacionamento(ItemPedido.class,
 				// "pedido", pedido);
-				List<ItemPedido> lista = REPOSITORY
-						.pesquisarTodos(ItemPedido.class);
+				List<ItemPedido> lista = REPOSITORY.pesquisarTodos(ItemPedido.class);
 				List<ItemPedido> itens = new ArrayList<ItemPedido>();
 				for (ItemPedido itemPedido : lista) {
-					if (itemPedido.getPedido() != null
-							&& itemPedido.getPedido().getId().equals(idPedido)) {
+					if (itemPedido.getPedido() != null && itemPedido.getPedido().getId().equals(idPedido)) {
 						itens.add(itemPedido);
 					}
 				}
@@ -170,12 +163,9 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			@Mock
 			List<Logradouro> pesquisarLogradouro(Integer idPedido) {
 				List<Logradouro> lista = new ArrayList<Logradouro>();
-				lista.add(ENTIDADE_BUILDER
-						.buildLogradouro(TipoLogradouro.COBRANCA));
-				lista.add(ENTIDADE_BUILDER
-						.buildLogradouro(TipoLogradouro.ENTREGA));
-				lista.add(ENTIDADE_BUILDER
-						.buildLogradouro(TipoLogradouro.FATURAMENTO));
+				lista.add(ENTIDADE_BUILDER.buildLogradouro(TipoLogradouro.COBRANCA));
+				lista.add(ENTIDADE_BUILDER.buildLogradouro(TipoLogradouro.ENTREGA));
+				lista.add(ENTIDADE_BUILDER.buildLogradouro(TipoLogradouro.FATURAMENTO));
 
 				return lista;
 			}
@@ -196,10 +186,8 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			public Representada pesquisarRepresentadaResumidaByIdPedido(
-					Integer idPedido) {
-				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class,
-						idPedido);
+			public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				Representada r = new Representada();
 				r.setId(p.getRepresentada().getId());
 				r.setNomeFantasia(p.getRepresentada().getNomeFantasia());
@@ -207,10 +195,17 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(
-					Integer idItemPedido) {
+			public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
 				ItemPedido i = pesquisarItemPedidoById(idItemPedido);
 				return i == null ? null : i.getPedido().getSituacaoPedido();
+			}
+
+			@Mock
+			public Object[] pesquisarTelefoneContatoByIdPedido(Integer idPedido) {
+
+				Pedido p = pesquisarById(idPedido, false);
+				return p == null || p.getContato() == null ? new Object[] {} : new Object[] { p.getContato().getDdd(),
+						p.getContato().getTelefone() };
 			}
 
 			@Mock
@@ -219,15 +214,12 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			Long pesquisarTotalItemPedido(Integer idPedido,
-					boolean apenasNaoRecebido) {
-				List<ItemPedido> lista = REPOSITORY
-						.pesquisarTodos(ItemPedido.class);
+			Long pesquisarTotalItemPedido(Integer idPedido, boolean apenasNaoRecebido) {
+				List<ItemPedido> lista = REPOSITORY.pesquisarTodos(ItemPedido.class);
 				long count = 0;
 
 				for (ItemPedido itemPedido : lista) {
-					if (itemPedido.getPedido() == null
-							|| !itemPedido.getPedido().getId().equals(idPedido)) {
+					if (itemPedido.getPedido() == null || !itemPedido.getPedido().getId().equals(idPedido)) {
 						continue;
 					}
 
@@ -239,16 +231,20 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return p == null ? null : p.getTransportadora();
+			}
+
+			@Mock
 			Double pesquisarValorPedido(Integer idPedido) {
-				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class,
-						idPedido);
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null ? pedido.getValorPedido() : null;
 			}
 
 			@Mock
 			Double pesquisarValorPedidoIPI(Integer idPedido) {
-				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class,
-						idPedido);
+				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null ? pedido.getValorPedidoIPI() : null;
 			}
 

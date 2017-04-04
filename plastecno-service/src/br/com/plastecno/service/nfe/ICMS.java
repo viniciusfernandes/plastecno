@@ -57,6 +57,13 @@ public class ICMS {
 	@XmlTransient
 	private ICMSGeral tipoIcms;
 
+	public ICMS() {
+	}
+
+	public ICMS(ICMSGeral icmsGeral) {
+		this.setTipoIcms(icmsGeral);
+	}
+
 	@XmlTransient
 	public ICMSInterestadual getIcmsInterestadual() {
 		return icmsInterestadual;

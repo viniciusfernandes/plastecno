@@ -26,4 +26,11 @@ public class TransportadoraDAO extends GenericDAO<Transportadora> {
 						"select new Transportadora(c.id, c.nomeFantasia) from Transportadora c where c.nomeFantasia like :nomeFantasia order by c.nomeFantasia asc ",
 						Transportadora.class).setParameter("nomeFantasia", "%" + nomeFantasia + "%").getResultList();
 	}
+
+	public Transportadora pesquisarTransportadoraLogradouroById(Integer idTransportadora) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select t from Transportadora t left join fetch t.logradouro where t.id =:idTransportadora ")
+						.setParameter("idTransportadora", idTransportadora), Transportadora.class, null);
+	}
 }

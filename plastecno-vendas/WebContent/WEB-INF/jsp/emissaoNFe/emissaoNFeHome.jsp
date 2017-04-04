@@ -913,17 +913,6 @@ function gerarInputHidden(objeto){
 	};
 };
 
-function adicionarInputHiddenFormulario(json){
-	if(json == null){
-		return;
-	}
-	input = document.createElement('input');
-	input.type = 'hidden';
-	input.name = json.nome;
-	input.value = json.valor;
-	document.getElementById('formEmissao').appendChild(input);
-};
-
 function gerarJsonTipoIcms(){
 	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms',
 		'campos':[{'nome':'codigoSituacaoTributaria', 'id':'tipoTributacaoICMS'},
@@ -1589,6 +1578,8 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	
 	var info = document.getElementById('infoAdicionaisProd');
 	info.value = info.value.split(':')[0]+': '+tot;
+	
+	calcularValorICMSInterestadual();
 };
 
 function zerarImposto(idImposto){
@@ -1608,7 +1599,7 @@ function inicializarCalculoImpostos(){
 	
 	campos = gerarJsonIcmsInterestadual().campos;
 	for (var i = 0; i < campos.length; i++) {
-		$('#bloco_icms_interestadual #'+campos[i].id).blur(function(){
+		$('#bloco_icms_interestadual #'+campos[i].id).keyup(function(){
 			calcularValorICMSInterestadual();
 		});
 	}
@@ -2327,7 +2318,7 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Cl. Enquadramento:</div>
 					<div class="input" style="width: 10%">
-						<input id="clEnquadramentoIPI" type="text" style="width: 100%" maxlength="5"/>
+						<input id="clEnquadramentoIPI" type="text" style="width: 100%" maxlength="3"/>
 					</div>
 					<div  class="label">Cod. Enquadramento:</div>
 					<div class="input" style="width: 50%">

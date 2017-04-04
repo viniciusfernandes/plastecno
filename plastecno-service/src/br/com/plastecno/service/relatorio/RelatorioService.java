@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
@@ -32,6 +33,14 @@ public interface RelatorioService {
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
 			Periodo periodo);
+
+	RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicata(Periodo periodo) throws BusinessException;
+
+	RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicataByIdPedido(Integer idPedido)
+			throws BusinessException;
+
+	RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicataByNumeroNFe(Integer numeroNFe)
+			throws BusinessException;
 
 	List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException;
 

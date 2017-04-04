@@ -81,12 +81,14 @@ public class ItemPedido extends Item {
 	@Transient
 	private Integer idPedido;
 
+	// Esse campo foi criado para associar o pedido de compra a determinados
+	// pedidos de vendas que nao possuem os itens no estoque e precisa ser
+	// comprados
 	@Column(name = "id_pedido_compra")
 	private Integer idPedidoCompra;
 
-	// Essa campo foi criado para manter o historico de compra indicando a
-	// pedido
-	// de revenda esta vinculado o pedido de compra.
+	// Essa campo foi criado para manter o historico de compra indicando a qual
+	// pedido de revenda esta vinculado o pedido de compra.
 	@Column(name = "id_pedido_venda")
 	private Integer idPedidoVenda;
 

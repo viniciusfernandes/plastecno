@@ -7,6 +7,7 @@ import br.com.plastecno.service.entity.NFePedido;
 import br.com.plastecno.service.impl.util.QueryUtil;
 
 public class NFePedidoDAO extends GenericDAO<NFePedido> {
+
 	public NFePedidoDAO(EntityManager entityManager) {
 		super(entityManager);
 	}
@@ -53,6 +54,14 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 		}
 		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(s.toString()).setParameter("idPedido", idPedido),
 				Integer.class, null);
+	}
+
+	public Object[] pesquisarNumeroSerieModeloNFe() {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery("select p.numero, p.serie, p.modelo, (select max(p2.numeroAssociado) from NFePedido p2) from NFePedido p where p.numero = (select max(p1.numero) from NFePedido p1 ) "),
+						Object[].class, null);
 	}
 
 	public String pesquisarXMLNFeByIdPedido(Integer idPedido) {

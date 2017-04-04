@@ -35,3 +35,26 @@ ALTER TABLE vendas.tb_item_pedido RENAME column valor_comissionado_representacao
 
 alter table vendas.tb_cliente add inscricao_suframa varchar(10) default null;
 
+
+create table vendas.tb_situacao_duplicata (
+	id integer not null,	
+	descricao varchar(20) not null
+);
+
+ALTER TABLE vendas.tb_situacao_duplicata ADD PRIMARY KEY (id);
+insert into vendas.tb_situacao_duplicata(id, descricao) values (0, 'A VENCER');
+insert into vendas.tb_situacao_duplicata(id, descricao) values (1, 'VENCIDO');
+insert into vendas.tb_situacao_duplicata(id, descricao) values (2, 'LIQUIDADO');
+
+create table vendas.tb_nfe_duplicata (
+	id integer not null,
+	id_nfe_pedido integer not null,
+	nome_cliente varchar(150) not null,
+	data_vencimento date not null,
+	valor numeric(10,2) not null,
+	id_situacao_duplicata integer not null
+);
+ALTER TABLE vendas.tb_nfe_duplicata ADD PRIMARY KEY (id);
+alter table vendas.tb_nfe_duplicata add constraint id_nfe_pedido foreign key (id_nfe_pedido) references vendas.tb_nfe_pedido (numero);
+alter table vendas.tb_nfe_duplicata add constraint id_situacao_duplicata foreign key (id_situacao_duplicata) references vendas.tb_situacao_duplicata (id);
+create sequence vendas.seq_nfe_duplicata_id increment by 1 minvalue 1 no maxvalue start with 1;

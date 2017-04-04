@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RamoAtividadeService;
@@ -21,12 +22,14 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
+import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ClienteWrapper;
@@ -47,6 +50,9 @@ import br.com.plastecno.util.StringUtils;
 public class RelatorioServiceImpl implements RelatorioService {
 	@EJB
 	private ClienteService clienteService;
+
+	@EJB
+	private DuplicataService duplicataService;
 
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
@@ -270,6 +276,81 @@ public class RelatorioServiceImpl implements RelatorioService {
 		return relatorio;
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicata(List<NFeDuplicata> lDuplic, String titulo)
+			throws BusinessException {
+		RelatorioWrapper<Integer, NFeDuplicata> relatorio = new RelatorioWrapper<Integer, NFeDuplicata>(titulo);
+		Date dtAtual = new Date();
+		for (NFeDuplicata d : lDuplic) {
+			// Vamos definir a situação da duplicata
+			if (!d.isLiquidado() && dtAtual.after(d.getDataVencimento())) {
+				d.setTipoSituacaoDuplicata(TipoSituacaoDuplicata.VENCIDO);
+			}
+			d.setDataVencimentoFormatada(StringUtils.formatarData(d.getDataVencimento()));
+
+			relatorio.addGrupo(d.getNumeroNFe(), d).setPropriedade("nomeCliente", d.getNomeCliente());
+		}
+
+		relatorio.sortGrupo(new Comparator<GrupoWrapper<Integer, NFeDuplicata>>() {
+			@Override
+			public int compare(GrupoWrapper<Integer, NFeDuplicata> o1, GrupoWrapper<Integer, NFeDuplicata> o2) {
+				return o1.getId() != null && o1.getId() != null ? o2.getId().compareTo(o1.getId()) : 0;
+			}
+		});
+
+		relatorio.sortElementoByGrupo(new Comparator<NFeDuplicata>() {
+
+			@Override
+			public int compare(NFeDuplicata o1, NFeDuplicata o2) {
+				return o1.getDataVencimento() != null && o2.getDataVencimento() != null ? o2.getDataVencimento()
+						.compareTo(o1.getDataVencimento()) : 0;
+			}
+		});
+		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicata(Periodo periodo) throws BusinessException {
+		if (periodo == null) {
+			throw new BusinessException("Não é possível gerar relatório de duplicatas pois o período esta nulo.");
+		}
+
+		StringBuilder titulo = new StringBuilder();
+		titulo.append("Duplicatas de ").append(StringUtils.formatarData(periodo.getInicio())).append(" à ")
+				.append(StringUtils.formatarData(periodo.getFim()));
+
+		return gerarRelatorioDuplicata(duplicataService.pesquisarDuplicataByPeriodo(periodo), titulo.toString());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicataByIdPedido(Integer idPedido)
+			throws BusinessException {
+		if (idPedido == null) {
+			throw new BusinessException("Não é possível gerar relatório de duplicatas pois número do pedido esta nulo.");
+		}
+
+		StringBuilder titulo = new StringBuilder();
+		titulo.append("Duplicatas do pedido No. ").append(idPedido);
+
+		return gerarRelatorioDuplicata(duplicataService.pesquisarDuplicataByIdPedido(idPedido), titulo.toString());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicataByNumeroNFe(Integer numeroNFe)
+			throws BusinessException {
+		if (numeroNFe == null) {
+			throw new BusinessException("Não é possível gerar relatório de duplicatas pois o número da NFe esta nulo.");
+		}
+
+		StringBuilder titulo = new StringBuilder();
+		titulo.append("Duplicatas do pedido da NFe ").append(numeroNFe);
+
+		return gerarRelatorioDuplicata(duplicataService.pesquisarDuplicataByNumeroNFe(numeroNFe), titulo.toString());
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pedido> gerarRelatorioEntrega(Periodo periodo) throws InformacaoInvalidaException {
@@ -347,7 +428,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 				item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
 				item.setAliquotaComissaoRepresentadaFormatado(NumeroUtils.formatarPercentual(item
 						.getAliquotaComissaoRepresentada()));
-				
+
 				item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
 				item.setValorComissionadoRepresentadaFormatado(NumeroUtils.formatarValorMonetario(item
 						.getValorComissionadoRepresentada()));

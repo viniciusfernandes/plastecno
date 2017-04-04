@@ -275,11 +275,10 @@ public class PedidoServiceImpl implements PedidoService {
 			return lista;
 		}
 
-		// As datas de pagamentos sao sempre calculadas a partir da data de
-		// envio nda nota fiscal, ou seja, a data correte.
+		// Pedidos com pagamento a vista ou antecipado nao deve ter boletos, por
+		// isso nao tera datas de pagamentos
 		String[] dias = formaPagamento.split("\\D+");
 		if (dias.length == 0) {
-			lista.add(new Date());
 			return lista;
 		}
 

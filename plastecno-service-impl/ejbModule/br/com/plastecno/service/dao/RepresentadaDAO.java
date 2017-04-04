@@ -8,6 +8,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoRelacionamento;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.impl.util.QueryUtil;
 
@@ -16,12 +17,29 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 		super(entityManager);
 	}
 
+	public double pesquisarAliquotaICMSRevendedor() {
+		Double icms = QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select r.aliquotaICMS from Representada r where r.tipoRelacionamento = :tipoRelacionamento")
+						.setParameter("tipoRelacionamento", TipoRelacionamento.REVENDA), Double.class, null);
+		return icms == null ? 0 : icms;
+	}
+
 	public Representada pesquisarById(Integer idRepresentada) {
 		return pesquisarById(Representada.class, idRepresentada);
 	}
 
 	public double pesquisarComissao(Integer idRepresentada) {
 		return super.pesquisarCampoById(Representada.class, idRepresentada, "comissao", Double.class);
+	}
+
+	public Logradouro pesquisarLogradorouro(Integer id) {
+		StringBuilder select = new StringBuilder("select t.logradouro from Representada t  ");
+		select.append(" INNER JOIN t.logradouro where t.id = :id ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("id", id);
+		return QueryUtil.gerarRegistroUnico(query, Logradouro.class, null);
 	}
 
 	public String pesquisarNomeFantasiaById(Integer idRepresentada) {
@@ -75,33 +93,27 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 		return query.getResultList();
 	}
 
-	public double pesquisarAliquotaICMSRevendedor() {
-		Double icms = QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery(
-						"select r.aliquotaICMS from Representada r where r.tipoRelacionamento = :tipoRelacionamento").setParameter(
-						"tipoRelacionamento", TipoRelacionamento.REVENDA), Double.class, null);
-		return icms == null ? 0 : icms;
-	}
-
 	public Representada pesquisarRevendedor() {
 		return QueryUtil
 				.gerarRegistroUnico(
 						entityManager
 								.createQuery(
 										"select new Representada(r.id, r.nomeFantasia) from Representada r where r.tipoRelacionamento = :tipoRelacionamento")
-								.setParameter("tipoRelacionamento", TipoRelacionamento.REVENDA), Representada.class, null);
+								.setParameter("tipoRelacionamento", TipoRelacionamento.REVENDA), Representada.class,
+						null);
 	}
 
 	public TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(Integer idRepresentada) {
 		Query query = this.entityManager.createQuery(
-				"select r.tipoApresentacaoIPI from Representada r where r.id = :idRepresentada").setParameter("idRepresentada",
-				idRepresentada);
+				"select r.tipoApresentacaoIPI from Representada r where r.id = :idRepresentada").setParameter(
+				"idRepresentada", idRepresentada);
 		return QueryUtil.gerarRegistroUnico(query, TipoApresentacaoIPI.class, TipoApresentacaoIPI.NUNCA);
 	}
 
 	public TipoRelacionamento pesquisarTipoRelacionamento(Integer idRepresentada) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("SELECT r.tipoRelacionamento FROM Representada r where r.id = :idRepresentada")
-						.setParameter("idRepresentada", idRepresentada), TipoRelacionamento.class, null);
+				entityManager.createQuery(
+						"SELECT r.tipoRelacionamento FROM Representada r where r.id = :idRepresentada").setParameter(
+						"idRepresentada", idRepresentada), TipoRelacionamento.class, null);
 	}
 }

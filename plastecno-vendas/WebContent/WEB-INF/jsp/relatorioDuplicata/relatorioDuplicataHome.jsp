@@ -25,7 +25,7 @@
 		inserirMascaraData('dataInicial');
 		inserirMascaraData('dataFinal');
 		inserirMascaraData('dataVencimento');
-		inserirMascaraMonetaria('valor', 10);
+		inserirMascaraMonetaria('valor', 7);
 	});
 
 function alterarDuplicata(botao, metodo, acao, tipo){

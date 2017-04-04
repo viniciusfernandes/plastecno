@@ -11,7 +11,6 @@ import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
-import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -34,6 +33,7 @@ public class RelatorioDuplicataController extends AbstractController {
         try {
             duplicataService.alterarDataVendimentoValorById(idDuplicata, dataVencimento, valor);
             redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
+            gerarMensagemSucesso("Duplicata alterada com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             irTopoPagina();
@@ -99,7 +99,7 @@ public class RelatorioDuplicataController extends AbstractController {
         NFeDuplicata d = duplicataService.pesquisarDuplicataById(idDuplicata);
         if (d != null) {
             addAtributo("dataVencimento", StringUtils.formatarData(d.getDataVencimento()));
-            addAtributo("valor", NumeroUtils.formatarValorMonetario(d.getValor()));
+            addAtributo("valor", d.getValor());
             addAtributo("idDuplicata", d.getId());
         }
         redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);

@@ -255,8 +255,8 @@ public class NFeServiceImpl implements NFeService {
 		double valorICMSDesonerado = 0;
 		double valorTotalTributos = 0;
 
-		for (DetalhamentoProdutoServicoNFe item : listaItem) {
-			tributo = item.getTributosProdutoServico();
+		for (DetalhamentoProdutoServicoNFe det : listaItem) {
+			tributo = det.getTributosProdutoServico();
 			if (tributo != null) {
 
 				valorTotalTributos += tributo.getValorTotalTributos();
@@ -300,7 +300,7 @@ public class NFeServiceImpl implements NFeService {
 				}
 			}
 
-			produto = item.getProdutoServicoNFe();
+			produto = det.getProdutoServicoNFe();
 
 			valorSeguro += produto.getValorTotalSeguro();
 			valorFrete += produto.getValorTotalFrete();
@@ -737,9 +737,9 @@ public class NFeServiceImpl implements NFeService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarQuantitadeItemRestanteByIdPedido(Integer idPedido) {
-		List<ItemPedido> lFracionado = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-		if (lFracionado.isEmpty()) {
-			return lFracionado;
+		List<ItemPedido> lRestante = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		if (lRestante.isEmpty()) {
+			return lRestante;
 		}
 
 		// Pesquisando a quantidade total ja fracionada de cada item
@@ -747,9 +747,9 @@ public class NFeServiceImpl implements NFeService {
 
 		// Aqui estamos criando uma nova lista pois o Java nao permite remover
 		// um item da lista que esta sendo iterada.
-		List<ItemPedido> lRestante = new ArrayList<ItemPedido>(lFracionado);
+		List<ItemPedido> lItem = new ArrayList<ItemPedido>(lRestante);
 		Integer qRestante = null;
-		for (ItemPedido i : lRestante) {
+		for (ItemPedido i : lItem) {
 			for (Integer[] val : lTotal) {
 				if (i.getSequencial().equals(val[0])) {
 					qRestante = i.getQuantidade() - val[1];
@@ -757,7 +757,7 @@ public class NFeServiceImpl implements NFeService {
 					// foram totalmente fracionados para que eles nao aparecam
 					// para o usuario com quantidade zerada.
 					if (qRestante == null || qRestante == 0) {
-						lFracionado.remove(i);
+						lRestante.remove(i);
 						break;
 					}
 					i.setQuantidade(qRestante);
@@ -765,7 +765,7 @@ public class NFeServiceImpl implements NFeService {
 				}
 			}
 		}
-		return lFracionado;
+		return lRestante;
 	}
 
 	@Override

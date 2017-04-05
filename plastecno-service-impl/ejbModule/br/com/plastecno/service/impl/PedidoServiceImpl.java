@@ -1628,7 +1628,7 @@ public class PedidoServiceImpl implements PedidoService {
 			return null;
 		}
 
-		Pedido pedido = pesquisarPedidoByIdItemPedido(idItemPedido);
+		Pedido pedido = pedidoDAO.pesquisarPedidoResumidoFinalidadeByIdItemPedido(idItemPedido);
 		if (pedido == null) {
 			return null;
 		}

@@ -310,6 +310,15 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						"idItemPedido", idItemPedido), Pedido.class, null);
 	}
 
+	public Pedido pesquisarPedidoResumidoFinalidadeByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Pedido(i.pedido.id, i.pedido.finalidadePedido, i.pedido.tipoPedido) from ItemPedido i where i.id =:idItemPedido")
+								.setParameter("idItemPedido", idItemPedido), Pedido.class, null);
+	}
+
 	public Pedido pesquisarPedidoResumidoCalculoComissao(Integer idPedido) {
 		return QueryUtil
 				.gerarRegistroUnico(

@@ -199,6 +199,13 @@ public class Pedido implements Serializable, Cloneable {
 		this.tipoPedido = tipoPedido;
 	}
 
+	// Construtor utilizado na pesquisa para carregar a finalidade do pedido
+	public Pedido(Integer id, TipoFinalidadePedido tipoFinalidadePedido, TipoPedido tipoPedido) {
+		this.id = id;
+		this.finalidadePedido = tipoFinalidadePedido;
+		this.tipoPedido = tipoPedido;
+	}
+
 	public Pedido(Integer id) {
 		this.id = id;
 	}

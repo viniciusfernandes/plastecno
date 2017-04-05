@@ -25,9 +25,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
+import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
@@ -41,8 +41,8 @@ public class Pedido implements Serializable, Cloneable {
 	 */
 	private static final long serialVersionUID = -7474382741231270790L;
 
-	@Column(name = "aliquota_comissao")
-	private Double aliquotaComissao;
+	@Transient
+	private Double aliquotaComissaoRepresentada;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_cliente")
@@ -63,7 +63,7 @@ public class Pedido implements Serializable, Cloneable {
 
 	@Transient
 	private String dataEmissaoNFFormatada;
-	
+
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_entrega")
 	private Date dataEntrega;
@@ -104,6 +104,9 @@ public class Pedido implements Serializable, Cloneable {
 	// Campo criado para atualizar o id do cliente no envio do pedido via json.
 	@Transient
 	private Integer idCliente;
+
+	@Transient
+	private Integer idVendedor;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@JoinTable(name = "tb_pedido_tb_logradouro", schema = "vendas", joinColumns = { @JoinColumn(name = "id_pedido", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_logradouro", referencedColumnName = "id") })
@@ -185,6 +188,17 @@ public class Pedido implements Serializable, Cloneable {
 	public Pedido() {
 	}
 
+	// Construtor utilizado na pesquisa para o calculo de comissao, por isso
+	// temos poucos parametros
+	public Pedido(Double aliquotaComissaoRepresentada, Integer id, Integer idVendedor,
+			TipoFinalidadePedido tipoFinalidadePedido, TipoPedido tipoPedido) {
+		this.aliquotaComissaoRepresentada = aliquotaComissaoRepresentada;
+		this.id = id;
+		this.idVendedor = idVendedor;
+		this.finalidadePedido = tipoFinalidadePedido;
+		this.tipoPedido = tipoPedido;
+	}
+
 	public Pedido(Integer id) {
 		this.id = id;
 	}
@@ -239,7 +253,8 @@ public class Pedido implements Serializable, Cloneable {
 
 	public Pedido(Integer id, TipoPedido tipoPedido, Date dataEntrega, Date dataEnvio, Double valorPedido,
 			String nomeFantasiaCliente, String razaoSocialCliente, String nomeFantasiaRepresentada) {
-		this(id, tipoPedido, dataEntrega, valorPedido, nomeFantasiaCliente, razaoSocialCliente, nomeFantasiaRepresentada);
+		this(id, tipoPedido, dataEntrega, valorPedido, nomeFantasiaCliente, razaoSocialCliente,
+				nomeFantasiaRepresentada);
 		this.dataEnvio = dataEnvio;
 	}
 
@@ -280,8 +295,8 @@ public class Pedido implements Serializable, Cloneable {
 		return o instanceof Pedido && id != null && id.equals(((Pedido) o).id);
 	}
 
-	public Double getAliquotaComissao() {
-		return aliquotaComissao;
+	public Double getAliquotaComissaoRepresentada() {
+		return aliquotaComissaoRepresentada;
 	}
 
 	public Cliente getCliente() {
@@ -346,6 +361,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public Integer getIdCliente() {
 		return idCliente;
+	}
+
+	public Integer getIdVendedor() {
+		return idVendedor;
 	}
 
 	public List<Logradouro> getListaLogradouro() {
@@ -495,8 +514,8 @@ public class Pedido implements Serializable, Cloneable {
 				&& SituacaoPedido.ENVIADO.equals(situacaoPedido);
 	}
 
-	public void setAliquotaComissao(Double aliquotaComissao) {
-		this.aliquotaComissao = aliquotaComissao;
+	public void setAliquotaComissaoRepresentada(Double aliquotaComissaoRepresentada) {
+		this.aliquotaComissaoRepresentada = aliquotaComissaoRepresentada;
 	}
 
 	public void setCliente(Cliente cliente) {
@@ -565,6 +584,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setIdCliente(Integer idCliente) {
 		this.idCliente = idCliente;
+	}
+
+	public void setIdVendedor(Integer idVendedor) {
+		this.idVendedor = idVendedor;
 	}
 
 	public void setListaLogradouro(List<Logradouro> listaLogradouro) {

@@ -30,10 +30,10 @@ import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
-import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
+import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
@@ -188,23 +188,13 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@TODO(descricao = "Redefinir os parametros do metodo pois nao eh necessario passar um pedido completo")
-	private void calcularComissaoVenda(Pedido pedido) throws BusinessException {
-		calcularComissaoVenda(pedido, pesquisarItemPedidoByIdPedido(pedido.getId()).toArray(new ItemPedido[] {}));
-	}
-
-	@TODO(descricao = "Redefinir os parametros do metodo pois nao eh necessario passar um pedido completo")
 	private void calcularComissaoVenda(Pedido pedido, ItemPedido... listaItem) throws BusinessException {
-		if (!pedido.isVenda() || !isCalculoComissaoPermitida(pedido.getFinalidadePedido())) {
+
+		if (pedido == null || !pedido.isVenda() || !isCalculoComissaoPermitida(pedido.getFinalidadePedido())) {
 			return;
 		}
 
-		if (pedido.isRepresentacao() && pedido.getAliquotaComissao() == null) {
-			throw new BusinessException("Não existe comissão configurada para o pedido pedido No. " + pedido.getId()
-					+ ". Veja as configurações da representada \"" + pedido.getRepresentada().getNomeFantasia() + "\"");
-		}
-
 		Comissao comissaoVenda = null;
-
 		Double aliqComissao = null;
 		Double aliqRepresentada = null;
 		Double valorComissionado = null;
@@ -230,13 +220,13 @@ public class PedidoServiceImpl implements PedidoService {
 				// Caso nao exista comissao configurada para o material devemos
 				// utilizar a comissao configurada para o vendedor.
 				if (comissaoVenda == null) {
-					comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
+					comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getIdVendedor());
 				}
 
 			} // O caso de venda por representacao tem uma comissao diferente da
 				// revenda.
 			else if (pedido.isRepresentacao()) {
-				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
+				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getIdVendedor());
 			}
 
 			// Nos calculos do preco de venda do item nao pode haver o IPI de
@@ -249,10 +239,10 @@ public class PedidoServiceImpl implements PedidoService {
 			} else if (pedido.isRepresentacao() && comissaoVenda != null
 					&& comissaoVenda.getAliquotaRepresentacao() != null) {
 				aliqComissao = comissaoVenda.getAliquotaRepresentacao();
-				aliqRepresentada = pedido.getRepresentada().getComissao();
+				aliqRepresentada = pedido.getAliquotaComissaoRepresentada();
 
 				valorComissionado = precoItem * aliqComissao;
-				valorComissionadoRepresentada = precoItem * (aliqRepresentada);
+				valorComissionadoRepresentada = precoItem * (aliqRepresentada == null ? 0 : aliqRepresentada);
 			} else {
 				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
 				throw new BusinessException(
@@ -559,7 +549,6 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido.isOrcamento()) {
 			enviarOrcamento(pedido, arquivoAnexado);
 		} else {
-			calcularComissaoVenda(pedido);
 			enviarVenda(pedido, arquivoAnexado);
 		}
 
@@ -603,7 +592,6 @@ public class PedidoServiceImpl implements PedidoService {
 			e.addMensagem(e.getListaMensagem());
 			throw e;
 		}
-
 	}
 
 	private Integer gerarSequencialItemPedido(Integer idPedido) {
@@ -665,8 +653,6 @@ public class PedidoServiceImpl implements PedidoService {
 				throw new BusinessException("Não existe vendedor associado ao cliente " + nomeCliente);
 			}
 			pedido.setVendedor(vendedor);
-			pedido.setAliquotaComissao(representadaService.pesquisarComissaoRepresentada(pedido.getRepresentada()
-					.getId()));
 		}
 
 		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());
@@ -729,11 +715,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 		itemPedido.configurarMedidaInterna();
 
-		// Temos que recuperar o pedido pois os valores totais do pedido serao
-		// alterados sempre com a inclusao de item. Esses valores serao
-		// utilizados
-		// para facilitar a exibicao dos valores do pedido para o usuario.
-		final Pedido pedido = pesquisarPedidoById(idPedido);
+		// Aqui retornamos apenas as informacoes necessarias do pedida para a
+		// inclusao do item para nao sobrecarregar o sistema.
+		Pedido pedido = pedidoDAO.pesquisarPedidoResumidoCalculoComissao(idPedido);
 		itemPedido.setPedido(pedido);
 		/*
 		 * Atualizando o valor de cada unidade do item que podera ser usado

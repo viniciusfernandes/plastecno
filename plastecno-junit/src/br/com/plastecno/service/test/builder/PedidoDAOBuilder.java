@@ -176,6 +176,13 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public Pedido pesquisarPedidoResumidoCalculoComissao(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return new Pedido(p.getRepresentada().getComissao(), p.getId(), p.getVendedor().getId(),
+						p.getFinalidadePedido(), p.getTipoPedido());
+			}
+
+			@Mock
 			Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
 				return 120d;
 			}

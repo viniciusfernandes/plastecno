@@ -59,6 +59,16 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public void alterarValorPedido(Integer idPedido, Double valorPedido, Double valorPedidoIPI) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				if (p == null) {
+					return;
+				}
+				p.setValorPedido(valorPedido);
+				p.setValorPedidoIPI(valorPedidoIPI);
+			}
+
+			@Mock
 			void cancelar(Integer IdPedido) {
 				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, IdPedido);
 				if (pedido != null) {

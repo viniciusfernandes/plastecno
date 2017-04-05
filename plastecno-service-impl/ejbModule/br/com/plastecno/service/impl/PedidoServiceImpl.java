@@ -50,7 +50,6 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
-import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.impl.calculo.CalculadoraPreco;
 import br.com.plastecno.service.impl.mensagem.email.GeradorPedidoEmail;
 import br.com.plastecno.service.impl.mensagem.email.TipoMensagemPedido;
@@ -187,7 +186,6 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
 	}
 
-	@TODO(descricao = "Redefinir os parametros do metodo pois nao eh necessario passar um pedido completo")
 	private void calcularComissaoVenda(Pedido pedido, ItemPedido... listaItem) throws BusinessException {
 
 		if (pedido == null || !pedido.isVenda() || !isCalculoComissaoPermitida(pedido.getFinalidadePedido())) {
@@ -695,7 +693,6 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.inserirDadosNotaFiscal(pedido);
 	}
 
-	@TODO(descricao = "Estamos recuperando o valor todo do pedido para associar ao item. DEvemos tambem implementar um esquema para calcular a comissao do item e nao do pedido todo. Rever urgentemente")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException {
@@ -791,8 +788,7 @@ public class PedidoServiceImpl implements PedidoService {
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao
 		 * de validacoes, caso contrario teremos um valor nulo na base de dados.
 		 */
-		pedido.setValorPedido(calcularValorPedido(idPedido));
-		pedido.setValorPedidoIPI(calcularValorPedidoIPI(idPedido));
+		pedidoDAO.alterarValorPedido(idPedido, calcularValorPedido(idPedido), calcularValorPedidoIPI(idPedido));
 
 		// Aqui estamos calculando a comissao pois qualquer alteracao do item do
 		// pedido deve refletir no relatorio de comissao. Mesmo que o pedido nao

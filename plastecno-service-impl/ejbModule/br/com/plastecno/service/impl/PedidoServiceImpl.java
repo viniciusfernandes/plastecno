@@ -16,7 +16,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.ClienteService;
@@ -186,6 +185,16 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private Double[] atualizarValoresPedido(Integer idPedido) {
+		Double[] valores = pedidoDAO.pesquisarValoresPedido(idPedido);
+		if (valores.length <= 0) {
+			return new Double[] {};
+		}
+		pedidoDAO.alterarValorPedido(idPedido, valores[0], valores[1]);
+		return valores;
+	}
+
 	private void calcularComissaoVenda(Pedido pedido, ItemPedido... listaItem) throws BusinessException {
 
 		if (pedido == null || !pedido.isVenda() || !isCalculoComissaoPermitida(pedido.getFinalidadePedido())) {
@@ -292,28 +301,6 @@ public class PedidoServiceImpl implements PedidoService {
 			cal.add(Calendar.DAY_OF_MONTH, -diaCorrido);
 		}
 		return lista;
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double calcularValorPedido(Integer idPedido) throws BusinessException {
-		try {
-			return pedidoDAO.pesquisarQuantidadePrecoUnidade(idPedido);
-		} catch (PersistenceException e) {
-			throw new BusinessException("Falha no calculo do valor da unidade do item do pedido " + idPedido
-					+ ". Provavelmente o valor do item esta estourando os limites do sistema.");
-		}
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException {
-		try {
-			return pedidoDAO.pesquisarQuantidadePrecoUnidadeIPI(idPedido);
-		} catch (PersistenceException e) {
-			throw new BusinessException("Falha no calculo do valor IPI do item do pedido " + idPedido
-					+ ". Provavelmente o valor do item esta estourando os limites do sistema.");
-		}
 	}
 
 	@Override
@@ -788,7 +775,7 @@ public class PedidoServiceImpl implements PedidoService {
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao
 		 * de validacoes, caso contrario teremos um valor nulo na base de dados.
 		 */
-		pedidoDAO.alterarValorPedido(idPedido, calcularValorPedido(idPedido), calcularValorPedidoIPI(idPedido));
+		atualizarValoresPedido(idPedido);
 
 		// Aqui estamos calculando a comissao pois qualquer alteracao do item do
 		// pedido deve refletir no relatorio de comissao. Mesmo que o pedido nao
@@ -1640,18 +1627,22 @@ public class PedidoServiceImpl implements PedidoService {
 		if (idItemPedido == null) {
 			return null;
 		}
-		ItemPedido itemPedido = new ItemPedido();
-		itemPedido.setId(idItemPedido);
-		Pedido pedido = null;
+
+		Pedido pedido = pesquisarPedidoByIdItemPedido(idItemPedido);
+		if (pedido == null) {
+			return null;
+		}
 		try {
-			pedido = pesquisarPedidoByIdItemPedido(idItemPedido);
-			itemPedidoDAO.remover(itemPedido);
+			itemPedidoDAO.remover(new ItemPedido(idItemPedido));
 
 			// Efetuando novamente o calculo pois na remocao o valor do pedido
 			// deve ser atualizado
-			pedido.setValorPedido(calcularValorPedido(pedido.getId()));
-			pedido.setValorPedidoIPI(calcularValorPedidoIPI(pedido.getId()));
-
+			Double[] valores = atualizarValoresPedido(pedido.getId());
+			if (valores.length > 0) {
+				pedido.setValorPedido(valores[0]);
+				pedido.setValorPedidoIPI(valores[1]);
+			}
+			
 			if (pedido.isCompraEfetuada() && pesquisarTotalItemPedido(pedido.getId()) <= 0L) {
 				pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
 			}

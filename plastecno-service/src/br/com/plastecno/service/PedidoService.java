@@ -39,10 +39,6 @@ public interface PedidoService {
 
 	List<Date> calcularDataPagamento(Integer idPedido);
 
-	Double calcularValorPedido(Integer idPedido) throws BusinessException;
-
-	Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException;
-
 	void cancelarPedido(Integer idPedido) throws BusinessException;
 
 	Integer comprarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)

@@ -17,6 +17,22 @@ public class NFeItemFracionadoDAOBuilder extends DAOBuilder<NFeItemFracionadoDAO
 	@Override
 	public NFeItemFracionadoDAO build() {
 		new MockUp<NFeItemFracionadoDAO>() {
+
+			@Mock
+			public Integer pesquisarIdItemFracionado(Integer idItemPedido, Integer numeroNFe) {
+				if (idItemPedido == null || numeroNFe == null) {
+					return null;
+				}
+
+				List<NFeItemFracionado> l = REPOSITORY.pesquisarTodos(NFeItemFracionado.class);
+				for (NFeItemFracionado i : l) {
+					if (idItemPedido.equals(i.getIdItemPedido()) && numeroNFe.equals(i.getNumeroNFe())) {
+						return i.getId();
+					}
+				}
+				return null;
+			}
+
 			@Mock
 			public List<Integer[]> pesquisarQuantidadeTotalItemFracionado(Integer idPedido) {
 				if (idPedido == null) {
@@ -51,6 +67,23 @@ public class NFeItemFracionadoDAOBuilder extends DAOBuilder<NFeItemFracionadoDAO
 					l.add(new Integer[] { e.getKey(), e.getValue() });
 				}
 				return l;
+			}
+
+			@Mock
+			public Integer pesqusisarQuantidadeTotalFracionadoByIdItemPedido(Integer idItemPedido, Integer numeroNFe) {
+				if (idItemPedido == null || numeroNFe == null) {
+					return null;
+				}
+
+				List<NFeItemFracionado> l = REPOSITORY.pesquisarTodos(NFeItemFracionado.class);
+				int totalFrac = 0;
+				for (NFeItemFracionado i : l) {
+					if (idItemPedido.equals(i.getIdItemPedido()) && !numeroNFe.equals(i.getNumeroNFe())
+							&& i.getQuantidadeFracionada() != null) {
+						totalFrac += i.getQuantidadeFracionada();
+					}
+				}
+				return totalFrac;
 			}
 		};
 		return new NFeItemFracionadoDAO(null);

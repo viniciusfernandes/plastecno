@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Id;
+
 import mockit.Mock;
 import mockit.MockUp;
 import br.com.plastecno.service.dao.GenericDAO;
@@ -84,11 +86,35 @@ public class EntidadeRepository {
 
 			@Mock
 			Object inserir(Object t) {
-				try {
-					Method m = t.getClass().getMethod("setId", Integer.class);
-					m.invoke(t, gerarId());
-				} catch (Exception e) {
-					throw new IllegalArgumentException(e);
+				Field[] campos = t.getClass().getDeclaredFields();
+				boolean isId = false;
+				for (Field f : campos) {
+					// Devemos verificar se o campos esta anotado como chave
+					// primaria pois nem todas as entidades possuem essa chave
+					// nomeada como ID, por exemplo a NFe.
+					if ((isId = f.isAnnotationPresent(Id.class)) && f.getName().equals("id")) {
+						try {
+							f.setAccessible(true);
+							f.set(t, gerarId());
+						} catch (IllegalArgumentException | IllegalAccessException e) {
+							throw new IllegalArgumentException(e);
+
+						} finally {
+							f.setAccessible(false);
+						}
+					} else if (isId) {
+						try {
+							f.setAccessible(true);
+							if (f.get(t) == null) {
+								throw new IllegalArgumentException("A chave primaria do campo " + f.getName()
+										+ " nao pode estar em branco e deve ser gerada manualmente.");
+							}
+						} catch (IllegalArgumentException | IllegalAccessException e) {
+							throw new IllegalArgumentException(e);
+						} finally {
+							f.setAccessible(false);
+						}
+					}
 				}
 				inserirEntidade(t);
 				return t;
@@ -164,8 +190,8 @@ public class EntidadeRepository {
 							+ "\" da entidade cujo valor eh \"" + valorAtributo + "\"", e);
 				}
 			} catch (NoSuchFieldException | SecurityException e) {
-				throw new IllegalArgumentException("A entidade do tipo " + classe + " nao possui o atributo \"" + nomeAtributo
-						+ "\"", e);
+				throw new IllegalArgumentException("A entidade do tipo " + classe + " nao possui o atributo \""
+						+ nomeAtributo + "\"", e);
 			}
 		}
 		return lista;
@@ -187,8 +213,8 @@ public class EntidadeRepository {
 						+ "\" da entidade cujo valor eh \"" + valorAtributo + "\"", e);
 			}
 		} catch (NoSuchFieldException | SecurityException e) {
-			throw new IllegalArgumentException("A entidade do tipo " + classe + " nao possui o atributo \"" + nomeAtributo
-					+ "\"", e);
+			throw new IllegalArgumentException("A entidade do tipo " + classe + " nao possui o atributo \""
+					+ nomeAtributo + "\"", e);
 		}
 	}
 
@@ -241,8 +267,8 @@ public class EntidadeRepository {
 						+ "\" da entidade cujo valor eh \"" + valorAtributo + "\"", e);
 			}
 		} catch (NoSuchFieldException | SecurityException e) {
-			throw new IllegalArgumentException("A entidade do tipo " + classe + " nao possui o atributo \"" + nomeAtributo
-					+ "\"", e);
+			throw new IllegalArgumentException("A entidade do tipo " + classe + " nao possui o atributo \""
+					+ nomeAtributo + "\"", e);
 		}
 	}
 

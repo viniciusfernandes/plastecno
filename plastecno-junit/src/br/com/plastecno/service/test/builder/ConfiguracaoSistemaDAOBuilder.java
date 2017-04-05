@@ -14,7 +14,9 @@ public class ConfiguracaoSistemaDAOBuilder extends DAOBuilder<ConfiguracaoSistem
 	public ConfiguracaoSistemaDAOBuilder() {
 		mapa.put(ParametroConfiguracaoSistema.REGIME_TRIBUTACAO, "3");
 		mapa.put(ParametroConfiguracaoSistema.CNAE, "1234567");
-		mapa.put(ParametroConfiguracaoSistema.CODIGO_MUNICIPIO_GERADOR_ICMS, "7777777");}
+		mapa.put(ParametroConfiguracaoSistema.CODIGO_MUNICIPIO_GERADOR_ICMS, "7777777");
+		mapa.put(ParametroConfiguracaoSistema.DIRETORIO_XML_NFE, "C:\\NFe");
+	}
 
 	@Override
 	public ConfiguracaoSistemaDAO build() {

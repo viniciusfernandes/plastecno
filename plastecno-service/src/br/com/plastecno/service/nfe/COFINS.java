@@ -42,6 +42,13 @@ public class COFINS {
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo COFINS")
 	private COFINSGeral tipoCofins;
 
+	public COFINS() {
+	}
+
+	public COFINS(COFINSGeral cofinsGeral) {
+		this.setTipoCofins(cofinsGeral);
+	}
+
 	public void configurarSubstituicaoTributaria() {
 		if (tipoCofins == null) {
 			return;

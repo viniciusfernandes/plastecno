@@ -25,7 +25,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import br.com.plastecno.service.constante.FinalidadePedido;
+import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoLogradouro;
@@ -91,7 +91,7 @@ public class Pedido implements Serializable, Cloneable {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "id_finalidade_pedido")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Finalidade do pedido")
-	private FinalidadePedido finalidadePedido;
+	private TipoFinalidadePedido finalidadePedido;
 
 	@Column(name = "forma_pagamento")
 	private String formaPagamento;
@@ -332,7 +332,7 @@ public class Pedido implements Serializable, Cloneable {
 		return dataVencimentoNFFormatada;
 	}
 
-	public FinalidadePedido getFinalidadePedido() {
+	public TipoFinalidadePedido getFinalidadePedido() {
 		return finalidadePedido;
 	}
 
@@ -551,7 +551,7 @@ public class Pedido implements Serializable, Cloneable {
 		this.dataVencimentoNFFormatada = dataVencimentoNFFormatada;
 	}
 
-	public void setFinalidadePedido(FinalidadePedido finalidadePedido) {
+	public void setFinalidadePedido(TipoFinalidadePedido finalidadePedido) {
 		this.finalidadePedido = finalidadePedido;
 	}
 

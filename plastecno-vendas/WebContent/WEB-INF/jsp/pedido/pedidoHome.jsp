@@ -345,25 +345,15 @@ $(document).ready(function() {
 			</div>
 
 			<div class="label obrigatorio">Finalidade:</div>
-			<div class="input">
-				<input type="radio" name="pedido.finalidadePedido"
-					value="${industrializacao}"
-					<c:if test="${industrializacao eq pedido.finalidadePedido}">checked</c:if> />
+			<div class="input" style="width: 80%">
+				<select id="finalidadePedido" name="pedido.finalidadePedido" style="width: 20%" >
+					<option value=""></option>
+					<c:forEach var="tipo" items="${listaTipoFinalidadePedido}">
+						<option value="${tipo}" 
+							<c:if test="${tipo eq pedido.finalidadePedido}">selected</c:if>>${tipo.descricao}</option>
+					</c:forEach>
+				</select>
 			</div>
-			<div class="label label_radio_button">Industrialização</div>
-			<div class="input">
-				<input type="radio" name="pedido.finalidadePedido"
-					value="${consumo}"
-					<c:if test="${consumo eq pedido.finalidadePedido}">checked</c:if> />
-			</div>
-			<div class="label label_radio_button" style="width: 8%">Consumo</div>
-			<div class="input">
-				<input type="radio" name="pedido.finalidadePedido"
-					value="${revenda}"
-					<c:if test="${revenda eq pedido.finalidadePedido}">checked</c:if> />
-			</div>
-			<div class="label label_radio_button" style="width: 50%">Revenda</div>
-
 			<div class="label">Observação:</div>
 			<div class="input areatexto" style="width: 70%">
 				<textarea id="obervacao" name="pedido.observacao"

@@ -30,7 +30,7 @@ import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
-import br.com.plastecno.service.constante.FinalidadePedido;
+import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
@@ -50,6 +50,7 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
+import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.impl.calculo.CalculadoraPreco;
 import br.com.plastecno.service.impl.mensagem.email.GeradorPedidoEmail;
 import br.com.plastecno.service.impl.mensagem.email.TipoMensagemPedido;
@@ -186,8 +187,14 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
 	}
 
+	@TODO(descricao = "Redefinir os parametros do metodo pois nao eh necessario passar um pedido completo")
 	private void calcularComissaoVenda(Pedido pedido) throws BusinessException {
-		if (!pedido.isVenda()) {
+		calcularComissaoVenda(pedido, pesquisarItemPedidoByIdPedido(pedido.getId()).toArray(new ItemPedido[] {}));
+	}
+
+	@TODO(descricao = "Redefinir os parametros do metodo pois nao eh necessario passar um pedido completo")
+	private void calcularComissaoVenda(Pedido pedido, ItemPedido... listaItem) throws BusinessException {
+		if (!pedido.isVenda() || !isCalculoComissaoPermitida(pedido.getFinalidadePedido())) {
 			return;
 		}
 
@@ -196,7 +203,6 @@ public class PedidoServiceImpl implements PedidoService {
 					+ ". Veja as configurações da representada \"" + pedido.getRepresentada().getNomeFantasia() + "\"");
 		}
 
-		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
 		Comissao comissaoVenda = null;
 
 		Double aliqComissao = null;
@@ -374,7 +380,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoCompra.setCliente(clienteService.pesquisarRevendedor());
 		pedidoCompra.setComprador(comprador);
 		pedidoCompra.setContato(contato);
-		pedidoCompra.setFinalidadePedido(FinalidadePedido.REVENDA);
+		pedidoCompra.setFinalidadePedido(TipoFinalidadePedido.REVENDA);
 		pedidoCompra.setProprietario(comprador);
 		pedidoCompra.setRepresentada(fornecedor);
 		pedidoCompra.setSituacaoPedido(SituacaoPedido.DIGITACAO);
@@ -703,6 +709,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.inserirDadosNotaFiscal(pedido);
 	}
 
+	@TODO(descricao = "Estamos recuperando o valor todo do pedido para associar ao item. DEvemos tambem implementar um esquema para calcular a comissao do item e nao do pedido todo. Rever urgentemente")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException {
@@ -726,7 +733,7 @@ public class PedidoServiceImpl implements PedidoService {
 		// alterados sempre com a inclusao de item. Esses valores serao
 		// utilizados
 		// para facilitar a exibicao dos valores do pedido para o usuario.
-		final Pedido pedido = this.pesquisarPedidoById(idPedido);
+		final Pedido pedido = pesquisarPedidoById(idPedido);
 		itemPedido.setPedido(pedido);
 		/*
 		 * Atualizando o valor de cada unidade do item que podera ser usado
@@ -800,8 +807,14 @@ public class PedidoServiceImpl implements PedidoService {
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao
 		 * de validacoes, caso contrario teremos um valor nulo na base de dados.
 		 */
-		pedido.setValorPedido(this.calcularValorPedido(idPedido));
-		pedido.setValorPedidoIPI(this.calcularValorPedidoIPI(idPedido));
+		pedido.setValorPedido(calcularValorPedido(idPedido));
+		pedido.setValorPedidoIPI(calcularValorPedidoIPI(idPedido));
+
+		// Aqui estamos calculando a comissao pois qualquer alteracao do item do
+		// pedido deve refletir no relatorio de comissao. Mesmo que o pedido nao
+		// tenha sido enviado a comissao sera calculada, mas so os pedidos
+		// enviados aparecerao no relatorio de comissao.
+		calcularComissaoVenda(pedido, itemPedido);
 
 		return itemPedido.getId();
 	}
@@ -847,6 +860,12 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setCliente(clienteService.inserir(cliente));
 		}
 		return inserir(pedido);
+	}
+
+	private boolean isCalculoComissaoPermitida(TipoFinalidadePedido tipoFinalidade) {
+		return TipoFinalidadePedido.INDUSTRIALIZACAO.equals(tipoFinalidade)
+				|| TipoFinalidadePedido.CONSUMO.equals(tipoFinalidade)
+				|| TipoFinalidadePedido.REVENDA.equals(tipoFinalidade);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)

@@ -22,7 +22,7 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TipoEntregaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
-import br.com.plastecno.service.constante.FinalidadePedido;
+import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoCST;
@@ -350,10 +350,13 @@ public class PedidoController extends AbstractController {
             if (aliquotaIPI != null) {
                 itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
             }
-            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
-            itemPedido.setAliquotaComissao(NumeroUtils.gerarAliquota(itemPedido.getAliquotaComissao()));
 
-            final Integer idItemPedido = this.pedidoService.inserirItemPedido(numeroPedido, itemPedido);
+            itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
+            if (itemPedido.contemAliquotaComissao()) {
+                itemPedido.setAliquotaComissao(NumeroUtils.gerarAliquota(itemPedido.getAliquotaComissao()));
+            }
+
+            final Integer idItemPedido = pedidoService.inserirItemPedido(numeroPedido, itemPedido);
             itemPedido.setId(idItemPedido);
 
             Double[] valorPedido = pedidoService.pesquisarValorPedidoByItemPedido(idItemPedido);
@@ -473,9 +476,7 @@ public class PedidoController extends AbstractController {
         addAtributo("listaFormaMaterial", formaMaterialService.pesquisar());
         addAtributo("listaContatoDesabilitada", true);
 
-        addAtributo("industrializacao", FinalidadePedido.INDUSTRIALIZACAO);
-        addAtributo("consumo", FinalidadePedido.CONSUMO);
-        addAtributo("revenda", FinalidadePedido.REVENDA);
+        addAtributo("listaTipoFinalidadePedido", TipoFinalidadePedido.values());
         addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
         addAtributo("inclusaoDadosNFdesabilitado", false);
         addAtributo("listaCST", TipoCST.values());

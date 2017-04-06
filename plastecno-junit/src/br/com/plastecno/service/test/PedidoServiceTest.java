@@ -384,7 +384,10 @@ public class PedidoServiceTest extends AbstractTest {
 	private PedidoRevendaECompra gerarRevendaEncomendada() {
 		Pedido pedidoRevenda = gerarPedidoRevenda();
 		ItemPedido item1 = gerarItemPedido();
+		item1.setPedido(pedidoRevenda);
+		
 		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
+		item2.setPedido(pedidoRevenda);
 		item2.setMaterial(item1.getMaterial());
 
 		Integer idPedidoRevenda = pedidoRevenda.getId();

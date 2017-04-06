@@ -251,7 +251,7 @@ public class PedidoServiceImpl implements PedidoService {
 				valorComissionado = precoItem * aliqComissao;
 				valorComissionadoRepresentada = precoItem * (aliqRepresentada == null ? 0 : aliqRepresentada);
 			} else {
-				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
+				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getIdVendedor());
 				throw new BusinessException(
 						"Não existe comissão configurada para o vendedor \""
 								+ vendedor.getNomeCompleto()
@@ -607,23 +607,23 @@ public class PedidoServiceImpl implements PedidoService {
 
 		final Integer idPedido = pedido.getId();
 		final boolean isPedidoNovo = idPedido == null;
+
+		final boolean vendaPermitida = usuarioService.isVendaPermitida(pedido.getCliente().getId(), pedido
+				.getVendedor().getId());
 		/*
 		 * Estamos proibindo que qualquer vendedor cadastre um NOVO pedido para
 		 * um cliente que nao esteja associado em sua carteira de clientes.
 		 */
-		if (isPedidoNovo && pedido.isVenda()
-				&& !this.usuarioService.isVendaPermitida(pedido.getCliente().getId(), pedido.getVendedor().getId())) {
+		if (isPedidoNovo && pedido.isVenda() && !vendaPermitida) {
 
-			Cliente cliente = this.clienteService.pesquisarById(pedido.getCliente().getId());
-			Usuario proprietario = this.usuarioService.pesquisarById(pedido.getProprietario().getId());
+			Cliente cliente = clienteService.pesquisarById(pedido.getCliente().getId());
+			Usuario proprietario = usuarioService.pesquisarById(pedido.getProprietario().getId());
 			throw new BusinessException("Não é possível incluir o pedido pois o cliente "
 					+ (cliente != null ? cliente.getNomeCompleto() : pedido.getCliente().getId())
 					+ " não esta associado ao vendedor "
 					+ (proprietario != null ? proprietario.getNome() + " - " + proprietario.getEmail() : pedido
 							.getCliente().getId()));
-		}
-
-		if (pedido.isVenda()) {
+		} else if (isPedidoNovo && pedido.isVenda() && vendaPermitida) {
 
 			// Efetuando o vinculo entre o vendedor e o pedido pois o vendedor
 			// eh
@@ -655,7 +655,7 @@ public class PedidoServiceImpl implements PedidoService {
 		 * Devemos sempre pesquisar pois o cliente pode ter alterado os dados de
 		 * logradouro
 		 */
-		pedido.addLogradouro(this.clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
+		pedido.addLogradouro(clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
 
 		if (isPedidoNovo) {
 			pedido = pedidoDAO.inserir(pedido);
@@ -1642,7 +1642,7 @@ public class PedidoServiceImpl implements PedidoService {
 				pedido.setValorPedido(valores[0]);
 				pedido.setValorPedidoIPI(valores[1]);
 			}
-			
+
 			if (pedido.isCompraEfetuada() && pesquisarTotalItemPedido(pedido.getId()) <= 0L) {
 				pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
 			}

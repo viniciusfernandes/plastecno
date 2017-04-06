@@ -13,7 +13,6 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 	@Override
 	public ItemPedidoDAO build() {
 		new MockUp<ItemPedidoDAO>() {
-
 			@Mock
 			public Integer inserirNcmItemAguardandoMaterialAssociadoItemCompra(Integer idItemPedidoCompra, String ncm) {
 				ItemPedido iCompra = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedidoCompra);
@@ -62,6 +61,12 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 				}
 
 				return l;
+			}
+
+			@Mock
+			public Integer pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				return i != null ? i.getQuantidadeRecepcionada() : null;
 			}
 
 			@Mock

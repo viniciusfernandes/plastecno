@@ -540,6 +540,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (quantidadeRecepcionada == null) {
 			quantidadeRecepcionada = 0;
 		}
+		
 		Integer quantidadeItem = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemPedidoCompra);
 		quantidadeItem += quantidadeRecepcionada;
 		pedidoService.alterarQuantidadeRecepcionada(idItemPedidoCompra, quantidadeItem);

@@ -58,3 +58,15 @@ ALTER TABLE vendas.tb_nfe_duplicata ADD PRIMARY KEY (id);
 alter table vendas.tb_nfe_duplicata add constraint id_nfe_pedido foreign key (id_nfe_pedido) references vendas.tb_nfe_pedido (numero);
 alter table vendas.tb_nfe_duplicata add constraint id_situacao_duplicata foreign key (id_situacao_duplicata) references vendas.tb_situacao_duplicata (id);
 create sequence vendas.seq_nfe_duplicata_id increment by 1 minvalue 1 no maxvalue start with 1;
+
+-------
+insert into vendas.tb_finalidade_pedido(id, descricao) values ('NOTA_ENTRADA', 'NOTA DE ENTRADA');
+insert into vendas.tb_finalidade_pedido(id, descricao) values ('RETORNO', 'RETORNO');
+insert into vendas.tb_finalidade_pedido(id, descricao) values ('DEVOLUCAO', 'DEVOLUÇÃO');
+insert into vendas.tb_finalidade_pedido(id, descricao) values ('AMOSTRA_GRATIS', 'AMOSTRA GRÁTIS');
+insert into vendas.tb_finalidade_pedido(id, descricao) values ('REMESSA_INDUSTRIALIZACAO', 'REMESSA P/ INDUSTRIALIZAÇÃO');
+insert into vendas.tb_finalidade_pedido(id, descricao) values ('REMESSA_CONSERTO', 'REMESSA P/ CONSERTO');
+insert into vendas.tb_finalidade_pedido(id, descricao) values ('REMESSA_ANALISE', 'REMESSA P/ ANÁLISE');
+insert into vendas.tb_finalidade_pedido(id, descricao) values ('SIMPLES_REMESSA', 'SIMPLES REMESSA');
+insert into vendas.tb_finalidade_pedido(id, descricao) values ('OUTRA_ENTRADA', 'OUTRA ENTRADA');
+insert into vendas.tb_finalidade_pedido(id, descricao) values ('PRIMEIRA_NOTA_TRIANGULAR', 'PRIMEIRA NOTA TRIANGULAR');

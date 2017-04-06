@@ -14,6 +14,8 @@ import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.COFINS;
+import br.com.plastecno.service.nfe.COFINSGeral;
 import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
@@ -23,6 +25,8 @@ import br.com.plastecno.service.nfe.ICMSGeral;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.IdentificacaoNFe;
 import br.com.plastecno.service.nfe.NFe;
+import br.com.plastecno.service.nfe.PIS;
+import br.com.plastecno.service.nfe.PISGeral;
 import br.com.plastecno.service.nfe.ProdutoServicoNFe;
 import br.com.plastecno.service.nfe.TransportadoraNFe;
 import br.com.plastecno.service.nfe.TransporteNFe;
@@ -31,11 +35,15 @@ import br.com.plastecno.service.nfe.constante.TipoDestinoOperacao;
 import br.com.plastecno.service.nfe.constante.TipoEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFinalidadeEmissao;
 import br.com.plastecno.service.nfe.constante.TipoFormaPagamento;
+import br.com.plastecno.service.nfe.constante.TipoModalidadeDeterminacaoBCICMS;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.nfe.constante.TipoOperacaoConsumidorFinal;
 import br.com.plastecno.service.nfe.constante.TipoOperacaoNFe;
+import br.com.plastecno.service.nfe.constante.TipoOrigemMercadoria;
 import br.com.plastecno.service.nfe.constante.TipoPresencaComprador;
+import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
+import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 import br.com.plastecno.service.test.builder.ServiceBuilder;
 
 public class NFeServiceTest extends AbstractTest {
@@ -136,9 +144,27 @@ public class NFeServiceTest extends AbstractTest {
 
 			ICMSGeral icmsGeral = new ICMSGeral();
 			icmsGeral.setCodigoSituacaoTributaria(TipoTributacaoICMS.ICMS_00.getCodigo());
+			icmsGeral.setAliquota(0.10);
+			icmsGeral.setValorBC(item.calcularPrecoTotal());
+			icmsGeral.setModalidadeDeterminacaoBC(TipoModalidadeDeterminacaoBCICMS.VALOR_OPERACAO.getCodigo());
+			icmsGeral.setOrigemMercadoria(TipoOrigemMercadoria.NACIONAL.getCodigo());
+
+			COFINSGeral cofinsGeral = new COFINSGeral();
+			cofinsGeral.setAliquota(0.10);
+			cofinsGeral.setCodigoSituacaoTributaria(TipoTributacaoCOFINS.COFINS_1.getCodigo());
+			cofinsGeral.setQuantidadeVendida((double) item.getQuantidade());
+			cofinsGeral.setValorBC(item.calcularPrecoTotal());
+
+			PISGeral pisGeral = new PISGeral();
+			pisGeral.setAliquota(0.20);
+			pisGeral.setCodigoSituacaoTributaria(TipoTributacaoPIS.PIS_1.getCodigo());
+			pisGeral.setQuantidadeVendida((double) item.getQuantidade());
+			pisGeral.setValorBC(item.calcularPrecoTotal());
 
 			trib = new TributosProdutoServico();
 			trib.setIcms(new ICMS(icmsGeral));
+			trib.setCofins(new COFINS(cofinsGeral));
+			trib.setPis(new PIS(pisGeral));
 
 			det = new DetalhamentoProdutoServicoNFe();
 			det.setInformacoesAdicionais("Apenas informacoes adicionais de teste");

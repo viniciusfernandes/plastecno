@@ -31,6 +31,14 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				.setParameter("situacao", situacaoPedido).setParameter("idPedido", idPedido).executeUpdate();
 	}
 
+	public void alterarValorPedido(Integer idPedido, Double valorPedido, Double valorPedidoIPI) {
+		this.entityManager
+				.createQuery(
+						"update Pedido p set p.valorPedido = :valorPedido, p.valorPedidoIPI = :valorPedidoIPI  where p.id = :idPedido")
+				.setParameter("valorPedido", valorPedido).setParameter("valorPedidoIPI", valorPedidoIPI)
+				.setParameter("idPedido", idPedido).executeUpdate();
+	}
+
 	public void cancelar(Integer idPedido) {
 		alterarSituacaoPedidoById(idPedido, SituacaoPedido.CANCELADO);
 	}
@@ -302,20 +310,22 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						"idItemPedido", idItemPedido), Pedido.class, null);
 	}
 
-	public Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
-						"select SUM(i.quantidade * i.precoUnidade) from ItemPedido i where i.pedido.id = :idPedido ")
-						.setParameter("idPedido", idPedido), Double.class, 0d);
-	}
-
-	public Double pesquisarQuantidadePrecoUnidadeIPI(Integer idPedido) {
+	public Pedido pesquisarPedidoResumidoFinalidadeByIdItemPedido(Integer idItemPedido) {
 		return QueryUtil
 				.gerarRegistroUnico(
-						this.entityManager
+						entityManager
 								.createQuery(
-										"select SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ")
-								.setParameter("idPedido", idPedido), Double.class, 0d);
+										"select new Pedido(i.pedido.id, i.pedido.finalidadePedido, i.pedido.tipoPedido) from ItemPedido i where i.id =:idItemPedido")
+								.setParameter("idItemPedido", idItemPedido), Pedido.class, null);
+	}
+
+	public Pedido pesquisarPedidoResumidoCalculoComissao(Integer idPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Pedido(p.representada.comissao, p.id, p.proprietario.id, p.finalidadePedido, p.tipoPedido) from Pedido p where p.id =:idPedido")
+								.setParameter("idPedido", idPedido), Pedido.class, null);
 	}
 
 	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
@@ -405,6 +415,19 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 								.createQuery(
 										"select p.transportadora from Pedido p join fetch p.transportadora.logradouro where p.id = :idPedido")
 								.setParameter("idPedido", idPedido), Transportadora.class, null);
+	}
+
+	public Double[] pesquisarValoresPedido(Integer idPedido) {
+		Object[] o = QueryUtil
+				.gerarRegistroUnico(
+						this.entityManager
+								.createQuery(
+										"select SUM(i.quantidade * i.precoUnidade), SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ")
+								.setParameter("idPedido", idPedido), Object[].class, new Object[] {});
+		if (o.length <= 0) {
+			return new Double[] {};
+		}
+		return new Double[] { (Double) o[0], (Double) o[1] };
 	}
 
 	public Double pesquisarValorPedido(Integer idPedido) {

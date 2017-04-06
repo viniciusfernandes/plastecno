@@ -54,8 +54,18 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 		new MockUp<PedidoDAO>() {
 			@Mock
-			void alterarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
+			public void alterarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
 				REPOSITORY.alterarEntidadeAtributoById(Pedido.class, idPedido, "situacaoPedido", situacaoPedido);
+			}
+
+			@Mock
+			public void alterarValorPedido(Integer idPedido, Double valorPedido, Double valorPedidoIPI) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				if (p == null) {
+					return;
+				}
+				p.setValorPedido(valorPedido);
+				p.setValorPedidoIPI(valorPedidoIPI);
 			}
 
 			@Mock
@@ -176,13 +186,18 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			Double pesquisarQuantidadePrecoUnidade(Integer idPedido) {
-				return 120d;
-			}
-
-			@Mock
-			Double pesquisarQuantidadePrecoUnidadeIPI(Integer idPedido) {
-				return 55d;
+			public Pedido pesquisarPedidoResumidoCalculoComissao(Integer idPedido) {
+				// Aqui temos que retornar o pedido inteiro senao podemos
+				// quebrar o relacionamento entre os objetos itemPedido e pedido
+				// pois o item realiza varios item.set(Pedido)
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				// Aqui estamos efetuando alguns sets que serao usados no
+				// calculo da comissao na inclusao dos itens do pedidos e esses
+				// atributos foram criados para evitar mais consultas ao banco
+				// de dados
+				p.setAliquotaComissaoRepresentada(p.getRepresentada().getComissao());
+				p.setIdVendedor(p.getVendedor().getId());
+				return p;
 			}
 
 			@Mock
@@ -196,7 +211,7 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
-				ItemPedido i = pesquisarItemPedidoById(idItemPedido);
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 				return i == null ? null : i.getPedido().getSituacaoPedido();
 			}
 
@@ -234,6 +249,27 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			public Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido) {
 				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return p == null ? null : p.getTransportadora();
+			}
+
+			@Mock
+			public Double[] pesquisarValoresPedido(Integer idPedido) {
+				double vTot = 0;
+				double vTotIPI = 0;
+
+				List<ItemPedido> lItem = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				if (lItem == null || lItem.isEmpty()) {
+					return new Double[] {};
+				}
+				for (ItemPedido i : lItem) {
+					if (i.getPedido() == null || i.getPedido().getId() == null
+							|| !i.getPedido().getId().equals(idPedido)) {
+						continue;
+					}
+					vTot += i.getQuantidade() * i.getPrecoUnidade();
+					vTotIPI += i.getQuantidade() * i.getPrecoUnidadeIPI();
+				}
+
+				return new Double[] { vTot, vTotIPI };
 			}
 
 			@Mock

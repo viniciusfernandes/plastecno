@@ -91,8 +91,8 @@
 					<th style="width: 45%">Descrição</th>
 					<th style="width: 10%">Vl. (R$)</th>
 					<th style="width: 2%">Comiss. (%)</th>
-					<th style="width: 2%">Comiss. Repres.(%)</th>
 					<th style="width: 10%">Vl. Comiss.(R$)</th>
+					<th style="width: 2%">Comiss. Repres.(%)</th>
 					<th style="width: 10%">Vl Comiss. Repres.(R$)</th>
 					<th style="width: 5%">Ações</th>
 				</tr>
@@ -111,8 +111,8 @@
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaComissaoFormatado}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaComissaoRepresentadaFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valorComissionadoFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaComissaoRepresentadaFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valorComissionadoRepresentadaFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 							<div class="coluna_acoes_listagem">

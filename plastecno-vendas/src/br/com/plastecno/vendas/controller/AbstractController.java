@@ -209,10 +209,12 @@ public abstract class AbstractController {
         item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
         item.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedido()));
         item.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedidoIPI()));
-        item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
-
         item.setValorICMSFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getValorICMS())));
         item.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getPrecoUnidadeIPI())));
+        
+        if (item.contemAliquotaComissao()) {
+            item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
+        }
     }
 
     void formatarItemPedido(List<ItemPedido> itens) {

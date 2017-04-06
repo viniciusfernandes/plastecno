@@ -3,7 +3,7 @@ package br.com.plastecno.service.test.builder;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.com.plastecno.service.constante.FinalidadePedido;
+import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoAcesso;
@@ -216,7 +216,7 @@ public class EntidadeBuilder {
 		pedido.setRepresentada(representada);
 		pedido.setProprietario(vendedor);
 		pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-		pedido.setFinalidadePedido(FinalidadePedido.CONSUMO);
+		pedido.setFinalidadePedido(TipoFinalidadePedido.CONSUMO);
 		pedido.setContato(contato);
 		pedido.setTipoEntrega(TipoEntrega.CIF);
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());

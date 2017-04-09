@@ -8,7 +8,7 @@ public class EntidadeValidacaoTipo {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Codigo")
 	private String codigo;
 
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo")
+	@InformacaoValidavel(obrigatorio = true, tiposNaoPermitidos = { "3" }, nomeExibicao = "Tipo")
 	private String tipo;
 
 	@InformacaoValidavel(tiposObrigatorios = { "4" }, tiposPermitidos = { "1", "2" }, tiposNaoPermitidos = { "3" }, nomeExibicao = "Valor")

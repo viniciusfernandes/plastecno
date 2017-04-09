@@ -40,6 +40,39 @@ public class DetalhamentoProdutoServicoNFe {
 		return tributosProdutoServico != null && tributosProdutoServico.contemIPI();
 	}
 
+	@XmlTransient
+	public double getAliquotaICMS() {
+		if (tributosProdutoServico == null || !tributosProdutoServico.contemICMS()) {
+			return 0;
+		}
+		ICMS icms = tributosProdutoServico.getIcms();
+		if (icms == null || icms.getTipoIcms() == null || icms.getTipoIcms().getAliquota() == null) {
+			return 0d;
+		}
+		return icms.getTipoIcms().getAliquota() / 100d;
+	}
+
+	@XmlTransient
+	public double getAliquotaICMSInterestadual() {
+		if (tributosProdutoServico == null || !tributosProdutoServico.contemICMSInterestadual()
+				|| tributosProdutoServico.getIcmsInterestadual().getAliquotaInterestadual() == null) {
+			return 0;
+		}
+		return tributosProdutoServico.getIcmsInterestadual().getAliquotaInterestadual() / 100d;
+	}
+
+	@XmlTransient
+	public double getAliquotaICMSST() {
+		if (tributosProdutoServico == null || !tributosProdutoServico.contemICMS()) {
+			return 0;
+		}
+		ICMS icms = tributosProdutoServico.getIcms();
+		if (icms == null || icms.getTipoIcms() == null || icms.getTipoIcms().getAliquotaST() == null) {
+			return 0d;
+		}
+		return icms.getTipoIcms().getAliquotaST() / 100d;
+	}
+
 	// Devemos fazer esse tratamento do indice do item pois ele esta sendo
 	// recuperado na pesquisa pelo numero do pedido e ele nao foi populado no
 	// banco de dados pois nao esta no xml
@@ -85,6 +118,11 @@ public class DetalhamentoProdutoServicoNFe {
 	@XmlTransient
 	public TributosProdutoServico getTributosProdutoServico() {
 		return tributosProdutoServico;
+	}
+
+	public double getValorBruto() {
+		return produtoServicoNFe != null && produtoServicoNFe.getValorTotalBruto() != null ? produtoServicoNFe
+				.getValorTotalBruto() : 0d;
 	}
 
 	public void setInformacoesAdicionais(String informacoesAdicionais) {

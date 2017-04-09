@@ -59,7 +59,6 @@ alter table vendas.tb_nfe_duplicata add constraint id_nfe_pedido foreign key (id
 alter table vendas.tb_nfe_duplicata add constraint id_situacao_duplicata foreign key (id_situacao_duplicata) references vendas.tb_situacao_duplicata (id);
 create sequence vendas.seq_nfe_duplicata_id increment by 1 minvalue 1 no maxvalue start with 1;
 
--------
 insert into vendas.tb_finalidade_pedido(id, descricao) values ('NOTA_ENTRADA', 'NOTA DE ENTRADA');
 insert into vendas.tb_finalidade_pedido(id, descricao) values ('RETORNO', 'RETORNO');
 insert into vendas.tb_finalidade_pedido(id, descricao) values ('DEVOLUCAO', 'DEVOLUÇÃO');
@@ -70,3 +69,10 @@ insert into vendas.tb_finalidade_pedido(id, descricao) values ('REMESSA_ANALISE'
 insert into vendas.tb_finalidade_pedido(id, descricao) values ('SIMPLES_REMESSA', 'SIMPLES REMESSA');
 insert into vendas.tb_finalidade_pedido(id, descricao) values ('OUTRA_ENTRADA', 'OUTRA ENTRADA');
 insert into vendas.tb_finalidade_pedido(id, descricao) values ('PRIMEIRA_NOTA_TRIANGULAR', 'PRIMEIRA NOTA TRIANGULAR');
+
+-------------------
+ALTER TABLE vendas.tb_nfe_pedido add valor numeric(10,2) ;
+ALTER TABLE vendas.tb_nfe_pedido add valor_icms numeric(10,2) ;
+ALTER TABLE vendas.tb_nfe_pedido add data_emissao date ;
+ALTER TABLE vendas.tb_nfe_pedido add nome_cliente varchar(250) ;
+

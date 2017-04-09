@@ -224,18 +224,27 @@ public class EntidadeRepository {
 			return null;
 		}
 
-		Integer idObj = null;
+		Object idObj = null;
 		Set<Object> listaEntidade = mapaEntidades.get(classe);
 		for (Object o : listaEntidade) {
 			try {
-				idObj = (Integer) o.getClass().getMethod("getId", (Class[]) null).invoke(o, (Object[]) null);
-				if (id.equals(idObj)) {
-					return (T) o;
+
+				Field[] campos = o.getClass().getDeclaredFields();
+				for (Field f : campos) {
+					if (f.isAnnotationPresent(Id.class)) {
+						f.setAccessible(true);
+						idObj = f.get(o);
+						f.setAccessible(false);
+
+						if (id.equals(idObj)) {
+							return (T) o;
+						}
+					}
 				}
+
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
-
 		}
 		return null;
 	}
@@ -288,6 +297,11 @@ public class EntidadeRepository {
 				System.out.println("Entidade: " + object);
 			}
 		}
+	}
+
+	<T> void removerEntidade(Class<T> classe, Integer id) {
+		T t = repository.pesquisarEntidadeById(classe, id);
+		mapaEntidades.get(classe).remove(t);
 	}
 
 }

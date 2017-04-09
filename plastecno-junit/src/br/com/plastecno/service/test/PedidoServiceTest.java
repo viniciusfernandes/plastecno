@@ -206,7 +206,7 @@ public class PedidoServiceTest extends AbstractTest {
 		pedido.setTipoPedido(tipoPedido);
 
 		try {
-			comissaoService.inserirComissaoRevendaVendedor(vendedor.getId(), 0.6);
+			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.6, 0.1);
 		} catch (BusinessException e3) {
 			printMensagens(e3);
 		}
@@ -385,7 +385,7 @@ public class PedidoServiceTest extends AbstractTest {
 		Pedido pedidoRevenda = gerarPedidoRevenda();
 		ItemPedido item1 = gerarItemPedido();
 		item1.setPedido(pedidoRevenda);
-		
+
 		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
 		item2.setPedido(pedidoRevenda);
 		item2.setMaterial(item1.getMaterial());
@@ -571,6 +571,21 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testEnvioEmailPedido() {
 		Pedido pedido = gerarPedidoClienteProspectado();
+		Integer idPedido = null;
+		try {
+			idPedido = pedidoService.inserir(pedido).getId();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		ItemPedido i = gerarItemPedido();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, i);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		try {
 			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
 		} catch (BusinessException e) {
@@ -888,39 +903,6 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testEnvioPedidoRepresentacaoSemComissaoRepresentacao() {
-		Pedido pedido = gerarPedidoRepresentacaoComItem();
-		Integer idPedido = pedido.getId();
-		Integer idVendedor = pedido.getVendedor().getId();
-		boolean throwed = false;
-
-		try {
-			comissaoService.inserirComissaoVendedor(idVendedor, null, null);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
-		} catch (BusinessException e) {
-			throwed = true;
-		}
-		assertTrue("O vendedor ainda nao possui comissao de representacao e deve ser validado no sistema", throwed);
-
-		try {
-			comissaoService.inserirComissaoVendedor(idVendedor, null, 0.1);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-	}
-
-	@Test
 	public void testEnvioPedidoRevendaComissaoItemPedido() {
 		Pedido pedido = gerarPedidoRevendaComItem();
 
@@ -960,39 +942,6 @@ public class PedidoServiceTest extends AbstractTest {
 		itemPedido = pedidoService.pesquisarItemPedidoById(idItemPedido);
 
 		assertEquals(valorComissionado, itemPedido.getValorComissionado());
-	}
-
-	@Test
-	public void testEnvioPedidoRevendaSemComissaoRevenda() {
-		Pedido pedido = gerarPedidoRevendaComItem();
-		Integer idPedido = pedido.getId();
-		Integer idVendedor = pedido.getVendedor().getId();
-		boolean throwed = false;
-		try {
-			comissaoService.inserirComissaoVendedor(idVendedor, null, null);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
-		} catch (BusinessException e) {
-			throwed = true;
-		}
-
-		assertTrue("O vendedor ainda nao possui comissao de revenda e deve ser validado no sistema", throwed);
-
-		try {
-			comissaoService.inserirComissaoVendedor(idVendedor, 0.1, null);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
 	}
 
 	@Test
@@ -1389,6 +1338,47 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoItemPedidoRepresentacaoSemComissaoRepresentacao() {
+		Pedido pedido = gerarPedidoRepresentacaoComItem();
+		Integer idPedido = pedido.getId();
+		Integer idVendedor = pedido.getVendedor().getId();
+		boolean throwed = false;
+
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, null, null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido i = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, i);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("O vendedor ainda nao possui comissao de representacao e deve ser validado no sistema", throwed);
+
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, null, 0.1);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		i = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(idPedido, i);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
+	@Test
 	public void testInclusaoItemPedidoRepresentadaSemIPI() {
 		Pedido pedido = gerarPedidoRepresentacao();
 		pedido.getRepresentada().setTipoApresentacaoIPI(null);
@@ -1406,6 +1396,51 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		assertNull("O IPI nao foi configurado e deve ser nulo", itemPedido.getAliquotaIPI());
+	}
+
+	@Test
+	public void testInclusaoItemPedidoRevendaSemComissaoRevenda() {
+		Pedido pedido = gerarPedidoRevendaComItem();
+		Integer idPedido = pedido.getId();
+		Integer idVendedor = pedido.getVendedor().getId();
+		boolean throwed = false;
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, null, null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido i = gerarItemPedido();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, i);
+		} catch (BusinessException e1) {
+			throwed = true;
+		}
+
+		assertTrue(
+				"O vendedor nao pode incluir um item de pedido de revenda pois ainda nao possui comissao de revenda e deve ser validado no sistema",
+				throwed);
+
+		try {
+			comissaoService.inserirComissaoVendedor(idVendedor, 0.1, null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		i = gerarItemPedido();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, i);
+		} catch (BusinessException e1) {
+			throwed = true;
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test

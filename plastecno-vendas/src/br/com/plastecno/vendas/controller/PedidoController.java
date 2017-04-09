@@ -1,6 +1,5 @@
 package br.com.plastecno.vendas.controller;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -94,15 +93,11 @@ public class PedidoController extends AbstractController {
     @Servico
     private ClienteService clienteService;
 
-    private String diretorioTemplateRelatorio;
-
     @Servico
     private EstoqueService estoqueService;
 
     @Servico
     private FormaMaterialService formaMaterialService;
-
-    private GeradorRelatorioPDF geradorRelatorio;
 
     @Servico
     private MaterialService materialService;
@@ -125,13 +120,11 @@ public class PedidoController extends AbstractController {
     @Servico
     private UsuarioService usuarioService;
 
-    public PedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF gerador,
+    public PedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
-        super(result, usuarioInfo);
+        super(result, usuarioInfo, geradorRelatorioPDF, request);
         this.verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS,
                 TipoAcesso.CADASTRO_PEDIDO_COMPRA);
-        this.geradorRelatorio = gerador;
-        this.diretorioTemplateRelatorio = request.getServletContext().getRealPath("/templates");
     }
 
     @Post("pedido/aceiteorcamento")
@@ -171,7 +164,7 @@ public class PedidoController extends AbstractController {
     public Download downloadPedidoPDF(Integer idPedido, TipoPedido tipoPedido) {
 
         try {
-            PedidoPDFWrapper wrapper = this.gerarPDF(idPedido, tipoPedido);
+            PedidoPDFWrapper wrapper = gerarPDF(idPedido, tipoPedido);
             final Pedido pedido = wrapper.getPedido();
 
             final StringBuilder titulo = new StringBuilder(pedido.isOrcamento() ? "Orcamento " : "Pedido ")
@@ -190,10 +183,10 @@ public class PedidoController extends AbstractController {
     @Post("pedido/envio")
     public void enviarPedido(Integer idPedido, TipoPedido tipoPedido) {
         try {
-            final PedidoPDFWrapper wrapper = this.gerarPDF(idPedido, tipoPedido);
+            final PedidoPDFWrapper wrapper = gerarPDF(idPedido, tipoPedido);
             final Pedido pedido = wrapper.getPedido();
 
-            this.pedidoService.enviarPedido(idPedido, wrapper.getArquivoPDF());
+            pedidoService.enviarPedido(idPedido, wrapper.getArquivoPDF());
 
             final String mensagem = pedido.isOrcamento() ? "Orçamento No. " + idPedido
                     + " foi enviado com sucesso para o cliente " + pedido.getCliente().getNomeFantasia()
@@ -274,21 +267,19 @@ public class PedidoController extends AbstractController {
 
         String tipo = pedido.isVenda() ? "Venda" : "Compra";
 
-        geradorRelatorio.addAtributo("tipoRelacionamento", pedido.isVenda() ? "Represent." : "Forneced.");
-        geradorRelatorio.addAtributo("tipoProprietario", pedido.isVenda() ? "Vendedor" : "Comprador");
-        geradorRelatorio.addAtributo("titulo", pedido.isOrcamento() ? "Orçamento de " + tipo : "Pedido de " + tipo);
-        geradorRelatorio.addAtributo("tipoPedido", tipo);
-        geradorRelatorio.addAtributo("pedido", pedido);
-        geradorRelatorio.addAtributo("logradouroFaturamento",
-                logradouroFaturamento != null ? logradouroFaturamento.getDescricao() : "");
-        geradorRelatorio.addAtributo("logradouroEntrega", logradouroEntrega != null ? logradouroEntrega.getDescricao()
+        addAtributoPDF("tipoRelacionamento", pedido.isVenda() ? "Represent." : "Forneced.");
+        addAtributoPDF("tipoProprietario", pedido.isVenda() ? "Vendedor" : "Comprador");
+        addAtributoPDF("titulo", pedido.isOrcamento() ? "Orçamento de " + tipo : "Pedido de " + tipo);
+        addAtributoPDF("tipoPedido", tipo);
+        addAtributoPDF("pedido", pedido);
+        addAtributoPDF("logradouroFaturamento", logradouroFaturamento != null ? logradouroFaturamento.getDescricao()
                 : "");
-        geradorRelatorio.addAtributo("logradouroCobranca",
-                logradouroCobranca != null ? logradouroCobranca.getDescricao() : "");
-        geradorRelatorio.addAtributo("listaItem", listaItem);
+        addAtributoPDF("logradouroEntrega", logradouroEntrega != null ? logradouroEntrega.getDescricao() : "");
+        addAtributoPDF("logradouroCobranca", logradouroCobranca != null ? logradouroCobranca.getDescricao() : "");
+        addAtributoPDF("listaItem", listaItem);
 
-        geradorRelatorio.processar(new File(diretorioTemplateRelatorio + "/pedido.html"));
-        return new PedidoPDFWrapper(pedido, geradorRelatorio.gerarPDF());
+        processarPDF("pedido.html");
+        return new PedidoPDFWrapper(pedido, gerarPDF());
     }
 
     /*

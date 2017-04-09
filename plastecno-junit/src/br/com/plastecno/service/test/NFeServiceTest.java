@@ -3,19 +3,23 @@ package br.com.plastecno.service.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
+import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.COFINS;
 import br.com.plastecno.service.nfe.COFINSGeral;
+import br.com.plastecno.service.nfe.CobrancaNFe;
 import br.com.plastecno.service.nfe.DadosNFe;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
@@ -48,6 +52,7 @@ import br.com.plastecno.service.test.builder.ServiceBuilder;
 
 public class NFeServiceTest extends AbstractTest {
 
+	private DuplicataService duplicataService;
 	private NFeService nFeService;
 	private PedidoService pedidoService;
 	private PedidoServiceTest pedidoServiceTest;
@@ -56,31 +61,21 @@ public class NFeServiceTest extends AbstractTest {
 		pedidoServiceTest = new PedidoServiceTest();
 		nFeService = ServiceBuilder.buildService(NFeService.class);
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
+		duplicataService = ServiceBuilder.buildService(DuplicataService.class);
 	}
 
-	private Integer gerarPedidoRevenda() {
-		Pedido p = pedidoServiceTest.gerarPedidoRevendaComItem();
-		Integer id = p.getId();
-		try {
-			pedidoService.enviarPedido(id, new byte[] {});
-			return id;
-		} catch (BusinessException e) {
-			printMensagens(e);
-			return null;
-		}
-	}
-
-	@Test
-	public void testEmissaoNFe() {
-		Integer idPedido = gerarPedidoRevenda();
+	private NFe gerarNFe(Integer idPedido) {
 		Cliente cli = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
 		Transportadora transPed = pedidoService.pesquisarTransportadoraByIdPedido(idPedido);
 		Logradouro endFaturamento = cli.getLogradouroFaturamento();
 
-		List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
+		List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataDataAmericanaByIdPedido(idPedido);
 
-		Assert.assertTrue("A lista de duplicatas deve conter ao menos 1 elemento para pedidos a prazo",
-				listaDuplicata != null && listaDuplicata.size() >= 1);
+		assertTrue("A lista de duplicatas deve conter ao menos 1 elemento para pedidos a prazo", listaDuplicata != null
+				&& listaDuplicata.size() >= 1);
+
+		CobrancaNFe cobrNfe = new CobrancaNFe();
+		cobrNfe.setListaDuplicata(listaDuplicata);
 
 		Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
 
@@ -175,16 +170,139 @@ public class NFeServiceTest extends AbstractTest {
 			lDet.add(det);
 		}
 		DadosNFe d = new DadosNFe();
+		d.setCobrancaNFe(cobrNfe);
 		d.setIdentificacaoNFe(i);
 		d.setIdentificacaoDestinatarioNFe(iDest);
 		d.setTransporteNFe(t);
 		d.setListaDetalhamentoProdutoServicoNFe(lDet);
-		NFe nFe = new NFe(d);
+
+		return new NFe(d);
+	}
+
+	private Integer gerarPedidoRevenda() {
+		Pedido p = pedidoServiceTest.gerarPedidoRevendaComItem();
+		Integer id = p.getId();
+		try {
+			pedidoService.enviarPedido(id, new byte[] {});
+			return id;
+		} catch (BusinessException e) {
+			printMensagens(e);
+			return null;
+		}
+	}
+
+	@Test
+	public void testEmissaoNFe() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFe(idPedido);
 
 		try {
 			nFeService.emitirNFeEntrada(nFe, idPedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+	}
+
+	@Test
+	public void testEmissaoNFeAPrazoSemDuplicada() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFe(idPedido);
+
+		nFe.getDadosNFe().getIdentificacaoNFe()
+				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.PRAZO.getCodigo()));
+		nFe.getDadosNFe().getCobrancaNFe().setListaDuplicata(null);
+
+		boolean throwed = false;
+		try {
+			nFeService.emitirNFeEntrada(nFe, idPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("NFe a prazo nao pode ser emitida sem duplicatas. Verificar a validacao", throwed);
+	}
+
+	@Test
+	public void testEmissaoNFeAVistaComDuplicada() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFe(idPedido);
+
+		nFe.getDadosNFe().getIdentificacaoNFe()
+				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
+
+		boolean throwed = false;
+		try {
+			nFeService.emitirNFeEntrada(nFe, idPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+		assertTrue("NFe a vista nao pode ser emitida com duplicatas. Verificar a validacao", throwed);
+	}
+
+	@Test
+	public void testEmissaoNFeDevolucaoComDuplicada() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFe(idPedido);
+		nFe.getDadosNFe().getIdentificacaoNFe()
+				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
+
+		Integer[] numeros = null;
+		try {
+			numeros = nFeService.gerarNumeroSerieModeloNFe();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		IdentificacaoNFe i = nFe.getDadosNFe().getIdentificacaoNFe();
+		i.setNumero(numeros[0].toString());
+		i.setSerie(numeros[1].toString());
+		i.setModelo(numeros[2].toString());
+
+		String numNFe = null;
+		try {
+			numNFe = nFeService.emitirNFeDevolucao(nFe, idPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<NFeDuplicata> lDupl = duplicataService.pesquisarDuplicataByNumeroNFe(Integer.parseInt(numNFe));
+		assertTrue("NFe de devolucao nao pode conter duplicatas para gerar os boletos. Verificar a validacao.",
+				lDupl == null || lDupl.isEmpty());
+	}
+
+	@Test
+	public void testEmissaoNFeTriangularizacaoComDuplicada() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFe(idPedido);
+		nFe.getDadosNFe().getIdentificacaoNFe()
+				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
+
+		String numNFe = null;
+		try {
+			numNFe = nFeService.emitirNFeTriangularizacao(nFe, idPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<NFeDuplicata> lDupl = duplicataService.pesquisarDuplicataByNumeroNFe(Integer.parseInt(numNFe));
+		assertTrue("NFe de triangularizacao nao pode conter duplicatas para gerar os boletos. Verificar a validacao.",
+				lDupl == null || lDupl.isEmpty());
+	}
+
+	@Test
+	public void testEmissaoNFeTriangularizacaoEItemFracionado() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFe(idPedido);
+		nFe.getDadosNFe().getIdentificacaoNFe()
+				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
+
+		String numNFe = null;
+		try {
+			numNFe = nFeService.emitirNFeTriangularizacao(nFe, idPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<Integer[]> lFrac = nFeService.pesquisarTotalItemFracionadoByNumeroNFe(Integer.parseInt(numNFe));
+		assertTrue("NFe de triangularizacao nao pode conter itens fracionados. Verificar a validacao.", lFrac == null
+				|| lFrac.isEmpty());
 	}
 }

@@ -1,6 +1,5 @@
 package br.com.plastecno.vendas.controller;
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -30,19 +29,14 @@ public class RelatorioVendaRepresentadaController extends AbstractController {
     private PedidoService pedidoService;
 
     @Servico
-    private RepresentadaService representadaService;
-
-    @Servico
     private RelatorioService relatorioService;
 
-    private GeradorRelatorioPDF geradorRelatorio;
-    private String diretorioTemplateRelatorio;
+    @Servico
+    private RepresentadaService representadaService;
 
-    public RelatorioVendaRepresentadaController(Result result, UsuarioInfo usuarioInfo,
-            GeradorRelatorioPDF gerador, HttpServletRequest request) {
-        super(result, usuarioInfo);
-        this.diretorioTemplateRelatorio = request.getServletContext().getRealPath("/templates");
-        this.geradorRelatorio = gerador;
+    public RelatorioVendaRepresentadaController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF gerador,
+            HttpServletRequest request) {
+        super(result, usuarioInfo, gerador, request);
     }
 
     @Get("relatorio/venda/representada/pdf")
@@ -51,15 +45,15 @@ public class RelatorioVendaRepresentadaController extends AbstractController {
         final Representada representada = this.representadaService.pesquisarById(idRepresentada);
         final String dataInicialFormatada = StringUtils.formatarData(dataInicial);
         final String dataFinalFormatada = StringUtils.formatarData(dataFinal);
-        
+
         addAtributo("dataInicial", dataInicialFormatada);
         addAtributo("dataFinal", dataInicialFormatada);
         addAtributo("representadaSelecionada", representada);
-        
+
         List<Pedido> listaPedido;
         try {
-            listaPedido = this.pedidoService.pesquisarEnviadosByPeriodoERepresentada(new Periodo(
-                    dataInicial, dataFinal), idRepresentada);
+            listaPedido = this.pedidoService.pesquisarEnviadosByPeriodoERepresentada(
+                    new Periodo(dataInicial, dataFinal), idRepresentada);
         } catch (InformacaoInvalidaException e1) {
             gerarListaMensagemErro(e1);
             return null;
@@ -73,16 +67,15 @@ public class RelatorioVendaRepresentadaController extends AbstractController {
 
         try {
 
-            geradorRelatorio.addAtributo("representada", representada);
-            geradorRelatorio.addAtributo("listaPedido", listaPedido);
-            geradorRelatorio.addAtributo("totalVendido", NumeroUtils.formatarValorMonetario(totalVendido));
-            geradorRelatorio.addAtributo("valorComissao",
+            addAtributoPDF("representada", representada);
+            addAtributoPDF("listaPedido", listaPedido);
+            addAtributoPDF("totalVendido", NumeroUtils.formatarValorMonetario(totalVendido));
+            addAtributoPDF("valorComissao",
                     NumeroUtils.formatarValorMonetario(totalVendido * representada.getComissao()));
-            geradorRelatorio.addAtributo("dataInicial", dataInicialFormatada);
-            geradorRelatorio.addAtributo("dataFinal", dataFinalFormatada);
-            geradorRelatorio.processar(new File(diretorioTemplateRelatorio + "/relatorioPedido.html"));
-
-            return this.gerarDownloadPDF(geradorRelatorio.gerarPDF(), "Vendas " + representada.getNomeFantasia() + " "
+            addAtributoPDF("dataInicial", dataInicialFormatada);
+            addAtributoPDF("dataFinal", dataFinalFormatada);
+            processarPDF("relatorioPedido.html");
+            return this.gerarDownloadPDF(gerarPDF(), "Vendas " + representada.getNomeFantasia() + " "
                     + dataInicialFormatada + " a " + dataFinalFormatada + ".pdf");
 
         } catch (Exception e) {

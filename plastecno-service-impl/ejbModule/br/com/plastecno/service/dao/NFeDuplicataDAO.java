@@ -49,7 +49,7 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 		return pesquisarDuplicataByNumeroNFeOuPedido(numeroNFe, true);
 	}
 
-	private List<NFeDuplicata> pesquisarDuplicataByNumeroNFeOuPedido(Integer numero, boolean isByNfe) {
+	public List<NFeDuplicata> pesquisarDuplicataByNumeroNFeOuPedido(Integer numero, boolean isByNfe) {
 		StringBuilder s = new StringBuilder();
 		s.append("select new NFeDuplicata(d.dataVencimento, d.id, d.nomeCliente, d.nFe.numero, d.tipoSituacaoDuplicata, d.valor) from NFeDuplicata d ");
 		if (isByNfe) {

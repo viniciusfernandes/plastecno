@@ -16,6 +16,12 @@ public class NFePedidoDAOBuilder extends DAOBuilder<NFePedidoDAO> {
 		new MockUp<NFePedidoDAO>() {
 
 			@Mock
+			public Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe) {
+				NFePedido n = REPOSITORY.pesquisarEntidadeById(NFePedido.class, numeroNFe);
+				return n == null ? null : n.getIdPedido();
+			}
+
+			@Mock
 			public Object[] pesquisarNumeroSerieModeloNFe() {
 
 				List<NFePedido> listaNFe = REPOSITORY.pesquisarTodos(NFePedido.class);

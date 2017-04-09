@@ -1,10 +1,15 @@
 package br.com.plastecno.service.dao;
 
+import java.util.Date;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.entity.NFePedido;
 import br.com.plastecno.service.impl.util.QueryUtil;
+import br.com.plastecno.service.nfe.constante.TipoNFe;
+import br.com.plastecno.service.nfe.constante.TipoSituacaoNFe;
 
 public class NFePedidoDAO extends GenericDAO<NFePedido> {
 
@@ -15,7 +20,7 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 	public void inserirNFePedido(NFePedido p) {
 		StringBuilder s = new StringBuilder();
 		if (isEntidadeExistente(NFePedido.class, "numero", p.getNumero())) {
-			s.append("update NFePedido p set p.serie = :serie, p.modelo = :modelo, p.xmlNFe = :xmlNFe, p.idPedido = :idPedido ");
+			s.append("update NFePedido p set p.serie = :serie, p.modelo = :modelo, p.xmlNFe = :xmlNFe, p.idPedido = :idPedido, p.valor=:valor, p.valorICMS = :valorICMS ");
 
 			if (p.getNumeroAssociado() != null) {
 				s.append(", p.numeroAssociado = :numeroAssociado ");
@@ -25,7 +30,8 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 
 			Query q = entityManager.createQuery(s.toString()).setParameter("numero", p.getNumero())
 					.setParameter("serie", p.getSerie()).setParameter("modelo", p.getModelo())
-					.setParameter("xmlNFe", p.getXmlNFe()).setParameter("idPedido", p.getIdPedido());
+					.setParameter("xmlNFe", p.getXmlNFe()).setParameter("idPedido", p.getIdPedido())
+					.setParameter("valor", p.getValor()).setParameter("valorICMS", p.getValorICMS());
 
 			if (p.getNumeroAssociado() != null) {
 				q.setParameter("numeroAssociado", p.getNumeroAssociado());
@@ -40,8 +46,18 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 
 	public Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select p.idPedido from NFePedido p where p.numero = :numero").setParameter(
-						"numero", numeroNFe), Integer.class, null);
+				entityManager.createQuery("select p.idPedido from NFePedido p where :numeroNFe = p.numero ")
+						.setParameter("numeroNFe", numeroNFe), Integer.class, null);
+	}
+
+	public List<NFePedido> pesquisarNFePedidoByPeriodo(Date dataInicial, Date dataFinal, TipoNFe tipoNFe,
+			TipoSituacaoNFe tipoSituacaoNFe) {
+		return entityManager
+				.createQuery(
+						"select new NFePedido(n.dataEmissao, n.idPedido, n.nomeCliente, n.numero, n.valor, n.valorICMS) from NFePedido n where n.tipoNFe=:tipoNFe and n.tipoSituacaoNFe=:tipoSituacaoNFe and n.dataEmissao >=:dataInicial and n.dataEmissao <=:dataFinal",
+						NFePedido.class).setParameter("tipoNFe", tipoNFe)
+				.setParameter("tipoSituacaoNFe", tipoSituacaoNFe).setParameter("dataInicial", dataInicial)
+				.setParameter("dataFinal", dataFinal).getResultList();
 	}
 
 	public Integer pesquisarNumeroNFe(Integer idPedido, boolean isTriangulacao) {

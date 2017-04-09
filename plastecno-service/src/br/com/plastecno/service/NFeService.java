@@ -7,10 +7,12 @@ import javax.ejb.Local;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.NFeItemFracionado;
+import br.com.plastecno.service.entity.NFePedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.NFe;
+import br.com.plastecno.service.wrapper.Periodo;
 
 @Local
 public interface NFeService {
@@ -23,7 +25,9 @@ public interface NFeService {
 
 	String emitirNFeTriangularizacao(NFe nFe, Integer idPedido) throws BusinessException;
 
-	List<DuplicataNFe> gerarDuplicataByIdPedido(Integer idPedido);
+	List<DuplicataNFe> gerarDuplicataDataAmericanaByIdPedido(Integer idPedido);
+
+	List<DuplicataNFe> gerarDuplicataDataLatinaByIdPedido(Integer idPedido);
 
 	EnderecoNFe gerarEnderecoNFe(Logradouro logradouro, String telefone);
 
@@ -41,11 +45,15 @@ public interface NFeService {
 
 	List<NFeItemFracionado> pesquisarItemFracionado();
 
+	List<NFePedido> pesquisarNFePedidoEntradaEmitidoByPeriodo(Periodo periodo);
+
 	List<Integer> pesquisarNumeroNFeByIdPedido(Integer idPedido);
 
 	List<ItemPedido> pesquisarQuantitadeItemRestanteByIdPedido(Integer idPedido);
 
 	List<Integer[]> pesquisarTotalItemFracionado(Integer idPedido);
+
+	List<Integer[]> pesquisarTotalItemFracionadoByNumeroNFe(Integer numeroNFe);
 
 	void removerItemFracionadoNFe(Integer idItemFracionado);
 

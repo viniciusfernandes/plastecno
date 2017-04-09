@@ -14,6 +14,23 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 	public ItemPedidoDAO build() {
 		new MockUp<ItemPedidoDAO>() {
 			@Mock
+			public List<ItemPedido> pesquisarCaracteristicaItemPedidoByNumeroItem(List<Integer> listaNumeroItem,
+					Integer idPedido) {
+				if (idPedido == null || listaNumeroItem == null || listaNumeroItem.isEmpty()) {
+					return new ArrayList<ItemPedido>();
+				}
+
+				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				List<ItemPedido> lItem = new ArrayList<ItemPedido>();
+				for (ItemPedido i : l) {
+					if (idPedido.equals(i.getPedido().getId()) && listaNumeroItem.contains(i.getSequencial())) {
+						lItem.add(i);
+					}
+				}
+				return lItem;
+			}
+
+			@Mock
 			public Integer inserirNcmItemAguardandoMaterialAssociadoItemCompra(Integer idItemPedidoCompra, String ncm) {
 				ItemPedido iCompra = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedidoCompra);
 				List<ItemPedido> lVenda = REPOSITORY.pesquisarEntidadeByAtributo(ItemPedido.class, "idPedidoCompra",
@@ -83,5 +100,4 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 
 		return new ItemPedidoDAO(null);
 	}
-
 }

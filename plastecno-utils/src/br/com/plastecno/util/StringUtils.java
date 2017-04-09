@@ -93,6 +93,10 @@ public final class StringUtils {
 		return date == null ? "" : FORMATADOR_DATA.format(date);
 	}
 
+	public static String formatarDataAmericana(Date date) {
+		return date == null ? "" : FORMATADOR_DATA_AMERICANO.format(date);
+	}
+
 	public static String formatarDataHora(Date date) {
 		return date == null ? "" : FORMATADOR_DATA_HORA.format(date);
 	}
@@ -165,6 +169,10 @@ public final class StringUtils {
 
 	public static Date parsearDataHora(String date) throws ParseException {
 		return isEmpty(date) ? null : FORMATADOR_DATA_HORA.parse(date);
+	}
+
+	public static Date parsearDataHoraTimezone(String date) throws ParseException {
+		return isEmpty(date) ? null : FORMATADOR_DATA_HORA_TIMEZONE.parse(date);
 	}
 
 	public static String removerAcentuacao(String valor) {

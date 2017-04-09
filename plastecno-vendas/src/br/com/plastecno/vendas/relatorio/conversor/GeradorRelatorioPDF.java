@@ -21,7 +21,11 @@ import br.com.caelum.vraptor.ioc.Component;
 import br.com.plastecno.vendas.relatorio.conversor.exception.ConversaoHTML2PDFException;
 
 @Component
+// O gerador de relatorio sera injetado pelo vraptor no construtor dos
+// controllers
 public final class GeradorRelatorioPDF {
+
+    private static Map<String, List<String>> LINHAS = new HashMap<String, List<String>>();
 
     /*
      * Os grupos encontrados em cada linha sao recuperados contendo as chaves
@@ -32,8 +36,6 @@ public final class GeradorRelatorioPDF {
     private static String limpar(String property) {
         return property.replace("{", "").replace("}", "");
     }
-
-    private static Map<String, List<String>> LINHAS = new HashMap<String, List<String>>();
     private StringBuilder cabecalho;
     private final Charset charset;
     private final ConversorHTML2PDF conversor;
@@ -136,6 +138,38 @@ public final class GeradorRelatorioPDF {
 
     public String gerarHTML() {
         return html == null ? "" : html.toString();
+    }
+
+    private List<String> gerarLinhas(File arquivo) throws ConversaoHTML2PDFException {
+        List<String> linhas = LINHAS.get(arquivo.getName());
+        if (linhas == null) {
+
+            int numLinha = 1;
+            linhas = new LinkedList<String>();
+            BufferedReader reader = null;
+            try {
+                reader = gerarBufferedFileReader(arquivo, charset);
+                String linha = null;
+                while ((linha = reader.readLine()) != null) {
+                    linhas.add(linha);
+                    numLinha++;
+                }
+            } catch (Exception e) {
+                throw new ConversaoHTML2PDFException("Falha na leitura do template HTML do relatorio\""
+                        + arquivo.getName() + "\". Problemas na linha: " + numLinha, e);
+            } finally {
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    throw new ConversaoHTML2PDFException("Falha ao encerrar a leitura do arquivo \""
+                            + arquivo.getName() + "\". Nao foi possivel liberar recursos de leitura do arquivo.", e);
+                }
+            }
+            LINHAS.put(arquivo.getName(), linhas);
+        }
+        return linhas;
     }
 
     public byte[] gerarPDF() throws ConversaoHTML2PDFException {
@@ -243,37 +277,5 @@ public final class GeradorRelatorioPDF {
             throw new ConversaoHTML2PDFException("Falha ao popular os valores do relatorio. Problemas na linha: "
                     + numLinha, e);
         }
-    }
-
-    private List<String> gerarLinhas(File arquivo) throws ConversaoHTML2PDFException {
-        List<String> linhas = LINHAS.get(arquivo.getName());
-        if (linhas == null) {
-
-            int numLinha = 1;
-            linhas = new LinkedList<String>();
-            BufferedReader reader = null;
-            try {
-                reader = gerarBufferedFileReader(arquivo, charset);
-                String linha = null;
-                while ((linha = reader.readLine()) != null) {
-                    linhas.add(linha);
-                    numLinha++;
-                }
-            } catch (Exception e) {
-                throw new ConversaoHTML2PDFException("Falha na leitura do template HTML do relatorio\""
-                        + arquivo.getName() + "\". Problemas na linha: " + numLinha, e);
-            } finally {
-                try {
-                    if (reader != null) {
-                        reader.close();
-                    }
-                } catch (IOException e) {
-                    throw new ConversaoHTML2PDFException("Falha ao encerrar a leitura do arquivo \""
-                            + arquivo.getName() + "\". Nao foi possivel liberar recursos de leitura do arquivo.", e);
-                }
-            }
-            LINHAS.put(arquivo.getName(), linhas);
-        }
-        return linhas;
     }
 }

@@ -444,7 +444,7 @@ public class EmissaoNFeController extends AbstractController {
             nFeService.validarEmissaoNFePedido(idPedido);
 
             Cliente cliente = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
-            List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataByIdPedido(idPedido);
+            List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataDataLatinaByIdPedido(idPedido);
             Object[] telefone = pedidoService.pesquisarTelefoneContatoByIdPedido(idPedido);
 
             /*

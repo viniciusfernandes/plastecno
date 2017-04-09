@@ -75,6 +75,19 @@ public class NFeItemFracionadoDAO extends GenericDAO<NFeItemFracionado> {
 		}
 		return l;
 	}
+	
+	public List<Integer[]> pesquisarQuantidadeTotalItemFracionadoByNumeroNFe(Integer numeroNFe) {
+		List<Object[]> listaTot = entityManager
+				.createQuery(
+						"select i.numeroItem, sum(i.quantidadeFracionada) from NFeItemFracionado i where i.numeroNFe =:numeroNFe group by i.numeroItem",
+						Object[].class).setParameter("numeroNFe", numeroNFe).getResultList();
+
+		List<Integer[]> l = new ArrayList<Integer[]>();
+		for (Object[] o : listaTot) {
+			l.add(new Integer[] { o != null ? (Integer) o[0] : 0, o != null ? ((Long) o[1]).intValue() : 0 });
+		}
+		return l;
+	}
 
 	public Integer pesqusisarQuantidadeTotalFracionadoByIdItemPedido(Integer idItemPedido, Integer numeroNFe) {
 		Long tot = QueryUtil

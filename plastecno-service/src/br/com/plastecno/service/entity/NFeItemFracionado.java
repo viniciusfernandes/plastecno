@@ -54,6 +54,11 @@ public class NFeItemFracionado {
 		this.valorBruto = valorBruto;
 	}
 
+	public NFeItemFracionado(Integer idPedido, Integer numeroItem, Integer numeroNFe, Integer quantidade,
+			Integer quantidadeFracionada) {
+		this(null, null, idPedido, null, numeroItem, numeroNFe, quantidade, quantidadeFracionada, null);
+	}
+
 	public String getDescricao() {
 		return descricao;
 	}

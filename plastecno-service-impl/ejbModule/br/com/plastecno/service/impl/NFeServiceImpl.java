@@ -744,7 +744,7 @@ public class NFeServiceImpl implements NFeService {
 				}
 			}
 
-			totalFrac = nFeItemFracionadoDAO.pesqusisarQuantidadeTotalFracionadoByIdItemPedido(idItem, numeroNFe);
+			totalFrac = pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(idItem, numeroNFe);
 			if (totalFrac > qtdeItem) {
 				throw new BusinessException(
 						"Não é possível fracionar uma quantidade maior do que a quantidade vendida para o item no. "
@@ -752,10 +752,7 @@ public class NFeServiceImpl implements NFeService {
 								+ " unidades.");
 			}
 			// Caso ainda existam itens do pedido para serem fracionado iremos
-			// inserir o registro no banco, caso contrario, vamos remover todos
-			// os registros de um determinado item do banco por questoes de
-			// performance, ja que nao eh necessario manter essa informacao no
-			// sistema.
+			// inserir o registro no banco.
 			if (totalFrac <= qtdeItem) {
 				// Aqui estamos configurando o ID do item fracionado para casa
 				// tenhamos uma edicao da NFe evitando a duplicacao de registro
@@ -783,6 +780,12 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<NFeItemFracionado> pesquisarItemFracionado() {
 		return nFeItemFracionadoDAO.pesquisarItemFracionado();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<NFeItemFracionado> pesquisarNFeItemFracionadoQuantidades(Integer numeroNFe) {
+		return nFeItemFracionadoDAO.pesquisarNFeItemFracionadoQuantidades(numeroNFe);
 	}
 
 	@Override
@@ -842,8 +845,22 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarTotalItemFracionadoByNumeroItemNumeroNFe(Integer numeroItem, Integer numeroNFe) {
+		return nFeItemFracionadoDAO.pesquisarTotalItemFracionadoByNumeroItemNumeroNFe(numeroItem, numeroNFe);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer[]> pesquisarTotalItemFracionadoByNumeroNFe(Integer numeroNFe) {
 		return nFeItemFracionadoDAO.pesquisarQuantidadeTotalItemFracionadoByNumeroNFe(numeroNFe);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(Integer idItem,
+			Integer numeroNFeExcluido) {
+		return nFeItemFracionadoDAO.pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(idItem,
+				numeroNFeExcluido);
 	}
 
 	@Override

@@ -365,10 +365,6 @@ public class PedidoServiceTest extends AbstractTest {
 		return pedido;
 	}
 
-	private Representada gerarRepresentada() {
-		return gerarRepresentada(TipoRelacionamento.REPRESENTACAO);
-	}
-
 	private Representada gerarRepresentada(TipoRelacionamento tipoRelacionamento) {
 		Representada representada = eBuilder.buildRepresentada();
 		representada.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);

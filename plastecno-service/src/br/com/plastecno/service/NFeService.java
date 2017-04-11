@@ -45,6 +45,8 @@ public interface NFeService {
 
 	List<NFeItemFracionado> pesquisarItemFracionado();
 
+	List<NFeItemFracionado> pesquisarNFeItemFracionadoQuantidades(Integer numeroNFe);
+
 	List<NFePedido> pesquisarNFePedidoEntradaEmitidoByPeriodo(Periodo periodo);
 
 	List<Integer> pesquisarNumeroNFeByIdPedido(Integer idPedido);
@@ -53,7 +55,11 @@ public interface NFeService {
 
 	List<Integer[]> pesquisarTotalItemFracionado(Integer idPedido);
 
+	Integer pesquisarTotalItemFracionadoByNumeroItemNumeroNFe(Integer numeroItem, Integer numeroNFe);
+
 	List<Integer[]> pesquisarTotalItemFracionadoByNumeroNFe(Integer numeroNFe);
+
+	Integer pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(Integer idItem, Integer numeroNFe);
 
 	void removerItemFracionadoNFe(Integer idItemFracionado);
 

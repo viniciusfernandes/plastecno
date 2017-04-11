@@ -373,6 +373,29 @@ public class NFeServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testEmissaoNFeFracionandoQuantidadeSuperiorAoItemPedido() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFe(idPedido);
+		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
+
+		DetalhamentoProdutoServicoNFe d = lDet.get(0);
+		ProdutoServicoNFe p = d.getProduto();
+		p.setQuantidadeComercial(p.getQuantidadeComercial() + 1);
+		p.setQuantidadeTributavel(p.getQuantidadeTributavel() + 1);
+
+		boolean throwed = false;
+		try {
+			nFeService.emitirNFeEntrada(nFe, idPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue(
+				"Nao eh possivel emitir uma NFe de item fracionado contendo quantidade maior do que a do item do pedido. Verificar as regras.",
+				throwed);
+	}
+
+	@Test
 	public void testEmissaoNFeTriangularizacaoComDuplicada() {
 		Integer idPedido = gerarPedidoRevenda();
 		NFe nFe = gerarNFe(idPedido);

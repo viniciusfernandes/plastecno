@@ -743,6 +743,12 @@ public class NFeServiceImpl implements NFeService {
 					break;
 				}
 			}
+			// Validando primeiro a quantidade fracionada para depois validar o
+			// total ja fracionado, assim evitamos de ir ao banco de dados.
+			if (qtdeFrac > qtdeItem) {
+				throw new BusinessException("Não é possivel incluir um item fracionado com quantidade " + qtdeFrac
+						+ " pois a quantidade do item No. " + numItem + " é " + qtdeItem);
+			}
 
 			totalFrac = pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(idItem, numeroNFe);
 			if (totalFrac > qtdeItem) {
@@ -751,9 +757,11 @@ public class NFeServiceImpl implements NFeService {
 								+ numItem + " do pedido no." + idPedido + ". Esse item contém apenas " + qtdeItem
 								+ " unidades.");
 			}
+
 			// Caso ainda existam itens do pedido para serem fracionado iremos
 			// inserir o registro no banco.
 			if (totalFrac <= qtdeItem) {
+
 				// Aqui estamos configurando o ID do item fracionado para casa
 				// tenhamos uma edicao da NFe evitando a duplicacao de registro
 				// que poderia surgir no relatorio de itens fracionados.

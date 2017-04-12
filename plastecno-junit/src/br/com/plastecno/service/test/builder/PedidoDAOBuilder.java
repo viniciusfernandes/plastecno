@@ -1,6 +1,7 @@
 package br.com.plastecno.service.test.builder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -181,8 +182,30 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			Integer pesquisarMaxSequenciaItemPedido(Integer idPedido) {
-				return 1;
+			public Integer pesquisarMaxSequenciaItemPedido(Integer idPedido) {
+				if (idPedido == null) {
+					return null;
+				}
+				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				if (l == null || l.isEmpty()) {
+					return null;
+				}
+				List<Integer> s = new ArrayList<Integer>();
+				Pedido p = null;
+				for (ItemPedido i : l) {
+					p = i.getPedido();
+					if (p != null && idPedido.equals(p.getId())) {
+						s.add(i.getSequencial());
+					}
+
+				}
+
+				if (s.isEmpty()) {
+					return null;
+				}
+
+				Collections.sort(s);
+				return s.get(s.size() - 1);
 			}
 
 			@Mock

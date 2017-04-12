@@ -33,6 +33,19 @@ public class NFeItemFracionadoDAOBuilder extends DAOBuilder<NFeItemFracionadoDAO
 			}
 
 			@Mock
+			public List<NFeItemFracionado> pesquisarNFeItemFracionadoQuantidades(Integer numeroNFe) {
+
+				List<NFeItemFracionado> l = REPOSITORY.pesquisarTodos(NFeItemFracionado.class);
+				List<NFeItemFracionado> lItem = new ArrayList<NFeItemFracionado>();
+				for (NFeItemFracionado i : l) {
+					if (numeroNFe.equals(i.getNumeroNFe())) {
+						lItem.add(i);
+					}
+				}
+				return lItem;
+			}
+
+			@Mock
 			public List<Integer[]> pesquisarQuantidadeFracionadaByNumeroItem(List<Integer> listaNumeroItem,
 					Integer numeroNFe) {
 				if (numeroNFe == null || listaNumeroItem == null || listaNumeroItem.isEmpty()) {
@@ -100,7 +113,7 @@ public class NFeItemFracionadoDAOBuilder extends DAOBuilder<NFeItemFracionadoDAO
 				// Aqui estamos acumulando o total de itens fracionados de um
 				// determinado item
 				for (NFeItemFracionado i : lItem) {
-					if (!numeroNFe.equals(i.getIdPedido())) {
+					if (!numeroNFe.equals(i.getNumeroNFe())) {
 						continue;
 					}
 
@@ -121,11 +134,32 @@ public class NFeItemFracionadoDAOBuilder extends DAOBuilder<NFeItemFracionadoDAO
 			}
 
 			@Mock
-			public Integer pesqusisarQuantidadeTotalFracionadoByIdItemPedido(Integer idItemPedido, Integer numeroNFe) {
+			public Integer pesquisarTotalItemFracionadoByNumeroItemNumeroNFe(Integer numeroItem, Integer numeroNFe) {
+				if (numeroItem == null || numeroNFe == null) {
+					return 0;
+				}
+				List<NFeItemFracionado> lItem = REPOSITORY.pesquisarTodos(NFeItemFracionado.class);
+				if (lItem == null || lItem.isEmpty()) {
+					return 0;
+				}
+
+				int totFrac = 0;
+				for (NFeItemFracionado i : lItem) {
+					if (!numeroNFe.equals(i.getNumeroNFe()) || !numeroItem.equals(i.getNumeroItem())) {
+						continue;
+					}
+
+					totFrac += i.getQuantidadeFracionada() == null ? 0 : i.getQuantidadeFracionada();
+				}
+				return totFrac;
+			}
+
+			@Mock
+			public Integer pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(Integer idItemPedido,
+					Integer numeroNFe) {
 				if (idItemPedido == null || numeroNFe == null) {
 					return null;
 				}
-
 				List<NFeItemFracionado> l = REPOSITORY.pesquisarTodos(NFeItemFracionado.class);
 				int totalFrac = 0;
 				for (NFeItemFracionado i : l) {

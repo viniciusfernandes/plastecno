@@ -55,6 +55,13 @@ public class NFePedidoDAOBuilder extends DAOBuilder<NFePedidoDAO> {
 				return new Object[] { ultimaNfe.getNumero(), ultimaNfe.getSerie(), ultimaNfe.getModelo(),
 						maxNumeroAssociado };
 			}
+
+			@Mock
+			public String pesquisarXMLNFeByNumero(Integer numero) {
+
+				NFePedido n = REPOSITORY.pesquisarEntidadeById(NFePedido.class, numero);
+				return n != null ? n.getXmlNFe() : null;
+			}
 		};
 		return new NFePedidoDAO(null);
 	}

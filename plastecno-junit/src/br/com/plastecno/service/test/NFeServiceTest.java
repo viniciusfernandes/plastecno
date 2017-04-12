@@ -1,9 +1,9 @@
 package br.com.plastecno.service.test;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -14,6 +14,7 @@ import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.NFeDuplicata;
+import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
@@ -64,7 +65,15 @@ public class NFeServiceTest extends AbstractTest {
 		duplicataService = ServiceBuilder.buildService(DuplicataService.class);
 	}
 
-	private NFe gerarNFe(Integer idPedido) {
+	private NFe gerarNFeItensNaoEmitidos(Integer idPedido) {
+		return gerarNFe(idPedido, true);
+	}
+
+	private NFe gerarNFeItensTodosItensPedido(Integer idPedido) {
+		return gerarNFe(idPedido, false);
+	}
+
+	private NFe gerarNFe(Integer idPedido, boolean apenasItensRestantes) {
 		Cliente cli = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
 		Transportadora transPed = pedidoService.pesquisarTransportadoraByIdPedido(idPedido);
 		Logradouro endFaturamento = cli.getLogradouroFaturamento();
@@ -119,7 +128,17 @@ public class NFeServiceTest extends AbstractTest {
 		t.setModalidadeFrete(TipoModalidadeFrete.EMITENTE.getCodigo());
 
 		List<DetalhamentoProdutoServicoNFe> lDet = new ArrayList<DetalhamentoProdutoServicoNFe>();
-		List<ItemPedido> lItem = nFeService.pesquisarQuantitadeItemRestanteByIdPedido(idPedido);
+
+		List<ItemPedido> lItem = null;
+		// Aqui devemos sempre recuperar as quantidades restantes de itens do
+		// pedido para gerar a nfe pois do contrario o sistema nao vai conseguir
+		// controlar as quantidades fracionadas inseridas.
+		if (apenasItensRestantes) {
+			lItem = nFeService.pesquisarQuantitadeItemRestanteByIdPedido(idPedido);
+		} else {
+			lItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		}
+
 		DetalhamentoProdutoServicoNFe det = null;
 		ProdutoServicoNFe prod = null;
 		TributosProdutoServico trib = null;
@@ -194,19 +213,57 @@ public class NFeServiceTest extends AbstractTest {
 	@Test
 	public void testEmissaoNFe() {
 		Integer idPedido = gerarPedidoRevenda();
-		NFe nFe = gerarNFe(idPedido);
-
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
+		Integer numeroNFe = null;
 		try {
-			nFeService.emitirNFeEntrada(nFe, idPedido);
+			numeroNFe = Integer.parseInt(nFeService.emitirNFeEntrada(nFe, idPedido));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+
+		Integer totFrac = null;
+		for (DetalhamentoProdutoServicoNFe d : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
+			totFrac = nFeService.pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(d.getNumeroItem(),
+					numeroNFe);
+			assertTrue("Todos os itens do pedido foram emitidos e nao deve haver itens fracionados", totFrac.equals(0));
+		}
+	}
+
+	@Test
+	public void testEmissaoNFeApenasUmDosItensDoPedido() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
+		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
+		lDet.remove(0);
+		Integer num = null;
+		try {
+			num = Integer.parseInt(nFeService.emitirNFeEntrada(nFe, idPedido));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			nFe = nFeService.gerarNFeByNumero(num);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer qtdeFrac = null;
+		for (DetalhamentoProdutoServicoNFe det : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
+			qtdeFrac = nFeService
+					.pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(det.getNumeroItem(), num);
+			assertEquals("Todos os itens do pedido foram emitidos e nao deve haver itens fracionados", (Integer) 0,
+					qtdeFrac);
+		}
+
 	}
 
 	@Test
 	public void testEmissaoNFeAPrazoSemDuplicada() {
 		Integer idPedido = gerarPedidoRevenda();
-		NFe nFe = gerarNFe(idPedido);
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 
 		nFe.getDadosNFe().getIdentificacaoNFe()
 				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.PRAZO.getCodigo()));
@@ -224,7 +281,7 @@ public class NFeServiceTest extends AbstractTest {
 	@Test
 	public void testEmissaoNFeAVistaComDuplicada() {
 		Integer idPedido = gerarPedidoRevenda();
-		NFe nFe = gerarNFe(idPedido);
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 
 		nFe.getDadosNFe().getIdentificacaoNFe()
 				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
@@ -241,7 +298,7 @@ public class NFeServiceTest extends AbstractTest {
 	@Test
 	public void testEmissaoNFeDevolucaoComDuplicada() {
 		Integer idPedido = gerarPedidoRevenda();
-		NFe nFe = gerarNFe(idPedido);
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		nFe.getDadosNFe().getIdentificacaoNFe()
 				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
 
@@ -269,9 +326,133 @@ public class NFeServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testEmissaoNFeFracionandoApenasUmDosItensDoPedido() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
+		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
+
+		DetalhamentoProdutoServicoNFe d = lDet.get(0);
+		ProdutoServicoNFe p = d.getProduto();
+
+		Integer numItemFrac = d.getNumeroItem();
+
+		int qRemov = 1;
+		int qEmit = p.getQuantidadeTributavel() - qRemov;
+		p.setQuantidadeTributavel(qEmit);
+		p.setQuantidadeComercial((double) qEmit);
+
+		Integer num = null;
+		try {
+			num = Integer.parseInt(nFeService.emitirNFeEntrada(nFe, idPedido));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			nFe = nFeService.gerarNFeByNumero(num);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		int qtdeFrac = 0;
+		List<ItemPedido> lItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+		for (ItemPedido i : lItem) {
+			if (!numItemFrac.equals(i.getSequencial())) {
+				continue;
+			}
+			qtdeFrac = nFeService.pesquisarTotalItemFracionadoByNumeroItemNumeroNFe(i.getSequencial(), num);
+			assertEquals(
+					"Esse item teve quantidade fracionada e deve ter a mesma quantidade do que foi emitido na nota",
+					qEmit, qtdeFrac);
+		}
+
+		for (DetalhamentoProdutoServicoNFe det : nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe()) {
+			qtdeFrac = nFeService.pesquisarTotalItemFracionadoByNumeroItemNumeroNFe(det.getNumeroItem(), num);
+			assertEquals("As quantidades fracionadas e quantidades tributaveis da NFe devem ser as mesmas", (int) det
+					.getProduto().getQuantidadeTributavel(), qtdeFrac);
+		}
+
+		lItem = nFeService.pesquisarQuantitadeItemRestanteByIdPedido(idPedido);
+		List<NFeItemFracionado> lFrac = nFeService.pesquisarNFeItemFracionadoQuantidades(num);
+		for (NFeItemFracionado ifrac : lFrac) {
+			for (ItemPedido i : lItem) {
+				if (!i.getSequencial().equals(ifrac.getNumeroItem())) {
+					continue;
+				}
+				assertEquals("As quantidades fracionadas e restantes do item do pedido nao conferem",
+						(int) i.getQuantidade() + (int) ifrac.getQuantidadeFracionada(), (int) ifrac.getQuantidade());
+			}
+		}
+	}
+
+	@Test
+	public void testEmissaoNFeFracionandoQuantidadeSuperiorAoItemPedido() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
+		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
+
+		DetalhamentoProdutoServicoNFe d = lDet.get(0);
+		ProdutoServicoNFe p = d.getProduto();
+		p.setQuantidadeComercial(p.getQuantidadeComercial() + 1);
+		p.setQuantidadeTributavel(p.getQuantidadeTributavel() + 1);
+
+		boolean throwed = false;
+		try {
+			nFeService.emitirNFeEntrada(nFe, idPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue(
+				"Nao eh possivel emitir uma NFe de item fracionado contendo quantidade maior do que a do item do pedido. Verificar as regras.",
+				throwed);
+	}
+
+	@Test
+	public void testEmissaoNFeFracionandoQuantidadeSuperiorAoTotalJaFracionado() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
+		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
+
+		DetalhamentoProdutoServicoNFe d = lDet.get(0);
+		ProdutoServicoNFe p = d.getProduto();
+		p.setQuantidadeComercial(p.getQuantidadeComercial() - 1);
+		p.setQuantidadeTributavel(p.getQuantidadeTributavel() - 1);
+
+		try {
+			// Aqui estamos fracionando o item
+			nFeService.emitirNFeEntrada(nFe, idPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		nFe = gerarNFeItensTodosItensPedido(idPedido);
+		lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
+
+		d = lDet.get(0);
+		p = d.getProduto();
+		p.setQuantidadeComercial(p.getQuantidadeComercial() + 1);
+		p.setQuantidadeTributavel(p.getQuantidadeTributavel() + 1);
+		boolean throwed = false;
+		try {
+			// Aqui estamos inserindo uma quantidade superior o que ja foi
+			// fracionado
+			nFeService.emitirNFeEntrada(nFe, idPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
+
+		assertTrue(
+				"Nao eh possivel emitir uma NFe de item fracionado contendo quantidade maior do que quantidade que ja foi fracionada. Verificar as regras.",
+				throwed);
+	}
+
+	@Test
 	public void testEmissaoNFeTriangularizacaoComDuplicada() {
 		Integer idPedido = gerarPedidoRevenda();
-		NFe nFe = gerarNFe(idPedido);
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		nFe.getDadosNFe().getIdentificacaoNFe()
 				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
 
@@ -290,7 +471,7 @@ public class NFeServiceTest extends AbstractTest {
 	@Test
 	public void testEmissaoNFeTriangularizacaoEItemFracionado() {
 		Integer idPedido = gerarPedidoRevenda();
-		NFe nFe = gerarNFe(idPedido);
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		nFe.getDadosNFe().getIdentificacaoNFe()
 				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
 

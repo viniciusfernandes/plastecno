@@ -54,7 +54,7 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 			TipoSituacaoNFe tipoSituacaoNFe) {
 		return entityManager
 				.createQuery(
-						"select new NFePedido(n.dataEmissao, n.idPedido, n.nomeCliente, n.numero, n.valor, n.valorICMS) from NFePedido n where n.tipoNFe=:tipoNFe and n.tipoSituacaoNFe=:tipoSituacaoNFe and n.dataEmissao >=:dataInicial and n.dataEmissao <=:dataFinal",
+						"select new NFePedido(n.dataEmissao, n.idPedido, n.nomeCliente, n.numero, n.valor, n.valorICMS) from NFePedido n where n.tipoNFe=:tipoNFe and n.tipoSituacaoNFe=:tipoSituacaoNFe and n.dataEmissao >=:dataInicial and n.dataEmissao <=:dataFinal order by n.dataEmissao",
 						NFePedido.class).setParameter("tipoNFe", tipoNFe)
 				.setParameter("tipoSituacaoNFe", tipoSituacaoNFe).setParameter("dataInicial", dataInicial)
 				.setParameter("dataFinal", dataFinal).getResultList();

@@ -25,7 +25,7 @@ public class RelatorioClienteRamoAtividadeController extends AbstractController 
     @Get("relatorio/cliente/ramoAtividade/listagem")
     public void gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) {
         try {
-            addAtributo("relatorio", this.relatorioService.gerarRelatorioClienteRamoAtividade(idRamoAtividade));
+            addAtributo("relatorio", relatorioService.gerarRelatorioClienteRamoAtividade(idRamoAtividade));
             addAtributo("relatorioGerado", true);
         } catch (BusinessException e) {
             this.gerarListaMensagemErro(e);

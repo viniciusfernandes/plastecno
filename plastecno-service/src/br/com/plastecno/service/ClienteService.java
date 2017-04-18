@@ -52,7 +52,7 @@ public interface ClienteService {
 
 	List<Cliente> pesquisarByNomeFantasia(String nomeFantasia);
 
-	List<Cliente> pesquisarByRamoAtividade(Integer idRamoAtividade);
+	List<Cliente> pesquisarClienteByIdRamoAtividade(Integer idRamoAtividade);
 
 	List<Cliente> pesquisarClienteByIdRegiao(Integer idRegiao) throws BusinessException;
 

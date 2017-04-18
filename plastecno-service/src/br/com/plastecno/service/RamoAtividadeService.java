@@ -14,8 +14,6 @@ public interface RamoAtividadeService {
 
     RamoAtividade inserir(RamoAtividade ramoAtividade) throws BusinessException;
 
-    RamoAtividade pesquisarRamoAtividadePadrao() throws BusinessException;
-
     boolean isSiglaExistente(Integer id, String sigla);
 
     boolean isSiglaExistente(String sigla);
@@ -36,7 +34,11 @@ public interface RamoAtividadeService {
 
     RamoAtividade pesquisarById(Integer id);
 
-    Long pesquisarTotalRegistros(RamoAtividade filtro, Boolean apenasRamoAtividadeAtivo);
+    RamoAtividade pesquisarRamoAtividadePadrao() throws BusinessException;
+
+    String pesquisarSigleById(Integer idRamo);
+
+	Long pesquisarTotalRegistros(RamoAtividade filtro, Boolean apenasRamoAtividadeAtivo);
 
 	void remover(RamoAtividade ramoAtividade);
 }

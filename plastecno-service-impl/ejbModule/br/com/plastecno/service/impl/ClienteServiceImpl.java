@@ -1,10 +1,13 @@
 package br.com.plastecno.service.impl;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -303,18 +306,54 @@ public class ClienteServiceImpl implements ClienteService {
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Cliente> pesquisarByRamoAtividade(Integer idRamoAtividade) {
+	public List<Cliente> pesquisarClienteByIdRamoAtividade(Integer idRamoAtividade) {
 		if (idRamoAtividade == null) {
 			return Collections.emptyList();
 		}
-		StringBuilder select = new StringBuilder("SELECT u FROM Cliente u ")
-				.append("left join fetch u.listaContato l ").append("left join fetch u.vendedor ")
-				.append("where u.ramoAtividade.id = :idRamoAtividade ");
 
-		select.append("order by u.vendedor.nome, u.nomeFantasia ");
+		StringBuilder select = new StringBuilder();
 
-		return this.entityManager.createQuery(select.toString()).setParameter("idRamoAtividade", idRamoAtividade)
-				.getResultList();
+		select.append("select c.id, u.nome u_nome, u.sobrenome, c.nome_fantasia, ct.nome, ct.ddi_1, ct.ddd_1, ct.telefone_1, ct.ramal_1, ct.fax_1   from vendas.tb_cliente c  ");
+		select.append("left join vendas.tb_contato_cliente cc on cc.id_cliente = c.id ");
+		select.append("left join vendas.tb_contato ct on ct.id = cc.id ");
+		select.append("left join vendas.tb_usuario u on u.id = c.id_vendedor ");
+		select.append("where c.id_ramo_atividade = ").append(idRamoAtividade);
+		select.append(" order by u.nome, c.nome_fantasia ");
+		List<Object[]> resultado = entityManager.createNativeQuery(select.toString()).getResultList();
+
+		if (resultado == null) {
+			return new ArrayList<Cliente>();
+		}
+
+		Cliente c = null;
+		ContatoCliente co = null;
+		Set<Integer> idList = new HashSet<Integer>();
+		List<Cliente> lCli = new ArrayList<Cliente>();
+		for (Object[] o : resultado) {
+			if (o[0] == null || idList.contains(o[0])) {
+				continue;
+			}
+			idList.add((Integer) o[0]);
+			
+			c = new Cliente();
+
+			c.setId((Integer) o[0]);
+			c.setNomeFantasia((String) (o[3] == null ? "" : o[3]));
+			c.setNomeVendedor((String) (o[1] == null ? "SEM VENDEDOR" : (o[1] + " " + (o[2] == null ? "" : o[2]))));
+
+			co = new ContatoCliente();
+			co.setNome((String) (o[4] == null ? "" : o[4]));
+			co.setDdi((String) (o[5] == null ? "" : o[5]));
+			co.setDdd((String) (o[6] == null ? "" : o[6]));
+			co.setTelefone((String) (o[7] == null ? "" : o[7]));
+			co.setRamal((String) (o[8] == null ? "" : o[8]));
+			co.setFax((String) (o[9] == null ? "" : o[9]));
+
+			c.addContato(co);
+
+			lCli.add(c);
+		}
+		return lCli;
 	}
 
 	@Override

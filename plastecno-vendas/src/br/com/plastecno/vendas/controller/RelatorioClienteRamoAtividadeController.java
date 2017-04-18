@@ -26,7 +26,6 @@ public class RelatorioClienteRamoAtividadeController extends AbstractController 
     public void gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) {
         try {
             addAtributo("relatorio", relatorioService.gerarRelatorioClienteRamoAtividade(idRamoAtividade));
-            addAtributo("relatorioGerado", true);
         } catch (BusinessException e) {
             this.gerarListaMensagemErro(e);
         }
@@ -36,7 +35,6 @@ public class RelatorioClienteRamoAtividadeController extends AbstractController 
 
     @Get("relatorio/cliente/ramoAtividade")
     public void relatorioClienteRamoAtividadeHome() {
-        addAtributo("listaRamoAtividade", this.ramoAtividadeService.pesquisar());
-        addAtributo("relatorioGerado", contemAtributo("relatorio"));
+        addAtributo("listaRamoAtividade", ramoAtividadeService.pesquisar());
     }
 }

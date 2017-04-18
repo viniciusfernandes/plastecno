@@ -169,25 +169,25 @@ public class ClienteController extends AbstractController {
 
     @Get("cliente/{idCliente}")
     public void pesquisarClienteById(Integer idCliente, boolean isRevendedor) {
-        Cliente cliente = this.clienteService.pesquisarById(idCliente);
+        Cliente cliente = clienteService.pesquisarById(idCliente);
         this.carregarVendedor(cliente);
 
         try {
-            popularPicklist(null, this.clienteService.pesquisarTransportadorasRedespacho(idCliente));
+            popularPicklist(null, clienteService.pesquisarTransportadorasRedespacho(idCliente));
         } catch (ControllerException e) {
             gerarLogErroNavegacao("Cliente", e);
         }
 
         if (cliente.getDataUltimoContato() != null) {
-            addAtributo("ultimoContato", this.formatarData(cliente.getDataUltimoContato()));
+            addAtributo("ultimoContato", formatarData(cliente.getDataUltimoContato()));
         }
 
         this.formatarDocumento(cliente);
         addAtributo("cliente", cliente);
         addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade().getId()
                 : "");
-        addAtributo("listaLogradouro", this.clienteService.pesquisarLogradouro(idCliente));
-        addAtributo("listaContato", this.clienteService.pesquisarContato(idCliente));
+        addAtributo("listaLogradouro", clienteService.pesquisarLogradouro(idCliente));
+        addAtributo("listaContato", clienteService.pesquisarContato(idCliente));
         addAtributo("comentarios", formatarComentarios(idCliente));
         addAtributo("tipoCliente", cliente.getTipoCliente());
         if (isRevendedor) {

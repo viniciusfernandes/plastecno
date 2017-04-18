@@ -111,12 +111,12 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 			<caption>${relatorio.titulo}</caption>
 			<thead>
 				<tr>
-					<th style="width: 10%">NFe</th>
-					<th style="width: 40%">Cliente</th>
-					<th style="width: 15%">Data Venc.</th>
+					<th style="width: 10%">Dt. Venc.</th>
+					<th style="width: 54%">Cliente</th>
+					<th style="width: 8%">NFe</th>
 					<th style="width: 10%">Vl. (R$)</th>
-					<th style="width: 15%">Situação</th>
-					<th style="width: 10%">Ações</th>
+					<th style="width: 10%">Situação</th>
+					<th style="width: 8%">Ações</th>
 				</tr>
 			</thead>
 			
@@ -126,10 +126,10 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 					<c:forEach items="${grupo.listaElemento}" var="elemento" varStatus="iElemento">
 						<tr>
 							<c:if test="${iElemento.count le 1}">
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id}</td>
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.propriedades['nomeCliente']}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.propriedades['dataVencimentoFormatada']}</td>
 							</c:if>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.dataVencimentoFormatada}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeCliente}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.numeroNFe}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.tipoSituacaoDuplicata.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">

@@ -25,19 +25,16 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.Pedido;
-import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
-import br.com.plastecno.service.wrapper.ClienteWrapper;
 import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
 import br.com.plastecno.service.wrapper.GrupoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.ReceitaWrapper;
-import br.com.plastecno.service.wrapper.RelatorioClienteRamoAtividade;
 import br.com.plastecno.service.wrapper.RelatorioValorTotalPedidoWrapper;
 import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
@@ -157,38 +154,38 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioClienteRamoAtividade gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade)
+	public RelatorioWrapper<String, Cliente> gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade)
 			throws BusinessException {
 
 		if (idRamoAtividade == null) {
 			throw new BusinessException("O ramo de atividade é obrigatório");
 		}
 
-		RamoAtividade ramoAtividade = this.ramoAtividadeService.pesquisarById(idRamoAtividade);
-		List<Cliente> listaCliente = this.clienteService.pesquisarByRamoAtividade(idRamoAtividade);
-		RelatorioClienteRamoAtividade relatorio = new RelatorioClienteRamoAtividade(
-				"Relatório de Clientes com o ramo de atividades " + ramoAtividade.getSigla());
+		String sigla = ramoAtividadeService.pesquisarSigleById(idRamoAtividade);
+		List<Cliente> listaCliente = clienteService.pesquisarClienteByIdRamoAtividade(idRamoAtividade);
 
-		StringBuilder descricaoContato = new StringBuilder();
-		for (Cliente cliente : listaCliente) {
+		RelatorioWrapper<String, Cliente> relatorio = new RelatorioWrapper<String, Cliente>(
+				"Relatório de Clientes com o ramo de atividades " + (sigla != null ? sigla : "\"Não definido\""));
 
-			if (cliente.isListaContatoPreenchida()) {
-				Contato c = cliente.getContatoPrincipal();
-				descricaoContato.append(c.getNome());
+		StringBuilder contatoFormatado = new StringBuilder();
+		Contato cc = null;
+		for (Cliente cl : listaCliente) {
+			if (cl.isListaContatoPreenchida()) {
+				cc = cl.getContatoPrincipal();
+				contatoFormatado.append(cc.getNome());
 
-				if (StringUtils.isNotEmpty(c.getEmail())) {
-					descricaoContato.append(" - ").append(c.getEmail());
+				if (StringUtils.isNotEmpty(cc.getEmail())) {
+					contatoFormatado.append(" - ").append(cc.getEmail());
 				}
 
-				if (StringUtils.isNotEmpty(c.getTelefone())) {
-					descricaoContato.append(" - ").append(c.getTelefoneFormatado());
+				if (StringUtils.isNotEmpty(cc.getTelefone())) {
+					contatoFormatado.append(" - ").append(cc.getTelefoneFormatado());
 				}
+				cl.setContatoFormatado(contatoFormatado.toString());
+				contatoFormatado.delete(0, contatoFormatado.length());
 			}
 
-			relatorio.addCliente(new ClienteWrapper(cliente.getVendedor().getNomeCompleto(), cliente.getRazaoSocial(),
-					descricaoContato.toString()));
-
-			descricaoContato.delete(0, descricaoContato.length());
+			relatorio.addGrupo(cl.getNomeVendedor(), cl);
 		}
 
 		return relatorio;
@@ -277,23 +274,23 @@ public class RelatorioServiceImpl implements RelatorioService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicata(List<NFeDuplicata> lDuplic, String titulo)
+	private RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicata(List<NFeDuplicata> lDuplic, String titulo)
 			throws BusinessException {
-		RelatorioWrapper<Integer, NFeDuplicata> relatorio = new RelatorioWrapper<Integer, NFeDuplicata>(titulo);
+		RelatorioWrapper<Date, NFeDuplicata> relatorio = new RelatorioWrapper<Date, NFeDuplicata>(titulo);
 		Date dtAtual = new Date();
 		for (NFeDuplicata d : lDuplic) {
 			// Vamos definir a situação da duplicata
 			if (!d.isLiquidado() && dtAtual.after(d.getDataVencimento())) {
 				d.setTipoSituacaoDuplicata(TipoSituacaoDuplicata.VENCIDO);
 			}
-			d.setDataVencimentoFormatada(StringUtils.formatarData(d.getDataVencimento()));
-
-			relatorio.addGrupo(d.getNumeroNFe(), d).setPropriedade("nomeCliente", d.getNomeCliente());
+			relatorio.addGrupo(d.getDataVencimento(), d).setPropriedade("dataVencimentoFormatada",
+					StringUtils.formatarData(d.getDataVencimento()));
 		}
 
-		relatorio.sortGrupo(new Comparator<GrupoWrapper<Integer, NFeDuplicata>>() {
+		relatorio.sortGrupo(new Comparator<GrupoWrapper<Date, NFeDuplicata>>() {
+
 			@Override
-			public int compare(GrupoWrapper<Integer, NFeDuplicata> o1, GrupoWrapper<Integer, NFeDuplicata> o2) {
+			public int compare(GrupoWrapper<Date, NFeDuplicata> o1, GrupoWrapper<Date, NFeDuplicata> o2) {
 				return o1.getId() != null && o1.getId() != null ? o2.getId().compareTo(o1.getId()) : 0;
 			}
 		});
@@ -302,8 +299,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 			@Override
 			public int compare(NFeDuplicata o1, NFeDuplicata o2) {
-				return o1.getDataVencimento() != null && o2.getDataVencimento() != null ? o2.getDataVencimento()
-						.compareTo(o1.getDataVencimento()) : 0;
+				return o1.getNumeroNFe() != null && o2.getNumeroNFe() != null ? o2.getNumeroNFe().compareTo(
+						o1.getNumeroNFe()) : 0;
 			}
 		});
 		return relatorio;
@@ -311,7 +308,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicata(Periodo periodo) throws BusinessException {
+	public RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicata(Periodo periodo) throws BusinessException {
 		if (periodo == null) {
 			throw new BusinessException("Não é possível gerar relatório de duplicatas pois o período esta nulo.");
 		}
@@ -325,7 +322,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicataByIdPedido(Integer idPedido)
+	public RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicataByIdPedido(Integer idPedido)
 			throws BusinessException {
 		if (idPedido == null) {
 			throw new BusinessException("Não é possível gerar relatório de duplicatas pois número do pedido esta nulo.");
@@ -339,7 +336,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, NFeDuplicata> gerarRelatorioDuplicataByNumeroNFe(Integer numeroNFe)
+	public RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicataByNumeroNFe(Integer numeroNFe)
 			throws BusinessException {
 		if (numeroNFe == null) {
 			throw new BusinessException("Não é possível gerar relatório de duplicatas pois o número da NFe esta nulo.");

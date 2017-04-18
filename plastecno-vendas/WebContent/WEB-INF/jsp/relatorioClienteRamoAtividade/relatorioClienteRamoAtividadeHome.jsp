@@ -56,7 +56,7 @@
 	</form>
 
 	<a id="rodape"></a>
-	<c:if test="${relatorioGerado}">
+	<c:if test="${not empty relatorio}">
 		<table class="listrada">
 			<caption>${relatorio.titulo}</caption>
 			<thead>
@@ -67,18 +67,14 @@
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach items="${relatorio.listaVendedorCliente}" var="vendedor"
-					varStatus="indiceVendedor">
-					<!-- bloco de totalizacao de valores vendidos para cada representada -->
-					<c:forEach items="${vendedor.listaCliente}" var="cliente"
-						varStatus="indiceCliente">
+				<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iGrupo">
+					<c:forEach items="${grupo.listaElemento}" var="elemento" varStatus="iElemento">
 						<tr>
-							<c:if test="${indiceCliente.count eq 1}">
-								<td class="fundo${indiceVendedor.index % 2 == 0 ? 1 : 2}"
-									rowspan="${vendedor.totalClientes}">${vendedor.nome}</td>
+							<c:if test="${iElemento.count eq 1}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id}</td>
 							</c:if>
-							<td class="fundo${indiceVendedor.index % 2 == 0 ? 1 : 2}">${cliente.nome}</td>
-							<td class="fundo${indiceVendedor.index % 2 == 0 ? 1 : 2}">${cliente.contato}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeFantasia}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.contatoFormatado}</td>
 						</tr>
 					</c:forEach>
 				</c:forEach>

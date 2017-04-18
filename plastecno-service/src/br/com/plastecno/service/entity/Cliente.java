@@ -2,6 +2,7 @@ package br.com.plastecno.service.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +42,9 @@ public class Cliente implements Serializable {
 
 	@InformacaoValidavel(intervaloComprimento = { 1, 15 }, tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
 	private String cnpj;
+
+	@Transient
+	private String contatoFormatado;
 
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF do cliente")
 	private String cpf;
@@ -100,6 +104,9 @@ public class Cliente implements Serializable {
 	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
 
+	@Transient
+	private String nomeVendedor;
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_ramo_atividade")
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Ramo de atividade do cliente")
@@ -121,6 +128,13 @@ public class Cliente implements Serializable {
 	private Usuario vendedor;
 
 	public Cliente() {
+	}
+
+	// Construturo utilizado no relatorio de clientes por ramo de atividades
+	public Cliente(ContatoCliente contatoCliente, String nomeVendedor, String razaoSocial, String sobrenomeVendedor) {
+		addContato(contatoCliente);
+		this.nomeVendedor = nomeVendedor + " " + sobrenomeVendedor;
+		this.razaoSocial = razaoSocial;
 	}
 
 	/*
@@ -151,15 +165,33 @@ public class Cliente implements Serializable {
 		this.inscricaoSUFRAMA = inscricaoSUFRAMA;
 	}
 
-	public void addContato(ContatoCliente contatoCliente) {
-		if (this.listaContato == null) {
-			this.setListaContato(new HashSet<ContatoCliente>());
-		}
-		this.listaContato.add(contatoCliente);
-		contatoCliente.setCliente(this);
+	// Construturo utilizado no relatorio de clientes por ramo de atividades
+	public Cliente(Set<ContatoCliente> listaContato, String nomeVendedor, String razaoSocial, String sobrenomeVendedor) {
+		addContato(listaContato);
+		this.nomeVendedor = nomeVendedor + " " + sobrenomeVendedor;
+		this.razaoSocial = razaoSocial;
 	}
 
-	public void addContato(List<ContatoCliente> listaContato) {
+	// Construturo utilizado no relatorio de clientes por ramo de atividades
+	public Cliente(String dddContato, String ddiContato, String emailContato, String faxContato, String nomeContato,
+			String nomeVendedor, String ramalContato, String razaoSocial, String sobreNomeVendedor,
+			String telefoneContato) {
+
+		ContatoCliente c = new ContatoCliente();
+		c.setEmail(emailContato);
+		c.setNome(nomeContato);
+		c.setTelefone(telefoneContato);
+		c.setDdd(dddContato);
+		c.setDdi(ddiContato);
+		c.setFax(faxContato);
+		c.setRamal(ramalContato);
+		addContato(c);
+
+		this.nomeVendedor = nomeVendedor + " " + sobreNomeVendedor;
+		this.razaoSocial = razaoSocial;
+	}
+
+	public void addContato(Collection<ContatoCliente> listaContato) {
 
 		if (listaContato == null) {
 			return;
@@ -168,6 +200,14 @@ public class Cliente implements Serializable {
 		for (ContatoCliente contatoCliente : listaContato) {
 			this.addContato(contatoCliente);
 		}
+	}
+
+	public void addContato(ContatoCliente contatoCliente) {
+		if (this.listaContato == null) {
+			this.setListaContato(new HashSet<ContatoCliente>());
+		}
+		this.listaContato.add(contatoCliente);
+		contatoCliente.setCliente(this);
 	}
 
 	public void addLogradouro(List<LogradouroCliente> listaLogradouro) {
@@ -207,6 +247,10 @@ public class Cliente implements Serializable {
 
 	public String getCnpj() {
 		return cnpj;
+	}
+
+	public String getContatoFormatado() {
+		return contatoFormatado;
 	}
 
 	public Contato getContatoPrincipal() {
@@ -285,6 +329,10 @@ public class Cliente implements Serializable {
 		return nomeFantasia;
 	}
 
+	public String getNomeVendedor() {
+		return nomeVendedor;
+	}
+
 	public RamoAtividade getRamoAtividade() {
 		return ramoAtividade;
 	}
@@ -334,6 +382,10 @@ public class Cliente implements Serializable {
 
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
+	}
+
+	public void setContatoFormatado(String contatoFormatado) {
+		this.contatoFormatado = contatoFormatado;
 	}
 
 	public void setCpf(String cpf) {
@@ -390,6 +442,10 @@ public class Cliente implements Serializable {
 
 	public void setNomeFantasia(String nomeFantasia) {
 		this.nomeFantasia = nomeFantasia;
+	}
+
+	public void setNomeVendedor(String nomeVendedor) {
+		this.nomeVendedor = nomeVendedor;
 	}
 
 	public void setRamoAtividade(RamoAtividade ramoAtividade) {

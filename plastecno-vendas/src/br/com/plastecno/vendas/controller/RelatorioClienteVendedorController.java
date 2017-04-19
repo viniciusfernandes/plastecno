@@ -9,9 +9,9 @@ import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
-import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -20,10 +20,13 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 public class RelatorioClienteVendedorController extends AbstractController {
 
     @Servico
-    private UsuarioService usuarioService;
+    private ClienteService clienteService;
 
     @Servico
-    private ClienteService clienteService;
+    private RelatorioService relatorioService;
+
+    @Servico
+    private UsuarioService usuarioService;
 
     public RelatorioClienteVendedorController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -31,15 +34,11 @@ public class RelatorioClienteVendedorController extends AbstractController {
 
     @Get("relatorio/cliente/vendedor/listagem")
     public void gerarRelatorioClienteVendedor(Integer idVendedor, boolean pesquisaClienteInativo) {
-        List<Cliente> listaCliente = null;
-
+        Usuario vend = usuarioService.pesquisarUsuarioResumidoById(idVendedor);
         try {
-            listaCliente = this.clienteService.pesquisarByIdVendedor(idVendedor, pesquisaClienteInativo);
-            for (Cliente cliente : listaCliente) {
-                cliente.setDataUltimoContatoFormatada(this.formatarData(cliente.getDataUltimoContato()));
-            }
-            addAtributo("listaCliente", listaCliente);
-            addAtributo("tituloRelatorio", "Relatório de Clientes " + (pesquisaClienteInativo ? "Inativos" : "Ativos"));
+            addAtributo("listaCliente",
+                    relatorioService.gerarRelatorioClienteVendedor(idVendedor, pesquisaClienteInativo));
+            addAtributo("titulo", vend != null ? "Clientes do Vendedor " + vend.getNome() : "");
             irRodapePagina();
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
@@ -47,13 +46,13 @@ public class RelatorioClienteVendedorController extends AbstractController {
         }
 
         addAtributo("pesquisaClienteInativo", pesquisaClienteInativo);
-        addAtributo("vendedor", this.usuarioService.pesquisarUsuarioResumidoById(idVendedor));
+        addAtributo("vendedor", vend);
     }
 
     @Get("relatorio/cliente/vendedor/nome")
     public void pesquisarClienteByNome(String nome) {
         List<Autocomplete> lista = new ArrayList<Autocomplete>();
-        List<Usuario> listaUsuario = this.usuarioService.pesquisarByNome(nome);
+        List<Usuario> listaUsuario = usuarioService.pesquisarByNome(nome);
         for (Usuario usuario : listaUsuario) {
             lista.add(new Autocomplete(usuario.getId(), usuario.getNomeCompleto()));
         }
@@ -64,7 +63,7 @@ public class RelatorioClienteVendedorController extends AbstractController {
     public void relatorioClienteVendedorHome() {
         boolean acessoClienteVendedorPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
         if (!acessoClienteVendedorPermitido) {
-            addAtributo("vendedor", this.usuarioService.pesquisarUsuarioResumidoById(getCodigoUsuario()));
+            addAtributo("vendedor", usuarioService.pesquisarUsuarioResumidoById(getCodigoUsuario()));
         }
         addAtributo("acessoClienteVendedorPermitido", acessoClienteVendedorPermitido);
         addAtributo("relatorioGerado", contemAtributo("listaCliente"));

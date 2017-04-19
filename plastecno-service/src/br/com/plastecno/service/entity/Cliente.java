@@ -245,6 +245,14 @@ public class Cliente implements Serializable {
 		this.listaRedespacho.add(transportadora);
 	}
 
+	public void formatarContatoPrincipal() {
+		Contato c = getContatoPrincipal();
+		if (c == null) {
+			return;
+		}
+		contatoFormatado = c.formatar();
+	}
+
 	public String getCnpj() {
 		return cnpj;
 	}
@@ -254,7 +262,7 @@ public class Cliente implements Serializable {
 	}
 
 	public Contato getContatoPrincipal() {
-		return this.isListaContatoPreenchida() ? this.listaContato.iterator().next() : null;
+		return isListaContatoPreenchida() ? listaContato.iterator().next() : null;
 	}
 
 	public String getCpf() {

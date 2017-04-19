@@ -16,7 +16,7 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 	}
 
 	public Usuario pesquisarByEmailSenha(String email, String senha) {
-		Query query = this.entityManager
+		Query query = entityManager
 				.createQuery(
 						"select u from Usuario u left join fetch u.listaPerfilAcesso where u.email = :email and u.senha = :senha")
 				.setParameter("email", email).setParameter("senha", senha);
@@ -50,7 +50,8 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 
 	public Usuario pesquisarUsuarioResumidoById(Integer id) {
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select new Usuario(c.id, c.nome, c.sobrenome, c.email) from Usuario c where c.id = :id")
+				this.entityManager.createQuery(
+						"select new Usuario(c.id, c.nome, c.sobrenome, c.email) from Usuario c where c.id = :id")
 						.setParameter("id", id), Usuario.class, null);
 	}
 
@@ -61,7 +62,8 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 								.createQuery(
 										"select u.ativo from Usuario u inner join u.listaPerfilAcesso p where u.id =:idVendedor and p.id = :idPerfilAcesso")
 								.setParameter("idVendedor", idVendedor)
-								.setParameter("idPerfilAcesso", TipoAcesso.CADASTRO_PEDIDO_VENDAS.indexOf()), Boolean.class, false);
+								.setParameter("idPerfilAcesso", TipoAcesso.CADASTRO_PEDIDO_VENDAS.indexOf()),
+						Boolean.class, false);
 	}
 
 	public Usuario pesquisarVendedorByIdCliente(Integer idCliente) {

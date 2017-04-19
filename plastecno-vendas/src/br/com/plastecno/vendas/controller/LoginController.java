@@ -37,13 +37,13 @@ public class LoginController extends AbstractController {
     @Post("login/entrar")
     public void logar(String email, String senha) {
         try {
-            Usuario usuario = this.autenticacaoService.autenticar(email, senha);
+            Usuario usuario = autenticacaoService.autenticar(email, senha);
 
             if (usuario == null) {
-                this.gerarListaMensagemAlerta("Falha na autenticação. Usuario/Senha inválido(s)");
+                gerarListaMensagemAlerta("Falha na autenticação. Usuario/Senha inválido(s)");
                 irPaginaHome();
             } else if (!usuario.isAtivo()) {
-                this.gerarListaMensagemAlerta("Falha na autenticação. Usuario desativado.");
+                gerarListaMensagemAlerta("Falha na autenticação. Usuario desativado.");
                 irPaginaHome();
             } else {
                 inicializarUsuarioInfo(usuario);

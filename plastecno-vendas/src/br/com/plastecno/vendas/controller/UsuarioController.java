@@ -13,6 +13,7 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.ContatoUsuario;
 import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -97,12 +98,12 @@ public class UsuarioController extends AbstractController {
 
             if (temElementos(listaIdPerfilAssociado)) {
                 for (Integer idPerfil : listaIdPerfilAssociado) {
-                    usuario.addPerfilAcesso(this.perfilAcessoService.pesquisarById(idPerfil));
+                    usuario.addPerfilAcesso(new PerfilAcesso(idPerfil));
                 }
             }
 
-            this.usuarioService.inserir(usuario, isAlteracaoSenha);
-            this.gerarMensagemCadastroSucesso(usuario, "nome");
+            usuarioService.inserir(usuario, isAlteracaoSenha);
+            gerarMensagemCadastroSucesso(usuario, "nome");
         } catch (BusinessException e) {
             inserirMascaraDocumentos(usuario);
             addAtributo("usuario", usuario);

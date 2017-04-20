@@ -16,11 +16,13 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 	}
 
 	public Usuario pesquisarByEmailSenha(String email, String senha) {
-		Query query = entityManager
-				.createQuery(
-						"select u from Usuario u left join fetch u.listaPerfilAcesso where u.email = :email and u.senha = :senha")
-				.setParameter("email", email).setParameter("senha", senha);
-		return QueryUtil.gerarRegistroUnico(query, Usuario.class, null);
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select u from Usuario u left join fetch u.listaPerfilAcesso where u.email = :email and u.senha = :senha",
+										Usuario.class).setParameter("email", email).setParameter("senha", senha),
+						Usuario.class, null);
 	}
 
 	public Usuario pesquisarById(Integer id) {

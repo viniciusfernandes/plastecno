@@ -18,6 +18,7 @@ import javax.persistence.Table;
 
 import br.com.plastecno.service.constante.TipoDocumento;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
+import br.com.plastecno.util.StringUtils;
 
 @Entity
 @Table(name = "tb_contato", schema = "vendas")
@@ -123,6 +124,18 @@ public class Contato implements Serializable {
 		return o instanceof Contato && this.id != null && this.id.equals(((Contato) o).id);
 	}
 
+	public String formatar() {
+		String s = getNome();
+		if (StringUtils.isNotEmpty(getEmail())) {
+			s += " - " + getEmail();
+		}
+
+		if (StringUtils.isNotEmpty(getTelefone())) {
+			s += " - " + getTelefoneFormatado();
+		}
+		return s;
+	}
+
 	private String formatarTelefone(String ddi, String ddd, String telefone, String ramal, String fax) {
 
 		StringBuilder telefoneFormatado = new StringBuilder();
@@ -130,13 +143,13 @@ public class Contato implements Serializable {
 		if (ddi != null && !ddi.isEmpty()) {
 			telefoneFormatado.append(ddi).append(" ");
 		}
-		
+
 		if (ddd != null && !ddd.isEmpty()) {
 			telefoneFormatado.append("(").append(ddd).append(") ");
 		}
-		
 
-		//telefoneFormatado.append("(").append(ddi == null ? "" : ddi).append(" / ").append(ddd == null ? "" : ddd).append(") ")
+		// telefoneFormatado.append("(").append(ddi == null ? "" :
+		// ddi).append(" / ").append(ddd == null ? "" : ddd).append(") ")
 		telefoneFormatado.append(telefone == null ? "" : formatarTelefoneComHifen(telefone)).append(" / ")
 				.append(ramal == null ? "" : ramal).append(" / ")
 				.append(fax == null ? "" : formatarTelefoneComHifen(fax));

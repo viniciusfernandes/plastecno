@@ -20,7 +20,6 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
-import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
@@ -167,28 +166,18 @@ public class RelatorioServiceImpl implements RelatorioService {
 		RelatorioWrapper<String, Cliente> relatorio = new RelatorioWrapper<String, Cliente>(
 				"Relatório de Clientes com o ramo de atividades " + (sigla != null ? sigla : "\"Não definido\""));
 
-		StringBuilder contatoFormatado = new StringBuilder();
-		Contato cc = null;
 		for (Cliente cl : listaCliente) {
-			if (cl.isListaContatoPreenchida()) {
-				cc = cl.getContatoPrincipal();
-				contatoFormatado.append(cc.getNome());
-
-				if (StringUtils.isNotEmpty(cc.getEmail())) {
-					contatoFormatado.append(" - ").append(cc.getEmail());
-				}
-
-				if (StringUtils.isNotEmpty(cc.getTelefone())) {
-					contatoFormatado.append(" - ").append(cc.getTelefoneFormatado());
-				}
-				cl.setContatoFormatado(contatoFormatado.toString());
-				contatoFormatado.delete(0, contatoFormatado.length());
-			}
-
 			relatorio.addGrupo(cl.getNomeVendedor(), cl);
 		}
-
 		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Cliente> gerarRelatorioClienteVendedor(Integer idVendedor, boolean clienteInativo)
+			throws BusinessException {
+		return clienteInativo ? clienteService.pesquisarInativosByIdVendedor(idVendedor) : clienteService
+				.pesquisarClienteContatoByIdVendedor(idVendedor);
 	}
 
 	@Override

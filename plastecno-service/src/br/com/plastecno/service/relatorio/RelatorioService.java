@@ -26,6 +26,8 @@ public interface RelatorioService {
 
 	RelatorioWrapper<String, Cliente> gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) throws BusinessException;
 
+	List<Cliente> gerarRelatorioClienteVendedor(Integer idVendedor, boolean clienteInativo) throws BusinessException;
+
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioComissaoVendedor(Integer idVendedor, Periodo periodo);
 
 	RelatorioWrapper<Integer, ComissaoVendaWrapper> gerarRelatorioComissaoVendedores(Periodo periodo);

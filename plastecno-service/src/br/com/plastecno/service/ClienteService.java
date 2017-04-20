@@ -46,7 +46,7 @@ public interface ClienteService {
 
 	Cliente pesquisarById(Integer id);
 
-	List<Cliente> pesquisarByIdVendedor(Integer idVendedor);
+	List<Cliente> pesquisarClienteContatoByIdVendedor(Integer idVendedor);
 
 	List<Cliente> pesquisarByIdVendedor(Integer idVendedor, boolean isPesquisaClienteInativo) throws BusinessException;
 

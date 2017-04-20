@@ -79,14 +79,13 @@ $(document).ready(function() {
 
 	<a id="rodape"></a>
 
-	<c:if test="${relatorioGerado}">
+	<c:if test="${not empty listaCliente}">
 		<table class="listrada">
-			<caption>${tituloRelatorio}</caption>
+			<caption>${titulo}</caption>
 			<thead>
 				<tr>
-					<th style="width: 10%">Ult. Cont.</th>
 					<th style="width: 50%">Cliente</th>
-					<th style="width: 35%">Contato</th>
+					<th style="width: 45%">Contato</th>
 					<th>Ações</th>
 				</tr>
 			</thead>
@@ -94,10 +93,8 @@ $(document).ready(function() {
 			<tbody>
 				<c:forEach var="cliente" items="${listaCliente}">
 					<tr>
-						<td>${cliente.dataUltimoContatoFormatada}</td>
-						<td>${cliente.nomeCompleto}</td>
-						<td>${cliente.contatoPrincipal.nome}-
-							${cliente.contatoPrincipal.telefoneFormatado}</td>
+						<td>${cliente.nomeFantasia}</td>
+						<td>${cliente.contatoFormatado}</td>
 						<td>
 							<div class="coluna_acoes_listagem">
 								<form action="<c:url value="/cliente/${cliente.id}"/>"

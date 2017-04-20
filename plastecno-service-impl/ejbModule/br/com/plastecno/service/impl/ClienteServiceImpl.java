@@ -83,6 +83,49 @@ public class ClienteServiceImpl implements ClienteService {
 		return query.executeUpdate();
 	}
 
+	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private List<Cliente> executarSelectClienteContato(StringBuilder select, boolean formatarContato) {
+		List<Object[]> resultado = entityManager.createNativeQuery(select.toString()).getResultList();
+
+		if (resultado == null) {
+			return new ArrayList<Cliente>();
+		}
+
+		Cliente c = null;
+		ContatoCliente co = null;
+		Set<Integer> idList = new HashSet<Integer>();
+		List<Cliente> lCli = new ArrayList<Cliente>();
+		for (Object[] o : resultado) {
+			if (o[0] == null || idList.contains(o[0])) {
+				continue;
+			}
+			idList.add((Integer) o[0]);
+
+			c = new Cliente();
+
+			c.setId((Integer) o[0]);
+			c.setNomeFantasia((String) (o[3] == null ? "" : o[3]));
+			c.setNomeVendedor((String) (o[1] == null ? "SEM VENDEDOR" : (o[1] + " " + (o[2] == null ? "" : o[2]))));
+
+			co = new ContatoCliente();
+			co.setNome((String) (o[4] == null ? "" : o[4]));
+			co.setDdi((String) (o[5] == null ? "" : o[5]));
+			co.setDdd((String) (o[6] == null ? "" : o[6]));
+			co.setTelefone((String) (o[7] == null ? "" : o[7]));
+			co.setRamal((String) (o[8] == null ? "" : o[8]));
+			co.setFax((String) (o[9] == null ? "" : o[9]));
+
+			if (formatarContato) {
+				c.setContatoFormatado(co.formatar());
+			}
+
+			c.addContato(co);
+			lCli.add(c);
+		}
+		return lCli;
+	}
+
 	private Query gerarQueryPesquisa(Cliente filtro, StringBuilder select) {
 		Query query = this.entityManager.createQuery(select.toString());
 		if (StringUtils.isNotEmpty(filtro.getNomeFantasia())) {
@@ -121,6 +164,15 @@ public class ClienteServiceImpl implements ClienteService {
 			select.append(" WHERE ").append(restricao);
 			select.delete(select.lastIndexOf("AND"), select.length() - 1);
 		}
+	}
+
+	private StringBuilder gerarSelectRelatorioClienteContato() {
+		StringBuilder s = new StringBuilder();
+		s.append("select c.id, u.nome u_nome, u.sobrenome, c.nome_fantasia, ct.nome, ct.ddi_1, ct.ddd_1, ct.telefone_1, ct.ramal_1, ct.fax_1   from vendas.tb_cliente c  ");
+		s.append("left join vendas.tb_contato_cliente cc on cc.id_cliente = c.id ");
+		s.append("left join vendas.tb_contato ct on ct.id = cc.id ");
+		s.append("left join vendas.tb_usuario u on u.id = c.id_vendedor ");
+		return s;
 	}
 
 	@PostConstruct
@@ -224,7 +276,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public PaginacaoWrapper<Cliente> paginarCliente(Cliente filtro, boolean carregarVendedor,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
-		return new PaginacaoWrapper<Cliente>(this.pesquisarTotalRegistros(filtro), this.pesquisarBy(filtro, true,
+		return new PaginacaoWrapper<Cliente>(pesquisarTotalRegistros(filtro), this.pesquisarBy(filtro, true,
 				indiceRegistroInicial, numeroMaximoRegistros));
 	}
 
@@ -267,30 +319,12 @@ public class ClienteServiceImpl implements ClienteService {
 		return clienteDAO.pesquisarById(id);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Cliente> pesquisarByIdVendedor(Integer idVendedor) {
-		StringBuilder select = new StringBuilder("select c from Cliente c left join fetch c.listaContato ");
-		if (idVendedor != null) {
-			select.append("where c.vendedor.id = :idVendedor ");
-		}
-		select.append(" order by c.dataUltimoContato, c.nomeFantasia ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		if (idVendedor != null) {
-			query.setParameter("idVendedor", idVendedor);
-		}
-
-		return query.getResultList();
-	}
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarByIdVendedor(Integer idVendedor, boolean isPesquisaClienteInativo)
 			throws BusinessException {
-		return isPesquisaClienteInativo ? this.pesquisarInativosByIdVendedor(idVendedor) : this
-				.pesquisarByIdVendedor(idVendedor);
+		return isPesquisaClienteInativo ? pesquisarInativosByIdVendedor(idVendedor)
+				: pesquisarClienteContatoByIdVendedor(idVendedor);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -303,7 +337,6 @@ public class ClienteServiceImpl implements ClienteService {
 		return query.getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> pesquisarClienteByIdRamoAtividade(Integer idRamoAtividade) {
@@ -311,61 +344,24 @@ public class ClienteServiceImpl implements ClienteService {
 			return Collections.emptyList();
 		}
 
-		StringBuilder select = new StringBuilder();
+		StringBuilder s = gerarSelectRelatorioClienteContato();
+		s.append("where c.id_ramo_atividade = ").append(idRamoAtividade);
+		s.append(" order by u.nome, c.nome_fantasia ");
 
-		select.append("select c.id, u.nome u_nome, u.sobrenome, c.nome_fantasia, ct.nome, ct.ddi_1, ct.ddd_1, ct.telefone_1, ct.ramal_1, ct.fax_1   from vendas.tb_cliente c  ");
-		select.append("left join vendas.tb_contato_cliente cc on cc.id_cliente = c.id ");
-		select.append("left join vendas.tb_contato ct on ct.id = cc.id ");
-		select.append("left join vendas.tb_usuario u on u.id = c.id_vendedor ");
-		select.append("where c.id_ramo_atividade = ").append(idRamoAtividade);
-		select.append(" order by u.nome, c.nome_fantasia ");
-		List<Object[]> resultado = entityManager.createNativeQuery(select.toString()).getResultList();
-
-		if (resultado == null) {
-			return new ArrayList<Cliente>();
-		}
-
-		Cliente c = null;
-		ContatoCliente co = null;
-		Set<Integer> idList = new HashSet<Integer>();
-		List<Cliente> lCli = new ArrayList<Cliente>();
-		for (Object[] o : resultado) {
-			if (o[0] == null || idList.contains(o[0])) {
-				continue;
-			}
-			idList.add((Integer) o[0]);
-			
-			c = new Cliente();
-
-			c.setId((Integer) o[0]);
-			c.setNomeFantasia((String) (o[3] == null ? "" : o[3]));
-			c.setNomeVendedor((String) (o[1] == null ? "SEM VENDEDOR" : (o[1] + " " + (o[2] == null ? "" : o[2]))));
-
-			co = new ContatoCliente();
-			co.setNome((String) (o[4] == null ? "" : o[4]));
-			co.setDdi((String) (o[5] == null ? "" : o[5]));
-			co.setDdd((String) (o[6] == null ? "" : o[6]));
-			co.setTelefone((String) (o[7] == null ? "" : o[7]));
-			co.setRamal((String) (o[8] == null ? "" : o[8]));
-			co.setFax((String) (o[9] == null ? "" : o[9]));
-
-			c.addContato(co);
-
-			lCli.add(c);
-		}
-		return lCli;
+		return executarSelectClienteContato(s, true);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(descricao = "Devemos melhorar essa pesquisa e retornar apenas dados necessarios do cliente")
 	public List<Cliente> pesquisarClienteByIdRegiao(Integer idRegiao) throws BusinessException {
 
 		if (idRegiao == null) {
 			throw new BusinessException("Escolha uma região para gerar o relatório de clientes.");
 		}
 
-		final List<Integer> listaIdBairro = this.entityManager
+		final List<Integer> listaIdBairro = entityManager
 				.createQuery("select b.id from Regiao r inner join r.listaBairro b where r.id = :idRegiao")
 				.setParameter("idRegiao", idRegiao).getResultList();
 
@@ -373,16 +369,29 @@ public class ClienteServiceImpl implements ClienteService {
 			return Collections.EMPTY_LIST;
 		}
 
-		StringBuilder select = new StringBuilder();
-		select.append("select c from Cliente c ")
+		StringBuilder s = new StringBuilder();
+		s.append("select c from Cliente c ")
 				// o contato deve ser exibido no relatorio e usamos um let join
 				// pois um cliente pode nao ter contatos
-				.append("left join fetch c.listaContato lc ").append("inner join fetch c.listaLogradouro l ")
+				.append("left join fetch c.listaContato ").append("inner join fetch c.listaLogradouro l ")
 				.append("where l.tipoLogradouro = :tipoLogradouro and l.endereco.bairro.id in (:listaIdBairro) ")
 				.append("order by c.nomeFantasia");
 
-		return this.entityManager.createQuery(select.toString()).setParameter("listaIdBairro", listaIdBairro)
+		List<Cliente> lCli = entityManager.createQuery(s.toString()).setParameter("listaIdBairro", listaIdBairro)
 				.setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO).getResultList();
+
+		return removerClienteDuplicado(lCli);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Cliente> pesquisarClienteContatoByIdVendedor(Integer idVendedor) {
+		StringBuilder s = gerarSelectRelatorioClienteContato();
+		if (idVendedor != null) {
+			s.append("where c.id_vendedor = ").append(idVendedor);
+		}
+		s.append(" order by c.nome_fantasia ");
+		return executarSelectClienteContato(s, true);
 	}
 
 	@Override
@@ -480,6 +489,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(descricao = "Retornar apenas as informacoes necessarias do cliente")
 	public List<Cliente> pesquisarInativosByIdVendedor(Integer idVendedor) throws BusinessException {
 		final String PARAMETRO = this.configuracaoSistemaService
 				.pesquisar(ParametroConfiguracaoSistema.DIAS_INATIVIDADE_CLIENTE);
@@ -509,7 +519,12 @@ public class ClienteServiceImpl implements ClienteService {
 			query.setParameter("idVendedor", idVendedor);
 		}
 		query.setParameter("dataInicioInatividade", dataInicioInatividade.getTime());
-		return query.getResultList();
+		List<Cliente> l = removerClienteDuplicado(query.getResultList());
+
+		for (Cliente c : l) {
+			c.formatarContatoPrincipal();
+		}
+		return l;
 	}
 
 	@Override
@@ -551,7 +566,7 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		final StringBuilder select = new StringBuilder("SELECT count(u.id) FROM Cliente u ");
-		this.gerarRestricaoPesquisa(filtro, select);
+		gerarRestricaoPesquisa(filtro, select);
 		Query query = this.gerarQueryPesquisa(filtro, select);
 		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
 	}
@@ -581,6 +596,21 @@ public class ClienteServiceImpl implements ClienteService {
 				.createQuery(
 						"select new Transportadora(t.id, t.nomeFantasia) from Cliente c inner join c.listaRedespacho t where c.id = :idCliente and t.ativo = true order by t.nomeFantasia asc")
 				.setParameter("idCliente", idCliente).getResultList();
+	}
+
+	private List<Cliente> removerClienteDuplicado(List<Cliente> lCli) {
+		if (lCli == null || lCli.isEmpty()) {
+			return lCli;
+		}
+
+		List<Cliente> l = new ArrayList<Cliente>(lCli.size());
+		for (Cliente c : lCli) {
+			if (l.contains(c)) {
+				continue;
+			}
+			l.add(c);
+		}
+		return l;
 	}
 
 	@Override

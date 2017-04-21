@@ -32,8 +32,8 @@ function gerarTelefone(isSecundario) {
 	var ddi = doc.getElementById('contato_ddi'+secundario).value;
 	var ddd = doc.getElementById('contato_ddd'+secundario).value;
 	var telefone = doc.getElementById('contato_telefone'+secundario).value;
-	var ramal = doc.getElementById('contato_ramal'+secundario).value;
-	var fax = doc.getElementById('contato_fax'+secundario).value;
+	var ramal = isSecundario? '' : doc.getElementById('contato_ramal'+secundario).value;
+	var fax = isSecundario? '' : doc.getElementById('contato_fax'+secundario).value;
 	
 	return formatarCamposTelefone(ddi, ddd, telefone, ramal, fax);
 }
@@ -47,14 +47,16 @@ function preencherCamposTelefone(telefoneFormatado, isSecundario) {
 	var ddi = doc.getElementById('contato_ddi'+secundario);
 	var ddd = doc.getElementById('contato_ddd'+secundario);
 	var telefone = doc.getElementById('contato_telefone'+secundario);
-	var ramal = doc.getElementById('contato_ramal'+secundario);
-	var fax = doc.getElementById('contato_fax'+secundario);
+	var ramal = !isSecundario? doc.getElementById('contato_ramal'+secundario) : null;
+	var fax = !isSecundario? doc.getElementById('contato_fax'+secundario) : null;
 	
 	ddi.value = dddTelefoneRamalFax[0];
 	ddd.value = dddTelefoneRamalFax[1];
 	telefone.value = dddTelefoneRamalFax[2];
-	ramal.value = dddTelefoneRamalFax[3];
-	fax.value = dddTelefoneRamalFax[4];
+	if(!isSecundario) {
+		ramal.value = dddTelefoneRamalFax[3];
+		fax.value = dddTelefoneRamalFax[4];
+	}
 }
 
 function inserirMascaraCamposContato() {

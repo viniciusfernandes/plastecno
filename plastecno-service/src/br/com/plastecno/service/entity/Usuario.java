@@ -12,7 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
@@ -51,7 +50,7 @@ public class Usuario implements Serializable {
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de contato do usuario")
 	private List<ContatoUsuario> listaContato;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@OneToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tb_usuario_tb_perfil_acesso", schema = "vendas", joinColumns = { @JoinColumn(name = "id_usuario") }, inverseJoinColumns = { @JoinColumn(name = "id_perfil_acesso") })
 	@InformacaoValidavel(nomeExibicao = "Perfil do usuario")
 	private List<PerfilAcesso> listaPerfilAcesso;

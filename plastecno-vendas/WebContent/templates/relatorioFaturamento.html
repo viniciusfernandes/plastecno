@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style type="text/css">
+{conteudoCss}
+</style>
+</head>
+<body>
+
+	{conteudoCabecalho}
+	<table>
+		<caption></caption>
+		<thead>
+			<tr>
+				<th colspan="6">Faturamento de {dataInicial} à {dataFinal}</th>
+			</tr>
+			<tr>
+				<th style="width: 5%">NFe</th>
+				<th style="width: 10%">Dt. Emiss.</th>
+				<th style="width: 7%">Ped.</th>
+				<th style="width: 60%">Cliente</th>
+				<th style="width: 8%">ICMS (R$)</th>
+				<th style="width: 10%">Valor (R$)</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- O ALGORITMO DE GERACAO DE RELATORIO ENTENDERA APENAS QUANDO AS COLUNAS ESTIVEREM ESCRITAS TODAS NA MESMA LINHA, CASO CONTRARIO TEREMOS PROBLEMAS NA GERACAO DO PDF -->
+			<tr{listaNFe}><td style="text-align: center">{numero}</td><td style="text-align: center">{dataEmissaoFormatada}</td><td style="text-align: center">{idPedido}</td><td style="text-align: center">{nomeCliente}</td><td style="text-align: center">{valorICMS}</td><td style="text-align: center">{valor}</td></tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td  colspan="6">FATUR.: R$ {vlTotal}</td>
+			</tr>
+			<tr>
+				<td colspan="6">ICMS: R$ {vlTotalICMS}</td>
+			</tr>
+		</tfoot>
+	</table>
+</body>
+</html>

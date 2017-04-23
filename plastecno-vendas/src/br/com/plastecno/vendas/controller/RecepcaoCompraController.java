@@ -70,7 +70,6 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("idRepresentadaSelecionada", idRepresentada);
-        addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
     }
 
     @Post("compra/item/edicao")
@@ -95,7 +94,7 @@ public class RecepcaoCompraController extends AbstractController {
 
     @Get("compra/recepcao")
     public void recepcaoCompraHome() {
-        addAtributo("listaRepresentada", representadaService.pesquisarFornecedorAtivo());
+        addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
     }
 

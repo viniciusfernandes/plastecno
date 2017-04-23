@@ -24,7 +24,7 @@ public class PISGeral {
 	@InformacaoValidavel(decimal = { 12, 4 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
 			"56", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "98", "99", "ST" }, tiposNaoPermitidos = {
 			"04", "05", "06", "07", "08", "09" }, nomeExibicao = "Quantidade vendida do PIS")
-	private Integer quantidadeVendida;
+	private Double quantidadeVendida;
 
 	@XmlElement(name = "vPIS")
 	@InformacaoValidavel(decimal = { 13, 2 }, tiposObrigatorios = { "03", "49", "50", "51", "52", "53", "54", "55",
@@ -65,7 +65,7 @@ public class PISGeral {
 	}
 
 	@XmlTransient
-	public Integer getQuantidadeVendida() {
+	public Double getQuantidadeVendida() {
 		return quantidadeVendida;
 	}
 
@@ -97,7 +97,7 @@ public class PISGeral {
 		this.codigoSituacaoTributaria = codigoSituacaoTributaria;
 	}
 
-	public void setQuantidadeVendida(Integer quantidadeVendida) {
+	public void setQuantidadeVendida(Double quantidadeVendida) {
 		this.quantidadeVendida = quantidadeVendida;
 	}
 

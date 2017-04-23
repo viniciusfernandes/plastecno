@@ -39,6 +39,9 @@ public class ComissaoDAOBuilder extends DAOBuilder<ComissaoDAO> {
 
 			@Mock
 			public Comissao pesquisarComissaoVigenteVendedor(Integer idVendedor) {
+				if (idVendedor == null) {
+					return null;
+				}
 				List<Comissao> lista = REPOSITORY.pesquisarTodos(Comissao.class);
 				for (Comissao comissao : lista) {
 					if (comissao.getDataFim() != null) {

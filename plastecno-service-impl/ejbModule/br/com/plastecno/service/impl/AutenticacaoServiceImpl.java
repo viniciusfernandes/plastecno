@@ -21,7 +21,7 @@ public class AutenticacaoServiceImpl implements AutenticacaoService {
 	@Override
 	public Usuario autenticar(String email, String senha) throws AutenticacaoException {
 		try {
-			senha = this.criptografar(senha);
+			senha = criptografar(senha);
 		} catch (CriptografiaException e) {
 			throw new AutenticacaoException("Falha na autenticacao do usuario com login " + email
 					+ ". Veja o log para mais detalhes", e);

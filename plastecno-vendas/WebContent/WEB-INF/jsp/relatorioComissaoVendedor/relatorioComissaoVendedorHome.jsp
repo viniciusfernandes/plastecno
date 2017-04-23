@@ -88,9 +88,12 @@
 					<th style="width: 10%">Pedido</th>
 					<th style="width: 2%">Item</th>
 					<th style="width: 5%">Qtde.</th>
-					<th style="width: 50%">Descrição</th>
-					<th style="width: 20%">Venda (R$)</th>
-					<th style="width: 10%">Valor Comiss. (R$)</th>
+					<th style="width: 45%">Descrição</th>
+					<th style="width: 10%">Vl. (R$)</th>
+					<th style="width: 2%">Comiss. (%)</th>
+					<th style="width: 10%">Vl. Comiss.(R$)</th>
+					<th style="width: 2%">Comiss. Repres.(%)</th>
+					<th style="width: 10%">Vl Comiss. Repres.(R$)</th>
 					<th style="width: 5%">Ações</th>
 				</tr>
 			</thead>
@@ -107,7 +110,10 @@
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaComissaoFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valorComissionadoFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaComissaoRepresentadaFormatado}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.valorComissionadoRepresentadaFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 							<div class="coluna_acoes_listagem">
 								<form action="<c:url value="/pedido/pdf"/>">

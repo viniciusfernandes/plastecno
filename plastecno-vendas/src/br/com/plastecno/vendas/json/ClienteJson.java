@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Transportadora;
 
 /*
@@ -18,20 +19,23 @@ public class ClienteJson {
     private String inscricaoEstadual;
     private final List<TransportadoraJson> listaRedespacho;
     private final List<TransportadoraJson> listaTransportadora;
+    private final LogradouroJson logradouroFaturamento;
     private final String nomeCompleto;
     private final String nomeFantasia;
     private final String razaoSocial;
     private final String site;
-
     private final String telefone;
-
     private final VendedorJson vendedor;
 
     public ClienteJson(Cliente cliente) {
-        this(cliente, null);
+        this(cliente, (List<Transportadora>) null);
     }
 
     public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora) {
+        this(cliente, listaTransportadora, null);
+    }
+
+    public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora, Logradouro logradouro) {
         this.listaTransportadora = new ArrayList<TransportadoraJson>();
         this.listaRedespacho = new ArrayList<TransportadoraJson>();
 
@@ -48,6 +52,8 @@ public class ClienteJson {
             telefone = cliente.getContatoPrincipal() != null ? cliente.getContatoPrincipal().getTelefoneFormatado()
                     : "";
             vendedor = cliente.getVendedor() == null ? null : new VendedorJson(cliente.getVendedor());
+
+            logradouroFaturamento = new LogradouroJson(logradouro);
 
             if (cliente.getListaRedespacho() != null) {
                 for (Transportadora redespacho : cliente.getListaRedespacho()) {
@@ -72,7 +78,12 @@ public class ClienteJson {
             nomeCompleto = "";
             telefone = "";
             vendedor = null;
+            logradouroFaturamento = new LogradouroJson(null);
         }
+    }
+
+    public ClienteJson(Cliente cliente, Logradouro logradouro) {
+        this(cliente, null, logradouro);
     }
 
     public String getCnpj() {
@@ -101,6 +112,10 @@ public class ClienteJson {
 
     public List<TransportadoraJson> getListaTransportadora() {
         return listaTransportadora;
+    }
+
+    public LogradouroJson getLogradouroFaturamento() {
+        return logradouroFaturamento;
     }
 
     public String getNomeCompleto() {

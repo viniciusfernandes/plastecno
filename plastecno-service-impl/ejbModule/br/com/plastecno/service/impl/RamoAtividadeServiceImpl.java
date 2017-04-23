@@ -17,6 +17,7 @@ import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.dao.RamoAtividadeDAO;
 import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
@@ -30,6 +31,7 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 	private RamoAtividadeDAO ramoAtividadeDAO;
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void desativar(Integer id) {
 		Query query = this.entityManager.createQuery("update RamoAtividade r set r.ativo = false where r.id = :id");
 		query.setParameter("id", id);
@@ -90,30 +92,35 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isSiglaExistente(Integer id, String sigla) {
 		return this.ramoAtividadeDAO.isEntidadeExistente(RamoAtividade.class, id, "sigla", sigla);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isSiglaExistente(String sigla) {
 		return this.ramoAtividadeDAO.isEntidadeExistente(RamoAtividade.class, "sigla", sigla);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public PaginacaoWrapper<RamoAtividade> paginarRamoAtividade(RamoAtividade filtro, Boolean apenasAtivos,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 
-		return new PaginacaoWrapper<RamoAtividade>(this.pesquisarTotalRegistros(filtro, apenasAtivos), this.pesquisarBy(
-				filtro, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
+		return new PaginacaoWrapper<RamoAtividade>(this.pesquisarTotalRegistros(filtro, apenasAtivos),
+				this.pesquisarBy(filtro, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<RamoAtividade> pesquisar() {
 		return this.pesquisar(null);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<RamoAtividade> pesquisar(Boolean ativo) {
 
 		StringBuilder select = new StringBuilder("SELECT r FROM RamoAtividade r ");
@@ -131,17 +138,20 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<RamoAtividade> pesquisarAtivo() {
 		return this.pesquisar(true);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<RamoAtividade> pesquisarBy(RamoAtividade filtro) {
 		return this.pesquisarBy(filtro, null, null, null);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<RamoAtividade> pesquisarBy(RamoAtividade filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 		if (filtro == null) {
@@ -164,6 +174,7 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RamoAtividade pesquisarById(Integer id) {
 		Query query = this.entityManager.createQuery("SELECT r FROM RamoAtividade r where r.id = :id");
 		query.setParameter("id", id);
@@ -184,8 +195,17 @@ public class RamoAtividadeServiceImpl implements RamoAtividadeService {
 		return inserir(r);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public String pesquisarSigleById(Integer idRamo) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select r.sigla from RamoAtividade r where r.id=:idRamo").setParameter(
+						"idRamo", idRamo), String.class, null);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalRegistros(RamoAtividade filtro, Boolean apenasRamoAtividadeAtivo) {
 		if (filtro == null) {
 			return 0L;

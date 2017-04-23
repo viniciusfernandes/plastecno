@@ -2,6 +2,7 @@ package br.com.plastecno.service.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +43,9 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(intervaloComprimento = { 1, 15 }, tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
 	private String cnpj;
 
+	@Transient
+	private String contatoFormatado;
+
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF do cliente")
 	private String cpf;
 
@@ -75,6 +79,10 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(intervaloComprimento = { 0, 15 }, tipoDocumento = TipoDocumento.INSCRICAO_ESTADUAL, nomeExibicao = "Inscrição estadual do Cliente")
 	private String inscricaoEstadual;
 
+	@Column(name = "inscricao_suframa")
+	@InformacaoValidavel(padrao = "\\d{8,9}", padraoExemplo = "de 8 a 9 digitos", nomeExibicao = "Inscrição na SUFRAMA")
+	private String inscricaoSUFRAMA;
+
 	/*
 	 * Tivemos que implementar como um Set pois o hibernate tem uma limitacao em
 	 * fazer multiplos fetchs com o tipo list e collection. Isso apareceu na
@@ -95,6 +103,9 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Nome fantasia do cliente")
 	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
+
+	@Transient
+	private String nomeVendedor;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_ramo_atividade")
@@ -119,6 +130,13 @@ public class Cliente implements Serializable {
 	public Cliente() {
 	}
 
+	// Construturo utilizado no relatorio de clientes por ramo de atividades
+	public Cliente(ContatoCliente contatoCliente, String nomeVendedor, String razaoSocial, String sobrenomeVendedor) {
+		addContato(contatoCliente);
+		this.nomeVendedor = nomeVendedor + " " + sobrenomeVendedor;
+		this.razaoSocial = razaoSocial;
+	}
+
 	/*
 	 * Construtor para popular o picklist da tela de vendedor
 	 */
@@ -141,15 +159,39 @@ public class Cliente implements Serializable {
 		this.email = email;
 	}
 
-	public void addContato(ContatoCliente contatoCliente) {
-		if (this.listaContato == null) {
-			this.setListaContato(new HashSet<ContatoCliente>());
-		}
-		this.listaContato.add(contatoCliente);
-		contatoCliente.setCliente(this);
+	public Cliente(Integer id, String nomeFantasia, String razaoSozial, String cnpj, String cpf,
+			String inscricaoEstadual, String inscricaoSUFRAMA, String email) {
+		this(id, nomeFantasia, razaoSozial, cnpj, cpf, inscricaoEstadual, email);
+		this.inscricaoSUFRAMA = inscricaoSUFRAMA;
 	}
 
-	public void addContato(List<ContatoCliente> listaContato) {
+	// Construturo utilizado no relatorio de clientes por ramo de atividades
+	public Cliente(Set<ContatoCliente> listaContato, String nomeVendedor, String razaoSocial, String sobrenomeVendedor) {
+		addContato(listaContato);
+		this.nomeVendedor = nomeVendedor + " " + sobrenomeVendedor;
+		this.razaoSocial = razaoSocial;
+	}
+
+	// Construturo utilizado no relatorio de clientes por ramo de atividades
+	public Cliente(String dddContato, String ddiContato, String emailContato, String faxContato, String nomeContato,
+			String nomeVendedor, String ramalContato, String razaoSocial, String sobreNomeVendedor,
+			String telefoneContato) {
+
+		ContatoCliente c = new ContatoCliente();
+		c.setEmail(emailContato);
+		c.setNome(nomeContato);
+		c.setTelefone(telefoneContato);
+		c.setDdd(dddContato);
+		c.setDdi(ddiContato);
+		c.setFax(faxContato);
+		c.setRamal(ramalContato);
+		addContato(c);
+
+		this.nomeVendedor = nomeVendedor + " " + sobreNomeVendedor;
+		this.razaoSocial = razaoSocial;
+	}
+
+	public void addContato(Collection<ContatoCliente> listaContato) {
 
 		if (listaContato == null) {
 			return;
@@ -158,6 +200,14 @@ public class Cliente implements Serializable {
 		for (ContatoCliente contatoCliente : listaContato) {
 			this.addContato(contatoCliente);
 		}
+	}
+
+	public void addContato(ContatoCliente contatoCliente) {
+		if (this.listaContato == null) {
+			this.setListaContato(new HashSet<ContatoCliente>());
+		}
+		this.listaContato.add(contatoCliente);
+		contatoCliente.setCliente(this);
 	}
 
 	public void addLogradouro(List<LogradouroCliente> listaLogradouro) {
@@ -195,12 +245,24 @@ public class Cliente implements Serializable {
 		this.listaRedespacho.add(transportadora);
 	}
 
+	public void formatarContatoPrincipal() {
+		Contato c = getContatoPrincipal();
+		if (c == null) {
+			return;
+		}
+		contatoFormatado = c.formatar();
+	}
+
 	public String getCnpj() {
 		return cnpj;
 	}
 
+	public String getContatoFormatado() {
+		return contatoFormatado;
+	}
+
 	public Contato getContatoPrincipal() {
-		return this.isListaContatoPreenchida() ? this.listaContato.iterator().next() : null;
+		return isListaContatoPreenchida() ? listaContato.iterator().next() : null;
 	}
 
 	public String getCpf() {
@@ -243,6 +305,10 @@ public class Cliente implements Serializable {
 		return inscricaoEstadual;
 	}
 
+	public String getInscricaoSUFRAMA() {
+		return inscricaoSUFRAMA;
+	}
+
 	public Set<ContatoCliente> getListaContato() {
 		return listaContato;
 	}
@@ -269,6 +335,10 @@ public class Cliente implements Serializable {
 
 	public String getNomeFantasia() {
 		return nomeFantasia;
+	}
+
+	public String getNomeVendedor() {
+		return nomeVendedor;
 	}
 
 	public RamoAtividade getRamoAtividade() {
@@ -322,6 +392,10 @@ public class Cliente implements Serializable {
 		this.cnpj = cnpj;
 	}
 
+	public void setContatoFormatado(String contatoFormatado) {
+		this.contatoFormatado = contatoFormatado;
+	}
+
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
 	}
@@ -358,6 +432,10 @@ public class Cliente implements Serializable {
 		this.inscricaoEstadual = inscricaoEstadual;
 	}
 
+	public void setInscricaoSUFRAMA(String inscricaoSUFRAMA) {
+		this.inscricaoSUFRAMA = inscricaoSUFRAMA;
+	}
+
 	public void setListaContato(Set<ContatoCliente> listaContato) {
 		this.listaContato = listaContato;
 	}
@@ -372,6 +450,10 @@ public class Cliente implements Serializable {
 
 	public void setNomeFantasia(String nomeFantasia) {
 		this.nomeFantasia = nomeFantasia;
+	}
+
+	public void setNomeVendedor(String nomeVendedor) {
+		this.nomeVendedor = nomeVendedor;
 	}
 
 	public void setRamoAtividade(RamoAtividade ramoAtividade) {

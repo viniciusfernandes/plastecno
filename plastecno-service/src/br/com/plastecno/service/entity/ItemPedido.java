@@ -42,6 +42,12 @@ public class ItemPedido extends Item {
 	@Transient
 	private Double aliquotaComissaoPedido;
 
+	@Column(name = "aliquota_comissao_representada")
+	private Double aliquotaComissaoRepresentada;
+
+	@Transient
+	private String aliquotaComissaoRepresentadaFormatado;
+
 	@Column(name = "aliquota_icms")
 	@InformacaoValidavel(numerico = true, positivo = true, nomeExibicao = "Alíquota ICMS")
 	private Double aliquotaICMS;
@@ -75,12 +81,14 @@ public class ItemPedido extends Item {
 	@Transient
 	private Integer idPedido;
 
+	// Esse campo foi criado para associar o pedido de compra a determinados
+	// pedidos de vendas que nao possuem os itens no estoque e precisa ser
+	// comprados
 	@Column(name = "id_pedido_compra")
 	private Integer idPedidoCompra;
 
-	// Essa campo foi criado para manter o historico de compra indicando a
-	// pedido
-	// de revenda esta vinculado o pedido de compra.
+	// Essa campo foi criado para manter o historico de compra indicando a qual
+	// pedido de revenda esta vinculado o pedido de compra.
 	@Column(name = "id_pedido_venda")
 	private Integer idPedidoVenda;
 
@@ -176,8 +184,11 @@ public class ItemPedido extends Item {
 	@Transient
 	private String valorComissionadoFormatado;
 
-	@Column(name = "valor_comissionado_representacao")
-	private Double valorComissionadoRepresentacao;
+	@Column(name = "valor_comissionado_representada")
+	private Double valorComissionadoRepresentada;
+
+	@Transient
+	private String valorComissionadoRepresentadaFormatado;
 
 	@Transient
 	private Double valorPedido;
@@ -194,17 +205,15 @@ public class ItemPedido extends Item {
 	public ItemPedido() {
 	}
 
-	public ItemPedido(Double precoUnidade, Integer quantidade,
-			Double aliquotaIPI, Double aliquotaICMS) {
+	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS) {
 		this.precoUnidade = precoUnidade;
 		this.quantidade = quantidade;
 		this.aliquotaIPI = aliquotaIPI;
 		this.aliquotaICMS = aliquotaICMS;
 	}
 
-	public ItemPedido(Double precoUnidade, Integer quantidade,
-			Double aliquotaIPI, Double aliquotaICMS, Double valorComissionado,
-			Double aliquotaComissaoPedido) {
+	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS,
+			Double valorComissionado, Double aliquotaComissaoPedido) {
 		this(precoUnidade, quantidade, aliquotaIPI, aliquotaICMS);
 		this.valorComissionado = valorComissionado;
 		this.aliquotaComissaoPedido = aliquotaComissaoPedido;
@@ -218,34 +227,43 @@ public class ItemPedido extends Item {
 		this.id = id;
 	}
 
+	// Construtor usado para pesquisar os itens de uma NFe que estao sendo
+	// devolvidos para o estoque.
+	public ItemPedido(Integer id, Integer sequencial, FormaMaterial formaMaterial, Integer idMaterial,
+			String siglaMaterial, String descricaoMaterial, Double medidaExterna, Double medidaInterna,
+			Double comprimento, Integer idPedido) {
+		this.id = id;
+		this.sequencial = sequencial;
+		this.formaMaterial = formaMaterial;
+		this.material = new Material(idMaterial, siglaMaterial, descricaoMaterial);
+		this.medidaExterna = medidaExterna;
+		this.medidaInterna = medidaInterna;
+		this.comprimento = comprimento;
+		this.idPedido = idPedido;
+	}
+
 	// Construtor utilizado na tela de recepcao de compras e itens aguardando
 	// material.
-	public ItemPedido(Integer id, Integer sequencial, Integer idPedido,
-			Integer idPedidoCompra, Integer idPedidoVenda,
-			String nomeProprietario, Integer quantidade,
-			Integer quantidadeRecepcionada, Integer quantidadeReservada,
-			Double precoUnidade, String nomeRepresentada, Date dataEntrega,
-			FormaMaterial formaMaterial, String siglaMaterial,
-			String descricaoMaterial, String descricaoPeca,
-			Double medidaExterna, Double medidaInterna, Double comprimento) {
-		this(id, sequencial, idPedido, nomeProprietario, quantidade,
-				quantidadeRecepcionada, quantidadeReservada, precoUnidade,
-				nomeRepresentada, dataEntrega, formaMaterial, siglaMaterial,
-				descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna,
-				comprimento);
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idPedidoCompra, Integer idPedidoVenda,
+			String nomeProprietario, Integer quantidade, Integer quantidadeRecepcionada, Integer quantidadeReservada,
+			Double precoUnidade, String nomeRepresentada, Date dataEntrega, FormaMaterial formaMaterial,
+			String siglaMaterial, String descricaoMaterial, String descricaoPeca, Double medidaExterna,
+			Double medidaInterna, Double comprimento) {
+		this(id, sequencial, idPedido, nomeProprietario, quantidade, quantidadeRecepcionada, quantidadeReservada,
+				precoUnidade, nomeRepresentada, dataEntrega, formaMaterial, siglaMaterial, descricaoMaterial,
+				descricaoPeca, medidaExterna, medidaInterna, comprimento);
 
 		this.idPedidoCompra = idPedidoCompra;
 		this.idPedidoVenda = idPedidoVenda;
 	}
 
 	// Construtor para relatorio de comissao
-	public ItemPedido(Integer id, Integer sequencial, Integer idPedido,
-			Integer idProprietario, String nomeProprietario,
-			String sobrenomeProprietario, Double precoUnidade,
-			Double precoCusto, Integer quantidade, Double valorComissionado,
-			FormaMaterial formaMaterial, String siglaMaterial,
-			String descricaoMaterial, String descricaoPeca,
-			Double medidaExterna, Double medidaInterna, Double comprimento) {
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, Integer idProprietario,
+			String nomeProprietario, String sobrenomeProprietario, Double precoUnidade, Double precoCusto,
+			Integer quantidade, Double aliquotaComissao, Double aliquotaComissaoRepresentada, Double valorComissionado,
+			Double valorComissionadoRepresentada, FormaMaterial formaMaterial, String siglaMaterial,
+			String descricaoMaterial, String descricaoPeca, Double medidaExterna, Double medidaInterna,
+			Double comprimento) {
 		this.id = id;
 		this.sequencial = sequencial;
 		this.idPedido = idPedido;
@@ -253,7 +271,10 @@ public class ItemPedido extends Item {
 		this.precoUnidade = precoUnidade;
 		this.precoCusto = precoCusto;
 		this.quantidade = quantidade;
+		this.aliquotaComissao = aliquotaComissao;
+		this.aliquotaComissaoRepresentada = aliquotaComissaoRepresentada;
 		this.valorComissionado = valorComissionado;
+		this.valorComissionadoRepresentada = valorComissionadoRepresentada;
 		this.formaMaterial = formaMaterial;
 		this.material = new Material(null, siglaMaterial, descricaoMaterial);
 		this.descricaoPeca = descricaoPeca;
@@ -264,18 +285,14 @@ public class ItemPedido extends Item {
 		this.sobrenomeProprietario = sobrenomeProprietario;
 	}
 
-	public ItemPedido(Integer id, Integer sequencial, Integer idPedido,
-			String nomeProprietario, Integer quantidade,
-			Integer quantidadeRecepcionada, Integer quantidadeReservada,
-			Double precoUnidade, String nomeRepresentada, Date dataEntrega,
-			FormaMaterial formaMaterial, String siglaMaterial,
-			String descricaoMaterial, String descricaoPeca,
-			Double medidaExterna, Double medidaInterna, Double comprimento) {
+	public ItemPedido(Integer id, Integer sequencial, Integer idPedido, String nomeProprietario, Integer quantidade,
+			Integer quantidadeRecepcionada, Integer quantidadeReservada, Double precoUnidade, String nomeRepresentada,
+			Date dataEntrega, FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial,
+			String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento) {
 
-		this(id, sequencial, idPedido, null, nomeProprietario, "",
-				precoUnidade, null, quantidade, (Double) null, formaMaterial,
-				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna,
-				medidaInterna, comprimento);
+		this(id, sequencial, idPedido, null, nomeProprietario, "", precoUnidade, null, quantidade, (Double) null,
+				(Double) null, (Double) null, (Double) null, formaMaterial, siglaMaterial, descricaoMaterial,
+				descricaoPeca, medidaExterna, medidaInterna, comprimento);
 		this.nomeRepresentada = nomeRepresentada;
 		this.dataEntrega = dataEntrega;
 		this.quantidadeRecepcionada = quantidadeRecepcionada;
@@ -284,20 +301,15 @@ public class ItemPedido extends Item {
 
 	// Construtor implementado para o relatorio de itens dos pedidos de um
 	// determinado cliente que eh fornecida na tela de cliente.
-	public ItemPedido(Integer idPedido, String numeroPedidoCliente,
-			SituacaoPedido situacaoPedido, Date dataEnvio,
-			TipoPedido tipoPedido, String nomeRepresentada, Integer id,
-			Integer sequencial, Integer quantidade, Double precoUnidade,
-			FormaMaterial formaMaterial, String siglaMaterial,
-			String descricaoMaterial, String descricaoPeca,
-			Double medidaExterna, Double medidaInterna, Double comprimento,
-			TipoVenda tipoVenda, Double precoVenda, Double aliquotaIPI,
-			Double aliquotaICMS) {
+	public ItemPedido(Integer idPedido, String numeroPedidoCliente, SituacaoPedido situacaoPedido, Date dataEnvio,
+			TipoPedido tipoPedido, String nomeRepresentada, Integer id, Integer sequencial, Integer quantidade,
+			Double precoUnidade, FormaMaterial formaMaterial, String siglaMaterial, String descricaoMaterial,
+			String descricaoPeca, Double medidaExterna, Double medidaInterna, Double comprimento, TipoVenda tipoVenda,
+			Double precoVenda, Double aliquotaIPI, Double aliquotaICMS) {
 
-		this(id, sequencial, idPedido, null, quantidade, null, null,
-				precoUnidade, nomeRepresentada, null, formaMaterial,
-				siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna,
-				medidaInterna, comprimento);
+		this(id, sequencial, idPedido, null, quantidade, null, null, precoUnidade, nomeRepresentada, null,
+				formaMaterial, siglaMaterial, descricaoMaterial, descricaoPeca, medidaExterna, medidaInterna,
+				comprimento);
 
 		pedido = new Pedido();
 		pedido.setId(idPedido);
@@ -317,13 +329,7 @@ public class ItemPedido extends Item {
 	}
 
 	public double calcularPrecoTotal() {
-		return this.quantidade != null && this.precoVenda != null ? this.quantidade
-				* this.precoVenda
-				: 0d;
-	}
-
-	public double getValorTotal() {
-		return calcularPrecoTotal();
+		return this.quantidade != null && this.precoVenda != null ? this.quantidade * this.precoVenda : 0d;
 	}
 
 	@Override
@@ -346,8 +352,7 @@ public class ItemPedido extends Item {
 			clone.setQuantidadeRecepcionada(0);
 			return clone;
 		} catch (CloneNotSupportedException e) {
-			throw new IllegalStateException("Falha ao clonar o item de pedido "
-					+ getId(), e);
+			throw new IllegalStateException("Falha ao clonar o item de pedido " + getId(), e);
 		}
 	}
 
@@ -364,8 +369,7 @@ public class ItemPedido extends Item {
 	}
 
 	public boolean contemMaterial() {
-		return formaMaterial != null && material != null
-				&& material.getId() != null;
+		return formaMaterial != null && material != null && material.getId() != null;
 	}
 
 	public Double getAliquotaComissao() {
@@ -378,6 +382,14 @@ public class ItemPedido extends Item {
 
 	public Double getAliquotaComissaoPedido() {
 		return aliquotaComissaoPedido;
+	}
+
+	public Double getAliquotaComissaoRepresentada() {
+		return aliquotaComissaoRepresentada;
+	}
+
+	public String getAliquotaComissaoRepresentadaFormatado() {
+		return aliquotaComissaoRepresentadaFormatado;
 	}
 
 	public Double getAliquotaICMS() {
@@ -536,8 +548,12 @@ public class ItemPedido extends Item {
 		return valorComissionadoFormatado;
 	}
 
-	public Double getValorComissionadoRepresentacao() {
-		return valorComissionadoRepresentacao;
+	public Double getValorComissionadoRepresentada() {
+		return valorComissionadoRepresentada;
+	}
+
+	public String getValorComissionadoRepresentadaFormatado() {
+		return valorComissionadoRepresentadaFormatado;
 	}
 
 	public Double getValorPedido() {
@@ -554,6 +570,10 @@ public class ItemPedido extends Item {
 
 	public String getValorPedidoIPIFormatado() {
 		return valorPedidoIPIFormatado;
+	}
+
+	public double getValorTotal() {
+		return calcularPrecoTotal();
 	}
 
 	public boolean isEncomendado() {
@@ -586,6 +606,14 @@ public class ItemPedido extends Item {
 
 	public void setAliquotaComissaoPedido(Double aliquotaComissaoPedido) {
 		this.aliquotaComissaoPedido = aliquotaComissaoPedido;
+	}
+
+	public void setAliquotaComissaoRepresentada(Double aliquotaComissaoRepresentada) {
+		this.aliquotaComissaoRepresentada = aliquotaComissaoRepresentada;
+	}
+
+	public void setAliquotaComissaoRepresentadaFormatado(String aliquotaComissaoRepresentadaFormatado) {
+		this.aliquotaComissaoRepresentadaFormatado = aliquotaComissaoRepresentadaFormatado;
 	}
 
 	public void setAliquotaICMS(Double aliquotaICMS) {
@@ -744,9 +772,12 @@ public class ItemPedido extends Item {
 		this.valorComissionadoFormatado = valorComissionadoFormatado;
 	}
 
-	public void setValorComissionadoRepresentacao(
-			Double valorComissionadoRepresentacao) {
-		this.valorComissionadoRepresentacao = valorComissionadoRepresentacao;
+	public void setValorComissionadoRepresentada(Double valorComissionadoRepresentada) {
+		this.valorComissionadoRepresentada = valorComissionadoRepresentada;
+	}
+
+	public void setValorComissionadoRepresentadaFormatado(String valorComissionadoRepresentadaFormatado) {
+		this.valorComissionadoRepresentadaFormatado = valorComissionadoRepresentadaFormatado;
 	}
 
 	public void setValorPedido(Double valorPedido) {

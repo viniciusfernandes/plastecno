@@ -16,7 +16,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.ClienteService;
@@ -30,10 +29,10 @@ import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
-import br.com.plastecno.service.constante.FinalidadePedido;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
+import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
@@ -186,54 +185,73 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
 	}
 
-	private void calcularComissaoVenda(Pedido pedido) throws BusinessException {
-		if (!pedido.isVenda()) {
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private Double[] atualizarValoresPedido(Integer idPedido) {
+		Double[] valores = pedidoDAO.pesquisarValoresPedido(idPedido);
+		if (valores.length <= 0) {
+			return new Double[] {};
+		}
+		pedidoDAO.alterarValorPedido(idPedido, valores[0], valores[1]);
+		return valores;
+	}
+
+	private void calcularComissaoVenda(Pedido pedido, ItemPedido... listaItem) throws BusinessException {
+
+		if (pedido == null || !pedido.isVenda() || !isCalculoComissaoPermitida(pedido.getFinalidadePedido())) {
 			return;
 		}
 
-		if (pedido.isRepresentacao() && pedido.getAliquotaComissao() == null) {
-			throw new BusinessException("Não existe comissão configurada para o pedido pedido No. " + pedido.getId()
-					+ ". Veja as configurações da representada \"" + pedido.getRepresentada().getNomeFantasia() + "\"");
-		}
-
-		List<ItemPedido> listaItem = pesquisarItemPedidoByIdPedido(pedido.getId());
 		Comissao comissaoVenda = null;
+		Double aliqComissao = null;
+		Double aliqRepresentada = null;
 		Double valorComissionado = null;
-		Double valorComissionadoRepresentacao = null;
+		Double valorComissionadoRepresentada = null;
 		Double precoItem = null;
 
 		for (ItemPedido itemPedido : listaItem) {
 
-			if (itemPedido.contemAliquotaComissao()) {
+			// Aqui estamos priorizando a aliquota que foi inputada pelo
+			// usuario. Usado em casos de vendas especiais, caso contrario sera
+			// usada a comissao cadastrada no sistema. Essa situacao eh
+			// utilizada apenas na revenda.
+			if (pedido.isRevenda() && itemPedido.contemAliquotaComissao()) {
 				comissaoVenda = new Comissao();
 				comissaoVenda.setAliquotaRevenda(itemPedido.getAliquotaComissao());
 				comissaoVenda.setAliquotaRepresentacao(itemPedido.getAliquotaComissao());
 			} else if (pedido.isRevenda() && !itemPedido.contemAliquotaComissao()) {
+				// A comissao cadastrada para o material tem prioridade a
+				// comissao configurada para o vendedor.
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(),
 						itemPedido.getFormaMaterial().indexOf());
 
-				// Caso nao exista comissao configurada para o material, devemos
+				// Caso nao exista comissao configurada para o material devemos
 				// utilizar a comissao configurada para o vendedor.
 				if (comissaoVenda == null) {
-					comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
+					comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getIdVendedor());
 				}
 
-			} else if (pedido.isRepresentacao()) {
-				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getVendedor().getId());
+			} // O caso de venda por representacao tem uma comissao diferente da
+				// revenda.
+			else if (pedido.isRepresentacao()) {
+				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getIdVendedor());
 			}
 
 			// Nos calculos do preco de venda do item nao pode haver o IPI de
 			// venda.
 			precoItem = itemPedido.calcularPrecoItem();
 
-			if (pedido.isRevenda() && comissaoVenda != null && comissaoVenda.getAliquotaRevenda() != null) {
-				valorComissionado = precoItem * comissaoVenda.getAliquotaRevenda();
-			} else if (pedido.isRepresentacao() && comissaoVenda != null
-					&& comissaoVenda.getAliquotaRepresentacao() != null) {
-				valorComissionado = precoItem * comissaoVenda.getAliquotaRepresentacao();
-				valorComissionadoRepresentacao = precoItem * (pedido.getRepresentada().getComissao());
+			if (comissaoVenda != null && comissaoVenda.getAliquotaRevenda() != null && pedido.isRevenda()) {
+				aliqComissao = comissaoVenda.getAliquotaRevenda();
+				valorComissionado = precoItem * aliqComissao;
+			} else if (comissaoVenda != null && comissaoVenda.getAliquotaRepresentacao() != null
+					&& pedido.isRepresentacao()) {
+				aliqComissao = comissaoVenda.getAliquotaRepresentacao();
+				aliqRepresentada = pedido.getAliquotaComissaoRepresentada();
+
+				valorComissionado = precoItem * aliqComissao;
+				valorComissionadoRepresentada = precoItem * (aliqRepresentada == null ? 0 : aliqRepresentada);
 			} else {
-				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getVendedor().getId());
+				Usuario vendedor = usuarioService.pesquisarUsuarioResumidoById(pedido.getIdVendedor());
 				throw new BusinessException(
 						"Não existe comissão configurada para o vendedor \""
 								+ vendedor.getNomeCompleto()
@@ -243,9 +261,10 @@ public class PedidoServiceImpl implements PedidoService {
 								+ pedido.getId()
 								+ ". Também pode não existir comissão padrão configurada para o material desse item, verifique as configurações do sistema.");
 			}
-
+			itemPedido.setAliquotaComissao(aliqComissao);
+			itemPedido.setAliquotaComissaoRepresentada(aliqRepresentada);
 			itemPedido.setValorComissionado(valorComissionado);
-			itemPedido.setValorComissionadoRepresentacao(valorComissionadoRepresentacao);
+			itemPedido.setValorComissionadoRepresentada(valorComissionadoRepresentada);
 			itemPedidoDAO.alterar(itemPedido);
 		}
 	}
@@ -259,11 +278,10 @@ public class PedidoServiceImpl implements PedidoService {
 			return lista;
 		}
 
-		// As datas de pagamentos sao sempre calculadas a partir da data de
-		// envio nda nota fiscal, ou seja, a data correte.
+		// Pedidos com pagamento a vista ou antecipado nao deve ter boletos, por
+		// isso nao tera datas de pagamentos
 		String[] dias = formaPagamento.split("\\D+");
 		if (dias.length == 0) {
-			lista.add(new Date());
 			return lista;
 		}
 
@@ -283,28 +301,6 @@ public class PedidoServiceImpl implements PedidoService {
 			cal.add(Calendar.DAY_OF_MONTH, -diaCorrido);
 		}
 		return lista;
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double calcularValorPedido(Integer idPedido) throws BusinessException {
-		try {
-			return pedidoDAO.pesquisarQuantidadePrecoUnidade(idPedido);
-		} catch (PersistenceException e) {
-			throw new BusinessException("Falha no calculo do valor da unidade do item do pedido " + idPedido
-					+ ". Provavelmente o valor do item esta estourando os limites do sistema.");
-		}
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double calcularValorPedidoIPI(Integer idPedido) throws BusinessException {
-		try {
-			return pedidoDAO.pesquisarQuantidadePrecoUnidadeIPI(idPedido);
-		} catch (PersistenceException e) {
-			throw new BusinessException("Falha no calculo do valor IPI do item do pedido " + idPedido
-					+ ". Provavelmente o valor do item esta estourando os limites do sistema.");
-		}
 	}
 
 	@Override
@@ -359,7 +355,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoCompra.setCliente(clienteService.pesquisarRevendedor());
 		pedidoCompra.setComprador(comprador);
 		pedidoCompra.setContato(contato);
-		pedidoCompra.setFinalidadePedido(FinalidadePedido.REVENDA);
+		pedidoCompra.setFinalidadePedido(TipoFinalidadePedido.REVENDA);
 		pedidoCompra.setProprietario(comprador);
 		pedidoCompra.setRepresentada(fornecedor);
 		pedidoCompra.setSituacaoPedido(SituacaoPedido.DIGITACAO);
@@ -538,7 +534,6 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido.isOrcamento()) {
 			enviarOrcamento(pedido, arquivoAnexado);
 		} else {
-			calcularComissaoVenda(pedido);
 			enviarVenda(pedido, arquivoAnexado);
 		}
 
@@ -582,7 +577,6 @@ public class PedidoServiceImpl implements PedidoService {
 			e.addMensagem(e.getListaMensagem());
 			throw e;
 		}
-
 	}
 
 	private Integer gerarSequencialItemPedido(Integer idPedido) {
@@ -613,23 +607,23 @@ public class PedidoServiceImpl implements PedidoService {
 
 		final Integer idPedido = pedido.getId();
 		final boolean isPedidoNovo = idPedido == null;
+
+		final boolean vendaPermitida = usuarioService.isVendaPermitida(pedido.getCliente().getId(), pedido
+				.getVendedor().getId());
 		/*
 		 * Estamos proibindo que qualquer vendedor cadastre um NOVO pedido para
 		 * um cliente que nao esteja associado em sua carteira de clientes.
 		 */
-		if (isPedidoNovo && pedido.isVenda()
-				&& !this.usuarioService.isVendaPermitida(pedido.getCliente().getId(), pedido.getVendedor().getId())) {
+		if (isPedidoNovo && pedido.isVenda() && !vendaPermitida) {
 
-			Cliente cliente = this.clienteService.pesquisarById(pedido.getCliente().getId());
-			Usuario proprietario = this.usuarioService.pesquisarById(pedido.getProprietario().getId());
+			Cliente cliente = clienteService.pesquisarById(pedido.getCliente().getId());
+			Usuario proprietario = usuarioService.pesquisarById(pedido.getProprietario().getId());
 			throw new BusinessException("Não é possível incluir o pedido pois o cliente "
 					+ (cliente != null ? cliente.getNomeCompleto() : pedido.getCliente().getId())
 					+ " não esta associado ao vendedor "
 					+ (proprietario != null ? proprietario.getNome() + " - " + proprietario.getEmail() : pedido
 							.getCliente().getId()));
-		}
-
-		if (pedido.isVenda()) {
+		} else if (isPedidoNovo && pedido.isVenda() && vendaPermitida) {
 
 			// Efetuando o vinculo entre o vendedor e o pedido pois o vendedor
 			// eh
@@ -644,8 +638,6 @@ public class PedidoServiceImpl implements PedidoService {
 				throw new BusinessException("Não existe vendedor associado ao cliente " + nomeCliente);
 			}
 			pedido.setVendedor(vendedor);
-			pedido.setAliquotaComissao(representadaService.pesquisarComissaoRepresentada(pedido.getRepresentada()
-					.getId()));
 		}
 
 		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());
@@ -663,7 +655,7 @@ public class PedidoServiceImpl implements PedidoService {
 		 * Devemos sempre pesquisar pois o cliente pode ter alterado os dados de
 		 * logradouro
 		 */
-		pedido.addLogradouro(this.clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
+		pedido.addLogradouro(clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
 
 		if (isPedidoNovo) {
 			pedido = pedidoDAO.inserir(pedido);
@@ -707,11 +699,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 		itemPedido.configurarMedidaInterna();
 
-		// Temos que recuperar o pedido pois os valores totais do pedido serao
-		// alterados sempre com a inclusao de item. Esses valores serao
-		// utilizados
-		// para facilitar a exibicao dos valores do pedido para o usuario.
-		final Pedido pedido = this.pesquisarPedidoById(idPedido);
+		// Aqui retornamos apenas as informacoes necessarias do pedida para a
+		// inclusao do item para nao sobrecarregar o sistema.
+		Pedido pedido = pedidoDAO.pesquisarPedidoResumidoCalculoComissao(idPedido);
 		itemPedido.setPedido(pedido);
 		/*
 		 * Atualizando o valor de cada unidade do item que podera ser usado
@@ -785,8 +775,13 @@ public class PedidoServiceImpl implements PedidoService {
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao
 		 * de validacoes, caso contrario teremos um valor nulo na base de dados.
 		 */
-		pedido.setValorPedido(this.calcularValorPedido(idPedido));
-		pedido.setValorPedidoIPI(this.calcularValorPedidoIPI(idPedido));
+		atualizarValoresPedido(idPedido);
+
+		// Aqui estamos calculando a comissao pois qualquer alteracao do item do
+		// pedido deve refletir no relatorio de comissao. Mesmo que o pedido nao
+		// tenha sido enviado a comissao sera calculada, mas so os pedidos
+		// enviados aparecerao no relatorio de comissao.
+		calcularComissaoVenda(pedido, itemPedido);
 
 		return itemPedido.getId();
 	}
@@ -832,6 +827,12 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setCliente(clienteService.inserir(cliente));
 		}
 		return inserir(pedido);
+	}
+
+	private boolean isCalculoComissaoPermitida(TipoFinalidadePedido tipoFinalidade) {
+		return TipoFinalidadePedido.INDUSTRIALIZACAO.equals(tipoFinalidade)
+				|| TipoFinalidadePedido.CONSUMO.equals(tipoFinalidade)
+				|| TipoFinalidadePedido.REVENDA.equals(tipoFinalidade);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -906,6 +907,16 @@ public class PedidoServiceImpl implements PedidoService {
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		return this.pesquisarPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, idFornecedor, isCompra,
 				indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarCaracteristicaItemPedidoByNumeroItem(List<Integer> listaNumeroItem,
+			Integer idPedido) {
+		if (idPedido == null || listaNumeroItem == null || listaNumeroItem.isEmpty()) {
+			return new ArrayList<ItemPedido>();
+		}
+		return itemPedidoDAO.pesquisarCaracteristicaItemPedidoByNumeroItem(listaNumeroItem, idPedido);
 	}
 
 	@Override
@@ -1616,17 +1627,21 @@ public class PedidoServiceImpl implements PedidoService {
 		if (idItemPedido == null) {
 			return null;
 		}
-		ItemPedido itemPedido = new ItemPedido();
-		itemPedido.setId(idItemPedido);
-		Pedido pedido = null;
+
+		Pedido pedido = pedidoDAO.pesquisarPedidoResumidoFinalidadeByIdItemPedido(idItemPedido);
+		if (pedido == null) {
+			return null;
+		}
 		try {
-			pedido = pesquisarPedidoByIdItemPedido(idItemPedido);
-			itemPedidoDAO.remover(itemPedido);
+			itemPedidoDAO.remover(new ItemPedido(idItemPedido));
 
 			// Efetuando novamente o calculo pois na remocao o valor do pedido
 			// deve ser atualizado
-			pedido.setValorPedido(calcularValorPedido(pedido.getId()));
-			pedido.setValorPedidoIPI(calcularValorPedidoIPI(pedido.getId()));
+			Double[] valores = atualizarValoresPedido(pedido.getId());
+			if (valores.length > 0) {
+				pedido.setValorPedido(valores[0]);
+				pedido.setValorPedidoIPI(valores[1]);
+			}
 
 			if (pedido.isCompraEfetuada() && pesquisarTotalItemPedido(pedido.getId()) <= 0L) {
 				pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);

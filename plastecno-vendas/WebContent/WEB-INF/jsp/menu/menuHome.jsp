@@ -95,6 +95,15 @@
 
 				<li><a href="javascript: void(0)">Relatórios</a>
 					<ul>
+						<c:if test="${acessoRelatorioDuplicataPermitido}">
+							<li><a href="relatorio/duplicata" target="principal_frame">Duplicatas</a></li>
+						</c:if>
+						<c:if test="${acessoRelatorioComissaoVendedorPermitido}">
+							<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Vendedor</a></li>
+						</c:if>
+						<c:if test="${acessoRelatorioFaturamentoPermitido}">
+							<li><a href="relatorio/faturamento" target="principal_frame">Faturamento</a></li>
+						</c:if>
 						<c:if test="${acessoRelatorioVendasRepresentadaPermitido}">
 							<li><a href="relatorio/pedido/periodo?isCompra=false" target="principal_frame">Valor Venda Período</a></li>
 						</c:if>
@@ -123,9 +132,6 @@
 						<c:if test="${acessoVendaPermitido}">
 							<li><a href="relatorio/venda/vendedor" target="principal_frame">Venda/Orçamto Vendedor</a></li>
 							<li><a href="relatorio/cliente/vendedor" target="principal_frame">Cliente Vendedor</a></li>
-						</c:if>
-						<c:if test="${acessoRelatorioComissaoVendedor}">
-							<li><a href="relatorio/comissao/vendedor" target="principal_frame">Comissão Vendedor</a></li>
 						</c:if>
 					</ul></li>
 				<c:if test="${acessoManutencaoPermitido}">

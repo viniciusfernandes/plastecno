@@ -30,7 +30,7 @@ public class RelatorioClienteRegiaoController extends AbstractController {
     @Get("relatorio/cliente/regiao/listagem/cliente")
     public void pesquisarClienteByRegiao(Regiao regiao) {
         try {
-            addAtributo("listaCliente", this.clienteService.pesquisarClienteByIdRegiao(regiao.getId()));
+            addAtributo("listaCliente", clienteService.pesquisarClienteByIdRegiao(regiao.getId()));
             addAtributo("regiao", regiao);
             addAtributo("relatorioGerado", true);
             addAtributo("tituloRelatorio", "Relatório dos Clientes da Região " + regiao.getNome());

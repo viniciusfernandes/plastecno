@@ -3,7 +3,7 @@ package br.com.plastecno.service.test.builder;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.com.plastecno.service.constante.FinalidadePedido;
+import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoAcesso;
@@ -28,6 +28,7 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Representada;
+import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.test.TestUtils;
 
@@ -183,9 +184,9 @@ public class EntidadeBuilder {
 		return logradouro;
 	}
 
-	public LogradouroCliente buildLogradouroCliente(
-			TipoLogradouro tipoLogradouro) {
+	public LogradouroCliente buildLogradouroCliente(TipoLogradouro tipoLogradouro) {
 		LogradouroCliente logradouro = new LogradouroCliente(buildEndereco());
+		logradouro.setNumero("223");
 		logradouro.setTipoLogradouro(tipoLogradouro);
 		return logradouro;
 	}
@@ -206,13 +207,16 @@ public class EntidadeBuilder {
 		Representada representada = buildRepresentada();
 		Contato contato = new Contato();
 		contato.setNome("Adriano");
+		contato.setDdd("11");
+		contato.setDdi("55");
+		contato.setTelefone("99996321");
 
 		Pedido pedido = new Pedido();
 		pedido.setCliente(cliente);
 		pedido.setRepresentada(representada);
 		pedido.setProprietario(vendedor);
 		pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-		pedido.setFinalidadePedido(FinalidadePedido.CONSUMO);
+		pedido.setFinalidadePedido(TipoFinalidadePedido.CONSUMO);
 		pedido.setContato(contato);
 		pedido.setTipoEntrega(TipoEntrega.CIF);
 		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
@@ -244,6 +248,8 @@ public class EntidadeBuilder {
 		representada.setComissao(0.05);
 		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
 		representada.setAliquotaICMS(0.18);
+		representada.setCnpj("77336617000107");
+		representada.setInscricaoEstadual("123456789");
 
 		Logradouro l = buildLogradouro(TipoLogradouro.FATURAMENTO);
 		l.setCep("09910345");
@@ -274,9 +280,19 @@ public class EntidadeBuilder {
 		return representada;
 	}
 
+	public Transportadora buildTransportadora() {
+		Transportadora t = new Transportadora();
+		t.setAtivo(true);
+		t.setCnpj("03233998000162");
+		t.setInscricaoEstadual("1234567");
+		t.setLogradouro(buildLogradouro(TipoLogradouro.FATURAMENTO));
+		t.setNomeFantasia("Transport teste");
+		t.setRazaoSocial("Transport teste LTDA");
+		return t;
+	}
+
 	public Usuario buildVendedor() {
-		Usuario vendedor = new Usuario(gerarId(), "Vinicius",
-				"Fernandes Vendedor");
+		Usuario vendedor = new Usuario(gerarId(), "Vinicius", "Fernandes Vendedor");
 		vendedor.setEmail("vinicius@teste.com.br");
 		vendedor.setSenha("1234567");
 		vendedor.setAtivo(true);

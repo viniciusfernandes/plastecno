@@ -84,11 +84,15 @@ $(document).ready(function() {
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
-		emitirNFe(false);
+		emitirNFe('ENTRADA');
+	});
+	
+	$('#botaoDevolverNF').click(function(){
+		emitirNFe('DEVOLUCAO');
 	});
 	
 	$('#botaoTriangularNF').click(function(){
-		emitirNFe(true);
+		emitirNFe('TRIANGULARIZACAO');
 	});
 	
 	$('#botaoProximoProduto').click(function(){
@@ -233,18 +237,11 @@ $(document).ready(function() {
 		
 		var request = $.ajax({
 							type: "get",
-							url: '<c:url value="/cliente/cnpj"/>',
+							url: '<c:url value="/cliente/serializacao/cnpj"/>',
 							data: 'cnpj='+cnpj,
 						});
 		request.done(function(response) {
-			var cliente = response.cliente;
-			if(cliente == undefined){
-				return;
-			}
-			$('#nomeCliente').val(cliente.razaoSocial);
-			$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
-			$('#telefone').val(cliente.telefone);
-			$('#email').val(cliente.email);
+			popularCliente(response.cliente);
 		});
 		
 		request.fail(function(request, status) {
@@ -273,14 +270,7 @@ $(document).ready(function() {
 				var erros = response.erros;
 				var contemErro = erros != undefined;
 				if (!contemErro) {
-					var cliente = response.cliente;
-					$('#email').val(cliente.email);
-					$('#cnpj').val(cliente.cnpj);
-					$('#cpf').val(cliente.cpf);
-					$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
-					$('#telefone').val(cliente.telefone);
-					$('#nomeCliente').val(cliente.razaoSocial);
-
+					popularCliente(response.cliente);
 				} else if (erros != undefined) {
 					gerarListaMensagemErro(erros);
 				}
@@ -293,6 +283,36 @@ $(document).ready(function() {
 				mensagem += ' contendo o valor de requisicao ' + parametro;
 				mensagem += ' => Excecao: ' + excecao;
 				gerarListaMensagemErro(new Array(mensagem));
+			});
+		}
+	});
+	
+	autocompletar({
+		url : '<c:url value="/transportadora/listagem/nome"/>',
+		campoPesquisavel : 'nomeTransportadora',
+		parametro : 'nomeFantasia',
+		containerResultados : 'containerPesquisaTransportadora',
+		selecionarItem: function(itemLista) {
+			var request = $.ajax({
+				type : 'get',
+				url : '<c:url value="emissaoNFe/transportadora/id"/>?id=' + itemLista.id
+			});
+			
+			request.done(function(response) {
+				var t = response.transportadora;
+				if(t == undefined || t == null){
+					return;
+				}
+				document.getElementById('nomeTransportadora').value = t.razaoSocial;
+				document.getElementById('cnpjTransportadora').value = t.cnpj;
+				document.getElementById('ieTransportadora').value = t.inscricaoEstadual;
+				document.getElementById('endTransportadora').value = t.enderecoFormatado;
+				document.getElementById('munTransportadora').value = t.municipioFormatado;
+				document.getElementById('ufTransportadora').value = t.ufFormatado;
+			});
+			request.fail(function(request, status) {
+				alert('Falha na pesquisa da transportadora => Status da requisicao: '
+						+ status);
 			});
 		}
 	});
@@ -361,6 +381,30 @@ $(document).ready(function() {
 	inicializarMascaraReferenciada();
 	inicializarAlteracaoTabelaProdutos();
 });
+
+function popularCliente(cliente){
+	if(cliente != undefined && cliente != null){
+		$('#nomeCliente').val(cliente.razaoSocial);
+		$('#cnpj').val(cliente.cnpj);
+		$('#cpf').val(cliente.cpf);
+		$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
+		$('#inscricaoSUFRAMA').val(cliente.inscricaoSUFRAMA);
+		$('#telefone').val(cliente.telefone);
+		$('#email').val(cliente.email);
+		
+		var l = cliente.logradouroFaturamento; 
+		if(l != undefined && l != null){
+			$('#cep').val(l.cep);
+			$('#endereco').val(l.endereco);
+			$('#numero').val(l.numero);
+			$('#complemento').val(l.complemento);
+			$('#bairro').val(l.bairro);
+			$('#cidade').val(l.cidade);
+			$('#uf').val(l.uf);
+			$('#pais').val(l.pais);
+		}
+	}
+};
 
 function alterarValorDuplicata(){
 	var vlTot = calcularValorTotalProdutos();
@@ -488,13 +532,13 @@ function calcularValorTotalProdutos(){
 	return tot;
 };
 
-function emitirNFe(isTriangulacao){
+function emitirNFe(tipoNFe){
 	gerarInputDuplicata();
 	gerarInputProdutoServico();
 	gerarInputVolume();
 	gerarInputReboque();
 	gerarInputReferenciada();
-	$('#formEmissao #isTriangulacao').val(isTriangulacao);
+	$('#formEmissao #tipoNFe').val(tipoNFe);
 	
 	$("#formEmissao input, #formEmissao textarea, #formEmissao select" ).each(function(i) {
 		<%-- A remocao dos campos em branco eh necessaria para que o vraptor nao popule os beans com seus atributos todos nulos --%>
@@ -1432,6 +1476,7 @@ function editarProduto(botao){
 	inicializarLegendaBlocoProduto('bloco_exportacao_prod');
 
 	fecharBloco('bloco_ipi');
+	fecharBloco('bloco_icms_interestadual');
 	fecharBloco('bloco_ii');
 	fecharBloco('bloco_iss');
 	fecharBloco('bloco_importacao_prod');
@@ -1533,6 +1578,8 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	
 	var info = document.getElementById('infoAdicionaisProd');
 	info.value = info.value.split(':')[0]+': '+tot;
+	
+	calcularValorICMSInterestadual();
 };
 
 function zerarImposto(idImposto){
@@ -1552,7 +1599,7 @@ function inicializarCalculoImpostos(){
 	
 	campos = gerarJsonIcmsInterestadual().campos;
 	for (var i = 0; i < campos.length; i++) {
-		$('#bloco_icms_interestadual #'+campos[i].id).blur(function(){
+		$('#bloco_icms_interestadual #'+campos[i].id).keyup(function(){
 			calcularValorICMSInterestadual();
 		});
 	}
@@ -1578,7 +1625,7 @@ function inicializarCalculoImpostos(){
 	<form id="formEmissao" action="<c:url value="/emissaoNFe/emitirNFe"/>" method="post">
 		<input type="hidden" name="nf.identificacaoLocalEntrega.codigoMunicipio" value="${nf.identificacaoLocalEntrega.codigoMunicipio}"/>
 		<input type="hidden" name="nf.identificacaoLocalRetirada.codigoMunicipio" value="${nf.identificacaoLocalRetirada.codigoMunicipio}"/>
-		<input type="hidden" id="isTriangulacao" name="isTriangulacao"/>
+		<input type="hidden" id="tipoNFe" name="tipoNFe"/>
 		
 		<fieldset id="bloco_dados_nfe">
 			<legend>::: Dados da NF-e :::</legend>
@@ -1639,11 +1686,11 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label">Dt. Ent./Saída:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="dataSaida" name="nf.identificacaoNFe.dataSaida" value="${nf.identificacaoNFe.dataSaida}" style="width: 100%"/>
+				<input type="text" id="dataSaida" name="nf.identificacaoNFe.dataSaida" value="${dataSaida}" style="width: 100%"/>
 			</div>
 			<div class="label">Hr. Ent./Saída:</div>
 			<div class="input" style="width: 10%">
-				<input type="text" id="horaSaida" name="nf.identificacaoNFe.horaSaida" value="${nf.identificacaoNFe.horaSaida}" style="width: 100%"/>
+				<input type="text" id="horaSaida" name="nf.identificacaoNFe.horaSaida" value="${horaSaida}" style="width: 100%"/>
 			</div>
 			<div class="label">Forma Pagamento:</div>
 			<div class="input" style="width: 10%">
@@ -1722,6 +1769,11 @@ function inicializarCalculoImpostos(){
 						name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
 						value="${cliente.inscricaoEstadual}"
 						style="width: 40%; text-align: right;" />
+				</div>
+				<div class="label">SUFRAMA:</div>
+				<div class="input" style="width: 80%">
+					<input type="text" id="inscricaoSUFRAMA" name="nf.identificacaoDestinatarioNFe.inscricaoSUFRAMA"
+						value="${cliente.inscricaoSUFRAMA}"  style="width: 20%" maxlength="9"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 15%">
@@ -1949,7 +2001,7 @@ function inicializarCalculoImpostos(){
 							<td>${p.ncm}</td>
 							<td>${p.cfop}</td>
 							<td>
-								<input type="button" value="" title="Editar Produto" class="botaoDinheiroPequeno" onclick="editarProduto(this);"/>
+								<input type="button" value="" title="Editar Produto" class="botaoEditar" onclick="editarProduto(this);"/>
 								<input type="button" value="" title="Remover Produto" class="botaoRemover" onclick="removerProduto(this);"/>
 							</td>
 							
@@ -2266,11 +2318,11 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div  class="label">Cl. Enquadramento:</div>
 					<div class="input" style="width: 10%">
-						<input id="clEnquadramentoIPI" type="text" style="width: 100%" />
+						<input id="clEnquadramentoIPI" type="text" style="width: 100%" maxlength="3"/>
 					</div>
 					<div  class="label">Cod. Enquadramento:</div>
 					<div class="input" style="width: 50%">
-						<input id="codEnquadramentoIPI" type="text" style="width: 20%" />
+						<input id="codEnquadramentoIPI" type="text" style="width: 20%" maxlength="3"/>
 					</div>
 					<div  class="label">CNPJ Produtor:</div>
 					<div class="input" style="width: 70%">
@@ -2540,6 +2592,7 @@ function inicializarCalculoImpostos(){
 					<div  class="label">Razão Soc./Nome:</div>
 					<div class="input" style="width: 80%">
 						<input type="text" id="nomeTransportadora" name="nf.transporteNFe.transportadoraNFe.razaoSocial" value="${transportadora.razaoSocial}" style="width: 45%" />
+						<div class="suggestionsBox" id="containerPesquisaTransportadora" style="display: none; width: 50%"></div>
 					</div>
 					<div  class="label">CNPJ:</div>
 					<div class="input" style="width: 10%">
@@ -2820,8 +2873,9 @@ function inicializarCalculoImpostos(){
 			</div>		
 		</fieldset>
 		<div class="bloco_botoes">
-			<input type="button" id="botaoEmitirNF" title="Emitir Nota Fiscal" value="" class="botaoEnviarEmail"/>
-			<input type="button" id="botaoTriangularNF" title="Triangular Nota Fiscal" value="" class="botaoTriangulo"/>
+			<input type="button" id="botaoEmitirNF" title="Emitir NFe Saída" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoTriangularNF" title="Triangularizar NFe" value="" class="botaoTriangulo"/>
+			<input type="button" id="botaoDevolverNF" title="Emitir NFe Devolução" value="" class="botaoRefazer"/>
 		</div>
 
 		<jsp:include page="/bloco/bloco_detalhe_items_nfe.jsp"></jsp:include>		

@@ -56,7 +56,9 @@ public class EmpacotamentoRevendaController extends AbstractController {
 
         // Carregando os dados dos pedidos para empacotamento para que haja um
         // acesso mais rapido a informacao
-        carregarRelatorioEmpacotamento(null);
+        if (!contemAtributo("relatorio")) {
+            carregarRelatorioEmpacotamento(null);
+        }
     }
 
     @Post("empacotamento/itens/inclusao")

@@ -31,7 +31,7 @@ public interface TransportadoraService {
 
     Transportadora pesquisarByCnpj(String cnpj);
 
-    Transportadora pesquisarById(Integer id);
+    Transportadora pesquisarTransportadoraLogradouroById(Integer id);
 
     List<Transportadora> pesquisarById(List<Integer> listaId);
 

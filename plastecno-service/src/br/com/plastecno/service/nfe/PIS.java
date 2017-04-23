@@ -34,6 +34,13 @@ public class PIS {
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Tipo PIS")
 	private PISGeral tipoPis;
 
+	public PIS() {
+	}
+
+	public PIS(PISGeral pisGeral) {
+		this.setTipoPis(pisGeral);
+	}
+
 	public void configurarSubstituicaoTributaria() {
 		if (tipoPis == null) {
 			return;

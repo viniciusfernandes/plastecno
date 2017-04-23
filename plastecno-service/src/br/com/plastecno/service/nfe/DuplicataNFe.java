@@ -9,7 +9,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @InformacaoValidavel
 @XmlType(propOrder = { "numero", "dataVencimento", "valor" })
 public class DuplicataNFe {
-	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}", padraoExemplo = "dd/mm/aaaa", nomeExibicao = "Data de vencimento da duplicata")
+	@InformacaoValidavel(padrao = "\\d{4}-\\d{2}-\\d{2}", padraoExemplo = "aaaa-mm-dd", nomeExibicao = "Data de vencimento da duplicata")
 	@XmlElement(name = "dVenc")
 	private String dataVencimento;
 

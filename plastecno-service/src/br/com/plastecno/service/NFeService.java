@@ -4,21 +4,30 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.NFeItemFracionado;
+import br.com.plastecno.service.entity.NFePedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.NFe;
+import br.com.plastecno.service.wrapper.Periodo;
 
 @Local
 public interface NFeService {
 
 	NFe carregarIdentificacaoEmitente(NFe nFe, Integer idPedido);
 
-	String emitirNFe(NFe nFe, Integer idPedido, boolean isTriangularizacao) throws BusinessException;
+	String emitirNFeDevolucao(NFe nFe, Integer idPedido) throws BusinessException;
 
-	List<DuplicataNFe> gerarDuplicataByIdPedido(Integer idPedido);
+	String emitirNFeEntrada(NFe nFe, Integer idPedido) throws BusinessException;
+
+	String emitirNFeTriangularizacao(NFe nFe, Integer idPedido) throws BusinessException;
+
+	List<DuplicataNFe> gerarDuplicataDataAmericanaByIdPedido(Integer idPedido);
+
+	List<DuplicataNFe> gerarDuplicataDataLatinaByIdPedido(Integer idPedido);
 
 	EnderecoNFe gerarEnderecoNFe(Logradouro logradouro, String telefone);
 
@@ -36,9 +45,21 @@ public interface NFeService {
 
 	List<NFeItemFracionado> pesquisarItemFracionado();
 
+	List<NFeItemFracionado> pesquisarNFeItemFracionadoQuantidades(Integer numeroNFe);
+
+	List<NFePedido> pesquisarNFePedidoEntradaEmitidoByPeriodo(Periodo periodo);
+
 	List<Integer> pesquisarNumeroNFeByIdPedido(Integer idPedido);
 
+	List<ItemPedido> pesquisarQuantitadeItemRestanteByIdPedido(Integer idPedido);
+
 	List<Integer[]> pesquisarTotalItemFracionado(Integer idPedido);
+
+	Integer pesquisarTotalItemFracionadoByNumeroItemNumeroNFe(Integer numeroItem, Integer numeroNFe);
+
+	List<Integer[]> pesquisarTotalItemFracionadoByNumeroNFe(Integer numeroNFe);
+
+	Integer pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(Integer idItem, Integer numeroNFe);
 
 	void removerItemFracionadoNFe(Integer idItemFracionado);
 

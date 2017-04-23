@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.servlet.http.HttpServletRequest;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Result;
@@ -33,6 +36,8 @@ import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.controller.exception.ControllerException;
 import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
+import br.com.plastecno.vendas.relatorio.conversor.GeradorRelatorioPDF;
+import br.com.plastecno.vendas.relatorio.conversor.exception.ConversaoHTML2PDFException;
 import br.com.plastecno.vendas.util.ServiceLocator;
 import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
@@ -42,9 +47,10 @@ public abstract class AbstractController {
     private final String cssMensagemAlerta = "mensagemAlerta";
     private final String cssMensagemErro = "mensagemErro";
     private final String cssMensagemSucesso = "mensagemSucesso";
+    private final String DIRETORIO_TEMPLATE_PDF;
+    private final GeradorRelatorioPDF GERADOR_PDF;
     private String homePath;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
-
     private String nomeTela;
     private final Integer numerRegistrosPorPagina = 10;
     private Picklist picklist;
@@ -55,7 +61,31 @@ public abstract class AbstractController {
     private UsuarioService usuarioService;
 
     public AbstractController(Result result) {
+        this(result, null, null);
+    }
+
+    public AbstractController(Result result, HttpServletRequest request) {
+        this(result, null, request);
+    }
+
+    /*
+     * Construtor utilizado para inicializar a sessao do usuario
+     */
+    public AbstractController(Result result, UsuarioInfo usuarioInfo) {
+        this(result, usuarioInfo, null);
+    }
+
+    // Construtor utilizado na geracao dos relatorio em PDF pois temos que pegar
+    // o caminho do diretorio dos templates. O gerador de relatorio sera
+    // injetado pelo vraptor no construtor dos
+    // controllers
+    public AbstractController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
+            HttpServletRequest request) {
         this.result = result;
+        this.usuarioInfo = usuarioInfo;
+        this.DIRETORIO_TEMPLATE_PDF = request != null ? request.getServletContext().getRealPath("/templates") + "/"
+                : null;
+        this.GERADOR_PDF = geradorRelatorioPDF;
         try {
             init();
             // Esse atributo foi criado para implementar o esquema para
@@ -83,12 +113,10 @@ public abstract class AbstractController {
         }
     }
 
-    /*
-     * Construtor utilizado para inicializar a sessao do usuario
-     */
-    public AbstractController(Result result, UsuarioInfo usuarioInfo) {
-        this(result);
-        this.usuarioInfo = usuarioInfo;
+    // construtor utilizado na geracao dos relatorio em PDF pois temos que pegar
+    // o caminho do diretorio dos templates.
+    public AbstractController(Result result, UsuarioInfo usuarioInfo, HttpServletRequest request) {
+        this(result, usuarioInfo, null, request);
     }
 
     void addAtributo(String nomeAtributo, Object valorAtributo) {
@@ -99,6 +127,10 @@ public abstract class AbstractController {
         if (!contemAtributo(nomeAtributo)) {
             addAtributo(nomeAtributo, valorAtributo);
         }
+    }
+
+    void addAtributoPDF(String nome, Object valor) {
+        GERADOR_PDF.addAtributo(nome, valor);
     }
 
     int calcularIndiceRegistroInicial(Integer paginaSelecionada) {
@@ -209,10 +241,12 @@ public abstract class AbstractController {
         item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
         item.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedido()));
         item.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedidoIPI()));
-        item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
-
         item.setValorICMSFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getValorICMS())));
         item.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getPrecoUnidadeIPI())));
+
+        if (item.contemAliquotaComissao()) {
+            item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
+        }
     }
 
     void formatarItemPedido(List<ItemPedido> itens) {
@@ -367,6 +401,10 @@ public abstract class AbstractController {
         this.result.include("cssMensagem", cssMensagemSucesso);
     }
 
+    byte[] gerarPDF() throws ConversaoHTML2PDFException {
+        return GERADOR_PDF.gerarPDF();
+    }
+
     List<PicklistElement> gerarPicklistElement() {
         return null;
     }
@@ -385,6 +423,10 @@ public abstract class AbstractController {
 
     Integer getCodigoUsuario() {
         return usuarioInfo.getCodigoUsuario();
+    }
+
+    GeradorRelatorioPDF getGeradorPDF() {
+        return GERADOR_PDF;
     }
 
     String getNomeTela() {
@@ -571,6 +613,10 @@ public abstract class AbstractController {
 
     void popularPicklist(List<?> elementosNaoAssociados, List<?> elementosAssociados) throws ControllerException {
         this.picklist.popular(elementosNaoAssociados, elementosAssociados);
+    }
+
+    void processarPDF(String nomeTemplate) throws ConversaoHTML2PDFException {
+        GERADOR_PDF.processar(new File(DIRETORIO_TEMPLATE_PDF + nomeTemplate));
     }
 
     <T extends AbstractController> T redirecTo(Class<T> classe) {

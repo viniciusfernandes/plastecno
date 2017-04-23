@@ -15,6 +15,7 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ComentarioCliente;
 import br.com.plastecno.service.entity.ContatoCliente;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
@@ -168,25 +169,25 @@ public class ClienteController extends AbstractController {
 
     @Get("cliente/{idCliente}")
     public void pesquisarClienteById(Integer idCliente, boolean isRevendedor) {
-        Cliente cliente = this.clienteService.pesquisarById(idCliente);
+        Cliente cliente = clienteService.pesquisarById(idCliente);
         this.carregarVendedor(cliente);
 
         try {
-            popularPicklist(null, this.clienteService.pesquisarTransportadorasRedespacho(idCliente));
+            popularPicklist(null, clienteService.pesquisarTransportadorasRedespacho(idCliente));
         } catch (ControllerException e) {
             gerarLogErroNavegacao("Cliente", e);
         }
 
         if (cliente.getDataUltimoContato() != null) {
-            addAtributo("ultimoContato", this.formatarData(cliente.getDataUltimoContato()));
+            addAtributo("ultimoContato", formatarData(cliente.getDataUltimoContato()));
         }
 
         this.formatarDocumento(cliente);
         addAtributo("cliente", cliente);
         addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade().getId()
                 : "");
-        addAtributo("listaLogradouro", this.clienteService.pesquisarLogradouro(idCliente));
-        addAtributo("listaContato", this.clienteService.pesquisarContato(idCliente));
+        addAtributo("listaLogradouro", clienteService.pesquisarLogradouro(idCliente));
+        addAtributo("listaContato", clienteService.pesquisarContato(idCliente));
         addAtributo("comentarios", formatarComentarios(idCliente));
         addAtributo("tipoCliente", cliente.getTipoCliente());
         if (isRevendedor) {
@@ -206,16 +207,17 @@ public class ClienteController extends AbstractController {
         serializarJson(new SerializacaoJson("lista", lista));
     }
 
-    @Get("cliente/cnpj")
-    public void pesquisarClienteResumidoByCnpj(String cnpj) {
+    @Get("cliente/serializacao/cnpj")
+    public void pesquisarClienteSerializadoByCnpj(String cnpj) {
         Cliente c = clienteService.pesquisarClienteResumidoByCnpj(cnpj);
-        serializarJson(new SerializacaoJson("cliente", new ClienteJson(c)));
+        Logradouro l = c != null ? c.getLogradouroFaturamento() : null;
+        serializarJson(new SerializacaoJson("cliente", new ClienteJson(c, l), true));
     }
 
     @Get("cliente/serializacao/{idCliente}")
     public void pesquisarClienteSerializadoById(Integer idCliente) {
-        Cliente cliente = clienteService.pesquisarClienteResumidoEContatoById(idCliente);
-        serializarJson(new SerializacaoJson("cliente", new ClienteJson(cliente)));
+        Cliente c = clienteService.pesquisarClienteResumidoLogradouroById(idCliente);
+        serializarJson(new SerializacaoJson("cliente", new ClienteJson(c, c.getLogradouroFaturamento()), true));
     }
 
     @Get("cliente/transportadora")

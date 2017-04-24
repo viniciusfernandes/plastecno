@@ -96,6 +96,7 @@ public class ClienteServiceImpl implements ClienteService {
 		ContatoCliente co = null;
 		Set<Integer> idList = new HashSet<Integer>();
 		List<Cliente> lCli = new ArrayList<Cliente>();
+		
 		for (Object[] o : resultado) {
 			if (o[0] == null || idList.contains(o[0])) {
 				continue;

@@ -1,9 +1,10 @@
 package br.com.plastecno.service.test.builder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import mockit.Mock;
 import mockit.MockUp;
@@ -42,14 +43,8 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {
-				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
-				long count = 0;
-				for (ItemPedido itemPedido : l) {
-					if (!itemPedido.isEncomendado() && itemPedido.getPedido().getId().equals(idPedido)) {
-						count++;
-					}
-				}
-				return count;
+				return REPOSITORY.contar(ItemPedido.class,
+						i -> !i.isEncomendado() && i.getPedido().getId().equals(idPedido));
 			};
 		};
 
@@ -99,7 +94,6 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			@Mock
 			public Cliente pesquisarClienteResumidoByIdPedido(Integer idPedido) {
 				Pedido p = this.pesquisarById(idPedido, false);
-
 				return p == null ? null : p.getCliente();
 			}
 
@@ -134,13 +128,12 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			List<Integer> pesquisarIdPedidoBySituacaoPedido(SituacaoPedido situacaoPedido) {
-				List<Pedido> l = REPOSITORY.pesquisarEntidadeByRelacionamento(Pedido.class, "situacaoPedido",
-						situacaoPedido);
-				List<Integer> id = new ArrayList<Integer>();
-				for (Pedido pedido : l) {
-					id.add(pedido.getId());
+				if (situacaoPedido == null) {
+					return new ArrayList<Integer>();
 				}
-				return id;
+				List<Pedido> l = REPOSITORY.pesquisarTodos(Pedido.class);
+				return l.stream().filter(p -> situacaoPedido.equals(p.getSituacaoPedido())).map(i -> i.getId())
+						.collect(Collectors.toList());
 			}
 
 			@Mock
@@ -157,18 +150,9 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido) {
-				// Pedido pedido = this.pesquisarById(idPedido, false);
-				// return
-				// REPOSITORY.pesquisarEntidadeByRelacionamento(ItemPedido.class,
-				// "pedido", pedido);
-				List<ItemPedido> lista = REPOSITORY.pesquisarTodos(ItemPedido.class);
-				List<ItemPedido> itens = new ArrayList<ItemPedido>();
-				for (ItemPedido itemPedido : lista) {
-					if (itemPedido.getPedido() != null && itemPedido.getPedido().getId().equals(idPedido)) {
-						itens.add(itemPedido);
-					}
-				}
-				return itens;
+				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				return l.stream().filter(i -> i.getPedido() != null && i.getPedido().getId().equals(idPedido))
+						.collect(Collectors.toList());
 			}
 
 			@Mock
@@ -190,22 +174,10 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 				if (l == null || l.isEmpty()) {
 					return null;
 				}
-				List<Integer> s = new ArrayList<Integer>();
-				Pedido p = null;
-				for (ItemPedido i : l) {
-					p = i.getPedido();
-					if (p != null && idPedido.equals(p.getId())) {
-						s.add(i.getSequencial());
-					}
 
-				}
-
-				if (s.isEmpty()) {
-					return null;
-				}
-
-				Collections.sort(s);
-				return s.get(s.size() - 1);
+				Optional<Integer> o = l.stream().filter(i -> idPedido.equals(i.getPedido().getId()))
+						.map(i -> i.getSequencial()).max((a, b) -> a == null || b == null ? -1 : Integer.compare(a, b));
+				return o.isPresent() ? o.get() : null;
 			}
 
 			@Mock
@@ -253,19 +225,7 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			Long pesquisarTotalItemPedido(Integer idPedido, boolean apenasNaoRecebido) {
-				List<ItemPedido> lista = REPOSITORY.pesquisarTodos(ItemPedido.class);
-				long count = 0;
-
-				for (ItemPedido itemPedido : lista) {
-					if (itemPedido.getPedido() == null || !itemPedido.getPedido().getId().equals(idPedido)) {
-						continue;
-					}
-
-					if (!apenasNaoRecebido || !itemPedido.isItemRecebido()) {
-						count++;
-					}
-				}
-				return count;
+				return REPOSITORY.contar(ItemPedido.class, i -> !apenasNaoRecebido || !i.isItemRecebido());
 			}
 
 			@Mock

@@ -122,6 +122,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		// Acumulando os valores dos itens de venda por representacao
 		listaItemVendido = pedidoService.pesquisarItemPedidoRepresentacaoByPeriodo(periodo);
+		
 		for (ItemPedido itemPedido : listaItemVendido) {
 
 			precoItem = itemPedido.getValorComissionado();

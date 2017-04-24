@@ -8,6 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Id;
 
@@ -51,12 +54,39 @@ public class EntidadeRepository {
 		mapaEntidades.clear();
 	}
 
+	@SuppressWarnings("unchecked")
+	<T> Long contar(Class<T> classe, Predicate<T> predicate) {
+		return gerarStream(classe, predicate).count();
+	}
+
 	<T> boolean contemEntidade(Class<T> classe, String nomeAtributo, Object valorAtributo, Object valorIdEntidade) {
 		return pesquisarEntidadeByAtributo(classe, nomeAtributo, valorAtributo, valorIdEntidade) != null;
 	}
 
+	@SuppressWarnings("unchecked")
+	<T> List<T> filtrar(Class<T> classe, Predicate<T>... predicates) {
+		return gerarStream(classe, predicates).collect(Collectors.toList());
+	}
+
 	private Integer gerarId() {
 		return (int) (9999 * Math.random());
+	}
+
+	private <T, R> Stream<T> gerarStream(Class<T> classe, Predicate<T>... predicates) {
+		Set<T> lEnt = (Set<T>) mapaEntidades.get(classe);
+
+		List<T> l = new ArrayList<T>();
+		if (lEnt != null && !lEnt.isEmpty()) {
+			l.addAll(lEnt);
+		} else {
+			return l.stream();
+		}
+
+		Stream<T> st = l.stream();
+		for (Predicate<T> p : predicates) {
+			st = st.filter(p);
+		}
+		return st;
 	}
 
 	private void initGenericDAO() {

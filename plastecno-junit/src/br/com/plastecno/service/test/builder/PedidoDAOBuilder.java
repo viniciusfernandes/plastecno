@@ -236,23 +236,25 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			public Double[] pesquisarValoresPedido(Integer idPedido) {
-				double vTot = 0;
-				double vTotIPI = 0;
 
 				List<ItemPedido> lItem = REPOSITORY.pesquisarTodos(ItemPedido.class);
 				if (lItem == null || lItem.isEmpty()) {
 					return new Double[] {};
 				}
-				for (ItemPedido i : lItem) {
-					if (i.getPedido() == null || i.getPedido().getId() == null
-							|| !i.getPedido().getId().equals(idPedido)) {
-						continue;
-					}
-					vTot += i.getQuantidade() * i.getPrecoUnidade();
-					vTotIPI += i.getQuantidade() * i.getPrecoUnidadeIPI();
-				}
 
-				return new Double[] { vTot, vTotIPI };
+				ItemPedido iAcum = lItem
+						.stream()
+						.filter(i -> !idPedido.equals(i.getPedido().getId()))
+						.reduce(new ItemPedido(),
+								(i1, i2) -> {
+									i1.setPrecoUnidade((i1.getPrecoUnidade() == null ? 0 : i1.getPrecoUnidade())
+											+ (i2.getQuantidade() * i2.getPrecoUnidade()));
+									i1.setPrecoUnidadeIPI((i1.getPrecoUnidade() == null ? 0 : i1.getPrecoUnidade())
+											+ (i2.getQuantidade() * i2.getPrecoUnidadeIPI()));
+									return i1;
+								});
+
+				return new Double[] { iAcum.getPrecoUnidade(), iAcum.getPrecoUnidadeIPI() };
 			}
 
 			@Mock

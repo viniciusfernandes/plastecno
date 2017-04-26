@@ -50,7 +50,7 @@ public class RepresentadaController extends AbstractController {
         representada.setCnpj(formatarCNPJ(representada.getCnpj()));
         representada.setInscricaoEstadual(formatarInscricaoEstadual(representada.getInscricaoEstadual()));
         representada.setComissao(NumeroUtils.gerarPercentual(representada.getComissao(), 2));
-        representada.setAliquotaICMS(NumeroUtils.gerarPercentual(representada.getAliquotaICMS()));
+        representada.setAliquotaICMS(NumeroUtils.gerarPercentualInteiro(representada.getAliquotaICMS()));
     }
 
     private String formatarComentarios(Integer idRepresentada) {

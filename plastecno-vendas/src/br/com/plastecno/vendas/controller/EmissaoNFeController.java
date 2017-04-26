@@ -360,8 +360,8 @@ public class EmissaoNFeController extends AbstractController {
         Object[] val = null;
         for (ItemPedido i : lista) {
             val = new Object[14];
-            val[0] = NumeroUtils.gerarPercentual(i.getAliquotaICMS());
-            val[1] = NumeroUtils.gerarPercentual(i.getAliquotaIPI());
+            val[0] = NumeroUtils.gerarPercentualInteiro(i.getAliquotaICMS());
+            val[1] = NumeroUtils.gerarPercentualInteiro(i.getAliquotaIPI());
             val[2] = "";
             val[3] = i.getDescricaoItemMaterial();
             val[4] = StringUtils.removerMascaraDocumento(i.getNcm());

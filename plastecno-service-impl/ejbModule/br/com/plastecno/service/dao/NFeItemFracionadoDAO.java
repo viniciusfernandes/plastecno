@@ -42,6 +42,12 @@ public class NFeItemFracionadoDAO extends GenericDAO<NFeItemFracionado> {
 		return entityManager.createQuery("select i from NFeItemFracionado i", NFeItemFracionado.class).getResultList();
 	}
 
+	public List<NFeItemFracionado> pesquisarItemFracionadoByNumeroNFe(Integer numeroNFe) {
+		return entityManager
+				.createQuery("select i from NFeItemFracionado i where i.numeroNFe = :numeroNFe",
+						NFeItemFracionado.class).setParameter("numeroNFe", numeroNFe).getResultList();
+	}
+
 	public List<NFeItemFracionado> pesquisarNFeItemFracionadoQuantidades(Integer numeroNFe) {
 		return entityManager
 				.createQuery(
@@ -83,6 +89,19 @@ public class NFeItemFracionadoDAO extends GenericDAO<NFeItemFracionado> {
 		return l;
 	}
 
+	public List<Integer[]> pesquisarQuantidadeTotalItemFracionadoByNumeroNFe(Integer numeroNFe) {
+		List<Object[]> listaTot = entityManager
+				.createQuery(
+						"select i.numeroItem, sum(i.quantidadeFracionada) from NFeItemFracionado i where i.numeroNFe =:numeroNFe group by i.numeroItem",
+						Object[].class).setParameter("numeroNFe", numeroNFe).getResultList();
+
+		List<Integer[]> l = new ArrayList<Integer[]>();
+		for (Object[] o : listaTot) {
+			l.add(new Integer[] { o != null ? (Integer) o[0] : 0, o != null ? ((Long) o[1]).intValue() : 0 });
+		}
+		return l;
+	}
+
 	public Integer pesquisarTotalItemFracionadoByNumeroItemNumeroNFe(Integer numeroItem, Integer numeroNFe) {
 		if (numeroItem == null || numeroNFe == null) {
 			return 0;
@@ -95,19 +114,6 @@ public class NFeItemFracionadoDAO extends GenericDAO<NFeItemFracionado> {
 								.setParameter("numeroNFe", numeroNFe).setParameter("numeroItem", numeroItem),
 						Long.class, 0l);
 		return tot.intValue();
-	}
-
-	public List<Integer[]> pesquisarQuantidadeTotalItemFracionadoByNumeroNFe(Integer numeroNFe) {
-		List<Object[]> listaTot = entityManager
-				.createQuery(
-						"select i.numeroItem, sum(i.quantidadeFracionada) from NFeItemFracionado i where i.numeroNFe =:numeroNFe group by i.numeroItem",
-						Object[].class).setParameter("numeroNFe", numeroNFe).getResultList();
-
-		List<Integer[]> l = new ArrayList<Integer[]>();
-		for (Object[] o : listaTot) {
-			l.add(new Integer[] { o != null ? (Integer) o[0] : 0, o != null ? ((Long) o[1]).intValue() : 0 });
-		}
-		return l;
 	}
 
 	public Integer pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(Integer idItemPedido, Integer numeroNFe) {

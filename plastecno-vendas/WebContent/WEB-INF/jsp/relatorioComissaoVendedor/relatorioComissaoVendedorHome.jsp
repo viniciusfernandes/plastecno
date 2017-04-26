@@ -90,10 +90,10 @@
 					<th style="width: 5%">Qtde.</th>
 					<th style="width: 45%">Descrição</th>
 					<th style="width: 10%">Vl. (R$)</th>
-					<th style="width: 2%">Comiss. (%)</th>
-					<th style="width: 10%">Vl. Comiss.(R$)</th>
-					<th style="width: 2%">Comiss. Repres.(%)</th>
-					<th style="width: 10%">Vl Comiss. Repres.(R$)</th>
+					<th style="width: 2%">Comiss. Vend.(%)</th>
+					<th style="width: 10%">Vl Comiss. Vend.(R$)</th>
+					<th style="width: 2%">Comiss. Matriz(%)</th>
+					<th style="width: 10%">Vl Comiss. Matriz(R$)</th>
 					<th style="width: 5%">Ações</th>
 				</tr>
 			</thead>

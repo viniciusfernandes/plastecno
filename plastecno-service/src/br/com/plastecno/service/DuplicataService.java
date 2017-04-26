@@ -30,4 +30,6 @@ public interface DuplicataService {
 
 	void removerDuplicataById(Integer idDuplicata) throws BusinessException;
 
+	void removerDuplicataByNumeroNFe(Integer numeroNFe);
+
 }

@@ -62,6 +62,11 @@ public class NFePedidoDAOBuilder extends DAOBuilder<NFePedidoDAO> {
 				NFePedido n = REPOSITORY.pesquisarEntidadeById(NFePedido.class, numero);
 				return n != null ? n.getXmlNFe() : null;
 			}
+
+			@Mock
+			public void removerNFePedido(Integer numeroNFe) {
+				REPOSITORY.removerEntidade(NFePedido.class, numeroNFe);
+			}
 		};
 		return new NFePedidoDAO(null);
 	}

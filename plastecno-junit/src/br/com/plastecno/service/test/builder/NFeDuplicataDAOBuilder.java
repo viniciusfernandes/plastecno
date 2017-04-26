@@ -7,7 +7,6 @@ import mockit.Mock;
 import mockit.MockUp;
 import br.com.plastecno.service.dao.NFeDuplicataDAO;
 import br.com.plastecno.service.entity.NFeDuplicata;
-import br.com.plastecno.service.entity.NFeItemFracionado;
 
 public class NFeDuplicataDAOBuilder extends DAOBuilder<NFeDuplicataDAO> {
 
@@ -34,7 +33,15 @@ public class NFeDuplicataDAOBuilder extends DAOBuilder<NFeDuplicataDAO> {
 
 			@Mock
 			public void removerDuplicataByNumeroNFe(Integer numeroNFe) {
-				REPOSITORY.removerEntidade(NFeItemFracionado.class, numeroNFe);
+				if (numeroNFe == null) {
+					return;
+				}
+				List<NFeDuplicata> l = REPOSITORY.pesquisarTodos(NFeDuplicata.class);
+				for (NFeDuplicata d : l) {
+					if (numeroNFe.equals(d.getnFe().getNumero())) {
+						REPOSITORY.removerEntidade(NFeDuplicata.class, d.getId());
+					}
+				}
 			}
 
 		};

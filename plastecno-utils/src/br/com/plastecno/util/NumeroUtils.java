@@ -31,8 +31,8 @@ public final class NumeroUtils {
 		return arredondar(valor, ESCALA_MONETARIA);
 	}
 
-	public static String formatarPercentual(Double decimal) {
-		return String.valueOf(gerarPercentual(decimal).intValue());
+	public static String formatarPercentualInteiro(Double decimal) {
+		return String.valueOf(gerarPercentualInteiro(decimal).intValue());
 	}
 
 	public static String formatarPercentual(Double decimal, int escala) {
@@ -54,7 +54,7 @@ public final class NumeroUtils {
 		return arredondar(percentual / CEM, escala);
 	}
 
-	public static Double gerarPercentual(Double decimal) {
+	public static Double gerarPercentualInteiro(Double decimal) {
 		return gerarPercentual(decimal, 0);
 	}
 

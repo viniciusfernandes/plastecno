@@ -412,8 +412,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 			item.setPrecoCustoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoCusto()));
 
 			if (isComissaoFormatado) {
-				item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
-				item.setAliquotaComissaoRepresentadaFormatado(NumeroUtils.formatarPercentual(item
+				item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao(), 2));
+				item.setAliquotaComissaoRepresentadaFormatado(NumeroUtils.formatarPercentualInteiro(item
 						.getAliquotaComissaoRepresentada()));
 
 				item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));

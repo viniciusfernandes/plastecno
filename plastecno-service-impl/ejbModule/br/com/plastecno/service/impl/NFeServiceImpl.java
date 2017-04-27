@@ -792,6 +792,12 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<NFeItemFracionado> pesquisarItemFracionadoByNumeroNFe(Integer numeroNFe) {
+		return nFeItemFracionadoDAO.pesquisarItemFracionadoByNumeroNFe(numeroNFe);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<NFeItemFracionado> pesquisarNFeItemFracionadoQuantidades(Integer numeroNFe) {
 		return nFeItemFracionadoDAO.pesquisarNFeItemFracionadoQuantidades(numeroNFe);
 	}
@@ -892,6 +898,7 @@ public class NFeServiceImpl implements NFeService {
 		}
 
 		nFeItemFracionadoDAO.removerItemFracionadoByNumeroNFe(numeroNFe);
+		duplicataService.removerDuplicataByNumeroNFe(numeroNFe);
 		nFePedidoDAO.removerNFePedido(numeroNFe);
 		removerXMLNFe(String.valueOf(idPedido), String.valueOf(numeroNFe));
 	}

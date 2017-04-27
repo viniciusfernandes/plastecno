@@ -179,14 +179,14 @@ public abstract class AbstractController {
     }
 
     void formatarAliquotaItemEstoque(ItemEstoque item) {
-        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
-        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
-        item.setMargemMinimaLucro(NumeroUtils.gerarPercentual(item.getMargemMinimaLucro()));
+        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaICMS()));
+        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaIPI()));
+        item.setMargemMinimaLucro(NumeroUtils.gerarPercentualInteiro(item.getMargemMinimaLucro()));
     }
 
     void formatarAliquotaItemPedido(ItemPedido item) {
-        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
-        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
+        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaICMS()));
+        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaIPI()));
     }
 
     String formatarCNPJ(String conteudo) {
@@ -220,7 +220,7 @@ public abstract class AbstractController {
         item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
         item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
         item.setPrecoMedioFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoMedio()));
-        item.setMargemMinimaLucro(NumeroUtils.gerarPercentual(item.getMargemMinimaLucro()));
+        item.setMargemMinimaLucro(NumeroUtils.gerarPercentualInteiro(item.getMargemMinimaLucro()));
     }
 
     void formatarItemEstoque(List<ItemEstoque> itens) {
@@ -230,8 +230,8 @@ public abstract class AbstractController {
     }
 
     void formatarItemPedido(ItemPedido item) {
-        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentual(item.getAliquotaICMS()));
-        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentual(item.getAliquotaIPI()));
+        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaICMS()));
+        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaIPI()));
         item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
         item.setPrecoUnidadeIPIFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidadeIPI()));
         item.setPrecoVendaFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoVenda()));
@@ -245,7 +245,7 @@ public abstract class AbstractController {
         item.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getPrecoUnidadeIPI())));
 
         if (item.contemAliquotaComissao()) {
-            item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao()));
+            item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaComissao()));
         }
     }
 

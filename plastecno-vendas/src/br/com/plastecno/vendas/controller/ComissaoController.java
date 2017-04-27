@@ -47,7 +47,7 @@ public class ComissaoController extends AbstractController {
         }
         comissao.setDataInicioFormatado(StringUtils.formatarDataHora(comissao.getDataInicio()));
         comissao.setDataFimFormatado(StringUtils.formatarDataHora(comissao.getDataFim()));
-        comissao.setAliquotaRevendaFormatada(NumeroUtils.gerarPercentual(comissao.getAliquotaRevenda()).toString());
+        comissao.setAliquotaRevendaFormatada(NumeroUtils.gerarPercentualInteiro(comissao.getAliquotaRevenda()).toString());
         comissao.setAliquotaRepresentacaoFormatada(NumeroUtils.gerarPercentual(comissao.getAliquotaRepresentacao(), 2)
                 .toString());
     }

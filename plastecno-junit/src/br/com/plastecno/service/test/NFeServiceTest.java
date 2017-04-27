@@ -65,14 +65,6 @@ public class NFeServiceTest extends AbstractTest {
 		duplicataService = ServiceBuilder.buildService(DuplicataService.class);
 	}
 
-	private NFe gerarNFeItensNaoEmitidos(Integer idPedido) {
-		return gerarNFe(idPedido, true);
-	}
-
-	private NFe gerarNFeItensTodosItensPedido(Integer idPedido) {
-		return gerarNFe(idPedido, false);
-	}
-
 	private NFe gerarNFe(Integer idPedido, boolean apenasItensRestantes) {
 		Cliente cli = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
 		Transportadora transPed = pedidoService.pesquisarTransportadoraByIdPedido(idPedido);
@@ -196,6 +188,14 @@ public class NFeServiceTest extends AbstractTest {
 		d.setListaDetalhamentoProdutoServicoNFe(lDet);
 
 		return new NFe(d);
+	}
+
+	private NFe gerarNFeItensNaoEmitidos(Integer idPedido) {
+		return gerarNFe(idPedido, true);
+	}
+
+	private NFe gerarNFeItensTodosItensPedido(Integer idPedido) {
+		return gerarNFe(idPedido, false);
 	}
 
 	private Integer gerarPedidoRevenda() {
@@ -485,5 +485,50 @@ public class NFeServiceTest extends AbstractTest {
 		List<Integer[]> lFrac = nFeService.pesquisarTotalItemFracionadoByNumeroNFe(Integer.parseInt(numNFe));
 		assertTrue("NFe de triangularizacao nao pode conter itens fracionados. Verificar a validacao.", lFrac == null
 				|| lFrac.isEmpty());
+	}
+
+	@Test
+	public void testRemovecaoNFeComItemFracionado() {
+		Integer idPedido = gerarPedidoRevenda();
+		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
+		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
+
+		DetalhamentoProdutoServicoNFe d = lDet.get(0);
+		ProdutoServicoNFe p = d.getProduto();
+
+		int qRemov = 1;
+		int qEmit = p.getQuantidadeTributavel() - qRemov;
+		p.setQuantidadeTributavel(qEmit);
+		p.setQuantidadeComercial((double) qEmit);
+
+		Integer num = null;
+		try {
+			num = Integer.parseInt(nFeService.emitirNFeEntrada(nFe, idPedido));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<NFeItemFracionado> lItem = nFeService.pesquisarItemFracionadoByNumeroNFe(num);
+		assertTrue("A NFe foi fracionada e deveria ter um item fracionado", lItem != null && !lItem.isEmpty());
+
+		List<NFeDuplicata> lDup = duplicataService.pesquisarDuplicataByNumeroNFe(num);
+		assertTrue("A NFe foi emitida e deveria duplicatas associadas", lDup != null && !lDup.isEmpty());
+
+		nFeService.removerNFe(num);
+
+		try {
+			nFe = nFeService.gerarNFeByNumero(num);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		assertNull("A NFe foi removida e nao deve existir no sistema nem no diretorio de NFes", nFe);
+
+		lItem = nFeService.pesquisarItemFracionadoByNumeroNFe(num);
+		assertTrue("A NFe foi removida e nao deve conter item fracionado", lItem == null || lItem.isEmpty());
+
+		lDup = duplicataService.pesquisarDuplicataByNumeroNFe(num);
+		assertTrue("A NFe foi removida e nao deve conter duplicatas", lDup == null || lDup.isEmpty());
 	}
 }

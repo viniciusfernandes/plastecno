@@ -111,4 +111,10 @@ public class DuplicataServiceImpl implements DuplicataService {
 		}
 		nFeDuplicataDAO.removerDuplicataById(idDuplicata);
 	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerDuplicataByNumeroNFe(Integer numeroNFe) {
+		nFeDuplicataDAO.removerDuplicataByNumeroNFe(numeroNFe);
+	}
 }

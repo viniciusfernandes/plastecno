@@ -5,7 +5,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.ContatoUsuario;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -54,7 +54,7 @@ public interface UsuarioService {
 
 	List<ContatoUsuario> pesquisarContatos(Integer id);
 
-	Logradouro pesquisarLogradouro(Integer id);
+	LogradouroEndereco pesquisarLogradouro(Integer id);
 
 	List<PerfilAcesso> pesquisarPerfisAssociados(Integer id);
 

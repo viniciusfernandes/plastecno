@@ -22,7 +22,7 @@ import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.entity.ComentarioRepresentada;
 import br.com.plastecno.service.entity.ContatoRepresentada;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -245,7 +245,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public Logradouro pesquisarLogradorouro(Integer id) {
+	public LogradouroEndereco pesquisarLogradorouro(Integer id) {
 		return representadaDAO.pesquisarLogradorouro(id);
 	}
 

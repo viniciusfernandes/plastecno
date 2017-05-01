@@ -2,10 +2,10 @@ package br.com.plastecno.service.dao;
 
 import javax.persistence.EntityManager;
 
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.Logradouravel;
 import br.com.plastecno.service.impl.util.QueryUtil;
 
-public class LogradouroDAO extends GenericDAO<Logradouro> {
+public class LogradouroDAO extends GenericDAO<Logradouravel> {
 
 	public LogradouroDAO(EntityManager entityManager) {
 		super(entityManager);

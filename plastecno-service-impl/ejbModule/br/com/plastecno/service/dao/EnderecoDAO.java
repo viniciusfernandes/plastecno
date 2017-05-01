@@ -17,12 +17,17 @@ public class EnderecoDAO extends GenericDAO<Endereco> {
 	public void inserirUF(UF uf) {
 		entityManager.merge(uf);
 	}
-
 	public boolean isUFExistente(String sigla, Integer idPais) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery("select u from UF u where u.sigla = :sigla and u.pais.id = :idPais ")
 						.setParameter("sigla", sigla).setParameter("idPais", idPais), UF.class, null) != null;
 
+	}
+
+	public Endereco pesquisarByCep(String cep) {
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery("select e from Endereco e where e.cep =:cep ").setParameter("cep", cep),
+				Endereco.class, null);
 	}
 
 	public List<String> pesquisarCEPExistente(List<String> listaCep) {

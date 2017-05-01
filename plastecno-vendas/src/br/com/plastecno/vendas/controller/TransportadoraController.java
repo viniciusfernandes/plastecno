@@ -12,7 +12,7 @@ import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.entity.ContatoTransportadora;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -49,7 +49,7 @@ public class TransportadoraController extends AbstractController {
     }
 
     @Post("transportadora/inclusao")
-    public void inserir(Transportadora transportadora, Logradouro logradouro, List<ContatoTransportadora> listaContato,
+    public void inserir(Transportadora transportadora, LogradouroEndereco logradouro, List<ContatoTransportadora> listaContato,
             List<Integer> listaContatoRemocao) {
         try {
             if (temElementos(listaContato)) {

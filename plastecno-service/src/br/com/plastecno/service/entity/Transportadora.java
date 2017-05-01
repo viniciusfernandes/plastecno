@@ -58,7 +58,7 @@ public class Transportadora implements Serializable {
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da transportadora")
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "id_logradouro")
-	private Logradouro logradouro;
+	private LogradouroEndereco logradouro;
 
 	@Transient
 	private String municipioFormatado;
@@ -85,12 +85,12 @@ public class Transportadora implements Serializable {
 		this.nomeFantasia = nomeFantasia;
 	}
 	
-	public Transportadora(Integer id, Logradouro logradouro){
+	public Transportadora(Integer id, LogradouroEndereco logradouro){
 		
 	}
 
 	public Transportadora(Integer id, String nomeFantasia, String razaoSocial, String cnpj, String inscricaoEstadual,
-			Logradouro logradouro) {
+			LogradouroEndereco logradouro) {
 		this(id, nomeFantasia);
 		setRazaoSocial(razaoSocial);
 		setLogradouro(logradouro);
@@ -159,7 +159,7 @@ public class Transportadora implements Serializable {
 		return listaContato;
 	}
 
-	public Logradouro getLogradouro() {
+	public LogradouroEndereco getLogradouro() {
 		return logradouro;
 	}
 
@@ -222,7 +222,7 @@ public class Transportadora implements Serializable {
 
 	public void setCidade(String cidade) {
 		if (logradouro == null) {
-			logradouro = new Logradouro();
+			logradouro = new LogradouroEndereco();
 		}
 		logradouro.setCidade(cidade);
 	}
@@ -233,7 +233,7 @@ public class Transportadora implements Serializable {
 
 	public void setEndereco(String endereco) {
 		if (logradouro == null) {
-			logradouro = new Logradouro();
+			logradouro = new LogradouroEndereco();
 		}
 		logradouro.setEndereco(endereco);
 	}
@@ -254,7 +254,7 @@ public class Transportadora implements Serializable {
 		this.listaContato = listaContato;
 	}
 
-	public void setLogradouro(Logradouro logradouro) {
+	public void setLogradouro(LogradouroEndereco logradouro) {
 		this.logradouro = logradouro;
 	}
 
@@ -276,7 +276,7 @@ public class Transportadora implements Serializable {
 
 	public void setUf(String uf) {
 		if (logradouro == null) {
-			logradouro = new Logradouro();
+			logradouro = new LogradouroEndereco();
 		}
 		logradouro.setUf(uf);
 	}

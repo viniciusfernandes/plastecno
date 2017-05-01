@@ -12,7 +12,7 @@ import br.com.plastecno.service.PerfilAcessoService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.ContatoUsuario;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -59,7 +59,7 @@ public class UsuarioController extends AbstractController {
         if (usuario == null) {
             this.gerarListaMensagemErro("Usuário não existe no sistema");
         } else {
-            Logradouro logradouro = this.usuarioService.pesquisarLogradouro(usuario.getId());
+            LogradouroEndereco logradouro = this.usuarioService.pesquisarLogradouro(usuario.getId());
             usuario.setLogradouro(logradouro);
 
             usuario.setSenha(null);
@@ -81,7 +81,7 @@ public class UsuarioController extends AbstractController {
 
     @Post("usuario/inclusao")
     public void inserir(Double salario, Double comissao, Usuario usuario, List<ContatoUsuario> listaContato,
-            Logradouro logradouro, List<Integer> listaIdPerfilAssociado, boolean isAlteracaoSenha) {
+            LogradouroEndereco logradouro, List<Integer> listaIdPerfilAssociado, boolean isAlteracaoSenha) {
         try {
 
             if (usuario.getId() == null) {

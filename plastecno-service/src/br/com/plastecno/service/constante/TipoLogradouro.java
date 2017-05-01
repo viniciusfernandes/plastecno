@@ -2,9 +2,15 @@ package br.com.plastecno.service.constante;
 
 
 public enum TipoLogradouro {
-	COBRANCA,
-	COMERCIAL,
-	ENTREGA,
-	FATURAMENTO,
-	RESIDENCIAL;
+	COBRANCA(0),
+	COMERCIAL(1),
+	ENTREGA(2),
+	FATURAMENTO(3),
+	RESIDENCIAL(4);
+	
+	private final Integer codigo;
+	private TipoLogradouro(Integer codigo){this.codigo=codigo;}
+	public Integer getCodigo() {
+		return codigo;
+	}
 }

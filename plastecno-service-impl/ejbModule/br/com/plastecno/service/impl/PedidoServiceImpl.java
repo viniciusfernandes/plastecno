@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -1727,9 +1726,10 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException {
-		List<LogradouroPedido> lLog = pedido.getListaLogradouro();
-		logradouroService.validarListaLogradouroPreenchida(lLog == null || lLog.isEmpty() ? null : lLog.stream()
-				.map(l -> l.getTipoLogradouro()).collect(Collectors.toList()));
+		if (pedido == null) {
+			return;
+		}
+		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
 	}
 
 	private void verificarMaterialAssociadoFornecedor(Integer idRepresentadaFornecedora, Set<Integer> listaIdItemPedido)

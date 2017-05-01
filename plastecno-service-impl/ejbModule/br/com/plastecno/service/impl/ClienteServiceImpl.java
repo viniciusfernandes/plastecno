@@ -176,6 +176,48 @@ public class ClienteServiceImpl implements ClienteService {
 		return s;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void importarLogradouro() {
+		List<Object[]> ids = entityManager.createQuery("select c.id, c.cliente.id from LogradouroCliente c")
+				.getResultList();
+		LogradouroCliente lc = null;
+		List<Object[]> logs = null;
+
+		for (Object[] o : ids) {
+			logs = entityManager
+					.createQuery(
+							"select l.endereco.cep, l.endereco.descricao, l.numero, l.complemento, l.endereco.bairro.descricao, l.endereco.cidade.descricao, l.endereco.cidade.uf, l.endereco.cidade.pais.descricao, l.codificado, l.tipoLogradouro from Logradouro l where l.id =:idlog ",
+							Object[].class).setParameter("idlog", o[0]).getResultList();
+
+			for (Object[] log : logs) {
+				lc = new LogradouroCliente();
+				lc.setId((Integer) o[0]);
+				lc.setCliente(new Cliente((Integer) o[1]));
+				lc.setCep((String) log[0]);
+				lc.setEndereco((String) log[1]);
+				lc.setNumero((String) log[2]);
+				lc.setComplemento((String) log[3]);
+				lc.setBairro((String) log[4]);
+				lc.setCidade((String) log[5]);
+				lc.setUf((String) log[6]);
+				lc.setPais((String) log[7]);
+				lc.setCodificado((boolean) log[8]);
+				lc.setTipoLogradouro((TipoLogradouro) log[9]);
+
+				entityManager
+						.createNativeQuery(
+								"update vendas.tb_logradouro_cliente set cep=:cep, endereco=:endereco, numero=:numero, complemento=:complemento, bairro=:bairro, cidade=:cidade, uf=:uf, pais=:pais, codificado=:codificado, id_tipo_logradouro=:tipo where id=:id")
+						.setParameter("cep", log[0]).setParameter("endereco", log[1]).setParameter("numero", log[2])
+						.setParameter("complemento", log[3]).setParameter("bairro", log[4])
+						.setParameter("cidade", log[5]).setParameter("uf", log[6]).setParameter("pais", log[7])
+						.setParameter("codificado", log[8]).setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo())
+						.setParameter("id", o[0]).executeUpdate();
+			}
+		}
+	}
+
 	@PostConstruct
 	public void init() {
 		clienteDAO = new ClienteDAO(entityManager);
@@ -241,6 +283,8 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		List<LogradouroCliente> lLogr = cliente.getListaLogradouro();
+		lLogr = logradouroService.inserir(lLogr);
+
 		// Vamos verificar os ceps ja existentes pois vamos inserir na tabela de
 		// logradouro apenas os enderecos que nao existirem no sistema. Devemos
 		// fazer esse filtro pois o usuario podera efetuar alteracoes no
@@ -251,11 +295,10 @@ public class ClienteServiceImpl implements ClienteService {
 		List<String> lCep = enderecamentoService.pesquisarCEPExistente(lLogr.stream().map(l -> l.getCep())
 				.collect(Collectors.toList()));
 
-		if (lCep.isEmpty()) {
-			return;
+		if (!lCep.isEmpty()) {
+			lLogr = lLogr.stream().filter(l -> !lCep.contains(l.getCep())).collect(Collectors.toList());
 		}
 
-		lLogr = lLogr.stream().filter(l -> !lCep.contains(l.getCep())).collect(Collectors.toList());
 		for (LogradouroCliente l : lLogr) {
 			enderecamentoService.inserir(l.gerarEndereco());
 		}
@@ -663,10 +706,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException {
-
-		List<LogradouroCliente> lLog = cliente.getListaLogradouro();
-		logradouroService.validarListaLogradouroPreenchida(lLog == null || lLog.isEmpty() ? null : lLog.stream()
-				.map(l -> l.getTipoLogradouro()).collect(Collectors.toList()));
+		logradouroService.validarListaLogradouroPreenchida(cliente.getListaLogradouro());
 	}
 
 	private void validarRevendedorExistente(Cliente cliente) throws BusinessException {

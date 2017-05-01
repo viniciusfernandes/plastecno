@@ -5,13 +5,15 @@ import java.util.List;
 
 import javax.ejb.Local;
 
-import br.com.plastecno.service.constante.TipoLogradouro;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.Logradouravel;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface LogradouroService {
-	<T extends Logradouro> List<T> inserir(List<T> listaLogradouro) throws BusinessException;
+	<T extends Logradouravel> List<T> inserir(List<T> listaLogradouro) throws BusinessException;
+
+	LogradouroEndereco inserir(LogradouroEndereco logradouro) throws BusinessException;
 
 	/**
 	 * Metodo criado para recuperaros ids do pais, estado, cidade e bairro e no
@@ -22,11 +24,11 @@ public interface LogradouroService {
 	 * @return
 	 * @throws BusinessException
 	 */
-	<T extends Logradouro> T inserir(T logradouro) throws BusinessException;
+	<T extends Logradouravel> T inserir(T logradouro) throws BusinessException;
 
-	List<? extends Logradouro> pesquisar(Integer id, Class<? extends Logradouro> classe);
+	List<? extends LogradouroEndereco> pesquisar(Integer id, Class<? extends LogradouroEndereco> classe);
 
-	<T extends Logradouro> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
+	<T extends LogradouroEndereco> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
 
 	String pesquisarCodigoIBGEByCEP(String cep);
 
@@ -48,7 +50,7 @@ public interface LogradouroService {
 	 * @param classe
 	 *            tipo de logradouro que sera removido
 	 */
-	<T extends Logradouro> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
+	<T extends LogradouroEndereco> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
 
-	void validarListaLogradouroPreenchida(List<TipoLogradouro> listaTipo) throws BusinessException;
+	void validarListaLogradouroPreenchida(List<? extends Logradouravel> listaLogradouro) throws BusinessException;
 }

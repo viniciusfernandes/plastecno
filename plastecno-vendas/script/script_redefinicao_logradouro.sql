@@ -18,6 +18,7 @@ CREATE TABLE vendas.tb_logradouro_pedido (
   endereco character varying(500),
   numero character varying(20),
   complemento character varying(250),
+  bairro character varying(50),
   cidade character varying(50),
   uf character varying(2),
   pais character varying(50),

@@ -101,9 +101,7 @@ public class EnderecamentoServiceImpl implements EnderecamentoService {
 
 	@Override
 	public Endereco pesquisarByCep(String cep) {
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select e from Endereco e where e.cep =:cep ").setParameter("cep", cep),
-				Endereco.class, null);
+		return enderecoDAO.pesquisarByCep(cep);
 	}
 
 	@Override

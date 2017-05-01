@@ -67,7 +67,7 @@ public class Representada implements Serializable {
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da representada")
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "id_logradouro")
-	private Logradouro logradouro;
+	private LogradouroEndereco logradouro;
 
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Nome fantasia")
 	@Column(name = "nome_fantasia")
@@ -164,7 +164,7 @@ public class Representada implements Serializable {
 		return listaMaterial;
 	}
 
-	public Logradouro getLogradouro() {
+	public LogradouroEndereco getLogradouro() {
 		return logradouro;
 	}
 
@@ -255,7 +255,7 @@ public class Representada implements Serializable {
 		this.listaMaterial = listaMaterial;
 	}
 
-	public void setLogradouro(Logradouro logradouro) {
+	public void setLogradouro(LogradouroEndereco logradouro) {
 		this.logradouro = logradouro;
 	}
 

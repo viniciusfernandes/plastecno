@@ -27,7 +27,7 @@ import br.com.plastecno.util.StringUtils;
 @Table(name = "tb_logradouro", schema = "vendas")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @InformacaoValidavel
-public class Logradouro implements Serializable, Cloneable {
+public class LogradouroEndereco extends Logradouravel  implements Serializable, Cloneable {
 	/**
 	 * 
 	 */
@@ -58,11 +58,11 @@ public class Logradouro implements Serializable, Cloneable {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo do Logradouro")
 	private TipoLogradouro tipoLogradouro;
 
-	public Logradouro() {
+	public LogradouroEndereco() {
 		this(new Endereco());
 	}
 
-	public Logradouro(Endereco endereco) {
+	public LogradouroEndereco(Endereco endereco) {
 		this.endereco = endereco;
 	}
 
@@ -75,13 +75,13 @@ public class Logradouro implements Serializable, Cloneable {
 	}
 
 	@Override
-	public Logradouro clone() throws CloneNotSupportedException {
-		return (Logradouro) super.clone();
+	public LogradouroEndereco clone() throws CloneNotSupportedException {
+		return (LogradouroEndereco) super.clone();
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof Logradouro && this.id != null && this.id.equals(((Logradouro) o).id);
+		return o instanceof LogradouroEndereco && this.id != null && this.id.equals(((LogradouroEndereco) o).id);
 	}
 
 	public String getBairro() {
@@ -221,4 +221,5 @@ public class Logradouro implements Serializable, Cloneable {
 	public void setUf(String uf) {
 		this.endereco.getCidade().setUf(uf);
 	}
+
 }

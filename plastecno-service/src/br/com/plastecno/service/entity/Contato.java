@@ -71,7 +71,7 @@ public class Contato implements Serializable {
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro do contato")
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "id_logradouro")
-	private Logradouro logradouro;
+	private LogradouroEndereco logradouro;
 
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Nome do contato")
 	private String nome;
@@ -259,7 +259,7 @@ public class Contato implements Serializable {
 		return id;
 	}
 
-	public Logradouro getLogradouro() {
+	public LogradouroEndereco getLogradouro() {
 		return logradouro;
 	}
 
@@ -363,7 +363,7 @@ public class Contato implements Serializable {
 		this.id = id;
 	}
 
-	public void setLogradouro(Logradouro logradouro) {
+	public void setLogradouro(LogradouroEndereco logradouro) {
 		this.logradouro = logradouro;
 	}
 

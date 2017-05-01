@@ -20,7 +20,8 @@ import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.LogradouroDAO;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.Logradouravel;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
@@ -40,7 +41,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 	}
 
 	@Override
-	public <T extends Logradouro> List<T> inserir(List<T> listaLogradouro) throws BusinessException {
+	public <T extends Logradouravel> List<T> inserir(List<T> listaLogradouro) throws BusinessException {
 		if (listaLogradouro == null) {
 			return null;
 		}
@@ -51,9 +52,24 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 		List<T> lista = new ArrayList<T>();
 		for (T logradouro : listaLogradouro) {
-			lista.add(this.inserir(logradouro));
+			lista.add(inserir(logradouro));
 		}
 		return lista;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public LogradouroEndereco inserir(LogradouroEndereco logradouro) throws BusinessException {
+		if (logradouro != null) {
+
+			/*
+			 * Aqui vamos configuirar o endereco, pois o servico de inclusao de
+			 * enderecos recuperar os IDS do bairro, cidade e pais.
+			 */
+			logradouro.addEndereco(enderecamentoService.inserir(logradouro.recuperarEndereco()));
+			return (LogradouroEndereco) logradouroDAO.alterar(logradouro);
+		}
+		return null;
 	}
 
 	/*
@@ -64,14 +80,9 @@ public class LogradouroServiceImpl implements LogradouroService {
 	 * .entity.Logradouro)
 	 */
 	@Override
-	public <T extends Logradouro> T inserir(T logradouro) throws BusinessException {
+	public <T extends Logradouravel> T inserir(T logradouro) throws BusinessException {
 		if (logradouro != null) {
 
-			/*
-			 * Aqui vamos configuirar o endereco, pois o servico de inclusao de
-			 * enderecos recuperar os IDS do bairro, cidade e pais.
-			 */
-			logradouro.addEndereco(enderecamentoService.inserir(logradouro.recuperarEndereco()));
 			return (T) logradouroDAO.alterar(logradouro);
 		}
 		return null;
@@ -80,7 +91,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<? extends Logradouro> pesquisar(Integer id, Class<? extends Logradouro> classe) {
+	public List<? extends LogradouroEndereco> pesquisar(Integer id, Class<? extends LogradouroEndereco> classe) {
 		String nomeTipoLogradouro = classe.getSimpleName();
 		StringBuilder select = new StringBuilder();
 		select.append("select c from ").append(nomeTipoLogradouro).append(" c inner join c.")
@@ -92,7 +103,8 @@ public class LogradouroServiceImpl implements LogradouroService {
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public <T extends Logradouro> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe) {
+	public <T extends LogradouroEndereco> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro,
+			Class<T> classe) {
 		String nomeTipoLogradouro = classe.getSimpleName();
 		StringBuilder select = new StringBuilder();
 		select.append("select l from ").append(nomeTipoLogradouro).append(" l where l.")
@@ -141,9 +153,11 @@ public class LogradouroServiceImpl implements LogradouroService {
 	 * Integer, java.util.Collection, java.lang.Class)
 	 */
 	@Override
-	public <T extends Logradouro> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe) {
-		List<? extends Logradouro> listaLogradouroCadastrado = this.pesquisarAusentes(id, listaLogradouro, classe);
-		for (Logradouro logradouro : listaLogradouroCadastrado) {
+	public <T extends LogradouroEndereco> void removerAusentes(Integer id, Collection<T> listaLogradouro,
+			Class<T> classe) {
+		List<? extends LogradouroEndereco> listaLogradouroCadastrado = this.pesquisarAusentes(id, listaLogradouro,
+				classe);
+		for (LogradouroEndereco logradouro : listaLogradouroCadastrado) {
 			this.entityManager.remove(logradouro);
 		}
 
@@ -151,15 +165,15 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void validarListaLogradouroPreenchida(List<TipoLogradouro> listaTipo) throws BusinessException {
+	public void validarListaLogradouroPreenchida(List<? extends Logradouravel> listaLogradouro) throws BusinessException {
 		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
 		lLogAusente.add(TipoLogradouro.COBRANCA);
 		lLogAusente.add(TipoLogradouro.ENTREGA);
 		lLogAusente.add(TipoLogradouro.FATURAMENTO);
 
-		if (listaTipo != null && !listaTipo.isEmpty()) {
-			listaTipo.forEach(t -> {
-				lLogAusente.remove(t);
+		if (listaLogradouro != null && !listaLogradouro.isEmpty()) {
+			listaLogradouro.forEach(t -> {
+				lLogAusente.remove(t.getTipoLogradouro());
 			});
 		}
 

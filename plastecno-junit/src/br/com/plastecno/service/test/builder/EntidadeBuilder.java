@@ -3,12 +3,12 @@ package br.com.plastecno.service.test.builder;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoEntrega;
+import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.constante.TipoVenda;
@@ -20,8 +20,9 @@ import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.Endereco;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.Logradouravel;
 import br.com.plastecno.service.entity.LogradouroCliente;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pais;
 import br.com.plastecno.service.entity.Pedido;
@@ -83,6 +84,12 @@ public class EntidadeBuilder {
 		cliente.setRazaoSocial("Revendedor Plastico LTDA");
 		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
 		return cliente;
+	}
+
+	public Cliente buildClienteVendedor() {
+		Cliente c = buildCliente();
+		c.setVendedor(buildVendedor());
+		return c;
 	}
 
 	public Endereco buildEndereco() {
@@ -178,17 +185,28 @@ public class EntidadeBuilder {
 		return l;
 	}
 
-	public Logradouro buildLogradouro(TipoLogradouro tipoLogradouro) {
-		Logradouro logradouro = new Logradouro(buildEndereco());
+	public LogradouroEndereco buildLogradouroEndereco(TipoLogradouro tipoLogradouro) {
+		LogradouroEndereco logradouro = new LogradouroEndereco(buildEndereco());
 		logradouro.setTipoLogradouro(tipoLogradouro);
 		return logradouro;
 	}
+	
+	private  Logradouravel buildLogradouravel(Logradouravel l, TipoLogradouro tipo){
+		l.setCep("09910456");
+		l.setBairro("Centro");
+		l.setCidade("Diadema");
+		l.setCodificado(true);
+		l.setComplemento("Fundos");
+		l.setPais("Brasil");
+		l.setUf("SP");
+		l.setEndereco("Rua Avare");
+		l.setNumero("223");
+		l.setTipoLogradouro(tipo);
+		return l;
+	}
 
 	public LogradouroCliente buildLogradouroCliente(TipoLogradouro tipoLogradouro) {
-		LogradouroCliente logradouro = new LogradouroCliente(buildEndereco());
-		logradouro.setNumero("223");
-		logradouro.setTipoLogradouro(tipoLogradouro);
-		return logradouro;
+		return (LogradouroCliente) buildLogradouravel( new LogradouroCliente(), tipoLogradouro);
 	}
 
 	public Material buildMaterial() {
@@ -251,7 +269,7 @@ public class EntidadeBuilder {
 		representada.setCnpj("77336617000107");
 		representada.setInscricaoEstadual("123456789");
 
-		Logradouro l = buildLogradouro(TipoLogradouro.FATURAMENTO);
+		LogradouroEndereco l = buildLogradouroEndereco(TipoLogradouro.FATURAMENTO);
 		l.setCep("09910345");
 		l.setEndereco("Rua Parnamirim");
 		l.setNumero("432");
@@ -285,7 +303,7 @@ public class EntidadeBuilder {
 		t.setAtivo(true);
 		t.setCnpj("03233998000162");
 		t.setInscricaoEstadual("1234567");
-		t.setLogradouro(buildLogradouro(TipoLogradouro.FATURAMENTO));
+		t.setLogradouro(buildLogradouroEndereco(TipoLogradouro.FATURAMENTO));
 		t.setNomeFantasia("Transport teste");
 		t.setRazaoSocial("Transport teste LTDA");
 		return t;

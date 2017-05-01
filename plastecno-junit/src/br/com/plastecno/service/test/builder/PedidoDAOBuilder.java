@@ -14,7 +14,7 @@ import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
@@ -156,11 +156,11 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			List<Logradouro> pesquisarLogradouro(Integer idPedido) {
-				List<Logradouro> lista = new ArrayList<Logradouro>();
-				lista.add(ENTIDADE_BUILDER.buildLogradouro(TipoLogradouro.COBRANCA));
-				lista.add(ENTIDADE_BUILDER.buildLogradouro(TipoLogradouro.ENTREGA));
-				lista.add(ENTIDADE_BUILDER.buildLogradouro(TipoLogradouro.FATURAMENTO));
+			List<LogradouroEndereco> pesquisarLogradouro(Integer idPedido) {
+				List<LogradouroEndereco> lista = new ArrayList<LogradouroEndereco>();
+				lista.add(ENTIDADE_BUILDER.buildLogradouroEndereco(TipoLogradouro.COBRANCA));
+				lista.add(ENTIDADE_BUILDER.buildLogradouroEndereco(TipoLogradouro.ENTREGA));
+				lista.add(ENTIDADE_BUILDER.buildLogradouroEndereco(TipoLogradouro.FATURAMENTO));
 
 				return lista;
 			}

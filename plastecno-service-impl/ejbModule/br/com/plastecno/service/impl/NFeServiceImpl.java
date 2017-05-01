@@ -39,7 +39,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.dao.NFeItemFracionadoDAO;
 import br.com.plastecno.service.dao.NFePedidoDAO;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.NFePedido;
@@ -171,7 +171,7 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setRegimeTributario(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.REGIME_TRIBUTACAO));
 		iEmit.setCNAEFiscal(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.CNAE));
 
-		Logradouro logradouro = representadaService.pesquisarLogradorouro(emitente.getId());
+		LogradouroEndereco logradouro = representadaService.pesquisarLogradorouro(emitente.getId());
 		EnderecoNFe endEmit = gerarEnderecoNFe(logradouro, emitente.getTelefone());
 
 		iEmit.setEnderecoEmitenteNFe(endEmit);
@@ -604,7 +604,7 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public EnderecoNFe gerarEnderecoNFe(Logradouro logradouro, String telefone) {
+	public EnderecoNFe gerarEnderecoNFe(LogradouroEndereco logradouro, String telefone) {
 		if (logradouro == null) {
 			return null;
 		}

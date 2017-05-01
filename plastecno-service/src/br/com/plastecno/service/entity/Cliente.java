@@ -93,7 +93,7 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de contato do cliente")
 	private Set<ContatoCliente> listaContato;
 
-	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de logradouro do cliente")
 	private List<LogradouroCliente> listaLogradouro;
 
@@ -136,6 +136,10 @@ public class Cliente implements Serializable {
 		addContato(contatoCliente);
 		this.nomeVendedor = nomeVendedor + " " + sobrenomeVendedor;
 		this.razaoSocial = razaoSocial;
+	}
+
+	public Cliente(Integer id) {
+		this.id = id;
 	}
 
 	/*

@@ -14,7 +14,7 @@ import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.entity.ComentarioRepresentada;
 import br.com.plastecno.service.entity.ContatoRepresentada;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.util.NumeroUtils;
@@ -72,7 +72,7 @@ public class RepresentadaController extends AbstractController {
     }
 
     @Post("representada/inclusao")
-    public void inserir(Representada representada, Logradouro logradouro, List<ContatoRepresentada> listaContato) {
+    public void inserir(Representada representada, LogradouroEndereco logradouro, List<ContatoRepresentada> listaContato) {
         try {
 
             if (hasAtributo(logradouro)) {

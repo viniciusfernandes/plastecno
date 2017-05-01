@@ -1,6 +1,8 @@
 package br.com.plastecno.service.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +14,7 @@ import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.Pedido;
@@ -68,7 +70,7 @@ public class NFeServiceTest extends AbstractTest {
 	private NFe gerarNFe(Integer idPedido, boolean apenasItensRestantes) {
 		Cliente cli = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
 		Transportadora transPed = pedidoService.pesquisarTransportadoraByIdPedido(idPedido);
-		Logradouro endFaturamento = cli.getLogradouroFaturamento();
+		LogradouroCliente endFaturamento = cli.getLogradouroFaturamento();
 
 		List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataDataAmericanaByIdPedido(idPedido);
 

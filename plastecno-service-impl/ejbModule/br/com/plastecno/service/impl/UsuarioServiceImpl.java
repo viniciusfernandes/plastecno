@@ -19,7 +19,7 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.ContatoUsuario;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -283,13 +283,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
-	public Logradouro pesquisarLogradouro(Integer id) {
+	public LogradouroEndereco pesquisarLogradouro(Integer id) {
 		StringBuilder select = new StringBuilder("select u.logradouro from Usuario u  ");
 		select.append(" INNER JOIN u.logradouro where u.id = :id ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("id", id);
-		return QueryUtil.gerarRegistroUnico(query, Logradouro.class, null);
+		return QueryUtil.gerarRegistroUnico(query, LogradouroEndereco.class, null);
 	}
 
 	@Override

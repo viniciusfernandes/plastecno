@@ -70,9 +70,11 @@ insert into vendas.tb_finalidade_pedido(id, descricao) values ('SIMPLES_REMESSA'
 insert into vendas.tb_finalidade_pedido(id, descricao) values ('OUTRA_ENTRADA', 'OUTRA ENTRADA');
 insert into vendas.tb_finalidade_pedido(id, descricao) values ('PRIMEIRA_NOTA_TRIANGULAR', 'PRIMEIRA NOTA TRIANGULAR');
 
--------------------
 ALTER TABLE vendas.tb_nfe_pedido add valor numeric(10,2) ;
 ALTER TABLE vendas.tb_nfe_pedido add valor_icms numeric(10,2) ;
 ALTER TABLE vendas.tb_nfe_pedido add data_emissao date ;
 ALTER TABLE vendas.tb_nfe_pedido add nome_cliente varchar(250) ;
+
+-----------------------------
+ALTER TABLE vendas.tb_pedido add valor_frete numeric(10,2) ;
 

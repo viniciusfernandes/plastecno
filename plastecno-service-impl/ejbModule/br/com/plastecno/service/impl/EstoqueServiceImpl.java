@@ -35,7 +35,7 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
 import br.com.plastecno.service.impl.anotation.TODO;
-import br.com.plastecno.service.impl.calculo.CalculadoraVolume;
+import br.com.plastecno.service.impl.calculo.CalculadoraItem;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
@@ -384,7 +384,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		itemEstoque.configurarMedidaInterna();
 
-		CalculadoraVolume.validarVolume(itemEstoque);
+		CalculadoraItem.validarVolume(itemEstoque);
 
 		// Verificando se existe item equivalente no estoque, caso nao exista
 		// vamos criar um novo.

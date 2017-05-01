@@ -2,12 +2,12 @@ package br.com.plastecno.service.impl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -96,7 +96,7 @@ public class ClienteServiceImpl implements ClienteService {
 		ContatoCliente co = null;
 		Set<Integer> idList = new HashSet<Integer>();
 		List<Cliente> lCli = new ArrayList<Cliente>();
-		
+
 		for (Object[] o : resultado) {
 			if (o[0] == null || idList.contains(o[0])) {
 				continue;
@@ -236,10 +236,28 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	private void inserirEndereco(Cliente cliente) throws BusinessException {
-		if (cliente.isListaLogradouroPreenchida()) {
-			for (LogradouroCliente logradouro : cliente.getListaLogradouro()) {
-				logradouro.addEndereco(this.enderecamentoService.inserir(logradouro.recuperarEndereco()));
-			}
+		if (!cliente.isListaLogradouroPreenchida()) {
+			return;
+		}
+
+		List<LogradouroCliente> lLogr = cliente.getListaLogradouro();
+		// Vamos verificar os ceps ja existentes pois vamos inserir na tabela de
+		// logradouro apenas os enderecos que nao existirem no sistema. Devemos
+		// fazer esse filtro pois o usuario podera efetuar alteracoes no
+		// endereco do cliente sem que reflita na tabela de logradouro, por
+		// exemplo: atualizar o nome de rua de um determinado cep. A tabela de
+		// logradouro eh utilizada apenas para consultar os ceps quando o
+		// usuario efetuar uma pesquisa no campo de ceps.
+		List<String> lCep = enderecamentoService.pesquisarCEPExistente(lLogr.stream().map(l -> l.getCep())
+				.collect(Collectors.toList()));
+
+		if (lCep.isEmpty()) {
+			return;
+		}
+
+		lLogr = lLogr.stream().filter(l -> !lCep.contains(l.getCep())).collect(Collectors.toList());
+		for (LogradouroCliente l : lLogr) {
+			enderecamentoService.inserir(l.gerarEndereco());
 		}
 	}
 
@@ -537,7 +555,9 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public LogradouroCliente pesquisarLogradouroById(Integer idLogradouro) {
-		return this.logradouroService.pesquisarById(idLogradouro, LogradouroCliente.class);
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery("select c from LogradouroCliente c where c.id = :idLogradouro")
+						.setParameter("idLogradouro", idLogradouro), LogradouroCliente.class, null);
 	}
 
 	@Override
@@ -621,16 +641,6 @@ public class ClienteServiceImpl implements ClienteService {
 		this.entityManager.merge(logradouroCliente);
 	}
 
-	@Override
-	public void removerLogradourosAusentes(Integer idCliente, Collection<LogradouroCliente> listaLogradouro) {
-		final List<LogradouroCliente> listaLogradouroCliente = logradouroService.pesquisarAusentes(idCliente,
-				listaLogradouro, LogradouroCliente.class);
-		for (LogradouroCliente logradouroCliente : listaLogradouroCliente) {
-			logradouroCliente.setCancelado(true);
-			this.entityManager.merge(logradouroCliente);
-		}
-	}
-
 	private void validarDocumentosPreenchidos(Cliente cliente) throws InformacaoInvalidaException {
 
 		if (this.isEmailExistente(cliente.getId(), cliente.getEmail())) {
@@ -653,7 +663,25 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException {
-		logradouroService.validarListaLogradouroPreenchida(cliente.getListaLogradouro());
+		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
+		lLogAusente.add(TipoLogradouro.COBRANCA);
+		lLogAusente.add(TipoLogradouro.ENTREGA);
+		lLogAusente.add(TipoLogradouro.FATURAMENTO);
+
+		List<LogradouroCliente> lLog = cliente.getListaLogradouro();
+		if (lLog != null && !lLog.isEmpty()) {
+			lLog.stream().map(l -> l.getTipoLogradouro()).forEach(t -> {
+				lLogAusente.remove(t);
+			});
+		}
+
+		if (lLogAusente.isEmpty()) {
+			return;
+		}
+
+		List<String> listaMensagem = new ArrayList<String>();
+		lLogAusente.forEach(t -> listaMensagem.add("É obrigatorio logradouro do tipo " + t));
+		throw new InformacaoInvalidaException(listaMensagem);
 	}
 
 	private void validarRevendedorExistente(Cliente cliente) throws BusinessException {

@@ -170,6 +170,7 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 				if (idPedido == null) {
 					return null;
 				}
+
 				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
 				if (l == null || l.isEmpty()) {
 					return null;

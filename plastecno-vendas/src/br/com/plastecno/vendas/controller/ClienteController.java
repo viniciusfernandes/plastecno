@@ -182,7 +182,7 @@ public class ClienteController extends AbstractController {
             addAtributo("ultimoContato", formatarData(cliente.getDataUltimoContato()));
         }
 
-        this.formatarDocumento(cliente);
+        //formatarDocumento(cliente);
         addAtributo("cliente", cliente);
         addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade().getId()
                 : "");

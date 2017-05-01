@@ -9,19 +9,52 @@ import br.com.plastecno.service.entity.Item;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.impl.calculo.exception.VolumeInvalidoException;
 
-public class CalculadoraVolume {
+public class CalculadoraItem {
+	private static Map<FormaMaterial, AlgoritmoCalculo> mapaAlgVol;
+	private static final double RAZAO_GRAMAS_PARA_KILOS = 0.001;
+	private static final double RAZAO_MILIMETRO_CUBICO_PARA_CENTIMETRO_CUBICO = 0.001;
 
-	public static double calcular(ItemPedido itemPedido) throws AlgoritmoCalculoException {
+	static {
+		mapaAlgVol = new HashMap<FormaMaterial, AlgoritmoCalculo>();
+		mapaAlgVol.put(FormaMaterial.CH, new AlgoritmoCalculoVolumeCH());
+		mapaAlgVol.put(FormaMaterial.BQ, new AlgoritmoCalculoVolumeBQ());
+		mapaAlgVol.put(FormaMaterial.BR, new AlgoritmoCalculoVolumeBR());
+		mapaAlgVol.put(FormaMaterial.TB, new AlgoritmoCalculoVolumeTB());
+		// Estamos usando a aproximacao de uma barra sextavada por um tubo.
+		// Recomendacao do cliente.
+		mapaAlgVol.put(FormaMaterial.BS, new AlgoritmoCalculoVolumeBR());
+	}
 
-		CalculadoraVolume.validarVolume(itemPedido);
+	public static Double calcularKiloUnidade(ItemPedido itemPedido) throws AlgoritmoCalculoException {
+		/*
+		 * Transformando o volume em milimentros cubicos para centimetros
+		 * cubicos e multiplicando pelo valor do peso especifico teremos o peso
+		 * em "gramas". Posteriormente multiplicamos por 1000 para recuperarmos
+		 * o peso em kilos.
+		 */
+		return CalculadoraItem.calcularVolume(itemPedido) * RAZAO_MILIMETRO_CUBICO_PARA_CENTIMETRO_CUBICO
+				* itemPedido.getMaterial().getPesoEspecifico() * RAZAO_GRAMAS_PARA_KILOS;
 
-		AlgoritmoCalculo algoritmoCalculo = mapaAlgoritmo.get(itemPedido.getFormaMaterial());
+	}
+
+	public static Double calcularKilo(ItemPedido itemPedido) throws AlgoritmoCalculoException {
+		return (itemPedido.getQuantidade() == null ? 0 : itemPedido.getQuantidade())
+				* CalculadoraItem.calcularVolume(itemPedido) * RAZAO_MILIMETRO_CUBICO_PARA_CENTIMETRO_CUBICO
+				* itemPedido.getMaterial().getPesoEspecifico() * RAZAO_GRAMAS_PARA_KILOS;
+
+	}
+
+	public static double calcularVolume(ItemPedido itemPedido) throws AlgoritmoCalculoException {
+
+		CalculadoraItem.validarVolume(itemPedido);
+
+		AlgoritmoCalculo algoritmoCalculo = mapaAlgVol.get(itemPedido.getFormaMaterial());
 		if (algoritmoCalculo == null) {
 			throw new AlgoritmoCalculoException("Não existe algoritmo para o calculo de volume da forma de material "
 					+ itemPedido.getFormaMaterial());
 		}
 		return algoritmoCalculo.calcular(itemPedido);
-	}
+	};
 
 	private static void validarFormaMaterial(Item item) throws VolumeInvalidoException {
 
@@ -64,7 +97,7 @@ public class CalculadoraVolume {
 				|| (comprimento != null && comprimento <= 0)) {
 			throw new VolumeInvalidoException("Os valores das medidas devem ser positivos");
 		}
-	};
+	}
 
 	private static void validarPeca(Item itemPedido) throws VolumeInvalidoException {
 		final Double medidaExterna = itemPedido.getMedidaExterna();
@@ -87,19 +120,6 @@ public class CalculadoraVolume {
 		validarFormaMaterial(item);
 	}
 
-	private static Map<FormaMaterial, AlgoritmoCalculo> mapaAlgoritmo;
-
-	static {
-		mapaAlgoritmo = new HashMap<FormaMaterial, AlgoritmoCalculo>();
-		mapaAlgoritmo.put(FormaMaterial.CH, new AlgoritmoCalculoVolumeCH());
-		mapaAlgoritmo.put(FormaMaterial.BQ, new AlgoritmoCalculoVolumeBQ());
-		mapaAlgoritmo.put(FormaMaterial.BR, new AlgoritmoCalculoVolumeBR());
-		mapaAlgoritmo.put(FormaMaterial.TB, new AlgoritmoCalculoVolumeTB());
-		// Estamos usando a aproximacao de uma barra sextavada por um tubo.
-		// Recomendacao do cliente.
-		mapaAlgoritmo.put(FormaMaterial.BS, new AlgoritmoCalculoVolumeBR());
-	}
-
-	private CalculadoraVolume() {
+	private CalculadoraItem() {
 	}
 }

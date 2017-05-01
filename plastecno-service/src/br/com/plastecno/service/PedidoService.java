@@ -250,4 +250,6 @@ public interface PedidoService {
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
 
+	void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException;
+
 }

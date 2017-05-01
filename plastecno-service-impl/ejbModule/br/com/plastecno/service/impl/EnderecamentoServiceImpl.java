@@ -1,9 +1,12 @@
 package br.com.plastecno.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -21,9 +24,9 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @Stateless
 public class EnderecamentoServiceImpl implements EnderecamentoService {
 
+	private EnderecoDAO enderecoDAO;
 	@PersistenceContext(unitName = "plastecno")
 	private EntityManager entityManager;
-	private EnderecoDAO enderecoDAO;
 
 	@PostConstruct
 	public void init() {
@@ -35,8 +38,9 @@ public class EnderecamentoServiceImpl implements EnderecamentoService {
 		ValidadorInformacao.validar(endereco);
 
 		/*
-		 * Vamos sempre atualizar o endereco enviado pois o cliente pode indicar que
-		 * o nome da rua foi alterado e o sistema nao reflete essa alteracao.
+		 * Vamos sempre atualizar o endereco enviado pois o cliente pode indicar
+		 * que o nome da rua foi alterado e o sistema nao reflete essa
+		 * alteracao.
 		 */
 		Bairro bairro = endereco.getBairro();
 		Cidade cidade = bairro.getCidade();
@@ -46,11 +50,11 @@ public class EnderecamentoServiceImpl implements EnderecamentoService {
 		cidade.setId(enderecoDAO.pesquisarIdCidadeByDescricao(cidade.getDescricao(), pais.getId()));
 		bairro.setId(enderecoDAO.pesquisarIdBairroByDescricao(bairro.getDescricao(), cidade.getId()));
 		/*
-		 * No caso em que pais, cidade ou bairro existam, devemos fazer um merge,
-		 * pois do contrario teremos um deatched obejct
+		 * No caso em que pais, cidade ou bairro existam, devemos fazer um
+		 * merge, pois do contrario teremos um deatched obejct
 		 */
 		endereco = enderecoDAO.alterar(endereco);
-		this.inserirUF(cidade.getUf(), endereco.getCidade().getPais());
+		inserirUF(cidade.getUf(), endereco.getCidade().getPais());
 		return endereco;
 	}
 
@@ -64,15 +68,16 @@ public class EnderecamentoServiceImpl implements EnderecamentoService {
 	@Override
 	public boolean isCepExitente(String cep) {
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select e.cep from Endereco e where e.cep =:cep ").setParameter("cep", cep),
-				Boolean.class, false, true);
+				this.entityManager.createQuery("select e.cep from Endereco e where e.cep =:cep ").setParameter("cep",
+						cep), Boolean.class, false, true);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * br.com.plastecno.service.CEPService#pesquisarBairroByCep(java.lang.String)
+	 * br.com.plastecno.service.CEPService#pesquisarBairroByCep(java.lang.String
+	 * )
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -96,8 +101,18 @@ public class EnderecamentoServiceImpl implements EnderecamentoService {
 
 	@Override
 	public Endereco pesquisarByCep(String cep) {
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery("select e from Endereco e where e.cep =:cep ")
-				.setParameter("cep", cep), Endereco.class, null);
+		return QueryUtil.gerarRegistroUnico(
+				this.entityManager.createQuery("select e from Endereco e where e.cep =:cep ").setParameter("cep", cep),
+				Endereco.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<String> pesquisarCEPExistente(List<String> listaCep) {
+		if (listaCep == null || listaCep.isEmpty()) {
+			return new ArrayList<String>();
+		}
+		return enderecoDAO.pesquisarCEPExistente(listaCep);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -25,6 +25,12 @@ public class EnderecoDAO extends GenericDAO<Endereco> {
 
 	}
 
+	public List<String> pesquisarCEPExistente(List<String> listaCep) {
+		return entityManager.createQuery("select e.cep from Endereco e where e.cep in(:listaCep)", String.class)
+				.setParameter("listaCep", listaCep).getResultList();
+
+	}
+
 	@SuppressWarnings("unchecked")
 	public Integer pesquisarIdBairroByDescricao(String descricao, Integer idCidade) {
 		List<Integer> lista = this.entityManager

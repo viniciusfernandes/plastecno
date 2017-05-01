@@ -25,7 +25,7 @@ import br.com.plastecno.util.StringUtils;
 
 @Entity
 @Table(name = "tb_logradouro", schema = "vendas")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @InformacaoValidavel
 public class Logradouro implements Serializable, Cloneable {
 	/**

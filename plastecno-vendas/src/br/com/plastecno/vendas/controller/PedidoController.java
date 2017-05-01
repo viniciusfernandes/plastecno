@@ -491,7 +491,7 @@ public class PedidoController extends AbstractController {
         cliente.setListaRedespacho(clienteService.pesquisarTransportadorasRedespacho(id));
 
         carregarVendedor(cliente);
-        formatarDocumento(cliente);
+        //formatarDocumento(cliente);
 
         final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar());
 

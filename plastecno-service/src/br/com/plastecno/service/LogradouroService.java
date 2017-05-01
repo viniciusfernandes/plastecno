@@ -27,8 +27,6 @@ public interface LogradouroService {
 
 	<T extends Logradouro> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
 
-	<T extends Logradouro> T pesquisarById(Integer idLogradouro, Class<T> classe);
-
 	String pesquisarCodigoIBGEByCEP(String cep);
 
 	String pesquisarCodigoIBGEByIdCidade(Integer idCidade);
@@ -50,7 +48,4 @@ public interface LogradouroService {
 	 *            tipo de logradouro que sera removido
 	 */
 	<T extends Logradouro> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
-
-	void validarListaLogradouroPreenchida(Collection<? extends Logradouro> listaLogradouro) throws BusinessException;
-
 }

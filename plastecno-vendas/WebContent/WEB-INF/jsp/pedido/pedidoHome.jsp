@@ -110,6 +110,7 @@ $(document).ready(function() {
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
 	inserirMascaraNumerica('numeroPedidoPesquisa', '9999999');
 	inserirMascaraMonetaria('precoVenda', 7);
+	inserirMascaraMonetaria('fretePedido', 7);
 	inserirMascaraNumerica('ipi', '99');
 	inserirMascaraNumerica('comissao', '99');
 	inserirMascaraNumerica('quantidade', '9999999');
@@ -345,14 +346,18 @@ $(document).ready(function() {
 			</div>
 
 			<div class="label obrigatorio">Finalidade:</div>
-			<div class="input" style="width: 80%">
-				<select id="finalidadePedido" name="pedido.finalidadePedido" style="width: 20%" >
+			<div class="input" style="width: 20%">
+				<select id="finalidadePedido" name="pedido.finalidadePedido" style="width: 100%" >
 					<option value=""></option>
 					<c:forEach var="tipo" items="${listaTipoFinalidadePedido}">
 						<option value="${tipo}" 
 							<c:if test="${tipo eq pedido.finalidadePedido}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
+			</div>
+			<div class="label">Frete (R$):</div>
+			<div class="input" style="width: 20%">
+				<input id="fretePedido" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 100%" />
 			</div>
 			<div class="label">Observação:</div>
 			<div class="input areatexto" style="width: 70%">

@@ -8,18 +8,18 @@ import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.ItemPedido;
 
 public class CalculadoraPreco {
-	private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgoritmoPreco;
+	private static final Map<TipoVenda, AlgoritmoCalculo> mapaAlgPreco;
 
 	static {
-		mapaAlgoritmoPreco = new HashMap<TipoVenda, AlgoritmoCalculo>();
-		mapaAlgoritmoPreco.put(TipoVenda.KILO, new AlgoritmoCalculoPrecoKilo());
-		mapaAlgoritmoPreco.put(TipoVenda.PECA, new AlgoritmoCalculoPrecoPeca());
+		mapaAlgPreco = new HashMap<TipoVenda, AlgoritmoCalculo>();
+		mapaAlgPreco.put(TipoVenda.KILO, new AlgoritmoCalculoPrecoKilo());
+		mapaAlgPreco.put(TipoVenda.PECA, new AlgoritmoCalculoPrecoPeca());
 	}
 
 	public static double calcular(ItemPedido itemPedido) throws AlgoritmoCalculoException {
 		validarCalculo(itemPedido);
 
-		AlgoritmoCalculo algoritmoCalculoPreco = mapaAlgoritmoPreco.get(itemPedido.getTipoVenda());
+		AlgoritmoCalculo algoritmoCalculoPreco = mapaAlgPreco.get(itemPedido.getTipoVenda());
 		if (algoritmoCalculoPreco == null) {
 			String mensagem = itemPedido.getTipoVenda() == null ? "O tipo de venda esta em branco. Selecione um tipo de venda"
 					: "Não existe algoritmo para o cálculo do valor do tipo de venda " + itemPedido.getTipoVenda();

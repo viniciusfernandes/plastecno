@@ -164,6 +164,9 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(nomeExibicao = "Redespacho do pedido")
 	private Transportadora transportadoraRedespacho;
 
+	@Column(name = "valor_frete")
+	private Double valorFrete;
+
 	@Column(name = "valor_parcela_nf")
 	private Double valorParcelaNF;
 
@@ -195,13 +198,6 @@ public class Pedido implements Serializable, Cloneable {
 		this.aliquotaComissaoRepresentada = aliquotaComissaoRepresentada;
 		this.id = id;
 		this.idVendedor = idVendedor;
-		this.finalidadePedido = tipoFinalidadePedido;
-		this.tipoPedido = tipoPedido;
-	}
-
-	// Construtor utilizado na pesquisa para carregar a finalidade do pedido
-	public Pedido(Integer id, TipoFinalidadePedido tipoFinalidadePedido, TipoPedido tipoPedido) {
-		this.id = id;
 		this.finalidadePedido = tipoFinalidadePedido;
 		this.tipoPedido = tipoPedido;
 	}
@@ -256,6 +252,13 @@ public class Pedido implements Serializable, Cloneable {
 		this.valorTotalNF = valorTotalNF;
 		this.numeroColeta = numeroColeta;
 		this.numeroVolumes = numeroVolumes;
+	}
+
+	// Construtor utilizado na pesquisa para carregar a finalidade do pedido
+	public Pedido(Integer id, TipoFinalidadePedido tipoFinalidadePedido, TipoPedido tipoPedido) {
+		this.id = id;
+		this.finalidadePedido = tipoFinalidadePedido;
+		this.tipoPedido = tipoPedido;
 	}
 
 	public Pedido(Integer id, TipoPedido tipoPedido, Date dataEntrega, Date dataEnvio, Double valorPedido,
@@ -432,6 +435,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public Transportadora getTransportadoraRedespacho() {
 		return transportadoraRedespacho;
+	}
+
+	public Double getValorFrete() {
+		return valorFrete;
 	}
 
 	public Double getValorParcelaNF() {
@@ -657,6 +664,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setTransportadoraRedespacho(Transportadora transportadoraRedespacho) {
 		this.transportadoraRedespacho = transportadoraRedespacho;
+	}
+
+	public void setValorFrete(Double valorFrete) {
+		this.valorFrete = valorFrete;
 	}
 
 	public void setValorParcelaNF(Double valorParcelaNF) {

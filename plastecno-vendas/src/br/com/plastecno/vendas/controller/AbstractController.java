@@ -206,8 +206,8 @@ public abstract class AbstractController {
     }
 
     void formatarDocumento(Cliente cliente) {
-        cliente.setCnpj(this.formatarCNPJ(cliente.getCnpj()));
-        cliente.setCpf(this.formatarCPF(cliente.getCpf()));
+        cliente.setCnpj(formatarCNPJ(cliente.getCnpj()));
+        cliente.setCpf(formatarCPF(cliente.getCpf()));
         cliente.setInscricaoEstadual(this.formatarInscricaoEstadual(cliente.getInscricaoEstadual()));
     }
 

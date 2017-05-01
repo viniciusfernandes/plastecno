@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,6 +34,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
+import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
@@ -42,6 +44,7 @@ import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
@@ -1711,6 +1714,30 @@ public class PedidoServiceImpl implements PedidoService {
 		if (exception.contemMensagem()) {
 			throw exception;
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException {
+		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
+		lLogAusente.add(TipoLogradouro.COBRANCA);
+		lLogAusente.add(TipoLogradouro.ENTREGA);
+		lLogAusente.add(TipoLogradouro.FATURAMENTO);
+
+		List<Logradouro> lLog = pedido.getListaLogradouro();
+		if (lLog != null && !lLog.isEmpty()) {
+			lLog.stream().map(l -> l.getTipoLogradouro()).forEach(t -> {
+				lLogAusente.remove(t);
+			});
+		}
+
+		if (lLogAusente.isEmpty()) {
+			return;
+		}
+
+		List<String> listaMensagem = new ArrayList<String>();
+		lLogAusente.forEach(t -> listaMensagem.add("É obrigatorio logradouro do tipo " + t));
+		throw new InformacaoInvalidaException(listaMensagem);
 	}
 
 	private void verificarMaterialAssociadoFornecedor(Integer idRepresentadaFornecedora, Set<Integer> listaIdItemPedido)

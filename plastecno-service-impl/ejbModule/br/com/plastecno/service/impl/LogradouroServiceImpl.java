@@ -3,9 +3,7 @@ package br.com.plastecno.service.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -18,12 +16,10 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
-import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.LogradouroDAO;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
-import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 
 @Stateless
 public class LogradouroServiceImpl implements LogradouroService {
@@ -114,17 +110,6 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public <T extends Logradouro> T pesquisarById(Integer idLogradouro, Class<T> classe) {
-		String nomeTipoLogradouro = classe.getSimpleName();
-		StringBuilder select = new StringBuilder();
-		select.append("select c from ").append(nomeTipoLogradouro).append(" c where c.id = :idLogradouro ");
-		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(select.toString()).setParameter("idLogradouro", idLogradouro), classe,
-				null);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public String pesquisarCodigoIBGEByCEP(String cep) {
 		if (cep == null) {
 			return null;
@@ -162,27 +147,4 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	}
 
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void validarListaLogradouroPreenchida(Collection<? extends Logradouro> listaLogradouro)
-			throws BusinessException {
-		Set<TipoLogradouro> listaTipoLogradouroNaoPreenchido = new HashSet<TipoLogradouro>();
-		listaTipoLogradouroNaoPreenchido.add(TipoLogradouro.COBRANCA);
-		listaTipoLogradouroNaoPreenchido.add(TipoLogradouro.ENTREGA);
-		listaTipoLogradouroNaoPreenchido.add(TipoLogradouro.FATURAMENTO);
-
-		if (listaLogradouro != null) {
-			for (Logradouro logradouro : listaLogradouro) {
-				listaTipoLogradouroNaoPreenchido.remove(logradouro.getTipoLogradouro());
-			}
-		}
-
-		if (!listaTipoLogradouroNaoPreenchido.isEmpty()) {
-			List<String> listaMensagem = new ArrayList<String>();
-			for (TipoLogradouro tipo : listaTipoLogradouroNaoPreenchido) {
-				listaMensagem.add("É obrigatorio logradouro do tipo " + tipo);
-			}
-			throw new InformacaoInvalidaException(listaMensagem);
-		}
-	}
 }

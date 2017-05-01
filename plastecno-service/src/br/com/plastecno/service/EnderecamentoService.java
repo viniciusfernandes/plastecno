@@ -27,5 +27,7 @@ public interface EnderecamentoService {
 
     Endereco pesquisarByCep(String cep);
 
-    List<UF> pesquisarUF();
+    List<String> pesquisarCEPExistente(List<String> listaCep);
+
+	List<UF> pesquisarUF();
 }

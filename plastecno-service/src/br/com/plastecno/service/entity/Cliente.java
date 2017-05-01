@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -321,11 +322,18 @@ public class Cliente implements Serializable {
 		return listaRedespacho;
 	}
 
-	public Logradouro getLogradouro(TipoLogradouro tipoLogradouro) {
-		return EntityUtils.getLogradouro(listaLogradouro, tipoLogradouro);
+	public LogradouroCliente getLogradouro(TipoLogradouro tipoLogradouro) {
+
+		if (listaLogradouro == null || listaLogradouro.isEmpty() || tipoLogradouro == null) {
+			return null;
+		}
+
+		List<LogradouroCliente> lista = listaLogradouro.stream()
+				.filter(l -> tipoLogradouro.equals(l.getTipoLogradouro())).collect(Collectors.toList());
+		return lista.size() > 0 ? lista.get(0) : null;
 	}
 
-	public Logradouro getLogradouroFaturamento() {
+	public LogradouroCliente getLogradouroFaturamento() {
 		return this.getLogradouro(TipoLogradouro.FATURAMENTO);
 	}
 

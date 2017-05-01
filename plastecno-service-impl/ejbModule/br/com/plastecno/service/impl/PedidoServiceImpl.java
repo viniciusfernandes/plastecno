@@ -1729,7 +1729,7 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido == null) {
 			return;
 		}
-		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
+		logradouroService.validarListaLogradouroPreenchidaXXX(pedido.getListaLogradouro());
 	}
 
 	private void verificarMaterialAssociadoFornecedor(Integer idRepresentadaFornecedora, Set<Integer> listaIdItemPedido)

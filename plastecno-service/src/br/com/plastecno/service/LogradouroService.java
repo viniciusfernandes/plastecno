@@ -5,13 +5,14 @@ import java.util.List;
 
 import javax.ejb.Local;
 
-import br.com.plastecno.service.entity.Logradouravel;
 import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroCliente;
+import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface LogradouroService {
-	<T extends Logradouravel> List<T> inserir(List<T> listaLogradouro) throws BusinessException;
+	List<LogradouroCliente> inserir(List<LogradouroCliente> listaLogradouro) throws BusinessException;
 
 	LogradouroEndereco inserir(LogradouroEndereco logradouro) throws BusinessException;
 
@@ -24,7 +25,7 @@ public interface LogradouroService {
 	 * @return
 	 * @throws BusinessException
 	 */
-	<T extends Logradouravel> T inserir(T logradouro) throws BusinessException;
+	LogradouroCliente inserir(LogradouroCliente logradouro) throws BusinessException;
 
 	List<? extends LogradouroEndereco> pesquisar(Integer id, Class<? extends LogradouroEndereco> classe);
 
@@ -52,5 +53,7 @@ public interface LogradouroService {
 	 */
 	<T extends LogradouroEndereco> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
 
-	void validarListaLogradouroPreenchida(List<? extends Logradouravel> listaLogradouro) throws BusinessException;
+	void validarListaLogradouroPreenchida(List<LogradouroCliente> listaLogradouro) throws BusinessException;
+
+	void validarListaLogradouroPreenchidaXXX(List<LogradouroPedido> listaLogradouro) throws BusinessException;
 }

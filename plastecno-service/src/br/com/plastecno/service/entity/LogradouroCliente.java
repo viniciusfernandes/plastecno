@@ -21,7 +21,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Entity
 @Table(name = "tb_logradouro_cliente", schema = "vendas")
 @InformacaoValidavel(validarHierarquia = true)
-public class LogradouroCliente extends Logradouravel implements Serializable, Cloneable {
+public class LogradouroCliente implements Logradouro, Serializable, Cloneable {
 	private static final long serialVersionUID = -8911271247053259317L;
 	private String bairro;
 

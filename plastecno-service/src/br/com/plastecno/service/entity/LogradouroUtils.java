@@ -2,33 +2,43 @@ package br.com.plastecno.service.entity;
 
 public class LogradouroUtils {
 
-	static String gerarDescricao(Logradouravel l, boolean codificado) {
+	static String gerarDescricao(Logradouro l, boolean codificado) {
 		return codificado ? gerarDescricaoLogradouroCodificado(l) : gerarDescricaoLogradouroNaoCodificado(l);
 	}
 
-	private static String gerarDescricaoLogradouroCodificado(Logradouravel l) {
-		StringBuilder logradouro = new StringBuilder().append(" CEP: ").append(l.getCep()).append(" - ")
-				.append(l.getEndereco());
-		if (l.getNumero() != null) {
-			logradouro.append(", No. ").append(l.getNumero());
+	private static String gerarDescricaoLogradouroCodificado(Logradouro l) {
+		return gerarDescricaoLogradouroCodificado(l.getBairro(), l.getCep(), l.getCidade(), l.getComplemento(),
+				l.getEndereco(), l.getNumero(), l.getPais(), l.getUf());
+	}
+
+	private static String gerarDescricaoLogradouroCodificado(String bairro, String cep, String cidade,
+			String complemento, String endereco, String numero, String pais, String uf) {
+		StringBuilder logradouro = new StringBuilder().append(" CEP: ").append(cep).append(" - ").append(endereco);
+		if (numero != null) {
+			logradouro.append(", No. ").append(numero);
 		}
 
-		logradouro.append(" - ").append(l.getComplemento() != null ? l.getComplemento() : "").append(" - ")
-				.append(l.getBairro()).append(" - ").append(l.getCidade()).append(" - ").append(l.getUf())
-				.append(" - ").append(l.getPais());
+		logradouro.append(" - ").append(complemento != null ? complemento : "").append(" - ").append(bairro)
+				.append(" - ").append(cidade).append(" - ").append(uf).append(" - ").append(pais);
 
 		return logradouro.toString();
 	}
 
-	private static String gerarDescricaoLogradouroNaoCodificado(Logradouravel l) {
-		StringBuilder logradouro = new StringBuilder().append(" CEP: ").append(l.getCep()).append(" - ")
-				.append(l.getComplemento() != null ? l.getComplemento() : "");
-		if (l.getNumero() != null) {
-			logradouro.append(", No. ").append(l.getNumero());
+	private static String gerarDescricaoLogradouroNaoCodificado(Logradouro l) {
+		return gerarDescricaoLogradouroNaoCodificado(l.getBairro(), l.getCep(), l.getCidade(), l.getComplemento(),
+				l.getEndereco(), l.getNumero(), l.getPais(), l.getUf());
+	}
+
+	private static String gerarDescricaoLogradouroNaoCodificado(String bairro, String cep, String cidade,
+			String complemento, String endereco, String numero, String pais, String uf) {
+		StringBuilder logradouro = new StringBuilder().append(" CEP: ").append(cep).append(" - ")
+				.append(complemento != null ? complemento : "");
+		if (numero != null) {
+			logradouro.append(", No. ").append(numero);
 		}
 
-		logradouro.append(" - ").append(l.getBairro()).append(" - ").append(l.getCidade()).append(" - ")
-				.append(l.getUf()).append(" - ").append(l.getPais());
+		logradouro.append(" - ").append(bairro).append(" - ").append(bairro).append(" - ").append(uf).append(" - ")
+				.append(pais);
 
 		return logradouro.toString();
 	}

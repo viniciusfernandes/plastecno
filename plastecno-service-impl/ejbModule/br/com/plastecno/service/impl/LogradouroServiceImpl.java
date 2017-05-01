@@ -20,8 +20,9 @@ import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.LogradouroDAO;
-import br.com.plastecno.service.entity.Logradouravel;
 import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroCliente;
+import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
@@ -41,7 +42,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 	}
 
 	@Override
-	public <T extends Logradouravel> List<T> inserir(List<T> listaLogradouro) throws BusinessException {
+	public List<LogradouroCliente> inserir(List<LogradouroCliente> listaLogradouro) throws BusinessException {
 		if (listaLogradouro == null) {
 			return null;
 		}
@@ -50,8 +51,8 @@ public class LogradouroServiceImpl implements LogradouroService {
 			return Collections.emptyList();
 		}
 
-		List<T> lista = new ArrayList<T>();
-		for (T logradouro : listaLogradouro) {
+		List<LogradouroCliente> lista = new ArrayList<>();
+		for (LogradouroCliente logradouro : listaLogradouro) {
 			lista.add(inserir(logradouro));
 		}
 		return lista;
@@ -72,18 +73,11 @@ public class LogradouroServiceImpl implements LogradouroService {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * br.com.plastecno.service.LogradouroService#inserir(br.com.plastecno.service
-	 * .entity.Logradouro)
-	 */
 	@Override
-	public <T extends Logradouravel> T inserir(T logradouro) throws BusinessException {
+	public LogradouroCliente inserir(LogradouroCliente logradouro) throws BusinessException {
 		if (logradouro != null) {
 
-			return (T) logradouroDAO.alterar(logradouro);
+			return (LogradouroCliente) entityManager.merge(logradouro);
 		}
 		return null;
 	}
@@ -103,8 +97,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public <T extends LogradouroEndereco> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro,
-			Class<T> classe) {
+	public <T extends LogradouroEndereco> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe) {
 		String nomeTipoLogradouro = classe.getSimpleName();
 		StringBuilder select = new StringBuilder();
 		select.append("select l from ").append(nomeTipoLogradouro).append(" l where l.")
@@ -153,10 +146,8 @@ public class LogradouroServiceImpl implements LogradouroService {
 	 * Integer, java.util.Collection, java.lang.Class)
 	 */
 	@Override
-	public <T extends LogradouroEndereco> void removerAusentes(Integer id, Collection<T> listaLogradouro,
-			Class<T> classe) {
-		List<? extends LogradouroEndereco> listaLogradouroCadastrado = this.pesquisarAusentes(id, listaLogradouro,
-				classe);
+	public <T extends LogradouroEndereco> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe) {
+		List<? extends LogradouroEndereco> listaLogradouroCadastrado = this.pesquisarAusentes(id, listaLogradouro, classe);
 		for (LogradouroEndereco logradouro : listaLogradouroCadastrado) {
 			this.entityManager.remove(logradouro);
 		}
@@ -165,7 +156,29 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void validarListaLogradouroPreenchida(List<? extends Logradouravel> listaLogradouro) throws BusinessException {
+	public void validarListaLogradouroPreenchida(List<LogradouroCliente> listaLogradouro) throws BusinessException {
+		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
+		lLogAusente.add(TipoLogradouro.COBRANCA);
+		lLogAusente.add(TipoLogradouro.ENTREGA);
+		lLogAusente.add(TipoLogradouro.FATURAMENTO);
+
+		if (listaLogradouro != null && !listaLogradouro.isEmpty()) {
+			listaLogradouro.forEach(t -> {
+				lLogAusente.remove(t.getTipoLogradouro());
+			});
+		}
+
+		if (lLogAusente.isEmpty()) {
+			return;
+		}
+
+		List<String> listaMensagem = new ArrayList<String>();
+		lLogAusente.forEach(t -> listaMensagem.add("É obrigatorio logradouro do tipo " + t));
+		throw new InformacaoInvalidaException(listaMensagem);
+	}
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public void validarListaLogradouroPreenchidaXXX(List<LogradouroPedido> listaLogradouro) throws BusinessException {
 		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
 		lLogAusente.add(TipoLogradouro.COBRANCA);
 		lLogAusente.add(TipoLogradouro.ENTREGA);

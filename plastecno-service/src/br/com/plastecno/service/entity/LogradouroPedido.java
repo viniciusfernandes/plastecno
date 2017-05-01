@@ -2,7 +2,6 @@ package br.com.plastecno.service.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -22,7 +21,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Entity
 @Table(name = "tb_logradouro_pedido", schema = "vendas")
 @InformacaoValidavel(validarHierarquia = true)
-public class LogradouroPedido extends Logradouravel implements Serializable, Cloneable {
+public class LogradouroPedido implements Logradouro, Serializable, Cloneable {
 	private static final long serialVersionUID = -8911271247053259317L;
 	private String bairro;
 	private String cep;
@@ -45,7 +44,7 @@ public class LogradouroPedido extends Logradouravel implements Serializable, Clo
 
 	private String pais;
 
-	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+	@ManyToOne
 	@JoinColumn(name = "id_pedido", referencedColumnName = "id", nullable = false)
 	private Pedido pedido;
 

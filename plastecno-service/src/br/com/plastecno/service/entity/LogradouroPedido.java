@@ -20,48 +20,60 @@ import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
-@Table(name = "tb_logradouro_cliente", schema = "vendas")
+@Table(name = "tb_logradouro_pedido", schema = "vendas")
 @InformacaoValidavel(validarHierarquia = true)
-public class LogradouroCliente implements Serializable, Cloneable {
+public class LogradouroPedido implements Serializable, Cloneable {
 	private static final long serialVersionUID = -8911271247053259317L;
 	private String bairro;
-
-	private boolean cancelado = false;
-
 	private String cep;
-
 	private String cidade;
-
-	/*
-	 * Aqui o cascade MERGE/PERSIST eh necessario pois o servico de logradouro
-	 * insere o novo logradouro na sessao e tem que construir o relacionamento
-	 * com o cliente, no caso em que o cascade nao exista, teremos um exception
-	 * lancada pois a chave do relacionamento id_cliente estara nula.
-	 */
-	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
-	@JoinColumn(name = "id_cliente", referencedColumnName = "id", nullable = false)
-	private Cliente cliente;
 	private Boolean codificado = true;
+
 	@Transient
 	private String codigoMunicipio;
+
 	private String complemento;
+
 	private String endereco;
 
 	@Id
-	@SequenceGenerator(name = "logradouroClienteSequence", sequenceName = "vendas.seq_logradouro_cliente_id", initialValue = 1, allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "logradouroClienteSequence")
+	@SequenceGenerator(name = "logradouroPedidoSequence", sequenceName = "vendas.seq_logradouro_pedido_id", initialValue = 1, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "logradouroPedidoSequence")
 	private Integer id;
 
 	private String numero;
+
 	private String pais;
+
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+	@JoinColumn(name = "id_pedido", referencedColumnName = "id", nullable = false)
+	private Pedido pedido;
+
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_tipo_logradouro")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo do Logradouro do cliente")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo do Logradouro do pedido")
 	private TipoLogradouro tipoLogradouro;
+
 	private String uf;
 
-	public LogradouroCliente() {
+	public LogradouroPedido() {
 	}
+	public LogradouroPedido(LogradouroCliente l) {
+		if (l == null) {
+			return;
+		}
+		setBairro(l.getBairro());
+		setCep(l.getCep());
+		setCidade(l.getCidade());
+		setCodigoMunicipio(l.getCodigoMunicipio());
+		setComplemento(l.getComplemento());
+		setEndereco(l.getEndereco());
+		setNumero(l.getNumero());
+		setPais(l.getPais());
+		setTipoLogradouro(l.getTipoLogradouro());
+		setUf(l.getUf());
+	}
+
 	public Endereco gerarEndereco() {
 		Pais p = new Pais();
 		p.setDescricao(getPais());
@@ -99,10 +111,6 @@ public class LogradouroCliente implements Serializable, Cloneable {
 		return cidade;
 	}
 
-	Cliente getCliente() {
-		return cliente;
-	}
-
 	public Boolean getCodificado() {
 		return codificado;
 	}
@@ -135,6 +143,10 @@ public class LogradouroCliente implements Serializable, Cloneable {
 		return pais;
 	}
 
+	public Pedido getPedido() {
+		return pedido;
+	}
+
 	public TipoLogradouro getTipoLogradouro() {
 		return tipoLogradouro;
 	}
@@ -143,16 +155,8 @@ public class LogradouroCliente implements Serializable, Cloneable {
 		return uf;
 	}
 
-	public boolean isCancelado() {
-		return cancelado;
-	}
-
 	public void setBairro(String bairro) {
 		this.bairro = bairro;
-	}
-
-	public void setCancelado(boolean cancelado) {
-		this.cancelado = cancelado;
 	}
 
 	public void setCep(String cep) {
@@ -161,10 +165,6 @@ public class LogradouroCliente implements Serializable, Cloneable {
 
 	public void setCidade(String cidade) {
 		this.cidade = cidade;
-	}
-
-	void setCliente(Cliente cliente) {
-		this.cliente = cliente;
 	}
 
 	public void setCodificado(Boolean codificado) {
@@ -193,6 +193,10 @@ public class LogradouroCliente implements Serializable, Cloneable {
 
 	public void setPais(String pais) {
 		this.pais = pais;
+	}
+
+	public void setPedido(Pedido pedido) {
+		this.pedido = pedido;
 	}
 
 	public void setTipoLogradouro(TipoLogradouro tipoLogradouro) {

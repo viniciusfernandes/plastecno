@@ -30,7 +30,7 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Transportadora;
@@ -238,7 +238,7 @@ public class PedidoController extends AbstractController {
                     + " pois não existe no sistema");
         }
 
-        pedido.setListaLogradouro(this.pedidoService.pesquisarLogradouro(idPedido));
+        pedido.setListaLogradouro(pedidoService.pesquisarLogradouro(idPedido));
 
         final List<ItemPedido> listaItem = this.pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 
@@ -261,9 +261,9 @@ public class PedidoController extends AbstractController {
             transportadora.setLogradouro(this.transportadoraService.pesquisarLogradorouro(transportadora.getId()));
         }
 
-        final Logradouro logradouroFaturamento = pedido.getLogradouro(TipoLogradouro.FATURAMENTO);
-        final Logradouro logradouroEntrega = pedido.getLogradouro(TipoLogradouro.ENTREGA);
-        final Logradouro logradouroCobranca = pedido.getLogradouro(TipoLogradouro.COBRANCA);
+        final LogradouroPedido logradouroFaturamento = pedido.getLogradouro(TipoLogradouro.FATURAMENTO);
+        final LogradouroPedido logradouroEntrega = pedido.getLogradouro(TipoLogradouro.ENTREGA);
+        final LogradouroPedido logradouroCobranca = pedido.getLogradouro(TipoLogradouro.COBRANCA);
 
         String tipo = pedido.isVenda() ? "Venda" : "Compra";
 

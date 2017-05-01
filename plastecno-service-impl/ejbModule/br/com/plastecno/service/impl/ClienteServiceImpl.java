@@ -663,25 +663,10 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException {
-		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
-		lLogAusente.add(TipoLogradouro.COBRANCA);
-		lLogAusente.add(TipoLogradouro.ENTREGA);
-		lLogAusente.add(TipoLogradouro.FATURAMENTO);
 
 		List<LogradouroCliente> lLog = cliente.getListaLogradouro();
-		if (lLog != null && !lLog.isEmpty()) {
-			lLog.stream().map(l -> l.getTipoLogradouro()).forEach(t -> {
-				lLogAusente.remove(t);
-			});
-		}
-
-		if (lLogAusente.isEmpty()) {
-			return;
-		}
-
-		List<String> listaMensagem = new ArrayList<String>();
-		lLogAusente.forEach(t -> listaMensagem.add("É obrigatorio logradouro do tipo " + t));
-		throw new InformacaoInvalidaException(listaMensagem);
+		logradouroService.validarListaLogradouroPreenchida(lLog == null || lLog.isEmpty() ? null : lLog.stream()
+				.map(l -> l.getTipoLogradouro()).collect(Collectors.toList()));
 	}
 
 	private void validarRevendedorExistente(Cliente cliente) throws BusinessException {

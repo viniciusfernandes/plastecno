@@ -82,10 +82,10 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 
 	@SuppressWarnings("unchecked")
 	public List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
-		StringBuilder select = new StringBuilder().append("select l from Cliente c ")
-				.append("inner join c.listaLogradouro l where c.id = :idCliente ").append(" and l.cancelado = false ");
-
-		return this.entityManager.createQuery(select.toString()).setParameter("idCliente", idCliente).getResultList();
+		return entityManager
+				.createQuery(
+						"select l from LogradouroCliente l where l.cliente.id = :idCliente  and l.cancelado = false")
+				.setParameter("idCliente", idCliente).getResultList();
 	}
 
 	public List<LogradouroCliente> pesquisarLogradouroFaturamentoById(Integer idCliente) {

@@ -9,7 +9,7 @@ import javax.ejb.Local;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
@@ -165,7 +165,7 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo);
 
-	List<Logradouro> pesquisarLogradouro(Integer idPedido);
+	List<LogradouroPedido> pesquisarLogradouro(Integer idPedido);
 
 	String pesquisarNomeVendedorByIdPedido(Integer idPedido);
 

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.exception.BusinessException;
 
@@ -48,4 +49,6 @@ public interface LogradouroService {
 	 *            tipo de logradouro que sera removido
 	 */
 	<T extends Logradouro> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe);
+
+	void validarListaLogradouroPreenchida(List<TipoLogradouro> listaTipo) throws BusinessException;
 }

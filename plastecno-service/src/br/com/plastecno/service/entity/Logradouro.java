@@ -84,35 +84,6 @@ public class Logradouro implements Serializable, Cloneable {
 		return o instanceof Logradouro && this.id != null && this.id.equals(((Logradouro) o).id);
 	}
 
-	private String gerarDescricaoLogradouroCodificado() {
-
-		StringBuilder logradouro = new StringBuilder().append(" CEP: ").append(this.getCep()).append(" - ")
-				.append(this.endereco.getDescricao());
-		if (this.numero != null) {
-			logradouro.append(", No. ").append(this.numero);
-		}
-
-		logradouro.append(" - ").append(this.complemento != null ? this.complemento : "").append(" - ")
-				.append(getBairro()).append(" - ").append(this.getCidade()).append(" - ").append(this.getUf())
-				.append(" - ").append(this.getPais());
-
-		return logradouro.toString();
-	}
-
-	private String gerarDescricaoLogradouroNaoCodificado() {
-
-		StringBuilder logradouro = new StringBuilder().append(" CEP: ").append(this.getCep()).append(" - ")
-				.append(this.complemento != null ? this.complemento : "");
-		if (this.numero != null) {
-			logradouro.append(", No. ").append(this.numero);
-		}
-
-		logradouro.append(" - ").append(getBairro()).append(" - ").append(this.getCidade()).append(" - ")
-				.append(this.getUf()).append(" - ").append(this.getPais());
-
-		return logradouro.toString();
-	}
-
 	public String getBairro() {
 		return this.endereco.getBairro().getDescricao();
 	}
@@ -138,8 +109,7 @@ public class Logradouro implements Serializable, Cloneable {
 	}
 
 	public String getDescricao() {
-		return this.codificado ? this.gerarDescricaoLogradouroCodificado() : this
-				.gerarDescricaoLogradouroNaoCodificado();
+		return LogradouroUtils.gerarDescricao(this, codificado);
 	}
 
 	public String getEndereco() {

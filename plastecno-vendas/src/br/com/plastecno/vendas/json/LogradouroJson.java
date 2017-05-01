@@ -1,6 +1,6 @@
 package br.com.plastecno.vendas.json;
 
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroCliente;
 
 public class LogradouroJson {
     private final String bairro;
@@ -12,7 +12,7 @@ public class LogradouroJson {
     private final String pais;
     private final String uf;
 
-    public LogradouroJson(Logradouro logradouro) {
+    public LogradouroJson(LogradouroCliente logradouro) {
         if (logradouro == null) {
             cep = "";
             endereco = "";

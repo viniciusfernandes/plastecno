@@ -217,15 +217,15 @@ public class Cliente implements Serializable {
 		}
 
 		for (LogradouroCliente logradouroCliente : listaLogradouro) {
-			this.addLogradouro(logradouroCliente);
+			addLogradouro(logradouroCliente);
 		}
 	}
 
 	public void addLogradouro(LogradouroCliente logradouroCliente) {
-		if (this.listaLogradouro == null) {
-			this.setListaLogradouro(new ArrayList<LogradouroCliente>());
+		if (listaLogradouro == null) {
+			setListaLogradouro(new ArrayList<LogradouroCliente>());
 		}
-		this.listaLogradouro.add(logradouroCliente);
+		listaLogradouro.add(logradouroCliente);
 		logradouroCliente.setCliente(this);
 	}
 

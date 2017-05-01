@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.plastecno.service.entity.Cliente;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Transportadora;
 
 /*
@@ -35,7 +35,7 @@ public class ClienteJson {
         this(cliente, listaTransportadora, null);
     }
 
-    public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora, Logradouro logradouro) {
+    public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora, LogradouroCliente logradouro) {
         this.listaTransportadora = new ArrayList<TransportadoraJson>();
         this.listaRedespacho = new ArrayList<TransportadoraJson>();
 
@@ -82,7 +82,7 @@ public class ClienteJson {
         }
     }
 
-    public ClienteJson(Cliente cliente, Logradouro logradouro) {
+    public ClienteJson(Cliente cliente, LogradouroCliente logradouro) {
         this(cliente, null, logradouro);
     }
 

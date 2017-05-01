@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -34,7 +34,6 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
-import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
@@ -43,8 +42,8 @@ import br.com.plastecno.service.entity.Comissao;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
+import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
@@ -529,7 +528,7 @@ public class PedidoServiceImpl implements PedidoService {
 		 * Devemos sempre usar a lista do cliente pois o cliente pode ter
 		 * alterado os dados de logradouro
 		 */
-		pedido.addLogradouro(clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
+		pedido.addLogradouro(gerarLogradouroPedidoByIdCliente(pedido.getCliente().getId()));
 		pedido.setDataEnvio(new Date());
 
 		validarEnvio(pedido);
@@ -562,7 +561,7 @@ public class PedidoServiceImpl implements PedidoService {
 			estoqueService.reservarItemPedido(pedido.getId());
 		}
 
-		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
+		validarListaLogradouroPreenchida(pedido);
 		try {
 			GeradorPedidoEmail gerador = new GeradorPedidoEmail(pedido, arquivoAnexado);
 			emailService.enviar(gerador.gerarMensagem(TipoMensagemPedido.VENDA));
@@ -580,6 +579,14 @@ public class PedidoServiceImpl implements PedidoService {
 			e.addMensagem(e.getListaMensagem());
 			throw e;
 		}
+	}
+
+	private List<LogradouroPedido> gerarLogradouroPedidoByIdCliente(Integer idCliente) {
+		List<LogradouroCliente> lLog = clienteService.pesquisarLogradouro(idCliente);
+		List<LogradouroPedido> lLogPed = new ArrayList<LogradouroPedido>();
+
+		lLog.stream().forEach(l -> lLogPed.add(new LogradouroPedido(l)));
+		return lLogPed;
 	}
 
 	private Integer gerarSequencialItemPedido(Integer idPedido) {
@@ -654,11 +661,12 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("A transportadora de redespacho é obrigatória para o tipo de entrega "
 					+ TipoEntrega.CIF_TRANS.getDescricao());
 		}
+
 		/*
 		 * Devemos sempre pesquisar pois o cliente pode ter alterado os dados de
 		 * logradouro
 		 */
-		pedido.addLogradouro(clienteService.pesquisarLogradouro(pedido.getCliente().getId()));
+		pedido.addLogradouro(gerarLogradouroPedidoByIdCliente(pedido.getCliente().getId()));
 
 		if (isPedidoNovo) {
 			pedido = pedidoDAO.inserir(pedido);
@@ -1217,7 +1225,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Logradouro> pesquisarLogradouro(Integer idPedido) {
+	public List<LogradouroPedido> pesquisarLogradouro(Integer idPedido) {
 		return pedidoDAO.pesquisarLogradouro(idPedido);
 	}
 
@@ -1719,25 +1727,9 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException {
-		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
-		lLogAusente.add(TipoLogradouro.COBRANCA);
-		lLogAusente.add(TipoLogradouro.ENTREGA);
-		lLogAusente.add(TipoLogradouro.FATURAMENTO);
-
-		List<Logradouro> lLog = pedido.getListaLogradouro();
-		if (lLog != null && !lLog.isEmpty()) {
-			lLog.stream().map(l -> l.getTipoLogradouro()).forEach(t -> {
-				lLogAusente.remove(t);
-			});
-		}
-
-		if (lLogAusente.isEmpty()) {
-			return;
-		}
-
-		List<String> listaMensagem = new ArrayList<String>();
-		lLogAusente.forEach(t -> listaMensagem.add("É obrigatorio logradouro do tipo " + t));
-		throw new InformacaoInvalidaException(listaMensagem);
+		List<LogradouroPedido> lLog = pedido.getListaLogradouro();
+		logradouroService.validarListaLogradouroPreenchida(lLog == null || lLog.isEmpty() ? null : lLog.stream()
+				.map(l -> l.getTipoLogradouro()).collect(Collectors.toList()));
 	}
 
 	private void verificarMaterialAssociadoFornecedor(Integer idRepresentadaFornecedora, Set<Integer> listaIdItemPedido)

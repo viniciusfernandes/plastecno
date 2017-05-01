@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,7 +16,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -108,9 +108,9 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private Integer idVendedor;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
-	@JoinTable(name = "tb_pedido_tb_logradouro", schema = "vendas", joinColumns = { @JoinColumn(name = "id_pedido", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_logradouro", referencedColumnName = "id") })
-	private List<Logradouro> listaLogradouro;
+	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de logradouro do pedido")
+	private List<LogradouroPedido> listaLogradouro;
 
 	@Column(name = "numero_coleta")
 	private String numeroColeta;
@@ -274,21 +274,21 @@ public class Pedido implements Serializable, Cloneable {
 		this.tipoPedido = tipoPedido;
 	}
 
-	public void addLogradouro(List<? extends Logradouro> listaLogradouro) {
+	public void addLogradouro(List<LogradouroPedido> listaLogradouro) {
 		if (listaLogradouro == null || listaLogradouro.isEmpty()) {
 			return;
 		}
 
-		for (Logradouro logradouro : listaLogradouro) {
+		for (LogradouroPedido logradouro : listaLogradouro) {
 			this.addLogradouro(logradouro);
 		}
 	}
 
-	public void addLogradouro(Logradouro logradouro) {
-		if (this.listaLogradouro == null) {
-			this.setListaLogradouro(new ArrayList<Logradouro>());
+	public void addLogradouro(LogradouroPedido logradouro) {
+		if (listaLogradouro == null) {
+			setListaLogradouro(new ArrayList<LogradouroPedido>());
 		}
-		this.listaLogradouro.add(logradouro);
+		listaLogradouro.add(logradouro);
 	}
 
 	public double addValorPedido(double valor) {
@@ -377,12 +377,18 @@ public class Pedido implements Serializable, Cloneable {
 		return idVendedor;
 	}
 
-	public List<Logradouro> getListaLogradouro() {
+	public List<LogradouroPedido> getListaLogradouro() {
 		return listaLogradouro;
 	}
 
-	public Logradouro getLogradouro(TipoLogradouro tipoLogradouro) {
-		return EntityUtils.getLogradouro(listaLogradouro, tipoLogradouro);
+	public LogradouroPedido getLogradouro(TipoLogradouro tipoLogradouro) {
+		if (listaLogradouro == null || listaLogradouro.isEmpty() || tipoLogradouro == null) {
+			return null;
+		}
+
+		List<LogradouroPedido> lista = listaLogradouro.stream()
+				.filter(l -> tipoLogradouro.equals(l.getTipoLogradouro())).collect(Collectors.toList());
+		return lista.size() > 0 ? lista.get(0) : null;
 	}
 
 	public String getNumeroColeta() {
@@ -604,7 +610,7 @@ public class Pedido implements Serializable, Cloneable {
 		this.idVendedor = idVendedor;
 	}
 
-	public void setListaLogradouro(List<Logradouro> listaLogradouro) {
+	public void setListaLogradouro(List<LogradouroPedido> listaLogradouro) {
 		this.listaLogradouro = listaLogradouro;
 	}
 

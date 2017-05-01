@@ -12,7 +12,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
@@ -250,9 +250,8 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Logradouro> pesquisarLogradouro(Integer idPedido) {
-		return this.entityManager
-				.createQuery("select l from Pedido p inner join p.listaLogradouro l where p.id = :idPedido")
+	public List<LogradouroPedido> pesquisarLogradouro(Integer idPedido) {
+		return entityManager.createQuery("select l from LogradouroPedido l where l.pedido.id = :idPedido")
 				.setParameter("idPedido", idPedido).getResultList();
 	}
 
@@ -310,15 +309,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						"idItemPedido", idItemPedido), Pedido.class, null);
 	}
 
-	public Pedido pesquisarPedidoResumidoFinalidadeByIdItemPedido(Integer idItemPedido) {
-		return QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select new Pedido(i.pedido.id, i.pedido.finalidadePedido, i.pedido.tipoPedido) from ItemPedido i where i.id =:idItemPedido")
-								.setParameter("idItemPedido", idItemPedido), Pedido.class, null);
-	}
-
 	public Pedido pesquisarPedidoResumidoCalculoComissao(Integer idPedido) {
 		return QueryUtil
 				.gerarRegistroUnico(
@@ -326,6 +316,15 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 								.createQuery(
 										"select new Pedido(p.representada.comissao, p.id, p.proprietario.id, p.finalidadePedido, p.tipoPedido) from Pedido p where p.id =:idPedido")
 								.setParameter("idPedido", idPedido), Pedido.class, null);
+	}
+
+	public Pedido pesquisarPedidoResumidoFinalidadeByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Pedido(i.pedido.id, i.pedido.finalidadePedido, i.pedido.tipoPedido) from ItemPedido i where i.id =:idItemPedido")
+								.setParameter("idItemPedido", idItemPedido), Pedido.class, null);
 	}
 
 	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {

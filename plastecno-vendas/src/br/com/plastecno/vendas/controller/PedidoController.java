@@ -240,25 +240,25 @@ public class PedidoController extends AbstractController {
 
         pedido.setListaLogradouro(pedidoService.pesquisarLogradouro(idPedido));
 
-        final List<ItemPedido> listaItem = this.pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+        final List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 
         formatarItemPedido(listaItem);
         formatarPedido(pedido);
 
         Cliente cliente = pedido.getCliente();
         this.formatarDocumento(cliente);
-        cliente.setListaLogradouro(this.clienteService.pesquisarLogradouro(cliente.getId()));
+        cliente.setListaLogradouro(clienteService.pesquisarLogradouroCliente(cliente.getId()));
 
         Transportadora transportadora = pedido.getTransportadora();
         if (transportadora != null) {
-            transportadora.setListaContato(this.transportadoraService.pesquisarContato(transportadora.getId()));
-            transportadora.setLogradouro(this.transportadoraService.pesquisarLogradorouro(transportadora.getId()));
+            transportadora.setListaContato(transportadoraService.pesquisarContato(transportadora.getId()));
+            transportadora.setLogradouro(transportadoraService.pesquisarLogradorouro(transportadora.getId()));
         }
 
         transportadora = pedido.getTransportadoraRedespacho();
         if (transportadora != null) {
-            transportadora.setListaContato(this.transportadoraService.pesquisarContato(transportadora.getId()));
-            transportadora.setLogradouro(this.transportadoraService.pesquisarLogradorouro(transportadora.getId()));
+            transportadora.setListaContato(transportadoraService.pesquisarContato(transportadora.getId()));
+            transportadora.setLogradouro(transportadoraService.pesquisarLogradorouro(transportadora.getId()));
         }
 
         final LogradouroPedido logradouroFaturamento = pedido.getLogradouro(TipoLogradouro.FATURAMENTO);

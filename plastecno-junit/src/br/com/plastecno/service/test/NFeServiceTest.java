@@ -70,7 +70,7 @@ public class NFeServiceTest extends AbstractTest {
 	private NFe gerarNFe(Integer idPedido, boolean apenasItensRestantes) {
 		Cliente cli = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
 		Transportadora transPed = pedidoService.pesquisarTransportadoraByIdPedido(idPedido);
-		LogradouroCliente endFaturamento = cli.getLogradouroFaturamento();
+		LogradouroCliente endFaturamento = cli.recuperarLogradouroFaturamento();
 
 		List<DuplicataNFe> listaDuplicata = nFeService.gerarDuplicataDataAmericanaByIdPedido(idPedido);
 

@@ -28,6 +28,7 @@ import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
 import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.ClienteDAO;
+import br.com.plastecno.service.dao.LogradouroDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ComentarioCliente;
 import br.com.plastecno.service.entity.ContatoCliente;
@@ -56,6 +57,8 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@PersistenceContext(unitName = "plastecno")
 	private EntityManager entityManager;
+
+	private LogradouroDAO logradouroDAO;
 
 	@EJB
 	private LogradouroService logradouroService;
@@ -182,30 +185,14 @@ public class ClienteServiceImpl implements ClienteService {
 	public void importarLogradouro() {
 		List<Object[]> ids = entityManager.createQuery("select c.id, c.cliente.id from LogradouroCliente c")
 				.getResultList();
-		LogradouroCliente lc = null;
 		List<Object[]> logs = null;
-
 		for (Object[] o : ids) {
 			logs = entityManager
 					.createQuery(
-							"select l.endereco.cep, l.endereco.descricao, l.numero, l.complemento, l.endereco.bairro.descricao, l.endereco.cidade.descricao, l.endereco.cidade.uf, l.endereco.cidade.pais.descricao, l.codificado, l.tipoLogradouro from Logradouro l where l.id =:idlog ",
+							"select l.endereco.cep, l.endereco.descricao, l.numero, l.complemento, l.endereco.bairro.descricao, l.endereco.cidade.descricao, l.endereco.cidade.uf, l.endereco.cidade.pais.descricao, l.codificado, l.tipoLogradouro from LogradouroEndereco l where l.id =:idlog ",
 							Object[].class).setParameter("idlog", o[0]).getResultList();
 
 			for (Object[] log : logs) {
-				lc = new LogradouroCliente();
-				lc.setId((Integer) o[0]);
-				lc.setCliente(new Cliente((Integer) o[1]));
-				lc.setCep((String) log[0]);
-				lc.setEndereco((String) log[1]);
-				lc.setNumero((String) log[2]);
-				lc.setComplemento((String) log[3]);
-				lc.setBairro((String) log[4]);
-				lc.setCidade((String) log[5]);
-				lc.setUf((String) log[6]);
-				lc.setPais((String) log[7]);
-				lc.setCodificado((boolean) log[8]);
-				lc.setTipoLogradouro((TipoLogradouro) log[9]);
-
 				entityManager
 						.createNativeQuery(
 								"update vendas.tb_logradouro_cliente set cep=:cep, endereco=:endereco, numero=:numero, complemento=:complemento, bairro=:bairro, cidade=:cidade, uf=:uf, pais=:pais, codificado=:codificado, id_tipo_logradouro=:tipo where id=:id")
@@ -216,11 +203,31 @@ public class ClienteServiceImpl implements ClienteService {
 						.setParameter("id", o[0]).executeUpdate();
 			}
 		}
+
+		ids = entityManager.createQuery("select p.id, p.cliente.id from Pedido p ").getResultList();
+		for (Object[] o : ids) {
+			logs = entityManager
+					.createQuery(
+							"select l.endereco.cep, l.endereco, l.numero, l.complemento, l.bairro, l.cidade, l.uf, l.pais, l.codificado, l.tipoLogradouro from LogradouroCliente l where l.cliente.id =:idCliente",
+							Object[].class).setParameter("idCliente", o[1]).getResultList();
+
+			for (Object[] log : logs) {
+				entityManager
+						.createNativeQuery(
+								"insert into  vendas.tb_logradouro_pedido (id, id_pedido, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_pedido_id'), :idPedido, :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )")
+						.setParameter("idPedido", o[0]).setParameter("cep", log[0]).setParameter("endereco", log[1])
+						.setParameter("numero", log[2]).setParameter("complemento", log[3])
+						.setParameter("bairro", log[4]).setParameter("cidade", log[5]).setParameter("uf", log[6])
+						.setParameter("pais", log[7]).setParameter("codificado", log[8])
+						.setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo()).executeUpdate();
+			}
+		}
 	}
 
 	@PostConstruct
 	public void init() {
 		clienteDAO = new ClienteDAO(entityManager);
+		logradouroDAO = new LogradouroDAO(entityManager);
 	}
 
 	@Override
@@ -472,7 +479,7 @@ public class ClienteServiceImpl implements ClienteService {
 	public Cliente pesquisarClienteResumidoByCnpj(String cnpj) {
 		Cliente c = clienteDAO.pesquisarClienteResumidoByCnpj(cnpj);
 		if (c != null) {
-			c.addLogradouro(pesquisarLogradouro(c.getId()));
+			c.addLogradouro(pesquisarLogradouroCliente(c.getId()));
 			c.addContato(pesquisarContato(c.getId()));
 			// Estamos anulando oconteudo desses campos para evitar
 			// lazyloadException que estava acontecedendo em algumas requisicoes
@@ -494,7 +501,7 @@ public class ClienteServiceImpl implements ClienteService {
 	public Cliente pesquisarClienteResumidoLogradouroById(Integer idCliente) {
 		Cliente c = clienteDAO.pesquisarClienteResumidoLogradouroById(idCliente);
 		if (c != null) {
-			c.addLogradouro(pesquisarLogradouro(idCliente));
+			c.addLogradouro(pesquisarLogradouroCliente(idCliente));
 		}
 		return c;
 	}
@@ -591,13 +598,13 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<LogradouroCliente> pesquisarLogradouro(Integer idCliente) {
-		return clienteDAO.pesquisarLogradouroById(idCliente);
+	public List<LogradouroCliente> pesquisarLogradouroCliente(Integer idCliente) {
+		return clienteDAO.pesquisarLogradouroClienteById(idCliente);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public LogradouroCliente pesquisarLogradouroById(Integer idLogradouro) {
+	public LogradouroCliente pesquisarLogradouroClienteById(Integer idLogradouro) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery("select c from LogradouroCliente c where c.id = :idLogradouro")
 						.setParameter("idLogradouro", idLogradouro), LogradouroCliente.class, null);
@@ -678,10 +685,12 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
-	public void removerLogradouro(Integer idLogradouro) {
-		final LogradouroCliente logradouroCliente = this.pesquisarLogradouroById(idLogradouro);
-		logradouroCliente.setCancelado(true);
-		this.entityManager.merge(logradouroCliente);
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerLogradouroCliente(Integer idLogradouro) {
+		if (idLogradouro == null) {
+			return;
+		}
+		logradouroDAO.remover(new LogradouroCliente(idLogradouro));
 	}
 
 	private void validarDocumentosPreenchidos(Cliente cliente) throws InformacaoInvalidaException {

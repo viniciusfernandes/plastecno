@@ -19,6 +19,8 @@ public interface Logradouro {
 
 	String getEndereco();
 
+	Integer getId();
+
 	String getNumero();
 
 	String getPais();
@@ -38,6 +40,8 @@ public interface Logradouro {
 	void setComplemento(String complemento);
 
 	void setEndereco(String endereco);
+
+	void setId(Integer id);
 
 	void setNumero(String numero);
 

@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -326,21 +325,6 @@ public class Cliente implements Serializable {
 		return listaRedespacho;
 	}
 
-	public LogradouroCliente getLogradouro(TipoLogradouro tipoLogradouro) {
-
-		if (listaLogradouro == null || listaLogradouro.isEmpty() || tipoLogradouro == null) {
-			return null;
-		}
-
-		List<LogradouroCliente> lista = listaLogradouro.stream()
-				.filter(l -> tipoLogradouro.equals(l.getTipoLogradouro())).collect(Collectors.toList());
-		return lista.size() > 0 ? lista.get(0) : null;
-	}
-
-	public LogradouroCliente getLogradouroFaturamento() {
-		return this.getLogradouro(TipoLogradouro.FATURAMENTO);
-	}
-
 	public String getNomeCompleto() {
 		return this.getNomeFantasia() + " - " + this.getRazaoSocial();
 	}
@@ -398,6 +382,24 @@ public class Cliente implements Serializable {
 			this.listaLogradouro.clear();
 		}
 
+	}
+
+	private LogradouroCliente recuperarLogradouro(TipoLogradouro tipoLogradouro) {
+
+		if (listaLogradouro == null || listaLogradouro.isEmpty() || tipoLogradouro == null) {
+			return null;
+		}
+
+		for (LogradouroCliente l : listaLogradouro) {
+			if (tipoLogradouro.equals(l.getTipoLogradouro())) {
+				return l;
+			}
+		}
+		return null;
+	}
+
+	public LogradouroCliente recuperarLogradouroFaturamento() {
+		return recuperarLogradouro(TipoLogradouro.FATURAMENTO);
 	}
 
 	public void setCnpj(String cnpj) {

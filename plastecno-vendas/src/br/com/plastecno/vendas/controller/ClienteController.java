@@ -93,6 +93,15 @@ public class ClienteController extends AbstractController {
         return concat.toString();
     }
 
+    @Get("importarlogradouro")
+    public void importarlogradouroCliente() {
+        System.out.println("Inicio da importacao");
+        clienteService.importarLogradouro();
+
+        System.out.println("Fim da importacao");
+        irTopoPagina();
+    }
+
     @Post("cliente/inclusao")
     public void inserirCliente(Cliente cliente, String comentario, List<LogradouroCliente> listaLogradouro,
             List<ContatoCliente> listaContato, List<Integer> listaIdTransportadoraAssociada, boolean isRevendedor) {
@@ -133,7 +142,6 @@ public class ClienteController extends AbstractController {
         if (isRevendedor) {
             redirecTo(this.getClass()).revendedorHome();
         } else {
-            formatarDocumento(cliente);
             carregarVendedor(cliente);
             addAtributo("cliente", cliente);
             addAtributo("listaLogradouro", listaLogradouro);
@@ -157,9 +165,8 @@ public class ClienteController extends AbstractController {
         final PaginacaoWrapper<Cliente> paginacao = this.clienteService.paginarCliente(filtro, true,
                 this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
 
-        for (Cliente cli : paginacao.getLista()) {
-            cli.setCnpj(formatarCNPJ(cli.getCnpj()));
-            cli.setCpf(formatarCPF(cli.getCpf()));
+        for (Cliente c : paginacao.getLista()) {
+            formatarDocumento(c);
         }
 
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaCliente");
@@ -185,7 +192,7 @@ public class ClienteController extends AbstractController {
         addAtributo("cliente", cliente);
         addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade().getId()
                 : "");
-        addAtributo("listaLogradouro", clienteService.pesquisarLogradouro(idCliente));
+        addAtributo("listaLogradouro", clienteService.pesquisarLogradouroCliente(idCliente));
         addAtributo("listaContato", clienteService.pesquisarContato(idCliente));
         addAtributo("comentarios", formatarComentarios(idCliente));
         addAtributo("tipoCliente", cliente.getTipoCliente());
@@ -209,14 +216,14 @@ public class ClienteController extends AbstractController {
     @Get("cliente/serializacao/cnpj")
     public void pesquisarClienteSerializadoByCnpj(String cnpj) {
         Cliente c = clienteService.pesquisarClienteResumidoByCnpj(cnpj);
-        LogradouroCliente l = c != null ? c.getLogradouroFaturamento() : null;
+        LogradouroCliente l = c != null ? c.recuperarLogradouroFaturamento() : null;
         serializarJson(new SerializacaoJson("cliente", new ClienteJson(c, l), true));
     }
 
     @Get("cliente/serializacao/{idCliente}")
     public void pesquisarClienteSerializadoById(Integer idCliente) {
         Cliente c = clienteService.pesquisarClienteResumidoLogradouroById(idCliente);
-        serializarJson(new SerializacaoJson("cliente", new ClienteJson(c, c.getLogradouroFaturamento()), true));
+        serializarJson(new SerializacaoJson("cliente", new ClienteJson(c, c.recuperarLogradouroFaturamento()), true));
     }
 
     @Get("cliente/transportadora")
@@ -238,7 +245,7 @@ public class ClienteController extends AbstractController {
 
     @Post("cliente/logradouro/remocao/{idLogradouro}")
     public void removerLogradouro(Integer idLogradouro) {
-        this.clienteService.removerLogradouro(idLogradouro);
+        clienteService.removerLogradouroCliente(idLogradouro);
         irTopoPagina();
     }
 

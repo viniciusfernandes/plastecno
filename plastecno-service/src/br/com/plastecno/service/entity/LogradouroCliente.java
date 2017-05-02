@@ -56,6 +56,10 @@ public class LogradouroCliente implements Logradouro, Serializable, Cloneable {
 	public LogradouroCliente() {
 	}
 
+	public LogradouroCliente(Integer id) {
+		this.id = id;
+	}
+
 	public Endereco gerarEndereco() {
 		Pais p = new Pais();
 		p.setDescricao(getPais());

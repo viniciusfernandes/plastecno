@@ -59,7 +59,6 @@ $(document).ready(function() {
 		parametros += pickListToParameter('listaIdTransportadoraAssociada');
 		parametros += '&comentario='+$('#bloco_comentario #comentario').val();
 		parametros += '&isRevendedor='+<c:out value="${isRevendedor}"/>
-		
 		$('#formCliente').attr("action",$('#formCliente').attr("action")+'?'+ parametros);
 		$('#formCliente').submit();
 						

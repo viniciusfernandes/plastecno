@@ -77,9 +77,9 @@ public interface ClienteService {
 
 	List<Cliente> pesquisarInativosByIdVendedor(Integer idVendedor) throws BusinessException;
 
-	List<LogradouroCliente> pesquisarLogradouro(Integer idCliente);
+	List<LogradouroCliente> pesquisarLogradouroCliente(Integer idCliente);
 
-	LogradouroCliente pesquisarLogradouroById(Integer idLogradouro);
+	LogradouroCliente pesquisarLogradouroClienteById(Integer idLogradouro);
 
 	LogradouroCliente pesquisarLogradouroFaturamentoById(Integer idCliente);
 
@@ -93,7 +93,7 @@ public interface ClienteService {
 
 	List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente);
 
-	void removerLogradouro(Integer idLogradouro);
+	void removerLogradouroCliente(Integer idLogradouro);
 
 	void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException;
 }

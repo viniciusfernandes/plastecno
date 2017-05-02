@@ -150,7 +150,6 @@ public class EmissaoNFeController extends AbstractController {
             Integer idPedido) {
         String numeroNFe = null;
         try {
-
             nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                     nFeService.gerarEnderecoNFe(logradouro, telefoneDestinatario));
             formatarDatas(nf, false);

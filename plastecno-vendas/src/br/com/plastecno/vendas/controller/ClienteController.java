@@ -134,7 +134,6 @@ public class ClienteController extends AbstractController {
         if (isRevendedor) {
             redirecTo(this.getClass()).revendedorHome();
         } else {
-            formatarDocumento(cliente);
             carregarVendedor(cliente);
             addAtributo("cliente", cliente);
             addAtributo("listaLogradouro", listaLogradouro);
@@ -182,7 +181,6 @@ public class ClienteController extends AbstractController {
             addAtributo("ultimoContato", formatarData(cliente.getDataUltimoContato()));
         }
 
-        this.formatarDocumento(cliente);
         addAtributo("cliente", cliente);
         addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade().getId()
                 : "");

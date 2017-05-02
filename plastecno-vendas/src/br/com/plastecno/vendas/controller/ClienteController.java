@@ -99,7 +99,7 @@ public class ClienteController extends AbstractController {
         clienteService.importarLogradouro();
 
         System.out.println("Fim da importacao");
-        irTopoPagina();
+        redirecTo(MenuController.class).menuHome();
     }
 
     @Post("cliente/inclusao")

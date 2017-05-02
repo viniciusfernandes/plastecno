@@ -56,9 +56,9 @@ public class Usuario implements Serializable {
 	private List<PerfilAcesso> listaPerfilAcesso;
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "id_logradouro")
+	@JoinColumn(name = "id_logradouro_usuario")
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da usuario")
-	private LogradouroEndereco logradouro;
+	private LogradouroUsuario logradouro;
 
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Nome do usuario")
 	private String nome;
@@ -153,7 +153,7 @@ public class Usuario implements Serializable {
 		return listaPerfilAcesso;
 	}
 
-	public LogradouroEndereco getLogradouro() {
+	public LogradouroUsuario getLogradouro() {
 		return logradouro;
 	}
 
@@ -237,7 +237,7 @@ public class Usuario implements Serializable {
 		this.listaPerfilAcesso = listaPerfilAcesso;
 	}
 
-	public void setLogradouro(LogradouroEndereco logradouro) {
+	public void setLogradouro(LogradouroUsuario logradouro) {
 		this.logradouro = logradouro;
 	}
 

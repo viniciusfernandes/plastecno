@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroPedido;
@@ -14,18 +15,9 @@ import br.com.plastecno.service.exception.BusinessException;
 public interface LogradouroService {
 	List<LogradouroCliente> inserir(List<LogradouroCliente> listaLogradouro) throws BusinessException;
 
-	LogradouroEndereco inserir(LogradouroEndereco logradouro) throws BusinessException;
+	Logradouro inserir(Logradouro logradouro) throws BusinessException;
 
-	/**
-	 * Metodo criado para recuperaros ids do pais, estado, cidade e bairro e no
-	 * caso em que nao existam ele cria um novo registro no sistema.
-	 * 
-	 * @param logradouro
-	 *            logradouro contendo os ids do pais, estado, cidade e bairro
-	 * @return
-	 * @throws BusinessException
-	 */
-	LogradouroCliente inserir(LogradouroCliente logradouro) throws BusinessException;
+	LogradouroEndereco inserirBaseCep(LogradouroEndereco logradouro) throws BusinessException;
 
 	List<? extends LogradouroEndereco> pesquisar(Integer id, Class<? extends LogradouroEndereco> classe);
 

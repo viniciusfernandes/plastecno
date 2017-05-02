@@ -123,7 +123,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 			throw new BusinessException("A comissão é obrigatorio no cadastro da representada");
 		}
 
-		representada.setLogradouro(this.logradouroService.inserir(representada.getLogradouro()));
+		representada.setLogradouro(this.logradouroService.inserirBaseCep(representada.getLogradouro()));
 
 		if (representada.getId() == null) {
 			return representadaDAO.inserir(representada).getId();

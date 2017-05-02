@@ -20,6 +20,7 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.ContatoUsuario;
 import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -53,9 +54,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 		this.verificarPerfilVendedor(idVendedor);
 
 		this.entityManager
-				.createQuery("update Cliente c set c.vendedor.id = :idVendedor where c.id in (:listaIdClienteAssociado)")
-				.setParameter("idVendedor", idVendedor).setParameter("listaIdClienteAssociado", listaIdClienteAssociado)
-				.executeUpdate();
+				.createQuery(
+						"update Cliente c set c.vendedor.id = :idVendedor where c.id in (:listaIdClienteAssociado)")
+				.setParameter("idVendedor", idVendedor)
+				.setParameter("listaIdClienteAssociado", listaIdClienteAssociado).executeUpdate();
 	}
 
 	@Override
@@ -84,14 +86,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
-	public void desassociarCliente(Integer idVendedor, List<Integer> listaIdClienteDesassociado) throws BusinessException {
+	public void desassociarCliente(Integer idVendedor, List<Integer> listaIdClienteDesassociado)
+			throws BusinessException {
 		this.verificarPerfilVendedor(idVendedor);
 
 		this.entityManager
 				.createQuery(
 						"update Cliente c set c.vendedor = null where c.vendedor.id = :idVendedor and c.id in (:listaIdClienteDesassociado)")
-				.setParameter("idVendedor", idVendedor).setParameter("listaIdClienteDesassociado", listaIdClienteDesassociado)
-				.executeUpdate();
+				.setParameter("idVendedor", idVendedor)
+				.setParameter("listaIdClienteDesassociado", listaIdClienteDesassociado).executeUpdate();
 	}
 
 	private Query gerarQueryPesquisa(Usuario filtro, boolean isVendedor, StringBuilder select) {
@@ -171,7 +174,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			throw new BusinessException("CPF enviado ja foi cadastrado para outro usuario");
 		}
 
-		usuario.setLogradouro(logradouroService.inserir(usuario.getLogradouro()));
+		usuario.setLogradouro(logradouroService.inserirBaseCep(usuario.getLogradouro()));
 		ValidadorInformacao.validar(usuario);
 		if (isAlteracaoSenha) {
 			try {
@@ -184,7 +187,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return usuario.getId() == null ? usuarioDAO.inserir(usuario).getId() : usuarioDAO.alterar(usuario).getId();
 	}
 
-	@TODO(descricao="Remover o hardcoded administracao")
+	@TODO(descricao = "Remover o hardcoded administracao")
 	@Override
 	public boolean isAdministrador(Integer idUsuario) {
 		List<PerfilAcesso> l = pesquisarPerfisAssociados(idUsuario);
@@ -230,8 +233,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
-	public PaginacaoWrapper<Usuario> paginarVendedor(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros) {
+	public PaginacaoWrapper<Usuario> paginarVendedor(Usuario filtro, Boolean apenasAtivos,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		return new PaginacaoWrapper<Usuario>(this.pesquisarTotalRegistros(filtro, apenasAtivos, true), this.pesquisar(
 				filtro, true, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
 
@@ -283,13 +286,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
-	public LogradouroEndereco pesquisarLogradouro(Integer id) {
-		StringBuilder select = new StringBuilder("select u.logradouro from Usuario u  ");
-		select.append(" INNER JOIN u.logradouro where u.id = :id ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("id", id);
-		return QueryUtil.gerarRegistroUnico(query, LogradouroEndereco.class, null);
+	public LogradouroUsuario pesquisarLogradouro(Integer id) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager
+						.createQuery("select u.logradouro from Usuario u INNER JOIN u.logradouro where u.id = :id")
+						.setParameter("id", id), LogradouroUsuario.class, null);
 	}
 
 	@Override
@@ -316,8 +317,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	public String pesquisarSenhaByEmail(String email) {
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery("select u.senha from Usuario u where u.email = :email ").setParameter("email",
-						email), String.class, null);
+				this.entityManager.createQuery("select u.senha from Usuario u where u.email = :email ").setParameter(
+						"email", email), String.class, null);
 	}
 
 	@Override
@@ -363,7 +364,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 								.createQuery(
 										"select c from Usuario c inner join c.listaPerfilAcesso p where c.id = :idVendedor and p.id = :idPerfilAcesso ")
 								.setParameter("idVendedor", idVendedor)
-								.setParameter("idPerfilAcesso", TipoAcesso.CADASTRO_PEDIDO_VENDAS.indexOf()), Usuario.class, null);
+								.setParameter("idPerfilAcesso", TipoAcesso.CADASTRO_PEDIDO_VENDAS.indexOf()),
+						Usuario.class, null);
 	}
 
 	@Override

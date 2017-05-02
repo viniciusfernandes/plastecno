@@ -20,9 +20,11 @@ import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.LogradouroDAO;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroPedido;
+import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
@@ -60,7 +62,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public LogradouroEndereco inserir(LogradouroEndereco logradouro) throws BusinessException {
+	public LogradouroEndereco inserirBaseCep(LogradouroEndereco logradouro) throws BusinessException {
 		if (logradouro != null) {
 
 			/*
@@ -74,14 +76,13 @@ public class LogradouroServiceImpl implements LogradouroService {
 	}
 
 	@Override
-	public LogradouroCliente inserir(LogradouroCliente logradouro) throws BusinessException {
+	public Logradouro inserir(Logradouro logradouro) throws BusinessException {
 		if (logradouro != null) {
-
 			return (LogradouroCliente) entityManager.merge(logradouro);
 		}
 		return null;
 	}
-
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)

@@ -346,8 +346,8 @@ $(document).ready(function() {
 			</div>
 
 			<div class="label obrigatorio">Finalidade:</div>
-			<div class="input" style="width: 20%">
-				<select id="finalidadePedido" name="pedido.finalidadePedido" style="width: 100%" >
+			<div class="input" style="width: 80%">
+				<select id="finalidadePedido" name="pedido.finalidadePedido" style="width: 25%" >
 					<option value=""></option>
 					<c:forEach var="tipo" items="${listaTipoFinalidadePedido}">
 						<option value="${tipo}" 
@@ -355,10 +355,12 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 			</div>
+			<%--
 			<div class="label">Frete (R$):</div>
 			<div class="input" style="width: 20%">
 				<input id="fretePedido" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 100%" />
 			</div>
+			 --%>
 			<div class="label">Observação:</div>
 			<div class="input areatexto" style="width: 70%">
 				<textarea id="obervacao" name="pedido.observacao"

@@ -29,5 +29,25 @@ CREATE TABLE vendas.tb_logradouro_pedido (
   CONSTRAINT id_tipo_logradouro FOREIGN KEY (id_tipo_logradouro) REFERENCES vendas.tb_tipo_logradouro (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+CREATE TABLE vendas.tb_logradouro_usuario (
+  id integer NOT NULL,
+  cancelado boolean DEFAULT false,
+  cep character varying(8),
+  endereco character varying(500),
+  numero character varying(20),
+  complemento character varying(250),
+  bairro character varying(50),
+  cidade character varying(50),
+  uf character varying(2),
+  pais character varying(50),
+  id_tipo_logradouro integer NOT NULL DEFAULT 3,
+  codificado boolean DEFAULT true,
+  CONSTRAINT tb_logradouro_usuario_pkey PRIMARY KEY (id),
+  CONSTRAINT id_tipo_logradouro FOREIGN KEY (id_tipo_logradouro) REFERENCES vendas.tb_tipo_logradouro (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+alter table vendas.tb_usuario add id_logradouro_usuario integer default null;
+
 create sequence vendas.seq_logradouro_cliente_id increment by 1 minvalue 1 no maxvalue start with 1;
 create sequence vendas.seq_logradouro_pedido_id increment by 1 minvalue 1 no maxvalue start with 1;
+create sequence vendas.seq_logradouro_usuario_id increment by 1 minvalue 1 no maxvalue start with 1;
+

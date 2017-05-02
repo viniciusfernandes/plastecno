@@ -102,7 +102,7 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 			throw new BusinessException("CNPJ enviado ja foi cadastrado para outra transportadora");
 		}
 
-		transportadora.setLogradouro(this.logradouroService.inserir(transportadora.getLogradouro()));
+		transportadora.setLogradouro(this.logradouroService.inserirBaseCep(transportadora.getLogradouro()));
 		return transportadoraDAO.alterar(transportadora).getId();
 	}
 

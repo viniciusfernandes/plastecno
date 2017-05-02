@@ -13,6 +13,7 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.ContatoUsuario;
 import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -59,7 +60,7 @@ public class UsuarioController extends AbstractController {
         if (usuario == null) {
             this.gerarListaMensagemErro("Usuário não existe no sistema");
         } else {
-            LogradouroEndereco logradouro = this.usuarioService.pesquisarLogradouro(usuario.getId());
+            LogradouroUsuario logradouro = this.usuarioService.pesquisarLogradouro(usuario.getId());
             usuario.setLogradouro(logradouro);
 
             usuario.setSenha(null);

@@ -9,8 +9,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -19,68 +17,39 @@ import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
-@Table(name = "tb_logradouro_cliente", schema = "vendas")
+@Table(name = "tb_logradouro_usuario", schema = "vendas")
 @InformacaoValidavel(validarHierarquia = true)
-public class LogradouroCliente implements Logradouro, Serializable, Cloneable {
-	private static final long serialVersionUID = -8911271247053259317L;
+public class LogradouroUsuario implements Logradouro, Serializable, Cloneable {
+	private static final long serialVersionUID = 60149013763540668L;
 	private String bairro;
-
 	private String cep;
-
 	private String cidade;
-
-	@ManyToOne
-	@JoinColumn(name = "id_cliente", referencedColumnName = "id", nullable = false)
-	private Cliente cliente;
 	private Boolean codificado = true;
+
 	@Transient
 	private String codigoMunicipio;
+
 	private String complemento;
+
 	private String endereco;
 
 	@Id
-	@SequenceGenerator(name = "logradouroClienteSequence", sequenceName = "vendas.seq_logradouro_cliente_id", initialValue = 1, allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "logradouroClienteSequence")
+	@SequenceGenerator(name = "logradouroUsuarioSequence", sequenceName = "vendas.seq_logradouro_usuario_id", initialValue = 1, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "logradouroUsuarioSequence")
 	private Integer id;
 
 	private String numero;
+
 	private String pais;
+
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_tipo_logradouro")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo do Logradouro do cliente")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo do Logradouro do pedido")
 	private TipoLogradouro tipoLogradouro;
+
 	private String uf;
 
-	public LogradouroCliente() {
-	}
-
-	public LogradouroCliente(Integer id) {
-		this.id = id;
-	}
-
-	public Endereco gerarEndereco() {
-		Pais p = new Pais();
-		p.setDescricao(getPais());
-
-		UF uf = new UF();
-		uf.setSigla(getUf());
-		uf.setPais(p);
-
-		Cidade c = new Cidade();
-		c.setDescricao(getCidade());
-		c.setPais(p);
-		c.setUf(uf.getSigla());
-
-		Bairro b = new Bairro();
-		b.setCidade(c);
-		b.setDescricao(getBairro());
-
-		Endereco e = new Endereco();
-		e.setBairro(b);
-		e.setCep(getCep());
-		e.setCidade(c);
-		e.setDescricao(getEndereco());
-		return e;
+	public LogradouroUsuario() {
 	}
 
 	public String getBairro() {
@@ -93,10 +62,6 @@ public class LogradouroCliente implements Logradouro, Serializable, Cloneable {
 
 	public String getCidade() {
 		return cidade;
-	}
-
-	public Cliente getCliente() {
-		return cliente;
 	}
 
 	public Boolean getCodificado() {
@@ -149,10 +114,6 @@ public class LogradouroCliente implements Logradouro, Serializable, Cloneable {
 
 	public void setCidade(String cidade) {
 		this.cidade = cidade;
-	}
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
 	}
 
 	public void setCodificado(Boolean codificado) {

@@ -22,7 +22,10 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Table(name = "tb_logradouro_pedido", schema = "vendas")
 @InformacaoValidavel(validarHierarquia = true)
 public class LogradouroPedido implements Logradouro, Serializable, Cloneable {
-	private static final long serialVersionUID = -8911271247053259317L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7587191572140848470L;
 	private String bairro;
 	private String cep;
 	private String cidade;

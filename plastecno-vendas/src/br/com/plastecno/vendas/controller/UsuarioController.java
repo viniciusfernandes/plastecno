@@ -12,7 +12,6 @@ import br.com.plastecno.service.PerfilAcessoService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.ContatoUsuario;
-import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Usuario;
@@ -82,7 +81,7 @@ public class UsuarioController extends AbstractController {
 
     @Post("usuario/inclusao")
     public void inserir(Double salario, Double comissao, Usuario usuario, List<ContatoUsuario> listaContato,
-            LogradouroEndereco logradouro, List<Integer> listaIdPerfilAssociado, boolean isAlteracaoSenha) {
+            LogradouroUsuario logradouro, List<Integer> listaIdPerfilAssociado, boolean isAlteracaoSenha) {
         try {
 
             if (usuario.getId() == null) {

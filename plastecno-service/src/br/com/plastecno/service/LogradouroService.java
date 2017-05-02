@@ -15,7 +15,7 @@ import br.com.plastecno.service.exception.BusinessException;
 public interface LogradouroService {
 	List<LogradouroCliente> inserir(List<LogradouroCliente> listaLogradouro) throws BusinessException;
 
-	Logradouro inserir(Logradouro logradouro) throws BusinessException;
+	<T extends Logradouro> T inserir(T logradouro) throws BusinessException;
 
 	LogradouroEndereco inserirBaseCep(LogradouroEndereco logradouro) throws BusinessException;
 

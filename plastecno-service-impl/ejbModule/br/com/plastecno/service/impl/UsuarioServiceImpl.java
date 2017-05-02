@@ -19,7 +19,6 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.dao.UsuarioDAO;
 import br.com.plastecno.service.entity.ContatoUsuario;
-import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Usuario;
@@ -35,17 +34,17 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @TransactionManagement(TransactionManagementType.CONTAINER)
 public class UsuarioServiceImpl implements UsuarioService {
 
+	@EJB
+	private AutenticacaoService autenticacaoService;
+
+	@EJB
+	private ContatoService contatoService;
+
 	@PersistenceContext(unitName = "plastecno")
 	private EntityManager entityManager;
 
 	@EJB
 	private LogradouroService logradouroService;
-
-	@EJB
-	private ContatoService contatoService;
-
-	@EJB
-	private AutenticacaoService autenticacaoService;
 
 	private UsuarioDAO usuarioDAO;
 
@@ -174,7 +173,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			throw new BusinessException("CPF enviado ja foi cadastrado para outro usuario");
 		}
 
-		usuario.setLogradouro(logradouroService.inserirBaseCep(usuario.getLogradouro()));
+		usuario.setLogradouro(logradouroService.inserir(usuario.getLogradouro()));
 		ValidadorInformacao.validar(usuario);
 		if (isAlteracaoSenha) {
 			try {

@@ -21,10 +21,9 @@ import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.LogradouroDAO;
 import br.com.plastecno.service.entity.Logradouro;
-import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.LogradouroCliente;
+import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.LogradouroPedido;
-import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
@@ -61,6 +60,14 @@ public class LogradouroServiceImpl implements LogradouroService {
 	}
 
 	@Override
+	public <T extends Logradouro> T inserir(T logradouro) throws BusinessException {
+		if (logradouro != null) {
+			return (T) entityManager.merge(logradouro);
+		}
+		return null;
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public LogradouroEndereco inserirBaseCep(LogradouroEndereco logradouro) throws BusinessException {
 		if (logradouro != null) {
@@ -74,14 +81,6 @@ public class LogradouroServiceImpl implements LogradouroService {
 		}
 		return null;
 	}
-
-	@Override
-	public Logradouro inserir(Logradouro logradouro) throws BusinessException {
-		if (logradouro != null) {
-			return (LogradouroCliente) entityManager.merge(logradouro);
-		}
-		return null;
-	}
 	
 	@Override
 	@SuppressWarnings("unchecked")
@@ -92,7 +91,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 		select.append("select c from ").append(nomeTipoLogradouro).append(" c inner join c.")
 				.append(nomeTipoLogradouro.replace("Logradouro", "").toLowerCase()).append(" l where l.id =:id");
 
-		return this.entityManager.createQuery(select.toString()).setParameter("id", id).getResultList();
+		return entityManager.createQuery(select.toString()).setParameter("id", id).getResultList();
 	}
 
 	@SuppressWarnings("unchecked")

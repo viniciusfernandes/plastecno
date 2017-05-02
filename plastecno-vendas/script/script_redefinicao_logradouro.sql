@@ -1,3 +1,4 @@
+
 ALTER TABLE vendas.tb_logradouro_cliente add cep varchar (8);
 ALTER TABLE vendas.tb_logradouro_cliente add endereco varchar (500);
 ALTER TABLE vendas.tb_logradouro_cliente add numero varchar (20);
@@ -5,10 +6,12 @@ ALTER TABLE vendas.tb_logradouro_cliente add complemento varchar (250);
 ALTER TABLE vendas.tb_logradouro_cliente add cidade varchar (50);
 ALTER TABLE vendas.tb_logradouro_cliente add uf varchar (2);
 ALTER TABLE vendas.tb_logradouro_cliente add pais varchar (50);
-ALTER TABLE vendas.tb_logradouro_cliente add id_tipo_logradouro integer NOT NULL;
-ALTER TABLE vendas.tb_logradouro_cliente add constraint id_tipo_logradouro foreign key (id_tipo_logradouro) references vendas.tb_tipo_logradouro (id);
+ALTER TABLE vendas.tb_logradouro_cliente add id_tipo_logradouro integer NOT NULL default 3;
 ALTER TABLE vendas.tb_logradouro_cliente add codificado boolean DEFAULT true;
 ALTER TABLE vendas.tb_logradouro_cliente add bairro varchar (50);
+
+ALTER TABLE vendas.tb_logradouro_cliente add constraint id_tipo_logradouro foreign key (id_tipo_logradouro) references vendas.tb_tipo_logradouro (id);
+
 
 CREATE TABLE vendas.tb_logradouro_pedido (
   id integer NOT NULL,

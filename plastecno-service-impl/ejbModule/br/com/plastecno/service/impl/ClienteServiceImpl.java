@@ -186,8 +186,7 @@ public class ClienteServiceImpl implements ClienteService {
 		List<Object[]> ids = entityManager.createQuery("select c.id, c.cliente.id from LogradouroCliente c")
 				.getResultList();
 		List<Object[]> logs = null;
-		
-	/*
+
 		for (Object[] o : ids) {
 			logs = entityManager
 					.createQuery(
@@ -224,24 +223,27 @@ public class ClienteServiceImpl implements ClienteService {
 						.setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo()).executeUpdate();
 			}
 		}
-		
-*/
-		ids = entityManager.createNativeQuery("select u.id_logradouro from vendas.tb_usuario u ").getResultList();
-		for (Object[] o : ids) {
+
+		List<Integer> idsU = entityManager.createNativeQuery("select u.id_logradouro from vendas.tb_usuario u ")
+				.getResultList();
+		for (Integer id : idsU) {
+			if (id == null) {
+				continue;
+			}
 			logs = entityManager
 					.createQuery(
-							"select l.endereco.cep, l.endereco, l.numero, l.complemento, l.bairro, l.cidade, l.uf, l.pais, l.codificado, l.tipoLogradouro from LogradouroEndereco l where l.id =:id",
-							Object[].class).setParameter("id", o[0]).getResultList();
+							"select l.endereco.cep, l.endereco.descricao, l.numero, l.complemento, l.endereco.bairro.descricao, l.endereco.cidade.descricao, l.endereco.cidade.uf, l.endereco.cidade.pais.descricao, l.codificado, l.tipoLogradouro from LogradouroEndereco l where l.id =:id",
+							Object[].class).setParameter("id", id).getResultList();
 
 			for (Object[] log : logs) {
 				entityManager
 						.createNativeQuery(
 								"insert into  vendas.tb_logradouro_usuario (id, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_usuario_id'), :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )")
-						.setParameter("cep", log[0]).setParameter("endereco", log[1])
-						.setParameter("numero", log[2]).setParameter("complemento", log[3])
-						.setParameter("bairro", log[4]).setParameter("cidade", log[5]).setParameter("uf", log[6])
-						.setParameter("pais", log[7]).setParameter("codificado", log[8])
-						.setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo()).executeUpdate();
+						.setParameter("cep", log[0]).setParameter("endereco", log[1]).setParameter("numero", log[2])
+						.setParameter("complemento", log[3]).setParameter("bairro", log[4])
+						.setParameter("cidade", log[5]).setParameter("uf", log[6]).setParameter("pais", log[7])
+						.setParameter("codificado", log[8]).setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo())
+						.executeUpdate();
 			}
 		}
 	}

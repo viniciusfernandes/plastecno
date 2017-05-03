@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.persistence.EntityManager;
@@ -33,7 +35,6 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 @Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)
 public class UsuarioServiceImpl implements UsuarioService {
-
 	@EJB
 	private AutenticacaoService autenticacaoService;
 
@@ -49,6 +50,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	private UsuarioDAO usuarioDAO;
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado) throws BusinessException {
 		this.verificarPerfilVendedor(idVendedor);
 
@@ -60,6 +62,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado,
 			List<Integer> listaIdClienteDesassociado) throws BusinessException {
 		if (idVendedor == null) {
@@ -74,6 +77,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public int desabilitar(Integer id) throws BusinessException {
 		Query query = this.entityManager.createQuery("update Usuario u set u.ativo = false where u.id =:id ");
 		query.setParameter("id", id);
@@ -85,6 +89,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void desassociarCliente(Integer idVendedor, List<Integer> listaIdClienteDesassociado)
 			throws BusinessException {
 		this.verificarPerfilVendedor(idVendedor);
@@ -159,6 +164,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserir(Usuario usuario, boolean isAlteracaoSenha) throws BusinessException {
 
 		if (!isAlteracaoSenha && usuario.getId() != null) {
@@ -188,6 +194,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@TODO(descricao = "Remover o hardcoded administracao")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isAdministrador(Integer idUsuario) {
 		List<PerfilAcesso> l = pesquisarPerfisAssociados(idUsuario);
 		for (PerfilAcesso perfilAcesso : l) {
@@ -199,31 +206,37 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isClienteAssociadoVendedor(Integer idCliente, Integer idVendedor) {
 		return usuarioDAO.pesquisarIdVendedorByIdCliente(idCliente, idVendedor) != null;
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isCPF(Integer id, String cpf) {
 		return usuarioDAO.isEntidadeExistente(Usuario.class, id, "cpf", cpf);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isEmailExistente(Integer id, String email) {
 		return usuarioDAO.isEntidadeExistente(Usuario.class, id, "email", email);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isVendaPermitida(Integer idCliente, Integer idVendedor) {
 		return isAdministrador(idVendedor) || isClienteAssociadoVendedor(idCliente, idVendedor);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isVendedorAtivo(Integer idVendedor) {
 		return usuarioDAO.pesquisarVendedorAtivo(idVendedor);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public PaginacaoWrapper<Usuario> paginarUsuario(Usuario filtro, boolean isVendedor, Boolean apenasAtivos,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		return new PaginacaoWrapper<Usuario>(this.pesquisarTotalRegistros(filtro, apenasAtivos, isVendedor),
@@ -232,6 +245,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public PaginacaoWrapper<Usuario> paginarVendedor(Usuario filtro, Boolean apenasAtivos,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		return new PaginacaoWrapper<Usuario>(this.pesquisarTotalRegistros(filtro, apenasAtivos, true), this.pesquisar(
@@ -239,6 +253,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private List<Usuario> pesquisar(Usuario filtro, boolean isVendedor, Boolean apenasAtivos,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 
@@ -255,22 +270,26 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Usuario> pesquisarBy(Usuario filtro) {
 		return this.pesquisar(filtro, false, false, null, null);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Usuario> pesquisarBy(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 		return this.pesquisar(filtro, false, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Usuario pesquisarById(Integer id) {
 		return usuarioDAO.pesquisarById(id);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Usuario> pesquisarByNome(String nome) {
 		return this.pesquisarUsuarioByNome(nome, false);
 	}
@@ -293,12 +312,14 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<PerfilAcesso> pesquisarPerfisAssociados(Integer id) {
 		return usuarioDAO.pesquisarPerfisAssociados(id);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<PerfilAcesso> pesquisarPerfisNaoAssociados(Integer id) {
 		List<PerfilAcesso> listaPerfil = this.pesquisarPerfisAssociados(id);
 		Query query = null;
@@ -314,6 +335,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public String pesquisarSenhaByEmail(String email) {
 		return QueryUtil.gerarRegistroUnico(
 				this.entityManager.createQuery("select u.senha from Usuario u where u.email = :email ").setParameter(
@@ -321,6 +343,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalRegistros(Usuario filtro, Boolean apenasAtivos, boolean isVendedor) {
 		if (filtro == null) {
 			return 0L;
@@ -334,6 +357,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@SuppressWarnings({ "unchecked" })
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private List<Usuario> pesquisarUsuarioByNome(String nome, boolean isVendedor) {
 		StringBuilder select = new StringBuilder("select new Usuario(u.id, u.nome, u.sobrenome) from Usuario u ");
 		if (isVendedor) {
@@ -350,11 +374,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Usuario pesquisarUsuarioResumidoById(Integer idUsuario) {
 		return usuarioDAO.pesquisarUsuarioResumidoById(idUsuario);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Usuario pesquisarVendedorById(Integer idVendedor) {
 
 		return QueryUtil
@@ -368,19 +394,33 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Usuario pesquisarVendedorByIdCliente(Integer idCliente) {
 		return usuarioDAO.pesquisarVendedorByIdCliente(idCliente);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Usuario> pesquisarVendedorByNome(String nome) {
 		return this.pesquisarUsuarioByNome(nome, true);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Usuario> pesquisarVendedores(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 		return this.pesquisar(filtro, true, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerLogradouro(Integer idLogradouro) {
+		if (idLogradouro == null) {
+			return;
+		}
+		
+		usuarioDAO.removerLogradouro(idLogradouro);
+		logradouroService.removerLogradouro(new LogradouroUsuario(idLogradouro));
 	}
 
 	private void verificarPerfilVendedor(Integer idVendedor) throws BusinessException {

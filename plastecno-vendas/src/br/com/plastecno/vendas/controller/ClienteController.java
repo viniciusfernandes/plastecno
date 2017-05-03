@@ -245,7 +245,7 @@ public class ClienteController extends AbstractController {
 
     @Post("cliente/logradouro/remocao/{idLogradouro}")
     public void removerLogradouro(Integer idLogradouro) {
-        clienteService.removerLogradouroCliente(idLogradouro);
+        clienteService.removerLogradouro(idLogradouro);
         irTopoPagina();
     }
 

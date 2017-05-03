@@ -49,6 +49,8 @@ CREATE TABLE vendas.tb_logradouro_usuario (
   CONSTRAINT id_tipo_logradouro FOREIGN KEY (id_tipo_logradouro) REFERENCES vendas.tb_tipo_logradouro (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 alter table vendas.tb_usuario add id_logradouro_usuario integer default null;
+ALTER TABLE vendas.tb_usuario add constraint id_logradouro_usuario  foreign key (id_logradouro_usuario ) references vendas.tb_logradouro_usuario  (id);
+
 
 create sequence vendas.seq_logradouro_cliente_id increment by 1 minvalue 1 no maxvalue start with 1;
 create sequence vendas.seq_logradouro_pedido_id increment by 1 minvalue 1 no maxvalue start with 1;

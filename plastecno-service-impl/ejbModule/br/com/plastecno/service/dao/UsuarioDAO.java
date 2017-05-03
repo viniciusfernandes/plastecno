@@ -73,4 +73,9 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 		query.setParameter("id", idCliente);
 		return QueryUtil.gerarRegistroUnico(query, Usuario.class, null);
 	}
+
+	public void removerLogradouro(Integer idLogradouro) {
+		entityManager.createQuery("update Usuario u set u.logradouro = null where u.logradouro.id = :idLogradouro")
+				.setParameter("idLogradouro", idLogradouro).executeUpdate();
+	}
 }

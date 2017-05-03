@@ -52,6 +52,10 @@ public class LogradouroUsuario implements Logradouro, Serializable, Cloneable {
 	public LogradouroUsuario() {
 	}
 
+	public LogradouroUsuario(Integer id) {
+		this.id = id;
+	}
+
 	public String getBairro() {
 		return bairro;
 	}

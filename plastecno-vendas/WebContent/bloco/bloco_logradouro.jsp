@@ -50,7 +50,6 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 <fieldset id="bloco_logradouro">
 	<legend>::: Endereço :::</legend>
 	<input type="hidden" id="idLogradouro" name="logradouro.id" value="${logradouro.id}" />
-	<input type="hidden" id="idCidade" name="logradouro.idCidade" value="${logradouro.idCidade}" />
 	<input type="hidden" id="codigoMunicipio" name="logradouro.codigoMunicipio" value="${logradouro.codigoMunicipio}" />
 
 	<c:if test="${tipoLogradouroRenderizado}">
@@ -72,11 +71,18 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 		<input type="text" id="cep" name="logradouro.cep" maxlength="8"
 			value="${logradouro.cep}" />
 	</div>
-	<div class="input" style="width: 5%">
+	<div class="input" style="width: 2%">
 		<input type="button" id="botaoPesquisaEndereco"
 			title="Pesquisar Endereço" value="" class="botaoPesquisarPequeno"
 			style="width: 20px" />
 	</div>
+	<c:if test="${not possuiMultiplosLogradouros}">
+		<div class="input" style="width: 5%">
+			<input type="button" id="botaoRemoverLogradouro"
+				title="Remover Logradouro" value="" class="botaoRemover"
+				style="width: 20px" />
+		</div>
+	</c:if>
 	<div class="label" style="width: 10%">End. codificado:</div>
 	<div class="input" style="width: 50%">
 		<input type="checkbox" id="codificado" name="logradouro.codificado"

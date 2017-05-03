@@ -93,7 +93,7 @@ public interface ClienteService {
 
 	List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente);
 
-	void removerLogradouroCliente(Integer idLogradouro);
+	void removerLogradouro(Integer idLogradouro);
 
 	void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException;
 }

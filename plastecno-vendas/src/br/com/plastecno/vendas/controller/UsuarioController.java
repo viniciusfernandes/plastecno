@@ -26,11 +26,11 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 @Resource
 public class UsuarioController extends AbstractController {
     @Servico
-    private UsuarioService usuarioService;
+    private ContatoService contatoService;
     @Servico
     private PerfilAcessoService perfilAcessoService;
     @Servico
-    private ContatoService contatoService;
+    private UsuarioService usuarioService;
 
     public UsuarioController(final Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -51,32 +51,6 @@ public class UsuarioController extends AbstractController {
             gerarLogErroInclusao("Usuario", e);
         }
         this.irPaginaHome();
-    }
-
-    @Get("usuario/edicao")
-    public void pesquisarUsuarioById(Integer id) {
-        Usuario usuario = this.usuarioService.pesquisarById(id);
-        if (usuario == null) {
-            this.gerarListaMensagemErro("Usuário não existe no sistema");
-        } else {
-            LogradouroUsuario logradouro = this.usuarioService.pesquisarLogradouro(usuario.getId());
-            usuario.setLogradouro(logradouro);
-
-            usuario.setSenha(null);
-            inserirMascaraDocumentos(usuario);
-            addAtributo("tipoLogradouroSelecionado", logradouro != null ? logradouro.getTipoLogradouro() : null);
-            addAtributo("usuario", usuario);
-            addAtributo("logradouro", logradouro);
-            addAtributo("listaContato", this.usuarioService.pesquisarContatos(id));
-
-            try {
-                popularPicklist(usuarioService.pesquisarPerfisNaoAssociados(id),
-                        usuarioService.pesquisarPerfisAssociados(id));
-            } catch (ControllerException e) {
-                gerarLogErroNavegacao("Usuario", e);
-            }
-        }
-        irTopoPagina();
     }
 
     @Post("usuario/inclusao")
@@ -142,6 +116,32 @@ public class UsuarioController extends AbstractController {
         addAtributo("usuario", filtro);
     }
 
+    @Get("usuario/edicao")
+    public void pesquisarUsuarioById(Integer id) {
+        Usuario usuario = this.usuarioService.pesquisarById(id);
+        if (usuario == null) {
+            this.gerarListaMensagemErro("Usuário não existe no sistema");
+        } else {
+            LogradouroUsuario logradouro = this.usuarioService.pesquisarLogradouro(usuario.getId());
+            usuario.setLogradouro(logradouro);
+
+            usuario.setSenha(null);
+            inserirMascaraDocumentos(usuario);
+            addAtributo("tipoLogradouroSelecionado", logradouro != null ? logradouro.getTipoLogradouro() : null);
+            addAtributo("usuario", usuario);
+            addAtributo("logradouro", logradouro);
+            addAtributo("listaContato", this.usuarioService.pesquisarContatos(id));
+
+            try {
+                popularPicklist(usuarioService.pesquisarPerfisNaoAssociados(id),
+                        usuarioService.pesquisarPerfisAssociados(id));
+            } catch (ControllerException e) {
+                gerarLogErroNavegacao("Usuario", e);
+            }
+        }
+        irTopoPagina();
+    }
+
     @Get("usuario/listagem/nome")
     public void pesquisarUsuarioByNome(String nome) {
         List<Autocomplete> lista = new ArrayList<Autocomplete>();
@@ -155,6 +155,13 @@ public class UsuarioController extends AbstractController {
     @Post("usuario/contato/remocao/{idContato}")
     public void removerContato(Integer idContato) {
         this.contatoService.remover(idContato);
+        irTopoPagina();
+    }
+
+    @Post("usuario/remocaologradouro")
+    public void removerLogradouro(Integer idLogradouro) {
+        usuarioService.removerLogradouro(idLogradouro);
+        gerarMensagemSucesso("O logradouro do usuário foi removido com sucesso.");
         irTopoPagina();
     }
 

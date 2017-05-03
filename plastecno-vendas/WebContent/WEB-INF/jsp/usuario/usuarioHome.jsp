@@ -70,6 +70,16 @@ $(document).ready(function() {
 		$('#formVazio').submit();
 	});
 	
+	$('#botaoRemoverLogradouro').click(function(){
+		var id = $('#bloco_logradouro #idLogradouro').val();
+		if(isEmpty(id)){
+			return;
+		}
+		var par = 'idLogradouro='+id;
+		$('#formVazio').attr('action','<c:url value="/usuario/remocaologradouro"/>?'+par).attr('method', 'post').submit();
+	});
+	
+	
 	inserirMascaraCPF('cpf');
 	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />

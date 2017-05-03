@@ -81,7 +81,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 		}
 		return null;
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -97,7 +97,8 @@ public class LogradouroServiceImpl implements LogradouroService {
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public <T extends LogradouroEndereco> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe) {
+	public <T extends LogradouroEndereco> List<T> pesquisarAusentes(Integer id, Collection<T> listaLogradouro,
+			Class<T> classe) {
 		String nomeTipoLogradouro = classe.getSimpleName();
 		StringBuilder select = new StringBuilder();
 		select.append("select l from ").append(nomeTipoLogradouro).append(" l where l.")
@@ -146,12 +147,20 @@ public class LogradouroServiceImpl implements LogradouroService {
 	 * Integer, java.util.Collection, java.lang.Class)
 	 */
 	@Override
-	public <T extends LogradouroEndereco> void removerAusentes(Integer id, Collection<T> listaLogradouro, Class<T> classe) {
-		List<? extends LogradouroEndereco> listaLogradouroCadastrado = this.pesquisarAusentes(id, listaLogradouro, classe);
+	public <T extends LogradouroEndereco> void removerAusentes(Integer id, Collection<T> listaLogradouro,
+			Class<T> classe) {
+		List<? extends LogradouroEndereco> listaLogradouroCadastrado = this.pesquisarAusentes(id, listaLogradouro,
+				classe);
 		for (LogradouroEndereco logradouro : listaLogradouroCadastrado) {
 			this.entityManager.remove(logradouro);
 		}
 
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerLogradouro(Logradouro logradouro) {
+		logradouroDAO.remover(logradouro);
 	}
 
 	@Override
@@ -176,6 +185,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 		lLogAusente.forEach(t -> listaMensagem.add("É obrigatorio logradouro do tipo " + t));
 		throw new InformacaoInvalidaException(listaMensagem);
 	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public void validarListaLogradouroPreenchidaXXX(List<LogradouroPedido> listaLogradouro) throws BusinessException {

@@ -248,8 +248,8 @@ public class ClienteServiceImpl implements ClienteService {
 		validarDocumentosPreenchidos(cliente);
 		validarRevendedorExistente(cliente);
 
-		Integer idCliente = clienteDAO.alterar(cliente).getId();
-		inserirEndereco(idCliente, cliente.getListaLogradouro());
+		Cliente c = clienteDAO.alterar(cliente);
+		inserirEndereco(c, cliente.getListaLogradouro());
 		return cliente;
 	}
 
@@ -283,12 +283,11 @@ public class ClienteServiceImpl implements ClienteService {
 
 	}
 
-	private void inserirEndereco(Integer idCliente, List<LogradouroCliente> lLogradouro) throws BusinessException {
-		if (lLogradouro == null || lLogradouro.isEmpty() || idCliente == null) {
+	private void inserirEndereco(Cliente c, List<LogradouroCliente> lLogradouro) throws BusinessException {
+		if (lLogradouro == null || lLogradouro.isEmpty()) {
 			return;
 		}
 
-		Cliente c = new Cliente(idCliente);
 		lLogradouro.stream().forEach(l -> l.setCliente(c));
 		lLogradouro = logradouroService.inserir(lLogradouro);
 

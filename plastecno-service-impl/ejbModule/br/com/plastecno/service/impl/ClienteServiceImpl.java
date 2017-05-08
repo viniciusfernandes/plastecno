@@ -212,7 +212,7 @@ public class ClienteServiceImpl implements ClienteService {
 			for (Object[] log : logs) {
 				entityManager
 						.createNativeQuery(
-								"insert into  vendas.tb_logradouro_pedido (id, id_pedido, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_pedido_id'), :idPedido, :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )")
+								"insert into  vendas.tb_logradouro_pedido (id, id_pedido, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_cliente_id'), :idPedido, :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )")
 						.setParameter("idPedido", o[0]).setParameter("cep", log[0]).setParameter("endereco", log[1])
 						.setParameter("numero", log[2]).setParameter("complemento", log[3])
 						.setParameter("bairro", log[4]).setParameter("cidade", log[5]).setParameter("uf", log[6])
@@ -247,8 +247,10 @@ public class ClienteServiceImpl implements ClienteService {
 
 		validarDocumentosPreenchidos(cliente);
 		validarRevendedorExistente(cliente);
-		inserirEndereco(cliente);
-		return cliente.getId() == null ? clienteDAO.inserir(cliente) : clienteDAO.alterar(cliente);
+
+		Cliente c = clienteDAO.alterar(cliente);
+		inserirEndereco(c, cliente.getListaLogradouro());
+		return cliente;
 	}
 
 	@Override
@@ -281,13 +283,13 @@ public class ClienteServiceImpl implements ClienteService {
 
 	}
 
-	private void inserirEndereco(Cliente cliente) throws BusinessException {
-		if (!cliente.isListaLogradouroPreenchida()) {
+	private void inserirEndereco(Cliente c, List<LogradouroCliente> lLogradouro) throws BusinessException {
+		if (lLogradouro == null || lLogradouro.isEmpty()) {
 			return;
 		}
 
-		List<LogradouroCliente> lLogr = cliente.getListaLogradouro();
-		lLogr = logradouroService.inserir(lLogr);
+		lLogradouro.stream().forEach(l -> l.setCliente(c));
+		lLogradouro = logradouroService.inserir(lLogradouro);
 
 		// Vamos verificar os ceps ja existentes pois vamos inserir na tabela de
 		// logradouro apenas os enderecos que nao existirem no sistema. Devemos
@@ -296,14 +298,16 @@ public class ClienteServiceImpl implements ClienteService {
 		// exemplo: atualizar o nome de rua de um determinado cep. A tabela de
 		// logradouro eh utilizada apenas para consultar os ceps quando o
 		// usuario efetuar uma pesquisa no campo de ceps.
-		List<String> lCep = enderecamentoService.pesquisarCEPExistente(lLogr.stream().map(l -> l.getCep())
-				.collect(Collectors.toList()));
+		List<String> lCep = enderecamentoService.pesquisarCEPExistente(lLogradouro.stream().map(l -> l.getCep())
+				.collect(Collectors.toSet()));
 
 		if (!lCep.isEmpty()) {
-			lLogr = lLogr.stream().filter(l -> !lCep.contains(l.getCep())).collect(Collectors.toList());
+			lLogradouro = lLogradouro.stream().filter(l -> !lCep.contains(l.getCep())).collect(Collectors.toList());
 		}
 
-		for (LogradouroCliente l : lLogr) {
+		// Aqui estamos populando a tabela de CEP com os novos enderecos
+		// inseridos pelo usuario
+		for (LogradouroCliente l : lLogradouro) {
 			enderecamentoService.inserir(l.gerarEndereco());
 		}
 	}

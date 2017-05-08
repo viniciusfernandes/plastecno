@@ -2,6 +2,7 @@ package br.com.plastecno.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
@@ -106,7 +107,7 @@ public class EnderecamentoServiceImpl implements EnderecamentoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<String> pesquisarCEPExistente(List<String> listaCep) {
+	public List<String> pesquisarCEPExistente(Set<String> listaCep) {
 		if (listaCep == null || listaCep.isEmpty()) {
 			return new ArrayList<String>();
 		}

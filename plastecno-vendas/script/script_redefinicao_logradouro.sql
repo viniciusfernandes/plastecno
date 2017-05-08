@@ -56,3 +56,5 @@ create sequence vendas.seq_logradouro_cliente_id increment by 1 minvalue 1 no ma
 create sequence vendas.seq_logradouro_pedido_id increment by 1 minvalue 1 no maxvalue start with 1;
 create sequence vendas.seq_logradouro_usuario_id increment by 1 minvalue 1 no maxvalue start with 1;
 
+
+ALTER TABLE vendas.tb_logradouro_cliente drop constraint id_logradouro_cliente;

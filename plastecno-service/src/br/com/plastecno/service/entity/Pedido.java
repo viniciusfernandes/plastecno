@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -28,7 +27,6 @@ import javax.persistence.Transient;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
-import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -286,6 +284,7 @@ public class Pedido implements Serializable, Cloneable {
 			setListaLogradouro(new ArrayList<LogradouroPedido>());
 		}
 		listaLogradouro.add(logradouro);
+		logradouro.setPedido(this);
 	}
 
 	public double addValorPedido(double valor) {
@@ -376,16 +375,6 @@ public class Pedido implements Serializable, Cloneable {
 
 	public List<LogradouroPedido> getListaLogradouro() {
 		return listaLogradouro;
-	}
-
-	public LogradouroPedido getLogradouro(TipoLogradouro tipoLogradouro) {
-		if (listaLogradouro == null || listaLogradouro.isEmpty() || tipoLogradouro == null) {
-			return null;
-		}
-
-		List<LogradouroPedido> lista = listaLogradouro.stream()
-				.filter(l -> tipoLogradouro.equals(l.getTipoLogradouro())).collect(Collectors.toList());
-		return lista.size() > 0 ? lista.get(0) : null;
 	}
 
 	public String getNumeroColeta() {

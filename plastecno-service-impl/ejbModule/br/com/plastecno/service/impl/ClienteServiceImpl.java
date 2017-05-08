@@ -212,13 +212,14 @@ public class ClienteServiceImpl implements ClienteService {
 			for (Object[] log : logs) {
 				entityManager
 						.createNativeQuery(
-								"insert into  vendas.tb_logradouro_pedido (id, id_pedido, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_cliente_id'), :idPedido, :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )")
+								"insert into  vendas.tb_logradouro_pedido (id, id_pedido, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_pedido_id'), :idPedido, :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )")
 						.setParameter("idPedido", o[0]).setParameter("cep", log[0]).setParameter("endereco", log[1])
 						.setParameter("numero", log[2]).setParameter("complemento", log[3])
 						.setParameter("bairro", log[4]).setParameter("cidade", log[5]).setParameter("uf", log[6])
 						.setParameter("pais", log[7]).setParameter("codificado", log[8])
 						.setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo()).executeUpdate();
 			}
+
 		}
 	}
 

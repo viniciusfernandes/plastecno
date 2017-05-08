@@ -261,9 +261,9 @@ public class PedidoController extends AbstractController {
             transportadora.setLogradouro(transportadoraService.pesquisarLogradorouro(transportadora.getId()));
         }
 
-        final LogradouroPedido logradouroFaturamento = pedido.getLogradouro(TipoLogradouro.FATURAMENTO);
-        final LogradouroPedido logradouroEntrega = pedido.getLogradouro(TipoLogradouro.ENTREGA);
-        final LogradouroPedido logradouroCobranca = pedido.getLogradouro(TipoLogradouro.COBRANCA);
+        final LogradouroPedido logradouroFaturamento = recuperarLogradouro(pedido, TipoLogradouro.FATURAMENTO);
+        final LogradouroPedido logradouroEntrega = recuperarLogradouro(pedido, TipoLogradouro.ENTREGA);
+        final LogradouroPedido logradouroCobranca = recuperarLogradouro(pedido, TipoLogradouro.COBRANCA);
 
         String tipo = pedido.isVenda() ? "Venda" : "Compra";
 
@@ -491,7 +491,7 @@ public class PedidoController extends AbstractController {
         cliente.setListaRedespacho(clienteService.pesquisarTransportadorasRedespacho(id));
 
         carregarVendedor(cliente);
-        //formatarDocumento(cliente);
+        // formatarDocumento(cliente);
 
         final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar());
 
@@ -684,6 +684,18 @@ public class PedidoController extends AbstractController {
             irRodapePagina();
         }
         configurarTipoPedido(tipoPedido);
+    }
+
+    private LogradouroPedido recuperarLogradouro(Pedido p, TipoLogradouro t) {
+        if (p.getListaLogradouro() == null || p.getListaLogradouro().isEmpty()) {
+            return null;
+        }
+        for (LogradouroPedido l : p.getListaLogradouro()) {
+            if (t.equals(l.getTipoLogradouro())) {
+                return l;
+            }
+        }
+        return null;
     }
 
     private void redirectByTipoPedido(TipoPedido tipoPedido) {

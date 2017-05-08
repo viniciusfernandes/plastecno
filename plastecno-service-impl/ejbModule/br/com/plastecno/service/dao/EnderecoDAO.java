@@ -1,6 +1,7 @@
 package br.com.plastecno.service.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
@@ -30,7 +31,7 @@ public class EnderecoDAO extends GenericDAO<Endereco> {
 				Endereco.class, null);
 	}
 
-	public List<String> pesquisarCEPExistente(List<String> listaCep) {
+	public List<String> pesquisarCEPExistente(Set<String> listaCep) {
 		return entityManager.createQuery("select e.cep from Endereco e where e.cep in(:listaCep)", String.class)
 				.setParameter("listaCep", listaCep).getResultList();
 

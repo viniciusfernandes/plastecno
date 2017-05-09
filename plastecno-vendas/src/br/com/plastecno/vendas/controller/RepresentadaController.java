@@ -14,7 +14,7 @@ import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.entity.ComentarioRepresentada;
 import br.com.plastecno.service.entity.ContatoRepresentada;
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroRepresentada;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.util.NumeroUtils;
@@ -72,7 +72,8 @@ public class RepresentadaController extends AbstractController {
     }
 
     @Post("representada/inclusao")
-    public void inserir(Representada representada, LogradouroEndereco logradouro, List<ContatoRepresentada> listaContato) {
+    public void inserir(Representada representada, LogradouroRepresentada logradouro,
+            List<ContatoRepresentada> listaContato) {
         try {
 
             if (hasAtributo(logradouro)) {
@@ -139,13 +140,13 @@ public class RepresentadaController extends AbstractController {
 
     @Get("representada/edicao")
     public void pesquisarRepresentadaById(Integer id) {
-        Representada representada = this.representadaService.pesquisarById(id);
+        Representada representada = representadaService.pesquisarById(id);
 
         formataDocumentos(representada);
 
         addAtributo("representada", representada);
-        addAtributo("listaContato", this.representadaService.pesquisarContato(id));
-        addAtributo("logradouro", this.representadaService.pesquisarLogradorouro(id));
+        addAtributo("listaContato", representadaService.pesquisarContato(id));
+        addAtributo("logradouro", representadaService.pesquisarLogradorouro(id));
         addAtributo("tipoApresentacaoIPISelecionada", representada.getTipoApresentacaoIPI());
         addAtributo("comentarios", formatarComentarios(id));
 

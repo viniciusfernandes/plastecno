@@ -16,7 +16,6 @@ ALTER TABLE vendas.tb_logradouro_cliente add constraint id_tipo_logradouro forei
 CREATE TABLE vendas.tb_logradouro_pedido (
   id integer NOT NULL,
   id_pedido integer NOT NULL,
-  cancelado boolean DEFAULT false,
   cep character varying(8),
   endereco character varying(500),
   numero character varying(20),
@@ -34,7 +33,6 @@ CREATE TABLE vendas.tb_logradouro_pedido (
 
 CREATE TABLE vendas.tb_logradouro_usuario (
   id integer NOT NULL,
-  cancelado boolean DEFAULT false,
   cep character varying(8),
   endereco character varying(500),
   numero character varying(20),
@@ -51,9 +49,25 @@ CREATE TABLE vendas.tb_logradouro_usuario (
 alter table vendas.tb_usuario add id_logradouro_usuario integer default null;
 ALTER TABLE vendas.tb_usuario add constraint id_logradouro_usuario  foreign key (id_logradouro_usuario ) references vendas.tb_logradouro_usuario  (id);
 
+CREATE TABLE vendas.tb_logradouro_representada (
+  id integer NOT NULL,
+  cep character varying(8),
+  endereco character varying(500),
+  numero character varying(20),
+  complemento character varying(250),
+  bairro character varying(50),
+  cidade character varying(50),
+  uf character varying(2),
+  pais character varying(50),
+  id_tipo_logradouro integer NOT NULL DEFAULT 3,
+  codificado boolean DEFAULT true,
+  CONSTRAINT tb_logradouro_representada_pkey PRIMARY KEY (id),
+  CONSTRAINT id_tipo_logradouro FOREIGN KEY (id_tipo_logradouro) REFERENCES vendas.tb_tipo_logradouro (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+alter table vendas.tb_representada add id_logradouro_representada integer default null;
+ALTER TABLE vendas.tb_representada add constraint id_logradouro_representada foreign key (id_logradouro_representada) references vendas.tb_logradouro_representada (id);
 
 create sequence vendas.seq_logradouro_cliente_id increment by 1 minvalue 1 no maxvalue start with 1;
 create sequence vendas.seq_logradouro_pedido_id increment by 1 minvalue 1 no maxvalue start with 1;
 create sequence vendas.seq_logradouro_usuario_id increment by 1 minvalue 1 no maxvalue start with 1;
-
-ALTER TABLE vendas.tb_logradouro_cliente drop constraint id_logradouro_cliente;
+create sequence vendas.seq_logradouro_representada_id increment by 1 minvalue 1 no maxvalue start with 1;

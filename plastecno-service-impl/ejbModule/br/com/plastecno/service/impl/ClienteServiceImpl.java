@@ -180,6 +180,9 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void importarLogradouro() {
+		entityManager.createNativeQuery(
+				"ALTER TABLE vendas.tb_logradouro_cliente drop constraint id_logradouro_cliente").executeUpdate();
+
 		List<Object[]> ids = entityManager.createQuery("select c.id, c.cliente.id from LogradouroCliente c")
 				.getResultList();
 		List<Object[]> logs = null;
@@ -221,6 +224,31 @@ public class ClienteServiceImpl implements ClienteService {
 			}
 
 		}
+		ids = entityManager.createNativeQuery("select id_logradouro, id from vendas.tb_representada r").getResultList();
+		for (Object[] o : ids) {
+			logs = entityManager
+					.createQuery(
+							"select l.endereco.cep, l.endereco.descricao, l.numero, l.complemento, l.endereco.bairro.descricao, l.endereco.cidade.descricao, l.endereco.cidade.uf, l.endereco.cidade.pais.descricao, l.codificado, l.tipoLogradouro from LogradouroEndereco l where l.id =:idlog ",
+							Object[].class).setParameter("idlog", o[0]).getResultList();
+
+			for (Object[] log : logs) {
+				entityManager
+						.createNativeQuery(
+								"insert into  vendas.tb_logradouro_representada (id, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_representada_id'), :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )")
+						.setParameter("cep", log[0]).setParameter("endereco", log[1]).setParameter("numero", log[2])
+						.setParameter("complemento", log[3]).setParameter("bairro", log[4])
+						.setParameter("cidade", log[5]).setParameter("uf", log[6]).setParameter("pais", log[7])
+						.setParameter("codificado", log[8]).setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo())
+						.executeUpdate();
+
+				entityManager
+						.createNativeQuery(
+								"update vendas.tb_representada set id_logradouro_representada = currval('vendas.seq_logradouro_representada_id') where id=:id_cliente")
+						.setParameter("id_cliente", o[1]).executeUpdate();
+			}
+		}
+
+		//entityManager.createNativeQuery("ALTER TABLE vendas.tb_representada drop id_logradouro").executeUpdate();
 	}
 
 	@PostConstruct

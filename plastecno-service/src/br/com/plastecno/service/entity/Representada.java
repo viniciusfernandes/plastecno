@@ -66,8 +66,8 @@ public class Representada implements Serializable {
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da representada")
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "id_logradouro")
-	private LogradouroEndereco logradouro;
+	@JoinColumn(name = "id_logradouro_representada")
+	private LogradouroRepresentada logradouro;
 
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Nome fantasia")
 	@Column(name = "nome_fantasia")
@@ -124,8 +124,7 @@ public class Representada implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof Representada && this.id != null
-				&& this.id.equals(((Representada) o).id);
+		return o instanceof Representada && this.id != null && this.id.equals(((Representada) o).id);
 	}
 
 	public Double getAliquotaICMS() {
@@ -164,7 +163,7 @@ public class Representada implements Serializable {
 		return listaMaterial;
 	}
 
-	public LogradouroEndereco getLogradouro() {
+	public LogradouroRepresentada getLogradouro() {
 		return logradouro;
 	}
 
@@ -203,8 +202,7 @@ public class Representada implements Serializable {
 
 	public boolean isFornecedor() {
 		return TipoRelacionamento.FORNECIMENTO.equals(tipoRelacionamento)
-				|| TipoRelacionamento.REPRESENTACAO_FORNECIMENTO
-						.equals(tipoRelacionamento);
+				|| TipoRelacionamento.REPRESENTACAO_FORNECIMENTO.equals(tipoRelacionamento);
 	}
 
 	public boolean isIPIHabilitado() {
@@ -255,7 +253,7 @@ public class Representada implements Serializable {
 		this.listaMaterial = listaMaterial;
 	}
 
-	public void setLogradouro(LogradouroEndereco logradouro) {
+	public void setLogradouro(LogradouroRepresentada logradouro) {
 		this.logradouro = logradouro;
 	}
 

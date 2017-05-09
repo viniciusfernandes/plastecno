@@ -8,7 +8,7 @@ import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoRelacionamento;
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroRepresentada;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.impl.util.QueryUtil;
 
@@ -33,13 +33,11 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 		return super.pesquisarCampoById(Representada.class, idRepresentada, "comissao", Double.class);
 	}
 
-	public LogradouroEndereco pesquisarLogradorouro(Integer id) {
-		StringBuilder select = new StringBuilder("select t.logradouro from Representada t  ");
-		select.append(" INNER JOIN t.logradouro where t.id = :id ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("id", id);
-		return QueryUtil.gerarRegistroUnico(query, LogradouroEndereco.class, null);
+	public LogradouroRepresentada pesquisarLogradorouro(Integer id) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select t.logradouro from Representada t INNER JOIN t.logradouro where t.id = :id")
+						.setParameter("id", id), LogradouroRepresentada.class, null);
 	}
 
 	public String pesquisarNomeFantasiaById(Integer idRepresentada) {

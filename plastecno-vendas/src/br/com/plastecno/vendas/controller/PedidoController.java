@@ -246,7 +246,7 @@ public class PedidoController extends AbstractController {
         formatarPedido(pedido);
 
         Cliente cliente = pedido.getCliente();
-        this.formatarDocumento(cliente);
+        formatarDocumento(cliente);
         cliente.setListaLogradouro(this.clienteService.pesquisarLogradouro(cliente.getId()));
 
         Transportadora transportadora = pedido.getTransportadora();
@@ -491,7 +491,6 @@ public class PedidoController extends AbstractController {
         cliente.setListaRedespacho(clienteService.pesquisarTransportadorasRedespacho(id));
 
         carregarVendedor(cliente);
-        formatarDocumento(cliente);
 
         final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar());
 
@@ -572,9 +571,7 @@ public class PedidoController extends AbstractController {
         if (pedido == null) {
             this.gerarListaMensagemErro("Pedido não existe no sistema");
         } else {
-            this.formatarPedido(pedido);
-            this.formatarDocumento(pedido.getCliente());
-
+            formatarPedido(pedido);
             List<Transportadora> listaRedespacho = clienteService.pesquisarTransportadorasRedespacho(pedido
                     .getCliente().getId());
 
@@ -661,8 +658,6 @@ public class PedidoController extends AbstractController {
              * permanecer na tela
              */
             Cliente cliente = clienteService.pesquisarById(idCliente);
-
-            formatarDocumento(cliente);
             carregarVendedor(cliente);
             addAtributo("cliente", cliente);
             addAtributo("proprietario", cliente.getVendedor());

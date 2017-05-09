@@ -32,24 +32,24 @@ public final class StringUtils {
 		final String[] conteudoArray = conteudo.replaceAll("\\D", "").split("");
 		final StringBuilder documento = new StringBuilder();
 
-		final int posicao2 = 2;
-		final int posicao5 = 5;
-		final int posicao8 = 8;
-		final int posicao12 = 12;
+		final int idxBloco1 = 1;
+		final int idxBloco2 = 4;
+		final int idxBloco3 = 7;
+		final int idxBloco4 = 11;
 
 		for (int i = 0; i < conteudoArray.length; i++) {
 			documento.append(conteudoArray[i]);
 			switch (i) {
-			case posicao2:
+			case idxBloco1:
 				documento.append(".");
 				break;
-			case posicao5:
+			case idxBloco2:
 				documento.append(".");
 				break;
-			case posicao8:
+			case idxBloco3:
 				documento.append("/");
 				break;
-			case posicao12:
+			case idxBloco4:
 				documento.append("-");
 				break;
 			default:
@@ -67,19 +67,19 @@ public final class StringUtils {
 		final String[] conteudoArray = conteudo.replaceAll("\\D", "").split("");
 		final StringBuilder documento = new StringBuilder();
 
-		final int posicao3 = 3;
-		final int posicao6 = 6;
-		final int posicao9 = 9;
+		final int idxBloco1 = 2;
+		final int idxBloco2 = 5;
+		final int idxBloco3 = 8;
 		for (int i = 0; i < conteudoArray.length; i++) {
 			documento.append(conteudoArray[i]);
 			switch (i) {
-			case posicao3:
+			case idxBloco1:
 				documento.append(".");
 				break;
-			case posicao6:
+			case idxBloco2:
 				documento.append(".");
 				break;
-			case posicao9:
+			case idxBloco3:
 				documento.append("-");
 				break;
 			default:

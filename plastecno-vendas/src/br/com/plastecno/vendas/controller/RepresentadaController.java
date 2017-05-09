@@ -46,9 +46,7 @@ public class RepresentadaController extends AbstractController {
         this.gerarMensagemSucesso("Representada desativada com sucesso");
     }
 
-    private void formataDocumentos(Representada representada) {
-        representada.setCnpj(formatarCNPJ(representada.getCnpj()));
-        representada.setInscricaoEstadual(formatarInscricaoEstadual(representada.getInscricaoEstadual()));
+    private void formataAliquotas(Representada representada) {
         representada.setComissao(NumeroUtils.gerarPercentual(representada.getComissao(), 2));
         representada.setAliquotaICMS(NumeroUtils.gerarPercentualInteiro(representada.getAliquotaICMS()));
     }
@@ -71,6 +69,10 @@ public class RepresentadaController extends AbstractController {
         return concat.toString();
     }
 
+    private void formatarDocumento(Representada r) {
+        r.setCnpj(formatarCNPJ(r.getCnpj()));
+    }
+
     @Post("representada/inclusao")
     public void inserir(Representada representada, Logradouro logradouro, List<ContatoRepresentada> listaContato) {
         try {
@@ -87,14 +89,14 @@ public class RepresentadaController extends AbstractController {
             representada.setComissao(NumeroUtils.gerarAliquota(representada.getComissao(), 3));
             representada.setAliquotaICMS(NumeroUtils.gerarAliquota(representada.getAliquotaICMS()));
 
-            this.representadaService.inserir(representada);
-            this.gerarMensagemCadastroSucesso(representada, "nomeFantasia");
+            representadaService.inserir(representada);
+            gerarMensagemCadastroSucesso(representada, "nomeFantasia");
         } catch (BusinessException e) {
-            this.formataDocumentos(representada);
+            formataAliquotas(representada);
             addAtributo("representada", representada);
             addAtributo("logradouro", representada.getLogradouro());
             addAtributo("listaContato", listaContato);
-            this.gerarListaMensagemErro(e);
+            gerarListaMensagemErro(e);
         } catch (Exception e) {
             gerarLogErroInclusao("Representada", e);
         }
@@ -111,7 +113,7 @@ public class RepresentadaController extends AbstractController {
             try {
                 representadaService.inserirComentario(getCodigoUsuario(), idRepresentada, comentario);
                 String nomeFantasia = representadaService.pesquisarNomeFantasiaById(idRepresentada);
-                this.gerarMensagemSucesso("Comentário sobre o representada/fornecedor \"" + nomeFantasia
+                gerarMensagemSucesso("Comentário sobre o representada/fornecedor \"" + nomeFantasia
                         + "\" inserido com sucesso.");
             } catch (BusinessException e) {
                 gerarListaMensagemErro(e);
@@ -130,7 +132,8 @@ public class RepresentadaController extends AbstractController {
                 calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
 
         for (Representada representada : lista) {
-            formataDocumentos(representada);
+            formatarDocumento(representada);
+            formataAliquotas(representada);
         }
 
         addAtributo("representada", filtro);
@@ -141,7 +144,7 @@ public class RepresentadaController extends AbstractController {
     public void pesquisarRepresentadaById(Integer id) {
         Representada representada = this.representadaService.pesquisarById(id);
 
-        formataDocumentos(representada);
+        formataAliquotas(representada);
 
         addAtributo("representada", representada);
         addAtributo("listaContato", this.representadaService.pesquisarContato(id));

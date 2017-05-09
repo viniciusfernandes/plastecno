@@ -82,17 +82,13 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 
 	@SuppressWarnings("unchecked")
 	public List<LogradouroCliente> pesquisarLogradouroClienteById(Integer idCliente) {
-		return entityManager
-				.createQuery(
-						"select l from LogradouroCliente l where l.cliente.id = :idCliente")
+		return entityManager.createQuery("select l from LogradouroCliente l where l.cliente.id = :idCliente")
 				.setParameter("idCliente", idCliente).getResultList();
 	}
 
 	public List<LogradouroCliente> pesquisarLogradouroFaturamentoById(Integer idCliente) {
-		StringBuilder select = new StringBuilder()
-				.append("select l from Cliente c ")
-				.append("inner join c.listaLogradouro l where c.id = :idCliente and l.tipoLogradouro = :tipoLogradouro ")
-				.append(" and l.cancelado = false ");
+		StringBuilder select = new StringBuilder().append("select l from Cliente c ").append(
+				"inner join c.listaLogradouro l where c.id = :idCliente and l.tipoLogradouro = :tipoLogradouro ");
 		return entityManager.createQuery(select.toString(), LogradouroCliente.class)
 				.setParameter("idCliente", idCliente).setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO)
 				.getResultList();

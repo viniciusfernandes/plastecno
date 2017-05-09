@@ -21,55 +21,67 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @InformacaoValidavel
 public class Cidade implements Serializable {
 
-    private static final long serialVersionUID = -5219769003137071691L;
+	private static final long serialVersionUID = -5219769003137071691L;
 
-    @Id
-    @SequenceGenerator(name = "cidadeSequence", sequenceName = "enderecamento.seq_cidade_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cidadeSequence")
-    @Column(name = "id_cidade")
-    private Integer id;
+	@Column(name = "cod_ibge")
+	@InformacaoValidavel(intervaloComprimento = { 1, 10 }, nomeExibicao = "Código do município")
+	private String codigoMunicipio;
 
-    @Column(name = "cidade")
-    @InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 50 }, nomeExibicao = "Cidade")
-    private String descricao;
+	@Column(name = "cidade")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 50 }, nomeExibicao = "Cidade")
+	private String descricao;
 
-    @InformacaoValidavel(obrigatorio = true, tamanho = 2, nomeExibicao = "UF")
-    private String uf;
+	@Id
+	@SequenceGenerator(name = "cidadeSequence", sequenceName = "enderecamento.seq_cidade_id", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cidadeSequence")
+	@Column(name = "id_cidade")
+	private Integer id;
 
-    @InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Pais")
-    @OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinColumn(name = "id_pais")
-    private Pais pais;
+	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Pais")
+	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@JoinColumn(name = "id_pais")
+	private Pais pais;
 
-    public String getDescricao() {
-        return descricao;
-    }
+	@InformacaoValidavel(obrigatorio = true, tamanho = 2, nomeExibicao = "UF")
+	private String uf;
 
-    public Integer getId() {
-        return id;
-    }
+	public String getCodigoMunicipio() {
+		return codigoMunicipio;
+	}
 
-    public Pais getPais() {
-        return pais;
-    }
+	public String getDescricao() {
+		return descricao;
+	}
 
-    public String getUf() {
-        return uf;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
+	public Pais getPais() {
+		return pais;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public String getUf() {
+		return uf;
+	}
 
-    public void setPais(Pais pais) {
-        this.pais = pais;
-    }
+	public void setCodigoMunicipio(String codigoMunicipio) {
+		this.codigoMunicipio = codigoMunicipio;
+	}
 
-    public void setUf(String uf) {
-        this.uf = uf;
-    }
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void setPais(Pais pais) {
+		this.pais = pais;
+	}
+
+	public void setUf(String uf) {
+		this.uf = uf;
+	}
 }

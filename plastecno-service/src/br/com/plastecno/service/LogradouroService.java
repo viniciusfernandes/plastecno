@@ -25,7 +25,7 @@ public interface LogradouroService {
 
 	String pesquisarCodigoIBGEByCEP(String cep);
 
-	String pesquisarCodigoIBGEByIdCidade(Integer idCidade);
+	String pesquisarCodigoMunicipioByCep(String cep);
 
 	/**
 	 * Metodo que remove todos os logradouros cadastrados no sistema que nao

@@ -381,7 +381,7 @@ public class NFeServiceImpl implements NFeService {
 		}
 	}
 
-	private void configurarSubistituicaoTributariaPosValidacao(NFe nFe) {
+	private void configurarSubstituicaoTributariaPosValidacao(NFe nFe) {
 		List<DetalhamentoProdutoServicoNFe> l = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 		TributosProdutoServico t = null;
 		for (DetalhamentoProdutoServicoNFe d : l) {
@@ -425,7 +425,7 @@ public class NFeServiceImpl implements NFeService {
 
 		ValidadorInformacao.validar(nFe);
 
-		configurarSubistituicaoTributariaPosValidacao(nFe);
+		configurarSubstituicaoTributariaPosValidacao(nFe);
 
 		final String xml = gerarXMLNfe(nFe, null);
 		// Devemos inserir o registro no banco de dados antes de gravar o
@@ -623,7 +623,7 @@ public class NFeServiceImpl implements NFeService {
 		endereco.setTelefone(telefone);
 
 		endereco.setCodigoMunicipio(logradouro.getCodigoMunicipio() != null ? logradouro.getCodigoMunicipio()
-				: logradouroService.pesquisarCodigoIBGEByIdCidade(logradouro.getIdCidade()));
+				: logradouroService.pesquisarCodigoMunicipioByCep(logradouro.getCep()));
 
 		return endereco;
 	}

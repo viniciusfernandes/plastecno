@@ -132,11 +132,11 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public String pesquisarCodigoIBGEByIdCidade(Integer idCidade) {
-		if (idCidade == null) {
+	public String pesquisarCodigoMunicipioByCep(String cep) {
+		if (cep == null) {
 			return null;
 		}
-		return logradouroDAO.pesquisarCodigoIBGEByIdCidade(idCidade);
+		return logradouroDAO.pesquisarCodigoMunicipioByCep(cep);
 	}
 
 	/*

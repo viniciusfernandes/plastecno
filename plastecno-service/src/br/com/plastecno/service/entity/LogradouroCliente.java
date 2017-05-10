@@ -21,7 +21,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Entity
 @Table(name = "tb_logradouro_cliente", schema = "vendas")
 @InformacaoValidavel(validarHierarquia = true)
-public class LogradouroCliente implements Logradouro, Serializable, Cloneable {
+public class LogradouroCliente extends Logradouro implements Serializable, Cloneable {
 	private static final long serialVersionUID = -8911271247053259317L;
 	private String bairro;
 
@@ -56,31 +56,6 @@ public class LogradouroCliente implements Logradouro, Serializable, Cloneable {
 
 	public LogradouroCliente(Integer id) {
 		this.id = id;
-	}
-
-	public Endereco gerarEndereco() {
-		Pais p = new Pais();
-		p.setDescricao(getPais());
-
-		UF uf = new UF();
-		uf.setSigla(getUf());
-		uf.setPais(p);
-
-		Cidade c = new Cidade();
-		c.setDescricao(getCidade());
-		c.setPais(p);
-		c.setUf(uf.getSigla());
-
-		Bairro b = new Bairro();
-		b.setCidade(c);
-		b.setDescricao(getBairro());
-
-		Endereco e = new Endereco();
-		e.setBairro(b);
-		e.setCep(getCep());
-		e.setCidade(c);
-		e.setDescricao(getEndereco());
-		return e;
 	}
 
 	public String getBairro() {

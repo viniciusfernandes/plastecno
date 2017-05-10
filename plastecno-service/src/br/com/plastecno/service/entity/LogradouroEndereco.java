@@ -23,7 +23,7 @@ import br.com.plastecno.util.StringUtils;
 @Entity
 @Table(name = "tb_logradouro", schema = "vendas")
 @InformacaoValidavel
-public class LogradouroEndereco implements Logradouro, Serializable, Cloneable {
+public class LogradouroEndereco extends Logradouro implements Serializable, Cloneable {
 	/**
 	 * 
 	 */

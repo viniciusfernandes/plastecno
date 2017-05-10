@@ -21,7 +21,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Entity
 @Table(name = "tb_logradouro_pedido", schema = "vendas")
 @InformacaoValidavel(validarHierarquia = true)
-public class LogradouroPedido implements Logradouro, Serializable, Cloneable {
+public class LogradouroPedido extends Logradouro implements Serializable, Cloneable {
 	/**
 	 * 
 	 */

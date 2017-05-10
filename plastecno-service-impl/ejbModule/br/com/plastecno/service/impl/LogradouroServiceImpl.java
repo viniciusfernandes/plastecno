@@ -61,11 +61,11 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	public <T extends Logradouro> T inserir(T logradouro) throws BusinessException {
-		if (logradouro != null) {
-			return (T) entityManager.merge(logradouro);
+		if (logradouro == null) {
+			return null;
 		}
-		return null;
-	}
+		return (T) logradouroDAO.alterar(logradouro) ;
+		}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)

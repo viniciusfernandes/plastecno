@@ -9,8 +9,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -21,7 +19,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Entity
 @Table(name = "tb_logradouro_representada", schema = "vendas")
 @InformacaoValidavel(validarHierarquia = true)
-public class LogradouroRepresentada implements Logradouro, Serializable, Cloneable {
+public class LogradouroRepresentada extends Logradouro implements Serializable, Cloneable {
 	/**
 	 * 
 	 */

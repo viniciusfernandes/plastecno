@@ -20,9 +20,12 @@ import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.Endereco;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouravel;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroPedido;
+import br.com.plastecno.service.entity.LogradouroRepresentada;
+import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pais;
 import br.com.plastecno.service.entity.Pedido;
@@ -185,28 +188,48 @@ public class EntidadeBuilder {
 		return l;
 	}
 
+	private <T extends Logradouro> T buildLogradouro(Class<T> classe, TipoLogradouro tipo) {
+		T l;
+		try {
+			l = classe.newInstance();
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+		l.setBairro("Centro");
+		l.setCep("09910470");
+		l.setCidade("Diadema");
+		l.setCodificado(true);
+		l.setCodigoMunicipio("321654");
+		l.setComplemento("Fundos");
+		l.setEndereco("Rua Viscondo do Rio Branco");
+		l.setNumero("3345");
+		l.setPais("Brasil");
+		l.setTipoLogradouro(tipo);
+		l.setUf("SP");
+
+		return l;
+	}
+
+	public LogradouroCliente buildLogradouroCliente(TipoLogradouro tipo) {
+		return buildLogradouro(LogradouroCliente.class, tipo);
+	}
+
 	public LogradouroEndereco buildLogradouroEndereco(TipoLogradouro tipoLogradouro) {
 		LogradouroEndereco logradouro = new LogradouroEndereco(buildEndereco());
 		logradouro.setTipoLogradouro(tipoLogradouro);
 		return logradouro;
 	}
-	
-	private  Logradouravel buildLogradouravel(Logradouravel l, TipoLogradouro tipo){
-		l.setCep("09910456");
-		l.setBairro("Centro");
-		l.setCidade("Diadema");
-		l.setCodificado(true);
-		l.setComplemento("Fundos");
-		l.setPais("Brasil");
-		l.setUf("SP");
-		l.setEndereco("Rua Avare");
-		l.setNumero("223");
-		l.setTipoLogradouro(tipo);
-		return l;
+
+	public LogradouroPedido buildLogradouroPedido(TipoLogradouro tipo) {
+		return buildLogradouro(LogradouroPedido.class, tipo);
 	}
 
-	public LogradouroCliente buildLogradouroCliente(TipoLogradouro tipoLogradouro) {
-		return (LogradouroCliente) buildLogradouravel( new LogradouroCliente(), tipoLogradouro);
+	public LogradouroRepresentada buildLogradouroRepresentada(TipoLogradouro tipo) {
+		return buildLogradouro(LogradouroRepresentada.class, tipo);
+	}
+
+	public LogradouroUsuario buildLogradouroUsuario(TipoLogradouro tipo) {
+		return buildLogradouro(LogradouroUsuario.class, tipo);
 	}
 
 	public Material buildMaterial() {
@@ -269,7 +292,7 @@ public class EntidadeBuilder {
 		representada.setCnpj("77336617000107");
 		representada.setInscricaoEstadual("123456789");
 
-		LogradouroEndereco l = buildLogradouroEndereco(TipoLogradouro.FATURAMENTO);
+		LogradouroRepresentada l = buildLogradouroRepresentada(TipoLogradouro.FATURAMENTO);
 		l.setCep("09910345");
 		l.setEndereco("Rua Parnamirim");
 		l.setNumero("432");

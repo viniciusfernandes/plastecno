@@ -5,7 +5,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.NFePedido;
 import br.com.plastecno.service.exception.BusinessException;
@@ -29,7 +29,7 @@ public interface NFeService {
 
 	List<DuplicataNFe> gerarDuplicataDataLatinaByIdPedido(Integer idPedido);
 
-	EnderecoNFe gerarEnderecoNFe(LogradouroEndereco logradouro, String telefone);
+	EnderecoNFe gerarEnderecoNFe(Logradouro logradouro, String telefone);
 
 	NFe gerarNFeByIdPedido(Integer idPedido) throws BusinessException;
 

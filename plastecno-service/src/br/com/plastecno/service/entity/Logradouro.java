@@ -2,53 +2,87 @@ package br.com.plastecno.service.entity;
 
 import br.com.plastecno.service.constante.TipoLogradouro;
 
-public interface Logradouro {
-	String getBairro();
+public abstract class Logradouro {
 
-	String getCep();
+	public void configurar(Endereco endereco) {
+		if (endereco == null) {
+			return;
+		}
+		this.setBairro(endereco.getBairro().getDescricao());
+	}
 
-	String getCidade();
+	public Endereco gerarEndereco() {
+		Pais p = new Pais();
+		p.setDescricao(getPais());
 
-	Boolean getCodificado();
+		UF uf = new UF();
+		uf.setSigla(getUf());
+		uf.setPais(p);
 
-	String getCodigoMunicipio();
+		Cidade c = new Cidade();
+		c.setDescricao(getCidade());
+		c.setPais(p);
+		c.setUf(uf.getSigla());
 
-	String getComplemento();
+		Bairro b = new Bairro();
+		b.setCidade(c);
+		b.setDescricao(getBairro());
 
-	String getDescricao();
+		Endereco e = new Endereco();
+		e.setBairro(b);
+		e.setCep(getCep());
+		e.setCidade(c);
+		e.setDescricao(getEndereco());
+		return e;
+	}
 
-	String getEndereco();
+	public abstract String getBairro();
 
-	Integer getId();
+	public abstract String getCep();
 
-	String getNumero();
+	public abstract String getCidade();
 
-	String getPais();
+	public abstract Boolean getCodificado();
 
-	TipoLogradouro getTipoLogradouro();
+	public abstract String getCodigoMunicipio();
 
-	String getUf();
+	public abstract String getComplemento();
 
-	void setBairro(String bairro);
+	public abstract String getDescricao();
 
-	void setCep(String cep);
+	public abstract String getEndereco();
 
-	void setCidade(String cidade);
+	public abstract Integer getId();
 
-	void setCodificado(Boolean codificado);
+	public abstract String getNumero();
 
-	void setComplemento(String complemento);
+	public abstract String getPais();
 
-	void setEndereco(String endereco);
+	public abstract TipoLogradouro getTipoLogradouro();
 
-	void setId(Integer id);
+	public abstract String getUf();
 
-	void setNumero(String numero);
+	public abstract void setBairro(String bairro);
 
-	void setPais(String pais);
+	public abstract void setCep(String cep);
 
-	void setTipoLogradouro(TipoLogradouro tipoLogradouro);
+	public abstract void setCidade(String cidade);
 
-	void setUf(String uf);
+	public abstract void setCodificado(Boolean codificado);
 
+	public abstract void setCodigoMunicipio(String codigoMunicipio);
+
+	public abstract void setComplemento(String complemento);
+
+	public abstract void setEndereco(String endereco);
+
+	public abstract void setId(Integer id);
+
+	public abstract void setNumero(String numero);
+
+	public abstract void setPais(String pais);
+
+	public abstract void setTipoLogradouro(TipoLogradouro tipoLogradouro);
+
+	public abstract void setUf(String uf);
 }

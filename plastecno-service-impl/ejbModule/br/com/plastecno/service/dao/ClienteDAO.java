@@ -81,7 +81,7 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<LogradouroCliente> pesquisarLogradouroClienteById(Integer idCliente) {
+	public List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
 		return entityManager.createQuery("select l from LogradouroCliente l where l.cliente.id = :idCliente")
 				.setParameter("idCliente", idCliente).getResultList();
 	}

@@ -248,7 +248,7 @@ public class ClienteServiceImpl implements ClienteService {
 			}
 		}
 
-		//entityManager.createNativeQuery("ALTER TABLE vendas.tb_representada drop id_logradouro").executeUpdate();
+		// entityManager.createNativeQuery("ALTER TABLE vendas.tb_representada drop id_logradouro").executeUpdate();
 	}
 
 	@PostConstruct
@@ -629,7 +629,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<LogradouroCliente> pesquisarLogradouroCliente(Integer idCliente) {
-		return clienteDAO.pesquisarLogradouroClienteById(idCliente);
+		return clienteDAO.pesquisarLogradouroById(idCliente);
 	}
 
 	@Override

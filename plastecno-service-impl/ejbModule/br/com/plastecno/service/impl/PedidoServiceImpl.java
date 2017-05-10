@@ -799,6 +799,9 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException {
+		if (itemPedido == null || itemPedido.getId() == null) {
+			return null;
+		}
 		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdItemPedido(itemPedido.getId());
 		if (idPedido == null) {
 			throw new BusinessException("Não existe pedido cadastrado para o item "
@@ -1400,6 +1403,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarQuantidadeReservadaByIdItemPedido(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarQuantidadeReservada(idItemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Representada pesquisarRepresentadaIdPedido(Integer idPedido) {
 		return representadaService.pesquisarById(pesquisarIdRepresentadaByIdPedido(idPedido));
 	}
@@ -1642,7 +1651,13 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido == null) {
 			return null;
 		}
+
 		try {
+			// Aqui vamos remover os itens reservados de devolver as quantidades
+			// reservadas do item do pedido para o estoque e zerar as
+			// quantidades reservadas do item do pedido.
+			estoqueService.devolverItemEstoque(idItemPedido);
+
 			itemPedidoDAO.remover(new ItemPedido(idItemPedido));
 
 			// Efetuando novamente o calculo pois na remocao o valor do pedido

@@ -167,8 +167,61 @@ public class EntidadeRepository {
 			}
 
 			@Mock
-			Object remover(Object t) {
-				return mapaEntidades.get(t.getClass()).remove(t);
+			<T> T remover(T t) {
+				if (t == null) {
+					return null;
+				}
+				Field[] campos = t.getClass().getDeclaredFields();
+				Field id = null;
+				for (Field f : campos) {
+					if (f.isAnnotationPresent(Id.class)) {
+						id = f;
+						break;
+					}
+				}
+
+				if (id == null) {
+					throw new IllegalStateException("A classe " + t.getClass().getName()
+							+ " nao possui um campo com anotacao @Id");
+				}
+
+				List<? extends Object> l = repository.pesquisarTodos(t.getClass());
+				id.setAccessible(true);
+				Object idVal;
+				try {
+					idVal = id.get(t);
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					throw new IllegalStateException("Nao foi possivel acessar o ID da classe " + t.getClass().getName()
+							+ " para a remocao do repositorio", e);
+				} finally {
+					id.setAccessible(false);
+				}
+
+				if (idVal == null) {
+					id.setAccessible(false);
+					return null;
+				}
+
+				T remov = null;
+				id.setAccessible(true);
+				for (Object obj : l) {
+					try {
+						if (idVal.equals(id.get(obj))) {
+							mapaEntidades.get(t.getClass()).remove(obj);
+							id.setAccessible(false);
+							remov = (T) obj;
+							break;
+						}
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						throw new IllegalStateException("Nao foi possivel acessar o ID da classe "
+								+ obj.getClass().getName(), e);
+					} finally {
+						id.setAccessible(false);
+					}
+
+				}
+
+				return remov;
 			}
 		};
 

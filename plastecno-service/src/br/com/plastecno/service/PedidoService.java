@@ -195,6 +195,8 @@ public interface PedidoService {
 
 	int pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido);
 
+	Integer pesquisarQuantidadeReservadaByIdItemPedido(Integer idItemPedido);
+
 	Representada pesquisarRepresentadaIdPedido(Integer idPedido);
 
 	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);

@@ -1,10 +1,10 @@
 package br.com.plastecno.service.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,6 +31,7 @@ import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.ItemReservado;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
@@ -542,7 +543,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		// Item peca = estoqueService.pesquisarItemEstoqueById(idPeca);
-		// assertEquals(peca.getQuantidadeMinima(), limite.getQuantidadeMinima());
+		// assertEquals(peca.getQuantidadeMinima(),
+		// limite.getQuantidadeMinima());
 	}
 
 	@Test
@@ -582,7 +584,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemEstoque item1 = estoqueService.pesquisarItemEstoqueById(idItem1);
 		ItemEstoque item2 = estoqueService.pesquisarItemEstoqueById(idItem2);
 
-		// Estmos alterando o item2 pois mesmo com medida diferente ele devera ter
+		// Estmos alterando o item2 pois mesmo com medida diferente ele devera
+		// ter
 		// seu limite configurado.
 		item2.setMedidaExterna(item2.getMedidaExterna() + 20);
 		item2.setComprimento(item2.getComprimento() + 20);
@@ -673,9 +676,11 @@ public class EstoqueServiceTest extends AbstractTest {
 		tubo2 = estoqueService.pesquisarItemEstoqueById(idTubo2);
 		barra = estoqueService.pesquisarItemEstoqueById(idBarra);
 
-		assertEquals("Foi configurado um ncm para os tubos e os valores nao esta identicos. Verifique a regra de negocio.",
+		assertEquals(
+				"Foi configurado um ncm para os tubos e os valores nao esta identicos. Verifique a regra de negocio.",
 				ncm, tubo.getNcm());
-		assertEquals("Foi configurado um ncm para os tubos e os valores nao esta identicos. Verifique a regra de negocio.",
+		assertEquals(
+				"Foi configurado um ncm para os tubos e os valores nao esta identicos. Verifique a regra de negocio.",
 				ncm, tubo2.getNcm());
 		assertNull(
 				"Nao foi configurado um ncm para as barras entao os valores devem estar nulos. Verifique a regra de negocio.",
@@ -862,7 +867,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		Double precoMedioReajustadoTB = 68.42d;
 		Double precoMedioFatorICMSReajustadoTB = 76.63d;
 
-		assertEquals("O preco medio de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
+		assertEquals(
+				"O preco medio de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
 				precoMedioReajustadoCH, NumeroUtils.arredondarValorMonetario(itemCH.getPrecoMedio()));
 
 		assertEquals(
@@ -885,7 +891,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			throwed = true;
 		}
-		assertTrue("A forma do material do item eh obrigatorio para o reajuste e essa condicao nao foi validada", throwed);
+		assertTrue("A forma do material do item eh obrigatorio para o reajuste e essa condicao nao foi validada",
+				throwed);
 
 		throwed = false;
 		itemCH.setId(null);
@@ -929,12 +936,14 @@ public class EstoqueServiceTest extends AbstractTest {
 		// Pesquisando o item resjustado
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 
-		assertEquals("O preco medio de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
+		assertEquals(
+				"O preco medio de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
 				precoMedioReajustado, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
 
 		assertEquals(
 				"O preco medio com fator ICMS de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
-				precoMedioFatorICMSReajustado, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedioFatorICMS()));
+				precoMedioFatorICMSReajustado,
+				NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedioFatorICMS()));
 	}
 
 	@Test
@@ -969,7 +978,8 @@ public class EstoqueServiceTest extends AbstractTest {
 			throwed = true;
 		}
 
-		assertTrue("O reajuste de preco necessita de um item para ser efetuado e essa condicao nao foi validada", throwed);
+		assertTrue("O reajuste de preco necessita de um item para ser efetuado e essa condicao nao foi validada",
+				throwed);
 
 	}
 
@@ -1646,8 +1656,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals("As medidas externa e interna devem ser iguais para barra quadrada", itemEstoque.getMedidaExterna(),
-				itemEstoque.getMedidaInterna());
+		assertEquals("As medidas externa e interna devem ser iguais para barra quadrada",
+				itemEstoque.getMedidaExterna(), itemEstoque.getMedidaInterna());
 	}
 
 	@Test
@@ -1677,6 +1687,53 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testRemocaoItemPedido() {
+		ItemEstoque itemEsto = gerarItemPedidoNoEstoque();
+		Integer qtdeEstoque = itemEsto.getQuantidade();
+
+		ItemPedido itemPed = eBuilder.buildItemPedido();
+		itemPed.copiar(itemEsto);
+		Pedido p = gerarPedido(TipoPedido.REVENDA);
+		itemPed.setPedido(p);
+		Integer idItemPedido = null;
+		try {
+			idItemPedido = pedidoService.inserirItemPedido(p.getId(), itemPed);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(p.getId(), new byte[] {});
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		List<ItemReservado> lItemReserv = estoqueService.pesquisarItemReservadoByIdItemPedido(idItemPedido);
+		assertTrue("O item do pedido deveria ter um item reservado no estoque pois o estoque ja foi populado",
+				lItemReserv.size() > 0);
+
+		try {
+			pedidoService.removerItemPedido(idItemPedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		itemPed = pedidoService.pesquisarItemPedidoById(idItemPedido);
+		assertTrue("O item foi removido do sistema e deveria ser nulo", itemPed == null);
+
+		lItemReserv = estoqueService.pesquisarItemReservadoByIdItemPedido(idItemPedido);
+		assertEquals("O item id " + idItemPedido
+				+ " foi removido do sistema e nao deveria ter item reservado associado", (Integer) 0,
+				(Integer) lItemReserv.size());
+
+		ItemEstoque itemEsto2 = estoqueService.pesquisarItemEstoqueById(itemEsto.getId());
+		assertEquals(
+				"Apos a remocao de um item de um pedido as quantidades reservada desse item devem ser devolvidas ao estoque",
+				qtdeEstoque, itemEsto2.getQuantidade());
+
+	}
+
+	@Test
 	public void testReservaItemEstoqueNaoExistente() {
 		gerarItemPedidoNoEstoque();
 
@@ -1689,14 +1746,15 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals("Um item inexistente no estoque nao pode ser reservado", SituacaoReservaEstoque.NAO_CONTEM_ESTOQUE,
-				situacaoReservaEstoque);
+		assertEquals("Um item inexistente no estoque nao pode ser reservado",
+				SituacaoReservaEstoque.NAO_CONTEM_ESTOQUE, situacaoReservaEstoque);
 	}
 
 	@Test
 	public void testReservaItemEstoqueQuantidadeIgualAoItemPedido() {
 		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
 		itemEstoque.setQuantidade(itemEstoque.getQuantidade() + 10);
+
 		try {
 			estoqueService.redefinirItemEstoque(itemEstoque);
 		} catch (BusinessException e1) {

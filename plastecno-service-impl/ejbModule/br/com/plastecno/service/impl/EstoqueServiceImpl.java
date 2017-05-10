@@ -44,7 +44,6 @@ import br.com.plastecno.validacao.ValidadorInformacao;
 public class EstoqueServiceImpl implements EstoqueService {
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
-
 	private ItemEstoqueDAO itemEstoqueDAO;
 
 	private ItemPedidoDAO itemPedidoDAO;
@@ -282,6 +281,32 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void devolverItemEstoque(Integer idItemPedido) {
+		if (idItemPedido == null) {
+			return;
+		}
+
+		Integer[] qtdesEstoque = itemReservadoDAO.pesquisarQuantidadeEstoqueByIdItemPedido(idItemPedido);
+		Integer idEstoque = null;
+		if (qtdesEstoque.length <= 0 || (idEstoque = qtdesEstoque[0]) == null) {
+			return;
+		}
+
+		Integer qtReservada = itemPedidoDAO.pesquisarQuantidadeReservada(idItemPedido);
+		if (qtReservada == null) {
+			qtReservada = 0;
+		}
+		Integer qtEstoque = qtdesEstoque[1];
+		if (qtEstoque == null) {
+			qtEstoque = 0;
+		}
+		itemPedidoDAO.alterarQuantidadeReservada(idItemPedido, 0);
+		itemReservadoDAO.removerByIdItemPedido(idItemPedido);
+		itemEstoqueDAO.alterarQuantidade(idEstoque, qtReservada + qtEstoque);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void empacotarPedido(List<Integer> listaIdPedido) {
 		if (listaIdPedido == null || listaIdPedido.isEmpty()) {
 			return;
@@ -465,6 +490,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 		return listaItem;
 	}
 
+	@Override
+	public List<ItemReservado> pesquisarItemReservadoByIdItemPedido(Integer idItemPedido) {
+		return itemReservadoDAO.pesquisarItemReservadoByIdItemPedido(idItemPedido);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -540,7 +570,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (quantidadeRecepcionada == null) {
 			quantidadeRecepcionada = 0;
 		}
-		
+
 		Integer quantidadeItem = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemPedidoCompra);
 		quantidadeItem += quantidadeRecepcionada;
 		pedidoService.alterarQuantidadeRecepcionada(idItemPedidoCompra, quantidadeItem);

@@ -33,6 +33,14 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				.setParameter("quantidadeRecepcionada", quantidadeRecepcionada).executeUpdate();
 	}
 
+	public void alterarQuantidadeReservada(Integer idItemPedido, Integer quantidadeReservada) {
+		entityManager
+				.createQuery(
+						"update ItemPedido i set i.quantidadeRecepcionada = :quantidadeReservada where i.id = :idItemPedido")
+				.setParameter("idItemPedido", idItemPedido).setParameter("quantidadeReservada", quantidadeReservada)
+				.executeUpdate();
+	}
+
 	private StringBuilder gerarConstrutorItemPedidoComDataEntrega() {
 		return new StringBuilder(
 				"select new ItemPedido(i.id, i.sequencial, i.pedido.id, i.pedido.proprietario.nome, i.quantidade, i.quantidadeRecepcionada, i.quantidadeReservada, i.precoUnidade, i.pedido.representada.nomeFantasia, i.pedido.dataEntrega, i.formaMaterial, i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento)  from ItemPedido i ");
@@ -459,6 +467,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	public Integer pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido) {
 		return pesquisarCampoById(ItemPedido.class, idItemPedido, "quantidadeRecepcionada", Integer.class);
+	}
+
+	public Integer pesquisarQuantidadeReservada(Integer idItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.quantidadeReservada from ItemPedido i where i.id=:idItemPedido")
+						.setParameter("idItemPedido", idItemPedido), Integer.class, null);
 	}
 
 	public Integer pesquisarSequencialItemPedido(Integer idItemPedido) {

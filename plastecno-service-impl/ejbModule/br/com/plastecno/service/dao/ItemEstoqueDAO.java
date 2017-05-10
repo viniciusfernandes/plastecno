@@ -30,6 +30,11 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 	}
 
+	public void alterarQuantidade(Integer idItemEstoque, Integer quantidade) {
+		entityManager.createQuery("update ItemEstoque i set i.quantidade = :quantidade where i.id = :idItemEstoque ")
+				.setParameter("idItemEstoque", idItemEstoque).executeUpdate();
+	}
+
 	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
 		StringBuilder select = new StringBuilder();
 		select.append("select SUM(i.precoMedio * i.quantidade * (1 + i.aliquotaIPI)) from ItemEstoque i ");
@@ -115,8 +120,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		entityManager
 				.createQuery(
 						"update ItemEstoque i set i.ncm = :ncm where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial ")
-				.setParameter("idMaterial", idMaterial).setParameter("formaMaterial", formaMaterial).setParameter("ncm", ncm)
-				.executeUpdate();
+				.setParameter("idMaterial", idMaterial).setParameter("formaMaterial", formaMaterial)
+				.setParameter("ncm", ncm).executeUpdate();
 	}
 
 	public ItemEstoque pesquisarById(Integer idItemEstoque) {
@@ -135,8 +140,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 	@SuppressWarnings("unchecked")
 	@WARNING(data = "02/07/2015", descricao = "Aqui temos um like na descricao do material o que pode acarretar lentidao nas pesquisas caso existe um grande numero de pecas no estoque")
-	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial, String descricaoPeca,
-			boolean zeradosExcluidos) {
+	public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
+			String descricaoPeca, boolean zeradosExcluidos) {
 		StringBuilder select = gerarConstrutorItemEstoque();
 
 		if (idMaterial != null || formaMaterial != null) {
@@ -162,12 +167,10 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		}
 
 		if (FormaMaterial.CH.equals(formaMaterial) || FormaMaterial.TB.equals(formaMaterial)) {
-			select
-					.append("order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
+			select.append("order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
 
 		} else {
-			select
-					.append("order by i.formaMaterial, i.material.sigla, i.medidaInterna asc, i.medidaExterna asc, i.comprimento asc ");
+			select.append("order by i.formaMaterial, i.material.sigla, i.medidaInterna asc, i.medidaExterna asc, i.comprimento asc ");
 		}
 
 		Query query = entityManager.createQuery(select.toString());
@@ -225,11 +228,9 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 		// A ordenacao desses tipos deve ser diferentes mesmo
 		if (FormaMaterial.CH.equals(formaMaterial) || FormaMaterial.TB.equals(formaMaterial)) {
-			select
-					.append("order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
+			select.append("order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
 		} else {
-			select
-					.append("order by i.formaMaterial, i.material.sigla, i.medidaInterna asc, i.medidaExterna asc, i.comprimento asc ");
+			select.append("order by i.formaMaterial, i.material.sigla, i.medidaInterna asc, i.medidaExterna asc, i.comprimento asc ");
 		}
 
 		TypedQuery<ItemEstoque> query = entityManager.createQuery(select.toString(), ItemEstoque.class)
@@ -252,8 +253,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 	public List<ItemEstoque> pesquisarItemEstoqueEscasso() {
 		StringBuilder select = gerarConstrutorItemEstoque();
 
-		select
-				.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
+		select.append(" where i.quantidade < i.quantidadeMinima order by i.formaMaterial, i.material.sigla, i.medidaExterna asc, i.medidaInterna asc, i.comprimento asc ");
 		return entityManager.createQuery(select.toString(), ItemEstoque.class).getResultList();
 	}
 
@@ -263,7 +263,8 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 						entityManager
 								.createQuery(
 										"select i.margemMinimaLucro, i.precoMedioFatorICMS, i.precoMedio, i.aliquotaIPI from ItemEstoque i where i.id= :idItemEstoque")
-								.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null, null, null });
+								.setParameter("idItemEstoque", idItemEstoque), Object[].class, new Object[] { null,
+								null, null });
 	}
 
 	public String pesquisarNcmItemEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
@@ -290,11 +291,10 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		} else {
 			select.append("select i ");
 		}
-		select
-				.append("from ItemEstoque i where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial and i.descricaoPeca = :descricaoPeca");
+		select.append("from ItemEstoque i where i.material.id = :idMaterial and i.formaMaterial = :formaMaterial and i.descricaoPeca = :descricaoPeca");
 		TypedQuery<ItemEstoque> query = entityManager.createQuery(select.toString(), ItemEstoque.class);
-		List<ItemEstoque> l = query.setParameter("formaMaterial", FormaMaterial.PC).setParameter("idMaterial", idMaterial)
-				.setParameter("descricaoPeca", descricaoPeca).getResultList();
+		List<ItemEstoque> l = query.setParameter("formaMaterial", FormaMaterial.PC)
+				.setParameter("idMaterial", idMaterial).setParameter("descricaoPeca", descricaoPeca).getResultList();
 
 		return recuperarItemNaoZerado(l);
 	}

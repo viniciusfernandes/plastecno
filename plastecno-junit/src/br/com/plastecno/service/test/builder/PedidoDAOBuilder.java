@@ -197,6 +197,20 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public Pedido pesquisarPedidoResumidoFinalidadeByIdItemPedido(Integer idItemPedido) {
+				if (idItemPedido == null) {
+					return null;
+				}
+				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				for (ItemPedido i : l) {
+					if (idItemPedido.equals(i.getId())) {
+						return i.getPedido();
+					}
+				}
+				return null;
+			}
+
+			@Mock
 			public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
 				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				Representada r = new Representada();

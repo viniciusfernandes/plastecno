@@ -13,21 +13,14 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 	@Override
 	public ItemPedidoDAO build() {
 		new MockUp<ItemPedidoDAO>() {
-			@Mock
-			public List<ItemPedido> pesquisarCaracteristicaItemPedidoByNumeroItem(List<Integer> listaNumeroItem,
-					Integer idPedido) {
-				if (idPedido == null || listaNumeroItem == null || listaNumeroItem.isEmpty()) {
-					return new ArrayList<ItemPedido>();
-				}
 
-				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
-				List<ItemPedido> lItem = new ArrayList<ItemPedido>();
-				for (ItemPedido i : l) {
-					if (idPedido.equals(i.getPedido().getId()) && listaNumeroItem.contains(i.getSequencial())) {
-						lItem.add(i);
-					}
+			@Mock
+			public void alterarQuantidadeReservada(Integer idItemPedido, Integer quantidadeReservada) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				if (i == null) {
+					return;
 				}
-				return lItem;
+				i.setQuantidadeReservada(quantidadeReservada);
 			}
 
 			@Mock
@@ -51,6 +44,23 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 					return 0;
 				}
 				return i.getAliquotaIPI();
+			}
+
+			@Mock
+			public List<ItemPedido> pesquisarCaracteristicaItemPedidoByNumeroItem(List<Integer> listaNumeroItem,
+					Integer idPedido) {
+				if (idPedido == null || listaNumeroItem == null || listaNumeroItem.isEmpty()) {
+					return new ArrayList<ItemPedido>();
+				}
+
+				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				List<ItemPedido> lItem = new ArrayList<ItemPedido>();
+				for (ItemPedido i : l) {
+					if (idPedido.equals(i.getPedido().getId()) && listaNumeroItem.contains(i.getSequencial())) {
+						lItem.add(i);
+					}
+				}
+				return lItem;
 			}
 
 			@Mock
@@ -84,6 +94,16 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 			public Integer pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido) {
 				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 				return i != null ? i.getQuantidadeRecepcionada() : null;
+			}
+
+			@Mock
+			public Integer pesquisarQuantidadeReservada(Integer idItemPedido) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				if (i == null) {
+					return null;
+
+				}
+				return i.getQuantidadeReservada();
 			}
 
 			@Mock

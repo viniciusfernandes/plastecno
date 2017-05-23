@@ -32,7 +32,7 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 
 	public void alterarQuantidade(Integer idItemEstoque, Integer quantidade) {
 		entityManager.createQuery("update ItemEstoque i set i.quantidade = :quantidade where i.id = :idItemEstoque ")
-				.setParameter("idItemEstoque", idItemEstoque).executeUpdate();
+				.setParameter("quantidade", quantidade).setParameter("idItemEstoque", idItemEstoque).executeUpdate();
 	}
 
 	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {

@@ -696,7 +696,7 @@ public class PedidoServiceImpl implements PedidoService {
 		// configurando o material para efetuar o calculo usando o peso
 		// especifico
 		if (itemPedido.getMaterial() != null) {
-			itemPedido.setMaterial(this.materialService.pesquisarById(itemPedido.getMaterial().getId()));
+			itemPedido.setMaterial(materialService.pesquisarById(itemPedido.getMaterial().getId()));
 		}
 
 		if (itemPedido.isPeca() && itemPedido.isVendaKilo()) {
@@ -759,6 +759,7 @@ public class PedidoServiceImpl implements PedidoService {
 		 * o item 1 deve ter acabamento, etc.
 		 */
 		if (itemPedido.isNovo()) {
+
 			itemPedido.setSequencial(gerarSequencialItemPedido(idPedido));
 		}
 
@@ -792,7 +793,6 @@ public class PedidoServiceImpl implements PedidoService {
 		// tenha sido enviado a comissao sera calculada, mas so os pedidos
 		// enviados aparecerao no relatorio de comissao.
 		calcularComissaoVenda(pedido, itemPedido);
-
 		return itemPedido.getId();
 	}
 
@@ -1671,6 +1671,7 @@ public class PedidoServiceImpl implements PedidoService {
 			if (pedido.isCompraEfetuada() && pesquisarTotalItemPedido(pedido.getId()) <= 0L) {
 				pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
 			}
+
 			return pedido;
 		} catch (NonUniqueResultException e) {
 			throw new BusinessException(

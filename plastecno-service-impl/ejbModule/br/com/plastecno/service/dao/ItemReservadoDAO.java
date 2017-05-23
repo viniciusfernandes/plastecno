@@ -42,7 +42,7 @@ public class ItemReservadoDAO extends GenericDAO<ItemReservado> {
 				.gerarRegistroUnico(
 						entityManager
 								.createQuery(
-										"select i.itemEstoque.id, i.itemEstoque.quantidade from ItemReservado i where i.itemPedido.id = idItemPedido")
+										"select i.itemEstoque.id, i.itemEstoque.quantidade from ItemReservado i where i.itemPedido.id = :idItemPedido")
 								.setParameter("idItemPedido", idItemPedido), Object[].class, null);
 
 		return o == null || o.length <= 0 ? new Integer[] {} : new Integer[] {(Integer) o[0], (Integer) o[1]};

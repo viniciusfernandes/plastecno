@@ -551,18 +551,23 @@ function emitirNFe(tipoNFe){
 };
 
 function removerProduto(botao){
-	var tabela = document.getElementById('tabela_produtos');
-	var l = botao.parentNode.parentNode;
-	var indice = l.cells[0].innerHTML;
-	tabela.deleteRow(l.rowIndex);
-	var nome = 'nf.listaItem['+indice+']';
-	$("input[name^='"+nome+"']").each(function(){
-		$(this).remove();
+	inicializarModalConfirmacao({
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REMOVER esse item?',
+		confirmar: function(){
+			var tabela = document.getElementById('tabela_produtos');
+			var l = botao.parentNode.parentNode;
+			var indice = l.cells[0].innerHTML;
+			tabela.deleteRow(l.rowIndex);
+			var nome = 'nf.listaItem['+indice+']';
+			$("input[name^='"+nome+"']").each(function(){
+				$(this).remove();
+			});
+			alterarValorDuplicata();
+			numeroImportacaoProduto = null;
+			numeroProdutoEdicao = null;
+			btProduto = null;
+		}
 	});
-	alterarValorDuplicata();
-	numeroImportacaoProduto = null;
-	numeroProdutoEdicao = null;
-	btProduto = null;
 };
 
 function inicializarMascaraReferenciada(){

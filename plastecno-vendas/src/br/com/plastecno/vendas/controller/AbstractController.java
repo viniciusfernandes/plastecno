@@ -165,10 +165,7 @@ public abstract class AbstractController {
 
     void configurarFiltroPediodoMensal() {
         if (!contemAtributo("dataInicial") && !contemAtributo("dataFinal")) {
-            Calendar dataInicial = Calendar.getInstance();
-            dataInicial.set(Calendar.DAY_OF_MONTH, 1);
-
-            addAtributo("dataInicial", StringUtils.formatarData(dataInicial.getTime()));
+            addAtributo("dataInicial", StringUtils.formatarData(gerarInicioMes()));
             addAtributo("dataFinal", StringUtils.formatarData(new Date()));
 
         }
@@ -283,6 +280,12 @@ public abstract class AbstractController {
 
     Download gerarDownloadPDF(byte[] bytesArquivo, String nomeArquivo) {
         return gerarDownload(bytesArquivo, nomeArquivo, "application/pdf;");
+    }
+
+    Date gerarInicioMes() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        return c.getTime();
     }
 
     void gerarListaMensagemAjax(String mensagem, String categoria) {

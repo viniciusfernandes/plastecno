@@ -10,16 +10,23 @@
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+<jsp:include page="/bloco/bloco_modal_js.jsp" />
+
 </head>
 <script type="text/javascript">
-
-$(document).ready(function() {
-	scrollTo('${ancora}');
-});
+function removerItem(botao){
+	inicializarModalConfirmacao({
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REMOVER esse item?',
+		confirmar: function(){
+			$(botao).closest('form').submit();	
+		}
+	});
+};
 
 </script>
 <body>
-<fieldset>
+	<div id="modal"></div>
+	<fieldset>
 		<legend>::: ${relatorio.titulo} :::</legend>
 		<table class="listrada">
 			<thead>
@@ -59,7 +66,7 @@ $(document).ready(function() {
 									</form>
 									<form action="<c:url value="pedidoFracionado/remocao"/>" method="post">
 										<input type="hidden" name="idItemFracionado" value="${item.id}" /> 
-										<input type="submit" value="" title="Remover Item Fracionado" class="botaoRemover"/>
+										<input type="button" value="" title="Remover Item Fracionado" class="botaoRemover" onclick="removerItem(this);"/>
 									</form>
 								</div>
 							</td>

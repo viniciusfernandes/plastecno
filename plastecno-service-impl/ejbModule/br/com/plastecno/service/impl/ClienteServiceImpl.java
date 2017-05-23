@@ -529,10 +529,12 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Cliente pesquisarClienteResumidoLogradouroById(Integer idCliente) {
-		Cliente c = clienteDAO.pesquisarClienteResumidoLogradouroById(idCliente);
-		if (c != null) {
-			c.addLogradouro(pesquisarLogradouroCliente(idCliente));
+		Cliente c = clienteDAO.pesquisarClienteResumidoDocumentoById(idCliente);
+		if (c == null) {
+			return null;
 		}
+		c.addLogradouro(pesquisarLogradouroCliente(idCliente));
+		c.addContato(pesquisarContatoPrincipalResumidoByIdCliente(idCliente));
 		return c;
 	}
 
@@ -583,6 +585,12 @@ public class ClienteServiceImpl implements ClienteService {
 		return this.entityManager
 				.createQuery("select l from Cliente c inner join c.listaContato l where c.id = :idCliente ")
 				.setParameter("idCliente", idCliente).getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente) {
+		return clienteDAO.pesquisarContatoPrincipalResumidoByIdCliente(idCliente);
 	}
 
 	@SuppressWarnings("unchecked")

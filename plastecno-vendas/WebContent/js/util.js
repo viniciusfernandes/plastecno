@@ -8,9 +8,16 @@ function removerNaoDigitos(listaId) {
 	var campo = null;
 	for (var i = 0; i < totalElementos; i++) {
 		campo = $('#'+listaId[i]);
-		campo.val(campo.val().replace(/\D/g, ''));
+		campo.val(removerCaracteresNaoDigitos(campo.val()));
 	}
 }
+
+function removerCaracteresNaoDigitos(valor){
+	if(isEmpty(valor)){
+		return valor;
+	}
+	return valor.replace(/\D/g, '');
+};
 
 function toUpperCaseInput (){
 	$("input, textArea").each(function(){

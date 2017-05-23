@@ -389,7 +389,7 @@ function popularCliente(cliente){
 		$('#cpf').val(cliente.cpf);
 		$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
 		$('#inscricaoSUFRAMA').val(cliente.inscricaoSUFRAMA);
-		$('#telefone').val(cliente.telefone);
+		$('#telefone').val(removerCaracteresNaoDigitos(cliente.telefone));
 		$('#email').val(cliente.email);
 		
 		var l = cliente.logradouroFaturamento; 

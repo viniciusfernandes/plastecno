@@ -75,6 +75,8 @@ public interface ClienteService {
 
 	List<ContatoCliente> pesquisarContato(Integer idCliente);
 
+	ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente);
+
 	List<Cliente> pesquisarInativosByIdVendedor(Integer idVendedor) throws BusinessException;
 
 	List<LogradouroCliente> pesquisarLogradouroCliente(Integer idCliente);

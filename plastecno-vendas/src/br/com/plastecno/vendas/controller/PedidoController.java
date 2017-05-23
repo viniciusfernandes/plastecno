@@ -491,6 +491,9 @@ public class PedidoController extends AbstractController {
         cliente.setListaRedespacho(clienteService.pesquisarTransportadorasRedespacho(id));
 
         carregarVendedor(cliente);
+        // Aqui devemos formatar os documentos do cliente pois eh uma requisicao
+        // assincrona e a mascara em javascript nao eh executada.
+        formatarDocumento(cliente);
 
         final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar());
 

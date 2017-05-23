@@ -27,6 +27,15 @@ public class ContatoCliente extends Contato {
 		super(contato);
 	}
 
+	// Construtor usado na pesquisa do contato principal do cliente
+	public ContatoCliente(String ddd, String ddi, String email, String nome, String telefone) {
+		setDdd(ddd);
+		setDdi(ddi);
+		setEmail(email);
+		setNome(nome);
+		setTelefone(telefone);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		return o instanceof Contato && this.getId() != null && this.getId().equals(((Contato) o).getId());

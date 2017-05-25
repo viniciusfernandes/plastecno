@@ -48,6 +48,8 @@ public interface PedidoService {
 
 	boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
 
+	Integer copiarPedido(Integer idPedido, boolean isOrcamento) throws BusinessException;
+
 	boolean empacotarItemAguardandoCompra(Integer idPedido) throws BusinessException;
 
 	boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException;
@@ -146,8 +148,8 @@ public interface PedidoService {
 	ItemPedido pesquisarItemPedidoById(Integer idItemPedido);
 
 	List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros,
-			ItemPedido itemVendido);
+			Integer idFornecedor, boolean isOrcamento, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros, ItemPedido itemVendido);
 
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 

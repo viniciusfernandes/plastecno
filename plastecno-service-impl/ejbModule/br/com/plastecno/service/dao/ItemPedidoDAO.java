@@ -358,8 +358,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
-			Integer idProprietario, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros, ItemPedido itemVendido) {
+			Integer idProprietario, Integer idFornecedor, boolean isOrcamento, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido) {
 
 		// Tivemos que particionar a consulta em 2 etapas pois a paginacao deve
 		// ser
@@ -384,6 +384,13 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			selectPedido.append(" and p.tipoPedido != :tipoPedido ");
 		}
 
+		if (isOrcamento) {
+			selectPedido.append(" and p.situacaoPedido = :orcamento ");
+		} else {
+			selectPedido.append(" and p.situacaoPedido != :orcamento ");
+
+		}
+
 		selectPedido.append("order by p.id desc ");
 
 		Query query = this.entityManager.createQuery(selectPedido.toString());
@@ -397,7 +404,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			query.setParameter("idFornecedor", idFornecedor);
 		}
 
-		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+		query.setParameter("tipoPedido", TipoPedido.COMPRA).setParameter("orcamento", SituacaoPedido.ORCAMENTO);
 
 		List<Object[]> listaIdPedido = QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 		if (listaIdPedido.isEmpty()) {

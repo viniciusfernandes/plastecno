@@ -99,6 +99,15 @@
 	width: 24px;
 }
 
+.botaoCopiarPequeno {
+	background: url("../images/copy_16.png") no-repeat scroll 0 0
+		transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
 .botaoDinheiro {
 	background: url("../images/money_24.png") no-repeat scroll 0 0
 		transparent;

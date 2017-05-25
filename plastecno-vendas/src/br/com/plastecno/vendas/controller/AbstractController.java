@@ -93,7 +93,7 @@ public abstract class AbstractController {
             // para isso vamos concatenar o nome do arquivo .css, .js, etc com o
             // valor desse atributo, assim o navegador entendera que eh um novo
             // recurso a ser carregado.
-            addAtributoPadrao("versaoCache", VERSAO_CACHE);
+            addAtributoCondicional("versaoCache", VERSAO_CACHE);
         } catch (ServiceLocatorException e) {
             this.logger.log(Level.SEVERE, "Falha no lookup de algum servico", e);
             this.result.include("erro",
@@ -123,7 +123,7 @@ public abstract class AbstractController {
         this.result.include(nomeAtributo, valorAtributo);
     }
 
-    void addAtributoPadrao(String nomeAtributo, Object valorAtributo) {
+    void addAtributoCondicional(String nomeAtributo, Object valorAtributo) {
         if (!contemAtributo(nomeAtributo)) {
             addAtributo(nomeAtributo, valorAtributo);
         }
@@ -473,18 +473,35 @@ public abstract class AbstractController {
      */
     private void inicializarPaginacao(Integer paginaSelecionada, Integer totalPaginas, Object objetoPaginado,
             String nomeObjetoPaginado) {
+        inicializarPaginacao(paginaSelecionada, totalPaginas, objetoPaginado, nomeObjetoPaginado, true);
+    }
+
+    /*
+     * Esse metodo ja garante que o usuario sera navegado para o rodape da
+     * pagina
+     */
+    private void inicializarPaginacao(Integer paginaSelecionada, Integer totalPaginas, Object objetoPaginado,
+            String nomeObjetoPaginado, boolean redirecionar) {
         if (paginaSelecionada == null || paginaSelecionada <= 1) {
             paginaSelecionada = 1;
         }
         this.result.include("paginaSelecionada", paginaSelecionada);
         this.result.include("totalPaginas", totalPaginas);
         this.result.include(nomeObjetoPaginado, objetoPaginado);
-        irRodapePagina();
+        if (redirecionar) {
+            irRodapePagina();
+        }
     }
 
     <T> void inicializarPaginacao(Integer paginaSelecionada, PaginacaoWrapper<T> paginacao, String nomeLista) {
         inicializarPaginacao(paginaSelecionada, calcularTotalPaginas(paginacao.getTotalPaginado()),
                 paginacao.getLista(), nomeLista);
+    }
+
+    <T> void inicializarPaginacaoSemRedirecionar(Integer paginaSelecionada, PaginacaoWrapper<T> paginacao,
+            String nomeLista) {
+        inicializarPaginacao(paginaSelecionada, calcularTotalPaginas(paginacao.getTotalPaginado()),
+                paginacao.getLista(), nomeLista, false);
     }
 
     /*
@@ -546,6 +563,13 @@ public abstract class AbstractController {
             String nomeRelatorio) {
         inicializarPaginacao(paginaSelecionada,
                 calcularTotalPaginas((Long) relatorio.getPropriedade("totalPesquisado")), relatorio, nomeRelatorio);
+    }
+
+    <T, K> void inicializarRelatorioPaginadoSemRedirecionar(Integer paginaSelecionada,
+            RelatorioWrapper<T, K> relatorio, String nomeRelatorio) {
+        inicializarPaginacao(paginaSelecionada,
+                calcularTotalPaginas((Long) relatorio.getPropriedade("totalPesquisado")), relatorio, nomeRelatorio,
+                false);
     }
 
     void init() throws ServiceLocatorException {

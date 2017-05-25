@@ -430,6 +430,36 @@ public class PedidoServiceImpl implements PedidoService {
 		return pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido) > 0;
 	}
 
+	@Override
+	public Integer copiarPedido(Integer idPedido, boolean isOrcamento) throws BusinessException {
+		Pedido pedido = pesquisarPedidoById(idPedido);
+		Pedido pedidoClone = null;
+		try {
+			pedidoClone = pedido.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new BusinessException("Falha no processo de copia do pedido No. " + idPedido, e);
+		}
+
+		pedidoClone.setId(null);
+		pedidoClone.setDataEntrega(new Date());
+		pedidoClone.setListaLogradouro(null);
+		pedidoClone.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO : SituacaoPedido.DIGITACAO);
+		pedidoClone = inserir(pedidoClone);
+
+		List<ItemPedido> listaItemPedido = pesquisarItemPedidoByIdPedido(idPedido);
+		ItemPedido itemPedidoClone = null;
+		for (ItemPedido itemPedido : listaItemPedido) {
+			try {
+				itemPedidoClone = itemPedido.clone();
+				inserirItemPedido(pedidoClone.getId(), itemPedidoClone);
+			} catch (IllegalStateException e) {
+				throw new BusinessException("Falha no processo de copia do item No. " + itemPedido.getId()
+						+ " do pedido No. " + idPedido, e);
+			}
+		}
+		return pedidoClone.getId();
+	}
+
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
 	private void definirTipoPedido(Pedido pedido) {
 		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
@@ -1158,14 +1188,14 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros,
-			ItemPedido itemVendido) {
+			Integer idFornecedor, boolean isOrcamento, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros, ItemPedido itemVendido) {
 
 		if (idCliente == null) {
 			return Collections.emptyList();
 		}
 		return itemPedidoDAO.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor,
-				isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
+				isOrcamento, isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
 	}
 
 	@Override
@@ -1609,36 +1639,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public Integer refazerPedido(Integer idPedido) throws BusinessException {
-		Pedido pedido = pesquisarPedidoById(idPedido);
-		Pedido pedidoClone = null;
-		try {
-			pedidoClone = pedido.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new BusinessException("Falha no processo de copia do pedido No. " + idPedido, e);
-		}
-
-		pedidoClone.setId(null);
-		pedidoClone.setDataEntrega(new Date());
-		pedidoClone.setListaLogradouro(null);
-		pedidoClone.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-		pedidoClone = inserir(pedidoClone);
-
-		List<ItemPedido> listaItemPedido = pesquisarItemPedidoByIdPedido(idPedido);
-		ItemPedido itemPedidoClone = null;
-		for (ItemPedido itemPedido : listaItemPedido) {
-			try {
-				itemPedidoClone = itemPedido.clone();
-				inserirItemPedido(pedidoClone.getId(), itemPedidoClone);
-			} catch (IllegalStateException e) {
-				throw new BusinessException("Falha no processo de copia do item No. " + itemPedido.getId()
-						+ " do pedido No. " + idPedido, e);
-			}
-		}
+		Integer idClone = copiarPedido(idPedido, false);
 
 		// Ao final da clonaem do pedido precisamos cancelar o antigo para que
 		// esse nao aparece nos faturamentos da empresa.
-		cancelarPedido(pedido.getId());
-		return pedidoClone.getId();
+		cancelarPedido(idClone);
+		return idClone;
 	}
 
 	@Override

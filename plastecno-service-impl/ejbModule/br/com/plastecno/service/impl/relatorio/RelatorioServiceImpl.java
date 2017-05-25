@@ -122,7 +122,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		// Acumulando os valores dos itens de venda por representacao
 		listaItemVendido = pedidoService.pesquisarItemPedidoRepresentacaoByPeriodo(periodo);
-		
+
 		for (ItemPedido itemPedido : listaItemVendido) {
 
 			precoItem = itemPedido.getValorComissionado();
@@ -363,7 +363,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(
-			Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra,
+			Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isOrcamento, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido) {
 		RelatorioWrapper<Pedido, ItemPedido> relatorio = new RelatorioWrapper<Pedido, ItemPedido>("");
 		if (idCliente == null) {
@@ -372,7 +372,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
 			List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(
-					idCliente, null, idFornecedor, isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
+					idCliente, null, idFornecedor, isOrcamento, isCompra, indiceRegistroInicial, numeroMaximoRegistros,
+					itemVendido);
 
 			for (ItemPedido i : listaItemPedido) {
 				relatorio.addGrupo(i.getPedido(), i);

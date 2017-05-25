@@ -50,8 +50,8 @@ public interface RelatorioService {
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(Integer idRepresentada, Periodo periodo);
 
 	RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
-			Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros, ItemPedido itemVendido);
+			Integer idVendedor, Integer idFornecedor, boolean isOrcamento, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido);
 
 	RelatorioWrapper<Integer, NFeItemFracionado> gerarRelatorioPedidoFracionado();
 

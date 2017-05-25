@@ -136,13 +136,13 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaCfop", listaCfop);
 
         // DEfinindo os valores padrao de pre-preenchimento da tela
-        addAtributoPadrao("finalidadeEmissaoSelecionada", TipoFinalidadeEmissao.NORMAL.getCodigo());
-        addAtributoPadrao("formaPagamentoSelecionada", TipoFormaPagamento.PRAZO.getCodigo());
-        addAtributoPadrao("tipoEmissaoSelecionada", TipoEmissao.NORMAL.getCodigo());
-        addAtributoPadrao("tipoImpressaoSelecionada", TipoImpressaoNFe.RETRATO.getCodigo());
-        addAtributoPadrao("tipoPresencaSelecionada", TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
-        addAtributoPadrao("tipoOperacaoSelecionada", TipoOperacaoNFe.SAIDA.getCodigo());
-        addAtributoPadrao("modalidadeFreteSelecionada", TipoModalidadeFrete.DESTINATARIO_REMETENTE.getCodigo());
+        addAtributoCondicional("finalidadeEmissaoSelecionada", TipoFinalidadeEmissao.NORMAL.getCodigo());
+        addAtributoCondicional("formaPagamentoSelecionada", TipoFormaPagamento.PRAZO.getCodigo());
+        addAtributoCondicional("tipoEmissaoSelecionada", TipoEmissao.NORMAL.getCodigo());
+        addAtributoCondicional("tipoImpressaoSelecionada", TipoImpressaoNFe.RETRATO.getCodigo());
+        addAtributoCondicional("tipoPresencaSelecionada", TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
+        addAtributoCondicional("tipoOperacaoSelecionada", TipoOperacaoNFe.SAIDA.getCodigo());
+        addAtributoCondicional("modalidadeFreteSelecionada", TipoModalidadeFrete.DESTINATARIO_REMETENTE.getCodigo());
     }
 
     @Post("emissaoNFe/emitirNFe")

@@ -3,7 +3,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
 
 <jsp:include page="/bloco/bloco_css.jsp" />
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
@@ -58,6 +57,18 @@ $(document).ready(function() {
 		} 
 		var form = $('#formVazio'); 
 		form.attr('action', '<c:url value="/pedido/'+numeroPedido+'?tipoPedido=${tipoPedido}"/>');
+		form.submit();
+		
+	});
+	
+	$("#botaoCopiarPedido").click(function() {
+		var numeroPedido = $('#numeroPedidoPesquisa').val();
+		if (isEmpty(numeroPedido)) {
+			gerarListaMensagemAlerta(new Array('O número do pedido é obrigatório para copiar o pedido'));
+			return;
+		} 
+		var form = $('#formVazio'); 
+		form.attr('method', 'post').attr('action', '<c:url value="/pedido/copia/'+numeroPedido+'?tipoPedido=${tipoPedido}"/>');
 		form.submit();
 		
 	});
@@ -190,12 +201,13 @@ $(document).ready(function() {
 	<div id="modal"></div>
 
 	<form id="formVazio" action="pedido" method="get">
+		<input type="hidden" name="orcamento" value="${empty orcamento ? false : orcamento}" />
 		<input type="hidden" name="tipoPedido" value="${tipoPedido}" />
 	</form>
 
 	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>" method="post">
 		<fieldset>
-			<legend>::: Dados do ${orcamento ? 'Orçamento': 'Pedido'} de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
+			<legend>::: Dados do ${orcamento ? 'Orçamento': 'Pedido'} de ${isCompra ? 'Compra': 'Venda'} :::</legend>
 
 			<!-- O campo id do pedido eh hidden pois o input text nao eh enviado na edicao do formulario pois esta "disabled" -->
 			<input type="hidden" id="numeroPedido" name="pedido.id" value="${pedido.id}" /> 
@@ -239,6 +251,10 @@ $(document).ready(function() {
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoPesquisaNumeroPedido"
 					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
+			</div>
+			<div class="input" style="width: 1%">
+				<input type="button" id="botaoCopiarPedido"
+					title="Copiar Pedido" value="" class="botaoCopiarPequeno" />
 			</div>
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoLimparNumeroPedido"
@@ -433,7 +449,7 @@ $(document).ready(function() {
 
 	<a id="rodape"></a>
 	<fieldset>
-		<legend>::: Resultado da Pesquisa de Pedidos de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
+		<legend>::: Resultado da Pesquisa de Pedidos de ${isCompra ? 'Compra': 'Venda'} :::</legend>
 		<div id="paginador"></div>
 		<div>
 			<table id="tabelaItemPedido" class="listrada">

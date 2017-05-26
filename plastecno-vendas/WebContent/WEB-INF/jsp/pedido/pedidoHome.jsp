@@ -386,7 +386,7 @@ $(document).ready(function() {
 		</fieldset>
 	</form>
 	<div class="bloco_botoes">
-		<form id="formPesquisa" action="pedido/listagem" method="get">
+		<form id="formPesquisa" action="<c:url value="/pedido/listagem"/>" method="get">
 			<input type="hidden" name="tipoPedido"  id="tipoPedidoPesquisa" value="${tipoPedido}"/> 
 			<input type="hidden" name="idCliente" id="idClientePesquisa"  value="${cliente.id}"/> 
 			<input type="hidden" name="idFornecedor" id="idFornecedorPesquisa" value="${idRepresentadaSelecionada}"/>

@@ -133,6 +133,14 @@ public abstract class AbstractController {
         GERADOR_PDF.addAtributo(nome, valor);
     }
 
+    final void ancorarRodape() {
+        result.include("ancora", "rodape");
+    }
+
+    final void ancorarTopo() {
+        result.include("ancora", "topo");
+    }
+
     int calcularIndiceRegistroInicial(Integer paginaSelecionada) {
         if (paginaSelecionada == null || paginaSelecionada <= 1) {
             return 0;
@@ -590,27 +598,25 @@ public abstract class AbstractController {
             }
         }
     }
-
     void irPaginaHome() {
         if (this.homePath == null) {
             throw new IllegalStateException("O controller " + this.getClass().getName() + " nao possui um metodo HOME");
         }
         redirecTo(this.homePath);
     }
-
     final void irRodapePagina() {
-        this.irPaginaHome();
-        this.result.include("ancora", "rodape");
+        irPaginaHome();
+        ancorarRodape();
     }
 
     private void irTelaErro() {
-        this.result.forwardTo(ErroController.class).erroHome();
-        this.result.include("ancora", "topo");
+        result.forwardTo(ErroController.class).erroHome();
+        ancorarTopo();
     }
 
     void irTopoPagina() {
         this.irPaginaHome();
-        this.result.include("ancora", "topo");
+        ancorarTopo();
     }
 
     boolean isAcessoPermitido(TipoAcesso... tipoAcesso) {

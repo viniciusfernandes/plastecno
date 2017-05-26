@@ -373,16 +373,6 @@ public class PedidoController extends AbstractController {
         addAtributo("listaSituacaoPedido", listaSituacao);
     }
 
-    private void redirecionarHome(TipoPedido tipoPedido, boolean orcamento) {
-        if (orcamento && !TipoPedido.COMPRA.equals(tipoPedido)) {
-            redirecTo(this.getClass()).orcamentoVendaHome();
-        } else if (!orcamento && TipoPedido.COMPRA.equals(tipoPedido)) {
-            redirecTo(this.getClass()).pedidoCompraHome();
-        } else {
-            redirecTo(this.getClass()).pedidoVendaHome();
-        }
-    }
-
     @Post("pedido/item/inclusao")
     public void inserirItemPedido(Integer numeroPedido, ItemPedido itemPedido, Double aliquotaIPI) {
         try {
@@ -493,18 +483,23 @@ public class PedidoController extends AbstractController {
 
     @Get("pedido/orcamento/venda")
     public void orcamentoVendaHome() {
-        inicializarHome(TipoPedido.REVENDA, true);
+        redirecTo(this.getClass()).pedidoHome(TipoPedido.REVENDA, true);
     }
 
     @Get("pedido/compra")
     public void pedidoCompraHome() {
-        inicializarHome(TipoPedido.COMPRA, false);
         addAtributoCondicional("isCompra", true);
         configurarTipoPedido(TipoPedido.COMPRA);
 
         addAtributo("listaRepresentada", representadaService.pesquisarFornecedor(true));
         addAtributo("descricaoTipoPedido", TipoPedido.COMPRA.getDescricao());
         addAtributo("cliente", clienteService.pesquisarRevendedor());
+        redirecTo(this.getClass()).pedidoHome(TipoPedido.COMPRA, false);
+    }
+
+    @Get("pedido")
+    public void pedidoHome(TipoPedido tipoPedido, boolean orcamento) {
+        inicializarHome(tipoPedido, orcamento);
     }
 
     @Get("pedido/venda")
@@ -684,7 +679,7 @@ public class PedidoController extends AbstractController {
 
             final RelatorioWrapper<Pedido, ItemPedido> relatorio = gerarRelatorioPaginadoItemPedido(idCliente,
                     idVendedor, idFornecedor, orcamento, isCompra, paginaSelecionada, itemVendido);
-            inicializarRelatorioPaginadoSemRedirecionar(paginaSelecionada, relatorio, "relatorioItemPedido");
+            inicializarRelatorioPaginado(paginaSelecionada, relatorio, "relatorioItemPedido");
 
             /*
              * Recuperando os dados do cliente no caso em que nao tenhamos
@@ -704,15 +699,15 @@ public class PedidoController extends AbstractController {
             } else {
                 addAtributo("vendedor", cliente.getVendedor());
             }
-            addAtributo("listaTransportadora", this.transportadoraService.pesquisar());
-            addAtributo("listaRedespacho", this.transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
+            addAtributo("listaTransportadora", transportadoraService.pesquisar());
+            addAtributo("listaRedespacho", transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
             addAtributo("idRepresentadaSelecionada", idFornecedor);
         }
         addAtributo("tipoPedido", tipoPedido);
         addAtributo("orcamento", orcamento);
         addAtributo("isCompra", isCompra);
         configurarTipoPedido(tipoPedido);
-        redirecionarHome(tipoPedido, orcamento);
+        // redirecionarHome(tipoPedido, orcamento);
     }
 
     private LogradouroPedido recuperarLogradouro(Pedido p, TipoLogradouro t) {
@@ -725,6 +720,16 @@ public class PedidoController extends AbstractController {
             }
         }
         return null;
+    }
+
+    private void redirecionarHome(TipoPedido tipoPedido, boolean orcamento) {
+        if (orcamento && !TipoPedido.COMPRA.equals(tipoPedido)) {
+            redirecTo(this.getClass()).orcamentoVendaHome();
+        } else if (!orcamento && TipoPedido.COMPRA.equals(tipoPedido)) {
+            redirecTo(this.getClass()).pedidoCompraHome();
+        } else {
+            redirecTo(this.getClass()).pedidoVendaHome();
+        }
     }
 
     @Post("pedido/refazer")

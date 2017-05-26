@@ -496,7 +496,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, ItemPedido itemVendido) {
+			Integer idFornecedor, boolean isOrcamento, boolean isCompra, ItemPedido itemVendido) {
 		StringBuilder select = new StringBuilder("select count(p.id) from Pedido p where p.cliente.id = :idCliente ");
 		if (idVendedor != null) {
 			select.append("and p.proprietario.id = :idVendedor ");
@@ -512,10 +512,17 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			select.append("and p.tipoPedido != :tipoPedido ");
 		}
 
+		if (isOrcamento) {
+			select.append("and p.situacaoPedido = :situacaoPedido ");
+		} else {
+			select.append("and p.situacaoPedido != :situacaoPedido ");
+		}
+
 		inserirPesquisaItemVendido(select, itemVendido);
 
 		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA);
+		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA)
+				.setParameter("situacaoPedido", SituacaoPedido.ORCAMENTO);
 
 		if (idVendedor != null) {
 			query.setParameter("idVendedor", idVendedor);

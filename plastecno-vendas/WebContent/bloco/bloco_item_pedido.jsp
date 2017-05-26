@@ -89,7 +89,7 @@ function pesquisarNcm(){
 
 </script>
 <fieldset id="bloco_item_pedido">
-	<legend>::: Itens do ${orcamento ? 'Orçamento': 'Pedido'} de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
+	<legend>::: Itens do ${orcamento ? 'Orçamento': 'Pedido'} de ${isCompra ? 'Compra': 'Venda'} :::</legend>
 
 	<!-- Esse campo sera usado para popular a tabela de itens com os dados que vieram do ItemPedidoJson -->
 	<input type="hidden" id="descricaoItemPedido" /> 
@@ -99,7 +99,7 @@ function pesquisarNcm(){
 	<input type="hidden" id="sequencial" name="itemPedido.sequencial" /> 
 	<input type="hidden" id="precoUnidade" />
 
-	<div class="label">Tipo de ${not empty tipoPedido ? 'Compra': 'Venda'}:</div>
+	<div class="label">Tipo de ${isCompra ? 'Compra': 'Venda'}:</div>
 	<div class="input">
 		<input type="radio" id="tipoVendaKilo" name="itemPedido.tipoVenda"
 			value="KILO" <c:if test="${empty pedido.id}">checked</c:if> />
@@ -214,7 +214,7 @@ function pesquisarNcm(){
 					<th style="width: 2%">Item</th>
 					<th style="width: 5%">Qtde.</th>
 					<th style="width: 45%">Descrição</th>
-					<th style="width: 7%">${not empty tipoPedido ? 'Compra': 'Venda'}</th>
+					<th style="width: 7%">${isCompra ? 'Compra': 'Venda'}</th>
 					<th style="width: 10%">Preço (R$)</th>
 					<th style="width: 10%">Unid. (R$)</th>
 					<th style="width: 10%">Total Item (R$)</th>

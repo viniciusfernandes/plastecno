@@ -379,8 +379,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 				relatorio.addGrupo(i.getPedido(), i);
 			}
 
-			relatorio.addPropriedade("totalPesquisado",
-					pedidoService.pesquisarTotalPedidoByIdClienteIdFornecedor(idCliente, idFornecedor, isCompra));
+			relatorio.addPropriedade("totalPesquisado", pedidoService.pesquisarTotalPedidoByIdClienteIdFornecedor(
+					idCliente, idFornecedor, isOrcamento, isCompra));
 		}
 
 		relatorio.sortGrupo(new Comparator<GrupoWrapper<Pedido, ItemPedido>>() {

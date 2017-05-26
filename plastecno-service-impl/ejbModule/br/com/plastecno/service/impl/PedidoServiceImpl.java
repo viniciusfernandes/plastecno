@@ -903,7 +903,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros, boolean isOrcamento) {
 		List<Pedido> listaPedido = null;
 		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
 			listaPedido = pesquisarByIdClienteIdFornecedor(idCliente, idFornecedor, isCompra, indiceRegistroInicial,
@@ -913,7 +913,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		return new PaginacaoWrapper<Pedido>(pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
-				idVendedor, idFornecedor, isCompra, null), listaPedido);
+				idVendedor, idFornecedor, isOrcamento, isCompra, null), listaPedido);
 	}
 
 	@Override
@@ -1456,6 +1456,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido) {
+		if (idPedido == null) {
+			return null;
+		}
 		return pedidoDAO.pesquisarSituacaoPedidoById(idPedido);
 	}
 
@@ -1520,26 +1523,28 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra) {
-		return pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, idFornecedor, isCompra, null);
+	public Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor,
+			boolean isOrcamento, boolean isCompra) {
+		return pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, idFornecedor, isOrcamento,
+				isCompra, null);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, ItemPedido itemVendido) {
+			Integer idFornecedor, boolean isOrcamento, boolean isCompra, ItemPedido itemVendido) {
 		if (idCliente == null) {
 			return 0L;
 		}
 
 		return itemPedidoDAO.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor,
-				isCompra, itemVendido);
+				isOrcamento, isCompra, itemVendido);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(Integer idCliente) {
-		return this.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false, null);
+		return this.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false, false, null);
 	}
 
 	@Override

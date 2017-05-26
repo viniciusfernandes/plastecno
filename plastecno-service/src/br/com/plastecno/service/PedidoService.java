@@ -78,7 +78,7 @@ public interface PedidoService {
 	boolean isPedidoVendaExistente(Integer idPedido);
 
 	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros, boolean isOrcamento);
 
 	double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido);
 
@@ -221,10 +221,10 @@ public interface PedidoService {
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
-	Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra);
+	Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isOrcamento, boolean isCompra);
 
 	Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, ItemPedido itemVendido);
+			Integer idFornecedor, boolean isOrcamento, boolean isCompra, ItemPedido itemVendido);
 
 	Long pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(Integer idCliente);
 

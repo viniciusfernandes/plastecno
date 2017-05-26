@@ -89,6 +89,6 @@ public class ItemAguardandoMaterialController extends AbstractController {
     @Post("itemAguardandoMaterial/edicao")
     public void pesquisarRevendaEncomendadaById(Integer idPedido, Date dataInicial, Date dataFinal,
             Integer idRepresentada) {
-        redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA);
+        redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA, false);
     }
 }

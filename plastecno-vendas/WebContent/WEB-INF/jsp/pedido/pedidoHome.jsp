@@ -183,6 +183,9 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoAceitarOrcamento').click(function (){
+		if(isEmpty($('#formEnvioPedido #idPedido').val())){
+			return;
+		}
 		inicializarModalConfirmacao({
 			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ACEITAR esse orçamento para os pedidos?',
 			confirmar: function(){
@@ -436,6 +439,7 @@ $(document).ready(function() {
 
 	<form id="formEnvioPedido" action="<c:url value="/pedido/envio"/>" method="post">
 		<input type="hidden" name="tipoPedido" value="${tipoPedido}"/>
+		<input type="hidden" name="orcamento" value="${orcamento}"/>
 		<div class="bloco_botoes">
 			<input type="button" id="botaoEnviarPedido" title="Enviar Email do ${orcamento ? 'Orcamento' : 'Pedido'}" value="" class="botaoEnviarEmail"
 				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> 

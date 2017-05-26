@@ -408,8 +408,8 @@ public abstract class AbstractController {
     void gerarMensagemSucesso(String mensagem) {
         List<String> mensagens = new ArrayList<String>();
         mensagens.add(mensagem);
-        this.result.include("listaMensagem", mensagens);
-        this.result.include("cssMensagem", cssMensagemSucesso);
+        result.include("listaMensagem", mensagens);
+        result.include("cssMensagem", cssMensagemSucesso);
     }
 
     byte[] gerarPDF() throws ConversaoHTML2PDFException {

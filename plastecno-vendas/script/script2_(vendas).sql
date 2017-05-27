@@ -874,6 +874,6 @@ ALTER TABLE enderecamento.tb_cidade ALTER COLUMN cod_ibge DROP NOT NULL;
 
 ALTER TABLE vendas.tb_transportadora drop constraint id_logradouro;
 ALTER TABLE vendas.tb_contato drop constraint id_logradouro;
-ALTER TABLE vendas.tb_transportadora constraint id_logradouro;
+ALTER TABLE vendas.tb_transportadora drop id_logradouro;
 ALTER TABLE vendas.tb_contato drop id_logradouro;
 ALTER TABLE vendas.tb_logradouro_cliente drop constraint id_logradouro_cliente;

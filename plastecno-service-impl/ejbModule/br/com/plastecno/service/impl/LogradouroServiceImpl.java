@@ -148,12 +148,6 @@ public class LogradouroServiceImpl implements LogradouroService {
 						.setParameter("id_contato", o[1]).executeUpdate();
 			}
 		}
-		entityManager.createNativeQuery("ALTER TABLE vendas.tb_transportadora drop constraint id_logradouro")
-				.executeUpdate();
-		entityManager.createNativeQuery("ALTER TABLE vendas.tb_contato drop constraint id_logradouro").executeUpdate();
-		entityManager.createNativeQuery("ALTER TABLE vendas.tb_transportadora constraint id_logradouro")
-				.executeUpdate();
-		entityManager.createNativeQuery("ALTER TABLE vendas.tb_contato drop id_logradouro").executeUpdate();
 	}
 
 	@PostConstruct

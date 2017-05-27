@@ -19,8 +19,6 @@ public interface ClienteService {
 
 	Integer contactarCliente(Integer id);
 
-	void importarLogradouro();
-
 	Cliente inserir(Cliente cliente) throws BusinessException;
 
 	void inserirComentario(Integer idProprietario, Integer idCliente, String comentario) throws BusinessException;

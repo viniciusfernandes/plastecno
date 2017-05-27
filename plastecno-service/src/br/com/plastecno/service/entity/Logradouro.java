@@ -1,6 +1,7 @@
 package br.com.plastecno.service.entity;
 
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.util.StringUtils;
 
 public abstract class Logradouro {
 
@@ -51,6 +52,20 @@ public abstract class Logradouro {
 	public abstract String getDescricao();
 
 	public abstract String getEndereco();
+
+	public String getEnderecoNumeroBairro() {
+		StringBuilder end = new StringBuilder();
+		if (StringUtils.isNotEmpty(getEndereco())) {
+			end.append(getEndereco());
+		}
+		if (StringUtils.isNotEmpty(getNumero())) {
+			end.append(" - ").append(getNumero());
+		}
+		if (StringUtils.isNotEmpty(getBairro())) {
+			end.append(" - ").append(getBairro());
+		}
+		return end.toString();
+	}
 
 	public abstract Integer getId();
 

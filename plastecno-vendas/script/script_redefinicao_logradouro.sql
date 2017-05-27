@@ -71,3 +71,44 @@ create sequence vendas.seq_logradouro_cliente_id increment by 1 minvalue 1 no ma
 create sequence vendas.seq_logradouro_pedido_id increment by 1 minvalue 1 no maxvalue start with 1;
 create sequence vendas.seq_logradouro_usuario_id increment by 1 minvalue 1 no maxvalue start with 1;
 create sequence vendas.seq_logradouro_representada_id increment by 1 minvalue 1 no maxvalue start with 1;
+
+
+CREATE TABLE vendas.tb_logradouro_transportadora (
+  id integer NOT NULL,
+  cep character varying(8),
+  endereco character varying(500),
+  numero character varying(20),
+  complemento character varying(250),
+  bairro character varying(50),
+  cidade character varying(50),
+  uf character varying(2),
+  pais character varying(50),
+  id_tipo_logradouro integer NOT NULL DEFAULT 3,
+  codificado boolean DEFAULT true,
+  CONSTRAINT tb_logradouro_transportadora_pkey PRIMARY KEY (id),
+  CONSTRAINT id_tipo_logradouro FOREIGN KEY (id_tipo_logradouro) REFERENCES vendas.tb_tipo_logradouro (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+alter table vendas.tb_transportadora add id_logradouro_transportadora integer default null;
+ALTER TABLE vendas.tb_transportadora add constraint id_logradouro_transportadora foreign key (id_logradouro_transportadora) references vendas.tb_logradouro_transportadora (id);
+create sequence vendas.seq_logradouro_transportadora_id increment by 1 minvalue 1 no maxvalue start with 1;
+
+
+CREATE TABLE vendas.tb_logradouro_contato (
+  id integer NOT NULL,
+  cep character varying(8),
+  endereco character varying(500),
+  numero character varying(20),
+  complemento character varying(250),
+  bairro character varying(50),
+  cidade character varying(50),
+  uf character varying(2),
+  pais character varying(50),
+  id_tipo_logradouro integer NOT NULL DEFAULT 3,
+  codificado boolean DEFAULT true,
+  CONSTRAINT tb_logradouro_contato_pkey PRIMARY KEY (id),
+  CONSTRAINT id_tipo_logradouro FOREIGN KEY (id_tipo_logradouro) REFERENCES vendas.tb_tipo_logradouro (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+alter table vendas.tb_contato add id_logradouro_contato integer default null;
+ALTER TABLE vendas.tb_contato add constraint id_logradouro_contato foreign key (id_logradouro_contato) references vendas.tb_logradouro_contato (id);
+create sequence vendas.seq_logradouro_contato_id increment by 1 minvalue 1 no maxvalue start with 1;
+

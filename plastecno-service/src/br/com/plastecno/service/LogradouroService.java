@@ -13,11 +13,15 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface LogradouroService {
+	void importarLogradouro();
+
 	List<LogradouroCliente> inserir(List<LogradouroCliente> listaLogradouro) throws BusinessException;
 
 	<T extends Logradouro> T inserir(T logradouro) throws BusinessException;
 
-	LogradouroEndereco inserirBaseCep(LogradouroEndereco logradouro) throws BusinessException;
+	void inserirEnderecoBaseCEP(Collection<Logradouro> lLogradouro) throws BusinessException;
+
+	void inserirEnderecoBaseCEP(Logradouro logradouro) throws BusinessException;
 
 	List<? extends LogradouroEndereco> pesquisar(Integer id, Class<? extends LogradouroEndereco> classe);
 

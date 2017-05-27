@@ -18,7 +18,7 @@ import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.dao.TransportadoraDAO;
 import br.com.plastecno.service.entity.ContatoTransportadora;
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroTransportadora;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
@@ -101,8 +101,7 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 		if (isCNPJExistente(transportadora.getId(), transportadora.getCnpj())) {
 			throw new BusinessException("CNPJ enviado ja foi cadastrado para outra transportadora");
 		}
-
-		transportadora.setLogradouro(this.logradouroService.inserirBaseCep(transportadora.getLogradouro()));
+		logradouroService.inserirEnderecoBaseCEP(transportadora.getLogradouro());
 		return transportadoraDAO.alterar(transportadora).getId();
 	}
 
@@ -187,13 +186,13 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public LogradouroEndereco pesquisarLogradorouro(Integer id) {
+	public LogradouroTransportadora pesquisarLogradorouro(Integer id) {
 		StringBuilder select = new StringBuilder("select t.logradouro from Transportadora t  ");
 		select.append(" INNER JOIN t.logradouro where t.id = :id ");
 
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("id", id);
-		return QueryUtil.gerarRegistroUnico(query, LogradouroEndereco.class, null);
+		return QueryUtil.gerarRegistroUnico(query, LogradouroTransportadora.class, null);
 	}
 
 	@Override

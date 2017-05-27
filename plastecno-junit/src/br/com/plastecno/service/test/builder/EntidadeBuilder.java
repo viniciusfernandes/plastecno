@@ -25,6 +25,7 @@ import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.LogradouroRepresentada;
+import br.com.plastecno.service.entity.LogradouroTransportadora;
 import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pais;
@@ -228,6 +229,10 @@ public class EntidadeBuilder {
 		return buildLogradouro(LogradouroRepresentada.class, tipo);
 	}
 
+	public LogradouroTransportadora buildLogradouroTransportadora(TipoLogradouro tipo) {
+		return buildLogradouro(LogradouroTransportadora.class, tipo);
+	}
+
 	public LogradouroUsuario buildLogradouroUsuario(TipoLogradouro tipo) {
 		return buildLogradouro(LogradouroUsuario.class, tipo);
 	}
@@ -326,9 +331,9 @@ public class EntidadeBuilder {
 		t.setAtivo(true);
 		t.setCnpj("03233998000162");
 		t.setInscricaoEstadual("1234567");
-		t.setLogradouro(buildLogradouroEndereco(TipoLogradouro.FATURAMENTO));
-		t.setNomeFantasia("Transport teste");
-		t.setRazaoSocial("Transport teste LTDA");
+		t.setLogradouro(buildLogradouroTransportadora(TipoLogradouro.COMERCIAL));
+		t.setNomeFantasia("Transport Fim");
+		t.setRazaoSocial("Transport Fim LTDA");
 		return t;
 	}
 

@@ -9,6 +9,7 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ContatoService;
+import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.constante.TipoAcesso;
@@ -29,13 +30,18 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class ClienteController extends AbstractController {
-
     @Servico
     private ClienteService clienteService;
+
     @Servico
     private ContatoService contatoService;
+
+    @Servico
+    private LogradouroService logradouroService;
+
     @Servico
     private RamoAtividadeService ramoAtividadeService;
+
     @Servico
     private TransportadoraService transportadoraService;
 
@@ -93,11 +99,10 @@ public class ClienteController extends AbstractController {
         return concat.toString();
     }
 
-    @Get("importarlogradouro")
-    public void importarlogradouroCliente() {
+    @Get("cliente/importarlogradouro")
+    public void importar() {
         System.out.println("Inicio da importacao");
-        clienteService.importarLogradouro();
-
+        logradouroService.importarLogradouro();
         System.out.println("Fim da importacao");
         redirecTo(MenuController.class).menuHome();
     }

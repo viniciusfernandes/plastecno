@@ -9,8 +9,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -19,13 +17,14 @@ import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
-@Table(name = "tb_logradouro_cliente", schema = "vendas")
+@Table(name = "tb_logradouro_contato", schema = "vendas")
 @InformacaoValidavel(validarHierarquia = true)
-public class LogradouroCliente extends Logradouro implements Serializable, Cloneable {
+public class LogradouroContato extends Logradouro implements Serializable, Cloneable {
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1913325608095858679L;
+	private static final long serialVersionUID = 8964690856306912523L;
 
 	private String bairro;
 
@@ -33,9 +32,6 @@ public class LogradouroCliente extends Logradouro implements Serializable, Clone
 
 	private String cidade;
 
-	@ManyToOne
-	@JoinColumn(name = "id_cliente", referencedColumnName = "id", nullable = false)
-	private Cliente cliente;
 	private Boolean codificado = true;
 	@Transient
 	private String codigoMunicipio;
@@ -43,8 +39,8 @@ public class LogradouroCliente extends Logradouro implements Serializable, Clone
 	private String endereco;
 
 	@Id
-	@SequenceGenerator(name = "logradouroClienteSequence", sequenceName = "vendas.seq_logradouro_cliente_id", initialValue = 1, allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "logradouroClienteSequence")
+	@SequenceGenerator(name = "logradouroContatoSequence", sequenceName = "vendas.seq_logradouro_contato_id", initialValue = 1, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "logradouroContatoSequence")
 	private Integer id;
 
 	private String numero;
@@ -55,10 +51,10 @@ public class LogradouroCliente extends Logradouro implements Serializable, Clone
 	private TipoLogradouro tipoLogradouro;
 	private String uf;
 
-	public LogradouroCliente() {
+	public LogradouroContato() {
 	}
 
-	public LogradouroCliente(Integer id) {
+	public LogradouroContato(Integer id) {
 		this.id = id;
 	}
 
@@ -72,10 +68,6 @@ public class LogradouroCliente extends Logradouro implements Serializable, Clone
 
 	public String getCidade() {
 		return cidade;
-	}
-
-	public Cliente getCliente() {
-		return cliente;
 	}
 
 	public Boolean getCodificado() {
@@ -128,10 +120,6 @@ public class LogradouroCliente extends Logradouro implements Serializable, Clone
 
 	public void setCidade(String cidade) {
 		this.cidade = cidade;
-	}
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
 	}
 
 	public void setCodificado(Boolean codificado) {

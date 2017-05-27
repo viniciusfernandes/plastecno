@@ -55,10 +55,10 @@ public class Transportadora implements Serializable {
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de contato da transportadora")
 	private List<ContatoTransportadora> listaContato;
 
-	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da transportadora")
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "id_logradouro")
-	private LogradouroEndereco logradouro;
+	@JoinColumn(name = "id_logradouro_transportadora")
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da transportadora")
+	private LogradouroTransportadora logradouro;
 
 	@Transient
 	private String municipioFormatado;
@@ -80,17 +80,17 @@ public class Transportadora implements Serializable {
 	public Transportadora() {
 	}
 
+	public Transportadora(Integer id, LogradouroEndereco logradouro) {
+
+	}
+
 	public Transportadora(Integer id, String nomeFantasia) {
 		this.id = id;
 		this.nomeFantasia = nomeFantasia;
 	}
-	
-	public Transportadora(Integer id, LogradouroEndereco logradouro){
-		
-	}
 
 	public Transportadora(Integer id, String nomeFantasia, String razaoSocial, String cnpj, String inscricaoEstadual,
-			LogradouroEndereco logradouro) {
+			LogradouroTransportadora logradouro) {
 		this(id, nomeFantasia);
 		setRazaoSocial(razaoSocial);
 		setLogradouro(logradouro);
@@ -159,7 +159,7 @@ public class Transportadora implements Serializable {
 		return listaContato;
 	}
 
-	public LogradouroEndereco getLogradouro() {
+	public LogradouroTransportadora getLogradouro() {
 		return logradouro;
 	}
 
@@ -222,7 +222,7 @@ public class Transportadora implements Serializable {
 
 	public void setCidade(String cidade) {
 		if (logradouro == null) {
-			logradouro = new LogradouroEndereco();
+			logradouro = new LogradouroTransportadora();
 		}
 		logradouro.setCidade(cidade);
 	}
@@ -233,7 +233,7 @@ public class Transportadora implements Serializable {
 
 	public void setEndereco(String endereco) {
 		if (logradouro == null) {
-			logradouro = new LogradouroEndereco();
+			logradouro = new LogradouroTransportadora();
 		}
 		logradouro.setEndereco(endereco);
 	}
@@ -254,7 +254,7 @@ public class Transportadora implements Serializable {
 		this.listaContato = listaContato;
 	}
 
-	public void setLogradouro(LogradouroEndereco logradouro) {
+	public void setLogradouro(LogradouroTransportadora logradouro) {
 		this.logradouro = logradouro;
 	}
 
@@ -276,7 +276,7 @@ public class Transportadora implements Serializable {
 
 	public void setUf(String uf) {
 		if (logradouro == null) {
-			logradouro = new LogradouroEndereco();
+			logradouro = new LogradouroTransportadora();
 		}
 		logradouro.setUf(uf);
 	}

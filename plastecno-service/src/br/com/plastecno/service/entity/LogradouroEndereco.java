@@ -18,7 +18,6 @@ import javax.persistence.Table;
 
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
-import br.com.plastecno.util.StringUtils;
 
 @Entity
 @Table(name = "tb_logradouro", schema = "vendas")
@@ -114,20 +113,6 @@ public class LogradouroEndereco extends Logradouro implements Serializable, Clon
 			return this.endereco.getDescricao() + ", " + complemento;
 		}
 		return this.endereco.getDescricao();
-	}
-
-	public String getEnderecoNumeroBairro() {
-		StringBuilder end = new StringBuilder();
-		if (StringUtils.isNotEmpty(getEndereco())) {
-			end.append(getEndereco());
-		}
-		if (StringUtils.isNotEmpty(getNumero())) {
-			end.append(" - ").append(getNumero());
-		}
-		if (StringUtils.isNotEmpty(getBairro())) {
-			end.append(" - ").append(getBairro());
-		}
-		return end.toString();
 	}
 
 	public Integer getId() {

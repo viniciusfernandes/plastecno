@@ -23,9 +23,11 @@ http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/persistence/persistence_2
 		<class>br.com.plastecno.service.entity.ItemPedido</class>
 		<class>br.com.plastecno.service.entity.ItemReservado</class>
 		<class>br.com.plastecno.service.entity.LogradouroCliente</class>
+		<class>br.com.plastecno.service.entity.LogradouroContato</class>
 		<class>br.com.plastecno.service.entity.LogradouroEndereco</class>
 		<class>br.com.plastecno.service.entity.LogradouroPedido</class>
 		<class>br.com.plastecno.service.entity.LogradouroRepresentada</class>
+		<class>br.com.plastecno.service.entity.LogradouroTransportadora</class>
 		<class>br.com.plastecno.service.entity.LogradouroUsuario</class>
 		<class>br.com.plastecno.service.entity.Pais</class>
 		<class>br.com.plastecno.service.entity.PerfilAcesso</class>

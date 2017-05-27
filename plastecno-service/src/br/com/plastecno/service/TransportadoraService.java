@@ -5,7 +5,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.ContatoTransportadora;
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroTransportadora;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -39,7 +39,7 @@ public interface TransportadoraService {
 
     List<ContatoTransportadora> pesquisarContato(Integer id);
 
-    LogradouroEndereco pesquisarLogradorouro(Integer id);
+    LogradouroTransportadora pesquisarLogradorouro(Integer id);
 
     Long pesquisarTotalRegistros(Transportadora filtro, Boolean apenasAtivos);
 

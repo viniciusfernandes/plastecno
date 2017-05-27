@@ -7,19 +7,15 @@ import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroEndereco;
-import br.com.plastecno.service.entity.LogradouroCliente;
-import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface LogradouroService {
 	void importarLogradouro();
 
-	List<LogradouroCliente> inserir(List<LogradouroCliente> listaLogradouro) throws BusinessException;
-
 	<T extends Logradouro> T inserir(T logradouro) throws BusinessException;
 
-	void inserirEnderecoBaseCEP(Collection<Logradouro> lLogradouro) throws BusinessException;
+	void inserirEnderecoBaseCEP(List<? extends Logradouro> lLogradouro) throws BusinessException;
 
 	void inserirEnderecoBaseCEP(Logradouro logradouro) throws BusinessException;
 
@@ -51,7 +47,6 @@ public interface LogradouroService {
 
 	void removerLogradouro(Logradouro logradouro);
 
-	void validarListaLogradouroPreenchida(List<LogradouroCliente> listaLogradouro) throws BusinessException;
+	void validarListaLogradouroPreenchida(List<? extends Logradouro> listaLogradouro) throws BusinessException;
 
-	void validarListaLogradouroPreenchidaXXX(List<LogradouroPedido> listaLogradouro) throws BusinessException;
 }

@@ -22,7 +22,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Entity
 @Table(name = "tb_logradouro", schema = "vendas")
 @InformacaoValidavel
-public class LogradouroEndereco extends Logradouro implements Serializable, Cloneable {
+public class LogradouroEndereco implements Serializable, Cloneable {
 	/**
 	 * 
 	 */
@@ -98,10 +98,6 @@ public class LogradouroEndereco extends Logradouro implements Serializable, Clon
 
 	public String getComplemento() {
 		return complemento;
-	}
-
-	public String getDescricao() {
-		return LogradouroUtils.gerarDescricao(this, codificado);
 	}
 
 	public String getEndereco() {

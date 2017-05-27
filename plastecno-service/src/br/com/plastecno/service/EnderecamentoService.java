@@ -1,7 +1,6 @@
 package br.com.plastecno.service;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.ejb.Local;
 
@@ -28,7 +27,7 @@ public interface EnderecamentoService {
 
     Endereco pesquisarByCep(String cep);
 
-    List<String> pesquisarCEPExistente(Set<String> listaCep);
+    List<String> pesquisarCEPExistente(List<String> listaCep);
 
 	List<UF> pesquisarUF();
 }

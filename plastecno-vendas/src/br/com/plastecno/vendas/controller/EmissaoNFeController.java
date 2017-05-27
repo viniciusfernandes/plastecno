@@ -25,6 +25,7 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoUF;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
@@ -146,7 +147,7 @@ public class EmissaoNFeController extends AbstractController {
     }
 
     @Post("emissaoNFe/emitirNFe")
-    public void emitirNFe(DadosNFe nf, TipoNFe tipoNFe, LogradouroEndereco logradouro, String telefoneDestinatario,
+    public void emitirNFe(DadosNFe nf, TipoNFe tipoNFe, LogradouroCliente logradouro, String telefoneDestinatario,
             Integer idPedido) {
         String numeroNFe = null;
         try {

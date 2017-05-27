@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -176,8 +175,6 @@ public class ClienteServiceImpl implements ClienteService {
 		return s;
 	}
 
-	
-
 	@PostConstruct
 	public void init() {
 		clienteDAO = new ClienteDAO(entityManager);
@@ -245,27 +242,12 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		lLogradouro.stream().forEach(l -> l.setCliente(c));
-		lLogradouro = logradouroService.inserir(lLogradouro);
-
-		// Vamos verificar os ceps ja existentes pois vamos inserir na tabela de
-		// logradouro apenas os enderecos que nao existirem no sistema. Devemos
-		// fazer esse filtro pois o usuario podera efetuar alteracoes no
-		// endereco do cliente sem que reflita na tabela de logradouro, por
-		// exemplo: atualizar o nome de rua de um determinado cep. A tabela de
-		// logradouro eh utilizada apenas para consultar os ceps quando o
-		// usuario efetuar uma pesquisa no campo de ceps.
-		List<String> lCep = enderecamentoService.pesquisarCEPExistente(lLogradouro.stream().map(l -> l.getCep())
-				.collect(Collectors.toSet()));
-
-		if (!lCep.isEmpty()) {
-			lLogradouro = lLogradouro.stream().filter(l -> !lCep.contains(l.getCep())).collect(Collectors.toList());
+		for (LogradouroCliente logradouro : lLogradouro) {
+			logradouroService.inserir(logradouro);
 		}
-
-		// Aqui estamos populando a tabela de CEP com os novos enderecos
-		// inseridos pelo usuario
-		for (LogradouroCliente l : lLogradouro) {
-			enderecamentoService.inserir(l.gerarEndereco());
-		}
+		// Aqui estamos populando a base de CEP para caso haja um cep ainda
+		// inexistente.
+		logradouroService.inserirEnderecoBaseCEP(lLogradouro);
 	}
 
 	@Override

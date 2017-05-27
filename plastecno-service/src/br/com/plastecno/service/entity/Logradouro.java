@@ -1,9 +1,47 @@
 package br.com.plastecno.service.entity;
 
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 import br.com.plastecno.util.StringUtils;
 
+@MappedSuperclass
 public abstract class Logradouro {
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 40 }, nomeExibicao = "Bairro")
+	private String bairro;
+
+	@InformacaoValidavel(obrigatorio = true, tamanho = 8, nomeExibicao = "CEP")
+	private String cep;
+
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 50 }, nomeExibicao = "Cidade")
+	private String cidade;
+
+	private Boolean codificado = true;
+
+	@Transient
+	private String codigoMunicipio;
+
+	@InformacaoValidavel(intervaloComprimento = { 1, 250 }, nomeExibicao = "Complemento do logradouro")
+	private String complemento;
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Endereco")
+	private String endereco;
+
+	private String numero;
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 50 }, nomeExibicao = "Pais")
+	private String pais;
+
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "id_tipo_logradouro")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo do Logradouro do cliente")
+	private TipoLogradouro tipoLogradouro;
+
+	@InformacaoValidavel(obrigatorio = true, tamanho = 2, nomeExibicao = "UF")
+	private String uf;
 
 	public void configurar(Endereco endereco) {
 		if (endereco == null) {
@@ -37,21 +75,37 @@ public abstract class Logradouro {
 		return e;
 	}
 
-	public abstract String getBairro();
+	public String getBairro() {
+		return bairro;
+	}
 
-	public abstract String getCep();
+	public String getCep() {
+		return cep;
+	}
 
-	public abstract String getCidade();
+	public String getCidade() {
+		return cidade;
+	}
 
-	public abstract Boolean getCodificado();
+	public Boolean getCodificado() {
+		return codificado;
+	}
 
-	public abstract String getCodigoMunicipio();
+	public String getCodigoMunicipio() {
+		return codigoMunicipio;
+	}
 
-	public abstract String getComplemento();
+	public String getComplemento() {
+		return complemento;
+	}
 
-	public abstract String getDescricao();
+	public String getDescricao() {
+		return LogradouroUtils.gerarDescricao(this, codificado);
+	}
 
-	public abstract String getEndereco();
+	public String getEndereco() {
+		return endereco;
+	}
 
 	public String getEnderecoNumeroBairro() {
 		StringBuilder end = new StringBuilder();
@@ -69,35 +123,66 @@ public abstract class Logradouro {
 
 	public abstract Integer getId();
 
-	public abstract String getNumero();
+	public String getNumero() {
+		return numero;
+	}
 
-	public abstract String getPais();
+	public String getPais() {
+		return pais;
+	}
 
-	public abstract TipoLogradouro getTipoLogradouro();
+	public TipoLogradouro getTipoLogradouro() {
+		return tipoLogradouro;
+	}
 
-	public abstract String getUf();
+	public String getUf() {
+		return uf;
+	}
 
-	public abstract void setBairro(String bairro);
+	public void setBairro(String bairro) {
+		this.bairro = bairro;
+	}
 
-	public abstract void setCep(String cep);
+	public void setCep(String cep) {
+		this.cep = cep;
+	}
 
-	public abstract void setCidade(String cidade);
+	public void setCidade(String cidade) {
+		this.cidade = cidade;
+	}
 
-	public abstract void setCodificado(Boolean codificado);
+	public void setCodificado(Boolean codificado) {
+		this.codificado = codificado;
+	}
 
-	public abstract void setCodigoMunicipio(String codigoMunicipio);
+	public void setCodigoMunicipio(String codigoMunicipio) {
+		this.codigoMunicipio = codigoMunicipio;
+	}
 
-	public abstract void setComplemento(String complemento);
+	public void setComplemento(String complemento) {
+		this.complemento = complemento;
+	}
 
-	public abstract void setEndereco(String endereco);
+	public void setEndereco(String endereco) {
+		this.endereco = endereco;
+	}
 
 	public abstract void setId(Integer id);
 
-	public abstract void setNumero(String numero);
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
 
-	public abstract void setPais(String pais);
+	public void setPais(String pais) {
+		this.pais = pais;
+	}
 
-	public abstract void setTipoLogradouro(TipoLogradouro tipoLogradouro);
+	public void setTipoLogradouro(TipoLogradouro tipoLogradouro) {
+		this.tipoLogradouro = tipoLogradouro;
+	}
 
-	public abstract void setUf(String uf);
+	public void setUf(String uf) {
+		this.uf = uf;
+	}
+
 }

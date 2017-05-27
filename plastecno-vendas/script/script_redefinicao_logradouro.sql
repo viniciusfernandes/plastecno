@@ -112,3 +112,5 @@ alter table vendas.tb_contato add id_logradouro_contato integer default null;
 ALTER TABLE vendas.tb_contato add constraint id_logradouro_contato foreign key (id_logradouro_contato) references vendas.tb_logradouro_contato (id);
 create sequence vendas.seq_logradouro_contato_id increment by 1 minvalue 1 no maxvalue start with 1;
 
+
+ALTER TABLE enderecamento.tb_cidade ALTER COLUMN cod_ibge DROP NOT NULL;

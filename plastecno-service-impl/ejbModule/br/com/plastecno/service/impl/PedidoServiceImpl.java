@@ -1756,7 +1756,7 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido == null) {
 			return;
 		}
-		logradouroService.validarListaLogradouroPreenchidaXXX(pedido.getListaLogradouro());
+		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
 	}
 
 	private void verificarMaterialAssociadoFornecedor(Integer idRepresentadaFornecedora, Set<Integer> listaIdItemPedido)

@@ -75,6 +75,4 @@ ALTER TABLE vendas.tb_nfe_pedido add valor_icms numeric(10,2) ;
 ALTER TABLE vendas.tb_nfe_pedido add data_emissao date ;
 ALTER TABLE vendas.tb_nfe_pedido add nome_cliente varchar(250) ;
 
------------------------------
 ALTER TABLE vendas.tb_pedido add valor_frete numeric(10,2) ;
-

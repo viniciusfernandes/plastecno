@@ -2,11 +2,9 @@ package br.com.plastecno.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -22,9 +20,7 @@ import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.LogradouroDAO;
 import br.com.plastecno.service.entity.Logradouro;
-import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroEndereco;
-import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
@@ -165,23 +161,6 @@ public class LogradouroServiceImpl implements LogradouroService {
 		logradouroDAO = new LogradouroDAO(entityManager);
 	}
 
-	@Override
-	public List<LogradouroCliente> inserir(List<LogradouroCliente> listaLogradouro) throws BusinessException {
-		if (listaLogradouro == null) {
-			return null;
-		}
-
-		if (listaLogradouro.isEmpty()) {
-			return Collections.emptyList();
-		}
-
-		List<LogradouroCliente> lista = new ArrayList<>();
-		for (LogradouroCliente logradouro : listaLogradouro) {
-			lista.add(inserir(logradouro));
-		}
-		return lista;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Logradouro> T inserir(T logradouro) throws BusinessException {
@@ -193,8 +172,8 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirEnderecoBaseCEP(Collection<Logradouro> lLogradouro) throws BusinessException {
-		if (lLogradouro == null || lLogradouro.isEmpty()) {
+	public void inserirEnderecoBaseCEP(List<? extends Logradouro> listaLogradouro) throws BusinessException {
+		if (listaLogradouro == null || listaLogradouro.isEmpty()) {
 			return;
 		}
 
@@ -205,16 +184,26 @@ public class LogradouroServiceImpl implements LogradouroService {
 		// exemplo: atualizar o nome de rua de um determinado cep. A tabela de
 		// logradouro eh utilizada apenas para consultar os ceps quando o
 		// usuario efetuar uma pesquisa no campo de ceps.
-		List<String> lCep = enderecamentoService.pesquisarCEPExistente(lLogradouro.stream().map(l -> l.getCep())
-				.collect(Collectors.toSet()));
+		List<String> lCep = new ArrayList<>();
+		for (Logradouro l : listaLogradouro) {
+			if (!lCep.contains(l.getCep())) {
+				lCep.add(l.getCep());
+			}
+		}
+		lCep = enderecamentoService.pesquisarCEPExistente(lCep);
 
+		List<Logradouro> listaInexistente = new ArrayList<>();
 		if (!lCep.isEmpty()) {
-			lLogradouro = lLogradouro.stream().filter(l -> !lCep.contains(l.getCep())).collect(Collectors.toList());
+			for (Logradouro l : listaLogradouro) {
+				if (!lCep.contains(l.getCep())) {
+					listaInexistente.add(l);
+				}
+			}
 		}
 
 		// Aqui estamos populando a tabela de CEP com os novos enderecos
 		// inseridos pelo usuario
-		for (Logradouro l : lLogradouro) {
+		for (Logradouro l : listaInexistente) {
 			enderecamentoService.inserir(l.gerarEndereco());
 		}
 	}
@@ -310,16 +299,16 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void validarListaLogradouroPreenchida(List<LogradouroCliente> listaLogradouro) throws BusinessException {
+	public void validarListaLogradouroPreenchida(List<? extends Logradouro> listaLogradouro) throws BusinessException {
 		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
 		lLogAusente.add(TipoLogradouro.COBRANCA);
 		lLogAusente.add(TipoLogradouro.ENTREGA);
 		lLogAusente.add(TipoLogradouro.FATURAMENTO);
 
 		if (listaLogradouro != null && !listaLogradouro.isEmpty()) {
-			listaLogradouro.forEach(t -> {
-				lLogAusente.remove(t.getTipoLogradouro());
-			});
+			for (Logradouro l : listaLogradouro) {
+				lLogAusente.remove(l.getTipoLogradouro());
+			}
 		}
 
 		if (lLogAusente.isEmpty()) {
@@ -327,30 +316,9 @@ public class LogradouroServiceImpl implements LogradouroService {
 		}
 
 		List<String> listaMensagem = new ArrayList<String>();
-		lLogAusente.forEach(t -> listaMensagem.add("É obrigatorio logradouro do tipo " + t));
-		throw new InformacaoInvalidaException(listaMensagem);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void validarListaLogradouroPreenchidaXXX(List<LogradouroPedido> listaLogradouro) throws BusinessException {
-		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
-		lLogAusente.add(TipoLogradouro.COBRANCA);
-		lLogAusente.add(TipoLogradouro.ENTREGA);
-		lLogAusente.add(TipoLogradouro.FATURAMENTO);
-
-		if (listaLogradouro != null && !listaLogradouro.isEmpty()) {
-			listaLogradouro.forEach(t -> {
-				lLogAusente.remove(t.getTipoLogradouro());
-			});
+		for (TipoLogradouro t : lLogAusente) {
+			listaMensagem.add("É obrigatorio logradouro do tipo " + t);
 		}
-
-		if (lLogAusente.isEmpty()) {
-			return;
-		}
-
-		List<String> listaMensagem = new ArrayList<String>();
-		lLogAusente.forEach(t -> listaMensagem.add("É obrigatorio logradouro do tipo " + t));
 		throw new InformacaoInvalidaException(listaMensagem);
 	}
 

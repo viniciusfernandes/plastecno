@@ -115,9 +115,9 @@ function pesquisarNcm(){
 		<input type="text" id="quantidade" name="itemPedido.quantidade" />
 	</div>
 	<div class="label" style="width: 6%">Forma:</div>
-	<div class="input" style="width: 60%">
+	<div class="input" style="width: 58%">
 		<select id="formaMaterial" name="itemPedido.formaMaterial"
-			style="width: 40%">
+			style="width: 45%">
 			<option value="">&lt&lt SELECIONE &gt&gt</option>
 			<c:forEach var="formaMaterial" items="${listaFormaMaterial}">
 				<option value="${formaMaterial}">${formaMaterial.descricao}</option>

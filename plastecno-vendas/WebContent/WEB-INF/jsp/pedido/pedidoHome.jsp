@@ -263,7 +263,7 @@ $(document).ready(function() {
 				<input type="button" id="botaoLimparNumeroPedido"
 					title="Limpar Pedido" value="" class="botaoLimparPequeno" />
 			</div>
-			<div class="label" style="width: 13%">Nr. Pedido Cliente:</div>
+			<div class="label" style="width: 12%">Nr. Pedido Cliente:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoCliente"
 					name="pedido.numeroPedidoCliente"
@@ -425,9 +425,9 @@ $(document).ready(function() {
 		</c:if>
 	</div>
 
-	<c:if test="${not empty pedido.id}">
+	<%-- c:if test="${not empty pedido.id}">
 		<jsp:include page="/bloco/bloco_nota_fiscal.jsp" />
-	</c:if>
+	</c:if --%>
 	<jsp:include page="/bloco/bloco_contato.jsp" />
 
 	<div class="bloco_botoes">

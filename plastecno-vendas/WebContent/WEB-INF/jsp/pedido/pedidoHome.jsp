@@ -37,6 +37,7 @@ $(document).ready(function() {
 	// inicializarAutocompleteDescricaoPeca('<c:url value="/estoque/descricaopeca"/>');
 	
 	habilitar('#bloco_item_pedido #descricao', false);
+	habilitar('#bloco_item_pedido #peso', false);
 	habilitar('#bloco_item_pedido #aliquotaIPI', <c:out value="${not empty pedido and pedido.representada.IPIHabilitado}"/>);
 	
 	var urlInclusaoPedido = '<c:url value="/pedido/inclusao"/>';
@@ -122,10 +123,12 @@ $(document).ready(function() {
 	inserirMascaraNumerica('numeroPedidoPesquisa', '9999999');
 	inserirMascaraMonetaria('precoVenda', 7);
 	inserirMascaraMonetaria('fretePedido', 7);
-	inserirMascaraNumerica('ipi', '99');
-	inserirMascaraNumerica('comissao', '99');
+	inserirMascaraNumerica('aliquotaIPI', '99');
+	inserirMascaraMonetaria('aliquotaComissao', 5);
+	inserirMascaraMonetaria('aliquotaICMS', 5);
 	inserirMascaraNumerica('quantidade', '9999999');
 	inserirMascaraMonetaria('comprimento', 8);
+	inserirMascaraMonetaria('peso', 8);
 	inserirMascaraMonetaria('medidaExterna', 8);
 	inserirMascaraMonetaria('medidaInterna', 8);
 	inserirMascaraNumerica('prazoEntrega', '999');

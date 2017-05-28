@@ -97,6 +97,16 @@ public class EmissaoNFeController extends AbstractController {
         inicializarListaCfop(request);
     }
 
+    private Double calcularPesoLiquido(List<ItemPedido> listaItem) {
+        double peso = 0;
+        for (ItemPedido i : listaItem) {
+            if (i.getPeso() != null) {
+                peso += i.getPeso();
+            }
+        }
+        return NumeroUtils.arredondarValorMonetario(peso);
+    }
+
     @Get("emissaoNFe/valorICMSInterestadual")
     public void calcularValorICMSInterestadual(ICMSInterestadual icms) {
         icms.carregarValores();
@@ -460,6 +470,13 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("infoAdFisco",
                     "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO NÚMERO "
                             + idPedido + ". VENDEDOR: " + nomeVend);
+
+            double peso = calcularPesoLiquido(listaItem);
+
+            addAtributo("quantidade", 1);
+            addAtributo("pesoLiquido", peso);
+            addAtributo("pesoBruto", peso);
+            addAtributo("especieVolume", "VOLUME");
 
             Date dtAtual = new Date();
             addAtributo("dataSaida", StringUtils.formatarData(dtAtual));

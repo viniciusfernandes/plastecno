@@ -1,6 +1,7 @@
 package br.com.plastecno.vendas.json;
 
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.util.NumeroUtils;
 
 public class ItemPedidoJson {
     private final String aliquotaComissao;
@@ -16,6 +17,7 @@ public class ItemPedidoJson {
     private final Double medidaInterna;
     private final String ncm;
     private final boolean peca;
+    private final String peso;
     private final Integer prazoEntrega;
     private final String precoItem;
     private final String precoMinimo;
@@ -59,6 +61,8 @@ public class ItemPedidoJson {
         aliquotaComissao = itemPedido.getAliquotaComissaoFormatado();
         ncm = itemPedido.getNcm();
         tipoCST = itemPedido.getTipoCst() != null ? itemPedido.getTipoCst().toString() : "";
+        peso = itemPedido.getPeso() == null ? "" : NumeroUtils.arredondarValorMonetario(itemPedido.getPeso())
+                .toString();
     }
 
     public String getAliquotaComissao() {
@@ -107,6 +111,10 @@ public class ItemPedidoJson {
 
     public String getNcm() {
         return ncm;
+    }
+
+    public String getPeso() {
+        return peso;
     }
 
     public Integer getPrazoEntrega() {

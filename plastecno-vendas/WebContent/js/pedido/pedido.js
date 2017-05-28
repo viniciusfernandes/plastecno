@@ -134,6 +134,7 @@ function inicializarBlocoItemPedido(urlTela) {
 						$('#aliquotaComissao').val(itemPedidoJson.aliquotaComissao);
 						$('#ncm').val(itemPedidoJson.ncm);
 						$('#cst').val(itemPedidoJson.tipoCST);
+						$('#peso').val(itemPedidoJson.peso);
 						
 						habilitarPreenchimentoPeca(itemPedidoJson.peca);
 					} else if(!contemErros && !contemItem){
@@ -164,6 +165,7 @@ function inicializarSelectFormaMaterial() {
 
 function habilitarPreenchimentoPeca(isPeca) {
 	habilitar('#bloco_item_pedido #descricao', isPeca);
+	habilitar('#bloco_item_pedido #peso', isPeca);
 	habilitar('#bloco_item_pedido #medidaExterna', !isPeca);
 	habilitar('#bloco_item_pedido #medidaInterna', !isPeca);
 	habilitar('#bloco_item_pedido #comprimento', !isPeca);

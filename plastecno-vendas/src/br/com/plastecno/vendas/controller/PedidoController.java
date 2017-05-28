@@ -135,6 +135,19 @@ public class PedidoController extends AbstractController {
         redirecTo(this.getClass()).pesquisarPedidoById(idPedido, tipoPedido, false);
     }
 
+    @Get("pedido/pesoitem")
+    public void calcularPesoItem(ItemPedido item) {
+        try {
+            Double peso = pedidoService.calcularPesoItemPedido(item);
+            String pesoFormatado = peso == null ? "" : String.valueOf(NumeroUtils.arredondarValorMonetario(peso));
+            serializarJson(new SerializacaoJson("peso", pesoFormatado));
+        } catch (BusinessException e) {
+            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
+        } catch (Exception e) {
+            gerarLogErroRequestAjax("cálculo do peso do item do pedido", e);
+        }
+    }
+
     @Post("pedido/cancelamento")
     public void cancelarPedido(Integer idPedido, TipoPedido tipoPedido, boolean orcamento) {
         try {

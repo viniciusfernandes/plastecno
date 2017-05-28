@@ -10,6 +10,14 @@ $(document).ready(function(){
 			return;			
 		}
 		pesquisarPrecoMinimo();
+		pesquisarPesoItem();
+	});
+	
+	$('#quantidade').keyup(function (){
+		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
+			return;			
+		}
+		pesquisarPesoItem();
 	});
 	
 	$('#ncm').focus(function (){
@@ -32,17 +40,18 @@ $(document).ready(function(){
 	});
 });
 
-function gerarParametrosItemPedido(){
-	var parametro = 'itemEstoque.material.id='+$('#bloco_item_pedido #idMaterial').val();
-	parametro += '&itemEstoque.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
-	parametro += '&itemEstoque.medidaExterna='+$('#bloco_item_pedido #medidaExterna').val();
-	parametro += '&itemEstoque.medidaInterna='+$('#bloco_item_pedido #medidaInterna').val();
-	parametro += '&itemEstoque.comprimento='+$('#bloco_item_pedido #comprimento').val();
+function gerarParametrosMedidasItem(){
+	var parametro = 'item.material.id='+$('#bloco_item_pedido #idMaterial').val();
+	parametro += '&item.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
+	parametro += '&item.medidaExterna='+$('#bloco_item_pedido #medidaExterna').val();
+	parametro += '&item.medidaInterna='+$('#bloco_item_pedido #medidaInterna').val();
+	parametro += '&item.comprimento='+$('#bloco_item_pedido #comprimento').val();
+	parametro += '&item.quantidade='+$('#bloco_item_pedido #quantidade').val();
 	return parametro;
 }
 
 function pesquisarPrecoMinimo(){
-	var parametro = gerarParametrosItemPedido();
+	var parametro = gerarParametrosMedidasItem();
 	var request = $.ajax({
 		type: 'get',
 		url: '<c:url value="/estoque/item/precominimo"/>',
@@ -50,7 +59,41 @@ function pesquisarPrecoMinimo(){
 	});
 	
 	request.done(function (response){
-		$('#bloco_item_pedido #precoMinimo').val(response.precoMinimo);
+		var preco = response.precoMinimo;
+		if(preco == undefined || preco == null){
+			return;
+		}
+		$('#bloco_item_pedido #precoMinimo').val(preco);
+	});
+	
+	request.fail(function(request, status, excecao) {
+		var mensagem = 'Falha no calculo do preco de venda sugerido: '+ idCampoPesquisavel;
+		mensagem += ' para a URL ' + url;
+		mensagem += ' contendo o valor de requisicao ' + parametro;
+		mensagem += ' => Excecao: ' + excecao;
+		gerarListaMensagemErro(new Array(mensagem));
+	});
+};
+
+function pesquisarPesoItem(){
+	var parametro = gerarParametrosMedidasItem();
+	var request = $.ajax({
+		type: 'get',
+		url: '<c:url value="/pedido/pesoitem"/>',
+		data: parametro 
+	});
+	
+	request.done(function (response){
+		var peso = response.peso;
+		if(peso != undefined || peso != null){
+			$('#bloco_item_pedido #peso').val(peso);
+			return;
+		} 
+		var erros = response.erros ; 
+		if(erros!= undefined && erros != null){
+			gerarListaMensagemErro(new Array(erros));
+			return;
+		}
 	});
 	
 	request.fail(function(request, status, excecao) {
@@ -63,7 +106,7 @@ function pesquisarPrecoMinimo(){
 };
 
 function pesquisarNcm(){
-	var parametro = gerarParametrosItemPedido();
+	var parametro = gerarParametrosMedidasItem();
 	var request = $.ajax({
 		type: 'get',
 		url: '<c:url value="/estoque/item/ncm"/>',
@@ -155,8 +198,12 @@ function pesquisarNcm(){
 			maxlength="11" style="width: 30%" />
 	</div>
 	<div class="label">Preço Mín.:</div>
-	<div class="input" style="width: 70%">
-		<input type="text" id="precoMinimo" name="itemPedido.precoMinimo" maxlength="8" style="width: 7%" disabled="disabled"/>
+	<div class="input" style="width: 10%">
+		<input type="text" id="precoMinimo" name="itemPedido.precoMinimo" maxlength="8" style="width: 100%" disabled="disabled"/>
+	</div>
+	<div class="label">Peso (kg):</div>
+	<div class="input" style="width: 50%">
+		<input type="text" id="peso" name="itemPedido.peso" maxlength="8" style="width: 18%" />
 	</div>
 	<div class="label">Preço:</div>
 	<div class="input" style="width: 5%">
@@ -172,7 +219,7 @@ function pesquisarNcm(){
 	<div class="label" style="width: 10%">ICMS (%) :</div>
 	<div class="input" style="width: 40%">
 		<input type="text" id="aliquotaICMS" name="itemPedido.aliquotaICMS"
-			maxlength="2" style="width: 5%"/>
+			maxlength="2" style="width: 10%"/>
 	</div>
 	<div class="label">Prazo (dias):</div>
 	<div class="input" style="width: 5%">

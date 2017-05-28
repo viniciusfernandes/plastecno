@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.ejb.Local;
 
+import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -38,6 +39,8 @@ public interface PedidoService {
 	void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido);
 
 	List<Date> calcularDataPagamento(Integer idPedido);
+
+	Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException;
 
 	void cancelarPedido(Integer idPedido) throws BusinessException;
 

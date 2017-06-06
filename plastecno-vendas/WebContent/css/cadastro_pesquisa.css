@@ -1,14 +1,9 @@
 .barraTitulo {
 	background: #398235; /* Old browsers */
-	background: -moz-linear-gradient(top, #398235 0%, #8ab66b 5%, #8ab66b 96%, #398235
-		100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #398235),
-		color-stop(5%, #8ab66b), color-stop(96%, #8ab66b),
-		color-stop(100%, #398235)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top, #398235 0%, #8ab66b 5%, #8ab66b 96%,
-		#398235 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top, #398235 0%, #8ab66b 5%, #8ab66b 96%, #398235
-		100%); /* Opera 11.10+ */
+	background: -moz-linear-gradient(top, #398235 0%, #8ab66b 5%, #8ab66b 96%, #398235 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #398235), color-stop(5%, #8ab66b), color-stop(96%, #8ab66b), color-stop(100%, #398235)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #398235 0%, #8ab66b 5%, #8ab66b 96%, #398235 100%); /* Chrome10+,Safari5.1+ */
+/*	background: -o-linear-gradient(top, #398235 0%, #8ab66b 5%, #8ab66b 96%, #398235 100%);  Opera 11.10+ */
 	background-position: right;
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
@@ -88,9 +83,7 @@
 	font-weight: bold;
 }
 
-//
-Essa classe sera util quando construido mais de bloco de inputs lado a lado,
-	por exemplo: inputs do cliente ao lado do endereco do cliente .
+/* Essa classe sera util quando construido mais de bloco de inputs lado a lado, por exemplo: inputs do cliente ao lado do endereco do cliente */
 .coluna {
 	border: 0px solid #4E5E53;
 	float: left;

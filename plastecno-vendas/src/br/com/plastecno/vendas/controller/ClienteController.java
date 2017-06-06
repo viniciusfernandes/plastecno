@@ -12,6 +12,7 @@ import br.com.plastecno.service.ContatoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.TransportadoraService;
+import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ComentarioCliente;
@@ -45,12 +46,26 @@ public class ClienteController extends AbstractController {
     @Servico
     private TransportadoraService transportadoraService;
 
+    @Servico
+    private UsuarioService usuarioService;
+
     public ClienteController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
 
-        this.setNomeTela("Cliente");
-        this.inicializarPicklist("Redespacho", "Cadastradas", "Redespacho", "id", "nomeFantasia", false,
-                "Transportadora");
+        setNomeTela("Cliente");
+        inicializarPicklist("Redespacho", "Cadastradas", "Redespacho", "id", "nomeFantasia", false, "Transportadora");
+        verificarPermissaoAcesso("isAssociacaoVendedorPermitida", TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS);
+    }
+
+    @Post("cliente/associacaovendedor")
+    public void associarVendedor(Integer idVendedor, Integer idCliente, boolean isRevendedor) {
+        try {
+            usuarioService.associarCliente(idVendedor, idCliente);
+            gerarMensagemSucesso("O cliente foi associado com sucesso.");
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+        redirecTo(this.getClass()).pesquisarClienteById(idCliente, isRevendedor);
     }
 
     @Get("cliente")
@@ -239,6 +254,16 @@ public class ClienteController extends AbstractController {
             listaResultado.add(new Autocomplete(transportadora.getId(), transportadora.getNomeFantasia()));
         }
         serializarJson(new SerializacaoJson("listaResultado", listaResultado));
+    }
+
+    @Get("cliente/listagem/vendedor")
+    public void pesquisarVendedorByNome(String nomeVendedor) {
+        List<Autocomplete> lista = new ArrayList<Autocomplete>();
+        List<Usuario> listaUsuario = usuarioService.pesquisarVendedorByNome(nomeVendedor);
+        for (Usuario usuario : listaUsuario) {
+            lista.add(new Autocomplete(usuario.getId(), usuario.getNome()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
     }
 
     @Post("cliente/contato/remocao/{idContato}")

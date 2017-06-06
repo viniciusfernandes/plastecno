@@ -36,6 +36,7 @@ public final class GeradorRelatorioPDF {
     private static String limpar(String property) {
         return property.replace("{", "").replace("}", "");
     }
+
     private StringBuilder cabecalho;
     private final Charset charset;
     private final ConversorHTML2PDF conversor;

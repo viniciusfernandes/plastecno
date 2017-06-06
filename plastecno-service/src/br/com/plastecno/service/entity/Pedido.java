@@ -125,6 +125,10 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(intervaloComprimento = { 0, 799 }, nomeExibicao = "Observação do pedido")
 	private String observacao;
 
+	@Column(name="observacao_producao")
+	@InformacaoValidavel(intervaloComprimento = { 0, 799 }, nomeExibicao = "Observação de produção do pedido")
+	private String observacaoProducao;
+
 	@Column(name = "prazo_entrega")
 	private Integer prazoEntrega;
 
@@ -397,6 +401,10 @@ public class Pedido implements Serializable, Cloneable {
 		return observacao;
 	}
 
+	public String getObservacaoProducao() {
+		return observacaoProducao;
+	}
+
 	public Integer getPrazoEntrega() {
 		return prazoEntrega;
 	}
@@ -614,6 +622,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setObservacao(String observacao) {
 		this.observacao = observacao;
+	}
+
+	public void setObservacaoProducao(String observacaoProducao) {
+		this.observacaoProducao = observacaoProducao;
 	}
 
 	public void setOrcamento(boolean isOrcamento) {

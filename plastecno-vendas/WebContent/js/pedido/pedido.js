@@ -271,7 +271,7 @@ function recuperarParametrosBlocoContato() {
 		return '';
 	}
 	return '&' + $('#bloco_contato').serialize();
-}
+};
 
 function inicializarAutomcompleteCliente(url) {
 	autocompletar({
@@ -444,7 +444,7 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 			$('#tipoVendaPeca').val('PECA');
 		});
 	}
-}
+};
 
 function inicializarFiltro() {
 	$("#filtro_nomeFantasia").val($("#nomeFantasia").val());
@@ -456,7 +456,7 @@ function inicializarFiltro() {
 function contactarCliente(idCliente) {
 	$('#formContactarCliente #idClienteContactado').val(idCliente);
 	$('#formContactarCliente').submit();
-}
+};
 
 function preencherComboTransportadora(combo, listaTransportadora) {
 	var TOTAL_TRANSPORTADORAS = listaTransportadora.length;
@@ -464,7 +464,7 @@ function preencherComboTransportadora(combo, listaTransportadora) {
 		combo.add(new Option(listaTransportadora[i].nomeFantasia,
 				listaTransportadora[i].id), null);
 	}
-}
+};
 
 function habilitarIPI(urlTela, idRepresentada) {
 	if(isEmpty(idRepresentada)){
@@ -472,7 +472,8 @@ function habilitarIPI(urlTela, idRepresentada) {
 	}
 	var request = $.ajax({
 		type : 'get',
-		url : urlTela + '/representada/' + idRepresentada + '/aliquotaIPI/'
+		url : urlTela + '/representada/' + idRepresentada + '/aliquotaIPI/',
+		async: true
 	});
 
 	request.done(function(response) {
@@ -482,7 +483,7 @@ function habilitarIPI(urlTela, idRepresentada) {
 
 	request
 			.fail(function(request, status) {
-				alert('Falha na verifica��o se � poss�vel o c�lculo do IPI pela representada => '
+				alert('Falha na verificação se é possível o cálculo do IPI pela representada => '
 						+ request.responseText);
 			});
-}
+};

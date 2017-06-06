@@ -198,7 +198,6 @@ $(document).ready(function() {
 		});
 	});
 });
-
 </script>
 
 </head>
@@ -258,14 +257,15 @@ $(document).ready(function() {
 				<input type="button" id="botaoPesquisaNumeroPedido"
 					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
 			</div>
-			<div class="input" style="width: 1%">
-				<input type="button" id="botaoCopiarPedido"
-					title="Copiar Pedido" value="" class="botaoCopiarPequeno" />
-			</div>
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoLimparNumeroPedido"
 					title="Limpar Pedido" value="" class="botaoLimparPequeno" />
 			</div>
+			<div class="input" style="width: 1%">
+				<input type="button" id="botaoCopiarPedido"
+					title="Copiar Pedido" value="" class="botaoCopiarPequeno" />
+			</div>
+			
 			<div class="label" style="width: 12%">Nr. Pedido Cliente:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoCliente"
@@ -387,6 +387,11 @@ $(document).ready(function() {
 			<div class="input areatexto" style="width: 70%">
 				<textarea id="obervacao" name="pedido.observacao"
 					style="width: 100%">${pedido.observacao}</textarea>
+			</div>
+			<div class="label">Observação Prod.:</div>
+			<div class="input areatexto" style="width: 70%">
+				<textarea id="observacaoProducao" name="pedido.observacaoProducao"
+					style="width: 100%">${pedido.observacaoProducao}</textarea>
 			</div>
 
 		</fieldset>

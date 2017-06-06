@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Comissao;
 import br.com.plastecno.service.impl.util.QueryUtil;
 
@@ -13,6 +14,22 @@ public class ComissaoDAO extends GenericDAO<Comissao> {
 
 	public ComissaoDAO(EntityManager entityManager) {
 		super(entityManager);
+	}
+
+	public Double pesquisarAliquotaComissaoByIdVendedor(Integer idVendedor, TipoPedido tipoPedido) {
+		if (idVendedor == null || tipoPedido == null || TipoPedido.COMPRA.equals(tipoPedido)) {
+			return null;
+		}
+
+		StringBuilder s = new StringBuilder("select ");
+		if (TipoPedido.REPRESENTACAO.equals(tipoPedido)) {
+			s.append("c.aliquotaRepresentacao ");
+		} else if (TipoPedido.REVENDA.equals(tipoPedido)) {
+			s.append("c.aliquotaRevenda ");
+		}
+		s.append(" from Comissao c where  c.idVendedor = :idVendedor and c.dataFim = null");
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(s.toString()).setParameter("idVendedor", idVendedor), Double.class, null);
 	}
 
 	public Comissao pesquisarById(Integer idComissao) {

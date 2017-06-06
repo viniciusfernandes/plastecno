@@ -669,28 +669,28 @@ public abstract class AbstractController {
         return StringUtils.removerMascaraDocumento(documento);
     }
 
-    void serializarJson(SerializacaoJson serializacaoJson) {
-        if (serializacaoJson == null) {
+    void serializarJson(SerializacaoJson json) {
+        if (json == null) {
             return;
         }
 
         Serializer serializer = null;
-        if (serializacaoJson.contemNome()) {
-            serializer = this.result.use(Results.json()).from(serializacaoJson.getObjeto(), serializacaoJson.getNome());
+        if (json.contemNome()) {
+            serializer = this.result.use(Results.json()).from(json.getObjeto(), json.getNome());
         } else {
-            serializer = this.result.use(Results.json()).from(serializacaoJson.getObjeto());
+            serializer = this.result.use(Results.json()).from(json.getObjeto());
         }
 
-        if (serializacaoJson.isRecursivo()) {
+        if (json.isRecursivo()) {
             serializer = serializer.recursive();
         }
 
-        if (serializacaoJson.contemInclusaoAtributo()) {
-            serializer.include(serializacaoJson.getAtributoInclusao());
+        if (json.contemInclusaoAtributo()) {
+            serializer.include(json.getAtributoInclusao());
         }
 
-        if (serializacaoJson.contemExclusaoAtributo()) {
-            serializer.exclude(serializacaoJson.getAtributoExclusao());
+        if (json.contemExclusaoAtributo()) {
+            serializer.exclude(json.getAtributoExclusao());
         }
         serializer.serialize();
     }

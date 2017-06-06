@@ -13,6 +13,7 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.FormaMaterialService;
 import br.com.plastecno.service.MaterialService;
@@ -92,6 +93,9 @@ public class PedidoController extends AbstractController {
 
     @Servico
     private ClienteService clienteService;
+
+    @Servico
+    private ComissaoService comissaoService;
 
     @Servico
     private EstoqueService estoqueService;
@@ -237,6 +241,16 @@ public class PedidoController extends AbstractController {
         } catch (Exception e) {
             gerarLogErro("envio de email do pedido No. " + idPedido, e);
         }
+    }
+
+    private String gerarComissao(Integer idRepresentada, Integer idVendedor) {
+        boolean isRevenda = representadaService.isRevendedor(idRepresentada);
+        TipoPedido t = isRevenda ? TipoPedido.REVENDA : TipoPedido.REPRESENTACAO;
+        if (idVendedor == null) {
+            idVendedor = getCodigoUsuario();
+        }
+        Double aliquota = comissaoService.pesquisarAliquotaComissaoByIdVendedor(idVendedor, t);
+        return aliquota == null ? "" : NumeroUtils.gerarPercentual(aliquota, 2).toString();
     }
 
     private void gerarListaRepresentada(Pedido pedido) {
@@ -565,7 +579,7 @@ public class PedidoController extends AbstractController {
     public void pesquisarMaterial(String sigla, Integer idRepresentada) {
         List<Autocomplete> lista = new ArrayList<Autocomplete>();
         if (sigla != null && idRepresentada != null) {
-            List<Material> listaMaterial = this.materialService.pesquisarMaterialAtivoBySigla(sigla, idRepresentada);
+            List<Material> listaMaterial = materialService.pesquisarMaterialAtivoBySigla(sigla, idRepresentada);
             for (Material material : listaMaterial) {
                 lista.add(new MaterialAutocomplete(material.getId(), material.getDescricaoFormatada(), material
                         .isImportado()));
@@ -644,6 +658,8 @@ public class PedidoController extends AbstractController {
             addAtributo("orcamento", pedido.isOrcamento());
             addAtributo("tipoPedido", pedido.getTipoPedido());
             addAtributo("isCompra", pedido.isCompra());
+            addAtributo("aliquotaComissao",
+                    gerarComissao(pedido.getRepresentada().getId(), pedido.getVendedor().getId()));
 
             gerarListaRepresentada(pedido);
 

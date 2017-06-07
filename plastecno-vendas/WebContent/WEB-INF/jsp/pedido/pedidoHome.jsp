@@ -306,6 +306,11 @@ $(document).ready(function() {
 					<c:if test="${pedido.clienteNotificadoVenda}">checked</c:if>
 					class="checkbox" style="width: 4%"/>
 			</div>
+			<div class="label">End. Faturam.</div>
+			<div class="input" style="width: 80%">
+				<input type="text" id="logradouroFaturamento"
+					value="${logradouroFaturamento}" disabled="disabled" class="uppercaseBloqueado desabilitado" style="width: 50%"/>
+			</div>
 			<div class="label">CNPJ:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="cnpj" name="cliente.cnpj"

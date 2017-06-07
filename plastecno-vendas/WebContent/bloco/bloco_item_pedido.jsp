@@ -227,7 +227,10 @@ function pesquisarNcm(){
 	</div>
 	<div class="label" style="width: 8%">Comiss. (%):</div>
 	<div class="input" style="width: 5%">
-		<input type="text" id="aliquotaComissao" name="itemPedido.aliquotaComissao" maxlength="3" />
+		<input type="text" id="aliquotaComissao" name="itemPedido.aliquotaComissao" maxlength="3" 
+			<c:out value="${acessoAlteracaoComissaoPermitida ? '' :'disabled=\"disabled\"'}"/>"
+			class="<c:out value="${acessoAlteracaoComissaoPermitida ? '' :'uppercaseBloqueado desabilitado'}"/>"
+		/>
 	</div>
 	<div class="label" style="width: 10%">C.S.T:</div>
 	<div class="input" style="width: 50%">

@@ -29,6 +29,7 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
@@ -374,14 +375,16 @@ public class PedidoController extends AbstractController {
             if (itemPedido.getMaterial() != null && itemPedido.getMaterial().getId() == null) {
                 itemPedido.setMaterial(null);
             }
+
             if (aliquotaIPI != null) {
                 itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
             }
 
+            itemPedido.setAliquotaComissao(itemPedido.getAliquotaComissao() == null
+                    || itemPedido.getAliquotaComissao() == 0d ? null : NumeroUtils.gerarAliquota(itemPedido
+                    .getAliquotaComissao()));
+
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
-            if (itemPedido.contemAliquotaComissao()) {
-                itemPedido.setAliquotaComissao(NumeroUtils.gerarAliquota(itemPedido.getAliquotaComissao()));
-            }
 
             final Integer idItemPedido = pedidoService.inserirItemPedido(numeroPedido, itemPedido);
             itemPedido.setId(idItemPedido);
@@ -513,12 +516,13 @@ public class PedidoController extends AbstractController {
         Cliente cliente = clienteService.pesquisarClienteEContatoById(id);
         cliente.setListaRedespacho(clienteService.pesquisarTransportadorasRedespacho(id));
 
+        LogradouroCliente logradouro = clienteService.pesquisarLogradouroFaturamentoById(id);
         carregarVendedor(cliente);
         // Aqui devemos formatar os documentos do cliente pois eh uma requisicao
         // assincrona e a mascara em javascript nao eh executada.
         formatarDocumento(cliente);
 
-        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar());
+        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar(), logradouro);
 
         SerializacaoJson serializacaoJson = new SerializacaoJson("cliente", json)
                 .incluirAtributo("listaTransportadora").incluirAtributo("listaRedespacho").incluirAtributo("vendedor");
@@ -617,6 +621,11 @@ public class PedidoController extends AbstractController {
             formatarItemPedido(listaItem);
             formatarPedido(pedido);
 
+            LogradouroCliente l = clienteService.pesquisarLogradouroFaturamentoById(pedido.getCliente().getId());
+            if (l != null) {
+                addAtributo("logradouroFaturamento", l.getCepEnderecoNumeroBairro());
+            }
+
             addAtributo("listaIdPedidoAssociado",
                     pedidoService.pesquisarIdPedidoAssociadoByIdPedidoOrigem(id, pedido.isCompra()));
             addAtributo("listaTransportadora", listaTransportadora);
@@ -633,7 +642,6 @@ public class PedidoController extends AbstractController {
             addAtributo("isCompra", pedido.isCompra());
             addAtributo("aliquotaComissao",
                     gerarComissao(pedido.getRepresentada().getId(), pedido.getVendedor().getId()));
-
             gerarListaRepresentada(pedido);
 
             SituacaoPedido situacao = pedido.getSituacaoPedido();
@@ -658,12 +666,16 @@ public class PedidoController extends AbstractController {
             final boolean acessoCompraPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO,
                     TipoAcesso.CADASTRO_PEDIDO_COMPRA);
 
+            final boolean acessoAlteracaoComissaoPermitida = !pedido.isNovo() && pedido.isRevendaEfetuada()
+                    && isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS);
+
             addAtributo("pedidoDesabilitado", isPedidoDesabilitado(pedido));
             addAtributo("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);
             addAtributo("acessoReenvioPedidoPermitido", acessoReenvioPedidoPermitido);
             addAtributo("acessoCancelamentoPedidoPermitido", acessoCancelamentoPedidoPermitido);
             addAtributo("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
             addAtributo("acessoCompraPermitido", acessoCompraPermitido);
+            addAtributo("acessoAlteracaoComissaoPermitida", acessoAlteracaoComissaoPermitida);
         }
         configurarTipoPedido(tipoPedido);
         // Estamos verificando se o pedido pesquisado eh realmente um orcamento
@@ -705,6 +717,12 @@ public class PedidoController extends AbstractController {
                 // Aqui ja foi carregado o vendedor resumido.
                 addAtributo("proprietario", cliente.getVendedor());
             }
+
+            LogradouroCliente l = clienteService.pesquisarLogradouroFaturamentoById(idCliente);
+            if (l != null) {
+                addAtributo("logradouroFaturamento", l.getCepEnderecoNumeroBairro());
+            }
+
             addAtributo("listaTransportadora", transportadoraService.pesquisar());
             addAtributo("listaRedespacho", transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
             addAtributo("idRepresentadaSelecionada", idFornecedor);

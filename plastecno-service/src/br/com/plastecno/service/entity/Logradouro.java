@@ -50,6 +50,23 @@ public abstract class Logradouro {
 		this.setBairro(endereco.getBairro().getDescricao());
 	}
 
+	private String gerarCepEnderecoNumeroBairro(boolean cepIncluido) {
+		StringBuilder end = new StringBuilder();
+		if (cepIncluido && StringUtils.isNotEmpty(getCep())) {
+			end.append(getCep()).append(" - ");
+		}
+		if (StringUtils.isNotEmpty(getEndereco())) {
+			end.append(getEndereco());
+		}
+		if (StringUtils.isNotEmpty(getNumero())) {
+			end.append(" - ").append(getNumero());
+		}
+		if (StringUtils.isNotEmpty(getBairro())) {
+			end.append(" - ").append(getBairro());
+		}
+		return end.toString();
+	}
+
 	public Endereco gerarEndereco() {
 		Pais p = new Pais();
 		p.setDescricao(getPais());
@@ -83,6 +100,10 @@ public abstract class Logradouro {
 		return cep;
 	}
 
+	public String getCepEnderecoNumeroBairro() {
+		return gerarCepEnderecoNumeroBairro(true);
+	}
+
 	public String getCidade() {
 		return cidade;
 	}
@@ -108,17 +129,7 @@ public abstract class Logradouro {
 	}
 
 	public String getEnderecoNumeroBairro() {
-		StringBuilder end = new StringBuilder();
-		if (StringUtils.isNotEmpty(getEndereco())) {
-			end.append(getEndereco());
-		}
-		if (StringUtils.isNotEmpty(getNumero())) {
-			end.append(" - ").append(getNumero());
-		}
-		if (StringUtils.isNotEmpty(getBairro())) {
-			end.append(" - ").append(getBairro());
-		}
-		return end.toString();
+		return gerarCepEnderecoNumeroBairro(false);
 	}
 
 	public abstract Integer getId();

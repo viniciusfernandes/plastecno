@@ -236,7 +236,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	public ItemPedido pesquisarItemPedidoById(Integer idItemPedido) {
-		Query query = this.entityManager.createQuery("select i from ItemPedido i where i.id = :idItemPedido");
+		Query query = entityManager.createQuery("select i from ItemPedido i where i.id = :idItemPedido");
 		query.setParameter("idItemPedido", idItemPedido);
 		return QueryUtil.gerarRegistroUnico(query, ItemPedido.class, null);
 	}
@@ -514,7 +514,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		}
 
 		if (isOrcamento) {
-			select.append("p.situacaoPedido = :situacaoPedido ");
+			select.append("p.situacaoPedido = :orcamento ");
 		} else {
 			select.append("p.situacaoPedido in (:situacoes) ");
 		}
@@ -534,7 +534,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		}
 
 		if (isOrcamento) {
-			query.setParameter("situacaoPedido", SituacaoPedido.ORCAMENTO);
+			query.setParameter("orcamento", SituacaoPedido.ORCAMENTO);
 		} else {
 			query.setParameter("situacoes", pesquisarSituacaoVendaEfetivada());
 		}

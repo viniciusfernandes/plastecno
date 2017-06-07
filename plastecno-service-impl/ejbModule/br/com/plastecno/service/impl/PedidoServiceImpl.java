@@ -29,6 +29,7 @@ import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
@@ -50,6 +51,7 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
+import br.com.plastecno.service.impl.calculo.CalculadoraItem;
 import br.com.plastecno.service.impl.calculo.CalculadoraPreco;
 import br.com.plastecno.service.impl.mensagem.email.GeradorPedidoEmail;
 import br.com.plastecno.service.impl.mensagem.email.TipoMensagemPedido;
@@ -68,7 +70,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private ClienteService clienteService;
-
 	@EJB
 	private ComissaoService comissaoService;
 
@@ -107,7 +108,8 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public void aceitarOrcamento(Integer idOrcamento) {
 		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoById(idOrcamento);
-		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)) {
+		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)
+				&& !SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido)) {
 			return;
 		}
 		// Para o aceite do orcamento devemos redirecionar o pedido para o
@@ -304,6 +306,28 @@ public class PedidoServiceImpl implements PedidoService {
 		return lista;
 	}
 
+	private void calcularPeso(ItemPedido itemPedido) throws AlgoritmoCalculoException {
+		// O sistema nao consegue calcular o peso das pecas
+		if (itemPedido.isPeca()) {
+			return;
+		}
+		itemPedido.setPeso(calcularPesoItemPedido(itemPedido));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException {
+		// O sistema nao consegue calcular o peso de pecas
+		if (itemPedido.isPeca()) {
+			return null;
+		}
+		if (itemPedido.contemMaterial() && itemPedido.getMaterial().getPesoEspecifico() == null) {
+			Double pEspecifico = materialService.pesquisarPesoEspecificoById(itemPedido.getMaterial().getId());
+			itemPedido.getMaterial().setPesoEspecifico(pEspecifico);
+		}
+		return CalculadoraItem.calcularKilo(itemPedido);
+	}
+
 	@Override
 	public void cancelarPedido(Integer idPedido) throws BusinessException {
 		if (idPedido == null) {
@@ -443,7 +467,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoClone.setId(null);
 		pedidoClone.setDataEntrega(new Date());
 		pedidoClone.setListaLogradouro(null);
-		pedidoClone.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO : SituacaoPedido.DIGITACAO);
+		pedidoClone.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO_DIGITACAO : SituacaoPedido.DIGITACAO);
 		pedidoClone = inserir(pedidoClone);
 
 		List<ItemPedido> listaItemPedido = pesquisarItemPedidoByIdPedido(idPedido);
@@ -576,8 +600,10 @@ public class PedidoServiceImpl implements PedidoService {
 			// na reserva dos itens do pedido, pois la o pedido entre em
 			// pendecia de
 			// reserva.
-			if (SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
+			if (!pedido.isOrcamento() && SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
 				pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
+			} else if (pedido.isOrcamento()) {
+				pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 			}
 		}
 		pedidoDAO.alterar(pedido);
@@ -671,7 +697,7 @@ public class PedidoServiceImpl implements PedidoService {
 			// de administrador faca cadastro de pedidos em nome de outro. Por
 			// isso
 			// estamos ajustando o vendedor correto.
-			Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(pedido.getCliente().getId());
+			Usuario vendedor = usuarioService.pesquisarVendedorResumidoByIdCliente(pedido.getCliente().getId());
 			if (vendedor == null) {
 				String nomeCliente = clienteService.pesquisarNomeFantasia(pedido.getCliente().getId());
 				throw new BusinessException("Não existe vendedor associado ao cliente " + nomeCliente);
@@ -823,6 +849,10 @@ public class PedidoServiceImpl implements PedidoService {
 		// tenha sido enviado a comissao sera calculada, mas so os pedidos
 		// enviados aparecerao no relatorio de comissao.
 		calcularComissaoVenda(pedido, itemPedido);
+
+		// Aqui estamos calculando o peso do item para agilizar o preenchimento
+		// do peso na geracao da NFe
+		calcularPeso(itemPedido);
 		return itemPedido.getId();
 	}
 
@@ -857,7 +887,17 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public Pedido inserirOrcamento(Pedido pedido) throws BusinessException {
-		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+		if (pedido == null) {
+			return null;
+		}
+
+		if (pedido.isNovo()) {
+			pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO_DIGITACAO);
+		} else if (!pedido.isNovo() && !pedido.isOrcamentoDigitacao()) {
+			// Estamos garantindo que teremos um orcamento no caso de edicao de
+			// um orcamento ja enviado
+			pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+		}
 		Cliente cliente = pedido.getCliente();
 
 		cliente.setRazaoSocial(cliente.getNomeFantasia());

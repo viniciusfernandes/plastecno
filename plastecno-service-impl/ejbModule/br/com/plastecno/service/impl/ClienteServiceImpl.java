@@ -220,7 +220,7 @@ public class ClienteServiceImpl implements ClienteService {
 			return;
 		}
 		Cliente cliente = pesquisarById(idCliente);
-		Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(idCliente);
+		Usuario vendedor = usuarioService.pesquisarVendedorResumidoByIdCliente(idCliente);
 		inserirComentario(vendedor, cliente, comentario);
 	}
 

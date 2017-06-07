@@ -14,6 +14,9 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 @Local
 public interface UsuarioService {
 
+	void associarCliente(Integer idVendedor, Integer idCliente) throws BusinessException;
+
+	@Deprecated
 	void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado) throws BusinessException;
 
 	void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado,
@@ -74,6 +77,8 @@ public interface UsuarioService {
 
 	List<Usuario> pesquisarVendedores(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros);
+
+	Usuario pesquisarVendedorResumidoByIdCliente(Integer idCliente);
 
 	void removerLogradouro(Integer idLogradouro);
 }

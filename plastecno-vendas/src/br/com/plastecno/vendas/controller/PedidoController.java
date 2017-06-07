@@ -1,9 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,6 +11,7 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.ClienteService;
+import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.FormaMaterialService;
 import br.com.plastecno.service.MaterialService;
@@ -30,6 +29,7 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
@@ -94,6 +94,9 @@ public class PedidoController extends AbstractController {
     private ClienteService clienteService;
 
     @Servico
+    private ComissaoService comissaoService;
+
+    @Servico
     private EstoqueService estoqueService;
 
     @Servico
@@ -133,6 +136,19 @@ public class PedidoController extends AbstractController {
         // Devemos configurar o parametro orcamento = false para direcionar o
         // usuario para a tela de vendas apos o aceite.
         redirecTo(this.getClass()).pesquisarPedidoById(idPedido, tipoPedido, false);
+    }
+
+    @Get("pedido/pesoitem")
+    public void calcularPesoItem(ItemPedido item) {
+        try {
+            Double peso = pedidoService.calcularPesoItemPedido(item);
+            String pesoFormatado = peso == null ? "" : String.valueOf(NumeroUtils.arredondarValorMonetario(peso));
+            serializarJson(new SerializacaoJson("peso", pesoFormatado));
+        } catch (BusinessException e) {
+            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
+        } catch (Exception e) {
+            gerarLogErroRequestAjax("cálculo do peso do item do pedido", e);
+        }
     }
 
     @Post("pedido/cancelamento")
@@ -226,6 +242,16 @@ public class PedidoController extends AbstractController {
         }
     }
 
+    private String gerarComissao(Integer idRepresentada, Integer idVendedor) {
+        boolean isRevenda = representadaService.isRevendedor(idRepresentada);
+        TipoPedido t = isRevenda ? TipoPedido.REVENDA : TipoPedido.REPRESENTACAO;
+        if (idVendedor == null) {
+            idVendedor = getCodigoUsuario();
+        }
+        Double aliquota = comissaoService.pesquisarAliquotaComissaoByIdVendedor(idVendedor, t);
+        return aliquota == null ? "" : NumeroUtils.gerarPercentual(aliquota, 2).toString();
+    }
+
     private void gerarListaRepresentada(Pedido pedido) {
         // Verificando se a lista de representada ja foi preenchida em outro
         // fluxo
@@ -238,13 +264,6 @@ public class PedidoController extends AbstractController {
             addAtributo("idRepresentadaSelecionada", pedido.getRepresentada().getId());
             addAtributo("ipiDesabilitado", !pedido.getRepresentada().isIPIHabilitado());
         }
-    }
-
-    private Set<SituacaoPedido> gerarListaSituacaoPedido() {
-        Set<SituacaoPedido> listaSituacao = new HashSet<SituacaoPedido>();
-        listaSituacao.add(SituacaoPedido.DIGITACAO);
-        listaSituacao.add(SituacaoPedido.ORCAMENTO);
-        return listaSituacao;
     }
 
     private PedidoPDFWrapper gerarPDF(Integer idPedido, TipoPedido tipoPedido) throws BusinessException {
@@ -330,8 +349,6 @@ public class PedidoController extends AbstractController {
     }
 
     private void inicializarHome(TipoPedido tipoPedido, boolean orcamento) {
-        inicializarListaSituacaoPedido();
-
         addAtributo("orcamento", orcamento);
         addAtributo("listaTipoEntrega", tipoEntregaService.pesquisar());
 
@@ -352,39 +369,22 @@ public class PedidoController extends AbstractController {
         addAtributoCondicional("pedidoDesabilitado", false);
     }
 
-    private void inicializarListaSituacaoPedido() {
-        final Set<SituacaoPedido> listaSituacao = this.gerarListaSituacaoPedido();
-
-        final SituacaoPedido situacaoPedidoSelecionada = (SituacaoPedido) getAtributo("situacaoPedidoSelecionada");
-
-        if (situacaoPedidoSelecionada == null) {
-            addAtributo("situacaoPedidoSelecionada", SituacaoPedido.DIGITACAO);
-        } else {
-            /*
-             * Vamos adicionar a situacao a lista pois na inicializacao nao
-             * temos cancelamento e enviado pois no preenchimento de um novo
-             * pedido o usuario nao tera acesso a essas opcoes, sendo que elas
-             * aparecerao em fluxos de consulta.
-             */
-            listaSituacao.add(situacaoPedidoSelecionada);
-        }
-        addAtributo("listaSituacaoPedido", listaSituacao);
-    }
-
     @Post("pedido/item/inclusao")
     public void inserirItemPedido(Integer numeroPedido, ItemPedido itemPedido, Double aliquotaIPI) {
         try {
             if (itemPedido.getMaterial() != null && itemPedido.getMaterial().getId() == null) {
                 itemPedido.setMaterial(null);
             }
+
             if (aliquotaIPI != null) {
                 itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
             }
 
+            itemPedido.setAliquotaComissao(itemPedido.getAliquotaComissao() == null
+                    || itemPedido.getAliquotaComissao() == 0d ? null : NumeroUtils.gerarAliquota(itemPedido
+                    .getAliquotaComissao()));
+
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
-            if (itemPedido.contemAliquotaComissao()) {
-                itemPedido.setAliquotaComissao(NumeroUtils.gerarAliquota(itemPedido.getAliquotaComissao()));
-            }
 
             final Integer idItemPedido = pedidoService.inserirItemPedido(numeroPedido, itemPedido);
             itemPedido.setId(idItemPedido);
@@ -405,13 +405,15 @@ public class PedidoController extends AbstractController {
     }
 
     @Post("pedido/inclusao")
-    public void inserirPedido(Pedido pedido, Contato contato) {
+    public void inserirPedido(Pedido pedido, Contato contato, boolean orcamento) {
         if (hasAtributo(contato)) {
             pedido.setContato(contato);
         }
 
-        if (pedido.getSituacaoPedido() == null) {
+        if (pedido.getSituacaoPedido() == null && !orcamento) {
             pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
+        } else if (pedido.getSituacaoPedido() == null && orcamento) {
+            pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO_DIGITACAO);
         }
 
         if (pedido.getTransportadora() != null && pedido.getTransportadora().getId() == null) {
@@ -442,6 +444,7 @@ public class PedidoController extends AbstractController {
             }
 
             addAtributo("orcamento", pedido.isOrcamento());
+            addAtributo("isCompra", pedido.isCompra());
             formatarPedido(pedido);
             // Esse comando eh para configurar o id do cliente que sera
             // serializado para o preenchimento do id na tela quando o cliente
@@ -513,12 +516,13 @@ public class PedidoController extends AbstractController {
         Cliente cliente = clienteService.pesquisarClienteEContatoById(id);
         cliente.setListaRedespacho(clienteService.pesquisarTransportadorasRedespacho(id));
 
+        LogradouroCliente logradouro = clienteService.pesquisarLogradouroFaturamentoById(id);
         carregarVendedor(cliente);
         // Aqui devemos formatar os documentos do cliente pois eh uma requisicao
         // assincrona e a mascara em javascript nao eh executada.
         formatarDocumento(cliente);
 
-        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar());
+        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar(), logradouro);
 
         SerializacaoJson serializacaoJson = new SerializacaoJson("cliente", json)
                 .incluirAtributo("listaTransportadora").incluirAtributo("listaRedespacho").incluirAtributo("vendedor");
@@ -552,7 +556,7 @@ public class PedidoController extends AbstractController {
     public void pesquisarMaterial(String sigla, Integer idRepresentada) {
         List<Autocomplete> lista = new ArrayList<Autocomplete>();
         if (sigla != null && idRepresentada != null) {
-            List<Material> listaMaterial = this.materialService.pesquisarMaterialAtivoBySigla(sigla, idRepresentada);
+            List<Material> listaMaterial = materialService.pesquisarMaterialAtivoBySigla(sigla, idRepresentada);
             for (Material material : listaMaterial) {
                 lista.add(new MaterialAutocomplete(material.getId(), material.getDescricaoFormatada(), material
                         .isImportado()));
@@ -617,6 +621,11 @@ public class PedidoController extends AbstractController {
             formatarItemPedido(listaItem);
             formatarPedido(pedido);
 
+            LogradouroCliente l = clienteService.pesquisarLogradouroFaturamentoById(pedido.getCliente().getId());
+            if (l != null) {
+                addAtributo("logradouroFaturamento", l.getCepEnderecoNumeroBairro());
+            }
+
             addAtributo("listaIdPedidoAssociado",
                     pedidoService.pesquisarIdPedidoAssociadoByIdPedidoOrigem(id, pedido.isCompra()));
             addAtributo("listaTransportadora", listaTransportadora);
@@ -631,7 +640,8 @@ public class PedidoController extends AbstractController {
             addAtributo("orcamento", pedido.isOrcamento());
             addAtributo("tipoPedido", pedido.getTipoPedido());
             addAtributo("isCompra", pedido.isCompra());
-
+            addAtributo("aliquotaComissao",
+                    gerarComissao(pedido.getRepresentada().getId(), pedido.getVendedor().getId()));
             gerarListaRepresentada(pedido);
 
             SituacaoPedido situacao = pedido.getSituacaoPedido();
@@ -656,12 +666,16 @@ public class PedidoController extends AbstractController {
             final boolean acessoCompraPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO,
                     TipoAcesso.CADASTRO_PEDIDO_COMPRA);
 
+            final boolean acessoAlteracaoComissaoPermitida = !pedido.isNovo() && pedido.isRevendaEfetuada()
+                    && isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS);
+
             addAtributo("pedidoDesabilitado", isPedidoDesabilitado(pedido));
             addAtributo("acessoEnvioPedidoPermitido", acessoEnvioPedidoPermitido);
             addAtributo("acessoReenvioPedidoPermitido", acessoReenvioPedidoPermitido);
             addAtributo("acessoCancelamentoPedidoPermitido", acessoCancelamentoPedidoPermitido);
             addAtributo("acessoRefazerPedidoPermitido", acessoRefazerPedidoPermitido);
             addAtributo("acessoCompraPermitido", acessoCompraPermitido);
+            addAtributo("acessoAlteracaoComissaoPermitida", acessoAlteracaoComissaoPermitida);
         }
         configurarTipoPedido(tipoPedido);
         // Estamos verificando se o pedido pesquisado eh realmente um orcamento
@@ -700,8 +714,15 @@ public class PedidoController extends AbstractController {
                 addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
                 addAtributo("listaRepresentada", representadaService.pesquisarFornecedor(true));
             } else {
-                addAtributo("vendedor", cliente.getVendedor());
+                // Aqui ja foi carregado o vendedor resumido.
+                addAtributo("proprietario", cliente.getVendedor());
             }
+
+            LogradouroCliente l = clienteService.pesquisarLogradouroFaturamentoById(idCliente);
+            if (l != null) {
+                addAtributo("logradouroFaturamento", l.getCepEnderecoNumeroBairro());
+            }
+
             addAtributo("listaTransportadora", transportadoraService.pesquisar());
             addAtributo("listaRedespacho", transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
             addAtributo("idRepresentadaSelecionada", idFornecedor);

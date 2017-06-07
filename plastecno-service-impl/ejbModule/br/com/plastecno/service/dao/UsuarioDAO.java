@@ -74,6 +74,13 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 		return QueryUtil.gerarRegistroUnico(query, Usuario.class, null);
 	}
 
+	public Usuario pesquisarVendedorResumidoByIdCliente(Integer idCliente) {
+		Query query = this.entityManager
+				.createQuery("select new Usuario(v.id, v.nome, v.sobrenome, v.email) from Cliente c inner join c.vendedor v where c.id =:id");
+		query.setParameter("id", idCliente);
+		return QueryUtil.gerarRegistroUnico(query, Usuario.class, null);
+	}
+
 	public void removerLogradouro(Integer idLogradouro) {
 		entityManager.createQuery("update Usuario u set u.logradouro = null where u.logradouro.id = :idLogradouro")
 				.setParameter("idLogradouro", idLogradouro).executeUpdate();

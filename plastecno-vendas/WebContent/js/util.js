@@ -259,6 +259,9 @@ function limparBlocoInput(blocoId) {
 }
 
 function scrollTo(idAncora) {
+	if(isEmpty(idAncora)){
+		return;
+	}
 	var ancora = document.getElementById(idAncora);
 	if (ancora != null) {
 			ancora.scrollIntoView(true);	

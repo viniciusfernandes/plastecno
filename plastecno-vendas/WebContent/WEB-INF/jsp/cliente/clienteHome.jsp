@@ -116,6 +116,29 @@ $(document).ready(function() {
 			formVazio.submit();
 		}
 	});
+	
+	
+	autocompletar({
+		url : '<c:url value="/cliente/listagem/vendedor"/>',
+		campoPesquisavel : 'vendedor',
+		parametro : 'nomeVendedor',
+		containerResultados : 'containerPesquisaVendedor',
+		selecionarItem: function(itemLista) {
+			var idCliente = $('#formCliente #id').val();
+			if(isEmpty(idCliente)){
+				var mensagem = new Array();
+				mensagem[0] = 'Selecione um cliente para associar a um novo vendedor';
+				gerarListaMensagemAlerta(mensagem);
+				return;
+			}
+			var formVazio = document.getElementById('formVazio');
+			adicionarInputHiddenFormulario('formVazio', 'idVendedor', itemLista.id);
+			adicionarInputHiddenFormulario('formVazio', 'idCliente', idCliente);
+			formVazio.action = '<c:url value="/cliente/associacaovendedor"/>';
+			formVazio.method = 'post';
+			formVazio.submit();
+		}
+	});
 });
 
 function inicializarFiltro() {
@@ -182,8 +205,10 @@ function remover(codigo, nome) {
 			<div class="label">Vendedor:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="vendedor"
-					value="${cliente.vendedor.nomeCompleto} - ${cliente.vendedor.email}" disabled="disabled" class="uppercaseBloqueado desabilitado"
+					value="${not empty cliente.vendedor ?cliente.vendedor.nomeCompleto : ''}" <c:out value="${ isAssociacaoVendedorPermitida? '' :'disabled=\"disabled\"'}"/>"
+					class="<c:out value="${isAssociacaoVendedorPermitida? '' :'uppercaseBloqueado desabilitado'}"/>"
 					style="width: 80%" />
+				<div class="suggestionsBox" id="containerPesquisaVendedor" style="display: none; width: 50%"></div>
 			</div>
 
 			<div class="label obrigatorio">Ramo Atividade:</div>

@@ -2640,12 +2640,12 @@ function inicializarCalculoImpostos(){
 					<legend>::: Volumes :::</legend>
 					<div class="label">Qtde.:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="quantidadeVolume" maxlength="15"/>
+						<input type="text" id="quantidadeVolume" value="${quantidade}" maxlength="15"/>
 					</div>
 					
 					<div class="label">Espécie:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="especieVolume" maxlength="60"/>
+						<input type="text" id="especieVolume" value="${especieVolume}" maxlength="60"/>
 					</div>
 					<div class="label">Marca:</div>
 					<div class="input" style="width: 30%">
@@ -2657,11 +2657,11 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div class="label">Peso Líq.(kg):</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="pesoLiquidoVolume"/>
+						<input type="text" id="pesoLiquidoVolume" value="${pesoLiquido}"/>
 					</div>
 					<div class="label">Peso Bruto(kg):</div>
 					<div class="input" style="width: 30%">
-						<input type="text" id="pesoBrutoVolume" style="width: 50%"/>
+						<input type="text" id="pesoBrutoVolume" value="${pesoBruto}" style="width: 50%"/>
 					</div>
 					<div class="bloco_botoes">
 						<a id="botaoInserirVolume" title="Inserir Dados da Volume" class="botaoAdicionar"></a>

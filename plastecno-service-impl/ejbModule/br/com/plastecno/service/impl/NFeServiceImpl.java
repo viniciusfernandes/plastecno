@@ -923,7 +923,8 @@ public class NFeServiceImpl implements NFeService {
 		}
 
 		SituacaoPedido sPed = pedidoService.pesquisarSituacaoPedidoById(idPedido);
-		if (SituacaoPedido.DIGITACAO.equals(sPed) || SituacaoPedido.ORCAMENTO.equals(sPed)) {
+		if (SituacaoPedido.DIGITACAO.equals(sPed) || SituacaoPedido.ORCAMENTO.equals(sPed)
+				|| SituacaoPedido.ORCAMENTO_DIGITACAO.equals(sPed)) {
 			throw new BusinessException("Não é possível emitir NFe para o pedido No. " + idPedido + " pois esta em "
 					+ sPed.getDescricao());
 		}

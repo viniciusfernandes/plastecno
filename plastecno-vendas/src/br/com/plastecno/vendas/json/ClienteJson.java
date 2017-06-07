@@ -20,6 +20,7 @@ public class ClienteJson {
     private final List<TransportadoraJson> listaRedespacho;
     private final List<TransportadoraJson> listaTransportadora;
     private final LogradouroJson logradouroFaturamento;
+    private final String logradouroFormatado;
     private final String nomeCompleto;
     private final String nomeFantasia;
     private final String razaoSocial;
@@ -54,6 +55,11 @@ public class ClienteJson {
             vendedor = cliente.getVendedor() == null ? null : new VendedorJson(cliente.getVendedor());
 
             logradouroFaturamento = new LogradouroJson(logradouro);
+            if (logradouro != null) {
+                logradouroFormatado = logradouro.getCepEnderecoNumeroBairro();
+            } else {
+                logradouroFormatado = "";
+            }
 
             if (cliente.getListaRedespacho() != null) {
                 for (Transportadora redespacho : cliente.getListaRedespacho()) {
@@ -79,6 +85,7 @@ public class ClienteJson {
             telefone = "";
             vendedor = null;
             logradouroFaturamento = new LogradouroJson(null);
+            logradouroFormatado = "";
         }
     }
 
@@ -116,6 +123,10 @@ public class ClienteJson {
 
     public LogradouroJson getLogradouroFaturamento() {
         return logradouroFaturamento;
+    }
+
+    public String getLogradouroFormatado() {
+        return logradouroFormatado;
     }
 
     public String getNomeCompleto() {

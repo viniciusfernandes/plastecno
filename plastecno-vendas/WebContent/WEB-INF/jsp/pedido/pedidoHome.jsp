@@ -37,6 +37,7 @@ $(document).ready(function() {
 	// inicializarAutocompleteDescricaoPeca('<c:url value="/estoque/descricaopeca"/>');
 	
 	habilitar('#bloco_item_pedido #descricao', false);
+	habilitar('#bloco_item_pedido #peso', false);
 	habilitar('#bloco_item_pedido #aliquotaIPI', <c:out value="${not empty pedido and pedido.representada.IPIHabilitado}"/>);
 	
 	var urlInclusaoPedido = '<c:url value="/pedido/inclusao"/>';
@@ -122,10 +123,12 @@ $(document).ready(function() {
 	inserirMascaraNumerica('numeroPedidoPesquisa', '9999999');
 	inserirMascaraMonetaria('precoVenda', 7);
 	inserirMascaraMonetaria('fretePedido', 7);
-	inserirMascaraNumerica('ipi', '99');
-	inserirMascaraNumerica('comissao', '99');
+	inserirMascaraNumerica('aliquotaIPI', '99');
+	inserirMascaraMonetaria('aliquotaComissao', 5);
+	inserirMascaraMonetaria('aliquotaICMS', 5);
 	inserirMascaraNumerica('quantidade', '9999999');
 	inserirMascaraMonetaria('comprimento', 8);
+	inserirMascaraMonetaria('peso', 8);
 	inserirMascaraMonetaria('medidaExterna', 8);
 	inserirMascaraMonetaria('medidaInterna', 8);
 	inserirMascaraNumerica('prazoEntrega', '999');
@@ -195,7 +198,6 @@ $(document).ready(function() {
 		});
 	});
 });
-
 </script>
 
 </head>
@@ -222,7 +224,7 @@ $(document).ready(function() {
 			<input type="hidden" id="situacaoPedido" name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
 			
 			<c:if test="${not empty pedido.id}">
-			<div class="label">Pedido(s) de ${empty tipoPedido ? 'Compra:': 'Venda:'}</div>
+			<div class="label">Pedido(s) de ${isCompra ? 'Compra:': 'Venda:'}</div>
 			<div class="input" style="width: 80%">
 				<select id="pedidoAssociado" name="idPedidoAssociado"
 					style="width: 13%" class="semprehabilitado">
@@ -234,7 +236,7 @@ $(document).ready(function() {
 			</div>
 			</c:if>
 			
-			<div class="label">${not empty tipoPedido ? 'Comprador:': 'Vendedor:'}</div>
+			<div class="label">${isCompra ? 'Comprador:': 'Vendedor:'}</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="proprietario" name="proprietario.nome"
 					value="${proprietario.nome} - ${proprietario.email}" disabled="disabled"
@@ -255,14 +257,15 @@ $(document).ready(function() {
 				<input type="button" id="botaoPesquisaNumeroPedido"
 					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
 			</div>
-			<div class="input" style="width: 1%">
-				<input type="button" id="botaoCopiarPedido"
-					title="Copiar Pedido" value="" class="botaoCopiarPequeno" />
-			</div>
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoLimparNumeroPedido"
 					title="Limpar Pedido" value="" class="botaoLimparPequeno" />
 			</div>
+			<div class="input" style="width: 1%">
+				<input type="button" id="botaoCopiarPedido"
+					title="Copiar Pedido" value="" class="botaoCopiarPequeno" />
+			</div>
+			
 			<div class="label" style="width: 12%">Nr. Pedido Cliente:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoCliente"
@@ -302,6 +305,11 @@ $(document).ready(function() {
 					name="pedido.clienteNotificadoVenda"
 					<c:if test="${pedido.clienteNotificadoVenda}">checked</c:if>
 					class="checkbox" style="width: 4%"/>
+			</div>
+			<div class="label">End. Faturam.</div>
+			<div class="input" style="width: 80%">
+				<input type="text" id="logradouroFaturamento"
+					value="${logradouroFaturamento}" disabled="disabled" class="uppercaseBloqueado desabilitado" style="width: 50%"/>
 			</div>
 			<div class="label">CNPJ:</div>
 			<div class="input" style="width: 10%">
@@ -384,6 +392,11 @@ $(document).ready(function() {
 			<div class="input areatexto" style="width: 70%">
 				<textarea id="obervacao" name="pedido.observacao"
 					style="width: 100%">${pedido.observacao}</textarea>
+			</div>
+			<div class="label">Observação Prod.:</div>
+			<div class="input areatexto" style="width: 70%">
+				<textarea id="observacaoProducao" name="pedido.observacaoProducao"
+					style="width: 100%">${pedido.observacaoProducao}</textarea>
 			</div>
 
 		</fieldset>

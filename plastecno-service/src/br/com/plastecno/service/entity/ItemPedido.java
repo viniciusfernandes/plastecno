@@ -121,6 +121,9 @@ public class ItemPedido extends Item {
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Pedido associado ao item")
 	private Pedido pedido;
 
+	@Column(name = "peso")
+	private Double peso;
+
 	@Column(name = "prazo_entrega")
 	private Integer prazoEntrega;
 
@@ -464,6 +467,10 @@ public class ItemPedido extends Item {
 		return pedido;
 	}
 
+	public Double getPeso() {
+		return peso;
+	}
+
 	public Integer getPrazoEntrega() {
 		return prazoEntrega;
 	}
@@ -690,6 +697,10 @@ public class ItemPedido extends Item {
 
 	public void setPedido(Pedido pedido) {
 		this.pedido = pedido;
+	}
+
+	public void setPeso(Double peso) {
+		this.peso = peso;
 	}
 
 	public void setPrazoEntrega(Integer prazoEntrega) {

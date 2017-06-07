@@ -158,7 +158,7 @@ public abstract class AbstractController {
 
     void carregarVendedor(Cliente cliente) {
 
-        Usuario vendedor = this.usuarioService.pesquisarVendedorByIdCliente(cliente.getId());
+        Usuario vendedor = usuarioService.pesquisarVendedorResumidoByIdCliente(cliente.getId());
         if (vendedor == null) {
             /*
              * Vamos sinalizar o usuario que o cliente que ele pretende efetuar
@@ -598,12 +598,14 @@ public abstract class AbstractController {
             }
         }
     }
+
     void irPaginaHome() {
         if (this.homePath == null) {
             throw new IllegalStateException("O controller " + this.getClass().getName() + " nao possui um metodo HOME");
         }
         redirecTo(this.homePath);
     }
+
     final void irRodapePagina() {
         irPaginaHome();
         ancorarRodape();
@@ -669,28 +671,28 @@ public abstract class AbstractController {
         return StringUtils.removerMascaraDocumento(documento);
     }
 
-    void serializarJson(SerializacaoJson serializacaoJson) {
-        if (serializacaoJson == null) {
+    void serializarJson(SerializacaoJson json) {
+        if (json == null) {
             return;
         }
 
         Serializer serializer = null;
-        if (serializacaoJson.contemNome()) {
-            serializer = this.result.use(Results.json()).from(serializacaoJson.getObjeto(), serializacaoJson.getNome());
+        if (json.contemNome()) {
+            serializer = this.result.use(Results.json()).from(json.getObjeto(), json.getNome());
         } else {
-            serializer = this.result.use(Results.json()).from(serializacaoJson.getObjeto());
+            serializer = this.result.use(Results.json()).from(json.getObjeto());
         }
 
-        if (serializacaoJson.isRecursivo()) {
+        if (json.isRecursivo()) {
             serializer = serializer.recursive();
         }
 
-        if (serializacaoJson.contemInclusaoAtributo()) {
-            serializer.include(serializacaoJson.getAtributoInclusao());
+        if (json.contemInclusaoAtributo()) {
+            serializer.include(json.getAtributoInclusao());
         }
 
-        if (serializacaoJson.contemExclusaoAtributo()) {
-            serializer.exclude(serializacaoJson.getAtributoExclusao());
+        if (json.contemExclusaoAtributo()) {
+            serializer.exclude(json.getAtributoExclusao());
         }
         serializer.serialize();
     }

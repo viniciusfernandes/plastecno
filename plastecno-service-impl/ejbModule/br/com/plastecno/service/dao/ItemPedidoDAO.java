@@ -385,9 +385,9 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		if (isOrcamento) {
-			selectPedido.append(" and p.situacaoPedido = :orcamento ");
+			selectPedido.append(" and p.situacaoPedido in (:listaTipoOrcamento) ");
 		} else {
-			selectPedido.append(" and p.situacaoPedido != :orcamento ");
+			selectPedido.append(" and p.situacaoPedido not in (:listaTipoOrcamento) ");
 
 		}
 
@@ -404,7 +404,10 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			query.setParameter("idFornecedor", idFornecedor);
 		}
 
-		query.setParameter("tipoPedido", TipoPedido.COMPRA).setParameter("orcamento", SituacaoPedido.ORCAMENTO);
+		List<SituacaoPedido> lOrcamento = new ArrayList<>();
+		lOrcamento.add(SituacaoPedido.ORCAMENTO);
+		lOrcamento.add(SituacaoPedido.ORCAMENTO_DIGITACAO);
+		query.setParameter("tipoPedido", TipoPedido.COMPRA).setParameter("listaTipoOrcamento", lOrcamento);
 
 		List<Object[]> listaIdPedido = QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 		if (listaIdPedido.isEmpty()) {
@@ -513,16 +516,20 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		if (isOrcamento) {
-			select.append("and p.situacaoPedido = :situacaoPedido ");
+			select.append("and p.situacaoPedido in (:listaTipoOrcamento) ");
 		} else {
-			select.append("and p.situacaoPedido != :situacaoPedido ");
+			select.append("and p.situacaoPedido not in (:listaTipoOrcamento) ");
 		}
 
 		inserirPesquisaItemVendido(select, itemVendido);
 
-		Query query = this.entityManager.createQuery(select.toString());
+		List<SituacaoPedido> lOrcamento = new ArrayList<>();
+		lOrcamento.add(SituacaoPedido.ORCAMENTO);
+		lOrcamento.add(SituacaoPedido.ORCAMENTO_DIGITACAO);
+
+		Query query = entityManager.createQuery(select.toString());
 		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA)
-				.setParameter("situacaoPedido", SituacaoPedido.ORCAMENTO);
+				.setParameter("listaTipoOrcamento", lOrcamento);
 
 		if (idVendedor != null) {
 			query.setParameter("idVendedor", idVendedor);

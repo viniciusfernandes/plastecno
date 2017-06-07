@@ -224,7 +224,7 @@ $(document).ready(function() {
 			<input type="hidden" id="situacaoPedido" name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
 			
 			<c:if test="${not empty pedido.id}">
-			<div class="label">Pedido(s) de ${empty tipoPedido ? 'Compra:': 'Venda:'}</div>
+			<div class="label">Pedido(s) de ${isCompra ? 'Compra:': 'Venda:'}</div>
 			<div class="input" style="width: 80%">
 				<select id="pedidoAssociado" name="idPedidoAssociado"
 					style="width: 13%" class="semprehabilitado">
@@ -236,7 +236,7 @@ $(document).ready(function() {
 			</div>
 			</c:if>
 			
-			<div class="label">${not empty tipoPedido ? 'Comprador:': 'Vendedor:'}</div>
+			<div class="label">${isCompra ? 'Comprador:': 'Vendedor:'}</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="proprietario" name="proprietario.nome"
 					value="${proprietario.nome} - ${proprietario.email}" disabled="disabled"

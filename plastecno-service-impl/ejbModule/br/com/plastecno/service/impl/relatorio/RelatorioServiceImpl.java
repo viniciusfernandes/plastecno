@@ -525,7 +525,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		final RelatorioWrapper<String, TotalizacaoPedidoWrapper> relatorio = new RelatorioWrapper<String, TotalizacaoPedidoWrapper>(
 				titulo.toString());
 
-		List<TotalizacaoPedidoWrapper> listaPedido = this.pedidoService.pesquisarValorVendaClienteByPeriodo(periodo,
+		List<TotalizacaoPedidoWrapper> listaPedido = pedidoService.pesquisarValorVendaClienteByPeriodo(periodo,
 				idCliente, orcamento);
 
 		double valorTotal = 0d;

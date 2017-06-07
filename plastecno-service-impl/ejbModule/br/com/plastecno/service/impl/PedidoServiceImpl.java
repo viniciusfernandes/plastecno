@@ -108,7 +108,8 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public void aceitarOrcamento(Integer idOrcamento) {
 		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoById(idOrcamento);
-		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)) {
+		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)
+				&& !SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido)) {
 			return;
 		}
 		// Para o aceite do orcamento devemos redirecionar o pedido para o
@@ -599,8 +600,10 @@ public class PedidoServiceImpl implements PedidoService {
 			// na reserva dos itens do pedido, pois la o pedido entre em
 			// pendecia de
 			// reserva.
-			if (SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
+			if (!pedido.isOrcamento() && SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
 				pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
+			} else if (pedido.isOrcamento()) {
+				pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 			}
 		}
 		pedidoDAO.alterar(pedido);
@@ -694,7 +697,7 @@ public class PedidoServiceImpl implements PedidoService {
 			// de administrador faca cadastro de pedidos em nome de outro. Por
 			// isso
 			// estamos ajustando o vendedor correto.
-			Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(pedido.getCliente().getId());
+			Usuario vendedor = usuarioService.pesquisarVendedorResumidoByIdCliente(pedido.getCliente().getId());
 			if (vendedor == null) {
 				String nomeCliente = clienteService.pesquisarNomeFantasia(pedido.getCliente().getId());
 				throw new BusinessException("Não existe vendedor associado ao cliente " + nomeCliente);
@@ -884,7 +887,17 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public Pedido inserirOrcamento(Pedido pedido) throws BusinessException {
-		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+		if (pedido == null) {
+			return null;
+		}
+
+		if (pedido.isNovo()) {
+			pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO_DIGITACAO);
+		} else if (!pedido.isNovo() && !pedido.isOrcamentoDigitacao()) {
+			// Estamos garantindo que teremos um orcamento no caso de edicao de
+			// um orcamento ja enviado
+			pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+		}
 		Cliente cliente = pedido.getCliente();
 
 		cliente.setRazaoSocial(cliente.getNomeFantasia());

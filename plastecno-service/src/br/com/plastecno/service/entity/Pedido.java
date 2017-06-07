@@ -125,7 +125,7 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(intervaloComprimento = { 0, 799 }, nomeExibicao = "Observação do pedido")
 	private String observacao;
 
-	@Column(name="observacao_producao")
+	@Column(name = "observacao_producao")
 	@InformacaoValidavel(intervaloComprimento = { 0, 799 }, nomeExibicao = "Observação de produção do pedido")
 	private String observacaoProducao;
 
@@ -499,8 +499,17 @@ public class Pedido implements Serializable, Cloneable {
 		return TipoPedido.REVENDA.equals(tipoPedido) && SituacaoPedido.ITEM_AGUARDANDO_MATERIAL.equals(situacaoPedido);
 	}
 
+	public boolean isNovo() {
+		return id == null;
+	}
+
 	public boolean isOrcamento() {
-		return SituacaoPedido.ORCAMENTO.equals(this.situacaoPedido);
+		return SituacaoPedido.ORCAMENTO.equals(situacaoPedido)
+				|| SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido);
+	}
+
+	public boolean isOrcamentoDigitacao() {
+		return SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido);
 	}
 
 	public boolean isRepresentacao() {

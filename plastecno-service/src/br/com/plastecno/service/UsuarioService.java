@@ -78,5 +78,7 @@ public interface UsuarioService {
 	List<Usuario> pesquisarVendedores(Usuario filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros);
 
+	Usuario pesquisarVendedorResumidoByIdCliente(Integer idCliente);
+
 	void removerLogradouro(Integer idLogradouro);
 }

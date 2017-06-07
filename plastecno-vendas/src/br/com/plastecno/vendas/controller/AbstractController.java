@@ -158,7 +158,7 @@ public abstract class AbstractController {
 
     void carregarVendedor(Cliente cliente) {
 
-        Usuario vendedor = this.usuarioService.pesquisarVendedorByIdCliente(cliente.getId());
+        Usuario vendedor = usuarioService.pesquisarVendedorResumidoByIdCliente(cliente.getId());
         if (vendedor == null) {
             /*
              * Vamos sinalizar o usuario que o cliente que ele pretende efetuar
@@ -598,12 +598,14 @@ public abstract class AbstractController {
             }
         }
     }
+
     void irPaginaHome() {
         if (this.homePath == null) {
             throw new IllegalStateException("O controller " + this.getClass().getName() + " nao possui um metodo HOME");
         }
         redirecTo(this.homePath);
     }
+
     final void irRodapePagina() {
         irPaginaHome();
         ancorarRodape();

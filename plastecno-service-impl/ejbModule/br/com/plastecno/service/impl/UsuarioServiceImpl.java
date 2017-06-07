@@ -423,6 +423,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Usuario pesquisarVendedorResumidoByIdCliente(Integer idCliente) {
+		return usuarioDAO.pesquisarVendedorByIdCliente(idCliente);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void removerLogradouro(Integer idLogradouro) {
 		if (idLogradouro == null) {

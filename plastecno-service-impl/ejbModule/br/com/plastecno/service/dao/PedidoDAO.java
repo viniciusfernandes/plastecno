@@ -514,7 +514,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		}
 
 		if (isOrcamento) {
-			select.append("p.situacaoPedido = :situacaoPedido ");
+			select.append("p.situacaoPedido = :orcamento ");
 		} else {
 			select.append("p.situacaoPedido in (:situacoes) ");
 		}
@@ -534,7 +534,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		}
 
 		if (isOrcamento) {
-			query.setParameter("situacaoPedido", SituacaoPedido.ORCAMENTO);
+			query.setParameter("orcamento", SituacaoPedido.ORCAMENTO);
 		} else {
 			query.setParameter("situacoes", pesquisarSituacaoVendaEfetivada());
 		}

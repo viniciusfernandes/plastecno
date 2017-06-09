@@ -312,17 +312,23 @@ $(document).ready(function() {
 					value="${logradouroFaturamento}" disabled="disabled" class="uppercaseBloqueado desabilitado" style="width: 50%"/>
 			</div>
 			<div class="label">CNPJ:</div>
-			<div class="input" style="width: 10%">
+			<div class="input" style="width: 15%">
 				<input type="text" id="cnpj" name="cliente.cnpj"
 					value="${cliente.cnpj}" class="desabilitado" disabled="disabled" />
 			</div>
 			<div class="label" style="width: 5%">CPF:</div>
-			<div class="input" style="width: 10%">
+			<div class="input" style="width: 60%">
 				<input type="text" id="cpf" name="cliente.cpf"
-					value="${cliente.cpf}" class="desabilitado" disabled="disabled" style="width: 95%"/>
+					value="${cliente.cpf}" class="desabilitado" disabled="disabled" style="width: 25%"/>
 			</div>
-			<div class="label" style="width: 14%">Email NFe:</div>
-			<div class="input" style="width: 40%">
+			<div class="label">SUFRAMA:</div>
+			<div class="input" style="width: 15%">
+				<input type="text" id="suframa" name="cliente.inscricaoSUFRAMA"
+					value="${cliente.inscricaoSUFRAMA}" 
+					class="uppercaseBloqueado desabilitado" disabled="disabled" />
+			</div>
+			<div class="label" style="width: 5%">Email:</div>
+			<div class="input" style="width: 50%">
 				<input type="text" id="email" name="cliente.email"
 					value="${cliente.email}" style="width: 45%"
 					class="uppercaseBloqueado desabilitado" disabled="disabled" />

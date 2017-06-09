@@ -513,8 +513,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public String pesquisarNcmItemEstoque(ItemEstoque configuracao) {
-		return itemEstoqueDAO.pesquisarNcmItemEstoque(configuracao);
+	public String pesquisarNcmItemEstoque(ItemEstoque item) {
+		return itemEstoqueDAO.pesquisarNcmItemEstoque(item);
 	}
 
 	@Override

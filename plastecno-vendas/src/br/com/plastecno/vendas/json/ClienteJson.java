@@ -25,6 +25,7 @@ public class ClienteJson {
     private final String nomeFantasia;
     private final String razaoSocial;
     private final String site;
+    private final String suframa;
     private final String telefone;
     private final VendedorJson vendedor;
 
@@ -53,7 +54,7 @@ public class ClienteJson {
             telefone = cliente.getContatoPrincipal() != null ? cliente.getContatoPrincipal().getTelefoneFormatado()
                     : "";
             vendedor = cliente.getVendedor() == null ? null : new VendedorJson(cliente.getVendedor());
-
+            suframa = cliente.getInscricaoSUFRAMA();
             logradouroFaturamento = new LogradouroJson(logradouro);
             if (logradouro != null) {
                 logradouroFormatado = logradouro.getCepEnderecoNumeroBairro();
@@ -84,6 +85,7 @@ public class ClienteJson {
             nomeCompleto = "";
             telefone = "";
             vendedor = null;
+            suframa = "";
             logradouroFaturamento = new LogradouroJson(null);
             logradouroFormatado = "";
         }
@@ -143,6 +145,10 @@ public class ClienteJson {
 
     public String getSite() {
         return site;
+    }
+
+    public String getSuframa() {
+        return suframa;
     }
 
     public String getTelefone() {

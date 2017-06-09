@@ -81,8 +81,32 @@
 				<td>{pedido.cliente.inscricaoEstadual}</td>
 			</tr>
 			<tr>
-				<td class="label">Observação:</td>
-				<td colspan="5">{pedido.observacao}</td>
+				<td class="label">SUFRAMA:</td>
+				<td colspan="2">{pedido.cliente.inscricaoSUFRAMA}</td>
+			</tr>
+		</tbody>
+	</table>
+	<table class="listagem">
+		<thead>
+			<tr>
+				<th class="descricaoTabela" >Observações</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="informacaoAdicional">{pedido.observacao}</td>
+			</tr>
+		</tbody>
+	</table>
+	<table class="listagem">
+		<thead>
+			<tr>
+				<th class="descricaoTabela" >Observações Produção</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="informacaoAdicional">{pedido.observacaoProducao}</td>
 			</tr>
 		</tbody>
 	</table>
@@ -217,18 +241,6 @@
 					{pedido.valorPedidoIPIFormatado}</td>
 			</tr>
 		</tfoot>
-	</table>
-	<table class="listagem">
-		<thead>
-			<tr>
-				<th class="descricaoTabela" >Observações Produção</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td class="informacaoAdicional">{pedido.observacaoProducao}</td>
-			</tr>
-		</tbody>
 	</table>
 	<table class="listagem">
 		<thead>

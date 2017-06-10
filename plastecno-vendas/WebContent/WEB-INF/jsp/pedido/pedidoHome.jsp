@@ -114,6 +114,17 @@ $(document).ready(function() {
 	});
 	</c:if>
 	
+	$('#botaoEditarCliente').click(function(){
+		var id = $('#formPedido #idCliente').val();
+		var url = null;
+		if(!isEmpty(id)){
+			url='<c:url value="/cliente/"/>'+id;
+		} else {
+			url='<c:url value="/cliente"/>';
+		}
+		$('#formVazio').attr('action', url).submit();
+	});
+	
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	
 	inserirMascaraData('dataEntrega');
@@ -296,8 +307,12 @@ $(document).ready(function() {
 			</div>
 			<div class="label obrigatorio">Cliente:</div>
 			<div class="input" style="width: 30%">
-				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}" class="pesquisavel" style="width: 85%"/>
+				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}" class="pesquisavel" style="width: 100%"/>
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
+			</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoEditarCliente"
+					title="Editar Cliente" value="" class="botaoEditar" />
 			</div>
 			<div class="label" style="width: 10%">Env. Email Ped.:</div>
 			<div class="input" style="width: 30%">

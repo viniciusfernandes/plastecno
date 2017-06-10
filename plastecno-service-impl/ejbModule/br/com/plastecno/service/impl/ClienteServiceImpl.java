@@ -203,7 +203,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 		Cliente c = clienteDAO.alterar(cliente);
 		inserirEndereco(c, cliente.getListaLogradouro());
-		return cliente;
+		return c;
 	}
 
 	@Override

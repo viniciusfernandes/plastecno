@@ -90,6 +90,18 @@ $(document).ready(function() {
 		$("#comentario").val("");	
 	});
 	
+	$("#botaoEditarPedido").click(function () {
+		var id = $('#formCliente #id').val(); 
+		var url = null;
+		if(!isEmpty(id)){
+			adicionarInputHiddenFormulario('formVazio', 'idCliente', id);
+			url='<c:url value="/pedido/venda/cliente"/>';
+		} else {
+			url='<c:url value="/pedido/venda"/>';
+		}
+		$('#formVazio').attr('action', url).submit();
+	});
+	
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
@@ -226,6 +238,10 @@ function remover(codigo, nome) {
 			<div class="input" style="width: 20%">
 				<input type="text" id="nomeFantasia" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" />
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
+			</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoEditarPedido"
+					title="Editar Pedido" value="" class="botaoCestaPequeno" />
 			</div>
 			<div class="label obrigatorio">Razão Social:</div>
 			<div class="input" style="width: 40%">

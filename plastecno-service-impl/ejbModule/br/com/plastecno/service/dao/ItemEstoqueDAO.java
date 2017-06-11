@@ -277,8 +277,11 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return QueryUtil.gerarRegistroUnico(query, String.class, null);
 	}
 
-	public String pesquisarNcmItemEstoque(ItemEstoque configuracao) {
-		return pesquisarNcmItemEstoque(configuracao.getMaterial().getId(), configuracao.getFormaMaterial());
+	public String pesquisarNcmItemEstoque(ItemEstoque item) {
+		if (item == null || item.getMaterial() == null) {
+			return null;
+		}
+		return pesquisarNcmItemEstoque(item.getMaterial().getId(), item.getFormaMaterial());
 	}
 
 	public ItemEstoque pesquisarPecaByDescricao(Integer idMaterial, String descricaoPeca, boolean apenasID) {

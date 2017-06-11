@@ -1,7 +1,6 @@
 package br.com.plastecno.service.test.builder;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import mockit.Mock;
@@ -36,7 +35,7 @@ public class EnderecoDAOBuilder extends DAOBuilder<EnderecoDAO> {
 			}
 
 			@Mock
-			public List<String> pesquisarCEPExistente(Set<String> listaCep) {
+			public List<String> pesquisarCEPExistente(List<String> listaCep) {
 				return REPOSITORY.pesquisarTodos(Endereco.class).stream().map(l -> l.getCep())
 						.filter(c -> listaCep.contains(c)).collect(Collectors.toList());
 			}

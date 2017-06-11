@@ -114,6 +114,17 @@ $(document).ready(function() {
 	});
 	</c:if>
 	
+	$('#botaoEditarCliente').click(function(){
+		var id = $('#formPedido #idCliente').val();
+		var url = null;
+		if(!isEmpty(id)){
+			url='<c:url value="/cliente/"/>'+id;
+		} else {
+			url='<c:url value="/cliente"/>';
+		}
+		$('#formVazio').attr('action', url).submit();
+	});
+	
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	
 	inserirMascaraData('dataEntrega');
@@ -296,8 +307,12 @@ $(document).ready(function() {
 			</div>
 			<div class="label obrigatorio">Cliente:</div>
 			<div class="input" style="width: 30%">
-				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}" class="pesquisavel" style="width: 85%"/>
+				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}" class="pesquisavel" style="width: 100%"/>
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
+			</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoEditarCliente"
+					title="Editar Cliente" value="" class="botaoEditar" />
 			</div>
 			<div class="label" style="width: 10%">Env. Email Ped.:</div>
 			<div class="input" style="width: 30%">
@@ -312,17 +327,23 @@ $(document).ready(function() {
 					value="${logradouroFaturamento}" disabled="disabled" class="uppercaseBloqueado desabilitado" style="width: 50%"/>
 			</div>
 			<div class="label">CNPJ:</div>
-			<div class="input" style="width: 10%">
+			<div class="input" style="width: 15%">
 				<input type="text" id="cnpj" name="cliente.cnpj"
 					value="${cliente.cnpj}" class="desabilitado" disabled="disabled" />
 			</div>
 			<div class="label" style="width: 5%">CPF:</div>
-			<div class="input" style="width: 10%">
+			<div class="input" style="width: 60%">
 				<input type="text" id="cpf" name="cliente.cpf"
-					value="${cliente.cpf}" class="desabilitado" disabled="disabled" style="width: 95%"/>
+					value="${cliente.cpf}" class="desabilitado" disabled="disabled" style="width: 25%"/>
 			</div>
-			<div class="label" style="width: 14%">Email NFe:</div>
-			<div class="input" style="width: 40%">
+			<div class="label">SUFRAMA:</div>
+			<div class="input" style="width: 15%">
+				<input type="text" id="suframa" name="cliente.inscricaoSUFRAMA"
+					value="${cliente.inscricaoSUFRAMA}" 
+					class="uppercaseBloqueado desabilitado" disabled="disabled" />
+			</div>
+			<div class="label" style="width: 5%">Email:</div>
+			<div class="input" style="width: 50%">
 				<input type="text" id="email" name="cliente.email"
 					value="${cliente.email}" style="width: 45%"
 					class="uppercaseBloqueado desabilitado" disabled="disabled" />

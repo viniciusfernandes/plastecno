@@ -75,6 +75,40 @@
 	width: 24px;
 }
 
+.botaoCesta {
+	background: url("../images/cesta_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoCestaPequeno {
+	background: url("../images/cesta_16.png") no-repeat scroll 0 0
+		transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
+.botaoCarrinho {
+	background: url("../images/carrinho_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoCarrinhoPequeno {
+	background: url("../images/carrinho_16.png") no-repeat scroll 0 0
+		transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
 .botaoCancelar {
 	background: url("../images/minus_24.png") no-repeat scroll 0 0
 		transparent;
@@ -499,6 +533,12 @@
 	background-position: center center;
 	height: 24px;
 	width: 24px;
+}
+
+.botaoCarrinho:hover {
+	background: url("../images/carrinho_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
 }
 
 .botaoCancelar:hover {

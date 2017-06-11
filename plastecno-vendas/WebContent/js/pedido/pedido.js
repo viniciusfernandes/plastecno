@@ -303,6 +303,7 @@ function inicializarAutomcompleteCliente(url) {
 					$('#cpf').val(clienteJson.cpf);
 					$('#nomeCliente').val(clienteJson.nomeCompleto);
 					$('#idVendedor').val(clienteJson.vendedor.id);
+					$('#suframa').val(clienteJson.suframa);
 					$('#proprietario').val(clienteJson.vendedor.nome + ' - '+ clienteJson.vendedor.email);
 					$('#logradouroFaturamento').val(clienteJson.logradouroFormatado);
 					limparComboBox('listaTransportadora');

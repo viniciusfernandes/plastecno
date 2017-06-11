@@ -100,6 +100,9 @@ public class Cliente implements Serializable {
 	@JoinTable(name = "tb_cliente_tb_transportadora", schema = "vendas", joinColumns = { @JoinColumn(name = "id_cliente", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_transportadora", referencedColumnName = "id") })
 	private List<Transportadora> listaRedespacho;
 
+	@Transient
+	private Logradouro logradouro;
+
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Nome fantasia do cliente")
 	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
@@ -325,6 +328,10 @@ public class Cliente implements Serializable {
 		return listaRedespacho;
 	}
 
+	public Logradouro getLogradouro() {
+		return logradouro;
+	}
+
 	public String getNomeCompleto() {
 		return this.getNomeFantasia() + " - " + this.getRazaoSocial();
 	}
@@ -460,6 +467,10 @@ public class Cliente implements Serializable {
 
 	public void setListaRedespacho(List<Transportadora> listaRedespacho) {
 		this.listaRedespacho = listaRedespacho;
+	}
+
+	public void setLogradouro(Logradouro logradouro) {
+		this.logradouro = logradouro;
 	}
 
 	public void setNomeFantasia(String nomeFantasia) {

@@ -211,9 +211,9 @@ public class EstoqueController extends AbstractController {
     }
 
     @Get("estoque/item/ncm")
-    public void pesquisarNcmItemEstoque(ItemEstoque itemEstoque) {
+    public void pesquisarNcmItemEstoque(ItemEstoque item) {
         try {
-            String ncm = estoqueService.pesquisarNcmItemEstoque(itemEstoque);
+            String ncm = estoqueService.pesquisarNcmItemEstoque(item);
             serializarJson(new SerializacaoJson("ncm", ncm == null ? "" : ncm));
         } catch (Exception e) {
             gerarLogErroRequestAjax("cálculo do preço minimo do item do pedido", e);

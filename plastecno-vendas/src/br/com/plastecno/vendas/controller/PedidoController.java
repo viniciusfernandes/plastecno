@@ -29,6 +29,7 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Material;
@@ -162,6 +163,31 @@ public class PedidoController extends AbstractController {
             gerarListaMensagemErro(e.getListaMensagem());
             pesquisarPedidoById(idPedido, tipoPedido, orcamento);
         }
+    }
+
+    @Get("pedido/venda/cliente")
+    public void carregarCliente(Integer idCliente) {
+        Cliente cliente = carregarDadosCliente(idCliente);
+        Logradouro l = cliente.getLogradouro();
+        addAtributo("cliente", cliente);
+        addAtributo("logradouroFaturamento", l != null ? l.getCepEnderecoNumeroBairro() : "");
+        addAtributo("proprietario", cliente.getVendedor());
+        addAtributo("listaTransportadora", transportadoraService.pesquisar());
+        addAtributo("listaRedespacho", clienteService.pesquisarTransportadorasRedespacho(idCliente));
+        
+        pedidoVendaHome();
+    }
+
+    private Cliente carregarDadosCliente(Integer idCliente) {
+        Cliente cliente = clienteService.pesquisarClienteEContatoById(idCliente);
+        cliente.setListaRedespacho(clienteService.pesquisarTransportadorasRedespacho(idCliente));
+        cliente.setLogradouro(clienteService.pesquisarLogradouroFaturamentoById(idCliente));
+
+        carregarVendedor(cliente);
+        // Aqui devemos formatar os documentos do cliente pois eh uma requisicao
+        // assincrona e a mascara em javascript nao eh executada.
+        formatarDocumento(cliente);
+        return cliente;
     }
 
     private void configurarTipoPedido(TipoPedido tipoPedido) {
@@ -513,16 +539,9 @@ public class PedidoController extends AbstractController {
      */
     @Get("pedido/cliente/{id}")
     public void pesquisarClienteById(Integer id) {
-        Cliente cliente = clienteService.pesquisarClienteEContatoById(id);
-        cliente.setListaRedespacho(clienteService.pesquisarTransportadorasRedespacho(id));
+        Cliente cliente = carregarDadosCliente(id);
 
-        LogradouroCliente logradouro = clienteService.pesquisarLogradouroFaturamentoById(id);
-        carregarVendedor(cliente);
-        // Aqui devemos formatar os documentos do cliente pois eh uma requisicao
-        // assincrona e a mascara em javascript nao eh executada.
-        formatarDocumento(cliente);
-
-        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar(), logradouro);
+        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar(), cliente.getLogradouro());
 
         SerializacaoJson serializacaoJson = new SerializacaoJson("cliente", json)
                 .incluirAtributo("listaTransportadora").incluirAtributo("listaRedespacho").incluirAtributo("vendedor");

@@ -30,20 +30,21 @@
 		<nav class="flutuante_esquerda">
 			<ul>
 				<c:if test="${acessoVendaPermitido}">
-				<li><a href="javascript: void(0)" target="principal_frame">Vendas</a>
+				<li><a href="pedido/venda" target="principal_frame">Ped. Vendas</a>
 					<ul>
-						<li><a href="pedido/venda" target="principal_frame">Ped. Vendas</a></li>
-						<li><a href="pedido/orcamento/venda" target="principal_frame">Orçamento</a></li>
 						<li><a href="itemAguardandoMaterial" target="principal_frame">Ped. Aguard. Material</a></li>
 						<li><a href="estoque" target="principal_frame">Estoque</a></li>
 					</ul>
 				</li>
 				</c:if>
+				<li><a href="cliente" target="principal_frame">Clientes</a></li>
+				<c:if test="${acessoVendaPermitido}">
+					<li><a href="pedido/orcamento/venda" target="principal_frame">Orçamento</a></li>
+				</c:if>
 				<c:if test="${acessoCompraPermitido}">
-					<li><a href="javascript: void(0)" target="principal_frame">Compras</a>
+					<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a>
 						<ul>
 							<li><a href="itemAguardandoCompra" target="principal_frame">Item Aguard. Compra</a></li>
-							<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a></li>
 							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
 							<li><a href="estoque" target="principal_frame">Estoque</a></li>
 							<li><a href="empacotamento" target="principal_frame">Empacotamento</a></li>					
@@ -58,7 +59,6 @@
 						</ul>
 					</li>
 				</c:if>
-				<li><a href="cliente" target="principal_frame">Clientes</a></li>
 				<li><a href="javascript: void(0)">Cadastros</a>
 					<ul>
 						<li><a href="ramo" target="principal_frame">Ramos Atividades</a></li>

@@ -638,6 +638,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	private List<LogradouroPedido> gerarLogradouroPedidoByIdCliente(Integer idCliente) {
 		List<LogradouroCliente> lLog = clienteService.pesquisarLogradouroCliente(idCliente);
+		if (lLog == null) {
+			return null;
+		}
 		List<LogradouroPedido> lLogPed = new ArrayList<LogradouroPedido>();
 
 		lLog.stream().forEach(l -> lLogPed.add(new LogradouroPedido(l)));
@@ -899,7 +902,10 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 		}
 		Cliente cliente = pedido.getCliente();
-
+		if (cliente == null) {
+			throw new BusinessException(
+					"O orçamento não contém cliente. O cliente deve ter ao menos um nome para a inclusão do orçamento.");
+		}
 		cliente.setRazaoSocial(cliente.getNomeFantasia());
 		cliente.addContato(new ContatoCliente(pedido.getContato()));
 		cliente.setVendedor(pedido.getVendedor());
@@ -907,6 +913,7 @@ public class PedidoServiceImpl implements PedidoService {
 		cliente.setRamoAtividade(ramoAtividadeService.pesquisarRamoAtividadePadrao());
 
 		if (pedido.isClienteNovo()) {
+			cliente.setVendedor(pedido.getVendedor());
 			pedido.setCliente(clienteService.inserir(cliente));
 		}
 		return inserir(pedido);

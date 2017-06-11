@@ -58,7 +58,7 @@ public interface EstoqueService {
 
 	String pesquisarNcmItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
-	String pesquisarNcmItemEstoque(ItemEstoque configuracao);
+	String pesquisarNcmItemEstoque(ItemEstoque item);
 
 	List<ItemEstoque> pesquisarPecaByDescricao(String descricao);
 

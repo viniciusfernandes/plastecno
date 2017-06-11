@@ -638,6 +638,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	private List<LogradouroPedido> gerarLogradouroPedidoByIdCliente(Integer idCliente) {
 		List<LogradouroCliente> lLog = clienteService.pesquisarLogradouroCliente(idCliente);
+		if (lLog == null) {
+			return null;
+		}
 		List<LogradouroPedido> lLogPed = new ArrayList<LogradouroPedido>();
 
 		lLog.stream().forEach(l -> lLogPed.add(new LogradouroPedido(l)));

@@ -26,6 +26,7 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoEntrega;
+import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.constante.TipoRelacionamento;
@@ -188,6 +189,28 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 		return material;
+	}
+
+	private Pedido gerarOrcamento() {
+		Usuario vendedor = eBuilder.buildVendedor();
+		vendedor.setSenha("asdf34");
+		try {
+			usuarioService.inserir(vendedor, true);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		Pedido p = new Pedido();
+		p.setRepresentada(gerarRevendedor());
+		p.setVendedor(vendedor);
+		p.setFinalidadePedido(TipoFinalidadePedido.CONSUMO);
+
+		Contato c = new Contato();
+		c.setNome("Renato");
+		c.setEmail("asdf@asdf.asdf");
+		c.setDdd("11");
+		c.setTelefone("54325432");
+		p.setContato(c);
+		return p;
 	}
 
 	private Pedido gerarPedido(TipoPedido tipoPedido, TipoRelacionamento tipoRelacionamento) {
@@ -441,6 +464,10 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		return new PedidoRevendaECompra(pedidoCompra, pedidoRevenda);
+	}
+
+	private Representada gerarRevendedor() {
+		return gerarRepresentada(TipoRelacionamento.REVENDA);
 	}
 
 	private Transportadora gerarTransportadora() {
@@ -1489,6 +1516,24 @@ public class PedidoServiceTest extends AbstractTest {
 		assertEquals(
 				"O IPI de material importado nao foi enviado portanto deve ser utilizado o default apos a inclusao do item do pedido",
 				padrao, itemPedido.getAliquotaIPI());
+	}
+
+	@Test
+	public void testInclusaoOrcamentoClienteNovo() {
+		Pedido pedido = gerarOrcamento();
+		Cliente cliente = new Cliente();
+		cliente.setNomeFantasia("Vinicius");
+
+		pedido.setCliente(cliente);
+		try {
+			pedido = pedidoService.inserirOrcamento(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals("O orcamento deve estar em orcamento em digitacao apos a inclusao"
+				+ pedido.getSituacaoPedido().getDescricao(), SituacaoPedido.ORCAMENTO_DIGITACAO,
+				pedido.getSituacaoPedido());
 	}
 
 	@Test

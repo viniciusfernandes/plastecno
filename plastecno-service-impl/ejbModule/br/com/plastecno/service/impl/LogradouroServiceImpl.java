@@ -34,6 +34,19 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	private LogradouroDAO logradouroDAO;
 
+	@Override
+	public void importarCodigoMunicipio() {
+		List<Object[]> l = entityManager.createQuery("select l.id,l.cep from LogradouroCliente l ", Object[].class)
+				.getResultList();
+		for (Object[] o : l) {
+			entityManager
+					.createQuery(
+							"update LogradouroCliente l set l.codigoMunicipio = (select e.cidade.codigoMunicipio from Endereco e where e.cep = :cep) where l.id=:id")
+					.setParameter("cep", o[1]).setParameter("id", o[0]).executeUpdate();
+		}
+
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)

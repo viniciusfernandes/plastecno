@@ -75,10 +75,10 @@
 					</ul>
 				</li>
 				<c:if test="${acessoNFePermitido}">
-				<li><a href="javascript: void(0)">NFe</a>
+				<li><a href="emissaoNFe" target="principal_frame">Emis. NFe</a>
 					<ul>
-						<li><a href="emissaoNFe" target="principal_frame">Emis. NFe</a></li>
 						<li><a href="pedidoFracionadoNFe" target="principal_frame">Ped. Fracionado</a></li>
+						<li><a href="javascript: void(0)" ></a></li>
 					</ul>
 				</li>
 				</c:if>

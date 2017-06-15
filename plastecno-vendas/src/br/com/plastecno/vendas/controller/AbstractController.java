@@ -471,8 +471,8 @@ public abstract class AbstractController {
     }
 
     void inicializarComboTipoLogradouro() {
-        this.result.include("listaTipoLogradouro", this.tipoLogradouroService.pesquisar());
-        this.result.include("tipoLogradouroRenderizado", true);
+        result.include("listaTipoLogradouro", this.tipoLogradouroService.pesquisar());
+        result.include("isTipoLogradoutoHabilitado", true);
     }
 
     /*

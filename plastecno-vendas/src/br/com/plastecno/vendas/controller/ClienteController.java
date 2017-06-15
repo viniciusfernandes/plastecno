@@ -117,7 +117,7 @@ public class ClienteController extends AbstractController {
     @Get("cliente/importarlogradouro")
     public void importar() {
         System.out.println("Inicio da importacao");
-        logradouroService.importarLogradouro();
+        logradouroService.importarCodigoMunicipio();
         System.out.println("Fim da importacao");
         redirecTo(MenuController.class).menuHome();
     }

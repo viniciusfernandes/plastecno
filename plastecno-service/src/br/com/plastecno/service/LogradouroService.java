@@ -11,6 +11,8 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface LogradouroService {
+	void importarCodigoMunicipio();
+
 	void importarLogradouro();
 
 	<T extends Logradouro> T inserir(T logradouro) throws BusinessException;

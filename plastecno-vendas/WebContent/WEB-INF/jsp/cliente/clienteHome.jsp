@@ -243,7 +243,7 @@ function remover(codigo, nome) {
 				<input type="button" id="botaoEditarPedido"
 					title="Editar Pedido" value="" class="botaoCestaPequeno" />
 			</div>
-			<div class="label obrigatorio">Razão Social:</div>
+			<div class="label obrigatorio" style="width: 13%">Razão Social:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="razaoSocial" name="cliente.razaoSocial"
 					value="${cliente.razaoSocial}" style="width: 80%" />

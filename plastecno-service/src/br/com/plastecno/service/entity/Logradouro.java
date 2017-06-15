@@ -4,7 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
@@ -23,7 +22,8 @@ public abstract class Logradouro {
 
 	private Boolean codificado = true;
 
-	@Transient
+	@Column(name = "codigo_municipio")
+	@InformacaoValidavel(intervaloComprimento = { 1, 7 }, nomeExibicao = "Código do município")
 	private String codigoMunicipio;
 
 	@InformacaoValidavel(intervaloComprimento = { 1, 250 }, nomeExibicao = "Complemento do logradouro")
@@ -79,6 +79,7 @@ public abstract class Logradouro {
 		c.setDescricao(getCidade());
 		c.setPais(p);
 		c.setUf(uf.getSigla());
+		c.setCodigoMunicipio(getCodigoMunicipio());
 
 		Bairro b = new Bairro();
 		b.setCidade(c);

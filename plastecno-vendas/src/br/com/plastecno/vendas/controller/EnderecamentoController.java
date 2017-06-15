@@ -23,7 +23,7 @@ public final class EnderecamentoController extends AbstractController {
 
     @Get("cep/endereco")
     public void pesquisarEndereco(String cep) {
-        Endereco endereco = this.enderecamentoService.pesquisarByCep(cep);
+        Endereco endereco = enderecamentoService.pesquisarByCep(cep);
 
         if (endereco == null) {
             Bairro bairro = new Bairro();

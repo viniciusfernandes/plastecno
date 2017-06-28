@@ -84,15 +84,17 @@ $(document).ready(function() {
 			<caption>${titulo}</caption>
 			<thead>
 				<tr>
-					<th style="width: 50%">Cliente</th>
-					<th style="width: 45%">Contato</th>
-					<th>Ações</th>
+					<th style="width: 10%">Últ. Ped.</th>
+					<th style="width: 25%">Cliente</th>
+					<th style="width: 65%">Contato</th>
+					<th style="width: 5%">Ações</th>
 				</tr>
 			</thead>
 
 			<tbody>
 				<c:forEach var="cliente" items="${listaCliente}">
 					<tr>
+						<td>${cliente.idUltimoPedido} - ${cliente.dataUltimoPedidoFormatado}</td>
 						<td>${cliente.nomeFantasia}</td>
 						<td>${cliente.contatoFormatado}</td>
 						<td>
@@ -101,6 +103,10 @@ $(document).ready(function() {
 									method="get">
 									<input type="submit" title="Vizualizar Dados do Cliente"
 										value="" class="botaoEditar" />
+								</form>
+								<form action="<c:url value="/relatorio/cliente/vendedor/pedido/pdf"/>" method="get">
+									<input type="hidden" name="idPedido" value="${cliente.idUltimoPedido}" />
+									<input type="submit" value="" title="Imprimir Pedido" class="botaoPdf_16" />
 								</form>
 							</div>
 						</td>

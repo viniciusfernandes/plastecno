@@ -1695,7 +1695,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 		// Ao final da clonaem do pedido precisamos cancelar o antigo para que
 		// esse nao aparece nos faturamentos da empresa.
-		cancelarPedido(idClone);
+		cancelarPedido(idPedido);
 		return idClone;
 	}
 

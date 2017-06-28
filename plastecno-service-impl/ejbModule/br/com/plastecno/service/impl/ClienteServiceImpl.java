@@ -3,6 +3,7 @@ package br.com.plastecno.service.impl;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -24,8 +25,10 @@ import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
+import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ComentarioCliente;
@@ -124,6 +127,23 @@ public class ClienteServiceImpl implements ClienteService {
 			lCli.add(c);
 		}
 		return lCli;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Date gerarDataInatividadeCliente() throws BusinessException {
+		final String PARAMETRO = configuracaoSistemaService
+				.pesquisar(ParametroConfiguracaoSistema.DIAS_INATIVIDADE_CLIENTE);
+
+		if (PARAMETRO == null) {
+			throw new BusinessException(
+					"Não configurado o parametro de dias de inatividade para pesquisa de clientes inativos");
+		}
+
+		final Integer DIAS_INATIVIDADE = Integer.parseInt(PARAMETRO);
+		final Calendar dtInativ = Calendar.getInstance();
+		dtInativ.add(Calendar.DAY_OF_YEAR, -DIAS_INATIVIDADE);
+		return dtInativ.getTime();
 	}
 
 	private Query gerarQueryPesquisa(Cliente filtro, StringBuilder select) {
@@ -388,7 +408,8 @@ public class ClienteServiceImpl implements ClienteService {
 		List<Cliente> lCli = entityManager.createQuery(s.toString()).setParameter("listaIdBairro", listaIdBairro)
 				.setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO).getResultList();
 
-		return removerClienteDuplicado(lCli);
+		removerClienteDuplicado(lCli);
+		return lCli;
 	}
 
 	@Override
@@ -507,40 +528,46 @@ public class ClienteServiceImpl implements ClienteService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@REVIEW(descricao = "Retornar apenas as informacoes necessarias do cliente")
 	public List<Cliente> pesquisarInativosByIdVendedor(Integer idVendedor) throws BusinessException {
-		final String PARAMETRO = this.configuracaoSistemaService
-				.pesquisar(ParametroConfiguracaoSistema.DIAS_INATIVIDADE_CLIENTE);
-
-		if (PARAMETRO == null) {
-			throw new BusinessException(
-					"Não configurado o parametro de dias de inatividade para pesquisa de clientes inativos");
-		}
-
-		final Integer DIAS_INATIVIDADE = Integer.parseInt(PARAMETRO);
-		final Calendar dataInicioInatividade = Calendar.getInstance();
-		dataInicioInatividade.add(Calendar.DAY_OF_YEAR, -DIAS_INATIVIDADE);
+		Date dtInativ = gerarDataInatividadeCliente();
 
 		final StringBuilder select = new StringBuilder();
-		select.append("select c from Pedido p inner join p.cliente c ");
-		select.append("left join fetch c.listaContato ");
+		select.append("select p.id, p.dataEnvio, p.cliente from Pedido p left join fetch p.cliente.listaContato ");
+		select.append("where p.id in (select max(p1.id) from Pedido p1 where p1.cliente.vendedor.id =:idVendedor and p1.tipoPedido !=:tipoCompra and p1.situacaoPedido not in (:listaSituacao) and p1.dataEnvio <= :dataInicioInatividade group by p1.cliente.id ) ");
+		
+		List<SituacaoPedido> lSit = new ArrayList<>();
+		lSit.add(SituacaoPedido.DIGITACAO);
+		lSit.add(SituacaoPedido.CANCELADO);
+		lSit.add(SituacaoPedido.ORCAMENTO);
+		lSit.add(SituacaoPedido.ORCAMENTO_DIGITACAO);
 
-		select.append("where p.dataEnvio <= :dataInicioInatividade ");
+		Query query = entityManager.createQuery(select.toString());
+		query.setParameter("dataInicioInatividade", dtInativ);
+		// Listando apenas os pedidos que ja tiveram venda efetuada
+		query.setParameter("listaSituacao", lSit);
+		// Listando apenas os pedidos do tipo de venda
+		query.setParameter("tipoCompra", TipoPedido.COMPRA);
 
-		if (idVendedor != null) {
-			select.append(" and c.vendedor.id = :idVendedor ");
-		}
-		select.append("order by c.dataUltimoContato, c.nomeFantasia ");
-
-		Query query = this.entityManager.createQuery(select.toString());
 		if (idVendedor != null) {
 			query.setParameter("idVendedor", idVendedor);
 		}
-		query.setParameter("dataInicioInatividade", dataInicioInatividade.getTime());
-		List<Cliente> l = removerClienteDuplicado(query.getResultList());
-
-		for (Cliente c : l) {
-			c.formatarContatoPrincipal();
+		List<Object[]> l = query.getResultList();
+		if (l == null || l.isEmpty()) {
+			return new ArrayList<Cliente>();
 		}
-		return l;
+
+		List<Cliente> lCli = new ArrayList<Cliente>();
+		Cliente c = null;
+		for (Object[] o : l) {
+			c = (Cliente) o[2];
+			c.setIdUltimoPedido((Integer) o[0]);
+			c.setDataUltimoPedidoFormatado(StringUtils.formatarData((Date) o[1]));
+			lCli.add(c);
+		}
+
+		for (Cliente cli : lCli) {
+			cli.formatarContatoPrincipal();
+		}
+		return lCli;
 	}
 
 	@Override
@@ -616,19 +643,19 @@ public class ClienteServiceImpl implements ClienteService {
 				.setParameter("idCliente", idCliente).getResultList();
 	}
 
-	private List<Cliente> removerClienteDuplicado(List<Cliente> lCli) {
+	private void removerClienteDuplicado(List<Cliente> lCli) {
 		if (lCli == null || lCli.isEmpty()) {
-			return lCli;
+			return;
 		}
 
-		List<Cliente> l = new ArrayList<Cliente>(lCli.size());
-		for (Cliente c : lCli) {
-			if (l.contains(c)) {
+		List<Cliente> l = new ArrayList<Cliente>(lCli);
+		lCli.clear();
+		for (Cliente c : l) {
+			if (lCli.contains(c)) {
 				continue;
 			}
-			l.add(c);
+			lCli.add(c);
 		}
-		return l;
 	}
 
 	@Override

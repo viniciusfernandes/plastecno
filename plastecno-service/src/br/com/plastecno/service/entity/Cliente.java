@@ -56,6 +56,10 @@ public class Cliente implements Serializable {
 	@Transient
 	private String dataUltimoContatoFormatada;
 
+	@Transient
+	// Esse atributo foi incluido para gerar relatorio de cliente inativo
+	private String dataUltimoPedidoFormatado;
+
 	@Column(name = "documento_estrangeiro")
 	@InformacaoValidavel(intervaloComprimento = { 0, 15 }, nomeExibicao = "Documento Estrangeiro")
 	private String documentoEstrangeiro;
@@ -71,6 +75,9 @@ public class Cliente implements Serializable {
 	@SequenceGenerator(name = "clienteSequence", sequenceName = "vendas.seq_cliente_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clienteSequence")
 	private Integer id;
+
+	@Transient
+	private Integer idUltimoPedido;
 
 	@Column(name = "informacoes_adicionais")
 	private String informacoesAdicionais;
@@ -284,6 +291,10 @@ public class Cliente implements Serializable {
 		return dataUltimoContatoFormatada;
 	}
 
+	public String getDataUltimoPedidoFormatado() {
+		return dataUltimoPedidoFormatado;
+	}
+
 	public String getDocumento() {
 		return this.isJuridico() ? this.cnpj : this.cpf;
 	}
@@ -302,6 +313,10 @@ public class Cliente implements Serializable {
 
 	public Integer getId() {
 		return id;
+	}
+
+	public Integer getIdUltimoPedido() {
+		return idUltimoPedido;
 	}
 
 	public String getInformacoesAdicionais() {
@@ -429,6 +444,10 @@ public class Cliente implements Serializable {
 		this.dataUltimoContatoFormatada = dataUltimoContatoFormatada;
 	}
 
+	public void setDataUltimoPedidoFormatado(String dataUltimoPedidoFormatado) {
+		this.dataUltimoPedidoFormatado = dataUltimoPedidoFormatado;
+	}
+
 	public void setDocumentoEstrangeiro(String documentoEstrangeiro) {
 		this.documentoEstrangeiro = documentoEstrangeiro;
 	}
@@ -443,6 +462,10 @@ public class Cliente implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public void setIdUltimoPedido(Integer idUltimoPedido) {
+		this.idUltimoPedido = idUltimoPedido;
 	}
 
 	public void setInformacoesAdicionais(String informacoesAdicionais) {

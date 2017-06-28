@@ -197,14 +197,12 @@ public class LogradouroServiceImpl implements LogradouroService {
 				lCep.add(l.getCep());
 			}
 		}
-		lCep = enderecamentoService.pesquisarCEPExistente(lCep);
+		List<String> lCepExistente = enderecamentoService.pesquisarCEPExistente(lCep);
 
 		List<Logradouro> listaInexistente = new ArrayList<>();
-		if (!lCep.isEmpty()) {
-			for (Logradouro l : listaLogradouro) {
-				if (!lCep.contains(l.getCep())) {
-					listaInexistente.add(l);
-				}
+		for (Logradouro l : listaLogradouro) {
+			if (!lCepExistente.contains(l.getCep())) {
+				listaInexistente.add(l);
 			}
 		}
 

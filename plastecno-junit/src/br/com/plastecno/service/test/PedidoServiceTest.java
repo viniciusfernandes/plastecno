@@ -580,6 +580,25 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testCopiaPedido() {
+		Pedido p = gerarPedidoRevenda();
+		SituacaoPedido s = p.getSituacaoPedido();
+		Integer idCopia = null;
+		try {
+			idCopia = pedidoService.copiarPedido(p.getId(), false);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		Pedido pCopia = pedidoService.pesquisarPedidoById(idCopia);
+		assertNotEquals("O pedido copia nao pode conter o mesmo ID do pedido copiado", p.getId(), pCopia.getId());
+
+		assertEquals("O pedido copia deve estar em DIGITACAO apos a copia", SituacaoPedido.DIGITACAO,
+				pCopia.getSituacaoPedido());
+
+		assertEquals("O pedido copiado deve ter a situacao igual a situacao anterior a copia", s, p.getSituacaoPedido());
+	}
+
+	@Test
 	public void testEfetuarEncomendaItemPedido() {
 		Pedido pedido = gerarPedidoRepresentacao();
 		Integer idPedido = pedido.getId();

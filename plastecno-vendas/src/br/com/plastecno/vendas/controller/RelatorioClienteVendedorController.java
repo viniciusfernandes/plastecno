@@ -6,12 +6,15 @@ import java.util.List;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
+import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -32,13 +35,23 @@ public class RelatorioClienteVendedorController extends AbstractController {
         super(result, usuarioInfo);
     }
 
+    @Get("relatorio/cliente/vendedor/pedido/pdf")
+    public Download downloadPedidoPDF(Integer idPedido) {
+        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
+    }
+
     @Get("relatorio/cliente/vendedor/listagem")
     public void gerarRelatorioClienteVendedor(Integer idVendedor, boolean pesquisaClienteInativo) {
         Usuario vend = usuarioService.pesquisarUsuarioResumidoById(idVendedor);
         try {
+            String titulo = vend != null ? "Clientes do Vendedor " + vend.getNome() : "";
+            if (pesquisaClienteInativo) {
+                titulo += ". Inativos desde " + StringUtils.formatarData(clienteService.gerarDataInatividadeCliente());
+            }
+            addAtributo("titulo", titulo);
             addAtributo("listaCliente",
                     relatorioService.gerarRelatorioClienteVendedor(idVendedor, pesquisaClienteInativo));
-            addAtributo("titulo", vend != null ? "Clientes do Vendedor " + vend.getNome() : "");
+
             irRodapePagina();
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

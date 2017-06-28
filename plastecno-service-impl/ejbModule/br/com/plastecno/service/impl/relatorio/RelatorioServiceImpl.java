@@ -177,8 +177,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> gerarRelatorioClienteVendedor(Integer idVendedor, boolean clienteInativo)
 			throws BusinessException {
-		return clienteInativo ? clienteService.pesquisarInativosByIdVendedor(idVendedor) : clienteService
-				.pesquisarClienteContatoByIdVendedor(idVendedor);
+		return clienteService.pesquisarClienteCompradorByIdVendedor(idVendedor, clienteInativo);
 	}
 
 	@Override

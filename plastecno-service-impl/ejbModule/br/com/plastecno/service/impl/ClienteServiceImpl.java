@@ -3,7 +3,6 @@ package br.com.plastecno.service.impl;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -347,14 +346,6 @@ public class ClienteServiceImpl implements ClienteService {
 		return clienteDAO.pesquisarById(id);
 	}
 
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Cliente> pesquisarByIdVendedor(Integer idVendedor, boolean isPesquisaClienteInativo)
-			throws BusinessException {
-		return isPesquisaClienteInativo ? pesquisarInativosByIdVendedor(idVendedor)
-				: pesquisarClienteContatoByIdVendedor(idVendedor);
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -409,6 +400,66 @@ public class ClienteServiceImpl implements ClienteService {
 				.setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO).getResultList();
 
 		removerClienteDuplicado(lCli);
+		return lCli;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(descricao = "Retornar apenas as informacoes necessarias do cliente")
+	public List<Cliente> pesquisarClienteCompradorByIdVendedor(Integer idVendedor, boolean inativos)
+			throws BusinessException {
+		final StringBuilder s = new StringBuilder();
+		s.append("select p.id, p.dataEnvio, p.cliente from Pedido p left join fetch p.cliente.listaContato ");
+		s.append("where p.id in ");
+		s.append("(select max(p1.id) from Pedido p1 where p1.tipoPedido !=:tipoCompra and p1.situacaoPedido not in (:listaSituacao) ");
+		if (idVendedor != null) {
+			s.append("and p1.cliente.vendedor.id =:idVendedor ");
+		}
+		s.append("group by p1.cliente.id ) ");
+
+		if (inativos) {
+			s.append("and p.dataEnvio <= :dtInatividade ");
+		}
+
+		s.append("order by p.cliente.nomeFantasia asc ");
+
+		List<SituacaoPedido> lSit = new ArrayList<>();
+		lSit.add(SituacaoPedido.DIGITACAO);
+		lSit.add(SituacaoPedido.CANCELADO);
+		lSit.add(SituacaoPedido.ORCAMENTO);
+		lSit.add(SituacaoPedido.ORCAMENTO_DIGITACAO);
+
+		Query query = entityManager.createQuery(s.toString());
+		if (inativos) {
+			query.setParameter("dtInatividade", gerarDataInatividadeCliente());
+		}
+
+		// Listando apenas os pedidos que ja tiveram venda efetuada
+		query.setParameter("listaSituacao", lSit);
+		// Listando apenas os pedidos do tipo de venda
+		query.setParameter("tipoCompra", TipoPedido.COMPRA);
+
+		if (idVendedor != null) {
+			query.setParameter("idVendedor", idVendedor);
+		}
+		List<Object[]> l = query.getResultList();
+		if (l == null || l.isEmpty()) {
+			return new ArrayList<Cliente>();
+		}
+
+		List<Cliente> lCli = new ArrayList<Cliente>();
+		Cliente c = null;
+		for (Object[] o : l) {
+			c = (Cliente) o[2];
+			c.setIdUltimoPedido((Integer) o[0]);
+			c.setDataUltimoPedidoFormatado(StringUtils.formatarData((Date) o[1]));
+			lCli.add(c);
+		}
+
+		for (Cliente cli : lCli) {
+			cli.formatarContatoPrincipal();
+		}
 		return lCli;
 	}
 
@@ -521,53 +572,6 @@ public class ClienteServiceImpl implements ClienteService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente) {
 		return clienteDAO.pesquisarContatoPrincipalResumidoByIdCliente(idCliente);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@REVIEW(descricao = "Retornar apenas as informacoes necessarias do cliente")
-	public List<Cliente> pesquisarInativosByIdVendedor(Integer idVendedor) throws BusinessException {
-		Date dtInativ = gerarDataInatividadeCliente();
-
-		final StringBuilder select = new StringBuilder();
-		select.append("select p.id, p.dataEnvio, p.cliente from Pedido p left join fetch p.cliente.listaContato ");
-		select.append("where p.id in (select max(p1.id) from Pedido p1 where p1.cliente.vendedor.id =:idVendedor and p1.tipoPedido !=:tipoCompra and p1.situacaoPedido not in (:listaSituacao) and p1.dataEnvio <= :dataInicioInatividade group by p1.cliente.id ) ");
-		
-		List<SituacaoPedido> lSit = new ArrayList<>();
-		lSit.add(SituacaoPedido.DIGITACAO);
-		lSit.add(SituacaoPedido.CANCELADO);
-		lSit.add(SituacaoPedido.ORCAMENTO);
-		lSit.add(SituacaoPedido.ORCAMENTO_DIGITACAO);
-
-		Query query = entityManager.createQuery(select.toString());
-		query.setParameter("dataInicioInatividade", dtInativ);
-		// Listando apenas os pedidos que ja tiveram venda efetuada
-		query.setParameter("listaSituacao", lSit);
-		// Listando apenas os pedidos do tipo de venda
-		query.setParameter("tipoCompra", TipoPedido.COMPRA);
-
-		if (idVendedor != null) {
-			query.setParameter("idVendedor", idVendedor);
-		}
-		List<Object[]> l = query.getResultList();
-		if (l == null || l.isEmpty()) {
-			return new ArrayList<Cliente>();
-		}
-
-		List<Cliente> lCli = new ArrayList<Cliente>();
-		Cliente c = null;
-		for (Object[] o : l) {
-			c = (Cliente) o[2];
-			c.setIdUltimoPedido((Integer) o[0]);
-			c.setDataUltimoPedidoFormatado(StringUtils.formatarData((Date) o[1]));
-			lCli.add(c);
-		}
-
-		for (Cliente cli : lCli) {
-			cli.formatarContatoPrincipal();
-		}
-		return lCli;
 	}
 
 	@Override

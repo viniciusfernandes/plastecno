@@ -41,16 +41,16 @@ public class RelatorioClienteVendedorController extends AbstractController {
     }
 
     @Get("relatorio/cliente/vendedor/listagem")
-    public void gerarRelatorioClienteVendedor(Integer idVendedor, boolean pesquisaClienteInativo) {
+    public void gerarRelatorioClienteVendedor(Integer idVendedor, boolean inativo) {
         Usuario vend = usuarioService.pesquisarUsuarioResumidoById(idVendedor);
         try {
-            String titulo = vend != null ? "Clientes do Vendedor " + vend.getNome() : "";
-            if (pesquisaClienteInativo) {
+            String titulo = vend != null ? "Clientes do Vendedor " + vend.getNome() : "Clientes";
+            if (inativo) {
                 titulo += ". Inativos desde " + StringUtils.formatarData(clienteService.gerarDataInatividadeCliente());
             }
             addAtributo("titulo", titulo);
             addAtributo("listaCliente",
-                    relatorioService.gerarRelatorioClienteVendedor(idVendedor, pesquisaClienteInativo));
+                    relatorioService.gerarRelatorioClienteVendedor(idVendedor, inativo));
 
             irRodapePagina();
         } catch (BusinessException e) {
@@ -58,7 +58,7 @@ public class RelatorioClienteVendedorController extends AbstractController {
             irTopoPagina();
         }
 
-        addAtributo("pesquisaClienteInativo", pesquisaClienteInativo);
+        addAtributo("inativo", inativo);
         addAtributo("vendedor", vend);
     }
 

@@ -46,7 +46,7 @@ $(document).ready(function() {
 			Inativos:</div>
 		<div class="input" style="width: 60%">
 			<input type="checkbox" id="chekboxClienteInativo"
-				<c:if test="${pesquisaClienteInativo}">checked</c:if>
+				<c:if test="${inativo}">checked</c:if>
 				class="checkbox" />
 		</div>
 		<div class="label" style="width: 30%">Vendedor:</div>
@@ -65,7 +65,7 @@ $(document).ready(function() {
 			method="get">
 			<input type="hidden" id="idVendedor" name="idVendedor"
 				value="${vendedor.id}" /> <input type="hidden" id="clienteInativo"
-				name="pesquisaClienteInativo" value="${pesquisaClienteInativo}" /> <input
+				name="inativo" value="${inativo}" /> <input
 				type="submit" title="Pesquisar Clientes do Vendedor" value=""
 				class="botaoPesquisar" />
 

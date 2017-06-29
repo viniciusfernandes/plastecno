@@ -14,7 +14,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import jxl.Workbook;
+import jxl.format.Alignment;
+import jxl.format.Border;
+import jxl.format.BorderLineStyle;
+import jxl.format.Colour;
 import jxl.write.Label;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
@@ -84,29 +90,58 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@EJB
 	private UsuarioService usuarioService;
 
+	private void configurarPlanilha(WritableSheet sheet) throws IOException, WriteException {
+		sheet.setColumnView(0, 15);
+		sheet.setColumnView(1, 40);
+		sheet.setColumnView(2, 40);
+		sheet.setColumnView(3, 40);
+		sheet.setColumnView(4, 150);
+
+		WritableFont cellFont = new WritableFont(WritableFont.TIMES, 10);
+		cellFont.setColour(Colour.WHITE);
+
+		WritableCellFormat cf = new WritableCellFormat(cellFont);
+		cf.setBorder(Border.ALL, BorderLineStyle.THIN);
+		cf.setBackground(Colour.GREEN);
+		cf.setAlignment(Alignment.CENTRE);
+		
+		// Criando o header
+		sheet.addCell(new Label(0, 0, "Dt. COMRPA", cf));
+		sheet.addCell(new Label(1, 0, "CLIENTE", cf));
+		sheet.addCell(new Label(2, 0, "CONTATO", cf));
+		sheet.addCell(new Label(3, 0, "TELEFONE", cf));
+		sheet.addCell(new Label(4, 0, "EMAIL", cf));
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public byte[] gerarPlanilhaClienteVendedor(Integer idVendedor, boolean clienteInativo) throws BusinessException {
 		List<Cliente> l = gerarRelatorioClienteVendedor(idVendedor, clienteInativo);
-		WritableWorkbook excel = null;
 		ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
 		try {
-			// excel = Workbook.createWorkbook(new
-			// File("C:\\Users\\vinicius\\ambiente_trabalho\\temp\\XXX.odt"));
-			excel = Workbook.createWorkbook(out);
-			WritableSheet sheet = excel.createSheet("Cliente", 0);
-			int row = -1;
+			WritableWorkbook excel = Workbook.createWorkbook(out);
+			WritableSheet sheet = excel.createSheet("Contato Cliente", 0);
+			configurarPlanilha(sheet);
+
+			WritableFont cellFont = new WritableFont(WritableFont.TIMES, 10);
+			cellFont.setColour(Colour.BLACK);
+
+			WritableCellFormat cf = new WritableCellFormat(cellFont);
+			cf.setBorder(Border.ALL, BorderLineStyle.THIN);
+
+			// Vamos incluir as linhas a partir do indice row=1 pois row=0 eh o header da planilha
+			int row = 0;
 			Contato ct = null;
 			for (Cliente c : l) {
-				row++;
-				sheet.addCell(new Label(0, row, c.getDataUltimoPedidoFormatado()));
-				sheet.addCell(new Label(1, row, c.getNomeFantasia()));
+				++row;
+				sheet.addCell(new Label(0, row, c.getDataUltimoPedidoFormatado(), cf));
+				sheet.addCell(new Label(1, row, c.getNomeFantasia(), cf));
 				if ((ct = c.getContatoPrincipal()) == null) {
 					continue;
 				}
-				sheet.addCell(new Label(2, row, ct.getNome()));
-				sheet.addCell(new Label(3, row, ct.getTelefoneFormatado()));
-				sheet.addCell(new Label(4, row, ct.getEmail()));
+				sheet.addCell(new Label(2, row, ct.getNome(), cf));
+				sheet.addCell(new Label(3, row, ct.getTelefoneFormatado(), cf));
+				sheet.addCell(new Label(4, row, ct.getEmail(), cf));
 			}
 			excel.write();
 			excel.close();

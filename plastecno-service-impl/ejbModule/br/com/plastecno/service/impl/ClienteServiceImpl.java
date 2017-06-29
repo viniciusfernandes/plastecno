@@ -422,7 +422,7 @@ public class ClienteServiceImpl implements ClienteService {
 			s.append("and p.dataEnvio <= :dtInatividade ");
 		}
 
-		s.append("order by p.dataEnvio desc ");
+		s.append(" order by p.dataEnvio desc ");
 
 		List<SituacaoPedido> lSit = new ArrayList<>();
 		lSit.add(SituacaoPedido.DIGITACAO);
@@ -456,10 +456,9 @@ public class ClienteServiceImpl implements ClienteService {
 			c.setDataUltimoPedidoFormatado(StringUtils.formatarData((Date) o[1]));
 			lCli.add(c);
 		}
-
-		for (Cliente cli : lCli) {
-			cli.formatarContatoPrincipal();
-		}
+		// Removendo a duplicacao de registros causados pelo join com os
+		// contatos
+		removerClienteDuplicado(lCli);
 		return lCli;
 	}
 

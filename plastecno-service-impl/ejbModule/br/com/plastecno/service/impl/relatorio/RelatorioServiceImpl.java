@@ -2,6 +2,7 @@ package br.com.plastecno.service.impl.relatorio;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -104,7 +105,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		cf.setBorder(Border.ALL, BorderLineStyle.THIN);
 		cf.setBackground(Colour.GREEN);
 		cf.setAlignment(Alignment.CENTRE);
-		
+
 		// Criando o header
 		sheet.addCell(new Label(0, 0, "Dt. COMRPA", cf));
 		sheet.addCell(new Label(1, 0, "CLIENTE", cf));
@@ -113,10 +114,47 @@ public class RelatorioServiceImpl implements RelatorioService {
 		sheet.addCell(new Label(4, 0, "EMAIL", cf));
 	}
 
+	private void formatarContatoPlanilha(List<Cliente> l) {
+		StringBuilder cNome = new StringBuilder();
+		StringBuilder cFone = new StringBuilder();
+		StringBuilder cEmail = new StringBuilder();
+
+		int tot = -1;
+		int i = 0;
+		Collection<? extends Contato> lCont = null;
+		for (Cliente c : l) {
+			lCont = c.getListaContato();
+			if (lCont == null || (tot = lCont.size()) == 0) {
+				continue;
+			}
+			i = tot - 1;
+			for (Contato ct : c.getListaContato()) {
+				cNome.append(ct.getNome());
+				cFone.append(ct.getTelefoneFormatado());
+				cEmail.append(ct.getEmail());
+				if (tot > 1 && i > 0) {
+					cNome.append("\n");
+					cFone.append("\n");
+					cEmail.append("\n");
+				}
+				i--;
+			}
+			c.setContatoFormatado(cNome.toString());
+			c.setTelefoneFormatado(cFone.toString());
+			c.setEmailFormatado(cEmail.toString());
+
+			cNome.delete(0, cNome.length());
+			cFone.delete(0, cFone.length());
+			cEmail.delete(0, cEmail.length());
+		}
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public byte[] gerarPlanilhaClienteVendedor(Integer idVendedor, boolean clienteInativo) throws BusinessException {
 		List<Cliente> l = gerarRelatorioClienteVendedor(idVendedor, clienteInativo);
+		formatarContatoPlanilha(l);
+
 		ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
 		try {
 			WritableWorkbook excel = Workbook.createWorkbook(out);
@@ -129,19 +167,16 @@ public class RelatorioServiceImpl implements RelatorioService {
 			WritableCellFormat cf = new WritableCellFormat(cellFont);
 			cf.setBorder(Border.ALL, BorderLineStyle.THIN);
 
-			// Vamos incluir as linhas a partir do indice row=1 pois row=0 eh o header da planilha
+			// Vamos incluir as linhas a partir do indice row=1 pois row=0 eh o
+			// header da planilha
 			int row = 0;
-			Contato ct = null;
 			for (Cliente c : l) {
 				++row;
 				sheet.addCell(new Label(0, row, c.getDataUltimoPedidoFormatado(), cf));
 				sheet.addCell(new Label(1, row, c.getNomeFantasia(), cf));
-				if ((ct = c.getContatoPrincipal()) == null) {
-					continue;
-				}
-				sheet.addCell(new Label(2, row, ct.getNome(), cf));
-				sheet.addCell(new Label(3, row, ct.getTelefoneFormatado(), cf));
-				sheet.addCell(new Label(4, row, ct.getEmail(), cf));
+				sheet.addCell(new Label(2, row, c.getContatoFormatado(), cf));
+				sheet.addCell(new Label(3, row, c.getTelefoneFormatado(), cf));
+				sheet.addCell(new Label(4, row, c.getEmailFormatado(), cf));
 			}
 			excel.write();
 			excel.close();
@@ -252,7 +287,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> gerarRelatorioClienteVendedor(Integer idVendedor, boolean clienteInativo)
 			throws BusinessException {
-		return clienteService.pesquisarClienteCompradorByIdVendedor(idVendedor, clienteInativo);
+		List<Cliente> l = clienteService.pesquisarClienteCompradorByIdVendedor(idVendedor, clienteInativo);
+		for (Cliente c : l) {
+			c.formatarContatoPrincipal();
+		}
+		return l;
 	}
 
 	@Override

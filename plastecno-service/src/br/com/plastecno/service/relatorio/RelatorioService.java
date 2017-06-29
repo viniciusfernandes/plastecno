@@ -22,6 +22,8 @@ import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 @Local
 public interface RelatorioService {
 
+	byte[] gerarPlanilhaClienteVendedor(Integer idVendedor, boolean clienteInativo) throws BusinessException;
+
 	ReceitaWrapper gerarReceitaEstimada(Periodo periodo);
 
 	RelatorioWrapper<String, Cliente> gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) throws BusinessException;

@@ -290,6 +290,10 @@ public abstract class AbstractController {
         return gerarDownload(bytesArquivo, nomeArquivo, "application/pdf;");
     }
 
+    Download gerarDownloadPlanilha(byte[] bytesArquivo, String nomeArquivo) {
+        return gerarDownload(bytesArquivo, nomeArquivo, "application/vnd.ms-excel;");
+    }
+
     Date gerarInicioMes() {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_MONTH, 1);

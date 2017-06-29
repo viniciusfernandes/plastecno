@@ -25,13 +25,13 @@ $(document).ready(function() {
 					parametro: 'nome', 
 					containerResultados: 'containerPesquisaVendedor',
 					selecionarItem: function (itemLista){
-						$('#idVendedor').val(itemLista.id);
+						$('#idVendedor, #idVendedorPlanilha').val(itemLista.id);
 					}
 				}
 		);
 	</c:if>
 	$('#chekboxClienteInativo').change(function (){
-		$('#formPesquisa #clienteInativo').val($(this).prop('checked'));
+		$('#formPesquisa #clienteInativo, #inativoPlanilha').val($(this).prop('checked'));
 	});
 }); 
 
@@ -60,20 +60,20 @@ $(document).ready(function() {
 		</div>
 	</fieldset>
 	<div class="bloco_botoes">
-		<form id="formPesquisa"
-			action="<c:url value="/relatorio/cliente/vendedor/listagem"/>"
-			method="get">
-			<input type="hidden" id="idVendedor" name="idVendedor"
-				value="${vendedor.id}" /> <input type="hidden" id="clienteInativo"
-				name="inativo" value="${inativo}" /> <input
-				type="submit" title="Pesquisar Clientes do Vendedor" value=""
-				class="botaoPesquisar" />
-
+		<form id="formPesquisa" action="<c:url value="/relatorio/cliente/vendedor/listagem"/>" method="get">
+			<input type="hidden" id="idVendedor" name="idVendedor" value="${vendedor.id}" />
+			<input type="hidden" id="clienteInativo" name="inativo" value="${inativo}" /> 
+			<input type="submit" title="Pesquisar Clientes do Vendedor" value="" class="botaoPesquisar" />
 		</form>
 		<form action="<c:url value="/relatorio/cliente/vendedor"/>"
 			method="get">
 			<input type="submit" value=""
 				title="Limpar Dados do Relatório de Clientes" class="botaoLimpar" />
+		</form>
+		<form action="<c:url value="/relatorio/cliente/vendedor/planilha"/>" method="get">
+			<input type="hidden" id="idVendedorPlanilha" name="idVendedor" value="${vendedor.id}" />
+			<input type="hidden" id="inativoPlanilha" name="inativo" value="${inativo}" />
+			<input type="submit" value="" title="Gerar Planilha de Clientes" class="botaoPlanilha" />
 		</form>
 	</div>
 

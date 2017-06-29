@@ -35,6 +35,17 @@ public class RelatorioClienteVendedorController extends AbstractController {
         super(result, usuarioInfo);
     }
 
+    @Get("relatorio/cliente/vendedor/planilha")
+    public Download dowanloadPlanilhaClienteVendedor(Integer idVendedor, boolean inativo) {
+        try {
+            return gerarDownloadPlanilha(relatorioService.gerarPlanilhaClienteVendedor(idVendedor, inativo),
+                    "planilha_clientes.xls");
+        } catch (BusinessException e) {
+            gerarLogErro("Geração da planilha de Cliente do Vendedor", e);
+            return null;
+        }
+    }
+
     @Get("relatorio/cliente/vendedor/pedido/pdf")
     public Download downloadPedidoPDF(Integer idPedido) {
         return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
@@ -49,9 +60,7 @@ public class RelatorioClienteVendedorController extends AbstractController {
                 titulo += ". Inativos desde " + StringUtils.formatarData(clienteService.gerarDataInatividadeCliente());
             }
             addAtributo("titulo", titulo);
-            addAtributo("listaCliente",
-                    relatorioService.gerarRelatorioClienteVendedor(idVendedor, inativo));
-
+            addAtributo("listaCliente", relatorioService.gerarRelatorioClienteVendedor(idVendedor, inativo));
             irRodapePagina();
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

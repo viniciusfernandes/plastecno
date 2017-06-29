@@ -422,7 +422,7 @@ public class ClienteServiceImpl implements ClienteService {
 			s.append("and p.dataEnvio <= :dtInatividade ");
 		}
 
-		s.append("order by p.cliente.nomeFantasia asc ");
+		s.append("order by p.dataEnvio desc ");
 
 		List<SituacaoPedido> lSit = new ArrayList<>();
 		lSit.add(SituacaoPedido.DIGITACAO);

@@ -1,5 +1,7 @@
 package br.com.plastecno.service.impl.relatorio;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -11,6 +13,11 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import jxl.Workbook;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.NFeService;
@@ -20,6 +27,7 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
@@ -75,6 +83,38 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@EJB
 	private UsuarioService usuarioService;
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public byte[] gerarPlanilhaClienteVendedor(Integer idVendedor, boolean clienteInativo) throws BusinessException {
+		List<Cliente> l = gerarRelatorioClienteVendedor(idVendedor, clienteInativo);
+		WritableWorkbook excel = null;
+		ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
+		try {
+			// excel = Workbook.createWorkbook(new
+			// File("C:\\Users\\vinicius\\ambiente_trabalho\\temp\\XXX.odt"));
+			excel = Workbook.createWorkbook(out);
+			WritableSheet sheet = excel.createSheet("Cliente", 0);
+			int row = -1;
+			Contato ct = null;
+			for (Cliente c : l) {
+				row++;
+				sheet.addCell(new Label(0, row, c.getDataUltimoPedidoFormatado()));
+				sheet.addCell(new Label(1, row, c.getNomeFantasia()));
+				if ((ct = c.getContatoPrincipal()) == null) {
+					continue;
+				}
+				sheet.addCell(new Label(2, row, ct.getNome()));
+				sheet.addCell(new Label(3, row, ct.getTelefoneFormatado()));
+				sheet.addCell(new Label(4, row, ct.getEmail()));
+			}
+			excel.write();
+			excel.close();
+		} catch (WriteException | IOException e) {
+			throw new BusinessException("Falha na geração da planilha excel dos clientes dos vendedores", e);
+		}
+		return out.toByteArray();
+	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)

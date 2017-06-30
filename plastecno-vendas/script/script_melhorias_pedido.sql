@@ -9,5 +9,4 @@ alter table vendas.tb_logradouro_representada add codigo_municipio varchar(10) d
 alter table vendas.tb_logradouro_transportadora  add codigo_municipio varchar(10) default null;
 alter table vendas.tb_logradouro_usuario add codigo_municipio varchar(10) default null;
 
-
-
+alter table vendas.tb_cliente ALTER COLUMN email SET DATA TYPE varchar(500);

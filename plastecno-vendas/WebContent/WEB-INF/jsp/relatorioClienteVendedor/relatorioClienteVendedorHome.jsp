@@ -25,13 +25,13 @@ $(document).ready(function() {
 					parametro: 'nome', 
 					containerResultados: 'containerPesquisaVendedor',
 					selecionarItem: function (itemLista){
-						$('#idVendedor').val(itemLista.id);
+						$('#idVendedor, #idVendedorPlanilha').val(itemLista.id);
 					}
 				}
 		);
 	</c:if>
 	$('#chekboxClienteInativo').change(function (){
-		$('#formPesquisa #clienteInativo').val($(this).prop('checked'));
+		$('#formPesquisa #clienteInativo, #inativoPlanilha').val($(this).prop('checked'));
 	});
 }); 
 
@@ -46,7 +46,7 @@ $(document).ready(function() {
 			Inativos:</div>
 		<div class="input" style="width: 60%">
 			<input type="checkbox" id="chekboxClienteInativo"
-				<c:if test="${pesquisaClienteInativo}">checked</c:if>
+				<c:if test="${inativo}">checked</c:if>
 				class="checkbox" />
 		</div>
 		<div class="label" style="width: 30%">Vendedor:</div>
@@ -60,20 +60,20 @@ $(document).ready(function() {
 		</div>
 	</fieldset>
 	<div class="bloco_botoes">
-		<form id="formPesquisa"
-			action="<c:url value="/relatorio/cliente/vendedor/listagem"/>"
-			method="get">
-			<input type="hidden" id="idVendedor" name="idVendedor"
-				value="${vendedor.id}" /> <input type="hidden" id="clienteInativo"
-				name="pesquisaClienteInativo" value="${pesquisaClienteInativo}" /> <input
-				type="submit" title="Pesquisar Clientes do Vendedor" value=""
-				class="botaoPesquisar" />
-
+		<form id="formPesquisa" action="<c:url value="/relatorio/cliente/vendedor/listagem"/>" method="get">
+			<input type="hidden" id="idVendedor" name="idVendedor" value="${vendedor.id}" />
+			<input type="hidden" id="clienteInativo" name="inativo" value="${inativo}" /> 
+			<input type="submit" title="Pesquisar Clientes do Vendedor" value="" class="botaoPesquisar" />
 		</form>
 		<form action="<c:url value="/relatorio/cliente/vendedor"/>"
 			method="get">
 			<input type="submit" value=""
 				title="Limpar Dados do Relatório de Clientes" class="botaoLimpar" />
+		</form>
+		<form action="<c:url value="/relatorio/cliente/vendedor/planilha"/>" method="get">
+			<input type="hidden" id="idVendedorPlanilha" name="idVendedor" value="${vendedor.id}" />
+			<input type="hidden" id="inativoPlanilha" name="inativo" value="${inativo}" />
+			<input type="submit" value="" title="Gerar Planilha de Clientes" class="botaoPlanilha" />
 		</form>
 	</div>
 
@@ -84,15 +84,17 @@ $(document).ready(function() {
 			<caption>${titulo}</caption>
 			<thead>
 				<tr>
-					<th style="width: 50%">Cliente</th>
-					<th style="width: 45%">Contato</th>
-					<th>Ações</th>
+					<th style="width: 10%">Últ. Ped.</th>
+					<th style="width: 25%">Cliente</th>
+					<th style="width: 65%">Contato</th>
+					<th style="width: 5%">Ações</th>
 				</tr>
 			</thead>
 
 			<tbody>
 				<c:forEach var="cliente" items="${listaCliente}">
 					<tr>
+						<td>${cliente.idUltimoPedido} - ${cliente.dataUltimoPedidoFormatado}</td>
 						<td>${cliente.nomeFantasia}</td>
 						<td>${cliente.contatoFormatado}</td>
 						<td>
@@ -101,6 +103,10 @@ $(document).ready(function() {
 									method="get">
 									<input type="submit" title="Vizualizar Dados do Cliente"
 										value="" class="botaoEditar" />
+								</form>
+								<form action="<c:url value="/relatorio/cliente/vendedor/pedido/pdf"/>" method="get">
+									<input type="hidden" name="idPedido" value="${cliente.idUltimoPedido}" />
+									<input type="submit" value="" title="Imprimir Pedido" class="botaoPdf_16" />
 								</form>
 							</div>
 						</td>

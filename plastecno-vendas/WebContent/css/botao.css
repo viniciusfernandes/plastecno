@@ -295,6 +295,14 @@
 	width: 24px;
 }
 
+.botaoPlanilha {
+	background: url("../images/sheet_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoProximo {
 	background: url("../images/next_24.png") no-repeat scroll 0 0
 		transparent;
@@ -581,6 +589,14 @@
 
 .botaoNF:hover {
 	background: url("../images/nf_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoPlanilha:hover {
+	background: url("../images/sheet_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 	height: 24px;

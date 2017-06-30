@@ -56,6 +56,10 @@ public class Cliente implements Serializable {
 	@Transient
 	private String dataUltimoContatoFormatada;
 
+	@Transient
+	// Esse atributo foi incluido para gerar relatorio de cliente inativo
+	private String dataUltimoPedidoFormatado;
+
 	@Column(name = "documento_estrangeiro")
 	@InformacaoValidavel(intervaloComprimento = { 0, 15 }, nomeExibicao = "Documento Estrangeiro")
 	private String documentoEstrangeiro;
@@ -67,10 +71,16 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email de cobrança do cliente")
 	private String emailCobranca;
 
+	@Transient
+	private String emailFormatado;
+
 	@Id
 	@SequenceGenerator(name = "clienteSequence", sequenceName = "vendas.seq_cliente_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clienteSequence")
 	private Integer id;
+
+	@Transient
+	private Integer idUltimoPedido;
 
 	@Column(name = "informacoes_adicionais")
 	private String informacoesAdicionais;
@@ -120,6 +130,9 @@ public class Cliente implements Serializable {
 	private String razaoSocial;
 
 	private String site;
+
+	@Transient
+	private String telefoneFormatado;
 
 	@Enumerated
 	@Column(name = "id_tipo_cliente")
@@ -284,6 +297,10 @@ public class Cliente implements Serializable {
 		return dataUltimoContatoFormatada;
 	}
 
+	public String getDataUltimoPedidoFormatado() {
+		return dataUltimoPedidoFormatado;
+	}
+
 	public String getDocumento() {
 		return this.isJuridico() ? this.cnpj : this.cpf;
 	}
@@ -300,8 +317,16 @@ public class Cliente implements Serializable {
 		return emailCobranca;
 	}
 
+	public String getEmailFormatado() {
+		return emailFormatado;
+	}
+
 	public Integer getId() {
 		return id;
+	}
+
+	public Integer getIdUltimoPedido() {
+		return idUltimoPedido;
 	}
 
 	public String getInformacoesAdicionais() {
@@ -354,6 +379,10 @@ public class Cliente implements Serializable {
 
 	public String getSite() {
 		return site;
+	}
+
+	public String getTelefoneFormatado() {
+		return telefoneFormatado;
 	}
 
 	public TipoCliente getTipoCliente() {
@@ -429,6 +458,10 @@ public class Cliente implements Serializable {
 		this.dataUltimoContatoFormatada = dataUltimoContatoFormatada;
 	}
 
+	public void setDataUltimoPedidoFormatado(String dataUltimoPedidoFormatado) {
+		this.dataUltimoPedidoFormatado = dataUltimoPedidoFormatado;
+	}
+
 	public void setDocumentoEstrangeiro(String documentoEstrangeiro) {
 		this.documentoEstrangeiro = documentoEstrangeiro;
 	}
@@ -441,8 +474,16 @@ public class Cliente implements Serializable {
 		this.emailCobranca = emailCobranca;
 	}
 
+	public void setEmailFormatado(String emailFormatado) {
+		this.emailFormatado = emailFormatado;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public void setIdUltimoPedido(Integer idUltimoPedido) {
+		this.idUltimoPedido = idUltimoPedido;
 	}
 
 	public void setInformacoesAdicionais(String informacoesAdicionais) {
@@ -491,6 +532,10 @@ public class Cliente implements Serializable {
 
 	public void setSite(String site) {
 		this.site = site;
+	}
+
+	public void setTelefoneFormatado(String telefoneFormatado) {
+		this.telefoneFormatado = telefoneFormatado;
 	}
 
 	public void setTipoCliente(TipoCliente tipoCliente) {

@@ -15,5 +15,6 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/plastecno-sistema/lib/jxl-2.6.12.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

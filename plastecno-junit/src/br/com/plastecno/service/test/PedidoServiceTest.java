@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +43,7 @@ import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.test.builder.ServiceBuilder;
+import br.com.plastecno.util.StringUtils;
 
 public class PedidoServiceTest extends AbstractTest {
 
@@ -1780,6 +1783,68 @@ public class PedidoServiceTest extends AbstractTest {
 		pedidoRevenda = pedidoService.pesquisarPedidoById(pedidoRevenda.getId());
 		assertEquals("O pedido deve aguardar nova encomenda dos itens apos a reencomenda no empacotamento",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, pedidoRevenda.getSituacaoPedido());
+	}
+
+	@Test
+	public void testReenvioEmailPedido() {
+		Pedido pedido = gerarPedidoClienteProspectado();
+		Integer idPedido = null;
+		try {
+			idPedido = pedidoService.inserir(pedido).getId();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		ItemPedido i = gerarItemPedido();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, i);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		Date dtEnvio = pedido.getDataEnvio();
+		// Aqui precisamos alterar a data de envio do pedido para simular um
+		// envio em data posterior
+		Calendar c = Calendar.getInstance();
+		c.setTime(dtEnvio);
+		c.add(Calendar.MONTH, -2);
+		c.add(Calendar.DAY_OF_MONTH, -10);
+		pedido.setDataEnvio(c.getTime());
+		try {
+			pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		// Adicionando um novo item para reenvio
+		i = gerarItemPedido();
+		i.setFormaMaterial(FormaMaterial.CH);
+		i.setQuantidade(70);
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, i);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		Date dtReenvio = pedido.getDataEnvio();
+		assertNotEquals("Apos o reenvio de um pedido a data de envio nao pode ser alterada",
+				StringUtils.formatarData(dtReenvio), StringUtils.formatarData(dtEnvio));
 	}
 
 	@Test

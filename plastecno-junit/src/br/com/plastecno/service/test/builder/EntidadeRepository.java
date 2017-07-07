@@ -203,8 +203,9 @@ public class EntidadeRepository {
 				}
 
 				T remov = null;
-				id.setAccessible(true);
+
 				for (Object obj : l) {
+					id.setAccessible(true);
 					try {
 						if (idVal.equals(id.get(obj))) {
 							mapaEntidades.get(t.getClass()).remove(obj);
@@ -218,7 +219,7 @@ public class EntidadeRepository {
 					} finally {
 						id.setAccessible(false);
 					}
-
+					id.setAccessible(false);
 				}
 
 				return remov;

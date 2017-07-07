@@ -539,6 +539,23 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private void enviarCompra(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
+
+		try {
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, arquivoAnexado, TipoMensagemPedido.COMPRA));
+		} catch (NotificacaoException e) {
+			StringBuilder mensagem = new StringBuilder();
+			mensagem.append("Falha no envio do pedido de compra No. ").append(pedido.getId()).append(" do comprador ")
+					.append(pedido.getComprador().getNomeCompleto()).append(" para o cliente ")
+					.append(pedido.getCliente().getNomeCompleto())
+					.append(" e contato feito por " + pedido.getContato().getNome());
+
+			e.addMensagem(e.getListaMensagem());
+			throw e;
+		}
+	}
+
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
 		Contato contato = pedido.getContato();
 		if (StringUtils.isEmpty(contato.getEmail())) {
@@ -567,23 +584,6 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 	}
 
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private void enviarCompra(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
-
-		try {
-			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, arquivoAnexado, TipoMensagemPedido.COMPRA));
-		} catch (NotificacaoException e) {
-			StringBuilder mensagem = new StringBuilder();
-			mensagem.append("Falha no envio do pedido de compra No. ").append(pedido.getId()).append(" do comprador ")
-					.append(pedido.getComprador().getNomeCompleto()).append(" para o cliente ")
-					.append(pedido.getCliente().getNomeCompleto())
-					.append(" e contato feito por " + pedido.getContato().getNome());
-
-			e.addMensagem(e.getListaMensagem());
-			throw e;
-		}
-	}
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException {
@@ -599,7 +599,11 @@ public class PedidoServiceImpl implements PedidoService {
 		 * alterado os dados de logradouro
 		 */
 		pedido.addLogradouro(gerarLogradouroPedidoByIdCliente(pedido.getCliente().getId()));
-		pedido.setDataEnvio(new Date());
+		// A data de emissao nao pode ser alterada pois dara conflito no calculo
+		// de comissao de vendas
+		if (pedido.getDataEnvio() == null) {
+			pedido.setDataEnvio(new Date());
+		}
 
 		validarEnvio(pedido);
 
@@ -1773,8 +1777,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		final BusinessException exception = new BusinessException();
-		if (SituacaoPedido.CANCELADO.equals(pedido.getSituacaoPedido())
-				|| SituacaoPedido.ENVIADO.equals(pedido.getSituacaoPedido())) {
+		if (SituacaoPedido.CANCELADO.equals(pedido.getSituacaoPedido())) {
 			exception.addMensagem("Pedido cancelado ou enviado não pode ser enviado para as representadas");
 		}
 

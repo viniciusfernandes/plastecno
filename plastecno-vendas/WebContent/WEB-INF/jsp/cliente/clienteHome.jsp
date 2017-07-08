@@ -19,6 +19,8 @@
 <script type="text/javascript" src="<c:url value="/js/logradouro.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bloco/contato.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+
 
 <script type="text/javascript">
 
@@ -102,6 +104,7 @@ $(document).ready(function() {
 		$('#formVazio').attr('action', url).submit();
 	});
 	
+	inserirMascaraData('dataNascimento');
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
@@ -271,9 +274,14 @@ function remover(codigo, nome) {
 				value="${cliente.documentoEstrangeiro}" maxlength="15" style="width: 40%" />
 			</div>
 			<div class="label">CPF:</div>
-			<div class="input" style="width: 80%">
+			<div class="input" style="width: 20%">
 				<input type="text" id="cpf" name="cliente.cpf"
-					value="${cliente.cpf}" class="pesquisavel" style="width: 25%" />
+					value="${cliente.cpf}" class="pesquisavel" style="width: 100%" />
+			</div>
+			<div class="label">Dt. Nasc.:</div>
+			<div class="input" style="width: 40%">
+				<input type="text" id="dataNascimento" name="cliente.dataNascimento" 
+				value="${cliente.dataNascimentoFormatada}" maxlength="15" style="width: 40%" />
 			</div>
 			<div class="label obrigatorio">Email Envio NFe:</div>
 			<div class="input" style="width: 20%">

@@ -74,7 +74,6 @@ public class ClienteController extends AbstractController {
         addAtributo("listaRamoAtividade", this.ramoAtividadeService.pesquisarAtivo());
 
         inicializarComboTipoLogradouro();
-
         // bloqueando alteracao dos dados do usuario por outro vendedor nao
         // associado
         final Cliente cliente = (Cliente) getAtributo("cliente");
@@ -159,6 +158,9 @@ public class ClienteController extends AbstractController {
         } catch (Exception e) {
             gerarLogErro("inclusao/alteracao de cliente", e);
         }
+
+        cliente.setDataNascimentoFormatada(StringUtils.formatarData(cliente.getDataNascimento()));
+
         if (isRevendedor) {
             redirecTo(this.getClass()).revendedorHome();
         } else {
@@ -196,25 +198,29 @@ public class ClienteController extends AbstractController {
     @Get("cliente/{idCliente}")
     public void pesquisarClienteById(Integer idCliente, boolean isRevendedor) {
         Cliente cliente = clienteService.pesquisarById(idCliente);
-        this.carregarVendedor(cliente);
+        if (cliente != null) {
+            cliente.setDataNascimentoFormatada(StringUtils.formatarData(cliente.getDataNascimento()));
+            carregarVendedor(cliente);
 
-        try {
-            popularPicklist(null, clienteService.pesquisarTransportadorasRedespacho(idCliente));
-        } catch (ControllerException e) {
-            gerarLogErroNavegacao("Cliente", e);
+            try {
+                popularPicklist(null, clienteService.pesquisarTransportadorasRedespacho(idCliente));
+            } catch (ControllerException e) {
+                gerarLogErroNavegacao("Cliente", e);
+            }
+
+            if (cliente.getDataUltimoContato() != null) {
+                addAtributo("ultimoContato", formatarData(cliente.getDataUltimoContato()));
+            }
+
+            addAtributo("cliente", cliente);
+            addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade()
+                    .getId() : "");
+            addAtributo("listaLogradouro", clienteService.pesquisarLogradouroCliente(idCliente));
+            addAtributo("listaContato", clienteService.pesquisarContato(idCliente));
+            addAtributo("comentarios", formatarComentarios(idCliente));
+            addAtributo("tipoCliente", cliente.getTipoCliente());
         }
 
-        if (cliente.getDataUltimoContato() != null) {
-            addAtributo("ultimoContato", formatarData(cliente.getDataUltimoContato()));
-        }
-
-        addAtributo("cliente", cliente);
-        addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade().getId()
-                : "");
-        addAtributo("listaLogradouro", clienteService.pesquisarLogradouroCliente(idCliente));
-        addAtributo("listaContato", clienteService.pesquisarContato(idCliente));
-        addAtributo("comentarios", formatarComentarios(idCliente));
-        addAtributo("tipoCliente", cliente.getTipoCliente());
         if (isRevendedor) {
             redirecTo(this.getClass()).revendedorHome();
         } else {

@@ -433,7 +433,7 @@ public abstract class AbstractController {
     }
 
     Object getAtributo(String nomeAtributo) {
-        return this.result.included().get(nomeAtributo);
+        return result.included().get(nomeAtributo);
     }
 
     Integer getCodigoUsuario() {

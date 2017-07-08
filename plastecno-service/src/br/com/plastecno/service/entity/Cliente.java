@@ -50,7 +50,14 @@ public class Cliente implements Serializable {
 	private String cpf;
 
 	@Temporal(TemporalType.DATE)
-	@Column(name = "data_ultimo_contato ")
+	@Column(name = "data_nascimento")
+	private Date dataNascimento;
+
+	@Transient
+	private String dataNascimentoFormatada;
+
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_ultimo_contato")
 	private Date dataUltimoContato;
 
 	@Transient
@@ -289,6 +296,14 @@ public class Cliente implements Serializable {
 		return cpf;
 	}
 
+	public Date getDataNascimento() {
+		return dataNascimento;
+	}
+
+	public String getDataNascimentoFormatada() {
+		return dataNascimentoFormatada;
+	}
+
 	public Date getDataUltimoContato() {
 		return dataUltimoContato;
 	}
@@ -448,6 +463,14 @@ public class Cliente implements Serializable {
 
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
+	}
+
+	public void setDataNascimento(Date dataNascimento) {
+		this.dataNascimento = dataNascimento;
+	}
+
+	public void setDataNascimentoFormatada(String dataNascimentoFormatada) {
+		this.dataNascimentoFormatada = dataNascimentoFormatada;
 	}
 
 	public void setDataUltimoContato(Date dataUltimoContato) {

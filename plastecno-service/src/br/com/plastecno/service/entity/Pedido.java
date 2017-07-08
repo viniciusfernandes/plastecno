@@ -55,6 +55,9 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Contato do pedido")
 	private Contato contato;
 
+	@Transient
+	private String contatoFormatado;
+
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_emissao_nf")
 	private Date dataEmissaoNF;
@@ -305,6 +308,14 @@ public class Pedido implements Serializable, Cloneable {
 		return o instanceof Pedido && id != null && id.equals(((Pedido) o).id);
 	}
 
+	public void formatarContato() {
+		if (contato == null) {
+			setContatoFormatado(null);
+			return;
+		}
+		setContatoFormatado(contato.formatar());
+	}
+
 	public Double getAliquotaComissaoRepresentada() {
 		return aliquotaComissaoRepresentada;
 	}
@@ -319,6 +330,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public Contato getContato() {
 		return contato;
+	}
+
+	public String getContatoFormatado() {
+		return contatoFormatado;
 	}
 
 	public Date getDataEmissaoNF() {
@@ -551,6 +566,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setContato(Contato contato) {
 		this.contato = contato;
+	}
+
+	public void setContatoFormatado(String contatoFormatado) {
+		this.contatoFormatado = contatoFormatado;
 	}
 
 	public void setDataEmissaoNF(Date dataEmissaoNF) {

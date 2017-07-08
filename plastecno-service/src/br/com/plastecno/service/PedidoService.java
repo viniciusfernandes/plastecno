@@ -8,6 +8,7 @@ import javax.ejb.Local;
 
 import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.LogradouroPedido;
@@ -171,6 +172,8 @@ public interface PedidoService {
 	List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo);
 
 	List<LogradouroPedido> pesquisarLogradouro(Integer idPedido);
+
+	List<LogradouroPedido> pesquisarLogradouro(Integer idPedido, TipoLogradouro tipo);
 
 	String pesquisarNomeVendedorByIdPedido(Integer idPedido);
 

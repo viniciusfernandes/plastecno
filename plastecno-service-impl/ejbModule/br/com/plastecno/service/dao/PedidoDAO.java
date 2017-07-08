@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -249,10 +250,21 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return query.getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<LogradouroPedido> pesquisarLogradouro(Integer idPedido) {
-		return entityManager.createQuery("select l from LogradouroPedido l where l.pedido.id = :idPedido")
-				.setParameter("idPedido", idPedido).getResultList();
+		return pesquisarLogradouro(idPedido, null);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<LogradouroPedido> pesquisarLogradouro(Integer idPedido, TipoLogradouro tipo) {
+		StringBuilder s = new StringBuilder("select l from LogradouroPedido l where l.pedido.id = :idPedido ");
+		if (tipo != null) {
+			s.append(" and l.tipoLogradouro =:tipo ");
+		}
+		Query q = entityManager.createQuery(s.toString()).setParameter("idPedido", idPedido);
+		if (tipo != null) {
+			q.setParameter("tipo", tipo);
+		}
+		return q.getResultList();
 	}
 
 	public Integer pesquisarMaxSequenciaItemPedido(Integer idPedido) {

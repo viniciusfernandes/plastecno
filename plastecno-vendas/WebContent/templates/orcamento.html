@@ -79,6 +79,8 @@
 				<td>{pedido.finalidadePedido.descricao}</td>
 				<td class="label">Pagamento:</td>
 				<td>{pedido.formaPagamento}</td>
+				<td class="label">Validade:</td>
+				<td>7 dias</td>
 			</tr>
 			<tr>
 				<td class="label">Tip. Entr.:</td>
@@ -88,132 +90,14 @@
 				<td class="label">Data Entrega:</td>
 				<td>{pedido.dataEntregaFormatada}</td>
 			</tr>
-			<tr>
-				<td class="label">SUFRAMA:</td>
-				<td colspan="2">{pedido.cliente.inscricaoSUFRAMA}</td>
-			</tr>
 		</tbody>
 	</table>
-	<table class="listagem">
-		<thead>
-			<tr>
-				<th class="descricaoTabela" >Observações</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td class="informacaoAdicional">{pedido.observacao}</td>
-			</tr>
-		</tbody>
-	</table>
-	<table class="listagem">
-		<thead>
-			<tr>
-				<th class="descricaoTabela" >Observações Produção</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td class="informacaoAdicional">{pedido.observacaoProducao}</td>
-			</tr>
-		</tbody>
-	</table>
-	<table>
-		<thead>
-			<tr>
-				<th colspan="6">Dados do Contato</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td class="label">Contato:</td>
-				<td>{pedido.contato.nome}</td>
-				<td class="label">Email:</td>
-				<td>{pedido.contato.email}</td>
-				<td class="label">Departamento:</td>
-				<td>{pedido.contato.departamento}</td>
-			</tr>
-			<tr>
-				<td class="label">Tel.:</td>
-				<td>{pedido.contato.telefoneFormatado}</td>
-				<td class="label">Ramal:</td>
-				<td>{pedido.contato.ramal}</td>
-				<td class="label">Fax:</td>
-				<td>{pedido.contato.faxComHifen}</td>
-			</tr>
-			<tr>
-				<td class="label">Cel.:</td>
-				<td colspan="4" style="align: left">{pedido.contato.telefoneSecundarioFormatado}</td>
-			</tr>
-		</tbody>
-	</table>
-	<table>
-		<thead>
-			<tr>
-				<th colspan="2">Lista de Endereços</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td class="label">End. Fat.:</td>
-				<td>{logradouroFaturamento}</td>
-			</tr>
-			<tr>
-				<td class="label">End. Cob.:</td>
-				<td>{logradouroCobranca}</td>
-			</tr>
-			<tr>
-				<td class="label">End. Ent.:</td>
-				<td>{logradouroEntrega}</td>
-			</tr>
-		</tbody>
-	</table>
-	<table>
-		<thead>
-			<tr>
-				<th colspan="8">Transportadora</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td class="label">Transport.:</td>
-				<td>{pedido.transportadora.nomeFantasia}</td>
-				<td class="label">CNPJ:</td>
-				<td>{pedido.transportadora.cnpj}</td>
-				<td class="label">Insc. Estad.:</td>
-				<td>{pedido.transportadora.inscricaoEstadual}</td>
-				<td class="label">Contato:</td>
-				<td>{pedido.transportadora.contatoPrincipal.nome} -
-					{pedido.transportadora.contatoPrincipal.email} -
-					{pedido.transportadora.contatoPrincipal.telefoneFormatado}</td>
-			</tr>
-			<tr>
-				<td class="label">End. Transp.</td>
-				<td colspan="7">{pedido.transportadora.logradouro.descricao}</td>
-			</tr>
-			<tr>
-				<td class="label">Redesp.:</td>
-				<td>{pedido.transportadoraRedespacho.nomeFantasia}</td>
-				<td class="label">CNPJ:</td>
-				<td>{pedido.transportadoraRedespacho.cnpj}</td>
-				<td class="label">Insc. Estad.:</td>
-				<td>{pedido.transportadoraRedespacho.inscricaoEstadual}</td>
-				<td class="label">Contato:</td>
-				<td>{pedido.transportadoraRedespacho.contatoPrincipal.nome} -
-					{pedido.transportadoraRedespacho.contatoPrincipal.email} -
-					{pedido.transportadoraRedespacho.contatoPrincipal.telefoneFormatado}</td>
-			</tr>
-			<tr>
-				<td class="label">End. Redesp.</td>
-				<td colspan="7">{pedido.transportadoraRedespacho.logradouro.descricao}</td>
-			</tr>
-		</tbody>
-	</table>
+	
 	<table class="listagem">
 		<thead>
 			<tr>
 				<th class="descricaoTabela" colspan="11">Lista de Itens do
-					Pedido</th>
+					Orçamento</th>
 			</tr>
 		</thead>
 		<thead>
@@ -249,24 +133,6 @@
 					{pedido.valorPedidoIPIFormatado}</td>
 			</tr>
 		</tfoot>
-	</table>
-	<table class="listagem">
-		<thead>
-			<tr>
-				<th class="descricaoTabela">Informações Adicionais</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td class="informacaoAdicional">Informar o número deste pedido de compras em sua nota fiscal eletrônica.</td>
-			</tr>
-			<tr>
-				<td class="informacaoAdicional">Enviar a nota fiscal eletrônica (XML e PDF) para <i style="text-decoration: underline;">plastecno@plastecno.com.br</i></td>
-			</tr>
-			<tr>
-				<td class="informacaoAdicional">Horário de recebimento de mercadorias : segundas as sextas feiras, das 8 às 17:30 horas (sem intervalo de almoço).</td>
-			</tr>
-		</tbody>
 	</table>
 </body>
 </html>

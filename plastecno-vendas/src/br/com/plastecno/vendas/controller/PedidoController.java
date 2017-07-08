@@ -42,6 +42,7 @@ import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.GrupoWrapper;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.NumeroUtils;
+import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ClienteJson;
 import br.com.plastecno.vendas.json.ItemPedidoJson;
@@ -174,7 +175,7 @@ public class PedidoController extends AbstractController {
         addAtributo("proprietario", cliente.getVendedor());
         addAtributo("listaTransportadora", transportadoraService.pesquisar());
         addAtributo("listaRedespacho", clienteService.pesquisarTransportadorasRedespacho(idCliente));
-        
+
         pedidoVendaHome();
     }
 
@@ -299,47 +300,51 @@ public class PedidoController extends AbstractController {
                     + " pois não existe no sistema");
         }
 
-        pedido.setListaLogradouro(pedidoService.pesquisarLogradouro(idPedido));
-
         final List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 
         formatarItemPedido(listaItem);
         formatarPedido(pedido);
+        formatarDocumento(pedido.getCliente());
 
-        Cliente cliente = pedido.getCliente();
-        formatarDocumento(cliente);
-        cliente.setListaLogradouro(clienteService.pesquisarLogradouroCliente(cliente.getId()));
-
-        Transportadora transportadora = pedido.getTransportadora();
-        if (transportadora != null) {
-            transportadora.setListaContato(transportadoraService.pesquisarContato(transportadora.getId()));
-            transportadora.setLogradouro(transportadoraService.pesquisarLogradorouro(transportadora.getId()));
-        }
-
-        transportadora = pedido.getTransportadoraRedespacho();
-        if (transportadora != null) {
-            transportadora.setListaContato(transportadoraService.pesquisarContato(transportadora.getId()));
-            transportadora.setLogradouro(transportadoraService.pesquisarLogradorouro(transportadora.getId()));
-        }
-
-        final LogradouroPedido logradouroFaturamento = recuperarLogradouro(pedido, TipoLogradouro.FATURAMENTO);
-        final LogradouroPedido logradouroEntrega = recuperarLogradouro(pedido, TipoLogradouro.ENTREGA);
-        final LogradouroPedido logradouroCobranca = recuperarLogradouro(pedido, TipoLogradouro.COBRANCA);
-
+        String template = pedido.isOrcamento() ? "orcamento.html" : "pedido.html";
         String tipo = pedido.isVenda() ? "Venda" : "Compra";
+        String titulo = pedido.isOrcamento() ? "Orçamento de " + tipo : "Pedido de " + tipo;
+        if (pedido.isOrcamento()) {
+            titulo += " No. " + pedido.getId() + " - " + StringUtils.formatarData(pedido.getDataEnvio());
+            pedido.formatarContato();
+            pedido.setListaLogradouro(pedidoService.pesquisarLogradouro(idPedido, TipoLogradouro.FATURAMENTO));
+        } else {
+            pedido.setListaLogradouro(pedidoService.pesquisarLogradouro(idPedido));
+            Transportadora transportadora = pedido.getTransportadora();
+            if (transportadora != null) {
+                transportadora.setListaContato(transportadoraService.pesquisarContato(transportadora.getId()));
+                transportadora.setLogradouro(transportadoraService.pesquisarLogradorouro(transportadora.getId()));
+            }
+
+            transportadora = pedido.getTransportadoraRedespacho();
+            if (transportadora != null) {
+                transportadora.setListaContato(transportadoraService.pesquisarContato(transportadora.getId()));
+                transportadora.setLogradouro(transportadoraService.pesquisarLogradorouro(transportadora.getId()));
+            }
+            final LogradouroPedido logradouroEntrega = recuperarLogradouro(pedido, TipoLogradouro.ENTREGA);
+            final LogradouroPedido logradouroCobranca = recuperarLogradouro(pedido, TipoLogradouro.COBRANCA);
+            addAtributoPDF("logradouroEntrega", logradouroEntrega != null ? logradouroEntrega.getDescricao() : "");
+            addAtributoPDF("logradouroCobranca", logradouroCobranca != null ? logradouroCobranca.getDescricao() : "");
+        }
+
+        LogradouroPedido logradouroFaturamento = recuperarLogradouro(pedido, TipoLogradouro.FATURAMENTO);
 
         addAtributoPDF("tipoRelacionamento", pedido.isVenda() ? "Represent." : "Forneced.");
         addAtributoPDF("tipoProprietario", pedido.isVenda() ? "Vendedor" : "Comprador");
-        addAtributoPDF("titulo", pedido.isOrcamento() ? "Orçamento de " + tipo : "Pedido de " + tipo);
+        addAtributoPDF("titulo", titulo);
         addAtributoPDF("tipoPedido", tipo);
         addAtributoPDF("pedido", pedido);
         addAtributoPDF("logradouroFaturamento", logradouroFaturamento != null ? logradouroFaturamento.getDescricao()
                 : "");
-        addAtributoPDF("logradouroEntrega", logradouroEntrega != null ? logradouroEntrega.getDescricao() : "");
-        addAtributoPDF("logradouroCobranca", logradouroCobranca != null ? logradouroCobranca.getDescricao() : "");
+
         addAtributoPDF("listaItem", listaItem);
 
-        processarPDF("pedido.html");
+        processarPDF(template);
         return new PedidoPDFWrapper(pedido, gerarPDF());
     }
 

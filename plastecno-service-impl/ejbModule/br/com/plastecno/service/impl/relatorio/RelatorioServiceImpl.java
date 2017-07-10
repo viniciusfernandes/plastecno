@@ -2,7 +2,6 @@ package br.com.plastecno.service.impl.relatorio;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -98,9 +97,9 @@ public class RelatorioServiceImpl implements RelatorioService {
 		sheet.setColumnView(3, 40);
 		sheet.setColumnView(4, 150);
 
-		WritableFont cellFont = new WritableFont(WritableFont.TIMES, 10);
+		WritableFont cellFont = new WritableFont(WritableFont.TIMES, 12);
 		cellFont.setColour(Colour.WHITE);
-
+		
 		WritableCellFormat cf = new WritableCellFormat(cellFont);
 		cf.setBorder(Border.ALL, BorderLineStyle.THIN);
 		cf.setBackground(Colour.GREEN);
@@ -114,46 +113,10 @@ public class RelatorioServiceImpl implements RelatorioService {
 		sheet.addCell(new Label(4, 0, "EMAIL", cf));
 	}
 
-	private void formatarContatoPlanilha(List<Cliente> l) {
-		StringBuilder cNome = new StringBuilder();
-		StringBuilder cFone = new StringBuilder();
-		StringBuilder cEmail = new StringBuilder();
-
-		int tot = -1;
-		int i = 0;
-		Collection<? extends Contato> lCont = null;
-		for (Cliente c : l) {
-			lCont = c.getListaContato();
-			if (lCont == null || (tot = lCont.size()) == 0) {
-				continue;
-			}
-			i = tot - 1;
-			for (Contato ct : c.getListaContato()) {
-				cNome.append(ct.getNome());
-				cFone.append(ct.getTelefoneFormatado());
-				cEmail.append(ct.getEmail());
-				if (tot > 1 && i > 0) {
-					cNome.append("\n");
-					cFone.append("\n");
-					cEmail.append("\n");
-				}
-				i--;
-			}
-			c.setContatoFormatado(cNome.toString());
-			c.setTelefoneFormatado(cFone.toString());
-			c.setEmailFormatado(cEmail.toString());
-
-			cNome.delete(0, cNome.length());
-			cFone.delete(0, cFone.length());
-			cEmail.delete(0, cEmail.length());
-		}
-	}
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public byte[] gerarPlanilhaClienteVendedor(Integer idVendedor, boolean clienteInativo) throws BusinessException {
 		List<Cliente> l = gerarRelatorioClienteVendedor(idVendedor, clienteInativo);
-		formatarContatoPlanilha(l);
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
 		try {
@@ -161,22 +124,42 @@ public class RelatorioServiceImpl implements RelatorioService {
 			WritableSheet sheet = excel.createSheet("Contato Cliente", 0);
 			configurarPlanilha(sheet);
 
-			WritableFont cellFont = new WritableFont(WritableFont.TIMES, 10);
-			cellFont.setColour(Colour.BLACK);
+			WritableFont f1 = new WritableFont(WritableFont.TIMES, 10);
+			f1.setColour(Colour.BLACK);
+			WritableCellFormat cf1 = new WritableCellFormat(f1);
+			cf1.setBorder(Border.ALL, BorderLineStyle.THIN);
 
-			WritableCellFormat cf = new WritableCellFormat(cellFont);
-			cf.setBorder(Border.ALL, BorderLineStyle.THIN);
+			WritableFont f2 = new WritableFont(WritableFont.TIMES, 10);
+			f2.setColour(Colour.BLACK);
+			WritableCellFormat cf2 = new WritableCellFormat(f2);
+			cf2.setBorder(Border.ALL, BorderLineStyle.THIN);
+			cf2.setBackground(Colour.GREY_25_PERCENT);
 
 			// Vamos incluir as linhas a partir do indice row=1 pois row=0 eh o
 			// header da planilha
 			int row = 0;
+			int cont = -1;
+			WritableCellFormat cf = null;
+
 			for (Cliente c : l) {
-				++row;
-				sheet.addCell(new Label(0, row, c.getDataUltimoPedidoFormatado(), cf));
-				sheet.addCell(new Label(1, row, c.getNomeFantasia(), cf));
-				sheet.addCell(new Label(2, row, c.getContatoFormatado(), cf));
-				sheet.addCell(new Label(3, row, c.getTelefoneFormatado(), cf));
-				sheet.addCell(new Label(4, row, c.getEmailFormatado(), cf));
+				cf = ++cont % 2 == 0 ? cf1 : cf2;
+				if (!c.contemContato()) {
+					++row;
+					sheet.addCell(new Label(0, row, c.getDataUltimoPedidoFormatado(), cf));
+					sheet.addCell(new Label(1, row, c.getNomeFantasia(), cf));
+					sheet.addCell(new Label(2, row, "", cf));
+					sheet.addCell(new Label(3, row, "", cf));
+					sheet.addCell(new Label(4, row, "", cf));
+				} else {
+					for (Contato ct : c.getListaContato()) {
+						++row;
+						sheet.addCell(new Label(0, row, c.getDataUltimoPedidoFormatado(), cf));
+						sheet.addCell(new Label(1, row, c.getNomeFantasia(), cf));
+						sheet.addCell(new Label(2, row, ct.getNome(), cf));
+						sheet.addCell(new Label(3, row, ct.getDDDTelefoneFormatado(), cf));
+						sheet.addCell(new Label(4, row, ct.getEmail(), cf));
+					}
+				}
 			}
 			excel.write();
 			excel.close();

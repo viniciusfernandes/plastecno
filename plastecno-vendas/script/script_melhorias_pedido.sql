@@ -12,3 +12,4 @@ alter table vendas.tb_logradouro_usuario add codigo_municipio varchar(10) defaul
 alter table vendas.tb_cliente ALTER COLUMN email SET DATA TYPE varchar(500);
 
 alter table vendas.tb_cliente add data_nascimento date default null;
+alter table vendas.tb_pedido add valor_frete numeric(10,2) default 0;

@@ -936,7 +936,7 @@ function gerarJsonTipoIcms(){
 };
 
 function gerarJsonIcmsInterestadual(){
-	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.icmsInterestadual',
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icmsInterestadual',
 		'campos':[{'nome':'valorBCUFDestino', 'id':'valorBCICMSInter'},
 		          {'nome':'percentualFCPDestino', 'id':'percFCPDestICMSInter'},
 		          {'nome':'aliquotaUFDestino', 'id':'aliquotaUFDestICMSInter'},

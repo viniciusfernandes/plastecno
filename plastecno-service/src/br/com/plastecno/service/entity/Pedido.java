@@ -169,6 +169,9 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(nomeExibicao = "Redespacho do pedido")
 	private Transportadora transportadoraRedespacho;
 
+	@Column(name = "valor_frete")
+	private Double valorFrete;
+
 	@Column(name = "valor_parcela_nf")
 	private Double valorParcelaNF;
 
@@ -452,6 +455,10 @@ public class Pedido implements Serializable, Cloneable {
 		return transportadoraRedespacho;
 	}
 
+	public Double getValorFrete() {
+		return valorFrete;
+	}
+
 	public Double getValorParcelaNF() {
 		return valorParcelaNF;
 	}
@@ -692,6 +699,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setTransportadoraRedespacho(Transportadora transportadoraRedespacho) {
 		this.transportadoraRedespacho = transportadoraRedespacho;
+	}
+
+	public void setValorFrete(Double valorFrete) {
+		this.valorFrete = valorFrete;
 	}
 
 	public void setValorParcelaNF(Double valorParcelaNF) {

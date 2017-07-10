@@ -243,10 +243,14 @@ function pesquisarNcm(){
 	</div>
 	<c:if test="${acessoDadosNotaFiscalPermitido}">
 		<div class="label" >NCM:</div>
-		<div class="input" style="width: 10%">
-			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}"/>
+		<div class="input" style="width: 80%">
+			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}" style="width: 10%"/>
 		</div>
 	</c:if>
+	<div class="label" >Tot. Frete (R$):</div>
+		<div class="input" style="width: 10%">
+			<input type="text" id="totalFrete" name="pedido.valorFrete" value="${pedido.valorFrete}"/>
+		</div>
 	
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">

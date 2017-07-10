@@ -272,6 +272,10 @@ public class Cliente implements Serializable {
 		this.listaRedespacho.add(transportadora);
 	}
 
+	public boolean contemContato() {
+		return listaContato != null && listaContato.size() > 0;
+	}
+
 	public void formatarContatoPrincipal() {
 		Contato c = getContatoPrincipal();
 		if (c == null) {

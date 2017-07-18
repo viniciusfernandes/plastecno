@@ -383,8 +383,7 @@ $(document).ready(function() {
 			</div>
 			<div class="label" style="width: 20%">Redespacho:</div>
 			<div class="input" style="width: 40%">
-				<select id="listaRedespacho"
-					name="pedido.transportadoraRedespacho.id" style="width: 45%">
+				<select id="listaRedespacho" name="pedido.transportadoraRedespacho.id" style="width: 45%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="redespacho" items="${listaRedespacho}">
 						<option value="${redespacho.id}"
@@ -394,8 +393,8 @@ $(document).ready(function() {
 			</div>
 
 			<div class="label obrigatorio">Finalidade:</div>
-			<div class="input" style="width: 80%">
-				<select id="finalidadePedido" name="pedido.finalidadePedido" style="width: 25%" >
+			<div class="input" style="width: 20%">
+				<select id="finalidadePedido" name="pedido.finalidadePedido" style="width: 80%" >
 					<option value=""></option>
 					<c:forEach var="tipo" items="${listaTipoFinalidadePedido}">
 						<option value="${tipo}" 
@@ -403,12 +402,10 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 			</div>
-			<%--
-			<div class="label">Frete (R$):</div>
-			<div class="input" style="width: 20%">
-				<input id="fretePedido" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 100%" />
+			<div class="label" style="width: 20% ">Frete (R$):</div>
+			<div class="input" style="width: 40%">
+				<input id="fretePedido" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 45%" />
 			</div>
-			 --%>
 			<div class="label">Observação:</div>
 			<div class="input areatexto" style="width: 70%">
 				<textarea id="obervacao" name="pedido.observacao"

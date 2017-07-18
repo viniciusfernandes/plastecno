@@ -238,6 +238,8 @@ public interface PedidoService {
 
 	Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido);
 
+	Double pesquisarValorFretePorItemByIdPedido(Integer idPedido);
+
 	Double pesquisarValorPedido(Integer idPedido);
 
 	Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido);

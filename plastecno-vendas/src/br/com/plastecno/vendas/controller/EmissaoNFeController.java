@@ -465,6 +465,10 @@ public class EmissaoNFeController extends AbstractController {
             // fracionada
             List<ItemPedido> listaItem = nFeService.pesquisarQuantitadeItemRestanteByIdPedido(idPedido);
 
+            double vFrete = NumeroUtils.arredondarValorMonetario(pedidoService
+                    .pesquisarValorFretePorItemByIdPedido(idPedido));
+            addAtributo("valorFrete", vFrete);
+
             String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
             addAtributo("idPedido", idPedido);
             addAtributo("infoAdFisco",
@@ -472,7 +476,7 @@ public class EmissaoNFeController extends AbstractController {
                             + idPedido + ". VENDEDOR: " + nomeVend);
 
             double peso = calcularPesoLiquido(listaItem);
-
+            List<ProdutoServicoJson> listaProduto = gerarListaProdutoItemPedido(listaItem);
             addAtributo("quantidade", 1);
             addAtributo("pesoLiquido", peso);
             addAtributo("pesoBruto", peso);
@@ -482,7 +486,7 @@ public class EmissaoNFeController extends AbstractController {
             addAtributo("dataSaida", StringUtils.formatarData(dtAtual));
             addAtributo("horaSaida", StringUtils.formatarHora(dtAtual));
             addAtributo("listaNumeroNFe", nFeService.pesquisarNumeroNFeByIdPedido(idPedido));
-            addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
+            addAtributo("listaProduto", listaProduto);
             addAtributo("listaDuplicata", listaDuplicata);
             addAtributo("cliente", cliente);
             addAtributo("formaPagamentoSelecionada", gerarTipoFormaPagamento(listaDuplicata.size()).getCodigo());

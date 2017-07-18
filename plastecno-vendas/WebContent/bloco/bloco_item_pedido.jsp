@@ -247,11 +247,6 @@ function pesquisarNcm(){
 			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}" style="width: 10%"/>
 		</div>
 	</c:if>
-	<div class="label" >Tot. Frete (R$):</div>
-		<div class="input" style="width: 10%">
-			<input type="text" id="totalFrete" name="pedido.valorFrete" value="${pedido.valorFrete}"/>
-		</div>
-	
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">
 			<a id="botaoInserirItemPedido" title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>

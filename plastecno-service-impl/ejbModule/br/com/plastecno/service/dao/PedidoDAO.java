@@ -407,8 +407,8 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		if (apenasNaoRecebido) {
 			select.append(" and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada = null)");
 		}
-		return (Long) this.entityManager.createQuery(select.toString()).setParameter("idPedido", idPedido)
-				.getSingleResult();
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(select.toString()).setParameter("idPedido", idPedido), Long.class, 0L);
 	}
 
 	public long pesquisarTotalItensPedido(Integer idPedido) {
@@ -439,6 +439,12 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 			return new Double[] {};
 		}
 		return new Double[] { (Double) o[0], (Double) o[1] };
+	}
+
+	public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.valorFrete from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), Double.class, 0d);
 	}
 
 	public Double pesquisarValorPedido(Integer idPedido) {

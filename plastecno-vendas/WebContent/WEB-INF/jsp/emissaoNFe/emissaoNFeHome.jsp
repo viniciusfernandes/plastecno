@@ -1497,6 +1497,12 @@ function editarProduto(botao){
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis.codigoSituacaoTributaria', 'idCampo': 'codSitTribPIS', 'valor': '01'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].informacoesAdicionais', 'idCampo': 'infoAdicionaisProd', 'valor': 'Total aproximado de tributos federais, estaduais e municipais: '+$('#valorTotaltributosProd').val()}]};
 	inicializarValoresDefaultProduto(valDefault);
+	
+	var vFrete = document.getElementById('nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.valorTotalFrete');
+	var contemFrete = vFrete != undefined && vFrete != null && !isEmpty(vFrete.value);
+	if(!contemFrete){
+		$('#valorFreteProd').val('<c:out value="${valorFrete}"/>');
+	}
 };
 
 function gerarJsonCalculoImpostos(){

@@ -1654,6 +1654,17 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double pesquisarValorFretePorItemByIdPedido(Integer idPedido) {
+		long total = pesquisarTotalItemPedido(idPedido);
+		if (0l == total) {
+			return 0d;
+		}
+		double vFrete = pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
+		return vFrete / total;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double pesquisarValorPedido(Integer idPedido) {
 		final Double valor = pedidoDAO.pesquisarValorPedido(idPedido);
 		return valor == null ? 0D : valor;

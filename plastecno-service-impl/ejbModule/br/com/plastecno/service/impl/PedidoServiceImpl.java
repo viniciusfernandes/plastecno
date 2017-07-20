@@ -465,8 +465,14 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Falha no processo de copia do pedido No. " + idPedido, e);
 		}
 
+		// Configurando a data de entrega para um dia posterior
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date());
+		c.add(Calendar.DAY_OF_MONTH, 1);
+
 		pedidoClone.setId(null);
-		pedidoClone.setDataEntrega(new Date());
+		pedidoClone.setDataEntrega(c.getTime());
+		pedidoClone.setDataEnvio(null);
 		pedidoClone.setListaLogradouro(null);
 		pedidoClone.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO_DIGITACAO : SituacaoPedido.DIGITACAO);
 		pedidoClone = inserir(pedidoClone);

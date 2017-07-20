@@ -126,14 +126,6 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 				this.pesquisarBy(filtro, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Transportadora> pesquisar() {
-		return this.entityManager.createQuery("select t from Transportadora t order by t.nomeFantasia ")
-				.getResultList();
-	}
-
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Transportadora> pesquisarBy(Transportadora filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
@@ -206,6 +198,14 @@ public class TransportadoraServiceImpl implements TransportadoraService {
 		this.gerarRestricaoPesquisa(filtro, apenasAtivos, select);
 		Query query = this.gerarQueryPesquisa(filtro, select);
 		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Transportadora> pesquisarTransportadoraAtiva() {
+		return entityManager.createQuery("select t from Transportadora t where t.ativo = true order by t.nomeFantasia ")
+				.getResultList();
 	}
 
 	@Override

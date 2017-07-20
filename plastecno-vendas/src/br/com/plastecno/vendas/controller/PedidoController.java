@@ -173,7 +173,7 @@ public class PedidoController extends AbstractController {
         addAtributo("cliente", cliente);
         addAtributo("logradouroFaturamento", l != null ? l.getCepEnderecoNumeroBairro() : "");
         addAtributo("proprietario", cliente.getVendedor());
-        addAtributo("listaTransportadora", transportadoraService.pesquisar());
+        addAtributo("listaTransportadora", transportadoraService.pesquisarTransportadoraAtiva());
         addAtributo("listaRedespacho", clienteService.pesquisarTransportadorasRedespacho(idCliente));
 
         pedidoVendaHome();
@@ -546,7 +546,7 @@ public class PedidoController extends AbstractController {
     public void pesquisarClienteById(Integer id) {
         Cliente cliente = carregarDadosCliente(id);
 
-        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisar(), cliente.getLogradouro());
+        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisarTransportadoraAtiva(), cliente.getLogradouro());
 
         SerializacaoJson serializacaoJson = new SerializacaoJson("cliente", json)
                 .incluirAtributo("listaTransportadora").incluirAtributo("listaRedespacho").incluirAtributo("vendedor");
@@ -747,7 +747,7 @@ public class PedidoController extends AbstractController {
                 addAtributo("logradouroFaturamento", l.getCepEnderecoNumeroBairro());
             }
 
-            addAtributo("listaTransportadora", transportadoraService.pesquisar());
+            addAtributo("listaTransportadora", transportadoraService.pesquisarTransportadoraAtiva());
             addAtributo("listaRedespacho", transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
             addAtributo("idRepresentadaSelecionada", idFornecedor);
         }

@@ -24,7 +24,7 @@ public interface TransportadoraService {
     PaginacaoWrapper<Transportadora> paginarTransportadora(Transportadora filtro, Boolean apenasAtivos,
             Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
 
-    List<Transportadora> pesquisar();
+    List<Transportadora> pesquisarTransportadoraAtiva();
 
     List<Transportadora> pesquisarBy(Transportadora filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
             Integer numeroMaximoRegistros);

@@ -483,6 +483,14 @@ public class PedidoServiceTest extends AbstractTest {
 		return transportadoraService.pesquisarTransportadoraLogradouroById(idTransportadora);
 	}
 
+	private Date retrocederData(Date dt) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(dt);
+		c.add(Calendar.MONTH, -2);
+		c.add(Calendar.DAY_OF_MONTH, -10);
+		return c.getTime();
+	}
+
 	@Test
 	public void testAceiteOrcamento() {
 		Pedido pedido = gerarPedidoOrcamento();
@@ -599,6 +607,65 @@ public class PedidoServiceTest extends AbstractTest {
 				pCopia.getSituacaoPedido());
 
 		assertEquals("O pedido copiado deve ter a situacao igual a situacao anterior a copia", s, p.getSituacaoPedido());
+	}
+
+	@Test
+	public void testDataEnvioCopiaPedidoEnviado() {
+		Pedido p = gerarPedidoClienteProspectado();
+		Integer idPed = null;
+		try {
+			idPed = pedidoService.inserir(p).getId();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		ItemPedido i = gerarItemPedido();
+
+		try {
+			pedidoService.inserirItemPedido(idPed, i);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPed, new byte[] {});
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		// Retrocedendo a data de envio para simular uma copia em data posterior
+		p.setDataEnvio(retrocederData(p.getDataEnvio()));
+		try {
+			pedidoService.inserir(p);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		p = pedidoService.pesquisarPedidoById(idPed);
+		String dtEnvFormt = StringUtils.formatarData(p.getDataEnvio());
+
+		Integer idCopia = null;
+		try {
+			idCopia = pedidoService.copiarPedido(idPed, false);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		Pedido pCopia = pedidoService.pesquisarPedidoById(idCopia);
+		Date dtEnvCopia = pCopia.getDataEnvio();
+
+		assertNull("A data de envio de uma copia do pedido deve ser nula", dtEnvCopia);
+
+		try {
+			pedidoService.enviarPedido(idCopia, new byte[] {});
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		pCopia = pedidoService.pesquisarPedidoById(idCopia);
+		String dtCopiaFormt = StringUtils.formatarData(pCopia.getDataEnvio());
+		assertNotEquals(
+				"As datas de envio do pedido original e copiado nao podem ser iguais pois o pedido copiado eh antigo",
+				dtCopiaFormt, dtEnvFormt);
+
 	}
 
 	@Test
@@ -1813,11 +1880,7 @@ public class PedidoServiceTest extends AbstractTest {
 		Date dtEnvio = pedido.getDataEnvio();
 		// Aqui precisamos alterar a data de envio do pedido para simular um
 		// envio em data posterior
-		Calendar c = Calendar.getInstance();
-		c.setTime(dtEnvio);
-		c.add(Calendar.MONTH, -2);
-		c.add(Calendar.DAY_OF_MONTH, -10);
-		pedido.setDataEnvio(c.getTime());
+		pedido.setDataEnvio(retrocederData(dtEnvio));
 		try {
 			pedidoService.inserir(pedido);
 		} catch (BusinessException e) {

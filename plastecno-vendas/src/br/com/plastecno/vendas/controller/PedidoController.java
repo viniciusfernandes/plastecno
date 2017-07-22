@@ -349,13 +349,23 @@ public class PedidoController extends AbstractController {
         int alt = 0;
         int larg = 0;
         int tot = listaItem.size();
+
         if (pedido.isOrcamento()) {
             larg = 550;
-            alt = 260 + 15 * tot;
+            alt = 260;
         } else {
             larg = 550;
-            alt = 800;
+            alt = 650;
         }
+        if (tot >= 5) {
+            tot = 5;
+        }
+        // Aqui estamos adicionando um valor de 15 pixels para cada item do
+        // pedido, pois assim a altura do PDF ficara de acordo com o total de
+        // itens. Note que o numero total foi limitado pois a a partir do limite
+        // o pdf devera ser pagina, caso contrario podemos ter um pdf com 50
+        // itens na mesma pagino e isso complica a impressao do arquivo.
+        alt += 15 * tot;
         return new PedidoPDFWrapper(pedido, gerarPDF(larg, alt));
     }
 

@@ -235,7 +235,7 @@ $(document).ready(function() {
 			<input type="hidden" id="situacaoPedido" name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
 			
 			<c:if test="${not empty pedido.id}">
-			<div class="label">Pedido(s) de ${isCompra ? 'Compra:': 'Venda:'}</div>
+			<div class="label">Pedido(s) de ${isCompra ? 'Venda:': 'Compra:'}</div>
 			<div class="input" style="width: 80%">
 				<select id="pedidoAssociado" name="idPedidoAssociado"
 					style="width: 13%" class="semprehabilitado">

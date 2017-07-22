@@ -68,7 +68,7 @@ public class EmailServiceImpl implements EmailService {
 			email.setMsg(mensagemEmail.getConteudo());
 			gerarAnexo(mensagemEmail, email);
 			
-			//email.send();
+			email.send();
 			
 		} catch (Exception e) {
 			StringBuilder mensagem = new StringBuilder();

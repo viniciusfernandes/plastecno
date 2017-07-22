@@ -420,6 +420,10 @@ public abstract class AbstractController {
         return GERADOR_PDF.gerarPDF();
     }
 
+    byte[] gerarPDF(int largura, int altura) throws ConversaoHTML2PDFException {
+        return GERADOR_PDF.gerarPDF(largura, altura);
+    }
+
     List<PicklistElement> gerarPicklistElement() {
         return null;
     }

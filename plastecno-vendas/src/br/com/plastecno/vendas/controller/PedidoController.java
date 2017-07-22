@@ -345,7 +345,18 @@ public class PedidoController extends AbstractController {
         addAtributoPDF("listaItem", listaItem);
 
         processarPDF(template);
-        return new PedidoPDFWrapper(pedido, gerarPDF());
+        // Alterando as medidas do PDF gerado.
+        int alt = 0;
+        int larg = 0;
+        int tot = listaItem.size();
+        if (pedido.isOrcamento()) {
+            larg = 550;
+            alt = 260 + 15 * tot;
+        } else {
+            larg = 550;
+            alt = 800;
+        }
+        return new PedidoPDFWrapper(pedido, gerarPDF(larg, alt));
     }
 
     /*
@@ -546,7 +557,8 @@ public class PedidoController extends AbstractController {
     public void pesquisarClienteById(Integer id) {
         Cliente cliente = carregarDadosCliente(id);
 
-        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisarTransportadoraAtiva(), cliente.getLogradouro());
+        final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisarTransportadoraAtiva(),
+                cliente.getLogradouro());
 
         SerializacaoJson serializacaoJson = new SerializacaoJson("cliente", json)
                 .incluirAtributo("listaTransportadora").incluirAtributo("listaRedespacho").incluirAtributo("vendedor");

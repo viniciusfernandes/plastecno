@@ -69,10 +69,6 @@ public class RepresentadaController extends AbstractController {
         return concat.toString();
     }
 
-    private void formatarDocumento(Representada r) {
-        r.setCnpj(formatarCNPJ(r.getCnpj()));
-    }
-
     @Post("representada/inclusao")
     public void inserir(Representada representada, LogradouroRepresentada logradouro,
             List<ContatoRepresentada> listaContato) {

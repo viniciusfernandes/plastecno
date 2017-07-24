@@ -143,6 +143,7 @@ $(document).ready(function() {
 	inserirMascaraMonetaria('medidaExterna', 8);
 	inserirMascaraMonetaria('medidaInterna', 8);
 	inserirMascaraNumerica('prazoEntrega', '999');
+	inserirMascaraNumerica('validade', '999');
 
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
@@ -406,6 +407,12 @@ $(document).ready(function() {
 			<div class="input" style="width: 40%">
 				<input id="fretePedido" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 45%" />
 			</div>
+			<c:if test="${pedido.orcamento}">
+				<div class="label">Validade:</div>
+				<div class="input" style="width: 80%">
+				<input id="validade" name="pedido.validade" value="${pedido.validade}" style="width: 5%" />
+			</div>
+			</c:if>
 			<div class="label">Observação:</div>
 			<div class="input areatexto" style="width: 70%">
 				<textarea id="obervacao" name="pedido.observacao"

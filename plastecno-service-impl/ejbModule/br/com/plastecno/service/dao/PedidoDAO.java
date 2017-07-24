@@ -428,7 +428,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 								.setParameter("idPedido", idPedido), Transportadora.class, null);
 	}
 
-	public Double[] pesquisarValoresPedido(Integer idPedido) {
+	public double[] pesquisarValoresPedido(Integer idPedido) {
 		Object[] o = QueryUtil
 				.gerarRegistroUnico(
 						this.entityManager
@@ -436,15 +436,24 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 										"select SUM(i.quantidade * i.precoUnidade), SUM(i.quantidade * i.precoUnidadeIPI) from ItemPedido i where i.pedido.id = :idPedido ")
 								.setParameter("idPedido", idPedido), Object[].class, new Object[] {});
 		if (o.length <= 0) {
-			return new Double[] {};
+			return new double[] {};
 		}
-		return new Double[] { (Double) o[0], (Double) o[1] };
+
+		if (o[0] == null) {
+			o[0] = 0d;
+		}
+
+		if (o[1] == null) {
+			o[1] = 0d;
+		}
+		return new double[] { (Double) o[0], (Double) o[1] };
 	}
 
 	public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(
+		Double val = QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select p.valorFrete from Pedido p where p.id = :idPedido").setParameter(
 						"idPedido", idPedido), Double.class, null);
+		return val == null ? 0d : val;
 	}
 
 	public Double pesquisarValorPedido(Integer idPedido) {

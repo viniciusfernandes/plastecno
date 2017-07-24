@@ -13,3 +13,6 @@ alter table vendas.tb_cliente ALTER COLUMN email SET DATA TYPE varchar(500);
 
 alter table vendas.tb_cliente add data_nascimento date default null;
 alter table vendas.tb_pedido add valor_frete numeric(10,2) default 0;
+
+%%%%%%%%%%%%
+alter table vendas.tb_pedido add validade integer default 0;

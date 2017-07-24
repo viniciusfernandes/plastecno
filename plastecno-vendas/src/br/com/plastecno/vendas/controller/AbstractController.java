@@ -26,6 +26,7 @@ import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -214,6 +215,15 @@ public abstract class AbstractController {
         cliente.setCnpj(formatarCNPJ(cliente.getCnpj()));
         cliente.setCpf(formatarCPF(cliente.getCpf()));
         cliente.setInscricaoEstadual(formatarInscricaoEstadual(cliente.getInscricaoEstadual()));
+    }
+
+    void formatarDocumento(Representada r) {
+        if (r == null) {
+            return;
+        }
+        r.setInscricaoEstadual(formatarInscricaoEstadual(r.getInscricaoEstadual()));
+        r.setCnpj(formatarCNPJ(r.getCnpj()));
+
     }
 
     String formatarInscricaoEstadual(String conteudo) {

@@ -305,7 +305,8 @@ public class PedidoController extends AbstractController {
         formatarItemPedido(listaItem);
         formatarPedido(pedido);
         formatarDocumento(pedido.getCliente());
-
+        formatarDocumento(pedido.getRepresentada());
+        
         String template = pedido.isOrcamento() ? "orcamento.html" : "pedido.html";
         String tipo = pedido.isVenda() ? "Venda" : "Compra";
         String titulo = pedido.isOrcamento() ? "Orçamento de " + tipo : "Pedido de " + tipo;

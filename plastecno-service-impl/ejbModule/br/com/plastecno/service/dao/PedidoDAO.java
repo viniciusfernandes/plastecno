@@ -444,7 +444,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select p.valorFrete from Pedido p where p.id = :idPedido").setParameter(
-						"idPedido", idPedido), Double.class, 0d);
+						"idPedido", idPedido), Double.class, null);
 	}
 
 	public Double pesquisarValorPedido(Integer idPedido) {

@@ -1665,7 +1665,10 @@ public class PedidoServiceImpl implements PedidoService {
 		if (0l == total) {
 			return 0d;
 		}
-		double vFrete = pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
+		Double vFrete = pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
+		if (vFrete == null) {
+			return 0d;
+		}
 		return vFrete / total;
 	}
 

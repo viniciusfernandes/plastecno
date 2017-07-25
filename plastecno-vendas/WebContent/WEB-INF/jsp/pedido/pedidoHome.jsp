@@ -407,7 +407,7 @@ $(document).ready(function() {
 			<div class="input" style="width: 40%">
 				<input id="fretePedido" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 45%" />
 			</div>
-			<c:if test="${pedido.orcamento}">
+			<c:if test="${orcamento}">
 				<div class="label">Validade:</div>
 				<div class="input" style="width: 80%">
 				<input id="validade" name="pedido.validade" value="${pedido.validade}" style="width: 5%" />

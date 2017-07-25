@@ -250,11 +250,14 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			public Double[] pesquisarValoresPedido(Integer idPedido) {
+			public double[] pesquisarValoresPedido(Integer idPedido) {
+				if (idPedido == null) {
+					return new double[] {};
+				}
 
 				List<ItemPedido> lItem = REPOSITORY.pesquisarTodos(ItemPedido.class);
 				if (lItem == null || lItem.isEmpty()) {
-					return new Double[] {};
+					return new double[] {};
 				}
 
 				ItemPedido iAcum = lItem
@@ -268,8 +271,27 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 											+ (i2.getQuantidade() * i2.getPrecoUnidadeIPI()));
 									return i1;
 								});
+				if (iAcum == null) {
+					return new double[] {};
+				}
 
-				return new Double[] { iAcum.getPrecoUnidade(), iAcum.getPrecoUnidadeIPI() };
+				if (iAcum.getPrecoUnidade() == null) {
+					iAcum.setPrecoUnidade(0d);
+				}
+
+				if (iAcum.getPrecoUnidadeIPI() == null) {
+					iAcum.setPrecoUnidadeIPI(0d);
+				}
+				return new double[] { iAcum.getPrecoUnidade(), iAcum.getPrecoUnidadeIPI() };
+			}
+
+			@Mock
+			public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				if (p == null) {
+					return 0d;
+				}
+				return p.getValorFrete() == null ? 0d : p.getValorFrete();
 			}
 
 			@Mock

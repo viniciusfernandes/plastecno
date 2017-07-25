@@ -1511,6 +1511,42 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoItemPedidoRevendaComFrete() {
+		Pedido p = gerarPedidoClienteProspectado();
+		Integer idPed = null;
+		try {
+			idPed = pedidoService.inserir(p).getId();
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido i = gerarItemPedido();
+		i.setTipoVenda(TipoVenda.PECA);
+		i.setPrecoVenda(100d);
+
+		try {
+			pedidoService.inserirItemPedido(idPed, i);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		double vPedido = pedidoService.pesquisarValorPedido(idPed);
+		double vFrete = 10d;
+
+		// Inserindo um valor de frete
+		p = pedidoService.pesquisarPedidoById(idPed);
+		p.setValorFrete(vFrete);
+		try {
+			pedidoService.inserir(p);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		double vPedidoFrete = pedidoService.pesquisarValorPedido(idPed);
+		assertTrue("O valor do pedido deve conter o valor do frete apos a inclusao do frete",
+				vPedidoFrete == (vFrete + vPedido));
+
+	}
+
+	@Test
 	public void testInclusaoItemPedidoRevendaSemComissaoRevenda() {
 		Pedido pedido = gerarPedidoRevendaComItem();
 		Integer idPedido = pedido.getId();

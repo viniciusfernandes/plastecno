@@ -52,6 +52,7 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
+import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.impl.calculo.CalculadoraItem;
 import br.com.plastecno.service.impl.calculo.CalculadoraPreco;
 import br.com.plastecno.service.impl.mensagem.email.GeradorPedidoEmail;
@@ -189,12 +190,20 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
 	}
 
+	@TODO(descricao = "Esse metodo existe apenas para manter a consitencia do valor do pedido no relatorio de pedidos vendidos. Acredito que deve ser removido fututamente e a query do relatorio sera melhorada")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private Double[] atualizarValoresPedido(Integer idPedido) {
-		Double[] valores = pedidoDAO.pesquisarValoresPedido(idPedido);
+	private double[] atualizarValoresPedido(Integer idPedido) {
+		double[] valores = pedidoDAO.pesquisarValoresPedido(idPedido);
 		if (valores.length <= 0) {
-			return new Double[] {};
+			pedidoDAO.alterarValorPedido(idPedido, 0d, 0d);
+			return new double[] {};
 		}
+
+		double vFrete = pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
+		// O custo do frete deve ser incorporado no pedido e repassado para o
+		// cliente.
+		valores[0] += vFrete;
+		valores[1] += vFrete;
 		pedidoDAO.alterarValorPedido(idPedido, valores[0], valores[1]);
 		return valores;
 	}
@@ -768,6 +777,8 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setValorPedidoIPI(pesquisarValorPedidoIPI(idPedido));
 			pedido = pedidoDAO.alterar(pedido);
 		}
+		// Aqui estamos atualizando o valor do pedido pois pode haver um frete.
+		atualizarValoresPedido(idPedido);
 
 		return pedido;
 	}
@@ -1666,9 +1677,6 @@ public class PedidoServiceImpl implements PedidoService {
 			return 0d;
 		}
 		Double vFrete = pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
-		if (vFrete == null) {
-			return 0d;
-		}
 		return vFrete / total;
 	}
 
@@ -1772,11 +1780,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 			// Efetuando novamente o calculo pois na remocao o valor do pedido
 			// deve ser atualizado
-			Double[] valores = atualizarValoresPedido(pedido.getId());
-			if (valores.length > 0) {
-				pedido.setValorPedido(valores[0]);
-				pedido.setValorPedidoIPI(valores[1]);
-			}
+			atualizarValoresPedido(pedido.getId());
 
 			if (pedido.isCompraEfetuada() && pesquisarTotalItemPedido(pedido.getId()) <= 0L) {
 				pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);

@@ -15,7 +15,8 @@
 				<td
 					style="color: #52774C; font-family: arial black; font-size: 15px; text-align: left; font-weight: bold;">PLASTECNO</td>
 				<td
-					style="color: #52774C; font-family: arial black; font-size: 10px; text-align: right">www.plastecno.com.br</td>
+					style="color: #52774C; font-family: arial black; font-size: 12px; text-align: right">PABX:
+					(11) 3021-9600 ou 3024-3330</td>
 			</tr>
 			<tr>
 				<td
@@ -23,72 +24,33 @@
 					e Com. LTDA.</td>
 				<td
 					style="color: #52774C; font-family: arial black; font-size: 8px; text-align: right">
-					R. Alvarenga Peixoto, 487 – CEP: 05095-010 – Vila Anastácio – São Paulo – SP</td>
+					{pedido.proprietario.nomeCompleto} - {pedido.proprietario.email}</td>
 			</tr>
-			<tr>
-				<td colspan="2"
-					style="color: #52774C; font-family: arial black; font-size: 8px; text-align: right">Contato:
-					(11) 3021-9600 ou 3024-3330</td>
-			</tr>
+			
 		</tbody>
 	</table>
 
-	<table>
-		<thead>
-			<tr>
-				<th colspan="6">{titulo}</th>
-			</tr>
-		</thead>
+	<table style="border:0;">
 		<tbody>
-			<tr>
-				<td class="label">{tipoProprietario}:</td>
-				<td colspan="5">{pedido.proprietario.nomeCompleto} - {pedido.proprietario.email}</td>
-			</tr>
-			<tr>
-				<td class="label">Número:</td>
-				<td>{pedido.id}</td>
-				<td class="label">Ped. Cli.:</td>
-				<td>{pedido.numeroPedidoCliente}</td>
-				<td class="label">{tipoRelacionamento}:</td>
-				<td>{pedido.representada.nomeFantasia}</td>
-			</tr>
 			<tr>
 				<td class="label">Cliente:</td>
 				<td colspan="3">{pedido.cliente.nomeCompleto}</td>
-				<td class="label">Contato:</td>
-				<td >{pedido.contatoFormatado}</td>
-			</tr>
-			<tr>
-				<td class="label" style="width: 70px">Email NFe:</td>
-				<td colspan="5">{pedido.cliente.email}</td>
+				<td class="label">CNPJ:</td>
+				<td>{pedido.cliente.cnpj}</td>
 			</tr>
 			<tr>
 				<td class="label" style="width: 70px">Endereço:</td>
-				<td colspan="5">{logradouroFaturamento}</td>
-			</tr>
-			<tr>
-				<td class="label">CNPJ:</td>
-				<td>{pedido.cliente.cnpj}</td>
+				<td colspan="3">{logradouroFaturamento}</td>
 				<td class="label">CPF:</td>
 				<td>{pedido.cliente.cpf}</td>
-				<td class="label">Insc. Est.:</td>
-				<td>{pedido.cliente.inscricaoEstadual}</td>
 			</tr>
 			<tr>
-				<td class="label">Finalidade:</td>
-				<td>{pedido.finalidadePedido.descricao}</td>
-				<td class="label">Pagamento:</td>
-				<td>{pedido.formaPagamento}</td>
-				<td class="label">Validade:</td>
-				<td>7 dias</td>
-			</tr>
-			<tr>
-				<td class="label">Tip. Entr.:</td>
-				<td>{pedido.tipoEntrega.descricao}</td>
-				<td class="label">Data Envio:</td>
-				<td>{pedido.dataEnvioFormatada}</td>
-				<td class="label">Data Entrega:</td>
-				<td>{pedido.dataEntregaFormatada}</td>
+				<td class="label" >Contato:</td>
+				<td >{pedido.contato.nome}</td>
+				<td class="label" >Email:</td>
+				<td >{pedido.contato.email}</td>
+				<td class="label" >Fone:</td>
+				<td >{pedido.contato.telefoneFormatado}</td>
 			</tr>
 		</tbody>
 	</table>
@@ -96,8 +58,7 @@
 	<table class="listagem">
 		<thead>
 			<tr>
-				<th class="descricaoTabela" colspan="11">Lista de Itens do
-					Orçamento</th>
+				<th class="descricaoTabela" colspan="11">{titulo}</th>
 			</tr>
 		</thead>
 		<thead>
@@ -132,5 +93,37 @@
 			</tr>
 		</tfoot>
 	</table>
+	<table style="border: 0;">
+		<tbody>
+			<tr>
+				<td style="text-align: right; font-size: 10px;" class="label">Frete:</td>
+				<td style="text-align: left;">{pedido.tipoEntrega.descricao}</td>
+				<td style="text-align: right; font-size: 10px;" class="label">Pagto:</td>
+				<td style="text-align: left;">{pedido.formaPagamento}</td>
+				<td style="text-align: right; font-size: 10px;" class="label">Validade:</td>
+				<td style="text-align: left;">{pedido.validade}</td>
+			</tr>
+		</tbody>
+	</table>
+	<table style="border: 0; margin-bottom: 40px">
+		<tbody>
+			<tr>
+				<td
+					style="font-family: arial black; font-size: 10px; text-align: center;">Plastecno Representações
+					e Com. LTDA.</td>
+			</tr>
+			<tr>
+				<td style="font-family: arial black; font-size: 8px; text-align: center">
+					R. Alvarenga Peixoto, 487 – CEP: 05095-010 – Vila Anastácio – São Paulo – SP</td>
+			</tr>
+			<tr>
+				<td style="font-family: arial black; font-size: 8px; text-align: center">CNPJ:{pedido.representada.cnpj}</td>
+			</tr>
+			<tr>
+				<td style="font-family: arial black; font-size: 8px; text-align: center">Insc. Est.:{pedido.representada.inscricaoEstadual}</td>
+			</tr>
+		</tbody>
+	</table>
+	
 </body>
 </html>

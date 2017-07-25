@@ -47,6 +47,9 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Cliente do pedido")
 	private Cliente cliente;
 
+	@Column(name = "validade")
+	private Integer validade;
+
 	@Column(name = "cliente_notificado_venda")
 	private boolean clienteNotificadoVenda = false;
 
@@ -455,6 +458,10 @@ public class Pedido implements Serializable, Cloneable {
 		return transportadoraRedespacho;
 	}
 
+	public Integer getValidade() {
+		return validade;
+	}
+
 	public Double getValorFrete() {
 		return valorFrete;
 	}
@@ -699,6 +706,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setTransportadoraRedespacho(Transportadora transportadoraRedespacho) {
 		this.transportadoraRedespacho = transportadoraRedespacho;
+	}
+
+	public void setValidade(Integer validade) {
+		this.validade = validade;
 	}
 
 	public void setValorFrete(Double valorFrete) {

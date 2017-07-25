@@ -117,10 +117,9 @@ public final class StringUtils {
 		final String[] conteudoArray = conteudo.replaceAll("\\D", "").split("");
 		final StringBuilder documento = new StringBuilder();
 
-		final int posicao3 = 3;
-		final int posicao6 = 6;
-		final int posicao9 = 9;
-		final int posicao12 = 12;
+		final int posicao3 = 2;
+		final int posicao6 = 5;
+		final int posicao9 = 8;
 		for (int i = 0; i < conteudoArray.length; i++) {
 			documento.append(conteudoArray[i]);
 			switch (i) {
@@ -131,9 +130,6 @@ public final class StringUtils {
 				documento.append(".");
 				break;
 			case posicao9:
-				documento.append(".");
-				break;
-			case posicao12:
 				documento.append(".");
 				break;
 			default:

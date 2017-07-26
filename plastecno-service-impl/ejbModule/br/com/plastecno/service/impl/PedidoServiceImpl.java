@@ -467,9 +467,9 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	public Integer copiarPedido(Integer idPedido, boolean isOrcamento) throws BusinessException {
 		Pedido pedido = pesquisarPedidoById(idPedido);
-		Pedido pedidoClone = null;
+		Pedido pClone = null;
 		try {
-			pedidoClone = pedido.clone();
+			pClone = pedido.clone();
 		} catch (CloneNotSupportedException e) {
 			throw new BusinessException("Falha no processo de copia do pedido No. " + idPedido, e);
 		}
@@ -479,25 +479,34 @@ public class PedidoServiceImpl implements PedidoService {
 		c.setTime(new Date());
 		c.add(Calendar.DAY_OF_MONTH, 1);
 
-		pedidoClone.setId(null);
-		pedidoClone.setDataEntrega(c.getTime());
-		pedidoClone.setDataEnvio(null);
-		pedidoClone.setListaLogradouro(null);
-		pedidoClone.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO_DIGITACAO : SituacaoPedido.DIGITACAO);
-		pedidoClone = inserir(pedidoClone);
+		pClone.setId(null);
+		pClone.setDataEntrega(c.getTime());
+		pClone.setDataEnvio(null);
+		pClone.setDataEmissaoNF(null);
+		pClone.setDataVencimentoNF(null);
+		pClone.setValorParcelaNF(null);
+		pClone.setValorTotalNF(null);
+		pClone.setListaLogradouro(null);
+		pClone.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO_DIGITACAO : SituacaoPedido.DIGITACAO);
+		pClone = inserir(pClone);
 
 		List<ItemPedido> listaItemPedido = pesquisarItemPedidoByIdPedido(idPedido);
-		ItemPedido itemPedidoClone = null;
+		ItemPedido iClone = null;
 		for (ItemPedido itemPedido : listaItemPedido) {
 			try {
-				itemPedidoClone = itemPedido.clone();
-				inserirItemPedido(pedidoClone.getId(), itemPedidoClone);
+				iClone = itemPedido.clone();
+				iClone.setIdPedidoCompra(null);
+				iClone.setIdPedidoVenda(null);
+				iClone.setQuantidadeRecepcionada(null);
+				iClone.setQuantidadeReservada(null);
+				iClone.setEncomendado(false);
+				inserirItemPedido(pClone.getId(), iClone);
 			} catch (IllegalStateException e) {
 				throw new BusinessException("Falha no processo de copia do item No. " + itemPedido.getId()
 						+ " do pedido No. " + idPedido, e);
 			}
 		}
-		return pedidoClone.getId();
+		return pClone.getId();
 	}
 
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")

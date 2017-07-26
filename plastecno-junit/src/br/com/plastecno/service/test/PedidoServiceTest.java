@@ -666,6 +666,16 @@ public class PedidoServiceTest extends AbstractTest {
 				"As datas de envio do pedido original e copiado nao podem ser iguais pois o pedido copiado eh antigo",
 				dtCopiaFormt, dtEnvFormt);
 
+		List<ItemPedido> lItem = pedidoService.pesquisarItemPedidoByIdPedido(idCopia);
+		for (ItemPedido item : lItem) {
+			assertNull("Apos a copia os itens nao podem ter pedido de compra", item.getIdPedidoCompra());
+			assertNull("Apos a copia os itens nao podem ter pedido de venda", item.getIdPedidoVenda());
+			assertFalse("Apos a copia os itens nao podem ter sido encomendados", item.getQuantidadeEncomendada() == 0);
+			assertTrue("Apos a copia os itens nao podem ter sido reservados", item.getQuantidadeReservada() == null
+					|| item.getQuantidadeReservada() == 0);
+			assertTrue("Apos a copia os itens nao podem ter sido recepcionado",
+					item.getQuantidadeRecepcionada() == null || item.getQuantidadeRecepcionada() == 0);
+		}
 	}
 
 	@Test

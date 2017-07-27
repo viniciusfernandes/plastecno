@@ -78,6 +78,8 @@ public interface ClienteService {
 
 	ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente);
 
+	Integer pesquisarIdVendedorByIdCliente(Integer idCliente);
+
 	List<LogradouroCliente> pesquisarLogradouroCliente(Integer idCliente);
 
 	LogradouroCliente pesquisarLogradouroClienteById(Integer idLogradouro);

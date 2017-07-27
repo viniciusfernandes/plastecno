@@ -575,6 +575,14 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarIdVendedorByIdCliente(Integer idCliente) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select c.vendedor.id from Cliente c where c.id = :idCliente").setParameter(
+						"idCliente", idCliente), Integer.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<LogradouroCliente> pesquisarLogradouroCliente(Integer idCliente) {
 		return clienteDAO.pesquisarLogradouroById(idCliente);
 	}

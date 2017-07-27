@@ -119,6 +119,8 @@ public interface PedidoService {
 
 	List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException;
 
+	Integer pesquisarIdClienteByIdPedido(Integer idPedido);
+
 	List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido);
 
 	Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido);

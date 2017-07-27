@@ -72,9 +72,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private ClienteService clienteService;
+
 	@EJB
 	private ComissaoService comissaoService;
-
 	@EJB
 	private EmailService emailService;
 
@@ -1169,6 +1169,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarIdClienteByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.cliente.id from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), Integer.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido) {
 		if (idPedido == null) {
 			return new ArrayList<Integer>(1);
@@ -1239,7 +1247,7 @@ public class PedidoServiceImpl implements PedidoService {
 			return null;
 		}
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
+				entityManager.createQuery(
 						"select v.id from Pedido p inner join p.proprietario v where p.id = :idPedido ").setParameter(
 						"idPedido", idPedido), Integer.class, null);
 	}

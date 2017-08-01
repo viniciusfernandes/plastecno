@@ -90,6 +90,12 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 								.setParameter("idCliente", idCliente), ContatoCliente.class, null);
 	}
 
+	public Integer pesquisarIdVendedorByIdCliente(Integer idCliente) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select c.vendedor.id from Cliente c where c.id =:id ").setParameter("id",
+						idCliente), Integer.class, null);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
 		return entityManager.createQuery("select l from LogradouroCliente l where l.cliente.id = :idCliente")

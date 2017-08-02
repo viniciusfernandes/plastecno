@@ -150,7 +150,7 @@ public class ClienteController extends AbstractController {
                 mensagem.append("O cliente ").append(cliente.getNomeCompleto()).append(" foi incluído com sucesso");
             }
 
-            clienteService.inserirComentario(cliente.getId(), comentario);
+            clienteService.inserirComentario(cliente.getId(), comentario, getCodigoUsuario());
 
             gerarMensagemSucesso(mensagem.toString());
         } catch (BusinessException e) {

@@ -234,13 +234,15 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
-	public void inserirComentario(Integer idCliente, String comentario) throws BusinessException {
+	public void inserirComentario(Integer idCliente, String comentario, Integer idUsuario) throws BusinessException {
 		if (StringUtils.isEmpty(comentario)) {
 			return;
 		}
 		Cliente cliente = pesquisarById(idCliente);
-		Usuario vendedor = usuarioService.pesquisarVendedorResumidoByIdCliente(idCliente);
-		inserirComentario(vendedor, cliente, comentario);
+		if (idUsuario == null) {
+			idUsuario = pesquisarIdVendedorByIdCliente(idCliente);
+		}
+		inserirComentario(new Usuario(idUsuario), cliente, comentario);
 	}
 
 	private void inserirComentario(Usuario proprietario, Cliente cliente, String comentario) throws BusinessException {
@@ -576,9 +578,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer pesquisarIdVendedorByIdCliente(Integer idCliente) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select c.vendedor.id from Cliente c where c.id = :idCliente").setParameter(
-						"idCliente", idCliente), Integer.class, null);
+		return clienteDAO.pesquisarIdVendedorByIdCliente(idCliente);
 	}
 
 	@Override

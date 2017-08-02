@@ -119,7 +119,7 @@ function habilitar(seletorCampo, habilitado) {
 }
 
 function isEmpty (string) {
-	return string == null || /^\s*$/.test(string);
+	return string == undefined || string == null || /^\s*$/.test(string);
 }
 
 

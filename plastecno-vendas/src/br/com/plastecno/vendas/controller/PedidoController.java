@@ -15,6 +15,7 @@ import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.FormaMaterialService;
 import br.com.plastecno.service.MaterialService;
+import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TipoEntregaService;
@@ -106,6 +107,9 @@ public class PedidoController extends AbstractController {
 
     @Servico
     private MaterialService materialService;
+
+    @Servico
+    private NFeService nFeService;
 
     @Servico
     private PedidoService pedidoService;
@@ -660,6 +664,11 @@ public class PedidoController extends AbstractController {
         serializarJson(new SerializacaoJson("lista", lista));
     }
 
+    @Get("pedido/nfe")
+    public void pesquisarNFeByNumero(Integer numeroNFe) {
+        redirecTo(EmissaoNFeController.class).pesquisarNFe(numeroNFe);
+    }
+
     @Get("pedido/{id}")
     public void pesquisarPedidoById(Integer id, TipoPedido tipoPedido, boolean orcamento) {
         Pedido pedido = null;
@@ -671,7 +680,7 @@ public class PedidoController extends AbstractController {
         } else {
             pedido = pedidoService.pesquisarPedidoById(id, TipoPedido.COMPRA.equals(tipoPedido));
             if (pedido == null) {
-                gerarListaMensagemErro("Pedido não existe no sistema");
+                gerarListaMensagemAlerta("Pedido não existe no sistema");
             } else {
                 formatarPedido(pedido);
                 List<Transportadora> listaRedespacho = clienteService.pesquisarTransportadorasRedespacho(pedido
@@ -696,6 +705,10 @@ public class PedidoController extends AbstractController {
                 LogradouroCliente l = clienteService.pesquisarLogradouroFaturamentoById(pedido.getCliente().getId());
                 if (l != null) {
                     addAtributo("logradouroFaturamento", l.getCepEnderecoNumeroBairro());
+                }
+
+                if (pedido.isVenda()) {
+                    addAtributo("listaNumeroNFe", nFeService.pesquisarNumeroNFeByIdPedido(pedido.getId()));
                 }
 
                 addAtributo("listaIdPedidoAssociado",

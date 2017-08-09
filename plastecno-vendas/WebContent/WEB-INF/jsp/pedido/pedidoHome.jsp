@@ -125,6 +125,11 @@ $(document).ready(function() {
 		$('#formVazio').attr('action', url).submit();
 	});
 	
+	$('#listaNumeroNFe').change(function(){
+		adicionarInputHiddenFormulario('formVazio', 'numeroNFe', $(this).val());
+		$('#formVazio').attr('action', '<c:url value="/pedido/nfe"/>').submit();
+	});
+	
 	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	
 	inserirMascaraData('dataEntrega');
@@ -237,12 +242,20 @@ $(document).ready(function() {
 			
 			<c:if test="${not empty pedido.id}">
 			<div class="label">Pedido(s) de ${isCompra ? 'Venda:': 'Compra:'}</div>
-			<div class="input" style="width: 80%">
-				<select id="pedidoAssociado" name="idPedidoAssociado"
-					style="width: 13%" class="semprehabilitado">
+			<div class="input" style="width: 10%">
+				<select id="pedidoAssociado" name="idPedidoAssociado" style="width: 100%" class="semprehabilitado">
 					<option value=""></option>
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
 						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label">Núm. NFe(s):</div>
+			<div class="input" style="width: 50%">
+				<select id="listaNumeroNFe" name="numeroNFe" style="width: 25%" class="semprehabilitado">
+					<option value="">&lt&lt SELECIONE &gt&gt</option>
+					<c:forEach var="numeroNFe" items="${listaNumeroNFe}">
+						<option value="${numeroNFe}">${numeroNFe}</option>
 					</c:forEach>
 				</select>
 			</div>

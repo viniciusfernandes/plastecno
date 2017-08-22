@@ -256,7 +256,7 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 		// se nao contem erro e foi clicao o botao de inclusao de item de
 		// pedidos
 		var pedido = response.pedido;
-		if (itemPedidoAcionado && response.erros == undefined && pedido != undefined && pedido != null) {
+		if (itemPedidoAcionado && response.erros == undefined && pedido != undefined && pedido != null && !isEmpty(pedido.id)) {
 			inserirItemPedido(pedido.id, urlInclusaoItemPedido);
 		}
 	});
@@ -273,7 +273,7 @@ function recuperarParametrosBlocoContato() {
 	return '&' + $('#bloco_contato').serialize();
 };
 
-function inicializarAutomcompleteCliente(url) {
+function inicializarAutocompleteCliente(url, preencherCampos) {
 	autocompletar({
 		url : url,
 		campoPesquisavel : 'nomeCliente',
@@ -295,26 +295,10 @@ function inicializarAutomcompleteCliente(url) {
 					if(clienteJson==undefined || clienteJson==null){
 						return;
 					}
-					$('#idCliente').val(clienteJson.id);
-					$('#formPesquisa #idClientePesquisa').val(clienteJson.id);
-					$('#site').val(clienteJson.site);
-					$('#email').val(clienteJson.email);
-					$('#cnpj').val(clienteJson.cnpj);
-					$('#cpf').val(clienteJson.cpf);
-					$('#nomeCliente').val(clienteJson.nomeCompleto);
-					$('#idVendedor').val(clienteJson.vendedor.id);
-					$('#suframa').val(clienteJson.suframa);
-					$('#proprietario').val(clienteJson.vendedor.nome + ' - '+ clienteJson.vendedor.email);
-					$('#logradouroFaturamento').val(clienteJson.logradouroFormatado);
-					limparComboBox('listaTransportadora');
-					limparComboBox('listaRedespacho');
-
-					var comboTransportadora = document.getElementById('listaTransportadora');
-					var comboRedespacho = document.getElementById('listaRedespacho');
-
-					preencherComboTransportadora(comboTransportadora, clienteJson.listaTransportadora);
-					preencherComboTransportadora(comboRedespacho, clienteJson.listaRedespacho);
-
+					
+					if(preencherCampos != undefined){
+						preencherCampos(clienteJson);
+					}
 					/*
 					 * As mensagens de alerta sempre serao exibidas pois nao
 					 * devem comprometer o fluxo da navegacao do usuario.
@@ -330,7 +314,7 @@ function inicializarAutomcompleteCliente(url) {
 	});
 };
 
-function inicializarAutomcompleteMaterial(url) {
+function inicializarAutocompleteMaterial(url) {
 	autocompletar({
 		url : url,
 		campoPesquisavel : 'material',
@@ -356,8 +340,6 @@ function inicializarAutocompleteDescricaoPeca(url) {
 };
 
 function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
-	if (!isEmpty(numeroPedido)) {
-		
 		var parametros = serializarBloco('bloco_item_pedido');
 		parametros += '&numeroPedido=' + numeroPedido;
 		var request = $.ajax({
@@ -444,7 +426,6 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 			$('#tipoVendaKilo').val('KILO');
 			$('#tipoVendaPeca').val('PECA');
 		});
-	}
 };
 
 function inicializarFiltro() {
@@ -460,6 +441,9 @@ function contactarCliente(idCliente) {
 };
 
 function preencherComboTransportadora(combo, listaTransportadora) {
+	if(combo == undefined){
+		return;
+	}
 	var TOTAL_TRANSPORTADORAS = listaTransportadora.length;
 	for (var i = 0; i < TOTAL_TRANSPORTADORAS; i++) {
 		combo.add(new Option(listaTransportadora[i].nomeFantasia,

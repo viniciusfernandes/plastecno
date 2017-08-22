@@ -39,7 +39,7 @@
 				</c:if>
 				<li><a href="cliente" target="principal_frame">Clientes</a></li>
 				<c:if test="${acessoVendaPermitido}">
-					<li><a href="pedido/orcamento/venda" target="principal_frame">Orçamento</a></li>
+					<li><a href="orcamento" target="principal_frame">Orçamento</a></li>
 				</c:if>
 				<c:if test="${acessoCompraPermitido}">
 					<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a>

@@ -21,6 +21,7 @@ import br.com.caelum.vraptor.serialization.Serializer;
 import br.com.caelum.vraptor.view.Results;
 import br.com.plastecno.service.TipoLogradouroService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemEstoque;
@@ -649,6 +650,27 @@ public abstract class AbstractController {
 
     boolean isElementosNaoAssociadosPreenchidosPicklist() {
         return this.picklist.isElementosNaoAssociadosPreenchidos();
+    }
+
+    /*
+     * Futuramente esse metodo devera ser removido para um controller em comum
+     * com o orcamento e pedido.
+     */
+    boolean isPedidoDesabilitado(Pedido pedido) {
+        if (pedido == null || isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS)) {
+            return false;
+        } else {
+            SituacaoPedido situacao = pedido.getSituacaoPedido();
+            boolean isCompraFinalizada = pedido.isCompra() && SituacaoPedido.COMPRA_RECEBIDA.equals(situacao);
+            boolean isVendaFinalizada = pedido.isVenda()
+                    && (SituacaoPedido.ENVIADO.equals(situacao)
+                            || SituacaoPedido.ITEM_AGUARDANDO_COMPRA.equals(situacao)
+                            || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao)
+                            || SituacaoPedido.EMPACOTADO.equals(situacao)
+                            || SituacaoPedido.COMPRA_ANDAMENTO.equals(situacao) || SituacaoPedido.ITEM_AGUARDANDO_MATERIAL
+                                .equals(situacao));
+            return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
+        }
     }
 
     /*

@@ -33,7 +33,7 @@
 $(document).ready(function() {
 	scrollTo('${ancora}');
 
-	inicializarAutomcompleteMaterial('<c:url value="/pedido/material"/>');
+	inicializarAutocompleteMaterial('<c:url value="/pedido/material"/>');
 	// inicializarAutocompleteDescricaoPeca('<c:url value="/estoque/descricaopeca"/>');
 	
 	habilitar('#bloco_item_pedido #descricao', false);
@@ -152,7 +152,28 @@ $(document).ready(function() {
 
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
-	inicializarAutomcompleteCliente('<c:url value="/pedido/cliente"/>');
+	inicializarAutocompleteCliente('<c:url value="/pedido/cliente"/>', function(cliente){
+		$('#idCliente').val(cliente.id);
+		$('#formPesquisa #idClientePesquisa').val(cliente.id);
+		$('#site').val(cliente.site);
+		$('#email').val(cliente.email);
+		$('#cnpj').val(cliente.cnpj);
+		$('#cpf').val(cliente.cpf);
+		$('#nomeCliente').val(cliente.nomeCompleto);
+		$('#idVendedor').val(cliente.vendedor.id);
+		$('#suframa').val(cliente.suframa);
+		$('#proprietario').val(cliente.vendedor.nome + ' - '+ cliente.vendedor.email);
+		$('#logradouroFaturamento').val(cliente.logradouroFormatado);
+		limparComboBox('listaTransportadora');
+		limparComboBox('listaRedespacho');
+
+		var comboTransportadora = document.getElementById('listaTransportadora');
+		var comboRedespacho = document.getElementById('listaRedespacho');
+
+		preencherComboTransportadora(comboTransportadora, cliente.listaTransportadora);
+		preencherComboTransportadora(comboRedespacho, cliente.listaRedespacho);
+	});
+	
 	<%--Desabilitando toda a tela de pedidos --%>
 	<c:if test="${pedidoDesabilitado}">
 		$('input[type=text], select:not(.semprehabilitado), textarea').attr('disabled', true).addClass('desabilitado');

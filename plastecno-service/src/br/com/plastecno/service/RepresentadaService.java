@@ -47,6 +47,8 @@ public interface RepresentadaService {
 
 	List<Representada> pesquisarFornecedorAtivo();
 
+	Integer pesquisarIdRevendedor();
+
 	LogradouroRepresentada pesquisarLogradorouro(Integer id);
 
 	String pesquisarNomeFantasiaById(Integer idRepresentada);

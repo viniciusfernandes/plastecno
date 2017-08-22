@@ -132,7 +132,7 @@ public class PedidoController extends AbstractController {
     public PedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
-        this.verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS,
+        verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS,
                 TipoAcesso.CADASTRO_PEDIDO_COMPRA);
     }
 
@@ -528,23 +528,6 @@ public class PedidoController extends AbstractController {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
             gerarLogErroRequestAjax("inclusao/alteracao do pedido", e);
-        }
-    }
-
-    private boolean isPedidoDesabilitado(Pedido pedido) {
-        if (pedido == null || isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS)) {
-            return false;
-        } else {
-            SituacaoPedido situacao = pedido.getSituacaoPedido();
-            boolean isCompraFinalizada = pedido.isCompra() && SituacaoPedido.COMPRA_RECEBIDA.equals(situacao);
-            boolean isVendaFinalizada = pedido.isVenda()
-                    && (SituacaoPedido.ENVIADO.equals(situacao)
-                            || SituacaoPedido.ITEM_AGUARDANDO_COMPRA.equals(situacao)
-                            || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao)
-                            || SituacaoPedido.EMPACOTADO.equals(situacao)
-                            || SituacaoPedido.COMPRA_ANDAMENTO.equals(situacao) || SituacaoPedido.ITEM_AGUARDANDO_MATERIAL
-                                .equals(situacao));
-            return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
         }
     }
 

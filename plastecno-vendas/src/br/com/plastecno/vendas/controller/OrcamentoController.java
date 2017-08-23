@@ -1,5 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import br.com.caelum.vraptor.Get;
@@ -57,8 +59,10 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Post("orcamento/inclusao")
     public void inserirOrcamento(Pedido pedido, Contato contato, Cliente cliente) {
-        if (cliente != null && contato != null) {
-            cliente.addContato(new ContatoCliente(contato));
+        if (cliente != null ) {
+            cliente.addContato(contato != null?new ContatoCliente(contato):null);
+            cliente.setRazaoSocial(cliente.getNomeFantasia());
+            removerMascaraDocumento(cliente);
         }
         pedido.setFinalidadePedido(TipoFinalidadePedido.OUTRA_ENTRADA);
         pedido.setCliente(cliente);
@@ -104,13 +108,18 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Get("orcamento/{idPedido}")
     public void pesquisarOrcamentoById(Integer idPedido) {
-        Pedido orcamento = pedidoService.pesquisarPedidoById(idPedido);
-        addAtributo("pedidoDesabilitado", isPedidoDesabilitado(orcamento));
-        addAtributo("pedido", orcamento);
-        addAtributo("contato", orcamento.getContato());
-        addAtributo("cliente", orcamento.getCliente());
+        Pedido pedido = pedidoService.pesquisarPedidoById(idPedido);
+        pedido.setRepresentada(pedidoService.pesquisarRepresentadaByIdPedido(idPedido));
+        List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+        formatarItemPedido(listaItem);
+        formatarPedido(pedido);
+
+        addAtributo("pedidoDesabilitado", isPedidoDesabilitado(pedido));
+        addAtributo("pedido", pedido);
+        addAtributo("contato", pedido.getContato());
+        addAtributo("cliente", pedido.getCliente());
         addAtributoCondicional("idRepresentadaSelecionada", pedidoService.pesquisarIdRepresentadaByIdPedido(idPedido));
-        addAtributo("listaItemPedido", pedidoService.pesquisarItemPedidoByIdPedido(idPedido));
+        addAtributo("listaItemPedido", listaItem);
         irTopoPagina();
     }
 }

@@ -230,6 +230,9 @@ public class Cliente implements Serializable {
 	}
 
 	public void addContato(ContatoCliente contatoCliente) {
+		if (contatoCliente == null) {
+			return;
+		}
 		if (this.listaContato == null) {
 			this.setListaContato(new HashSet<ContatoCliente>());
 		}

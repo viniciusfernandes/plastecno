@@ -36,10 +36,6 @@ $(document).ready(function() {
 	inicializarAutocompleteMaterial('<c:url value="/pedido/material"/>');
 	// inicializarAutocompleteDescricaoPeca('<c:url value="/estoque/descricaopeca"/>');
 	
-	habilitar('#bloco_item_pedido #descricao', false);
-	habilitar('#bloco_item_pedido #peso', false);
-	habilitar('#bloco_item_pedido #aliquotaIPI', <c:out value="${not empty pedido and pedido.representada.IPIHabilitado}"/>);
-	
 	var urlInclusaoPedido = '<c:url value="/pedido/inclusao"/>';
 	var urlInclusaoItemPedido = '<c:url value="/pedido/item/inclusao"/>';
 	$("#botaoInserirPedido").click(function() {
@@ -137,17 +133,7 @@ $(document).ready(function() {
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
 	inserirMascaraNumerica('numeroPedidoPesquisa', '9999999');
-	inserirMascaraMonetaria('precoVenda', 7);
 	inserirMascaraMonetaria('fretePedido', 7);
-	inserirMascaraNumerica('aliquotaIPI', '99');
-	inserirMascaraMonetaria('aliquotaComissao', 5);
-	inserirMascaraMonetaria('aliquotaICMS', 5);
-	inserirMascaraNumerica('quantidade', '9999999');
-	inserirMascaraMonetaria('comprimento', 8);
-	inserirMascaraMonetaria('peso', 8);
-	inserirMascaraMonetaria('medidaExterna', 8);
-	inserirMascaraMonetaria('medidaInterna', 8);
-	inserirMascaraNumerica('prazoEntrega', '999');
 	inserirMascaraNumerica('validade', '999');
 
 	<jsp:include page="/bloco/bloco_paginador.jsp" />

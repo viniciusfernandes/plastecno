@@ -60,13 +60,15 @@ $(document).ready(function() {
 });
 
 function inserirOrcamento(){
+	toUpperCaseInput();
+	toLowerCaseInput();
+	
 	var parametros = $('#formPedido').serialize();
 	var request = $.ajax({
 		type : "post",
 		url : '<c:url value="/orcamento/inclusao"/>',
 		data : parametros
 	});
-	
 
 	request.done(function(response) {
 		var erros = response.erros;
@@ -124,7 +126,7 @@ function inserirOrcamento(){
 	<form id="formVazio" method="get"></form>
 
 	<form id="formPedido" action="<c:url value="/orcamento/inclusao"/>" method="post">
-		<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${pedido.vendedor.id}"/>
+		<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${xxxxxxxxx}"/>
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<input type="hidden" id="idPedido"  name="pedido.id" value="${pedido.id}"/>
 	
@@ -161,7 +163,7 @@ function inserirOrcamento(){
 			
 		<div class="label obrigatorio">Cliente:</div>
 		<div class="input" style="width: 30%">
-			<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}" class="pesquisavel" style="width: 100%"/>
+			<input type="text" id="nomeCliente" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" style="width: 100%"/>
 			<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 		</div>
 		<div class="input" style="width: 2%">
@@ -186,7 +188,8 @@ function inserirOrcamento(){
 		
 		<div class="label" style="width: 10%">Email:</div>
 		<div class="input" style="width: 30%">
-			<input type="text" id="email" name="contato.email" value="${contato.email}" style="width: 100%"/>
+			<input type="text" id="email" name="contato.email" value="${contato.email}" style="width: 100%"
+				class="apenasLowerCase uppercaseBloqueado lowerCase" />
 		</div>
 		
 		<div class="label">DDD:</div>

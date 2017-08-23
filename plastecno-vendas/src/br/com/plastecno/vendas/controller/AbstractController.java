@@ -659,6 +659,11 @@ public abstract class AbstractController {
         }
     }
 
+    void removerMascaraDocumento(Cliente cliente) {
+        cliente.setCnpj(removerMascaraDocumento(cliente.getCnpj()));
+        cliente.setCpf(removerMascaraDocumento(cliente.getCpf()));
+    }
+
     String removerMascaraDocumento(String documento) {
         return StringUtils.removerMascaraDocumento(documento);
     }

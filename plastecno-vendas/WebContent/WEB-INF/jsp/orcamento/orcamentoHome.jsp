@@ -25,19 +25,23 @@ $(document).ready(function() {
 	scrollTo('${ancora}');
 
 	$("#botaoInserirItemPedido").click(function() {
+		inserirOrcamento();
 		inserirItemPedido($('#numeroPedido').val(), '<c:url value="/orcamento/item/inclusao"/>');
 	});
 	
-	$("#botaoPesquisaNumeroPedido").click(function() {
-		var numeroPedido = $('#numeroPedido').val();
-		if (isEmpty(numeroPedido)) {
+	$("#botaoInserirOrcamento").click(function() {
+		inserirOrcamento();
+	});
+	
+	$("#botaoPesquisaOrcamento").click(function() {
+		var idPedido = $('#numeroPedido').val();
+		if (isEmpty(idPedido)) {
 			gerarListaMensagemAlerta(new Array('O número do pedido é obrigatório para a pesquisa'));
 			return;
 		} 
-		var form = $('#formVazio'); 
-		form.attr('action', '<c:url value="/orcamento/'+numeroPedido+'"/>');
+		var form = document.getElementById('formVazio');
+		form.action = '<c:url value="/orcamento/'+idPedido+'"/>';
 		form.submit();
-		
 	});
 	
 	inicializarAutocompleteCliente('<c:url value="/orcamento/cliente"/>', function(cliente){
@@ -45,6 +49,8 @@ $(document).ready(function() {
 		$('#cnpj').val(cliente.cnpj);
 		$('#cpf').val(cliente.cpf);
 		$('#nomeCliente').val(cliente.nomeCompleto);
+		$('#ddd').val(cliente.ddd);
+		$('#telefone').val(cliente.telefone);
 		$('#idVendedor').val(cliente.vendedor.id);
 		$('#vendedor').val(cliente.vendedor.nome + ' - '+ cliente.vendedor.email);
 	});
@@ -80,6 +86,7 @@ function inserirOrcamento(){
 			 * tela sera desabilitado e nao sera enviado no request.
 			 */
 			$('#idCliente').val(pedidoJson.idCliente);
+			$('#idPedido').val(pedidoJson.id);
 			$('#numeroPedido').val(pedidoJson.id);
 			$('#numeroPedidoPesquisa').val(pedidoJson.id);
 			$('#formEnvioOrcamento #idPedido').val(pedidoJson.id);
@@ -90,7 +97,6 @@ function inserirOrcamento(){
 					pedidoJson.proprietario.nome + ' - '
 							+ pedidoJson.proprietario.email);
 			$('#idVendedor').val(pedidoJson.proprietario.id);
-			$('#botaoEnviarPedido').show();
 			
 			habilitar('#numeroPedido', false);
 			gerarListaMensagemSucesso(new Array('O orçamento No. ' + pedidoJson.id + ' foi incluido com sucesso.'));
@@ -114,9 +120,13 @@ function inserirOrcamento(){
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 
-	<input type="hidden" name="idVendedor" value="${idVendedor}"/>
-	<input type="hidden" name="idCliente" value="${cliente.id}"/>
-	<input type="hidden" name="idPedido" value="${pedido.id}"/>
+
+	<form id="formVazio" method="get"></form>
+
+	<form id="formPedido" action="<c:url value="/orcamento/inclusao"/>" method="post">
+		<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${pedido.vendedor.id}"/>
+		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
+		<input type="hidden" id="idPedido"  name="pedido.id" value="${pedido.id}"/>
 	
 	<fieldset>
 		<legend>Orçamento</legend>
@@ -125,12 +135,12 @@ function inserirOrcamento(){
 			<input type="text" id="numeroPedido" value="${pedido.id}" class="pesquisavel" style="width: 100%"/>
 		</div>
 		<div class="input" style="width: 2%">
-				<input type="button" id="botaoPesquisaNumeroPedido"
+				<input type="button" id="botaoPesquisaOrcamento"
 					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
 			</div>
 		<div class="label" style="width: 8%">Situação:</div>
 			<div class="input" style="width: 40%">
-				<input type="text" name="pedido.situacaoPedido" 
+				<input type="text" id="situacaoPedido" name="pedido.situacaoPedido" 
 					value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled" style="width: 75%"/>
 			</div>
 		<div class="label obrigatorio" >Fornecedor:</div>
@@ -161,40 +171,37 @@ function inserirOrcamento(){
 		
 		<div class="label" style="width: 8%">CNPJ:</div>
 		<div class="input" style="width: 12%">
-			<input type="text" id="cpnj" value="${cliente.cpnj}" style="width: 100%"/>
+			<input type="text" id="cnpj" name="cliente.cnpj" value="${cliente.cnpj}" style="width: 100%"/>
 		</div>
 		
 		<div class="label" style="width: 5%">CPF:</div>
 		<div class="input" style="width: 20%">
-			<input type="text" id="cpnj" value="${cliente.cpf}" style="width: 60%"/>
+			<input type="text" id="cpf" name="cliente.cpf" value="${cliente.cpf}" style="width: 60%"/>
 		</div>
 		
 		<div class="label">Contato:</div>
 		<div class="input" style="width: 30%">
-			<input type="text" id="contato" value="${contato.nome}" style="width: 100%"/>
+			<input type="text" id="contato" name="contato.nome" value="${contato.nome}" style="width: 100%"/>
 		</div>
 		
 		<div class="label" style="width: 10%">Email:</div>
 		<div class="input" style="width: 30%">
-			<input type="text" id="email" value="${contato.email}" style="width: 100%"/>
+			<input type="text" id="email" name="contato.email" value="${contato.email}" style="width: 100%"/>
 		</div>
 		
 		<div class="label">DDD:</div>
 		<div class="input" style="width: 5%">
-			<input type="text" id="telefone" value="${contato.ddd}" style="width: 100%"/>
+			<input type="text" id="ddd" name="contato.ddd" value="${contato.ddd}" style="width: 100%"/>
 		</div>
 		
 		<div class="label" style="width: 8%">Telefone:</div>
 		<div class="input" style="width: 16%">
-			<input type="text" id="telefone" value="${contato.telefone}" style="width: 100%"/>
+			<input type="text" id="telefone" name="contato.telefone" value="${contato.telefone}" style="width: 100%"/>
 		</div>
-		
-	</fieldset>
-	<form id="formEnvioOrcamento" action="<c:url value="/orcamento/inclusao"/>" method="post">
 		<div class="bloco_botoes">
-			<input type="button" id="botaoEnviar" title="Inserir Orçamento" value="" class="botaoInserir"/>
-			<input type="hidden" id="idPedido" name="idPedido" value="${pedido.id}" />
+			<input type="button" id="botaoInserirOrcamento" title="Inserir Orçamento" value="" class="botaoInserir"/>
 		</div>
+	</fieldset>
 	</form>
 	
 	<jsp:include page="/bloco/bloco_item_pedido.jsp" />

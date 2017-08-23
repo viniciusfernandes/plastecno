@@ -295,7 +295,6 @@ function inicializarAutocompleteCliente(url, preencherCampos) {
 					if(clienteJson==undefined || clienteJson==null){
 						return;
 					}
-					
 					if(preencherCampos != undefined){
 						preencherCampos(clienteJson);
 					}

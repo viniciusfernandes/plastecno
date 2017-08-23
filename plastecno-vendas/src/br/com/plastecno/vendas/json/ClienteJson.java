@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Transportadora;
@@ -15,7 +16,9 @@ import br.com.plastecno.service.entity.Transportadora;
 public class ClienteJson {
     private final String cnpj;
     private final String cpf;
+    private String ddd;
     private final String email;
+    private final String emailContato;
     private final Integer id;
     private String inscricaoEstadual;
     private final List<TransportadoraJson> listaRedespacho;
@@ -23,22 +26,28 @@ public class ClienteJson {
     private final LogradouroJson logradouroFaturamento;
     private final String logradouroFormatado;
     private final String nomeCompleto;
+    private final String nomeContato;
     private final String nomeFantasia;
     private final String razaoSocial;
     private final String site;
     private final String suframa;
-    private final String telefone;
+    private String telefone;
     private final VendedorJson vendedor;
 
     public ClienteJson(Cliente cliente) {
-        this(cliente, (List<Transportadora>) null);
+        this(cliente, (List<Transportadora>) null, null, null);
+    }
+
+    public ClienteJson(Cliente cliente, boolean telefoneFormatado) {
+        this(cliente, (List<Transportadora>) null, null, null);
     }
 
     public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora) {
-        this(cliente, listaTransportadora, null);
+        this(cliente, listaTransportadora, null, null);
     }
 
-    public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora, Logradouro logradouro) {
+    public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora, List<Transportadora> listaRedespacho,
+            Logradouro logradouro) {
         this.listaTransportadora = new ArrayList<TransportadoraJson>();
         this.listaRedespacho = new ArrayList<TransportadoraJson>();
 
@@ -52,8 +61,12 @@ public class ClienteJson {
             cpf = cliente.getCpf();
             inscricaoEstadual = cliente.getInscricaoEstadual();
             nomeCompleto = cliente.getNomeCompleto();
-            telefone = cliente.getContatoPrincipal() != null ? cliente.getContatoPrincipal().getTelefoneFormatado()
-                    : "";
+
+            Contato c = cliente.getContatoPrincipal();
+            telefone = c != null ? c.getTelefoneFormatado() : "";
+            nomeContato = c != null ? c.getNome() : "";
+            emailContato = c != null ? c.getEmail() : "";
+
             vendedor = cliente.getVendedor() == null ? null : new VendedorJson(cliente.getVendedor());
             suframa = cliente.getInscricaoSUFRAMA();
             logradouroFaturamento = new LogradouroJson(logradouro);
@@ -63,8 +76,8 @@ public class ClienteJson {
                 logradouroFormatado = "";
             }
 
-            if (cliente.getListaRedespacho() != null) {
-                for (Transportadora redespacho : cliente.getListaRedespacho()) {
+            if (listaRedespacho != null) {
+                for (Transportadora redespacho : listaRedespacho) {
                     this.listaRedespacho.add(new TransportadoraJson(redespacho));
                 }
             }
@@ -89,7 +102,13 @@ public class ClienteJson {
             suframa = "";
             logradouroFaturamento = new LogradouroJson(null);
             logradouroFormatado = "";
+            nomeContato = "";
+            emailContato = "";
         }
+    }
+
+    public ClienteJson(Cliente cliente, List<Transportadora> listaTransportadora, Logradouro logradouro) {
+        this(cliente, listaTransportadora, null, logradouro);
     }
 
     public ClienteJson(Cliente cliente, LogradouroCliente logradouro) {
@@ -104,8 +123,16 @@ public class ClienteJson {
         return cpf;
     }
 
+    public String getDdd() {
+        return ddd;
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public String getEmailContato() {
+        return emailContato;
     }
 
     public Integer getId() {
@@ -136,6 +163,10 @@ public class ClienteJson {
         return nomeCompleto;
     }
 
+    public String getNomeContato() {
+        return nomeContato;
+    }
+
     public String getNomeFantasia() {
         return nomeFantasia;
     }
@@ -160,7 +191,20 @@ public class ClienteJson {
         return vendedor;
     }
 
+    public void setDdd(String ddd) {
+        this.ddd = ddd;
+    }
+
+    public void setDDDTelefone(String ddd, String telefone) {
+        this.ddd = ddd;
+        this.telefone = telefone;
+    }
+
     public void setInscricaoEstadual(String inscricaoEstadual) {
         this.inscricaoEstadual = inscricaoEstadual;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
     }
 }

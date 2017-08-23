@@ -54,7 +54,7 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 import br.com.plastecno.vendas.relatorio.conversor.GeradorRelatorioPDF;
 
 @Resource
-public class PedidoController extends AbstractController {
+public class PedidoController extends AbstractPedidoController {
 
     private class MaterialAutocomplete extends Autocomplete {
         private Boolean importado;
@@ -604,7 +604,7 @@ public class PedidoController extends AbstractController {
         Cliente cliente = carregarDadosCliente(id);
 
         final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisarTransportadoraAtiva(),
-                cliente.getLogradouro());
+                cliente.getListaRedespacho(), cliente.getLogradouro());
 
         SerializacaoJson serializacaoJson = new SerializacaoJson("cliente", json)
                 .incluirAtributo("listaTransportadora").incluirAtributo("listaRedespacho").incluirAtributo("vendedor");

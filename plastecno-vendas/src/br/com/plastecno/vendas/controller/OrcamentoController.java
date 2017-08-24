@@ -16,6 +16,7 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoAcesso;
+import br.com.plastecno.service.constante.TipoCST;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
@@ -25,6 +26,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
+import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ClienteJson;
 import br.com.plastecno.vendas.json.SerializacaoJson;
@@ -44,6 +46,9 @@ public class OrcamentoController extends AbstractPedidoController {
     private PedidoService pedidoService;
 
     @Servico
+    private RelatorioService relatorioService;
+
+    @Servico
     private RepresentadaService representadaService;
 
     @Servico
@@ -56,6 +61,7 @@ public class OrcamentoController extends AbstractPedidoController {
 
         super.setClienteService(clienteService);
         super.setPedidoService(pedidoService);
+        super.setRelatorioService(relatorioService);
     }
 
     @Post("orcamento/aceite/{id}")
@@ -128,6 +134,7 @@ public class OrcamentoController extends AbstractPedidoController {
         addAtributo("vendedorEmail", getUsuario().getEmail());
         addAtributoCondicional("idRepresentadaSelecionada", representadaService.pesquisarIdRevendedor());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
+        addAtributo("listaCST", TipoCST.values());
     }
 
     /*
@@ -164,17 +171,32 @@ public class OrcamentoController extends AbstractPedidoController {
     @Get("orcamento/{idPedido}")
     public void pesquisarOrcamentoById(Integer idPedido) {
         Pedido pedido = pedidoService.pesquisarPedidoById(idPedido);
-        pedido.setRepresentada(pedidoService.pesquisarRepresentadaByIdPedido(idPedido));
-        List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-        formatarItemPedido(listaItem);
-        formatarPedido(pedido);
+        if (pedido == null || !pedido.isOrcamento()) {
+            gerarListaMensagemAlerta("O orçamento No. " + idPedido + " não existe no sistema");
+        } else {
+            pedido.setRepresentada(pedidoService.pesquisarRepresentadaByIdPedido(idPedido));
+            List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+            formatarItemPedido(listaItem);
+            formatarPedido(pedido);
 
-        addAtributo("pedidoDesabilitado", isPedidoDesabilitado(pedido));
-        addAtributo("pedido", pedido);
-        addAtributo("contato", pedido.getContato());
-        addAtributo("cliente", pedido.getCliente());
-        addAtributoCondicional("idRepresentadaSelecionada", pedidoService.pesquisarIdRepresentadaByIdPedido(idPedido));
-        addAtributo("listaItemPedido", listaItem);
+            addAtributo("pedidoDesabilitado", isPedidoDesabilitado(pedido));
+            addAtributo("pedido", pedido);
+            addAtributo("contato", pedido.getContato());
+            addAtributo("cliente", pedido.getCliente());
+            addAtributoCondicional("idRepresentadaSelecionada",
+                    pedidoService.pesquisarIdRepresentadaByIdPedido(idPedido));
+            addAtributo("listaItemPedido", listaItem);
+        }
         irTopoPagina();
+    }
+
+    @Get("orcamento/listagem")
+    public void pesquisarOrcamentoByIdCliente(Integer idCliente, Integer idVendedor, Integer idRepresentada,
+            TipoPedido tipoPedido, Integer paginaSelecionada, ItemPedido itemVendido) {
+
+        super.pesquisarPedidoByIdCliente(idCliente, idVendedor, idRepresentada, tipoPedido, true, paginaSelecionada,
+                itemVendido);
+
+        irRodapePagina();
     }
 }

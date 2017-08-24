@@ -8,17 +8,23 @@ import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
+import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.relatorio.RelatorioService;
+import br.com.plastecno.service.wrapper.GrupoWrapper;
+import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -44,12 +50,28 @@ public class AbstractPedidoController extends AbstractController {
     }
 
     private ClienteService clienteService;
+
     private PedidoService pedidoService;
+
+    private RelatorioService relatorioService;
+
+    private RepresentadaService representadaService;
+
     private TransportadoraService transportadoraService;
+    private UsuarioService usuarioService;
 
     public AbstractPedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
+    }
+
+    void configurarTipoPedido(TipoPedido tipoPedido) {
+        if (TipoPedido.COMPRA.equals(tipoPedido)) {
+            addAtributo("tipoPedido", tipoPedido);
+            if (!contemAtributo("proprietario")) {
+                addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
+            }
+        }
     }
 
     Download downloadPDFPedido(Integer idPedido, TipoPedido tipoPedido) {
@@ -194,6 +216,37 @@ public class AbstractPedidoController extends AbstractController {
         }
     }
 
+    /*
+     * Metodo dedicado a gerar relatorio paginado dos itens dos pedidos no caso
+     * em que o usuario seja um administrador, sendo assim, ele podera consultar
+     * os pedidos de todos os vendedores
+     */
+    private RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioPaginadoItemPedido(Integer idCliente,
+            Integer idVendedor, Integer idFornecedor, boolean isOrcamento, boolean isCompra, Integer paginaSelecionada,
+            ItemPedido itemVendido) {
+        final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
+
+        // Essa variavel eh utilizada para decidirmos se queremos recuperar
+        // todos os pedidos de um determinado cliente independentemente do
+        // vendedor. Essa acao sera disparada por qualquer um que seja
+        // adiministrador do sistema, podendo ser um outro vendedor ou nao.
+        boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+        RelatorioWrapper<Pedido, ItemPedido> relatorio = relatorioService
+                .gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, pesquisarTodos ? null
+                        : idVendedor, idFornecedor, isOrcamento, isCompra, indiceRegistroInicial,
+                        getNumerRegistrosPorPagina(), itemVendido);
+
+        for (GrupoWrapper<Pedido, ItemPedido> grupo : relatorio.getListaGrupo()) {
+            formatarPedido(grupo.getId());
+
+            for (ItemPedido itemPedido : grupo.getListaElemento()) {
+                formatarItemPedido(itemPedido);
+            }
+        }
+
+        return relatorio;
+    }
+
     boolean isPedidoDesabilitado(Pedido pedido) {
         if (pedido == null || isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS)) {
             return false;
@@ -244,6 +297,57 @@ public class AbstractPedidoController extends AbstractController {
         return isAcessoVendaPermitido;
     }
 
+    public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
+            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido) {
+        boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
+        if (idCliente == null) {
+            gerarListaMensagemAlerta("Cliente é obrigatório para a pesquisa de pedidos");
+        } else if (!isVisulizacaoClientePermitida(idCliente)) {
+            gerarListaMensagemAlerta("O usuário não tem permissão para pesquisar os pedidos do cliente.");
+        } else {
+
+            final RelatorioWrapper<Pedido, ItemPedido> relatorio = gerarRelatorioPaginadoItemPedido(idCliente,
+                    idVendedor, idFornecedor, orcamento, isCompra, paginaSelecionada, itemVendido);
+            inicializarRelatorioPaginadoSemRedirecionar(paginaSelecionada, relatorio, "relatorioItemPedido");
+
+            /*
+             * Recuperando os dados do cliente no caso em que nao tenhamos
+             * resultado na pesquisa de pedido, entao os dados do cliente devem
+             * permanecer na tela
+             */
+            Cliente cliente = clienteService.pesquisarById(idCliente);
+            carregarVendedor(cliente);
+            addAtributo("cliente", cliente);
+
+            if (isCompra) {
+                // Aqui estamos supondo que o usuario que acessou a tela eh um
+                // comprador pois ele tem permissao para isso. E o campo com o
+                // nome do comprador deve sempre estar preenchido.
+                addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
+                addAtributo("listaRepresentada", representadaService.pesquisarFornecedor(true));
+            } else {
+                // Aqui ja foi carregado o vendedor resumido.
+                addAtributo("proprietario", cliente.getVendedor());
+            }
+
+            LogradouroCliente l = clienteService.pesquisarLogradouroFaturamentoById(idCliente);
+            if (l != null) {
+                addAtributo("logradouroFaturamento", l.getCepEnderecoNumeroBairro());
+            }
+
+            if (!orcamento) {
+                addAtributo("listaTransportadora", transportadoraService.pesquisarTransportadoraAtiva());
+                addAtributo("listaRedespacho", transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
+            }
+            addAtributo("idRepresentadaSelecionada", idFornecedor);
+        }
+        addAtributo("tipoPedido", tipoPedido);
+        addAtributo("orcamento", orcamento);
+        addAtributo("isCompra", isCompra);
+        configurarTipoPedido(tipoPedido);
+
+    }
+
     LogradouroPedido recuperarLogradouro(Pedido p, TipoLogradouro t) {
         if (p.getListaLogradouro() == null || p.getListaLogradouro().isEmpty()) {
             return null;
@@ -264,7 +368,19 @@ public class AbstractPedidoController extends AbstractController {
         this.pedidoService = pedidoService;
     }
 
+    public void setRelatorioService(RelatorioService relatorioService) {
+        this.relatorioService = relatorioService;
+    }
+
+    public void setRepresentadaService(RepresentadaService representadaService) {
+        this.representadaService = representadaService;
+    }
+
     public void setTransportadoraService(TransportadoraService transportadoraService) {
         this.transportadoraService = transportadoraService;
+    }
+
+    public void setUsuarioService(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 }

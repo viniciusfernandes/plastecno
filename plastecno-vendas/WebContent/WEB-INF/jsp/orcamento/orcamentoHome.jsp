@@ -5,11 +5,11 @@
 <head>
 
 <jsp:include page="/bloco/bloco_css.jsp" />
+<jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/tabela_handler.js?${versaoCache}"/>"></script>
@@ -20,6 +20,7 @@
 <script type="text/javascript" src="<c:url value="/js/pedido/bloco_item_pedido.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js?${versaoCache}"/>"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -28,7 +29,6 @@ $(document).ready(function() {
 	var tabelaItemHandler = gerarTabelaItemPedido('<c:url value="/orcamento"/>');
 	
 	$("#botaoInserirItemPedido").click(function() {
-		inserirOrcamento();
 		inserirItemPedido($('#numeroPedido').val(), '<c:url value="/orcamento/item/inclusao"/>');
 	});
 	
@@ -44,6 +44,22 @@ $(document).ready(function() {
 		} 
 		var form = document.getElementById('formVazio');
 		form.action = '<c:url value="/orcamento/"/>'+idPedido;
+		form.submit();
+	});
+	
+	$("#botaoListarOrcamento").click(function() {
+		var form = document.getElementById('formVazio');
+		adicionarInputHiddenFormulario('formVazio', 'idCliente', $('#idCliente').val());
+		adicionarInputHiddenFormulario('formVazio', 'idVendedor', $('#idVendedor').val());
+		adicionarInputHiddenFormulario('formVazio', 'idRepresentada', $('#idRepresentada').val());
+
+		form.action = '<c:url value="/orcamento/listagem"/>';
+		form.submit();
+	});
+	
+	$("#botaoLimparOrcamento").click(function() {
+		var form = document.getElementById('formVazio');
+		form.action = '<c:url value="/orcamento"/>';
 		form.submit();
 	});
 	
@@ -92,10 +108,16 @@ $(document).ready(function() {
 		$('#telefone').val(cliente.telefone);
 		$('#idVendedor').val(cliente.vendedor.id);
 		$('#vendedor').val(cliente.vendedor.nome + ' - '+ cliente.vendedor.email);
+		
+		$('#idClienteListagem').val(cliente.id);
+		$('#idVendedorListagem').val(cliente.vendedor.id);
 	});
 	inicializarAutocompleteMaterial('<c:url value="/orcamento/material"/>');
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
+	
+	<jsp:include page="/bloco/bloco_paginador.jsp" />
+
 });
 
 function inserirOrcamento(){
@@ -161,7 +183,12 @@ function inserirOrcamento(){
 <body>
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
-
+		<%--Esse form foi criado apenas para a paginacao --%>
+		<form id="formPesquisa" action="<c:url value="/orcamento/listagem"/>" method="get">
+			<input type="hidden" name="idCliente" id="idClienteListagem"  value="${cliente.id}"/> 
+			<input type="hidden" name="idRepresentada" id="idRepresentadaListagem" value="${idRepresentadaSelecionada}"/>
+			<input type="hidden" name="idVendedor" id="idVendedorListagem" value="${pedido.proprietario.id}"/>  
+		</form>
 
 	<form id="formVazio" method="get"></form>
 
@@ -208,8 +235,7 @@ function inserirOrcamento(){
 			<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 		</div>
 		<div class="input" style="width: 2%">
-			<input type="button" id="botaoEditarCliente"
-					title="Editar Cliente" value="" class="botaoEditar" />
+			<input type="button" id="botaoListarOrcamento" title="Pesquisar Orçamento" value="" class="botaoPesquisarPequeno" />
 		</div>
 		
 		<div class="label" style="width: 8%">CNPJ:</div>
@@ -245,6 +271,7 @@ function inserirOrcamento(){
 		<div class="bloco_botoes">
 			<input type="button" id="botaoInserirOrcamento" title="Inserir Orçamento" value="" class="botaoInserir"/>
 			<input type="button" id="botaoPDFOrcamento" value="" title="PDF Orçamento" class="botaoPDF" />
+			<input type="button" id="botaoLimparOrcamento" value="" title="Limpar Orçamento" class="botaoLimpar" />
 		</div>
 	</fieldset>
 	</form>
@@ -254,5 +281,8 @@ function inserirOrcamento(){
 		<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
 		<input type="button" id="botaoAceitarOrcamento" title="Aceitar Orçamento" value="" class="botaoAceitar" />
 	</div>
+	
+	<jsp:include page="/bloco/bloco_listagem_item_pedido.jsp"/>
+	
 </body>
 </html>

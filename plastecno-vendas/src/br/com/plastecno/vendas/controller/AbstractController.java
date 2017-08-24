@@ -485,9 +485,9 @@ public abstract class AbstractController {
         if (paginaSelecionada == null || paginaSelecionada <= 1) {
             paginaSelecionada = 1;
         }
-        this.result.include("paginaSelecionada", paginaSelecionada);
-        this.result.include("totalPaginas", totalPaginas);
-        this.result.include(nomeObjetoPaginado, objetoPaginado);
+        result.include("paginaSelecionada", paginaSelecionada);
+        result.include("totalPaginas", totalPaginas);
+        result.include(nomeObjetoPaginado, objetoPaginado);
         if (redirecionar) {
             irRodapePagina();
         }

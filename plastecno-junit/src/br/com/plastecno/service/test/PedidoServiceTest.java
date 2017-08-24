@@ -565,7 +565,6 @@ public class PedidoServiceTest extends AbstractTest {
 		assertEquals(
 				"A situacao do pedido que nao seja um orcamento nao deve ser modificada apos o aceite do orcamento",
 				situacaoPedidoAntes, pedido.getSituacaoPedido());
-
 	}
 
 	@Test

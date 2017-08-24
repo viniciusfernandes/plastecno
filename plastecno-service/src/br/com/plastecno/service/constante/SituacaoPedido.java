@@ -1,5 +1,9 @@
 package br.com.plastecno.service.constante;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 public enum SituacaoPedido {
 	DIGITACAO ("DIGITAÇÃO") ,
 	ORCAMENTO ("ORÇAMENTO"),
@@ -19,9 +23,20 @@ public enum SituacaoPedido {
 	
 	private SituacaoPedido(String descricao){
 		this.descricao = descricao;
+		
 	}
 	
 	public String getDescricao(){
 		return this.descricao;
+	}
+	
+	private static List<SituacaoPedido> listaOrcamento = new ArrayList<SituacaoPedido>();
+	static{
+		listaOrcamento.add(ORCAMENTO);
+		listaOrcamento.add(ORCAMENTO_ACEITO);
+		listaOrcamento.add(ORCAMENTO_DIGITACAO);
+	}
+	public static List<SituacaoPedido> getListaOrcamento(){
+		return listaOrcamento;
 	}
 }

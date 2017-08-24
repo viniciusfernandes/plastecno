@@ -94,7 +94,8 @@ $(document).ready(function() {
 			return;
 		} 
 		var form = document.getElementById('formVazio');
-		form.action = '<c:url value="/orcamento/pdf/"/>'+idPedido;
+		adicionarInputHiddenFormulario('formVazio', 'idPedido', idPedido);
+		form.action = '<c:url value="/orcamento/pdf"/>';
 		form.method = 'get';
 		form.submit();
 	});

@@ -42,12 +42,12 @@
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaICMSFormatado}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/pedido/pdf"/>">
+									<form action="${orcamento? 'orcamento/pdf': 'pedido/pdf' }">
 										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
 										<input type="hidden" name="idPedido" value="${grupo.id.id}" />
 										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
 									</form>
-									<form action="<c:url value="/pedido/${grupo.id.id}"/>" method="get">
+									<form action="${orcamento? 'orcamento/': 'pedido/' }${grupo.id.id}" method="get">
 										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
 										<input type="hidden" name="id" value="${grupo.id.id}" />
 										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />

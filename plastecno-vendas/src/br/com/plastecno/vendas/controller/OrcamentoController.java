@@ -79,9 +79,9 @@ public class OrcamentoController extends AbstractPedidoController {
 
     }
 
-    @Get("orcamento/pdf/{id}")
-    public Download downloadPDFOrcamento(Integer id) {
-        return super.downloadPDFPedido(id, TipoPedido.REVENDA);
+    @Get("orcamento/pdf")
+    public Download downloadPDFOrcamento(Integer idPedido) {
+        return super.downloadPDFPedido(idPedido, TipoPedido.REVENDA);
     }
 
     @Post("orcamento/envio/{id}")

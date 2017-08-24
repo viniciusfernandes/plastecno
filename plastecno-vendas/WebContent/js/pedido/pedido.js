@@ -180,7 +180,8 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 		var request = $.ajax({
 			type : 'post',
 			url : urlInclusaoItemPedido,
-			data : parametros
+			data : parametros,
+			async: false
 		});
 
 		request.done(function(response) {

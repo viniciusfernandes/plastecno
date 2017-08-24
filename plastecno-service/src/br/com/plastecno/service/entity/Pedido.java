@@ -47,9 +47,6 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Cliente do pedido")
 	private Cliente cliente;
 
-	@Column(name = "validade")
-	private Integer validade;
-
 	@Column(name = "cliente_notificado_venda")
 	private boolean clienteNotificadoVenda = false;
 
@@ -108,6 +105,9 @@ public class Pedido implements Serializable, Cloneable {
 	// Campo criado para atualizar o id do cliente no envio do pedido via json.
 	@Transient
 	private Integer idCliente;
+
+	@Column(name = "id_orcamento")
+	private Integer idOrcamento;
 
 	@Transient
 	private Integer idVendedor;
@@ -171,6 +171,9 @@ public class Pedido implements Serializable, Cloneable {
 	@JoinColumn(name = "id_transportadora_redespacho")
 	@InformacaoValidavel(nomeExibicao = "Redespacho do pedido")
 	private Transportadora transportadoraRedespacho;
+
+	@Column(name = "validade")
+	private Integer validade;
 
 	@Column(name = "valor_frete")
 	private Double valorFrete;
@@ -392,6 +395,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public Integer getIdCliente() {
 		return idCliente;
+	}
+
+	public Integer getIdOrcamento() {
+		return idOrcamento;
 	}
 
 	public Integer getIdVendedor() {
@@ -636,6 +643,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setIdCliente(Integer idCliente) {
 		this.idCliente = idCliente;
+	}
+
+	public void setIdOrcamento(Integer idOrcamento) {
+		this.idOrcamento = idOrcamento;
 	}
 
 	public void setIdVendedor(Integer idVendedor) {

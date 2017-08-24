@@ -9,6 +9,7 @@ import javax.ejb.Local;
 import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.LogradouroPedido;
@@ -23,7 +24,7 @@ import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 
 @Local
 public interface PedidoService {
-	void aceitarOrcamento(Integer idOrcamento);
+	Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException;
 
 	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
 
@@ -224,6 +225,8 @@ public interface PedidoService {
 	List<SituacaoPedido> pesquisarSituacaoVendaEfetivada();
 
 	Object[] pesquisarTelefoneContatoByIdPedido(Integer idPedido);
+
+	TipoPedido pesquisarTipoPedidoByIdPedido(Integer idPedido);
 
 	List<TotalizacaoPedidoWrapper> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo);
 

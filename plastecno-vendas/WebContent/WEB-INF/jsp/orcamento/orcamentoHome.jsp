@@ -106,7 +106,8 @@ function inserirOrcamento(){
 	var request = $.ajax({
 		type : "post",
 		url : '<c:url value="/orcamento/inclusao"/>',
-		data : parametros
+		data : parametros,
+		async: false
 	});
 
 	request.done(function(response) {

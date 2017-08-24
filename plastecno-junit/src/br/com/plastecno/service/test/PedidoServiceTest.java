@@ -493,27 +493,43 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testAceiteOrcamento() {
-		Pedido pedido = gerarPedidoOrcamento();
-		ItemPedido itemPedido = gerarItemPedido();
-		Integer idPedido = pedido.getId();
+		Pedido orcamento = gerarPedidoOrcamento();
+		ItemPedido itemOrcamento = gerarItemPedido();
+		Integer idOrcamento = orcamento.getId();
 
 		try {
-			pedidoService.inserirItemPedido(idPedido, itemPedido);
+			pedidoService.inserirItemPedido(idOrcamento, itemOrcamento);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idOrcamento, new byte[] {});
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		pedidoService.aceitarOrcamento(idPedido);
+		orcamento = pedidoService.pesquisarPedidoById(idOrcamento);
+		assertEquals("A situacao do orcamento deve ser ORCAMENTO apos o aceite do orcamento", SituacaoPedido.ORCAMENTO,
+				orcamento.getSituacaoPedido());
 
-		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		Integer idPedido = null;
+		try {
+			idPedido = pedidoService.aceitarOrcamento(idOrcamento);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Pedido pedido = pedidoService.pesquisarPedidoById(idPedido);
 		assertEquals("A situacao do pedido deve ser DIGITACAO apos o aceite do orcamento", SituacaoPedido.DIGITACAO,
 				pedido.getSituacaoPedido());
+
+		orcamento = pedidoService.pesquisarPedidoById(idOrcamento);
+		assertEquals("A situacao do orcamento deve ser ORCAMENTO ACEITO apos o aceite do orcamento",
+				SituacaoPedido.ORCAMENTO_ACEITO, orcamento.getSituacaoPedido());
+
+		assertNotEquals("OS ids do pedido e do orcamento devem ser diferentes apos o aceito do orcamento",
+				pedido.getId(), orcamento.getId());
 
 	}
 
@@ -537,9 +553,14 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		SituacaoPedido situacaoPedidoAntes = pedido.getSituacaoPedido();
+		boolean throwed = false;
+		try {
+			pedidoService.aceitarOrcamento(idPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
 
-		pedidoService.aceitarOrcamento(idPedido);
-
+		assertTrue("Um id de pedido foi usado no aceite de orcamento e isso nao pode ocorrer.", throwed);
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
 		assertEquals(
 				"A situacao do pedido que nao seja um orcamento nao deve ser modificada apos o aceite do orcamento",

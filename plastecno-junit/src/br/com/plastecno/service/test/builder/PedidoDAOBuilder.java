@@ -49,6 +49,13 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 		};
 
 		new MockUp<PedidoDAO>() {
+
+			@Mock
+			public void alterarIdOrcamentoByIdPedido(Integer idPedido, Integer idOrcamento) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				p.setIdOrcamento(idOrcamento);
+			}
+
 			@Mock
 			public void alterarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
 				REPOSITORY.alterarEntidadeAtributoById(Pedido.class, idPedido, "situacaoPedido", situacaoPedido);

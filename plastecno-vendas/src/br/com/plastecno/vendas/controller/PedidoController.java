@@ -405,11 +405,6 @@ public class PedidoController extends AbstractPedidoController {
         redirecionarHome(tipoPedido, orcamento, true);
     }
 
-    @Get("pedido/orcamento/venda")
-    public void orcamentoVendaHome() {
-        redirecTo(this.getClass()).pedidoHome(TipoPedido.REVENDA, true);
-    }
-
     @Get("pedido/compra")
     public void pedidoCompraHome() {
         addAtributoCondicional("isCompra", true);
@@ -644,9 +639,7 @@ public class PedidoController extends AbstractPedidoController {
     }
 
     private void redirecionarHome(TipoPedido tipoPedido, boolean orcamento, boolean topoPagina) {
-        if (orcamento && !TipoPedido.COMPRA.equals(tipoPedido)) {
-            redirecTo(this.getClass()).orcamentoVendaHome();
-        } else if (!orcamento && TipoPedido.COMPRA.equals(tipoPedido)) {
+        if (!orcamento && TipoPedido.COMPRA.equals(tipoPedido)) {
             redirecTo(this.getClass()).pedidoCompraHome();
         } else {
             redirecTo(this.getClass()).pedidoVendaHome();

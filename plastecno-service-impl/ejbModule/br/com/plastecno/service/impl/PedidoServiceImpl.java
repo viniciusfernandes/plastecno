@@ -108,16 +108,25 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@Override
-	public void aceitarOrcamento(Integer idOrcamento) {
+	public Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException {
 		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoById(idOrcamento);
 		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)
 				&& !SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido)) {
-			return;
+			throw new BusinessException(
+					"Apenas os orçamentos em digitação ou enviados podem ser aceitos para um novo pedido.");
 		}
-		// Para o aceite do orcamento devemos redirecionar o pedido para o
-		// inicio da
-		// digitacao do pedido
-		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.DIGITACAO);
+
+		Integer idPedido = copiarPedido(idOrcamento, true);
+
+		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.ORCAMENTO_ACEITO);
+
+		// O pedido deve ir para digitacao
+		alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.DIGITACAO);
+
+		// Amarrando o pedido ao orcamento para o aceite. Isso sera utilizado em
+		// relatorios dos orcamento que viraram pedidos.
+		pedidoDAO.alterarIdOrcamentoByIdPedido(idPedido, idOrcamento);
+		return idPedido;
 	}
 
 	@Override
@@ -1615,6 +1624,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 		final Integer idRepresentada = pedidoDAO.pesquisarIdRepresentadaByIdPedido(itemPedido.getPedido().getId());
 		return representadaService.pesquisarTipoApresentacaoIPI(idRepresentada);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public TipoPedido pesquisarTipoPedidoByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarTipoPedidoById(idPedido);
 	}
 
 	@Override

@@ -60,10 +60,17 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Post("orcamento/aceite/{id}")
     public void aceitarOrcamento(Integer id) {
-        pedidoService.aceitarOrcamento(id);
-        // Devemos configurar o parametro orcamento = false para direcionar o
-        // usuario para a tela de vendas apos o aceite.
-        redirecTo(this.getClass()).pesquisarItemOrcamentoById(id);
+        try {
+            Integer idPedido = pedidoService.aceitarOrcamento(id);
+            // Devemos configurar o parametro orcamento = false para direcionar
+            // o
+            // usuario para a tela de vendas apos o aceite.
+            redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA, true);
+        } catch (BusinessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
     @Get("orcamento/pdf/{id}")

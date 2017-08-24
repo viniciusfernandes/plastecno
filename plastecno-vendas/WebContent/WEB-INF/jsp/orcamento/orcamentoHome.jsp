@@ -17,6 +17,7 @@
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/pedido/pedido.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/pedido/bloco_item_pedido.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 
@@ -24,6 +25,8 @@
 $(document).ready(function() {
 	scrollTo('${ancora}');
 
+	var tabelaItemHandler = gerarTabelaItemPedido('<c:url value="/orcamento"/>');
+	
 	$("#botaoInserirItemPedido").click(function() {
 		inserirOrcamento();
 		inserirItemPedido($('#numeroPedido').val(), '<c:url value="/orcamento/item/inclusao"/>');
@@ -126,9 +129,10 @@ function inserirOrcamento(){
 	<form id="formVazio" method="get"></form>
 
 	<form id="formPedido" action="<c:url value="/orcamento/inclusao"/>" method="post">
-		<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${xxxxxxxxx}"/>
+		<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${pedido.proprietario.id}"/>
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<input type="hidden" id="idPedido"  name="pedido.id" value="${pedido.id}"/>
+		<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
 	
 	<fieldset>
 		<legend>Orçamento</legend>
@@ -147,7 +151,7 @@ function inserirOrcamento(){
 			</div>
 		<div class="label obrigatorio" >Fornecedor:</div>
 		<div class="input" style="width: 30%">
-			<select id="representada" name="pedido.representada.id" style="width: 100%">
+			<select id="representada" id="representada" name="pedido.representada.id" style="width: 100%">
 				<option value="">&lt&lt SELECIONE &gt&gt</option>
 				<c:forEach var="representada" items="${listaRepresentada}">
 					<option value="${representada.id}"

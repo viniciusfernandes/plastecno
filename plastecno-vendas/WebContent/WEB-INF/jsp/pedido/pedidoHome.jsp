@@ -19,6 +19,7 @@
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/pedido/pedido.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/pedido/bloco_item_pedido.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 
@@ -33,6 +34,7 @@
 $(document).ready(function() {
 	scrollTo('${ancora}');
 
+	var tabelaItemHandler = gerarTabelaItemPedido('<c:url value="/pedido"/>')
 	inicializarAutocompleteMaterial('<c:url value="/pedido/material"/>');
 	// inicializarAutocompleteDescricaoPeca('<c:url value="/estoque/descricaopeca"/>');
 	
@@ -125,8 +127,6 @@ $(document).ready(function() {
 		adicionarInputHiddenFormulario('formVazio', 'numeroNFe', $(this).val());
 		$('#formVazio').attr('action', '<c:url value="/pedido/nfe"/>').submit();
 	});
-	
-	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
 	
 	inserirMascaraData('dataEntrega');
 	inserirMascaraCNPJ('cnpj');

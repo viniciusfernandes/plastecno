@@ -41,7 +41,7 @@ $(document).ready(function(){
 		$('<input>').attr('type','hidden').attr('name','itemVendido.comprimento').attr('value',$('#bloco_item_pedido #comprimento').val()).appendTo('#formPesquisa');
 		$('#botaoPesquisaPedido').click();
 	});
-
+	
 	inserirMascaraNCM('bloco_item_pedido #ncm');
 	inserirMascaraMonetaria('precoVenda', 7);
 	inserirMascaraNumerica('aliquotaIPI', '99');

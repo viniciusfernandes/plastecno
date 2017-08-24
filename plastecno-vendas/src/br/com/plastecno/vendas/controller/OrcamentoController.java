@@ -59,8 +59,8 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Post("orcamento/inclusao")
     public void inserirOrcamento(Pedido pedido, Contato contato, Cliente cliente) {
-        if (cliente != null ) {
-            cliente.addContato(contato != null?new ContatoCliente(contato):null);
+        if (cliente != null) {
+            cliente.addContato(contato != null ? new ContatoCliente(contato) : null);
             cliente.setRazaoSocial(cliente.getNomeFantasia());
             removerMascaraDocumento(cliente);
         }
@@ -99,6 +99,11 @@ public class OrcamentoController extends AbstractPedidoController {
     @Get("orcamento/cliente")
     public void pesquisarClienteByNomeFantasia(String nomeFantasia) {
         forwardTo(PedidoController.class).pesquisarClienteByNomeFantasia(nomeFantasia);
+    }
+
+    @Get("orcamento/item/{id}")
+    public void pesquisarItemOrcamentoById(Integer id) {
+        forwardTo(PedidoController.class).pesquisarItemPedidoById(id);
     }
 
     @Get("orcamento/material")

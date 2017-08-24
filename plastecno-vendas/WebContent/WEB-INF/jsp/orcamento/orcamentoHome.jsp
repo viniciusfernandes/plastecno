@@ -39,11 +39,47 @@ $(document).ready(function() {
 	$("#botaoPesquisaOrcamento").click(function() {
 		var idPedido = $('#numeroPedido').val();
 		if (isEmpty(idPedido)) {
-			gerarListaMensagemAlerta(new Array('O número do pedido é obrigatório para a pesquisa'));
+			gerarListaMensagemAlerta(new Array('O número do orçamento é obrigatório para a pesquisa'));
 			return;
 		} 
 		var form = document.getElementById('formVazio');
-		form.action = '<c:url value="/orcamento/'+idPedido+'"/>';
+		form.action = '<c:url value="/orcamento/"/>'+idPedido;
+		form.submit();
+	});
+	
+	$('#botaoEnviarOrcamento').click(function (){
+		var idPedido = $('#numeroPedido').val();
+		if (isEmpty(idPedido)) {
+			gerarListaMensagemAlerta(new Array('O número do orçamento é obrigatório para o envio'));
+			return;
+		} 
+		var form = document.getElementById('formVazio');
+		form.action = '<c:url value="/orcamento/envio/"/>'+idPedido;
+		form.method = 'post';
+		form.submit();
+	});
+	
+	$('#botaoAceitarOrcamento').click(function (){
+		var idPedido = $('#numeroPedido').val();
+		if (isEmpty(idPedido)) {
+			gerarListaMensagemAlerta(new Array('O número do orçamento é obrigatório para o aceite'));
+			return;
+		} 
+		var form = document.getElementById('formVazio');
+		form.action = '<c:url value="/orcamento/aceite/"/>'+idPedido;
+		form.method = 'post';
+		form.submit();
+	});
+	
+	$("#botaoPDFOrcamento").click(function() {
+		var idPedido = $('#numeroPedido').val();
+		if (isEmpty(idPedido)) {
+			gerarListaMensagemAlerta(new Array('O orçamento não pode ser impresso pois não existe no sistema'));
+			return;
+		} 
+		var form = document.getElementById('formVazio');
+		form.action = '<c:url value="/orcamento/pdf/"/>'+idPedido;
+		form.method = 'get';
 		form.submit();
 	});
 	
@@ -207,11 +243,15 @@ function inserirOrcamento(){
 		</div>
 		<div class="bloco_botoes">
 			<input type="button" id="botaoInserirOrcamento" title="Inserir Orçamento" value="" class="botaoInserir"/>
+			<input type="button" id="botaoPDFOrcamento" value="" title="PDF Orçamento" class="botaoPDF" />
 		</div>
 	</fieldset>
 	</form>
 	
 	<jsp:include page="/bloco/bloco_item_pedido.jsp" />
-			
+	<div class="bloco_botoes">
+		<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
+		<input type="button" id="botaoAceitarOrcamento" title="Aceitar Orçamento" value="" class="botaoAceitar" />
+	</div>
 </body>
 </html>

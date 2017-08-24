@@ -48,7 +48,7 @@ public class RelatorioClienteVendedorController extends AbstractController {
 
     @Get("relatorio/cliente/vendedor/pedido/pdf")
     public Download downloadPedidoPDF(Integer idPedido) {
-        return redirecTo(PedidoController.class).downloadPedidoPDF(idPedido, TipoPedido.REVENDA);
+        return redirecTo(PedidoController.class).downloadPDFPedido(idPedido, TipoPedido.REVENDA);
     }
 
     @Get("relatorio/cliente/vendedor/listagem")

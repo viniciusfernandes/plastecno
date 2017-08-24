@@ -8,6 +8,7 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
@@ -16,11 +17,14 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ClienteJson;
 import br.com.plastecno.vendas.json.SerializacaoJson;
@@ -50,6 +54,45 @@ public class OrcamentoController extends AbstractPedidoController {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
         verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS);
 
+        super.setClienteService(clienteService);
+        super.setPedidoService(pedidoService);
+    }
+
+    @Post("orcamento/aceite/{id}")
+    public void aceitarOrcamento(Integer id) {
+        pedidoService.aceitarOrcamento(id);
+        // Devemos configurar o parametro orcamento = false para direcionar o
+        // usuario para a tela de vendas apos o aceite.
+        redirecTo(this.getClass()).pesquisarItemOrcamentoById(id);
+    }
+
+    @Get("orcamento/pdf/{id}")
+    public Download downloadPDFOrcamento(Integer id) {
+        return super.downloadPDFPedido(id, TipoPedido.REVENDA);
+    }
+
+    @Post("orcamento/envio/{id}")
+    public void enviarOrcamento(Integer id) {
+        try {
+            final PedidoPDFWrapper wrapper = gerarPDF(id, TipoPedido.REVENDA);
+            final Pedido pedido = wrapper.getPedido();
+
+            pedidoService.enviarPedido(id, wrapper.getArquivoPDF());
+
+            final String mensagem = "Orçamento No. " + id + " foi enviado com sucesso para o cliente "
+                    + pedido.getCliente().getNomeFantasia();
+
+            gerarMensagemSucesso(mensagem);
+        } catch (NotificacaoException e) {
+            gerarLogErro("envio de email do orcamento No. " + id, e);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            // populando a tela de pedidos
+            redirecTo(this.getClass()).pesquisarOrcamentoById(id);
+        } catch (Exception e) {
+            gerarLogErro("envio de email do orcamento No. " + id, e);
+        }
+        irTopoPagina();
     }
 
     @Post("orcamento/item/inclusao")

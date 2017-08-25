@@ -18,7 +18,9 @@ public enum SituacaoPedido {
 	ITEM_AGUARDANDO_MATERIAL("ITEM AGUARDANDO MATERIAL"),
 	REVENDA_PARCIALMENTE_RESERVADA("REVENDA PARCIALMENTE RESERVADA"),
 	ORCAMENTO_DIGITACAO ("ORÇAMENTO DIGITAÇÃO"),
-	ORCAMENTO_ACEITO ("ORÇAMENTO ACEITO");
+	ORCAMENTO_ACEITO ("ORÇAMENTO ACEITO"),
+	ORCAMENTO_CANCELADO("ORÇAMENTO CANCELADO");
+	
 	private String descricao;
 	
 	private SituacaoPedido(String descricao){
@@ -34,6 +36,7 @@ public enum SituacaoPedido {
 	static{
 		listaOrcamento.add(ORCAMENTO);
 		listaOrcamento.add(ORCAMENTO_ACEITO);
+		listaOrcamento.add(ORCAMENTO_CANCELADO);
 		listaOrcamento.add(ORCAMENTO_DIGITACAO);
 	}
 	public static List<SituacaoPedido> getListaOrcamento(){

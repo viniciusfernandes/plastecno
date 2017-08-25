@@ -44,6 +44,8 @@ public interface PedidoService {
 
 	Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException;
 
+	void cancelarOrcamento(Integer idOrcamento) throws BusinessException;
+
 	void cancelarPedido(Integer idPedido) throws BusinessException;
 
 	Integer comprarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
@@ -244,6 +246,8 @@ public interface PedidoService {
 	List<TotalizacaoPedidoWrapper> pesquisarTotalPedidoVendaResumidaByPeriodo(Periodo periodo);
 
 	Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido);
+
+	Transportadora pesquisarTransportadoraResumidaByIdPedido(Integer idPedido);
 
 	Double pesquisarValorFretePorItemByIdPedido(Integer idPedido);
 

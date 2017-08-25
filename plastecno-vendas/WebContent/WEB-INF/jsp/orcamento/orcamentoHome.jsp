@@ -39,7 +39,6 @@ $(document).ready(function() {
 	$("#botaoPesquisaOrcamento").click(function() {
 		var idPedido = $('#numeroPedido').val();
 		if (isEmpty(idPedido)) {
-			gerarListaMensagemAlerta(new Array('O número do orçamento é obrigatório para a pesquisa'));
 			return;
 		} 
 		var form = document.getElementById('formVazio');
@@ -66,7 +65,6 @@ $(document).ready(function() {
 	$('#botaoEnviarOrcamento').click(function (){
 		var idPedido = $('#numeroPedido').val();
 		if (isEmpty(idPedido)) {
-			gerarListaMensagemAlerta(new Array('O número do orçamento é obrigatório para o envio'));
 			return;
 		} 
 		var form = document.getElementById('formVazio');
@@ -78,7 +76,6 @@ $(document).ready(function() {
 	$('#botaoAceitarOrcamento').click(function (){
 		var idPedido = $('#numeroPedido').val();
 		if (isEmpty(idPedido)) {
-			gerarListaMensagemAlerta(new Array('O número do orçamento é obrigatório para o aceite'));
 			return;
 		} 
 		var form = document.getElementById('formVazio');
@@ -90,13 +87,34 @@ $(document).ready(function() {
 	$("#botaoPDFOrcamento").click(function() {
 		var idPedido = $('#numeroPedido').val();
 		if (isEmpty(idPedido)) {
-			gerarListaMensagemAlerta(new Array('O orçamento não pode ser impresso pois não existe no sistema'));
 			return;
 		} 
 		var form = document.getElementById('formVazio');
 		adicionarInputHiddenFormulario('formVazio', 'idPedido', idPedido);
 		form.action = '<c:url value="/orcamento/pdf"/>';
 		form.method = 'get';
+		form.submit();
+	});
+	
+	$("#botaoCancelarOrcamento").click(function() {
+		var idPedido = $('#numeroPedido').val();
+		if (isEmpty(idPedido)) {
+			return;
+		} 
+		var form = document.getElementById('formVazio');
+		form.action = '<c:url value="/orcamento/cancelamento/"/>'+idPedido ;
+		form.method = 'post';
+		form.submit();
+	});
+	
+	$("#botaoCopiarOrcamento").click(function() {
+		var idPedido = $('#numeroPedido').val();
+		if (isEmpty(idPedido)) {
+			return;
+		} 
+		var form = document.getElementById('formVazio');
+		form.action = '<c:url value="/orcamento/copia/"/>'+idPedido ;
+		form.method = 'post';
 		form.submit();
 	});
 	
@@ -113,10 +131,23 @@ $(document).ready(function() {
 		$('#idClienteListagem').val(cliente.id);
 		$('#idVendedorListagem').val(cliente.vendedor.id);
 	});
+	
 	inicializarAutocompleteMaterial('<c:url value="/orcamento/material"/>');
+	
+	autocompletar({
+		url : '<c:url value="/orcamento/transportadora/listagem"/>',
+		campoPesquisavel : 'transportadora',
+		parametro : 'nomeFantasia',
+		containerResultados : 'containerPesquisaTransportadora',
+		selecionarItem : function(itemLista) {
+			$('#idTransportadora').val(itemLista.id);
+		}
+	});
+	
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
-	
+	inserirMascaraNumerica('validade', '999');
+
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 
 });
@@ -198,7 +229,7 @@ function inserirOrcamento(){
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<input type="hidden" id="idPedido"  name="pedido.id" value="${pedido.id}"/>
 		<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
-	
+		<input type="hidden" id="idTransportadora"  name="pedido.transportadora.id" value="${pedido.transportadora.id}"/>
 	<fieldset>
 		<legend>Orçamento</legend>
 		<div class="label">Número:</div>
@@ -208,8 +239,12 @@ function inserirOrcamento(){
 		<div class="input" style="width: 2%">
 				<input type="button" id="botaoPesquisaOrcamento"
 					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
-			</div>
-		<div class="label" style="width: 8%">Situação:</div>
+		</div>
+		<div class="input" style="width: 1%">
+				<input type="button" id="botaoCopiarOrcamento"
+					title="Copiar Orçamento" value="" class="botaoCopiarPequeno" />
+		</div>
+		<div class="label" style="width: 7%">Situação:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="situacaoPedido" name="pedido.situacaoPedido" 
 					value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled" style="width: 75%"/>
@@ -266,13 +301,30 @@ function inserirOrcamento(){
 		</div>
 		
 		<div class="label" style="width: 8%">Telefone:</div>
-		<div class="input" style="width: 16%">
-			<input type="text" id="telefone" name="contato.telefone" value="${contato.telefone}" style="width: 100%"/>
+		<div class="input" style="width: 70%">
+			<input type="text" id="telefone" name="contato.telefone" value="${contato.telefone}" style="width: 23%"/>
 		</div>
+		<div class="label">Transportadora:</div>
+		<div class="input" style="width: 30%">
+			<input type="text" id="transportadora" name="pedido.transportadora.nomeFantasia" value="${pedido.transportadora.nomeFantasia}" style="width: 100%"/>
+			<div class="suggestionsBox" id="containerPesquisaTransportadora" style="display: none; width: 30%"></div>
+		</div>
+		
+		<div class="label" style="width: 10%">Pagamento:</div>
+		<div class="input" style="width: 30%">
+			<input type="text" id="pagamento" name="pedido.formaPagamento" value="${pedido.formaPagamento}" style="width: 100%"/>
+		</div>
+		<%--
+		<div class="label">Validade:</div>
+		<div class="input" style="width: 80%">
+			<input id="validade" name="pedido.validade" value="${pedido.validade}" style="width: 6%" />
+		</div>
+		--%>
 		<div class="bloco_botoes">
 			<input type="button" id="botaoInserirOrcamento" title="Inserir Orçamento" value="" class="botaoInserir"/>
 			<input type="button" id="botaoPDFOrcamento" value="" title="PDF Orçamento" class="botaoPDF" />
 			<input type="button" id="botaoLimparOrcamento" value="" title="Limpar Orçamento" class="botaoLimpar" />
+			<input  type="button"id="botaoCancelarOrcamento" value="" title="Cancelar Orçamento" class="botaoCancelar" />
 		</div>
 	</fieldset>
 	</form>

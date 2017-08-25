@@ -45,10 +45,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				.setParameter("idPedido", idPedido).executeUpdate();
 	}
 
-	public void cancelar(Integer idPedido) {
-		alterarSituacaoPedidoById(idPedido, SituacaoPedido.CANCELADO);
-	}
-
 	private Query gerarQueryPesquisa(Pedido filtro, StringBuilder select) {
 		Query query = this.entityManager.createQuery(select.toString());
 		final Cliente cliente = filtro.getCliente();
@@ -227,6 +223,12 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				entityManager.createQuery(
 						"select p.id from ItemPedido i inner join i.pedido p where i.id IN (:listaIdItemPedido)")
 						.setParameter("listaIdItemPedido", listaIdItemPedido), List.class, null);
+	}
+
+	public Integer pesquisarIdPedidoByIdOrcamento(Integer idOrcamento) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.id from Pedido p where p.idOrcamento = :idOrcamento").setParameter(
+						"idOrcamento", idOrcamento), Integer.class, null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -439,6 +441,15 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						entityManager
 								.createQuery(
 										"select p.transportadora from Pedido p join fetch p.transportadora.logradouro where p.id = :idPedido")
+								.setParameter("idPedido", idPedido), Transportadora.class, null);
+	}
+
+	public Transportadora pesquisarTransportadoraResumidaByIdPedido(Integer idPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new Transportadora (p.transportadora.id, p.transportadora.nomeFantasia) from Pedido p where p.id = :idPedido")
 								.setParameter("idPedido", idPedido), Transportadora.class, null);
 	}
 

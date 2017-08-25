@@ -79,6 +79,34 @@ public class OrcamentoController extends AbstractPedidoController {
 
     }
 
+    @Post("orcamento/cancelamento/{idOrcamento}")
+    public void cancelarOrcamento(Integer idOrcamento) {
+        try {
+            pedidoService.cancelarOrcamento(idOrcamento);
+            gerarMensagemSucesso("Orçamento No. " + idOrcamento + " cancelado com sucesso");
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e.getListaMensagem());
+            redirecTo(this.getClass()).pesquisarOrcamentoById(idOrcamento);
+        }
+        irTopoPagina();
+    }
+
+    @Post("orcamento/copia/{idOrcamento}")
+    public void copiarOrcamento(Integer idOrcamento) {
+        try {
+            Integer idPedidoClone = pedidoService.copiarPedido(idOrcamento, true);
+            pesquisarOrcamentoById(idPedidoClone);
+            gerarMensagemSucesso("Orçamento No. " + idPedidoClone + " inserido e copiado a partir do orçamento No. "
+                    + idOrcamento);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            pesquisarOrcamentoById(idOrcamento);
+        } catch (Exception e) {
+            gerarLogErro("copia do pedido de No. " + idOrcamento, e);
+            pesquisarOrcamentoById(idOrcamento);
+        }
+    }
+
     @Get("orcamento/pdf")
     public Download downloadPDFOrcamento(Integer idPedido) {
         return super.downloadPDFPedido(idPedido, TipoPedido.REVENDA);
@@ -175,6 +203,8 @@ public class OrcamentoController extends AbstractPedidoController {
             gerarListaMensagemAlerta("O orçamento No. " + idPedido + " não existe no sistema");
         } else {
             pedido.setRepresentada(pedidoService.pesquisarRepresentadaByIdPedido(idPedido));
+            pedido.setTransportadora(pedidoService.pesquisarTransportadoraResumidaByIdPedido(idPedido));
+
             List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
             formatarItemPedido(listaItem);
             formatarPedido(pedido);
@@ -198,5 +228,10 @@ public class OrcamentoController extends AbstractPedidoController {
                 itemVendido);
 
         irRodapePagina();
+    }
+
+    @Get("orcamento/transportadora/listagem")
+    public void pesquisarTransportadoraByNomeFantasia(String nomeFantasia) {
+        forwardTo(TransportadoraController.class).pesquisarTransportadoraByNomeFantasia(nomeFantasia);
     }
 }

@@ -348,6 +348,22 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void cancelarOrcamento(Integer idOrcamento) throws BusinessException {
+		if (idOrcamento == null) {
+			throw new BusinessException("Não é possível cancelar o orçamento pois ele não existe no sistema");
+		}
+
+		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdOrcamento(idOrcamento);
+		if (idPedido != null) {
+			throw new BusinessException("O orçamento No. " + idOrcamento + " esta associado ao pedido No. " + idPedido
+					+ " e não pode ser cancelado.");
+		}
+		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.ORCAMENTO_CANCELADO);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void cancelarPedido(Integer idPedido) throws BusinessException {
 		if (idPedido == null) {
 			throw new BusinessException("Não é possível cancelar o pedido pois ele não existe no sistema");
@@ -361,7 +377,7 @@ public class PedidoServiceImpl implements PedidoService {
 		} else if (TipoPedido.REVENDA.equals(tipoPedido)) {
 			estoqueService.cancelarReservaEstoqueByIdPedido(idPedido);
 		}
-		pedidoDAO.cancelar(idPedido);
+		alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.CANCELADO);
 	}
 
 	@Override
@@ -1691,6 +1707,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarTransportadoraByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Transportadora pesquisarTransportadoraResumidaByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarTransportadoraResumidaByIdPedido(idPedido);
 	}
 
 	private List<ItemPedido> pesquisarValoresItemPedidoResumidoByPeriodo(Periodo periodo,

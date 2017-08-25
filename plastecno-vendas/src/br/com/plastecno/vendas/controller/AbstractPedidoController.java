@@ -29,6 +29,7 @@ import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 import br.com.plastecno.vendas.relatorio.conversor.GeradorRelatorioPDF;
+import br.com.plastecno.vendas.relatorio.conversor.exception.ConversaoHTML2PDFException;
 
 public class AbstractPedidoController extends AbstractController {
     class PedidoPDFWrapper {
@@ -84,6 +85,9 @@ public class AbstractPedidoController extends AbstractController {
                     .append(".pdf");
 
             return gerarDownloadPDF(wrapper.getArquivoPDF(), titulo.toString());
+        } catch (ConversaoHTML2PDFException e) {
+            gerarLogErro("conversão do relatório de pedido", e);
+            return null;
         } catch (BusinessException e) {
             gerarMensagemAlerta(e.getMensagemEmpilhada());
             // Estamos retornando null porque no caso de falhas nao devemos

@@ -593,4 +593,9 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 		return query.getResultList();
 	}
+
+	public void removerLogradouroPedido(Integer idPedido) {
+		entityManager.createQuery("delete from LogradouroPedido l where l.pedido.id = :idPedido")
+				.setParameter("idPedido", idPedido).executeUpdate();
+	}
 }

@@ -51,6 +51,11 @@ public class LogradouroPedido extends Logradouro implements Serializable, Clonea
 		setUf(l.getUf());
 	}
 
+	public LogradouroPedido(Pedido pedido, LogradouroCliente l) {
+		this(l);
+		this.pedido = pedido;
+	}
+
 	public Integer getId() {
 		return id;
 	}

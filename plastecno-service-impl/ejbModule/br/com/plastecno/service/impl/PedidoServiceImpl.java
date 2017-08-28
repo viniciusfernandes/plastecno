@@ -199,6 +199,24 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private void associarLogradouroCliente(Pedido pedido) throws BusinessException {
+		if (pedido == null || pedido.getCliente() == null) {
+			return;
+		}
+		List<LogradouroCliente> lLog = clienteService.pesquisarLogradouroCliente(pedido.getCliente().getId());
+		if (lLog == null) {
+			return;
+		}
+		// Antes de associar um logradouro novo devemos remover os antigos
+		pedidoDAO.removerLogradouroPedido(pedido.getId());
+		LogradouroPedido lPed = null;
+		for (LogradouroCliente lCli : lLog) {
+			lPed = new LogradouroPedido(pedido, lCli);
+			pedido.addLogradouro(logradouroService.inserir(lPed));
+		}
+	}
+
 	@TODO(descricao = "Esse metodo existe apenas para manter a consitencia do valor do pedido no relatorio de pedidos vendidos. Acredito que deve ser removido fututamente e a query do relatorio sera melhorada")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private double[] atualizarValoresPedido(Integer idPedido) {
@@ -644,11 +662,6 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Pedido não exite no sistema");
 		}
 
-		/*
-		 * Devemos sempre usar a lista do cliente pois o cliente pode ter
-		 * alterado os dados de logradouro
-		 */
-		pedido.addLogradouro(gerarLogradouroPedidoByIdCliente(pedido.getCliente().getId()));
 		// A data de emissao nao pode ser alterada pois dara conflito no calculo
 		// de comissao de vendas
 		if (pedido.getDataEnvio() == null) {
@@ -707,18 +720,6 @@ public class PedidoServiceImpl implements PedidoService {
 			e.addMensagem(e.getListaMensagem());
 			throw e;
 		}
-	}
-
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private List<LogradouroPedido> gerarLogradouroPedidoByIdCliente(Integer idCliente) {
-		List<LogradouroCliente> lLog = clienteService.pesquisarLogradouroCliente(idCliente);
-		if (lLog == null) {
-			return null;
-		}
-		List<LogradouroPedido> lLogPed = new ArrayList<LogradouroPedido>();
-
-		lLog.stream().forEach(l -> lLogPed.add(new LogradouroPedido(l)));
-		return lLogPed;
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -795,12 +796,6 @@ public class PedidoServiceImpl implements PedidoService {
 					+ TipoEntrega.CIF_TRANS.getDescricao());
 		}
 
-		/*
-		 * Devemos sempre pesquisar pois o cliente pode ter alterado os dados de
-		 * logradouro
-		 */
-		pedido.addLogradouro(gerarLogradouroPedidoByIdCliente(pedido.getCliente().getId()));
-
 		if (isPedidoNovo) {
 			pedido = pedidoDAO.inserir(pedido);
 		} else {
@@ -813,6 +808,9 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		// Aqui estamos atualizando o valor do pedido pois pode haver um frete.
 		atualizarValoresPedido(idPedido);
+
+		// Devemos sempre associar ao pedido o logradouro do cliente.
+		associarLogradouroCliente(pedido);
 
 		return pedido;
 	}
@@ -1859,6 +1857,12 @@ public class PedidoServiceImpl implements PedidoService {
 					e);
 		}
 
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerLogradouroPedido(Integer idPedido) {
+		pedidoDAO.removerLogradouroPedido(idPedido);
 	}
 
 	private void validarEnvio(Pedido pedido) throws BusinessException {

@@ -15,6 +15,7 @@ import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
@@ -49,7 +50,6 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 		};
 
 		new MockUp<PedidoDAO>() {
-
 			@Mock
 			public void alterarIdOrcamentoByIdPedido(Integer idPedido, Integer idOrcamento) {
 				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
@@ -69,14 +69,6 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 				}
 				p.setValorPedido(valorPedido);
 				p.setValorPedidoIPI(valorPedidoIPI);
-			}
-
-			@Mock
-			void cancelar(Integer IdPedido) {
-				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, IdPedido);
-				if (pedido != null) {
-					pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
-				}
 			}
 
 			@Mock
@@ -311,6 +303,21 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			Double pesquisarValorPedidoIPI(Integer idPedido) {
 				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null ? pedido.getValorPedidoIPI() : null;
+			}
+
+			@Mock
+			public void removerLogradouroPedido(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				if (p == null) {
+					return;
+				}
+				List<LogradouroPedido> lLog = p.getListaLogradouro();
+				for (LogradouroPedido l : lLog) {
+					// Removendo do banco
+					REPOSITORY.removerEntidade(LogradouroPedido.class, l.getId());
+				}
+				// Simulando a remocado do logradouro do pedidod
+				p.setListaLogradouro(null);
 			}
 
 		};

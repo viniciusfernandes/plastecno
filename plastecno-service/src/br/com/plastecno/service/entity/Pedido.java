@@ -112,7 +112,7 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private Integer idVendedor;
 
-	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY)
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de logradouro do pedido")
 	private List<LogradouroPedido> listaLogradouro;
 

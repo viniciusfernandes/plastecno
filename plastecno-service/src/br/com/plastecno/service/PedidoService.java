@@ -273,6 +273,8 @@ public interface PedidoService {
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
 
+	void removerLogradouroPedido(Integer idPedido);
+
 	void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException;
 
 }

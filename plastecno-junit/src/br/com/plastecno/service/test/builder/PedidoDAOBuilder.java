@@ -312,6 +312,9 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 					return;
 				}
 				List<LogradouroPedido> lLog = p.getListaLogradouro();
+				if (lLog == null) {
+					return;
+				}
 				for (LogradouroPedido l : lLog) {
 					// Removendo do banco
 					REPOSITORY.removerEntidade(LogradouroPedido.class, l.getId());

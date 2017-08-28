@@ -193,6 +193,7 @@ public class AbstractPedidoController extends AbstractController {
             addAtributoPDF("listaItem", listaItem);
 
             processarPDF(template);
+            
             // Alterando as medidas do PDF gerado.
             int alt = 0;
             int larg = 0;
@@ -200,7 +201,7 @@ public class AbstractPedidoController extends AbstractController {
 
             if (pedido.isOrcamento()) {
                 larg = 550;
-                alt = 260;
+                alt = 310;
             } else {
                 larg = 550;
                 alt = 650;

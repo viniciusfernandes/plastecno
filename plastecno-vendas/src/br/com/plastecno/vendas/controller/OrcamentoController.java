@@ -158,8 +158,6 @@ public class OrcamentoController extends AbstractPedidoController {
         addAtributo("orcamento", true);
         addAtributoCondicional("pedidoDesabilitado", false);
         addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaAtiva());
-        addAtributo("vendedorNome", getUsuario().getNome());
-        addAtributo("vendedorEmail", getUsuario().getEmail());
         addAtributoCondicional("idRepresentadaSelecionada", representadaService.pesquisarIdRevendedor());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("listaCST", TipoCST.values());

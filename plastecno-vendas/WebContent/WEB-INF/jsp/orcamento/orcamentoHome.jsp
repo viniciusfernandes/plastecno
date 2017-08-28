@@ -232,6 +232,10 @@ function inserirOrcamento(){
 		<input type="hidden" id="idTransportadora"  name="pedido.transportadora.id" value="${pedido.transportadora.id}"/>
 	<fieldset>
 		<legend>Orçamento</legend>
+		<div class="label" style="width: 56%">Dt. Envio:</div>
+		<div class="input" style="width: 30%">
+			<input type="text" id="dataEnvio" value="${pedido.dataEnvioFormatada}"  class="desabilitado" disabled="disabled" style="width: 100%" />
+		</div>
 		<div class="label">Número:</div>
 		<div class="input" style="width: 30%">
 			<input type="text" id="numeroPedido" value="${pedido.id}" class="pesquisavel" style="width: 100%"/>
@@ -261,13 +265,13 @@ function inserirOrcamento(){
 		</div>
 		<div class="label" style="width: 10%">Vendedor:</div>
 		<div class="input" style="width: 40%">
-			<input type="text" id="vendedor" name="vendedor.nome" value="${vendedorNome} - ${vendedorEmail}" disabled="disabled"
+			<input type="text" id="vendedor"  value="${pedido.vendedor.nome} - ${pedido.vendedor.email}" disabled="disabled"
 					class="uppercaseBloqueado desabilitado" style="width: 75%"/>
 		</div>
 			
 		<div class="label obrigatorio">Cliente:</div>
 		<div class="input" style="width: 30%">
-			<input type="text" id="nomeCliente" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" style="width: 100%"/>
+			<input type="text" id="nomeCliente" name="cliente.nomeFantasia" value="${cliente.nomeCompleto}" class="pesquisavel" style="width: 100%"/>
 			<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 		</div>
 		<div class="input" style="width: 2%">

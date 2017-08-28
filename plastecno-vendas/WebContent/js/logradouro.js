@@ -89,7 +89,7 @@ function inicializarBlocoLogradouro(urlTela) {
 		parametros += '&'+nomeLista+'['+indiceLinha+'].uf='+(!isEmpty(celulas[8].innerHTML)?celulas[8].innerHTML:'');
 		parametros += '&'+nomeLista+'['+indiceLinha+'].pais='+(!isEmpty(celulas[9].innerHTML)?celulas[9].innerHTML:'');
 		parametros += '&'+nomeLista+'['+indiceLinha+'].codigoMunicipio='+(!isEmpty(celulas[10].innerHTML)?celulas[10].innerHTML:'');
-		parametros += '&'+nomeLista+'['+indiceLinha+'].codificado='+(!isEmpty(celulas[11].innerHTML)?celulas[11].innerHTML:'');
+		//parametros += '&'+nomeLista+'['+indiceLinha+'].codificado='+(!isEmpty(celulas[11].innerHTML)?celulas[11].innerHTML:'');
 		return parametros;
 	});
 	

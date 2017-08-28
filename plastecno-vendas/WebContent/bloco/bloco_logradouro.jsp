@@ -84,16 +84,11 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 		</div>
 	</c:if>
 	<div class="label" style="width: 7%">Cod. Mun.:</div>
-	<div class="input" style="width: 10%">
+	<div class="input" style="width: 50%">
 		<input type="text" id="codigoMunicipio" name="logradouro.codigoMunicipio" maxlength="7"
-			value="${logradouro.codigoMunicipio}" />
+			value="${logradouro.codigoMunicipio}" style="width: 25%"/>
 	</div>
-	<div class="label" style="width: 10%">End. codificado:</div>
-	<div class="input" style="width: 40%">
-		<input type="checkbox" id="codificado" name="logradouro.codificado"
-			<c:if test="${empty logradouro or (not empty logradouro and logradouro.codificado)}">checked="checked"</c:if>
-			class="checkbox" />
-	</div>
+	
 	<div class="label">Endereço:</div>
 	<div class="input" style="width: 40%">
 		<input type="text" id="endereco" name="logradouro.endereco"

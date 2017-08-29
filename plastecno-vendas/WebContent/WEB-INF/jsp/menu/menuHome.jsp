@@ -92,7 +92,9 @@
 					</ul>
 				</li>
 				</c:if>
-
+				<li>
+					<a href="pagamento" target="principal_frame">Pagamento</a>
+				</li>
 				<li><a href="javascript: void(0)">Relatórios</a>
 					<ul>
 						<c:if test="${acessoRelatorioDuplicataPermitido}">

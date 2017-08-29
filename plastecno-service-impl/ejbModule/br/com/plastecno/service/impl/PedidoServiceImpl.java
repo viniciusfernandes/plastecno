@@ -108,16 +108,25 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@Override
-	public void aceitarOrcamento(Integer idOrcamento) {
+	public Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException {
 		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoById(idOrcamento);
 		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)
 				&& !SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido)) {
-			return;
+			throw new BusinessException(
+					"Apenas os orçamentos em digitação ou enviados podem ser aceitos para um novo pedido.");
 		}
-		// Para o aceite do orcamento devemos redirecionar o pedido para o
-		// inicio da
-		// digitacao do pedido
-		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.DIGITACAO);
+
+		Integer idPedido = copiarPedido(idOrcamento, true);
+
+		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.ORCAMENTO_ACEITO);
+
+		// O pedido deve ir para digitacao
+		alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.DIGITACAO);
+
+		// Amarrando o pedido ao orcamento para o aceite. Isso sera utilizado em
+		// relatorios dos orcamento que viraram pedidos.
+		pedidoDAO.alterarIdOrcamentoByIdPedido(idPedido, idOrcamento);
+		return idPedido;
 	}
 
 	@Override
@@ -188,6 +197,24 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido) {
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
+	}
+
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private void associarLogradouroCliente(Pedido pedido) throws BusinessException {
+		if (pedido == null || pedido.getCliente() == null) {
+			return;
+		}
+		List<LogradouroCliente> lLog = clienteService.pesquisarLogradouroCliente(pedido.getCliente().getId());
+		if (lLog == null) {
+			return;
+		}
+		// Antes de associar um logradouro novo devemos remover os antigos
+		pedidoDAO.removerLogradouroPedido(pedido.getId());
+		LogradouroPedido lPed = null;
+		for (LogradouroCliente lCli : lLog) {
+			lPed = new LogradouroPedido(pedido, lCli);
+			pedido.addLogradouro(logradouroService.inserir(lPed));
+		}
 	}
 
 	@TODO(descricao = "Esse metodo existe apenas para manter a consitencia do valor do pedido no relatorio de pedidos vendidos. Acredito que deve ser removido fututamente e a query do relatorio sera melhorada")
@@ -339,6 +366,22 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void cancelarOrcamento(Integer idOrcamento) throws BusinessException {
+		if (idOrcamento == null) {
+			throw new BusinessException("Não é possível cancelar o orçamento pois ele não existe no sistema");
+		}
+
+		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdOrcamento(idOrcamento);
+		if (idPedido != null) {
+			throw new BusinessException("O orçamento No. " + idOrcamento + " esta associado ao pedido No. " + idPedido
+					+ " e não pode ser cancelado.");
+		}
+		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.ORCAMENTO_CANCELADO);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void cancelarPedido(Integer idPedido) throws BusinessException {
 		if (idPedido == null) {
 			throw new BusinessException("Não é possível cancelar o pedido pois ele não existe no sistema");
@@ -352,7 +395,7 @@ public class PedidoServiceImpl implements PedidoService {
 		} else if (TipoPedido.REVENDA.equals(tipoPedido)) {
 			estoqueService.cancelarReservaEstoqueByIdPedido(idPedido);
 		}
-		pedidoDAO.cancelar(idPedido);
+		alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.CANCELADO);
 	}
 
 	@Override
@@ -619,11 +662,6 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Pedido não exite no sistema");
 		}
 
-		/*
-		 * Devemos sempre usar a lista do cliente pois o cliente pode ter
-		 * alterado os dados de logradouro
-		 */
-		pedido.addLogradouro(gerarLogradouroPedidoByIdCliente(pedido.getCliente().getId()));
 		// A data de emissao nao pode ser alterada pois dara conflito no calculo
 		// de comissao de vendas
 		if (pedido.getDataEnvio() == null) {
@@ -682,18 +720,6 @@ public class PedidoServiceImpl implements PedidoService {
 			e.addMensagem(e.getListaMensagem());
 			throw e;
 		}
-	}
-
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private List<LogradouroPedido> gerarLogradouroPedidoByIdCliente(Integer idCliente) {
-		List<LogradouroCliente> lLog = clienteService.pesquisarLogradouroCliente(idCliente);
-		if (lLog == null) {
-			return null;
-		}
-		List<LogradouroPedido> lLogPed = new ArrayList<LogradouroPedido>();
-
-		lLog.stream().forEach(l -> lLogPed.add(new LogradouroPedido(l)));
-		return lLogPed;
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -770,12 +796,6 @@ public class PedidoServiceImpl implements PedidoService {
 					+ TipoEntrega.CIF_TRANS.getDescricao());
 		}
 
-		/*
-		 * Devemos sempre pesquisar pois o cliente pode ter alterado os dados de
-		 * logradouro
-		 */
-		pedido.addLogradouro(gerarLogradouroPedidoByIdCliente(pedido.getCliente().getId()));
-
 		if (isPedidoNovo) {
 			pedido = pedidoDAO.inserir(pedido);
 		} else {
@@ -788,6 +808,9 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		// Aqui estamos atualizando o valor do pedido pois pode haver um frete.
 		atualizarValoresPedido(idPedido);
+
+		// Devemos sempre associar ao pedido o logradouro do cliente.
+		associarLogradouroCliente(pedido);
 
 		return pedido;
 	}
@@ -1552,6 +1575,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Representada pesquisarRepresentadaByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarRepresentadaByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Representada pesquisarRepresentadaIdPedido(Integer idPedido) {
 		return representadaService.pesquisarById(pesquisarIdRepresentadaByIdPedido(idPedido));
 	}
@@ -1613,6 +1642,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public TipoPedido pesquisarTipoPedidoByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarTipoPedidoById(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<TotalizacaoPedidoWrapper> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo) {
 		return pedidoDAO.pesquisarValorTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), true);
 	}
@@ -1670,6 +1705,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarTransportadoraByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Transportadora pesquisarTransportadoraResumidaByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarTransportadoraResumidaByIdPedido(idPedido);
 	}
 
 	private List<ItemPedido> pesquisarValoresItemPedidoResumidoByPeriodo(Periodo periodo,
@@ -1816,6 +1857,12 @@ public class PedidoServiceImpl implements PedidoService {
 					e);
 		}
 
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerLogradouroPedido(Integer idPedido) {
+		pedidoDAO.removerLogradouroPedido(idPedido);
 	}
 
 	private void validarEnvio(Pedido pedido) throws BusinessException {

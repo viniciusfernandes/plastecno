@@ -15,6 +15,7 @@ import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.FormaMaterialService;
 import br.com.plastecno.service.MaterialService;
+import br.com.plastecno.service.NFeService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TipoEntregaService;
@@ -24,14 +25,12 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoCST;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
-import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
-import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Transportadora;
@@ -39,10 +38,7 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.relatorio.RelatorioService;
-import br.com.plastecno.service.wrapper.GrupoWrapper;
-import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.NumeroUtils;
-import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ClienteJson;
 import br.com.plastecno.vendas.json.ItemPedidoJson;
@@ -53,7 +49,7 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 import br.com.plastecno.vendas.relatorio.conversor.GeradorRelatorioPDF;
 
 @Resource
-public class PedidoController extends AbstractController {
+public class PedidoController extends AbstractPedidoController {
 
     private class MaterialAutocomplete extends Autocomplete {
         private Boolean importado;
@@ -74,24 +70,6 @@ public class PedidoController extends AbstractController {
         }
     }
 
-    private class PedidoPDFWrapper {
-        private final byte[] arquivoPDF;
-        private final Pedido pedido;
-
-        public PedidoPDFWrapper(Pedido pedido, byte[] arquivoPDF) {
-            this.pedido = pedido;
-            this.arquivoPDF = arquivoPDF;
-        }
-
-        public byte[] getArquivoPDF() {
-            return arquivoPDF;
-        }
-
-        public Pedido getPedido() {
-            return pedido;
-        }
-    }
-
     @Servico
     private ClienteService clienteService;
 
@@ -106,6 +84,9 @@ public class PedidoController extends AbstractController {
 
     @Servico
     private MaterialService materialService;
+
+    @Servico
+    private NFeService nFeService;
 
     @Servico
     private PedidoService pedidoService;
@@ -128,16 +109,15 @@ public class PedidoController extends AbstractController {
     public PedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
-        this.verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS,
+        verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS,
                 TipoAcesso.CADASTRO_PEDIDO_COMPRA);
-    }
 
-    @Post("pedido/aceiteorcamento")
-    public void aceitarOrcamento(Integer idPedido, TipoPedido tipoPedido) {
-        pedidoService.aceitarOrcamento(idPedido);
-        // Devemos configurar o parametro orcamento = false para direcionar o
-        // usuario para a tela de vendas apos o aceite.
-        redirecTo(this.getClass()).pesquisarPedidoById(idPedido, tipoPedido, false);
+        super.setClienteService(clienteService);
+        super.setPedidoService(pedidoService);
+        super.setTransportadoraService(transportadoraService);
+        super.setRepresentadaService(representadaService);
+        super.setUsuarioService(usuarioService);
+        super.setRelatorioService(relatorioService);
     }
 
     @Get("pedido/pesoitem")
@@ -191,15 +171,6 @@ public class PedidoController extends AbstractController {
         return cliente;
     }
 
-    private void configurarTipoPedido(TipoPedido tipoPedido) {
-        if (TipoPedido.COMPRA.equals(tipoPedido)) {
-            addAtributo("tipoPedido", tipoPedido);
-            if (!contemAtributo("proprietario")) {
-                addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
-            }
-        }
-    }
-
     @Post("pedido/copia/{idPedido}")
     public void copiarPedido(Integer idPedido, TipoPedido tipoPedido, boolean orcamento) {
         try {
@@ -218,34 +189,14 @@ public class PedidoController extends AbstractController {
         }
     }
 
-    @Get("pedidoassociado/pdf")
-    public Download downloadPedidoAssociadoPDF(Integer idPedido, TipoPedido tipoPedido) {
-        return downloadPedidoPDF(idPedido, tipoPedido != null ? null : TipoPedido.COMPRA);
+    @Get("pedido/pdf")
+    public Download downloadPDFPedido(Integer idPedido, TipoPedido tipoPedido) {
+        return super.downloadPDFPedido(idPedido, tipoPedido);
     }
 
-    @Get("pedido/pdf")
-    public Download downloadPedidoPDF(Integer idPedido, TipoPedido tipoPedido) {
-
-        try {
-            PedidoPDFWrapper wrapper = gerarPDF(idPedido, tipoPedido);
-            final Pedido pedido = wrapper.getPedido();
-
-            final StringBuilder titulo = new StringBuilder(pedido.isOrcamento() ? "Orcamento " : "Pedido ")
-                    .append("No. ").append(idPedido).append(" - ").append(pedido.getCliente().getNomeFantasia())
-                    .append(".pdf");
-
-            return gerarDownloadPDF(wrapper.getArquivoPDF(), titulo.toString());
-        } catch (BusinessException e) {
-            gerarMensagemAlerta(e.getMensagemEmpilhada());
-            // Estamos retornando null porque no caso de falhas nao devemos
-            // efetuar o download do arquivo
-            return null;
-        } catch (Exception e) {
-            gerarLogErro("geração do relatório de pedido", e);
-            // Estamos retornando null porque no caso de falhas nao devemos
-            // efetuar o download do arquivo
-            return null;
-        }
+    @Get("pedidoassociado/pdf")
+    public Download downloadPedidoAssociadoPDF(Integer idPedido, TipoPedido tipoPedido) {
+        return downloadPDFPedido(idPedido, tipoPedido != null ? null : TipoPedido.COMPRA);
     }
 
     @Post("pedido/envio")
@@ -296,124 +247,6 @@ public class PedidoController extends AbstractController {
             addAtributo("idRepresentadaSelecionada", pedido.getRepresentada().getId());
             addAtributo("ipiDesabilitado", !pedido.getRepresentada().isIPIHabilitado());
         }
-    }
-
-    private PedidoPDFWrapper gerarPDF(Integer idPedido, TipoPedido tipoPedido) throws BusinessException {
-        // Se vendedor que pesquisa o pedido nao estiver associado ao cliente
-        // nao devemos exibi-lo para o vendedor que pesquisa por questao de
-        // sigilo.
-        if (!isVisulizacaoPermitida(idPedido, tipoPedido)) {
-            throw new BusinessException("O usuário não tem permissão de acesso ao pedido.");
-        } else {
-            Pedido pedido = pedidoService.pesquisarPedidoById(idPedido, TipoPedido.COMPRA.equals(tipoPedido));
-            if (pedido == null) {
-                throw new BusinessException("Não é possível gerar o PDF do pedido de numero " + idPedido
-                        + " pois não existe no sistema.");
-            }
-
-            final List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-
-            formatarItemPedido(listaItem);
-            formatarPedido(pedido);
-            formatarDocumento(pedido.getCliente());
-            formatarDocumento(pedido.getRepresentada());
-
-            String template = pedido.isOrcamento() ? "orcamento.html" : "pedido.html";
-            String tipo = pedido.isVenda() ? "Venda" : "Compra";
-            String titulo = pedido.isOrcamento() ? "Orçamento de " + tipo : "Pedido de " + tipo;
-            if (pedido.isOrcamento()) {
-                titulo += " No. " + pedido.getId() + " - " + StringUtils.formatarData(pedido.getDataEnvio());
-                pedido.formatarContato();
-                pedido.setListaLogradouro(pedidoService.pesquisarLogradouro(idPedido, TipoLogradouro.FATURAMENTO));
-            } else {
-                pedido.setListaLogradouro(pedidoService.pesquisarLogradouro(idPedido));
-                Transportadora transportadora = pedido.getTransportadora();
-                if (transportadora != null) {
-                    transportadora.setListaContato(transportadoraService.pesquisarContato(transportadora.getId()));
-                    transportadora.setLogradouro(transportadoraService.pesquisarLogradorouro(transportadora.getId()));
-                }
-
-                transportadora = pedido.getTransportadoraRedespacho();
-                if (transportadora != null) {
-                    transportadora.setListaContato(transportadoraService.pesquisarContato(transportadora.getId()));
-                    transportadora.setLogradouro(transportadoraService.pesquisarLogradorouro(transportadora.getId()));
-                }
-                final LogradouroPedido logradouroEntrega = recuperarLogradouro(pedido, TipoLogradouro.ENTREGA);
-                final LogradouroPedido logradouroCobranca = recuperarLogradouro(pedido, TipoLogradouro.COBRANCA);
-                addAtributoPDF("logradouroEntrega", logradouroEntrega != null ? logradouroEntrega.getDescricao() : "");
-                addAtributoPDF("logradouroCobranca", logradouroCobranca != null ? logradouroCobranca.getDescricao()
-                        : "");
-            }
-
-            LogradouroPedido logradouroFaturamento = recuperarLogradouro(pedido, TipoLogradouro.FATURAMENTO);
-
-            addAtributoPDF("tipoRelacionamento", pedido.isVenda() ? "Represent." : "Forneced.");
-            addAtributoPDF("tipoProprietario", pedido.isVenda() ? "Vendedor" : "Comprador");
-            addAtributoPDF("titulo", titulo);
-            addAtributoPDF("tipoPedido", tipo);
-            addAtributoPDF("pedido", pedido);
-            addAtributoPDF("logradouroFaturamento",
-                    logradouroFaturamento != null ? logradouroFaturamento.getDescricao() : "");
-
-            addAtributoPDF("listaItem", listaItem);
-
-            processarPDF(template);
-            // Alterando as medidas do PDF gerado.
-            int alt = 0;
-            int larg = 0;
-            int tot = listaItem.size();
-
-            if (pedido.isOrcamento()) {
-                larg = 550;
-                alt = 260;
-            } else {
-                larg = 550;
-                alt = 650;
-            }
-            if (tot >= 5) {
-                tot = 5;
-            }
-            // Aqui estamos adicionando um valor de 15 pixels para cada item do
-            // pedido, pois assim a altura do PDF ficara de acordo com o total
-            // de
-            // itens. Note que o numero total foi limitado pois a a partir do
-            // limite
-            // o pdf devera ser pagina, caso contrario podemos ter um pdf com 50
-            // itens na mesma pagino e isso complica a impressao do arquivo.
-            alt += 15 * tot;
-            return new PedidoPDFWrapper(pedido, gerarPDF(larg, alt));
-        }
-    }
-
-    /*
-     * Metodo dedicado a gerar relatorio paginado dos itens dos pedidos no caso
-     * em que o usuario seja um administrador, sendo assim, ele podera consultar
-     * os pedidos de todos os vendedores
-     */
-    private RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioPaginadoItemPedido(Integer idCliente,
-            Integer idVendedor, Integer idFornecedor, boolean isOrcamento, boolean isCompra, Integer paginaSelecionada,
-            ItemPedido itemVendido) {
-        final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
-
-        // Essa variavel eh utilizada para decidirmos se queremos recuperar
-        // todos os pedidos de um determinado cliente independentemente do
-        // vendedor. Essa acao sera disparada por qualquer um que seja
-        // adiministrador do sistema, podendo ser um outro vendedor ou nao.
-        boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
-        RelatorioWrapper<Pedido, ItemPedido> relatorio = relatorioService
-                .gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, pesquisarTodos ? null
-                        : idVendedor, idFornecedor, isOrcamento, isCompra, indiceRegistroInicial,
-                        getNumerRegistrosPorPagina(), itemVendido);
-
-        for (GrupoWrapper<Pedido, ItemPedido> grupo : relatorio.getListaGrupo()) {
-            formatarPedido(grupo.getId());
-
-            for (ItemPedido itemPedido : grupo.getListaElemento()) {
-                formatarItemPedido(itemPedido);
-            }
-        }
-
-        return relatorio;
     }
 
     private void inicializarHome(TipoPedido tipoPedido, boolean orcamento) {
@@ -527,65 +360,10 @@ public class PedidoController extends AbstractController {
         }
     }
 
-    private boolean isPedidoDesabilitado(Pedido pedido) {
-        if (pedido == null || isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS)) {
-            return false;
-        } else {
-            SituacaoPedido situacao = pedido.getSituacaoPedido();
-            boolean isCompraFinalizada = pedido.isCompra() && SituacaoPedido.COMPRA_RECEBIDA.equals(situacao);
-            boolean isVendaFinalizada = pedido.isVenda()
-                    && (SituacaoPedido.ENVIADO.equals(situacao)
-                            || SituacaoPedido.ITEM_AGUARDANDO_COMPRA.equals(situacao)
-                            || SituacaoPedido.REVENDA_AGUARDANDO_EMPACOTAMENTO.equals(situacao)
-                            || SituacaoPedido.EMPACOTADO.equals(situacao)
-                            || SituacaoPedido.COMPRA_ANDAMENTO.equals(situacao) || SituacaoPedido.ITEM_AGUARDANDO_MATERIAL
-                                .equals(situacao));
-            return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
-        }
-    }
-
-    private boolean isVisulizacaoClientePermitida(Integer idCliente) {
-        // Aqui temos que verificar se o usuario eh o vendedor associado ao
-        // cliente.
-        boolean isGestor = isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS);
-        if (isGestor) {
-            return true;
-        }
-        Integer idVend = clienteService.pesquisarIdVendedorByIdCliente(idCliente);
-        Integer idUsu = getCodigoUsuario();
-        final boolean isAcessoVendaPermitido = (idVend == null || idUsu.equals(idVend))
-                && (isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_VENDAS));
-        return isAcessoVendaPermitido;
-    }
-
-    private boolean isVisulizacaoPermitida(Integer idPedido, TipoPedido tipoPedido) {
-        boolean isAdm = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
-        if (isAdm) {
-            return true;
-        }
-        boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
-        boolean isVenda = !isCompra;
-        final boolean isAcessoCompraPermitida = isCompra && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_COMPRA);
-        if (isAcessoCompraPermitida) {
-            return true;
-        }
-        Integer idCli = pedidoService.pesquisarIdClienteByIdPedido(idPedido);
-
-        // Aqui temos que verificar se o usuario eh o vendedor associado ao
-        // cliente.
-        final boolean isAcessoVendaPermitido = isVenda && isVisulizacaoClientePermitida(idCli);
-        return isAcessoVendaPermitido;
-    }
-
     @Get("pedido/limpar")
     public void limpar(TipoPedido tipoPedido, boolean orcamento) {
         configurarTipoPedido(tipoPedido);
         redirecionarHome(tipoPedido, orcamento, true);
-    }
-
-    @Get("pedido/orcamento/venda")
-    public void orcamentoVendaHome() {
-        redirecTo(this.getClass()).pedidoHome(TipoPedido.REVENDA, true);
     }
 
     @Get("pedido/compra")
@@ -617,7 +395,7 @@ public class PedidoController extends AbstractController {
         Cliente cliente = carregarDadosCliente(id);
 
         final ClienteJson json = new ClienteJson(cliente, transportadoraService.pesquisarTransportadoraAtiva(),
-                cliente.getLogradouro());
+                cliente.getListaRedespacho(), cliente.getLogradouro());
 
         SerializacaoJson serializacaoJson = new SerializacaoJson("cliente", json)
                 .incluirAtributo("listaTransportadora").incluirAtributo("listaRedespacho").incluirAtributo("vendedor");
@@ -660,6 +438,11 @@ public class PedidoController extends AbstractController {
         serializarJson(new SerializacaoJson("lista", lista));
     }
 
+    @Get("pedido/nfe")
+    public void pesquisarNFeByNumero(Integer numeroNFe) {
+        redirecTo(EmissaoNFeController.class).pesquisarNFe(numeroNFe);
+    }
+
     @Get("pedido/{id}")
     public void pesquisarPedidoById(Integer id, TipoPedido tipoPedido, boolean orcamento) {
         Pedido pedido = null;
@@ -670,8 +453,8 @@ public class PedidoController extends AbstractController {
             gerarListaMensagemAlerta("O usuário não tem permissão de acesso ao pedido.");
         } else {
             pedido = pedidoService.pesquisarPedidoById(id, TipoPedido.COMPRA.equals(tipoPedido));
-            if (pedido == null) {
-                gerarListaMensagemErro("Pedido não existe no sistema");
+            if (pedido == null || pedido.isOrcamento()) {
+                gerarListaMensagemAlerta("Pedido No. " + id + " não existe no sistema");
             } else {
                 formatarPedido(pedido);
                 List<Transportadora> listaRedespacho = clienteService.pesquisarTransportadorasRedespacho(pedido
@@ -696,6 +479,10 @@ public class PedidoController extends AbstractController {
                 LogradouroCliente l = clienteService.pesquisarLogradouroFaturamentoById(pedido.getCliente().getId());
                 if (l != null) {
                     addAtributo("logradouroFaturamento", l.getCepEnderecoNumeroBairro());
+                }
+
+                if (pedido.isVenda()) {
+                    addAtributo("listaNumeroNFe", nFeService.pesquisarNumeroNFeByIdPedido(pedido.getId()));
                 }
 
                 addAtributo("listaIdPedidoAssociado",
@@ -764,70 +551,16 @@ public class PedidoController extends AbstractController {
     @Get("pedido/listagem")
     public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
             TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido) {
-        boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
-        if (idCliente == null) {
-            gerarListaMensagemAlerta("Cliente é obrigatório para a pesquisa de pedidos");
-        } else if (!isVisulizacaoClientePermitida(idCliente)) {
-            gerarListaMensagemAlerta("O usuário não tem permissão para pesquisar os pedidos do cliente.");
-        } else {
 
-            final RelatorioWrapper<Pedido, ItemPedido> relatorio = gerarRelatorioPaginadoItemPedido(idCliente,
-                    idVendedor, idFornecedor, orcamento, isCompra, paginaSelecionada, itemVendido);
-            inicializarRelatorioPaginadoSemRedirecionar(paginaSelecionada, relatorio, "relatorioItemPedido");
+        super.pesquisarPedidoByIdCliente(idCliente, idVendedor, idFornecedor, tipoPedido, orcamento, paginaSelecionada,
+                itemVendido);
 
-            /*
-             * Recuperando os dados do cliente no caso em que nao tenhamos
-             * resultado na pesquisa de pedido, entao os dados do cliente devem
-             * permanecer na tela
-             */
-            Cliente cliente = clienteService.pesquisarById(idCliente);
-            carregarVendedor(cliente);
-            addAtributo("cliente", cliente);
-
-            if (isCompra) {
-                // Aqui estamos supondo que o usuario que acessou a tela eh um
-                // comprador pois ele tem permissao para isso. E o campo com o
-                // nome do comprador deve sempre estar preenchido.
-                addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
-                addAtributo("listaRepresentada", representadaService.pesquisarFornecedor(true));
-            } else {
-                // Aqui ja foi carregado o vendedor resumido.
-                addAtributo("proprietario", cliente.getVendedor());
-            }
-
-            LogradouroCliente l = clienteService.pesquisarLogradouroFaturamentoById(idCliente);
-            if (l != null) {
-                addAtributo("logradouroFaturamento", l.getCepEnderecoNumeroBairro());
-            }
-
-            addAtributo("listaTransportadora", transportadoraService.pesquisarTransportadoraAtiva());
-            addAtributo("listaRedespacho", transportadoraService.pesquisarTransportadoraByIdCliente(idCliente));
-            addAtributo("idRepresentadaSelecionada", idFornecedor);
-        }
-        addAtributo("tipoPedido", tipoPedido);
-        addAtributo("orcamento", orcamento);
-        addAtributo("isCompra", isCompra);
         configurarTipoPedido(tipoPedido);
-
         redirecionarHome(tipoPedido, orcamento, false);
     }
 
-    private LogradouroPedido recuperarLogradouro(Pedido p, TipoLogradouro t) {
-        if (p.getListaLogradouro() == null || p.getListaLogradouro().isEmpty()) {
-            return null;
-        }
-        for (LogradouroPedido l : p.getListaLogradouro()) {
-            if (t.equals(l.getTipoLogradouro())) {
-                return l;
-            }
-        }
-        return null;
-    }
-
     private void redirecionarHome(TipoPedido tipoPedido, boolean orcamento, boolean topoPagina) {
-        if (orcamento && !TipoPedido.COMPRA.equals(tipoPedido)) {
-            redirecTo(this.getClass()).orcamentoVendaHome();
-        } else if (!orcamento && TipoPedido.COMPRA.equals(tipoPedido)) {
+        if (!orcamento && TipoPedido.COMPRA.equals(tipoPedido)) {
             redirecTo(this.getClass()).pedidoCompraHome();
         } else {
             redirecTo(this.getClass()).pedidoVendaHome();

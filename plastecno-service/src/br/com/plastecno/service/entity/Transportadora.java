@@ -80,6 +80,9 @@ public class Transportadora implements Serializable {
 	public Transportadora() {
 	}
 
+	/*
+	 * Construtor utilizado em pesquisa da transportadora do pedido
+	 */
 	public Transportadora(Integer id, String nomeFantasia) {
 		this.id = id;
 		this.nomeFantasia = nomeFantasia;

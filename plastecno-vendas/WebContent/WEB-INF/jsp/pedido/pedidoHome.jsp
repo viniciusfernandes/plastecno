@@ -19,6 +19,7 @@
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/pedido/pedido.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/pedido/bloco_item_pedido.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 
@@ -33,12 +34,9 @@
 $(document).ready(function() {
 	scrollTo('${ancora}');
 
-	inicializarAutomcompleteMaterial('<c:url value="/pedido/material"/>');
+	var tabelaItemHandler = gerarTabelaItemPedido('<c:url value="/pedido"/>')
+	inicializarAutocompleteMaterial('<c:url value="/pedido/material"/>');
 	// inicializarAutocompleteDescricaoPeca('<c:url value="/estoque/descricaopeca"/>');
-	
-	habilitar('#bloco_item_pedido #descricao', false);
-	habilitar('#bloco_item_pedido #peso', false);
-	habilitar('#bloco_item_pedido #aliquotaIPI', <c:out value="${not empty pedido and pedido.representada.IPIHabilitado}"/>);
 	
 	var urlInclusaoPedido = '<c:url value="/pedido/inclusao"/>';
 	var urlInclusaoItemPedido = '<c:url value="/pedido/item/inclusao"/>';
@@ -125,29 +123,43 @@ $(document).ready(function() {
 		$('#formVazio').attr('action', url).submit();
 	});
 	
-	inicializarBlocoItemPedido('<c:url value="/pedido"/>');
+	$('#listaNumeroNFe').change(function(){
+		adicionarInputHiddenFormulario('formVazio', 'numeroNFe', $(this).val());
+		$('#formVazio').attr('action', '<c:url value="/pedido/nfe"/>').submit();
+	});
 	
 	inserirMascaraData('dataEntrega');
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
 	inserirMascaraNumerica('numeroPedidoPesquisa', '9999999');
-	inserirMascaraMonetaria('precoVenda', 7);
 	inserirMascaraMonetaria('fretePedido', 7);
-	inserirMascaraNumerica('aliquotaIPI', '99');
-	inserirMascaraMonetaria('aliquotaComissao', 5);
-	inserirMascaraMonetaria('aliquotaICMS', 5);
-	inserirMascaraNumerica('quantidade', '9999999');
-	inserirMascaraMonetaria('comprimento', 8);
-	inserirMascaraMonetaria('peso', 8);
-	inserirMascaraMonetaria('medidaExterna', 8);
-	inserirMascaraMonetaria('medidaInterna', 8);
-	inserirMascaraNumerica('prazoEntrega', '999');
 	inserirMascaraNumerica('validade', '999');
 
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
-	inicializarAutomcompleteCliente('<c:url value="/pedido/cliente"/>');
+	inicializarAutocompleteCliente('<c:url value="/pedido/cliente"/>', function(cliente){
+		$('#idCliente').val(cliente.id);
+		$('#formPesquisa #idClientePesquisa').val(cliente.id);
+		$('#site').val(cliente.site);
+		$('#email').val(cliente.email);
+		$('#cnpj').val(cliente.cnpj);
+		$('#cpf').val(cliente.cpf);
+		$('#nomeCliente').val(cliente.nomeCompleto);
+		$('#idVendedor').val(cliente.vendedor.id);
+		$('#suframa').val(cliente.suframa);
+		$('#proprietario').val(cliente.vendedor.nome + ' - '+ cliente.vendedor.email);
+		$('#logradouroFaturamento').val(cliente.logradouroFormatado);
+		limparComboBox('listaTransportadora');
+		limparComboBox('listaRedespacho');
+
+		var comboTransportadora = document.getElementById('listaTransportadora');
+		var comboRedespacho = document.getElementById('listaRedespacho');
+
+		preencherComboTransportadora(comboTransportadora, cliente.listaTransportadora);
+		preencherComboTransportadora(comboRedespacho, cliente.listaRedespacho);
+	});
+	
 	<%--Desabilitando toda a tela de pedidos --%>
 	<c:if test="${pedidoDesabilitado}">
 		$('input[type=text], select:not(.semprehabilitado), textarea').attr('disabled', true).addClass('desabilitado');
@@ -237,12 +249,20 @@ $(document).ready(function() {
 			
 			<c:if test="${not empty pedido.id}">
 			<div class="label">Pedido(s) de ${isCompra ? 'Venda:': 'Compra:'}</div>
-			<div class="input" style="width: 80%">
-				<select id="pedidoAssociado" name="idPedidoAssociado"
-					style="width: 13%" class="semprehabilitado">
+			<div class="input" style="width: 10%">
+				<select id="pedidoAssociado" name="idPedidoAssociado" style="width: 100%" class="semprehabilitado">
 					<option value=""></option>
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
 						<option value="${idPedidoAssociado}">${idPedidoAssociado}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label">Núm. NFe(s):</div>
+			<div class="input" style="width: 50%">
+				<select id="listaNumeroNFe" name="numeroNFe" style="width: 25%" class="semprehabilitado">
+					<option value="">&lt&lt SELECIONE &gt&gt</option>
+					<c:forEach var="numeroNFe" items="${listaNumeroNFe}">
+						<option value="${numeroNFe}">${numeroNFe}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -489,71 +509,7 @@ $(document).ready(function() {
 		</div>
 	</form>
 
-	<a id="rodape"></a>
-	<fieldset>
-		<legend>::: Resultado da Pesquisa de Pedidos de ${isCompra ? 'Compra': 'Venda'} :::</legend>
-		<div id="paginador"></div>
-		<div>
-			<table id="tabelaItemPedido" class="listrada">
-			<thead>
-				<tr>
-					<th style="width: 10%">Situaç.</th>
-					<th style="width: 10%">Ped./N. Cli.</th>
-					<th style="width: 5%">Item</th>
-					<th style="width: 5%">Qtde.</th>
-					<th style="width: 35%">Descrição</th>
-					<th style="width: 5%">Venda</th>
-					<th style="width: 5%">Preço (R$)</th>
-					<th style="width: 5%">Unid. (R$)</th>
-					<th style="width: 10%">Total (R$)</th>
-					<th style="width: 5%">IPI (%)</th>
-					<th style="width: 5%">ICMS (%)</th>
-					<th>Ações</th>
-				</tr>
-			</thead>
-
-			<tbody>
-			
-			<c:forEach items="${relatorioItemPedido.listaGrupo}" var="grupo" varStatus="iGrupo">
-					<c:forEach items="${grupo.listaElemento}" var="item" varStatus="iElemento">
-						<tr>
-							<c:if test="${iElemento.count le 1}">
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.situacaoPedido.descricao}</td>
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id.id}/<br></br>${grupo.id.numeroPedidoCliente}</td>
-							</c:if>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" style="text-align: center;">${item.tipoVenda}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoVendaFormatado}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoUnidadeFormatado}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaIPIFormatado}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.aliquotaICMSFormatado}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
-								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/pedido/pdf"/>">
-										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
-										<input type="hidden" name="idPedido" value="${grupo.id.id}" />
-										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
-									</form>
-									<form action="<c:url value="/pedido/${grupo.id.id}"/>" method="get">
-										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
-										<input type="hidden" name="id" value="${grupo.id.id}" />
-										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
-									</form>
-								</div>
-							</td>
-						</tr>
-					</c:forEach>
-				</c:forEach>
-
-			</tbody>
-			
-		</table>
-			
-		</div>
-	</fieldset>
+	<jsp:include page="/bloco/bloco_listagem_item_pedido.jsp"/>
 	
 </body>
 </html>

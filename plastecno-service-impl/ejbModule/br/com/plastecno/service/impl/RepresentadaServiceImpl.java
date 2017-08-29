@@ -245,6 +245,12 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	public Integer pesquisarIdRevendedor() {
+		Representada r = representadaDAO.pesquisarRevendedor();
+		return r == null ? null : r.getId();
+	}
+
+	@Override
 	public LogradouroRepresentada pesquisarLogradorouro(Integer id) {
 		return representadaDAO.pesquisarLogradorouro(id);
 	}

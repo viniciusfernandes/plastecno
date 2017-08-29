@@ -404,10 +404,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			query.setParameter("idFornecedor", idFornecedor);
 		}
 
-		List<SituacaoPedido> lOrcamento = new ArrayList<>();
-		lOrcamento.add(SituacaoPedido.ORCAMENTO);
-		lOrcamento.add(SituacaoPedido.ORCAMENTO_DIGITACAO);
-		query.setParameter("tipoPedido", TipoPedido.COMPRA).setParameter("listaTipoOrcamento", lOrcamento);
+		query.setParameter("tipoPedido", TipoPedido.COMPRA).setParameter("listaTipoOrcamento",
+				SituacaoPedido.getListaOrcamento());
 
 		List<Object[]> listaIdPedido = QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 		if (listaIdPedido.isEmpty()) {

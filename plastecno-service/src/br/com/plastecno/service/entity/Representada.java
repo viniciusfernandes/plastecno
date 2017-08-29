@@ -100,6 +100,14 @@ public class Representada implements Serializable {
 		this.nomeFantasia = nomeFantasia;
 	}
 
+	public Representada(Integer id, String nomeFantasia, TipoApresentacaoIPI tipoApresentacaoIPI,
+			TipoRelacionamento tipoRelacionamento) {
+		this.id = id;
+		this.nomeFantasia = nomeFantasia;
+		this.tipoApresentacaoIPI = tipoApresentacaoIPI;
+		this.tipoRelacionamento = tipoRelacionamento;
+	}
+
 	public void addContato(ContatoRepresentada contato) {
 		if (this.listaContato == null) {
 			this.listaContato = new ArrayList<ContatoRepresentada>();

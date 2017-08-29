@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import br.com.plastecno.service.ClienteService;
@@ -36,6 +37,8 @@ import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
@@ -493,27 +496,43 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testAceiteOrcamento() {
-		Pedido pedido = gerarPedidoOrcamento();
-		ItemPedido itemPedido = gerarItemPedido();
-		Integer idPedido = pedido.getId();
+		Pedido orcamento = gerarPedidoOrcamento();
+		ItemPedido itemOrcamento = gerarItemPedido();
+		Integer idOrcamento = orcamento.getId();
 
 		try {
-			pedidoService.inserirItemPedido(idPedido, itemPedido);
+			pedidoService.inserirItemPedido(idOrcamento, itemOrcamento);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idOrcamento, new byte[] {});
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		pedidoService.aceitarOrcamento(idPedido);
+		orcamento = pedidoService.pesquisarPedidoById(idOrcamento);
+		assertEquals("A situacao do orcamento deve ser ORCAMENTO apos o aceite do orcamento", SituacaoPedido.ORCAMENTO,
+				orcamento.getSituacaoPedido());
 
-		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		Integer idPedido = null;
+		try {
+			idPedido = pedidoService.aceitarOrcamento(idOrcamento);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Pedido pedido = pedidoService.pesquisarPedidoById(idPedido);
 		assertEquals("A situacao do pedido deve ser DIGITACAO apos o aceite do orcamento", SituacaoPedido.DIGITACAO,
 				pedido.getSituacaoPedido());
+
+		orcamento = pedidoService.pesquisarPedidoById(idOrcamento);
+		assertEquals("A situacao do orcamento deve ser ORCAMENTO ACEITO apos o aceite do orcamento",
+				SituacaoPedido.ORCAMENTO_ACEITO, orcamento.getSituacaoPedido());
+
+		assertNotEquals("OS ids do pedido e do orcamento devem ser diferentes apos o aceito do orcamento",
+				pedido.getId(), orcamento.getId());
 
 	}
 
@@ -537,14 +556,18 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		SituacaoPedido situacaoPedidoAntes = pedido.getSituacaoPedido();
+		boolean throwed = false;
+		try {
+			pedidoService.aceitarOrcamento(idPedido);
+		} catch (BusinessException e) {
+			throwed = true;
+		}
 
-		pedidoService.aceitarOrcamento(idPedido);
-
+		assertTrue("Um id de pedido foi usado no aceite de orcamento e isso nao pode ocorrer.", throwed);
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
 		assertEquals(
 				"A situacao do pedido que nao seja um orcamento nao deve ser modificada apos o aceite do orcamento",
 				situacaoPedidoAntes, pedido.getSituacaoPedido());
-
 	}
 
 	@Test
@@ -593,6 +616,26 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testCopiaPedido() {
 		Pedido p = gerarPedidoRevenda();
+		ItemPedido item1 = gerarItemPedido();
+		ItemPedido item2 = gerarItemPedido();
+
+		// Alterando as medidas do item para simular itens distintos.
+		item2.setMedidaExterna(200d);
+		item2.setMedidaInterna(20d);
+		item2.setComprimento(200d);
+		try {
+			pedidoService.inserirItemPedido(p.getId(), item1);
+			pedidoService.inserirItemPedido(p.getId(), item2);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(p.getId(), new byte[] {});
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		SituacaoPedido s = p.getSituacaoPedido();
 		Integer idCopia = null;
 		try {
@@ -605,8 +648,53 @@ public class PedidoServiceTest extends AbstractTest {
 
 		assertEquals("O pedido copia deve estar em DIGITACAO apos a copia", SituacaoPedido.DIGITACAO,
 				pCopia.getSituacaoPedido());
-
 		assertEquals("O pedido copiado deve ter a situacao igual a situacao anterior a copia", s, p.getSituacaoPedido());
+		assertNull("O pedido copiado nao pode ter data de envio", pCopia.getDataEnvio());
+		assertNull("O pedido copiado nao pode ter data emissao NFe", pCopia.getDataEmissaoNF());
+		assertNull("O pedido copiado nao pode ter data vencimento", pCopia.getDataVencimentoNF());
+		assertNull("O pedido copiado nao pode ter valor de parcela NFe", pCopia.getValorParcelaNF());
+		assertNull("O pedido copiado nao pode ter total NFe", pCopia.getValorTotalNF());
+		assertEquals("O pedido copia deve conter a mesma data de entrega",
+				StringUtils.formatarData(pCopia.getDataEntrega()), StringUtils.formatarData(p.getDataEntrega()));
+
+		List<ItemPedido> lItemCopia = pedidoService.pesquisarItemPedidoByIdPedido(pCopia.getId());
+		List<ItemPedido> lItem = pedidoService.pesquisarItemPedidoByIdPedido(p.getId());
+
+		for (Logradouro lCopia : pCopia.getListaLogradouro()) {
+			for (Logradouro l : p.getListaLogradouro()) {
+				if (lCopia.getId() == null) {
+					Assert.fail("O logradouro do pedido que foi copiado nao contem id. Item: "
+							+ lCopia.getEnderecoNumeroBairro());
+					break;
+				}
+				assertFalse("O logradouro do pedido que foi copiado nao pode conter o mesmo id do original", lCopia
+						.getId().equals(l.getId()));
+			}
+		}
+
+		for (ItemPedido iCopia : lItemCopia) {
+			for (ItemPedido iPed : lItem) {
+				if (iCopia.getId() == null) {
+					Assert.fail("O item do pedido que foi copiado nao contem id. Item: "
+							+ iCopia.getDescricaoSemFormatacao());
+					break;
+				}
+				assertNull("O item copiado nao pode ter pedido de compra. Item: " + iCopia.getDescricaoSemFormatacao(),
+						iCopia.getIdPedidoCompra());
+				assertNull(
+						"O item copiado nao pode ter quantidade recepcionada. Item: "
+								+ iCopia.getDescricaoSemFormatacao(), iCopia.getQuantidadeRecepcionada());
+				assertNull("O item copiado nao pode ter pedido de venda. Item: " + iCopia.getDescricaoSemFormatacao(),
+						iCopia.getIdPedidoVenda());
+				assertTrue(
+						"O item copiado nao pode ter quantidade reservada. Item: " + iCopia.getDescricaoSemFormatacao(),
+						iCopia.getQuantidadeReservada() == null || iCopia.getQuantidadeReservada() == 0);
+				assertFalse("O item copiado nao pode ter encomendas. Item: " + iCopia.getDescricaoSemFormatacao(),
+						iCopia.isEncomendado());
+				assertFalse("O item do pedido que foi copiado nao pode conter o mesmo id do item original. Item: "
+						+ iCopia.getDescricaoSemFormatacao(), iCopia.getId().equals(iPed.getId()));
+			}
+		}
 	}
 
 	@Test
@@ -1851,6 +1939,38 @@ public class PedidoServiceTest extends AbstractTest {
 
 		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
+	}
+
+	@Test
+	public void testModificacaoLogradouroPedidoNovaInclusaoPedido() {
+		Pedido pedido = gerarPedidoSimples();
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<LogradouroPedido> lLogPedido = pedido.getListaLogradouro();
+		assertFalse("A lista de logradouro do pedido nao deve estar vazia", lLogPedido == null || lLogPedido.isEmpty());
+
+		// Realizando uma aletacao no pedido para simular a alteracao do
+		// logradouro automaticamente
+		pedido.setFormaPagamento("APENAS UMA ALTERACAO");
+		pedido.setObservacaoProducao("Inclusao de observacao de producao");
+		try {
+			pedido = pedidoService.inserir(pedido);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<LogradouroPedido> lLogPedido2 = pedido.getListaLogradouro();
+		for (LogradouroPedido l2 : lLogPedido2) {
+			for (LogradouroPedido l : lLogPedido) {
+				assertNotEquals(
+						"Os logradouros sao modificados apos as alteracoes do pedido e nao devem ter os mesmos ids",
+						l2.getId(), l.getId());
+			}
+		}
 	}
 
 	@Test

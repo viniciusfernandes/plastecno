@@ -47,9 +47,6 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Cliente do pedido")
 	private Cliente cliente;
 
-	@Column(name = "validade")
-	private Integer validade;
-
 	@Column(name = "cliente_notificado_venda")
 	private boolean clienteNotificadoVenda = false;
 
@@ -109,10 +106,13 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private Integer idCliente;
 
+	@Column(name = "id_orcamento")
+	private Integer idOrcamento;
+
 	@Transient
 	private Integer idVendedor;
 
-	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY)
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de logradouro do pedido")
 	private List<LogradouroPedido> listaLogradouro;
 
@@ -171,6 +171,9 @@ public class Pedido implements Serializable, Cloneable {
 	@JoinColumn(name = "id_transportadora_redespacho")
 	@InformacaoValidavel(nomeExibicao = "Redespacho do pedido")
 	private Transportadora transportadoraRedespacho;
+
+	@Column(name = "validade")
+	private Integer validade;
 
 	@Column(name = "valor_frete")
 	private Double valorFrete;
@@ -394,6 +397,10 @@ public class Pedido implements Serializable, Cloneable {
 		return idCliente;
 	}
 
+	public Integer getIdOrcamento() {
+		return idOrcamento;
+	}
+
 	public Integer getIdVendedor() {
 		return idVendedor;
 	}
@@ -534,7 +541,8 @@ public class Pedido implements Serializable, Cloneable {
 
 	public boolean isOrcamento() {
 		return SituacaoPedido.ORCAMENTO.equals(situacaoPedido)
-				|| SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido);
+				|| SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido)
+				|| SituacaoPedido.ORCAMENTO_ACEITO.equals(situacaoPedido);
 	}
 
 	public boolean isOrcamentoDigitacao() {
@@ -636,6 +644,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setIdCliente(Integer idCliente) {
 		this.idCliente = idCliente;
+	}
+
+	public void setIdOrcamento(Integer idOrcamento) {
+		this.idOrcamento = idOrcamento;
 	}
 
 	public void setIdVendedor(Integer idVendedor) {

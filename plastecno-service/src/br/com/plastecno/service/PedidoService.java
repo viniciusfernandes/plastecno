@@ -9,6 +9,7 @@ import javax.ejb.Local;
 import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.LogradouroPedido;
@@ -23,7 +24,7 @@ import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 
 @Local
 public interface PedidoService {
-	void aceitarOrcamento(Integer idOrcamento);
+	Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException;
 
 	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
 
@@ -42,6 +43,8 @@ public interface PedidoService {
 	List<Date> calcularDataPagamento(Integer idPedido);
 
 	Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException;
+
+	void cancelarOrcamento(Integer idOrcamento) throws BusinessException;
 
 	void cancelarPedido(Integer idPedido) throws BusinessException;
 
@@ -207,6 +210,8 @@ public interface PedidoService {
 
 	Integer pesquisarQuantidadeReservadaByIdItemPedido(Integer idItemPedido);
 
+	Representada pesquisarRepresentadaByIdPedido(Integer idPedido);
+
 	Representada pesquisarRepresentadaIdPedido(Integer idPedido);
 
 	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
@@ -222,6 +227,8 @@ public interface PedidoService {
 	List<SituacaoPedido> pesquisarSituacaoVendaEfetivada();
 
 	Object[] pesquisarTelefoneContatoByIdPedido(Integer idPedido);
+
+	TipoPedido pesquisarTipoPedidoByIdPedido(Integer idPedido);
 
 	List<TotalizacaoPedidoWrapper> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo);
 
@@ -239,6 +246,8 @@ public interface PedidoService {
 	List<TotalizacaoPedidoWrapper> pesquisarTotalPedidoVendaResumidaByPeriodo(Periodo periodo);
 
 	Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido);
+
+	Transportadora pesquisarTransportadoraResumidaByIdPedido(Integer idPedido);
 
 	Double pesquisarValorFretePorItemByIdPedido(Integer idPedido);
 
@@ -263,6 +272,8 @@ public interface PedidoService {
 	Integer refazerPedido(Integer idPedido) throws BusinessException;
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
+
+	void removerLogradouroPedido(Integer idPedido);
 
 	void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException;
 

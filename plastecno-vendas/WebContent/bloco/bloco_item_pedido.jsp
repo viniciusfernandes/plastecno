@@ -3,7 +3,10 @@
 
 $(document).ready(function(){
 	
-	inserirMascaraNCM('bloco_item_pedido #ncm');
+	habilitar('#bloco_item_pedido #descricao', false);
+	habilitar('#bloco_item_pedido #peso', false);
+	habilitar('#bloco_item_pedido #aliquotaIPI', <c:out value="${not empty pedido and pedido.representada.IPIHabilitado}"/>);
+	
 	$('#precoVenda').focus(function (){
 		
 		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
@@ -38,6 +41,18 @@ $(document).ready(function(){
 		$('<input>').attr('type','hidden').attr('name','itemVendido.comprimento').attr('value',$('#bloco_item_pedido #comprimento').val()).appendTo('#formPesquisa');
 		$('#botaoPesquisaPedido').click();
 	});
+	
+	inserirMascaraNCM('bloco_item_pedido #ncm');
+	inserirMascaraMonetaria('precoVenda', 7);
+	inserirMascaraNumerica('aliquotaIPI', '99');
+	inserirMascaraMonetaria('aliquotaComissao', 5);
+	inserirMascaraMonetaria('aliquotaICMS', 5);
+	inserirMascaraNumerica('quantidade', '9999999');
+	inserirMascaraMonetaria('comprimento', 8);
+	inserirMascaraMonetaria('peso', 8);
+	inserirMascaraMonetaria('medidaExterna', 8);
+	inserirMascaraMonetaria('medidaInterna', 8);
+	inserirMascaraNumerica('prazoEntrega', '999');
 });
 
 function gerarParametrosMedidasItem(){
@@ -298,8 +313,6 @@ function pesquisarNcm(){
 						</td>
 					</tr>
 				</c:forEach>
-
-
 			</tbody>
 			<tfoot>
 				<tr>

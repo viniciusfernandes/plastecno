@@ -17,6 +17,7 @@ import br.com.plastecno.service.constante.SituacaoPagamento;
 import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
+@InformacaoValidavel
 @Entity
 @Table(name = "tb_pagamento", schema = "vendas")
 public class Pagamento {
@@ -33,12 +34,14 @@ public class Pagamento {
 	@Transient
 	private String dataRecebimentoFormatada;
 
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Data de vencimento de pagamento")
 	@Column(name = "data_vencimento")
 	private Date dataVencimento;
 
 	@Transient
 	private String dataVencimentoFormatada;
 
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 200 }, nomeExibicao = "Descrição do pagamento")
 	private String descricao;
 
 	@Id
@@ -79,14 +82,15 @@ public class Pagamento {
 	@Column(name = "total_parcelas")
 	private Integer totalParcelas;
 
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Valor do pagamento")
+	@Column(name = "valor")
+	private Double valor;
+
 	@Column(name = "valor_credito_icms")
 	private Double valorCreditoICMS;
 
 	@Column(name = "valor_nf")
 	private Double valorNF;
-
-	@Column(name = "valor_parcela")
-	private Double valorParcela;
 
 	public Date getDataEmissao() {
 		return dataEmissao;
@@ -160,16 +164,16 @@ public class Pagamento {
 		return totalParcelas;
 	}
 
+	public Double getValor() {
+		return valor;
+	}
+
 	public Double getValorCreditoICMS() {
 		return valorCreditoICMS;
 	}
 
 	public Double getValorNF() {
 		return valorNF;
-	}
-
-	public Double getValorParcela() {
-		return valorParcela;
 	}
 
 	public void setDataEmissao(Date dataEmissao) {
@@ -244,6 +248,10 @@ public class Pagamento {
 		this.totalParcelas = totalParcelas;
 	}
 
+	public void setValor(Double valor) {
+		this.valor = valor;
+	}
+
 	public void setValorCreditoICMS(Double valorCreditoICMS) {
 		this.valorCreditoICMS = valorCreditoICMS;
 	}
@@ -252,7 +260,4 @@ public class Pagamento {
 		this.valorNF = valorNF;
 	}
 
-	public void setValorParcela(Double valorParcela) {
-		this.valorParcela = valorParcela;
-	}
 }

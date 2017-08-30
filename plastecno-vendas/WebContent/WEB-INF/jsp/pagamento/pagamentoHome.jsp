@@ -16,21 +16,64 @@
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
+<script type="text/javascript">
+
+$(document).ready(function() {
+	scrollTo('${ancora}');
+	$('#botaoInserirPagamento').click(function(){
+		$('#formPagamento').attr('action', '<c:out value="pagamento/inclusao"/>').attr('method', 'post').submit();	
+	});
+	
+	inserirMascaraData('dataVencimento');
+	inserirMascaraData('dataEmissao');
+	inserirMascaraData('dataRecebimento');
+	inserirMascaraMonetaria('valorNF', 7);
+	inserirMascaraMonetaria('valor', 7);
+	inserirMascaraMonetaria('valorCreditoICMS', 7);
+	inserirMascaraNumerica('quantidade', '99999');
+	inserirMascaraNumerica('parcela', '999');
+	inserirMascaraNumerica('pedido', '9999999');
+	inserirMascaraNumerica('totalParcelas', '99999');
+	inserirMascaraNumerica('numeroNF', '9999999');
+	inserirMascaraNumerica('sequencial', '99');
+	
+	autocompletar({
+		url : '<c:url value="/pagamento/fornecedor/listagem"/>',
+		campoPesquisavel : 'fornecedor',
+		parametro : 'nomeFantasia',
+		containerResultados : 'containerPesquisaFornecedor',
+		selecionarItem : function(itemLista) {
+			$('#idFornecedor').val(itemLista.id);
+		}
+	});
+	
+});
+
+</script>
 
 </head>
 <body>
-	<form id="formPedido" action="<c:url value="/pagamento/inclusao"/>" method="post">
-		<input type="hidden" id="idPedido"  name="pedido.id" value="${pedido.id}"/>
-		<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
+
+	<jsp:include page="/bloco/bloco_mensagem.jsp" />
+	<div id="modal"></div>
+	
+	<form id="formPagamento" action="<c:url value="/pagamento/inclusao"/>" method="post">
+		<input type="hidden" id="idFornecedor" name="pagamento.idFornecedor" value="${pagamento.idFornecedor}"/>
 	<fieldset>
 		<legend>Pagamento</legend>
 		<div class="label">Dt. Venc.:</div>
 		<div class="input" style="width: 10%">
-			<input type="text" id="dataVencimento" value="${pagamento.dataVencimentoFormatada}" disabled="disabled" style="width: 100%" />
+			<input type="text" id="dataVencimento" name="pagamento.dataVencimento" value="${pagamento.dataVencimentoFormatada}" style="width: 100%" />
 		</div>
 		<div class="label" style="width: 9%">Tipo:</div>
 		<div class="input" style="width: 13%">
-			<input type="text" id="tipoPagamento" value="${pagamento.tipoPagamento}" style="width: 100%"/>
+			<select id="tipoPagamento" name="pagamento.tipoPagamento" style="width: 100%">
+				<option value="">&lt&lt SELECIONE &gt&gt</option>
+				<c:forEach var="tipoPagamento" items="${listaTipoPagamento}">
+					<option value="${tipoPagamento}"
+						<c:if test="${tipoPagamento eq tipoPagamentoSelecionado}">selected</c:if>>${tipoPagamento}</option>
+				</c:forEach>
+			</select>
 		</div>
 		<div class="label" style="width: 10%">Situação:</div>
 			<div class="input" style="width: 40%">
@@ -47,14 +90,17 @@
 		
 		<div class="label" style="width: 10%">Val. Parc:</div>
 		<div class="input" style="width: 40%">
-			<input type="text" id="valorParcela" name="pagamento.valorParcela" value="${pagamento.valorParcela}" style="width: 75%"/>
+			<input type="text" id="valor" name="pagamento.valor" value="${pagamento.valor}" style="width: 75%"/>
 		</div>
 			
 		<div class="label obrigatorio">NF:</div>
 		<div class="input" style="width: 10%">
 			<input type="text" id="numeroNF" name="pagamento.numeroNF" value="${pagamento.numeroNF}" style="width: 100%"/>
 		</div>
-		<div class="label" style="width: 9%">Val. NF:</div>
+		<div class="input" style="width: 2%">
+			<input type="button" id="botaoPesquisaNF" title="Pesquisar Pagamentos da NF" value="" class="botaoPesquisarPequeno" />
+		</div>
+		<div class="label" style="width: 7%">Val. NF:</div>
 		<div class="input" style="width: 13%">
 			<input type="text" id="valorNF" name="pagamento.valorNF" value="${pagamento.valorNF}" style="width: 100%"/>
 		</div>
@@ -73,10 +119,13 @@
 		<div class="input" style="width: 10%">
 			<input type="text" id="pedido" name="pagamento.idPedido" value="${pagamento.idPedido}" style="width: 100%"/>
 		</div>
-		
-		<div class="label" style="width: 9%">Fornec.:</div>
+		<div class="input" style="width: 2%">
+			<input type="button" id="botaoPesquisaPedido" title="Pesquisar Pagamentos do Pedido" value="" class="botaoPesquisarPequeno" />
+		</div>
+		<div class="label" style="width: 7%">Fornec.:</div>
 		<div class="input" style="width: 60%">
-			<input type="text" id="fornecedor" name="pagamento.idFornecedor" value="${pagamento.idFornecedor}" style="width: 22%"/>
+			<input type="text" id="fornecedor" value="${nomeFornecedor}" style="width: 22%"/>
+			<div class="suggestionsBox" id="containerPesquisaFornecedor" style="display: none; width: 30%"></div>
 		</div>
 		<div class="label">Item:</div>
 		<div class="input" style="width: 10%">
@@ -92,11 +141,11 @@
 		</div>
 		<div class="label">Cred. ICMS:</div>
 		<div class="input" style="width: 10%">
-			<input type="text" id="dataEnvio" value="${pedido.dataEnvioFormatada}"  style="width: 100%" />
+			<input type="text" id="valorCreditoICMS" value="${pedido.valorCreditoICMS}"  style="width: 100%" />
 		</div>
 		<div class="label" style="width: 9%">Mod. Frete:</div>
 		<div class="input" style="width: 13%">
-			<select id="frete" id="frete" name="pagamento.modalidadeFrete" style="width: 100%">
+			<select id="frete" name="pagamento.modalidadeFrete" style="width: 100%">
 				<option value="">&lt&lt SELECIONE &gt&gt</option>
 				<c:forEach var="frete" items="${listaModalidadeFrete}">
 					<option value="${frete.codigo}"

@@ -245,6 +245,13 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Representada> pesquisarFornecedorAtivoByNomeFantasia(String nomeFantasia) {
+		return representadaDAO.pesquisarRepresentadaByTipoRelacionamento(nomeFantasia, true,
+				TipoRelacionamento.FORNECIMENTO, TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+	}
+
+	@Override
 	public Integer pesquisarIdRevendedor() {
 		Representada r = representadaDAO.pesquisarRevendedor();
 		return r == null ? null : r.getId();

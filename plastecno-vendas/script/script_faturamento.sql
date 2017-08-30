@@ -14,7 +14,7 @@ create table vendas.tb_pagamento (
 	parcela integer default null,
 	total_parcelas integer default null,
 	valor_nf numeric(10, 2) default 0,
-	valor_parcela numeric(10, 2) default 0,
+	valor numeric(10, 2) default 0,
 	valor_credito_icms numeric(10, 2) default 0,
 	modalidade_frete integer default null,
 	data_emissao date default null,
@@ -32,9 +32,19 @@ ALTER TABLE vendas.tb_pagamento ADD PRIMARY KEY (id);
 ALTER TABLE vendas.tb_pagamento ADD CONSTRAINT id_tipo_pagamento FOREIGN KEY (id_tipo_pagamento ) REFERENCES vendas.tb_tipo_pagamento (id);
 ALTER TABLE vendas.tb_pagamento ADD CONSTRAINT id_situacao_pagamento FOREIGN KEY (id_situacao_pagamento ) REFERENCES vendas.tb_situacao_pagamento (id);
 
-create sequence seq_pagamento_id increment by 1 minvalue 1 no maxvalue start with 1;
+create sequence vendas.seq_pagamento_id increment by 1 minvalue 1 no maxvalue start with 1;
 
 create index idx_pagamento_id_fornecedor on vendas.tb_pagamento (id_fornecedor);
 create index idx_pagamento_id_pedido on vendas.tb_pagamento (id_pedido);
 create index idx_pagamento_numero_nf on vendas.tb_pagamento (numero_nf);
 
+insert into vendas.tb_tipo_pagamento values (0, 'FOLHA_PAGAMENTO');
+insert into vendas.tb_tipo_pagamento values (1, 'INSUMO');
+insert into vendas.tb_tipo_pagamento values (2, 'DESPESAS_FIXAS');
+insert into vendas.tb_tipo_pagamento values (3, 'ACAO_JUDICIAL');
+insert into vendas.tb_tipo_pagamento values (4, 'EQUIPAMENTO');
+insert into vendas.tb_tipo_pagamento values (5, 'EVENTUALIDADE');
+
+insert into vendas.tb_situacao_pagamento values (0, 'A_VENCER');
+insert into vendas.tb_situacao_pagamento values (1, 'VENCIDO');
+insert into vendas.tb_situacao_pagamento values (2, 'LIQUIDADO');

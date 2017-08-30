@@ -174,7 +174,7 @@ public abstract class AbstractController {
 
     void configurarFiltroPediodoMensal() {
         if (!contemAtributo("dataInicial") && !contemAtributo("dataFinal")) {
-            addAtributo("dataInicial", StringUtils.formatarData(gerarInicioMes()));
+            addAtributo("dataInicial", StringUtils.formatarData(gerarDataInicioMes()));
             addAtributo("dataFinal", StringUtils.formatarData(new Date()));
 
         }
@@ -278,7 +278,7 @@ public abstract class AbstractController {
         return gerarDownload(bytesArquivo, nomeArquivo, "application/vnd.ms-excel;");
     }
 
-    Date gerarInicioMes() {
+    Date gerarDataInicioMes() {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_MONTH, 1);
         return c.getTime();

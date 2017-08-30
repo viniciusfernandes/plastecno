@@ -1,5 +1,6 @@
 package br.com.plastecno.service.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -12,9 +13,25 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 		super(entityManager);
 	}
 
+	public void liquidarPagamento(Integer idPagamento) {
+		entityManager.createQuery("update Pagamento p set p.liquidado = true where p.id = :idPagamento")
+				.setParameter("idPagamento", idPagamento).executeUpdate();
+	}
+
+	public Pagamento pesquisarById(Integer idPagamento) {
+		return super.pesquisarById(Pagamento.class, idPagamento);
+	}
+
 	public List<Pagamento> pesquisarByIdPedido(Integer idPedido) {
 		return entityManager.createQuery("select p from Pagamento p where p.idPedido =:idPedido", Pagamento.class)
 				.setParameter("idPedido", idPedido).getResultList();
 	}
 
+	public List<Pagamento> pesquisarPagamentoByPeriodo(Date dataInicio, Date dataFim) {
+		return entityManager
+				.createQuery(
+						"select p from Pagamento p where p.dataVencimento >=:dataInicio and p.dataVencimento <=:dataFim ",
+						Pagamento.class).setParameter("dataInicio", dataInicio).setParameter("dataFim", dataFim)
+				.getResultList();
+	}
 }

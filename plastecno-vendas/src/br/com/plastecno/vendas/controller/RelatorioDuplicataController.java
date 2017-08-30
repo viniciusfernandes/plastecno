@@ -113,7 +113,7 @@ public class RelatorioDuplicataController extends AbstractController {
 
     @Get("relatorio/duplicata")
     public void relatorioDuplicataHome() {
-        gerarRelatorioByPeriodo(gerarInicioMes(), new Date());
+        gerarRelatorioByPeriodo(gerarDataInicioMes(), new Date());
     }
 
     @Post("duplicata/remocao/{idDuplicata}")

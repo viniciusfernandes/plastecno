@@ -1,5 +1,6 @@
 package br.com.plastecno.service.test.builder;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.Bairro;
@@ -28,6 +30,7 @@ import br.com.plastecno.service.entity.LogradouroRepresentada;
 import br.com.plastecno.service.entity.LogradouroTransportadora;
 import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.entity.Material;
+import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.entity.Pais;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.PerfilAcesso;
@@ -35,6 +38,7 @@ import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
+import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.test.TestUtils;
 
 public class EntidadeBuilder {
@@ -245,6 +249,19 @@ public class EntidadeBuilder {
 		return material;
 	}
 
+	public Pagamento buildPagamento() {
+		Pagamento p = new Pagamento();
+		p.setDataRecebimento(new Date());
+		p.setDataVencimento(new Date());
+		p.setDescricao("SALARIO DE VENDEDOR");
+		p.setModalidadeFrete(Integer.parseInt(TipoModalidadeFrete.SEM_FRETE.getCodigo()));
+		p.setParcela(1);
+		p.setTipoPagamento(TipoPagamento.FOLHA_PAGAMENTO);
+		p.setTotalParcelas(1);
+		p.setValor(2000.0);
+		return p;
+	}
+
 	public Pedido buildPedido() {
 		Usuario vendedor = buildVendedor();
 		Cliente cliente = buildCliente();
@@ -265,7 +282,7 @@ public class EntidadeBuilder {
 		pedido.setFinalidadePedido(TipoFinalidadePedido.CONSUMO);
 		pedido.setContato(contato);
 		pedido.setTipoEntrega(TipoEntrega.CIF);
-		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+		pedido.setDataEntrega(TestUtils.gerarDataAmanha());
 		pedido.setFormaPagamento("30 dias uteis");
 		return pedido;
 	}

@@ -324,7 +324,7 @@ public class PedidoServiceTest extends AbstractTest {
 		Pedido pedido = gerarPedidoRevenda();
 		pedido.setFormaPagamento("A VISTA");
 		pedido.setTipoEntrega(TipoEntrega.FOB);
-		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+		pedido.setDataEntrega(TestUtils.gerarDataAmanha());
 		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 		pedido.getContato().setEmail("vinicius@hotmail.com");
 		pedido.getContato().setDdd("11");
@@ -462,7 +462,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		Pedido pedidoCompra = pedidoService.pesquisarCompraById(idPedidoCompra);
 		pedidoCompra.setFormaPagamento("A VISTA");
-		pedidoCompra.setDataEntrega(TestUtils.gerarDataPosterior());
+		pedidoCompra.setDataEntrega(TestUtils.gerarDataAmanha());
 		try {
 			pedidoService.enviarPedido(idPedidoCompra, new byte[] {});
 		} catch (BusinessException e) {
@@ -963,7 +963,7 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testEnvioEmailPedidoReservaInvalida() {
 		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+		pedido.setDataEntrega(TestUtils.gerarDataAmanha());
 		pedido.setFormaPagamento("30 dias");
 		pedido.setTipoEntrega(TipoEntrega.FOB);
 		Integer idPedido = null;
@@ -1081,7 +1081,7 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testEnvioPedidoCompra() {
 		Pedido pedido = gerarPedidoClienteProspectado();
-		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
+		pedido.setDataEntrega(TestUtils.gerarDataAmanha());
 		pedido.setFormaPagamento("30 dias a vista");
 		pedido.setTipoEntrega(TipoEntrega.CIF);
 		pedido.setTipoPedido(TipoPedido.COMPRA);
@@ -1792,7 +1792,7 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoPedidoDataEntregaInvalida() {
 		Pedido pedido = eBuilder.buildPedido();
-		pedido.setDataEntrega(TestUtils.gerarDataAnterior());
+		pedido.setDataEntrega(TestUtils.gerarDataOntem());
 		boolean throwed = false;
 		try {
 			pedido = pedidoService.inserir(pedido);
@@ -2255,7 +2255,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		try {
 			pedidoCompra.setFormaPagamento("A VISTA");
-			pedidoCompra.setDataEntrega(TestUtils.gerarDataPosterior());
+			pedidoCompra.setDataEntrega(TestUtils.gerarDataAmanha());
 			pedidoService.enviarPedido(idPedidoCompra, new byte[] {});
 		} catch (BusinessException e) {
 			printMensagens(e);

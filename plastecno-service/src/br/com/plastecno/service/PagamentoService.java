@@ -6,13 +6,18 @@ import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.wrapper.Periodo;
 
 @Local
 public interface PagamentoService {
 
 	Integer inserir(Pagamento pagamento) throws BusinessException;
 
+	void liquidarPagamento(Integer idPagamento);
+
+	Pagamento pesquisarById(Integer idPagamento);
+
 	List<Pagamento> pesquisarByIdPedido(Integer idPedido);
 
-
+	List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo);
 }

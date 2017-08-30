@@ -2,10 +2,7 @@ create table vendas.tb_tipo_pagamento (
 	id integer not null,
 	descricao varchar(50)
 );
-create table vendas.tb_situacao_pagamento (
-	id integer not null,
-	descricao varchar(50)
-);
+
 create table vendas.tb_pagamento (
 	id integer not null,
 	id_fornecedor integer default null,
@@ -24,13 +21,11 @@ create table vendas.tb_pagamento (
 	quantidade_item integer default 0,
 	sequencial_item integer default 0,
 	id_tipo_pagamento integer not null,
-	id_situacao_pagamento integer not null
+	liquidado boolean default false
 );
 ALTER TABLE vendas.tb_tipo_pagamento ADD PRIMARY KEY (id);
-ALTER TABLE vendas.tb_situacao_pagamento ADD PRIMARY KEY (id);
 ALTER TABLE vendas.tb_pagamento ADD PRIMARY KEY (id);
 ALTER TABLE vendas.tb_pagamento ADD CONSTRAINT id_tipo_pagamento FOREIGN KEY (id_tipo_pagamento ) REFERENCES vendas.tb_tipo_pagamento (id);
-ALTER TABLE vendas.tb_pagamento ADD CONSTRAINT id_situacao_pagamento FOREIGN KEY (id_situacao_pagamento ) REFERENCES vendas.tb_situacao_pagamento (id);
 
 create sequence vendas.seq_pagamento_id increment by 1 minvalue 1 no maxvalue start with 1;
 
@@ -44,7 +39,3 @@ insert into vendas.tb_tipo_pagamento values (2, 'DESPESAS_FIXAS');
 insert into vendas.tb_tipo_pagamento values (3, 'ACAO_JUDICIAL');
 insert into vendas.tb_tipo_pagamento values (4, 'EQUIPAMENTO');
 insert into vendas.tb_tipo_pagamento values (5, 'EVENTUALIDADE');
-
-insert into vendas.tb_situacao_pagamento values (0, 'A_VENCER');
-insert into vendas.tb_situacao_pagamento values (1, 'VENCIDO');
-insert into vendas.tb_situacao_pagamento values (2, 'LIQUIDADO');

@@ -10,10 +10,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import br.com.plastecno.service.PagamentoService;
-import br.com.plastecno.service.constante.SituacaoPagamento;
 import br.com.plastecno.service.dao.PagamentoDAO;
 import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
@@ -32,9 +32,23 @@ public class PagamentoServiceImpl implements PagamentoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserir(Pagamento pagamento) throws BusinessException {
-		pagamento.setSituacaoPagamento(SituacaoPagamento.A_VENCER);
 		ValidadorInformacao.validar(pagamento);
 		return pagamentoDAO.inserir(pagamento).getId();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void liquidarPagamento(Integer idPagamento) {
+		if (idPagamento == null) {
+			return;
+		}
+		pagamentoDAO.liquidarPagamento(idPagamento);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Pagamento pesquisarById(Integer idPagamento) {
+		return pagamentoDAO.pesquisarById(idPagamento);
 	}
 
 	@Override
@@ -43,4 +57,9 @@ public class PagamentoServiceImpl implements PagamentoService {
 		return pagamentoDAO.pesquisarByIdPedido(idPedido);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo) {
+		return pagamentoDAO.pesquisarPagamentoByPeriodo(periodo.getInicio(), periodo.getFim());
+	}
 }

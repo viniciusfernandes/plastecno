@@ -24,8 +24,15 @@ $(document).ready(function() {
 		$('#formPagamento').attr('action', '<c:out value="pagamento/inclusao"/>').attr('method', 'post').submit();	
 	});
 	
+	$('#botaoLimparPeriodo').click(function(){
+		$(this).closest('form').attr('action', '<c:out value="pagamento"/>').attr('method', 'get').submit();	
+	});
+	
 	inserirMascaraData('dataVencimento');
 	inserirMascaraData('dataEmissao');
+	inserirMascaraData('dataInicial');
+	inserirMascaraData('dataFinal');
+	
 	inserirMascaraData('dataRecebimento');
 	inserirMascaraMonetaria('valorNF', 7);
 	inserirMascaraMonetaria('valor', 7);
@@ -56,6 +63,29 @@ $(document).ready(function() {
 
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
+	
+	<fieldset id="bloco_pesquisa">
+			<legend>::: Pagamentos do Período :::</legend>
+			<form action="<c:url value="/pagamento/periodo/listagem"/>" method="get">
+				<div class="label" style="width: 30%">Data Inícial:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="dataInicial" name="dataInicial"
+						value="${dataInicial}" maxlength="10" class="pesquisavel" />
+				</div>
+				<div class="label" style="width: 10%">Data Final:</div>
+				<div class="input" style="width: 10%">
+					<input type="text" id="dataFinal" name="dataFinal"
+						value="${dataFinal}" maxlength="100" class="pesquisavel"
+						style="width: 100%" />
+				</div>
+				<div class="input" style="width: 2%">
+					<input type="submit" id="botaoPesquisarPagamentoPeriodo" title="Pesquisar Pagamentos por Período" value="" class="botaoPesquisarPequeno" style="width: 100%"/>
+				</div>
+				<div class="input" style="width: 10%">
+					<input type="button" id="botaoLimparPeriodo" value="" title="Limpar Pagamentos do Período" class="botaoLimparPequeno" />
+				</div>
+			</form>
+		</fieldset>
 	
 	<form id="formPagamento" action="<c:url value="/pagamento/inclusao"/>" method="post">
 		<input type="hidden" id="idFornecedor" name="pagamento.idFornecedor" value="${pagamento.idFornecedor}"/>
@@ -160,5 +190,61 @@ $(document).ready(function() {
 		</div>
 	</fieldset>
 	</form>
+	
+	<c:if test="${not empty listaPagamento}">
+	<a id="rodape"></a>
+		<table class="listrada">
+			<caption>${titulo}</caption>
+			<thead>
+				<tr>
+					<th style="width: 3%">Sit.</th>
+					<th style="width: 7%">Venc.</th>
+					<th style="width: 7%">Val.(R$)</th>
+					<th style="width: 7%">NF</th>
+					<th style="width: 7%">Val. NF(R$)</th>
+					<th style="width: 33%">Desc.</th>
+					<th style="width: 5%">Parc.</th>
+					<th style="width: 8%">Forn.</th>
+					<th style="width: 5%">ICMS(R$)</th>
+					<th style="width: 5%">Ação</th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:forEach items="${listaPagamento}" var="pagamento" >
+					<tr>
+						<c:choose>
+							<c:when test="${pagamento.liquidado}">
+								<td style="text-align: center"><div class="botaoVerificacaoEfetuadaGrande" title="Liquidado"></div></td>
+							</c:when>
+							<c:when test="${not pagamento.liquidado and pagamento.vencido}">
+								<td style="text-align: center"><div class="botaoVerificacaoFalhaGrande" title="Vencido"></div></td>
+							</c:when>
+							<c:otherwise>
+								<td style="text-align: center"><div class="botaoVerificacaoAguardadaGrande" title="Aguardando"></div></td>
+							</c:otherwise>
+						</c:choose>
+						<td>${pagamento.dataVencimentoFormatada}</td>
+						<td>${pagamento.valor}</td>
+						<td>${pagamento.numeroNF}</td>
+						<td>${pagamento.valorNF}</td>
+						<td>${pagamento.descricao}</td>
+						<td>${pagamento.parcelaFormatada}</td>
+						<td>${pagamento.nomeFornecedor}</td>
+						<td>${pagamento.valorCreditoICMS}</td>
+						<td>
+							<div class="coluna_acoes_listagem">
+								<form action="<c:url value="/pagamento/"/>${pagamento.id}" >
+									<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
+								</form>
+								<form action="<c:url value="/pagamento/liquidacao/"/>${pagamento.id}" method="post" >
+									<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificarPequeno" />
+								</form>
+							</div>
+						</td>
+					</tr>
+				</c:forEach>
+			</tbody>
+		</table>
+	</c:if>
 </body>
 </html>

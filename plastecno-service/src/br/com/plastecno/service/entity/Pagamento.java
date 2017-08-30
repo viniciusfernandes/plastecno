@@ -1,5 +1,7 @@
 package br.com.plastecno.service.entity;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -13,7 +15,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import br.com.plastecno.service.constante.SituacaoPagamento;
 import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
@@ -55,8 +56,13 @@ public class Pagamento {
 	@Column(name = "id_pedido")
 	private Integer idPedido;
 
+	private boolean liquidado;
+
 	@Column(name = "modalidade_frete")
 	private Integer modalidadeFrete;
+
+	@Transient
+	private String nomeFornecedor;
 
 	@Column(name = "numero_nf")
 	private Integer numeroNF;
@@ -68,11 +74,6 @@ public class Pagamento {
 
 	@Column(name = "sequencial_item")
 	private Integer sequencialItem;
-
-	@Enumerated(EnumType.ORDINAL)
-	@Column(name = "id_situacao_pagamento")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Situação do pagamento")
-	private SituacaoPagamento situacaoPagamento;
 
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_tipo_pagamento")
@@ -88,6 +89,12 @@ public class Pagamento {
 
 	@Column(name = "valor_credito_icms")
 	private Double valorCreditoICMS;
+
+	@Transient
+	private String valorCreditoICMSFormatado;
+
+	@Transient
+	private String valorFormatado;
 
 	@Column(name = "valor_nf")
 	private Double valorNF;
@@ -136,12 +143,20 @@ public class Pagamento {
 		return modalidadeFrete;
 	}
 
+	public String getNomeFornecedor() {
+		return nomeFornecedor;
+	}
+
 	public Integer getNumeroNF() {
 		return numeroNF;
 	}
 
 	public Integer getParcela() {
 		return parcela;
+	}
+
+	public String getParcelaFormatada() {
+		return parcela + "/" + totalParcelas;
 	}
 
 	public Integer getQuantidadeItem() {
@@ -152,8 +167,14 @@ public class Pagamento {
 		return sequencialItem;
 	}
 
-	public SituacaoPagamento getSituacaoPagamento() {
-		return situacaoPagamento;
+	public String getSituacaoPagamento() {
+		if (!isLiquidado() && isVencido()) {
+			return "VENCIDO";
+		}
+		if (isLiquidado()) {
+			return "LIQUIDADO";
+		}
+		return "AGUARDANDO";
 	}
 
 	public TipoPagamento getTipoPagamento() {
@@ -172,8 +193,27 @@ public class Pagamento {
 		return valorCreditoICMS;
 	}
 
+	public String getValorCreditoICMSFormatado() {
+		return valorCreditoICMSFormatado;
+	}
+
+	public String getValorFormatado() {
+		return valorFormatado;
+	}
+
 	public Double getValorNF() {
 		return valorNF;
+	}
+
+	public boolean isLiquidado() {
+		return liquidado;
+	}
+
+	public boolean isVencido() {
+		if (dataVencimento == null) {
+			return false;
+		}
+		return dataVencimento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isBefore(LocalDate.now());
 	}
 
 	public void setDataEmissao(Date dataEmissao) {
@@ -216,8 +256,16 @@ public class Pagamento {
 		this.idPedido = idPedido;
 	}
 
+	public void setLiquidado(boolean liquidado) {
+		this.liquidado = liquidado;
+	}
+
 	public void setModalidadeFrete(Integer modalidadeFrete) {
 		this.modalidadeFrete = modalidadeFrete;
+	}
+
+	public void setNomeFornecedor(String nomeFornecedor) {
+		this.nomeFornecedor = nomeFornecedor;
 	}
 
 	public void setNumeroNF(Integer numeroNF) {
@@ -236,10 +284,6 @@ public class Pagamento {
 		this.sequencialItem = sequencialItem;
 	}
 
-	public void setSituacaoPagamento(SituacaoPagamento situacaoPagamento) {
-		this.situacaoPagamento = situacaoPagamento;
-	}
-
 	public void setTipoPagamento(TipoPagamento tipoPagamento) {
 		this.tipoPagamento = tipoPagamento;
 	}
@@ -254,6 +298,14 @@ public class Pagamento {
 
 	public void setValorCreditoICMS(Double valorCreditoICMS) {
 		this.valorCreditoICMS = valorCreditoICMS;
+	}
+
+	public void setValorCreditoICMSFormatado(String valorCreditoICMSFormatado) {
+		this.valorCreditoICMSFormatado = valorCreditoICMSFormatado;
+	}
+
+	public void setValorFormatado(String valorFormatado) {
+		this.valorFormatado = valorFormatado;
 	}
 
 	public void setValorNF(Double valorNF) {

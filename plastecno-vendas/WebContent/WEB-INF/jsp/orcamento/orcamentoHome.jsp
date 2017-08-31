@@ -147,6 +147,7 @@ $(document).ready(function() {
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraNumerica('validade', '999');
+	inserirMascaraMonetaria('frete', 7);
 
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 
@@ -236,8 +237,8 @@ function inserirOrcamento(){
 		<div class="input" style="width: 30%">
 			<input type="text" id="dataEnvio" value="${pedido.dataEnvioFormatada}"  class="desabilitado" disabled="disabled" style="width: 100%" />
 		</div>
-		<div class="label">Número:</div>
-		<div class="input" style="width: 30%">
+		<div class="label">Núm.:</div>
+		<div class="input" style="width: 7%">
 			<input type="text" id="numeroPedido" value="${pedido.id}" class="pesquisavel" style="width: 100%"/>
 		</div>
 		<div class="input" style="width: 2%">
@@ -248,7 +249,12 @@ function inserirOrcamento(){
 				<input type="button" id="botaoCopiarOrcamento"
 					title="Copiar Orçamento" value="" class="botaoCopiarPequeno" />
 		</div>
-		<div class="label" style="width: 7%">Situação:</div>
+		<div class="label" style="width: 8%">Núm. Cli.:</div>
+		<div class="input" style="width: 11%">
+			<input type="text" id="numeroPedido" value="${pedido.id}" class="pesquisavel" style="width: 100%"/>
+		</div>
+		
+		<div class="label" style="width: 10%">Situação:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="situacaoPedido" name="pedido.situacaoPedido" 
 					value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled" style="width: 75%"/>
@@ -318,12 +324,15 @@ function inserirOrcamento(){
 		<div class="input" style="width: 30%">
 			<input type="text" id="pagamento" name="pedido.formaPagamento" value="${pedido.formaPagamento}" style="width: 100%"/>
 		</div>
-		<%--
-		<div class="label">Validade:</div>
-		<div class="input" style="width: 80%">
-			<input id="validade" name="pedido.validade" value="${pedido.validade}" style="width: 6%" />
+		<div class="label">Frete (R$):</div>
+		<div class="input" style="width: 75%">
+			<input id="frete" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 40%" />
 		</div>
-		--%>
+		<div class="label">Observação:</div>
+			<div class="input areatexto" style="width: 70%">
+				<textarea id="obervacao" name="pedido.observacao"
+					style="width: 100%">${pedido.observacao}</textarea>
+			</div>
 		<div class="bloco_botoes">
 			<input type="button" id="botaoInserirOrcamento" title="Inserir Orçamento" value="" class="botaoInserir"/>
 			<input type="button" id="botaoPDFOrcamento" value="" title="PDF Orçamento" class="botaoPDF" />

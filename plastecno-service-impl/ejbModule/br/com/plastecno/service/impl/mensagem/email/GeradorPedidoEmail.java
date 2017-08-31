@@ -18,11 +18,11 @@ public final class GeradorPedidoEmail {
 		mapaMensagem.put(TipoMensagemPedido.COMPRA, CompraEmailBuilder.class);
 	}
 
-	public static MensagemEmail gerarMensagem(Pedido pedido, byte[] arquivoAnexado, TipoMensagemPedido tipoMensagem)
-			throws MensagemEmailException {
+	public static MensagemEmail gerarMensagem(Pedido pedido, TipoMensagemPedido tipoMensagem, byte[] pdfPedido,
+			byte[]... anexos) throws MensagemEmailException {
 		try {
-			return mapaMensagem.get(tipoMensagem).getConstructor(Pedido.class, byte[].class)
-					.newInstance(pedido, arquivoAnexado).gerarMensagemEmail();
+			return mapaMensagem.get(tipoMensagem).getConstructor(Pedido.class, byte[].class, byte[][].class)
+					.newInstance(pedido, pdfPedido, anexos).gerarMensagemEmail();
 		} catch (Exception e) {
 			throw new MensagemEmailException("Falha ao tentar inicializar o construtor da mensagem de email", e);
 		}

@@ -36,6 +36,10 @@ $(document).ready(function() {
 		inserirOrcamento();
 	});
 	
+	$("#botaoAnexarArquivo").click(function() {
+		$('#botaoAnexarOculto').click();
+	});
+	
 	$("#botaoPesquisaOrcamento").click(function() {
 		var idPedido = $('#numeroPedido').val();
 		if (isEmpty(idPedido)) {
@@ -67,10 +71,8 @@ $(document).ready(function() {
 		if (isEmpty(idPedido)) {
 			return;
 		} 
-		var form = document.getElementById('formVazio');
-		form.action = '<c:url value="/orcamento/envio/"/>'+idPedido;
-		form.method = 'post';
-		form.submit();
+		adicionarInputHiddenFormulario('formEnvio', 'idOrcamento', idPedido);
+		document.getElementById('formEnvio').submit();
 	});
 	
 	$('#botaoAceitarOrcamento').click(function (){
@@ -224,7 +226,7 @@ function inserirOrcamento(){
 		</form>
 
 	<form id="formVazio" method="get"></form>
-
+	
 	<form id="formPedido" action="<c:url value="/orcamento/inclusao"/>" method="post">
 		<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${pedido.proprietario.id}"/>
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
@@ -233,6 +235,7 @@ function inserirOrcamento(){
 		<input type="hidden" id="idTransportadora"  name="pedido.transportadora.id" value="${pedido.transportadora.id}"/>
 	<fieldset>
 		<legend>Orçamento</legend>
+		
 		<div class="label" style="width: 56%">Dt. Envio:</div>
 		<div class="input" style="width: 30%">
 			<input type="text" id="dataEnvio" value="${pedido.dataEnvioFormatada}"  class="desabilitado" disabled="disabled" style="width: 100%" />
@@ -344,7 +347,11 @@ function inserirOrcamento(){
 	
 	<jsp:include page="/bloco/bloco_item_pedido.jsp" />
 	<div class="bloco_botoes">
-		<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
+		<form id="formEnvio" action="orcamento/envio" method="post" enctype="multipart/form-data">
+			<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
+			<input type="button" id="botaoAnexarArquivo" title="Anexar Arquivo" value="" class="botaoAnexar" />
+			<input type="file" id="botaoAnexarOculto" style="display: none;" name="anexo"/>
+		</form>
 		<input type="button" id="botaoAceitarOrcamento" title="Aceitar Orçamento" value="" class="botaoAceitar" />
 	</div>
 	

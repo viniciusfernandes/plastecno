@@ -75,6 +75,22 @@
 	width: 24px;
 }
 
+.botaoAnexar {
+	background: url("../images/paperclip_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoAnexar:hover {
+	background: url("../images/paperclip_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoCesta {
 	background: url("../images/cesta_24.png") no-repeat scroll
 		0 0 transparent;

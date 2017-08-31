@@ -607,10 +607,10 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private void enviarCompra(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
+	private void enviarCompra(Pedido pedido, byte[] pdfPedido, byte[]... anexos) throws BusinessException {
 
 		try {
-			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, arquivoAnexado, TipoMensagemPedido.COMPRA));
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.COMPRA, pdfPedido, anexos));
 		} catch (NotificacaoException e) {
 			StringBuilder mensagem = new StringBuilder();
 			mensagem.append("Falha no envio do pedido de compra No. ").append(pedido.getId()).append(" do comprador ")
@@ -624,7 +624,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
+	private void enviarOrcamento(Pedido pedido, byte[] pdfPedido, byte[]... anexos) throws BusinessException {
 		Contato contato = pedido.getContato();
 		if (StringUtils.isEmpty(contato.getEmail())) {
 			throw new BusinessException("Email do contato é obrigatório para envio do orçamento");
@@ -639,7 +639,8 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		try {
-			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, arquivoAnexado, TipoMensagemPedido.ORCAMENTO));
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.ORCAMENTO, pdfPedido,
+					anexos));
 		} catch (NotificacaoException e) {
 			StringBuilder mensagem = new StringBuilder();
 			mensagem.append("Falha no envio do orçamento No. ").append(pedido.getId()).append(" do vendedor ")
@@ -654,7 +655,13 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException {
+	public void enviarPedido(Integer idPedido, byte[] pdfPedido) throws BusinessException {
+		enviarPedido(idPedido, pdfPedido, (byte[][]) null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void enviarPedido(Integer idPedido, byte[] pdfPedido, byte[]... anexos) throws BusinessException {
 
 		final Pedido pedido = pesquisarPedidoById(idPedido);
 
@@ -671,11 +678,11 @@ public class PedidoServiceImpl implements PedidoService {
 		validarEnvio(pedido);
 
 		if (pedido.isOrcamento()) {
-			enviarOrcamento(pedido, arquivoAnexado);
+			enviarOrcamento(pedido, pdfPedido, anexos);
 		} else if (pedido.isVenda()) {
-			enviarVenda(pedido, arquivoAnexado);
+			enviarVenda(pedido, pdfPedido, anexos);
 		} else if (pedido.isCompra()) {
-			enviarCompra(pedido, arquivoAnexado);
+			enviarCompra(pedido, pdfPedido, anexos);
 		}
 
 		if (pedido.isCompra()) {
@@ -696,7 +703,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private void enviarVenda(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
+	private void enviarVenda(Pedido pedido, byte[] pdfPedido, byte[]... anexos) throws BusinessException {
 		this.validarEnvioVenda(pedido);
 
 		if (pedido.isRevenda()) {
@@ -705,10 +712,10 @@ public class PedidoServiceImpl implements PedidoService {
 
 		validarListaLogradouroPreenchida(pedido);
 		try {
-			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, arquivoAnexado, TipoMensagemPedido.VENDA));
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA, pdfPedido, anexos));
 			if (pedido.isClienteNotificadoVenda()) {
-				emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, arquivoAnexado,
-						TipoMensagemPedido.VENDA_CLIENTE));
+				emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA_CLIENTE,
+						pdfPedido, anexos));
 			}
 
 		} catch (NotificacaoException e) {

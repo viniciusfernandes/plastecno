@@ -4,11 +4,14 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.IOUtils;
+
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.download.Download;
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
@@ -112,26 +115,27 @@ public class OrcamentoController extends AbstractPedidoController {
         return super.downloadPDFPedido(idPedido, TipoPedido.REVENDA);
     }
 
-    @Post("orcamento/envio/{id}")
-    public void enviarOrcamento(Integer id) {
+    @Get("orcamento/envio")
+    public void enviarOrcamento(Integer idOrcamento, UploadedFile anexo) {
         try {
-            final PedidoPDFWrapper wrapper = gerarPDF(id, TipoPedido.REVENDA);
+            IOUtils.toByteArray(anexo.getFile());
+            final PedidoPDFWrapper wrapper = gerarPDF(idOrcamento, TipoPedido.REVENDA);
             final Pedido pedido = wrapper.getPedido();
 
-            pedidoService.enviarPedido(id, wrapper.getArquivoPDF());
+            pedidoService.enviarPedido(idOrcamento, wrapper.getArquivoPDF());
 
-            final String mensagem = "Orçamento No. " + id + " foi enviado com sucesso para o cliente "
+            final String mensagem = "Orçamento No. " + idOrcamento + " foi enviado com sucesso para o cliente "
                     + pedido.getCliente().getNomeFantasia();
 
             gerarMensagemSucesso(mensagem);
         } catch (NotificacaoException e) {
-            gerarLogErro("envio de email do orcamento No. " + id, e);
+            gerarLogErro("envio de email do orcamento No. " + idOrcamento, e);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             // populando a tela de pedidos
-            redirecTo(this.getClass()).pesquisarOrcamentoById(id);
+            redirecTo(this.getClass()).pesquisarOrcamentoById(idOrcamento);
         } catch (Exception e) {
-            gerarLogErro("envio de email do orcamento No. " + id, e);
+            gerarLogErro("envio de email do orcamento No. " + idOrcamento, e);
         }
         irTopoPagina();
     }

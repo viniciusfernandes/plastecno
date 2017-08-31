@@ -1,21 +1,16 @@
 package br.com.plastecno.service.impl.mensagem.email;
 
 import br.com.plastecno.service.entity.Pedido;
-import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.mensagem.email.exception.MensagemEmailException;
 import br.com.plastecno.util.StringUtils;
 
 public class CompraEmailBuilder extends PedidoEmailBuilder {
 
-	public CompraEmailBuilder(Pedido pedido, byte[] arquivoAnexo) throws MensagemEmailException {
-		super(pedido, arquivoAnexo);
-	}
-
-	@Override
-	public AnexoEmail gerarArquivoAnexo() {
-		return new AnexoEmail(arquivoAnexo, "application/pdf", "Pedido No. " + pedido.getId() + " "
-				+ pedido.getCliente().getNomeFantasia() + ".pdf", "Pedido de comprado por "
-				+ pedido.getComprador().getNome());
+	public CompraEmailBuilder(Pedido pedido, byte[] arquivoPedido, byte[]... arquivoAnexo)
+			throws MensagemEmailException {
+		super(pedido, arquivoPedido, arquivoAnexo);
+		setNomeArquivo("Pedido No. " + pedido.getId() + " " + pedido.getCliente().getNomeFantasia());
+		setDescricaoArquivo("Pedido de comprado por " + pedido.getComprador().getNome());
 	}
 
 	@Override

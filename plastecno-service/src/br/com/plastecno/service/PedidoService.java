@@ -65,6 +65,8 @@ public interface PedidoService {
 
 	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
 
+	void enviarPedido(Integer idPedido, byte[] pdfPedido, byte[]... anexos) throws BusinessException;
+
 	Pedido inserir(Pedido pedido) throws BusinessException;
 
 	void inserirDadosNotaFiscal(Pedido pedido);
@@ -236,7 +238,8 @@ public interface PedidoService {
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
-	Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isOrcamento, boolean isCompra);
+	Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isOrcamento,
+			boolean isCompra);
 
 	Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
 			Integer idFornecedor, boolean isOrcamento, boolean isCompra, ItemPedido itemVendido);

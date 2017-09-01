@@ -18,6 +18,7 @@ import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
@@ -63,9 +64,9 @@ public interface PedidoService {
 
 	boolean empacotarPedidoAguardandoCompra(Integer idPedido) throws BusinessException;
 
-	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
+	void enviarPedido(Integer idPedido, AnexoEmail pdfPedido) throws BusinessException;
 
-	void enviarPedido(Integer idPedido, byte[] pdfPedido, byte[]... anexos) throws BusinessException;
+	void enviarPedido(Integer idPedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException;
 
 	Pedido inserir(Pedido pedido) throws BusinessException;
 

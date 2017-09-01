@@ -1,16 +1,17 @@
 package br.com.plastecno.service.impl.mensagem.email;
 
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.mensagem.email.exception.MensagemEmailException;
 import br.com.plastecno.util.NumeroUtils;
 
 public class OrcamentoEmailBuilder extends PedidoEmailBuilder {
 
-	public OrcamentoEmailBuilder(Pedido pedido, byte[] anexoPedido, byte[]... outrosAnexos)
+	public OrcamentoEmailBuilder(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos)
 			throws MensagemEmailException {
-		super(pedido, anexoPedido);
-		setNomeArquivo("Orçamento No. " + pedido.getId() + " " + pedido.getCliente().getNomeFantasia());
-		setDescricaoArquivo("Orçamento realizado pela Plastecno");
+		super(pedido, pdfPedido, anexos);
+		pdfPedido.setNome("Orçamento No. " + pedido.getId() + " " + pedido.getCliente().getNomeFantasia());
+		pdfPedido.setDescricao("Orçamento realizado pela Plastecno");
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.nfe.COFINS;
 import br.com.plastecno.service.nfe.COFINSGeral;
 import br.com.plastecno.service.nfe.CobrancaNFe;
@@ -204,7 +205,7 @@ public class NFeServiceTest extends AbstractTest {
 		Pedido p = pedidoServiceTest.gerarPedidoRevendaComItem();
 		Integer id = p.getId();
 		try {
-			pedidoService.enviarPedido(id, new byte[] {});
+			pedidoService.enviarPedido(id, new AnexoEmail(new byte[] {}));
 			return id;
 		} catch (BusinessException e) {
 			printMensagens(e);

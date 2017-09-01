@@ -58,6 +58,7 @@ import br.com.plastecno.service.impl.calculo.CalculadoraPreco;
 import br.com.plastecno.service.impl.mensagem.email.GeradorPedidoEmail;
 import br.com.plastecno.service.impl.mensagem.email.TipoMensagemPedido;
 import br.com.plastecno.service.impl.util.QueryUtil;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
@@ -607,8 +608,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private void enviarCompra(Pedido pedido, byte[] pdfPedido, byte[]... anexos) throws BusinessException {
-
+	private void enviarCompra(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
 		try {
 			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.COMPRA, pdfPedido, anexos));
 		} catch (NotificacaoException e) {
@@ -624,7 +624,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private void enviarOrcamento(Pedido pedido, byte[] pdfPedido, byte[]... anexos) throws BusinessException {
+	private void enviarOrcamento(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
 		Contato contato = pedido.getContato();
 		if (StringUtils.isEmpty(contato.getEmail())) {
 			throw new BusinessException("Email do contato é obrigatório para envio do orçamento");
@@ -655,13 +655,13 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void enviarPedido(Integer idPedido, byte[] pdfPedido) throws BusinessException {
-		enviarPedido(idPedido, pdfPedido, (byte[][]) null);
+	public void enviarPedido(Integer idPedido, AnexoEmail pdfPedido) throws BusinessException {
+		enviarPedido(idPedido, pdfPedido, (AnexoEmail[]) null);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void enviarPedido(Integer idPedido, byte[] pdfPedido, byte[]... anexos) throws BusinessException {
+	public void enviarPedido(Integer idPedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
 
 		final Pedido pedido = pesquisarPedidoById(idPedido);
 
@@ -703,7 +703,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private void enviarVenda(Pedido pedido, byte[] pdfPedido, byte[]... anexos) throws BusinessException {
+	private void enviarVenda(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
 		this.validarEnvioVenda(pedido);
 
 		if (pedido.isRevenda()) {

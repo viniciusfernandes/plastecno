@@ -37,6 +37,7 @@ import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
@@ -205,7 +206,7 @@ public class PedidoController extends AbstractPedidoController {
             final PedidoPDFWrapper wrapper = gerarPDF(idPedido, tipoPedido);
             final Pedido pedido = wrapper.getPedido();
 
-            pedidoService.enviarPedido(idPedido, wrapper.getArquivoPDF());
+            pedidoService.enviarPedido(idPedido, new AnexoEmail(wrapper.getArquivoPDF()));
 
             final String mensagem = pedido.isOrcamento() ? "Orçamento No. " + idPedido
                     + " foi enviado com sucesso para o cliente " + pedido.getCliente().getNomeFantasia()

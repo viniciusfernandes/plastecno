@@ -6,13 +6,13 @@ import br.com.plastecno.service.mensagem.email.MensagemEmail;
 import br.com.plastecno.service.mensagem.email.exception.MensagemEmailException;
 
 abstract class PedidoEmailBuilder {
-	final byte[][] anexos;
+	final AnexoEmail[] anexos;
 	private String descricaoArquivo;
 	private String nomeArquivo;
-	final byte[] pdfPedido;
+	final AnexoEmail pdfPedido;
 	final Pedido pedido;
 
-	public PedidoEmailBuilder(Pedido pedido, byte[] pdfPedido, byte[]... anexos) throws MensagemEmailException {
+	public PedidoEmailBuilder(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws MensagemEmailException {
 
 		if (pedido == null || pdfPedido == null) {
 			throw new MensagemEmailException("O pedido e o arquivo em anexo são obrigatorios");
@@ -27,18 +27,6 @@ abstract class PedidoEmailBuilder {
 		return anexos != null && anexos.length > 0;
 	}
 
-	private AnexoEmail[] gerarArquivoAnexo() {
-		final AnexoEmail[] anexoEmail = new AnexoEmail[getTotalAnexos()];
-		anexoEmail[0] = new AnexoEmail(pdfPedido, "application/pdf", nomeArquivo + ".pdf", descricaoArquivo);
-		if (contemAnexos()) {
-			for (int i = 0; i < anexoEmail.length; i++) {
-				anexoEmail[i + 1] = new AnexoEmail(pdfPedido, null, "teste" + i + ".pdf", null);
-			}
-		}
-
-		return anexoEmail;
-	}
-
 	public abstract String gerarConteudo();
 
 	public abstract String gerarDestinatario();
@@ -46,7 +34,12 @@ abstract class PedidoEmailBuilder {
 	public final MensagemEmail gerarMensagemEmail() {
 		final MensagemEmail email = new MensagemEmail(gerarTitulo(), gerarRemetente(), gerarDestinatario(),
 				gerarConteudo());
-		email.addAnexo(gerarArquivoAnexo());
+		// Confuigurando o tipo de arquivo a ser enviado e sua extensao, o que
+		// eh comum a todos os pedidos.
+		pdfPedido.setNome(pdfPedido.getNome() + ".pdf");
+		pdfPedido.setTipoAnexo("application/pdf");
+		email.addAnexo(pdfPedido);
+		email.addAnexo(anexos);
 		return email;
 	}
 
@@ -60,11 +53,6 @@ abstract class PedidoEmailBuilder {
 
 	public String getNomeArquivo() {
 		return nomeArquivo;
-	}
-
-	public int getTotalAnexos() {
-		// Retornamos 1 pois isso indica que existe ao menos o anexo do pedido.
-		return contemAnexos() ? anexos.length + 1 : 1;
 	}
 
 	public void setDescricaoArquivo(String descricaoArquivo) {

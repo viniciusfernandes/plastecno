@@ -50,7 +50,7 @@ public class EmailServiceImpl implements EmailService {
 			email.setSSLOnConnect(Boolean.valueOf(configuracaoSistemaService
 					.pesquisar(ParametroConfiguracaoSistema.SSL_HABILITADO_PARA_SMTP)));
 			email.setSubject(mensagemEmail.getTitulo());
-
+			email.setTLS(true);
 			if (StringUtils.isEmpty(REMETENTE)) {
 				throw new NotificacaoException("Endereco de email do remetente eh obrigatorio");
 			}
@@ -67,9 +67,9 @@ public class EmailServiceImpl implements EmailService {
 			email.addTo(gerarDestinatarios(DESTINATARIO));
 			email.setMsg(mensagemEmail.getConteudo());
 			gerarAnexo(mensagemEmail, email);
-			
-			//email.send();
-			
+
+			email.send();
+
 		} catch (Exception e) {
 			StringBuilder mensagem = new StringBuilder();
 			mensagem.append("Falha no envio de email de ");

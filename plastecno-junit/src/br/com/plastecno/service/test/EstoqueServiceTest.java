@@ -38,6 +38,7 @@ import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.TODO;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.test.builder.ServiceBuilder;
 import br.com.plastecno.util.NumeroUtils;
 
@@ -77,7 +78,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -200,7 +201,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -244,7 +245,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -766,7 +767,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 
 		try {
-			pedidoService.enviarPedido(i.getPedido().getId(), new byte[] {});
+			pedidoService.enviarPedido(i.getPedido().getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -1703,7 +1704,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(p.getId(), new byte[] {});
+			pedidoService.enviarPedido(p.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -1880,7 +1881,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			pedidoService.inserirItemPedido(pedido.getId(), item1);
 			pedidoService.inserirItemPedido(pedido.getId(), item2);
 
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 
 			// Inserindo apenas um dos itens para fazermos os testes de
 			// pendencia
@@ -1911,7 +1912,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(pedidoRevenda.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedidoRevenda.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -1946,7 +1947,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e2) {
 			printMensagens(e2);
 		}
@@ -2010,7 +2011,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		try {
 			// Nesse ponto vamos popular o estoque com o pedido de compras
-			pedidoService.enviarPedido(i1.getPedido().getId(), new byte[] {});
+			pedidoService.enviarPedido(i1.getPedido().getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}

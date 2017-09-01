@@ -1,11 +1,8 @@
 package br.com.plastecno.vendas.controller;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.io.IOUtils;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
@@ -30,6 +27,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ClienteJson;
@@ -45,6 +43,8 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Servico
     private MaterialService materialService;
+
+    private final String ID_ORCAMENTO = "idOrcamento";
 
     @Servico
     private PedidoService pedidoService;
@@ -80,7 +80,19 @@ public class OrcamentoController extends AbstractPedidoController {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
 
+    @Post("orcamento/anexo")
+    public void anexarArquivoEnvio(UploadedFile anexo) {
+        Integer idOrcamento = (Integer) getSessao(ID_ORCAMENTO);
+        removerSessao(ID_ORCAMENTO);
+       enviarOrcamento(idOrcamento, anexo);
+    }
+
+    @Post("orcamento/temporario/id")
+    public void adicionarIdOrcamentoTemporario(Integer idOrcamento) {
+        addSessao(ID_ORCAMENTO, idOrcamento);
+        serializarJson(new SerializacaoJson("ok", true));
     }
 
     @Post("orcamento/cancelamento/{idOrcamento}")
@@ -119,10 +131,15 @@ public class OrcamentoController extends AbstractPedidoController {
     @Post("orcamento/envio")
     public void enviarOrcamento(Integer idOrcamento, UploadedFile anexo) {
         try {
+            idOrcamento = 16717;
             final PedidoPDFWrapper wrapper = gerarPDF(idOrcamento, TipoPedido.REVENDA);
             final Pedido pedido = wrapper.getPedido();
 
-            pedidoService.enviarPedido(idOrcamento, wrapper.getArquivoPDF());
+            AnexoEmail pdfPedido = new AnexoEmail(wrapper.getArquivoPDF());
+            AnexoEmail anexoEmail = anexo != null ? new AnexoEmail(toByteArray(anexo.getFile()),
+                    anexo.getContentType(), anexo.getFileName(), null) : null;
+
+            pedidoService.enviarPedido(idOrcamento, pdfPedido, anexoEmail);
 
             final String mensagem = "Orçamento No. " + idOrcamento + " foi enviado com sucesso para o cliente "
                     + pedido.getCliente().getNomeFantasia();

@@ -71,8 +71,21 @@ $(document).ready(function() {
 		if (isEmpty(idPedido)) {
 			return;
 		} 
-		adicionarInputHiddenFormulario('formEnvio', 'idOrcamento', idPedido);
-		document.getElementById('formEnvio').submit();
+		var url = '<c:url value="orcamento/temporario/id"/>';
+		var request = $.ajax({
+			type : "post",
+			url : url,
+			data : {'idOrcamento':idPedido}
+		});
+		
+		request.done(function(response) {
+			document.getElementById('formAnexo').submit();
+		});
+		
+
+		request.fail(function(request, status) {
+			alert('Falha envio do orcamento => Status da requisicao: ' + status);
+		});
 	});
 	
 	$('#botaoAceitarOrcamento').click(function (){
@@ -347,11 +360,11 @@ function inserirOrcamento(){
 	
 	<jsp:include page="/bloco/bloco_item_pedido.jsp" />
 	<div class="bloco_botoes">
-		<form id="formEnvio" action="orcamento/envio" method="post" enctype="multipart/form-data">
-			<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
+		<form id="formAnexo" action="orcamento/anexo" method="post" enctype="multipart/form-data">
 			<input type="button" id="botaoAnexarArquivo" title="Anexar Arquivo" value="" class="botaoAnexar" />
 			<input type="file" id="botaoAnexarOculto" style="display: none;" name="anexo"/>
 		</form>
+		<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
 		<input type="button" id="botaoAceitarOrcamento" title="Aceitar Orçamento" value="" class="botaoAceitar" />
 	</div>
 	

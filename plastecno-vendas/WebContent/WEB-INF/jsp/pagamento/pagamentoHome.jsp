@@ -271,7 +271,7 @@ $(document).ready(function() {
 										</form>
 									</c:otherwise>
 								</c:choose>
-								<form action="<c:url value="/pagamento/remocao/"/>${pagamento.id}" >
+								<form action="<c:url value="/pagamento/remocao/"/>${pagamento.id}" method="post">
 									<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 									<input type="submit" value="" title="Remover Pagamento" class="botaoRemover"/>

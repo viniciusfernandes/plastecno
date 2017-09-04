@@ -21,11 +21,33 @@
 $(document).ready(function() {
 	scrollTo('${ancora}');
 	$('#botaoInserirPagamento').click(function(){
+		if(isEmpty($('#idPagamento').val())){
+			return;
+		}
+		adicionarInputHiddenFormulario('formPagamento', 'dataInicial', $('#dataInicial').val());
+		adicionarInputHiddenFormulario('formPagamento', 'dataFinal', $('#dataFinal').val());
 		$('#formPagamento').attr('action', '<c:out value="pagamento/inclusao"/>').attr('method', 'post').submit();	
+	});
+	
+	$('#botaoRemoverPagamento').click(function(){
+		var idPag = $('#idPagamento').val();
+		if(isEmpty(idPag)){
+			return;
+		}
+		adicionarInputHiddenFormulario('formVazio', 'idPagamento', idPag);
+		adicionarInputHiddenFormulario('formVazio', 'dataInicial', $('#dataInicial').val());
+		adicionarInputHiddenFormulario('formVazio', 'dataFinal', $('#dataFinal').val());
+		$('#formVazio').attr('action', '<c:out value="pagamento/remocao"/>').attr('method', 'post').submit();	
 	});
 	
 	$('#botaoLimparPeriodo').click(function(){
 		$(this).closest('form').attr('action', '<c:out value="pagamento"/>').attr('method', 'get').submit();	
+	});
+	
+	$('#botaoLimparPagamento').click(function(){
+		$('#formPagamento input:text').val('');
+		$('#formPagamento input:hidden').val('');
+		$('#formPagamento select').val('');	
 	});
 	
 	inserirMascaraData('dataVencimento');
@@ -86,9 +108,13 @@ $(document).ready(function() {
 				</div>
 			</form>
 		</fieldset>
+		
+	<form id="formVazio"></form>
 	
 	<form id="formPagamento" action="<c:url value="/pagamento/inclusao"/>" method="post">
 		<input type="hidden" id="idFornecedor" name="pagamento.idFornecedor" value="${pagamento.idFornecedor}"/>
+		<input type="hidden" id="idPagamento" name="pagamento.id" value="${pagamento.id}"/>
+		
 	<fieldset>
 		<legend>Pagamento</legend>
 		<div class="label">Dt. Venc.:</div>
@@ -101,7 +127,7 @@ $(document).ready(function() {
 				<option value="">&lt&lt SELECIONE &gt&gt</option>
 				<c:forEach var="tipoPagamento" items="${listaTipoPagamento}">
 					<option value="${tipoPagamento}"
-						<c:if test="${tipoPagamento eq tipoPagamentoSelecionado}">selected</c:if>>${tipoPagamento}</option>
+						<c:if test="${tipoPagamento eq pagamento.tipoPagamento}">selected</c:if>>${tipoPagamento}</option>
 				</c:forEach>
 			</select>
 		</div>
@@ -154,16 +180,16 @@ $(document).ready(function() {
 		</div>
 		<div class="label" style="width: 7%">Fornec.:</div>
 		<div class="input" style="width: 60%">
-			<input type="text" id="fornecedor" value="${nomeFornecedor}" style="width: 22%"/>
+			<input type="text" id="fornecedor" name="pagamento.nomeFornecedor" value="${pagamento.nomeFornecedor}" style="width: 22%"/>
 			<div class="suggestionsBox" id="containerPesquisaFornecedor" style="display: none; width: 30%"></div>
 		</div>
 		<div class="label">Item:</div>
 		<div class="input" style="width: 10%">
-			<input type="text" id="sequencial" value="${pagamento.sequencialItem}" style="width: 100%" />
+			<input type="text" id="sequencial" name="pagamento.sequencialItem" value="${pagamento.sequencialItem}" style="width: 100%" />
 		</div>
 		<div class="label" style="width: 9%">Qtde:</div>
 		<div class="input" style="width: 13%">
-			<input type="text" id="quantidade" value="${pagamento.quantidadeItem}" style="width: 100%"/>
+			<input type="text" id="quantidade" name="pagamento.quantidadeItem" value="${pagamento.quantidadeItem}" style="width: 100%"/>
 		</div>
 		<div class="label" style="width: 10%">Descrição:</div>
 			<div class="input" style="width: 40%">
@@ -171,7 +197,7 @@ $(document).ready(function() {
 		</div>
 		<div class="label">Cred. ICMS:</div>
 		<div class="input" style="width: 10%">
-			<input type="text" id="valorCreditoICMS" value="${pedido.valorCreditoICMS}"  style="width: 100%" />
+			<input type="text" id="valorCreditoICMS" name="pagamento.valorCreditoICMS" value="${pagamento.valorCreditoICMS}"  style="width: 100%" />
 		</div>
 		<div class="label" style="width: 9%">Mod. Frete:</div>
 		<div class="input" style="width: 13%">
@@ -179,14 +205,14 @@ $(document).ready(function() {
 				<option value="">&lt&lt SELECIONE &gt&gt</option>
 				<c:forEach var="frete" items="${listaModalidadeFrete}">
 					<option value="${frete.codigo}"
-						<c:if test="${frete.codigo eq freteSelecionado}">selected</c:if>>${frete.descricao}</option>
+						<c:if test="${frete.codigo eq pagamento.modalidadeFrete}">selected</c:if>>${frete.descricao}</option>
 				</c:forEach>
 			</select>
 		</div>
 		<div class="bloco_botoes">
 			<input type="button" id="botaoInserirPagamento" title="Inserir Pagamento" value="" class="botaoInserir"/>
 			<input type="button" id="botaoLimparPagamento" value="" title="Limpar Pagamento" class="botaoLimpar" />
-			<input  type="button"id="botaoCancelarPagamento" value="" title="Cancelar Pagamento" class="botaoCancelar" />
+			<input  type="button"id="botaoRemoverPagamento" value="" title="Remover Pagamento" class="botaoCancelar" />
 		</div>
 	</fieldset>
 	</form>
@@ -234,17 +260,23 @@ $(document).ready(function() {
 						<td>
 							<div class="coluna_acoes_listagem">
 								<form action="<c:url value="/pagamento/"/>${pagamento.id}" >
+									<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 									<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
 								</form>
 								
 								<c:choose>
 									<c:when test="${not pagamento.liquidado}">
 										<form action="<c:url value="/pagamento/liquidacao/"/>${pagamento.id}" method="post" >
+											<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+											<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 											<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificacaoEfetuadaPequeno" />
 										</form>
 									</c:when>
 									<c:otherwise>
 										<form action="<c:url value="/pagamento/retonoliquidacao/"/>${pagamento.id}" method="post" >
+											<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+											<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 											<input type="submit" value="" title="Retornar Liquidação Pagamento" class="botaoVerificacaoFalhaPequeno" />
 										</form>
 									</c:otherwise>

@@ -134,6 +134,13 @@ public abstract class AbstractController {
         GERADOR_PDF.addAtributo(nome, valor);
     }
 
+    void addPeriodo(Date dataInicial, Date dataFinal) {
+        // Estamos adicionando apenas se as datas nao foram adicionadas para
+        // mantermos o filtro selecionado pelo usuario.
+        addAtributoCondicional("dataInicial", formatarData(dataInicial));
+        addAtributoCondicional("dataFinal", formatarData(dataFinal));
+    }
+
     final void ancorarRodape() {
         result.include("ancora", "rodape");
     }
@@ -266,6 +273,12 @@ public abstract class AbstractController {
         }
     }
 
+    Date gerarDataInicioMes() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        return c.getTime();
+    }
+
     Download gerarDownload(byte[] bytesArquivo, String nomeArquivo, String contentType) {
         return new ByteArrayDownload(bytesArquivo, contentType, StringUtils.removerAcentuacao(nomeArquivo));
     }
@@ -276,12 +289,6 @@ public abstract class AbstractController {
 
     Download gerarDownloadPlanilha(byte[] bytesArquivo, String nomeArquivo) {
         return gerarDownload(bytesArquivo, nomeArquivo, "application/vnd.ms-excel;");
-    }
-
-    Date gerarDataInicioMes() {
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.DAY_OF_MONTH, 1);
-        return c.getTime();
     }
 
     void gerarListaMensagemAjax(String mensagem, String categoria) {

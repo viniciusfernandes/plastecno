@@ -34,6 +34,21 @@ public class PagamentoController extends AbstractController {
         super(result, request);
     }
 
+    private void addListaPagamento(Date dataInicial, Date dataFinal) throws InformacaoInvalidaException {
+        List<Pagamento> lista = pagamentoService.pesquisarPagamentoByPeriodo(new Periodo(dataInicial, dataFinal));
+        formatarPagamento(lista);
+        addAtributo("titulo",
+                "Pagamentos de " + StringUtils.formatarData(dataInicial) + " a " + StringUtils.formatarData(dataFinal));
+        addAtributo("listaPagamento", lista);
+        addPeriodo(dataInicial, dataFinal);
+    }
+
+    private void addPagamento(Pagamento p) {
+        formatarPagamento(p);
+        p.setNomeFornecedor(representadaService.pesquisarNomeFantasiaById(p.getIdFornecedor()));
+        addAtributo("pagamento", p);
+    }
+
     private void formatarPagamento(List<Pagamento> lista) {
         for (Pagamento p : lista) {
             formatarPagamento(p);
@@ -42,28 +57,38 @@ public class PagamentoController extends AbstractController {
 
     private void formatarPagamento(Pagamento p) {
         p.setDataVencimentoFormatada(StringUtils.formatarData(p.getDataVencimento()));
+        p.setDataEmissaoFormatada(StringUtils.formatarData(p.getDataEmissao()));
+        p.setDataRecebimentoFormatada(StringUtils.formatarData(p.getDataRecebimento()));
+
         p.setValor(NumeroUtils.arredondarValorMonetario(p.getValor()));
         p.setValorCreditoICMS(NumeroUtils.arredondarValorMonetario(p.getValorCreditoICMS()));
         p.setValorNF(NumeroUtils.arredondarValorMonetario(p.getValorNF()));
     }
 
     @Post("pagamento/inclusao")
-    public void inserirPagamento(Pagamento pagamento) {
+    public void inserirPagamento(Pagamento pagamento, Date dataInicial, Date dataFinal) {
         try {
             pagamentoService.inserir(pagamento);
+            pesquisarPagamentoByPeriodo(dataInicial, dataFinal);
+
             gerarMensagemSucesso("Pagamento inserido com sucesso.");
         } catch (BusinessException e) {
-            addAtributo("pagamento", pagamento);
+            addPagamento(pagamento);
+            try {
+                addListaPagamento(dataInicial, dataFinal);
+            } catch (InformacaoInvalidaException e1) {
+                gerarListaMensagemErro(e);
+            }
             gerarListaMensagemErro(e);
+            irTopoPagina();
         }
-        irTopoPagina();
     }
 
     @Post("pagamento/liquidacao/{idPagamento}")
-    public void liquidarPagamento(Integer idPagamento) {
+    public void liquidarPagamento(Integer idPagamento, Date dataInicial, Date dataFinal) {
         pagamentoService.liquidarPagamento(idPagamento);
         gerarMensagemSucesso("Pagamento liquidado com sucesso.");
-        irTopoPagina();
+        pesquisarPagamentoByPeriodo(dataInicial, dataFinal);
     }
 
     @Get("pagamento")
@@ -71,8 +96,7 @@ public class PagamentoController extends AbstractController {
         addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
         addAtributo("listaTipoPagamento", TipoPagamento.values());
         addAtributo("listaFornecedor", representadaService.pesquisarRepresentadaAtivoByTipoPedido(TipoPedido.COMPRA));
-        addAtributo("dataInicial", formatarData(gerarDataInicioMes()));
-        addAtributo("dataFinal", formatarData(new Date()));
+        addPeriodo(new Date(), gerarDataInicioMes());
     }
 
     @Get("pagamento/fornecedor/listagem")
@@ -81,11 +105,14 @@ public class PagamentoController extends AbstractController {
     }
 
     @Get("pagamento/{idPagamento}")
-    public void pesquisarPagamentoById(Integer idPagamento) {
+    public void pesquisarPagamentoById(Integer idPagamento, Date dataInicial, Date dataFinal) {
+        addPagamento(pagamentoService.pesquisarById(idPagamento));
+        try {
+            addListaPagamento(dataInicial, dataFinal);
+        } catch (InformacaoInvalidaException e) {
+            gerarListaMensagemAlerta(e);
+        }
         pagamentoHome();
-        Pagamento p = pagamentoService.pesquisarById(idPagamento);
-        formatarPagamento(p);
-        addAtributo("pagamento", p);
         irTopoPagina();
     }
 
@@ -96,23 +123,30 @@ public class PagamentoController extends AbstractController {
     @Get("pagamento/periodo/listagem")
     public void pesquisarPagamentoByPeriodo(Date dataInicial, Date dataFinal) {
         try {
-            List<Pagamento> lista = pagamentoService.pesquisarPagamentoByPeriodo(new Periodo(dataInicial, dataFinal));
-            formatarPagamento(lista);
-            addAtributo(
-                    "titulo",
-                    "Pagamentos de " + StringUtils.formatarData(dataInicial) + " a "
-                            + StringUtils.formatarData(dataFinal));
-            addAtributo("listaPagamento", lista);
+            addListaPagamento(dataInicial, dataFinal);
             irRodapePagina();
         } catch (InformacaoInvalidaException e) {
             gerarListaMensagemAlerta(e);
             irTopoPagina();
         }
+
+    }
+
+    @Post("pagamento/remocao")
+    public void removerPagamento(Integer idPagamento, Date dataInicial, Date dataFinal) {
+        try {
+            pagamentoService.remover(idPagamento);
+            gerarMensagemSucesso("Pagamento removido com sucesso.");
+        } catch (BusinessException e) {
+            addPagamento(pagamentoService.pesquisarById(idPagamento));
+            gerarListaMensagemErro(e);
+        }
+        pesquisarPagamentoByPeriodo(dataInicial, dataFinal);
     }
 
     @Post("pagamento/retonoliquidacao/{idPagamento}")
-    public void retornarLiquidacaoPagamento(Integer idPagamento) {
+    public void retornarLiquidacaoPagamento(Integer idPagamento, Date dataInicial, Date dataFinal) {
         pagamentoService.retornarLiquidacaoPagamento(idPagamento);
-        pesquisarPagamentoById(idPagamento);
+        pesquisarPagamentoById(idPagamento, dataInicial, dataFinal);
     }
 }

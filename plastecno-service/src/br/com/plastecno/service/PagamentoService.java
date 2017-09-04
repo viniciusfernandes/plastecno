@@ -21,5 +21,7 @@ public interface PagamentoService {
 
 	List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo);
 
+	void remover(Integer idPagamento) throws BusinessException;
+
 	void retornarLiquidacaoPagamento(Integer idPagamento);
 }

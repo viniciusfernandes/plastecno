@@ -61,7 +61,7 @@ public class Pagamento {
 	@Column(name = "modalidade_frete")
 	private Integer modalidadeFrete;
 
-	@Transient
+	@Column(name = "nome_fornecedor")
 	private String nomeFornecedor;
 
 	@Column(name = "numero_nf")
@@ -98,6 +98,13 @@ public class Pagamento {
 
 	@Column(name = "valor_nf")
 	private Double valorNF;
+
+	public Pagamento() {
+	}
+
+	public Pagamento(Integer id) {
+		this.id = id;
+	}
 
 	public Date getDataEmissao() {
 		return dataEmissao;
@@ -156,7 +163,7 @@ public class Pagamento {
 	}
 
 	public String getParcelaFormatada() {
-		return parcela + "/" + totalParcelas;
+		return (parcela == null ? 0 : parcela) + "/" + (totalParcelas == null ? 0 : totalParcelas);
 	}
 
 	public Integer getQuantidadeItem() {

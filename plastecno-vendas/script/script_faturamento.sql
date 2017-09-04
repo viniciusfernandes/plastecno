@@ -21,7 +21,8 @@ create table vendas.tb_pagamento (
 	quantidade_item integer default 0,
 	sequencial_item integer default 0,
 	id_tipo_pagamento integer not null,
-	liquidado boolean default false
+	liquidado boolean default false,
+	nome_fornecedor varchar(150) default null
 );
 ALTER TABLE vendas.tb_tipo_pagamento ADD PRIMARY KEY (id);
 ALTER TABLE vendas.tb_pagamento ADD PRIMARY KEY (id);

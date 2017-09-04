@@ -30,7 +30,7 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 	public List<Pagamento> pesquisarPagamentoByPeriodo(Date dataInicio, Date dataFim) {
 		return entityManager
 				.createQuery(
-						"select p from Pagamento p where p.dataVencimento >=:dataInicio and p.dataVencimento <=:dataFim ",
+						"select p from Pagamento p where p.dataVencimento >=:dataInicio and p.dataVencimento <=:dataFim order by p.dataVencimento asc",
 						Pagamento.class).setParameter("dataInicio", dataInicio).setParameter("dataFim", dataFim)
 				.getResultList();
 	}

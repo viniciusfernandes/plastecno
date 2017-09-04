@@ -32,8 +32,25 @@ public class PagamentoServiceImpl implements PagamentoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserir(Pagamento pagamento) throws BusinessException {
+		if (pagamento == null) {
+			return null;
+		}
+
 		ValidadorInformacao.validar(pagamento);
-		return pagamentoDAO.inserir(pagamento).getId();
+		if (pagamento.getParcela() != null && pagamento.getTotalParcelas() != null
+				&& pagamento.getParcela() > pagamento.getTotalParcelas()) {
+			throw new BusinessException("A parcela não pode ser maior do que o total de parcelas.");
+		}
+
+		if (pagamento.getParcela() == null && pagamento.getTotalParcelas() != null) {
+			throw new BusinessException("A parcela deve ser preenchida.");
+		}
+
+		if (pagamento.getParcela() != null && pagamento.getTotalParcelas() == null) {
+			throw new BusinessException("O total de parcelas devem ser preenchidos.");
+		}
+
+		return pagamentoDAO.alterar(pagamento).getId();
 	}
 
 	@Override
@@ -65,7 +82,19 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void remover(Integer idPagamento) throws BusinessException {
+		if (idPagamento == null) {
+			return;
+		}
+		pagamentoDAO.remover(new Pagamento(idPagamento));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void retornarLiquidacaoPagamento(Integer idPagamento) {
+		if (idPagamento == null) {
+			return;
+		}
 		pagamentoDAO.alterarPropriedade(Pagamento.class, idPagamento, "liquidado", false);
 	}
 }

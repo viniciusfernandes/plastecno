@@ -132,7 +132,7 @@ public class PagamentoController extends AbstractController {
 
     }
 
-    @Post("pagamento/remocao")
+    @Post("pagamento/remocao/{idPagamento}")
     public void removerPagamento(Integer idPagamento, Date dataInicial, Date dataFinal) {
         try {
             pagamentoService.remover(idPagamento);

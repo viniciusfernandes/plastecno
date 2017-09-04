@@ -29,17 +29,6 @@ $(document).ready(function() {
 		$('#formPagamento').attr('action', '<c:out value="pagamento/inclusao"/>').attr('method', 'post').submit();	
 	});
 	
-	$('#botaoRemoverPagamento').click(function(){
-		var idPag = $('#idPagamento').val();
-		if(isEmpty(idPag)){
-			return;
-		}
-		adicionarInputHiddenFormulario('formVazio', 'idPagamento', idPag);
-		adicionarInputHiddenFormulario('formVazio', 'dataInicial', $('#dataInicial').val());
-		adicionarInputHiddenFormulario('formVazio', 'dataFinal', $('#dataFinal').val());
-		$('#formVazio').attr('action', '<c:out value="pagamento/remocao"/>').attr('method', 'post').submit();	
-	});
-	
 	$('#botaoLimparPeriodo').click(function(){
 		$(this).closest('form').attr('action', '<c:out value="pagamento"/>').attr('method', 'get').submit();	
 	});
@@ -212,7 +201,6 @@ $(document).ready(function() {
 		<div class="bloco_botoes">
 			<input type="button" id="botaoInserirPagamento" title="Inserir Pagamento" value="" class="botaoInserir"/>
 			<input type="button" id="botaoLimparPagamento" value="" title="Limpar Pagamento" class="botaoLimpar" />
-			<input  type="button"id="botaoRemoverPagamento" value="" title="Remover Pagamento" class="botaoCancelar" />
 		</div>
 	</fieldset>
 	</form>
@@ -228,11 +216,12 @@ $(document).ready(function() {
 					<th style="width: 7%">Val.(R$)</th>
 					<th style="width: 7%">NF</th>
 					<th style="width: 7%">Val. NF(R$)</th>
+					<th style="width: 7%">Ped.</th>
 					<th style="width: 33%">Desc.</th>
 					<th style="width: 5%">Parc.</th>
 					<th style="width: 8%">Forn.</th>
 					<th style="width: 5%">ICMS(R$)</th>
-					<th style="width: 5%">Ação</th>
+					<th style="width: 7%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -253,6 +242,7 @@ $(document).ready(function() {
 						<td>${pagamento.valor}</td>
 						<td>${pagamento.numeroNF}</td>
 						<td>${pagamento.valorNF}</td>
+						<td>${pagamento.idPedido}</td>
 						<td>${pagamento.descricao}</td>
 						<td>${pagamento.parcelaFormatada}</td>
 						<td>${pagamento.nomeFornecedor}</td>
@@ -281,6 +271,11 @@ $(document).ready(function() {
 										</form>
 									</c:otherwise>
 								</c:choose>
+								<form action="<c:url value="/pagamento/remocao/"/>${pagamento.id}" >
+									<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+									<input type="submit" value="" title="Remover Pagamento" class="botaoRemover"/>
+								</form>
 							</div>
 						</td>
 					</tr>

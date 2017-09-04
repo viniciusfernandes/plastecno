@@ -21,6 +21,10 @@ public interface PagamentoService {
 
 	List<Pagamento> pesquisarPagamentoByIdFornecedor(Integer idFornecedor, Periodo periodo);
 
+	List<Pagamento> pesquisarPagamentoByIdPedido(Integer idPedido);
+
+	List<Pagamento> pesquisarPagamentoByNF(Integer numeroNF);
+
 	List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo);
 
 	void remover(Integer idPagamento) throws BusinessException;

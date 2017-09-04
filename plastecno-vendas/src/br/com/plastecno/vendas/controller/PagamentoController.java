@@ -135,8 +135,30 @@ public class PagamentoController extends AbstractController {
         }
     }
 
-    @Get("pagamento/pedido/listagem")
-    public void pesquisarPagamentoByIdPedido(Integer idPedido) {
+    @Get("pagamento/pedido/{idPedido}")
+    public void pesquisarPagamentoByIdPedido(Integer idPedido, Date dataInicial, Date dataFinal) {
+        List<Pagamento> lista;
+        try {
+            lista = pagamentoService.pesquisarPagamentoByIdPedido(idPedido);
+            addListaPagamento(lista, dataInicial, dataFinal);
+            irRodapePagina();
+        } catch (InformacaoInvalidaException e) {
+            addPeriodo(dataInicial, dataFinal);
+            irTopoPagina();
+        }
+    }
+
+    @Get("pagamento/nf/{numeroNF}")
+    public void pesquisarPagamentoByNF(Integer numeroNF, Date dataInicial, Date dataFinal) {
+        List<Pagamento> lista;
+        try {
+            lista = pagamentoService.pesquisarPagamentoByNF(numeroNF);
+            addListaPagamento(lista, dataInicial, dataFinal);
+            irRodapePagina();
+        } catch (InformacaoInvalidaException e) {
+            addPeriodo(dataInicial, dataFinal);
+            irTopoPagina();
+        }
     }
 
     @Get("pagamento/periodo/listagem")

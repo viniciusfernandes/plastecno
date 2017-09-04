@@ -86,6 +86,24 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pagamento> pesquisarPagamentoByIdPedido(Integer idPedido) {
+		if (idPedido == null) {
+			return new ArrayList<Pagamento>();
+		}
+		return pagamentoDAO.pesquisarPagamentoByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pagamento> pesquisarPagamentoByNF(Integer numeroNF) {
+		if (numeroNF == null) {
+			return new ArrayList<Pagamento>();
+		}
+		return pagamentoDAO.pesquisarPagamentoByNF(numeroNF);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo) {
 		return pagamentoDAO.pesquisarPagamentoByPeriodo(periodo.getInicio(), periodo.getFim());
 	}

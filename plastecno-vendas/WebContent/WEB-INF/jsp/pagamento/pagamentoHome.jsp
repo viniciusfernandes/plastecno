@@ -48,6 +48,28 @@ $(document).ready(function() {
 		$('#formVazio').attr('action', '<c:out value="pagamento/fornecedor/"/>'+idForn).attr('method', 'get').submit();	
 	});
 	
+	$('#botaoPesquisarPedido').click(function(){
+		var idPedido = $('#pedido').val();
+		if(isEmpty(idPedido)){
+			return;
+		}
+		adicionarInputHiddenFormulario('formVazio', 'idPedido', idPedido);
+		adicionarInputHiddenFormulario('formVazio', 'dataInicial', $('#dataInicial').val());
+		adicionarInputHiddenFormulario('formVazio', 'dataFinal', $('#dataFinal').val());
+		$('#formVazio').attr('action', '<c:out value="pagamento/pedido/"/>'+idPedido).attr('method', 'get').submit();	
+	});
+	
+	$('#botaoPesquisarNF').click(function(){
+		var numeroNF = $('#numeroNF').val();
+		if(isEmpty(numeroNF)){
+			return;
+		}
+		adicionarInputHiddenFormulario('formVazio', 'numeroNF', numeroNF);
+		adicionarInputHiddenFormulario('formVazio', 'dataInicial', $('#dataInicial').val());
+		adicionarInputHiddenFormulario('formVazio', 'dataFinal', $('#dataFinal').val());
+		$('#formVazio').attr('action', '<c:out value="pagamento/nf/"/>'+numeroNF).attr('method', 'get').submit();	
+	});
+	
 	inserirMascaraData('dataVencimento');
 	inserirMascaraData('dataEmissao');
 	inserirMascaraData('dataInicial');
@@ -152,7 +174,7 @@ $(document).ready(function() {
 			<input type="text" id="numeroNF" name="pagamento.numeroNF" value="${pagamento.numeroNF}" style="width: 100%"/>
 		</div>
 		<div class="input" style="width: 2%">
-			<input type="button" id="botaoPesquisaNF" title="Pesquisar Pagamentos da NF" value="" class="botaoPesquisarPequeno" />
+			<input type="button" id="botaoPesquisarNF" title="Pesquisar Pagamentos da NF" value="" class="botaoPesquisarPequeno" />
 		</div>
 		<div class="label" style="width: 7%">Val. NF:</div>
 		<div class="input" style="width: 13%">
@@ -174,7 +196,7 @@ $(document).ready(function() {
 			<input type="text" id="pedido" name="pagamento.idPedido" value="${pagamento.idPedido}" style="width: 100%"/>
 		</div>
 		<div class="input" style="width: 2%">
-			<input type="button" id="botaoPesquisaPedido" title="Pesquisar Pagamentos do Pedido" value="" class="botaoPesquisarPequeno" />
+			<input type="button" id="botaoPesquisarPedido" title="Pesquisar Pagamentos do Pedido" value="" class="botaoPesquisarPequeno" />
 		</div>
 		<div class="label" style="width: 7%">Fornec.:</div>
 		<div class="input" style="width: 13%">

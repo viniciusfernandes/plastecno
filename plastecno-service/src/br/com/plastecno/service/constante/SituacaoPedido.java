@@ -42,4 +42,8 @@ public enum SituacaoPedido {
 	public static List<SituacaoPedido> getListaOrcamento(){
 		return listaOrcamento;
 	}
+	
+	public static boolean isOrcamento(SituacaoPedido situacaoPedido){
+		return situacaoPedido!=null && listaOrcamento.contains(situacaoPedido);
+	}
 }

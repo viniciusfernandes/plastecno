@@ -330,19 +330,28 @@ function inserirOrcamento(){
 		<div class="input" style="width: 70%">
 			<input type="text" id="telefone" name="contato.telefone" value="${contato.telefone}" style="width: 23%"/>
 		</div>
-		<div class="label">Transportadora:</div>
+		<div class="label">Tipo Entrega:</div>
+			<div class="input" style="width: 30%">
+				<select id="tipoEntrega" name="pedido.tipoEntrega" style="width: 100%">
+					<option value="">&lt&lt SELECIONE &gt&gt</option>
+					<c:forEach var="tipoEntrega" items="${listaTipoEntrega}">
+						<option value="${tipoEntrega}"
+							<c:if test="${tipoEntrega eq pedido.tipoEntrega}">selected</c:if>>${tipoEntrega.descricao}</option>
+					</c:forEach>
+				</select>
+			</div>
+		<div class="label" style="width: 10%">Transportadora:</div>
 		<div class="input" style="width: 30%">
 			<input type="text" id="transportadora" name="pedido.transportadora.nomeFantasia" value="${pedido.transportadora.nomeFantasia}" style="width: 100%"/>
 			<div class="suggestionsBox" id="containerPesquisaTransportadora" style="display: none; width: 30%"></div>
 		</div>
-		
+		<div class="label">Frete (R$):</div>
+		<div class="input" style="width: 30%">
+			<input id="frete" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 100%" />
+		</div>
 		<div class="label" style="width: 10%">Pagamento:</div>
 		<div class="input" style="width: 30%">
 			<input type="text" id="pagamento" name="pedido.formaPagamento" value="${pedido.formaPagamento}" style="width: 100%"/>
-		</div>
-		<div class="label">Frete (R$):</div>
-		<div class="input" style="width: 75%">
-			<input id="frete" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 40%" />
 		</div>
 		<div class="label">Observação:</div>
 			<div class="input areatexto" style="width: 70%">
@@ -360,11 +369,11 @@ function inserirOrcamento(){
 	
 	<jsp:include page="/bloco/bloco_item_pedido.jsp" />
 	<div class="bloco_botoes">
+		<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
 		<form id="formAnexo" action="orcamento/anexo" method="post" enctype="multipart/form-data">
 			<input type="button" id="botaoAnexarArquivo" title="Anexar Arquivo" value="" class="botaoAnexar" />
 			<input type="file" id="botaoAnexarOculto" style="display: none;" name="anexo"/>
 		</form>
-		<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
 		<input type="button" id="botaoAceitarOrcamento" title="Aceitar Orçamento" value="" class="botaoAceitar" />
 	</div>
 	

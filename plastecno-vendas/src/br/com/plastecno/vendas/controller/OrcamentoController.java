@@ -18,6 +18,7 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoCST;
+import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
@@ -41,10 +42,10 @@ public class OrcamentoController extends AbstractPedidoController {
     @Servico
     private ClienteService clienteService;
 
+    private final String ID_ORCAMENTO = "idOrcamento";
+
     @Servico
     private MaterialService materialService;
-
-    private final String ID_ORCAMENTO = "idOrcamento";
 
     @Servico
     private PedidoService pedidoService;
@@ -82,17 +83,17 @@ public class OrcamentoController extends AbstractPedidoController {
         }
     }
 
-    @Post("orcamento/anexo")
-    public void anexarArquivoEnvio(UploadedFile anexo) {
-        Integer idOrcamento = (Integer) getSessao(ID_ORCAMENTO);
-        removerSessao(ID_ORCAMENTO);
-       enviarOrcamento(idOrcamento, anexo);
-    }
-
     @Post("orcamento/temporario/id")
     public void adicionarIdOrcamentoTemporario(Integer idOrcamento) {
         addSessao(ID_ORCAMENTO, idOrcamento);
         serializarJson(new SerializacaoJson("ok", true));
+    }
+
+    @Post("orcamento/anexo")
+    public void anexarArquivoEnvio(UploadedFile anexo) {
+        Integer idOrcamento = (Integer) getSessao(ID_ORCAMENTO);
+        removerSessao(ID_ORCAMENTO);
+        enviarOrcamento(idOrcamento, anexo);
     }
 
     @Post("orcamento/cancelamento/{idOrcamento}")
@@ -182,6 +183,7 @@ public class OrcamentoController extends AbstractPedidoController {
         addAtributoCondicional("idRepresentadaSelecionada", representadaService.pesquisarIdRevendedor());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("listaCST", TipoCST.values());
+        addAtributo("listaTipoEntrega", TipoEntrega.values());
     }
 
     /*
@@ -218,9 +220,9 @@ public class OrcamentoController extends AbstractPedidoController {
     @Get("orcamento/{idPedido}")
     public void pesquisarOrcamentoById(Integer idPedido) {
         Pedido pedido = pedidoService.pesquisarPedidoById(idPedido);
-        if (pedido == null || !pedido.isOrcamento()) {
+        if (pedido == null) {
             gerarListaMensagemAlerta("O orçamento No. " + idPedido + " não existe no sistema");
-        } else {
+        } else if (pedido.isOrcamento()) {
             pedido.setRepresentada(pedidoService.pesquisarRepresentadaByIdPedido(idPedido));
             pedido.setTransportadora(pedidoService.pesquisarTransportadoraResumidaByIdPedido(idPedido));
 
@@ -236,7 +238,12 @@ public class OrcamentoController extends AbstractPedidoController {
                     pedidoService.pesquisarIdRepresentadaByIdPedido(idPedido));
             addAtributo("listaItemPedido", listaItem);
         }
-        irTopoPagina();
+
+        if (!pedido.isOrcamento()) {
+            redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA, false);
+        } else {
+            irTopoPagina();
+        }
     }
 
     @Get("orcamento/listagem")

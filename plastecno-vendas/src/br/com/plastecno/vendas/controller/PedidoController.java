@@ -454,9 +454,9 @@ public class PedidoController extends AbstractPedidoController {
             gerarListaMensagemAlerta("O usuário não tem permissão de acesso ao pedido.");
         } else {
             pedido = pedidoService.pesquisarPedidoById(id, TipoPedido.COMPRA.equals(tipoPedido));
-            if (pedido == null || pedido.isOrcamento()) {
+            if (pedido == null) {
                 gerarListaMensagemAlerta("Pedido No. " + id + " não existe no sistema");
-            } else {
+            } else if (!pedido.isOrcamento()) {
                 formatarPedido(pedido);
                 List<Transportadora> listaRedespacho = clienteService.pesquisarTransportadorasRedespacho(pedido
                         .getCliente().getId());
@@ -540,13 +540,21 @@ public class PedidoController extends AbstractPedidoController {
                 addAtributo("acessoAlteracaoComissaoPermitida", acessoAlteracaoComissaoPermitida);
             }
         }
-        configurarTipoPedido(tipoPedido);
-        // Estamos verificando se o pedido pesquisado eh realmente um orcamento
-        // pois, por conta do reaproveitamento de codigo, o usuario pode acessar
-        // um pedido de vendas na tela de orcamento. Caso tenha sido pesquisado
-        // um pedido de vendas na tela de orcamento devemos direcionar o usuario
-        // para a tela de vendas
-        redirecionarHome(tipoPedido, pedido == null ? orcamento : pedido.isOrcamento(), true);
+        if (pedido.isOrcamento()) {
+            redirecTo(OrcamentoController.class).pesquisarOrcamentoById(id);
+        } else {
+            configurarTipoPedido(tipoPedido);
+            // Estamos verificando se o pedido pesquisado eh realmente um
+            // orcamento
+            // pois, por conta do reaproveitamento de codigo, o usuario pode
+            // acessar
+            // um pedido de vendas na tela de orcamento. Caso tenha sido
+            // pesquisado
+            // um pedido de vendas na tela de orcamento devemos direcionar o
+            // usuario
+            // para a tela de vendas
+            redirecionarHome(tipoPedido, pedido == null ? orcamento : pedido.isOrcamento(), true);
+        }
     }
 
     @Get("pedido/listagem")

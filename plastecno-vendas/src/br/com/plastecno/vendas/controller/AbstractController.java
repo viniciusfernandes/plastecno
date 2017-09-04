@@ -25,6 +25,7 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
@@ -43,9 +44,10 @@ import br.com.plastecno.vendas.util.ServiceLocator;
 import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
 public abstract class AbstractController {
-
     private final static Long VERSAO_CACHE = new Date().getTime();
+
     private final String cssMensagemAlerta = "mensagemAlerta";
+
     private final String cssMensagemErro = "mensagemErro";
     private final String cssMensagemSucesso = "mensagemSucesso";
     private final String DIRETORIO_TEMPLATE_PDF;
@@ -60,11 +62,9 @@ public abstract class AbstractController {
     private TipoLogradouroService tipoLogradouroService;
     private UsuarioInfo usuarioInfo;
     private UsuarioService usuarioService;
-
     public AbstractController(Result result) {
         this(result, null, null);
     }
-
     public AbstractController(Result result, HttpServletRequest request) {
         this(result, null, request);
     }
@@ -249,6 +249,22 @@ public abstract class AbstractController {
         for (ItemEstoque item : itens) {
             this.formatarItemEstoque(item);
         }
+    }
+
+    void formatarPagamento(List<Pagamento> lista) {
+        for (Pagamento p : lista) {
+            formatarPagamento(p);
+        }
+    }
+
+    void formatarPagamento(Pagamento p) {
+        p.setDataVencimentoFormatada(StringUtils.formatarData(p.getDataVencimento()));
+        p.setDataEmissaoFormatada(StringUtils.formatarData(p.getDataEmissao()));
+        p.setDataRecebimentoFormatada(StringUtils.formatarData(p.getDataRecebimento()));
+
+        p.setValor(NumeroUtils.arredondarValorMonetario(p.getValor()));
+        p.setValorCreditoICMS(NumeroUtils.arredondarValorMonetario(p.getValorCreditoICMS()));
+        p.setValorNF(NumeroUtils.arredondarValorMonetario(p.getValorNF()));
     }
 
     void formatarPedido(Pedido pedido) {

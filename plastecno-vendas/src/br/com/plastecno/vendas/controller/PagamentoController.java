@@ -18,7 +18,6 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.Periodo;
-import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 
@@ -52,22 +51,6 @@ public class PagamentoController extends AbstractController {
         formatarPagamento(p);
         p.setNomeFornecedor(representadaService.pesquisarNomeFantasiaById(p.getIdFornecedor()));
         addAtributo("pagamento", p);
-    }
-
-    private void formatarPagamento(List<Pagamento> lista) {
-        for (Pagamento p : lista) {
-            formatarPagamento(p);
-        }
-    }
-
-    private void formatarPagamento(Pagamento p) {
-        p.setDataVencimentoFormatada(StringUtils.formatarData(p.getDataVencimento()));
-        p.setDataEmissaoFormatada(StringUtils.formatarData(p.getDataEmissao()));
-        p.setDataRecebimentoFormatada(StringUtils.formatarData(p.getDataRecebimento()));
-
-        p.setValor(NumeroUtils.arredondarValorMonetario(p.getValor()));
-        p.setValorCreditoICMS(NumeroUtils.arredondarValorMonetario(p.getValorCreditoICMS()));
-        p.setValorNF(NumeroUtils.arredondarValorMonetario(p.getValorNF()));
     }
 
     @Post("pagamento/inclusao")

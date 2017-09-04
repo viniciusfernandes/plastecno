@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -11,7 +12,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import br.com.plastecno.service.PagamentoService;
+import br.com.plastecno.service.PedidoService;
+import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.dao.PagamentoDAO;
+import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.Periodo;
@@ -24,6 +28,41 @@ public class PagamentoServiceImpl implements PagamentoService {
 	private EntityManager entityManager;
 
 	private PagamentoDAO pagamentoDAO;
+
+	@EJB
+	private PedidoService pedidoService;
+
+	private Integer calcularTotalParcelas(Integer idPedido) {
+		return pedidoService.calcularDataPagamento(idPedido).size();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Pagamento gerarPagamentoItemPedido(Integer idItemPedido) {
+		if (idItemPedido == null) {
+			return null;
+		}
+		ItemPedido i = pedidoService.pesquisarItemPedidoPagamento(idItemPedido);
+		if (i == null) {
+			return null;
+		}
+		Pagamento p = new Pagamento();
+		p.setDescricao(i.getDescricaoItemMaterial());
+		p.setIdFornecedor(i.getIdRepresentada());
+		p.setIdPedido(i.getIdPedido());
+		p.setNomeFornecedor(i.getNomeRepresentada());
+		// Configurando o pagamento gerado como sendo sempre a primeira parcela,
+		// pois os pagamentos das outras parcelas serao geradas em outro
+		// servico.
+		p.setParcela(1);
+		p.setQuantidadeItem(i.getQuantidade());
+		p.setSequencialItem(i.getSequencial());
+		p.setTipoPagamento(TipoPagamento.INSUMO);
+		p.setTotalParcelas(calcularTotalParcelas(i.getIdPedido()));
+		p.setValor(i.getValorTotal());
+		p.setValorCreditoICMS(i.getValorICMS());
+		return p;
+	}
 
 	@PostConstruct
 	public void init() {

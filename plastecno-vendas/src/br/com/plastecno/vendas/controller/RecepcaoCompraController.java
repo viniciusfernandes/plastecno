@@ -8,10 +8,12 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.plastecno.message.AlteracaoEstoquePublisher;
 import br.com.plastecno.service.EstoqueService;
+import br.com.plastecno.service.PagamentoService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
@@ -30,6 +32,9 @@ public class RecepcaoCompraController extends AbstractController {
     private EstoqueService estoqueService;
 
     @Servico
+    private PagamentoService pagamentoService;
+
+    @Servico
     private PedidoService pedidoService;
 
     @Servico
@@ -40,6 +45,14 @@ public class RecepcaoCompraController extends AbstractController {
 
     public RecepcaoCompraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
+    }
+
+    @Post("compra/item/pagamento/{idItem}")
+    public void gerarPagamentoItemPedido(Integer idItem, Date dataInicial, Date dataFinal, Integer idRepresentada) {
+        Pagamento p = pagamentoService.gerarPagamentoItemPedido(idItem);
+        formatarPagamento(p);
+        addAtributo("pagamento", p);
+        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao/inclusaodadosnf")
@@ -66,9 +79,7 @@ public class RecepcaoCompraController extends AbstractController {
             gerarListaMensagemErro(e);
             irTopoPagina();
         }
-
-        addAtributo("dataInicial", formatarData(dataInicial));
-        addAtributo("dataFinal", formatarData(dataFinal));
+        addPeriodo(dataInicial, dataFinal);
         addAtributo("idRepresentadaSelecionada", idRepresentada);
     }
 

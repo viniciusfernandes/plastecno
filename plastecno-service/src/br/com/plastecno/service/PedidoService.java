@@ -168,6 +168,8 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal);
 
+	ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido);
+
 	List<ItemPedido> pesquisarItemPedidoRepresentacaoByPeriodo(Periodo periodo);
 
 	List<ItemPedido> pesquisarItemPedidoRevendaByPeriodo(Periodo periodo);

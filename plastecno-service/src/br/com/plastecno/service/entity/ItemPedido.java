@@ -95,6 +95,9 @@ public class ItemPedido extends Item {
 	@Transient
 	private Integer idProprietario;
 
+	@Transient
+	private Integer idRepresentada;
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao pedido")
@@ -206,6 +209,28 @@ public class ItemPedido extends Item {
 	private String valorPedidoIPIFormatado;
 
 	public ItemPedido() {
+	}
+
+	// Construtor usado para recuperar os dados que serao utilizados para gerar
+	// um pagamento do item
+	public ItemPedido(Double aliquotaICMS, Double comprimento, String descricaoMaterial, String descricaoPeca,
+			FormaMaterial formaMaterial, Integer id, Integer idPedido, Integer idRepresentada, Double medidaExterna,
+			Double medidaInterna, String nomeRepresentada, Double precoUnidade, Integer quantidade, Integer sequencial,
+			String siglaMaterial) {
+		this.aliquotaICMS = aliquotaICMS;
+		this.comprimento = comprimento;
+		this.descricaoPeca = descricaoPeca;
+		this.formaMaterial = formaMaterial;
+		this.id = id;
+		this.idRepresentada = idRepresentada;
+		this.idPedido = idPedido;
+		this.material = new Material(null, siglaMaterial, descricaoMaterial);
+		this.medidaExterna = medidaExterna;
+		this.medidaInterna = medidaInterna;
+		this.nomeRepresentada = nomeRepresentada;
+		this.precoUnidade = precoUnidade;
+		this.quantidade = quantidade;
+		this.sequencial = sequencial;
 	}
 
 	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS) {
@@ -439,6 +464,10 @@ public class ItemPedido extends Item {
 		return idProprietario;
 	}
 
+	public Integer getIdRepresentada() {
+		return idRepresentada;
+	}
+
 	public Material getMaterial() {
 		return material;
 	}
@@ -669,6 +698,10 @@ public class ItemPedido extends Item {
 
 	public void setIdProprietario(Integer idProprietario) {
 		this.idProprietario = idProprietario;
+	}
+
+	public void setIdRepresentada(Integer idRepresentada) {
+		this.idRepresentada = idRepresentada;
 	}
 
 	public void setMaterial(Material material) {

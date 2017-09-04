@@ -11,6 +11,8 @@ import br.com.plastecno.service.wrapper.Periodo;
 @Local
 public interface PagamentoService {
 
+	Pagamento gerarPagamentoItemPedido(Integer idItemPedido);
+
 	Integer inserir(Pagamento pagamento) throws BusinessException;
 
 	void liquidarPagamento(Integer idPagamento);

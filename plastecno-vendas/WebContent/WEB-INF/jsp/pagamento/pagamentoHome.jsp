@@ -236,9 +236,19 @@ $(document).ready(function() {
 								<form action="<c:url value="/pagamento/"/>${pagamento.id}" >
 									<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
 								</form>
-								<form action="<c:url value="/pagamento/liquidacao/"/>${pagamento.id}" method="post" >
-									<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificarPequeno" />
-								</form>
+								
+								<c:choose>
+									<c:when test="${not pagamento.liquidado}">
+										<form action="<c:url value="/pagamento/liquidacao/"/>${pagamento.id}" method="post" >
+											<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificacaoEfetuadaPequeno" />
+										</form>
+									</c:when>
+									<c:otherwise>
+										<form action="<c:url value="/pagamento/retonoliquidacao/"/>${pagamento.id}" method="post" >
+											<input type="submit" value="" title="Retornar Liquidação Pagamento" class="botaoVerificacaoFalhaPequeno" />
+										</form>
+									</c:otherwise>
+								</c:choose>
 							</div>
 						</td>
 					</tr>

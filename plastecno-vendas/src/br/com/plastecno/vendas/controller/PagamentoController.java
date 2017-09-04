@@ -36,11 +36,15 @@ public class PagamentoController extends AbstractController {
 
     private void formatarPagamento(List<Pagamento> lista) {
         for (Pagamento p : lista) {
-            p.setDataVencimentoFormatada(StringUtils.formatarData(p.getDataVencimento()));
-            p.setValor(NumeroUtils.arredondarValorMonetario(p.getValor()));
-            p.setValorCreditoICMS(NumeroUtils.arredondarValorMonetario(p.getValorCreditoICMS()));
-            p.setValorNF(NumeroUtils.arredondarValorMonetario(p.getValorNF()));
+            formatarPagamento(p);
         }
+    }
+
+    private void formatarPagamento(Pagamento p) {
+        p.setDataVencimentoFormatada(StringUtils.formatarData(p.getDataVencimento()));
+        p.setValor(NumeroUtils.arredondarValorMonetario(p.getValor()));
+        p.setValorCreditoICMS(NumeroUtils.arredondarValorMonetario(p.getValorCreditoICMS()));
+        p.setValorNF(NumeroUtils.arredondarValorMonetario(p.getValorNF()));
     }
 
     @Post("pagamento/inclusao")
@@ -52,6 +56,13 @@ public class PagamentoController extends AbstractController {
             addAtributo("pagamento", pagamento);
             gerarListaMensagemErro(e);
         }
+        irTopoPagina();
+    }
+
+    @Post("pagamento/liquidacao/{idPagamento}")
+    public void liquidarPagamento(Integer idPagamento) {
+        pagamentoService.liquidarPagamento(idPagamento);
+        gerarMensagemSucesso("Pagamento liquidado com sucesso.");
         irTopoPagina();
     }
 
@@ -69,21 +80,17 @@ public class PagamentoController extends AbstractController {
         forwardTo(RepresentadaController.class).pesquisarFornecedorByNomeFantasia(nomeFantasia);
     }
 
-    @Get("pagamento/pedido/listagem")
-    public void pesquisarPagamentoByIdPedido(Integer idPedido) {
-    }
-
     @Get("pagamento/{idPagamento}")
     public void pesquisarPagamentoById(Integer idPagamento) {
-        addAtributo("pagamento", pagamentoService.pesquisarById(idPagamento));
+        pagamentoHome();
+        Pagamento p = pagamentoService.pesquisarById(idPagamento);
+        formatarPagamento(p);
+        addAtributo("pagamento", p);
         irTopoPagina();
     }
 
-    @Post("pagamento/liquidacao/{idPagamento}")
-    public void liquidarPagamento(Integer idPagamento) {
-        pagamentoService.liquidarPagamento(idPagamento);
-        gerarMensagemSucesso("Pagamento liquidado com sucesso.");
-        irTopoPagina();
+    @Get("pagamento/pedido/listagem")
+    public void pesquisarPagamentoByIdPedido(Integer idPedido) {
     }
 
     @Get("pagamento/periodo/listagem")
@@ -101,5 +108,11 @@ public class PagamentoController extends AbstractController {
             gerarListaMensagemAlerta(e);
             irTopoPagina();
         }
+    }
+
+    @Post("pagamento/retonoliquidacao/{idPagamento}")
+    public void retornarLiquidacaoPagamento(Integer idPagamento) {
+        pagamentoService.retornarLiquidacaoPagamento(idPagamento);
+        pesquisarPagamentoById(idPagamento);
     }
 }

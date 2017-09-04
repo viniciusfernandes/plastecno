@@ -20,4 +20,6 @@ public interface PagamentoService {
 	List<Pagamento> pesquisarByIdPedido(Integer idPedido);
 
 	List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo);
+
+	void retornarLiquidacaoPagamento(Integer idPagamento);
 }

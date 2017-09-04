@@ -62,4 +62,10 @@ public class PagamentoServiceImpl implements PagamentoService {
 	public List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo) {
 		return pagamentoDAO.pesquisarPagamentoByPeriodo(periodo.getInicio(), periodo.getFim());
 	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void retornarLiquidacaoPagamento(Integer idPagamento) {
+		pagamentoDAO.alterarPropriedade(Pagamento.class, idPagamento, "liquidado", false);
+	}
 }

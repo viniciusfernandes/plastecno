@@ -35,7 +35,12 @@ public class PagamentoController extends AbstractController {
     }
 
     private void addListaPagamento(Date dataInicial, Date dataFinal) throws InformacaoInvalidaException {
-        List<Pagamento> lista = pagamentoService.pesquisarPagamentoByPeriodo(new Periodo(dataInicial, dataFinal));
+        addListaPagamento(pagamentoService.pesquisarPagamentoByPeriodo(new Periodo(dataInicial, dataFinal)),
+                dataInicial, dataFinal);
+    }
+
+    private void addListaPagamento(List<Pagamento> lista, Date dataInicial, Date dataFinal)
+            throws InformacaoInvalidaException {
         formatarPagamento(lista);
         addAtributo("titulo",
                 "Pagamentos de " + StringUtils.formatarData(dataInicial) + " a " + StringUtils.formatarData(dataFinal));
@@ -96,7 +101,7 @@ public class PagamentoController extends AbstractController {
         addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
         addAtributo("listaTipoPagamento", TipoPagamento.values());
         addAtributo("listaFornecedor", representadaService.pesquisarRepresentadaAtivoByTipoPedido(TipoPedido.COMPRA));
-        addPeriodo(new Date(), gerarDataInicioMes());
+        addPeriodo(gerarDataInicioMes(), new Date());
     }
 
     @Get("pagamento/fornecedor/listagem")
@@ -114,6 +119,20 @@ public class PagamentoController extends AbstractController {
         }
         pagamentoHome();
         irTopoPagina();
+    }
+
+    @Get("pagamento/fornecedor/{idFornecedor}")
+    public void pesquisarPagamentoByIdFornecedor(Integer idFornecedor, Date dataInicial, Date dataFinal) {
+        List<Pagamento> lista;
+        try {
+            lista = pagamentoService
+                    .pesquisarPagamentoByIdFornecedor(idFornecedor, new Periodo(dataInicial, dataFinal));
+            addListaPagamento(lista, dataInicial, dataFinal);
+            irRodapePagina();
+        } catch (InformacaoInvalidaException e) {
+            addPeriodo(dataInicial, dataFinal);
+            irTopoPagina();
+        }
     }
 
     @Get("pagamento/pedido/listagem")

@@ -27,6 +27,14 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 				.setParameter("idPedido", idPedido).getResultList();
 	}
 
+	public List<Pagamento> pesquisarPagamentoByIdFornecedor(Integer idFornecedor, Date dataInicial, Date dataFinal) {
+		return entityManager
+				.createQuery(
+						"select p from Pagamento p where p.idFornecedor = :idFornecedor and p.dataVencimento >=:dataInicial and p.dataVencimento <=:dataFinal ",
+						Pagamento.class).setParameter("idFornecedor", idFornecedor)
+				.setParameter("dataInicial", dataInicial).setParameter("dataFinal", dataFinal).getResultList();
+	}
+
 	public List<Pagamento> pesquisarPagamentoByPeriodo(Date dataInicio, Date dataFim) {
 		return entityManager
 				.createQuery(

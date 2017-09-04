@@ -1,5 +1,6 @@
 package br.com.plastecno.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -72,6 +73,15 @@ public class PagamentoServiceImpl implements PagamentoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pagamento> pesquisarByIdPedido(Integer idPedido) {
 		return pagamentoDAO.pesquisarByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pagamento> pesquisarPagamentoByIdFornecedor(Integer idFornecedor, Periodo periodo) {
+		if (idFornecedor == null || periodo == null) {
+			return new ArrayList<Pagamento>();
+		}
+		return pagamentoDAO.pesquisarPagamentoByIdFornecedor(idFornecedor, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override

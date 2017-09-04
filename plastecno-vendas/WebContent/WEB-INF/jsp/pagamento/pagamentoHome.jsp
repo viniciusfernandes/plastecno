@@ -21,9 +21,7 @@
 $(document).ready(function() {
 	scrollTo('${ancora}');
 	$('#botaoInserirPagamento').click(function(){
-		if(isEmpty($('#idPagamento').val())){
-			return;
-		}
+		
 		adicionarInputHiddenFormulario('formPagamento', 'dataInicial', $('#dataInicial').val());
 		adicionarInputHiddenFormulario('formPagamento', 'dataFinal', $('#dataFinal').val());
 		$('#formPagamento').attr('action', '<c:out value="pagamento/inclusao"/>').attr('method', 'post').submit();	
@@ -37,6 +35,17 @@ $(document).ready(function() {
 		$('#formPagamento input:text').val('');
 		$('#formPagamento input:hidden').val('');
 		$('#formPagamento select').val('');	
+	});
+	
+	$('#botaoPesquisarFornecedor').click(function(){
+		var idForn = $('#idFornecedor').val();
+		if(isEmpty(idForn)){
+			return;
+		}
+		adicionarInputHiddenFormulario('formVazio', 'idFornecedor', idForn);
+		adicionarInputHiddenFormulario('formVazio', 'dataInicial', $('#dataInicial').val());
+		adicionarInputHiddenFormulario('formVazio', 'dataFinal', $('#dataFinal').val());
+		$('#formVazio').attr('action', '<c:out value="pagamento/fornecedor/"/>'+idForn).attr('method', 'get').submit();	
 	});
 	
 	inserirMascaraData('dataVencimento');
@@ -168,9 +177,12 @@ $(document).ready(function() {
 			<input type="button" id="botaoPesquisaPedido" title="Pesquisar Pagamentos do Pedido" value="" class="botaoPesquisarPequeno" />
 		</div>
 		<div class="label" style="width: 7%">Fornec.:</div>
-		<div class="input" style="width: 60%">
-			<input type="text" id="fornecedor" name="pagamento.nomeFornecedor" value="${pagamento.nomeFornecedor}" style="width: 22%"/>
+		<div class="input" style="width: 13%">
+			<input type="text" id="fornecedor" name="pagamento.nomeFornecedor" value="${pagamento.nomeFornecedor}" style="width: 100%"/>
 			<div class="suggestionsBox" id="containerPesquisaFornecedor" style="display: none; width: 30%"></div>
+		</div>
+		<div class="input" style="width: 50%">
+			<input type="button" id="botaoPesquisarFornecedor" title="Pesquisar Pagamentos do Fornecedor" value="" class="botaoPesquisarPequeno" />
 		</div>
 		<div class="label">Item:</div>
 		<div class="input" style="width: 10%">

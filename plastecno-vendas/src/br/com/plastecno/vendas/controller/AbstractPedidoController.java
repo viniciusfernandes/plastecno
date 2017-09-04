@@ -148,8 +148,8 @@ public class AbstractPedidoController extends AbstractController {
 
             final List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
 
-            formatarItemPedido(listaItem);
             formatarPedido(pedido);
+            formatarItemPedido(listaItem);
             formatarDocumento(pedido.getCliente());
             formatarDocumento(pedido.getRepresentada());
 

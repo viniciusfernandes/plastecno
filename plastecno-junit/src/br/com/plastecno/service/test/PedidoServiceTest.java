@@ -45,6 +45,7 @@ import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.test.builder.ServiceBuilder;
 import br.com.plastecno.util.StringUtils;
 
@@ -146,7 +147,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -429,7 +430,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedidoRevenda, new byte[] {});
+			pedidoService.enviarPedido(idPedidoRevenda, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -464,7 +465,7 @@ public class PedidoServiceTest extends AbstractTest {
 		pedidoCompra.setFormaPagamento("A VISTA");
 		pedidoCompra.setDataEntrega(TestUtils.gerarDataPosterior());
 		try {
-			pedidoService.enviarPedido(idPedidoCompra, new byte[] {});
+			pedidoService.enviarPedido(idPedidoCompra, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -507,7 +508,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idOrcamento, new byte[] {});
+			pedidoService.enviarPedido(idOrcamento, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -550,7 +551,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -631,7 +632,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(p.getId(), new byte[] {});
+			pedidoService.enviarPedido(p.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -716,7 +717,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPed, new byte[] {});
+			pedidoService.enviarPedido(idPed, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -744,7 +745,7 @@ public class PedidoServiceTest extends AbstractTest {
 		assertNull("A data de envio de uma copia do pedido deve ser nula", dtEnvCopia);
 
 		try {
-			pedidoService.enviarPedido(idCopia, new byte[] {});
+			pedidoService.enviarPedido(idCopia, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -797,7 +798,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -811,7 +812,7 @@ public class PedidoServiceTest extends AbstractTest {
 		Integer idPedido = pedido.getId();
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -823,7 +824,7 @@ public class PedidoServiceTest extends AbstractTest {
 		Pedido pedido = gerarPedidoRepresentacao();
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -836,7 +837,7 @@ public class PedidoServiceTest extends AbstractTest {
 		pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -856,7 +857,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -890,7 +891,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -918,7 +919,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -948,7 +949,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -982,7 +983,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1007,7 +1008,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -1033,7 +1034,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -1059,7 +1060,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -1071,7 +1072,7 @@ public class PedidoServiceTest extends AbstractTest {
 		Pedido pedido = gerarPedidoRevenda();
 		boolean throwed = false;
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -1103,7 +1104,7 @@ public class PedidoServiceTest extends AbstractTest {
 				pedido.getSituacaoPedido());
 
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1144,7 +1145,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1582,7 +1583,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1683,7 +1684,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1915,7 +1916,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2037,7 +2038,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2065,7 +2066,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(pedido.getId(), new byte[] {});
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2168,7 +2169,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2217,7 +2218,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2256,7 +2257,7 @@ public class PedidoServiceTest extends AbstractTest {
 		try {
 			pedidoCompra.setFormaPagamento("A VISTA");
 			pedidoCompra.setDataEntrega(TestUtils.gerarDataPosterior());
-			pedidoService.enviarPedido(idPedidoCompra, new byte[] {});
+			pedidoService.enviarPedido(idPedidoCompra, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2287,7 +2288,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2327,7 +2328,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2367,7 +2368,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2420,7 +2421,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2459,7 +2460,7 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

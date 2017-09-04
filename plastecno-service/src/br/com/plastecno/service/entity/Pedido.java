@@ -178,6 +178,9 @@ public class Pedido implements Serializable, Cloneable {
 	@Column(name = "valor_frete")
 	private Double valorFrete;
 
+	@Transient
+	private String valorFreteFormatado;
+
 	@Column(name = "valor_parcela_nf")
 	private Double valorParcelaNF;
 
@@ -473,6 +476,10 @@ public class Pedido implements Serializable, Cloneable {
 		return valorFrete;
 	}
 
+	public String getValorFreteFormatado() {
+		return valorFreteFormatado;
+	}
+
 	public Double getValorParcelaNF() {
 		return valorParcelaNF;
 	}
@@ -540,9 +547,7 @@ public class Pedido implements Serializable, Cloneable {
 	}
 
 	public boolean isOrcamento() {
-		return SituacaoPedido.ORCAMENTO.equals(situacaoPedido)
-				|| SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido)
-				|| SituacaoPedido.ORCAMENTO_ACEITO.equals(situacaoPedido);
+		return SituacaoPedido.isOrcamento(situacaoPedido);
 	}
 
 	public boolean isOrcamentoDigitacao() {
@@ -726,6 +731,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setValorFrete(Double valorFrete) {
 		this.valorFrete = valorFrete;
+	}
+
+	public void setValorFreteFormatado(String valorFreteFormatado) {
+		this.valorFreteFormatado = valorFreteFormatado;
 	}
 
 	public void setValorParcelaNF(Double valorParcelaNF) {

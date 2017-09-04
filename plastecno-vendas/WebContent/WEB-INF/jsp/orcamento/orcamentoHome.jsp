@@ -36,6 +36,10 @@ $(document).ready(function() {
 		inserirOrcamento();
 	});
 	
+	$("#botaoAnexarArquivo").click(function() {
+		$('#botaoAnexarOculto').click();
+	});
+	
 	$("#botaoPesquisaOrcamento").click(function() {
 		var idPedido = $('#numeroPedido').val();
 		if (isEmpty(idPedido)) {
@@ -67,10 +71,21 @@ $(document).ready(function() {
 		if (isEmpty(idPedido)) {
 			return;
 		} 
-		var form = document.getElementById('formVazio');
-		form.action = '<c:url value="/orcamento/envio/"/>'+idPedido;
-		form.method = 'post';
-		form.submit();
+		var url = '<c:url value="orcamento/temporario/id"/>';
+		var request = $.ajax({
+			type : "post",
+			url : url,
+			data : {'idOrcamento':idPedido}
+		});
+		
+		request.done(function(response) {
+			document.getElementById('formAnexo').submit();
+		});
+		
+
+		request.fail(function(request, status) {
+			alert('Falha envio do orcamento => Status da requisicao: ' + status);
+		});
 	});
 	
 	$('#botaoAceitarOrcamento').click(function (){
@@ -147,6 +162,7 @@ $(document).ready(function() {
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraNumerica('validade', '999');
+	inserirMascaraMonetaria('frete', 7);
 
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 
@@ -223,7 +239,7 @@ function inserirOrcamento(){
 		</form>
 
 	<form id="formVazio" method="get"></form>
-
+	
 	<form id="formPedido" action="<c:url value="/orcamento/inclusao"/>" method="post">
 		<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${pedido.proprietario.id}"/>
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
@@ -232,12 +248,13 @@ function inserirOrcamento(){
 		<input type="hidden" id="idTransportadora"  name="pedido.transportadora.id" value="${pedido.transportadora.id}"/>
 	<fieldset>
 		<legend>Orçamento</legend>
+		
 		<div class="label" style="width: 56%">Dt. Envio:</div>
 		<div class="input" style="width: 30%">
 			<input type="text" id="dataEnvio" value="${pedido.dataEnvioFormatada}"  class="desabilitado" disabled="disabled" style="width: 100%" />
 		</div>
-		<div class="label">Número:</div>
-		<div class="input" style="width: 30%">
+		<div class="label">Núm.:</div>
+		<div class="input" style="width: 7%">
 			<input type="text" id="numeroPedido" value="${pedido.id}" class="pesquisavel" style="width: 100%"/>
 		</div>
 		<div class="input" style="width: 2%">
@@ -248,7 +265,12 @@ function inserirOrcamento(){
 				<input type="button" id="botaoCopiarOrcamento"
 					title="Copiar Orçamento" value="" class="botaoCopiarPequeno" />
 		</div>
-		<div class="label" style="width: 7%">Situação:</div>
+		<div class="label" style="width: 8%">Núm. Cli.:</div>
+		<div class="input" style="width: 11%">
+			<input type="text" id="numeroPedido" value="${pedido.id}" class="pesquisavel" style="width: 100%"/>
+		</div>
+		
+		<div class="label" style="width: 10%">Situação:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="situacaoPedido" name="pedido.situacaoPedido" 
 					value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled" style="width: 75%"/>
@@ -308,22 +330,34 @@ function inserirOrcamento(){
 		<div class="input" style="width: 70%">
 			<input type="text" id="telefone" name="contato.telefone" value="${contato.telefone}" style="width: 23%"/>
 		</div>
-		<div class="label">Transportadora:</div>
+		<div class="label">Tipo Entrega:</div>
+			<div class="input" style="width: 30%">
+				<select id="tipoEntrega" name="pedido.tipoEntrega" style="width: 100%">
+					<option value="">&lt&lt SELECIONE &gt&gt</option>
+					<c:forEach var="tipoEntrega" items="${listaTipoEntrega}">
+						<option value="${tipoEntrega}"
+							<c:if test="${tipoEntrega eq pedido.tipoEntrega}">selected</c:if>>${tipoEntrega.descricao}</option>
+					</c:forEach>
+				</select>
+			</div>
+		<div class="label" style="width: 10%">Transportadora:</div>
 		<div class="input" style="width: 30%">
 			<input type="text" id="transportadora" name="pedido.transportadora.nomeFantasia" value="${pedido.transportadora.nomeFantasia}" style="width: 100%"/>
 			<div class="suggestionsBox" id="containerPesquisaTransportadora" style="display: none; width: 30%"></div>
 		</div>
-		
+		<div class="label">Frete (R$):</div>
+		<div class="input" style="width: 30%">
+			<input id="frete" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 100%" />
+		</div>
 		<div class="label" style="width: 10%">Pagamento:</div>
 		<div class="input" style="width: 30%">
 			<input type="text" id="pagamento" name="pedido.formaPagamento" value="${pedido.formaPagamento}" style="width: 100%"/>
 		</div>
-		<%--
-		<div class="label">Validade:</div>
-		<div class="input" style="width: 80%">
-			<input id="validade" name="pedido.validade" value="${pedido.validade}" style="width: 6%" />
-		</div>
-		--%>
+		<div class="label">Observação:</div>
+			<div class="input areatexto" style="width: 70%">
+				<textarea id="obervacao" name="pedido.observacao"
+					style="width: 100%">${pedido.observacao}</textarea>
+			</div>
 		<div class="bloco_botoes">
 			<input type="button" id="botaoInserirOrcamento" title="Inserir Orçamento" value="" class="botaoInserir"/>
 			<input type="button" id="botaoPDFOrcamento" value="" title="PDF Orçamento" class="botaoPDF" />
@@ -336,6 +370,10 @@ function inserirOrcamento(){
 	<jsp:include page="/bloco/bloco_item_pedido.jsp" />
 	<div class="bloco_botoes">
 		<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
+		<form id="formAnexo" action="orcamento/anexo" method="post" enctype="multipart/form-data">
+			<input type="button" id="botaoAnexarArquivo" title="Anexar Arquivo" value="" class="botaoAnexar" />
+			<input type="file" id="botaoAnexarOculto" style="display: none;" name="anexo"/>
+		</form>
 		<input type="button" id="botaoAceitarOrcamento" title="Aceitar Orçamento" value="" class="botaoAceitar" />
 	</div>
 	

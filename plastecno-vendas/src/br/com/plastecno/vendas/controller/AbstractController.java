@@ -1,6 +1,9 @@
 package br.com.plastecno.vendas.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -56,6 +59,7 @@ public abstract class AbstractController {
     private final Integer numerRegistrosPorPagina = 10;
     private Picklist picklist;
     private final String possuiMultiplosLogradouros = "possuiMultiplosLogradouros";
+    private HttpServletRequest request;
     private Result result;
     private TipoLogradouroService tipoLogradouroService;
     private UsuarioInfo usuarioInfo;
@@ -83,6 +87,7 @@ public abstract class AbstractController {
     public AbstractController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
         this.result = result;
+        this.request = request;
         this.usuarioInfo = usuarioInfo;
         this.DIRETORIO_TEMPLATE_PDF = request != null ? request.getServletContext().getRealPath("/templates") + "/"
                 : null;
@@ -132,6 +137,13 @@ public abstract class AbstractController {
 
     void addAtributoPDF(String nome, Object valor) {
         GERADOR_PDF.addAtributo(nome, valor);
+    }
+
+    void addSessao(String atributo, Object valor) {
+        if (request == null) {
+            throw new IllegalStateException("Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
+        }
+        request.getSession().setAttribute(atributo, valor);
     }
 
     final void ancorarRodape() {
@@ -249,6 +261,7 @@ public abstract class AbstractController {
         pedido.setDataEntregaFormatada(formatarData(pedido.getDataEntrega()));
         pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));
         pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedidoIPI()));
+        pedido.setValorFreteFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorFrete()));
         pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
         pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));
     }
@@ -438,6 +451,14 @@ public abstract class AbstractController {
 
     Integer getNumerRegistrosPorPagina() {
         return numerRegistrosPorPagina;
+    }
+
+    Object getSessao(String atributo) {
+        if (request == null) {
+            throw new IllegalStateException(
+                    "Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
+        }
+        return request.getSession().getAttribute(atributo);
     }
 
     Usuario getUsuario() {
@@ -668,6 +689,14 @@ public abstract class AbstractController {
         return StringUtils.removerMascaraDocumento(documento);
     }
 
+    
+    void removerSessao(String atributo) {
+        if (request == null) {
+            throw new IllegalStateException("Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
+        }
+        request.getSession().removeAttribute(atributo);
+    }
+
     void serializarJson(SerializacaoJson json) {
         if (json == null) {
             return;
@@ -700,6 +729,21 @@ public abstract class AbstractController {
 
     boolean temElementos(Collection<?> lista) {
         return lista != null && !lista.isEmpty();
+    }
+
+    byte[] toByteArray(InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            return new byte[] {};
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int read = 0;
+        while ((read = inputStream.read(buffer, 0, buffer.length)) != -1) {
+            baos.write(buffer, 0, read);
+        }
+        baos.flush();
+        baos.close();
+        return baos.toByteArray();
     }
 
     void verificarPermissaoAcesso(String nomePermissaoAcesso, TipoAcesso... listaTipoAcesso) {

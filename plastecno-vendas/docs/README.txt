@@ -64,3 +64,18 @@ com.caelum.vraptor.proxy.ProxyInvocationException: org.springframework.beans.fac
 =========== COMANDOS PROMPT WINDOWS ===================
 1) Para remover arquivos recursivamente
 for /d /r . %d in (<padrao do nomedo arquivo>) do @if exist "%d" rd /s/q "%d"
+
+================ CONFUIGURACAO DE ENVIO DE EMAIL DO HOTMAIL ==================
+Use as configurações a seguir no seu aplicativo de email. 
+
+    Servidor de entrada (POP3)
+        Endereço do servidor: pop-mail.outlook.com
+        Porta: 995
+        Conexão criptografada: SSL 
+    Servidor de saída (SMTP)
+        Endereço do servidor: smtp-mail.outlook.com
+        Porta: 25 (ou 587 se a 25 estiver bloqueada)
+        Autenticação: Sim
+        Conexão criptografada: TLS 
+    Nome de usuário: seu endereço de email
+    Senha: sua senha

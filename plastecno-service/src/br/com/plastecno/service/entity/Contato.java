@@ -75,7 +75,7 @@ public class Contato implements Serializable {
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da Contato")
 	private LogradouroContato logradouro;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Nome do contato")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 80 }, nomeExibicao = "Nome do contato")
 	private String nome;
 
 	@InformacaoValidavel(nomeExibicao = "Ramal do contato")

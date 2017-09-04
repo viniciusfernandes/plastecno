@@ -7,15 +7,11 @@ import br.com.plastecno.util.StringUtils;
 
 public class CompraEmailBuilder extends PedidoEmailBuilder {
 
-	public CompraEmailBuilder(Pedido pedido, byte[] arquivoAnexo) throws MensagemEmailException {
-		super(pedido, arquivoAnexo);
-	}
-
-	@Override
-	public AnexoEmail gerarArquivoAnexo() {
-		return new AnexoEmail(arquivoAnexo, "application/pdf", "Pedido No. " + pedido.getId() + " "
-				+ pedido.getCliente().getNomeFantasia() + ".pdf", "Pedido de comprado por "
-				+ pedido.getComprador().getNome());
+	public CompraEmailBuilder(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail ... anexos)
+			throws MensagemEmailException {
+		super(pedido, pdfPedido, anexos);
+		pdfPedido.setNome("Pedido No. " + pedido.getId() + " " + pedido.getCliente().getNomeFantasia());
+		pdfPedido.setDescricao("Pedido de comprado por " + pedido.getComprador().getNome());
 	}
 
 	@Override

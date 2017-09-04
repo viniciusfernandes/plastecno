@@ -9,6 +9,7 @@ import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.interceptor.download.Download;
+import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
@@ -17,6 +18,7 @@ import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoCST;
+import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
@@ -26,6 +28,7 @@ import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.json.ClienteJson;
@@ -38,6 +41,8 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Servico
     private ClienteService clienteService;
+
+    private final String ID_ORCAMENTO = "idOrcamento";
 
     @Servico
     private MaterialService materialService;
@@ -76,7 +81,19 @@ public class OrcamentoController extends AbstractPedidoController {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
 
+    @Post("orcamento/temporario/id")
+    public void adicionarIdOrcamentoTemporario(Integer idOrcamento) {
+        addSessao(ID_ORCAMENTO, idOrcamento);
+        serializarJson(new SerializacaoJson("ok", true));
+    }
+
+    @Post("orcamento/anexo")
+    public void anexarArquivoEnvio(UploadedFile anexo) {
+        Integer idOrcamento = (Integer) getSessao(ID_ORCAMENTO);
+        removerSessao(ID_ORCAMENTO);
+        enviarOrcamento(idOrcamento, anexo);
     }
 
     @Post("orcamento/cancelamento/{idOrcamento}")
@@ -112,26 +129,31 @@ public class OrcamentoController extends AbstractPedidoController {
         return super.downloadPDFPedido(idPedido, TipoPedido.REVENDA);
     }
 
-    @Post("orcamento/envio/{id}")
-    public void enviarOrcamento(Integer id) {
+    @Post("orcamento/envio")
+    public void enviarOrcamento(Integer idOrcamento, UploadedFile anexo) {
         try {
-            final PedidoPDFWrapper wrapper = gerarPDF(id, TipoPedido.REVENDA);
+            idOrcamento = 16717;
+            final PedidoPDFWrapper wrapper = gerarPDF(idOrcamento, TipoPedido.REVENDA);
             final Pedido pedido = wrapper.getPedido();
 
-            pedidoService.enviarPedido(id, wrapper.getArquivoPDF());
+            AnexoEmail pdfPedido = new AnexoEmail(wrapper.getArquivoPDF());
+            AnexoEmail anexoEmail = anexo != null ? new AnexoEmail(toByteArray(anexo.getFile()),
+                    anexo.getContentType(), anexo.getFileName(), null) : null;
 
-            final String mensagem = "Orçamento No. " + id + " foi enviado com sucesso para o cliente "
+            pedidoService.enviarPedido(idOrcamento, pdfPedido, anexoEmail);
+
+            final String mensagem = "Orçamento No. " + idOrcamento + " foi enviado com sucesso para o cliente "
                     + pedido.getCliente().getNomeFantasia();
 
             gerarMensagemSucesso(mensagem);
         } catch (NotificacaoException e) {
-            gerarLogErro("envio de email do orcamento No. " + id, e);
+            gerarLogErro("envio de email do orcamento No. " + idOrcamento, e);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             // populando a tela de pedidos
-            redirecTo(this.getClass()).pesquisarOrcamentoById(id);
+            redirecTo(this.getClass()).pesquisarOrcamentoById(idOrcamento);
         } catch (Exception e) {
-            gerarLogErro("envio de email do orcamento No. " + id, e);
+            gerarLogErro("envio de email do orcamento No. " + idOrcamento, e);
         }
         irTopoPagina();
     }
@@ -161,6 +183,7 @@ public class OrcamentoController extends AbstractPedidoController {
         addAtributoCondicional("idRepresentadaSelecionada", representadaService.pesquisarIdRevendedor());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("listaCST", TipoCST.values());
+        addAtributo("listaTipoEntrega", TipoEntrega.values());
     }
 
     /*
@@ -197,9 +220,9 @@ public class OrcamentoController extends AbstractPedidoController {
     @Get("orcamento/{idPedido}")
     public void pesquisarOrcamentoById(Integer idPedido) {
         Pedido pedido = pedidoService.pesquisarPedidoById(idPedido);
-        if (pedido == null || !pedido.isOrcamento()) {
+        if (pedido == null) {
             gerarListaMensagemAlerta("O orçamento No. " + idPedido + " não existe no sistema");
-        } else {
+        } else if (pedido.isOrcamento()) {
             pedido.setRepresentada(pedidoService.pesquisarRepresentadaByIdPedido(idPedido));
             pedido.setTransportadora(pedidoService.pesquisarTransportadoraResumidaByIdPedido(idPedido));
 
@@ -215,7 +238,12 @@ public class OrcamentoController extends AbstractPedidoController {
                     pedidoService.pesquisarIdRepresentadaByIdPedido(idPedido));
             addAtributo("listaItemPedido", listaItem);
         }
-        irTopoPagina();
+
+        if (!pedido.isOrcamento()) {
+            redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA, false);
+        } else {
+            irTopoPagina();
+        }
     }
 
     @Get("orcamento/listagem")

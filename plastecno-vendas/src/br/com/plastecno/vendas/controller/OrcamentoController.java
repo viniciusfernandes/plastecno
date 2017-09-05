@@ -132,7 +132,6 @@ public class OrcamentoController extends AbstractPedidoController {
     @Post("orcamento/envio")
     public void enviarOrcamento(Integer idOrcamento, UploadedFile anexo) {
         try {
-            idOrcamento = 16717;
             final PedidoPDFWrapper wrapper = gerarPDF(idOrcamento, TipoPedido.REVENDA);
             final Pedido pedido = wrapper.getPedido();
 

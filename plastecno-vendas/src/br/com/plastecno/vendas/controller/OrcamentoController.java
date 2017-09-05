@@ -132,13 +132,15 @@ public class OrcamentoController extends AbstractPedidoController {
     @Post("orcamento/envio")
     public void enviarOrcamento(Integer idOrcamento, UploadedFile anexo) {
         try {
-            idOrcamento = 16717;
             final PedidoPDFWrapper wrapper = gerarPDF(idOrcamento, TipoPedido.REVENDA);
             final Pedido pedido = wrapper.getPedido();
 
             AnexoEmail pdfPedido = new AnexoEmail(wrapper.getArquivoPDF());
-            AnexoEmail anexoEmail = anexo != null ? new AnexoEmail(toByteArray(anexo.getFile()),
-                    anexo.getContentType(), anexo.getFileName(), null) : null;
+            AnexoEmail anexoEmail = null;
+            if (anexo != null) {
+                anexoEmail = new AnexoEmail(toByteArray(anexo.getFile()), anexo.getContentType(), anexo.getFileName(),
+                        null);
+            }
 
             pedidoService.enviarPedido(idOrcamento, pdfPedido, anexoEmail);
 

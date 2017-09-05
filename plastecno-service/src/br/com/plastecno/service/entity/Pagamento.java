@@ -1,5 +1,6 @@
 package br.com.plastecno.service.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -21,7 +22,11 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @InformacaoValidavel
 @Entity
 @Table(name = "tb_pagamento", schema = "vendas")
-public class Pagamento {
+public class Pagamento implements Serializable, Cloneable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3646353541626202858L;
 
 	@Column(name = "data_emissao")
 	private Date dataEmissao;
@@ -53,6 +58,9 @@ public class Pagamento {
 	@Column(name = "id_fornecedor")
 	private Integer idFornecedor;
 
+	@Column(name = "id_item_pedido")
+	private Integer idItemPedido;
+
 	@Column(name = "id_pedido")
 	private Integer idPedido;
 
@@ -67,7 +75,7 @@ public class Pagamento {
 	@Column(name = "numero_nf")
 	private Integer numeroNF;
 
-	private Integer parcela;
+	private Integer parcela = 1;
 
 	@Column(name = "quantidade_item")
 	private Integer quantidadeItem;
@@ -81,7 +89,7 @@ public class Pagamento {
 	private TipoPagamento tipoPagamento;
 
 	@Column(name = "total_parcelas")
-	private Integer totalParcelas;
+	private Integer totalParcelas = 1;
 
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Valor do pagamento")
 	@Column(name = "valor")
@@ -104,6 +112,15 @@ public class Pagamento {
 
 	public Pagamento(Integer id) {
 		this.id = id;
+	}
+
+	@Override
+	public Pagamento clone() {
+		try {
+			return (Pagamento) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new IllegalStateException("Falha ao clonar o pagamento " + getDescricao(), e);
+		}
 	}
 
 	public Date getDataEmissao() {
@@ -140,6 +157,10 @@ public class Pagamento {
 
 	public Integer getIdFornecedor() {
 		return idFornecedor;
+	}
+
+	public Integer getIdItemPedido() {
+		return idItemPedido;
 	}
 
 	public Integer getIdPedido() {
@@ -257,6 +278,10 @@ public class Pagamento {
 
 	public void setIdFornecedor(Integer idFornecedor) {
 		this.idFornecedor = idFornecedor;
+	}
+
+	public void setIdItemPedido(Integer idItemPedido) {
+		this.idItemPedido = idItemPedido;
 	}
 
 	public void setIdPedido(Integer idPedido) {

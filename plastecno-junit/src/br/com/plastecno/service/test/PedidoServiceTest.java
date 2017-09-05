@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -611,6 +612,56 @@ public class PedidoServiceTest extends AbstractTest {
 		}
 
 		assertTrue("A quantidade recepcionada e superior a quantidade comprada e deve ser validada", throwed);
+	}
+
+	@Test
+	public void testCalculoParcelasVencimento() {
+		Pedido p = gerarPedidoRevenda();
+		p.setFormaPagamento("10/20/30 dias");
+		try {
+			p = pedidoService.inserir(p);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		// Gerando as datas de parcelamento a partir da data atual.
+		Date dtAtual = new Date();
+		Calendar c = Calendar.getInstance();
+		c.setTime(dtAtual);
+		c.add(Calendar.DAY_OF_MONTH, 10);
+
+		Date dt1 = c.getTime();
+
+		c = Calendar.getInstance();
+		c.setTime(dtAtual);
+		c.add(Calendar.DAY_OF_MONTH, 20);
+
+		Date dt2 = c.getTime();
+
+		c = Calendar.getInstance();
+		c.setTime(dtAtual);
+		c.add(Calendar.DAY_OF_MONTH, 30);
+
+		Date dt3 = c.getTime();
+
+		List<Date> listaData = new ArrayList<Date>();
+		listaData.add(dt1);
+		listaData.add(dt2);
+		listaData.add(dt3);
+
+		List<Date> listaParg = pedidoService.calcularDataPagamento(p.getId(), dtAtual);
+		assertTrue("O pedido contem 3 parcelas de pagamento e deve ter 3 datas de vencimento.", listaParg != null
+				&& listaParg.size() == 3);
+
+		int totalDt = 0;
+		for (Date pag : listaParg) {
+			for (int i = 0; i < listaData.size(); i++) {
+				if (StringUtils.formatarData(listaData.get(i)).equals(StringUtils.formatarData(pag))) {
+					totalDt++;
+				}
+			}
+		}
+		assertTrue("O total de parcelas de vencimento esta diferente do previso e configurado no pedido.", totalDt == 3);
 	}
 
 	@Test

@@ -283,7 +283,7 @@ public class EntidadeBuilder {
 		pedido.setContato(contato);
 		pedido.setTipoEntrega(TipoEntrega.CIF);
 		pedido.setDataEntrega(TestUtils.gerarDataAmanha());
-		pedido.setFormaPagamento("30 dias uteis");
+		pedido.setFormaPagamento("30 / 40 dias uteis");
 		return pedido;
 	}
 

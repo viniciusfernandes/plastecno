@@ -12,10 +12,13 @@ import br.com.plastecno.service.PagamentoService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.TipoPagamento;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
@@ -52,6 +55,9 @@ public class RecepcaoCompraController extends AbstractController {
         Pagamento p = pagamentoService.gerarPagamentoItemPedido(idItem);
         formatarPagamento(p);
         addAtributo("pagamento", p);
+        addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
+        addAtributo("listaTipoPagamento", TipoPagamento.values());
+        addAtributo("listaFornecedor", representadaService.pesquisarRepresentadaAtivoByTipoPedido(TipoPedido.COMPRA));
         pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
@@ -59,6 +65,17 @@ public class RecepcaoCompraController extends AbstractController {
     public void inserirDadosNotaFiscal(Pedido pedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         pedidoService.inserirDadosNotaFiscal(pedido);
         pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+    }
+
+    @Post("compra/item/pagamento/inclusao")
+    public void inserirPagamentoItemPedido(Pagamento pagamento, Date dataInicial, Date dataFinal, Integer idRepresentada) {
+        try {
+            pagamentoService.inserirPagamentoItemPedido(pagamento);
+            pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
     }
 
     @Get("compra/recepcao/listagem")

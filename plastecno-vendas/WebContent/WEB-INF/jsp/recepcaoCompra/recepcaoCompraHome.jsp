@@ -68,6 +68,13 @@ $(document).ready(function() {
 		$(form).attr('action', '<c:url value="/compra/recepcao/inclusaodadosnf"/>'+parametros);
 		$(form).submit();
 	});
+	
+	$('#botaoInserirPagamento').click(function (){
+		adicionarInputHiddenFormulario('formPagamento', 'dataInicial', $('#dataInicial').val());
+		adicionarInputHiddenFormulario('formPagamento', 'dataFinal', $('#dataFinal').val());
+		adicionarInputHiddenFormulario('formPagamento', 'idRepresentada', $('#formPesquisa #idRepresentada').val());
+		$('#formPagamento').attr('action', '<c:url value="/compra/item/pagamento/inclusao"/>').attr('method', 'post').submit();	
+	});
 });
 
 function removerItem(botao){

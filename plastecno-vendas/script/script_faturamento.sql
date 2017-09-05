@@ -6,6 +6,7 @@ create table vendas.tb_tipo_pagamento (
 create table vendas.tb_pagamento (
 	id integer not null,
 	id_fornecedor integer default null,
+	id_item_pedido integer default null,
 	id_pedido integer default null,
 	numero_nf integer default null,
 	parcela integer default null,
@@ -31,6 +32,7 @@ ALTER TABLE vendas.tb_pagamento ADD CONSTRAINT id_tipo_pagamento FOREIGN KEY (id
 create sequence vendas.seq_pagamento_id increment by 1 minvalue 1 no maxvalue start with 1;
 
 create index idx_pagamento_id_fornecedor on vendas.tb_pagamento (id_fornecedor);
+create index idx_pagamento_id_item_pedido on vendas.tb_pagamento (id_item_pedido);
 create index idx_pagamento_id_pedido on vendas.tb_pagamento (id_pedido);
 create index idx_pagamento_numero_nf on vendas.tb_pagamento (numero_nf);
 

@@ -42,6 +42,8 @@ public interface PedidoService {
 
 	List<Date> calcularDataPagamento(Integer idPedido);
 
+	List<Date> calcularDataPagamento(Integer idPedido, Date dataInicial);
+
 	Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException;
 
 	void cancelarOrcamento(Integer idOrcamento) throws BusinessException;

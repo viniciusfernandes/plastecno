@@ -94,7 +94,7 @@
 				</c:if>
 				<c:if test="${acessoPagamentoPermitido}">
 				<li>
-					<a href="pagamento" target="principal_frame">Pagamento</a>
+					<a href="pagamento/periodo/listagem" target="principal_frame">Pagamento</a>
 				</li>
 				</c:if>
 				<li><a href="javascript: void(0)">Relatórios</a>

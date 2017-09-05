@@ -15,6 +15,8 @@ public interface PagamentoService {
 
 	Integer inserir(Pagamento pagamento) throws BusinessException;
 
+	void inserirPagamentoItemPedido(Pagamento pagamento) throws BusinessException;
+
 	void liquidarPagamento(Integer idPagamento);
 
 	Pagamento pesquisarById(Integer idPagamento);

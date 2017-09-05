@@ -147,6 +147,14 @@ public class PagamentoController extends AbstractController {
     @Get("pagamento/periodo/listagem")
     public void pesquisarPagamentoByPeriodo(Date dataInicial, Date dataFinal) {
         try {
+            // Estamos inicializando as datas pois esse metodo eh acessado a
+            // partir do menu inicial
+            if (dataInicial == null) {
+                dataInicial = gerarDataInicioMes();
+            }
+            if (dataFinal == null) {
+                dataFinal = new Date();
+            }
             addListaPagamento(dataInicial, dataFinal);
             irRodapePagina();
         } catch (InformacaoInvalidaException e) {

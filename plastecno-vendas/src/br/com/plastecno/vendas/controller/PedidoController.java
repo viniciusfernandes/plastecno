@@ -540,7 +540,7 @@ public class PedidoController extends AbstractPedidoController {
                 addAtributo("acessoAlteracaoComissaoPermitida", acessoAlteracaoComissaoPermitida);
             }
         }
-        if (pedido.isOrcamento()) {
+        if (pedido != null && pedido.isOrcamento()) {
             redirecTo(OrcamentoController.class).pesquisarOrcamentoById(id);
         } else {
             configurarTipoPedido(tipoPedido);

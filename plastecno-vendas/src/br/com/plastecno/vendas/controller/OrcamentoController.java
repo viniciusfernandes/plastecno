@@ -136,8 +136,11 @@ public class OrcamentoController extends AbstractPedidoController {
             final Pedido pedido = wrapper.getPedido();
 
             AnexoEmail pdfPedido = new AnexoEmail(wrapper.getArquivoPDF());
-            AnexoEmail anexoEmail = anexo != null ? new AnexoEmail(toByteArray(anexo.getFile()),
-                    anexo.getContentType(), anexo.getFileName(), null) : null;
+            AnexoEmail anexoEmail = null;
+            if (anexo != null) {
+                anexoEmail = new AnexoEmail(toByteArray(anexo.getFile()), anexo.getContentType(), anexo.getFileName(),
+                        null);
+            }
 
             pedidoService.enviarPedido(idOrcamento, pdfPedido, anexoEmail);
 

@@ -83,6 +83,9 @@ public class EmailServiceImpl implements EmailService {
 	private void gerarAnexo(MensagemEmail mensagemEmail, MultiPartEmail email) throws EmailException, IOException {
 		if (mensagemEmail.contemAnexo()) {
 			for (AnexoEmail anexo : mensagemEmail.getListaAnexo()) {
+				if (anexo == null) {
+					continue;
+				}
 				email.attach(new ByteArrayDataSource(anexo.getConteudo(), anexo.getTipoAnexo()), anexo.getNome(),
 						anexo.getDescricao());
 			}

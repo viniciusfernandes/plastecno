@@ -30,6 +30,9 @@ public class MensagemEmail implements Serializable {
 			listaAnexo = new ArrayList<AnexoEmail>();
 		}
 		for (AnexoEmail a : anexoEmail) {
+			if (a == null) {
+				continue;
+			}
 			listaAnexo.add(a);
 		}
 	}

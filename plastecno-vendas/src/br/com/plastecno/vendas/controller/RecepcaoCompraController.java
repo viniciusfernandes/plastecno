@@ -58,13 +58,13 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
         addAtributo("listaTipoPagamento", TipoPagamento.values());
         addAtributo("listaFornecedor", representadaService.pesquisarRepresentadaAtivoByTipoPedido(TipoPedido.COMPRA));
-        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        pesquisarCompraAguardandoRecepcao(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao/inclusaodadosnf")
     public void inserirDadosNotaFiscal(Pedido pedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         pedidoService.inserirDadosNotaFiscal(pedido);
-        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        pesquisarCompraAguardandoRecepcao(dataInicial, dataFinal, idRepresentada);
     }
 
     @Post("compra/item/pagamento/inclusao")
@@ -77,16 +77,16 @@ public class RecepcaoCompraController extends AbstractController {
             addAtributo("pagamento", pagamento);
             gerarListaMensagemErro(e);
         }
-        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        pesquisarCompraAguardandoRecepcao(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao/listagem")
-    public void pesquisarCompraAguardandoRecebimento(Date dataInicial, Date dataFinal, Integer idRepresentada) {
+    public void pesquisarCompraAguardandoRecepcao(Date dataInicial, Date dataFinal, Integer idRepresentada) {
 
         try {
             Periodo periodo = Periodo.gerarPeriodo(dataInicial, dataFinal);
             RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService
-                    .gerarRelatorioCompraAguardandoRecebimento(idRepresentada, periodo);
+                    .gerarRelatorioCompraAguardandoRecepcao(idRepresentada, periodo);
 
             addAtributo("relatorio", relatorio);
             if (contemAtributo("permanecerTopo")) {
@@ -118,7 +118,7 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("idRepresentadaSelecionada", idRepresentada);
-        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        pesquisarCompraAguardandoRecepcao(dataInicial, dataFinal, idRepresentada);
         irTopoPagina();
     }
 
@@ -155,7 +155,7 @@ public class RecepcaoCompraController extends AbstractController {
         alteracaoEstoquePublisher.publicar();
 
         addAtributo("permanecerTopo", true);
-        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        pesquisarCompraAguardandoRecepcao(dataInicial, dataFinal, idRepresentada);
     }
 
     @Post("compra/item/recepcao")
@@ -172,6 +172,6 @@ public class RecepcaoCompraController extends AbstractController {
         } catch (BusinessException e) {
             this.gerarListaMensagemErro(e);
         }
-        redirecTo(this.getClass()).pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+        redirecTo(this.getClass()).pesquisarCompraAguardandoRecepcao(dataInicial, dataFinal, idRepresentada);
     }
 }

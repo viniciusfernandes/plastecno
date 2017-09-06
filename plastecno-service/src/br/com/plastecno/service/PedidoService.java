@@ -108,7 +108,7 @@ public interface PedidoService {
 
 	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
 
-	List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo);
+	List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo);
 
 	Pedido pesquisarCompraById(Integer id);
 

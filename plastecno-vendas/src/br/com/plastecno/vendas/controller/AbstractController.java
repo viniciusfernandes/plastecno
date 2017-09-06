@@ -62,9 +62,11 @@ public abstract class AbstractController {
     private TipoLogradouroService tipoLogradouroService;
     private UsuarioInfo usuarioInfo;
     private UsuarioService usuarioService;
+
     public AbstractController(Result result) {
         this(result, null, null);
     }
+
     public AbstractController(Result result, HttpServletRequest request) {
         this(result, null, request);
     }
@@ -251,7 +253,7 @@ public abstract class AbstractController {
         }
     }
 
-    void formatarPagamento(List<Pagamento> lista) {
+    void formatarPagamento(Collection<Pagamento> lista) {
         for (Pagamento p : lista) {
             formatarPagamento(p);
         }

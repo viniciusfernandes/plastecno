@@ -7,11 +7,14 @@ import javax.ejb.Local;
 import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.service.wrapper.RelatorioWrapper;
 
 @Local
 public interface PagamentoService {
 
 	Pagamento gerarPagamentoItemPedido(Integer idItemPedido);
+
+	RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(Periodo periodo);
 
 	Integer inserir(Pagamento pagamento) throws BusinessException;
 

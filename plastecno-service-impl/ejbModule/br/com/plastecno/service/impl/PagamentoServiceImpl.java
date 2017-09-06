@@ -19,7 +19,10 @@ import br.com.plastecno.service.dao.PagamentoDAO;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.wrapper.GrupoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.service.wrapper.RelatorioWrapper;
+import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
 
 @Stateless
@@ -67,6 +70,34 @@ public class PagamentoServiceImpl implements PagamentoService {
 		return p;
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(Periodo periodo) {
+		List<Pagamento> lPagamento = pesquisarPagamentoByPeriodo(periodo);
+
+		RelatorioWrapper<String, Pagamento> relatorio = new RelatorioWrapper<String, Pagamento>("Pagamentos de "
+				+ StringUtils.formatarData(periodo.getInicio()) + " a " + StringUtils.formatarData(periodo.getFim()));
+		GrupoWrapper<String, Pagamento> gr = null;
+		for (Pagamento p : lPagamento) {
+			// Agrupando os pagamentos de compra pelo numero da NF.
+			if (p.getNumeroNF() != null) {
+				// Aqui estamos concatenando u numero da NF com o ID do
+				// fornecedor para criar o ID pois diferentes fornecedores podem
+				// ter o mesmo numreo de NF, assim minimizamos conflitos.
+				gr = relatorio.addGrupo(String.valueOf(p.getNumeroNF()) + p.getIdFornecedor() + p.getParcela(), p);
+				gr.setPropriedade("numeroNF", p.getNumeroNF());
+				gr.setPropriedade("dataVencimento", StringUtils.formatarData(p.getDataVencimento()));
+				gr.setPropriedade("liquidado", p.isLiquidado());
+				gr.setPropriedade("vencido", !p.isLiquidado() && p.isVencido());
+				gr.setPropriedade("valorNF", p.getValorNF());
+			} else {
+				// Todos os outros tipos de pagamentos nao serao agrupados.
+				relatorio.addElemento(p.getId().toString(), p);
+			}
+		}
+		return relatorio;
+	}
+
 	@PostConstruct
 	public void init() {
 		pagamentoDAO = new PagamentoDAO(entityManager);
@@ -101,6 +132,11 @@ public class PagamentoServiceImpl implements PagamentoService {
 	public void inserirPagamentoItemPedido(Pagamento pagamento) throws BusinessException {
 		if (pagamento == null) {
 			return;
+		}
+
+		if (pagamento.getNumeroNF() == null) {
+			throw new BusinessException(
+					"O número da NF deve ser preenchido para a inclusão do pagamento do item do pedido.");
 		}
 
 		Integer idPedido = pagamento.getIdPedido();

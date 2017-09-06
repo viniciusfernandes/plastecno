@@ -100,15 +100,14 @@ $(document).ready(function() {
 	
 	<jsp:include page="/bloco/bloco_edicao_pagamento.jsp"/>
 	
-	<c:if test="${not empty listaPagamento}">
+	<c:if test="${true}">
 	<a id="rodape"></a>
 		<table class="listrada">
-			<caption>${titulo}</caption>
+			<caption>${relatorio.titulo}</caption>
 			<thead>
 				<tr>
 					<th style="width: 3%">Sit.</th>
 					<th style="width: 7%">Venc.</th>
-					<th style="width: 7%">Val.(R$)</th>
 					<th style="width: 7%">NF</th>
 					<th style="width: 7%">Val. NF(R$)</th>
 					<th style="width: 7%">Ped.</th>
@@ -116,64 +115,128 @@ $(document).ready(function() {
 					<th style="width: 5%">Parc.</th>
 					<th style="width: 8%">Forn.</th>
 					<th style="width: 5%">ICMS(R$)</th>
+					<th style="width: 7%">Val.(R$)</th>
 					<th style="width: 7%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach items="${listaPagamento}" var="pagamento" >
-					<tr>
-						<c:choose>
-							<c:when test="${pagamento.liquidado}">
-								<td style="text-align: center"><div class="botaoVerificacaoEfetuadaGrande" title="Liquidado"></div></td>
-							</c:when>
-							<c:when test="${not pagamento.liquidado and pagamento.vencido}">
-								<td style="text-align: center"><div class="botaoVerificacaoFalhaGrande" title="Vencido"></div></td>
-							</c:when>
-							<c:otherwise>
-								<td style="text-align: center"><div class="botaoVerificacaoAguardadaGrande" title="Aguardando"></div></td>
-							</c:otherwise>
-						</c:choose>
-						<td>${pagamento.dataVencimentoFormatada}</td>
-						<td>${pagamento.valor}</td>
-						<td>${pagamento.numeroNF}</td>
-						<td>${pagamento.valorNF}</td>
-						<td>${pagamento.idPedido}</td>
-						<td>${pagamento.descricao}</td>
-						<td>${pagamento.parcelaFormatada}</td>
-						<td>${pagamento.nomeFornecedor}</td>
-						<td>${pagamento.valorCreditoICMS}</td>
-						<td>
-							<div class="coluna_acoes_listagem">
-								<form action="<c:url value="/pagamento/"/>${pagamento.id}" >
-									<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-									<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
-								</form>
-								
+				<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iGrupo">
+					<c:forEach items="${grupo.listaElemento}" var="elemento" varStatus="iElemento">
+						<tr>
+							<c:if test="${iElemento.count le 1}">
 								<c:choose>
-									<c:when test="${not pagamento.liquidado}">
-										<form action="<c:url value="/pagamento/liquidacao/"/>${pagamento.id}" method="post" >
-											<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-											<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-											<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificacaoEfetuadaPequeno" />
-										</form>
+									<c:when test="${grupo.propriedades['liquidado']}">
+										<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center"><div class="botaoVerificacaoEfetuadaGrande" title="Liquidado"></div></td>
+									</c:when>
+									<c:when test="${grupo.propriedades['vencido']}">
+										<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center"><div class="botaoVerificacaoFalhaGrande" title="Vencido"></div></td>
 									</c:when>
 									<c:otherwise>
-										<form action="<c:url value="/pagamento/retonoliquidacao/"/>${pagamento.id}" method="post" >
-											<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-											<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-											<input type="submit" value="" title="Retornar Liquidação Pagamento" class="botaoVerificacaoFalhaPequeno" />
-										</form>
+										<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center"><div class="botaoVerificacaoAguardadaGrande" title="Aguardando"></div></td>
 									</c:otherwise>
 								</c:choose>
-								<form action="<c:url value="/pagamento/remocao/"/>${pagamento.id}" method="post">
-									<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-									<input type="submit" value="" title="Remover Pagamento" class="botaoRemover"/>
-								</form>
-							</div>
-						</td>
-					</tr>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['dataVencimento']}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['numeroNF']}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['valorNF']}</td>
+							</c:if>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.idPedido}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.descricao}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.parcelaFormatada}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeFornecedor}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valorCreditoICMS}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
+							<c:if test="${iElemento.count le 1}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">
+									<div class="coluna_acoes_listagem">
+										<form action="<c:url value="/pagamento/nfparcelada"/>${elemento.id}" >
+											<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+											<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+											<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
+										</form>
+										
+										<c:choose>
+											<c:when test="${not elemento.liquidado}">
+												<form action="<c:url value="/pagamento/liquidacao/nfparcelada"/>${elemento.id}" method="post" >
+													<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+													<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+													<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificacaoEfetuadaPequeno" />
+												</form>
+											</c:when>
+											<c:otherwise>
+												<form action="<c:url value="/pagamento/retonoliquidacao/nfparcelada"/>${elemento.id}" method="post" >
+													<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+													<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+													<input type="submit" value="" title="Retornar Liquidação Pagamento" class="botaoVerificacaoFalhaPequeno" />
+												</form>
+											</c:otherwise>
+										</c:choose>
+										<form action="<c:url value="/pagamento/remocao/"/>${elemento.id}" method="post">
+											<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+											<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+											<input type="submit" value="" title="Remover Pagamento" class="botaoRemover"/>
+										</form>
+									</div>
+								</td>
+							</c:if>
+						</tr>
+					</c:forEach>
+				</c:forEach>
+				<c:forEach items="${relatorio.listaElemento}" var="elemento" varStatus="iElemento">
+						<tr>
+							<c:if test="${iElemento.count le 1}">
+								<c:choose>
+									<c:when test="${elemento.liquidado}">
+										<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"><div class="botaoVerificacaoEfetuadaGrande" title="Liquidado"></div></td>
+									</c:when>
+									<c:when test="${grupo.propriedades['vencido']}">
+										<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"><div class="botaoVerificacaoFalhaGrande" title="Vencido"></div></td>
+									</c:when>
+									<c:otherwise>
+										<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"><div class="botaoVerificacaoAguardadaGrande" title="Aguardando"></div></td>
+									</c:otherwise>
+								</c:choose>
+								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center">${elemento.dataVencimentoFormatada}</td>
+								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"></td>
+								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"></td>
+							</c:if>
+							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
+							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.descricao}</td>
+							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.parcelaFormatada}</td>
+							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
+							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
+							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
+							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">
+								<div class="coluna_acoes_listagem">
+									<form action="<c:url value="/pagamento/"/>${elemento.id}" >
+										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+										<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
+									</form>
+									
+									<c:choose>
+										<c:when test="${not elemento.liquidado}">
+											<form action="<c:url value="/pagamento/liquidacao/"/>${elemento.id}" method="post" >
+												<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+												<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+												<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificacaoEfetuadaPequeno" />
+											</form>
+										</c:when>
+										<c:otherwise>
+											<form action="<c:url value="/pagamento/retonoliquidacao/"/>${elemento.id}" method="post" >
+												<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+												<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+												<input type="submit" value="" title="Retornar Liquidação Pagamento" class="botaoVerificacaoFalhaPequeno" />
+											</form>
+										</c:otherwise>
+									</c:choose>
+									<form action="<c:url value="/pagamento/remocao/"/>${elemento.id}" method="post">
+										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+										<input type="submit" value="" title="Remover Pagamento" class="botaoRemover"/>
+									</form>
+								</div>
+							</td>
+						</tr>
 				</c:forEach>
 			</tbody>
 		</table>

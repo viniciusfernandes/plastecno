@@ -1116,12 +1116,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo) {
+	public List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo) {
 		if (periodo != null) {
-			return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo.getInicio(),
+			return itemPedidoDAO.pesquisarCompraAguardandoRecepcao(idRepresentada, periodo.getInicio(),
 					periodo.getFim());
 		}
-		return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, null, null);
+		return itemPedidoDAO.pesquisarCompraAguardandoRecepcao(idRepresentada, null, null);
 	}
 
 	@Override

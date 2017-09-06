@@ -68,8 +68,6 @@ public interface PedidoService {
 
 	void enviarPedido(Integer idPedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException;
 
-	Pedido inserir(Pedido pedido) throws BusinessException;
-
 	void inserirDadosNotaFiscal(Pedido pedido);
 
 	Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException;
@@ -80,6 +78,8 @@ public interface PedidoService {
 			throws BusinessException;
 
 	Pedido inserirOrcamento(Pedido pedido) throws BusinessException;
+
+	Pedido inserirPedido(Pedido pedido) throws BusinessException;
 
 	boolean isCalculoIPIHabilitado(Integer idPedido);
 

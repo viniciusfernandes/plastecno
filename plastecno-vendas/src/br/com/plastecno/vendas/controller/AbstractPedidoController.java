@@ -193,7 +193,7 @@ public class AbstractPedidoController extends AbstractController {
             addAtributoPDF("listaItem", listaItem);
 
             processarPDF(template);
-            
+
             // Alterando as medidas do PDF gerado.
             int alt = 0;
             int larg = 0;
@@ -265,7 +265,7 @@ public class AbstractPedidoController extends AbstractController {
                             || SituacaoPedido.EMPACOTADO.equals(situacao)
                             || SituacaoPedido.COMPRA_ANDAMENTO.equals(situacao) || SituacaoPedido.ITEM_AGUARDANDO_MATERIAL
                                 .equals(situacao));
-            return SituacaoPedido.CANCELADO.equals(situacao) || isCompraFinalizada || isVendaFinalizada;
+            return SituacaoPedido.isCancelado(situacao) || isCompraFinalizada || isVendaFinalizada;
         }
     }
 

@@ -441,7 +441,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoCompra.setTipoPedido(TipoPedido.COMPRA);
 		pedidoCompra.setTipoEntrega(TipoEntrega.CIF);
 
-		pedidoCompra = inserir(pedidoCompra);
+		pedidoCompra = inserirPedido(pedidoCompra);
 		ItemPedido itemCadastrado = null;
 		ItemPedido itemClone = null;
 		boolean incluiAlgumItem = false;
@@ -532,7 +532,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pClone.setValorTotalNF(null);
 		pClone.setListaLogradouro(null);
 		pClone.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO_DIGITACAO : SituacaoPedido.DIGITACAO);
-		pClone = inserir(pClone);
+		pClone = inserirPedido(pClone);
 
 		List<ItemPedido> listaItemPedido = pesquisarItemPedidoByIdPedido(idPedido);
 		ItemPedido iClone = null;
@@ -666,9 +666,13 @@ public class PedidoServiceImpl implements PedidoService {
 		final Pedido pedido = pesquisarPedidoById(idPedido);
 
 		if (pedido == null) {
-			throw new BusinessException("Pedido não exite no sistema");
+			throw new BusinessException("Pedido/Orçamento não exite no sistema");
 		}
 
+		if(pedido.isCancelado()){
+			throw new BusinessException("Pedido/Orçamento foi cancelado e não pode ser enviado.");
+		}
+		
 		// A data de emissao nao pode ser alterada pois dara conflito no calculo
 		// de comissao de vendas
 		if (pedido.getDataEnvio() == null) {
@@ -741,15 +745,10 @@ public class PedidoServiceImpl implements PedidoService {
 		itemPedidoDAO = new ItemPedidoDAO(entityManager);
 	}
 
-	/*
-	 * Esse metodo retorna um pedido pois, apos a inclusao de um novo pedido,
-	 * configuramos a data de inclusao como sendo a data atual, e essa
-	 * informacao deve ser retornada para o componente chamador.
-	 */
-	@Override
-	public Pedido inserir(Pedido pedido) throws BusinessException {
-		if (SituacaoPedido.CANCELADO.equals(pedido.getSituacaoPedido())) {
-			throw new InformacaoInvalidaException("Pedido ja foi cancelado e nao pode ser alterado");
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	private Pedido inserir(Pedido pedido) throws BusinessException {
+		if (pedido.isCancelado()) {
+			throw new InformacaoInvalidaException("Pedido/Orçamento ja foi cancelado e não pode ser alterado");
 		}
 
 		definirTipoPedido(pedido);
@@ -971,33 +970,57 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public Pedido inserirOrcamento(Pedido pedido) throws BusinessException {
-		if (pedido == null) {
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Pedido inserirOrcamento(Pedido orcamento) throws BusinessException {
+		if (orcamento == null) {
 			return null;
 		}
 
-		if (pedido.isNovo()) {
-			pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO_DIGITACAO);
-		} else if (!pedido.isNovo() && !pedido.isOrcamentoDigitacao()) {
-			// Estamos garantindo que teremos um orcamento no caso de edicao de
-			// um orcamento ja enviado
-			pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
+		if (orcamento.isNovo()) {
+			orcamento.setSituacaoPedido(SituacaoPedido.ORCAMENTO_DIGITACAO);
+		} else {
+			// Garantindo a coerencia da situacao do pedido.
+			orcamento.setSituacaoPedido(pesquisarSituacaoPedidoById(orcamento.getId()));
 		}
-		Cliente cliente = pedido.getCliente();
+
+		if (!orcamento.isOrcamento()) {
+			throw new BusinessException("Esse pedido não é um orçamento e portanto não pode ser incluído dessa forma");
+		}
+
+		Cliente cliente = orcamento.getCliente();
 		if (cliente == null) {
 			throw new BusinessException(
 					"O orçamento não contém cliente. O cliente deve ter ao menos um nome para a inclusão do orçamento.");
 		}
 		cliente.setRazaoSocial(cliente.getNomeFantasia());
-		cliente.addContato(new ContatoCliente(pedido.getContato()));
-		cliente.setVendedor(pedido.getVendedor());
+		cliente.addContato(new ContatoCliente(orcamento.getContato()));
+		cliente.setVendedor(orcamento.getVendedor());
 
 		cliente.setRamoAtividade(ramoAtividadeService.pesquisarRamoAtividadePadrao());
 
-		if (pedido.isClienteNovo()) {
-			cliente.setVendedor(pedido.getVendedor());
-			pedido.setCliente(clienteService.inserir(cliente));
+		if (orcamento.isClienteNovo()) {
+			cliente.setVendedor(orcamento.getVendedor());
+			orcamento.setCliente(clienteService.inserir(cliente));
 		}
+		return inserir(orcamento);
+	}
+
+	/*
+	 * Esse metodo retorna um pedido pois, apos a inclusao de um novo pedido,
+	 * configuramos a data de inclusao como sendo a data atual, e essa
+	 * informacao deve ser retornada para o componente chamador.
+	 */
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Pedido inserirPedido(Pedido pedido) throws BusinessException {
+		if (pedido == null) {
+			return null;
+		}
+
+		if (pedido.isOrcamento()) {
+			return inserirOrcamento(pedido);
+		}
+
 		return inserir(pedido);
 	}
 

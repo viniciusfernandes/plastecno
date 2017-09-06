@@ -49,7 +49,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 		}
 		Pagamento p = new Pagamento();
 		p.setDataRecebimento(new Date());
-		p.setDescricao(i.getDescricaoItemMaterial());
+		p.setDescricao(i.getDescricao());
 		p.setIdFornecedor(i.getIdRepresentada());
 		p.setIdItemPedido(idItemPedido);
 		p.setIdPedido(i.getIdPedido());

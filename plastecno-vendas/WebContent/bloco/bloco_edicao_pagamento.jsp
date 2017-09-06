@@ -38,6 +38,7 @@ $(document).ready(function() {
 <form id="formPagamento" action="<c:url value="/pagamento/inclusao"/>" method="post">
 		<input type="hidden" id="idFornecedor" name="pagamento.idFornecedor" value="${pagamento.idFornecedor}"/>
 		<input type="hidden" id="idPagamento" name="pagamento.id" value="${pagamento.id}"/>
+		<input type="hidden" id="idItemPedidoPagamento" name="pagamento.idItemPedido" value="${pagamento.idItemPedido}"/>
 		
 	<fieldset>
 		<legend>Pagamento</legend>

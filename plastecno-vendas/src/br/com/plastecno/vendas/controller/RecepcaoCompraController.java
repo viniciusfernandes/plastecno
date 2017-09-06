@@ -71,11 +71,13 @@ public class RecepcaoCompraController extends AbstractController {
     public void inserirPagamentoItemPedido(Pagamento pagamento, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         try {
             pagamentoService.inserirPagamentoItemPedido(pagamento);
-            pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
+            gerarMensagemSucesso("Pagamento incluído com sucesso. Pedido No. " + pagamento.getIdPedido() + " item "
+                    + pagamento.getDescricao());
         } catch (BusinessException e) {
+            addAtributo("pagamento", pagamento);
             gerarListaMensagemErro(e);
-            irTopoPagina();
         }
+        pesquisarCompraAguardandoRecebimento(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao/listagem")

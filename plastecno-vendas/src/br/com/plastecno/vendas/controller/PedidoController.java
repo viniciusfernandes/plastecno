@@ -339,11 +339,7 @@ public class PedidoController extends AbstractPedidoController {
                     .getId());
 
             pedido.setProprietario(proprietario);
-            if (pedido.isOrcamento()) {
-                pedidoService.inserirOrcamento(pedido);
-            } else {
-                pedidoService.inserir(pedido);
-            }
+            pedidoService.inserirPedido(pedido);
 
             addAtributo("orcamento", pedido.isOrcamento());
             addAtributo("isCompra", pedido.isCompra());

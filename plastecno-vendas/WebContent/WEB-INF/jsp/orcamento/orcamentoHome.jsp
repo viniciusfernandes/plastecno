@@ -71,6 +71,26 @@ $(document).ready(function() {
 		if (isEmpty(idPedido)) {
 			return;
 		} 
+		
+		var tot = 0;
+		var files  = document.getElementById("botaoAnexarOculto").files;
+		for(var i =0; i< files.length;i++){
+			tot += files[i].size;
+		}
+		var mb = 1000000;
+		tot = tot/mb;
+		
+		var max = 20; 
+		if(tot > max){
+			var mens = new Array();
+			mens[0]='O tamanho dos arquivos anexados é '+tot+' Mb, mas não pode ultrapassar '+max+' Mb.';
+			for(var i =0; i< files.length;i++){
+				mens[i+1] = files[i].name+' '+files[i].size/mb+' Mb';
+			}
+			gerarListaMensagemAlerta(mens);
+			return;
+		}
+		
 		var url = '<c:url value="orcamento/temporario/id"/>';
 		var request = $.ajax({
 			type : "post",
@@ -201,9 +221,9 @@ function inserirOrcamento(){
 			$('#idPedido').val(pedidoJson.id);
 			$('#numeroPedido').val(pedidoJson.id);
 			$('#numeroPedidoPesquisa').val(pedidoJson.id);
-			$('#formEnvioOrcamento #idPedido').val(pedidoJson.id);
 			
 			$('#situacaoPedido').val(pedidoJson.situacaoPedido);
+			$('#idSituacaoPedido').val(pedidoJson.situacaoPedido);
 			$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);
 			$('#proprietario').val(
 					pedidoJson.proprietario.nome + ' - '
@@ -244,8 +264,9 @@ function inserirOrcamento(){
 		<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${pedido.proprietario.id}"/>
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<input type="hidden" id="idPedido"  name="pedido.id" value="${pedido.id}"/>
-		<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
 		<input type="hidden" id="idTransportadora"  name="pedido.transportadora.id" value="${pedido.transportadora.id}"/>
+		<input type="hidden" id="idSituacaoPedido"  name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
+		
 	<fieldset>
 		<legend>Orçamento</legend>
 		
@@ -272,8 +293,8 @@ function inserirOrcamento(){
 		
 		<div class="label" style="width: 10%">Situação:</div>
 			<div class="input" style="width: 40%">
-				<input type="text" id="situacaoPedido" name="pedido.situacaoPedido" 
-					value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled" style="width: 75%"/>
+				<input type="text" id="situacaoPedido"  value="${pedido.situacaoPedido}" 
+					class="desabilitado" disabled="disabled" style="width: 75%"/>
 			</div>
 		<div class="label obrigatorio" >Fornecedor:</div>
 		<div class="input" style="width: 30%">
@@ -281,7 +302,7 @@ function inserirOrcamento(){
 				<option value="">&lt&lt SELECIONE &gt&gt</option>
 				<c:forEach var="representada" items="${listaRepresentada}">
 					<option value="${representada.id}"
-						<c:if test="${representada.id eq idRepresentadaSelecionada}">selected</c:if>>${representada.nomeFantasia}</option>
+						<c:if test="${representada.id eq idRepresentadaSelecionada or (representada.id eq pedido.representada.id)}">selected</c:if>>${representada.nomeFantasia}</option>
 				</c:forEach>
 			</select>
 		</div>
@@ -372,7 +393,7 @@ function inserirOrcamento(){
 		<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
 		<form id="formAnexo" action="orcamento/anexo" method="post" enctype="multipart/form-data">
 			<input type="button" id="botaoAnexarArquivo" title="Anexar Arquivo" value="" class="botaoAnexar" />
-			<input type="file" id="botaoAnexarOculto" style="display: none;" name="anexo"/>
+			<input type="file" id="botaoAnexarOculto" style="display: none;" name="anexo[]" multiple="multiple"/>
 		</form>
 		<input type="button" id="botaoAceitarOrcamento" title="Aceitar Orçamento" value="" class="botaoAceitar" />
 	</div>

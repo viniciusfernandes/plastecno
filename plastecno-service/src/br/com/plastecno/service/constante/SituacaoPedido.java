@@ -33,17 +33,25 @@ public enum SituacaoPedido {
 	}
 	
 	private static List<SituacaoPedido> listaOrcamento = new ArrayList<SituacaoPedido>();
+	private static List<SituacaoPedido> listaCancelado= new ArrayList<SituacaoPedido>();
 	static{
 		listaOrcamento.add(ORCAMENTO);
 		listaOrcamento.add(ORCAMENTO_ACEITO);
 		listaOrcamento.add(ORCAMENTO_CANCELADO);
 		listaOrcamento.add(ORCAMENTO_DIGITACAO);
+		
+		listaCancelado.add(CANCELADO);
+		listaCancelado.add(ORCAMENTO_CANCELADO);
 	}
 	public static List<SituacaoPedido> getListaOrcamento(){
 		return listaOrcamento;
 	}
 	
 	public static boolean isOrcamento(SituacaoPedido situacaoPedido){
-		return situacaoPedido!=null && listaOrcamento.contains(situacaoPedido);
+		return situacaoPedido != null && listaOrcamento.contains(situacaoPedido);
+	}
+	
+	public static boolean isCancelado(SituacaoPedido situacaoPedido){
+		return situacaoPedido != null && listaCancelado.contains(situacaoPedido);
 	}
 }

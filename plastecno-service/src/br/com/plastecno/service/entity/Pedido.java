@@ -513,6 +513,10 @@ public class Pedido implements Serializable, Cloneable {
 		return id != null ? id : -1;
 	}
 
+	public boolean isCancelado() {
+		return SituacaoPedido.isCancelado(situacaoPedido);
+	}
+
 	public boolean isClienteNotificadoVenda() {
 		return this.clienteNotificadoVenda;
 	}

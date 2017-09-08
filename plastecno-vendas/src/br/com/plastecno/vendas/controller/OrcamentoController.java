@@ -8,6 +8,7 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.Validator;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.plastecno.service.ClienteService;
@@ -58,10 +59,12 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Servico
     private UsuarioService usuarioService;
+    private Validator validador;
 
     public OrcamentoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
-            HttpServletRequest request) {
+            HttpServletRequest request, Validator validador) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
+        this.validador = validador;
         verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS);
 
         super.setClienteService(clienteService);
@@ -78,8 +81,8 @@ public class OrcamentoController extends AbstractPedidoController {
             // usuario para a tela de vendas apos o aceite.
             redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA, true);
         } catch (BusinessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            gerarListaMensagemErro(e);
+            pesquisarOrcamentoById(id);
         }
     }
 
@@ -90,7 +93,7 @@ public class OrcamentoController extends AbstractPedidoController {
     }
 
     @Post("orcamento/anexo")
-    public void anexarArquivoEnvio(UploadedFile anexo) {
+    public void anexarArquivoEnvio(List<UploadedFile> anexo) {
         Integer idOrcamento = (Integer) getSessao(ID_ORCAMENTO);
         removerSessao(ID_ORCAMENTO);
         enviarOrcamento(idOrcamento, anexo);
@@ -130,16 +133,21 @@ public class OrcamentoController extends AbstractPedidoController {
     }
 
     @Post("orcamento/envio")
-    public void enviarOrcamento(Integer idOrcamento, UploadedFile anexo) {
+    public void enviarOrcamento(Integer idOrcamento, List<UploadedFile> anexo) {
+        validador.onErrorRedirectTo(ErroController.class).erroHome();
         try {
             final PedidoPDFWrapper wrapper = gerarPDF(idOrcamento, TipoPedido.REVENDA);
             final Pedido pedido = wrapper.getPedido();
 
             AnexoEmail pdfPedido = new AnexoEmail(wrapper.getArquivoPDF());
-            AnexoEmail anexoEmail = null;
+            AnexoEmail[] anexoEmail = null;
             if (anexo != null) {
-                anexoEmail = new AnexoEmail(toByteArray(anexo.getFile()), anexo.getContentType(), anexo.getFileName(),
-                        null);
+                anexoEmail = new AnexoEmail[anexo.size()];
+                for (int i = 0; i < anexoEmail.length; i++) {
+                    anexoEmail[i] = new AnexoEmail(toByteArray(anexo.get(i).getFile()), anexo.get(i).getContentType(),
+                            anexo.get(i).getFileName(), null);
+                }
+
             }
 
             pedidoService.enviarPedido(idOrcamento, pdfPedido, anexoEmail);
@@ -165,6 +173,9 @@ public class OrcamentoController extends AbstractPedidoController {
         forwardTo(PedidoController.class).inserirItemPedido(numeroPedido, itemPedido, aliquotaIPI);
     }
 
+    // Aqui o nome do parametro eh "pedido" pois parte do javascript foi
+    // reaproveitado da tela de pedidos e os parametros sao enviados com esse
+    // nome.
     @Post("orcamento/inclusao")
     public void inserirOrcamento(Pedido pedido, Contato contato, Cliente cliente) {
         if (cliente != null) {
@@ -172,7 +183,7 @@ public class OrcamentoController extends AbstractPedidoController {
             cliente.setRazaoSocial(cliente.getNomeFantasia());
             removerMascaraDocumento(cliente);
         }
-        pedido.setFinalidadePedido(TipoFinalidadePedido.OUTRA_ENTRADA);
+        pedido.setFinalidadePedido(TipoFinalidadePedido.INDUSTRIALIZACAO);
         pedido.setCliente(cliente);
         forwardTo(PedidoController.class).inserirPedido(pedido, contato, true);
     }

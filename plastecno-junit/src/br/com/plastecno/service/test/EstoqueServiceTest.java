@@ -310,7 +310,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		gerarRevendedor();
 
 		try {
-			pedido = pedidoService.inserir(pedido);
+			pedido = pedidoService.inserirPedido(pedido);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}

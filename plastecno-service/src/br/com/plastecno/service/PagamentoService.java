@@ -22,6 +22,8 @@ public interface PagamentoService {
 
 	void liquidarPagamento(Integer idPagamento);
 
+	void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela);
+
 	Pagamento pesquisarById(Integer idPagamento);
 
 	List<Pagamento> pesquisarByIdPedido(Integer idPedido);
@@ -36,5 +38,8 @@ public interface PagamentoService {
 
 	void remover(Integer idPagamento) throws BusinessException;
 
-	void retornarLiquidacaoPagamento(Integer idPagamento);
+	void retornarLiquidacaoPagamento(Integer idPagamento) throws BusinessException;
+
+	void retornarLiquidacaoPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela)
+			throws BusinessException;
 }

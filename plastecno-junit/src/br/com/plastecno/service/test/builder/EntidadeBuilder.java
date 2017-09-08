@@ -262,6 +262,13 @@ public class EntidadeBuilder {
 		return p;
 	}
 
+	public Pagamento buildPagamentoNF() {
+		Pagamento p = buildPagamento();
+		p.setTotalParcelas(3);
+		p.setNumeroNF(1234);
+		return p;
+	}
+
 	public Pedido buildPedido() {
 		Usuario vendedor = buildVendedor();
 		Cliente cliente = buildCliente();

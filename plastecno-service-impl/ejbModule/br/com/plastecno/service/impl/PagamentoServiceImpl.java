@@ -37,7 +37,9 @@ public class PagamentoServiceImpl implements PagamentoService {
 	private PedidoService pedidoService;
 
 	private Integer calcularTotalParcelas(Integer idPedido) {
-		return pedidoService.calcularDataPagamento(idPedido).size();
+		int tot = pedidoService.calcularDataPagamento(idPedido).size();
+		// Estamos retornando 1 indicando o pagamento a vista.
+		return tot == 0 ? 1 : tot;
 	}
 
 	@Override
@@ -78,6 +80,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 		RelatorioWrapper<String, Pagamento> relatorio = new RelatorioWrapper<String, Pagamento>("Pagamentos de "
 				+ StringUtils.formatarData(periodo.getInicio()) + " a " + StringUtils.formatarData(periodo.getFim()));
 		GrupoWrapper<String, Pagamento> gr = null;
+		Double val = null;
 		for (Pagamento p : lPagamento) {
 			// Agrupando os pagamentos de compra pelo numero da NF.
 			if (p.getNumeroNF() != null) {
@@ -89,7 +92,15 @@ public class PagamentoServiceImpl implements PagamentoService {
 				gr.setPropriedade("dataVencimento", StringUtils.formatarData(p.getDataVencimento()));
 				gr.setPropriedade("liquidado", p.isLiquidado());
 				gr.setPropriedade("vencido", !p.isLiquidado() && p.isVencido());
-				gr.setPropriedade("valorNF", p.getValorNF());
+
+				val = (Double) gr.getPropriedade("valorNF");
+				if (val == null) {
+					val = 0d;
+				}
+
+				// O valor da NF do relatorio deve ser a soma de todos valores
+				// dos itens.
+				gr.setPropriedade("valorNF", val + p.getValor());
 			} else {
 				// Todos os outros tipos de pagamentos nao serao agrupados.
 				relatorio.addElemento(p.getId().toString(), p);
@@ -163,9 +174,10 @@ public class PagamentoServiceImpl implements PagamentoService {
 			clone.setDataVencimento(listaData.get(i));
 			clone.setParcela(i + 1);
 			clone.setTotalParcelas(totParc);
+			clone.setValor(pagamento.getValor() / totParc);
+			clone.setValorCreditoICMS(pagamento.getValorCreditoICMS() / totParc);
 			inserir(clone);
 		}
-
 	}
 
 	@Override
@@ -175,6 +187,12 @@ public class PagamentoServiceImpl implements PagamentoService {
 			return;
 		}
 		pagamentoDAO.liquidarPagamento(idPagamento);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela) {
+		pagamentoDAO.liquidarPagamentoNFParcelada(numeroNF, idFornecedor, parcela);
 	}
 
 	@Override
@@ -233,10 +251,22 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void retornarLiquidacaoPagamento(Integer idPagamento) {
+	public void retornarLiquidacaoPagamento(Integer idPagamento) throws BusinessException {
 		if (idPagamento == null) {
-			return;
+			throw new BusinessException("O ID do pagamento é obrigatório para retornar a liquidação.");
 		}
-		pagamentoDAO.alterarPropriedade(Pagamento.class, idPagamento, "liquidado", false);
+		pagamentoDAO.retornarLiquidacaoPagamento(idPagamento);
 	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void retornarLiquidacaoPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela)
+			throws BusinessException {
+		if (numeroNF == null || idFornecedor == null || parcela == null) {
+			throw new BusinessException(
+					"O número da NF, ID do fornecedor e a parcela são obrigatórios para retornar a liquidação da NF.");
+		}
+		pagamentoDAO.retornarLiquidacaoPagamentoNFParcelada(numeroNF, idFornecedor, parcela);
+	}
+
 }

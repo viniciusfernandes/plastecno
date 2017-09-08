@@ -72,7 +72,6 @@ public class PagamentoController extends AbstractController {
             gerarListaMensagemAlerta(e);
             irTopoPagina();
         }
-
     }
 
     @Post("pagamento/inclusao")
@@ -98,6 +97,15 @@ public class PagamentoController extends AbstractController {
     public void liquidarPagamento(Integer idPagamento, Date dataInicial, Date dataFinal) {
         pagamentoService.liquidarPagamento(idPagamento);
         gerarMensagemSucesso("Pagamento liquidado com sucesso.");
+        gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
+    }
+
+    @Post("pagamento/liquidacao/nfparcelada")
+    public void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela,
+            String nomeFornecedor, Date dataInicial, Date dataFinal) {
+        pagamentoService.liquidarPagamentoNFParcelada(numeroNF, idFornecedor, parcela);
+        gerarMensagemSucesso("A parcela No. " + parcela + "da NF " + numeroNF + " do fornecedor " + nomeFornecedor
+                + " liquidada com sucesso.");
         gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
     }
 
@@ -180,7 +188,35 @@ public class PagamentoController extends AbstractController {
 
     @Post("pagamento/retonoliquidacao/{idPagamento}")
     public void retornarLiquidacaoPagamento(Integer idPagamento, Date dataInicial, Date dataFinal) {
-        pagamentoService.retornarLiquidacaoPagamento(idPagamento);
-        pesquisarPagamentoById(idPagamento, dataInicial, dataFinal);
+        try {
+            pagamentoService.retornarLiquidacaoPagamento(idPagamento);
+            gerarMensagemSucesso("O retorno da liquidação do pagamento foi realizado com sucesso.");
+        } catch (BusinessException e) {
+            pesquisarPagamentoById(idPagamento, dataInicial, dataFinal);
+            gerarListaMensagemErro(e);
+        }
+        try {
+            gerarRelatorioPagamento(dataInicial, dataFinal);
+        } catch (InformacaoInvalidaException e) {
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
+    }
+
+    @Post("pagamento/retonoliquidacao/nfparcelada")
+    public void retornarLiquidacaoPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela,
+            String nomeFornecedor, Date dataInicial, Date dataFinal) {
+        try {
+            pagamentoService.retornarLiquidacaoPagamentoNFParcelada(numeroNF, idFornecedor, parcela);
+            gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
+        } catch (BusinessException e) {
+            try {
+                gerarRelatorioPagamento(dataInicial, dataFinal);
+            } catch (InformacaoInvalidaException e1) {
+                e.addMensagem(e1.getListaMensagem());
+            }
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
     }
 }

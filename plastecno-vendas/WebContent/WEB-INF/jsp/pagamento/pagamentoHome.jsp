@@ -116,7 +116,7 @@ $(document).ready(function() {
 					<th style="width: 8%">Forn.</th>
 					<th style="width: 5%">ICMS(R$)</th>
 					<th style="width: 7%">Val.(R$)</th>
-					<th style="width: 7%">Ação</th>
+					<th colspan="2" style="width: 7%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -145,36 +145,47 @@ $(document).ready(function() {
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeFornecedor}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valorCreditoICMS}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" style="width: 5%">
+								<div class="coluna_acoes_listagem">
+								<form action="<c:url value="/pagamento/"/>${elemento.id}" >
+									<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+									<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
+								</form>
+								<form action="<c:url value="/pagamento/remocao/"/>${elemento.id}" method="post">
+									<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+									<input type="submit" value="" title="Remover Pagamento" class="botaoRemover"/>
+								</form>
+								</div>
+							</td>
 							<c:if test="${iElemento.count le 1}">
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="width: 2%">
 									<div class="coluna_acoes_listagem">
-										<form action="<c:url value="/pagamento/nfparcelada"/>${elemento.id}" >
-											<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-											<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-											<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
-										</form>
-										
 										<c:choose>
 											<c:when test="${not elemento.liquidado}">
-												<form action="<c:url value="/pagamento/liquidacao/nfparcelada"/>${elemento.id}" method="post" >
+												<form action="<c:url value="/pagamento/liquidacao/nfparcelada"/>" method="post" >
 													<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 													<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+													<input type="hidden" name="numeroNF" value="${elemento.numeroNF}"/>
+													<input type="hidden" name="idFornecedor" value="${elemento.idFornecedor}"/>
+													<input type="hidden" name="nomeFornecedor" value="${elemento.nomeFornecedor}"/>
+													<input type="hidden" name="parcela" value="${elemento.parcela}"/>
 													<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificacaoEfetuadaPequeno" />
 												</form>
 											</c:when>
 											<c:otherwise>
-												<form action="<c:url value="/pagamento/retonoliquidacao/nfparcelada"/>${elemento.id}" method="post" >
+												<form action="<c:url value="/pagamento/retonoliquidacao/nfparcelada"/>" method="post" >
 													<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 													<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+													<input type="hidden" name="numeroNF" value="${elemento.numeroNF}"/>
+													<input type="hidden" name="idFornecedor" value="${elemento.idFornecedor}"/>
+													<input type="hidden" name="nomeFornecedor" value="${elemento.nomeFornecedor}"/>
+													<input type="hidden" name="parcela" value="${elemento.parcela}"/>
 													<input type="submit" value="" title="Retornar Liquidação Pagamento" class="botaoVerificacaoFalhaPequeno" />
 												</form>
 											</c:otherwise>
 										</c:choose>
-										<form action="<c:url value="/pagamento/remocao/"/>${elemento.id}" method="post">
-											<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-											<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-											<input type="submit" value="" title="Remover Pagamento" class="botaoRemover"/>
-										</form>
 									</div>
 								</td>
 							</c:if>
@@ -205,7 +216,7 @@ $(document).ready(function() {
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
-							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">
+							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" colspan="2">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/pagamento/"/>${elemento.id}" >
 										<input type="hidden" name="dataInicial" value="${dataInicial}"/>

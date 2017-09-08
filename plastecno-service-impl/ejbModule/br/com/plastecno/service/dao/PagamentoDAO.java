@@ -71,6 +71,11 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 				.getResultList();
 	}
 
+	public void removerPagamentoPaceladoItemPedido(Integer idItemPedido) {
+		entityManager.createQuery("delete from Pagamento p where p.idItemPedido = :idItemPedido ")
+				.setParameter("idItemPedido", idItemPedido).executeUpdate();
+	}
+
 	public void retornarLiquidacaoPagamento(Integer idPagamento) {
 		liquidarPagamento(idPagamento, false);
 	}

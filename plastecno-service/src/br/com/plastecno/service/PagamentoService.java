@@ -38,6 +38,8 @@ public interface PagamentoService {
 
 	void remover(Integer idPagamento) throws BusinessException;
 
+	void removerPagamentoPaceladoItemPedido(Integer idItemPedido) throws BusinessException;
+
 	void retornarLiquidacaoPagamento(Integer idPagamento) throws BusinessException;
 
 	void retornarLiquidacaoPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela)

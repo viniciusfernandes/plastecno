@@ -54,7 +54,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 		}
 		Pagamento p = new Pagamento();
 		p.setDataRecebimento(new Date());
-		p.setDescricao(i.getDescricao());
+		p.setDescricao(i.getDescricaoSemFormatacao());
 		p.setIdFornecedor(i.getIdRepresentada());
 		p.setIdItemPedido(idItemPedido);
 		p.setIdPedido(i.getIdPedido());
@@ -247,6 +247,15 @@ public class PagamentoServiceImpl implements PagamentoService {
 			return;
 		}
 		pagamentoDAO.remover(new Pagamento(idPagamento));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerPagamentoPaceladoItemPedido(Integer idItemPedido) throws BusinessException {
+		if (idItemPedido == null) {
+			return;
+		}
+		pagamentoDAO.removerPagamentoPaceladoItemPedido(idItemPedido);
 	}
 
 	@Override

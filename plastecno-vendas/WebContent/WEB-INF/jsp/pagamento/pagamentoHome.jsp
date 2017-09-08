@@ -152,7 +152,7 @@ $(document).ready(function() {
 									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 									<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
 								</form>
-								<form action="<c:url value="/pagamento/remocao/"/>${elemento.id}" method="post">
+								<form action="<c:url value="/pagamento/remocao/nfparcelada/"/>${elemento.idItemPedido}" method="post">
 									<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 									<input type="submit" value="" title="Remover Pagamento" class="botaoRemover"/>

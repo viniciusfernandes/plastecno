@@ -58,13 +58,15 @@ public class PagamentoController extends AbstractController {
     @Get("pagamento/periodo/listagem")
     public void gerarRelatorioPagamentoByPeriodo(Date dataInicial, Date dataFinal) {
         try {
+
+            Date dtAtual = new Date();
             // Estamos inicializando as datas pois esse metodo eh acessado a
             // partir do menu inicial
             if (dataInicial == null) {
-                dataInicial = gerarDataInicioMes();
+                dataInicial = dtAtual;
             }
             if (dataFinal == null) {
-                dataFinal = new Date();
+                dataFinal = dtAtual;
             }
             gerarRelatorioPagamento(dataInicial, dataFinal);
             irRodapePagina();
@@ -114,7 +116,8 @@ public class PagamentoController extends AbstractController {
         addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
         addAtributo("listaTipoPagamento", TipoPagamento.values());
         addAtributo("listaFornecedor", representadaService.pesquisarRepresentadaAtivoByTipoPedido(TipoPedido.COMPRA));
-        addPeriodo(gerarDataInicioMes(), new Date());
+        Date dtAtual = new Date();
+        addPeriodo(dtAtual, dtAtual);
     }
 
     @Get("pagamento/fornecedor/listagem")
@@ -181,6 +184,17 @@ public class PagamentoController extends AbstractController {
             gerarMensagemSucesso("Pagamento removido com sucesso.");
         } catch (BusinessException e) {
             addPagamento(pagamentoService.pesquisarById(idPagamento));
+            gerarListaMensagemErro(e);
+        }
+        gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
+    }
+
+    @Post("pagamento/remocao/nfparcelada/{idItemPedido}")
+    public void removerPagamentoParceladoItemPedido(Integer idItemPedido, Date dataInicial, Date dataFinal) {
+        try {
+            pagamentoService.removerPagamentoPaceladoItemPedido(idItemPedido);
+            gerarMensagemSucesso("Pagamento do item parcelado foi removido com sucesso.");
+        } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
         gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);

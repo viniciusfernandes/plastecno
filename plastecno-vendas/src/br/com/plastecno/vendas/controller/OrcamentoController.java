@@ -183,7 +183,7 @@ public class OrcamentoController extends AbstractPedidoController {
             cliente.setRazaoSocial(cliente.getNomeFantasia());
             removerMascaraDocumento(cliente);
         }
-        pedido.setFinalidadePedido(TipoFinalidadePedido.OUTRA_ENTRADA);
+        pedido.setFinalidadePedido(TipoFinalidadePedido.INDUSTRIALIZACAO);
         pedido.setCliente(cliente);
         forwardTo(PedidoController.class).inserirPedido(pedido, contato, true);
     }

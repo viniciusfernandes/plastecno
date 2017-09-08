@@ -264,7 +264,6 @@ function inserirOrcamento(){
 		<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${pedido.proprietario.id}"/>
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<input type="hidden" id="idPedido"  name="pedido.id" value="${pedido.id}"/>
-		<input type="hidden" id="idRepresentada" name="pedido.representada.id" value="${idRepresentadaSelecionada}" />
 		<input type="hidden" id="idTransportadora"  name="pedido.transportadora.id" value="${pedido.transportadora.id}"/>
 		<input type="hidden" id="idSituacaoPedido"  name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
 		
@@ -303,7 +302,7 @@ function inserirOrcamento(){
 				<option value="">&lt&lt SELECIONE &gt&gt</option>
 				<c:forEach var="representada" items="${listaRepresentada}">
 					<option value="${representada.id}"
-						<c:if test="${representada.id eq idRepresentadaSelecionada}">selected</c:if>>${representada.nomeFantasia}</option>
+						<c:if test="${representada.id eq idRepresentadaSelecionada or (representada.id eq pedido.representada.id)}">selected</c:if>>${representada.nomeFantasia}</option>
 				</c:forEach>
 			</select>
 		</div>

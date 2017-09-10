@@ -66,8 +66,8 @@ public class PagamentoServiceTest extends AbstractTest {
 		ped1.setRepresentada(fornc);
 		ped2.setRepresentada(fornc);
 		try {
-			pedidoService.inserir(ped1);
-			pedidoService.inserir(ped2);
+			pedidoService.inserirPedido(ped1);
+			pedidoService.inserirPedido(ped2);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}

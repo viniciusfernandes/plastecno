@@ -97,86 +97,7 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 	}
-
-	private ItemPedido gerarItemPedido() {
-		List<Representada> listaRepresentada = representadaService.pesquisarRepresentadaEFornecedor();
-		Representada representada = null;
-		if (listaRepresentada.isEmpty()) {
-			representada = eBuilder.buildRepresentada();
-			try {
-				representadaService.inserir(representada);
-			} catch (BusinessException e) {
-				printMensagens(e);
-			}
-		} else {
-			representada = listaRepresentada.get(0);
-		}
-
-		Material material = eBuilder.buildMaterial();
-		material.addRepresentada(representada);
-		try {
-			materialService.inserir(material);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		ItemPedido itemPedido = eBuilder.buildItemPedido();
-		itemPedido.setMaterial(material);
-		itemPedido.setAliquotaIPI(null);
-		itemPedido.setNcm("36.39.90.90");
-		return itemPedido;
-	}
-
-	private ItemPedido gerarItemPedidoCompra() {
-		Pedido pedido = gerarPedidoCompra();
-		Integer idPedido = pedido.getId();
-		ItemPedido itemPedido = gerarItemPedido();
-		try {
-			pedidoService.inserirItemPedido(idPedido, itemPedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		pedido = pedidoService.pesquisarCompraById(idPedido);
-		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, pedido.getSituacaoPedido());
-		return itemPedido;
-	}
-
-	private ItemPedido gerarItemPedidoPeca() {
-		List<Representada> listaRepresentada = representadaService.pesquisarRepresentadaEFornecedor();
-		Representada representada = null;
-		if (listaRepresentada.isEmpty()) {
-			representada = eBuilder.buildRepresentada();
-			try {
-				representadaService.inserir(representada);
-			} catch (BusinessException e) {
-				printMensagens(e);
-			}
-		} else {
-			representada = listaRepresentada.get(0);
-		}
-
-		Material material = eBuilder.buildMaterial();
-		material.addRepresentada(representada);
-		try {
-			materialService.inserir(material);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		ItemPedido itemPedido = eBuilder.buildItemPedidoPeca();
-		itemPedido.setMaterial(material);
-		itemPedido.setAliquotaIPI(null);
-		itemPedido.setQuantidade(44);
-		return itemPedido;
-	}
-
+	
 	private Material gerarMaterial(Representada representada) {
 		Material material = eBuilder.buildMaterial();
 		material.setImportado(true);
@@ -187,223 +108,6 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 		return material;
-	}
-
-	private Pedido gerarOrcamento() {
-		Usuario vendedor = eBuilder.buildVendedor();
-		vendedor.setSenha("asdf34");
-		try {
-			usuarioService.inserir(vendedor, true);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		Pedido p = new Pedido();
-		p.setSituacaoPedido(null);
-		p.setRepresentada(gerarRevendedor());
-		p.setVendedor(vendedor);
-		p.setFinalidadePedido(TipoFinalidadePedido.CONSUMO);
-
-		Contato c = new Contato();
-		c.setNome("Renato");
-		c.setEmail("asdf@asdf.asdf");
-		c.setDdd("11");
-		c.setTelefone("54325432");
-		p.setContato(c);
-
-		Cliente cli = new Cliente();
-		cli.setCpf("29186568876");
-		cli.setEmail("vendas@google.com");
-		cli.setNomeFantasia("Google Inc.");
-		
-		p.setCliente(cli);
-		return p;
-	}
-
-	private Pedido gerarPedido(TipoPedido tipoPedido, TipoRelacionamento tipoRelacionamento) {
-		Usuario vendedor = eBuilder.buildVendedor();
-		try {
-			usuarioService.inserir(vendedor, true);
-		} catch (BusinessException e2) {
-			printMensagens(e2);
-		}
-
-		Transportadora transp = gerarTransportadora();
-
-		Pedido pedido = eBuilder.buildPedido();
-		pedido.setTransportadora(transp);
-		pedido.setVendedor(vendedor);
-		pedido.setTipoPedido(tipoPedido);
-
-		try {
-			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.6, 0.1);
-		} catch (BusinessException e3) {
-			printMensagens(e3);
-		}
-
-		Cliente cliente = pedido.getCliente();
-		cliente.setVendedor(vendedor);
-		try {
-			clienteService.inserir(cliente);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		Representada representada = gerarRepresentada(tipoRelacionamento);
-		pedido.setRepresentada(representada);
-		try {
-			pedido = pedidoService.inserirPedido(pedido);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		Material material = eBuilder.buildMaterial();
-		material.addRepresentada(representada);
-		try {
-			material.setId(materialService.inserir(material));
-		} catch (BusinessException e2) {
-			printMensagens(e2);
-		}
-		return pedido;
-	}
-
-	private Pedido gerarPedidoClienteProspectado() {
-		Pedido pedido = eBuilder.buildPedido();
-
-		Usuario vendedor = pedido.getVendedor();
-		try {
-			usuarioService.inserir(vendedor, true);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		try {
-			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.05, 0.1d);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		Cliente cliente = pedido.getCliente();
-		try {
-			clienteService.inserir(cliente);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		try {
-			representadaService.inserir(pedido.getRepresentada());
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		return pedido;
-	}
-
-	public Pedido gerarPedidoComItem(TipoPedido tipoPedido) {
-		Pedido pedido = gerarPedido(tipoPedido, TipoPedido.REVENDA.equals(tipoPedido) ? TipoRelacionamento.REVENDA
-				: TipoRelacionamento.REPRESENTACAO);
-		ItemPedido item1 = gerarItemPedido();
-		ItemPedido item2 = gerarItemPedidoPeca();
-		Integer idPedido = pedido.getId();
-		try {
-			pedidoService.inserirItemPedido(idPedido, item1);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-		try {
-			pedidoService.inserirItemPedido(idPedido, item2);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-		return pedido;
-	}
-
-	private Pedido gerarPedidoCompra() {
-		return gerarPedido(TipoPedido.COMPRA, TipoRelacionamento.REPRESENTACAO);
-	}
-
-	private Pedido gerarPedidoOrcamento() {
-		Pedido pedido = gerarPedidoRevenda();
-		pedido.setFormaPagamento("A VISTA");
-		pedido.setTipoEntrega(TipoEntrega.FOB);
-		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
-		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
-		pedido.getContato().setEmail("vinicius@hotmail.com");
-		pedido.getContato().setDdd("11");
-		pedido.getContato().setTelefone("43219999");
-		return pedido;
-	}
-
-	private Pedido gerarPedidoRepresentacao() {
-		return gerarPedido(TipoPedido.REPRESENTACAO, TipoRelacionamento.REPRESENTACAO);
-	}
-
-	private Pedido gerarPedidoRepresentacaoComItem() {
-		return gerarPedidoComItem(TipoPedido.REPRESENTACAO);
-	}
-
-	public Pedido gerarPedidoRevenda() {
-		Cliente revendedor = eBuilder.buildClienteRevendedor();
-		try {
-			clienteService.inserir(revendedor);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		return gerarPedido(TipoPedido.REVENDA, TipoRelacionamento.REPRESENTACAO);
-	}
-
-	protected Pedido gerarPedidoRevendaComItem() {
-		Cliente revendedor = eBuilder.buildClienteRevendedor();
-		try {
-			clienteService.inserir(revendedor);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		return gerarPedidoComItem(TipoPedido.REVENDA);
-	}
-
-	private Pedido gerarPedidoSimples() {
-		Representada representada = eBuilder.buildRepresentadaRevendedora();
-		try {
-			representadaService.inserir(representada);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		Pedido pedido = eBuilder.buildPedido();
-
-		pedido.setRepresentada(representada);
-		Usuario vendedor = eBuilder.buildVendedor();
-		vendedor.setId(null);
-
-		try {
-			usuarioService.inserir(vendedor, false);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		Cliente cliente = eBuilder.buildCliente();
-		cliente.setVendedor(vendedor);
-		try {
-			clienteService.inserir(cliente);
-		} catch (BusinessException e2) {
-			printMensagens(e2);
-		}
-
-		pedido.setCliente(cliente);
-		pedido.setVendedor(vendedor);
-		pedido.getCliente().setVendedor(vendedor);
-		return pedido;
-	}
-
-	private Representada gerarRepresentada(TipoRelacionamento tipoRelacionamento) {
-		Representada representada = eBuilder.buildRepresentada();
-		representada.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
-		representada.setTipoRelacionamento(tipoRelacionamento);
-		try {
-			representadaService.inserir(representada);
-		} catch (BusinessException e3) {
-			printMensagens(e3);
-		}
-		return representada;
 	}
 
 	private PedidoRevendaECompra gerarRevendaEncomendada() {
@@ -596,7 +300,7 @@ public class PedidoServiceTest extends AbstractTest {
 		Pedido p = gPedido.gerarPedidoRevenda();
 		p.setFormaPagamento("10/20/30 dias");
 		try {
-			p = pedidoService.inserir(p);
+			p = pedidoService.inserirPedido(p);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1770,6 +1474,11 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoOrcamento() {
+		Pedido orcamento = gerarOrcamento();
+
+
+	@Test
 	public void testInclusaoOrcamentoClienteNovo() {
 		Pedido pedido = gPedido.gerarOrcamento();
 		Cliente cliente = new Cliente();
@@ -1870,28 +1579,23 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O nome do contato eh obrigatorio para a inclusao do pedido", throwed);
-	}
-
-	@Test
-	public void testInclusaoOrcamento() {
-		Pedido orcamento = gerarOrcamento();
-	public void testInclusaoPedidoOrcamento() {
+	}	public void testInclusaoPedidoOrcamento() {
 		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.getCliente().setId(null);
 
 		// Incluindo o pedido no sistema para, posteriormente, inclui-lo como
 		// orcamento.
 		try {
-			orcamento = pedidoService.inserirOrcamento(orcamento);
+			pedido = pedidoService.inserirOrcamento(pedido);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		assertNotEquals("Pedido deve ser incluido no sistema antes de virar um orcamento", null, orcamento.getId());
+		assertNotEquals("Pedido deve ser incluido no sistema antes de virar um orcamento", null, pedido.getId());
 
 		assertEquals("Pedido incluido deve ir para orcamento e esta definido como: "
-				+ orcamento.getSituacaoPedido().getDescricao(), SituacaoPedido.ORCAMENTO_DIGITACAO,
-				orcamento.getSituacaoPedido());
+				+ pedido.getSituacaoPedido().getDescricao(), SituacaoPedido.ORCAMENTO_DIGITACAO,
+				pedido.getSituacaoPedido());
 
 	}
 

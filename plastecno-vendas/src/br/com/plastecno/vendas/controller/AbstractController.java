@@ -141,15 +141,17 @@ public abstract class AbstractController {
         GERADOR_PDF.addAtributo(nome, valor);
     }
 
- void addPeriodo(Date dataInicial, Date dataFinal) {
+    void addPeriodo(Date dataInicial, Date dataFinal) {
         // Estamos adicionando apenas se as datas nao foram adicionadas para
         // mantermos o filtro selecionado pelo usuario.
         addAtributoCondicional("dataInicial", formatarData(dataInicial));
         addAtributoCondicional("dataFinal", formatarData(dataFinal));
     }
+
     void addSessao(String atributo, Object valor) {
         if (request == null) {
-            throw new IllegalStateException("Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
+            throw new IllegalStateException(
+                    "Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
         }
         request.getSession().setAttribute(atributo, valor);
     }
@@ -713,10 +715,10 @@ public abstract class AbstractController {
         return StringUtils.removerMascaraDocumento(documento);
     }
 
-    
     void removerSessao(String atributo) {
         if (request == null) {
-            throw new IllegalStateException("Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
+            throw new IllegalStateException(
+                    "Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
         }
         request.getSession().removeAttribute(atributo);
     }

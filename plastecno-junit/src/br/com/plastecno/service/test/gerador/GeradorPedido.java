@@ -26,6 +26,7 @@ import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.test.TestUtils;
 import br.com.plastecno.service.test.builder.EntidadeBuilder;
 import br.com.plastecno.service.test.builder.ServiceBuilder;
@@ -109,7 +110,7 @@ public class GeradorPedido {
 		}
 
 		try {
-			pedidoService.enviarPedido(idPedido, new byte[] {});
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -202,7 +203,7 @@ public class GeradorPedido {
 		Representada representada = gRepresentada.gerarRepresentada(tipoRelacionamento);
 		pedido.setRepresentada(representada);
 		try {
-			pedido = pedidoService.inserir(pedido);
+			pedido = pedidoService.inserirPedido(pedido);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}

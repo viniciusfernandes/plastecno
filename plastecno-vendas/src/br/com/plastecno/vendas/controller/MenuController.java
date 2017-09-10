@@ -3,7 +3,7 @@ package br.com.plastecno.vendas.controller;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.plastecno.service.constante.TipoAcesso;
+import static br.com.plastecno.service.constante.TipoAcesso.*;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 /**
@@ -16,28 +16,24 @@ public class MenuController extends AbstractController {
 
     public MenuController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
-        verificarPermissaoAcesso("acessoAdministracaoPermitido", TipoAcesso.ADMINISTRACAO);
+        verificarPermissaoAcesso("acessoAdministracaoPermitido", ADMINISTRACAO);
         // verificarPermissaoAcesso("acessoManutencaoPermitido",
         // TipoAcesso.MANUTENCAO);
-        verificarPermissaoAcesso("acessoRelatorioClienteRegiaoPermitido", TipoAcesso.CONSULTA_RELATORIO_CLIENTE_REGIAO);
-        verificarPermissaoAcesso("acessoRelatorioVendasRepresentadaPermitido",
-                TipoAcesso.CONSULTA_RELATORIO_VENDAS_REPRESENTADA);
-        verificarPermissaoAcesso("acessoRelatorioEntregaPermitido", TipoAcesso.CONSULTA_RELATORIO_ENTREGA);
-        verificarPermissaoAcesso("acessoRelatorioPedidoRepresentadaPermitido", TipoAcesso.ADMINISTRACAO,
-                TipoAcesso.OPERACAO_CONTABIL);
-        verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", TipoAcesso.ADMINISTRACAO,
-                TipoAcesso.GERENCIA_VENDAS);
-        verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", TipoAcesso.ADMINISTRACAO);
-        verificarPermissaoAcesso("acessoVendaPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_PEDIDO_VENDAS);
-        verificarPermissaoAcesso("acessoCompraPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_PEDIDO_COMPRA);
-        verificarPermissaoAcesso("acessoRelatorioComissaoVendedorPermitido", TipoAcesso.ADMINISTRACAO,
-                TipoAcesso.CADASTRO_PEDIDO_VENDAS);
-        verificarPermissaoAcesso("acessoValorReceitaPermitido", TipoAcesso.ADMINISTRACAO);
-        verificarPermissaoAcesso("acessoRecepcaoCompraPermitido", TipoAcesso.RECEPCAO_COMPRA);
-        verificarPermissaoAcesso("acessoNFePermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS,
-                TipoAcesso.FATURAMENTO);
-        verificarPermissaoAcesso("acessoRelatorioDuplicataPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.FATURAMENTO);
-        verificarPermissaoAcesso("acessoRelatorioFaturamentoPermitido", TipoAcesso.ADMINISTRACAO);
+        verificarPermissaoAcesso("acessoRelatorioClienteRegiaoPermitido", CONSULTA_RELATORIO_CLIENTE_REGIAO);
+        verificarPermissaoAcesso("acessoRelatorioVendasRepresentadaPermitido", CONSULTA_RELATORIO_VENDAS_REPRESENTADA);
+        verificarPermissaoAcesso("acessoRelatorioEntregaPermitido", CONSULTA_RELATORIO_ENTREGA);
+        verificarPermissaoAcesso("acessoRelatorioPedidoRepresentadaPermitido", ADMINISTRACAO, OPERACAO_CONTABIL);
+        verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", ADMINISTRACAO, GERENCIA_VENDAS);
+        verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", ADMINISTRACAO);
+        verificarPermissaoAcesso("acessoVendaPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_VENDAS);
+        verificarPermissaoAcesso("acessoCompraPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_COMPRA);
+        verificarPermissaoAcesso("acessoRelatorioComissaoVendedorPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_VENDAS);
+        verificarPermissaoAcesso("acessoValorReceitaPermitido", ADMINISTRACAO);
+        verificarPermissaoAcesso("acessoRecepcaoCompraPermitido", RECEPCAO_COMPRA);
+        verificarPermissaoAcesso("acessoNFePermitido", ADMINISTRACAO, GERENCIA_VENDAS, FATURAMENTO);
+        verificarPermissaoAcesso("acessoRelatorioDuplicataPermitido", ADMINISTRACAO, FATURAMENTO);
+        verificarPermissaoAcesso("acessoRelatorioFaturamentoPermitido", ADMINISTRACAO);
+        verificarPermissaoAcesso("acessoPagamentoPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_COMPRA, OPERACAO_CONTABIL);
     }
 
     @Get("/")

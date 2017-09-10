@@ -118,8 +118,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Date dataInicial,
-			Date dataFinal) {
+	public List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Date dataInicial, Date dataFinal) {
 		StringBuilder select = gerarConstrutorItemPedidoIdPedidoCompraEVenda();
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
 		select.append("and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada =null)");
@@ -431,6 +430,15 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		inserirParametroPesquisaItemVendido(queryItem, itemVendido);
 
 		return queryItem.getResultList();
+	}
+
+	public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new ItemPedido(i.aliquotaICMS, i.comprimento, i.material.descricao, i.descricaoPeca, i.formaMaterial, i.id, i.pedido.id, i.pedido.representada.id, i.medidaExterna, i.medidaInterna, i.pedido.representada.nomeFantasia, i.precoUnidade, i.quantidade, i.sequencial, i.material.sigla) from ItemPedido i where i.id =:idItemPedido ")
+								.setParameter("idItemPedido", idItemPedido), ItemPedido.class, null);
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,

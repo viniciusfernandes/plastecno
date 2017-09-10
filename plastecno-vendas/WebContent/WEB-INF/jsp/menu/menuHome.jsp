@@ -45,7 +45,7 @@
 					<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a>
 						<ul>
 							<li><a href="itemAguardandoCompra" target="principal_frame">Item Aguard. Compra</a></li>
-							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
+							<li><a href="compra/recepcao/listagem" target="principal_frame">Recepção Compras</a></li>
 							<li><a href="estoque" target="principal_frame">Estoque</a></li>
 							<li><a href="empacotamento" target="principal_frame">Empacotamento</a></li>					
 						</ul>
@@ -92,7 +92,11 @@
 					</ul>
 				</li>
 				</c:if>
-
+				<c:if test="${acessoPagamentoPermitido}">
+				<li>
+					<a href="pagamento/periodo/listagem" target="principal_frame">Pagamento</a>
+				</li>
+				</c:if>
 				<li><a href="javascript: void(0)">Relatórios</a>
 					<ul>
 						<c:if test="${acessoRelatorioDuplicataPermitido}">

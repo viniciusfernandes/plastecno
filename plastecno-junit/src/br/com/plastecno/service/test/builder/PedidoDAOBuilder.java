@@ -111,7 +111,7 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			public String pesquisarFormaPagamentoByIdPedido(Integer idPedido) {
-				Pedido p = pesquisarById(idPedido, false);
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return p == null ? null : p.getFormaPagamento();
 			}
 

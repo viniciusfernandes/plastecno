@@ -313,6 +313,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Date> calcularDataPagamento(Integer idPedido) {
+		return calcularDataPagamento(idPedido, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Date> calcularDataPagamento(Integer idPedido, Date dataInicial) {
 		List<Date> lista = new ArrayList<Date>();
 		String formaPagamento = pedidoDAO.pesquisarFormaPagamentoByIdPedido(idPedido);
 		if (formaPagamento == null) {
@@ -326,8 +332,12 @@ public class PedidoServiceImpl implements PedidoService {
 			return lista;
 		}
 
+		if (dataInicial == null) {
+			dataInicial = new Date();
+		}
+
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
+		cal.setTime(dataInicial);
 		Integer diaCorrido = null;
 		for (String dia : dias) {
 			try {
@@ -338,7 +348,8 @@ public class PedidoServiceImpl implements PedidoService {
 			cal.add(Calendar.DAY_OF_MONTH, diaCorrido);
 			lista.add(cal.getTime());
 
-			// Retornando a data atual para somar os outros dias corridos
+			// Retornando a data atual para somar os outros dias corridos e
+			// evitar criar outros objetos Calendar.
 			cal.add(Calendar.DAY_OF_MONTH, -diaCorrido);
 		}
 		return lista;
@@ -1135,12 +1146,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo) {
+	public List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo) {
 		if (periodo != null) {
-			return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo.getInicio(),
+			return itemPedidoDAO.pesquisarCompraAguardandoRecepcao(idRepresentada, periodo.getInicio(),
 					periodo.getFim());
 		}
-		return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, null, null);
+		return itemPedidoDAO.pesquisarCompraAguardandoRecepcao(idRepresentada, null, null);
 	}
 
 	@Override
@@ -1382,6 +1393,11 @@ public class PedidoServiceImpl implements PedidoService {
 	public List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal) {
 		return itemPedidoDAO.pesquisarItemPedidoAguardandoMaterial(idCliente, dataInicial, dataFinal);
 	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarItemPedidoPagamento(idItemPedido);}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)

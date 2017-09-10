@@ -28,6 +28,7 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
@@ -46,9 +47,10 @@ import br.com.plastecno.vendas.util.ServiceLocator;
 import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
 public abstract class AbstractController {
-
     private final static Long VERSAO_CACHE = new Date().getTime();
+
     private final String cssMensagemAlerta = "mensagemAlerta";
+
     private final String cssMensagemErro = "mensagemErro";
     private final String cssMensagemSucesso = "mensagemSucesso";
     private final String DIRETORIO_TEMPLATE_PDF;
@@ -139,6 +141,12 @@ public abstract class AbstractController {
         GERADOR_PDF.addAtributo(nome, valor);
     }
 
+ void addPeriodo(Date dataInicial, Date dataFinal) {
+        // Estamos adicionando apenas se as datas nao foram adicionadas para
+        // mantermos o filtro selecionado pelo usuario.
+        addAtributoCondicional("dataInicial", formatarData(dataInicial));
+        addAtributoCondicional("dataFinal", formatarData(dataFinal));
+    }
     void addSessao(String atributo, Object valor) {
         if (request == null) {
             throw new IllegalStateException("Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
@@ -186,7 +194,7 @@ public abstract class AbstractController {
 
     void configurarFiltroPediodoMensal() {
         if (!contemAtributo("dataInicial") && !contemAtributo("dataFinal")) {
-            addAtributo("dataInicial", StringUtils.formatarData(gerarInicioMes()));
+            addAtributo("dataInicial", StringUtils.formatarData(gerarDataInicioMes()));
             addAtributo("dataFinal", StringUtils.formatarData(new Date()));
 
         }
@@ -256,6 +264,22 @@ public abstract class AbstractController {
         }
     }
 
+    void formatarPagamento(Collection<Pagamento> lista) {
+        for (Pagamento p : lista) {
+            formatarPagamento(p);
+        }
+    }
+
+    void formatarPagamento(Pagamento p) {
+        p.setDataVencimentoFormatada(StringUtils.formatarData(p.getDataVencimento()));
+        p.setDataEmissaoFormatada(StringUtils.formatarData(p.getDataEmissao()));
+        p.setDataRecebimentoFormatada(StringUtils.formatarData(p.getDataRecebimento()));
+
+        p.setValor(NumeroUtils.arredondarValorMonetario(p.getValor()));
+        p.setValorCreditoICMS(NumeroUtils.arredondarValorMonetario(p.getValorCreditoICMS()));
+        p.setValorNF(NumeroUtils.arredondarValorMonetario(p.getValorNF()));
+    }
+
     void formatarPedido(Pedido pedido) {
         pedido.setDataEnvioFormatada(formatarData(pedido.getDataEnvio()));
         pedido.setDataEntregaFormatada(formatarData(pedido.getDataEntrega()));
@@ -279,6 +303,12 @@ public abstract class AbstractController {
         }
     }
 
+    Date gerarDataInicioMes() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        return c.getTime();
+    }
+
     Download gerarDownload(byte[] bytesArquivo, String nomeArquivo, String contentType) {
         return new ByteArrayDownload(bytesArquivo, contentType, StringUtils.removerAcentuacao(nomeArquivo));
     }
@@ -289,12 +319,6 @@ public abstract class AbstractController {
 
     Download gerarDownloadPlanilha(byte[] bytesArquivo, String nomeArquivo) {
         return gerarDownload(bytesArquivo, nomeArquivo, "application/vnd.ms-excel;");
-    }
-
-    Date gerarInicioMes() {
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.DAY_OF_MONTH, 1);
-        return c.getTime();
     }
 
     void gerarListaMensagemAjax(String mensagem, String categoria) {

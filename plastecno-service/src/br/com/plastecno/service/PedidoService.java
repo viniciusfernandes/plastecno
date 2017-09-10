@@ -43,6 +43,8 @@ public interface PedidoService {
 
 	List<Date> calcularDataPagamento(Integer idPedido);
 
+	List<Date> calcularDataPagamento(Integer idPedido, Date dataInicial);
+
 	Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException;
 
 	void cancelarOrcamento(Integer idOrcamento) throws BusinessException;
@@ -109,7 +111,7 @@ public interface PedidoService {
 
 	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
 
-	List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo);
+	List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo);
 
 	Pedido pesquisarCompraById(Integer id);
 
@@ -170,6 +172,8 @@ public interface PedidoService {
 	List<ItemPedido> pesquisarItemPedidoEncomendado();
 
 	List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal);
+
+	ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido);
 
 	List<ItemPedido> pesquisarItemPedidoRepresentacaoByPeriodo(Periodo periodo);
 

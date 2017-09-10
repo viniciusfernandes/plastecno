@@ -99,7 +99,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		WritableFont cellFont = new WritableFont(WritableFont.TIMES, 12);
 		cellFont.setColour(Colour.WHITE);
-		
+
 		WritableCellFormat cf = new WritableCellFormat(cellFont);
 		cf.setBorder(Border.ALL, BorderLineStyle.THIN);
 		cf.setBackground(Colour.GREEN);
@@ -349,11 +349,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecepcao(Integer idRepresentada,
 			Periodo periodo) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
-				"Pedidos de Compras para Recebimento",
-				pedidoService.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo), false);
+				"Pedidos de Compras para Recepção",
+				pedidoService.pesquisarCompraAguardandoRecepcao(idRepresentada, periodo), false);
 
 		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;

@@ -68,6 +68,13 @@ $(document).ready(function() {
 		$(form).attr('action', '<c:url value="/compra/recepcao/inclusaodadosnf"/>'+parametros);
 		$(form).submit();
 	});
+	
+	$('#botaoInserirPagamento').click(function (){
+		adicionarInputHiddenFormulario('formPagamento', 'dataInicial', $('#dataInicial').val());
+		adicionarInputHiddenFormulario('formPagamento', 'dataFinal', $('#dataFinal').val());
+		adicionarInputHiddenFormulario('formPagamento', 'idRepresentada', $('#formPesquisa #idRepresentada').val());
+		$('#formPagamento').attr('action', '<c:url value="/compra/item/pagamento/inclusao"/>').attr('method', 'post').submit();	
+	});
 });
 
 function removerItem(botao){
@@ -129,9 +136,10 @@ function recepcionarItem(botao){
 			</div>
 		</fieldset>
 	</form>
-	
+	<c:if test="${not empty pagamento}">
+		<jsp:include page="/bloco/bloco_edicao_pagamento.jsp"/>
+	</c:if>
 	<c:if test="${not empty itemPedido}">
-		<jsp:include page="/bloco/bloco_nota_fiscal.jsp"/>
 		<jsp:include page="/bloco/bloco_edicao_item.jsp"/>
 	</c:if>
 	
@@ -187,6 +195,12 @@ function recepcionarItem(botao){
 										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
 										<input type="button" value="" title="Remover o Item do Pedido" 
 											onclick="removerItem(this);" class="botaoRemover" />
+									</form>
+									<form action="<c:url value="/compra/item/pagamento/${item.id}"/>" method="post" >
+										<input type="hidden" name="dataInicial" value="${dataInicial}" />
+										<input type="hidden" name="dataFinal" value="${dataFinal}" /> 
+										<input type="submit" value="" title="Gerar Pagamento do Item" 
+											class="botaoDinheiroPequeno" />
 									</form>
 									
 								</div>

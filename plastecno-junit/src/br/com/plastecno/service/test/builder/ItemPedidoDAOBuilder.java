@@ -13,7 +13,6 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 	@Override
 	public ItemPedidoDAO build() {
 		new MockUp<ItemPedidoDAO>() {
-
 			@Mock
 			public void alterarQuantidadeReservada(Integer idItemPedido, Integer quantidadeReservada) {
 				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
@@ -70,6 +69,20 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 					return new Object[] {};
 				}
 				return new Object[] { i.getMaterial().getId(), i.getFormaMaterial() };
+			}
+
+			@Mock
+			public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				if (i == null) {
+					return null;
+				}
+				// Essas dados sao recuperados na query jpa e sao necessarios
+				// para gerar um pagamento do item.
+				i.setIdPedido(i.getPedido().getId());
+				i.setIdRepresentada(i.getPedido().getRepresentada().getId());
+				i.setNomeRepresentada(i.getPedido().getRepresentada().getNomeFantasia());
+				return i;
 			}
 
 			@Mock

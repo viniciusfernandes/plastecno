@@ -1,13 +1,14 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <jsp:include page="/bloco/bloco_css.jsp" />
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
-<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script src="http://code.jquery.com/jquery-1.10.2.js" type="text/javascript"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
@@ -51,7 +52,7 @@ $(document).ready(function() {
 	$("#botaoPesquisaNumeroPedido").click(function() {
 		var numeroPedido = $('#numeroPedidoPesquisa').val();
 		if (isEmpty(numeroPedido)) {
-			gerarListaMensagemAlerta(new Array('O número do pedido é obrigatório para a pesquisa'));
+			gerarListaMensagemAlerta(new Array('O nÃºmero do pedido Ã© obrigatÃ³rio para a pesquisa'));
 			return;
 		} 
 		var form = $('#formVazio'); 
@@ -63,7 +64,7 @@ $(document).ready(function() {
 	$("#botaoCopiarPedido").click(function() {
 		var numeroPedido = $('#numeroPedidoPesquisa').val();
 		if (isEmpty(numeroPedido)) {
-			gerarListaMensagemAlerta(new Array('O número do pedido é obrigatório para copiar o pedido'));
+			gerarListaMensagemAlerta(new Array('O nÃºmero do pedido Ã© obrigatÃ³rio para copiar o pedido'));
 			return;
 		} 
 		var form = $('#formVazio'); 
@@ -83,7 +84,7 @@ $(document).ready(function() {
 	$("#botaoImpressaoPedido").click(function() {
 		var numeroPedido = $('#numeroPedido').val();
 		if (isEmpty(numeroPedido)) {
-			gerarListaMensagemAlerta(new Array('O pedido não pode ser impresso pois não existe no sistema'));
+			gerarListaMensagemAlerta(new Array('O pedido nÃ£o pode ser impresso pois nÃ£o existe no sistema'));
 			return;
 		} 
 
@@ -184,7 +185,7 @@ $(document).ready(function() {
 	
 	$('#botaoRefazerPedido').click(function (){
 		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REFAZER esse pedido?',
+			mensagem: 'Essa aÃ§Ã£o nÃ£o poderÃ¡ serÃ¡ desfeita. VocÃª tem certeza de que deseja REFAZER esse pedido?',
 			confirmar: function(){
 				$('#botaoRefazerPedido').closest('form').submit();	
 			}
@@ -193,7 +194,7 @@ $(document).ready(function() {
 	
 	$('#botaoCancelarPedido').click(function (){
 		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja CANCELAR esse pedido?',
+			mensagem: 'Essa aÃ§Ã£o nÃ£o poderÃ¡ serÃ¡ desfeita. VocÃª tem certeza de que deseja CANCELAR esse pedido?',
 			confirmar: function(){
 				$('#botaoCancelarPedido').closest('form').submit();	
 			}
@@ -202,7 +203,7 @@ $(document).ready(function() {
 	
 	$('#botaoEnviarPedido').click(function (){
 		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ENVIAR esse pedido?',
+			mensagem: 'Essa aÃ§Ã£o nÃ£o poderÃ¡ serÃ¡ desfeita. VocÃª tem certeza de que deseja ENVIAR esse pedido?',
 			confirmar: function(){
 				$('#botaoEnviarPedido').closest('form').submit();	
 			}
@@ -214,7 +215,7 @@ $(document).ready(function() {
 			return;
 		}
 		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ACEITAR esse orçamento para os pedidos?',
+			mensagem: 'Essa aÃ§Ã£o nÃ£o poderÃ¡ serÃ¡ desfeita. VocÃª tem certeza de que deseja ACEITAR esse orÃ§amento para os pedidos?',
 			confirmar: function(){
 				var form = $('#botaoAceitarOrcamento').closest('form');
 				$(form).attr('action', '<c:url value="pedido/aceiteorcamento"/>').submit();
@@ -236,7 +237,7 @@ $(document).ready(function() {
 
 	<form id="formPedido" action="<c:url value="/pedido/inclusao"/>" method="post">
 		<fieldset>
-			<legend>::: Dados do ${orcamento ? 'Orçamento': 'Pedido'} de ${isCompra ? 'Compra': 'Venda'} :::</legend>
+			<legend>::: Dados do ${orcamento ? 'OrÃ§amento': 'Pedido'} de ${isCompra ? 'Compra': 'Venda'} :::</legend>
 
 			<!-- O campo id do pedido eh hidden pois o input text nao eh enviado na edicao do formulario pois esta "disabled" -->
 			<input type="hidden" id="numeroPedido" name="pedido.id" value="${pedido.id}" /> 
@@ -257,7 +258,7 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Núm. NFe(s):</div>
+			<div class="label">NÃºm. NFe(s):</div>
 			<div class="input" style="width: 50%">
 				<select id="listaNumeroNFe" name="numeroNFe" style="width: 25%" class="semprehabilitado">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
@@ -274,13 +275,13 @@ $(document).ready(function() {
 					value="${proprietario.nome} - ${proprietario.email}" disabled="disabled"
 					class="uppercaseBloqueado desabilitado" style="width: 95%"/>
 			</div>
-			<div class="label" style="width: 10%">Situação:</div>
+			<div class="label" style="width: 10%">SituaÃ§Ã£o:</div>
 			<div class="input" style="width: 20%">
 				<input type="text" name="pedido.situacaoPedido" 
 					value="${pedido.situacaoPedido}" class="desabilitado" disabled="disabled" width="95%"/>
 			</div>
 			
-			<div class="label">Número:</div>
+			<div class="label">NÃºmero:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoPesquisa" value="${pedido.id}"
 					class="pesquisavel" />
@@ -433,12 +434,12 @@ $(document).ready(function() {
 				<input id="validade" name="pedido.validade" value="${pedido.validade}" style="width: 5%" />
 			</div>
 			</c:if>
-			<div class="label">Observação:</div>
+			<div class="label">ObservaÃ§Ã£o:</div>
 			<div class="input areatexto" style="width: 70%">
 				<textarea id="obervacao" name="pedido.observacao"
 					style="width: 100%">${pedido.observacao}</textarea>
 			</div>
-			<div class="label">Observação Prod.:</div>
+			<div class="label">ObservaÃ§Ã£o Prod.:</div>
 			<div class="input areatexto" style="width: 70%">
 				<textarea id="observacaoProducao" name="pedido.observacaoProducao"
 					style="width: 100%">${pedido.observacaoProducao}</textarea>
@@ -503,7 +504,7 @@ $(document).ready(function() {
 				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> 
 			/>
 			<c:if test="${orcamento}">
-				<input type="button" id="botaoAceitarOrcamento" title="Aceitar do Orçamento" value="" class="botaoAceitar"/>
+				<input type="button" id="botaoAceitarOrcamento" title="Aceitar do OrÃ§amento" value="" class="botaoAceitar"/>
 			</c:if>
 			<input type="hidden" id="idPedido" name="idPedido" value="${pedido.id}" />
 		</div>

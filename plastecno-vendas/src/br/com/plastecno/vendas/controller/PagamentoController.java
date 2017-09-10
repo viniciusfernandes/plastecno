@@ -47,7 +47,7 @@ public class PagamentoController extends AbstractController {
     private void gerarRelatorioPagamento(List<Pagamento> lista, Date dataInicial, Date dataFinal)
             throws InformacaoInvalidaException {
 
-        RelatorioWrapper<String, Pagamento> relatorio = pagamentoService.gerarRelatorioPagamento(new Periodo(
+        RelatorioWrapper<String, Pagamento> relatorio = pagamentoService.gerarRelatorioPagamento(lista, new Periodo(
                 dataInicial, dataFinal));
 
         formatarPagamento(relatorio.getListaElemento());
@@ -139,11 +139,9 @@ public class PagamentoController extends AbstractController {
 
     @Get("pagamento/fornecedor/{idFornecedor}")
     public void pesquisarPagamentoByIdFornecedor(Integer idFornecedor, Date dataInicial, Date dataFinal) {
-        List<Pagamento> lista;
         try {
-            lista = pagamentoService
-                    .pesquisarPagamentoByIdFornecedor(idFornecedor, new Periodo(dataInicial, dataFinal));
-            gerarRelatorioPagamento(lista, dataInicial, dataFinal);
+            gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByIdFornecedor(idFornecedor, new Periodo(
+                    dataInicial, dataFinal)), dataInicial, dataFinal);
             irRodapePagina();
         } catch (InformacaoInvalidaException e) {
             addPeriodo(dataInicial, dataFinal);
@@ -153,10 +151,8 @@ public class PagamentoController extends AbstractController {
 
     @Get("pagamento/pedido/{idPedido}")
     public void pesquisarPagamentoByIdPedido(Integer idPedido, Date dataInicial, Date dataFinal) {
-        List<Pagamento> lista;
         try {
-            lista = pagamentoService.pesquisarPagamentoByIdPedido(idPedido);
-            gerarRelatorioPagamento(lista, dataInicial, dataFinal);
+            gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByIdPedido(idPedido), dataInicial, dataFinal);
             irRodapePagina();
         } catch (InformacaoInvalidaException e) {
             addPeriodo(dataInicial, dataFinal);
@@ -166,10 +162,8 @@ public class PagamentoController extends AbstractController {
 
     @Get("pagamento/nf/{numeroNF}")
     public void pesquisarPagamentoByNF(Integer numeroNF, Date dataInicial, Date dataFinal) {
-        List<Pagamento> lista;
         try {
-            lista = pagamentoService.pesquisarPagamentoByNF(numeroNF);
-            gerarRelatorioPagamento(lista, dataInicial, dataFinal);
+            gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByNF(numeroNF), dataInicial, dataFinal);
             irRodapePagina();
         } catch (InformacaoInvalidaException e) {
             addPeriodo(dataInicial, dataFinal);

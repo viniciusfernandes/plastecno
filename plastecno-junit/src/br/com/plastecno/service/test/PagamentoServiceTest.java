@@ -22,10 +22,16 @@ import br.com.plastecno.service.test.gerador.GeradorRepresentada;
 import br.com.plastecno.util.DateUtils;
 import br.com.plastecno.util.NumeroUtils;
 
-public class PagamentoTest extends AbstractTest {
+public class PagamentoServiceTest extends AbstractTest {
+	private GeradorPedido gPedido = GeradorPedido.getInstance();
+
+	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
+
 	private PagamentoService pagamentoService;
 
-	public PagamentoTest() {
+	private PedidoService pedidoService;
+
+	public PagamentoServiceTest() {
 		pagamentoService = ServiceBuilder.buildService(PagamentoService.class);
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
 	}
@@ -43,25 +49,6 @@ public class PagamentoTest extends AbstractTest {
 		p = pagamentoService.pesquisarById(idPag);
 		assertFalse("O pagamento ainda nao venceu, verifique a configuracao da situacao do pagamento", p.isVencido());
 	}
-
-	@Test
-	public void testInclusaoPagamentoVencido() {
-		Pagamento p = eBuilder.buildPagamentoNF();
-		p.setDataVencimento(DateUtils.retrocederData(new Date()));
-		Integer idPag = null;
-		try {
-			idPag = pagamentoService.inserir(p);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		p = pagamentoService.pesquisarById(idPag);
-		assertTrue("O pagamento ja venceu, verifique a configuracao da situacao do pagamento", p.isVencido());
-	}
-
-	private GeradorPedido gPedido = GeradorPedido.getInstance();
-	private PedidoService pedidoService;
-	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
 
 	@Test
 	public void testInclusaoPagamentoItemServico() {
@@ -87,9 +74,11 @@ public class PagamentoTest extends AbstractTest {
 
 		ItemPedido i1 = gPedido.gerarItemPedido();
 		i1.setQuantidade(1000);
+		i1.setAliquotaIPI(0.1d);
 
 		ItemPedido i2 = gPedido.gerarItemPedido();
 		i2.setQuantidade(2000);
+		i1.setAliquotaIPI(0.2d);
 
 		ItemPedido i3 = gPedido.gerarItemPedido();
 		i3.setQuantidade(3000);
@@ -143,7 +132,7 @@ public class PagamentoTest extends AbstractTest {
 			totICMS += p.getValorCreditoICMS();
 			totValNF += p.getValor();
 		}
-		double valNF = i1.getValorTotal() + i2.getValorTotal() + i3.getValorTotal();
+		double valNF = i1.getValorTotalIPI() + i2.getValorTotalIPI() + i3.getValorTotalIPI();
 		double valICMS = i1.getValorICMS() + i2.getValorICMS() + i3.getValorICMS();
 
 		assertEquals("Os valores totais dos pagamentos da NF nao conferem com os valores totais dos itens dos pedidos",
@@ -151,5 +140,20 @@ public class PagamentoTest extends AbstractTest {
 		assertEquals(
 				"Os valores totais do icms dos pagamentos da NF nao conferem com os valores totais do icms dos itens dos pedidos",
 				NumeroUtils.formatarValorMonetario(valICMS), NumeroUtils.formatarValorMonetario(totICMS));
+	}
+
+	@Test
+	public void testInclusaoPagamentoVencido() {
+		Pagamento p = eBuilder.buildPagamentoNF();
+		p.setDataVencimento(DateUtils.retrocederData(new Date()));
+		Integer idPag = null;
+		try {
+			idPag = pagamentoService.inserir(p);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		p = pagamentoService.pesquisarById(idPag);
+		assertTrue("O pagamento ja venceu, verifique a configuracao da situacao do pagamento", p.isVencido());
 	}
 }

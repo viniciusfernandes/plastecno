@@ -20,6 +20,7 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.relatorio.RelatorioService;
+import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
@@ -58,7 +59,13 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
         addAtributo("listaTipoPagamento", TipoPagamento.values());
         addAtributo("listaFornecedor", representadaService.pesquisarRepresentadaAtivoByTipoPedido(TipoPedido.COMPRA));
-        pesquisarCompraAguardandoRecepcao(dataInicial, dataFinal, idRepresentada);
+        try {
+            gerarRelatorio(dataInicial, dataFinal, idRepresentada);
+        } catch (InformacaoInvalidaException e) {
+            gerarListaMensagemAlerta(e);
+
+        }
+        irTopoPagina();
     }
 
     @Get("compra/recepcao/inclusaodadosnf")
@@ -84,11 +91,7 @@ public class RecepcaoCompraController extends AbstractController {
     public void pesquisarCompraAguardandoRecepcao(Date dataInicial, Date dataFinal, Integer idRepresentada) {
 
         try {
-            Periodo periodo = Periodo.gerarPeriodo(dataInicial, dataFinal);
-            RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService
-                    .gerarRelatorioCompraAguardandoRecepcao(idRepresentada, periodo);
-
-            addAtributo("relatorio", relatorio);
+            gerarRelatorio(dataInicial, dataFinal, idRepresentada);
             if (contemAtributo("permanecerTopo")) {
                 irTopoPagina();
             } else {
@@ -100,6 +103,15 @@ public class RecepcaoCompraController extends AbstractController {
         }
         addPeriodo(dataInicial, dataFinal);
         addAtributo("idRepresentadaSelecionada", idRepresentada);
+    }
+
+    private void gerarRelatorio(Date dataInicial, Date dataFinal, Integer idRepresentada)
+            throws InformacaoInvalidaException {
+        Periodo periodo = Periodo.gerarPeriodo(dataInicial, dataFinal);
+        RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraAguardandoRecepcao(
+                idRepresentada, periodo);
+
+        addAtributo("relatorio", relatorio);
     }
 
     @Post("compra/item/edicao")

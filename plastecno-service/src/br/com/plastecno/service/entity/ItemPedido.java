@@ -357,7 +357,11 @@ public class ItemPedido extends Item {
 	}
 
 	public double calcularPrecoTotal() {
-		return this.quantidade != null && this.precoVenda != null ? this.quantidade * this.precoVenda : 0d;
+		return this.quantidade != null && precoVenda != null ? quantidade * precoVenda : 0d;
+	}
+
+	public double calcularPrecoTotalIPI() {
+		return this.quantidade != null && precoUnidadeIPI != null ? quantidade * precoUnidadeIPI : 0d;
 	}
 
 	@Override
@@ -610,6 +614,10 @@ public class ItemPedido extends Item {
 
 	public double getValorTotal() {
 		return calcularPrecoTotal();
+	}
+
+	public double getValorTotalIPI() {
+		return calcularPrecoTotalIPI();
 	}
 
 	public boolean isEncomendado() {

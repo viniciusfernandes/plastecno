@@ -14,6 +14,8 @@ public interface PagamentoService {
 
 	Pagamento gerarPagamentoItemPedido(Integer idItemPedido);
 
+	RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(List<Pagamento> lPagamento, Periodo periodo);
+
 	RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(Periodo periodo);
 
 	Integer inserir(Pagamento pagamento) throws BusinessException;

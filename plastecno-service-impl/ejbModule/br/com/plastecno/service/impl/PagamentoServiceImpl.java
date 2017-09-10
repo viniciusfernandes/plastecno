@@ -67,18 +67,22 @@ public class PagamentoServiceImpl implements PagamentoService {
 		p.setSequencialItem(i.getSequencial());
 		p.setTipoPagamento(TipoPagamento.INSUMO);
 		p.setTotalParcelas(calcularTotalParcelas(i.getIdPedido()));
-		p.setValor(i.getValorTotal());
+		p.setValor(i.getValorTotalIPI());
 		p.setValorCreditoICMS(i.getValorICMS());
 		return p;
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(Periodo periodo) {
-		List<Pagamento> lPagamento = pesquisarPagamentoByPeriodo(periodo);
+	public RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(List<Pagamento> lPagamento, Periodo periodo) {
 
 		RelatorioWrapper<String, Pagamento> relatorio = new RelatorioWrapper<String, Pagamento>("Pagamentos de "
 				+ StringUtils.formatarData(periodo.getInicio()) + " a " + StringUtils.formatarData(periodo.getFim()));
+
+		if (lPagamento == null || lPagamento.isEmpty()) {
+			return relatorio;
+		}
+
 		GrupoWrapper<String, Pagamento> gr = null;
 		Double val = null;
 		for (Pagamento p : lPagamento) {
@@ -107,6 +111,12 @@ public class PagamentoServiceImpl implements PagamentoService {
 			}
 		}
 		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(Periodo periodo) {
+		return gerarRelatorioPagamento(pesquisarPagamentoByPeriodo(periodo), periodo);
 	}
 
 	@PostConstruct

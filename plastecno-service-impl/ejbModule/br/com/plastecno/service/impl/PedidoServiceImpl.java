@@ -566,12 +566,16 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
 	private void definirTipoPedido(Pedido pedido) {
+		if (pedido == null) {
+			return;
+		}
+
 		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
 		// portanto, faremos uma consulta pelo nome da representada para
 		// decidir, ja
 		// que os pedidos de compra sempre serao configurados antes de inserir.
 		if (pedido.getTipoPedido() == null) {
-			if (representadaService.isRevendedor(pedido.getRepresentada().getId())) {
+			if (pedido.getRepresentada() != null && representadaService.isRevendedor(pedido.getRepresentada().getId())) {
 				pedido.setTipoPedido(TipoPedido.REVENDA);
 			} else {
 				pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
@@ -680,10 +684,10 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("Pedido/Orçamento não exite no sistema");
 		}
 
-		if(pedido.isCancelado()){
+		if (pedido.isCancelado()) {
 			throw new BusinessException("Pedido/Orçamento foi cancelado e não pode ser enviado.");
 		}
-		
+
 		// A data de emissao nao pode ser alterada pois dara conflito no calculo
 		// de comissao de vendas
 		if (pedido.getDataEnvio() == null) {

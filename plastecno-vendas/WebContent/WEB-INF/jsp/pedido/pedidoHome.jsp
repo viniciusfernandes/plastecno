@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -52,7 +54,7 @@ $(document).ready(function() {
 	$("#botaoPesquisaNumeroPedido").click(function() {
 		var numeroPedido = $('#numeroPedidoPesquisa').val();
 		if (isEmpty(numeroPedido)) {
-			gerarListaMensagemAlerta(new Array('O número do pedido é obrigatório para a pesquisa'));
+			gerarListaMensagemAlerta(new Array('O n�mero do pedido � obrigat�rio para a pesquisa'));
 			return;
 		} 
 		var form = $('#formVazio'); 
@@ -77,9 +79,11 @@ $(document).ready(function() {
 		 $('#formLimparPedido').submit();
 	});
 	
+	<%--
 	$("#representada").change(function() {
 		habilitarIPI('<c:url value="/pedido"/>', $(this).val());	
 	});
+	--%>
 	
 	$("#botaoImpressaoPedido").click(function() {
 		var numeroPedido = $('#numeroPedido').val();
@@ -185,7 +189,7 @@ $(document).ready(function() {
 	
 	$('#botaoRefazerPedido').click(function (){
 		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REFAZER esse pedido?',
+			mensagem: 'Essa ação não poderá ser desfeita. Você tem certeza de que deseja REFAZER esse pedido?',
 			confirmar: function(){
 				$('#botaoRefazerPedido').closest('form').submit();	
 			}
@@ -194,7 +198,7 @@ $(document).ready(function() {
 	
 	$('#botaoCancelarPedido').click(function (){
 		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja CANCELAR esse pedido?',
+			mensagem: 'Essa ação não poderá ser desfeita. Você tem certeza de que deseja CANCELAR esse pedido?',
 			confirmar: function(){
 				$('#botaoCancelarPedido').closest('form').submit();	
 			}
@@ -203,7 +207,7 @@ $(document).ready(function() {
 	
 	$('#botaoEnviarPedido').click(function (){
 		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ENVIAR esse pedido?',
+			mensagem: 'Essa ação não poderá ser desfeita. Você tem certeza de que deseja ENVIAR esse pedido?',
 			confirmar: function(){
 				$('#botaoEnviarPedido').closest('form').submit();	
 			}
@@ -215,7 +219,7 @@ $(document).ready(function() {
 			return;
 		}
 		inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja ACEITAR esse orçamento para os pedidos?',
+			mensagem: 'Essa ação não poderá ser desfeita. Você tem certeza de que deseja ACEITAR esse orçamento para os pedidos?',
 			confirmar: function(){
 				var form = $('#botaoAceitarOrcamento').closest('form');
 				$(form).attr('action', '<c:url value="pedido/aceiteorcamento"/>').submit();
@@ -484,9 +488,6 @@ $(document).ready(function() {
 		</c:if>
 	</div>
 
-	<%-- c:if test="${not empty pedido.id}">
-		<jsp:include page="/bloco/bloco_nota_fiscal.jsp" />
-	</c:if --%>
 	<jsp:include page="/bloco/bloco_contato.jsp" />
 
 	<div class="bloco_botoes">
@@ -500,11 +501,11 @@ $(document).ready(function() {
 		<input type="hidden" name="tipoPedido" value="${tipoPedido}"/>
 		<input type="hidden" name="orcamento" value="${orcamento}"/>
 		<div class="bloco_botoes">
-			<input type="button" id="botaoEnviarPedido" title="Enviar Email do ${orcamento ? 'Orcamento' : 'Pedido'}" value="" class="botaoEnviarEmail"
+			<input type="button" id="botaoEnviarPedido" title="Enviar Email do ${orcamento ? 'Orçamento' : 'Pedido'}" value="" class="botaoEnviarEmail"
 				<c:if test="${not acessoEnvioPedidoPermitido and not acessoReenvioPedidoPermitido}"> style='display:none'</c:if> 
 			/>
 			<c:if test="${orcamento}">
-				<input type="button" id="botaoAceitarOrcamento" title="Aceitar do Orçamento" value="" class="botaoAceitar"/>
+				<input type="button" id="botaoAceitarOrcamento" title="Aceitar do Or�amento" value="" class="botaoAceitar"/>
 			</c:if>
 			<input type="hidden" id="idPedido" name="idPedido" value="${pedido.id}" />
 		</div>

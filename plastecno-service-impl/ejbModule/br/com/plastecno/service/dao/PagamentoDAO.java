@@ -1,5 +1,6 @@
 package br.com.plastecno.service.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -69,6 +70,22 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 						"select p from Pagamento p where p.dataVencimento >=:dataInicio and p.dataVencimento <=:dataFim order by p.dataVencimento asc",
 						Pagamento.class).setParameter("dataInicio", dataInicio).setParameter("dataFim", dataFim)
 				.getResultList();
+	}
+
+	public List<Integer[]> pesquisarQuantidadePagaByIdItem(List<Integer> listaIdItem) {
+		List<Object[]> l = entityManager
+				.createQuery(
+						"select p.idItemPedido, p.sequencialItem, p.idPedido, SUM(p.quantidadeItem), p.quantidadeTotal from Pagamento p where p.idItemPedido in (:listaIdItem) group by p.idItemPedido, p.idPedido, p.quantidadeTotal, p.sequencialItem",
+						Object[].class).setParameter("listaIdItem", listaIdItem).getResultList();
+		if (l.isEmpty()) {
+			return new ArrayList<>();
+		}
+		List<Integer[]> lTotal = new ArrayList<>(l.size());
+		for (Object[] o : l) {
+			lTotal.add(new Integer[] { (Integer) o[0], (Integer) o[1], (Integer) o[2], ((Long) o[3]).intValue(),
+					(Integer) o[4] });
+		}
+		return lTotal;
 	}
 
 	public void removerPagamentoPaceladoItemPedido(Integer idItemPedido) {

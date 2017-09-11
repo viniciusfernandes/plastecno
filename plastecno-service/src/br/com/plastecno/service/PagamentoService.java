@@ -50,4 +50,8 @@ public interface PagamentoService {
 
 	void retornarLiquidacaoPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela)
 			throws BusinessException;
+
+	void validarPagamentoTotalizadoByIdItem(List<Integer> listaIdItem) throws BusinessException;
+
+	List<Integer[]> verificarPagamentoTotalizadoByIdItem(List<Integer> listaIdItem);
 }

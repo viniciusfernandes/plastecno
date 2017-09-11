@@ -1401,7 +1401,8 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {
-		return itemPedidoDAO.pesquisarItemPedidoPagamento(idItemPedido);}
+		return itemPedidoDAO.pesquisarItemPedidoPagamento(idItemPedido);
+	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -1989,5 +1990,12 @@ public class PedidoServiceImpl implements PedidoService {
 						+ idPedido + " pois o fornecedor \"" + nomeFantasia + "\" não trabalha com o material do item");
 			}
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem) {
+		// Apenas um registro deve ser retornado, o que indica apenas um fornecedor
+		return itemPedidoDAO.pesquisarTotalFornecedorDistintoByIdItem(listaIdItem).size() > 1;
 	}
 }

@@ -285,4 +285,6 @@ public interface PedidoService {
 
 	void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException;
 
+	boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem);
+
 }

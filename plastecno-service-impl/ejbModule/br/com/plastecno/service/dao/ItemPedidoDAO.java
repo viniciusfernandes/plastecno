@@ -495,6 +495,13 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return pesquisarCampoById(ItemPedido.class, idItemPedido, "sequencial", Integer.class);
 	}
 
+	public List<Integer> pesquisarTotalFornecedorDistintoByIdItem(List<Integer> listaIdItem) {
+		return entityManager
+				.createQuery(
+						"select i.pedido.representada.id from ItemPedido i where i.id in(:listaIdItem) group by i.pedido.representada.id",
+						Integer.class).setParameter("listaIdItem", listaIdItem).getResultList();
+	}
+
 	public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {
 		return QueryUtil
 				.gerarRegistroUnico(

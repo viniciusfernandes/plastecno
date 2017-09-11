@@ -80,6 +80,9 @@ public class Pagamento implements Serializable, Cloneable {
 	@Column(name = "quantidade_item")
 	private Integer quantidadeItem;
 
+	@Column(name = "quantidade_total")
+	private Integer quantidadeTotal;
+
 	@Column(name = "sequencial_item")
 	private Integer sequencialItem;
 
@@ -189,6 +192,10 @@ public class Pagamento implements Serializable, Cloneable {
 
 	public Integer getQuantidadeItem() {
 		return quantidadeItem;
+	}
+
+	public Integer getQuantidadeTotal() {
+		return quantidadeTotal;
 	}
 
 	public Integer getSequencialItem() {
@@ -310,6 +317,10 @@ public class Pagamento implements Serializable, Cloneable {
 
 	public void setQuantidadeItem(Integer quantidadeItem) {
 		this.quantidadeItem = quantidadeItem;
+	}
+
+	public void setQuantidadeTotal(Integer quantidadeTotal) {
+		this.quantidadeTotal = quantidadeTotal;
 	}
 
 	public void setSequencialItem(Integer sequencialItem) {

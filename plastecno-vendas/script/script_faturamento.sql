@@ -20,6 +20,7 @@ create table vendas.tb_pagamento (
 	data_recebimento date default null,
 	descricao varchar(200),
 	quantidade_item integer default 0,
+	quantidade_total integer default 0,
 	sequencial_item integer default 0,
 	id_tipo_pagamento integer not null,
 	liquidado boolean default false,

@@ -152,6 +152,16 @@ public class PagamentoServiceImpl implements PagamentoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void inserirPagamentoParceladoItemPedido(Integer numeroNF, Double valorNF, Date dataVencimento,
 			Date dataEmissao, Integer modalidadeFrete, List<Integer> listaIdItem) throws BusinessException {
+
+		if (pedidoService.contemFornecedorDistintoByIdItem(listaIdItem)) {
+			throw new BusinessException(
+					"Os itens a serem pagos não são do mesmo fornecedor. Verifique os pedidos enviados.");
+		}
+
+		// Aqui estamos validando se os itens enviados ja possuem os pagamentos
+		// de todas as suas quantidades do pedido.
+		validarPagamentoTotalizadoByIdItem(listaIdItem);
+
 		Pagamento p = null;
 		for (Integer idItem : listaIdItem) {
 			p = gerarPagamentoItemPedido(idItem);
@@ -303,6 +313,41 @@ public class PagamentoServiceImpl implements PagamentoService {
 					"O número da NF, ID do fornecedor e a parcela são obrigatórios para retornar a liquidação da NF.");
 		}
 		pagamentoDAO.retornarLiquidacaoPagamentoNFParcelada(numeroNF, idFornecedor, parcela);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public void validarPagamentoTotalizadoByIdItem(List<Integer> listaIdItem) throws BusinessException {
+		List<Integer[]> lPago = verificarPagamentoTotalizadoByIdItem(listaIdItem);
+		if (lPago.size() > 0) {
+			BusinessException e = new BusinessException();
+			for (Integer[] item : lPago) {
+				e.addMensagem("O item " + item[1] + " do pedido No. " + item[2]
+						+ " tem os pagamentos de todas as suas quantidades cadastradas.");
+			}
+			throw e;
+		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Integer[]> verificarPagamentoTotalizadoByIdItem(List<Integer> listaIdItem) {
+		List<Integer[]> lItem = pagamentoDAO.pesquisarQuantidadePagaByIdItem(listaIdItem);
+		if (lItem.isEmpty()) {
+			return new ArrayList<Integer[]>();
+		}
+		List<Integer[]> lPago = new ArrayList<Integer[]>();
+		int qtde = 0;
+		int qtdeTotal = 0;
+		for (Integer[] item : lItem) {
+			qtde = item[3] == null ? 0 : item[3].intValue();
+			qtdeTotal = item[4] == null ? 0 : item[4].intValue();
+			if (qtde > qtdeTotal) {
+				lPago.add(new Integer[] { item[0], item[1], item[2] });
+			}
+		}
+		return lPago;
+
 	}
 
 }

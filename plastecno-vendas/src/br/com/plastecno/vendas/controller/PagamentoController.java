@@ -166,6 +166,7 @@ public class PagamentoController extends AbstractController {
             gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByNF(numeroNF), dataInicial, dataFinal);
             irRodapePagina();
         } catch (InformacaoInvalidaException e) {
+            gerarListaMensagemErro(e);
             addPeriodo(dataInicial, dataFinal);
             irTopoPagina();
         }

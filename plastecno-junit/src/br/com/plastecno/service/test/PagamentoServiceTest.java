@@ -111,9 +111,9 @@ public class PagamentoServiceTest extends AbstractTest {
 				pag2.getIdPedido());
 
 		try {
-			pagamentoService.inserirPagamentoItemPedido(pag1);
-			pagamentoService.inserirPagamentoItemPedido(pag2);
-			pagamentoService.inserirPagamentoItemPedido(pag3);
+			pagamentoService.inserirPagamentoParceladoItemPedido(pag1);
+			pagamentoService.inserirPagamentoParceladoItemPedido(pag2);
+			pagamentoService.inserirPagamentoParceladoItemPedido(pag3);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

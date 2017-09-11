@@ -150,7 +150,24 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirPagamentoItemPedido(Pagamento pagamento) throws BusinessException {
+	public void inserirPagamentoParceladoItemPedido(Integer numeroNF, Double valorNF, Date dataVencimento,
+			Date dataEmissao, Integer modalidadeFrete, List<Integer> listaIdItem) throws BusinessException {
+		Pagamento p = null;
+		for (Integer idItem : listaIdItem) {
+			p = gerarPagamentoItemPedido(idItem);
+			p.setNumeroNF(numeroNF);
+			p.setValorNF(valorNF);
+			p.setModalidadeFrete(modalidadeFrete);
+			p.setDataEmissao(dataEmissao);
+			p.setDataVencimento(dataVencimento);
+
+			inserirPagamentoParceladoItemPedido(p);
+		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void inserirPagamentoParceladoItemPedido(Pagamento pagamento) throws BusinessException {
 		if (pagamento == null) {
 			return;
 		}

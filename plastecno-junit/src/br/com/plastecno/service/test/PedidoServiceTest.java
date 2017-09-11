@@ -97,7 +97,7 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 	}
-	
+
 	private Material gerarMaterial(Representada representada) {
 		Material material = eBuilder.buildMaterial();
 		material.setImportado(true);
@@ -1474,11 +1474,6 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
-	public void testInclusaoOrcamento() {
-		Pedido orcamento = gerarOrcamento();
-
-
-	@Test
 	public void testInclusaoOrcamentoClienteNovo() {
 		Pedido pedido = gPedido.gerarOrcamento();
 		Cliente cliente = new Cliente();
@@ -1579,7 +1574,9 @@ public class PedidoServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("O nome do contato eh obrigatorio para a inclusao do pedido", throwed);
-	}	public void testInclusaoPedidoOrcamento() {
+	}
+
+	public void testInclusaoPedidoOrcamento() {
 		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.getCliente().setId(null);
 

@@ -1,5 +1,6 @@
 package br.com.plastecno.service;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.Local;
@@ -20,7 +21,10 @@ public interface PagamentoService {
 
 	Integer inserir(Pagamento pagamento) throws BusinessException;
 
-	void inserirPagamentoItemPedido(Pagamento pagamento) throws BusinessException;
+	void inserirPagamentoParceladoItemPedido(Integer numeroNF, Double valorNF, Date dataVencimento, Date dataEmissao,
+			Integer modalidadeFrete, List<Integer> listaIdItem) throws BusinessException;
+
+	void inserirPagamentoParceladoItemPedido(Pagamento pagamento) throws BusinessException;
 
 	void liquidarPagamento(Integer idPagamento);
 

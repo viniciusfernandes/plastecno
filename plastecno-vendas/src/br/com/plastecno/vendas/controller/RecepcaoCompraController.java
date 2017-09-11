@@ -1,6 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.Date;
+import java.util.List;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
@@ -68,6 +69,15 @@ public class RecepcaoCompraController extends AbstractController {
         irTopoPagina();
     }
 
+    private void gerarRelatorio(Date dataInicial, Date dataFinal, Integer idRepresentada)
+            throws InformacaoInvalidaException {
+        Periodo periodo = Periodo.gerarPeriodo(dataInicial, dataFinal);
+        RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraAguardandoRecepcao(
+                idRepresentada, periodo);
+
+        addAtributo("relatorio", relatorio);
+    }
+
     @Get("compra/recepcao/inclusaodadosnf")
     public void inserirDadosNotaFiscal(Pedido pedido, Date dataInicial, Date dataFinal, Integer idRepresentada) {
         pedidoService.inserirDadosNotaFiscal(pedido);
@@ -75,16 +85,20 @@ public class RecepcaoCompraController extends AbstractController {
     }
 
     @Post("compra/item/pagamento/inclusao")
-    public void inserirPagamentoItemPedido(Pagamento pagamento, Date dataInicial, Date dataFinal, Integer idRepresentada) {
+    public void inserirPagamentoItemPedido(Pagamento pagamento, List<Integer> listaIdItem, Date dataInicial,
+            Date dataFinal, Integer idRepresentada) {
         try {
-            pagamentoService.inserirPagamentoItemPedido(pagamento);
-            gerarMensagemSucesso("Pagamento incluído com sucesso. Pedido No. " + pagamento.getIdPedido() + " item "
-                    + pagamento.getDescricao());
+            pagamentoService.inserirPagamentoParceladoItemPedido(pagamento.getNumeroNF(), pagamento.getValorNF(),
+                    pagamento.getDataVencimento(), pagamento.getDataEmissao(), pagamento.getModalidadeFrete(),
+                    listaIdItem);
+
+            Date dtAtual = new Date();
+            redirecTo(PagamentoController.class).pesquisarPagamentoByNF(pagamento.getNumeroNF(), dtAtual, dtAtual);
         } catch (BusinessException e) {
             addAtributo("pagamento", pagamento);
             gerarListaMensagemErro(e);
+            pesquisarCompraAguardandoRecepcao(dataInicial, dataFinal, idRepresentada);
         }
-        pesquisarCompraAguardandoRecepcao(dataInicial, dataFinal, idRepresentada);
     }
 
     @Get("compra/recepcao/listagem")
@@ -103,15 +117,6 @@ public class RecepcaoCompraController extends AbstractController {
         }
         addPeriodo(dataInicial, dataFinal);
         addAtributo("idRepresentadaSelecionada", idRepresentada);
-    }
-
-    private void gerarRelatorio(Date dataInicial, Date dataFinal, Integer idRepresentada)
-            throws InformacaoInvalidaException {
-        Periodo periodo = Periodo.gerarPeriodo(dataInicial, dataFinal);
-        RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraAguardandoRecepcao(
-                idRepresentada, periodo);
-
-        addAtributo("relatorio", relatorio);
     }
 
     @Post("compra/item/edicao")

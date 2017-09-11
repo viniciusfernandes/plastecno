@@ -141,7 +141,8 @@ public abstract class AbstractController {
 
     void addSessao(String atributo, Object valor) {
         if (request == null) {
-            throw new IllegalStateException("Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
+            throw new IllegalStateException(
+                    "Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
         }
         request.getSession().setAttribute(atributo, valor);
     }
@@ -261,6 +262,7 @@ public abstract class AbstractController {
         pedido.setDataEntregaFormatada(formatarData(pedido.getDataEntrega()));
         pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));
         pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedidoIPI()));
+        pedido.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorTotal()));
         pedido.setValorFreteFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorFrete()));
         pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
         pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));
@@ -689,10 +691,10 @@ public abstract class AbstractController {
         return StringUtils.removerMascaraDocumento(documento);
     }
 
-    
     void removerSessao(String atributo) {
         if (request == null) {
-            throw new IllegalStateException("Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
+            throw new IllegalStateException(
+                    "Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
         }
         request.getSession().removeAttribute(atributo);
     }

@@ -199,6 +199,9 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private String valorPedidoIPIFormatado;
 
+	@Transient
+	private String valorTotalFormatado;
+
 	@Column(name = "valor_total_nf")
 	private Double valorTotalNF;
 
@@ -500,6 +503,14 @@ public class Pedido implements Serializable, Cloneable {
 		return valorPedidoIPIFormatado;
 	}
 
+	public Double getValorTotal() {
+		return (valorPedidoIPI == null ? 0d : valorPedidoIPI) + (valorFrete == null ? 0d : valorFrete);
+	}
+
+	public String getValorTotalFormatado() {
+		return valorTotalFormatado;
+	}
+
 	public Double getValorTotalNF() {
 		return valorTotalNF;
 	}
@@ -759,6 +770,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setValorPedidoIPIFormatado(String valorPedidoIPIFormatado) {
 		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
+	}
+
+	public void setValorTotalFormatado(String valorTotalFormatado) {
+		this.valorTotalFormatado = valorTotalFormatado;
 	}
 
 	public void setValorTotalNF(Double valorTotalNF) {

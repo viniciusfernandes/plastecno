@@ -5,7 +5,9 @@ $(document).ready(function(){
 	
 	habilitar('#bloco_item_pedido #descricao', false);
 	habilitar('#bloco_item_pedido #peso', false);
+	<%--
 	habilitar('#bloco_item_pedido #aliquotaIPI', <c:out value="${not empty pedido and pedido.representada.IPIHabilitado}"/>);
+	--%>
 	
 	$('#precoVenda').focus(function (){
 		
@@ -328,6 +330,13 @@ function pesquisarNcm(){
 					<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
 					<td colspan="4"><div id="valorPedidoIPI"
 							style="text-align: left;">R$ ${not empty pedido.valorPedidoIPI ? pedido.valorPedidoIPIFormatado : 0}</div></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td colspan="4"></td>
+					<td colspan="2" style="text-align: right;">TOTAL COM FRETE:</td>
+					<td colspan="4"><div id="valorPedidoFrete"
+							style="text-align: left;">R$ ${pedido.valorTotalFormatado}</div></td>
 				</tr>
 			</tfoot>
 		</table>

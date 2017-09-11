@@ -92,8 +92,8 @@ public class RecepcaoCompraController extends AbstractController {
                     pagamento.getDataVencimento(), pagamento.getDataEmissao(), pagamento.getModalidadeFrete(),
                     listaIdItem);
 
-            Date dtAtual = new Date();
-            redirecTo(PagamentoController.class).pesquisarPagamentoByNF(pagamento.getNumeroNF(), dtAtual, dtAtual);
+            redirecTo(PagamentoController.class)
+                    .pesquisarPagamentoByNF(pagamento.getNumeroNF(), new Date(), new Date());
         } catch (BusinessException e) {
             addAtributo("pagamento", pagamento);
             gerarListaMensagemErro(e);
@@ -143,6 +143,7 @@ public class RecepcaoCompraController extends AbstractController {
     public void recepcaoCompraHome() {
         addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
+        addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
     }
 
     @Post("compra/item/recepcaoparcial")

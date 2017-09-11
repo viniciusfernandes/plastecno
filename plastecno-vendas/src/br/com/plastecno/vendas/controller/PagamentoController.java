@@ -59,14 +59,13 @@ public class PagamentoController extends AbstractController {
     public void gerarRelatorioPagamentoByPeriodo(Date dataInicial, Date dataFinal) {
         try {
 
-            Date dtAtual = new Date();
             // Estamos inicializando as datas pois esse metodo eh acessado a
             // partir do menu inicial
             if (dataInicial == null) {
-                dataInicial = dtAtual;
+                dataInicial = new Date();
             }
             if (dataFinal == null) {
-                dataFinal = dtAtual;
+                dataFinal = new Date();
             }
             gerarRelatorioPagamento(dataInicial, dataFinal);
             irRodapePagina();

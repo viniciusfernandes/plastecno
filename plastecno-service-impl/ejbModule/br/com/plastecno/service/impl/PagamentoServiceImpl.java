@@ -190,7 +190,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 			throw new BusinessException(
 					"A data de recebimento deve ser preenchida para a inclusão do pagamento do item do pedido.");
 		}
-		List<Date> listaData = pedidoService.calcularDataPagamento(idPedido, pagamento.getDataRecebimento());
+		List<Date> listaData = pedidoService.calcularDataPagamento(idPedido, pagamento.getDataEmissao());
 
 		// Aqui identificamos um pagamento a vista como um total de uma unica
 		// parcela

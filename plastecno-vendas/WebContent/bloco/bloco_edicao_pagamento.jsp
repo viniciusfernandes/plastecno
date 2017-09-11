@@ -12,8 +12,8 @@ $(document).ready(function() {
 	inserirMascaraData('dataEmissao');
 	inserirMascaraData('dataInicial');
 	inserirMascaraData('dataFinal');
-
 	inserirMascaraData('dataRecebimento');
+
 	inserirMascaraMonetaria('valorNF', 7);
 	inserirMascaraMonetaria('valor', 7);
 	inserirMascaraMonetaria('valorCreditoICMS', 7);

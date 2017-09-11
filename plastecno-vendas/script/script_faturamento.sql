@@ -42,3 +42,5 @@ insert into vendas.tb_tipo_pagamento values (2, 'DESPESAS_FIXAS');
 insert into vendas.tb_tipo_pagamento values (3, 'ACAO_JUDICIAL');
 insert into vendas.tb_tipo_pagamento values (4, 'EQUIPAMENTO');
 insert into vendas.tb_tipo_pagamento values (5, 'EVENTUALIDADE');
+insert into vendas.tb_tipo_pagamento values (6, 'IMPOSTO');
+

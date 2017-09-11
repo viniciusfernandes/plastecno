@@ -65,6 +65,14 @@ $(document).ready(function() {
 	});
 });
 
+function removerPagamento(botao){
+	inicializarModalConfirmacao({
+		mensagem: 'Você tem certeza de que deseja REMOVER esse item?',
+		confirmar: function(){
+			$(botao).closest('form').submit();
+		}
+	});
+};
 </script>
 
 </head>
@@ -111,7 +119,8 @@ $(document).ready(function() {
 					<th style="width: 7%">NF</th>
 					<th style="width: 7%">Val. NF(R$)</th>
 					<th style="width: 7%">Ped.</th>
-					<th style="width: 33%">Desc.</th>
+					<th style="width: 2%">Item</th>
+					<th style="width: 37%">Desc.</th>
 					<th style="width: 5%">Parc.</th>
 					<th style="width: 8%">Forn.</th>
 					<th style="width: 5%">ICMS(R$)</th>
@@ -140,6 +149,7 @@ $(document).ready(function() {
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['valorNF']}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.idPedido}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.sequencialItem}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.parcelaFormatada}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeFornecedor}</td>
@@ -147,16 +157,20 @@ $(document).ready(function() {
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" style="width: 5%">
 								<div class="coluna_acoes_listagem">
-								<form action="<c:url value="/pagamento/"/>${elemento.id}" >
-									<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-									<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
-								</form>
-								<form action="<c:url value="/pagamento/remocao/nfparcelada/"/>${elemento.idItemPedido}" method="post">
-									<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-									<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-									<input type="submit" value="" title="Remover Pagamento" class="botaoRemover"/>
-								</form>
+								<div class="input" style="width: 50%">
+									<form action="<c:url value="/pagamento/"/>${elemento.id}" >
+										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+										<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
+									</form>
+								</div>
+								<div class="input" style="width: 50%">
+									<form action="<c:url value="/pagamento/remocao/nfparcelada/"/>${elemento.idItemPedido}" method="post">
+										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
+										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+										<input type="button" value="" title="Remover Pagamento" class="botaoRemover" onclick="removerPagamento(this);"/>
+									</form>
+								</div>
 								</div>
 							</td>
 							<c:if test="${iElemento.count le 1}">
@@ -211,6 +225,7 @@ $(document).ready(function() {
 								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"></td>
 							</c:if>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
+							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.descricao}</td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.parcelaFormatada}</td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
@@ -243,7 +258,7 @@ $(document).ready(function() {
 									<form action="<c:url value="/pagamento/remocao/"/>${elemento.id}" method="post">
 										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-										<input type="submit" value="" title="Remover Pagamento" class="botaoRemover"/>
+										<input type="button" value="" title="Remover Pagamento" class="botaoRemover" onclick="removerPagamento(this);"/>
 									</form>
 								</div>
 							</td>

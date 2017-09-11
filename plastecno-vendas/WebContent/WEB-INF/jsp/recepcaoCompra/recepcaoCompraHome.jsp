@@ -83,6 +83,17 @@ $(document).ready(function() {
 		$('#formPagamento').attr('action', '<c:url value="/compra/item/pagamento/inclusao"/>').attr('method', 'post').submit();	
 	});
 	
+	$('#botaoLimparPagamento').click(function(){
+		$('#formPagamento input:text').val('');
+		$('#formPagamento input:hidden').val('');
+		$('#formPagamento select').val('');	
+	});
+	
+	inserirMascaraData('dataEmissao');
+	inserirMascaraData('dataRecebimento');
+
+	inserirMascaraMonetaria('valorNF', 7);
+	inserirMascaraNumerica('numeroNF', '9999999');
 });
 
 function removerItem(botao){
@@ -148,19 +159,14 @@ function recepcionarItem(botao){
 	<form id="formPagamento">
 	<fieldset>
 		<legend>Pagamento</legend>
-		<div class="label">Dt. Venc.:</div>
-		<div class="input" style="width: 10%">
-			<input type="text" id="dataVencimento" name="pagamento.dataVencimento" value="${pagamento.dataVencimentoFormatada}" style="width: 100%" />
-		</div>
-		
-		<div class="label" style="width: 10%">Dt. Emiss.:</div>
+		<div class="label" >Dt. Emiss.:</div>
 		<div class="input" style="width: 10%">
 			<input type="text" id="dataEmissao" name="pagamento.dataEmissao" value="${pagamento.dataEmissaoFormatada}" style="width: 100%"/>
 		</div>
 		
 		<div class="label" style="width: 10%">Dt. Receb.:</div>
-		<div class="input" style="width: 40%">
-			<input type="text" id="dataRecebimento" name="pagamento.dataRecebimento" value="${pagamento.dataRecebimentoFormatada}" style="width: 30%" />
+		<div class="input" style="width: 60%">
+			<input type="text" id="dataRecebimento" name="pagamento.dataRecebimento" value="${pagamento.dataRecebimentoFormatada}" style="width: 17%" />
 		</div>
 		
 		<div class="label obrigatorio">NF:</div>

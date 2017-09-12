@@ -457,8 +457,7 @@ public class PedidoController extends AbstractPedidoController {
                 List<Transportadora> listaRedespacho = clienteService.pesquisarTransportadorasRedespacho(pedido
                         .getCliente().getId());
 
-                List<Transportadora> listaTransportadora = clienteService.pesquisarTransportadorasDesassociadas(pedido
-                        .getCliente().getId());
+                List<Transportadora> listaTransportadora = transportadoraService.pesquisarTransportadoraAtiva();
 
                 if (!listaRedespacho.contains(pedido.getTransportadoraRedespacho())) {
                     listaRedespacho.add(pedido.getTransportadoraRedespacho());

@@ -7,20 +7,17 @@ import br.com.plastecno.util.NumeroUtils;
 
 public class OrcamentoEmailBuilder extends PedidoEmailBuilder {
 
-	public OrcamentoEmailBuilder(Pedido pedido, byte[] arquivoAnexo) throws MensagemEmailException {
-		super(pedido, arquivoAnexo);
-	}
-
-	@Override
-	public AnexoEmail gerarArquivoAnexo() {
-		return new AnexoEmail(arquivoAnexo, "application/pdf", 
-				"Orçamento No. "+pedido.getId()+" "+pedido.getCliente().getNomeFantasia()+".pdf", "Orçamento realizado pela Plastecno");
+	public OrcamentoEmailBuilder(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos)
+			throws MensagemEmailException {
+		super(pedido, pdfPedido, anexos);
+		pdfPedido.setNome("Orçamento No. " + pedido.getId() + " " + pedido.getCliente().getNomeFantasia());
+		pdfPedido.setDescricao("Orçamento realizado pela Plastecno");
 	}
 
 	@Override
 	public String gerarConteudo() {
-		return "Prezado "+pedido.getContato().getNome()+
-				", segue o orçamento para analise. Valor total de R$ "+NumeroUtils.formatarValorMonetario(pedido.getValorPedido());
+		return "Prezado " + pedido.getContato().getNome() + ", segue o orçamento para analise. Valor total de R$ "
+				+ NumeroUtils.formatarValorMonetario(pedido.getValorPedido());
 	}
 
 	@Override
@@ -35,7 +32,7 @@ public class OrcamentoEmailBuilder extends PedidoEmailBuilder {
 
 	@Override
 	public String gerarTitulo() {
-		return "Plastecno - Orçamento de Venda No. "+pedido.getId()+" - "+pedido.getCliente().getNomeFantasia();
+		return "Plastecno - Orçamento de Venda No. " + pedido.getId() + " - " + pedido.getCliente().getNomeFantasia();
 	}
 
 }

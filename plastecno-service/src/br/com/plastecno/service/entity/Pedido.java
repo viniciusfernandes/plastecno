@@ -55,6 +55,9 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "Contato do pedido")
 	private Contato contato;
 
+	@Transient
+	private String contatoFormatado;
+
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_emissao_nf")
 	private Date dataEmissaoNF;
@@ -103,10 +106,13 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private Integer idCliente;
 
+	@Column(name = "id_orcamento")
+	private Integer idOrcamento;
+
 	@Transient
 	private Integer idVendedor;
 
-	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY)
 	@InformacaoValidavel(iteravel = true, nomeExibicao = "Lista de logradouro do pedido")
 	private List<LogradouroPedido> listaLogradouro;
 
@@ -124,6 +130,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	@InformacaoValidavel(intervaloComprimento = { 0, 799 }, nomeExibicao = "Observação do pedido")
 	private String observacao;
+
+	@Column(name = "observacao_producao")
+	@InformacaoValidavel(intervaloComprimento = { 0, 799 }, nomeExibicao = "Observação de produção do pedido")
+	private String observacaoProducao;
 
 	@Column(name = "prazo_entrega")
 	private Integer prazoEntrega;
@@ -162,6 +172,15 @@ public class Pedido implements Serializable, Cloneable {
 	@InformacaoValidavel(nomeExibicao = "Redespacho do pedido")
 	private Transportadora transportadoraRedespacho;
 
+	@Column(name = "validade")
+	private Integer validade;
+
+	@Column(name = "valor_frete")
+	private Double valorFrete;
+
+	@Transient
+	private String valorFreteFormatado;
+
 	@Column(name = "valor_parcela_nf")
 	private Double valorParcelaNF;
 
@@ -179,6 +198,9 @@ public class Pedido implements Serializable, Cloneable {
 
 	@Transient
 	private String valorPedidoIPIFormatado;
+
+	@Transient
+	private String valorTotalFormatado;
 
 	@Column(name = "valor_total_nf")
 	private Double valorTotalNF;
@@ -301,6 +323,14 @@ public class Pedido implements Serializable, Cloneable {
 		return o instanceof Pedido && id != null && id.equals(((Pedido) o).id);
 	}
 
+	public void formatarContato() {
+		if (contato == null) {
+			setContatoFormatado(null);
+			return;
+		}
+		setContatoFormatado(contato.formatar());
+	}
+
 	public Double getAliquotaComissaoRepresentada() {
 		return aliquotaComissaoRepresentada;
 	}
@@ -315,6 +345,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public Contato getContato() {
 		return contato;
+	}
+
+	public String getContatoFormatado() {
+		return contatoFormatado;
 	}
 
 	public Date getDataEmissaoNF() {
@@ -369,6 +403,10 @@ public class Pedido implements Serializable, Cloneable {
 		return idCliente;
 	}
 
+	public Integer getIdOrcamento() {
+		return idOrcamento;
+	}
+
 	public Integer getIdVendedor() {
 		return idVendedor;
 	}
@@ -395,6 +433,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public String getObservacao() {
 		return observacao;
+	}
+
+	public String getObservacaoProducao() {
+		return observacaoProducao;
 	}
 
 	public Integer getPrazoEntrega() {
@@ -429,6 +471,18 @@ public class Pedido implements Serializable, Cloneable {
 		return transportadoraRedespacho;
 	}
 
+	public Integer getValidade() {
+		return validade;
+	}
+
+	public Double getValorFrete() {
+		return valorFrete;
+	}
+
+	public String getValorFreteFormatado() {
+		return valorFreteFormatado;
+	}
+
 	public Double getValorParcelaNF() {
 		return valorParcelaNF;
 	}
@@ -449,6 +503,14 @@ public class Pedido implements Serializable, Cloneable {
 		return valorPedidoIPIFormatado;
 	}
 
+	public Double getValorTotal() {
+		return (valorPedidoIPI == null ? 0d : valorPedidoIPI) + (valorFrete == null ? 0d : valorFrete);
+	}
+
+	public String getValorTotalFormatado() {
+		return valorTotalFormatado;
+	}
+
 	public Double getValorTotalNF() {
 		return valorTotalNF;
 	}
@@ -460,6 +522,10 @@ public class Pedido implements Serializable, Cloneable {
 	@Override
 	public int hashCode() {
 		return id != null ? id : -1;
+	}
+
+	public boolean isCancelado() {
+		return SituacaoPedido.isCancelado(situacaoPedido);
 	}
 
 	public boolean isClienteNotificadoVenda() {
@@ -491,8 +557,16 @@ public class Pedido implements Serializable, Cloneable {
 		return TipoPedido.REVENDA.equals(tipoPedido) && SituacaoPedido.ITEM_AGUARDANDO_MATERIAL.equals(situacaoPedido);
 	}
 
+	public boolean isNovo() {
+		return id == null;
+	}
+
 	public boolean isOrcamento() {
-		return SituacaoPedido.ORCAMENTO.equals(this.situacaoPedido);
+		return SituacaoPedido.isOrcamento(situacaoPedido);
+	}
+
+	public boolean isOrcamentoDigitacao() {
+		return SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido);
 	}
 
 	public boolean isRepresentacao() {
@@ -534,6 +608,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setContato(Contato contato) {
 		this.contato = contato;
+	}
+
+	public void setContatoFormatado(String contatoFormatado) {
+		this.contatoFormatado = contatoFormatado;
 	}
 
 	public void setDataEmissaoNF(Date dataEmissaoNF) {
@@ -588,6 +666,10 @@ public class Pedido implements Serializable, Cloneable {
 		this.idCliente = idCliente;
 	}
 
+	public void setIdOrcamento(Integer idOrcamento) {
+		this.idOrcamento = idOrcamento;
+	}
+
 	public void setIdVendedor(Integer idVendedor) {
 		this.idVendedor = idVendedor;
 	}
@@ -614,6 +696,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setObservacao(String observacao) {
 		this.observacao = observacao;
+	}
+
+	public void setObservacaoProducao(String observacaoProducao) {
+		this.observacaoProducao = observacaoProducao;
 	}
 
 	public void setOrcamento(boolean isOrcamento) {
@@ -654,6 +740,18 @@ public class Pedido implements Serializable, Cloneable {
 		this.transportadoraRedespacho = transportadoraRedespacho;
 	}
 
+	public void setValidade(Integer validade) {
+		this.validade = validade;
+	}
+
+	public void setValorFrete(Double valorFrete) {
+		this.valorFrete = valorFrete;
+	}
+
+	public void setValorFreteFormatado(String valorFreteFormatado) {
+		this.valorFreteFormatado = valorFreteFormatado;
+	}
+
 	public void setValorParcelaNF(Double valorParcelaNF) {
 		this.valorParcelaNF = valorParcelaNF;
 	}
@@ -672,6 +770,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public void setValorPedidoIPIFormatado(String valorPedidoIPIFormatado) {
 		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
+	}
+
+	public void setValorTotalFormatado(String valorTotalFormatado) {
+		this.valorTotalFormatado = valorTotalFormatado;
 	}
 
 	public void setValorTotalNF(Double valorTotalNF) {

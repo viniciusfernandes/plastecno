@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -25,8 +24,10 @@ import br.com.plastecno.service.EnderecamentoService;
 import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.ParametroConfiguracaoSistema;
+import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ClienteDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ComentarioCliente;
@@ -127,6 +128,23 @@ public class ClienteServiceImpl implements ClienteService {
 		return lCli;
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Date gerarDataInatividadeCliente() throws BusinessException {
+		final String PARAMETRO = configuracaoSistemaService
+				.pesquisar(ParametroConfiguracaoSistema.DIAS_INATIVIDADE_CLIENTE);
+
+		if (PARAMETRO == null) {
+			throw new BusinessException(
+					"Não configurado o parametro de dias de inatividade para pesquisa de clientes inativos");
+		}
+
+		final Integer DIAS_INATIVIDADE = Integer.parseInt(PARAMETRO);
+		final Calendar dtInativ = Calendar.getInstance();
+		dtInativ.add(Calendar.DAY_OF_YEAR, -DIAS_INATIVIDADE);
+		return dtInativ.getTime();
+	}
+
 	private Query gerarQueryPesquisa(Cliente filtro, StringBuilder select) {
 		Query query = this.entityManager.createQuery(select.toString());
 		if (StringUtils.isNotEmpty(filtro.getNomeFantasia())) {
@@ -176,53 +194,6 @@ public class ClienteServiceImpl implements ClienteService {
 		return s;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void importarLogradouro() {
-		List<Object[]> ids = entityManager.createQuery("select c.id, c.cliente.id from LogradouroCliente c")
-				.getResultList();
-		List<Object[]> logs = null;
-
-		for (Object[] o : ids) {
-			logs = entityManager
-					.createQuery(
-							"select l.endereco.cep, l.endereco.descricao, l.numero, l.complemento, l.endereco.bairro.descricao, l.endereco.cidade.descricao, l.endereco.cidade.uf, l.endereco.cidade.pais.descricao, l.codificado, l.tipoLogradouro from LogradouroEndereco l where l.id =:idlog ",
-							Object[].class).setParameter("idlog", o[0]).getResultList();
-
-			for (Object[] log : logs) {
-				entityManager
-						.createNativeQuery(
-								"update vendas.tb_logradouro_cliente set cep=:cep, endereco=:endereco, numero=:numero, complemento=:complemento, bairro=:bairro, cidade=:cidade, uf=:uf, pais=:pais, codificado=:codificado, id_tipo_logradouro=:tipo where id=:id")
-						.setParameter("cep", log[0]).setParameter("endereco", log[1]).setParameter("numero", log[2])
-						.setParameter("complemento", log[3]).setParameter("bairro", log[4])
-						.setParameter("cidade", log[5]).setParameter("uf", log[6]).setParameter("pais", log[7])
-						.setParameter("codificado", log[8]).setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo())
-						.setParameter("id", o[0]).executeUpdate();
-			}
-		}
-
-		ids = entityManager.createQuery("select p.id, p.cliente.id from Pedido p ").getResultList();
-		for (Object[] o : ids) {
-			logs = entityManager
-					.createQuery(
-							"select l.endereco.cep, l.endereco, l.numero, l.complemento, l.bairro, l.cidade, l.uf, l.pais, l.codificado, l.tipoLogradouro from LogradouroCliente l where l.cliente.id =:idCliente",
-							Object[].class).setParameter("idCliente", o[1]).getResultList();
-
-			for (Object[] log : logs) {
-				entityManager
-						.createNativeQuery(
-								"insert into  vendas.tb_logradouro_pedido (id, id_pedido, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_pedido_id'), :idPedido, :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )")
-						.setParameter("idPedido", o[0]).setParameter("cep", log[0]).setParameter("endereco", log[1])
-						.setParameter("numero", log[2]).setParameter("complemento", log[3])
-						.setParameter("bairro", log[4]).setParameter("cidade", log[5]).setParameter("uf", log[6])
-						.setParameter("pais", log[7]).setParameter("codificado", log[8])
-						.setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo()).executeUpdate();
-			}
-
-		}
-	}
-
 	@PostConstruct
 	public void init() {
 		clienteDAO = new ClienteDAO(entityManager);
@@ -249,9 +220,9 @@ public class ClienteServiceImpl implements ClienteService {
 		validarDocumentosPreenchidos(cliente);
 		validarRevendedorExistente(cliente);
 
-		Integer idCliente = clienteDAO.alterar(cliente).getId();
-		inserirEndereco(idCliente, cliente.getListaLogradouro());
-		return cliente;
+		Cliente c = clienteDAO.alterar(cliente);
+		inserirEndereco(c, cliente.getListaLogradouro());
+		return c;
 	}
 
 	@Override
@@ -263,13 +234,15 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
-	public void inserirComentario(Integer idCliente, String comentario) throws BusinessException {
+	public void inserirComentario(Integer idCliente, String comentario, Integer idUsuario) throws BusinessException {
 		if (StringUtils.isEmpty(comentario)) {
 			return;
 		}
 		Cliente cliente = pesquisarById(idCliente);
-		Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(idCliente);
-		inserirComentario(vendedor, cliente, comentario);
+		if (idUsuario == null) {
+			idUsuario = pesquisarIdVendedorByIdCliente(idCliente);
+		}
+		inserirComentario(new Usuario(idUsuario), cliente, comentario);
 	}
 
 	private void inserirComentario(Usuario proprietario, Cliente cliente, String comentario) throws BusinessException {
@@ -284,34 +257,18 @@ public class ClienteServiceImpl implements ClienteService {
 
 	}
 
-	private void inserirEndereco(Integer idCliente, List<LogradouroCliente> lLogradouro) throws BusinessException {
-		if (lLogradouro == null || lLogradouro.isEmpty() || idCliente == null) {
+	private void inserirEndereco(Cliente c, List<LogradouroCliente> lLogradouro) throws BusinessException {
+		if (lLogradouro == null || lLogradouro.isEmpty()) {
 			return;
 		}
 
-		Cliente c = new Cliente(idCliente);
 		lLogradouro.stream().forEach(l -> l.setCliente(c));
-		lLogradouro = logradouroService.inserir(lLogradouro);
-
-		// Vamos verificar os ceps ja existentes pois vamos inserir na tabela de
-		// logradouro apenas os enderecos que nao existirem no sistema. Devemos
-		// fazer esse filtro pois o usuario podera efetuar alteracoes no
-		// endereco do cliente sem que reflita na tabela de logradouro, por
-		// exemplo: atualizar o nome de rua de um determinado cep. A tabela de
-		// logradouro eh utilizada apenas para consultar os ceps quando o
-		// usuario efetuar uma pesquisa no campo de ceps.
-		List<String> lCep = enderecamentoService.pesquisarCEPExistente(lLogradouro.stream().map(l -> l.getCep())
-				.collect(Collectors.toSet()));
-
-		if (!lCep.isEmpty()) {
-			lLogradouro = lLogradouro.stream().filter(l -> !lCep.contains(l.getCep())).collect(Collectors.toList());
+		for (LogradouroCliente logradouro : lLogradouro) {
+			logradouroService.inserir(logradouro);
 		}
-
-		// Aqui estamos populando a tabela de CEP com os novos enderecos
-		// inseridos pelo usuario
-		for (LogradouroCliente l : lLogradouro) {
-			enderecamentoService.inserir(l.gerarEndereco());
-		}
+		// Aqui estamos populando a base de CEP para caso haja um cep ainda
+		// inexistente.
+		logradouroService.inserirEnderecoBaseCEP(lLogradouro);
 	}
 
 	@Override
@@ -391,14 +348,6 @@ public class ClienteServiceImpl implements ClienteService {
 		return clienteDAO.pesquisarById(id);
 	}
 
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Cliente> pesquisarByIdVendedor(Integer idVendedor, boolean isPesquisaClienteInativo)
-			throws BusinessException {
-		return isPesquisaClienteInativo ? pesquisarInativosByIdVendedor(idVendedor)
-				: pesquisarClienteContatoByIdVendedor(idVendedor);
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -452,7 +401,67 @@ public class ClienteServiceImpl implements ClienteService {
 		List<Cliente> lCli = entityManager.createQuery(s.toString()).setParameter("listaIdBairro", listaIdBairro)
 				.setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO).getResultList();
 
-		return removerClienteDuplicado(lCli);
+		removerClienteDuplicado(lCli);
+		return lCli;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@REVIEW(descricao = "Retornar apenas as informacoes necessarias do cliente")
+	public List<Cliente> pesquisarClienteCompradorByIdVendedor(Integer idVendedor, boolean inativos)
+			throws BusinessException {
+		final StringBuilder s = new StringBuilder();
+		s.append("select p.id, p.dataEnvio, p.cliente from Pedido p left join fetch p.cliente.listaContato ");
+		s.append("where p.id in ");
+		s.append("(select max(p1.id) from Pedido p1 where p1.tipoPedido !=:tipoCompra and p1.situacaoPedido not in (:listaSituacao) ");
+		if (idVendedor != null) {
+			s.append("and p1.cliente.vendedor.id =:idVendedor ");
+		}
+		s.append("group by p1.cliente.id ) ");
+
+		if (inativos) {
+			s.append("and p.dataEnvio <= :dtInatividade ");
+		}
+
+		s.append(" order by p.dataEnvio desc ");
+
+		List<SituacaoPedido> lSit = new ArrayList<>();
+		lSit.add(SituacaoPedido.DIGITACAO);
+		lSit.add(SituacaoPedido.CANCELADO);
+		lSit.add(SituacaoPedido.ORCAMENTO);
+		lSit.add(SituacaoPedido.ORCAMENTO_DIGITACAO);
+
+		Query query = entityManager.createQuery(s.toString());
+		if (inativos) {
+			query.setParameter("dtInatividade", gerarDataInatividadeCliente());
+		}
+
+		// Listando apenas os pedidos que ja tiveram venda efetuada
+		query.setParameter("listaSituacao", lSit);
+		// Listando apenas os pedidos do tipo de venda
+		query.setParameter("tipoCompra", TipoPedido.COMPRA);
+
+		if (idVendedor != null) {
+			query.setParameter("idVendedor", idVendedor);
+		}
+		List<Object[]> l = query.getResultList();
+		if (l == null || l.isEmpty()) {
+			return new ArrayList<Cliente>();
+		}
+
+		List<Cliente> lCli = new ArrayList<Cliente>();
+		Cliente c = null;
+		for (Object[] o : l) {
+			c = (Cliente) o[2];
+			c.setIdUltimoPedido((Integer) o[0]);
+			c.setDataUltimoPedidoFormatado(StringUtils.formatarData((Date) o[1]));
+			lCli.add(c);
+		}
+		// Removendo a duplicacao de registros causados pelo join com os
+		// contatos
+		removerClienteDuplicado(lCli);
+		return lCli;
 	}
 
 	@Override
@@ -502,10 +511,12 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Cliente pesquisarClienteResumidoLogradouroById(Integer idCliente) {
-		Cliente c = clienteDAO.pesquisarClienteResumidoLogradouroById(idCliente);
-		if (c != null) {
-			c.addLogradouro(pesquisarLogradouroCliente(idCliente));
+		Cliente c = clienteDAO.pesquisarClienteResumidoDocumentoById(idCliente);
+		if (c == null) {
+			return null;
 		}
+		c.addLogradouro(pesquisarLogradouroCliente(idCliente));
+		c.addContato(pesquisarContatoPrincipalResumidoByIdCliente(idCliente));
 		return c;
 	}
 
@@ -558,51 +569,22 @@ public class ClienteServiceImpl implements ClienteService {
 				.setParameter("idCliente", idCliente).getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@REVIEW(descricao = "Retornar apenas as informacoes necessarias do cliente")
-	public List<Cliente> pesquisarInativosByIdVendedor(Integer idVendedor) throws BusinessException {
-		final String PARAMETRO = this.configuracaoSistemaService
-				.pesquisar(ParametroConfiguracaoSistema.DIAS_INATIVIDADE_CLIENTE);
+	public ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente) {
+		return clienteDAO.pesquisarContatoPrincipalResumidoByIdCliente(idCliente);
+	}
 
-		if (PARAMETRO == null) {
-			throw new BusinessException(
-					"Não configurado o parametro de dias de inatividade para pesquisa de clientes inativos");
-		}
-
-		final Integer DIAS_INATIVIDADE = Integer.parseInt(PARAMETRO);
-		final Calendar dataInicioInatividade = Calendar.getInstance();
-		dataInicioInatividade.add(Calendar.DAY_OF_YEAR, -DIAS_INATIVIDADE);
-
-		final StringBuilder select = new StringBuilder();
-		select.append("select c from Pedido p inner join p.cliente c ");
-		select.append("left join fetch c.listaContato ");
-
-		select.append("where p.dataEnvio <= :dataInicioInatividade ");
-
-		if (idVendedor != null) {
-			select.append(" and c.vendedor.id = :idVendedor ");
-		}
-		select.append("order by c.dataUltimoContato, c.nomeFantasia ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		if (idVendedor != null) {
-			query.setParameter("idVendedor", idVendedor);
-		}
-		query.setParameter("dataInicioInatividade", dataInicioInatividade.getTime());
-		List<Cliente> l = removerClienteDuplicado(query.getResultList());
-
-		for (Cliente c : l) {
-			c.formatarContatoPrincipal();
-		}
-		return l;
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarIdVendedorByIdCliente(Integer idCliente) {
+		return clienteDAO.pesquisarIdVendedorByIdCliente(idCliente);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<LogradouroCliente> pesquisarLogradouroCliente(Integer idCliente) {
-		return clienteDAO.pesquisarLogradouroClienteById(idCliente);
+		return clienteDAO.pesquisarLogradouroById(idCliente);
 	}
 
 	@Override
@@ -672,19 +654,19 @@ public class ClienteServiceImpl implements ClienteService {
 				.setParameter("idCliente", idCliente).getResultList();
 	}
 
-	private List<Cliente> removerClienteDuplicado(List<Cliente> lCli) {
+	private void removerClienteDuplicado(List<Cliente> lCli) {
 		if (lCli == null || lCli.isEmpty()) {
-			return lCli;
+			return;
 		}
 
-		List<Cliente> l = new ArrayList<Cliente>(lCli.size());
-		for (Cliente c : lCli) {
-			if (l.contains(c)) {
+		List<Cliente> l = new ArrayList<Cliente>(lCli);
+		lCli.clear();
+		for (Cliente c : l) {
+			if (lCli.contains(c)) {
 				continue;
 			}
-			l.add(c);
+			lCli.add(c);
 		}
-		return l;
 	}
 
 	@Override

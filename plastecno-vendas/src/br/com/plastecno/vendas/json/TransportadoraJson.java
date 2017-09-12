@@ -1,6 +1,6 @@
 package br.com.plastecno.vendas.json;
 
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.Transportadora;
 
 public class TransportadoraJson {
@@ -17,7 +17,7 @@ public class TransportadoraJson {
         this(transp, null);
     }
 
-    public TransportadoraJson(Transportadora transp, LogradouroEndereco logr) {
+    public TransportadoraJson(Transportadora transp, Logradouro logr) {
         id = transp == null || transp.getId() == null ? 0 : transp.getId();
         nomeFantasia = transp == null ? "" : transp.getNomeFantasia();
         razaoSocial = transp == null ? "" : transp.getRazaoSocial();

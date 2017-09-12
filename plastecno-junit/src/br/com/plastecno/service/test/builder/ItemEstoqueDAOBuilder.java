@@ -18,8 +18,20 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 		new MockUp<ItemEstoqueDAO>() {
 			@Mock
 			public void alterarPrecoMedioFatorICMS(List<ItemEstoque> listaItem) {
-				// Esse metodo executa apenas um update dos dados em banco e como as
-				// entidades estao em memoria, elas ja estao com os valores alterados.
+				// Esse metodo executa apenas um update dos dados em banco e
+				// como as
+				// entidades estao em memoria, elas ja estao com os valores
+				// alterados.
+			}
+
+			@Mock
+			public void alterarQuantidade(Integer idItemEstoque, Integer quantidade) {
+
+				ItemEstoque i = REPOSITORY.pesquisarEntidadeById(ItemEstoque.class, idItemEstoque);
+				if (i == null) {
+					return;
+				}
+				i.setQuantidade(quantidade);
 			}
 
 			@Mock
@@ -34,7 +46,8 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 					isMaterialIgual = idMaterial != null && idMaterial.equals(i.getMaterial().getId());
 					isFormaIgual = formaMaterial != null && formaMaterial.equals(i.getFormaMaterial());
 					if (isAmbosNulos || isMaterialIgual || isFormaIgual) {
-						listaValores.add(new Double[] { i.getPrecoMedio(), (double) i.getQuantidade(), i.getAliquotaIPI() });
+						listaValores.add(new Double[] { i.getPrecoMedio(), (double) i.getQuantidade(),
+								i.getAliquotaIPI() });
 					}
 				}
 
@@ -64,9 +77,12 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 						continue;
 					}
 
-					// Se nao contem medida isso indica que faremos atualizacao de todos
-					// os itens cujo material e forma coincidem, mas no caso em que contem
-					// medida, faremos atualizacao apenas dos itens que possuem medidas
+					// Se nao contem medida isso indica que faremos atualizacao
+					// de todos
+					// os itens cujo material e forma coincidem, mas no caso em
+					// que contem
+					// medida, faremos atualizacao apenas dos itens que possuem
+					// medidas
 					// iguais.
 
 					isIgual = configuracao.isEqual(i);
@@ -99,13 +115,14 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			@Mock
 			public List<ItemEstoque> pesquisarItemEstoque(Integer idMaterial, FormaMaterial formaMaterial,
 					String descricaoPeca) {
-				List<ItemEstoque> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(ItemEstoque.class, "formaMaterial",
-						formaMaterial);
+				List<ItemEstoque> lista = REPOSITORY.pesquisarEntidadeByRelacionamento(ItemEstoque.class,
+						"formaMaterial", formaMaterial);
 				List<ItemEstoque> itens = new ArrayList<ItemEstoque>();
 				boolean isMaterialSelecionado = false;
 				boolean isPecaSelecionada = false;
 				for (ItemEstoque item : lista) {
-					// A primeira condicao indica que se deseja todas as formas de
+					// A primeira condicao indica que se deseja todas as formas
+					// de
 					// materiais.
 					isMaterialSelecionado = idMaterial == null
 							|| (item.getMaterial() != null && idMaterial.equals(item.getMaterial().getId()));
@@ -114,7 +131,8 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 						continue;
 					}
 
-					isPecaSelecionada = item.isPeca() && descricaoPeca != null && descricaoPeca.equals(item.getDescricaoPeca());
+					isPecaSelecionada = item.isPeca() && descricaoPeca != null
+							&& descricaoPeca.equals(item.getDescricaoPeca());
 					if (isMaterialSelecionado && isPecaSelecionada) {
 						itens.add(item);
 						continue;
@@ -218,8 +236,8 @@ public class ItemEstoqueDAOBuilder extends DAOBuilder<ItemEstoqueDAO> {
 			}
 
 			@Mock
-			public List<ItemEstoque> pesquisarPrecoMedioAliquotaICMSItemEstoque(Integer idItemEstoque, Integer idMaterial,
-					FormaMaterial formaMaterial) {
+			public List<ItemEstoque> pesquisarPrecoMedioAliquotaICMSItemEstoque(Integer idItemEstoque,
+					Integer idMaterial, FormaMaterial formaMaterial) {
 				List<ItemEstoque> lista = new ArrayList<ItemEstoque>();
 				if (idItemEstoque != null) {
 					lista.add(REPOSITORY.pesquisarEntidadeById(ItemEstoque.class, idItemEstoque));

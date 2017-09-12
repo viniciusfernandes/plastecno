@@ -1,7 +1,11 @@
 function inicializarModalConfirmacao(config) {
 	var confirmar = config.confirmar;
 	var mensagem = config.mensagem;
-	var modal = $('#modal').dialog({
+	var modal = $('#modal');
+	if(modal == undefined || modal == null){
+		alert('Nao existe um div de modal para reenderizar as mensagens.');
+	}
+	modal = $(modal).dialog({
 		autoOpen : false,
 		modal : true,
 		resizable : false,

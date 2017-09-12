@@ -4,31 +4,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.mensagem.email.MensagemEmail;
 import br.com.plastecno.service.mensagem.email.exception.MensagemEmailException;
 
 public final class GeradorPedidoEmail {
 
-	private final Pedido pedido;
-	private final byte[] arquivoAnexado;
-	private final Map<TipoMensagemPedido, Class<? extends PedidoEmailBuilder>> mapaMensagem; 
-	
-	public GeradorPedidoEmail (Pedido pedido, byte[] arquivoAnexado) {
-		this.pedido = pedido;
-		this.arquivoAnexado = arquivoAnexado;
-		this.mapaMensagem = new HashMap<TipoMensagemPedido, Class<? extends PedidoEmailBuilder>>();
-		
-		this.mapaMensagem.put(TipoMensagemPedido.VENDA, VendaEmailBuilder.class);
-		this.mapaMensagem.put(TipoMensagemPedido.ORCAMENTO, OrcamentoEmailBuilder.class);
-		this.mapaMensagem.put(TipoMensagemPedido.VENDA_CLIENTE, VendaClienteEmailBuilder.class);
+	private static final Map<TipoMensagemPedido, Class<? extends PedidoEmailBuilder>> mapaMensagem;
+	static {
+		mapaMensagem = new HashMap<TipoMensagemPedido, Class<? extends PedidoEmailBuilder>>();
+		mapaMensagem.put(TipoMensagemPedido.VENDA, VendaEmailBuilder.class);
+		mapaMensagem.put(TipoMensagemPedido.ORCAMENTO, OrcamentoEmailBuilder.class);
+		mapaMensagem.put(TipoMensagemPedido.VENDA_CLIENTE, VendaClienteEmailBuilder.class);
+		mapaMensagem.put(TipoMensagemPedido.COMPRA, CompraEmailBuilder.class);
 	}
-	
-	public MensagemEmail gerarMensagem(TipoMensagemPedido tipoMensagem) throws MensagemEmailException {
+
+	public static MensagemEmail gerarMensagem(Pedido pedido, TipoMensagemPedido tipoMensagem, AnexoEmail pdfPedido,
+			AnexoEmail... anexos) throws MensagemEmailException {
 		try {
-			return this.mapaMensagem.get(tipoMensagem).getConstructor(Pedido.class, byte[].class)
-					.newInstance(this.pedido, this.arquivoAnexado).gerarMensagemEmail();
+			return mapaMensagem.get(tipoMensagem).getConstructor(Pedido.class, AnexoEmail.class, AnexoEmail[].class)
+					.newInstance(pedido, pdfPedido, anexos).gerarMensagemEmail();
 		} catch (Exception e) {
 			throw new MensagemEmailException("Falha ao tentar inicializar o construtor da mensagem de email", e);
 		}
+	}
+
+	private GeradorPedidoEmail() {
 	}
 }

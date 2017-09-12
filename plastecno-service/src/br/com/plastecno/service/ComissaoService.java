@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Comissao;
 import br.com.plastecno.service.exception.BusinessException;
 
@@ -20,6 +21,8 @@ public interface ComissaoService {
 
 	Integer inserirComissaoVendedor(Integer idVendedor, Double comissaoRevenda, Double comissaoRepresentacao)
 			throws BusinessException;
+
+	Double pesquisarAliquotaComissaoByIdVendedor(Integer idVendedor, TipoPedido tipoPedido);
 
 	Comissao pesquisarAliquotaComissaoVigenteVendedor(Integer idVendedor);
 

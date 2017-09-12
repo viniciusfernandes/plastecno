@@ -8,9 +8,16 @@ function removerNaoDigitos(listaId) {
 	var campo = null;
 	for (var i = 0; i < totalElementos; i++) {
 		campo = $('#'+listaId[i]);
-		campo.val(campo.val().replace(/\D/g, ''));
+		campo.val(removerCaracteresNaoDigitos(campo.val()));
 	}
 }
+
+function removerCaracteresNaoDigitos(valor){
+	if(isEmpty(valor)){
+		return valor;
+	}
+	return valor.replace(/\D/g, '');
+};
 
 function toUpperCaseInput (){
 	$("input, textArea").each(function(){
@@ -112,7 +119,7 @@ function habilitar(seletorCampo, habilitado) {
 }
 
 function isEmpty (string) {
-	return string == null || /^\s*$/.test(string);
+	return string == undefined || string == null || /^\s*$/.test(string);
 }
 
 
@@ -252,6 +259,9 @@ function limparBlocoInput(blocoId) {
 }
 
 function scrollTo(idAncora) {
+	if(isEmpty(idAncora)){
+		return;
+	}
 	var ancora = document.getElementById(idAncora);
 	if (ancora != null) {
 			ancora.scrollIntoView(true);	
@@ -366,4 +376,49 @@ function adicionarInputHiddenFormulario(formId, name, value){
 	input.name = name;
 	input.value = value;
 	document.getElementById(formId).appendChild(input);
+};
+
+function tabelaChecker(config){
+	if(config == undefined || config==null|| isEmpty(config.idTabela) || isEmpty(config.nomeParametros)){
+		alert('Falha na configuracao da tabela selecionavel.');
+	}
+	var lValores = new Array();
+	$('#'+config.idTabela + ' tr input:checkbox').click(function(){
+		if($(this).prop('checked')){
+			lValores.push($(this).val());	
+		} else {
+			var idx = lValores.indexOf($(this).val());
+			if(idx < 0){
+				return;
+			}
+			lValores.splice(idx, 1);
+		}
+	});
+	
+	this.gerarListaParametros = function (){
+		var parametros = '';
+		for (var i = 0; i < lValores.length; i++) {
+			// Estamos validando aqui pois no DELETE dos itens da lista o javascript mantem undefined.
+			if(lValores[i] != undefined){
+				parametros+='&'+config.nomeParametros+'[]='+lValores[i];
+			}
+		};
+		return parametros;
+	};
+	
+	this. addInputHidden = function (idForm){
+		if(idForm == undefined || idForm==null|| isEmpty(idForm)){
+			return;
+		}
+		for (var i = 0; i < lValores.length; i++) {
+			// Estamos validando aqui pois no DELETE dos itens da lista o javascript mantem undefined.
+			if(lValores[i] != undefined){
+				adicionarInputHiddenFormulario(idForm, config.nomeParametros+'['+i+']', lValores[i]);
+			}
+		};
+	};
+	
+	this.hasChecked = function(){
+		return lValores.length > 0;
+	};
 };

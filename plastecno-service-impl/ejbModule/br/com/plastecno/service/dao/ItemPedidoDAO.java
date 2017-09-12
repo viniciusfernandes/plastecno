@@ -33,6 +33,14 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				.setParameter("quantidadeRecepcionada", quantidadeRecepcionada).executeUpdate();
 	}
 
+	public void alterarQuantidadeReservada(Integer idItemPedido, Integer quantidadeReservada) {
+		entityManager
+				.createQuery(
+						"update ItemPedido i set i.quantidadeRecepcionada = :quantidadeReservada where i.id = :idItemPedido")
+				.setParameter("idItemPedido", idItemPedido).setParameter("quantidadeReservada", quantidadeReservada)
+				.executeUpdate();
+	}
+
 	private StringBuilder gerarConstrutorItemPedidoComDataEntrega() {
 		return new StringBuilder(
 				"select new ItemPedido(i.id, i.sequencial, i.pedido.id, i.pedido.proprietario.nome, i.quantidade, i.quantidadeRecepcionada, i.quantidadeReservada, i.precoUnidade, i.pedido.representada.nomeFantasia, i.pedido.dataEntrega, i.formaMaterial, i.material.sigla, i.material.descricao, i.descricaoPeca, i.medidaExterna, i.medidaInterna, i.comprimento)  from ItemPedido i ");
@@ -110,8 +118,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Date dataInicial,
-			Date dataFinal) {
+	public List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Date dataInicial, Date dataFinal) {
 		StringBuilder select = gerarConstrutorItemPedidoIdPedidoCompraEVenda();
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
 		select.append("and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada =null)");
@@ -350,8 +357,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
-			Integer idProprietario, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros, ItemPedido itemVendido) {
+			Integer idProprietario, Integer idFornecedor, boolean isOrcamento, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido) {
 
 		// Tivemos que particionar a consulta em 2 etapas pois a paginacao deve
 		// ser
@@ -376,6 +383,13 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			selectPedido.append(" and p.tipoPedido != :tipoPedido ");
 		}
 
+		if (isOrcamento) {
+			selectPedido.append(" and p.situacaoPedido in (:listaTipoOrcamento) ");
+		} else {
+			selectPedido.append(" and p.situacaoPedido not in (:listaTipoOrcamento) ");
+
+		}
+
 		selectPedido.append("order by p.id desc ");
 
 		Query query = this.entityManager.createQuery(selectPedido.toString());
@@ -389,7 +403,8 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			query.setParameter("idFornecedor", idFornecedor);
 		}
 
-		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+		query.setParameter("tipoPedido", TipoPedido.COMPRA).setParameter("listaTipoOrcamento",
+				SituacaoPedido.getListaOrcamento());
 
 		List<Object[]> listaIdPedido = QueryUtil.paginar(query, indiceRegistroInicial, numeroMaximoRegistros);
 		if (listaIdPedido.isEmpty()) {
@@ -415,6 +430,15 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		inserirParametroPesquisaItemVendido(queryItem, itemVendido);
 
 		return queryItem.getResultList();
+	}
+
+	public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new ItemPedido(i.aliquotaICMS, i.comprimento, i.material.descricao, i.descricaoPeca, i.formaMaterial, i.id, i.pedido.id, i.pedido.representada.id, i.medidaExterna, i.medidaInterna, i.pedido.representada.nomeFantasia, i.precoUnidade, i.quantidade, i.sequencial, i.material.sigla) from ItemPedido i where i.id =:idItemPedido ")
+								.setParameter("idItemPedido", idItemPedido), ItemPedido.class, null);
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,
@@ -461,8 +485,21 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return pesquisarCampoById(ItemPedido.class, idItemPedido, "quantidadeRecepcionada", Integer.class);
 	}
 
+	public Integer pesquisarQuantidadeReservada(Integer idItemPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.quantidadeReservada from ItemPedido i where i.id=:idItemPedido")
+						.setParameter("idItemPedido", idItemPedido), Integer.class, null);
+	}
+
 	public Integer pesquisarSequencialItemPedido(Integer idItemPedido) {
 		return pesquisarCampoById(ItemPedido.class, idItemPedido, "sequencial", Integer.class);
+	}
+
+	public List<Integer> pesquisarTotalFornecedorDistintoByIdItem(List<Integer> listaIdItem) {
+		return entityManager
+				.createQuery(
+						"select i.pedido.representada.id from ItemPedido i where i.id in(:listaIdItem) group by i.pedido.representada.id",
+						Integer.class).setParameter("listaIdItem", listaIdItem).getResultList();
 	}
 
 	public Long pesquisarTotalItemRevendaNaoEncomendado(Integer idPedido) {
@@ -475,7 +512,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, ItemPedido itemVendido) {
+			Integer idFornecedor, boolean isOrcamento, boolean isCompra, ItemPedido itemVendido) {
 		StringBuilder select = new StringBuilder("select count(p.id) from Pedido p where p.cliente.id = :idCliente ");
 		if (idVendedor != null) {
 			select.append("and p.proprietario.id = :idVendedor ");
@@ -491,10 +528,21 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 			select.append("and p.tipoPedido != :tipoPedido ");
 		}
 
+		if (isOrcamento) {
+			select.append("and p.situacaoPedido in (:listaTipoOrcamento) ");
+		} else {
+			select.append("and p.situacaoPedido not in (:listaTipoOrcamento) ");
+		}
+
 		inserirPesquisaItemVendido(select, itemVendido);
 
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA);
+		List<SituacaoPedido> lOrcamento = new ArrayList<>();
+		lOrcamento.add(SituacaoPedido.ORCAMENTO);
+		lOrcamento.add(SituacaoPedido.ORCAMENTO_DIGITACAO);
+
+		Query query = entityManager.createQuery(select.toString());
+		query.setParameter("idCliente", idCliente).setParameter("tipoPedido", TipoPedido.COMPRA)
+				.setParameter("listaTipoOrcamento", lOrcamento);
 
 		if (idVendedor != null) {
 			query.setParameter("idVendedor", idVendedor);

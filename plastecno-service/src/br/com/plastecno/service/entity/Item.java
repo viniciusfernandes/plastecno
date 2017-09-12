@@ -7,7 +7,6 @@ import javax.persistence.Transient;
 import br.com.plastecno.service.constante.FormaMaterial;
 
 public abstract class Item implements Serializable, Cloneable {
-
 	/**
 	 * 
 	 */
@@ -105,6 +104,28 @@ public abstract class Item implements Serializable, Cloneable {
 
 	public boolean contemMedida() {
 		return getMedidaExterna() != null || getMedidaInterna() != null || getComprimento() != null;
+	}
+
+	public void copiar(ItemEstoque itemEStoque) {
+		this.setComprimento(itemEStoque.getComprimento());
+		this.setDescricaoPeca(itemEStoque.getDescricaoPeca());
+		this.setFormaMaterial(itemEStoque.getFormaMaterial());
+		this.setMaterial(itemEStoque.getMaterial());
+		this.setMedidaExterna(itemEStoque.getMedidaExterna());
+		this.setMedidaInterna(itemEStoque.getMedidaInterna());
+		this.setQuantidade(itemEStoque.getQuantidade());
+	}
+
+	public void copiar(ItemPedido itemPedido) {
+		this.setComprimento(itemPedido.getComprimento());
+		this.setDescricaoPeca(itemPedido.getDescricaoPeca());
+		this.setFormaMaterial(itemPedido.getFormaMaterial());
+		this.setMaterial(itemPedido.getMaterial());
+		this.setMedidaExterna(itemPedido.getMedidaExterna());
+		this.setMedidaInterna(itemPedido.getMedidaInterna());
+		this.setQuantidade(itemPedido.getQuantidade());
+		this.setAliquotaIPI(itemPedido.getAliquotaIPI());
+		this.setAliquotaICMS(itemPedido.getAliquotaICMS());
 	}
 
 	public String gerarCodigo() {

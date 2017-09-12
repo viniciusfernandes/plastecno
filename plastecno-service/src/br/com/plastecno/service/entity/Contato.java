@@ -25,10 +25,12 @@ import br.com.plastecno.util.StringUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 @InformacaoValidavel
 public class Contato implements Serializable {
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1884771619205961167L;
+	private static final long serialVersionUID = 2455547533115716220L;
+
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF")
 	private String cpf;
 
@@ -68,12 +70,12 @@ public class Contato implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "contatoSequence")
 	private Integer id;
 
-	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro do contato")
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "id_logradouro")
-	private LogradouroEndereco logradouro;
+	@JoinColumn(name = "id_logradouro_contato")
+	@InformacaoValidavel(cascata = true, nomeExibicao = "Logradouro da Contato")
+	private LogradouroContato logradouro;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 20 }, nomeExibicao = "Nome do contato")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 80 }, nomeExibicao = "Nome do contato")
 	private String nome;
 
 	@InformacaoValidavel(nomeExibicao = "Ramal do contato")
@@ -259,7 +261,7 @@ public class Contato implements Serializable {
 		return id;
 	}
 
-	public LogradouroEndereco getLogradouro() {
+	public LogradouroContato getLogradouro() {
 		return logradouro;
 	}
 
@@ -363,7 +365,7 @@ public class Contato implements Serializable {
 		this.id = id;
 	}
 
-	public void setLogradouro(LogradouroEndereco logradouro) {
+	public void setLogradouro(LogradouroContato logradouro) {
 		this.logradouro = logradouro;
 	}
 

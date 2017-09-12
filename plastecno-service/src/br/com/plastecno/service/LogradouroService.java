@@ -7,17 +7,19 @@ import javax.ejb.Local;
 
 import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroEndereco;
-import br.com.plastecno.service.entity.LogradouroCliente;
-import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface LogradouroService {
-	List<LogradouroCliente> inserir(List<LogradouroCliente> listaLogradouro) throws BusinessException;
+	void importarCodigoMunicipio();
+
+	void importarLogradouro();
 
 	<T extends Logradouro> T inserir(T logradouro) throws BusinessException;
 
-	LogradouroEndereco inserirBaseCep(LogradouroEndereco logradouro) throws BusinessException;
+	void inserirEnderecoBaseCEP(List<? extends Logradouro> lLogradouro) throws BusinessException;
+
+	void inserirEnderecoBaseCEP(Logradouro logradouro) throws BusinessException;
 
 	List<? extends LogradouroEndereco> pesquisar(Integer id, Class<? extends LogradouroEndereco> classe);
 
@@ -25,7 +27,7 @@ public interface LogradouroService {
 
 	String pesquisarCodigoIBGEByCEP(String cep);
 
-	String pesquisarCodigoIBGEByIdCidade(Integer idCidade);
+	String pesquisarCodigoMunicipioByCep(String cep);
 
 	/**
 	 * Metodo que remove todos os logradouros cadastrados no sistema que nao
@@ -47,7 +49,6 @@ public interface LogradouroService {
 
 	void removerLogradouro(Logradouro logradouro);
 
-	void validarListaLogradouroPreenchida(List<LogradouroCliente> listaLogradouro) throws BusinessException;
+	void validarListaLogradouroPreenchida(List<? extends Logradouro> listaLogradouro) throws BusinessException;
 
-	void validarListaLogradouroPreenchidaXXX(List<LogradouroPedido> listaLogradouro) throws BusinessException;
 }

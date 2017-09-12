@@ -11,46 +11,18 @@ function inicializarBlocoLogradouro(urlTela) {
 	
 	tabelaLogradouroHandler.editarRegistro(function (linha){
 		var doc = document;
-		for ( var i = 0; i < this.TOTAL_COLUNAS; i++) {
-			
-			switch (i) {
-				case 0:
-					doc.getElementById('idLogradouro').value = linha.cells[i].innerHTML;
-					break;
-				case 1:
-					doc.getElementById('tipoLogradouro').value = linha.cells[i].innerHTML;
-					break;
-				case 2:
-					doc.getElementById('cep').value = linha.cells[i].innerHTML;
-					break;
-				case 3:
-					doc.getElementById('endereco').value = linha.cells[i].innerHTML;
-					break;
-				case 4:
-					doc.getElementById('numero').value = linha.cells[i].innerHTML;
-					break;
-				case 5:
-					doc.getElementById('complemento').value = linha.cells[i].innerHTML;
-					break;
-				case 6:
-					doc.getElementById('bairro').value = linha.cells[i].innerHTML;
-					break;
-				case 7:
-					doc.getElementById('cidade').value = linha.cells[i].innerHTML;
-					break;
-				case 8:
-					doc.getElementById('uf').value = linha.cells[i].innerHTML;
-					break;
-				case 9:
-					doc.getElementById('pais').value = linha.cells[i].innerHTML;
-					break;
-				case 10:
-					doc.getElementById('codificado').checked = 'false'== linha.cells[i].innerHTML ? false : true;
-					break;
-				default:
-					break;
-			}
-		};
+		doc.getElementById('idLogradouro').value = linha.cells[0].innerHTML;
+		doc.getElementById('tipoLogradouro').value = linha.cells[1].innerHTML;
+		doc.getElementById('cep').value = linha.cells[2].innerHTML;
+		doc.getElementById('endereco').value = linha.cells[3].innerHTML;
+		doc.getElementById('numero').value = linha.cells[4].innerHTML;
+		doc.getElementById('complemento').value = linha.cells[5].innerHTML;
+		doc.getElementById('bairro').value = linha.cells[6].innerHTML;
+		doc.getElementById('cidade').value = linha.cells[7].innerHTML;
+		doc.getElementById('uf').value = linha.cells[8].innerHTML;
+		doc.getElementById('pais').value = linha.cells[9].innerHTML;
+		doc.getElementById('codigoMunicipio').value = linha.cells[10].innerHTML;
+		doc.getElementById('codificado').checked = 'false'== linha.cells[11].innerHTML ? false : true;
 	});
 	
 	tabelaLogradouroHandler.incluirRegistro(function (ehEdicao, linha){
@@ -91,6 +63,9 @@ function inicializarBlocoLogradouro(urlTela) {
 					celula.innerHTML = doc.getElementById('pais').value;
 					break;
 				case 10:
+					celula.innerHTML = doc.getElementById('codigoMunicipio').value;
+					break;
+				case 11:
 					celula.innerHTML = doc.getElementById('codificado').checked;
 					celula.style.display = 'none';
 					break;
@@ -103,49 +78,18 @@ function inicializarBlocoLogradouro(urlTela) {
 	tabelaLogradouroHandler.gerarParametros(function (indiceLinha, linha, nomeLista) {
 		var parametros = '';
 		var celulas = linha.cells;
-		var TOTAL_CELULAS = celulas.length;
-		for ( var j = 0; j < TOTAL_CELULAS; j++) {
-			if (!isEmpty(celulas[j].innerHTML)) {
-				switch (j) {
-					case 0:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].id='+celulas[j].innerHTML;
-						break;
-					case 1:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].tipoLogradouro='+celulas[j].innerHTML;
-						break;
-					case 2:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].cep='+celulas[j].innerHTML;
-						break;
-					case 3:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].endereco='+celulas[j].innerHTML;
-						break;
-					case 4:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].numero='+celulas[j].innerHTML;
-						break;
-					case 5:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].complemento='+celulas[j].innerHTML;
-						break;
-					case 6:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].bairro='+celulas[j].innerHTML;
-						break;
-					case 7:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].cidade='+celulas[j].innerHTML;
-						break;
-					case 8:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].uf='+celulas[j].innerHTML;
-						break;
-					case 9:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].pais='+celulas[j].innerHTML;
-						break;
-					case 10:
-						parametros += '&'+nomeLista+'['+indiceLinha+'].codificado='+celulas[j].innerHTML;
-						break;
-					default:
-						break;
-				}
-				
-			}
-		}
+		parametros += '&'+nomeLista+'['+indiceLinha+'].id='+(!isEmpty(celulas[0].innerHTML)?celulas[0].innerHTML:'');
+		parametros += '&'+nomeLista+'['+indiceLinha+'].tipoLogradouro='+(!isEmpty(celulas[1].innerHTML)?celulas[1].innerHTML:'');
+		parametros += '&'+nomeLista+'['+indiceLinha+'].cep='+(!isEmpty(celulas[2].innerHTML)?celulas[2].innerHTML:'');
+		parametros += '&'+nomeLista+'['+indiceLinha+'].endereco='+(!isEmpty(celulas[3].innerHTML)?celulas[3].innerHTML:'');
+		parametros += '&'+nomeLista+'['+indiceLinha+'].numero='+(!isEmpty(celulas[4].innerHTML)?celulas[4].innerHTML:'');
+		parametros += '&'+nomeLista+'['+indiceLinha+'].complemento='+(!isEmpty(celulas[5].innerHTML)?celulas[5].innerHTML:'');
+		parametros += '&'+nomeLista+'['+indiceLinha+'].bairro='+(!isEmpty(celulas[6].innerHTML)?celulas[6].innerHTML:'');
+		parametros += '&'+nomeLista+'['+indiceLinha+'].cidade='+(!isEmpty(celulas[7].innerHTML)?celulas[7].innerHTML:'');
+		parametros += '&'+nomeLista+'['+indiceLinha+'].uf='+(!isEmpty(celulas[8].innerHTML)?celulas[8].innerHTML:'');
+		parametros += '&'+nomeLista+'['+indiceLinha+'].pais='+(!isEmpty(celulas[9].innerHTML)?celulas[9].innerHTML:'');
+		parametros += '&'+nomeLista+'['+indiceLinha+'].codigoMunicipio='+(!isEmpty(celulas[10].innerHTML)?celulas[10].innerHTML:'');
+		//parametros += '&'+nomeLista+'['+indiceLinha+'].codificado='+(!isEmpty(celulas[11].innerHTML)?celulas[11].innerHTML:'');
 		return parametros;
 	});
 	

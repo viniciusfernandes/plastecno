@@ -22,6 +22,8 @@ import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 @Local
 public interface RelatorioService {
 
+	byte[] gerarPlanilhaClienteVendedor(Integer idVendedor, boolean clienteInativo) throws BusinessException;
+
 	ReceitaWrapper gerarReceitaEstimada(Periodo periodo);
 
 	RelatorioWrapper<String, Cliente> gerarRelatorioClienteRamoAtividade(Integer idRamoAtividade) throws BusinessException;
@@ -34,7 +36,7 @@ public interface RelatorioService {
 
 	List<Pedido> gerarRelatorioCompra(Periodo periodo) throws InformacaoInvalidaException;
 
-	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
+	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecepcao(Integer idRepresentada,
 			Periodo periodo);
 
 	RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicata(Periodo periodo) throws BusinessException;
@@ -50,8 +52,8 @@ public interface RelatorioService {
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemAguardandoMaterial(Integer idRepresentada, Periodo periodo);
 
 	RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
-			Integer idVendedor, Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial,
-			Integer numeroMaximoRegistros, ItemPedido itemVendido);
+			Integer idVendedor, Integer idFornecedor, boolean isOrcamento, boolean isCompra,
+			Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido);
 
 	RelatorioWrapper<Integer, NFeItemFracionado> gerarRelatorioPedidoFracionado();
 

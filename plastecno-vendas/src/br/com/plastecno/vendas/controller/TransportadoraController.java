@@ -12,7 +12,7 @@ import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.entity.ContatoTransportadora;
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroTransportadora;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -32,13 +32,13 @@ public class TransportadoraController extends AbstractController {
 
     public TransportadoraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
-        this.setNomeTela("Transportadora");
-        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
+        setNomeTela("Transportadora");
+        verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
     }
 
     @Post("transportadora/desativacao")
     public void desativar(Integer idTransportadora) {
-        this.transportadoraService.desativar(idTransportadora);
+        transportadoraService.desativar(idTransportadora);
         gerarMensagemSucesso("Transportadora desativada com sucesso");
         irTopoPagina();
     }
@@ -49,8 +49,8 @@ public class TransportadoraController extends AbstractController {
     }
 
     @Post("transportadora/inclusao")
-    public void inserir(Transportadora transportadora, LogradouroEndereco logradouro, List<ContatoTransportadora> listaContato,
-            List<Integer> listaContatoRemocao) {
+    public void inserir(Transportadora transportadora, LogradouroTransportadora logradouro,
+            List<ContatoTransportadora> listaContato, List<Integer> listaContatoRemocao) {
         try {
             if (temElementos(listaContato)) {
                 transportadora.addContato(listaContato);
@@ -61,10 +61,9 @@ public class TransportadoraController extends AbstractController {
                 transportadora.setLogradouro(logradouro);
             }
 
-            this.transportadoraService.inserir(transportadora);
-            this.gerarMensagemCadastroSucesso(transportadora, "nomeFantasia");
+            transportadoraService.inserir(transportadora);
+            gerarMensagemCadastroSucesso(transportadora, "nomeFantasia");
         } catch (BusinessException e) {
-            this.formatarDocumentos(transportadora);
             addAtributo("transportadora", transportadora);
             addAtributo("logradouro", logradouro);
             addAtributo("listaContato", listaContato);
@@ -79,11 +78,10 @@ public class TransportadoraController extends AbstractController {
     public void pesquisar(Integer idTransportadora) {
 
         Transportadora transportadora = transportadoraService.pesquisarTransportadoraLogradouroById(idTransportadora);
-        formatarDocumentos(transportadora);
 
         addAtributo("transportadora", transportadora);
-        addAtributo("listaContato", this.transportadoraService.pesquisarContato(idTransportadora));
-        addAtributo("logradouro", this.transportadoraService.pesquisarLogradorouro(idTransportadora));
+        addAtributo("listaContato", transportadoraService.pesquisarContato(idTransportadora));
+        addAtributo("logradouro", transportadoraService.pesquisarLogradorouro(idTransportadora));
         irTopoPagina();
     }
 
@@ -91,14 +89,12 @@ public class TransportadoraController extends AbstractController {
     public void pesquisar(Transportadora filtro, Integer paginaSelecionada) {
         filtro.setCnpj(this.removerMascaraDocumento(filtro.getCnpj()));
 
-        PaginacaoWrapper<Transportadora> paginacao = this.transportadoraService.paginarTransportadora(filtro, null,
-                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
-
-        for (Transportadora transportadora : paginacao.getLista()) {
-            this.formatarDocumentos(transportadora);
+        PaginacaoWrapper<Transportadora> paginacao = transportadoraService.paginarTransportadora(filtro, null,
+                calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+        for (Transportadora t : paginacao.getValor()) {
+            formatarDocumentos(t);
         }
-
-        this.inicializarPaginacao(paginaSelecionada, paginacao, "listaTransportadora");
+        inicializarPaginacao(paginaSelecionada, paginacao, "listaTransportadora");
         addAtributo("transportadora", filtro);
     }
 

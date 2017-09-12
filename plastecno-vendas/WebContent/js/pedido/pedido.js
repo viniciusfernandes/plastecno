@@ -1,159 +1,3 @@
-var tabelaItemHandler = null;
-
-function inicializarBlocoItemPedido(urlTela) {
-	
-	var TOTAL_COLUNAS_ITEM_PEDIDO = 11;
-	
-	tabelaItemHandler = new BlocoTabelaHandler(urlTela, 'ItemPedido',
-			'tabelaItemPedido', 'bloco_item_pedido');
-	tabelaItemHandler.setTotalColunas(TOTAL_COLUNAS_ITEM_PEDIDO);
-
-	// Estamos passando uma funcao de callback para a tabela_handler popular o
-	// valor do pedido atualizado
-	tabelaItemHandler.removerRegistroCallback(function(response) {
-		var pedido = response.pedido;
-		if(pedido == undefined || pedido == null){
-			return;
-		}
-		$('#tabelaItemPedido tfoot #valorPedido').html(pedido.valorPedido);
-		$('#tabelaItemPedido tfoot #valorPedidoIPI')
-				.html(pedido.valorPedidoIPI);
-	});
-
-	tabelaItemHandler
-			.incluirRegistro(function(ehEdicao, linha) {
-				var celula = null;
-				for (var i = 0; i < this.TOTAL_COLUNAS; i++) {
-					celula = ehEdicao ? linha.cells[i] : linha.insertCell(i);
-
-					// Ocultando a primeira celula que eh reservada ao ID do
-					// registro
-					switch (i) {
-					case 0:
-						celula.innerHTML = $('#bloco_item_pedido #idItemPedido')
-								.val();
-						
-						celula.style.display="none";
-						break;
-						
-					case 1:
-						celula.innerHTML = $('#bloco_item_pedido #sequencial')
-								.val();
-						break;
-
-					case 2:
-						celula.innerHTML = $('#bloco_item_pedido #quantidade')
-								.val();
-						break;
-					case 3:
-						/*
-						 * Esse item foi recuperado o json retornado pelo
-						 * controller pois assim teremos e que eh identica ao
-						 * que em outros pontos da aplicacao
-						 */
-						celula.innerHTML = $(
-								'#bloco_item_pedido #descricaoItemPedido')
-								.val();
-						break;
-					case 4:
-						// Pegando o valor que foi escolhido no ragio group do
-						// tipo de vendas
-						celula.innerHTML = $(
-								"#bloco_item_pedido input[type='radio']:checked")
-								.val();
-						break;
-					case 5:
-						celula.innerHTML = $("#bloco_item_pedido #precoVenda")
-								.val();
-						break;
-					case 6:
-						celula.innerHTML = $("#bloco_item_pedido #precoUnidade")
-								.val();
-						break;
-
-					case 7:
-						celula.innerHTML = $("#bloco_item_pedido #precoItem").val();
-						break;
-						
-					case 8:
-						celula.innerHTML = $("#bloco_item_pedido #aliquotaIPI").val();
-						break;
-					
-					case 9:
-						celula.innerHTML = $("#bloco_item_pedido #aliquotaICMS")
-								.val();
-						break;
-					
-					case 10:
-						celula.innerHTML = $("#bloco_item_pedido #prazoEntregaItem")
-								.val();
-						break;
-					
-					}
-
-				}
-			});
-
-	tabelaItemHandler
-			.editarRegistro(function(linha) {
-
-				var request = $.ajax({
-					type : 'get',
-					url : tabelaItemHandler.urlTela + '/item/' + linha.cells[0].innerHTML
-				});
-
-				request.done(function(response) {
-					var itemPedidoJson = response.itemPedido;
-					var erros = response.erros;
-					var contemErros = erros != undefined && erros !=null;
-					var contemItem = itemPedidoJson != undefined && itemPedidoJson !=null;
-					if(!contemErros && contemItem){
-						$('#idItemPedido').val(itemPedidoJson.id);
-						$('#sequencial').val(itemPedidoJson.sequencial);
-						
-						$('#formaMaterial').val(itemPedidoJson.formaMaterial);
-	
-						if (itemPedidoJson.vendaKilo) {
-							$('#tipoVendaKilo').prop('checked', true);
-						} else {
-							$('#tipoVendaPeca').prop('checked', true);
-						}
-	
-						$('#quantidade').val(itemPedidoJson.quantidade);
-						$('#material').val(itemPedidoJson.siglaMaterial);
-						$('#idMaterial').val(itemPedidoJson.idMaterial);
-						$('#medidaExterna').val(itemPedidoJson.medidaExterna);
-						$('#medidaInterna').val(itemPedidoJson.medidaInterna);
-						$('#comprimento').val(itemPedidoJson.comprimento);
-						$('#precoVenda').val(itemPedidoJson.precoVenda);
-						$('#precoUnidade').val(itemPedidoJson.precoUnidade);
-						$('#descricao').val(itemPedidoJson.descricaoPeca);
-						$('#aliquotaICMS').val(itemPedidoJson.aliquotaICMS);
-						$('#aliquotaIPI').val(itemPedidoJson.aliquotaIPI);
-						$('#prazoEntregaItem').val(itemPedidoJson.prazoEntrega);
-						$('#aliquotaComissao').val(itemPedidoJson.aliquotaComissao);
-						$('#ncm').val(itemPedidoJson.ncm);
-						$('#cst').val(itemPedidoJson.tipoCST);
-						
-						habilitarPreenchimentoPeca(itemPedidoJson.peca);
-					} else if(!contemErros && !contemItem){
-						gerarListaMensagemAlerta(['Usuario pode nao estar logado no sistema']);
-					} else if(contemErros){
-						gerarListaMensagemErro(erros);
-					}
-				});
-
-				request
-						.fail(function(request, status) {
-							alert('Falha na pesquisa do item do pedido => Status da requisicao: '
-									+ status);
-						});
-
-			});
-
-	inicializarSelectFormaMaterial();
-};
-
 function inicializarSelectFormaMaterial() {
 	$('#bloco_item_pedido #formaMaterial').change(function() {
 		var forma = $(this).val();
@@ -164,6 +8,7 @@ function inicializarSelectFormaMaterial() {
 
 function habilitarPreenchimentoPeca(isPeca) {
 	habilitar('#bloco_item_pedido #descricao', isPeca);
+	habilitar('#bloco_item_pedido #peso', isPeca);
 	habilitar('#bloco_item_pedido #medidaExterna', !isPeca);
 	habilitar('#bloco_item_pedido #medidaInterna', !isPeca);
 	habilitar('#bloco_item_pedido #comprimento', !isPeca);
@@ -173,13 +18,6 @@ function habilitarPreenchimentoMedidaInterna(temMedidaInterna) {
 	habilitar('#bloco_item_pedido #medidaInterna', temMedidaInterna);
 };
 
-function editarItemPedido(botaoEdicao) {
-	tabelaItemHandler.editar(botaoEdicao);
-};
-
-function removerItemPedido(botaoRemocao) {
-	tabelaItemHandler.removerRegistro(botaoRemocao);
-};
 
 
 function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
@@ -254,7 +92,7 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 		// se nao contem erro e foi clicao o botao de inclusao de item de
 		// pedidos
 		var pedido = response.pedido;
-		if (itemPedidoAcionado && response.erros == undefined && pedido != undefined && pedido != null) {
+		if (itemPedidoAcionado && response.erros == undefined && pedido != undefined && pedido != null && !isEmpty(pedido.id)) {
 			inserirItemPedido(pedido.id, urlInclusaoItemPedido);
 		}
 	});
@@ -269,9 +107,9 @@ function recuperarParametrosBlocoContato() {
 		return '';
 	}
 	return '&' + $('#bloco_contato').serialize();
-}
+};
 
-function inicializarAutomcompleteCliente(url) {
+function inicializarAutocompleteCliente(url, preencherCampos) {
 	autocompletar({
 		url : url,
 		campoPesquisavel : 'nomeCliente',
@@ -293,25 +131,9 @@ function inicializarAutomcompleteCliente(url) {
 					if(clienteJson==undefined || clienteJson==null){
 						return;
 					}
-					$('#idCliente').val(clienteJson.id);
-					$('#formPesquisa #idClientePesquisa').val(clienteJson.id);
-					$('#site').val(clienteJson.site);
-					$('#email').val(clienteJson.email);
-					$('#cnpj').val(clienteJson.cnpj);
-					$('#cpf').val(clienteJson.cpf);
-					$('#nomeCliente').val(clienteJson.nomeCompleto);
-					$('#idVendedor').val(clienteJson.vendedor.id);
-					$('#proprietario').val(clienteJson.vendedor.nome + ' - '+ clienteJson.vendedor.email);
-
-					limparComboBox('listaTransportadora');
-					limparComboBox('listaRedespacho');
-
-					var comboTransportadora = document.getElementById('listaTransportadora');
-					var comboRedespacho = document.getElementById('listaRedespacho');
-
-					preencherComboTransportadora(comboTransportadora, clienteJson.listaTransportadora);
-					preencherComboTransportadora(comboRedespacho, clienteJson.listaRedespacho);
-
+					if(preencherCampos != undefined){
+						preencherCampos(clienteJson);
+					}
 					/*
 					 * As mensagens de alerta sempre serao exibidas pois nao
 					 * devem comprometer o fluxo da navegacao do usuario.
@@ -327,7 +149,7 @@ function inicializarAutomcompleteCliente(url) {
 	});
 };
 
-function inicializarAutomcompleteMaterial(url) {
+function inicializarAutocompleteMaterial(url) {
 	autocompletar({
 		url : url,
 		campoPesquisavel : 'material',
@@ -353,14 +175,13 @@ function inicializarAutocompleteDescricaoPeca(url) {
 };
 
 function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
-	if (!isEmpty(numeroPedido)) {
-		
 		var parametros = serializarBloco('bloco_item_pedido');
 		parametros += '&numeroPedido=' + numeroPedido;
 		var request = $.ajax({
 			type : 'post',
 			url : urlInclusaoItemPedido,
-			data : parametros
+			data : parametros,
+			async: false
 		});
 
 		request.done(function(response) {
@@ -441,8 +262,7 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 			$('#tipoVendaKilo').val('KILO');
 			$('#tipoVendaPeca').val('PECA');
 		});
-	}
-}
+};
 
 function inicializarFiltro() {
 	$("#filtro_nomeFantasia").val($("#nomeFantasia").val());
@@ -454,15 +274,18 @@ function inicializarFiltro() {
 function contactarCliente(idCliente) {
 	$('#formContactarCliente #idClienteContactado').val(idCliente);
 	$('#formContactarCliente').submit();
-}
+};
 
 function preencherComboTransportadora(combo, listaTransportadora) {
+	if(combo == undefined){
+		return;
+	}
 	var TOTAL_TRANSPORTADORAS = listaTransportadora.length;
 	for (var i = 0; i < TOTAL_TRANSPORTADORAS; i++) {
 		combo.add(new Option(listaTransportadora[i].nomeFantasia,
 				listaTransportadora[i].id), null);
 	}
-}
+};
 
 function habilitarIPI(urlTela, idRepresentada) {
 	if(isEmpty(idRepresentada)){
@@ -470,7 +293,8 @@ function habilitarIPI(urlTela, idRepresentada) {
 	}
 	var request = $.ajax({
 		type : 'get',
-		url : urlTela + '/representada/' + idRepresentada + '/aliquotaIPI/'
+		url : urlTela + '/representada/' + idRepresentada + '/aliquotaIPI/',
+		async: true
 	});
 
 	request.done(function(response) {
@@ -480,7 +304,7 @@ function habilitarIPI(urlTela, idRepresentada) {
 
 	request
 			.fail(function(request, status) {
-				alert('Falha na verifica��o se � poss�vel o c�lculo do IPI pela representada => '
+				alert('Falha na verificação se é possível o cálculo do IPI pela representada => '
 						+ request.responseText);
 			});
-}
+};

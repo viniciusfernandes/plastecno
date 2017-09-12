@@ -137,7 +137,7 @@ public class ComissaoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoNovaVersaoComissaoVendedor() {
 		Integer idVendedor = gerarVendedor().getId();
-		Comissao c1 = new Comissao(0.1, TestUtils.gerarDataAnterior());
+		Comissao c1 = new Comissao(0.1, TestUtils.gerarDataOntem());
 		c1.setIdVendedor(idVendedor);
 		try {
 			comissaoService.inserir(c1);

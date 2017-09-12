@@ -25,6 +25,7 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoUF;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroEndereco;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
@@ -96,6 +97,16 @@ public class EmissaoNFeController extends AbstractController {
         inicializarListaCfop(request);
     }
 
+    private Double calcularPesoLiquido(List<ItemPedido> listaItem) {
+        double peso = 0;
+        for (ItemPedido i : listaItem) {
+            if (i.getPeso() != null) {
+                peso += i.getPeso();
+            }
+        }
+        return NumeroUtils.arredondarValorMonetario(peso);
+    }
+
     @Get("emissaoNFe/valorICMSInterestadual")
     public void calcularValorICMSInterestadual(ICMSInterestadual icms) {
         icms.carregarValores();
@@ -136,21 +147,20 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("listaCfop", listaCfop);
 
         // DEfinindo os valores padrao de pre-preenchimento da tela
-        addAtributoPadrao("finalidadeEmissaoSelecionada", TipoFinalidadeEmissao.NORMAL.getCodigo());
-        addAtributoPadrao("formaPagamentoSelecionada", TipoFormaPagamento.PRAZO.getCodigo());
-        addAtributoPadrao("tipoEmissaoSelecionada", TipoEmissao.NORMAL.getCodigo());
-        addAtributoPadrao("tipoImpressaoSelecionada", TipoImpressaoNFe.RETRATO.getCodigo());
-        addAtributoPadrao("tipoPresencaSelecionada", TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
-        addAtributoPadrao("tipoOperacaoSelecionada", TipoOperacaoNFe.SAIDA.getCodigo());
-        addAtributoPadrao("modalidadeFreteSelecionada", TipoModalidadeFrete.DESTINATARIO_REMETENTE.getCodigo());
+        addAtributoCondicional("finalidadeEmissaoSelecionada", TipoFinalidadeEmissao.NORMAL.getCodigo());
+        addAtributoCondicional("formaPagamentoSelecionada", TipoFormaPagamento.PRAZO.getCodigo());
+        addAtributoCondicional("tipoEmissaoSelecionada", TipoEmissao.NORMAL.getCodigo());
+        addAtributoCondicional("tipoImpressaoSelecionada", TipoImpressaoNFe.RETRATO.getCodigo());
+        addAtributoCondicional("tipoPresencaSelecionada", TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
+        addAtributoCondicional("tipoOperacaoSelecionada", TipoOperacaoNFe.SAIDA.getCodigo());
+        addAtributoCondicional("modalidadeFreteSelecionada", TipoModalidadeFrete.DESTINATARIO_REMETENTE.getCodigo());
     }
 
     @Post("emissaoNFe/emitirNFe")
-    public void emitirNFe(DadosNFe nf, TipoNFe tipoNFe, LogradouroEndereco logradouro, String telefoneDestinatario,
+    public void emitirNFe(DadosNFe nf, TipoNFe tipoNFe, LogradouroCliente logradouro, String telefoneDestinatario,
             Integer idPedido) {
         String numeroNFe = null;
         try {
-
             nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                     nFeService.gerarEnderecoNFe(logradouro, telefoneDestinatario));
             formatarDatas(nf, false);
@@ -455,17 +465,28 @@ public class EmissaoNFeController extends AbstractController {
             // fracionada
             List<ItemPedido> listaItem = nFeService.pesquisarQuantitadeItemRestanteByIdPedido(idPedido);
 
+            double vFrete = NumeroUtils.arredondarValorMonetario(pedidoService
+                    .pesquisarValorFretePorItemByIdPedido(idPedido));
+            addAtributo("valorFrete", vFrete);
+
             String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
             addAtributo("idPedido", idPedido);
             addAtributo("infoAdFisco",
                     "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO NÚMERO "
                             + idPedido + ". VENDEDOR: " + nomeVend);
 
+            double peso = calcularPesoLiquido(listaItem);
+            List<ProdutoServicoJson> listaProduto = gerarListaProdutoItemPedido(listaItem);
+            addAtributo("quantidade", 1);
+            addAtributo("pesoLiquido", peso);
+            addAtributo("pesoBruto", peso);
+            addAtributo("especieVolume", "VOLUME");
+
             Date dtAtual = new Date();
             addAtributo("dataSaida", StringUtils.formatarData(dtAtual));
             addAtributo("horaSaida", StringUtils.formatarHora(dtAtual));
             addAtributo("listaNumeroNFe", nFeService.pesquisarNumeroNFeByIdPedido(idPedido));
-            addAtributo("listaProduto", gerarListaProdutoItemPedido(listaItem));
+            addAtributo("listaProduto", listaProduto);
             addAtributo("listaDuplicata", listaDuplicata);
             addAtributo("cliente", cliente);
             addAtributo("formaPagamentoSelecionada", gerarTipoFormaPagamento(listaDuplicata.size()).getCodigo());

@@ -1,5 +1,6 @@
 package br.com.plastecno.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -51,10 +52,21 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado) throws BusinessException {
-		this.verificarPerfilVendedor(idVendedor);
+	public void associarCliente(Integer idVendedor, Integer idCliente) throws BusinessException {
+		if (idVendedor == null || idCliente == null) {
+			return;
+		}
 
-		this.entityManager
+		List<Integer> ids = new ArrayList<>();
+		ids.add(idCliente);
+		associarCliente(idVendedor, ids);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void associarCliente(Integer idVendedor, List<Integer> listaIdClienteAssociado) throws BusinessException {
+		verificarPerfilVendedor(idVendedor);
+		entityManager
 				.createQuery(
 						"update Cliente c set c.vendedor.id = :idVendedor where c.id in (:listaIdClienteAssociado)")
 				.setParameter("idVendedor", idVendedor)
@@ -70,10 +82,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 		}
 
 		if (listaIdClienteDesassociado != null) {
-			this.desassociarCliente(idVendedor, listaIdClienteDesassociado);
+			desassociarCliente(idVendedor, listaIdClienteDesassociado);
 		}
 
-		this.associarCliente(idVendedor, listaIdClienteAssociado);
+		associarCliente(idVendedor, listaIdClienteAssociado);
 	}
 
 	@Override
@@ -92,9 +104,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void desassociarCliente(Integer idVendedor, List<Integer> listaIdClienteDesassociado)
 			throws BusinessException {
-		this.verificarPerfilVendedor(idVendedor);
-
-		this.entityManager
+		entityManager
 				.createQuery(
 						"update Cliente c set c.vendedor = null where c.vendedor.id = :idVendedor and c.id in (:listaIdClienteDesassociado)")
 				.setParameter("idVendedor", idVendedor)
@@ -291,7 +301,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Usuario> pesquisarByNome(String nome) {
-		return this.pesquisarUsuarioByNome(nome, false);
+		return this.pesquisarUsuarioResumidoByNome(nome, false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -356,9 +366,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Usuario pesquisarUsuarioResumidoById(Integer idUsuario) {
+		return usuarioDAO.pesquisarUsuarioResumidoById(idUsuario);
+	}
+
 	@SuppressWarnings({ "unchecked" })
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private List<Usuario> pesquisarUsuarioByNome(String nome, boolean isVendedor) {
+	private List<Usuario> pesquisarUsuarioResumidoByNome(String nome, boolean isVendedor) {
 		StringBuilder select = new StringBuilder("select new Usuario(u.id, u.nome, u.sobrenome) from Usuario u ");
 		if (isVendedor) {
 			select.append("inner join u.listaPerfilAcesso p where p.id = :idPerfilAcesso and u.nome like :nome ");
@@ -366,17 +382,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 			select.append("where u.nome like :nome ");
 		}
 
-		Query query = this.entityManager.createQuery(select.toString()).setParameter("nome", "%" + nome + "%");
+		Query query = entityManager.createQuery(select.toString()).setParameter("nome", "%" + nome + "%");
 		if (isVendedor) {
 			query.setParameter("idPerfilAcesso", TipoAcesso.CADASTRO_PEDIDO_VENDAS.indexOf());
 		}
 		return query.getResultList();
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Usuario pesquisarUsuarioResumidoById(Integer idUsuario) {
-		return usuarioDAO.pesquisarUsuarioResumidoById(idUsuario);
 	}
 
 	@Override
@@ -402,7 +412,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Usuario> pesquisarVendedorByNome(String nome) {
-		return this.pesquisarUsuarioByNome(nome, true);
+		return this.pesquisarUsuarioResumidoByNome(nome, true);
 	}
 
 	@Override
@@ -413,12 +423,18 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Usuario pesquisarVendedorResumidoByIdCliente(Integer idCliente) {
+		return usuarioDAO.pesquisarVendedorByIdCliente(idCliente);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void removerLogradouro(Integer idLogradouro) {
 		if (idLogradouro == null) {
 			return;
 		}
-		
+
 		usuarioDAO.removerLogradouro(idLogradouro);
 		logradouroService.removerLogradouro(new LogradouroUsuario(idLogradouro));
 	}

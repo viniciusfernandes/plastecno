@@ -48,7 +48,7 @@ public class ItemAguardandoCompraController extends AbstractController {
             addAtributo("dataFinal", formatarData(dataFinal));
             addAtributo("cliente", cliente);
 
-            redirecTo(PedidoController.class).pesquisarPedidoById(idPedidoCompra, TipoPedido.COMPRA);
+            redirecTo(PedidoController.class).pesquisarPedidoById(idPedidoCompra, TipoPedido.COMPRA, false);
         } catch (BusinessException e) {
             addAtributo("permanecerTopo", true);
             gerarListaMensagemErro(e);

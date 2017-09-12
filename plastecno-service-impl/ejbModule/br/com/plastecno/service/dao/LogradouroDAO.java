@@ -11,11 +11,11 @@ public class LogradouroDAO extends GenericDAO<Logradouro> {
 		super(entityManager);
 	}
 
-	public String pesquisarCodigoIBGEByIdCidade(Integer idCidade) {
+	public String pesquisarCodigoMunicipioByCep(String cep) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createNativeQuery(
-						"select c.cod_ibge from enderecamento.tb_cidade as c where c.id_cidade = :idCidade")
-						.setParameter("idCidade", idCidade), String.class, "");
+				entityManager.createQuery(
+						"select c.codigoMunicipio from Endereco e inner join e.cidade c where e.cep = :cep")
+						.setParameter("cep", cep), String.class, null);
 	}
-	
+
 }

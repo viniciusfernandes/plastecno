@@ -19,6 +19,8 @@
 <script type="text/javascript" src="<c:url value="/js/logradouro.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/bloco/contato.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+
 
 <script type="text/javascript">
 
@@ -90,6 +92,19 @@ $(document).ready(function() {
 		$("#comentario").val("");	
 	});
 	
+	$("#botaoEditarPedido").click(function () {
+		var id = $('#formCliente #id').val(); 
+		var url = null;
+		if(!isEmpty(id)){
+			adicionarInputHiddenFormulario('formVazio', 'idCliente', id);
+			url='<c:url value="/pedido/venda/cliente"/>';
+		} else {
+			url='<c:url value="/pedido/venda"/>';
+		}
+		$('#formVazio').attr('action', url).submit();
+	});
+	
+	inserirMascaraData('dataNascimento');
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraInscricaoEstadual('inscricaoEstadual');
@@ -113,6 +128,29 @@ $(document).ready(function() {
 		selecionarItem: function(itemLista) {
 			var formVazio = document.getElementById('formVazio');
 			formVazio.action = '<c:url value="/cliente/"/>'+itemLista.id;
+			formVazio.submit();
+		}
+	});
+	
+	
+	autocompletar({
+		url : '<c:url value="/cliente/listagem/vendedor"/>',
+		campoPesquisavel : 'vendedor',
+		parametro : 'nomeVendedor',
+		containerResultados : 'containerPesquisaVendedor',
+		selecionarItem: function(itemLista) {
+			var idCliente = $('#formCliente #id').val();
+			if(isEmpty(idCliente)){
+				var mensagem = new Array();
+				mensagem[0] = 'Selecione um cliente para associar a um novo vendedor';
+				gerarListaMensagemAlerta(mensagem);
+				return;
+			}
+			var formVazio = document.getElementById('formVazio');
+			adicionarInputHiddenFormulario('formVazio', 'idVendedor', itemLista.id);
+			adicionarInputHiddenFormulario('formVazio', 'idCliente', idCliente);
+			formVazio.action = '<c:url value="/cliente/associacaovendedor"/>';
+			formVazio.method = 'post';
 			formVazio.submit();
 		}
 	});
@@ -182,8 +220,10 @@ function remover(codigo, nome) {
 			<div class="label">Vendedor:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="vendedor"
-					value="${cliente.vendedor.nomeCompleto} - ${cliente.vendedor.email}" disabled="disabled" class="uppercaseBloqueado desabilitado"
+					value="${not empty cliente.vendedor ?cliente.vendedor.nomeCompleto : ''}" <c:out value="${ isAssociacaoVendedorPermitida? '' :'disabled=\"disabled\"'}"/>"
+					class="<c:out value="${isAssociacaoVendedorPermitida? '' :'uppercaseBloqueado desabilitado'}"/>"
 					style="width: 80%" />
+				<div class="suggestionsBox" id="containerPesquisaVendedor" style="display: none; width: 50%"></div>
 			</div>
 
 			<div class="label obrigatorio">Ramo Atividade:</div>
@@ -202,7 +242,11 @@ function remover(codigo, nome) {
 				<input type="text" id="nomeFantasia" name="cliente.nomeFantasia" value="${cliente.nomeFantasia}" class="pesquisavel" />
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
-			<div class="label obrigatorio">Razão Social:</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoEditarPedido"
+					title="Editar Pedido" value="" class="botaoCestaPequeno" />
+			</div>
+			<div class="label obrigatorio" style="width: 13%">Razão Social:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="razaoSocial" name="cliente.razaoSocial"
 					value="${cliente.razaoSocial}" style="width: 80%" />
@@ -230,9 +274,14 @@ function remover(codigo, nome) {
 				value="${cliente.documentoEstrangeiro}" maxlength="15" style="width: 40%" />
 			</div>
 			<div class="label">CPF:</div>
-			<div class="input" style="width: 80%">
+			<div class="input" style="width: 20%">
 				<input type="text" id="cpf" name="cliente.cpf"
-					value="${cliente.cpf}" class="pesquisavel" style="width: 25%" />
+					value="${cliente.cpf}" class="pesquisavel" style="width: 100%" />
+			</div>
+			<div class="label">Dt. Nasc.:</div>
+			<div class="input" style="width: 40%">
+				<input type="text" id="dataNascimento" name="cliente.dataNascimento" 
+				value="${cliente.dataNascimentoFormatada}" maxlength="15" style="width: 40%" />
 			</div>
 			<div class="label obrigatorio">Email Envio NFe:</div>
 			<div class="input" style="width: 20%">

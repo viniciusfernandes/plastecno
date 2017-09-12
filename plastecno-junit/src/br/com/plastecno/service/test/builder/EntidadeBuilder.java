@@ -1,5 +1,6 @@
 package br.com.plastecno.service.test.builder;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.constante.TipoVenda;
 import br.com.plastecno.service.entity.Bairro;
@@ -20,10 +22,15 @@ import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.Endereco;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.Logradouravel;
+import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroPedido;
+import br.com.plastecno.service.entity.LogradouroRepresentada;
+import br.com.plastecno.service.entity.LogradouroTransportadora;
+import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.entity.Material;
+import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.entity.Pais;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.PerfilAcesso;
@@ -31,6 +38,7 @@ import br.com.plastecno.service.entity.RamoAtividade;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
+import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.test.TestUtils;
 
 public class EntidadeBuilder {
@@ -185,28 +193,52 @@ public class EntidadeBuilder {
 		return l;
 	}
 
+	private <T extends Logradouro> T buildLogradouro(Class<T> classe, TipoLogradouro tipo) {
+		T l;
+		try {
+			l = classe.newInstance();
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+		l.setBairro("Centro");
+		l.setCep("09910470");
+		l.setCidade("Diadema");
+		l.setCodificado(true);
+		l.setCodigoMunicipio("321654");
+		l.setComplemento("Fundos");
+		l.setEndereco("Rua Viscondo do Rio Branco");
+		l.setNumero("3345");
+		l.setPais("Brasil");
+		l.setTipoLogradouro(tipo);
+		l.setUf("SP");
+
+		return l;
+	}
+
+	public LogradouroCliente buildLogradouroCliente(TipoLogradouro tipo) {
+		return buildLogradouro(LogradouroCliente.class, tipo);
+	}
+
 	public LogradouroEndereco buildLogradouroEndereco(TipoLogradouro tipoLogradouro) {
 		LogradouroEndereco logradouro = new LogradouroEndereco(buildEndereco());
 		logradouro.setTipoLogradouro(tipoLogradouro);
 		return logradouro;
 	}
-	
-	private  Logradouravel buildLogradouravel(Logradouravel l, TipoLogradouro tipo){
-		l.setCep("09910456");
-		l.setBairro("Centro");
-		l.setCidade("Diadema");
-		l.setCodificado(true);
-		l.setComplemento("Fundos");
-		l.setPais("Brasil");
-		l.setUf("SP");
-		l.setEndereco("Rua Avare");
-		l.setNumero("223");
-		l.setTipoLogradouro(tipo);
-		return l;
+
+	public LogradouroPedido buildLogradouroPedido(TipoLogradouro tipo) {
+		return buildLogradouro(LogradouroPedido.class, tipo);
 	}
 
-	public LogradouroCliente buildLogradouroCliente(TipoLogradouro tipoLogradouro) {
-		return (LogradouroCliente) buildLogradouravel( new LogradouroCliente(), tipoLogradouro);
+	public LogradouroRepresentada buildLogradouroRepresentada(TipoLogradouro tipo) {
+		return buildLogradouro(LogradouroRepresentada.class, tipo);
+	}
+
+	public LogradouroTransportadora buildLogradouroTransportadora(TipoLogradouro tipo) {
+		return buildLogradouro(LogradouroTransportadora.class, tipo);
+	}
+
+	public LogradouroUsuario buildLogradouroUsuario(TipoLogradouro tipo) {
+		return buildLogradouro(LogradouroUsuario.class, tipo);
 	}
 
 	public Material buildMaterial() {
@@ -215,6 +247,26 @@ public class EntidadeBuilder {
 		material.setDescricao("PLASTICO DURO");
 		material.setPesoEspecifico(0.33);
 		return material;
+	}
+
+	public Pagamento buildPagamento() {
+		Pagamento p = new Pagamento();
+		p.setDataRecebimento(new Date());
+		p.setDataVencimento(new Date());
+		p.setDescricao("SALARIO DE VENDEDOR");
+		p.setModalidadeFrete(Integer.parseInt(TipoModalidadeFrete.SEM_FRETE.getCodigo()));
+		p.setParcela(1);
+		p.setTipoPagamento(TipoPagamento.FOLHA_PAGAMENTO);
+		p.setTotalParcelas(1);
+		p.setValor(2000.0);
+		return p;
+	}
+
+	public Pagamento buildPagamentoNF() {
+		Pagamento p = buildPagamento();
+		p.setTotalParcelas(3);
+		p.setNumeroNF(1234);
+		return p;
 	}
 
 	public Pedido buildPedido() {
@@ -237,8 +289,8 @@ public class EntidadeBuilder {
 		pedido.setFinalidadePedido(TipoFinalidadePedido.CONSUMO);
 		pedido.setContato(contato);
 		pedido.setTipoEntrega(TipoEntrega.CIF);
-		pedido.setDataEntrega(TestUtils.gerarDataPosterior());
-		pedido.setFormaPagamento("30 dias uteis");
+		pedido.setDataEntrega(TestUtils.gerarDataAmanha());
+		pedido.setFormaPagamento("30 / 40 dias uteis");
 		return pedido;
 	}
 
@@ -269,7 +321,7 @@ public class EntidadeBuilder {
 		representada.setCnpj("77336617000107");
 		representada.setInscricaoEstadual("123456789");
 
-		LogradouroEndereco l = buildLogradouroEndereco(TipoLogradouro.FATURAMENTO);
+		LogradouroRepresentada l = buildLogradouroRepresentada(TipoLogradouro.FATURAMENTO);
 		l.setCep("09910345");
 		l.setEndereco("Rua Parnamirim");
 		l.setNumero("432");
@@ -303,9 +355,9 @@ public class EntidadeBuilder {
 		t.setAtivo(true);
 		t.setCnpj("03233998000162");
 		t.setInscricaoEstadual("1234567");
-		t.setLogradouro(buildLogradouroEndereco(TipoLogradouro.FATURAMENTO));
-		t.setNomeFantasia("Transport teste");
-		t.setRazaoSocial("Transport teste LTDA");
+		t.setLogradouro(buildLogradouroTransportadora(TipoLogradouro.COMERCIAL));
+		t.setNomeFantasia("Transport Fim");
+		t.setRazaoSocial("Transport Fim LTDA");
 		return t;
 	}
 

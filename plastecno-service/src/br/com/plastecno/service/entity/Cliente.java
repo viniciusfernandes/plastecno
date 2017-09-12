@@ -50,11 +50,22 @@ public class Cliente implements Serializable {
 	private String cpf;
 
 	@Temporal(TemporalType.DATE)
-	@Column(name = "data_ultimo_contato ")
+	@Column(name = "data_nascimento")
+	private Date dataNascimento;
+
+	@Transient
+	private String dataNascimentoFormatada;
+
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_ultimo_contato")
 	private Date dataUltimoContato;
 
 	@Transient
 	private String dataUltimoContatoFormatada;
+
+	@Transient
+	// Esse atributo foi incluido para gerar relatorio de cliente inativo
+	private String dataUltimoPedidoFormatado;
 
 	@Column(name = "documento_estrangeiro")
 	@InformacaoValidavel(intervaloComprimento = { 0, 15 }, nomeExibicao = "Documento Estrangeiro")
@@ -67,10 +78,16 @@ public class Cliente implements Serializable {
 	@InformacaoValidavel(padrao = ".+@.+\\..{2,}", nomeExibicao = "Email de cobrança do cliente")
 	private String emailCobranca;
 
+	@Transient
+	private String emailFormatado;
+
 	@Id
 	@SequenceGenerator(name = "clienteSequence", sequenceName = "vendas.seq_cliente_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clienteSequence")
 	private Integer id;
+
+	@Transient
+	private Integer idUltimoPedido;
 
 	@Column(name = "informacoes_adicionais")
 	private String informacoesAdicionais;
@@ -100,6 +117,9 @@ public class Cliente implements Serializable {
 	@JoinTable(name = "tb_cliente_tb_transportadora", schema = "vendas", joinColumns = { @JoinColumn(name = "id_cliente", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_transportadora", referencedColumnName = "id") })
 	private List<Transportadora> listaRedespacho;
 
+	@Transient
+	private Logradouro logradouro;
+
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Nome fantasia do cliente")
 	@Column(name = "nome_fantasia")
 	private String nomeFantasia;
@@ -117,6 +137,9 @@ public class Cliente implements Serializable {
 	private String razaoSocial;
 
 	private String site;
+
+	@Transient
+	private String telefoneFormatado;
 
 	@Enumerated
 	@Column(name = "id_tipo_cliente")
@@ -207,6 +230,9 @@ public class Cliente implements Serializable {
 	}
 
 	public void addContato(ContatoCliente contatoCliente) {
+		if (contatoCliente == null) {
+			return;
+		}
 		if (this.listaContato == null) {
 			this.setListaContato(new HashSet<ContatoCliente>());
 		}
@@ -249,6 +275,10 @@ public class Cliente implements Serializable {
 		this.listaRedespacho.add(transportadora);
 	}
 
+	public boolean contemContato() {
+		return listaContato != null && listaContato.size() > 0;
+	}
+
 	public void formatarContatoPrincipal() {
 		Contato c = getContatoPrincipal();
 		if (c == null) {
@@ -273,12 +303,24 @@ public class Cliente implements Serializable {
 		return cpf;
 	}
 
+	public Date getDataNascimento() {
+		return dataNascimento;
+	}
+
+	public String getDataNascimentoFormatada() {
+		return dataNascimentoFormatada;
+	}
+
 	public Date getDataUltimoContato() {
 		return dataUltimoContato;
 	}
 
 	public String getDataUltimoContatoFormatada() {
 		return dataUltimoContatoFormatada;
+	}
+
+	public String getDataUltimoPedidoFormatado() {
+		return dataUltimoPedidoFormatado;
 	}
 
 	public String getDocumento() {
@@ -297,8 +339,16 @@ public class Cliente implements Serializable {
 		return emailCobranca;
 	}
 
+	public String getEmailFormatado() {
+		return emailFormatado;
+	}
+
 	public Integer getId() {
 		return id;
+	}
+
+	public Integer getIdUltimoPedido() {
+		return idUltimoPedido;
 	}
 
 	public String getInformacoesAdicionais() {
@@ -325,6 +375,10 @@ public class Cliente implements Serializable {
 		return listaRedespacho;
 	}
 
+	public Logradouro getLogradouro() {
+		return logradouro;
+	}
+
 	public String getNomeCompleto() {
 		return this.getNomeFantasia() + " - " + this.getRazaoSocial();
 	}
@@ -347,6 +401,10 @@ public class Cliente implements Serializable {
 
 	public String getSite() {
 		return site;
+	}
+
+	public String getTelefoneFormatado() {
+		return telefoneFormatado;
 	}
 
 	public TipoCliente getTipoCliente() {
@@ -414,12 +472,24 @@ public class Cliente implements Serializable {
 		this.cpf = cpf;
 	}
 
+	public void setDataNascimento(Date dataNascimento) {
+		this.dataNascimento = dataNascimento;
+	}
+
+	public void setDataNascimentoFormatada(String dataNascimentoFormatada) {
+		this.dataNascimentoFormatada = dataNascimentoFormatada;
+	}
+
 	public void setDataUltimoContato(Date dataUltimoContato) {
 		this.dataUltimoContato = dataUltimoContato;
 	}
 
 	public void setDataUltimoContatoFormatada(String dataUltimoContatoFormatada) {
 		this.dataUltimoContatoFormatada = dataUltimoContatoFormatada;
+	}
+
+	public void setDataUltimoPedidoFormatado(String dataUltimoPedidoFormatado) {
+		this.dataUltimoPedidoFormatado = dataUltimoPedidoFormatado;
 	}
 
 	public void setDocumentoEstrangeiro(String documentoEstrangeiro) {
@@ -434,8 +504,16 @@ public class Cliente implements Serializable {
 		this.emailCobranca = emailCobranca;
 	}
 
+	public void setEmailFormatado(String emailFormatado) {
+		this.emailFormatado = emailFormatado;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public void setIdUltimoPedido(Integer idUltimoPedido) {
+		this.idUltimoPedido = idUltimoPedido;
 	}
 
 	public void setInformacoesAdicionais(String informacoesAdicionais) {
@@ -462,6 +540,10 @@ public class Cliente implements Serializable {
 		this.listaRedespacho = listaRedespacho;
 	}
 
+	public void setLogradouro(Logradouro logradouro) {
+		this.logradouro = logradouro;
+	}
+
 	public void setNomeFantasia(String nomeFantasia) {
 		this.nomeFantasia = nomeFantasia;
 	}
@@ -480,6 +562,10 @@ public class Cliente implements Serializable {
 
 	public void setSite(String site) {
 		this.site = site;
+	}
+
+	public void setTelefoneFormatado(String telefoneFormatado) {
+		this.telefoneFormatado = telefoneFormatado;
 	}
 
 	public void setTipoCliente(TipoCliente tipoCliente) {

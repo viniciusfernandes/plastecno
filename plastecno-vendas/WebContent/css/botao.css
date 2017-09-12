@@ -75,6 +75,56 @@
 	width: 24px;
 }
 
+.botaoAnexar {
+	background: url("../images/paperclip_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoAnexar:hover {
+	background: url("../images/paperclip_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoCesta {
+	background: url("../images/cesta_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoCestaPequeno {
+	background: url("../images/cesta_16.png") no-repeat scroll 0 0
+		transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
+.botaoCarrinho {
+	background: url("../images/carrinho_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoCarrinhoPequeno {
+	background: url("../images/carrinho_16.png") no-repeat scroll 0 0
+		transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
 .botaoCancelar {
 	background: url("../images/minus_24.png") no-repeat scroll 0 0
 		transparent;
@@ -97,6 +147,15 @@
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
+}
+
+.botaoCopiarPequeno {
+	background: url("../images/copy_16.png") no-repeat scroll 0 0
+		transparent;
+	border: none;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
 }
 
 .botaoDinheiro {
@@ -252,6 +311,14 @@
 	width: 24px;
 }
 
+.botaoPlanilha {
+	background: url("../images/sheet_24.png") no-repeat scroll 0 0
+		transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoProximo {
 	background: url("../images/next_24.png") no-repeat scroll 0 0
 		transparent;
@@ -391,6 +458,54 @@
 	width: 24px;
 }
 
+.botaoVerificacaoFalhaGrande {
+	background: url("../images/checked_red_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoVerificacaoFalhaPequeno {
+	background: url("../images/checked_red_16.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
+.botaoVerificacaoAguardadaGrande {
+	background: url("../images/checked_yellow_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoVerificacaoAguardadaPequeno {
+	background: url("../images/checked_yellow_16.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
+.botaoVerificacaoEfetuadaGrande {
+	background: url("../images/checked_green_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoVerificacaoEfetuadaPequeno {
+	background: url("../images/checked_green_16.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
 .botaoVerificarPequeno {
 	background: url("../images/checked_16.png") no-repeat scroll 0 0
 		transparent;
@@ -492,6 +607,12 @@
 	width: 24px;
 }
 
+.botaoCarrinho:hover {
+	background: url("../images/carrinho_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+}
+
 .botaoCancelar:hover {
 	background: url("../images/minus_16.png") no-repeat scroll 0 0
 		transparent;
@@ -532,6 +653,14 @@
 
 .botaoNF:hover {
 	background: url("../images/nf_16.png") no-repeat scroll 0 0
+		transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoPlanilha:hover {
+	background: url("../images/sheet_16.png") no-repeat scroll 0 0
 		transparent;
 	background-position: center center;
 	height: 24px;

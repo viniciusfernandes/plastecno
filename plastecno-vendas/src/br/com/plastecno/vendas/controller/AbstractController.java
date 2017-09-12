@@ -1,6 +1,9 @@
 package br.com.plastecno.vendas.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -25,7 +28,9 @@ import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
@@ -42,9 +47,10 @@ import br.com.plastecno.vendas.util.ServiceLocator;
 import br.com.plastecno.vendas.util.exception.ServiceLocatorException;
 
 public abstract class AbstractController {
-
     private final static Long VERSAO_CACHE = new Date().getTime();
+
     private final String cssMensagemAlerta = "mensagemAlerta";
+
     private final String cssMensagemErro = "mensagemErro";
     private final String cssMensagemSucesso = "mensagemSucesso";
     private final String DIRETORIO_TEMPLATE_PDF;
@@ -55,6 +61,7 @@ public abstract class AbstractController {
     private final Integer numerRegistrosPorPagina = 10;
     private Picklist picklist;
     private final String possuiMultiplosLogradouros = "possuiMultiplosLogradouros";
+    private HttpServletRequest request;
     private Result result;
     private TipoLogradouroService tipoLogradouroService;
     private UsuarioInfo usuarioInfo;
@@ -82,6 +89,7 @@ public abstract class AbstractController {
     public AbstractController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
         this.result = result;
+        this.request = request;
         this.usuarioInfo = usuarioInfo;
         this.DIRETORIO_TEMPLATE_PDF = request != null ? request.getServletContext().getRealPath("/templates") + "/"
                 : null;
@@ -93,7 +101,7 @@ public abstract class AbstractController {
             // para isso vamos concatenar o nome do arquivo .css, .js, etc com o
             // valor desse atributo, assim o navegador entendera que eh um novo
             // recurso a ser carregado.
-            addAtributoPadrao("versaoCache", VERSAO_CACHE);
+            addAtributoCondicional("versaoCache", VERSAO_CACHE);
         } catch (ServiceLocatorException e) {
             this.logger.log(Level.SEVERE, "Falha no lookup de algum servico", e);
             this.result.include("erro",
@@ -123,7 +131,7 @@ public abstract class AbstractController {
         this.result.include(nomeAtributo, valorAtributo);
     }
 
-    void addAtributoPadrao(String nomeAtributo, Object valorAtributo) {
+    void addAtributoCondicional(String nomeAtributo, Object valorAtributo) {
         if (!contemAtributo(nomeAtributo)) {
             addAtributo(nomeAtributo, valorAtributo);
         }
@@ -131,6 +139,29 @@ public abstract class AbstractController {
 
     void addAtributoPDF(String nome, Object valor) {
         GERADOR_PDF.addAtributo(nome, valor);
+    }
+
+    void addPeriodo(Date dataInicial, Date dataFinal) {
+        // Estamos adicionando apenas se as datas nao foram adicionadas para
+        // mantermos o filtro selecionado pelo usuario.
+        addAtributoCondicional("dataInicial", formatarData(dataInicial));
+        addAtributoCondicional("dataFinal", formatarData(dataFinal));
+    }
+
+    void addSessao(String atributo, Object valor) {
+        if (request == null) {
+            throw new IllegalStateException(
+                    "Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
+        }
+        request.getSession().setAttribute(atributo, valor);
+    }
+
+    final void ancorarRodape() {
+        result.include("ancora", "rodape");
+    }
+
+    final void ancorarTopo() {
+        result.include("ancora", "topo");
     }
 
     int calcularIndiceRegistroInicial(Integer paginaSelecionada) {
@@ -150,7 +181,7 @@ public abstract class AbstractController {
 
     void carregarVendedor(Cliente cliente) {
 
-        Usuario vendedor = this.usuarioService.pesquisarVendedorByIdCliente(cliente.getId());
+        Usuario vendedor = usuarioService.pesquisarVendedorResumidoByIdCliente(cliente.getId());
         if (vendedor == null) {
             /*
              * Vamos sinalizar o usuario que o cliente que ele pretende efetuar
@@ -165,10 +196,7 @@ public abstract class AbstractController {
 
     void configurarFiltroPediodoMensal() {
         if (!contemAtributo("dataInicial") && !contemAtributo("dataFinal")) {
-            Calendar dataInicial = Calendar.getInstance();
-            dataInicial.set(Calendar.DAY_OF_MONTH, 1);
-
-            addAtributo("dataInicial", StringUtils.formatarData(dataInicial.getTime()));
+            addAtributo("dataInicial", StringUtils.formatarData(gerarDataInicioMes()));
             addAtributo("dataFinal", StringUtils.formatarData(new Date()));
 
         }
@@ -211,6 +239,15 @@ public abstract class AbstractController {
         cliente.setInscricaoEstadual(formatarInscricaoEstadual(cliente.getInscricaoEstadual()));
     }
 
+    void formatarDocumento(Representada r) {
+        if (r == null) {
+            return;
+        }
+        r.setInscricaoEstadual(formatarInscricaoEstadual(r.getInscricaoEstadual()));
+        r.setCnpj(formatarCNPJ(r.getCnpj()));
+
+    }
+
     String formatarInscricaoEstadual(String conteudo) {
         return StringUtils.formatarInscricaoEstadual(conteudo);
     }
@@ -229,30 +266,20 @@ public abstract class AbstractController {
         }
     }
 
-    void formatarItemPedido(ItemPedido item) {
-        item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaICMS()));
-        item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaIPI()));
-        item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
-        item.setPrecoUnidadeIPIFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidadeIPI()));
-        item.setPrecoVendaFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoVenda()));
-        item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
-        item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
-        item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
-        item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
-        item.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedido()));
-        item.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedidoIPI()));
-        item.setValorICMSFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getValorICMS())));
-        item.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getPrecoUnidadeIPI())));
-
-        if (item.contemAliquotaComissao()) {
-            item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaComissao()));
+    void formatarPagamento(Collection<Pagamento> lista) {
+        for (Pagamento p : lista) {
+            formatarPagamento(p);
         }
     }
 
-    void formatarItemPedido(List<ItemPedido> itens) {
-        for (ItemPedido item : itens) {
-            formatarItemPedido(item);
-        }
+    void formatarPagamento(Pagamento p) {
+        p.setDataVencimentoFormatada(StringUtils.formatarData(p.getDataVencimento()));
+        p.setDataEmissaoFormatada(StringUtils.formatarData(p.getDataEmissao()));
+        p.setDataRecebimentoFormatada(StringUtils.formatarData(p.getDataRecebimento()));
+
+        p.setValor(NumeroUtils.arredondarValorMonetario(p.getValor()));
+        p.setValorCreditoICMS(NumeroUtils.arredondarValorMonetario(p.getValorCreditoICMS()));
+        p.setValorNF(NumeroUtils.arredondarValorMonetario(p.getValorNF()));
     }
 
     void formatarPedido(Pedido pedido) {
@@ -260,6 +287,8 @@ public abstract class AbstractController {
         pedido.setDataEntregaFormatada(formatarData(pedido.getDataEntrega()));
         pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));
         pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedidoIPI()));
+        pedido.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorTotal()));
+        pedido.setValorFreteFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorFrete()));
         pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
         pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));
     }
@@ -277,12 +306,22 @@ public abstract class AbstractController {
         }
     }
 
+    Date gerarDataInicioMes() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        return c.getTime();
+    }
+
     Download gerarDownload(byte[] bytesArquivo, String nomeArquivo, String contentType) {
         return new ByteArrayDownload(bytesArquivo, contentType, StringUtils.removerAcentuacao(nomeArquivo));
     }
 
     Download gerarDownloadPDF(byte[] bytesArquivo, String nomeArquivo) {
         return gerarDownload(bytesArquivo, nomeArquivo, "application/pdf;");
+    }
+
+    Download gerarDownloadPlanilha(byte[] bytesArquivo, String nomeArquivo) {
+        return gerarDownload(bytesArquivo, nomeArquivo, "application/vnd.ms-excel;");
     }
 
     void gerarListaMensagemAjax(String mensagem, String categoria) {
@@ -397,12 +436,16 @@ public abstract class AbstractController {
     void gerarMensagemSucesso(String mensagem) {
         List<String> mensagens = new ArrayList<String>();
         mensagens.add(mensagem);
-        this.result.include("listaMensagem", mensagens);
-        this.result.include("cssMensagem", cssMensagemSucesso);
+        result.include("listaMensagem", mensagens);
+        result.include("cssMensagem", cssMensagemSucesso);
     }
 
     byte[] gerarPDF() throws ConversaoHTML2PDFException {
         return GERADOR_PDF.gerarPDF();
+    }
+
+    byte[] gerarPDF(int largura, int altura) throws ConversaoHTML2PDFException {
+        return GERADOR_PDF.gerarPDF(largura, altura);
     }
 
     List<PicklistElement> gerarPicklistElement() {
@@ -418,7 +461,7 @@ public abstract class AbstractController {
     }
 
     Object getAtributo(String nomeAtributo) {
-        return this.result.included().get(nomeAtributo);
+        return result.included().get(nomeAtributo);
     }
 
     Integer getCodigoUsuario() {
@@ -435,6 +478,14 @@ public abstract class AbstractController {
 
     Integer getNumerRegistrosPorPagina() {
         return numerRegistrosPorPagina;
+    }
+
+    Object getSessao(String atributo) {
+        if (request == null) {
+            throw new IllegalStateException(
+                    "Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
+        }
+        return request.getSession().getAttribute(atributo);
     }
 
     Usuario getUsuario() {
@@ -460,8 +511,8 @@ public abstract class AbstractController {
     }
 
     void inicializarComboTipoLogradouro() {
-        this.result.include("listaTipoLogradouro", this.tipoLogradouroService.pesquisar());
-        this.result.include("tipoLogradouroRenderizado", true);
+        result.include("listaTipoLogradouro", this.tipoLogradouroService.pesquisar());
+        result.include("isTipoLogradoutoHabilitado", true);
     }
 
     /*
@@ -470,18 +521,35 @@ public abstract class AbstractController {
      */
     private void inicializarPaginacao(Integer paginaSelecionada, Integer totalPaginas, Object objetoPaginado,
             String nomeObjetoPaginado) {
+        inicializarPaginacao(paginaSelecionada, totalPaginas, objetoPaginado, nomeObjetoPaginado, true);
+    }
+
+    /*
+     * Esse metodo ja garante que o usuario sera navegado para o rodape da
+     * pagina
+     */
+    private void inicializarPaginacao(Integer paginaSelecionada, Integer totalPaginas, Object objetoPaginado,
+            String nomeObjetoPaginado, boolean redirecionar) {
         if (paginaSelecionada == null || paginaSelecionada <= 1) {
             paginaSelecionada = 1;
         }
-        this.result.include("paginaSelecionada", paginaSelecionada);
-        this.result.include("totalPaginas", totalPaginas);
-        this.result.include(nomeObjetoPaginado, objetoPaginado);
-        irRodapePagina();
+        result.include("paginaSelecionada", paginaSelecionada);
+        result.include("totalPaginas", totalPaginas);
+        result.include(nomeObjetoPaginado, objetoPaginado);
+        if (redirecionar) {
+            irRodapePagina();
+        }
     }
 
     <T> void inicializarPaginacao(Integer paginaSelecionada, PaginacaoWrapper<T> paginacao, String nomeLista) {
         inicializarPaginacao(paginaSelecionada, calcularTotalPaginas(paginacao.getTotalPaginado()),
                 paginacao.getLista(), nomeLista);
+    }
+
+    <T> void inicializarPaginacaoSemRedirecionar(Integer paginaSelecionada, PaginacaoWrapper<T> paginacao,
+            String nomeLista) {
+        inicializarPaginacao(paginaSelecionada, calcularTotalPaginas(paginacao.getTotalPaginado()),
+                paginacao.getLista(), nomeLista, false);
     }
 
     /*
@@ -545,6 +613,13 @@ public abstract class AbstractController {
                 calcularTotalPaginas((Long) relatorio.getPropriedade("totalPesquisado")), relatorio, nomeRelatorio);
     }
 
+    <T, K> void inicializarRelatorioPaginadoSemRedirecionar(Integer paginaSelecionada,
+            RelatorioWrapper<T, K> relatorio, String nomeRelatorio) {
+        inicializarPaginacao(paginaSelecionada,
+                calcularTotalPaginas((Long) relatorio.getPropriedade("totalPesquisado")), relatorio, nomeRelatorio,
+                false);
+    }
+
     void init() throws ServiceLocatorException {
         this.tipoLogradouroService = ServiceLocator.locate(TipoLogradouroService.class);
         this.usuarioService = ServiceLocator.locate(UsuarioService.class);
@@ -572,18 +647,18 @@ public abstract class AbstractController {
     }
 
     final void irRodapePagina() {
-        this.irPaginaHome();
-        this.result.include("ancora", "rodape");
+        irPaginaHome();
+        ancorarRodape();
     }
 
     private void irTelaErro() {
-        this.result.forwardTo(ErroController.class).erroHome();
-        this.result.include("ancora", "topo");
+        result.forwardTo(ErroController.class).erroHome();
+        ancorarTopo();
     }
 
     void irTopoPagina() {
         this.irPaginaHome();
-        this.result.include("ancora", "topo");
+        ancorarTopo();
     }
 
     boolean isAcessoPermitido(TipoAcesso... tipoAcesso) {
@@ -632,32 +707,45 @@ public abstract class AbstractController {
         }
     }
 
+    void removerMascaraDocumento(Cliente cliente) {
+        cliente.setCnpj(removerMascaraDocumento(cliente.getCnpj()));
+        cliente.setCpf(removerMascaraDocumento(cliente.getCpf()));
+    }
+
     String removerMascaraDocumento(String documento) {
         return StringUtils.removerMascaraDocumento(documento);
     }
 
-    void serializarJson(SerializacaoJson serializacaoJson) {
-        if (serializacaoJson == null) {
+    void removerSessao(String atributo) {
+        if (request == null) {
+            throw new IllegalStateException(
+                    "Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
+        }
+        request.getSession().removeAttribute(atributo);
+    }
+
+    void serializarJson(SerializacaoJson json) {
+        if (json == null) {
             return;
         }
 
         Serializer serializer = null;
-        if (serializacaoJson.contemNome()) {
-            serializer = this.result.use(Results.json()).from(serializacaoJson.getObjeto(), serializacaoJson.getNome());
+        if (json.contemNome()) {
+            serializer = this.result.use(Results.json()).from(json.getObjeto(), json.getNome());
         } else {
-            serializer = this.result.use(Results.json()).from(serializacaoJson.getObjeto());
+            serializer = this.result.use(Results.json()).from(json.getObjeto());
         }
 
-        if (serializacaoJson.isRecursivo()) {
+        if (json.isRecursivo()) {
             serializer = serializer.recursive();
         }
 
-        if (serializacaoJson.contemInclusaoAtributo()) {
-            serializer.include(serializacaoJson.getAtributoInclusao());
+        if (json.contemInclusaoAtributo()) {
+            serializer.include(json.getAtributoInclusao());
         }
 
-        if (serializacaoJson.contemExclusaoAtributo()) {
-            serializer.exclude(serializacaoJson.getAtributoExclusao());
+        if (json.contemExclusaoAtributo()) {
+            serializer.exclude(json.getAtributoExclusao());
         }
         serializer.serialize();
     }
@@ -668,6 +756,21 @@ public abstract class AbstractController {
 
     boolean temElementos(Collection<?> lista) {
         return lista != null && !lista.isEmpty();
+    }
+
+    byte[] toByteArray(InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            return new byte[] {};
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int read = 0;
+        while ((read = inputStream.read(buffer, 0, buffer.length)) != -1) {
+            baos.write(buffer, 0, read);
+        }
+        baos.flush();
+        baos.close();
+        return baos.toByteArray();
     }
 
     void verificarPermissaoAcesso(String nomePermissaoAcesso, TipoAcesso... listaTipoAcesso) {

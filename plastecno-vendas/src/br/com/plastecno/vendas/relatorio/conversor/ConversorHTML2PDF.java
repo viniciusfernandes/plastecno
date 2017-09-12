@@ -10,6 +10,7 @@ import br.com.plastecno.vendas.relatorio.conversor.exception.ConversaoHTML2PDFEx
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
 
@@ -25,8 +26,11 @@ final class ConversorHTML2PDF {
         this.charset = charset;
     }
 
-    public byte[] converter(InputStream arquivoHTML) throws ConversaoHTML2PDFException {
+    public byte[] converter(InputStream arquivoHTML, int largura, int altura) throws ConversaoHTML2PDFException {
         final Document document = new Document();
+        document.setPageSize(new Rectangle(largura, altura));
+        document.setMargins(15, 15, 15, 15);
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PdfWriter writer = null;
         try {

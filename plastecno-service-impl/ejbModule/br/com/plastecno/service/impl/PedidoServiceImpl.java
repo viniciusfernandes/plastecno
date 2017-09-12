@@ -29,10 +29,12 @@ import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
+import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
+import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
@@ -50,10 +52,13 @@ import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
+import br.com.plastecno.service.impl.anotation.TODO;
+import br.com.plastecno.service.impl.calculo.CalculadoraItem;
 import br.com.plastecno.service.impl.calculo.CalculadoraPreco;
 import br.com.plastecno.service.impl.mensagem.email.GeradorPedidoEmail;
 import br.com.plastecno.service.impl.mensagem.email.TipoMensagemPedido;
 import br.com.plastecno.service.impl.util.QueryUtil;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
@@ -71,7 +76,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private ComissaoService comissaoService;
-
 	@EJB
 	private EmailService emailService;
 
@@ -105,15 +109,25 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@Override
-	public void aceitarOrcamento(Integer idOrcamento) {
+	public Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException {
 		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoById(idOrcamento);
-		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)) {
-			return;
+		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)
+				&& !SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido)) {
+			throw new BusinessException(
+					"Apenas os orçamentos em digitação ou enviados podem ser aceitos para um novo pedido.");
 		}
-		// Para o aceite do orcamento devemos redirecionar o pedido para o
-		// inicio da
-		// digitacao do pedido
-		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.DIGITACAO);
+
+		Integer idPedido = copiarPedido(idOrcamento, true);
+
+		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.ORCAMENTO_ACEITO);
+
+		// O pedido deve ir para digitacao
+		alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.DIGITACAO);
+
+		// Amarrando o pedido ao orcamento para o aceite. Isso sera utilizado em
+		// relatorios dos orcamento que viraram pedidos.
+		pedidoDAO.alterarIdOrcamentoByIdPedido(idPedido, idOrcamento);
+		return idPedido;
 	}
 
 	@Override
@@ -187,11 +201,37 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	private Double[] atualizarValoresPedido(Integer idPedido) {
-		Double[] valores = pedidoDAO.pesquisarValoresPedido(idPedido);
-		if (valores.length <= 0) {
-			return new Double[] {};
+	private void associarLogradouroCliente(Pedido pedido) throws BusinessException {
+		if (pedido == null || pedido.getCliente() == null) {
+			return;
 		}
+		List<LogradouroCliente> lLog = clienteService.pesquisarLogradouroCliente(pedido.getCliente().getId());
+		if (lLog == null) {
+			return;
+		}
+		// Antes de associar um logradouro novo devemos remover os antigos
+		pedidoDAO.removerLogradouroPedido(pedido.getId());
+		LogradouroPedido lPed = null;
+		for (LogradouroCliente lCli : lLog) {
+			lPed = new LogradouroPedido(pedido, lCli);
+			pedido.addLogradouro(logradouroService.inserir(lPed));
+		}
+	}
+
+	@TODO(descricao = "Esse metodo existe apenas para manter a consitencia do valor do pedido no relatorio de pedidos vendidos. Acredito que deve ser removido fututamente e a query do relatorio sera melhorada")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private double[] atualizarValoresPedido(Integer idPedido) {
+		double[] valores = pedidoDAO.pesquisarValoresPedido(idPedido);
+		if (valores.length <= 0) {
+			pedidoDAO.alterarValorPedido(idPedido, 0d, 0d);
+			return new double[] {};
+		}
+
+		double vFrete = pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
+		// O custo do frete deve ser incorporado no pedido e repassado para o
+		// cliente.
+		valores[0] += vFrete;
+		valores[1] += vFrete;
 		pedidoDAO.alterarValorPedido(idPedido, valores[0], valores[1]);
 		return valores;
 	}
@@ -273,6 +313,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Date> calcularDataPagamento(Integer idPedido) {
+		return calcularDataPagamento(idPedido, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Date> calcularDataPagamento(Integer idPedido, Date dataInicial) {
 		List<Date> lista = new ArrayList<Date>();
 		String formaPagamento = pedidoDAO.pesquisarFormaPagamentoByIdPedido(idPedido);
 		if (formaPagamento == null) {
@@ -286,8 +332,12 @@ public class PedidoServiceImpl implements PedidoService {
 			return lista;
 		}
 
+		if (dataInicial == null) {
+			dataInicial = new Date();
+		}
+
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
+		cal.setTime(dataInicial);
 		Integer diaCorrido = null;
 		for (String dia : dias) {
 			try {
@@ -298,13 +348,52 @@ public class PedidoServiceImpl implements PedidoService {
 			cal.add(Calendar.DAY_OF_MONTH, diaCorrido);
 			lista.add(cal.getTime());
 
-			// Retornando a data atual para somar os outros dias corridos
+			// Retornando a data atual para somar os outros dias corridos e
+			// evitar criar outros objetos Calendar.
 			cal.add(Calendar.DAY_OF_MONTH, -diaCorrido);
 		}
 		return lista;
 	}
 
+	private void calcularPeso(ItemPedido itemPedido) throws AlgoritmoCalculoException {
+		// O sistema nao consegue calcular o peso das pecas
+		if (itemPedido.isPeca()) {
+			return;
+		}
+		itemPedido.setPeso(calcularPesoItemPedido(itemPedido));
+	}
+
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException {
+		// O sistema nao consegue calcular o peso de pecas
+		if (itemPedido.isPeca()) {
+			return null;
+		}
+		if (itemPedido.contemMaterial() && itemPedido.getMaterial().getPesoEspecifico() == null) {
+			Double pEspecifico = materialService.pesquisarPesoEspecificoById(itemPedido.getMaterial().getId());
+			itemPedido.getMaterial().setPesoEspecifico(pEspecifico);
+		}
+		return CalculadoraItem.calcularKilo(itemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void cancelarOrcamento(Integer idOrcamento) throws BusinessException {
+		if (idOrcamento == null) {
+			throw new BusinessException("Não é possível cancelar o orçamento pois ele não existe no sistema");
+		}
+
+		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdOrcamento(idOrcamento);
+		if (idPedido != null) {
+			throw new BusinessException("O orçamento No. " + idOrcamento + " esta associado ao pedido No. " + idPedido
+					+ " e não pode ser cancelado.");
+		}
+		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.ORCAMENTO_CANCELADO);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void cancelarPedido(Integer idPedido) throws BusinessException {
 		if (idPedido == null) {
 			throw new BusinessException("Não é possível cancelar o pedido pois ele não existe no sistema");
@@ -318,7 +407,7 @@ public class PedidoServiceImpl implements PedidoService {
 		} else if (TipoPedido.REVENDA.equals(tipoPedido)) {
 			estoqueService.cancelarReservaEstoqueByIdPedido(idPedido);
 		}
-		pedidoDAO.cancelar(idPedido);
+		alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.CANCELADO);
 	}
 
 	@Override
@@ -363,7 +452,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoCompra.setTipoPedido(TipoPedido.COMPRA);
 		pedidoCompra.setTipoEntrega(TipoEntrega.CIF);
 
-		pedidoCompra = inserir(pedidoCompra);
+		pedidoCompra = inserirPedido(pedidoCompra);
 		ItemPedido itemCadastrado = null;
 		ItemPedido itemClone = null;
 		boolean incluiAlgumItem = false;
@@ -430,14 +519,63 @@ public class PedidoServiceImpl implements PedidoService {
 		return pesquisarQuantidadeNaoRecepcionadaItemPedido(idItemPedido) > 0;
 	}
 
+	@Override
+	public Integer copiarPedido(Integer idPedido, boolean isOrcamento) throws BusinessException {
+		Pedido pedido = pesquisarPedidoById(idPedido);
+		Pedido pClone = null;
+		try {
+			pClone = pedido.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new BusinessException("Falha no processo de copia do pedido No. " + idPedido, e);
+		}
+
+		// Configurando a data de entrega para um dia posterior
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date());
+		c.add(Calendar.DAY_OF_MONTH, 1);
+
+		pClone.setId(null);
+		pClone.setDataEntrega(c.getTime());
+		pClone.setDataEnvio(null);
+		pClone.setDataEmissaoNF(null);
+		pClone.setDataVencimentoNF(null);
+		pClone.setValorParcelaNF(null);
+		pClone.setValorTotalNF(null);
+		pClone.setListaLogradouro(null);
+		pClone.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO_DIGITACAO : SituacaoPedido.DIGITACAO);
+		pClone = inserirPedido(pClone);
+
+		List<ItemPedido> listaItemPedido = pesquisarItemPedidoByIdPedido(idPedido);
+		ItemPedido iClone = null;
+		for (ItemPedido itemPedido : listaItemPedido) {
+			try {
+				iClone = itemPedido.clone();
+				iClone.setIdPedidoCompra(null);
+				iClone.setIdPedidoVenda(null);
+				iClone.setQuantidadeRecepcionada(null);
+				iClone.setQuantidadeReservada(null);
+				iClone.setEncomendado(false);
+				inserirItemPedido(pClone.getId(), iClone);
+			} catch (IllegalStateException e) {
+				throw new BusinessException("Falha no processo de copia do item No. " + itemPedido.getId()
+						+ " do pedido No. " + idPedido, e);
+			}
+		}
+		return pClone.getId();
+	}
+
 	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
 	private void definirTipoPedido(Pedido pedido) {
+		if (pedido == null) {
+			return;
+		}
+
 		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
 		// portanto, faremos uma consulta pelo nome da representada para
 		// decidir, ja
 		// que os pedidos de compra sempre serao configurados antes de inserir.
 		if (pedido.getTipoPedido() == null) {
-			if (representadaService.isRevendedor(pedido.getRepresentada().getId())) {
+			if (pedido.getRepresentada() != null && representadaService.isRevendedor(pedido.getRepresentada().getId())) {
 				pedido.setTipoPedido(TipoPedido.REVENDA);
 			} else {
 				pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
@@ -484,7 +622,24 @@ public class PedidoServiceImpl implements PedidoService {
 		return empacotamentoOk;
 	}
 
-	private void enviarOrcamento(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private void enviarCompra(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
+		try {
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.COMPRA, pdfPedido, anexos));
+		} catch (NotificacaoException e) {
+			StringBuilder mensagem = new StringBuilder();
+			mensagem.append("Falha no envio do pedido de compra No. ").append(pedido.getId()).append(" do comprador ")
+					.append(pedido.getComprador().getNomeCompleto()).append(" para o cliente ")
+					.append(pedido.getCliente().getNomeCompleto())
+					.append(" e contato feito por " + pedido.getContato().getNome());
+
+			e.addMensagem(e.getListaMensagem());
+			throw e;
+		}
+	}
+
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private void enviarOrcamento(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
 		Contato contato = pedido.getContato();
 		if (StringUtils.isEmpty(contato.getEmail())) {
 			throw new BusinessException("Email do contato é obrigatório para envio do orçamento");
@@ -499,8 +654,8 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		try {
-			emailService.enviar(new GeradorPedidoEmail(pedido, arquivoAnexado)
-					.gerarMensagem(TipoMensagemPedido.ORCAMENTO));
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.ORCAMENTO, pdfPedido,
+					anexos));
 		} catch (NotificacaoException e) {
 			StringBuilder mensagem = new StringBuilder();
 			mensagem.append("Falha no envio do orçamento No. ").append(pedido.getId()).append(" do vendedor ")
@@ -515,27 +670,38 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException {
+	public void enviarPedido(Integer idPedido, AnexoEmail pdfPedido) throws BusinessException {
+		enviarPedido(idPedido, pdfPedido, (AnexoEmail[]) null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void enviarPedido(Integer idPedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
 
 		final Pedido pedido = pesquisarPedidoById(idPedido);
 
 		if (pedido == null) {
-			throw new BusinessException("Pedido não exite no sistema");
+			throw new BusinessException("Pedido/Orçamento não exite no sistema");
 		}
 
-		/*
-		 * Devemos sempre usar a lista do cliente pois o cliente pode ter
-		 * alterado os dados de logradouro
-		 */
-		pedido.addLogradouro(gerarLogradouroPedidoByIdCliente(pedido.getCliente().getId()));
-		pedido.setDataEnvio(new Date());
+		if (pedido.isCancelado()) {
+			throw new BusinessException("Pedido/Orçamento foi cancelado e não pode ser enviado.");
+		}
+
+		// A data de emissao nao pode ser alterada pois dara conflito no calculo
+		// de comissao de vendas
+		if (pedido.getDataEnvio() == null) {
+			pedido.setDataEnvio(new Date());
+		}
 
 		validarEnvio(pedido);
 
 		if (pedido.isOrcamento()) {
-			enviarOrcamento(pedido, arquivoAnexado);
-		} else {
-			enviarVenda(pedido, arquivoAnexado);
+			enviarOrcamento(pedido, pdfPedido, anexos);
+		} else if (pedido.isVenda()) {
+			enviarVenda(pedido, pdfPedido, anexos);
+		} else if (pedido.isCompra()) {
+			enviarCompra(pedido, pdfPedido, anexos);
 		}
 
 		if (pedido.isCompra()) {
@@ -546,14 +712,17 @@ public class PedidoServiceImpl implements PedidoService {
 			// na reserva dos itens do pedido, pois la o pedido entre em
 			// pendecia de
 			// reserva.
-			if (SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
+			if (!pedido.isOrcamento() && SituacaoPedido.DIGITACAO.equals(pedido.getSituacaoPedido())) {
 				pedido.setSituacaoPedido(SituacaoPedido.ENVIADO);
+			} else if (pedido.isOrcamento()) {
+				pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
 			}
 		}
 		pedidoDAO.alterar(pedido);
 	}
 
-	private void enviarVenda(Pedido pedido, byte[] arquivoAnexado) throws BusinessException {
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private void enviarVenda(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
 		this.validarEnvioVenda(pedido);
 
 		if (pedido.isRevenda()) {
@@ -562,11 +731,10 @@ public class PedidoServiceImpl implements PedidoService {
 
 		validarListaLogradouroPreenchida(pedido);
 		try {
-			GeradorPedidoEmail gerador = new GeradorPedidoEmail(pedido, arquivoAnexado);
-			emailService.enviar(gerador.gerarMensagem(TipoMensagemPedido.VENDA));
-
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA, pdfPedido, anexos));
 			if (pedido.isClienteNotificadoVenda()) {
-				emailService.enviar(gerador.gerarMensagem(TipoMensagemPedido.VENDA_CLIENTE));
+				emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA_CLIENTE,
+						pdfPedido, anexos));
 			}
 
 		} catch (NotificacaoException e) {
@@ -580,14 +748,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 	}
 
-	private List<LogradouroPedido> gerarLogradouroPedidoByIdCliente(Integer idCliente) {
-		List<LogradouroCliente> lLog = clienteService.pesquisarLogradouroCliente(idCliente);
-		List<LogradouroPedido> lLogPed = new ArrayList<LogradouroPedido>();
-
-		lLog.stream().forEach(l -> lLogPed.add(new LogradouroPedido(l)));
-		return lLogPed;
-	}
-
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private Integer gerarSequencialItemPedido(Integer idPedido) {
 		Integer seq = pedidoDAO.pesquisarMaxSequenciaItemPedido(idPedido);
 		return seq == null ? 1 : ++seq;
@@ -599,15 +760,10 @@ public class PedidoServiceImpl implements PedidoService {
 		itemPedidoDAO = new ItemPedidoDAO(entityManager);
 	}
 
-	/*
-	 * Esse metodo retorna um pedido pois, apos a inclusao de um novo pedido,
-	 * configuramos a data de inclusao como sendo a data atual, e essa
-	 * informacao deve ser retornada para o componente chamador.
-	 */
-	@Override
-	public Pedido inserir(Pedido pedido) throws BusinessException {
-		if (SituacaoPedido.CANCELADO.equals(pedido.getSituacaoPedido())) {
-			throw new InformacaoInvalidaException("Pedido ja foi cancelado e nao pode ser alterado");
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	private Pedido inserir(Pedido pedido) throws BusinessException {
+		if (pedido.isCancelado()) {
+			throw new InformacaoInvalidaException("Pedido/Orçamento ja foi cancelado e não pode ser alterado");
 		}
 
 		definirTipoPedido(pedido);
@@ -641,7 +797,7 @@ public class PedidoServiceImpl implements PedidoService {
 			// de administrador faca cadastro de pedidos em nome de outro. Por
 			// isso
 			// estamos ajustando o vendedor correto.
-			Usuario vendedor = usuarioService.pesquisarVendedorByIdCliente(pedido.getCliente().getId());
+			Usuario vendedor = usuarioService.pesquisarVendedorResumidoByIdCliente(pedido.getCliente().getId());
 			if (vendedor == null) {
 				String nomeCliente = clienteService.pesquisarNomeFantasia(pedido.getCliente().getId());
 				throw new BusinessException("Não existe vendedor associado ao cliente " + nomeCliente);
@@ -661,12 +817,6 @@ public class PedidoServiceImpl implements PedidoService {
 					+ TipoEntrega.CIF_TRANS.getDescricao());
 		}
 
-		/*
-		 * Devemos sempre pesquisar pois o cliente pode ter alterado os dados de
-		 * logradouro
-		 */
-		pedido.addLogradouro(gerarLogradouroPedidoByIdCliente(pedido.getCliente().getId()));
-
 		if (isPedidoNovo) {
 			pedido = pedidoDAO.inserir(pedido);
 		} else {
@@ -677,6 +827,11 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setValorPedidoIPI(pesquisarValorPedidoIPI(idPedido));
 			pedido = pedidoDAO.alterar(pedido);
 		}
+		// Aqui estamos atualizando o valor do pedido pois pode haver um frete.
+		atualizarValoresPedido(idPedido);
+
+		// Devemos sempre associar ao pedido o logradouro do cliente.
+		associarLogradouroCliente(pedido);
 
 		return pedido;
 	}
@@ -696,7 +851,7 @@ public class PedidoServiceImpl implements PedidoService {
 		// configurando o material para efetuar o calculo usando o peso
 		// especifico
 		if (itemPedido.getMaterial() != null) {
-			itemPedido.setMaterial(this.materialService.pesquisarById(itemPedido.getMaterial().getId()));
+			itemPedido.setMaterial(materialService.pesquisarById(itemPedido.getMaterial().getId()));
 		}
 
 		if (itemPedido.isPeca() && itemPedido.isVendaKilo()) {
@@ -759,6 +914,7 @@ public class PedidoServiceImpl implements PedidoService {
 		 * o item 1 deve ter acabamento, etc.
 		 */
 		if (itemPedido.isNovo()) {
+
 			itemPedido.setSequencial(gerarSequencialItemPedido(idPedido));
 		}
 
@@ -793,12 +949,18 @@ public class PedidoServiceImpl implements PedidoService {
 		// enviados aparecerao no relatorio de comissao.
 		calcularComissaoVenda(pedido, itemPedido);
 
+		// Aqui estamos calculando o peso do item para agilizar o preenchimento
+		// do peso na geracao da NFe
+		calcularPeso(itemPedido);
 		return itemPedido.getId();
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException {
+		if (itemPedido == null || itemPedido.getId() == null) {
+			return null;
+		}
 		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdItemPedido(itemPedido.getId());
 		if (idPedido == null) {
 			throw new BusinessException("Não existe pedido cadastrado para o item "
@@ -823,19 +985,57 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public Pedido inserirOrcamento(Pedido pedido) throws BusinessException {
-		pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO);
-		Cliente cliente = pedido.getCliente();
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Pedido inserirOrcamento(Pedido orcamento) throws BusinessException {
+		if (orcamento == null) {
+			return null;
+		}
 
+		if (orcamento.isNovo()) {
+			orcamento.setSituacaoPedido(SituacaoPedido.ORCAMENTO_DIGITACAO);
+		} else {
+			// Garantindo a coerencia da situacao do pedido.
+			orcamento.setSituacaoPedido(pesquisarSituacaoPedidoById(orcamento.getId()));
+		}
+
+		if (!orcamento.isOrcamento()) {
+			throw new BusinessException("Esse pedido não é um orçamento e portanto não pode ser incluído dessa forma");
+		}
+
+		Cliente cliente = orcamento.getCliente();
+		if (cliente == null) {
+			throw new BusinessException(
+					"O orçamento não contém cliente. O cliente deve ter ao menos um nome para a inclusão do orçamento.");
+		}
 		cliente.setRazaoSocial(cliente.getNomeFantasia());
-		cliente.addContato(new ContatoCliente(pedido.getContato()));
-		cliente.setVendedor(pedido.getVendedor());
+		cliente.addContato(new ContatoCliente(orcamento.getContato()));
+		cliente.setVendedor(orcamento.getVendedor());
 
 		cliente.setRamoAtividade(ramoAtividadeService.pesquisarRamoAtividadePadrao());
 
-		if (pedido.isClienteNovo()) {
-			pedido.setCliente(clienteService.inserir(cliente));
+		if (orcamento.isClienteNovo()) {
+			cliente.setVendedor(orcamento.getVendedor());
+			orcamento.setCliente(clienteService.inserir(cliente));
 		}
+		return inserir(orcamento);
+	}
+
+	/*
+	 * Esse metodo retorna um pedido pois, apos a inclusao de um novo pedido,
+	 * configuramos a data de inclusao como sendo a data atual, e essa
+	 * informacao deve ser retornada para o componente chamador.
+	 */
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Pedido inserirPedido(Pedido pedido) throws BusinessException {
+		if (pedido == null) {
+			return null;
+		}
+
+		if (pedido.isOrcamento()) {
+			return inserirOrcamento(pedido);
+		}
+
 		return inserir(pedido);
 	}
 
@@ -870,7 +1070,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
+			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros, boolean isOrcamento) {
 		List<Pedido> listaPedido = null;
 		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
 			listaPedido = pesquisarByIdClienteIdFornecedor(idCliente, idFornecedor, isCompra, indiceRegistroInicial,
@@ -880,7 +1080,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		return new PaginacaoWrapper<Pedido>(pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
-				idVendedor, idFornecedor, isCompra, null), listaPedido);
+				idVendedor, idFornecedor, isOrcamento, isCompra, null), listaPedido);
 	}
 
 	@Override
@@ -950,12 +1150,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo) {
+	public List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo) {
 		if (periodo != null) {
-			return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo.getInicio(),
+			return itemPedidoDAO.pesquisarCompraAguardandoRecepcao(idRepresentada, periodo.getInicio(),
 					periodo.getFim());
 		}
-		return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, null, null);
+		return itemPedidoDAO.pesquisarCompraAguardandoRecepcao(idRepresentada, null, null);
 	}
 
 	@Override
@@ -1037,6 +1237,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarIdClienteByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.cliente.id from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), Integer.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido) {
 		if (idPedido == null) {
 			return new ArrayList<Integer>(1);
@@ -1107,7 +1315,7 @@ public class PedidoServiceImpl implements PedidoService {
 			return null;
 		}
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createQuery(
+				entityManager.createQuery(
 						"select v.id from Pedido p inner join p.proprietario v where p.id = :idPedido ").setParameter(
 						"idPedido", idPedido), Integer.class, null);
 	}
@@ -1155,14 +1363,14 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros,
-			ItemPedido itemVendido) {
+			Integer idFornecedor, boolean isOrcamento, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros, ItemPedido itemVendido) {
 
 		if (idCliente == null) {
 			return Collections.emptyList();
 		}
 		return itemPedidoDAO.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor,
-				isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
+				isOrcamento, isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
 	}
 
 	@Override
@@ -1188,6 +1396,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal) {
 		return itemPedidoDAO.pesquisarItemPedidoAguardandoMaterial(idCliente, dataInicial, dataFinal);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarItemPedidoPagamento(idItemPedido);
 	}
 
 	@Override
@@ -1225,7 +1439,13 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<LogradouroPedido> pesquisarLogradouro(Integer idPedido) {
-		return pedidoDAO.pesquisarLogradouro(idPedido);
+		return pesquisarLogradouro(idPedido, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<LogradouroPedido> pesquisarLogradouro(Integer idPedido, TipoLogradouro tipo) {
+		return pedidoDAO.pesquisarLogradouro(idPedido, tipo);
 	}
 
 	@Override
@@ -1400,6 +1620,18 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarQuantidadeReservadaByIdItemPedido(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarQuantidadeReservada(idItemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Representada pesquisarRepresentadaByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarRepresentadaByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Representada pesquisarRepresentadaIdPedido(Integer idPedido) {
 		return representadaService.pesquisarById(pesquisarIdRepresentadaByIdPedido(idPedido));
 	}
@@ -1417,6 +1649,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido) {
+		if (idPedido == null) {
+			return null;
+		}
 		return pedidoDAO.pesquisarSituacaoPedidoById(idPedido);
 	}
 
@@ -1458,6 +1693,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public TipoPedido pesquisarTipoPedidoByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarTipoPedidoById(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<TotalizacaoPedidoWrapper> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo) {
 		return pedidoDAO.pesquisarValorTotalPedidoByPeriodo(periodo.getInicio(), periodo.getFim(), true);
 	}
@@ -1481,26 +1722,28 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra) {
-		return pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, idFornecedor, isCompra, null);
+	public Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor,
+			boolean isOrcamento, boolean isCompra) {
+		return pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, idFornecedor, isOrcamento,
+				isCompra, null);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, ItemPedido itemVendido) {
+			Integer idFornecedor, boolean isOrcamento, boolean isCompra, ItemPedido itemVendido) {
 		if (idCliente == null) {
 			return 0L;
 		}
 
 		return itemPedidoDAO.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, idVendedor, idFornecedor,
-				isCompra, itemVendido);
+				isOrcamento, isCompra, itemVendido);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(Integer idCliente) {
-		return this.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false, null);
+		return this.pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(idCliente, null, null, false, false, null);
 	}
 
 	@Override
@@ -1515,6 +1758,12 @@ public class PedidoServiceImpl implements PedidoService {
 		return pedidoDAO.pesquisarTransportadoraByIdPedido(idPedido);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Transportadora pesquisarTransportadoraResumidaByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarTransportadoraResumidaByIdPedido(idPedido);
+	}
+
 	private List<ItemPedido> pesquisarValoresItemPedidoResumidoByPeriodo(Periodo periodo,
 			List<SituacaoPedido> listaSituacao, TipoPedido tipoPedido) {
 		StringBuilder select = new StringBuilder();
@@ -1527,6 +1776,17 @@ public class PedidoServiceImpl implements PedidoService {
 		return this.entityManager.createQuery(select.toString(), ItemPedido.class)
 				.setParameter("dataInicio", periodo.getInicio()).setParameter("dataFim", periodo.getFim())
 				.setParameter("situacoes", listaSituacao).setParameter("tipoPedido", tipoPedido).getResultList();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double pesquisarValorFretePorItemByIdPedido(Integer idPedido) {
+		long total = pesquisarTotalItemPedido(idPedido);
+		if (0l == total) {
+			return 0d;
+		}
+		Double vFrete = pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
+		return vFrete / total;
 	}
 
 	@Override
@@ -1600,36 +1860,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	public Integer refazerPedido(Integer idPedido) throws BusinessException {
-		Pedido pedido = pesquisarPedidoById(idPedido);
-		Pedido pedidoClone = null;
-		try {
-			pedidoClone = pedido.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new BusinessException("Falha no processo de copia do pedido No. " + idPedido, e);
-		}
-
-		pedidoClone.setId(null);
-		pedidoClone.setDataEntrega(new Date());
-		pedidoClone.setListaLogradouro(null);
-		pedidoClone.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-		pedidoClone = inserir(pedidoClone);
-
-		List<ItemPedido> listaItemPedido = pesquisarItemPedidoByIdPedido(idPedido);
-		ItemPedido itemPedidoClone = null;
-		for (ItemPedido itemPedido : listaItemPedido) {
-			try {
-				itemPedidoClone = itemPedido.clone();
-				inserirItemPedido(pedidoClone.getId(), itemPedidoClone);
-			} catch (IllegalStateException e) {
-				throw new BusinessException("Falha no processo de copia do item No. " + itemPedido.getId()
-						+ " do pedido No. " + idPedido, e);
-			}
-		}
+		Integer idClone = copiarPedido(idPedido, false);
 
 		// Ao final da clonaem do pedido precisamos cancelar o antigo para que
 		// esse nao aparece nos faturamentos da empresa.
-		cancelarPedido(pedido.getId());
-		return pedidoClone.getId();
+		cancelarPedido(idPedido);
+		return idClone;
 	}
 
 	@Override
@@ -1642,20 +1878,23 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido == null) {
 			return null;
 		}
+
 		try {
+			// Aqui vamos remover os itens reservados de devolver as quantidades
+			// reservadas do item do pedido para o estoque e zerar as
+			// quantidades reservadas do item do pedido.
+			estoqueService.devolverItemEstoque(idItemPedido);
+
 			itemPedidoDAO.remover(new ItemPedido(idItemPedido));
 
 			// Efetuando novamente o calculo pois na remocao o valor do pedido
 			// deve ser atualizado
-			Double[] valores = atualizarValoresPedido(pedido.getId());
-			if (valores.length > 0) {
-				pedido.setValorPedido(valores[0]);
-				pedido.setValorPedidoIPI(valores[1]);
-			}
+			atualizarValoresPedido(pedido.getId());
 
 			if (pedido.isCompraEfetuada() && pesquisarTotalItemPedido(pedido.getId()) <= 0L) {
 				pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
 			}
+
 			return pedido;
 		} catch (NonUniqueResultException e) {
 			throw new BusinessException(
@@ -1671,6 +1910,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerLogradouroPedido(Integer idPedido) {
+		pedidoDAO.removerLogradouroPedido(idPedido);
+	}
+
 	private void validarEnvio(Pedido pedido) throws BusinessException {
 
 		if (!pedido.isOrcamento()) {
@@ -1678,8 +1923,7 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		final BusinessException exception = new BusinessException();
-		if (SituacaoPedido.CANCELADO.equals(pedido.getSituacaoPedido())
-				|| SituacaoPedido.ENVIADO.equals(pedido.getSituacaoPedido())) {
+		if (SituacaoPedido.CANCELADO.equals(pedido.getSituacaoPedido())) {
 			exception.addMensagem("Pedido cancelado ou enviado não pode ser enviado para as representadas");
 		}
 
@@ -1729,7 +1973,7 @@ public class PedidoServiceImpl implements PedidoService {
 		if (pedido == null) {
 			return;
 		}
-		logradouroService.validarListaLogradouroPreenchidaXXX(pedido.getListaLogradouro());
+		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
 	}
 
 	private void verificarMaterialAssociadoFornecedor(Integer idRepresentadaFornecedora, Set<Integer> listaIdItemPedido)
@@ -1746,5 +1990,12 @@ public class PedidoServiceImpl implements PedidoService {
 						+ idPedido + " pois o fornecedor \"" + nomeFantasia + "\" não trabalha com o material do item");
 			}
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem) {
+		// Apenas um registro deve ser retornado, o que indica apenas um fornecedor
+		return itemPedidoDAO.pesquisarTotalFornecedorDistintoByIdItem(listaIdItem).size() > 1;
 	}
 }

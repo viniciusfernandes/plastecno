@@ -3,13 +3,26 @@
 
 $(document).ready(function(){
 	
-	inserirMascaraNCM('bloco_item_pedido #ncm');
+	habilitar('#bloco_item_pedido #descricao', false);
+	habilitar('#bloco_item_pedido #peso', false);
+	<%--
+	habilitar('#bloco_item_pedido #aliquotaIPI', <c:out value="${not empty pedido and pedido.representada.IPIHabilitado}"/>);
+	--%>
+	
 	$('#precoVenda').focus(function (){
 		
 		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
 			return;			
 		}
 		pesquisarPrecoMinimo();
+		pesquisarPesoItem();
+	});
+	
+	$('#quantidade').keyup(function (){
+		if(isEmpty($('#bloco_item_pedido #idMaterial').val())|| isEmpty($('#bloco_item_pedido #formaMaterial').val())){
+			return;			
+		}
+		pesquisarPesoItem();
 	});
 	
 	$('#ncm').focus(function (){
@@ -30,19 +43,32 @@ $(document).ready(function(){
 		$('<input>').attr('type','hidden').attr('name','itemVendido.comprimento').attr('value',$('#bloco_item_pedido #comprimento').val()).appendTo('#formPesquisa');
 		$('#botaoPesquisaPedido').click();
 	});
+	
+	inserirMascaraNCM('bloco_item_pedido #ncm');
+	inserirMascaraMonetaria('precoVenda', 7);
+	inserirMascaraNumerica('aliquotaIPI', '99');
+	inserirMascaraMonetaria('aliquotaComissao', 5);
+	inserirMascaraMonetaria('aliquotaICMS', 5);
+	inserirMascaraNumerica('quantidade', '9999999');
+	inserirMascaraMonetaria('comprimento', 8);
+	inserirMascaraMonetaria('peso', 8);
+	inserirMascaraMonetaria('medidaExterna', 8);
+	inserirMascaraMonetaria('medidaInterna', 8);
+	inserirMascaraNumerica('prazoEntrega', '999');
 });
 
-function gerarParametrosItemPedido(){
-	var parametro = 'itemEstoque.material.id='+$('#bloco_item_pedido #idMaterial').val();
-	parametro += '&itemEstoque.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
-	parametro += '&itemEstoque.medidaExterna='+$('#bloco_item_pedido #medidaExterna').val();
-	parametro += '&itemEstoque.medidaInterna='+$('#bloco_item_pedido #medidaInterna').val();
-	parametro += '&itemEstoque.comprimento='+$('#bloco_item_pedido #comprimento').val();
+function gerarParametrosMedidasItem(){
+	var parametro = 'item.material.id='+$('#bloco_item_pedido #idMaterial').val();
+	parametro += '&item.formaMaterial='+$('#bloco_item_pedido #formaMaterial').val();
+	parametro += '&item.medidaExterna='+$('#bloco_item_pedido #medidaExterna').val();
+	parametro += '&item.medidaInterna='+$('#bloco_item_pedido #medidaInterna').val();
+	parametro += '&item.comprimento='+$('#bloco_item_pedido #comprimento').val();
+	parametro += '&item.quantidade='+$('#bloco_item_pedido #quantidade').val();
 	return parametro;
 }
 
 function pesquisarPrecoMinimo(){
-	var parametro = gerarParametrosItemPedido();
+	var parametro = gerarParametrosMedidasItem();
 	var request = $.ajax({
 		type: 'get',
 		url: '<c:url value="/estoque/item/precominimo"/>',
@@ -50,7 +76,41 @@ function pesquisarPrecoMinimo(){
 	});
 	
 	request.done(function (response){
-		$('#bloco_item_pedido #precoMinimo').val(response.precoMinimo);
+		var preco = response.precoMinimo;
+		if(preco == undefined || preco == null){
+			return;
+		}
+		$('#bloco_item_pedido #precoMinimo').val(preco);
+	});
+	
+	request.fail(function(request, status, excecao) {
+		var mensagem = 'Falha no calculo do preco de venda sugerido: '+ idCampoPesquisavel;
+		mensagem += ' para a URL ' + url;
+		mensagem += ' contendo o valor de requisicao ' + parametro;
+		mensagem += ' => Excecao: ' + excecao;
+		gerarListaMensagemErro(new Array(mensagem));
+	});
+};
+
+function pesquisarPesoItem(){
+	var parametro = gerarParametrosMedidasItem();
+	var request = $.ajax({
+		type: 'get',
+		url: '<c:url value="/pedido/pesoitem"/>',
+		data: parametro 
+	});
+	
+	request.done(function (response){
+		var peso = response.peso;
+		if(peso != undefined || peso != null){
+			$('#bloco_item_pedido #peso').val(peso);
+			return;
+		} 
+		var erros = response.erros ; 
+		if(erros!= undefined && erros != null){
+			gerarListaMensagemErro(new Array(erros));
+			return;
+		}
 	});
 	
 	request.fail(function(request, status, excecao) {
@@ -63,7 +123,7 @@ function pesquisarPrecoMinimo(){
 };
 
 function pesquisarNcm(){
-	var parametro = gerarParametrosItemPedido();
+	var parametro = gerarParametrosMedidasItem();
 	var request = $.ajax({
 		type: 'get',
 		url: '<c:url value="/estoque/item/ncm"/>',
@@ -89,7 +149,7 @@ function pesquisarNcm(){
 
 </script>
 <fieldset id="bloco_item_pedido">
-	<legend>::: Itens do ${orcamento ? 'Orçamento': 'Pedido'} de ${not empty tipoPedido ? 'Compra': 'Venda'} :::</legend>
+	<legend>::: Itens do ${orcamento ? 'Orçamento': 'Pedido'} de ${isCompra ? 'Compra': 'Venda'} :::</legend>
 
 	<!-- Esse campo sera usado para popular a tabela de itens com os dados que vieram do ItemPedidoJson -->
 	<input type="hidden" id="descricaoItemPedido" /> 
@@ -99,7 +159,7 @@ function pesquisarNcm(){
 	<input type="hidden" id="sequencial" name="itemPedido.sequencial" /> 
 	<input type="hidden" id="precoUnidade" />
 
-	<div class="label">Tipo de ${not empty tipoPedido ? 'Compra': 'Venda'}:</div>
+	<div class="label">Tipo de ${isCompra ? 'Compra': 'Venda'}:</div>
 	<div class="input">
 		<input type="radio" id="tipoVendaKilo" name="itemPedido.tipoVenda"
 			value="KILO" <c:if test="${empty pedido.id}">checked</c:if> />
@@ -115,9 +175,9 @@ function pesquisarNcm(){
 		<input type="text" id="quantidade" name="itemPedido.quantidade" />
 	</div>
 	<div class="label" style="width: 6%">Forma:</div>
-	<div class="input" style="width: 60%">
+	<div class="input" style="width: 58%">
 		<select id="formaMaterial" name="itemPedido.formaMaterial"
-			style="width: 40%">
+			style="width: 45%">
 			<option value="">&lt&lt SELECIONE &gt&gt</option>
 			<c:forEach var="formaMaterial" items="${listaFormaMaterial}">
 				<option value="${formaMaterial}">${formaMaterial.descricao}</option>
@@ -155,8 +215,12 @@ function pesquisarNcm(){
 			maxlength="11" style="width: 30%" />
 	</div>
 	<div class="label">Preço Mín.:</div>
-	<div class="input" style="width: 70%">
-		<input type="text" id="precoMinimo" name="itemPedido.precoMinimo" maxlength="8" style="width: 7%" disabled="disabled"/>
+	<div class="input" style="width: 10%">
+		<input type="text" id="precoMinimo" name="itemPedido.precoMinimo" maxlength="8" style="width: 100%" disabled="disabled"/>
+	</div>
+	<div class="label">Peso (kg):</div>
+	<div class="input" style="width: 50%">
+		<input type="text" id="peso" name="itemPedido.peso" maxlength="8" style="width: 18%" />
 	</div>
 	<div class="label">Preço:</div>
 	<div class="input" style="width: 5%">
@@ -172,7 +236,7 @@ function pesquisarNcm(){
 	<div class="label" style="width: 10%">ICMS (%) :</div>
 	<div class="input" style="width: 40%">
 		<input type="text" id="aliquotaICMS" name="itemPedido.aliquotaICMS"
-			maxlength="2" style="width: 5%"/>
+			maxlength="2" style="width: 10%"/>
 	</div>
 	<div class="label">Prazo (dias):</div>
 	<div class="input" style="width: 5%">
@@ -180,7 +244,10 @@ function pesquisarNcm(){
 	</div>
 	<div class="label" style="width: 8%">Comiss. (%):</div>
 	<div class="input" style="width: 5%">
-		<input type="text" id="aliquotaComissao" name="itemPedido.aliquotaComissao" maxlength="3" />
+		<input type="text" id="aliquotaComissao" name="itemPedido.aliquotaComissao" maxlength="3" 
+			<c:out value="${acessoAlteracaoComissaoPermitida ? '' :'disabled=\"disabled\"'}"/>"
+			class="<c:out value="${acessoAlteracaoComissaoPermitida ? '' :'uppercaseBloqueado desabilitado'}"/>"
+		/>
 	</div>
 	<div class="label" style="width: 10%">C.S.T:</div>
 	<div class="input" style="width: 50%">
@@ -193,11 +260,10 @@ function pesquisarNcm(){
 	</div>
 	<c:if test="${acessoDadosNotaFiscalPermitido}">
 		<div class="label" >NCM:</div>
-		<div class="input" style="width: 10%">
-			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}"/>
+		<div class="input" style="width: 80%">
+			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}" style="width: 10%"/>
 		</div>
 	</c:if>
-	
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">
 			<a id="botaoInserirItemPedido" title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>
@@ -214,7 +280,7 @@ function pesquisarNcm(){
 					<th style="width: 2%">Item</th>
 					<th style="width: 5%">Qtde.</th>
 					<th style="width: 45%">Descrição</th>
-					<th style="width: 7%">${not empty tipoPedido ? 'Compra': 'Venda'}</th>
+					<th style="width: 7%">${isCompra ? 'Compra': 'Venda'}</th>
 					<th style="width: 10%">Preço (R$)</th>
 					<th style="width: 10%">Unid. (R$)</th>
 					<th style="width: 10%">Total Item (R$)</th>
@@ -249,8 +315,6 @@ function pesquisarNcm(){
 						</td>
 					</tr>
 				</c:forEach>
-
-
 			</tbody>
 			<tfoot>
 				<tr>
@@ -266,6 +330,13 @@ function pesquisarNcm(){
 					<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
 					<td colspan="4"><div id="valorPedidoIPI"
 							style="text-align: left;">R$ ${not empty pedido.valorPedidoIPI ? pedido.valorPedidoIPIFormatado : 0}</div></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td colspan="4"></td>
+					<td colspan="2" style="text-align: right;">TOTAL COM FRETE:</td>
+					<td colspan="4"><div id="valorPedidoFrete"
+							style="text-align: left;">R$ ${pedido.valorTotalFormatado}</div></td>
 				</tr>
 			</tfoot>
 		</table>

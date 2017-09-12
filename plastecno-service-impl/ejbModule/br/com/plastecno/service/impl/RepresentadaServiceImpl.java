@@ -22,7 +22,7 @@ import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.RepresentadaDAO;
 import br.com.plastecno.service.entity.ComentarioRepresentada;
 import br.com.plastecno.service.entity.ContatoRepresentada;
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroRepresentada;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
@@ -123,7 +123,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 			throw new BusinessException("A comissão é obrigatorio no cadastro da representada");
 		}
 
-		representada.setLogradouro(this.logradouroService.inserirBaseCep(representada.getLogradouro()));
+		representada.setLogradouro(logradouroService.inserir(representada.getLogradouro()));
 
 		if (representada.getId() == null) {
 			return representadaDAO.inserir(representada).getId();
@@ -245,7 +245,20 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
-	public LogradouroEndereco pesquisarLogradorouro(Integer id) {
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Representada> pesquisarFornecedorAtivoByNomeFantasia(String nomeFantasia) {
+		return representadaDAO.pesquisarRepresentadaByTipoRelacionamento(nomeFantasia, true,
+				TipoRelacionamento.FORNECIMENTO, TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+	}
+
+	@Override
+	public Integer pesquisarIdRevendedor() {
+		Representada r = representadaDAO.pesquisarRevendedor();
+		return r == null ? null : r.getId();
+	}
+
+	@Override
+	public LogradouroRepresentada pesquisarLogradorouro(Integer id) {
 		return representadaDAO.pesquisarLogradorouro(id);
 	}
 

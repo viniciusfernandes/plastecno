@@ -20,6 +20,7 @@ import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.nfe.COFINS;
 import br.com.plastecno.service.nfe.COFINSGeral;
 import br.com.plastecno.service.nfe.CobrancaNFe;
@@ -52,16 +53,16 @@ import br.com.plastecno.service.nfe.constante.TipoTributacaoCOFINS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoICMS;
 import br.com.plastecno.service.nfe.constante.TipoTributacaoPIS;
 import br.com.plastecno.service.test.builder.ServiceBuilder;
+import br.com.plastecno.service.test.gerador.GeradorPedido;
 
 public class NFeServiceTest extends AbstractTest {
 
 	private DuplicataService duplicataService;
+	private GeradorPedido gPedido = GeradorPedido.getInstance();
 	private NFeService nFeService;
 	private PedidoService pedidoService;
-	private PedidoServiceTest pedidoServiceTest;
 
 	public NFeServiceTest() {
-		pedidoServiceTest = new PedidoServiceTest();
 		nFeService = ServiceBuilder.buildService(NFeService.class);
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
 		duplicataService = ServiceBuilder.buildService(DuplicataService.class);
@@ -201,10 +202,10 @@ public class NFeServiceTest extends AbstractTest {
 	}
 
 	private Integer gerarPedidoRevenda() {
-		Pedido p = pedidoServiceTest.gerarPedidoRevendaComItem();
+		Pedido p = gPedido.gerarPedidoRevendaComItem();
 		Integer id = p.getId();
 		try {
-			pedidoService.enviarPedido(id, new byte[] {});
+			pedidoService.enviarPedido(id, new AnexoEmail(new byte[] {}));
 			return id;
 		} catch (BusinessException e) {
 			printMensagens(e);

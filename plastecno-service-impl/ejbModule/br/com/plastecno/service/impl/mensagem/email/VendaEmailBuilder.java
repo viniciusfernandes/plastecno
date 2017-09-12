@@ -7,22 +7,18 @@ import br.com.plastecno.util.StringUtils;
 
 public class VendaEmailBuilder extends PedidoEmailBuilder {
 
-	public VendaEmailBuilder(Pedido pedido, byte[] arquivoAnexo) throws MensagemEmailException {
-		super(pedido, arquivoAnexo);
-	}
-
-	@Override
-	public AnexoEmail gerarArquivoAnexo() {
-		return new AnexoEmail(arquivoAnexo, "application/pdf", 
-				"Pedido No. "+pedido.getId()+" "+pedido.getCliente().getNomeFantasia()+".pdf", "Pedido de venda realizado pela Plastecno");
+	public VendaEmailBuilder(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws MensagemEmailException {
+		super(pedido, pdfPedido, anexos);
+		pdfPedido.setNome("Pedido No. " + pedido.getId() + " " + pedido.getCliente().getNomeFantasia());
+		pdfPedido.setDescricao("Pedido de venda realizado pela Plastecno");
 	}
 
 	@Override
 	public String gerarConteudo() {
-		return "Segue o pedido de venda para o cliente "+pedido.getCliente().getNomeCompleto()
-				+ (StringUtils.isNotEmpty(pedido.getObservacao()) 
-						? "\n\nFavor considerar as seguintes observações:\n"+pedido.getObservacao() 
-							: "");
+		return "Segue o pedido de venda para o cliente "
+				+ pedido.getCliente().getNomeCompleto()
+				+ (StringUtils.isNotEmpty(pedido.getObservacao()) ? "\n\nFavor considerar as seguintes observações:\n"
+						+ pedido.getObservacao() : "");
 	}
 
 	@Override
@@ -37,6 +33,6 @@ public class VendaEmailBuilder extends PedidoEmailBuilder {
 
 	@Override
 	public String gerarTitulo() {
-		return "Plastecno - Pedido de Venda No: "+pedido.getId()+" - "+pedido.getCliente().getNomeFantasia();
+		return "Plastecno - Pedido de Venda No: " + pedido.getId() + " - " + pedido.getCliente().getNomeFantasia();
 	}
 }

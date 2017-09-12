@@ -8,7 +8,7 @@ import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ComentarioRepresentada;
 import br.com.plastecno.service.entity.ContatoRepresentada;
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroRepresentada;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.exception.BusinessException;
 
@@ -47,7 +47,11 @@ public interface RepresentadaService {
 
 	List<Representada> pesquisarFornecedorAtivo();
 
-	LogradouroEndereco pesquisarLogradorouro(Integer id);
+	List<Representada> pesquisarFornecedorAtivoByNomeFantasia(String nomeFantasia);
+
+	Integer pesquisarIdRevendedor();
+
+	LogradouroRepresentada pesquisarLogradorouro(Integer id);
 
 	String pesquisarNomeFantasiaById(Integer idRepresentada);
 

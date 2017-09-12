@@ -38,9 +38,9 @@ public class EstoqueController extends AbstractController {
     }
 
     @Get("estoque/item/precominimo")
-    public void calcularPrecoMinimoItemEstoque(ItemEstoque itemEstoque) {
+    public void calcularPrecoMinimoItemEstoque(ItemEstoque item) {
         try {
-            Double precoMinimo = estoqueService.calcularPrecoMinimoItemEstoque(itemEstoque);
+            Double precoMinimo = estoqueService.calcularPrecoMinimoItemEstoque(item);
             String precoMinimoFormatado = precoMinimo == null ? "" : NumeroUtils.formatarValorMonetario(precoMinimo);
             serializarJson(new SerializacaoJson("precoMinimo", precoMinimoFormatado));
         } catch (BusinessException e) {
@@ -211,9 +211,9 @@ public class EstoqueController extends AbstractController {
     }
 
     @Get("estoque/item/ncm")
-    public void pesquisarNcmItemEstoque(ItemEstoque itemEstoque) {
+    public void pesquisarNcmItemEstoque(ItemEstoque item) {
         try {
-            String ncm = estoqueService.pesquisarNcmItemEstoque(itemEstoque);
+            String ncm = estoqueService.pesquisarNcmItemEstoque(item);
             serializarJson(new SerializacaoJson("ncm", ncm == null ? "" : ncm));
         } catch (Exception e) {
             gerarLogErroRequestAjax("cálculo do preço minimo do item do pedido", e);

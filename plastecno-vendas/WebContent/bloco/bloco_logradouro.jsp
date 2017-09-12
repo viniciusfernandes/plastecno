@@ -20,15 +20,16 @@ $(document).ready(function(){
 						});
 		request.done(function(response) {
 			var endereco = response.endereco;
+			if(endereco==undefined || endereco==null){
+				return;
+			}
 			$('#endereco').val(endereco.descricao);
 			$('#bairro').val(endereco.bairro.descricao);
 			$('#cidade').val(endereco.cidade.descricao);
 			$('#uf').val(endereco.cidade.uf);
 			$('#pais').val(endereco.cidade.pais.descricao);
 			$('#idCidade').val(endereco.cidade.id);
-			
-			//var isEnderecoExistente = endereco.cidade.id != null;
-			//desabilitarCamposEndereco(isEnderecoExistente);
+			$('#codigoMunicipio').val(endereco.cidade.codigoMunicipio);
 		});
 		
 		request.fail(function(request, status) {
@@ -50,9 +51,8 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 <fieldset id="bloco_logradouro">
 	<legend>::: Endereço :::</legend>
 	<input type="hidden" id="idLogradouro" name="logradouro.id" value="${logradouro.id}" />
-	<input type="hidden" id="codigoMunicipio" name="logradouro.codigoMunicipio" value="${logradouro.codigoMunicipio}" />
 
-	<c:if test="${tipoLogradouroRenderizado}">
+	<c:if test="${isTipoLogradoutoHabilitado}">
 		<div class="label">Tipo End.:</div>
 		<div class="input" style="width: 80%">
 			<select id="tipoLogradouro" name="logradouro.tipoLogradouro"
@@ -77,18 +77,18 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 			style="width: 20px" />
 	</div>
 	<c:if test="${not possuiMultiplosLogradouros}">
-		<div class="input" style="width: 5%">
+		<div class="input" style="width: 2%">
 			<input type="button" id="botaoRemoverLogradouro"
 				title="Remover Logradouro" value="" class="botaoRemover"
 				style="width: 20px" />
 		</div>
 	</c:if>
-	<div class="label" style="width: 10%">End. codificado:</div>
+	<div class="label" style="width: 7%">Cod. Mun.:</div>
 	<div class="input" style="width: 50%">
-		<input type="checkbox" id="codificado" name="logradouro.codificado"
-			<c:if test="${empty logradouro or (not empty logradouro and logradouro.codificado)}">checked="checked"</c:if>
-			class="checkbox" />
+		<input type="text" id="codigoMunicipio" name="logradouro.codigoMunicipio" maxlength="7"
+			value="${logradouro.codigoMunicipio}" style="width: 25%"/>
 	</div>
+	
 	<div class="label">Endereço:</div>
 	<div class="input" style="width: 40%">
 		<input type="text" id="endereco" name="logradouro.endereco"
@@ -149,6 +149,7 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 						<th style="width: 10%">Cidade</th>
 						<th style="width: 5%">UF</th>
 						<th style="width: 10%">País</th>
+						<th style="width: 10%">Cód.</th>
 						<th>Ações</th>
 					</tr>
 				</thead>
@@ -167,12 +168,12 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 							<td>${logradouro.cidade}</td>
 							<td>${logradouro.uf}</td>
 							<td>${logradouro.pais}</td>
+							<td>${logradouro.codigoMunicipio}</td>
 							<td style="display: none;">${logradouro.codificado}</td>
-							<td><input type="button" value=""
-								title="Editar Dados do Logradouro"
-								onclick="editarLogradouro(this);" class="botaoEditar" /> <input
-								type="button" value="" title="Remover Dados do Logradouro"
-								onclick="removerLogradouro(this);" class="botaoRemover" /></td>
+							<td>
+								<input type="button" value="" title="Editar Dados do Logradouro" onclick="editarLogradouro(this);" class="botaoEditar" /> 
+								<input type="button" value="" title="Remover Dados do Logradouro" onclick="removerLogradouro(this);" class="botaoRemover" />
+							</td>
 						</tr>
 					</c:forEach>
 

@@ -39,7 +39,8 @@ import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.dao.NFeItemFracionadoDAO;
 import br.com.plastecno.service.dao.NFePedidoDAO;
 import br.com.plastecno.service.entity.ItemPedido;
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.Logradouro;
+import br.com.plastecno.service.entity.LogradouroRepresentada;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
 import br.com.plastecno.service.entity.NFePedido;
@@ -171,7 +172,7 @@ public class NFeServiceImpl implements NFeService {
 		iEmit.setRegimeTributario(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.REGIME_TRIBUTACAO));
 		iEmit.setCNAEFiscal(configuracaoSistemaService.pesquisar(ParametroConfiguracaoSistema.CNAE));
 
-		LogradouroEndereco logradouro = representadaService.pesquisarLogradorouro(emitente.getId());
+		LogradouroRepresentada logradouro = representadaService.pesquisarLogradorouro(emitente.getId());
 		EnderecoNFe endEmit = gerarEnderecoNFe(logradouro, emitente.getTelefone());
 
 		iEmit.setEnderecoEmitenteNFe(endEmit);
@@ -381,7 +382,7 @@ public class NFeServiceImpl implements NFeService {
 		}
 	}
 
-	private void configurarSubistituicaoTributariaPosValidacao(NFe nFe) {
+	private void configurarSubstituicaoTributariaPosValidacao(NFe nFe) {
 		List<DetalhamentoProdutoServicoNFe> l = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 		TributosProdutoServico t = null;
 		for (DetalhamentoProdutoServicoNFe d : l) {
@@ -425,7 +426,7 @@ public class NFeServiceImpl implements NFeService {
 
 		ValidadorInformacao.validar(nFe);
 
-		configurarSubistituicaoTributariaPosValidacao(nFe);
+		configurarSubstituicaoTributariaPosValidacao(nFe);
 
 		final String xml = gerarXMLNfe(nFe, null);
 		// Devemos inserir o registro no banco de dados antes de gravar o
@@ -604,7 +605,7 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public EnderecoNFe gerarEnderecoNFe(LogradouroEndereco logradouro, String telefone) {
+	public EnderecoNFe gerarEnderecoNFe(Logradouro logradouro, String telefone) {
 		if (logradouro == null) {
 			return null;
 		}
@@ -623,7 +624,7 @@ public class NFeServiceImpl implements NFeService {
 		endereco.setTelefone(telefone);
 
 		endereco.setCodigoMunicipio(logradouro.getCodigoMunicipio() != null ? logradouro.getCodigoMunicipio()
-				: logradouroService.pesquisarCodigoIBGEByIdCidade(logradouro.getIdCidade()));
+				: logradouroService.pesquisarCodigoMunicipioByCep(logradouro.getCep()));
 
 		return endereco;
 	}
@@ -922,7 +923,8 @@ public class NFeServiceImpl implements NFeService {
 		}
 
 		SituacaoPedido sPed = pedidoService.pesquisarSituacaoPedidoById(idPedido);
-		if (SituacaoPedido.DIGITACAO.equals(sPed) || SituacaoPedido.ORCAMENTO.equals(sPed)) {
+		if (SituacaoPedido.DIGITACAO.equals(sPed) || SituacaoPedido.ORCAMENTO.equals(sPed)
+				|| SituacaoPedido.ORCAMENTO_DIGITACAO.equals(sPed)) {
 			throw new BusinessException("Não é possível emitir NFe para o pedido No. " + idPedido + " pois esta em "
 					+ sPed.getDescricao());
 		}

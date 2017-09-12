@@ -8,6 +8,7 @@ import javax.persistence.Query;
 import br.com.plastecno.service.constante.TipoCliente;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.impl.util.QueryUtil;
 
@@ -71,7 +72,7 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 								.setParameter("idCliente", idCliente), Cliente.class, null);
 	}
 
-	public Cliente pesquisarClienteResumidoLogradouroById(Integer idCliente) {
+	public Cliente pesquisarClienteResumidoDocumentoById(Integer idCliente) {
 		return QueryUtil
 				.gerarRegistroUnico(
 						entityManager
@@ -80,19 +81,30 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 								.setParameter("idCliente", idCliente), Cliente.class, null);
 	}
 
+	public ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new ContatoCliente(c.ddd, c.ddi, c.email, c.nome, c.telefone) from ContatoCliente c where  c.id = (select max(c1.id) from ContatoCliente c1 where c1.cliente.id = :idCliente )")
+								.setParameter("idCliente", idCliente), ContatoCliente.class, null);
+	}
+
+	public Integer pesquisarIdVendedorByIdCliente(Integer idCliente) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select c.vendedor.id from Cliente c where c.id =:id ").setParameter("id",
+						idCliente), Integer.class, null);
+	}
+
 	@SuppressWarnings("unchecked")
-	public List<LogradouroCliente> pesquisarLogradouroClienteById(Integer idCliente) {
-		return entityManager
-				.createQuery(
-						"select l from LogradouroCliente l where l.cliente.id = :idCliente")
+	public List<LogradouroCliente> pesquisarLogradouroById(Integer idCliente) {
+		return entityManager.createQuery("select l from LogradouroCliente l where l.cliente.id = :idCliente")
 				.setParameter("idCliente", idCliente).getResultList();
 	}
 
 	public List<LogradouroCliente> pesquisarLogradouroFaturamentoById(Integer idCliente) {
-		StringBuilder select = new StringBuilder()
-				.append("select l from Cliente c ")
-				.append("inner join c.listaLogradouro l where c.id = :idCliente and l.tipoLogradouro = :tipoLogradouro ")
-				.append(" and l.cancelado = false ");
+		StringBuilder select = new StringBuilder().append("select l from Cliente c ").append(
+				"inner join c.listaLogradouro l where c.id = :idCliente and l.tipoLogradouro = :tipoLogradouro ");
 		return entityManager.createQuery(select.toString(), LogradouroCliente.class)
 				.setParameter("idCliente", idCliente).setParameter("tipoLogradouro", TipoLogradouro.FATURAMENTO)
 				.getResultList();

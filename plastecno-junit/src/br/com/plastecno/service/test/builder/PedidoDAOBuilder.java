@@ -15,6 +15,7 @@ import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
@@ -50,6 +51,12 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 		new MockUp<PedidoDAO>() {
 			@Mock
+			public void alterarIdOrcamentoByIdPedido(Integer idPedido, Integer idOrcamento) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				p.setIdOrcamento(idOrcamento);
+			}
+
+			@Mock
 			public void alterarSituacaoPedidoById(Integer idPedido, SituacaoPedido situacaoPedido) {
 				REPOSITORY.alterarEntidadeAtributoById(Pedido.class, idPedido, "situacaoPedido", situacaoPedido);
 			}
@@ -62,14 +69,6 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 				}
 				p.setValorPedido(valorPedido);
 				p.setValorPedidoIPI(valorPedidoIPI);
-			}
-
-			@Mock
-			void cancelar(Integer IdPedido) {
-				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, IdPedido);
-				if (pedido != null) {
-					pedido.setSituacaoPedido(SituacaoPedido.CANCELADO);
-				}
 			}
 
 			@Mock
@@ -112,7 +111,7 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			public String pesquisarFormaPagamentoByIdPedido(Integer idPedido) {
-				Pedido p = pesquisarById(idPedido, false);
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return p == null ? null : p.getFormaPagamento();
 			}
 
@@ -197,6 +196,20 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public Pedido pesquisarPedidoResumidoFinalidadeByIdItemPedido(Integer idItemPedido) {
+				if (idItemPedido == null) {
+					return null;
+				}
+				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				for (ItemPedido i : l) {
+					if (idItemPedido.equals(i.getId())) {
+						return i.getPedido();
+					}
+				}
+				return null;
+			}
+
+			@Mock
 			public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
 				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				Representada r = new Representada();
@@ -236,11 +249,14 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
-			public Double[] pesquisarValoresPedido(Integer idPedido) {
+			public double[] pesquisarValoresPedido(Integer idPedido) {
+				if (idPedido == null) {
+					return new double[] {};
+				}
 
 				List<ItemPedido> lItem = REPOSITORY.pesquisarTodos(ItemPedido.class);
 				if (lItem == null || lItem.isEmpty()) {
-					return new Double[] {};
+					return new double[] {};
 				}
 
 				ItemPedido iAcum = lItem
@@ -254,8 +270,27 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 											+ (i2.getQuantidade() * i2.getPrecoUnidadeIPI()));
 									return i1;
 								});
+				if (iAcum == null) {
+					return new double[] {};
+				}
 
-				return new Double[] { iAcum.getPrecoUnidade(), iAcum.getPrecoUnidadeIPI() };
+				if (iAcum.getPrecoUnidade() == null) {
+					iAcum.setPrecoUnidade(0d);
+				}
+
+				if (iAcum.getPrecoUnidadeIPI() == null) {
+					iAcum.setPrecoUnidadeIPI(0d);
+				}
+				return new double[] { iAcum.getPrecoUnidade(), iAcum.getPrecoUnidadeIPI() };
+			}
+
+			@Mock
+			public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				if (p == null) {
+					return 0d;
+				}
+				return p.getValorFrete() == null ? 0d : p.getValorFrete();
 			}
 
 			@Mock
@@ -268,6 +303,24 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			Double pesquisarValorPedidoIPI(Integer idPedido) {
 				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null ? pedido.getValorPedidoIPI() : null;
+			}
+
+			@Mock
+			public void removerLogradouroPedido(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				if (p == null) {
+					return;
+				}
+				List<LogradouroPedido> lLog = p.getListaLogradouro();
+				if (lLog == null) {
+					return;
+				}
+				for (LogradouroPedido l : lLog) {
+					// Removendo do banco
+					REPOSITORY.removerEntidade(LogradouroPedido.class, l.getId());
+				}
+				// Simulando a remocado do logradouro do pedidod
+				p.setListaLogradouro(null);
 			}
 
 		};

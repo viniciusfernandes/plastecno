@@ -1,5 +1,7 @@
 package br.com.plastecno.service.impl.relatorio;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -11,6 +13,17 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import jxl.Workbook;
+import jxl.format.Alignment;
+import jxl.format.Border;
+import jxl.format.BorderLineStyle;
+import jxl.format.Colour;
+import jxl.write.Label;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.NFeService;
@@ -20,6 +33,7 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
+import br.com.plastecno.service.entity.Contato;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.entity.NFeItemFracionado;
@@ -76,6 +90,85 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@EJB
 	private UsuarioService usuarioService;
 
+	private void configurarPlanilha(WritableSheet sheet) throws IOException, WriteException {
+		sheet.setColumnView(0, 15);
+		sheet.setColumnView(1, 40);
+		sheet.setColumnView(2, 40);
+		sheet.setColumnView(3, 40);
+		sheet.setColumnView(4, 150);
+
+		WritableFont cellFont = new WritableFont(WritableFont.TIMES, 12);
+		cellFont.setColour(Colour.WHITE);
+
+		WritableCellFormat cf = new WritableCellFormat(cellFont);
+		cf.setBorder(Border.ALL, BorderLineStyle.THIN);
+		cf.setBackground(Colour.GREEN);
+		cf.setAlignment(Alignment.CENTRE);
+
+		// Criando o header
+		sheet.addCell(new Label(0, 0, "Dt. COMRPA", cf));
+		sheet.addCell(new Label(1, 0, "CLIENTE", cf));
+		sheet.addCell(new Label(2, 0, "CONTATO", cf));
+		sheet.addCell(new Label(3, 0, "TELEFONE", cf));
+		sheet.addCell(new Label(4, 0, "EMAIL", cf));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public byte[] gerarPlanilhaClienteVendedor(Integer idVendedor, boolean clienteInativo) throws BusinessException {
+		List<Cliente> l = gerarRelatorioClienteVendedor(idVendedor, clienteInativo);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
+		try {
+			WritableWorkbook excel = Workbook.createWorkbook(out);
+			WritableSheet sheet = excel.createSheet("Contato Cliente", 0);
+			configurarPlanilha(sheet);
+
+			WritableFont f1 = new WritableFont(WritableFont.TIMES, 10);
+			f1.setColour(Colour.BLACK);
+			WritableCellFormat cf1 = new WritableCellFormat(f1);
+			cf1.setBorder(Border.ALL, BorderLineStyle.THIN);
+
+			WritableFont f2 = new WritableFont(WritableFont.TIMES, 10);
+			f2.setColour(Colour.BLACK);
+			WritableCellFormat cf2 = new WritableCellFormat(f2);
+			cf2.setBorder(Border.ALL, BorderLineStyle.THIN);
+			cf2.setBackground(Colour.GREY_25_PERCENT);
+
+			// Vamos incluir as linhas a partir do indice row=1 pois row=0 eh o
+			// header da planilha
+			int row = 0;
+			int cont = -1;
+			WritableCellFormat cf = null;
+
+			for (Cliente c : l) {
+				cf = ++cont % 2 == 0 ? cf1 : cf2;
+				if (!c.contemContato()) {
+					++row;
+					sheet.addCell(new Label(0, row, c.getDataUltimoPedidoFormatado(), cf));
+					sheet.addCell(new Label(1, row, c.getNomeFantasia(), cf));
+					sheet.addCell(new Label(2, row, "", cf));
+					sheet.addCell(new Label(3, row, "", cf));
+					sheet.addCell(new Label(4, row, "", cf));
+				} else {
+					for (Contato ct : c.getListaContato()) {
+						++row;
+						sheet.addCell(new Label(0, row, c.getDataUltimoPedidoFormatado(), cf));
+						sheet.addCell(new Label(1, row, c.getNomeFantasia(), cf));
+						sheet.addCell(new Label(2, row, ct.getNome(), cf));
+						sheet.addCell(new Label(3, row, ct.getDDDTelefoneFormatado(), cf));
+						sheet.addCell(new Label(4, row, ct.getEmail(), cf));
+					}
+				}
+			}
+			excel.write();
+			excel.close();
+		} catch (WriteException | IOException e) {
+			throw new BusinessException("Falha na geração da planilha excel dos clientes dos vendedores", e);
+		}
+		return out.toByteArray();
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ReceitaWrapper gerarReceitaEstimada(Periodo periodo) {
@@ -122,7 +215,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		// Acumulando os valores dos itens de venda por representacao
 		listaItemVendido = pedidoService.pesquisarItemPedidoRepresentacaoByPeriodo(periodo);
-		
+
 		for (ItemPedido itemPedido : listaItemVendido) {
 
 			precoItem = itemPedido.getValorComissionado();
@@ -177,8 +270,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Cliente> gerarRelatorioClienteVendedor(Integer idVendedor, boolean clienteInativo)
 			throws BusinessException {
-		return clienteInativo ? clienteService.pesquisarInativosByIdVendedor(idVendedor) : clienteService
-				.pesquisarClienteContatoByIdVendedor(idVendedor);
+		List<Cliente> l = clienteService.pesquisarClienteCompradorByIdVendedor(idVendedor, clienteInativo);
+		for (Cliente c : l) {
+			c.formatarContatoPrincipal();
+		}
+		return l;
 	}
 
 	@Override
@@ -253,11 +349,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecepcao(Integer idRepresentada,
 			Periodo periodo) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
-				"Pedidos de Compras para Recebimento",
-				pedidoService.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo), false);
+				"Pedidos de Compras para Recepção",
+				pedidoService.pesquisarCompraAguardandoRecepcao(idRepresentada, periodo), false);
 
 		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
@@ -363,7 +459,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(
-			Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isCompra,
+			Integer idCliente, Integer idVendedor, Integer idFornecedor, boolean isOrcamento, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido) {
 		RelatorioWrapper<Pedido, ItemPedido> relatorio = new RelatorioWrapper<Pedido, ItemPedido>("");
 		if (idCliente == null) {
@@ -372,14 +468,15 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
 			List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(
-					idCliente, null, idFornecedor, isCompra, indiceRegistroInicial, numeroMaximoRegistros, itemVendido);
+					idCliente, null, idFornecedor, isOrcamento, isCompra, indiceRegistroInicial, numeroMaximoRegistros,
+					itemVendido);
 
 			for (ItemPedido i : listaItemPedido) {
 				relatorio.addGrupo(i.getPedido(), i);
 			}
 
-			relatorio.addPropriedade("totalPesquisado",
-					pedidoService.pesquisarTotalPedidoByIdClienteIdFornecedor(idCliente, idFornecedor, isCompra));
+			relatorio.addPropriedade("totalPesquisado", pedidoService.pesquisarTotalPedidoByIdClienteIdFornecedor(
+					idCliente, idFornecedor, isOrcamento, isCompra));
 		}
 
 		relatorio.sortGrupo(new Comparator<GrupoWrapper<Pedido, ItemPedido>>() {
@@ -524,7 +621,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		final RelatorioWrapper<String, TotalizacaoPedidoWrapper> relatorio = new RelatorioWrapper<String, TotalizacaoPedidoWrapper>(
 				titulo.toString());
 
-		List<TotalizacaoPedidoWrapper> listaPedido = this.pedidoService.pesquisarValorVendaClienteByPeriodo(periodo,
+		List<TotalizacaoPedidoWrapper> listaPedido = pedidoService.pesquisarValorVendaClienteByPeriodo(periodo,
 				idCliente, orcamento);
 
 		double valorTotal = 0d;

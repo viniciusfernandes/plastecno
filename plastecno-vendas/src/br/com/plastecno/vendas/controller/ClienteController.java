@@ -9,8 +9,10 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ContatoService;
+import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.TransportadoraService;
+import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ComentarioCliente;
@@ -29,22 +31,41 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class ClienteController extends AbstractController {
-
     @Servico
     private ClienteService clienteService;
+
     @Servico
     private ContatoService contatoService;
+
+    @Servico
+    private LogradouroService logradouroService;
+
     @Servico
     private RamoAtividadeService ramoAtividadeService;
+
     @Servico
     private TransportadoraService transportadoraService;
+
+    @Servico
+    private UsuarioService usuarioService;
 
     public ClienteController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
 
-        this.setNomeTela("Cliente");
-        this.inicializarPicklist("Redespacho", "Cadastradas", "Redespacho", "id", "nomeFantasia", false,
-                "Transportadora");
+        setNomeTela("Cliente");
+        inicializarPicklist("Redespacho", "Cadastradas", "Redespacho", "id", "nomeFantasia", false, "Transportadora");
+        verificarPermissaoAcesso("isAssociacaoVendedorPermitida", TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS);
+    }
+
+    @Post("cliente/associacaovendedor")
+    public void associarVendedor(Integer idVendedor, Integer idCliente, boolean isRevendedor) {
+        try {
+            usuarioService.associarCliente(idVendedor, idCliente);
+            gerarMensagemSucesso("O cliente foi associado com sucesso.");
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+        redirecTo(this.getClass()).pesquisarClienteById(idCliente, isRevendedor);
     }
 
     @Get("cliente")
@@ -53,7 +74,6 @@ public class ClienteController extends AbstractController {
         addAtributo("listaRamoAtividade", this.ramoAtividadeService.pesquisarAtivo());
 
         inicializarComboTipoLogradouro();
-
         // bloqueando alteracao dos dados do usuario por outro vendedor nao
         // associado
         final Cliente cliente = (Cliente) getAtributo("cliente");
@@ -93,11 +113,10 @@ public class ClienteController extends AbstractController {
         return concat.toString();
     }
 
-    @Get("importarlogradouro")
-    public void importarlogradouroCliente() {
+    @Get("cliente/importarlogradouro")
+    public void importar() {
         System.out.println("Inicio da importacao");
-        clienteService.importarLogradouro();
-
+        logradouroService.importarCodigoMunicipio();
         System.out.println("Fim da importacao");
         redirecTo(MenuController.class).menuHome();
     }
@@ -131,7 +150,7 @@ public class ClienteController extends AbstractController {
                 mensagem.append("O cliente ").append(cliente.getNomeCompleto()).append(" foi incluído com sucesso");
             }
 
-            clienteService.inserirComentario(cliente.getId(), comentario);
+            clienteService.inserirComentario(cliente.getId(), comentario, getCodigoUsuario());
 
             gerarMensagemSucesso(mensagem.toString());
         } catch (BusinessException e) {
@@ -139,6 +158,9 @@ public class ClienteController extends AbstractController {
         } catch (Exception e) {
             gerarLogErro("inclusao/alteracao de cliente", e);
         }
+
+        cliente.setDataNascimentoFormatada(StringUtils.formatarData(cliente.getDataNascimento()));
+
         if (isRevendedor) {
             redirecTo(this.getClass()).revendedorHome();
         } else {
@@ -176,26 +198,29 @@ public class ClienteController extends AbstractController {
     @Get("cliente/{idCliente}")
     public void pesquisarClienteById(Integer idCliente, boolean isRevendedor) {
         Cliente cliente = clienteService.pesquisarById(idCliente);
-        this.carregarVendedor(cliente);
+        if (cliente != null) {
+            cliente.setDataNascimentoFormatada(StringUtils.formatarData(cliente.getDataNascimento()));
+            carregarVendedor(cliente);
 
-        try {
-            popularPicklist(null, clienteService.pesquisarTransportadorasRedespacho(idCliente));
-        } catch (ControllerException e) {
-            gerarLogErroNavegacao("Cliente", e);
+            try {
+                popularPicklist(null, clienteService.pesquisarTransportadorasRedespacho(idCliente));
+            } catch (ControllerException e) {
+                gerarLogErroNavegacao("Cliente", e);
+            }
+
+            if (cliente.getDataUltimoContato() != null) {
+                addAtributo("ultimoContato", formatarData(cliente.getDataUltimoContato()));
+            }
+
+            addAtributo("cliente", cliente);
+            addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade()
+                    .getId() : "");
+            addAtributo("listaLogradouro", clienteService.pesquisarLogradouroCliente(idCliente));
+            addAtributo("listaContato", clienteService.pesquisarContato(idCliente));
+            addAtributo("comentarios", formatarComentarios(idCliente));
+            addAtributo("tipoCliente", cliente.getTipoCliente());
         }
 
-        if (cliente.getDataUltimoContato() != null) {
-            addAtributo("ultimoContato", formatarData(cliente.getDataUltimoContato()));
-        }
-
-        // formatarDocumento(cliente);
-        addAtributo("cliente", cliente);
-        addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade().getId()
-                : "");
-        addAtributo("listaLogradouro", clienteService.pesquisarLogradouroCliente(idCliente));
-        addAtributo("listaContato", clienteService.pesquisarContato(idCliente));
-        addAtributo("comentarios", formatarComentarios(idCliente));
-        addAtributo("tipoCliente", cliente.getTipoCliente());
         if (isRevendedor) {
             redirecTo(this.getClass()).revendedorHome();
         } else {
@@ -235,6 +260,16 @@ public class ClienteController extends AbstractController {
             listaResultado.add(new Autocomplete(transportadora.getId(), transportadora.getNomeFantasia()));
         }
         serializarJson(new SerializacaoJson("listaResultado", listaResultado));
+    }
+
+    @Get("cliente/listagem/vendedor")
+    public void pesquisarVendedorByNome(String nomeVendedor) {
+        List<Autocomplete> lista = new ArrayList<Autocomplete>();
+        List<Usuario> listaUsuario = usuarioService.pesquisarVendedorByNome(nomeVendedor);
+        for (Usuario usuario : listaUsuario) {
+            lista.add(new Autocomplete(usuario.getId(), usuario.getNome()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
     }
 
     @Post("cliente/contato/remocao/{idContato}")

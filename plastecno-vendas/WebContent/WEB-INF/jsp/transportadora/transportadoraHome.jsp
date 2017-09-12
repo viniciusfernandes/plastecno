@@ -2,8 +2,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <style type="text/css">

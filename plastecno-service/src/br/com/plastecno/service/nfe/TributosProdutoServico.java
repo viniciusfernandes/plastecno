@@ -8,7 +8,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 @XmlType(propOrder = { "valorTotalTributos", "icms", "ipi", "impostoImportacao", "pis", "pisSubstituicaoTributaria",
-		"cofins", "issqn", "informacaoAdicional" })
+		"cofins", "icmsInterestadual", "issqn", "informacaoAdicional" })
 public class TributosProdutoServico {
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "COFINS do produtos/serviços")
 	@XmlElement(name = "COFINS")
@@ -17,6 +17,10 @@ public class TributosProdutoServico {
 	@InformacaoValidavel(obrigatorio = true, cascata = true, nomeExibicao = "ICMS do produtos/serviços")
 	@XmlElement(name = "ICMS")
 	private ICMS icms;
+
+	@XmlElement(name = "ICMSUFDest")
+	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS interestadual")
+	private ICMSInterestadual icmsInterestadual;
 
 	@InformacaoValidavel(cascata = true, nomeExibicao = "Imposto de importação do produtos/serviços")
 	@XmlElement(name = "II")
@@ -53,7 +57,7 @@ public class TributosProdutoServico {
 	}
 
 	public boolean contemICMSInterestadual() {
-		return icms != null && icms.getIcmsInterestadual() != null;
+		return icmsInterestadual != null;
 	}
 
 	public boolean contemImpostoImportacao() {
@@ -84,7 +88,7 @@ public class TributosProdutoServico {
 
 	@XmlTransient
 	public ICMSInterestadual getIcmsInterestadual() {
-		return icms != null ? icms.getIcmsInterestadual() : null;
+		return icmsInterestadual;
 	}
 
 	@XmlTransient
@@ -148,6 +152,10 @@ public class TributosProdutoServico {
 
 	public void setIcms(ICMS icms) {
 		this.icms = icms;
+	}
+
+	public void setIcmsInterestadual(ICMSInterestadual icmsInterestadual) {
+		this.icmsInterestadual = icmsInterestadual;
 	}
 
 	public void setImpostoImportacao(ImpostoImportacao impostoImportacao) {

@@ -42,9 +42,7 @@
 		<tbody>
 			<tr>
 				<td class="label">{tipoProprietario}:</td>
-				<td colspan="2">{pedido.proprietario.nomeCompleto}</td>
-				<td class="label" style="width: 70px">Email Envio NFe:</td>
-				<td colspan="2">{pedido.cliente.email}</td>
+				<td colspan="5">{pedido.proprietario.nomeCompleto} - {pedido.proprietario.email}</td>
 			</tr>
 			<tr>
 				<td class="label">Número:</td>
@@ -53,6 +51,28 @@
 				<td>{pedido.numeroPedidoCliente}</td>
 				<td class="label">{tipoRelacionamento}:</td>
 				<td>{pedido.representada.nomeFantasia}</td>
+			</tr>
+			<tr>
+				<td class="label">Cliente:</td>
+				<td colspan="3">{pedido.cliente.nomeCompleto}</td>
+				<td class="label">Contato:</td>
+				<td >{pedido.contatoFormatado}</td>
+			</tr>
+			<tr>
+				<td class="label" style="width: 70px">Email NFe:</td>
+				<td colspan="5">{pedido.cliente.email}</td>
+			</tr>
+			<tr>
+				<td class="label" style="width: 70px">Endereço:</td>
+				<td colspan="5">{logradouroFaturamento}</td>
+			</tr>
+			<tr>
+				<td class="label">CNPJ:</td>
+				<td>{pedido.cliente.cnpj}</td>
+				<td class="label">CPF:</td>
+				<td>{pedido.cliente.cpf}</td>
+				<td class="label">Insc. Est.:</td>
+				<td>{pedido.cliente.inscricaoEstadual}</td>
 			</tr>
 			<tr>
 				<td class="label">Finalidade:</td>
@@ -69,20 +89,32 @@
 				<td>{pedido.dataEntregaFormatada}</td>
 			</tr>
 			<tr>
-				<td class="label">Cliente:</td>
-				<td colspan="5">{pedido.cliente.nomeCompleto}</td>
+				<td class="label">SUFRAMA:</td>
+				<td colspan="2">{pedido.cliente.inscricaoSUFRAMA}</td>
 			</tr>
+		</tbody>
+	</table>
+	<table class="listagem">
+		<thead>
 			<tr>
-				<td class="label">CNPJ:</td>
-				<td>{pedido.cliente.cnpj}</td>
-				<td class="label">CPF:</td>
-				<td>{pedido.cliente.cpf}</td>
-				<td class="label">Insc. Est.:</td>
-				<td>{pedido.cliente.inscricaoEstadual}</td>
+				<th class="descricaoTabela" >Observações</th>
 			</tr>
+		</thead>
+		<tbody>
 			<tr>
-				<td class="label">Observação:</td>
-				<td colspan="5">{pedido.observacao}</td>
+				<td class="informacaoAdicional">{pedido.observacao}</td>
+			</tr>
+		</tbody>
+	</table>
+	<table class="listagem">
+		<thead>
+			<tr>
+				<th class="descricaoTabela" >Observações Produção</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="informacaoAdicional">{pedido.observacaoProducao}</td>
 			</tr>
 		</tbody>
 	</table>
@@ -205,23 +237,26 @@
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="5"></td>
-				<td colspan="2" style="text-align: right;">TOTAL SEM IPI:</td>
+				<td colspan="7" style="text-align: right;">TOTAL SEM IPI:</td>
 				<td colspan="3" style="text-align: left;">R$
 					{pedido.valorPedidoFormatado}</td>
 			</tr>
 			<tr>
-				<td colspan="5"></td>
-				<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
+				<td colspan="7" style="text-align: right;">TOTAL COM IPI:</td>
 				<td colspan="3" style="text-align: left;">R$
 					{pedido.valorPedidoIPIFormatado}</td>
+			</tr>
+			<tr>
+				<td colspan="7" style="text-align: right;">TOTAL COM FRETE:</td>
+				<td colspan="3" style="text-align: left;">R$
+					{pedido.valorTotalFormatado}</td>
 			</tr>
 		</tfoot>
 	</table>
 	<table class="listagem">
 		<thead>
 			<tr>
-				<th class="descricaoTabela" >Informações Adicionais</th>
+				<th class="descricaoTabela">Informações Adicionais</th>
 			</tr>
 		</thead>
 		<tbody>

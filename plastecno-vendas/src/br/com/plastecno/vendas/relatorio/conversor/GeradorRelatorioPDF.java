@@ -25,8 +25,6 @@ import br.com.plastecno.vendas.relatorio.conversor.exception.ConversaoHTML2PDFEx
 // controllers
 public final class GeradorRelatorioPDF {
 
-    private static Map<String, List<String>> LINHAS = new HashMap<String, List<String>>();
-
     /*
      * Os grupos encontrados em cada linha sao recuperados contendo as chaves
      * como {cliente.nome}, {pedido.id}, etc. Sendo que para recuperarmos os
@@ -36,6 +34,9 @@ public final class GeradorRelatorioPDF {
     private static String limpar(String property) {
         return property.replace("{", "").replace("}", "");
     }
+
+    private static Map<String, List<String>> LINHAS = new HashMap<String, List<String>>();
+
     private StringBuilder cabecalho;
     private final Charset charset;
     private final ConversorHTML2PDF conversor;
@@ -173,8 +174,14 @@ public final class GeradorRelatorioPDF {
     }
 
     public byte[] gerarPDF() throws ConversaoHTML2PDFException {
+        // Aqui estamos usando o valor defaul do PDF do pedido
         return html == null || html.length() == 0 ? new byte[0] : conversor.converter(new ByteArrayInputStream(this
-                .gerarHTML().getBytes(charset)));
+                .gerarHTML().getBytes(charset)), 590, 840);
+    }
+
+    public byte[] gerarPDF(int largula, int altura) throws ConversaoHTML2PDFException {
+        return html == null || html.length() == 0 ? new byte[0] : conversor.converter(new ByteArrayInputStream(this
+                .gerarHTML().getBytes(charset)), largula, altura);
     }
 
     public void processar(File arquivo) throws ConversaoHTML2PDFException {

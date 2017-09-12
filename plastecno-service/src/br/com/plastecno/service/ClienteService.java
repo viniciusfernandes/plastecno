@@ -1,5 +1,6 @@
 package br.com.plastecno.service;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.Local;
@@ -19,13 +20,13 @@ public interface ClienteService {
 
 	Integer contactarCliente(Integer id);
 
-	void importarLogradouro();
+	Date gerarDataInatividadeCliente() throws BusinessException;
 
 	Cliente inserir(Cliente cliente) throws BusinessException;
 
 	void inserirComentario(Integer idProprietario, Integer idCliente, String comentario) throws BusinessException;
 
-	void inserirComentario(Integer idCliente, String comentario) throws BusinessException;
+	void inserirComentario(Integer idCliente, String comentario, Integer idUsuario) throws BusinessException;
 
 	boolean isCNPJExistente(Integer idCliente, String cnpj);
 
@@ -47,13 +48,13 @@ public interface ClienteService {
 
 	Cliente pesquisarById(Integer id);
 
-	List<Cliente> pesquisarByIdVendedor(Integer idVendedor, boolean isPesquisaClienteInativo) throws BusinessException;
-
 	List<Cliente> pesquisarByNomeFantasia(String nomeFantasia);
 
 	List<Cliente> pesquisarClienteByIdRamoAtividade(Integer idRamoAtividade);
 
 	List<Cliente> pesquisarClienteByIdRegiao(Integer idRegiao) throws BusinessException;
+
+	List<Cliente> pesquisarClienteCompradorByIdVendedor(Integer idVendedor, boolean inativos) throws BusinessException;
 
 	List<Cliente> pesquisarClienteContatoByIdVendedor(Integer idVendedor);
 
@@ -75,7 +76,9 @@ public interface ClienteService {
 
 	List<ContatoCliente> pesquisarContato(Integer idCliente);
 
-	List<Cliente> pesquisarInativosByIdVendedor(Integer idVendedor) throws BusinessException;
+	ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente);
+
+	Integer pesquisarIdVendedorByIdCliente(Integer idCliente);
 
 	List<LogradouroCliente> pesquisarLogradouroCliente(Integer idCliente);
 

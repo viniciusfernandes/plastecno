@@ -6,7 +6,10 @@ import java.util.Set;
 
 import javax.ejb.Local;
 
+import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.plastecno.service.constante.SituacaoPedido;
+import br.com.plastecno.service.constante.TipoLogradouro;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.LogradouroPedido;
@@ -15,13 +18,14 @@ import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.mensagem.email.AnexoEmail;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 
 @Local
 public interface PedidoService {
-	void aceitarOrcamento(Integer idOrcamento);
+	Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException;
 
 	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
 
@@ -39,6 +43,12 @@ public interface PedidoService {
 
 	List<Date> calcularDataPagamento(Integer idPedido);
 
+	List<Date> calcularDataPagamento(Integer idPedido, Date dataInicial);
+
+	Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException;
+
+	void cancelarOrcamento(Integer idOrcamento) throws BusinessException;
+
 	void cancelarPedido(Integer idPedido) throws BusinessException;
 
 	Integer comprarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
@@ -48,15 +58,17 @@ public interface PedidoService {
 
 	boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
 
+	Integer copiarPedido(Integer idPedido, boolean isOrcamento) throws BusinessException;
+
 	boolean empacotarItemAguardandoCompra(Integer idPedido) throws BusinessException;
 
 	boolean empacotarItemAguardandoMaterial(Integer idPedido) throws BusinessException;
 
 	boolean empacotarPedidoAguardandoCompra(Integer idPedido) throws BusinessException;
 
-	void enviarPedido(Integer idPedido, byte[] arquivoAnexado) throws BusinessException;
+	void enviarPedido(Integer idPedido, AnexoEmail pdfPedido) throws BusinessException;
 
-	Pedido inserir(Pedido pedido) throws BusinessException;
+	void enviarPedido(Integer idPedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException;
 
 	void inserirDadosNotaFiscal(Pedido pedido);
 
@@ -69,6 +81,8 @@ public interface PedidoService {
 
 	Pedido inserirOrcamento(Pedido pedido) throws BusinessException;
 
+	Pedido inserirPedido(Pedido pedido) throws BusinessException;
+
 	boolean isCalculoIPIHabilitado(Integer idPedido);
 
 	boolean isPedidoEnviado(Integer idPedido);
@@ -76,7 +90,7 @@ public interface PedidoService {
 	boolean isPedidoVendaExistente(Integer idPedido);
 
 	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros);
+			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros, boolean isOrcamento);
 
 	double pesquisarAliquotaIPIByIdItemPedido(Integer idItemPedido);
 
@@ -97,7 +111,7 @@ public interface PedidoService {
 
 	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
 
-	List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo);
+	List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo);
 
 	Pedido pesquisarCompraById(Integer id);
 
@@ -112,6 +126,8 @@ public interface PedidoService {
 	List<Pedido> pesquisarEnviadosByPeriodoERepresentada(Periodo periodo, Integer idRepresentada);
 
 	List<Pedido> pesquisarEnviadosByPeriodoEVendedor(Periodo periodo, Integer idVendedor) throws BusinessException;
+
+	Integer pesquisarIdClienteByIdPedido(Integer idPedido);
 
 	List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido);
 
@@ -146,8 +162,8 @@ public interface PedidoService {
 	ItemPedido pesquisarItemPedidoById(Integer idItemPedido);
 
 	List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros,
-			ItemPedido itemVendido);
+			Integer idFornecedor, boolean isOrcamento, boolean isCompra, Integer indiceRegistroInicial,
+			Integer numeroMaximoRegistros, ItemPedido itemVendido);
 
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
@@ -156,6 +172,8 @@ public interface PedidoService {
 	List<ItemPedido> pesquisarItemPedidoEncomendado();
 
 	List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal);
+
+	ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido);
 
 	List<ItemPedido> pesquisarItemPedidoRepresentacaoByPeriodo(Periodo periodo);
 
@@ -166,6 +184,8 @@ public interface PedidoService {
 	List<ItemPedido> pesquisarItemPedidoVendaResumidaByPeriodo(Periodo periodo);
 
 	List<LogradouroPedido> pesquisarLogradouro(Integer idPedido);
+
+	List<LogradouroPedido> pesquisarLogradouro(Integer idPedido, TipoLogradouro tipo);
 
 	String pesquisarNomeVendedorByIdPedido(Integer idPedido);
 
@@ -195,6 +215,10 @@ public interface PedidoService {
 
 	int pesquisarQuantidadeRecepcionadaItemPedido(Integer idItemPedido);
 
+	Integer pesquisarQuantidadeReservadaByIdItemPedido(Integer idItemPedido);
+
+	Representada pesquisarRepresentadaByIdPedido(Integer idPedido);
+
 	Representada pesquisarRepresentadaIdPedido(Integer idPedido);
 
 	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);
@@ -211,22 +235,29 @@ public interface PedidoService {
 
 	Object[] pesquisarTelefoneContatoByIdPedido(Integer idPedido);
 
+	TipoPedido pesquisarTipoPedidoByIdPedido(Integer idPedido);
+
 	List<TotalizacaoPedidoWrapper> pesquisarTotalCompraResumidaByPeriodo(Periodo periodo);
 
 	long pesquisarTotalItemCompradoNaoRecebido(Integer idPedido);
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
-	Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isCompra);
+	Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isOrcamento,
+			boolean isCompra);
 
 	Long pesquisarTotalPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
-			Integer idFornecedor, boolean isCompra, ItemPedido itemVendido);
+			Integer idFornecedor, boolean isOrcamento, boolean isCompra, ItemPedido itemVendido);
 
 	Long pesquisarTotalPedidoVendaByIdClienteIdVendedorIdFornecedor(Integer idCliente);
 
 	List<TotalizacaoPedidoWrapper> pesquisarTotalPedidoVendaResumidaByPeriodo(Periodo periodo);
 
 	Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido);
+
+	Transportadora pesquisarTransportadoraResumidaByIdPedido(Integer idPedido);
+
+	Double pesquisarValorFretePorItemByIdPedido(Integer idPedido);
 
 	Double pesquisarValorPedido(Integer idPedido);
 
@@ -250,6 +281,10 @@ public interface PedidoService {
 
 	Pedido removerItemPedido(Integer idItemPedido) throws BusinessException;
 
+	void removerLogradouroPedido(Integer idPedido);
+
 	void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException;
+
+	boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem);
 
 }

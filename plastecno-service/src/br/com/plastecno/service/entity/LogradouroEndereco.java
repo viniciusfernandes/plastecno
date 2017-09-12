@@ -15,25 +15,20 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
-import br.com.plastecno.util.StringUtils;
 
 @Entity
 @Table(name = "tb_logradouro", schema = "vendas")
 @InformacaoValidavel
-public class LogradouroEndereco implements Logradouro, Serializable, Cloneable {
+public class LogradouroEndereco implements Serializable, Cloneable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -9088499085002422043L;
 
 	private Boolean codificado = true;
-
-	@Transient
-	private String codigoMunicipio;
 
 	@InformacaoValidavel(intervaloComprimento = { 1, 250 }, nomeExibicao = "Complemento do logradouro")
 	private String complemento;
@@ -98,15 +93,11 @@ public class LogradouroEndereco implements Logradouro, Serializable, Cloneable {
 	}
 
 	public String getCodigoMunicipio() {
-		return codigoMunicipio;
+		return endereco.getCidade().getCodigoMunicipio();
 	}
 
 	public String getComplemento() {
 		return complemento;
-	}
-
-	public String getDescricao() {
-		return LogradouroUtils.gerarDescricao(this, codificado);
 	}
 
 	public String getEndereco() {
@@ -118,20 +109,6 @@ public class LogradouroEndereco implements Logradouro, Serializable, Cloneable {
 			return this.endereco.getDescricao() + ", " + complemento;
 		}
 		return this.endereco.getDescricao();
-	}
-
-	public String getEnderecoNumeroBairro() {
-		StringBuilder end = new StringBuilder();
-		if (StringUtils.isNotEmpty(getEndereco())) {
-			end.append(getEndereco());
-		}
-		if (StringUtils.isNotEmpty(getNumero())) {
-			end.append(" - ").append(getNumero());
-		}
-		if (StringUtils.isNotEmpty(getBairro())) {
-			end.append(" - ").append(getBairro());
-		}
-		return end.toString();
 	}
 
 	public Integer getId() {
@@ -184,7 +161,7 @@ public class LogradouroEndereco implements Logradouro, Serializable, Cloneable {
 	}
 
 	public void setCodigoMunicipio(String codigoMunicipio) {
-		this.codigoMunicipio = codigoMunicipio;
+		endereco.getCidade().setCodigoMunicipio(codigoMunicipio);
 	}
 
 	public void setComplemento(String complemento) {

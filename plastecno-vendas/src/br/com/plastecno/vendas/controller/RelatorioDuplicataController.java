@@ -40,19 +40,24 @@ public class RelatorioDuplicataController extends AbstractController {
         }
     }
 
-    @Get("relatorio/duplicata/listagem")
-    public void gerarRelatorioDuplicata(Date dataInicial, Date dataFinal) {
+    private void gerarRelatorioByPeriodo(Date dataInicial, Date dataFinal) {
+        if (contemAtributo("relatorio")) {
+            return;
+        }
+
         try {
             addAtributo("relatorio", relatorioService.gerarRelatorioDuplicata(new Periodo(dataInicial, dataFinal)));
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
-
-        // Aqui estamos indo para o topo da pagina pois o formulario de pesquisa
-        // eh pequeno e nao ha a necessidade de rolar a pagina para baixo
-        irTopoPagina();
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
+    }
+
+    @Get("relatorio/duplicata/listagem")
+    public void gerarRelatorioDuplicata(Date dataInicial, Date dataFinal) {
+        gerarRelatorioByPeriodo(dataInicial, dataFinal);
+        irTopoPagina();
     }
 
     @Get("relatorio/duplicata/listagem/pedido")
@@ -108,7 +113,7 @@ public class RelatorioDuplicataController extends AbstractController {
 
     @Get("relatorio/duplicata")
     public void relatorioDuplicataHome() {
-        configurarFiltroPediodoMensal();
+        gerarRelatorioByPeriodo(gerarDataInicioMes(), new Date());
     }
 
     @Post("duplicata/remocao/{idDuplicata}")

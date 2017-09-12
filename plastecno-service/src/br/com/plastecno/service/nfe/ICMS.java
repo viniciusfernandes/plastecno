@@ -11,7 +11,7 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 
 @InformacaoValidavel
 @XmlType(propOrder = { "icms00", "icms10", "icms20", "icms30", "icms40", "icms41", "icms50", "icms51", "icms60",
-		"icms70", "icms90", "icmsPART", "icmsInterestadual" })
+		"icms70", "icms90", "icmsPART" })
 public class ICMS {
 	@XmlElement(name = "ICMS00")
 	private ICMSGeral icms00;
@@ -46,10 +46,6 @@ public class ICMS {
 	@XmlElement(name = "ICMS90")
 	private ICMSGeral icms90;
 
-	@XmlElement(name = "ICMSUFDest")
-	@InformacaoValidavel(cascata = true, nomeExibicao = "ICMS interestadual")
-	private ICMSInterestadual icmsInterestadual;
-
 	@XmlElement(name = "ICMSPart")
 	private ICMSGeral icmsPART;
 
@@ -62,11 +58,6 @@ public class ICMS {
 
 	public ICMS(ICMSGeral icmsGeral) {
 		this.setTipoIcms(icmsGeral);
-	}
-
-	@XmlTransient
-	public ICMSInterestadual getIcmsInterestadual() {
-		return icmsInterestadual;
 	}
 
 	@XmlTransient
@@ -97,10 +88,6 @@ public class ICMS {
 				campo.setAccessible(false);
 			}
 		}
-	}
-
-	public void setIcmsInterestadual(ICMSInterestadual icmsInterestadual) {
-		this.icmsInterestadual = icmsInterestadual;
 	}
 
 	/*

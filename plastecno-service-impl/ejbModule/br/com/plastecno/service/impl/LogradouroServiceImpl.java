@@ -2,7 +2,6 @@ package br.com.plastecno.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,9 +20,7 @@ import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.dao.LogradouroDAO;
 import br.com.plastecno.service.entity.Logradouro;
-import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroEndereco;
-import br.com.plastecno.service.entity.LogradouroPedido;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
@@ -37,49 +34,191 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	private LogradouroDAO logradouroDAO;
 
+	@Override
+	public void importarCodigoMunicipio() {
+		List<Object[]> l = entityManager.createQuery("select l.id,l.cep from LogradouroCliente l ", Object[].class)
+				.getResultList();
+		for (Object[] o : l) {
+			entityManager
+					.createQuery(
+							"update LogradouroCliente l set l.codigoMunicipio = (select e.cidade.codigoMunicipio from Endereco e where e.cep = :cep) where l.id=:id")
+					.setParameter("cep", o[1]).setParameter("id", o[0]).executeUpdate();
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void importarLogradouro() {
+		List<Object[]> ids = null;
+		List<Object[]> logs = null;
+		/*
+		 * entityManager.createNativeQuery(
+		 * "ALTER TABLE vendas.tb_logradouro_cliente drop constraint id_logradouro_cliente"
+		 * ).executeUpdate();
+		 * 
+		 * ids = entityManager.createQuery(
+		 * "select c.id, c.cliente.id from LogradouroCliente c"
+		 * ).getResultList();
+		 * 
+		 * for (Object[] o : ids) { logs = entityManager .createQuery(
+		 * "select l.endereco.cep, l.endereco.descricao, l.numero, l.complemento, l.endereco.bairro.descricao, l.endereco.cidade.descricao, l.endereco.cidade.uf, l.endereco.cidade.pais.descricao, l.codificado, l.tipoLogradouro from LogradouroEndereco l where l.id =:idlog "
+		 * , Object[].class).setParameter("idlog", o[0]).getResultList();
+		 * 
+		 * for (Object[] log : logs) { entityManager .createNativeQuery(
+		 * "update vendas.tb_logradouro_cliente set cep=:cep, endereco=:endereco, numero=:numero, complemento=:complemento, bairro=:bairro, cidade=:cidade, uf=:uf, pais=:pais, codificado=:codificado, id_tipo_logradouro=:tipo where id=:id"
+		 * ) .setParameter("cep", log[0]).setParameter("endereco",
+		 * log[1]).setParameter("numero", log[2]) .setParameter("complemento",
+		 * log[3]).setParameter("bairro", log[4]) .setParameter("cidade",
+		 * log[5]).setParameter("uf", log[6]).setParameter("pais", log[7])
+		 * .setParameter("codificado", log[8]).setParameter("tipo",
+		 * ((TipoLogradouro) log[9]).getCodigo()) .setParameter("id",
+		 * o[0]).executeUpdate(); } }
+		 * 
+		 * ids =
+		 * entityManager.createQuery("select p.id, p.cliente.id from Pedido p "
+		 * ).getResultList(); for (Object[] o : ids) { logs = entityManager
+		 * .createQuery(
+		 * "select l.endereco.cep, l.endereco, l.numero, l.complemento, l.bairro, l.cidade, l.uf, l.pais, l.codificado, l.tipoLogradouro from LogradouroCliente l where l.cliente.id =:idCliente"
+		 * , Object[].class).setParameter("idCliente", o[1]).getResultList();
+		 * 
+		 * for (Object[] log : logs) { entityManager .createNativeQuery(
+		 * "insert into  vendas.tb_logradouro_pedido (id, id_pedido, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_pedido_id'), :idPedido, :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )"
+		 * ) .setParameter("idPedido", o[0]).setParameter("cep",
+		 * log[0]).setParameter("endereco", log[1]) .setParameter("numero",
+		 * log[2]).setParameter("complemento", log[3]) .setParameter("bairro",
+		 * log[4]).setParameter("cidade", log[5]).setParameter("uf", log[6])
+		 * .setParameter("pais", log[7]).setParameter("codificado", log[8])
+		 * .setParameter("tipo", ((TipoLogradouro)
+		 * log[9]).getCodigo()).executeUpdate(); }
+		 * 
+		 * } ids = entityManager.createNativeQuery(
+		 * "select id_logradouro, id from vendas.tb_representada r"
+		 * ).getResultList(); for (Object[] o : ids) { logs = entityManager
+		 * .createQuery(
+		 * "select l.endereco.cep, l.endereco.descricao, l.numero, l.complemento, l.endereco.bairro.descricao, l.endereco.cidade.descricao, l.endereco.cidade.uf, l.endereco.cidade.pais.descricao, l.codificado, l.tipoLogradouro from LogradouroEndereco l where l.id =:idlog "
+		 * , Object[].class).setParameter("idlog", o[0]).getResultList();
+		 * 
+		 * for (Object[] log : logs) { entityManager .createNativeQuery(
+		 * "insert into  vendas.tb_logradouro_representada (id, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_representada_id'), :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )"
+		 * ) .setParameter("cep", log[0]).setParameter("endereco",
+		 * log[1]).setParameter("numero", log[2]) .setParameter("complemento",
+		 * log[3]).setParameter("bairro", log[4]) .setParameter("cidade",
+		 * log[5]).setParameter("uf", log[6]).setParameter("pais", log[7])
+		 * .setParameter("codificado", log[8]).setParameter("tipo",
+		 * ((TipoLogradouro) log[9]).getCodigo()) .executeUpdate();
+		 * 
+		 * entityManager .createNativeQuery(
+		 * "update vendas.tb_representada set id_logradouro_representada = currval('vendas.seq_logradouro_representada_id') where id=:id_cliente"
+		 * ) .setParameter("id_cliente", o[1]).executeUpdate(); } }
+		 */
+		ids = entityManager.createNativeQuery("select id_logradouro, id from vendas.tb_transportadora r")
+				.getResultList();
+		for (Object[] o : ids) {
+			logs = entityManager
+					.createQuery(
+							"select l.endereco.cep, l.endereco.descricao, l.numero, l.complemento, l.endereco.bairro.descricao, l.endereco.cidade.descricao, l.endereco.cidade.uf, l.endereco.cidade.pais.descricao, l.codificado, l.tipoLogradouro from LogradouroEndereco l where l.id =:idlog ",
+							Object[].class).setParameter("idlog", o[0]).getResultList();
+
+			for (Object[] log : logs) {
+				entityManager
+						.createNativeQuery(
+								"insert into  vendas.tb_logradouro_transportadora (id, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_transportadora_id'), :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )")
+						.setParameter("cep", log[0]).setParameter("endereco", log[1]).setParameter("numero", log[2])
+						.setParameter("complemento", log[3]).setParameter("bairro", log[4])
+						.setParameter("cidade", log[5]).setParameter("uf", log[6]).setParameter("pais", log[7])
+						.setParameter("codificado", log[8]).setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo())
+						.executeUpdate();
+
+				entityManager
+						.createNativeQuery(
+								"update vendas.tb_transportadora set id_logradouro_transportadora = currval('vendas.seq_logradouro_transportadora_id') where id=:id_transportadora")
+						.setParameter("id_transportadora", o[1]).executeUpdate();
+			}
+		}
+
+		ids = entityManager.createNativeQuery("select id_logradouro, id from vendas.tb_contato r").getResultList();
+		for (Object[] o : ids) {
+			logs = entityManager
+					.createQuery(
+							"select l.endereco.cep, l.endereco.descricao, l.numero, l.complemento, l.endereco.bairro.descricao, l.endereco.cidade.descricao, l.endereco.cidade.uf, l.endereco.cidade.pais.descricao, l.codificado, l.tipoLogradouro from LogradouroEndereco l where l.id =:idlog ",
+							Object[].class).setParameter("idlog", o[0]).getResultList();
+
+			for (Object[] log : logs) {
+				entityManager
+						.createNativeQuery(
+								"insert into  vendas.tb_logradouro_contato (id, cep, endereco, numero, complemento, bairro, cidade, uf, pais, codificado, id_tipo_logradouro) values (nextval('vendas.seq_logradouro_contato_id'), :cep, :endereco, :numero , :complemento, :bairro, :cidade, :uf, :pais, :codificado, :tipo )")
+						.setParameter("cep", log[0]).setParameter("endereco", log[1]).setParameter("numero", log[2])
+						.setParameter("complemento", log[3]).setParameter("bairro", log[4])
+						.setParameter("cidade", log[5]).setParameter("uf", log[6]).setParameter("pais", log[7])
+						.setParameter("codificado", log[8]).setParameter("tipo", ((TipoLogradouro) log[9]).getCodigo())
+						.executeUpdate();
+
+				entityManager
+						.createNativeQuery(
+								"update vendas.tb_contato set id_logradouro_contato = currval('vendas.seq_logradouro_representada_id') where id=:id_contato")
+						.setParameter("id_contato", o[1]).executeUpdate();
+			}
+		}
+	}
+
 	@PostConstruct
 	public void init() {
 		logradouroDAO = new LogradouroDAO(entityManager);
 	}
 
-	@Override
-	public List<LogradouroCliente> inserir(List<LogradouroCliente> listaLogradouro) throws BusinessException {
-		if (listaLogradouro == null) {
-			return null;
-		}
-
-		if (listaLogradouro.isEmpty()) {
-			return Collections.emptyList();
-		}
-
-		List<LogradouroCliente> lista = new ArrayList<>();
-		for (LogradouroCliente logradouro : listaLogradouro) {
-			lista.add(inserir(logradouro));
-		}
-		return lista;
-	}
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Logradouro> T inserir(T logradouro) throws BusinessException {
-		if (logradouro != null) {
-			return (T) entityManager.merge(logradouro);
+		if (logradouro == null) {
+			return null;
 		}
-		return null;
+		return (T) logradouroDAO.alterar(logradouro);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public LogradouroEndereco inserirBaseCep(LogradouroEndereco logradouro) throws BusinessException {
-		if (logradouro != null) {
-
-			/*
-			 * Aqui vamos configuirar o endereco, pois o servico de inclusao de
-			 * enderecos recuperar os IDS do bairro, cidade e pais.
-			 */
-			logradouro.addEndereco(enderecamentoService.inserir(logradouro.recuperarEndereco()));
-			return (LogradouroEndereco) logradouroDAO.alterar(logradouro);
+	public void inserirEnderecoBaseCEP(List<? extends Logradouro> listaLogradouro) throws BusinessException {
+		if (listaLogradouro == null || listaLogradouro.isEmpty()) {
+			return;
 		}
-		return null;
+
+		// Vamos verificar os ceps ja existentes pois vamos inserir na tabela de
+		// logradouro apenas os enderecos que nao existirem no sistema. Devemos
+		// fazer esse filtro pois o usuario podera efetuar alteracoes no
+		// endereco do cliente sem que reflita na tabela de logradouro, por
+		// exemplo: atualizar o nome de rua de um determinado cep. A tabela de
+		// logradouro eh utilizada apenas para consultar os ceps quando o
+		// usuario efetuar uma pesquisa no campo de ceps.
+		List<String> lCep = new ArrayList<>();
+		for (Logradouro l : listaLogradouro) {
+			if (!lCep.contains(l.getCep())) {
+				lCep.add(l.getCep());
+			}
+		}
+		List<String> lCepExistente = enderecamentoService.pesquisarCEPExistente(lCep);
+
+		List<Logradouro> listaInexistente = new ArrayList<>();
+		for (Logradouro l : listaLogradouro) {
+			if (!lCepExistente.contains(l.getCep())) {
+				listaInexistente.add(l);
+			}
+		}
+
+		// Aqui estamos populando a tabela de CEP com os novos enderecos
+		// inseridos pelo usuario
+		for (Logradouro l : listaInexistente) {
+			enderecamentoService.inserir(l.gerarEndereco());
+		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void inserirEnderecoBaseCEP(Logradouro logradouro) throws BusinessException {
+		List<Logradouro> l = new ArrayList<Logradouro>();
+		l.add(logradouro);
+		inserirEnderecoBaseCEP(l);
 	}
 
 	@Override
@@ -132,11 +271,11 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public String pesquisarCodigoIBGEByIdCidade(Integer idCidade) {
-		if (idCidade == null) {
+	public String pesquisarCodigoMunicipioByCep(String cep) {
+		if (cep == null) {
 			return null;
 		}
-		return logradouroDAO.pesquisarCodigoIBGEByIdCidade(idCidade);
+		return logradouroDAO.pesquisarCodigoMunicipioByCep(cep);
 	}
 
 	/*
@@ -165,16 +304,16 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void validarListaLogradouroPreenchida(List<LogradouroCliente> listaLogradouro) throws BusinessException {
+	public void validarListaLogradouroPreenchida(List<? extends Logradouro> listaLogradouro) throws BusinessException {
 		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
 		lLogAusente.add(TipoLogradouro.COBRANCA);
 		lLogAusente.add(TipoLogradouro.ENTREGA);
 		lLogAusente.add(TipoLogradouro.FATURAMENTO);
 
 		if (listaLogradouro != null && !listaLogradouro.isEmpty()) {
-			listaLogradouro.forEach(t -> {
-				lLogAusente.remove(t.getTipoLogradouro());
-			});
+			for (Logradouro l : listaLogradouro) {
+				lLogAusente.remove(l.getTipoLogradouro());
+			}
 		}
 
 		if (lLogAusente.isEmpty()) {
@@ -182,30 +321,9 @@ public class LogradouroServiceImpl implements LogradouroService {
 		}
 
 		List<String> listaMensagem = new ArrayList<String>();
-		lLogAusente.forEach(t -> listaMensagem.add("É obrigatorio logradouro do tipo " + t));
-		throw new InformacaoInvalidaException(listaMensagem);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void validarListaLogradouroPreenchidaXXX(List<LogradouroPedido> listaLogradouro) throws BusinessException {
-		Set<TipoLogradouro> lLogAusente = new HashSet<TipoLogradouro>();
-		lLogAusente.add(TipoLogradouro.COBRANCA);
-		lLogAusente.add(TipoLogradouro.ENTREGA);
-		lLogAusente.add(TipoLogradouro.FATURAMENTO);
-
-		if (listaLogradouro != null && !listaLogradouro.isEmpty()) {
-			listaLogradouro.forEach(t -> {
-				lLogAusente.remove(t.getTipoLogradouro());
-			});
+		for (TipoLogradouro t : lLogAusente) {
+			listaMensagem.add("É obrigatorio logradouro do tipo " + t);
 		}
-
-		if (lLogAusente.isEmpty()) {
-			return;
-		}
-
-		List<String> listaMensagem = new ArrayList<String>();
-		lLogAusente.forEach(t -> listaMensagem.add("É obrigatorio logradouro do tipo " + t));
 		throw new InformacaoInvalidaException(listaMensagem);
 	}
 

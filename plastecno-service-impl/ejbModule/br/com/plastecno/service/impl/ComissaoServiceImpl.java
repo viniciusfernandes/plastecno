@@ -17,6 +17,7 @@ import br.com.plastecno.service.MaterialService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.dao.ComissaoDAO;
 import br.com.plastecno.service.entity.Comissao;
 import br.com.plastecno.service.entity.Material;
@@ -107,10 +108,17 @@ public class ComissaoServiceImpl implements ComissaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double pesquisarAliquotaComissaoByIdVendedor(Integer idVendedor, TipoPedido tipoPedido) {
+		return comissaoDAO.pesquisarAliquotaComissaoByIdVendedor(idVendedor, tipoPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Comissao pesquisarAliquotaComissaoVigenteVendedor(Integer idVendedor) {
 		return comissaoDAO.pesquisarComissaoVigenteVendedor(idVendedor);
 	}
 
+	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Comissao pesquisarById(Integer idComissao) {

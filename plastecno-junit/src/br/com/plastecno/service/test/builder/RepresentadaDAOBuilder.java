@@ -8,9 +8,8 @@ import mockit.MockUp;
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.dao.RepresentadaDAO;
-import br.com.plastecno.service.entity.LogradouroEndereco;
+import br.com.plastecno.service.entity.LogradouroRepresentada;
 import br.com.plastecno.service.entity.Representada;
-import br.com.plastecno.service.entity.Transportadora;
 
 public class RepresentadaDAOBuilder extends DAOBuilder<RepresentadaDAO> {
 
@@ -35,7 +34,7 @@ public class RepresentadaDAOBuilder extends DAOBuilder<RepresentadaDAO> {
 			}
 
 			@Mock
-			public LogradouroEndereco pesquisarLogradorouro(Integer id) {
+			public LogradouroRepresentada pesquisarLogradorouro(Integer id) {
 				Representada r = REPOSITORY.pesquisarEntidadeById(Representada.class, id);
 				return r == null ? null : r.getLogradouro();
 			}

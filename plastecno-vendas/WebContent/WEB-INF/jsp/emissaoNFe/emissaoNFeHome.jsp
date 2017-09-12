@@ -22,8 +22,6 @@
 <script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/edicao_tabela.js?${versaoCache}"/>"></script>
 
-
-
 <style type="text/css">
 fieldset .fieldsetInterno {
 	margin: 0 1% 1% 1%;
@@ -39,7 +37,6 @@ fieldset .fieldsetInterno legend {
 
 </style>
 <script type="text/javascript">
-
 var numeroProdutoEdicao = null;
 var numeroImportacaoProduto = null;
 var editorTabelaImportacao = null;
@@ -361,7 +358,7 @@ $(document).ready(function() {
 	fecharBloco('bloco_retencao_icms');
 	fecharBloco('bloco_veiculo');
 	
-	<%-- Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota --%>
+	/* Aqui fazemos com que os blocos de tributos nao sejam visualizados de inicio na tela, mas apenas quando editar o item da nota */
 	$('#bloco_tributos').fadeOut('fast');
 	$('#bloco_info_adicionais_prod').fadeOut('fast');
 	$('#bloco_importacao_prod').fadeOut('fast');
@@ -389,7 +386,7 @@ function popularCliente(cliente){
 		$('#cpf').val(cliente.cpf);
 		$('#inscricaoEstadual').val(cliente.inscricaoEstadual);
 		$('#inscricaoSUFRAMA').val(cliente.inscricaoSUFRAMA);
-		$('#telefone').val(cliente.telefone);
+		$('#telefone').val(removerCaracteresNaoDigitos(cliente.telefone));
 		$('#email').val(cliente.email);
 		
 		var l = cliente.logradouroFaturamento; 
@@ -541,7 +538,7 @@ function emitirNFe(tipoNFe){
 	$('#formEmissao #tipoNFe').val(tipoNFe);
 	
 	$("#formEmissao input, #formEmissao textarea, #formEmissao select" ).each(function(i) {
-		<%-- A remocao dos campos em branco eh necessaria para que o vraptor nao popule os beans com seus atributos todos nulos --%>
+		/* A remocao dos campos em branco eh necessaria para que o vraptor nao popule os beans com seus atributos todos nulos  */
 		if(isEmpty($(this).val())){
 			$(this).remove();
 		}
@@ -551,18 +548,23 @@ function emitirNFe(tipoNFe){
 };
 
 function removerProduto(botao){
-	var tabela = document.getElementById('tabela_produtos');
-	var l = botao.parentNode.parentNode;
-	var indice = l.cells[0].innerHTML;
-	tabela.deleteRow(l.rowIndex);
-	var nome = 'nf.listaItem['+indice+']';
-	$("input[name^='"+nome+"']").each(function(){
-		$(this).remove();
+	inicializarModalConfirmacao({
+		mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REMOVER esse item?',
+		confirmar: function(){
+			var tabela = document.getElementById('tabela_produtos');
+			var l = botao.parentNode.parentNode;
+			var indice = l.cells[0].innerHTML;
+			tabela.deleteRow(l.rowIndex);
+			var nome = 'nf.listaItem['+indice+']';
+			$("input[name^='"+nome+"']").each(function(){
+				$(this).remove();
+			});
+			alterarValorDuplicata();
+			numeroImportacaoProduto = null;
+			numeroProdutoEdicao = null;
+			btProduto = null;
+		}
 	});
-	alterarValorDuplicata();
-	numeroImportacaoProduto = null;
-	numeroProdutoEdicao = null;
-	btProduto = null;
 };
 
 function inicializarMascaraReferenciada(){
@@ -638,7 +640,7 @@ function inicializarTabelaImportacaoProd(){
 				if(numeroProdutoEdicao == null || linha == null){
 					return;
 				}
-				<%-- EStamos definindo qual o numero de importacao aqui para que o usuario possa inserir as adicoes em sequencia pois la temos que saber qua eh a importacao associada --%>
+				/* EStamos definindo qual o numero de importacao aqui para que o usuario possa inserir as adicoes em sequencia pois la temos que saber qua eh a importacao associada */
 				var isNovo = numeroImportacaoProduto == null || numeroImportacaoProduto != linha.id;
 				if(isNovo){
 					numeroImportacaoProduto = linha.id;
@@ -814,7 +816,7 @@ function gerarInputLinhasTabela(nomeTabela, parametroJson){
 	for (var i = 0; i < linhas.length; i++) {
 		campos = new Array();
 		celulas = linhas[i].cells;
-		<%-- devemos excluir a ultima celula da tabela pois eh a celula de botoes de acoes --%>
+		/* Devemos excluir a ultima celula da tabela pois eh a celula de botoes de acoes */
 		max = celulas.length - 1;
 		for (var j= 0; j < max; j++) {
 			campos[j] = {'nome':parametroJson.nomes[j] == null?'':parametroJson.nomes[j], 'valor':celulas[j].innerHTML};
@@ -836,7 +838,7 @@ function gerarLegendaBloco(nomeBloco){
 
 function abrirBloco(nomeBloco, blocosFechados){
 	gerarLegendaBloco(nomeBloco);
-	<%-- Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn --%>
+	/* Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn */
 	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table, #'+nomeBloco+' .fieldsetInterno').fadeIn('fast');
 	if(blocosFechados == undefined || blocosFechados == null){
 		return;
@@ -848,7 +850,7 @@ function abrirBloco(nomeBloco, blocosFechados){
 
 function fecharBloco(nomeBloco){
 	gerarLegendaBloco(nomeBloco);
-	<%-- Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn --%>
+	/* Aqui estamos evitando que o div de autocomplete de cliente seja exibido pelo fadeIn */
 	$('#'+nomeBloco+' div:not(.suggestionsBox), '+'#'+nomeBloco+' table, #'+nomeBloco+' .fieldsetInterno').fadeOut('fast');
 };
 
@@ -893,14 +895,14 @@ function gerarInputHidden(objeto){
 	var nome = null;
 	for (var i = 0; i < campos.length; i++) {
 		nome = objeto.nomeObjeto +'.'+campos[i].nome;
-		<%-- Devemos verificar  se o input ja foi criado pelo usuario, caso nao existe devemos cria-lo--%>
+		/* Devemos verificar se o input ja foi criado pelo usuario, caso nao existe devemos cria-lo */
 		if((input = document.getElementById(nome)) == undefined || input == null){
 			input = document.createElement('input');
 			input.type = 'hidden';
 			input.name = nome;
-			<%-- Estamos usando o fato de que os parametros enviados ao servidor tem um unico nome, por exemplo o primeiro e o segundo elemento de uma lista 
+			/* Estamos usando o fato de que os parametros enviados ao servidor tem um unico nome, por exemplo o primeiro e o segundo elemento de uma lista 
 			contendo o atributo situacao tributaria sera enviado como nf.listaItem[0].situacaoTributaria e nf.listaItem[1].situacaoTributaria, e devem ser unicos 
-			para que os parametros da nfe sejam preenchidos corretamente, com isso podemos usar como id --%>
+			para que os parametros da nfe sejam preenchidos corretamente, com isso podemos usar como id */
 			input.id = nome;
 			form.appendChild(input);
 		} 
@@ -931,7 +933,7 @@ function gerarJsonTipoIcms(){
 };
 
 function gerarJsonIcmsInterestadual(){
-	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.icmsInterestadual',
+	return {'nomeObjeto':'nf.listaItem['+numeroProdutoEdicao+'].tributos.icmsInterestadual',
 		'campos':[{'nome':'valorBCUFDestino', 'id':'valorBCICMSInter'},
 		          {'nome':'percentualFCPDestino', 'id':'percFCPDestICMSInter'},
 		          {'nome':'aliquotaUFDestino', 'id':'aliquotaUFDestICMSInter'},
@@ -1426,16 +1428,16 @@ function editarProduto(botao){
 	btProduto = botao;
 	var linha = botao.parentNode.parentNode;
 	var celulas = linha.cells;
-	
-	<%-- Aqui estamos apenas dando condicao ao usuario para alterar a descricao dos produtos da tabela que serao enviados para gerar a NFe --%>
+
+	/* Aqui estamos apenas dando condicao ao usuario para alterar a descricao dos produtos da tabela que serao enviados para gerar a NFe */
 	$('#bloco_info_adicionais_prod #quantidadeProduto').val(celulas[4].innerHTML);
 	$('#bloco_info_adicionais_prod #codigoProduto').val(celulas[1].innerHTML);
     $('#bloco_info_adicionais_prod #descricaoProduto').val(celulas[2].innerHTML);
     
-    <%-- Estamos supondo que a sequencia do item do pedido eh unica --%>
+    /* Estamos supondo que a sequencia do item do pedido eh unica */
 	numeroProdutoEdicao = celulas[0].innerHTML;
-	<%-- A execucao dos metodos abaixo dependem da definicao do numero do produto que esta sendo editado --%>
-    var valorBC = celulas[6].innerHTML;
+    /* A execucao dos metodos abaixo dependem da definicao do numero do produto que esta sendo editado */
+	var valorBC = celulas[6].innerHTML;
 	var valoresTabela = {'campos':[{'id': 'itemPedidoCompraProd', 'valorTabela':celulas[0].innerHTML},
 								   {'id': 'ncm', 'valorTabela': celulas[12].innerHTML},
 								   {'id': 'cfop', 'valorTabela': celulas[13].innerHTML},
@@ -1445,13 +1447,13 @@ function editarProduto(botao){
 	                               {'id': 'valorBCCOFINS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCICMS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCIPI', 'valorTabela': valorBC},
-	                               {'id': 'aliquotaPIS', 'valorTabela': '<c:out value="${percentualPis}"/>'},
-	                               {'id': 'aliquotaCOFINS', 'valorTabela': '<c:out value="${percentualCofins}"/>'}
+	                               {'id': 'aliquotaPIS', 'valorTabela': $('#percentualPis').val()},
+	                               {'id': 'aliquotaCOFINS', 'valorTabela': $('#percentualCofins').val()}
 	                               ]};
 	recuperarValoresProduto(valoresTabela);
 	calcularValoresImpostos(null, false);
-	
-	<%-- Aqui estamos apenas dando condicao ao usuario para alterar a descricao dos produtos da tabela que serao enviados para gerar a NFe --%>
+
+	/* Aqui estamos apenas dando condicao ao usuario para alterar a descricao dos produtos da tabela que serao enviados para gerar a NFe */
 	$('#bloco_info_adicionais_prod #quantidadeProduto').val(celulas[4].innerHTML);
 	$('#bloco_info_adicionais_prod #codigoProduto').val(celulas[1].innerHTML);
     $('#bloco_info_adicionais_prod #descricaoProduto').val(celulas[2].innerHTML);
@@ -1483,6 +1485,7 @@ function editarProduto(botao){
 	fecharBloco('bloco_exportacao_prod');
 	fecharBloco('bloco_adicao_import');
 	
+	/* Aqui estamos atribuindo um valor default para o rapido preenchimento da tela pelo usuario. Esses valores sao utilizados com maior frequencia. */
 	var valDefault = {'campos':
 		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idCampo': 'cfop', 'valor': '5102'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.codigoSituacaoTributaria', 'idCampo': 'tipoTributacaoICMS', 'valor': '00'},
@@ -1492,6 +1495,13 @@ function editarProduto(botao){
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.pis.tipoPis.codigoSituacaoTributaria', 'idCampo': 'codSitTribPIS', 'valor': '01'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].informacoesAdicionais', 'idCampo': 'infoAdicionaisProd', 'valor': 'Total aproximado de tributos federais, estaduais e municipais: '+$('#valorTotaltributosProd').val()}]};
 	inicializarValoresDefaultProduto(valDefault);
+	
+	/* Preenchendo o valor do frete que ja foi inserido no cadastro do pedido e negociado com o vendedor */
+	var vFrete = document.getElementById('nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.valorTotalFrete');
+	var contemFrete = vFrete != undefined && vFrete != null && !isEmpty(vFrete.value);
+	if(!contemFrete){
+		$('#valorFreteProd').val($('#valorFrete').val());
+	}
 };
 
 function gerarJsonCalculoImpostos(){
@@ -1580,6 +1590,7 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	info.value = info.value.split(':')[0]+': '+tot;
 	
 	calcularValorICMSInterestadual();
+	calcularValorUnidadeTributavelIPI();
 };
 
 function zerarImposto(idImposto){
@@ -1588,6 +1599,17 @@ function zerarImposto(idImposto){
 
 function calcularAlteracaoAliquota(){
 	return calcularValoresImpostos(null, true);
+};
+
+function calcularValorUnidadeTributavelIPI(){
+	var qtde = $('#bloco_info_adicionais_prod #quantidadeProduto').val();
+	var vlIPI = $('#bloco_tributos #valorIPI').val();
+	if(isEmpty(qtde) || isEmpty(vlIPI) || qtde == 0 || vlIPI == 0){
+		$('#bloco_tributos #valorUnidTribIPI, #bloco_tributos #qtdeUnidTribIPI').val(0);
+		return;
+	}
+	$('#bloco_tributos #qtdeUnidTribIPI').val(qtde)
+	$('#bloco_tributos #valorUnidTribIPI').val(vlIPI/qtde);
 };
 
 function inicializarCalculoImpostos(){
@@ -1605,9 +1627,13 @@ function inicializarCalculoImpostos(){
 	}
 };
 </script>
-
 </head>
 <body>
+	<%-- Os campos hidden abaixo foram criado para serem utilizados em algumas funcoes do emissaoNFe.js --%>
+	<input type="hidden" id="percentualPis" value="${percentualPis}"/>
+	<input type="hidden" id="percentualCofins" value="${percentualCofins}"/>
+	<input type="hidden" id="valorFrete" value="${valorFrete}"/>
+	
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 	<form id="formVazio" ></form>
@@ -2635,12 +2661,12 @@ function inicializarCalculoImpostos(){
 					<legend>::: Volumes :::</legend>
 					<div class="label">Qtde.:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="quantidadeVolume" maxlength="15"/>
+						<input type="text" id="quantidadeVolume" value="${quantidade}" maxlength="15"/>
 					</div>
 					
 					<div class="label">Espécie:</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="especieVolume" maxlength="60"/>
+						<input type="text" id="especieVolume" value="${especieVolume}" maxlength="60"/>
 					</div>
 					<div class="label">Marca:</div>
 					<div class="input" style="width: 30%">
@@ -2652,11 +2678,11 @@ function inicializarCalculoImpostos(){
 					</div>
 					<div class="label">Peso Líq.(kg):</div>
 					<div class="input" style="width: 10%">
-						<input type="text" id="pesoLiquidoVolume"/>
+						<input type="text" id="pesoLiquidoVolume" value="${pesoLiquido}"/>
 					</div>
 					<div class="label">Peso Bruto(kg):</div>
 					<div class="input" style="width: 30%">
-						<input type="text" id="pesoBrutoVolume" style="width: 50%"/>
+						<input type="text" id="pesoBrutoVolume" value="${pesoBruto}" style="width: 50%"/>
 					</div>
 					<div class="bloco_botoes">
 						<a id="botaoInserirVolume" title="Inserir Dados da Volume" class="botaoAdicionar"></a>

@@ -30,21 +30,22 @@
 		<nav class="flutuante_esquerda">
 			<ul>
 				<c:if test="${acessoVendaPermitido}">
-				<li><a href="javascript: void(0)" target="principal_frame">Vendas</a>
+				<li><a href="pedido/venda" target="principal_frame">Ped. Vendas</a>
 					<ul>
-						<li><a href="pedido" target="principal_frame">Ped. Vendas</a></li>
-						<li><a href="orcamento" target="principal_frame">Orçamento</a></li>
 						<li><a href="itemAguardandoMaterial" target="principal_frame">Ped. Aguard. Material</a></li>
 						<li><a href="estoque" target="principal_frame">Estoque</a></li>
 					</ul>
 				</li>
 				</c:if>
+				<li><a href="cliente" target="principal_frame">Clientes</a></li>
+				<c:if test="${acessoVendaPermitido}">
+					<li><a href="orcamento" target="principal_frame">Orçamento</a></li>
+				</c:if>
 				<c:if test="${acessoCompraPermitido}">
-					<li><a href="javascript: void(0)" target="principal_frame">Compras</a>
+					<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a>
 						<ul>
 							<li><a href="itemAguardandoCompra" target="principal_frame">Item Aguard. Compra</a></li>
-							<li><a href="pedido/compra" target="principal_frame">Ped. Compras</a></li>
-							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
+							<li><a href="compra/recepcao/listagem" target="principal_frame">Recepção Compras</a></li>
 							<li><a href="estoque" target="principal_frame">Estoque</a></li>
 							<li><a href="empacotamento" target="principal_frame">Empacotamento</a></li>					
 						</ul>
@@ -58,7 +59,6 @@
 						</ul>
 					</li>
 				</c:if>
-				<li><a href="cliente" target="principal_frame">Clientes</a></li>
 				<li><a href="javascript: void(0)">Cadastros</a>
 					<ul>
 						<li><a href="ramo" target="principal_frame">Ramos Atividades</a></li>
@@ -75,10 +75,10 @@
 					</ul>
 				</li>
 				<c:if test="${acessoNFePermitido}">
-				<li><a href="javascript: void(0)">NFe</a>
+				<li><a href="emissaoNFe" target="principal_frame">Emis. NFe</a>
 					<ul>
-						<li><a href="emissaoNFe" target="principal_frame">Emis. NFe</a></li>
 						<li><a href="pedidoFracionadoNFe" target="principal_frame">Ped. Fracionado</a></li>
+						<li><a href="javascript: void(0)" ></a></li>
 					</ul>
 				</li>
 				</c:if>
@@ -92,7 +92,11 @@
 					</ul>
 				</li>
 				</c:if>
-
+				<c:if test="${acessoPagamentoPermitido}">
+				<li>
+					<a href="pagamento/periodo/listagem" target="principal_frame">Pagamento</a>
+				</li>
+				</c:if>
 				<li><a href="javascript: void(0)">Relatórios</a>
 					<ul>
 						<c:if test="${acessoRelatorioDuplicataPermitido}">

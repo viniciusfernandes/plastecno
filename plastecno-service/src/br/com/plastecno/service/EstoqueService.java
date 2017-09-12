@@ -9,6 +9,7 @@ import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.entity.Item;
 import br.com.plastecno.service.entity.ItemEstoque;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.ItemReservado;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.exception.BusinessException;
 
@@ -28,6 +29,8 @@ public interface EstoqueService {
 	void devolverEstoqueItemPedido(List<Integer[]> listaItemDevolucao, Integer idPedido) throws BusinessException;
 
 	void devolverItemCompradoEstoqueByIdPedido(Integer idPedido) throws BusinessException;
+
+	void devolverItemEstoque(Integer idItemPedido);
 
 	void empacotarPedido(List<Integer> listaIdPedido);
 
@@ -49,11 +52,13 @@ public interface EstoqueService {
 
 	List<ItemEstoque> pesquisarItemEstoqueEscasso();
 
+	List<ItemReservado> pesquisarItemReservadoByIdItemPedido(Integer idItemPedido);
+
 	List<Material> pesquisarMateriaEstoque(String sigla);
 
 	String pesquisarNcmItemEstoque(Integer idMaterial, FormaMaterial formaMaterial);
 
-	String pesquisarNcmItemEstoque(ItemEstoque configuracao);
+	String pesquisarNcmItemEstoque(ItemEstoque item);
 
 	List<ItemEstoque> pesquisarPecaByDescricao(String descricao);
 

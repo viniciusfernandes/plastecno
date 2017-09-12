@@ -111,8 +111,9 @@ public class ItemEstoque extends Item {
 	}
 
 	public ItemEstoque(Integer id, FormaMaterial formaMaterial, String descricaoPeca, String siglaMaterial,
-			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio, Double precoMedioFatorCIMS,
-			Double margemMinimaLucro, Integer quantidade, Integer quantidadeMinima, Double aliquotaIPI) {
+			Double medidaExterna, Double medidaInterna, Double comprimento, Double precoMedio,
+			Double precoMedioFatorCIMS, Double margemMinimaLucro, Integer quantidade, Integer quantidadeMinima,
+			Double aliquotaIPI) {
 		this.comprimento = comprimento;
 		this.descricaoPeca = descricaoPeca;
 		this.formaMaterial = formaMaterial;
@@ -142,8 +143,10 @@ public class ItemEstoque extends Item {
 		ItemEstoque clone;
 		try {
 			clone = (ItemEstoque) super.clone();
-			// Note que ao clonar devemos cancelar o ID pois o clonagem representa uma
-			// regra de negocios, assim a entidade resultante sera incluida na sessao
+			// Note que ao clonar devemos cancelar o ID pois o clonagem
+			// representa uma
+			// regra de negocios, assim a entidade resultante sera incluida na
+			// sessao
 			// de persistencia e deve ser uma nova entidade
 			clone.setId(null);
 			return clone;
@@ -169,17 +172,10 @@ public class ItemEstoque extends Item {
 		setMargemMinimaLucro(itemEstoque.getMargemMinimaLucro());
 	}
 
+	@Override
 	public void copiar(ItemPedido itemPedido) {
-		this.setComprimento(itemPedido.getComprimento());
-		this.setDescricaoPeca(itemPedido.getDescricaoPeca());
-		this.setFormaMaterial(itemPedido.getFormaMaterial());
-		this.setMaterial(itemPedido.getMaterial());
-		this.setMedidaExterna(itemPedido.getMedidaExterna());
-		this.setMedidaInterna(itemPedido.getMedidaInterna());
-		this.setQuantidade(itemPedido.getQuantidade());
+		super.copiar(itemPedido);
 		this.setPrecoMedio(itemPedido.getPrecoUnidade());
-		this.setAliquotaIPI(itemPedido.getAliquotaIPI());
-		this.setAliquotaICMS(itemPedido.getAliquotaICMS());
 	}
 
 	public Double getAliquotaICMS() {

@@ -6,15 +6,18 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 <jsp:include page="/bloco/bloco_css.jsp" />
-<jsp:include page="/bloco/bloco_modal_js.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
-
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+
+<jsp:include page="/bloco/bloco_modal_js.jsp" />
 
 <title>Relatório das Duplicatas</title>
 <script type="text/javascript">
@@ -29,13 +32,18 @@
 	});
 
 function alterarDuplicata(botao, metodo, acao, tipo){
-	$(botao).closest('form').attr('action', acao).attr('method', metodo).submit();	
+	inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja '+tipo+' esse item?',
+			confirmar: function(){
+				$(botao).closest('form').attr('action', acao).attr('method', metodo).submit();
+			}
+		});
 };
 </script>
 </head>
 <body>
-	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
+	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<form id="formVazio" action="<c:url value="/relatorio/duplicata"/>">
 	</form>
 

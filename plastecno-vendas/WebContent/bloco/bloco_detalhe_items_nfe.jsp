@@ -21,11 +21,11 @@
 <input type="hidden" id="${detItem}.tributos.icms.tipoIcms.aliquota" name="${detItem}.tributos.icms.tipoIcms.aliquota" value="${item.tributos.icms.tipoIcms.aliquota}"/>
 
 <%-- bloco de icms interestadual --%>
-<input type="hidden" id="${detItem}.tributos.icms.icmsInterestadual.aliquotaInterestadual" name="${detItem}.tributos.icms.icmsInterestadual.aliquotaInterestadual" value="${item.tributos.icms.icmsInterestadual.aliquotaInterestadual}"/>
-<input type="hidden" id="${detItem}.tributos.icms.icmsInterestadual.aliquotaUFDestino" name="${detItem}.tributos.icms.icmsInterestadual.aliquotaUFDestino" value="${item.tributos.icms.icmsInterestadual.aliquotaUFDestino}"/>
-<input type="hidden" id="${detItem}.tributos.icms.icmsInterestadual.percentualFCPDestino" name="${detItem}.tributos.icms.icmsInterestadual.percentualFCPDestino" value="${item.tributos.icms.icmsInterestadual.percentualFCPDestino}"/>
-<input type="hidden" id="${detItem}.tributos.icms.icmsInterestadual.percentualProvisorioPartilha" name="${detItem}.tributos.icms.icmsInterestadual.percentualProvisorioPartilha" value="${item.tributos.icms.icmsInterestadual.percentualProvisorioPartilha}"/>
-<input type="hidden" id="${detItem}.tributos.icms.icmsInterestadual.valorBCUFDestino" name="${detItem}.tributos.icms.icmsInterestadual.valorBCUFDestino" value="${item.tributos.icms.icmsInterestadual.valorBCUFDestino}"/>
+<input type="hidden" id="${detItem}.tributos.icmsInterestadual.aliquotaInterestadual" name="${detItem}.tributos.icmsInterestadual.aliquotaInterestadual" value="${item.tributos.icmsInterestadual.aliquotaInterestadual}"/>
+<input type="hidden" id="${detItem}.tributos.icmsInterestadual.aliquotaUFDestino" name="${detItem}.tributos.icmsInterestadual.aliquotaUFDestino" value="${item.tributos.icmsInterestadual.aliquotaUFDestino}"/>
+<input type="hidden" id="${detItem}.tributos.icmsInterestadual.percentualFCPDestino" name="${detItem}.tributos.icmsInterestadual.percentualFCPDestino" value="${item.tributos.icmsInterestadual.percentualFCPDestino}"/>
+<input type="hidden" id="${detItem}.tributos.icmsInterestadual.percentualProvisorioPartilha" name="${detItem}.tributos.icmsInterestadual.percentualProvisorioPartilha" value="${item.tributos.icmsInterestadual.percentualProvisorioPartilha}"/>
+<input type="hidden" id="${detItem}.tributos.icmsInterestadual.valorBCUFDestino" name="${detItem}.tributos.icmsInterestadual.valorBCUFDestino" value="${item.tributos.icmsInterestadual.valorBCUFDestino}"/>
 
 <%-- bloco de ipi --%>
 <input type="hidden" id="${detItem}.tributos.ipi.tipoIpi.aliquota" name="${detItem}.tributos.ipi.tipoIpi.aliquota" value="${item.tributos.ipi.tipoIpi.aliquota}"/>

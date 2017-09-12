@@ -32,9 +32,9 @@ public class MaterialServiceImpl implements MaterialService {
 	@PersistenceContext(unitName = "plastecno")
 	private EntityManager entityManager;
 
+	private MaterialDAO materialDAO;
 	@EJB
 	private RepresentadaService representadaService;
-	private MaterialDAO materialDAO;
 
 	@Override
 	public void desativar(Integer id) {
@@ -134,8 +134,8 @@ public class MaterialServiceImpl implements MaterialService {
 	public PaginacaoWrapper<Material> paginarMaterial(Material filtro, Boolean apenasAtivos,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 
-		return new PaginacaoWrapper<Material>(this.pesquisarTotalRegistros(filtro, apenasAtivos), this.pesquisarBy(filtro,
-				apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
+		return new PaginacaoWrapper<Material>(this.pesquisarTotalRegistros(filtro, apenasAtivos), this.pesquisarBy(
+				filtro, apenasAtivos, indiceRegistroInicial, numeroMaximoRegistros));
 
 	}
 
@@ -173,6 +173,14 @@ public class MaterialServiceImpl implements MaterialService {
 	@Override
 	public List<Material> pesquisarMaterialAtivoBySigla(String sigla, Integer idRepresentada) {
 		return materialDAO.pesquisarBySigla(sigla, idRepresentada, true);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double pesquisarPesoEspecificoById(Integer idMaterial) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select m.pesoEspecifico from Material m where m.id=:id").setParameter("id",
+						idMaterial), Double.class, 0d);
 	}
 
 	@SuppressWarnings("unchecked")

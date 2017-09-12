@@ -253,7 +253,7 @@ function recepcionarItem(botao){
 										<input type="button" value="" title="Remover o Item do Pedido" 
 											onclick="removerItem(this);" class="botaoRemover" />
 									</form>
-									<div class="input" style="width: 1%">
+									<div class="input" style="width: 20%">
 										<input type="checkbox" name="idItemPedido" value="${item.id}" />
 									</div>
 								</div>

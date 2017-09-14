@@ -25,7 +25,7 @@ $(document).ready(function() {
 	$('#botaoPesquisarPagamentoPeriodo').click(function(){
 		var request = $.ajax({
 			type: 'get',
-			url: '<c:url value="/fluxocaixa/grafico/bar"/>',
+			url: '<c:url value="/fluxocaixa/grafico/bar/mes"/>',
 			data: {dataInicial: $('#dataInicial').val(), dataFinal: $('#dataFinal').val()}
 		});
 		
@@ -53,7 +53,7 @@ $(document).ready(function() {
 			    data: {
 			        labels: grafico.listaLabel,
 			        datasets: [{
-			            label: "My First dataset",
+			            label: grafico.titulo,
 			            backgroundColor: 'rgb(255, 99, 132)',
 			            borderColor: 'rgb(255, 99, 132)',
 			            data: grafico.listaDado
@@ -104,8 +104,8 @@ $(document).ready(function() {
 				</div>
 				
 		</fieldset>
-<canvas id="myChart" ></canvas>
-
-Aqui deve estar o fluxo.........
+	<div class="input" style="width: 50%">
+		<canvas id="myChart" ></canvas>
+	</div>
 </body>
 </html>

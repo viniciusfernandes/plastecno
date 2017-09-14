@@ -208,7 +208,6 @@ function removerPagamento(botao){
 				</c:forEach>
 				<c:forEach items="${relatorio.listaElemento}" var="elemento" varStatus="iElemento">
 						<tr>
-							<c:if test="${iElemento.count le 1}">
 								<c:choose>
 									<c:when test="${elemento.liquidado}">
 										<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"><div class="botaoVerificacaoEfetuadaGrande" title="Liquidado"></div></td>
@@ -223,7 +222,6 @@ function removerPagamento(botao){
 								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center">${elemento.dataVencimentoFormatada}</td>
 								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"></td>
 								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"></td>
-							</c:if>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.descricao}</td>

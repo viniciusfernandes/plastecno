@@ -3,9 +3,19 @@
 <!DOCTYPE>
 <html>
 <head>
+
 <jsp:include page="/bloco/bloco_css.jsp" />
+<jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/Chart.min.js"/>"></script>
 
 <script type="text/javascript">
@@ -15,22 +25,38 @@ $(document).ready(function() {
 	$('#botaoPesquisarPagamentoPeriodo').click(function(){
 		var request = $.ajax({
 			type: 'get',
-			url: '<c:url value="/fluxocaixa/grafico"/>'
+			url: '<c:url value="/fluxocaixa/grafico/bar"/>',
+			data: {dataInicial: $('#dataInicial').val(), dataFinal: $('#dataFinal').val()}
 		});
 		
 		
 		request.done(function (response){
-			var dados = response.dados;
+			if(response.erros != undefined){
+				gerarListaMensagemErro(response.erros);
+				return;
+			}
+			
+			var grafico = response.grafico;
+			if(grafico == undefined){
+				return;
+			}
+			
+			if(grafico.listaLabel == undefined || grafico.listaDado == undefined){
+				gerarListaMensagemErro(['A lista de labels e dados estão em branco e devem ser enviadas']);
+				return;
+			}
+			var chart = document.getElementById('myChart');
+			chart.innerHTML = '';
 			var ctx = document.getElementById('myChart').getContext('2d');
 			var myLineChart = new Chart(ctx, {
 			    type: 'bar',
 			    data: {
-			        labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+			        labels: grafico.listaLabel,
 			        datasets: [{
 			            label: "My First dataset",
-			            //backgroundColor: 'rgb(255, 99, 132)',
+			            backgroundColor: 'rgb(255, 99, 132)',
 			            borderColor: 'rgb(255, 99, 132)',
-			            data:dados,
+			            data: grafico.listaDado
 			        }]
 			    },
 			    options: {
@@ -47,14 +73,12 @@ $(document).ready(function() {
 		});
 		
 		request.fail(function(request, status, excecao) {
-			var mensagem = 'Falha na pesquisa do item de venda sugerido: '+ idCampoPesquisavel;
-			mensagem += ' para a URL ' + url;
-			mensagem += ' contendo o valor de requisicao ' + parametro;
-			mensagem += ' => Excecao: ' + excecao;
-			gerarListaMensagemErro(new Array(mensagem));
+			gerarListaMensagemErro(['Falha na geracao do grafico de fluxo de caixa por mes. Excecao: ' + excecao]);
 		});
+		
 	});
-	
+	inserirMascaraData('dataInicial');
+	inserirMascaraData('dataFinal');
 	
 });
 </script>

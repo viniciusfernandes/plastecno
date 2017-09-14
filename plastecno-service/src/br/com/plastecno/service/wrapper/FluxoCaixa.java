@@ -11,6 +11,7 @@ import java.util.Map;
 import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.util.DateUtils;
+import br.com.plastecno.util.StringUtils;
 
 public class FluxoCaixa {
 
@@ -36,8 +37,8 @@ public class FluxoCaixa {
 	public void addDuplicata(Date dtVencimento, Double valor) throws BusinessException {
 
 		if (!isDataVencimentoValida(dtVencimento)) {
-			throw new BusinessException(
-					"A data de vencimento da duplicata esta fora do periodo definido para o fluxo de caixa");
+			throw new BusinessException("A data de vencimento " + StringUtils.formatarData(dtVencimento)
+					+ " da duplicata com valor " + valor + " esta fora do periodo definido para o fluxo de caixa");
 		}
 		addFluxo(new Fluxo(DateUtils.gerarCalendarioSemHorario(dtVencimento), 0, null, 0, valor));
 	}
@@ -58,7 +59,8 @@ public class FluxoCaixa {
 			throws BusinessException {
 
 		if (!isDataVencimentoValida(dtVencimento)) {
-			throw new BusinessException("A data de pagamento esta fora do periodo definido para o fluxo de caixa");
+			throw new BusinessException("A data de vencimento " + StringUtils.formatarData(dtVencimento)
+					+ " do pagamento com valor " + valor + " esta fora do periodo definido para o fluxo de caixa");
 		}
 		addFluxo(new Fluxo(DateUtils.gerarCalendarioSemHorario(dtVencimento), valor, tipoPagamento, valorCredICMS, 0));
 	}
@@ -141,7 +143,8 @@ public class FluxoCaixa {
 	}
 
 	private boolean isDataVencimentoValida(Date dtVencimento) {
-		return dtVencimento != null && (dtVencimento.after(dataInicial) && dtVencimento.before(dataFinal));
+		return dtVencimento != null
+				&& (dtVencimento.compareTo(dataInicial) >= 0 && dtVencimento.compareTo(dataFinal) <= 0);
 
 	}
 

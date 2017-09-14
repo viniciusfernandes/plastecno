@@ -1,14 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Resource;
@@ -18,9 +11,8 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.Fluxo;
 import br.com.plastecno.service.wrapper.FluxoCaixa;
 import br.com.plastecno.service.wrapper.Periodo;
-import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
-import br.com.plastecno.vendas.json.Ponto2D;
+import br.com.plastecno.vendas.json.GraficoBar2D;
 import br.com.plastecno.vendas.json.SerializacaoJson;
 
 @Resource
@@ -35,35 +27,26 @@ public class FluxoCaixaController extends AbstractController {
 
     @Get("fluxocaixa")
     public void fluxoCaixaHome() {
-
+        addPeriodo(gerarDataInicioAno(), gerarDataFimAno());
     }
 
-    @Get("fluxocaixa/grafico")
-    public void gerarGrafico() {
-        Calendar inicio = Calendar.getInstance();
-        inicio.setTime(new Date());
-        inicio.set(Calendar.YEAR, 2016);
-
-        Calendar fim = Calendar.getInstance();
-        fim.setTime(new Date());
-        fim.set(Calendar.YEAR, 2019);
-
+    @Get("fluxocaixa/grafico/bar")
+    public void gerarGraficoBar(Date dataInicial, Date dataFinal) {
         try {
-            FluxoCaixa fluxoCaixa = faturamentoService.gerarFluxoFaixaByPeriodo(new Periodo(inicio.getTime(), fim
-                    .getTime()));
+            FluxoCaixa fluxoCaixa = faturamentoService.gerarFluxoFaixaByPeriodo(new Periodo(dataInicial, dataFinal));
             List<Fluxo> lFluxo = fluxoCaixa.gerarFluxoByMes();
-            List<Ponto2D> dados = new ArrayList<>(100);
-
+            GraficoBar2D grf = new GraficoBar2D();
             for (Fluxo f : lFluxo) {
                 System.out.println(f);
-                dados.add(new Ponto2D(null, f.getValFluxo()));
+                grf.adicionar(f.getMes() + "/" + f.getAno(), f.getValFluxo());
             }
-            serializarJson(new SerializacaoJson("dados", dados));
+            serializarJson(new SerializacaoJson("grafico", grf).incluirAtributo("listaLabel", "listaDado"));
 
         } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
+            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
-            gerarLogErro("Falha na geracao do fluxo de caixa", e);
+            gerarLogErroRequestAjax("inclusao/alteracao do pedido", e);
         }
+
     }
 }

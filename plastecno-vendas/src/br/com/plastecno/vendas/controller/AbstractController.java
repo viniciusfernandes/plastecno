@@ -311,6 +311,20 @@ public abstract class AbstractController {
         c.set(Calendar.DAY_OF_MONTH, 1);
         return c.getTime();
     }
+    
+    Date gerarDataInicioAno() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        c.set(Calendar.MONTH, 0);
+        return c.getTime();
+    }
+    
+    Date gerarDataFimAno() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 31);
+        c.set(Calendar.MONTH, 11);
+        return c.getTime();
+    }
 
     Download gerarDownload(byte[] bytesArquivo, String nomeArquivo, String contentType) {
         return new ByteArrayDownload(bytesArquivo, contentType, StringUtils.removerAcentuacao(nomeArquivo));

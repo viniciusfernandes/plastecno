@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,12 +56,21 @@ public class FluxoCaixaController extends AbstractController {
         try {
             FluxoCaixa fluxoCaixa = faturamentoService.gerarFluxoFaixaByPeriodo(new Periodo(dataInicial, dataFinal));
             List<Fluxo> lFluxo = fluxoCaixa.gerarFluxoByMes();
-            GraficoBar2D grf = new GraficoBar2D("Faturamento mensal");
+            GraficoBar2D gValFluxo = new GraficoBar2D("Fluxo");
+            GraficoBar2D gValPag = new GraficoBar2D("Saída");
+            GraficoBar2D gValDup = new GraficoBar2D("Entrada");
+            String label = null;
             for (Fluxo f : lFluxo) {
-                grf.adicionar(mapMes.get(f.getMes()) + "/" + f.getAno(),
-                        NumeroUtils.arredondarValorMonetario(f.getValFluxo()));
+                label = mapMes.get(f.getMes()) + "/" + f.getAno();
+                gValFluxo.adicionar(label, NumeroUtils.arredondarValorMonetario(f.getValFluxo()));
+                gValDup.adicionar(label, NumeroUtils.arredondarValorMonetario(f.getValDuplicata()));
+                gValPag.adicionar(label, NumeroUtils.arredondarValorMonetario(-f.getValPagamento()));
             }
-            serializarJson(new SerializacaoJson("grafico", grf).incluirAtributo("listaLabel", "listaDado"));
+            List<GraficoBar2D> lGrafico = new ArrayList<>();
+            lGrafico.add(gValDup);
+            lGrafico.add(gValPag);
+            lGrafico.add(gValFluxo);
+            serializarJson(new SerializacaoJson("listaGrafico", lGrafico).incluirAtributo("listaLabel", "listaDado"));
 
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));

@@ -36,39 +36,39 @@ $(document).ready(function() {
 				return;
 			}
 			
-			var grafico = response.grafico;
-			if(grafico == undefined){
+			var listaGrafico = response.listaGrafico;
+			if(listaGrafico == undefined){
 				return;
 			}
-			
-			if(grafico.listaLabel == undefined || grafico.listaDado == undefined){
-				gerarListaMensagemErro(['A lista de labels e dados estão em branco e devem ser enviadas']);
-				return;
-			}
+
+			var datasets = new Array();
+			var rgb = [{r:76, g:181, b:56}, {r:69 , g:146, b:224}, {r:219, g:100, b:169}];
+			for (var i = 0; i < 3; i++) {
+				if(listaGrafico[i].listaLabel == undefined || listaGrafico[i].listaDado == undefined){
+					gerarListaMensagemErro(['A lista de labels e dados do gráfico '+listaGrafico[i].titulo+ ' estão em branco e devem ser enviadas']);
+					return;
+				}
+				datasets[i] = {
+		            label: listaGrafico[i].titulo,
+		            backgroundColor: 'rgb('+rgb[i].r+', '+rgb[i].g+', '+rgb[i].b+')',
+		            data: listaGrafico[i].listaDado
+		        };
+			}			
 			var chart = document.getElementById('myChart');
 			chart.innerHTML = '';
 			var ctx = document.getElementById('myChart').getContext('2d');
 			var myLineChart = new Chart(ctx, {
 			    type: 'bar',
 			    data: {
-			        labels: grafico.listaLabel,
-			        datasets: [{
-			            label: grafico.titulo,
-			            backgroundColor: 'rgb(255, 99, 132)',
-			            borderColor: 'rgb(255, 99, 132)',
-			            data: grafico.listaDado
-			        }]
+			        labels: listaGrafico[0].listaLabel,
+			        datasets: datasets
 			    },
 			    options: {
-			        scales: {
-			            xAxes: [{
-			                stacked: true
-			            }],
-			            yAxes: [{
-			                stacked: true
-			            }]
-			        }
-			    }
+				      title: {
+				        display: true,
+				        text: 'Fuxo de Caixa (R$)'
+				      }
+				    }
 			});
 		});
 		
@@ -104,8 +104,11 @@ $(document).ready(function() {
 				</div>
 				
 		</fieldset>
-	<div class="input" style="width: 50%">
+	<div class="input" style="width: 40%">
 		<canvas id="myChart" ></canvas>
+	</div>
+	<div class="input" style="width: 40%">
+		<canvas id="bar-chart-grouped" ></canvas>
 	</div>
 </body>
 </html>

@@ -205,6 +205,12 @@ public class ItemPedido extends Item {
 	@Transient
 	private String valorPedidoIPIFormatado;
 
+	@Transient
+	private Double valorTotalPedidoSemFrete;
+
+	@Transient
+	private String valorTotalPedidoSemFreteFormatado;
+
 	public ItemPedido() {
 	}
 
@@ -583,6 +589,14 @@ public class ItemPedido extends Item {
 		return calcularPrecoTotal();
 	}
 
+	public Double getValorTotalPedidoSemFrete() {
+		return valorTotalPedidoSemFrete;
+	}
+
+	public String getValorTotalPedidoSemFreteFormatado() {
+		return valorTotalPedidoSemFreteFormatado;
+	}
+
 	public boolean isEncomendado() {
 		return encomendado;
 	}
@@ -805,6 +819,14 @@ public class ItemPedido extends Item {
 
 	public void setValorPedidoIPIFormatado(String valorPedidoIPIFormatado) {
 		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
+	}
+
+	public void setValorTotalPedidoSemFrete(Double valorTotalPedidoSemFrete) {
+		this.valorTotalPedidoSemFrete = valorTotalPedidoSemFrete;
+	}
+
+	public void setValorTotalPedidoSemFreteFormatado(String valorTotalPedidoSemFreteFormatado) {
+		this.valorTotalPedidoSemFreteFormatado = valorTotalPedidoSemFreteFormatado;
 	}
 
 }

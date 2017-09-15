@@ -294,6 +294,7 @@ public class PedidoController extends AbstractPedidoController {
             Double[] valorPedido = pedidoService.pesquisarValorPedidoByItemPedido(idItemPedido);
             itemPedido.setValorPedido(valorPedido[0]);
             itemPedido.setValorPedidoIPI(valorPedido[1]);
+            itemPedido.setValorTotalPedidoSemFrete(valorPedido[1] - (valorPedido[2] == null ? 0 : valorPedido[2]));
 
             formatarItemPedido(itemPedido);
             formatarPedido(itemPedido.getPedido());
@@ -457,8 +458,7 @@ public class PedidoController extends AbstractPedidoController {
                 List<Transportadora> listaRedespacho = clienteService.pesquisarTransportadorasRedespacho(pedido
                         .getCliente().getId());
 
-                List<Transportadora> listaTransportadora = clienteService.pesquisarTransportadorasDesassociadas(pedido
-                        .getCliente().getId());
+                List<Transportadora> listaTransportadora = transportadoraService.pesquisarTransportadoraAtiva();
 
                 if (!listaRedespacho.contains(pedido.getTransportadoraRedespacho())) {
                     listaRedespacho.add(pedido.getTransportadoraRedespacho());

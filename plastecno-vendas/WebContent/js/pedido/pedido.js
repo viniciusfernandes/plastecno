@@ -202,7 +202,10 @@ function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
 						itemPedido.valorPedido);
 				$('#bloco_item_pedido #tabelaItemPedido #valorPedidoIPI').html(
 						itemPedido.valorPedidoIPI);
-
+				
+				$('#bloco_item_pedido #tabelaItemPedido #valorTotalSemFrete').html(
+						itemPedido.valorTotalPedidoSemFrete);
+				
 				$('#bloco_item_pedido #aliquotaICMS').val(
 						itemPedido.aliquotaICMS);
 				$('#bloco_item_pedido #precoUnidade').val(

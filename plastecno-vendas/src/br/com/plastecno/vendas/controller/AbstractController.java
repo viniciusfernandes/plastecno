@@ -262,7 +262,7 @@ public abstract class AbstractController {
         pedido.setDataEntregaFormatada(formatarData(pedido.getDataEntrega()));
         pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));
         pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedidoIPI()));
-        pedido.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorTotal()));
+        pedido.setValorTotalSemFreteFormatado(NumeroUtils.formatarValorMonetario(pedido.calcularValorTotalSemFrete()));
         pedido.setValorFreteFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorFrete()));
         pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
         pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));

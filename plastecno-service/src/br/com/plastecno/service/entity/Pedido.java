@@ -199,11 +199,11 @@ public class Pedido implements Serializable, Cloneable {
 	@Transient
 	private String valorPedidoIPIFormatado;
 
-	@Transient
-	private String valorTotalFormatado;
-
 	@Column(name = "valor_total_nf")
 	private Double valorTotalNF;
+
+	@Transient
+	private String valorTotalSemFreteFormatado;
 
 	public Pedido() {
 	}
@@ -311,6 +311,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public double addValorPedido(double valor) {
 		return this.valorPedido += valor;
+	}
+
+	public Double calcularValorTotalSemFrete() {
+		return (valorPedidoIPI == null ? 0d : valorPedidoIPI) - (valorFrete == null ? 0d : valorFrete);
 	}
 
 	@Override
@@ -503,16 +507,12 @@ public class Pedido implements Serializable, Cloneable {
 		return valorPedidoIPIFormatado;
 	}
 
-	public Double getValorTotal() {
-		return (valorPedidoIPI == null ? 0d : valorPedidoIPI) + (valorFrete == null ? 0d : valorFrete);
-	}
-
-	public String getValorTotalFormatado() {
-		return valorTotalFormatado;
-	}
-
 	public Double getValorTotalNF() {
 		return valorTotalNF;
+	}
+
+	public String getValorTotalSemFreteFormatado() {
+		return valorTotalSemFreteFormatado;
 	}
 
 	public Usuario getVendedor() {
@@ -772,12 +772,12 @@ public class Pedido implements Serializable, Cloneable {
 		this.valorPedidoIPIFormatado = valorPedidoIPIFormatado;
 	}
 
-	public void setValorTotalFormatado(String valorTotalFormatado) {
-		this.valorTotalFormatado = valorTotalFormatado;
-	}
-
 	public void setValorTotalNF(Double valorTotalNF) {
 		this.valorTotalNF = valorTotalNF;
+	}
+
+	public void setValorTotalSemFreteFormatado(String valorTotalSemFreteFormatado) {
+		this.valorTotalSemFreteFormatado = valorTotalSemFreteFormatado;
 	}
 
 	public void setVendedor(Usuario vendedor) {

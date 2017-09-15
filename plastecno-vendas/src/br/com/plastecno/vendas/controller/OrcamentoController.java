@@ -24,7 +24,6 @@ import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
-import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
@@ -169,7 +168,7 @@ public class OrcamentoController extends AbstractPedidoController {
     }
 
     @Post("orcamento/item/inclusao")
-    public void inserirItemPedido(Integer numeroPedido, ItemPedido itemPedido, Double aliquotaIPI) {
+    public void inserirItemOrcamento(Integer numeroPedido, ItemPedido itemPedido, Double aliquotaIPI) {
         forwardTo(PedidoController.class).inserirItemPedido(numeroPedido, itemPedido, aliquotaIPI);
     }
 
@@ -179,8 +178,6 @@ public class OrcamentoController extends AbstractPedidoController {
     @Post("orcamento/inclusao")
     public void inserirOrcamento(Pedido pedido, Contato contato, Cliente cliente) {
         if (cliente != null) {
-            cliente.addContato(contato != null ? new ContatoCliente(contato) : null);
-            cliente.setRazaoSocial(cliente.getNomeFantasia());
             removerMascaraDocumento(cliente);
         }
         pedido.setFinalidadePedido(TipoFinalidadePedido.INDUSTRIALIZACAO);

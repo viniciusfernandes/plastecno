@@ -294,6 +294,7 @@ public class PedidoController extends AbstractPedidoController {
             Double[] valorPedido = pedidoService.pesquisarValorPedidoByItemPedido(idItemPedido);
             itemPedido.setValorPedido(valorPedido[0]);
             itemPedido.setValorPedidoIPI(valorPedido[1]);
+            itemPedido.setValorTotalPedidoSemFrete(valorPedido[1] - (valorPedido[2] == null ? 0 : valorPedido[2]));
 
             formatarItemPedido(itemPedido);
             formatarPedido(itemPedido.getPedido());

@@ -996,14 +996,13 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException(
 					"O orçamento não contém cliente. O cliente deve ter ao menos um nome para a inclusão do orçamento.");
 		}
-		cliente.setRazaoSocial(cliente.getNomeFantasia());
-		cliente.addContato(new ContatoCliente(orcamento.getContato()));
-		cliente.setVendedor(orcamento.getVendedor());
-
-		cliente.setRamoAtividade(ramoAtividadeService.pesquisarRamoAtividadePadrao());
 
 		if (orcamento.isClienteNovo()) {
+			cliente.addContato(new ContatoCliente(orcamento.getContato()));
+			cliente.setRazaoSocial(cliente.getNomeFantasia());
 			cliente.setVendedor(orcamento.getVendedor());
+			cliente.setRamoAtividade(ramoAtividadeService.pesquisarRamoAtividadePadrao());
+
 			orcamento.setCliente(clienteService.inserir(cliente));
 		}
 		return inserir(orcamento);
@@ -1345,6 +1344,7 @@ public class PedidoServiceImpl implements PedidoService {
 			Double[] valorPedido = pesquisarValorPedidoByItemPedido(idItemPedido);
 			itemPedido.setValorPedido(valorPedido[0]);
 			itemPedido.setValorPedidoIPI(valorPedido[1]);
+			itemPedido.setValorTotalPedidoSemFrete(valorPedido[2]);
 		}
 		return itemPedido;
 	}

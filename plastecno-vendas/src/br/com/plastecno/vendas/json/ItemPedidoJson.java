@@ -30,6 +30,7 @@ public class ItemPedidoJson {
     private final String tipoCST;
     private final String valorPedido;
     private final String valorPedidoIPI;
+    private final String valorTotalPedidoSemFrete;
     private final boolean vendaKilo;
 
     public ItemPedidoJson(ItemPedido itemPedido) {
@@ -63,6 +64,7 @@ public class ItemPedidoJson {
         tipoCST = itemPedido.getTipoCst() != null ? itemPedido.getTipoCst().toString() : "";
         peso = itemPedido.getPeso() == null ? "" : NumeroUtils.arredondarValorMonetario(itemPedido.getPeso())
                 .toString();
+        valorTotalPedidoSemFrete = itemPedido.getValorTotalPedidoSemFreteFormatado();
     }
 
     public String getAliquotaComissao() {
@@ -163,6 +165,10 @@ public class ItemPedidoJson {
 
     public String getValorPedidoIPI() {
         return valorPedidoIPI;
+    }
+
+    public String getValorTotalPedidoSemFrete() {
+        return valorTotalPedidoSemFrete;
     }
 
     public boolean isPeca() {

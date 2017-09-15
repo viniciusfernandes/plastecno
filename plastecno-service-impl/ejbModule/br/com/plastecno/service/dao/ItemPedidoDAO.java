@@ -544,9 +544,9 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	public Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido) {
 		Query query = this.entityManager
-				.createQuery("select i.pedido.valorPedido, i.pedido.valorPedidoIPI  from ItemPedido i where i.id = :idItemPedido");
+				.createQuery("select i.pedido.valorPedido, i.pedido.valorPedidoIPI, i.pedido.valorFrete  from ItemPedido i where i.id = :idItemPedido");
 		query.setParameter("idItemPedido", idItemPedido);
-		Object[] valores = QueryUtil.gerarRegistroUnico(query, Object[].class, new Object[] { 0d, 0d });
-		return new Double[] { (Double) valores[0], (Double) valores[1] };
+		Object[] valores = QueryUtil.gerarRegistroUnico(query, Object[].class, new Object[] { 0d, 0d, 0d });
+		return new Double[] { (Double) valores[0], (Double) valores[1], (Double) valores[2] };
 	}
 }

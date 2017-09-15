@@ -144,7 +144,7 @@ public class Contato implements Serializable {
 
 		if (ddi != null && !ddi.isEmpty()) {
 			telefoneFormatado.append(ddi).append(" ");
-		}
+		} else {telefoneFormatado.append(" / ");}
 
 		if (ddd != null && !ddd.isEmpty()) {
 			telefoneFormatado.append("(").append(ddd).append(") ");

@@ -14,9 +14,9 @@ $(document).ready(function() {
 	inserirMascaraData('dataFinal');
 	inserirMascaraData('dataRecebimento');
 
-	inserirMascaraMonetaria('valorNF', 7);
-	inserirMascaraMonetaria('valor', 7);
-	inserirMascaraMonetaria('valorCreditoICMS', 7);
+	inserirMascaraMonetaria('valorNF', 9);
+	inserirMascaraMonetaria('valor', 9);
+	inserirMascaraMonetaria('valorCreditoICMS', 9);
 	inserirMascaraNumerica('quantidade', '99999');
 	inserirMascaraNumerica('parcela', '999');
 	inserirMascaraNumerica('pedido', '9999999');

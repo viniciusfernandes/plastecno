@@ -21,7 +21,6 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	
-	
 	$('#botaoPesquisarPagamentoPeriodo').click(function(){
 		var request = $.ajax({
 			type: 'get',
@@ -36,40 +35,83 @@ $(document).ready(function() {
 				return;
 			}
 			
-			var grafico = response.grafico;
-			if(grafico == undefined){
+			var listaGrafico = response.listaGrafico;
+			if(listaGrafico == undefined){
 				return;
 			}
-			
-			if(grafico.listaLabel == undefined || grafico.listaDado == undefined){
-				gerarListaMensagemErro(['A lista de labels e dados estão em branco e devem ser enviadas']);
-				return;
-			}
-			var chart = document.getElementById('myChart');
-			chart.innerHTML = '';
-			var ctx = document.getElementById('myChart').getContext('2d');
-			var myLineChart = new Chart(ctx, {
+
+			var datasets = new Array();
+			var rgb = [{r:76, g:181, b:56}, {r:69 , g:146, b:224}, {r:219, g:100, b:169}];
+			for (var i = 0; i < 3; i++) {
+				if(listaGrafico[i].listaLabel == undefined || listaGrafico[i].listaDado == undefined){
+					gerarListaMensagemErro(['A lista de labels e dados do gráfico '+listaGrafico[i].titulo+ ' estão em branco e devem ser enviadas']);
+					return;
+				}
+				datasets[i] = {
+		            label: listaGrafico[i].titulo,
+		            backgroundColor: 'rgb('+rgb[i].r+', '+rgb[i].g+', '+rgb[i].b+')',
+		            data: listaGrafico[i].listaDado
+		        };
+			}			
+			var ctxFlx = document.getElementById('graficoFluxoMensal').getContext('2d');
+			new Chart(ctxFlx, {
 			    type: 'bar',
 			    data: {
-			        labels: grafico.listaLabel,
-			        datasets: [{
-			            label: grafico.titulo,
-			            backgroundColor: 'rgb(255, 99, 132)',
-			            borderColor: 'rgb(255, 99, 132)',
-			            data: grafico.listaDado
-			        }]
+			        labels: listaGrafico[0].listaLabel,
+			        datasets: datasets
 			    },
 			    options: {
-			        scales: {
-			            xAxes: [{
-			                stacked: true
-			            }],
-			            yAxes: [{
-			                stacked: true
-			            }]
-			        }
-			    }
+				      title: {
+				        display: true,
+				        text: 'Fuxo de Caixa com Créd. ICMS (R$)'
+				      }
+				    }
 			});
+			
+
+			var ctxLine = document.getElementById("graficoFaturamentoMensal").getContext("2d");
+			new Chart(ctxLine, {
+			  type: 'line',
+			  data: {
+			    labels: listaGrafico[2].listaLabel,
+			    datasets: [{
+			    	label:'Val. Mensal.',
+			      fill: false,
+			      backgroundColor: '#8fa8c8',
+			      pointBackgroundColor: '#75539e',
+			      borderColor: '#75539e',
+			      pointHighlightStroke: '#75539e',
+			      data: listaGrafico[2].listaDado,
+			    }]
+			  },
+			  options: {
+				title: {
+					display: true,
+				    text: 'Faturamento com Créd. ICMS (R$)'
+				}
+			  }
+			});
+			
+			var ctxPag = document.getElementById("graficoPagamento").getContext("2d");
+			new Chart(ctxPag, {
+				  type: 'doughnut',
+				  data: {
+				    labels: listaGrafico[3].listaLabel,
+				    datasets: [{
+				    	label:'Pag. do período.',
+				      backgroundColor: ['#7db9e8', '#76DB79', '#E8997D', '#A85A8B'],
+				      data: listaGrafico[3].listaDado,
+				    }]
+				  },
+				  options: {
+					title: {
+						display: true,
+					    text: 'Pagamentos (R$)'
+					}
+				  }
+				});
+				
+			
 		});
 		
 		request.fail(function(request, status, excecao) {
@@ -80,6 +122,7 @@ $(document).ready(function() {
 	inserirMascaraData('dataInicial');
 	inserirMascaraData('dataFinal');
 	
+	$('#botaoPesquisarPagamentoPeriodo').click();
 });
 </script>
 
@@ -104,8 +147,14 @@ $(document).ready(function() {
 				</div>
 				
 		</fieldset>
-	<div class="input" style="width: 50%">
-		<canvas id="myChart" ></canvas>
+	<div class="input" style="width: 50%; height: 20%">
+		<canvas id="graficoFluxoMensal" ></canvas>
+	</div>
+	<div class="input" style="width: 50%; height: 20%">
+		<canvas id="graficoFaturamentoMensal" ></canvas>
+	</div>
+	<div class="input" style="width: 50%; height: 20%; margin-top: 2%">
+		<canvas id="graficoPagamento"></canvas>
 	</div>
 </body>
 </html>

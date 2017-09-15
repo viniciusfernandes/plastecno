@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,19 +22,8 @@ import br.com.plastecno.vendas.json.SerializacaoJson;
 @Resource
 public class FluxoCaixaController extends AbstractController {
 
-    @Servico
-    private FaturamentoService faturamentoService;
-
-    public FluxoCaixaController(Result result) {
-        super(result);
-    }
-
-    @Get("fluxocaixa")
-    public void fluxoCaixaHome() {
-        addPeriodo(gerarDataInicioAno(), gerarDataFimAno());
-    }
-
     private static final Map<Integer, String> mapMes;
+
     static {
         mapMes = new HashMap<>();
         mapMes.put(0, "Jan");
@@ -50,17 +40,47 @@ public class FluxoCaixaController extends AbstractController {
         mapMes.put(11, "Dez");
     }
 
+    @Servico
+    private FaturamentoService faturamentoService;
+
+    public FluxoCaixaController(Result result) {
+        super(result);
+    }
+    @Get("fluxocaixa")
+    public void fluxoCaixaHome() {
+        addPeriodo(gerarDataInicioAno(), gerarDataFimAno());
+    }
+
     @Get("fluxocaixa/grafico/bar/mes")
     public void gerarGraficoBarMensal(Date dataInicial, Date dataFinal) {
         try {
             FluxoCaixa fluxoCaixa = faturamentoService.gerarFluxoFaixaByPeriodo(new Periodo(dataInicial, dataFinal));
             List<Fluxo> lFluxo = fluxoCaixa.gerarFluxoByMes();
-            GraficoBar2D grf = new GraficoBar2D("Faturamento mensal");
+            GraficoBar2D gValFluxo = new GraficoBar2D("Fluxo");
+            GraficoBar2D gValPag = new GraficoBar2D("Saída");
+            GraficoBar2D gValDup = new GraficoBar2D("Entrada");
+            GraficoBar2D gValTipoPag = new GraficoBar2D("Tipo Pagamento");
+
+            String label = null;
             for (Fluxo f : lFluxo) {
-                grf.adicionar(mapMes.get(f.getMes()) + "/" + f.getAno(),
-                        NumeroUtils.arredondarValorMonetario(f.getValFluxo()));
+                label = mapMes.get(f.getMes()) + "/" + f.getAno();
+                gValFluxo.adicionar(label, NumeroUtils.arredondarValorMonetario(f.getValFluxo()));
+                gValDup.adicionar(label, NumeroUtils.arredondarValorMonetario(f.getValDuplicata()));
+                gValPag.adicionar(label, NumeroUtils.arredondarValorMonetario(-f.getValPagamento()));
             }
-            serializarJson(new SerializacaoJson("grafico", grf).incluirAtributo("listaLabel", "listaDado"));
+
+            List<Fluxo> lFluxoPag = fluxoCaixa.gerarFluxoByTipoPagamento();
+            for (Fluxo f : lFluxoPag) {
+                gValTipoPag.adicionar(f.getTipoPagamento().toString(),
+                        NumeroUtils.arredondarValorMonetario(f.getValPagamento()));
+            }
+
+            List<GraficoBar2D> lGrafico = new ArrayList<>();
+            lGrafico.add(gValDup);
+            lGrafico.add(gValPag);
+            lGrafico.add(gValFluxo);
+            lGrafico.add(gValTipoPag);
+            serializarJson(new SerializacaoJson("listaGrafico", lGrafico).incluirAtributo("listaLabel", "listaDado"));
 
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));

@@ -182,6 +182,8 @@ $(document).ready(function() {
 	inserirMascaraCNPJ('cnpj');
 	inserirMascaraCPF('cpf');
 	inserirMascaraNumerica('validade', '999');
+	inserirMascaraNumerica('ddd', '999');
+	inserirMascaraNumerica('telefone', '99999999');
 	inserirMascaraMonetaria('frete', 7);
 
 	<jsp:include page="/bloco/bloco_paginador.jsp" />

@@ -21,7 +21,6 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	
-	
 	$('#botaoPesquisarPagamentoPeriodo').click(function(){
 		var request = $.ajax({
 			type: 'get',
@@ -54,10 +53,8 @@ $(document).ready(function() {
 		            data: listaGrafico[i].listaDado
 		        };
 			}			
-			var chart = document.getElementById('myChart');
-			chart.innerHTML = '';
-			var ctx = document.getElementById('myChart').getContext('2d');
-			var myLineChart = new Chart(ctx, {
+			var ctxFlx = document.getElementById('graficoFluxoMensal').getContext('2d');
+			new Chart(ctxFlx, {
 			    type: 'bar',
 			    data: {
 			        labels: listaGrafico[0].listaLabel,
@@ -66,10 +63,59 @@ $(document).ready(function() {
 			    options: {
 				      title: {
 				        display: true,
-				        text: 'Fuxo de Caixa (R$)'
+				        text: 'Fuxo de Caixa com Créd. ICMS (R$)'
 				      }
 				    }
 			});
+			
+
+			var ctxLine = document.getElementById("graficoFaturamentoMensal").getContext("2d");
+			new Chart(ctxLine, {
+			  type: 'line',
+			  data: {
+			    labels: listaGrafico[2].listaLabel,
+			    datasets: [{
+			    	label:'Val. Mensal.',
+			      fill: false,
+			      backgroundColor: '#8fa8c8',
+			      pointBackgroundColor: '#75539e',
+			      borderColor: '#75539e',
+			      pointHighlightStroke: '#75539e',
+			      data: listaGrafico[2].listaDado,
+			    }]
+			  },
+			  options: {
+				title: {
+					display: true,
+				    text: 'Faturamento com Créd. ICMS (R$)'
+				}
+			  }
+			});
+			
+			var ctxPag = document.getElementById("graficoPagamento").getContext("2d");
+			new Chart(ctxPag, {
+				  type: 'doughnut',
+				  data: {
+				    labels: listaGrafico[2].listaLabel,
+				    datasets: [{
+				    	label:'Pag. do período.',
+				      fill: false,
+				      backgroundColor: '#8fa8c8',
+				      pointBackgroundColor: '#75539e',
+				      borderColor: '#75539e',
+				      pointHighlightStroke: '#75539e',
+				      data: listaGrafico[2].listaDado,
+				    }]
+				  },
+				  options: {
+					title: {
+						display: true,
+					    text: 'Pagamentos (R$)'
+					}
+				  }
+				});
+				
+			
 		});
 		
 		request.fail(function(request, status, excecao) {
@@ -80,6 +126,7 @@ $(document).ready(function() {
 	inserirMascaraData('dataInicial');
 	inserirMascaraData('dataFinal');
 	
+	$('#botaoPesquisarPagamentoPeriodo').click();
 });
 </script>
 
@@ -104,11 +151,14 @@ $(document).ready(function() {
 				</div>
 				
 		</fieldset>
-	<div class="input" style="width: 40%">
-		<canvas id="myChart" ></canvas>
+	<div class="input" style="width: 50%">
+		<canvas id="graficoFluxoMensal" ></canvas>
 	</div>
-	<div class="input" style="width: 40%">
-		<canvas id="bar-chart-grouped" ></canvas>
+	<div class="input" style="width: 50%">
+		<canvas id="graficoFaturamentoMensal" ></canvas>
+	</div>
+	<div class="input" style="width: 50%">
+		<canvas id="graficoPagamento" ></canvas>
 	</div>
 </body>
 </html>

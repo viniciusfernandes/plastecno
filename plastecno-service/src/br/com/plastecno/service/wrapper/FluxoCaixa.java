@@ -142,6 +142,29 @@ public class FluxoCaixa {
 		return lFluxoMes;
 	}
 
+	public List<Fluxo> gerarFluxoByTipoPagamento() {
+		Map<TipoPagamento, Fluxo> mapTipo = new HashMap<>();
+		List<Fluxo> lFluxoPag = new ArrayList<>();
+		Fluxo f = null;
+		TipoPagamento tpPag = null;
+		for (Fluxo fluxo : lFluxo) {
+			tpPag = fluxo.getTipoPagamento();
+			if (tpPag == null) {
+				continue;
+			}
+
+			if ((f = mapTipo.get(tpPag)) == null) {
+				f = new Fluxo(fluxo.getDtVencimento(), fluxo.getValPagamento(), fluxo.getTipoPagamento(),
+						fluxo.getValCredICMS(), fluxo.getValDuplicata());
+				mapTipo.put(tpPag, f);
+				lFluxoPag.add(f);
+				continue;
+			}
+			f.adicionar(fluxo.getValPagamento(), fluxo.getValCredICMS(), 0d);
+		}
+		return lFluxoPag;
+	}
+
 	private boolean isDataVencimentoValida(Date dtVencimento) {
 		return dtVencimento != null
 				&& (dtVencimento.compareTo(dataInicial) >= 0 && dtVencimento.compareTo(dataFinal) <= 0);

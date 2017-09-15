@@ -96,15 +96,11 @@ $(document).ready(function() {
 			new Chart(ctxPag, {
 				  type: 'doughnut',
 				  data: {
-				    labels: listaGrafico[2].listaLabel,
+				    labels: listaGrafico[3].listaLabel,
 				    datasets: [{
 				    	label:'Pag. do período.',
-				      fill: false,
-				      backgroundColor: '#8fa8c8',
-				      pointBackgroundColor: '#75539e',
-				      borderColor: '#75539e',
-				      pointHighlightStroke: '#75539e',
-				      data: listaGrafico[2].listaDado,
+				      backgroundColor: ['#7db9e8', '#76DB79', '#E8997D', '#A85A8B'],
+				      data: listaGrafico[3].listaDado,
 				    }]
 				  },
 				  options: {
@@ -151,14 +147,14 @@ $(document).ready(function() {
 				</div>
 				
 		</fieldset>
-	<div class="input" style="width: 50%">
+	<div class="input" style="width: 50%; height: 20%">
 		<canvas id="graficoFluxoMensal" ></canvas>
 	</div>
-	<div class="input" style="width: 50%">
+	<div class="input" style="width: 50%; height: 20%">
 		<canvas id="graficoFaturamentoMensal" ></canvas>
 	</div>
-	<div class="input" style="width: 50%">
-		<canvas id="graficoPagamento" ></canvas>
+	<div class="input" style="width: 50%; height: 20%; margin-top: 2%">
+		<canvas id="graficoPagamento"></canvas>
 	</div>
 </body>
 </html>

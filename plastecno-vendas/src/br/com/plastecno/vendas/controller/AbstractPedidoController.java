@@ -121,7 +121,7 @@ public class AbstractPedidoController extends AbstractController {
         item.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedidoIPI()));
         item.setValorICMSFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getValorICMS())));
         item.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getPrecoUnidadeIPI())));
-
+        item.setValorTotalPedidoSemFreteFormatado(NumeroUtils.formatarValorMonetario(item.getValorTotalPedidoSemFrete()));
         if (item.contemAliquotaComissao()) {
             item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaComissao()));
         }

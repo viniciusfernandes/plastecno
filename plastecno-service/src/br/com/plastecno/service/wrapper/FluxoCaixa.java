@@ -81,6 +81,7 @@ public class FluxoCaixa {
 			}
 			f.adicionar(fluxo.getValPagamento(), fluxo.getValCredICMS(), fluxo.getValDuplicata());
 		}
+		ordernar(lFluxoAno);
 		return lFluxoAno;
 	}
 

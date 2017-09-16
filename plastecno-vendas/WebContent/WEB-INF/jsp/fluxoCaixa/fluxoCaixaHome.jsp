@@ -20,11 +20,12 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
+	var charts = new Array();
 	
 	$('#botaoPesquisarPagamentoPeriodo').click(function(){
 		var request = $.ajax({
 			type: 'get',
-			url: '<c:url value="/fluxocaixa/grafico/bar/mes"/>',
+			url: '<c:url value="/fluxocaixa/graficos"/>',
 			data: {dataInicial: $('#dataInicial').val(), dataFinal: $('#dataFinal').val()}
 		});
 		
@@ -40,6 +41,12 @@ $(document).ready(function() {
 				return;
 			}
 
+			if(charts.length >0){
+				for (var i = 0; i < charts.length; i++) {
+					charts[i].destroy();
+				}
+			}
+			
 			var datasets = new Array();
 			var rgb = [{r:76, g:181, b:56}, {r:69 , g:146, b:224}, {r:219, g:100, b:169}];
 			for (var i = 0; i < 3; i++) {
@@ -54,7 +61,7 @@ $(document).ready(function() {
 		        };
 			}			
 			var ctxFlx = document.getElementById('graficoFluxoMensal').getContext('2d');
-			new Chart(ctxFlx, {
+			var grfFluxMensal = new Chart(ctxFlx, {
 			    type: 'bar',
 			    data: {
 			        labels: listaGrafico[0].listaLabel,
@@ -70,12 +77,12 @@ $(document).ready(function() {
 			
 
 			var ctxLine = document.getElementById("graficoFaturamentoMensal").getContext("2d");
-			new Chart(ctxLine, {
+			var grfFatMensal = new Chart(ctxLine, {
 			  type: 'line',
 			  data: {
 			    labels: listaGrafico[2].listaLabel,
 			    datasets: [{
-			    	label:'Val. Mensal.',
+			    	label:'Valores',
 			      fill: false,
 			      backgroundColor: '#8fa8c8',
 			      pointBackgroundColor: '#75539e',
@@ -87,19 +94,40 @@ $(document).ready(function() {
 			  options: {
 				title: {
 					display: true,
-				    text: 'Faturamento com Créd. ICMS (R$)'
+				    text: 'Faturamento Mensal com Créd. ICMS (R$)'
 				}
 			  }
 			});
 			
+			var ctxFatAnual = document.getElementById("graficoFaturamentoAnual").getContext("2d");
+			var grfFatAnual = new Chart(ctxFatAnual, {
+			  type: 'bar',
+			  data: {
+			    labels: listaGrafico[4].listaLabel,
+			    datasets: [{
+			    	label:'Valores',
+			      backgroundColor: '#C96AC3',
+			      borderColor: '#75539e',
+			      data: listaGrafico[4].listaDado,
+			    }]
+			  },
+			  options: {
+				title: {
+					display: true,
+				    text: 'Faturamento Anual com Créd. ICMS (R$)'
+				}
+			  }
+			});
+			
+			
 			var ctxPag = document.getElementById("graficoPagamento").getContext("2d");
-			new Chart(ctxPag, {
+			var grfPag = new Chart(ctxPag, {
 				  type: 'doughnut',
 				  data: {
 				    labels: listaGrafico[3].listaLabel,
 				    datasets: [{
 				    	label:'Pag. do período.',
-				      backgroundColor: ['#7db9e8', '#76DB79', '#E8997D', '#A85A8B'],
+				      backgroundColor: ['#7db9e8', '#76DB79', '#E8997D', '#A85A8B', '#C5CC6E', '#C9776C', '#5999A5'],
 				      data: listaGrafico[3].listaDado,
 				    }]
 				  },
@@ -111,7 +139,10 @@ $(document).ready(function() {
 				  }
 				});
 				
-			
+			charts[0] = grfFluxMensal;
+			charts[1] = grfFatMensal;
+			charts[2] = grfPag;
+			charts[3] = grfFatAnual;
 		});
 		
 		request.fail(function(request, status, excecao) {
@@ -155,6 +186,9 @@ $(document).ready(function() {
 	</div>
 	<div class="input" style="width: 50%; height: 20%; margin-top: 2%">
 		<canvas id="graficoPagamento"></canvas>
+	</div>
+	<div class="input" style="width: 50%; height: 20%; margin-top: 2%">
+		<canvas id="graficoFaturamentoAnual"></canvas>
 	</div>
 </body>
 </html>

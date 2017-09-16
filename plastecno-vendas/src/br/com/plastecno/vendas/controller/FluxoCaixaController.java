@@ -46,13 +46,14 @@ public class FluxoCaixaController extends AbstractController {
     public FluxoCaixaController(Result result) {
         super(result);
     }
+
     @Get("fluxocaixa")
     public void fluxoCaixaHome() {
         addPeriodo(gerarDataInicioAno(), gerarDataFimAno());
     }
 
-    @Get("fluxocaixa/grafico/bar/mes")
-    public void gerarGraficoBarMensal(Date dataInicial, Date dataFinal) {
+    @Get("fluxocaixa/graficos")
+    public void gerarGraficos(Date dataInicial, Date dataFinal) {
         try {
             FluxoCaixa fluxoCaixa = faturamentoService.gerarFluxoFaixaByPeriodo(new Periodo(dataInicial, dataFinal));
             List<Fluxo> lFluxo = fluxoCaixa.gerarFluxoByMes();
@@ -60,6 +61,7 @@ public class FluxoCaixaController extends AbstractController {
             GraficoBar2D gValPag = new GraficoBar2D("Saída");
             GraficoBar2D gValDup = new GraficoBar2D("Entrada");
             GraficoBar2D gValTipoPag = new GraficoBar2D("Tipo Pagamento");
+            GraficoBar2D gValFatAnual = new GraficoBar2D("Faturamento Anual");
 
             String label = null;
             for (Fluxo f : lFluxo) {
@@ -75,11 +77,18 @@ public class FluxoCaixaController extends AbstractController {
                         NumeroUtils.arredondarValorMonetario(f.getValPagamento()));
             }
 
+            List<Fluxo> lFluxoAnual = fluxoCaixa.gerarFluxoByAno();
+            for (Fluxo f : lFluxoAnual) {
+                gValFatAnual.adicionar(String.valueOf(f.getAno()),
+                        NumeroUtils.arredondarValorMonetario(f.getValFluxo()));
+            }
+
             List<GraficoBar2D> lGrafico = new ArrayList<>();
             lGrafico.add(gValDup);
             lGrafico.add(gValPag);
             lGrafico.add(gValFluxo);
             lGrafico.add(gValTipoPag);
+            lGrafico.add(gValFatAnual);
             serializarJson(new SerializacaoJson("listaGrafico", lGrafico).incluirAtributo("listaLabel", "listaDado"));
 
         } catch (BusinessException e) {

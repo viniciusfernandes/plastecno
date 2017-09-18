@@ -110,8 +110,6 @@ public class PedidoController extends AbstractPedidoController {
     public PedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
-        verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS,
-                TipoAcesso.CADASTRO_PEDIDO_COMPRA);
 
         super.setClienteService(clienteService);
         super.setPedidoService(pedidoService);
@@ -263,8 +261,6 @@ public class PedidoController extends AbstractPedidoController {
         addAtributo("descricaoTipoPedido", TipoPedido.REPRESENTACAO.getDescricao());
         addAtributo("inclusaoDadosNFdesabilitado", false);
         addAtributo("listaCST", TipoCST.values());
-        addAtributo("acessoDadosNotaFiscalPermitido",
-                isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_PEDIDO_COMPRA));
 
         // verificando se o parametro para desabilitar ja foi incluido em outro
         // fluxo

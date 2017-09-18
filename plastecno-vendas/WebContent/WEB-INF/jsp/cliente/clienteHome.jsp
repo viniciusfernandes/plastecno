@@ -3,7 +3,7 @@
 <!DOCTYPE html >
 <html>
 <head>
-<meta charset="utf-8">
+<meta>
 
 <jsp:include page="/bloco/bloco_css.jsp"></jsp:include>
 

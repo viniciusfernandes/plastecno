@@ -64,11 +64,11 @@ public class OrcamentoController extends AbstractPedidoController {
             HttpServletRequest request, Validator validador) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
         this.validador = validador;
-        verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS);
+       
 
-        super.setClienteService(clienteService);
-        super.setPedidoService(pedidoService);
-        super.setRelatorioService(relatorioService);
+        setClienteService(clienteService);
+        setPedidoService(pedidoService);
+        setRelatorioService(relatorioService);
     }
 
     @Post("orcamento/aceite/{id}")

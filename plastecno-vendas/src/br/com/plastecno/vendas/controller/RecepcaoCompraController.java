@@ -13,6 +13,7 @@ import br.com.plastecno.service.PagamentoService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.constante.FormaMaterial;
+import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
@@ -50,6 +51,8 @@ public class RecepcaoCompraController extends AbstractController {
 
     public RecepcaoCompraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
+        verificarPermissaoAcesso("acessoGeracaoPagamentoPermitida", TipoAcesso.CADASTRO_PEDIDO_COMPRA,
+                TipoAcesso.ADMINISTRACAO, TipoAcesso.RECEPCAO_COMPRA, TipoAcesso.OPERACAO_CONTABIL);
     }
 
     @Post("compra/item/pagamento/{idItem}")

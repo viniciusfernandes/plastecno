@@ -99,7 +99,9 @@
 				</c:if>
 				<li><a href="javascript: void(0)">Relatórios</a>
 					<ul>
-						<li><a href="fluxocaixa" target="principal_frame">Fluxo Caixa</a></li>
+						<c:if test="${acessoFluxoCaixaPermitido}">
+							<li><a href="fluxocaixa" target="principal_frame">Fluxo Caixa</a></li>
+						</c:if>
 						<c:if test="${acessoRelatorioDuplicataPermitido}">
 							<li><a href="relatorio/duplicata" target="principal_frame">Duplicatas</a></li>
 						</c:if>

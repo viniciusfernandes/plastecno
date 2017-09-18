@@ -17,7 +17,6 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
-import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoCST;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;

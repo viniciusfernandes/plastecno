@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class GraficoBar2D {
+public class Grafico2D {
     @XmlElement(name = "dados")
     private List<Double> listaDado = new ArrayList<>();
 
@@ -16,8 +16,7 @@ public class GraficoBar2D {
 
     private String titulo;
 
-    public GraficoBar2D(String titulo) {
-        super();
+    public Grafico2D(String titulo) {
         this.titulo = titulo;
     }
 
@@ -36,6 +35,18 @@ public class GraficoBar2D {
 
     public String getTitulo() {
         return titulo;
+    }
+
+    public void setListaDado(List<Double> listaDado) {
+        this.listaDado = listaDado;
+    }
+
+    public void setListaLabel(List<String> listaLabel) {
+        this.listaLabel = listaLabel;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
 }

@@ -1,6 +1,5 @@
 package br.com.plastecno.vendas.controller;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,8 @@ import br.com.plastecno.service.wrapper.FluxoCaixa;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
-import br.com.plastecno.vendas.json.GraficoBar2D;
+import br.com.plastecno.vendas.json.FluxoCaixaPainelGrafico2D;
+import br.com.plastecno.vendas.json.Grafico2D;
 import br.com.plastecno.vendas.json.SerializacaoJson;
 
 @Resource
@@ -57,39 +57,43 @@ public class FluxoCaixaController extends AbstractController {
         try {
             FluxoCaixa fluxoCaixa = faturamentoService.gerarFluxoFaixaByPeriodo(new Periodo(dataInicial, dataFinal));
             List<Fluxo> lFluxo = fluxoCaixa.gerarFluxoByMes();
-            GraficoBar2D gValFluxo = new GraficoBar2D("Fluxo");
-            GraficoBar2D gValPag = new GraficoBar2D("Saída");
-            GraficoBar2D gValDup = new GraficoBar2D("Entrada");
-            GraficoBar2D gValTipoPag = new GraficoBar2D("Tipo Pagamento");
-            GraficoBar2D gValFatAnual = new GraficoBar2D("Faturamento Anual");
+            Grafico2D grfFluxoMensal = new Grafico2D("Fluxo Mensal");
+            Grafico2D grfPagMensal = new Grafico2D("Pagamento Mesal");
+            Grafico2D grfFatMensal = new Grafico2D("Faturamento Mensal");
+            Grafico2D grfTipoPag = new Grafico2D("Tipo Pagamento");
+            Grafico2D gValFatAnual = new Grafico2D("Faturamento Anual");
 
+            // gerando os graficos mensais
             String label = null;
             for (Fluxo f : lFluxo) {
                 label = mapMes.get(f.getMes()) + "/" + f.getAno();
-                gValFluxo.adicionar(label, NumeroUtils.arredondarValorMonetario(f.getValFluxo()));
-                gValDup.adicionar(label, NumeroUtils.arredondarValorMonetario(f.getValDuplicata()));
-                gValPag.adicionar(label, NumeroUtils.arredondarValorMonetario(-f.getValPagamento()));
+                grfFluxoMensal.adicionar(label, NumeroUtils.arredondarValorMonetario(f.getValFluxo()));
+                grfFatMensal.adicionar(label, NumeroUtils.arredondarValorMonetario(f.getValDuplicata()));
+                grfPagMensal.adicionar(label, NumeroUtils.arredondarValorMonetario(-f.getValPagamento()));
             }
 
+            // gerando o grafico de pagamento por tipo de pagamento
             List<Fluxo> lFluxoPag = fluxoCaixa.gerarFluxoByTipoPagamento();
             for (Fluxo f : lFluxoPag) {
-                gValTipoPag.adicionar(f.getTipoPagamento().toString(),
+                grfTipoPag.adicionar(f.getTipoPagamento().toString(),
                         NumeroUtils.arredondarValorMonetario(f.getValPagamento()));
             }
 
+            // gerando o grafico de fluxo de caixa anual
             List<Fluxo> lFluxoAnual = fluxoCaixa.gerarFluxoByAno();
             for (Fluxo f : lFluxoAnual) {
                 gValFatAnual.adicionar(String.valueOf(f.getAno()),
                         NumeroUtils.arredondarValorMonetario(f.getValFluxo()));
             }
 
-            List<GraficoBar2D> lGrafico = new ArrayList<>();
-            lGrafico.add(gValDup);
-            lGrafico.add(gValPag);
-            lGrafico.add(gValFluxo);
-            lGrafico.add(gValTipoPag);
-            lGrafico.add(gValFatAnual);
-            serializarJson(new SerializacaoJson("listaGrafico", lGrafico).incluirAtributo("listaLabel", "listaDado"));
+            FluxoCaixaPainelGrafico2D grfPainel = new FluxoCaixaPainelGrafico2D();
+            grfPainel.setGraficoFaturamentoAnual(gValFatAnual);
+            grfPainel.setGraficoFaturamentoMensal(grfFatMensal);
+            grfPainel.setGraficoFluxoMensal(grfFluxoMensal);
+            grfPainel.setGraficoPagamentoMensal(grfPagMensal);
+            grfPainel.setGraficoTipoPagamento(grfTipoPag);
+
+            serializarJson(new SerializacaoJson("painelGrafico", grfPainel, true));
 
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));

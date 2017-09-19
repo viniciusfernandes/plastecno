@@ -4,6 +4,7 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import static br.com.plastecno.service.constante.TipoAcesso.*;
+import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 /**
@@ -16,9 +17,9 @@ public class MenuController extends AbstractController {
 
     public MenuController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
-        verificarPermissaoAcesso("acessoAdministracaoPermitido", ADMINISTRACAO);
         // verificarPermissaoAcesso("acessoManutencaoPermitido",
         // TipoAcesso.MANUTENCAO);
+        verificarPermissaoAcesso("acessoAdministracaoPermitido", ADMINISTRACAO);
         verificarPermissaoAcesso("acessoRelatorioClienteRegiaoPermitido", CONSULTA_RELATORIO_CLIENTE_REGIAO);
         verificarPermissaoAcesso("acessoRelatorioVendasRepresentadaPermitido", CONSULTA_RELATORIO_VENDAS_REPRESENTADA);
         verificarPermissaoAcesso("acessoRelatorioEntregaPermitido", CONSULTA_RELATORIO_ENTREGA);
@@ -34,6 +35,8 @@ public class MenuController extends AbstractController {
         verificarPermissaoAcesso("acessoRelatorioDuplicataPermitido", ADMINISTRACAO, FATURAMENTO);
         verificarPermissaoAcesso("acessoRelatorioFaturamentoPermitido", ADMINISTRACAO);
         verificarPermissaoAcesso("acessoPagamentoPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_COMPRA, OPERACAO_CONTABIL);
+        verificarPermissaoAcesso("acessoFluxoCaixaPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.FATURAMENTO,
+                TipoAcesso.OPERACAO_CONTABIL);
     }
 
     @Get("/")

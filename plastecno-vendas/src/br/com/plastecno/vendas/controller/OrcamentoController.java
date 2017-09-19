@@ -17,7 +17,6 @@ import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.FormaMaterial;
-import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoCST;
 import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
@@ -64,11 +63,11 @@ public class OrcamentoController extends AbstractPedidoController {
             HttpServletRequest request, Validator validador) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
         this.validador = validador;
-        verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS);
+       
 
-        super.setClienteService(clienteService);
-        super.setPedidoService(pedidoService);
-        super.setRelatorioService(relatorioService);
+        setClienteService(clienteService);
+        setPedidoService(pedidoService);
+        setRelatorioService(relatorioService);
     }
 
     @Post("orcamento/aceite/{id}")

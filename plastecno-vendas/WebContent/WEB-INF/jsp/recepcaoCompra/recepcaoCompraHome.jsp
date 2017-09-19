@@ -156,6 +156,7 @@ function recepcionarItem(botao){
 		</fieldset>
 	</form>
 	
+	<c:if test="acessoGeracaoPagamentoPermitida">
 	<form id="formPagamento">
 	<fieldset>
 		<legend>Pagamento</legend>
@@ -195,6 +196,7 @@ function recepcionarItem(botao){
 		</div>
 	</fieldset>
 	</form>
+	</c:if>
 	
 	<c:if test="${not empty itemPedido}">
 		<jsp:include page="/bloco/bloco_edicao_item.jsp"/>

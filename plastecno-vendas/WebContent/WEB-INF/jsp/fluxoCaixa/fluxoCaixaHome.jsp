@@ -36,35 +36,36 @@ $(document).ready(function() {
 				return;
 			}
 			
-			var listaGrafico = response.listaGrafico;
-			if(listaGrafico == undefined){
+			var painel = response.painelGrafico;
+			if(painel == undefined){
 				return;
 			}
-
+			<%-- Limpando os grafico para uma nova renderizacao --%>
 			if(charts.length >0){
 				for (var i = 0; i < charts.length; i++) {
 					charts[i].destroy();
 				}
 			}
-			
+			<%-- Criando arrays dos grafico apenas para a inicializacao do dataset --%>
+			var graficos = [painel.graficoFluxoMensal, painel.graficoFaturamentoMensal, painel.graficoPagamentoMensal];
 			var datasets = new Array();
-			var rgb = [{r:76, g:181, b:56}, {r:69 , g:146, b:224}, {r:219, g:100, b:169}];
-			for (var i = 0; i < 3; i++) {
-				if(listaGrafico[i].listaLabel == undefined || listaGrafico[i].listaDado == undefined){
-					gerarListaMensagemErro(['A lista de labels e dados do gráfico '+listaGrafico[i].titulo+ ' estão em branco e devem ser enviadas']);
+			var cores = ['#4CB538', '#4592E0', '#DB64A9'];
+			for (var i = 0; i < graficos.length; i++) {
+				if(graficos[i].listaLabel == undefined || graficos[i].listaDado == undefined){
+					gerarListaMensagemErro(['A lista de labels e dados do gráfico '+graficos[i].titulo+ ' estão em branco e devem ser enviadas']);
 					return;
 				}
 				datasets[i] = {
-		            label: listaGrafico[i].titulo,
-		            backgroundColor: 'rgb('+rgb[i].r+', '+rgb[i].g+', '+rgb[i].b+')',
-		            data: listaGrafico[i].listaDado
+		            label: graficos[i].titulo,
+		            backgroundColor: cores[i],
+		            data: graficos[i].listaDado
 		        };
 			}			
 			var ctxFlx = document.getElementById('graficoFluxoMensal').getContext('2d');
-			var grfFluxMensal = new Chart(ctxFlx, {
+			 charts[0] = new Chart(ctxFlx, {
 			    type: 'bar',
 			    data: {
-			        labels: listaGrafico[0].listaLabel,
+			        labels: graficos[0].listaLabel,
 			        datasets: datasets
 			    },
 			    options: {
@@ -77,10 +78,10 @@ $(document).ready(function() {
 			
 
 			var ctxLine = document.getElementById("graficoFaturamentoMensal").getContext("2d");
-			var grfFatMensal = new Chart(ctxLine, {
+			charts[1] = new Chart(ctxLine, {
 			  type: 'line',
 			  data: {
-			    labels: listaGrafico[2].listaLabel,
+			    labels: painel.graficoFaturamentoMensal.listaLabel,
 			    datasets: [{
 			    	label:'Valores',
 			      fill: false,
@@ -88,7 +89,7 @@ $(document).ready(function() {
 			      pointBackgroundColor: '#75539e',
 			      borderColor: '#75539e',
 			      pointHighlightStroke: '#75539e',
-			      data: listaGrafico[2].listaDado,
+			      data: painel.graficoFaturamentoMensal.listaDado,
 			    }]
 			  },
 			  options: {
@@ -100,15 +101,15 @@ $(document).ready(function() {
 			});
 			
 			var ctxFatAnual = document.getElementById("graficoFaturamentoAnual").getContext("2d");
-			var grfFatAnual = new Chart(ctxFatAnual, {
+			charts[2] = new Chart(ctxFatAnual, {
 			  type: 'bar',
 			  data: {
-			    labels: listaGrafico[4].listaLabel,
+			    labels: painel.graficoFaturamentoAnual.listaLabel,
 			    datasets: [{
 			    	label:'Valores',
 			      backgroundColor: '#C96AC3',
 			      borderColor: '#75539e',
-			      data: listaGrafico[4].listaDado,
+			      data:  painel.graficoFaturamentoAnual.listaDado,
 			    }]
 			  },
 			  options: {
@@ -120,15 +121,15 @@ $(document).ready(function() {
 			});
 			
 			
-			var ctxPag = document.getElementById("graficoPagamento").getContext("2d");
-			var grfPag = new Chart(ctxPag, {
+			var ctxPag = document.getElementById("graficoTipoPagamento").getContext("2d");
+			charts[3] = new Chart(ctxPag, {
 				  type: 'doughnut',
 				  data: {
-				    labels: listaGrafico[3].listaLabel,
+				    labels: painel.graficoTipoPagamento.listaLabel,
 				    datasets: [{
 				    	label:'Pag. do período.',
 				      backgroundColor: ['#7db9e8', '#76DB79', '#E8997D', '#A85A8B', '#C5CC6E', '#C9776C', '#5999A5'],
-				      data: listaGrafico[3].listaDado,
+				      data: painel.graficoTipoPagamento.listaDado,
 				    }]
 				  },
 				  options: {
@@ -138,11 +139,6 @@ $(document).ready(function() {
 					}
 				  }
 				});
-				
-			charts[0] = grfFluxMensal;
-			charts[1] = grfFatMensal;
-			charts[2] = grfPag;
-			charts[3] = grfFatAnual;
 		});
 		
 		request.fail(function(request, status, excecao) {
@@ -185,7 +181,7 @@ $(document).ready(function() {
 		<canvas id="graficoFaturamentoMensal" ></canvas>
 	</div>
 	<div class="input" style="width: 50%; height: 20%; margin-top: 2%">
-		<canvas id="graficoPagamento"></canvas>
+		<canvas id="graficoTipoPagamento"></canvas>
 	</div>
 	<div class="input" style="width: 50%; height: 20%; margin-top: 2%">
 		<canvas id="graficoFaturamentoAnual"></canvas>

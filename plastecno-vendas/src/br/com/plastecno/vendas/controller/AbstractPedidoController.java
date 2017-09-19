@@ -64,6 +64,9 @@ public class AbstractPedidoController extends AbstractController {
     public AbstractPedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
+        verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS);
+        verificarPermissaoAcesso("acessoDadosNotaFiscalPermitido", TipoAcesso.ADMINISTRACAO,
+                TipoAcesso.CADASTRO_PEDIDO_COMPRA);
     }
 
     void configurarTipoPedido(TipoPedido tipoPedido) {

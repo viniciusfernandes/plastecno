@@ -42,9 +42,9 @@ body {
 
 .logo {
 	background-image: url("../../images/logo_plastecno.jpg");
-	background-position: 10% left;
+	background-position: center center;
 	background-repeat: no-repeat;
-	height: 80px;
+	height: 70px;
 }
 
 .enfeite {
@@ -71,6 +71,7 @@ nav ul {
 	height: 100%;
 	list-style: none;
 	position: relative;
+	margin: 0px;
 }
 
 nav ul:after {
@@ -117,7 +118,7 @@ nav ul ul li {
 }
 
 nav ul ul li a {
-	background-color: #DBFBFF;
+	background-color: #277696;
 	padding: 5px 25px;
 	color: white;
 }

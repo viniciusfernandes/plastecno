@@ -156,7 +156,7 @@ function recepcionarItem(botao){
 		</fieldset>
 	</form>
 	
-	<c:if test="acessoGeracaoPagamentoPermitida">
+	<c:if test="${acessoGeracaoPagamentoPermitida}">
 	<form id="formPagamento">
 	<fieldset>
 		<legend>Pagamento</legend>

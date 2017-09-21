@@ -54,7 +54,7 @@ $(document).ready(function(){
 	inserirMascaraMonetaria('peso', 8);
 	inserirMascaraMonetaria('medidaExterna', 8);
 	inserirMascaraMonetaria('medidaInterna', 8);
-	inserirMascaraNumerica('prazoEntrega', '999');
+	inserirMascaraNumerica('prazoEntregaItem', '999');
 });
 
 function gerarParametrosMedidasItem(){

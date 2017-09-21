@@ -137,7 +137,8 @@ $(document).ready(function() {
 	inserirMascaraNumerica('numeroPedidoPesquisa', '9999999');
 	inserirMascaraMonetaria('fretePedido', 7);
 	inserirMascaraNumerica('validade', '999');
-
+	inserirMascaraNumerica('prazoEntrega', '999');
+	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	inicializarAutocompleteCliente('<c:url value="/pedido/cliente"/>', function(cliente){

@@ -270,7 +270,7 @@ function inserirOrcamento(){
 		<input type="hidden" id="idSituacaoPedido"  name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
 		
 	<fieldset>
-		<legend>Orçamento</legend>
+		<legend>::: Orçamento :::</legend>
 		
 		<div class="label" style="width: 56%">Dt. Envio:</div>
 		<div class="input" style="width: 30%">

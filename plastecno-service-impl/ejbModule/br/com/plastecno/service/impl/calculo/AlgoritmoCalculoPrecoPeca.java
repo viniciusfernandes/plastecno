@@ -8,7 +8,7 @@ public class AlgoritmoCalculoPrecoPeca implements AlgoritmoCalculo {
 	@Override
 	public double calcular(ItemPedido itemPedido) throws AlgoritmoCalculoException {
 		CalculadoraItem.validarVolume(itemPedido);
-		return itemPedido.calcularPrecoTotal();
+		return itemPedido.calcularPrecoTotalVenda();
 	}
 
 }

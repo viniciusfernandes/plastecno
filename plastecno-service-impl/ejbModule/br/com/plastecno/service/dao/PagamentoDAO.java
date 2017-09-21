@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
+import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.entity.Pagamento;
 
 public class PagamentoDAO extends GenericDAO<Pagamento> {
@@ -64,12 +66,20 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 						Pagamento.class).setParameter("numeroNF", numeroNF).getResultList();
 	}
 
-	public List<Pagamento> pesquisarPagamentoByPeriodo(Date dataInicio, Date dataFim) {
-		return entityManager
-				.createQuery(
-						"select p from Pagamento p where p.dataVencimento >=:dataInicio and p.dataVencimento <=:dataFim order by p.dataVencimento asc",
-						Pagamento.class).setParameter("dataInicio", dataInicio).setParameter("dataFim", dataFim)
-				.getResultList();
+	public List<Pagamento> pesquisarPagamentoByPeriodo(Date dataInicio, Date dataFim, List<TipoPagamento> listaTipo) {
+		StringBuilder s = new StringBuilder();
+		s.append("select p from Pagamento p where p.dataVencimento >=:dataInicio and p.dataVencimento <=:dataFim ");
+		if (listaTipo != null && listaTipo.size() > 0) {
+			s.append("and p.tipoPagamento in (:listaTipo) ");
+		}
+		s.append("order by p.dataVencimento asc");
+
+		TypedQuery<Pagamento> q = entityManager.createQuery(s.toString(), Pagamento.class)
+				.setParameter("dataInicio", dataInicio).setParameter("dataFim", dataFim);
+		if (listaTipo != null && listaTipo.size() > 0) {
+			q.setParameter("listaTipo", listaTipo);
+		}
+		return q.getResultList();
 	}
 
 	public List<Integer[]> pesquisarQuantidadePagaByIdItem(List<Integer> listaIdItem) {

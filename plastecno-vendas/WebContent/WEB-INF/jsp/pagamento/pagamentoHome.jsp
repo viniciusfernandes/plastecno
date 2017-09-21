@@ -117,7 +117,6 @@ function removerPagamento(botao){
 					<th style="width: 3%">Sit.</th>
 					<th style="width: 7%">Venc.</th>
 					<th style="width: 7%">NF</th>
-					<th style="width: 7%">Val. NF(R$)</th>
 					<th style="width: 7%">Ped.</th>
 					<th style="width: 2%">Item</th>
 					<th style="width: 37%">Desc.</th>
@@ -125,6 +124,7 @@ function removerPagamento(botao){
 					<th style="width: 8%">Forn.</th>
 					<th style="width: 5%">ICMS(R$)</th>
 					<th style="width: 7%">Val.(R$)</th>
+					<th style="width: 7%">Total (R$)</th>
 					<th colspan="2" style="width: 7%">Ação</th>
 				</tr>
 			</thead>
@@ -146,7 +146,6 @@ function removerPagamento(botao){
 								</c:choose>
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['dataVencimento']}</td>
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['numeroNF']}</td>
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['valorNF']}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.idPedido}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.sequencialItem}</td>
@@ -155,6 +154,9 @@ function removerPagamento(botao){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeFornecedor}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valorCreditoICMS}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
+							<c:if test="${iElemento.count le 1}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['valorTotal']}</td>
+							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" style="width: 5%">
 								<div class="coluna_acoes_listagem">
 								<div class="input" style="width: 50%">
@@ -221,7 +223,6 @@ function removerPagamento(botao){
 								</c:choose>
 								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center">${elemento.dataVencimentoFormatada}</td>
 								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"></td>
-								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"></td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.descricao}</td>
@@ -229,6 +230,7 @@ function removerPagamento(botao){
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
+							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center">${elemento.valor}</td>
 							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" colspan="2">
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/pagamento/"/>${elemento.id}" >

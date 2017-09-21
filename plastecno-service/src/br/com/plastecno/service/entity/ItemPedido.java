@@ -362,7 +362,7 @@ public class ItemPedido extends Item {
 		setQuantidadeReservada(getQuantidadeReservada() + quantidadeReservada);
 	}
 
-	public double calcularPrecoTotal() {
+	public double calcularPrecoTotalVenda() {
 		return this.quantidade != null && precoVenda != null ? quantidade * precoVenda : 0d;
 	}
 
@@ -619,7 +619,7 @@ public class ItemPedido extends Item {
 	}
 
 	public double getValorTotal() {
-		return calcularPrecoTotal();
+		return calcularPrecoTotalVenda();
 	}
 
 	public double getValorTotalIPI() {

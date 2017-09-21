@@ -17,8 +17,6 @@ public interface PagamentoService {
 
 	RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(List<Pagamento> lPagamento, Periodo periodo);
 
-	RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(Periodo periodo);
-
 	Integer inserir(Pagamento pagamento) throws BusinessException;
 
 	void inserirPagamentoParceladoItemPedido(Integer numeroNF, Double valorNF, Date dataVencimento, Date dataEmissao,
@@ -41,6 +39,8 @@ public interface PagamentoService {
 	List<Pagamento> pesquisarPagamentoByNF(Integer numeroNF);
 
 	List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo);
+
+	List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo, boolean apenasInsumos);
 
 	void remover(Integer idPagamento) throws BusinessException;
 

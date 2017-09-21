@@ -159,15 +159,15 @@ function recepcionarItem(botao){
 	<c:if test="${acessoGeracaoPagamentoPermitida}">
 	<form id="formPagamento">
 	<fieldset>
-		<legend>Pagamento</legend>
+		<legend>::: Pagamento :::</legend>
 		<div class="label" >Dt. Emiss.:</div>
 		<div class="input" style="width: 10%">
-			<input type="text" id="dataEmissao" name="pagamento.dataEmissao" value="${pagamento.dataEmissaoFormatada}" style="width: 100%"/>
+			<input type="text" id="dataEmissao" name="pagamento.dataEmissao" value="${dataEmissaoFormatada}" style="width: 100%"/>
 		</div>
 		
 		<div class="label" style="width: 10%">Dt. Receb.:</div>
 		<div class="input" style="width: 60%">
-			<input type="text" id="dataRecebimento" name="pagamento.dataRecebimento" value="${pagamento.dataRecebimentoFormatada}" style="width: 17%" />
+			<input type="text" id="dataRecebimento" name="pagamento.dataRecebimento" value="${dataRecebimentoFormatada}" style="width: 17%" />
 		</div>
 		
 		<div class="label obrigatorio">NF:</div>

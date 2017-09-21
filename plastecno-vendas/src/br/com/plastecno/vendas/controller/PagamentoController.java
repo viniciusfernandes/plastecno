@@ -11,6 +11,7 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.PagamentoService;
 import br.com.plastecno.service.RepresentadaService;
+import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Pagamento;
@@ -20,6 +21,7 @@ import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
+import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class PagamentoController extends AbstractController {
@@ -29,8 +31,8 @@ public class PagamentoController extends AbstractController {
     @Servico
     private RepresentadaService representadaService;
 
-    public PagamentoController(Result result, HttpServletRequest request) {
-        super(result, request);
+    public PagamentoController(Result result, UsuarioInfo usuarioInfo, HttpServletRequest request) {
+        super(result, usuarioInfo, request);
     }
 
     private void addPagamento(Pagamento p) {
@@ -40,7 +42,9 @@ public class PagamentoController extends AbstractController {
     }
 
     private void gerarRelatorioPagamento(Date dataInicial, Date dataFinal) throws InformacaoInvalidaException {
-        gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByPeriodo(new Periodo(dataInicial, dataFinal)),
+        boolean exibirApenasInsumos = !isAcessoPermitido(TipoAcesso.OPERACAO_CONTABIL, TipoAcesso.ADMINISTRACAO);
+        gerarRelatorioPagamento(
+                pagamentoService.pesquisarPagamentoByPeriodo(new Periodo(dataInicial, dataFinal), exibirApenasInsumos),
                 dataInicial, dataFinal);
     }
 

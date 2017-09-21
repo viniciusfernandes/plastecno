@@ -570,6 +570,8 @@ public class NFeServiceImpl implements NFeService {
 	private List<DuplicataNFe> gerarDuplicataByIdPedido(Integer idPedido, boolean isDataAmericana) {
 		List<Date> listaData = pedidoService.calcularDataPagamento(idPedido);
 		double totalParcelas = listaData.size();
+		// EStamos retornando uma lista vazia de duplicatas pois para indicar
+		// que o pagamento da NF foi realizado a vista.
 		if (totalParcelas <= 0) {
 			return new ArrayList<DuplicataNFe>();
 		}

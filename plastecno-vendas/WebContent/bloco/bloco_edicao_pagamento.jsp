@@ -41,7 +41,7 @@ $(document).ready(function() {
 		<input type="hidden" id="idItemPedidoPagamento" name="pagamento.idItemPedido" value="${pagamento.idItemPedido}"/>
 		
 	<fieldset>
-		<legend>Pagamento</legend>
+		<legend>::: Pagamento :::</legend>
 		<div class="label">Dt. Venc.:</div>
 		<div class="input" style="width: 10%">
 			<input type="text" id="dataVencimento" name="pagamento.dataVencimento" value="${pagamento.dataVencimentoFormatada}" style="width: 100%" />

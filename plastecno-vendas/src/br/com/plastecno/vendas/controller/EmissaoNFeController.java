@@ -378,7 +378,7 @@ public class EmissaoNFeController extends AbstractController {
             val[5] = i.getSequencial();
             val[6] = i.getQuantidade();
             val[7] = i.getTipoVenda().toString();
-            val[8] = NumeroUtils.arredondarValorMonetario(i.calcularPrecoTotal());
+            val[8] = NumeroUtils.arredondarValorMonetario(i.calcularPrecoTotalVenda());
             val[9] = NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade());
             val[10] = NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade());
             val[11] = NumeroUtils.arredondarValorMonetario(i.calcularValorICMS());

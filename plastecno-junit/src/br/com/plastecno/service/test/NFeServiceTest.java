@@ -154,7 +154,7 @@ public class NFeServiceTest extends AbstractTest {
 			ICMSGeral icmsGeral = new ICMSGeral();
 			icmsGeral.setCodigoSituacaoTributaria(TipoTributacaoICMS.ICMS_00.getCodigo());
 			icmsGeral.setAliquota(0.10);
-			icmsGeral.setValorBC(item.calcularPrecoTotal());
+			icmsGeral.setValorBC(item.calcularPrecoTotalVenda());
 			icmsGeral.setModalidadeDeterminacaoBC(TipoModalidadeDeterminacaoBCICMS.VALOR_OPERACAO.getCodigo());
 			icmsGeral.setOrigemMercadoria(TipoOrigemMercadoria.NACIONAL.getCodigo());
 
@@ -162,13 +162,13 @@ public class NFeServiceTest extends AbstractTest {
 			cofinsGeral.setAliquota(0.10);
 			cofinsGeral.setCodigoSituacaoTributaria(TipoTributacaoCOFINS.COFINS_1.getCodigo());
 			cofinsGeral.setQuantidadeVendida((double) item.getQuantidade());
-			cofinsGeral.setValorBC(item.calcularPrecoTotal());
+			cofinsGeral.setValorBC(item.calcularPrecoTotalVenda());
 
 			PISGeral pisGeral = new PISGeral();
 			pisGeral.setAliquota(0.20);
 			pisGeral.setCodigoSituacaoTributaria(TipoTributacaoPIS.PIS_1.getCodigo());
 			pisGeral.setQuantidadeVendida((double) item.getQuantidade());
-			pisGeral.setValorBC(item.calcularPrecoTotal());
+			pisGeral.setValorBC(item.calcularPrecoTotalVenda());
 
 			trib = new TributosProdutoServico();
 			trib.setIcms(new ICMS(icmsGeral));

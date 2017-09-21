@@ -25,6 +25,7 @@ import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
+import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
@@ -147,6 +148,8 @@ public class RecepcaoCompraController extends AbstractController {
         addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
+        addAtributo("dataEmissaoFormatada", StringUtils.formatarData(new Date()));
+        addAtributo("dataRecebimentoFormatada", StringUtils.formatarData(new Date()));
     }
 
     @Post("compra/item/recepcaoparcial")

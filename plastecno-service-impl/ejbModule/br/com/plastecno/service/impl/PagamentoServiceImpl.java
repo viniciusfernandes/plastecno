@@ -22,6 +22,7 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.wrapper.GrupoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
+import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
 
@@ -67,7 +68,8 @@ public class PagamentoServiceImpl implements PagamentoService {
 		p.setSequencialItem(i.getSequencial());
 		p.setTipoPagamento(TipoPagamento.INSUMO);
 		p.setTotalParcelas(calcularTotalParcelas(i.getIdPedido()));
-		p.setValor(i.getValorTotalIPI());
+		// Nao devemos usar o valor total pois na compra o IPI nao eh destacado.
+		p.setValor(i.calcularPrecoItem());
 		p.setValorCreditoICMS(i.getValorICMS());
 		return p;
 	}
@@ -85,6 +87,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 		GrupoWrapper<String, Pagamento> gr = null;
 		Double val = null;
+		final String vlTotal = "valorTotal";
 		for (Pagamento p : lPagamento) {
 			// Agrupando os pagamentos de compra pelo numero da NF.
 			if (p.getNumeroNF() != null) {
@@ -97,26 +100,27 @@ public class PagamentoServiceImpl implements PagamentoService {
 				gr.setPropriedade("liquidado", p.isLiquidado());
 				gr.setPropriedade("vencido", !p.isLiquidado() && p.isVencido());
 
-				val = (Double) gr.getPropriedade("valorNF");
+				val = (Double) gr.getPropriedade(vlTotal);
 				if (val == null) {
 					val = 0d;
 				}
 
 				// O valor da NF do relatorio deve ser a soma de todos valores
 				// dos itens.
-				gr.setPropriedade("valorNF", val + p.getValor());
+				gr.setPropriedade(vlTotal, val + p.getValor());
 			} else {
 				// Todos os outros tipos de pagamentos nao serao agrupados.
 				relatorio.addElemento(p.getId().toString(), p);
 			}
 		}
-		return relatorio;
-	}
 
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(Periodo periodo) {
-		return gerarRelatorioPagamento(pesquisarPagamentoByPeriodo(periodo), periodo);
+		// Arredondando o valor total das NFs no fim para evitar problemas de
+		// arredondamentos
+		List<GrupoWrapper<String, Pagamento>> lGRupo = relatorio.getListaGrupo();
+		for (GrupoWrapper<String, Pagamento> g : lGRupo) {
+			g.setPropriedade(vlTotal, NumeroUtils.arredondarValorMonetario((Double) g.getPropriedade(vlTotal)));
+		}
+		return relatorio;
 	}
 
 	@PostConstruct
@@ -200,8 +204,17 @@ public class PagamentoServiceImpl implements PagamentoService {
 			throw new BusinessException(
 					"A data de recebimento deve ser preenchida para a inclusão do pagamento do item do pedido.");
 		}
-		List<Date> listaData = pedidoService.calcularDataPagamento(idPedido, pagamento.getDataEmissao());
 
+		if (pagamento.getDataEmissao() == null) {
+			throw new BusinessException(
+					"A data de emissão deve ser preenchida para a inclusão do pagamento do item do pedido.");
+		}
+		List<Date> listaData = pedidoService.calcularDataPagamento(idPedido, pagamento.getDataEmissao());
+		// No caso de pagamento a vista a unica data que teremos eh a de
+		// vencimento.
+		if (listaData.isEmpty()) {
+			listaData.add(pagamento.getDataEmissao());
+		}
 		// Aqui identificamos um pagamento a vista como um total de uma unica
 		// parcela
 		int totParc = listaData.size() <= 0 ? 1 : listaData.size();
@@ -274,7 +287,18 @@ public class PagamentoServiceImpl implements PagamentoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo) {
-		return pagamentoDAO.pesquisarPagamentoByPeriodo(periodo.getInicio(), periodo.getFim());
+		return pagamentoDAO.pesquisarPagamentoByPeriodo(periodo.getInicio(), periodo.getFim(), null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo, boolean apenasInsumos) {
+		if (apenasInsumos) {
+			List<TipoPagamento> lTipo = new ArrayList<>();
+			lTipo.add(TipoPagamento.INSUMO);
+			return pagamentoDAO.pesquisarPagamentoByPeriodo(periodo.getInicio(), periodo.getFim(), lTipo);
+		}
+		return pagamentoDAO.pesquisarPagamentoByPeriodo(periodo.getInicio(), periodo.getFim(), null);
 	}
 
 	@Override

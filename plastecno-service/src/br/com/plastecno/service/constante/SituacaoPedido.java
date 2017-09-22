@@ -32,8 +32,10 @@ public enum SituacaoPedido {
 		return this.descricao;
 	}
 	
-	private static List<SituacaoPedido> listaOrcamento = new ArrayList<SituacaoPedido>();
 	private static List<SituacaoPedido> listaCancelado= new ArrayList<SituacaoPedido>();
+	private static List<SituacaoPedido> listaOrcamento = new ArrayList<SituacaoPedido>();
+	private static List<SituacaoPedido> listaPedidoNaoEfetivado = new ArrayList<SituacaoPedido>();
+
 	static{
 		listaOrcamento.add(ORCAMENTO);
 		listaOrcamento.add(ORCAMENTO_ACEITO);
@@ -42,9 +44,18 @@ public enum SituacaoPedido {
 		
 		listaCancelado.add(CANCELADO);
 		listaCancelado.add(ORCAMENTO_CANCELADO);
+		
+		// Devemos considerar que um orcamento nao eh um pedido.
+		listaPedidoNaoEfetivado.add(DIGITACAO);
+		listaPedidoNaoEfetivado.add(CANCELADO);
+		listaPedidoNaoEfetivado.addAll(listaOrcamento);
 	}
 	public static List<SituacaoPedido> getListaOrcamento(){
 		return listaOrcamento;
+	}
+	
+	public static List<SituacaoPedido> getListaPedidoNaoEfetivado (){
+		return listaPedidoNaoEfetivado ;
 	}
 	
 	public static boolean isOrcamento(SituacaoPedido situacaoPedido){

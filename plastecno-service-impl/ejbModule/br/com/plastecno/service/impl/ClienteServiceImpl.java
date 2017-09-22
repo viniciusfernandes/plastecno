@@ -426,19 +426,15 @@ public class ClienteServiceImpl implements ClienteService {
 
 		s.append(" order by p.dataEnvio desc ");
 
-		List<SituacaoPedido> lSit = new ArrayList<>();
-		lSit.add(SituacaoPedido.DIGITACAO);
-		lSit.add(SituacaoPedido.CANCELADO);
-		lSit.add(SituacaoPedido.ORCAMENTO);
-		lSit.add(SituacaoPedido.ORCAMENTO_DIGITACAO);
+		
 
 		Query query = entityManager.createQuery(s.toString());
 		if (inativos) {
 			query.setParameter("dtInatividade", gerarDataInatividadeCliente());
 		}
 
-		// Listando apenas os pedidos que ja tiveram venda efetuada
-		query.setParameter("listaSituacao", lSit);
+		// removendo da listagem apenas os pedidos que nao tiveram venda efetuada
+		query.setParameter("listaSituacao", SituacaoPedido.getListaPedidoNaoEfetivado());
 		// Listando apenas os pedidos do tipo de venda
 		query.setParameter("tipoCompra", TipoPedido.COMPRA);
 

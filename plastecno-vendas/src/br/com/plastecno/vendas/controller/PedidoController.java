@@ -9,7 +9,9 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.Validator;
 import br.com.caelum.vraptor.interceptor.download.Download;
+import br.com.caelum.vraptor.validator.Message;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ComissaoService;
 import br.com.plastecno.service.EstoqueService;
@@ -106,9 +108,10 @@ public class PedidoController extends AbstractPedidoController {
 
     @Servico
     private UsuarioService usuarioService;
+    private Validator validator;
 
     public PedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
-            HttpServletRequest request) {
+            HttpServletRequest request, Validator validator) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
 
         super.setClienteService(clienteService);
@@ -117,6 +120,8 @@ public class PedidoController extends AbstractPedidoController {
         super.setRepresentadaService(representadaService);
         super.setUsuarioService(usuarioService);
         super.setRelatorioService(relatorioService);
+
+        this.validator = validator;
     }
 
     @Get("pedido/pesoitem")
@@ -269,6 +274,8 @@ public class PedidoController extends AbstractPedidoController {
 
     @Post("pedido/item/inclusao")
     public void inserirItemPedido(Integer numeroPedido, ItemPedido itemPedido, Double aliquotaIPI) {
+        // Remover adiante
+        verificarConversao();
         try {
             if (itemPedido.getMaterial() != null && itemPedido.getMaterial().getId() == null) {
                 itemPedido.setMaterial(null);
@@ -305,6 +312,9 @@ public class PedidoController extends AbstractPedidoController {
 
     @Post("pedido/inclusao")
     public void inserirPedido(Pedido pedido, Contato contato, boolean orcamento) {
+        // Remover adiante
+        verificarConversao();
+
         if (hasAtributo(contato)) {
             pedido.setContato(contato);
         }
@@ -600,6 +610,16 @@ public class PedidoController extends AbstractPedidoController {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
             gerarLogErro("Remoção do item do pedido", e);
+        }
+    }
+
+    private void verificarConversao() {
+        if (validator != null && validator.hasErrors()) {
+            StringBuilder s = new StringBuilder();
+            for (Message m : validator.getErrors()) {
+                s.append(m.getCategory() + "=>" + m.getMessage());
+            }
+            gerarLogErro("Coversao de dados pelo VRaptor: " + s.toString());
         }
     }
 

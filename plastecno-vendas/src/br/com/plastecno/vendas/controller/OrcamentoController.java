@@ -63,7 +63,6 @@ public class OrcamentoController extends AbstractPedidoController {
             HttpServletRequest request, Validator validador) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
         this.validador = validador;
-       
 
         setClienteService(clienteService);
         setPedidoService(pedidoService);
@@ -268,5 +267,10 @@ public class OrcamentoController extends AbstractPedidoController {
     @Get("orcamento/transportadora/listagem")
     public void pesquisarTransportadoraByNomeFantasia(String nomeFantasia) {
         forwardTo(TransportadoraController.class).pesquisarTransportadoraByNomeFantasia(nomeFantasia);
+    }
+
+    @Post("orcamento/itempedido/remocao/{id}")
+    public void removerItemOrcamento(Integer id) {
+        forwardTo(PedidoController.class).removerItemPedido(id);
     }
 }

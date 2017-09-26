@@ -1,15 +1,11 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.Validator;
 import br.com.caelum.vraptor.interceptor.download.Download;
-import br.com.caelum.vraptor.validator.Message;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
@@ -61,8 +57,6 @@ public class AbstractPedidoController extends AbstractController {
 
     private ClienteService clienteService;
 
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
-
     private PedidoService pedidoService;
 
     private RelatorioService relatorioService;
@@ -73,20 +67,12 @@ public class AbstractPedidoController extends AbstractController {
 
     private UsuarioService usuarioService;
 
-    private Validator validator;
-
     public AbstractPedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
         verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS);
         verificarPermissaoAcesso("acessoDadosNotaFiscalPermitido", TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.CADASTRO_PEDIDO_COMPRA);
-    }
-
-    public AbstractPedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
-            HttpServletRequest request, Validator validator) {
-        this(result, usuarioInfo, geradorRelatorioPDF, request);
-        this.validator = validator;
     }
 
     void configurarTipoPedido(TipoPedido tipoPedido) {
@@ -276,8 +262,6 @@ public class AbstractPedidoController extends AbstractController {
     }
 
     void inserirItemPedido(Integer numeroPedido, ItemPedido itemPedido, Double aliquotaIPI) {
-        // Remover adiante
-        verificarConversao();
         try {
             if (itemPedido.getMaterial() != null && itemPedido.getMaterial().getId() == null) {
                 itemPedido.setMaterial(null);
@@ -313,9 +297,6 @@ public class AbstractPedidoController extends AbstractController {
     }
 
     void inserirPedido(Pedido pedido, Contato contato, boolean orcamento) {
-        // Remover adiante
-        verificarConversao();
-
         if (hasAtributo(contato)) {
             pedido.setContato(contato);
         }
@@ -513,13 +494,4 @@ public class AbstractPedidoController extends AbstractController {
         this.usuarioService = usuarioService;
     }
 
-    private void verificarConversao() {
-        if (validator != null && validator.hasErrors()) {
-            StringBuilder s = new StringBuilder();
-            for (Message m : validator.getErrors()) {
-                s.append(m.getCategory() + "=>" + m.getMessage());
-            }
-            logger.log(Level.SEVERE, "Coversao de dados pelo VRaptor: " + s.toString());
-        }
-    }
 }

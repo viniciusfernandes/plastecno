@@ -57,12 +57,10 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Servico
     private UsuarioService usuarioService;
-    private Validator validador;
 
     public OrcamentoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request, Validator validador) {
-        super(result, usuarioInfo, geradorRelatorioPDF, request);
-        this.validador = validador;
+        super(result, usuarioInfo, geradorRelatorioPDF, request, validador);
 
         setClienteService(clienteService);
         setPedidoService(pedidoService);
@@ -131,7 +129,6 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Post("orcamento/envio")
     public void enviarOrcamento(Integer idOrcamento, List<UploadedFile> anexo) {
-        validador.onErrorRedirectTo(ErroController.class).erroHome();
         try {
             final PedidoPDFWrapper wrapper = gerarPDF(idOrcamento, TipoPedido.REVENDA);
             final Pedido pedido = wrapper.getPedido();
@@ -271,6 +268,6 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Post("orcamento/itempedido/remocao/{id}")
     public void removerItemOrcamento(Integer id) {
-        forwardTo(PedidoController.class).removerItemPedido(id);
+        super.removerItemPedido(id);
     }
 }

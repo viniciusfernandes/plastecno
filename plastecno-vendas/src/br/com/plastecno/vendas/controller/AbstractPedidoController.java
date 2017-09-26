@@ -1,6 +1,8 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -58,6 +60,8 @@ public class AbstractPedidoController extends AbstractController {
     }
 
     private ClienteService clienteService;
+
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private PedidoService pedidoService;
 
@@ -515,7 +519,7 @@ public class AbstractPedidoController extends AbstractController {
             for (Message m : validator.getErrors()) {
                 s.append(m.getCategory() + "=>" + m.getMessage());
             }
-            gerarLogErro("Coversao de dados pelo VRaptor: " + s.toString());
+            logger.log(Level.SEVERE, "Coversao de dados pelo VRaptor: " + s.toString());
         }
     }
 }

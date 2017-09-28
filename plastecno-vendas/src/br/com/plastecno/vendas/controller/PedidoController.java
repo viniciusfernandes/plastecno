@@ -9,7 +9,6 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.Validator;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.plastecno.service.ClienteService;
 import br.com.plastecno.service.ComissaoService;
@@ -107,8 +106,8 @@ public class PedidoController extends AbstractPedidoController {
     private UsuarioService usuarioService;
 
     public PedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
-            HttpServletRequest request, Validator validator) {
-        super(result, usuarioInfo, geradorRelatorioPDF, request, validator);
+            HttpServletRequest request) {
+        super(result, usuarioInfo, geradorRelatorioPDF, request);
 
         super.setClienteService(clienteService);
         super.setPedidoService(pedidoService);

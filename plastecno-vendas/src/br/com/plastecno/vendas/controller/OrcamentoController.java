@@ -8,7 +8,6 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.Validator;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.plastecno.service.ClienteService;
@@ -59,8 +58,8 @@ public class OrcamentoController extends AbstractPedidoController {
     private UsuarioService usuarioService;
 
     public OrcamentoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
-            HttpServletRequest request, Validator validador) {
-        super(result, usuarioInfo, geradorRelatorioPDF, request, validador);
+            HttpServletRequest request) {
+        super(result, usuarioInfo, geradorRelatorioPDF, request);
 
         setClienteService(clienteService);
         setPedidoService(pedidoService);

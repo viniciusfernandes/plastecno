@@ -194,12 +194,11 @@ function inserirOrcamento(){
 	toUpperCaseInput();
 	toLowerCaseInput();
 	
-	var parametros = $('#formPedido').serialize();
+	var parametros = serializarForm('formPedido');
 	var request = $.ajax({
 		type : "post",
 		url : '<c:url value="/orcamento/inclusao"/>',
-		data : parametros,
-		async: false
+		data : parametros
 	});
 
 	request.done(function(response) {
@@ -255,19 +254,21 @@ function inserirOrcamento(){
 	<div id="modal"></div>
 		<%--Esse form foi criado apenas para a paginacao --%>
 		<form id="formPesquisa" action="<c:url value="/orcamento/listagem"/>" method="get">
-			<input type="hidden" name="idCliente" id="idClienteListagem"  value="${cliente.id}"/> 
-			<input type="hidden" name="idRepresentada" id="idRepresentadaListagem" value="${idRepresentadaSelecionada}"/>
-			<input type="hidden" name="idVendedor" id="idVendedorListagem" value="${pedido.proprietario.id}"/>  
+			<input type="hidden" id="idClienteListagem" name="idCliente" value="${cliente.id}"/> 
+			<input type="hidden" id="idRepresentadaListagem" name="idRepresentada" value="${idRepresentadaSelecionada}"/>
+			<input type="hidden" id="idVendedorListagem" name="idVendedor" value="${pedido.proprietario.id}"/> 
 		</form>
 
 	<form id="formVazio" method="get"></form>
 	
 	<form id="formPedido" action="<c:url value="/orcamento/inclusao"/>" method="post">
+		<%-- Os campos ocultos estao presentes pois no formulario eles estao como campode apenas leitura e precisam ser enviados no submit --%>
 		<input type="hidden" id="idVendedor" name="pedido.proprietario.id" value="${pedido.proprietario.id}"/>
 		<input type="hidden" id="idCliente" name="cliente.id" value="${cliente.id}"/>
 		<input type="hidden" id="idPedido"  name="pedido.id" value="${pedido.id}"/>
 		<input type="hidden" id="idTransportadora"  name="pedido.transportadora.id" value="${pedido.transportadora.id}"/>
 		<input type="hidden" id="idSituacaoPedido"  name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
+		<input type="hidden" id="idRepresentada"  name="pedido.representada.id" value="${pedido.representada.id}"/>
 		
 	<fieldset>
 		<legend>::: Orçamento :::</legend>
@@ -300,7 +301,7 @@ function inserirOrcamento(){
 			</div>
 		<div class="label obrigatorio" >Fornecedor:</div>
 		<div class="input" style="width: 30%">
-			<select id="representada" id="representada" name="pedido.representada.id" style="width: 100%">
+			<select id="representada" name="pedido.representada.id" style="width: 100%">
 				<option value="">&lt&lt SELECIONE &gt&gt</option>
 				<c:forEach var="representada" items="${listaRepresentada}">
 					<option value="${representada.id}"

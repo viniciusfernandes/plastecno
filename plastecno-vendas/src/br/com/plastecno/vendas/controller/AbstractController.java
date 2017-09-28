@@ -18,9 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.Validator;
 import br.com.caelum.vraptor.interceptor.download.ByteArrayDownload;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.caelum.vraptor.serialization.Serializer;
+import br.com.caelum.vraptor.validator.Message;
 import br.com.caelum.vraptor.view.Results;
 import br.com.plastecno.service.TipoLogradouroService;
 import br.com.plastecno.service.UsuarioService;
@@ -67,8 +69,10 @@ public abstract class AbstractController {
     private UsuarioInfo usuarioInfo;
     private UsuarioService usuarioService;
 
+    private Validator validator;
+
     public AbstractController(Result result) {
-        this(result, null, null);
+        this(result, null, (HttpServletRequest)null);
     }
 
     public AbstractController(Result result, HttpServletRequest request) {
@@ -79,7 +83,7 @@ public abstract class AbstractController {
      * Construtor utilizado para inicializar a sessao do usuario
      */
     public AbstractController(Result result, UsuarioInfo usuarioInfo) {
-        this(result, usuarioInfo, null);
+        this(result, usuarioInfo, (HttpServletRequest)null);
     }
 
     // Construtor utilizado na geracao dos relatorio em PDF pois temos que pegar
@@ -120,11 +124,24 @@ public abstract class AbstractController {
             irTelaErro();
         }
     }
-
+    
     // construtor utilizado na geracao dos relatorio em PDF pois temos que pegar
     // o caminho do diretorio dos templates.
     public AbstractController(Result result, UsuarioInfo usuarioInfo, HttpServletRequest request) {
         this(result, usuarioInfo, null, request);
+    }
+
+    /*
+     * Construtor utilizado para inicializar a sessao do usuario e validacao
+     */
+    public AbstractController(Result result, UsuarioInfo usuarioInfo, Validator validator) {
+        this(result, usuarioInfo, (HttpServletRequest)null);
+        this.validator=validator;
+    }
+
+    public AbstractController(Result result, Validator validator) {
+        this(result, null,(HttpServletRequest) null);
+        this.validator = validator;
     }
 
     void addAtributo(String nomeAtributo, Object valorAtributo) {
@@ -685,6 +702,16 @@ public abstract class AbstractController {
 
     boolean isElementosNaoAssociadosPreenchidosPicklist() {
         return this.picklist.isElementosNaoAssociadosPreenchidos();
+    }
+
+    void loggarFalhaConversaoParametros() {
+        if (validator != null && validator.hasErrors()) {
+            StringBuilder s = new StringBuilder();
+            for (Message m : validator.getErrors()) {
+                s.append(m.getCategory() + "=>" + m.getMessage());
+            }
+            logger.log(Level.SEVERE, "Falha na conversao dos parametros: " + s.toString());
+        }
     }
 
     /*

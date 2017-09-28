@@ -8,7 +8,6 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.Validator;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.plastecno.service.ClienteService;
@@ -57,12 +56,10 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Servico
     private UsuarioService usuarioService;
-    private Validator validador;
 
     public OrcamentoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
-            HttpServletRequest request, Validator validador) {
+            HttpServletRequest request) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
-        this.validador = validador;
 
         setClienteService(clienteService);
         setPedidoService(pedidoService);
@@ -131,7 +128,6 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Post("orcamento/envio")
     public void enviarOrcamento(Integer idOrcamento, List<UploadedFile> anexo) {
-        validador.onErrorRedirectTo(ErroController.class).erroHome();
         try {
             final PedidoPDFWrapper wrapper = gerarPDF(idOrcamento, TipoPedido.REVENDA);
             final Pedido pedido = wrapper.getPedido();
@@ -271,6 +267,6 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Post("orcamento/itempedido/remocao/{id}")
     public void removerItemOrcamento(Integer id) {
-        forwardTo(PedidoController.class).removerItemPedido(id);
+        super.removerItemPedido(id);
     }
 }

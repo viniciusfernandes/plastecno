@@ -31,9 +31,11 @@ abstract class PedidoEmailBuilder {
 
 	public abstract String gerarDestinatario();
 
+	public abstract String gerarDestinatarioCc();
+
 	public final MensagemEmail gerarMensagemEmail() {
 		final MensagemEmail email = new MensagemEmail(gerarTitulo(), gerarRemetente(), gerarDestinatario(),
-				gerarConteudo());
+				gerarDestinatarioCc(), gerarConteudo());
 		// Confuigurando o tipo de arquivo a ser enviado e sua extensao, o que
 		// eh comum a todos os pedidos.
 		pdfPedido.setNome(pdfPedido.getNome() + ".pdf");

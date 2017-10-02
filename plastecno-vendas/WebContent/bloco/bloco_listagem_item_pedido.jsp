@@ -1,10 +1,20 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<script type="text/javascript">
+
+$(document).ready(function(){
+	adicionarInputHiddenIdLinhaSelecionada('tabelaListagemItemPedido', 'formPesquisa', <c:out value="${listaIdItemSelecionado}"/>);
+});
+
+</script>
 <a id="rodape"></a>
 	<fieldset>
 		<legend>::: Resultado da Pesquisa de Pedidos de ${isCompra ? 'Compra': 'Venda'} :::</legend>
 		<div id="paginador"></div>
+		<div class="bloco_botoes">
+			<input type="button" id="botaoGerarPedido" title="Gerar Novo ${orcamento ? 'Orçamento': 'Pedido'}" value="" class="botaoEnviarEmail"/>
+		</div>
 		<div>
-			<table id="tabelaItemPedido" class="listrada">
+			<table id="tabelaListagemItemPedido" class="listrada">
 			<thead>
 				<tr>
 					<th style="width: 10%">Situaç.</th>
@@ -45,13 +55,20 @@
 									<form action="${orcamento? 'orcamento/pdf': 'pedido/pdf' }">
 										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
 										<input type="hidden" name="idPedido" value="${grupo.id.id}" />
-										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
+										<div class="input" style="width: 35%">
+											<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
+										</div>
 									</form>
 									<form action="${orcamento? 'orcamento/': 'pedido/' }${grupo.id.id}" method="get">
 										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
 										<input type="hidden" name="id" value="${grupo.id.id}" />
-										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
+										<div class="input" style="width: 35%">
+											<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
+										</div>
 									</form>
+									<div class="input" style="width: 30%">
+										<input type="checkbox" value="${item.id}" ${not empty idSelec[item.id]?'checked':''}/>
+									</div>
 								</div>
 							</td>
 						</tr>

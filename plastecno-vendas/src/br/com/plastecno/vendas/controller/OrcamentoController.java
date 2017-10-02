@@ -252,10 +252,10 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Get("orcamento/listagem")
     public void pesquisarOrcamentoByIdCliente(Integer idCliente, Integer idVendedor, Integer idRepresentada,
-            TipoPedido tipoPedido, Integer paginaSelecionada, ItemPedido itemVendido) {
+            TipoPedido tipoPedido, Integer paginaSelecionada, ItemPedido itemVendido, Integer[] listaIdItemSelecionado) {
 
         super.pesquisarPedidoByIdCliente(idCliente, idVendedor, idRepresentada, tipoPedido, true, paginaSelecionada,
-                itemVendido);
+                itemVendido, listaIdItemSelecionado);
 
         irRodapePagina();
     }

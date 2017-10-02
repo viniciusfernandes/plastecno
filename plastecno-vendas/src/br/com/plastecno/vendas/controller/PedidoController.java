@@ -472,10 +472,11 @@ public class PedidoController extends AbstractPedidoController {
 
     @Get("pedido/listagem")
     public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido) {
+            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido,
+            Integer[] listaIdItemSelecionado) {
 
         super.pesquisarPedidoByIdCliente(idCliente, idVendedor, idFornecedor, tipoPedido, orcamento, paginaSelecionada,
-                itemVendido);
+                itemVendido, listaIdItemSelecionado);
 
         configurarTipoPedido(tipoPedido);
         redirecionarHome(tipoPedido, orcamento, false);

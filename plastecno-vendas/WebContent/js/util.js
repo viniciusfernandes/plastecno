@@ -367,13 +367,81 @@ function serializarFormPesquisa(){
 	return serializarBloco('formPesquisa');
 }
 
-function adicionarInputHiddenFormulario(formId, name, value){
-	if(isEmpty(formId) || isEmpty(name) || isEmpty(value)){
+function gerarInputHiddenFormulario(idForm, idInput, name, value){
+	if(isEmpty(idForm) || isEmpty(name) || isEmpty(value)){
 		return;
 	}
 	input = document.createElement('input');
 	input.type = 'hidden';
+	input.id = idInput;
 	input.name = name;
 	input.value = value;
-	document.getElementById(formId).appendChild(input);
+	document.getElementById(idForm).appendChild(input);
+};
+
+function adicionarInputHiddenFormulario(idForm, name, value){
+	gerarInputHiddenFormulario(idForm, null, name, value); 
+};
+
+function inicializarLinhaSelecionavel(idTabela){
+	idTabela = '#'+idTabela;
+	var tb = $(idTabela);
+	if(tb == undefined || tb == null){
+		alert('O elemento de ID '+idTabela+' nao existe.');
+		return;
+	}
+	
+	if($(tb).prop('tagName') != 'TABLE'){
+		alert('O elemento de ID '+idTabela+' nao eh uma tabela.');
+		return;
+	}
+	
+	tb.valSelec = new Array();
+	var selector = idTabela +' tr td input:checkbox';
+	// Adicionando a lista os itens carregados no inicio do load da pagina.
+	$(selector).each(function(){
+		if($(this).prop('checked')){
+			tb.valSelec.push($(this).val());	
+		}
+	});
+	// Definindo o evento de selecao.
+	$(selector).click(function(){
+		if($(this).prop('checked')){
+			tb.valSelec.push($(this).val());	
+		} else {
+			var index = tb.valSelec.indexOf($(this).val());
+			delete tb.valSelec[index];
+		}
+	});
+};
+
+function adicionarInputHiddenIdLinhaSelecionada(idTabela, idForm, listaIdItemSelecionado){
+	var form = document.getElementById(idForm);
+	if(form == undefined || form == null){
+		alert('O form de ID '+idForm+' nao existe.');
+		return;
+	}
+	
+	if($(form).prop('tagName') != 'FORM'){
+		alert('O form de ID '+idForm+' nao eh uma FORM.');
+		return;
+	}
+	
+	var nome = 'listaIdItemSelecionado[]';	
+	var id = 'idItemSelec';
+	// Adicionando a lista os itens carregados no inicio do load da pagina.
+	if(listaIdItemSelecionado != undefined && listaIdItemSelecionado != null){
+		for (var i = 0; i < listaIdItemSelecionado.length; i++) {
+			gerarInputHiddenFormulario(idForm, id+listaIdItemSelecionado[i], nome, +listaIdItemSelecionado[i]);
+		}
+	}
+	// Definindo o evento de selecao.
+	$('#'+idTabela +' tr td input:checkbox').click(function(){
+		var idSel = id+$(this).val();
+		if($(this).prop('checked')){
+			gerarInputHiddenFormulario(idForm, idSel, nome, $(this).val());
+		} else {
+			form.removeChild(document.getElementById(idSel));
+		}
+	});
 };

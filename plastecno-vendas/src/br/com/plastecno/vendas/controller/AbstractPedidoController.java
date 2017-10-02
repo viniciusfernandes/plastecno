@@ -1,6 +1,9 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -73,6 +76,18 @@ public class AbstractPedidoController extends AbstractController {
         verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS);
         verificarPermissaoAcesso("acessoDadosNotaFiscalPermitido", TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+    }
+
+    private void adicionarIdItemSelecionado(Integer[] listaIdItemSelecionado) {
+        if (listaIdItemSelecionado == null || listaIdItemSelecionado.length <= 0) {
+            return;
+        }
+        Map<Integer, Boolean> idSelecionado = new HashMap<>();
+        for (Integer id : listaIdItemSelecionado) {
+            idSelecionado.put(id, true);
+        }
+        addAtributo("idSelec", idSelecionado);
+        addAtributo("listaIdItemSelecionado", Arrays.deepToString(listaIdItemSelecionado));
     }
 
     void configurarTipoPedido(TipoPedido tipoPedido) {
@@ -397,7 +412,8 @@ public class AbstractPedidoController extends AbstractController {
     }
 
     public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido) {
+            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido,
+            Integer[] listaIdItemSelecionado) {
         boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
         if (idCliente == null) {
             gerarListaMensagemAlerta("Cliente é obrigatório para a pesquisa de pedidos");
@@ -444,7 +460,7 @@ public class AbstractPedidoController extends AbstractController {
         addAtributo("orcamento", orcamento);
         addAtributo("isCompra", isCompra);
         configurarTipoPedido(tipoPedido);
-
+        adicionarIdItemSelecionado(listaIdItemSelecionado);
     }
 
     LogradouroPedido recuperarLogradouro(Pedido p, TipoLogradouro t) {

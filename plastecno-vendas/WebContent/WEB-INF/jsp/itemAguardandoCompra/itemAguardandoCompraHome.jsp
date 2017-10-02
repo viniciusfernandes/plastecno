@@ -145,7 +145,7 @@ function selecionarItemPedido(campo){
 			</select>
 		</div>
 		<div class="bloco_botoes">
-			<input type="button" id="botaoComprar" title="Comprar Itens" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoComprar" title="Enviar Itens Para Compras" value="" class="botaoEnviarEmail"/>
 		</div>
 		<table id="tabelaItemEncomenda" class="listrada">
 			<thead>

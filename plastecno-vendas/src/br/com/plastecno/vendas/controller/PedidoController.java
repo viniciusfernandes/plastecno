@@ -168,6 +168,18 @@ public class PedidoController extends AbstractPedidoController {
         return cliente;
     }
 
+    @Post("pedido/copiaitem")
+    public void copiarItemSelecionado(TipoPedido tipoPedido, boolean orcamento, List<Integer> listaIdItemSelecionado) {
+        try {
+            Pedido p = pedidoService
+                    .gerarPedidoItemSelecionado(getCodigoUsuario(), true, false, listaIdItemSelecionado);
+            pesquisarPedidoById(p.getId(), tipoPedido, orcamento);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
+    }
+
     @Post("pedido/copia/{idPedido}")
     public void copiarPedido(Integer idPedido, TipoPedido tipoPedido, boolean orcamento) {
         try {

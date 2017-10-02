@@ -68,6 +68,9 @@ public interface PedidoService {
 
 	void enviarPedido(Integer idPedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException;
 
+	Pedido gerarPedidoItemSelecionado(Integer idVendedor, boolean isCompra, boolean isOrcamento,
+			List<Integer> listaIdItemSelecionado) throws BusinessException;
+
 	void inserirDadosNotaFiscal(Pedido pedido);
 
 	Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException;
@@ -158,6 +161,8 @@ public interface PedidoService {
 	List<ItemPedido> pesquisarItemPedidoAguardandoEmpacotamento(Integer idCliente);
 
 	ItemPedido pesquisarItemPedidoById(Integer idItemPedido);
+
+	List<ItemPedido> pesquisarItemPedidoById(List<Integer> listaIdItem);
 
 	List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente, Integer idVendedor,
 			Integer idFornecedor, boolean isOrcamento, boolean isCompra, Integer indiceRegistroInicial,

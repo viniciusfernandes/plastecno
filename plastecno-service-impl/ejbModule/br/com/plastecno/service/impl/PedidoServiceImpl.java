@@ -737,6 +737,66 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Pedido gerarPedidoItemSelecionado(Integer idVendedor, boolean isCompra, boolean isOrcamento,
+			List<Integer> listaIdItemSelecionado) throws BusinessException {
+		if (listaIdItemSelecionado == null || listaIdItemSelecionado.isEmpty()) {
+			throw new BusinessException("A lista de item selecionado deve ser preenchida para gerar um novo pedido.");
+		}
+
+		if (itemPedidoDAO.verificarItemPedidoMesmoFornecedor(listaIdItemSelecionado)) {
+			throw new BusinessException(
+					"Os itens selecionados devem ser de pedidos efetuados para um mesmo fornecedor. Verifique os itens escolhidos.");
+		}
+
+		if (itemPedidoDAO.verificarItemPedidoMesmoCliente(listaIdItemSelecionado)) {
+			throw new BusinessException(
+					"Os itens selecionados devem ser de pedidos efetuados para um mesmo cliente. Verifique os itens escolhidos.");
+		}
+
+		List<ItemPedido> listaItem = pesquisarItemPedidoById(listaIdItemSelecionado);
+		if (listaItem == null || listaItem.isEmpty()) {
+			throw new BusinessException("Os itens selecionados não existem no sistema.");
+		}
+		// Como todos os pedidos pertendem ao mesmo fornecedor, entao basta
+		// espquisar pelo primeiro.
+		Integer idRepres = itemPedidoDAO.pesquisarIdRepresentadaByIdItem(listaIdItemSelecionado.get(0));
+		Integer idCli = itemPedidoDAO.pesquisarIdClienteByIdItem(listaIdItemSelecionado.get(0));
+
+		TipoPedido tipo = null;
+		if (isCompra) {
+			tipo = TipoPedido.COMPRA;
+		} else if (representadaService.isRevendedor(idRepres)) {
+			tipo = TipoPedido.REPRESENTACAO;
+		} else {
+			tipo = TipoPedido.REVENDA;
+		}
+
+		Pedido p = new Pedido();
+		p.setVendedor(new Usuario(idVendedor));
+		p.setDataEntrega(DateUtils.gerarDataAmanha());
+		p.setFormaPagamento("28 DDL");
+		p.setRepresentada(new Representada(idRepres, null));
+		p.setTipoPedido(tipo);
+		p.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO_DIGITACAO : SituacaoPedido.DIGITACAO);
+		p.setCliente(new Cliente(idCli));
+		p.setFinalidadePedido(TipoFinalidadePedido.INDUSTRIALIZACAO);
+
+		Contato c = new Contato();
+		c.setNome("PREENCHER CONTATO");
+		p.setContato(c);
+		
+		p = inserirPedido(p);
+
+		ItemPedido clone = null;
+		for (ItemPedido item : listaItem) {
+			clone = item.clone();
+			inserirItemPedido(p.getId(), clone);
+		}
+		return p;
+	}
+
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private Integer gerarSequencialItemPedido(Integer idPedido) {
 		Integer seq = pedidoDAO.pesquisarMaxSequenciaItemPedido(idPedido);
@@ -1347,6 +1407,12 @@ public class PedidoServiceImpl implements PedidoService {
 			itemPedido.setValorTotalPedidoSemFrete(valorPedido[2]);
 		}
 		return itemPedido;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoById(List<Integer> listaIdItem) {
+		return itemPedidoDAO.pesquisarItemPedidoById(listaIdItem);
 	}
 
 	@Override

@@ -105,6 +105,18 @@ public class OrcamentoController extends AbstractPedidoController {
         irTopoPagina();
     }
 
+    @Post("orcamento/copiaitem")
+    public void copiarItemSelecionado(List<Integer> listaIdItemSelecionado) {
+        try {
+            Pedido p = pedidoService
+                    .gerarPedidoItemSelecionado(getCodigoUsuario(), false, true, listaIdItemSelecionado);
+            pesquisarOrcamentoById(p.getId());
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
+    }
+
     @Post("orcamento/copia/{idOrcamento}")
     public void copiarOrcamento(Integer idOrcamento) {
         try {

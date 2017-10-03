@@ -70,8 +70,8 @@ public class EmailServiceImpl implements EmailService {
 				email.addCc(cc);
 			}
 			gerarAnexo(mensagemEmail, email);
-			//email.setTLS(true);
-			//email.send();
+			// email.setTLS(true);
+			// email.send();
 
 		} catch (Exception e) {
 			StringBuilder mensagem = new StringBuilder();
@@ -97,6 +97,9 @@ public class EmailServiceImpl implements EmailService {
 			return null;
 		}
 		String[] dest = emails.split(";");
+		if (dest.length == 1) {
+			return dest;
+		}
 		// Aqui estamos utilizando o Set para remover os emails repetivos dos
 		// destinatarios
 		HashSet<String> s = new HashSet<String>();

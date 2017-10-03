@@ -259,7 +259,7 @@ public class OrcamentoController extends AbstractPedidoController {
             addAtributo("listaItemPedido", listaItem);
         }
 
-        if (!pedido.isOrcamento()) {
+        if (pedido != null && !pedido.isOrcamento()) {
             redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA, false);
         } else {
             irTopoPagina();

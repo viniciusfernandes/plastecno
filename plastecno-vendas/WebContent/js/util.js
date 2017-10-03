@@ -367,15 +367,54 @@ function serializarFormPesquisa(){
 	return serializarBloco('formPesquisa');
 }
 
-function adicionarInputHiddenFormulario(formId, name, value){
-	if(isEmpty(formId) || isEmpty(name) || isEmpty(value)){
+function gerarInputHiddenFormulario(idForm, idInput, name, value){
+	if(isEmpty(idForm) || isEmpty(name) || isEmpty(value)){
 		return;
 	}
 	input = document.createElement('input');
 	input.type = 'hidden';
+	input.id = idInput;
 	input.name = name;
 	input.value = value;
-	document.getElementById(formId).appendChild(input);
+	document.getElementById(idForm).appendChild(input);
+};
+
+function adicionarInputHiddenFormulario(idForm, name, value){
+	gerarInputHiddenFormulario(idForm, null, name, value); 
+};
+
+function tabelaLinhaSelecionavel(config){
+	var listaValorSelecionado = config.listaValorSelecionado;
+	var idTabela = config.idTabela;
+	var idBotaoLimpar = config.idBotaoLimpar;
+	var onInit = config.onInit;
+	var onSelect = config.onSelect;
+	var onUnselect = config.onUnselect;
+	var onClean = config.onClean;
+	
+	// Adicionando a lista os itens carregados no inicio do load da pagina.
+	if(onInit != undefined && listaValorSelecionado != undefined && listaValorSelecionado != null){
+		for (var i = 0; i < listaValorSelecionado.length; i++) {
+			onInit(listaValorSelecionado[i]);
+		}
+	}
+	// Definindo o evento de selecao.
+	$('#'+idTabela +' tr td input:checkbox').click(function(){
+		if($(this).prop('checked')){
+			onSelect($(this));
+		} else {
+			onUnselect($(this));
+		}
+	});
+	
+	$('#'+idBotaoLimpar).click(function(){
+		$('#'+idTabela +' tr td input:checkbox').each(function(){
+			if($(this).prop('checked')){
+				$(this).prop('checked', false);
+			} 
+		});
+		onClean();
+	});
 };
 
 function tabelaChecker(config){

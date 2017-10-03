@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -103,6 +104,21 @@ public class OrcamentoController extends AbstractPedidoController {
             redirecTo(this.getClass()).pesquisarOrcamentoById(idOrcamento);
         }
         irTopoPagina();
+    }
+
+    @Post("orcamento/copiaitem")
+    public void copiarItemSelecionado(Integer idCliente, Integer idRepresentada, Integer idVendedor,
+            TipoPedido tipoPedido, Integer[] listaIdItemSelecionado) {
+        try {
+            Pedido p = pedidoService.gerarPedidoItemSelecionado(idVendedor == null ? getCodigoUsuario() : idVendedor,
+                    false, true, listaIdItemSelecionado == null ? null : Arrays.asList(listaIdItemSelecionado));
+            pesquisarOrcamentoById(p.getId());
+        } catch (BusinessException e) {
+            pesquisarOrcamentoByIdCliente(idCliente, idVendedor, idRepresentada, tipoPedido, 1, null,
+                    listaIdItemSelecionado);
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
     }
 
     @Post("orcamento/copia/{idOrcamento}")
@@ -252,10 +268,10 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Get("orcamento/listagem")
     public void pesquisarOrcamentoByIdCliente(Integer idCliente, Integer idVendedor, Integer idRepresentada,
-            TipoPedido tipoPedido, Integer paginaSelecionada, ItemPedido itemVendido) {
+            TipoPedido tipoPedido, Integer paginaSelecionada, ItemPedido itemVendido, Integer[] listaIdItemSelecionado) {
 
         super.pesquisarPedidoByIdCliente(idCliente, idVendedor, idRepresentada, tipoPedido, true, paginaSelecionada,
-                itemVendido);
+                itemVendido, listaIdItemSelecionado);
 
         irRodapePagina();
     }

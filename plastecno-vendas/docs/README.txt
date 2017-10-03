@@ -79,3 +79,4 @@ Use as configurações a seguir no seu aplicativo de email.
         Conexão criptografada: TLS 
     Nome de usuário: seu endereço de email
     Senha: sua senha
+    email.setTLS(true);

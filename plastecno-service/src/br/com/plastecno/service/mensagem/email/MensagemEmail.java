@@ -11,14 +11,17 @@ public class MensagemEmail implements Serializable {
 	private static final long serialVersionUID = -861137251424068538L;
 	private final String conteudo;
 	private final String destinatario;
+
+	private final String destinatarioCc;
 	private List<AnexoEmail> listaAnexo;
 	private final String remetente;
 	private final String titulo;
 
-	public MensagemEmail(String titutlo, String remetente, String destinatario, String conteudo) {
+	public MensagemEmail(String titutlo, String remetente, String destinatario, String destinatarioCc, String conteudo) {
 		this.titulo = titutlo;
 		this.remetente = remetente;
 		this.destinatario = destinatario;
+		this.destinatarioCc = destinatarioCc;
 		this.conteudo = conteudo;
 	}
 
@@ -47,6 +50,10 @@ public class MensagemEmail implements Serializable {
 
 	public String getDestinatario() {
 		return destinatario;
+	}
+
+	public String getDestinatarioCc() {
+		return destinatarioCc;
 	}
 
 	public List<AnexoEmail> getListaAnexo() {

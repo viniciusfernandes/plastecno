@@ -51,7 +51,7 @@ $(document).ready(function() {
 	$("#botaoPesquisaNumeroPedido").click(function() {
 		var numeroPedido = $('#numeroPedidoPesquisa').val();
 		if (isEmpty(numeroPedido)) {
-			gerarListaMensagemAlerta(new Array('O n�mero do pedido � obrigat�rio para a pesquisa'));
+			gerarListaMensagemAlerta(new Array('O número do pedido é obrigatório para a pesquisa'));
 			return;
 		} 
 		var form = $('#formVazio'); 

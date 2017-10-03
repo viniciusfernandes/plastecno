@@ -31,8 +31,20 @@ public final class DateUtils {
 		return calendar;
 	}
 
+	public static Date gerarDataAmanha() {
+		Calendar c = gerarCalendarioSemHorario(new Date());
+		c.add(Calendar.DAY_OF_MONTH, 1);
+		return c.getTime();
+	}
+
 	public static Date gerarDataAtualSemHorario() {
 		return gerarCalendarioSemHorario(new Date()).getTime();
+	}
+
+	public static Date gerarDataOntem() {
+		Calendar c = gerarCalendarioSemHorario(new Date());
+		c.add(Calendar.DAY_OF_MONTH, -1);
+		return c.getTime();
 	}
 
 	public static Date gerarDataSemHorario(Date data) {
@@ -44,22 +56,25 @@ public final class DateUtils {
 			throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
 		}
 
+      if (inicio == null || fim == null) {
+            throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
+        }
 		inicio = gerarDataSemHorario(inicio);
 		fim = gerarDataSemHorario(fim);
 		return inicio.compareTo(fim) < 0;
 	}
 
+  
 	public static boolean isAnteriorDataAtual(Date inicio) {
 		return isAnterior(inicio, new Date());
 	}
 
+        
 	public static boolean isPosteriror(Date inicio, Date fim) {
-
-		if (inicio == null || fim == null) {
-			throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
-		}
-
-		inicio = gerarDataSemHorario(inicio);
+if (inicio == null || fim == null) {
+            throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
+        }
+inicio = gerarDataSemHorario(inicio);
 		fim = gerarDataSemHorario(fim);
 		return inicio.compareTo(fim) > 0;
 	}

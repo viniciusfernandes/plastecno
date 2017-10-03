@@ -745,12 +745,12 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException("A lista de item selecionado deve ser preenchida para gerar um novo pedido.");
 		}
 
-		if (itemPedidoDAO.verificarItemPedidoMesmoFornecedor(listaIdItemSelecionado)) {
+		if (!itemPedidoDAO.verificarItemPedidoMesmoFornecedor(listaIdItemSelecionado)) {
 			throw new BusinessException(
 					"Os itens selecionados devem ser de pedidos efetuados para um mesmo fornecedor. Verifique os itens escolhidos.");
 		}
 
-		if (itemPedidoDAO.verificarItemPedidoMesmoCliente(listaIdItemSelecionado)) {
+		if (!itemPedidoDAO.verificarItemPedidoMesmoCliente(listaIdItemSelecionado)) {
 			throw new BusinessException(
 					"Os itens selecionados devem ser de pedidos efetuados para um mesmo cliente. Verifique os itens escolhidos.");
 		}

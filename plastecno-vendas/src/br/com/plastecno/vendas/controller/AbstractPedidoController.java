@@ -78,7 +78,7 @@ public class AbstractPedidoController extends AbstractController {
                 TipoAcesso.CADASTRO_PEDIDO_COMPRA);
     }
 
-    private void adicionarIdItemSelecionado(Integer[] listaIdItemSelecionado) {
+    void adicionarIdItemSelecionado(Integer[] listaIdItemSelecionado) {
         if (listaIdItemSelecionado == null || listaIdItemSelecionado.length <= 0) {
             return;
         }
@@ -88,6 +88,13 @@ public class AbstractPedidoController extends AbstractController {
         }
         addAtributo("idSelec", idSelecionado);
         addAtributo("listaIdItemSelecionado", Arrays.deepToString(listaIdItemSelecionado));
+    }
+
+    void adicionarIdItemSelecionado(List<Integer> listaIdItemSelecionado) {
+        if (listaIdItemSelecionado == null) {
+            return;
+        }
+        adicionarIdItemSelecionado(listaIdItemSelecionado.toArray(new Integer[] {}));
     }
 
     void configurarTipoPedido(TipoPedido tipoPedido) {

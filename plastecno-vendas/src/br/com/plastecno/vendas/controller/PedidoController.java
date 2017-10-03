@@ -1,6 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -169,12 +170,16 @@ public class PedidoController extends AbstractPedidoController {
     }
 
     @Post("pedido/copiaitem")
-    public void copiarItemSelecionado(TipoPedido tipoPedido, boolean orcamento, List<Integer> listaIdItemSelecionado) {
+    public void copiarItemSelecionado(Integer idCliente, Integer idFornecedor, Integer idVendedor,
+            TipoPedido tipoPedido, boolean orcamento, Integer[] listaIdItemSelecionado) {
         try {
-            Pedido p = pedidoService
-                    .gerarPedidoItemSelecionado(getCodigoUsuario(), true, false, listaIdItemSelecionado);
-            pesquisarPedidoById(p.getId(), tipoPedido, orcamento);
+            Pedido p = pedidoService.gerarPedidoItemSelecionado(idVendedor == null ? getCodigoUsuario() : idVendedor,
+                    TipoPedido.COMPRA.equals(tipoPedido), false,
+                    listaIdItemSelecionado == null ? null : Arrays.asList(listaIdItemSelecionado));
+            pesquisarPedidoById(p.getId(), tipoPedido, false);
         } catch (BusinessException e) {
+            pesquisarPedidoByIdCliente(idCliente, idVendedor, idFornecedor, tipoPedido, orcamento, 1, null,
+                    listaIdItemSelecionado);
             gerarListaMensagemErro(e);
             irTopoPagina();
         }

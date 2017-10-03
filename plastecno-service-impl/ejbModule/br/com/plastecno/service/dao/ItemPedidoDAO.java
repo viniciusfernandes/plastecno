@@ -567,22 +567,18 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	public boolean verificarItemPedidoMesmoCliente(List<Integer> listaIdItem) {
-		Long total = QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select count(i.pedido.cliente.id) from ItemPedido i where i.id in (:listaIdItem) group by i.pedido.cliente.id")
-								.setParameter("listaIdItem", listaIdItem), Long.class, 0L);
-		return total <= 1;
+		List<Integer> l = entityManager
+				.createQuery(
+						"select i.pedido.cliente.id from ItemPedido i where i.id in (:listaIdItem) group by i.pedido.cliente.id",
+						Integer.class).setParameter("listaIdItem", listaIdItem).getResultList();
+		return l.size() <= 1;
 	}
 
 	public boolean verificarItemPedidoMesmoFornecedor(List<Integer> listaIdItem) {
-		Long total = QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select count(i.pedido.representada.id) from ItemPedido i where i.id in (:listaIdItem) group by i.pedido.representada.id")
-								.setParameter("listaIdItem", listaIdItem), Long.class, 0L);
-		return total <= 1;
+		List<Integer> l = entityManager
+				.createQuery(
+						"select i.pedido.representada.id from ItemPedido i where i.id in (:listaIdItem) group by i.pedido.representada.id",
+						Integer.class).setParameter("listaIdItem", listaIdItem).getResultList();
+		return l.size() <= 1;
 	}
 }

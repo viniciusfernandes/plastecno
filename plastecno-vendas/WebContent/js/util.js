@@ -383,65 +383,36 @@ function adicionarInputHiddenFormulario(idForm, name, value){
 	gerarInputHiddenFormulario(idForm, null, name, value); 
 };
 
-function inicializarLinhaSelecionavel(idTabela){
-	idTabela = '#'+idTabela;
-	var tb = $(idTabela);
-	if(tb == undefined || tb == null){
-		alert('O elemento de ID '+idTabela+' nao existe.');
-		return;
-	}
+function tabelaLinhaSelecionavel(config){
+	var listaValorSelecionado = config.listaValorSelecionado;
+	var idTabela = config.idTabela;
+	var idBotaoLimpar = config.idBotaoLimpar;
+	var onInit = config.onInit;
+	var onSelect = config.onSelect;
+	var onUnselect = config.onUnselect;
+	var onClean = config.onClean;
 	
-	if($(tb).prop('tagName') != 'TABLE'){
-		alert('O elemento de ID '+idTabela+' nao eh uma tabela.');
-		return;
-	}
-	
-	tb.valSelec = new Array();
-	var selector = idTabela +' tr td input:checkbox';
 	// Adicionando a lista os itens carregados no inicio do load da pagina.
-	$(selector).each(function(){
-		if($(this).prop('checked')){
-			tb.valSelec.push($(this).val());	
-		}
-	});
-	// Definindo o evento de selecao.
-	$(selector).click(function(){
-		if($(this).prop('checked')){
-			tb.valSelec.push($(this).val());	
-		} else {
-			var index = tb.valSelec.indexOf($(this).val());
-			delete tb.valSelec[index];
-		}
-	});
-};
-
-function adicionarInputHiddenIdLinhaSelecionada(idTabela, idForm, listaIdItemSelecionado){
-	var form = document.getElementById(idForm);
-	if(form == undefined || form == null){
-		alert('O form de ID '+idForm+' nao existe.');
-		return;
-	}
-	
-	if($(form).prop('tagName') != 'FORM'){
-		alert('O form de ID '+idForm+' nao eh uma FORM.');
-		return;
-	}
-	
-	var nome = 'listaIdItemSelecionado[]';	
-	var id = 'idItemSelec';
-	// Adicionando a lista os itens carregados no inicio do load da pagina.
-	if(listaIdItemSelecionado != undefined && listaIdItemSelecionado != null){
-		for (var i = 0; i < listaIdItemSelecionado.length; i++) {
-			gerarInputHiddenFormulario(idForm, id+listaIdItemSelecionado[i], nome, +listaIdItemSelecionado[i]);
+	if(onInit != undefined && listaValorSelecionado != undefined && listaValorSelecionado != null){
+		for (var i = 0; i < listaValorSelecionado.length; i++) {
+			onInit(listaValorSelecionado[i]);
 		}
 	}
 	// Definindo o evento de selecao.
 	$('#'+idTabela +' tr td input:checkbox').click(function(){
-		var idSel = id+$(this).val();
 		if($(this).prop('checked')){
-			gerarInputHiddenFormulario(idForm, idSel, nome, $(this).val());
+			onSelect($(this));
 		} else {
-			form.removeChild(document.getElementById(idSel));
+			onUnselect($(this));
 		}
+	});
+	
+	$('#'+idBotaoLimpar).click(function(){
+		$('#'+idTabela +' tr td input:checkbox').each(function(){
+			if($(this).prop('checked')){
+				$(this).prop('checked', false);
+			} 
+		});
+		onClean();
 	});
 };

@@ -51,7 +51,7 @@ $(document).ready(function() {
 	$("#botaoPesquisaNumeroPedido").click(function() {
 		var numeroPedido = $('#numeroPedidoPesquisa').val();
 		if (isEmpty(numeroPedido)) {
-			gerarListaMensagemAlerta(new Array('O n�mero do pedido � obrigat�rio para a pesquisa'));
+			gerarListaMensagemAlerta(new Array('O número do pedido é obrigatório para a pesquisa'));
 			return;
 		} 
 		var form = $('#formVazio'); 
@@ -137,7 +137,8 @@ $(document).ready(function() {
 	inserirMascaraNumerica('numeroPedidoPesquisa', '9999999');
 	inserirMascaraMonetaria('fretePedido', 7);
 	inserirMascaraNumerica('validade', '999');
-
+	inserirMascaraNumerica('prazoEntrega', '999');
+	
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	inicializarAutocompleteCliente('<c:url value="/pedido/cliente"/>', function(cliente){

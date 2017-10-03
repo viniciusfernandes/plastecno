@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +9,6 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.Validator;
 import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.plastecno.service.ClienteService;
@@ -57,13 +57,10 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Servico
     private UsuarioService usuarioService;
-    private Validator validador;
 
     public OrcamentoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
-            HttpServletRequest request, Validator validador) {
+            HttpServletRequest request) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
-        this.validador = validador;
-       
 
         setClienteService(clienteService);
         setPedidoService(pedidoService);
@@ -109,6 +106,21 @@ public class OrcamentoController extends AbstractPedidoController {
         irTopoPagina();
     }
 
+    @Post("orcamento/copiaitem")
+    public void copiarItemSelecionado(Integer idCliente, Integer idRepresentada, Integer idVendedor,
+            TipoPedido tipoPedido, Integer[] listaIdItemSelecionado) {
+        try {
+            Pedido p = pedidoService.gerarPedidoItemSelecionado(idVendedor == null ? getCodigoUsuario() : idVendedor,
+                    false, true, listaIdItemSelecionado == null ? null : Arrays.asList(listaIdItemSelecionado));
+            pesquisarOrcamentoById(p.getId());
+        } catch (BusinessException e) {
+            pesquisarOrcamentoByIdCliente(idCliente, idVendedor, idRepresentada, tipoPedido, 1, null,
+                    listaIdItemSelecionado);
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
+    }
+
     @Post("orcamento/copia/{idOrcamento}")
     public void copiarOrcamento(Integer idOrcamento) {
         try {
@@ -132,7 +144,6 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Post("orcamento/envio")
     public void enviarOrcamento(Integer idOrcamento, List<UploadedFile> anexo) {
-        validador.onErrorRedirectTo(ErroController.class).erroHome();
         try {
             final PedidoPDFWrapper wrapper = gerarPDF(idOrcamento, TipoPedido.REVENDA);
             final Pedido pedido = wrapper.getPedido();
@@ -257,10 +268,10 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Get("orcamento/listagem")
     public void pesquisarOrcamentoByIdCliente(Integer idCliente, Integer idVendedor, Integer idRepresentada,
-            TipoPedido tipoPedido, Integer paginaSelecionada, ItemPedido itemVendido) {
+            TipoPedido tipoPedido, Integer paginaSelecionada, ItemPedido itemVendido, Integer[] listaIdItemSelecionado) {
 
         super.pesquisarPedidoByIdCliente(idCliente, idVendedor, idRepresentada, tipoPedido, true, paginaSelecionada,
-                itemVendido);
+                itemVendido, listaIdItemSelecionado);
 
         irRodapePagina();
     }
@@ -268,5 +279,10 @@ public class OrcamentoController extends AbstractPedidoController {
     @Get("orcamento/transportadora/listagem")
     public void pesquisarTransportadoraByNomeFantasia(String nomeFantasia) {
         forwardTo(TransportadoraController.class).pesquisarTransportadoraByNomeFantasia(nomeFantasia);
+    }
+
+    @Post("orcamento/itempedido/remocao/{id}")
+    public void removerItemOrcamento(Integer id) {
+        super.removerItemPedido(id);
     }
 }

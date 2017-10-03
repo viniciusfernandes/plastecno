@@ -272,6 +272,15 @@ function inicializarFiltro() {
 	$("#filtro_cnpj").val($("#cnpj").val());
 	$("#filtro_cpf").val($("#cpf").val());
 	$("#filtro_email").val($("#email").val());
+	
+	var tb = document.getElementById('tabelaListagemItemPedido');
+	var linhas = tb.linhasSelec;
+	if(linhas == undefined || linhas == null){
+		return;
+	}
+	for (var i = 0; i < linhas.length; i++) {
+		adicionarInputHiddenFormulario('formPesquisa', 'listaIdItemSelecionado['+i+']', linhas[i]);
+	}
 };
 
 function contactarCliente(idCliente) {

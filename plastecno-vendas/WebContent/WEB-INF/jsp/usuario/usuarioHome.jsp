@@ -167,19 +167,22 @@ function inicializarModalCancelamento(botao){
 					class="apenasLowerCase uppercaseBloqueado pesquisavel lowerCase" />
 			</div>
 			<div class="label">Cadastrar senha:</div>
-			<div class="input" style="width: 80%">
+			<div class="input" style="width: 20%">
 				<input type="checkbox" id="isAlteracaoSenha" name="isAlteracaoSenha"
 					class="checkbox"></input>
 			</div>
+			<div class="label">Email Cc:</div>
+			<div class="input" style="width: 40%">
+				<input type="text" id="emailCopia" name="usuario.emailCopia" value="${usuario.emailCopia}" style="width: 80%"
+					class="apenasLowerCase uppercaseBloqueado pesquisavel lowerCase" />
+			</div>
 			<div class="label obrigatorio">Senha:</div>
 			<div class="input" style="width: 80%">
-				<input type="password" id="senha" name="usuario.senha"
-					style="width: 20%" class="uppercaseBloqueado" />
+				<input type="password" id="senha" name="usuario.senha" style="width: 20%" class="uppercaseBloqueado" />
 			</div>
 			<div class="label obrigatorio">Confirmacao Senha:</div>
 			<div class="input" style="width: 80%">
-				<input type="password" id="senhaConfirmada" style="width: 20%"
-					class="upperCaseBloqueado" />
+				<input type="password" id="senhaConfirmada" style="width: 20%" class="upperCaseBloqueado" />
 			</div>
 		</form>
 	</fieldset>

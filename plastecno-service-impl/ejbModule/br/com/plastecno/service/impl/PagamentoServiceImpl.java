@@ -157,6 +157,11 @@ public class PagamentoServiceImpl implements PagamentoService {
 	public void inserirPagamentoParceladoItemPedido(Integer numeroNF, Double valorNF, Date dataVencimento,
 			Date dataEmissao, Integer modalidadeFrete, List<Integer> listaIdItem) throws BusinessException {
 
+		if (listaIdItem == null || listaIdItem.isEmpty()) {
+			throw new BusinessException(
+					"A lista dos IDs dos item deve ser preenchida para gerar os pagamentos do pedido.");
+		}
+
 		if (pedidoService.contemFornecedorDistintoByIdItem(listaIdItem)) {
 			throw new BusinessException(
 					"Os itens a serem pagos não são do mesmo fornecedor. Verifique os pedidos enviados.");

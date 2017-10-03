@@ -54,7 +54,7 @@ $(document).ready(function(){
 	inserirMascaraMonetaria('peso', 8);
 	inserirMascaraMonetaria('medidaExterna', 8);
 	inserirMascaraMonetaria('medidaInterna', 8);
-	inserirMascaraNumerica('prazoEntrega', '999');
+	inserirMascaraNumerica('prazoEntregaItem', '999');
 });
 
 function gerarParametrosMedidasItem(){
@@ -320,16 +320,16 @@ function pesquisarNcm(){
 				<tr>
 					<td></td>
 					<td colspan="4"></td>
-					<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
-					<td colspan="4"><div id="valorPedidoIPI"
-							style="text-align: left;">R$ ${not empty pedido.valorPedidoIPI ? pedido.valorPedidoIPIFormatado : 0}</div></td>
+					<td colspan="2" style="text-align: right;">TOTAL SEM IPI:</td>
+					<td colspan="4"><div id="valorPedido"
+							style="text-align: left;">R$ ${not empty pedido.valorPedido ? pedido.valorPedidoFormatado : 0}</div></td>
 				</tr>
 				<tr>
 					<td></td>
 					<td colspan="4"></td>
-					<td colspan="2" style="text-align: right;">TOTAL SEM IPI:</td>
-					<td colspan="4"><div id="valorPedido"
-							style="text-align: left;">R$ ${not empty pedido.valorPedido ? pedido.valorPedidoFormatado : 0}</div></td>
+					<td colspan="2" style="text-align: right;">TOTAL COM IPI:</td>
+					<td colspan="4"><div id="valorPedidoIPI"
+							style="text-align: left;">R$ ${not empty pedido.valorPedidoIPI ? pedido.valorPedidoIPIFormatado : 0}</div></td>
 				</tr>
 				<tr>
 					<td></td>

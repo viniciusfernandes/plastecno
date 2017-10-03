@@ -26,6 +26,11 @@ public class OrcamentoEmailBuilder extends PedidoEmailBuilder {
 	}
 
 	@Override
+	public String gerarDestinatarioCc() {
+		return pedido.getVendedor().getEmailCopia();
+	}
+
+	@Override
 	public String gerarRemetente() {
 		return pedido.getVendedor().getEmail();
 	}

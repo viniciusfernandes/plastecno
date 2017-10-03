@@ -1,10 +1,46 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<script type="text/javascript">
+
+$(document).ready(function(){
+	var nome = 'listaIdItemSelecionado[]';	
+	var id = 'idItemSelec';
+	var idForm = 'formPesquisa';
+	var form = document.getElementById(idForm);
+	tabelaLinhaSelecionavel({
+		idTabela:'tabelaListagemItemPedido',
+		idBotaoLimpar:'botaoRemoverSelecaoItem',
+		listaValorSelecionado: <c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>,
+		onSelect: function(checkbox){
+			gerarInputHiddenFormulario(idForm, id+$(checkbox).val(), nome, $(checkbox).val());
+		},
+		onUnselect: function(checkbox){
+			form.removeChild(document.getElementById(id+$(checkbox).val()));
+		},
+		onInit: function(valor){
+			gerarInputHiddenFormulario(idForm, id+valor, nome, valor);
+		},
+		onClean: function(){
+			$('#'+idForm+' input[id^=\''+id+'\']').remove();
+		}
+	});
+	
+	$('#botaoCopiarItem').click(function(){
+		$('#formPesquisa').attr('action', '<c:url value="${orcamento ? \'orcamento\' : \'pedido\' }/copiaitem"/>').attr('method', 'post').submit();
+	});
+	
+});
+
+</script>
 <a id="rodape"></a>
 	<fieldset>
 		<legend>::: Resultado da Pesquisa de Pedidos de ${isCompra ? 'Compra': 'Venda'} :::</legend>
 		<div id="paginador"></div>
+		<div class="bloco_botoes">
+			<input type="button" id="botaoCopiarItem" title="Gerar Novo ${orcamento ? 'Orçamento': 'Pedido'}" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoRemoverSelecaoItem" value="" title="Remover Seleção Item" class="botaoLimpar" />
+		</div>
 		<div>
-			<table id="tabelaItemPedido" class="listrada">
+			<table id="tabelaListagemItemPedido" class="listrada">
 			<thead>
 				<tr>
 					<th style="width: 10%">Situaç.</th>
@@ -45,13 +81,20 @@
 									<form action="${orcamento? 'orcamento/pdf': 'pedido/pdf' }">
 										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
 										<input type="hidden" name="idPedido" value="${grupo.id.id}" />
-										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
+										<div class="input" style="width: 35%">
+											<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro" />
+										</div>
 									</form>
 									<form action="${orcamento? 'orcamento/': 'pedido/' }${grupo.id.id}" method="get">
 										<input type="hidden" name="tipoPedido" value="${grupo.id.tipoPedido}" /> 
 										<input type="hidden" name="id" value="${grupo.id.id}" />
-										<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
+										<div class="input" style="width: 35%">
+											<input type="submit" id="botaoEditarPedido" title="Editar Dados do Pedido" value="" class="botaoEditar" />
+										</div>
 									</form>
+									<div class="input" style="width: 30%">
+										<input type="checkbox" value="${item.id}" ${not empty idSelec[item.id]?'checked':''}/>
+									</div>
 								</div>
 							</td>
 						</tr>

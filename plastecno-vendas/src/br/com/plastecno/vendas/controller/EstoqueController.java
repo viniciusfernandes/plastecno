@@ -41,8 +41,7 @@ public class EstoqueController extends AbstractController {
     public void calcularPrecoMinimoItemEstoque(ItemEstoque item) {
         try {
             Double precoMinimo = estoqueService.calcularPrecoMinimoItemEstoque(item);
-            String precoMinimoFormatado = precoMinimo == null ? "" : NumeroUtils.formatarValorMonetario(precoMinimo);
-            serializarJson(new SerializacaoJson("precoMinimo", precoMinimoFormatado));
+            serializarJson(new SerializacaoJson("precoMinimo", precoMinimo == null ? "" : String.valueOf(precoMinimo)));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {

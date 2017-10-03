@@ -101,6 +101,10 @@ public class PagamentoServiceTest extends AbstractTest {
 		Pagamento pag2 = pagamentoService.gerarPagamentoItemPedido(id2);
 		Pagamento pag3 = pagamentoService.gerarPagamentoItemPedido(id3);
 
+		pag1.setDataEmissao(new Date());
+		pag2.setDataEmissao(new Date());
+		pag3.setDataEmissao(new Date());
+		
 		pag1.setNumeroNF(numeroNF);
 		pag2.setNumeroNF(numeroNF);
 		pag3.setNumeroNF(numeroNF);

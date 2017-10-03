@@ -21,9 +21,6 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-	
-	var checker = new tabelaChecker({idTabela:'tabelaRecepcaoCompras', nomeParametros:'listaIdItem'});
-	
 	scrollTo('${ancora}');
 	
 	inserirMascaraData('dataInicial');
@@ -71,12 +68,29 @@ $(document).ready(function() {
 		$(form).submit();
 	});
 	
-	$('#botaoInserirPagamento').click(function (){
-		if(!checker.hasChecked()){
-			gerarListaMensagemAlerta(['Para efetuar um pagamento selecione algum elemento da lista de compras.']);
-			return;
+	var nome = 'listaIdItemSelecionado[]';	
+	var id = 'idItemSelec';
+	var idForm = 'formPagamento';
+	var form = document.getElementById(idForm);
+	tabelaLinhaSelecionavel({
+		idTabela: 'tabelaRecepcaoCompras',
+		idBotaoLimpar:'botaoLimparPagamento',
+		listaValorSelecionado: <c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>,
+		onSelect: function(checkbox){
+			gerarInputHiddenFormulario(idForm, id+$(checkbox).val(), nome, $(checkbox).val());
+		},
+		onUnselect: function(checkbox){
+			form.removeChild(document.getElementById(id+$(checkbox).val()));
+		},
+		onInit: function(valor){
+			gerarInputHiddenFormulario(idForm, id+valor, nome, valor);
+		},
+		onClean: function(){
+			$('#'+idForm+' input[id^=\''+id+'\']').remove();
 		}
-		checker.addInputHidden('formPagamento');
+	});
+	
+	$('#botaoInserirPagamento').click(function (){
 		adicionarInputHiddenFormulario('formPagamento', 'dataInicial', $('#dataInicial').val());
 		adicionarInputHiddenFormulario('formPagamento', 'dataFinal', $('#dataFinal').val());
 		adicionarInputHiddenFormulario('formPagamento', 'idRepresentada', $('#formPesquisa #idRepresentada').val());
@@ -216,7 +230,7 @@ function recepcionarItem(botao){
 					<th style="width: 38%">Desc. Item</th>
 					<th style="width: 10%">Comprador</th>
 					<th style="width: 10%">Forneced.</th>
-					<th style="width: 13%">Ação</th>
+					<th style="width: 10%">Ação</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -238,25 +252,31 @@ function recepcionarItem(botao){
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/pedido/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" />
-										<input type="hidden" name="tipoPedido" value="${relatorio.propriedades['tipoPedido']}" /> 
-										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
+										<input type="hidden" name="tipoPedido" value="${relatorio.propriedades['tipoPedido']}" />
+										<div class="input" style="width: 20%"> 
+											<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
+										</div>
 									</form>
 									<form action="<c:url value="/compra/item/recepcao"/>" method="post" >
 										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
-										<input type="button" value="" title="Recepcionar o Item do Pedido" 
-										onclick="recepcionarItem(this);" class="botaoAdicionar_16" />
+										<div class="input" style="width: 20%">
+											<input type="button" value="" title="Recepcionar o Item do Pedido" onclick="recepcionarItem(this);" class="botaoAdicionar_16" />
+										</div>
 									</form>
 									<form action="<c:url value="/compra/item/edicao"/>" method="post">
-										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
-										<input type="button" value="" title="Editar o Item do Pedido" class="botaoEditar" onclick="submeterForm(this);"/>
+										<input type="hidden" name="idItemPedido" value="${item.id}" />
+										<div class="input" style="width: 20%">
+											<input type="button" value="" title="Editar o Item do Pedido" class="botaoEditar" onclick="submeterForm(this);"/>
+										</div>
 									</form>
 									<form action="<c:url value="/compra/item/remocao"/>" method="post" >
-										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
-										<input type="button" value="" title="Remover o Item do Pedido" 
-											onclick="removerItem(this);" class="botaoRemover" />
+										<input type="hidden" name="idItemPedido" value="${item.id}" />
+										<div class="input" style="width: 20%">
+											<input type="button" value="" title="Remover o Item do Pedido" onclick="removerItem(this);" class="botaoRemover" />
+										</div>
 									</form>
 									<div class="input" style="width: 20%">
-										<input type="checkbox" name="idItemPedido" value="${item.id}" />
+										<input type="checkbox" name="idItemPedido" value="${item.id}" ${not empty idSelec[item.id]?'checked':''}/>
 									</div>
 								</div>
 							</td>

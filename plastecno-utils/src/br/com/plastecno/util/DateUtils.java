@@ -56,25 +56,23 @@ public final class DateUtils {
 			throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
 		}
 
-      if (inicio == null || fim == null) {
-            throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
-        }
+		if (inicio == null || fim == null) {
+			throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
+		}
 		inicio = gerarDataSemHorario(inicio);
 		fim = gerarDataSemHorario(fim);
 		return inicio.compareTo(fim) < 0;
 	}
 
-  
 	public static boolean isAnteriorDataAtual(Date inicio) {
 		return isAnterior(inicio, new Date());
 	}
 
-        
 	public static boolean isPosteriror(Date inicio, Date fim) {
-if (inicio == null || fim == null) {
-            throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
-        }
-inicio = gerarDataSemHorario(inicio);
+		if (inicio == null || fim == null) {
+			throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
+		}
+		inicio = gerarDataSemHorario(inicio);
 		fim = gerarDataSemHorario(fim);
 		return inicio.compareTo(fim) > 0;
 	}

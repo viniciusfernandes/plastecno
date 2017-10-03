@@ -89,19 +89,22 @@ public class RecepcaoCompraController extends AbstractController {
     }
 
     @Post("compra/item/pagamento/inclusao")
-    public void inserirPagamentoItemPedido(Pagamento pagamento, List<Integer> listaIdItem, Date dataInicial,
-            Date dataFinal, Integer idRepresentada) {
+    public void inserirPagamentoItemPedido(Pagamento pagamento, Date dataInicial, Date dataFinal,
+            Integer idRepresentada, List<Integer> listaIdItemSelecionado) {
         try {
             pagamentoService.inserirPagamentoParceladoItemPedido(pagamento.getNumeroNF(), pagamento.getValorNF(),
                     pagamento.getDataVencimento(), pagamento.getDataEmissao(), pagamento.getModalidadeFrete(),
-                    listaIdItem);
+                    listaIdItemSelecionado);
 
             redirecTo(PagamentoController.class)
                     .pesquisarPagamentoByNF(pagamento.getNumeroNF(), new Date(), new Date());
         } catch (BusinessException e) {
+            addAtributo("dataInicial", dataInicial);
+            addAtributo("dataFinal", dataFinal);
             addAtributo("pagamento", pagamento);
-            gerarListaMensagemErro(e);
             pesquisarCompraAguardandoRecepcao(dataInicial, dataFinal, idRepresentada);
+            adicionarIdItemSelecionado(listaIdItemSelecionado);
+            gerarListaMensagemErro(e);
         }
     }
 

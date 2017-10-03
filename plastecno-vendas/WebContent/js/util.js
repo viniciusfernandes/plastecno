@@ -400,9 +400,10 @@ function tabelaLinhaSelecionavel(config){
 	}
 	// Definindo o evento de selecao.
 	$('#'+idTabela +' tr td input:checkbox').click(function(){
-		if($(this).prop('checked')){
+		var ck = $(this).prop('checked'); 
+		if(ck && onSelect != undefined){
 			onSelect($(this));
-		} else {
+		} else if(!ck && onUnselect != undefined){
 			onUnselect($(this));
 		}
 	});
@@ -413,51 +414,8 @@ function tabelaLinhaSelecionavel(config){
 				$(this).prop('checked', false);
 			} 
 		});
-		onClean();
-	});
-};
-
-function tabelaChecker(config){
-	if(config == undefined || config==null|| isEmpty(config.idTabela) || isEmpty(config.nomeParametros)){
-		alert('Falha na configuracao da tabela selecionavel.');
-	}
-	var lValores = new Array();
-	$('#'+config.idTabela + ' tr input:checkbox').click(function(){
-		if($(this).prop('checked')){
-			lValores.push($(this).val());	
-		} else {
-			var idx = lValores.indexOf($(this).val());
-			if(idx < 0){
-				return;
-			}
-			lValores.splice(idx, 1);
+		if(onClean != undefined){
+			onClean();
 		}
 	});
-	
-	this.gerarListaParametros = function (){
-		var parametros = '';
-		for (var i = 0; i < lValores.length; i++) {
-			// Estamos validando aqui pois no DELETE dos itens da lista o javascript mantem undefined.
-			if(lValores[i] != undefined){
-				parametros+='&'+config.nomeParametros+'[]='+lValores[i];
-			}
-		};
-		return parametros;
-	};
-	
-	this. addInputHidden = function (idForm){
-		if(idForm == undefined || idForm==null|| isEmpty(idForm)){
-			return;
-		}
-		for (var i = 0; i < lValores.length; i++) {
-			// Estamos validando aqui pois no DELETE dos itens da lista o javascript mantem undefined.
-			if(lValores[i] != undefined){
-				adicionarInputHiddenFormulario(idForm, config.nomeParametros+'['+i+']', lValores[i]);
-			}
-		};
-	};
-	
-	this.hasChecked = function(){
-		return lValores.length > 0;
-	};
 };

@@ -7,10 +7,13 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,7 +75,7 @@ public abstract class AbstractController {
     private Validator validator;
 
     public AbstractController(Result result) {
-        this(result, null, (HttpServletRequest)null);
+        this(result, null, (HttpServletRequest) null);
     }
 
     public AbstractController(Result result, HttpServletRequest request) {
@@ -83,7 +86,7 @@ public abstract class AbstractController {
      * Construtor utilizado para inicializar a sessao do usuario
      */
     public AbstractController(Result result, UsuarioInfo usuarioInfo) {
-        this(result, usuarioInfo, (HttpServletRequest)null);
+        this(result, usuarioInfo, (HttpServletRequest) null);
     }
 
     // Construtor utilizado na geracao dos relatorio em PDF pois temos que pegar
@@ -124,7 +127,7 @@ public abstract class AbstractController {
             irTelaErro();
         }
     }
-    
+
     // construtor utilizado na geracao dos relatorio em PDF pois temos que pegar
     // o caminho do diretorio dos templates.
     public AbstractController(Result result, UsuarioInfo usuarioInfo, HttpServletRequest request) {
@@ -135,12 +138,12 @@ public abstract class AbstractController {
      * Construtor utilizado para inicializar a sessao do usuario e validacao
      */
     public AbstractController(Result result, UsuarioInfo usuarioInfo, Validator validator) {
-        this(result, usuarioInfo, (HttpServletRequest)null);
-        this.validator=validator;
+        this(result, usuarioInfo, (HttpServletRequest) null);
+        this.validator = validator;
     }
 
     public AbstractController(Result result, Validator validator) {
-        this(result, null,(HttpServletRequest) null);
+        this(result, null, (HttpServletRequest) null);
         this.validator = validator;
     }
 
@@ -171,6 +174,25 @@ public abstract class AbstractController {
                     "Utilize o contrutor que contenha um HTTPRequest nos parametros para injetar o request");
         }
         request.getSession().setAttribute(atributo, valor);
+    }
+
+    void adicionarIdItemSelecionado(Integer[] listaIdItemSelecionado) {
+        if (listaIdItemSelecionado == null || listaIdItemSelecionado.length <= 0) {
+            return;
+        }
+        Map<Integer, Boolean> idSelecionado = new HashMap<>();
+        for (Integer id : listaIdItemSelecionado) {
+            idSelecionado.put(id, true);
+        }
+        addAtributo("idSelec", idSelecionado);
+        addAtributo("listaIdItemSelecionado", Arrays.deepToString(listaIdItemSelecionado));
+    }
+
+    void adicionarIdItemSelecionado(List<Integer> listaIdItemSelecionado) {
+        if (listaIdItemSelecionado == null) {
+            return;
+        }
+        adicionarIdItemSelecionado(listaIdItemSelecionado.toArray(new Integer[] {}));
     }
 
     final void ancorarRodape() {
@@ -323,23 +345,23 @@ public abstract class AbstractController {
         }
     }
 
-    Date gerarDataInicioMes() {
+    Date gerarDataFimAno() {
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.DAY_OF_MONTH, 1);
+        c.set(Calendar.DAY_OF_MONTH, 31);
+        c.set(Calendar.MONTH, 11);
         return c.getTime();
     }
-    
+
     Date gerarDataInicioAno() {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_MONTH, 1);
         c.set(Calendar.MONTH, 0);
         return c.getTime();
     }
-    
-    Date gerarDataFimAno() {
+
+    Date gerarDataInicioMes() {
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.DAY_OF_MONTH, 31);
-        c.set(Calendar.MONTH, 11);
+        c.set(Calendar.DAY_OF_MONTH, 1);
         return c.getTime();
     }
 

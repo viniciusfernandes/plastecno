@@ -654,8 +654,12 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		try {
-			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.ORCAMENTO, pdfPedido,
-					anexos));
+			// O caso do email alternativo eh para direcionar o email de
+			// orcamento para o proprio vendedor, pois eles costumam a enviar o
+			// PDF do orcamento para o contato do cliente de outra forma.
+			TipoMensagemPedido tipo = pedido.isClienteNotificadoVenda() ? TipoMensagemPedido.ORCAMENTO
+					: TipoMensagemPedido.ORCAMENTO_ALTERNATIVO;
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, tipo, pdfPedido, anexos));
 		} catch (NotificacaoException e) {
 			StringBuilder mensagem = new StringBuilder();
 			mensagem.append("Falha no envio do orçamento No. ").append(pedido.getId()).append(" do vendedor ")
@@ -732,6 +736,7 @@ public class PedidoServiceImpl implements PedidoService {
 		validarListaLogradouroPreenchida(pedido);
 		try {
 			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA, pdfPedido, anexos));
+			// Caso o contato tambem queira receber o email
 			if (pedido.isClienteNotificadoVenda()) {
 				emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA_CLIENTE,
 						pdfPedido, anexos));
@@ -797,7 +802,7 @@ public class PedidoServiceImpl implements PedidoService {
 		Contato c = new Contato();
 		c.setNome("PREENCHER CONTATO");
 		p.setContato(c);
-		
+
 		p = inserirPedido(p);
 
 		ItemPedido clone = null;

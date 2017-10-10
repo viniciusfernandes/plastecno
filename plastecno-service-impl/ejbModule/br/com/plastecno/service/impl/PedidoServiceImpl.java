@@ -643,8 +643,12 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		try {
-			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.ORCAMENTO, pdfPedido,
-					anexos));
+			// O caso do email alternativo eh para direcionar o email de
+			// orcamento para o proprio vendedor, pois eles costumam a enviar o
+			// PDF do orcamento para o contato do cliente de outra forma.
+			TipoMensagemPedido tipo = pedido.isClienteNotificadoVenda() ? TipoMensagemPedido.ORCAMENTO
+					: TipoMensagemPedido.ORCAMENTO_ALTERNATIVO;
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, tipo, pdfPedido, anexos));
 		} catch (NotificacaoException e) {
 			StringBuilder mensagem = new StringBuilder();
 			mensagem.append("Falha no envio do orçamento No. ").append(pedido.getId()).append(" do vendedor ")
@@ -724,6 +728,7 @@ public class PedidoServiceImpl implements PedidoService {
 		validarListaLogradouroPreenchida(pedido);
 		try {
 			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA, pdfPedido, anexos));
+			// Caso o contato tambem queira receber o email
 			if (pedido.isClienteNotificadoVenda()) {
 				emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA_CLIENTE,
 						pdfPedido, anexos));
@@ -738,6 +743,66 @@ public class PedidoServiceImpl implements PedidoService {
 			e.addMensagem(e.getListaMensagem());
 			throw e;
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Pedido gerarPedidoItemSelecionado(Integer idVendedor, boolean isCompra, boolean isOrcamento,
+			List<Integer> listaIdItemSelecionado) throws BusinessException {
+		if (listaIdItemSelecionado == null || listaIdItemSelecionado.isEmpty()) {
+			throw new BusinessException("A lista de item selecionado deve ser preenchida para gerar um novo pedido.");
+		}
+
+		if (!itemPedidoDAO.verificarItemPedidoMesmoFornecedor(listaIdItemSelecionado)) {
+			throw new BusinessException(
+					"Os itens selecionados devem ser de pedidos efetuados para um mesmo fornecedor. Verifique os itens escolhidos.");
+		}
+
+		if (!itemPedidoDAO.verificarItemPedidoMesmoCliente(listaIdItemSelecionado)) {
+			throw new BusinessException(
+					"Os itens selecionados devem ser de pedidos efetuados para um mesmo cliente. Verifique os itens escolhidos.");
+		}
+
+		List<ItemPedido> listaItem = pesquisarItemPedidoById(listaIdItemSelecionado);
+		if (listaItem == null || listaItem.isEmpty()) {
+			throw new BusinessException("Os itens selecionados não existem no sistema.");
+		}
+		// Como todos os pedidos pertendem ao mesmo fornecedor, entao basta
+		// espquisar pelo primeiro.
+		Integer idRepres = itemPedidoDAO.pesquisarIdRepresentadaByIdItem(listaIdItemSelecionado.get(0));
+		Integer idCli = itemPedidoDAO.pesquisarIdClienteByIdItem(listaIdItemSelecionado.get(0));
+
+		TipoPedido tipo = null;
+		if (isCompra) {
+			tipo = TipoPedido.COMPRA;
+		} else if (representadaService.isRevendedor(idRepres)) {
+			tipo = TipoPedido.REPRESENTACAO;
+		} else {
+			tipo = TipoPedido.REVENDA;
+		}
+
+		Pedido p = new Pedido();
+		p.setVendedor(new Usuario(idVendedor));
+		p.setDataEntrega(DateUtils.gerarDataAmanha());
+		p.setFormaPagamento("28 DDL");
+		p.setRepresentada(new Representada(idRepres, null));
+		p.setTipoPedido(tipo);
+		p.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO_DIGITACAO : SituacaoPedido.DIGITACAO);
+		p.setCliente(new Cliente(idCli));
+		p.setFinalidadePedido(TipoFinalidadePedido.INDUSTRIALIZACAO);
+
+		Contato c = new Contato();
+		c.setNome("PREENCHER CONTATO");
+		p.setContato(c);
+
+		p = inserirPedido(p);
+
+		ItemPedido clone = null;
+		for (ItemPedido item : listaItem) {
+			clone = item.clone();
+			inserirItemPedido(p.getId(), clone);
+		}
+		return p;
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -1347,6 +1412,12 @@ public class PedidoServiceImpl implements PedidoService {
 			itemPedido.setValorTotalPedidoSemFrete(valorPedido[2]);
 		}
 		return itemPedido;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoById(List<Integer> listaIdItem) {
+		return itemPedidoDAO.pesquisarItemPedidoById(listaIdItem);
 	}
 
 	@Override

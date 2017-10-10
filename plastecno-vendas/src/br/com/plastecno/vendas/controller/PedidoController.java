@@ -1,6 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -166,6 +167,22 @@ public class PedidoController extends AbstractPedidoController {
         // assincrona e a mascara em javascript nao eh executada.
         formatarDocumento(cliente);
         return cliente;
+    }
+
+    @Post("pedido/copiaitem")
+    public void copiarItemSelecionado(Integer idCliente, Integer idFornecedor, Integer idVendedor,
+            TipoPedido tipoPedido, boolean orcamento, Integer[] listaIdItemSelecionado) {
+        try {
+            Pedido p = pedidoService.gerarPedidoItemSelecionado(idVendedor == null ? getCodigoUsuario() : idVendedor,
+                    TipoPedido.COMPRA.equals(tipoPedido), false,
+                    listaIdItemSelecionado == null ? null : Arrays.asList(listaIdItemSelecionado));
+            pesquisarPedidoById(p.getId(), tipoPedido, false);
+        } catch (BusinessException e) {
+            pesquisarPedidoByIdCliente(idCliente, idVendedor, idFornecedor, tipoPedido, orcamento, 1, null,
+                    listaIdItemSelecionado);
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
     }
 
     @Post("pedido/copia/{idPedido}")
@@ -472,10 +489,11 @@ public class PedidoController extends AbstractPedidoController {
 
     @Get("pedido/listagem")
     public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido) {
+            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido,
+            Integer[] listaIdItemSelecionado) {
 
         super.pesquisarPedidoByIdCliente(idCliente, idVendedor, idFornecedor, tipoPedido, orcamento, paginaSelecionada,
-                itemVendido);
+                itemVendido, listaIdItemSelecionado);
 
         configurarTipoPedido(tipoPedido);
         redirecionarHome(tipoPedido, orcamento, false);

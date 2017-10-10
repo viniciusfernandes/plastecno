@@ -351,8 +351,13 @@ function inserirOrcamento(){
 		</div>
 		
 		<div class="label" style="width: 8%">Telefone:</div>
-		<div class="input" style="width: 70%">
-			<input type="text" id="telefone" name="contato.telefone" value="${contato.telefone}" style="width: 23%"/>
+		<div class="input" style="width: 16%">
+			<input type="text" id="telefone" name="contato.telefone" value="${contato.telefone}" style="width: 100%"/>
+		</div>
+		<div class="label" style="width: 10%">Email Cont.:</div>
+		<div class="input" style="width: 40%">
+			<input type="checkbox" id="clienteNotificadoVenda" name="pedido.clienteNotificadoVenda"
+				<c:if test="${pedido.clienteNotificadoVenda}">checked</c:if> class="checkbox" style="width: 4%"/>
 		</div>
 		<div class="label">Tipo Entrega:</div>
 			<div class="input" style="width: 30%">
@@ -378,7 +383,7 @@ function inserirOrcamento(){
 			<input type="text" id="pagamento" name="pedido.formaPagamento" value="${pedido.formaPagamento}" style="width: 100%"/>
 		</div>
 		<div class="label">Observação:</div>
-			<div class="input areatexto" style="width: 70%">
+			<div class="input areatexto" style="width: 71%">
 				<textarea id="obervacao" name="pedido.observacao"
 					style="width: 100%">${pedido.observacao}</textarea>
 			</div>

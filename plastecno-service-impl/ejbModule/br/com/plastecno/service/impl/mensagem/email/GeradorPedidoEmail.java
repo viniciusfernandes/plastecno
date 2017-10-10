@@ -15,6 +15,7 @@ public final class GeradorPedidoEmail {
 		mapaMensagem = new HashMap<TipoMensagemPedido, Class<? extends PedidoEmailBuilder>>();
 		mapaMensagem.put(TipoMensagemPedido.VENDA, VendaEmailBuilder.class);
 		mapaMensagem.put(TipoMensagemPedido.ORCAMENTO, OrcamentoEmailBuilder.class);
+		mapaMensagem.put(TipoMensagemPedido.ORCAMENTO_ALTERNATIVO, OrcamentoEmailAlternaticoBuilder.class);
 		mapaMensagem.put(TipoMensagemPedido.VENDA_CLIENTE, VendaClienteEmailBuilder.class);
 		mapaMensagem.put(TipoMensagemPedido.COMPRA, CompraEmailBuilder.class);
 	}

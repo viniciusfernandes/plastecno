@@ -39,7 +39,7 @@ public class EmailServiceImpl implements EmailService {
 		try {
 			final String REMETENTE = mensagemEmail.getRemetente();
 			final String DESTINATARIO = mensagemEmail.getDestinatario();
-
+			final String DESTINATARIO_CC = mensagemEmail.getDestinatarioCc();
 			final String SENHA = autenticacaoService.decriptografar(usuarioService.pesquisarSenhaByEmail(REMETENTE));
 
 			MultiPartEmail email = new HtmlEmail();
@@ -64,8 +64,12 @@ public class EmailServiceImpl implements EmailService {
 			}
 
 			email.setFrom(REMETENTE);
-			email.addTo(gerarDestinatarios(DESTINATARIO));
+			email.addTo(gerarEmails(DESTINATARIO));
 			email.setMsg(mensagemEmail.getConteudo());
+			final String[] cc = gerarEmails(DESTINATARIO_CC);
+			if (cc != null) {
+				email.addCc(cc);
+			}
 			gerarAnexo(mensagemEmail, email);
 			
 			email.send();
@@ -89,8 +93,14 @@ public class EmailServiceImpl implements EmailService {
 		}
 	}
 
-	private String[] gerarDestinatarios(String destinatarios) {
-		String[] dest = destinatarios.split(";");
+	private String[] gerarEmails(String emails) {
+		if (emails == null || emails.isEmpty()) {
+			return null;
+		}
+		String[] dest = emails.split(";");
+		if (dest.length == 1) {
+			return dest;
+		}
 		// Aqui estamos utilizando o Set para remover os emails repetivos dos
 		// destinatarios
 		HashSet<String> s = new HashSet<String>();

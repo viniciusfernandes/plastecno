@@ -58,7 +58,7 @@ public abstract class AbstractController {
     private String homePath;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private String nomeTela;
-    private final Integer numerRegistrosPorPagina = 10;
+    private final Integer numerRegistrosPorPagina = 20;
     private Picklist picklist;
     private final String possuiMultiplosLogradouros = "possuiMultiplosLogradouros";
     private HttpServletRequest request;

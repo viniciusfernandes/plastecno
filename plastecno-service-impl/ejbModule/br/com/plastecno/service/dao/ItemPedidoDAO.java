@@ -16,7 +16,6 @@ import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.wrapper.Periodo;
 
 public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
-
 	public ItemPedidoDAO(EntityManager entityManager) {
 		super(entityManager);
 	}
@@ -158,6 +157,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return query.getResultList();
 	}
 
+	public Integer pesquisarIdClienteByIdItem(Integer idItem) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.pedido.cliente.id from ItemPedido i where i.id = :idItem ")
+						.setParameter("idItem", idItem), Integer.class, null);
+	}
+
 	public List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido) {
 		return entityManager.createQuery("select i.id from ItemPedido i where i.pedido.id = :idPedido", Integer.class)
 				.setParameter("idPedido", idPedido).getResultList();
@@ -205,6 +210,12 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return entityManager
 				.createQuery("select i.idPedidoCompra, i.idPedidoVenda from ItemPedido i where i.id = :idItemPedido",
 						Object[].class).setParameter("idItemPedido", idItemPedido).getSingleResult();
+	}
+
+	public Integer pesquisarIdRepresentadaByIdItem(Integer idItem) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.pedido.representada.id from ItemPedido i where i.id = :idItem ")
+						.setParameter("idItem", idItem), Integer.class, null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -355,6 +366,11 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		}
 
 		return query.getResultList();
+	}
+
+	public List<ItemPedido> pesquisarItemPedidoById(List<Integer> listaIdItem) {
+		return entityManager.createQuery("select i from ItemPedido i where i.id in (:listaIdItem)", ItemPedido.class)
+				.setParameter("listaIdItem", listaIdItem).getResultList();
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
@@ -548,5 +564,21 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		query.setParameter("idItemPedido", idItemPedido);
 		Object[] valores = QueryUtil.gerarRegistroUnico(query, Object[].class, new Object[] { 0d, 0d, 0d });
 		return new Double[] { (Double) valores[0], (Double) valores[1], (Double) valores[2] };
+	}
+
+	public boolean verificarItemPedidoMesmoCliente(List<Integer> listaIdItem) {
+		List<Integer> l = entityManager
+				.createQuery(
+						"select i.pedido.cliente.id from ItemPedido i where i.id in (:listaIdItem) group by i.pedido.cliente.id",
+						Integer.class).setParameter("listaIdItem", listaIdItem).getResultList();
+		return l.size() <= 1;
+	}
+
+	public boolean verificarItemPedidoMesmoFornecedor(List<Integer> listaIdItem) {
+		List<Integer> l = entityManager
+				.createQuery(
+						"select i.pedido.representada.id from ItemPedido i where i.id in (:listaIdItem) group by i.pedido.representada.id",
+						Integer.class).setParameter("listaIdItem", listaIdItem).getResultList();
+		return l.size() <= 1;
 	}
 }

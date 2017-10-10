@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -37,6 +38,10 @@ public class Usuario implements Serializable {
 
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 50 }, nomeExibicao = "Email do usuario")
 	private String email;
+
+	@Column(name = "email_copia")
+	@InformacaoValidavel(intervaloComprimento = { 0, 250 }, nomeExibicao = "Lista email para cópia do usuário")
+	private String emailCopia;
 
 	@Id
 	@SequenceGenerator(name = "usuarioSequence", sequenceName = "vendas.seq_usuario_id", allocationSize = 1, initialValue = 1)
@@ -137,6 +142,10 @@ public class Usuario implements Serializable {
 		return email;
 	}
 
+	public String getEmailCopia() {
+		return emailCopia;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -219,6 +228,10 @@ public class Usuario implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public void setEmailCopia(String emailCopia) {
+		this.emailCopia = emailCopia;
 	}
 
 	public void setId(Integer id) {

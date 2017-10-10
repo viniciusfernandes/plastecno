@@ -7,8 +7,7 @@ import br.com.plastecno.util.StringUtils;
 
 public class CompraEmailBuilder extends PedidoEmailBuilder {
 
-	public CompraEmailBuilder(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail ... anexos)
-			throws MensagemEmailException {
+	public CompraEmailBuilder(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws MensagemEmailException {
 		super(pedido, pdfPedido, anexos);
 		pdfPedido.setNome("Pedido No. " + pedido.getId() + " " + pedido.getCliente().getNomeFantasia());
 		pdfPedido.setDescricao("Pedido de comprado por " + pedido.getComprador().getNome());
@@ -24,9 +23,17 @@ public class CompraEmailBuilder extends PedidoEmailBuilder {
 
 	@Override
 	public String gerarDestinatario() {
-		// Aqui estamos enviando o email para a representada (fornecedor) e para
-		// os emails cadastrados no cliente (para acompanhamento das compras)
-		return pedido.getRepresentada().getEmail() + ";" + pedido.getCliente().getEmail();
+		// Aqui estamos enviando o email para a representada (fornecedor no caso
+		// de compras).
+		return pedido.getRepresentada().getEmail();
+	}
+
+	@Override
+	public String gerarDestinatarioCc() {
+		// Aqui estamos enviando o email para
+		// os emails cadastrados no cliente comprador (no caso a revendedora)
+		// para acompanhamento das compras.
+		return pedido.getCliente().getEmail();
 	}
 
 	@Override

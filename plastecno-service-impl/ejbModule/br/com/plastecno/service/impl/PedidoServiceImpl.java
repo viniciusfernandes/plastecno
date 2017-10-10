@@ -683,6 +683,9 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido.setDataEnvio(new Date());
 		}
 
+		// Devemos associar ao pedido o logradouro do cliente somento no envio.
+		associarLogradouroCliente(pedido);
+
 		validarEnvio(pedido);
 
 		if (pedido.isOrcamento()) {
@@ -818,9 +821,6 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 		// Aqui estamos atualizando o valor do pedido pois pode haver um frete.
 		atualizarValoresPedido(idPedido);
-
-		// Devemos sempre associar ao pedido o logradouro do cliente.
-		associarLogradouroCliente(pedido);
 
 		return pedido;
 	}

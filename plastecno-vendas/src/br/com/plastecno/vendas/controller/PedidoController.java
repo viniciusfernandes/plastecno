@@ -285,7 +285,7 @@ public class PedidoController extends AbstractPedidoController {
     public void pedidoCompraHome() {
         addAtributoCondicional("isCompra", true);
         configurarTipoPedido(TipoPedido.COMPRA);
-
+        addAtributo("listaTransportadora", transportadoraService.pesquisarTransportadoraAtiva());
         addAtributo("listaRepresentada", representadaService.pesquisarFornecedor(true));
         addAtributo("descricaoTipoPedido", TipoPedido.COMPRA.getDescricao());
         addAtributo("cliente", clienteService.pesquisarRevendedor());

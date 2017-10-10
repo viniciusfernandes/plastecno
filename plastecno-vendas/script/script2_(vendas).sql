@@ -877,3 +877,26 @@ ALTER TABLE vendas.tb_contato drop constraint id_logradouro;
 ALTER TABLE vendas.tb_transportadora drop id_logradouro;
 ALTER TABLE vendas.tb_contato drop id_logradouro;
 ALTER TABLE vendas.tb_logradouro_cliente drop constraint id_logradouro_cliente;
+
+alter table vendas.tb_item_pedido add peso numeric(9,2) default 0;
+alter table vendas.tb_pedido add observacao_producao varchar(800) default null;
+insert into vendas.tb_situacao_pedido (id, descricao) values (12, 'ORCAMENTO DIGITACAO');
+
+alter table vendas.tb_logradouro_cliente add codigo_municipio varchar(10) default null;
+alter table vendas.tb_logradouro_contato add codigo_municipio varchar(10) default null;
+alter table vendas.tb_logradouro_pedido add codigo_municipio varchar(10) default null;
+alter table vendas.tb_logradouro_representada add codigo_municipio varchar(10) default null;
+alter table vendas.tb_logradouro_transportadora  add codigo_municipio varchar(10) default null;
+alter table vendas.tb_logradouro_usuario add codigo_municipio varchar(10) default null;
+alter table vendas.tb_cliente ALTER COLUMN email SET DATA TYPE varchar(500);
+alter table vendas.tb_cliente add data_nascimento date default null;
+alter table vendas.tb_pedido add valor_frete numeric(10,2) default 0;
+alter table vendas.tb_pedido add validade integer default 0;
+
+insert into vendas.tb_situacao_pedido (id, descricao) values (13, 'ORCAMENTO ACEITO');
+alter table vendas.tb_pedido add id_orcamento integer default null;
+insert into vendas.tb_situacao_pedido (id, descricao) values (14, 'ORCAMENTO CANCELADO');
+create index idx_pedido_id_orcamento on vendas.tb_pedido (id_orcamento);
+alter table vendas.tb_contato alter column nome set data type varchar(80) ;
+
+alter table vendas.tb_usuario add email_copia varchar(250) default null;

@@ -51,6 +51,20 @@ public class DuplicataServiceImpl implements DuplicataService {
 				.setParameter("tipoAVencer", TipoSituacaoDuplicata.A_VENCER).setParameter("dataAtual", new Date());
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void configurarIdCliente() {
+		List<Object[]> l = entityManager
+				.createQuery("select d.id , d.nFe.idPedido from NFeDuplicata d", Object[].class).getResultList();
+		for (Object[] o : l) {
+
+			entityManager
+					.createQuery(
+							"update NFeDuplicata d set d.idCliente = (select p.cliente.id from Pedido p where p.id = :idPedido) where d.id = :id")
+					.setParameter("idPedido", o[1]).setParameter("id", o[0]).executeUpdate();
+		}
+	}
+
 	@PostConstruct
 	public void init() {
 		nFeDuplicataDAO = new NFeDuplicataDAO(entityManager);
@@ -83,6 +97,12 @@ public class DuplicataServiceImpl implements DuplicataService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NFeDuplicata pesquisarDuplicataById(Integer idDuplicata) {
 		return nFeDuplicataDAO.pesquisarDuplicataById(idDuplicata);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<NFeDuplicata> pesquisarDuplicataByIdCliente(Integer idCliente) {
+		return nFeDuplicataDAO.pesquisarDuplicataByIdCliente(idCliente);
 	}
 
 	@Override

@@ -505,6 +505,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem) {
+		// Apenas um registro deve ser retornado, o que indica apenas um
+		// fornecedor
+		return itemPedidoDAO.pesquisarTotalFornecedorDistintoByIdItem(listaIdItem).size() > 1;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean contemItemPedido(Integer idPedido) {
 		return this.pesquisarTotalItemPedido(idPedido) > 0;
 	}
@@ -1302,9 +1310,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer pesquisarIdClienteByIdPedido(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select p.cliente.id from Pedido p where p.id = :idPedido").setParameter(
-						"idPedido", idPedido), Integer.class, null);
+		return pedidoDAO.pesquisarIdClienteByIdPedido(idPedido);
 	}
 
 	@Override
@@ -2061,12 +2067,5 @@ public class PedidoServiceImpl implements PedidoService {
 						+ idPedido + " pois o fornecedor \"" + nomeFantasia + "\" não trabalha com o material do item");
 			}
 		}
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem) {
-		// Apenas um registro deve ser retornado, o que indica apenas um fornecedor
-		return itemPedidoDAO.pesquisarTotalFornecedorDistintoByIdItem(listaIdItem).size() > 1;
 	}
 }

@@ -408,6 +408,21 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicataByIdCliente(Integer idCliente)
+			throws BusinessException {
+		if (idCliente == null) {
+			throw new BusinessException("Não é possível gerar relatório de duplicatas pois o ID do cliente esta nulo.");
+		}
+
+		StringBuilder titulo = new StringBuilder();
+
+		titulo.append("Duplicatas do Cliente ").append(clienteService.pesquisarNomeFantasia(idCliente));
+
+		return gerarRelatorioDuplicata(duplicataService.pesquisarDuplicataByIdCliente(idCliente), titulo.toString());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicataByIdPedido(Integer idPedido)
 			throws BusinessException {
 		if (idPedido == null) {

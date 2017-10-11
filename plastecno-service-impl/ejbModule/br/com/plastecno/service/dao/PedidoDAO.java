@@ -210,6 +210,12 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						"idPedido", idPedido), String.class, null);
 	}
 
+	public Integer pesquisarIdClienteByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.cliente.id from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), Integer.class, null);
+	}
+
 	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(

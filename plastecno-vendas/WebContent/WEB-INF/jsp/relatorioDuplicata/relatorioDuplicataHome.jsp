@@ -10,12 +10,9 @@
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
-
-<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
 
 <jsp:include page="/bloco/bloco_modal_js.jsp" />
 
@@ -25,10 +22,21 @@
 		$('#botaoLimpar').click(function () {
 			$('#formVazio').submit();
 		});
-		inserirMascaraData('dataInicial');
-		inserirMascaraData('dataFinal');
-		inserirMascaraData('dataVencimento');
-		inserirMascaraMonetaria('valor', 7);
+	
+		autocompletar({
+			url : '<c:url value="/duplicata/cliente/listagem/nome"/>',
+			campoPesquisavel : 'nomeCliente',
+			parametro : 'nomeCliente',
+			containerResultados : 'containerPesquisaCliente',
+			selecionarItem: function(itemLista) {
+				var form = document.getElementById('formVazio');
+				adicionarInputHiddenFormulario('formVazio', 'nomeCliente', document.getElementById('nomeCliente').value);
+				form.action = '<c:url value="/relatorio/duplicata/listagem/cliente/"/>'+itemLista.id;
+				form.method = 'get';
+				form.submit();
+			}
+		});
+		
 	});
 
 function alterarDuplicata(botao, metodo, acao, tipo){
@@ -74,10 +82,15 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 					<input type="text" id="idPedido" name="idPedido"
 						value="${idPedido}" maxlength="10" class="pesquisavel" style="width: 100%"/>
 				</div>
-				<div class="input" style="width: 50%">
-					<input type="submit" id="botaoPesquisaPedido" title="Pesquisar Duplicatas do Pedido" value="" class="botaoPesquisarPequeno" style="width: 5%"/>
+				<div class="input" style="width: 2%">
+					<input type="submit" id="botaoPesquisaPedido" title="Pesquisar Duplicatas do Pedido" value="" class="botaoPesquisarPequeno" />
 				</div>
 			</form>
+			<div class="label" style="width: 8%">Cliente:</div>
+			<div class="input" style="width: 45%">
+				<input type="text" id="nomeCliente" value="${nomeCliente}" class="pesquisavel"  style="width: 50%"/>
+				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
+			</div>
 			
 			<form action="<c:url value="/relatorio/duplicata/listagem/nfe"/>">
 				<div class="label" style="width: 30%">NFe:</div>
@@ -123,6 +136,7 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 					<th style="width: 54%">Cliente</th>
 					<th style="width: 8%">NFe</th>
 					<th style="width: 10%">Vl. (R$)</th>
+					<th style="width: 5%">Parc.</th>
 					<th style="width: 10%">Situação</th>
 					<th style="width: 8%">Ações</th>
 				</tr>
@@ -139,19 +153,25 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeCliente}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.numeroNFe}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.parcelaFormatada}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.tipoSituacaoDuplicata.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
 									<form>
 										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-										
-										<input type="button" title="Editar Duplicata" value="" class="botaoEditar" 
-											onclick="alterarDuplicata(this, 'get', '<c:url value="/duplicata/${elemento.id}"/>','ALTERAR')"/>
-										<input type="button" title="Liquidar Duplicata" value="" class="botaoVerificarPequeno" 
-											onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/liquidacao/${elemento.id}"/>','LIQUIDAR')"/>
-										<input type="button" title="Remover Duplicata" value="" class="botaoRemover" 
-											onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/remocao/${elemento.id}"/>','REMOVER')"/>
+										<div class="input" style="width: 33%">
+											<input type="button" title="Editar Duplicata" value="" class="botaoEditar" 
+												onclick="alterarDuplicata(this, 'get', '<c:url value="/duplicata/${elemento.id}"/>','ALTERAR')"/>
+										</div>
+										<div class="input" style="width: 33%">
+											<input type="button" title="Liquidar Duplicata" value="" class="botaoVerificarPequeno" 
+												onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/liquidacao/${elemento.id}"/>','LIQUIDAR')"/>
+										</div>
+										<div class="input" style="width: 33%">
+											<input type="button" title="Remover Duplicata" value="" class="botaoRemover" 
+												onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/remocao/${elemento.id}"/>','REMOVER')"/>
+										</div>
 									</form>
 								</div>
 							</td>

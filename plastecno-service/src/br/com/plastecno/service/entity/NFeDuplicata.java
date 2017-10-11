@@ -34,6 +34,10 @@ public class NFeDuplicata {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "nFeDuplicataSequence")
 	private Integer id;
 
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Id do cliente da duplicata")
+	@Column(name = "id_cliente")
+	private Integer idCliente;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_nfe_pedido", referencedColumnName = "numero", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Número da NFe da duplicata")
@@ -48,16 +52,44 @@ public class NFeDuplicata {
 	@Transient
 	private Integer numeroNFe;
 
+	private Integer parcela;
+
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "id_situacao_duplicata")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Situação da duplicada")
 	private TipoSituacaoDuplicata tipoSituacaoDuplicata;
+
+	@Column(name = "total_parcelas")
+	private Integer totalParcelas;
 
 	@Column(name = "valor")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Valor da duplicata")
 	private Double valor;
 
 	public NFeDuplicata() {
+	}
+
+	public NFeDuplicata(Date dataVencimento, Integer id, Integer idCliente, String nomeCliente, Integer numeroNFe,
+			TipoSituacaoDuplicata tipoSituacaoDuplicata, Double valor) {
+		this(dataVencimento, nomeCliente, numeroNFe, tipoSituacaoDuplicata, valor);
+		this.idCliente = idCliente;
+	}
+
+	// Construtor utilizado na pesquisa de duplicatas para gerar o relatorio de
+	// duplicatas
+	public NFeDuplicata(Date dataVencimento, Integer id, Integer parcela, TipoSituacaoDuplicata tipoSituacaoDuplicata,
+			Integer totalParcelas, Double valor) {
+		this(dataVencimento, id, null, null, tipoSituacaoDuplicata, valor);
+		this.parcela = parcela;
+		this.totalParcelas = totalParcelas;
+	}
+
+	// Construtor utilizado no relatorio de duplicatas
+	public NFeDuplicata(Date dataVencimento, Integer id, String nomeCliente, Integer numeroNFe, Integer parcela,
+			TipoSituacaoDuplicata tipoSituacaoDuplicata, Integer totalParcelas, Double valor) {
+		this(dataVencimento, id, null, nomeCliente, numeroNFe, tipoSituacaoDuplicata, valor);
+		this.parcela = parcela;
+		this.totalParcelas = totalParcelas;
 	}
 
 	// Construtor utilizado no relatorio de duplicatas
@@ -95,6 +127,10 @@ public class NFeDuplicata {
 		return id;
 	}
 
+	public Integer getIdCliente() {
+		return idCliente;
+	}
+
 	public NFePedido getnFe() {
 		return nFe;
 	}
@@ -107,8 +143,20 @@ public class NFeDuplicata {
 		return numeroNFe;
 	}
 
+	public Integer getParcela() {
+		return parcela;
+	}
+
+	public String getParcelaFormatada() {
+		return parcela == null || totalParcelas == null ? "" : parcela + "/" + totalParcelas;
+	}
+
 	public TipoSituacaoDuplicata getTipoSituacaoDuplicata() {
 		return tipoSituacaoDuplicata;
+	}
+
+	public Integer getTotalParcelas() {
+		return totalParcelas;
 	}
 
 	public Double getValor() {
@@ -131,6 +179,10 @@ public class NFeDuplicata {
 		this.id = id;
 	}
 
+	public void setIdCliente(Integer idCliente) {
+		this.idCliente = idCliente;
+	}
+
 	public void setnFe(NFePedido nFe) {
 		this.nFe = nFe;
 	}
@@ -143,8 +195,16 @@ public class NFeDuplicata {
 		this.numeroNFe = numeroNFe;
 	}
 
+	public void setParcela(Integer parcela) {
+		this.parcela = parcela;
+	}
+
 	public void setTipoSituacaoDuplicata(TipoSituacaoDuplicata tipoSituacaoDuplicata) {
 		this.tipoSituacaoDuplicata = tipoSituacaoDuplicata;
+	}
+
+	public void setTotalParcelas(Integer totalParcelas) {
+		this.totalParcelas = totalParcelas;
 	}
 
 	public void setValor(Double valor) {

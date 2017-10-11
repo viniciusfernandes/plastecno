@@ -40,6 +40,12 @@ public class RelatorioDuplicataController extends AbstractController {
         }
     }
 
+    @Get("duplicata/configuracao")
+    public void configurarIdCliente() {
+        duplicataService.configurarIdCliente();
+        irTopoPagina();
+    }
+
     private void gerarRelatorioByPeriodo(Date dataInicial, Date dataFinal) {
         if (contemAtributo("relatorio")) {
             return;
@@ -57,6 +63,20 @@ public class RelatorioDuplicataController extends AbstractController {
     @Get("relatorio/duplicata/listagem")
     public void gerarRelatorioDuplicata(Date dataInicial, Date dataFinal) {
         gerarRelatorioByPeriodo(dataInicial, dataFinal);
+        irTopoPagina();
+    }
+
+    @Get("relatorio/duplicata/listagem/cliente/{idCliente}")
+    public void gerarRelatorioDuplicataByIdCliente(Integer idCliente, String nomeCliente) {
+        try {
+            addAtributo("relatorio", relatorioService.gerarRelatorioDuplicataByIdCliente(idCliente));
+            addAtributo("nomeCliente", nomeCliente);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+
+        // Aqui estamos indo para o topo da pagina pois o formulario de pesquisa
+        // eh pequeno e nao ha a necessidade de rolar a pagina para baixo
         irTopoPagina();
     }
 
@@ -99,6 +119,11 @@ public class RelatorioDuplicataController extends AbstractController {
         }
     }
 
+    @Get("duplicata/cliente/listagem/nome")
+    public void pesquisarClienteByNomeFantasia(String nomeCliente) {
+        forwardTo(ClienteController.class).pesquisarClienteByNomeFantasia(nomeCliente);
+    }
+
     @Get("duplicata/{idDuplicata}")
     public void pesquisarDuplicataById(Integer idDuplicata, Date dataInicial, Date dataFinal) {
         NFeDuplicata d = duplicataService.pesquisarDuplicataById(idDuplicata);
@@ -108,7 +133,6 @@ public class RelatorioDuplicataController extends AbstractController {
             addAtributo("idDuplicata", d.getId());
         }
         redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
-
     }
 
     @Get("relatorio/duplicata")

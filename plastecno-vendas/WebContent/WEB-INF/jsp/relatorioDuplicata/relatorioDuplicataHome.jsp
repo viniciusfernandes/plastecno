@@ -3,18 +3,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
-<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
 
-<jsp:include page="/bloco/bloco_modal_js.jsp" />
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/autocomplete.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 
 <title>Relatório das Duplicatas</title>
 <script type="text/javascript">
@@ -36,7 +37,10 @@
 				form.submit();
 			}
 		});
-		
+
+	inserirMascaraData('dataInicial');
+	inserirMascaraData('dataFinal');
+	
 	});
 
 function alterarDuplicata(botao, metodo, acao, tipo){
@@ -61,12 +65,12 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 				<div class="label" style="width: 30%">Data Inícial:</div>
 				<div class="input" style="width: 10%">
 					<input type="text" id="dataInicial" name="dataInicial"
-						value="${dataInicial}" maxlength="10" class="pesquisavel" />
+						value="${dataInicial}" class="pesquisavel" />
 				</div>
 				<div class="label" style="width: 10%">Data Final:</div>
 				<div class="input" style="width: 10%">
 					<input type="text" id="dataFinal" name="dataFinal"
-						value="${dataFinal}" maxlength="100" class="pesquisavel"
+						value="${dataFinal}" class="pesquisavel"
 						style="width: 100%" />
 				</div>
 				<div class="input" style="width: 2%">
@@ -128,6 +132,7 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 	
 	<a id="rodape"></a>
 		<c:if test="${not empty relatorio}">
+		
 		<table id="tabelaItemPedido" class="listrada">
 			<caption>${relatorio.titulo}</caption>
 			<thead>
@@ -148,7 +153,7 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 					<c:forEach items="${grupo.listaElemento}" var="elemento" varStatus="iElemento">
 						<tr>
 							<c:if test="${iElemento.count le 1}">
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.propriedades['dataVencimentoFormatada']}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento + 2}">${grupo.propriedades['dataVencimentoFormatada']}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeCliente}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.numeroNFe}</td>
@@ -177,9 +182,31 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 							</td>
 						</tr>
 					</c:forEach>
+						<tr>
+							<td colspan="7" style="text-align: center; border-bottom: 0px; font-size: 10px" class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">TOTAL R$ ${grupo.propriedades['totDia']}</td>
+						</tr>
+						<tr>
+							<td colspan="7" style="text-align: center; border-top: 0px; font-size: 10px" class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">A RECEBER R$ ${grupo.propriedades['totReceberDia']}</td>
+						</tr>
 				</c:forEach>
-
 			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="3" style="text-align: right;">QTDE.:</td>
+					<td colspan="4"><div id="valorPedido"
+							style="text-align: left;">${relatorio.propriedades['qtde']}</div></td>
+				</tr>
+				<tr>
+					<td colspan="3" style="text-align: right;">TOTAL:</td>
+					<td colspan="4"><div id="valorPedidoIPI"
+							style="text-align: left;">R$ ${relatorio.propriedades['tot']}</div></td>
+				</tr>
+				<tr>
+					<td colspan="3" style="text-align: right;">A RECEBER:</td>
+					<td colspan="4"><div id="valorTotalSemFrete"
+							style="text-align: left;">R$ ${relatorio.propriedades['totReceber']}</div></td>
+				</tr>
+			</tfoot>
 		</table>
 		</c:if>
 </body>

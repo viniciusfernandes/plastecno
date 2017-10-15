@@ -79,7 +79,7 @@ public class ItemAguardandoCompraController extends AbstractController {
         addAtributo("listaFornecedor", this.representadaService.pesquisarFornecedorAtivo());
     }
 
-    @Post("itemAguardandoCompra/item/listagem")
+    @Get("itemAguardandoCompra/item/listagem")
     public void pesquisarItemAguardandoCompra(Date dataInicial, Date dataFinal, Cliente cliente) {
         try {
             Periodo periodo = Periodo.gerarPeriodo(dataInicial, dataFinal);

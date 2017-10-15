@@ -112,11 +112,11 @@ public class RelatorioDuplicataController extends AbstractController {
     public void liquidarDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
         try {
             duplicataService.liquidarDuplicataById(idDuplicata);
-            redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
+            gerarRelatorioDuplicata(dataInicial, dataFinal);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
-            irTopoPagina();
         }
+        irTopoPagina();
     }
 
     @Get("duplicata/cliente/listagem/nome")
@@ -144,10 +144,10 @@ public class RelatorioDuplicataController extends AbstractController {
     public void removerDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
         try {
             duplicataService.removerDuplicataById(idDuplicata);
-            redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
+            gerarRelatorioDuplicata(dataInicial, dataFinal);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
-            irTopoPagina();
         }
+        irTopoPagina();
     }
 }

@@ -44,7 +44,7 @@
 				<c:if test="${acessoCompraPermitido}">
 					<li><a href="pedido/compra" target="principal_frame">Ped. Compras +</a>
 						<ul>
-							<li><a href="itemAguardandoCompra" target="principal_frame">Item Aguard. Compra</a></li>
+							<li><a href="itemAguardandoCompra/item/listagem" target="principal_frame">Item Aguard. Compra</a></li>
 							<li><a href="compra/recepcao/listagem" target="principal_frame">Recepção Compras</a></li>
 							<li><a href="estoque" target="principal_frame">Estoque</a></li>
 							<li><a href="empacotamento" target="principal_frame">Empacotamento</a></li>					

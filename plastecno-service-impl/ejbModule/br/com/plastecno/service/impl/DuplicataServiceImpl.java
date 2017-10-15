@@ -16,6 +16,7 @@ import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.util.DateUtils;
 
 @Stateless
 public class DuplicataServiceImpl implements DuplicataService {
@@ -49,6 +50,18 @@ public class DuplicataServiceImpl implements DuplicataService {
 						"update NFeDuplicata d set d.tipoSituacaoDuplicata =:tipoVencida where d.dataVencimento >= :dataAtual and d.tipoSituacaoDuplicata =:tipoAVencer")
 				.setParameter("tipoVencida", TipoSituacaoDuplicata.VENCIDO)
 				.setParameter("tipoAVencer", TipoSituacaoDuplicata.A_VENCER).setParameter("dataAtual", new Date());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void cancelarLiquidacaoDuplicataById(Integer idDuplicata) throws BusinessException {
+		if (idDuplicata == null) {
+			return;
+		}
+		Date dtVenc = nFeDuplicataDAO.pesquisarDataVencimentoById(idDuplicata);
+		nFeDuplicataDAO.alterarSituacaoById(idDuplicata,
+				DateUtils.isPosterirorDataAtual(dtVenc) ? TipoSituacaoDuplicata.A_VENCER
+						: TipoSituacaoDuplicata.VENCIDO);
 	}
 
 	@Override

@@ -32,6 +32,12 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 				.executeUpdate();
 	}
 
+	public Date pesquisarDataVencimentoById(Integer idDuplicata) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select d.dataVencimento from NFeDuplicata d where d.id=:idDuplicata")
+						.setParameter("idDuplicata", idDuplicata), Date.class, null);
+	}
+
 	public List<NFeDuplicata> pesquisarDuplicataByCNPJCliente(String cnpj, Date dataInicial, Date dataFinal) {
 		StringBuilder s = new StringBuilder();
 		s.append("select new NFeDuplicata(d.dataVencimento, d.id, d.nomeCliente, d.nFe.numero, d.tipoSituacaoDuplicata, d.valor) from NFeDuplicata d where ");

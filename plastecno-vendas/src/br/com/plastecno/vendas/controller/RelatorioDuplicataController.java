@@ -40,6 +40,17 @@ public class RelatorioDuplicataController extends AbstractController {
         }
     }
 
+    @Post("duplicata/liquidacao/cancelamento/{idDuplicata}")
+    public void cancelarLiquidacaoDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
+        try {
+            duplicataService.cancelarLiquidacaoDuplicataById(idDuplicata);
+            gerarRelatorioDuplicata(dataInicial, dataFinal);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+        irTopoPagina();
+    }
+
     @Get("duplicata/configuracao")
     public void configurarIdCliente() {
         duplicataService.configurarIdCliente();
@@ -150,4 +161,5 @@ public class RelatorioDuplicataController extends AbstractController {
         }
         irTopoPagina();
     }
+
 }

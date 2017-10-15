@@ -43,9 +43,14 @@
 	
 	});
 
-function alterarDuplicata(botao, metodo, acao, tipo){
+function alterarDuplicata(botao, metodo, acao){
+	$(botao).closest('form').attr('action', acao).attr('method', metodo).submit();
+};
+
+
+function removerDuplicata(botao, metodo, acao){
 	inicializarModalConfirmacao({
-			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja '+tipo+' esse item?',
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REMOVER esse item?',
 			confirmar: function(){
 				$(botao).closest('form').attr('action', acao).attr('method', metodo).submit();
 			}
@@ -162,20 +167,30 @@ function alterarDuplicata(botao, metodo, acao, tipo){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.tipoSituacaoDuplicata.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form>
+									<form method="post">
 										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 										<div class="input" style="width: 33%">
 											<input type="button" title="Editar Duplicata" value="" class="botaoEditar" 
-												onclick="alterarDuplicata(this, 'get', '<c:url value="/duplicata/${elemento.id}"/>','ALTERAR')"/>
+												onclick="alterarDuplicata(this, 'get', '<c:url value="/duplicata/${elemento.id}"/>')"/>
 										</div>
-										<div class="input" style="width: 33%">
-											<input type="button" title="Liquidar Duplicata" value="" class="botaoVerificarPequeno" 
-												onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/liquidacao/${elemento.id}"/>','LIQUIDAR')"/>
-										</div>
+										<c:choose>
+											<c:when test="${not elemento.liquidado}">
+												<div class="input" style="width: 33%">
+													<input type="button" title="Cancelar Liquidação Duplicata" value="" class="botaoVerificacaoEfetuadaPequeno" 
+														onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/liquidacao/${elemento.id}"/>')"/>
+												</div>
+											</c:when>
+											<c:otherwise>
+												<div class="input" style="width: 33%">
+													<input type="button" title="Liquidar Duplicata" value="" class="botaoVerificacaoFalhaPequeno" 
+														onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/liquidacao/cancelamento/${elemento.id}"/>')"/>
+												</div>
+											</c:otherwise>
+										</c:choose>
 										<div class="input" style="width: 33%">
 											<input type="button" title="Remover Duplicata" value="" class="botaoRemover" 
-												onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/remocao/${elemento.id}"/>','REMOVER')"/>
+												onclick="removerDuplicata(this, 'post', '<c:url value="/duplicata/remocao/${elemento.id}"/>')"/>
 										</div>
 									</form>
 								</div>

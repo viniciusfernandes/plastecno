@@ -17,6 +17,8 @@ public interface DuplicataService {
 
 	void atualizarSituacaoDuplicataVencida();
 
+	void cancelarLiquidacaoDuplicataById(Integer idDuplicata) throws BusinessException;
+
 	void configurarIdCliente();
 
 	void inserirDuplicata(Integer numeroNFe, List<NFeDuplicata> listaDuplicata);

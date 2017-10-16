@@ -9,6 +9,7 @@ import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.constante.TipoBanco;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.util.StringUtils;
@@ -27,17 +28,33 @@ public class RelatorioDuplicataController extends AbstractController {
         super(result, usuarioInfo);
     }
 
-    @Post("duplicata/alteracaodata")
-    public void alterarDuplicata(Integer idDuplicata, Date dataVencimento, Double valor, Date dataInicial,
-            Date dataFinal) {
+    @Post("duplicata/alteracao")
+    public void alterarDuplicata(NFeDuplicata duplicata, Date dataInicial, Date dataFinal) {
         try {
-            duplicataService.alterarDataVendimentoValorById(idDuplicata, dataVencimento, valor);
+            duplicataService.alterarDuplicataById(duplicata);
             redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
             gerarMensagemSucesso("Duplicata alterada com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             irTopoPagina();
         }
+    }
+
+    @Post("duplicata/liquidacao/cancelamento/{idDuplicata}")
+    public void cancelarLiquidacaoDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
+        try {
+            duplicataService.cancelarLiquidacaoDuplicataById(idDuplicata);
+            gerarRelatorioDuplicata(dataInicial, dataFinal);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+        irTopoPagina();
+    }
+
+    @Get("duplicata/configuracao")
+    public void configurarIdCliente() {
+        duplicataService.configurarIdCliente();
+        irTopoPagina();
     }
 
     private void gerarRelatorioByPeriodo(Date dataInicial, Date dataFinal) {
@@ -57,6 +74,20 @@ public class RelatorioDuplicataController extends AbstractController {
     @Get("relatorio/duplicata/listagem")
     public void gerarRelatorioDuplicata(Date dataInicial, Date dataFinal) {
         gerarRelatorioByPeriodo(dataInicial, dataFinal);
+        irTopoPagina();
+    }
+
+    @Get("relatorio/duplicata/listagem/cliente/{idCliente}")
+    public void gerarRelatorioDuplicataByIdCliente(Integer idCliente, String nomeCliente) {
+        try {
+            addAtributo("relatorio", relatorioService.gerarRelatorioDuplicataByIdCliente(idCliente));
+            addAtributo("nomeCliente", nomeCliente);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+
+        // Aqui estamos indo para o topo da pagina pois o formulario de pesquisa
+        // eh pequeno e nao ha a necessidade de rolar a pagina para baixo
         irTopoPagina();
     }
 
@@ -92,23 +123,27 @@ public class RelatorioDuplicataController extends AbstractController {
     public void liquidarDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
         try {
             duplicataService.liquidarDuplicataById(idDuplicata);
-            redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
+            gerarRelatorioDuplicata(dataInicial, dataFinal);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
-            irTopoPagina();
         }
+        irTopoPagina();
+    }
+
+    @Get("duplicata/cliente/listagem/nome")
+    public void pesquisarClienteByNomeFantasia(String nomeCliente) {
+        forwardTo(ClienteController.class).pesquisarClienteByNomeFantasia(nomeCliente);
     }
 
     @Get("duplicata/{idDuplicata}")
     public void pesquisarDuplicataById(Integer idDuplicata, Date dataInicial, Date dataFinal) {
         NFeDuplicata d = duplicataService.pesquisarDuplicataById(idDuplicata);
         if (d != null) {
-            addAtributo("dataVencimento", StringUtils.formatarData(d.getDataVencimento()));
-            addAtributo("valor", d.getValor());
-            addAtributo("idDuplicata", d.getId());
+            d.setDataVencimentoFormatada(StringUtils.formatarData(d.getDataVencimento()));
+            addAtributo("duplicata", d);
         }
+        addAtributo("listaBanco", TipoBanco.values());
         redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
-
     }
 
     @Get("relatorio/duplicata")
@@ -120,10 +155,11 @@ public class RelatorioDuplicataController extends AbstractController {
     public void removerDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
         try {
             duplicataService.removerDuplicataById(idDuplicata);
-            redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
+            gerarRelatorioDuplicata(dataInicial, dataFinal);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
-            irTopoPagina();
         }
+        irTopoPagina();
     }
+
 }

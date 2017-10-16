@@ -364,13 +364,67 @@ public class RelatorioServiceImpl implements RelatorioService {
 			throws BusinessException {
 		RelatorioWrapper<Date, NFeDuplicata> relatorio = new RelatorioWrapper<Date, NFeDuplicata>(titulo);
 		Date dtAtual = new Date();
+		int qtde = 0;
+		boolean okVal = false;
+		boolean liqd = false;
+		Double tot = 0d;
+		Double totReceber = 0d;
+		Double totDia = null;
+		Double totReceberDia = null;
+		GrupoWrapper<Date, NFeDuplicata> g = null;
 		for (NFeDuplicata d : lDuplic) {
+			totReceberDia = 0d;
+			totDia = 0d;
+
+			okVal = d.getValor() != null;
+			liqd = d.isLiquidado();
+			qtde++;
+
+			if (okVal) {
+				tot += d.getValor();
+			}
+
+			if (okVal && !liqd) {
+				totReceber += d.getValor();
+			}
+
 			// Vamos definir a situação da duplicata
-			if (!d.isLiquidado() && dtAtual.after(d.getDataVencimento())) {
+			if (!liqd && dtAtual.after(d.getDataVencimento())) {
 				d.setTipoSituacaoDuplicata(TipoSituacaoDuplicata.VENCIDO);
 			}
-			relatorio.addGrupo(d.getDataVencimento(), d).setPropriedade("dataVencimentoFormatada",
-					StringUtils.formatarData(d.getDataVencimento()));
+
+			g = relatorio.addGrupo(d.getDataVencimento(), d);
+			if ((totDia = (Double) g.getPropriedade("totDia")) == null && okVal) {
+				totDia = d.getValor();
+			} else if (totDia != null && okVal) {
+				totDia += d.getValor();
+			} else if (totDia == null) {
+				totDia = 0d;
+			}
+
+			if ((totReceberDia = (Double) g.getPropriedade("totReceberDia")) == null && !liqd) {
+				totReceberDia = d.getValor();
+			} else if (totReceberDia != null && okVal && !liqd) {
+				totReceberDia += d.getValor();
+			} else if (totReceberDia == null) {
+				totReceberDia = 0d;
+			}
+
+			g.setPropriedade("totDia", totDia);
+			g.setPropriedade("totReceberDia", totReceberDia);
+			g.setPropriedade("dataVencimentoFormatada", StringUtils.formatarData(d.getDataVencimento()));
+		}
+
+		// Apenas formantando os valores apos as totalizacoes para evitar
+		// diferencas nos arredondamentos.
+		relatorio.addPropriedade("qtde", qtde);
+		relatorio.addPropriedade("totReceber", NumeroUtils.arredondarValorMonetario(totReceber));
+		relatorio.addPropriedade("tot", NumeroUtils.arredondarValorMonetario(tot));
+
+		for (GrupoWrapper<Date, NFeDuplicata> gr : relatorio.getListaGrupo()) {
+			gr.setPropriedade("totDia", NumeroUtils.arredondarValorMonetario((Double) gr.getPropriedade("totDia")));
+			gr.setPropriedade("totReceberDia",
+					NumeroUtils.arredondarValorMonetario((Double) gr.getPropriedade("totReceberDia")));
 		}
 
 		relatorio.sortGrupo(new Comparator<GrupoWrapper<Date, NFeDuplicata>>() {
@@ -404,6 +458,21 @@ public class RelatorioServiceImpl implements RelatorioService {
 				.append(StringUtils.formatarData(periodo.getFim()));
 
 		return gerarRelatorioDuplicata(duplicataService.pesquisarDuplicataByPeriodo(periodo), titulo.toString());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicataByIdCliente(Integer idCliente)
+			throws BusinessException {
+		if (idCliente == null) {
+			throw new BusinessException("Não é possível gerar relatório de duplicatas pois o ID do cliente esta nulo.");
+		}
+
+		StringBuilder titulo = new StringBuilder();
+
+		titulo.append("Duplicatas do Cliente ").append(clienteService.pesquisarNomeFantasia(idCliente));
+
+		return gerarRelatorioDuplicata(duplicataService.pesquisarDuplicataByIdCliente(idCliente), titulo.toString());
 	}
 
 	@Override

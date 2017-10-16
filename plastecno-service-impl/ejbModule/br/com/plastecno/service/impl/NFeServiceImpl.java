@@ -9,6 +9,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -382,6 +384,28 @@ public class NFeServiceImpl implements NFeService {
 		}
 	}
 
+	private void configurarNumeroParcela(List<NFeDuplicata> lDuplicata) {
+		if (lDuplicata == null) {
+			return;
+		}
+		// Ordenando a lista de duplicadas pois o numero da parcela sera dado
+		// pela ordem do elemento na lista.
+		Collections.sort(lDuplicata, new Comparator<NFeDuplicata>() {
+			@Override
+			public int compare(NFeDuplicata o1, NFeDuplicata o2) {
+				Date d1 = o1.getDataVencimento();
+				Date d2 = o2.getDataVencimento();
+				return d1 == null || d2 == null ? -1 : d1.compareTo(d2);
+			}
+		});
+		final int totParc = lDuplicata.size();
+		int parc = 0;
+		for (NFeDuplicata d : lDuplicata) {
+			d.setTotalParcelas(totParc);
+			d.setParcela(++parc);
+		}
+	}
+
 	private void configurarSubstituicaoTributariaPosValidacao(NFe nFe) {
 		List<DetalhamentoProdutoServicoNFe> l = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 		TributosProdutoServico t = null;
@@ -505,19 +529,28 @@ public class NFeServiceImpl implements NFeService {
 			return num;
 		}
 
+		Integer idCliente = pedidoService.pesquisarIdClienteByIdPedido(idPedido);
+		if (idCliente == null) {
+			throw new BusinessException("O ID do cliente do pedido No. " + idPedido
+					+ " não foi encontrado pelo sistema. Verifique se o cliente existe.");
+		}
+
 		Integer numeroNFe = Integer.parseInt(dados.getIdentificacaoNFe().getNumero());
+
 		List<NFeDuplicata> lista = new ArrayList<NFeDuplicata>();
 		for (DuplicataNFe dNFe : lDuplicata) {
 			try {
-				lista.add(new NFeDuplicata(StringUtils.parsearDataAmericano(dNFe.getDataVencimento()), dados
-						.getIdentificacaoDestinatarioNFe().getRazaoSocial(), numeroNFe, TipoSituacaoDuplicata.A_VENCER,
-						dNFe.getValor()));
+				lista.add(new NFeDuplicata(StringUtils.parsearDataAmericano(dNFe.getDataVencimento()), null, idCliente,
+						dados.getIdentificacaoDestinatarioNFe().getRazaoSocial(), numeroNFe,
+						TipoSituacaoDuplicata.A_VENCER, dNFe.getValor()));
 			} catch (ParseException e) {
 				throw new BusinessException(
 						"O campo de data de vendimento de uma das duplicatas não esta no formato correto. O valor enviado foi "
 								+ dNFe.getDataVencimento());
 			}
 		}
+
+		configurarNumeroParcela(lista);
 		duplicataService.inserirDuplicata(numeroNFe, lista);
 		return num;
 	}

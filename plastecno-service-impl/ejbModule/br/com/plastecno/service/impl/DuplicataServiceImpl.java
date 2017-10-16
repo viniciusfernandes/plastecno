@@ -14,8 +14,10 @@ import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.dao.NFeDuplicataDAO;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.constante.TipoBanco;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.util.DateUtils;
 
 @Stateless
 public class DuplicataServiceImpl implements DuplicataService {
@@ -27,18 +29,20 @@ public class DuplicataServiceImpl implements DuplicataService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarDataVendimentoValorById(Integer idDuplicata, Date dataVencimento, Double valor)
-			throws BusinessException {
-		if (idDuplicata == null) {
-			return;
+	public void alterarDuplicataById(NFeDuplicata duplicata) throws BusinessException {
+		if (duplicata == null || duplicata.getId() == null) {
+			throw new BusinessException("Não é possível alterar duplicata nula ou com código nulo.");
 		}
-		if (dataVencimento == null) {
+
+		if (duplicata.getDataVencimento() == null) {
 			throw new BusinessException("A data de vencimento da duplicata não pode ser nula.");
 		}
-		if (valor == null) {
+		if (duplicata.getValor() == null) {
 			throw new BusinessException("O valor da duplicata não pode ser nulo.");
 		}
-		nFeDuplicataDAO.alterarDataVendimentoById(idDuplicata, dataVencimento, valor);
+		TipoBanco tpBanco = TipoBanco.getTipoBanco(duplicata.getCodigoBanco());
+		nFeDuplicataDAO.alterarDuplicataById(duplicata.getId(), duplicata.getDataVencimento(), duplicata
+				.getValor(), tpBanco != null ? tpBanco.getCodigo() : null, tpBanco != null ? tpBanco.getNome() : null);
 	}
 
 	@Override
@@ -49,6 +53,32 @@ public class DuplicataServiceImpl implements DuplicataService {
 						"update NFeDuplicata d set d.tipoSituacaoDuplicata =:tipoVencida where d.dataVencimento >= :dataAtual and d.tipoSituacaoDuplicata =:tipoAVencer")
 				.setParameter("tipoVencida", TipoSituacaoDuplicata.VENCIDO)
 				.setParameter("tipoAVencer", TipoSituacaoDuplicata.A_VENCER).setParameter("dataAtual", new Date());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void cancelarLiquidacaoDuplicataById(Integer idDuplicata) throws BusinessException {
+		if (idDuplicata == null) {
+			return;
+		}
+		Date dtVenc = nFeDuplicataDAO.pesquisarDataVencimentoById(idDuplicata);
+		nFeDuplicataDAO.alterarSituacaoById(idDuplicata,
+				DateUtils.isPosterirorDataAtual(dtVenc) ? TipoSituacaoDuplicata.A_VENCER
+						: TipoSituacaoDuplicata.VENCIDO);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void configurarIdCliente() {
+		List<Object[]> l = entityManager
+				.createQuery("select d.id , d.nFe.idPedido from NFeDuplicata d", Object[].class).getResultList();
+		for (Object[] o : l) {
+
+			entityManager
+					.createQuery(
+							"update NFeDuplicata d set d.idCliente = (select p.cliente.id from Pedido p where p.id = :idPedido) where d.id = :id")
+					.setParameter("idPedido", o[1]).setParameter("id", o[0]).executeUpdate();
+		}
 	}
 
 	@PostConstruct
@@ -83,6 +113,12 @@ public class DuplicataServiceImpl implements DuplicataService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NFeDuplicata pesquisarDuplicataById(Integer idDuplicata) {
 		return nFeDuplicataDAO.pesquisarDuplicataById(idDuplicata);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<NFeDuplicata> pesquisarDuplicataByIdCliente(Integer idCliente) {
+		return nFeDuplicataDAO.pesquisarDuplicataByIdCliente(idCliente);
 	}
 
 	@Override

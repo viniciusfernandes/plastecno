@@ -1,6 +1,5 @@
 package br.com.plastecno.service;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.ejb.Local;
@@ -12,8 +11,7 @@ import br.com.plastecno.service.wrapper.Periodo;
 @Local
 public interface DuplicataService {
 
-	void alterarDataVendimentoValorById(Integer idDuplicata, Date dataVencimento, Double valor)
-			throws BusinessException;
+	void alterarDuplicataById(NFeDuplicata duplicata) throws BusinessException;
 
 	void atualizarSituacaoDuplicataVencida();
 

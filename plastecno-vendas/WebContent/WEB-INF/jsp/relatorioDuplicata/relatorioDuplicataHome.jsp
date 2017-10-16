@@ -113,20 +113,29 @@ function removerDuplicata(botao, metodo, acao){
 			</form>
 		</fieldset>
 
-	<c:if test="${not empty idDuplicata}">
+	<c:if test="${not empty duplicata}">
 	<fieldset id="bloco_edicao_duplicata">
 		<legend>::: Relatório das Duplicatas :::</legend>
-		<form action="<c:url value="/duplicata/alteracaodata"/>" method="post">
-			<input type="hidden" name="idDuplicata" value="${idDuplicata}"/>
+		<form action="<c:url value="/duplicata/alteracao"/>" method="post">
+			<input type="hidden" name="duplicata.id" value="${duplicata.id}"/>
 			<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 			<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 			<div class="label">Dt Venc.:</div>
 			<div class="input" style="width: 15%">
-				<input type="text" id="dataVencimento" name="dataVencimento" value="${dataVencimento}" />
+				<input type="text" id="dataVencimento" name="duplicata.dataVencimento" value="${duplicata.dataVencimentoFormatada}" />
 			</div>
-			<div class="label">Vl. (R$):</div>
+			<div class="label" style="width: 10%">Vl. (R$):</div>
 			<div class="input" style="width: 15%">
-				<input type="text" id="valor" name="valor" value="${valor}"/>
+				<input type="text" id="valor" name="duplicata.valor" value="${duplicata.valor}"/>
+			</div>
+			<div class="label" style="width: 10%">Banco:</div>
+			<div class="input" style="width: 15%">
+				<select name="duplicata.codigoBanco">
+					<option value="${banco.codigo}">${banco.nome}</option>
+					<c:forEach items="${listaBanco}" var="banco">
+						<option value="${banco.codigo}" <c:if test="${banco.codigo eq duplicata.codigoBanco}">selected</c:if> >${banco.nome}</option>
+					</c:forEach>
+				</select>
 			</div>
 			<div class="bloco_botoes">
 				<input type="submit" value="" class="botaoInserir" title="Alterar Data da Duplicata"/>
@@ -143,8 +152,9 @@ function removerDuplicata(botao, metodo, acao){
 			<thead>
 				<tr>
 					<th style="width: 10%">Dt. Venc.</th>
-					<th style="width: 54%">Cliente</th>
+					<th style="width: 42%">Cliente</th>
 					<th style="width: 8%">NFe</th>
+					<th style="width: 12%">Banco</th>
 					<th style="width: 10%">Vl. (R$)</th>
 					<th style="width: 5%">Parc.</th>
 					<th style="width: 10%">Situação</th>
@@ -162,12 +172,13 @@ function removerDuplicata(botao, metodo, acao){
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeCliente}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.numeroNFe}</td>
+							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeBanco}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.parcelaFormatada}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.tipoSituacaoDuplicata.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
-									<form method="post">
+									<form>
 										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 										<div class="input" style="width: 33%">
@@ -177,13 +188,13 @@ function removerDuplicata(botao, metodo, acao){
 										<c:choose>
 											<c:when test="${not elemento.liquidado}">
 												<div class="input" style="width: 33%">
-													<input type="button" title="Cancelar Liquidação Duplicata" value="" class="botaoVerificacaoEfetuadaPequeno" 
+													<input type="button" title="Liquidação Duplicata" value="" class="botaoVerificacaoEfetuadaPequeno" 
 														onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/liquidacao/${elemento.id}"/>')"/>
 												</div>
 											</c:when>
 											<c:otherwise>
 												<div class="input" style="width: 33%">
-													<input type="button" title="Liquidar Duplicata" value="" class="botaoVerificacaoFalhaPequeno" 
+													<input type="button" title="Cancelar Liquidação Duplicata" value="" class="botaoVerificacaoFalhaPequeno" 
 														onclick="alterarDuplicata(this, 'post', '<c:url value="/duplicata/liquidacao/cancelamento/${elemento.id}"/>')"/>
 												</div>
 											</c:otherwise>
@@ -208,17 +219,17 @@ function removerDuplicata(botao, metodo, acao){
 			<tfoot>
 				<tr>
 					<td colspan="3" style="text-align: right;">QTDE.:</td>
-					<td colspan="4"><div id="valorPedido"
+					<td colspan="5"><div id="valorPedido"
 							style="text-align: left;">${relatorio.propriedades['qtde']}</div></td>
 				</tr>
 				<tr>
 					<td colspan="3" style="text-align: right;">TOTAL:</td>
-					<td colspan="4"><div id="valorPedidoIPI"
+					<td colspan="5"><div id="valorPedidoIPI"
 							style="text-align: left;">R$ ${relatorio.propriedades['tot']}</div></td>
 				</tr>
 				<tr>
 					<td colspan="3" style="text-align: right;">A RECEBER:</td>
-					<td colspan="4"><div id="valorTotalSemFrete"
+					<td colspan="5"><div id="valorTotalSemFrete"
 							style="text-align: left;">R$ ${relatorio.propriedades['totReceber']}</div></td>
 				</tr>
 			</tfoot>

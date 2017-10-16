@@ -22,6 +22,9 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 @Entity
 @Table(name = "tb_nfe_duplicata", schema = "vendas")
 public class NFeDuplicata {
+	@Column(name = "codigo_banco")
+	private String codigoBanco;
+
 	@Column(name = "data_vencimento")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Data de vencimento da duplicata")
 	private Date dataVencimento;
@@ -42,6 +45,9 @@ public class NFeDuplicata {
 	@JoinColumn(name = "id_nfe_pedido", referencedColumnName = "numero", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Número da NFe da duplicata")
 	private NFePedido nFe;
+
+	@Column(name = "nome_banco")
+	private String nomeBanco;
 
 	// Esse campo foi criado para otimizar a pesquisa das duplicatas pois temos
 	// que recuperar o nome do cliente do pedido.
@@ -72,6 +78,7 @@ public class NFeDuplicata {
 	public NFeDuplicata(Date dataVencimento, Integer id, Integer idCliente, String nomeCliente, Integer numeroNFe,
 			TipoSituacaoDuplicata tipoSituacaoDuplicata, Double valor) {
 		this(dataVencimento, nomeCliente, numeroNFe, tipoSituacaoDuplicata, valor);
+		this.id = id;
 		this.idCliente = idCliente;
 	}
 
@@ -80,14 +87,6 @@ public class NFeDuplicata {
 	public NFeDuplicata(Date dataVencimento, Integer id, Integer parcela, TipoSituacaoDuplicata tipoSituacaoDuplicata,
 			Integer totalParcelas, Double valor) {
 		this(dataVencimento, id, null, null, tipoSituacaoDuplicata, valor);
-		this.parcela = parcela;
-		this.totalParcelas = totalParcelas;
-	}
-
-	// Construtor utilizado no relatorio de duplicatas
-	public NFeDuplicata(Date dataVencimento, Integer id, String nomeCliente, Integer numeroNFe, Integer parcela,
-			TipoSituacaoDuplicata tipoSituacaoDuplicata, Integer totalParcelas, Double valor) {
-		this(dataVencimento, id, null, nomeCliente, numeroNFe, tipoSituacaoDuplicata, valor);
 		this.parcela = parcela;
 		this.totalParcelas = totalParcelas;
 	}
@@ -115,6 +114,21 @@ public class NFeDuplicata {
 
 	}
 
+	// Construtor utilizado no relatorio de duplicatas
+	public NFeDuplicata(String codigoBanco, Date dataVencimento, Integer id, String nomeBanco, String nomeCliente,
+			Integer numeroNFe, Integer parcela, TipoSituacaoDuplicata tipoSituacaoDuplicata, Integer totalParcelas,
+			Double valor) {
+		this(dataVencimento, id, null, nomeCliente, numeroNFe, tipoSituacaoDuplicata, valor);
+		this.parcela = parcela;
+		this.totalParcelas = totalParcelas;
+		this.codigoBanco = codigoBanco;
+		this.nomeBanco = nomeBanco;
+	}
+
+	public String getCodigoBanco() {
+		return codigoBanco;
+	}
+
 	public Date getDataVencimento() {
 		return dataVencimento;
 	}
@@ -133,6 +147,10 @@ public class NFeDuplicata {
 
 	public NFePedido getnFe() {
 		return nFe;
+	}
+
+	public String getNomeBanco() {
+		return nomeBanco;
 	}
 
 	public String getNomeCliente() {
@@ -167,6 +185,10 @@ public class NFeDuplicata {
 		return TipoSituacaoDuplicata.LIQUIDADO.equals(tipoSituacaoDuplicata);
 	}
 
+	public void setCodigoBanco(String codigoBanco) {
+		this.codigoBanco = codigoBanco;
+	}
+
 	public void setDataVencimento(Date dataVencimento) {
 		this.dataVencimento = dataVencimento;
 	}
@@ -185,6 +207,10 @@ public class NFeDuplicata {
 
 	public void setnFe(NFePedido nFe) {
 		this.nFe = nFe;
+	}
+
+	public void setNomeBanco(String nomeBanco) {
+		this.nomeBanco = nomeBanco;
 	}
 
 	public void setNomeCliente(String nomeCliente) {

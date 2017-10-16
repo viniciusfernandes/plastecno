@@ -9,6 +9,7 @@ import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.constante.TipoBanco;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.util.StringUtils;
@@ -27,11 +28,10 @@ public class RelatorioDuplicataController extends AbstractController {
         super(result, usuarioInfo);
     }
 
-    @Post("duplicata/alteracaodata")
-    public void alterarDuplicata(Integer idDuplicata, Date dataVencimento, Double valor, Date dataInicial,
-            Date dataFinal) {
+    @Post("duplicata/alteracao")
+    public void alterarDuplicata(NFeDuplicata duplicata, Date dataInicial, Date dataFinal) {
         try {
-            duplicataService.alterarDataVendimentoValorById(idDuplicata, dataVencimento, valor);
+            duplicataService.alterarDuplicataById(duplicata);
             redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
             gerarMensagemSucesso("Duplicata alterada com sucesso.");
         } catch (BusinessException e) {
@@ -139,10 +139,10 @@ public class RelatorioDuplicataController extends AbstractController {
     public void pesquisarDuplicataById(Integer idDuplicata, Date dataInicial, Date dataFinal) {
         NFeDuplicata d = duplicataService.pesquisarDuplicataById(idDuplicata);
         if (d != null) {
-            addAtributo("dataVencimento", StringUtils.formatarData(d.getDataVencimento()));
-            addAtributo("valor", d.getValor());
-            addAtributo("idDuplicata", d.getId());
+            d.setDataVencimentoFormatada(StringUtils.formatarData(d.getDataVencimento()));
+            addAtributo("duplicata", d);
         }
+        addAtributo("listaBanco", TipoBanco.values());
         redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
     }
 

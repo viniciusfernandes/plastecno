@@ -14,6 +14,7 @@ import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.dao.NFeDuplicataDAO;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.exception.BusinessException;
+import br.com.plastecno.service.nfe.constante.TipoBanco;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.util.DateUtils;
@@ -28,18 +29,20 @@ public class DuplicataServiceImpl implements DuplicataService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarDataVendimentoValorById(Integer idDuplicata, Date dataVencimento, Double valor)
-			throws BusinessException {
-		if (idDuplicata == null) {
-			return;
+	public void alterarDuplicataById(NFeDuplicata duplicata) throws BusinessException {
+		if (duplicata == null || duplicata.getId() == null) {
+			throw new BusinessException("Não é possível alterar duplicata nula ou com código nulo.");
 		}
-		if (dataVencimento == null) {
+
+		if (duplicata.getDataVencimento() == null) {
 			throw new BusinessException("A data de vencimento da duplicata não pode ser nula.");
 		}
-		if (valor == null) {
+		if (duplicata.getValor() == null) {
 			throw new BusinessException("O valor da duplicata não pode ser nulo.");
 		}
-		nFeDuplicataDAO.alterarDataVendimentoById(idDuplicata, dataVencimento, valor);
+		TipoBanco tpBanco = TipoBanco.getTipoBanco(duplicata.getCodigoBanco());
+		nFeDuplicataDAO.alterarDuplicataById(duplicata.getId(), duplicata.getDataVencimento(), duplicata
+				.getValor(), tpBanco != null ? tpBanco.getCodigo() : null, tpBanco != null ? tpBanco.getNome() : null);
 	}
 
 	@Override

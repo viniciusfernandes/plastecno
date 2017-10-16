@@ -16,12 +16,14 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 		super(entityManager);
 	}
 
-	public void alterarDataVendimentoById(Integer idDuplicata, Date dataVencimento, Double valor) {
+	public void alterarDuplicataById(Integer idDuplicata, Date dataVencimento, Double valor, String codigoBanco,
+			String nomeBanco) {
 		entityManager
 				.createQuery(
-						"update NFeDuplicata d set d.dataVencimento =:dataVencimento, d.valor =:valor where d.id = :idDuplicata")
+						"update NFeDuplicata d set d.dataVencimento =:dataVencimento, d.valor =:valor, d.codigoBanco=:codigoBanco, d.nomeBanco=:nomeBanco  where d.id = :idDuplicata")
 				.setParameter("dataVencimento", dataVencimento).setParameter("idDuplicata", idDuplicata)
-				.setParameter("valor", valor).executeUpdate();
+				.setParameter("valor", valor).setParameter("codigoBanco", codigoBanco)
+				.setParameter("nomeBanco", nomeBanco).executeUpdate();
 	}
 
 	public void alterarSituacaoById(Integer idDuplicata, TipoSituacaoDuplicata tipoSituacaoDuplicata) {
@@ -53,12 +55,9 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 	}
 
 	public NFeDuplicata pesquisarDuplicataById(Integer idDuplicata) {
-		return QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select new NFeDuplicata(d.dataVencimento, d.id, d.parcela, d.tipoSituacaoDuplicata, d.totalParcelas, d.valor) from NFeDuplicata d where d.id =:idDuplicata")
-								.setParameter("idDuplicata", idDuplicata), NFeDuplicata.class, null);
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select d from NFeDuplicata d where d.id =:idDuplicata").setParameter(
+						"idDuplicata", idDuplicata), NFeDuplicata.class, null);
 	}
 
 	public List<NFeDuplicata> pesquisarDuplicataByIdCliente(Integer idCliente) {
@@ -76,7 +75,7 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 	private List<NFeDuplicata> pesquisarDuplicataByNumeroNFeOuPedido(Integer numeroNFe, Integer idPedido,
 			Integer idCliente) {
 		StringBuilder s = new StringBuilder();
-		s.append("select new NFeDuplicata(d.dataVencimento, d.id, d.nomeCliente, d.nFe.numero, d.parcela, d.tipoSituacaoDuplicata, d.totalParcelas, d.valor) from NFeDuplicata d ");
+		s.append("select new NFeDuplicata(d.codigoBanco, d.dataVencimento, d.id, d.nomeBanco, d.nomeCliente, d.nFe.numero, d.parcela, d.tipoSituacaoDuplicata, d.totalParcelas, d.valor) from NFeDuplicata d ");
 
 		if (numeroNFe != null) {
 			s.append("where d.nFe.numero =:numeroNFe ");
@@ -100,7 +99,7 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 	public List<NFeDuplicata> pesquisarDuplicataByPeriodo(Periodo periodo) {
 		return entityManager
 				.createQuery(
-						"select new NFeDuplicata(d.dataVencimento, d.id, d.nomeCliente, d.nFe.numero, d.tipoSituacaoDuplicata, d.valor) from NFeDuplicata d where d.dataVencimento>= :dataInicial and d.dataVencimento<= :dataFinal",
+						"select new NFeDuplicata(d.codigoBanco, d.dataVencimento, d.id, d.nomeBanco, d.nomeCliente, d.nFe.numero, d.parcela, d.tipoSituacaoDuplicata, d.totalParcelas, d.valor) from NFeDuplicata d where d.dataVencimento>= :dataInicial and d.dataVencimento<= :dataFinal",
 						NFeDuplicata.class).setParameter("dataInicial", periodo.getInicio())
 				.setParameter("dataFinal", periodo.getFim()).getResultList();
 	}

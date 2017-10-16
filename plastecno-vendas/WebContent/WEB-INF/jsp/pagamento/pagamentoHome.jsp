@@ -42,6 +42,16 @@ $(document).ready(function() {
 		$('#formVazio').attr('action', '<c:out value="pagamento/fornecedor/"/>'+idForn).attr('method', 'get').submit();	
 	});
 	
+	$('#botaoPesquisarCompras').click(function(){
+		var idForn = $('#idFornecedor').val();
+		if(isEmpty(idForn)){
+			return;
+		}
+		adicionarInputHiddenFormulario('formVazio', 'dataInicial', $('#dataInicial').val());
+		adicionarInputHiddenFormulario('formVazio', 'dataFinal', $('#dataFinal').val());
+		$('#formVazio').attr('action', '<c:out value="pagamento/compraefetivada/listagem/"/>'+idForn).attr('method', 'get').submit();	
+	});
+	
 	$('#botaoPesquisarPedido').click(function(){
 		var idPedido = $('#pedido').val();
 		if(isEmpty(idPedido)){
@@ -107,9 +117,12 @@ function removerPagamento(botao){
 	<form id="formVazio"></form>
 	
 	<jsp:include page="/bloco/bloco_edicao_pagamento.jsp"/>
-	
-	<c:if test="${true}">
 	<a id="rodape"></a>
+<c:choose>
+	<c:when test="${isPesquisaPedidoCompra}">
+		<jsp:include page="/bloco/bloco_listagem_pedido_compra.jsp"></jsp:include>
+	</c:when>
+	<c:otherwise>
 		<table class="listrada">
 			<caption>${relatorio.titulo}</caption>
 			<thead>
@@ -266,6 +279,9 @@ function removerPagamento(botao){
 				</c:forEach>
 			</tbody>
 		</table>
-	</c:if>
+	</c:otherwise>
+</c:choose>
+	
+		
 </body>
 </html>

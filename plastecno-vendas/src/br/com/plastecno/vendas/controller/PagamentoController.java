@@ -17,6 +17,7 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
+import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
@@ -126,6 +127,24 @@ public class PagamentoController extends AbstractController {
     @Get("pagamento/fornecedor/listagem")
     public void pesquisarFornecedorByNomeFantasia(String nomeFantasia) {
         forwardTo(RepresentadaController.class).pesquisarFornecedorByNomeFantasia(nomeFantasia);
+    }
+
+    @Servico
+    private RelatorioService relatorioService;
+
+    @Get("pagamento/compraefetivada/listagem/{idFornecedor}")
+    public void gerarRelatorioItemPedidoCompraEfetivada(Integer idFornecedor, Date dataInicial, Date dataFinal) {
+
+        try {
+            addAtributo("isPesquisaPedidoCompra", true);
+            addAtributo("relatorio", relatorioService.gerarRelatorioItemPedidoCompraEfetivada(idFornecedor,
+                    new Periodo(dataInicial, dataFinal)));
+            irRodapePagina();
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
+        addPeriodo(dataInicial, dataFinal);
     }
 
     @Get("pagamento/{idPagamento}")

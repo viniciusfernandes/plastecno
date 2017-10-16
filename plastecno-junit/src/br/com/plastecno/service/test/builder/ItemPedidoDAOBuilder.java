@@ -63,6 +63,20 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 			}
 
 			@Mock
+			public Integer pesquisarIdItemPedidoByIdPedidoSequencial(Integer idPedido, Integer sequencial) {
+				if (idPedido == null || sequencial == null) {
+					return null;
+				}
+				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				for (ItemPedido i : l) {
+					if (idPedido.equals(i.getPedido().getId()) && sequencial.equals(i.getSequencial())) {
+						return i.getId();
+					}
+				}
+				return null;
+			}
+
+			@Mock
 			public Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido) {
 				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 				if (i == null) {

@@ -116,46 +116,6 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				.setParameter("listaNumeroItem", listaNumeroItem).getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Date dataInicial, Date dataFinal) {
-		StringBuilder select = gerarConstrutorItemPedidoIdPedidoCompraEVenda();
-		select.append("where i.pedido.tipoPedido = :tipoPedido ");
-		select.append("and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada =null)");
-		select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
-
-		if (dataInicial != null) {
-			select.append("and i.pedido.dataEnvio >= :dataInicial ");
-		}
-
-		if (dataFinal != null) {
-			select.append("and i.pedido.dataEnvio <= :dataFinal ");
-		}
-
-		if (idRepresentada != null) {
-			select.append("and i.pedido.representada.id = :idRepresentada ");
-		}
-
-		select.append("order by i.pedido.dataEntrega asc ");
-
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("tipoPedido", TipoPedido.COMPRA);
-		query.setParameter("situacaoPedido", SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
-
-		if (dataInicial != null) {
-			query.setParameter("dataInicial", dataInicial);
-		}
-
-		if (dataFinal != null) {
-			query.setParameter("dataFinal", dataFinal);
-		}
-
-		if (idRepresentada != null) {
-			query.setParameter("idRepresentada", idRepresentada);
-		}
-
-		return query.getResultList();
-	}
-
 	public Integer pesquisarIdClienteByIdItem(Integer idItem) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select i.pedido.cliente.id from ItemPedido i where i.id = :idItem ")
@@ -165,6 +125,16 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	public List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido) {
 		return entityManager.createQuery("select i.id from ItemPedido i where i.pedido.id = :idPedido", Integer.class)
 				.setParameter("idPedido", idPedido).getResultList();
+	}
+
+	public Integer pesquisarIdItemPedidoByIdPedidoSequencial(Integer idPedido, Integer sequencial) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select i.id from ItemPedido i where i.pedido.id = :idPedido and i.sequencial =:sequencial",
+										Integer.class).setParameter("sequencial", sequencial)
+								.setParameter("idPedido", idPedido), Integer.class, null);
 	}
 
 	public Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido) {
@@ -446,6 +416,74 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		inserirParametroPesquisaItemVendido(queryItem, itemVendido);
 
 		return queryItem.getResultList();
+	}
+
+	public List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada, Date dataInicial,
+			Date dataFinal) {
+		List<SituacaoPedido> l = new ArrayList<SituacaoPedido>(1);
+		l.add(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
+
+		return pesquisarItemPedidoCompraAguardandoRecepcaoBySituacaoCompra(idRepresentada, dataInicial, dataFinal, l,
+				true);
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcaoBySituacaoCompra(Integer idRepresentada,
+			Date dataInicial, Date dataFinal, List<SituacaoPedido> listaSituacao, boolean isQtdeRecepcionada) {
+		StringBuilder select = gerarConstrutorItemPedidoIdPedidoCompraEVenda();
+		select.append("where i.pedido.tipoPedido = :tipoPedido ");
+		// Essa condicao foi incluida para reaproveitar o codigo na pesquisa dos
+		// pedidos de compra que estao aguardando recepcao.
+		if (isQtdeRecepcionada) {
+			select.append("and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada =null)");
+		}
+		if (listaSituacao != null && listaSituacao.size() == 1) {
+			select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
+		} else if (listaSituacao != null && listaSituacao.size() > 1) {
+			select.append("and i.pedido.situacaoPedido in (:listaSituacao) ");
+		}
+
+		if (dataInicial != null) {
+			select.append("and i.pedido.dataEnvio >= :dataInicial ");
+		}
+
+		if (dataFinal != null) {
+			select.append("and i.pedido.dataEnvio <= :dataFinal ");
+		}
+
+		if (idRepresentada != null) {
+			select.append("and i.pedido.representada.id = :idRepresentada ");
+		}
+
+		select.append("order by i.pedido.dataEntrega asc ");
+
+		Query query = this.entityManager.createQuery(select.toString());
+		query.setParameter("tipoPedido", TipoPedido.COMPRA);
+
+		if (listaSituacao != null && listaSituacao.size() == 1) {
+			query.setParameter("situacaoPedido", listaSituacao.get(0));
+		} else if (listaSituacao != null && listaSituacao.size() > 1) {
+			query.setParameter("listaSituacao", listaSituacao);
+		}
+
+		if (dataInicial != null) {
+			query.setParameter("dataInicial", dataInicial);
+		}
+
+		if (dataFinal != null) {
+			query.setParameter("dataFinal", dataFinal);
+		}
+
+		if (idRepresentada != null) {
+			query.setParameter("idRepresentada", idRepresentada);
+		}
+
+		return query.getResultList();
+	}
+
+	public List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, Date dataInicial, Date dataFinal) {
+		return pesquisarItemPedidoCompraAguardandoRecepcaoBySituacaoCompra(idRepresentada, dataInicial, dataFinal,
+				SituacaoPedido.getListaCompraEfetivada(), false);
 	}
 
 	public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {

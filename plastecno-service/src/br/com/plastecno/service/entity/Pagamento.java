@@ -240,6 +240,10 @@ public class Pagamento implements Serializable, Cloneable {
 		return valorNF;
 	}
 
+	public boolean isInsumo() {
+		return TipoPagamento.INSUMO.equals(tipoPagamento);
+	}
+
 	public boolean isLiquidado() {
 		return liquidado;
 	}

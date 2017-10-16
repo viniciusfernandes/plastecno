@@ -108,8 +108,11 @@ $(document).ready(function() {
 			<input type="text" id="fornecedor" name="pagamento.nomeFornecedor" value="${pagamento.nomeFornecedor}" style="width: 100%"/>
 			<div class="suggestionsBox" id="containerPesquisaFornecedor" style="display: none; width: 30%"></div>
 		</div>
-		<div class="input" style="width: 50%">
+		<div class="input" style="width: 2%">
 			<input type="button" id="botaoPesquisarFornecedor" title="Pesquisar Pagamentos do Fornecedor" value="" class="botaoPesquisarPequeno" />
+		</div>
+		<div class="input" style="width: 40%">
+			<input type="button" id="botaoPesquisarCompras" title="Pesquisar Pedidos de Compra do Fornecedor" value="" class="botaoCestaPequeno" />
 		</div>
 		<div class="label">Item:</div>
 		<div class="input" style="width: 10%">

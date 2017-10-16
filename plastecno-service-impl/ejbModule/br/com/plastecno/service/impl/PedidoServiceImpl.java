@@ -1222,16 +1222,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo) {
-		if (periodo != null) {
-			return itemPedidoDAO.pesquisarCompraAguardandoRecepcao(idRepresentada, periodo.getInicio(),
-					periodo.getFim());
-		}
-		return itemPedidoDAO.pesquisarCompraAguardandoRecepcao(idRepresentada, null, null);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Pedido pesquisarCompraById(Integer id) {
 		return pesquisarPedidoById(id, true);
 	}
@@ -1317,9 +1307,18 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido) {
 		if (idPedido == null) {
-			return new ArrayList<Integer>(1);
+			return new ArrayList<Integer>();
 		}
 		return itemPedidoDAO.pesquisarIdItemPedidoByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarIdItemPedidoByIdPedidoSequencial(Integer idPedido, Integer sequencial) {
+		if (idPedido == null || sequencial == null) {
+			return null;
+		}
+		return itemPedidoDAO.pesquisarIdItemPedidoByIdPedidoSequencial(idPedido, sequencial);
 	}
 
 	@Override
@@ -1458,9 +1457,28 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo) {
+		if (periodo != null) {
+			return itemPedidoDAO.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, periodo.getInicio(),
+					periodo.getFim());
+		}
+		return itemPedidoDAO.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, null, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo) {
 		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoCompraEfetivada(),
 				TipoPedido.COMPRA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, Periodo periodo) {
+		if (periodo == null) {
+			return itemPedidoDAO.pesquisarItemPedidoCompraEfetivada(idRepresentada, null, null);
+		}
+		return itemPedidoDAO.pesquisarItemPedidoCompraEfetivada(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override

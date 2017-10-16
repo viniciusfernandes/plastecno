@@ -353,7 +353,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 			Periodo periodo) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
 				"Pedidos de Compras para Recepção",
-				pedidoService.pesquisarCompraAguardandoRecepcao(idRepresentada, periodo), false);
+				pedidoService.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, periodo), false);
 
 		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
@@ -560,6 +560,17 @@ public class RelatorioServiceImpl implements RelatorioService {
 		});
 
 		relatorio.sortElementoByGrupo(ordenacaoItemPedido);
+		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemPedidoCompraEfetivada(Integer idRepresentada,
+			Periodo periodo) {
+		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido("Pedidos de Compras Efetivadas",
+				pedidoService.pesquisarItemPedidoCompraEfetivada(idRepresentada, periodo), false);
+
+		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
 	}
 

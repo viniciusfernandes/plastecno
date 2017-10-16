@@ -132,7 +132,24 @@ public class PagamentoServiceImpl implements PagamentoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserir(Pagamento pagamento) throws BusinessException {
 		if (pagamento == null) {
-			return null;
+			throw new BusinessException("O pagamento não pode ser nulo para a inclusão.");
+		}
+
+		// Aqui estamos permitindo que o usuario cadastre os pagamentos de item
+		// a item do pedido na tela de pagamentos.
+		if (pagamento.isInsumo() && (pagamento.getIdPedido() == null || pagamento.getSequencialItem() == null)) {
+			throw new BusinessException(
+					"O pagamento de insumos deve conter o número do pedido e o número do item do pedido.");
+		}
+
+		if (pagamento.isInsumo()) {
+			Integer idItem = pedidoService.pesquisarIdItemPedidoByIdPedidoSequencial(pagamento.getIdPedido(),
+					pagamento.getSequencialItem());
+			if (idItem == null) {
+				throw new BusinessException("O pagamento não pode ser cadastrado pois não existe item No \""
+						+ pagamento.getSequencialItem() + "\" do pedido No \"" + pagamento.getIdPedido() + "\"");
+			}
+			pagamento.setIdItemPedido(idItem);
 		}
 
 		ValidadorInformacao.validar(pagamento);

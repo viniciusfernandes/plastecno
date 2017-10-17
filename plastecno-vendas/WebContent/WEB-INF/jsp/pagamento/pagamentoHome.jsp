@@ -278,6 +278,20 @@ function removerPagamento(botao){
 						</tr>
 				</c:forEach>
 			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="6" style="text-align: right;">QTDE.:</td>
+					<td colspan="6"><div style="text-align: left;">${relatorio.propriedades['qtde']}</div></td>
+				</tr>
+				<tr>
+					<td colspan="6" style="text-align: right;">TOTAL:</td>
+					<td colspan="6"><div style="text-align: left;">R$ ${relatorio.propriedades['tot']}</div></td>
+				</tr>
+				<tr>
+					<td colspan="6" style="text-align: right;">CRED. ICMS:</td>
+					<td colspan="6"><div style="text-align: left;">R$ ${relatorio.propriedades['totCredICMS']}</div></td>
+				</tr>
+			</tfoot>
 		</table>
 	</c:otherwise>
 </c:choose>

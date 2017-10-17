@@ -53,6 +53,7 @@ import br.com.plastecno.service.wrapper.RelatorioVendaVendedorByRepresentada;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.plastecno.service.wrapper.VendaClienteWrapper;
+import br.com.plastecno.util.DateUtils;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 
@@ -567,7 +568,9 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemPedidoCompraEfetivada(Integer idRepresentada,
 			Periodo periodo) {
-		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido("Pedidos de Compras Efetivadas",
+		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
+				"Compras de " + StringUtils.formatarData(periodo.getInicio()) + " a "
+						+ StringUtils.formatarData(periodo.getFim()),
 				pedidoService.pesquisarItemPedidoCompraEfetivada(idRepresentada, periodo), false);
 
 		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);

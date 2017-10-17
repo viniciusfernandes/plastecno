@@ -41,8 +41,9 @@ public class DuplicataServiceImpl implements DuplicataService {
 			throw new BusinessException("O valor da duplicata não pode ser nulo.");
 		}
 		TipoBanco tpBanco = TipoBanco.getTipoBanco(duplicata.getCodigoBanco());
-		nFeDuplicataDAO.alterarDuplicataById(duplicata.getId(), duplicata.getDataVencimento(), duplicata
-				.getValor(), tpBanco != null ? tpBanco.getCodigo() : null, tpBanco != null ? tpBanco.getNome() : null);
+		nFeDuplicataDAO.alterarDuplicataById(duplicata.getId(), duplicata.getDataVencimento(), duplicata.getValor(),
+				tpBanco != null ? tpBanco.getCodigo() : null, tpBanco != null ? tpBanco.getNome() : null,
+				duplicata.getTipoSituacaoDuplicata());
 	}
 
 	@Override
@@ -62,9 +63,10 @@ public class DuplicataServiceImpl implements DuplicataService {
 			return;
 		}
 		Date dtVenc = nFeDuplicataDAO.pesquisarDataVencimentoById(idDuplicata);
-		nFeDuplicataDAO.alterarSituacaoById(idDuplicata,
-				DateUtils.isPosterirorDataAtual(dtVenc) ? TipoSituacaoDuplicata.A_VENCER
-						: TipoSituacaoDuplicata.VENCIDO);
+		nFeDuplicataDAO
+				.alterarSituacaoById(idDuplicata,
+						!DateUtils.isAnteriorDataAtual(dtVenc) ? TipoSituacaoDuplicata.A_VENCER
+								: TipoSituacaoDuplicata.VENCIDO);
 	}
 
 	@Override

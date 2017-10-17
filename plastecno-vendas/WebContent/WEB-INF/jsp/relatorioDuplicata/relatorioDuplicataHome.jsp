@@ -125,15 +125,24 @@ function removerDuplicata(botao, metodo, acao){
 				<input type="text" id="dataVencimento" name="duplicata.dataVencimento" value="${duplicata.dataVencimentoFormatada}" />
 			</div>
 			<div class="label" style="width: 10%">Vl. (R$):</div>
-			<div class="input" style="width: 15%">
-				<input type="text" id="valor" name="duplicata.valor" value="${duplicata.valor}"/>
+			<div class="input" style="width: 55%">
+				<input type="text" id="valor" name="duplicata.valor" value="${duplicata.valor}" style="width: 25%"/>
 			</div>
-			<div class="label" style="width: 10%">Banco:</div>
+			<div class="label">Banco:</div>
 			<div class="input" style="width: 15%">
 				<select name="duplicata.codigoBanco">
-					<option value="${banco.codigo}">${banco.nome}</option>
+					<option></option>
 					<c:forEach items="${listaBanco}" var="banco">
 						<option value="${banco.codigo}" <c:if test="${banco.codigo eq duplicata.codigoBanco}">selected</c:if> >${banco.nome}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label" style="width: 10%">Situação:</div>
+			<div class="input" style="width: 55%">
+				<select name="duplicata.tipoSituacaoDuplicata" style="width: 25%">
+					<option></option>
+					<c:forEach items="${listaTipoSituacao}" var="tipo">
+						<option value="${tipo}" <c:if test="${tipo eq duplicata.tipoSituacaoDuplicata}">selected</c:if> >${tipo.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>

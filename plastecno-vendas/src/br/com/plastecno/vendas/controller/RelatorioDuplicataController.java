@@ -10,6 +10,7 @@ import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.entity.NFeDuplicata;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoBanco;
+import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.util.StringUtils;
@@ -67,8 +68,8 @@ public class RelatorioDuplicataController extends AbstractController {
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
-        addAtributo("dataInicial", formatarData(dataInicial));
-        addAtributo("dataFinal", formatarData(dataFinal));
+        addAtributo("listaTipoSituacao", TipoSituacaoDuplicata.values());
+        addPeriodo(dataInicial, dataFinal);
     }
 
     @Get("relatorio/duplicata/listagem")

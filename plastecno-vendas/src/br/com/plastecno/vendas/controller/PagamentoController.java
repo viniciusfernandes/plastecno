@@ -46,14 +46,17 @@ public class PagamentoController extends AbstractController {
     }
 
     @Get("pagamento/compraefetivada/listagem/{idFornecedor}")
-    public void gerarRelatorioItemPedidoCompraEfetivada(Integer idFornecedor, Date dataInicial, Date dataFinal) {
+    public void gerarRelatorioItemPedidoCompraEfetivada(Pagamento pagamento, Integer idFornecedor, Date dataInicial,
+            Date dataFinal) {
         try {
             String nomeForn = representadaService.pesquisarNomeFantasiaById(idFornecedor);
-            Pagamento p = new Pagamento();
-            p.setIdFornecedor(idFornecedor);
-            p.setNomeFornecedor(nomeForn);
+            if (pagamento == null) {
+                pagamento = new Pagamento();
+            }
+            pagamento.setIdFornecedor(idFornecedor);
+            pagamento.setNomeFornecedor(nomeForn);
 
-            addPagamento(p);
+            addPagamento(pagamento);
             addAtributo("isPesquisaPedidoCompra", true);
             addAtributo("relatorio", relatorioService.gerarRelatorioItemPedidoCompraEfetivada(idFornecedor,
                     new Periodo(dataInicial, dataFinal)));
@@ -133,7 +136,7 @@ public class PagamentoController extends AbstractController {
             } catch (BusinessException e) {
                 addPagamento(pagamento);
                 adicionarIdItemSelecionado(listaIdItemSelecionado);
-                gerarRelatorioItemPedidoCompraEfetivada(pagamento.getIdFornecedor(), dataInicial, dataFinal);
+                gerarRelatorioItemPedidoCompraEfetivada(pagamento, pagamento.getIdFornecedor(), dataInicial, dataFinal);
                 gerarListaMensagemErro(e);
                 irTopoPagina();
             }

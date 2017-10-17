@@ -10,14 +10,23 @@ $(document).ready(function() {
 		idTabela: 'tabelaPedidoCompra',
 		idBotaoLimpar:'botaoLimparPagamento',
 		listaValorSelecionado: <c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>,
-		onSelect: function(checkbox){
-			gerarInputHiddenFormulario(idForm, id+$(checkbox).val(), nome, $(checkbox).val());
+		onSelect: function(json){
+			gerarInputHiddenFormulario(idForm, id+json.valCheckbox, nome, json.valCheckbox);
+			if(onSelectItemTabela != undefined){
+				onSelectItemTabela(json);
+			}
 		},
-		onUnselect: function(checkbox){
-			form.removeChild(document.getElementById(id+$(checkbox).val()));
+		onUnselect: function(json){
+			form.removeChild(document.getElementById(id+json.valCheckbox));
+			if(onSelectItemTabela != undefined){
+				onSelectItemTabela(json);
+			}
 		},
-		onInit: function(valor){
-			gerarInputHiddenFormulario(idForm, id+valor, nome, valor);
+		onInit: function(listaValorSelecionado){
+			for (var i = 0; i < listaValorSelecionado.length; i++) {
+				gerarInputHiddenFormulario(idForm, id+listaValorSelecionado[i], nome, listaValorSelecionado[i]);
+			}
+			onSelectItemTabela({checked:true, totChecked:listaValorSelecionado.length});
 		},
 		onClean: function(){
 			$('#'+idForm+' input[id^=\''+id+'\']').remove();

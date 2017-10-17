@@ -1,6 +1,8 @@
 package br.com.plastecno.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -87,8 +89,13 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 		GrupoWrapper<String, Pagamento> gr = null;
 		Double val = null;
+		double tot = 0d;
+		double totCredICMS = 0d;
 		final String vlTotal = "valorTotal";
 		for (Pagamento p : lPagamento) {
+			tot += p.getValor() != null ? p.getValor() : 0d;
+			totCredICMS += p.getValorCreditoICMS() != null ? p.getValorCreditoICMS() : 0d;
+
 			// Agrupando os pagamentos de compra pelo numero da NF.
 			if (p.getNumeroNF() != null) {
 				// Aqui estamos concatenando u numero da NF com o ID do
@@ -100,6 +107,9 @@ public class PagamentoServiceImpl implements PagamentoService {
 				gr.setPropriedade("liquidado", p.isLiquidado());
 				gr.setPropriedade("vencido", !p.isLiquidado() && p.isVencido());
 
+				// Essa propriedade eh apenas para o ordenamento cronologico dos
+				// grupos.
+				gr.setPropriedade("dtVenc", p.getDataVencimento());
 				val = (Double) gr.getPropriedade(vlTotal);
 				if (val == null) {
 					val = 0d;
@@ -114,12 +124,26 @@ public class PagamentoServiceImpl implements PagamentoService {
 			}
 		}
 
+		relatorio.addPropriedade("qtde", lPagamento.size());
+		relatorio.addPropriedade("tot", tot);
+		relatorio.addPropriedade("totCredICMS", totCredICMS);
+
 		// Arredondando o valor total das NFs no fim para evitar problemas de
 		// arredondamentos
 		List<GrupoWrapper<String, Pagamento>> lGRupo = relatorio.getListaGrupo();
 		for (GrupoWrapper<String, Pagamento> g : lGRupo) {
 			g.setPropriedade(vlTotal, NumeroUtils.arredondarValorMonetario((Double) g.getPropriedade(vlTotal)));
 		}
+
+		Collections.sort(lGRupo, new Comparator<GrupoWrapper<String, Pagamento>>() {
+
+			@Override
+			public int compare(GrupoWrapper<String, Pagamento> o1, GrupoWrapper<String, Pagamento> o2) {
+				Date dtVenc1 = (Date) o1.getPropriedade("dtVenc");
+				Date dtVenc2 = (Date) o2.getPropriedade("dtVenc");
+				return dtVenc1 != null && dtVenc2 != null ? dtVenc1.compareTo(dtVenc2) : -1;
+			}
+		});
 		return relatorio;
 	}
 
@@ -132,7 +156,24 @@ public class PagamentoServiceImpl implements PagamentoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserir(Pagamento pagamento) throws BusinessException {
 		if (pagamento == null) {
-			return null;
+			throw new BusinessException("O pagamento não pode ser nulo para a inclusão.");
+		}
+
+		// Aqui estamos permitindo que o usuario cadastre os pagamentos de item
+		// a item do pedido na tela de pagamentos.
+		if (pagamento.isInsumo() && (pagamento.getIdPedido() == null || pagamento.getSequencialItem() == null)) {
+			throw new BusinessException(
+					"O pagamento de insumos deve conter o número do pedido e o número do item do pedido.");
+		}
+
+		if (pagamento.isInsumo()) {
+			Integer idItem = pedidoService.pesquisarIdItemPedidoByIdPedidoSequencial(pagamento.getIdPedido(),
+					pagamento.getSequencialItem());
+			if (idItem == null) {
+				throw new BusinessException("O pagamento não pode ser cadastrado pois não existe item No \""
+						+ pagamento.getSequencialItem() + "\" do pedido No \"" + pagamento.getIdPedido() + "\"");
+			}
+			pagamento.setIdItemPedido(idItem);
 		}
 
 		ValidadorInformacao.validar(pagamento);

@@ -10,14 +10,16 @@ $(document).ready(function(){
 		idTabela:'tabelaListagemItemPedido',
 		idBotaoLimpar:'botaoRemoverSelecaoItem',
 		listaValorSelecionado: <c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>,
-		onSelect: function(checkbox){
-			gerarInputHiddenFormulario(idForm, id+$(checkbox).val(), nome, $(checkbox).val());
+		onSelect: function(json){
+			gerarInputHiddenFormulario(idForm, id+json.valCheckbox, nome, json.valCheckbox);
 		},
-		onUnselect: function(checkbox){
-			form.removeChild(document.getElementById(id+$(checkbox).val()));
+		onUnselect: function(json){
+			form.removeChild(document.getElementById(id+json.valCheckbox));
 		},
-		onInit: function(valor){
-			gerarInputHiddenFormulario(idForm, id+valor, nome, valor);
+		onInit: function(listaValorSelecionado){
+			for (var i = 0; i < listaValorSelecionado.length; i++) {
+				gerarInputHiddenFormulario(idForm, id+listaValorSelecionado[i], nome, listaValorSelecionado[i]);
+			}
 		},
 		onClean: function(){
 			$('#'+idForm+' input[id^=\''+id+'\']').remove();

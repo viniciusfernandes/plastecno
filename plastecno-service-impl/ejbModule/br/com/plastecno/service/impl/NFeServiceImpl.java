@@ -70,6 +70,7 @@ import br.com.plastecno.service.nfe.constante.TipoNFe;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoNFe;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.util.DateUtils;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
@@ -538,11 +539,15 @@ public class NFeServiceImpl implements NFeService {
 		Integer numeroNFe = Integer.parseInt(dados.getIdentificacaoNFe().getNumero());
 
 		List<NFeDuplicata> lista = new ArrayList<NFeDuplicata>();
+		Date dtVenc = null;
+		TipoSituacaoDuplicata tpSit = null;
 		for (DuplicataNFe dNFe : lDuplicata) {
 			try {
-				lista.add(new NFeDuplicata(StringUtils.parsearDataAmericano(dNFe.getDataVencimento()), null, idCliente,
-						dados.getIdentificacaoDestinatarioNFe().getRazaoSocial(), numeroNFe,
-						TipoSituacaoDuplicata.A_VENCER, dNFe.getValor()));
+				dtVenc = StringUtils.parsearDataAmericano(dNFe.getDataVencimento());
+				tpSit = !DateUtils.isAnteriorDataAtual(dtVenc) ? TipoSituacaoDuplicata.A_VENCER
+						: TipoSituacaoDuplicata.VENCIDO;
+				lista.add(new NFeDuplicata(dtVenc, null, idCliente, dados.getIdentificacaoDestinatarioNFe()
+						.getRazaoSocial(), numeroNFe, tpSit, dNFe.getValor()));
 			} catch (ParseException e) {
 				throw new BusinessException(
 						"O campo de data de vendimento de uma das duplicatas não esta no formato correto. O valor enviado foi "

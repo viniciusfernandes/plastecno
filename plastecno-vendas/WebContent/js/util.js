@@ -391,24 +391,32 @@ function tabelaLinhaSelecionavel(config){
 	var onSelect = config.onSelect;
 	var onUnselect = config.onUnselect;
 	var onClean = config.onClean;
-	
+	var tot = 0;
 	// Adicionando a lista os itens carregados no inicio do load da pagina.
 	if(onInit != undefined && listaValorSelecionado != undefined && listaValorSelecionado != null){
-		for (var i = 0; i < listaValorSelecionado.length; i++) {
-			onInit(listaValorSelecionado[i]);
-		}
+		tot = listaValorSelecionado.length;
+		onInit(listaValorSelecionado);
 	}
 	// Definindo o evento de selecao.
 	$('#'+idTabela +' tr td input:checkbox').click(function(){
-		var ck = $(this).prop('checked'); 
+		var ck = $(this).prop('checked');
+		if(ck){
+			tot++;
+		} else if(!ck && tot>0) {
+			tot--;
+		} else {
+			tot=0;
+		}
+		
 		if(ck && onSelect != undefined){
-			onSelect($(this));
+			onSelect({checked: $(this).prop('checked'), totChecked: tot, valCheckbox:$(this).val()});
 		} else if(!ck && onUnselect != undefined){
-			onUnselect($(this));
+			onUnselect({checked: $(this).prop('checked'), totChecked: tot, valCheckbox:$(this).val()});
 		}
 	});
 	
 	$('#'+idBotaoLimpar).click(function(){
+		tot=0;
 		$('#'+idTabela +' tr td input:checkbox').each(function(){
 			if($(this).prop('checked')){
 				$(this).prop('checked', false);

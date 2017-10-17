@@ -34,6 +34,31 @@ $(document).ready(function() {
 		}
 	});
 });
+
+function onSelectItemTabela(json){
+	if(json.checked && json.totChecked >= 1){
+		$('#dataVencimento').attr('readonly', true).addClass('desabilitado').val('');
+		$('#parcela').attr('readonly', true).addClass('desabilitado').val('');
+		$('#totalParcelas').attr('readonly', true).addClass('desabilitado').val('');
+		$('#valor').attr('readonly', true).addClass('desabilitado').val('');
+		$('#pedido').attr('readonly', true).addClass('desabilitado').val('');
+		$('#sequencial').attr('readonly', true).addClass('desabilitado').val('');
+		$('#quantidade').attr('readonly', true).addClass('desabilitado').val('');
+		$('#descricao').attr('readonly', true).addClass('desabilitado').val('');
+		$('#valorCreditoICMS').attr('readonly', true).addClass('desabilitado').val('');
+	} else if(!json.checked && json.totChecked <= 0) {
+		$('#dataVencimento').attr('readonly', false).toggleClass('desabilitado');
+		$('#parcela').attr('readonly', false).toggleClass('desabilitado');
+		$('#totalParcelas').attr('readonly', false).toggleClass('desabilitado');
+		$('#valor').attr('readonly', false).toggleClass('desabilitado');
+		$('#pedido').attr('readonly', false).toggleClass('desabilitado');
+		$('#sequencial').attr('readonly', false).toggleClass('desabilitado');
+		$('#quantidade').attr('readonly', false).toggleClass('desabilitado');
+		$('#descricao').attr('readonly', false).toggleClass('desabilitado');
+		$('#valorCreditoICMS').attr('readonly', false).toggleClass('desabilitado');
+	}
+};
+
 </script>
 <form id="formPagamento" action="<c:url value="/pagamento/inclusao"/>" method="post">
 		<input type="hidden" id="idFornecedor" name="pagamento.idFornecedor" value="${pagamento.idFornecedor}"/>
@@ -108,8 +133,11 @@ $(document).ready(function() {
 			<input type="text" id="fornecedor" name="pagamento.nomeFornecedor" value="${pagamento.nomeFornecedor}" style="width: 100%"/>
 			<div class="suggestionsBox" id="containerPesquisaFornecedor" style="display: none; width: 30%"></div>
 		</div>
-		<div class="input" style="width: 50%">
+		<div class="input" style="width: 2%">
 			<input type="button" id="botaoPesquisarFornecedor" title="Pesquisar Pagamentos do Fornecedor" value="" class="botaoPesquisarPequeno" />
+		</div>
+		<div class="input" style="width: 40%">
+			<input type="button" id="botaoPesquisarCompras" title="Pesquisar Pedidos de Compra do Fornecedor" value="" class="botaoCestaPequeno" />
 		</div>
 		<div class="label">Item:</div>
 		<div class="input" style="width: 10%">

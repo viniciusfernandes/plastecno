@@ -17,6 +17,7 @@ import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
+import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
@@ -29,6 +30,9 @@ public class PagamentoController extends AbstractController {
     @Servico
     private PagamentoService pagamentoService;
     @Servico
+    private RelatorioService relatorioService;
+
+    @Servico
     private RepresentadaService representadaService;
 
     public PagamentoController(Result result, UsuarioInfo usuarioInfo, HttpServletRequest request) {
@@ -39,6 +43,29 @@ public class PagamentoController extends AbstractController {
         formatarPagamento(p);
         p.setNomeFornecedor(representadaService.pesquisarNomeFantasiaById(p.getIdFornecedor()));
         addAtributo("pagamento", p);
+    }
+
+    @Get("pagamento/compraefetivada/listagem/{idFornecedor}")
+    public void gerarRelatorioItemPedidoCompraEfetivada(Pagamento pagamento, Integer idFornecedor, Date dataInicial,
+            Date dataFinal) {
+        try {
+            String nomeForn = representadaService.pesquisarNomeFantasiaById(idFornecedor);
+            if (pagamento == null) {
+                pagamento = new Pagamento();
+            }
+            pagamento.setIdFornecedor(idFornecedor);
+            pagamento.setNomeFornecedor(nomeForn);
+
+            addPagamento(pagamento);
+            addAtributo("isPesquisaPedidoCompra", true);
+            addAtributo("relatorio", relatorioService.gerarRelatorioItemPedidoCompraEfetivada(idFornecedor,
+                    new Periodo(dataInicial, dataFinal)));
+            irRodapePagina();
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
+        addPeriodo(dataInicial, dataFinal);
     }
 
     private void gerarRelatorioPagamento(Date dataInicial, Date dataFinal) throws InformacaoInvalidaException {
@@ -80,22 +107,42 @@ public class PagamentoController extends AbstractController {
     }
 
     @Post("pagamento/inclusao")
-    public void inserirPagamento(Pagamento pagamento, Date dataInicial, Date dataFinal) {
-        try {
-            pagamentoService.inserir(pagamento);
-            gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
+    public void inserirPagamento(Pagamento pagamento, Date dataInicial, Date dataFinal,
+            List<Integer> listaIdItemSelecionado) {
 
-            gerarMensagemSucesso("Pagamento inserido com sucesso.");
-        } catch (BusinessException e) {
-            addPagamento(pagamento);
+        if (listaIdItemSelecionado == null || listaIdItemSelecionado.isEmpty()) {
             try {
-                gerarRelatorioPagamento(dataInicial, dataFinal);
-            } catch (InformacaoInvalidaException e1) {
+                pagamentoService.inserir(pagamento);
+                gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
+                gerarMensagemSucesso("Pagamento inserido com sucesso.");
+            } catch (BusinessException e) {
+                addPagamento(pagamento);
+                try {
+                    gerarRelatorioPagamento(dataInicial, dataFinal);
+                } catch (InformacaoInvalidaException e1) {
+                    gerarListaMensagemErro(e);
+                }
                 gerarListaMensagemErro(e);
+                irTopoPagina();
             }
-            gerarListaMensagemErro(e);
-            irTopoPagina();
+        } else {
+            try {
+                pagamentoService.inserirPagamentoParceladoItemPedido(pagamento.getNumeroNF(), pagamento.getValorNF(),
+                        pagamento.getDataVencimento(), pagamento.getDataEmissao(), pagamento.getModalidadeFrete(),
+                        listaIdItemSelecionado);
+                redirecTo(PagamentoController.class).pesquisarPagamentoByNF(pagamento.getNumeroNF(), dataInicial,
+                        dataFinal);
+                gerarMensagemSucesso("Pagamento inserido com sucesso.");
+            } catch (BusinessException e) {
+                addPagamento(pagamento);
+                adicionarIdItemSelecionado(listaIdItemSelecionado);
+                gerarRelatorioItemPedidoCompraEfetivada(pagamento, pagamento.getIdFornecedor(), dataInicial, dataFinal);
+                gerarListaMensagemErro(e);
+                irTopoPagina();
+            }
         }
+
+        addPeriodo(dataInicial, dataFinal);
     }
 
     @Post("pagamento/liquidacao/{idPagamento}")

@@ -57,6 +57,9 @@ public interface RelatorioService {
 			Integer idVendedor, Integer idFornecedor, boolean isOrcamento, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido);
 
+	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemPedidoCompraEfetivada(Integer idRepresentada,
+			Periodo periodo);
+
 	RelatorioWrapper<Integer, NFeItemFracionado> gerarRelatorioPedidoFracionado();
 
 	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioRevendaEmpacotamento(Integer idCliente);

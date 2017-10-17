@@ -17,13 +17,13 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 	}
 
 	public void alterarDuplicataById(Integer idDuplicata, Date dataVencimento, Double valor, String codigoBanco,
-			String nomeBanco) {
+			String nomeBanco, TipoSituacaoDuplicata tipo) {
 		entityManager
 				.createQuery(
-						"update NFeDuplicata d set d.dataVencimento =:dataVencimento, d.valor =:valor, d.codigoBanco=:codigoBanco, d.nomeBanco=:nomeBanco  where d.id = :idDuplicata")
+						"update NFeDuplicata d set d.dataVencimento =:dataVencimento, d.valor =:valor, d.codigoBanco=:codigoBanco, d.nomeBanco=:nomeBanco, d.tipoSituacaoDuplicata =:tipo  where d.id = :idDuplicata")
 				.setParameter("dataVencimento", dataVencimento).setParameter("idDuplicata", idDuplicata)
 				.setParameter("valor", valor).setParameter("codigoBanco", codigoBanco)
-				.setParameter("nomeBanco", nomeBanco).executeUpdate();
+				.setParameter("nomeBanco", nomeBanco).setParameter("tipo", tipo).executeUpdate();
 	}
 
 	public void alterarSituacaoById(Integer idDuplicata, TipoSituacaoDuplicata tipoSituacaoDuplicata) {

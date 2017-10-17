@@ -54,6 +54,8 @@ public interface PedidoService {
 	Integer comprarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
 			throws BusinessException;
 
+	boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem);
+
 	boolean contemItemPedido(Integer idPedido);
 
 	boolean contemQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
@@ -114,8 +116,6 @@ public interface PedidoService {
 
 	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
 
-	List<ItemPedido> pesquisarCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo);
-
 	Pedido pesquisarCompraById(Integer id);
 
 	List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador) throws BusinessException;
@@ -133,6 +133,8 @@ public interface PedidoService {
 	Integer pesquisarIdClienteByIdPedido(Integer idPedido);
 
 	List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido);
+
+	Integer pesquisarIdItemPedidoByIdPedidoSequencial(Integer idPedido, Integer sequencial);
 
 	Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido);
 
@@ -172,7 +174,11 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
+	List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo);
+
 	List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo);
+
+	List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, Periodo periodo);
 
 	List<ItemPedido> pesquisarItemPedidoEncomendado();
 
@@ -289,7 +295,5 @@ public interface PedidoService {
 	void removerLogradouroPedido(Integer idPedido);
 
 	void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException;
-
-	boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem);
 
 }

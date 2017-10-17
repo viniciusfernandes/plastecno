@@ -41,7 +41,6 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
-import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
@@ -353,7 +352,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 			Periodo periodo) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
 				"Pedidos de Compras para Recepção",
-				pedidoService.pesquisarCompraAguardandoRecepcao(idRepresentada, periodo), false);
+				pedidoService.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, periodo), false);
 
 		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
@@ -363,7 +362,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 	private RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicata(List<NFeDuplicata> lDuplic, String titulo)
 			throws BusinessException {
 		RelatorioWrapper<Date, NFeDuplicata> relatorio = new RelatorioWrapper<Date, NFeDuplicata>(titulo);
-		Date dtAtual = new Date();
 		int qtde = 0;
 		boolean okVal = false;
 		boolean liqd = false;
@@ -386,11 +384,6 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 			if (okVal && !liqd) {
 				totReceber += d.getValor();
-			}
-
-			// Vamos definir a situação da duplicata
-			if (!liqd && dtAtual.after(d.getDataVencimento())) {
-				d.setTipoSituacaoDuplicata(TipoSituacaoDuplicata.VENCIDO);
 			}
 
 			g = relatorio.addGrupo(d.getDataVencimento(), d);
@@ -431,7 +424,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 			@Override
 			public int compare(GrupoWrapper<Date, NFeDuplicata> o1, GrupoWrapper<Date, NFeDuplicata> o2) {
-				return o1.getId() != null && o1.getId() != null ? o2.getId().compareTo(o1.getId()) : 0;
+				return o1.getId() != null && o2.getId() != null ? o1.getId().compareTo(o2.getId()) : 0;
 			}
 		});
 
@@ -560,6 +553,19 @@ public class RelatorioServiceImpl implements RelatorioService {
 		});
 
 		relatorio.sortElementoByGrupo(ordenacaoItemPedido);
+		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemPedidoCompraEfetivada(Integer idRepresentada,
+			Periodo periodo) {
+		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
+				"Compras de " + StringUtils.formatarData(periodo.getInicio()) + " a "
+						+ StringUtils.formatarData(periodo.getFim()),
+				pedidoService.pesquisarItemPedidoCompraEfetivada(idRepresentada, periodo), false);
+
+		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
 	}
 

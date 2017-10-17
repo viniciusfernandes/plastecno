@@ -125,8 +125,8 @@ public class PagamentoServiceImpl implements PagamentoService {
 		}
 
 		relatorio.addPropriedade("qtde", lPagamento.size());
-		relatorio.addPropriedade("tot", tot);
-		relatorio.addPropriedade("totCredICMS", totCredICMS);
+		relatorio.addPropriedade("tot", NumeroUtils.arredondarValorMonetario(tot));
+		relatorio.addPropriedade("totCredICMS", NumeroUtils.arredondarValorMonetario(totCredICMS));
 
 		// Arredondando o valor total das NFs no fim para evitar problemas de
 		// arredondamentos

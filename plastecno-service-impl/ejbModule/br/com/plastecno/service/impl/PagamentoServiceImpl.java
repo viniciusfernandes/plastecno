@@ -103,13 +103,6 @@ public class PagamentoServiceImpl implements PagamentoService {
 				// ter o mesmo numreo de NF, assim minimizamos conflitos.
 				gr = relatorio.addGrupo(String.valueOf(p.getNumeroNF()) + p.getIdFornecedor() + p.getParcela(), p);
 				gr.setPropriedade("numeroNF", p.getNumeroNF());
-				gr.setPropriedade("dataVencimento", StringUtils.formatarData(p.getDataVencimento()));
-				gr.setPropriedade("liquidado", p.isLiquidado());
-				gr.setPropriedade("vencido", !p.isLiquidado() && p.isVencido());
-
-				// Essa propriedade eh apenas para o ordenamento cronologico dos
-				// grupos.
-				gr.setPropriedade("dtVenc", p.getDataVencimento());
 				val = (Double) gr.getPropriedade(vlTotal);
 				if (val == null) {
 					val = 0d;
@@ -117,11 +110,22 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 				// O valor da NF do relatorio deve ser a soma de todos valores
 				// dos itens.
-				gr.setPropriedade(vlTotal, val + p.getValor());
+				val += p.getValor();
 			} else {
+				val = p.getValor();
 				// Todos os outros tipos de pagamentos nao serao agrupados.
-				relatorio.addElemento(p.getId().toString(), p);
+				// Usamos o ID do pagamento pois a estrategia eh tratar os
+				// pagamentos que nao tem NF com um grupo com um unico elemento.
+				gr = relatorio.addGrupo(p.getId().toString(), p);
 			}
+			gr.setPropriedade(vlTotal, val);
+			gr.setPropriedade("dataVencimento", StringUtils.formatarData(p.getDataVencimento()));
+			gr.setPropriedade("liquidado", p.isLiquidado());
+			gr.setPropriedade("vencido", !p.isLiquidado() && p.isVencido());
+
+			// Essa propriedade eh apenas para o ordenamento cronologico dos
+			// grupos.
+			gr.setPropriedade("dtVenc", p.getDataVencimento());
 		}
 
 		relatorio.addPropriedade("qtde", lPagamento.size());

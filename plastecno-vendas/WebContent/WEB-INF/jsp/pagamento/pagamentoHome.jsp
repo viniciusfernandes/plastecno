@@ -221,62 +221,7 @@ function removerPagamento(botao){
 						</tr>
 					</c:forEach>
 				</c:forEach>
-				<c:forEach items="${relatorio.listaElemento}" var="elemento" varStatus="iElemento">
-						<tr>
-								<c:choose>
-									<c:when test="${elemento.liquidado}">
-										<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"><div class="botaoVerificacaoEfetuadaGrande" title="Liquidado"></div></td>
-									</c:when>
-									<c:when test="${grupo.propriedades['vencido']}">
-										<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"><div class="botaoVerificacaoFalhaGrande" title="Vencido"></div></td>
-									</c:when>
-									<c:otherwise>
-										<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"><div class="botaoVerificacaoAguardadaGrande" title="Aguardando"></div></td>
-									</c:otherwise>
-								</c:choose>
-								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center">${elemento.dataVencimentoFormatada}</td>
-								<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center"></td>
-							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
-							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
-							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.descricao}</td>
-							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.parcelaFormatada}</td>
-							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
-							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}"></td>
-							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
-							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" style="text-align: center">${elemento.valor}</td>
-							<td class="fundo${iElemento.index % 2 == 0 ? 1 : 2}" colspan="2">
-								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/pagamento/"/>${elemento.id}" >
-										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-										<input type="submit" value="" title="Editar Pagamento" class="botaoEditar"/>
-									</form>
-									
-									<c:choose>
-										<c:when test="${not elemento.liquidado}">
-											<form action="<c:url value="/pagamento/liquidacao/"/>${elemento.id}" method="post" >
-												<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-												<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-												<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificacaoEfetuadaPequeno" />
-											</form>
-										</c:when>
-										<c:otherwise>
-											<form action="<c:url value="/pagamento/retonoliquidacao/"/>${elemento.id}" method="post" >
-												<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-												<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-												<input type="submit" value="" title="Retornar Liquidação Pagamento" class="botaoVerificacaoFalhaPequeno" />
-											</form>
-										</c:otherwise>
-									</c:choose>
-									<form action="<c:url value="/pagamento/remocao/"/>${elemento.id}" method="post">
-										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
-										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-										<input type="button" value="" title="Remover Pagamento" class="botaoRemover" onclick="removerPagamento(this);"/>
-									</form>
-								</div>
-							</td>
-						</tr>
-				</c:forEach>
+				
 			</tbody>
 			<tfoot>
 				<tr>

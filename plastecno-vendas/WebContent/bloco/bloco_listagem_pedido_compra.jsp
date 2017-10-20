@@ -12,13 +12,13 @@ $(document).ready(function() {
 		listaValorSelecionado: <c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>,
 		onSelect: function(json){
 			gerarInputHiddenFormulario(idForm, id+json.valCheckbox, nome, json.valCheckbox);
-			if(onSelectItemTabela != undefined){
+			if(onSelectItemTabela != undefined) {
 				onSelectItemTabela(json);
 			}
 		},
 		onUnselect: function(json){
 			form.removeChild(document.getElementById(id+json.valCheckbox));
-			if(onSelectItemTabela != undefined){
+			if(onSelectItemTabela != undefined) {
 				onSelectItemTabela(json);
 			}
 		},
@@ -26,7 +26,9 @@ $(document).ready(function() {
 			for (var i = 0; i < listaValorSelecionado.length; i++) {
 				gerarInputHiddenFormulario(idForm, id+listaValorSelecionado[i], nome, listaValorSelecionado[i]);
 			}
-			onSelectItemTabela({checked:true, totChecked:listaValorSelecionado.length});
+			if(onSelectItemTabela != undefined) {
+				onSelectItemTabela({checked:true, totChecked:listaValorSelecionado.length});
+			}
 		},
 		onClean: function(){
 			$('#'+idForm+' input[id^=\''+id+'\']').remove();

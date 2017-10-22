@@ -33,31 +33,38 @@ $(document).ready(function() {
 			$('#idFornecedor').val(itemLista.id);
 		}
 	});
+	
+	var listaIdSelecionado=<c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>;
+	tabelaLinhaSelecionavelExt({
+		idForm:'formPagamento',
+		idTabela:'tabelaPedidoCompra',
+		idBotaoLimpar:'botaoLimparPagamento',
+		listaIdSelecionado: listaIdSelecionado,
+		onSelectItem: function(json){
+			if(json.checked && json.totChecked >= 1){
+				$('#dataVencimento').attr('readonly', true).addClass('desabilitado').val('');
+				$('#parcela').attr('readonly', true).addClass('desabilitado').val('');
+				$('#totalParcelas').attr('readonly', true).addClass('desabilitado').val('');
+				$('#valor').attr('readonly', true).addClass('desabilitado').val('');
+				$('#pedido').attr('readonly', true).addClass('desabilitado').val('');
+				$('#sequencial').attr('readonly', true).addClass('desabilitado').val('');
+				$('#quantidade').attr('readonly', true).addClass('desabilitado').val('');
+				$('#descricao').attr('readonly', true).addClass('desabilitado').val('');
+				$('#valorCreditoICMS').attr('readonly', true).addClass('desabilitado').val('');
+			} else if(!json.checked && json.totChecked <= 0) {
+				$('#dataVencimento').attr('readonly', false).toggleClass('desabilitado');
+				$('#parcela').attr('readonly', false).toggleClass('desabilitado');
+				$('#totalParcelas').attr('readonly', false).toggleClass('desabilitado');
+				$('#valor').attr('readonly', false).toggleClass('desabilitado');
+				$('#pedido').attr('readonly', false).toggleClass('desabilitado');
+				$('#sequencial').attr('readonly', false).toggleClass('desabilitado');
+				$('#quantidade').attr('readonly', false).toggleClass('desabilitado');
+				$('#descricao').attr('readonly', false).toggleClass('desabilitado');
+				$('#valorCreditoICMS').attr('readonly', false).toggleClass('desabilitado');
+			}
+		}
+	});
 });
-
-function onSelectItemTabela(json){
-	if(json.checked && json.totChecked >= 1){
-		$('#dataVencimento').attr('readonly', true).addClass('desabilitado').val('');
-		$('#parcela').attr('readonly', true).addClass('desabilitado').val('');
-		$('#totalParcelas').attr('readonly', true).addClass('desabilitado').val('');
-		$('#valor').attr('readonly', true).addClass('desabilitado').val('');
-		$('#pedido').attr('readonly', true).addClass('desabilitado').val('');
-		$('#sequencial').attr('readonly', true).addClass('desabilitado').val('');
-		$('#quantidade').attr('readonly', true).addClass('desabilitado').val('');
-		$('#descricao').attr('readonly', true).addClass('desabilitado').val('');
-		$('#valorCreditoICMS').attr('readonly', true).addClass('desabilitado').val('');
-	} else if(!json.checked && json.totChecked <= 0) {
-		$('#dataVencimento').attr('readonly', false).toggleClass('desabilitado');
-		$('#parcela').attr('readonly', false).toggleClass('desabilitado');
-		$('#totalParcelas').attr('readonly', false).toggleClass('desabilitado');
-		$('#valor').attr('readonly', false).toggleClass('desabilitado');
-		$('#pedido').attr('readonly', false).toggleClass('desabilitado');
-		$('#sequencial').attr('readonly', false).toggleClass('desabilitado');
-		$('#quantidade').attr('readonly', false).toggleClass('desabilitado');
-		$('#descricao').attr('readonly', false).toggleClass('desabilitado');
-		$('#valorCreditoICMS').attr('readonly', false).toggleClass('desabilitado');
-	}
-};
 
 </script>
 <form id="formPagamento" action="<c:url value="/pagamento/inclusao"/>" method="post">

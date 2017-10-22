@@ -1686,15 +1686,15 @@ function inicializarCalculoImpostos(){
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoRemoverNFe" title="Remover NFe" value="" class="botaoRemover" />
 			</div>
-			<div class="label" style="width: 10%">Mod. NFe:</div>
-			<div class="input" style="width: 5%">
+			<div class="label" style="width: 11%">Mod. NFe:</div>
+			<div class="input" style="width: 10%">
 				<input type="text" name="nf.identificacaoNFe.modelo" value="${modeloNFe}" maxlength="2" style="width: 100%" />
 			</div>
 			<div class="label" style="width: 10%">Série NFe:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" name="nf.identificacaoNFe.serie" value="${serieNFe}" maxlength="3" style="width: 100%" />
 			</div>
-			<div class="label">Tipo Operação:</div>
+			<div class="label" style="width: 10%">Tipo Operação:</div>
 			<div class="input" style="width: 10%">
 				<select name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
 					<c:forEach var="tipo" items="${listaTipoOperacao}">
@@ -1703,18 +1703,18 @@ function inicializarCalculoImpostos(){
 				</select>
 			</div>
 			<div class="label">Dest. Operação:</div>
-			<div class="input" style="width: 23%">
+			<div class="input" style="width: 36%">
 				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 100%" >
 					<c:forEach var="tipo" items="${listaTipoDestinoOperacao}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoDestinoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Dt. Ent./Saída:</div>
+			<div class="label" style="width: 10%">Dt. Ent./Saída:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="dataSaida" name="nf.identificacaoNFe.dataSaida" value="${dataSaida}" style="width: 100%"/>
 			</div>
-			<div class="label">Hr. Ent./Saída:</div>
+			<div class="label" style="width: 10%">Hr. Ent./Saída:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="horaSaida" name="nf.identificacaoNFe.horaSaida" value="${horaSaida}" style="width: 100%"/>
 			</div>
@@ -1727,16 +1727,16 @@ function inicializarCalculoImpostos(){
 				</select>
 			</div>
 			<div class="label">Forma Emissão:</div>
-			<div class="input" style="width: 20%">
-				<select name="nf.identificacaoNFe.tipoEmissao"  style="width: 50%">
+			<div class="input" style="width: 10%">
+				<select name="nf.identificacaoNFe.tipoEmissao"  style="width: 100%">
 					<c:forEach var="tipoEmissao" items="${listaTipoEmissao}">
 						<option value="${tipoEmissao.codigo}" <c:if test="${tipoEmissao.codigo eq tipoEmissaoSelecionada}">selected</c:if>>${tipoEmissao.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Finalidade Emissão:</div>
-			<div class="input" style="width: 10%">
-				<select name="nf.identificacaoNFe.finalidadeEmissao" style="width: 100%" >
+			<div class="label" style="width: 10%">Final. Emiss.:</div>
+			<div class="input" style="width: 30%">
+				<select name="nf.identificacaoNFe.finalidadeEmissao" style="width: 33%" >
 					<c:forEach var="finalidade" items="${listaTipoFinalidadeEmissao}">
 						<option value="${finalidade.codigo}" <c:if test="${finalidade.codigo eq finalidadeEmissaoSelecionada}">selected</c:if>>${finalidade.descricao}</option>
 					</c:forEach>
@@ -1744,7 +1744,7 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label">Presen. Comprador:</div>
 			<div class="input" style="width: 80%">
-				<select name="nf.identificacaoNFe.tipoPresencaComprador" style="width: 20%">
+				<select name="nf.identificacaoNFe.tipoPresencaComprador" style="width: 45%">
 					<c:forEach var="tipo" items="${listaTipoPresencaComprador}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoPresencaSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
@@ -1767,17 +1767,22 @@ function inicializarCalculoImpostos(){
 				</select>
 			</div>
 			<div class="label">Natureza Operação:</div>
-			<div class="input" style="width: 50%">
-				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 100%"/>
+			<div class="input" style="width: 80%">
+				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 45%"/>
 			</div>
 			
 			<div class="divFieldset">
 			<fieldset id="bloco_destinatario" class="fieldsetInterno">
 				<legend>::: Destinatário ::: -</legend>
 				<div class="label">Razão Social/Nome:</div>
-				<div class="input" style="width: 80%">
-					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.razaoSocial" value="${cliente.razaoSocial}"  maxlength="70" style="width: 60%"/>
+				<div class="input" style="width: 50%">
+					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.razaoSocial" value="${cliente.razaoSocial}"  maxlength="70" style="width: 100%"/>
 					<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
+				</div>
+				<div class="label" style="width: 8%">Email:</div>
+				<div class="input" style="width: 20%">
+					<input type="text" id="email" name="nf.identificacaoDestinatarioNFe.email"
+						value="${cliente.email}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
 				</div>
 				
 				<div class="label">CNPJ:</div>
@@ -1789,34 +1794,26 @@ function inicializarCalculoImpostos(){
 						<input type="button" id="botaoPesquisarCnpjDest"
 							title="Pesquisar CNPJ Destinatário" value="" class="botaoPesquisarPequeno" />
 					</div>
-				<div class="label">Insc. Estadual:</div>
-				<div class="input" style="width: 40%">
-					<input type="text" id="inscricaoEstadual"
-						name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
-						value="${cliente.inscricaoEstadual}"
-						style="width: 40%; text-align: right;" />
+				<div class="label" style="width: 10%">Insc. Estadual:</div>
+				<div class="input" style="width: 50%">
+					<input type="text" id="inscricaoEstadual" name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
+						value="${cliente.inscricaoEstadual}" style="width: 44%; text-align: left;" />
 				</div>
 				<div class="label">SUFRAMA:</div>
 				<div class="input" style="width: 80%">
 					<input type="text" id="inscricaoSUFRAMA" name="nf.identificacaoDestinatarioNFe.inscricaoSUFRAMA"
-						value="${cliente.inscricaoSUFRAMA}"  style="width: 20%" maxlength="9"/>
+						value="${cliente.inscricaoSUFRAMA}"  style="width: 19%" maxlength="9"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 15%">
 					<input type="text" id="cpf" name="nf.identificacaoDestinatarioNFe.cpf"
 						value="${cliente.cpf}"  />
 				</div>
-				<div class="label">Telefone:</div>
-				<div class="input" style="width: 10%">
+				<div class="label" style="width: 12%">Telefone:</div>
+				<div class="input" style="width: 50%">
 					<input type="text" id="telefone" name="telefoneDestinatario"
-						value="${telefoneContatoPedido}" />
+						value="${telefoneContatoPedido}" style="width: 44%"/>
 				</div>
-				<div class="label">Email:</div>
-				<div class="input" style="width: 20%">
-					<input type="text" id="email" name="nf.identificacaoDestinatarioNFe.email"
-						value="${cliente.email}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
-				</div>
-				
 				<div class="divFieldset">
 				<jsp:include page="/bloco/bloco_logradouro.jsp"></jsp:include>
 				</div>
@@ -1828,7 +1825,7 @@ function inicializarCalculoImpostos(){
 			<legend>::: NF/NFe Referenciada ::: -</legend>
 			<div class="label">Chave Acesso:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="chaveReferenciada" style="width: 50%"/>
+				<input type="text" id="chaveReferenciada" style="width: 45%"/>
 			</div>
 			<div class="label">Núm. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">

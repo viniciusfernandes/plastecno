@@ -86,13 +86,13 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 	<div class="label" style="width: 7%">Cod. Mun.:</div>
 	<div class="input" style="width: 50%">
 		<input type="text" id="codigoMunicipio" name="logradouro.codigoMunicipio" maxlength="7"
-			value="${logradouro.codigoMunicipio}" style="width: 25%"/>
+			value="${logradouro.codigoMunicipio}" style="width: 20%"/>
 	</div>
 	
 	<div class="label">Endereço:</div>
-	<div class="input" style="width: 40%">
-		<input type="text" id="endereco" name="logradouro.endereco"
-			value="${logradouro.endereco}" class="uppercaseBloqueado" />
+	<div class="input" style="width: 32%">
+		<input type="text" id="endereco" name="logradouro.endereco" value="${logradouro.endereco}" 
+			style="width: 100%" class="uppercaseBloqueado" />
 	</div>
 	<div class="label" style="width: 8%">Número:</div>
 	<div class="input" style="width: 30%">
@@ -100,10 +100,9 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 			value="${logradouro.numero}" maxlength="5" style="width: 25%" />
 	</div>
 	<div class="label">Complemento:</div>
-	<div class="input" style="width: 70%">
+	<div class="input" style="width: 80%">
 		<input type="text" id="complemento" name="logradouro.complemento"
-			value="${logradouro.complemento}" class="uppercaseBloqueado"
-			style="width: 57%" />
+			value="${logradouro.complemento}" class="uppercaseBloqueado" style="width: 40%" />
 	</div>
 	<div class="label">Cidade:</div>
 	<div class="input" style="width: 80%">

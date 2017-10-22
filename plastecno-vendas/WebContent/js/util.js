@@ -384,7 +384,7 @@ function adicionarInputHiddenFormulario(idForm, name, value){
 };
 
 function tabelaLinhaSelecionavel(config){
-	var listaValorSelecionado = config.listaValorSelecionado;
+	var listaIdSelecionado = config.listaIdSelecionado;
 	var idTabela = config.idTabela;
 	var idBotaoLimpar = config.idBotaoLimpar;
 	var onInit = config.onInit;
@@ -393,9 +393,9 @@ function tabelaLinhaSelecionavel(config){
 	var onClean = config.onClean;
 	var tot = 0;
 	// Adicionando a lista os itens carregados no inicio do load da pagina.
-	if(onInit != undefined && listaValorSelecionado != undefined && listaValorSelecionado != null){
-		tot = listaValorSelecionado.length;
-		onInit(listaValorSelecionado);
+	if(onInit != undefined && listaIdSelecionado != undefined && listaIdSelecionado != null){
+		tot = listaIdSelecionado.length;
+		onInit(listaIdSelecionado);
 	}
 	// Definindo o evento de selecao.
 	$('#'+idTabela +' tr td input:checkbox').click(function(){
@@ -424,6 +424,43 @@ function tabelaLinhaSelecionavel(config){
 		});
 		if(onClean != undefined){
 			onClean();
+		}
+	});
+};
+
+function tabelaLinhaSelecionavelExt(config){
+	var nome = 'listaIdItemSelecionado[]';	
+	var id = 'idItemSelec';
+	var idForm = config.idForm;
+	var form = document.getElementById(idForm);
+	var onSelectItem = config.onSelectItem
+	
+	tabelaLinhaSelecionavel({
+		idTabela: config.idTabela,
+		idBotaoLimpar: config.idBotaoLimpar,
+		listaIdSelecionado: config.listaIdSelecionado,
+		onSelect: function(json){
+			gerarInputHiddenFormulario(idForm, id+json.valCheckbox, nome, json.valCheckbox);
+			if(onSelectItem != undefined) {
+				onSelectItem(json);
+			}
+		},
+		onUnselect: function(json){
+			form.removeChild(document.getElementById(id+json.valCheckbox));
+			if(onSelectItem != undefined) {
+				onSelectItem(json);
+			}
+		},
+		onInit: function(listaIdSelecionado){
+			for (var i = 0; i < listaIdSelecionado.length; i++) {
+				gerarInputHiddenFormulario(idForm, id+listaIdSelecionado[i], nome, listaIdSelecionado[i]);
+			}
+			if(onSelectItem != undefined) {
+				onSelectItem({checked:true, totChecked:listaIdSelecionado.length});
+			}
+		},
+		onClean: function(){
+			$('#'+idForm+' input[id^=\''+id+'\']').remove();
 		}
 	});
 };

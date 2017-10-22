@@ -81,6 +81,14 @@ $(document).ready(function() {
 		$('#formPagamento select').val('');	
 	});
 	
+	var listaIdSelecionado=<c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>;
+	tabelaLinhaSelecionavelExt({
+		idForm:'formPagamento',
+		idTabela:'tabelaPedidoCompra',
+		idBotaoLimpar:'botaoLimparPagamento',
+		listaIdSelecionado: listaIdSelecionado
+	});
+	
 	inserirMascaraData('dataEmissao');
 	inserirMascaraData('dataRecebimento');
 

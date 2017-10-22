@@ -73,6 +73,7 @@ $(document).ready(function() {
 		adicionarInputHiddenFormulario('formVazio', 'dataFinal', $('#dataFinal').val());
 		$('#formVazio').attr('action', '<c:out value="pagamento/nf/"/>'+numeroNF).attr('method', 'get').submit();	
 	});
+	
 });
 
 function removerPagamento(botao){

@@ -2,30 +2,14 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
-	var nome = 'listaIdItemSelecionado[]';	
-	var id = 'idItemSelec';
-	var idForm = 'formPesquisa';
-	var form = document.getElementById(idForm);
-	tabelaLinhaSelecionavel({
+	var listaIdSelecionado=<c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>;
+	tabelaLinhaSelecionavelExt({
+		idForm:'formPesquisa',
 		idTabela:'tabelaListagemItemPedido',
 		idBotaoLimpar:'botaoRemoverSelecaoItem',
-		listaValorSelecionado: <c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>,
-		onSelect: function(json){
-			gerarInputHiddenFormulario(idForm, id+json.valCheckbox, nome, json.valCheckbox);
-		},
-		onUnselect: function(json){
-			form.removeChild(document.getElementById(id+json.valCheckbox));
-		},
-		onInit: function(listaValorSelecionado){
-			for (var i = 0; i < listaValorSelecionado.length; i++) {
-				gerarInputHiddenFormulario(idForm, id+listaValorSelecionado[i], nome, listaValorSelecionado[i]);
-			}
-		},
-		onClean: function(){
-			$('#'+idForm+' input[id^=\''+id+'\']').remove();
-		}
+		listaIdSelecionado: listaIdSelecionado
 	});
-	
+
 	$('#botaoCopiarItem').click(function(){
 		$('#formPesquisa').attr('action', '<c:url value="${orcamento ? \'orcamento\' : \'pedido\' }/copiaitem"/>').attr('method', 'post').submit();
 	});

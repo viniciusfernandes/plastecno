@@ -1,41 +1,4 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<script type="text/javascript">
-
-$(document).ready(function() {
-	var nome = 'listaIdItemSelecionado[]';	
-	var id = 'idItemSelec';
-	var idForm = 'formPagamento';
-	var form = document.getElementById(idForm);
-	tabelaLinhaSelecionavel({
-		idTabela: 'tabelaPedidoCompra',
-		idBotaoLimpar:'botaoLimparPagamento',
-		listaValorSelecionado: <c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>,
-		onSelect: function(json){
-			gerarInputHiddenFormulario(idForm, id+json.valCheckbox, nome, json.valCheckbox);
-			if(onSelectItemTabela != undefined) {
-				onSelectItemTabela(json);
-			}
-		},
-		onUnselect: function(json){
-			form.removeChild(document.getElementById(id+json.valCheckbox));
-			if(onSelectItemTabela != undefined) {
-				onSelectItemTabela(json);
-			}
-		},
-		onInit: function(listaValorSelecionado){
-			for (var i = 0; i < listaValorSelecionado.length; i++) {
-				gerarInputHiddenFormulario(idForm, id+listaValorSelecionado[i], nome, listaValorSelecionado[i]);
-			}
-			if(onSelectItemTabela != undefined) {
-				onSelectItemTabela({checked:true, totChecked:listaValorSelecionado.length});
-			}
-		},
-		onClean: function(){
-			$('#'+idForm+' input[id^=\''+id+'\']').remove();
-		}
-	});
-});
-</script>
 	<c:if test="${not empty relatorio}">
 		<table id='tabelaPedidoCompra' class="listrada" >
 			<caption>${relatorio.titulo}</caption>

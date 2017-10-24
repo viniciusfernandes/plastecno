@@ -250,6 +250,16 @@ $(document).ready(function() {
 		calcularValoresImpostos(null, false);
 	});
 	
+	$('#valorFretePedido').keyup(function(){
+		calcularValoresImpostos(null, false);
+		alterarValorDuplicata();
+		var valFrete = calcularValorFreteProduto();
+		<%--Aqui estamos carregando os valores que foram inseridos nos input hidden --%>
+		$("input[name*='produtoServicoNFe.valorTotalFrete']").each(function(){
+			$(this).val(valFrete);
+		});
+	});
+	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
 		campoPesquisavel : 'nomeCliente',
@@ -314,7 +324,8 @@ $(document).ready(function() {
 		}
 	});
 	
-	alterarValorDuplicata();
+	<%-- O valor das duplicatas era defini aqui, mas esta dando conflito com o que eh gerado no servidor --%>
+	//alterarValorDuplicata();
 	
 	inicializarBotaoPesquisarCEP({'idBotao':'botaoCepRetirada',
 		'idCep': 'cepRetirada', 'idEndereco': 'enderecoRetirada', 'idBairro': 'bairroRetirada', 
@@ -330,6 +341,8 @@ $(document).ready(function() {
 	inserirMascaraData('dataSaida');
 	inserirMascaraData('dtImportProd');
 	inserirMascaraData('dataDesembImportProd');
+	
+	inserirMascaraDecimal('valorFretePedido', 10, 2);
 
 	inicializarFadeInBloco('bloco_icms');
 	inicializarFadeInBloco('bloco_icms_interestadual');
@@ -404,33 +417,29 @@ function popularCliente(cliente){
 };
 
 function alterarValorDuplicata(){
-	var vlTot = calcularValorTotalProdutos();
+	var vlTot = calcularValorTotalProdutosFrete();
 	if(!isEmpty(vlTot)){
 		vlTot = parseFloat(vlTot);
 	} else {
 		vlTot = 0;
 	}
-	var vlFrete = 0;
 	var vlDesp= 0;
 	var vl = 0;
+
+	<%--Aqui estamos carregando os valores que foram inseridos nos input hidden --%>
 	$("input[name*='produtoServicoNFe.outrasDespesasAcessorias']").each(function(){
 		if(!isEmpty(vl = $(this).val())){
 			vlDesp += parseFloat(vl);
 		}
 	});
 	
-	$("input[name*='produtoServicoNFe.valorTotalFrete']").each(function(){
-		if(!isEmpty(vl = $(this).val())){
-			vlFrete += parseFloat(vl);
-		}
-	});
-
 	var linhas = document.getElementById('tabela_duplicata').rows;
+	<%--Removendo a quantidade referete ao cabecalho da tabela --%>
 	var numDuplic = linhas.length -1;
 	if(numDuplic<=0){
 		return;
 	}
-	vl = ((vlTot+vlFrete+vlDesp)/numDuplic).toFixed(2);
+	vl = ((vlTot+vlDesp)/numDuplic).toFixed(2);
 	for (var i = 1; i < linhas.length; i++) {
 		linhas[i].cells[2].innerHTML = vl;
 	}
@@ -520,12 +529,14 @@ function inicializarAlteracaoTabelaProdutos(){
 	});
 };
 
-function calcularValorTotalProdutos(){
+function calcularValorTotalProdutosFrete(){
 	var linhas = document.getElementById('tabela_produtos').rows;
 	var tot = 0;
 	for (var i = 1; i < linhas.length; i++) {
 		tot += parseFloat(linhas[i].cells[6].innerHTML);
+		tot += parseFloat(linhas[i].cells[9].innerHTML);
 	}
+	tot+=parseFloat(document.getElementById('valorFretePedido').value);
 	return tot;
 };
 
@@ -1318,7 +1329,8 @@ function inicializarModalCancelamento(botao){
 		}
 	});
 };
-
+<%--Essa funcao verifica se existe algum input hidden contendo os valores dos impostos, e caso nao contenha ele inclui os inputs no documento 
+para manter o estado dos impostos que estao sendo preenchidos. Eh sempre executado no click de edicao de um item --%>
 function recuperarValoresProduto(valoresTabela){
 	var impostos = new Array();
 	impostos [0] = gerarJsonTipoIcms();
@@ -1500,7 +1512,7 @@ function editarProduto(botao){
 	var vFrete = document.getElementById('nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.valorTotalFrete');
 	var contemFrete = vFrete != undefined && vFrete != null && !isEmpty(vFrete.value);
 	if(!contemFrete){
-		$('#valorFreteProd').val($('#valorFrete').val());
+		$('#valorFreteProd').val(calcularValorFreteProduto());
 	}
 };
 
@@ -1510,6 +1522,15 @@ function gerarJsonCalculoImpostos(){
 	    	{'idVl':'valorBCPIS', 'idAliq':'aliquotaPIS', 'idImp':'valorPIS'},
 	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI'},
 	    	{'idVl':'valorBCISS', 'idAliq':'aliquotaISS', 'idImp':'valorISS'}];	
+};
+
+function calcularValorFreteProduto(){
+	var qtde=document.getElementById('tabela_produtos').rows.length-1;
+	if(qtde<=0){
+		return 0;
+	}
+	var val = parseFloat(document.getElementById('valorFretePedido').value);
+	return val / qtde;
 };
 
 function calcularValorICMSInterestadual(){
@@ -1557,7 +1578,7 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 		return;
 	}
 	
-	var frete = document.getElementById('valorFreteProd').value;
+	var frete = document.getElementById('valorFretePedido').value;
 	if(isEmpty(frete)){
 		frete = 0;
 	}
@@ -1734,7 +1755,7 @@ function inicializarCalculoImpostos(){
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label" style="width: 10%">Final. Emiss.:</div>
+			<div class="label" style="width: 10%">Finald. Emiss.:</div>
 			<div class="input" style="width: 30%">
 				<select name="nf.identificacaoNFe.finalidadeEmissao" style="width: 33%" >
 					<c:forEach var="finalidade" items="${listaTipoFinalidadeEmissao}">
@@ -1767,9 +1788,13 @@ function inicializarCalculoImpostos(){
 				</select>
 			</div>
 			<div class="label">Natureza Operação:</div>
-			<div class="input" style="width: 80%">
-				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 45%"/>
+			<div class="input" style="width: 36%">
+				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 100%"/>
 			</div>
+			<div class="label" style="width: 10%">Frete Pedido:</div>
+				<div class="input" style="width: 30%">
+					<input type="text" id="valorFretePedido" value="${valorFretePedido}" style="width: 33%"/>
+				</div>
 			
 			<div class="divFieldset">
 			<fieldset id="bloco_destinatario" class="fieldsetInterno">
@@ -2901,6 +2926,7 @@ function inicializarCalculoImpostos(){
 			<input type="button" id="botaoDevolverNF" title="Emitir NFe Devolução" value="" class="botaoRefazer"/>
 		</div>
 
+		<%-- Esse bloco contem todos os input hidden utilizados para manter o estado dos impostos dos itens que foram editados --%>
 		<jsp:include page="/bloco/bloco_detalhe_items_nfe.jsp"></jsp:include>		
 	</form>
 

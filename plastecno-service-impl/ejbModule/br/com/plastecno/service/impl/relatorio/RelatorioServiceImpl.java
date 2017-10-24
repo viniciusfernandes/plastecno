@@ -723,7 +723,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 			throw new BusinessException("O vendedor é obrigatório para a geração do relatório");
 		}
 
-		final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamento " : "Vendas ").append(" do Vendedor ")
+		final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamentos " : "Vendas ").append(" do Vendedor ")
 				.append(vendedor.getNome()).append(" de ").append(StringUtils.formatarData(periodo.getInicio()))
 				.append(" à ").append(StringUtils.formatarData(periodo.getFim()));
 

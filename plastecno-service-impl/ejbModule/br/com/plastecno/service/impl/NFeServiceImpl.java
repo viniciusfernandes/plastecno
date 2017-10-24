@@ -613,9 +613,9 @@ public class NFeServiceImpl implements NFeService {
 		if (totalParcelas <= 0) {
 			return new ArrayList<DuplicataNFe>();
 		}
-		Double valorPedido = pedidoService.pesquisarValorPedido(idPedido);
+		Double valTotPed = pedidoService.pesquisarValorPedidoIPI(idPedido);
 
-		Double valorDuplicata = valorPedido != null ? valorPedido / totalParcelas : 0;
+		Double valorDuplicata = valTotPed != null ? valTotPed / totalParcelas : 0;
 		List<DuplicataNFe> listaDuplicata = new ArrayList<DuplicataNFe>();
 		DuplicataNFe dup = null;
 		for (Date d : listaData) {

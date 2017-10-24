@@ -480,6 +480,14 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return new double[] { (Double) o[0], (Double) o[1] };
 	}
 
+	public Double[] pesquisarValoresPedidoFreteIPIById(Integer idPedido) {
+		Query query = this.entityManager
+				.createQuery("select p.valorPedido, p.valorFrete, p.valorPedidoIPI from Pedido p where p.id = :idPedido");
+		query.setParameter("idPedido", idPedido);
+		Object[] valores = QueryUtil.gerarRegistroUnico(query, Object[].class, new Object[] { 0d, 0d, 0d });
+		return new Double[] { (Double) valores[0], (Double) valores[1], (Double) valores[2] };
+	}
+
 	public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
 		Double val = QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select p.valorFrete from Pedido p where p.id = :idPedido").setParameter(
@@ -494,11 +502,9 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	public Double pesquisarValorPedidoIPI(Integer idPedido) {
-		StringBuilder select = new StringBuilder();
-		select.append("select i.valorPedidoIPI from Pedido i where i.id = :idPedido ");
-		Query query = this.entityManager.createQuery(select.toString());
-		query.setParameter("idPedido", idPedido);
-		return QueryUtil.gerarRegistroUnico(query, Double.class, 0d);
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.valorPedidoIPI from Pedido i where i.id = :idPedido ")
+						.setParameter("idPedido", idPedido), Double.class, 0d);
 	}
 
 	@SuppressWarnings("unchecked")

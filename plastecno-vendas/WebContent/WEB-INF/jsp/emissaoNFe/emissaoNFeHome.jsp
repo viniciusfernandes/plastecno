@@ -258,6 +258,7 @@ $(document).ready(function() {
 		$("input[name*='produtoServicoNFe.valorTotalFrete']").each(function(){
 			$(this).val(valFrete);
 		});
+		$('#valorFreteProd').val(valFrete);
 	});
 	
 	autocompletar({
@@ -1570,7 +1571,8 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	var vl = 0;
 	if(btProduto != null){
 		linha = btProduto.parentNode.parentNode;
-		vBC = linha.cells[6].innerHTML;
+		vBC = parseFloat(linha.cells[6].innerHTML);
+		vBC+= calcularValorFreteProduto();
 	} else {
 		return;
 	}
@@ -1578,12 +1580,6 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 		return;
 	}
 	
-	var frete = document.getElementById('valorFretePedido').value;
-	if(isEmpty(frete)){
-		frete = 0;
-	}
-
-	vBC = parseFloat(vBC)+parseFloat(frete);
 	for (var i = 0; i < campos.length; i++) {
 		aliq = document.getElementById(campos[i].idAliq).value;
 		if(isEmpty(aliq)){

@@ -272,6 +272,8 @@ public interface PedidoService {
 
 	Double pesquisarValorFretePorItemByIdPedido(Integer idPedido);
 
+	Double[] calcularValorFreteUnidadeByIdPedido(Integer idPedido);
+
 	Double pesquisarValorPedido(Integer idPedido);
 
 	Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido);

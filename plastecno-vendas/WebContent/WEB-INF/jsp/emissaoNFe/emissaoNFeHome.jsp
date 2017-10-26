@@ -337,6 +337,7 @@ $(document).ready(function() {
 	inserirMascaraData('dataDesembImportProd');
 	
 	inserirMascaraDecimal('valorFretePedido', 10, 2);
+	inserirMascaraDecimal('valorFreteUnidade', 10, 2);
 
 	inicializarFadeInBloco('bloco_icms');
 	inicializarFadeInBloco('bloco_icms_interestadual');
@@ -491,8 +492,7 @@ function inicializarAlteracaoTabelaProdutos(){
 			cells[8].innerHTML = (vTot*pICMS/100).toFixed(2);
 			cells[9].innerHTML = (vTot*pIPI/100).toFixed(2);
 			
-			calcularValoresImpostos(null, false);
-			alterarValorDuplicata();
+			recalcularValorFrete();
 		}
 	});
 	
@@ -529,14 +529,14 @@ function calcularValorTotalProdutosFrete(){
 		return 0;
 	}
 	var tot = 0;
-	var vlFretePrd = calcularValorFreteProduto();
+	var vlFreteUnid = calcularValorFreteUnidade();
 	for (var i = 1; i < linhas.length; i++) {
 		// valor item
 		tot += parseFloat(linhas[i].cells[6].innerHTML);
 		// valor ipi
 		tot += parseFloat(linhas[i].cells[9].innerHTML);
 		// valor frete por unidade do item pois pode haver emissao francionada
-		tot += vlFretePrd * parseFloat(linhas[i].cells[4].innerHTML);
+		tot += vlFreteUnid * parseFloat(linhas[i].cells[4].innerHTML);
 	}
 	return tot;
 };
@@ -1516,7 +1516,7 @@ function editarProduto(botao){
 	var contemFrete = vFrete != undefined && vFrete != null && !isEmpty(vFrete.value);
 	if(!contemFrete){
 		var qtde = parseFloat(linha.cells[4].innerHTML);
-		$('#valorFreteProd').val((calcularValorFreteProduto()*qtde).toFixed(2));
+		$('#valorFreteProd').val((calcularValorFreteUnidade()*qtde).toFixed(2));
 	}
 };
 
@@ -1546,17 +1546,12 @@ function calcularQuantidadeItem(){
 };
 
 <%--O valor do frete eh calculado por qtde do item pois eh possivel que os itens sejam fracionados--%>
-function calcularValorFreteProduto(){
-	var qtde = calcularQuantidadeItem();
-	if(qtde<=0){
-		return 0;
-	}
-	var val = parseFloat(document.getElementById('valorFretePedido').value);
-	return val / qtde; 
+function calcularValorFreteUnidade(){
+	return document.getElementById('valorFreteUnidade').value; 
 };
 
 function recalcularValorFrete(){
-	var vlFrete = calcularValorFreteProduto();
+	var vlFrete = calcularValorFreteUnidade();
 	var linhas = document.getElementById('tabela_produtos').rows;
 	if(linhas.length<=1){
 		return;
@@ -1626,7 +1621,7 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 		vBCSemFrete = parseFloat(linha.cells[6].innerHTML);
 		qtde = parseFloat(linha.cells[4].innerHTML);
 		<%--O valor do frete eh calculado por qtde do item pois eh possivel que os itens sejam fracionados--%>
-		vBC = vBCSemFrete + (calcularValorFreteProduto() * qtde);
+		vBC = vBCSemFrete + (calcularValorFreteUnidade() * qtde);
 	} else {
 		return;
 	}
@@ -1841,10 +1836,14 @@ function inicializarCalculoImpostos(){
 			<div class="input" style="width: 36%">
 				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 100%"/>
 			</div>
-			<div class="label" style="width: 10%">Frete Pedido:</div>
-				<div class="input" style="width: 30%">
-					<input type="text" id="valorFretePedido" value="${valorFretePedido}" style="width: 33%" disabled="disabled" class="desabilitado"/>
-				</div>
+			<div class="label" style="width: 10%">Frete (R$):</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="valorFretePedido" value="${valorFretePedido}" style="width: 100%" disabled="disabled" class="desabilitado"/>
+			</div>
+			<div class="label" style="width: 10%">Frete Unid.(R$):</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="valorFreteUnidade" value="${valorFreteUnidade}" style="width: 100%" disabled="disabled" class="desabilitado"/>
+			</div>
 			
 			<div class="divFieldset">
 			<fieldset id="bloco_destinatario" class="fieldsetInterno">

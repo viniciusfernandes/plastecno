@@ -575,11 +575,7 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("infoAdFisco", nf.getInformacoesAdicionaisNFe() != null ? nf.getInformacoesAdicionaisNFe()
                 .getInformacoesAdicionaisInteresseFisco() : null);
 
-        double valFrete = 0d;
-        for (DetalhamentoProdutoServicoNFe d : listaDet) {
-            valFrete += d.getProdutoServicoNFe().getValorTotalFrete();
-        }
-        addAtributo("valorFretePedido", NumeroUtils.arredondarValorMonetario(valFrete));
+        addAtributo("valorFretePedido", pedidoService.pesquisarValorFreteByIdPedido(idPedido));
 
         IdentificacaoNFe iNFe = null;
         if ((iNFe = nf.getIdentificacaoNFe()) != null) {

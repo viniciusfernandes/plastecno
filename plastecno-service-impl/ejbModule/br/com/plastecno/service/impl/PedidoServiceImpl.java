@@ -378,6 +378,16 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double[] calcularValorFreteUnidadeByIdPedido(Integer idPedido) {
+		Double[] val = itemPedidoDAO.pesquisarValorFreteUnidadeByIdPedido(idPedido);
+		if (val[1] != 0d) {
+			val[1] = val[0] / val[1];
+		}
+		return val;
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void cancelarOrcamento(Integer idOrcamento) throws BusinessException {
 		if (idOrcamento == null) {

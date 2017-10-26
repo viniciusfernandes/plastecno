@@ -611,6 +611,16 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return QueryUtil.gerarRegistroUnico(query, Long.class, null);
 	}
 
+	public Double[] pesquisarValorFreteUnidadeByIdPedido(Integer idPedido) {
+		Object val[] = QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select i.pedido.valorFrete, sum(i.quantidade) from ItemPedido i where i.pedido.id = :idPedido group by i.pedido.valorFrete ")
+								.setParameter("idPedido", idPedido), Object[].class, new Object[] { 0d, 0d });
+		return new Double[] { val[0] == null ? 0d : (Double) val[0], val[1] == null ? 0d : (Long) val[1] };
+	}
+
 	public Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido) {
 		Query query = this.entityManager
 				.createQuery("select i.pedido.valorPedido, i.pedido.valorPedidoIPI, i.pedido.valorFrete  from ItemPedido i where i.id = :idItemPedido");

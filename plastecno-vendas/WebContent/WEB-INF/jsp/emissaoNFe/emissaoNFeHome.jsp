@@ -251,14 +251,7 @@ $(document).ready(function() {
 	});
 	
 	$('#valorFretePedido').keyup(function(){
-		calcularValoresImpostos(null, false);
-		alterarValorDuplicata();
-		var valFrete = calcularValorFreteProduto();
-		<%--Aqui estamos carregando os valores que foram inseridos nos input hidden --%>
-		$("input[name*='produtoServicoNFe.valorTotalFrete']").each(function(){
-			$(this).val(valFrete);
-		});
-		$('#valorFreteProd').val(valFrete);
+		recalcularValorFrete();
 	});
 	
 	autocompletar({
@@ -344,6 +337,7 @@ $(document).ready(function() {
 	inserirMascaraData('dataDesembImportProd');
 	
 	inserirMascaraDecimal('valorFretePedido', 10, 2);
+	inserirMascaraDecimal('valorFreteUnidade', 10, 2);
 
 	inicializarFadeInBloco('bloco_icms');
 	inicializarFadeInBloco('bloco_icms_interestadual');
@@ -476,7 +470,7 @@ function inicializarAlteracaoTabelaProdutos(){
 			return null;
 		}
 		
-		for (var i = 0; i < linhas.length; i++) {
+		for (var i = 1; i < linhas.length; i++) {
 			if(numeroProdutoEdicao == linhas[i].cells[0].innerHTML){
 				linhas[i].cells[indice].innerHTML = valor;
 				return linhas[i];
@@ -498,8 +492,7 @@ function inicializarAlteracaoTabelaProdutos(){
 			cells[8].innerHTML = (vTot*pICMS/100).toFixed(2);
 			cells[9].innerHTML = (vTot*pIPI/100).toFixed(2);
 			
-			calcularValoresImpostos(null, false);
-			alterarValorDuplicata();
+			recalcularValorFrete();
 		}
 	});
 	
@@ -532,12 +525,19 @@ function inicializarAlteracaoTabelaProdutos(){
 
 function calcularValorTotalProdutosFrete(){
 	var linhas = document.getElementById('tabela_produtos').rows;
-	var tot = 0;
-	for (var i = 1; i < linhas.length; i++) {
-		tot += parseFloat(linhas[i].cells[6].innerHTML);
-		tot += parseFloat(linhas[i].cells[9].innerHTML);
+	if(linhas.length<=1){
+		return 0;
 	}
-	tot+=parseFloat(document.getElementById('valorFretePedido').value);
+	var tot = 0;
+	var vlFreteUnid = calcularValorFreteUnidade();
+	for (var i = 1; i < linhas.length; i++) {
+		// valor item
+		tot += parseFloat(linhas[i].cells[6].innerHTML);
+		// valor ipi
+		tot += parseFloat(linhas[i].cells[9].innerHTML);
+		// valor frete por unidade do item pois pode haver emissao francionada
+		tot += vlFreteUnid * parseFloat(linhas[i].cells[4].innerHTML);
+	}
 	return tot;
 };
 
@@ -571,7 +571,9 @@ function removerProduto(botao){
 			$("input[name^='"+nome+"']").each(function(){
 				$(this).remove();
 			});
-			alterarValorDuplicata();
+			
+			recalcularValorFrete();
+			
 			numeroImportacaoProduto = null;
 			numeroProdutoEdicao = null;
 			btProduto = null;
@@ -1513,25 +1515,67 @@ function editarProduto(botao){
 	var vFrete = document.getElementById('nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.valorTotalFrete');
 	var contemFrete = vFrete != undefined && vFrete != null && !isEmpty(vFrete.value);
 	if(!contemFrete){
-		$('#valorFreteProd').val(calcularValorFreteProduto());
+		var qtde = parseFloat(linha.cells[4].innerHTML);
+		$('#valorFreteProd').val((calcularValorFreteUnidade()*qtde).toFixed(2));
 	}
 };
 
 function gerarJsonCalculoImpostos(){
-	return [{'idVl':'valorBCICMS', 'idAliq':'aliquotaICMS', 'idImp':'valorICMS'},
-			{'idVl':'valorBCCOFINS', 'idAliq':'aliquotaCOFINS', 'idImp':'valorCOFINS'},
-	    	{'idVl':'valorBCPIS', 'idAliq':'aliquotaPIS', 'idImp':'valorPIS'},
-	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI'},
-	    	{'idVl':'valorBCISS', 'idAliq':'aliquotaISS', 'idImp':'valorISS'}];	
+	return [{'idVl':'valorBCICMS', 'idAliq':'aliquotaICMS', 'idImp':'valorICMS', incideFrete: true},
+			{'idVl':'valorBCCOFINS', 'idAliq':'aliquotaCOFINS', 'idImp':'valorCOFINS', incideFrete: true},
+	    	{'idVl':'valorBCPIS', 'idAliq':'aliquotaPIS', 'idImp':'valorPIS', incideFrete: true},
+	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI', incideFrete: false},
+	    	{'idVl':'valorBCISS', 'idAliq':'aliquotaISS', 'idImp':'valorISS', incideFrete: false}];	
 };
 
-function calcularValorFreteProduto(){
-	var qtde=document.getElementById('tabela_produtos').rows.length-1;
-	if(qtde<=0){
+function calcularQuantidadeItem(){
+	var qtde=0;
+	var linhas = document.getElementById('tabela_produtos').rows;
+	<%--Comeca a contagem do 1 para evitar a linha do header--%>
+	if(linhas.length<=1){
 		return 0;
 	}
-	var val = parseFloat(document.getElementById('valorFretePedido').value);
-	return val / qtde;
+	<%--Comeca a contagem do 1 para evitar a linha do header--%>
+	for (var i= 1; i < linhas.length; i++) {
+		qtde += parseFloat(linhas[i].cells[4].innerHTML);
+	}
+	if(qtde<0){
+		return 0;
+	}
+	return qtde;
+};
+
+<%--O valor do frete eh calculado por qtde do item pois eh possivel que os itens sejam fracionados--%>
+function calcularValorFreteUnidade(){
+	return document.getElementById('valorFreteUnidade').value; 
+};
+
+function recalcularValorFrete(){
+	var vlFrete = calcularValorFreteUnidade();
+	var linhas = document.getElementById('tabela_produtos').rows;
+	if(linhas.length<=1){
+		return;
+	}
+	var qtde = 0;
+	var id = '';
+	var input = null;
+	<%--Aqui estamos carregando os valores que foram inseridos nos input hidden para que a alteracao seja submetida com o formulario--%>
+	for (var i = 1; i < linhas.length; i++) {
+		id = linhas[i].cells[0].innerHTML;
+		qtde = parseFloat(linhas[i].cells[4].innerHTML);
+		input = document.getElementById('nf.listaItem['+id+'].produtoServicoNFe.valorTotalFrete');
+		if(input != undefined && input != null){
+			input.value = (vlFrete*qtde).toFixed(2);
+		}
+		<%--Atualizando o campo de frete do produto para que o usuario visualize a alteracao e ela nao ocorra apenas nos campos hidden--%>
+		if(numeroProdutoEdicao == id){
+			document.getElementById('valorFreteProd').value=(vlFrete*qtde).toFixed(2);
+		}
+
+	}
+	
+	calcularValoresImpostos(null, false);
+	alterarValorDuplicata();
 };
 
 function calcularValorICMSInterestadual(){
@@ -1562,6 +1606,7 @@ function calcularValorICMSInterestadual(){
 	});	
 };
 
+<%--Funcao executada na edicao de um produto--%>
 function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	var campos = gerarJsonCalculoImpostos();
 	var aliq=null; 
@@ -1569,10 +1614,14 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	var tot = 0;
 	var vBC = 0;
 	var vl = 0;
+	var vBCSemFrete =0;
+	var qtde = 0
 	if(btProduto != null){
 		linha = btProduto.parentNode.parentNode;
-		vBC = parseFloat(linha.cells[6].innerHTML);
-		vBC+= calcularValorFreteProduto();
+		vBCSemFrete = parseFloat(linha.cells[6].innerHTML);
+		qtde = parseFloat(linha.cells[4].innerHTML);
+		<%--O valor do frete eh calculado por qtde do item pois eh possivel que os itens sejam fracionados--%>
+		vBC = vBCSemFrete + (calcularValorFreteUnidade() * qtde);
 	} else {
 		return;
 	}
@@ -1589,7 +1638,7 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 		if(isAlteracaoAliq){
 			vBC = document.getElementById(campos[i].idVl).value;
 		} else {
-			document.getElementById(campos[i].idVl).value = vBC;
+			document.getElementById(campos[i].idVl).value = campos[i].incideFrete? vBC : vBCSemFrete;
 		}
 		
 		if(idValorRemovido != undefined && idValorRemovido == campos[i].idVl){
@@ -1787,10 +1836,14 @@ function inicializarCalculoImpostos(){
 			<div class="input" style="width: 36%">
 				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 100%"/>
 			</div>
-			<div class="label" style="width: 10%">Frete Pedido:</div>
-				<div class="input" style="width: 30%">
-					<input type="text" id="valorFretePedido" value="${valorFretePedido}" style="width: 33%"/>
-				</div>
+			<div class="label" style="width: 10%">Frete (R$):</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="valorFretePedido" value="${valorFretePedido}" style="width: 100%" disabled="disabled" class="desabilitado"/>
+			</div>
+			<div class="label" style="width: 10%">Frete Unid.(R$):</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="valorFreteUnidade" value="${valorFreteUnidade}" style="width: 100%" disabled="disabled" class="desabilitado"/>
+			</div>
 			
 			<div class="divFieldset">
 			<fieldset id="bloco_destinatario" class="fieldsetInterno">

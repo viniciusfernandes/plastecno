@@ -248,6 +248,10 @@ public class Pagamento implements Serializable, Cloneable {
 		return liquidado;
 	}
 
+	public boolean isNovo() {
+		return id == null;
+	}
+
 	public boolean isVencido() {
 		if (dataVencimento == null) {
 			return false;

@@ -41,7 +41,7 @@ public class PagamentoServiceTest extends AbstractTest {
 		Pagamento p = eBuilder.buildPagamento();
 		Integer idPag = null;
 		try {
-			idPag = pagamentoService.inserir(p);
+			idPag = pagamentoService.inserirPagamento(p);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -97,9 +97,9 @@ public class PagamentoServiceTest extends AbstractTest {
 		Integer numeroNF = 12000;
 
 		// Geranado 2 pedidos que serao pagos na mesma nota fiscal
-		Pagamento pag1 = pagamentoService.gerarPagamentoItemPedido(id1);
-		Pagamento pag2 = pagamentoService.gerarPagamentoItemPedido(id2);
-		Pagamento pag3 = pagamentoService.gerarPagamentoItemPedido(id3);
+		Pagamento pag1 = pagamentoService.gerarPagamentoItemCompra(id1);
+		Pagamento pag2 = pagamentoService.gerarPagamentoItemCompra(id2);
+		Pagamento pag3 = pagamentoService.gerarPagamentoItemCompra(id3);
 
 		pag1.setDataEmissao(new Date());
 		pag2.setDataEmissao(new Date());
@@ -115,9 +115,9 @@ public class PagamentoServiceTest extends AbstractTest {
 				pag2.getIdPedido());
 
 		try {
-			pagamentoService.inserirPagamentoParceladoItemPedido(pag1);
-			pagamentoService.inserirPagamentoParceladoItemPedido(pag2);
-			pagamentoService.inserirPagamentoParceladoItemPedido(pag3);
+			pagamentoService.inserirPagamentoParceladoItemCompra(pag1);
+			pagamentoService.inserirPagamentoParceladoItemCompra(pag2);
+			pagamentoService.inserirPagamentoParceladoItemCompra(pag3);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -152,7 +152,7 @@ public class PagamentoServiceTest extends AbstractTest {
 		p.setDataVencimento(DateUtils.retrocederData(new Date()));
 		Integer idPag = null;
 		try {
-			idPag = pagamentoService.inserir(p);
+			idPag = pagamentoService.inserirPagamento(p);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

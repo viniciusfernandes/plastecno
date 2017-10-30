@@ -76,9 +76,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private ComissaoService comissaoService;
+
 	@EJB
 	private EmailService emailService;
-
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
 
@@ -151,6 +151,10 @@ public class PedidoServiceImpl implements PedidoService {
 			return;
 		}
 
+		if (quantidadeRecepcionada < 0) {
+			quantidadeRecepcionada = 0;
+		}
+
 		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
 		if (!SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
 			throw new BusinessException(
@@ -171,6 +175,7 @@ public class PedidoServiceImpl implements PedidoService {
 					"Não é possível recepcionar uma quantidade maior do que foi comprado para o item No. "
 							+ sequencialItem + " do pedido No. " + idPedido);
 		}
+
 		itemPedidoDAO.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
 	}
 
@@ -1380,6 +1385,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoItemAguardandoCompra() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer[] pesquisarIdPedidoQuantidadeSequencialByIdPedido(Integer idItem) {
+		return itemPedidoDAO.pesquisarIdPedidoQuantidadeSequencialByIdPedido(idItem);
 	}
 
 	@Override

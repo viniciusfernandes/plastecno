@@ -181,6 +181,13 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 						Object[].class).setParameter("idItemPedido", idItemPedido).getSingleResult();
 	}
 
+	public Integer[] pesquisarIdPedidoQuantidadeSequencialByIdPedido(Integer idItem) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select i.pedido.id, i.quantidade, i.sequencial from ItemPedido i where i.id =:idItem")
+						.setParameter("idItem", idItem), Integer[].class, new Integer[] { 0, 0, 0 });
+	}
+
 	public Integer pesquisarIdRepresentadaByIdItem(Integer idItem) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select i.pedido.representada.id from ItemPedido i where i.id = :idItem ")

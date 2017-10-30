@@ -112,7 +112,7 @@ public class PagamentoController extends AbstractController {
 
         if (listaIdItemSelecionado == null || listaIdItemSelecionado.isEmpty()) {
             try {
-                pagamentoService.inserir(pagamento);
+                pagamentoService.inserirPagamento(pagamento);
                 gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
                 gerarMensagemSucesso("Pagamento inserido com sucesso.");
             } catch (BusinessException e) {
@@ -127,7 +127,7 @@ public class PagamentoController extends AbstractController {
             }
         } else {
             try {
-                pagamentoService.inserirPagamentoParceladoItemPedido(pagamento.getNumeroNF(), pagamento.getValorNF(),
+                pagamentoService.inserirPagamentoParceladoItemCompra(pagamento.getNumeroNF(), pagamento.getValorNF(),
                         pagamento.getDataVencimento(), pagamento.getDataEmissao(), pagamento.getModalidadeFrete(),
                         listaIdItemSelecionado);
                 redirecTo(PagamentoController.class).pesquisarPagamentoByNF(pagamento.getNumeroNF(), dataInicial,

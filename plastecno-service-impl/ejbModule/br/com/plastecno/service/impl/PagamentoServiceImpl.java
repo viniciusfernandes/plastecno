@@ -422,20 +422,21 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void removerPagamentoPaceladoItemPedido(Integer idItemPedido) throws BusinessException {
-		if (idItemPedido == null) {
+	public void removerPagamentoPaceladoByIdPagamento(Integer idPagamento) throws BusinessException {
+		if (idPagamento == null) {
 			return;
 		}
-		int qtdePag = pagamentoDAO.pesquisarQuantidadeTotalByIdItem(idItemPedido);
-		int qtdeRecp = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemPedido);
-		int qtde = qtdeRecp - qtdePag;
-		if (qtde < 0) {
-			Integer[] val = pedidoService.pesquisarIdPedidoQuantidadeSequencialByIdPedido(idItemPedido);
-			throw new BusinessException("O item No. " + val[2] + " do pedido No. " + val[0] + " pode ter no máximo "
-					+ qtdeRecp + " e foi enviado " + qtdePag);
+
+		Integer idItem = pagamentoDAO.pesquisarIdItemPedidoByIdPagamento(idPagamento);
+		// Condicao que so ocorre no caso de pagamentos de insumos.
+		if (idItem != null) {
+			Integer qtde = pagamentoDAO.pesquisarQuantidadeById(idPagamento);
+			pedidoService.alterarQuantidadeRecepcionada(idItem, 0);
+			pagamentoDAO.removerPagamentoPaceladoItemPedido(idItem);
+			estoqueService.removerEstoqueItemCompra(idItem, qtde);
+		} else {
+			remover(idPagamento);
 		}
-		pedidoService.alterarQuantidadeRecepcionada(idItemPedido, qtde);
-		pagamentoDAO.removerPagamentoPaceladoItemPedido(idItemPedido);
 	}
 
 	@Override

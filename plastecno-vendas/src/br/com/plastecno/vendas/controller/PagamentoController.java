@@ -234,10 +234,10 @@ public class PagamentoController extends AbstractController {
         gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
     }
 
-    @Post("pagamento/remocao/nfparcelada/{idItemPedido}")
-    public void removerPagamentoParceladoItemPedido(Integer idItemPedido, Date dataInicial, Date dataFinal) {
+    @Post("pagamento/remocao/nfparcelada/{idPagamento}")
+    public void removerPagamentoParceladoItemPedido(Integer idPagamento, Date dataInicial, Date dataFinal) {
         try {
-            pagamentoService.removerPagamentoPaceladoItemPedido(idItemPedido);
+            pagamentoService.removerPagamentoPaceladoByIdPagamento(idPagamento);
             gerarMensagemSucesso("Pagamento do item parcelado foi removido com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);

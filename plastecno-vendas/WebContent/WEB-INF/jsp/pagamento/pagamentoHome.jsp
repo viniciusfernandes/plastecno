@@ -181,7 +181,7 @@ function removerPagamento(botao){
 									</form>
 								</div>
 								<div class="input" style="width: 50%">
-									<form action="<c:url value="/pagamento/remocao/nfparcelada/"/>${elemento.idItemPedido}" method="post">
+									<form action="<c:url value="/pagamento/remocao/nfparcelada/"/>${elemento.id}" method="post">
 										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 										<input type="button" value="" title="Remover Pagamento" class="botaoRemover" onclick="removerPagamento(this);"/>

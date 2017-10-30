@@ -25,6 +25,7 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 
 	public void liquidarPagamento(Integer idPagamento) {
 		liquidarPagamento(idPagamento, true);
+
 	}
 
 	private void liquidarPagamento(Integer idPagamento, boolean liquidado) {
@@ -51,6 +52,12 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 	public List<Pagamento> pesquisarByIdPedido(Integer idPedido) {
 		return entityManager.createQuery("select p from Pagamento p where p.idPedido =:idPedido", Pagamento.class)
 				.setParameter("idPedido", idPedido).getResultList();
+	}
+
+	public Integer pesquisarIdItemPedidoByIdPagamento(Integer idPagamento) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.idItemPedido from Pagamento p where p.id=:idPagamento")
+						.setParameter("idPagamento", idPagamento), Integer.class, null);
 	}
 
 	public List<Pagamento> pesquisarPagamentoByIdFornecedor(Integer idFornecedor, Date dataInicial, Date dataFinal) {

@@ -94,14 +94,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 		aliquotaICMSItem = aliquotaICMSItem != null ? aliquotaICMSItem : 0d;
 
 		double fatorICMS = aliquotaICMSRevendedor - aliquotaICMSItem;
-		return precoMedio * (1 + fatorICMS);
+		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + fatorICMS));
 	}
 
 	private void calcularPrecoMedioFatorICMS(ItemEstoque itemEstoque) {
 		if (itemEstoque.getPrecoMedio() == null) {
 			return;
 		}
-
 		itemEstoque.setPrecoMedioFatorICMS(calcularPrecoMedioFatorICMS(
 				representadaService.pesquisarAliquotaICMSRevendedor(), itemEstoque.getAliquotaICMS(),
 				itemEstoque.getPrecoMedio()));
@@ -582,13 +581,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer recalcularEstoqueItemCompra(Integer idItemCompra, Integer quantidade) throws BusinessException {
-	if (quantidade== null) {
-		quantidade = 0;
-	}
-	ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemCompra);
-	itemEstoque.setQuantidade(quantidade);
+		if (quantidade == null) {
+			quantidade = 0;
+		}
+		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemCompra);
+		itemEstoque.setQuantidade(quantidade);
 
-	return recalcularValorItemEstoque(itemEstoque).getId();
+		return recalcularValorItemEstoque(itemEstoque).getId();
 	}
 
 	@Override
@@ -771,14 +770,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 			}
 		}
 	}
-	
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer removerEstoqueItemCompra(Integer idItemCompra, Integer quantidadeRemovida) throws BusinessException {
 		if (quantidadeRemovida == null) {
 			quantidadeRemovida = 0;
 		}
-		return recalcularEstoqueItemCompra(idItemCompra, -1*quantidadeRemovida);
+		// Estamos multiplicando por -1 para que o sistema de estoque some um
+		// valor negativo nos precos do estoque, o que significa que um item
+		// comprado foi removido.
+		return recalcularEstoqueItemCompra(idItemCompra, -1 * quantidadeRemovida);
 	}
 
 	private void removerItemReservadoByIdPedido(Integer idPedido) {

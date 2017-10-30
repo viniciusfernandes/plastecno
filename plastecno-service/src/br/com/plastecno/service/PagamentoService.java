@@ -44,7 +44,7 @@ public interface PagamentoService {
 
 	void remover(Integer idPagamento) throws BusinessException;
 
-	void removerPagamentoPaceladoItemPedido(Integer idItemPedido) throws BusinessException;
+	void removerPagamentoPaceladoByIdPagamento(Integer idItemPedido) throws BusinessException;
 
 	void retornarLiquidacaoPagamento(Integer idPagamento) throws BusinessException;
 

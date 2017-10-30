@@ -47,6 +47,8 @@ public interface PedidoService {
 
 	Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException;
 
+	Double[] calcularValorFreteUnidadeByIdPedido(Integer idPedido);
+
 	void cancelarOrcamento(Integer idOrcamento) throws BusinessException;
 
 	void cancelarPedido(Integer idPedido) throws BusinessException;
@@ -151,6 +153,8 @@ public interface PedidoService {
 	List<Integer> pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido);
 
 	List<Integer> pesquisarIdPedidoItemAguardandoCompra();
+
+	Integer[] pesquisarIdPedidoQuantidadeSequencialByIdPedido(Integer idItem);
 
 	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
 
@@ -271,8 +275,6 @@ public interface PedidoService {
 	Double pesquisarValorFreteByIdPedido(Integer idPedido);
 
 	Double pesquisarValorFretePorItemByIdPedido(Integer idPedido);
-
-	Double[] calcularValorFreteUnidadeByIdPedido(Integer idPedido);
 
 	Double pesquisarValorPedido(Integer idPedido);
 

@@ -14,6 +14,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PagamentoService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.constante.TipoPagamento;
@@ -34,6 +35,9 @@ public class PagamentoServiceImpl implements PagamentoService {
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
 
+	@EJB
+	private EstoqueService estoqueService;
+
 	private PagamentoDAO pagamentoDAO;
 
 	@EJB
@@ -47,7 +51,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Pagamento gerarPagamentoItemPedido(Integer idItemPedido) {
+	public Pagamento gerarPagamentoItemCompra(Integer idItemPedido) {
 		if (idItemPedido == null) {
 			return null;
 		}
@@ -156,9 +160,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 		pagamentoDAO = new PagamentoDAO(entityManager);
 	}
 
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer inserir(Pagamento pagamento) throws BusinessException {
+	private Integer inserir(Pagamento pagamento) throws BusinessException {
 		if (pagamento == null) {
 			throw new BusinessException("O pagamento não pode ser nulo para a inclusão.");
 		}
@@ -199,7 +201,59 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirPagamentoParceladoItemPedido(Integer numeroNF, Double valorNF, Date dataVencimento,
+	public Integer inserirPagamento(Pagamento pagamento) throws BusinessException {
+		if (pagamento == null) {
+			return null;
+		}
+		// Devemos dar baixa nos itens do pedido que estao aguardando a recepcao
+		// para que eles sejam removidos do relatorio de compras aguardando
+		// recepcao.
+		if (pagamento.isInsumo()) {
+			Integer idItem = pagamento.getIdItemPedido();
+			int qtdeNova = pagamento.getQuantidadeItem() == null ? 0 : pagamento.getQuantidadeItem();
+			int qtdeItem = pedidoService.pesquisarQuantidadeItemPedido(idItem);
+			if (qtdeNova > qtdeItem) {
+				throw new BusinessException("A quantidade máxima para o item No. " + pagamento.getSequencialItem()
+						+ " do pedido No. " + pagamento.getIdPedido() + " é " + qtdeItem);
+			}
+			if (!pagamento.isNovo()) {
+				int qtdePag = pagamentoDAO.pesquisarQuantidadeById(pagamento.getId());
+				if (qtdeNova != qtdePag) {
+					// Mantendo a corencia dos valores pagos pois todas as
+					// parcelas de um mesmo item devem ter o mesmo preco.
+					pagamentoDAO.alterarQuantidadeItemPagamentoByIdItemPedido(idItem, qtdeNova);
+					// Devolvendo os itens para a fila de pedidos de compras
+					// para recepcao
+					pedidoService.alterarQuantidadeRecepcionada(idItem, qtdeNova);
+				}
+				// Essa condicao eh para subtrair das quantidades do estoque
+				// pois a reducao de quantidade do pagamaento indica devolucao
+				// do item para a fila de recepcao de compras. No caso em que a
+				// quantidade seja zero, nenhuma acao sera tomada.
+				if ((qtdeItem = qtdePag - qtdeNova) > 0) {
+					estoqueService.removerEstoqueItemCompra(idItem, qtdeItem);
+				} else if (qtdeItem < 0) {
+					// Essa condicao indica que o usuario esta acrescentando os
+					// itens do pagamento, entao essa nova quantidade deve ser
+					// recepcionada como uma compra nova.
+					qtdeItem = qtdeNova - qtdePag;
+					estoqueService.recalcularEstoqueItemCompra(idItem, qtdeItem);
+				}
+			} else {
+				estoqueService.recepcionarItemCompra(idItem, qtdeNova, null);
+			}
+		}
+		// Eh importante inserir o pagamento apenas apos a ercepcao de
+		// compras
+		// pois la vamos ate o banco recuperar as informacoes das
+		// quantidades do
+		// que ja foi pago.
+		return inserir(pagamento);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void inserirPagamentoParceladoItemCompra(Integer numeroNF, Double valorNF, Date dataVencimento,
 			Date dataEmissao, Integer modalidadeFrete, List<Integer> listaIdItem) throws BusinessException {
 
 		if (listaIdItem == null || listaIdItem.isEmpty()) {
@@ -218,20 +272,20 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 		Pagamento p = null;
 		for (Integer idItem : listaIdItem) {
-			p = gerarPagamentoItemPedido(idItem);
+			p = gerarPagamentoItemCompra(idItem);
 			p.setNumeroNF(numeroNF);
 			p.setValorNF(valorNF);
 			p.setModalidadeFrete(modalidadeFrete);
 			p.setDataEmissao(dataEmissao);
 			p.setDataVencimento(dataVencimento);
 
-			inserirPagamentoParceladoItemPedido(p);
+			inserirPagamentoParceladoItemCompra(p);
 		}
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirPagamentoParceladoItemPedido(Pagamento pagamento) throws BusinessException {
+	public void inserirPagamentoParceladoItemCompra(Pagamento pagamento) throws BusinessException {
 		if (pagamento == null) {
 			return;
 		}
@@ -277,6 +331,12 @@ public class PagamentoServiceImpl implements PagamentoService {
 			clone.setValor(pagamento.getValor() / totParc);
 			clone.setValorCreditoICMS(pagamento.getValorCreditoICMS() / totParc);
 			inserir(clone);
+		}
+		// Devemos dar baixa nos itens do pedido que estao aguardando a recepcao
+		// para que eles sejam removidos do relatorio de compras aguardando
+		// recepcao.
+		if (pagamento.isInsumo()) {
+			estoqueService.recepcionarItemCompra(pagamento.getIdItemPedido(), pagamento.getQuantidadeItem(), null);
 		}
 	}
 
@@ -362,11 +422,21 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void removerPagamentoPaceladoItemPedido(Integer idItemPedido) throws BusinessException {
-		if (idItemPedido == null) {
+	public void removerPagamentoPaceladoByIdPagamento(Integer idPagamento) throws BusinessException {
+		if (idPagamento == null) {
 			return;
 		}
-		pagamentoDAO.removerPagamentoPaceladoItemPedido(idItemPedido);
+
+		Integer idItem = pagamentoDAO.pesquisarIdItemPedidoByIdPagamento(idPagamento);
+		// Condicao que so ocorre no caso de pagamentos de insumos.
+		if (idItem != null) {
+			Integer qtde = pagamentoDAO.pesquisarQuantidadeById(idPagamento);
+			pedidoService.alterarQuantidadeRecepcionada(idItem, 0);
+			pagamentoDAO.removerPagamentoPaceladoItemPedido(idItem);
+			estoqueService.removerEstoqueItemCompra(idItem, qtde);
+		} else {
+			remover(idPagamento);
+		}
 	}
 
 	@Override

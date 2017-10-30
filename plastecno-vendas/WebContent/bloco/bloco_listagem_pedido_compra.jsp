@@ -41,12 +41,6 @@
 											<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
 										</div>
 									</form>
-									<form action="<c:url value="/compra/item/recepcao"/>" method="post" >
-										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
-										<div class="input" style="width: 20%">
-											<input type="button" value="" title="Recepcionar o Item do Pedido" onclick="recepcionarItem(this);" class="botaoAdicionar_16" />
-										</div>
-									</form>
 									<form action="<c:url value="/compra/item/edicao"/>" method="post">
 										<input type="hidden" name="idItemPedido" value="${item.id}" />
 										<div class="input" style="width: 20%">

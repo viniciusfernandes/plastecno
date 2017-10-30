@@ -76,9 +76,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private ComissaoService comissaoService;
+
 	@EJB
 	private EmailService emailService;
-
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
 
@@ -151,25 +151,33 @@ public class PedidoServiceImpl implements PedidoService {
 			return;
 		}
 
-		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
-		if (!SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
-			throw new BusinessException(
-					"Não é possível alterar a quantidade recepcionada pois a situacao do pedido é \""
-							+ situacaoPedido.getDescricao() + "\"");
+		if (quantidadeRecepcionada < 0) {
+			quantidadeRecepcionada = 0;
 		}
 
-		Integer quantidadeItem = itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
-		if (quantidadeItem == null) {
+		Integer qtdeItem = pesquisarQuantidadeItemPedido(idItemPedido);
+		if (qtdeItem == null) {
 			throw new BusinessException("O item de pedido de código " + idItemPedido
 					+ " pesquisado não existe no sistema");
 		}
 
-		if (quantidadeItem < quantidadeRecepcionada) {
+		if (qtdeItem < quantidadeRecepcionada) {
 			Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 			Integer sequencialItem = itemPedidoDAO.pesquisarSequencialItemPedido(idItemPedido);
 			throw new BusinessException(
 					"Não é possível recepcionar uma quantidade maior do que foi comprado para o item No. "
 							+ sequencialItem + " do pedido No. " + idPedido);
+		} else if (qtdeItem > quantidadeRecepcionada) {
+			alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
+		} else {
+			return;
+		}
+
+		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
+		if (!SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
+			throw new BusinessException(
+					"Não é possível alterar a quantidade recepcionada pois a situacao do pedido é \""
+							+ situacaoPedido.getDescricao() + "\"");
 		}
 		itemPedidoDAO.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
 	}
@@ -1380,6 +1388,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoItemAguardandoCompra() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer[] pesquisarIdPedidoQuantidadeSequencialByIdPedido(Integer idItem) {
+		return itemPedidoDAO.pesquisarIdPedidoQuantidadeSequencialByIdPedido(idItem);
 	}
 
 	@Override

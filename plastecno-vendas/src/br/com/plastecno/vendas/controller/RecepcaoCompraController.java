@@ -58,7 +58,7 @@ public class RecepcaoCompraController extends AbstractController {
 
     @Post("compra/item/pagamento/{idItem}")
     public void gerarPagamentoItemPedido(Integer idItem, Date dataInicial, Date dataFinal, Integer idRepresentada) {
-        Pagamento p = pagamentoService.gerarPagamentoItemPedido(idItem);
+        Pagamento p = pagamentoService.gerarPagamentoItemCompra(idItem);
         formatarPagamento(p);
         addAtributo("pagamento", p);
         addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
@@ -92,7 +92,7 @@ public class RecepcaoCompraController extends AbstractController {
     public void inserirPagamentoItemPedido(Pagamento pagamento, Date dataInicial, Date dataFinal,
             Integer idRepresentada, List<Integer> listaIdItemSelecionado) {
         try {
-            pagamentoService.inserirPagamentoParceladoItemPedido(pagamento.getNumeroNF(), pagamento.getValorNF(),
+            pagamentoService.inserirPagamentoParceladoItemCompra(pagamento.getNumeroNF(), pagamento.getValorNF(),
                     pagamento.getDataVencimento(), pagamento.getDataEmissao(), pagamento.getModalidadeFrete(),
                     listaIdItemSelecionado);
 

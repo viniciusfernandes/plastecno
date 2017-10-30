@@ -9,15 +9,23 @@ import javax.persistence.TypedQuery;
 
 import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.entity.Pagamento;
+import br.com.plastecno.service.impl.util.QueryUtil;
 
 public class PagamentoDAO extends GenericDAO<Pagamento> {
-
 	public PagamentoDAO(EntityManager entityManager) {
 		super(entityManager);
 	}
 
+	public void alterarQuantidadeItemPagamentoByIdItemPedido(Integer idItemPedido, Integer quantidade) {
+		entityManager
+				.createQuery(
+						"update Pagamento p set p.quantidadeItem =:quantidade where p.idItemPedido = :idItemPedido")
+				.setParameter("idItemPedido", idItemPedido).setParameter("quantidade", quantidade).executeUpdate();
+	}
+
 	public void liquidarPagamento(Integer idPagamento) {
 		liquidarPagamento(idPagamento, true);
+
 	}
 
 	private void liquidarPagamento(Integer idPagamento, boolean liquidado) {
@@ -44,6 +52,12 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 	public List<Pagamento> pesquisarByIdPedido(Integer idPedido) {
 		return entityManager.createQuery("select p from Pagamento p where p.idPedido =:idPedido", Pagamento.class)
 				.setParameter("idPedido", idPedido).getResultList();
+	}
+
+	public Integer pesquisarIdItemPedidoByIdPagamento(Integer idPagamento) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.idItemPedido from Pagamento p where p.id=:idPagamento")
+						.setParameter("idPagamento", idPagamento), Integer.class, null);
 	}
 
 	public List<Pagamento> pesquisarPagamentoByIdFornecedor(Integer idFornecedor, Date dataInicial, Date dataFinal) {
@@ -82,6 +96,15 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 		return q.getResultList();
 	}
 
+	public int pesquisarQuantidadeById(Integer idPagamento) {
+		if (idPagamento == null) {
+			return 0;
+		}
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.quantidadeItem from Pagamento p where p.id=:idPagamento")
+						.setParameter("idPagamento", idPagamento), Integer.class, 0);
+	}
+
 	public List<Integer[]> pesquisarQuantidadePagaByIdItem(List<Integer> listaIdItem) {
 		List<Object[]> l = entityManager
 				.createQuery(
@@ -96,6 +119,16 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 					(Integer) o[4] });
 		}
 		return lTotal;
+	}
+
+	public Integer pesquisarQuantidadeTotalByIdItem(Integer idItem) {
+		if (idItem == null) {
+			return null;
+		}
+		List<Integer> l = new ArrayList<>();
+		l.add(idItem);
+		List<Integer[]> lItem = pesquisarQuantidadePagaByIdItem(l);
+		return lItem.size() <= 0 ? 0 : lItem.get(0)[3];
 	}
 
 	public void removerPagamentoPaceladoItemPedido(Integer idItemPedido) {

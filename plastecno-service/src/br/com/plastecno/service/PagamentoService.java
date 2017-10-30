@@ -13,16 +13,16 @@ import br.com.plastecno.service.wrapper.RelatorioWrapper;
 @Local
 public interface PagamentoService {
 
-	Pagamento gerarPagamentoItemPedido(Integer idItemPedido);
+	Pagamento gerarPagamentoItemCompra(Integer idItemPedido);
 
 	RelatorioWrapper<String, Pagamento> gerarRelatorioPagamento(List<Pagamento> lPagamento, Periodo periodo);
 
-	Integer inserir(Pagamento pagamento) throws BusinessException;
+	Integer inserirPagamento(Pagamento pagamento) throws BusinessException;
 
-	void inserirPagamentoParceladoItemPedido(Integer numeroNF, Double valorNF, Date dataVencimento, Date dataEmissao,
+	void inserirPagamentoParceladoItemCompra(Integer numeroNF, Double valorNF, Date dataVencimento, Date dataEmissao,
 			Integer modalidadeFrete, List<Integer> listaIdItem) throws BusinessException;
 
-	void inserirPagamentoParceladoItemPedido(Pagamento pagamento) throws BusinessException;
+	void inserirPagamentoParceladoItemCompra(Pagamento pagamento) throws BusinessException;
 
 	void liquidarPagamento(Integer idPagamento);
 
@@ -44,7 +44,7 @@ public interface PagamentoService {
 
 	void remover(Integer idPagamento) throws BusinessException;
 
-	void removerPagamentoPaceladoItemPedido(Integer idItemPedido) throws BusinessException;
+	void removerPagamentoPaceladoByIdPagamento(Integer idItemPedido) throws BusinessException;
 
 	void retornarLiquidacaoPagamento(Integer idPagamento) throws BusinessException;
 

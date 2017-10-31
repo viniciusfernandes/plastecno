@@ -59,6 +59,77 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@EJB
 	private RepresentadaService representadaService;
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
+			throws BusinessException {
+		if (idItemCompra == null) {
+			return null;
+		}
+		if (quantidadeRecepcionada == null) {
+			quantidadeRecepcionada = 0;
+		}
+
+		Integer quantidadeItem = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemCompra);
+		quantidadeItem += quantidadeRecepcionada;
+		pedidoService.alterarQuantidadeRecepcionada(idItemCompra, quantidadeItem);
+
+		return alterarEstoque(idItemCompra, quantidadeRecepcionada);
+	}
+	
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer alterarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
+			throws BusinessException {
+		if (idItemCompra == null) {
+			return null;
+		}
+		if (quantidadeRecepcionada == null) {
+			quantidadeRecepcionada = 0;
+		}
+
+		pedidoService.alterarQuantidadeRecepcionada(idItemCompra, quantidadeRecepcionada);
+		return alterarEstoque(idItemCompra, quantidadeRecepcionada);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada, String ncm)
+			throws BusinessException {
+		if (idItemCompra == null) {
+			return null;
+		}
+		Integer idItemEstoque = adicionarQuantidadeRecepcionadaItemCompra(idItemCompra, quantidadeRecepcionada);
+
+		Object[] materialFormaMaterial = pedidoService.pesquisarIdMaterialFormaMaterialItemPedido(idItemCompra);
+		String ncmEstoque = materialFormaMaterial.length == 2 ? pesquisarNcmItemEstoque(
+				(Integer) materialFormaMaterial[0], (FormaMaterial) materialFormaMaterial[1]) : null;
+
+		boolean isNovoNcm = (ncmEstoque == null || ncmEstoque.isEmpty()) && (ncm != null && !ncm.isEmpty());
+		boolean isNcmDiferente = ncm != null && ncmEstoque != null && !ncm.equals(ncmEstoque);
+
+		if (isNovoNcm) {
+			// Inserindo configuracao do ncm no estoque.
+			itemEstoqueDAO.inserirConfiguracaoNcmEstoque((Integer) materialFormaMaterial[0],
+					(FormaMaterial) materialFormaMaterial[1], ncm);
+		}
+
+		if (ncm == null || (isNcmDiferente && !isNovoNcm)) {
+			ncm = ncmEstoque;
+		}
+
+		if (ncm != null && !ncm.isEmpty()) {
+			// Inserindo o ncm no pedido de compra.
+			ItemPedido itemPedidoCompra = pedidoService.pesquisarItemPedidoById(idItemCompra);
+			itemPedidoCompra.setNcm(ncm);
+			itemPedidoDAO.alterar(itemPedidoCompra);
+
+			// Inserindo ncm nos pedidos de revenda associados a essa compra.
+			pedidoService.inserirNcmItemAguardandoMaterialAssociadoByIdItemCompra(idItemCompra, ncm);
+		}
+		return idItemEstoque;
+	}
+
 	private Integer alterarEstoque(Integer idItemCompra, Integer quantidade) throws BusinessException {
 		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemCompra);
 		itemEstoque.setQuantidade(quantidade);
@@ -608,61 +679,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		calcularPrecoMedioFatorICMS(itemCadastrado);
 		return itemCadastrado;
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer recepcionarItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada) throws BusinessException {
-		if (idItemCompra == null) {
-			return null;
-		}
-		if (quantidadeRecepcionada == null) {
-			quantidadeRecepcionada = 0;
-		}
-
-		Integer quantidadeItem = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemCompra);
-		quantidadeItem += quantidadeRecepcionada;
-		pedidoService.alterarQuantidadeRecepcionada(idItemCompra, quantidadeItem);
-
-		return alterarEstoque(idItemCompra, quantidadeRecepcionada);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer recepcionarItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada, String ncm)
-			throws BusinessException {
-		if (idItemCompra == null) {
-			return null;
-		}
-		Integer idItemEstoque = recepcionarItemCompra(idItemCompra, quantidadeRecepcionada);
-
-		Object[] materialFormaMaterial = pedidoService.pesquisarIdMaterialFormaMaterialItemPedido(idItemCompra);
-		String ncmEstoque = materialFormaMaterial.length == 2 ? pesquisarNcmItemEstoque(
-				(Integer) materialFormaMaterial[0], (FormaMaterial) materialFormaMaterial[1]) : null;
-
-		boolean isNovoNcm = (ncmEstoque == null || ncmEstoque.isEmpty()) && (ncm != null && !ncm.isEmpty());
-		boolean isNcmDiferente = ncm != null && ncmEstoque != null && !ncm.equals(ncmEstoque);
-
-		if (isNovoNcm) {
-			// Inserindo configuracao do ncm no estoque.
-			itemEstoqueDAO.inserirConfiguracaoNcmEstoque((Integer) materialFormaMaterial[0],
-					(FormaMaterial) materialFormaMaterial[1], ncm);
-		}
-
-		if (ncm == null || (isNcmDiferente && !isNovoNcm)) {
-			ncm = ncmEstoque;
-		}
-
-		if (ncm != null && !ncm.isEmpty()) {
-			// Inserindo o ncm no pedido de compra.
-			ItemPedido itemPedidoCompra = pedidoService.pesquisarItemPedidoById(idItemCompra);
-			itemPedidoCompra.setNcm(ncm);
-			itemPedidoDAO.alterar(itemPedidoCompra);
-
-			// Inserindo ncm nos pedidos de revenda associados a essa compra.
-			pedidoService.inserirNcmItemAguardandoMaterialAssociadoByIdItemCompra(idItemCompra, ncm);
-		}
-		return idItemEstoque;
 	}
 
 	@Override

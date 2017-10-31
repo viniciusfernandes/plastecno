@@ -858,6 +858,9 @@ public class PedidoServiceImpl implements PedidoService {
 		definirTipoPedido(pedido);
 
 		ValidadorInformacao.validar(pedido);
+		if (!pedido.isOrcamento() && (StringUtils.isEmpty(pedido.getFormaPagamento()))) {
+			throw new BusinessException("Forma de pagamento é obrigatória para os pedidos de venda/compra");
+		}
 
 		final Integer idPedido = pedido.getId();
 		final boolean isPedidoNovo = idPedido == null;
@@ -1714,6 +1717,15 @@ public class PedidoServiceImpl implements PedidoService {
 	public int pesquisarQuantidadeItemPedido(Integer idItemPedido) {
 		Integer q = itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
 		return q == null ? 0 : q;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer[] pesquisarQuantidadeItemPedidoByIdItemPedido(Integer idItemPedido) {
+		if (idItemPedido == null) {
+			return null;
+		}
+		return itemPedidoDAO.pesquisarQuantidadeItemPedidoByIdItemPedido(idItemPedido);
 	}
 
 	@Override

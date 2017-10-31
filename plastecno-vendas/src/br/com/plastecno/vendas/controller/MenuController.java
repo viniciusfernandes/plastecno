@@ -1,10 +1,18 @@
 package br.com.plastecno.vendas.controller;
 
+import static br.com.plastecno.service.constante.TipoAcesso.ADMINISTRACAO;
+import static br.com.plastecno.service.constante.TipoAcesso.CADASTRO_PEDIDO_COMPRA;
+import static br.com.plastecno.service.constante.TipoAcesso.CADASTRO_PEDIDO_VENDAS;
+import static br.com.plastecno.service.constante.TipoAcesso.CONSULTA_RELATORIO_CLIENTE_REGIAO;
+import static br.com.plastecno.service.constante.TipoAcesso.CONSULTA_RELATORIO_ENTREGA;
+import static br.com.plastecno.service.constante.TipoAcesso.CONSULTA_RELATORIO_VENDAS_REPRESENTADA;
+import static br.com.plastecno.service.constante.TipoAcesso.FATURAMENTO;
+import static br.com.plastecno.service.constante.TipoAcesso.GERENCIA_VENDAS;
+import static br.com.plastecno.service.constante.TipoAcesso.OPERACAO_CONTABIL;
+import static br.com.plastecno.service.constante.TipoAcesso.RECEPCAO_COMPRA;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
-import static br.com.plastecno.service.constante.TipoAcesso.*;
-import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 /**
@@ -35,8 +43,7 @@ public class MenuController extends AbstractController {
         verificarPermissaoAcesso("acessoRelatorioDuplicataPermitido", ADMINISTRACAO, FATURAMENTO);
         verificarPermissaoAcesso("acessoRelatorioFaturamentoPermitido", ADMINISTRACAO);
         verificarPermissaoAcesso("acessoPagamentoPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_COMPRA, OPERACAO_CONTABIL);
-        verificarPermissaoAcesso("acessoFluxoCaixaPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.FATURAMENTO,
-                TipoAcesso.OPERACAO_CONTABIL);
+        verificarPermissaoAcesso("acessoFluxoCaixaPermitido", ADMINISTRACAO, OPERACAO_CONTABIL);
     }
 
     @Get("/")

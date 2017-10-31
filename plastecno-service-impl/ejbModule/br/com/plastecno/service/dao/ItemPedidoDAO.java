@@ -498,7 +498,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				.gerarRegistroUnico(
 						entityManager
 								.createQuery(
-										"select new ItemPedido(i.aliquotaICMS, i.comprimento, i.material.descricao, i.descricaoPeca, i.formaMaterial, i.id, i.pedido.id, i.pedido.representada.id, i.medidaExterna, i.medidaInterna, i.pedido.representada.nomeFantasia, i.precoUnidade, i.quantidade, i.sequencial, i.material.sigla) from ItemPedido i where i.id =:idItemPedido ")
+										"select new ItemPedido(i.aliquotaICMS, i.comprimento, i.material.descricao, i.descricaoPeca, i.formaMaterial, i.id, i.pedido.id, i.pedido.representada.id, i.medidaExterna, i.medidaInterna, i.pedido.representada.nomeFantasia, i.precoUnidade, i.quantidade, i.quantidadeRecepcionada, i.sequencial, i.material.sigla) from ItemPedido i where i.id =:idItemPedido ")
 								.setParameter("idItemPedido", idItemPedido), ItemPedido.class, null);
 	}
 
@@ -530,14 +530,25 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		return pesquisarCampoById(ItemPedido.class, idItemPedido, "quantidade", Integer.class);
 	}
 
+	public Integer[] pesquisarQuantidadeItemPedidoByIdItemPedido(Integer idItemPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select i.id, i.quantidade, i.quantidadeRecepcionada, i.sequencial from ItemPedido i where i.id =:idItemPedido")
+								.setParameter("idItemPedido", idItemPedido), Integer[].class, null);
+
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Integer[]> pesquisarQuantidadeItemPedidoByIdPedido(Integer idPedido) {
 		List<Object[]> qtdes = entityManager
-				.createQuery("select i.id, i.quantidade, i.sequencial from ItemPedido i where i.pedido.id =:idPedido")
+				.createQuery(
+						"select i.id, i.quantidade, i.sequencial, i.quantidadeRecepcionada from ItemPedido i where i.pedido.id =:idPedido")
 				.setParameter("idPedido", idPedido).getResultList();
 		List<Integer[]> l = new ArrayList<Integer[]>();
 		for (Object[] q : qtdes) {
-			l.add(new Integer[] { (Integer) q[0], (Integer) q[1], (Integer) q[2] });
+			l.add(new Integer[] { (Integer) q[0], (Integer) q[1], (Integer) q[2], (Integer) q[3] });
 		}
 		return l;
 	}

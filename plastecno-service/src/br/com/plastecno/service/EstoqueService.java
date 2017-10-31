@@ -17,6 +17,14 @@ import br.com.plastecno.service.exception.BusinessException;
 @Local
 public interface EstoqueService {
 
+	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada) throws BusinessException;
+
+	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada, String ncm)
+			throws BusinessException;
+
+	Integer alterarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
+			throws BusinessException;
+
 	double calcularPrecoCustoItemEstoque(Item filtro);
 
 	Double calcularPrecoMinimoItemEstoque(Item filtro) throws BusinessException;
@@ -72,11 +80,6 @@ public interface EstoqueService {
 	Integer recalcularEstoqueItemCompra(Integer idItemCompra, Integer quantidade) throws BusinessException;
 
 	ItemEstoque recalcularValorItemEstoque(ItemEstoque itemEstoque) throws AlgoritmoCalculoException;
-
-	Integer recepcionarItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada) throws BusinessException;
-
-	Integer recepcionarItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada, String ncm)
-			throws BusinessException;
 
 	Integer recortarItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 

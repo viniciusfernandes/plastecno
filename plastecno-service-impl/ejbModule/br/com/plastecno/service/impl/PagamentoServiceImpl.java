@@ -70,7 +70,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 		// pois os pagamentos das outras parcelas serao geradas em outro
 		// servico.
 		p.setParcela(1);
-		p.setQuantidadeItem(i.getQuantidade());
+		p.setQuantidadeItem(i.getQuantidadeRestanteRecepcionar());
 		p.setSequencialItem(i.getSequencial());
 		p.setTipoPagamento(TipoPagamento.INSUMO);
 		p.setTotalParcelas(calcularTotalParcelas(i.getIdPedido()));
@@ -218,13 +218,23 @@ public class PagamentoServiceImpl implements PagamentoService {
 			}
 			if (!pagamento.isNovo()) {
 				int qtdePag = pagamentoDAO.pesquisarQuantidadeById(pagamento.getId());
+				int qtdeRecep = 0;
 				if (qtdeNova != qtdePag) {
+					int qtdeTot = pesquisarQuantidadeTotalPagaByIdItem(idItem);
+					qtdeRecep = qtdeTot + (qtdeNova - qtdePag);
+					if (qtdeRecep > qtdeItem) {
+						throw new BusinessException("A quantidade máxima do item No. " + pagamento.getSequencialItem()
+								+ " do pedido No. " + pagamento.getIdPedido() + " é " + (qtdeItem - qtdeTot));
+					}
+					// Devolvendo os itens para a fila de pedidos de compras
+					// para recepcao e deve se levar em consideracao todos
+					// os outros pagamentos desse mesmo item.
+					pedidoService.alterarQuantidadeRecepcionada(idItem, qtdeRecep);
+
 					// Mantendo a corencia dos valores pagos pois todas as
 					// parcelas de um mesmo item devem ter o mesmo preco.
-					pagamentoDAO.alterarQuantidadeItemPagamentoByIdItemPedido(idItem, qtdeNova);
-					// Devolvendo os itens para a fila de pedidos de compras
-					// para recepcao
-					pedidoService.alterarQuantidadeRecepcionada(idItem, qtdeNova);
+					pagamentoDAO
+							.alterarQuantidadeItemPagamentoByIdItemPedido(pagamento.getNumeroNF(), idItem, qtdeNova);
 				}
 				// Essa condicao eh para subtrair das quantidades do estoque
 				// pois a reducao de quantidade do pagamaento indica devolucao
@@ -240,7 +250,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 					estoqueService.recalcularEstoqueItemCompra(idItem, qtdeItem);
 				}
 			} else {
-				estoqueService.recepcionarItemCompra(idItem, qtdeNova, null);
+				estoqueService.adicionarQuantidadeRecepcionadaItemCompra(idItem, qtdeNova, null);
 			}
 		}
 		// Eh importante inserir o pagamento apenas apos a ercepcao de
@@ -268,7 +278,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 		// Aqui estamos validando se os itens enviados ja possuem os pagamentos
 		// de todas as suas quantidades do pedido.
-		validarPagamentoTotalizadoByIdItem(listaIdItem);
+		// validarPagamentoTotalizadoByIdItem(listaIdItem);
 
 		Pagamento p = null;
 		for (Integer idItem : listaIdItem) {
@@ -319,6 +329,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 		if (listaData.isEmpty()) {
 			listaData.add(pagamento.getDataEmissao());
 		}
+
 		// Aqui identificamos um pagamento a vista como um total de uma unica
 		// parcela
 		int totParc = listaData.size() <= 0 ? 1 : listaData.size();
@@ -336,7 +347,8 @@ public class PagamentoServiceImpl implements PagamentoService {
 		// para que eles sejam removidos do relatorio de compras aguardando
 		// recepcao.
 		if (pagamento.isInsumo()) {
-			estoqueService.recepcionarItemCompra(pagamento.getIdItemPedido(), pagamento.getQuantidadeItem(), null);
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(pagamento.getIdItemPedido(),
+					pagamento.getQuantidadeItem(), null);
 		}
 	}
 
@@ -412,6 +424,17 @@ public class PagamentoServiceImpl implements PagamentoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public int pesquisarQuantidadeTotalPagaByIdItem(Integer idItemPedido) {
+		List<Integer> l = pagamentoDAO.pesquisarQuantidadePagaByIdItem(idItemPedido);
+		int tot = 0;
+		for (Integer q : l) {
+			tot += q;
+		}
+		return tot;
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void remover(Integer idPagamento) throws BusinessException {
 		if (idPagamento == null) {
@@ -430,7 +453,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 		Integer idItem = pagamentoDAO.pesquisarIdItemPedidoByIdPagamento(idPagamento);
 		// Condicao que so ocorre no caso de pagamentos de insumos.
 		if (idItem != null) {
-			Integer qtde = pagamentoDAO.pesquisarQuantidadeById(idPagamento);
+			Integer qtde = pedidoService.pesquisarQuantidadeItemPedido(idItem);
 			pedidoService.alterarQuantidadeRecepcionada(idItem, 0);
 			pagamentoDAO.removerPagamentoPaceladoItemPedido(idItem);
 			estoqueService.removerEstoqueItemCompra(idItem, qtde);
@@ -458,40 +481,4 @@ public class PagamentoServiceImpl implements PagamentoService {
 		}
 		pagamentoDAO.retornarLiquidacaoPagamentoNFParcelada(numeroNF, idFornecedor, parcela);
 	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void validarPagamentoTotalizadoByIdItem(List<Integer> listaIdItem) throws BusinessException {
-		List<Integer[]> lPago = verificarPagamentoTotalizadoByIdItem(listaIdItem);
-		if (lPago.size() > 0) {
-			BusinessException e = new BusinessException();
-			for (Integer[] item : lPago) {
-				e.addMensagem("O item " + item[1] + " do pedido No. " + item[2]
-						+ " tem os pagamentos de todas as suas quantidades cadastradas.");
-			}
-			throw e;
-		}
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Integer[]> verificarPagamentoTotalizadoByIdItem(List<Integer> listaIdItem) {
-		List<Integer[]> lItem = pagamentoDAO.pesquisarQuantidadePagaByIdItem(listaIdItem);
-		if (lItem.isEmpty()) {
-			return new ArrayList<Integer[]>();
-		}
-		List<Integer[]> lPago = new ArrayList<Integer[]>();
-		int qtde = 0;
-		int qtdeTotal = 0;
-		for (Integer[] item : lItem) {
-			qtde = item[3] == null ? 0 : item[3].intValue();
-			qtdeTotal = item[4] == null ? 0 : item[4].intValue();
-			if (qtde > qtdeTotal) {
-				lPago.add(new Integer[] { item[0], item[1], item[2] });
-			}
-		}
-		return lPago;
-
-	}
-
 }

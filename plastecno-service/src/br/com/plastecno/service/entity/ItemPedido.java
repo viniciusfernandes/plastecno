@@ -221,8 +221,8 @@ public class ItemPedido extends Item {
 	// um pagamento do item
 	public ItemPedido(Double aliquotaICMS, Double comprimento, String descricaoMaterial, String descricaoPeca,
 			FormaMaterial formaMaterial, Integer id, Integer idPedido, Integer idRepresentada, Double medidaExterna,
-			Double medidaInterna, String nomeRepresentada, Double precoUnidade, Integer quantidade, Integer sequencial,
-			String siglaMaterial) {
+			Double medidaInterna, String nomeRepresentada, Double precoUnidade, Integer quantidade,
+			Integer quantidadeRecepcionada, Integer sequencial, String siglaMaterial) {
 		this.aliquotaICMS = aliquotaICMS;
 		this.comprimento = comprimento;
 		this.descricaoPeca = descricaoPeca;
@@ -236,7 +236,19 @@ public class ItemPedido extends Item {
 		this.nomeRepresentada = nomeRepresentada;
 		this.precoUnidade = precoUnidade;
 		this.quantidade = quantidade;
+		this.quantidadeRecepcionada = quantidadeRecepcionada;
 		this.sequencial = sequencial;
+	}
+
+	// Construtor usado para recuperar os dados que serao utilizados para gerar
+	// um pagamento do item
+	public ItemPedido(Double aliquotaICMS, Double comprimento, String descricaoMaterial, String descricaoPeca,
+			FormaMaterial formaMaterial, Integer id, Integer idPedido, Integer idRepresentada, Double medidaExterna,
+			Double medidaInterna, String nomeRepresentada, Double precoUnidade, Integer quantidade, Integer sequencial,
+			String siglaMaterial) {
+		this(aliquotaICMS, comprimento, descricaoMaterial, descricaoPeca, formaMaterial, id, idPedido, idRepresentada,
+				medidaExterna, medidaInterna, nomeRepresentada, precoUnidade, quantidade, null, sequencial,
+				siglaMaterial);
 	}
 
 	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS) {
@@ -362,12 +374,12 @@ public class ItemPedido extends Item {
 		setQuantidadeReservada(getQuantidadeReservada() + quantidadeReservada);
 	}
 
-	public double calcularPrecoTotalVenda() {
-		return this.quantidade != null && precoVenda != null ? quantidade * precoVenda : 0d;
-	}
-
 	public double calcularPrecoTotalIPI() {
 		return this.quantidade != null && precoUnidadeIPI != null ? quantidade * precoUnidadeIPI : 0d;
+	}
+
+	public double calcularPrecoTotalVenda() {
+		return this.quantidade != null && precoVenda != null ? quantidade * precoVenda : 0d;
 	}
 
 	@Override
@@ -559,11 +571,15 @@ public class ItemPedido extends Item {
 	}
 
 	public Integer getQuantidadeRecepcionada() {
-		return quantidadeRecepcionada;
+		return quantidadeRecepcionada == null ? 0 : quantidadeRecepcionada;
 	}
 
 	public Integer getQuantidadeReservada() {
 		return quantidadeReservada == null ? 0 : quantidadeReservada;
+	}
+
+	public int getQuantidadeRestanteRecepcionar() {
+		return getQuantidade() - getQuantidadeRecepcionada();
 	}
 
 	public Integer getSequencial() {

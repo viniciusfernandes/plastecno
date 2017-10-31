@@ -161,7 +161,7 @@ public class RecepcaoCompraController extends AbstractController {
             Date dataFinal, Integer idRepresentada, String ncm) {
         String mensagem = null;
         try {
-            estoqueService.recepcionarItemCompra(idItemPedido, quantidadeRecepcionada, ncm);
+            estoqueService.adicionarQuantidadeRecepcionadaItemCompra(idItemPedido, quantidadeRecepcionada, ncm);
             boolean contemItem = pedidoService.contemQuantidadeNaoRecepcionadaItemPedido(idItemPedido);
             Integer idPedido = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
 

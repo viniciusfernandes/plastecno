@@ -42,6 +42,8 @@ public interface PagamentoService {
 
 	List<Pagamento> pesquisarPagamentoByPeriodo(Periodo periodo, boolean apenasInsumos);
 
+	int pesquisarQuantidadeTotalPagaByIdItem(Integer idItemPedido);
+
 	void remover(Integer idPagamento) throws BusinessException;
 
 	void removerPagamentoPaceladoByIdPagamento(Integer idItemPedido) throws BusinessException;
@@ -51,7 +53,4 @@ public interface PagamentoService {
 	void retornarLiquidacaoPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela)
 			throws BusinessException;
 
-	void validarPagamentoTotalizadoByIdItem(List<Integer> listaIdItem) throws BusinessException;
-
-	List<Integer[]> verificarPagamentoTotalizadoByIdItem(List<Integer> listaIdItem);
 }

@@ -176,7 +176,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -365,7 +365,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -379,7 +379,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(item1.getId(), item1.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(item1.getId(), item1.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -388,7 +388,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		Integer quantidadeAntes = pesquisarQuantidadeTotalItemEstoque(idItemEstoque);
 
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(item2.getId(), item2.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(item2.getId(), item2.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -531,7 +531,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido itemPeca = gerarItemPedidoPeca(TipoPedido.COMPRA);
 
 		try {
-			estoqueService.recepcionarItemCompra(itemPeca.getId(), itemPeca.getQuantidade());
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(itemPeca.getId(), itemPeca.getQuantidade());
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -774,7 +774,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -990,7 +990,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1023,7 +1023,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		final String ncm = "11.11.11.11";
 
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade(), ncm);
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), ncm);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1059,7 +1059,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		final String ncm = "11.11.11.11";
 
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade(), ncm);
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), ncm);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1095,7 +1095,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		final String ncm = "11.11.11.11";
 
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade(), ncm);
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), ncm);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1132,7 +1132,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade(), null);
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), null);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1169,7 +1169,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade(), null);
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), null);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1204,7 +1204,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade(), "");
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), "");
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1231,7 +1231,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		Integer quantidadeRecepcionada = i.getQuantidade() - 1;
 
 		try {
-			estoqueService.recepcionarItemCompra(i.getId(), quantidadeRecepcionada);
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), quantidadeRecepcionada);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1247,7 +1247,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1442,7 +1442,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1463,7 +1463,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1484,7 +1484,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1505,7 +1505,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1573,7 +1573,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1594,7 +1594,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1644,7 +1644,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.recepcionarItemCompra(i.getId(), i.getQuantidade());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -1885,8 +1885,8 @@ public class EstoqueServiceTest extends AbstractTest {
 
 			// Inserindo apenas um dos itens para fazermos os testes de
 			// pendencia
-			estoqueService.recepcionarItemCompra(item1.getId(), item1.getQuantidade());
-			estoqueService.recepcionarItemCompra(item2.getId(), item2.getQuantidade());
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(item1.getId(), item1.getQuantidade());
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(item2.getId(), item2.getQuantidade());
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -2017,7 +2017,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			estoqueService.recepcionarItemCompra(i1.getId(), i1.getQuantidade());
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i1.getId(), i1.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -2029,7 +2029,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		List<ItemPedido> listaItemComprado = gerarListaItemPedido(TipoPedido.COMPRA);
 		for (ItemPedido itemPedido : listaItemComprado) {
 			try {
-				estoqueService.recepcionarItemCompra(itemPedido.getId(), itemPedido.getQuantidade());
+				estoqueService.adicionarQuantidadeRecepcionadaItemCompra(itemPedido.getId(), itemPedido.getQuantidade());
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}
@@ -2046,7 +2046,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		List<ItemPedido> listaItemComprado = gerarListaItemPedido(TipoPedido.COMPRA);
 		for (ItemPedido itemPedido : listaItemComprado) {
 			try {
-				estoqueService.recepcionarItemCompra(itemPedido.getId(), itemPedido.getQuantidade());
+				estoqueService.adicionarQuantidadeRecepcionadaItemCompra(itemPedido.getId(), itemPedido.getQuantidade());
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}

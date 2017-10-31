@@ -116,6 +116,12 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public Integer pesquisarIdClienteByIdPedido(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return p != null && p.getCliente() != null ? p.getCliente().getId() : null;
+			}
+
+			@Mock
 			public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 				if (i == null) {

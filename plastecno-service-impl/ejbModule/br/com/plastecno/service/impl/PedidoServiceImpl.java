@@ -169,8 +169,6 @@ public class PedidoServiceImpl implements PedidoService {
 							+ sequencialItem + " do pedido No. " + idPedido);
 		} else if (qtdeItem > quantidadeRecepcionada) {
 			alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
-		} else {
-			return;
 		}
 
 		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);

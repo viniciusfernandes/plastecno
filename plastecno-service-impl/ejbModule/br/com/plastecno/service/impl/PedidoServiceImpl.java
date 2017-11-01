@@ -169,8 +169,6 @@ public class PedidoServiceImpl implements PedidoService {
 							+ sequencialItem + " do pedido No. " + idPedido);
 		} else if (qtdeItem > quantidadeRecepcionada) {
 			alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
-		} else {
-			return;
 		}
 
 		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
@@ -383,6 +381,28 @@ public class PedidoServiceImpl implements PedidoService {
 			itemPedido.getMaterial().setPesoEspecifico(pEspecifico);
 		}
 		return CalculadoraItem.calcularKilo(itemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double calcularValorFretePorItemByIdItem(Integer idItem) {
+		long total = pesquisarTotalItemPedidoByIdItem(idItem);
+		if (0l == total) {
+			return 0d;
+		}
+		Double vFrete = pesquisarValorFreteByIdItem(idItem);
+		return vFrete / total;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double calcularValorFretePorItemByIdPedido(Integer idPedido) {
+		long total = pesquisarTotalItemPedido(idPedido);
+		if (0l == total) {
+			return 0d;
+		}
+		Double vFrete = pesquisarValorFreteByIdPedido(idPedido);
+		return vFrete / total;
 	}
 
 	@Override
@@ -860,6 +880,9 @@ public class PedidoServiceImpl implements PedidoService {
 		definirTipoPedido(pedido);
 
 		ValidadorInformacao.validar(pedido);
+		if (!pedido.isOrcamento() && (StringUtils.isEmpty(pedido.getFormaPagamento()))) {
+			throw new BusinessException("Forma de pagamento é obrigatória para os pedidos de venda/compra");
+		}
 
 		final Integer idPedido = pedido.getId();
 		final boolean isPedidoNovo = idPedido == null;
@@ -1720,6 +1743,15 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer[] pesquisarQuantidadeItemPedidoByIdItemPedido(Integer idItemPedido) {
+		if (idItemPedido == null) {
+			return null;
+		}
+		return itemPedidoDAO.pesquisarQuantidadeItemPedidoByIdItemPedido(idItemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer[]> pesquisarQuantidadeItemPedidoByIdPedido(Integer idPedido) {
 		return itemPedidoDAO.pesquisarQuantidadeItemPedidoByIdPedido(idPedido);
 	}
@@ -1834,6 +1866,12 @@ public class PedidoServiceImpl implements PedidoService {
 		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public long pesquisarTotalItemPedidoByIdItem(Integer idItem) {
+		return pedidoDAO.pesquisarTotalItemPedidoByIdItem(idItem);
+	}
+
 	public Long pesquisarTotalItemRevendaAguardandoEncomenda(Integer idItemPedido) {
 		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 		return itemPedidoDAO.pesquisarTotalItemRevendaNaoEncomendado(idPedido);
@@ -1899,19 +1937,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
-		return pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
+	public Double pesquisarValorFreteByIdItem(Integer idItem) {
+		return pedidoDAO.pesquisarValorFreteByIdItem(idItem);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double pesquisarValorFretePorItemByIdPedido(Integer idPedido) {
-		long total = pesquisarTotalItemPedido(idPedido);
-		if (0l == total) {
-			return 0d;
-		}
-		Double vFrete = pesquisarValorFreteByIdPedido(idPedido);
-		return vFrete / total;
+	public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
 	}
 
 	@Override

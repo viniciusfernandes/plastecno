@@ -72,15 +72,20 @@ public abstract class Item implements Serializable, Cloneable {
 		return getPrecoUnidade() * getQuantidade();
 	}
 
+	public double calcularPrecoTotalIPI() {
+		return getQuantidade() != null ? getQuantidade() * calcularPrecoUnidadeIPI() : 0d;
+	}
+
 	public Double calcularPrecoUnidadeIPI() {
 		if (getPrecoUnidade() == null) {
 			return null;
 		}
-
+		if (getPrecoUnidade() == null) {
+			return 0d;
+		}
 		if (getAliquotaIPI() == null) {
 			return getPrecoUnidade();
 		}
-
 		return getPrecoUnidade() * (1 + getAliquotaIPI());
 	}
 

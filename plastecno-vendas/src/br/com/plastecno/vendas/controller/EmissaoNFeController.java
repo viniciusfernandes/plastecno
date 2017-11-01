@@ -466,7 +466,7 @@ public class EmissaoNFeController extends AbstractController {
             List<ItemPedido> listaItem = nFeService.pesquisarQuantitadeItemRestanteByIdPedido(idPedido);
 
             double vFrete = NumeroUtils.arredondarValorMonetario(pedidoService
-                    .pesquisarValorFretePorItemByIdPedido(idPedido));
+                    .calcularValorFretePorItemByIdPedido(idPedido));
             addAtributo("valorFrete", vFrete);
 
             String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);

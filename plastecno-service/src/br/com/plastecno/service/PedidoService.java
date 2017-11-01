@@ -47,6 +47,10 @@ public interface PedidoService {
 
 	Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException;
 
+	Double calcularValorFretePorItemByIdItem(Integer idItem);
+
+	Double calcularValorFretePorItemByIdPedido(Integer idPedido);
+
 	Double[] calcularValorFreteUnidadeByIdPedido(Integer idPedido);
 
 	void cancelarOrcamento(Integer idOrcamento) throws BusinessException;
@@ -224,6 +228,8 @@ public interface PedidoService {
 
 	int pesquisarQuantidadeItemPedido(Integer idItemPedido);
 
+	Integer[] pesquisarQuantidadeItemPedidoByIdItemPedido(Integer idItemPedido);
+
 	List<Integer[]> pesquisarQuantidadeItemPedidoByIdPedido(Integer idPedido);
 
 	int pesquisarQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
@@ -258,6 +264,8 @@ public interface PedidoService {
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
+	long pesquisarTotalItemPedidoByIdItem(Integer idItem);
+
 	Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isOrcamento,
 			boolean isCompra);
 
@@ -272,9 +280,9 @@ public interface PedidoService {
 
 	Transportadora pesquisarTransportadoraResumidaByIdPedido(Integer idPedido);
 
-	Double pesquisarValorFreteByIdPedido(Integer idPedido);
+	Double pesquisarValorFreteByIdItem(Integer idItem);
 
-	Double pesquisarValorFretePorItemByIdPedido(Integer idPedido);
+	Double pesquisarValorFreteByIdPedido(Integer idPedido);
 
 	Double pesquisarValorPedido(Integer idPedido);
 

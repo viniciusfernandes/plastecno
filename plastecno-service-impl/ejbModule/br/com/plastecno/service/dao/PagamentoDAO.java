@@ -16,28 +16,20 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 		super(entityManager);
 	}
 
-	public void alterarQuantidadeItemPagamentoByIdItemPedido(Integer idItemPedido, Integer quantidade) {
+	public void alterarQuantidadeItemPagamentoByIdItemPedido(Integer numeroNF, Integer idItemPedido, Integer quantidade) {
 		entityManager
 				.createQuery(
-						"update Pagamento p set p.quantidadeItem =:quantidade where p.idItemPedido = :idItemPedido")
-				.setParameter("idItemPedido", idItemPedido).setParameter("quantidade", quantidade).executeUpdate();
+						"update Pagamento p set p.quantidadeItem =:quantidade where p.idItemPedido = :idItemPedido and p.numeroNF = :numeroNF")
+				.setParameter("idItemPedido", idItemPedido).setParameter("numeroNF", numeroNF)
+				.setParameter("quantidade", quantidade).executeUpdate();
 	}
 
-	public void liquidarPagamento(Integer idPagamento) {
-		liquidarPagamento(idPagamento, true);
-
-	}
-
-	private void liquidarPagamento(Integer idPagamento, boolean liquidado) {
+	public void liquidarPagamento(Integer idPagamento, boolean liquidado) {
 		entityManager.createQuery("update Pagamento p set p.liquidado = :liquidado where p.id = :idPagamento")
 				.setParameter("idPagamento", idPagamento).setParameter("liquidado", liquidado).executeUpdate();
 	}
 
-	public void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela) {
-		liquidarPagamentoNFParcelada(numeroNF, idFornecedor, parcela, true);
-	}
-
-	private void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela, boolean liquidado) {
+	public void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela, boolean liquidado) {
 		entityManager
 				.createQuery(
 						"update Pagamento p set p.liquidado = :liquidado where p.numeroNF = :numeroNF and p.idFornecedor = :idFornecedor and p.parcela = :parcela ")
@@ -105,30 +97,19 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 						.setParameter("idPagamento", idPagamento), Integer.class, 0);
 	}
 
-	public List<Integer[]> pesquisarQuantidadePagaByIdItem(List<Integer> listaIdItem) {
+	public List<Integer> pesquisarQuantidadePagaByIdItem(Integer idItem) {
 		List<Object[]> l = entityManager
 				.createQuery(
-						"select p.idItemPedido, p.sequencialItem, p.idPedido, SUM(p.quantidadeItem), p.quantidadeTotal from Pagamento p where p.idItemPedido in (:listaIdItem) group by p.idItemPedido, p.idPedido, p.quantidadeTotal, p.sequencialItem",
-						Object[].class).setParameter("listaIdItem", listaIdItem).getResultList();
-		if (l.isEmpty()) {
-			return new ArrayList<>();
-		}
-		List<Integer[]> lTotal = new ArrayList<>(l.size());
-		for (Object[] o : l) {
-			lTotal.add(new Integer[] { (Integer) o[0], (Integer) o[1], (Integer) o[2], ((Long) o[3]).intValue(),
-					(Integer) o[4] });
-		}
-		return lTotal;
-	}
+						"select p.numeroNF, p.quantidadeItem from Pagamento p where p.idItemPedido = :idItem group by p.numeroNF, p.quantidadeItem",
+						Object[].class).setParameter("idItem", idItem).getResultList();
 
-	public Integer pesquisarQuantidadeTotalByIdItem(Integer idItem) {
-		if (idItem == null) {
-			return null;
+		List<Integer> lQtde = new ArrayList<>();
+		for (Object[] o : l) {
+			if (o[1] != null) {
+				lQtde.add((Integer) o[1]);
+			}
 		}
-		List<Integer> l = new ArrayList<>();
-		l.add(idItem);
-		List<Integer[]> lItem = pesquisarQuantidadePagaByIdItem(l);
-		return lItem.size() <= 0 ? 0 : lItem.get(0)[3];
+		return lQtde;
 	}
 
 	public void removerPagamentoPaceladoItemPedido(Integer idItemPedido) {

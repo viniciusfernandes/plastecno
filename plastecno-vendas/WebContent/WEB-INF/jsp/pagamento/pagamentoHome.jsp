@@ -117,8 +117,8 @@ function removerPagamento(botao){
 		
 	<form id="formVazio"></form>
 	
-	<jsp:include page="/bloco/bloco_edicao_pagamento.jsp"/>
 	<a id="rodape"></a>
+	<jsp:include page="/bloco/bloco_edicao_pagamento.jsp"/>
 <c:choose>
 	<c:when test="${isPesquisaPedidoCompra}">
 		<jsp:include page="/bloco/bloco_listagem_pedido_compra.jsp"></jsp:include>
@@ -184,6 +184,7 @@ function removerPagamento(botao){
 									<form action="<c:url value="/pagamento/remocao/nfparcelada/"/>${elemento.id}" method="post">
 										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
+										<input type="hidden" name="numeroNF" value="${elemento.numeroNF}"/>
 										<input type="button" value="" title="Remover Pagamento" class="botaoRemover" onclick="removerPagamento(this);"/>
 									</form>
 								</div>
@@ -193,7 +194,7 @@ function removerPagamento(botao){
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="width: 2%">
 									<div class="coluna_acoes_listagem">
 										<c:choose>
-											<c:when test="${not elemento.liquidado}">
+											<c:when test="${grupo.propriedades['insumo']}">
 												<form action="<c:url value="/pagamento/liquidacao/nfparcelada"/>" method="post" >
 													<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 													<input type="hidden" name="dataFinal" value="${dataFinal}"/>
@@ -201,18 +202,32 @@ function removerPagamento(botao){
 													<input type="hidden" name="idFornecedor" value="${elemento.idFornecedor}"/>
 													<input type="hidden" name="nomeFornecedor" value="${elemento.nomeFornecedor}"/>
 													<input type="hidden" name="parcela" value="${elemento.parcela}"/>
-													<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificacaoEfetuadaPequeno" />
+													<c:choose>
+														<c:when test="${not grupo.propriedades['liquidado']}">
+															<input type="hidden" name="liquidado" value="true"/>
+															<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificacaoEfetuadaPequeno" />
+														</c:when>
+														<c:otherwise>
+															<input type="hidden" name="liquidado" value="false"/>
+															<input type="submit" value="" title="Retornar Liquidação Pagamento" class="botaoVerificacaoFalhaPequeno" />
+														</c:otherwise>	
+													</c:choose>
 												</form>
 											</c:when>
 											<c:otherwise>
-												<form action="<c:url value="/pagamento/retonoliquidacao/nfparcelada"/>" method="post" >
+												<form action="<c:url value="/pagamento/liquidacao/${elemento.id}"/>" method="post" >
 													<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 													<input type="hidden" name="dataFinal" value="${dataFinal}"/>
-													<input type="hidden" name="numeroNF" value="${elemento.numeroNF}"/>
-													<input type="hidden" name="idFornecedor" value="${elemento.idFornecedor}"/>
-													<input type="hidden" name="nomeFornecedor" value="${elemento.nomeFornecedor}"/>
-													<input type="hidden" name="parcela" value="${elemento.parcela}"/>
-													<input type="submit" value="" title="Retornar Liquidação Pagamento" class="botaoVerificacaoFalhaPequeno" />
+													<c:choose>
+														<c:when test="${not grupo.propriedades['liquidado']}">
+															<input type="hidden" name="liquidado" value="true"/>
+															<input type="submit" value="" title="Liquidar Pagamento" class="botaoVerificacaoEfetuadaPequeno" />
+														</c:when>
+															<c:otherwise>
+															<input type="hidden" name="liquidado" value="false"/>
+															<input type="submit" value="" title="Retornar Liquidação Pagamento" class="botaoVerificacaoFalhaPequeno" />
+														</c:otherwise>	
+													</c:choose>
 												</form>
 											</c:otherwise>
 										</c:choose>

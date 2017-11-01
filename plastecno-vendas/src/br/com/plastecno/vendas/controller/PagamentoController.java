@@ -86,6 +86,41 @@ public class PagamentoController extends AbstractController {
         addPeriodo(dataInicial, dataFinal);
     }
 
+    @Get("pagamento/fornecedor/{idFornecedor}")
+    public void gerarRelatorioPagamentoByIdFornecedor(Integer idFornecedor, Date dataInicial, Date dataFinal) {
+        try {
+            gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByIdFornecedor(idFornecedor, new Periodo(
+                    dataInicial, dataFinal)), dataInicial, dataFinal);
+            irRodapePagina();
+        } catch (InformacaoInvalidaException e) {
+            addPeriodo(dataInicial, dataFinal);
+            irTopoPagina();
+        }
+    }
+
+    @Get("pagamento/pedido/{idPedido}")
+    public void gerarRelatorioPagamentoByIdPedido(Integer idPedido, Date dataInicial, Date dataFinal) {
+        try {
+            gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByIdPedido(idPedido), dataInicial, dataFinal);
+            irRodapePagina();
+        } catch (InformacaoInvalidaException e) {
+            addPeriodo(dataInicial, dataFinal);
+            irTopoPagina();
+        }
+    }
+
+    @Get("pagamento/nf/{numeroNF}")
+    public void gerarRelatorioPagamentoByNF(Integer numeroNF, Date dataInicial, Date dataFinal) {
+        try {
+            gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByNF(numeroNF), dataInicial, dataFinal);
+            irRodapePagina();
+        } catch (InformacaoInvalidaException e) {
+            gerarListaMensagemErro(e);
+            addPeriodo(dataInicial, dataFinal);
+            irTopoPagina();
+        }
+    }
+
     @Get("pagamento/periodo/listagem")
     public void gerarRelatorioPagamentoByPeriodo(Date dataInicial, Date dataFinal) {
         try {
@@ -107,58 +142,42 @@ public class PagamentoController extends AbstractController {
     }
 
     @Post("pagamento/inclusao")
-    public void inserirPagamento(Pagamento pagamento, Date dataInicial, Date dataFinal,
-            List<Integer> listaIdItemSelecionado) {
-
-        if (listaIdItemSelecionado == null || listaIdItemSelecionado.isEmpty()) {
-            try {
-                pagamentoService.inserirPagamento(pagamento);
+    public void inserirPagamento(Pagamento pagamento, Date dataInicial, Date dataFinal) {
+        try {
+            pagamentoService.inserirPagamento(pagamento);
+            if (pagamento.isInsumo()) {
+                gerarRelatorioPagamentoByNF(pagamento.getNumeroNF(), dataInicial, dataFinal);
+            } else {
                 gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
-                gerarMensagemSucesso("Pagamento inserido com sucesso.");
-            } catch (BusinessException e) {
-                addPagamento(pagamento);
-                try {
-                    gerarRelatorioPagamento(dataInicial, dataFinal);
-                } catch (InformacaoInvalidaException e1) {
-                    gerarListaMensagemErro(e);
-                }
-                gerarListaMensagemErro(e);
-                irTopoPagina();
             }
-        } else {
+            gerarMensagemSucesso("Pagamento inserido com sucesso.");
+        } catch (BusinessException e) {
+            addPagamento(pagamento);
             try {
-                pagamentoService.inserirPagamentoParceladoItemCompra(pagamento.getNumeroNF(), pagamento.getValorNF(),
-                        pagamento.getDataVencimento(), pagamento.getDataEmissao(), pagamento.getModalidadeFrete(),
-                        listaIdItemSelecionado);
-                redirecTo(PagamentoController.class).pesquisarPagamentoByNF(pagamento.getNumeroNF(), dataInicial,
-                        dataFinal);
-                gerarMensagemSucesso("Pagamento inserido com sucesso.");
-            } catch (BusinessException e) {
-                addPagamento(pagamento);
-                adicionarIdItemSelecionado(listaIdItemSelecionado);
-                gerarRelatorioItemPedidoCompraEfetivada(pagamento, pagamento.getIdFornecedor(), dataInicial, dataFinal);
+                gerarRelatorioPagamento(dataInicial, dataFinal);
+            } catch (InformacaoInvalidaException e1) {
                 gerarListaMensagemErro(e);
-                irTopoPagina();
             }
+            gerarListaMensagemErro(e);
+            irTopoPagina();
         }
-
         addPeriodo(dataInicial, dataFinal);
     }
 
     @Post("pagamento/liquidacao/{idPagamento}")
-    public void liquidarPagamento(Integer idPagamento, Date dataInicial, Date dataFinal) {
-        pagamentoService.liquidarPagamento(idPagamento);
+    public void liquidarPagamento(Integer idPagamento, boolean liquidado, Date dataInicial, Date dataFinal) {
+        pagamentoService.liquidarPagamento(idPagamento, liquidado);
         gerarMensagemSucesso("Pagamento liquidado com sucesso.");
         gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
     }
 
     @Post("pagamento/liquidacao/nfparcelada")
     public void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela,
-            String nomeFornecedor, Date dataInicial, Date dataFinal) {
-        pagamentoService.liquidarPagamentoNFParcelada(numeroNF, idFornecedor, parcela);
+            String nomeFornecedor, boolean liquidado, Date dataInicial, Date dataFinal) {
+        pagamentoService.liquidarPagamentoNFParcelada(numeroNF, idFornecedor, parcela, liquidado);
         gerarMensagemSucesso("A parcela No. " + parcela + "da NF " + numeroNF + " do fornecedor " + nomeFornecedor
                 + " liquidada com sucesso.");
-        gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
+        gerarRelatorioPagamentoByNF(numeroNF, dataInicial, dataFinal);
     }
 
     @Get("pagamento")
@@ -187,41 +206,6 @@ public class PagamentoController extends AbstractController {
         irTopoPagina();
     }
 
-    @Get("pagamento/fornecedor/{idFornecedor}")
-    public void pesquisarPagamentoByIdFornecedor(Integer idFornecedor, Date dataInicial, Date dataFinal) {
-        try {
-            gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByIdFornecedor(idFornecedor, new Periodo(
-                    dataInicial, dataFinal)), dataInicial, dataFinal);
-            irRodapePagina();
-        } catch (InformacaoInvalidaException e) {
-            addPeriodo(dataInicial, dataFinal);
-            irTopoPagina();
-        }
-    }
-
-    @Get("pagamento/pedido/{idPedido}")
-    public void pesquisarPagamentoByIdPedido(Integer idPedido, Date dataInicial, Date dataFinal) {
-        try {
-            gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByIdPedido(idPedido), dataInicial, dataFinal);
-            irRodapePagina();
-        } catch (InformacaoInvalidaException e) {
-            addPeriodo(dataInicial, dataFinal);
-            irTopoPagina();
-        }
-    }
-
-    @Get("pagamento/nf/{numeroNF}")
-    public void pesquisarPagamentoByNF(Integer numeroNF, Date dataInicial, Date dataFinal) {
-        try {
-            gerarRelatorioPagamento(pagamentoService.pesquisarPagamentoByNF(numeroNF), dataInicial, dataFinal);
-            irRodapePagina();
-        } catch (InformacaoInvalidaException e) {
-            gerarListaMensagemErro(e);
-            addPeriodo(dataInicial, dataFinal);
-            irTopoPagina();
-        }
-    }
-
     @Post("pagamento/remocao/{idPagamento}")
     public void removerPagamento(Integer idPagamento, Date dataInicial, Date dataFinal) {
         try {
@@ -235,14 +219,15 @@ public class PagamentoController extends AbstractController {
     }
 
     @Post("pagamento/remocao/nfparcelada/{idPagamento}")
-    public void removerPagamentoParceladoItemPedido(Integer idPagamento, Date dataInicial, Date dataFinal) {
+    public void removerPagamentoParceladoItemPedido(Integer numeroNF, Integer idPagamento, Date dataInicial,
+            Date dataFinal) {
         try {
             pagamentoService.removerPagamentoPaceladoByIdPagamento(idPagamento);
             gerarMensagemSucesso("Pagamento do item parcelado foi removido com sucesso.");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
-        gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
+        gerarRelatorioPagamentoByNF(numeroNF, dataInicial, dataFinal);
     }
 
     @Post("pagamento/retonoliquidacao/{idPagamento}")

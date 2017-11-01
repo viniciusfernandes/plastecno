@@ -24,21 +24,12 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 				.setParameter("quantidade", quantidade).executeUpdate();
 	}
 
-	public void liquidarPagamento(Integer idPagamento) {
-		liquidarPagamento(idPagamento, true);
-
-	}
-
-	private void liquidarPagamento(Integer idPagamento, boolean liquidado) {
+	public void liquidarPagamento(Integer idPagamento, boolean liquidado) {
 		entityManager.createQuery("update Pagamento p set p.liquidado = :liquidado where p.id = :idPagamento")
 				.setParameter("idPagamento", idPagamento).setParameter("liquidado", liquidado).executeUpdate();
 	}
 
-	public void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela) {
-		liquidarPagamentoNFParcelada(numeroNF, idFornecedor, parcela, true);
-	}
-
-	private void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela, boolean liquidado) {
+	public void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela, boolean liquidado) {
 		entityManager
 				.createQuery(
 						"update Pagamento p set p.liquidado = :liquidado where p.numeroNF = :numeroNF and p.idFornecedor = :idFornecedor and p.parcela = :parcela ")

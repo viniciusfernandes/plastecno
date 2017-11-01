@@ -385,6 +385,28 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double calcularValorFretePorItemByIdItem(Integer idItem) {
+		long total = pesquisarTotalItemPedidoByIdItem(idItem);
+		if (0l == total) {
+			return 0d;
+		}
+		Double vFrete = pesquisarValorFreteByIdItem(idItem);
+		return vFrete / total;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double calcularValorFretePorItemByIdPedido(Integer idPedido) {
+		long total = pesquisarTotalItemPedido(idPedido);
+		if (0l == total) {
+			return 0d;
+		}
+		Double vFrete = pesquisarValorFreteByIdPedido(idPedido);
+		return vFrete / total;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double[] calcularValorFreteUnidadeByIdPedido(Integer idPedido) {
 		Double[] val = itemPedidoDAO.pesquisarValorFreteUnidadeByIdPedido(idPedido);
 		if (val[1] != 0d) {
@@ -1844,6 +1866,12 @@ public class PedidoServiceImpl implements PedidoService {
 		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public long pesquisarTotalItemPedidoByIdItem(Integer idItem) {
+		return pedidoDAO.pesquisarTotalItemPedidoByIdItem(idItem);
+	}
+
 	public Long pesquisarTotalItemRevendaAguardandoEncomenda(Integer idItemPedido) {
 		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 		return itemPedidoDAO.pesquisarTotalItemRevendaNaoEncomendado(idPedido);
@@ -1909,19 +1937,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
-		return pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
+	public Double pesquisarValorFreteByIdItem(Integer idItem) {
+		return pedidoDAO.pesquisarValorFreteByIdItem(idItem);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double pesquisarValorFretePorItemByIdPedido(Integer idPedido) {
-		long total = pesquisarTotalItemPedido(idPedido);
-		if (0l == total) {
-			return 0d;
-		}
-		Double vFrete = pesquisarValorFreteByIdPedido(idPedido);
-		return vFrete / total;
+	public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
 	}
 
 	@Override

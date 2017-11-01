@@ -24,9 +24,9 @@ public interface PagamentoService {
 
 	void inserirPagamentoParceladoItemCompra(Pagamento pagamento) throws BusinessException;
 
-	void liquidarPagamento(Integer idPagamento);
+	void liquidarPagamento(Integer idPagamento, boolean liquidado);
 
-	void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela);
+	void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela, boolean liquidado);
 
 	Pagamento pesquisarById(Integer idPagamento);
 

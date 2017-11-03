@@ -78,7 +78,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 		p.setTotalParcelas(calcularTotalParcelas(i.getIdPedido()));
 		// Nao devemos usar o valor total pois na compra o IPI nao eh destacado.
 		p.setValor(i.calcularPrecoTotalIPI() + valFrete);
-		p.setValorCreditoICMS(i.getValorICMS());
+		p.setValorCreditoICMS(i.calcularValorICMS());
 		return p;
 	}
 

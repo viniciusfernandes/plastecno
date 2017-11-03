@@ -222,7 +222,7 @@ function inserirOrcamento(){
 			$('#idPedido').val(pedidoJson.id);
 			$('#numeroPedido').val(pedidoJson.id);
 			$('#numeroPedidoPesquisa').val(pedidoJson.id);
-			
+			$('#numeroPedidoCliente').val(pedidoJson.numeroPedidoCliente);
 			$('#situacaoPedido').val(pedidoJson.situacaoPedido);
 			$('#idSituacaoPedido').val(pedidoJson.situacaoPedido);
 			$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);
@@ -291,7 +291,8 @@ function inserirOrcamento(){
 		</div>
 		<div class="label" style="width: 8%">Núm. Cli.:</div>
 		<div class="input" style="width: 11%">
-			<input type="text" id="numeroPedido" value="${pedido.id}" class="pesquisavel" style="width: 100%"/>
+			<input type="text" id="numeroPedidoCliente" name="pedido.numeroPedidoCliente" 
+				value="${pedido.numeroPedidoCliente}" class="pesquisavel" style="width: 100%"/>
 		</div>
 		
 		<div class="label" style="width: 10%">Situação:</div>

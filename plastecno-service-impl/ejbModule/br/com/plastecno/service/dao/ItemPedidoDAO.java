@@ -498,7 +498,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				.gerarRegistroUnico(
 						entityManager
 								.createQuery(
-										"select new ItemPedido(i.aliquotaIPI, i.comprimento, i.material.descricao, i.descricaoPeca, i.formaMaterial, i.id, i.pedido.id, i.pedido.representada.id, i.medidaExterna, i.medidaInterna, i.pedido.representada.nomeFantasia, i.precoUnidade, i.quantidade, i.quantidadeRecepcionada, i.sequencial, i.material.sigla) from ItemPedido i where i.id =:idItemPedido ")
+										"select new ItemPedido(i.aliquotaICMS, i.aliquotaIPI, i.comprimento, i.material.descricao, i.descricaoPeca, i.formaMaterial, i.id, i.pedido.id, i.pedido.representada.id, i.medidaExterna, i.medidaInterna, i.pedido.representada.nomeFantasia, i.precoUnidade, i.quantidade, i.quantidadeRecepcionada, i.sequencial, i.material.sigla) from ItemPedido i where i.id =:idItemPedido ")
 								.setParameter("idItemPedido", idItemPedido), ItemPedido.class, null);
 	}
 

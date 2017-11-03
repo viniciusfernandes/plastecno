@@ -219,10 +219,11 @@ public class ItemPedido extends Item {
 
 	// Construtor usado para recuperar os dados que serao utilizados para gerar
 	// um pagamento do item
-	public ItemPedido(Double aliquotaIPI, Double comprimento, String descricaoMaterial, String descricaoPeca,
-			FormaMaterial formaMaterial, Integer id, Integer idPedido, Integer idRepresentada, Double medidaExterna,
-			Double medidaInterna, String nomeRepresentada, Double precoUnidade, Integer quantidade,
-			Integer quantidadeRecepcionada, Integer sequencial, String siglaMaterial) {
+	public ItemPedido(Double aliquotaICMS, Double aliquotaIPI, Double comprimento, String descricaoMaterial,
+			String descricaoPeca, FormaMaterial formaMaterial, Integer id, Integer idPedido, Integer idRepresentada,
+			Double medidaExterna, Double medidaInterna, String nomeRepresentada, Double precoUnidade,
+			Integer quantidade, Integer quantidadeRecepcionada, Integer sequencial, String siglaMaterial) {
+		this.aliquotaICMS = aliquotaICMS;
 		this.aliquotaIPI = aliquotaIPI;
 		this.comprimento = comprimento;
 		this.descricaoPeca = descricaoPeca;
@@ -242,13 +243,13 @@ public class ItemPedido extends Item {
 
 	// Construtor usado para recuperar os dados que serao utilizados para gerar
 	// um pagamento do item
-	public ItemPedido(Double aliquotaIPI, Double comprimento, String descricaoMaterial, String descricaoPeca,
-			FormaMaterial formaMaterial, Integer id, Integer idPedido, Integer idRepresentada, Double medidaExterna,
-			Double medidaInterna, String nomeRepresentada, Double precoUnidade, Integer quantidade, Integer sequencial,
-			String siglaMaterial) {
-		this(aliquotaIPI, comprimento, descricaoMaterial, descricaoPeca, formaMaterial, id, idPedido, idRepresentada,
-				medidaExterna, medidaInterna, nomeRepresentada, precoUnidade, quantidade, null, sequencial,
-				siglaMaterial);
+	public ItemPedido(Double aliquotaICMS, Double aliquotaIPI, Double comprimento, String descricaoMaterial,
+			String descricaoPeca, FormaMaterial formaMaterial, Integer id, Integer idPedido, Integer idRepresentada,
+			Double medidaExterna, Double medidaInterna, String nomeRepresentada, Double precoUnidade,
+			Integer quantidade, Integer sequencial, String siglaMaterial) {
+		this(aliquotaICMS, aliquotaIPI, comprimento, descricaoMaterial, descricaoPeca, formaMaterial, id, idPedido,
+				idRepresentada, medidaExterna, medidaInterna, nomeRepresentada, precoUnidade, quantidade, null,
+				sequencial, siglaMaterial);
 	}
 
 	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS) {

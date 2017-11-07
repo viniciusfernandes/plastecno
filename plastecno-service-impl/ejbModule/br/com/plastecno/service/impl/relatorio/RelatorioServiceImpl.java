@@ -99,7 +99,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 		WritableFont cellFont = new WritableFont(WritableFont.TIMES, 12);
 		cellFont.setColour(Colour.WHITE);
-		
+
 		WritableCellFormat cf = new WritableCellFormat(cellFont);
 		cf.setBorder(Border.ALL, BorderLineStyle.THIN);
 		cf.setBackground(Colour.GREEN);
@@ -466,7 +466,8 @@ public class RelatorioServiceImpl implements RelatorioService {
 			return relatorio;
 		}
 
-		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)) {
+		if (idVendedor == null || usuarioService.isVendaPermitida(idCliente, idVendedor)
+				|| usuarioService.isCompraPermitida(idVendedor)) {
 			List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdClienteIdVendedorIdFornecedor(
 					idCliente, null, idFornecedor, isOrcamento, isCompra, indiceRegistroInicial, numeroMaximoRegistros,
 					itemVendido);

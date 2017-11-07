@@ -13,7 +13,7 @@ import br.com.plastecno.service.LogradouroService;
 import br.com.plastecno.service.RamoAtividadeService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
-import br.com.plastecno.service.constante.TipoAcesso;
+import static br.com.plastecno.service.constante.TipoAcesso.*;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.ComentarioCliente;
 import br.com.plastecno.service.entity.ContatoCliente;
@@ -54,7 +54,7 @@ public class ClienteController extends AbstractController {
 
         setNomeTela("Cliente");
         inicializarPicklist("Redespacho", "Cadastradas", "Redespacho", "id", "nomeFantasia", false, "Transportadora");
-        verificarPermissaoAcesso("isAssociacaoVendedorPermitida", TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS);
+        verificarPermissaoAcesso("isAssociacaoVendedorPermitida", ADMINISTRACAO, GERENCIA_VENDAS);
     }
 
     @Post("cliente/associacaovendedor")
@@ -80,9 +80,9 @@ public class ClienteController extends AbstractController {
         final boolean isInclusaoCliente = cliente == null || cliente.getId() == null;
         final boolean isVendedorIgual = cliente != null && cliente.getVendedor() != null
                 && getCodigoUsuario().equals(cliente.getVendedor().getId());
-        final boolean isAdministrador = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+        final boolean isAcessoEdicao = isAcessoPermitido(ADMINISTRACAO, FATURAMENTO);
         boolean isRevendedor = cliente != null && cliente.isRevendedor();
-        addAtributo("acessoInclusaoPermitido", isAdministrador || isInclusaoCliente || isVendedorIgual || isRevendedor);
+        addAtributo("acessoInclusaoPermitido", isAcessoEdicao || isInclusaoCliente || isVendedorIgual || isRevendedor);
     }
 
     @Post("cliente/contactar")

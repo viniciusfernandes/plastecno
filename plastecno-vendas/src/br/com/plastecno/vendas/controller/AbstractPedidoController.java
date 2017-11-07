@@ -257,8 +257,8 @@ public class AbstractPedidoController extends AbstractController {
      * em que o usuario seja um administrador, sendo assim, ele podera consultar
      * os pedidos de todos os vendedores
      */
-    private RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioPaginadoItemPedido(Integer idCliente,
-            Integer idVendedor, Integer idFornecedor, boolean isOrcamento, boolean isCompra, Integer paginaSelecionada,
+    private RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioPaginadoItemPedido(Integer idCliente, Integer idUsuario,
+            Integer idFornecedor, boolean isOrcamento, boolean isCompra, Integer paginaSelecionada,
             ItemPedido itemVendido) {
         final int indiceRegistroInicial = calcularIndiceRegistroInicial(paginaSelecionada);
 
@@ -268,8 +268,8 @@ public class AbstractPedidoController extends AbstractController {
         // adiministrador do sistema, podendo ser um outro vendedor ou nao.
         boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
         RelatorioWrapper<Pedido, ItemPedido> relatorio = relatorioService
-                .gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente, pesquisarTodos ? null
-                        : idVendedor, idFornecedor, isOrcamento, isCompra, indiceRegistroInicial,
+                .gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
+                        pesquisarTodos ? null : idUsuario, idFornecedor, isOrcamento, isCompra, indiceRegistroInicial,
                         getNumerRegistrosPorPagina(), itemVendido);
 
         for (GrupoWrapper<Pedido, ItemPedido> grupo : relatorio.getListaGrupo()) {
@@ -396,7 +396,8 @@ public class AbstractPedidoController extends AbstractController {
         Integer idUsu = getCodigoUsuario();
         final boolean isAcessoVendaPermitido = (idVend == null || idUsu.equals(idVend))
                 && (isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_VENDAS));
-        return isAcessoVendaPermitido;
+        final boolean isAcessoCompraPermitida = isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+        return isAcessoVendaPermitido || isAcessoCompraPermitida;
     }
 
     boolean isVisulizacaoPermitida(Integer idPedido, TipoPedido tipoPedido) {
@@ -418,9 +419,8 @@ public class AbstractPedidoController extends AbstractController {
         return isAcessoVendaPermitido;
     }
 
-    public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
-            TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido,
-            Integer[] listaIdItemSelecionado) {
+    void pesquisarPedidoByIdCliente(Integer idCliente, Integer idUsuario, Integer idFornecedor, TipoPedido tipoPedido,
+            boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido, Integer[] listaIdItemSelecionado) {
         boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
         if (idCliente == null) {
             gerarListaMensagemAlerta("Cliente é obrigatório para a pesquisa de pedidos");
@@ -429,7 +429,7 @@ public class AbstractPedidoController extends AbstractController {
         } else {
 
             final RelatorioWrapper<Pedido, ItemPedido> relatorio = gerarRelatorioPaginadoItemPedido(idCliente,
-                    idVendedor, idFornecedor, orcamento, isCompra, paginaSelecionada, itemVendido);
+                    idUsuario, idFornecedor, orcamento, isCompra, paginaSelecionada, itemVendido);
             inicializarRelatorioPaginadoSemRedirecionar(paginaSelecionada, relatorio, "relatorioItemPedido");
 
             /*

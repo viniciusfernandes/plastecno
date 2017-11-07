@@ -3,9 +3,7 @@ package br.com.plastecno.vendas.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
@@ -491,7 +489,7 @@ public class PedidoController extends AbstractPedidoController {
     public void pesquisarPedidoByIdCliente(Integer idCliente, Integer idVendedor, Integer idFornecedor,
             TipoPedido tipoPedido, boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido,
             Integer[] listaIdItemSelecionado) {
-
+        // Chamdo o metodo da classe abstrata
         super.pesquisarPedidoByIdCliente(idCliente, idVendedor, idFornecedor, tipoPedido, orcamento, paginaSelecionada,
                 itemVendido, listaIdItemSelecionado);
 

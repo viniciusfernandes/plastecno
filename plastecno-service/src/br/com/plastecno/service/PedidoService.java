@@ -43,7 +43,15 @@ public interface PedidoService {
 
 	List<Date> calcularDataPagamento(Integer idPedido);
 
+	List<Date> calcularDataPagamento(Integer idPedido, Date dataInicial);
+
 	Double calcularPesoItemPedido(ItemPedido itemPedido) throws AlgoritmoCalculoException;
+
+	Double calcularValorFretePorItemByIdItem(Integer idItem);
+
+	Double calcularValorFretePorItemByIdPedido(Integer idPedido);
+
+	Double[] calcularValorFreteUnidadeByIdPedido(Integer idPedido);
 
 	void cancelarOrcamento(Integer idOrcamento) throws BusinessException;
 
@@ -51,6 +59,8 @@ public interface PedidoService {
 
 	Integer comprarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
 			throws BusinessException;
+
+	boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem);
 
 	boolean contemItemPedido(Integer idPedido);
 
@@ -112,8 +122,6 @@ public interface PedidoService {
 
 	double pesquisarComissaoRepresentadaByIdPedido(Integer idPedido);
 
-	List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo);
-
 	Pedido pesquisarCompraById(Integer id);
 
 	List<Pedido> pesquisarCompraByPeriodoEComprador(Periodo periodo, Integer idComprador) throws BusinessException;
@@ -132,6 +140,8 @@ public interface PedidoService {
 
 	List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido);
 
+	Integer pesquisarIdItemPedidoByIdPedidoSequencial(Integer idPedido, Integer sequencial);
+
 	Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido);
 
 	List<Integer> pesquisarIdPedidoAguardandoCompra();
@@ -147,6 +157,8 @@ public interface PedidoService {
 	List<Integer> pesquisarIdPedidoByIdItemPedido(List<Integer> listaIdItemPedido);
 
 	List<Integer> pesquisarIdPedidoItemAguardandoCompra();
+
+	Integer[] pesquisarIdPedidoQuantidadeSequencialByIdPedido(Integer idItem);
 
 	Integer pesquisarIdRepresentadaByIdPedido(Integer idPedido);
 
@@ -170,11 +182,17 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
+	List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo);
+
 	List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo);
+
+	List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, Periodo periodo);
 
 	List<ItemPedido> pesquisarItemPedidoEncomendado();
 
 	List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal);
+
+	ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido);
 
 	List<ItemPedido> pesquisarItemPedidoRepresentacaoByPeriodo(Periodo periodo);
 
@@ -210,6 +228,8 @@ public interface PedidoService {
 
 	int pesquisarQuantidadeItemPedido(Integer idItemPedido);
 
+	Integer[] pesquisarQuantidadeItemPedidoByIdItemPedido(Integer idItemPedido);
+
 	List<Integer[]> pesquisarQuantidadeItemPedidoByIdPedido(Integer idPedido);
 
 	int pesquisarQuantidadeNaoRecepcionadaItemPedido(Integer idItemPedido);
@@ -244,6 +264,8 @@ public interface PedidoService {
 
 	Long pesquisarTotalItemPedido(Integer idPedido);
 
+	long pesquisarTotalItemPedidoByIdItem(Integer idItem);
+
 	Long pesquisarTotalPedidoByIdClienteIdFornecedor(Integer idCliente, Integer idFornecedor, boolean isOrcamento,
 			boolean isCompra);
 
@@ -258,7 +280,9 @@ public interface PedidoService {
 
 	Transportadora pesquisarTransportadoraResumidaByIdPedido(Integer idPedido);
 
-	Double pesquisarValorFretePorItemByIdPedido(Integer idPedido);
+	Double pesquisarValorFreteByIdItem(Integer idItem);
+
+	Double pesquisarValorFreteByIdPedido(Integer idPedido);
 
 	Double pesquisarValorPedido(Integer idPedido);
 

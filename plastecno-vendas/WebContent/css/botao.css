@@ -99,6 +99,14 @@
 	width: 24px;
 }
 
+.botaoCesta:hover {
+	background: url("../images/cesta_16.png") no-repeat scroll
+		0 0 transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoCestaPequeno {
 	background: url("../images/cesta_16.png") no-repeat scroll 0 0
 		transparent;
@@ -456,6 +464,54 @@
 	cursor: pointer;
 	height: 24px;
 	width: 24px;
+}
+
+.botaoVerificacaoFalhaGrande {
+	background: url("../images/checked_red_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoVerificacaoFalhaPequeno {
+	background: url("../images/checked_red_16.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
+.botaoVerificacaoAguardadaGrande {
+	background: url("../images/checked_yellow_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoVerificacaoAguardadaPequeno {
+	background: url("../images/checked_yellow_16.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
+.botaoVerificacaoEfetuadaGrande {
+	background: url("../images/checked_green_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoVerificacaoEfetuadaPequeno {
+	background: url("../images/checked_green_16.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
 }
 
 .botaoVerificarPequeno {

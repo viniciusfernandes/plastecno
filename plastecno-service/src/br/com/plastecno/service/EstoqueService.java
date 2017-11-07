@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoReservaEstoque;
 import br.com.plastecno.service.entity.Item;
@@ -15,6 +16,14 @@ import br.com.plastecno.service.exception.BusinessException;
 
 @Local
 public interface EstoqueService {
+
+	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada) throws BusinessException;
+
+	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada, String ncm)
+			throws BusinessException;
+
+	Integer alterarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
+			throws BusinessException;
 
 	double calcularPrecoCustoItemEstoque(Item filtro);
 
@@ -68,14 +77,15 @@ public interface EstoqueService {
 
 	void reajustarPrecoItemEstoque(ItemEstoque itemReajustado) throws BusinessException;
 
-	Integer recepcionarItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada) throws BusinessException;
+	Integer recalcularEstoqueItemCompra(Integer idItemCompra, Integer quantidade) throws BusinessException;
 
-	Integer recepcionarItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada, String ncm)
-			throws BusinessException;
+	ItemEstoque recalcularValorItemEstoque(ItemEstoque itemEstoque) throws AlgoritmoCalculoException;
 
 	Integer recortarItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
+
+	Integer removerEstoqueItemCompra(Integer idItemCompra, Integer quantidadeRemovida) throws BusinessException;
 
 	boolean reservarItemPedido(Integer idPedido) throws BusinessException;
 

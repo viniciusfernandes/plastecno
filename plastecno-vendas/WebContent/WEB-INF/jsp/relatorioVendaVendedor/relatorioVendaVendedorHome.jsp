@@ -118,12 +118,18 @@
 							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${venda.nomeCliente}</td>
 							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">${venda.valorVendaFormatado}</td>
 							<td class="fundo${iteracaoRepresentada.index % 2 == 0 ? 1 : 2}">
-								<form action="<c:url value="/pedido/pdf"/>">
-									<input type="hidden" name="idPedido"
-										value="${venda.numeroPedido}" /> <input type="submit" value=""
-										title="Visualizar Pedido PDF" class="botaoPDF"
-										style="border: none;" />
-								</form>
+								
+							<form action="<c:url value="${orcamento ? '/orcamento/pdf': '/pedido/pdf'}"/>">
+								<input type="hidden" name="idPedido" value="${venda.numeroPedido}" />
+								<div class="input" style="width: 40%">
+									<input type="submit" value="" title="Visualizar Pedido/Orçamto PDF" class="botaoPDFPequeno" style="border: none;" />
+								</div>
+							</form>
+							<form action="<c:url value="${orcamento ? '/orcamento/' : '/pedido/'}${venda.numeroPedido}"/>">
+								<div class="input" style="width: 40%">
+									<input type="submit" value="" title="Editar pedido/Orçamto" class="botaoEditar" style="border: none;" />
+								</div>
+							</form>
 							</td>
 
 						</tr>

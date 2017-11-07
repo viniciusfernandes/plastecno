@@ -36,10 +36,12 @@ public interface RelatorioService {
 
 	List<Pedido> gerarRelatorioCompra(Periodo periodo) throws InformacaoInvalidaException;
 
-	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
+	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecepcao(Integer idRepresentada,
 			Periodo periodo);
 
 	RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicata(Periodo periodo) throws BusinessException;
+
+	RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicataByIdCliente(Integer idCliente) throws BusinessException;
 
 	RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicataByIdPedido(Integer idPedido) throws BusinessException;
 
@@ -54,6 +56,9 @@ public interface RelatorioService {
 	RelatorioWrapper<Pedido, ItemPedido> gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(Integer idCliente,
 			Integer idVendedor, Integer idFornecedor, boolean isOrcamento, boolean isCompra,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros, ItemPedido itemVendido);
+
+	RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemPedidoCompraEfetivada(Integer idRepresentada,
+			Periodo periodo);
 
 	RelatorioWrapper<Integer, NFeItemFracionado> gerarRelatorioPedidoFracionado();
 

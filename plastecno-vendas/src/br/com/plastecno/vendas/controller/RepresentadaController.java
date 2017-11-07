@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.caelum.vraptor.Get;
@@ -20,6 +21,7 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
+import br.com.plastecno.vendas.json.SerializacaoJson;
 import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
@@ -135,6 +137,17 @@ public class RepresentadaController extends AbstractController {
 
         addAtributo("representada", filtro);
         addAtributo("listaRepresentada", lista);
+    }
+
+    @Get("representada/fornecedor/listagem")
+    public void pesquisarFornecedorByNomeFantasia(String nomeFantasia) {
+        List<Representada> listaFornecedor = representadaService.pesquisarFornecedorAtivoByNomeFantasia(nomeFantasia);
+        List<Autocomplete> lista = new ArrayList<Autocomplete>(50);
+        for (Representada f : listaFornecedor) {
+            lista.add(new Autocomplete(f.getId(), f.getNomeFantasia()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
+
     }
 
     @Get("representada/edicao")

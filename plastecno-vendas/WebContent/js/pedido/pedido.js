@@ -18,84 +18,92 @@ function habilitarPreenchimentoMedidaInterna(temMedidaInterna) {
 	habilitar('#bloco_item_pedido #medidaInterna', temMedidaInterna);
 };
 
-
-
 function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 		urlInclusaoItemPedido) {
 	toUpperCaseInput();
 	toLowerCaseInput();
-	
+
 	var parametros = $('#formPedido').serialize();
 	parametros += serializarBloco('bloco_dados_nota_fiscal');
 	parametros += recuperarParametrosBlocoContato();
-	// Esse termo foi incluido para podermos recuperar o nome do cliente no caso em que temos um orcamento e o cliente nao exista.
-	parametros += '&pedido.cliente.nomeFantasia='+$('#formPedido #nomeCliente').val(); 
+	// Esse termo foi incluido para podermos recuperar o nome do cliente no caso
+	// em que temos um orcamento e o cliente nao exista.
+	parametros += '&pedido.cliente.nomeFantasia='
+			+ $('#formPedido #nomeCliente').val();
 	var request = $.ajax({
 		type : "post",
 		url : urlInclusaoPedido,
 		data : parametros
 	});
 
-	request.done(function(response) {
-		var erros = response.erros;
-		var contemErro = erros != undefined;
-		/*
-		 * Ocultando no caso de que o usuario envie um novo request com a area
-		 * de mensagem renderizada e deve ser um hide para que o bloco suma
-		 * rapidamente apos novo request
-		 */
-		$('#bloco_mensagem').hide();
+	request
+			.done(function(response) {
+				var erros = response.erros;
+				var contemErro = erros != undefined;
+				/*
+				 * Ocultando no caso de que o usuario envie um novo request com
+				 * a area de mensagem renderizada e deve ser um hide para que o
+				 * bloco suma rapidamente apos novo request
+				 */
+				$('#bloco_mensagem').hide();
 
-		var pedidoJson = response.pedido;
-		var contemPedido =pedidoJson != undefined && pedidoJson != null;
-		if (!contemErro && contemPedido) {
-			/*
-			 * Temos que ter esse campo oculto pois o campo Numero do Pedido na
-			 * tela sera desabilitado e nao sera enviado no request.
-			 */
-			$('#idCliente').val(pedidoJson.idCliente);
-			$('#numeroPedido').val(pedidoJson.id);
-			$('#tipoPedido').val(pedidoJson.tipoPedido);
-			$('#numeroPedidoPesquisa').val(pedidoJson.id);
-			$('#formEnvioPedido #idPedido').val(pedidoJson.id);
-			
-			$('#situacaoPedido').val(pedidoJson.situacaoPedido);
-			
-			// preenchendo esse campo caso o usuario queira cancelar o pedido
-			$('#idPedidoCancelamento').val(pedidoJson.id);
-			$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);
-			$('#proprietario').val(
-					pedidoJson.proprietario.nome + ' - '
-							+ pedidoJson.proprietario.email);
-			$('#idVendedor').val(pedidoJson.proprietario.id);
-			$('#formEnvioPedido #botaoEnviarPedido').show();
-			
-			habilitar('#numeroPedidoPesquisa', false);
+				var pedidoJson = response.pedido;
+				var contemPedido = pedidoJson != undefined
+						&& pedidoJson != null;
+				if (!contemErro && contemPedido) {
+					/*
+					 * Temos que ter esse campo oculto pois o campo Numero do
+					 * Pedido na tela sera desabilitado e nao sera enviado no
+					 * request.
+					 */
+					$('#idCliente').val(pedidoJson.idCliente);
+					$('#numeroPedido').val(pedidoJson.id);
+					$('#tipoPedido').val(pedidoJson.tipoPedido);
+					$('#numeroPedidoPesquisa').val(pedidoJson.id);
+					$('#formEnvioPedido #idPedido').val(pedidoJson.id);
 
-			/*
-			 * Nao adicionaremos a mensagem de sucesso no caso em que o usuario
-			 * ja esteja incluindo os itens do pedido
-			 */
-			if (!itemPedidoAcionado) {
-				gerarListaMensagemSucesso(new Array('O pedido No. '
-						+ pedidoJson.id + ' foi incluido com sucesso.'));
-			}
+					$('#situacaoPedido').val(pedidoJson.situacaoPedido);
 
-		} else if(!contemErro && !contemPedido) {
-			gerarListaMensagemAlerta(['O usuario pode nao estar logado no sistema']);
-		} else if(contemErro) {
-			gerarListaMensagemErro(erros);
-		}
-	});
+					// preenchendo esse campo caso o usuario queira cancelar o
+					// pedido
+					$('#idPedidoCancelamento').val(pedidoJson.id);
+					$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);
+					$('#proprietario').val(
+							pedidoJson.proprietario.nome + ' - '
+									+ pedidoJson.proprietario.email);
+					$('#idVendedor').val(pedidoJson.proprietario.id);
+					$('#formEnvioPedido #botaoEnviarPedido').show();
 
-	request.always(function(response) {
-		// se nao contem erro e foi clicao o botao de inclusao de item de
-		// pedidos
-		var pedido = response.pedido;
-		if (itemPedidoAcionado && response.erros == undefined && pedido != undefined && pedido != null && !isEmpty(pedido.id)) {
-			inserirItemPedido(pedido.id, urlInclusaoItemPedido);
-		}
-	});
+					habilitar('#numeroPedidoPesquisa', false);
+
+					/*
+					 * Nao adicionaremos a mensagem de sucesso no caso em que o
+					 * usuario ja esteja incluindo os itens do pedido
+					 */
+					if (!itemPedidoAcionado) {
+						gerarListaMensagemSucesso(new Array('O pedido No. '
+								+ pedidoJson.id + ' foi incluido com sucesso.'));
+					}
+
+				} else if (!contemErro && !contemPedido) {
+					gerarListaMensagemAlerta([ 'O usuario pode nao estar logado no sistema' ]);
+				} else if (contemErro) {
+					gerarListaMensagemErro(erros);
+				}
+			});
+
+	request
+			.always(function(response) {
+				// se nao contem erro e foi clicao o botao de inclusao de item
+				// de
+				// pedidos
+				var pedido = response.pedido;
+				if (itemPedidoAcionado && response.erros == undefined
+						&& pedido != undefined && pedido != null
+						&& !isEmpty(pedido.id)) {
+					inserirItemPedido(pedido.id, urlInclusaoItemPedido);
+				}
+			});
 
 	request.fail(function(request, status) {
 		alert('Falha inclusao do pedido => Status da requisicao: ' + status);
@@ -128,10 +136,10 @@ function inicializarAutocompleteCliente(url, preencherCampos) {
 				var contemErro = erros != undefined;
 				if (!contemErro) {
 					var clienteJson = response.cliente;
-					if(clienteJson==undefined || clienteJson==null){
+					if (clienteJson == undefined || clienteJson == null) {
 						return;
 					}
-					if(preencherCampos != undefined){
+					if (preencherCampos != undefined) {
 						preencherCampos(clienteJson);
 					}
 					/*
@@ -155,9 +163,34 @@ function inicializarAutocompleteMaterial(url) {
 		campoPesquisavel : 'material',
 		parametro : 'sigla',
 		containerResultados : 'containerPesquisaMaterial',
-		gerarVinculo : function () {return 'idRepresentada=' + $('#representada').val()},
+		gerarVinculo : function() {
+			return 'idRepresentada=' + $('#representada').val()
+		},
 		selecionarItem : function(itemLista) {
 			$('#idMaterial').val(itemLista.id);
+		}
+	});
+};
+
+function inicializarAutocompleteContatoCliente(url) {
+	autocompletar({
+		url : url,
+		campoPesquisavel : 'contato_nome',
+		parametro : 'nomeContato',
+		containerResultados : 'containerContatoCliente',
+		gerarVinculo : function() {
+			return 'idCliente=' + $('#formPedido #idCliente').val()
+		},
+		selecionarItem : function(contato) {
+			$('#contato_idContato').val(contato.id);
+			$('#contato_nome').val(contato.nome);
+			$('#contato_departamento').val(contato.departamento);
+			$('#contato_email').val(contato.email);
+			$('#contato_ddi').val(contato.ddi);
+			$('#contato_ddd').val(contato.ddd);
+			$('#contato_telefone').val(contato.telefone);
+			$('#contato_ramal').val(contato.ramal);
+			$('#contato_fax').val(contato.fax);
 		}
 	});
 };
@@ -175,96 +208,108 @@ function inicializarAutocompleteDescricaoPeca(url) {
 };
 
 function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
-		var parametros = serializarBloco('bloco_item_pedido');
-		parametros += '&numeroPedido=' + numeroPedido;
-		var request = $.ajax({
-			type : 'post',
-			url : urlInclusaoItemPedido,
-			data : parametros,
-			async: false
-		});
+	var parametros = serializarBloco('bloco_item_pedido');
+	parametros += '&numeroPedido=' + numeroPedido;
+	var request = $.ajax({
+		type : 'post',
+		url : urlInclusaoItemPedido,
+		data : parametros,
+		async : false
+	});
 
-		request.done(function(response) {
-			var erros = response.erros;
-			var contemErro = erros != undefined;
-			// Ocultando no caso de que o usuario envie um novo request com a
-			// area de mensagem renderizada
-			$('#bloco_mensagem').fadeOut();
+	request
+			.done(function(response) {
+				var erros = response.erros;
+				var contemErro = erros != undefined;
+				// Ocultando no caso de que o usuario envie um novo request com
+				// a
+				// area de mensagem renderizada
+				$('#bloco_mensagem').fadeOut();
 
-			// Verificando se existe algum erro no processo de inclusao
-			var itemPedido = response.itemPedido;
-			var contemItem = itemPedido != undefined && itemPedido !=null;
-			if (!contemErro && contemItem) {
+				// Verificando se existe algum erro no processo de inclusao
 				var itemPedido = response.itemPedido;
-				// Esses valore de campos hidden serao utilizados na inclusao do
-				// novo item na tabela de itens do pedido
-				$('#bloco_item_pedido #tabelaItemPedido #valorPedido').html(
-						itemPedido.valorPedido);
-				$('#bloco_item_pedido #tabelaItemPedido #valorPedidoIPI').html(
-						itemPedido.valorPedidoIPI);
-				
-				$('#bloco_item_pedido #tabelaItemPedido #valorTotalSemFrete').html(
-						itemPedido.valorTotalPedidoSemFrete);
-				
-				$('#bloco_item_pedido #aliquotaICMS').val(
-						itemPedido.aliquotaICMS);
-				$('#bloco_item_pedido #precoUnidade').val(
-						itemPedido.precoUnidade);
-				// Esse campo sera usado para popular a tabela de itens com os
-				// dados pois nao estao no grid de inputs com os dados do item
-				$('#bloco_item_pedido #aliquotaIPI').val(
-						itemPedido.aliquotaIPI);
-				// Esse valores foram preenchidos no controller de acordo com a
-				// forma do material
-				$('#bloco_item_pedido #descricaoItemPedido').val(
-						itemPedido.descricaoItemPedido);
-				/*
-				 * Eh necessario esse campo pois cada linha da tabela de itens
-				 * do pedido deve conter um id para posteriormente efetuarmos a
-				 * edicao do item
-				 */
-				$('#bloco_item_pedido #idItemPedido').val(itemPedido.id);
-				
-				/*
-				 * O sequencial eh o indicador de qual item o vendedor esta atuando assim pode
-				 * fazer referencia a esse item no campo de observacao.
-				 */
-				$('#bloco_item_pedido #sequencial').val(itemPedido.sequencial);
-				
-				$('#bloco_item_pedido #aliquotaComissao').val(itemPedido.aliquotaComissao);
-				
-				/*
-				 * Aqui o campo de representada sera desabilitado e nao sera
-				 * enviado na submissao do formulario, por isso criamos um campo
-				 * oculto idRepresentada.
-				 */
-				$('#idRepresentada').val($('#representada').val());
-				$('#idRepresentada').attr('disabled', false);
-				
-				/*
-				 * Preenchendo o campo com o valor do item que foi calculado no servidor.
-				 */
-				$('#bloco_item_pedido #precoItem').val(itemPedido.precoItem);
-				
-				habilitar('#representada', false);
+				var contemItem = itemPedido != undefined && itemPedido != null;
+				if (!contemErro && contemItem) {
+					var itemPedido = response.itemPedido;
+					// Esses valore de campos hidden serao utilizados na
+					// inclusao do
+					// novo item na tabela de itens do pedido
+					$('#bloco_item_pedido #tabelaItemPedido #valorPedido')
+							.html(itemPedido.valorPedido);
+					$('#bloco_item_pedido #tabelaItemPedido #valorPedidoIPI')
+							.html(itemPedido.valorPedidoIPI);
 
-				tabelaItemHandler.adicionar();
-			} else if(!contemErro && !contemItem) {
-				gerarListaMensagemAlerta(['O usuário pode não estar logado no sistema']);
-			} else if(contemErro) {
-				gerarListaMensagemErro(erros);
-			}
-		});
+					$(
+							'#bloco_item_pedido #tabelaItemPedido #valorTotalSemFrete')
+							.html(itemPedido.valorTotalPedidoSemFrete);
 
-		request.fail(function(request, status) {
-			alert('Falha inclusao do tem do pedido => Status da requisicao: '
-					+ status);
-		});
+					$('#bloco_item_pedido #aliquotaICMS').val(
+							itemPedido.aliquotaICMS);
+					$('#bloco_item_pedido #precoUnidade').val(
+							itemPedido.precoUnidade);
+					// Esse campo sera usado para popular a tabela de itens com
+					// os
+					// dados pois nao estao no grid de inputs com os dados do
+					// item
+					$('#bloco_item_pedido #aliquotaIPI').val(
+							itemPedido.aliquotaIPI);
+					// Esse valores foram preenchidos no controller de acordo
+					// com a
+					// forma do material
+					$('#bloco_item_pedido #descricaoItemPedido').val(
+							itemPedido.descricaoItemPedido);
+					/*
+					 * Eh necessario esse campo pois cada linha da tabela de
+					 * itens do pedido deve conter um id para posteriormente
+					 * efetuarmos a edicao do item
+					 */
+					$('#bloco_item_pedido #idItemPedido').val(itemPedido.id);
 
-		request.always(function(response) {
-			$('#tipoVendaKilo').val('KILO');
-			$('#tipoVendaPeca').val('PECA');
-		});
+					/*
+					 * O sequencial eh o indicador de qual item o vendedor esta
+					 * atuando assim pode fazer referencia a esse item no campo
+					 * de observacao.
+					 */
+					$('#bloco_item_pedido #sequencial').val(
+							itemPedido.sequencial);
+
+					$('#bloco_item_pedido #aliquotaComissao').val(
+							itemPedido.aliquotaComissao);
+
+					/*
+					 * Aqui o campo de representada sera desabilitado e nao sera
+					 * enviado na submissao do formulario, por isso criamos um
+					 * campo oculto idRepresentada.
+					 */
+					$('#idRepresentada').val($('#representada').val());
+					$('#idRepresentada').attr('disabled', false);
+
+					/*
+					 * Preenchendo o campo com o valor do item que foi calculado
+					 * no servidor.
+					 */
+					$('#bloco_item_pedido #precoItem')
+							.val(itemPedido.precoItem);
+
+					habilitar('#representada', false);
+
+					tabelaItemHandler.adicionar();
+				} else if (!contemErro && !contemItem) {
+					gerarListaMensagemAlerta([ 'O usuário pode não estar logado no sistema' ]);
+				} else if (contemErro) {
+					gerarListaMensagemErro(erros);
+				}
+			});
+
+	request.fail(function(request, status) {
+		alert('Falha inclusao do tem do pedido => Status da requisicao: '
+				+ status);
+	});
+
+	request.always(function(response) {
+		$('#tipoVendaKilo').val('KILO');
+		$('#tipoVendaPeca').val('PECA');
+	});
 };
 
 function inicializarFiltro() {
@@ -272,14 +317,15 @@ function inicializarFiltro() {
 	$("#filtro_cnpj").val($("#cnpj").val());
 	$("#filtro_cpf").val($("#cpf").val());
 	$("#filtro_email").val($("#email").val());
-	
+
 	var tb = document.getElementById('tabelaListagemItemPedido');
 	var linhas = tb.linhasSelec;
-	if(linhas == undefined || linhas == null){
+	if (linhas == undefined || linhas == null) {
 		return;
 	}
 	for (var i = 0; i < linhas.length; i++) {
-		adicionarInputHiddenFormulario('formPesquisa', 'listaIdItemSelecionado['+i+']', linhas[i]);
+		adicionarInputHiddenFormulario('formPesquisa',
+				'listaIdItemSelecionado[' + i + ']', linhas[i]);
 	}
 };
 
@@ -289,7 +335,7 @@ function contactarCliente(idCliente) {
 };
 
 function preencherComboTransportadora(combo, listaTransportadora) {
-	if(combo == undefined){
+	if (combo == undefined) {
 		return;
 	}
 	var TOTAL_TRANSPORTADORAS = listaTransportadora.length;
@@ -300,13 +346,13 @@ function preencherComboTransportadora(combo, listaTransportadora) {
 };
 
 function habilitarIPI(urlTela, idRepresentada) {
-	if(isEmpty(idRepresentada)){
+	if (isEmpty(idRepresentada)) {
 		return;
 	}
 	var request = $.ajax({
 		type : 'get',
 		url : urlTela + '/representada/' + idRepresentada + '/aliquotaIPI/',
-		async: true
+		async : true
 	});
 
 	request.done(function(response) {

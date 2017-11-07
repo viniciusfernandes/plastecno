@@ -56,7 +56,7 @@ public class TotalizacaoPedidoWrapper {
 	}
 
 	public Double getValorTotal() {
-		return valorTotal;
+		return valorTotal == null ? 0 : valorTotal;
 	}
 
 	public String getValorTotalFormatado() {
@@ -64,7 +64,7 @@ public class TotalizacaoPedidoWrapper {
 	}
 
 	public Double getValorTotalIPI() {
-		return valorTotalIPI;
+		return valorTotalIPI == null ? 0 : valorTotalIPI;
 	}
 
 	public String getValorTotalIPIFormatado() {

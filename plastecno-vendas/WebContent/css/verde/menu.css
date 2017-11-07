@@ -16,7 +16,7 @@ body {
 
 #content {
 	background-color: white; 
-	box-shadow: 0px 0px 35px #6B7A69;
+	box-shadow: 0px 0px 35px #829E7E;
 	margin: 0 5%;
 	padding: 0 0.5%;
 	width: 90%; 
@@ -41,7 +41,7 @@ body {
 	background-image: url("../../images/logo_plastecno.jpg");
 	background-position: center center;
 	background-repeat: no-repeat;
-	height: 150px;
+	height: 70px;
 }
 
 .enfeite {
@@ -64,11 +64,11 @@ nav {
 }
 
 nav ul {
-	background: #6B7A69;
+	background: #829E7E;
 	height: 100%;
 	list-style: none;
 	position: relative;
-	margin: 0 0 5px;
+	margin: 0px;
 }
 
 nav ul:after {
@@ -82,7 +82,7 @@ nav ul li {
 }
 
 nav ul li a:hover {
-	/* box-shadow: 0 0 2px 1px #6B7A69; */
+	/* box-shadow: 0 0 2px 1px #829E7E; */
 }
 
 nav > ul li:not(:first-child) {
@@ -90,11 +90,11 @@ nav > ul li:not(:first-child) {
 }
 
 nav ul li a {
-	background: #6B7A69;
+	background: #829E7E;
 	color: white;
 	font-weight: bold;
 	display: block;
-	padding: 5px 40px;
+	padding: 5px 20px;
 	text-decoration: none;
 }
 
@@ -115,9 +115,9 @@ nav ul ul li {
 }
 
 nav ul ul li a {
-	background-color: #D7F7C5;
-	padding: 5px 40px;
-	color: #6B7A69;
+	background-color: #829E7E;
+	padding: 5px 20px;
+	color: white;
 }
 
 nav ul ul ul {
@@ -132,14 +132,9 @@ nav ul ul li:hover a {
 	background: white;
 }
 
-nav ul li a:hover {
-	background: #D7F7C5;
-	color: #6B7A69;
-}
-
 nav ul ul li a:hover {
-	background: #6B7A69;
-	color: white;
+	background: #D7F7C5;
+	color: #829E7E;
 }
 
 

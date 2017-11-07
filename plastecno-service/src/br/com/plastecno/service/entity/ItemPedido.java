@@ -95,6 +95,9 @@ public class ItemPedido extends Item {
 	@Transient
 	private Integer idProprietario;
 
+	@Transient
+	private Integer idRepresentada;
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao pedido")
@@ -212,6 +215,41 @@ public class ItemPedido extends Item {
 	private String valorTotalPedidoSemFreteFormatado;
 
 	public ItemPedido() {
+	}
+
+	// Construtor usado para recuperar os dados que serao utilizados para gerar
+	// um pagamento do item
+	public ItemPedido(Double aliquotaICMS, Double aliquotaIPI, Double comprimento, String descricaoMaterial,
+			String descricaoPeca, FormaMaterial formaMaterial, Integer id, Integer idPedido, Integer idRepresentada,
+			Double medidaExterna, Double medidaInterna, String nomeRepresentada, Double precoUnidade,
+			Integer quantidade, Integer quantidadeRecepcionada, Integer sequencial, String siglaMaterial) {
+		this.aliquotaICMS = aliquotaICMS;
+		this.aliquotaIPI = aliquotaIPI;
+		this.comprimento = comprimento;
+		this.descricaoPeca = descricaoPeca;
+		this.formaMaterial = formaMaterial;
+		this.id = id;
+		this.idRepresentada = idRepresentada;
+		this.idPedido = idPedido;
+		this.material = new Material(null, siglaMaterial, descricaoMaterial);
+		this.medidaExterna = medidaExterna;
+		this.medidaInterna = medidaInterna;
+		this.nomeRepresentada = nomeRepresentada;
+		this.precoUnidade = precoUnidade;
+		this.quantidade = quantidade;
+		this.quantidadeRecepcionada = quantidadeRecepcionada;
+		this.sequencial = sequencial;
+	}
+
+	// Construtor usado para recuperar os dados que serao utilizados para gerar
+	// um pagamento do item
+	public ItemPedido(Double aliquotaICMS, Double aliquotaIPI, Double comprimento, String descricaoMaterial,
+			String descricaoPeca, FormaMaterial formaMaterial, Integer id, Integer idPedido, Integer idRepresentada,
+			Double medidaExterna, Double medidaInterna, String nomeRepresentada, Double precoUnidade,
+			Integer quantidade, Integer sequencial, String siglaMaterial) {
+		this(aliquotaICMS, aliquotaIPI, comprimento, descricaoMaterial, descricaoPeca, formaMaterial, id, idPedido,
+				idRepresentada, medidaExterna, medidaInterna, nomeRepresentada, precoUnidade, quantidade, null,
+				sequencial, siglaMaterial);
 	}
 
 	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS) {
@@ -337,8 +375,8 @@ public class ItemPedido extends Item {
 		setQuantidadeReservada(getQuantidadeReservada() + quantidadeReservada);
 	}
 
-	public double calcularPrecoTotal() {
-		return this.quantidade != null && this.precoVenda != null ? this.quantidade * this.precoVenda : 0d;
+	public double calcularPrecoTotalVenda() {
+		return this.quantidade != null && precoVenda != null ? quantidade * precoVenda : 0d;
 	}
 
 	@Override
@@ -445,6 +483,10 @@ public class ItemPedido extends Item {
 		return idProprietario;
 	}
 
+	public Integer getIdRepresentada() {
+		return idRepresentada;
+	}
+
 	public Material getMaterial() {
 		return material;
 	}
@@ -526,11 +568,15 @@ public class ItemPedido extends Item {
 	}
 
 	public Integer getQuantidadeRecepcionada() {
-		return quantidadeRecepcionada;
+		return quantidadeRecepcionada == null ? 0 : quantidadeRecepcionada;
 	}
 
 	public Integer getQuantidadeReservada() {
 		return quantidadeReservada == null ? 0 : quantidadeReservada;
+	}
+
+	public int getQuantidadeRestanteRecepcionar() {
+		return getQuantidade() - getQuantidadeRecepcionada();
 	}
 
 	public Integer getSequencial() {
@@ -586,7 +632,11 @@ public class ItemPedido extends Item {
 	}
 
 	public double getValorTotal() {
-		return calcularPrecoTotal();
+		return calcularPrecoTotalVenda();
+	}
+
+	public double getValorTotalIPI() {
+		return calcularPrecoTotalIPI();
 	}
 
 	public Double getValorTotalPedidoSemFrete() {
@@ -683,6 +733,10 @@ public class ItemPedido extends Item {
 
 	public void setIdProprietario(Integer idProprietario) {
 		this.idProprietario = idProprietario;
+	}
+
+	public void setIdRepresentada(Integer idRepresentada) {
+		this.idRepresentada = idRepresentada;
 	}
 
 	public void setMaterial(Material material) {

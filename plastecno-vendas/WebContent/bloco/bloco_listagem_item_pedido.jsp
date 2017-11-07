@@ -2,28 +2,14 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
-	var nome = 'listaIdItemSelecionado[]';	
-	var id = 'idItemSelec';
-	var idForm = 'formPesquisa';
-	var form = document.getElementById(idForm);
-	tabelaLinhaSelecionavel({
+	var listaIdSelecionado=<c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>;
+	tabelaLinhaSelecionavelExt({
+		idForm:'formPesquisa',
 		idTabela:'tabelaListagemItemPedido',
 		idBotaoLimpar:'botaoRemoverSelecaoItem',
-		listaValorSelecionado: <c:out value="${not empty listaIdItemSelecionado ? listaIdItemSelecionado : \'new Array()\'}"/>,
-		onSelect: function(checkbox){
-			gerarInputHiddenFormulario(idForm, id+$(checkbox).val(), nome, $(checkbox).val());
-		},
-		onUnselect: function(checkbox){
-			form.removeChild(document.getElementById(id+$(checkbox).val()));
-		},
-		onInit: function(valor){
-			gerarInputHiddenFormulario(idForm, id+valor, nome, valor);
-		},
-		onClean: function(){
-			$('#'+idForm+' input[id^=\''+id+'\']').remove();
-		}
+		listaIdSelecionado: listaIdSelecionado
 	});
-	
+
 	$('#botaoCopiarItem').click(function(){
 		$('#formPesquisa').attr('action', '<c:url value="${orcamento ? \'orcamento\' : \'pedido\' }/copiaitem"/>').attr('method', 'post').submit();
 	});
@@ -36,7 +22,7 @@ $(document).ready(function(){
 		<legend>::: Resultado da Pesquisa de Pedidos de ${isCompra ? 'Compra': 'Venda'} :::</legend>
 		<div id="paginador"></div>
 		<div class="bloco_botoes">
-			<input type="button" id="botaoCopiarItem" title="Gerar Novo ${orcamento ? 'Orçamento': 'Pedido'}" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoCopiarItem" title="Gerar Novo ${orcamento ? 'Orçamento': 'Pedido'}" value="" class="botaoCesta"/>
 			<input type="button" id="botaoRemoverSelecaoItem" value="" title="Remover Seleção Item" class="botaoLimpar" />
 		</div>
 		<div>

@@ -56,6 +56,9 @@ public final class DateUtils {
 			throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
 		}
 
+		if (inicio == null || fim == null) {
+			throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
+		}
 		inicio = gerarDataSemHorario(inicio);
 		fim = gerarDataSemHorario(fim);
 		return inicio.compareTo(fim) < 0;
@@ -66,11 +69,9 @@ public final class DateUtils {
 	}
 
 	public static boolean isPosteriror(Date inicio, Date fim) {
-
 		if (inicio == null || fim == null) {
 			throw new IllegalArgumentException("Ambas as datas inicio e fim devem ser preenchidas para a comparacao");
 		}
-
 		inicio = gerarDataSemHorario(inicio);
 		fim = gerarDataSemHorario(fim);
 		return inicio.compareTo(fim) > 0;
@@ -78,6 +79,18 @@ public final class DateUtils {
 
 	public static boolean isPosterirorDataAtual(final Date inicio) {
 		return isPosteriror(inicio, new Date());
+	}
+
+	public static Date retrocederData(Date dt) {
+		return retrocederData(dt, 1, 0);
+	}
+
+	public static Date retrocederData(Date dt, int dias, int meses) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(dt);
+		c.add(Calendar.MONTH, -dias);
+		c.add(Calendar.DAY_OF_MONTH, -meses);
+		return c.getTime();
 	}
 
 	private DateUtils() {

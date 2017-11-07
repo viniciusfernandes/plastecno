@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.entity.ContatoUsuario;
 import br.com.plastecno.service.entity.LogradouroUsuario;
 import br.com.plastecno.service.entity.PerfilAcesso;
@@ -28,9 +29,11 @@ public interface UsuarioService {
 
 	Integer inserir(Usuario usuario, boolean isAlteracaoSenha) throws BusinessException;
 
-	boolean isAdministrador(Integer idUsuario);
+	boolean isAcessoPermitido(Integer idUsuario, TipoAcesso... tipos);
 
 	boolean isClienteAssociadoVendedor(Integer idCliente, Integer idVendedor);
+
+	boolean isCompraPermitida(Integer idUsuario);
 
 	boolean isCPF(Integer id, String cpf);
 

@@ -1,5 +1,7 @@
 package br.com.plastecno.service.impl;
 
+import static br.com.plastecno.service.constante.TipoAcesso.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +29,6 @@ import br.com.plastecno.service.entity.PerfilAcesso;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.CriptografiaException;
-import br.com.plastecno.service.impl.anotation.TODO;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 import br.com.plastecno.util.StringUtils;
@@ -202,23 +203,34 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return usuario.getId() == null ? usuarioDAO.inserir(usuario).getId() : usuarioDAO.alterar(usuario).getId();
 	}
 
-	@TODO(descricao = "Remover o hardcoded administracao")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public boolean isAdministrador(Integer idUsuario) {
+	public boolean isAcessoPermitido(Integer idUsuario, TipoAcesso... tipos) {
 		List<PerfilAcesso> l = pesquisarPerfisAssociados(idUsuario);
+		TipoAcesso tp = null;
 		for (PerfilAcesso perfilAcesso : l) {
-			if (perfilAcesso.getDescricao().equals("ADMINISTRACAO")) {
-				return true;
+			tp = TipoAcesso.valueOf(perfilAcesso.getDescricao());
+			for (TipoAcesso t : tipos) {
+				if (t.equals((tp))) {
+					return true;
+				}
 			}
+
 		}
 		return false;
+
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isClienteAssociadoVendedor(Integer idCliente, Integer idVendedor) {
 		return usuarioDAO.pesquisarIdVendedorByIdCliente(idCliente, idVendedor) != null;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean isCompraPermitida(Integer idUsuario) {
+		return isAcessoPermitido(idUsuario, ADMINISTRACAO, CADASTRO_PEDIDO_COMPRA, RECEPCAO_COMPRA);
 	}
 
 	@Override
@@ -236,7 +248,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isVendaPermitida(Integer idCliente, Integer idVendedor) {
-		return isAdministrador(idVendedor) || isClienteAssociadoVendedor(idCliente, idVendedor);
+		return isAcessoPermitido(idVendedor, ADMINISTRACAO, GERENCIA_VENDAS)
+				|| isClienteAssociadoVendedor(idCliente, idVendedor);
 	}
 
 	@Override
@@ -384,7 +397,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 		Query query = entityManager.createQuery(select.toString()).setParameter("nome", "%" + nome + "%");
 		if (isVendedor) {
-			query.setParameter("idPerfilAcesso", TipoAcesso.CADASTRO_PEDIDO_VENDAS.indexOf());
+			query.setParameter("idPerfilAcesso", CADASTRO_PEDIDO_VENDAS.indexOf());
 		}
 		return query.getResultList();
 	}

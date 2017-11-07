@@ -35,7 +35,7 @@ public class RelatorioVendaVendedorController extends AbstractController {
     public void gerarRelatorioPedidoVendedor(boolean orcamento, Date dataInicial, Date dataFinal, Integer idVendedor) {
         try {
 
-            addAtributo("relatorio", this.relatorioService.gerarRelatorioVendaVendedor(orcamento, new Periodo(
+            addAtributo("relatorio", relatorioService.gerarRelatorioVendaVendedor(orcamento, new Periodo(
                     dataInicial, dataFinal), idVendedor));
             irRodapePagina();
         } catch (BusinessException e) {
@@ -63,9 +63,7 @@ public class RelatorioVendaVendedorController extends AbstractController {
     public void relatorioVendaVendedorHome() {
         configurarFiltroPediodoMensal();
         addAtributo("relatorioGerado", contemAtributo("relatorio"));
-        addAtributo("titulo",
-                isAcessoPermitido(TipoAcesso.OPERACAO_CONTABIL) ? "Relatório de Orçamento do Vendedor"
-                        : "Relatório de Vendas do Vendedor");
+        addAtributo("titulo", "Relatório de Venda/Orçamto do Vendedor");
 
         boolean acessoPesquisaVendaVendedorPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.GERENCIA_VENDAS, TipoAcesso.OPERACAO_CONTABIL);

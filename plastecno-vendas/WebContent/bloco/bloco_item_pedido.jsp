@@ -15,6 +15,7 @@ $(document).ready(function(){
 			return;			
 		}
 		pesquisarPrecoMinimo();
+		pesquisarNcm();
 		pesquisarPesoItem();
 	});
 	
@@ -48,7 +49,7 @@ $(document).ready(function(){
 	inserirMascaraMonetaria('precoVenda', 7);
 	inserirMascaraNumerica('aliquotaIPI', '99');
 	inserirMascaraMonetaria('aliquotaComissao', 5);
-	inserirMascaraMonetaria('aliquotaICMS', 5);
+	inserirMascaraNumerica('aliquotaICMS', '99');
 	inserirMascaraNumerica('quantidade', '9999999');
 	inserirMascaraMonetaria('comprimento', 8);
 	inserirMascaraMonetaria('peso', 8);
@@ -258,12 +259,13 @@ function pesquisarNcm(){
 			</c:forEach>
 		</select>
 	</div>
-	<c:if test="${acessoDadosNotaFiscalPermitido}">
-		<div class="label" >NCM:</div>
-		<div class="input" style="width: 80%">
-			<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}" style="width: 10%"/>
-		</div>
-	</c:if>
+	<div class="label" >NCM:</div>
+	<div class="input" style="width: 80%">
+		<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}" style="width: 10%" 	
+			<c:out value="${not acessoDadosNotaFiscalPermitido ? 'disabled=\"disabled\"' : ''}"/>"
+			<c:out value="${not acessoDadosNotaFiscalPermitido ? 'class=\"uppercaseBloqueado desabilitado\"' : ''}"/>
+		/>
+	</div>
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">
 			<a id="botaoInserirItemPedido" title="Adicionar Dados do Item do Pedido" class="botaoAdicionar"></a>

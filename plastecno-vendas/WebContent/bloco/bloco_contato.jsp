@@ -6,8 +6,8 @@
 
 	<div class="label condicional">Nome:</div>
 	<div class="input" style="width: 40%">
-		<input type="text" id="contato_nome" name="contato.nome"
-			value="${contato.nome}" />
+		<input type="text" id="contato_nome" name="contato.nome" value="${contato.nome}" />
+		<div class="suggestionsBox" id="containerContatoCliente" style="display: none; width: 50%"></div>
 	</div>
 
 	<div class="label condicional" style="width: 12%">Departamento:</div>

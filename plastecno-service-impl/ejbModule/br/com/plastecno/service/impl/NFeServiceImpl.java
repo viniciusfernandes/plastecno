@@ -9,6 +9,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -68,6 +70,7 @@ import br.com.plastecno.service.nfe.constante.TipoNFe;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoNFe;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.util.DateUtils;
 import br.com.plastecno.util.NumeroUtils;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.validacao.ValidadorInformacao;
@@ -382,6 +385,28 @@ public class NFeServiceImpl implements NFeService {
 		}
 	}
 
+	private void configurarNumeroParcela(List<NFeDuplicata> lDuplicata) {
+		if (lDuplicata == null) {
+			return;
+		}
+		// Ordenando a lista de duplicadas pois o numero da parcela sera dado
+		// pela ordem do elemento na lista.
+		Collections.sort(lDuplicata, new Comparator<NFeDuplicata>() {
+			@Override
+			public int compare(NFeDuplicata o1, NFeDuplicata o2) {
+				Date d1 = o1.getDataVencimento();
+				Date d2 = o2.getDataVencimento();
+				return d1 == null || d2 == null ? -1 : d1.compareTo(d2);
+			}
+		});
+		final int totParc = lDuplicata.size();
+		int parc = 0;
+		for (NFeDuplicata d : lDuplicata) {
+			d.setTotalParcelas(totParc);
+			d.setParcela(++parc);
+		}
+	}
+
 	private void configurarSubstituicaoTributariaPosValidacao(NFe nFe) {
 		List<DetalhamentoProdutoServicoNFe> l = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 		TributosProdutoServico t = null;
@@ -505,19 +530,32 @@ public class NFeServiceImpl implements NFeService {
 			return num;
 		}
 
+		Integer idCliente = pedidoService.pesquisarIdClienteByIdPedido(idPedido);
+		if (idCliente == null) {
+			throw new BusinessException("O ID do cliente do pedido No. " + idPedido
+					+ " não foi encontrado pelo sistema. Verifique se o cliente existe.");
+		}
+
 		Integer numeroNFe = Integer.parseInt(dados.getIdentificacaoNFe().getNumero());
+
 		List<NFeDuplicata> lista = new ArrayList<NFeDuplicata>();
+		Date dtVenc = null;
+		TipoSituacaoDuplicata tpSit = null;
 		for (DuplicataNFe dNFe : lDuplicata) {
 			try {
-				lista.add(new NFeDuplicata(StringUtils.parsearDataAmericano(dNFe.getDataVencimento()), dados
-						.getIdentificacaoDestinatarioNFe().getRazaoSocial(), numeroNFe, TipoSituacaoDuplicata.A_VENCER,
-						dNFe.getValor()));
+				dtVenc = StringUtils.parsearDataAmericano(dNFe.getDataVencimento());
+				tpSit = !DateUtils.isAnteriorDataAtual(dtVenc) ? TipoSituacaoDuplicata.A_VENCER
+						: TipoSituacaoDuplicata.VENCIDO;
+				lista.add(new NFeDuplicata(dtVenc, null, idCliente, dados.getIdentificacaoDestinatarioNFe()
+						.getRazaoSocial(), numeroNFe, tpSit, dNFe.getValor()));
 			} catch (ParseException e) {
 				throw new BusinessException(
 						"O campo de data de vendimento de uma das duplicatas não esta no formato correto. O valor enviado foi "
 								+ dNFe.getDataVencimento());
 			}
 		}
+
+		configurarNumeroParcela(lista);
 		duplicataService.inserirDuplicata(numeroNFe, lista);
 		return num;
 	}
@@ -570,12 +608,14 @@ public class NFeServiceImpl implements NFeService {
 	private List<DuplicataNFe> gerarDuplicataByIdPedido(Integer idPedido, boolean isDataAmericana) {
 		List<Date> listaData = pedidoService.calcularDataPagamento(idPedido);
 		double totalParcelas = listaData.size();
+		// EStamos retornando uma lista vazia de duplicatas pois para indicar
+		// que o pagamento da NF foi realizado a vista.
 		if (totalParcelas <= 0) {
 			return new ArrayList<DuplicataNFe>();
 		}
-		Double valorPedido = pedidoService.pesquisarValorPedido(idPedido);
+		Double valTotPed = pedidoService.pesquisarValorPedidoIPI(idPedido);
 
-		Double valorDuplicata = valorPedido != null ? valorPedido / totalParcelas : 0;
+		Double valorDuplicata = valTotPed != null ? valTotPed / totalParcelas : 0;
 		List<DuplicataNFe> listaDuplicata = new ArrayList<DuplicataNFe>();
 		DuplicataNFe dup = null;
 		for (Date d : listaData) {
@@ -744,31 +784,19 @@ public class NFeServiceImpl implements NFeService {
 					break;
 				}
 			}
-			// Validando primeiro a quantidade fracionada para depois validar o
-			// total ja fracionado, assim evitamos de ir ao banco de dados.
-			if (qtdeFrac > qtdeItem) {
-				throw new BusinessException("Não é possivel incluir um item fracionado com quantidade " + qtdeFrac
-						+ " pois a quantidade do item No. " + numItem + " é " + qtdeItem);
-			}
 
 			totalFrac = pesqusisarQuantidadeTotalFracionadoByIdItemPedidoNFeExcluida(idItem, numeroNFe);
-			if (totalFrac > qtdeItem) {
+			if (totalFrac + qtdeFrac > qtdeItem) {
 				throw new BusinessException(
 						"Não é possível fracionar uma quantidade maior do que a quantidade vendida para o item no. "
-								+ numItem + " do pedido no." + idPedido + ". Esse item contém apenas " + qtdeItem
-								+ " unidades.");
+								+ numItem + " do pedido no." + idPedido + ". Enviar no máximo "
+								+ (qtdeItem - totalFrac) + " unidades.");
 			}
-
-			// Caso ainda existam itens do pedido para serem fracionado iremos
-			// inserir o registro no banco.
-			if (totalFrac <= qtdeItem) {
-
-				// Aqui estamos configurando o ID do item fracionado para casa
-				// tenhamos uma edicao da NFe evitando a duplicacao de registro
-				// que poderia surgir no relatorio de itens fracionados.
-				nFeItemFracionadoDAO.alterar(new NFeItemFracionado(idItemFrac, idItem, idPedido, p.getDescricao(),
-						numItem, numeroNFe, qtdeItem, qtdeFrac, p.getValorTotalBruto()));
-			}
+			// Aqui estamos configurando o ID do item fracionado para casa
+			// tenhamos uma edicao da NFe evitando a duplicacao de registro
+			// que poderia surgir no relatorio de itens fracionados.
+			nFeItemFracionadoDAO.alterar(new NFeItemFracionado(idItemFrac, idItem, idPedido, p.getDescricao(), numItem,
+					numeroNFe, qtdeItem, qtdeFrac, p.getValorTotalBruto()));
 		}
 	}
 

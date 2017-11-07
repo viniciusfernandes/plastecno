@@ -378,7 +378,7 @@ public class EmissaoNFeController extends AbstractController {
             val[5] = i.getSequencial();
             val[6] = i.getQuantidade();
             val[7] = i.getTipoVenda().toString();
-            val[8] = NumeroUtils.arredondarValorMonetario(i.calcularPrecoTotal());
+            val[8] = NumeroUtils.arredondarValorMonetario(i.calcularPrecoTotalVenda());
             val[9] = NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade());
             val[10] = NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade());
             val[11] = NumeroUtils.arredondarValorMonetario(i.calcularValorICMS());
@@ -466,7 +466,7 @@ public class EmissaoNFeController extends AbstractController {
             List<ItemPedido> listaItem = nFeService.pesquisarQuantitadeItemRestanteByIdPedido(idPedido);
 
             double vFrete = NumeroUtils.arredondarValorMonetario(pedidoService
-                    .pesquisarValorFretePorItemByIdPedido(idPedido));
+                    .calcularValorFretePorItemByIdPedido(idPedido));
             addAtributo("valorFrete", vFrete);
 
             String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
@@ -476,8 +476,12 @@ public class EmissaoNFeController extends AbstractController {
                             + idPedido + ". VENDEDOR: " + nomeVend);
 
             double peso = calcularPesoLiquido(listaItem);
+            Double[] valFreteUni = pedidoService.calcularValorFreteUnidadeByIdPedido(idPedido);
             List<ProdutoServicoJson> listaProduto = gerarListaProdutoItemPedido(listaItem);
+
             addAtributo("quantidade", 1);
+            addAtributo("valorFretePedido", valFreteUni[0]);
+            addAtributo("valorFreteUnidade", NumeroUtils.arredondarValorMonetario(valFreteUni[1]));
             addAtributo("pesoLiquido", peso);
             addAtributo("pesoBruto", peso);
             addAtributo("especieVolume", "VOLUME");
@@ -561,7 +565,7 @@ public class EmissaoNFeController extends AbstractController {
         if (nf == null || idPedido == null) {
             return;
         }
-
+        List<DetalhamentoProdutoServicoNFe> listaDet = nf.getListaDetalhamentoProdutoServicoNFe();
         emissaoNFeHome();
 
         popularDestinatario(nf);
@@ -570,9 +574,14 @@ public class EmissaoNFeController extends AbstractController {
         addAtributo("idPedido", idPedido);
         addAtributo("listaNumeroNFe", nFeService.pesquisarNumeroNFeByIdPedido(idPedido));
         addAtributo("nf", nf);
-        addAtributo("listaProduto", gerarListaProdutoDetalhamento(nf.getListaDetalhamentoProdutoServicoNFe()));
+        addAtributo("listaProduto", gerarListaProdutoDetalhamento(listaDet));
         addAtributo("infoAdFisco", nf.getInformacoesAdicionaisNFe() != null ? nf.getInformacoesAdicionaisNFe()
                 .getInformacoesAdicionaisInteresseFisco() : null);
+
+        Double[] valFreteUni = pedidoService.calcularValorFreteUnidadeByIdPedido(idPedido);
+
+        addAtributo("valorFretePedido", valFreteUni[0]);
+        addAtributo("valorFreteUnidade", NumeroUtils.arredondarValorMonetario(valFreteUni[1]));
 
         IdentificacaoNFe iNFe = null;
         if ((iNFe = nf.getIdentificacaoNFe()) != null) {

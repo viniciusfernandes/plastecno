@@ -13,22 +13,22 @@ public class NFeDuplicataDAOBuilder extends DAOBuilder<NFeDuplicataDAO> {
 	@Override
 	public NFeDuplicataDAO build() {
 		new MockUp<NFeDuplicataDAO>() {
-			@Mock
-			public List<NFeDuplicata> pesquisarDuplicataByNumeroNFeOuPedido(Integer numero, boolean isByNfe) {
-				if (numero == null) {
-					return new ArrayList<NFeDuplicata>();
-				}
 
+			@Mock
+			private List<NFeDuplicata> pesquisarDuplicataByNumeroNFeOuPedido(Integer numeroNFe, Integer idPedido,
+					Integer idCliente) {
 				List<NFeDuplicata> l = REPOSITORY.pesquisarTodos(NFeDuplicata.class);
-				List<NFeDuplicata> lDup = new ArrayList<NFeDuplicata>();
+				List<NFeDuplicata> ldup = new ArrayList<>();
 				for (NFeDuplicata d : l) {
-					if (isByNfe && d.getnFe() != null && numero.equals(d.getnFe().getNumero())) {
-						lDup.add(d);
-					} else if (!isByNfe && d.getnFe() != null && numero.equals(d.getnFe().getIdPedido())) {
-						lDup.add(d);
+					if (numeroNFe != null && numeroNFe.equals(d.getnFe().getNumero())) {
+						ldup.add(d);
+					} else if (idPedido != null && idPedido.equals(d.getnFe().getIdPedido())) {
+						ldup.add(d);
+					} else if (idCliente != null && idCliente.equals(d.getIdCliente())) {
+						ldup.add(d);
 					}
 				}
-				return lDup;
+				return ldup;
 			}
 
 			@Mock

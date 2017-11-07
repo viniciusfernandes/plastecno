@@ -250,6 +250,10 @@ $(document).ready(function() {
 		calcularValoresImpostos(null, false);
 	});
 	
+	$('#valorFretePedido').keyup(function(){
+		recalcularValorFrete();
+	});
+	
 	autocompletar({
 		url : '<c:url value="/cliente/listagem/nome"/>',
 		campoPesquisavel : 'nomeCliente',
@@ -314,7 +318,8 @@ $(document).ready(function() {
 		}
 	});
 	
-	alterarValorDuplicata();
+	<%-- O valor das duplicatas era defini aqui, mas esta dando conflito com o que eh gerado no servidor --%>
+	//alterarValorDuplicata();
 	
 	inicializarBotaoPesquisarCEP({'idBotao':'botaoCepRetirada',
 		'idCep': 'cepRetirada', 'idEndereco': 'enderecoRetirada', 'idBairro': 'bairroRetirada', 
@@ -330,6 +335,9 @@ $(document).ready(function() {
 	inserirMascaraData('dataSaida');
 	inserirMascaraData('dtImportProd');
 	inserirMascaraData('dataDesembImportProd');
+	
+	inserirMascaraDecimal('valorFretePedido', 10, 2);
+	inserirMascaraDecimal('valorFreteUnidade', 10, 2);
 
 	inicializarFadeInBloco('bloco_icms');
 	inicializarFadeInBloco('bloco_icms_interestadual');
@@ -404,33 +412,29 @@ function popularCliente(cliente){
 };
 
 function alterarValorDuplicata(){
-	var vlTot = calcularValorTotalProdutos();
+	var vlTot = calcularValorTotalProdutosFrete();
 	if(!isEmpty(vlTot)){
 		vlTot = parseFloat(vlTot);
 	} else {
 		vlTot = 0;
 	}
-	var vlFrete = 0;
 	var vlDesp= 0;
 	var vl = 0;
+
+	<%--Aqui estamos carregando os valores que foram inseridos nos input hidden --%>
 	$("input[name*='produtoServicoNFe.outrasDespesasAcessorias']").each(function(){
 		if(!isEmpty(vl = $(this).val())){
 			vlDesp += parseFloat(vl);
 		}
 	});
 	
-	$("input[name*='produtoServicoNFe.valorTotalFrete']").each(function(){
-		if(!isEmpty(vl = $(this).val())){
-			vlFrete += parseFloat(vl);
-		}
-	});
-
 	var linhas = document.getElementById('tabela_duplicata').rows;
+	<%--Removendo a quantidade referete ao cabecalho da tabela --%>
 	var numDuplic = linhas.length -1;
 	if(numDuplic<=0){
 		return;
 	}
-	vl = ((vlTot+vlFrete+vlDesp)/numDuplic).toFixed(2);
+	vl = ((vlTot+vlDesp)/numDuplic).toFixed(2);
 	for (var i = 1; i < linhas.length; i++) {
 		linhas[i].cells[2].innerHTML = vl;
 	}
@@ -466,7 +470,7 @@ function inicializarAlteracaoTabelaProdutos(){
 			return null;
 		}
 		
-		for (var i = 0; i < linhas.length; i++) {
+		for (var i = 1; i < linhas.length; i++) {
 			if(numeroProdutoEdicao == linhas[i].cells[0].innerHTML){
 				linhas[i].cells[indice].innerHTML = valor;
 				return linhas[i];
@@ -488,8 +492,7 @@ function inicializarAlteracaoTabelaProdutos(){
 			cells[8].innerHTML = (vTot*pICMS/100).toFixed(2);
 			cells[9].innerHTML = (vTot*pIPI/100).toFixed(2);
 			
-			calcularValoresImpostos(null, false);
-			alterarValorDuplicata();
+			recalcularValorFrete();
 		}
 	});
 	
@@ -520,11 +523,20 @@ function inicializarAlteracaoTabelaProdutos(){
 	});
 };
 
-function calcularValorTotalProdutos(){
+function calcularValorTotalProdutosFrete(){
 	var linhas = document.getElementById('tabela_produtos').rows;
+	if(linhas.length<=1){
+		return 0;
+	}
 	var tot = 0;
+	var vlFreteUnid = calcularValorFreteUnidade();
 	for (var i = 1; i < linhas.length; i++) {
+		// valor item
 		tot += parseFloat(linhas[i].cells[6].innerHTML);
+		// valor ipi
+		tot += parseFloat(linhas[i].cells[9].innerHTML);
+		// valor frete por unidade do item pois pode haver emissao francionada
+		tot += vlFreteUnid * parseFloat(linhas[i].cells[4].innerHTML);
 	}
 	return tot;
 };
@@ -559,7 +571,9 @@ function removerProduto(botao){
 			$("input[name^='"+nome+"']").each(function(){
 				$(this).remove();
 			});
-			alterarValorDuplicata();
+			
+			recalcularValorFrete();
+			
 			numeroImportacaoProduto = null;
 			numeroProdutoEdicao = null;
 			btProduto = null;
@@ -1318,7 +1332,8 @@ function inicializarModalCancelamento(botao){
 		}
 	});
 };
-
+<%--Essa funcao verifica se existe algum input hidden contendo os valores dos impostos, e caso nao contenha ele inclui os inputs no documento 
+para manter o estado dos impostos que estao sendo preenchidos. Eh sempre executado no click de edicao de um item --%>
 function recuperarValoresProduto(valoresTabela){
 	var impostos = new Array();
 	impostos [0] = gerarJsonTipoIcms();
@@ -1500,16 +1515,67 @@ function editarProduto(botao){
 	var vFrete = document.getElementById('nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.valorTotalFrete');
 	var contemFrete = vFrete != undefined && vFrete != null && !isEmpty(vFrete.value);
 	if(!contemFrete){
-		$('#valorFreteProd').val($('#valorFrete').val());
+		var qtde = parseFloat(linha.cells[4].innerHTML);
+		$('#valorFreteProd').val((calcularValorFreteUnidade()*qtde).toFixed(2));
 	}
 };
 
 function gerarJsonCalculoImpostos(){
-	return [{'idVl':'valorBCICMS', 'idAliq':'aliquotaICMS', 'idImp':'valorICMS'},
-			{'idVl':'valorBCCOFINS', 'idAliq':'aliquotaCOFINS', 'idImp':'valorCOFINS'},
-	    	{'idVl':'valorBCPIS', 'idAliq':'aliquotaPIS', 'idImp':'valorPIS'},
-	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI'},
-	    	{'idVl':'valorBCISS', 'idAliq':'aliquotaISS', 'idImp':'valorISS'}];	
+	return [{'idVl':'valorBCICMS', 'idAliq':'aliquotaICMS', 'idImp':'valorICMS', incideFrete: true},
+			{'idVl':'valorBCCOFINS', 'idAliq':'aliquotaCOFINS', 'idImp':'valorCOFINS', incideFrete: true},
+	    	{'idVl':'valorBCPIS', 'idAliq':'aliquotaPIS', 'idImp':'valorPIS', incideFrete: true},
+	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI', incideFrete: false},
+	    	{'idVl':'valorBCISS', 'idAliq':'aliquotaISS', 'idImp':'valorISS', incideFrete: false}];	
+};
+
+function calcularQuantidadeItem(){
+	var qtde=0;
+	var linhas = document.getElementById('tabela_produtos').rows;
+	<%--Comeca a contagem do 1 para evitar a linha do header--%>
+	if(linhas.length<=1){
+		return 0;
+	}
+	<%--Comeca a contagem do 1 para evitar a linha do header--%>
+	for (var i= 1; i < linhas.length; i++) {
+		qtde += parseFloat(linhas[i].cells[4].innerHTML);
+	}
+	if(qtde<0){
+		return 0;
+	}
+	return qtde;
+};
+
+<%--O valor do frete eh calculado por qtde do item pois eh possivel que os itens sejam fracionados--%>
+function calcularValorFreteUnidade(){
+	return document.getElementById('valorFreteUnidade').value; 
+};
+
+function recalcularValorFrete(){
+	var vlFrete = calcularValorFreteUnidade();
+	var linhas = document.getElementById('tabela_produtos').rows;
+	if(linhas.length<=1){
+		return;
+	}
+	var qtde = 0;
+	var id = '';
+	var input = null;
+	<%--Aqui estamos carregando os valores que foram inseridos nos input hidden para que a alteracao seja submetida com o formulario--%>
+	for (var i = 1; i < linhas.length; i++) {
+		id = linhas[i].cells[0].innerHTML;
+		qtde = parseFloat(linhas[i].cells[4].innerHTML);
+		input = document.getElementById('nf.listaItem['+id+'].produtoServicoNFe.valorTotalFrete');
+		if(input != undefined && input != null){
+			input.value = (vlFrete*qtde).toFixed(2);
+		}
+		<%--Atualizando o campo de frete do produto para que o usuario visualize a alteracao e ela nao ocorra apenas nos campos hidden--%>
+		if(numeroProdutoEdicao == id){
+			document.getElementById('valorFreteProd').value=(vlFrete*qtde).toFixed(2);
+		}
+
+	}
+	
+	calcularValoresImpostos(null, false);
+	alterarValorDuplicata();
 };
 
 function calcularValorICMSInterestadual(){
@@ -1540,6 +1606,7 @@ function calcularValorICMSInterestadual(){
 	});	
 };
 
+<%--Funcao executada na edicao de um produto--%>
 function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	var campos = gerarJsonCalculoImpostos();
 	var aliq=null; 
@@ -1547,9 +1614,14 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	var tot = 0;
 	var vBC = 0;
 	var vl = 0;
+	var vBCSemFrete =0;
+	var qtde = 0
 	if(btProduto != null){
 		linha = btProduto.parentNode.parentNode;
-		vBC = linha.cells[6].innerHTML;
+		vBCSemFrete = parseFloat(linha.cells[6].innerHTML);
+		qtde = parseFloat(linha.cells[4].innerHTML);
+		<%--O valor do frete eh calculado por qtde do item pois eh possivel que os itens sejam fracionados--%>
+		vBC = vBCSemFrete + (calcularValorFreteUnidade() * qtde);
 	} else {
 		return;
 	}
@@ -1557,12 +1629,6 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 		return;
 	}
 	
-	var frete = document.getElementById('valorFreteProd').value;
-	if(isEmpty(frete)){
-		frete = 0;
-	}
-
-	vBC = parseFloat(vBC)+parseFloat(frete);
 	for (var i = 0; i < campos.length; i++) {
 		aliq = document.getElementById(campos[i].idAliq).value;
 		if(isEmpty(aliq)){
@@ -1572,7 +1638,7 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 		if(isAlteracaoAliq){
 			vBC = document.getElementById(campos[i].idVl).value;
 		} else {
-			document.getElementById(campos[i].idVl).value = vBC;
+			document.getElementById(campos[i].idVl).value = campos[i].incideFrete? vBC : vBCSemFrete;
 		}
 		
 		if(idValorRemovido != undefined && idValorRemovido == campos[i].idVl){
@@ -1686,15 +1752,15 @@ function inicializarCalculoImpostos(){
 			<div class="input" style="width: 2%">
 				<input type="button" id="botaoRemoverNFe" title="Remover NFe" value="" class="botaoRemover" />
 			</div>
-			<div class="label" style="width: 10%">Mod. NFe:</div>
-			<div class="input" style="width: 5%">
+			<div class="label" style="width: 11%">Mod. NFe:</div>
+			<div class="input" style="width: 10%">
 				<input type="text" name="nf.identificacaoNFe.modelo" value="${modeloNFe}" maxlength="2" style="width: 100%" />
 			</div>
 			<div class="label" style="width: 10%">Série NFe:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" name="nf.identificacaoNFe.serie" value="${serieNFe}" maxlength="3" style="width: 100%" />
 			</div>
-			<div class="label">Tipo Operação:</div>
+			<div class="label" style="width: 10%">Tipo Operação:</div>
 			<div class="input" style="width: 10%">
 				<select name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
 					<c:forEach var="tipo" items="${listaTipoOperacao}">
@@ -1703,18 +1769,18 @@ function inicializarCalculoImpostos(){
 				</select>
 			</div>
 			<div class="label">Dest. Operação:</div>
-			<div class="input" style="width: 23%">
+			<div class="input" style="width: 36%">
 				<select name="nf.identificacaoNFe.destinoOperacao" style="width: 100%" >
 					<c:forEach var="tipo" items="${listaTipoDestinoOperacao}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoDestinoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Dt. Ent./Saída:</div>
+			<div class="label" style="width: 10%">Dt. Ent./Saída:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="dataSaida" name="nf.identificacaoNFe.dataSaida" value="${dataSaida}" style="width: 100%"/>
 			</div>
-			<div class="label">Hr. Ent./Saída:</div>
+			<div class="label" style="width: 10%">Hr. Ent./Saída:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="horaSaida" name="nf.identificacaoNFe.horaSaida" value="${horaSaida}" style="width: 100%"/>
 			</div>
@@ -1727,16 +1793,16 @@ function inicializarCalculoImpostos(){
 				</select>
 			</div>
 			<div class="label">Forma Emissão:</div>
-			<div class="input" style="width: 20%">
-				<select name="nf.identificacaoNFe.tipoEmissao"  style="width: 50%">
+			<div class="input" style="width: 10%">
+				<select name="nf.identificacaoNFe.tipoEmissao"  style="width: 100%">
 					<c:forEach var="tipoEmissao" items="${listaTipoEmissao}">
 						<option value="${tipoEmissao.codigo}" <c:if test="${tipoEmissao.codigo eq tipoEmissaoSelecionada}">selected</c:if>>${tipoEmissao.descricao}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Finalidade Emissão:</div>
-			<div class="input" style="width: 10%">
-				<select name="nf.identificacaoNFe.finalidadeEmissao" style="width: 100%" >
+			<div class="label" style="width: 10%">Finald. Emiss.:</div>
+			<div class="input" style="width: 30%">
+				<select name="nf.identificacaoNFe.finalidadeEmissao" style="width: 33%" >
 					<c:forEach var="finalidade" items="${listaTipoFinalidadeEmissao}">
 						<option value="${finalidade.codigo}" <c:if test="${finalidade.codigo eq finalidadeEmissaoSelecionada}">selected</c:if>>${finalidade.descricao}</option>
 					</c:forEach>
@@ -1744,7 +1810,7 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label">Presen. Comprador:</div>
 			<div class="input" style="width: 80%">
-				<select name="nf.identificacaoNFe.tipoPresencaComprador" style="width: 20%">
+				<select name="nf.identificacaoNFe.tipoPresencaComprador" style="width: 45%">
 					<c:forEach var="tipo" items="${listaTipoPresencaComprador}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoPresencaSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
@@ -1767,17 +1833,30 @@ function inicializarCalculoImpostos(){
 				</select>
 			</div>
 			<div class="label">Natureza Operação:</div>
-			<div class="input" style="width: 50%">
+			<div class="input" style="width: 36%">
 				<input type="text" name="nf.identificacaoNFe.naturezaOperacao" value="${nf.identificacaoNFe.naturezaOperacao}" style="width: 100%"/>
+			</div>
+			<div class="label" style="width: 10%">Frete (R$):</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="valorFretePedido" value="${valorFretePedido}" style="width: 100%" disabled="disabled" class="desabilitado"/>
+			</div>
+			<div class="label" style="width: 10%">Frete Unid.(R$):</div>
+			<div class="input" style="width: 10%">
+				<input type="text" id="valorFreteUnidade" value="${valorFreteUnidade}" style="width: 100%" disabled="disabled" class="desabilitado"/>
 			</div>
 			
 			<div class="divFieldset">
 			<fieldset id="bloco_destinatario" class="fieldsetInterno">
 				<legend>::: Destinatário ::: -</legend>
 				<div class="label">Razão Social/Nome:</div>
-				<div class="input" style="width: 80%">
-					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.razaoSocial" value="${cliente.razaoSocial}"  maxlength="70" style="width: 60%"/>
+				<div class="input" style="width: 50%">
+					<input type="text" id="nomeCliente" name="nf.identificacaoDestinatarioNFe.razaoSocial" value="${cliente.razaoSocial}"  maxlength="70" style="width: 100%"/>
 					<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
+				</div>
+				<div class="label" style="width: 8%">Email:</div>
+				<div class="input" style="width: 20%">
+					<input type="text" id="email" name="nf.identificacaoDestinatarioNFe.email"
+						value="${cliente.email}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
 				</div>
 				
 				<div class="label">CNPJ:</div>
@@ -1789,34 +1868,26 @@ function inicializarCalculoImpostos(){
 						<input type="button" id="botaoPesquisarCnpjDest"
 							title="Pesquisar CNPJ Destinatário" value="" class="botaoPesquisarPequeno" />
 					</div>
-				<div class="label">Insc. Estadual:</div>
-				<div class="input" style="width: 40%">
-					<input type="text" id="inscricaoEstadual"
-						name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
-						value="${cliente.inscricaoEstadual}"
-						style="width: 40%; text-align: right;" />
+				<div class="label" style="width: 10%">Insc. Estadual:</div>
+				<div class="input" style="width: 50%">
+					<input type="text" id="inscricaoEstadual" name="nf.identificacaoDestinatarioNFe.inscricaoEstadual"
+						value="${cliente.inscricaoEstadual}" style="width: 44%; text-align: left;" />
 				</div>
 				<div class="label">SUFRAMA:</div>
 				<div class="input" style="width: 80%">
 					<input type="text" id="inscricaoSUFRAMA" name="nf.identificacaoDestinatarioNFe.inscricaoSUFRAMA"
-						value="${cliente.inscricaoSUFRAMA}"  style="width: 20%" maxlength="9"/>
+						value="${cliente.inscricaoSUFRAMA}"  style="width: 19%" maxlength="9"/>
 				</div>
 				<div class="label">CPF:</div>
 				<div class="input" style="width: 15%">
 					<input type="text" id="cpf" name="nf.identificacaoDestinatarioNFe.cpf"
 						value="${cliente.cpf}"  />
 				</div>
-				<div class="label">Telefone:</div>
-				<div class="input" style="width: 10%">
+				<div class="label" style="width: 12%">Telefone:</div>
+				<div class="input" style="width: 50%">
 					<input type="text" id="telefone" name="telefoneDestinatario"
-						value="${telefoneContatoPedido}" />
+						value="${telefoneContatoPedido}" style="width: 44%"/>
 				</div>
-				<div class="label">Email:</div>
-				<div class="input" style="width: 20%">
-					<input type="text" id="email" name="nf.identificacaoDestinatarioNFe.email"
-						value="${cliente.email}" class="apenasLowerCase uppercaseBloqueado lowerCase" />
-				</div>
-				
 				<div class="divFieldset">
 				<jsp:include page="/bloco/bloco_logradouro.jsp"></jsp:include>
 				</div>
@@ -1828,7 +1899,7 @@ function inicializarCalculoImpostos(){
 			<legend>::: NF/NFe Referenciada ::: -</legend>
 			<div class="label">Chave Acesso:</div>
 			<div class="input" style="width: 80%">
-				<input type="text" id="chaveReferenciada" style="width: 50%"/>
+				<input type="text" id="chaveReferenciada" style="width: 45%"/>
 			</div>
 			<div class="label">Núm. Doc. Fiscal:</div>
 			<div class="input" style="width: 10%">
@@ -2904,6 +2975,7 @@ function inicializarCalculoImpostos(){
 			<input type="button" id="botaoDevolverNF" title="Emitir NFe Devolução" value="" class="botaoRefazer"/>
 		</div>
 
+		<%-- Esse bloco contem todos os input hidden utilizados para manter o estado dos impostos dos itens que foram editados --%>
 		<jsp:include page="/bloco/bloco_detalhe_items_nfe.jsp"></jsp:include>		
 	</form>
 

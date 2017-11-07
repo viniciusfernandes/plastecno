@@ -76,9 +76,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private ComissaoService comissaoService;
+
 	@EJB
 	private EmailService emailService;
-
 	@PersistenceContext(name = "plastecno")
 	private EntityManager entityManager;
 
@@ -151,25 +151,31 @@ public class PedidoServiceImpl implements PedidoService {
 			return;
 		}
 
-		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
-		if (!SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
-			throw new BusinessException(
-					"Não é possível alterar a quantidade recepcionada pois a situacao do pedido é \""
-							+ situacaoPedido.getDescricao() + "\"");
+		if (quantidadeRecepcionada < 0) {
+			quantidadeRecepcionada = 0;
 		}
 
-		Integer quantidadeItem = itemPedidoDAO.pesquisarQuantidadeItemPedido(idItemPedido);
-		if (quantidadeItem == null) {
+		Integer qtdeItem = pesquisarQuantidadeItemPedido(idItemPedido);
+		if (qtdeItem == null) {
 			throw new BusinessException("O item de pedido de código " + idItemPedido
 					+ " pesquisado não existe no sistema");
 		}
 
-		if (quantidadeItem < quantidadeRecepcionada) {
+		if (qtdeItem < quantidadeRecepcionada) {
 			Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 			Integer sequencialItem = itemPedidoDAO.pesquisarSequencialItemPedido(idItemPedido);
 			throw new BusinessException(
 					"Não é possível recepcionar uma quantidade maior do que foi comprado para o item No. "
 							+ sequencialItem + " do pedido No. " + idPedido);
+		} else if (qtdeItem > quantidadeRecepcionada) {
+			alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
+		}
+
+		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
+		if (!SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
+			throw new BusinessException(
+					"Não é possível alterar a quantidade recepcionada pois a situacao do pedido é \""
+							+ situacaoPedido.getDescricao() + "\"");
 		}
 		itemPedidoDAO.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
 	}
@@ -313,6 +319,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Date> calcularDataPagamento(Integer idPedido) {
+		return calcularDataPagamento(idPedido, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<Date> calcularDataPagamento(Integer idPedido, Date dataInicial) {
 		List<Date> lista = new ArrayList<Date>();
 		String formaPagamento = pedidoDAO.pesquisarFormaPagamentoByIdPedido(idPedido);
 		if (formaPagamento == null) {
@@ -326,8 +338,12 @@ public class PedidoServiceImpl implements PedidoService {
 			return lista;
 		}
 
+		if (dataInicial == null) {
+			dataInicial = new Date();
+		}
+
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
+		cal.setTime(dataInicial);
 		Integer diaCorrido = null;
 		for (String dia : dias) {
 			try {
@@ -338,7 +354,8 @@ public class PedidoServiceImpl implements PedidoService {
 			cal.add(Calendar.DAY_OF_MONTH, diaCorrido);
 			lista.add(cal.getTime());
 
-			// Retornando a data atual para somar os outros dias corridos
+			// Retornando a data atual para somar os outros dias corridos e
+			// evitar criar outros objetos Calendar.
 			cal.add(Calendar.DAY_OF_MONTH, -diaCorrido);
 		}
 		return lista;
@@ -364,6 +381,38 @@ public class PedidoServiceImpl implements PedidoService {
 			itemPedido.getMaterial().setPesoEspecifico(pEspecifico);
 		}
 		return CalculadoraItem.calcularKilo(itemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double calcularValorFretePorItemByIdItem(Integer idItem) {
+		long total = pesquisarTotalItemPedidoByIdItem(idItem);
+		if (0l == total) {
+			return 0d;
+		}
+		Double vFrete = pesquisarValorFreteByIdItem(idItem);
+		return vFrete / total;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double calcularValorFretePorItemByIdPedido(Integer idPedido) {
+		long total = pesquisarTotalItemPedido(idPedido);
+		if (0l == total) {
+			return 0d;
+		}
+		Double vFrete = pesquisarValorFreteByIdPedido(idPedido);
+		return vFrete / total;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double[] calcularValorFreteUnidadeByIdPedido(Integer idPedido) {
+		Double[] val = itemPedidoDAO.pesquisarValorFreteUnidadeByIdPedido(idPedido);
+		if (val[1] != 0d) {
+			val[1] = val[0] / val[1];
+		}
+		return val;
 	}
 
 	@Override
@@ -490,6 +539,14 @@ public class PedidoServiceImpl implements PedidoService {
 			pedidoDAO.remover(pedidoCompra);
 		}
 		return pedidoCompra.getId();
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem) {
+		// Apenas um registro deve ser retornado, o que indica apenas um
+		// fornecedor
+		return itemPedidoDAO.pesquisarTotalFornecedorDistintoByIdItem(listaIdItem).size() > 1;
 	}
 
 	@Override
@@ -826,6 +883,9 @@ public class PedidoServiceImpl implements PedidoService {
 		definirTipoPedido(pedido);
 
 		ValidadorInformacao.validar(pedido);
+		if (!pedido.isOrcamento() && (StringUtils.isEmpty(pedido.getFormaPagamento()))) {
+			throw new BusinessException("Forma de pagamento é obrigatória para os pedidos de venda/compra");
+		}
 
 		final Integer idPedido = pedido.getId();
 		final boolean isPedidoNovo = idPedido == null;
@@ -1203,16 +1263,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarCompraAguardandoRecebimento(Integer idRepresentada, Periodo periodo) {
-		if (periodo != null) {
-			return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo.getInicio(),
-					periodo.getFim());
-		}
-		return itemPedidoDAO.pesquisarCompraAguardandoRecebimento(idRepresentada, null, null);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Pedido pesquisarCompraById(Integer id) {
 		return pesquisarPedidoById(id, true);
 	}
@@ -1291,18 +1341,25 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer pesquisarIdClienteByIdPedido(Integer idPedido) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select p.cliente.id from Pedido p where p.id = :idPedido").setParameter(
-						"idPedido", idPedido), Integer.class, null);
+		return pedidoDAO.pesquisarIdClienteByIdPedido(idPedido);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdItemPedidoByIdPedido(Integer idPedido) {
 		if (idPedido == null) {
-			return new ArrayList<Integer>(1);
+			return new ArrayList<Integer>();
 		}
 		return itemPedidoDAO.pesquisarIdItemPedidoByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarIdItemPedidoByIdPedidoSequencial(Integer idPedido, Integer sequencial) {
+		if (idPedido == null || sequencial == null) {
+			return null;
+		}
+		return itemPedidoDAO.pesquisarIdItemPedidoByIdPedidoSequencial(idPedido, sequencial);
 	}
 
 	@Override
@@ -1354,6 +1411,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoItemAguardandoCompra() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer[] pesquisarIdPedidoQuantidadeSequencialByIdPedido(Integer idItem) {
+		return itemPedidoDAO.pesquisarIdPedidoQuantidadeSequencialByIdPedido(idItem);
 	}
 
 	@Override
@@ -1441,9 +1504,28 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo) {
+		if (periodo != null) {
+			return itemPedidoDAO.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, periodo.getInicio(),
+					periodo.getFim());
+		}
+		return itemPedidoDAO.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, null, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo) {
 		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoCompraEfetivada(),
 				TipoPedido.COMPRA);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, Periodo periodo) {
+		if (periodo == null) {
+			return itemPedidoDAO.pesquisarItemPedidoCompraEfetivada(idRepresentada, null, null);
+		}
+		return itemPedidoDAO.pesquisarItemPedidoCompraEfetivada(idRepresentada, periodo.getInicio(), periodo.getFim());
 	}
 
 	@Override
@@ -1456,6 +1538,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoEncomendado(Integer idCliente, Date dataInicial, Date dataFinal) {
 		return itemPedidoDAO.pesquisarItemPedidoAguardandoMaterial(idCliente, dataInicial, dataFinal);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {
+		return itemPedidoDAO.pesquisarItemPedidoPagamento(idItemPedido);
 	}
 
 	@Override
@@ -1655,6 +1743,15 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer[] pesquisarQuantidadeItemPedidoByIdItemPedido(Integer idItemPedido) {
+		if (idItemPedido == null) {
+			return null;
+		}
+		return itemPedidoDAO.pesquisarQuantidadeItemPedidoByIdItemPedido(idItemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer[]> pesquisarQuantidadeItemPedidoByIdPedido(Integer idPedido) {
 		return itemPedidoDAO.pesquisarQuantidadeItemPedidoByIdPedido(idPedido);
 	}
@@ -1769,6 +1866,12 @@ public class PedidoServiceImpl implements PedidoService {
 		return pedidoDAO.pesquisarTotalItemPedido(idPedido);
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public long pesquisarTotalItemPedidoByIdItem(Integer idItem) {
+		return pedidoDAO.pesquisarTotalItemPedidoByIdItem(idItem);
+	}
+
 	public Long pesquisarTotalItemRevendaAguardandoEncomenda(Integer idItemPedido) {
 		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 		return itemPedidoDAO.pesquisarTotalItemRevendaNaoEncomendado(idPedido);
@@ -1834,13 +1937,14 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Double pesquisarValorFretePorItemByIdPedido(Integer idPedido) {
-		long total = pesquisarTotalItemPedido(idPedido);
-		if (0l == total) {
-			return 0d;
-		}
-		Double vFrete = pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
-		return vFrete / total;
+	public Double pesquisarValorFreteByIdItem(Integer idItem) {
+		return pedidoDAO.pesquisarValorFreteByIdItem(idItem);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Double pesquisarValorFreteByIdPedido(Integer idPedido) {
+		return pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
 	}
 
 	@Override

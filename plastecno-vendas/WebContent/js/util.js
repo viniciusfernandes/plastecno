@@ -384,35 +384,83 @@ function adicionarInputHiddenFormulario(idForm, name, value){
 };
 
 function tabelaLinhaSelecionavel(config){
-	var listaValorSelecionado = config.listaValorSelecionado;
+	var listaIdSelecionado = config.listaIdSelecionado;
 	var idTabela = config.idTabela;
 	var idBotaoLimpar = config.idBotaoLimpar;
 	var onInit = config.onInit;
 	var onSelect = config.onSelect;
 	var onUnselect = config.onUnselect;
 	var onClean = config.onClean;
-	
+	var tot = 0;
 	// Adicionando a lista os itens carregados no inicio do load da pagina.
-	if(onInit != undefined && listaValorSelecionado != undefined && listaValorSelecionado != null){
-		for (var i = 0; i < listaValorSelecionado.length; i++) {
-			onInit(listaValorSelecionado[i]);
-		}
+	if(onInit != undefined && listaIdSelecionado != undefined && listaIdSelecionado != null){
+		tot = listaIdSelecionado.length;
+		onInit(listaIdSelecionado);
 	}
 	// Definindo o evento de selecao.
 	$('#'+idTabela +' tr td input:checkbox').click(function(){
-		if($(this).prop('checked')){
-			onSelect($(this));
+		var ck = $(this).prop('checked');
+		if(ck){
+			tot++;
+		} else if(!ck && tot>0) {
+			tot--;
 		} else {
-			onUnselect($(this));
+			tot=0;
+		}
+		
+		if(ck && onSelect != undefined){
+			onSelect({checked: $(this).prop('checked'), totChecked: tot, valCheckbox:$(this).val()});
+		} else if(!ck && onUnselect != undefined){
+			onUnselect({checked: $(this).prop('checked'), totChecked: tot, valCheckbox:$(this).val()});
 		}
 	});
 	
 	$('#'+idBotaoLimpar).click(function(){
+		tot=0;
 		$('#'+idTabela +' tr td input:checkbox').each(function(){
 			if($(this).prop('checked')){
 				$(this).prop('checked', false);
 			} 
 		});
-		onClean();
+		if(onClean != undefined){
+			onClean();
+		}
+	});
+};
+
+function tabelaLinhaSelecionavelExt(config){
+	var nome = 'listaIdItemSelecionado[]';	
+	var id = 'idItemSelec';
+	var idForm = config.idForm;
+	var form = document.getElementById(idForm);
+	var onSelectItem = config.onSelectItem
+	
+	tabelaLinhaSelecionavel({
+		idTabela: config.idTabela,
+		idBotaoLimpar: config.idBotaoLimpar,
+		listaIdSelecionado: config.listaIdSelecionado,
+		onSelect: function(json){
+			gerarInputHiddenFormulario(idForm, id+json.valCheckbox, nome, json.valCheckbox);
+			if(onSelectItem != undefined) {
+				onSelectItem(json);
+			}
+		},
+		onUnselect: function(json){
+			form.removeChild(document.getElementById(id+json.valCheckbox));
+			if(onSelectItem != undefined) {
+				onSelectItem(json);
+			}
+		},
+		onInit: function(listaIdSelecionado){
+			for (var i = 0; i < listaIdSelecionado.length; i++) {
+				gerarInputHiddenFormulario(idForm, id+listaIdSelecionado[i], nome, listaIdSelecionado[i]);
+			}
+			if(onSelectItem != undefined) {
+				onSelectItem({checked:true, totChecked:listaIdSelecionado.length});
+			}
+		},
+		onClean: function(){
+			$('#'+idForm+' input[id^=\''+id+'\']').remove();
+		}
 	});
 };

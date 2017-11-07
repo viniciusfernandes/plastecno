@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoRelacionamento;
@@ -46,8 +47,12 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 						.setParameter("idRepresentada", idRepresentada), String.class, null);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Representada> pesquisarRepresentadaByTipoRelacionamento(boolean ativo, TipoRelacionamento... tipos) {
+		return pesquisarRepresentadaByTipoRelacionamento(null, ativo, tipos);
+	}
+
+	public List<Representada> pesquisarRepresentadaByTipoRelacionamento(String nomeFantasia, boolean ativo,
+			TipoRelacionamento... tipos) {
 		StringBuilder select = new StringBuilder(
 				"SELECT new Representada(r.id, r.nomeFantasia) FROM Representada r where r.ativo = :ativo ");
 
@@ -55,11 +60,20 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 			select.append("and r.tipoRelacionamento IN (:tipos) ");
 		}
 
+		if (nomeFantasia != null) {
+			select.append("and r.nomeFantasia like :nomeFantasia ");
+		}
+
 		select.append("order by r.nomeFantasia ");
 
-		Query query = this.entityManager.createQuery(select.toString()).setParameter("ativo", ativo);
+		TypedQuery<Representada> query = entityManager.createQuery(select.toString(), Representada.class).setParameter(
+				"ativo", ativo);
 		if (tipos != null) {
 			query.setParameter("tipos", Arrays.asList(tipos));
+		}
+
+		if (nomeFantasia != null) {
+			query.setParameter("nomeFantasia", "%" + nomeFantasia + "%");
 		}
 		return query.getResultList();
 	}

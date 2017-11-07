@@ -1,9 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -76,25 +73,6 @@ public class AbstractPedidoController extends AbstractController {
         verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS);
         verificarPermissaoAcesso("acessoDadosNotaFiscalPermitido", TipoAcesso.ADMINISTRACAO,
                 TipoAcesso.CADASTRO_PEDIDO_COMPRA);
-    }
-
-    void adicionarIdItemSelecionado(Integer[] listaIdItemSelecionado) {
-        if (listaIdItemSelecionado == null || listaIdItemSelecionado.length <= 0) {
-            return;
-        }
-        Map<Integer, Boolean> idSelecionado = new HashMap<>();
-        for (Integer id : listaIdItemSelecionado) {
-            idSelecionado.put(id, true);
-        }
-        addAtributo("idSelec", idSelecionado);
-        addAtributo("listaIdItemSelecionado", Arrays.deepToString(listaIdItemSelecionado));
-    }
-
-    void adicionarIdItemSelecionado(List<Integer> listaIdItemSelecionado) {
-        if (listaIdItemSelecionado == null) {
-            return;
-        }
-        adicionarIdItemSelecionado(listaIdItemSelecionado.toArray(new Integer[] {}));
     }
 
     void configurarTipoPedido(TipoPedido tipoPedido) {

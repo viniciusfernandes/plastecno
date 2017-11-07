@@ -16,12 +16,14 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 		super(entityManager);
 	}
 
-	public void alterarDataVendimentoById(Integer idDuplicata, Date dataVencimento, Double valor) {
+	public void alterarDuplicataById(Integer idDuplicata, Date dataVencimento, Double valor, String codigoBanco,
+			String nomeBanco, TipoSituacaoDuplicata tipo) {
 		entityManager
 				.createQuery(
-						"update NFeDuplicata d set d.dataVencimento =:dataVencimento, d.valor =:valor where d.id = :idDuplicata")
+						"update NFeDuplicata d set d.dataVencimento =:dataVencimento, d.valor =:valor, d.codigoBanco=:codigoBanco, d.nomeBanco=:nomeBanco, d.tipoSituacaoDuplicata =:tipo  where d.id = :idDuplicata")
 				.setParameter("dataVencimento", dataVencimento).setParameter("idDuplicata", idDuplicata)
-				.setParameter("valor", valor).executeUpdate();
+				.setParameter("valor", valor).setParameter("codigoBanco", codigoBanco)
+				.setParameter("nomeBanco", nomeBanco).setParameter("tipo", tipo).executeUpdate();
 	}
 
 	public void alterarSituacaoById(Integer idDuplicata, TipoSituacaoDuplicata tipoSituacaoDuplicata) {
@@ -32,37 +34,64 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 				.executeUpdate();
 	}
 
+	public Date pesquisarDataVencimentoById(Integer idDuplicata) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select d.dataVencimento from NFeDuplicata d where d.id=:idDuplicata")
+						.setParameter("idDuplicata", idDuplicata), Date.class, null);
+	}
+
+	public List<NFeDuplicata> pesquisarDuplicataByCNPJCliente(String cnpj, Date dataInicial, Date dataFinal) {
+		StringBuilder s = new StringBuilder();
+		s.append("select new NFeDuplicata(d.dataVencimento, d.id, d.nomeCliente, d.nFe.numero, d.tipoSituacaoDuplicata, d.valor) from NFeDuplicata d where ");
+		if (dataInicial != null && dataFinal != null) {
+			s.append("and d.dataVencimento >=:dataInicial and d.dataVencimento <=:dataFinal");
+		}
+		TypedQuery<NFeDuplicata> q = entityManager.createQuery(s.toString(), NFeDuplicata.class);
+		if (dataInicial != null && dataFinal != null) {
+			q.setParameter("dataInicial", dataInicial).setParameter("dataFinal", dataFinal);
+
+		}
+		return q.getResultList();
+	}
+
 	public NFeDuplicata pesquisarDuplicataById(Integer idDuplicata) {
-		return QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select new NFeDuplicata(d.dataVencimento, d.id, d.tipoSituacaoDuplicata, d.valor) from NFeDuplicata d where d.id =:idDuplicata")
-								.setParameter("idDuplicata", idDuplicata), NFeDuplicata.class, null);
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select d from NFeDuplicata d where d.id =:idDuplicata").setParameter(
+						"idDuplicata", idDuplicata), NFeDuplicata.class, null);
+	}
+
+	public List<NFeDuplicata> pesquisarDuplicataByIdCliente(Integer idCliente) {
+		return pesquisarDuplicataByNumeroNFeOuPedido(null, null, idCliente);
 	}
 
 	public List<NFeDuplicata> pesquisarDuplicataByIdPedido(Integer idPedido) {
-		return pesquisarDuplicataByNumeroNFeOuPedido(idPedido, false);
+		return pesquisarDuplicataByNumeroNFeOuPedido(null, idPedido, null);
 	}
 
 	public List<NFeDuplicata> pesquisarDuplicataByNumeroNFe(Integer numeroNFe) {
-		return pesquisarDuplicataByNumeroNFeOuPedido(numeroNFe, true);
+		return pesquisarDuplicataByNumeroNFeOuPedido(numeroNFe, null, null);
 	}
 
-	public List<NFeDuplicata> pesquisarDuplicataByNumeroNFeOuPedido(Integer numero, boolean isByNfe) {
+	private List<NFeDuplicata> pesquisarDuplicataByNumeroNFeOuPedido(Integer numeroNFe, Integer idPedido,
+			Integer idCliente) {
 		StringBuilder s = new StringBuilder();
-		s.append("select new NFeDuplicata(d.dataVencimento, d.id, d.nomeCliente, d.nFe.numero, d.tipoSituacaoDuplicata, d.valor) from NFeDuplicata d ");
-		if (isByNfe) {
+		s.append("select new NFeDuplicata(d.codigoBanco, d.dataVencimento, d.id, d.nomeBanco, d.nomeCliente, d.nFe.numero, d.parcela, d.tipoSituacaoDuplicata, d.totalParcelas, d.valor) from NFeDuplicata d ");
+
+		if (numeroNFe != null) {
 			s.append("where d.nFe.numero =:numeroNFe ");
-		} else {
+		} else if (idPedido != null) {
 			s.append("where d.nFe.idPedido =:idPedido ");
+		} else if (idCliente != null) {
+			s.append("where d.idCliente =:idCliente ");
 		}
 
 		TypedQuery<NFeDuplicata> q = entityManager.createQuery(s.toString(), NFeDuplicata.class);
-		if (isByNfe) {
-			q.setParameter("numeroNFe", numero);
-		} else {
-			q.setParameter("idPedido", numero);
+		if (numeroNFe != null) {
+			q.setParameter("numeroNFe", numeroNFe);
+		} else if (idPedido != null) {
+			q.setParameter("idPedido", idPedido);
+		} else if (idCliente != null) {
+			q.setParameter("idCliente", idCliente);
 		}
 		return q.getResultList();
 	}
@@ -70,7 +99,7 @@ public class NFeDuplicataDAO extends GenericDAO<NFeDuplicata> {
 	public List<NFeDuplicata> pesquisarDuplicataByPeriodo(Periodo periodo) {
 		return entityManager
 				.createQuery(
-						"select new NFeDuplicata(d.dataVencimento, d.id, d.nomeCliente, d.nFe.numero, d.tipoSituacaoDuplicata, d.valor) from NFeDuplicata d where d.dataVencimento>= :dataInicial and d.dataVencimento<= :dataFinal",
+						"select new NFeDuplicata(d.codigoBanco, d.dataVencimento, d.id, d.nomeBanco, d.nomeCliente, d.nFe.numero, d.parcela, d.tipoSituacaoDuplicata, d.totalParcelas, d.valor) from NFeDuplicata d where d.dataVencimento>= :dataInicial and d.dataVencimento<= :dataFinal",
 						NFeDuplicata.class).setParameter("dataInicial", periodo.getInicio())
 				.setParameter("dataFinal", periodo.getFim()).getResultList();
 	}

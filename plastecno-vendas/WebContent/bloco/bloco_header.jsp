@@ -4,5 +4,5 @@
 <link rel="icon" href="<c:url value="/images/favicon.ico"/>"
 	type="image/x-icon" />
 
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/${initParam['padraoCSS']}/menu.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/botao.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/${initParam['padraoCSS']}/menu.css?${versaoCache}"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/botao.css?${versaoCache}"/>" />

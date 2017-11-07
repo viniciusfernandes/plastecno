@@ -18,6 +18,7 @@ import javax.persistence.Query;
 import br.com.plastecno.service.EstoqueService;
 import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.RepresentadaService;
+import br.com.plastecno.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.SituacaoReservaEstoque;
@@ -59,6 +60,92 @@ public class EstoqueServiceImpl implements EstoqueService {
 	private RepresentadaService representadaService;
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
+			throws BusinessException {
+		if (idItemCompra == null) {
+			return null;
+		}
+		if (quantidadeRecepcionada == null) {
+			quantidadeRecepcionada = 0;
+		}
+
+		Integer quantidadeItem = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemCompra);
+		quantidadeItem += quantidadeRecepcionada;
+		pedidoService.alterarQuantidadeRecepcionada(idItemCompra, quantidadeItem);
+
+		return alterarEstoque(idItemCompra, quantidadeRecepcionada);
+	}
+	
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer alterarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
+			throws BusinessException {
+		if (idItemCompra == null) {
+			return null;
+		}
+		if (quantidadeRecepcionada == null) {
+			quantidadeRecepcionada = 0;
+		}
+
+		pedidoService.alterarQuantidadeRecepcionada(idItemCompra, quantidadeRecepcionada);
+		return alterarEstoque(idItemCompra, quantidadeRecepcionada);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada, String ncm)
+			throws BusinessException {
+		if (idItemCompra == null) {
+			return null;
+		}
+		Integer idItemEstoque = adicionarQuantidadeRecepcionadaItemCompra(idItemCompra, quantidadeRecepcionada);
+
+		Object[] materialFormaMaterial = pedidoService.pesquisarIdMaterialFormaMaterialItemPedido(idItemCompra);
+		String ncmEstoque = materialFormaMaterial.length == 2 ? pesquisarNcmItemEstoque(
+				(Integer) materialFormaMaterial[0], (FormaMaterial) materialFormaMaterial[1]) : null;
+
+		boolean isNovoNcm = (ncmEstoque == null || ncmEstoque.isEmpty()) && (ncm != null && !ncm.isEmpty());
+		boolean isNcmDiferente = ncm != null && ncmEstoque != null && !ncm.equals(ncmEstoque);
+
+		if (isNovoNcm) {
+			// Inserindo configuracao do ncm no estoque.
+			itemEstoqueDAO.inserirConfiguracaoNcmEstoque((Integer) materialFormaMaterial[0],
+					(FormaMaterial) materialFormaMaterial[1], ncm);
+		}
+
+		if (ncm == null || (isNcmDiferente && !isNovoNcm)) {
+			ncm = ncmEstoque;
+		}
+
+		if (ncm != null && !ncm.isEmpty()) {
+			// Inserindo o ncm no pedido de compra.
+			ItemPedido itemPedidoCompra = pedidoService.pesquisarItemPedidoById(idItemCompra);
+			itemPedidoCompra.setNcm(ncm);
+			itemPedidoDAO.alterar(itemPedidoCompra);
+
+			// Inserindo ncm nos pedidos de revenda associados a essa compra.
+			pedidoService.inserirNcmItemAguardandoMaterialAssociadoByIdItemCompra(idItemCompra, ncm);
+		}
+		return idItemEstoque;
+	}
+
+	private Integer alterarEstoque(Integer idItemCompra, Integer quantidade) throws BusinessException {
+		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemCompra);
+		itemEstoque.setQuantidade(quantidade);
+
+		// itemEstoque.setPrecoMedio(itemEstoque.calcularPrecoUnidadeIPI());
+		/*
+		 * O fator de correcao de icms deve ser gravado durante a inclusao do
+		 * item no estoque para que seja utilizado no calculo do preco minimo de
+		 * venda posteriormente, pois existe um esquema de debito/credito de
+		 * icms em cada item do estoque que deve ser repassado para o cliente.
+		 */
+		calcularPrecoMedioFatorICMS(itemEstoque);
+		return inserirItemEstoque(itemEstoque);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double calcularPrecoCustoItemEstoque(Item item) {
 		if (item.getQuantidade() == null) {
@@ -78,14 +165,13 @@ public class EstoqueServiceImpl implements EstoqueService {
 		aliquotaICMSItem = aliquotaICMSItem != null ? aliquotaICMSItem : 0d;
 
 		double fatorICMS = aliquotaICMSRevendedor - aliquotaICMSItem;
-		return precoMedio * (1 + fatorICMS);
+		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + fatorICMS));
 	}
 
 	private void calcularPrecoMedioFatorICMS(ItemEstoque itemEstoque) {
 		if (itemEstoque.getPrecoMedio() == null) {
 			return;
 		}
-
 		itemEstoque.setPrecoMedioFatorICMS(calcularPrecoMedioFatorICMS(
 				representadaService.pesquisarAliquotaICMSRevendedor(), itemEstoque.getAliquotaICMS(),
 				itemEstoque.getPrecoMedio()));
@@ -111,38 +197,54 @@ public class EstoqueServiceImpl implements EstoqueService {
 		removerValoresNulos(itemCadastrado);
 		removerValoresNulos(itemEstoque);
 
-		final double qItem = itemEstoque.getQuantidade() != null && itemEstoque.getQuantidade() >= 0d ? itemEstoque
-				.getQuantidade() : 0;
+		final double qItem = itemEstoque.getQuantidade() != null ? itemEstoque.getQuantidade() : 0;
 
 		final double qCadastrada = itemCadastrado.getQuantidade() != null && itemCadastrado.getQuantidade() >= 0d ? itemCadastrado
 				.getQuantidade() : 0;
 
-		final double precoEstoque = qCadastrada
+		final double precoCadastrado = qCadastrada
 				* (itemCadastrado.getPrecoMedio() != null ? itemCadastrado.getPrecoMedio() : 0d);
 
-		final double precoEstoqueFatorICMS = qCadastrada
+		final double precoFatorICMSCadastrado = qCadastrada
 				* (itemCadastrado.getPrecoMedioFatorICMS() != null ? itemCadastrado.getPrecoMedioFatorICMS() : 0d);
 
-		final double precoItem = qItem * itemEstoque.getPrecoMedio();
-		final double precoItemFatorICMS = qItem * itemEstoque.getPrecoMedioFatorICMS();
+		final double precoItem = qItem * (itemEstoque.getPrecoMedio() != null ? itemEstoque.getPrecoMedio() : 0d);
+		final double precoItemFatorICMS = qItem
+				* (itemEstoque.getPrecoMedioFatorICMS() != null ? itemEstoque.getPrecoMedioFatorICMS() : 0d);
 
 		// Estamos possibilitando a inclusao de novos itens no estoque com preco
 		// zerado pois eh possivel que haja devolucao dos itens que foram
 		// vendidos
-		final double quantidadeTotal = qCadastrada + qItem;
+		double quantidadeTotal = qCadastrada + qItem;
+		if (quantidadeTotal < 0) {
+			quantidadeTotal = 0d;
+		}
 		// Se a quantidade total for nula, entao o item cadastrado no estoque
 		// deve permanecer com o mesmo preco medio e fator icms
-		final double precoMedio = quantidadeTotal <= 0d ? precoEstoque : (precoEstoque + precoItem) / quantidadeTotal;
-		final double precoMedioFatorICMS = quantidadeTotal <= 0d ? precoEstoqueFatorICMS
-				: (precoEstoqueFatorICMS + precoItemFatorICMS) / quantidadeTotal;
+		double precoMedio = quantidadeTotal <= 0d ? precoCadastrado : (precoCadastrado + precoItem) / quantidadeTotal;
+		double precoMedioFatorICMS = quantidadeTotal <= 0d ? precoFatorICMSCadastrado
+				: (precoFatorICMSCadastrado + precoItemFatorICMS) / quantidadeTotal;
 
 		final double ipiCadastrado = qCadastrada * itemCadastrado.getAliquotaIPI();
 		final double ipiItem = qItem * itemEstoque.getAliquotaIPI();
-		final double ipiMedio = quantidadeTotal <= 0d ? ipiCadastrado : (ipiCadastrado + ipiItem) / quantidadeTotal;
+		double ipiMedio = quantidadeTotal <= 0d ? ipiCadastrado : (ipiCadastrado + ipiItem) / quantidadeTotal;
 
 		final double icmsCadastrado = qCadastrada * itemCadastrado.getAliquotaICMS();
 		final double icmsItem = qItem * itemEstoque.getAliquotaICMS();
-		final double icmsMedio = quantidadeTotal <= 0d ? icmsCadastrado : (icmsCadastrado + icmsItem) / quantidadeTotal;
+		double icmsMedio = quantidadeTotal <= 0d ? icmsCadastrado : (icmsCadastrado + icmsItem) / quantidadeTotal;
+
+		if (precoMedio < 0) {
+			precoMedio = 0d;
+		}
+		if (precoMedioFatorICMS < 0) {
+			precoMedioFatorICMS = 0d;
+		}
+		if (ipiMedio < 0) {
+			ipiMedio = 0d;
+		}
+		if (icmsMedio < 0) {
+			icmsMedio = 0d;
+		}
 
 		itemCadastrado.setPrecoMedio(precoMedio);
 		itemCadastrado.setPrecoMedioFatorICMS(precoMedioFatorICMS);
@@ -406,23 +508,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (!itemEstoque.isPeca() && StringUtils.isNotEmpty(itemEstoque.getDescricaoPeca())) {
 			throw new BusinessException("A descrição é apenas itens do tipo peças. Remova a descrição.");
 		}
-
-		itemEstoque.configurarMedidaInterna();
-
-		CalculadoraItem.validarVolume(itemEstoque);
-
-		// Verificando se existe item equivalente no estoque, caso nao exista
-		// vamos criar um novo.
-		ItemEstoque itemCadastrado = pesquisarItemEstoque(itemEstoque);
-		calcularPrecoMedioItemEstoque(itemCadastrado, itemEstoque);
-
-		if (itemCadastrado == null) {
-			itemCadastrado = itemEstoque;
-		}
-
-		calcularPrecoMedioFatorICMS(itemCadastrado);
-
-		return itemEstoqueDAO.alterar(itemCadastrado).getId();
+		return itemEstoqueDAO.alterar(recalcularValorItemEstoque(itemEstoque)).getId();
 	}
 
 	@Override
@@ -564,64 +650,35 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer recepcionarItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada)
-			throws BusinessException {
-		if (quantidadeRecepcionada == null) {
-			quantidadeRecepcionada = 0;
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer recalcularEstoqueItemCompra(Integer idItemCompra, Integer quantidade) throws BusinessException {
+		if (quantidade == null) {
+			quantidade = 0;
 		}
+		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemCompra);
+		itemEstoque.setQuantidade(quantidade);
 
-		Integer quantidadeItem = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemPedidoCompra);
-		quantidadeItem += quantidadeRecepcionada;
-		pedidoService.alterarQuantidadeRecepcionada(idItemPedidoCompra, quantidadeItem);
-
-		ItemEstoque itemEstoque = gerarItemEstoqueByIdItemPedido(idItemPedidoCompra);
-		itemEstoque.setQuantidade(quantidadeRecepcionada);
-
-		// itemEstoque.setPrecoMedio(itemEstoque.calcularPrecoUnidadeIPI());
-		/*
-		 * O fator de correcao de icms deve ser gravado durante a inclusao do
-		 * item no estoque para que seja utilizado no calculo do preco minimo de
-		 * venda posteriormente, pois existe um esquema de debito/credito de
-		 * icms em cada item do estoque que deve ser repassado para o cliente.
-		 */
-		calcularPrecoMedioFatorICMS(itemEstoque);
-		return inserirItemEstoque(itemEstoque);
+		return recalcularValorItemEstoque(itemEstoque).getId();
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer recepcionarItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada, String ncm)
-			throws BusinessException {
-		Integer idItemEstoque = recepcionarItemCompra(idItemPedidoCompra, quantidadeRecepcionada);
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ItemEstoque recalcularValorItemEstoque(ItemEstoque itemEstoque) throws AlgoritmoCalculoException {
+		itemEstoque.configurarMedidaInterna();
 
-		Object[] materialFormaMaterial = pedidoService.pesquisarIdMaterialFormaMaterialItemPedido(idItemPedidoCompra);
-		String ncmEstoque = materialFormaMaterial.length == 2 ? pesquisarNcmItemEstoque(
-				(Integer) materialFormaMaterial[0], (FormaMaterial) materialFormaMaterial[1]) : null;
+		CalculadoraItem.validarVolume(itemEstoque);
 
-		boolean isNovoNcm = (ncmEstoque == null || ncmEstoque.isEmpty()) && (ncm != null && !ncm.isEmpty());
-		boolean isNcmDiferente = ncm != null && ncmEstoque != null && !ncm.equals(ncmEstoque);
+		// Verificando se existe item equivalente no estoque, caso nao exista
+		// vamos criar um novo.
+		ItemEstoque itemCadastrado = pesquisarItemEstoque(itemEstoque);
+		calcularPrecoMedioItemEstoque(itemCadastrado, itemEstoque);
 
-		if (isNovoNcm) {
-			// Inserindo configuracao do ncm no estoque.
-			itemEstoqueDAO.inserirConfiguracaoNcmEstoque((Integer) materialFormaMaterial[0],
-					(FormaMaterial) materialFormaMaterial[1], ncm);
+		if (itemCadastrado == null) {
+			itemCadastrado = itemEstoque;
 		}
 
-		if (ncm == null || (isNcmDiferente && !isNovoNcm)) {
-			ncm = ncmEstoque;
-		}
-
-		if (ncm != null && !ncm.isEmpty()) {
-			// Inserindo o ncm no pedido de compra.
-			ItemPedido itemPedidoCompra = pedidoService.pesquisarItemPedidoById(idItemPedidoCompra);
-			itemPedidoCompra.setNcm(ncm);
-			itemPedidoDAO.alterar(itemPedidoCompra);
-
-			// Inserindo ncm nos pedidos de revenda associados a essa compra.
-			pedidoService.inserirNcmItemAguardandoMaterialAssociadoByIdItemCompra(idItemPedidoCompra, ncm);
-		}
-		return idItemEstoque;
+		calcularPrecoMedioFatorICMS(itemCadastrado);
+		return itemCadastrado;
 	}
 
 	@Override
@@ -728,6 +785,18 @@ public class EstoqueServiceImpl implements EstoqueService {
 				itemEstoqueDAO.alterar(itemEstoque);
 			}
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer removerEstoqueItemCompra(Integer idItemCompra, Integer quantidadeRemovida) throws BusinessException {
+		if (quantidadeRemovida == null) {
+			quantidadeRemovida = 0;
+		}
+		// Estamos multiplicando por -1 para que o sistema de estoque some um
+		// valor negativo nos precos do estoque, o que significa que um item
+		// comprado foi removido.
+		return recalcularEstoqueItemCompra(idItemCompra, -1 * quantidadeRemovida);
 	}
 
 	private void removerItemReservadoByIdPedido(Integer idPedido) {

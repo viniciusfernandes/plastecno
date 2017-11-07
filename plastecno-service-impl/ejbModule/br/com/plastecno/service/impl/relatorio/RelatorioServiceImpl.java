@@ -41,7 +41,6 @@ import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.impl.anotation.REVIEW;
-import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
 import br.com.plastecno.service.wrapper.ComissaoVendaWrapper;
@@ -349,11 +348,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecebimento(Integer idRepresentada,
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecepcao(Integer idRepresentada,
 			Periodo periodo) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
-				"Pedidos de Compras para Recebimento",
-				pedidoService.pesquisarCompraAguardandoRecebimento(idRepresentada, periodo), false);
+				"Pedidos de Compras para Recepção",
+				pedidoService.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, periodo), false);
 
 		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
@@ -363,21 +362,69 @@ public class RelatorioServiceImpl implements RelatorioService {
 	private RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicata(List<NFeDuplicata> lDuplic, String titulo)
 			throws BusinessException {
 		RelatorioWrapper<Date, NFeDuplicata> relatorio = new RelatorioWrapper<Date, NFeDuplicata>(titulo);
-		Date dtAtual = new Date();
+		int qtde = 0;
+		boolean okVal = false;
+		boolean liqd = false;
+		Double tot = 0d;
+		Double totReceber = 0d;
+		Double totDia = null;
+		Double totReceberDia = null;
+		GrupoWrapper<Date, NFeDuplicata> g = null;
 		for (NFeDuplicata d : lDuplic) {
-			// Vamos definir a situação da duplicata
-			if (!d.isLiquidado() && dtAtual.after(d.getDataVencimento())) {
-				d.setTipoSituacaoDuplicata(TipoSituacaoDuplicata.VENCIDO);
+			totReceberDia = 0d;
+			totDia = 0d;
+
+			okVal = d.getValor() != null;
+			liqd = d.isLiquidado();
+			qtde++;
+
+			if (okVal) {
+				tot += d.getValor();
 			}
-			relatorio.addGrupo(d.getDataVencimento(), d).setPropriedade("dataVencimentoFormatada",
-					StringUtils.formatarData(d.getDataVencimento()));
+
+			if (okVal && !liqd) {
+				totReceber += d.getValor();
+			}
+
+			g = relatorio.addGrupo(d.getDataVencimento(), d);
+			if ((totDia = (Double) g.getPropriedade("totDia")) == null && okVal) {
+				totDia = d.getValor();
+			} else if (totDia != null && okVal) {
+				totDia += d.getValor();
+			} else if (totDia == null) {
+				totDia = 0d;
+			}
+
+			if ((totReceberDia = (Double) g.getPropriedade("totReceberDia")) == null && !liqd) {
+				totReceberDia = d.getValor();
+			} else if (totReceberDia != null && okVal && !liqd) {
+				totReceberDia += d.getValor();
+			} else if (totReceberDia == null) {
+				totReceberDia = 0d;
+			}
+
+			g.setPropriedade("totDia", totDia);
+			g.setPropriedade("totReceberDia", totReceberDia);
+			g.setPropriedade("dataVencimentoFormatada", StringUtils.formatarData(d.getDataVencimento()));
+		}
+
+		// Apenas formantando os valores apos as totalizacoes para evitar
+		// diferencas nos arredondamentos.
+		relatorio.addPropriedade("qtde", qtde);
+		relatorio.addPropriedade("totReceber", NumeroUtils.arredondarValorMonetario(totReceber));
+		relatorio.addPropriedade("tot", NumeroUtils.arredondarValorMonetario(tot));
+
+		for (GrupoWrapper<Date, NFeDuplicata> gr : relatorio.getListaGrupo()) {
+			gr.setPropriedade("totDia", NumeroUtils.arredondarValorMonetario((Double) gr.getPropriedade("totDia")));
+			gr.setPropriedade("totReceberDia",
+					NumeroUtils.arredondarValorMonetario((Double) gr.getPropriedade("totReceberDia")));
 		}
 
 		relatorio.sortGrupo(new Comparator<GrupoWrapper<Date, NFeDuplicata>>() {
 
 			@Override
 			public int compare(GrupoWrapper<Date, NFeDuplicata> o1, GrupoWrapper<Date, NFeDuplicata> o2) {
-				return o1.getId() != null && o1.getId() != null ? o2.getId().compareTo(o1.getId()) : 0;
+				return o1.getId() != null && o2.getId() != null ? o1.getId().compareTo(o2.getId()) : 0;
 			}
 		});
 
@@ -404,6 +451,21 @@ public class RelatorioServiceImpl implements RelatorioService {
 				.append(StringUtils.formatarData(periodo.getFim()));
 
 		return gerarRelatorioDuplicata(duplicataService.pesquisarDuplicataByPeriodo(periodo), titulo.toString());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Date, NFeDuplicata> gerarRelatorioDuplicataByIdCliente(Integer idCliente)
+			throws BusinessException {
+		if (idCliente == null) {
+			throw new BusinessException("Não é possível gerar relatório de duplicatas pois o ID do cliente esta nulo.");
+		}
+
+		StringBuilder titulo = new StringBuilder();
+
+		titulo.append("Duplicatas do Cliente ").append(clienteService.pesquisarNomeFantasia(idCliente));
+
+		return gerarRelatorioDuplicata(duplicataService.pesquisarDuplicataByIdCliente(idCliente), titulo.toString());
 	}
 
 	@Override
@@ -492,6 +554,19 @@ public class RelatorioServiceImpl implements RelatorioService {
 		});
 
 		relatorio.sortElementoByGrupo(ordenacaoItemPedido);
+		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemPedidoCompraEfetivada(Integer idRepresentada,
+			Periodo periodo) {
+		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
+				"Compras de " + StringUtils.formatarData(periodo.getInicio()) + " a "
+						+ StringUtils.formatarData(periodo.getFim()),
+				pedidoService.pesquisarItemPedidoCompraEfetivada(idRepresentada, periodo), false);
+
+		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
 	}
 
@@ -649,7 +724,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 			throw new BusinessException("O vendedor é obrigatório para a geração do relatório");
 		}
 
-		final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamento " : "Vendas ").append(" do Vendedor ")
+		final StringBuilder titulo = new StringBuilder(orcamento ? "Orçamentos " : "Vendas ").append(" do Vendedor ")
 				.append(vendedor.getNome()).append(" de ").append(StringUtils.formatarData(periodo.getInicio()))
 				.append(" à ").append(StringUtils.formatarData(periodo.getFim()));
 

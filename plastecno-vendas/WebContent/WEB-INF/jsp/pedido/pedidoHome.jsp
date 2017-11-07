@@ -1,15 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <jsp:include page="/bloco/bloco_css.jsp" />
 <jsp:include page="/bloco/bloco_relatorio_css.jsp" />
 
-<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script src="http://code.jquery.com/jquery-1.10.2.js" type="text/javascript"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.paginate.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
@@ -326,13 +324,12 @@ $(document).ready(function() {
 				<input type="text" id="prazoEntrega" name="pedido.prazoEntrega" value="${pedido.prazoEntrega}"/>
 			</div>
 			<div class="label" style="width: 12%">Data Envio:</div>
-			<div class="input" style="width: 30%">
-				<input type="text" id="dataEnvio"
-					value="${pedido.dataEnvioFormatada}" readonly="readonly"
-					class="desabilitado" style="width: 25%" />
+			<div class="input" style="width: 20%">
+				<input type="text" id="dataEnvio" value="${pedido.dataEnvioFormatada}" readonly="readonly"
+					class="desabilitado" style="width: 100%" />
 			</div>
 			<div class="label obrigatorio">Cliente:</div>
-			<div class="input" style="width: 30%">
+			<div class="input" style="width: 38%">
 				<input type="text" id="nomeCliente" value="${cliente.nomeCompleto}" class="pesquisavel" style="width: 100%"/>
 				<div class="suggestionsBox" id="containerPesquisaCliente" style="display: none; width: 50%"></div>
 			</div>
@@ -348,47 +345,32 @@ $(document).ready(function() {
 					class="checkbox" style="width: 4%"/>
 			</div>
 			<div class="label">End. Faturam.</div>
-			<div class="input" style="width: 80%">
+			<div class="input" style="width: 38%">
 				<input type="text" id="logradouroFaturamento"
-					value="${logradouroFaturamento}" disabled="disabled" class="uppercaseBloqueado desabilitado" style="width: 50%"/>
+					value="${logradouroFaturamento}" disabled="disabled" class="uppercaseBloqueado desabilitado"/>
+			</div>
+			<div class="label" style="width: 12%">Email:</div>
+			<div class="input" style="width: 20%">
+				<input type="text" id="email" name="cliente.email"
+					value="${cliente.email}" style="width: 100%"
+					class="uppercaseBloqueado desabilitado" disabled="disabled" />
 			</div>
 			<div class="label">CNPJ:</div>
 			<div class="input" style="width: 15%">
-				<input type="text" id="cnpj" name="cliente.cnpj"
-					value="${cliente.cnpj}" class="desabilitado" disabled="disabled" />
+				<input type="text" id="cnpj" name="cliente.cnpj" value="${cliente.cnpj}" class="desabilitado" disabled="disabled" />
 			</div>
-			<div class="label" style="width: 5%">CPF:</div>
-			<div class="input" style="width: 60%">
-				<input type="text" id="cpf" name="cliente.cpf"
-					value="${cliente.cpf}" class="desabilitado" disabled="disabled" style="width: 25%"/>
-			</div>
-			<div class="label">SUFRAMA:</div>
+			<div class="label" style="width: 7%">CPF:</div>
 			<div class="input" style="width: 15%">
-				<input type="text" id="suframa" name="cliente.inscricaoSUFRAMA"
-					value="${cliente.inscricaoSUFRAMA}" 
-					class="uppercaseBloqueado desabilitado" disabled="disabled" />
+				<input type="text" id="cpf" name="cliente.cpf" value="${cliente.cpf}" class="desabilitado" disabled="disabled" />
 			</div>
-			<div class="label" style="width: 5%">Email:</div>
-			<div class="input" style="width: 50%">
-				<input type="text" id="email" name="cliente.email"
-					value="${cliente.email}" style="width: 45%"
-					class="uppercaseBloqueado desabilitado" disabled="disabled" />
-			</div>
-			<div class="label" style="width: 15%">Tipo Entrega:</div>
+			<div class="label" style="width: 12%">SUFRAMA:</div>
 			<div class="input" style="width: 20%">
-				<select id="tipoEntrega" name="pedido.tipoEntrega"
-					style="width: 80%">
-					<option value="">&lt&lt SELECIONE &gt&gt</option>
-					<c:forEach var="tipoEntrega" items="${listaTipoEntrega}">
-						<option value="${tipoEntrega}"
-							<c:if test="${tipoEntrega eq pedido.tipoEntrega}">selected</c:if>>${tipoEntrega.descricao}</option>
-					</c:forEach>
-				</select>
+				<input type="text" id="suframa" name="cliente.inscricaoSUFRAMA" value="${cliente.inscricaoSUFRAMA}" 
+					class="uppercaseBloqueado desabilitado" disabled="disabled" />
 			</div>
-			<div class="label obrigatorio" style="width: 20%">${not empty tipoPedido ? 'Fornecedor:': 'Representada:'}</div>
-			<div class="input" style="width: 40%">
-				<select id="representada" name="pedido.representada.id"
-					style="width: 45%">
+			<div class="label obrigatorio" >${not empty tipoPedido ? 'Fornecedor:': 'Representada:'}</div>
+			<div class="input" style="width: 15%">
+				<select id="representada" name="pedido.representada.id" style="width: 100%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="representada" items="${listaRepresentada}">
 						<option value="${representada.id}"
@@ -396,31 +378,9 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Transportadora:</div>
-			<div class="input" style="width: 20%">
-				<select id="listaTransportadora" name="pedido.transportadora.id"
-					style="width: 80%">
-					<option value="">&lt&lt SELECIONE &gt&gt</option>
-					<c:forEach var="transportadora" items="${listaTransportadora}">
-						<option value="${transportadora.id}"
-							<c:if test="${transportadora.id eq pedido.transportadora.id}">selected</c:if>>${transportadora.nomeFantasia}</option>
-					</c:forEach>
-				</select>
-			</div>
-			<div class="label" style="width: 20%">Redespacho:</div>
-			<div class="input" style="width: 40%">
-				<select id="listaRedespacho" name="pedido.transportadoraRedespacho.id" style="width: 45%">
-					<option value="">&lt&lt SELECIONE &gt&gt</option>
-					<c:forEach var="redespacho" items="${listaRedespacho}">
-						<option value="${redespacho.id}"
-							<c:if test="${redespacho.id eq pedido.transportadoraRedespacho.id}">selected</c:if>>${redespacho.nomeFantasia}</option>
-					</c:forEach>
-				</select>
-			</div>
-
-			<div class="label obrigatorio">Finalidade:</div>
-			<div class="input" style="width: 20%">
-				<select id="finalidadePedido" name="pedido.finalidadePedido" style="width: 80%" >
+			<div class="label obrigatorio" style="width: 7%">Finalidade:</div>
+			<div class="input" style="width: 60%">
+				<select id="finalidadePedido" name="pedido.finalidadePedido" style="width: 25%" >
 					<option value=""></option>
 					<c:forEach var="tipo" items="${listaTipoFinalidadePedido}">
 						<option value="${tipo}" 
@@ -428,9 +388,40 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label" style="width: 20% ">Frete (R$):</div>
-			<div class="input" style="width: 40%">
-				<input id="fretePedido" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 45%" />
+			<div class="label">Transportadora:</div>
+			<div class="input" style="width: 15%">
+				<select id="listaTransportadora" name="pedido.transportadora.id" style="width: 100%">
+					<option value="">&lt&lt SELECIONE &gt&gt</option>
+					<c:forEach var="transportadora" items="${listaTransportadora}">
+						<option value="${transportadora.id}"
+							<c:if test="${transportadora.id eq pedido.transportadora.id}">selected</c:if>>${transportadora.nomeFantasia}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label" style="width: 7%">Redesp.:</div>
+			<div class="input" style="width: 60%">
+				<select id="listaRedespacho" name="pedido.transportadoraRedespacho.id" style="width: 25%">
+					<option value="">&lt&lt SELECIONE &gt&gt</option>
+					<c:forEach var="redespacho" items="${listaRedespacho}">
+						<option value="${redespacho.id}"
+							<c:if test="${redespacho.id eq pedido.transportadoraRedespacho.id}">selected</c:if>>${redespacho.nomeFantasia}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label">Tipo Entrega:</div>
+			<div class="input" style="width: 15%">
+				<select id="tipoEntrega" name="pedido.tipoEntrega"
+					style="width: 100%">
+					<option value="">&lt&lt SELECIONE &gt&gt</option>
+					<c:forEach var="tipoEntrega" items="${listaTipoEntrega}">
+						<option value="${tipoEntrega}"
+							<c:if test="${tipoEntrega eq pedido.tipoEntrega}">selected</c:if>>${tipoEntrega.descricao}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="label" style="width: 7% ">Frete (R$):</div>
+			<div class="input" style="width: 60%">
+				<input id="fretePedido" name="pedido.valorFrete" value="${pedido.valorFrete}" style="width: 25%" />
 			</div>
 			<c:if test="${orcamento}">
 				<div class="label">Validade:</div>
@@ -439,12 +430,12 @@ $(document).ready(function() {
 			</div>
 			</c:if>
 			<div class="label">Observação:</div>
-			<div class="input areatexto" style="width: 70%">
+			<div class="input areatexto" style="width: 71%">
 				<textarea id="obervacao" name="pedido.observacao"
 					style="width: 100%">${pedido.observacao}</textarea>
 			</div>
 			<div class="label">Observação Prod.:</div>
-			<div class="input areatexto" style="width: 70%">
+			<div class="input areatexto" style="width: 71%">
 				<textarea id="observacaoProducao" name="pedido.observacaoProducao"
 					style="width: 100%">${pedido.observacaoProducao}</textarea>
 			</div>

@@ -12,7 +12,7 @@ public class AlgoritmoCalculoPrecoKilo implements AlgoritmoCalculo {
 		}
 		// multiplicando a quantidade de itens pelo valor da venda pelo peso de
 		// cada item
-		return itemPedido.calcularPrecoTotal() * CalculadoraItem.calcularKiloUnidade(itemPedido);
+		return itemPedido.calcularPrecoTotalVenda() * CalculadoraItem.calcularKiloUnidade(itemPedido);
 	}
 
 }

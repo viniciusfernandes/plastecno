@@ -13,13 +13,13 @@ public class RelatorioWrapper<T, K> {
 	/*
 	 * Essa lista foi criada para ser utilizada quando um relatorio necessita
 	 * agrupar informacoes, por exemplo: um agrupamento de todos os itens do
-	 * pedido para um determinado vendedor, ou seja, o agrupamento pode ser feito
-	 * adotando como chave o nome do vendedor, ja a lista de elementos desse grupo
-	 * seriam os itens do pediso, sendo assim, teriamos como:
+	 * pedido para um determinado vendedor, ou seja, o agrupamento pode ser
+	 * feito adotando como chave o nome do vendedor, ja a lista de elementos
+	 * desse grupo seriam os itens do pediso, sendo assim, teriamos como:
 	 * 
 	 * GrupoWrapper<String, ItemPedido> grupo = ... ;
-	 * grupo.addElemento("Vinicius", item1); grupo.addElemento("Vinicius", item2);
-	 * grupo.addElemento("Vinicius", item3);
+	 * grupo.addElemento("Vinicius", item1); grupo.addElemento("Vinicius",
+	 * item2); grupo.addElemento("Vinicius", item3);
 	 * 
 	 * 
 	 * listaGrupo.addGrupo(grupo);
@@ -104,6 +104,9 @@ public class RelatorioWrapper<T, K> {
 	}
 
 	public Object getPropriedade(String nomePropriedade) {
+		if (propriedades == null) {
+			return null;
+		}
 		return propriedades.get(nomePropriedade);
 	}
 

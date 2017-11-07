@@ -1,9 +1,6 @@
 package br.com.plastecno.service.impl;
 
-import static br.com.plastecno.service.constante.TipoAcesso.ADMINISTRACAO;
-import static br.com.plastecno.service.constante.TipoAcesso.CADASTRO_PEDIDO_COMPRA;
-import static br.com.plastecno.service.constante.TipoAcesso.CADASTRO_PEDIDO_VENDAS;
-import static br.com.plastecno.service.constante.TipoAcesso.RECEPCAO_COMPRA;
+import static br.com.plastecno.service.constante.TipoAcesso.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -251,7 +248,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isVendaPermitida(Integer idCliente, Integer idVendedor) {
-		return isAcessoPermitido(idVendedor, ADMINISTRACAO) || isClienteAssociadoVendedor(idCliente, idVendedor);
+		return isAcessoPermitido(idVendedor, ADMINISTRACAO, GERENCIA_VENDAS)
+				|| isClienteAssociadoVendedor(idCliente, idVendedor);
 	}
 
 	@Override

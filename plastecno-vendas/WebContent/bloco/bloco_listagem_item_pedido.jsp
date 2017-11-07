@@ -22,7 +22,7 @@ $(document).ready(function(){
 		<legend>::: Resultado da Pesquisa de Pedidos de ${isCompra ? 'Compra': 'Venda'} :::</legend>
 		<div id="paginador"></div>
 		<div class="bloco_botoes">
-			<input type="button" id="botaoCopiarItem" title="Gerar Novo ${orcamento ? 'Orçamento': 'Pedido'}" value="" class="botaoEnviarEmail"/>
+			<input type="button" id="botaoCopiarItem" title="Gerar Novo ${orcamento ? 'Orçamento': 'Pedido'}" value="" class="botaoCesta"/>
 			<input type="button" id="botaoRemoverSelecaoItem" value="" title="Remover Seleção Item" class="botaoLimpar" />
 		</div>
 		<div>

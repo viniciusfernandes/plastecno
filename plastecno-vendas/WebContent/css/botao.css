@@ -99,6 +99,14 @@
 	width: 24px;
 }
 
+.botaoCesta:hover {
+	background: url("../images/cesta_16.png") no-repeat scroll
+		0 0 transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
 .botaoCestaPequeno {
 	background: url("../images/cesta_16.png") no-repeat scroll 0 0
 		transparent;

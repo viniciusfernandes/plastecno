@@ -12,7 +12,7 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.SituacaoPedido;
-import br.com.plastecno.service.constante.TipoAcesso;
+import static br.com.plastecno.service.constante.TipoAcesso.*;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
@@ -70,9 +70,8 @@ public class AbstractPedidoController extends AbstractController {
     public AbstractPedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
-        verificarPermissaoAcesso("acessoCadastroPedidoPermitido", TipoAcesso.CADASTRO_PEDIDO_VENDAS);
-        verificarPermissaoAcesso("acessoDadosNotaFiscalPermitido", TipoAcesso.ADMINISTRACAO,
-                TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+        verificarPermissaoAcesso("acessoCadastroPedidoPermitido", CADASTRO_PEDIDO_VENDAS);
+        verificarPermissaoAcesso("acessoDadosNotaFiscalPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_COMPRA);
     }
 
     void configurarTipoPedido(TipoPedido tipoPedido) {
@@ -244,7 +243,7 @@ public class AbstractPedidoController extends AbstractController {
         // todos os pedidos de um determinado cliente independentemente do
         // vendedor. Essa acao sera disparada por qualquer um que seja
         // adiministrador do sistema, podendo ser um outro vendedor ou nao.
-        boolean pesquisarTodos = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+        boolean pesquisarTodos = isAcessoPermitido(ADMINISTRACAO, GERENCIA_VENDAS);
         RelatorioWrapper<Pedido, ItemPedido> relatorio = relatorioService
                 .gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
                         pesquisarTodos ? null : idUsuario, idFornecedor, isOrcamento, isCompra, indiceRegistroInicial,
@@ -347,7 +346,7 @@ public class AbstractPedidoController extends AbstractController {
     }
 
     boolean isPedidoDesabilitado(Pedido pedido) {
-        if (pedido == null || isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS)) {
+        if (pedido == null || isAcessoPermitido(ADMINISTRACAO, GERENCIA_VENDAS)) {
             return false;
         } else {
             SituacaoPedido situacao = pedido.getSituacaoPedido();
@@ -366,26 +365,26 @@ public class AbstractPedidoController extends AbstractController {
     boolean isVisulizacaoClientePermitida(Integer idCliente) {
         // Aqui temos que verificar se o usuario eh o vendedor associado ao
         // cliente.
-        boolean isGestor = isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS);
+        boolean isGestor = isAcessoPermitido(ADMINISTRACAO, GERENCIA_VENDAS);
         if (isGestor) {
             return true;
         }
         Integer idVend = clienteService.pesquisarIdVendedorByIdCliente(idCliente);
         Integer idUsu = getCodigoUsuario();
         final boolean isAcessoVendaPermitido = (idVend == null || idUsu.equals(idVend))
-                && (isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_VENDAS));
-        final boolean isAcessoCompraPermitida = isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+                && (isAcessoPermitido(CADASTRO_PEDIDO_VENDAS));
+        final boolean isAcessoCompraPermitida = isAcessoPermitido(CADASTRO_PEDIDO_COMPRA);
         return isAcessoVendaPermitido || isAcessoCompraPermitida;
     }
 
     boolean isVisulizacaoPermitida(Integer idPedido, TipoPedido tipoPedido) {
-        boolean isAdm = isAcessoPermitido(TipoAcesso.ADMINISTRACAO);
+        boolean isAdm = isAcessoPermitido(ADMINISTRACAO);
         if (isAdm) {
             return true;
         }
         boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
         boolean isVenda = !isCompra;
-        final boolean isAcessoCompraPermitida = isCompra && isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_COMPRA);
+        final boolean isAcessoCompraPermitida = isCompra && isAcessoPermitido(CADASTRO_PEDIDO_COMPRA);
         if (isAcessoCompraPermitida) {
             return true;
         }
@@ -397,6 +396,8 @@ public class AbstractPedidoController extends AbstractController {
         return isAcessoVendaPermitido;
     }
 
+    
+    
     void pesquisarPedidoByIdCliente(Integer idCliente, Integer idUsuario, Integer idFornecedor, TipoPedido tipoPedido,
             boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido, Integer[] listaIdItemSelecionado) {
         boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);

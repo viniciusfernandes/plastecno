@@ -99,6 +99,10 @@ $(document).ready(function() {
 		});
 		
 		request.done(function(response) {
+			return;
+		});
+		
+		request.always(function(response) {
 			document.getElementById('formAnexo').submit();
 		});
 		

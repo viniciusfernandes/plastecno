@@ -249,6 +249,31 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public long pesquisarTotalItemPedidoByIdItem(Integer idItem) {
+				if (idItem == null) {
+					return 0L;
+				}
+				List<ItemPedido> l = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				int count = 0;
+				Integer idPed = null;
+				for (ItemPedido i : l) {
+					if (i.getPedido() != null && idItem.equals(i.getId())) {
+						idPed = i.getPedido().getId();
+						break;
+					}
+				}
+				if (idPed == null) {
+					return 0l;
+				}
+				for (ItemPedido i : l) {
+					if (i.getPedido() != null && idPed.equals(i.getPedido().getId())) {
+						count++;
+					}
+				}
+				return count;
+			}
+
+			@Mock
 			public Transportadora pesquisarTransportadoraByIdPedido(Integer idPedido) {
 				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return p == null ? null : p.getTransportadora();
@@ -288,6 +313,13 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 					iAcum.setPrecoUnidadeIPI(0d);
 				}
 				return new double[] { iAcum.getPrecoUnidade(), iAcum.getPrecoUnidadeIPI() };
+			}
+
+			@Mock
+			public double pesquisarValorFreteByIdItem(Integer idItem) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItem);
+				return i != null && i.getPedido() != null && i.getPedido().getValorFrete() != null ? i.getPedido()
+						.getValorFrete() : 0d;
 			}
 
 			@Mock

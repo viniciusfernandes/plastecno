@@ -36,7 +36,8 @@ public class MenuController extends AbstractController {
         verificarPermissaoAcesso("acessoRelatorioClienteRamoAtividadePermitido", ADMINISTRACAO);
         verificarPermissaoAcesso("acessoVendaPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_VENDAS);
         verificarPermissaoAcesso("acessoCompraPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_COMPRA);
-        verificarPermissaoAcesso("acessoRelatorioComissaoVendedorPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_VENDAS);
+        verificarPermissaoAcesso("acessoRelatorioComissaoVendedorPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_VENDAS,
+                OPERACAO_CONTABIL);
         verificarPermissaoAcesso("acessoValorReceitaPermitido", ADMINISTRACAO);
         verificarPermissaoAcesso("acessoRecepcaoCompraPermitido", RECEPCAO_COMPRA);
         verificarPermissaoAcesso("acessoNFePermitido", ADMINISTRACAO, GERENCIA_VENDAS, FATURAMENTO);

@@ -898,7 +898,8 @@ public class PedidoServiceTest extends AbstractTest {
 		ItemPedido itemComprado = listaItemComprado.get(0);
 		try {
 			// Recepcionando os itens comprados para preencher o estoque.
-			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(itemComprado.getId(), itemComprado.getQuantidade());
+			estoqueService
+					.adicionarQuantidadeRecepcionadaItemCompra(itemComprado.getId(), itemComprado.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -922,7 +923,8 @@ public class PedidoServiceTest extends AbstractTest {
 		for (ItemPedido itemComprado : listaItemComprado) {
 			// Recepcionando os itens comprados para preencher o estoque.
 			try {
-				estoqueService.adicionarQuantidadeRecepcionadaItemCompra(itemComprado.getId(), itemComprado.getQuantidade());
+				estoqueService.adicionarQuantidadeRecepcionadaItemCompra(itemComprado.getId(),
+						itemComprado.getQuantidade());
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}

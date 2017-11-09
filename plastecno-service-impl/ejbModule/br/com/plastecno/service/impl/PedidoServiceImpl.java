@@ -490,7 +490,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoCompra.setTipoPedido(TipoPedido.COMPRA);
 		pedidoCompra.setTipoEntrega(TipoEntrega.CIF);
 
-		pedidoCompra = inserirPedido(pedidoCompra);
+		pedidoCompra = inserir(pedidoCompra);
 		ItemPedido itemCadastrado = null;
 		ItemPedido itemClone = null;
 		boolean incluiAlgumItem = false;
@@ -883,9 +883,6 @@ public class PedidoServiceImpl implements PedidoService {
 		definirTipoPedido(pedido);
 
 		ValidadorInformacao.validar(pedido);
-		if (!pedido.isOrcamento() && (StringUtils.isEmpty(pedido.getFormaPagamento()))) {
-			throw new BusinessException("Forma de pagamento é obrigatória para os pedidos de venda/compra");
-		}
 
 		final Integer idPedido = pedido.getId();
 		final boolean isPedidoNovo = idPedido == null;
@@ -1149,6 +1146,9 @@ public class PedidoServiceImpl implements PedidoService {
 			return inserirOrcamento(pedido);
 		}
 
+		if (!pedido.isOrcamento() && (StringUtils.isEmpty(pedido.getFormaPagamento()))) {
+			throw new BusinessException("Forma de pagamento é obrigatória para os pedidos de venda/compra");
+		}
 		return inserir(pedido);
 	}
 

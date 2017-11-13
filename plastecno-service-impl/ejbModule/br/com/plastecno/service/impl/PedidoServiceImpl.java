@@ -542,6 +542,15 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void configurarDataEnvio(Integer idPedido) {
+		Date dtEnv = pesquisarDataEnvio(idPedido);
+		if (dtEnv == null) {
+			pedidoDAO.alterarDataEnvio(idPedido, new Date());
+		}
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem) {
 		// Apenas um registro deve ser retornado, o que indica apenas um
@@ -1283,6 +1292,9 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Date pesquisarDataEnvio(Integer idPedido) {
+		if (idPedido == null) {
+			return null;
+		}
 		return pedidoDAO.pesquisarDataEnvioById(idPedido);
 	}
 

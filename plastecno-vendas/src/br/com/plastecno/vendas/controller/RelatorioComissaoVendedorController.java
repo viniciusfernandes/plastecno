@@ -7,7 +7,7 @@ import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.plastecno.service.UsuarioService;
-import br.com.plastecno.service.constante.TipoAcesso;
+import static br.com.plastecno.service.constante.TipoAcesso.*;
 import br.com.plastecno.service.entity.Usuario;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.relatorio.RelatorioService;
@@ -30,7 +30,7 @@ public class RelatorioComissaoVendedorController extends AbstractController {
     @Post("relatorio/comissao/vendedor/listagem")
     public void gerarRelatorioComissaoVendedor(Date dataInicial, Date dataFinal, Usuario vendedor) {
         try {
-            if (!isAcessoPermitido(TipoAcesso.ADMINISTRACAO)) {
+            if (!isAcessoPermitido(ADMINISTRACAO)) {
                 vendedor = usuarioService.pesquisarUsuarioResumidoById(vendedor.getId());
             }
             if (vendedor == null || vendedor.getId() == null) {
@@ -57,7 +57,7 @@ public class RelatorioComissaoVendedorController extends AbstractController {
     public void relatorioComissaoVendedorHome() {
         configurarFiltroPediodoMensal();
         addAtributo("acessoPesquisaComissaoPermitido", true);
-        if (!isAcessoPermitido(TipoAcesso.ADMINISTRACAO)) {
+        if (!isAcessoPermitido(ADMINISTRACAO, OPERACAO_CONTABIL)) {
             addAtributo("acessoPesquisaComissaoPermitido", false);
             addAtributo("vendedor", usuarioService.pesquisarById(getCodigoUsuario()));
         }

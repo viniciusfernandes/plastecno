@@ -323,7 +323,7 @@ function remover(codigo, nome) {
 			</div>
 
 			<div class="bloco_botoes">
-				<c:if test="${acessoInclusaoPermitido}">
+				<c:if test="${acessoInclusaoClientePermitido}">
 					<a id="botaoIncluirComentario" title="Adicionar Dados do Comentario" class="botaoAdicionar"></a>
 					<a id="botaoLimparComentario" title="Limpar Dados do Comentario" class="botaoLimpar"></a>
 				</c:if>
@@ -344,7 +344,7 @@ function remover(codigo, nome) {
 	
 
 	<div class="bloco_botoes">
-		<c:if test="${acessoInclusaoPermitido}">
+		<c:if test="${acessoInclusaoClientePermitido}">
 			<a id="botaoInserirCliente" title="${isRevendedor ? 'Definir como Revendedor' :'Incluir Dados do Cliente'}" class="botaoInserir"></a>
 		</c:if>
 	</div>

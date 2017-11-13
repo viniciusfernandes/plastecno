@@ -27,6 +27,11 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		super(entityManager);
 	}
 
+	public void alterarDataEnvio(Integer idPedido, Date dateEnvio) {
+		entityManager.createQuery("update Pedido p set p.dataEnvio= :dataEnvio where p.id = :idPedido")
+				.setParameter("dataEnvio", dateEnvio).setParameter("idPedido", idPedido).executeUpdate();
+	}
+
 	public void alterarIdOrcamentoByIdPedido(Integer idPedido, Integer idOrcamento) {
 		this.entityManager.createQuery("update Pedido p set p.idOrcamento= :idOrcamento where p.id = :idPedido")
 				.setParameter("idOrcamento", idOrcamento).setParameter("idPedido", idPedido).executeUpdate();

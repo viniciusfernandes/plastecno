@@ -80,9 +80,10 @@ public class ClienteController extends AbstractController {
         final boolean isInclusaoCliente = cliente == null || cliente.getId() == null;
         final boolean isVendedorIgual = cliente != null && cliente.getVendedor() != null
                 && getCodigoUsuario().equals(cliente.getVendedor().getId());
-        final boolean isAcessoEdicao = isAcessoPermitido(ADMINISTRACAO, FATURAMENTO);
+        final boolean isAcessoEdicao = isAcessoPermitido(ADMINISTRACAO, GERENCIA_VENDAS, FATURAMENTO);
         boolean isRevendedor = cliente != null && cliente.isRevendedor();
-        addAtributo("acessoInclusaoPermitido", isAcessoEdicao || isInclusaoCliente || isVendedorIgual || isRevendedor);
+        addAtributo("acessoInclusaoClientePermitido", isAcessoEdicao || isInclusaoCliente || isVendedorIgual
+                || isRevendedor);
     }
 
     @Post("cliente/contactar")

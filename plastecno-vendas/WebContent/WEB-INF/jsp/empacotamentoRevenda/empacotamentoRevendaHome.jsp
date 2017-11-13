@@ -184,20 +184,28 @@ function empacotarPedido(campo){
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/pedido/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
-										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
+										<div class="input" style="width: 25%">
+											<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
+										</div>
 									</form>
 									<form action="<c:url value="/empacotamento/item/pesquisadadosnf"/>" method="get">
 										<input type="hidden" name="idItemPedido" value="${item.id}" /> 
 										<input type="hidden" name="idCliente" value="${cliente.id}" /> 
-										<input type="submit" value="" title="Editar o Item do Pedido" class="botaoEditar"/>
+										<div class="input" style="width: 25%">
+											<input type="submit" value="" title="Editar o Item do Pedido" class="botaoEditar"/>
+										</div>									
 									</form>
 									<form action="<c:url value="/emissaoNFe/pedido"/>" method="get">
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
-										<input type="submit" value="" title="Emitir Nota Fiscal do Pedido" class="botaoNFPequeno"/>
+										<div class="input" style="width: 25%">
+											<input type="submit" value="" title="Emitir Nota Fiscal do Pedido" class="botaoNFPequeno"/>
+										</div>
 									</form>
 									<form action="<c:url value="/empacotamento/item/reencomenda"/>" method="post">
-										<input type="hidden" name="idItemPedido" value="${item.id}"> 
-										<input type="button" title="Reenviar Item do Pedido para Encomenda" value="" class="botaoRemover" onclick="enviarEncomenda(this);"/>
+										<input type="hidden" name="idItemPedido" value="${item.id}">
+										<div class="input" style="width: 25%">
+											<input type="button" title="Reenviar Item do Pedido para Encomenda" value="" class="botaoRemover" onclick="enviarEncomenda(this);"/>
+										</div>
 									</form>
 								</div>
 							</td>

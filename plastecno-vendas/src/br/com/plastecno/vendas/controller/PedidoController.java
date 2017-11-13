@@ -214,6 +214,12 @@ public class PedidoController extends AbstractPedidoController {
     @Post("pedido/envio")
     public void enviarPedido(Integer idPedido, TipoPedido tipoPedido, boolean orcamento) {
         try {
+
+            // Esse alteracao da data de envio foi necessaria pois essa data era
+            // definida no sistema apenas apos a geracao do PDf e pois isso nao
+            // aparecia no PDF enviado ao cliente.
+            pedidoService.configurarDataEnvio(idPedido);
+
             final PedidoPDFWrapper wrapper = gerarPDF(idPedido, tipoPedido);
             final Pedido pedido = wrapper.getPedido();
 

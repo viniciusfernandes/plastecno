@@ -27,6 +27,8 @@ import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 public interface PedidoService {
 	Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException;
 
+	void configurarDataEnvio(Integer idPedido);
+
 	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
 
 	void alterarItemAguardandoMaterialByIdPedido(Integer idPedido);

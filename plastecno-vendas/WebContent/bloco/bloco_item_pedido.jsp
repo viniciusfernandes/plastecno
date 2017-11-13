@@ -179,7 +179,7 @@ function pesquisarNcm(){
 	<div class="input" style="width: 58%">
 		<select id="formaMaterial" name="itemPedido.formaMaterial"
 			style="width: 45%">
-			<option value="">&lt&lt SELECIONE &gt&gt</option>
+			<option value=""></option>
 			<c:forEach var="formaMaterial" items="${listaFormaMaterial}">
 				<option value="${formaMaterial}">${formaMaterial.descricao}</option>
 			</c:forEach>
@@ -253,7 +253,7 @@ function pesquisarNcm(){
 	<div class="label" style="width: 10%">C.S.T:</div>
 	<div class="input" style="width: 50%">
 		<select id="cst" name="itemPedido.tipoCst" style="width: 30%">
-			<option value="">&lt&lt SELECIONE &gt&gt</option>
+			<option value=""></option>
 			<c:forEach var="CST" items="${listaCST}">
 				<option value="${CST}">${CST.codigo} - ${CST.descricao}</option>
 			</c:forEach>
@@ -261,10 +261,7 @@ function pesquisarNcm(){
 	</div>
 	<div class="label" >NCM:</div>
 	<div class="input" style="width: 80%">
-		<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}" style="width: 10%" 	
-			<c:out value="${not acessoDadosNotaFiscalPermitido ? 'disabled=\"disabled\"' : ''}"/>"
-			<c:out value="${not acessoDadosNotaFiscalPermitido ? 'class=\"uppercaseBloqueado desabilitado\"' : ''}"/>
-		/>
+		<input type="text" id="ncm" name="itemPedido.ncm" value="${itemPedido.ncm}" style="width: 10%"/>
 	</div>
 	<div class="bloco_botoes">
 		<c:if test="${not pedidoDesabilitado and acessoCadastroPedidoPermitido}">

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -94,14 +96,15 @@ public class PagamentoServiceImpl implements PagamentoService {
 		}
 
 		GrupoWrapper<String, Pagamento> gr = null;
-		Double val = null;
+		Map<Integer, Double> valNf = new HashMap<>();
 		double tot = 0d;
 		double totCredICMS = 0d;
+		Double val = 0d;
 		Boolean liqud = false;
 		boolean isInsumo = false;
-		final String VL_TOTAL_LABEL = "valorTotal";
-		final String LIQUIDADO_LABEL = "liquidado";
-		final String INSUMO_LABEL = "insumo";
+		final String VL_TOTAL_GRUPO = "valorTotal";
+		final String GRUPO_LIQUIDADO = "liquidado";
+		final String INSUMO_GRUPO = "insumo";
 		for (Pagamento p : lPagamento) {
 			tot += p.getValor() != null ? p.getValor() : 0d;
 			totCredICMS += p.getValorCreditoICMS() != null ? p.getValorCreditoICMS() : 0d;
@@ -113,33 +116,33 @@ public class PagamentoServiceImpl implements PagamentoService {
 				// ter o mesmo numreo de NF, assim minimizamos conflitos.
 				gr = relatorio.addGrupo(String.valueOf(p.getNumeroNF()) + p.getIdFornecedor() + p.getParcela(), p);
 				gr.setPropriedade("numeroNF", p.getNumeroNF());
-				val = (Double) gr.getPropriedade(VL_TOTAL_LABEL);
-				liqud = (Boolean) gr.getPropriedade(LIQUIDADO_LABEL);
+				liqud = (Boolean) gr.getPropriedade(GRUPO_LIQUIDADO);
 				isInsumo = true;
-				if (val == null) {
+
+				if ((val = valNf.get(p.getNumeroNF())) == null) {
 					val = 0d;
 				}
+				val += p.getValor() != null ? p.getValor() : 0d;
+				// O valor da NF do relatorio deve ser a soma de todos valores
+				// dos itens.
+				valNf.put(p.getNumeroNF(), val);
+
 				if (liqud == null) {
 					liqud = p.isLiquidado();
 				} else {
 					// Sera liquidado quando todos os itens forem liquidados.
 					liqud &= p.isLiquidado();
 				}
-
-				// O valor da NF do relatorio deve ser a soma de todos valores
-				// dos itens.
-				val += p.getValor();
 			} else {
 				isInsumo = false;
-				val = p.getValor();
 				// Todos os outros tipos de pagamentos nao serao agrupados.
 				// Usamos o ID do pagamento pois a estrategia eh tratar os
 				// pagamentos que nao tem NF com um grupo com um unico elemento.
 				gr = relatorio.addGrupo(p.getId().toString(), p);
+				gr.setPropriedade(VL_TOTAL_GRUPO, p.getValor());
 			}
-			gr.setPropriedade(VL_TOTAL_LABEL, val);
-			gr.setPropriedade(LIQUIDADO_LABEL, liqud);
-			gr.setPropriedade(INSUMO_LABEL, isInsumo);
+			gr.setPropriedade(GRUPO_LIQUIDADO, liqud);
+			gr.setPropriedade(INSUMO_GRUPO, isInsumo);
 			gr.setPropriedade("dataVencimento", StringUtils.formatarData(p.getDataVencimento()));
 			gr.setPropriedade("liquidado", p.isLiquidado());
 			gr.setPropriedade("vencido", !p.isLiquidado() && p.isVencido());
@@ -147,6 +150,28 @@ public class PagamentoServiceImpl implements PagamentoService {
 			// Essa propriedade eh apenas para o ordenamento cronologico dos
 			// grupos.
 			gr.setPropriedade("dtVenc", p.getDataVencimento());
+		}
+
+		Map<Integer, Integer> totParcNf = new HashMap<>();
+		Integer parc = 0;
+		Integer nf = null;
+		// Determinando a quantidade de parcelas de uma determinada NF
+		for (GrupoWrapper<String, Pagamento> g : relatorio.getListaGrupo()) {
+			nf = (Integer) g.getPropriedade("numeroNF");
+			if (nf != null && (parc = totParcNf.get(nf)) != null) {
+				totParcNf.put(nf, parc + 1);
+			} else if (nf != null && parc == null) {
+				totParcNf.put(nf, 1);
+			}
+		}
+
+		for (GrupoWrapper<String, Pagamento> g : relatorio.getListaGrupo()) {
+			nf = (Integer) g.getPropriedade("numeroNF");
+			if (nf == null) {
+				continue;
+			}
+			val = valNf.get(nf) / totParcNf.get(nf);
+			g.setPropriedade(VL_TOTAL_GRUPO, val);
 		}
 
 		relatorio.addPropriedade("qtde", lPagamento.size());
@@ -157,8 +182,8 @@ public class PagamentoServiceImpl implements PagamentoService {
 		// arredondamentos
 		List<GrupoWrapper<String, Pagamento>> lGRupo = relatorio.getListaGrupo();
 		for (GrupoWrapper<String, Pagamento> g : lGRupo) {
-			g.setPropriedade(VL_TOTAL_LABEL,
-					NumeroUtils.arredondarValorMonetario((Double) g.getPropriedade(VL_TOTAL_LABEL)));
+			g.setPropriedade(VL_TOTAL_GRUPO,
+					NumeroUtils.arredondarValorMonetario((Double) g.getPropriedade(VL_TOTAL_GRUPO)));
 		}
 
 		Collections.sort(lGRupo, new Comparator<GrupoWrapper<String, Pagamento>>() {
@@ -170,6 +195,44 @@ public class PagamentoServiceImpl implements PagamentoService {
 				return dtVenc1 != null && dtVenc2 != null ? dtVenc1.compareTo(dtVenc2) : -1;
 			}
 		});
+
+		// Ordenando os elementos do grupo
+		for (GrupoWrapper<String, Pagamento> g : lGRupo) {
+			Collections.sort(g.getListaElemento(), new Comparator<Pagamento>() {
+				@Override
+				public int compare(Pagamento p1, Pagamento p2) {
+					if (p1.getIdPedido() == null || p2.getIdPedido() == null) {
+						return -1;
+					}
+					int h1 = p1.getIdPedido();
+					int h2 = p2.getIdPedido();
+					// Se o idPedido foi maior entao vai para o inicio da lista
+					if (h1 > h2) {
+						return 1;
+					}
+					// Se o idPedido foi menor entao vai para o fim da lista
+					if (h1 < h2) {
+						return -1;
+					}
+
+					// Aqui estao os casos em que od ids dos pedidos sao iguais.
+					// Nesse caso estamos subtraindo os sequenciais do item do
+					// id do pedido para colocar os maiores sequenciais no fim
+					// da lista
+					h1 -= p1.getSequencialItem() == null ? 0 : p1.getSequencialItem();
+					h2 -= p2.getSequencialItem() == null ? 0 : p2.getSequencialItem();
+					if (h1 > h2) {
+						return -1;
+					}
+					if (h1 < h2) {
+						return 1;
+					}
+
+					return 0;
+				}
+			});
+		}
+
 		return relatorio;
 	}
 

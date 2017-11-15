@@ -92,9 +92,10 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 		if (idPagamento == null) {
 			return 0;
 		}
-		return QueryUtil.gerarRegistroUnico(
+		Integer q = QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select p.quantidadeItem from Pagamento p where p.id=:idPagamento")
 						.setParameter("idPagamento", idPagamento), Integer.class, 0);
+		return q == null ? 0 : q;
 	}
 
 	public List<Integer> pesquisarQuantidadePagaByIdItem(Integer idItem) {

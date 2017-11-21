@@ -463,6 +463,12 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarIdItemPedidoByIdPagamento(Integer idPagamento) {
+		return pagamentoDAO.pesquisarIdItemPedidoByIdPagamento(idPagamento);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Pagamento> pesquisarPagamentoByIdFornecedor(Integer idFornecedor, Periodo periodo) {
 		if (idFornecedor == null || periodo == null) {
 			return new ArrayList<Pagamento>();
@@ -532,13 +538,13 @@ public class PagamentoServiceImpl implements PagamentoService {
 			return;
 		}
 
-		Integer idItem = pagamentoDAO.pesquisarIdItemPedidoByIdPagamento(idPagamento);
+		Integer idItem = pesquisarIdItemPedidoByIdPagamento(idPagamento);
 		// Condicao que so ocorre no caso de pagamentos de insumos.
 		if (idItem != null) {
-			Integer qtde = pedidoService.pesquisarQuantidadeItemPedido(idItem);
+			Integer qtdeRecp = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItem);
+			estoqueService.removerEstoqueItemCompra(idItem, qtdeRecp);
 			pedidoService.alterarQuantidadeRecepcionada(idItem, 0);
 			pagamentoDAO.removerPagamentoPaceladoItemPedido(idItem);
-			estoqueService.removerEstoqueItemCompra(idItem, qtde);
 		} else {
 			remover(idPagamento);
 		}

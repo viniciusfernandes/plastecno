@@ -333,32 +333,34 @@ public class PedidoServiceImpl implements PedidoService {
 
 		// Pedidos com pagamento a vista ou antecipado nao deve ter boletos, por
 		// isso nao tera datas de pagamentos
-		String[] dias = formaPagamento.split("\\D+");
-		if (dias.length == 0) {
+		String[] diasPag = formaPagamento.split("\\D+");
+		if (diasPag.length == 0) {
 			return lista;
 		}
 
 		if (dataInicial == null) {
 			dataInicial = new Date();
 		}
-
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dataInicial);
-		Integer diaCorrido = null;
-		for (String dia : dias) {
+		/*
+		 * Calendar cal = Calendar.getInstance(); cal.setTime(dataInicial);
+		 * Integer diaCorrido = null; for (String dia : diasPag) { try {
+		 * diaCorrido = Integer.parseInt(dia); } catch (NumberFormatException e)
+		 * { continue; } cal.add(Calendar.DAY_OF_MONTH, diaCorrido);
+		 * lista.add(cal.getTime());
+		 * 
+		 * // Retornando a data atual para somar os outros dias corridos e //
+		 * evitar criar outros objetos Calendar. cal.add(Calendar.DAY_OF_MONTH,
+		 * -diaCorrido); }
+		 */
+		Integer[] dias = new Integer[diasPag.length];
+		for (int i = 0; i < dias.length; i++) {
 			try {
-				diaCorrido = Integer.parseInt(dia);
-			} catch (NumberFormatException e) {
+				dias[i] = Integer.parseInt(diasPag[i]);
+			} catch (Exception e) {
 				continue;
 			}
-			cal.add(Calendar.DAY_OF_MONTH, diaCorrido);
-			lista.add(cal.getTime());
-
-			// Retornando a data atual para somar os outros dias corridos e
-			// evitar criar outros objetos Calendar.
-			cal.add(Calendar.DAY_OF_MONTH, -diaCorrido);
 		}
-		return lista;
+		return DateUtils.gerarListaDataParcelamento(dataInicial, dias);
 	}
 
 	private void calcularPeso(ItemPedido itemPedido) throws AlgoritmoCalculoException {

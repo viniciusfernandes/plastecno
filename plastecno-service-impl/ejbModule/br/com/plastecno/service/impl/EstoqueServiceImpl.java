@@ -76,7 +76,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		return alterarEstoque(idItemCompra, quantidadeRecepcionada);
 	}
-	
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer alterarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
@@ -94,8 +94,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada, String ncm)
-			throws BusinessException {
+	public Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada,
+			String ncm) throws BusinessException {
 		if (idItemCompra == null) {
 			return null;
 		}
@@ -246,10 +246,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 			icmsMedio = 0d;
 		}
 
-		itemCadastrado.setPrecoMedio(precoMedio);
-		itemCadastrado.setPrecoMedioFatorICMS(precoMedioFatorICMS);
-		itemCadastrado.setAliquotaIPI(ipiMedio);
-		itemCadastrado.setAliquotaICMS(icmsMedio);
+		itemCadastrado.setPrecoMedio(NumeroUtils.arredondarValorMonetario(precoMedio));
+		itemCadastrado.setPrecoMedioFatorICMS(NumeroUtils.arredondarValorMonetario(precoMedioFatorICMS));
+		itemCadastrado.setAliquotaIPI(NumeroUtils.arredondar(ipiMedio, 5));
+		itemCadastrado.setAliquotaICMS(NumeroUtils.arredondar(icmsMedio, 5));
 		itemCadastrado.setQuantidade((int) quantidadeTotal);
 	}
 

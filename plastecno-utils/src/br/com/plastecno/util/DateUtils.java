@@ -1,7 +1,9 @@
 package br.com.plastecno.util;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public final class DateUtils {
 
@@ -49,6 +51,55 @@ public final class DateUtils {
 
 	public static Date gerarDataSemHorario(Date data) {
 		return data != null ? gerarCalendarioSemHorario(data).getTime() : null;
+	}
+
+	public static List<Date> gerarListaDataParcelamento(Date dataBase, Integer... dias) {
+		List<Date> lData = new ArrayList<>();
+		if (dataBase == null || dias == null || dias.length == 0) {
+			return lData;
+		}
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dataBase);
+		for (Integer dia : dias) {
+			if (dia == null) {
+				continue;
+			}
+			cal.add(Calendar.DAY_OF_MONTH, dia);
+			lData.add(cal.getTime());
+
+			// Retornando a data atual para somar os outros dias corridos e
+			// evitar criar outros objetos Calendar.
+			cal.add(Calendar.DAY_OF_MONTH, -dia);
+		}
+		return lData;
+	}
+
+	public static List<Date> gerarListaDataParcelasIguais(Date dataBase, int totalParcelas) {
+		List<Date> lData = new ArrayList<>();
+		if (dataBase == null) {
+			return lData;
+		}
+
+		lData.add(dataBase);
+		if (totalParcelas <= 1) {
+			return lData;
+		}
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dataBase);
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int last = 0;
+		do {
+			cal.add(Calendar.MONTH, 1);
+			if (day > (last = cal.getActualMaximum(Calendar.DAY_OF_MONTH))) {
+				cal.set(Calendar.DAY_OF_MONTH, last);
+			} else {
+				cal.set(Calendar.DAY_OF_MONTH, day);
+			}
+			lData.add(cal.getTime());
+		} while (--totalParcelas > 1);
+		return lData;
 	}
 
 	public static boolean isAnterior(Date inicio, Date fim) {

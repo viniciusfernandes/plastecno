@@ -32,6 +32,8 @@ public interface PagamentoService {
 
 	List<Pagamento> pesquisarByIdPedido(Integer idPedido);
 
+	Integer pesquisarIdItemPedidoByIdPagamento(Integer idPagamento);
+
 	List<Pagamento> pesquisarPagamentoByIdFornecedor(Integer idFornecedor, Periodo periodo);
 
 	List<Pagamento> pesquisarPagamentoByIdPedido(Integer idPedido);

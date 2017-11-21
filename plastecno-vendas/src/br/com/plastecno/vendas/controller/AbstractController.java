@@ -195,6 +195,13 @@ public abstract class AbstractController {
         adicionarIdItemSelecionado(listaIdItemSelecionado.toArray(new Integer[] {}));
     }
 
+    final void ancorarElemento(Object idElemento) {
+        if (idElemento == null) {
+            return;
+        }
+        result.include("ancora", idElemento);
+    }
+
     final void ancorarRodape() {
         result.include("ancora", "rodape");
     }

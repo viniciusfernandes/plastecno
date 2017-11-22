@@ -89,7 +89,6 @@ function removerPagamento(botao){
 </head>
 <body>
 
-	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
 	
 	<fieldset id="bloco_pesquisa">
@@ -124,6 +123,7 @@ function removerPagamento(botao){
 		<jsp:include page="/bloco/bloco_listagem_pedido_compra.jsp"></jsp:include>
 	</c:when>
 	<c:otherwise>
+		<jsp:include page="/bloco/bloco_mensagem.jsp" />
 		<table class="listrada">
 			<caption>${relatorio.titulo}</caption>
 			<thead>

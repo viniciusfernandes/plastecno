@@ -542,8 +542,12 @@ public class PagamentoServiceImpl implements PagamentoService {
 		// Condicao que so ocorre no caso de pagamentos de insumos.
 		if (idItem != null) {
 			Integer qtdeRecp = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItem);
-			estoqueService.removerEstoqueItemCompra(idItem, qtdeRecp);
+			// A quantidade recepcionada deve ser zerada para que posteriormente
+			// seja removida do estoque. Essa ordem eh importante pois a remocao
+			// do item do estoque verifica se o pedido esta como
+			// "compra recebida"
 			pedidoService.alterarQuantidadeRecepcionada(idItem, 0);
+			estoqueService.removerEstoqueItemCompra(idItem, qtdeRecp);
 			pagamentoDAO.removerPagamentoPaceladoItemPedido(idItem);
 		} else {
 			remover(idPagamento);

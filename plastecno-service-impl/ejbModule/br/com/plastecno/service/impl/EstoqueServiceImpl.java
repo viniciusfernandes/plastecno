@@ -199,18 +199,20 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		final double qItem = itemEstoque.getQuantidade() != null ? itemEstoque.getQuantidade() : 0;
 
+		// No caso em que o estoque esteja zerado mas contenha um valor medio
+		// associado ao item, porecisao definir a quantidade cadsatrada como 1
+		// para que esse valor entre no calculo dos valores medios.
 		final double qCadastrada = itemCadastrado.getQuantidade() != null && itemCadastrado.getQuantidade() >= 0d ? itemCadastrado
-				.getQuantidade() : 0;
+				.getQuantidade() : 1;
 
-		final double precoCadastrado = qCadastrada
-				* (itemCadastrado.getPrecoMedio() != null ? itemCadastrado.getPrecoMedio() : 0d);
+		final double precoCadastrado = itemCadastrado.getPrecoMedio() != null ? itemCadastrado.getPrecoMedio() : 0d;
 
-		final double precoFatorICMSCadastrado = qCadastrada
-				* (itemCadastrado.getPrecoMedioFatorICMS() != null ? itemCadastrado.getPrecoMedioFatorICMS() : 0d);
+		final double precoFatorICMSCadastrado = itemCadastrado.getPrecoMedioFatorICMS() != null ? itemCadastrado
+				.getPrecoMedioFatorICMS() : 0d;
 
-		final double precoItem = qItem * (itemEstoque.getPrecoMedio() != null ? itemEstoque.getPrecoMedio() : 0d);
-		final double precoItemFatorICMS = qItem
-				* (itemEstoque.getPrecoMedioFatorICMS() != null ? itemEstoque.getPrecoMedioFatorICMS() : 0d);
+		final double precoItem = itemEstoque.getPrecoMedio() != null ? itemEstoque.getPrecoMedio() : 0d;
+		final double precoItemFatorICMS = itemEstoque.getPrecoMedioFatorICMS() != null ? itemEstoque
+				.getPrecoMedioFatorICMS() : 0d;
 
 		// Estamos possibilitando a inclusao de novos itens no estoque com preco
 		// zerado pois eh possivel que haja devolucao dos itens que foram
@@ -221,17 +223,32 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 		// Se a quantidade total for nula, entao o item cadastrado no estoque
 		// deve permanecer com o mesmo preco medio e fator icms
-		double precoMedio = quantidadeTotal <= 0d ? precoCadastrado : (precoCadastrado + precoItem) / quantidadeTotal;
-		double precoMedioFatorICMS = quantidadeTotal <= 0d ? precoFatorICMSCadastrado
-				: (precoFatorICMSCadastrado + precoItemFatorICMS) / quantidadeTotal;
+		double precoMedio = precoCadastrado;
+		if (quantidadeTotal > 0d) {
+			precoMedio = (qCadastrada * precoCadastrado + qItem * precoItem) / quantidadeTotal;
+		}
 
-		final double ipiCadastrado = qCadastrada * itemCadastrado.getAliquotaIPI();
-		final double ipiItem = qItem * itemEstoque.getAliquotaIPI();
-		double ipiMedio = quantidadeTotal <= 0d ? ipiCadastrado : (ipiCadastrado + ipiItem) / quantidadeTotal;
+		double precoMedioFatorICMS = precoFatorICMSCadastrado;
+		if (quantidadeTotal > 0d) {
+			precoMedioFatorICMS = (qCadastrada * precoFatorICMSCadastrado + qItem * precoItemFatorICMS)
+					/ quantidadeTotal;
+		}
 
-		final double icmsCadastrado = qCadastrada * itemCadastrado.getAliquotaICMS();
-		final double icmsItem = qItem * itemEstoque.getAliquotaICMS();
-		double icmsMedio = quantidadeTotal <= 0d ? icmsCadastrado : (icmsCadastrado + icmsItem) / quantidadeTotal;
+		final double aliqIPICadastrado = itemCadastrado.getAliquotaIPI();
+		final double aliqIPIItem = itemEstoque.getAliquotaIPI();
+
+		double aliqIPIMedio = aliqIPICadastrado;
+		if (quantidadeTotal > 0d) {
+			aliqIPIMedio = (qCadastrada * aliqIPICadastrado + qItem * aliqIPIItem) / quantidadeTotal;
+		}
+
+		final double aliqICMSCadastrado = itemCadastrado.getAliquotaICMS();
+		final double aliqICMSItem = itemEstoque.getAliquotaICMS();
+
+		double aliqICMSMedio = aliqICMSCadastrado;
+		if (quantidadeTotal > 0d) {
+			aliqICMSMedio = (qCadastrada * aliqICMSCadastrado + qItem * aliqICMSItem) / quantidadeTotal;
+		}
 
 		if (precoMedio < 0) {
 			precoMedio = 0d;
@@ -239,17 +256,17 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (precoMedioFatorICMS < 0) {
 			precoMedioFatorICMS = 0d;
 		}
-		if (ipiMedio < 0) {
-			ipiMedio = 0d;
+		if (aliqIPIMedio < 0) {
+			aliqIPIMedio = 0d;
 		}
-		if (icmsMedio < 0) {
-			icmsMedio = 0d;
+		if (aliqICMSMedio < 0) {
+			aliqICMSMedio = 0d;
 		}
 
 		itemCadastrado.setPrecoMedio(NumeroUtils.arredondarValorMonetario(precoMedio));
 		itemCadastrado.setPrecoMedioFatorICMS(NumeroUtils.arredondarValorMonetario(precoMedioFatorICMS));
-		itemCadastrado.setAliquotaIPI(NumeroUtils.arredondar(ipiMedio, 5));
-		itemCadastrado.setAliquotaICMS(NumeroUtils.arredondar(icmsMedio, 5));
+		itemCadastrado.setAliquotaIPI(NumeroUtils.arredondar(aliqIPIMedio, 5));
+		itemCadastrado.setAliquotaICMS(NumeroUtils.arredondar(aliqICMSMedio, 5));
 		itemCadastrado.setQuantidade((int) quantidadeTotal);
 	}
 

@@ -71,7 +71,7 @@ public class EmailServiceImpl implements EmailService {
 				email.addCc(cc);
 			}
 			gerarAnexo(mensagemEmail, email);
-			
+			email.setTLS(true);
 			email.send();
 			
 		} catch (Exception e) {

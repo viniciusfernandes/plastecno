@@ -16,6 +16,12 @@
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.3.datepicker.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
+
+<style type="text/css">
+#tabelaPagamentos tr th, #tabelaPagamentos tr td{
+	font-size: 10px;
+} 
+</style>
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -124,21 +130,22 @@ function removerPagamento(botao){
 	</c:when>
 	<c:otherwise>
 		<jsp:include page="/bloco/bloco_mensagem.jsp" />
-		<table class="listrada">
+		<table id="tabelaPagamentos" class="listrada">
 			<caption>${relatorio.titulo}</caption>
 			<thead>
 				<tr>
 					<th style="width: 3%">Sit.</th>
 					<th style="width: 7%">Venc.</th>
-					<th style="width: 7%">NF</th>
-					<th style="width: 7%">Ped.</th>
+					<th style="width: 5%">NF</th>
+					<th style="width: 5%">Ped.</th>
 					<th style="width: 2%">Item</th>
-					<th style="width: 37%">Desc.</th>
-					<th style="width: 5%">Parc.</th>
+					<th style="width: 31%">Desc.</th>
+					<th style="width: 3%">Parc.</th>
 					<th style="width: 8%">Forn.</th>
 					<th style="width: 5%">ICMS(R$)</th>
 					<th style="width: 7%">Val.(R$)</th>
-					<th style="width: 7%">Total (R$)</th>
+					<th style="width: 9%">Ped.(R$)</th>
+					<th style="width: 9%">NF (R$)</th>
 					<th colspan="2" style="width: 7%">Ação</th>
 				</tr>
 			</thead>
@@ -169,8 +176,10 @@ function removerPagamento(botao){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valorCreditoICMS}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.valor}</td>
 							<c:if test="${iElemento.count le 1}">
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['valorTotal']}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['valorParcela']}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['valorParcelaNF']}</td>
 							</c:if>
+							<%--BLOCO DE BOTOES PARA EDICAO E REMOCAO DOS PAGAMENTOS--%>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" style="width: 5%">
 								<div class="coluna_acoes_listagem">
 								<div class="input" style="width: 50%">
@@ -190,6 +199,7 @@ function removerPagamento(botao){
 								</div>
 								</div>
 							</td>
+							<%--BLOCO DE BOTOES PARA LIQUIDACAO DOS PAGAMENTOS--%>
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="width: 2%">
 									<div class="coluna_acoes_listagem">

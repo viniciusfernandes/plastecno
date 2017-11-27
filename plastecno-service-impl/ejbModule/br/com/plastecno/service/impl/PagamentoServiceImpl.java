@@ -177,7 +177,9 @@ public class PagamentoServiceImpl implements PagamentoService {
 			totParc = totParcNf.get(nf);
 			val = nfPag.get(nf) / totParc;
 			g.setPropriedade(VL_PARCELA, val);
-
+			
+			// Aqui estamos pegando o primeiro item da lista pois o valor da NF
+			// eh igual para todos os itens da nota.
 			val = g.getListaElemento().get(0).getValorNF();
 			if (val == null) {
 				val = 0d;
@@ -186,8 +188,8 @@ public class PagamentoServiceImpl implements PagamentoService {
 		}
 
 		relatorio.addPropriedade("qtde", lPagamento.size());
-		relatorio.addPropriedade("tot", NumeroUtils.arredondarValorMonetario(tot));
-		relatorio.addPropriedade("totCredICMS", NumeroUtils.arredondarValorMonetario(totCredICMS));
+		relatorio.addPropriedade("tot", NumeroUtils.formatarValorMonetario(tot));
+		relatorio.addPropriedade("totCredICMS", NumeroUtils.formatarValorMonetario(totCredICMS));
 
 		// Arredondando o valor total das NFs no fim para evitar problemas de
 		// arredondamentos
@@ -261,9 +263,10 @@ public class PagamentoServiceImpl implements PagamentoService {
 		// Aqui estamos permitindo que o usuario cadastre os pagamentos de item
 		// a item do pedido na tela de pagamentos.
 		if (pagamento.isInsumo()
-				&& (pagamento.getNumeroNF() == null || pagamento.getIdPedido() == null || pagamento.getSequencialItem() == null)) {
+				&& (pagamento.getNumeroNF() == null || pagamento.getIdPedido() == null
+						|| pagamento.getSequencialItem() == null || pagamento.getValorNF() == null)) {
 			throw new BusinessException(
-					"O pagamento de insumos deve conter o npumero da NF, o número do pedido e o número do item do pedido.");
+					"O pagamento de insumos deve conter o número da NF, o número do pedido e o número do item do pedido e valor da NF.");
 		}
 
 		if (pagamento.isInsumo()) {
@@ -288,6 +291,15 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 		if (pagamento.getParcela() != null && pagamento.getTotalParcelas() == null) {
 			throw new BusinessException("O total de parcelas devem ser preenchidos.");
+		}
+
+		if (pagamento.isInsumo()) {
+			// Esse metodo eh necessario pois qualquer alteracao do valor da NF
+			// deve ser refletido em todas as parcelas e mante-lo igual para
+			// todos os itens eh necessario pois o relatorio supoe que o valor
+			// da NF eh igual para todos os itens.
+			pagamentoDAO.alterarValorNFPagamentoInsumo(pagamento.getNumeroNF(), pagamento.getIdFornecedor(),
+					pagamento.getValorNF());
 		}
 
 		return pagamentoDAO.alterar(pagamento).getId();

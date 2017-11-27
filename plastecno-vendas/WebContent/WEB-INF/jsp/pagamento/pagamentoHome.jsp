@@ -19,7 +19,7 @@
 
 <style type="text/css">
 #tabelaPagamentos tr th, #tabelaPagamentos tr td{
-	font-size: 10px;
+	font-size: 12px;
 } 
 </style>
 <script type="text/javascript">
@@ -125,10 +125,10 @@ function removerPagamento(botao){
 	<a id="rodape"></a>
 	<jsp:include page="/bloco/bloco_edicao_pagamento.jsp"/>
 <c:choose>
-	<c:when test="${isPesquisaPedidoCompra}">
+	<c:when test="${isPesquisaPagamento}">
 		<jsp:include page="/bloco/bloco_listagem_pedido_compra.jsp"></jsp:include>
 	</c:when>
-	<c:otherwise>
+	<c:when test="${not isPesquisaPagamento and not empty relatorio}">
 		<jsp:include page="/bloco/bloco_mensagem.jsp" />
 		<table id="tabelaPagamentos" class="listrada">
 			<caption>${relatorio.titulo}</caption>
@@ -252,19 +252,19 @@ function removerPagamento(botao){
 			<tfoot>
 				<tr>
 					<td colspan="6" style="text-align: right;">QTDE.:</td>
-					<td colspan="7"><div style="text-align: left;">${relatorio.propriedades['qtde']}</div></td>
+					<td colspan="8"><div style="text-align: left;">${relatorio.propriedades['qtde']}</div></td>
 				</tr>
 				<tr>
 					<td colspan="6" style="text-align: right;">TOTAL:</td>
-					<td colspan="7"><div style="text-align: left;">R$ ${relatorio.propriedades['tot']}</div></td>
+					<td colspan="8"><div style="text-align: left;">R$ ${relatorio.propriedades['tot']}</div></td>
 				</tr>
 				<tr>
 					<td colspan="6" style="text-align: right;">CRED. ICMS:</td>
-					<td colspan="7"><div style="text-align: left;">R$ ${relatorio.propriedades['totCredICMS']}</div></td>
+					<td colspan="8"><div style="text-align: left;">R$ ${relatorio.propriedades['totCredICMS']}</div></td>
 				</tr>
 			</tfoot>
 		</table>
-	</c:otherwise>
+	</c:when>
 </c:choose>
 	
 		

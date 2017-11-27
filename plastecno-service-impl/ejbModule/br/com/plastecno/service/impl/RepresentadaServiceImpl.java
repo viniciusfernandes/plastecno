@@ -119,7 +119,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 					+ revendedor.getNomeFantasia() + "\" para em seguida cadastrar um outro.");
 		}
 
-		if (!representada.isFornecedor() && representada.getComissao() == 0) {
+		if (representada.isRepresentda()&& representada.getComissao() == 0) {
 			throw new BusinessException("A comissão é obrigatorio no cadastro da representada");
 		}
 

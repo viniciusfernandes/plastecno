@@ -41,7 +41,7 @@ public class Representada implements Serializable {
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ")
 	private String cnpj;
 
-	@InformacaoValidavel(obrigatorio = true, numerico = true, positivo = true, nomeExibicao = "Comissão da representada")
+	@InformacaoValidavel(obrigatorio = true, numerico = true, nomeExibicao = "Comissão da representada")
 	private double comissao = 0;
 
 	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 1, 150 }, nomeExibicao = "Email para envio dos pedidos")
@@ -219,6 +219,10 @@ public class Representada implements Serializable {
 
 	public boolean isPessoaJuridica() {
 		return cnpj != null && !cnpj.isEmpty();
+	}
+
+	public boolean isRepresentda() {
+		return TipoRelacionamento.REPRESENTACAO.equals(tipoRelacionamento);
 	}
 
 	public boolean isRevendedor() {

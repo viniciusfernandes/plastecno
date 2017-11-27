@@ -57,7 +57,7 @@ public class PagamentoController extends AbstractController {
             pagamento.setNomeFornecedor(nomeForn);
 
             addPagamento(pagamento);
-            addAtributo("isPesquisaPedidoCompra", true);
+            addAtributo("isPesquisaPagamento", true);
             addAtributo("relatorio", relatorioService.gerarRelatorioItemPedidoCompraEfetivada(idFornecedor,
                     new Periodo(dataInicial, dataFinal)));
             irRodapePagina();
@@ -197,13 +197,8 @@ public class PagamentoController extends AbstractController {
     @Get("pagamento/{idPagamento}")
     public void pesquisarPagamentoById(Integer idPagamento, Date dataInicial, Date dataFinal) {
         addPagamento(pagamentoService.pesquisarById(idPagamento));
-        try {
-            gerarRelatorioPagamento(dataInicial, dataFinal);
-        } catch (InformacaoInvalidaException e) {
-            gerarListaMensagemAlerta(e);
-        }
         pagamentoHome();
-        irTopoPagina();
+        irRodapePagina();
     }
 
     @Post("pagamento/remocao/{idPagamento}")

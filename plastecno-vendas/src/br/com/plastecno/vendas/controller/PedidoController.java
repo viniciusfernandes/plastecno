@@ -3,7 +3,9 @@ package br.com.plastecno.vendas.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
+
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
@@ -32,6 +34,7 @@ import br.com.plastecno.service.entity.Logradouro;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.entity.Pedido;
+import br.com.plastecno.service.entity.Representada;
 import br.com.plastecno.service.entity.Transportadora;
 import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.exception.NotificacaoException;
@@ -114,6 +117,21 @@ public class PedidoController extends AbstractPedidoController {
         super.setRepresentadaService(representadaService);
         super.setUsuarioService(usuarioService);
         super.setRelatorioService(relatorioService);
+    }
+
+    private void adicionarRepresentadaNaLista(Representada repres, List<Representada> lRepres) {
+        Integer idRep = repres.getId();
+        if (lRepres != null) {
+            boolean ok = false;
+            for (Representada r : lRepres) {
+                if (ok = r.getId().equals(idRep)) {
+                    return;
+                }
+            }
+            if (!ok) {
+                lRepres.add(repres);
+            }
+        }
     }
 
     @Get("pedido/pesoitem")
@@ -254,16 +272,24 @@ public class PedidoController extends AbstractPedidoController {
     }
 
     private void gerarListaRepresentada(Pedido pedido) {
+        List<Representada> lRepres = null;
         // Verificando se a lista de representada ja foi preenchida em outro
         // fluxo
         if (!contemAtributo("listaRepresentada")) {
             TipoPedido tipoPedido = pedido == null ? null : pedido.getTipoPedido();
-            addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaAtivoByTipoPedido(tipoPedido));
+            lRepres = representadaService.pesquisarRepresentadaAtivoByTipoPedido(tipoPedido);
+            addAtributo("listaRepresentada", lRepres);
         }
 
         if (pedido != null) {
-            addAtributo("idRepresentadaSelecionada", pedido.getRepresentada().getId());
-            addAtributo("ipiDesabilitado", !pedido.getRepresentada().isIPIHabilitado());
+            Representada repres = pedido.getRepresentada();
+            // Essa adicao da representada ocorre pois o usuario pode mudar o
+            // tipo de relacionamento da representada para fornecedor e ela pode
+            // nao aparecer na lista e com isso o combo box nao exibira a
+            // representada do pedido determinado.
+            adicionarRepresentadaNaLista(repres, lRepres);
+            addAtributo("idRepresentadaSelecionada", repres.getId());
+            addAtributo("ipiDesabilitado", !repres.isIPIHabilitado());
         }
     }
 
@@ -392,7 +418,6 @@ public class PedidoController extends AbstractPedidoController {
             if (pedido == null) {
                 gerarListaMensagemAlerta("Pedido No. " + id + " não existe no sistema");
             } else if (!pedido.isOrcamento()) {
-                formatarPedido(pedido);
                 List<Transportadora> listaRedespacho = clienteService.pesquisarTransportadorasRedespacho(pedido
                         .getCliente().getId());
 

@@ -92,7 +92,7 @@ $(document).ready(function() {
 	inserirMascaraData('dataEmissao');
 	inserirMascaraData('dataRecebimento');
 
-	inserirMascaraMonetaria('valorNF', 7);
+	inserirMascaraMonetaria('valorNF', 11);
 	inserirMascaraNumerica('numeroNF', '9999999');
 });
 

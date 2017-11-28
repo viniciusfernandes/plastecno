@@ -36,12 +36,11 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoPesquisar').click(function () {
-		var parametros = serializarBloco('bloco_pesquisa');
 		adicionarInputHiddenFormulario('formVazio', 'dataInicial', document.getElementById('dataInicial').value);
 		adicionarInputHiddenFormulario('formVazio', 'dataFinal', document.getElementById('dataFinal').value);
 		adicionarInputHiddenFormulario('formVazio', 'cliente.nomeFantasia', document.getElementById('nomeFantasia').value);
-		var action = '<c:url value="/itemAguardandoCompra/item/listagem"/>?'+parametros;
-		$('#formVazio').attr('action', action).attr('method', 'get').submit();
+		adicionarInputHiddenFormulario('formVazio', 'cliente.id', document.getElementById('idCliente').value);
+		$('#formVazio').attr('action', '<c:url value="/itemAguardandoCompra/item/listagem"/>').attr('method', 'get').submit();
 	});
 	
 	$('#botaoComprar').click(function () {

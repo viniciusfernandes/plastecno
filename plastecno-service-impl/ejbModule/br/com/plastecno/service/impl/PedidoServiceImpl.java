@@ -287,11 +287,11 @@ public class PedidoServiceImpl implements PedidoService {
 			// venda.
 			precoItem = itemPedido.calcularPrecoItem();
 
-			if (comissaoVenda != null && comissaoVenda.getAliquotaRevenda() != null && pedido.isRevenda()) {
+			if (pedido.isRevenda() && comissaoVenda != null && comissaoVenda.getAliquotaRevenda() != null) {
 				aliqComissao = comissaoVenda.getAliquotaRevenda();
 				valorComissionado = precoItem * aliqComissao;
-			} else if (comissaoVenda != null && comissaoVenda.getAliquotaRepresentacao() != null
-					&& pedido.isRepresentacao()) {
+			} else if (pedido.isRepresentacao() && comissaoVenda != null
+					&& comissaoVenda.getAliquotaRepresentacao() != null) {
 				aliqComissao = comissaoVenda.getAliquotaRepresentacao();
 				aliqRepresentada = pedido.getAliquotaComissaoRepresentada();
 

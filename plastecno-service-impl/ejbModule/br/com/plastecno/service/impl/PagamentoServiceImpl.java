@@ -96,13 +96,15 @@ public class PagamentoServiceImpl implements PagamentoService {
 		}
 
 		GrupoWrapper<String, Pagamento> gr = null;
-		Map<Integer, Double> valNf = new HashMap<>();
+		Map<Integer, Double> nfPag = new HashMap<>();
+
 		double tot = 0d;
 		double totCredICMS = 0d;
+		boolean isInsumo = false;
 		Double val = 0d;
 		Boolean liqud = false;
-		boolean isInsumo = false;
-		final String VL_TOTAL_GRUPO = "valorTotal";
+		final String VL_PARCELA = "valorParcela";
+		final String VL_PARCELA_NF = "valorParcelaNF";
 		final String GRUPO_LIQUIDADO = "liquidado";
 		final String INSUMO_GRUPO = "insumo";
 		for (Pagamento p : lPagamento) {
@@ -111,21 +113,22 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 			// Agrupando os pagamentos de compra pelo numero da NF.
 			if (p.getNumeroNF() != null) {
+				isInsumo = true;
 				// Aqui estamos concatenando u numero da NF com o ID do
 				// fornecedor para criar o ID pois diferentes fornecedores podem
 				// ter o mesmo numreo de NF, assim minimizamos conflitos.
 				gr = relatorio.addGrupo(String.valueOf(p.getNumeroNF()) + p.getIdFornecedor() + p.getParcela(), p);
 				gr.setPropriedade("numeroNF", p.getNumeroNF());
 				liqud = (Boolean) gr.getPropriedade(GRUPO_LIQUIDADO);
-				isInsumo = true;
 
-				if ((val = valNf.get(p.getNumeroNF())) == null) {
+				// Bloco de codigo para totalizar os valores dos itens da NF
+				if ((val = nfPag.get(p.getNumeroNF())) == null) {
 					val = 0d;
 				}
 				val += p.getValor() != null ? p.getValor() : 0d;
 				// O valor da NF do relatorio deve ser a soma de todos valores
 				// dos itens.
-				valNf.put(p.getNumeroNF(), val);
+				nfPag.put(p.getNumeroNF(), val);
 
 				if (liqud == null) {
 					liqud = p.isLiquidado();
@@ -134,12 +137,12 @@ public class PagamentoServiceImpl implements PagamentoService {
 					liqud &= p.isLiquidado();
 				}
 			} else {
-				isInsumo = false;
+				isInsumo = true;
 				// Todos os outros tipos de pagamentos nao serao agrupados.
 				// Usamos o ID do pagamento pois a estrategia eh tratar os
 				// pagamentos que nao tem NF com um grupo com um unico elemento.
 				gr = relatorio.addGrupo(p.getId().toString(), p);
-				gr.setPropriedade(VL_TOTAL_GRUPO, p.getValor());
+				gr.setPropriedade(VL_PARCELA, p.getValor());
 			}
 			gr.setPropriedade(GRUPO_LIQUIDADO, liqud);
 			gr.setPropriedade(INSUMO_GRUPO, isInsumo);
@@ -165,25 +168,36 @@ public class PagamentoServiceImpl implements PagamentoService {
 			}
 		}
 
+		Integer totParc = null;
 		for (GrupoWrapper<String, Pagamento> g : relatorio.getListaGrupo()) {
 			nf = (Integer) g.getPropriedade("numeroNF");
 			if (nf == null) {
 				continue;
 			}
-			val = valNf.get(nf) / totParcNf.get(nf);
-			g.setPropriedade(VL_TOTAL_GRUPO, val);
+			totParc = totParcNf.get(nf);
+			val = nfPag.get(nf) / totParc;
+			g.setPropriedade(VL_PARCELA, val);
+			
+			// Aqui estamos pegando o primeiro item da lista pois o valor da NF
+			// eh igual para todos os itens da nota.
+			val = g.getListaElemento().get(0).getValorNF();
+			if (val == null) {
+				val = 0d;
+			}
+			g.setPropriedade(VL_PARCELA_NF, val / totParc);
 		}
 
 		relatorio.addPropriedade("qtde", lPagamento.size());
-		relatorio.addPropriedade("tot", NumeroUtils.arredondarValorMonetario(tot));
-		relatorio.addPropriedade("totCredICMS", NumeroUtils.arredondarValorMonetario(totCredICMS));
+		relatorio.addPropriedade("tot", NumeroUtils.formatarValorMonetario(tot));
+		relatorio.addPropriedade("totCredICMS", NumeroUtils.formatarValorMonetario(totCredICMS));
 
 		// Arredondando o valor total das NFs no fim para evitar problemas de
 		// arredondamentos
 		List<GrupoWrapper<String, Pagamento>> lGRupo = relatorio.getListaGrupo();
 		for (GrupoWrapper<String, Pagamento> g : lGRupo) {
-			g.setPropriedade(VL_TOTAL_GRUPO,
-					NumeroUtils.arredondarValorMonetario((Double) g.getPropriedade(VL_TOTAL_GRUPO)));
+			g.setPropriedade(VL_PARCELA, NumeroUtils.arredondarValorMonetario((Double) g.getPropriedade(VL_PARCELA)));
+			g.setPropriedade(VL_PARCELA_NF,
+					NumeroUtils.arredondarValorMonetario((Double) g.getPropriedade(VL_PARCELA_NF)));
 		}
 
 		Collections.sort(lGRupo, new Comparator<GrupoWrapper<String, Pagamento>>() {
@@ -249,9 +263,10 @@ public class PagamentoServiceImpl implements PagamentoService {
 		// Aqui estamos permitindo que o usuario cadastre os pagamentos de item
 		// a item do pedido na tela de pagamentos.
 		if (pagamento.isInsumo()
-				&& (pagamento.getNumeroNF() == null || pagamento.getIdPedido() == null || pagamento.getSequencialItem() == null)) {
+				&& (pagamento.getNumeroNF() == null || pagamento.getIdPedido() == null
+						|| pagamento.getSequencialItem() == null || pagamento.getValorNF() == null)) {
 			throw new BusinessException(
-					"O pagamento de insumos deve conter o npumero da NF, o número do pedido e o número do item do pedido.");
+					"O pagamento de insumos deve conter o número da NF, o número do pedido e o número do item do pedido e valor da NF.");
 		}
 
 		if (pagamento.isInsumo()) {
@@ -276,6 +291,15 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 		if (pagamento.getParcela() != null && pagamento.getTotalParcelas() == null) {
 			throw new BusinessException("O total de parcelas devem ser preenchidos.");
+		}
+
+		if (pagamento.isInsumo()) {
+			// Esse metodo eh necessario pois qualquer alteracao do valor da NF
+			// deve ser refletido em todas as parcelas e mante-lo igual para
+			// todos os itens eh necessario pois o relatorio supoe que o valor
+			// da NF eh igual para todos os itens.
+			pagamentoDAO.alterarValorNFPagamentoInsumo(pagamento.getNumeroNF(), pagamento.getIdFornecedor(),
+					pagamento.getValorNF());
 		}
 
 		return pagamentoDAO.alterar(pagamento).getId();

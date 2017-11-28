@@ -24,6 +24,16 @@ public class PagamentoDAO extends GenericDAO<Pagamento> {
 				.setParameter("quantidade", quantidade).executeUpdate();
 	}
 
+	public void alterarValorNFPagamentoInsumo(Integer numeroNF, Integer idFornecedor, Double valorNF) {
+		// Estamos garantindo que o valor das nfs serao alterados apenas para os
+		// insumos quando passamos o tipo de pagamento.
+		entityManager
+				.createQuery(
+						"update Pagamento p set p.valorNF=:valorNF where p.numeroNF = :numeroNF and p.idFornecedor = :idFornecedor and p.tipoPagamento =:tipo")
+				.setParameter("numeroNF", numeroNF).setParameter("idFornecedor", idFornecedor)
+				.setParameter("valorNF", valorNF).setParameter("tipo", TipoPagamento.INSUMO).executeUpdate();
+	}
+
 	public void liquidarPagamento(Integer idPagamento, boolean liquidado) {
 		entityManager.createQuery("update Pagamento p set p.liquidado = :liquidado where p.id = :idPagamento")
 				.setParameter("idPagamento", idPagamento).setParameter("liquidado", liquidado).executeUpdate();

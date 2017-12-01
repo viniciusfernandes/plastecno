@@ -27,10 +27,10 @@ import br.com.plastecno.vendas.controller.anotacao.Login;
 @Intercepts
 public class ControleAcessoInterceptor implements Interceptor {
 
+    private final boolean auditoriaHabilidata;
+    private Logger logger = Logger.getLogger(this.getClass().getSimpleName());
     private Result result;
     private UsuarioInfo usuarioInfo;
-    private Logger logger = Logger.getLogger(this.getClass().getSimpleName());
-    private final boolean auditoriaHabilidata;
 
     public ControleAcessoInterceptor(Result result, UsuarioInfo usuarioInfo, HttpServletRequest request) {
         this.result = result;
@@ -72,15 +72,16 @@ public class ControleAcessoInterceptor implements Interceptor {
         try {
             stack.next(metodo, resourceInstance);
         } catch (InterceptionException e) {
-            String mensagem = null;
+            StringBuilder mensagem = new StringBuilder();
             if (usuarioInfo.isLogado()) {
-                mensagem = "Falha no redirecionamento do usuario \"" + usuarioInfo.getDescricaoLogin() + "\""
-                        + " que requisitou o metodo " + metodo.getMethod().getName();
+                mensagem.append("Falha no redirecionamento do usuario \"").append(usuarioInfo.getDescricaoLogin())
+                        .append("\"").append(" que requisitou o metodo ").append(metodo.getMethod().getName());
             } else {
-                mensagem = "Tentativa de acesso por usuario nao autenticado ou timeoute de sessao";
+                mensagem.append("Tentativa de acesso por usuario nao autenticado ou timeoute de sessao");
             }
-            mensagem += ". Possivel causa: " + e.getMessage();
-            logger.log(Level.WARNING, mensagem, e);
+
+            mensagem.append(". Possivel causa: " + e.getMessage());
+            logger.log(Level.WARNING, mensagem.toString(), e);
         } catch (RuntimeException e) {
             logger.log(Level.SEVERE,
                     "Falha na interceptacao do metodo \"" + metodo.getMethod().getName() + "\" efetuado pelo usuario: "

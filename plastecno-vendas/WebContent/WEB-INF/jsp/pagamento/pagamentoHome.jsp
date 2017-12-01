@@ -144,7 +144,7 @@ function removerPagamento(botao){
 					<th style="width: 8%">Forn.</th>
 					<th style="width: 5%">ICMS(R$)</th>
 					<th style="width: 7%">Val.(R$)</th>
-					<th style="width: 9%">Ped.(R$)</th>
+					<th style="width: 9%">Item (R$)</th>
 					<th style="width: 9%">NF (R$)</th>
 					<th colspan="2" style="width: 7%">Ação</th>
 				</tr>

@@ -15,6 +15,8 @@ import br.com.plastecno.service.wrapper.PaginacaoWrapper;
 @Local
 public interface UsuarioService {
 
+	void alterarComissaoSimples(Integer iUsuario, boolean isComissaoSimples);
+
 	void associarCliente(Integer idVendedor, Integer idCliente) throws BusinessException;
 
 	@Deprecated
@@ -32,6 +34,8 @@ public interface UsuarioService {
 	boolean isAcessoPermitido(Integer idUsuario, TipoAcesso... tipos);
 
 	boolean isClienteAssociadoVendedor(Integer idCliente, Integer idVendedor);
+
+	boolean isComissionadoSimples(Integer idUsuario);
 
 	boolean isCompraPermitida(Integer idUsuario);
 

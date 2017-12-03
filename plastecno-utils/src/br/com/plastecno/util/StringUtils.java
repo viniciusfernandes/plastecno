@@ -181,6 +181,16 @@ public final class StringUtils {
 		return Normalizer.normalize(valor, Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 	}
 
+	public static String removerAcentuacaoESubstituir(String valor, String oldChar, String newChar) {
+		if (valor == null) {
+			return null;
+		}
+		if (valor.length() <= 0) {
+			return "";
+		}
+		return Normalizer.normalize(valor, Form.NFD).replaceAll("[^\\p{ASCII}]", "").replace(oldChar, newChar);
+	}
+
 	public static String removerMascaraDocumento(String documento) {
 		if (documento == null) {
 			return null;

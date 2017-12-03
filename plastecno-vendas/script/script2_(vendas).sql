@@ -900,3 +900,69 @@ create index idx_pedido_id_orcamento on vendas.tb_pedido (id_orcamento);
 alter table vendas.tb_contato alter column nome set data type varchar(80) ;
 
 alter table vendas.tb_usuario add email_copia varchar(250) default null;
+
+
+create table vendas.tb_tipo_pagamento (
+	id integer not null,
+	descricao varchar(50)
+);
+
+create table vendas.tb_pagamento (
+	id integer not null,
+	id_fornecedor integer default null,
+	id_item_pedido integer default null,
+	id_pedido integer default null,
+	numero_nf integer default null,
+	parcela integer default null,
+	total_parcelas integer default null,
+	valor_nf numeric(10, 2) default 0,
+	valor numeric(10, 2) default 0,
+	valor_credito_icms numeric(10, 2) default 0,
+	modalidade_frete integer default null,
+	data_emissao date default null,
+	data_vencimento date not null,
+	data_recebimento date default null,
+	descricao varchar(200),
+	quantidade_item integer default 0,
+	quantidade_total integer default 0,
+	sequencial_item integer default 0,
+	id_tipo_pagamento integer not null,
+	liquidado boolean default false,
+	nome_fornecedor varchar(150) default null
+);
+ALTER TABLE vendas.tb_tipo_pagamento ADD PRIMARY KEY (id);
+ALTER TABLE vendas.tb_pagamento ADD PRIMARY KEY (id);
+ALTER TABLE vendas.tb_pagamento ADD CONSTRAINT id_tipo_pagamento FOREIGN KEY (id_tipo_pagamento ) REFERENCES vendas.tb_tipo_pagamento (id);
+
+create sequence vendas.seq_pagamento_id increment by 1 minvalue 1 no maxvalue start with 1;
+
+create index idx_pagamento_id_fornecedor on vendas.tb_pagamento (id_fornecedor);
+create index idx_pagamento_id_item_pedido on vendas.tb_pagamento (id_item_pedido);
+create index idx_pagamento_id_pedido on vendas.tb_pagamento (id_pedido);
+create index idx_pagamento_numero_nf on vendas.tb_pagamento (numero_nf);
+
+insert into vendas.tb_tipo_pagamento values (0, 'FOLHA_PAGAMENTO');
+insert into vendas.tb_tipo_pagamento values (1, 'INSUMO');
+insert into vendas.tb_tipo_pagamento values (2, 'DESPESAS_FIXAS');
+insert into vendas.tb_tipo_pagamento values (3, 'ACAO_JUDICIAL');
+insert into vendas.tb_tipo_pagamento values (4, 'EQUIPAMENTO');
+insert into vendas.tb_tipo_pagamento values (5, 'EVENTUALIDADE');
+insert into vendas.tb_tipo_pagamento values (6, 'IMPOSTO');
+
+alter table vendas.tb_nfe_duplicata add id_cliente integer default null;
+create index idx_nfe_duplicata_id_cliente on vendas.tb_nfe_duplicata (id_cliente);
+alter table vendas.tb_nfe_duplicata add parcela integer default null;
+alter table vendas.tb_nfe_duplicata add total_parcelas integer default null;
+alter table vendas.tb_nfe_duplicata add codigo_banco varchar(5) default null;
+alter table vendas.tb_nfe_duplicata add nome_banco varchar(30) default null;
+create index idx_nfe_duplicata_codigo_banco on vendas.tb_nfe_duplicata (codigo_banco);
+
+insert into vendas.tb_situacao_duplicata values (3, 'CARTORIO');
+insert into vendas.tb_situacao_duplicata values (4, 'PROTESTADO');
+insert into vendas.tb_situacao_duplicata values (5, 'A_VISTA');
+
+insert into vendas.tb_tipo_pagamento values (7, 'PRESTACAO_SERVICO');
+insert into vendas.tb_tipo_pagamento values (8, 'FRETE');
+insert into vendas.tb_tipo_pagamento values (9, 'BENEFICIOS_FOLHA');
+insert into vendas.tb_tipo_pagamento values (10, 'ICMS');
+insert into vendas.tb_tipo_pagamento values (11, 'BANCOS_EMPRESTIMOS_JUROS');

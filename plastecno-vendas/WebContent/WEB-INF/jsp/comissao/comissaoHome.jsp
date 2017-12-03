@@ -121,6 +121,12 @@ function remover(codigo, sigla) {
 					style="width: 50%"
 					class="uppercaseBloqueado pesquisavel desabilitado" disabled='disabled'/>
 			</div>
+			<div class="label">Comis. Simples:</div>
+			<div class="input" style="width: 80%">
+				<input type="checkbox" name="vendedor.comissionadoSimples" 
+					value="${not empty vendedor and vendedor.comissionadoSimples}" 
+					<c:if test="${not empty vendedor and vendedor.comissionadoSimples}">checked</c:if> style="width: 2%"/>
+			</div>
 			<div class="label">Revenda (%):</div>
 			<div class="input" style="width: 70%">
 				<input type="text" id="comissaoRevenda" name="comissaoRevenda" value="${comissao.aliquotaRevendaFormatada}" style="width: 5%"/>

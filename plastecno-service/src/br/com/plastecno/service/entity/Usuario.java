@@ -33,6 +33,9 @@ public class Usuario implements Serializable {
 
 	private boolean ativo;
 
+	@Column(name = "comissionado_simples")
+	private boolean comissionadoSimples;
+
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF")
 	private String cpf;
 
@@ -198,6 +201,10 @@ public class Usuario implements Serializable {
 		return ativo;
 	}
 
+	public boolean isComissionadoSimples() {
+		return comissionadoSimples;
+	}
+
 	public boolean isComprador() {
 		return isAcessoPermitido(TipoAcesso.CADASTRO_PEDIDO_COMPRA);
 	}
@@ -220,6 +227,10 @@ public class Usuario implements Serializable {
 
 	public void setAtivo(boolean ativo) {
 		this.ativo = ativo;
+	}
+
+	public void setComissionadoSimples(boolean comissionadoSimples) {
+		this.comissionadoSimples = comissionadoSimples;
 	}
 
 	public void setCpf(String cpf) {

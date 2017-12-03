@@ -53,6 +53,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarComissaoSimples(Integer iUsuario, boolean isComissaoSimples) {
+		usuarioDAO.alterarComissaoSimples(iUsuario, isComissaoSimples);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void associarCliente(Integer idVendedor, Integer idCliente) throws BusinessException {
 		if (idVendedor == null || idCliente == null) {
 			return;
@@ -225,6 +231,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isClienteAssociadoVendedor(Integer idCliente, Integer idVendedor) {
 		return usuarioDAO.pesquisarIdVendedorByIdCliente(idCliente, idVendedor) != null;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean isComissionadoSimples(Integer idUsuario) {
+		return usuarioDAO.pesquisarComissionadoSimples(idUsuario);
 	}
 
 	@Override

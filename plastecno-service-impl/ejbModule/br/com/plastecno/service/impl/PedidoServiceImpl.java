@@ -254,6 +254,7 @@ public class PedidoServiceImpl implements PedidoService {
 		Double valorComissionado = null;
 		Double valorComissionadoRepresentada = null;
 		Double precoItem = null;
+		boolean isComissaoSimples = isComissaoSimplesVendedor(pedido.getId());
 
 		for (ItemPedido itemPedido : listaItem) {
 
@@ -265,6 +266,10 @@ public class PedidoServiceImpl implements PedidoService {
 				comissaoVenda = new Comissao();
 				comissaoVenda.setAliquotaRevenda(itemPedido.getAliquotaComissao());
 				comissaoVenda.setAliquotaRepresentacao(itemPedido.getAliquotaComissao());
+			} else if (pedido.isRevenda() && !itemPedido.contemAliquotaComissao() && isComissaoSimples) {
+				// Essa condicao foi incluida para os usuarios recentes do
+				// sistema cujas regras de comissionamento foram modificadas.
+				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getIdVendedor());
 			} else if (pedido.isRevenda() && !itemPedido.contemAliquotaComissao()) {
 				// A comissao cadastrada para o material tem prioridade a
 				// comissao configurada para o vendedor.
@@ -844,9 +849,9 @@ public class PedidoServiceImpl implements PedidoService {
 		if (isCompra) {
 			tipo = TipoPedido.COMPRA;
 		} else if (representadaService.isRevendedor(idRepres)) {
-			tipo = TipoPedido.REPRESENTACAO;
-		} else {
 			tipo = TipoPedido.REVENDA;
+		} else {
+			tipo = TipoPedido.REPRESENTACAO;
 		}
 
 		Pedido p = new Pedido();
@@ -868,6 +873,10 @@ public class PedidoServiceImpl implements PedidoService {
 		ItemPedido clone = null;
 		for (ItemPedido item : listaItem) {
 			clone = item.clone();
+			// Aqui estamos configurando a aliquota como null para forcar o
+			// calculo da comissao no caso em que os valores das comissoes
+			// tenham sido atualizados.
+			clone.setAliquotaComissao(null);
 			inserirItemPedido(p.getId(), clone);
 		}
 		return p;
@@ -1174,6 +1183,12 @@ public class PedidoServiceImpl implements PedidoService {
 	public boolean isCalculoIPIHabilitado(Integer idPedido) {
 		Integer idRepresentada = pesquisarIdRepresentadaByIdPedido(idPedido);
 		return representadaService.isCalculoIPIHabilitado(idRepresentada);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean isComissaoSimplesVendedor(Integer idPedido) {
+		return pedidoDAO.pesquisarComissaoSimplesVendedor(idPedido);
 	}
 
 	@Override

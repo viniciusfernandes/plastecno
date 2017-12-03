@@ -15,6 +15,12 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 		super(entityManager);
 	}
 
+	public void alterarComissaoSimples(Integer iUsuario, boolean comissaoSimples) {
+		entityManager
+				.createQuery("update Usuario u set u.comissionadoSimples = :comissaoSimples where u.id =:iUsuario")
+				.setParameter("iUsuario", iUsuario).setParameter("comissaoSimples", comissaoSimples).executeUpdate();
+	}
+
 	public Usuario pesquisarByEmailSenha(String email, String senha) {
 		return QueryUtil
 				.gerarRegistroUnico(
@@ -27,6 +33,13 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 
 	public Usuario pesquisarById(Integer id) {
 		return super.pesquisarById(Usuario.class, id);
+	}
+
+	public boolean pesquisarComissionadoSimples(Integer idUsuario) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select u.comissionadoSimples from Usuario u.comissionadoSimples where u.id=:idUsuario")
+						.setParameter("idUsuario", idUsuario), boolean.class, false);
 	}
 
 	public Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {

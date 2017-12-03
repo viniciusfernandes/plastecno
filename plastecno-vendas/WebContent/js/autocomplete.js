@@ -69,6 +69,7 @@ var autocompletar = function(configuracao) {
 				var mensagem = 'Falha no AUTOCOMPLETE do campo: '+ idCampoPesquisavel;
 				mensagem += ' para a URL ' + url;
 				mensagem += ' contendo o valor de requisicao ' + parametro;
+				mensagem += ' => Status: '+status;
 				mensagem += ' => Excecao: ' + excecao;
 				gerarListaMensagemErro(new Array(mensagem));
 			});

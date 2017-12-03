@@ -27,8 +27,6 @@ import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 public interface PedidoService {
 	Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException;
 
-	void configurarDataEnvio(Integer idPedido);
-
 	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
 
 	void alterarItemAguardandoMaterialByIdPedido(Integer idPedido);
@@ -61,6 +59,8 @@ public interface PedidoService {
 
 	Integer comprarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)
 			throws BusinessException;
+
+	void configurarDataEnvio(Integer idPedido);
 
 	boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem);
 
@@ -97,6 +97,8 @@ public interface PedidoService {
 	Pedido inserirPedido(Pedido pedido) throws BusinessException;
 
 	boolean isCalculoIPIHabilitado(Integer idPedido);
+
+	boolean isComissaoSimplesVendedor(Integer idPedido);
 
 	boolean isPedidoEnviado(Integer idPedido);
 

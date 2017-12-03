@@ -171,6 +171,13 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						.setParameter("idPedido", idPedido), Double.class, 0d);
 	}
 
+	public boolean pesquisarComissaoSimplesVendedor(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select p.proprietario.comissionadoSimples from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), Boolean.class, false);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<ItemPedido> pesquisarCompraPendenteRecebimento() {
 		StringBuilder select = new StringBuilder();

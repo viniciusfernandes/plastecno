@@ -373,7 +373,8 @@ public abstract class AbstractController {
     }
 
     Download gerarDownload(byte[] bytesArquivo, String nomeArquivo, String contentType) {
-        return new ByteArrayDownload(bytesArquivo, contentType, StringUtils.removerAcentuacao(nomeArquivo));
+        return new ByteArrayDownload(bytesArquivo, contentType, StringUtils.removerAcentuacaoESubstituir(nomeArquivo,
+                " ", "_"));
     }
 
     Download gerarDownloadPDF(byte[] bytesArquivo, String nomeArquivo) {

@@ -22,6 +22,9 @@ $(document).ready(function(){
 		<legend>::: Resultado da Pesquisa de Pedidos de ${isCompra ? 'Compra': 'Venda'} :::</legend>
 		<div id="paginador"></div>
 		<div class="bloco_botoes">
+			<c:if test="${orcamento}">
+				<input type="button" id="botaoAceitarListaItemOrcamento" title="Aceitar Itens Orçamento" value="" class="botaoAceitar"/>
+			</c:if>
 			<input type="button" id="botaoCopiarItem" title="Gerar Novo ${orcamento ? 'Orçamento': 'Pedido'}" value="" class="botaoCesta"/>
 			<input type="button" id="botaoRemoverSelecaoItem" value="" title="Remover Seleção Item" class="botaoLimpar" />
 		</div>

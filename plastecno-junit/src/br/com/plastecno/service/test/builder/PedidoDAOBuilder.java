@@ -104,6 +104,15 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public boolean pesquisarComissaoSimplesVendedor(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				if (p == null || p.getProprietario() == null) {
+					return false;
+				}
+				return p.getProprietario().isComissionadoSimples();
+			}
+
+			@Mock
 			public Date pesquisarDataEnvioById(Integer idPedido) {
 				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null ? pedido.getDataEntrega() : null;

@@ -122,6 +122,13 @@ $(document).ready(function() {
 		form.method = 'post';
 		form.submit();
 	});
+
+	$('#botaoAceitarListaItemOrcamento').click(function (){
+		var form = document.getElementById('formPesquisa');
+		form.action = '<c:url value="/orcamento/aceite/listaitem"/>';
+		form.method = 'post';
+		form.submit();
+	});
 	
 	$("#botaoPDFOrcamento").click(function() {
 		var idPedido = $('#numeroPedido').val();

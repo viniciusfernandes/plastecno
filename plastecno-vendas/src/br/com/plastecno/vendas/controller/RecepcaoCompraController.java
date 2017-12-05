@@ -89,6 +89,11 @@ public class RecepcaoCompraController extends AbstractController {
     }
 
     @Post("compra/item/pagamento/inclusao")
+    /*
+     * AQUI ACHO QUE PODEMOS REALIZAR UMA CHAMADA DO
+     * AlteracaoEstoqueListener.publicar PARA ENVIAR OS PEDIDOS PARA O
+     * EMPACOTAMENTO AUTOMATICAMENTE.
+     */
     public void inserirPagamentoItemPedido(Pagamento pagamento, Date dataInicial, Date dataFinal,
             Integer idRepresentada, List<Integer> listaIdItemSelecionado) {
         try {
@@ -96,8 +101,8 @@ public class RecepcaoCompraController extends AbstractController {
                     pagamento.getDataVencimento(), pagamento.getDataEmissao(), pagamento.getModalidadeFrete(),
                     listaIdItemSelecionado);
 
-            redirecTo(PagamentoController.class)
-                    .gerarRelatorioPagamentoByNF(pagamento.getNumeroNF(), new Date(), new Date());
+            redirecTo(PagamentoController.class).gerarRelatorioPagamentoByNF(pagamento.getNumeroNF(), new Date(),
+                    new Date());
         } catch (BusinessException e) {
             addAtributo("dataInicial", dataInicial);
             addAtributo("dataFinal", dataFinal);

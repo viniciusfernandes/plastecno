@@ -177,7 +177,7 @@ public class PagamentoController extends AbstractController {
         pagamentoService.liquidarPagamentoNFParcelada(numeroNF, idFornecedor, parcela, liquidado);
         gerarMensagemSucesso("A parcela No. " + parcela + "da NF " + numeroNF + " do fornecedor " + nomeFornecedor
                 + " liquidada com sucesso.");
-        gerarRelatorioPagamentoByNF(numeroNF, dataInicial, dataFinal);
+        gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
     }
 
     @Get("pagamento")

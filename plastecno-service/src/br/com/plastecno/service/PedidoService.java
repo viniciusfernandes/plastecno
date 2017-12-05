@@ -25,6 +25,9 @@ import br.com.plastecno.service.wrapper.TotalizacaoPedidoWrapper;
 
 @Local
 public interface PedidoService {
+	Integer aceitarListaItemOrcamento(Integer idCliente, Integer idRepresentada, Integer idVendedor,
+			TipoPedido tipoPedido, Integer[] listaIdItemSelecionado) throws BusinessException;
+
 	Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException;
 
 	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
@@ -38,6 +41,8 @@ public interface PedidoService {
 	void alterarRevendaAguardandoMaterialByIdItem(Integer idItemPedido);
 
 	void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido);
+
+	void alterarSituacaoPedidoByIdItemPedido(List<Integer> listaIdItem, SituacaoPedido situacaoPedido);
 
 	void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido);
 

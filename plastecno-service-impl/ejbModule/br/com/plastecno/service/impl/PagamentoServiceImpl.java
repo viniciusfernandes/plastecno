@@ -100,7 +100,6 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 		double tot = 0d;
 		double totCredICMS = 0d;
-		boolean isInsumo = false;
 		Double val = 0d;
 		Boolean liqud = false;
 		final String VL_PARCELA = "valorParcela";
@@ -112,8 +111,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 			totCredICMS += p.getValorCreditoICMS() != null ? p.getValorCreditoICMS() : 0d;
 
 			// Agrupando os pagamentos de compra pelo numero da NF.
-			if (p.getNumeroNF() != null) {
-				isInsumo = true;
+			if (p.isInsumo()) {
 				// Aqui estamos concatenando u numero da NF com o ID do
 				// fornecedor para criar o ID pois diferentes fornecedores podem
 				// ter o mesmo numreo de NF, assim minimizamos conflitos.
@@ -137,7 +135,6 @@ public class PagamentoServiceImpl implements PagamentoService {
 					liqud &= p.isLiquidado();
 				}
 			} else {
-				isInsumo = true;
 				// Todos os outros tipos de pagamentos nao serao agrupados.
 				// Usamos o ID do pagamento pois a estrategia eh tratar os
 				// pagamentos que nao tem NF com um grupo com um unico elemento.
@@ -145,7 +142,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 				gr.setPropriedade(VL_PARCELA, p.getValor());
 			}
 			gr.setPropriedade(GRUPO_LIQUIDADO, liqud);
-			gr.setPropriedade(INSUMO_GRUPO, isInsumo);
+			gr.setPropriedade(INSUMO_GRUPO, p.isInsumo());
 			gr.setPropriedade("dataVencimento", StringUtils.formatarData(p.getDataVencimento()));
 			gr.setPropriedade("liquidado", p.isLiquidado());
 			gr.setPropriedade("vencido", !p.isLiquidado() && p.isVencido());

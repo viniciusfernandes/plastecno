@@ -67,12 +67,28 @@ public class OrcamentoController extends AbstractPedidoController {
         setRelatorioService(relatorioService);
     }
 
+    @Post("orcamento/aceite/listaitem")
+    public void aceitarListaItemOrcamento(Integer idCliente, Integer idRepresentada, Integer idVendedor,
+            TipoPedido tipoPedido, Integer[] listaIdItemSelecionado) {
+        try {
+            Integer idPed = pedidoService.aceitarListaItemOrcamento(idCliente, idRepresentada, idVendedor, tipoPedido,
+                    listaIdItemSelecionado);
+            // Devemos configurar o parametro orcamento = false para direcionar
+            // usuario para a tela de vendas apos o aceite.
+            redirecTo(PedidoController.class).pesquisarPedidoById(idPed, TipoPedido.REVENDA, true);
+        } catch (BusinessException e) {
+            pesquisarOrcamentoByIdCliente(idCliente, idVendedor, idRepresentada, tipoPedido, 1, null,
+                    listaIdItemSelecionado);
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
+    }
+
     @Post("orcamento/aceite/{id}")
     public void aceitarOrcamento(Integer id) {
         try {
             Integer idPedido = pedidoService.aceitarOrcamento(id);
             // Devemos configurar o parametro orcamento = false para direcionar
-            // o
             // usuario para a tela de vendas apos o aceite.
             redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA, true);
         } catch (BusinessException e) {
@@ -110,9 +126,9 @@ public class OrcamentoController extends AbstractPedidoController {
     public void copiarItemSelecionado(Integer idCliente, Integer idRepresentada, Integer idVendedor,
             TipoPedido tipoPedido, Integer[] listaIdItemSelecionado) {
         try {
-            Pedido p = pedidoService.gerarPedidoItemSelecionado(idVendedor == null ? getCodigoUsuario() : idVendedor,
+            Pedido orc = pedidoService.gerarPedidoItemSelecionado(idVendedor == null ? getCodigoUsuario() : idVendedor,
                     false, true, listaIdItemSelecionado == null ? null : Arrays.asList(listaIdItemSelecionado));
-            pesquisarOrcamentoById(p.getId());
+            pesquisarOrcamentoById(orc.getId());
         } catch (BusinessException e) {
             pesquisarOrcamentoByIdCliente(idCliente, idVendedor, idRepresentada, tipoPedido, 1, null,
                     listaIdItemSelecionado);

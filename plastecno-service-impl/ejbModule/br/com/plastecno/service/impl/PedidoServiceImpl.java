@@ -1,6 +1,7 @@
 package br.com.plastecno.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -107,8 +108,24 @@ public class PedidoServiceImpl implements PedidoService {
 	@EJB
 	private UsuarioService usuarioService;
 
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer aceitarListaItemOrcamento(Integer idCliente, Integer idRepresentada, Integer idVendedor,
+			TipoPedido tipoPedido, Integer[] listaIdItemSelecionado) throws BusinessException {
+
+		if (idVendedor == null) {
+			idVendedor = clienteService.pesquisarIdVendedorByIdCliente(idCliente);
+		}
+		Pedido orc = gerarPedidoItemSelecionado(idVendedor, false, true,
+				listaIdItemSelecionado == null ? null : Arrays.asList(listaIdItemSelecionado));
+		Integer idPed = aceitarOrcamento(orc.getId());
+
+		alterarSituacaoPedidoByIdItemPedido(Arrays.asList(listaIdItemSelecionado), SituacaoPedido.ORCAMENTO_ACEITO);
+		return idPed;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException {
 		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoById(idOrcamento);
 		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)
@@ -198,6 +215,12 @@ public class PedidoServiceImpl implements PedidoService {
 	public void alterarSituacaoPedidoByIdItemPedido(Integer idItemPedido, SituacaoPedido situacaoPedido) {
 		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 		pedidoDAO.alterarSituacaoPedidoById(idPedido, situacaoPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarSituacaoPedidoByIdItemPedido(List<Integer> listaIdItem, SituacaoPedido situacaoPedido) {
+		pedidoDAO.alterarSituacaoPedidoByIdItemPedido(listaIdItem, situacaoPedido);
 	}
 
 	@Override

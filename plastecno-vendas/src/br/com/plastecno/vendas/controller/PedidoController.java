@@ -307,6 +307,9 @@ public class PedidoController extends AbstractPedidoController {
         addAtributo("inclusaoDadosNFdesabilitado", false);
         addAtributo("listaCST", TipoCST.values());
 
+        addAtributoCondicional("acessoAlteracaoComissaoPermitida",
+                isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS));
+
         // verificando se o parametro para desabilitar ja foi incluido em outro
         // fluxo
         addAtributoCondicional("pedidoDesabilitado", false);
@@ -487,7 +490,7 @@ public class PedidoController extends AbstractPedidoController {
                 final boolean acessoCompraPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO,
                         TipoAcesso.CADASTRO_PEDIDO_COMPRA);
 
-                final boolean acessoAlteracaoComissaoPermitida = !pedido.isNovo() && pedido.isRevendaEfetuada()
+                final boolean acessoAlteracaoComissaoPermitida = !pedido.isCancelado()
                         && isAcessoPermitido(TipoAcesso.ADMINISTRACAO, TipoAcesso.GERENCIA_VENDAS);
 
                 addAtributo("pedidoDesabilitado", isPedidoDesabilitado(pedido));

@@ -1,5 +1,10 @@
 package br.com.plastecno.vendas.controller;
 
+import static br.com.plastecno.service.constante.TipoAcesso.ADMINISTRACAO;
+import static br.com.plastecno.service.constante.TipoAcesso.CADASTRO_PEDIDO_COMPRA;
+import static br.com.plastecno.service.constante.TipoAcesso.CADASTRO_PEDIDO_VENDAS;
+import static br.com.plastecno.service.constante.TipoAcesso.GERENCIA_VENDAS;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +17,6 @@ import br.com.plastecno.service.RepresentadaService;
 import br.com.plastecno.service.TransportadoraService;
 import br.com.plastecno.service.UsuarioService;
 import br.com.plastecno.service.constante.SituacaoPedido;
-import static br.com.plastecno.service.constante.TipoAcesso.*;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
@@ -167,9 +171,23 @@ public class AbstractPedidoController extends AbstractController {
             if (pedido.isOrcamento()) {
                 titulo += " No. " + pedido.getId() + " - " + StringUtils.formatarData(pedido.getDataEnvio());
                 pedido.formatarContato();
-                pedido.setListaLogradouro(pedidoService.pesquisarLogradouro(idPedido, TipoLogradouro.FATURAMENTO));
             } else {
-                pedido.setListaLogradouro(pedidoService.pesquisarLogradouro(idPedido));
+                // Aqui estamos recuperando o logradouro do pedido para o
+                // preenchimento das informacoes do PDF que sera gerado. Caso
+                // nao haja logradouro cadastrado para o pedido, o que pode
+                // acontecer pois os logradouros dos pedidos sao gerados no
+                // envio do email, associaremos o pedido aos logradouros do
+                // cliente, o que ja sera feito apos o envio.
+                List<LogradouroPedido> lLog = pedidoService.pesquisarLogradouro(idPedido);
+                if (lLog.isEmpty()) {
+                    List<LogradouroCliente> lLogCli = clienteService.pesquisarLogradouroCliente(pedido.getCliente()
+                            .getId());
+                    for (LogradouroCliente l : lLogCli) {
+                        lLog.add(new LogradouroPedido(l));
+                    }
+                }
+                pedido.setListaLogradouro(lLog);
+
                 Transportadora transportadora = pedido.getTransportadora();
                 if (transportadora != null) {
                     transportadora.setListaContato(transportadoraService.pesquisarContato(transportadora.getId()));
@@ -189,14 +207,14 @@ public class AbstractPedidoController extends AbstractController {
             }
 
             LogradouroPedido logradouroFaturamento = recuperarLogradouro(pedido, TipoLogradouro.FATURAMENTO);
+            addAtributoPDF("logradouroFaturamento",
+                    logradouroFaturamento != null ? logradouroFaturamento.getDescricao() : "");
 
             addAtributoPDF("tipoRelacionamento", pedido.isVenda() ? "Represent." : "Forneced.");
             addAtributoPDF("tipoProprietario", pedido.isVenda() ? "Vendedor" : "Comprador");
             addAtributoPDF("titulo", titulo);
             addAtributoPDF("tipoPedido", tipo);
             addAtributoPDF("pedido", pedido);
-            addAtributoPDF("logradouroFaturamento",
-                    logradouroFaturamento != null ? logradouroFaturamento.getDescricao() : "");
 
             addAtributoPDF("listaItem", listaItem);
 
@@ -396,8 +414,6 @@ public class AbstractPedidoController extends AbstractController {
         return isAcessoVendaPermitido;
     }
 
-    
-    
     void pesquisarPedidoByIdCliente(Integer idCliente, Integer idUsuario, Integer idFornecedor, TipoPedido tipoPedido,
             boolean orcamento, Integer paginaSelecionada, ItemPedido itemVendido, Integer[] listaIdItemSelecionado) {
         boolean isCompra = TipoPedido.COMPRA.equals(tipoPedido);
@@ -450,10 +466,11 @@ public class AbstractPedidoController extends AbstractController {
     }
 
     LogradouroPedido recuperarLogradouro(Pedido p, TipoLogradouro t) {
-        if (p.getListaLogradouro() == null || p.getListaLogradouro().isEmpty()) {
+        List<LogradouroPedido> lLog = p.getListaLogradouro();
+        if (t == null || lLog == null || lLog.isEmpty()) {
             return null;
         }
-        for (LogradouroPedido l : p.getListaLogradouro()) {
+        for (LogradouroPedido l : lLog) {
             if (t.equals(l.getTipoLogradouro())) {
                 return l;
             }

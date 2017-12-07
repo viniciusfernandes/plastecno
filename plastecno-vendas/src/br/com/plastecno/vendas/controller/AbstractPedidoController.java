@@ -171,6 +171,9 @@ public class AbstractPedidoController extends AbstractController {
             if (pedido.isOrcamento()) {
                 titulo += " No. " + pedido.getId() + " - " + StringUtils.formatarData(pedido.getDataEnvio());
                 pedido.formatarContato();
+                // Aqui estamos evitando o LazyLoadException da lista do
+                // logradouro
+                pedido.setListaLogradouro(null);
             } else {
                 // Aqui estamos recuperando o logradouro do pedido para o
                 // preenchimento das informacoes do PDF que sera gerado. Caso

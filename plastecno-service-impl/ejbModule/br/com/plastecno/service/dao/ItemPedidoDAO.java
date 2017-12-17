@@ -9,9 +9,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.SituacaoPedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.ItemPedido;
+import br.com.plastecno.service.entity.Material;
 import br.com.plastecno.service.impl.util.QueryUtil;
 import br.com.plastecno.service.wrapper.Periodo;
 
@@ -38,6 +40,20 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 						"update ItemPedido i set i.quantidadeRecepcionada = :quantidadeReservada where i.id = :idItemPedido")
 				.setParameter("idItemPedido", idItemPedido).setParameter("quantidadeReservada", quantidadeReservada)
 				.executeUpdate();
+	}
+
+	public void alterarValoresComissao(ItemPedido item) {
+		if (item == null || item.getId() == null) {
+			return;
+		}
+		entityManager
+				.createQuery(
+						"update ItemPedido i set i.aliquotaComissao = :aliquotaComissao, i.aliquotaComissaoRepresentada=:aliquotaComissaoRepresentada, i.valorComissionado=:valorComissionado, i.valorComissionadoRepresentada=:valorComissionadoRepresentada where i.id = :idItem")
+				.setParameter("aliquotaComissao", item.getAliquotaComissao())
+				.setParameter("aliquotaComissaoRepresentada", item.getAliquotaComissaoRepresentada())
+				.setParameter("valorComissionado", item.getValorComissionado())
+				.setParameter("valorComissionadoRepresentada", item.getValorComissionadoRepresentada())
+				.setParameter("idItem", item.getId()).executeUpdate();
 	}
 
 	private StringBuilder gerarConstrutorItemPedidoComDataEntrega() {
@@ -105,6 +121,10 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 				entityManager.createQuery("select i.aliquotaIPI from ItemPedido i where i.id = :idItemPedido")
 						.setParameter("idItemPedido", idItemPedido), Double.class, 0d);
 		return ipi == null ? 0 : ipi;
+	}
+
+	public ItemPedido pesquisarById(Integer idItem) {
+		return super.pesquisarById(ItemPedido.class, idItem);
 	}
 
 	public List<ItemPedido> pesquisarCaracteristicaItemPedidoByNumeroItem(List<Integer> listaNumeroItem,
@@ -500,6 +520,27 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 								.createQuery(
 										"select new ItemPedido(i.aliquotaICMS, i.aliquotaIPI, i.comprimento, i.material.descricao, i.descricaoPeca, i.formaMaterial, i.id, i.pedido.id, i.pedido.representada.id, i.medidaExterna, i.medidaInterna, i.pedido.representada.nomeFantasia, i.precoUnidade, i.quantidade, i.quantidadeRecepcionada, i.sequencial, i.material.sigla) from ItemPedido i where i.id =:idItemPedido ")
 								.setParameter("idItemPedido", idItemPedido), ItemPedido.class, null);
+	}
+
+	public ItemPedido pesquisarItemPedidoValoresComissaoById(Integer idItem) {
+		Object[] o = QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select i.aliquotaComissao, i.formaMaterial, i.pedido.id, i.material.id, i.precoUnidade, i.quantidade  from ItemPedido i where i.id=:idItem")
+								.setParameter("idItem", idItem), Object[].class, null);
+		if (o == null) {
+			return null;
+		}
+		ItemPedido i = new ItemPedido();
+		i.setId(idItem);
+		i.setAliquotaComissao((Double) o[0]);
+		i.setFormaMaterial((FormaMaterial) o[1]);
+		i.setIdPedido((Integer) o[2]);
+		i.setMaterial(new Material((Integer) o[3]));
+		i.setPrecoUnidade((Double) o[4]);
+		i.setQuantidade((Integer) o[5]);
+		return i;
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoVendaComissionadaByPeriodo(Periodo periodo, Integer idVendedor,

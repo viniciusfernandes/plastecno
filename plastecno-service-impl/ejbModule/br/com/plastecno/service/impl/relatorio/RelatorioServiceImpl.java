@@ -598,6 +598,14 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 		// Reordenando os itens pelo numero de sequencia de inclusao no pedido.
 		relatorio.sortElementoByGrupo(ordenacaoItemPedido);
+
+		// Reordenando os grupos pelo numero do pedido.
+		relatorio.sortGrupo(new Comparator<GrupoWrapper<Integer, ItemPedido>>() {
+			@Override
+			public int compare(GrupoWrapper<Integer, ItemPedido> o1, GrupoWrapper<Integer, ItemPedido> o2) {
+				return o1.getId() != null && o2.getId() != null ? o1.getId().compareTo(o2.getId()) : -1;
+			}
+		});
 		return relatorio;
 	}
 

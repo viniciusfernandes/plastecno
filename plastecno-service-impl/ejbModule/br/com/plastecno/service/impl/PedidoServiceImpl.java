@@ -265,6 +265,23 @@ public class PedidoServiceImpl implements PedidoService {
 		return valores;
 	}
 
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void calcularComissaoItemPedido(Integer idItem) throws BusinessException {
+		ItemPedido i = itemPedidoDAO.pesquisarItemPedidoValoresComissaoById(idItem);
+		if (idItem == null || i == null) {
+			throw new BusinessException("O item do pedido não existe no sistema.");
+		}
+		// Aqui estamos configurando null para forcar a rotina a recalcular a
+		// comissao.
+		i.setAliquotaComissao(null);
+		i.setAliquotaComissaoRepresentada(null);
+
+		Pedido p = pedidoDAO.pesquisarPedidoResumidoCalculoComissao(i.getIdPedido());
+		calcularComissaoVenda(p, i);
+		itemPedidoDAO.alterarValoresComissao(i);
+	}
+
 	private void calcularComissaoVenda(Pedido pedido, ItemPedido... listaItem) throws BusinessException {
 
 		if (pedido == null || !pedido.isVenda() || !isCalculoComissaoPermitida(pedido.getFinalidadePedido())) {
@@ -279,25 +296,25 @@ public class PedidoServiceImpl implements PedidoService {
 		Double precoItem = null;
 		boolean isComissaoSimples = isComissaoSimplesVendedor(pedido.getId());
 
-		for (ItemPedido itemPedido : listaItem) {
+		for (ItemPedido item : listaItem) {
 
 			// Aqui estamos priorizando a aliquota que foi inputada pelo
 			// usuario. Usado em casos de vendas especiais, caso contrario sera
 			// usada a comissao cadastrada no sistema. Essa situacao eh
 			// utilizada apenas na revenda.
-			if (pedido.isRevenda() && itemPedido.contemAliquotaComissao()) {
+			if (pedido.isRevenda() && item.contemAliquotaComissao()) {
 				comissaoVenda = new Comissao();
-				comissaoVenda.setAliquotaRevenda(itemPedido.getAliquotaComissao());
-				comissaoVenda.setAliquotaRepresentacao(itemPedido.getAliquotaComissao());
-			} else if (pedido.isRevenda() && !itemPedido.contemAliquotaComissao() && isComissaoSimples) {
+				comissaoVenda.setAliquotaRevenda(item.getAliquotaComissao());
+				comissaoVenda.setAliquotaRepresentacao(item.getAliquotaComissao());
+			} else if (pedido.isRevenda() && !item.contemAliquotaComissao() && isComissaoSimples) {
 				// Essa condicao foi incluida para os usuarios recentes do
 				// sistema cujas regras de comissionamento foram modificadas.
 				comissaoVenda = comissaoService.pesquisarComissaoVigenteVendedor(pedido.getIdVendedor());
-			} else if (pedido.isRevenda() && !itemPedido.contemAliquotaComissao()) {
+			} else if (pedido.isRevenda() && !item.contemAliquotaComissao()) {
 				// A comissao cadastrada para o material tem prioridade a
 				// comissao configurada para o vendedor.
-				comissaoVenda = comissaoService.pesquisarComissaoVigenteProduto(itemPedido.getMaterial().getId(),
-						itemPedido.getFormaMaterial().indexOf());
+				comissaoVenda = comissaoService.pesquisarComissaoVigenteProduto(item.getMaterial().getId(), item
+						.getFormaMaterial().indexOf());
 
 				// Caso nao exista comissao configurada para o material devemos
 				// utilizar a comissao configurada para o vendedor.
@@ -313,7 +330,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 			// Nos calculos do preco de venda do item nao pode haver o IPI de
 			// venda.
-			precoItem = itemPedido.calcularPrecoItem();
+			precoItem = item.calcularPrecoItem();
 
 			if (pedido.isRevenda() && comissaoVenda != null && comissaoVenda.getAliquotaRevenda() != null) {
 				aliqComissao = comissaoVenda.getAliquotaRevenda();
@@ -331,16 +348,15 @@ public class PedidoServiceImpl implements PedidoService {
 						"Não existe comissão configurada para o vendedor \""
 								+ vendedor.getNomeCompleto()
 								+ "\". Problema para calular a comissão do item No. "
-								+ itemPedido.getSequencial()
+								+ item.getSequencial()
 								+ " do pedido No. "
 								+ pedido.getId()
 								+ ". Também pode não existir comissão padrão configurada para o material desse item, verifique as configurações do sistema.");
 			}
-			itemPedido.setAliquotaComissao(aliqComissao);
-			itemPedido.setAliquotaComissaoRepresentada(aliqRepresentada);
-			itemPedido.setValorComissionado(valorComissionado);
-			itemPedido.setValorComissionadoRepresentada(valorComissionadoRepresentada);
-			itemPedidoDAO.alterar(itemPedido);
+			item.setAliquotaComissao(aliqComissao);
+			item.setAliquotaComissaoRepresentada(aliqRepresentada);
+			item.setValorComissionado(valorComissionado);
+			item.setValorComissionadoRepresentada(valorComissionadoRepresentada);
 		}
 	}
 

@@ -91,6 +91,32 @@
 	width: 24px;
 }
 
+.botaoCalculadora {
+	background: url("../images/calculator_24.png") no-repeat scroll
+		0 0 transparent;
+	cursor: pointer;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoCalculadora:hover {
+	background: url("../images/calculator_16.png") no-repeat scroll
+		0 0 transparent;
+	background-position: center center;
+	height: 24px;
+	width: 24px;
+}
+
+.botaoCalculadoraPequeno {
+	background: url("../images/calculator_16.png") no-repeat scroll 0 0
+		transparent;
+	border: 0;
+	cursor: pointer;
+	height: 16px;
+	margin-left: 5px;
+	width: 16px;
+}
+
 .botaoCesta {
 	background: url("../images/cesta_24.png") no-repeat scroll
 		0 0 transparent;

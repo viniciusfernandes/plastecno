@@ -25,21 +25,14 @@ import br.com.plastecno.service.validacao.annotation.InformacaoValidavel;
 public class Material implements Serializable {
 	private static final long serialVersionUID = 9196522865218486979L;
 
+	private boolean ativo = true;
+	@InformacaoValidavel(trim = true, intervaloComprimento = { 0, 50 }, nomeExibicao = "Descrição do Material")
+	private String descricao;
+
 	@Id
 	@SequenceGenerator(name = "materialSequence", sequenceName = "vendas.seq_material_id", initialValue = 1, allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "materialSequence")
 	private Integer id;
-	private boolean ativo = true;
-
-	@InformacaoValidavel(trim = true, obrigatorio = true, intervaloComprimento = { 1, 10 }, nomeExibicao = "Sigla do Material")
-	private String sigla;
-
-	@InformacaoValidavel(trim = true, intervaloComprimento = { 0, 50 }, nomeExibicao = "Descrição do Material")
-	private String descricao;
-
-	@Column(name = "peso_especifico")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Peso especifico do Material")
-	private Double pesoEspecifico;
 
 	private boolean importado;
 
@@ -47,12 +40,23 @@ public class Material implements Serializable {
 	@JoinTable(name = "tb_material_tb_representada", schema = "vendas", joinColumns = { @JoinColumn(name = "id_material", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "id_representada", referencedColumnName = "id") })
 	private List<Representada> listaRepresentada;
 
+	@Column(name = "peso_especifico")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Peso especifico do Material")
+	private Double pesoEspecifico;
+
+	@InformacaoValidavel(trim = true, obrigatorio = true, intervaloComprimento = { 1, 10 }, nomeExibicao = "Sigla do Material")
+	private String sigla;
+
 	public Material() {
 
 	}
 
 	public Material(Double pesoEspecifico) {
 		this.pesoEspecifico = pesoEspecifico;
+	}
+
+	public Material(Integer id) {
+		this.id = id;
 	}
 
 	public Material(Integer id, String sigla, String descricao) {

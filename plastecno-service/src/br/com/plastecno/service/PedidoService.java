@@ -46,6 +46,8 @@ public interface PedidoService {
 
 	void alterarSituacaoPedidoByIdPedido(Integer idPedido, SituacaoPedido situacaoPedido);
 
+	void calcularComissaoItemPedido(Integer idItem) throws BusinessException;
+
 	List<Date> calcularDataPagamento(Integer idPedido);
 
 	List<Date> calcularDataPagamento(Integer idPedido, Date dataInicial);

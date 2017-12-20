@@ -42,6 +42,18 @@
 			}
 		});
 	});
+	
+function recalcularComissao(idItem){
+	var f = document.getElementById('formVazio');
+	adicionarInputHiddenFormulario('formVazio', 'vendedor.id', $('#idVendedor').val());
+	adicionarInputHiddenFormulario('formVazio', 'vendedor.nome', $('#nome').val());
+	adicionarInputHiddenFormulario('formVazio', 'dataInicial', $('#dataInicial').val());
+	adicionarInputHiddenFormulario('formVazio', 'dataFinal', $('#dataFinal').val());
+	adicionarInputHiddenFormulario('formVazio', 'idItem', idItem);
+	f.action = '<c:url value="/relatorio/comissao/recalculoitem"/>';
+	f.method = 'post';
+	f.submit();
+};
 </script>
 </head>
 <body>
@@ -54,7 +66,7 @@
 		
 			<legend>::: Relatório das Comissões do Vendedor :::</legend>
 			<div class="label obrigatorio" style="width: 30%">Data Inícial:</div>
-			<div class="input" style="width: 15%">
+			<div class="input" style="width: 10%">
 				<input type="text" id="dataInicial" name="dataInicial"
 					value="${dataInicial}" maxlength="10" class="pesquisavel" />
 			</div>
@@ -63,13 +75,13 @@
 			<div class="input" style="width: 35%">
 				<input type="text" id="dataFinal" name="dataFinal"
 					value="${dataFinal}" maxlength="100" class="pesquisavel"
-					style="width: 45%" />
+					style="width: 30%" />
 			</div>
 			<div class="label" style="width: 30%">Vendedor:</div>
 			<div class="input" style="width: 40%">
 				<input type="text" id="nome" name="vendedor.nome" value="${vendedor.nome}"
 					class="pesquisavel <c:if test="${not acessoPesquisaComissaoPermitido}">desabilitado</c:if>" 
-					<c:if test="${not acessoPesquisaComissaoPermitido}">disabled="disabled"</c:if> style="width: 50%" />
+					<c:if test="${not acessoPesquisaComissaoPermitido}">disabled="disabled"</c:if> style="width: 79%" />
 				<div class="suggestionsBox" id="containerPesquisaVendedor" style="display: none; width: 50%"></div>
 			</div>
 		</fieldset>
@@ -118,8 +130,14 @@
 							<div class="coluna_acoes_listagem">
 								<form action="<c:url value="/pedido/pdf"/>">
 									<input type="hidden" name="idPedido" value="${pedido.id}"/>
-									<input type="submit" title="Vizualizar Pedido PDF" value="" class="botaoPDF" />
+									<div class="input" style="width: 50%">
+										<input type="submit" title="Vizualizar Pedido PDF" value="" class="botaoPDFPequeno" />
+									</div>
 								</form>
+								<div class="input" style="width: 50%">
+									<input type="button" title="Recalcular Comissão Item" value="" class="botaoCalculadoraPequeno" 
+										onclick="recalcularComissao('${item.id}');"/>
+								</div>
 							</div>
 						</td>
 						</tr>

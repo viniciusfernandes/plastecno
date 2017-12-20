@@ -6,6 +6,7 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.plastecno.service.PedidoService;
 import br.com.plastecno.service.UsuarioService;
 import static br.com.plastecno.service.constante.TipoAcesso.*;
 import br.com.plastecno.service.entity.Usuario;
@@ -17,6 +18,9 @@ import br.com.plastecno.vendas.login.UsuarioInfo;
 
 @Resource
 public class RelatorioComissaoVendedorController extends AbstractController {
+    @Servico
+    private PedidoService pedidoService;
+
     @Servico
     private RelatorioService relatorioService;
 
@@ -51,6 +55,17 @@ public class RelatorioComissaoVendedorController extends AbstractController {
         addAtributo("dataInicial", formatarData(dataInicial));
         addAtributo("dataFinal", formatarData(dataFinal));
         addAtributo("vendedor", vendedor);
+    }
+
+    @Post("relatorio/comissao/recalculoitem")
+    public void recalcularComissaItemPedido(Integer idItem, Date dataInicial, Date dataFinal, Usuario vendedor) {
+        try {
+            pedidoService.calcularComissaoItemPedido(idItem);
+            gerarRelatorioComissaoVendedor(dataInicial, dataFinal, vendedor);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
     }
 
     @Get("relatorio/comissao/vendedor")

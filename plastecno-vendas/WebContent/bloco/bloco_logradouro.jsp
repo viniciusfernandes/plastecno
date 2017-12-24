@@ -168,7 +168,7 @@ function desabilitarCamposEndereco(isEnderecoExistente) {
 							<td>${logradouro.uf}</td>
 							<td>${logradouro.pais}</td>
 							<td>${logradouro.codigoMunicipio}</td>
-							<td style="display: none;">${logradouro.codificado}</td>
+							<!-- td style="display: none;">${logradouro.codificado}</td-->
 							<td>
 								<input type="button" value="" title="Editar Dados do Logradouro" onclick="editarLogradouro(this);" class="botaoEditar" /> 
 								<input type="button" value="" title="Remover Dados do Logradouro" onclick="removerLogradouro(this);" class="botaoRemover" />

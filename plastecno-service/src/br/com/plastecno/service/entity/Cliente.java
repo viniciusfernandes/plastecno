@@ -264,7 +264,7 @@ public class Cliente implements Serializable {
 		}
 
 		for (Transportadora transportadora : listaRedespacho) {
-			this.addRedespacho(transportadora);
+			addRedespacho(transportadora);
 		}
 	}
 

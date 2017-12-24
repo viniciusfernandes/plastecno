@@ -7,7 +7,6 @@
 <jsp:include page="/bloco/bloco_css.jsp" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-
 <script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/mascara.js?${versaoCache}"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js?${versaoCache}"/>"></script>
@@ -20,6 +19,8 @@
 <title>Relatório das Duplicatas</title>
 <script type="text/javascript">
 	$(document).ready(function() {
+		ancorar('${ancora}');
+		
 		$('#botaoLimpar').click(function () {
 			$('#formVazio').submit();
 		});
@@ -175,7 +176,7 @@ function removerDuplicata(botao, metodo, acao){
 			
 			<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iGrupo">
 					<c:forEach items="${grupo.listaElemento}" var="elemento" varStatus="iElemento">
-						<tr>
+						<tr id="${grupo.propriedades['dataSemLimitador']}">
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento + 2}">${grupo.propriedades['dataVencimentoFormatada']}</td>
 							</c:if>
@@ -188,6 +189,7 @@ function removerDuplicata(botao, metodo, acao){
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
 								<div class="coluna_acoes_listagem">
 									<form>
+										<input type="hidden" name="idGrupo" value="${grupo.propriedades['dataSemLimitador']}"/>
 										<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 										<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 										<div class="input" style="width: 33%">

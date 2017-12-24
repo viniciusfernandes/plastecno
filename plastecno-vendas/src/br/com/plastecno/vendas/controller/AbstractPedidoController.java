@@ -135,7 +135,7 @@ public class AbstractPedidoController extends AbstractController {
         item.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getPrecoUnidadeIPI())));
         item.setValorTotalPedidoSemFreteFormatado(NumeroUtils.formatarValorMonetario(item.getValorTotalPedidoSemFrete()));
         if (item.contemAliquotaComissao()) {
-            item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaComissao()));
+            item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao(), 4));
         }
     }
 
@@ -292,8 +292,8 @@ public class AbstractPedidoController extends AbstractController {
             }
 
             itemPedido.setAliquotaComissao(itemPedido.getAliquotaComissao() == null
-                    || itemPedido.getAliquotaComissao() == 0d ? null : NumeroUtils.gerarAliquota(itemPedido
-                    .getAliquotaComissao()));
+                    || itemPedido.getAliquotaComissao() == 0d ? null : NumeroUtils.gerarAliquota(
+                    itemPedido.getAliquotaComissao(), 4));
 
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
 

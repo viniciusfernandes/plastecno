@@ -464,3 +464,9 @@ function tabelaLinhaSelecionavelExt(config){
 		}
 	});
 };
+
+function ancorar(idElemento){
+	$('html, body').animate({
+	    scrollTop: ($('#'+idElemento).first().offset().top)
+	},0);
+};

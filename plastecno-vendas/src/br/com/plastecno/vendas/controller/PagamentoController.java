@@ -165,19 +165,22 @@ public class PagamentoController extends AbstractController {
     }
 
     @Post("pagamento/liquidacao/{idPagamento}")
-    public void liquidarPagamento(Integer idPagamento, boolean liquidado, Date dataInicial, Date dataFinal) {
+    public void liquidarPagamento(String idGrupo, Integer idPagamento, boolean liquidado, Date dataInicial,
+            Date dataFinal) {
         pagamentoService.liquidarPagamento(idPagamento, liquidado);
         gerarMensagemSucesso("Pagamento liquidado com sucesso.");
         gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
+        ancorarElemento(idGrupo);
     }
 
     @Post("pagamento/liquidacao/nfparcelada")
-    public void liquidarPagamentoNFParcelada(Integer numeroNF, Integer idFornecedor, Integer parcela,
+    public void liquidarPagamentoNFParcelada(String idGrupo, Integer numeroNF, Integer idFornecedor, Integer parcela,
             String nomeFornecedor, boolean liquidado, Date dataInicial, Date dataFinal) {
         pagamentoService.liquidarPagamentoNFParcelada(numeroNF, idFornecedor, parcela, liquidado);
         gerarMensagemSucesso("A parcela No. " + parcela + "da NF " + numeroNF + " do fornecedor " + nomeFornecedor
                 + " liquidada com sucesso.");
         gerarRelatorioPagamentoByPeriodo(dataInicial, dataFinal);
+        ancorarElemento(idGrupo);
     }
 
     @Get("pagamento")

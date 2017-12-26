@@ -220,8 +220,17 @@ public class ClienteServiceImpl implements ClienteService {
 		validarDocumentosPreenchidos(cliente);
 		validarRevendedorExistente(cliente);
 
+		if (cliente.contemContato()) {
+			for (ContatoCliente ct : cliente.getListaContato()) {
+				ct.setCliente(cliente);
+			}
+		}
+
 		Cliente c = clienteDAO.alterar(cliente);
-		inserirEndereco(c, cliente.getListaLogradouro());
+		// Esse bloco existe pois a lista de logradouro nao tem cascade. Tem-se
+		// que implementar a instrucao de inclusao do relacionamento.
+		c.setListaLogradouro(cliente.getListaLogradouro());
+		inserirEndereco(c);
 		return c;
 	}
 
@@ -257,13 +266,14 @@ public class ClienteServiceImpl implements ClienteService {
 
 	}
 
-	private void inserirEndereco(Cliente c, List<LogradouroCliente> lLogradouro) throws BusinessException {
+	private void inserirEndereco(Cliente c) throws BusinessException {
+		List<LogradouroCliente> lLogradouro = c.getListaLogradouro();
 		if (lLogradouro == null || lLogradouro.isEmpty()) {
 			return;
 		}
 
-		lLogradouro.stream().forEach(l -> l.setCliente(c));
 		for (LogradouroCliente logradouro : lLogradouro) {
+			logradouro.setCliente(c);
 			logradouroService.inserir(logradouro);
 		}
 		// Aqui estamos populando a base de CEP para caso haja um cep ainda
@@ -426,14 +436,13 @@ public class ClienteServiceImpl implements ClienteService {
 
 		s.append(" order by p.dataEnvio desc ");
 
-		
-
 		Query query = entityManager.createQuery(s.toString());
 		if (inativos) {
 			query.setParameter("dtInatividade", gerarDataInatividadeCliente());
 		}
 
-		// removendo da listagem apenas os pedidos que nao tiveram venda efetuada
+		// removendo da listagem apenas os pedidos que nao tiveram venda
+		// efetuada
 		query.setParameter("listaSituacao", SituacaoPedido.getListaPedidoNaoEfetivado());
 		// Listando apenas os pedidos do tipo de venda
 		query.setParameter("tipoCompra", TipoPedido.COMPRA);

@@ -1,6 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import br.com.caelum.vraptor.Get;
@@ -127,15 +128,15 @@ public class ClienteController extends AbstractController {
             List<ContatoCliente> listaContato, List<Integer> listaIdTransportadoraAssociada, boolean isRevendedor) {
         try {
             if (temElementos(listaLogradouro)) {
-                cliente.addLogradouro(listaLogradouro);
+                cliente.setListaLogradouro(listaLogradouro);
             }
 
             if (temElementos(listaContato)) {
-                cliente.addContato(listaContato);
+                cliente.setListaContato(new HashSet<ContatoCliente>(listaContato));
             }
 
             if (temElementos(listaIdTransportadoraAssociada)) {
-                cliente.addRedespacho(this.transportadoraService.pesquisarById(listaIdTransportadoraAssociada));
+                cliente.setListaRedespacho(transportadoraService.pesquisarById(listaIdTransportadoraAssociada));
             }
 
             if (cliente.getId() == null) {

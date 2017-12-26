@@ -22,6 +22,8 @@ public final class StringUtils {
 
 	private static final SimpleDateFormat FORMATADOR_DATA_HORA_TIMEZONE = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ssXXX");
+
+	private static final SimpleDateFormat FORMATADOR_DATA_SEM_LIMITADOR = new SimpleDateFormat("ddMMyyyy");
 	private static final SimpleDateFormat FORMATADOR_HORA = new SimpleDateFormat("HH:mm");
 
 	public static String formatarCNPJ(String conteudo) {
@@ -103,6 +105,10 @@ public final class StringUtils {
 
 	public static String formatarDataHoraTimezone(Date date) {
 		return date == null ? "" : FORMATADOR_DATA_HORA_TIMEZONE.format(date);
+	}
+
+	public static String formatarDataSemLimitador(Date data) {
+		return data == null ? "" : FORMATADOR_DATA_SEM_LIMITADOR.format(data);
 	}
 
 	public static String formatarHora(Date date) {

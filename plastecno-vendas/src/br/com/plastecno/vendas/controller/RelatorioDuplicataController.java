@@ -12,7 +12,9 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoBanco;
 import br.com.plastecno.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.plastecno.service.relatorio.RelatorioService;
+import br.com.plastecno.service.wrapper.GrupoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
+import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.StringUtils;
 import br.com.plastecno.vendas.controller.anotacao.Servico;
 import br.com.plastecno.vendas.login.UsuarioInfo;
@@ -42,7 +44,7 @@ public class RelatorioDuplicataController extends AbstractController {
     }
 
     @Post("duplicata/liquidacao/cancelamento/{idDuplicata}")
-    public void cancelarLiquidacaoDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
+    public void cancelarLiquidacaoDuplicata(String idGrupo, Integer idDuplicata, Date dataInicial, Date dataFinal) {
         try {
             duplicataService.cancelarLiquidacaoDuplicataById(idDuplicata);
             gerarRelatorioDuplicata(dataInicial, dataFinal);
@@ -50,6 +52,7 @@ public class RelatorioDuplicataController extends AbstractController {
             gerarListaMensagemErro(e);
         }
         irTopoPagina();
+        ancorarElemento(idGrupo);
     }
 
     @Get("duplicata/configuracao")
@@ -64,7 +67,12 @@ public class RelatorioDuplicataController extends AbstractController {
         }
 
         try {
-            addAtributo("relatorio", relatorioService.gerarRelatorioDuplicata(new Periodo(dataInicial, dataFinal)));
+            RelatorioWrapper<Date, NFeDuplicata> r = relatorioService.gerarRelatorioDuplicata(new Periodo(dataInicial,
+                    dataFinal));
+            for (GrupoWrapper<Date, NFeDuplicata> g : r.getListaGrupo()) {
+                g.setPropriedade("dataSemLimitador", StringUtils.formatarDataSemLimitador(g.getId()));
+            }
+            addAtributo("relatorio", r);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
@@ -121,7 +129,7 @@ public class RelatorioDuplicataController extends AbstractController {
     }
 
     @Post("duplicata/liquidacao/{idDuplicata}")
-    public void liquidarDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
+    public void liquidarDuplicata(String idGrupo, Integer idDuplicata, Date dataInicial, Date dataFinal) {
         try {
             duplicataService.liquidarDuplicataById(idDuplicata);
             gerarRelatorioDuplicata(dataInicial, dataFinal);
@@ -129,6 +137,7 @@ public class RelatorioDuplicataController extends AbstractController {
             gerarListaMensagemErro(e);
         }
         irTopoPagina();
+        ancorarElemento(idGrupo);
     }
 
     @Get("duplicata/cliente/listagem/nome")
@@ -137,7 +146,7 @@ public class RelatorioDuplicataController extends AbstractController {
     }
 
     @Get("duplicata/{idDuplicata}")
-    public void pesquisarDuplicataById(Integer idDuplicata, Date dataInicial, Date dataFinal) {
+    public void pesquisarDuplicataById(String idGrupo, Integer idDuplicata, Date dataInicial, Date dataFinal) {
         NFeDuplicata d = duplicataService.pesquisarDuplicataById(idDuplicata);
         if (d != null) {
             d.setDataVencimentoFormatada(StringUtils.formatarData(d.getDataVencimento()));
@@ -145,6 +154,7 @@ public class RelatorioDuplicataController extends AbstractController {
         }
         addAtributo("listaBanco", TipoBanco.values());
         redirecTo(this.getClass()).gerarRelatorioDuplicata(dataInicial, dataFinal);
+        ancorarElemento(idGrupo);
     }
 
     @Get("relatorio/duplicata")
@@ -153,7 +163,7 @@ public class RelatorioDuplicataController extends AbstractController {
     }
 
     @Post("duplicata/remocao/{idDuplicata}")
-    public void removerDuplicata(Integer idDuplicata, Date dataInicial, Date dataFinal) {
+    public void removerDuplicata(String idGrupo, Integer idDuplicata, Date dataInicial, Date dataFinal) {
         try {
             duplicataService.removerDuplicataById(idDuplicata);
             gerarRelatorioDuplicata(dataInicial, dataFinal);
@@ -161,6 +171,7 @@ public class RelatorioDuplicataController extends AbstractController {
             gerarListaMensagemErro(e);
         }
         irTopoPagina();
+        ancorarElemento(idGrupo);
     }
 
 }

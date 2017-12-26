@@ -25,7 +25,10 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-	scrollTo('${ancora}');
+	$('html, body').animate({
+	    scrollTop: ($('#${ancora}').first().offset().top)
+	},0);
+	
 	$('#botaoInserirPagamento').click(function(){
 		
 		adicionarInputHiddenFormulario('formPagamento', 'dataInicial', $('#dataInicial').val());
@@ -152,7 +155,7 @@ function removerPagamento(botao){
 			<tbody>
 				<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iGrupo">
 					<c:forEach items="${grupo.listaElemento}" var="elemento" varStatus="iElemento">
-						<tr>
+						<tr id="${grupo.id}">
 							<c:if test="${iElemento.count le 1}">
 								<c:choose>
 									<c:when test="${grupo.propriedades['liquidado']}">
@@ -168,7 +171,7 @@ function removerPagamento(botao){
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['dataVencimento']}</td>
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}" style="text-align: center">${grupo.propriedades['numeroNF']}</td>
 							</c:if>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.idPedido}</td>
+							<td id="${elemento.id }" class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.idPedido}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.sequencialItem}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.parcelaFormatada}</td>
@@ -206,6 +209,7 @@ function removerPagamento(botao){
 										<c:choose>
 											<c:when test="${grupo.propriedades['insumo']}">
 												<form action="<c:url value="/pagamento/liquidacao/nfparcelada"/>" method="post" >
+													<input type="hidden" name="idGrupo" value="${grupo.id}"/>
 													<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 													<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 													<input type="hidden" name="numeroNF" value="${elemento.numeroNF}"/>
@@ -226,6 +230,7 @@ function removerPagamento(botao){
 											</c:when>
 											<c:otherwise>
 												<form action="<c:url value="/pagamento/liquidacao/${elemento.id}"/>" method="post" >
+													<input type="hidden" name="idGrupo" value="${grupo.id}"/>
 													<input type="hidden" name="dataInicial" value="${dataInicial}"/>
 													<input type="hidden" name="dataFinal" value="${dataFinal}"/>
 													<c:choose>

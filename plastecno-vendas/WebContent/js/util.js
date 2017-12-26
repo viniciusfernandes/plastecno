@@ -466,7 +466,11 @@ function tabelaLinhaSelecionavelExt(config){
 };
 
 function ancorar(idElemento){
+	var e = document.getElementById(idElemento);
+	if(e==null){
+		return;
+	}
 	$('html, body').animate({
-	    scrollTop: ($('#'+idElemento).first().offset().top)
+	    scrollTop: ($(e).first().offset().top)
 	},0);
 };

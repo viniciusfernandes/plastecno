@@ -118,8 +118,4 @@ var autocompletar = function(configuracao) {
 	$(idCampoPesquisavel).click(function (e){
 		$(idContainerResultados).hide();
 	});
-	
-	$(idCampoPesquisavel).blur(function (e){
-		$(idContainerResultados).hide();
-	});
 };

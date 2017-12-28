@@ -154,7 +154,7 @@ public class RecepcaoCompraController extends AbstractController {
     @Get("compra/recepcao")
     public void recepcaoCompraHome() {
         addAtributo("alteracaoPedidoCompraHabilitada", true);
-        addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
+        addAtributo("listaRepresentada", representadaService.pesquisarFornecedorAtivo());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
         addAtributo("dataEmissaoFormatada", StringUtils.formatarData(new Date()));

@@ -349,13 +349,21 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecepcao(Integer idRepresentada,
-			Periodo periodo) {
+			List<Integer> listaNumeroPedido, Periodo periodo) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
 				"Pedidos de Compras para Recepção",
-				pedidoService.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, periodo), false);
+				pedidoService.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, listaNumeroPedido, periodo),
+				false);
 
 		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioCompraAguardandoRecepcao(Integer idRepresentada,
+			Periodo periodo) {
+		return gerarRelatorioCompraAguardandoRecepcao(idRepresentada, null, periodo);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -560,14 +568,21 @@ public class RelatorioServiceImpl implements RelatorioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemPedidoCompraEfetivada(Integer idRepresentada,
-			Periodo periodo) {
+			List<Integer> listaNumeroPedido, Periodo periodo) {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = gerarRelatorioItensPorPedido(
 				"Compras de " + StringUtils.formatarData(periodo.getInicio()) + " a "
 						+ StringUtils.formatarData(periodo.getFim()),
-				pedidoService.pesquisarItemPedidoCompraEfetivada(idRepresentada, periodo), false);
+				pedidoService.pesquisarItemPedidoCompraEfetivada(idRepresentada, listaNumeroPedido, periodo), false);
 
 		relatorio.addPropriedade("tipoPedido", TipoPedido.COMPRA);
 		return relatorio;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public RelatorioWrapper<Integer, ItemPedido> gerarRelatorioItemPedidoCompraEfetivada(Integer idRepresentada,
+			Periodo periodo) {
+		return gerarRelatorioItemPedidoCompraEfetivada(idRepresentada, null, periodo);
 	}
 
 	@REVIEW(descricao = "Nem sempre eh necessario carregar as informacoes da representada")

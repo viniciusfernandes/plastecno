@@ -447,23 +447,34 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	public List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada, Date dataInicial,
 			Date dataFinal) {
+		return pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, null, dataInicial, dataFinal);
+	}
+
+	public List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada,
+			List<Integer> listaNumeroPedido, Date dataInicial, Date dataFinal) {
 		List<SituacaoPedido> l = new ArrayList<SituacaoPedido>(1);
 		l.add(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 
-		return pesquisarItemPedidoCompraAguardandoRecepcaoBySituacaoCompra(idRepresentada, dataInicial, dataFinal, l,
-				true);
+		return pesquisarItemPedidoCompraAguardandoRecepcaoBySituacaoCompra(idRepresentada, listaNumeroPedido,
+				dataInicial, dataFinal, l, true);
 	}
 
 	@SuppressWarnings("unchecked")
 	private List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcaoBySituacaoCompra(Integer idRepresentada,
-			Date dataInicial, Date dataFinal, List<SituacaoPedido> listaSituacao, boolean isQtdeRecepcionada) {
+			List<Integer> listaNumeroPedido, Date dataInicial, Date dataFinal, List<SituacaoPedido> listaSituacao,
+			boolean isQtdeRecepcionada) {
 		StringBuilder select = gerarConstrutorItemPedidoIdPedidoCompraEVenda();
 		select.append("where i.pedido.tipoPedido = :tipoPedido ");
 		// Essa condicao foi incluida para reaproveitar o codigo na pesquisa dos
 		// pedidos de compra que estao aguardando recepcao.
 		if (isQtdeRecepcionada) {
-			select.append("and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada =null)");
+			select.append("and (i.quantidade != i.quantidadeRecepcionada or i.quantidadeRecepcionada =null) ");
 		}
+
+		if (listaNumeroPedido != null && !listaNumeroPedido.isEmpty()) {
+			select.append("and i.pedido.id in (:listaNumeroPedido) ");
+		}
+
 		if (listaSituacao != null && listaSituacao.size() == 1) {
 			select.append("and i.pedido.situacaoPedido = :situacaoPedido ");
 		} else if (listaSituacao != null && listaSituacao.size() > 1) {
@@ -487,6 +498,10 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		Query query = this.entityManager.createQuery(select.toString());
 		query.setParameter("tipoPedido", TipoPedido.COMPRA);
 
+		if (listaNumeroPedido != null && !listaNumeroPedido.isEmpty()) {
+			query.setParameter("listaNumeroPedido", listaNumeroPedido);
+		}
+
 		if (listaSituacao != null && listaSituacao.size() == 1) {
 			query.setParameter("situacaoPedido", listaSituacao.get(0));
 		} else if (listaSituacao != null && listaSituacao.size() > 1) {
@@ -509,8 +524,14 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, Date dataInicial, Date dataFinal) {
-		return pesquisarItemPedidoCompraAguardandoRecepcaoBySituacaoCompra(idRepresentada, dataInicial, dataFinal,
-				SituacaoPedido.getListaCompraEfetivada(), false);
+		return pesquisarItemPedidoCompraAguardandoRecepcaoBySituacaoCompra(idRepresentada, null, dataInicial,
+				dataFinal, SituacaoPedido.getListaCompraEfetivada(), false);
+	}
+
+	public List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, List<Integer> listaNumeroPedido,
+			Date dataInicial, Date dataFinal) {
+		return pesquisarItemPedidoCompraAguardandoRecepcaoBySituacaoCompra(idRepresentada, null, dataInicial,
+				dataFinal, SituacaoPedido.getListaCompraEfetivada(), false);
 	}
 
 	public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {

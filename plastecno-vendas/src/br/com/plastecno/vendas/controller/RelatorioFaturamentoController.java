@@ -1,5 +1,7 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +43,13 @@ public class RelatorioFaturamentoController extends AbstractController {
                 vlTotal += n.getValor() == null ? 0 : n.getValor();
                 vlTotalICMS += n.getValorICMS() == null ? 0 : n.getValorICMS();
             }
+            
+            Collections.sort(lNfe, new Comparator<NFePedido>() {
+                @Override
+                public int compare(NFePedido o1, NFePedido o2) {
+                    return o1.getNumero().compareTo(o2.getNumero());
+                }
+            });
 
             String dtInicial = StringUtils.formatarData(dataInicial);
             String dtFinal = StringUtils.formatarData(dataFinal);

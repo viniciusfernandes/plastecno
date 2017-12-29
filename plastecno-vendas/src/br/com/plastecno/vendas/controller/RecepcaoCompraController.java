@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import br.com.plastecno.service.constante.FormaMaterial;
 import br.com.plastecno.service.constante.TipoAcesso;
 import br.com.plastecno.service.constante.TipoPagamento;
 import br.com.plastecno.service.constante.TipoPedido;
+import br.com.plastecno.service.entity.Item;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pagamento;
 import br.com.plastecno.service.entity.Pedido;
@@ -23,6 +25,7 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.constante.TipoModalidadeFrete;
 import br.com.plastecno.service.relatorio.RelatorioService;
 import br.com.plastecno.service.validacao.exception.InformacaoInvalidaException;
+import br.com.plastecno.service.wrapper.GrupoWrapper;
 import br.com.plastecno.service.wrapper.Periodo;
 import br.com.plastecno.service.wrapper.RelatorioWrapper;
 import br.com.plastecno.util.StringUtils;
@@ -73,13 +76,18 @@ public class RecepcaoCompraController extends AbstractController {
         irTopoPagina();
     }
 
-    private void gerarRelatorio(Date dataInicial, Date dataFinal, Integer idRepresentada)
-            throws InformacaoInvalidaException {
+    private RelatorioWrapper<Integer, ItemPedido> gerarRelatorio(Date dataInicial, Date dataFinal,
+            Integer idRepresentada) throws InformacaoInvalidaException {
+        return gerarRelatorio(dataInicial, dataFinal, idRepresentada, null);
+    }
+
+    private RelatorioWrapper<Integer, ItemPedido> gerarRelatorio(Date dataInicial, Date dataFinal,
+            Integer idRepresentada, List<Integer> listaNumeroPedido) throws InformacaoInvalidaException {
         Periodo periodo = Periodo.gerarPeriodo(dataInicial, dataFinal);
         RelatorioWrapper<Integer, ItemPedido> relatorio = relatorioService.gerarRelatorioCompraAguardandoRecepcao(
-                idRepresentada, periodo);
-
+                idRepresentada, listaNumeroPedido, periodo);
         addAtributo("relatorio", relatorio);
+        return relatorio;
     }
 
     @Get("compra/recepcao/inclusaodadosnf")
@@ -151,10 +159,44 @@ public class RecepcaoCompraController extends AbstractController {
         irTopoPagina();
     }
 
+    @Get("compra/recepcao/listagem/pedido")
+    public void pesquisarListaPedido(List<Integer> listaNumeroPedido, Date dataInicial, Date dataFinal,
+            Integer idRepresentada) {
+        try {
+            RelatorioWrapper<Integer, ItemPedido> r = gerarRelatorio(dataInicial, dataFinal, idRepresentada,
+                    listaNumeroPedido);
+
+            // Adicionando IDs dos itens dos pedidos na lista de itens
+            // selecionados para que eles sejam checkados na tela para facilitar
+            // a escolha pelo usuario.
+            List<Integer> listaIdItemSelecionado = new ArrayList<>();
+            for (GrupoWrapper<Integer, ItemPedido> g : r.getListaGrupo()) {
+                for (Item i : g.getListaElemento()) {
+                    listaIdItemSelecionado.add(i.getId());
+                }
+            }
+            adicionarIdItemSelecionado(listaIdItemSelecionado);
+            irRodapePagina();
+        } catch (InformacaoInvalidaException e) {
+            irTopoPagina();
+        }
+        addAtributo("dataInicial", formatarData(dataInicial));
+        addAtributo("dataFinal", formatarData(dataFinal));
+        addAtributo("idRepresentadaSelecionada", idRepresentada);
+
+        StringBuilder lNum = new StringBuilder();
+        if (listaNumeroPedido != null && !listaNumeroPedido.isEmpty()) {
+            for (Integer num : listaNumeroPedido) {
+                lNum.append(num).append(" ");
+            }
+            addAtributo("listaNumeroPedido", lNum);
+        }
+    }
+
     @Get("compra/recepcao")
     public void recepcaoCompraHome() {
         addAtributo("alteracaoPedidoCompraHabilitada", true);
-        addAtributo("listaRepresentada", representadaService.pesquisarRepresentadaEFornecedor());
+        addAtributo("listaRepresentada", representadaService.pesquisarFornecedorAtivo());
         addAtributo("listaFormaMaterial", FormaMaterial.values());
         addAtributo("listaModalidadeFrete", TipoModalidadeFrete.values());
         addAtributo("dataEmissaoFormatada", StringUtils.formatarData(new Date()));

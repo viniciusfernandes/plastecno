@@ -193,9 +193,15 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoByIdPedido(Integer idPedido);
 
+	List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada,
+			List<Integer> listaNumeroPedido, Periodo periodo);
+
 	List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo);
 
 	List<ItemPedido> pesquisarItemPedidoCompradoResumidoByPeriodo(Periodo periodo);
+
+	List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, List<Integer> listaNumeroPedido,
+			Periodo periodo);
 
 	List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, Periodo periodo);
 

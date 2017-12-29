@@ -176,9 +176,9 @@ function removerDuplicata(botao, metodo, acao){
 			
 			<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iGrupo">
 					<c:forEach items="${grupo.listaElemento}" var="elemento" varStatus="iElemento">
-						<tr id="${grupo.propriedades['dataSemLimitador']}">
+						<tr>
 							<c:if test="${iElemento.count le 1}">
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento + 2}">${grupo.propriedades['dataVencimentoFormatada']}</td>
+								<td id="${grupo.propriedades['dataSemLimitador']}" class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento + 2}">${grupo.propriedades['dataVencimentoFormatada']}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeCliente}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.numeroNFe}</td>

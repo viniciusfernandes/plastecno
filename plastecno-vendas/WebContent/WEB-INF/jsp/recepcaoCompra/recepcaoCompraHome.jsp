@@ -89,6 +89,21 @@ $(document).ready(function() {
 		listaIdSelecionado: listaIdSelecionado
 	});
 	
+	$('#botaoPesquisaNumeroPedido').click(function(){
+		var lNumero = $('#listaNumeroPedido').val();
+		if(isEmpty(lNumero)){
+			return;
+		}
+		lNumero = lNumero.replace(/\D+/g, ';').split(';');
+		var f = document.getElementById('formVazio');
+		for (var i = 0; i < lNumero.length; i++) {
+			adicionarInputHiddenFormulario('formVazio', 'listaNumeroPedido['+i+']', lNumero[i]);
+		}
+		f.action = '<c:url value="/compra/recepcao/listagem/pedido"/>';
+		f.method='get';
+		f.submit();
+	});
+	
 	inserirMascaraData('dataEmissao');
 	inserirMascaraData('dataRecebimento');
 
@@ -140,14 +155,21 @@ function recepcionarItem(botao){
 					value="${dataFinal}" maxlength="100" class="pesquisavel" />
 			</div>
 			<div class="label" style="width: 30%">Fornecedor:</div>
-			<div class="input" style="width: 50%">
-				<select name="idRepresentada" style="width: 30%">
+			<div class="input" style="width: 60%">
+				<select name="idRepresentada" style="width: 25%">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="representada" items="${listaRepresentada}">
 						<option value="${representada.id}"
 							<c:if test="${representada.id eq idRepresentadaSelecionada}">selected</c:if>>${representada.nomeFantasia}</option>
 					</c:forEach>
 				</select>
+			</div>
+			<div class="label" style="width: 30%">Pedido(s):</div>
+			<div class="input" style="width: 26%">
+				<input type="text" id="listaNumeroPedido" value="${listaNumeroPedido}" style="width: 100%"/>
+			</div>
+			<div class="input" style="width: 2%">
+				<input type="button" id="botaoPesquisaNumeroPedido" title="Pesquisar Pedido(s)" value="" class="botaoPesquisarPequeno"/>
 			</div>
 			<div class="bloco_botoes">
 				<input type="submit" value="" class="botaoPesquisar" /> 
@@ -181,8 +203,8 @@ function recepcionarItem(botao){
 		</div>
 		
 		<div class="label" style="width: 10%">Mod. Frete:</div>
-		<div class="input" style="width: 13%">
-			<select id="frete" name="pagamento.modalidadeFrete" style="width: 100%">
+		<div class="input" style="width: 40%">
+			<select id="frete" name="pagamento.modalidadeFrete" style="width: 40%">
 				<option value="">&lt&lt SELECIONE &gt&gt</option>
 				<c:forEach var="frete" items="${listaModalidadeFrete}">
 					<option value="${frete.codigo}"

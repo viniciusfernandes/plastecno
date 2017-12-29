@@ -1572,12 +1572,19 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo) {
+	public List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada,
+			List<Integer> listaNumeroPedido, Periodo periodo) {
 		if (periodo != null) {
-			return itemPedidoDAO.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, periodo.getInicio(),
-					periodo.getFim());
+			return itemPedidoDAO.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, listaNumeroPedido,
+					periodo.getInicio(), periodo.getFim());
 		}
-		return itemPedidoDAO.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, null, null);
+		return itemPedidoDAO.pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, listaNumeroPedido, null, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoCompraAguardandoRecepcao(Integer idRepresentada, Periodo periodo) {
+		return pesquisarItemPedidoCompraAguardandoRecepcao(idRepresentada, null, periodo);
 	}
 
 	@Override
@@ -1589,11 +1596,19 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, Periodo periodo) {
+	public List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, List<Integer> listaNumeroPedido,
+			Periodo periodo) {
 		if (periodo == null) {
-			return itemPedidoDAO.pesquisarItemPedidoCompraEfetivada(idRepresentada, null, null);
+			return itemPedidoDAO.pesquisarItemPedidoCompraEfetivada(idRepresentada, listaNumeroPedido, null, null);
 		}
-		return itemPedidoDAO.pesquisarItemPedidoCompraEfetivada(idRepresentada, periodo.getInicio(), periodo.getFim());
+		return itemPedidoDAO.pesquisarItemPedidoCompraEfetivada(idRepresentada, listaNumeroPedido, periodo.getInicio(),
+				periodo.getFim());
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoCompraEfetivada(Integer idRepresentada, Periodo periodo) {
+		return pesquisarItemPedidoCompraEfetivada(idRepresentada, null, periodo);
 	}
 
 	@Override

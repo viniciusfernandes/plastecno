@@ -50,8 +50,8 @@ public class ControleAcessoInterceptor implements Interceptor {
          * tela de login.
          */
         if (!usuarioInfo.isLogado()) {
-            result.forwardTo(LoginController.class).redirecionarLogin();
-            return;
+            //result.forwardTo(LoginController.class).redirecionarLogin();
+            //return;
         }
 
         if (auditoriaHabilidata) {

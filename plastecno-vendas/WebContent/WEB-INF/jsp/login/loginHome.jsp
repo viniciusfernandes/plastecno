@@ -47,9 +47,6 @@
 			</ul>
 		</nav>
 		<jsp:include page="/bloco/bloco_mensagem.jsp" />
-		<div id="center_content">
-				<iframe name="principal_frame" style="border: 0; height: 95%; width: 100%;"></iframe>
-		</div>
 	</div>
 	
 </body>

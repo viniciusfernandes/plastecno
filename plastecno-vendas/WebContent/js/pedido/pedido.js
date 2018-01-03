@@ -157,6 +157,42 @@ function inicializarAutocompleteCliente(url, preencherCampos) {
 	});
 };
 
+function inicializarAutocompleteContatoCliente(url, preencherCampos) {
+	autocompletar({
+		url : url,
+		campoPesquisavel : 'contato',
+		parametro : 'nome',
+		containerResultados : 'containerPesquisaContatoCliente',
+		gerarVinculo : function() {
+			return 'idCliente=' + $('#idCliente').val();
+		},
+		selecionarItem : function(itemLista) {
+			var request = $.ajax({
+				type : "get",
+				url : url + '/' + itemLista.id
+			});
+
+			request.done(function(response) {
+				var erros = response.erros;
+				var contemErro = erros != undefined;
+				if (!contemErro) {
+					var contato = response.contato;
+					if (contato == undefined || contato == null) {
+						return;
+					}
+					if (preencherCampos != undefined) {
+						preencherCampos(contato);
+					}
+
+				} else {
+					gerarListaMensagemErro(erros);
+				}
+
+			});
+		}
+	});
+};
+
 function inicializarAutocompleteMaterial(url) {
 	autocompletar({
 		url : url,
@@ -172,7 +208,7 @@ function inicializarAutocompleteMaterial(url) {
 	});
 };
 
-function inicializarAutocompleteContatoCliente(url) {
+function inicializarAutocompleteContatoClienteXXXX(url) {
 	autocompletar({
 		url : url,
 		campoPesquisavel : 'contato_nome',

@@ -76,7 +76,11 @@ public interface ClienteService {
 
 	List<ContatoCliente> pesquisarContato(Integer idCliente);
 
+	ContatoCliente pesquisarContatoByIdContato(Integer idContato);
+
 	ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente);
+
+	List<ContatoCliente> pesquisarContatoResumidoByNomeFantasia(Integer idCliente, String nome);
 
 	Integer pesquisarIdVendedorByIdCliente(Integer idCliente);
 

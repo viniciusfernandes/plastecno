@@ -1,5 +1,6 @@
 package br.com.plastecno.vendas.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
+import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.Pedido;
 import br.com.plastecno.service.exception.BusinessException;
@@ -241,6 +243,21 @@ public class OrcamentoController extends AbstractPedidoController {
     @Get("orcamento/cliente")
     public void pesquisarClienteByNomeFantasia(String nomeFantasia) {
         forwardTo(PedidoController.class).pesquisarClienteByNomeFantasia(nomeFantasia);
+    }
+
+    @Get("orcamento/contatocliente/{idContato}")
+    public void pesquisarContatoByIdContato(Integer idContato) {
+        serializarJson(new SerializacaoJson("contato", clienteService.pesquisarContatoByIdContato(idContato)));
+    }
+
+    @Get("orcamento/contatocliente")
+    public void pesquisarContatoClienteByNomeFantasia(Integer idCliente, String nome) {
+        List<ContatoCliente> lContato = clienteService.pesquisarContatoResumidoByNomeFantasia(idCliente, nome);
+        List<Autocomplete> lista = new ArrayList<>();
+        for (ContatoCliente c : lContato) {
+            lista.add(new Autocomplete(c.getId(), c.getNome()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
     }
 
     @Get("orcamento/item/{id}")

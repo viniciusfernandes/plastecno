@@ -81,6 +81,15 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 								.setParameter("idCliente", idCliente), Cliente.class, null);
 	}
 
+	public ContatoCliente pesquisarContatoByIdContato(Integer idContato) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select new ContatoCliente (cc.ddd, cc.ddi, cc.departamento, cc.email, cc.cliente.id, cc.nome, cc.telefone) from ContatoCliente cc where cc.id = :idContato")
+								.setParameter("idContato", idContato), ContatoCliente.class, null);
+	}
+
 	public ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente) {
 		return QueryUtil
 				.gerarRegistroUnico(
@@ -88,6 +97,14 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 								.createQuery(
 										"select new ContatoCliente(c.ddd, c.ddi, c.email, c.nome, c.telefone) from ContatoCliente c where  c.id = (select max(c1.id) from ContatoCliente c1 where c1.cliente.id = :idCliente )")
 								.setParameter("idCliente", idCliente), ContatoCliente.class, null);
+	}
+
+	public List<ContatoCliente> pesquisarContatoResumidoByNomeFantasia(Integer idCliente, String nome) {
+		return entityManager
+				.createQuery(
+						"select new ContatoCliente (cc.id, cc.nome) from ContatoCliente cc where cc.cliente.id = :idCliente and cc.nome like :nome ",
+						ContatoCliente.class).setParameter("idCliente", idCliente)
+				.setParameter("nome", "%" + nome + "%").getResultList();
 	}
 
 	public Integer pesquisarIdVendedorByIdCliente(Integer idCliente) {

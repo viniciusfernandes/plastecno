@@ -163,6 +163,21 @@ $(document).ready(function() {
 		preencherComboTransportadora(comboRedespacho, cliente.listaRedespacho);
 	});
 	
+	inicializarAutocompleteContatoCliente('<c:url value="/pedido/contatocliente"/>', 'contato_nome', function(contato){
+		$('#contato_idContato').val(contato.id);
+		$('#contato_nome').val(contato.nome);
+		$('#contato_departamento').val(contato.departamento);
+		$('#contato_email').val(contato.email);
+		$('#contato_ddi').val(contato.ddi);
+		$('#contato_ddd').val(contato.ddd);
+		$('#contato_dddSecundario').val(contato.dddSecundario);
+		$('#contato_telefone').val(contato.telefone);
+		$('#contato_telefoneSecundario').val(contato.telefoneSecundario);
+		$('#contato_ramal').val(contato.ramal);
+		$('#contato_fax').val(contato.fax);
+	});
+	
+	
 	<%--Desabilitando toda a tela de pedidos --%>
 	<c:if test="${pedidoDesabilitado}">
 		$('input[type=text], select:not(.semprehabilitado), textarea').attr('disabled', true).addClass('desabilitado');

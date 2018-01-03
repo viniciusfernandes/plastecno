@@ -37,18 +37,6 @@ public class ContatoCliente extends Contato {
 		setNome(nome);
 	}
 
-	// Construtor usado na pesquisa do contato do cliente
-	public ContatoCliente(String ddd, String ddi, String departamento, String email, Integer idCliente, String nome,
-			String telefone) {
-		setDdd(ddd);
-		setDdi(ddi);
-		setDepartamento(departamento);
-		setEmail(email);
-		setIdCliente(idCliente);
-		setNome(nome);
-		setTelefone(telefone);
-	}
-
 	// Construtor usado na pesquisa do contato principal do cliente
 	public ContatoCliente(String ddd, String ddi, String email, String nome, String telefone) {
 		setDdd(ddd);
@@ -56,6 +44,22 @@ public class ContatoCliente extends Contato {
 		setEmail(email);
 		setNome(nome);
 		setTelefone(telefone);
+	}
+
+	// Construtor usado na pesquisa do contato do cliente
+	public ContatoCliente(String ddd, String dddSecundario, String ddi, String departamento, String email, String fax,
+			Integer idCliente, String nome, String ramal, String telefone, String telefoneSecundario) {
+		setDdd(ddd);
+		setDddSecundario(dddSecundario);
+		setDdi(ddi);
+		setDepartamento(departamento);
+		setEmail(email);
+		setFax(fax);
+		setIdCliente(idCliente);
+		setNome(nome);
+		setRamal(ramal);
+		setTelefone(telefone);
+		setTelefoneSecundario(telefoneSecundario);
 	}
 
 	@Override

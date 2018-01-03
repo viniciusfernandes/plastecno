@@ -86,7 +86,7 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 				.gerarRegistroUnico(
 						entityManager
 								.createQuery(
-										"select new ContatoCliente (cc.ddd, cc.ddi, cc.departamento, cc.email, cc.cliente.id, cc.nome, cc.telefone) from ContatoCliente cc where cc.id = :idContato")
+										"select new ContatoCliente (cc.ddd, cc.dddSecundario, cc.ddi, cc.departamento, cc.email, cc.fax, cc.cliente.id, cc.nome, cc.ramal, cc.telefone, cc.telefoneSecundario) from ContatoCliente cc where cc.id = :idContato")
 								.setParameter("idContato", idContato), ContatoCliente.class, null);
 	}
 

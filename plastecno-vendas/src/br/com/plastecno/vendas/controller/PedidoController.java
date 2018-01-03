@@ -378,6 +378,16 @@ public class PedidoController extends AbstractPedidoController {
         serializarJson(new SerializacaoJson("lista", lista));
     }
 
+    @Get("pedido/contatocliente/{idContato}")
+    public void pesquisarContatoByIdContato(Integer idContato) {
+        super.pesquisarContatoByIdContato(idContato);
+    }
+
+    @Get("pedido/contatocliente")
+    public void pesquisarContatoClienteByNomeFantasia(Integer idCliente, String nome) {
+        super.pesquisarContatoClienteByNomeFantasia(idCliente, nome);
+    }
+
     @Get("pedido/item/{id}")
     public void pesquisarItemPedidoById(Integer id) {
         ItemPedido itemPedido = pedidoService.pesquisarItemPedidoById(id);

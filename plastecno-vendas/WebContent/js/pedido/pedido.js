@@ -157,10 +157,10 @@ function inicializarAutocompleteCliente(url, preencherCampos) {
 	});
 };
 
-function inicializarAutocompleteContatoCliente(url, preencherCampos) {
+function inicializarAutocompleteContatoCliente(url, idCampo, preencherCampos) {
 	autocompletar({
 		url : url,
-		campoPesquisavel : 'contato',
+		campoPesquisavel : idCampo,
 		parametro : 'nome',
 		containerResultados : 'containerPesquisaContatoCliente',
 		gerarVinculo : function() {
@@ -204,29 +204,6 @@ function inicializarAutocompleteMaterial(url) {
 		},
 		selecionarItem : function(itemLista) {
 			$('#idMaterial').val(itemLista.id);
-		}
-	});
-};
-
-function inicializarAutocompleteContatoClienteXXXX(url) {
-	autocompletar({
-		url : url,
-		campoPesquisavel : 'contato_nome',
-		parametro : 'nomeContato',
-		containerResultados : 'containerContatoCliente',
-		gerarVinculo : function() {
-			return 'idCliente=' + $('#formPedido #idCliente').val()
-		},
-		selecionarItem : function(contato) {
-			$('#contato_idContato').val(contato.id);
-			$('#contato_nome').val(contato.nome);
-			$('#contato_departamento').val(contato.departamento);
-			$('#contato_email').val(contato.email);
-			$('#contato_ddi').val(contato.ddi);
-			$('#contato_ddd').val(contato.ddd);
-			$('#contato_telefone').val(contato.telefone);
-			$('#contato_ramal').val(contato.ramal);
-			$('#contato_fax').val(contato.fax);
 		}
 	});
 };

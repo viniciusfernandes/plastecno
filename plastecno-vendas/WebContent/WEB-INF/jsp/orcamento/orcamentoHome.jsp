@@ -178,7 +178,7 @@ $(document).ready(function() {
 		$('#idVendedorListagem').val(cliente.vendedor.id);
 	});
 	
-	inicializarAutocompleteContatoCliente('<c:url value="/orcamento/contatocliente"/>', function(contato){
+	inicializarAutocompleteContatoCliente('<c:url value="/orcamento/contatocliente"/>', 'contato', function(contato){
 		$('#contato').val(contato.nome);
 		$('#email').val(contato.email);
 		$('#ddd').val(contato.ddd);

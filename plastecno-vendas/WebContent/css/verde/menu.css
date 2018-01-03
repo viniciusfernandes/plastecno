@@ -6,27 +6,39 @@
 }
 
 body {
-	background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 50%, rgba(150,197,111,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(50%,rgba(255,255,255,1)), color-stop(100%,rgba(150,197,111,1))); /* Chrome,Safari4+ */
-	background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 50%,rgba(150,197,111,1) 100%); /* Chrome10+,Safari5.1+ */
-	background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 50%,rgba(150,197,111,1) 100%); /* IE10+ */
-	
+	background-color: #95a5a6;	
 	font: 12px Arial;	
 }
 
 #content {
-	background-color: white; 
-	box-shadow: 0px 0px 35px #829E7E;
-	margin: 0 5%;
+	margin: 0 auto;
 	padding: 0 0.5%;
-	width: 90%; 
+	padding-bottom: 1%;
+	width: 98%; 
+	height: 97vh;
+	background-color: #fcfcfc;
+	overflow: hidden;
+}
+
+.main_wrapper {
+	width: 100%; 
+	height: 97.5%; 
+	overflow: hidden;
+	padding: 0;
 }
 
 #center_content {
-	background: -moz-linear-gradient(top,  #ffffff 0%, #d6dbc9 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#d6dbc9)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #ffffff 0%,#d6dbc9 100%); /* Chrome10+,Safari5.1+ */
-	height: 1500px;
+	float: right;
+	background-color: #ffffff;
+	height: 90%;
+	padding-bottom: 2%;
+	width: 85%;
+}
+
+#conteudo_principal {
+	border: 0; 
+	height: 94.5%; 
+	width: 100%;
 }
 
 #footer {
@@ -39,17 +51,18 @@ body {
 
 .logo {
 	background-image: url("../../images/logo_plastecno.jpg");
-	background-position: center center;
+	background-position: left;
 	background-repeat: no-repeat;
-	height: 70px;
+	background-size: contain;
+	display: block;
+	width: auto;
+	height: 40px;
 }
 
 .enfeite {
-	background: -moz-linear-gradient(left,  rgba(255,215,0,1) 0%, rgba(122,99,0,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(255,215,0,1)), color-stop(100%,rgba(122,99,0,1))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(left,  rgba(255,215,0,1) 0%,rgba(122,99,0,1) 100%); /* Chrome10+,Safari5.1+ */
 	height: 1px;
-	margin-bottom: 1px;	
+	background-color: #ffd700;	
+	margin-bottom: 2px;
 }
 
 .flutuante_esquerda {
@@ -59,13 +72,19 @@ body {
 }
 
 nav {
-	height: 25px;
+	height: 89.5%;
+	padding-bottom: 2%;
 	margin-bottom: 15px;
+	width: 14.5%;
+	display: block;
+	float: left;
 }
 
 nav ul {
 	background: #829E7E;
-	height: 100%;
+	height: 91.5%;
+	padding-bottom: 2%;
+	width: 100%;
 	list-style: none;
 	position: relative;
 	margin: 0px;
@@ -79,6 +98,7 @@ nav ul:after {
 
 nav ul li {
 	float: left;
+	width: 100%;
 }
 
 nav ul li a:hover {
@@ -105,7 +125,10 @@ nav ul ul {
 nav ul ul {
 	padding: 0;
 	position: absolute;
-	top: 100%;
+	top: 0;
+	left: 100%;
+	background-color: transparent;
+	border-top: 1px solid #829E7E
 }
 
 nav ul ul li {
@@ -120,6 +143,7 @@ nav ul ul li a {
 	color: white;
 }
 
+
 nav ul ul ul {
 	position: absolute; left: 100%; top:0;
 }
@@ -129,21 +153,28 @@ nav ul li:hover > ul {
 }
 
 nav ul ul li:hover a {
-	background: white;
+	background-color: #829E7E;
 }
 
-nav ul ul li a:hover {
-	background: #D7F7C5;
-	color: #829E7E;
+#pedidos_compras:hover > ul {
+	top: 75px;
 }
 
+#cadastros:hover > ul {
+	top: 100px;
+}
 
-nav ul li ul li:last-child a {
-	border-radius: 0 0 10px 10px;
+#nfe:hover > ul {
+	top: 123px;
+}
+
+#relatorios:hover > ul {
+	top: 175px;
 }
 
 .bloco_autenticacao {
-	float: left;
+	display: inline;
+	float: right;
 	height: 30px;
 	width: 100%;
 }

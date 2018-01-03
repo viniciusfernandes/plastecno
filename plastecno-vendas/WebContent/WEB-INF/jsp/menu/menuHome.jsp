@@ -24,10 +24,8 @@
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
-		<div class="enfeite flutuante_esquerda"></div>
-		<div class="enfeite flutuante_esquerda"></div>
-
-		<nav class="flutuante_esquerda">
+	<div class="main_wrapper">
+		<nav>
 			<ul>
 				<c:if test="${acessoVendaPermitido}">
 				<li><a href="pedido/venda" target="principal_frame">Ped. Vendas +</a>
@@ -42,7 +40,7 @@
 					<li><a href="orcamento" target="principal_frame">Orçamento</a></li>
 				</c:if>
 				<c:if test="${acessoCompraPermitido}">
-					<li><a href="pedido/compra" target="principal_frame">Ped. Compras +</a>
+					<li id="pedidos_compras"><a href="pedido/compra" target="principal_frame">Ped. Compras +</a>
 						<ul>
 							<li><a href="itemAguardandoCompra/item/listagem" target="principal_frame">Item Aguard. Compra</a></li>
 							<li><a href="compra/recepcao/listagem" target="principal_frame">Recepção Compras</a></li>
@@ -59,7 +57,7 @@
 						</ul>
 					</li>
 				</c:if>
-				<li><a href="javascript: void(0)">Cadastros +</a>
+				<li id="cadastros"><a href="javascript: void(0)">Cadastros +</a>
 					<ul>
 						<li><a href="ramo" target="principal_frame">Ramos Atividades</a></li>
 						<li><a href="representada" target="principal_frame">Represent. / Forneced.</a></li>
@@ -75,7 +73,7 @@
 					</ul>
 				</li>
 				<c:if test="${acessoNFePermitido}">
-				<li><a href="emissaoNFe" target="principal_frame">Emis. NFe +</a>
+				<li id="nfe"><a href="emissaoNFe" target="principal_frame">Emis. NFe +</a>
 					<ul>
 						<li><a href="pedidoFracionadoNFe" target="principal_frame">Ped. Fracionado</a></li>
 						<li><a href="javascript: void(0);" ></a></li>
@@ -97,7 +95,7 @@
 					<a href="pagamento/periodo/listagem" target="principal_frame">Pagamento</a>
 				</li>
 				</c:if>
-				<li><a href="javascript: void(0)">Relatórios +</a>
+				<li id="relatorios"><a href="javascript: void(0)">Relatórios +</a>
 					<ul>
 						<c:if test="${acessoFluxoCaixaPermitido}">
 							<li><a href="fluxocaixa" target="principal_frame">Fluxo Caixa</a></li>
@@ -153,9 +151,9 @@
 			</ul>
 		</nav>
 		<div id="center_content">
-			<iframe name="principal_frame"
-				style="border: 0; height: 95%; width: 100%;"></iframe>
+			<iframe id="conteudo_principal" name="principal_frame"></iframe>
 		</div>
+	</div>
 	</div>
 </body>
 </html>

@@ -10,11 +10,8 @@
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <style type="text/css">
-.areaMensagem {
-	display: block;
-	float: left;
-	margin: 0 5%;
-	width: 90%;
+nav {
+	height: 1%;
 }
 </style>
 </head>
@@ -38,8 +35,6 @@
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
-		<div class="enfeite flutuante_esquerda"></div>
-		<div class="enfeite flutuante_esquerda"></div>
 		
 		<nav class="flutuante_esquerda">
 			<ul>
@@ -47,9 +42,6 @@
 			</ul>
 		</nav>
 		<jsp:include page="/bloco/bloco_mensagem.jsp" />
-		<div id="center_content">
-				<iframe name="principal_frame" style="border: 0; height: 95%; width: 100%;"></iframe>
-		</div>
 	</div>
 	
 </body>

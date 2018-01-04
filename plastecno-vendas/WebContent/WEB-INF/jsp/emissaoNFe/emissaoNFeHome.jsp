@@ -1448,7 +1448,7 @@ function editarProduto(botao){
 	$('#bloco_info_adicionais_prod #quantidadeProduto').val(celulas[4].innerHTML);
 	$('#bloco_info_adicionais_prod #codigoProduto').val(celulas[1].innerHTML);
     $('#bloco_info_adicionais_prod #descricaoProduto').val(celulas[2].innerHTML);
-    
+
     /* Estamos supondo que a sequencia do item do pedido eh unica */
 	numeroProdutoEdicao = celulas[0].innerHTML;
     /* A execucao dos metodos abaixo dependem da definicao do numero do produto que esta sendo editado */
@@ -1502,7 +1502,8 @@ function editarProduto(botao){
 	
 	/* Aqui estamos atribuindo um valor default para o rapido preenchimento da tela pelo usuario. Esses valores sao utilizados com maior frequencia. */
 	var valDefault = {'campos':
-		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idCampo': 'cfop', 'valor': '5102'},
+		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.numeroPedidoCompra', 'idCampo': 'numeroPedidoCompraProd', 'valor': $('#numeroPedidoCliente').val()},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idCampo': 'cfop', 'valor': '5102'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.codigoSituacaoTributaria', 'idCampo': 'tipoTributacaoICMS', 'valor': '00'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.origemMercadoria', 'idCampo': 'origemMercadoriaICMS', 'valor': '0'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.modalidadeDeterminacaoBC', 'idCampo': 'modBCICMS', 'valor': '0'},
@@ -1699,6 +1700,7 @@ function inicializarCalculoImpostos(){
 	<input type="hidden" id="percentualPis" value="${percentualPis}"/>
 	<input type="hidden" id="percentualCofins" value="${percentualCofins}"/>
 	<input type="hidden" id="valorFrete" value="${valorFrete}"/>
+	<input type="hidden" id="numeroPedidoCliente" value="${numeroPedidoCliente}"/>
 	
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>

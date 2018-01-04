@@ -1371,7 +1371,7 @@ public class PedidoServiceImpl implements PedidoService {
 				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoVendaEfetivada())
 				.setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
 	}
-
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -1683,6 +1683,15 @@ public class PedidoServiceImpl implements PedidoService {
 				this.entityManager.createQuery(
 						"select v.nome from Pedido p inner join p.proprietario v where p.id = :idPedido ")
 						.setParameter("idPedido", idPedido), String.class, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public String pesquisarNumeroPedidoClienteByIdPedido(Integer idPedido) {
+		if (idPedido == null) {
+			return null;
+		}
+		return pedidoDAO.pesquisarNumeroPedidoClienteByIdPedido(idPedido);
 	}
 
 	@Override

@@ -25,7 +25,7 @@ import br.com.plastecno.util.StringUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 @InformacaoValidavel
 public class Contato implements Serializable {
-	
+
 	/**
 	 * 
 	 */
@@ -34,7 +34,7 @@ public class Contato implements Serializable {
 	@InformacaoValidavel(tipoDocumento = TipoDocumento.CPF, nomeExibicao = "CPF")
 	private String cpf;
 
-	@InformacaoValidavel(intervaloComprimento = { 0, 3 }, nomeExibicao = "DDD do contato")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 0, 3 }, nomeExibicao = "DDD do contato")
 	@Column(name = "ddd_1")
 	private String ddd;
 
@@ -50,11 +50,11 @@ public class Contato implements Serializable {
 	@Column(name = "ddi_2")
 	private String ddiSecundario;
 
-	@InformacaoValidavel(intervaloComprimento = { 0, 50 }, nomeExibicao = "Departamento do contato")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 0, 50 }, nomeExibicao = "Departamento do contato")
 	@Column(name = "departamento")
 	private String departamento;
 
-	@InformacaoValidavel(intervaloComprimento = { 0, 200 }, nomeExibicao = "Email do contato")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 0, 200 }, nomeExibicao = "Email do contato")
 	private String email;
 
 	@InformacaoValidavel(intervaloComprimento = { 0, 9 }, nomeExibicao = "FAX do contato")
@@ -89,7 +89,7 @@ public class Contato implements Serializable {
 	@InformacaoValidavel(intervaloComprimento = { 0, 100 })
 	private String sobrenome;
 
-	@InformacaoValidavel(intervaloComprimento = { 0, 10 }, nomeExibicao = "Telefone do contato")
+	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 0, 10 }, nomeExibicao = "Telefone do contato")
 	@Column(name = "telefone_1")
 	private String telefone;
 
@@ -144,7 +144,9 @@ public class Contato implements Serializable {
 
 		if (ddi != null && !ddi.isEmpty()) {
 			telefoneFormatado.append(ddi).append(" ");
-		} else {telefoneFormatado.append(" / ");}
+		} else {
+			telefoneFormatado.append(" / ");
+		}
 
 		if (ddd != null && !ddd.isEmpty()) {
 			telefoneFormatado.append("(").append(ddd).append(") ");

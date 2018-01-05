@@ -513,20 +513,34 @@ public class PedidoServiceImpl implements PedidoService {
 
 		verificarMaterialAssociadoFornecedor(idRepresentadaFornecedora, listaIdItemPedido);
 
-		Cliente revendedor = clienteService.pesquisarRevendedor();
-		if (revendedor == null) {
+		Cliente cliente = clienteService.pesquisarRevendedor();
+		if (cliente == null) {
 			throw new BusinessException(
-					"Para efetuar uma encomenda é necessário cadastrar um cliente como revendedor no sistema");
+					"Para efetuar uma compra é necessário cadastrar um cliente como revendedor no sistema");
 		}
 
 		Usuario comprador = usuarioService.pesquisarById(idComprador);
 
+		List<ContatoCliente> lCont = clienteService.pesquisarContato(cliente.getId());
+		ContatoCliente cc = null;
+		if (lCont.isEmpty()) {
+			throw new BusinessException("O cliente " + cliente.getNomeFantasia()
+					+ " não possui contato. Verifique o cadastro de cliente.");
+		} else {
+			// Para o preenchimento dos contatos de compra basta pegarmos o
+			// primeiro ddd e telefone do cliente, que eh o revendedor.
+			cc = lCont.get(0);
+		}
+
 		Contato contato = new Contato();
 		contato.setNome(comprador.getNome());
 		contato.setEmail(comprador.getEmail());
+		contato.setDdd(cc.getDdd());
+		contato.setTelefone(cc.getTelefone());
+		contato.setDepartamento("COMPRAS");
 
 		Pedido pedidoCompra = new Pedido();
-		pedidoCompra.setCliente(clienteService.pesquisarRevendedor());
+		pedidoCompra.setCliente(cliente);
 		pedidoCompra.setComprador(comprador);
 		pedidoCompra.setContato(contato);
 		pedidoCompra.setFinalidadePedido(TipoFinalidadePedido.REVENDA);

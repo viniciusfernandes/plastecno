@@ -50,7 +50,7 @@ public class Contato implements Serializable {
 	@Column(name = "ddi_2")
 	private String ddiSecundario;
 
-	@InformacaoValidavel(obrigatorio = true, intervaloComprimento = { 0, 50 }, nomeExibicao = "Departamento do contato")
+	@InformacaoValidavel(intervaloComprimento = { 0, 50 }, nomeExibicao = "Departamento do contato")
 	@Column(name = "departamento")
 	private String departamento;
 

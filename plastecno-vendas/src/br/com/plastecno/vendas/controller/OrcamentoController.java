@@ -243,6 +243,16 @@ public class OrcamentoController extends AbstractPedidoController {
         forwardTo(PedidoController.class).pesquisarClienteByNomeFantasia(nomeFantasia);
     }
 
+    @Get("orcamento/contatocliente/{idContato}")
+    public void pesquisarContatoByIdContato(Integer idContato) {
+        super.pesquisarContatoByIdContato(idContato);
+    }
+
+    @Get("orcamento/contatocliente")
+    public void pesquisarContatoClienteByNomeFantasia(Integer idCliente, String nome) {
+        super.pesquisarContatoClienteByNomeFantasia(idCliente, nome);
+    }
+
     @Get("orcamento/item/{id}")
     public void pesquisarItemOrcamentoById(Integer id) {
         forwardTo(PedidoController.class).pesquisarItemPedidoById(id);

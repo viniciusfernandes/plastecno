@@ -468,12 +468,17 @@ public class EmissaoNFeController extends AbstractController {
             double vFrete = NumeroUtils.arredondarValorMonetario(pedidoService
                     .calcularValorFretePorItemByIdPedido(idPedido));
             addAtributo("valorFrete", vFrete);
+            String numPedCli = pedidoService.pesquisarNumeroPedidoClienteByIdPedido(idPedido);
+            if (numPedCli == null) {
+                numPedCli = "";
+            }
 
             String nomeVend = pedidoService.pesquisarNomeVendedorByIdPedido(idPedido);
             addAtributo("idPedido", idPedido);
             addAtributo("infoAdFisco",
                     "MATERIAL ISENTO DE ST; MATERIAL NÃO DESTINADO PARA CONSTRUÇÃO CIVIL E NEM PARA AUTOPEÇAS; PEDIDO NÚMERO "
-                            + idPedido + ". VENDEDOR: " + nomeVend);
+                            + idPedido + "; NÚM. PEDIDO CLIENTE " + numPedCli + ". VENDEDOR: " + nomeVend);
+            addAtributo("numeroPedidoCliente", numPedCli);
 
             double peso = calcularPesoLiquido(listaItem);
             Double[] valFreteUni = pedidoService.calcularValorFreteUnidadeByIdPedido(idPedido);

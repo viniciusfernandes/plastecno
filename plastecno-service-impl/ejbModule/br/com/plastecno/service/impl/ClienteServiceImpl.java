@@ -576,8 +576,21 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ContatoCliente pesquisarContatoByIdContato(Integer idContato) {
+		return clienteDAO.pesquisarContatoByIdContato(idContato);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente) {
 		return clienteDAO.pesquisarContatoPrincipalResumidoByIdCliente(idCliente);
+	}
+
+	
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ContatoCliente> pesquisarContatoResumidoByNomeFantasia(Integer idCliente, String nome) {
+		return clienteDAO.pesquisarContatoResumidoByNomeFantasia(idCliente, nome);
 	}
 
 	@Override

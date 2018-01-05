@@ -5,6 +5,7 @@ import static br.com.plastecno.service.constante.TipoAcesso.CADASTRO_PEDIDO_COMP
 import static br.com.plastecno.service.constante.TipoAcesso.CADASTRO_PEDIDO_VENDAS;
 import static br.com.plastecno.service.constante.TipoAcesso.GERENCIA_VENDAS;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
 import br.com.plastecno.service.entity.Cliente;
 import br.com.plastecno.service.entity.Contato;
+import br.com.plastecno.service.entity.ContatoCliente;
 import br.com.plastecno.service.entity.ItemPedido;
 import br.com.plastecno.service.entity.LogradouroCliente;
 import br.com.plastecno.service.entity.LogradouroPedido;
@@ -415,6 +417,19 @@ public class AbstractPedidoController extends AbstractController {
         // cliente.
         final boolean isAcessoVendaPermitido = isVenda && isVisulizacaoClientePermitida(idCli);
         return isAcessoVendaPermitido;
+    }
+
+    void pesquisarContatoByIdContato(Integer idContato) {
+        serializarJson(new SerializacaoJson("contato", clienteService.pesquisarContatoByIdContato(idContato)));
+    }
+
+    void pesquisarContatoClienteByNomeFantasia(Integer idCliente, String nome) {
+        List<ContatoCliente> lContato = clienteService.pesquisarContatoResumidoByNomeFantasia(idCliente, nome);
+        List<Autocomplete> lista = new ArrayList<>();
+        for (ContatoCliente c : lContato) {
+            lista.add(new Autocomplete(c.getId(), c.getNome()));
+        }
+        serializarJson(new SerializacaoJson("lista", lista));
     }
 
     void pesquisarPedidoByIdCliente(Integer idCliente, Integer idUsuario, Integer idFornecedor, TipoPedido tipoPedido,

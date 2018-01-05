@@ -157,6 +157,42 @@ function inicializarAutocompleteCliente(url, preencherCampos) {
 	});
 };
 
+function inicializarAutocompleteContatoCliente(url, idCampo, preencherCampos) {
+	autocompletar({
+		url : url,
+		campoPesquisavel : idCampo,
+		parametro : 'nome',
+		containerResultados : 'containerPesquisaContatoCliente',
+		gerarVinculo : function() {
+			return 'idCliente=' + $('#idCliente').val();
+		},
+		selecionarItem : function(itemLista) {
+			var request = $.ajax({
+				type : "get",
+				url : url + '/' + itemLista.id
+			});
+
+			request.done(function(response) {
+				var erros = response.erros;
+				var contemErro = erros != undefined;
+				if (!contemErro) {
+					var contato = response.contato;
+					if (contato == undefined || contato == null) {
+						return;
+					}
+					if (preencherCampos != undefined) {
+						preencherCampos(contato);
+					}
+
+				} else {
+					gerarListaMensagemErro(erros);
+				}
+
+			});
+		}
+	});
+};
+
 function inicializarAutocompleteMaterial(url) {
 	autocompletar({
 		url : url,
@@ -168,29 +204,6 @@ function inicializarAutocompleteMaterial(url) {
 		},
 		selecionarItem : function(itemLista) {
 			$('#idMaterial').val(itemLista.id);
-		}
-	});
-};
-
-function inicializarAutocompleteContatoCliente(url) {
-	autocompletar({
-		url : url,
-		campoPesquisavel : 'contato_nome',
-		parametro : 'nomeContato',
-		containerResultados : 'containerContatoCliente',
-		gerarVinculo : function() {
-			return 'idCliente=' + $('#formPedido #idCliente').val()
-		},
-		selecionarItem : function(contato) {
-			$('#contato_idContato').val(contato.id);
-			$('#contato_nome').val(contato.nome);
-			$('#contato_departamento').val(contato.departamento);
-			$('#contato_email').val(contato.email);
-			$('#contato_ddi').val(contato.ddi);
-			$('#contato_ddd').val(contato.ddd);
-			$('#contato_telefone').val(contato.telefone);
-			$('#contato_ramal').val(contato.ramal);
-			$('#contato_fax').val(contato.fax);
 		}
 	});
 };

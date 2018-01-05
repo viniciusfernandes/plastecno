@@ -178,6 +178,13 @@ $(document).ready(function() {
 		$('#idVendedorListagem').val(cliente.vendedor.id);
 	});
 	
+	inicializarAutocompleteContatoCliente('<c:url value="/orcamento/contatocliente"/>', 'contato', function(contato){
+		$('#contato').val(contato.nome);
+		$('#email').val(contato.email);
+		$('#ddd').val(contato.ddd);
+		$('#telefone').val(contato.telefone);
+	});
+	
 	inicializarAutocompleteMaterial('<c:url value="/orcamento/material"/>');
 	
 	autocompletar({
@@ -349,6 +356,7 @@ function inserirOrcamento(){
 		<div class="label">Contato:</div>
 		<div class="input" style="width: 30%">
 			<input type="text" id="contato" name="contato.nome" value="${contato.nome}" style="width: 100%"/>
+			<div class="suggestionsBox" id="containerPesquisaContatoCliente" style="display: none; width: 30%"></div>
 		</div>
 		
 		<div class="label" style="width: 10%">Email:</div>

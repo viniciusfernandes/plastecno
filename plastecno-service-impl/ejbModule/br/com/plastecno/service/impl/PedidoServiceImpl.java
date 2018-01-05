@@ -903,8 +903,13 @@ public class PedidoServiceImpl implements PedidoService {
 		p.setCliente(new Cliente(idCli));
 		p.setFinalidadePedido(TipoFinalidadePedido.INDUSTRIALIZACAO);
 
+		// Aqui estamos preenchendo com esses valores pois nao ha como saber com
+		// qual contato do cliente o vendedor esta negociando.
 		Contato c = new Contato();
 		c.setNome("PREENCHER CONTATO");
+		c.setDdd("11");
+		c.setEmail("preencher@email.com");
+		c.setTelefone("999999999");
 		p.setContato(c);
 
 		p = inserirPedido(p);
@@ -1371,7 +1376,7 @@ public class PedidoServiceImpl implements PedidoService {
 				.setParameter("dataFim", periodo.getFim()).setParameter("situacoes", pesquisarSituacaoVendaEfetivada())
 				.setParameter("tipoPedido", TipoPedido.COMPRA).getResultList();
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)

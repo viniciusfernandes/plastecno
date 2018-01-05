@@ -32,7 +32,7 @@ body {
 	background-color: #ffffff;
 	height: 90%;
 	padding-bottom: 2%;
-	width: 85%;
+	width: 89%;
 }
 
 #conteudo_principal {
@@ -75,7 +75,7 @@ nav {
 	height: 89.5%;
 	padding-bottom: 2%;
 	margin-bottom: 15px;
-	width: 14.5%;
+	width: 10.5%;
 	display: block;
 	float: left;
 }
@@ -128,7 +128,6 @@ nav ul ul {
 	top: 0;
 	left: 100%;
 	background-color: transparent;
-	border-top: 1px solid #829E7E
 }
 
 nav ul ul li {
@@ -156,20 +155,32 @@ nav ul ul li:hover a {
 	background-color: #829E7E;
 }
 
+nav ul li > ul, nav ul li > ul li{
+	width: 110%;
+}
+
+nav, nav ul li ul li:last-child {
+	border-radius: 3px;
+}
+
+nav ul li a:hover, nav ul li ul a{
+	background-color: #C1D6BC;
+}
+
 #pedidos_compras:hover > ul {
-	top: 75px;
+	top: 15%;
 }
 
 #cadastros:hover > ul {
-	top: 100px;
+	top: 20%;
 }
 
 #nfe:hover > ul {
-	top: 123px;
+	top: 25%;
 }
 
 #relatorios:hover > ul {
-	top: 175px;
+	top: 35%;
 }
 
 .bloco_autenticacao {

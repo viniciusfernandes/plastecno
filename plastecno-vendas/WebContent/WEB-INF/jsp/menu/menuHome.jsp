@@ -76,7 +76,6 @@
 				<li id="nfe"><a href="emissaoNFe" target="principal_frame">Emis. NFe +</a>
 					<ul>
 						<li><a href="pedidoFracionadoNFe" target="principal_frame">Ped. Fracionado</a></li>
-						<li><a href="javascript: void(0);" ></a></li>
 					</ul>
 				</li>
 				</c:if>

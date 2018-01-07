@@ -28,7 +28,7 @@
 		<nav>
 			<ul>
 				<c:if test="${acessoVendaPermitido}">
-				<li><a href="pedido/venda" target="principal_frame">Ped. Vendas +</a>
+				<li id="primeiraOpcao"><a href="pedido/venda" target="principal_frame">Ped. Vendas +</a>
 					<ul>
 						<li><a href="itemAguardandoMaterial" target="principal_frame">Ped. Aguard. Material</a></li>
 						<li><a href="estoque" target="principal_frame">Estoque</a></li>

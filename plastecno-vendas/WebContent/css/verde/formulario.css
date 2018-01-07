@@ -27,7 +27,8 @@
 
 /* inicio das definicoes do layout para o fieldset dos inputs de cadastro */
 fieldset {
-	margin-bottom: 10px;
+	background: #E4EAE1;
+	margin: 5px 10px 5px 5px;
 	min-height: 100px;
 }
 
@@ -41,7 +42,7 @@ legend {
 	color: white;
 	font-size: 15px;
 	font-weight: bold;
-	margin-left: -2px;
+	margin-left: 5px;
 	margin-bottom: 5px;
 	padding: 5px;
 }

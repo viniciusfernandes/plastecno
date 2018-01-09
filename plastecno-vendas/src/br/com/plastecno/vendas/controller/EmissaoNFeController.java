@@ -34,7 +34,6 @@ import br.com.plastecno.service.nfe.DeclaracaoImportacao;
 import br.com.plastecno.service.nfe.DetalhamentoProdutoServicoNFe;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
-import br.com.plastecno.service.nfe.ICMSInterestadual;
 import br.com.plastecno.service.nfe.IdentificacaoDestinatarioNFe;
 import br.com.plastecno.service.nfe.IdentificacaoNFe;
 import br.com.plastecno.service.nfe.NFe;
@@ -105,15 +104,6 @@ public class EmissaoNFeController extends AbstractController {
             }
         }
         return NumeroUtils.arredondarValorMonetario(peso);
-    }
-
-    @Get("emissaoNFe/valorICMSInterestadual")
-    public void calcularValorICMSInterestadual(ICMSInterestadual icms) {
-        icms.carregarValores();
-        icms.setValorFCPDestino(NumeroUtils.arredondarValorMonetario(icms.getValorFCPDestino()));
-        icms.setValorUFDestino(NumeroUtils.arredondarValorMonetario(icms.getValorUFDestino()));
-        icms.setValorUFRemetente(NumeroUtils.arredondarValorMonetario(icms.getValorUFRemetente()));
-        serializarJson(new SerializacaoJson("icms", icms));
     }
 
     @Get("emissaoNFe")

@@ -119,7 +119,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 					+ revendedor.getNomeFantasia() + "\" para em seguida cadastrar um outro.");
 		}
 
-		if (representada.isRepresentda()&& representada.getComissao() == 0) {
+		if (representada.isRepresentda() && representada.getComissao() == 0) {
 			throw new BusinessException("A comissão é obrigatorio no cadastro da representada");
 		}
 
@@ -150,21 +150,25 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Boolean isCalculoIPIHabilitado(Integer idRepresentada) {
 		return !TipoApresentacaoIPI.NUNCA.equals(representadaDAO.pesquisarTipoApresentacaoIPI(idRepresentada));
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isCNPJExistente(Integer id, String cnpj) {
 		return this.representadaDAO.isEntidadeExistente(Representada.class, id, "cnpj", cnpj);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isNomeFantasiaExistente(Integer id, String nomeFantasia) {
 		return this.representadaDAO.isEntidadeExistente(Representada.class, id, "nomeFantasia", nomeFantasia);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isRevendedor(Integer idRepresentada) {
 		return TipoRelacionamento.REVENDA.equals(representadaDAO.pesquisarTipoRelacionamento(idRepresentada));
 	}
@@ -175,11 +179,13 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double pesquisarAliquotaICMSRevendedor() {
 		return representadaDAO.pesquisarAliquotaICMSRevendedor();
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@SuppressWarnings("unchecked")
 	public List<Representada> pesquisarBy(Representada filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
@@ -201,12 +207,14 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Representada pesquisarById(Integer id) {
 		return representadaDAO.pesquisarById(id);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Representada> pesquisarById(List<Integer> listaIdRepresentada) {
 		return this.entityManager.createQuery("select m from Representada m where m.id in (:listaIdRepresentada) ")
 				.setParameter("listaIdRepresentada", listaIdRepresentada).getResultList();
@@ -214,6 +222,7 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ComentarioRepresentada> pesquisarComentarioByIdRepresentada(Integer idRepresentada) {
 		return (List<ComentarioRepresentada>) entityManager
 				.createQuery(
@@ -223,23 +232,27 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double pesquisarComissaoRepresentada(Integer idRepresentada) {
 		return representadaDAO.pesquisarComissao(idRepresentada);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ContatoRepresentada> pesquisarContato(Integer id) {
 		return (List<ContatoRepresentada>) this.contatoService.pesquisar(id, ContatoRepresentada.class);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Representada> pesquisarFornecedor(Boolean ativo) {
 		return representadaDAO.pesquisarRepresentadaByTipoRelacionamento(ativo, TipoRelacionamento.FORNECIMENTO,
 				TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Representada> pesquisarFornecedorAtivo() {
 		return pesquisarFornecedor(true);
 	}
@@ -252,12 +265,14 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer pesquisarIdRevendedor() {
 		Representada r = representadaDAO.pesquisarRevendedor();
 		return r == null ? null : r.getId();
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public LogradouroRepresentada pesquisarLogradorouro(Integer id) {
 		return representadaDAO.pesquisarLogradorouro(id);
 	}
@@ -269,16 +284,19 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Representada> pesquisarRepresentada(Boolean ativo) {
 		return representadaDAO.pesquisarRepresentadaExcluindoRelacionamento(ativo, TipoRelacionamento.FORNECIMENTO);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Representada> pesquisarRepresentadaAtiva() {
 		return this.pesquisarRepresentada(true);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Representada> pesquisarRepresentadaAtivoByTipoPedido(TipoPedido tipoPedido) {
 		if (TipoPedido.COMPRA.equals(tipoPedido)) {
 			return pesquisarFornecedorAtivo();
@@ -287,22 +305,32 @@ public class RepresentadaServiceImpl implements RepresentadaService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Representada> pesquisarRepresentadaEFornecedor() {
 		return representadaDAO.pesquisarRepresentadaEFornecedor();
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Representada pesquisarRevendedor() {
 		return representadaDAO.pesquisarRevendedor();
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(Integer idRepresentada) {
 		Representada representada = pesquisarById(idRepresentada);
 		return representada != null ? representada.getTipoApresentacaoIPI() : null;
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public TipoRelacionamento pesquisarTipoRelacionamento(Integer idRepresentada) {
+		return representadaDAO.pesquisarTipoRelacionamento(idRepresentada);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalRegistros(Representada filtro, Boolean apenasAtivos) {
 		if (filtro == null) {
 			return 0L;

@@ -6,6 +6,7 @@ import javax.ejb.Local;
 
 import br.com.plastecno.service.constante.TipoApresentacaoIPI;
 import br.com.plastecno.service.constante.TipoPedido;
+import br.com.plastecno.service.constante.TipoRelacionamento;
 import br.com.plastecno.service.entity.ComentarioRepresentada;
 import br.com.plastecno.service.entity.ContatoRepresentada;
 import br.com.plastecno.service.entity.LogradouroRepresentada;
@@ -66,6 +67,8 @@ public interface RepresentadaService {
 	Representada pesquisarRevendedor();
 
 	TipoApresentacaoIPI pesquisarTipoApresentacaoIPI(Integer idRepresentada);
+
+	TipoRelacionamento pesquisarTipoRelacionamento(Integer idRepresentada);
 
 	Long pesquisarTotalRegistros(Representada filtro, Boolean apenasAtivos);
 }

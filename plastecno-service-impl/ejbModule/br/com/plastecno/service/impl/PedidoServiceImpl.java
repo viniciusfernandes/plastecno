@@ -37,6 +37,8 @@ import br.com.plastecno.service.constante.TipoEntrega;
 import br.com.plastecno.service.constante.TipoFinalidadePedido;
 import br.com.plastecno.service.constante.TipoLogradouro;
 import br.com.plastecno.service.constante.TipoPedido;
+import br.com.plastecno.service.constante.TipoRelacionamento;
+import static br.com.plastecno.service.constante.TipoRelacionamento.*;
 import br.com.plastecno.service.dao.ItemPedidoDAO;
 import br.com.plastecno.service.dao.PedidoDAO;
 import br.com.plastecno.service.entity.Cliente;
@@ -610,6 +612,23 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 	}
 
+	/*
+	 * Esse metodo foi implementado para garantir a coerencia na configuracao do
+	 * Tipo de Pedido. Estavam sendo cadastrados pedidos de representacao para o
+	 * revendedor. Por isso devemos garantir que se a representada eh um
+	 * revendedor, entao o pedido deve ser de REVENDA. Esse problema pode surgir
+	 * novamente ao se mudar o tipo de relacionamento da representada de
+	 * REVENDEDOR para REPRESENTACAO, consequentemente os calculos de comissao
+	 * estarao errados.
+	 */
+	private void configurarTipoVenda(Pedido pedido) {
+		if (pedido == null || !pedido.isVenda() || pedido.getRepresentada() == null) {
+			return;
+		}
+		boolean isRevendedor = representadaService.isRevendedor(pedido.getRepresentada().getId());
+		pedido.setTipoPedido(isRevendedor ? TipoPedido.REVENDA : TipoPedido.REPRESENTACAO);
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean contemFornecedorDistintoByIdItem(List<Integer> listaIdItem) {
@@ -677,25 +696,6 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 		}
 		return pClone.getId();
-	}
-
-	@REVIEW(data = "26/02/2015", descricao = "Esse metodo nao esta muito claro quando tratamos as condicoes dos pedidos de compra. Atualmente tipo nulo vem do controller no caso em que o pedido NAO EH COMPRA")
-	private void definirTipoPedido(Pedido pedido) {
-		if (pedido == null) {
-			return;
-		}
-
-		// Aqui os pedidos de venda/revenda podem nao ter sido configurados,
-		// portanto, faremos uma consulta pelo nome da representada para
-		// decidir, ja
-		// que os pedidos de compra sempre serao configurados antes de inserir.
-		if (pedido.getTipoPedido() == null) {
-			if (pedido.getRepresentada() != null && representadaService.isRevendedor(pedido.getRepresentada().getId())) {
-				pedido.setTipoPedido(TipoPedido.REVENDA);
-			} else {
-				pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
-			}
-		}
 	}
 
 	/**
@@ -958,7 +958,16 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new InformacaoInvalidaException("Pedido/Orçamento ja foi cancelado e não pode ser alterado");
 		}
 
-		definirTipoPedido(pedido);
+		/*
+		 * Esse metodo foi implementado para garantir a coerencia na
+		 * configuracao do Tipo de Pedido. Estavam sendo cadastrados pedidos de
+		 * representacao para o revendedor. Por isso devemos garantir que se a
+		 * representada eh um revendedor, entao o pedido deve ser de REVENDA.
+		 * Esse problema pode surgir novamente ao se mudar o tipo de
+		 * relacionamento da representada de REVENDEDOR para REPRESENTACAO,
+		 * consequentemente os calculos de comissao estarao errados.
+		 */
+		configurarTipoVenda(pedido);
 
 		ValidadorInformacao.validar(pedido);
 

@@ -194,7 +194,7 @@ $(document).ready(function() {
 	});
 
 	// A segunda condicao verifica quando o pedido eh do tipo de compra
-	habilitar('#nomeCliente', <c:out value="${empty pedido.id and empty tipoPedido}"/>);
+	habilitar('#nomeCliente', <c:out value="${empty pedido.id and not isCompra}"/>);
 	habilitar('#numeroPedidoPesquisa', <c:out value="${empty pedido.id}"/>);
 	habilitar('#representada', <c:out value="${empty pedido.id or not contemItem}"/>);
 	habilitar('#bloco_item_pedido #ipi', <c:out value="${not ipiDesabilitado}"/>);

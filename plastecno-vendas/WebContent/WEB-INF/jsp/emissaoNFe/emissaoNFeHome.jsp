@@ -1529,7 +1529,7 @@ function gerarJsonCalculoImpostos(){
 	        {'idVl':'valorBCICMSInter', 'idAliq':null , 'idImp':null, incideFrete: true, 'impostoPadrao': false},
 			{'idVl':'valorBCCOFINS', 'idAliq':'aliquotaCOFINS', 'idImp':'valorCOFINS', incideFrete: true, 'impostoPadrao': true},
 	    	{'idVl':'valorBCPIS', 'idAliq':'aliquotaPIS', 'idImp':'valorPIS', incideFrete: true, 'impostoPadrao': true},
-	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI', incideFrete: false, 'impostoPadrao': true},
+	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI', incideFrete: true, 'impostoPadrao': true},
 	    	{'idVl':'valorBCISS', 'idAliq':'aliquotaISS', 'idImp':'valorISS', incideFrete: false,'impostoPadrao': true}];	
 };
 
@@ -2407,7 +2407,7 @@ function inicializarCalculoImpostos(){
 					<div class="input" style="width: 10%">
 						<input id="valorBCIPI" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota:</div>
+					<div  class="label">Alíquota(%):</div>
 					<div class="input" style="width: 10%">
 						<input id="aliquotaIPI" type="text" style="width: 100%" />
 					</div>

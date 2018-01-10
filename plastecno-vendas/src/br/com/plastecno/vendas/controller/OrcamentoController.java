@@ -73,9 +73,12 @@ public class OrcamentoController extends AbstractPedidoController {
         try {
             Integer idPed = pedidoService.aceitarListaItemOrcamento(idCliente, idRepresentada, idVendedor, tipoPedido,
                     listaIdItemSelecionado);
+            TipoPedido tPed = representadaService.isRevendedor(idRepresentada) ? TipoPedido.REVENDA
+                    : TipoPedido.REPRESENTACAO;
+
             // Devemos configurar o parametro orcamento = false para direcionar
             // usuario para a tela de vendas apos o aceite.
-            redirecTo(PedidoController.class).pesquisarPedidoById(idPed, TipoPedido.REVENDA, true);
+            redirecTo(PedidoController.class).pesquisarPedidoById(idPed, tPed, true);
         } catch (BusinessException e) {
             pesquisarOrcamentoByIdCliente(idCliente, idVendedor, idRepresentada, tipoPedido, 1, null,
                     listaIdItemSelecionado);
@@ -206,6 +209,15 @@ public class OrcamentoController extends AbstractPedidoController {
         if (cliente != null) {
             removerMascaraDocumento(cliente);
         }
+
+        // Configurando o tipo de venda que sera efetuado. Aqui ja estamos
+        // supondo que a lista de representadas inicializada na tela nao contem
+        // fornecedores.
+        if (pedido.getTipoPedido() == null && pedido.getRepresentada() != null) {
+            pedido.setTipoPedido(representadaService.isRevendedor(pedido.getRepresentada().getId()) ? TipoPedido.REVENDA
+                    : TipoPedido.REPRESENTACAO);
+        }
+
         pedido.setFinalidadePedido(TipoFinalidadePedido.INDUSTRIALIZACAO);
         pedido.setCliente(cliente);
         forwardTo(PedidoController.class).inserirPedido(pedido, contato, true);

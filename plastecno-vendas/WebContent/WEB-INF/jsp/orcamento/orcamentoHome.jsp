@@ -277,7 +277,9 @@ function inserirOrcamento(){
 			<input type="hidden" id="idVendedorListagem" name="idVendedor" value="${pedido.proprietario.id}"/> 
 		</form>
 
-	<form id="formVazio" method="get"></form>
+	<form id="formVazio" method="get">
+		<input type="hidden" name="pedido.tipoPedido" value="${pedido.tipoPedido}"/>
+	</form>
 	
 	<form id="formPedido" action="<c:url value="/orcamento/inclusao"/>" method="post">
 		<%-- Os campos ocultos estao presentes pois no formulario eles estao como campode apenas leitura e precisam ser enviados no submit --%>
@@ -287,7 +289,7 @@ function inserirOrcamento(){
 		<input type="hidden" id="idTransportadora"  name="pedido.transportadora.id" value="${pedido.transportadora.id}"/>
 		<input type="hidden" id="idSituacaoPedido"  name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
 		<input type="hidden" id="idRepresentada"  name="pedido.representada.id" value="${pedido.representada.id}"/>
-		
+		<input type="hidden" name="pedido.tipoPedido" value="${pedido.tipoPedido}"/>
 	<fieldset>
 		<legend>::: Orçamento :::</legend>
 		

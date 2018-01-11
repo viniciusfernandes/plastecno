@@ -80,12 +80,9 @@ public class AbstractPedidoController extends AbstractController {
         verificarPermissaoAcesso("acessoDadosNotaFiscalPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_COMPRA);
     }
 
-    void configurarTipoPedido(TipoPedido tipoPedido) {
-        if (TipoPedido.COMPRA.equals(tipoPedido)) {
-            addAtributo("tipoPedido", tipoPedido);
-            if (!contemAtributo("proprietario")) {
-                addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
-            }
+    void addProprietario() {
+        if (!contemAtributo("proprietario")) {
+            addAtributo("proprietario", usuarioService.pesquisarById(getCodigoUsuario()));
         }
     }
 
@@ -479,7 +476,8 @@ public class AbstractPedidoController extends AbstractController {
         addAtributo("tipoPedido", tipoPedido);
         addAtributo("orcamento", orcamento);
         addAtributo("isCompra", isCompra);
-        configurarTipoPedido(tipoPedido);
+        addAtributo("tipoPedido", tipoPedido);
+        addProprietario();
         adicionarIdItemSelecionado(listaIdItemSelecionado);
     }
 

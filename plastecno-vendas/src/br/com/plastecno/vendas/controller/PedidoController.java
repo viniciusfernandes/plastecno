@@ -152,7 +152,7 @@ public class PedidoController extends AbstractPedidoController {
         try {
             pedidoService.cancelarPedido(idPedido);
             gerarMensagemSucesso("Pedido No. " + idPedido + " cancelado com sucesso");
-            configurarTipoPedido(tipoPedido);
+            addProprietario();
             redirecionarHome(tipoPedido, orcamento, true);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e.getListaMensagem());
@@ -295,6 +295,8 @@ public class PedidoController extends AbstractPedidoController {
 
     private void inicializarHome(TipoPedido tipoPedido, boolean orcamento) {
         addAtributo("orcamento", orcamento);
+        addAtributo("tipoPedido", tipoPedido);
+
         addAtributo("listaTipoEntrega", tipoEntregaService.pesquisar());
 
         gerarListaRepresentada(null);
@@ -327,14 +329,14 @@ public class PedidoController extends AbstractPedidoController {
 
     @Get("pedido/limpar")
     public void limpar(TipoPedido tipoPedido, boolean orcamento) {
-        configurarTipoPedido(tipoPedido);
+        addProprietario();
         redirecionarHome(tipoPedido, orcamento, true);
     }
 
     @Get("pedido/compra")
     public void pedidoCompraHome() {
         addAtributoCondicional("isCompra", true);
-        configurarTipoPedido(TipoPedido.COMPRA);
+        addProprietario();
         addAtributo("listaTransportadora", transportadoraService.pesquisarTransportadoraAtiva());
         addAtributo("listaRepresentada", representadaService.pesquisarFornecedorAtivo());
         addAtributo("descricaoTipoPedido", TipoPedido.COMPRA.getDescricao());
@@ -515,7 +517,7 @@ public class PedidoController extends AbstractPedidoController {
         if (pedido != null && pedido.isOrcamento()) {
             redirecTo(OrcamentoController.class).pesquisarOrcamentoById(id);
         } else {
-            configurarTipoPedido(tipoPedido);
+            addProprietario();
             // Estamos verificando se o pedido pesquisado eh realmente um
             // orcamento
             // pois, por conta do reaproveitamento de codigo, o usuario pode
@@ -537,7 +539,7 @@ public class PedidoController extends AbstractPedidoController {
         super.pesquisarPedidoByIdCliente(idCliente, idVendedor, idFornecedor, tipoPedido, orcamento, paginaSelecionada,
                 itemVendido, listaIdItemSelecionado);
 
-        configurarTipoPedido(tipoPedido);
+        addProprietario();
         redirecionarHome(tipoPedido, orcamento, false);
     }
 

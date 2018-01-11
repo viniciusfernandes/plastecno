@@ -1600,6 +1600,8 @@ function calcularValorICMSInterestadual(){
 	if(isEmpty(pDest)){
 		pDest = 0;
 	}
+	pFCP = pFCP/100; 
+	pInt = pInt/100; 
 	pDest = pDest/100; 
 	var pOrig = 1 - pDest;
 	$('#bloco_icms_interestadual #valorFCPICMSInter').val((vlBC*pFCP).toFixed(2));
@@ -1661,7 +1663,7 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	var info = document.getElementById('infoAdicionaisProd');
 	info.value = info.value.split(':')[0]+': '+tot;
 	
-	calcularValorICMSInterestadual(vBC);
+	calcularValorICMSInterestadual();
 	calcularValorUnidadeTributavelIPI();
 };
 
@@ -2274,7 +2276,7 @@ function inicializarCalculoImpostos(){
 				<div class="divFieldset">
 				<fieldset id="bloco_icms_interestadual" class="fieldsetInterno">
 				<legend>::: ICMS Interestadual Prod.::: +</legend>
-					<div  class="label obrigatorio">Perc. FCP:</div>
+					<div  class="label obrigatorio">Perc. FCP(%):</div>
 					<div class="input" style="width: 10%">
 						<input id="percFCPDestICMSInter" type="text" style="width: 100%" />
 					</div>
@@ -2282,11 +2284,11 @@ function inicializarCalculoImpostos(){
 					<div class="input" style="width: 10%">
 						<input id="valorBCICMSInter" type="text" style="width: 100%" />
 					</div>
-					<div  class="label obrigatorio">Alíq. Interna:</div>
+					<div  class="label obrigatorio">Alíq. Interna(%):</div>
 					<div class="input" style="width: 20%">
 						<input id="aliquotaUFDestICMSInter" type="text" style="width: 50%" />
 					</div>
-					<div  class="label obrigatorio">Alíq. Interest.:</div>
+					<div  class="label obrigatorio">Alíq. Interest.(%):</div>
 					<div class="input" style="width: 10%">
 						<select id="aliquotaICMSInter" style="width: 100%">
 							<option value=""></option>
@@ -2295,7 +2297,7 @@ function inicializarCalculoImpostos(){
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label obrigatorio">Perc. Partilha:</div>
+					<div  class="label obrigatorio">Perc. Partilha(%):</div>
 					<div class="input" style="width: 50%">
 						<select id="percProvPartilhaICMSInter" style="width: 20%">
 							<option value=""></option>

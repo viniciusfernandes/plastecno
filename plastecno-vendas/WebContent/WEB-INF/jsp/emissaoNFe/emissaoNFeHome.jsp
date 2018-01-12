@@ -44,7 +44,7 @@ var editorTabelaAdicao = null;
 var editorTabelaExportacao = null;
 var btProduto = null;
 $(document).ready(function() {
-	scrollTo('${ancora}');
+	ancorar('${ancora}');
 	
 	$("#botaoPesquisaPedido").click(function() {
 		if(isEmpty($('#idPedido').val())){
@@ -458,7 +458,7 @@ function encontrarBotaoEdicaoProduto(proximo){
 					break;
 				}					
 			}
-			scrollTo('produtosInfo');
+			ancorar('bloco_info_adicionais_prod');
 		}
 	}
 };
@@ -1448,7 +1448,7 @@ function editarProduto(botao){
 	$('#bloco_info_adicionais_prod #quantidadeProduto').val(celulas[4].innerHTML);
 	$('#bloco_info_adicionais_prod #codigoProduto').val(celulas[1].innerHTML);
     $('#bloco_info_adicionais_prod #descricaoProduto').val(celulas[2].innerHTML);
-    
+
     /* Estamos supondo que a sequencia do item do pedido eh unica */
 	numeroProdutoEdicao = celulas[0].innerHTML;
     /* A execucao dos metodos abaixo dependem da definicao do numero do produto que esta sendo editado */
@@ -1461,6 +1461,7 @@ function editarProduto(botao){
 	                               {'id': 'valorBCPIS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCCOFINS', 'valorTabela': valorBC},
 	                               {'id': 'valorBCICMS', 'valorTabela': valorBC},
+	                               {'id': 'valorBCICMSInter', 'valorTabela': valorBC},
 	                               {'id': 'valorBCIPI', 'valorTabela': valorBC},
 	                               {'id': 'aliquotaPIS', 'valorTabela': $('#percentualPis').val()},
 	                               {'id': 'aliquotaCOFINS', 'valorTabela': $('#percentualCofins').val()}
@@ -1502,7 +1503,8 @@ function editarProduto(botao){
 	
 	/* Aqui estamos atribuindo um valor default para o rapido preenchimento da tela pelo usuario. Esses valores sao utilizados com maior frequencia. */
 	var valDefault = {'campos':
-		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idCampo': 'cfop', 'valor': '5102'},
+		[{'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.numeroPedidoCompra', 'idCampo': 'numeroPedidoCompraProd', 'valor': $('#numeroPedidoCliente').val()},
+		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].produtoServicoNFe.cfop', 'idCampo': 'cfop', 'valor': '5102'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.codigoSituacaoTributaria', 'idCampo': 'tipoTributacaoICMS', 'valor': '00'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.origemMercadoria', 'idCampo': 'origemMercadoriaICMS', 'valor': '0'},
 		 {'idHidden': 'nf.listaItem['+numeroProdutoEdicao+'].tributos.icms.tipoIcms.modalidadeDeterminacaoBC', 'idCampo': 'modBCICMS', 'valor': '0'},
@@ -1518,14 +1520,17 @@ function editarProduto(botao){
 		var qtde = parseFloat(linha.cells[4].innerHTML);
 		$('#valorFreteProd').val((calcularValorFreteUnidade()*qtde).toFixed(2));
 	}
+	
+	ancorar('bloco_info_adicionais_prod');
 };
 
 function gerarJsonCalculoImpostos(){
-	return [{'idVl':'valorBCICMS', 'idAliq':'aliquotaICMS', 'idImp':'valorICMS', incideFrete: true},
-			{'idVl':'valorBCCOFINS', 'idAliq':'aliquotaCOFINS', 'idImp':'valorCOFINS', incideFrete: true},
-	    	{'idVl':'valorBCPIS', 'idAliq':'aliquotaPIS', 'idImp':'valorPIS', incideFrete: true},
-	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI', incideFrete: false},
-	    	{'idVl':'valorBCISS', 'idAliq':'aliquotaISS', 'idImp':'valorISS', incideFrete: false}];	
+	return [{'idVl':'valorBCICMS', 'idAliq':'aliquotaICMS', 'idImp':'valorICMS', incideFrete: true, 'impostoPadrao': true},
+	        {'idVl':'valorBCICMSInter', 'idAliq':null , 'idImp':null, incideFrete: true, 'impostoPadrao': false},
+			{'idVl':'valorBCCOFINS', 'idAliq':'aliquotaCOFINS', 'idImp':'valorCOFINS', incideFrete: true, 'impostoPadrao': true},
+	    	{'idVl':'valorBCPIS', 'idAliq':'aliquotaPIS', 'idImp':'valorPIS', incideFrete: true, 'impostoPadrao': true},
+	    	{'idVl':'valorBCIPI', 'idAliq':'aliquotaIPI', 'idImp':'valorIPI', incideFrete: true, 'impostoPadrao': true},
+	    	{'idVl':'valorBCISS', 'idAliq':'aliquotaISS', 'idImp':'valorISS', incideFrete: false,'impostoPadrao': true}];	
 };
 
 function calcularQuantidadeItem(){
@@ -1579,31 +1584,29 @@ function recalcularValorFrete(){
 };
 
 function calcularValorICMSInterestadual(){
-	var parametros = '';
-	var campos = gerarJsonIcmsInterestadual().campos;
-	
-	for (var i = 0; i< campos.length; i++) {
-		parametros += 'icms.'+campos[i].nome+'='+$('#bloco_icms_interestadual #'+campos[i].id).val()+'&';	
+	var vlBC = $('#bloco_icms_interestadual #valorBCICMSInter').val();
+	var pFCP = $('#bloco_icms_interestadual #percFCPDestICMSInter').val();
+	var pInt = $('#bloco_icms_interestadual #aliquotaUFDestICMSInter').val();
+	var pDest = $('#bloco_icms_interestadual #percProvPartilhaICMSInter').val();
+	if(isEmpty(vlBC)){
+		vlBC = 0;
 	}
-	
-	var request = $.ajax({
-		type: "get",
-		url: '<c:url value="/emissaoNFe/valorICMSInterestadual"/>',
-		data: parametros,
-	});
-	request.done(function(response) {
-		var icms = response.icms;
-		if(icms == undefined){
-			return;
-		}
-		$('#bloco_icms_interestadual #valorFCPICMSInter').val(icms.valorFCPDestino);
-		$('#bloco_icms_interestadual #valorICMSInter').val(icms.valorUFDestino);
-		$('#bloco_icms_interestadual #valorPartICMSInter').val(icms.valorUFRemetente);
-	});
-	
-	request.fail(function(request, status) {
-		alert('Falha no calculo do ICMS interestadual => Status da requisicao: '+status);
-	});	
+	if(isEmpty(pFCP)){
+		pFCP = 0;
+	}
+	if(isEmpty(pInt)){
+		pInt = 0;
+	}
+	if(isEmpty(pDest)){
+		pDest = 0;
+	}
+	pFCP = pFCP/100; 
+	pInt = pInt/100; 
+	pDest = pDest/100; 
+	var pOrig = 1 - pDest;
+	$('#bloco_icms_interestadual #valorFCPICMSInter').val((vlBC*pFCP).toFixed(2));
+	$('#bloco_icms_interestadual #valorICMSInter').val((vlBC*pInt*pDest).toFixed(2));
+	$('#bloco_icms_interestadual #valorPartICMSInter').val((vlBC*pInt*pOrig).toFixed(2));
 };
 
 <%--Funcao executada na edicao de um produto--%>
@@ -1630,16 +1633,21 @@ function calcularValoresImpostos(idValorRemovido, isAlteracaoAliq){
 	}
 	
 	for (var i = 0; i < campos.length; i++) {
-		aliq = document.getElementById(campos[i].idAliq).value;
-		if(isEmpty(aliq)){
-			continue;
-		}
-		
 		if(isAlteracaoAliq){
 			vBC = document.getElementById(campos[i].idVl).value;
 		} else {
 			document.getElementById(campos[i].idVl).value = campos[i].incideFrete? vBC : vBCSemFrete;
 		}
+		<%--Essa condicao surgiu por conta do ICMS Interestadual. Esse imposto utiliza outro algoritmo. --%>
+		if(!campos[i].impostoPadrao){
+			continue;
+		}
+		
+		aliq = document.getElementById(campos[i].idAliq).value;
+		if(isEmpty(aliq)){
+			continue;
+		}
+		
 		
 		if(idValorRemovido != undefined && idValorRemovido == campos[i].idVl){
 			vl = 0;
@@ -1681,16 +1689,20 @@ function calcularValorUnidadeTributavelIPI(){
 function inicializarCalculoImpostos(){
 	var campos = gerarJsonCalculoImpostos();
 	for (var i = 0; i < campos.length; i++) {
-		document.getElementById(campos[i].idVl).onkeyup = calcularAlteracaoAliquota;
-		document.getElementById(campos[i].idAliq).onkeyup = calcularAlteracaoAliquota;
+		if(campos[i].impostoPadrao){
+			document.getElementById(campos[i].idVl).onkeyup = calcularAlteracaoAliquota;
+			document.getElementById(campos[i].idAliq).onkeyup = calcularAlteracaoAliquota;
+		}
 	}
-	
-	campos = gerarJsonIcmsInterestadual().campos;
-	for (var i = 0; i < campos.length; i++) {
-		$('#bloco_icms_interestadual #'+campos[i].id).keyup(function(){
+
+	$('#bloco_icms_interestadual #valorBCICMSInter, #bloco_icms_interestadual #percFCPDestICMSInter, #bloco_icms_interestadual #aliquotaUFDestICMSInter')
+		.keyup(function(){
 			calcularValorICMSInterestadual();
-		});
-	}
+	});
+	$('#bloco_icms_interestadual #aliquotaICMSInter, #bloco_icms_interestadual #percProvPartilhaICMSInter')
+		.change(function(){
+			calcularValorICMSInterestadual();
+	});
 };
 </script>
 </head>
@@ -1699,6 +1711,7 @@ function inicializarCalculoImpostos(){
 	<input type="hidden" id="percentualPis" value="${percentualPis}"/>
 	<input type="hidden" id="percentualCofins" value="${percentualCofins}"/>
 	<input type="hidden" id="valorFrete" value="${valorFrete}"/>
+	<input type="hidden" id="numeroPedidoCliente" value="${numeroPedidoCliente}"/>
 	
 	<jsp:include page="/bloco/bloco_mensagem.jsp" />
 	<div id="modal"></div>
@@ -2107,7 +2120,6 @@ function inicializarCalculoImpostos(){
 				</tbody>
 			</table>
 			
-			<a id="produtosInfo"></a>
 			<fieldset id="bloco_info_adicionais_prod" class="fieldsetInterno">
 				<legend>::: Info. Adicionais Prod. ::: +</legend>
 				<div class="label">Quantidade:</div>
@@ -2264,7 +2276,7 @@ function inicializarCalculoImpostos(){
 				<div class="divFieldset">
 				<fieldset id="bloco_icms_interestadual" class="fieldsetInterno">
 				<legend>::: ICMS Interestadual Prod.::: +</legend>
-					<div  class="label obrigatorio">Perc. FCP:</div>
+					<div  class="label obrigatorio">Perc. FCP(%):</div>
 					<div class="input" style="width: 10%">
 						<input id="percFCPDestICMSInter" type="text" style="width: 100%" />
 					</div>
@@ -2272,11 +2284,11 @@ function inicializarCalculoImpostos(){
 					<div class="input" style="width: 10%">
 						<input id="valorBCICMSInter" type="text" style="width: 100%" />
 					</div>
-					<div  class="label obrigatorio">Alíq. Interna:</div>
+					<div  class="label obrigatorio">Alíq. Interna(%):</div>
 					<div class="input" style="width: 20%">
 						<input id="aliquotaUFDestICMSInter" type="text" style="width: 50%" />
 					</div>
-					<div  class="label obrigatorio">Alíq. Interest.:</div>
+					<div  class="label obrigatorio">Alíq. Interest.(%):</div>
 					<div class="input" style="width: 10%">
 						<select id="aliquotaICMSInter" style="width: 100%">
 							<option value=""></option>
@@ -2285,7 +2297,7 @@ function inicializarCalculoImpostos(){
 							</c:forEach>
 						</select>
 					</div>
-					<div  class="label obrigatorio">Perc. Partilha:</div>
+					<div  class="label obrigatorio">Perc. Partilha(%):</div>
 					<div class="input" style="width: 50%">
 						<select id="percProvPartilhaICMSInter" style="width: 20%">
 							<option value=""></option>
@@ -2397,7 +2409,7 @@ function inicializarCalculoImpostos(){
 					<div class="input" style="width: 10%">
 						<input id="valorBCIPI" type="text" style="width: 100%" />
 					</div>
-					<div  class="label">Alíquota:</div>
+					<div  class="label">Alíquota(%):</div>
 					<div class="input" style="width: 10%">
 						<input id="aliquotaIPI" type="text" style="width: 100%" />
 					</div>

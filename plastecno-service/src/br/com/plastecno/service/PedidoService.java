@@ -225,6 +225,8 @@ public interface PedidoService {
 
 	String pesquisarNomeVendedorByIdPedido(Integer idPedido);
 
+	String pesquisarNumeroPedidoClienteByIdPedido(Integer idPedido);
+
 	Pedido pesquisarPedidoById(Integer id);
 
 	Pedido pesquisarPedidoById(Integer idPedido, boolean isCompra);

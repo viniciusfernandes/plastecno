@@ -9,11 +9,6 @@
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/mensagem.css"/>" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<style type="text/css">
-nav {
-	height: 1%;
-}
-</style>
 </head>
 <body>
 	<div id="content">
@@ -36,12 +31,18 @@ nav {
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
 		
-		<nav class="flutuante_esquerda">
-			<ul>
-											
-			</ul>
-		</nav>
-		<jsp:include page="/bloco/bloco_mensagem.jsp" />
+		<div class="main_wrapper">
+			<nav class="flutuante_esquerda">
+				<ul>
+					<li></li>				
+				</ul>
+			</nav>
+			<jsp:include page="/bloco/bloco_mensagem.jsp" />
+			<div id="center_content">
+				<iframe id="conteudo_principal" name="principal_frame"></iframe>
+			</div>
+		</div>
+		
 	</div>
 	
 </body>

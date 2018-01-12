@@ -3,10 +3,10 @@
 	color: #FFFFFF;
 	font-weight: bold;	
 }
-
+/* essa propriedade esta refletindo em todo o sistema. Refazer isso urgentemente */
 ul {
-	margin: 1px;
-	padding: 0px;
+	//margin: 1px;
+	//padding: 1px;
 	list-style: none;
 }
 

@@ -5,51 +5,20 @@
 	font-family: 'verdana';
 }
 
-body {
-	background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 50%, rgba(150,197,111,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(50%,rgba(255,255,255,1)), color-stop(100%,rgba(150,197,111,1))); /* Chrome,Safari4+ */
-	background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 50%,rgba(150,197,111,1) 100%); /* Chrome10+,Safari5.1+ */
-	background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 50%,rgba(150,197,111,1) 100%); /* IE10+ */
-	
-	font: 12px Arial;	
-}
-
-#content {
-	background-color: white; 
-	box-shadow: 0px 0px 35px #829E7E;
-	margin: 0 5%;
-	padding: 0 0.5%;
-	width: 90%; 
-}
-
-#center_content {
-	background: -moz-linear-gradient(top,  #ffffff 0%, #d6dbc9 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#d6dbc9)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #ffffff 0%,#d6dbc9 100%); /* Chrome10+,Safari5.1+ */
-	height: 1500px;
-}
-
-#footer {
-	background: black;	
-	color: white;
-	font-size: 20px;
-	height: 50px;
-	text-align: center;
-}
-
 .logo {
 	background-image: url("../../images/logo_plastecno.jpg");
-	background-position: center center;
+	background-position: left;
 	background-repeat: no-repeat;
-	height: 70px;
+	background-size: contain;
+	display: block;
+	width: auto;
+	height: 40px;
 }
 
 .enfeite {
-	background: -moz-linear-gradient(left,  rgba(255,215,0,1) 0%, rgba(122,99,0,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(255,215,0,1)), color-stop(100%,rgba(122,99,0,1))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(left,  rgba(255,215,0,1) 0%,rgba(122,99,0,1) 100%); /* Chrome10+,Safari5.1+ */
 	height: 1px;
-	margin-bottom: 1px;	
+	background-color: #ffd700;	
+	margin-bottom: 2px;
 }
 
 .flutuante_esquerda {
@@ -58,93 +27,10 @@ body {
 	width: 100%;
 }
 
-nav {
-	height: 25px;
-	margin-bottom: 15px;
-}
-
-nav ul {
-	background: #829E7E;
-	height: 100%;
-	list-style: none;
-	position: relative;
-	margin: 0px;
-}
-
-nav ul:after {
-	content: "";
-	clear: both;
-	display: block;
-}
-
-nav ul li {
-	float: left;
-}
-
-nav ul li a:hover {
-	/* box-shadow: 0 0 2px 1px #829E7E; */
-}
-
-nav > ul li:not(:first-child) {
-	/* border-left: 1px solid white; */
-}
-
-nav ul li a {
-	background: #829E7E;
-	color: white;
-	font-weight: bold;
-	display: block;
-	padding: 5px 20px;
-	text-decoration: none;
-}
-
-nav ul ul {
-	display: none;
-}
-
-nav ul ul {
-	padding: 0;
-	position: absolute;
-	top: 100%;
-}
-
-nav ul ul li {
-	/* border-top: 1px solid white; */
-	float: none;
-	position: relative;
-}
-
-nav ul ul li a {
-	background-color: #829E7E;
-	padding: 5px 20px;
-	color: white;
-}
-
-nav ul ul ul {
-	position: absolute; left: 100%; top:0;
-}
-
-nav ul li:hover > ul {
-	display: block;
-}
-
-nav ul ul li:hover a {
-	background: white;
-}
-
-nav ul ul li a:hover {
-	background: #D7F7C5;
-	color: #829E7E;
-}
-
-
-nav ul li ul li:last-child a {
-	border-radius: 0 0 10px 10px;
-}
-
 .bloco_autenticacao {
 	float: left;
 	height: 30px;
+	margin-top: 5px;
 	width: 100%;
 }
 
@@ -179,4 +65,167 @@ nav ul li ul li:last-child a {
 	color: #604F00;
 	float: left;
 	margin-top: 5px;
+}
+
+body {
+	background-color: #95a5a6;	
+	font: 12px Arial;
+}
+
+/* Dimensionamento e dos menus */
+nav {
+	float: left;
+	/*Esse posicionamento garante que os posicionamentos dos submenus estarao corretos*/
+	position: relative;
+	height: 90vh;
+}
+
+nav ul:first-child {
+	background: #829E7E;
+	height: 100%;
+	width: 10vw;
+}
+
+nav ul li {
+	list-style: none;
+	width: 100%;
+}
+
+nav ul li:hover > ul  {
+	display: block;
+}
+
+nav ul  li  > ul {
+	display: none;
+	left: 100%;
+	position: absolute;
+}
+
+nav ul li a {
+	background: #829E7E;
+	color: white;
+	font-weight: bold;
+	display: block;
+	padding: 5px 20px;
+	text-decoration: none;
+}
+
+nav ul li > ul {
+	width: 125%;
+}
+/* Dimensionamento e dos menus */
+
+
+/* Posicionamento dos submenus */
+/* 
+	Estamos definindo um valores padrao para todoso os browseres para que nao haja diferencas no posicionamento dos submenus.
+	Sem essa definicao o Chrome e o FF definiam valores diferentes o que ocasionava o desalinhamento dos submentos, os quais
+tem a propriedade top definidas a partir desse valor. Agora cada submenu tem o top definido adicionando 20px de um para o outro.
+*/
+nav ul li, nav ul li a {
+	height: 20px;
+}
+
+#menuPedido ul {
+	top:0;
+}
+
+#menuPedidoCompra ul {
+	top: 60px;
+}
+
+#menuCadastros ul {
+	top: 80px;
+}
+
+#menuNFe  ul {
+	top: 100px;
+}
+
+#menuRelatorios  ul {
+	top: 140px;
+}
+/* Posicionamento dos submenus */
+
+/*Arredondamento das bordas dos menus e submenus */
+nav ul li:hover a {
+	background: #D7F7C5;
+	color: #829E7E;
+}
+
+nav ul li  ul li:hover a {
+	color: white;
+}
+
+nav  ul {
+	border-radius: 5px;
+}
+
+nav  > ul   li:first-child  > a {
+	border-radius: 5px 5px 0 0;
+}
+
+nav  > ul   li:first-child :hover  {
+	border-radius: 5px 0 0 0;
+}
+
+nav  > ul   li:last-child :hover  {
+	//border-radius: 0 0 0 5px;
+}
+
+
+nav  ul  li ul  li:first-child  > a {
+	border-radius: 0 5px 0 0;
+}
+
+
+nav  ul  li ul  li:last-child  > a {
+	border-radius: 0 0 5px 5px;
+}
+
+nav  ul  li:last-child , nav  ul  li:last-child > a {
+	//border-radius: 0 0 5px 5px;
+}
+/*Arredondamento das bordas dos menus e submenus */
+
+
+#content {
+	margin: 0 auto;
+	padding: 0 0.5%;
+	padding-bottom: 1%;
+	width: 98%; 
+	height: 97vh;
+	background-color: #fcfcfc;
+	overflow: hidden;
+}
+
+.main_wrapper {
+	width: 100%; 
+	height: 97.5%; 
+	overflow: hidden;
+	padding: 0;
+}
+
+#center_content {
+	float: right;
+	background-color: #ffffff;
+	height: 90vh;
+	padding-bottom: 2%;
+	width: 89%;
+}
+
+#conteudo_principal {
+	background: #F4F4F4;
+	border: 0; 
+	border-radius: 5px;
+	height: 100%; 
+	width: 100%;
+}
+
+#footer {
+	background: black;	
+	color: white;
+	font-size: 20px;
+	height: 50px;
+	text-align: center;
 }

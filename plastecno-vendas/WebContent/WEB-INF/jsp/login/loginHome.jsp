@@ -9,22 +9,9 @@
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/mensagem.css"/>" />
 
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-<style type="text/css">
-.areaMensagem {
-	display: block;
-	float: left;
-	margin: 0 5%;
-	width: 90%;
-}
-</style>
 </head>
 <body>
 	<div id="content">
-		<header class="logo">
-			<div id="header_content">
-			</div>
-		</header>
-		
 		<form action="<c:url value="/login/entrar"/>" method="post">
 			<div class="bloco_autenticacao flutuante_esquerda">
 				<input type="submit" value="" class="botaoLogin" title="Entrar no sistema"/>
@@ -38,18 +25,19 @@
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
-		<div class="enfeite flutuante_esquerda"></div>
-		<div class="enfeite flutuante_esquerda"></div>
 		
-		<nav class="flutuante_esquerda">
-			<ul>
-											
-			</ul>
-		</nav>
-		<jsp:include page="/bloco/bloco_mensagem.jsp" />
-		<div id="center_content">
-				<iframe name="principal_frame" style="border: 0; height: 95%; width: 100%;"></iframe>
+		<div class="main_wrapper">
+			<nav class="flutuante_esquerda">
+				<ul>
+					<li></li>				
+				</ul>
+			</nav>
+			<jsp:include page="/bloco/bloco_mensagem.jsp" />
+			<div id="center_content">
+				<iframe id="conteudo_principal" name="principal_frame"></iframe>
+			</div>
 		</div>
+		
 	</div>
 	
 </body>

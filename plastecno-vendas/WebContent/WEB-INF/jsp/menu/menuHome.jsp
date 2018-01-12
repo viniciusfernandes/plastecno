@@ -8,10 +8,6 @@
 </head>
 <body>
 	<div id="content">
-		<header class="logo">
-			<div id="header_content"></div>
-		</header>
-
 		<form action="<c:url value="/login/sair"/>" method="get">
 			<div class="bloco_autenticacao flutuante_esquerda">
 				<input type="submit" value="" class="botaoLogout"
@@ -115,26 +111,26 @@
 							<li><a href="relatorio/pedido/periodo?isCompra=true" target="principal_frame">Valor Compra Período</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioEntregaPermitido}">
-							<li><a href="relatorio/pedido?isCompra=false" target="principal_frame">Pedido Venda Período</a></li>
+							<li><a href="relatorio/pedido?isCompra=false" target="principal_frame">Venda Período</a></li>
 						</c:if>
 						<c:if test="${acessoCompraPermitido}">
-							<li><a href="relatorio/pedido?isCompra=true" target="principal_frame">Pedido Compra Período</a></li>
+							<li><a href="relatorio/pedido?isCompra=true" target="principal_frame">Compra Período</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioPedidoRepresentadaPermitido}">
 							<li><a href="relatorio/venda/representada" target="principal_frame">Venda Representada</a></li>
 							<li><a href="relatorio/venda/cliente" target="principal_frame">Venda Cliente</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioEntregaPermitido}">
-							<li><a href="relatorio/pedido?isEntrega=true" target="principal_frame">Acompanhamento Entrega</a></li>
+							<li><a href="relatorio/pedido?isEntrega=true" target="principal_frame">Entrega</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioClienteRamoAtividadePermitido}">
-							<li><a href="relatorio/cliente/ramoAtividade" target="principal_frame">Cliente Ramo Atividade</a></li>
+							<li><a href="relatorio/cliente/ramoAtividade" target="principal_frame">Cliente/Ramo Ativ.</a></li>
 						</c:if>
 						<c:if test="${acessoRelatorioClienteRegiaoPermitido}">
 							<li><a href="relatorio/cliente/regiao" target="principal_frame">Cliente Região</a></li>
 						</c:if>
 						<c:if test="${acessoVendaPermitido}">
-							<li><a href="relatorio/venda/vendedor" target="principal_frame">Venda/Orçamto Vendedor</a></li>
+							<li><a href="relatorio/venda/vendedor" target="principal_frame">Venda/Orçamto</a></li>
 							<li><a href="relatorio/cliente/vendedor" target="principal_frame">Cliente Vendedor</a></li>
 						</c:if>
 					</ul></li>

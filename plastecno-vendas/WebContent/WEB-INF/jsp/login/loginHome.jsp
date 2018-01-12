@@ -12,11 +12,6 @@
 </head>
 <body>
 	<div id="content">
-		<header class="logo">
-			<div id="header_content">
-			</div>
-		</header>
-		
 		<form action="<c:url value="/login/entrar"/>" method="post">
 			<div class="bloco_autenticacao flutuante_esquerda">
 				<input type="submit" value="" class="botaoLogin" title="Entrar no sistema"/>

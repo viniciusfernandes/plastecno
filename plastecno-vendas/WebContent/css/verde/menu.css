@@ -104,7 +104,6 @@ nav ul  li  > ul {
 nav ul li a {
 	background: #829E7E;
 	color: white;
-	font-weight: bold;
 	display: block;
 	padding: 5px 20px;
 	text-decoration: none;
@@ -149,8 +148,9 @@ nav ul li, nav ul li a {
 
 /*Arredondamento das bordas dos menus e submenus */
 nav ul li:hover a {
-	background: #D7F7C5;
+	background: #C9E5B9;
 	color: #829E7E;
+	font-weight: bold;
 }
 
 nav ul li  ul li:hover a {

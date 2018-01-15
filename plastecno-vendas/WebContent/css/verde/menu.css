@@ -75,8 +75,6 @@ body {
 /* Dimensionamento e dos menus */
 nav {
 	float: left;
-	/*Esse posicionamento garante que os posicionamentos dos submenus estarao corretos*/
-	position: relative;
 	height: 90vh;
 	width: 11%;
 }
@@ -99,7 +97,7 @@ nav ul li:hover > ul  {
 nav ul  li  > ul {
 	display: none;
 	left: 100%;
-	position: absolute;
+	position: relative;
 }
 
 nav ul li a {
@@ -108,7 +106,7 @@ nav ul li a {
 	display: block;
 	font-size: 13px;
 	font-weight: bold;
-	padding: 5px 20px;
+	padding: 5px 5px 0 20px;
 	text-decoration: none;
 }
 
@@ -128,24 +126,8 @@ nav ul li, nav ul li a {
 	height: 20px;
 }
 
-#menuPedido ul {
-	top:0;
-}
-
-#menuPedidoCompra ul {
-	top: 60px;
-}
-
-#menuCadastros ul {
-	top: 80px;
-}
-
-#menuNFe  ul {
-	top: 100px;
-}
-
-#menuRelatorios  ul {
-	top: 140px;
+#menuPedido ul, #menuPedidoCompra ul , #menuCadastros ul , #menuNFe  ul , #menuRelatorios  ul {
+	top: -25px;
 }
 /* Posicionamento dos submenus */
 

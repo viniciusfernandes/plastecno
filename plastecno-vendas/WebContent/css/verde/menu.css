@@ -30,7 +30,7 @@
 .bloco_autenticacao {
 	float: left;
 	height: 30px;
-	margin-top: 5px;
+	margin-top: 2vh;
 	width: 100%;
 }
 
@@ -75,15 +75,14 @@ body {
 /* Dimensionamento e dos menus */
 nav {
 	float: left;
-	/*Esse posicionamento garante que os posicionamentos dos submenus estarao corretos*/
-	position: relative;
 	height: 90vh;
+	width: 11%;
 }
 
 nav ul:first-child {
 	background: #829E7E;
 	height: 100%;
-	width: 10vw;
+	width: 100%;
 }
 
 nav ul li {
@@ -98,19 +97,21 @@ nav ul li:hover > ul  {
 nav ul  li  > ul {
 	display: none;
 	left: 100%;
-	position: absolute;
+	position: relative;
 }
 
 nav ul li a {
 	background: #829E7E;
 	color: white;
 	display: block;
-	padding: 5px 20px;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 5px 5px 0 20px;
 	text-decoration: none;
 }
 
 nav ul li > ul {
-	width: 125%;
+	width: 140%;
 }
 /* Dimensionamento e dos menus */
 
@@ -125,24 +126,8 @@ nav ul li, nav ul li a {
 	height: 20px;
 }
 
-#menuPedido ul {
-	top:0;
-}
-
-#menuPedidoCompra ul {
-	top: 60px;
-}
-
-#menuCadastros ul {
-	top: 80px;
-}
-
-#menuNFe  ul {
-	top: 100px;
-}
-
-#menuRelatorios  ul {
-	top: 140px;
+#menuPedido ul, #menuPedidoCompra ul , #menuCadastros ul , #menuNFe  ul , #menuRelatorios  ul {
+	top: -25px;
 }
 /* Posicionamento dos submenus */
 
@@ -161,33 +146,24 @@ nav  ul {
 	border-radius: 5px;
 }
 
-nav  > ul   li:first-child  > a {
+nav  > ul li:first-child  > a {
 	border-radius: 5px 5px 0 0;
 }
 
-nav  > ul   li:first-child :hover  {
+
+
+nav  > ul li:first-child  > a:hover   {
 	border-radius: 5px 0 0 0;
 }
 
-nav  > ul   li:last-child :hover  {
-	//border-radius: 0 0 0 5px;
-}
-
-
-nav  ul  li ul  li:first-child  > a {
+nav ul li ul li:first-child  > a  {
 	border-radius: 0 5px 0 0;
 }
-
 
 nav  ul  li ul  li:last-child  > a {
 	border-radius: 0 0 5px 5px;
 }
-
-nav  ul  li:last-child , nav  ul  li:last-child > a {
-	//border-radius: 0 0 5px 5px;
-}
 /*Arredondamento das bordas dos menus e submenus */
-
 
 #content {
 	margin: 0 auto;
@@ -210,8 +186,7 @@ nav  ul  li:last-child , nav  ul  li:last-child > a {
 	float: right;
 	background-color: #ffffff;
 	height: 90vh;
-	padding-bottom: 2%;
-	width: 89%;
+	width: 88%;
 }
 
 #conteudo_principal {

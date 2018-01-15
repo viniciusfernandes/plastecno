@@ -15,30 +15,27 @@
 		<form action="<c:url value="/login/entrar"/>" method="post">
 			<div class="bloco_autenticacao flutuante_esquerda">
 				<input type="submit" value="" class="botaoLogin" title="Entrar no sistema"/>
-				<input type="password" id="sigla" name="senha" style="width: 8%"/>
+				<input type="password" name="senha" style="width: 8%"/>
 				<label>Senha:</label>
-				<input type="text" id="sigla" name="email" style="width: 25%"/>
+				<input type="text" name="email" style="width: 25%"/>
 				<label>Email:</label>
 			</div>
 		</form>
-		
+
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
-		
-		<div class="main_wrapper">
-			<nav class="flutuante_esquerda">
-				<ul>
-					<li></li>				
-				</ul>
-			</nav>
+	<div class="main_wrapper">
+		<nav>
+			<ul>
+				<li></li>
+			</ul>
+		</nav>
+		<div id="center_content">
 			<jsp:include page="/bloco/bloco_mensagem.jsp" />
-			<div id="center_content">
-				<iframe id="conteudo_principal" name="principal_frame"></iframe>
-			</div>
+			<iframe id="conteudo_principal" name="principal_frame"></iframe>
 		</div>
-		
 	</div>
-	
+	</div>	
 </body>
 </html>

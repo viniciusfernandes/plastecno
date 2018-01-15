@@ -24,7 +24,7 @@
 		<nav>
 			<ul>
 				<c:if test="${acessoVendaPermitido}">
-				<li id="menuPedido"><a href="pedido/venda" target="principal_frame">Ped. Vendas +</a>
+				<li id="menuPedido"><a href="pedido/venda" target="principal_frame">Ped. Vendas ></a>
 					<ul>
 						<li><a href="itemAguardandoMaterial" target="principal_frame">Ped. Aguard. Material</a></li>
 						<li><a href="estoque" target="principal_frame">Estoque</a></li>
@@ -36,7 +36,7 @@
 					<li><a href="orcamento" target="principal_frame">Orçamento</a></li>
 				</c:if>
 				<c:if test="${acessoCompraPermitido}">
-					<li id="menuPedidoCompra"><a href="pedido/compra" target="principal_frame">Ped. Compras +</a>
+					<li id="menuPedidoCompra"><a href="pedido/compra" target="principal_frame">Ped. Compras ></a>
 						<ul>
 							<li><a href="itemAguardandoCompra/item/listagem" target="principal_frame">Item Aguard. Compra</a></li>
 							<li><a href="compra/recepcao/listagem" target="principal_frame">Recepção Compras</a></li>
@@ -46,14 +46,14 @@
 					</li>
 				</c:if>
 				<c:if test="${acessoRecepcaoCompraPermitido}">
-					<li><a href="javascript: void(0)" target="principal_frame">Recepção Compras +</a>
+					<li><a href="javascript: void(0)" target="principal_frame">Recepção Compras ></a>
 						<ul>
 							<li><a href="compra/recepcao" target="principal_frame">Recepção Compras</a></li>
 							<li><a href="estoque" target="principal_frame">Estoque</a></li>
 						</ul>
 					</li>
 				</c:if>
-				<li id="menuCadastros"><a href="javascript: void(0)">Cadastros +</a>
+				<li id="menuCadastros"><a href="javascript: void(0)">Cadastros ></a>
 					<ul>
 						<li><a href="ramo" target="principal_frame">Ramos Atividades</a></li>
 						<li><a href="representada" target="principal_frame">Represent. / Forneced.</a></li>
@@ -69,7 +69,7 @@
 					</ul>
 				</li>
 				<c:if test="${acessoNFePermitido}">
-				<li id="menuNFe"><a href="emissaoNFe" target="principal_frame">Emis. NFe +</a>
+				<li id="menuNFe"><a href="emissaoNFe" target="principal_frame">Emis. NFe ></a>
 					<ul>
 						<li><a href="pedidoFracionadoNFe" target="principal_frame">Ped. Fracionado</a></li>
 					</ul>
@@ -90,7 +90,7 @@
 					<a href="pagamento/periodo/listagem" target="principal_frame">Pagamento</a>
 				</li>
 				</c:if>
-				<li id="menuRelatorios"><a href="javascript: void(0)">Relatórios +</a>
+				<li id="menuRelatorios"><a href="javascript: void(0)">Relatórios ></a>
 					<ul>
 						<c:if test="${acessoFluxoCaixaPermitido}">
 							<li><a href="fluxocaixa" target="principal_frame">Fluxo Caixa</a></li>

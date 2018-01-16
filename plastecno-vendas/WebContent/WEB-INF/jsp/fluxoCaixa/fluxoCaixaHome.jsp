@@ -17,7 +17,11 @@
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/Chart.min.js"/>"></script>
-
+<style type="text/css">
+#graficoTipoPagamento, #graficoFaturamentoAnual {
+	margin-top: 150px;
+}
+</style>
 <script type="text/javascript">
 $(document).ready(function() {
 	var charts = new Array();
@@ -174,16 +178,16 @@ $(document).ready(function() {
 				</div>
 				
 		</fieldset>
-	<div class="input" style="width: 50%; height: 20%">
+	<div class="input" style="width: 40%; height: 20%">
 		<canvas id="graficoFluxoMensal" ></canvas>
 	</div>
-	<div class="input" style="width: 50%; height: 20%">
+	<div class="input" style="width: 40%; height: 20%">
 		<canvas id="graficoFaturamentoMensal" ></canvas>
 	</div>
-	<div class="input" style="width: 50%; height: 20%; margin-top: 2%">
+	<div class="input" style="width: 40%; height: 20%; margin-top: 2%">
 		<canvas id="graficoTipoPagamento"></canvas>
 	</div>
-	<div class="input" style="width: 50%; height: 20%; margin-top: 2%">
+	<div class="input" style="width: 40%; height: 20%; margin-top: 2%">
 		<canvas id="graficoFaturamentoAnual"></canvas>
 	</div>
 </body>

@@ -26,7 +26,7 @@
 				<c:if test="${acessoVendaPermitido}">
 				<li id="menuPedido"><a href="pedido/venda" target="principal_frame">Ped. Vendas +</a>
 					<ul>
-						<li><a href="itemAguardandoMaterial" target="principal_frame">Ped. Aguard. Material</a></li>
+						<li><a href="itemAguardandoMaterial/listagem" target="principal_frame">Ped. Aguard. Material</a></li>
 						<li><a href="estoque" target="principal_frame">Estoque</a></li>
 					</ul>
 				</li>

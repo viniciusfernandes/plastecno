@@ -118,12 +118,16 @@ function enviarEmpacotamento(botao){
 								<div class="coluna_acoes_listagem">
 									<form action="<c:url value="/pedido/pdf"/>" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
-										<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
+										<div class="input" style="width: 50%">
+											<input type="submit" value="" title="Visualizar Pedido PDF" class="botaoPdf_16 botaoPdf_16_centro"/>
+										</div>
 									</form>
 									<form action="<c:url value="/itemAguardandoMaterial/empacotamento"/>" method="post" >
 										<input type="hidden" name="idPedido" value="${pedido.id}" /> 
-										<input type="button" value="" title="Enviar Pedido para o Empacotamento" 
-										onclick="enviarEmpacotamento(this);" class="botaoAdicionar_16" />
+										<div class="input" style="width: 50%">
+											<input type="button" value="" title="Enviar Pedido para o Empacotamento" 
+												onclick="enviarEmpacotamento(this);" class="botaoAdicionar_16" />
+										</div>
 									</form>
 								</div>
 							</td>

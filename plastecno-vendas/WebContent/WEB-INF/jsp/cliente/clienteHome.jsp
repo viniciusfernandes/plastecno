@@ -351,6 +351,7 @@ function remover(codigo, nome) {
 
 	<c:if test="${not isRevendedor}">
 	<a id="rodape"></a>
+	
 	<fieldset>
 		<legend>::: Resultado da Pesquisa de Clientes :::</legend>
 		<div id="paginador"></div>

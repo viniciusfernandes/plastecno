@@ -18,4 +18,13 @@ public enum TipoOperacaoNFe {
 		return descricao;
 	}
 
+	public static TipoOperacaoNFe getTipo(String codigo) {
+		if (ENTRADA.codigo.equals(codigo)) {
+			return ENTRADA;
+		}
+		if (SAIDA.codigo.equals(codigo)) {
+			return SAIDA;
+		}
+		return null;
+	}
 }

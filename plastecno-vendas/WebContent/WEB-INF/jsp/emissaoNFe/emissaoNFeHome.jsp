@@ -81,7 +81,8 @@ $(document).ready(function() {
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
-		emitirNFe('ENTRADA');
+		var isSaida = $('#tipoOperacao').val() == '1';
+		emitirNFe(isSaida? 'SAIDA' : 'ENTRADA');
 	});
 	
 	$('#botaoDevolverNF').click(function(){
@@ -1775,7 +1776,7 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label" style="width: 10%">Tipo Operação:</div>
 			<div class="input" style="width: 10%">
-				<select name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
+				<select id="tipoOperacao" name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
 					<c:forEach var="tipo" items="${listaTipoOperacao}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>

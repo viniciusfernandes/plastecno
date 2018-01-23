@@ -1268,8 +1268,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@Override
-	public boolean isPedidoVendaExistente(Integer idPedido) {
-		return pesquisarPedidoById(idPedido, false) != null;
+	public boolean isPedidoExistente(Integer idPedido) {
+		return pedidoDAO.isPedidoExistente(idPedido);
 	}
 
 	@Override

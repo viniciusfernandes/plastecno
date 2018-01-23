@@ -12,6 +12,7 @@ import br.com.plastecno.service.exception.BusinessException;
 import br.com.plastecno.service.nfe.DuplicataNFe;
 import br.com.plastecno.service.nfe.EnderecoNFe;
 import br.com.plastecno.service.nfe.NFe;
+import br.com.plastecno.service.nfe.constante.TipoNFe;
 import br.com.plastecno.service.wrapper.Periodo;
 
 @Local
@@ -19,9 +20,13 @@ public interface NFeService {
 
 	NFe carregarIdentificacaoEmitente(NFe nFe, Integer idPedido);
 
+	String emitirNFe(NFe nFe, TipoNFe tipoNFe, Integer idPedido) throws BusinessException;
+
 	String emitirNFeDevolucao(NFe nFe, Integer idPedido) throws BusinessException;
 
 	String emitirNFeEntrada(NFe nFe, Integer idPedido) throws BusinessException;
+
+	String emitirNFeSaida(NFe nFe, Integer idPedido) throws BusinessException;
 
 	String emitirNFeTriangularizacao(NFe nFe, Integer idPedido) throws BusinessException;
 

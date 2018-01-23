@@ -120,6 +120,11 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	}
 
+	public boolean isPedidoExistente(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(entityManager.createQuery("select p.id from Pedido p where p.id=:idPedido")
+				.setParameter("idPedido", idPedido), Integer.class, null) != null;
+	}
+
 	public List<Pedido> pesquisarBy(Pedido filtro, Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 		StringBuilder select = null;
 		select = new StringBuilder("select p from Pedido p ");

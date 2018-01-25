@@ -35,6 +35,13 @@ fieldset .fieldsetInterno legend {
 	float: left;
 }
 
+fieldset > fieldset {
+	background: :#DBE8D5;
+}
+
+fieldset > fieldset > fieldset {
+	background: :#CDE5C3;
+}
 </style>
 <script type="text/javascript">
 var numeroProdutoEdicao = null;
@@ -2170,7 +2177,7 @@ function inicializarCalculoImpostos(){
 			</fieldset>
 			
 			<fieldset id="bloco_tributos" class="fieldsetInterno">
-				<legend class="fieldsetInterno">::: Tributos Prod.::: -</legend>
+				<legend >::: Tributos Prod.::: -</legend>
 				<div class="divFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
 					<legend title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>

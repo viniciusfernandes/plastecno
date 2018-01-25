@@ -73,8 +73,8 @@ nav {
 }
 
 nav ul:first-child {
-	//background: #829E7E;
-	background: #BDC9B7;
+	background: #829E7E;
+	//background: #BDC9B7;
 	height: 100%;
 	width: 100%;
 }
@@ -95,10 +95,11 @@ nav ul  li  > ul {
 }
 
 nav ul li a {
-	//background: #829E7E;
-	background: #BDC9B7;
+	background: #829E7E;
+	//background: #BDC9B7;
 	//border-bottom: 1px solid #829E7E;
-	color: #5C7A4B;
+	//color: #5C7A4B;
+	color: white;
 	display: block;
 	font-size: 15px;
 	//font-weight: bold;
@@ -130,12 +131,11 @@ nav ul li, nav ul li a {
 /*Arredondamento das bordas dos menus e submenus */
 nav ul li:hover a {
 	background: #C9E5B9;
-	color: white;
-	//font-weight: bold;
 }
 
-nav ul li ul li:hover a {
-	//color: white;
+nav ul > li:hover > a {
+	color: #829E7E;
+	font-size: 15.5px;
 }
 
 nav  ul {

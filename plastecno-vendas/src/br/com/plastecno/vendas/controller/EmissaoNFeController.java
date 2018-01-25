@@ -149,26 +149,12 @@ public class EmissaoNFeController extends AbstractController {
     @Post("emissaoNFe/emitirNFe")
     public void emitirNFe(DadosNFe nf, TipoNFe tipoNFe, LogradouroCliente logradouro, String telefoneDestinatario,
             Integer idPedido) {
-        String numeroNFe = null;
         try {
             nf.getIdentificacaoDestinatarioNFe().setEnderecoDestinatarioNFe(
                     nFeService.gerarEnderecoNFe(logradouro, telefoneDestinatario));
             formatarDatas(nf, false);
             ordenarListaDetalhamentoProduto(nf);
-
-            if (tipoNFe == null) {
-                tipoNFe = TipoNFe.ENTRADA;
-            }
-
-            // REFATORAR ESSA IMPLEMENTACAO POIS AQUI EH UM PONTO DE
-            // COMPLEXIDADE ACICLOMATIA. UTILIZAR LAMBDA EXPESSIONS.
-            if (TipoNFe.DEVOLUCAO.equals(tipoNFe)) {
-                numeroNFe = nFeService.emitirNFeDevolucao(new NFe(nf), idPedido);
-            } else if (TipoNFe.ENTRADA.equals(tipoNFe)) {
-                numeroNFe = nFeService.emitirNFeEntrada(new NFe(nf), idPedido);
-            } else if (TipoNFe.TRIANGULARIZACAO.equals(tipoNFe)) {
-                numeroNFe = nFeService.emitirNFeTriangularizacao(new NFe(nf), idPedido);
-            }
+            String numeroNFe = nFeService.emitirNFe(new NFe(nf), tipoNFe, idPedido);
 
             gerarMensagemSucesso("A NFe de número " + numeroNFe + " do pedido No. " + idPedido
                     + " foi gerada com sucesso.");
@@ -505,6 +491,9 @@ public class EmissaoNFeController extends AbstractController {
                 addAtributo("modeloNFe", numNFe[2]);
             } catch (BusinessException e) {
                 gerarListaMensagemAlerta(e);
+            }
+            if (listaItem.isEmpty()) {
+                gerarMensagemAlerta("O pedido No. " + idPedido + " não possui itens para emissão.");
             }
 
         } catch (BusinessException e1) {

@@ -109,7 +109,7 @@ public interface PedidoService {
 
 	boolean isPedidoEnviado(Integer idPedido);
 
-	boolean isPedidoVendaExistente(Integer idPedido);
+	boolean isPedidoExistente(Integer idPedido);
 
 	PaginacaoWrapper<Pedido> paginarPedido(Integer idCliente, Integer idVendedor, Integer idFornecedor,
 			boolean isCompra, Integer indiceRegistroInicial, Integer numeroMaximoRegistros, boolean isOrcamento);

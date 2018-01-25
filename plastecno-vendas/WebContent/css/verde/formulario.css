@@ -28,22 +28,32 @@
 /* inicio das definicoes do layout para o fieldset dos inputs de cadastro */
 fieldset {
 	background: #E4EAE1;
-	margin: 5px 10px 5px 5px;
+	margin: 5px 10px 5px 10px;
 	min-height: 100px;
+	
 }
 
-fieldset, legend {
-	border: 1px solid #42A823;
-	border-radius: 12px;
+fieldset {
+	//border: 1px solid #5C7A4B;
+	border: 1px solid #8AB66B;
+	border-radius: 5px 5px 0 0;
+	//border-bottom: 1px solid #5C7A4B;
+	border-bottom: 1px solid #8AB66B;
 }
 
 legend {
+	//background: #BDC9B7;
 	background: #8AB66B;
+	border-radius: 5px 5px 0 0;
+	//border-top: 1px solid #5C7A4B;
+	border-top: 1px solid #8AB66B;
+	//color: #5C7A4B;
 	color: white;
+	//float: left;
 	font-size: 15px;
-	font-weight: bold;
-	margin-left: 5px;
+	//font-weight: bold;
 	margin-bottom: 5px;
+	margin-left: 3px;
 	padding: 5px;
 }
 /* fim das definicoes do layout para o fieldset dos inputs de cadastro */
@@ -63,7 +73,7 @@ legend {
 }
 
 .label {
-	font-weight: bold;
+	//font-weight: bold;
 	margin-right: 1%;
 	text-align: right;
 	width: 15%;

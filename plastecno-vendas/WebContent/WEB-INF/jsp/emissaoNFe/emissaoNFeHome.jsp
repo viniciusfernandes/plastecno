@@ -35,6 +35,13 @@ fieldset .fieldsetInterno legend {
 	float: left;
 }
 
+fieldset > fieldset {
+	background: :#DBE8D5;
+}
+
+fieldset > fieldset > fieldset {
+	background: :#CDE5C3;
+}
 </style>
 <script type="text/javascript">
 var numeroProdutoEdicao = null;
@@ -81,7 +88,8 @@ $(document).ready(function() {
 	$('#bloco_logradouro').addClass('fieldsetInterno');
 
 	$('#botaoEmitirNF').click(function(){
-		emitirNFe('ENTRADA');
+		var isSaida = $('#tipoOperacao').val() == '1';
+		emitirNFe(isSaida? 'SAIDA' : 'ENTRADA');
 	});
 	
 	$('#botaoDevolverNF').click(function(){
@@ -1775,7 +1783,7 @@ function inicializarCalculoImpostos(){
 			</div>
 			<div class="label" style="width: 10%">Tipo Operação:</div>
 			<div class="input" style="width: 10%">
-				<select name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
+				<select id="tipoOperacao" name="nf.identificacaoNFe.tipoOperacao" style="width: 100%" >
 					<c:forEach var="tipo" items="${listaTipoOperacao}">
 						<option value="${tipo.codigo}" <c:if test="${tipo.codigo eq tipoOperacaoSelecionada}">selected</c:if>>${tipo.descricao}</option>
 					</c:forEach>
@@ -2169,7 +2177,7 @@ function inicializarCalculoImpostos(){
 			</fieldset>
 			
 			<fieldset id="bloco_tributos" class="fieldsetInterno">
-				<legend class="fieldsetInterno">::: Tributos Prod.::: -</legend>
+				<legend >::: Tributos Prod.::: -</legend>
 				<div class="divFieldset">
 				<fieldset id="bloco_icms" class="fieldsetInterno">
 					<legend title="Clique para exibir os campos ICMS">::: ICMS Prod.::: +</legend>

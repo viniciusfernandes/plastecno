@@ -8,7 +8,7 @@ import br.com.plastecno.service.DuplicataService;
 import br.com.plastecno.service.DuplicataVencidaMonitor;
 
 @Stateless
-public class DuplicataVendidaMonitorImpl implements DuplicataVencidaMonitor {
+public class DuplicataVencidaMonitorImpl implements DuplicataVencidaMonitor {
 
 	@EJB
 	private DuplicataService duplicataService;

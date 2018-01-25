@@ -5,7 +5,7 @@
 	font-family: 'Lato', Arial, Helvetica, sans-serif;
 }
 
-input, select, fieldset, textarea {
+input, select, textarea {
 	border: 1px solid;
 	border-color: #4B7931;
 	border-radius: 3px;

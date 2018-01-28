@@ -129,7 +129,7 @@ nav ul li, nav ul li a {
 }
 
 #menuPedido ul, #menuPedidoCompra ul , #menuCadastros ul , #menuNFe  ul , #menuRelatorios  ul, #menuRecepcaoCompras ul {
-	top: -25px;
+	top: -26px;
 }
 /* Posicionamento dos submenus */
 
@@ -151,12 +151,6 @@ nav  > ul li:first-child  > a {
 	border-radius: 5px 5px 0 0;
 }
 
-
-
-nav  > ul li:first-child  > a:hover   {
-	//border-radius: 5px 0 0 0;
-}
-
 nav ul li ul li:first-child  > a  {
 	border-radius: 0 5px 0 0;
 }
@@ -166,6 +160,32 @@ nav  ul  li ul  li:last-child  > a {
 	border-radius: 0 0 5px 0;
 }
 /*Arredondamento das bordas dos menus e submenus */
+
+/* Bordas dos menus e submenus */
+nav > ul > li > a{
+	border-left: 1px solid #829E7E;	
+}
+
+nav > ul > li:first-child > a {
+	border-top: 1px solid #829E7E;
+}
+
+nav ul > li > ul > li > a{
+	border-right: 1px solid #829E7E;
+}
+nav ul > li > ul > li:first-child > a{
+	border-top: 1px solid #829E7E;
+}
+
+nav ul > li > ul > li:last-child > a{
+	border-bottom: 1px solid #829E7E;	
+}
+
+
+#menuPedido:hover > a {
+	border-radius: 5px 0 0 0;	
+}
+/* Bordas dos menus e submenus */
 
 #content {
 	margin: 0 auto;

@@ -72,6 +72,11 @@ nav {
 	width: 11%;
 }
 
+nav > ul {
+	margin: 0;
+	padding: 0;
+} 
+
 nav ul:first-child {
 	background: #829E7E;
 	//background: #BDC9B7;
@@ -124,17 +129,17 @@ nav ul li, nav ul li a {
 }
 
 #menuPedido ul, #menuPedidoCompra ul , #menuCadastros ul , #menuNFe  ul , #menuRelatorios  ul, #menuRecepcaoCompras ul {
-	top: -25px;
+	top: -26px;
 }
 /* Posicionamento dos submenus */
 
 /*Arredondamento das bordas dos menus e submenus */
 nav ul li:hover a {
+	color: #829E7E;
 	background: #C9E5B9;
 }
 
 nav ul > li:hover > a {
-	color: #829E7E;
 	font-size: 15.5px;
 }
 
@@ -146,20 +151,41 @@ nav  > ul li:first-child  > a {
 	border-radius: 5px 5px 0 0;
 }
 
-
-
-nav  > ul li:first-child  > a:hover   {
-	border-radius: 5px 0 0 0;
-}
-
 nav ul li ul li:first-child  > a  {
 	border-radius: 0 5px 0 0;
 }
 
 nav  ul  li ul  li:last-child  > a {
-	border-radius: 0 0 5px 5px;
+	//border-radius: 0 0 5px 5px;
+	border-radius: 0 0 5px 0;
 }
 /*Arredondamento das bordas dos menus e submenus */
+
+/* Bordas dos menus e submenus */
+nav > ul > li > a{
+	border-left: 1px solid #829E7E;	
+}
+
+nav > ul > li:first-child > a {
+	border-top: 1px solid #829E7E;
+}
+
+nav ul > li > ul > li > a{
+	border-right: 1px solid #829E7E;
+}
+nav ul > li > ul > li:first-child > a{
+	border-top: 1px solid #829E7E;
+}
+
+nav ul > li > ul > li:last-child > a{
+	border-bottom: 1px solid #829E7E;	
+}
+
+
+#menuPedido:hover > a {
+	border-radius: 5px 0 0 0;	
+}
+/* Bordas dos menus e submenus */
 
 #content {
 	margin: 0 auto;
@@ -180,13 +206,11 @@ nav  ul  li ul  li:last-child  > a {
 
 #center_content {
 	float: right;
-	background-color: #ffffff;
 	height: 90vh;
 	width: 88%;
 }
 
 #conteudo_principal {
-	background: #F4F4F4;
 	border: 0; 
 	border-radius: 5px;
 	height: 100%; 

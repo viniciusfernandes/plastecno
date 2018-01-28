@@ -34,7 +34,7 @@ public class RelatorioFaturamentoController extends AbstractController {
     @Get("relatorio/faturamento/pdf")
     public Download downloadRelatorioFaturamento(Date dataInicial, Date dataFinal) {
         try {
-            List<NFePedido> lNfe = nFeService.pesquisarNFePedidoEntradaEmitidoByPeriodo(new Periodo(dataInicial,
+            List<NFePedido> lNfe = nFeService.pesquisarNFePedidoSaidaEmitidaByPeriodo(new Periodo(dataInicial,
                     dataFinal));
             double vlTotal = 0;
             double vlTotalICMS = 0;
@@ -43,7 +43,7 @@ public class RelatorioFaturamentoController extends AbstractController {
                 vlTotal += n.getValor() == null ? 0 : n.getValor();
                 vlTotalICMS += n.getValorICMS() == null ? 0 : n.getValorICMS();
             }
-            
+
             Collections.sort(lNfe, new Comparator<NFePedido>() {
                 @Override
                 public int compare(NFePedido o1, NFePedido o2) {

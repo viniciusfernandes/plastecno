@@ -21,21 +21,20 @@
 				<label>Email:</label>
 			</div>
 		</form>
-
+		
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
 		<div class="enfeite flutuante_esquerda"></div>
 	<div class="main_wrapper">
 		<nav>
 			<ul>
-				<li></li>
+				
 			</ul>
 		</nav>
 		<div id="center_content">
-			<jsp:include page="/bloco/bloco_mensagem.jsp" />
 			<iframe id="conteudo_principal" name="principal_frame"></iframe>
 		</div>
 	</div>
-	</div>	
+	</div>
 </body>
 </html>

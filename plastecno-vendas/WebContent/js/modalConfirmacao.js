@@ -20,7 +20,8 @@ function inicializarModalConfirmacao(config) {
 			"Cancelar" : function() {
 				$(this).dialog("close");
 			}
-		}
+		},
+		position: { my: "center", at: "center", of: window}
 	});
 
 	$(modal).html(mensagem);

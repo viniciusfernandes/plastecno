@@ -707,7 +707,7 @@ public class NFeServiceImpl implements NFeService {
 		carregarOutrasConfiguracoes(nFe);
 
 		validarFormaPagamento(nFe);
-		validarTipoOperacao(nFe, idPedido);
+		validarTipoOperacao(nFe, tipoNFe, idPedido);
 		validarEmissaoNFePedido(idPedido);
 		validarNumeroNFePedido(idPedido, ide.getNumero() != null ? Integer.parseInt(ide.getNumero()) : null);
 
@@ -1043,10 +1043,20 @@ public class NFeServiceImpl implements NFeService {
 		}
 	}
 
-	private void validarTipoOperacao(NFe nFe, Integer idPedido) throws BusinessException {
-		TipoPedido tp = pedidoService.pesquisarTipoPedidoByIdPedido(idPedido);
+	private void validarTipoOperacao(NFe nFe, TipoNFe tipoNFe, Integer idPedido) throws BusinessException {
 		String codOper = nFe.getDadosNFe().getIdentificacaoNFe().getTipoOperacao();
 		TipoOperacaoNFe tpOper = TipoOperacaoNFe.getTipo(codOper);
+
+		// No preenchimento de uma nota de devolucao, que eh uma operacao de
+		// saida, o usuario pode usar um pedido de compra. O que pode ocorrer no
+		// caso de aquisicao de um produto com defeito. Consequentemente, um
+		// pedido estara associado um varias NFes. Por isso a validacao nao
+		// ocorrera nos casos de devolucao.
+		if (DEVOLUCAO.equals(tipoNFe)) {
+			return;
+		}
+
+		TipoPedido tp = pedidoService.pesquisarTipoPedidoByIdPedido(idPedido);
 
 		if (TipoPedido.isCompra(tp) && !TipoOperacaoNFe.ENTRADA.equals(tpOper)) {
 			throw new BusinessException("O pedido de No. " + idPedido

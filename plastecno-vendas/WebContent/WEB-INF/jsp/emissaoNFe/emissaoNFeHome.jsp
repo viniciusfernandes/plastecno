@@ -73,8 +73,13 @@ $(document).ready(function() {
 		if(isEmpty($('#numeroNFe').val())){
 			return;
 		}
-		$('#formPesquisaNFe #numeroNFePesquisa').val($('#numeroNFe').val());
-		$('#formPesquisaNFe').attr('action', '<c:url value="/emissaoNFe/remocao"/>').attr('method', 'post').submit();
+		inicializarModalConfirmacao({
+			mensagem: 'Essa ação não poderá será desfeita. Você tem certeza de que deseja REMOVER esse item?',
+			confirmar: function(){
+				$('#formPesquisaNFe #numeroNFePesquisa').val($('#numeroNFe').val());
+				$('#formPesquisaNFe').attr('action', '<c:url value="/emissaoNFe/remocao"/>').attr('method', 'post').submit();
+			}
+		});
 	});
 	
 	$("#botaoPedidoPDF").click(function() {

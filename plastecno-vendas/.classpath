@@ -3,17 +3,16 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/plastecno-service"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/plastecno-utils"/>
-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.jboss.ide.eclipse.as.core.server.runtime.runtimeTarget/WildFly 8.x Runtime">
-		<attributes>
-			<attribute name="owner.project.facets" value="jst.web"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/svr-service"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/svr-utils"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0_45">
 		<attributes>
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.jboss.ide.eclipse.as.core.server.runtime.runtimeTarget/WildFly 8.x Runtime"/>
+	<classpathentry kind="lib" path="/svr-sistema/lib/itextpdf-5.4.2.jar"/>
+	<classpathentry kind="lib" path="/svr-sistema/lib/jxl-2.6.12.jar"/>
+	<classpathentry kind="lib" path="/svr-sistema/lib/xmlworker-5.4.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

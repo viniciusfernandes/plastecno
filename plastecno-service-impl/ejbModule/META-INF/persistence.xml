@@ -33,6 +33,7 @@ http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/persistence/persistence_2
 		<class>br.com.svr.service.entity.PerfilAcesso</class>
 		<class>br.com.svr.service.entity.Material</class>
 		<class>br.com.svr.service.entity.Pedido</class>
+		<class>br.com.svr.service.entity.crm.Negociacao</class>
 		<class>br.com.svr.service.entity.NFeDuplicata</class>
 		<class>br.com.svr.service.entity.NFePedido</class>
 		<class>br.com.svr.service.entity.NFeItemFracionado</class>

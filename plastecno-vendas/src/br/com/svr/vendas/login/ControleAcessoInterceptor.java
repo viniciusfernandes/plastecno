@@ -51,7 +51,7 @@ public class ControleAcessoInterceptor implements Interceptor {
          */
         if (!usuarioInfo.isLogado()) {
             result.forwardTo(LoginController.class).redirecionarLogin();
-            return;
+            //return;
         }
 
         if (auditoriaHabilidata) {

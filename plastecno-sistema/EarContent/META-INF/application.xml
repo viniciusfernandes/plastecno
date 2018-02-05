@@ -10,4 +10,13 @@
   <module>
     <ejb>svr-service-impl.jar</ejb>
   </module>
+  <module>
+    <web>
+      <web-uri>svr-crm.war</web-uri>
+      <context-root>svr/crm</context-root>
+    </web>
+  </module>
+  <module>
+    <java>javassist-3.4.GA.jar</java>
+  </module>
 </application>

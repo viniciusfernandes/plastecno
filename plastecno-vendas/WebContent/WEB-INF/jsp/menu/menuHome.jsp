@@ -134,6 +134,7 @@
 									Editor</a></li>
 						</ul></li>
 				</c:if>
+				<li><a href="negociacao" target="principal_frame">Negociação</a></li>
 			</ul>
 		</nav>
 		<div id="center_content">

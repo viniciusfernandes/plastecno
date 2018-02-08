@@ -80,6 +80,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private EmailService emailService;
+	
 	@PersistenceContext(name = "svr")
 	private EntityManager entityManager;
 

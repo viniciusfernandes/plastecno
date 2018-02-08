@@ -1481,7 +1481,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoOrcamentoClienteNovo() {
-		Pedido pedido = gPedido.gerarOrcamento();
+		Pedido pedido = gPedido.gerarOrcamentoSemCliente();
 		Cliente cliente = new Cliente();
 		cliente.setNomeFantasia("Vinicius");
 

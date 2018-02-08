@@ -150,6 +150,17 @@ public class GeradorPedido {
 	}
 
 	public Pedido gerarOrcamento() {
+		Pedido o = gerarPedidoRevenda();
+		ItemPedido i = gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(o.getId(), i);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return o;
+	}
+
+	public Pedido gerarOrcamentoSemCliente() {
 		Usuario vendedor = eBuilder.buildVendedor();
 		vendedor.setSenha("asdf34");
 		try {

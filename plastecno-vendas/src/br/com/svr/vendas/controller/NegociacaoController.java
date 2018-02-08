@@ -13,6 +13,5 @@ public class NegociacaoController extends AbstractController {
 
     @Get("negociacao")
     public void negociacaoHome() {
-System.out.println("testesssssssss");
     }
 }

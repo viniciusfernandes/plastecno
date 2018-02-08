@@ -6,15 +6,12 @@
 <meta charset="utf-8">
 <jsp:include page="/bloco/bloco_css.jsp"></jsp:include>
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
-
 <style type="text/css">
 .coluna {
 	width: 15%;
 	float: left;
-	border: 1px solid black;
 	margin-right: 0;
 	margin-top: 0;
-	background: #e5e5e5;
 }
 .header  {
 	width: 15%;
@@ -24,8 +21,9 @@
 	text-align: center;
 }
 .coluna {
-	height: 80vh;
+	height: 100%;
 	padding: 0;
+	min-height: 99vh;
 }
 .block {
 	margin-top: 1px;
@@ -42,6 +40,17 @@ div.block {
 div.block > a, div.block > a > span {
 	width: 100%;
 	float: left;
+	color: black;
+	font-size: 12px;
+	font-family: 'Lato', Arial, Helvetica, sans-serif;
+}
+
+div.block > a > span {
+	padding-left: 5px;
+}
+
+fieldset.coluna > legend {
+	width: 90%;
 }
 </style>
 <script type="text/javascript">
@@ -61,26 +70,9 @@ function drag(ev) {
 </script>
 </head>
 <body>
-<div id="cab1" class="coluna header" style="height: 5vh">
-	Primeiro contato
-</div>
-<div id="cab2" class="coluna header" style="height: 5vh">
-	Primeiro contato
-</div>
-<div id="cab3" class="coluna header" style="height: 5vh">
-	Primeiro contato
-</div>
-<div id="cab4" class="coluna header" style="height: 5vh">
-	Primeiro contato
-</div>
-<div id="cab5" class="coluna header" style="height: 5vh">
-	Primeiro contato
-</div>
-<div id="cab6" class="coluna header" style="height: 5vh">
-	Primeiro contato
-</div>
-<div id="col1" class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<div id="xxx" class="block" draggable="true" ondragstart="drag(event)">
+<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
+	<legend>Propostas Clientes</legend>
+	<div id="o1" class="block" draggable="true" ondragstart="drag(event)">
 		<a class="front" href="/deal/1" >
 			<span>Orçamento Nº 22425</span>
 			<span>R$13.428,36</span>
@@ -89,9 +81,7 @@ function drag(ev) {
 			<span>Vitoria Industrial</span>
 		</a>
 	</div>
-</div>
-<div id="col2" class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<div id="xxx" class="block" draggable="true" ondragstart="drag(event)">
+	<div id="o11" class="block" draggable="true" ondragstart="drag(event)">
 		<a class="front" href="/deal/1" >
 			<span>Orçamento Nº 22425</span>
 			<span>R$13.428,36</span>
@@ -100,9 +90,7 @@ function drag(ev) {
 			<span>Vitoria Industrial</span>
 		</a>
 	</div>
-</div>
-<div id="col3" class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<div id="xxx" class="block" draggable="true" ondragstart="drag(event)">
+	<div id="o12" class="block" draggable="true" ondragstart="drag(event)">
 		<a class="front" href="/deal/1" >
 			<span>Orçamento Nº 22425</span>
 			<span>R$13.428,36</span>
@@ -111,9 +99,7 @@ function drag(ev) {
 			<span>Vitoria Industrial</span>
 		</a>
 	</div>
-</div>
-<div id="col4" class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<div id="xxx" class="block" draggable="true" ondragstart="drag(event)">
+	<div id="o13" class="block" draggable="true" ondragstart="drag(event)">
 		<a class="front" href="/deal/1" >
 			<span>Orçamento Nº 22425</span>
 			<span>R$13.428,36</span>
@@ -122,9 +108,7 @@ function drag(ev) {
 			<span>Vitoria Industrial</span>
 		</a>
 	</div>
-</div>
-<div id="col5" class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<div id="zzz" class="block" draggable="true" ondragstart="drag(event)">
+	<div id="o14" class="block" draggable="true" ondragstart="drag(event)">
 		<a class="front" href="/deal/1" >
 			<span>Orçamento Nº 22425</span>
 			<span>R$13.428,36</span>
@@ -133,9 +117,7 @@ function drag(ev) {
 			<span>Vitoria Industrial</span>
 		</a>
 	</div>
-</div>
-<div id="col6" class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<div id="ooo" class="block" draggable="true" ondragstart="drag(event)">
+	<div id="o15" class="block" draggable="true" ondragstart="drag(event)">
 		<a class="front" href="/deal/1" >
 			<span>Orçamento Nº 22425</span>
 			<span>R$13.428,36</span>
@@ -144,6 +126,111 @@ function drag(ev) {
 			<span>Vitoria Industrial</span>
 		</a>
 	</div>
-</div>
+	<div id="o16" class="block" draggable="true" ondragstart="drag(event)">
+		<a class="front" href="/deal/1" >
+			<span>Orçamento Nº 22425</span>
+			<span>R$13.428,36</span>
+		</a>
+		<a class="front" href="/deal/1" >
+			<span>Vitoria Industrial</span>
+		</a>
+	</div>
+	<div id="o17" class="block" draggable="true" ondragstart="drag(event)">
+		<a class="front" href="/deal/1" >
+			<span>Orçamento Nº 22425</span>
+			<span>R$13.428,36</span>
+		</a>
+		<a class="front" href="/deal/1" >
+			<span>Vitoria Industrial</span>
+		</a>
+	</div>
+	<div id="o18" class="block" draggable="true" ondragstart="drag(event)">
+		<a class="front" href="/deal/1" >
+			<span>Orçamento Nº 22425</span>
+			<span>R$13.428,36</span>
+		</a>
+		<a class="front" href="/deal/1" >
+			<span>Vitoria Industrial</span>
+		</a>
+	</div>
+	<div id="o19" class="block" draggable="true" ondragstart="drag(event)">
+		<a class="front" href="/deal/1" >
+			<span>Orçamento Nº 22425</span>
+			<span>R$13.428,36</span>
+		</a>
+		<a class="front" href="/deal/1" >
+			<span>Vitoria Industrial</span>
+		</a>
+	</div>
+	<div id="o181" class="block" draggable="true" ondragstart="drag(event)">
+		<a class="front" href="/deal/1" >
+			<span>Orçamento Nº 22425</span>
+			<span>R$13.428,36</span>
+		</a>
+		<a class="front" href="/deal/1" >
+			<span>Vitoria Industrial</span>
+		</a>
+	</div>
+</fieldset>
+<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
+	<legend>Primeiro contato</legend>
+	<div id="o2" class="block" draggable="true" ondragstart="drag(event)">
+		<a class="front" href="/deal/1" >
+			<span>Orçamento Nº 22425</span>
+			<span>R$13.428,36</span>
+		</a>
+		<a class="front" href="/deal/1" >
+			<span>Vitoria Industrial</span>
+		</a>
+	</div>
+</fieldset>
+<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
+	<legend>Negócios Potenciais</legend>
+	<div id="o3" class="block" draggable="true" ondragstart="drag(event)">
+		<a class="front" href="/deal/1" >
+			<span>Orçamento Nº 22425</span>
+			<span>R$13.428,36</span>
+		</a>
+		<a class="front" href="/deal/1" >
+			<span>Vitoria Industrial</span>
+		</a>
+	</div>
+</fieldset>
+<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
+	<legend>Projetos</legend>
+	<div id="o4" class="block" draggable="true" ondragstart="drag(event)">
+		<a class="front" href="/deal/1" >
+			<span>Orçamento Nº 22425</span>
+			<span>R$13.428,36</span>
+		</a>
+		<a class="front" href="/deal/1" >
+			<span>Vitoria Industrial</span>
+		</a>
+	</div>
+</fieldset>
+<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
+	<legend>Prováveis</legend>
+	<div id="o5" class="block" draggable="true" ondragstart="drag(event)">
+		<a class="front" href="/deal/1" >
+			<span>Orçamento Nº 22425</span>
+			<span>R$13.428,36</span>
+		</a>
+		<a class="front" href="/deal/1" >
+			<span>Vitoria Industrial</span>
+		</a>
+	</div>
+</fieldset>
+<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
+	<legend>Começando</legend>
+	<div id="o6" class="block" draggable="true" ondragstart="drag(event)">
+		<a class="front" href="/deal/1" >
+			<span>Orçamento Nº 22425</span>
+			<span>R$13.428,36</span>
+		</a>
+		<a class="front" href="/deal/1" >
+			<span>Vitoria Industrial</span>
+		</a>
+	</div>
+</fieldset>
 </body>
 </html>

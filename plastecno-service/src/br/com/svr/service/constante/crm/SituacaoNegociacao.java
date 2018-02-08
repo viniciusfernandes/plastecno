@@ -1,6 +1,6 @@
 package br.com.svr.service.constante.crm;
 
-public enum TipoSituacaoNegociacao {
+public enum SituacaoNegociacao {
 	ABERTO,
 	ACEITO,
 	ANDAMENTO,

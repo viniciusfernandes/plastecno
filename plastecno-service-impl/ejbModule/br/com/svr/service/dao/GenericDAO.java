@@ -22,9 +22,10 @@ public class GenericDAO<T> {
 		}
 		StringBuilder select = new StringBuilder();
 		select.append("update ").append(classe.getSimpleName()).append(" e ");
-		select.append(" set e.").append(nomePropriedade).append(" = :").append(nomePropriedade).append(" where e.id = :id");
-		entityManager.createQuery(select.toString()).setParameter(nomePropriedade, valorPropriedade).setParameter("id", id)
-				.executeUpdate();
+		select.append(" set e.").append(nomePropriedade).append(" = :").append(nomePropriedade)
+				.append(" where e.id = :id");
+		entityManager.createQuery(select.toString()).setParameter(nomePropriedade, valorPropriedade)
+				.setParameter("id", id).executeUpdate();
 	}
 
 	public T flush(T t) {
@@ -46,8 +47,8 @@ public class GenericDAO<T> {
 		return this.isEntidadeExistente(classe, nomeAtributo, valorAtributo, null, null);
 	}
 
-	public boolean isEntidadeExistente(Class<T> classe, String nomeAtributo, Object valorAtributo, Object nomeIdEntidade,
-			Object valorIdEntidade) {
+	public boolean isEntidadeExistente(Class<T> classe, String nomeAtributo, Object valorAtributo,
+			Object nomeIdEntidade, Object valorIdEntidade) {
 
 		StringBuilder select = new StringBuilder();
 		select.append("select r.").append(nomeAtributo).append(" ");
@@ -70,7 +71,7 @@ public class GenericDAO<T> {
 		return query.getResultList().size() > 0;
 	}
 
-	T pesquisarById(Class<T> classe, Integer id) {
+	protected T pesquisarById(Class<T> classe, Integer id) {
 
 		if (id == null) {
 			return null;
@@ -79,16 +80,16 @@ public class GenericDAO<T> {
 		StringBuilder select = new StringBuilder();
 		select.append("select e from ").append(classe.getSimpleName());
 		select.append(" e where e.id = :id");
-		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id), classe,
-				null);
+		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id),
+				classe, null);
 	}
 
-	<K> K pesquisarCampoById(Class<T> classe, Integer id, String nomeCampo, Class<K> retorno) {
+	protected <K> K pesquisarCampoById(Class<T> classe, Integer id, String nomeCampo, Class<K> retorno) {
 		StringBuilder select = new StringBuilder();
 		select.append("select ").append("e.").append(nomeCampo).append(" from ").append(classe.getSimpleName());
 		select.append(" e where e.id = :id");
-		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id), retorno,
-				null);
+		return QueryUtil.gerarRegistroUnico(entityManager.createQuery(select.toString()).setParameter("id", id),
+				retorno, null);
 	}
 
 	public T remover(T t) {

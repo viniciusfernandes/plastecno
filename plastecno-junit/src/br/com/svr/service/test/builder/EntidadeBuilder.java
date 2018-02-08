@@ -280,6 +280,7 @@ public class EntidadeBuilder {
 		contato.setDdd("11");
 		contato.setDdi("55");
 		contato.setTelefone("99996321");
+		contato.setEmail("adriano@plastecno.com.br");
 
 		Pedido pedido = new Pedido();
 		pedido.setCliente(cliente);

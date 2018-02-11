@@ -223,6 +223,8 @@ public interface PedidoService {
 
 	List<LogradouroPedido> pesquisarLogradouro(Integer idPedido, TipoLogradouro tipo);
 
+	Object[] pesquisarNomeClienteNomeContatoValor(Integer idPedido);
+
 	String pesquisarNomeVendedorByIdPedido(Integer idPedido);
 
 	String pesquisarNumeroPedidoClienteByIdPedido(Integer idPedido);

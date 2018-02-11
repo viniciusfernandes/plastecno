@@ -6,7 +6,7 @@ import javax.persistence.Query;
 import br.com.svr.service.impl.util.QueryUtil;
 
 public class GenericDAO<T> {
-	final EntityManager entityManager;
+	protected final EntityManager entityManager;
 
 	public GenericDAO(EntityManager entityManager) {
 		this.entityManager = entityManager;

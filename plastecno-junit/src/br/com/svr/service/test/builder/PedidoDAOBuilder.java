@@ -196,6 +196,16 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public Object[] pesquisarNomeClienteNomeContatoValor(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				if (p == null) {
+					return null;
+				}
+				return new Object[] { p.getCliente().getNomeFantasia(), p.getContato().getDdd(),
+						p.getContato().getNome(), p.getContato().getTelefone(), p.getValorPedido() };
+			}
+
+			@Mock
 			public Pedido pesquisarPedidoResumidoCalculoComissao(Integer idPedido) {
 				// Aqui temos que retornar o pedido inteiro senao podemos
 				// quebrar o relacionamento entre os objetos itemPedido e pedido

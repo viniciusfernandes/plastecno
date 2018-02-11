@@ -1,34 +1,32 @@
 package br.com.svr.service.entity.crm;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
-import br.com.svr.service.entity.Pedido;
-import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
 @Table(name = "tb_negociacao", schema = "crm")
 @InformacaoValidavel
-public class Negociacao {
+public class Negociacao implements Serializable {
+	private static final long serialVersionUID = -8125636304167827730L;
+
 	@Column(name = "id_categoria_negociacao")
 	@Enumerated(EnumType.ORDINAL)
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Categoria da negociação")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Categoria da negociação")
 	private CategoriaNegociacao categoriaNegociacao;
 
 	private String comentario;
@@ -41,25 +39,39 @@ public class Negociacao {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "negociacaoSequence")
 	private Integer id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_pedido")
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Orçamento da negociação")
-	private Pedido orcamento;
+	@Column(name = "id_orcamento")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Orçamento da negociação")
+	private Integer idOrcamento;
+
+	@Column(name = "id_vendedor")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Vendedor da negociação")
+	private Integer idVendedor;
+
+	@Column(name = "nome_cliente")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Nome do cliente da negociação")
+	private String nomeCliente;
+
+	@Column(name = "nome_contato")
+	@InformacaoValidavel(nomeExibicao = "Nome do contato da negociação")
+	private String nomeContato;
 
 	@Column(name = "id_situacao_negociacao")
 	@Enumerated(EnumType.ORDINAL)
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Situação da negociação")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Situação da negociação")
 	private SituacaoNegociacao situacaoNegociacao;
+
+	@Column(name = "telefone_contato")
+	@InformacaoValidavel(nomeExibicao = "Telefone do contato da negociação")
+	private String telefoneContato;
 
 	@Column(name = "id_tipo_nao_fechamento")
 	@Enumerated(EnumType.ORDINAL)
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Tipo de não-fechamento da negociação")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo de não-fechamento da negociação")
 	private TipoNaoFechamento tipoNaoFechamento;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_vendedor")
-	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Vendedor da negociação")
-	private Usuario vendedor;
+	@Column(name = "valor")
+	@InformacaoValidavel(nomeExibicao = "Valor da negociação")
+	private double valor;
 
 	public CategoriaNegociacao getCategoriaNegociacao() {
 		return categoriaNegociacao;
@@ -77,20 +89,36 @@ public class Negociacao {
 		return id;
 	}
 
-	public Pedido getOrcamento() {
-		return orcamento;
+	public Integer getIdOrcamento() {
+		return idOrcamento;
+	}
+
+	public Integer getIdVendedor() {
+		return idVendedor;
+	}
+
+	public String getNomeCliente() {
+		return nomeCliente;
+	}
+
+	public String getNomeContato() {
+		return nomeContato;
 	}
 
 	public SituacaoNegociacao getSituacaoNegociacao() {
 		return situacaoNegociacao;
 	}
 
+	public String getTelefoneContato() {
+		return telefoneContato;
+	}
+
 	public TipoNaoFechamento getTipoNaoFechamento() {
 		return tipoNaoFechamento;
 	}
 
-	public Usuario getVendedor() {
-		return vendedor;
+	public double getValor() {
+		return valor;
 	}
 
 	public void setCategoriaNegociacao(CategoriaNegociacao categoriaNegociacao) {
@@ -109,19 +137,35 @@ public class Negociacao {
 		this.id = id;
 	}
 
-	public void setOrcamento(Pedido orcamento) {
-		this.orcamento = orcamento;
+	public void setIdOrcamento(Integer idOrcamento) {
+		this.idOrcamento = idOrcamento;
+	}
+
+	public void setIdVendedor(Integer idVendedor) {
+		this.idVendedor = idVendedor;
+	}
+
+	public void setNomeCliente(String nomeCliente) {
+		this.nomeCliente = nomeCliente;
+	}
+
+	public void setNomeContato(String nomeContato) {
+		this.nomeContato = nomeContato;
 	}
 
 	public void setSituacaoNegociacao(SituacaoNegociacao situacaoNegociacao) {
 		this.situacaoNegociacao = situacaoNegociacao;
 	}
 
+	public void setTelefoneContato(String telefoneContato) {
+		this.telefoneContato = telefoneContato;
+	}
+
 	public void setTipoNaoFechamento(TipoNaoFechamento tipoNaoFechamento) {
 		this.tipoNaoFechamento = tipoNaoFechamento;
 	}
 
-	public void setVendedor(Usuario vendedor) {
-		this.vendedor = vendedor;
+	public void setValor(double valor) {
+		this.valor = valor;
 	}
 }

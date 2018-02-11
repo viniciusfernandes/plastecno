@@ -80,7 +80,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private EmailService emailService;
-	
+
 	@PersistenceContext(name = "svr")
 	private EntityManager entityManager;
 
@@ -1698,6 +1698,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<LogradouroPedido> pesquisarLogradouro(Integer idPedido, TipoLogradouro tipo) {
 		return pedidoDAO.pesquisarLogradouro(idPedido, tipo);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Object[] pesquisarNomeClienteNomeContatoValor(Integer idPedido) {
+		return pedidoDAO.pesquisarNomeClienteNomeContatoValor(idPedido);
 	}
 
 	@Override

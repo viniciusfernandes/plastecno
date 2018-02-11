@@ -34,6 +34,7 @@ public enum SituacaoPedido {
 	
 	private static List<SituacaoPedido> listaCancelado= new ArrayList<SituacaoPedido>();
 	private static List<SituacaoPedido> listaOrcamento = new ArrayList<SituacaoPedido>();
+	private static List<SituacaoPedido> listaOrcamentoAberto = new ArrayList<SituacaoPedido>();
 	private static List<SituacaoPedido> listaPedidoNaoEfetivado = new ArrayList<SituacaoPedido>();
 	private static List<SituacaoPedido> listaCompraEfetivada = new ArrayList<SituacaoPedido>();
 	private static List<SituacaoPedido> listaVendaEfetivada = new ArrayList<SituacaoPedido>();
@@ -43,6 +44,9 @@ public enum SituacaoPedido {
 		listaOrcamento.add(ORCAMENTO_ACEITO);
 		listaOrcamento.add(ORCAMENTO_CANCELADO);
 		listaOrcamento.add(ORCAMENTO_DIGITACAO);
+		
+		listaOrcamentoAberto.add(ORCAMENTO);
+		listaOrcamentoAberto.add(ORCAMENTO_DIGITACAO);
 		
 		listaCancelado.add(CANCELADO);
 		listaCancelado.add(ORCAMENTO_CANCELADO);
@@ -65,6 +69,10 @@ public enum SituacaoPedido {
 	}
 	public static List<SituacaoPedido> getListaOrcamento(){
 		return listaOrcamento;
+	}
+	
+	public static List<SituacaoPedido> getListaOrcamentoAberto(){
+		return listaOrcamentoAberto;
 	}
 	
 	public static List<SituacaoPedido> getListaPedidoNaoEfetivado (){

@@ -6,6 +6,8 @@
 <meta charset="utf-8">
 <jsp:include page="/bloco/bloco_css.jsp"></jsp:include>
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
+
 <style type="text/css">
 .coluna {
 	width: 15%;
@@ -34,7 +36,7 @@
 	margin-left: 0;
 }
 div.block {
-	padding: 0px 0 60px 0;
+	padding: 0px 0 90px 0;
 }
 
 div.block > a, div.block > a > span {
@@ -56,8 +58,31 @@ fieldset.coluna > legend {
 <script type="text/javascript">
 function drop(ev) {
 	ev.preventDefault();
-	var data = ev.dataTransfer.getData("text");
-	ev.target.appendChild(document.getElementById(data));
+	var idNegociacao = ev.dataTransfer.getData("text");
+	var categ = ev.target.id;
+	var leg = document.getElementById('leg'+categ);
+	var val = removerCaracteresNaoDigitos(document.getElementById('val'+idNegociacao).innerHTML);
+	if(isEmpty(val)){
+		val = 0;
+	}
+	var tot = removerCaracteresNaoDigitos(leg.innerHTML);
+	if(isEmpty(tot)){
+		tot = 0;
+	}
+	tot = parseFloat(val)+parseFloat(tot);
+	var request = $.ajax({
+		type : "post",
+		url : '<c:url value="/negociacao/alteracaocategoria/"/>'+idNegociacao,
+		data: {'categoria': categ}
+	});
+	request.done(function(response) {
+		ev.target.appendChild(document.getElementById(idNegociacao));
+		leg.innerHTML = leg.innerHTML.split(':')[0]+ ': R$' +tot; 
+	});
+	
+	request.fail(function(request, status) {
+		alert('Falha alteracao da categoria da negociacao => Status da requisicao: ' + status);
+	});
 };
 
 function allowDrop(ev) {
@@ -70,167 +95,30 @@ function drag(ev) {
 </script>
 </head>
 <body>
-<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<legend>Propostas Clientes</legend>
-	<div id="o1" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-	<div id="o11" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-	<div id="o12" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-	<div id="o13" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-	<div id="o14" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-	<div id="o15" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-	<div id="o16" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-	<div id="o17" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-	<div id="o18" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-	<div id="o19" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-	<div id="o181" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
+<c:forEach items="${relatorio.listaGrupo}" var="g">
+<fieldset id="${g.id}" class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
+	<legend id="leg${g.id}">${g.id.descricao}: R$ ${g.propriedades['valorTotal']}</legend>
+	<c:forEach items="${g.listaElemento}" var="neg">
+		<c:if test="${not empty neg}">
+		<div id="${neg.id}" class="block" draggable="true" ondragstart="drag(event)">
+			<a class="front" href="/deal/1" >
+				<span><strong>Orçamento Nº ${neg.idOrcamento}</strong></span>
+				<span id="val${neg.id}">R$ ${neg.valor}</span>
+			</a>
+			<a class="front" href="/deal/1" >
+				<span>${neg.nomeCliente}</span>
+			</a>
+			<a class="front" href="/deal/1" >
+				<span>${neg.nomeContato}</span>
+			</a>
+			<a class="front" href="/deal/1" >
+				<span>${neg.telefoneContato}</span>
+			</a>
+		</div>
+		</c:if>
+	</c:forEach>
 </fieldset>
-<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<legend>Primeiro contato</legend>
-	<div id="o2" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-</fieldset>
-<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<legend>Negócios Potenciais</legend>
-	<div id="o3" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-</fieldset>
-<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<legend>Projetos</legend>
-	<div id="o4" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-</fieldset>
-<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<legend>Prováveis</legend>
-	<div id="o5" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-</fieldset>
-<fieldset class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<legend>Começando</legend>
-	<div id="o6" class="block" draggable="true" ondragstart="drag(event)">
-		<a class="front" href="/deal/1" >
-			<span>Orçamento Nº 22425</span>
-			<span>R$13.428,36</span>
-		</a>
-		<a class="front" href="/deal/1" >
-			<span>Vitoria Industrial</span>
-		</a>
-	</div>
-</fieldset>
+</c:forEach>
+
 </body>
 </html>

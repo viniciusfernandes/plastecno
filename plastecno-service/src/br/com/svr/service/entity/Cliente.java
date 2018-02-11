@@ -35,10 +35,7 @@ import br.com.svr.service.validacao.annotation.InformacaoValidavel;
 @Table(name = "tb_cliente", schema = "vendas")
 @InformacaoValidavel
 public class Cliente implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4628886058991048859L;
+	private static final long serialVersionUID = 4605031735495403363L;
 
 	@InformacaoValidavel(intervaloComprimento = { 1, 15 }, tipoDocumento = TipoDocumento.CNPJ, nomeExibicao = "CNPJ do cliente")
 	private String cnpj;

@@ -8,6 +8,7 @@ import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.dao.GenericDAO;
 import br.com.svr.service.entity.crm.Negociacao;
+import br.com.svr.service.impl.util.QueryUtil;
 
 public class NegociacaoDAO extends GenericDAO<Negociacao> {
 	public NegociacaoDAO(EntityManager entityManager) {
@@ -19,6 +20,14 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 				.createQuery(
 						"update Negociacao n set n.categoriaNegociacao =:categoriaNegociacao where n.id=:idNegociacao")
 				.setParameter("categoriaNegociacao", categoriaNegociacao).setParameter("idNegociacao", idNegociacao)
+				.executeUpdate();
+	}
+
+	public void alterarSituacaoNegociacao(Integer idNegociacao, SituacaoNegociacao situacaoNegociacao) {
+		entityManager
+				.createQuery(
+						"update Negociacao n set n.situacaoNegociacao =:situacaoNegociacao where n.id=:idNegociacao")
+				.setParameter("situacaoNegociacao", situacaoNegociacao).setParameter("idNegociacao", idNegociacao)
 				.executeUpdate();
 	}
 
@@ -35,9 +44,17 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 		return super.pesquisarById(Negociacao.class, idNegociacao);
 	}
 
-	public List<Negociacao> pesquisarNegociacaoByIdVendedor(Integer idVendedor) {
+	public Integer pesquisarIdPedidoByIdNegociacao(Integer idNegociacao) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select n.idOrcamento from Negociacao n where n.id =:idNegociacao")
+						.setParameter("idNegociacao", idNegociacao), Integer.class, null);
+	}
+
+	public List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor) {
 		return entityManager
-				.createQuery("select n from Negociacao n where n.idVendedor = :idVendedor", Negociacao.class)
-				.setParameter("idVendedor", idVendedor).getResultList();
+				.createQuery(
+						"select n from Negociacao n where n.idVendedor = :idVendedor and n.situacaoNegociacao =:situacaoNegociacao",
+						Negociacao.class).setParameter("idVendedor", idVendedor)
+				.setParameter("situacaoNegociacao", SituacaoNegociacao.ABERTO).getResultList();
 	}
 }

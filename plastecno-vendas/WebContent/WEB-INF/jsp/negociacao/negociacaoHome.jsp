@@ -7,6 +7,9 @@
 <jsp:include page="/bloco/bloco_css.jsp"></jsp:include>
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/util.js?${versaoCache}"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${versaoCache}"/>"></script>
+
 
 <style type="text/css">
 .coluna {
@@ -36,7 +39,7 @@
 	margin-left: 0;
 }
 div.block {
-	padding: 0px 0 90px 0;
+	padding: 0px 0 80px 0;
 }
 
 div.block > a {
@@ -137,9 +140,36 @@ function removerDecoracaoColuna(coluna){
 		coluna.style.border = '1px solid #8AB66B';
 	}
 };
+
+function cancelarNegociacao(idNegociacao){
+	inicializarModalConfirmacao({
+		mensagem: 'Você tem certeza de que deseja CANCELAR esse item?',
+		confirmar: function(){
+			adicionarInputHiddenFormulario('formVazio', 'idNegociacao', idNegociacao);
+			var f = document.getElementById('formVazio');
+			f.action = '<c:url value="negociacao/cancelamento/"/>'+idNegociacao;
+			f.submit();
+		}
+	});
+};
+
+function aceitarNegociacao(idNegociacao){
+	inicializarModalConfirmacao({
+		mensagem: 'Você tem certeza de que deseja ACEITAR esse item?',
+		confirmar: function(){
+			adicionarInputHiddenFormulario('formVazio', 'idNegociacao', idNegociacao);
+			var f = document.getElementById('formVazio');
+			f.action = '<c:url value="negociacao/aceite/"/>'+idNegociacao;
+			f.submit();
+		}
+	});
+};
 </script>
 </head>
 <body>
+<jsp:include page="/bloco/bloco_mensagem.jsp" />
+<div id="modal"></div>
+<form id="formVazio" method="post"></form>
 <c:forEach items="${relatorio.listaGrupo}" var="g">
 <fieldset id="${g.id}" class="coluna" ondrop="drop(event)" ondragover="dragover(event)" ondragleave="dragleave(event)">
 	<legend id="leg${g.id}">
@@ -151,11 +181,15 @@ function removerDecoracaoColuna(coluna){
 	<c:forEach items="${g.listaElemento}" var="neg">
 		<c:if test="${not empty neg}">
 		<div id="${neg.id}" class="block" draggable="true" ondragstart="drag(event)" ondragover="dragover(event)">
-			<a style="width: 100%; float: left;" href="orcamento/${neg.idOrcamento}" draggable="false">
-				<span style="width: 100%; float: left;" draggable="false"><strong>Orçamento Nº ${neg.idOrcamento}</strong></span>
+			<a style="width: 75%; float: left;" href="orcamento/${neg.idOrcamento}" draggable="false">
+				<span style="width: 100%; float: left;" draggable="false"><strong>Orç. Nº ${neg.idOrcamento}</strong></span>
 				<span style="float: left;" draggable="false">R$</span>
 				<span style="float: left;" draggable="false">${neg.valor}</span>
 			</a>
+			<a style="width: 10%; float: left;" class="botaoVerificacaoFalhaPequeno" 
+				onclick="cancelarNegociacao(${neg.id})" title="Cancelar Negociação"></a>
+			<a style="width: 10%; float: left; margin-left: 2%" class="botaoVerificacaoEfetuadaPequeno" 
+				onclick="aceitarNegociacao(${neg.id})" title="Aceitar Negociação"></a>
 			<a class="front" href="javascript: void(0);" draggable="false">
 				<span>${neg.nomeCliente}</span>
 			</a>

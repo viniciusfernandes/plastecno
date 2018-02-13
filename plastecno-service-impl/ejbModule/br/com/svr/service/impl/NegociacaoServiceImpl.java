@@ -36,6 +36,13 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer aceitarNegocicacao(Integer idNegociacao) throws BusinessException {
+		negociacaoDAO.alterarSituacaoNegociacao(idNegociacao, SituacaoNegociacao.ACEITO);
+		return pedidoService.aceitarOrcamento(negociacaoDAO.pesquisarIdPedidoByIdNegociacao(idNegociacao));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterarCategoria(Integer idNegociacao, CategoriaNegociacao categoriaNegociacao)
 			throws BusinessException {
 		if (idNegociacao == null) {
@@ -51,6 +58,15 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double calcularValorCategoriaNegociacao(Integer idVendedor, CategoriaNegociacao categoria) {
 		return negociacaoDAO.calcularValorCategoriaNegociacaoAberta(idVendedor, categoria);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer cancelarNegocicacao(Integer idNegociacao) throws BusinessException {
+		negociacaoDAO.alterarSituacaoNegociacao(idNegociacao, SituacaoNegociacao.CANCELADO);
+		Integer idOrc = negociacaoDAO.pesquisarIdPedidoByIdNegociacao(idNegociacao);
+		pedidoService.cancelarOrcamento(idOrc);
+		return idOrc;
 	}
 
 	@Override
@@ -76,7 +92,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	public RelatorioWrapper<CategoriaNegociacao, Negociacao> gerarRelatorioNegociacao(Integer idVendedor) {
 		RelatorioWrapper<CategoriaNegociacao, Negociacao> rel = new RelatorioWrapper<CategoriaNegociacao, Negociacao>(
 				"RElatório de Negociações");
-		List<Negociacao> lNeg = pesquisarNegociacaoByIdVendedor(idVendedor);
+		List<Negociacao> lNeg = pesquisarNegociacaoAbertaByIdVendedor(idVendedor);
 		for (Negociacao n : lNeg) {
 			rel.addGrupo(n.getCategoriaNegociacao(), n);
 		}
@@ -90,7 +106,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 			}
 			g.setPropriedade("valorTotal", tot);
 		}
-		
+
 		// Adicionando os grupos que o usuario nao tem negociacao para que todos
 		// eles aparecem no relatorio.
 		GrupoWrapper<CategoriaNegociacao, Negociacao> gr = null;
@@ -159,7 +175,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<Negociacao> pesquisarNegociacaoByIdVendedor(Integer idVendedor) {
-		return negociacaoDAO.pesquisarNegociacaoByIdVendedor(idVendedor);
+	public List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor) {
+		return negociacaoDAO.pesquisarNegociacaoAbertaByIdVendedor(idVendedor);
 	}
 }

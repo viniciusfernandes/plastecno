@@ -5,6 +5,7 @@ import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.svr.service.NegociacaoService;
+import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
@@ -25,6 +26,19 @@ public class NegociacaoController extends AbstractController {
         super(result, usuarioInfo);
     }
 
+    @Post("negociacao/aceite/{idNegociacao}")
+    public void aceitarNegocicacao(Integer idNegociacao) {
+        Integer idOrcamento;
+        try {
+            idOrcamento = negociacaoService.aceitarNegocicacao(idNegociacao);
+            redirecTo(PedidoController.class).pesquisarPedidoById(idOrcamento, TipoPedido.REVENDA, true);
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+            irTopoPagina();
+        }
+
+    }
+
     @Post("negociacao/alteracaocategoria/{idNegociacao}")
     public void alterarCategoriaNegociacao(Integer idNegociacao, CategoriaNegociacao categoriaInicial,
             CategoriaNegociacao categoriaFinal) {
@@ -39,6 +53,16 @@ public class NegociacaoController extends AbstractController {
                     .calcularValorCategoriaNegociacao(idVendedor, categoriaFinal)));
 
             serializarJson(new SerializacaoJson("valores", v));
+        } catch (BusinessException e) {
+            gerarListaMensagemErro(e);
+        }
+        irTopoPagina();
+    }
+
+    @Post("negociacao/cancelamento/{idNegociacao}")
+    public void cancelarNegocicacao(Integer idNegociacao) {
+        try {
+            negociacaoService.cancelarNegocicacao(idNegociacao);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
@@ -63,7 +87,7 @@ public class NegociacaoController extends AbstractController {
         for (GrupoWrapper<CategoriaNegociacao, Negociacao> g : rel.getListaGrupo()) {
             g.setPropriedade("valorTotal", NumeroUtils.formatarValorMonetario((Double) g.getPropriedade("valorTotal")));
         }
-        
+
         addAtributo("relatorio", rel);
     }
 }

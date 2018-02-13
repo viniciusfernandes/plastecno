@@ -5,6 +5,8 @@
 <head>
 <jsp:include page="/bloco/bloco_header.jsp" />
 <jsp:include page="/bloco/bloco_css.jsp" />
+<script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${versaoCache}"/>"></script>
+
 </head>
 <body>
 	<div id="content">

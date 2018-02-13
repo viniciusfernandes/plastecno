@@ -12,6 +12,8 @@ import br.com.svr.service.wrapper.GrupoWrapper;
 import br.com.svr.service.wrapper.RelatorioWrapper;
 import br.com.svr.util.NumeroUtils;
 import br.com.svr.vendas.controller.anotacao.Servico;
+import br.com.svr.vendas.json.SerializacaoJson;
+import br.com.svr.vendas.json.ValorNegociacaoJson;
 import br.com.svr.vendas.login.UsuarioInfo;
 
 @Resource
@@ -24,9 +26,19 @@ public class NegociacaoController extends AbstractController {
     }
 
     @Post("negociacao/alteracaocategoria/{idNegociacao}")
-    public void alterarCategoriaNegociacao(Integer idNegociacao, CategoriaNegociacao categoria) {
+    public void alterarCategoriaNegociacao(Integer idNegociacao, CategoriaNegociacao categoriaInicial,
+            CategoriaNegociacao categoriaFinal) {
         try {
-            negociacaoService.alterarCategoria(idNegociacao, categoria);
+            negociacaoService.alterarCategoria(idNegociacao, categoriaFinal);
+            Integer idVendedor = getCodigoUsuario();
+
+            ValorNegociacaoJson v = new ValorNegociacaoJson();
+            v.setValorCategoriaInicial(NumeroUtils.formatarValorMonetario(negociacaoService
+                    .calcularValorCategoriaNegociacao(idVendedor, categoriaInicial)));
+            v.setValorCategoriaFinal(NumeroUtils.formatarValorMonetario(negociacaoService
+                    .calcularValorCategoriaNegociacao(idVendedor, categoriaFinal)));
+
+            serializarJson(new SerializacaoJson("valores", v));
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
@@ -45,17 +57,13 @@ public class NegociacaoController extends AbstractController {
 
     @Get("negociacao")
     public void negociacaoHome() {
-        RelatorioWrapper<CategoriaNegociacao, Negociacao> rel = negociacaoService.gerarRelatorioNegociacao(20);
+        RelatorioWrapper<CategoriaNegociacao, Negociacao> rel = negociacaoService
+                .gerarRelatorioNegociacao(getCodigoUsuario());
+
         for (GrupoWrapper<CategoriaNegociacao, Negociacao> g : rel.getListaGrupo()) {
             g.setPropriedade("valorTotal", NumeroUtils.formatarValorMonetario((Double) g.getPropriedade("valorTotal")));
         }
-        GrupoWrapper<CategoriaNegociacao, Negociacao> gr = null;
-        for (CategoriaNegociacao c : CategoriaNegociacao.values()) {
-            gr = rel.getGrupo(c);
-            if (gr == null) {
-                rel.addGrupo(c, null);
-            }
-        }
+        
         addAtributo("relatorio", rel);
     }
 }

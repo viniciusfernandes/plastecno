@@ -11,6 +11,8 @@ public interface NegociacaoService {
 
 	void alterarCategoria(Integer idNegociacao, CategoriaNegociacao categoriaNegociacao) throws BusinessException;
 
+	double calcularValorCategoriaNegociacao(Integer idVendedor, CategoriaNegociacao categoria);
+
 	void gerarNegociacaoInicial() throws BusinessException;
 
 	RelatorioWrapper<CategoriaNegociacao, Negociacao> gerarRelatorioNegociacao(Integer idVendedor);

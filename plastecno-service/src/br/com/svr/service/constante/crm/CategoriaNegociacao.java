@@ -1,8 +1,12 @@
 package br.com.svr.service.constante.crm;
 
 public enum CategoriaNegociacao {
-	PROPOSTA_CLIENTE("Proposta Cliente", 1), PRIMEIRO_CONTATO("Primeiro Contato", 2), POTENCIAIS("Potenciais", 3), PROJETOS(
-			"Projetos", 5), PROVAVEIS("Prováveis", 4), ESPECIAIS("Especiais", 6);
+	PROPOSTA_CLIENTE("Proposta Cliente", 1), 
+	PRIMEIRO_CONTATO("Primeiro Contato", 2), 
+	POTENCIAIS("Potenciais", 3), 
+	PROJETOS("Projetos", 5), 
+	PROVAVEIS("Prováveis", 4), 
+	ESPECIAIS("Especiais", 6);
 	private final String descricao;
 	private final Integer ordem;
 

@@ -48,6 +48,12 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public double calcularValorCategoriaNegociacao(Integer idVendedor, CategoriaNegociacao categoria) {
+		return negociacaoDAO.calcularValorCategoriaNegociacaoAberta(idVendedor, categoria);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void gerarNegociacaoInicial() throws BusinessException {
 		boolean contemNeg = QueryUtil.gerarRegistroUnico(
@@ -84,13 +90,25 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 			}
 			g.setPropriedade("valorTotal", tot);
 		}
+		
+		// Adicionando os grupos que o usuario nao tem negociacao para que todos
+		// eles aparecem no relatorio.
+		GrupoWrapper<CategoriaNegociacao, Negociacao> gr = null;
+		for (CategoriaNegociacao c : CategoriaNegociacao.values()) {
+			gr = rel.getGrupo(c);
+			if (gr == null) {
+				gr = rel.addGrupo(c, null);
+				gr.setPropriedade("valorTotal", 0d);
+			}
+		}
+
 		rel.sortGrupo(new Comparator<GrupoWrapper<CategoriaNegociacao, Negociacao>>() {
 
 			@Override
 			public int compare(GrupoWrapper<CategoriaNegociacao, Negociacao> g1,
 					GrupoWrapper<CategoriaNegociacao, Negociacao> g2) {
 
-				return g1.getId().compareTo(g2.getId());
+				return g1.getId().getOrdem().compareTo(g2.getId().getOrdem());
 			}
 		});
 		rel.sortElementoByGrupo(new Comparator<Negociacao>() {

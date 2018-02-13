@@ -53,13 +53,23 @@ div.block > a > span {
 fieldset.coluna > legend {
 	width: 90%;
 }
+
+a.front {
+	float: left;
+	text-decoration: none;
+	width: 100%; 
+}
 </style>
 <script type="text/javascript">
 function drop(ev) {
 	ev.preventDefault();
+	var coluna = recuperarColunaTarget(ev);
+	if(!isFieldset(coluna)){
+		return;
+	}
+	var categoriaFinal = coluna.id;
 	var idNegociacao = ev.dataTransfer.getData("idNegociacao");
 	var categoriaInicial = ev.dataTransfer.getData("categoriaInicial");
-	var categoriaFinal = ev.target.id;
 	
 	var valCategFinal = document.getElementById('totVal'+categoriaFinal);
 	var valCategInicial = document.getElementById('totVal'+categoriaInicial);
@@ -71,7 +81,7 @@ function drop(ev) {
 	});
 	request.done(function(response) {
 		var valores = response.valores;
-		document.getElementById(categoriaFinal).appendChild(document.getElementById(idNegociacao));
+		coluna.appendChild(document.getElementById(idNegociacao));
 		valCategFinal.innerHTML = valores.valorCategoriaFinal;
 		valCategInicial.innerHTML = valores.valorCategoriaInicial; 
 	});
@@ -79,21 +89,59 @@ function drop(ev) {
 	request.fail(function(request, status) {
 		alert('Falha alteracao da categoria da negociacao => Status da requisicao: ' + status);
 	});
+	
+	request.always(function(response){
+		removerDecoracaoColuna(coluna);
+	});
 };
 
-function allowDrop(ev) {
+function dragleave(ev) {
     ev.preventDefault();
+    var col = recuperarColunaTarget(ev);
+    removerDecoracaoColuna(col)
+};
+
+function dragover(ev) {
+    ev.preventDefault();
+    var col = recuperarColunaTarget(ev);
+    decorarColuna(col);
 };
 
 function drag(ev) {
     ev.dataTransfer.setData("idNegociacao", ev.target.id);
     ev.dataTransfer.setData("categoriaInicial", ev.target.parentNode.id);
 };
+
+function recuperarColunaTarget(ev){
+	if(ev.target.nodeName == 'DIV'){
+		return ev.target.parentNode;
+	}
+	if(ev.target.nodeName == 'A'){
+		return ev.target.parentNode.parentNode;
+	}
+	return ev.target;	
+};
+
+function isFieldset(tag){
+	return tag.nodeName =='FIELDSET';
+}
+
+function decorarColuna(coluna){
+	if(isFieldset(coluna)){
+		coluna.style.border = '1px solid #ffd700';
+	}
+};
+
+function removerDecoracaoColuna(coluna){
+	if(isFieldset(coluna)){
+		coluna.style.border = '1px solid #8AB66B';
+	}
+};
 </script>
 </head>
 <body>
 <c:forEach items="${relatorio.listaGrupo}" var="g">
-<fieldset id="${g.id}" class="coluna" ondrop="drop(event)" ondragover="allowDrop(event)">
+<fieldset id="${g.id}" class="coluna" ondrop="drop(event)" ondragover="dragover(event)" ondragleave="dragleave(event)">
 	<legend id="leg${g.id}">
 		<span style="width: 100%; float: left;"><strong>${g.id.descricao}: </strong> </span>  
 		<span style="width: 100%; float: left;">R$
@@ -102,19 +150,19 @@ function drag(ev) {
 	</legend>
 	<c:forEach items="${g.listaElemento}" var="neg">
 		<c:if test="${not empty neg}">
-		<div id="${neg.id}" class="block" draggable="true" ondragstart="drag(event)">
-			<a class="front" href="/deal/1" draggable="false">
+		<div id="${neg.id}" class="block" draggable="true" ondragstart="drag(event)" ondragover="dragover(event)">
+			<a style="width: 100%; float: left;" href="orcamento/${neg.idOrcamento}" draggable="false">
 				<span style="width: 100%; float: left;" draggable="false"><strong>Orçamento Nº ${neg.idOrcamento}</strong></span>
 				<span style="float: left;" draggable="false">R$</span>
 				<span style="float: left;" draggable="false">${neg.valor}</span>
 			</a>
-			<a class="front" href="/deal/1" draggable="false">
+			<a class="front" href="javascript: void(0);" draggable="false">
 				<span>${neg.nomeCliente}</span>
 			</a>
-			<a class="front" href="/deal/1" draggable="false">
+			<a class="front" href="javascript: void(0);" draggable="false">
 				<span>${neg.nomeContato}</span>
 			</a>
-			<a class="front" href="/deal/1" draggable="false">
+			<a class="front" href="javascript: void(0);" draggable="false">
 				<span>${neg.telefoneContato}</span>
 			</a>
 		</div>

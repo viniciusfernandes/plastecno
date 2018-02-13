@@ -67,13 +67,16 @@ a.front {
 function drop(ev) {
 	ev.preventDefault();
 	var coluna = recuperarColunaTarget(ev);
-	if(!isFieldset(coluna)){
-		return;
-	}
+	
 	var categoriaFinal = coluna.id;
 	var idNegociacao = ev.dataTransfer.getData("idNegociacao");
 	var categoriaInicial = ev.dataTransfer.getData("categoriaInicial");
 	
+	if(!isFieldset(coluna)){
+		var colInicial = document.getElementById(categoriaInicial);
+		colInicial.appendChild(idNegociacao);
+		return;
+	}
 	var valCategFinal = document.getElementById('totVal'+categoriaFinal);
 	var valCategInicial = document.getElementById('totVal'+categoriaInicial);
 	
@@ -131,13 +134,15 @@ function isFieldset(tag){
 
 function decorarColuna(coluna){
 	if(isFieldset(coluna)){
-		coluna.style.border = '1px solid #ffd700';
+		$(coluna).css('border', '1px solid #ffd700');
+		$('#legend'+coluna.id).css('background', '#CCAA04').css('border-color', '#CCAA04');
 	}
 };
 
 function removerDecoracaoColuna(coluna){
 	if(isFieldset(coluna)){
-		coluna.style.border = '1px solid #8AB66B';
+		$(coluna).css('border', '1px solid #8AB66B');
+		$('#legend'+coluna.id).css('background', '#8AB66B').css('border-color', '#8AB66B');
 	}
 };
 
@@ -172,7 +177,7 @@ function aceitarNegociacao(idNegociacao){
 <form id="formVazio" method="post"></form>
 <c:forEach items="${relatorio.listaGrupo}" var="g">
 <fieldset id="${g.id}" class="coluna" ondrop="drop(event)" ondragover="dragover(event)" ondragleave="dragleave(event)">
-	<legend id="leg${g.id}">
+	<legend id="legend${g.id}">
 		<span style="width: 100%; float: left;"><strong>${g.id.descricao}: </strong> </span>  
 		<span style="width: 100%; float: left;">R$
 			<span id="totVal${g.id}" >${g.propriedades['valorTotal']}</span>

@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
+import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.dao.GenericDAO;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.impl.util.QueryUtil;
@@ -28,6 +29,13 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 				.createQuery(
 						"update Negociacao n set n.situacaoNegociacao =:situacaoNegociacao where n.id=:idNegociacao")
 				.setParameter("situacaoNegociacao", situacaoNegociacao).setParameter("idNegociacao", idNegociacao)
+				.executeUpdate();
+	}
+
+	public void alterarTipoNaoFechamento(Integer idNegociacao, TipoNaoFechamento tipoNaoFechamento) {
+		entityManager
+				.createQuery("update Negociacao n set n.tipoNaoFechamento =:tipoNaoFechamento where n.id=:idNegociacao")
+				.setParameter("tipoNaoFechamento", tipoNaoFechamento).setParameter("idNegociacao", idNegociacao)
 				.executeUpdate();
 	}
 

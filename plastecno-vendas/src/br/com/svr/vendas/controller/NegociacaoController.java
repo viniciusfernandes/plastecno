@@ -7,6 +7,7 @@ import br.com.caelum.vraptor.Result;
 import br.com.svr.service.NegociacaoService;
 import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
+import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.wrapper.GrupoWrapper;
@@ -48,9 +49,9 @@ public class NegociacaoController extends AbstractController {
 
             ValorNegociacaoJson v = new ValorNegociacaoJson();
             v.setValorCategoriaInicial(NumeroUtils.formatarValorMonetario(negociacaoService
-                    .calcularValorCategoriaNegociacao(idVendedor, categoriaInicial)));
+                    .calcularValorCategoriaNegociacaoAberta(idVendedor, categoriaInicial)));
             v.setValorCategoriaFinal(NumeroUtils.formatarValorMonetario(negociacaoService
-                    .calcularValorCategoriaNegociacao(idVendedor, categoriaFinal)));
+                    .calcularValorCategoriaNegociacaoAberta(idVendedor, categoriaFinal)));
 
             serializarJson(new SerializacaoJson("valores", v));
         } catch (BusinessException e) {
@@ -60,23 +61,40 @@ public class NegociacaoController extends AbstractController {
     }
 
     @Post("negociacao/cancelamento/{idNegociacao}")
-    public void cancelarNegocicacao(Integer idNegociacao) {
+    public void cancelarNegocicacao(Integer idNegociacao, TipoNaoFechamento motivo) {
         try {
-            negociacaoService.cancelarNegocicacao(idNegociacao);
+            negociacaoService.cancelarNegocicacao(idNegociacao, motivo);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
         }
         irTopoPagina();
     }
 
-    @Get("negociacao/gerarnegociacao")
+    @Get("negociacao/geracaoindiceconversaocliente")
+    public void gerarIndiceConversaoCliente() {
+        try {
+            System.out.println("INICIO de geracao de indice de conversao...");
+
+            negociacaoService.gerarIndiceConversaoCliente();
+
+            System.out.println("FIM de geracao de indice de conversao...");
+        } catch (BusinessException e) {
+            gerarLogErro("Geracao indice de conversao", e);
+        }
+    }
+
+    @Get("negociacao/geracaonegociacao")
     public void gerarNegociacao() {
         try {
+            System.out.println("INICIO de geracao de negociacao...");
+
             negociacaoService.gerarNegociacaoInicial();
+
+            System.out.println("FIM de geracao de negociacao...");
         } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
+            gerarLogErro("Geracao de negociacao", e);
         }
-        irTopoPagina();
+        // irTopoPagina();
     }
 
     @Get("negociacao")
@@ -89,5 +107,10 @@ public class NegociacaoController extends AbstractController {
         }
 
         addAtributo("relatorio", rel);
+        addAtributo("motivoPagamento", TipoNaoFechamento.FORMA_PAGAMENTO);
+        addAtributo("motivoFrete", TipoNaoFechamento.FRETE);
+        addAtributo("motivoOutros", TipoNaoFechamento.OUTROS);
+        addAtributo("motivoEntrega", TipoNaoFechamento.PRAZO_ENTREGA);
+        addAtributo("motivoPreco", TipoNaoFechamento.PRECO);
     }
 }

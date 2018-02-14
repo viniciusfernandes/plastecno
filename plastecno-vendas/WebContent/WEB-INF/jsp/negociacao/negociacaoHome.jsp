@@ -147,15 +147,39 @@ function removerDecoracaoColuna(coluna){
 };
 
 function cancelarNegociacao(idNegociacao){
-	inicializarModalConfirmacao({
-		mensagem: 'Você tem certeza de que deseja CANCELAR esse item?',
-		confirmar: function(){
-			adicionarInputHiddenFormulario('formVazio', 'idNegociacao', idNegociacao);
-			var f = document.getElementById('formVazio');
-			f.action = '<c:url value="negociacao/cancelamento/"/>'+idNegociacao;
-			f.submit();
-		}
-	});
+	var cancelar = function(motivo){
+		adicionarInputHiddenFormulario('formVazio', 'idNegociacao', idNegociacao);
+		adicionarInputHiddenFormulario('formVazio', 'motivo', motivo);
+		
+		var f = document.getElementById('formVazio');
+		f.action = '<c:url value="negociacao/cancelamento/"/>'+idNegociacao;
+		f.submit();
+	};
+	inicializarModal({
+		mensagem: 'Qual é o motivo do CANCELAMENTO?',
+		botoes: {
+				"Preço" : function() {
+					cancelar('${motivoPreco}');
+					$(this).dialog("close");
+				},
+				"Frete" : function() {
+					cancelar('${motivoFrete}');
+					$(this).dialog("close");
+				},
+				"Pagamento" : function() {
+					cancelar('${motivoPagamento}');
+					$(this).dialog("close");
+				},
+				"Entrega" : function() {
+					cancelar('${motivoEntrega}');
+					$(this).dialog("close");
+				},
+				"Outros" : function() {
+					cancelar('${motivoOutros}');
+					$(this).dialog("close");
+				}
+			}
+		});
 };
 
 function aceitarNegociacao(idNegociacao){

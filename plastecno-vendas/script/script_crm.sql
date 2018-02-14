@@ -53,10 +53,18 @@ ALTER TABLE crm.tb_negociacao ADD PRIMARY KEY (id);
 ALTER TABLE crm.tb_negociacao ADD CONSTRAINT id_situacao_negociacao FOREIGN KEY (id_situacao_negociacao) REFERENCES crm.tb_situacao_negociacao(id);
 ALTER TABLE crm.tb_negociacao ADD CONSTRAINT id_categoria_negociacao FOREIGN KEY (id_categoria_negociacao) REFERENCES crm.tb_categoria_negociacao(id);
 ALTER TABLE crm.tb_negociacao ADD CONSTRAINT id_tipo_nao_fechamento  FOREIGN KEY (id_tipo_nao_fechamento) REFERENCES crm.tb_tipo_nao_fechamento (id);
-create index idx_id_vendedor on crm.tb_negociacao (id_vendedor);
-create index idx_id_orcamento on crm.tb_negociacao (id_orcamento);
-
+create index idx_negociacao_id_vendedor on crm.tb_negociacao (id_vendedor);
+create index idx_negociacao_id_orcamento on crm.tb_negociacao (id_orcamento);
 
 create sequence crm.seq_negociacao_id increment by 1 minvalue 1 no maxvalue start with 1;
 
+create table crm.tb_indice_conversao (
+	id integer not null,
+	id_cliente integer not null,
+	indice_conversao_valor numeric(9, 5) default 0,
+	indice_conversao_quantidade numeric(9, 5) default 0
+);
+ALTER TABLE crm.tb_indice_conversao ADD PRIMARY KEY (id);
+create index idx_indice_conversao_id_cliente on crm.tb_indice_conversao (id_cliente);
+create sequence crm.seq_indice_conversao_id increment by 1 minvalue 1 no maxvalue start with 1;
 

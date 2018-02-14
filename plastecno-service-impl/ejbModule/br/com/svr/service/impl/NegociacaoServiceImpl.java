@@ -18,6 +18,7 @@ import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.dao.crm.NegociacaoDAO;
+import br.com.svr.service.entity.crm.IndiceConversao;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.util.QueryUtil;
@@ -56,17 +57,65 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public double calcularValorCategoriaNegociacao(Integer idVendedor, CategoriaNegociacao categoria) {
+	public double calcularValorCategoriaNegociacaoAberta(Integer idVendedor, CategoriaNegociacao categoria) {
 		return negociacaoDAO.calcularValorCategoriaNegociacaoAberta(idVendedor, categoria);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer cancelarNegocicacao(Integer idNegociacao) throws BusinessException {
+	public Integer cancelarNegocicacao(Integer idNegociacao, TipoNaoFechamento tipoNaoFechamento)
+			throws BusinessException {
 		negociacaoDAO.alterarSituacaoNegociacao(idNegociacao, SituacaoNegociacao.CANCELADO);
+		negociacaoDAO.alterarTipoNaoFechamento(idNegociacao, tipoNaoFechamento);
 		Integer idOrc = negociacaoDAO.pesquisarIdPedidoByIdNegociacao(idNegociacao);
 		pedidoService.cancelarOrcamento(idOrc);
 		return idOrc;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void gerarIndiceConversaoCliente() throws BusinessException {
+		List<Integer> lIdCliente = entityManager.createQuery("select c.id from Cliente c", Integer.class)
+				.getResultList();
+		List<Object[]> lIdPed = null;
+		Double vOrc = null;
+		Double vPed = null;
+		double idxValor = 0;
+		int qtdePed = 0;
+		IndiceConversao indConv = null;
+		for (Integer idCli : lIdCliente) {
+			lIdPed = entityManager
+					.createQuery(
+							"select p.id, p.idOrcamento, p.valorPedido from Pedido p where p.idOrcamento != null and p.cliente.id =:idCliente",
+							Object[].class).setParameter("idCliente", idCli).getResultList();
+			qtdePed = lIdPed.size();
+
+			if (qtdePed <= 0) {
+				continue;
+			}
+			idxValor = 0;
+			for (Object[] ids : lIdPed) {
+				vPed = (Double) ids[2];
+				vOrc = entityManager.createQuery("select p.valorPedido from Pedido p where p.id =:idOrc", Double.class)
+						.setParameter("idOrc", ids[1]).getSingleResult();
+				if (vOrc == null || vPed == null || vOrc == 0d || vPed == 0d) {
+					continue;
+				}
+				idxValor += vOrc / vPed;
+			}
+
+			idxValor /= qtdePed;
+			indConv = new IndiceConversao();
+			indConv.setIndiceValor(idxValor);
+			indConv.setIdCliente(idCli);
+			try {
+				entityManager.persist(indConv);
+				entityManager.flush();
+			} catch (Exception e) {
+				System.out.println("idx=" + idxValor + " valPed=" + vPed + " valOrc=" + vOrc);
+				return;
+			}
+		}
 	}
 
 	@Override

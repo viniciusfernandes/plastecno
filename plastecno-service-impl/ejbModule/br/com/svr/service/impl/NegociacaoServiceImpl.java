@@ -198,14 +198,17 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 			throw new BusinessException("É necessário um ID de orçamento para a inclusão de uma negociação");
 		}
 		Object[] dados = pedidoService.pesquisarNomeClienteNomeContatoValor(idOrcamento);
+		Double idxConvValor = negociacaoDAO.pesquisarIndiceConversaoValorByIdCliente((Integer) dados[0]);
+		
 		Negociacao n = new Negociacao();
 		n.setCategoriaNegociacao(CategoriaNegociacao.PROPOSTA_CLIENTE);
 		n.setIdOrcamento(idOrcamento);
-		n.setNomeCliente((String) dados[0]);
-		n.setNomeContato(dados[2] == null ? null : (String) dados[2]);
+		n.setIndiceConversaoValor(idxConvValor);
+		n.setNomeCliente((String) dados[1]);
+		n.setNomeContato(dados[3] == null ? null : (String) dados[3]);
 		n.setSituacaoNegociacao(SituacaoNegociacao.ABERTO);
-		n.setTelefoneContato(dados[3] == null ? null : ((dados[1] == null ? "" : dados[1]) + "-" + dados[3]));
-		n.setValor(dados[4] == null ? 0d : (double) dados[4]);
+		n.setTelefoneContato(dados[4] == null ? null : ((dados[2] == null ? "" : dados[2]) + "-" + dados[4]));
+		n.setValor(dados[5] == null ? 0d : (double) dados[5]);
 		n.setTipoNaoFechamento(TipoNaoFechamento.OK);
 
 		// Aqui eh possivel que outro vendedor realize uma negociacao iniciado

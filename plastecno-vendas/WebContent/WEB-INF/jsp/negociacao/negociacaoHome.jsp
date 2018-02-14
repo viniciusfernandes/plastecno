@@ -39,7 +39,7 @@
 	margin-left: 0;
 }
 div.block {
-	padding: 0px 0 80px 0;
+	padding: 0px 0 90px 0;
 }
 
 div.block > a {
@@ -221,6 +221,9 @@ function aceitarNegociacao(idNegociacao){
 				onclick="aceitarNegociacao(${neg.id})" title="Aceitar Negociação"></a>
 			<a class="front" href="javascript: void(0);" draggable="false">
 				<span>${neg.nomeCliente}</span>
+			</a>
+			<a class="front" href="javascript: void(0);" draggable="false">
+				<span>Conversão: ${neg.indiceConversaoValor}</span>
 			</a>
 			<a class="front" href="javascript: void(0);" draggable="false">
 				<span>${neg.nomeContato}</span>

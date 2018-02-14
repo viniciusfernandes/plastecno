@@ -316,7 +316,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				.gerarRegistroUnico(
 						entityManager
 								.createQuery(
-										"select p.cliente.nomeFantasia,  p.contato.ddd, p.contato.nome, p.contato.telefone, p.valorPedido from Pedido p where p.id=:idPedido")
+										"select p.cliente.id, p.cliente.nomeFantasia,  p.contato.ddd, p.contato.nome, p.contato.telefone, p.valorPedido from Pedido p where p.id=:idPedido")
 								.setParameter("idPedido", idPedido), Object[].class, null);
 	}
 

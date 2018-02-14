@@ -47,14 +47,18 @@ public class Negociacao implements Serializable {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Vendedor da negociação")
 	private Integer idVendedor;
 
+	@Column(name = "indice_conversao_valor")
+	private double indiceConversaoValor;
+
 	@Column(name = "nome_cliente")
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Nome do cliente da negociação")
 	private String nomeCliente;
 
+
 	@Column(name = "nome_contato")
 	@InformacaoValidavel(nomeExibicao = "Nome do contato da negociação")
 	private String nomeContato;
-
+	
 	@Column(name = "id_situacao_negociacao")
 	@Enumerated(EnumType.ORDINAL)
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Situação da negociação")
@@ -95,6 +99,10 @@ public class Negociacao implements Serializable {
 
 	public Integer getIdVendedor() {
 		return idVendedor;
+	}
+
+	public double getIndiceConversaoValor() {
+		return indiceConversaoValor;
 	}
 
 	public String getNomeCliente() {
@@ -143,6 +151,10 @@ public class Negociacao implements Serializable {
 
 	public void setIdVendedor(Integer idVendedor) {
 		this.idVendedor = idVendedor;
+	}
+
+	public void setIndiceConversaoValor(double indiceConversaoValor) {
+		this.indiceConversaoValor = indiceConversaoValor;
 	}
 
 	public void setNomeCliente(String nomeCliente) {

@@ -37,7 +37,7 @@ insert into crm.tb_tipo_nao_fechamento values (5, 'OUTROS');
 
 create table crm.tb_negociacao (
 	id integer not null,
-	id_orcamento integer not null,
+	id_orcamento integer not null unique,
 	id_situacao_negociacao integer not null,
 	id_tipo_nao_fechamento integer not null,
 	id_vendedor integer not null,
@@ -47,7 +47,8 @@ create table crm.tb_negociacao (
 	nome_cliente varchar(150) not null,
 	nome_contato varchar(100) default null,
 	telefone_contato varchar(15) default null,
-	valor numeric(10, 2) default 0
+	valor numeric(10, 2) default 0,
+	indice_conversao_valor numeric(9, 5) default 0
 );
 ALTER TABLE crm.tb_negociacao ADD PRIMARY KEY (id);
 ALTER TABLE crm.tb_negociacao ADD CONSTRAINT id_situacao_negociacao FOREIGN KEY (id_situacao_negociacao) REFERENCES crm.tb_situacao_negociacao(id);
@@ -60,7 +61,7 @@ create sequence crm.seq_negociacao_id increment by 1 minvalue 1 no maxvalue star
 
 create table crm.tb_indice_conversao (
 	id integer not null,
-	id_cliente integer not null,
+	id_cliente integer not null unique,
 	indice_conversao_valor numeric(9, 5) default 0,
 	indice_conversao_quantidade numeric(9, 5) default 0
 );

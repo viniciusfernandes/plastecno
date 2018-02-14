@@ -58,6 +58,12 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 						.setParameter("idNegociacao", idNegociacao), Integer.class, null);
 	}
 
+	public double pesquisarIndiceConversaoValorByIdCliente(Integer idCliente) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.indiceValor from IndiceConversao i where i.idCliente =:idCliente")
+						.setParameter("idCliente", idCliente), Double.class, 0d);
+	}
+
 	public List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor) {
 		return entityManager
 				.createQuery(

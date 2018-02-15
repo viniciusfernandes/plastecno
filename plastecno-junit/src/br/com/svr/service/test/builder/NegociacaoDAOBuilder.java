@@ -16,10 +16,21 @@ public class NegociacaoDAOBuilder extends DAOBuilder<NegociacaoDAO> {
 	public NegociacaoDAO build() {
 
 		new MockUp<NegociacaoDAO>() {
+			@Mock
+			public void alterarSituacaoNegociacao(Integer idNegociacao, SituacaoNegociacao situacaoNegociacao) {
+				REPOSITORY.alterarEntidadeAtributoById(Negociacao.class, idNegociacao, "situacaoNegociacao",
+						situacaoNegociacao);
+			}
 
 			@Mock
 			public Negociacao pesquisarById(Integer id) {
 				return REPOSITORY.pesquisarEntidadeById(Negociacao.class, id);
+			}
+
+			@Mock
+			public Integer pesquisarIdPedidoByIdNegociacao(Integer idNegociacao) {
+				Negociacao n = REPOSITORY.pesquisarEntidadeById(Negociacao.class, idNegociacao);
+				return n != null ? n.getOrcamento().getId() : null;
 			}
 
 			@Mock
@@ -36,10 +47,10 @@ public class NegociacaoDAOBuilder extends DAOBuilder<NegociacaoDAO> {
 			@Mock
 			public List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor) {
 				List<Negociacao> lNeg = REPOSITORY.pesquisarTodos(Negociacao.class);
-				List<Negociacao> l = new ArrayList<>(lNeg);
+				List<Negociacao> l = new ArrayList<>();
 				for (Negociacao n : lNeg) {
 					if (idVendedor.equals(n.getIdVendedor())
-							|| SituacaoNegociacao.ABERTO.equals(n.getSituacaoNegociacao())) {
+							&& SituacaoNegociacao.ABERTO.equals(n.getSituacaoNegociacao())) {
 						l.add(n);
 					}
 				}

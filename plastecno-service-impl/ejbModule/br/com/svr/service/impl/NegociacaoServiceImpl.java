@@ -18,6 +18,7 @@ import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.dao.crm.NegociacaoDAO;
+import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.crm.IndiceConversao;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
@@ -199,16 +200,15 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 		}
 		Object[] dados = pedidoService.pesquisarIdNomeClienteNomeContatoValor(idOrcamento);
 		Double idxConvValor = negociacaoDAO.pesquisarIndiceConversaoValorByIdCliente((Integer) dados[0]);
-		
+
 		Negociacao n = new Negociacao();
 		n.setCategoriaNegociacao(CategoriaNegociacao.PROPOSTA_CLIENTE);
-		n.setIdOrcamento(idOrcamento);
+		n.setOrcamento(new Pedido(idOrcamento));
 		n.setIndiceConversaoValor(idxConvValor);
 		n.setNomeCliente((String) dados[1]);
 		n.setNomeContato(dados[3] == null ? null : (String) dados[3]);
 		n.setSituacaoNegociacao(SituacaoNegociacao.ABERTO);
 		n.setTelefoneContato(dados[4] == null ? null : ((dados[2] == null ? "" : dados[2]) + "-" + dados[4]));
-		n.setValor(dados[5] == null ? 0d : (double) dados[5]);
 		n.setTipoNaoFechamento(TipoNaoFechamento.OK);
 
 		// Aqui eh possivel que outro vendedor realize uma negociacao iniciado

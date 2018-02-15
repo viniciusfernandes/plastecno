@@ -7,15 +7,20 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
+import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.validacao.annotation.InformacaoValidavel;
 
 @Entity
@@ -39,8 +44,7 @@ public class Negociacao implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "negociacaoSequence")
 	private Integer id;
 
-	@Column(name = "id_orcamento")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Orçamento da negociação")
+	@Transient
 	private Integer idOrcamento;
 
 	@Column(name = "id_vendedor")
@@ -54,11 +58,15 @@ public class Negociacao implements Serializable {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Nome do cliente da negociação")
 	private String nomeCliente;
 
-
 	@Column(name = "nome_contato")
 	@InformacaoValidavel(nomeExibicao = "Nome do contato da negociação")
 	private String nomeContato;
-	
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_orcamento", referencedColumnName = "id", nullable = false)
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Orçamento da negociação")
+	private Pedido orcamento;
+
 	@Column(name = "id_situacao_negociacao")
 	@Enumerated(EnumType.ORDINAL)
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Situação da negociação")
@@ -73,9 +81,27 @@ public class Negociacao implements Serializable {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Tipo de não-fechamento da negociação")
 	private TipoNaoFechamento tipoNaoFechamento;
 
-	@Column(name = "valor")
-	@InformacaoValidavel(nomeExibicao = "Valor da negociação")
+	@Transient
 	private double valor;
+
+	public Negociacao() {
+	}
+
+	/*
+	 * Construtor utilizado na geracao do relatorio de negociacao
+	 */
+	public Negociacao(CategoriaNegociacao categoriaNegociacao, Integer id, Integer idOrcamento,
+			Double indiceConversaoValor, String nomeCliente, String nomeContato, String telefoneContato, Double valor) {
+		super();
+		this.categoriaNegociacao = categoriaNegociacao;
+		this.id = id;
+		this.idOrcamento = idOrcamento;
+		this.indiceConversaoValor = indiceConversaoValor == null ? 0d : indiceConversaoValor;
+		this.nomeCliente = nomeCliente;
+		this.nomeContato = nomeContato;
+		this.telefoneContato = telefoneContato;
+		this.valor = valor == null ? 0 : valor;
+	}
 
 	public CategoriaNegociacao getCategoriaNegociacao() {
 		return categoriaNegociacao;
@@ -111,6 +137,10 @@ public class Negociacao implements Serializable {
 
 	public String getNomeContato() {
 		return nomeContato;
+	}
+
+	public Pedido getOrcamento() {
+		return orcamento;
 	}
 
 	public SituacaoNegociacao getSituacaoNegociacao() {
@@ -163,6 +193,10 @@ public class Negociacao implements Serializable {
 
 	public void setNomeContato(String nomeContato) {
 		this.nomeContato = nomeContato;
+	}
+
+	public void setOrcamento(Pedido orcamento) {
+		this.orcamento = orcamento;
 	}
 
 	public void setSituacaoNegociacao(SituacaoNegociacao situacaoNegociacao) {

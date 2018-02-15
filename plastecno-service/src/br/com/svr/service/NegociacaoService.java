@@ -29,5 +29,4 @@ public interface NegociacaoService {
 	Negociacao pesquisarById(Integer idNegociacao);
 
 	List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor);
-
 }

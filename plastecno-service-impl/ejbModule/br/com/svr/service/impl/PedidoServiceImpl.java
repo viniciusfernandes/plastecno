@@ -138,12 +138,16 @@ public class PedidoServiceImpl implements PedidoService {
 			throw new BusinessException(
 					"Apenas os orçamentos em digitação ou enviados podem ser aceitos para um novo pedido.");
 		}
-
-		Integer idPedido = copiarPedido(idOrcamento, true);
-
+		// Efetuando o aceito do orcamento
 		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.ORCAMENTO_ACEITO);
 
-		// O pedido deve ir para digitacao
+		// Aqui estamos configurando isOrcamento == false pois as informacoes do
+		// orcamento serao copiadas para um pedido de venda. Alem disso, vamos
+		// usar esse fato para evitar da criacao de novas Negociacoes para o
+		// orcamento que ja foi aceito.
+		Integer idPedido = copiarPedido(idOrcamento, false);
+
+		// Garantindo que o pedido deve ir para digitacao
 		alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.DIGITACAO);
 
 		// Amarrando o pedido ao orcamento para o aceite. Isso sera utilizado em
@@ -679,6 +683,7 @@ public class PedidoServiceImpl implements PedidoService {
 		pClone.setValorParcelaNF(null);
 		pClone.setValorTotalNF(null);
 		pClone.setListaLogradouro(null);
+		pClone.setIdOrcamento(null);
 		pClone.setSituacaoPedido(isOrcamento ? SituacaoPedido.ORCAMENTO_DIGITACAO : SituacaoPedido.DIGITACAO);
 		pClone = inserirPedido(pClone);
 
@@ -1217,8 +1222,11 @@ public class PedidoServiceImpl implements PedidoService {
 
 			orcamento.setCliente(clienteService.inserir(cliente));
 		}
+
 		Pedido orc = inserir(orcamento);
-		negociacaoService.inserirNegociacao(orc.getId(), orc.getVendedor().getId());
+		if (orc.isOrcamentoDigitacao()) {
+			negociacaoService.inserirNegociacao(orc.getId(), orc.getVendedor().getId());
+		}
 		return orc;
 	}
 
@@ -1471,6 +1479,12 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Object[] pesquisarIdNomeClienteNomeContatoValor(Integer idPedido) {
+		return pedidoDAO.pesquisarIdNomeClienteNomeContatoValor(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarIdPedidoAguardandoCompra() {
 		return pedidoDAO.pesquisarIdPedidoBySituacaoPedido(SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
 	}
@@ -1704,12 +1718,6 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<LogradouroPedido> pesquisarLogradouro(Integer idPedido, TipoLogradouro tipo) {
 		return pedidoDAO.pesquisarLogradouro(idPedido, tipo);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Object[] pesquisarIdNomeClienteNomeContatoValor(Integer idPedido) {
-		return pedidoDAO.pesquisarIdNomeClienteNomeContatoValor(idPedido);
 	}
 
 	@Override

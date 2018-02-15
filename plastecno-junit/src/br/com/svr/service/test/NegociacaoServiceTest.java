@@ -26,6 +26,22 @@ public class NegociacaoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testAceiteNegociacao() {
+		Pedido o = gPedido.gerarOrcamento();
+		List<Negociacao> lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
+		assertEquals("Deve existir apenas 1 negociacao por orcamento incluido.", (Integer) 1, (Integer) lNeg.size());
+
+		Negociacao n = lNeg.get(0);
+		try {
+			negociacaoService.aceitarNegocicacao(n.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
+		assertEquals("Nao deve existir negociacao apos o orcamento aceito.", (Integer) 0, (Integer) lNeg.size());
+	}
+
+	@Test
 	public void testInclusaoNegociacao() {
 		Pedido o = gPedido.gerarOrcamento();
 		Integer idNeg = null;
@@ -41,7 +57,8 @@ public class NegociacaoServiceTest extends AbstractTest {
 				CategoriaNegociacao.PROPOSTA_CLIENTE, n.getCategoriaNegociacao());
 		assertEquals("O vendedor da negociacao deve ser o mesmo do orcamento.", o.getVendedor().getId(),
 				n.getIdVendedor());
-		assertEquals("O id do orcamento da negociacao deve ser o mesmo do orcamento.", o.getId(), n.getIdOrcamento());
+		assertEquals("O id do orcamento da negociacao deve ser o mesmo do orcamento.", o.getId(), n.getOrcamento()
+				.getId());
 		assertEquals("O tipo de nao fechamento da negociacao deve ser OK na inclusao.", TipoNaoFechamento.OK,
 				n.getTipoNaoFechamento());
 
@@ -65,7 +82,8 @@ public class NegociacaoServiceTest extends AbstractTest {
 				CategoriaNegociacao.PROPOSTA_CLIENTE, n.getCategoriaNegociacao());
 		assertEquals("O vendedor da negociacao deve ser o mesmo do orcamento.", o.getVendedor().getId(),
 				n.getIdVendedor());
-		assertEquals("O id do orcamento da negociacao deve ser o mesmo do orcamento.", o.getId(), n.getIdOrcamento());
+		assertEquals("O id do orcamento da negociacao deve ser o mesmo do orcamento.", o.getId(), n.getOrcamento()
+				.getId());
 		assertEquals("O tipo de nao fechamento da negociacao deve ser OK na inclusao.", TipoNaoFechamento.OK,
 				n.getTipoNaoFechamento());
 

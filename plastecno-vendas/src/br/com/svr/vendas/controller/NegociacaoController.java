@@ -104,8 +104,15 @@ public class NegociacaoController extends AbstractController {
 
         for (GrupoWrapper<CategoriaNegociacao, Negociacao> g : rel.getListaGrupo()) {
             g.setPropriedade("valorTotal", NumeroUtils.formatarValorMonetario((Double) g.getPropriedade("valorTotal")));
+
+            for (Negociacao n : g.getListaElemento()) {
+                if (n == null) {
+                    continue;
+                }
+                n.setIndiceConversaoValor(n.getIndiceConversaoValor() * 100);
+            }
         }
-        
+
         addAtributo("relatorio", rel);
         addAtributo("motivoPagamento", TipoNaoFechamento.FORMA_PAGAMENTO);
         addAtributo("motivoFrete", TipoNaoFechamento.FRETE);

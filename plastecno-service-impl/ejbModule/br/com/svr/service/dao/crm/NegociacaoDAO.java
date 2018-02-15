@@ -42,7 +42,7 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 	public double calcularValorCategoriaNegociacaoAberta(Integer idVendedor, CategoriaNegociacao categoria) {
 		Object v = entityManager
 				.createQuery(
-						"select sum(n.valor) from Negociacao n where n.idVendedor = :idVendedor and n.categoriaNegociacao =:categoria and n.situacaoNegociacao =:situacaoNegociacao")
+						"select sum(n.orcamento.valorPedidoIPI) from Negociacao n where n.idVendedor = :idVendedor and n.categoriaNegociacao =:categoria and n.situacaoNegociacao =:situacaoNegociacao")
 				.setParameter("idVendedor", idVendedor).setParameter("categoria", categoria)
 				.setParameter("situacaoNegociacao", SituacaoNegociacao.ABERTO).getSingleResult();
 		return v == null ? 0d : (double) v;
@@ -54,7 +54,7 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 
 	public Integer pesquisarIdPedidoByIdNegociacao(Integer idNegociacao) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select n.idOrcamento from Negociacao n where n.id =:idNegociacao")
+				entityManager.createQuery("select n.orcamento.id from Negociacao n where n.id =:idNegociacao")
 						.setParameter("idNegociacao", idNegociacao), Integer.class, null);
 	}
 
@@ -67,8 +67,9 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 	public List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor) {
 		return entityManager
 				.createQuery(
-						"select n from Negociacao n where n.idVendedor = :idVendedor and n.situacaoNegociacao =:situacaoNegociacao",
+						"select new Negociacao(n.categoriaNegociacao, n.id, n.orcamento.id, n.indiceConversaoValor, n.nomeCliente, n.nomeContato, n.telefoneContato, n.orcamento.valorPedidoIPI) from Negociacao n where n.idVendedor = :idVendedor and n.situacaoNegociacao =:situacaoNegociacao",
 						Negociacao.class).setParameter("idVendedor", idVendedor)
 				.setParameter("situacaoNegociacao", SituacaoNegociacao.ABERTO).getResultList();
 	}
+
 }

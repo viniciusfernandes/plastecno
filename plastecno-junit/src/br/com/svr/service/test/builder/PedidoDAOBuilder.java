@@ -131,6 +131,17 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public Object[] pesquisarIdNomeClienteNomeContatoValor(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				if (p == null) {
+					return null;
+				}
+				return new Object[] { p.getCliente().getId(), p.getCliente().getNomeFantasia(),
+						p.getContato().getDdd(), p.getContato().getNome(), p.getContato().getTelefone(),
+						p.getValorPedido() };
+			}
+
+			@Mock
 			public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 				if (i == null) {
@@ -193,16 +204,6 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 				Optional<Integer> o = l.stream().filter(i -> idPedido.equals(i.getPedido().getId()))
 						.map(i -> i.getSequencial()).max((a, b) -> a == null || b == null ? -1 : Integer.compare(a, b));
 				return o.isPresent() ? o.get() : null;
-			}
-
-			@Mock
-			public Object[] pesquisarNomeClienteNomeContatoValor(Integer idPedido) {
-				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
-				if (p == null) {
-					return null;
-				}
-				return new Object[] { p.getCliente().getNomeFantasia(), p.getContato().getDdd(),
-						p.getContato().getNome(), p.getContato().getTelefone(), p.getValorPedido() };
 			}
 
 			@Mock

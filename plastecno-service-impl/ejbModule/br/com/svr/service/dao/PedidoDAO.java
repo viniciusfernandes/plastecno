@@ -311,7 +311,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 
 	}
 
-	public Object[] pesquisarNomeClienteNomeContatoValor(Integer idPedido) {
+	public Object[] pesquisarIdNomeClienteNomeContatoValor(Integer idPedido) {
 		return QueryUtil
 				.gerarRegistroUnico(
 						entityManager

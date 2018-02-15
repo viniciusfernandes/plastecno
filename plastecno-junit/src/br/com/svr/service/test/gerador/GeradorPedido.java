@@ -150,7 +150,7 @@ public class GeradorPedido {
 	}
 
 	public Pedido gerarOrcamento() {
-		Pedido o = gerarPedidoRevenda();
+		Pedido o = gerarPedidoRevenda(SituacaoPedido.ORCAMENTO_DIGITACAO);
 		ItemPedido i = gerarItemPedido();
 		try {
 			pedidoService.inserirItemPedido(o.getId(), i);
@@ -182,7 +182,8 @@ public class GeradorPedido {
 		return p;
 	}
 
-	public Pedido gerarPedido(TipoPedido tipoPedido, TipoRelacionamento tipoRelacionamento) {
+	public Pedido gerarPedido(TipoPedido tipoPedido, SituacaoPedido situacaoPedido,
+			TipoRelacionamento tipoRelacionamento) {
 		Usuario vendedor = eBuilder.buildVendedor();
 		try {
 			usuarioService.inserir(vendedor, true);
@@ -196,6 +197,7 @@ public class GeradorPedido {
 		pedido.setTransportadora(transp);
 		pedido.setVendedor(vendedor);
 		pedido.setTipoPedido(tipoPedido);
+		pedido.setSituacaoPedido(situacaoPedido);
 
 		try {
 			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.6, 0.1);
@@ -227,6 +229,10 @@ public class GeradorPedido {
 			printMensagens(e2);
 		}
 		return pedido;
+	}
+
+	public Pedido gerarPedido(TipoPedido tipoPedido, TipoRelacionamento tipoRelacionamento) {
+		return gerarPedido(tipoPedido, SituacaoPedido.DIGITACAO, tipoRelacionamento);
 	}
 
 	public Pedido gerarPedidoClienteProspectado() {
@@ -304,13 +310,17 @@ public class GeradorPedido {
 	}
 
 	public Pedido gerarPedidoRevenda() {
+		return gerarPedidoRevenda(SituacaoPedido.DIGITACAO);
+	}
+
+	public Pedido gerarPedidoRevenda(SituacaoPedido situacaoPedido) {
 		Cliente revendedor = eBuilder.buildClienteRevendedor();
 		try {
 			clienteService.inserir(revendedor);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		return gerarPedido(TipoPedido.REVENDA, TipoRelacionamento.REPRESENTACAO);
+		return gerarPedido(TipoPedido.REVENDA, SituacaoPedido.ORCAMENTO_DIGITACAO, TipoRelacionamento.REPRESENTACAO);
 	}
 
 	public Pedido gerarPedidoRevendaComItem() {

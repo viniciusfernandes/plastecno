@@ -21,14 +21,12 @@ import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.TipoLogradouro;
 import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.entity.Cliente;
-import br.com.svr.service.entity.Contato;
 import br.com.svr.service.entity.ContatoCliente;
 import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.LogradouroCliente;
 import br.com.svr.service.entity.LogradouroPedido;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.Transportadora;
-import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.relatorio.RelatorioService;
 import br.com.svr.service.wrapper.GrupoWrapper;
@@ -312,56 +310,6 @@ public class AbstractPedidoController extends AbstractController {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
             gerarLogErroRequestAjax("inclusao/alteracao do item do pedido " + numeroPedido, e);
-        }
-    }
-
-    void inserirPedido(Pedido pedido, Contato contato, boolean orcamento) {
-        if (hasAtributo(contato)) {
-            pedido.setContato(contato);
-        }
-
-        if (pedido.getSituacaoPedido() == null && !orcamento) {
-            pedido.setSituacaoPedido(SituacaoPedido.DIGITACAO);
-        } else if (pedido.getSituacaoPedido() == null && orcamento) {
-            pedido.setSituacaoPedido(SituacaoPedido.ORCAMENTO_DIGITACAO);
-        }
-
-        if (pedido.getTransportadora() != null && pedido.getTransportadora().getId() == null) {
-            pedido.setTransportadora(null);
-        }
-
-        if (pedido.getTransportadoraRedespacho() != null && pedido.getTransportadoraRedespacho().getId() == null) {
-            pedido.setTransportadoraRedespacho(null);
-        }
-
-        try {
-
-            /*
-             * Carregando as informacoes do vendedor DO PEDIDO. Caso seja um
-             * pedido novo, vamos associa-lo ao vendedor, caso contrario,
-             * recuperamos o usuario que efetuou a venda. Precisamo recuperar o
-             * vendedor, pois o JSON devera conter o nome e email do vendedor.
-             */
-            final Usuario proprietario = pedido.getId() == null ? usuarioService
-                    .pesquisarUsuarioResumidoById(getCodigoUsuario()) : pedidoService.pesquisarProprietario(pedido
-                    .getId());
-
-            pedido.setProprietario(proprietario);
-            pedidoService.inserirPedido(pedido);
-
-            addAtributo("orcamento", pedido.isOrcamento());
-            addAtributo("isCompra", pedido.isCompra());
-            formatarPedido(pedido);
-            // Esse comando eh para configurar o id do cliente que sera
-            // serializado para o preenchimento do id na tela quando o cliente
-            // nao existe no caso do orcamento.
-            pedido.setIdCliente(pedido.getCliente().getId());
-            serializarJson(new SerializacaoJson(pedido).incluirAtributo("situacaoPedido", "proprietario"));
-
-        } catch (BusinessException e) {
-            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
-        } catch (Exception e) {
-            gerarLogErroRequestAjax("inclusao/alteracao do pedido", e);
         }
     }
 

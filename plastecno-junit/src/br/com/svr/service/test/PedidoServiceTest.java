@@ -407,7 +407,7 @@ public class PedidoServiceTest extends AbstractTest {
 				}
 			}
 		}
-		
+
 		for (ItemPedido iCopia : lItemCopia) {
 			for (ItemPedido iPed : lItem) {
 				if (iCopia.getId() == null) {

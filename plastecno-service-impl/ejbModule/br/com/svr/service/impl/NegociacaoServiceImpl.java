@@ -197,7 +197,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 		if (idOrcamento == null) {
 			throw new BusinessException("É necessário um ID de orçamento para a inclusão de uma negociação");
 		}
-		Object[] dados = pedidoService.pesquisarNomeClienteNomeContatoValor(idOrcamento);
+		Object[] dados = pedidoService.pesquisarIdNomeClienteNomeContatoValor(idOrcamento);
 		Double idxConvValor = negociacaoDAO.pesquisarIndiceConversaoValorByIdCliente((Integer) dados[0]);
 		
 		Negociacao n = new Negociacao();

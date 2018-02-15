@@ -25,6 +25,7 @@ import br.com.svr.service.EmailService;
 import br.com.svr.service.EstoqueService;
 import br.com.svr.service.LogradouroService;
 import br.com.svr.service.MaterialService;
+import br.com.svr.service.NegociacaoService;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.RamoAtividadeService;
 import br.com.svr.service.RepresentadaService;
@@ -94,6 +95,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private MaterialService materialService;
+
+	@EJB
+	private NegociacaoService negociacaoService;
 
 	private PedidoDAO pedidoDAO;
 
@@ -1213,7 +1217,9 @@ public class PedidoServiceImpl implements PedidoService {
 
 			orcamento.setCliente(clienteService.inserir(cliente));
 		}
-		return inserir(orcamento);
+		Pedido orc = inserir(orcamento);
+		negociacaoService.inserirNegociacao(orc.getId(), orc.getVendedor().getId());
+		return orc;
 	}
 
 	/*
@@ -1702,8 +1708,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Object[] pesquisarNomeClienteNomeContatoValor(Integer idPedido) {
-		return pedidoDAO.pesquisarNomeClienteNomeContatoValor(idPedido);
+	public Object[] pesquisarIdNomeClienteNomeContatoValor(Integer idPedido) {
+		return pedidoDAO.pesquisarIdNomeClienteNomeContatoValor(idPedido);
 	}
 
 	@Override

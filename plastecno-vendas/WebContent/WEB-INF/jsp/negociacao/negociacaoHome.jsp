@@ -13,26 +13,28 @@
 
 <style type="text/css">
 .coluna {
-	width: 15%;
 	float: left;
 	margin-right: 0;
 	margin-top: 0;
+	width: 15%;
+	
 }
 .header  {
-	width: 15%;
-	float: left;
 	border: 1px solid black;
+	float: left;
 	margin-bottom: 0;
 	text-align: center;
+	width: 15%;
 }
 .coluna {
 	height: 100%;
 	padding: 0;
+	margin-bottom: 0;
 	min-height: 99vh;
 }
 .block {
-	margin-top: 1px;
 	background: #F4F4F4;
+	margin-top: 1px;
 }
 #cab2, #cab3, #cab4, #cab5, #cab6, #col2, #col3, #col4, #col5, #col6  {
 	border-left: 0;
@@ -43,10 +45,10 @@ div.block {
 }
 
 div.block > a {
-	float: left;
 	color: black;
-	font-size: 12px;
+	float: left;
 	font-family: 'Lato', Arial, Helvetica, sans-serif;
+	font-size: 12px;
 }
 
 div.block > a > span {
@@ -64,6 +66,26 @@ a.front {
 }
 </style>
 <script type="text/javascript">
+$(document).ready(function() {
+	configurarAlturaColunas();
+});
+function configurarAlturaColunas(){
+	var tamanhos = new Array();
+	var max = 0;
+	var i =0;
+	$('fieldset.coluna').each(function(){
+		tamanhos[i++] = parseFloat($(this).css('height').replace('px', ''));
+	});
+	for (i = 0; i < tamanhos.length; i++) {
+		if(max < tamanhos[i]){
+			max = tamanhos[i];
+		}
+	}
+	$('fieldset.coluna').each(function(){
+		$(this).css('height', max);
+	});
+};
+
 function drop(ev) {
 	ev.preventDefault();
 	var coluna = recuperarColunaTarget(ev);

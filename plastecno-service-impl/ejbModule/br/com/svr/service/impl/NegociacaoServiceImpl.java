@@ -180,7 +180,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 			@Override
 			public int compare(Negociacao n1, Negociacao n2) {
-				return n1.getId().compareTo(n2.getId());
+				return n2.getId().compareTo(n1.getId());
 			}
 		});
 		return rel;

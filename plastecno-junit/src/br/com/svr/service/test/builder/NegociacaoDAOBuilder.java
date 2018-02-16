@@ -16,6 +16,7 @@ public class NegociacaoDAOBuilder extends DAOBuilder<NegociacaoDAO> {
 	public NegociacaoDAO build() {
 
 		new MockUp<NegociacaoDAO>() {
+
 			@Mock
 			public void alterarSituacaoNegociacao(Integer idNegociacao, SituacaoNegociacao situacaoNegociacao) {
 				REPOSITORY.alterarEntidadeAtributoById(Negociacao.class, idNegociacao, "situacaoNegociacao",
@@ -31,6 +32,20 @@ public class NegociacaoDAOBuilder extends DAOBuilder<NegociacaoDAO> {
 			public Integer pesquisarIdPedidoByIdNegociacao(Integer idNegociacao) {
 				Negociacao n = REPOSITORY.pesquisarEntidadeById(Negociacao.class, idNegociacao);
 				return n != null ? n.getOrcamento().getId() : null;
+			}
+
+			@Mock
+			public IndiceConversao pesquisarIndiceByIdCliente(Integer idCliente) {
+				if (idCliente == null) {
+					return null;
+				}
+				List<IndiceConversao> l = REPOSITORY.pesquisarTodos(IndiceConversao.class);
+				for (IndiceConversao i : l) {
+					if (idCliente.equals(i.getIdCliente())) {
+						return i;
+					}
+				}
+				return null;
 			}
 
 			@Mock
@@ -55,6 +70,20 @@ public class NegociacaoDAOBuilder extends DAOBuilder<NegociacaoDAO> {
 					}
 				}
 				return l;
+			}
+
+			@Mock
+			public Negociacao pesquisarNegociacaoByIdOrcamento(Integer idOrcamento) {
+				if (idOrcamento == null) {
+					return null;
+				}
+				List<Negociacao> l = REPOSITORY.pesquisarTodos(Negociacao.class);
+				for (Negociacao n : l) {
+					if (idOrcamento.equals(n.getOrcamento().getId())) {
+						return n;
+					}
+				}
+				return null;
 			}
 		};
 		return new NegociacaoDAO(null);

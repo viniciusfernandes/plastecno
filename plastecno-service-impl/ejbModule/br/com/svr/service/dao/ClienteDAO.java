@@ -81,6 +81,12 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 								.setParameter("idCliente", idCliente), Cliente.class, null);
 	}
 
+	public List<ContatoCliente> pesquisarContato(Integer idCliente) {
+		return entityManager
+				.createQuery("select l from Cliente c inner join c.listaContato l where c.id = :idCliente ",
+						ContatoCliente.class).setParameter("idCliente", idCliente).getResultList();
+	}
+
 	public ContatoCliente pesquisarContatoByIdContato(Integer idContato) {
 		return QueryUtil
 				.gerarRegistroUnico(

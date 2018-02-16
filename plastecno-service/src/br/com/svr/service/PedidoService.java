@@ -107,6 +107,10 @@ public interface PedidoService {
 
 	boolean isComissaoSimplesVendedor(Integer idPedido);
 
+	boolean isOrcamentoAberto(Integer idPedido);
+
+	boolean isPedidoCancelado(Integer idPedido);
+
 	boolean isPedidoEnviado(Integer idPedido);
 
 	boolean isPedidoExistente(Integer idPedido);
@@ -154,6 +158,8 @@ public interface PedidoService {
 	Integer pesquisarIdItemPedidoByIdPedidoSequencial(Integer idPedido, Integer sequencial);
 
 	Object[] pesquisarIdMaterialFormaMaterialItemPedido(Integer idItemPedido);
+
+	Object[] pesquisarIdNomeClienteNomeContatoValor(Integer idPedido);
 
 	List<Integer> pesquisarIdPedidoAguardandoCompra();
 
@@ -222,8 +228,6 @@ public interface PedidoService {
 	List<LogradouroPedido> pesquisarLogradouro(Integer idPedido);
 
 	List<LogradouroPedido> pesquisarLogradouro(Integer idPedido, TipoLogradouro tipo);
-
-	Object[] pesquisarIdNomeClienteNomeContatoValor(Integer idPedido);
 
 	String pesquisarNomeVendedorByIdPedido(Integer idPedido);
 

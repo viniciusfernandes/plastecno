@@ -21,10 +21,16 @@ public class IndiceConversao {
 	private Integer idCliente;
 
 	@Column(name = "indice_conversao_quantidade")
-	private double indiceQuandidade;
+	private double indiceQuandidade = 0d;
 
 	@Column(name = "indice_conversao_valor")
-	private double indiceValor;
+	private double indiceValor = 0d;
+
+	@Column(name = "quantidade_vendas")
+	private int quantidadeVendas = 0;
+
+	public IndiceConversao() {
+	}
 
 	public Integer getId() {
 		return id;
@@ -42,6 +48,10 @@ public class IndiceConversao {
 		return indiceValor;
 	}
 
+	public int getQuantidadeVendas() {
+		return quantidadeVendas;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -56,6 +66,10 @@ public class IndiceConversao {
 
 	public void setIndiceValor(double indiceValor) {
 		this.indiceValor = indiceValor;
+	}
+
+	public void setQuantidadeVendas(int quantidadeVendas) {
+		this.quantidadeVendas = quantidadeVendas;
 	}
 
 }

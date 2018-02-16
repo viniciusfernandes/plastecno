@@ -565,13 +565,10 @@ public class ClienteServiceImpl implements ClienteService {
 				.setParameter("idCliente", idCliente).getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ContatoCliente> pesquisarContato(Integer idCliente) {
-		return this.entityManager
-				.createQuery("select l from Cliente c inner join c.listaContato l where c.id = :idCliente ")
-				.setParameter("idCliente", idCliente).getResultList();
+		return clienteDAO.pesquisarContato(idCliente);
 	}
 
 	@Override
@@ -586,7 +583,6 @@ public class ClienteServiceImpl implements ClienteService {
 		return clienteDAO.pesquisarContatoPrincipalResumidoByIdCliente(idCliente);
 	}
 
-	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ContatoCliente> pesquisarContatoResumidoByNomeFantasia(Integer idCliente, String nome) {

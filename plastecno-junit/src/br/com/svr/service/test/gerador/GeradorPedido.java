@@ -8,6 +8,7 @@ import org.junit.Assert;
 
 import br.com.svr.service.ClienteService;
 import br.com.svr.service.ComissaoService;
+import br.com.svr.service.ContatoService;
 import br.com.svr.service.MaterialService;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.RepresentadaService;
@@ -19,6 +20,8 @@ import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.constante.TipoRelacionamento;
 import br.com.svr.service.entity.Cliente;
 import br.com.svr.service.entity.Contato;
+import br.com.svr.service.entity.ContatoCliente;
+import br.com.svr.service.entity.ContatoRepresentada;
 import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.Material;
 import br.com.svr.service.entity.Pedido;
@@ -46,6 +49,8 @@ public class GeradorPedido {
 
 	private ComissaoService comissaoService;
 
+	private ContatoService contatoService;
+
 	private EntidadeBuilder eBuilder;
 
 	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
@@ -68,6 +73,25 @@ public class GeradorPedido {
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
+		contatoService = ServiceBuilder.buildService(ContatoService.class);
+	}
+
+	public <T extends Contato> T gerarContato(Class<T> t) {
+		T ct;
+		try {
+			ct = t.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new IllegalStateException("Falha na criacao de uma instancia do contato do tipo "
+					+ t.getClass().getName());
+		}
+		ct.setNome("Daniel Pereira");
+		ct.setDdd("11");
+		ct.setDdi("55");
+		ct.setDepartamento("Comercial");
+		ct.setTelefone("999999999");
+		ct.setEmail("daniel@gmail.com");
+		ct.setId(contatoService.inserir(ct));
+		return ct;
 	}
 
 	public ItemPedido gerarItemPedido() {
@@ -151,6 +175,16 @@ public class GeradorPedido {
 
 	public Pedido gerarOrcamento() {
 		Pedido o = gerarPedidoRevenda(SituacaoPedido.ORCAMENTO_DIGITACAO);
+		// Inserindo frete para testar o calculo do indice de conversao com
+		// frete
+		// o.setValorFrete(1000d);
+
+		try {
+			pedidoService.inserirPedido(o);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		ItemPedido i = gerarItemPedido();
 		try {
 			pedidoService.inserirItemPedido(o.getId(), i);
@@ -172,6 +206,7 @@ public class GeradorPedido {
 		p.setRepresentada(gRepresentada.gerarRevendedor());
 		p.setVendedor(vendedor);
 		p.setFinalidadePedido(TipoFinalidadePedido.CONSUMO);
+		p.setTipoPedido(TipoPedido.REVENDA);
 
 		Contato c = new Contato();
 		c.setNome("Renato");
@@ -214,6 +249,9 @@ public class GeradorPedido {
 		}
 
 		Representada representada = gRepresentada.gerarRepresentada(tipoRelacionamento);
+		if (TipoRelacionamento.REVENDA.equals(tipoRelacionamento)) {
+			representada.addContato(gerarContato(ContatoRepresentada.class));
+		}
 		pedido.setRepresentada(representada);
 		try {
 			pedido = pedidoService.inserirPedido(pedido);
@@ -237,7 +275,6 @@ public class GeradorPedido {
 
 	public Pedido gerarPedidoClienteProspectado() {
 		Pedido pedido = eBuilder.buildPedido();
-
 		Usuario vendedor = pedido.getVendedor();
 		try {
 			usuarioService.inserir(vendedor, true);
@@ -315,16 +352,22 @@ public class GeradorPedido {
 
 	public Pedido gerarPedidoRevenda(SituacaoPedido situacaoPedido) {
 		Cliente revendedor = eBuilder.buildClienteRevendedor();
+		ContatoCliente ct = gerarContato(ContatoCliente.class);
+		revendedor.addContato(ct);
+
 		try {
 			clienteService.inserir(revendedor);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		return gerarPedido(TipoPedido.REVENDA, SituacaoPedido.ORCAMENTO_DIGITACAO, TipoRelacionamento.REPRESENTACAO);
+		return gerarPedido(TipoPedido.REVENDA, situacaoPedido, TipoRelacionamento.REVENDA);
 	}
 
 	public Pedido gerarPedidoRevendaComItem() {
 		Cliente revendedor = eBuilder.buildClienteRevendedor();
+		ContatoCliente ct = gerarContato(ContatoCliente.class);
+		revendedor.addContato(ct);
+
 		try {
 			clienteService.inserir(revendedor);
 		} catch (BusinessException e) {

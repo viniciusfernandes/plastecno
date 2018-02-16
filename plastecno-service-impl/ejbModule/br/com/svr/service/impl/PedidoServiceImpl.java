@@ -260,9 +260,9 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private double[] atualizarValoresPedido(Integer idPedido) {
 		double[] valores = pedidoDAO.pesquisarValoresPedido(idPedido);
+		
 		if (valores.length <= 0) {
-			pedidoDAO.alterarValorPedido(idPedido, 0d, 0d);
-			return new double[] {};
+			valores = new double[] { 0d, 0d };
 		}
 
 		double vFrete = pedidoDAO.pesquisarValorFreteByIdPedido(idPedido);
@@ -849,6 +849,10 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 		}
 		pedidoDAO.alterar(pedido);
+
+		// O recalculo do indice deve ser feito apenas quando o pedido for
+		// finalizado, por isso esta aqui.
+		negociacaoService.recalcularIndiceConversao(idPedido, pedido.getIdOrcamento());
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -1037,7 +1041,7 @@ public class PedidoServiceImpl implements PedidoService {
 			pedido = pedidoDAO.alterar(pedido);
 		}
 		// Aqui estamos atualizando o valor do pedido pois pode haver um frete.
-		atualizarValoresPedido(idPedido);
+		atualizarValoresPedido(pedido.getId());
 
 		return pedido;
 	}
@@ -1269,6 +1273,20 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isComissaoSimplesVendedor(Integer idPedido) {
 		return pedidoDAO.pesquisarComissaoSimplesVendedor(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean isOrcamentoAberto(Integer idPedido) {
+		SituacaoPedido s = pesquisarSituacaoPedidoById(idPedido);
+		return SituacaoPedido.isOrcamentoAberto(s);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public boolean isPedidoCancelado(Integer idPedido) {
+		SituacaoPedido s = pesquisarSituacaoPedidoById(idPedido);
+		return SituacaoPedido.isCancelado(s);
 	}
 
 	@Override
@@ -1933,11 +1951,13 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<SituacaoPedido> pesquisarSituacaoCompraEfetivada() {
 		return pedidoDAO.pesquisarSituacaoCompraEfetivada();
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public SituacaoPedido pesquisarSituacaoPedidoById(Integer idPedido) {
 		if (idPedido == null) {
 			return null;
@@ -1946,16 +1966,19 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
 		return pedidoDAO.pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<SituacaoPedido> pesquisarSituacaoRevendaEfetivada() {
 		return pedidoDAO.pesquisarSituacaoRevendaEfetivada();
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<SituacaoPedido> pesquisarSituacaoVendaEfetivada() {
 		return pedidoDAO.pesquisarSituacaoVendaEfetivada();
 	}
@@ -2011,6 +2034,7 @@ public class PedidoServiceImpl implements PedidoService {
 		return pedidoDAO.pesquisarTotalItemPedidoByIdItem(idItem);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalItemRevendaAguardandoEncomenda(Integer idItemPedido) {
 		Integer idPedido = pesquisarIdPedidoByIdItemPedido(idItemPedido);
 		return itemPedidoDAO.pesquisarTotalItemRevendaNaoEncomendado(idPedido);
@@ -2094,6 +2118,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Double[] pesquisarValorPedidoByItemPedido(Integer idItemPedido) {
 		return itemPedidoDAO.pesquisarValorPedidoByItemPedido(idItemPedido);
 	}
@@ -2156,6 +2181,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer refazerPedido(Integer idPedido) throws BusinessException {
 		Integer idClone = copiarPedido(idPedido, false);
 
@@ -2166,6 +2192,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Pedido removerItemPedido(Integer idItemPedido) throws BusinessException {
 		if (idItemPedido == null) {
 			return null;

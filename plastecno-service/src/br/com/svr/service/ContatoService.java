@@ -10,6 +10,8 @@ import br.com.svr.service.entity.Contato;
 @Local
 public interface ContatoService {
 
+    Integer inserir(Contato contato);
+
     List<? extends Contato> pesquisar(Integer id, Class<? extends Contato> classe);
 
     <T extends Contato> List<T> pesquisarAusentes(Integer id, Collection<T> listaContato, Class<T> classe);
@@ -20,6 +22,6 @@ public interface ContatoService {
 
     void remover(Integer idContato);
 
-    <T extends Contato> void remover(Integer idContato, Class<T> classe);
+	<T extends Contato> void remover(Integer idContato, Class<T> classe);
 
 }

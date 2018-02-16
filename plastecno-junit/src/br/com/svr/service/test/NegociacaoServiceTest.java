@@ -7,22 +7,27 @@ import java.util.List;
 import org.junit.Test;
 
 import br.com.svr.service.NegociacaoService;
+import br.com.svr.service.PedidoService;
 import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.entity.Pedido;
+import br.com.svr.service.entity.crm.IndiceConversao;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
+import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.test.builder.ServiceBuilder;
 import br.com.svr.service.test.gerador.GeradorPedido;
 
 public class NegociacaoServiceTest extends AbstractTest {
 	private GeradorPedido gPedido = GeradorPedido.getInstance();
 	private NegociacaoService negociacaoService;
+	private PedidoService pedidoService;
 
 	public NegociacaoServiceTest() {
 		negociacaoService = ServiceBuilder.buildService(NegociacaoService.class);
+		pedidoService = ServiceBuilder.buildService(PedidoService.class);
 	}
 
 	@Test
@@ -87,5 +92,42 @@ public class NegociacaoServiceTest extends AbstractTest {
 		assertEquals("O tipo de nao fechamento da negociacao deve ser OK na inclusao.", TipoNaoFechamento.OK,
 				n.getTipoNaoFechamento());
 
+	}
+
+	@Test
+	public void testRecalculoIndiceConversao() {
+		Pedido o = gPedido.gerarOrcamento();
+		pedidoService.pesquisarValorPedidoIPI(o.getId());
+		Integer idCliente = pedidoService.pesquisarIdClienteByIdPedido(o.getId());
+
+		IndiceConversao idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
+		assertNull("Na inclusao de um orcamento nao pode ser criado o indice de conversao", idxConv);
+
+		List<Negociacao> lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
+		assertEquals("Deve existir apenas 1 negociacao por orcamento incluido.", (Integer) 1, (Integer) lNeg.size());
+
+		Negociacao n = lNeg.get(0);
+		Integer idPedido = null;
+		try {
+			idPedido = negociacaoService.aceitarNegocicacao(n.getId());
+			pedidoService.pesquisarValorPedidoIPI(o.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		try {
+			// Aqui estamos enviando o pedido para que seja refeito o calculo do
+			// indice.
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		pedidoService.pesquisarValorPedidoIPI(o.getId());
+		pedidoService.pesquisarValorPedidoIPI(idPedido);
+		idCliente = pedidoService.pesquisarIdClienteByIdPedido(idPedido);
+		idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
+
+		assertNotNull("No envio do pedido deve ser gerado um indice de conversao", idxConv);
+		assertEquals("Apos o envio de pedido sem alteracao de preco o indice de conversao deve ser 1", (Double) 1d,
+				(Double) idxConv.getIndiceValor());
 	}
 }

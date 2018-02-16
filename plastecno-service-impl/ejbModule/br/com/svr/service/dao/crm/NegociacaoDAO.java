@@ -8,6 +8,7 @@ import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.dao.GenericDAO;
+import br.com.svr.service.entity.crm.IndiceConversao;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.impl.util.QueryUtil;
 
@@ -58,6 +59,12 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 						.setParameter("idNegociacao", idNegociacao), Integer.class, null);
 	}
 
+	public IndiceConversao pesquisarIndiceByIdCliente(Integer idCliente) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i from IndiceConversao i where i.idCliente =:idCliente")
+						.setParameter("idCliente", idCliente), IndiceConversao.class, null);
+	}
+
 	public double pesquisarIndiceConversaoValorByIdCliente(Integer idCliente) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select i.indiceValor from IndiceConversao i where i.idCliente =:idCliente")
@@ -70,6 +77,12 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 						"select new Negociacao(n.categoriaNegociacao, n.id, n.orcamento.id, n.indiceConversaoValor, n.nomeCliente, n.nomeContato, n.telefoneContato, n.orcamento.valorPedidoIPI) from Negociacao n where n.idVendedor = :idVendedor and n.situacaoNegociacao =:situacaoNegociacao",
 						Negociacao.class).setParameter("idVendedor", idVendedor)
 				.setParameter("situacaoNegociacao", SituacaoNegociacao.ABERTO).getResultList();
+	}
+
+	public Negociacao pesquisarNegociacaoByIdOrcamento(Integer idOrcamento) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select n from Negociacao n where n.orcamento.id =:idOrcamento")
+						.setParameter("idOrcamento", idOrcamento), Negociacao.class, null);
 	}
 
 }

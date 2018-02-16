@@ -8,6 +8,7 @@ import mockit.MockUp;
 import br.com.svr.service.constante.TipoCliente;
 import br.com.svr.service.dao.ClienteDAO;
 import br.com.svr.service.entity.Cliente;
+import br.com.svr.service.entity.ContatoCliente;
 import br.com.svr.service.entity.LogradouroCliente;
 
 public class ClienteDAOBuilder extends DAOBuilder<ClienteDAO> {
@@ -15,9 +16,17 @@ public class ClienteDAOBuilder extends DAOBuilder<ClienteDAO> {
 	@Override
 	public ClienteDAO build() {
 		new MockUp<ClienteDAO>() {
+
 			@Mock
 			public boolean isEmailExistente(Integer idCliente, String email) {
 				return REPOSITORY.contemEntidade(Cliente.class, "email", email, idCliente);
+			}
+
+			@Mock
+			public List<ContatoCliente> pesquisarContato(Integer idCliente) {
+				Cliente c = REPOSITORY.pesquisarEntidadeById(Cliente.class, idCliente);
+				return c == null || c.getListaContato() == null ? new ArrayList<ContatoCliente>()
+						: new ArrayList<ContatoCliente>(c.getListaContato());
 			}
 
 			@Mock

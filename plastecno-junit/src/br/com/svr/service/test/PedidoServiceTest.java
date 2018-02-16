@@ -33,6 +33,7 @@ import br.com.svr.service.constante.TipoRelacionamento;
 import br.com.svr.service.constante.TipoVenda;
 import br.com.svr.service.entity.Cliente;
 import br.com.svr.service.entity.Contato;
+import br.com.svr.service.entity.ContatoRepresentada;
 import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.Logradouro;
 import br.com.svr.service.entity.LogradouroPedido;
@@ -435,7 +436,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testDataEnvioCopiaPedidoEnviado() {
-		Pedido p = gPedido.gerarPedidoClienteProspectado();
+		Pedido p = gPedido.gerarPedidoRepresentacao();
 		Integer idPed = null;
 		try {
 			idPed = pedidoService.inserirPedido(p).getId();
@@ -516,7 +517,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedido() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		Integer idPedido = null;
 		try {
 			idPedido = pedidoService.inserirPedido(pedido).getId();
@@ -698,7 +699,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioEmailPedidoReservaInvalida() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.setDataEntrega(TestUtils.gerarDataAmanha());
 		pedido.setFormaPagamento("30 dias");
 		pedido.setTipoEntrega(TipoEntrega.FOB);
@@ -816,7 +817,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testEnvioPedidoCompra() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.setDataEntrega(TestUtils.gerarDataAmanha());
 		pedido.setFormaPagamento("30 dias a vista");
 		pedido.setTipoEntrega(TipoEntrega.CIF);
@@ -964,7 +965,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoComIPIRepresentadaSemIPI() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.NUNCA);
 		try {
 			pedido = pedidoService.inserirPedido(pedido);
@@ -1007,7 +1008,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoIPINuloMaterialImportadoRepresentadaIPIOcasional() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserirPedido(pedido);
@@ -1062,7 +1063,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoIPIZeradoMaterialImportadoRepresentadaIPIOcasional() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserirPedido(pedido);
@@ -1109,7 +1110,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoMaterialImportadoRepresentadaIPIOcasional() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserirPedido(pedido);
@@ -1134,7 +1135,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoMaterialImportadoRepresentadaSemIPI() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.NUNCA);
 		try {
 			pedido = pedidoService.inserirPedido(pedido);
@@ -1158,7 +1159,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoMaterialNacionalRepresentadaIPIOcasional() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserirPedido(pedido);
@@ -1348,7 +1349,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoRevendaComFrete() {
-		Pedido p = gPedido.gerarPedidoClienteProspectado();
+		Pedido p = gPedido.gerarPedidoRepresentacao();
 		Integer idPed = null;
 		try {
 			idPed = pedidoService.inserirPedido(p).getId();
@@ -1429,7 +1430,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoSemIPIMaterialNacionalRepresentadaIPIOcasional() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserirPedido(pedido);
@@ -1455,7 +1456,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemSemIPIPedidoMaterialImportadoRepresentadaIPIOcasional() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		pedido.getRepresentada().setTipoApresentacaoIPI(TipoApresentacaoIPI.OCASIONAL);
 		try {
 			pedido = pedidoService.inserirPedido(pedido);
@@ -1669,6 +1670,8 @@ public class PedidoServiceTest extends AbstractTest {
 			// podermos efetuar a encomenda dos itens para o fornecedor.
 			Representada representada = pedido.getRepresentada();
 			representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
+			representada.addContato(gPedido.gerarContato(ContatoRepresentada.class));
+
 			pedidoService.comprarItemPedido(pedido.getVendedor().getId(), pedido.getRepresentada().getId(), ids);
 
 		} catch (BusinessException e) {
@@ -1758,7 +1761,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testReenvioEmailPedido() {
-		Pedido pedido = gPedido.gerarPedidoClienteProspectado();
+		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		Integer idPedido = null;
 		try {
 			idPedido = pedidoService.inserirPedido(pedido).getId();
@@ -1810,7 +1813,7 @@ public class PedidoServiceTest extends AbstractTest {
 
 		pedido = pedidoService.pesquisarPedidoById(idPedido);
 		Date dtReenvio = pedido.getDataEnvio();
-		assertNotEquals("Apos o reenvio de um pedido a data de envio nao pode ser alterada",
+		assertEquals("Apos o reenvio de um pedido a data de envio nao pode ser alterada",
 				StringUtils.formatarData(dtReenvio), StringUtils.formatarData(dtEnvio));
 	}
 

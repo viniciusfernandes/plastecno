@@ -88,8 +88,8 @@ public class EntidadeBuilder {
 
 	public Cliente buildClienteRevendedor() {
 		Cliente cliente = buildCliente();
-		cliente.setNomeFantasia("Revendedor Plastico");
-		cliente.setRazaoSocial("Revendedor Plastico LTDA");
+		cliente.setNomeFantasia("Acrílicos Merediano");
+		cliente.setRazaoSocial("Acrílicos Merediano LTDA");
 		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
 		return cliente;
 	}

@@ -79,6 +79,12 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public boolean isPedidoExistente(Integer idPedido) {
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return p != null;
+			}
+
+			@Mock
 			Pedido pesquisarById(Integer idPedido, boolean isCompra) {
 				Pedido pedido = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
 				return pedido != null && pedido.isCompra() == isCompra ? pedido : null;
@@ -309,30 +315,16 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 				if (lItem == null || lItem.isEmpty()) {
 					return new double[] {};
 				}
-
-				ItemPedido iAcum = lItem
-						.stream()
-						.filter(i -> !idPedido.equals(i.getPedido().getId()))
-						.reduce(new ItemPedido(),
-								(i1, i2) -> {
-									i1.setPrecoUnidade((i1.getPrecoUnidade() == null ? 0 : i1.getPrecoUnidade())
-											+ (i2.getQuantidade() * i2.getPrecoUnidade()));
-									i1.setPrecoUnidadeIPI((i1.getPrecoUnidade() == null ? 0 : i1.getPrecoUnidade())
-											+ (i2.getQuantidade() * i2.getPrecoUnidadeIPI()));
-									return i1;
-								});
-				if (iAcum == null) {
-					return new double[] {};
+				double valTotIPI = 0d;
+				double valTot = 0d;
+				for (ItemPedido i : lItem) {
+					if (idPedido.equals(i.getPedido().getId())) {
+						valTot += i.calcularPrecoItem();
+						valTotIPI += i.calcularPrecoTotalIPI();
+					}
 				}
 
-				if (iAcum.getPrecoUnidade() == null) {
-					iAcum.setPrecoUnidade(0d);
-				}
-
-				if (iAcum.getPrecoUnidadeIPI() == null) {
-					iAcum.setPrecoUnidadeIPI(0d);
-				}
-				return new double[] { iAcum.getPrecoUnidade(), iAcum.getPrecoUnidadeIPI() };
+				return new double[] { valTot, valTotIPI };
 			}
 
 			@Mock

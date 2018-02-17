@@ -36,7 +36,6 @@ import br.com.svr.service.entity.Contato;
 import br.com.svr.service.entity.ContatoRepresentada;
 import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.Logradouro;
-import br.com.svr.service.entity.LogradouroPedido;
 import br.com.svr.service.entity.Material;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.Representada;
@@ -112,15 +111,15 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	private PedidoRevendaECompra gerarRevendaEncomendada() {
-		Pedido pedidoRevenda = gPedido.gerarPedidoRevenda();
+		Pedido pRevenda = gPedido.gerarPedidoRevenda();
 		ItemPedido item1 = gPedido.gerarItemPedido();
-		item1.setPedido(pedidoRevenda);
+		item1.setPedido(pRevenda);
 
 		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
-		item2.setPedido(pedidoRevenda);
+		item2.setPedido(pRevenda);
 		item2.setMaterial(item1.getMaterial());
 
-		Integer idPedidoRevenda = pedidoRevenda.getId();
+		Integer idPedidoRevenda = pRevenda.getId();
 		try {
 			pedidoService.inserirItemPedido(idPedidoRevenda, item1);
 		} catch (BusinessException e1) {
@@ -144,10 +143,10 @@ public class PedidoServiceTest extends AbstractTest {
 				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
 
-		Representada fornecedor = pedidoRevenda.getRepresentada();
+		Representada fornecedor = pRevenda.getRepresentada();
 		fornecedor.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
 
-		Cliente revendedor = pedidoRevenda.getCliente();
+		Cliente revendedor = pRevenda.getCliente();
 		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
 
 		Set<Integer> listaId = new HashSet<Integer>();
@@ -155,7 +154,7 @@ public class PedidoServiceTest extends AbstractTest {
 		listaId.add(item2.getId());
 		Integer idPedidoCompra = null;
 		try {
-			idPedidoCompra = pedidoService.comprarItemPedido(pedidoRevenda.getComprador().getId(), fornecedor.getId(),
+			idPedidoCompra = pedidoService.comprarItemPedido(pRevenda.getComprador().getId(), fornecedor.getId(),
 					listaId);
 		} catch (BusinessException e) {
 			printMensagens(e);
@@ -174,7 +173,7 @@ public class PedidoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		return new PedidoRevendaECompra(pedidoCompra, pedidoRevenda);
+		return new PedidoRevendaECompra(pedidoCompra, pRevenda);
 	}
 
 	@Test
@@ -418,9 +417,10 @@ public class PedidoServiceTest extends AbstractTest {
 				}
 				assertNull("O item copiado nao pode ter pedido de compra. Item: " + iCopia.getDescricaoSemFormatacao(),
 						iCopia.getIdPedidoCompra());
-				assertNull(
+				assertTrue(
 						"O item copiado nao pode ter quantidade recepcionada. Item: "
-								+ iCopia.getDescricaoSemFormatacao(), iCopia.getQuantidadeRecepcionada());
+								+ iCopia.getDescricaoSemFormatacao(), iCopia.getQuantidadeRecepcionada() == null
+								|| iCopia.getQuantidadeRecepcionada() == 0);
 				assertNull("O item copiado nao pode ter pedido de venda. Item: " + iCopia.getDescricaoSemFormatacao(),
 						iCopia.getIdPedidoVenda());
 				assertTrue(
@@ -618,14 +618,16 @@ public class PedidoServiceTest extends AbstractTest {
 
 		Contato contato = pedido.getContato();
 		contato.setDdd(null);
+		boolean throwed = false;
 		try {
 			// Inserindo a alteracao do contato no sistema
 			pedidoService.inserirPedido(pedido);
 		} catch (BusinessException e1) {
-			printMensagens(e1);
+			throwed = true;
 		}
+		assertTrue("Nao eh possivel inserir pedido sem DDD do contato", throwed);
+		throwed = false;
 
-		boolean throwed = false;
 		try {
 			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
@@ -676,14 +678,16 @@ public class PedidoServiceTest extends AbstractTest {
 
 		Contato contato = pedido.getContato();
 		contato.setTelefone(null);
+		boolean throwed = false;
 		try {
 			// Inserindo a alteracao do contato no sistema
 			pedidoService.inserirPedido(pedido);
 		} catch (BusinessException e1) {
-			printMensagens(e1);
+			throwed = true;
 		}
+		assertTrue("O telefone  do contato do orcamento eh obrigatorio", throwed);
 
-		boolean throwed = false;
+		throwed = false;
 		try {
 			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
@@ -1680,38 +1684,6 @@ public class PedidoServiceTest extends AbstractTest {
 
 		situacaoPedido = pedidoService.pesquisarSituacaoPedidoById(idPedido);
 		assertEquals(SituacaoPedido.ITEM_AGUARDANDO_MATERIAL, situacaoPedido);
-	}
-
-	@Test
-	public void testModificacaoLogradouroPedidoNovaInclusaoPedido() {
-		Pedido pedido = gPedido.gerarPedidoSimples();
-		try {
-			pedido = pedidoService.inserirPedido(pedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		List<LogradouroPedido> lLogPedido = pedido.getListaLogradouro();
-		assertFalse("A lista de logradouro do pedido nao deve estar vazia", lLogPedido == null || lLogPedido.isEmpty());
-
-		// Realizando uma aletacao no pedido para simular a alteracao do
-		// logradouro automaticamente
-		pedido.setFormaPagamento("APENAS UMA ALTERACAO");
-		pedido.setObservacaoProducao("Inclusao de observacao de producao");
-		try {
-			pedido = pedidoService.inserirPedido(pedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		List<LogradouroPedido> lLogPedido2 = pedido.getListaLogradouro();
-		for (LogradouroPedido l2 : lLogPedido2) {
-			for (LogradouroPedido l : lLogPedido) {
-				assertNotEquals(
-						"Os logradouros sao modificados apos as alteracoes do pedido e nao devem ter os mesmos ids",
-						l2.getId(), l.getId());
-			}
-		}
 	}
 
 	@Test

@@ -55,11 +55,12 @@ public class EntidadeBuilder {
 
 	public Cliente buildCliente() {
 		Cliente cliente = new Cliente();
+		double no = Math.random();
 		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
 		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.ENTREGA));
 		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.COBRANCA));
-		cliente.setRazaoSocial("Exercito Brasileiro");
-		cliente.setNomeFantasia("Exercito Brasileiro");
+		cliente.setRazaoSocial("Exercito Brasileiro " + no);
+		cliente.setNomeFantasia("Exercito Brasileiro " + no);
 		cliente.setCnpj("25632147000125");
 		cliente.setRamoAtividade(buildRamoAtividade());
 		cliente.setEmail("alex@gmail.com.br");
@@ -88,8 +89,9 @@ public class EntidadeBuilder {
 
 	public Cliente buildClienteRevendedor() {
 		Cliente cliente = buildCliente();
-		cliente.setNomeFantasia("Acrílicos Merediano");
-		cliente.setRazaoSocial("Acrílicos Merediano LTDA");
+		double no = Math.random();
+		cliente.setNomeFantasia("Acrílicos Merediano No " + no);
+		cliente.setRazaoSocial("Acrílicos Merediano LTDA " + no);
 		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
 		return cliente;
 	}

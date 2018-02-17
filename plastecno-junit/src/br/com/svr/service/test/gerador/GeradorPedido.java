@@ -2,6 +2,7 @@ package br.com.svr.service.test.gerador;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -9,6 +10,7 @@ import org.junit.Assert;
 import br.com.svr.service.ClienteService;
 import br.com.svr.service.ComissaoService;
 import br.com.svr.service.ContatoService;
+import br.com.svr.service.LogradouroService;
 import br.com.svr.service.MaterialService;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.RepresentadaService;
@@ -23,6 +25,7 @@ import br.com.svr.service.entity.Contato;
 import br.com.svr.service.entity.ContatoCliente;
 import br.com.svr.service.entity.ContatoRepresentada;
 import br.com.svr.service.entity.ItemPedido;
+import br.com.svr.service.entity.LogradouroCliente;
 import br.com.svr.service.entity.Material;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.Representada;
@@ -74,6 +77,7 @@ public class GeradorPedido {
 		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
 		contatoService = ServiceBuilder.buildService(ContatoService.class);
+		logradouroService = ServiceBuilder.buildService(LogradouroService.class);
 	}
 
 	public <T extends Contato> T gerarContato(Class<T> t) {
@@ -90,7 +94,6 @@ public class GeradorPedido {
 		ct.setDepartamento("Comercial");
 		ct.setTelefone("999999999");
 		ct.setEmail("daniel@gmail.com");
-		ct.setId(contatoService.inserir(ct));
 		return ct;
 	}
 
@@ -229,6 +232,7 @@ public class GeradorPedido {
 		Transportadora transp = gTransportadora.gerarTransportadora();
 
 		Pedido pedido = eBuilder.buildPedido();
+		pedido.setCliente(gerarCliente(vendedor));
 		pedido.setTransportadora(transp);
 		pedido.setVendedor(vendedor);
 		pedido.setTipoPedido(tipoPedido);
@@ -238,14 +242,6 @@ public class GeradorPedido {
 			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.6, 0.1);
 		} catch (BusinessException e3) {
 			printMensagens(e3);
-		}
-
-		Cliente cliente = pedido.getCliente();
-		cliente.setVendedor(vendedor);
-		try {
-			clienteService.inserir(cliente);
-		} catch (BusinessException e) {
-			printMensagens(e);
 		}
 
 		Representada representada = gRepresentada.gerarRepresentada(tipoRelacionamento);
@@ -385,8 +381,8 @@ public class GeradorPedido {
 		}
 
 		Pedido pedido = eBuilder.buildPedido();
-
 		pedido.setRepresentada(representada);
+		pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
 		Usuario vendedor = eBuilder.buildVendedor();
 		vendedor.setId(null);
 
@@ -396,19 +392,33 @@ public class GeradorPedido {
 			printMensagens(e1);
 		}
 
-		Cliente cliente = eBuilder.buildCliente();
-		cliente.setVendedor(vendedor);
-		try {
-			clienteService.inserir(cliente);
-		} catch (BusinessException e2) {
-			printMensagens(e2);
-		}
-
-		pedido.setCliente(cliente);
+		pedido.setCliente(gerarCliente(vendedor));
 		pedido.setVendedor(vendedor);
 		pedido.getCliente().setVendedor(vendedor);
 		return pedido;
 	}
+
+	public Cliente gerarCliente(Usuario vendedor) {
+		Cliente cliente = eBuilder.buildCliente();
+		cliente.setVendedor(vendedor);
+		List<LogradouroCliente> lLog = new ArrayList<>();
+		for (LogradouroCliente l : cliente.getListaLogradouro()) {
+			try {
+				lLog.add(logradouroService.inserir(l));
+			} catch (BusinessException e) {
+				printMensagens(e);
+			}
+		}
+		cliente.setListaLogradouro(lLog);
+		try {
+			return clienteService.inserir(cliente);
+		} catch (BusinessException e2) {
+			printMensagens(e2);
+		}
+		return null;
+	}
+
+	private LogradouroService logradouroService;
 
 	public void printMensagens(BusinessException exception) {
 		Assert.fail("Falha em alguma regra de negocio. As mensagens sao: " + exception.getMensagemConcatenada());

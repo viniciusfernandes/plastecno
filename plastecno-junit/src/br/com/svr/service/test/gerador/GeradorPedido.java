@@ -266,10 +266,10 @@ public class GeradorPedido {
 
 		// Temos que gerar um revendedor pois eh ele que efetuara as comprar
 		// para abastecer o estoque.
-		Cliente revendedor = gerarClienteRevendedor();
+		Cliente cliente = TipoPedido.COMPRA.equals(tipoPedido) ? gerarClienteRevendedor() : gerarCliente(vendedor);
 
 		Pedido pCompra = eBuilder.buildPedido();
-		pCompra.setCliente(revendedor);
+		pCompra.setCliente(cliente);
 		pCompra.setTransportadora(transp);
 		pCompra.setVendedor(vendedor);
 		pCompra.setTipoPedido(tipoPedido);

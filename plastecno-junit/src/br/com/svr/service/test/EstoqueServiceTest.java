@@ -47,9 +47,11 @@ public class EstoqueServiceTest extends AbstractTest {
 	private ClienteService clienteService;
 	private ComissaoService comissaoService;
 	private EstoqueService estoqueService;
+	private GeradorPedido gPedido = GeradorPedido.getInstance();
 	private MaterialService materialService;
 	private PedidoService pedidoService;
 	private RepresentadaService representadaService;
+
 	private UsuarioService usuarioService;
 
 	public EstoqueServiceTest() {
@@ -61,8 +63,6 @@ public class EstoqueServiceTest extends AbstractTest {
 		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
 	}
-
-	private GeradorPedido gPedido = GeradorPedido.getInstance();
 
 	private ItemPedido enviarItemPedido(Integer quantidade, TipoPedido tipoPedido) {
 		Pedido pCompra = gPedido.gerarPedidoCompra();
@@ -177,28 +177,10 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	private ItemEstoque gerarItemPedidoNoEstoque() {
 		ItemPedido iCompra = enviarItemPedidoCompra();
-		Integer idComprador = pedidoService.pesquisarIdVendedorByIdPedido(iCompra.getPedido().getId());
-		// Pegando o promeiro fornecedor que aparecer na listagem pois eh
-		// indiferente.
-		List<Representada> lRepresenta = representadaService.pesquisarFornecedorAtivo();
-		assertTrue("A lista de fornecedores devem ser preenchida.", lRepresenta != null && lRepresenta.size() != 0);
-		Integer idFornecedor = lRepresenta.get(0).getId();
-
-		Set<Integer> lIds = new HashSet<>();
-		lIds.add(iCompra.getId());
-		try {
-			pedidoService.comprarItemPedido(idComprador, idFornecedor, lIds);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
 		Integer idItemEstoque = null;
 		try {
-			// idItemEstoque =
-			// estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(),
-			// i.getQuantidade());
-			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(), iCompra.getQuantidade(),
-					"99999999");
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(),
+					iCompra.getQuantidade(), "99999999");
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -331,8 +313,20 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
+		try {
+			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.1, 0.2);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
 		// No sistema sempre devemos ter o revendedor cadastrado.
-		gerarRevendedor();
+		Representada revendedor = gerarRevendedor();
+		if (TipoPedido.REVENDA.equals(tipoPedido)) {
+			// Aqui estamos garantindo que a representada eh um revendedor para
+			// ajustar com o metod de definicao do tipo de pedido executado no
+			// envio do pedido.
+			pedido.setRepresentada(revendedor);
+		}
 
 		try {
 			pedido = pedidoService.inserirPedido(pedido);

@@ -16,6 +16,16 @@ public class NegociacaoDAOBuilder extends DAOBuilder<NegociacaoDAO> {
 	public NegociacaoDAO build() {
 
 		new MockUp<NegociacaoDAO>() {
+			@Mock
+			public void alterarIndiceConversaoValorByIdCliente(Integer idCliente, Double indice,
+					SituacaoNegociacao situacaoNegociacao) {
+				List<Negociacao> l = REPOSITORY.pesquisarTodos(Negociacao.class);
+				for (Negociacao n : l) {
+					if (idCliente.equals(n.getIdCliente()) && situacaoNegociacao.equals(n.getSituacaoNegociacao())) {
+						n.setIndiceConversaoValor(indice);
+					}
+				}
+			}
 
 			@Mock
 			public void alterarSituacaoNegociacao(Integer idNegociacao, SituacaoNegociacao situacaoNegociacao) {

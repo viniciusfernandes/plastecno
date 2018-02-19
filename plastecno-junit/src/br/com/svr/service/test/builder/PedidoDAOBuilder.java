@@ -175,6 +175,15 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public Integer pesquisarIdVendedorByIdPedido(Integer idPedido) {
+				if (idPedido == null) {
+					return null;
+				}
+				Pedido p = REPOSITORY.pesquisarEntidadeById(Pedido.class, idPedido);
+				return p == null ? null : p.getVendedor().getId();
+			}
+
+			@Mock
 			public ItemPedido pesquisarItemPedidoById(Integer idItemPedido) {
 				return REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 			}
@@ -252,7 +261,22 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 
 			@Mock
 			public SituacaoPedido pesquisarSituacaoPedidoByIdItemPedido(Integer idItemPedido) {
+				if (idItemPedido == null) {
+					return null;
+				}
 				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				List<Pedido> lP = REPOSITORY.pesquisarTodos(Pedido.class);
+				List<ItemPedido> lIt = REPOSITORY.pesquisarTodos(ItemPedido.class);
+				for (Pedido p : lP) {
+					System.out.println("Pedido no: " + p.getId() + " tipo ped: " + p.getTipoPedido() + " situacao: "
+							+ p.getSituacaoPedido());
+					for (ItemPedido it : lIt) {
+						if (it.getPedido().getId().equals(p.getId())) {
+							System.out.println("\t Item: " + it.getId() + " no: " + it.getSequencial() + " qtde: "
+									+ it.getQuantidade());
+						}
+					}
+				}
 				return i == null ? null : i.getPedido().getSituacaoPedido();
 			}
 

@@ -13,6 +13,7 @@ import br.com.caelum.vraptor.interceptor.download.Download;
 import br.com.caelum.vraptor.interceptor.multipart.UploadedFile;
 import br.com.svr.service.ClienteService;
 import br.com.svr.service.MaterialService;
+import br.com.svr.service.NegociacaoService;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.RepresentadaService;
 import br.com.svr.service.UsuarioService;
@@ -45,6 +46,9 @@ public class OrcamentoController extends AbstractPedidoController {
 
     @Servico
     private MaterialService materialService;
+
+    @Servico
+    private NegociacaoService negociacaoService;
 
     @Servico
     private PedidoService pedidoService;
@@ -90,7 +94,7 @@ public class OrcamentoController extends AbstractPedidoController {
     @Post("orcamento/aceite/{id}")
     public void aceitarOrcamento(Integer id) {
         try {
-            Integer idPedido = pedidoService.aceitarOrcamento(id);
+            Integer idPedido = negociacaoService.aceitarNegocicacaoByIdOrcamento(id);
             // Devemos configurar o parametro orcamento = false para direcionar
             // usuario para a tela de vendas apos o aceite.
             redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA, true);

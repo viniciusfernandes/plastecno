@@ -44,6 +44,10 @@ public class Negociacao implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "negociacaoSequence")
 	private Integer id;
 
+	@Column(name = "id_cliente")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Id cliente da negociação")
+	private Integer idCliente;
+
 	@Transient
 	private Integer idOrcamento;
 
@@ -119,6 +123,10 @@ public class Negociacao implements Serializable {
 		return id;
 	}
 
+	public Integer getIdCliente() {
+		return idCliente;
+	}
+
 	public Integer getIdOrcamento() {
 		return idOrcamento;
 	}
@@ -173,6 +181,10 @@ public class Negociacao implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public void setIdCliente(Integer idCliente) {
+		this.idCliente = idCliente;
 	}
 
 	public void setIdOrcamento(Integer idOrcamento) {

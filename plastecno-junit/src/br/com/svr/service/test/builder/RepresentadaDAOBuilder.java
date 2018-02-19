@@ -16,7 +16,6 @@ public class RepresentadaDAOBuilder extends DAOBuilder<RepresentadaDAO> {
 	@Override
 	public RepresentadaDAO build() {
 		new MockUp<RepresentadaDAO>() {
-
 			@Mock
 			public double pesquisarAliquotaICMSRevendedor() {
 				List<Representada> lista = REPOSITORY.pesquisarTodos(Representada.class);
@@ -83,6 +82,17 @@ public class RepresentadaDAOBuilder extends DAOBuilder<RepresentadaDAO> {
 					}
 				}
 				return representadas;
+			}
+
+			@Mock
+			public Representada pesquisarRevendedor() {
+				List<Representada> l = REPOSITORY.pesquisarTodos(Representada.class);
+				for (Representada r : l) {
+					if (TipoRelacionamento.REVENDA.equals(r.getTipoRelacionamento())) {
+						return r;
+					}
+				}
+				return null;
 			}
 
 			@Mock

@@ -31,7 +31,7 @@ public class NegociacaoController extends AbstractController {
     public void aceitarNegocicacao(Integer idNegociacao) {
         Integer idOrcamento;
         try {
-            idOrcamento = negociacaoService.aceitarNegocicacao(idNegociacao);
+            idOrcamento = negociacaoService.aceitarNegocicacaoByIdNegociacao(idNegociacao);
             redirecTo(PedidoController.class).pesquisarPedidoById(idOrcamento, TipoPedido.REVENDA, true);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
@@ -109,7 +109,7 @@ public class NegociacaoController extends AbstractController {
                 if (n == null) {
                     continue;
                 }
-                n.setIndiceConversaoValor(n.getIndiceConversaoValor() * 100);
+                n.setIndiceConversaoValor(NumeroUtils.arredondarValorMonetario(n.getIndiceConversaoValor()));
             }
         }
 

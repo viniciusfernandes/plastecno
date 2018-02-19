@@ -240,6 +240,21 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 						"idPedido", idPedido), Integer.class, null);
 	}
 
+	public Object[] pesquisarIdNomeClienteNomeContatoValor(Integer idPedido) {
+		return QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select p.cliente.id, p.cliente.nomeFantasia,  p.contato.ddd, p.contato.nome, p.contato.telefone, p.valorPedido from Pedido p where p.id=:idPedido")
+								.setParameter("idPedido", idPedido), Object[].class, null);
+	}
+
+	public Integer pesquisarIdOrcamentoByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.idOrcamento from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), Integer.class, null);
+	}
+
 	public Integer pesquisarIdPedidoByIdItemPedido(Integer idItemPedido) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
@@ -271,6 +286,16 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		final String select = "select r.id from Pedido p inner join p.representada r where p.id = :idPedido";
 		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(select).setParameter("idPedido", idPedido),
 				Integer.class, null);
+	}
+
+	public Integer pesquisarIdVendedorByIdPedido(Integer idPedido) {
+		if (idPedido == null) {
+			return null;
+		}
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select v.id from Pedido p inner join p.proprietario v where p.id = :idPedido ").setParameter(
+						"idPedido", idPedido), Integer.class, null);
 	}
 
 	public ItemPedido pesquisarItemPedidoById(Integer idItemPedido) {
@@ -309,15 +334,6 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				.createQuery("select max(i.sequencial) from ItemPedido i where i.pedido.id = :idPedido")
 				.setParameter("idPedido", idPedido).getSingleResult();
 
-	}
-
-	public Object[] pesquisarIdNomeClienteNomeContatoValor(Integer idPedido) {
-		return QueryUtil
-				.gerarRegistroUnico(
-						entityManager
-								.createQuery(
-										"select p.cliente.id, p.cliente.nomeFantasia,  p.contato.ddd, p.contato.nome, p.contato.telefone, p.valorPedido from Pedido p where p.id=:idPedido")
-								.setParameter("idPedido", idPedido), Object[].class, null);
 	}
 
 	public String pesquisarNumeroPedidoClienteByIdPedido(Integer idPedido) {

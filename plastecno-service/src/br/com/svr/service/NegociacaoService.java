@@ -11,9 +11,13 @@ import br.com.svr.service.wrapper.RelatorioWrapper;
 
 public interface NegociacaoService {
 
-	Integer aceitarNegocicacao(Integer idNegociacao) throws BusinessException;
+	Integer aceitarNegocicacaoByIdNegociacao(Integer idNegociacao) throws BusinessException;
+
+	Integer aceitarNegocicacaoByIdOrcamento(Integer idOrcamento) throws BusinessException;
 
 	void alterarCategoria(Integer idNegociacao, CategoriaNegociacao categoriaNegociacao) throws BusinessException;
+
+	void alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(Integer idCliente, Double valor);
 
 	double calcularValorCategoriaNegociacaoAberta(Integer idVendedor, CategoriaNegociacao categoria);
 
@@ -25,7 +29,7 @@ public interface NegociacaoService {
 
 	RelatorioWrapper<CategoriaNegociacao, Negociacao> gerarRelatorioNegociacao(Integer idVendedor);
 
-	Integer inserirNegociacao(Integer idOrcamento, Integer idVendedor) throws BusinessException;
+	Integer inserirNegociacao(Integer idOrcamento, Integer idCliente, Integer idVendedor) throws BusinessException;
 
 	Negociacao pesquisarById(Integer idNegociacao);
 

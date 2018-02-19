@@ -90,7 +90,7 @@ public class MaterialServiceImpl implements MaterialService {
 			material.clearListaRepresentada();
 
 			for (Integer idRepresentada : listaIdRepresentadaAssociada) {
-				material.addRepresentada(this.representadaService.pesquisarById(idRepresentada));
+				material.addRepresentada(representadaService.pesquisarById(idRepresentada));
 			}
 		}
 

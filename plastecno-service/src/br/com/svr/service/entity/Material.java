@@ -144,7 +144,7 @@ public class Material implements Serializable {
 		this.importado = importado;
 	}
 
-	void setListaRepresentada(List<Representada> listaRepresentada) {
+	public void setListaRepresentada(List<Representada> listaRepresentada) {
 		this.listaRepresentada = listaRepresentada;
 	}
 

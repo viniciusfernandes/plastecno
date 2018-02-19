@@ -38,7 +38,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 		Negociacao n = lNeg.get(0);
 		try {
-			negociacaoService.aceitarNegocicacao(n.getId());
+			negociacaoService.aceitarNegocicacaoByIdNegociacao(n.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -51,7 +51,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 		Pedido o = gPedido.gerarOrcamento();
 		Integer idNeg = null;
 		try {
-			idNeg = negociacaoService.inserirNegociacao(o.getId(), o.getVendedor().getId());
+			idNeg = negociacaoService.inserirNegociacao(o.getId(), o.getCliente().getId(), o.getVendedor().getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -109,7 +109,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 		Negociacao n = lNeg.get(0);
 		Integer idPedido = null;
 		try {
-			idPedido = negociacaoService.aceitarNegocicacao(n.getId());
+			idPedido = negociacaoService.aceitarNegocicacaoByIdNegociacao(n.getId());
 			pedidoService.pesquisarValorPedidoIPI(o.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);

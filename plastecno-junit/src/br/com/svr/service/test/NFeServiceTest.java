@@ -12,6 +12,7 @@ import org.junit.Test;
 import br.com.svr.service.DuplicataService;
 import br.com.svr.service.NFeService;
 import br.com.svr.service.PedidoService;
+import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.entity.Cliente;
 import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.LogradouroCliente;
@@ -70,6 +71,8 @@ public class NFeServiceTest extends AbstractTest {
 
 	private NFe gerarNFe(Integer idPedido, boolean apenasItensRestantes) {
 		Cliente cli = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
+		boolean isVenda = TipoPedido.isVenda(pedidoService.pesquisarTipoPedidoByIdPedido(idPedido));
+
 		Transportadora transPed = pedidoService.pesquisarTransportadoraByIdPedido(idPedido);
 		LogradouroCliente endFaturamento = cli.recuperarLogradouroFaturamento();
 
@@ -105,7 +108,7 @@ public class NFeServiceTest extends AbstractTest {
 		i.setFinalidadeEmissao(Integer.parseInt(TipoFinalidadeEmissao.NORMAL.getCodigo()));
 		i.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.PRAZO.getCodigo()));
 		i.setTipoEmissao(TipoEmissao.NORMAL.getCodigo());
-		i.setTipoOperacao(TipoOperacaoNFe.ENTRADA.getCodigo());
+		i.setTipoOperacao(isVenda ? TipoOperacaoNFe.SAIDA.getCodigo() : TipoOperacaoNFe.ENTRADA.getCodigo());
 		i.setTipoPresencaComprador(TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
 		i.setNaturezaOperacao("NATUREZA DA OPERACAO DE ENVIO TESTE");
 		i.setOperacaoConsumidorFinal(TipoOperacaoConsumidorFinal.NORMAL.getCodigo());
@@ -274,7 +277,7 @@ public class NFeServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			nFeService.emitirNFeEntrada(nFe, idPedido);
+			nFeService.emitirNFeSaida(nFe, idPedido);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -291,7 +294,7 @@ public class NFeServiceTest extends AbstractTest {
 
 		boolean throwed = false;
 		try {
-			nFeService.emitirNFeEntrada(nFe, idPedido);
+			nFeService.emitirNFeSaida(nFe, idPedido);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -506,7 +509,7 @@ public class NFeServiceTest extends AbstractTest {
 
 		Integer num = null;
 		try {
-			num = Integer.parseInt(nFeService.emitirNFeEntrada(nFe, idPedido));
+			num = Integer.parseInt(nFeService.emitirNFeSaida(nFe, idPedido));
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		} catch (BusinessException e) {

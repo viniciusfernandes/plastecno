@@ -25,6 +25,15 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 				.executeUpdate();
 	}
 
+	public void alterarIndiceConversaoValorByIdCliente(Integer idCliente, Double indice,
+			SituacaoNegociacao situacaoNegociacao) {
+		entityManager
+				.createQuery(
+						"update Negociacao n set n.indiceConversaoValor =:indice where n.idCliente =:idCliente and n.situacaoNegociacao=:situacaoNegociacao")
+				.setParameter("indice", indice).setParameter("idCliente", idCliente)
+				.setParameter("situacaoNegociacao", situacaoNegociacao).executeUpdate();
+	}
+
 	public void alterarSituacaoNegociacao(Integer idNegociacao, SituacaoNegociacao situacaoNegociacao) {
 		entityManager
 				.createQuery(
@@ -51,6 +60,12 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 
 	public Negociacao pesquisarById(Integer idNegociacao) {
 		return super.pesquisarById(Negociacao.class, idNegociacao);
+	}
+
+	public Integer pesquisarIdNegociacaoByIdOrcamento(Integer idOrcamento) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select n.id from Negociacao n where n.orcamento.id =:idOrcamento")
+						.setParameter("idOrcamento", idOrcamento), Integer.class, null);
 	}
 
 	public Integer pesquisarIdPedidoByIdNegociacao(Integer idNegociacao) {

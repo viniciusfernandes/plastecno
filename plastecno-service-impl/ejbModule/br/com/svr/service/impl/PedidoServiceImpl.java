@@ -153,6 +153,7 @@ public class PedidoServiceImpl implements PedidoService {
 		// Amarrando o pedido ao orcamento para o aceite. Isso sera utilizado em
 		// relatorios dos orcamento que viraram pedidos.
 		pedidoDAO.alterarIdOrcamentoByIdPedido(idPedido, idOrcamento);
+
 		return idPedido;
 	}
 
@@ -201,7 +202,8 @@ public class PedidoServiceImpl implements PedidoService {
 		if (!SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.equals(situacaoPedido)) {
 			throw new BusinessException(
 					"Não é possível alterar a quantidade recepcionada pois a situacao do pedido é \""
-							+ situacaoPedido.getDescricao() + "\"");
+							+ situacaoPedido.getDescricao() + "\", quando deveria ser "
+							+ SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO.getDescricao());
 		}
 		itemPedidoDAO.alterarQuantidadeRecepcionada(idItemPedido, quantidadeRecepcionada);
 	}
@@ -260,7 +262,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private double[] atualizarValoresPedido(Integer idPedido) {
 		double[] valores = pedidoDAO.pesquisarValoresPedido(idPedido);
-		
+
 		if (valores.length <= 0) {
 			valores = new double[] { 0d, 0d };
 		}
@@ -834,6 +836,8 @@ public class PedidoServiceImpl implements PedidoService {
 			enviarCompra(pedido, pdfPedido, anexos);
 		}
 
+		// Definindo a situacao do pedido apenas apos o sucesso do envio do
+		// email.
 		if (pedido.isCompra()) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO);
 		} else {
@@ -849,10 +853,6 @@ public class PedidoServiceImpl implements PedidoService {
 			}
 		}
 		pedidoDAO.alterar(pedido);
-
-		// O recalculo do indice deve ser feito apenas quando o pedido for
-		// finalizado, por isso esta aqui.
-		negociacaoService.recalcularIndiceConversao(idPedido, pedido.getIdOrcamento());
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -864,6 +864,13 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		validarListaLogradouroPreenchida(pedido);
+
+		// O recalculo do indice deve ser feito aqui pois apos a inclusao e
+		// aceite do orcamento o vendedor pode alterar os itens do pedidod e
+		// recalculando aqui o sistema compara o valor do pedido atualizado e do
+		// orcamento que foi aceito.
+		negociacaoService.recalcularIndiceConversao(pedido.getId(), pedido.getIdOrcamento());
+
 		try {
 			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA, pdfPedido, anexos));
 			// Caso o contato tambem queira receber o email
@@ -1036,6 +1043,7 @@ public class PedidoServiceImpl implements PedidoService {
 			// recuperando as informacoes do sistema que nao devem ser alteradas
 			// na edicao do pedido.
 			pedido.setDataEnvio(pesquisarDataEnvio(idPedido));
+			pedido.setIdOrcamento(pedidoDAO.pesquisarIdOrcamentoByIdPedido(idPedido));
 			pedido.setValorPedido(pesquisarValorPedido(idPedido));
 			pedido.setValorPedidoIPI(pesquisarValorPedidoIPI(idPedido));
 			pedido = pedidoDAO.alterar(pedido);
@@ -1229,7 +1237,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 		Pedido orc = inserir(orcamento);
 		if (orc.isOrcamentoDigitacao()) {
-			negociacaoService.inserirNegociacao(orc.getId(), orc.getVendedor().getId());
+			negociacaoService.inserirNegociacao(orc.getId(), cliente.getId(), orc.getVendedor().getId());
 		}
 		return orc;
 	}
@@ -1560,13 +1568,7 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Integer pesquisarIdVendedorByIdPedido(Integer idPedido) {
-		if (idPedido == null) {
-			return null;
-		}
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery(
-						"select v.id from Pedido p inner join p.proprietario v where p.id = :idPedido ").setParameter(
-						"idPedido", idPedido), Integer.class, null);
+		return pedidoDAO.pesquisarIdVendedorByIdPedido(idPedido);
 	}
 
 	@Override

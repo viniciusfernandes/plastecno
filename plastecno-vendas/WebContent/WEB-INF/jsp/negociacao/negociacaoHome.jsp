@@ -96,7 +96,10 @@ function drop(ev) {
 	
 	if(!isFieldset(coluna)){
 		var colInicial = document.getElementById(categoriaInicial);
-		colInicial.appendChild(idNegociacao);
+		var neg = document.getElementById(idNegociacao);
+		if(neg!= undefined && neg != null){
+			colInicial.appendChild(neg);
+		}
 		return;
 	}
 	var valCategFinal = document.getElementById('totVal'+categoriaFinal);
@@ -245,7 +248,7 @@ function aceitarNegociacao(idNegociacao){
 				<span>${neg.nomeCliente}</span>
 			</a>
 			<a class="front" href="javascript: void(0);" draggable="false">
-				<span>Conversão: ${neg.indiceConversaoValor}%</span>
+				<span>Conversão: ${neg.indiceConversaoValor} vezes</span>
 			</a>
 			<a class="front" href="javascript: void(0);" draggable="false">
 				<span>${neg.nomeContato}</span>

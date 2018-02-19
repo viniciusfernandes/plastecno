@@ -90,8 +90,11 @@ public class EntidadeBuilder {
 	public Cliente buildClienteRevendedor() {
 		Cliente cliente = buildCliente();
 		double no = Math.random();
-		cliente.setNomeFantasia("Acrílicos Merediano No " + no);
-		cliente.setRazaoSocial("Acrílicos Merediano LTDA " + no);
+		cliente.setCnpj("25632147000125");
+		cliente.setRazaoSocial("Revendedor de Plasticos" + no);
+		cliente.setNomeFantasia("Revendedor de Plasticos LTDA" + no);
+		cliente.setRamoAtividade(buildRamoAtividade());
+		cliente.setEmail("revendplastcios@gmail.com.br");
 		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
 		return cliente;
 	}
@@ -125,6 +128,15 @@ public class EntidadeBuilder {
 		repositorio.inserirEntidade(pais);
 		repositorio.inserirEntidade(endereco);
 		return endereco;
+	}
+
+	public Representada buildFornecedor() {
+		Representada representada = buildRepresentada();
+		representada.setNomeFantasia("Fornecedor Plastico");
+		representada.setEmail("fornecedorplastico@cobex.com.br");
+		representada.setRazaoSocial("Fornecedor Plastico LTDA");
+		representada.setTipoRelacionamento(TipoRelacionamento.FORNECIMENTO);
+		return representada;
 	}
 
 	public ItemEstoque buildItemEstoque() {
@@ -335,15 +347,6 @@ public class EntidadeBuilder {
 		return representada;
 	}
 
-	public Representada buildRepresentadaFornecedor() {
-		Representada representada = buildRepresentada();
-		representada.setNomeFantasia("Fornecedor Plastico");
-		representada.setEmail("fornecedorplastico@cobex.com.br");
-		representada.setRazaoSocial("Fornecedor Plastico LTDA");
-		representada.setTipoRelacionamento(TipoRelacionamento.FORNECIMENTO);
-		return representada;
-	}
-
 	public Representada buildRepresentadaRevendedora() {
 		Representada representada = buildRepresentada();
 		representada.setNomeFantasia("Revendedor Plastico");
@@ -351,6 +354,15 @@ public class EntidadeBuilder {
 		representada.setRazaoSocial("Revendedor Plastico LTDA");
 		representada.setTipoRelacionamento(TipoRelacionamento.REVENDA);
 		return representada;
+	}
+
+	public Cliente buildRevendedor() {
+		Cliente cliente = buildCliente();
+		double no = Math.random();
+		cliente.setNomeFantasia("Acrílicos Merediano No " + no);
+		cliente.setRazaoSocial("Acrílicos Merediano LTDA " + no);
+		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
+		return cliente;
 	}
 
 	public Transportadora buildTransportadora() {

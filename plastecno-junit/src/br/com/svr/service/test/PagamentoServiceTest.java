@@ -16,6 +16,7 @@ import br.com.svr.service.entity.Pagamento;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.Representada;
 import br.com.svr.service.exception.BusinessException;
+import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.test.builder.ServiceBuilder;
 import br.com.svr.service.test.gerador.GeradorPedido;
 import br.com.svr.service.test.gerador.GeradorRepresentada;
@@ -94,7 +95,15 @@ public class PagamentoServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 
+		try {
+			pedidoService.enviarPedido(ped1.getId(), new AnexoEmail(new byte[] {}));
+			pedidoService.enviarPedido(ped2.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		Integer numeroNF = 12000;
+		double valorNF = 1000d;
 
 		// Geranado 2 pedidos que serao pagos na mesma nota fiscal
 		Pagamento pag1 = pagamentoService.gerarPagamentoItemCompra(id1);
@@ -104,10 +113,14 @@ public class PagamentoServiceTest extends AbstractTest {
 		pag1.setDataEmissao(new Date());
 		pag2.setDataEmissao(new Date());
 		pag3.setDataEmissao(new Date());
-		
+
 		pag1.setNumeroNF(numeroNF);
 		pag2.setNumeroNF(numeroNF);
 		pag3.setNumeroNF(numeroNF);
+
+		pag1.setValorNF(valorNF);
+		pag2.setValorNF(valorNF);
+		pag3.setValorNF(valorNF);
 
 		assertEquals("Os pagamentos dos itens do mesmo pedido devem conter o mesmo id do fornecedor.",
 				pag1.getIdFornecedor(), pag2.getIdFornecedor());

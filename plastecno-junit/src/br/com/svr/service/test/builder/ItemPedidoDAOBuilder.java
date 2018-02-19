@@ -86,6 +86,15 @@ public class ItemPedidoDAOBuilder extends DAOBuilder<ItemPedidoDAO> {
 			}
 
 			@Mock
+			public Object[] pesquisarIdPedidoCompraEVenda(Integer idItemPedido) {
+				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
+				if (i == null) {
+					return new Object[] {};
+				}
+				return new Object[] { i.getIdPedidoCompra(), i.getIdPedidoVenda() };
+			}
+
+			@Mock
 			public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {
 				ItemPedido i = REPOSITORY.pesquisarEntidadeById(ItemPedido.class, idItemPedido);
 				if (i == null) {

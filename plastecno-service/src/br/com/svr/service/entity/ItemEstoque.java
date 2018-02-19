@@ -69,7 +69,7 @@ public class ItemEstoque extends Item {
 	private Double medidaInterna;
 
 	@Column(name = "ncm")
-	@InformacaoValidavel(obrigatorio = false, tipoDocumento = TipoDocumento.NCM)
+	@InformacaoValidavel(obrigatorio = false, tipoDocumento = TipoDocumento.NCM, nomeExibicao="NCM do item de estoque")
 	private String ncm;
 
 	@Column(name = "preco_medio")

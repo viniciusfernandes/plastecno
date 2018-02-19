@@ -180,7 +180,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(),
-					iCompra.getQuantidade(), "99999999");
+					iCompra.getQuantidade(), "99.11.22.33");
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

@@ -13,7 +13,7 @@ public class ValidadorInformacaoTest extends AbstractTest {
 	private EntidadeValidacao gerarEntidadeValidacao() {
 		EntidadeValidacao e = new EntidadeValidacao();
 		e.setNomeFantasia("PETROBRAS");
-		e.setRazaoSocial("PETRO FUNILARIAS");
+		e.setRazaoSocial("PETRO LTDA");
 		e.setCnpj("46825523000178");
 		e.setCpf("29186568876");
 		e.setInscricaoEstadual("123456789012");

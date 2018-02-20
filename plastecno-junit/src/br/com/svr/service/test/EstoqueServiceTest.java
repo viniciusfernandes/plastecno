@@ -13,13 +13,10 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import br.com.svr.service.ClienteService;
-import br.com.svr.service.ComissaoService;
 import br.com.svr.service.EstoqueService;
 import br.com.svr.service.MaterialService;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.RepresentadaService;
-import br.com.svr.service.UsuarioService;
 import br.com.svr.service.constante.FormaMaterial;
 import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.SituacaoReservaEstoque;
@@ -35,7 +32,6 @@ import br.com.svr.service.entity.ItemReservado;
 import br.com.svr.service.entity.Material;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.Representada;
-import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.anotation.TODO;
 import br.com.svr.service.mensagem.email.AnexoEmail;
@@ -44,48 +40,48 @@ import br.com.svr.service.test.gerador.GeradorPedido;
 import br.com.svr.util.NumeroUtils;
 
 public class EstoqueServiceTest extends AbstractTest {
-	private ClienteService clienteService;
-	private ComissaoService comissaoService;
 	private EstoqueService estoqueService;
 	private GeradorPedido gPedido = GeradorPedido.getInstance();
 	private MaterialService materialService;
 	private PedidoService pedidoService;
 	private RepresentadaService representadaService;
 
-	private UsuarioService usuarioService;
-
 	public EstoqueServiceTest() {
 		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
-		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
-		clienteService = ServiceBuilder.buildService(ClienteService.class);
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
-		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
 	}
 
 	private ItemPedido enviarItemPedido(Integer quantidade, TipoPedido tipoPedido) {
-		Pedido pCompra = gPedido.gerarPedidoCompra();
-
-		ItemPedido iCompra = eBuilder.buildItemPedido();
-		if (quantidade != null) {
-			iCompra.setQuantidade(quantidade);
+		Pedido pedido = null;
+		if (TipoPedido.COMPRA.equals(tipoPedido)) {
+			pedido = gPedido.gerarPedidoCompra();
+		} else if (TipoPedido.REVENDA.equals(tipoPedido)) {
+			pedido = gPedido.gerarPedidoRevenda();
+		} else {
+			pedido = gPedido.gerarPedidoRepresentacao();
 		}
-		iCompra.setMaterial(gerarMaterial(pCompra.getRepresentada().getId()));
+
+		ItemPedido item = eBuilder.buildItemPedido();
+		if (quantidade != null) {
+			item.setQuantidade(quantidade);
+		}
+		item.setMaterial(gerarMaterial(pedido.getRepresentada().getId()));
 
 		try {
-			final Integer id = pedidoService.inserirItemPedido(pCompra.getId(), iCompra);
-			iCompra.setId(id);
+			final Integer id = pedidoService.inserirItemPedido(pedido.getId(), item);
+			item.setId(id);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
 
 		try {
-			pedidoService.enviarPedido(pCompra.getId(), new AnexoEmail(new byte[] {}));
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		return iCompra;
+		return item;
 	}
 
 	private ItemPedido enviarItemPedido(TipoPedido tipoPedido) {
@@ -285,56 +281,16 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	private Pedido gerarPedido(TipoPedido tipoPedido) {
-		Usuario vendedor = gerarVendedor();
-
-		Pedido pedido = eBuilder.buildPedido();
-		pedido.setTipoPedido(tipoPedido);
-		pedido.setVendedor(vendedor);
-
-		Cliente cliente = null;
-		Representada representada = null;
-
 		if (TipoPedido.COMPRA.equals(tipoPedido)) {
-			cliente = eBuilder.buildRevendedor();
-			representada = gerarFornecedor();
-
-		} else {
-			cliente = eBuilder.buildCliente();
-			representada = gerarRepresentada();
+			return gPedido.gerarPedidoCompra();
 		}
-
-		pedido.setCliente(cliente);
-		pedido.setRepresentada(representada);
-
-		cliente.setVendedor(vendedor);
-		try {
-			clienteService.inserir(cliente);
-		} catch (BusinessException e) {
-			printMensagens(e);
+		if (TipoPedido.REPRESENTACAO.equals(tipoPedido)) {
+			return gPedido.gerarPedidoRepresentacao();
 		}
-
-		try {
-			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.1, 0.2);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		// No sistema sempre devemos ter o revendedor cadastrado.
-		Representada revendedor = gerarRevendedor();
 		if (TipoPedido.REVENDA.equals(tipoPedido)) {
-			// Aqui estamos garantindo que a representada eh um revendedor para
-			// ajustar com o metod de definicao do tipo de pedido executado no
-			// envio do pedido.
-			pedido.setRepresentada(revendedor);
+			return gPedido.gerarPedidoRevenda();
 		}
-
-		try {
-			pedido = pedidoService.inserirPedido(pedido);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
-
-		return pedido;
+		return null;
 	}
 
 	private Representada gerarRepresentada() {
@@ -346,32 +302,6 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e3);
 		}
 		return representada;
-	}
-
-	private Representada gerarRevendedor() {
-		Representada revendedor = eBuilder.buildRepresentadaRevendedora();
-		try {
-			representadaService.inserir(revendedor);
-		} catch (BusinessException e3) {
-			printMensagens(e3);
-		}
-		return revendedor;
-	}
-
-	private Usuario gerarVendedor() {
-		Usuario vendedor = eBuilder.buildVendedor();
-		try {
-			usuarioService.inserir(vendedor, true);
-		} catch (BusinessException e2) {
-			printMensagens(e2);
-		}
-
-		try {
-			comissaoService.inserirComissaoRevendaVendedor(vendedor.getId(), 0.9);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		return vendedor;
 	}
 
 	private Integer pesquisarQuantidadeTotalItemEstoque(Integer idItemEstoque) {
@@ -1715,10 +1645,13 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemEstoque itemEsto = gerarItemPedidoNoEstoque();
 		Integer qtdeEstoque = itemEsto.getQuantidade();
 
+		Pedido p = gerarPedido(TipoPedido.REVENDA);
+
 		ItemPedido itemPed = eBuilder.buildItemPedido();
 		itemPed.copiar(itemEsto);
-		Pedido p = gerarPedido(TipoPedido.REVENDA);
 		itemPed.setPedido(p);
+		itemPed.setAliquotaIPI(null);
+
 		Integer idItemPedido = null;
 		try {
 			idItemPedido = pedidoService.inserirItemPedido(p.getId(), itemPed);
@@ -1946,16 +1879,18 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testReservaPedidoComUmDosItemNaoExistenteEstoque() {
-		Pedido pedido = gerarPedido(TipoPedido.REVENDA);
+		Pedido pedido = gPedido.gerarPedidoRevenda();
 		Material material = gerarMaterial(pedido.getRepresentada().getId());
 
 		ItemPedido item1 = eBuilder.buildItemPedido();
 		item1.setPedido(pedido);
 		item1.setMaterial(material);
+		item1.setAliquotaIPI(null);
 
 		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
 		item2.setPedido(pedido);
 		item2.setMaterial(material);
+		item2.setAliquotaIPI(null);
 
 		try {
 			pedidoService.inserirItemPedido(pedido.getId(), item1);

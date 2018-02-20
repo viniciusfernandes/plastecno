@@ -857,7 +857,7 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private void enviarVenda(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
-		this.validarEnvioVenda(pedido);
+		validarEnvioVenda(pedido);
 
 		if (pedido.isRevenda()) {
 			estoqueService.reservarItemPedido(pedido.getId());

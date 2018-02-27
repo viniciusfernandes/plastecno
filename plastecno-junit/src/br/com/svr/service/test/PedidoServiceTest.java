@@ -407,7 +407,7 @@ public class PedidoServiceTest extends AbstractTest {
 				}
 			}
 		}
-		
+
 		for (ItemPedido iCopia : lItemCopia) {
 			for (ItemPedido iPed : lItem) {
 				if (iCopia.getId() == null) {
@@ -867,7 +867,7 @@ public class PedidoServiceTest extends AbstractTest {
 			// testar o algoritmo de calculo de comissoes disparado no envio do
 			// pedido. Essa informacao pode ser inputada pelo usuario e deve ter
 			// prioridade no calculo.
-			pedidoService.inserirItemPedido(itemPedido);
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}

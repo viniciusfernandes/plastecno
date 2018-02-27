@@ -94,8 +94,6 @@ public interface PedidoService {
 
 	Integer inserirItemPedido(Integer idPedido, ItemPedido itemPedido) throws BusinessException;
 
-	Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException;
-
 	void inserirNcmItemAguardandoMaterialAssociadoByIdItemCompra(Integer idItemPedidoCompra, String ncm)
 			throws BusinessException;
 

@@ -1153,20 +1153,6 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException {
-		if (itemPedido == null || itemPedido.getId() == null) {
-			return null;
-		}
-		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdItemPedido(itemPedido.getId());
-		if (idPedido == null) {
-			throw new BusinessException("Não existe pedido cadastrado para o item "
-					+ (itemPedido.isPeca() ? itemPedido.getDescricaoPeca() : itemPedido.getDescricao()));
-		}
-		return inserirItemPedido(idPedido, itemPedido);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void inserirNcmItemAguardandoMaterialAssociadoByIdItemCompra(Integer idItemPedidoCompra, String ncm)
 			throws BusinessException {
 		if (idItemPedidoCompra == null || ncm == null || ncm.isEmpty()) {
@@ -2127,11 +2113,27 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void reencomendarItemPedido(Integer idItemPedido) throws BusinessException {
-		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
+		if (idItemPedido == null) {
+			throw new BusinessException(
+					"Não é possível reencomendar o item do pedido pois esse item não existe no sistema.");
+		}
+
 		ItemPedido itemPedido = pesquisarItemPedidoById(idItemPedido);
+		if (itemPedido == null) {
+			throw new BusinessException(
+					"Não é possível reencomendar o item do pedido pois esse item não existe no sistema.");
+		}
+
+		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
 		itemPedido.setQuantidadeReservada(0);
 		itemPedido.setEncomendado(false);
-		inserirItemPedido(itemPedido);
+		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdItemPedido(itemPedido.getId());
+		if (idPedido == null) {
+			throw new BusinessException("Não existe pedido cadastrado para o item "
+					+ (itemPedido.isPeca() ? itemPedido.getDescricaoPeca() : itemPedido.getDescricao()));
+		}
+
+		inserirItemPedido(idPedido, itemPedido);
 	}
 
 	@Override

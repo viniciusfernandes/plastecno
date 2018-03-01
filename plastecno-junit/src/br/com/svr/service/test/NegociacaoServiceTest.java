@@ -49,6 +49,34 @@ public class NegociacaoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testCancelamentoNegociacao() {
+		Pedido o = gPedido.gerarOrcamento();
+		ItemPedido i = gPedido.gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(o.getId(), i);
+			pedidoService.enviarPedido(o.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		Negociacao n = negociacaoService.pesquisarNegociacaoByIdOrcamento(o.getId());
+		assertNotNull("Todo orcamento enviado deve ter uma negociacao", n);
+
+		TipoNaoFechamento tpNFechamento = TipoNaoFechamento.FORMA_PAGAMENTO;
+		try {
+			negociacaoService.cancelarNegocicacao(n.getId(), tpNFechamento);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		n = negociacaoService.pesquisarNegociacaoByIdOrcamento(o.getId());
+		assertEquals("O tipo de nao fechamento na negociacao dever ser igual ao que foi cadastrado.", tpNFechamento,
+				n.getTipoNaoFechamento());
+
+		SituacaoPedido stOrc = pedidoService.pesquisarSituacaoPedidoById(o.getId());
+		assertEquals("O orcamento deve ser cancelado apos o cancelamento da negociacao",
+				SituacaoPedido.ORCAMENTO_CANCELADO, stOrc);
+	}
+
+	@Test
 	public void testCancelamentoOrcamentoENegociacao() {
 		Pedido o = gPedido.gerarOrcamento();
 		ItemPedido i = gPedido.gerarItemPedido();
@@ -62,7 +90,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 		assertNotNull("Todo orcamento enviado deve ter uma negociacao", n);
 
 		try {
-			pedidoService.cancelarOrcamento(o.getId());
+			pedidoService.cancelarOrcamentoRemoverNegociacao(o.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

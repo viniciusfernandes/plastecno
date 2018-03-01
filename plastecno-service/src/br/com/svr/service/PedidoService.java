@@ -62,6 +62,8 @@ public interface PedidoService {
 
 	void cancelarOrcamento(Integer idOrcamento) throws BusinessException;
 
+	void cancelarOrcamentoRemoverNegociacao(Integer idOrcamento) throws BusinessException;
+
 	void cancelarPedido(Integer idPedido) throws BusinessException;
 
 	Integer comprarItemPedido(Integer idComprador, Integer idFornecedor, Set<Integer> listaIdItemPedido)

@@ -120,7 +120,7 @@ public class OrcamentoController extends AbstractPedidoController {
     @Post("orcamento/cancelamento/{idOrcamento}")
     public void cancelarOrcamento(Integer idOrcamento) {
         try {
-            pedidoService.cancelarOrcamento(idOrcamento);
+            pedidoService.cancelarOrcamentoRemoverNegociacao(idOrcamento);
             gerarMensagemSucesso("Orçamento No. " + idOrcamento + " cancelado com sucesso");
         } catch (BusinessException e) {
             gerarListaMensagemErro(e.getListaMensagem());

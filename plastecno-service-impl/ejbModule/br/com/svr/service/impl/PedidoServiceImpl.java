@@ -485,6 +485,12 @@ public class PedidoServiceImpl implements PedidoService {
 					+ " e não pode ser cancelado.");
 		}
 		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.ORCAMENTO_CANCELADO);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void cancelarOrcamentoRemoverNegociacao(Integer idOrcamento) throws BusinessException {
+		cancelarOrcamento(idOrcamento);
 		negociacaoService.removerNegociacaoByIdOrcamento(idOrcamento);
 	}
 

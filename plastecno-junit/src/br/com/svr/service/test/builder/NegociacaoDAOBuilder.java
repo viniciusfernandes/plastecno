@@ -6,6 +6,7 @@ import java.util.List;
 import mockit.Mock;
 import mockit.MockUp;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
+import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.dao.crm.NegociacaoDAO;
 import br.com.svr.service.entity.crm.IndiceConversao;
 import br.com.svr.service.entity.crm.Negociacao;
@@ -31,6 +32,15 @@ public class NegociacaoDAOBuilder extends DAOBuilder<NegociacaoDAO> {
 			public void alterarSituacaoNegociacao(Integer idNegociacao, SituacaoNegociacao situacaoNegociacao) {
 				REPOSITORY.alterarEntidadeAtributoById(Negociacao.class, idNegociacao, "situacaoNegociacao",
 						situacaoNegociacao);
+			}
+
+			@Mock
+			public void alterarTipoNaoFechamento(Integer idNegociacao, TipoNaoFechamento tipoNaoFechamento) {
+				Negociacao n = REPOSITORY.pesquisarEntidadeById(Negociacao.class, idNegociacao);
+				if (n == null) {
+					return;
+				}
+				n.setTipoNaoFechamento(tipoNaoFechamento);
 			}
 
 			@Mock

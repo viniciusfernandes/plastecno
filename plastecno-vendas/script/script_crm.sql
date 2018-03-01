@@ -1,3 +1,5 @@
+drop schema IF EXISTS crm cascade;
+create schema crm;
 create table crm.tb_categoria_negociacao (
 	id integer not null,
 	descricao varchar (50) not null

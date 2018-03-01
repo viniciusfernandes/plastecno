@@ -1,8 +1,10 @@
 package br.com.svr.service.impl.mensagem.email;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import static br.com.svr.service.impl.mensagem.email.TipoMensagemPedido.MENSAGEM_COMPRA;
+import static br.com.svr.service.impl.mensagem.email.TipoMensagemPedido.MENSAGEM_ORCAMENTO;
+import static br.com.svr.service.impl.mensagem.email.TipoMensagemPedido.MENSAGEM_ORCAMENTO_ALTERNATIVO;
+import static br.com.svr.service.impl.mensagem.email.TipoMensagemPedido.MENSAGEM_VENDA;
+import static br.com.svr.service.impl.mensagem.email.TipoMensagemPedido.MENSAGEM_VENDA_CLIENTE;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.mensagem.email.MensagemEmail;
@@ -10,24 +12,26 @@ import br.com.svr.service.mensagem.email.exception.MensagemEmailException;
 
 public final class GeradorPedidoEmail {
 
-	private static final Map<TipoMensagemPedido, Class<? extends PedidoEmailBuilder>> mapaMensagem;
-	static {
-		mapaMensagem = new HashMap<TipoMensagemPedido, Class<? extends PedidoEmailBuilder>>();
-		mapaMensagem.put(TipoMensagemPedido.VENDA, VendaEmailBuilder.class);
-		mapaMensagem.put(TipoMensagemPedido.ORCAMENTO, OrcamentoEmailBuilder.class);
-		mapaMensagem.put(TipoMensagemPedido.ORCAMENTO_ALTERNATIVO, OrcamentoEmailAlternaticoBuilder.class);
-		mapaMensagem.put(TipoMensagemPedido.VENDA_CLIENTE, VendaClienteEmailBuilder.class);
-		mapaMensagem.put(TipoMensagemPedido.COMPRA, CompraEmailBuilder.class);
-	}
-
 	public static MensagemEmail gerarMensagem(Pedido pedido, TipoMensagemPedido tipoMensagem, AnexoEmail pdfPedido,
 			AnexoEmail... anexos) throws MensagemEmailException {
-		try {
-			return mapaMensagem.get(tipoMensagem).getConstructor(Pedido.class, AnexoEmail.class, AnexoEmail[].class)
-					.newInstance(pedido, pdfPedido, anexos).gerarMensagemEmail();
-		} catch (Exception e) {
-			throw new MensagemEmailException("Falha ao tentar inicializar o construtor da mensagem de email", e);
+
+		PedidoEmailBuilder emailBuilder = null;
+		if (MENSAGEM_VENDA.equals(tipoMensagem)) {
+			emailBuilder = new VendaEmailBuilder(pedido, pdfPedido, anexos);
+		} else if (MENSAGEM_ORCAMENTO.equals(tipoMensagem)) {
+			emailBuilder = new OrcamentoEmailBuilder(pedido, pdfPedido, anexos);
+		} else if (MENSAGEM_ORCAMENTO_ALTERNATIVO.equals(tipoMensagem)) {
+			emailBuilder = new OrcamentoEmailAlternaticoBuilder(pedido, pdfPedido, anexos);
+		} else if (MENSAGEM_VENDA_CLIENTE.equals(tipoMensagem)) {
+			emailBuilder = new VendaClienteEmailBuilder(pedido, pdfPedido, anexos);
+		} else if (MENSAGEM_COMPRA.equals(tipoMensagem)) {
+			emailBuilder = new CompraEmailBuilder(pedido, pdfPedido, anexos);
 		}
+		if (emailBuilder == null) {
+			throw new MensagemEmailException(
+					"O tipo de mensagem de email nao foi configurado no sistema ou esta em branco.");
+		}
+		return emailBuilder.gerarMensagemEmail();
 	}
 
 	private GeradorPedidoEmail() {

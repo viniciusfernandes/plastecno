@@ -40,4 +40,6 @@ public interface NegociacaoService {
 	Negociacao pesquisarNegociacaoByIdOrcamento(Integer idOrcamento);
 
 	void recalcularIndiceConversao(Integer idPedido, Integer idOrcamento) throws BusinessException;
+
+	void removerNegociacaoByIdOrcamento(Integer idOrcamento);
 }

@@ -605,6 +605,38 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testEnvioEmailPedidoOrcamentoCliente() {
+		Pedido pedido = gPedido.gerarPedidoOrcamento();
+		pedido.setClienteNotificadoVenda(true);
+
+		try {
+			pedidoService.inserirPedido(pedido);
+		} catch (BusinessException e2) {
+			printMensagens(e2);
+		}
+
+		ItemPedido itemPedido = gPedido.gerarItemPedido();
+		Integer idPedido = pedido.getId();
+
+		try {
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		pedido = pedidoService.pesquisarPedidoById(idPedido);
+		assertEquals("A situacao do pedido deve ser ORCAMENTO apos o envio de email de orcamento",
+				SituacaoPedido.ORCAMENTO, pedido.getSituacaoPedido());
+
+	}
+
+	@Test
 	public void testEnvioEmailPedidoOrcamentoSemDDDContato() {
 		Pedido pedido = gPedido.gerarPedidoOrcamento();
 		ItemPedido itemPedido = gPedido.gerarItemPedido();
@@ -872,7 +904,7 @@ public class PedidoServiceTest extends AbstractTest {
 			// testar o algoritmo de calculo de comissoes disparado no envio do
 			// pedido. Essa informacao pode ser inputada pelo usuario e deve ter
 			// prioridade no calculo.
-			pedidoService.inserirItemPedido(itemPedido);
+			pedidoService.inserirItemPedido(idPedido, itemPedido);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -893,6 +925,30 @@ public class PedidoServiceTest extends AbstractTest {
 		itemPedido = pedidoService.pesquisarItemPedidoById(idItemPedido);
 
 		assertEquals(valorComissionado, itemPedido.getValorComissionado());
+	}
+
+	@Test
+	public void testEnvioPedidoVendaEmailContato() {
+		Pedido p = gPedido.gerarPedidoRevenda();
+		p.setClienteNotificadoVenda(true);
+
+		try {
+			pedidoService.inserirPedido(p);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemPedido i = gPedido.gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(p.getId(), i);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		try {
+			pedidoService.enviarPedido(p.getId(), new AnexoEmail(new byte[] {}), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test

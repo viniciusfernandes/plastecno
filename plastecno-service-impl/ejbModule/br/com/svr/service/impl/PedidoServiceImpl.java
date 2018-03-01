@@ -485,6 +485,7 @@ public class PedidoServiceImpl implements PedidoService {
 					+ " e não pode ser cancelado.");
 		}
 		alterarSituacaoPedidoByIdPedido(idOrcamento, SituacaoPedido.ORCAMENTO_CANCELADO);
+		negociacaoService.removerNegociacaoByIdOrcamento(idOrcamento);
 	}
 
 	@Override
@@ -750,7 +751,8 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private void enviarCompra(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
 		try {
-			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.COMPRA, pdfPedido, anexos));
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.MENSAGEM_COMPRA, pdfPedido,
+					anexos));
 		} catch (NotificacaoException e) {
 			StringBuilder mensagem = new StringBuilder();
 			mensagem.append("Falha no envio do pedido de compra No. ").append(pedido.getId()).append(" do comprador ")
@@ -782,8 +784,8 @@ public class PedidoServiceImpl implements PedidoService {
 			// O caso do email alternativo eh para direcionar o email de
 			// orcamento para o proprio vendedor, pois eles costumam a enviar o
 			// PDF do orcamento para o contato do cliente de outra forma.
-			TipoMensagemPedido tipo = pedido.isClienteNotificadoVenda() ? TipoMensagemPedido.ORCAMENTO
-					: TipoMensagemPedido.ORCAMENTO_ALTERNATIVO;
+			TipoMensagemPedido tipo = pedido.isClienteNotificadoVenda() ? TipoMensagemPedido.MENSAGEM_ORCAMENTO
+					: TipoMensagemPedido.MENSAGEM_ORCAMENTO_ALTERNATIVO;
 			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, tipo, pdfPedido, anexos));
 		} catch (NotificacaoException e) {
 			StringBuilder mensagem = new StringBuilder();
@@ -872,10 +874,11 @@ public class PedidoServiceImpl implements PedidoService {
 		negociacaoService.recalcularIndiceConversao(pedido.getId(), pedido.getIdOrcamento());
 
 		try {
-			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA, pdfPedido, anexos));
+			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.MENSAGEM_VENDA, pdfPedido,
+					anexos));
 			// Caso o contato tambem queira receber o email
 			if (pedido.isClienteNotificadoVenda()) {
-				emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.VENDA_CLIENTE,
+				emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.MENSAGEM_VENDA_CLIENTE,
 						pdfPedido, anexos));
 			}
 
@@ -1171,20 +1174,6 @@ public class PedidoServiceImpl implements PedidoService {
 		// do peso na geracao da NFe
 		calcularPeso(itemPedido);
 		return itemPedido.getId();
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer inserirItemPedido(ItemPedido itemPedido) throws BusinessException {
-		if (itemPedido == null || itemPedido.getId() == null) {
-			return null;
-		}
-		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdItemPedido(itemPedido.getId());
-		if (idPedido == null) {
-			throw new BusinessException("Não existe pedido cadastrado para o item "
-					+ (itemPedido.isPeca() ? itemPedido.getDescricaoPeca() : itemPedido.getDescricao()));
-		}
-		return inserirItemPedido(idPedido, itemPedido);
 	}
 
 	@Override
@@ -2175,11 +2164,25 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void reencomendarItemPedido(Integer idItemPedido) throws BusinessException {
+		if (idItemPedido == null) {
+			throw new BusinessException("Não pode haver reencomenda de item para ID do item nulo.");
+		}
+
 		alterarSituacaoPedidoByIdItemPedido(idItemPedido, SituacaoPedido.ITEM_AGUARDANDO_COMPRA);
 		ItemPedido itemPedido = pesquisarItemPedidoById(idItemPedido);
+		if (itemPedido == null || itemPedido.getId() == null) {
+			throw new BusinessException("O item com ID " + idItemPedido + " não existe no sistema.");
+		}
+
 		itemPedido.setQuantidadeReservada(0);
 		itemPedido.setEncomendado(false);
-		inserirItemPedido(itemPedido);
+
+		Integer idPedido = pedidoDAO.pesquisarIdPedidoByIdItemPedido(itemPedido.getId());
+		if (idPedido == null) {
+			throw new BusinessException("Não existe pedido cadastrado para o item "
+					+ (itemPedido.isPeca() ? itemPedido.getDescricaoPeca() : itemPedido.getDescricao()));
+		}
+		inserirItemPedido(idPedido, itemPedido);
 	}
 
 	@Override

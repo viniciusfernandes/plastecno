@@ -95,6 +95,16 @@ public class NegociacaoDAOBuilder extends DAOBuilder<NegociacaoDAO> {
 				}
 				return null;
 			}
+
+			@Mock
+			public void removerNegociacaoByIdOrcamento(Integer idOrcamento) {
+				List<Negociacao> l = REPOSITORY.pesquisarTodos(Negociacao.class);
+				for (Negociacao n : l) {
+					if (idOrcamento.equals(n.getOrcamento().getId())) {
+						REPOSITORY.removerEntidade(Negociacao.class, n.getId());
+					}
+				}
+			}
 		};
 		return new NegociacaoDAO(null);
 	}

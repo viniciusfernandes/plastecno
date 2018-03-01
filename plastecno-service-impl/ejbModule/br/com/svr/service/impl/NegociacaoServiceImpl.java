@@ -322,4 +322,10 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 		alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(idCliente, idxVal);
 	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerNegociacaoByIdOrcamento(Integer idOrcamento) {
+		negociacaoDAO.removerNegociacaoByIdOrcamento(idOrcamento);
+	}
 }

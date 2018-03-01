@@ -49,6 +49,28 @@ public class NegociacaoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testCancelamentoOrcamentoENegociacao() {
+		Pedido o = gPedido.gerarOrcamento();
+		ItemPedido i = gPedido.gerarItemPedido();
+		try {
+			pedidoService.inserirItemPedido(o.getId(), i);
+			pedidoService.enviarPedido(o.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		Negociacao n = negociacaoService.pesquisarNegociacaoByIdOrcamento(o.getId());
+		assertNotNull("Todo orcamento enviado deve ter uma negociacao", n);
+
+		try {
+			pedidoService.cancelarOrcamento(o.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		n = negociacaoService.pesquisarNegociacaoByIdOrcamento(o.getId());
+		assertNull("Os orcamentos cancelados nao devem conter negociacao no sistema.", n);
+	}
+
+	@Test
 	public void testInclusaoNegociacao() {
 		Pedido o = gPedido.gerarOrcamento();
 		Integer idNeg = null;
@@ -162,7 +184,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 		for (ItemPedido i : lItem) {
 			i.setQuantidade(i.getQuantidade() * 2);
 			try {
-				pedidoService.inserirItemPedido(i);
+				pedidoService.inserirItemPedido(idPedido, i);
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}

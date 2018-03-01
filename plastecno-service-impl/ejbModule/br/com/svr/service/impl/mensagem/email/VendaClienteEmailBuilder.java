@@ -6,8 +6,9 @@ import br.com.svr.service.mensagem.email.exception.MensagemEmailException;
 
 public class VendaClienteEmailBuilder extends VendaEmailBuilder {
 
-	public VendaClienteEmailBuilder(Pedido pedido, AnexoEmail arquivoAnexo) throws MensagemEmailException {
-		super(pedido, arquivoAnexo);
+	public VendaClienteEmailBuilder(Pedido pedido, AnexoEmail arquivoAnexo, AnexoEmail... anexos)
+			throws MensagemEmailException {
+		super(pedido, arquivoAnexo, anexos);
 	}
 
 	@Override

@@ -100,4 +100,9 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 						.setParameter("idOrcamento", idOrcamento), Negociacao.class, null);
 	}
 
+	public void removerNegociacaoByIdOrcamento(Integer idOrcamento) {
+		entityManager.createQuery("delete Negociacao n where n.orcamento.id = :idOrcamento")
+				.setParameter("idOrcamento", idOrcamento).executeUpdate();
+	}
+
 }

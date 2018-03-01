@@ -164,6 +164,19 @@ public class PedidoDAOBuilder extends DAOBuilder<PedidoDAO> {
 			}
 
 			@Mock
+			public Integer pesquisarIdPedidoByIdOrcamento(Integer idOrcamento) {
+				List<Pedido> l = REPOSITORY.pesquisarEntidadeByAtributo(Pedido.class, "idOrcamento", idOrcamento);
+				if (l.size() <= 0) {
+					return null;
+				}
+				if (l.size() > 1) {
+					throw new IllegalStateException("Nao eh possivel existe mais de um pedido com o mesmo idOrcamento");
+				}
+
+				return l.get(0).getId();
+			}
+
+			@Mock
 			List<Integer> pesquisarIdPedidoBySituacaoPedido(SituacaoPedido situacaoPedido) {
 				if (situacaoPedido == null) {
 					return new ArrayList<Integer>();

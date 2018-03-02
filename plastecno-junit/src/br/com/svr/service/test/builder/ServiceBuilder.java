@@ -7,31 +7,43 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import mockit.Mock;
 import mockit.MockUp;
 import br.com.svr.service.EmailService;
-import br.com.svr.service.dao.GenericDAO;
 import br.com.svr.service.exception.NotificacaoException;
 import br.com.svr.service.impl.EmailServiceImpl;
 import br.com.svr.service.mensagem.email.MensagemEmail;
 
 public class ServiceBuilder {
+	private static EntityManager em = null;
 
-	@SuppressWarnings("unchecked")
-	private static <T> T buildDAO(Class<T> daoClass) {
-		try {
-			DAOBuilder<T> daoBuilder = mapDAO.get(daoClass);
-			if (daoBuilder == null) {
-				daoBuilder = (DAOBuilder<T>) Class.forName(
-						"br.com.svr.service.test.builder." + daoClass.getSimpleName() + "Builder").newInstance();
-				mapDAO.put(daoClass, daoBuilder);
-				return daoBuilder.build();
+	/*
+	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS
+	 * CICLICAS ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE.
+	 * QUANDO VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD
+	 * DO ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS,
+	 * JOGAMOS O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O
+	 * ESTOQUESERVICE FOR EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE
+	 * ELE JA ESTA EM MEMORIA E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS
+	 * TEMPORARIAMENTE ESSES OBJETOS EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE
+	 * SER EXECUTADO PARA CADA TESTE UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS
+	 * IMPLEMENTACOES MOCKADAS DOS METODOS. ELAS VALEM APENAS EM CADA TESTE
+	 * UNITARIO.
+	 */
+	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
+
+	private static void buildEmailService() {
+		new MockUp<EmailServiceImpl>() {
+
+			@Mock
+			public void enviar(MensagemEmail mensagemEmail) throws NotificacaoException {
 			}
-			return daoBuilder.build();
-		} catch (Exception e) {
-			throw new IllegalStateException("Falha no build do DAO \"" + daoClass.getName() + "\"", e);
-		}
+		};
+
+		mapTemporarioServices.put(EmailService.class, new EmailServiceImpl());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -40,41 +52,57 @@ public class ServiceBuilder {
 		if (service != null) {
 			return service;
 		}
-		
+
 		buildEmailService();
-		
+
 		String serviceNameImpl = classe.getName().replace("service", "service.impl") + "Impl";
 		try {
 			/*
 			 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS
 			 * CICLICAS ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE
 			 * SERVICE. QUANDO VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE
-			 * EFETUAR O BUILD DO ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK
-			 * ENTRE OS BUILDS, JOGAMOS O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM
-			 * QUE O ESTOQUESERVICE FOR EFFETUAR O BUILD DO PEDIDOSSERVICE,
-			 * VERIFICAMOS QUE ELE JA ESTA EM MEMORIA E RETORNAMOS ESSE OBJETO. SENDO
-			 * QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS EM MEMORIA POIS O MECANISMO
-			 * DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE UNITARIO, POIS ESSE EH O
-			 * CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS METODOS. ELAS VALEM
-			 * APENAS EM CADA TESTE UNITARIO.
+			 * EFETUAR O BUILD DO ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM
+			 * DEADLOCK ENTRE OS BUILDS, JOGAMOS O OBJETO PEDIDOSERVICEIMPL EM
+			 * MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR EFFETUAR O BUILD DO
+			 * PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA E
+			 * RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES
+			 * OBJETOS EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO
+			 * PARA CADA TESTE UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS
+			 * IMPLEMENTACOES MOCKADAS DOS METODOS. ELAS VALEM APENAS EM CADA
+			 * TESTE UNITARIO.
 			 */
 			service = (T) Class.forName(serviceNameImpl).newInstance();
 			mapTemporarioServices.put(classe, service);
 		} catch (Exception e1) {
-			throw new IllegalStateException("Nao foi possivel instanciar a implementacao do servico \"" + serviceNameImpl
-					+ "\"", e1);
+			throw new IllegalStateException("Nao foi possivel instanciar a implementacao do servico \""
+					+ serviceNameImpl + "\"", e1);
 		}
 
 		initDependencias(service);
 		return service;
 	}
 
+	public static void config(EntityManager em) {
+		if (ServiceBuilder.em == null) {
+			ServiceBuilder.em = em;
+		}
+	}
+
 	private static void initDependencias(Object service) {
 		Field[] campos = service.getClass().getDeclaredFields();
 		for (Field campo : campos) {
-			if (campo.getName().endsWith("DAO") && !campo.getType().equals(GenericDAO.class)) {
-				buildDAO(campo.getType());
+			if (campo.isAnnotationPresent(EJB.class)) {
+				inject(service, buildService(campo.getType()), campo.getName());
 			}
+			// Injetando o entity manager
+			if (campo.isAnnotationPresent(PersistenceContext.class)) {
+				if (em == null) {
+					throw new IllegalStateException("O entity manager esta nulo e nao pode ser injetado no servico "
+							+ service.getClass().getName() + ". Execute o metodo ServiceBuilder.config(EntityManager).");
+				}
+				inject(service, em, campo.getName());
+			}
+
 		}
 
 		try {
@@ -86,15 +114,10 @@ public class ServiceBuilder {
 				}
 			}
 		} catch (Exception e) {
-			throw new IllegalStateException("Falha a execucao do metodo init do servico " + service.getClass().getName(), e);
+			throw new IllegalStateException("Falha a execucao do metodo init do servico "
+					+ service.getClass().getName(), e);
 		}
 
-		for (Field campo : campos) {
-			if (campo.isAnnotationPresent(EJB.class)) {
-				inject(service, buildService(campo.getType()), campo.getName());
-			}
-
-		}
 	}
 
 	private static void inject(Object service, Object dependencia, String nomeCampo) {
@@ -110,34 +133,6 @@ public class ServiceBuilder {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	private final static Map<Class<?>, DAOBuilder> mapDAO = new HashMap<Class<?>, DAOBuilder>();
-
-	/*
-	 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS CICLICAS
-	 * ENTRE OS SERVICOS, POR EXEMPLO, PEDIDOSERVICE E ESTOQUE SERVICE. QUANDO
-	 * VAMOS EFETUAR O BUILD DO PEDIDOSERVICE, TEMOS QUE EFETUAR O BUILD DO
-	 * ESTOQUESERVICE, ENTAO, PARA CONTORNAR UM DEADLOCK ENTRE OS BUILDS, JOGAMOS
-	 * O OBJETO PEDIDOSERVICEIMPL EM MEMORIA, E ASSIM QUE O ESTOQUESERVICE FOR
-	 * EFFETUAR O BUILD DO PEDIDOSSERVICE, VERIFICAMOS QUE ELE JA ESTA EM MEMORIA
-	 * E RETORNAMOS ESSE OBJETO. SENDO QUE MANTEMOS TEMPORARIAMENTE ESSES OBJETOS
-	 * EM MEMORIA POIS O MECANISMO DO MOCKIT DEVE SER EXECUTADO PARA CADA TESTE
-	 * UNITARIO, POIS ESSE EH O CICLO DE VIDA DAS IMPLEMENTACOES MOCKADAS DOS
-	 * METODOS. ELAS VALEM APENAS EM CADA TESTE UNITARIO.
-	 */
-	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
-
 	ServiceBuilder() {
-	}
-
-	private static void buildEmailService() {
-		new MockUp<EmailServiceImpl>() {
-
-			@Mock
-			public void enviar(MensagemEmail mensagemEmail) throws NotificacaoException {
-			}
-		};
-
-		mapTemporarioServices.put(EmailService.class, new EmailServiceImpl());
 	}
 }

@@ -113,6 +113,13 @@ public class PedidoServiceImpl implements PedidoService {
 	@EJB
 	private UsuarioService usuarioService;
 
+	public PedidoServiceImpl() {
+	}
+
+	public PedidoServiceImpl(EntityManager entityManager) {
+		this.entityManager = entityManager;
+	}
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer aceitarListaItemOrcamento(Integer idCliente, Integer idRepresentada, Integer idVendedor,

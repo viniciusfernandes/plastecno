@@ -1,4 +1,4 @@
-package br.com.svr.validacao;
+package br.com.svr.service.validacao;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -6,9 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import br.com.svr.service.constante.TipoDocumento;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
-import br.com.svr.service.validacao.exception.InformacaoInvalidaException;
 import br.com.svr.util.NumeroUtils;
 
 public final class ValidadorInformacao {

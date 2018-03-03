@@ -26,9 +26,9 @@ import br.com.svr.service.entity.crm.IndiceConversao;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.util.QueryUtil;
+import br.com.svr.service.validacao.ValidadorInformacao;
 import br.com.svr.service.wrapper.GrupoWrapper;
 import br.com.svr.service.wrapper.RelatorioWrapper;
-import br.com.svr.validacao.ValidadorInformacao;
 
 @Stateless
 public class NegociacaoServiceImpl implements NegociacaoService {

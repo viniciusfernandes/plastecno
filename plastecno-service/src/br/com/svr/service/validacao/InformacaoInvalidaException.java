@@ -1,4 +1,4 @@
-package br.com.svr.service.validacao.exception;
+package br.com.svr.service.validacao;
 
 import java.util.List;
 

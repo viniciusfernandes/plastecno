@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import br.com.svr.service.nfe.constante.TipoTributacaoPIS;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @InformacaoValidavel
 @XmlType(propOrder = { "pisAliquota", "pisQuantidade", "pisNaoTributado", "pisOutrasOperacoes", "pisST" })

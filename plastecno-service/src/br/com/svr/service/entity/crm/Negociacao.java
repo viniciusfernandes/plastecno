@@ -21,7 +21,7 @@ import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.entity.Pedido;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @Entity
 @Table(name = "tb_negociacao", schema = "crm")

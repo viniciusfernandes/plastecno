@@ -19,10 +19,10 @@ import javax.persistence.Transient;
 import br.com.svr.service.constante.FormaMaterial;
 import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.TipoCST;
-import br.com.svr.service.constante.TipoDocumento;
 import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.constante.TipoVenda;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
+import br.com.svr.service.validacao.TipoDocumento;
 
 @Entity
 @Table(name = "tb_item_pedido", schema = "vendas")

@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @XmlRootElement(name = "nfe")
 @InformacaoValidavel

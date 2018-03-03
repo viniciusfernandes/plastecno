@@ -19,8 +19,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import br.com.svr.service.constante.TipoAcesso;
-import br.com.svr.service.constante.TipoDocumento;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
+import br.com.svr.service.validacao.TipoDocumento;
 
 @Entity
 @Table(name = "tb_usuario", schema = "vendas")

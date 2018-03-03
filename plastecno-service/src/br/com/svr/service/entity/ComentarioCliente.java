@@ -17,7 +17,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @Entity
 @Table(name = "tb_comentario_cliente", schema = "vendas")

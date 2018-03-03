@@ -24,12 +24,12 @@ import br.com.svr.service.dao.PagamentoDAO;
 import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.Pagamento;
 import br.com.svr.service.exception.BusinessException;
+import br.com.svr.service.validacao.ValidadorInformacao;
 import br.com.svr.service.wrapper.GrupoWrapper;
 import br.com.svr.service.wrapper.Periodo;
 import br.com.svr.service.wrapper.RelatorioWrapper;
 import br.com.svr.util.NumeroUtils;
 import br.com.svr.util.StringUtils;
-import br.com.svr.validacao.ValidadorInformacao;
 
 @Stateless
 public class PagamentoServiceImpl implements PagamentoService {

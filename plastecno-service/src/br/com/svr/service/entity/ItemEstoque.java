@@ -15,8 +15,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import br.com.svr.service.constante.FormaMaterial;
-import br.com.svr.service.constante.TipoDocumento;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
+import br.com.svr.service.validacao.TipoDocumento;
 
 @Entity
 @Table(name = "tb_item_estoque", schema = "vendas")

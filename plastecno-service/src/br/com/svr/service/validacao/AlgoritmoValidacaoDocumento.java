@@ -1,4 +1,4 @@
-package br.com.svr.validacao.algoritmo;
+package br.com.svr.service.validacao;
 
 public interface AlgoritmoValidacaoDocumento {
 	boolean isValido(String documento);

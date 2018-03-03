@@ -2,14 +2,12 @@ package br.com.svr.service.test;
 
 import org.junit.Test;
 
-import br.com.svr.service.PedidoService;
 import br.com.svr.service.RamoAtividadeService;
 import br.com.svr.service.entity.RamoAtividade;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.test.builder.ServiceBuilder;
 
 public class JPATeste extends AbstractTest {
-	private PedidoService pedidoService;
 	private RamoAtividadeService ramoAtividadeService;
 
 	public JPATeste() {
@@ -21,14 +19,13 @@ public class JPATeste extends AbstractTest {
 		RamoAtividade r = new RamoAtividade();
 		r.setSigla("XXX");
 		r.setDescricao("TEsteee");
-		
-		
+
 		try {
 			r = ramoAtividadeService.inserir(r);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		
+
 		r = new RamoAtividade();
 		r.setSigla("zzz");
 		r.setDescricao("zzzTEsteee");
@@ -37,7 +34,7 @@ public class JPATeste extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		
+
 		System.out.println("inicio..." + r.getId());
 	}
 }

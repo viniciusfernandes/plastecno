@@ -17,7 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import br.com.svr.service.nfe.constante.TipoSituacaoDuplicata;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @Entity
 @Table(name = "tb_nfe_duplicata", schema = "vendas")

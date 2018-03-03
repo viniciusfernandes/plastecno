@@ -37,9 +37,9 @@ import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.anotation.REVIEW;
 import br.com.svr.service.impl.anotation.TODO;
 import br.com.svr.service.impl.calculo.CalculadoraItem;
+import br.com.svr.service.validacao.ValidadorInformacao;
 import br.com.svr.util.NumeroUtils;
 import br.com.svr.util.StringUtils;
-import br.com.svr.validacao.ValidadorInformacao;
 
 @Stateless
 public class EstoqueServiceImpl implements EstoqueService {

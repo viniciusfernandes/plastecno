@@ -18,8 +18,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import br.com.svr.service.constante.TipoDocumento;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
+import br.com.svr.service.validacao.TipoDocumento;
 
 @Entity
 @Table(name = "tb_transportadora", schema = "vendas")

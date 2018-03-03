@@ -17,7 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import br.com.svr.service.constante.TipoPagamento;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @InformacaoValidavel
 @Entity

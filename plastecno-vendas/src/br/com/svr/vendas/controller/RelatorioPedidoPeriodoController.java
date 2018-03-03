@@ -8,7 +8,7 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.relatorio.RelatorioService;
-import br.com.svr.service.validacao.exception.InformacaoInvalidaException;
+import br.com.svr.service.validacao.InformacaoInvalidaException;
 import br.com.svr.service.wrapper.Periodo;
 import br.com.svr.vendas.controller.anotacao.Servico;
 

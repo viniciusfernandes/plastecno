@@ -21,9 +21,9 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import br.com.svr.service.constante.TipoApresentacaoIPI;
-import br.com.svr.service.constante.TipoDocumento;
 import br.com.svr.service.constante.TipoRelacionamento;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
+import br.com.svr.service.validacao.TipoDocumento;
 
 @Entity
 @Table(name = "tb_representada", schema = "vendas")

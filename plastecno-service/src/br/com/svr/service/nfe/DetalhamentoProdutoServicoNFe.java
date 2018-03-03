@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @InformacaoValidavel(campoIdentificacao = "numeroItem")
 @XmlType(propOrder = { "numeroItem", "produtoServicoNFe", "tributosProdutoServico", "informacoesAdicionais" })

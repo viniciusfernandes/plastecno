@@ -1,14 +1,7 @@
-package br.com.svr.validacao;
+package br.com.svr.service.validacao;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import br.com.svr.service.constante.TipoDocumento;
-import br.com.svr.validacao.algoritmo.AlgoritmoValidacaoCNPJ;
-import br.com.svr.validacao.algoritmo.AlgoritmoValidacaoCPF;
-import br.com.svr.validacao.algoritmo.AlgoritmoValidacaoDocumento;
-import br.com.svr.validacao.algoritmo.AlgoritmoValidacaoInscricaoEstadual;
-import br.com.svr.validacao.algoritmo.AlgoritmoValidacaoNCM;
 
 public class ValidadorDocumento {
 	private static final Map<TipoDocumento, AlgoritmoValidacaoDocumento> mapa;

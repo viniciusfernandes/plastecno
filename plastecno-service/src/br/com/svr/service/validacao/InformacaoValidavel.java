@@ -1,11 +1,9 @@
-package br.com.svr.service.validacao.annotation;
+package br.com.svr.service.validacao;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import br.com.svr.service.constante.TipoDocumento;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD })

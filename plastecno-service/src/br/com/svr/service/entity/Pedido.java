@@ -28,7 +28,7 @@ import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.TipoEntrega;
 import br.com.svr.service.constante.TipoFinalidadePedido;
 import br.com.svr.service.constante.TipoPedido;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @Entity
 @Table(name = "tb_pedido", schema = "vendas")

@@ -3,7 +3,7 @@ package br.com.svr.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @InformacaoValidavel
 public class InformacoesAdicionaisNFe {

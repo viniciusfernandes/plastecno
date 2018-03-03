@@ -72,11 +72,11 @@ import br.com.svr.service.nfe.constante.TipoNFe;
 import br.com.svr.service.nfe.constante.TipoOperacaoNFe;
 import br.com.svr.service.nfe.constante.TipoSituacaoDuplicata;
 import br.com.svr.service.nfe.constante.TipoSituacaoNFe;
+import br.com.svr.service.validacao.ValidadorInformacao;
 import br.com.svr.service.wrapper.Periodo;
 import br.com.svr.util.DateUtils;
 import br.com.svr.util.NumeroUtils;
 import br.com.svr.util.StringUtils;
-import br.com.svr.validacao.ValidadorInformacao;
 
 @Stateless
 public class NFeServiceImpl implements NFeService {

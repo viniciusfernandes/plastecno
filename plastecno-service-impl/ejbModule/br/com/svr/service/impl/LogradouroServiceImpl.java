@@ -23,7 +23,7 @@ import br.com.svr.service.entity.Logradouro;
 import br.com.svr.service.entity.LogradouroEndereco;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.util.QueryUtil;
-import br.com.svr.service.validacao.exception.InformacaoInvalidaException;
+import br.com.svr.service.validacao.InformacaoInvalidaException;
 
 @Stateless
 public class LogradouroServiceImpl implements LogradouroService {

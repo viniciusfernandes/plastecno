@@ -11,7 +11,7 @@ import br.com.svr.service.entity.NFeDuplicata;
 import br.com.svr.service.entity.NFeItemFracionado;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.exception.BusinessException;
-import br.com.svr.service.validacao.exception.InformacaoInvalidaException;
+import br.com.svr.service.validacao.InformacaoInvalidaException;
 import br.com.svr.service.wrapper.ComissaoVendaWrapper;
 import br.com.svr.service.wrapper.Periodo;
 import br.com.svr.service.wrapper.ReceitaWrapper;

@@ -1,4 +1,4 @@
-package br.com.svr.service.constante;
+package br.com.svr.service.validacao;
 
 /**
  * Classe utilizada para definir o tipo de documento na validacao dos digitos.

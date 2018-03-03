@@ -42,7 +42,7 @@ import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.anotation.REVIEW;
 import br.com.svr.service.relatorio.RelatorioService;
-import br.com.svr.service.validacao.exception.InformacaoInvalidaException;
+import br.com.svr.service.validacao.InformacaoInvalidaException;
 import br.com.svr.service.wrapper.ComissaoVendaWrapper;
 import br.com.svr.service.wrapper.GrupoWrapper;
 import br.com.svr.service.wrapper.Periodo;

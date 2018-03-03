@@ -38,10 +38,10 @@ import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.anotation.REVIEW;
 import br.com.svr.service.impl.util.QueryUtil;
-import br.com.svr.service.validacao.exception.InformacaoInvalidaException;
+import br.com.svr.service.validacao.InformacaoInvalidaException;
+import br.com.svr.service.validacao.ValidadorInformacao;
 import br.com.svr.service.wrapper.PaginacaoWrapper;
 import br.com.svr.util.StringUtils;
-import br.com.svr.validacao.ValidadorInformacao;
 
 @Stateless
 public class ClienteServiceImpl implements ClienteService {

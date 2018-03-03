@@ -18,7 +18,7 @@ import br.com.svr.service.entity.Pagamento;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.nfe.constante.TipoModalidadeFrete;
 import br.com.svr.service.relatorio.RelatorioService;
-import br.com.svr.service.validacao.exception.InformacaoInvalidaException;
+import br.com.svr.service.validacao.InformacaoInvalidaException;
 import br.com.svr.service.wrapper.Periodo;
 import br.com.svr.service.wrapper.RelatorioWrapper;
 import br.com.svr.vendas.controller.anotacao.Servico;

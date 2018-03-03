@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import br.com.svr.service.nfe.constante.TipoTributacaoICMS;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @InformacaoValidavel
 @XmlType(propOrder = { "icms00", "icms10", "icms20", "icms30", "icms40", "icms41", "icms50", "icms51", "icms60",

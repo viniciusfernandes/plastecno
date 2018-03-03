@@ -2,7 +2,7 @@ package br.com.svr.service.wrapper;
 
 import java.util.Date;
 
-import br.com.svr.service.validacao.exception.InformacaoInvalidaException;
+import br.com.svr.service.validacao.InformacaoInvalidaException;
 
 public class Periodo {
 

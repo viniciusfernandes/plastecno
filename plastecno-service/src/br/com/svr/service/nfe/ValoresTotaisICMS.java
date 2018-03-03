@@ -3,7 +3,7 @@ package br.com.svr.service.nfe;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @InformacaoValidavel
 @XmlType(propOrder = { "valorBaseCalculo", "valorTotalICMS", "valorTotalICMSDesonerado", "valorTotalICMSFundoPobreza",

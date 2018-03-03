@@ -18,9 +18,9 @@ import br.com.svr.service.dao.RamoAtividadeDAO;
 import br.com.svr.service.entity.RamoAtividade;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.util.QueryUtil;
+import br.com.svr.service.validacao.ValidadorInformacao;
 import br.com.svr.service.wrapper.PaginacaoWrapper;
 import br.com.svr.util.StringUtils;
-import br.com.svr.validacao.ValidadorInformacao;
 
 @Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)

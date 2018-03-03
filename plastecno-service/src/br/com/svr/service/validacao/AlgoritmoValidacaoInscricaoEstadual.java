@@ -1,4 +1,4 @@
-package br.com.svr.validacao.algoritmo;
+package br.com.svr.service.validacao;
 
 public class AlgoritmoValidacaoInscricaoEstadual implements
 		AlgoritmoValidacaoDocumento {

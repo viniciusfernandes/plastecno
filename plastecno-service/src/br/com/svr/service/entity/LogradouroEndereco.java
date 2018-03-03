@@ -17,7 +17,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import br.com.svr.service.constante.TipoLogradouro;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @Entity
 @Table(name = "tb_logradouro", schema = "vendas")

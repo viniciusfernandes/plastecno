@@ -27,9 +27,9 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import br.com.svr.service.constante.TipoCliente;
-import br.com.svr.service.constante.TipoDocumento;
 import br.com.svr.service.constante.TipoLogradouro;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
+import br.com.svr.service.validacao.TipoDocumento;
 
 @Entity
 @Table(name = "tb_cliente", schema = "vendas")

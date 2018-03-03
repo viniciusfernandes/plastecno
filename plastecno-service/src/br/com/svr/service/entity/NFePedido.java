@@ -12,7 +12,7 @@ import javax.persistence.Transient;
 
 import br.com.svr.service.nfe.constante.TipoNFe;
 import br.com.svr.service.nfe.constante.TipoSituacaoNFe;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @Entity
 @Table(name = "tb_nfe_pedido", schema = "vendas")

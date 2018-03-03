@@ -19,7 +19,7 @@ import br.com.svr.service.entity.Pais;
 import br.com.svr.service.entity.UF;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.util.QueryUtil;
-import br.com.svr.validacao.ValidadorInformacao;
+import br.com.svr.service.validacao.ValidadorInformacao;
 
 @Stateless
 public class EnderecamentoServiceImpl implements EnderecamentoService {

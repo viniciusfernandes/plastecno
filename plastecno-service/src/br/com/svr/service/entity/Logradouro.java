@@ -6,7 +6,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 
 import br.com.svr.service.constante.TipoLogradouro;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 import br.com.svr.util.StringUtils;
 
 @MappedSuperclass

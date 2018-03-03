@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import br.com.svr.service.nfe.constante.TipoTributacaoICMS;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @InformacaoValidavel(campoCondicional = "codigoSituacaoTributaria", nomeExibicaoCampoCondicional = "Código de situação tributária")
 @XmlType(propOrder = { "origemMercadoria", "valorBCSTRetido", "valorSTRetido", "valorBCSTUFDestino",

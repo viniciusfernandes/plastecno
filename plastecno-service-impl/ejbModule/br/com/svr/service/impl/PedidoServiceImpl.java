@@ -61,14 +61,14 @@ import br.com.svr.service.impl.mensagem.email.GeradorPedidoEmail;
 import br.com.svr.service.impl.mensagem.email.TipoMensagemPedido;
 import br.com.svr.service.impl.util.QueryUtil;
 import br.com.svr.service.mensagem.email.AnexoEmail;
-import br.com.svr.service.validacao.exception.InformacaoInvalidaException;
+import br.com.svr.service.validacao.InformacaoInvalidaException;
+import br.com.svr.service.validacao.ValidadorInformacao;
 import br.com.svr.service.wrapper.PaginacaoWrapper;
 import br.com.svr.service.wrapper.Periodo;
 import br.com.svr.service.wrapper.TotalizacaoPedidoWrapper;
 import br.com.svr.util.DateUtils;
 import br.com.svr.util.NumeroUtils;
 import br.com.svr.util.StringUtils;
-import br.com.svr.validacao.ValidadorInformacao;
 
 @Stateless
 public class PedidoServiceImpl implements PedidoService {

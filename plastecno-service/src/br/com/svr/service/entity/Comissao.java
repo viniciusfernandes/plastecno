@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import br.com.svr.service.constante.FormaMaterial;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @Entity
 @Table(name = "tb_comissao", schema = "vendas")

@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import br.com.svr.service.validacao.exception.InformacaoInvalidaException;
-import br.com.svr.validacao.ValidadorInformacao;
+import br.com.svr.service.validacao.InformacaoInvalidaException;
+import br.com.svr.service.validacao.ValidadorInformacao;
 
 public class ValidadorInformacaoTest extends AbstractTest {
 	private EntidadeValidacao gerarEntidadeValidacao() {

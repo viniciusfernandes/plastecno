@@ -33,7 +33,6 @@ import br.com.svr.service.entity.Material;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.Representada;
 import br.com.svr.service.exception.BusinessException;
-import br.com.svr.service.impl.anotation.TODO;
 import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.test.builder.ServiceBuilder;
 import br.com.svr.service.test.gerador.GeradorPedido;
@@ -1213,29 +1212,6 @@ public class EstoqueServiceTest extends AbstractTest {
 				precoMedioSemFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
 	}
 
-	@TODO
-	public void testRecortarItemEstoque() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
-		ItemEstoque itemRecortado = itemEstoque.clone();
-
-		itemRecortado.setId(itemEstoque.getId());
-		itemRecortado.setQuantidade(itemEstoque.getQuantidade() - 1);
-		// Configurando a reducao ou recorte do item do estoque.
-		itemRecortado.setMedidaExterna(itemEstoque.getMedidaExterna() - 10);
-		itemRecortado.setMedidaInterna(itemEstoque.getMedidaInterna() - 2);
-		itemRecortado.setComprimento(itemEstoque.getComprimento() - 1);
-
-		Integer idItemNovo = null;
-		try {
-			idItemNovo = estoqueService.recortarItemEstoque(itemRecortado);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		ItemEstoque itemNovo = estoqueService.pesquisarItemEstoqueById(idItemNovo);
-		assertEquals("A quantidade do item novo deve ser a mesma que a do item recortado apos a inclusao no estoque",
-				itemNovo.getQuantidade(), itemRecortado.getQuantidade());
-	}
-
 	@Test
 	public void testRecortarItemEstoqueComprimentoInvalido() {
 		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
@@ -1251,29 +1227,6 @@ public class EstoqueServiceTest extends AbstractTest {
 			throwed = true;
 		}
 		assertTrue("A comprimento recortado eh superior ao comprimento do estoque", throwed);
-	}
-
-	@TODO
-	public void testRecortarItemEstoqueDimensaoInvalida() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
-		ItemEstoque itemRecortado = itemEstoque.clone();
-
-		itemRecortado.setId(itemEstoque.getId());
-		itemRecortado.setQuantidade(itemEstoque.getQuantidade() - 1);
-		// Configurando a reducao ou recorte do item do estoque.
-		itemRecortado.setMedidaExterna(itemEstoque.getMedidaExterna() - 1);
-		itemRecortado.setMedidaInterna(itemEstoque.getMedidaInterna() - 1);
-		itemRecortado.setComprimento(itemEstoque.getComprimento() - 1);
-
-		Integer idItemNovo = null;
-		try {
-			idItemNovo = estoqueService.recortarItemEstoque(itemRecortado);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		ItemEstoque itemNovo = estoqueService.pesquisarItemEstoqueById(idItemNovo);
-		assertEquals("A quantidade do item novo deve ser a mesma que a do item recortado apos a inclusao no estoque",
-				itemNovo.getQuantidade(), itemRecortado.getQuantidade());
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 package br.com.svr.service.test;
 
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @InformacaoValidavel(campoCondicional = "tipo", nomeExibicao = "Entidade de validação", nomeExibicaoCampoCondicional = "Tipo da entidade")
 public class EntidadeValidacaoTipo {

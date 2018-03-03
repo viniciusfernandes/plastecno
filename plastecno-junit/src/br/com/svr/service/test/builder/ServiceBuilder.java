@@ -10,13 +10,6 @@ import javax.ejb.EJB;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import mockit.Mock;
-import mockit.MockUp;
-import br.com.svr.service.EmailService;
-import br.com.svr.service.exception.NotificacaoException;
-import br.com.svr.service.impl.EmailServiceImpl;
-import br.com.svr.service.mensagem.email.MensagemEmail;
-
 public class ServiceBuilder {
 	private static EntityManager em = null;
 
@@ -36,14 +29,7 @@ public class ServiceBuilder {
 	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
 
 	private static void buildEmailService() {
-		new MockUp<EmailServiceImpl>() {
-
-			@Mock
-			public void enviar(MensagemEmail mensagemEmail) throws NotificacaoException {
-			}
-		};
-
-		mapTemporarioServices.put(EmailService.class, new EmailServiceImpl());
+	
 	}
 
 	@SuppressWarnings("unchecked")

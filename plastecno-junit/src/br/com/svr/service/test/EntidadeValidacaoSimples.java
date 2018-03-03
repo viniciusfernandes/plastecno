@@ -1,6 +1,6 @@
 package br.com.svr.service.test;
 
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @InformacaoValidavel
 public class EntidadeValidacaoSimples {

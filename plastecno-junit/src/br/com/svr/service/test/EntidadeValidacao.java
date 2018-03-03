@@ -3,8 +3,8 @@ package br.com.svr.service.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.svr.service.constante.TipoDocumento;
-import br.com.svr.service.validacao.annotation.InformacaoValidavel;
+import br.com.svr.service.validacao.InformacaoValidavel;
+import br.com.svr.service.validacao.TipoDocumento;
 
 @InformacaoValidavel
 public class EntidadeValidacao {

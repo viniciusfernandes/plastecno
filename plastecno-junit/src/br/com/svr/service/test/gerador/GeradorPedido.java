@@ -12,11 +12,15 @@ import br.com.svr.service.ComissaoService;
 import br.com.svr.service.LogradouroService;
 import br.com.svr.service.MaterialService;
 import br.com.svr.service.PedidoService;
+import br.com.svr.service.PerfilAcessoService;
+import br.com.svr.service.RamoAtividadeService;
 import br.com.svr.service.RepresentadaService;
 import br.com.svr.service.UsuarioService;
 import br.com.svr.service.constante.SituacaoPedido;
+import br.com.svr.service.constante.TipoCliente;
 import br.com.svr.service.constante.TipoEntrega;
 import br.com.svr.service.constante.TipoFinalidadePedido;
+import br.com.svr.service.constante.TipoLogradouro;
 import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.constante.TipoRelacionamento;
 import br.com.svr.service.entity.Cliente;
@@ -27,6 +31,8 @@ import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.LogradouroCliente;
 import br.com.svr.service.entity.Material;
 import br.com.svr.service.entity.Pedido;
+import br.com.svr.service.entity.PerfilAcesso;
+import br.com.svr.service.entity.RamoAtividade;
 import br.com.svr.service.entity.Representada;
 import br.com.svr.service.entity.Transportadora;
 import br.com.svr.service.entity.Usuario;
@@ -63,6 +69,10 @@ public class GeradorPedido {
 
 	private PedidoService pedidoService;
 
+	private PerfilAcessoService perfilAcessoService;
+
+	private RamoAtividadeService ramoAtividadeService;
+
 	private RepresentadaService representadaService;
 
 	private UsuarioService usuarioService;
@@ -76,6 +86,50 @@ public class GeradorPedido {
 		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
 		logradouroService = ServiceBuilder.buildService(LogradouroService.class);
+		ramoAtividadeService = ServiceBuilder.buildService(RamoAtividadeService.class);
+		perfilAcessoService = ServiceBuilder.buildService(PerfilAcessoService.class);
+	}
+
+	public Cliente gerarCliente() {
+		RamoAtividade ramo = gerarRamoAtividade();
+		Cliente c = eBuilder.buildCliente();
+		c.setRamoAtividade(ramo);
+		c.setListaLogradouro(null);
+
+		Usuario vend = gerarVendedor();
+		c.setVendedor(vend);
+
+		LogradouroCliente lFat = eBuilder.buildLogradouroCliente(TipoLogradouro.FATURAMENTO);
+		c.addLogradouro(lFat);
+		try {
+			return clienteService.inserir(c);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return null;
+	}
+
+	private Cliente gerarCliente(TipoCliente tipoCliente) {
+		RamoAtividade ramo = eBuilder.buildRamoAtividade();
+		try {
+			ramo = ramoAtividadeService.inserir(ramo);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		Cliente cli = null;
+		if (TipoCliente.REVENDEDOR.equals(tipoCliente)) {
+			cli = eBuilder.buildClienteRevendedor();
+		} else {
+			throw new IllegalStateException("O tipo de cliente nao existe.");
+		}
+		cli.setRamoAtividade(ramo);
+		cli.addContato(gerarContato(ContatoCliente.class));
+		try {
+			return clienteService.inserir(cli);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return null;
 	}
 
 	public Cliente gerarCliente(Usuario vendedor) {
@@ -103,14 +157,7 @@ public class GeradorPedido {
 	}
 
 	public Cliente gerarClienteRevendedor() {
-		Cliente revend = eBuilder.buildClienteRevendedor();
-		revend.addContato(gerarContato(ContatoCliente.class));
-		try {
-			return clienteService.inserir(revend);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		return null;
+		return gerarCliente(TipoCliente.REVENDEDOR);
 	}
 
 	public <T extends Contato> T gerarContato(Class<T> t) {
@@ -377,7 +424,7 @@ public class GeradorPedido {
 	}
 
 	public Pedido gerarPedidoRevenda(SituacaoPedido situacaoPedido) {
-		Cliente revendedor = eBuilder.buildRevendedor();
+		Cliente revendedor = gerarClienteRevendedor();
 		ContatoCliente ct = gerarContato(ContatoCliente.class);
 		revendedor.addContato(ct);
 		// Garantindo a existencia de um revendedor no sistema para inserir um
@@ -427,6 +474,39 @@ public class GeradorPedido {
 		pedido.setVendedor(vendedor);
 		pedido.getCliente().setVendedor(vendedor);
 		return pedido;
+	}
+
+	public RamoAtividade gerarRamoAtividade() {
+		RamoAtividade r = eBuilder.buildRamoAtividade();
+		try {
+			return ramoAtividadeService.inserir(r);
+		} catch (BusinessException e) {
+			printMensagens(e);
+			return null;
+		}
+	}
+
+	public Usuario gerarVendedor() {
+		Usuario vend = eBuilder.buildVendedor();
+
+		// Inserindo os perfis no sistema
+		List<PerfilAcesso> lPerf = eBuilder.buildListaPerfilAcesso();
+		Integer idPerf = null;
+		for (PerfilAcesso p : lPerf) {
+			idPerf = perfilAcessoService.inserir(p);
+			p.setId(idPerf);
+			vend.addPerfilAcesso(p);
+		}
+
+		Integer id = null;
+		try {
+			id = usuarioService.inserir(vend, true);
+		} catch (BusinessException e) {
+			printMensagens(e);
+			return null;
+		}
+		vend.setId(id);
+		return vend;
 	}
 
 	public void printMensagens(BusinessException exception) {

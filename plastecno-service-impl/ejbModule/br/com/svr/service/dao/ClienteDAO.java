@@ -145,4 +145,9 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 										"select new Cliente(c.id, c.nomeFantasia, c.razaoSocial) from Cliente c where c.tipoCliente = :tipoCliente")
 								.setParameter("tipoCliente", TipoCliente.REVENDEDOR), Cliente.class, null);
 	}
+
+	public void removerLogradouroCliente(Integer idCliente) {
+		entityManager.createQuery("delete from LogradouroCliente l where l.cliente.id = :idCliente")
+				.setParameter("idCliente", idCliente).executeUpdate();
+	}
 }

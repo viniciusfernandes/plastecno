@@ -878,7 +878,7 @@ public class PedidoServiceImpl implements PedidoService {
 			estoqueService.reservarItemPedido(pedido.getId());
 		}
 
-		validarListaLogradouroPreenchida(pedido);
+		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
 
 		// O recalculo do indice deve ser feito aqui pois apos a inclusao e
 		// aceite do orcamento o vendedor pode alterar os itens do pedidod e
@@ -2307,15 +2307,6 @@ public class PedidoServiceImpl implements PedidoService {
 		if (exception.contemMensagem()) {
 			throw exception;
 		}
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException {
-		if (pedido == null) {
-			return;
-		}
-		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
 	}
 
 	private void verificarMaterialAssociadoFornecedor(Integer idRepresentadaFornecedora, Set<Integer> listaIdItemPedido)

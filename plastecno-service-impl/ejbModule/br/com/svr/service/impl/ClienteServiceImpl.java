@@ -226,11 +226,11 @@ public class ClienteServiceImpl implements ClienteService {
 			}
 		}
 
-		Cliente c = clienteDAO.alterar(cliente);
-		// Esse bloco existe pois a lista de logradouro nao tem cascade. Tem-se
-		// que implementar a instrucao de inclusao do relacionamento.
-		c.setListaLogradouro(cliente.getListaLogradouro());
-		inserirEndereco(c);
+		List<LogradouroCliente> lLogrd = new ArrayList<>(cliente.getListaLogradouro());
+
+		Cliente c = cliente.isNovo() ? clienteDAO.inserir(cliente) : clienteDAO.alterar(cliente);
+		inserirLogradouroCliente(c.getId(), lLogrd);
+		
 		return c;
 	}
 
@@ -266,12 +266,13 @@ public class ClienteServiceImpl implements ClienteService {
 
 	}
 
-	private void inserirEndereco(Cliente c) throws BusinessException {
-		List<LogradouroCliente> lLogradouro = c.getListaLogradouro();
+	private void inserirLogradouroCliente(Integer idCliente, List<LogradouroCliente> lLogradouro)
+			throws BusinessException {
 		if (lLogradouro == null || lLogradouro.isEmpty()) {
 			return;
 		}
-
+		Cliente c = new Cliente(idCliente);
+		clienteDAO.removerLogradouroCliente(idCliente);
 		for (LogradouroCliente logradouro : lLogradouro) {
 			logradouro.setCliente(c);
 			logradouroService.inserir(logradouro);

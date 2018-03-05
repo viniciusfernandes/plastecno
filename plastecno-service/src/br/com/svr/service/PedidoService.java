@@ -333,6 +333,4 @@ public interface PedidoService {
 
 	void removerLogradouroPedido(Integer idPedido);
 
-	void validarListaLogradouroPreenchida(Pedido pedido) throws BusinessException;
-
 }

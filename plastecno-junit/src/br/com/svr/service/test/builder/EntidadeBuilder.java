@@ -62,9 +62,7 @@ public class EntidadeBuilder {
 		cliente.setRazaoSocial("Exercito Brasileiro " + no);
 		cliente.setNomeFantasia("Exercito Brasileiro " + no);
 		cliente.setCnpj("25632147000125");
-		cliente.setRamoAtividade(buildRamoAtividade());
 		cliente.setEmail("alex@gmail.com.br");
-		cliente.setId(gerarId());
 		cliente.setTipoCliente(TipoCliente.NORMAL);
 		return cliente;
 	}
@@ -93,7 +91,6 @@ public class EntidadeBuilder {
 		cliente.setCnpj("25632147000125");
 		cliente.setRazaoSocial("Revendedor de Plasticos" + no);
 		cliente.setNomeFantasia("Revendedor de Plasticos LTDA" + no);
-		cliente.setRamoAtividade(buildRamoAtividade());
 		cliente.setEmail("revendplastcios@gmail.com.br");
 		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
 		return cliente;
@@ -320,8 +317,6 @@ public class EntidadeBuilder {
 		ramoAtividade.setAtivo(true);
 		ramoAtividade.setDescricao("Industria Belica");
 		ramoAtividade.setSigla("IB");
-		ramoAtividade.setId(gerarId());
-		repositorio.inserirEntidade(ramoAtividade);
 		return ramoAtividade;
 	}
 
@@ -381,7 +376,6 @@ public class EntidadeBuilder {
 		vendedor.setEmail("vinicius@teste.com.br");
 		vendedor.setSenha("1234567");
 		vendedor.setAtivo(true);
-		vendedor.addPerfilAcesso(buildListaPerfilAcesso());
 		return vendedor;
 	}
 

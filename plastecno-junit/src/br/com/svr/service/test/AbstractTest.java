@@ -1,12 +1,14 @@
 package br.com.svr.service.test;
 
 import java.io.FileNotFoundException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -19,7 +21,7 @@ public abstract class AbstractTest {
 	protected static EntityManager em;
 	protected static EntityManagerFactory emf;
 
-	//@AfterClass
+	// @AfterClass
 	public static void close() {
 		if (em != null) {
 			em.clear();
@@ -32,6 +34,7 @@ public abstract class AbstractTest {
 
 	@BeforeClass
 	public static void init() throws FileNotFoundException {
+
 		try {
 			emf = Persistence.createEntityManagerFactory("svr");
 
@@ -40,6 +43,8 @@ public abstract class AbstractTest {
 		}
 		em = emf.createEntityManager();
 		ServiceBuilder.config(em);
+
+	
 	}
 
 	protected EntidadeBuilder eBuilder = EntidadeBuilder.getInstance();

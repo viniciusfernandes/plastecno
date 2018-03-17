@@ -34,7 +34,12 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 	@Test
 	public void testAceiteNegociacao() {
-		Pedido o = gPedido.gerarOrcamento();
+		Pedido o = null;
+		try {
+			o = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
 		List<Negociacao> lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
 		assertEquals("Deve existir apenas 1 negociacao por orcamento incluido.", (Integer) 1, (Integer) lNeg.size());
 
@@ -50,10 +55,13 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 	@Test
 	public void testCancelamentoNegociacao() {
-		Pedido o = gPedido.gerarOrcamento();
-		ItemPedido i = gPedido.gerarItemPedido();
+		Pedido o = null;
 		try {
-			pedidoService.inserirItemPedido(o.getId(), i);
+			o = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		try {
 			pedidoService.enviarPedido(o.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
@@ -78,10 +86,13 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 	@Test
 	public void testCancelamentoOrcamentoENegociacao() {
-		Pedido o = gPedido.gerarOrcamento();
-		ItemPedido i = gPedido.gerarItemPedido();
+		Pedido o = null;
 		try {
-			pedidoService.inserirItemPedido(o.getId(), i);
+			o = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		try {
 			pedidoService.enviarPedido(o.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
@@ -100,7 +111,12 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoNegociacao() {
-		Pedido o = gPedido.gerarOrcamento();
+		Pedido o = null;
+		try {
+			o = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
 		Integer idNeg = null;
 		try {
 			idNeg = negociacaoService.inserirNegociacao(o.getId(), o.getCliente().getId(), o.getVendedor().getId());
@@ -123,7 +139,12 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoOrcamentoInclusaoNegociacao() {
-		Pedido o = gPedido.gerarOrcamento();
+		Pedido o = null;
+		try {
+			o = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
 		assertEquals("Para a inclusao de uma negociacao deve-se ter um orcamento em digitacao.",
 				SituacaoPedido.ORCAMENTO_DIGITACAO, o.getSituacaoPedido());
 
@@ -132,7 +153,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 		assertEquals("Para cada orcamento incluido deve-se ter apenas uma negociacao incluida", new Integer(1),
 				(Integer) lNeg.size());
 
-		Negociacao n = lNeg.get(0);
+		Negociacao n = recarregarEntidade(Negociacao.class, lNeg.get(0).getId());
 
 		assertEquals("A negociacao criada deve estar em aberto.", SituacaoNegociacao.ABERTO, n.getSituacaoNegociacao());
 		assertEquals("A categoria da negociacao criada deve ser uma proposta ao cliente.",
@@ -148,7 +169,13 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecalculoIndiceConversao() {
-		Pedido o = gPedido.gerarOrcamento();
+
+		Pedido o = null;
+		try {
+			o = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
 		pedidoService.pesquisarValorPedidoIPI(o.getId());
 		Integer idCliente = pedidoService.pesquisarIdClienteByIdPedido(o.getId());
 
@@ -162,13 +189,13 @@ public class NegociacaoServiceTest extends AbstractTest {
 		Integer idPedido = null;
 		try {
 			idPedido = negociacaoService.aceitarNegocicacaoByIdNegociacao(n.getId());
-			pedidoService.pesquisarValorPedidoIPI(o.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-
 		idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
 		assertNull("No aceite de uma negociacao nao pode ser criado o indice de conversao", idxConv);
+
+		recarregarEntidade(Pedido.class, idPedido);
 
 		try {
 			// Aqui estamos enviando o pedido para que seja refeito o calculo do
@@ -177,8 +204,6 @@ public class NegociacaoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		pedidoService.pesquisarValorPedidoIPI(o.getId());
-		pedidoService.pesquisarValorPedidoIPI(idPedido);
 		idCliente = pedidoService.pesquisarIdClienteByIdPedido(idPedido);
 		idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
 

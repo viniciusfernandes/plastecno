@@ -18,7 +18,7 @@ public class PerfilAcesso implements Serializable {
 	private static final long serialVersionUID = 1443539622924823746L;
 	private String descricao;
 	@Id
-	@SequenceGenerator(name = "perfilAcessoSequence", sequenceName = "seq_perfil_acesso_id")
+	@SequenceGenerator(name = "perfilAcessoSequence", sequenceName = "seq_perfil_acesso_id", allocationSize = 1, initialValue = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "perfilAcessoSequence")
 	private Integer id;
 

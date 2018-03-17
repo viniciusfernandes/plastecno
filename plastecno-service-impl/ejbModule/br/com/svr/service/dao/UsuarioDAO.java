@@ -73,7 +73,7 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 	public boolean pesquisarVendedorAtivo(Integer idVendedor) {
 		return QueryUtil
 				.gerarRegistroUnico(
-						this.entityManager
+						entityManager
 								.createQuery(
 										"select u.ativo from Usuario u inner join u.listaPerfilAcesso p where u.id =:idVendedor and p.id = :idPerfilAcesso")
 								.setParameter("idVendedor", idVendedor)

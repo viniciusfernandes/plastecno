@@ -566,7 +566,7 @@ public class Pedido implements Serializable, Cloneable {
 	}
 
 	public boolean isOrcamentoDigitacao() {
-		return SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido);
+		return isVenda() && SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido);
 	}
 
 	public boolean isRepresentacao() {

@@ -37,6 +37,8 @@ public interface MaterialService {
 
 	List<Material> pesquisarBySigla(String sigla, Integer idRepresentada);
 
+	Material pesquisarBySiglaIdentica(String sigla);
+
 	List<Material> pesquisarMaterialAtivoBySigla(String sigla, Integer idRepresentada);
 
 	Double pesquisarPesoEspecificoById(Integer idMaterial);

@@ -85,8 +85,15 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer cancelarNegocicacao(Integer idNegociacao, TipoNaoFechamento tipoNaoFechamento)
 			throws BusinessException {
-		negociacaoDAO.alterarSituacaoNegociacao(idNegociacao, SituacaoNegociacao.CANCELADO);
-		negociacaoDAO.alterarTipoNaoFechamento(idNegociacao, tipoNaoFechamento);
+		Negociacao n = pesquisarById(idNegociacao);
+		n.setTipoNaoFechamento(tipoNaoFechamento);
+		n.setSituacaoNegociacao(SituacaoNegociacao.CANCELADO);
+		negociacaoDAO.alterar(n);
+		
+		// negociacaoDAO.alterarSituacaoNegociacao(idNegociacao,
+		// SituacaoNegociacao.CANCELADO);
+		// negociacaoDAO.alterarTipoNaoFechamento(idNegociacao,
+		// tipoNaoFechamento);
 		Integer idOrc = negociacaoDAO.pesquisarIdPedidoByIdNegociacao(idNegociacao);
 		pedidoService.cancelarOrcamento(idOrc);
 		return idOrc;
@@ -231,26 +238,23 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 			idCliente = pedidoService.pesquisarIdClienteByIdPedido(idOrcamento);
 		}
 
-		if (idCliente.intValue() == 4192) {
-			System.out.println("achou");
-		}
-
 		Object[] dados = pedidoService.pesquisarIdNomeClienteNomeContatoValor(idOrcamento);
 		Double idxConvValor = negociacaoDAO.pesquisarIndiceConversaoValorByIdCliente(idCliente);
 
 		Negociacao n = pesquisarNegociacaoByIdOrcamento(idOrcamento);
 		if (n == null) {
 			n = new Negociacao();
+			// ESSES dados devem ser imutaveis apos a criacao da negociacao.
+			n.setCategoriaNegociacao(CategoriaNegociacao.PROPOSTA_CLIENTE);
+			n.setIdCliente(idCliente);
+			n.setOrcamento(new Pedido(idOrcamento));
+			n.setSituacaoNegociacao(SituacaoNegociacao.ABERTO);
+			n.setTipoNaoFechamento(TipoNaoFechamento.OK);
 		}
-		n.setCategoriaNegociacao(CategoriaNegociacao.PROPOSTA_CLIENTE);
-		n.setIdCliente(idCliente);
 		n.setNomeCliente((String) dados[1]);
-		n.setOrcamento(new Pedido(idOrcamento));
 		n.setIndiceConversaoValor(idxConvValor);
 		n.setNomeContato(dados[3] == null ? null : (String) dados[3]);
-		n.setSituacaoNegociacao(SituacaoNegociacao.ABERTO);
 		n.setTelefoneContato(dados[4] == null ? null : ((dados[2] == null ? "" : dados[2]) + "-" + dados[4]));
-		n.setTipoNaoFechamento(TipoNaoFechamento.OK);
 
 		// Aqui eh possivel que outro vendedor realize uma negociacao iniciado
 		// por outro vendedor no caso da ausencia do mesmo.

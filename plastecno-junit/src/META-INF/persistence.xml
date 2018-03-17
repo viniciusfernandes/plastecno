@@ -7,12 +7,14 @@
 	<persistence-unit name="svr" transaction-type="RESOURCE_LOCAL">
 
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+
 		<class>br.com.svr.service.entity.Bairro</class>
 		<class>br.com.svr.service.entity.Cidade</class>
 		<class>br.com.svr.service.entity.Cliente</class>
 		<class>br.com.svr.service.entity.Comissao</class>
 		<class>br.com.svr.service.entity.ComentarioCliente</class>
 		<class>br.com.svr.service.entity.ComentarioRepresentada</class>
+		<class>br.com.svr.service.entity.ConfiguracaoSistema</class>
 		<class>br.com.svr.service.entity.Contato</class>
 		<class>br.com.svr.service.entity.ContatoCliente</class>
 		<class>br.com.svr.service.entity.ContatoRepresentada</class>
@@ -56,7 +58,7 @@
 			<property name="javax.persistence.jdbc.password" value="" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
-			<property name="show_sql" value="true" />
+			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.temp.use_jdbc_metadata_defaults"
 				value="false" />
 		</properties>

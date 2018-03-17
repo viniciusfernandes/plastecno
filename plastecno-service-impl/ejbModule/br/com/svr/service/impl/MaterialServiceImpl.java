@@ -105,7 +105,10 @@ public class MaterialServiceImpl implements MaterialService {
 			throw new BusinessException("Material já existente com a sigla " + material.getSigla());
 		}
 		// Realizando o merge das associacoes das representadas
-		return material.getId() != null ? materialDAO.alterar(material).getId() : materialDAO.inserir(material).getId();
+		// return material.getId() != null ?
+		// materialDAO.alterar(material).getId() :
+		// materialDAO.inserir(material).getId();
+		return materialDAO.alterar(material).getId();
 	}
 
 	@Override
@@ -127,10 +130,12 @@ public class MaterialServiceImpl implements MaterialService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isMaterialImportado(Integer idMaterial) {
 		return materialDAO.isMaterialImportado(idMaterial);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public PaginacaoWrapper<Material> paginarMaterial(Material filtro, Boolean apenasAtivos,
 			Integer indiceRegistroInicial, Integer numeroMaximoRegistros) {
 
@@ -140,6 +145,7 @@ public class MaterialServiceImpl implements MaterialService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Material> pesquisarBy(Material filtro, Boolean apenasAtivos, Integer indiceRegistroInicial,
 			Integer numeroMaximoRegistros) {
 
@@ -156,21 +162,31 @@ public class MaterialServiceImpl implements MaterialService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Material pesquisarById(Integer id) {
 		return materialDAO.pesquisarById(id);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Material> pesquisarBySigla(String sigla) {
 		return materialDAO.pesquisarBySigla(sigla);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Material> pesquisarBySigla(String sigla, Integer idRepresentada) {
 		return materialDAO.pesquisarBySigla(sigla, idRepresentada);
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Material pesquisarBySiglaIdentica(String sigla) {
+		return materialDAO.pesquisarBySiglaIdentica(sigla);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Material> pesquisarMaterialAtivoBySigla(String sigla, Integer idRepresentada) {
 		return materialDAO.pesquisarBySigla(sigla, idRepresentada, true);
 	}
@@ -185,6 +201,7 @@ public class MaterialServiceImpl implements MaterialService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Representada> pesquisarRepresentadasAssociadas(Integer idMaterial) {
 		Query query = this.entityManager
 				.createQuery("select new Representada(r.id, r.nomeFantasia) from Material m , IN (m.listaRepresentada) r where  m.id = :id order by r.nomeFantasia asc");
@@ -194,6 +211,7 @@ public class MaterialServiceImpl implements MaterialService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Representada> pesquisarRepresentadasNaoAssociadas(Integer idMaterial) {
 		List<Representada> listaRepresentada = this.pesquisarRepresentadasAssociadas(idMaterial);
 		Query query = null;
@@ -209,6 +227,7 @@ public class MaterialServiceImpl implements MaterialService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Long pesquisarTotalRegistros(Material filtro, Boolean apenasAtivos) {
 		if (filtro == null) {
 			return 0L;

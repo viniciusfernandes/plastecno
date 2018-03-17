@@ -285,7 +285,7 @@ public class OrcamentoController extends AbstractPedidoController {
         if (pedido == null) {
             gerarListaMensagemAlerta("O orçamento No. " + idPedido + " não existe no sistema");
         } else if (pedido.isOrcamento()) {
-            pedido.setRepresentada(pedidoService.pesquisarRepresentadaByIdPedido(idPedido));
+            pedido.setRepresentada(pedidoService.pesquisarRepresentadaResumidaByIdPedido(idPedido));
             pedido.setTransportadora(pedidoService.pesquisarTransportadoraResumidaByIdPedido(idPedido));
 
             List<ItemPedido> listaItem = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);

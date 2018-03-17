@@ -16,12 +16,12 @@ public class ConfiguracaoSistemaDAO {
 
 	public String pesquisar(ParametroConfiguracaoSistema parametro) {
 		return QueryUtil.gerarRegistroUnico(
-				this.entityManager.createNativeQuery(
-						"select valor from vendas.tb_configuracao_sistema where parametro  = :parametro ")
-						.setParameter("parametro", parametro.toString()), String.class, null);
+				entityManager.createQuery(
+						"select c.valor from ConfiguracaoSistema c where c.parametro  = :parametro ").setParameter(
+						"parametro", parametro.toString()), String.class, null);
 	}
 
 	public List<Object[]> pesquisarCFOP() {
-		return this.entityManager.createNativeQuery("select codigo, descricao from vendas.tb_cfop").getResultList();
+		return entityManager.createNativeQuery("select codigo, descricao from vendas.tb_cfop").getResultList();
 	}
 }

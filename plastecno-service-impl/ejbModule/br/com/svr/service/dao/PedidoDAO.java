@@ -408,18 +408,24 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 	}
 
 	public Representada pesquisarRepresentadaByIdPedido(Integer idPedido) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select p.representada from Pedido p where p.id = :idPedido").setParameter(
+						"idPedido", idPedido), Representada.class, null);
+	}
+
+	public Representada pesquisarRepresentadaNomeFantasiaByIdPedido(Integer idPedido) {
+		final String select = "select new Representada(r.id, r.nomeFantasia) from Pedido p inner join p.representada r where p.id = :idPedido";
+		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(select).setParameter("idPedido", idPedido),
+				Representada.class, null);
+	}
+
+	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
 		return QueryUtil
 				.gerarRegistroUnico(
 						entityManager
 								.createQuery(
 										"select new Representada(p.representada.id, p.representada.nomeFantasia, p.representada.tipoApresentacaoIPI, p.representada.tipoRelacionamento) from Pedido p where p.id = :idPedido")
 								.setParameter("idPedido", idPedido), Representada.class, null);
-	}
-
-	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
-		final String select = "select new Representada(r.id, r.nomeFantasia) from Pedido p inner join p.representada r where p.id = :idPedido";
-		return QueryUtil.gerarRegistroUnico(this.entityManager.createQuery(select).setParameter("idPedido", idPedido),
-				Representada.class, null);
 	}
 
 	public List<SituacaoPedido> pesquisarSituacaoCompraEfetivada() {

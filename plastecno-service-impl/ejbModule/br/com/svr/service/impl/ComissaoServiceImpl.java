@@ -51,13 +51,18 @@ public class ComissaoServiceImpl implements ComissaoService {
 		boolean isVendedorNulo = comissao.getIdVendedor() == null;
 		boolean isMaterialNulo = comissao.getIdMaterial() == null;
 		boolean isFormaNulo = comissao.getIdFormaMaterial() == null;
+		if (isVendedorNulo) {
+			throw new BusinessException("O id do vendedor não deve ser nulo.");
+		}
+
 		if (!isVendedorNulo && !usuarioService.isVendedorAtivo(comissao.getIdVendedor())) {
-			throw new BusinessException("O vendedor de código No. " + comissao.getIdVendedor()
-					+ " não existe no sistema ou não tem o perfil de vendedor");
+			Usuario u = usuarioService.pesquisarUsuarioResumidoById(comissao.getIdVendedor());
+			throw new BusinessException("O vendedor " + u.getNomeCompleto() + " não está ativo no sistema.");
 		}
 
 		if (!isMaterialNulo && !materialService.isMaterialExistente(comissao.getIdMaterial())) {
-			throw new BusinessException("O material de código No. " + comissao.getIdVendedor() + " não existe no sistema");
+			throw new BusinessException("O material de código No. " + comissao.getIdVendedor()
+					+ " não existe no sistema");
 		}
 
 		boolean isInvalido = isFormaNulo && isMaterialNulo && isVendedorNulo;
@@ -118,7 +123,6 @@ public class ComissaoServiceImpl implements ComissaoService {
 		return comissaoDAO.pesquisarComissaoVigenteVendedor(idVendedor);
 	}
 
-	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Comissao pesquisarById(Integer idComissao) {

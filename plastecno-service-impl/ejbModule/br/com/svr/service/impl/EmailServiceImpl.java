@@ -2,6 +2,8 @@ package br.com.svr.service.impl;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -33,6 +35,7 @@ public class EmailServiceImpl implements EmailService {
 
 	@EJB
 	private UsuarioService usuarioService;
+	private Logger log = Logger.getLogger(this.getClass().getName());
 
 	public void enviar(MensagemEmail mensagemEmail) throws NotificacaoException {
 
@@ -74,6 +77,7 @@ public class EmailServiceImpl implements EmailService {
 			// email.send();
 
 		} catch (Exception e) {
+			log.log(Level.SEVERE, "Falha na configuracao do envio de email.", e);
 			StringBuilder mensagem = new StringBuilder();
 			mensagem.append("Falha no envio de email de ");
 			mensagem.append(mensagemEmail.getRemetente());

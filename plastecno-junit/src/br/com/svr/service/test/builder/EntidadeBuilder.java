@@ -40,6 +40,7 @@ import br.com.svr.service.entity.Transportadora;
 import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.nfe.constante.TipoModalidadeFrete;
 import br.com.svr.service.test.TestUtils;
+import br.com.svr.service.validacao.ValidadorDocumento;
 
 public class EntidadeBuilder {
 	private static final EntidadeBuilder builder = new EntidadeBuilder();
@@ -61,8 +62,8 @@ public class EntidadeBuilder {
 		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.COBRANCA));
 		cliente.setRazaoSocial("Exercito Brasileiro " + no);
 		cliente.setNomeFantasia("Exercito Brasileiro " + no);
-		cliente.setCnpj("25632147000125");
-		cliente.setEmail("alex@gmail.com.br");
+		cliente.setCnpj(ValidadorDocumento.gerarCNPJ());
+		cliente.setEmail(cliente.getCnpj() + "@cliente.com.br");
 		cliente.setTipoCliente(TipoCliente.NORMAL);
 		return cliente;
 	}
@@ -105,15 +106,12 @@ public class EntidadeBuilder {
 	public Endereco buildEndereco() {
 		Bairro bairro = new Bairro();
 		bairro.setDescricao("Centro");
-		bairro.setId(gerarId());
 
 		Cidade cidade = new Cidade();
 		cidade.setDescricao("Sao Paulo");
 		cidade.setUf("SP");
-		cidade.setId(gerarId());
 
 		Pais pais = new Pais();
-		pais.setId(gerarId());
 		pais.setDescricao("Brasil");
 
 		Endereco endereco = new Endereco(bairro, cidade, pais);
@@ -345,7 +343,7 @@ public class EntidadeBuilder {
 	public Representada buildRepresentadaRevendedora() {
 		Representada representada = buildRepresentada();
 		representada.setNomeFantasia("Revendedor Plastico");
-		representada.setEmail("revendedorplastico@cobex.com.br");
+		representada.setEmail("revendedorplastico@gmail.com.br");
 		representada.setRazaoSocial("Revendedor Plastico LTDA");
 		representada.setTipoRelacionamento(TipoRelacionamento.REVENDA);
 		return representada;
@@ -372,14 +370,15 @@ public class EntidadeBuilder {
 	}
 
 	public Usuario buildVendedor() {
-		Usuario vendedor = new Usuario(gerarId(), "Vinicius", "Fernandes Vendedor");
-		vendedor.setEmail("vinicius@teste.com.br");
+		Usuario vendedor = new Usuario(null, "Vinicius", "Apolonio");
+		vendedor.setEmail("vendedor@teste.com.br");
+		vendedor.setEmailCopia("vendedorcopia@hotmail.com.br;compradorcopia@hotmail.com.br");
 		vendedor.setSenha("1234567");
 		vendedor.setAtivo(true);
 		return vendedor;
 	}
 
-	public Integer gerarId() {
+	public Integer xgerarId() {
 		return (int) (9999 * Math.random());
 	}
 

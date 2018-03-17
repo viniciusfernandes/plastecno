@@ -13,6 +13,7 @@ http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/persistence/persistence_2
 		<class>br.com.svr.service.entity.Comissao</class>
 		<class>br.com.svr.service.entity.ComentarioCliente</class>
 		<class>br.com.svr.service.entity.ComentarioRepresentada</class>
+		<class>br.com.svr.service.entity.ConfiguracaoSistema</class>
 		<class>br.com.svr.service.entity.Contato</class>
 		<class>br.com.svr.service.entity.ContatoCliente</class>
 		<class>br.com.svr.service.entity.ContatoRepresentada</class>

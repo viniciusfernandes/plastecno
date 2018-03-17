@@ -2,14 +2,14 @@ package br.com.svr.service.test.gerador;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.EntityManager;
 
 import org.junit.Assert;
 
 import br.com.svr.service.ClienteService;
 import br.com.svr.service.ComissaoService;
-import br.com.svr.service.LogradouroService;
 import br.com.svr.service.MaterialService;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.PerfilAcessoService;
@@ -17,6 +17,7 @@ import br.com.svr.service.RamoAtividadeService;
 import br.com.svr.service.RepresentadaService;
 import br.com.svr.service.UsuarioService;
 import br.com.svr.service.constante.SituacaoPedido;
+import br.com.svr.service.constante.TipoAcesso;
 import br.com.svr.service.constante.TipoCliente;
 import br.com.svr.service.constante.TipoEntrega;
 import br.com.svr.service.constante.TipoFinalidadePedido;
@@ -28,7 +29,6 @@ import br.com.svr.service.entity.Contato;
 import br.com.svr.service.entity.ContatoCliente;
 import br.com.svr.service.entity.ContatoRepresentada;
 import br.com.svr.service.entity.ItemPedido;
-import br.com.svr.service.entity.LogradouroCliente;
 import br.com.svr.service.entity.Material;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.PerfilAcesso;
@@ -44,13 +44,20 @@ import br.com.svr.service.test.builder.ServiceBuilder;
 
 public class GeradorPedido {
 
+	private static EntityManager em;
+
 	private static GeradorPedido gerador;
 
 	public static GeradorPedido getInstance() {
-		if (gerador == null) {
+		if (GeradorPedido.gerador == null) {
 			gerador = new GeradorPedido();
 		}
 		return gerador;
+	}
+
+	public static GeradorPedido getInstance(EntityManager em) {
+		GeradorPedido.em = em;
+		return getInstance();
 	}
 
 	private ClienteService clienteService;
@@ -62,8 +69,6 @@ public class GeradorPedido {
 	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
 
 	private GeradorTransportadora gTransportadora = GeradorTransportadora.getInstance();
-
-	private LogradouroService logradouroService;
 
 	private MaterialService materialService;
 
@@ -85,44 +90,19 @@ public class GeradorPedido {
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
-		logradouroService = ServiceBuilder.buildService(LogradouroService.class);
 		ramoAtividadeService = ServiceBuilder.buildService(RamoAtividadeService.class);
 		perfilAcessoService = ServiceBuilder.buildService(PerfilAcessoService.class);
 	}
 
-	public Cliente gerarCliente() {
-		RamoAtividade ramo = gerarRamoAtividade();
-		Cliente c = eBuilder.buildCliente();
-		c.setRamoAtividade(ramo);
-		c.setListaLogradouro(null);
-
-		Usuario vend = gerarVendedor();
-		c.setVendedor(vend);
-
-		LogradouroCliente lFat = eBuilder.buildLogradouroCliente(TipoLogradouro.FATURAMENTO);
-		c.addLogradouro(lFat);
-		try {
-			return clienteService.inserir(c);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-		return null;
-	}
-
 	private Cliente gerarCliente(TipoCliente tipoCliente) {
-		RamoAtividade ramo = eBuilder.buildRamoAtividade();
-		try {
-			ramo = ramoAtividadeService.inserir(ramo);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
+
 		Cliente cli = null;
 		if (TipoCliente.REVENDEDOR.equals(tipoCliente)) {
 			cli = eBuilder.buildClienteRevendedor();
 		} else {
 			throw new IllegalStateException("O tipo de cliente nao existe.");
 		}
-		cli.setRamoAtividade(ramo);
+		cli.setRamoAtividade(gerarRamoAtividade());
 		cli.addContato(gerarContato(ContatoCliente.class));
 		try {
 			return clienteService.inserir(cli);
@@ -133,31 +113,30 @@ public class GeradorPedido {
 	}
 
 	public Cliente gerarCliente(Usuario vendedor) {
+		RamoAtividade ramo = gerarRamoAtividade();
 		ContatoCliente ct = gerarContato(ContatoCliente.class);
 
-		Cliente cliente = eBuilder.buildCliente();
-		cliente.addContato(ct);
-		cliente.setVendedor(vendedor);
+		Cliente c = eBuilder.buildCliente();
+		c.setRamoAtividade(ramo);
+		c.setListaLogradouro(null);
+		c.setVendedor(vendedor);
+		c.addContato(ct);
 
-		List<LogradouroCliente> lLog = new ArrayList<>();
-		for (LogradouroCliente l : cliente.getListaLogradouro()) {
-			try {
-				lLog.add(logradouroService.inserir(l));
-			} catch (BusinessException e) {
-				printMensagens(e);
-			}
-		}
-		cliente.setListaLogradouro(lLog);
+		c.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
+		c.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.ENTREGA));
+		c.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.COBRANCA));
+
 		try {
-			return clienteService.inserir(cliente);
-		} catch (BusinessException e2) {
-			printMensagens(e2);
+			return clienteService.inserir(c);
+		} catch (BusinessException e) {
+			printMensagens(e);
 		}
-		return null;
+
+		return c;
 	}
 
-	public Cliente gerarClienteRevendedor() {
-		return gerarCliente(TipoCliente.REVENDEDOR);
+	public Cliente gerarClienteComVendedor() {
+		return gerarCliente(gerarVendedor());
 	}
 
 	public <T extends Contato> T gerarContato(Class<T> t) {
@@ -177,13 +156,15 @@ public class GeradorPedido {
 		return ct;
 	}
 
+	@Deprecated
 	public ItemPedido gerarItemPedido() {
 		List<Representada> listaRepresentada = representadaService.pesquisarRepresentadaEFornecedor();
 		Representada representada = null;
 		if (listaRepresentada.isEmpty()) {
 			representada = eBuilder.buildRepresentada();
 			try {
-				representadaService.inserir(representada);
+				Integer idRepres = representadaService.inserir(representada);
+				representada = representadaService.pesquisarById(idRepres);
 			} catch (BusinessException e) {
 				printMensagens(e);
 			}
@@ -191,19 +172,21 @@ public class GeradorPedido {
 			representada = listaRepresentada.get(0);
 		}
 
-		Material material = eBuilder.buildMaterial();
-		material.addRepresentada(representada);
-		try {
-			materialService.inserir(material);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
 		ItemPedido itemPedido = eBuilder.buildItemPedido();
-		itemPedido.setMaterial(material);
+		itemPedido.setMaterial(gerarMaterial(representada));
 		itemPedido.setAliquotaIPI(null);
 		itemPedido.setNcm("36.39.90.90");
 		return itemPedido;
+	}
+
+	public ItemPedido gerarItemPedido(Integer idPedido) throws BusinessException {
+		Representada repres = pedidoService.pesquisarRepresentadaByIdPedido(idPedido);
+		ItemPedido itemPedido = eBuilder.buildItemPedido();
+		itemPedido.setMaterial(gerarMaterial(repres));
+		itemPedido.setAliquotaIPI(null);
+		itemPedido.setNcm("36.39.90.90");
+		Integer idItem = pedidoService.inserirItemPedido(idPedido, itemPedido);
+		return pedidoService.pesquisarItemPedidoById(idItem);
 	}
 
 	public ItemPedido gerarItemPedidoCompra() {
@@ -256,24 +239,31 @@ public class GeradorPedido {
 		return itemPedido;
 	}
 
-	public Pedido gerarOrcamento() {
-		Pedido o = gerarPedidoRevenda(SituacaoPedido.ORCAMENTO_DIGITACAO);
-		// Inserindo frete para testar o calculo do indice de conversao com
-		// frete
-		// o.setValorFrete(1000d);
-
-		try {
-			pedidoService.inserirPedido(o);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
+	public Material gerarMaterial(Representada representada) {
+		Material mat = materialService.pesquisarBySiglaIdentica(eBuilder.buildMaterial().getSigla());
+		if (mat != null) {
+			return mat;
 		}
 
-		ItemPedido i = gerarItemPedido();
+		mat = eBuilder.buildMaterial();
+		mat.addRepresentada(representada);
+		Integer idMat = null;
 		try {
-			pedidoService.inserirItemPedido(o.getId(), i);
+			idMat = materialService.inserir(mat);
+			return materialService.pesquisarById(idMat);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
+		return null;
+	}
+
+	public Pedido gerarOrcamento() {
+		return gerarPedidoRevenda(SituacaoPedido.ORCAMENTO_DIGITACAO);
+	}
+
+	public Pedido gerarOrcamentoComItem() throws BusinessException {
+		Pedido o = gerarOrcamento();
+		gerarItemPedido(o.getId());
 		return o;
 	}
 
@@ -303,24 +293,27 @@ public class GeradorPedido {
 	public Pedido gerarPedido(TipoPedido tipoPedido, SituacaoPedido situacaoPedido,
 			TipoRelacionamento tipoRelacionamentoRepresentada) {
 		Usuario vendedor = eBuilder.buildVendedor();
+
+		vendedor.addPerfilAcesso(gerarPerfilAcesso(TipoAcesso.CADASTRO_PEDIDO_VENDAS));
+		Integer idVend = null;
 		try {
-			usuarioService.inserir(vendedor, true);
+			idVend = usuarioService.inserir(vendedor, true);
 		} catch (BusinessException e2) {
 			printMensagens(e2);
 		}
-
+		vendedor = recarregarEntidade(Usuario.class, idVend);
 		Transportadora transp = gTransportadora.gerarTransportadora();
 
 		// Temos que gerar um revendedor pois eh ele que efetuara as comprar
 		// para abastecer o estoque.
-		Cliente cliente = TipoPedido.COMPRA.equals(tipoPedido) ? gerarClienteRevendedor() : gerarCliente(vendedor);
+		Cliente cliente = TipoPedido.COMPRA.equals(tipoPedido) ? gerarRevendedor() : gerarCliente(vendedor);
 
-		Pedido pCompra = eBuilder.buildPedido();
-		pCompra.setCliente(cliente);
-		pCompra.setTransportadora(transp);
-		pCompra.setVendedor(vendedor);
-		pCompra.setTipoPedido(tipoPedido);
-		pCompra.setSituacaoPedido(situacaoPedido);
+		Pedido pedido = eBuilder.buildPedido();
+		pedido.setCliente(cliente);
+		pedido.setTransportadora(transp);
+		pedido.setVendedor(vendedor);
+		pedido.setTipoPedido(tipoPedido);
+		pedido.setSituacaoPedido(situacaoPedido);
 
 		try {
 			comissaoService.inserirComissaoVendedor(vendedor.getId(), 0.6, 0.1);
@@ -332,14 +325,14 @@ public class GeradorPedido {
 		if (TipoRelacionamento.REVENDA.equals(tipoRelacionamentoRepresentada)) {
 			representada.addContato(gerarContato(ContatoRepresentada.class));
 		}
-		pCompra.setRepresentada(representada);
+		pedido.setRepresentada(representada);
 		try {
-			pCompra = pedidoService.inserirPedido(pCompra);
+			pedido = pedidoService.inserirPedido(pedido);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
 
-		return pCompra;
+		return pedido;
 	}
 
 	public Pedido gerarPedido(TipoPedido tipoPedido, TipoRelacionamento tipoRelacionamento) {
@@ -424,7 +417,7 @@ public class GeradorPedido {
 	}
 
 	public Pedido gerarPedidoRevenda(SituacaoPedido situacaoPedido) {
-		Cliente revendedor = gerarClienteRevendedor();
+		Cliente revendedor = gerarRevendedor();
 		ContatoCliente ct = gerarContato(ContatoCliente.class);
 		revendedor.addContato(ct);
 		// Garantindo a existencia de um revendedor no sistema para inserir um
@@ -476,14 +469,42 @@ public class GeradorPedido {
 		return pedido;
 	}
 
+	public PerfilAcesso gerarPerfilAcesso(TipoAcesso tipoAcesso) {
+		if (tipoAcesso == null) {
+			return null;
+		}
+		List<PerfilAcesso> l = perfilAcessoService.pesquisar();
+		if (l.isEmpty()) {
+			throw new IllegalStateException(
+					"A lista de perfil de acesso deve ser inicilizada antes de todos os testes serem executados. Veja em AbstractTest");
+		}
+
+		l = perfilAcessoService.pesquisar();
+		for (PerfilAcesso p : l) {
+			if (tipoAcesso.toString().equals(p.getDescricao())) {
+				return p;
+			}
+		}
+		throw new IllegalStateException(
+				"Nao foi possivel encontrar o perfil de acesso cadastrado no sistema para o tipo " + tipoAcesso);
+	}
+
 	public RamoAtividade gerarRamoAtividade() {
-		RamoAtividade r = eBuilder.buildRamoAtividade();
+		RamoAtividade r = pesquisarPrimeiroRegistro(RamoAtividade.class);
+		if (r != null) {
+			return r;
+		}
+		r = eBuilder.buildRamoAtividade();
 		try {
 			return ramoAtividadeService.inserir(r);
 		} catch (BusinessException e) {
 			printMensagens(e);
-			return null;
+			throw new IllegalStateException("Falha na geracao de ramo de atividade", e);
 		}
+	}
+
+	public Cliente gerarRevendedor() {
+		return gerarCliente(TipoCliente.REVENDEDOR);
 	}
 
 	public Usuario gerarVendedor() {
@@ -509,7 +530,19 @@ public class GeradorPedido {
 		return vend;
 	}
 
+	private <T> T pesquisarPrimeiroRegistro(Class<T> classe) {
+		List<T> l = em.createQuery("from " + classe.getSimpleName(), classe).getResultList();
+		return l.size() >= 1 ? l.get(0) : null;
+	}
+
 	public void printMensagens(BusinessException exception) {
 		Assert.fail("Falha em alguma regra de negocio. As mensagens sao: " + exception.getMensagemConcatenada());
+	}
+
+	public <T> T recarregarEntidade(Class<T> classe, Integer id) {
+		T e = em.createQuery("select e from " + classe.getSimpleName() + " e where e.id =:id", classe)
+				.setParameter("id", id).getSingleResult();
+		em.refresh(e);
+		return e;
 	}
 }

@@ -1,5 +1,7 @@
 package br.com.svr.service.test.gerador;
 
+import java.util.List;
+
 import org.junit.Assert;
 
 import br.com.svr.service.RepresentadaService;
@@ -9,6 +11,8 @@ import br.com.svr.service.entity.Representada;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.test.builder.EntidadeBuilder;
 import br.com.svr.service.test.builder.ServiceBuilder;
+import br.com.svr.util.NumeroUtils;
+import br.com.svr.util.StringUtils;
 
 public class GeradorRepresentada {
 	private static GeradorRepresentada gerador;
@@ -32,16 +36,30 @@ public class GeradorRepresentada {
 		return gerarRepresentada(TipoRelacionamento.FORNECIMENTO);
 	}
 
-	public Representada gerarRepresentada(TipoRelacionamento tipoRelacionamento) {
-		Representada representada = eBuilder.buildRepresentada();
-		representada.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
-		representada.setTipoRelacionamento(tipoRelacionamento);
+	public Representada gerarRepresentada(TipoRelacionamento tpRelac) {
+		if (tpRelac == null) {
+			throw new IllegalStateException("Nao eh possivel gerar uma representada com tipo de relacionamento nulo;");
+		}
+		List<Representada> lRep = null;
+		Representada r = null;
+		if (tpRelac.isFornecimento() && !(lRep = representadaService.pesquisarFornecedorAtivo()).isEmpty()) {
+			return lRep.get(0);
+		} else if (tpRelac.isRevenda() && (r = representadaService.pesquisarRevendedor()) != null) {
+			return r;
+
+		} else if (tpRelac.isRepresentacao() && !(lRep = representadaService.pesquisarRepresentadaAtiva()).isEmpty()) {
+			return lRep.get(0);
+		}
+
+		r = eBuilder.buildRepresentada();
+		r.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
+		r.setTipoRelacionamento(tpRelac);
 		try {
-			representadaService.inserir(representada);
+			r.setId(representadaService.inserir(r));
 		} catch (BusinessException e3) {
 			printMensagens(e3);
 		}
-		return representada;
+		return r;
 	}
 
 	public Representada gerarRevendedor() {

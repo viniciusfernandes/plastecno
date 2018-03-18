@@ -51,12 +51,14 @@ public class EntidadeBuilder {
 
 	private EntidadeRepository repositorio = EntidadeRepository.getInstance();
 
+	private int sequencia = 0;
+
 	private EntidadeBuilder() {
 	}
 
 	public Cliente buildCliente() {
 		Cliente cliente = new Cliente();
-		double no = Math.random();
+		double no = gerarSequencia();
 		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.FATURAMENTO));
 		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.ENTREGA));
 		cliente.addLogradouro(buildLogradouroCliente(TipoLogradouro.COBRANCA));
@@ -88,7 +90,7 @@ public class EntidadeBuilder {
 
 	public Cliente buildClienteRevendedor() {
 		Cliente cliente = buildCliente();
-		double no = Math.random();
+		double no = gerarSequencia();
 		cliente.setCnpj("25632147000125");
 		cliente.setRazaoSocial("Revendedor de Plasticos" + no);
 		cliente.setNomeFantasia("Revendedor de Plasticos LTDA" + no);
@@ -162,18 +164,19 @@ public class EntidadeBuilder {
 	}
 
 	public ItemPedido buildItemPedido() {
-		ItemPedido itemPedido = new ItemPedido();
-		itemPedido.setAliquotaIPI(0.11d);
-		itemPedido.setAliquotaICMS(0.06d);
-		itemPedido.setMaterial(buildMaterial());
-		itemPedido.setFormaMaterial(FormaMaterial.TB);
-		itemPedido.setQuantidade(2);
-		itemPedido.setMedidaExterna(120d);
-		itemPedido.setMedidaInterna(100d);
-		itemPedido.setComprimento(1000d);
-		itemPedido.setTipoVenda(TipoVenda.KILO);
-		itemPedido.setPrecoVenda(60d);
-		return itemPedido;
+		ItemPedido i = new ItemPedido();
+		i.setAliquotaIPI(0.11d);
+		i.setAliquotaICMS(0.06d);
+		i.setMaterial(buildMaterial());
+		i.setFormaMaterial(FormaMaterial.TB);
+		i.setQuantidade(2);
+		i.setMedidaExterna(120d);
+		i.setMedidaInterna(100d);
+		i.setComprimento(1000d);
+		i.setTipoVenda(TipoVenda.KILO);
+		i.setPrecoVenda(60d);
+		i.setNcm("36.39.90.90");
+		return i;
 	}
 
 	public ItemPedido buildItemPedidoPeca() {
@@ -319,15 +322,16 @@ public class EntidadeBuilder {
 	}
 
 	public Representada buildRepresentada() {
-		Representada representada = new Representada(null, "COBEX");
-		representada.setAtivo(true);
-		representada.setRazaoSocial("COBEX LTDA");
-		representada.setEmail("vendas@cobex.com.br");
-		representada.setComissao(0.05);
-		representada.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
-		representada.setAliquotaICMS(0.18);
-		representada.setCnpj("77336617000107");
-		representada.setInscricaoEstadual("123456789");
+		Representada r = new Representada(null, "COBEX");
+		r.setAtivo(true);
+		r.setNomeFantasia(r.getNomeFantasia() + " " + gerarSequencia());
+		r.setRazaoSocial("COBEX LTDA");
+		r.setEmail("vendas@cobex.com.br");
+		r.setComissao(0.05);
+		r.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO);
+		r.setAliquotaICMS(0.18);
+		r.setCnpj(ValidadorDocumento.gerarCNPJ());
+		r.setInscricaoEstadual("123456789");
 
 		LogradouroRepresentada l = buildLogradouroRepresentada(TipoLogradouro.FATURAMENTO);
 		l.setCep("09910345");
@@ -335,23 +339,23 @@ public class EntidadeBuilder {
 		l.setNumero("432");
 		l.setCidade("Diadema");
 		l.setComplemento("Conjunto 330");
-		representada.setLogradouro(l);
+		r.setLogradouro(l);
 
-		return representada;
+		return r;
 	}
 
 	public Representada buildRepresentadaRevendedora() {
-		Representada representada = buildRepresentada();
-		representada.setNomeFantasia("Revendedor Plastico");
-		representada.setEmail("revendedorplastico@gmail.com.br");
-		representada.setRazaoSocial("Revendedor Plastico LTDA");
-		representada.setTipoRelacionamento(TipoRelacionamento.REVENDA);
-		return representada;
+		Representada r = buildRepresentada();
+		r.setNomeFantasia("Revendedor Plastico");
+		r.setEmail("revendedorplastico@gmail.com.br");
+		r.setRazaoSocial("Revendedor Plastico LTDA");
+		r.setTipoRelacionamento(TipoRelacionamento.REVENDA);
+		return r;
 	}
 
 	public Cliente buildRevendedor() {
 		Cliente cliente = buildCliente();
-		double no = Math.random();
+		double no = gerarSequencia();
 		cliente.setNomeFantasia("Acrílicos Merediano No " + no);
 		cliente.setRazaoSocial("Acrílicos Merediano LTDA " + no);
 		cliente.setTipoCliente(TipoCliente.REVENDEDOR);
@@ -370,16 +374,17 @@ public class EntidadeBuilder {
 	}
 
 	public Usuario buildVendedor() {
-		Usuario vendedor = new Usuario(null, "Vinicius", "Apolonio");
-		vendedor.setEmail("vendedor@teste.com.br");
-		vendedor.setEmailCopia("vendedorcopia@hotmail.com.br;compradorcopia@hotmail.com.br");
+		int i = gerarSequencia();
+		Usuario vendedor = new Usuario(null, "Vinicius " + i, "Apolonio");
+		vendedor.setEmail("vendedor_" + i + "@teste.com.br");
+		vendedor.setEmailCopia("vendedorcopia_" + i + "@hotmail.com.br;compradorcopia_" + i + "@hotmail.com.br");
 		vendedor.setSenha("1234567");
 		vendedor.setAtivo(true);
 		return vendedor;
 	}
 
-	public Integer xgerarId() {
-		return (int) (9999 * Math.random());
+	private int gerarSequencia() {
+		return sequencia++;
 	}
 
 }

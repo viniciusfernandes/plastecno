@@ -15,4 +15,16 @@ public enum TipoRelacionamento {
 	public String getDescricao() {
 		return this.descricao;
 	}
+	
+	public boolean isFornecimento(){
+		return this.equals(FORNECIMENTO) || this.equals(REPRESENTACAO_FORNECIMENTO);
+	}
+	
+	public boolean isRevenda(){
+		return this.equals(REVENDA);
+	}
+	
+	public boolean isRepresentacao(){
+		return this.equals(REPRESENTACAO)|| this.equals(REPRESENTACAO_FORNECIMENTO);
+	}
 }

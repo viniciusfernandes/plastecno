@@ -225,12 +225,13 @@ public class ClienteServiceImpl implements ClienteService {
 				ct.setCliente(cliente);
 			}
 		}
-
-		List<LogradouroCliente> lLogrd = new ArrayList<>(cliente.getListaLogradouro());
-
+		List<LogradouroCliente> lLogrd = new ArrayList<>();
+		if (cliente.contemLogradouro()) {
+			lLogrd.addAll(cliente.getListaLogradouro());
+		}
 		Cliente c = cliente.isNovo() ? clienteDAO.inserir(cliente) : clienteDAO.alterar(cliente);
 		inserirLogradouroCliente(c.getId(), lLogrd);
-		
+
 		return c;
 	}
 

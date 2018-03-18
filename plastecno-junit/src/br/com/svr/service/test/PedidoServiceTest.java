@@ -22,6 +22,7 @@ import br.com.svr.service.ComissaoService;
 import br.com.svr.service.EstoqueService;
 import br.com.svr.service.MaterialService;
 import br.com.svr.service.PedidoService;
+import br.com.svr.service.RepresentadaService;
 import br.com.svr.service.constante.FormaMaterial;
 import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.TipoApresentacaoIPI;
@@ -43,6 +44,7 @@ import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.test.builder.ServiceBuilder;
+import br.com.svr.service.test.gerador.GeradorRepresentada;
 import br.com.svr.util.DateUtils;
 import br.com.svr.util.StringUtils;
 
@@ -73,9 +75,13 @@ public class PedidoServiceTest extends AbstractTest {
 
 	private EstoqueService estoqueService;
 
+	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
+
 	private MaterialService materialService;
 
 	private PedidoService pedidoService;
+
+	private RepresentadaService representadaService;
 
 	public PedidoServiceTest() {
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
@@ -83,6 +89,8 @@ public class PedidoServiceTest extends AbstractTest {
 		materialService = ServiceBuilder.buildService(MaterialService.class);
 		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
+		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
+
 	}
 
 	private void associarVendedor(Cliente cliente) {
@@ -96,15 +104,16 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	private Material gerarMaterial(Representada representada) {
-		Material material = eBuilder.buildMaterial();
-		material.setImportado(true);
-		material.addRepresentada(representada);
+		Material mat = eBuilder.buildMaterial();
+		mat.setImportado(true);
+		mat.addRepresentada(representada);
 		try {
-			materialService.inserir(material);
+			mat.setId(materialService.inserir(mat));
+			;
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
-		return material;
+		return mat;
 	}
 
 	private PedidoRevendaECompra gerarRevendaEncomendada() {
@@ -1090,32 +1099,24 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoIPINuloRepresentadaComIPIObrigatorio() {
-		Pedido pedido = gPedido.gerarPedidoRepresentacao();
+		Pedido p = gPedido.gerarPedidoComItem(TipoPedido.REPRESENTACAO);
 
-		Representada representada = pedido.getRepresentada();
+		Representada representada = p.getRepresentada();
 		representada.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
-
-		Integer idPedido = pedido.getId();
-		ItemPedido itemPedido = gPedido.gerarItemPedido();
 		try {
-			pedidoService.inserirItemPedido(idPedido, itemPedido);
+			representadaService.inserir(representada);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		try {
-			pedido = pedidoService.inserirPedido(pedido);
-		} catch (BusinessException e1) {
-			printMensagens(e1);
-		}
+		List<ItemPedido> l = pedidoService.pesquisarItemPedidoByIdPedido(p.getId());
+		for (ItemPedido i : l) {
 
-		try {
-			pedidoService.inserirItemPedido(pedido.getId(), itemPedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
+			assertTrue("O IPI do item do item " + i.getSequencial()
+					+ " nao confere com o IPI da forma de material escolhida", FormaMaterial.TB.getIpi() == i
+					.getAliquotaIPI().doubleValue());
+
 		}
-		assertTrue("O IPI do item nao confere com o IPI da forma de material escolhida",
-				FormaMaterial.TB.getIpi() == itemPedido.getAliquotaIPI().doubleValue());
 	}
 
 	@Test
@@ -1573,16 +1574,11 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoPedidoCompra() {
 		Pedido pedido = gPedido.gerarPedidoCompra();
-		pedido.setId(null);
-		try {
-			pedido = pedidoService.inserirPedido(pedido);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
 
-		assertEquals("Todo pedido incluido deve ir para a digitacao", SituacaoPedido.DIGITACAO,
+		assertEquals("Todo pedido de compra incluido deve ir para a digitacao", SituacaoPedido.DIGITACAO,
 				pedido.getSituacaoPedido());
-		assertEquals("O tipo do pedido deve ser de compra apos a inclusao", TipoPedido.COMPRA, pedido.getTipoPedido());
+		assertEquals("O tipo do pedido de compra deve ser de compra apos a inclusao", TipoPedido.COMPRA,
+				pedido.getTipoPedido());
 	}
 
 	@Test
@@ -1613,7 +1609,9 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoPedidoDigitadoSemVendedorAssociado() {
 		Pedido pedido = gPedido.gerarPedidoRepresentacao();
-		pedido.setVendedor(new Usuario());
+		Usuario outroVend = gPedido.gerarVendedor();
+		pedido.setVendedor(outroVend);
+
 		boolean throwed = false;
 		try {
 			pedido = pedidoService.inserirPedido(pedido);
@@ -1917,18 +1915,21 @@ public class PedidoServiceTest extends AbstractTest {
 	@Test
 	public void testRevendaComApenasUmItemEncomendado() {
 		Pedido pedido = gPedido.gerarPedidoRevenda();
-		ItemPedido item1 = gPedido.gerarItemPedido();
-		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
-		item2.setMaterial(item1.getMaterial());
+		Material mat = gerarMaterial(pedido.getRepresentada());
+
+		ItemPedido iTubo = eBuilder.buildItemPedido();
+		iTubo.setMaterial(mat);
+		ItemPedido iPeca = eBuilder.buildItemPedidoPeca();
+		iPeca.setMaterial(mat);
 
 		Integer idPedido = pedido.getId();
 		try {
-			pedidoService.inserirItemPedido(idPedido, item1);
+			pedidoService.inserirItemPedido(idPedido, iTubo);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
 		try {
-			pedidoService.inserirItemPedido(idPedido, item2);
+			pedidoService.inserirItemPedido(idPedido, iPeca);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -1944,16 +1945,13 @@ public class PedidoServiceTest extends AbstractTest {
 				"O pedido nao contem itens no estoque e deve aguardar o setor de comprar encomendar os itens de um fornecedor",
 				SituacaoPedido.ITEM_AGUARDANDO_COMPRA, situacaoPedido);
 
-		Representada fornecedor = pedido.getRepresentada();
-		fornecedor.setTipoRelacionamento(TipoRelacionamento.REPRESENTACAO_FORNECIMENTO);
-
-		Cliente revendedor = pedido.getCliente();
-		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
+		Representada forn = gRepresentada.gerarFornecedor();
+		gPedido.gerarAssociacaoMaterial(mat, forn.getId());
 
 		Set<Integer> listaId = new HashSet<Integer>();
-		listaId.add(item1.getId());
+		listaId.add(iTubo.getId());
 		try {
-			pedidoService.comprarItemPedido(pedido.getComprador().getId(), fornecedor.getId(), listaId);
+			pedidoService.comprarItemPedido(pedido.getComprador().getId(), forn.getId(), listaId);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

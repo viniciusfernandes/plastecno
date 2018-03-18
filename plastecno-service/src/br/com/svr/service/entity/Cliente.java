@@ -276,6 +276,10 @@ public class Cliente implements Serializable {
 		return listaContato != null && listaContato.size() > 0;
 	}
 
+	public boolean contemLogradouro() {
+		return listaLogradouro != null && listaLogradouro.size() > 0;
+	}
+
 	public void formatarContatoPrincipal() {
 		Contato c = getContatoPrincipal();
 		if (c == null) {

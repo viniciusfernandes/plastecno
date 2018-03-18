@@ -2,6 +2,7 @@ package br.com.svr.service.test.gerador;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -94,6 +95,18 @@ public class GeradorPedido {
 		perfilAcessoService = ServiceBuilder.buildService(PerfilAcessoService.class);
 	}
 
+	public Material gerarAssociacaoMaterial(Material mat, Integer idRepresentada) {
+		Representada forn = gRepresentada.gerarFornecedor();
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(forn.getId());
+		try {
+			mat.setId(materialService.inserir(mat, ids));
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		return mat;
+	}
+
 	private Cliente gerarCliente(TipoCliente tipoCliente) {
 
 		Cliente cli = null;
@@ -175,7 +188,6 @@ public class GeradorPedido {
 		ItemPedido itemPedido = eBuilder.buildItemPedido();
 		itemPedido.setMaterial(gerarMaterial(representada));
 		itemPedido.setAliquotaIPI(null);
-		itemPedido.setNcm("36.39.90.90");
 		return itemPedido;
 	}
 
@@ -190,53 +202,19 @@ public class GeradorPedido {
 	}
 
 	public ItemPedido gerarItemPedidoCompra() {
-		Pedido pedido = gerarPedidoCompra();
-		Integer idPedido = pedido.getId();
-		ItemPedido itemPedido = gerarItemPedido();
+		Pedido pedido = gerarPedidoComItem(TipoPedido.COMPRA);
+
 		try {
-			pedidoService.inserirItemPedido(idPedido, itemPedido);
+			pedidoService.enviarPedido(pedido.getId(), new AnexoEmail(new byte[] {}));
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		try {
-			pedidoService.enviarPedido(idPedido, new AnexoEmail(new byte[] {}));
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		pedido = pedidoService.pesquisarCompraById(idPedido);
+		pedido = recarregarEntidade(Pedido.class, pedido.getId());
 		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, pedido.getSituacaoPedido());
-		return itemPedido;
-	}
 
-	public ItemPedido gerarItemPedidoPeca() {
-		List<Representada> listaRepresentada = representadaService.pesquisarRepresentadaEFornecedor();
-		Representada representada = null;
-		if (listaRepresentada.isEmpty()) {
-			representada = eBuilder.buildRepresentada();
-			try {
-				representadaService.inserir(representada);
-			} catch (BusinessException e) {
-				printMensagens(e);
-			}
-		} else {
-			representada = listaRepresentada.get(0);
-		}
-
-		Material material = eBuilder.buildMaterial();
-		material.addRepresentada(representada);
-		try {
-			materialService.inserir(material);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		ItemPedido itemPedido = eBuilder.buildItemPedidoPeca();
-		itemPedido.setMaterial(material);
-		itemPedido.setAliquotaIPI(null);
-		itemPedido.setQuantidade(44);
-		return itemPedido;
+		List<ItemPedido> l = pedidoService.pesquisarItemPedidoByIdPedido(pedido.getId());
+		return l.size() <= 0 ? null : l.get(0);
 	}
 
 	public Material gerarMaterial(Representada representada) {
@@ -290,8 +268,7 @@ public class GeradorPedido {
 		return p;
 	}
 
-	public Pedido gerarPedido(TipoPedido tipoPedido, SituacaoPedido situacaoPedido,
-			TipoRelacionamento tipoRelacionamentoRepresentada) {
+	public Pedido gerarPedido(TipoPedido tipoPedido, SituacaoPedido situacaoPedido, TipoRelacionamento tpRel) {
 		Usuario vendedor = eBuilder.buildVendedor();
 
 		vendedor.addPerfilAcesso(gerarPerfilAcesso(TipoAcesso.CADASTRO_PEDIDO_VENDAS));
@@ -321,8 +298,8 @@ public class GeradorPedido {
 			printMensagens(e3);
 		}
 
-		Representada representada = gRepresentada.gerarRepresentada(tipoRelacionamentoRepresentada);
-		if (TipoRelacionamento.REVENDA.equals(tipoRelacionamentoRepresentada)) {
+		Representada representada = gRepresentada.gerarRepresentada(tpRel);
+		if (TipoRelacionamento.REVENDA.equals(tpRel)) {
 			representada.addContato(gerarContato(ContatoRepresentada.class));
 		}
 		pedido.setRepresentada(representada);
@@ -370,22 +347,32 @@ public class GeradorPedido {
 	}
 
 	public Pedido gerarPedidoComItem(TipoPedido tipoPedido) {
-		Pedido pedido = gerarPedido(tipoPedido, TipoPedido.REVENDA.equals(tipoPedido) ? TipoRelacionamento.REVENDA
+		Pedido p = gerarPedido(tipoPedido, TipoPedido.REVENDA.equals(tipoPedido) ? TipoRelacionamento.REVENDA
 				: TipoRelacionamento.REPRESENTACAO);
-		ItemPedido item1 = gerarItemPedido();
-		ItemPedido item2 = gerarItemPedidoPeca();
-		Integer idPedido = pedido.getId();
+		Material mat = gerarMaterial(p.getRepresentada());
+
+		ItemPedido iTubo = eBuilder.buildItemPedido();
+		iTubo.setMaterial(mat);
+		iTubo.setAliquotaIPI(null);
+		iTubo.setNcm("36.39.90.90");
+
+		ItemPedido iPeca = eBuilder.buildItemPedidoPeca();
+		iPeca.setMaterial(mat);
+		iPeca.setAliquotaIPI(null);
+		iPeca.setQuantidade(44);
+
+		Integer idPedido = p.getId();
 		try {
-			pedidoService.inserirItemPedido(idPedido, item1);
+			pedidoService.inserirItemPedido(idPedido, iTubo);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
 		try {
-			pedidoService.inserirItemPedido(idPedido, item2);
+			pedidoService.inserirItemPedido(idPedido, iPeca);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
-		return pedido;
+		return p;
 	}
 
 	public Pedido gerarPedidoCompra() {
@@ -529,6 +516,8 @@ public class GeradorPedido {
 		vend.setId(id);
 		return vend;
 	}
+	
+	
 
 	private <T> T pesquisarPrimeiroRegistro(Class<T> classe) {
 		List<T> l = em.createQuery("from " + classe.getSimpleName(), classe).getResultList();

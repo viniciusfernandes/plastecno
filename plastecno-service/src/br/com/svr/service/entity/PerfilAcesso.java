@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "tb_perfil_acesso", schema = "vendas")
-public class PerfilAcesso implements Serializable {
+public class PerfilAcesso implements Serializable, Cloneable {
 	/**
 	 * 
 	 */
@@ -27,6 +27,16 @@ public class PerfilAcesso implements Serializable {
 
 	public PerfilAcesso(Integer id) {
 		this.id = id;
+	}
+
+	public PerfilAcesso(String descricao, Integer id) {
+		this.descricao = descricao;
+		this.id = id;
+	}
+
+	@Override
+	public PerfilAcesso clone() {
+		return new PerfilAcesso(this.descricao, this.id);
 	}
 
 	@Override
@@ -54,5 +64,4 @@ public class PerfilAcesso implements Serializable {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
 }

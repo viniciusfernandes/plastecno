@@ -193,12 +193,20 @@ public class GeradorPedido {
 
 	public ItemPedido gerarItemPedido(Integer idPedido) throws BusinessException {
 		Representada repres = pedidoService.pesquisarRepresentadaByIdPedido(idPedido);
-		ItemPedido itemPedido = eBuilder.buildItemPedido();
-		itemPedido.setMaterial(gerarMaterial(repres));
-		itemPedido.setAliquotaIPI(null);
-		itemPedido.setNcm("36.39.90.90");
-		Integer idItem = pedidoService.inserirItemPedido(idPedido, itemPedido);
+		ItemPedido i = eBuilder.buildItemPedido();
+		i.setMaterial(gerarMaterial(repres));
+		i.setAliquotaIPI(null);
+		i.setNcm("36.39.90.90");
+		Integer idItem = pedidoService.inserirItemPedido(idPedido, i);
 		return pedidoService.pesquisarItemPedidoById(idItem);
+	}
+
+	public ItemPedido gerarItemPedido(Representada representada) {
+		ItemPedido i = eBuilder.buildItemPedido();
+		i.setMaterial(gerarMaterial(representada));
+		i.setAliquotaIPI(null);
+		i.setNcm("36.39.90.90");
+		return i;
 	}
 
 	public ItemPedido gerarItemPedidoCompra() {
@@ -498,12 +506,13 @@ public class GeradorPedido {
 		Usuario vend = eBuilder.buildVendedor();
 
 		// Inserindo os perfis no sistema
-		List<PerfilAcesso> lPerf = eBuilder.buildListaPerfilAcesso();
-		Integer idPerf = null;
+		List<PerfilAcesso> lPerf = perfilAcessoService.pesquisar();
 		for (PerfilAcesso p : lPerf) {
-			idPerf = perfilAcessoService.inserir(p);
-			p.setId(idPerf);
-			vend.addPerfilAcesso(p);
+			if (TipoAcesso.CADASTRO_CLIENTE.indexOf() == p.getId().intValue()
+					|| TipoAcesso.CADASTRO_PEDIDO_VENDAS.indexOf() == p.getId().intValue()
+					|| TipoAcesso.CADASTRO_BASICO.indexOf() == p.getId().intValue()) {
+				vend.addPerfilAcesso(p.clone());
+			}
 		}
 
 		Integer id = null;
@@ -516,8 +525,6 @@ public class GeradorPedido {
 		vend.setId(id);
 		return vend;
 	}
-	
-	
 
 	private <T> T pesquisarPrimeiroRegistro(Class<T> classe) {
 		List<T> l = em.createQuery("from " + classe.getSimpleName(), classe).getResultList();

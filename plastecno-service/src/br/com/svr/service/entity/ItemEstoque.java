@@ -58,7 +58,7 @@ public class ItemEstoque extends Item {
 	private Double margemMinimaLucro;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_material", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "id_material", referencedColumnName = "id")
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Material associado ao item do estoque")
 	private Material material;
 

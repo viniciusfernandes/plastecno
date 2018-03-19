@@ -1609,6 +1609,7 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testInclusaoPedidoDigitadoSemVendedorAssociado() {
 		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		Usuario outroVend = gPedido.gerarVendedor();
+		outroVend = recarregarEntidade(Usuario.class, outroVend.getId());
 		pedido.setVendedor(outroVend);
 
 		boolean throwed = false;

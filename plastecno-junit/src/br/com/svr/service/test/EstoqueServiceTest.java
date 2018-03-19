@@ -351,8 +351,17 @@ public class EstoqueServiceTest extends AbstractTest {
 		Integer idItemEstoque = recepcionarItemCompra();
 		ItemEstoque item1 = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
 
+		item1.setQuantidadeMinima(11);
+
+		try {
+			estoqueService.inserirItemEstoque(item1);
+			item1 = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
 		ItemEstoque configuracao = item1.clone();
-		configuracao.setQuantidadeMinima(10);
+		configuracao.setQuantidadeMinima(item1.getQuantidadeMinima() + 3);
 		configuracao.setMargemMinimaLucro(0.1d);
 
 		try {
@@ -373,7 +382,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		item1 = estoqueService.pesquisarItemEstoqueById(item1.getId());
+		item1 = recarregarEntidade(ItemEstoque.class, item1.getId());
 		depois = item1.getQuantidadeMinima();
 		assertTrue("A quantidade minima de estoque foi alterada e por isso os valores devem ser diferentes",
 				!antes.equals(depois));

@@ -387,7 +387,7 @@ public class PedidoController extends AbstractPedidoController {
         addAtributo("listaTransportadora", transportadoraService.pesquisarTransportadoraAtiva());
         addAtributo("listaRepresentada", representadaService.pesquisarFornecedorAtivo());
         addAtributo("descricaoTipoPedido", TipoPedido.COMPRA.getDescricao());
-        addAtributo("cliente", clienteService.pesquisarRevendedor());
+        addAtributo("cliente", clienteService.pesquisarNomeRevendedor());
         redirecTo(this.getClass()).pedidoHome(TipoPedido.COMPRA, false);
     }
 

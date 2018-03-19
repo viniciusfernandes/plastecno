@@ -349,7 +349,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<PerfilAcesso> pesquisarPerfisAssociados(Integer id) {
-		return usuarioDAO.pesquisarPerfisAssociados(id);
+		return usuarioDAO.pesquisarPerfisAssociadosByIdUsuario(id);
 	}
 
 	@SuppressWarnings("unchecked")

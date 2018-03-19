@@ -67,7 +67,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Cliente alterarRevendedor(Cliente cliente) throws BusinessException {
-		Cliente revendedor = pesquisarRevendedor();
+		Cliente revendedor = pesquisarNomeRevendedor();
 		if (revendedor != null) {
 			clienteDAO.alterarTipoCliente(revendedor.getId(), TipoCliente.NORMAL);
 		}
@@ -626,8 +626,8 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public Cliente pesquisarRevendedor() {
-		return clienteDAO.pesquisarRevendedor();
+	public Cliente pesquisarNomeRevendedor() {
+		return clienteDAO.pesquisarNomeRevendedor();
 	}
 
 	@Override
@@ -721,7 +721,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 	private void validarRevendedorExistente(Cliente cliente) throws BusinessException {
 		if (cliente.isRevendedor() && clienteDAO.isRevendedorExistente(cliente.getId())) {
-			Cliente revendedor = clienteDAO.pesquisarRevendedor();
+			Cliente revendedor = clienteDAO.pesquisarNomeRevendedor();
 			throw new BusinessException("Não é possível mais de um cliente revendedor cadastrado. O cliente \""
 					+ revendedor.getNomeFantasia() + "\" já esta cadastrado como revendedor.");
 		}

@@ -92,7 +92,7 @@ public interface ClienteService {
 
 	String pesquisarNomeFantasia(Integer idCliente);
 
-	Cliente pesquisarRevendedor();
+	Cliente pesquisarNomeRevendedor();
 
 	Long pesquisarTotalRegistros(Cliente filtro);
 

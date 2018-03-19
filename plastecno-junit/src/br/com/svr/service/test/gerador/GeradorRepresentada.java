@@ -11,8 +11,6 @@ import br.com.svr.service.entity.Representada;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.test.builder.EntidadeBuilder;
 import br.com.svr.service.test.builder.ServiceBuilder;
-import br.com.svr.util.NumeroUtils;
-import br.com.svr.util.StringUtils;
 
 public class GeradorRepresentada {
 	private static GeradorRepresentada gerador;

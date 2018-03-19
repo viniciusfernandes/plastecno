@@ -137,7 +137,7 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 		return super.pesquisarCampoById(Cliente.class, idCliente, "nomeFantasia", String.class);
 	}
 
-	public Cliente pesquisarRevendedor() {
+	public Cliente pesquisarNomeRevendedor() {
 		return QueryUtil
 				.gerarRegistroUnico(
 						entityManager

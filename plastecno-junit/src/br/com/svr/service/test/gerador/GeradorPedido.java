@@ -110,13 +110,14 @@ public class GeradorPedido {
 	private Cliente gerarCliente(TipoCliente tipoCliente) {
 
 		Cliente cli = null;
-		if (TipoCliente.REVENDEDOR.equals(tipoCliente)) {
-			cli = eBuilder.buildClienteRevendedor();
+		if (TipoCliente.REVENDEDOR.equals(tipoCliente) && (cli = clienteService.pesquisarNomeRevendedor()) != null) {
+			return cli;
 		} else {
-			throw new IllegalStateException("O tipo de cliente nao existe.");
+			cli = eBuilder.buildClienteRevendedor();
 		}
 		cli.setRamoAtividade(gerarRamoAtividade());
 		cli.addContato(gerarContato(ContatoCliente.class));
+
 		try {
 			return clienteService.inserir(cli);
 		} catch (BusinessException e) {
@@ -254,7 +255,7 @@ public class GeradorPedido {
 	}
 
 	public Pedido gerarOrcamentoSemCliente() {
-		Usuario vendedor = eBuilder.buildVendedor();
+		Usuario vendedor = eBuilder.buildUsuario();
 		vendedor.setSenha("asdf34");
 		try {
 			usuarioService.inserir(vendedor, true);
@@ -277,7 +278,7 @@ public class GeradorPedido {
 	}
 
 	public Pedido gerarPedido(TipoPedido tipoPedido, SituacaoPedido situacaoPedido, TipoRelacionamento tpRel) {
-		Usuario vendedor = eBuilder.buildVendedor();
+		Usuario vendedor = eBuilder.buildUsuario();
 
 		vendedor.addPerfilAcesso(gerarPerfilAcesso(TipoAcesso.CADASTRO_PEDIDO_VENDAS));
 		Integer idVend = null;
@@ -426,7 +427,7 @@ public class GeradorPedido {
 	}
 
 	public Pedido gerarPedidoRevendaComItem() {
-		Cliente revendedor = eBuilder.buildRevendedor();
+		Cliente revendedor = gerarRevendedor();
 		ContatoCliente ct = gerarContato(ContatoCliente.class);
 		revendedor.addContato(ct);
 
@@ -449,7 +450,7 @@ public class GeradorPedido {
 		Pedido pedido = eBuilder.buildPedido();
 		pedido.setRepresentada(representada);
 		pedido.setTipoPedido(TipoPedido.REPRESENTACAO);
-		Usuario vendedor = eBuilder.buildVendedor();
+		Usuario vendedor = eBuilder.buildUsuario();
 		vendedor.setId(null);
 
 		try {
@@ -502,8 +503,10 @@ public class GeradorPedido {
 		return gerarCliente(TipoCliente.REVENDEDOR);
 	}
 
+	
+	
 	public Usuario gerarVendedor() {
-		Usuario vend = eBuilder.buildVendedor();
+		Usuario vend = eBuilder.buildUsuario();
 
 		// Inserindo os perfis no sistema
 		List<PerfilAcesso> lPerf = perfilAcessoService.pesquisar();

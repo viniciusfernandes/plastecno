@@ -50,11 +50,9 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<PerfilAcesso> pesquisarPerfisAssociados(Integer id) {
-		Query query = this.entityManager
-				.createQuery("select p from Usuario u , IN (u.listaPerfilAcesso) p where  u.id = :id order by p.descricao asc");
-		query.setParameter("id", id);
-		return query.getResultList();
+	public List<PerfilAcesso> pesquisarPerfisAssociadosByIdUsuario(Integer idUsuario) {
+		return entityManager.createQuery("select u.listaPerfilAcesso from Usuario u where  u.id = :idUsuario ")
+				.setParameter("idUsuario", idUsuario).getResultList();
 	}
 
 	public String pesquisarSenha(Integer idUsuario) {

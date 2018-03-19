@@ -538,18 +538,18 @@ public class PedidoServiceImpl implements PedidoService {
 
 		verificarMaterialAssociadoFornecedor(idRepresentadaFornecedora, listaIdItemPedido);
 
-		Cliente cliente = clienteService.pesquisarRevendedor();
-		if (cliente == null) {
+		Cliente revendedor = clienteService.pesquisarNomeRevendedor();
+		if (revendedor == null) {
 			throw new BusinessException(
 					"Para efetuar uma compra é necessário cadastrar um cliente como revendedor no sistema");
 		}
 
 		Usuario comprador = usuarioService.pesquisarById(idComprador);
 
-		List<ContatoCliente> lCont = clienteService.pesquisarContato(cliente.getId());
+		List<ContatoCliente> lCont = clienteService.pesquisarContato(revendedor.getId());
 		ContatoCliente cc = null;
 		if (lCont.isEmpty()) {
-			throw new BusinessException("O cliente " + cliente.getNomeFantasia()
+			throw new BusinessException("O cliente " + revendedor.getNomeFantasia()
 					+ " não possui contato. Verifique o cadastro de cliente.");
 		} else {
 			// Para o preenchimento dos contatos de compra basta pegarmos o
@@ -565,7 +565,7 @@ public class PedidoServiceImpl implements PedidoService {
 		contato.setDepartamento("COMPRAS");
 
 		Pedido pedidoCompra = new Pedido();
-		pedidoCompra.setCliente(cliente);
+		pedidoCompra.setCliente(revendedor);
 		pedidoCompra.setComprador(comprador);
 		pedidoCompra.setContato(contato);
 		pedidoCompra.setFinalidadePedido(TipoFinalidadePedido.REVENDA);
@@ -878,8 +878,13 @@ public class PedidoServiceImpl implements PedidoService {
 			estoqueService.reservarItemPedido(pedido.getId());
 		}
 
-		logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
+		try {
 
+			logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
+
+		} catch (BusinessException e) {
+			throw new BusinessException("Falha no envio do pedido de venda.").addMensagem(e.getListaMensagem());
+		}
 		// O recalculo do indice deve ser feito aqui pois apos a inclusao e
 		// aceite do orcamento o vendedor pode alterar os itens do pedidod e
 		// recalculando aqui o sistema compara o valor do pedido atualizado e do
@@ -2267,7 +2272,7 @@ public class PedidoServiceImpl implements PedidoService {
 	private void validarEnvio(Pedido pedido) throws BusinessException {
 
 		if (!pedido.isOrcamento()) {
-			clienteService.validarListaLogradouroPreenchida(pedido.getCliente());
+			logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
 		}
 
 		final BusinessException exception = new BusinessException();

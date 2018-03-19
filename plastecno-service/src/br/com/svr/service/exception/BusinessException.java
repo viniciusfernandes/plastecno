@@ -32,12 +32,14 @@ public class BusinessException extends Exception {
 		this.listaMensagem.add(mensagem);
 	}
 
-	public void addMensagem(List<String> listaMensagem) {
+	public BusinessException addMensagem(List<String> listaMensagem) {
 		this.listaMensagem.addAll(listaMensagem);
+		return this;
 	}
 
-	public void addMensagem(String mensagem) {
+	public BusinessException addMensagem(String mensagem) {
 		this.listaMensagem.add(mensagem);
+		return this;
 	}
 
 	public boolean contemExceptionPropagada() {

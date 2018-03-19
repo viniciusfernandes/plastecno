@@ -50,7 +50,7 @@ public class ComissaoServiceTest extends AbstractTest {
 	}
 
 	private Usuario gerarVendedor() {
-		Usuario vendedor = eBuilder.buildVendedor();
+		Usuario vendedor = eBuilder.buildUsuario();
 		try {
 			usuarioService.inserir(vendedor, true);
 		} catch (BusinessException e) {

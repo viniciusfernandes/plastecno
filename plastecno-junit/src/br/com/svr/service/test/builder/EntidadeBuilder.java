@@ -91,7 +91,7 @@ public class EntidadeBuilder {
 	public Cliente buildClienteRevendedor() {
 		Cliente cliente = buildCliente();
 		double no = gerarSequencia();
-		cliente.setCnpj("25632147000125");
+		cliente.setCnpj(ValidadorDocumento.gerarCNPJ());
 		cliente.setRazaoSocial("Revendedor de Plasticos" + no);
 		cliente.setNomeFantasia("Revendedor de Plasticos LTDA" + no);
 		cliente.setEmail("revendplastcios@gmail.com.br");
@@ -101,7 +101,7 @@ public class EntidadeBuilder {
 
 	public Cliente buildClienteVendedor() {
 		Cliente c = buildCliente();
-		c.setVendedor(buildVendedor());
+		c.setVendedor(buildUsuario());
 		return c;
 	}
 
@@ -282,7 +282,7 @@ public class EntidadeBuilder {
 	}
 
 	public Pedido buildPedido() {
-		Usuario vendedor = buildVendedor();
+		Usuario vendedor = buildUsuario();
 		Cliente cliente = buildCliente();
 		cliente.setVendedor(vendedor);
 
@@ -373,7 +373,7 @@ public class EntidadeBuilder {
 		return t;
 	}
 
-	public Usuario buildVendedor() {
+	public Usuario buildUsuario() {
 		int i = gerarSequencia();
 		Usuario vendedor = new Usuario(null, "Vinicius " + i, "Apolonio");
 		vendedor.setEmail("vendedor_" + i + "@teste.com.br");

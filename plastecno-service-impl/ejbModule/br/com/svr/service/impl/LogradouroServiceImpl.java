@@ -281,8 +281,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * br.com.svr.service.LogradouroService#removerAusentes(java.lang.
+	 * @see br.com.svr.service.LogradouroService#removerAusentes(java.lang.
 	 * Integer, java.util.Collection, java.lang.Class)
 	 */
 	@Override
@@ -312,7 +311,15 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 		if (listaLogradouro != null && !listaLogradouro.isEmpty()) {
 			for (Logradouro l : listaLogradouro) {
-				lLogAusente.remove(l.getTipoLogradouro());
+				if (!lLogAusente.remove(l.getTipoLogradouro())) {
+					throw new BusinessException(
+							"Falha na validação da lista de logradouro do pedido preenchia. Não foi removido do tipo de logradouro "
+									+ l.getTipoLogradouro());
+				}
+				// Aqui estamos tratando o caso em que muitos logradouros do mesmo tipo foram enviados.
+				if (lLogAusente.isEmpty()) {
+					break;
+				}
 			}
 		}
 

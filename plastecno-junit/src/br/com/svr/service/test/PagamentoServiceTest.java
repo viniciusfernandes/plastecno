@@ -73,16 +73,33 @@ public class PagamentoServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 
-		ItemPedido i1 = gPedido.gerarItemPedido();
-		i1.setQuantidade(1000);
-		i1.setAliquotaIPI(0.1d);
+		ItemPedido i1 = null;
+		;
+		try {
+			i1 = gPedido.gerarItemPedido(ped1.getId());
+			i1.setQuantidade(1000);
+			i1.setAliquotaIPI(0.1d);
+		} catch (BusinessException e2) {
+			printMensagens(e2);
+		}
 
-		ItemPedido i2 = gPedido.gerarItemPedido();
-		i2.setQuantidade(2000);
-		i1.setAliquotaIPI(0.2d);
+		ItemPedido i2 = null;
+		;
+		try {
+			i2 = gPedido.gerarItemPedido(ped1.getId());
+			i2.setQuantidade(2000);
+			i1.setAliquotaIPI(0.2d);
+		} catch (BusinessException e2) {
+			printMensagens(e2);
+		}
 
-		ItemPedido i3 = gPedido.gerarItemPedido();
-		i3.setQuantidade(3000);
+		ItemPedido i3 = null;
+		try {
+			i3 = gPedido.gerarItemPedido(ped2.getId());
+			i3.setQuantidade(3000);
+		} catch (BusinessException e2) {
+			printMensagens(e2);
+		}
 
 		Integer id1 = null;
 		Integer id2 = null;

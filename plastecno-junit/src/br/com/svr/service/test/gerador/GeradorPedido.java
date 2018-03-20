@@ -174,28 +174,6 @@ public class GeradorPedido {
 		return ct;
 	}
 
-	@Deprecated
-	public ItemPedido gerarItemPedido() {
-		List<Representada> listaRepresentada = representadaService.pesquisarRepresentadaEFornecedor();
-		Representada representada = null;
-		if (listaRepresentada.isEmpty()) {
-			representada = eBuilder.buildRepresentada();
-			try {
-				Integer idRepres = representadaService.inserir(representada);
-				representada = representadaService.pesquisarById(idRepres);
-			} catch (BusinessException e) {
-				printMensagens(e);
-			}
-		} else {
-			representada = listaRepresentada.get(0);
-		}
-
-		ItemPedido itemPedido = eBuilder.buildItemPedido();
-		itemPedido.setMaterial(gerarMaterial(representada));
-		itemPedido.setAliquotaIPI(null);
-		return itemPedido;
-	}
-
 	public ItemPedido gerarItemPedido(Integer idPedido) throws BusinessException {
 		Representada repres = pedidoService.pesquisarRepresentadaByIdPedido(idPedido);
 		ItemPedido i = eBuilder.buildItemPedido();

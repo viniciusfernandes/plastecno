@@ -57,7 +57,13 @@ public class ComissaoServiceImpl implements ComissaoService {
 
 		if (!isVendedorNulo && !usuarioService.isVendedorAtivo(comissao.getIdVendedor())) {
 			Usuario u = usuarioService.pesquisarUsuarioResumidoById(comissao.getIdVendedor());
-			throw new BusinessException("O vendedor " + u.getNomeCompleto() + " não está ativo no sistema.");
+			String mensagem = null;
+			if (u != null) {
+				mensagem = "O vendedor " + u.getNomeCompleto() + " não está ativo no sistema.";
+			} else {
+				mensagem = "O vendedor não existe no sistema.";
+			}
+			throw new BusinessException(mensagem);
 		}
 
 		if (!isMaterialNulo && !materialService.isMaterialExistente(comissao.getIdMaterial())) {

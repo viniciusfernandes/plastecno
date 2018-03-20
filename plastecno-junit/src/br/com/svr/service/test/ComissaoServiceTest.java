@@ -18,6 +18,7 @@ import br.com.svr.service.entity.Representada;
 import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.test.builder.ServiceBuilder;
+import br.com.svr.service.test.gerador.GeradorRepresentada;
 
 public class ComissaoServiceTest extends AbstractTest {
 	private ComissaoService comissaoService;
@@ -32,40 +33,11 @@ public class ComissaoServiceTest extends AbstractTest {
 		perfilAcessoService = ServiceBuilder.buildService(PerfilAcessoService.class);
 	}
 
-	private Material gerarMaterial() {
-		Representada representada = eBuilder.buildRepresentada();
-		Material material = eBuilder.buildMaterial();
-		List<Material> lista = materialService.pesquisarBySigla(material.getSigla());
-		if (lista.isEmpty()) {
-			material.addRepresentada(representada);
-			try {
-				material.setId(materialService.inserir(material));
-			} catch (BusinessException e) {
-				printMensagens(e);
-			}
-		} else {
-			material = lista.get(0);
-		}
-		return material;
-	}
-
-	private Usuario gerarVendedor() {
-		Usuario vendedor = eBuilder.buildUsuario();
-		try {
-			usuarioService.inserir(vendedor, true);
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		for (PerfilAcesso perfil : vendedor.getListaPerfilAcesso()) {
-			perfilAcessoService.inserir(perfil);
-		}
-		return vendedor;
-	}
-
 	@Test
 	public void testInclusaoComissaoFormaMaterial() {
 		Comissao comissao = new Comissao(0.1, new Date());
+		Usuario vend = gPedido.gerarVendedor();
+		comissao.setIdVendedor(vend.getId());
 		comissao.setIdFormaMaterial(FormaMaterial.BQ.indexOf());
 		try {
 			comissaoService.inserir(comissao);
@@ -89,13 +61,21 @@ public class ComissaoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoComissaoMaterial() {
 		Comissao comissao = new Comissao(0.1, new Date());
-		comissao.setIdMaterial(gerarMaterial().getId());
+		Representada revend = gRepresentada.gerarRevendedor();
+		Material mat = gPedido.gerarMaterial(revend);
+		Usuario vend = gPedido.gerarVendedor();
+
+		comissao.setIdVendedor(vend.getId());
+		comissao.setIdMaterial(mat.getId());
+
 		try {
 			comissaoService.inserir(comissao);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 	}
+
+	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
 
 	@Test
 	public void testInclusaoComissaoMaterialInexistente() {
@@ -113,7 +93,7 @@ public class ComissaoServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoComissaoVendedor() {
 		Comissao comissao = new Comissao(0.1, new Date());
-		comissao.setIdVendedor(gerarVendedor().getId());
+		comissao.setIdVendedor(gPedido.gerarVendedor().getId());
 		try {
 			comissaoService.inserir(comissao);
 		} catch (BusinessException e) {
@@ -136,7 +116,7 @@ public class ComissaoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoNovaVersaoComissaoVendedor() {
-		Integer idVendedor = gerarVendedor().getId();
+		Integer idVendedor = gPedido.gerarVendedor().getId();
 		Comissao c1 = new Comissao(0.1, TestUtils.gerarDataOntem());
 		c1.setIdVendedor(idVendedor);
 		try {

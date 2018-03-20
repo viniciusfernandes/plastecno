@@ -70,7 +70,7 @@ public class NFeServiceTest extends AbstractTest {
 	}
 
 	private NFe gerarNFe(Integer idPedido, boolean apenasItensRestantes) {
-		Cliente cli = pedidoService.pesquisarClienteResumidoByIdPedido(idPedido);
+		Cliente cli = pedidoService.pesquisarClienteByIdPedido(idPedido);
 		boolean isVenda = TipoPedido.isVenda(pedidoService.pesquisarTipoPedidoByIdPedido(idPedido));
 
 		Transportadora transPed = pedidoService.pesquisarTransportadoraByIdPedido(idPedido);
@@ -103,15 +103,24 @@ public class NFeServiceTest extends AbstractTest {
 		iDest.setRazaoSocial(cli.getRazaoSocial());
 		iDest.setEnderecoDestinatarioNFe(endDest);
 
-		IdentificacaoNFe i = new IdentificacaoNFe();
-		i.setDestinoOperacao(TipoDestinoOperacao.NORMAL.getCodigo());
-		i.setFinalidadeEmissao(Integer.parseInt(TipoFinalidadeEmissao.NORMAL.getCodigo()));
-		i.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.PRAZO.getCodigo()));
-		i.setTipoEmissao(TipoEmissao.NORMAL.getCodigo());
-		i.setTipoOperacao(isVenda ? TipoOperacaoNFe.SAIDA.getCodigo() : TipoOperacaoNFe.ENTRADA.getCodigo());
-		i.setTipoPresencaComprador(TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
-		i.setNaturezaOperacao("NATUREZA DA OPERACAO DE ENVIO TESTE");
-		i.setOperacaoConsumidorFinal(TipoOperacaoConsumidorFinal.NORMAL.getCodigo());
+		IdentificacaoNFe iNfe = new IdentificacaoNFe();
+		iNfe.setDestinoOperacao(TipoDestinoOperacao.NORMAL.getCodigo());
+		iNfe.setFinalidadeEmissao(Integer.parseInt(TipoFinalidadeEmissao.NORMAL.getCodigo()));
+		iNfe.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.PRAZO.getCodigo()));
+		iNfe.setTipoEmissao(TipoEmissao.NORMAL.getCodigo());
+		iNfe.setTipoOperacao(isVenda ? TipoOperacaoNFe.SAIDA.getCodigo() : TipoOperacaoNFe.ENTRADA.getCodigo());
+		iNfe.setTipoPresencaComprador(TipoPresencaComprador.NAO_PRESENCIAL_OUTROS.getCodigo());
+		iNfe.setNaturezaOperacao("NATUREZA DA OPERACAO DE ENVIO TESTE");
+		iNfe.setOperacaoConsumidorFinal(TipoOperacaoConsumidorFinal.NORMAL.getCodigo());
+		iNfe.setMunicipioOcorrenciaFatorGerador("3550308");
+		iNfe.setCodigoUFEmitente("SP");
+
+		// Aqui estamos inserindo os valores no sistema manualmente, mas apos a
+		// inclusao da primeita NFe o sistema deve gerar os dados
+		// automaticamente.
+		iNfe.setNumero(String.valueOf(1000));
+		iNfe.setSerie(String.valueOf(2));
+		iNfe.setModelo(String.valueOf(55));
 
 		TransportadoraNFe tNfe = new TransportadoraNFe();
 		tNfe.setCnpj(transPed.getCnpj());
@@ -188,7 +197,7 @@ public class NFeServiceTest extends AbstractTest {
 		}
 		DadosNFe d = new DadosNFe();
 		d.setCobrancaNFe(cobrNfe);
-		d.setIdentificacaoNFe(i);
+		d.setIdentificacaoNFe(iNfe);
 		d.setIdentificacaoDestinatarioNFe(iDest);
 		d.setTransporteNFe(t);
 		d.setListaDetalhamentoProdutoServicoNFe(lDet);
@@ -204,7 +213,7 @@ public class NFeServiceTest extends AbstractTest {
 		return gerarNFe(idPedido, false);
 	}
 
-	private Integer gerarPedidoRevenda() {
+	private Integer enviarPedidoRevendaComItem() {
 		Pedido p = gPedido.gerarPedidoRevendaComItem();
 		Integer id = p.getId();
 		try {
@@ -218,9 +227,10 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testEmissaoNFe() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		Integer numeroNFe = null;
+
 		try {
 			numeroNFe = Integer.parseInt(nFeService.emitirNFeEntrada(nFe, idPedido));
 		} catch (BusinessException e) {
@@ -237,7 +247,7 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testEmissaoNFeApenasUmDosItensDoPedido() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 		lDet.remove(0);
@@ -268,7 +278,7 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testEmissaoNFeAPrazoSemDuplicada() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 
 		nFe.getDadosNFe().getIdentificacaoNFe()
@@ -286,7 +296,7 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testEmissaoNFeAVistaComDuplicada() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 
 		nFe.getDadosNFe().getIdentificacaoNFe()
@@ -303,21 +313,27 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testEmissaoNFeDevolucaoComDuplicada() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		nFe.getDadosNFe().getIdentificacaoNFe()
-				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
+				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.PRAZO.getCodigo()));
 
-		Integer[] numeros = null;
 		try {
-			numeros = nFeService.gerarNumeroSerieModeloNFe();
+			nFeService.emitirNFeSaida(nFe, idPedido);
+		} catch (BusinessException e2) {
+			printMensagens(e2);
+		}
+
+		Integer[] novosNumeros = null;
+		try {
+			novosNumeros = nFeService.gerarNumeroSerieModeloNFe();
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
 		IdentificacaoNFe i = nFe.getDadosNFe().getIdentificacaoNFe();
-		i.setNumero(numeros[0].toString());
-		i.setSerie(numeros[1].toString());
-		i.setModelo(numeros[2].toString());
+		i.setNumero(novosNumeros[0].toString());
+		i.setSerie(novosNumeros[1].toString());
+		i.setModelo(novosNumeros[2].toString());
 
 		String numNFe = null;
 		try {
@@ -333,7 +349,7 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testEmissaoNFeFracionandoApenasUmDosItensDoPedido() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 
@@ -395,7 +411,7 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testEmissaoNFeFracionandoQuantidadeSuperiorAoItemPedido() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 
@@ -418,7 +434,7 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testEmissaoNFeFracionandoQuantidadeSuperiorAoTotalJaFracionado() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 
@@ -457,10 +473,16 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testEmissaoNFeTriangularizacaoComDuplicada() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		nFe.getDadosNFe().getIdentificacaoNFe()
-				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
+				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.PRAZO.getCodigo()));
+
+		try {
+			nFeService.emitirNFeSaida(nFe, idPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
 
 		String numNFe = null;
 		try {
@@ -476,10 +498,16 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testEmissaoNFeTriangularizacaoEItemFracionado() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		nFe.getDadosNFe().getIdentificacaoNFe()
-				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.VISTA.getCodigo()));
+				.setIndicadorFormaPagamento(Integer.parseInt(TipoFormaPagamento.PRAZO.getCodigo()));
+
+		try {
+			nFeService.emitirNFeSaida(nFe, idPedido);
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
 
 		String numNFe = null;
 		try {
@@ -495,7 +523,7 @@ public class NFeServiceTest extends AbstractTest {
 
 	@Test
 	public void testRemovecaoNFeComItemFracionado() {
-		Integer idPedido = gerarPedidoRevenda();
+		Integer idPedido = enviarPedidoRevendaComItem();
 		NFe nFe = gerarNFeItensNaoEmitidos(idPedido);
 		List<DetalhamentoProdutoServicoNFe> lDet = nFe.getDadosNFe().getListaDetalhamentoProdutoServicoNFe();
 

@@ -1948,12 +1948,6 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	@Override
-	public Representada pesquisarRepresentadaIdPedido(Integer idPedido) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Representada pesquisarRepresentadaNomeFantasiaByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarRepresentadaNomeFantasiaByIdPedido(idPedido);

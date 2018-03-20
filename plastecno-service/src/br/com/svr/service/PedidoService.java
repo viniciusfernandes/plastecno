@@ -265,8 +265,6 @@ public interface PedidoService {
 
 	Representada pesquisarRepresentadaByIdPedido(Integer idPedido);
 
-	Representada pesquisarRepresentadaIdPedido(Integer idPedido);
-
 	Representada pesquisarRepresentadaNomeFantasiaByIdPedido(Integer idPedido);
 
 	Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido);

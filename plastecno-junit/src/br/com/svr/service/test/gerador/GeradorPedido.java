@@ -111,12 +111,16 @@ public class GeradorPedido {
 
 		Cliente cli = null;
 		if (TipoCliente.REVENDEDOR.equals(tipoCliente) && (cli = clienteService.pesquisarNomeRevendedor()) != null) {
-			return cli;
-		} else {
+			// Recuperando as informacoes completas do revendedor.
+			return clienteService.pesquisarById(cli.getId());
+		} else if (TipoCliente.REVENDEDOR.equals(tipoCliente) && cli == null) {
 			cli = eBuilder.buildClienteRevendedor();
+		} else {
+			cli = eBuilder.buildCliente();
 		}
 		cli.setRamoAtividade(gerarRamoAtividade());
 		cli.addContato(gerarContato(ContatoCliente.class));
+		cli.setTipoCliente(tipoCliente);
 
 		try {
 			return clienteService.inserir(cli);
@@ -503,8 +507,6 @@ public class GeradorPedido {
 		return gerarCliente(TipoCliente.REVENDEDOR);
 	}
 
-	
-	
 	public Usuario gerarVendedor() {
 		Usuario vend = eBuilder.buildUsuario();
 

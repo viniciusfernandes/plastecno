@@ -63,7 +63,9 @@ public class NFePedido {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Valor ICMS NFe do pedido")
 	private Double valorICMS;
 
-	@Column(name = "xml_nfe")
+	// Aqui a tributo lenght esta presente para que o xml seja inserido no banco
+	// de dados em memoria dos testes de integracao.
+	@Column(name = "xml_nfe", length = 999999999)
 	private String xmlNFe;
 
 	public NFePedido() {

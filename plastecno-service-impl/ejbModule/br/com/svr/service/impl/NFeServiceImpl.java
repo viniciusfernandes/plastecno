@@ -164,7 +164,7 @@ public class NFeServiceImpl implements NFeService {
 	public NFe carregarIdentificacaoEmitente(NFe nFe, Integer idPedido) {
 
 		// No caso de revenda a representada eh a propria revendedora do produto
-		Representada emitente = pedidoService.pesquisarRepresentadaIdPedido(idPedido);
+		Representada emitente = pedidoService.pesquisarRepresentadaByIdPedido(idPedido);
 
 		if (emitente == null) {
 			return nFe;

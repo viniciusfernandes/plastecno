@@ -21,11 +21,8 @@ import br.com.svr.service.constante.FormaMaterial;
 import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.SituacaoReservaEstoque;
 import br.com.svr.service.constante.TipoApresentacaoIPI;
-import br.com.svr.service.constante.TipoCliente;
 import br.com.svr.service.constante.TipoPedido;
-import br.com.svr.service.constante.TipoRelacionamento;
 import br.com.svr.service.constante.TipoVenda;
-import br.com.svr.service.entity.Cliente;
 import br.com.svr.service.entity.ItemEstoque;
 import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.ItemReservado;
@@ -36,13 +33,16 @@ import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.test.builder.ServiceBuilder;
 import br.com.svr.service.test.gerador.GeradorPedido;
+import br.com.svr.service.test.gerador.GeradorRepresentada;
 import br.com.svr.util.NumeroUtils;
 
 public class EstoqueServiceTest extends AbstractTest {
 	private EstoqueService estoqueService;
 	private GeradorPedido gPedido = GeradorPedido.getInstance();
+	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
 	private MaterialService materialService;
 	private PedidoService pedidoService;
+
 	private RepresentadaService representadaService;
 
 	public EstoqueServiceTest() {
@@ -632,9 +632,9 @@ public class EstoqueServiceTest extends AbstractTest {
 		String ncm = "11.11.11.11";
 		estoqueService.inserirConfiguracaoNcmEstoque(idMaterial, FormaMaterial.TB, ncm);
 
-		tubo = estoqueService.pesquisarItemEstoqueById(idTubo);
-		tubo2 = estoqueService.pesquisarItemEstoqueById(idTubo2);
-		barra = estoqueService.pesquisarItemEstoqueById(idBarra);
+		tubo = recarregarEntidade(ItemEstoque.class, idTubo);
+		tubo2 = recarregarEntidade(ItemEstoque.class, idTubo2);
+		barra = recarregarEntidade(ItemEstoque.class, idBarra);
 
 		assertEquals(
 				"Foi configurado um ncm para os tubos e os valores nao esta identicos. Verifique a regra de negocio.",
@@ -894,7 +894,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		Double precoMedioFatorICMSReajustado = 70.75d;
 
 		// Pesquisando o item resjustado
-		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		itemEstoque = recarregarEntidade(ItemEstoque.class, idItemEstoque);
 
 		assertEquals(
 				"O preco medio de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
@@ -948,6 +948,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		ItemPedido i = enviarItemPedidoCompra();
 
 		Integer idItemEstoque = null;
+		i = recarregarEntidade(ItemPedido.class, i.getId());
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
 		} catch (BusinessException e) {
@@ -980,7 +981,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		final String ncm = "11.11.11.11";
-
+		recarregarEntidade(ItemPedido.class, i.getId());
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), ncm);
 		} catch (BusinessException e) {
@@ -1003,14 +1004,14 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecepcaoItemPedidoCompraItemEstoqueNCMNulo() {
-		ItemPedido i = enviarItemPedidoCompra();
-		ItemEstoque itemEstoque = new ItemEstoque();
-		itemEstoque.copiar(i);
-		itemEstoque.setNcm(null);
+		ItemPedido iCompra = enviarItemPedidoCompra();
+		ItemEstoque iEstoque = new ItemEstoque();
+		iEstoque.copiar(iCompra);
+		iEstoque.setNcm(null);
 
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.inserirItemEstoque(itemEstoque);
+			idItemEstoque = estoqueService.inserirItemEstoque(iEstoque);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
@@ -1018,23 +1019,26 @@ public class EstoqueServiceTest extends AbstractTest {
 		final String ncm = "11.11.11.11";
 
 		try {
-			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), ncm);
+			iCompra = recarregarEntidade(ItemPedido.class, iCompra.getId());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(),
+					iCompra.getQuantidade(), ncm);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
+		assertEquals(SituacaoPedido.COMPRA_RECEBIDA,
+				pedidoService.pesquisarSituacaoPedidoById(iCompra.getPedido().getId()));
 
-		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
-		i = pedidoService.pesquisarItemPedidoById(i.getId());
+		iEstoque = recarregarEntidade(ItemEstoque.class, idItemEstoque);
+		iCompra = recarregarEntidade(ItemPedido.class, iCompra.getId());
 
 		assertEquals(
 				"O item do estoque nao contem ncm e deve ser configurado apos a recepcao da compra. Verficique as regras de negocios.",
-				ncm, itemEstoque.getNcm());
+				ncm, iEstoque.getNcm());
 
 		assertEquals(
 				"O item do pedido teve o ncm configurado na recepcao da compra, mas as informacoes nao confere. Verficique as regras de negocios.",
-				ncm, i.getNcm());
+				ncm, iCompra.getNcm());
 	}
 
 	@Test
@@ -1054,6 +1058,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		final String ncm = "11.11.11.11";
 
 		try {
+			i = recarregarEntidade(ItemPedido.class, i.getId());
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), ncm);
 		} catch (BusinessException e) {
 			printMensagens(e);
@@ -1061,8 +1066,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
 
-		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
-		i = pedidoService.pesquisarItemPedidoById(i.getId());
+		itemEstoque = recarregarEntidade(ItemEstoque.class, idItemEstoque);
 
 		assertEquals(
 				"O item do estoque nao contem ncm e deve ser configurado apos a recepcao da compra. Verficique as regras de negocios.",
@@ -1090,18 +1094,17 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 
+		recarregarEntidade(ItemPedido.class, i.getId());
+
 		try {
 			idItemEstoque = estoqueService
 					.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), null);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
 
 		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
-		i = pedidoService.pesquisarItemPedidoById(i.getId());
-
 		i = pedidoService.pesquisarItemPedidoById(i.getId());
 
 		assertEquals(
@@ -1115,36 +1118,38 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecepcaoItemPedidoCompraNCMNuloItemEstoqueNulo() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido iCompra = enviarItemPedidoCompra();
 
-		ItemEstoque itemEstoque = new ItemEstoque();
-		itemEstoque.copiar(i);
-		itemEstoque.setNcm(null);
+		ItemEstoque iEstoque = new ItemEstoque();
+		iEstoque.copiar(iCompra);
+		iEstoque.setNcm(null);
 
 		Integer idItemEstoque = null;
 		try {
-			idItemEstoque = estoqueService.inserirItemEstoque(itemEstoque);
+			idItemEstoque = estoqueService.inserirItemEstoque(iEstoque);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
 
 		try {
-			idItemEstoque = estoqueService
-					.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), null);
+			iEstoque = recarregarEntidade(ItemEstoque.class, iEstoque.getId());
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(),
+					iCompra.getQuantidade(), null);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(i.getPedido().getId()));
+		assertEquals(SituacaoPedido.COMPRA_RECEBIDA,
+				pedidoService.pesquisarSituacaoPedidoById(iCompra.getPedido().getId()));
 
-		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
-		i = pedidoService.pesquisarItemPedidoById(i.getId());
+		iEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		iCompra = pedidoService.pesquisarItemPedidoById(iCompra.getId());
 
-		i = pedidoService.pesquisarItemPedidoById(i.getId());
+		iCompra = pedidoService.pesquisarItemPedidoById(iCompra.getId());
 
-		assertEquals("Nao exite configuracao para o ncm. Verficique as regras de negocios.", null, i.getNcm());
+		assertEquals("Nao exite configuracao para o ncm. Verficique as regras de negocios.", null, iCompra.getNcm());
 
-		assertEquals("Nao exite configuracao para o ncm. Verficique as regras de negocios.", null, i.getNcm());
+		assertEquals("Nao exite configuracao para o ncm. Verficique as regras de negocios.", null, iCompra.getNcm());
 	}
 
 	@Test
@@ -1163,6 +1168,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
+
+		recarregarEntidade(ItemPedido.class, i.getId());
 
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), "");
@@ -1787,7 +1794,7 @@ public class EstoqueServiceTest extends AbstractTest {
 	public void testReservaPedidoComTodosItensExistentesEstoque() {
 		Pedido pedido = gerarPedido(TipoPedido.COMPRA);
 		Representada representada = pedido.getRepresentada();
-		Material material = gerarMaterial(pedido.getRepresentada().getId());
+		Material material = gPedido.gerarMaterial(representada);
 
 		ItemPedido item1 = eBuilder.buildItemPedido();
 		ItemPedido item2 = eBuilder.buildItemPedidoPeca();
@@ -1809,7 +1816,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 
-		Pedido pedidoRevenda = gerarPedido(TipoPedido.REVENDA);
+		Pedido pedidoRevenda = gPedido.gerarPedidoRevenda();
 		pedidoRevenda.setRepresentada(representada);
 		ItemPedido itemRevenda1 = eBuilder.buildItemPedido();
 		ItemPedido itemRevenda2 = eBuilder.buildItemPedidoPeca();
@@ -1872,11 +1879,8 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e2);
 		}
 
-		Representada fornecedor = pedido.getRepresentada();
-		fornecedor.setTipoRelacionamento(TipoRelacionamento.FORNECIMENTO);
-
-		Cliente revendedor = pedido.getCliente();
-		revendedor.setTipoCliente(TipoCliente.REVENDEDOR);
+		Representada fornecedor = gRepresentada.gerarFornecedor();
+		gPedido.gerarRevendedor();
 
 		Set<Integer> ids = new HashSet<Integer>();
 		ids.add(item1.getId());
@@ -1937,11 +1941,14 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
+			i1 = recarregarEntidade(ItemPedido.class, i1.getId());
 			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i1.getId(), i1.getQuantidade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, i1.getPedido().getSituacaoPedido());
+
+		Pedido p = recarregarEntidade(Pedido.class, i1.getPedido().getId());
+		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, p.getSituacaoPedido());
 	}
 
 	@Test

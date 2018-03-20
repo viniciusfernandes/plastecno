@@ -1,36 +1,24 @@
 package br.com.svr.service.test;
 
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import br.com.svr.service.ComissaoService;
-import br.com.svr.service.MaterialService;
-import br.com.svr.service.PerfilAcessoService;
-import br.com.svr.service.UsuarioService;
 import br.com.svr.service.constante.FormaMaterial;
 import br.com.svr.service.entity.Comissao;
 import br.com.svr.service.entity.Material;
-import br.com.svr.service.entity.PerfilAcesso;
 import br.com.svr.service.entity.Representada;
 import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.test.builder.ServiceBuilder;
-import br.com.svr.service.test.gerador.GeradorRepresentada;
 
 public class ComissaoServiceTest extends AbstractTest {
 	private ComissaoService comissaoService;
-	private MaterialService materialService;
-	private UsuarioService usuarioService;
-	private PerfilAcessoService perfilAcessoService;
 
 	public ComissaoServiceTest() {
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
-		materialService = ServiceBuilder.buildService(MaterialService.class);
-		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
-		perfilAcessoService = ServiceBuilder.buildService(PerfilAcessoService.class);
 	}
 
 	@Test
@@ -74,8 +62,6 @@ public class ComissaoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 	}
-
-	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
 
 	@Test
 	public void testInclusaoComissaoMaterialInexistente() {

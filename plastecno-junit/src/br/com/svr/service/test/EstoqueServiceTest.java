@@ -32,14 +32,10 @@ import br.com.svr.service.entity.Representada;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.test.builder.ServiceBuilder;
-import br.com.svr.service.test.gerador.GeradorPedido;
-import br.com.svr.service.test.gerador.GeradorRepresentada;
 import br.com.svr.util.NumeroUtils;
 
 public class EstoqueServiceTest extends AbstractTest {
 	private EstoqueService estoqueService;
-	private GeradorPedido gPedido = GeradorPedido.getInstance();
-	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
 	private MaterialService materialService;
 	private PedidoService pedidoService;
 

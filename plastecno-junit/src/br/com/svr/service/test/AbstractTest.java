@@ -11,67 +11,55 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import br.com.svr.service.ServiceUtils;
 import br.com.svr.service.constante.TipoAcesso;
 import br.com.svr.service.entity.ConfiguracaoSistema;
 import br.com.svr.service.entity.PerfilAcesso;
+import br.com.svr.service.entity.RamoAtividade;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.test.builder.EntidadeBuilder;
 import br.com.svr.service.test.builder.ServiceBuilder;
 import br.com.svr.service.test.gerador.GeradorPedido;
+import br.com.svr.service.test.gerador.GeradorRepresentada;
 
 public abstract class AbstractTest {
 	private static EntityManager em;
 	private static EntityManagerFactory emf;
 
 	protected static GeradorPedido gPedido = null;
+	protected static GeradorRepresentada gRepresentada = null;
 
-	@AfterClass
-	public static void close() {
-		if (em != null) {
-			em.clear();
-			em.close();
-		}
-		if (emf != null) {
-			emf.close();
-		}
-	}
+	private static ServiceUtils serviceUtils;
 
+	// Essa anotacao obriga que o metodo seja estatico.
 	@BeforeClass
 	public static void init() throws FileNotFoundException {
+		if (emf != null) {
+			return;
+		}
 		try {
 			emf = Persistence.createEntityManagerFactory("svr");
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		em = emf.createEntityManager();
-
 		ServiceBuilder.config(em);
-		gPedido = GeradorPedido.getInstance(em);
+
+		serviceUtils = ServiceBuilder.buildService(ServiceUtils.class);
+
+		gPedido = GeradorPedido.getInstance();
+		gRepresentada = GeradorRepresentada.getInstance();
+
+		initParametrosSistema();
+		initPerfilAcesso();
+		initRamoAtividade();
 	}
 
-	protected EntidadeBuilder eBuilder = EntidadeBuilder.getInstance();
-
-	@After
-	public void afterTest() {
-		em.getTransaction().rollback();
-		em.clear();
-	}
-
-	@Before
-	public void beforeTest() {
-		if (!em.getTransaction().isActive()) {
-			em.getTransaction().begin();
-		}
-		inserirParametrosSistema();
-		inserirPerfilAcesso();
-	}
-
-	private void inserirParametrosSistema() {
+	private static void initParametrosSistema() {
 		List<ConfiguracaoSistema> l = em.createQuery("from ConfiguracaoSistema", ConfiguracaoSistema.class)
 				.getResultList();
 		if (!l.isEmpty()) {
@@ -95,7 +83,7 @@ public abstract class AbstractTest {
 		em.getTransaction().begin();
 	}
 
-	private void inserirPerfilAcesso() {
+	private static void initPerfilAcesso() {
 		List<PerfilAcesso> l = em.createQuery("from PerfilAcesso", PerfilAcesso.class).getResultList();
 		if (!l.isEmpty()) {
 			return;
@@ -123,6 +111,43 @@ public abstract class AbstractTest {
 		em.getTransaction().begin();
 	}
 
+	private static void initRamoAtividade() {
+		List<RamoAtividade> l = em.createQuery("from RamoAtividade", RamoAtividade.class).getResultList();
+		if (!l.isEmpty()) {
+			return;
+		}
+		if (!em.getTransaction().isActive()) {
+			em.getTransaction().begin();
+		}
+		RamoAtividade r = new RamoAtividade();
+		r.setDescricao("Industria Belica");
+		r.setSigla("IB");
+		try {
+			em.merge(r);
+		} catch (Exception e) {
+			throw new IllegalStateException("Falha na geracao de ramo de atividade no inicio dos testes", e);
+		}
+
+		em.getTransaction().commit();
+		em.getTransaction().begin();
+	}
+
+	protected EntidadeBuilder eBuilder = EntidadeBuilder.getInstance();
+
+	@After
+	public void afterTest() {
+		em.getTransaction().rollback();
+		em.clear();
+	}
+
+	@Before
+	public void beforeTest() {
+		if (!em.getTransaction().isActive()) {
+			em.getTransaction().begin();
+		}
+
+	}
+
 	protected <T> T pesquisarPrimeiroObjeto(Class<T> classe) {
 		List<T> l = em.createQuery("from " + classe.getSimpleName(), classe).getResultList();
 		return l.size() <= 0 ? null : l.get(0);
@@ -136,10 +161,7 @@ public abstract class AbstractTest {
 	}
 
 	protected <T> T recarregarEntidade(Class<T> classe, Integer id) {
-		T e = em.createQuery("select e from " + classe.getSimpleName() + " e where e.id =:id", classe)
-				.setParameter("id", id).getSingleResult();
-		em.refresh(e);
-		return e;
+		return serviceUtils.recarregarEntidade(classe, id);
 	}
 
 }

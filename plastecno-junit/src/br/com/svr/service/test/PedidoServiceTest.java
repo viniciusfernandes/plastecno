@@ -44,7 +44,6 @@ import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.test.builder.ServiceBuilder;
-import br.com.svr.service.test.gerador.GeradorRepresentada;
 import br.com.svr.util.DateUtils;
 import br.com.svr.util.StringUtils;
 
@@ -55,8 +54,6 @@ public class PedidoServiceTest extends AbstractTest {
 	private ComissaoService comissaoService;
 
 	private EstoqueService estoqueService;
-
-	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
 
 	private MaterialService materialService;
 

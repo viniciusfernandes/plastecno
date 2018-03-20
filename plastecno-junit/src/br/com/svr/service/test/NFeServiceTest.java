@@ -54,12 +54,10 @@ import br.com.svr.service.nfe.constante.TipoTributacaoCOFINS;
 import br.com.svr.service.nfe.constante.TipoTributacaoICMS;
 import br.com.svr.service.nfe.constante.TipoTributacaoPIS;
 import br.com.svr.service.test.builder.ServiceBuilder;
-import br.com.svr.service.test.gerador.GeradorPedido;
 
 public class NFeServiceTest extends AbstractTest {
 
 	private DuplicataService duplicataService;
-	private GeradorPedido gPedido = GeradorPedido.getInstance();
 	private NFeService nFeService;
 	private PedidoService pedidoService;
 
@@ -67,6 +65,18 @@ public class NFeServiceTest extends AbstractTest {
 		nFeService = ServiceBuilder.buildService(NFeService.class);
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
 		duplicataService = ServiceBuilder.buildService(DuplicataService.class);
+	}
+
+	private Integer enviarPedidoRevendaComItem() {
+		Pedido p = gPedido.gerarPedidoRevendaComItem();
+		Integer id = p.getId();
+		try {
+			pedidoService.enviarPedido(id, new AnexoEmail(new byte[] {}));
+			return id;
+		} catch (BusinessException e) {
+			printMensagens(e);
+			return null;
+		}
 	}
 
 	private NFe gerarNFe(Integer idPedido, boolean apenasItensRestantes) {
@@ -211,18 +221,6 @@ public class NFeServiceTest extends AbstractTest {
 
 	private NFe gerarNFeItensTodosItensPedido(Integer idPedido) {
 		return gerarNFe(idPedido, false);
-	}
-
-	private Integer enviarPedidoRevendaComItem() {
-		Pedido p = gPedido.gerarPedidoRevendaComItem();
-		Integer id = p.getId();
-		try {
-			pedidoService.enviarPedido(id, new AnexoEmail(new byte[] {}));
-			return id;
-		} catch (BusinessException e) {
-			printMensagens(e);
-			return null;
-		}
 	}
 
 	@Test

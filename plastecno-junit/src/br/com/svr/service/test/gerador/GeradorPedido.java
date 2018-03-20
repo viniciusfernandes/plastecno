@@ -5,8 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.junit.Assert;
 
 import br.com.svr.service.ClienteService;
@@ -16,6 +14,7 @@ import br.com.svr.service.PedidoService;
 import br.com.svr.service.PerfilAcessoService;
 import br.com.svr.service.RamoAtividadeService;
 import br.com.svr.service.RepresentadaService;
+import br.com.svr.service.ServiceUtils;
 import br.com.svr.service.UsuarioService;
 import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.TipoAcesso;
@@ -45,8 +44,6 @@ import br.com.svr.service.test.builder.ServiceBuilder;
 
 public class GeradorPedido {
 
-	private static EntityManager em;
-
 	private static GeradorPedido gerador;
 
 	public static GeradorPedido getInstance() {
@@ -54,11 +51,6 @@ public class GeradorPedido {
 			gerador = new GeradorPedido();
 		}
 		return gerador;
-	}
-
-	public static GeradorPedido getInstance(EntityManager em) {
-		GeradorPedido.em = em;
-		return getInstance();
 	}
 
 	private ClienteService clienteService;
@@ -81,6 +73,8 @@ public class GeradorPedido {
 
 	private RepresentadaService representadaService;
 
+	private ServiceUtils serviceUtils;
+
 	private UsuarioService usuarioService;
 
 	private GeradorPedido() {
@@ -93,6 +87,7 @@ public class GeradorPedido {
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
 		ramoAtividadeService = ServiceBuilder.buildService(RamoAtividadeService.class);
 		perfilAcessoService = ServiceBuilder.buildService(PerfilAcessoService.class);
+		serviceUtils = ServiceBuilder.buildService(ServiceUtils.class);
 	}
 
 	public Material gerarAssociacaoMaterial(Material mat, Integer idRepresentada) {
@@ -201,7 +196,7 @@ public class GeradorPedido {
 			printMensagens(e);
 		}
 
-		pedido = recarregarEntidade(Pedido.class, pedido.getId());
+		pedido = serviceUtils.recarregarEntidade(Pedido.class, pedido.getId());
 		assertEquals(SituacaoPedido.COMPRA_AGUARDANDO_RECEBIMENTO, pedido.getSituacaoPedido());
 
 		List<ItemPedido> l = pedidoService.pesquisarItemPedidoByIdPedido(pedido.getId());
@@ -269,7 +264,7 @@ public class GeradorPedido {
 		} catch (BusinessException e2) {
 			printMensagens(e2);
 		}
-		vendedor = recarregarEntidade(Usuario.class, idVend);
+		vendedor = serviceUtils.recarregarEntidade(Usuario.class, idVend);
 		Transportadora transp = gTransportadora.gerarTransportadora();
 
 		// Temos que gerar um revendedor pois eh ele que efetuara as comprar
@@ -468,13 +463,12 @@ public class GeradorPedido {
 	}
 
 	public RamoAtividade gerarRamoAtividade() {
-		RamoAtividade r = pesquisarPrimeiroRegistro(RamoAtividade.class);
-		if (r != null) {
-			return r;
+		List<RamoAtividade> l = ramoAtividadeService.pesquisar();
+		if (!l.isEmpty()) {
+			return l.get(0);
 		}
-		r = eBuilder.buildRamoAtividade();
 		try {
-			return ramoAtividadeService.inserir(r);
+			return ramoAtividadeService.inserir(eBuilder.buildRamoAtividade());
 		} catch (BusinessException e) {
 			printMensagens(e);
 			throw new IllegalStateException("Falha na geracao de ramo de atividade", e);
@@ -509,19 +503,8 @@ public class GeradorPedido {
 		return vend;
 	}
 
-	private <T> T pesquisarPrimeiroRegistro(Class<T> classe) {
-		List<T> l = em.createQuery("from " + classe.getSimpleName(), classe).getResultList();
-		return l.size() >= 1 ? l.get(0) : null;
-	}
-
 	public void printMensagens(BusinessException exception) {
 		Assert.fail("Falha em alguma regra de negocio. As mensagens sao: " + exception.getMensagemConcatenada());
 	}
 
-	public <T> T recarregarEntidade(Class<T> classe, Integer id) {
-		T e = em.createQuery("select e from " + classe.getSimpleName() + " e where e.id =:id", classe)
-				.setParameter("id", id).getSingleResult();
-		em.refresh(e);
-		return e;
-	}
 }

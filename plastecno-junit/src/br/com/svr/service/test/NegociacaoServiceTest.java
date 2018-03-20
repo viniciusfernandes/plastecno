@@ -1,6 +1,8 @@
 package br.com.svr.service.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
@@ -19,11 +21,9 @@ import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.test.builder.ServiceBuilder;
-import br.com.svr.service.test.gerador.GeradorPedido;
 import br.com.svr.util.NumeroUtils;
 
 public class NegociacaoServiceTest extends AbstractTest {
-	private GeradorPedido gPedido = GeradorPedido.getInstance();
 	private NegociacaoService negociacaoService;
 	private PedidoService pedidoService;
 

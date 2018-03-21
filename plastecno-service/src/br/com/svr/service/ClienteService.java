@@ -100,6 +100,8 @@ public interface ClienteService {
 
 	List<Transportadora> pesquisarTransportadorasRedespacho(Integer idCliente);
 
+	void removerLogradouroByIdCliente(Integer idCliente);
+
 	void removerLogradouro(Integer idLogradouro);
 
 	void validarListaLogradouroPreenchida(Cliente cliente) throws BusinessException;

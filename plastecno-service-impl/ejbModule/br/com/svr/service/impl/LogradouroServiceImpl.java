@@ -311,11 +311,7 @@ public class LogradouroServiceImpl implements LogradouroService {
 
 		if (listaLogradouro != null && !listaLogradouro.isEmpty()) {
 			for (Logradouro l : listaLogradouro) {
-				if (!lLogAusente.remove(l.getTipoLogradouro())) {
-					throw new BusinessException(
-							"Falha na validação da lista de logradouro do pedido preenchia. Não foi removido do tipo de logradouro "
-									+ l.getTipoLogradouro());
-				}
+				lLogAusente.remove(l.getTipoLogradouro());
 				// Aqui estamos tratando o caso em que muitos logradouros do mesmo tipo foram enviados.
 				if (lLogAusente.isEmpty()) {
 					break;
@@ -333,5 +329,4 @@ public class LogradouroServiceImpl implements LogradouroService {
 		}
 		throw new InformacaoInvalidaException(listaMensagem);
 	}
-
 }

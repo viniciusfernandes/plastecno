@@ -273,7 +273,7 @@ public class ClienteServiceImpl implements ClienteService {
 			return;
 		}
 		Cliente c = new Cliente(idCliente);
-		clienteDAO.removerLogradouroCliente(idCliente);
+		// clienteDAO.removerLogradouroCliente(idCliente);
 		for (LogradouroCliente logradouro : lLogradouro) {
 			logradouro.setCliente(c);
 			logradouroService.inserir(logradouro);
@@ -683,6 +683,12 @@ public class ClienteServiceImpl implements ClienteService {
 			}
 			lCli.add(c);
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerLogradouroByIdCliente(Integer idCliente) {
+		clienteDAO.removerLogradouroByIdCliente(idCliente);
 	}
 
 	@Override

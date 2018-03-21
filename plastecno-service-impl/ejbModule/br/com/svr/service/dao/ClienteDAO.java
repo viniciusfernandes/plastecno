@@ -146,7 +146,7 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 								.setParameter("tipoCliente", TipoCliente.REVENDEDOR), Cliente.class, null);
 	}
 
-	public void removerLogradouroCliente(Integer idCliente) {
+	public void removerLogradouroByIdCliente(Integer idCliente) {
 		entityManager.createQuery("delete from LogradouroCliente l where l.cliente.id = :idCliente")
 				.setParameter("idCliente", idCliente).executeUpdate();
 	}

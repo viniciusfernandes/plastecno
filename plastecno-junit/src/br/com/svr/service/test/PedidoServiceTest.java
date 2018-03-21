@@ -814,6 +814,9 @@ public class PedidoServiceTest extends AbstractTest {
 	public void testEnvioEmailPedidoSemEnderecoFaturamento() {
 		Pedido pedido = gPedido.gerarPedidoRevenda();
 		Cliente cliente = pedido.getCliente();
+		// removendo os logrs para ter certeza que nao ha informacao no sistema.
+		clienteService.removerLogradouroByIdCliente(cliente.getId());
+
 		cliente.setListaLogradouro(null);
 		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.COBRANCA));
 		cliente.addLogradouro(eBuilder.buildLogradouroCliente(TipoLogradouro.ENTREGA));

@@ -168,7 +168,7 @@ public class ClienteController extends AbstractController {
         } else {
             carregarVendedor(cliente);
             addAtributo("cliente", cliente);
-            addAtributo("listaLogradouro", listaLogradouro);
+            addAtributo("listaLogradouro", clienteService.pesquisarLogradouroCliente(cliente.getId()));
             addAtributo("listaContato", listaContato);
             addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade()
                     .getId() : null);
@@ -276,7 +276,7 @@ public class ClienteController extends AbstractController {
 
     @Post("cliente/contato/remocao/{idContato}")
     public void removerContato(Integer idContato) {
-        this.contatoService.remover(idContato, ContatoCliente.class);
+        contatoService.remover(idContato, ContatoCliente.class);
         irTopoPagina();
     }
 

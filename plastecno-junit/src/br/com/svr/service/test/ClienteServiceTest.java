@@ -64,10 +64,12 @@ public class ClienteServiceTest extends AbstractTest {
 		List<LogradouroCliente> lLogr = clienteService.pesquisarLogradouroCliente(c.getId());
 		assertEquals("O cliente contem apenas 1 logradouro nessa inclusao", (Integer) 1, (Integer) lLogr.size());
 
-		LogradouroCliente lCobr = eBuilder.buildLogradouroCliente(TipoLogradouro.COBRANCA);
-		c = clienteService.pesquisarById(c.getId());
-		c.addLogradouro(lCobr);
-
+		// Editando o enderedo de faturamento
+		lFat = lLogr.get(0);
+		lFat.setCep("09943555");
+		lFat.setEndereco("Avenida Tuiuti Ferraz");
+		c.setListaLogradouro(null);
+		c.addLogradouro(lFat);
 		try {
 			clienteService.inserir(c);
 		} catch (BusinessException e) {
@@ -75,15 +77,29 @@ public class ClienteServiceTest extends AbstractTest {
 		}
 
 		lLogr = clienteService.pesquisarLogradouroCliente(c.getId());
-		assertEquals("O cliente contem apenas 2 logradouro nessa inclusao", (Integer) 2, (Integer) lLogr.size());
+		assertEquals("O cliente contem apenas 1 logradouro nessa inclusao", (Integer) 1, (Integer) lLogr.size());
+
+		LogradouroCliente lCobr = eBuilder.buildLogradouroCliente(TipoLogradouro.COBRANCA);
+		c = clienteService.pesquisarById(c.getId());
+		// AQui o cliente tem um logradouro de faturamento e quando for inviado
+		// ao banco de dados ele tera 1 logr de faturamento. Totalizando 2
+		// logradouros.
+		c.addLogradouro(lCobr);
+
+		try {
+			clienteService.inserir(c);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		lLogr = clienteService.pesquisarLogradouroCliente(c.getId());
+		assertEquals("O cliente contem apenas 2 logradouro nessa inclusao.", (Integer) 2, (Integer) lLogr.size());
 
 		LogradouroCliente lCom = eBuilder.buildLogradouroCliente(TipoLogradouro.COMERCIAL);
 		c = clienteService.pesquisarById(c.getId());
-		// Limpando a lista de logradouros e inserindo novos.
+		// Limpando a lista de logradouros e inserindo novos, mas no sistema
+		// permanecerao os antigos.
 		c.setListaLogradouro(null);
 		c.addLogradouro(lCom);
-		c.addLogradouro(lCobr);
-		c.addLogradouro(lFat);
 
 		try {
 			clienteService.inserir(c);
@@ -92,7 +108,7 @@ public class ClienteServiceTest extends AbstractTest {
 		}
 
 		lLogr = clienteService.pesquisarLogradouroCliente(c.getId());
-		assertEquals("O cliente contem apenas 3 logradouro nessa inclusao", (Integer) 3, (Integer) lLogr.size());
+		assertEquals("O cliente contem apenas 3 logradouro nessa inclusao.", (Integer) 3, (Integer) lLogr.size());
 
 	}
 

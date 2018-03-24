@@ -408,7 +408,7 @@ public class ItemPedido extends Item {
 	}
 
 	public boolean contemAliquotaComissao() {
-		return aliquotaComissao != null && aliquotaComissao > 0;
+		return aliquotaComissao != null;
 	}
 
 	public boolean contemLargura() {

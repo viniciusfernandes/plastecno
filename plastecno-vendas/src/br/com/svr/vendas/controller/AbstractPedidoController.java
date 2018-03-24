@@ -288,10 +288,12 @@ public class AbstractPedidoController extends AbstractController {
                 itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
             }
 
-            itemPedido.setAliquotaComissao(itemPedido.getAliquotaComissao() == null
-                    || itemPedido.getAliquotaComissao() == 0d ? null : NumeroUtils.gerarAliquota(
-                    itemPedido.getAliquotaComissao(), 4));
-
+            if (itemPedido.getAliquotaComissao() == null) {
+                itemPedido.setAliquotaComissao(0d);
+            } else {
+                itemPedido.setAliquotaComissao(NumeroUtils.gerarAliquota(itemPedido.getAliquotaComissao(), 4));
+            }
+            
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
 
             final Integer idItemPedido = pedidoService.inserirItemPedido(numeroPedido, itemPedido);

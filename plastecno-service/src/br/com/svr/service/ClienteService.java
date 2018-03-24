@@ -80,7 +80,7 @@ public interface ClienteService {
 
 	ContatoCliente pesquisarContatoPrincipalResumidoByIdCliente(Integer idCliente);
 
-	List<ContatoCliente> pesquisarContatoResumidoByNomeFantasia(Integer idCliente, String nome);
+	List<ContatoCliente> pesquisarContatoResumidoByIdCliente(Integer idCliente);
 
 	Integer pesquisarIdVendedorByIdCliente(Integer idCliente);
 

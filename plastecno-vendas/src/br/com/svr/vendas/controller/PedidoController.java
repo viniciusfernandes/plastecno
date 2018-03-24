@@ -433,8 +433,8 @@ public class PedidoController extends AbstractPedidoController {
     }
 
     @Get("pedido/contatocliente")
-    public void pesquisarContatoClienteByNomeFantasia(Integer idCliente, String nome) {
-        super.pesquisarContatoClienteByNomeFantasia(idCliente, nome);
+    public void pesquisarContatoClienteByIdCliente(Integer idCliente) {
+        super.pesquisarContatoClienteByIdCliente(idCliente);
     }
 
     @Get("pedido/item/{id}")

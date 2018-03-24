@@ -368,8 +368,8 @@ public class AbstractPedidoController extends AbstractController {
         serializarJson(new SerializacaoJson("contato", clienteService.pesquisarContatoByIdContato(idContato)));
     }
 
-    void pesquisarContatoClienteByNomeFantasia(Integer idCliente, String nome) {
-        List<ContatoCliente> lContato = clienteService.pesquisarContatoResumidoByNomeFantasia(idCliente, nome);
+    void pesquisarContatoClienteByIdCliente(Integer idCliente) {
+        List<ContatoCliente> lContato = clienteService.pesquisarContatoResumidoByIdCliente(idCliente);
         List<Autocomplete> lista = new ArrayList<>();
         for (ContatoCliente c : lContato) {
             lista.add(new Autocomplete(c.getId(), c.getNome()));

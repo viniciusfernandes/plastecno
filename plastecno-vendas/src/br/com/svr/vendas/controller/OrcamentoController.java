@@ -265,8 +265,8 @@ public class OrcamentoController extends AbstractPedidoController {
     }
 
     @Get("orcamento/contatocliente")
-    public void pesquisarContatoClienteByNomeFantasia(Integer idCliente, String nome) {
-        super.pesquisarContatoClienteByNomeFantasia(idCliente, nome);
+    public void pesquisarContatoClienteByIdCliente(Integer idCliente) {
+        super.pesquisarContatoClienteByIdCliente(idCliente);
     }
 
     @Get("orcamento/item/{id}")

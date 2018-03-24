@@ -89,7 +89,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 		n.setTipoNaoFechamento(tipoNaoFechamento);
 		n.setSituacaoNegociacao(SituacaoNegociacao.CANCELADO);
 		negociacaoDAO.alterar(n);
-		
+
 		// negociacaoDAO.alterarSituacaoNegociacao(idNegociacao,
 		// SituacaoNegociacao.CANCELADO);
 		// negociacaoDAO.alterarTipoNaoFechamento(idNegociacao,
@@ -162,8 +162,8 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 		}
 		List<Object[]> listaIdOrc = entityManager
 				.createQuery(
-						"select o.id, o.cliente.id, o.proprietario.id from Pedido o where o.situacaoPedido in (:listaOrcamentoAberto)",
-						Object[].class).setParameter("listaOrcamentoAberto", SituacaoPedido.getListaOrcamentoAberto())
+						"select o.id, o.cliente.id, o.proprietario.id from Pedido o where o.id>=14900 and o.situacaoPedido in (:listaSituacoes)",
+						Object[].class).setParameter("listaSituacoes", SituacaoPedido.getListaOrcamentoAberto())
 				.getResultList();
 		for (Object[] ids : listaIdOrc) {
 			inserirNegociacao((Integer) ids[0], (Integer) ids[1], (Integer) ids[2]);

@@ -38,14 +38,16 @@ $(document).ready(function() {
 	inicializarAutocompleteMaterial('<c:url value="/pedido/material"/>');
 	// inicializarAutocompleteDescricaoPeca('<c:url value="/estoque/descricaopeca"/>');
 	
-	var urlInclusaoPedido = '<c:url value="/pedido/inclusao"/>';
-	var urlInclusaoItemPedido = '<c:url value="/pedido/item/inclusao"/>';
 	$("#botaoInserirPedido").click(function() {
-		inserirPedido(false, urlInclusaoPedido, urlInclusaoItemPedido);
+		inserirPedido({urlInclusao:'<c:url value="/pedido/inclusao"/>'});
 	});
 	 
 	$("#botaoInserirItemPedido").click(function() {
-		inserirPedido(true, urlInclusaoPedido, urlInclusaoItemPedido);	
+		inserirPedido({
+			urlInclusao:'<c:url value="/pedido/inclusao"/>', 
+			inserirItem:inserirItemPedido, 
+			urlInclusaoItem:'<c:url value="/pedido/item/inclusao"/>'
+			});
 	});
 
 	$("#botaoPesquisaNumeroPedido").click(function() {
@@ -222,7 +224,10 @@ $(document).ready(function() {
 		inicializarModalConfirmacao({
 			mensagem: 'Essa ação não poderá ser desfeita. Você tem certeza de que deseja ENVIAR esse pedido?',
 			confirmar: function(){
-				$('#botaoEnviarPedido').closest('form').submit();	
+				inserirPedido({
+					urlInclusao:'<c:url value="/pedido/inclusao"/>', 
+					enviar:	function(){document.getElementById('formEnvioPedido').submit();}
+				});
 			}
 		});
 	});

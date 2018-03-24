@@ -587,8 +587,8 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<ContatoCliente> pesquisarContatoResumidoByNomeFantasia(Integer idCliente, String nome) {
-		return clienteDAO.pesquisarContatoResumidoByNomeFantasia(idCliente, nome);
+	public List<ContatoCliente> pesquisarContatoResumidoByIdCliente(Integer idCliente) {
+		return clienteDAO.pesquisarContatoResumidoByIdCliente(idCliente);
 	}
 
 	@Override
@@ -687,17 +687,17 @@ public class ClienteServiceImpl implements ClienteService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void removerLogradouroByIdCliente(Integer idCliente) {
-		clienteDAO.removerLogradouroByIdCliente(idCliente);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void removerLogradouro(Integer idLogradouro) {
 		if (idLogradouro == null) {
 			return;
 		}
 		logradouroService.removerLogradouro(new LogradouroCliente(idLogradouro));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerLogradouroByIdCliente(Integer idCliente) {
+		clienteDAO.removerLogradouroByIdCliente(idCliente);
 	}
 
 	private void validarDocumentosPreenchidos(Cliente cliente) throws InformacaoInvalidaException {

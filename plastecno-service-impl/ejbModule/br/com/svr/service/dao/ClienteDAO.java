@@ -105,12 +105,11 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 								.setParameter("idCliente", idCliente), ContatoCliente.class, null);
 	}
 
-	public List<ContatoCliente> pesquisarContatoResumidoByNomeFantasia(Integer idCliente, String nome) {
+	public List<ContatoCliente> pesquisarContatoResumidoByIdCliente(Integer idCliente) {
 		return entityManager
 				.createQuery(
-						"select new ContatoCliente (cc.id, cc.nome) from ContatoCliente cc where cc.cliente.id = :idCliente and cc.nome like :nome ",
-						ContatoCliente.class).setParameter("idCliente", idCliente)
-				.setParameter("nome", "%" + nome + "%").getResultList();
+						"select new ContatoCliente (cc.id, cc.nome) from ContatoCliente cc where cc.cliente.id = :idCliente",
+						ContatoCliente.class).setParameter("idCliente", idCliente).getResultList();
 	}
 
 	public Integer pesquisarIdVendedorByIdCliente(Integer idCliente) {

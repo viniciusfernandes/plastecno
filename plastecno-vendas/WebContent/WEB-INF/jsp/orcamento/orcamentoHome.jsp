@@ -29,11 +29,15 @@ $(document).ready(function() {
 	var tabelaItemHandler = gerarTabelaItemPedido('<c:url value="/orcamento"/>');
 	
 	$("#botaoInserirItemPedido").click(function() {
-		inserirItemPedido($('#numeroPedido').val(), '<c:url value="/orcamento/item/inclusao"/>');
+		inserirOrcamento({
+			urlInclusao:'<c:url value="/orcamento/inclusao"/>', 
+			inserirItem:inserirItemPedido, 
+			urlInclusaoItem:'<c:url value="/orcamento/item/inclusao"/>'
+			});
 	});
 	
 	$("#botaoInserirOrcamento").click(function() {
-		inserirOrcamento();
+		inserirOrcamento({urlInclusao:'<c:url value="/orcamento/inclusao"/>'});
 	});
 	
 	$("#botaoAnexarArquivo").click(function() {
@@ -67,49 +71,56 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoEnviarOrcamento').click(function (){
-		var idPedido = $('#numeroPedido').val();
-		if (isEmpty(idPedido)) {
-			return;
-		} 
-		
-		var tot = 0;
-		var files  = document.getElementById("botaoAnexarOculto").files;
-		for(var i =0; i< files.length;i++){
-			tot += files[i].size;
-		}
-		var mb = 1000000;
-		tot = tot/mb;
-		
-		var max = 20; 
-		if(tot > max){
-			var mens = new Array();
-			mens[0]='O tamanho dos arquivos anexados é '+tot+' Mb, mas não pode ultrapassar '+max+' Mb.';
+		var enviarOrcamento = function(){
+			var idPedido = $('#numeroPedido').val();
+			if (isEmpty(idPedido)) {
+				return;
+			} 
+			
+			var tot = 0;
+			var files  = document.getElementById("botaoAnexarOculto").files;
 			for(var i =0; i< files.length;i++){
-				mens[i+1] = files[i].name+' '+files[i].size/mb+' Mb';
+				tot += files[i].size;
 			}
-			gerarListaMensagemAlerta(mens);
-			return;
-		}
-		
-		var url = '<c:url value="orcamento/temporario/id"/>';
-		var request = $.ajax({
-			type : "post",
-			url : url,
-			data : {'idOrcamento':idPedido}
-		});
-		
-		request.done(function(response) {
-			return;
-		});
-		
-		request.always(function(response) {
-			document.getElementById('formAnexo').submit();
-		});
-		
+			var mb = 1000000;
+			tot = tot/mb;
+			
+			var max = 20; 
+			if(tot > max){
+				var mens = new Array();
+				mens[0]='O tamanho dos arquivos anexados é '+tot+' Mb, mas não pode ultrapassar '+max+' Mb.';
+				for(var i =0; i< files.length;i++){
+					mens[i+1] = files[i].name+' '+files[i].size/mb+' Mb';
+				}
+				gerarListaMensagemAlerta(mens);
+				return;
+			}
+			
+			var url = '<c:url value="orcamento/temporario/id"/>';
+			var request = $.ajax({
+				type : "post",
+				url : url,
+				data : {'idOrcamento':idPedido}
+			});
+			
+			request.done(function(response) {
+				return;
+			});
+			
+			request.always(function(response) {
+				document.getElementById('formAnexo').submit();
+			});
+			
 
-		request.fail(function(request, status) {
-			alert('Falha envio do orcamento => Status da requisicao: ' + status);
-		});
+			request.fail(function(request, status) {
+				alert('Falha envio do orcamento => Status da requisicao: ' + status);
+			});
+		};
+		
+		inserirOrcamento({
+			urlInclusao:'<c:url value="/orcamento/inclusao"/>', 
+			enviar: enviarOrcamento
+			});
 	});
 	
 	$('#botaoAceitarOrcamento').click(function (){
@@ -207,63 +218,6 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_paginador.jsp" />
 
 });
-
-function inserirOrcamento(){
-	toUpperCaseInput();
-	toLowerCaseInput();
-	
-	var parametros = serializarForm('formPedido');
-	var request = $.ajax({
-		type : "post",
-		url : '<c:url value="/orcamento/inclusao"/>',
-		data : parametros
-	});
-
-	request.done(function(response) {
-		var erros = response.erros;
-		var contemErro = erros != undefined;
-		/*
-		 * Ocultando no caso de que o usuario envie um novo request com a area
-		 * de mensagem renderizada e deve ser um hide para que o bloco suma
-		 * rapidamente apos novo request
-		 */
-		$('#bloco_mensagem').hide();
-
-		var pedidoJson = response.pedido;
-		var contemPedido =pedidoJson != undefined && pedidoJson != null;
-		if (!contemErro && contemPedido) {
-			/*
-			 * Temos que ter esse campo oculto pois o campo Numero do Pedido na
-			 * tela sera desabilitado e nao sera enviado no request.
-			 */
-			$('#idCliente').val(pedidoJson.idCliente);
-			$('#idPedido').val(pedidoJson.id);
-			$('#numeroPedido').val(pedidoJson.id);
-			$('#numeroPedidoPesquisa').val(pedidoJson.id);
-			$('#numeroPedidoCliente').val(pedidoJson.numeroPedidoCliente);
-			$('#situacaoPedido').val(pedidoJson.situacaoPedido);
-			$('#idSituacaoPedido').val(pedidoJson.situacaoPedido);
-			$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);
-			$('#proprietario').val(
-					pedidoJson.proprietario.nome + ' - '
-							+ pedidoJson.proprietario.email);
-			$('#idVendedor').val(pedidoJson.proprietario.id);
-			
-			habilitar('#numeroPedido', false);
-			gerarListaMensagemSucesso(new Array('O orçamento No. ' + pedidoJson.id + ' foi incluido com sucesso.'));
-
-		} else if(!contemErro && !contemPedido) {
-			gerarListaMensagemAlerta(['O usuario pode nao estar logado no sistema']);
-		} else if(contemErro) {
-			gerarListaMensagemErro(erros);
-		}
-	});
-
-	request.fail(function(request, status) {
-		alert('Falha inclusao do orcamento => Status da requisicao: ' + status);
-	});
-
-}
 </script>
 	
 </head>

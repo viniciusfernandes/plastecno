@@ -808,7 +808,7 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 
-		itemCH = estoqueService.pesquisarItemEstoqueById(idCH);
+		itemCH = recarregarEntidade(ItemEstoque.class, idCH);
 		itemCH.setAliquotaReajuste(0.1);
 
 		try {
@@ -1958,10 +1958,10 @@ public class EstoqueServiceTest extends AbstractTest {
 				printMensagens(e);
 			}
 		}
-		Double totalEstoque = 1.0;
+		Double totalEstoque = 1.11;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.BQ));
 
-		totalEstoque = 2.0;
+		totalEstoque = 2.22;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, FormaMaterial.TB));
 	}
 
@@ -1976,7 +1976,7 @@ public class EstoqueServiceTest extends AbstractTest {
 				printMensagens(e);
 			}
 		}
-		Double totalEstoque = 3.0d;
+		Double totalEstoque = 3.33d;
 		assertEquals(totalEstoque, estoqueService.calcularValorEstoque(null, null));
 	}
 

@@ -224,9 +224,21 @@ $(document).ready(function() {
 		inicializarModalConfirmacao({
 			mensagem: 'Essa ação não poderá ser desfeita. Você tem certeza de que deseja ENVIAR esse pedido?',
 			confirmar: function(){
+				
 				inserirPedido({
 					urlInclusao:'<c:url value="/pedido/inclusao"/>', 
-					enviar:	function(){document.getElementById('formEnvioPedido').submit();}
+					enviar:	function(){
+						$('#formEnvioPedido' ).submit(function(e) {
+							$.ajax({
+						      url: '<c:url value="/pedido/inclusao"/>',
+						      type: 'post',
+						      data: new FormData(this),
+						      processData: false,
+						      contentType: false
+						    });
+						    e.preventDefault();
+						});
+					}
 				});
 			}
 		});

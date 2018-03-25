@@ -70,6 +70,17 @@ $(document).ready(function() {
 		form.submit();
 	});
 	
+	$('#formAnexo').submit(function(e) {
+		$.ajax({
+	      url: '<c:url value="/orcamento/envio/anexo"/>',
+	      type: 'post',
+	      data: new FormData(this),
+	      processData: false,
+	      contentType: false
+	    });
+	    e.preventDefault();
+	});
+	
 	$('#botaoEnviarOrcamento').click(function (){
 		var enviarOrcamento = function(){
 			var idPedido = $('#numeroPedido').val();
@@ -108,7 +119,7 @@ $(document).ready(function() {
 			});
 			
 			request.always(function(response) {
-				document.getElementById('formAnexo').submit();
+				$('#formAnexo').submit();
 			});
 			
 
@@ -120,7 +131,7 @@ $(document).ready(function() {
 		inserirOrcamento({
 			urlInclusao:'<c:url value="/orcamento/inclusao"/>', 
 			enviar: enviarOrcamento
-			});
+		});
 	});
 	
 	$('#botaoAceitarOrcamento').click(function (){
@@ -375,7 +386,7 @@ $(document).ready(function() {
 	<jsp:include page="/bloco/bloco_item_pedido.jsp" />
 	<div class="bloco_botoes">
 		<input type="button" id="botaoEnviarOrcamento" title="Enviar Orçamento" value="" class="botaoEnviarEmail" />
-		<form id="formAnexo" action="orcamento/anexo" method="post" enctype="multipart/form-data">
+		<form id="formAnexo" enctype="multipart/form-data">
 			<input type="button" id="botaoAnexarArquivo" title="Anexar Arquivo" value="" class="botaoAnexar" />
 			<input type="file" id="botaoAnexarOculto" style="display: none;" name="anexo[]" multiple="multiple"/>
 		</form>

@@ -110,8 +110,8 @@ public class OrcamentoController extends AbstractPedidoController {
         serializarJson(new SerializacaoJson("ok", true));
     }
 
-    @Post("orcamento/anexo")
-    public void anexarArquivoEnvio(List<UploadedFile> anexo) {
+    @Post("orcamento/envio/anexo")
+    public void enviarOrcamentoArquivoAnexo(List<UploadedFile> anexo) {
         Integer idOrcamento = (Integer) getSessao(ID_ORCAMENTO);
         removerSessao(ID_ORCAMENTO);
         enviarOrcamento(idOrcamento, anexo);
@@ -165,8 +165,7 @@ public class OrcamentoController extends AbstractPedidoController {
         return super.downloadPDFPedido(idPedido, TipoPedido.REVENDA);
     }
 
-    @Post("orcamento/envio")
-    public void enviarOrcamento(Integer idOrcamento, List<UploadedFile> anexo) {
+    private void enviarOrcamento(Integer idOrcamento, List<UploadedFile> anexo) {
         try {
             final PedidoPDFWrapper wrapper = gerarPDF(idOrcamento, TipoPedido.REVENDA);
             final Pedido pedido = wrapper.getPedido();

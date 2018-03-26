@@ -74,6 +74,7 @@ $(document).ready(function() {
 	$('#botaoEnviarOrcamento').click(function (){
 		var enviarOrcamento = function(){
 			var idPedido = $('#numeroPedido').val();
+			var ok = false;
 			if (isEmpty(idPedido)) {
 				return;
 			} 
@@ -117,14 +118,28 @@ $(document).ready(function() {
 						      contentType: false
 						    });
 				upload.done(function (response){
-					if(response.sucesso != undefined && response.sucesso != null){
+					if(ok = (response.sucesso != undefined && response.sucesso != null)){
 						limparTela();
 						gerarListaMensagemSucesso(response.sucesso);
 					}else {
 						gerarListaMensagemErro(response.erros);
 					}
 				});
-				
+				upload.always(function(resp){
+					if(!ok){
+						return;
+					}
+					habilitar('#numeroPedido', true);
+					var req = $.ajax({
+					      url: '<c:url value="/orcamento/usuariocorrente"/>',
+					      type: 'get'
+					    });
+					req.done(function(resp){
+						var vend = resp.vendedor;
+						document.getElementById('idVendedor').value = vend.id;
+						document.getElementById('vendedor').value = vend.nome+' - '+vend.email;
+					});
+				});
 				upload.fail(function(request, status, erro){
 					gerarListaMensagemSucesso(["Falha no envio do orçamento No. "+idPedido+"."]);
 				});

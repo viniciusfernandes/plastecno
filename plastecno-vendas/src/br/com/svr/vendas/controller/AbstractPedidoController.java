@@ -293,7 +293,7 @@ public class AbstractPedidoController extends AbstractController {
             } else {
                 itemPedido.setAliquotaComissao(NumeroUtils.gerarAliquota(itemPedido.getAliquotaComissao(), 4));
             }
-            
+
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
 
             final Integer idItemPedido = pedidoService.inserirItemPedido(numeroPedido, itemPedido);

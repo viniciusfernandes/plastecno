@@ -529,12 +529,20 @@ public abstract class AbstractController {
         return usuarioInfo.getCodigoUsuario();
     }
 
+    String getEmailUsuario() {
+        return usuarioInfo.getEmail();
+    }
+
     GeradorRelatorioPDF getGeradorPDF() {
         return GERADOR_PDF;
     }
 
     String getNomeTela() {
         return nomeTela;
+    }
+
+    String getNomeUsuario() {
+        return usuarioInfo.getNome();
     }
 
     Integer getNumerRegistrosPorPagina() {

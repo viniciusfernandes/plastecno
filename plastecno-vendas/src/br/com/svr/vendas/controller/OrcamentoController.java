@@ -33,6 +33,7 @@ import br.com.svr.service.relatorio.RelatorioService;
 import br.com.svr.vendas.controller.anotacao.Servico;
 import br.com.svr.vendas.json.ClienteJson;
 import br.com.svr.vendas.json.SerializacaoJson;
+import br.com.svr.vendas.json.VendedorJson;
 import br.com.svr.vendas.login.UsuarioInfo;
 import br.com.svr.vendas.relatorio.conversor.GeradorRelatorioPDF;
 
@@ -254,6 +255,12 @@ public class OrcamentoController extends AbstractPedidoController {
     @Get("orcamento/cliente")
     public void pesquisarClienteByNomeFantasia(String nomeFantasia) {
         forwardTo(PedidoController.class).pesquisarClienteByNomeFantasia(nomeFantasia);
+    }
+
+    @Get("orcamento/vendedor")
+    public void pesquisarVendedor() {
+        serializarJson(new SerializacaoJson("vendedor", new VendedorJson(getCodigoUsuario(), getNomeUsuario(),
+                getEmailUsuario())));
     }
 
     @Get("orcamento/contatocliente/{idContato}")

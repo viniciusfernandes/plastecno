@@ -221,6 +221,7 @@ $(document).ready(function() {
 	});
 	
 	$('#botaoEnviarPedido').click(function (){
+		var ok = false;
 		inicializarModalConfirmacao({
 			mensagem: 'Essa ação não poderá ser desfeita. Você tem certeza de que deseja ENVIAR esse pedido?',
 			confirmar: function(){
@@ -233,17 +234,44 @@ $(document).ready(function() {
 				      data: {tipoPedido:tipoPedido, idPedido: idPedido},
 				    });
 				enviarPedido.done(function (response){
-					if(response.sucesso != undefined && response.sucesso != null){
+					if(ok =(response.sucesso != undefined && response.sucesso != null)){
 						limparTela();
 						gerarListaMensagemSucesso(response.sucesso);
 					}else {
 						gerarListaMensagemErro(response.erros);
 					}
 				});
+				enviarPedido.always(function(response){
+					if(!ok){
+						return;
+					}
+					document.getElementById('tipoPedido').value = tipoPedido;
+					habilitar('#numeroPedidoPesquisa', true);
+
+					$('#divPedAssocLabel, #divPedAssocInput, #divNumNFeLabel, #divNumNFeInput').remove();
+					
+					var req = $.ajax({
+					      url: '<c:url value="/pedido/clienteusuario"/>',
+					      type: 'get',
+					      data:{tipoPedido:tipoPedido}
+					    });
+					req.done(function(resp){
+						var cli = resp.cliente;
+						if(cli.id != undefined){
+							document.getElementById('nomeCliente').value = cli.nomeFantasia+' - '+cli.razaoSocial;
+							document.getElementById('idCliente').value = cli.id;
+						} else {
+							habilitar('#nomeCliente', true);
+						}
+						document.getElementById('idVendedor').value = cli.vendedor.id;
+						document.getElementById('proprietario').value = cli.vendedor.nome+' - '+cli.vendedor.email;
+					});
+				});
 				
 				enviarPedido.fail(function(request, status, erro){
 					gerarListaMensagemSucesso(["Falha no envio do pedido No. "+idPedido+"."]);
 				}); 
+				
 				inserirPedido({
 					urlInclusao:'<c:url value="/pedido/inclusao"/>', 
 					enviar:	enviarPedido
@@ -291,8 +319,8 @@ $(document).ready(function() {
 			<input type="hidden" id="situacaoPedido" name="pedido.situacaoPedido" value="${pedido.situacaoPedido}"/>
 			
 			<c:if test="${not empty pedido.id}">
-			<div class="label">Pedido(s) de ${isCompra ? 'Venda:': 'Compra:'}</div>
-			<div class="input" style="width: 10%">
+			<div id="divPedAssocLabel" class="label">Pedido(s) de ${isCompra ? 'Venda:': 'Compra:'}</div>
+			<div id="divPedAssocInput"  class="input" style="width: 10%">
 				<select id="pedidoAssociado" name="idPedidoAssociado" style="width: 100%" class="semprehabilitado">
 					<option value=""></option>
 					<c:forEach var="idPedidoAssociado" items="${listaIdPedidoAssociado}">
@@ -300,8 +328,8 @@ $(document).ready(function() {
 					</c:forEach>
 				</select>
 			</div>
-			<div class="label">Núm. NFe(s):</div>
-			<div class="input" style="width: 50%">
+			<div id="divNumNFeLabel" class="label">Núm. NFe(s):</div>
+			<div id="divNumNFeInput" class="input" style="width: 50%">
 				<select id="listaNumeroNFe" name="numeroNFe" style="width: 25%" class="semprehabilitado">
 					<option value="">&lt&lt SELECIONE &gt&gt</option>
 					<c:forEach var="numeroNFe" items="${listaNumeroNFe}">

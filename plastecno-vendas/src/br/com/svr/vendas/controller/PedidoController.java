@@ -421,6 +421,19 @@ public class PedidoController extends AbstractPedidoController {
         serializarJson(new SerializacaoJson("lista", lista));
     }
 
+    @Get("pedido/clienteusuario")
+    public void pesquisarClienteUsuario(TipoPedido tipoPedido) {
+        Usuario usu = new Usuario(getCodigoUsuario(), getNomeUsuario(), null, getEmailUsuario());
+        Cliente cli = null;
+        if (TipoPedido.isCompra(tipoPedido)) {
+            cli = clienteService.pesquisarNomeRevendedor();
+        } else {
+            cli = new Cliente();
+        }
+        cli.setVendedor(usu);
+        serializarJson(new SerializacaoJson("cliente", new ClienteJson(cli), true));
+    }
+
     @Get("pedido/contatocliente/{idContato}")
     public void pesquisarContatoByIdContato(Integer idContato) {
         super.pesquisarContatoByIdContato(idContato);

@@ -475,11 +475,17 @@ function ancorar(idElemento){
 	},0);
 };
 
-function limparTela(){
+function limparTela(camposExclusao){
 	$("input, checkbox, textArea, select").each(function(){
-		$(this).attr('disabled', false).removeClass('desabilitado').val('');
+		$(this).val('');
 	});
 	$("table tbody tr").each(function(){
 		$(this).html('');
 	});
+	
+	if(camposExclusao!=undefined && camposExclusao!=null){
+		for (var i = 0; i < camposExclusao.length; i++) {
+			camposExclusao[i].campo.value =camposExclusao[i].val;
+		}
+	}
 };

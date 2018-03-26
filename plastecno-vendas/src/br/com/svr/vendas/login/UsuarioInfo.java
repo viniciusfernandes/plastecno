@@ -17,10 +17,12 @@ import br.com.svr.service.entity.Usuario;
 public class UsuarioInfo {
 
     private Integer codigoUsuario;
-    private boolean usuarioLogado = false;
-    private List<TipoAcesso> listaTipoAcesso;
     private boolean compraPermitida;
+    private String email;
+    private List<TipoAcesso> listaTipoAcesso;
+    private String nome;
     private String nomeCompleto;
+    private boolean usuarioLogado = false;
 
     public Integer getCodigoUsuario() {
         return this.codigoUsuario;
@@ -28,6 +30,14 @@ public class UsuarioInfo {
 
     public String getDescricaoLogin() {
         return nomeCompleto + " - " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     public void inicializar(Usuario usuario) {
@@ -38,6 +48,9 @@ public class UsuarioInfo {
         this.codigoUsuario = usuario.getId();
         this.compraPermitida = usuario.isComprador();
         this.nomeCompleto = usuario.getNomeCompleto();
+        this.nome = usuario.getNome();
+        this.email = usuario.getEmail();
+
         this.usuarioLogado = true;
         this.listaTipoAcesso = new ArrayList<TipoAcesso>();
 

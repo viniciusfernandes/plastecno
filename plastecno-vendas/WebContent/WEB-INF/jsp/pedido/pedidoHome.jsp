@@ -227,18 +227,7 @@ $(document).ready(function() {
 				
 				inserirPedido({
 					urlInclusao:'<c:url value="/pedido/inclusao"/>', 
-					enviar:	function(){
-						$('#formEnvioPedido' ).submit(function(e) {
-							$.ajax({
-						      url: '<c:url value="/pedido/inclusao"/>',
-						      type: 'post',
-						      data: new FormData(this),
-						      processData: false,
-						      contentType: false
-						    });
-						    e.preventDefault();
-						});
-					}
+					enviar:	function(){document.getElementById('formEnvioPedido').submit();}
 				});
 			}
 		});

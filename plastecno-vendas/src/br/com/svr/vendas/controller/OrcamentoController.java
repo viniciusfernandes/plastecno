@@ -110,13 +110,6 @@ public class OrcamentoController extends AbstractPedidoController {
         serializarJson(new SerializacaoJson("ok", true));
     }
 
-    @Post("orcamento/envio/anexo")
-    public void enviarOrcamentoArquivoAnexo(List<UploadedFile> anexo) {
-        Integer idOrcamento = (Integer) getSessao(ID_ORCAMENTO);
-        removerSessao(ID_ORCAMENTO);
-        enviarOrcamento(idOrcamento, anexo);
-    }
-
     @Post("orcamento/cancelamento/{idOrcamento}")
     public void cancelarOrcamento(Integer idOrcamento) {
         try {
@@ -183,20 +176,25 @@ public class OrcamentoController extends AbstractPedidoController {
 
             pedidoService.enviarPedido(idOrcamento, pdfPedido, anexoEmail);
 
-            final String mensagem = "Orçamento No. " + idOrcamento + " foi enviado com sucesso para o cliente "
-                    + pedido.getCliente().getNomeFantasia();
-
-            gerarMensagemSucesso(mensagem);
+            serializarJson(new SerializacaoJson("sucesso", new String[] {"Orçamento No. " + idOrcamento
+                    + " foi enviado com sucesso para o cliente " + pedido.getCliente().getNomeFantasia()}));
         } catch (NotificacaoException e) {
             gerarLogErro("envio de email do orcamento No. " + idOrcamento, e);
         } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
-            // populando a tela de pedidos
-            redirecTo(this.getClass()).pesquisarOrcamentoById(idOrcamento);
+            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
             gerarLogErro("envio de email do orcamento No. " + idOrcamento, e);
+            serializarJson(new SerializacaoJson("erros", new String[] {"Falha no envio do orçamento No. " + idOrcamento
+                    + ". Verifique o log do servidor para mais detalhes."}));
+
         }
-        irTopoPagina();
+    }
+
+    @Post("orcamento/envio/anexo")
+    public void enviarOrcamentoArquivoAnexo(List<UploadedFile> anexo) {
+        Integer idOrcamento = (Integer) getSessao(ID_ORCAMENTO);
+        removerSessao(ID_ORCAMENTO);
+        enviarOrcamento(idOrcamento, anexo);
     }
 
     @Post("orcamento/item/inclusao")

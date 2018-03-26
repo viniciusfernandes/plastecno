@@ -25,7 +25,7 @@ function toUpperCaseInput (){
 			$(this).val($(this).val().toUpperCase());
 		}
 	});
-}
+};
 
 function toLowerCaseInput (){
 	$("input, textArea").each(function(){
@@ -33,7 +33,7 @@ function toLowerCaseInput (){
 			$(this).val($(this).val().toLowerCase());
 		}
 	});
-}
+};
 
 function inicializarPaginador(inicializarFiltro, paginaSelecionada, totalPaginas) {
 	$("#paginador").paginate({
@@ -473,4 +473,13 @@ function ancorar(idElemento){
 	$('html, body').animate({
 	    scrollTop: ($(e).first().offset().top)
 	},0);
+};
+
+function limparTela(){
+	$("input, checkbox, textArea, select").each(function(){
+		$(this).attr('disabled', false).removeClass('desabilitado').val('');
+	});
+	$("table tbody tr").each(function(){
+		$(this).html('');
+	});
 };

@@ -70,16 +70,6 @@ $(document).ready(function() {
 		form.submit();
 	});
 	
-	$('#formAnexo').submit(function(e) {
-		$.ajax({
-	      url: '<c:url value="/orcamento/envio/anexo"/>',
-	      type: 'post',
-	      data: new FormData(this),
-	      processData: false,
-	      contentType: false
-	    });
-	    e.preventDefault();
-	});
 	
 	$('#botaoEnviarOrcamento').click(function (){
 		var enviarOrcamento = function(){
@@ -119,7 +109,25 @@ $(document).ready(function() {
 			});
 			
 			request.always(function(response) {
-				$('#formAnexo').submit();
+				var upload = $.ajax({
+						      url: '<c:url value="/orcamento/envio/anexo"/>',
+						      type: 'post',
+						      data: new FormData(document.getElementById('formAnexo')),
+						      processData: false,
+						      contentType: false
+						    });
+				upload.done(function (response){
+					if(response.sucesso != undefined && response.sucesso != null){
+						limparTela();
+						gerarListaMensagemSucesso(response.sucesso);
+					}else {
+						gerarListaMensagemErro(response.erros);
+					}
+				});
+				
+				upload.fail(function(request, status, erro){
+					gerarListaMensagemSucesso(["Falha no envio do orçamento No. "+idPedido+"."]);
+				});
 			});
 			
 

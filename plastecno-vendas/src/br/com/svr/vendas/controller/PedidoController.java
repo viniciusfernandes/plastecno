@@ -244,21 +244,15 @@ public class PedidoController extends AbstractPedidoController {
 
             pedidoService.enviarPedido(idPedido, new AnexoEmail(wrapper.getArquivoPDF()));
 
-            final String mensagem = pedido.isOrcamento() ? "Orçamento No. " + idPedido
-                    + " foi enviado com sucesso para o cliente " + pedido.getCliente().getNomeFantasia()
+            serializarJson(new SerializacaoJson("sucesso", new String[] {pedido.isOrcamento() ? "Orçamento No. "
+                    + idPedido + " foi enviado com sucesso para o cliente " + pedido.getCliente().getNomeFantasia()
                     : "Pedido No. " + idPedido + " foi enviado com sucesso para a representada "
-                            + pedido.getRepresentada().getNomeFantasia();
-
-            gerarMensagemSucesso(mensagem);
-            redirecionarHome(tipoPedido, orcamento, true);
+                            + pedido.getRepresentada().getNomeFantasia()}));
         } catch (NotificacaoException e) {
             gerarLogErro("envio de email do pedido No. " + idPedido, e);
+            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (BusinessException e) {
-            gerarListaMensagemErro(e);
-            // populando a tela de pedidos
-            redirecTo(this.getClass()).pesquisarPedidoById(idPedido, tipoPedido, orcamento);
-        } catch (Exception e) {
-            gerarLogErro("envio de email do pedido No. " + idPedido, e);
+            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         }
     }
 

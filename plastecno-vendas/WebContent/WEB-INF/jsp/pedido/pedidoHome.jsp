@@ -224,10 +224,29 @@ $(document).ready(function() {
 		inicializarModalConfirmacao({
 			mensagem: 'Essa ação não poderá ser desfeita. Você tem certeza de que deseja ENVIAR esse pedido?',
 			confirmar: function(){
+				var tipoPedido = $('#tipoPedido').val();
+				var idPedido = $('#numeroPedido').val();
 				
+				var enviarPedido = $.ajax({
+				      url: '<c:url value="/pedido/envio"/>',
+				      type: 'post',
+				      data: {tipoPedido:tipoPedido, idPedido: idPedido},
+				    });
+				enviarPedido.done(function (response){
+					if(response.sucesso != undefined && response.sucesso != null){
+						limparTela();
+						gerarListaMensagemSucesso(response.sucesso);
+					}else {
+						gerarListaMensagemErro(response.erros);
+					}
+				});
+				
+				enviarPedido.fail(function(request, status, erro){
+					gerarListaMensagemSucesso(["Falha no envio do pedido No. "+idPedido+"."]);
+				}); 
 				inserirPedido({
 					urlInclusao:'<c:url value="/pedido/inclusao"/>', 
-					enviar:	function(){document.getElementById('formEnvioPedido').submit();}
+					enviar:	enviarPedido
 				});
 			}
 		});

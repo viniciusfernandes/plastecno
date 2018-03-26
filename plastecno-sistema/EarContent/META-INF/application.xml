@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_6.xsd" id="Application_ID" version="6">
-  <display-name>svr-sistema</display-name>
+  <display-name>svr-sistema-teste</display-name>
   <module>
     <web>
-      <web-uri>svr-vendas.war</web-uri>
-      <context-root>svr/vendas</context-root>
+      <web-uri>svr-vendas-teste.war</web-uri>
+      <context-root>svr/teste</context-root>
     </web>
   </module>
   <module>
-    <ejb>svr-service-impl.jar</ejb>
+    <ejb>svr-service-impl-teste.jar</ejb>
   </module>
   <module>
     <java>javassist-3.4.GA.jar</java>

@@ -12,4 +12,6 @@
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/jquery-ui-1.10.4.dialog.min.css"/>" />
 
 
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/picklist.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/picklist.css?${versaoCache}"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/modal.css?${versaoCache}"/>" />
+

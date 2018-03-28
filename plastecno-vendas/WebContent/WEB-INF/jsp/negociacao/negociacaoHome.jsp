@@ -64,6 +64,8 @@ a.front {
 	text-decoration: none;
 	width: 100%; 
 }
+
+
 </style>
 <script type="text/javascript">
 var dialog =null;
@@ -72,7 +74,7 @@ $(document).ready(function() {
 	configurarAlturaColunas();
 	dialog = $( "#dialog-form" ).dialog({
 		autoOpen: false,
-        height: 300,
+        height: 200,
         width: 350,
         modal: true,
         buttons: {
@@ -80,15 +82,15 @@ $(document).ready(function() {
     			var req = $.ajax({
     					type : "post",
     					url : '<c:url value="/negociacao/observacao/inclusao"/>',
-    					data : {idNegociacao: idNeg, observacao:$('#observacao').val()}
+    					data : {'idNegociacao': idNeg, 'observacao':$('#observacao').val()}
     			});
     			req.done(function(response){
     				var erros = response.erros;
     				if(erros!=undefined && erros!=null){
-    					alert('ferrou...');
+    					gerarListaMensagemErroById('bloco_mensagem_modal', erros);
     				} else {
     					$('#observacao').val('');
-    					$(this).dialog('close');
+    					dialog.dialog( "close" );
     				}
     			});
     		}     
@@ -265,13 +267,14 @@ function aceitarNegociacao(idNegociacao){
 <jsp:include page="/bloco/bloco_mensagem.jsp" />
 <div id="modal"></div>
 
-<div id="dialog-form" title="Edição da Negociação"> 
+<div id="dialog-form" title="Edição da Negociação">
+	<div id="bloco_mensagem_modal" class="areaMensagem" style="display: none;">
+		<ul></ul>
+	</div>
  	<form>
 		<div class="input areatexto" style="width: 100%; text-align: left;">
 			<textarea id="observacao" name="observacao" style="width: 100%"></textarea>
 		</div>
-      <!-- Allow form submission with keyboard without duplicating the dialog button -->
-      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
   </form>
 </div>
  

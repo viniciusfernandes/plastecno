@@ -293,21 +293,9 @@ function limparComboBox(idCombo) {
 	var combo = $('#'+idCombo);
 	combo.empty();
 	combo.append($('<option value="">&lt&lt SELECIONE &gt&gt</option>'));
-}
-
-function gerarListaMensagemErro (listaMensagem) {
-	gerarListaMensagem(listaMensagem, 'mensagemErro');
 };
 
-function gerarListaMensagemAlerta (listaMensagem) {
-	gerarListaMensagem(listaMensagem, 'mensagemAlerta');
-};
-
-function gerarListaMensagemSucesso (listaMensagem) {
-	gerarListaMensagem(listaMensagem, 'mensagemSucesso');
-};
-
-function gerarListaMensagem (listaMensagem, cssMensagem) {
+function gerarListaMensagemByIdBloco (idBloco, listaMensagem, cssMensagem) {
 	
 	if (listaMensagem == undefined || listaMensagem == null) {
 		return;
@@ -320,11 +308,34 @@ function gerarListaMensagem (listaMensagem, cssMensagem) {
 	}
 	
 	// temos que remover as classes anteriores para exibir apenas a classe desejada
-	$('#bloco_mensagem').removeClass('mensagemErro mensagemAlerta mensagemSucesso');
-	$('#bloco_mensagem').addClass(cssMensagem);
-	$('#bloco_mensagem ul').html(li);
-	$('#bloco_mensagem').show();
+	$('#'+idBloco).removeClass('mensagemErro mensagemAlerta mensagemSucesso');
+	$('#'+idBloco).addClass(cssMensagem);
+	$('#'+idBloco +' ul').html(li);
+	$('#'+idBloco).show();
 	scrollTo('topo');
+};
+
+function gerarListaMensagemErro (listaMensagem) {
+	gerarListaMensagem(listaMensagem, 'mensagemErro');
+};
+
+function gerarListaMensagemErroById (idBloco, listaMensagem) {
+	gerarListaMensagemByIdBloco(idBloco, listaMensagem, 'mensagemErro');
+};
+
+function gerarListaMensagemAlerta (listaMensagem) {
+	gerarListaMensagem(listaMensagem, 'mensagemAlerta');
+};
+
+function gerarListaMensagemSucesso (listaMensagem) {
+	gerarListaMensagem(listaMensagem, 'mensagemSucesso');
+};
+
+function gerarListaMensagemSucessoById (idBloco, listaMensagem) {
+	gerarListaMensagemByIdBloco(idBloco, listaMensagem, 'mensagemSucesso');
+};
+function gerarListaMensagem (listaMensagem, cssMensagem) {
+	gerarListaMensagemByIdBloco('bloco_mensagem', listaMensagem, cssMensagem);
 };
 
 function gerarData(data) {

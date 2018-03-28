@@ -13,7 +13,7 @@ function inicializarModal(config) {
 		buttons : config.botoes,
 		position: { my: "center", at: "center", of: window}
 	});
-
+	
 	$(modal).html(mensagem);
 	$(modal).dialog('open');
 };

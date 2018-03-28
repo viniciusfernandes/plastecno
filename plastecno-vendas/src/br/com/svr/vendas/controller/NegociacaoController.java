@@ -101,6 +101,7 @@ public class NegociacaoController extends AbstractController {
     public void inserirObservacao(Integer idNegociacao, String observacao) {
         try {
             negociacaoService.inserirObservacao(idNegociacao, observacao);
+            serializarJson(new SerializacaoJson("sucesso", "A observação foi incluida com sucesso."));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         }

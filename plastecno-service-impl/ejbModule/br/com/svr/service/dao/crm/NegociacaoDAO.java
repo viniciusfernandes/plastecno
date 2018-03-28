@@ -58,6 +58,11 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 		return v == null ? 0d : (double) v;
 	}
 
+	public void inserirObservacao(Integer idNegociacao, String observacao) {
+		entityManager.createQuery("update Negociacao n set n.observacao =:observacao where n.id=:idNegociacao")
+				.setParameter("observacao", observacao).setParameter("idNegociacao", idNegociacao).executeUpdate();
+	}
+
 	public Negociacao pesquisarById(Integer idNegociacao) {
 		return super.pesquisarById(Negociacao.class, idNegociacao);
 	}
@@ -98,6 +103,13 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select n from Negociacao n where n.orcamento.id =:idOrcamento")
 						.setParameter("idOrcamento", idOrcamento), Negociacao.class, null);
+	}
+
+	public String pesquisarObservacao(Integer idNegociacao) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select n.observacao from Negociacao n where n.id=:idNegociacao")
+						.setParameter("idNegociacao", idNegociacao), String.class, null);
+
 	}
 
 	public void removerNegociacaoByIdOrcamento(Integer idOrcamento) {

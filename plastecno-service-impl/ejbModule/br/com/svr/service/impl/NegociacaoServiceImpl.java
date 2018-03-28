@@ -29,6 +29,7 @@ import br.com.svr.service.impl.util.QueryUtil;
 import br.com.svr.service.validacao.ValidadorInformacao;
 import br.com.svr.service.wrapper.GrupoWrapper;
 import br.com.svr.service.wrapper.RelatorioWrapper;
+import br.com.svr.util.StringUtils;
 
 @Stateless
 public class NegociacaoServiceImpl implements NegociacaoService {
@@ -270,6 +271,18 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void inserirObservacao(Integer idNegociacao, String observacao) throws BusinessException {
+		if (idNegociacao == null) {
+			return;
+		}
+		if (StringUtils.isNotEmpty(observacao) && observacao.length() > 1000) {
+			throw new BusinessException("O tamanho da observação da negociação não pode ultrapassar 1000 caracteres.");
+		}
+		negociacaoDAO.inserirObservacao(idNegociacao, observacao);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Negociacao pesquisarById(Integer idNegociacao) {
 		return negociacaoDAO.pesquisarById(idNegociacao);
@@ -291,6 +304,15 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Negociacao pesquisarNegociacaoByIdOrcamento(Integer idOrcamento) {
 		return negociacaoDAO.pesquisarNegociacaoByIdOrcamento(idOrcamento);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public String pesquisarObservacao(Integer idNegociacao) {
+		if (idNegociacao == null) {
+			return null;
+		}
+		return negociacaoDAO.pesquisarObservacao(idNegociacao);
 	}
 
 	@Override

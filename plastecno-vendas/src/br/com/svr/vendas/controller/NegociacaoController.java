@@ -97,6 +97,16 @@ public class NegociacaoController extends AbstractController {
         // irTopoPagina();
     }
 
+    @Post("negociacao/observacao/inclusao")
+    public void inserirObservacao(Integer idNegociacao, String observacao) {
+        try {
+            negociacaoService.inserirObservacao(idNegociacao, observacao);
+            serializarJson(new SerializacaoJson("sucesso", "A observação foi incluida com sucesso."));
+        } catch (BusinessException e) {
+            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
+        }
+    }
+
     @Get("negociacao")
     public void negociacaoHome() {
         RelatorioWrapper<CategoriaNegociacao, Negociacao> rel = negociacaoService
@@ -119,5 +129,10 @@ public class NegociacaoController extends AbstractController {
         addAtributo("motivoOutros", TipoNaoFechamento.OUTROS);
         addAtributo("motivoEntrega", TipoNaoFechamento.PRAZO_ENTREGA);
         addAtributo("motivoPreco", TipoNaoFechamento.PRECO);
+    }
+
+    @Get("negociacao/observacao/{idNegociacao}")
+    public void pesquisarObservacao(Integer idNegociacao) {
+        serializarJson(new SerializacaoJson("observacao", negociacaoService.pesquisarObservacao(idNegociacao)));
     }
 }

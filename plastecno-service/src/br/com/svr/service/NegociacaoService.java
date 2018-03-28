@@ -31,6 +31,8 @@ public interface NegociacaoService {
 
 	Integer inserirNegociacao(Integer idOrcamento, Integer idCliente, Integer idVendedor) throws BusinessException;
 
+	void inserirObservacao(Integer idNegociacao, String observacao) throws BusinessException;
+
 	Negociacao pesquisarById(Integer idNegociacao);
 
 	IndiceConversao pesquisarIndiceConversaoByIdCliente(Integer idCliente);
@@ -38,6 +40,8 @@ public interface NegociacaoService {
 	List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor);
 
 	Negociacao pesquisarNegociacaoByIdOrcamento(Integer idOrcamento);
+
+	String pesquisarObservacao(Integer idNegociacao);
 
 	void recalcularIndiceConversao(Integer idPedido, Integer idOrcamento) throws BusinessException;
 

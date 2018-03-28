@@ -45,7 +45,7 @@ create table crm.tb_negociacao (
 	id_tipo_nao_fechamento integer not null,
 	id_vendedor integer not null,
 	id_categoria_negociacao integer not null,
-	comentario varchar(1000) default null,
+	observacao varchar(1000) default null,
 	data_encerramento date default null,
 	nome_cliente varchar(150) not null,
 	nome_contato varchar(100) default null,

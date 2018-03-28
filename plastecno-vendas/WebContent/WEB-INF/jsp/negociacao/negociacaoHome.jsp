@@ -64,10 +64,38 @@ a.front {
 	text-decoration: none;
 	width: 100%; 
 }
+
+
 </style>
 <script type="text/javascript">
+var dialog =null;
+var idNeg = null;
 $(document).ready(function() {
 	configurarAlturaColunas();
+	dialog = $( "#dialog-form" ).dialog({
+		autoOpen: false,
+        height: 200,
+        width: 350,
+        modal: true,
+        buttons: {
+    		Inserir: function(){
+    			var req = $.ajax({
+    					type : "post",
+    					url : '<c:url value="/negociacao/observacao/inclusao"/>',
+    					data : {'idNegociacao': idNeg, 'observacao':$('#observacao').val()}
+    			});
+    			req.done(function(response){
+    				var erros = response.erros;
+    				if(erros!=undefined && erros!=null){
+    					gerarListaMensagemErroById('bloco_mensagem_modal', erros);
+    				} else {
+    					$('#observacao').val('');
+    					dialog.dialog( "close" );
+    				}
+    			});
+    		}     
+        }
+	});
 });
 function configurarAlturaColunas(){
 	var tamanhos = new Array();
@@ -207,6 +235,18 @@ function cancelarNegociacao(idNegociacao){
 		});
 };
 
+function editarNegociacao(idNegociacao){
+	idNeg=idNegociacao;
+	var req = $.ajax({
+		type : 'get',
+		url : '<c:url value="/negociacao/observacao/"/>'+idNegociacao,
+	});
+	req.done(function(response){
+		$('#observacao').val(response.observacao);
+	});
+	dialog.dialog('open');
+};
+
 function aceitarNegociacao(idNegociacao){
 	inicializarModalConfirmacao({
 		mensagem: 'Você tem certeza de que deseja ACEITAR esse item?',
@@ -218,11 +258,27 @@ function aceitarNegociacao(idNegociacao){
 		}
 	});
 };
+
+
 </script>
 </head>
 <body>
+
 <jsp:include page="/bloco/bloco_mensagem.jsp" />
 <div id="modal"></div>
+
+<div id="dialog-form" title="Edição da Negociação">
+	<div id="bloco_mensagem_modal" class="areaMensagem" style="display: none;">
+		<ul></ul>
+	</div>
+ 	<form>
+		<div class="input areatexto" style="width: 100%; text-align: left;">
+			<textarea id="observacao" name="observacao" style="width: 100%"></textarea>
+		</div>
+  </form>
+</div>
+ 
+
 <form id="formVazio" method="post"></form>
 <c:forEach items="${relatorio.listaGrupo}" var="g">
 <fieldset id="${g.id}" class="coluna" ondrop="drop(event)" ondragover="dragover(event)" ondragleave="dragleave(event)">
@@ -240,6 +296,8 @@ function aceitarNegociacao(idNegociacao){
 				<span style="float: left;" draggable="false">R$</span>
 				<span style="float: left;" draggable="false">${neg.valor}</span>
 			</a>
+			<a style="width: 10%; float: left;" class="botaoEditar" 
+				onclick="editarNegociacao(${neg.id})" title="Editar Negociação"></a>
 			<a style="width: 10%; float: left;" class="botaoVerificacaoFalhaPequeno" 
 				onclick="cancelarNegociacao(${neg.id})" title="Cancelar Negociação"></a>
 			<a style="width: 10%; float: left; margin-left: 2%" class="botaoVerificacaoEfetuadaPequeno" 

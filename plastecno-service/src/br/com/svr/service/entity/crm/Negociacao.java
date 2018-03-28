@@ -34,8 +34,6 @@ public class Negociacao implements Serializable {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Categoria da negociação")
 	private CategoriaNegociacao categoriaNegociacao;
 
-	private String comentario;
-
 	@Column(name = "data_encerramento")
 	private Date dataEncerramento;
 
@@ -65,6 +63,9 @@ public class Negociacao implements Serializable {
 	@Column(name = "nome_contato")
 	@InformacaoValidavel(nomeExibicao = "Nome do contato da negociação")
 	private String nomeContato;
+
+	@InformacaoValidavel(intervaloComprimento = { 0, 1000 }, nomeExibicao = "Observação da negociação")
+	public String observacao;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_orcamento", referencedColumnName = "id", nullable = false)
@@ -111,10 +112,6 @@ public class Negociacao implements Serializable {
 		return categoriaNegociacao;
 	}
 
-	public String getComentario() {
-		return comentario;
-	}
-
 	public Date getDataEncerramento() {
 		return dataEncerramento;
 	}
@@ -147,6 +144,10 @@ public class Negociacao implements Serializable {
 		return nomeContato;
 	}
 
+	public String getObservacao() {
+		return observacao;
+	}
+
 	public Pedido getOrcamento() {
 		return orcamento;
 	}
@@ -169,10 +170,6 @@ public class Negociacao implements Serializable {
 
 	public void setCategoriaNegociacao(CategoriaNegociacao categoriaNegociacao) {
 		this.categoriaNegociacao = categoriaNegociacao;
-	}
-
-	public void setComentario(String comentario) {
-		this.comentario = comentario;
 	}
 
 	public void setDataEncerramento(Date dataEncerramento) {
@@ -205,6 +202,10 @@ public class Negociacao implements Serializable {
 
 	public void setNomeContato(String nomeContato) {
 		this.nomeContato = nomeContato;
+	}
+
+	public void setObservacao(String observacao) {
+		this.observacao = observacao;
 	}
 
 	public void setOrcamento(Pedido orcamento) {

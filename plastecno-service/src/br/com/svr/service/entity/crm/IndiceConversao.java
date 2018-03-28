@@ -20,16 +20,29 @@ public class IndiceConversao {
 	@Column(name = "id_cliente")
 	private Integer idCliente;
 
-	@Column(name = "indice_conversao_quantidade")
-	private double indiceQuandidade = 0d;
-
 	@Column(name = "indice_conversao_valor")
 	private double indiceValor = 0d;
 
+	@Column(name = "quantidade_orcamentos")
+	private long quantidadeOrcamentos = 0;
+
 	@Column(name = "quantidade_vendas")
-	private int quantidadeVendas = 0;
+	private long quantidadeVendas = 0;
+
+	@Column(name = "valor_orcamentos")
+	private double valorOrcamentos = 0;
+
+	@Column(name = "valor_vendas")
+	private double valorVendas = 0;
 
 	public IndiceConversao() {
+	}
+
+	public double calcularIndice() {
+		if (valorVendas == 0 || valorOrcamentos == 0) {
+			return 0d;
+		}
+		return indiceValor = valorVendas / valorOrcamentos;
 	}
 
 	public Integer getId() {
@@ -40,16 +53,24 @@ public class IndiceConversao {
 		return idCliente;
 	}
 
-	public double getIndiceQuandidade() {
-		return indiceQuandidade;
-	}
-
 	public double getIndiceValor() {
 		return indiceValor;
 	}
 
-	public int getQuantidadeVendas() {
+	public long getQuantidadeOrcamentos() {
+		return quantidadeOrcamentos;
+	}
+
+	public long getQuantidadeVendas() {
 		return quantidadeVendas;
+	}
+
+	public double getValorOrcamentos() {
+		return valorOrcamentos;
+	}
+
+	public double getValorVendas() {
+		return valorVendas;
 	}
 
 	public void setId(Integer id) {
@@ -60,16 +81,23 @@ public class IndiceConversao {
 		this.idCliente = idCliente;
 	}
 
-	public void setIndiceQuandidade(double indiceQuandidade) {
-		this.indiceQuandidade = indiceQuandidade;
-	}
-
 	public void setIndiceValor(double indiceValor) {
 		this.indiceValor = indiceValor;
 	}
 
-	public void setQuantidadeVendas(int quantidadeVendas) {
+	public void setQuantidadeOrcamentos(long quantidadeOrcamentos) {
+		this.quantidadeOrcamentos = quantidadeOrcamentos;
+	}
+
+	public void setQuantidadeVendas(long quantidadeVendas) {
 		this.quantidadeVendas = quantidadeVendas;
 	}
 
+	public void setValorOrcamentos(double valorOrcamentos) {
+		this.valorOrcamentos = valorOrcamentos;
+	}
+
+	public void setValorVendas(double valorVendas) {
+		this.valorVendas = valorVendas;
+	}
 }

@@ -163,10 +163,10 @@ public class PagamentoServiceTest extends AbstractTest {
 		double valICMS = i1.getValorICMS() + i2.getValorICMS() + i3.getValorICMS();
 
 		assertEquals("Os valores totais dos pagamentos da NF nao conferem com os valores totais dos itens dos pedidos",
-				NumeroUtils.formatarValorMonetario(valNF), NumeroUtils.formatarValorMonetario(totValNF));
+				NumeroUtils.formatarValor2Decimais(valNF), NumeroUtils.formatarValor2Decimais(totValNF));
 		assertEquals(
 				"Os valores totais do icms dos pagamentos da NF nao conferem com os valores totais do icms dos itens dos pedidos",
-				NumeroUtils.formatarValorMonetario(valICMS), NumeroUtils.formatarValorMonetario(totICMS));
+				NumeroUtils.formatarValor2Decimais(valICMS), NumeroUtils.formatarValor2Decimais(totICMS));
 	}
 
 	@Test

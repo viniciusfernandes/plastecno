@@ -176,7 +176,6 @@ public class NegociacaoServiceTest extends AbstractTest {
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
-		pedidoService.pesquisarValorPedidoIPI(o.getId());
 		Integer idCliente = pedidoService.pesquisarIdClienteByIdPedido(o.getId());
 
 		IndiceConversao idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);

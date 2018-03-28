@@ -53,7 +53,7 @@ public class EstoqueController extends AbstractController {
     public void calcularValorEstoque(Material material, FormaMaterial formaMaterial) {
         Double valorEstoque = estoqueService.calcularValorEstoque(material.getId(), formaMaterial);
 
-        addAtributo("valorEstoque", NumeroUtils.formatarValorMonetario(valorEstoque));
+        addAtributo("valorEstoque", NumeroUtils.formatarValor2Decimais(valorEstoque));
         addAtributo("formaSelecionada", formaMaterial);
         addAtributo("material", materialService.pesquisarById(material.getId()));
         irTopoPagina();

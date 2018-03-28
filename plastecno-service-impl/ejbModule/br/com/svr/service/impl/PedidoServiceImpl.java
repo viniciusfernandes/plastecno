@@ -1142,7 +1142,7 @@ public class PedidoServiceImpl implements PedidoService {
 		final Double precoUnidadeIPI = CalculadoraPreco.calcularPorUnidadeIPI(itemPedido);
 
 		itemPedido.setPrecoUnidadeIPI(precoUnidadeIPI);
-		itemPedido.setPrecoMinimo(NumeroUtils.arredondarValorMonetario(estoqueService
+		itemPedido.setPrecoMinimo(NumeroUtils.arredondarValor2Decimais(estoqueService
 				.calcularPrecoMinimoItemEstoque(itemPedido)));
 		itemPedido.setPrecoCusto(estoqueService.calcularPrecoCustoItemEstoque(itemPedido));
 

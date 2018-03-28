@@ -602,7 +602,7 @@ public class NFeServiceImpl implements NFeService {
 
 			// Valor padrao eh boleto pois eh o maior numero de ocorrencias
 			dup.setNumero("BOLETO");
-			dup.setValor(NumeroUtils.arredondarValorMonetario(valorDuplicata));
+			dup.setValor(NumeroUtils.arredondarValor2Decimais(valorDuplicata));
 
 			listaDuplicata.add(dup);
 		}

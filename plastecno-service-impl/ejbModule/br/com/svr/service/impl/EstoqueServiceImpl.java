@@ -165,7 +165,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		aliquotaICMSItem = aliquotaICMSItem != null ? aliquotaICMSItem : 0d;
 
 		double fatorICMS = aliquotaICMSRevendedor - aliquotaICMSItem;
-		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + fatorICMS));
+		return NumeroUtils.arredondarValor2Decimais(precoMedio * (1 + fatorICMS));
 	}
 
 	private void calcularPrecoMedioFatorICMS(ItemEstoque itemEstoque) {
@@ -263,8 +263,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 			aliqICMSMedio = 0d;
 		}
 
-		itemCadastrado.setPrecoMedio(NumeroUtils.arredondarValorMonetario(precoMedio));
-		itemCadastrado.setPrecoMedioFatorICMS(NumeroUtils.arredondarValorMonetario(precoMedioFatorICMS));
+		itemCadastrado.setPrecoMedio(NumeroUtils.arredondarValor2Decimais(precoMedio));
+		itemCadastrado.setPrecoMedioFatorICMS(NumeroUtils.arredondarValor2Decimais(precoMedioFatorICMS));
 		itemCadastrado.setAliquotaIPI(NumeroUtils.arredondar(aliqIPIMedio, 5));
 		itemCadastrado.setAliquotaICMS(NumeroUtils.arredondar(aliqICMSMedio, 5));
 		itemCadastrado.setQuantidade((int) quantidadeTotal);
@@ -286,7 +286,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 
 		// Precisamos arredondar
-		return NumeroUtils.arredondarValorMonetario(precoMedio * (1 + margemMinimaLucro) * (1 + aliquotaIPI));
+		return NumeroUtils.arredondarValor2Decimais(precoMedio * (1 + margemMinimaLucro) * (1 + aliquotaIPI));
 	}
 
 	private void calcularPrecoMinimo(ItemEstoque itemEstoque) {
@@ -319,7 +319,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	public Double calcularValorEstoque(Integer idMaterial, FormaMaterial formaMaterial) {
-		return NumeroUtils.arredondarValorMonetario(itemEstoqueDAO.calcularValorEstoque(idMaterial, formaMaterial));
+		return NumeroUtils.arredondarValor2Decimais(itemEstoqueDAO.calcularValorEstoque(idMaterial, formaMaterial));
 	}
 
 	@Override

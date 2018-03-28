@@ -56,8 +56,8 @@ public class RelatorioFaturamentoController extends AbstractController {
 
             addAtributoPDF("dataInicial", dtInicial);
             addAtributoPDF("dataFinal", dtFinal);
-            addAtributoPDF("vlTotal", NumeroUtils.arredondarValorMonetario(vlTotal));
-            addAtributoPDF("vlTotalICMS", NumeroUtils.arredondarValorMonetario(vlTotalICMS));
+            addAtributoPDF("vlTotal", NumeroUtils.arredondarValor2Decimais(vlTotal));
+            addAtributoPDF("vlTotalICMS", NumeroUtils.arredondarValor2Decimais(vlTotalICMS));
             addAtributoPDF("listaNFe", lNfe);
 
             processarPDF("relatorioFaturamento.html");

@@ -69,9 +69,9 @@ public class RelatorioVendaRepresentadaController extends AbstractController {
 
             addAtributoPDF("representada", representada);
             addAtributoPDF("listaPedido", listaPedido);
-            addAtributoPDF("totalVendido", NumeroUtils.formatarValorMonetario(totalVendido));
+            addAtributoPDF("totalVendido", NumeroUtils.formatarValor2Decimais(totalVendido));
             addAtributoPDF("valorComissao",
-                    NumeroUtils.formatarValorMonetario(totalVendido * representada.getComissao()));
+                    NumeroUtils.formatarValor2Decimais(totalVendido * representada.getComissao()));
             addAtributoPDF("dataInicial", dataInicialFormatada);
             addAtributoPDF("dataFinal", dataFinalFormatada);
             processarPDF("relatorioPedido.html");

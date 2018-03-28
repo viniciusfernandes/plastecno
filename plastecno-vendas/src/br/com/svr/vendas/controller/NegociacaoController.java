@@ -48,9 +48,9 @@ public class NegociacaoController extends AbstractController {
             Integer idVendedor = getCodigoUsuario();
 
             ValorNegociacaoJson v = new ValorNegociacaoJson();
-            v.setValorCategoriaInicial(NumeroUtils.formatarValorMonetario(negociacaoService
+            v.setValorCategoriaInicial(NumeroUtils.formatarValor2Decimais(negociacaoService
                     .calcularValorCategoriaNegociacaoAberta(idVendedor, categoriaInicial)));
-            v.setValorCategoriaFinal(NumeroUtils.formatarValorMonetario(negociacaoService
+            v.setValorCategoriaFinal(NumeroUtils.formatarValor2Decimais(negociacaoService
                     .calcularValorCategoriaNegociacaoAberta(idVendedor, categoriaFinal)));
 
             serializarJson(new SerializacaoJson("valores", v));
@@ -103,13 +103,13 @@ public class NegociacaoController extends AbstractController {
                 .gerarRelatorioNegociacao(getCodigoUsuario());
 
         for (GrupoWrapper<CategoriaNegociacao, Negociacao> g : rel.getListaGrupo()) {
-            g.setPropriedade("valorTotal", NumeroUtils.formatarValorMonetario((Double) g.getPropriedade("valorTotal")));
+            g.setPropriedade("valorTotal", NumeroUtils.formatarValor2Decimais((Double) g.getPropriedade("valorTotal")));
 
             for (Negociacao n : g.getListaElemento()) {
                 if (n == null) {
                     continue;
                 }
-                n.setIndiceConversaoValor(NumeroUtils.arredondarValorMonetario(n.getIndiceConversaoValor()));
+                n.setIndiceConversaoValor(NumeroUtils.gerarPercentual2Decimais(n.getIndiceConversaoValor()));
             }
         }
 

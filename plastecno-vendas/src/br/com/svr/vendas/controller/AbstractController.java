@@ -299,10 +299,10 @@ public abstract class AbstractController {
     }
 
     void formatarItemEstoque(ItemEstoque item) {
-        item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
-        item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
-        item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
-        item.setPrecoMedioFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoMedio()));
+        item.setMedidaExternaFomatada(NumeroUtils.formatarValor2Decimais(item.getMedidaExterna()));
+        item.setMedidaInternaFomatada(NumeroUtils.formatarValor2Decimais(item.getMedidaInterna()));
+        item.setComprimentoFormatado(NumeroUtils.formatarValor2Decimais(item.getComprimento()));
+        item.setPrecoMedioFormatado(NumeroUtils.formatarValor2Decimais(item.getPrecoMedio()));
         item.setMargemMinimaLucro(NumeroUtils.gerarPercentualInteiro(item.getMargemMinimaLucro()));
     }
 
@@ -323,18 +323,18 @@ public abstract class AbstractController {
         p.setDataEmissaoFormatada(StringUtils.formatarData(p.getDataEmissao()));
         p.setDataRecebimentoFormatada(StringUtils.formatarData(p.getDataRecebimento()));
 
-        p.setValor(NumeroUtils.arredondarValorMonetario(p.getValor()));
-        p.setValorCreditoICMS(NumeroUtils.arredondarValorMonetario(p.getValorCreditoICMS()));
-        p.setValorNF(NumeroUtils.arredondarValorMonetario(p.getValorNF()));
+        p.setValor(NumeroUtils.arredondarValor2Decimais(p.getValor()));
+        p.setValorCreditoICMS(NumeroUtils.arredondarValor2Decimais(p.getValorCreditoICMS()));
+        p.setValorNF(NumeroUtils.arredondarValor2Decimais(p.getValorNF()));
     }
 
     void formatarPedido(Pedido pedido) {
         pedido.setDataEnvioFormatada(formatarData(pedido.getDataEnvio()));
         pedido.setDataEntregaFormatada(formatarData(pedido.getDataEntrega()));
-        pedido.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedido()));
-        pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorPedidoIPI()));
-        pedido.setValorTotalSemFreteFormatado(NumeroUtils.formatarValorMonetario(pedido.calcularValorTotalSemFrete()));
-        pedido.setValorFreteFormatado(NumeroUtils.formatarValorMonetario(pedido.getValorFrete()));
+        pedido.setValorPedidoFormatado(NumeroUtils.formatarValor2Decimais(pedido.getValorPedido()));
+        pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValor2Decimais(pedido.getValorPedidoIPI()));
+        pedido.setValorTotalSemFreteFormatado(NumeroUtils.formatarValor2Decimais(pedido.calcularValorTotalSemFrete()));
+        pedido.setValorFreteFormatado(NumeroUtils.formatarValor2Decimais(pedido.getValorFrete()));
         pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
         pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));
     }

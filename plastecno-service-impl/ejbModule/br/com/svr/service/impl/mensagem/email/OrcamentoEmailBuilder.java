@@ -17,7 +17,7 @@ public class OrcamentoEmailBuilder extends PedidoEmailBuilder {
 	@Override
 	public String gerarConteudo() {
 		return "Prezado " + pedido.getContato().getNome() + ", segue o orçamento para analise. Valor total de R$ "
-				+ NumeroUtils.formatarValorMonetario(pedido.getValorPedido());
+				+ NumeroUtils.formatarValor2Decimais(pedido.getValorPedido());
 	}
 
 	@Override

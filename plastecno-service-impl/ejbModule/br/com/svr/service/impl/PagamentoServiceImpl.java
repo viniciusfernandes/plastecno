@@ -185,16 +185,16 @@ public class PagamentoServiceImpl implements PagamentoService {
 		}
 
 		relatorio.addPropriedade("qtde", lPagamento.size());
-		relatorio.addPropriedade("tot", NumeroUtils.formatarValorMonetario(tot));
-		relatorio.addPropriedade("totCredICMS", NumeroUtils.formatarValorMonetario(totCredICMS));
+		relatorio.addPropriedade("tot", NumeroUtils.formatarValor2Decimais(tot));
+		relatorio.addPropriedade("totCredICMS", NumeroUtils.formatarValor2Decimais(totCredICMS));
 
 		// Arredondando o valor total das NFs no fim para evitar problemas de
 		// arredondamentos
 		List<GrupoWrapper<String, Pagamento>> lGRupo = relatorio.getListaGrupo();
 		for (GrupoWrapper<String, Pagamento> g : lGRupo) {
-			g.setPropriedade(VL_PARCELA, NumeroUtils.arredondarValorMonetario((Double) g.getPropriedade(VL_PARCELA)));
+			g.setPropriedade(VL_PARCELA, NumeroUtils.arredondarValor2Decimais((Double) g.getPropriedade(VL_PARCELA)));
 			g.setPropriedade(VL_PARCELA_NF,
-					NumeroUtils.arredondarValorMonetario((Double) g.getPropriedade(VL_PARCELA_NF)));
+					NumeroUtils.arredondarValor2Decimais((Double) g.getPropriedade(VL_PARCELA_NF)));
 		}
 
 		Collections.sort(lGRupo, new Comparator<GrupoWrapper<String, Pagamento>>() {

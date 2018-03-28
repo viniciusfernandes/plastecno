@@ -19,7 +19,7 @@ class Grupo {
 	Grupo(String nome, Double valor) {
 		this.nome = nome;
 		this.valor = valor;
-		this.valorFormatado = NumeroUtils.formatarValorMonetario(valor);
+		this.valorFormatado = NumeroUtils.formatarValor2Decimais(valor);
 	}
 
 	void addSubgrupo(Grupo grupo) {
@@ -63,7 +63,7 @@ class Grupo {
 	}
 
 	String getValorTotalFormatado() {
-		return NumeroUtils.formatarValorMonetario(this.getValorTotal());
+		return NumeroUtils.formatarValor2Decimais(this.getValorTotal());
 	}
 	
 	void limparListaSubgrupo() {

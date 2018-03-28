@@ -103,7 +103,7 @@ public class EmissaoNFeController extends AbstractController {
                 peso += i.getPeso();
             }
         }
-        return NumeroUtils.arredondarValorMonetario(peso);
+        return NumeroUtils.arredondarValor2Decimais(peso);
     }
 
     @Get("emissaoNFe")
@@ -282,19 +282,19 @@ public class EmissaoNFeController extends AbstractController {
         ProdutoServicoJson p = null;
         for (Object[] val : listaValores) {
             p = new ProdutoServicoJson();
-            p.setAliquotaICMS(NumeroUtils.arredondarValorMonetario((Double) val[0]));
-            p.setAliquotaIPI(NumeroUtils.arredondarValorMonetario((Double) val[1]));
+            p.setAliquotaICMS(NumeroUtils.arredondarValor2Decimais((Double) val[0]));
+            p.setAliquotaIPI(NumeroUtils.arredondarValor2Decimais((Double) val[1]));
             p.setCfop((String) val[2]);
             p.setDescricao((String) val[3]);
             p.setNcm((String) val[4]);
             p.setNumeroItem((Integer) val[5]);
             p.setQuantidade((Integer) val[6]);
             p.setUnidadeComercial((String) val[7]);
-            p.setValorTotalBruto(NumeroUtils.arredondarValorMonetario((Double) val[8]));
-            p.setValorUnitarioComercializacao(NumeroUtils.arredondarValorMonetario((Double) val[9]));
-            p.setValorUnitarioTributavel(NumeroUtils.arredondarValorMonetario((Double) val[10]));
-            p.setValorICMS(NumeroUtils.arredondarValorMonetario((Double) val[11]));
-            p.setValorIPI(NumeroUtils.arredondarValorMonetario((Double) val[12]));
+            p.setValorTotalBruto(NumeroUtils.arredondarValor2Decimais((Double) val[8]));
+            p.setValorUnitarioComercializacao(NumeroUtils.arredondarValor2Decimais((Double) val[9]));
+            p.setValorUnitarioTributavel(NumeroUtils.arredondarValor2Decimais((Double) val[10]));
+            p.setValorICMS(NumeroUtils.arredondarValor2Decimais((Double) val[11]));
+            p.setValorIPI(NumeroUtils.arredondarValor2Decimais((Double) val[12]));
             p.setCodigo((String) val[13]);
             l.add(p);
         }
@@ -354,11 +354,11 @@ public class EmissaoNFeController extends AbstractController {
             val[5] = i.getSequencial();
             val[6] = i.getQuantidade();
             val[7] = i.getTipoVenda().toString();
-            val[8] = NumeroUtils.arredondarValorMonetario(i.calcularPrecoTotalVenda());
-            val[9] = NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade());
-            val[10] = NumeroUtils.arredondarValorMonetario(i.getPrecoUnidade());
-            val[11] = NumeroUtils.arredondarValorMonetario(i.calcularValorICMS());
-            val[12] = NumeroUtils.arredondarValorMonetario(i.calcularValorIPI());
+            val[8] = NumeroUtils.arredondarValor2Decimais(i.calcularPrecoTotalVenda());
+            val[9] = NumeroUtils.arredondarValor2Decimais(i.getPrecoUnidade());
+            val[10] = NumeroUtils.arredondarValor2Decimais(i.getPrecoUnidade());
+            val[11] = NumeroUtils.arredondarValor2Decimais(i.calcularValorICMS());
+            val[12] = NumeroUtils.arredondarValor2Decimais(i.calcularValorIPI());
             val[13] = i.gerarCodigo();
             l.add(val);
         }
@@ -441,7 +441,7 @@ public class EmissaoNFeController extends AbstractController {
             // fracionada
             List<ItemPedido> listaItem = nFeService.pesquisarQuantitadeItemRestanteByIdPedido(idPedido);
 
-            double vFrete = NumeroUtils.arredondarValorMonetario(pedidoService
+            double vFrete = NumeroUtils.arredondarValor2Decimais(pedidoService
                     .calcularValorFretePorItemByIdPedido(idPedido));
             addAtributo("valorFrete", vFrete);
             String numPedCli = pedidoService.pesquisarNumeroPedidoClienteByIdPedido(idPedido);
@@ -462,7 +462,7 @@ public class EmissaoNFeController extends AbstractController {
 
             addAtributo("quantidade", 1);
             addAtributo("valorFretePedido", valFreteUni[0]);
-            addAtributo("valorFreteUnidade", NumeroUtils.arredondarValorMonetario(valFreteUni[1]));
+            addAtributo("valorFreteUnidade", NumeroUtils.arredondarValor2Decimais(valFreteUni[1]));
             addAtributo("pesoLiquido", peso);
             addAtributo("pesoBruto", peso);
             addAtributo("especieVolume", "VOLUME");
@@ -565,7 +565,7 @@ public class EmissaoNFeController extends AbstractController {
         Double[] valFreteUni = pedidoService.calcularValorFreteUnidadeByIdPedido(idPedido);
 
         addAtributo("valorFretePedido", valFreteUni[0]);
-        addAtributo("valorFreteUnidade", NumeroUtils.arredondarValorMonetario(valFreteUni[1]));
+        addAtributo("valorFreteUnidade", NumeroUtils.arredondarValor2Decimais(valFreteUni[1]));
 
         IdentificacaoNFe iNFe = null;
         if ((iNFe = nf.getIdentificacaoNFe()) != null) {

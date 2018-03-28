@@ -67,23 +67,23 @@ public class FluxoCaixaController extends AbstractController {
             String label = null;
             for (Fluxo f : lFluxo) {
                 label = mapMes.get(f.getMes()) + "/" + f.getAno();
-                grfFluxoMensal.adicionar(label, NumeroUtils.arredondarValorMonetario(f.getValFluxo()));
-                grfFatMensal.adicionar(label, NumeroUtils.arredondarValorMonetario(f.getValDuplicata()));
-                grfPagMensal.adicionar(label, NumeroUtils.arredondarValorMonetario(-f.getValPagamento()));
+                grfFluxoMensal.adicionar(label, NumeroUtils.arredondarValor2Decimais(f.getValFluxo()));
+                grfFatMensal.adicionar(label, NumeroUtils.arredondarValor2Decimais(f.getValDuplicata()));
+                grfPagMensal.adicionar(label, NumeroUtils.arredondarValor2Decimais(-f.getValPagamento()));
             }
 
             // gerando o grafico de pagamento por tipo de pagamento
             List<Fluxo> lFluxoPag = fluxoCaixa.gerarFluxoByTipoPagamento();
             for (Fluxo f : lFluxoPag) {
                 grfTipoPag.adicionar(f.getTipoPagamento().toString(),
-                        NumeroUtils.arredondarValorMonetario(f.getValPagamento()));
+                        NumeroUtils.arredondarValor2Decimais(f.getValPagamento()));
             }
 
             // gerando o grafico de fluxo de caixa anual
             List<Fluxo> lFluxoAnual = fluxoCaixa.gerarFluxoByAno();
             for (Fluxo f : lFluxoAnual) {
                 gValFatAnual.adicionar(String.valueOf(f.getAno()),
-                        NumeroUtils.arredondarValorMonetario(f.getValFluxo()));
+                        NumeroUtils.arredondarValor2Decimais(f.getValFluxo()));
             }
 
             FluxoCaixaPainelGrafico2D grfPainel = new FluxoCaixaPainelGrafico2D();

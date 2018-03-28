@@ -139,7 +139,7 @@ public class PedidoController extends AbstractPedidoController {
     public void calcularPesoItem(ItemPedido item) {
         try {
             Double peso = pedidoService.calcularPesoItemPedido(item);
-            String pesoFormatado = peso == null ? "" : String.valueOf(NumeroUtils.arredondarValorMonetario(peso));
+            String pesoFormatado = peso == null ? "" : String.valueOf(NumeroUtils.arredondarValor2Decimais(peso));
             serializarJson(new SerializacaoJson("peso", pesoFormatado));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));

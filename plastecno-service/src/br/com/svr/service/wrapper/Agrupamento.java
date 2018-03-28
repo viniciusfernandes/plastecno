@@ -62,6 +62,6 @@ class Agrupamento<T extends Grupo, K extends Grupo> {
     }
 
     public String getValorTotalAgrupadoFormatado() {
-        return NumeroUtils.formatarValorMonetario(this.getValorTotalAgrupado());
+        return NumeroUtils.formatarValor2Decimais(this.getValorTotalAgrupado());
     }
 }

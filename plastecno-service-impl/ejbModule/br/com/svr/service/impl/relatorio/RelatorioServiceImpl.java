@@ -230,17 +230,17 @@ public class RelatorioServiceImpl implements RelatorioService {
 		double valorLiquido = valorReceita - valorIPI - valorICMS - valorComissionado;
 
 		ReceitaWrapper receita = new ReceitaWrapper();
-		receita.setValorCompradoFormatado(NumeroUtils.formatarValorMonetario(valorComprado));
-		receita.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(valorVendido));
-		receita.setValorCreditoICMSFormatado(NumeroUtils.formatarValorMonetario(valorCreditoICMS));
-		receita.setValorDebitoICMSFormatado(NumeroUtils.formatarValorMonetario(valorDebitoICMS));
-		receita.setValorCreditoIPIFormatado(NumeroUtils.formatarValorMonetario(valorCreditoIPI));
-		receita.setValorDebitoIPIFormatado(NumeroUtils.formatarValorMonetario(valorDebitoIPI));
-		receita.setValorICMSFormatado(NumeroUtils.formatarValorMonetario(valorICMS));
-		receita.setValorIPIFormatado(NumeroUtils.formatarValorMonetario(valorIPI));
-		receita.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(valorComissionado));
-		receita.setValorLiquidoFormatado(NumeroUtils.formatarValorMonetario(valorLiquido));
-		receita.setValorReceitaFormatado(NumeroUtils.formatarValorMonetario(valorReceita));
+		receita.setValorCompradoFormatado(NumeroUtils.formatarValor2Decimais(valorComprado));
+		receita.setValorVendidoFormatado(NumeroUtils.formatarValor2Decimais(valorVendido));
+		receita.setValorCreditoICMSFormatado(NumeroUtils.formatarValor2Decimais(valorCreditoICMS));
+		receita.setValorDebitoICMSFormatado(NumeroUtils.formatarValor2Decimais(valorDebitoICMS));
+		receita.setValorCreditoIPIFormatado(NumeroUtils.formatarValor2Decimais(valorCreditoIPI));
+		receita.setValorDebitoIPIFormatado(NumeroUtils.formatarValor2Decimais(valorDebitoIPI));
+		receita.setValorICMSFormatado(NumeroUtils.formatarValor2Decimais(valorICMS));
+		receita.setValorIPIFormatado(NumeroUtils.formatarValor2Decimais(valorIPI));
+		receita.setValorComissionadoFormatado(NumeroUtils.formatarValor2Decimais(valorComissionado));
+		receita.setValorLiquidoFormatado(NumeroUtils.formatarValor2Decimais(valorLiquido));
+		receita.setValorReceitaFormatado(NumeroUtils.formatarValor2Decimais(valorReceita));
 		return receita;
 	}
 
@@ -292,7 +292,7 @@ public class RelatorioServiceImpl implements RelatorioService {
 		for (ItemPedido itemPedido : listaItemPedido) {
 			valorTotalComissionado += itemPedido.getValorComissionado() == null ? 0 : itemPedido.getValorComissionado();
 		}
-		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotalComissionado));
+		relatorio.setValorTotal(NumeroUtils.formatarValor2Decimais(valorTotalComissionado));
 		return relatorio;
 	}
 
@@ -332,11 +332,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 		}
 
 		for (ComissaoVendaWrapper c : relatorio.getListaElemento()) {
-			c.setValorVendidoFormatado(NumeroUtils.formatarValorMonetario(c.getValorVendido()));
-			c.setValorComissaoFormatado(NumeroUtils.formatarValorMonetario(c.getValorComissao()));
+			c.setValorVendidoFormatado(NumeroUtils.formatarValor2Decimais(c.getValorVendido()));
+			c.setValorComissaoFormatado(NumeroUtils.formatarValor2Decimais(c.getValorComissao()));
 		}
 
-		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotalComissionado));
+		relatorio.setValorTotal(NumeroUtils.formatarValor2Decimais(valorTotalComissionado));
 		return relatorio;
 	}
 
@@ -419,13 +419,13 @@ public class RelatorioServiceImpl implements RelatorioService {
 		// Apenas formantando os valores apos as totalizacoes para evitar
 		// diferencas nos arredondamentos.
 		relatorio.addPropriedade("qtde", qtde);
-		relatorio.addPropriedade("totReceber", NumeroUtils.arredondarValorMonetario(totReceber));
-		relatorio.addPropriedade("tot", NumeroUtils.arredondarValorMonetario(tot));
+		relatorio.addPropriedade("totReceber", NumeroUtils.arredondarValor2Decimais(totReceber));
+		relatorio.addPropriedade("tot", NumeroUtils.arredondarValor2Decimais(tot));
 
 		for (GrupoWrapper<Date, NFeDuplicata> gr : relatorio.getListaGrupo()) {
-			gr.setPropriedade("totDia", NumeroUtils.arredondarValorMonetario((Double) gr.getPropriedade("totDia")));
+			gr.setPropriedade("totDia", NumeroUtils.arredondarValor2Decimais((Double) gr.getPropriedade("totDia")));
 			gr.setPropriedade("totReceberDia",
-					NumeroUtils.arredondarValorMonetario((Double) gr.getPropriedade("totReceberDia")));
+					NumeroUtils.arredondarValor2Decimais((Double) gr.getPropriedade("totReceberDia")));
 		}
 
 		relatorio.sortGrupo(new Comparator<GrupoWrapper<Date, NFeDuplicata>>() {
@@ -592,20 +592,20 @@ public class RelatorioServiceImpl implements RelatorioService {
 		RelatorioWrapper<Integer, ItemPedido> relatorio = new RelatorioWrapper<Integer, ItemPedido>(titulo);
 		for (ItemPedido item : listaItem) {
 
-			item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
-			item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
-			item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
-			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
-			item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
-			item.setPrecoCustoItemFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoCusto()));
+			item.setMedidaExternaFomatada(NumeroUtils.formatarValor2Decimais(item.getMedidaExterna()));
+			item.setMedidaInternaFomatada(NumeroUtils.formatarValor2Decimais(item.getMedidaInterna()));
+			item.setComprimentoFormatado(NumeroUtils.formatarValor2Decimais(item.getComprimento()));
+			item.setPrecoUnidadeFormatado(NumeroUtils.formatarValor2Decimais(item.getPrecoUnidade()));
+			item.setPrecoItemFormatado(NumeroUtils.formatarValor2Decimais(item.calcularPrecoItem()));
+			item.setPrecoCustoItemFormatado(NumeroUtils.formatarValor2Decimais(item.getPrecoCusto()));
 
 			if (isComissaoFormatado) {
 				item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao(), 2));
 				item.setAliquotaComissaoRepresentadaFormatado(NumeroUtils.formatarPercentualInteiro(item
 						.getAliquotaComissaoRepresentada()));
 
-				item.setValorComissionadoFormatado(NumeroUtils.formatarValorMonetario(item.getValorComissionado()));
-				item.setValorComissionadoRepresentadaFormatado(NumeroUtils.formatarValorMonetario(item
+				item.setValorComissionadoFormatado(NumeroUtils.formatarValor2Decimais(item.getValorComissionado()));
+				item.setValorComissionadoRepresentadaFormatado(NumeroUtils.formatarValor2Decimais(item
 						.getValorComissionadoRepresentada()));
 			}
 			relatorio.addGrupo(item.getIdPedido(), item).setPropriedade("dataEntrega",
@@ -726,14 +726,14 @@ public class RelatorioServiceImpl implements RelatorioService {
 		double valorTotal = 0d;
 		for (TotalizacaoPedidoWrapper totalizacao : listaPedido) {
 			try {
-				totalizacao.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(totalizacao.getValorTotal()));
+				totalizacao.setValorTotalFormatado(NumeroUtils.formatarValor2Decimais(totalizacao.getValorTotal()));
 				relatorio.addGrupo(totalizacao.getNomeCliente(), totalizacao);
 				valorTotal += totalizacao.getValorTotal();
 			} catch (Exception e) {
 				throw new BusinessException("Falha na geracao do relatorio de vendas para o cliente " + idCliente, e);
 			}
 		}
-		relatorio.setValorTotal(NumeroUtils.formatarValorMonetario(valorTotal));
+		relatorio.setValorTotal(NumeroUtils.formatarValor2Decimais(valorTotal));
 		return relatorio;
 	}
 

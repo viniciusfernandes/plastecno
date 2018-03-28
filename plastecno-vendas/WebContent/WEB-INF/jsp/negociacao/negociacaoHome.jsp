@@ -248,7 +248,7 @@ function aceitarNegociacao(idNegociacao){
 				<span>${neg.nomeCliente}</span>
 			</a>
 			<a class="front" href="javascript: void(0);" draggable="false">
-				<span>Conversão: ${neg.indiceConversaoValor} vezes</span>
+				<span>Conversão: ${neg.indiceConversaoValor} %</span>
 			</a>
 			<a class="front" href="javascript: void(0);" draggable="false">
 				<span>${neg.nomeContato}</span>

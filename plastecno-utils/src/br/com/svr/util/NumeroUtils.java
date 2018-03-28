@@ -27,7 +27,7 @@ public final class NumeroUtils {
 		return new BigDecimal(valor).setScale(escala, BigDecimal.ROUND_HALF_UP).floatValue();
 	}
 
-	public static Double arredondarValorMonetario(Double valor) {
+	public static Double arredondarValor2Decimais(Double valor) {
 		return arredondar(valor, ESCALA_MONETARIA);
 	}
 
@@ -39,7 +39,7 @@ public final class NumeroUtils {
 		return String.valueOf(gerarPercentualInteiro(decimal).intValue());
 	}
 
-	public static String formatarValorMonetario(Double valor) {
+	public static String formatarValor2Decimais(Double valor) {
 		return valor == null ? null : FORMATADOR_DECIMAL.format(valor);
 	}
 
@@ -61,15 +61,12 @@ public final class NumeroUtils {
 		return arredondar(decimal * CEM, escala);
 	}
 
-	public static Double gerarPercentualInteiro(Double decimal) {
-		return gerarPercentual(decimal, 0);
+	public static Double gerarPercentual2Decimais(Double decimal) {
+		return gerarPercentual(decimal, 2);
 	}
 
-	public static double normalizarPercentual(Double percentual) {
-		if (percentual == null) {
-			return 0.00;
-		}
-		return arredondar(percentual, ESCALA_MONETARIA);
+	public static Double gerarPercentualInteiro(Double decimal) {
+		return gerarPercentual(decimal, 0);
 	}
 
 	private NumeroUtils() {

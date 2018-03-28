@@ -119,18 +119,18 @@ public class AbstractPedidoController extends AbstractController {
     void formatarItemPedido(ItemPedido item) {
         item.setAliquotaICMSFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaICMS()));
         item.setAliquotaIPIFormatado(NumeroUtils.formatarPercentualInteiro(item.getAliquotaIPI()));
-        item.setPrecoUnidadeFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidade()));
-        item.setPrecoUnidadeIPIFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoUnidadeIPI()));
-        item.setPrecoVendaFormatado(NumeroUtils.formatarValorMonetario(item.getPrecoVenda()));
-        item.setPrecoItemFormatado(NumeroUtils.formatarValorMonetario(item.calcularPrecoItem()));
-        item.setMedidaExternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaExterna()));
-        item.setMedidaInternaFomatada(NumeroUtils.formatarValorMonetario(item.getMedidaInterna()));
-        item.setComprimentoFormatado(NumeroUtils.formatarValorMonetario(item.getComprimento()));
-        item.setValorPedidoFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedido()));
-        item.setValorPedidoIPIFormatado(NumeroUtils.formatarValorMonetario(item.getValorPedidoIPI()));
-        item.setValorICMSFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getValorICMS())));
-        item.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValorMonetario(item.getPrecoUnidadeIPI())));
-        item.setValorTotalPedidoSemFreteFormatado(NumeroUtils.formatarValorMonetario(item.getValorTotalPedidoSemFrete()));
+        item.setPrecoUnidadeFormatado(NumeroUtils.formatarValor2Decimais(item.getPrecoUnidade()));
+        item.setPrecoUnidadeIPIFormatado(NumeroUtils.formatarValor2Decimais(item.getPrecoUnidadeIPI()));
+        item.setPrecoVendaFormatado(NumeroUtils.formatarValor2Decimais(item.getPrecoVenda()));
+        item.setPrecoItemFormatado(NumeroUtils.formatarValor2Decimais(item.calcularPrecoItem()));
+        item.setMedidaExternaFomatada(NumeroUtils.formatarValor2Decimais(item.getMedidaExterna()));
+        item.setMedidaInternaFomatada(NumeroUtils.formatarValor2Decimais(item.getMedidaInterna()));
+        item.setComprimentoFormatado(NumeroUtils.formatarValor2Decimais(item.getComprimento()));
+        item.setValorPedidoFormatado(NumeroUtils.formatarValor2Decimais(item.getValorPedido()));
+        item.setValorPedidoIPIFormatado(NumeroUtils.formatarValor2Decimais(item.getValorPedidoIPI()));
+        item.setValorICMSFormatado(String.valueOf(NumeroUtils.arredondarValor2Decimais(item.getValorICMS())));
+        item.setValorIPIFormatado(String.valueOf(NumeroUtils.arredondarValor2Decimais(item.getPrecoUnidadeIPI())));
+        item.setValorTotalPedidoSemFreteFormatado(NumeroUtils.formatarValor2Decimais(item.getValorTotalPedidoSemFrete()));
         if (item.contemAliquotaComissao()) {
             item.setAliquotaComissaoFormatado(NumeroUtils.formatarPercentual(item.getAliquotaComissao(), 4));
         }

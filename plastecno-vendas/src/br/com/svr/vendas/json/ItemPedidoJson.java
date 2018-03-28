@@ -62,7 +62,7 @@ public class ItemPedidoJson {
         aliquotaComissao = itemPedido.getAliquotaComissaoFormatado();
         ncm = itemPedido.getNcm();
         tipoCST = itemPedido.getTipoCst() != null ? itemPedido.getTipoCst().toString() : "";
-        peso = itemPedido.getPeso() == null ? "" : NumeroUtils.arredondarValorMonetario(itemPedido.getPeso())
+        peso = itemPedido.getPeso() == null ? "" : NumeroUtils.arredondarValor2Decimais(itemPedido.getPeso())
                 .toString();
         valorTotalPedidoSemFrete = itemPedido.getValorTotalPedidoSemFreteFormatado();
     }

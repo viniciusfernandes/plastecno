@@ -63,19 +63,19 @@ public class RelatorioValorTotalPedidoWrapper extends RelatorioWrapper<Integer, 
 	public RelatorioValorTotalPedidoWrapper formatarValores() {
 		for (GrupoWrapper<Integer, TotalizacaoPedidoWrapper> g : super.getListaGrupo()) {
 			for (TotalizacaoPedidoWrapper t : g.getListaElemento()) {
-				t.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(t.getValorTotal()));
-				t.setValorTotalIPIFormatado(NumeroUtils.formatarValorMonetario(t.getValorTotalIPI()));
+				t.setValorTotalFormatado(NumeroUtils.formatarValor2Decimais(t.getValorTotal()));
+				t.setValorTotalIPIFormatado(NumeroUtils.formatarValor2Decimais(t.getValorTotalIPI()));
 			}
 			g.setPropriedade("valorTotalFormatado",
-					NumeroUtils.formatarValorMonetario((Double) g.getPropriedade("valorTotal")));
+					NumeroUtils.formatarValor2Decimais((Double) g.getPropriedade("valorTotal")));
 			g.setPropriedade("valorTotalIPIFormatado",
-					NumeroUtils.formatarValorMonetario((Double) g.getPropriedade("valorTotalIPI")));
+					NumeroUtils.formatarValor2Decimais((Double) g.getPropriedade("valorTotalIPI")));
 		}
 
 		// Formatando a totalizacao das representadas
 		for (TotalizacaoPedidoWrapper t : super.getListaElemento()) {
-			t.setValorTotalFormatado(NumeroUtils.formatarValorMonetario(t.getValorTotal()));
-			t.setValorTotalIPIFormatado(NumeroUtils.formatarValorMonetario(t.getValorTotalIPI()));
+			t.setValorTotalFormatado(NumeroUtils.formatarValor2Decimais(t.getValorTotal()));
+			t.setValorTotalIPIFormatado(NumeroUtils.formatarValor2Decimais(t.getValorTotalIPI()));
 		}
 
 		calcularTotaisGerais();
@@ -88,7 +88,7 @@ public class RelatorioValorTotalPedidoWrapper extends RelatorioWrapper<Integer, 
 	}
 
 	public String getTotalGeralFormatado() {
-		return NumeroUtils.formatarValorMonetario(totalGeral);
+		return NumeroUtils.formatarValor2Decimais(totalGeral);
 	}
 
 	public double getTotalGeralIPI() {
@@ -96,10 +96,10 @@ public class RelatorioValorTotalPedidoWrapper extends RelatorioWrapper<Integer, 
 	}
 
 	public String getTotalGeralIPIFormatado() {
-		return NumeroUtils.formatarValorMonetario(totalGeralIPI);
+		return NumeroUtils.formatarValor2Decimais(totalGeralIPI);
 	}
 
 	public String getValorIPIFormatado() {
-		return NumeroUtils.formatarValorMonetario(totalGeralIPI - totalGeral);
+		return NumeroUtils.formatarValor2Decimais(totalGeralIPI - totalGeral);
 	}
 }

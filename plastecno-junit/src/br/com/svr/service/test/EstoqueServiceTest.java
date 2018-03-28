@@ -690,7 +690,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		assertEquals(
 				"Apos a inclusao de um item novo deve-se aplicar o fator ICMS no preco de custo. Verifique o algoritmo de calculo",
-				precoFatorICMS, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedioFatorICMS()));
+				precoFatorICMS, NumeroUtils.arredondarValor2Decimais(itemEstoque.getPrecoMedioFatorICMS()));
 	}
 
 	@Test
@@ -825,19 +825,19 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		assertEquals(
 				"O preco medio de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
-				precoMedioReajustadoCH, NumeroUtils.arredondarValorMonetario(itemCH.getPrecoMedio()));
+				precoMedioReajustadoCH, NumeroUtils.arredondarValor2Decimais(itemCH.getPrecoMedio()));
 
 		assertEquals(
 				"O preco medio com fator ICMS de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
-				precoMedioFatorICMSReajustadoCH, NumeroUtils.arredondarValorMonetario(itemCH.getPrecoMedioFatorICMS()));
+				precoMedioFatorICMSReajustadoCH, NumeroUtils.arredondarValor2Decimais(itemCH.getPrecoMedioFatorICMS()));
 
 		assertEquals(
 				"O preco medio do tubo nao pode ter sido reajustado pois estamos reajustanto uma chapa. Verifique o algoritmo de reajuste",
-				precoMedioReajustadoTB, NumeroUtils.arredondarValorMonetario(itemTB.getPrecoMedio()));
+				precoMedioReajustadoTB, NumeroUtils.arredondarValor2Decimais(itemTB.getPrecoMedio()));
 
 		assertEquals(
 				"O preco medio com fator ICMS do tubo nao pode ter sido reajustado pois estamos reajustanto uma chapa. Verifique o algoritmo de reajuste",
-				precoMedioFatorICMSReajustadoTB, NumeroUtils.arredondarValorMonetario(itemTB.getPrecoMedioFatorICMS()));
+				precoMedioFatorICMSReajustadoTB, NumeroUtils.arredondarValor2Decimais(itemTB.getPrecoMedioFatorICMS()));
 
 		boolean throwed = false;
 		itemCH.setId(null);
@@ -894,12 +894,12 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		assertEquals(
 				"O preco medio de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
-				precoMedioReajustado, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
+				precoMedioReajustado, NumeroUtils.arredondarValor2Decimais(itemEstoque.getPrecoMedio()));
 
 		assertEquals(
 				"O preco medio com fator ICMS de um determinado item de estoque foi reajustado. Verifique o algoritmo de reajuste",
 				precoMedioFatorICMSReajustado,
-				NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedioFatorICMS()));
+				NumeroUtils.arredondarValor2Decimais(itemEstoque.getPrecoMedioFatorICMS()));
 	}
 
 	@Test
@@ -957,7 +957,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		Double precoMedioComFatorIPI = 68.42;
 
 		assertEquals("O valor do preco medio apos a recepcao da compra deve conter o ipi. Os valores nao conferem",
-				precoMedioComFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
+				precoMedioComFatorIPI, NumeroUtils.arredondarValor2Decimais(itemEstoque.getPrecoMedio()));
 	}
 
 	@Test
@@ -1221,7 +1221,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		assertEquals(
 				"O item nao contem ipi entao o valor do preco medio apos a recepcao da compra deve ser o mesmo. Os valores nao conferem",
-				precoMedioSemFatorIPI, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedio()));
+				precoMedioSemFatorIPI, NumeroUtils.arredondarValor2Decimais(itemEstoque.getPrecoMedio()));
 	}
 
 	@Test
@@ -1352,7 +1352,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 		assertEquals(
 				"Apos a redefinicao do item o deve-se incluir aplicar o fator ICMS no preco de custo. Verifique o algoritmo de calculo",
-				precoFatorICMS, NumeroUtils.arredondarValorMonetario(itemEstoque.getPrecoMedioFatorICMS()));
+				precoFatorICMS, NumeroUtils.arredondarValor2Decimais(itemEstoque.getPrecoMedioFatorICMS()));
 	}
 
 	@Test

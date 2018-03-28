@@ -65,9 +65,11 @@ create sequence crm.seq_negociacao_id increment by 1 minvalue 1 no maxvalue star
 create table crm.tb_indice_conversao (
 	id integer not null,
 	id_cliente integer not null unique,
-	quantidade_vendas integer not null default 0,
 	indice_conversao_valor numeric(9, 5) not null default 0,
-	indice_conversao_quantidade numeric(9, 5) not null default 0
+	quantidade_orcamentos integer not null default 0,
+	quantidade_vendas integer not null default 0,
+	valor_vendas numeric(15, 5) not null default 0,
+	valor_orcamentos numeric(15, 5) not null default 0
 );
 ALTER TABLE crm.tb_indice_conversao ADD PRIMARY KEY (id);
 create index idx_indice_conversao_id_cliente on crm.tb_indice_conversao (id_cliente);

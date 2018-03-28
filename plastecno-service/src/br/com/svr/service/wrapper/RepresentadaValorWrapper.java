@@ -13,7 +13,7 @@ public class RepresentadaValorWrapper extends Grupo {
 	public RepresentadaValorWrapper(String nome, Double valor, Double valorVendaIPI) {
 		this(nome, valor);
 		this.valorVendaIPI = valorVendaIPI;
-		this.valorVendaIPIFormatado = NumeroUtils.formatarValorMonetario(valorVendaIPI);
+		this.valorVendaIPIFormatado = NumeroUtils.formatarValor2Decimais(valorVendaIPI);
 	}
 
 	public String getNomeRepresentada() {

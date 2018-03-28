@@ -33,9 +33,9 @@ public class EmailServiceImpl implements EmailService {
 	@EJB
 	private ConfiguracaoSistemaService configuracaoSistemaService;
 
+	private Logger log = Logger.getLogger(this.getClass().getName());
 	@EJB
 	private UsuarioService usuarioService;
-	private Logger log = Logger.getLogger(this.getClass().getName());
 
 	public void enviar(MensagemEmail mensagemEmail) throws NotificacaoException {
 
@@ -74,7 +74,7 @@ public class EmailServiceImpl implements EmailService {
 			}
 			gerarAnexo(mensagemEmail, email);
 			// email.setTLS(true);
-			// email.send();
+			email.send();
 
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Falha na configuracao do envio de email.", e);

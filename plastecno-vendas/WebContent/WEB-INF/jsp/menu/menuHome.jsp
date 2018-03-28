@@ -136,7 +136,9 @@
 									Editor</a></li>
 						</ul></li>
 				</c:if>
+				<c:if test="${false}">
 				<li><a href="negociacao" target="principal_frame">Negociação</a></li>
+				</c:if>
 			</ul>
 		</nav>
 		<div id="center_content">

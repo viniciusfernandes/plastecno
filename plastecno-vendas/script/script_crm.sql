@@ -50,7 +50,8 @@ create table crm.tb_negociacao (
 	nome_cliente varchar(150) not null,
 	nome_contato varchar(100) default null,
 	telefone_contato varchar(15) default null,
-	indice_conversao_valor numeric(9, 5) default 0
+	indice_conversao_valor numeric(15, 5) default 0,
+	indice_conversao_quantidade numeric(15, 5) default 0
 );
 ALTER TABLE crm.tb_negociacao ADD PRIMARY KEY (id);
 ALTER TABLE crm.tb_negociacao ADD CONSTRAINT id_situacao_negociacao FOREIGN KEY (id_situacao_negociacao) REFERENCES crm.tb_situacao_negociacao(id);
@@ -62,16 +63,18 @@ create index idx_negociacao_id_cliente on crm.tb_negociacao (id_cliente);
 
 create sequence crm.seq_negociacao_id increment by 1 minvalue 1 no maxvalue start with 1;
 
-create table crm.tb_indice_conversao (
+create table crm.tb_indicador_cliente (
 	id integer not null,
 	id_cliente integer not null unique,
-	indice_conversao_valor numeric(9, 5) not null default 0,
+	indice_conversao_valor numeric(15, 5) not null default 0,
+	indice_conversao_quantidade numeric(15, 5) not null default 0,
+	valor_medio numeric(15, 5) not null default 0,
 	quantidade_orcamentos integer not null default 0,
 	quantidade_vendas integer not null default 0,
 	valor_vendas numeric(15, 5) not null default 0,
 	valor_orcamentos numeric(15, 5) not null default 0
 );
-ALTER TABLE crm.tb_indice_conversao ADD PRIMARY KEY (id);
-create index idx_indice_conversao_id_cliente on crm.tb_indice_conversao (id_cliente);
-create sequence crm.seq_indice_conversao_id increment by 1 minvalue 1 no maxvalue start with 1;
+ALTER TABLE crm.tb_indicador_clitente ADD PRIMARY KEY (id);
+create index idx_indicador_clitente_id_cliente on crm.tb_indicador_clitente (id_cliente);
+create sequence crm.seq_indicador_cliente_id increment by 1 minvalue 1 no maxvalue start with 1;
 

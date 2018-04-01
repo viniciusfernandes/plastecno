@@ -889,7 +889,7 @@ public class PedidoServiceImpl implements PedidoService {
 		// aceite do orcamento o vendedor pode alterar os itens do pedidod e
 		// recalculando aqui o sistema compara o valor do pedido atualizado e do
 		// orcamento que foi aceito.
-		negociacaoService.recalcularIndiceConversao(pedido.getId(), pedido.getIdOrcamento());
+		negociacaoService.recalcularIndicadorCliente(pedido.getId(), pedido.getIdOrcamento());
 
 		try {
 			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.MENSAGEM_VENDA, pdfPedido,

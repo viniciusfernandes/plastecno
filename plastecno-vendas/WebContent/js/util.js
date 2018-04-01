@@ -315,6 +315,14 @@ function gerarListaMensagemByIdBloco (idBloco, listaMensagem, cssMensagem) {
 	scrollTo('topo');
 };
 
+function gerarListaMensagemSucessoById (idBloco, listaMensagem) {
+	gerarListaMensagemByIdBloco(idBloco, listaMensagem, 'mensagemSucesso');
+};
+
+function gerarListaMensagem (listaMensagem, cssMensagem) {
+	gerarListaMensagemByIdBloco('bloco_mensagem', listaMensagem, cssMensagem);
+};
+
 function gerarListaMensagemErro (listaMensagem) {
 	gerarListaMensagem(listaMensagem, 'mensagemErro');
 };
@@ -329,13 +337,6 @@ function gerarListaMensagemAlerta (listaMensagem) {
 
 function gerarListaMensagemSucesso (listaMensagem) {
 	gerarListaMensagem(listaMensagem, 'mensagemSucesso');
-};
-
-function gerarListaMensagemSucessoById (idBloco, listaMensagem) {
-	gerarListaMensagemByIdBloco(idBloco, listaMensagem, 'mensagemSucesso');
-};
-function gerarListaMensagem (listaMensagem, cssMensagem) {
-	gerarListaMensagemByIdBloco('bloco_mensagem', listaMensagem, cssMensagem);
 };
 
 function gerarData(data) {

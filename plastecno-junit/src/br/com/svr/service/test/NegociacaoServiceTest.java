@@ -16,7 +16,7 @@ import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.Pedido;
-import br.com.svr.service.entity.crm.IndiceConversao;
+import br.com.svr.service.entity.crm.IndicadorCliente;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.mensagem.email.AnexoEmail;
@@ -178,7 +178,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 		}
 		Integer idCliente = pedidoService.pesquisarIdClienteByIdPedido(o.getId());
 
-		IndiceConversao idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
+		IndicadorCliente idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
 		assertNull("Na inclusao de um orcamento nao pode ser criado o indice de conversao", idxConv);
 
 		List<Negociacao> lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
@@ -208,10 +208,10 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 		assertNotNull("No envio do pedido deve ser gerado um indice de conversao", idxConv);
 		assertEquals("Apos o envio de pedido sem alteracao de preco o indice de conversao deve ser 1", (Double) 1d,
-				(Double) idxConv.getIndiceValor());
+				(Double) idxConv.getIndiceConversaoValor());
 
 		int idIdxConv = idxConv.getId();
-		double idxValorAntigo = idxConv.getIndiceValor();
+		double idxValorAntigo = idxConv.getIndiceConversaoValor();
 
 		try {
 			// Aqui estamos reenviando o pedido para que seja atualizado o
@@ -228,7 +228,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 				"O cliente ja tem um indice de conversao, entao apos o envio do pedido o indice de conversao deve ser o mesmo",
 				(Integer) idIdxConv, idxConv.getId());
 		assertEquals("Apos o reenvio do pedido sem alteracao de valores os valores do indice devem ser os mesmos",
-				(Double) idxValorAntigo, (Double) idxConv.getIndiceValor());
+				(Double) idxValorAntigo, (Double) idxConv.getIndiceConversaoValor());
 
 		// Aqui estamos efetuando a alteracao da quanitdade dos itens para que
 		// altere o valor do indice de conversao apos o reenvio do pedido.
@@ -249,6 +249,6 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 		idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
 		assertEquals("Apos o reenvio do pedido com alteracao de valores os valores do indice devem ser recalculados",
-				(Double) 1.333d, (Double) NumeroUtils.arredondar(idxConv.getIndiceValor(), 3));
+				(Double) 1.333d, (Double) NumeroUtils.arredondar(idxConv.getIndiceConversaoValor(), 3));
 	}
 }

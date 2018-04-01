@@ -53,6 +53,9 @@ public class Negociacao implements Serializable {
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Vendedor da negociação")
 	private Integer idVendedor;
 
+	@Column(name = "indice_conversao_quantidade")
+	private double indiceConversaoQuantidade;
+
 	@Column(name = "indice_conversao_valor")
 	private double indiceConversaoValor;
 
@@ -96,11 +99,13 @@ public class Negociacao implements Serializable {
 	 * Construtor utilizado na geracao do relatorio de negociacao
 	 */
 	public Negociacao(CategoriaNegociacao categoriaNegociacao, Integer id, Integer idOrcamento,
-			Double indiceConversaoValor, String nomeCliente, String nomeContato, String telefoneContato, Double valor) {
+			Double indiceConversaoQuantidade, Double indiceConversaoValor, String nomeCliente, String nomeContato,
+			String telefoneContato, Double valor) {
 		super();
 		this.categoriaNegociacao = categoriaNegociacao;
 		this.id = id;
 		this.idOrcamento = idOrcamento;
+		this.indiceConversaoQuantidade = indiceConversaoQuantidade == null ? 0 : indiceConversaoQuantidade;
 		this.indiceConversaoValor = indiceConversaoValor == null ? 0d : indiceConversaoValor;
 		this.nomeCliente = nomeCliente;
 		this.nomeContato = nomeContato;
@@ -130,6 +135,10 @@ public class Negociacao implements Serializable {
 
 	public Integer getIdVendedor() {
 		return idVendedor;
+	}
+
+	public double getIndiceConversaoQuantidade() {
+		return indiceConversaoQuantidade;
 	}
 
 	public double getIndiceConversaoValor() {
@@ -190,6 +199,10 @@ public class Negociacao implements Serializable {
 
 	public void setIdVendedor(Integer idVendedor) {
 		this.idVendedor = idVendedor;
+	}
+
+	public void setIndiceConversaoQuantidade(double indiceConversaoQuantidade) {
+		this.indiceConversaoQuantidade = indiceConversaoQuantidade;
 	}
 
 	public void setIndiceConversaoValor(double indiceConversaoValor) {

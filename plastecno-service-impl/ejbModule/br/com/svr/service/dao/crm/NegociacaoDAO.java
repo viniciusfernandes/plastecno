@@ -8,7 +8,7 @@ import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.dao.GenericDAO;
-import br.com.svr.service.entity.crm.IndiceConversao;
+import br.com.svr.service.entity.crm.IndicadorCliente;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.impl.util.QueryUtil;
 
@@ -79,22 +79,24 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 						.setParameter("idNegociacao", idNegociacao), Integer.class, null);
 	}
 
-	public IndiceConversao pesquisarIndiceByIdCliente(Integer idCliente) {
+	public IndicadorCliente pesquisarIndicadorByIdCliente(Integer idCliente) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i from IndiceConversao i where i.idCliente =:idCliente")
-						.setParameter("idCliente", idCliente), IndiceConversao.class, null);
+				entityManager.createQuery("select i from IndicadorCliente i where i.idCliente =:idCliente")
+						.setParameter("idCliente", idCliente), IndicadorCliente.class, null);
 	}
 
-	public double pesquisarIndiceConversaoValorByIdCliente(Integer idCliente) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i.indiceValor from IndiceConversao i where i.idCliente =:idCliente")
-						.setParameter("idCliente", idCliente), Double.class, 0d);
+	public double[] pesquisarIndiceConversaoValorByIdCliente(Integer idCliente) {
+		Object[] o = entityManager
+				.createQuery(
+						"select i.indiceConversaoQuantidade, i.indiceConversaoValor from IndicadorCliente i where i.idCliente =:idCliente",
+						Object[].class).setParameter("idCliente", idCliente).getSingleResult();
+		return o == null || o.length <= 0 ? new double[] {} : new double[] { (Double) o[0], (Double) o[1] };
 	}
 
 	public List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor) {
 		return entityManager
 				.createQuery(
-						"select new Negociacao(n.categoriaNegociacao, n.id, n.orcamento.id, n.indiceConversaoValor, n.nomeCliente, n.nomeContato, n.telefoneContato, n.orcamento.valorPedidoIPI) from Negociacao n where n.idVendedor = :idVendedor and n.situacaoNegociacao =:situacaoNegociacao",
+						"select new Negociacao(n.categoriaNegociacao, n.id, n.orcamento.id, n.indiceConversaoQuantidade, n.indiceConversaoValor, n.nomeCliente, n.nomeContato, n.telefoneContato, n.orcamento.valorPedidoIPI) from Negociacao n where n.idVendedor = :idVendedor and n.situacaoNegociacao =:situacaoNegociacao",
 						Negociacao.class).setParameter("idVendedor", idVendedor)
 				.setParameter("situacaoNegociacao", SituacaoNegociacao.ABERTO).getResultList();
 	}

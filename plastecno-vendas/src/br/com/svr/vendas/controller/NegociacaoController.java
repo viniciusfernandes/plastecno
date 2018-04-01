@@ -120,6 +120,7 @@ public class NegociacaoController extends AbstractController {
                     continue;
                 }
                 n.setIndiceConversaoValor(NumeroUtils.gerarPercentual2Decimais(n.getIndiceConversaoValor()));
+                n.setIndiceConversaoQuantidade(NumeroUtils.gerarPercentual2Decimais(n.getIndiceConversaoQuantidade()));
             }
         }
 

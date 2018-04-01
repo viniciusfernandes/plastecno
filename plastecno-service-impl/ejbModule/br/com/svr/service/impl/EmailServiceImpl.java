@@ -73,8 +73,8 @@ public class EmailServiceImpl implements EmailService {
 				email.addCc(cc);
 			}
 			gerarAnexo(mensagemEmail, email);
-			// email.setTLS(true);
-			// email.send();
+			//email.setTLS(true);
+			//email.send();
 
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Falha na configuracao do envio de email.", e);

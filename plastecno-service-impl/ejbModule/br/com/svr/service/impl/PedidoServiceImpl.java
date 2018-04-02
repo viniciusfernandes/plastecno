@@ -2251,6 +2251,10 @@ public class PedidoServiceImpl implements PedidoService {
 		valOrc = valOrc - valorVelho + valorNovo;
 
 		IndicadorCliente ind = indicadorClienteDAO.pesquisarIndicadorById(idCliente);
+		if (ind == null) {
+			ind = new IndicadorCliente();
+			ind.setIdCliente(idCliente);
+		}
 		ind.setValorOrcamentos(valOrc);
 		ind.calcularIndicadores();
 		return indicadorClienteDAO.alterar(ind);
@@ -2262,8 +2266,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 		// Nao vamos incluir o frete pois isso eh um custo que pode nao refletir
 		// a capacidade de compra do cliente.
-		if (valorPedido == null || valorPedido == 0d) {
-			return null;
+		if (valorPedido == null) {
+			valorPedido = 0d;
 		}
 
 		IndicadorCliente ind = indicadorClienteDAO.pesquisarIndicadorById(idCliente);

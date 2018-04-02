@@ -39,14 +39,14 @@ $(document).ready(function() {
 	// inicializarAutocompleteDescricaoPeca('<c:url value="/estoque/descricaopeca"/>');
 	
 	$("#botaoInserirPedido").click(function() {
-		inserirPedido({urlInclusao:'<c:url value="/pedido/inclusao"/>'});
+		inserirPedido({'urlInclusao':'<c:url value="/pedido/inclusao"/>'});
 	});
 	 
 	$("#botaoInserirItemPedido").click(function() {
 		inserirPedido({
-			urlInclusao:'<c:url value="/pedido/inclusao"/>', 
-			inserirItem:inserirItemPedido, 
-			urlInclusaoItem:'<c:url value="/pedido/item/inclusao"/>'
+			'urlInclusao':'<c:url value="/pedido/inclusao"/>', 
+			'inserirItem':inserirItemPedido, 
+			'urlInclusaoItem':'<c:url value="/pedido/item/inclusao"/>'
 			});
 	});
 
@@ -228,53 +228,52 @@ $(document).ready(function() {
 				var tipoPedido = $('#tipoPedido').val();
 				var idPedido = $('#numeroPedido').val();
 				
-				var enviarPedido = $.ajax({
-				      url: '<c:url value="/pedido/envio"/>',
-				      type: 'post',
-				      data: {tipoPedido:tipoPedido, idPedido: idPedido},
-				    });
-				enviarPedido.done(function (response){
-					if(ok =(response.sucesso != undefined && response.sucesso != null)){
-						limparTela();
-						gerarListaMensagemSucesso(response.sucesso);
-					}else {
-						gerarListaMensagemErro(response.erros);
-					}
-				});
-				enviarPedido.always(function(response){
-					if(!ok){
-						return;
-					}
-					document.getElementById('tipoPedido').value = tipoPedido;
-					habilitar('#numeroPedidoPesquisa', true);
-
-					$('#divPedAssocLabel, #divPedAssocInput, #divNumNFeLabel, #divNumNFeInput').remove();
-					
-					var req = $.ajax({
-					      url: '<c:url value="/pedido/clienteusuario"/>',
-					      type: 'get',
-					      data:{tipoPedido:tipoPedido}
-					    });
-					req.done(function(resp){
-						var cli = resp.cliente;
-						if(cli.id != undefined){
-							document.getElementById('nomeCliente').value = cli.nomeFantasia+' - '+cli.razaoSocial;
-							document.getElementById('idCliente').value = cli.id;
-						} else {
-							habilitar('#nomeCliente', true);
-						}
-						document.getElementById('idVendedor').value = cli.vendedor.id;
-						document.getElementById('proprietario').value = cli.vendedor.nome+' - '+cli.vendedor.email;
-					});
-				});
-				
-				enviarPedido.fail(function(request, status, erro){
-					gerarListaMensagemSucesso(["Falha no envio do pedido No. "+idPedido+"."]);
-				}); 
-				
 				inserirPedido({
 					urlInclusao:'<c:url value="/pedido/inclusao"/>', 
-					enviar:	enviarPedido
+					enviar:	function(){
+						var enviarPedido = $.ajax({
+						      url: '<c:url value="/pedido/envio"/>',
+						      type: 'post',
+						      data: {'tipoPedido':tipoPedido, 'idPedido': idPedido},
+						    });
+						enviarPedido.done(function (response){
+							if(ok =(response.sucesso != undefined && response.sucesso != null)){
+								limparTela();
+								gerarListaMensagemSucesso(response.sucesso);
+							}else {
+								gerarListaMensagemErro(response.erros);
+							}
+						});
+						enviarPedido.always(function(response){
+							if(!ok){
+								return;
+							}
+							document.getElementById('tipoPedido').value = tipoPedido;
+							habilitar('#numeroPedidoPesquisa', true);
+
+							$('#divPedAssocLabel, #divPedAssocInput, #divNumNFeLabel, #divNumNFeInput').remove();
+							
+							var req = $.ajax({
+							      url: '<c:url value="/pedido/clienteusuario"/>',
+							      type: 'get',
+							      data:{tipoPedido:tipoPedido}
+							    });
+							req.done(function(resp){
+								var cli = resp.cliente;
+								if(cli.id != undefined){
+									document.getElementById('nomeCliente').value = cli.nomeFantasia+' - '+cli.razaoSocial;
+									document.getElementById('idCliente').value = cli.id;
+								} else {
+									habilitar('#nomeCliente', true);
+								}
+								document.getElementById('idVendedor').value = cli.vendedor.id;
+								document.getElementById('proprietario').value = cli.vendedor.nome+' - '+cli.vendedor.email;
+							});
+						});
+						enviarPedido.fail(function(request, status, erro){
+							gerarListaMensagemSucesso(["Falha no envio do pedido No. "+idPedido+"."]);
+						}); 
+					}// fim do callback de envio do pedido
 				});
 			}
 		});

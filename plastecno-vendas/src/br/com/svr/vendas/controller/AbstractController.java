@@ -452,9 +452,9 @@ public abstract class AbstractController {
      * tela de erro generico.
      */
     void gerarLogErro(String descricaoOperacao, Exception e) {
-        this.logger.log(Level.SEVERE, "Falha na operacao " + descricaoOperacao, e);
-        this.result.include("cssMensagem", cssMensagemErro);
-        this.result.include("listaMensagem", new String[] {"Falha na operacao " + descricaoOperacao
+        logger.log(Level.SEVERE, "Falha na operacao " + descricaoOperacao, e);
+        result.include("cssMensagem", cssMensagemErro);
+        result.include("listaMensagem", new String[] {"Falha na operacao " + descricaoOperacao
                 + " .Verifique o log do servidor para maiores detalhes. CAUSA: " + e.getMessage()});
         irTelaErro();
     }
@@ -740,6 +740,10 @@ public abstract class AbstractController {
 
     boolean isElementosNaoAssociadosPreenchidosPicklist() {
         return this.picklist.isElementosNaoAssociadosPreenchidos();
+    }
+
+    void logErro(String descricao, Exception e) {
+        logger.log(Level.SEVERE, "Falha na operacao " + descricao, e);
     }
 
     void loggarFalhaConversaoParametros() {

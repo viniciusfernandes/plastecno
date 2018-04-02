@@ -19,10 +19,9 @@ import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
-import br.com.svr.service.dao.crm.IndiceConversaoDAO;
 import br.com.svr.service.dao.crm.NegociacaoDAO;
 import br.com.svr.service.entity.Pedido;
-import br.com.svr.service.entity.crm.IndiceConversao;
+import br.com.svr.service.entity.crm.IndicadorCliente;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.util.QueryUtil;
@@ -36,7 +35,6 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	@PersistenceContext(name = "svr")
 	private EntityManager entityManager;
 
-	private IndiceConversaoDAO indiceConversaoDAO;
 	private Logger log = Logger.getLogger(this.getClass().getName());
 	private NegociacaoDAO negociacaoDAO;
 
@@ -72,8 +70,10 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(Integer idCliente, Double indice) {
-		negociacaoDAO.alterarIndiceConversaoValorByIdCliente(idCliente, indice, SituacaoNegociacao.ABERTO);
+	public void alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(Integer idCliente, Double indiceQuantidade,
+			Double indiceValor) {
+		negociacaoDAO.alterarIndiceConversaoValorByIdCliente(idCliente, indiceQuantidade, indiceValor,
+				SituacaoNegociacao.ABERTO);
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void gerarIndiceConversaoCliente() throws BusinessException {
+	public void gerarIndicadorCliente() throws BusinessException {
 		List<Integer> idsCliente = entityManager.createQuery("select c.id from Cliente c", Integer.class)
 				.getResultList();
 
@@ -112,8 +112,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 		Object[] valPed = null;
 		Object[] valOrc = null;
 
-		IndiceConversao idx = null;
-		Integer idPed = null;
+		IndicadorCliente idx = null;
 		for (Integer idCli : idsCliente) {
 			valPed = entityManager
 					.createQuery(
@@ -129,21 +128,21 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 							Object[].class).setParameter("listaSituacao", SituacaoPedido.getListaOrcamentoEfetivado())
 					.setParameter("idCliente", idCli).getSingleResult();
 
-			idx = new IndiceConversao();
+			idx = new IndicadorCliente();
 			idx.setValorVendas(valPed[1] == null ? 0 : (double) valPed[1]);
-			idx.setQuantidadeVendas(valPed[0] == null ? 0 : (long) valPed[0]);
+			idx.setQuantidadeVendas(valPed[0] == null ? 0 : ((Long) valPed[0]).intValue());
 
 			idx.setValorOrcamentos(valOrc[1] == null ? 0 : (double) valOrc[1]);
-			idx.setQuantidadeOrcamentos(valOrc[0] == null ? 0 : (long) valOrc[0]);
+			idx.setQuantidadeOrcamentos(valOrc[0] == null ? 0 : ((Long) valOrc[0]).intValue());
 
-			idx.calcularIndice();
+			idx.calcularIndicadores();
 
 			idx.setIdCliente(idCli);
 			try {
-				entityManager.persist(idx);
+				entityManager.merge(idx);
 				entityManager.flush();
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Falha no calculo do indice de conversao do pedido " + idPed);
+				log.log(Level.SEVERE, "Falha no calculo do indice de conversao do cliente " + idCli, e);
 				return;
 			}
 		}
@@ -226,7 +225,6 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	@PostConstruct
 	public void init() {
 		negociacaoDAO = new NegociacaoDAO(entityManager);
-		indiceConversaoDAO = new IndiceConversaoDAO(entityManager);
 	}
 
 	@Override
@@ -242,7 +240,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 		}
 
 		Object[] dados = pedidoService.pesquisarIdNomeClienteNomeContatoValor(idOrcamento);
-		Double idxConvValor = negociacaoDAO.pesquisarIndiceConversaoValorByIdCliente(idCliente);
+		double indices[] = negociacaoDAO.pesquisarIndiceConversaoValorByIdCliente(idCliente);
 
 		Negociacao n = pesquisarNegociacaoByIdOrcamento(idOrcamento);
 		if (n == null) {
@@ -253,9 +251,10 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 			n.setOrcamento(new Pedido(idOrcamento));
 			n.setSituacaoNegociacao(SituacaoNegociacao.ABERTO);
 			n.setTipoNaoFechamento(TipoNaoFechamento.OK);
+			n.setIndiceConversaoQuantidade(indices.length <= 0 ? 0 : indices[0]);
+			n.setIndiceConversaoValor(indices.length <= 0 ? 0 : indices[1]);
 		}
 		n.setNomeCliente((String) dados[1]);
-		n.setIndiceConversaoValor(idxConvValor);
 		n.setNomeContato(dados[3] == null ? null : (String) dados[3]);
 		n.setTelefoneContato(dados[4] == null ? null : ((dados[2] == null ? "" : dados[2]) + "-" + dados[4]));
 
@@ -290,8 +289,8 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public IndiceConversao pesquisarIndiceConversaoByIdCliente(Integer idCliente) {
-		return negociacaoDAO.pesquisarIndiceByIdCliente(idCliente);
+	public IndicadorCliente pesquisarIndicadorByIdCliente(Integer idCliente) {
+		return negociacaoDAO.pesquisarIndicadorByIdCliente(idCliente);
 	}
 
 	@Override
@@ -313,44 +312,6 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 			return null;
 		}
 		return negociacaoDAO.pesquisarObservacao(idNegociacao);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void recalcularIndiceConversao(Integer idPedido, Integer idOrcamento) throws BusinessException {
-		if (idOrcamento == null) {
-			return;
-		}
-		if (pedidoService.isPedidoCancelado(idOrcamento)) {
-			throw new BusinessException(
-					"Não é possível efetuar o recalculo do índice de convesão para o Orçamento No. " + idOrcamento
-							+ " pois ele não esta em aberto.");
-		}
-		// Nao vamos incluir o frete pois isso eh um custo que pode nao refletir
-		// a capacidade de compra do cliente.
-		Double valOrc = pedidoService.pesquisarValorPedidoIPI(idOrcamento);
-		Double valPed = pedidoService.pesquisarValorPedidoIPI(idPedido);
-		if (valOrc == null || valPed == null || valOrc == 0d || valPed == 0d) {
-			return;
-		}
-		Integer idCliente = pedidoService.pesquisarIdClienteByIdPedido(idOrcamento);
-
-		IndiceConversao idx = negociacaoDAO.pesquisarIndiceByIdCliente(idCliente);
-		if (idx == null) {
-			idx = new IndiceConversao();
-		}
-
-		idx.setQuantidadeVendas(idx.getQuantidadeVendas() + 1);
-		idx.setValorVendas(idx.getValorVendas() + valPed);
-
-		idx.setQuantidadeOrcamentos(idx.getQuantidadeOrcamentos() + 1);
-		idx.setValorOrcamentos(idx.getValorOrcamentos() + valOrc);
-
-		idx.setIdCliente(idCliente);
-		idx.calcularIndice();
-		indiceConversaoDAO.alterar(idx);
-
-		alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(idCliente, idx.getIndiceValor());
 	}
 
 	@Override

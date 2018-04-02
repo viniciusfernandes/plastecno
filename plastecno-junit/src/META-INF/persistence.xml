@@ -21,7 +21,7 @@
 		<class>br.com.svr.service.entity.ContatoTransportadora</class>
 		<class>br.com.svr.service.entity.ContatoUsuario</class>
 		<class>br.com.svr.service.entity.Endereco</class>
-		<class>br.com.svr.service.entity.crm.IndiceConversao</class>
+		<class>br.com.svr.service.entity.crm.IndicadorCliente</class>
 		<class>br.com.svr.service.entity.ItemEstoque</class>
 		<class>br.com.svr.service.entity.ItemPedido</class>
 		<class>br.com.svr.service.entity.ItemReservado</class>
@@ -58,7 +58,7 @@
 			<property name="javax.persistence.jdbc.password" value="" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
-			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.temp.use_jdbc_metadata_defaults"
 				value="false" />
 		</properties>

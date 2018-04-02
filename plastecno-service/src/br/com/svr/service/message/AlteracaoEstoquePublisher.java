@@ -1,4 +1,4 @@
-package br.com.svr.message;
+package br.com.svr.service.message;
 
 import javax.ejb.Local;
 

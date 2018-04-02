@@ -40,6 +40,7 @@ import br.com.svr.service.constante.TipoLogradouro;
 import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.dao.ItemPedidoDAO;
 import br.com.svr.service.dao.PedidoDAO;
+import br.com.svr.service.dao.crm.IndicadorClienteDAO;
 import br.com.svr.service.entity.Cliente;
 import br.com.svr.service.entity.Comissao;
 import br.com.svr.service.entity.Contato;
@@ -51,6 +52,7 @@ import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.Representada;
 import br.com.svr.service.entity.Transportadora;
 import br.com.svr.service.entity.Usuario;
+import br.com.svr.service.entity.crm.IndicadorCliente;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.exception.NotificacaoException;
 import br.com.svr.service.impl.anotation.REVIEW;
@@ -73,6 +75,10 @@ import br.com.svr.util.StringUtils;
 @Stateless
 public class PedidoServiceImpl implements PedidoService {
 
+	// @EJB
+	// private AlteracaoIndicesNegociacaoPublisher
+	// alteracaoIndicesNegociacaoPublisher;
+
 	@EJB
 	private ClienteService clienteService;
 
@@ -87,6 +93,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@EJB
 	private EstoqueService estoqueService;
+
+	private IndicadorClienteDAO indicadorClienteDAO;
 
 	private ItemPedidoDAO itemPedidoDAO;
 
@@ -885,12 +893,17 @@ public class PedidoServiceImpl implements PedidoService {
 		} catch (BusinessException e) {
 			throw new BusinessException("Falha no envio do pedido de venda.").addMensagem(e.getListaMensagem());
 		}
-		// O recalculo do indice deve ser feito aqui pois apos a inclusao e
-		// aceite do orcamento o vendedor pode alterar os itens do pedidod e
-		// recalculando aqui o sistema compara o valor do pedido atualizado e do
-		// orcamento que foi aceito.
-		negociacaoService.recalcularIndiceConversao(pedido.getId(), pedido.getIdOrcamento());
-
+		// Apenas o recalculo do valor de vendas deve ser refeito pois o indice
+		// do valor de orcamentos e de quantidades de orcamentos estao sendo
+		// feitos na inclusao dos itens do orcamento.
+		IndicadorCliente ind = recalcularIndiceValorVendas(pedido.getCliente().getId(), pedido.getValorPedidoIPI());
+		// Estamos publicando a acao de alteracao das negociacoes de modo
+		// assincrono pois ela demanda tempo.
+		// alteracaoIndicesNegociacaoPublisher.publicar(pedido.getCliente().getId(),
+		// ind.getIndiceConversaoQuantidade(),
+		// ind.getIndiceConversaoValor());
+		negociacaoService.alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(pedido.getCliente().getId(),
+				ind.getIndiceConversaoQuantidade(), ind.getIndiceConversaoValor());
 		try {
 			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.MENSAGEM_VENDA, pdfPedido,
 					anexos));
@@ -990,6 +1003,7 @@ public class PedidoServiceImpl implements PedidoService {
 	public void init() {
 		pedidoDAO = new PedidoDAO(entityManager);
 		itemPedidoDAO = new ItemPedidoDAO(entityManager);
+		indicadorClienteDAO = new IndicadorClienteDAO(entityManager);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -1146,18 +1160,18 @@ public class PedidoServiceImpl implements PedidoService {
 				.calcularPrecoMinimoItemEstoque(itemPedido)));
 		itemPedido.setPrecoCusto(estoqueService.calcularPrecoCustoItemEstoque(itemPedido));
 
+		boolean isItemNovo = false;
 		/*
 		 * O valor sequencial sera utilizado para que a representada identifique
 		 * rapidamento qual eh o item que deve ser customizado, assim o vendedor
 		 * podera fazer referencias ao item no campo de observacao, por exemplo:
 		 * o item 1 deve ter acabamento, etc.
 		 */
-		if (itemPedido.isNovo()) {
-
+		if (isItemNovo = itemPedido.isNovo()) {
 			itemPedido.setSequencial(gerarSequencialItemPedido(idPedido));
 		}
 
-		if (itemPedido.isNovo()) {
+		if (isItemNovo) {
 			itemPedidoDAO.inserir(itemPedido);
 		} else {
 			if (pedido.isCompra()) {
@@ -1176,12 +1190,31 @@ public class PedidoServiceImpl implements PedidoService {
 		}
 
 		ValidadorInformacao.validar(itemPedido);
+
+		double valPedVelho = pesquisarValorPedidoIPI(idPedido);
+		double valPedNovo = 0;
 		/*
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao
 		 * de validacoes, caso contrario teremos um valor nulo na base de dados.
 		 */
 		atualizarValoresPedido(idPedido);
 
+		// Aqui esta sendo recalculado o valor do orcamento velho para incluir o
+		// valor do orcamento que teve um item adicionado ou alterado. Esse
+		// desconto deve ocorrer e nao pode ser incluido duas vezes.
+		// Isso ocorre pois um orcamento pode nao se tornar um pedido e ficar
+		// parado no sistema, as os dados de valores devem ser incluidos nos
+		// indicadores do cliente pois assim o vendedor sabera o quanto esta
+		// sendo orcado.
+		if (pedido.isOrcamento() && pedido.isVenda()) {
+			valPedNovo = pesquisarValorPedidoIPI(idPedido);
+			Integer idCliente = pedido.getCliente() == null ? pesquisarIdClienteByIdPedido(pedido.getId()) : pedido
+					.getCliente().getId();
+			IndicadorCliente ind = recalcularIndiceValorOrcamento(idCliente, valPedVelho, valPedNovo);
+			negociacaoService.alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(idCliente,
+					ind.getIndiceConversaoQuantidade(), ind.getIndiceConversaoValor());
+
+		}
 		// Aqui estamos calculando a comissao pois qualquer alteracao do item do
 		// pedido deve refletir no relatorio de comissao. Mesmo que o pedido nao
 		// tenha sido enviado a comissao sera calculada, mas so os pedidos
@@ -1215,8 +1248,8 @@ public class PedidoServiceImpl implements PedidoService {
 		if (orcamento == null) {
 			return null;
 		}
-
-		if (orcamento.isNovo()) {
+		boolean isNovo = false;
+		if (isNovo = orcamento.isNovo()) {
 			orcamento.setSituacaoPedido(SituacaoPedido.ORCAMENTO_DIGITACAO);
 		} else {
 			// Garantindo a coerencia da situacao do pedido.
@@ -1246,6 +1279,18 @@ public class PedidoServiceImpl implements PedidoService {
 		if (orc.isOrcamentoDigitacao()) {
 			negociacaoService.inserirNegociacao(orc.getId(), cliente.getId(), orc.getVendedor().getId());
 		}
+
+		if (isNovo && orc.isVenda()) {
+			// Vamos alterar a quantidade de orcamento do indicador apenas
+			// quando for criado um orcamento. No caso em que o orcamento ja
+			// exista esse valor ja estara atualizado e nao ha necessidade de um
+			// recalculo. O valor do indice de orcamentos sera recalculado na
+			// inclusao dos itens do orcamento e apenas la.
+			IndicadorCliente ind = recalcularIndiceQuantidadeOrcamento(orc.getCliente().getId());
+			negociacaoService.alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(orc.getCliente().getId(),
+					ind.getIndiceConversaoQuantidade(), ind.getIndiceConversaoValor());
+		}
+
 		return orc;
 	}
 
@@ -2177,6 +2222,66 @@ public class PedidoServiceImpl implements PedidoService {
 								.createQuery(
 										"select new Usuario(v.id, v.nome, v.sobrenome) from ItemPedido i inner join i.pedido.proprietario v where i.id = :idItemPedido ")
 								.setParameter("idItemPedido", idItemPedido), Usuario.class, null);
+	}
+
+	private IndicadorCliente recalcularIndiceQuantidadeOrcamento(Integer idCliente) {
+		if (idCliente == null) {
+			return null;
+		}
+		int qtdeOrc = indicadorClienteDAO.pesquisarQuantidadeOrcamentos(idCliente);
+		IndicadorCliente ind = indicadorClienteDAO.pesquisarIndicadorById(idCliente);
+		if (ind == null) {
+			ind = new IndicadorCliente();
+			ind.setIdCliente(idCliente);
+		}
+		ind.setQuantidadeOrcamentos(qtdeOrc + 1);
+		ind.calcularIndicadores();
+		return indicadorClienteDAO.alterar(ind);
+	}
+
+	private IndicadorCliente recalcularIndiceValorOrcamento(Integer idCliente, double valorVelho, double valorNovo) {
+		if (idCliente == null) {
+			return null;
+		}
+
+		double valOrc = indicadorClienteDAO.pesquisarValorOrcamentos(idCliente);
+		// Aqui esta sendo descontado o valor do pedido velho para incluir o
+		// valor do pedido que teve um item adicionado ou alterado. Esse
+		// desconto deve ocorrer e nao pode ser incluido duas vezes.
+		valOrc = valOrc - valorVelho + valorNovo;
+
+		IndicadorCliente ind = indicadorClienteDAO.pesquisarIndicadorById(idCliente);
+		if (ind == null) {
+			ind = new IndicadorCliente();
+			ind.setIdCliente(idCliente);
+		}
+		ind.setValorOrcamentos(valOrc);
+		ind.calcularIndicadores();
+		return indicadorClienteDAO.alterar(ind);
+	}
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	private IndicadorCliente recalcularIndiceValorVendas(Integer idCliente, Double valorPedido)
+			throws BusinessException {
+
+		// Nao vamos incluir o frete pois isso eh um custo que pode nao refletir
+		// a capacidade de compra do cliente.
+		if (valorPedido == null) {
+			valorPedido = 0d;
+		}
+
+		IndicadorCliente ind = indicadorClienteDAO.pesquisarIndicadorById(idCliente);
+		if (ind == null) {
+			ind = new IndicadorCliente();
+			ind.setIdCliente(idCliente);
+		}
+
+		// Adicionando uma quantidade de venda efetuada.
+		ind.setQuantidadeVendas(ind.getQuantidadeVendas() + 1);
+		ind.setValorVendas(ind.getValorVendas() + valorPedido);
+
+		ind.calcularIndicadores();
+		return indicadorClienteDAO.alterar(ind);
 	}
 
 	@Override

@@ -291,22 +291,26 @@ function aceitarNegociacao(idNegociacao){
 	<c:forEach items="${g.listaElemento}" var="neg">
 		<c:if test="${not empty neg}">
 		<div id="${neg.id}" class="block" draggable="true" ondragstart="drag(event)" ondragover="dragover(event)">
-			<a style="width: 75%; float: left;" href="orcamento/${neg.idOrcamento}" draggable="false">
+			<a style="width: 60%; float: left;" href="orcamento/${neg.idOrcamento}" draggable="false">
 				<span style="width: 100%; float: left;" draggable="false"><strong>Orç. Nº ${neg.idOrcamento}</strong></span>
-				<span style="float: left;" draggable="false">R$</span>
-				<span style="float: left;" draggable="false">${neg.valor}</span>
 			</a>
-			<a style="width: 10%; float: left;" class="botaoEditar" 
-				onclick="editarNegociacao(${neg.id})" title="Editar Negociação"></a>
 			<a style="width: 10%; float: left;" class="botaoVerificacaoFalhaPequeno" 
 				onclick="cancelarNegociacao(${neg.id})" title="Cancelar Negociação"></a>
 			<a style="width: 10%; float: left; margin-left: 2%" class="botaoVerificacaoEfetuadaPequeno" 
 				onclick="aceitarNegociacao(${neg.id})" title="Aceitar Negociação"></a>
+			<a style="width: 10%; float: left;" class="botaoEditar" 
+				onclick="editarNegociacao(${neg.id})" title="Editar Negociação"></a>
+			
+			<a style="width: 100%; float: left;" draggable="false">
+				<span style="float: left;" draggable="false">R$</span>
+				<span style="float: left;" draggable="false">${neg.valor}</span>
+			</a>
 			<a class="front" href="javascript: void(0);" draggable="false">
 				<span>${neg.nomeCliente}</span>
 			</a>
 			<a class="front" href="javascript: void(0);" draggable="false">
-				<span>Conversão: ${neg.indiceConversaoValor} %</span>
+				<span title="Indice de conversão de valores">Val: ${neg.indiceConversaoValor} %</span>
+				<span title="Indice de conversão de quantidades">Qtde: ${neg.indiceConversaoQuantidade} %</span>
 			</a>
 			<a class="front" href="javascript: void(0);" draggable="false">
 				<span>${neg.nomeContato}</span>

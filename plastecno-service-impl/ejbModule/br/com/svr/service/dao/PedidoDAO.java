@@ -394,7 +394,7 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 				.gerarRegistroUnico(
 						entityManager
 								.createQuery(
-										"select new Pedido(p.representada.comissao, p.id, p.proprietario.id, p.finalidadePedido, p.tipoPedido) from Pedido p where p.id =:idPedido")
+										"select new Pedido(p.representada.comissao, p.id, p.proprietario.id, p.finalidadePedido, p.situacaoPedido, p.tipoPedido) from Pedido p where p.id =:idPedido")
 								.setParameter("idPedido", idPedido), Pedido.class, null);
 	}
 

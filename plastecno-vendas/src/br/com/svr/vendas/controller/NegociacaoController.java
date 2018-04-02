@@ -70,14 +70,14 @@ public class NegociacaoController extends AbstractController {
         irTopoPagina();
     }
 
-    @Get("negociacao/geracaoindiceconversaocliente")
-    public void gerarIndiceConversaoCliente() {
+    @Get("negociacao/geracaoindicadorcliente")
+    public void gerarIndicadorCliente() {
         try {
-            System.out.println("INICIO de geracao de indice de conversao...");
+            System.out.println("INICIO de geracao de indicador do cliente...");
 
-            negociacaoService.gerarIndiceConversaoCliente();
+            negociacaoService.gerarIndicadorCliente();
 
-            System.out.println("FIM de geracao de indice de conversao...");
+            System.out.println("FIM de geracao de indicador do cliente...");
         } catch (BusinessException e) {
             gerarLogErro("Geracao indice de conversao", e);
         }
@@ -114,12 +114,19 @@ public class NegociacaoController extends AbstractController {
 
         for (GrupoWrapper<CategoriaNegociacao, Negociacao> g : rel.getListaGrupo()) {
             g.setPropriedade("valorTotal", NumeroUtils.formatarValor2Decimais((Double) g.getPropriedade("valorTotal")));
-
+            double ind = -1;
             for (Negociacao n : g.getListaElemento()) {
                 if (n == null) {
                     continue;
                 }
-                n.setIndiceConversaoValor(NumeroUtils.gerarPercentual2Decimais(n.getIndiceConversaoValor()));
+                // Apresentando o indice de valor limitado por 100 por eh o
+                // suficiente para informar o usuario dos potenciais do
+                // usuario. Alem disso estava desalinhando os campos da tela.
+                ind = NumeroUtils.gerarPercentualInteiro(n.getIndiceConversaoValor());
+                n.setIndiceConversaoValor(ind > 1000d ? 999d : ind);
+
+                ind = NumeroUtils.gerarPercentualInteiro(n.getIndiceConversaoQuantidade());
+                n.setIndiceConversaoQuantidade(ind > 1000d ? 999d : ind);
             }
         }
 
@@ -133,6 +140,7 @@ public class NegociacaoController extends AbstractController {
 
     @Get("negociacao/observacao/{idNegociacao}")
     public void pesquisarObservacao(Integer idNegociacao) {
-        serializarJson(new SerializacaoJson("observacao", negociacaoService.pesquisarObservacao(idNegociacao)));
+        String obs = negociacaoService.pesquisarObservacao(idNegociacao);
+        serializarJson(new SerializacaoJson("observacao", obs == null ? " " : obs));
     }
 }

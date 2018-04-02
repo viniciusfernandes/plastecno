@@ -3,12 +3,14 @@ package br.com.svr.service.dao.crm;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
 import br.com.svr.service.dao.GenericDAO;
-import br.com.svr.service.entity.crm.IndiceConversao;
+import br.com.svr.service.entity.crm.IndicadorCliente;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.impl.util.QueryUtil;
 
@@ -25,12 +27,13 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 				.executeUpdate();
 	}
 
-	public void alterarIndiceConversaoValorByIdCliente(Integer idCliente, Double indice,
+	public void alterarIndiceConversaoValorByIdCliente(Integer idCliente, Double indiceQuantidade, Double indiceValor,
 			SituacaoNegociacao situacaoNegociacao) {
 		entityManager
 				.createQuery(
-						"update Negociacao n set n.indiceConversaoValor =:indice where n.idCliente =:idCliente and n.situacaoNegociacao=:situacaoNegociacao")
-				.setParameter("indice", indice).setParameter("idCliente", idCliente)
+						"update Negociacao n set n.indiceConversaoQuantidade =:indiceQuantidade, n.indiceConversaoValor =:indiceValor where n.idCliente =:idCliente and n.situacaoNegociacao=:situacaoNegociacao")
+				.setParameter("idCliente", idCliente).setParameter("indiceQuantidade", indiceQuantidade)
+				.setParameter("indiceValor", indiceValor).setParameter("idCliente", idCliente)
 				.setParameter("situacaoNegociacao", situacaoNegociacao).executeUpdate();
 	}
 
@@ -79,22 +82,31 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 						.setParameter("idNegociacao", idNegociacao), Integer.class, null);
 	}
 
-	public IndiceConversao pesquisarIndiceByIdCliente(Integer idCliente) {
+	public IndicadorCliente pesquisarIndicadorByIdCliente(Integer idCliente) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i from IndiceConversao i where i.idCliente =:idCliente")
-						.setParameter("idCliente", idCliente), IndiceConversao.class, null);
+				entityManager.createQuery("select i from IndicadorCliente i where i.idCliente =:idCliente")
+						.setParameter("idCliente", idCliente), IndicadorCliente.class, null);
 	}
 
-	public double pesquisarIndiceConversaoValorByIdCliente(Integer idCliente) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i.indiceValor from IndiceConversao i where i.idCliente =:idCliente")
-						.setParameter("idCliente", idCliente), Double.class, 0d);
+	public double[] pesquisarIndiceConversaoValorByIdCliente(Integer idCliente) {
+		Object[] o = null;
+		try {
+			o = entityManager
+					.createQuery(
+							"select i.indiceConversaoQuantidade, i.indiceConversaoValor from IndicadorCliente i where i.idCliente =:idCliente",
+							Object[].class).setParameter("idCliente", idCliente).getSingleResult();
+
+		} catch (NonUniqueResultException | NoResultException e) {
+			return new double[] {};
+		}
+
+		return o == null || o.length <= 0 ? new double[] {} : new double[] { (Double) o[0], (Double) o[1] };
 	}
 
 	public List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor) {
 		return entityManager
 				.createQuery(
-						"select new Negociacao(n.categoriaNegociacao, n.id, n.orcamento.id, n.indiceConversaoValor, n.nomeCliente, n.nomeContato, n.telefoneContato, n.orcamento.valorPedidoIPI) from Negociacao n where n.idVendedor = :idVendedor and n.situacaoNegociacao =:situacaoNegociacao",
+						"select new Negociacao(n.categoriaNegociacao, n.id, n.orcamento.id, n.indiceConversaoQuantidade, n.indiceConversaoValor, n.nomeCliente, n.nomeContato, n.telefoneContato, n.orcamento.valorPedidoIPI) from Negociacao n where n.idVendedor = :idVendedor and n.situacaoNegociacao =:situacaoNegociacao",
 						Negociacao.class).setParameter("idVendedor", idVendedor)
 				.setParameter("situacaoNegociacao", SituacaoNegociacao.ABERTO).getResultList();
 	}

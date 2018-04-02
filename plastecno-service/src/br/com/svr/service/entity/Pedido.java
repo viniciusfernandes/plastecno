@@ -208,6 +208,12 @@ public class Pedido implements Serializable, Cloneable {
 	public Pedido() {
 	}
 
+	public Pedido(Double aliquotaComissaoRepresentada, Integer id, Integer idVendedor,
+			TipoFinalidadePedido tipoFinalidadePedido, SituacaoPedido situacaoPedido, TipoPedido tipoPedido) {
+		this(aliquotaComissaoRepresentada, id, idVendedor, tipoFinalidadePedido, tipoPedido);
+		this.situacaoPedido = situacaoPedido;
+	}
+
 	// Construtor utilizado na pesquisa para o calculo de comissao, por isso
 	// temos poucos parametros
 	public Pedido(Double aliquotaComissaoRepresentada, Integer id, Integer idVendedor,

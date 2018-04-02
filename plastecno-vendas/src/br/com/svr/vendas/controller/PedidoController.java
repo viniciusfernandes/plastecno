@@ -249,10 +249,10 @@ public class PedidoController extends AbstractPedidoController {
                     : "Pedido No. " + idPedido + " foi enviado com sucesso para a representada "
                             + pedido.getRepresentada().getNomeFantasia()}));
         } catch (NotificacaoException e) {
-            gerarLogErro("envio de email do pedido No. " + idPedido, e);
-            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
+            logErro("envio de email do pedido No. " + idPedido, e);
+            serializarJson(new SerializacaoJson("erros", e.getListaMensagem().toArray()));
         } catch (BusinessException e) {
-            serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
+            serializarJson(new SerializacaoJson("erros", e.getListaMensagem().toArray()));
         }
     }
 

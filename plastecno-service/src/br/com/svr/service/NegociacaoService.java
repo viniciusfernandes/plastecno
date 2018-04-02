@@ -4,7 +4,7 @@ import java.util.List;
 
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
-import br.com.svr.service.entity.crm.IndiceConversao;
+import br.com.svr.service.entity.crm.IndicadorCliente;
 import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.wrapper.RelatorioWrapper;
@@ -17,13 +17,14 @@ public interface NegociacaoService {
 
 	void alterarCategoria(Integer idNegociacao, CategoriaNegociacao categoriaNegociacao) throws BusinessException;
 
-	void alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(Integer idCliente, Double valor);
+	void alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(Integer idCliente, Double indiceQuantidade,
+			Double indiceValor);
 
 	double calcularValorCategoriaNegociacaoAberta(Integer idVendedor, CategoriaNegociacao categoria);
 
 	Integer cancelarNegocicacao(Integer idNegociacao, TipoNaoFechamento tipoNaoFechamento) throws BusinessException;
 
-	void gerarIndiceConversaoCliente() throws BusinessException;
+	void gerarIndicadorCliente() throws BusinessException;
 
 	void gerarNegociacaoInicial() throws BusinessException;
 
@@ -35,15 +36,13 @@ public interface NegociacaoService {
 
 	Negociacao pesquisarById(Integer idNegociacao);
 
-	IndiceConversao pesquisarIndiceConversaoByIdCliente(Integer idCliente);
+	IndicadorCliente pesquisarIndicadorByIdCliente(Integer idCliente);
 
 	List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor);
 
 	Negociacao pesquisarNegociacaoByIdOrcamento(Integer idOrcamento);
 
 	String pesquisarObservacao(Integer idNegociacao);
-
-	void recalcularIndiceConversao(Integer idPedido, Integer idOrcamento) throws BusinessException;
 
 	void removerNegociacaoByIdOrcamento(Integer idOrcamento);
 }

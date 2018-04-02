@@ -108,8 +108,8 @@ function inserirPedido(config) {
 };
 
 function inserirOrcamento(config){
-	//toUpperCaseInput();
-	//toLowerCaseInput();
+	toUpperCaseInput();
+	toLowerCaseInput();
 	var hasIncItem = config.inserirItem != undefined && config.inserirItem!=null;
 	var hasEnvio = config.enviar!= undefined && config.enviar!=null;
 

@@ -13,5 +13,4 @@
 
 
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/picklist.css?${versaoCache}"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/modal.css?${versaoCache}"/>" />
 

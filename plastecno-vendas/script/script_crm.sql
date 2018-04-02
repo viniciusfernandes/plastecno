@@ -64,8 +64,7 @@ create index idx_negociacao_id_cliente on crm.tb_negociacao (id_cliente);
 create sequence crm.seq_negociacao_id increment by 1 minvalue 1 no maxvalue start with 1;
 
 create table crm.tb_indicador_cliente (
-	id integer not null,
-	id_cliente integer not null unique,
+	id_cliente integer not null,
 	indice_conversao_valor numeric(15, 5) not null default 0,
 	indice_conversao_quantidade numeric(15, 5) not null default 0,
 	valor_medio numeric(15, 5) not null default 0,
@@ -74,7 +73,4 @@ create table crm.tb_indicador_cliente (
 	valor_vendas numeric(15, 5) not null default 0,
 	valor_orcamentos numeric(15, 5) not null default 0
 );
-ALTER TABLE crm.tb_indicador_clitente ADD PRIMARY KEY (id);
-create index idx_indicador_clitente_id_cliente on crm.tb_indicador_clitente (id_cliente);
-create sequence crm.seq_indicador_cliente_id increment by 1 minvalue 1 no maxvalue start with 1;
-
+ALTER TABLE crm.tb_indicador_cliente ADD PRIMARY KEY (id_cliente);

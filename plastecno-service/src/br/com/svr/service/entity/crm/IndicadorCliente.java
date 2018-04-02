@@ -2,22 +2,18 @@ package br.com.svr.service.entity.crm;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import br.com.svr.service.validacao.InformacaoValidavel;
 
 @Entity
 @Table(name = "tb_indicador_cliente", schema = "crm")
 public class IndicadorCliente {
 
 	@Id
-	@SequenceGenerator(name = "indicadorClienteSequence", sequenceName = "crm.seq_indicador_cliente_id", allocationSize = 1, initialValue = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "indicadorClienteSequence")
-	private Integer id;
-
 	@Column(name = "id_cliente")
+	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Id do cliente")
 	private Integer idCliente;
 
 	@Column(name = "indice_conversao_quantidade")
@@ -45,25 +41,38 @@ public class IndicadorCliente {
 	}
 
 	public void calcularIndicadores() {
-		if (valorVendas == 0 || valorOrcamentos == 0) {
+		if (valorVendas == 0) {
 			indiceConversaoValor = 0d;
+		} else if (valorOrcamentos == 0) {
+			// Aqui estamos tratando a situacao em que nao ha orcamentos e que
+			// uma venda foi efetuada sem orcamento, portanto o indice deve ser
+			// 1.
+			indiceConversaoValor = 1d;
 		} else {
 			indiceConversaoValor = valorVendas / valorOrcamentos;
 		}
-		if (quantidadeVendas == 0 || quantidadeOrcamentos == 0) {
+		if (quantidadeVendas == 0) {
 			indiceConversaoQuantidade = 0d;
+		} else if (quantidadeOrcamentos == 0) {
+			// Aqui estamos tratando a situacao em que nao ha orcamentos e que
+			// uma venda foi efetuada sem orcamento, portanto o indice deve ser
+			// 1.
+			indiceConversaoQuantidade = 1d;
 		} else {
-			indiceConversaoQuantidade = quantidadeVendas / quantidadeOrcamentos;
+			indiceConversaoQuantidade = quantidadeVendas > quantidadeOrcamentos ? 1 : ((double) quantidadeVendas)
+					/ ((double) quantidadeOrcamentos);
 		}
-		if (quantidadeVendas == 0 || valorVendas == 0) {
+		if (valorVendas == 0) {
 			valorMedio = 0;
+		} else if (quantidadeVendas == 0) {
+			valorMedio = valorVendas;
 		} else {
-			valorMedio = valorVendas / quantidadeVendas;
+			valorMedio = valorVendas / ((double) quantidadeVendas);
 		}
 	}
 
 	public Integer getId() {
-		return id;
+		return idCliente;
 	}
 
 	public Integer getIdCliente() {
@@ -99,7 +108,7 @@ public class IndicadorCliente {
 	}
 
 	public void setId(Integer id) {
-		this.id = id;
+		this.idCliente = id;
 	}
 
 	public void setIdCliente(Integer idCliente) {

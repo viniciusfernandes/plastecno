@@ -3,6 +3,8 @@ package br.com.svr.service.dao.crm;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
@@ -25,12 +27,13 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 				.executeUpdate();
 	}
 
-	public void alterarIndiceConversaoValorByIdCliente(Integer idCliente, Double indice,
+	public void alterarIndiceConversaoValorByIdCliente(Integer idCliente, Double indiceQuantidade, Double indiceValor,
 			SituacaoNegociacao situacaoNegociacao) {
 		entityManager
 				.createQuery(
-						"update Negociacao n set n.indiceConversaoValor =:indice where n.idCliente =:idCliente and n.situacaoNegociacao=:situacaoNegociacao")
-				.setParameter("indice", indice).setParameter("idCliente", idCliente)
+						"update Negociacao n set n.indiceConversaoQuantidade =:indiceQuantidade, n.indiceConversaoValor =:indiceValor where n.idCliente =:idCliente and n.situacaoNegociacao=:situacaoNegociacao")
+				.setParameter("idCliente", idCliente).setParameter("indiceQuantidade", indiceQuantidade)
+				.setParameter("indiceValor", indiceValor).setParameter("idCliente", idCliente)
 				.setParameter("situacaoNegociacao", situacaoNegociacao).executeUpdate();
 	}
 
@@ -86,10 +89,17 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 	}
 
 	public double[] pesquisarIndiceConversaoValorByIdCliente(Integer idCliente) {
-		Object[] o = entityManager
-				.createQuery(
-						"select i.indiceConversaoQuantidade, i.indiceConversaoValor from IndicadorCliente i where i.idCliente =:idCliente",
-						Object[].class).setParameter("idCliente", idCliente).getSingleResult();
+		Object[] o = null;
+		try {
+			o = entityManager
+					.createQuery(
+							"select i.indiceConversaoQuantidade, i.indiceConversaoValor from IndicadorCliente i where i.idCliente =:idCliente",
+							Object[].class).setParameter("idCliente", idCliente).getSingleResult();
+
+		} catch (NonUniqueResultException | NoResultException e) {
+			return new double[] {};
+		}
+
 		return o == null || o.length <= 0 ? new double[] {} : new double[] { (Double) o[0], (Double) o[1] };
 	}
 

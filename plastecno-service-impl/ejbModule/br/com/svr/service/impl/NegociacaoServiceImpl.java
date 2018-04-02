@@ -19,7 +19,6 @@ import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
-import br.com.svr.service.dao.crm.IndicadorClienteDAO;
 import br.com.svr.service.dao.crm.NegociacaoDAO;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.crm.IndicadorCliente;
@@ -36,7 +35,6 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	@PersistenceContext(name = "svr")
 	private EntityManager entityManager;
 
-	private IndicadorClienteDAO indiceConversaoDAO;
 	private Logger log = Logger.getLogger(this.getClass().getName());
 	private NegociacaoDAO negociacaoDAO;
 
@@ -72,8 +70,10 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(Integer idCliente, Double indice) {
-		negociacaoDAO.alterarIndiceConversaoValorByIdCliente(idCliente, indice, SituacaoNegociacao.ABERTO);
+	public void alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(Integer idCliente, Double indiceQuantidade,
+			Double indiceValor) {
+		negociacaoDAO.alterarIndiceConversaoValorByIdCliente(idCliente, indiceQuantidade, indiceValor,
+				SituacaoNegociacao.ABERTO);
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void gerarIndiceConversaoCliente() throws BusinessException {
+	public void gerarIndicadorCliente() throws BusinessException {
 		List<Integer> idsCliente = entityManager.createQuery("select c.id from Cliente c", Integer.class)
 				.getResultList();
 
@@ -139,7 +139,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 			idx.setIdCliente(idCli);
 			try {
-				entityManager.persist(idx);
+				entityManager.merge(idx);
 				entityManager.flush();
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Falha no calculo do indice de conversao do cliente " + idCli, e);
@@ -225,7 +225,6 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	@PostConstruct
 	public void init() {
 		negociacaoDAO = new NegociacaoDAO(entityManager);
-		indiceConversaoDAO = new IndicadorClienteDAO(entityManager);
 	}
 
 	@Override
@@ -290,7 +289,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public IndicadorCliente pesquisarIndiceConversaoByIdCliente(Integer idCliente) {
+	public IndicadorCliente pesquisarIndicadorByIdCliente(Integer idCliente) {
 		return negociacaoDAO.pesquisarIndicadorByIdCliente(idCliente);
 	}
 
@@ -313,44 +312,6 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 			return null;
 		}
 		return negociacaoDAO.pesquisarObservacao(idNegociacao);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public void recalcularIndicadorCliente(Integer idPedido, Integer idOrcamento) throws BusinessException {
-		if (idOrcamento == null) {
-			return;
-		}
-		if (pedidoService.isPedidoCancelado(idOrcamento)) {
-			throw new BusinessException(
-					"Não é possível efetuar o recalculo do índice de convesão para o Orçamento No. " + idOrcamento
-							+ " pois ele não esta em aberto.");
-		}
-		// Nao vamos incluir o frete pois isso eh um custo que pode nao refletir
-		// a capacidade de compra do cliente.
-		Double valOrc = pedidoService.pesquisarValorPedidoIPI(idOrcamento);
-		Double valPed = pedidoService.pesquisarValorPedidoIPI(idPedido);
-		if (valOrc == null || valPed == null || valOrc == 0d || valPed == 0d) {
-			return;
-		}
-		Integer idCliente = pedidoService.pesquisarIdClienteByIdPedido(idOrcamento);
-
-		IndicadorCliente idx = negociacaoDAO.pesquisarIndicadorByIdCliente(idCliente);
-		if (idx == null) {
-			idx = new IndicadorCliente();
-		}
-
-		idx.setQuantidadeVendas(idx.getQuantidadeVendas() + 1);
-		idx.setValorVendas(idx.getValorVendas() + valPed);
-
-		idx.setQuantidadeOrcamentos(idx.getQuantidadeOrcamentos() + 1);
-		idx.setValorOrcamentos(idx.getValorOrcamentos() + valOrc);
-
-		idx.setIdCliente(idCliente);
-		idx.calcularIndicadores();
-		indiceConversaoDAO.alterar(idx);
-
-		alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(idCliente, idx.getIndiceConversaoValor());
 	}
 
 	@Override

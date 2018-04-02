@@ -1,8 +1,6 @@
 package br.com.svr.service.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -30,6 +28,46 @@ public class NegociacaoServiceTest extends AbstractTest {
 	public NegociacaoServiceTest() {
 		negociacaoService = ServiceBuilder.buildService(NegociacaoService.class);
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
+	}
+
+	@Test
+	public void testRecalculoIndicadorClienteEnvioPedido() {
+		Pedido orc = null;
+		try {
+			orc = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Negociacao n = negociacaoService.pesquisarNegociacaoByIdOrcamento(orc.getId());
+		IndicadorCliente indCli = negociacaoService.pesquisarIndicadorByIdCliente(orc.getCliente().getId());
+
+		assertNotNull("Apos inserido um orcamento deve existir uma negociacao", n);
+		assertNotNull("Apos inserido um orcamento deve existir um indicador do cliente", indCli);
+
+		double indValNeg = n.getIndiceConversaoValor();
+		double indQtdeNeg = n.getIndiceConversaoQuantidade();
+
+		double indVal = indCli.getIndiceConversaoValor();
+		double indQtde = indCli.getIndiceConversaoQuantidade();
+
+		assertTrue("Os valores dos indices de valor devem ser igual apos a inclusao de um orcamento",
+				indValNeg == indVal);
+		assertTrue("Os valores dos indices de quantidade devem ser igual apos a inclusao de um orcamento",
+				indQtdeNeg == indQtde);
+
+		Integer idPed = null;
+		try {
+			idPed = negociacaoService.aceitarNegocicacaoByIdNegociacao(n.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPed, new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
 	}
 
 	@Test
@@ -178,8 +216,8 @@ public class NegociacaoServiceTest extends AbstractTest {
 		}
 		Integer idCliente = pedidoService.pesquisarIdClienteByIdPedido(o.getId());
 
-		IndicadorCliente idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
-		assertNull("Na inclusao de um orcamento nao pode ser criado o indice de conversao", idxConv);
+		IndicadorCliente idxConv = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
+		assertNotNull("Na inclusao de um orcamento deve ser criado um indicador do cliente", idxConv);
 
 		List<Negociacao> lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
 		assertEquals("Deve existir apenas 1 negociacao por orcamento incluido.", (Integer) 1, (Integer) lNeg.size());
@@ -191,8 +229,9 @@ public class NegociacaoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
-		assertNull("No aceite de uma negociacao nao pode ser criado o indice de conversao", idxConv);
+		idxConv = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
+		assertNotNull("No aceite de uma negociacao ja deveria existir no sistema apos a inclusao de um orcamento",
+				idxConv);
 
 		recarregarEntidade(Pedido.class, idPedido);
 
@@ -204,7 +243,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		idCliente = pedidoService.pesquisarIdClienteByIdPedido(idPedido);
-		idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
+		idxConv = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
 
 		assertNotNull("No envio do pedido deve ser gerado um indice de conversao", idxConv);
 		assertEquals("Apos o envio de pedido sem alteracao de preco o indice de conversao deve ser 1", (Double) 1d,
@@ -222,7 +261,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
+		idxConv = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
 		assertNotNull("No reenvio do pedido deve ser gerado um indice de conversao", idxConv);
 		assertEquals(
 				"O cliente ja tem um indice de conversao, entao apos o envio do pedido o indice de conversao deve ser o mesmo",
@@ -247,7 +286,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		idxConv = negociacaoService.pesquisarIndiceConversaoByIdCliente(idCliente);
+		idxConv = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
 		assertEquals("Apos o reenvio do pedido com alteracao de valores os valores do indice devem ser recalculados",
 				(Double) 1.333d, (Double) NumeroUtils.arredondar(idxConv.getIndiceConversaoValor(), 3));
 	}

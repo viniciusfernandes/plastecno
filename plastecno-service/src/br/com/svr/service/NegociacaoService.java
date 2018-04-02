@@ -17,13 +17,14 @@ public interface NegociacaoService {
 
 	void alterarCategoria(Integer idNegociacao, CategoriaNegociacao categoriaNegociacao) throws BusinessException;
 
-	void alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(Integer idCliente, Double valor);
+	void alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(Integer idCliente, Double indiceQuantidade,
+			Double indiceValor);
 
 	double calcularValorCategoriaNegociacaoAberta(Integer idVendedor, CategoriaNegociacao categoria);
 
 	Integer cancelarNegocicacao(Integer idNegociacao, TipoNaoFechamento tipoNaoFechamento) throws BusinessException;
 
-	void gerarIndiceConversaoCliente() throws BusinessException;
+	void gerarIndicadorCliente() throws BusinessException;
 
 	void gerarNegociacaoInicial() throws BusinessException;
 
@@ -35,15 +36,13 @@ public interface NegociacaoService {
 
 	Negociacao pesquisarById(Integer idNegociacao);
 
-	IndicadorCliente pesquisarIndiceConversaoByIdCliente(Integer idCliente);
+	IndicadorCliente pesquisarIndicadorByIdCliente(Integer idCliente);
 
 	List<Negociacao> pesquisarNegociacaoAbertaByIdVendedor(Integer idVendedor);
 
 	Negociacao pesquisarNegociacaoByIdOrcamento(Integer idOrcamento);
 
 	String pesquisarObservacao(Integer idNegociacao);
-
-	void recalcularIndicadorCliente(Integer idPedido, Integer idOrcamento) throws BusinessException;
 
 	void removerNegociacaoByIdOrcamento(Integer idOrcamento);
 }

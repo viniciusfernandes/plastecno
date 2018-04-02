@@ -59,8 +59,7 @@ public class IndicadorCliente {
 			// 1.
 			indiceConversaoQuantidade = 1d;
 		} else {
-			indiceConversaoQuantidade = quantidadeVendas > quantidadeOrcamentos ? 1 : ((double) quantidadeVendas)
-					/ ((double) quantidadeOrcamentos);
+			indiceConversaoQuantidade = ((double) quantidadeVendas) / ((double) quantidadeOrcamentos);
 		}
 		if (valorVendas == 0) {
 			valorMedio = 0;

@@ -114,13 +114,19 @@ public class NegociacaoController extends AbstractController {
 
         for (GrupoWrapper<CategoriaNegociacao, Negociacao> g : rel.getListaGrupo()) {
             g.setPropriedade("valorTotal", NumeroUtils.formatarValor2Decimais((Double) g.getPropriedade("valorTotal")));
-
+            double ind = -1;
             for (Negociacao n : g.getListaElemento()) {
                 if (n == null) {
                     continue;
                 }
-                n.setIndiceConversaoValor(NumeroUtils.gerarPercentualInteiro(n.getIndiceConversaoValor()));
-                n.setIndiceConversaoQuantidade(NumeroUtils.gerarPercentualInteiro(n.getIndiceConversaoQuantidade()));
+                // Apresentando o indice de valor limitado por 100 por eh o
+                // suficiente para informar o usuario dos potenciais do
+                // usuario. Alem disso estava desalinhando os campos da tela.
+                ind = NumeroUtils.gerarPercentualInteiro(n.getIndiceConversaoValor());
+                n.setIndiceConversaoValor(ind > 1000d ? 999d : ind);
+
+                ind = NumeroUtils.gerarPercentualInteiro(n.getIndiceConversaoQuantidade());
+                n.setIndiceConversaoQuantidade(ind > 1000d ? 999d : ind);
             }
         }
 

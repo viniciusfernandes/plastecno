@@ -882,28 +882,32 @@ public class PedidoServiceImpl implements PedidoService {
 	private void enviarVenda(Pedido pedido, AnexoEmail pdfPedido, AnexoEmail... anexos) throws BusinessException {
 		validarEnvioVenda(pedido);
 
+		// Apenas o recalculo do valor de vendas deve ser refeito pois o indice
+		// do valor de orcamentos e de quantidades de orcamentos estao sendo
+		// feitos na inclusao dos itens do orcamento. O recalculo sera efetuado
+		// apenas para pedidos que nao foram enviados pois no reenvio o calculo
+		// nao podera ser refeito.
+		if (!pedido.isVendaEfetuada()) {
+			IndicadorCliente ind = recalcularIndiceValorVendas(pedido.getCliente().getId(), pedido.getValorPedidoIPI());
+			// Estamos publicando a acao de alteracao das negociacoes de modo
+			// assincrono pois ela demanda tempo.
+			// alteracaoIndicesNegociacaoPublisher.publicar(pedido.getCliente().getId(),
+			// ind.getIndiceConversaoQuantidade(),
+			// ind.getIndiceConversaoValor());
+			negociacaoService.alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(pedido.getCliente().getId(),
+					ind.getIndiceConversaoQuantidade(), ind.getIndiceConversaoValor());
+		}
+
 		if (pedido.isRevenda()) {
 			estoqueService.reservarItemPedido(pedido.getId());
 		}
 
 		try {
-
 			logradouroService.validarListaLogradouroPreenchida(pedido.getListaLogradouro());
-
 		} catch (BusinessException e) {
 			throw new BusinessException("Falha no envio do pedido de venda.").addMensagem(e.getListaMensagem());
 		}
-		// Apenas o recalculo do valor de vendas deve ser refeito pois o indice
-		// do valor de orcamentos e de quantidades de orcamentos estao sendo
-		// feitos na inclusao dos itens do orcamento.
-		IndicadorCliente ind = recalcularIndiceValorVendas(pedido.getCliente().getId(), pedido.getValorPedidoIPI());
-		// Estamos publicando a acao de alteracao das negociacoes de modo
-		// assincrono pois ela demanda tempo.
-		// alteracaoIndicesNegociacaoPublisher.publicar(pedido.getCliente().getId(),
-		// ind.getIndiceConversaoQuantidade(),
-		// ind.getIndiceConversaoValor());
-		negociacaoService.alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(pedido.getCliente().getId(),
-				ind.getIndiceConversaoQuantidade(), ind.getIndiceConversaoValor());
+
 		try {
 			emailService.enviar(GeradorPedidoEmail.gerarMensagem(pedido, TipoMensagemPedido.MENSAGEM_VENDA, pdfPedido,
 					anexos));
@@ -1197,7 +1201,13 @@ public class PedidoServiceImpl implements PedidoService {
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao
 		 * de validacoes, caso contrario teremos um valor nulo na base de dados.
 		 */
-		atualizarValoresPedido(idPedido);
+		double[] valores = atualizarValoresPedido(idPedido);
+		// No caso em esse seja o primeiro item a ser incluido o pedido nao
+		// contera um valor velho, portanto devemos configurar o valor do pedido
+		// novo que acabou de ser calculado.
+		if (valPedVelho == 0) {
+		//	valPedNovo = valores[1];
+		}
 
 		// Aqui esta sendo recalculado o valor do orcamento velho para incluir o
 		// valor do orcamento que teve um item adicionado ou alterado. Esse

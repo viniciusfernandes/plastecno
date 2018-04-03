@@ -547,10 +547,10 @@ public class PedidoController extends AbstractPedidoController {
                 // cancelar
                 // pedidos ja enviados
                 final boolean acessoCancelamentoPedidoPermitido = !SituacaoPedido.CANCELADO.equals(situacao)
-                        || pedido.isVendaEfetuada() || pedido.isRevendaEfetuada()
+                        || pedido.isRevendaEnviada() || pedido.isRevendaEfetuada()
                         || (pedido.isCompraEfetuada() && isAcessoPermitido(TipoAcesso.ADMINISTRACAO));
 
-                final boolean acessoRefazerPedidoPermitido = (pedido.isVendaEfetuada() || pedido.isRevendaEfetuada())
+                final boolean acessoRefazerPedidoPermitido = (pedido.isRevendaEnviada() || pedido.isRevendaEfetuada())
                         && !SituacaoPedido.CANCELADO.equals(situacao) && !SituacaoPedido.DIGITACAO.equals(situacao);
 
                 final boolean acessoCompraPermitido = isAcessoPermitido(TipoAcesso.ADMINISTRACAO,

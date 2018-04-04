@@ -55,6 +55,26 @@ public class NegociacaoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testAceiteOrcamentoENegociacao() {
+		Pedido o = null;
+		try {
+			o = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		List<Negociacao> lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
+		assertEquals("Deve existir apenas 1 negociacao por orcamento incluido.", (Integer) 1, (Integer) lNeg.size());
+
+		try {
+			pedidoService.aceitarOrcamentoENegociacaoByIdOrcamento(o.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
+		assertEquals("Nao deve existir negociacao apos o orcamento aceito.", (Integer) 0, (Integer) lNeg.size());
+	}
+
+	@Test
 	public void testCancelamentoNegociacao() {
 		Pedido o = null;
 		try {

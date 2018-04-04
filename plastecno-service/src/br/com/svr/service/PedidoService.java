@@ -30,6 +30,8 @@ public interface PedidoService {
 
 	Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException;
 
+	Integer aceitarOrcamentoENegociacaoByIdOrcamento(Integer idOrcamento) throws BusinessException;
+
 	void alterarItemAguardandoCompraByIdPedido(Integer idPedido);
 
 	void alterarItemAguardandoMaterialByIdPedido(Integer idPedido);

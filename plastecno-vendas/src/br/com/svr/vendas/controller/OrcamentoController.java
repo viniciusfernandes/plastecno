@@ -92,16 +92,16 @@ public class OrcamentoController extends AbstractPedidoController {
         }
     }
 
-    @Post("orcamento/aceite/{id}")
-    public void aceitarOrcamento(Integer id) {
+    @Post("orcamento/aceite/{idOrcamento}")
+    public void aceitarOrcamento(Integer idOrcamento) {
         try {
-            Integer idPedido = negociacaoService.aceitarNegocicacaoByIdOrcamento(id);
+            Integer idPedido = pedidoService.aceitarOrcamentoENegociacaoByIdOrcamento(idOrcamento);
             // Devemos configurar o parametro orcamento = false para direcionar
             // usuario para a tela de vendas apos o aceite.
             redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA, true);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
-            pesquisarOrcamentoById(id);
+            pesquisarOrcamentoById(idOrcamento);
         }
     }
 
@@ -257,12 +257,6 @@ public class OrcamentoController extends AbstractPedidoController {
         forwardTo(PedidoController.class).pesquisarClienteByNomeFantasia(nomeFantasia);
     }
 
-    @Get("orcamento/vendedor")
-    public void pesquisarVendedor() {
-        serializarJson(new SerializacaoJson("vendedor", new VendedorJson(getCodigoUsuario(), getNomeUsuario(),
-                getEmailUsuario())));
-    }
-
     @Get("orcamento/contatocliente/{idContato}")
     public void pesquisarContatoByIdContato(Integer idContato) {
         super.pesquisarContatoByIdContato(idContato);
@@ -325,6 +319,12 @@ public class OrcamentoController extends AbstractPedidoController {
     @Get("orcamento/transportadora/listagem")
     public void pesquisarTransportadoraByNomeFantasia(String nomeFantasia) {
         forwardTo(TransportadoraController.class).pesquisarTransportadoraByNomeFantasia(nomeFantasia);
+    }
+
+    @Get("orcamento/vendedor")
+    public void pesquisarVendedor() {
+        serializarJson(new SerializacaoJson("vendedor", new VendedorJson(getCodigoUsuario(), getNomeUsuario(),
+                getEmailUsuario())));
     }
 
     @Post("orcamento/itempedido/remocao/{id}")

@@ -587,13 +587,17 @@ public class Pedido implements Serializable, Cloneable {
 		return isRevenda() && !SituacaoPedido.CANCELADO.equals(situacaoPedido);
 	}
 
+	public boolean isRevendaEnviada() {
+		return isRepresentacao() && !SituacaoPedido.CANCELADO.equals(situacaoPedido)
+				&& SituacaoPedido.ENVIADO.equals(situacaoPedido);
+	}
+
 	public boolean isVenda() {
 		return isRevenda() || isRepresentacao();
 	}
 
 	public boolean isVendaEfetuada() {
-		return isRepresentacao() && !SituacaoPedido.CANCELADO.equals(situacaoPedido)
-				&& SituacaoPedido.ENVIADO.equals(situacaoPedido);
+		return isVenda() && SituacaoPedido.isVendaEfetivada(situacaoPedido);
 	}
 
 	public void setAliquotaComissaoRepresentada(Double aliquotaComissaoRepresentada) {

@@ -76,7 +76,7 @@ public class NegociacaoDAO extends GenericDAO<Negociacao> {
 						.setParameter("idOrcamento", idOrcamento), Integer.class, null);
 	}
 
-	public Integer pesquisarIdPedidoByIdNegociacao(Integer idNegociacao) {
+	public Integer pesquisarIdOrcamentoByIdNegociacao(Integer idNegociacao) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery("select n.orcamento.id from Negociacao n where n.id =:idNegociacao")
 						.setParameter("idNegociacao", idNegociacao), Integer.class, null);

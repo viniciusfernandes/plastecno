@@ -43,16 +43,9 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer aceitarNegocicacaoByIdNegociacao(Integer idNegociacao) throws BusinessException {
-		negociacaoDAO.alterarSituacaoNegociacao(idNegociacao, SituacaoNegociacao.ACEITO);
-		Integer idOrcamento = negociacaoDAO.pesquisarIdPedidoByIdNegociacao(idNegociacao);
-		return pedidoService.aceitarOrcamento(idOrcamento);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer aceitarNegocicacaoByIdOrcamento(Integer idOrcamento) throws BusinessException {
-		return aceitarNegocicacaoByIdNegociacao(negociacaoDAO.pesquisarIdNegociacaoByIdOrcamento(idOrcamento));
+	public Integer aceitarNegocicacaoEOrcamentoByIdNegociacao(Integer idNegociacao) throws BusinessException {
+		alterarSituacaoNegociacaoAceite(idNegociacao);
+		return pedidoService.aceitarOrcamento(negociacaoDAO.pesquisarIdOrcamentoByIdNegociacao(idNegociacao));
 	}
 
 	@Override
@@ -77,6 +70,12 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void alterarSituacaoNegociacaoAceite(Integer idNegociacao) {
+		negociacaoDAO.alterarSituacaoNegociacao(idNegociacao, SituacaoNegociacao.ACEITO);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double calcularValorCategoriaNegociacaoAberta(Integer idVendedor, CategoriaNegociacao categoria) {
 		return negociacaoDAO.calcularValorCategoriaNegociacaoAberta(idVendedor, categoria);
@@ -91,11 +90,7 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 		n.setSituacaoNegociacao(SituacaoNegociacao.CANCELADO);
 		negociacaoDAO.alterar(n);
 
-		// negociacaoDAO.alterarSituacaoNegociacao(idNegociacao,
-		// SituacaoNegociacao.CANCELADO);
-		// negociacaoDAO.alterarTipoNaoFechamento(idNegociacao,
-		// tipoNaoFechamento);
-		Integer idOrc = negociacaoDAO.pesquisarIdPedidoByIdNegociacao(idNegociacao);
+		Integer idOrc = negociacaoDAO.pesquisarIdOrcamentoByIdNegociacao(idNegociacao);
 		pedidoService.cancelarOrcamento(idOrc);
 		return idOrc;
 	}
@@ -285,6 +280,12 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Negociacao pesquisarById(Integer idNegociacao) {
 		return negociacaoDAO.pesquisarById(idNegociacao);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarIdNegociacaoByIdOrcamento(Integer idOrcamento) {
+		return negociacaoDAO.pesquisarIdNegociacaoByIdOrcamento(idOrcamento);
 	}
 
 	@Override

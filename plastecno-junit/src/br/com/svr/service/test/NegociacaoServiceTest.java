@@ -1,7 +1,11 @@
 package br.com.svr.service.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.junit.Test;
@@ -19,7 +23,6 @@ import br.com.svr.service.entity.crm.Negociacao;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.test.builder.ServiceBuilder;
-import br.com.svr.util.NumeroUtils;
 
 public class NegociacaoServiceTest extends AbstractTest {
 	private NegociacaoService negociacaoService;
@@ -28,46 +31,6 @@ public class NegociacaoServiceTest extends AbstractTest {
 	public NegociacaoServiceTest() {
 		negociacaoService = ServiceBuilder.buildService(NegociacaoService.class);
 		pedidoService = ServiceBuilder.buildService(PedidoService.class);
-	}
-
-	@Test
-	public void testRecalculoIndicadorClienteEnvioPedido() {
-		Pedido orc = null;
-		try {
-			orc = gPedido.gerarOrcamentoComItem();
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		Negociacao n = negociacaoService.pesquisarNegociacaoByIdOrcamento(orc.getId());
-		IndicadorCliente indCli = negociacaoService.pesquisarIndicadorByIdCliente(orc.getCliente().getId());
-
-		assertNotNull("Apos inserido um orcamento deve existir uma negociacao", n);
-		assertNotNull("Apos inserido um orcamento deve existir um indicador do cliente", indCli);
-
-		double indValNeg = n.getIndiceConversaoValor();
-		double indQtdeNeg = n.getIndiceConversaoQuantidade();
-
-		double indVal = indCli.getIndiceConversaoValor();
-		double indQtde = indCli.getIndiceConversaoQuantidade();
-
-		assertTrue("Os valores dos indices de valor devem ser igual apos a inclusao de um orcamento",
-				indValNeg == indVal);
-		assertTrue("Os valores dos indices de quantidade devem ser igual apos a inclusao de um orcamento",
-				indQtdeNeg == indQtde);
-
-		Integer idPed = null;
-		try {
-			idPed = negociacaoService.aceitarNegocicacaoByIdNegociacao(n.getId());
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
-
-		try {
-			pedidoService.enviarPedido(idPed, new AnexoEmail(new byte[] {}));
-		} catch (BusinessException e) {
-			printMensagens(e);
-		}
 	}
 
 	@Test
@@ -83,7 +46,27 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 		Negociacao n = lNeg.get(0);
 		try {
-			negociacaoService.aceitarNegocicacaoByIdNegociacao(n.getId());
+			negociacaoService.aceitarNegocicacaoEOrcamentoByIdNegociacao(n.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
+		assertEquals("Nao deve existir negociacao apos o orcamento aceito.", (Integer) 0, (Integer) lNeg.size());
+	}
+
+	@Test
+	public void testAceiteOrcamentoENegociacao() {
+		Pedido o = null;
+		try {
+			o = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		List<Negociacao> lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
+		assertEquals("Deve existir apenas 1 negociacao por orcamento incluido.", (Integer) 1, (Integer) lNeg.size());
+
+		try {
+			pedidoService.aceitarOrcamentoENegociacaoByIdOrcamento(o.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -148,6 +131,58 @@ public class NegociacaoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testCriacaoIndicadorClienteInclusaoItemOrcamento() {
+		Pedido orc = gPedido.gerarOrcamento();
+		IndicadorCliente ind = negociacaoService.pesquisarIndicadorByIdCliente(orc.getCliente().getId());
+		assertNotNull("Na inclusao orcamento o indicador do cliente deve ser criado", ind);
+
+		ItemPedido i = gPedido.gerarItemPedido(orc.getRepresentada());
+		try {
+			pedidoService.inserirItemPedido(orc.getId(), i);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ind = negociacaoService.pesquisarIndicadorByIdCliente(orc.getCliente().getId());
+		assertEquals("Na inclusao de um item de orcamento o indice de valor deve ser 0", (Double) 0d,
+				(Double) ind.getIndiceConversaoValor());
+
+		assertEquals("Na inclusao de um item de orcamento o indice de quantidade deve ser 1", (Double) 0d,
+				(Double) ind.getIndiceConversaoValor());
+	}
+
+	@Test
+	public void testCriacaoIndicadorClientePedidoRevendaSemOrcamento() {
+		Pedido p = gPedido.gerarPedidoRevenda();
+		IndicadorCliente ind = negociacaoService.pesquisarIndicadorByIdCliente(p.getCliente().getId());
+		assertNull("Na inclusao de pedido de revenda nao pode existir indicador do cliente", ind);
+
+		ItemPedido i = gPedido.gerarItemPedido(p.getRepresentada());
+		try {
+			pedidoService.inserirItemPedido(p.getId(), i);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		ind = negociacaoService.pesquisarIndicadorByIdCliente(p.getCliente().getId());
+		assertNull("Na inclusao do item do pedido de revenda nao pode existir indicador do cliente", ind);
+
+		try {
+			recarregarEntidade(Pedido.class, p.getId());
+			pedidoService.enviarPedido(p.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ind = negociacaoService.pesquisarIndicadorByIdCliente(p.getCliente().getId());
+		assertNotNull("No envio do pedido de revenda o indicador do cliente deve ser criado", ind);
+
+		assertEquals("No envio do primeiro pedido do cliente o indice de valor deve ser 1", (Double) 1d,
+				(Double) ind.getIndiceConversaoValor());
+		assertEquals("No envio do primeiro pedido do cliente o indice de quantidade deve ser 1", (Double) 1d,
+				(Double) ind.getIndiceConversaoValor());
+	}
+
+	@Test
 	public void testInclusaoNegociacao() {
 		Pedido o = null;
 		try {
@@ -206,6 +241,46 @@ public class NegociacaoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testRecalculoIndicadorClienteEnvioPedido() {
+		Pedido orc = null;
+		try {
+			orc = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Negociacao n = negociacaoService.pesquisarNegociacaoByIdOrcamento(orc.getId());
+		IndicadorCliente indCli = negociacaoService.pesquisarIndicadorByIdCliente(orc.getCliente().getId());
+
+		assertNotNull("Apos inserido um orcamento deve existir uma negociacao", n);
+		assertNotNull("Apos inserido um orcamento deve existir um indicador do cliente", indCli);
+
+		double indValNeg = n.getIndiceConversaoValor();
+		double indQtdeNeg = n.getIndiceConversaoQuantidade();
+
+		double indVal = indCli.getIndiceConversaoValor();
+		double indQtde = indCli.getIndiceConversaoQuantidade();
+
+		assertTrue("Os valores dos indices de valor devem ser igual apos a inclusao de um orcamento",
+				indValNeg == indVal);
+		assertTrue("Os valores dos indices de quantidade devem ser igual apos a inclusao de um orcamento",
+				indQtdeNeg == indQtde);
+
+		Integer idPed = null;
+		try {
+			idPed = negociacaoService.aceitarNegocicacaoEOrcamentoByIdNegociacao(n.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(idPed, new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+	}
+
+	@Test
 	public void testRecalculoIndiceConversao() {
 
 		Pedido o = null;
@@ -216,8 +291,16 @@ public class NegociacaoServiceTest extends AbstractTest {
 		}
 		Integer idCliente = pedidoService.pesquisarIdClienteByIdPedido(o.getId());
 
-		IndicadorCliente idxConv = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
-		assertNotNull("Na inclusao de um orcamento deve ser criado um indicador do cliente", idxConv);
+		IndicadorCliente indCli = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
+		assertNotNull("Na inclusao de um orcamento deve ser criado um indicador do cliente", indCli);
+
+		double indVal = indCli.getIndiceConversaoValor();
+		double indQtde = indCli.getIndiceConversaoQuantidade();
+
+		assertEquals("Na inclusao de um orcamento sem pedidos cadastrados o indice de valor deve ser 0", (Double) 0d,
+				(Double) indVal);
+		assertEquals("Na inclusao de um orcamento sem pedidos cadastrados o indice de quantidade deve ser 0",
+				(Double) 0d, (Double) indQtde);
 
 		List<Negociacao> lNeg = negociacaoService.pesquisarNegociacaoAbertaByIdVendedor(o.getVendedor().getId());
 		assertEquals("Deve existir apenas 1 negociacao por orcamento incluido.", (Integer) 1, (Integer) lNeg.size());
@@ -225,13 +308,13 @@ public class NegociacaoServiceTest extends AbstractTest {
 		Negociacao n = lNeg.get(0);
 		Integer idPedido = null;
 		try {
-			idPedido = negociacaoService.aceitarNegocicacaoByIdNegociacao(n.getId());
+			idPedido = negociacaoService.aceitarNegocicacaoEOrcamentoByIdNegociacao(n.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		idxConv = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
+		indCli = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
 		assertNotNull("No aceite de uma negociacao ja deveria existir no sistema apos a inclusao de um orcamento",
-				idxConv);
+				indCli);
 
 		recarregarEntidade(Pedido.class, idPedido);
 
@@ -243,14 +326,14 @@ public class NegociacaoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 		idCliente = pedidoService.pesquisarIdClienteByIdPedido(idPedido);
-		idxConv = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
+		indCli = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
 
-		assertNotNull("No envio do pedido deve ser gerado um indice de conversao", idxConv);
+		assertNotNull("No envio do pedido deve ser gerado um indice de conversao", indCli);
 		assertEquals("Apos o envio de pedido sem alteracao de preco o indice de conversao deve ser 1", (Double) 1d,
-				(Double) idxConv.getIndiceConversaoValor());
+				(Double) indCli.getIndiceConversaoValor());
 
-		int idIdxConv = idxConv.getId();
-		double idxValorAntigo = idxConv.getIndiceConversaoValor();
+		int idIdxConv = indCli.getId();
+		double idxValorAntigo = indCli.getIndiceConversaoValor();
 
 		try {
 			// Aqui estamos reenviando o pedido para que seja atualizado o
@@ -261,13 +344,12 @@ public class NegociacaoServiceTest extends AbstractTest {
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		idxConv = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
-		assertNotNull("No reenvio do pedido deve ser gerado um indice de conversao", idxConv);
+		indCli = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
 		assertEquals(
 				"O cliente ja tem um indice de conversao, entao apos o envio do pedido o indice de conversao deve ser o mesmo",
-				(Integer) idIdxConv, idxConv.getId());
+				(Integer) idIdxConv, indCli.getId());
 		assertEquals("Apos o reenvio do pedido sem alteracao de valores os valores do indice devem ser os mesmos",
-				(Double) idxValorAntigo, (Double) idxConv.getIndiceConversaoValor());
+				(Double) idxValorAntigo, (Double) indCli.getIndiceConversaoValor());
 
 		// Aqui estamos efetuando a alteracao da quanitdade dos itens para que
 		// altere o valor do indice de conversao apos o reenvio do pedido.
@@ -286,8 +368,10 @@ public class NegociacaoServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		idxConv = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
-		assertEquals("Apos o reenvio do pedido com alteracao de valores os valores do indice devem ser recalculados",
-				(Double) 1.333d, (Double) NumeroUtils.arredondar(idxConv.getIndiceConversaoValor(), 3));
+		indCli = negociacaoService.pesquisarIndicadorByIdCliente(idCliente);
+		assertEquals("Apos o reenvio do pedido sem alteracao o indice de valor deve ser o mesmo", (Double) 1d,
+				(Double) indCli.getIndiceConversaoValor());
+		assertEquals("Apos o reenvio do pedido sem alteracao o indice de quantidae deve ser o mesmo", (Double) 1d,
+				(Double) indCli.getIndiceConversaoQuantidade());
 	}
 }

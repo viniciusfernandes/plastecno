@@ -817,8 +817,8 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e);
 		}
 
-		Double precoMedioReajustadoCH = 110d;
-		Double precoMedioFatorICMSReajustadoCH = 103.4d;
+		Double precoMedioReajustadoCH = 100d;
+		Double precoMedioFatorICMSReajustadoCH = 94d;
 
 		Double precoMedioReajustadoTB = 68.42d;
 		Double precoMedioFatorICMSReajustadoTB = 64.32d;

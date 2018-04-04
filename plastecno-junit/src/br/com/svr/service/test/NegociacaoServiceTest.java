@@ -46,7 +46,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 		Negociacao n = lNeg.get(0);
 		try {
-			negociacaoService.aceitarNegocicacaoByIdNegociacao(n.getId());
+			negociacaoService.aceitarNegocicacaoEOrcamentoByIdNegociacao(n.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -248,7 +248,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 
 		Integer idPed = null;
 		try {
-			idPed = negociacaoService.aceitarNegocicacaoByIdNegociacao(n.getId());
+			idPed = negociacaoService.aceitarNegocicacaoEOrcamentoByIdNegociacao(n.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -288,7 +288,7 @@ public class NegociacaoServiceTest extends AbstractTest {
 		Negociacao n = lNeg.get(0);
 		Integer idPedido = null;
 		try {
-			idPedido = negociacaoService.aceitarNegocicacaoByIdNegociacao(n.getId());
+			idPedido = negociacaoService.aceitarNegocicacaoEOrcamentoByIdNegociacao(n.getId());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}

@@ -163,7 +163,7 @@ $(document).ready(function() {
 			return;
 		} 
 		var form = document.getElementById('formVazio');
-		form.action = '<c:url value="/orcamento/aceite/"/>'+idPedido;
+		form.action = '<c:url value="/orcamento/aceite/"/>'+idPedido ;
 		form.method = 'post';
 		form.submit();
 	});

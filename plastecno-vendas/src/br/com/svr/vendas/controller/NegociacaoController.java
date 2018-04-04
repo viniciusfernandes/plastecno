@@ -29,10 +29,10 @@ public class NegociacaoController extends AbstractController {
 
     @Post("negociacao/aceite/{idNegociacao}")
     public void aceitarNegocicacao(Integer idNegociacao) {
-        Integer idOrcamento;
+        Integer idPedido;
         try {
-            idOrcamento = negociacaoService.aceitarNegocicacaoByIdNegociacao(idNegociacao);
-            redirecTo(PedidoController.class).pesquisarPedidoById(idOrcamento, TipoPedido.REVENDA, true);
+            idPedido = negociacaoService.aceitarNegocicacaoEOrcamentoByIdNegociacao(idNegociacao);
+            redirecTo(PedidoController.class).pesquisarPedidoById(idPedido, TipoPedido.REVENDA, true);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             irTopoPagina();

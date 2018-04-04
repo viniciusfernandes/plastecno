@@ -147,6 +147,9 @@ public class PedidoServiceImpl implements PedidoService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer aceitarOrcamento(Integer idOrcamento) throws BusinessException {
+		if (idOrcamento == null) {
+			throw new BusinessException("Não é possível aceitar pedido com Id nulo.");
+		}
 		SituacaoPedido situacaoPedido = pesquisarSituacaoPedidoById(idOrcamento);
 		if (!SituacaoPedido.ORCAMENTO.equals(situacaoPedido)
 				&& !SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido)) {
@@ -170,6 +173,17 @@ public class PedidoServiceImpl implements PedidoService {
 		pedidoDAO.alterarIdOrcamentoByIdPedido(idPedido, idOrcamento);
 
 		return idPedido;
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer aceitarOrcamentoENegociacaoByIdOrcamento(Integer idOrcamento) throws BusinessException {
+		Integer idPed = aceitarOrcamento(idOrcamento);
+		Integer idNeg = negociacaoService.pesquisarIdNegociacaoByIdOrcamento(idOrcamento);
+		if (idNeg != null) {
+			negociacaoService.alterarSituacaoNegociacaoAceite(idNeg);
+		}
+		return idPed;
 	}
 
 	@Override
@@ -1206,7 +1220,7 @@ public class PedidoServiceImpl implements PedidoService {
 		// contera um valor velho, portanto devemos configurar o valor do pedido
 		// novo que acabou de ser calculado.
 		if (valPedVelho == 0) {
-		//	valPedNovo = valores[1];
+			// valPedNovo = valores[1];
 		}
 
 		// Aqui esta sendo recalculado o valor do orcamento velho para incluir o
@@ -1347,9 +1361,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public boolean isOrcamentoAberto(Integer idPedido) {
-		SituacaoPedido s = pesquisarSituacaoPedidoById(idPedido);
-		return SituacaoPedido.isOrcamentoAberto(s);
+	public boolean isOrcamentoAberto(Integer idOrcamento) {
+		return SituacaoPedido.isOrcamentoAberto(pesquisarSituacaoPedidoById(idOrcamento));
 	}
 
 	@Override

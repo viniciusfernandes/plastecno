@@ -33,7 +33,7 @@ public class TransportadoraController extends AbstractController {
     public TransportadoraController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
         setNomeTela("Transportadora");
-        verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
+        verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_BASICO);
     }
 
     @Post("transportadora/desativacao")

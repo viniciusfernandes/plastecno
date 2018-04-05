@@ -708,7 +708,7 @@ alter table vendas.tb_nfe_pedido add constraint id_tipo_nfe foreign key (id_tipo
 alter table vendas.tb_nfe_pedido add constraint id_situacao_nfe foreign key (id_situacao_nfe ) references vendas.tb_situacao_nfe (id);
 
 alter table vendas.tb_item_pedido add aliquota_comissao_representada numeric(5,5) default 0;
-ALTER TABLE vendas.tb_item_pedido RENAME column valor_comissionado_representacao TO valor_comissionado_representada;
+ALTER TABLE vendas.tb_item_pedido add valor_comissionado_representada numeric(9,2) default 0;
 
 alter table vendas.tb_cliente add inscricao_suframa varchar(10) default null;
 
@@ -751,10 +751,6 @@ ALTER TABLE vendas.tb_nfe_pedido add valor numeric(10,2) ;
 ALTER TABLE vendas.tb_nfe_pedido add valor_icms numeric(10,2) ;
 ALTER TABLE vendas.tb_nfe_pedido add data_emissao date ;
 ALTER TABLE vendas.tb_nfe_pedido add nome_cliente varchar(250) ;
-
-ALTER TABLE vendas.tb_pedido add valor_frete numeric(10,2) ;
-
-
 
 ALTER TABLE vendas.tb_logradouro_cliente add cep varchar (8);
 ALTER TABLE vendas.tb_logradouro_cliente add endereco varchar (500);
@@ -966,3 +962,5 @@ insert into vendas.tb_tipo_pagamento values (8, 'FRETE');
 insert into vendas.tb_tipo_pagamento values (9, 'BENEFICIOS_FOLHA');
 insert into vendas.tb_tipo_pagamento values (10, 'ICMS');
 insert into vendas.tb_tipo_pagamento values (11, 'BANCOS_EMPRESTIMOS_JUROS');
+
+alter table vendas.tb_usuario add comissionado_simples boolean default false;

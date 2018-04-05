@@ -196,7 +196,6 @@ insert into vendas.tb_cfop (codigo, descricao) values (2557, 'Transferencia de m
 insert into vendas.tb_cfop (codigo, descricao) values (2603, 'Ressarcimento de ICMS retido por substituicao tributaria');
 insert into vendas.tb_cfop (codigo, descricao) values (2651, 'Compra de combustivel ou lubrificante p/ industrializacao subsequente');
 insert into vendas.tb_cfop (codigo, descricao) values (2652, 'Compra de combustivel ou lubrificante p/ comercializacao');
-insert into vendas.tb_cfop (codigo, descricao) values (2652, 'Compra de combustivel ou lubrificante p/ comercializacao');
 insert into vendas.tb_cfop (codigo, descricao) values (2653, 'Compra de combustivel ou lubrificante por consumidor ou usuario final');
 insert into vendas.tb_cfop (codigo, descricao) values (2658, 'Transferencia de combustivel ou lubrificante p/ industrializacao');
 insert into vendas.tb_cfop (codigo, descricao) values (2659, 'Transferencia de combustivel ou lubrificante p/ comercializacao ');

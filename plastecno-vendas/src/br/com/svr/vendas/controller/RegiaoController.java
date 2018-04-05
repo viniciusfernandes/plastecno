@@ -39,7 +39,8 @@ public class RegiaoController extends AbstractController {
          */
         this.inicializarPicklist("Bairros para Associar", "Bairros Encontrados", "Bairros da Região", "idBairro",
                 "descricao", "CEP");
-        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
+        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.ADMINISTRACAO,
+                TipoAcesso.CADASTRO_BASICO);
     }
 
     private List<CidadeBairroJson> gerarListaCidadeBairro(List<Bairro> listaBairro) {

@@ -179,12 +179,10 @@ public class OrcamentoController extends AbstractPedidoController {
 
             serializarJson(new SerializacaoJson("sucesso", new String[] {"Orçamento No. " + idOrcamento
                     + " foi enviado com sucesso para o cliente " + pedido.getCliente().getNomeFantasia()}));
-        } catch (NotificacaoException e) {
-            gerarLogErro("envio de email do orcamento No. " + idOrcamento, e);
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
-            gerarLogErro("envio de email do orcamento No. " + idOrcamento, e);
+            logErro("Falha no envio de email do orcamento No. " + idOrcamento, e);
             serializarJson(new SerializacaoJson("erros", new String[] {"Falha no envio do orçamento No. " + idOrcamento
                     + ". Verifique o log do servidor para mais detalhes."}));
 

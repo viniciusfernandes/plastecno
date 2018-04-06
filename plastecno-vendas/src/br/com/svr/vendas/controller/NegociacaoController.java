@@ -104,6 +104,10 @@ public class NegociacaoController extends AbstractController {
             serializarJson(new SerializacaoJson("sucesso", "A observação foi incluida com sucesso."));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
+        } catch (Exception e) {
+            logErro("Falha na inclusao da observacao da negociacao.", e);
+            serializarJson(new SerializacaoJson("erros",
+                    new String[] {"Falha na inclusao da observacao da negociacao. Veja o log para mais detalhes."}));
         }
     }
 

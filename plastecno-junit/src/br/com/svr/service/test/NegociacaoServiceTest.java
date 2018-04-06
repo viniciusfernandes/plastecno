@@ -12,6 +12,7 @@ import org.junit.Test;
 import br.com.svr.service.NegociacaoService;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.constante.SituacaoPedido;
+import br.com.svr.service.constante.TipoVenda;
 import br.com.svr.service.constante.crm.CategoriaNegociacao;
 import br.com.svr.service.constante.crm.SituacaoNegociacao;
 import br.com.svr.service.constante.crm.TipoNaoFechamento;
@@ -130,6 +131,47 @@ public class NegociacaoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testCriacaoIndicadorAceiteOrcamento() {
+		Pedido orc = null;
+		try {
+			orc = gPedido.gerarOrcamentoComItem();
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		IndicadorCliente ind = negociacaoService.pesquisarIndicadorByIdCliente(orc.getCliente().getId());
+		assertNotNull("Na inclusao de um orcamento deve ser criado um indicador do cliente", ind);
+		assertEquals("Na inclusao de um orcamento quantidade de orcamentos deve ser igual a 1", (Integer) 1,
+				(Integer) ind.getQuantidadeOrcamentos());
+		assertEquals("Na inclusao de um orcamento quantidade de vendas deve ser igual a 0", (Long) 0L,
+				(Long) ind.getQuantidadeVendas());
+
+		Integer idPed = null;
+		try {
+			idPed = pedidoService.aceitarOrcamento(orc.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ind = recarregarEntidade(IndicadorCliente.class, ind.getId());
+		assertEquals("Apos o aceite de um orcamento quantidade de orcamentos deve ser igual a 1", (Integer) 1,
+				(Integer) ind.getQuantidadeOrcamentos());
+		assertEquals("Apos o aceite de um orcamento quantidade de vendas deve ser igual a 0", (Long) 0L,
+				(Long) ind.getQuantidadeVendas());
+
+		try {
+			pedidoService.enviarPedido(idPed, new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ind = recarregarEntidade(IndicadorCliente.class, ind.getId());
+		assertEquals("Apos o envio de um pedido quantidade de orcamentos deve ser igual a 1", (Integer) 1,
+				(Integer) ind.getQuantidadeOrcamentos());
+		assertEquals("Apos o envio de um pedido quantidade de vendas deve ser igual a 1", (Long) 1L,
+				(Long) ind.getQuantidadeVendas());
+	}
+
+	@Test
 	public void testCriacaoIndicadorClienteInclusaoItemOrcamento() {
 		Pedido orc = gPedido.gerarOrcamento();
 		IndicadorCliente ind = negociacaoService.pesquisarIndicadorByIdCliente(orc.getCliente().getId());
@@ -147,7 +189,80 @@ public class NegociacaoServiceTest extends AbstractTest {
 				(Double) ind.getIndiceConversaoValor());
 
 		assertEquals("Na inclusao de um item de orcamento o indice de quantidade deve ser 1", (Double) 0d,
-				(Double) ind.getIndiceConversaoValor());
+				(Double) ind.getIndiceConversaoQuantidade());
+	}
+
+	@Test
+	public void testCriacaoIndicadorClienteMudancaValoresItemOrcamento() {
+		Pedido orc = gPedido.gerarOrcamento();
+		ItemPedido i = gPedido.gerarItemPedido(orc.getRepresentada());
+		i.setQuantidade(100);
+		i.setTipoVenda(TipoVenda.PECA);
+		i.setPrecoVenda(10d);
+
+		try {
+			pedidoService.inserirItemPedido(orc.getId(), i);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		orc = recarregarEntidade(Pedido.class, orc.getId());
+		IndicadorCliente ind = negociacaoService.pesquisarIndicadorByIdCliente(orc.getCliente().getId());
+		assertEquals(
+				"Na inclusao do primeiro item de orcamento o valor de orcamentos deve ser igual ao valor do orcamento sem frete",
+				(Double) orc.calcularValorPedidoIPISemFrete(), (Double) ind.getValorOrcamentos());
+
+		assertEquals("Na inclusao do primeiro item de orcamento o indice de quantidade deve ser 1", (Integer) 1,
+				(Integer) ind.getQuantidadeOrcamentos());
+
+		// reduzindo a quantidade do item para verificar o tratamento da reducao
+		// do valor do orcamento.
+		i.setQuantidade(1);
+		try {
+			pedidoService.inserirItemPedido(orc.getId(), i);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		orc = recarregarEntidade(Pedido.class, orc.getId());
+		ind = recarregarEntidade(IndicadorCliente.class, ind.getId());
+
+		assertEquals(
+				"Na reducao do valor do item o valor anterior deve ser subtraido do valor dos orcamentos do indicador",
+				(Double) orc.calcularValorPedidoIPISemFrete(), (Double) ind.getValorOrcamentos());
+
+		ItemPedido i2 = i.clone();
+		i2.setQuantidade(20);
+		i2.setPrecoVenda(20d);
+		i2.setAliquotaIPI(0d);
+		i2.setTipoVenda(TipoVenda.PECA);
+
+		double valOrc = ind.getValorOrcamentos() + 400d;
+
+		try {
+			pedidoService.inserirItemPedido(orc.getId(), i2);
+		} catch (BusinessException e) {
+
+			printMensagens(e);
+		}
+		ind = recarregarEntidade(IndicadorCliente.class, ind.getId());
+		assertEquals("Na inclusao de novo item seu valor deve ser adicionado ao valor dos orcamentos do indicador",
+				(Double) valOrc, (Double) ind.getValorOrcamentos());
+
+		try {
+			pedidoService.enviarPedido(orc.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		assertEquals("No envio do orcamento os valores e quantidades de orcamentos devem permanecer os mesmos.",
+				(Double) valOrc, (Double) ind.getValorOrcamentos());
+		assertEquals("No envio do orcamento os valores e quantidades de orcamentos devem permanecer os mesmos.",
+				(Integer) 1, (Integer) ind.getQuantidadeOrcamentos());
+
+		assertEquals("No envio do orcamento os valores e quantidades de pedidos devem ser zero.", (Double) 0d,
+				(Double) ind.getValorVendas());
+		assertEquals("No envio do orcamento os valores e quantidades de pedidos devem ser zero.", (Long) 0L,
+				(Long) ind.getQuantidadeVendas());
 	}
 
 	@Test

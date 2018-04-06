@@ -1,7 +1,5 @@
 package br.com.svr.service.dao.crm;
 
-import java.util.List;
-
 import javax.persistence.EntityManager;
 
 import br.com.svr.service.dao.GenericDAO;
@@ -37,13 +35,13 @@ public class IndicadorClienteDAO extends GenericDAO<IndicadorCliente> {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
 						"select i.quantidadeOrcamentos from IndicadorCliente i where i.idCliente =:idCliente")
-						.setParameter("idCliente", idCliente), int.class, 0);
+						.setParameter("idCliente", idCliente), Integer.class, 0);
 	}
 
 	public double pesquisarValorOrcamentos(Integer idCliente) {
-		List<Double> l = entityManager
-				.createQuery("select i.valorOrcamentos from IndicadorCliente i where i.idCliente =:idCliente",
-						Double.class).setParameter("idCliente", idCliente).getResultList();
-		return l.isEmpty() ? 0d : l.get(0);
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery(
+						"select i.valorOrcamentos from IndicadorCliente i where i.idCliente =:idCliente", Double.class)
+						.setParameter("idCliente", idCliente), Double.class, 0d);
 	}
 }

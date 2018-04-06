@@ -2268,14 +2268,17 @@ public class PedidoServiceImpl implements PedidoService {
 			ind.setIdCliente(idCliente);
 		}
 		double valOrc = indicadorClienteDAO.pesquisarValorOrcamentos(idCliente);
-
-		// Aqui esta sendo descontado o valor do pedido velho para incluir o
-		// valor do pedido que teve um item adicionado ou alterado. Esse
-		// desconto deve ocorrer e nao pode ser incluido duas vezes.
-		if (-valorVelho + valorNovo <= 0) {
+		if (valOrc <= 0) {
 			valOrc = valorNovo;
+
 		} else {
-			valOrc = -valorVelho + valorNovo;
+			// Aqui esta sendo descontado o valor do pedido velho para incluir o
+			// valor do pedido que teve um item adicionado ou alterado. Esse
+			// desconto deve ocorrer e nao pode ser incluido duas vezes.
+			valOrc += -valorVelho + valorNovo;
+			if (valOrc < 0) {
+				valOrc = valorNovo;
+			}
 		}
 
 		ind.setValorOrcamentos(valOrc);

@@ -570,6 +570,9 @@ create index idx_comissao_id_forma_material on vendas.tb_comissao (id_forma_mate
 create index idx_comissao_id_material on vendas.tb_comissao (id_material);
 create sequence vendas.seq_comissao_id increment by 1 minvalue 1 no maxvalue start with 1;
 
+alter table vendas.tb_comissao rename column valor to aliquota_revenda;
+alter table vendas.tb_comissao add aliquota_representacao numeric(2, 2) default null;
+
 alter table vendas.tb_item_pedido add comissao numeric (2,2) default 0;
 update vendas.tb_perfil_acesso set descricao = 'CADASTRO_PEDIDO_VENDAS' WHERE ID = 9;
 

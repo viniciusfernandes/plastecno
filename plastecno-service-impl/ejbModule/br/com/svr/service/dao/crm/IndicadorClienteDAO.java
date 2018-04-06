@@ -1,5 +1,7 @@
 package br.com.svr.service.dao.crm;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 
 import br.com.svr.service.dao.GenericDAO;
@@ -27,20 +29,21 @@ public class IndicadorClienteDAO extends GenericDAO<IndicadorCliente> {
 
 	public IndicadorCliente pesquisarIndicadorById(Integer idCliente) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i from IndicadorCliente i where i.idCliente =:idCliente").setParameter(
-						"idCliente", idCliente), IndicadorCliente.class, null);
+				entityManager.createQuery("select i from IndicadorCliente i where i.idCliente =:idCliente")
+						.setParameter("idCliente", idCliente), IndicadorCliente.class, null);
 	}
 
 	public int pesquisarQuantidadeOrcamentos(Integer idCliente) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
-						"select i.quantidadeOrcamentos from IndicadorCliente i where i.idCliente =:idCliente").setParameter(
-						"idCliente", idCliente), int.class, 0);
+						"select i.quantidadeOrcamentos from IndicadorCliente i where i.idCliente =:idCliente")
+						.setParameter("idCliente", idCliente), int.class, 0);
 	}
 
-	public int pesquisarValorOrcamentos(Integer idCliente) {
-		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i.valorOrcamentos from IndicadorCliente i where i.idCliente =:idCliente")
-						.setParameter("idCliente", idCliente), int.class, 0);
+	public double pesquisarValorOrcamentos(Integer idCliente) {
+		List<Double> l = entityManager
+				.createQuery("select i.valorOrcamentos from IndicadorCliente i where i.idCliente =:idCliente",
+						Double.class).setParameter("idCliente", idCliente).getResultList();
+		return l.isEmpty() ? 0d : l.get(0);
 	}
 }

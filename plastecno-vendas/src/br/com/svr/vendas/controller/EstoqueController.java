@@ -45,7 +45,10 @@ public class EstoqueController extends AbstractController {
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
-            gerarLogErroRequestAjax("cálculo do preço minimo do item do pedido", e);
+            logErro("Falha no calculo do preco minimo do item do pedido", e);
+            serializarJson(new SerializacaoJson("erros",
+                    new String[] {"Falha no calculo do preco minimo do item do pedido. Veja o log para mais detalhes."}));
+
         }
     }
 

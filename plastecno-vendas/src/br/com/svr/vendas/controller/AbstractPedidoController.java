@@ -74,7 +74,7 @@ public class AbstractPedidoController extends AbstractController {
     public AbstractPedidoController(Result result, UsuarioInfo usuarioInfo, GeradorRelatorioPDF geradorRelatorioPDF,
             HttpServletRequest request) {
         super(result, usuarioInfo, geradorRelatorioPDF, request);
-        verificarPermissaoAcesso("acessoCadastroPedidoPermitido", CADASTRO_PEDIDO_VENDAS);
+        verificarPermissaoAcesso("acessoCadastroPedidoPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_VENDAS);
         verificarPermissaoAcesso("acessoDadosNotaFiscalPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_COMPRA);
     }
 
@@ -311,7 +311,9 @@ public class AbstractPedidoController extends AbstractController {
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
-            gerarLogErroRequestAjax("inclusao/alteracao do item do pedido " + numeroPedido, e);
+            logErro("Falha inclusao/alteracao do item do pedido " + numeroPedido, e);
+            serializarJson(new SerializacaoJson("erros", new String[] {"Falha inclusao/alteracao do item do pedido "
+                    + numeroPedido + ". Veja o log do servidor para mais detalhes."}));
         }
     }
 
@@ -451,7 +453,10 @@ public class AbstractPedidoController extends AbstractController {
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
-            gerarLogErro("Remoção do item do pedido", e);
+            logErro("Falha na remoção do item do pedido", e);
+            serializarJson(new SerializacaoJson("erros",
+                    new String[] {"Falha na remoção do item do pedido. Veja o log do servidor para mais detalhes."}));
+
         }
     }
 

@@ -38,7 +38,6 @@ import br.com.svr.service.entity.Representada;
 import br.com.svr.service.entity.Transportadora;
 import br.com.svr.service.entity.Usuario;
 import br.com.svr.service.exception.BusinessException;
-import br.com.svr.service.exception.NotificacaoException;
 import br.com.svr.service.mensagem.email.AnexoEmail;
 import br.com.svr.service.relatorio.RelatorioService;
 import br.com.svr.util.NumeroUtils;
@@ -248,11 +247,12 @@ public class PedidoController extends AbstractPedidoController {
                     + idPedido + " foi enviado com sucesso para o cliente " + pedido.getCliente().getNomeFantasia()
                     : "Pedido No. " + idPedido + " foi enviado com sucesso para a representada "
                             + pedido.getRepresentada().getNomeFantasia()}));
-        } catch (NotificacaoException e) {
-            logErro("envio de email do pedido No. " + idPedido, e);
-            serializarJson(new SerializacaoJson("erros", e.getListaMensagem().toArray()));
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem().toArray()));
+        } catch (Exception e) {
+            logErro("Falha envio de email do pedido No. " + idPedido, e);
+            serializarJson(new SerializacaoJson("erros", new String[] {"Falha envio de email do pedido No. " + idPedido
+                    + ". Verifique o log do servidor."}));
         }
     }
 
@@ -364,7 +364,9 @@ public class PedidoController extends AbstractPedidoController {
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
-            gerarLogErroRequestAjax("inclusao/alteracao do pedido", e);
+            logErro("Falha inclusao/alteracao do pedido", e);
+            serializarJson(new SerializacaoJson("erros",
+                    new String[] {"Falha inclusao/alteracao do pedido. Veja o log para mais detalhes."}));
         }
     }
 

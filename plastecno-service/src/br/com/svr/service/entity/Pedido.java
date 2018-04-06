@@ -571,6 +571,10 @@ public class Pedido implements Serializable, Cloneable {
 		return SituacaoPedido.isOrcamento(situacaoPedido);
 	}
 
+	public boolean isOrcamentoAberto() {
+		return SituacaoPedido.isOrcamentoAberto(situacaoPedido);
+	}
+
 	public boolean isOrcamentoDigitacao() {
 		return isVenda() && SituacaoPedido.ORCAMENTO_DIGITACAO.equals(situacaoPedido);
 	}

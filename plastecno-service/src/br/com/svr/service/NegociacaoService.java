@@ -20,6 +20,8 @@ public interface NegociacaoService {
 
 	void alterarSituacaoNegociacaoAceite(Integer idNegociacao);
 
+	void atualizarIndiceNegociacao();
+
 	double calcularValorCategoriaNegociacaoAberta(Integer idVendedor, CategoriaNegociacao categoria);
 
 	Integer cancelarNegocicacao(Integer idNegociacao, TipoNaoFechamento tipoNaoFechamento) throws BusinessException;

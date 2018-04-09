@@ -76,6 +76,29 @@ public class NegociacaoServiceImpl implements NegociacaoService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void atualizarIndiceNegociacao() {
+		List<Object[]> idCli = entityManager.createQuery("select n.id, n.idCliente from Negociacao n ", Object[].class)
+				.getResultList();
+		for (Object id[] : idCli) {
+			try {
+				entityManager
+						.createQuery(
+								"update Negociacao ne set ne.indiceConversaoQuantidade = (select i.indiceConversaoQuantidade from IndicadorCliente i where i.idCliente=:idCli) where ne.id =:id")
+						.setParameter("id", id[0]).setParameter("idCli", id[1]).executeUpdate();
+				entityManager
+						.createQuery(
+								"update Negociacao ne set ne.indiceConversaoValor = (select i.indiceConversaoValor from IndicadorCliente i where i.idCliente=:idCli) where ne.id =:id")
+						.setParameter("id", id[0]).setParameter("idCli", id[1]).executeUpdate();
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Falha na atualizacao das negociacoes do indice de conversao do cliente ", e);
+				return;
+			}
+		}
+
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public double calcularValorCategoriaNegociacaoAberta(Integer idVendedor, CategoriaNegociacao categoria) {
 		return negociacaoDAO.calcularValorCategoriaNegociacaoAberta(idVendedor, categoria);

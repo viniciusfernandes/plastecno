@@ -28,7 +28,7 @@ public final class MaterialController extends AbstractController {
         this.setNomeTela("Material");
         this.inicializarPicklist("Representadas", "Representadas Cadastradas", "Representadas Associadas", "id",
                 "nomeFantasia");
-        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
+        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_BASICO);
     }
 
     @Post("material/desativacao")

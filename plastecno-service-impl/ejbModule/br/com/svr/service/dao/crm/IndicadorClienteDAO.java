@@ -27,20 +27,21 @@ public class IndicadorClienteDAO extends GenericDAO<IndicadorCliente> {
 
 	public IndicadorCliente pesquisarIndicadorById(Integer idCliente) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i from IndicadorCliente i where i.idCliente =:idCliente").setParameter(
-						"idCliente", idCliente), IndicadorCliente.class, null);
+				entityManager.createQuery("select i from IndicadorCliente i where i.idCliente =:idCliente")
+						.setParameter("idCliente", idCliente), IndicadorCliente.class, null);
 	}
 
 	public int pesquisarQuantidadeOrcamentos(Integer idCliente) {
 		return QueryUtil.gerarRegistroUnico(
 				entityManager.createQuery(
-						"select i.quantidadeOrcamentos from IndicadorCliente i where i.idCliente =:idCliente").setParameter(
-						"idCliente", idCliente), int.class, 0);
+						"select i.quantidadeOrcamentos from IndicadorCliente i where i.idCliente =:idCliente")
+						.setParameter("idCliente", idCliente), Integer.class, 0);
 	}
 
-	public int pesquisarValorOrcamentos(Integer idCliente) {
+	public double pesquisarValorOrcamentos(Integer idCliente) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select i.valorOrcamentos from IndicadorCliente i where i.idCliente =:idCliente")
-						.setParameter("idCliente", idCliente), int.class, 0);
+				entityManager.createQuery(
+						"select i.valorOrcamentos from IndicadorCliente i where i.idCliente =:idCliente", Double.class)
+						.setParameter("idCliente", idCliente), Double.class, 0d);
 	}
 }

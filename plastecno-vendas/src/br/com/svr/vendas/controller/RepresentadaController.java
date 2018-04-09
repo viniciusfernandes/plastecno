@@ -38,7 +38,8 @@ public class RepresentadaController extends AbstractController {
     public RepresentadaController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
         this.setNomeTela("Representada");
-        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
+        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.ADMINISTRACAO,
+                TipoAcesso.CADASTRO_BASICO);
     }
 
     @Post("representada/desativacao")

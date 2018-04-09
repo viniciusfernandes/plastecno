@@ -319,7 +319,7 @@ public class Pedido implements Serializable, Cloneable {
 		return this.valorPedido += valor;
 	}
 
-	public Double calcularValorTotalSemFrete() {
+	public Double calcularValorPedidoIPISemFrete() {
 		return (valorPedidoIPI == null ? 0d : valorPedidoIPI) - (valorFrete == null ? 0d : valorFrete);
 	}
 
@@ -569,6 +569,10 @@ public class Pedido implements Serializable, Cloneable {
 
 	public boolean isOrcamento() {
 		return SituacaoPedido.isOrcamento(situacaoPedido);
+	}
+
+	public boolean isOrcamentoAberto() {
+		return SituacaoPedido.isOrcamentoAberto(situacaoPedido);
 	}
 
 	public boolean isOrcamentoDigitacao() {

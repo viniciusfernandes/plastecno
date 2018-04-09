@@ -26,7 +26,8 @@ public class RamoAtividadeController extends AbstractController {
     public RamoAtividadeController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
         this.setNomeTela("Ramo de atividade");
-        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
+        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.ADMINISTRACAO,
+                TipoAcesso.CADASTRO_BASICO);
     }
 
     @Post("ramo/desativacao")

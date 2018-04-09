@@ -1613,14 +1613,19 @@ public class PedidoServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPedidoDigitadoSemVendedorAssociado() {
-		Pedido pedido = gPedido.gerarPedidoRepresentacao();
+		Pedido p = gPedido.gerarPedidoRepresentacao();
 		Usuario outroVend = gPedido.gerarVendedor();
 		outroVend = recarregarEntidade(Usuario.class, outroVend.getId());
-		pedido.setVendedor(outroVend);
+		try {
+			p = pedidoService.pesquisarPedidoById(pedidoService.copiarPedido(p.getId(), false));
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		p.setVendedor(outroVend);
 
 		boolean throwed = false;
 		try {
-			pedido = pedidoService.inserirPedido(pedido);
+			pedidoService.inserirPedido(p);
 		} catch (BusinessException e) {
 			throwed = true;
 		}

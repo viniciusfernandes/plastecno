@@ -98,7 +98,9 @@ public class FluxoCaixaController extends AbstractController {
         } catch (BusinessException e) {
             serializarJson(new SerializacaoJson("erros", e.getListaMensagem()));
         } catch (Exception e) {
-            gerarLogErroRequestAjax("inclusao/alteracao do pedido", e);
+            logErro("Falha na inclusao/alteracao do pedido.", e);
+            serializarJson(new SerializacaoJson("erros",
+                    new String[] {"Falha na inclusao/alteracao do pedido. Veja o log para mais detalhes."}));
         }
 
     }

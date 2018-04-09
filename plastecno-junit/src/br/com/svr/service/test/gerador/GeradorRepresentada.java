@@ -52,7 +52,7 @@ public class GeradorRepresentada {
 		r = eBuilder.buildRepresentada();
 		r.setTipoApresentacaoIPI(TipoApresentacaoIPI.SEMPRE);
 		r.setTipoRelacionamento(tpRelac);
-		try {
+		try { 
 			r.setId(representadaService.inserir(r));
 		} catch (BusinessException e3) {
 			printMensagens(e3);

@@ -90,8 +90,8 @@ public class EmissaoNFeController extends AbstractController {
 
     public EmissaoNFeController(HttpServletRequest request, Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
-        this.setNomeTela("Ramo de atividade");
-        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.CADASTRO_BASICO);
+        setNomeTela("Ramo de atividade");
+        verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.ADMINISTRACAO, TipoAcesso.CADASTRO_BASICO);
 
         inicializarListaCfop(request);
     }

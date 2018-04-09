@@ -57,6 +57,8 @@ public class EstoqueServiceTest extends AbstractTest {
 		} else {
 			pedido = gPedido.gerarPedidoRepresentacao();
 		}
+		Representada r = recarregarEntidade(Representada.class, pedido.getRepresentada().getId());
+		pedido.setRepresentada(r);
 
 		ItemPedido item = eBuilder.buildItemPedido();
 		if (quantidade != null) {
@@ -674,23 +676,23 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemInexistenteEstoque() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
-		itemEstoque.setId(null);
+		ItemEstoque item = gerarItemPedidoNoEstoque();
+		ItemEstoque item2 = item.clone();
 
 		Integer idItem = null;
 
 		try {
-			idItem = estoqueService.inserirItemEstoque(itemEstoque);
+			idItem = estoqueService.inserirItemEstoque(item2);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		itemEstoque = estoqueService.pesquisarItemEstoqueById(idItem);
+		item2 = estoqueService.pesquisarItemEstoqueById(idItem);
 		Double precoFatorICMS = 64.31;
 
 		assertEquals(
 				"Apos a inclusao de um item novo deve-se aplicar o fator ICMS no preco de custo. Verifique o algoritmo de calculo",
-				precoFatorICMS, NumeroUtils.arredondarValor2Decimais(itemEstoque.getPrecoMedioFatorICMS()));
+				precoFatorICMS, NumeroUtils.arredondarValor2Decimais(item2.getPrecoMedioFatorICMS()));
 	}
 
 	@Test
@@ -756,33 +758,33 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testPesquisarItemEstoqueCadastrado() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
-		itemEstoque.setId(null);
-		Integer idItemEstoque = null;
+		ItemEstoque item1 = gerarItemPedidoNoEstoque();
+		ItemEstoque item2 = item1.clone();
+		Integer idItem2 = null;
 		try {
-			idItemEstoque = estoqueService.inserirItemEstoque(itemEstoque);
+			idItem2 = estoqueService.inserirItemEstoque(item2);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		ItemEstoque itemClone = itemEstoque.clone();
+		ItemEstoque itemClone = item1.clone();
 		ItemEstoque itemCadastrado = estoqueService.pesquisarItemEstoque(itemClone);
 
 		assertNotNull(
 				"O item pesquisado eh identico ao cadastrado, portanto deve existir no sistema. Possivel falha na inclusao",
 				itemCadastrado);
 		assertEquals("O item pesquisado eh identico ao cadastrado, portanto deve existir no sistema com o mesmo ID",
-				idItemEstoque, itemCadastrado.getId());
+				idItem2, itemCadastrado.getId());
 
 		final double tolerancia = 0.02d;
 		// Alterando o comprimento em 1mm para testar a tolerancia.
-		itemClone.setComprimento(itemEstoque.getComprimento() + tolerancia);
+		itemClone.setComprimento(item1.getComprimento() + tolerancia);
 
 		itemCadastrado = estoqueService.pesquisarItemEstoque(itemClone);
 		assertNull(
 				"Foi adicionado o valor de tolerancia ao item de estoque para verificar que ele nao existe no estoque e deve ser nulo",
 				itemCadastrado);
 		// Alterando o comprimento em 1mm para testar a tolerancia.
-		itemClone.setComprimento(itemEstoque.getComprimento() - tolerancia);
+		itemClone.setComprimento(item1.getComprimento() - tolerancia);
 
 		itemCadastrado = estoqueService.pesquisarItemEstoque(itemClone);
 		assertNull(
@@ -1120,16 +1122,16 @@ public class EstoqueServiceTest extends AbstractTest {
 		iEstoque.copiar(iCompra);
 		iEstoque.setNcm(null);
 
-		Integer idItemEstoque = null;
+		Integer idItemEst = null;
 		try {
-			idItemEstoque = estoqueService.inserirItemEstoque(iEstoque);
+			idItemEst = estoqueService.inserirItemEstoque(iEstoque);
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
 
 		try {
-			iEstoque = recarregarEntidade(ItemEstoque.class, iEstoque.getId());
-			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(),
+			iEstoque = recarregarEntidade(ItemEstoque.class, idItemEst);
+			idItemEst = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(),
 					iCompra.getQuantidade(), null);
 		} catch (BusinessException e) {
 			printMensagens(e);
@@ -1138,7 +1140,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		assertEquals(SituacaoPedido.COMPRA_RECEBIDA,
 				pedidoService.pesquisarSituacaoPedidoById(iCompra.getPedido().getId()));
 
-		iEstoque = estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		iEstoque = estoqueService.pesquisarItemEstoqueById(idItemEst);
 		iCompra = pedidoService.pesquisarItemPedidoById(iCompra.getId());
 
 		iCompra = pedidoService.pesquisarItemPedidoById(iCompra.getId());

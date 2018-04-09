@@ -1,5 +1,7 @@
 package br.com.svr.service.test.gerador;
 
+import java.util.List;
+
 import org.junit.Assert;
 
 import br.com.svr.service.TransportadoraService;
@@ -28,13 +30,17 @@ public class GeradorTransportadora {
 	}
 
 	public Transportadora gerarTransportadora() {
-		Integer idTransportadora = null;
+		Integer idTrans = null;
+		List<Transportadora> lTransp = transportadoraService.pesquisarTransportadoraAtiva();
+		if (lTransp.size() >= 1) {
+			return lTransp.get(0);
+		}
 		try {
-			idTransportadora = transportadoraService.inserir(eBuilder.buildTransportadora());
+			idTrans = transportadoraService.inserir(eBuilder.buildTransportadora());
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-		return transportadoraService.pesquisarTransportadoraLogradouroById(idTransportadora);
+		return transportadoraService.pesquisarTransportadoraLogradouroById(idTrans);
 	}
 
 	public void printMensagens(BusinessException exception) {

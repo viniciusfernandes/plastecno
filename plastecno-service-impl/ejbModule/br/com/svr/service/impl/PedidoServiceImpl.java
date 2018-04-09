@@ -795,7 +795,7 @@ public class PedidoServiceImpl implements PedidoService {
 					.append(pedido.getCliente().getNomeCompleto())
 					.append(" e contato feito por " + pedido.getContato().getNome());
 
-			e.addMensagem(e.getListaMensagem());
+			e.addMensagem(mensagem.toString());
 			throw e;
 		}
 	}
@@ -829,7 +829,7 @@ public class PedidoServiceImpl implements PedidoService {
 					.append(pedido.getCliente().getNomeCompleto())
 					.append(" e contato feito por " + pedido.getContato().getNome());
 
-			e.addMensagem(e.getListaMensagem());
+			e.addMensagem(mensagem.toString());
 			throw e;
 		}
 	}
@@ -937,7 +937,7 @@ public class PedidoServiceImpl implements PedidoService {
 					.append(pedido.getVendedor().getNomeCompleto()).append(" para a representada ")
 					.append(pedido.getRepresentada().getNomeFantasia());
 
-			e.addMensagem(e.getListaMensagem());
+			e.addMensagem(mensagem.toString());
 			throw e;
 		}
 	}
@@ -1215,13 +1215,7 @@ public class PedidoServiceImpl implements PedidoService {
 		 * Devemos sempre atualizar o valor do pedido mesmo em caso de excecao
 		 * de validacoes, caso contrario teremos um valor nulo na base de dados.
 		 */
-		double[] valores = atualizarValoresPedido(idPedido);
-		// No caso em esse seja o primeiro item a ser incluido o pedido nao
-		// contera um valor velho, portanto devemos configurar o valor do pedido
-		// novo que acabou de ser calculado.
-		if (valPedVelho == 0) {
-			// valPedNovo = valores[1];
-		}
+		atualizarValoresPedido(idPedido);
 
 		// Aqui esta sendo recalculado o valor do orcamento velho para incluir o
 		// valor do orcamento que teve um item adicionado ou alterado. Esse
@@ -1230,11 +1224,12 @@ public class PedidoServiceImpl implements PedidoService {
 		// parado no sistema, as os dados de valores devem ser incluidos nos
 		// indicadores do cliente pois assim o vendedor sabera o quanto esta
 		// sendo orcado.
-		if (pedido.isOrcamento() && pedido.isVenda()) {
+		if (pedido.isOrcamentoAberto() && pedido.isVenda()) {
 			valPedNovo = pesquisarValorPedidoIPI(idPedido);
 			Integer idCliente = pedido.getCliente() == null ? pesquisarIdClienteByIdPedido(pedido.getId()) : pedido
 					.getCliente().getId();
 			IndicadorCliente ind = recalcularIndiceValorOrcamento(idCliente, valPedVelho, valPedNovo);
+
 			negociacaoService.alterarNegociacaoAbertaIndiceConversaoValorByIdCliente(idCliente,
 					ind.getIndiceConversaoQuantidade(), ind.getIndiceConversaoValor());
 
@@ -2267,17 +2262,25 @@ public class PedidoServiceImpl implements PedidoService {
 			return null;
 		}
 
-		double valOrc = indicadorClienteDAO.pesquisarValorOrcamentos(idCliente);
-		// Aqui esta sendo descontado o valor do pedido velho para incluir o
-		// valor do pedido que teve um item adicionado ou alterado. Esse
-		// desconto deve ocorrer e nao pode ser incluido duas vezes.
-		valOrc = valOrc - valorVelho + valorNovo;
-
 		IndicadorCliente ind = indicadorClienteDAO.pesquisarIndicadorById(idCliente);
 		if (ind == null) {
 			ind = new IndicadorCliente();
 			ind.setIdCliente(idCliente);
 		}
+		double valOrc = indicadorClienteDAO.pesquisarValorOrcamentos(idCliente);
+		if (valOrc <= 0) {
+			valOrc = valorNovo;
+
+		} else {
+			// Aqui esta sendo descontado o valor do pedido velho para incluir o
+			// valor do pedido que teve um item adicionado ou alterado. Esse
+			// desconto deve ocorrer e nao pode ser incluido duas vezes.
+			valOrc += -valorVelho + valorNovo;
+			if (valOrc < 0) {
+				valOrc = valorNovo;
+			}
+		}
+
 		ind.setValorOrcamentos(valOrc);
 		ind.calcularIndicadores();
 		return indicadorClienteDAO.alterar(ind);

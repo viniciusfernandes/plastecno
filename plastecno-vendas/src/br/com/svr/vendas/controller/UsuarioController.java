@@ -37,7 +37,8 @@ public class UsuarioController extends AbstractController {
         this.setNomeTela("Usuario do sistema");
         this.inicializarPicklist("Perfis de Acesso", "Perfis Cadastrados", "Perfis Associados", "id", "descricao",
                 false);
-        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.ADMINISTRACAO);
+        this.verificarPermissaoAcesso("acessoCadastroBasicoPermitido", TipoAcesso.ADMINISTRACAO,
+                TipoAcesso.ADMINISTRACAO);
     }
 
     @Post("usuario/desativacao")

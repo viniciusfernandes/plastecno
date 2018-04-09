@@ -60,6 +60,13 @@ public class NegociacaoController extends AbstractController {
         irTopoPagina();
     }
 
+    @Get("negociacao/atualizacaonegociacao")
+    public void atualizarNegociacao() {
+        System.out.println("INICIO de atualizacao da negociacao ...");
+        negociacaoService.atualizarIndiceNegociacao();
+        System.out.println("FIM de atualizacao da negociacao ...");
+    }
+
     @Post("negociacao/cancelamento/{idNegociacao}")
     public void cancelarNegocicacao(Integer idNegociacao, TipoNaoFechamento motivo) {
         try {
@@ -74,9 +81,7 @@ public class NegociacaoController extends AbstractController {
     public void gerarIndicadorCliente() {
         try {
             System.out.println("INICIO de geracao de indicador do cliente...");
-
             negociacaoService.gerarIndicadorCliente();
-
             System.out.println("FIM de geracao de indicador do cliente...");
         } catch (BusinessException e) {
             gerarLogErro("Geracao indice de conversao", e);

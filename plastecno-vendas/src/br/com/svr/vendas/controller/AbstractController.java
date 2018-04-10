@@ -333,7 +333,8 @@ public abstract class AbstractController {
         pedido.setDataEntregaFormatada(formatarData(pedido.getDataEntrega()));
         pedido.setValorPedidoFormatado(NumeroUtils.formatarValor2Decimais(pedido.getValorPedido()));
         pedido.setValorPedidoIPIFormatado(NumeroUtils.formatarValor2Decimais(pedido.getValorPedidoIPI()));
-        pedido.setValorTotalSemFreteFormatado(NumeroUtils.formatarValor2Decimais(pedido.calcularValorPedidoIPISemFrete()));
+        pedido.setValorTotalSemFreteFormatado(NumeroUtils.formatarValor2Decimais(pedido
+                .calcularValorPedidoIPISemFrete()));
         pedido.setValorFreteFormatado(NumeroUtils.formatarValor2Decimais(pedido.getValorFrete()));
         pedido.setDataEmissaoNFFormatada(formatarData(pedido.getDataEmissaoNF()));
         pedido.setDataVencimentoNFFormatada(formatarData(pedido.getDataVencimentoNF()));
@@ -740,6 +741,10 @@ public abstract class AbstractController {
 
     boolean isElementosNaoAssociadosPreenchidosPicklist() {
         return this.picklist.isElementosNaoAssociadosPreenchidos();
+    }
+
+    boolean isVendedor() {
+        return usuarioInfo.isVendaPermitida();
     }
 
     void logErro(String descricao, Exception e) {

@@ -5,8 +5,15 @@
 <head>
 <jsp:include page="/bloco/bloco_header.jsp" />
 <jsp:include page="/bloco/bloco_css.jsp" />
+<script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/modalConfirmacao.js?${versaoCache}"/>"></script>
-
+<script type="text/javascript">
+$(document).ready(function() {
+	<c:if test="${acessoInicialTelaNegociacao}">
+		$('#linkNegociacao')[0].click();
+	</c:if>
+});
+</script>
 </head>
 <body>
 	<div id="content">
@@ -136,7 +143,10 @@
 									Editor</a></li>
 						</ul></li>
 				</c:if>
-				<li><a href="negociacao" target="principal_frame">Negociação</a></li>
+				<c:if test="${acessoVendaPermitido}">
+					<li><a id="linkNegociacao" href="negociacao" target="principal_frame">Negociação</a></li>
+				</c:if>
+				
 			</ul>
 		</nav>
 		<div id="center_content">

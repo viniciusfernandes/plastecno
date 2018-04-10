@@ -20,9 +20,11 @@ public class UsuarioInfo {
     private boolean compraPermitida;
     private String email;
     private List<TipoAcesso> listaTipoAcesso;
+
     private String nome;
     private String nomeCompleto;
     private boolean usuarioLogado = false;
+    private boolean vendaPermitida;
 
     public Integer getCodigoUsuario() {
         return this.codigoUsuario;
@@ -45,25 +47,25 @@ public class UsuarioInfo {
             return;
         }
 
-        this.codigoUsuario = usuario.getId();
-        this.compraPermitida = usuario.isComprador();
-        this.nomeCompleto = usuario.getNomeCompleto();
-        this.nome = usuario.getNome();
-        this.email = usuario.getEmail();
+        codigoUsuario = usuario.getId();
+        compraPermitida = usuario.isComprador();
+        nomeCompleto = usuario.getNomeCompleto();
+        nome = usuario.getNome();
+        email = usuario.getEmail();
+        vendaPermitida = usuario.isVendedor();
 
-        this.usuarioLogado = true;
-        this.listaTipoAcesso = new ArrayList<TipoAcesso>();
+        usuarioLogado = true;
+        listaTipoAcesso = new ArrayList<TipoAcesso>();
 
         if (usuario.getListaPerfilAcesso() != null) {
             TipoAcesso tipoAcesso = null;
             for (PerfilAcesso perfil : usuario.getListaPerfilAcesso()) {
                 tipoAcesso = TipoAcesso.valueOfBy(perfil.getDescricao());
                 if (tipoAcesso != null) {
-                    this.listaTipoAcesso.add(tipoAcesso);
+                    listaTipoAcesso.add(tipoAcesso);
                 }
             }
         }
-
     }
 
     public boolean isAcessoNaoPermitido(TipoAcesso... tipoAcesso) {
@@ -92,6 +94,10 @@ public class UsuarioInfo {
 
     public boolean isLogado() {
         return usuarioLogado;
+    }
+
+    public boolean isVendaPermitida() {
+        return vendaPermitida;
     }
 
     public void limpar() {

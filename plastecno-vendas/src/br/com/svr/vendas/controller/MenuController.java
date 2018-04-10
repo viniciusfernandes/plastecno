@@ -44,10 +44,10 @@ public class MenuController extends AbstractController {
         verificarPermissaoAcesso("acessoRelatorioFaturamentoPermitido", ADMINISTRACAO);
         verificarPermissaoAcesso("acessoPagamentoPermitido", ADMINISTRACAO, CADASTRO_PEDIDO_COMPRA, OPERACAO_CONTABIL);
         verificarPermissaoAcesso("acessoFluxoCaixaPermitido", ADMINISTRACAO, OPERACAO_CONTABIL);
+        verificarPermissaoAcesso("acessoInicialTelaNegociacao", CADASTRO_PEDIDO_VENDAS);
     }
 
     @Get("/")
     public void menuHome() {
     }
-
 }

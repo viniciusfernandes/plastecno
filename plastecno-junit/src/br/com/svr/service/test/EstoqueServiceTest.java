@@ -85,10 +85,6 @@ public class EstoqueServiceTest extends AbstractTest {
 		return enviarItemPedido(null, tipoPedido);
 	}
 
-	private ItemPedido enviarItemPedidoCompra() {
-		return enviarItemPedido(TipoPedido.COMPRA);
-	}
-
 	private ItemPedido enviarItemPedidoRevenda() {
 		return enviarItemPedido(TipoPedido.REVENDA);
 	}
@@ -135,6 +131,10 @@ public class EstoqueServiceTest extends AbstractTest {
 		return fornecedor;
 	}
 
+	private ItemPedido gerarItemCompraEnviado() {
+		return enviarItemPedido(TipoPedido.COMPRA);
+	}
+
 	private ItemEstoque gerarItemEstoqueComMedidaInterna(FormaMaterial formaMaterial) {
 		ItemEstoque item = eBuilder.buildItemEstoque();
 		item.setMaterial(gerarMaterial());
@@ -169,7 +169,7 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	private ItemEstoque gerarItemPedidoNoEstoque() {
-		ItemPedido iCompra = enviarItemPedidoCompra();
+		ItemPedido iCompra = gerarItemCompraEnviado();
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(),
@@ -308,7 +308,7 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	private Integer recepcionarItemCompra() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
@@ -320,7 +320,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testAlteracaoItemPedidoNoEstoque() {
-		ItemPedido item1 = enviarItemPedidoCompra();
+		ItemPedido item1 = gerarItemCompraEnviado();
 		ItemPedido item2 = gerarItemPedidoClone(item1.getQuantidade() + 100, item1);
 
 		Integer idItemEstoque = null;
@@ -536,11 +536,11 @@ public class EstoqueServiceTest extends AbstractTest {
 	@Test
 	public void testInclusaoConfiguracaoEstoqueSemMedidas() {
 
-		Integer idItem1 = recepcionarItemCompra();
-		Integer idItem2 = recepcionarItemCompra();
+		Integer idEst1 = recepcionarItemCompra();
+		Integer idEst2 = recepcionarItemCompra();
 
-		ItemEstoque item1 = estoqueService.pesquisarItemEstoqueById(idItem1);
-		ItemEstoque item2 = estoqueService.pesquisarItemEstoqueById(idItem2);
+		ItemEstoque item1 = estoqueService.pesquisarItemEstoqueById(idEst1);
+		ItemEstoque item2 = estoqueService.pesquisarItemEstoqueById(idEst2);
 
 		// Estmos alterando o item2 pois mesmo com medida diferente ele devera
 		// ter
@@ -554,31 +554,31 @@ public class EstoqueServiceTest extends AbstractTest {
 			printMensagens(e1);
 		}
 
-		ItemEstoque configuracao = gerarConfiguracaoEstoque();
-		configuracao.setMaterial(item1.getMaterial());
-		configuracao.setFormaMaterial(item1.getFormaMaterial());
-		configuracao.setMedidaExterna(null);
-		configuracao.setMedidaInterna(null);
-		configuracao.setComprimento(null);
+		ItemEstoque config = gerarConfiguracaoEstoque();
+		config.setMaterial(item1.getMaterial());
+		config.setFormaMaterial(item1.getFormaMaterial());
+		config.setMedidaExterna(null);
+		config.setMedidaInterna(null);
+		config.setComprimento(null);
 
 		try {
-			estoqueService.inserirConfiguracaoEstoque(configuracao);
+			estoqueService.inserirConfiguracaoEstoque(config);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		item1 = estoqueService.pesquisarItemEstoqueById(item1.getId());
-		item2 = estoqueService.pesquisarItemEstoqueById(item2.getId());
+		item1 = recarregarEntidade(ItemEstoque.class, idEst1);
+		item2 = recarregarEntidade(ItemEstoque.class, idEst2);
 
 		assertEquals("Os valores da margem minima de lucro devem ser as mesmas apos o cadastro do limite minimo",
-				item1.getMargemMinimaLucro(), configuracao.getMargemMinimaLucro());
+				item1.getMargemMinimaLucro(), config.getMargemMinimaLucro());
 		assertEquals("Os valores da quantidade minima devem ser as mesmas apos o cadastro do limite minimo",
-				item1.getQuantidadeMinima(), configuracao.getQuantidadeMinima());
+				item1.getQuantidadeMinima(), config.getQuantidadeMinima());
 
 		assertEquals("Os valores da margem minima de lucro devem ser as mesmas apos o cadastro do limite minimo",
-				item2.getMargemMinimaLucro(), configuracao.getMargemMinimaLucro());
+				item2.getMargemMinimaLucro(), config.getMargemMinimaLucro());
 		assertEquals("Os valores da quantidade minima devem ser as mesmas apos o cadastro do limite minimo",
-				item2.getQuantidadeMinima(), configuracao.getQuantidadeMinima());
+				item2.getQuantidadeMinima(), config.getQuantidadeMinima());
 	}
 
 	@Test
@@ -721,7 +721,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemPedidoValidoNoEstoque() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 
 		try {
 			pedidoService.enviarPedido(i.getPedido().getId(), new AnexoEmail(new byte[] {}));
@@ -943,7 +943,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecepcaoItemPedidoCompraComAliquotaIPI() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 
 		Integer idItemEstoque = null;
 		i = recarregarEntidade(ItemPedido.class, i.getId());
@@ -964,7 +964,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecepcaoItemPedidoCompraItemEstoqueComNCM() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		final String ncmAntes = "22.22.22.22";
 
 		ItemEstoque itemEstoque = new ItemEstoque();
@@ -1002,7 +1002,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecepcaoItemPedidoCompraItemEstoqueNCMNulo() {
-		ItemPedido iCompra = enviarItemPedidoCompra();
+		ItemPedido iCompra = gerarItemCompraEnviado();
 		ItemEstoque iEstoque = new ItemEstoque();
 		iEstoque.copiar(iCompra);
 		iEstoque.setNcm(null);
@@ -1041,7 +1041,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecepcaoItemPedidoCompraItemEstoqueNCMVazio() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		ItemEstoque itemEstoque = new ItemEstoque();
 		itemEstoque.copiar(i);
 		itemEstoque.setNcm("");
@@ -1077,7 +1077,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecepcaoItemPedidoCompraNCMNuloItemEstoque() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 
 		String ncm = "22.22.22.22";
 
@@ -1116,7 +1116,8 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecepcaoItemPedidoCompraNCMNuloItemEstoqueNulo() {
-		ItemPedido iCompra = enviarItemPedidoCompra();
+		ItemPedido iCompra = gerarItemCompraEnviado();
+		final Integer idCompra = iCompra.getPedido().getId();
 
 		ItemEstoque iEstoque = new ItemEstoque();
 		iEstoque.copiar(iCompra);
@@ -1130,29 +1131,22 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		try {
-			iEstoque = recarregarEntidade(ItemEstoque.class, idItemEst);
 			idItemEst = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(),
 					iCompra.getQuantidade(), null);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
-
-		assertEquals(SituacaoPedido.COMPRA_RECEBIDA,
-				pedidoService.pesquisarSituacaoPedidoById(iCompra.getPedido().getId()));
+		assertEquals(SituacaoPedido.COMPRA_RECEBIDA, pedidoService.pesquisarSituacaoPedidoById(idCompra));
 
 		iEstoque = estoqueService.pesquisarItemEstoqueById(idItemEst);
 		iCompra = pedidoService.pesquisarItemPedidoById(iCompra.getId());
 
-		iCompra = pedidoService.pesquisarItemPedidoById(iCompra.getId());
-
-		assertEquals("Nao exite configuracao para o ncm. Verficique as regras de negocios.", null, iCompra.getNcm());
-
-		assertEquals("Nao exite configuracao para o ncm. Verficique as regras de negocios.", null, iCompra.getNcm());
+		assertNull("Nao exite configuracao para o ncm. Verficique as regras de negocios.", iEstoque.getNcm());
 	}
 
 	@Test
 	public void testRecepcaoItemPedidoCompraNCMVazioItemEstoque() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 
 		String ncm = "22.22.22.22";
 
@@ -1193,7 +1187,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecepcaoItemPedidoCompraQuantidadeInferior() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		Integer quantidadeRecepcionada = i.getQuantidade() - 1;
 
 		try {
@@ -1208,7 +1202,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecepcaoItemPedidoCompraSemAliquotaIPI() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		i.setAliquotaIPI(null);
 
 		Integer idItemEstoque = null;
@@ -1359,7 +1353,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRedefinicaoEstoqueFormaMaterialNulo() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
@@ -1380,7 +1374,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRedefinicaoEstoqueMaterialNulo() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
@@ -1401,7 +1395,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRedefinicaoEstoqueMaterialQuantidadeNegativa() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
@@ -1422,7 +1416,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRedefinicaoEstoqueMaterialQuantidadeZerada() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
@@ -1490,7 +1484,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRedefinicaoEstoquePrecoMedioNulo() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
@@ -1511,7 +1505,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRedefinicaoEstoqueQuantidadeNegativa() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
@@ -1561,7 +1555,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRedefinirItemPedidoFormaQuadrada() {
-		ItemPedido i = enviarItemPedidoCompra();
+		ItemPedido i = gerarItemCompraEnviado();
 		Integer idItemEstoque = null;
 		try {
 			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade());
@@ -1650,7 +1644,7 @@ public class EstoqueServiceTest extends AbstractTest {
 				+ " foi removido do sistema e nao deveria ter item reservado associado", (Integer) 0,
 				(Integer) lItemReserv.size());
 
-		ItemEstoque itemEsto2 = estoqueService.pesquisarItemEstoqueById(itemEsto.getId());
+		ItemEstoque itemEsto2 = recarregarEntidade(ItemEstoque.class, itemEsto.getId());
 		assertEquals(
 				"Apos a remocao de um item de um pedido as quantidades reservada desse item devem ser devolvidas ao estoque",
 				qtdeEstoque, itemEsto2.getQuantidade());
@@ -1919,7 +1913,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testSituacaoPedidoAposInclusaoVariosItensNoEstoque() {
-		ItemPedido i1 = enviarItemPedidoCompra();
+		ItemPedido i1 = gerarItemCompraEnviado();
 		// Fabricando um segundo item para facilitar.
 		ItemPedido i2 = eBuilder.buildItemPedidoPeca();
 		i2.setPedido(i1.getPedido());

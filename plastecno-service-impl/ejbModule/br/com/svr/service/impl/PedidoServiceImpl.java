@@ -1044,38 +1044,43 @@ public class PedidoServiceImpl implements PedidoService {
 		ValidadorInformacao.validar(pedido);
 
 		final Integer idPedido = pedido.getId();
+		final Integer idProp = pedido.getVendedor().getId();
+		final Integer idCli = pedido.getCliente().getId();
 		final boolean isPedidoNovo = idPedido == null;
 
-		final boolean vendaPermitida = usuarioService.isVendaPermitida(pedido.getCliente().getId(), pedido
-				.getVendedor().getId());
+		final boolean vendaPermitida = usuarioService.isVendaPermitida(idCli, idProp);
 		/*
 		 * Estamos proibindo que qualquer vendedor cadastre um NOVO pedido para
 		 * um cliente que nao esteja associado em sua carteira de clientes.
 		 */
-		if (isPedidoNovo && pedido.isVenda() && !vendaPermitida) {
+		if (pedido.isVenda() && !vendaPermitida) {
 
-			Cliente cliente = clienteService.pesquisarById(pedido.getCliente().getId());
-			Usuario proprietario = usuarioService.pesquisarById(pedido.getProprietario().getId());
+			Cliente cliente = clienteService.pesquisarById(idCli);
+			Usuario proprietario = usuarioService.pesquisarById(idProp);
 			throw new BusinessException("Não é possível incluir o pedido pois o cliente "
-					+ (cliente != null ? cliente.getNomeCompleto() : pedido.getCliente().getId())
-					+ " não esta associado ao vendedor "
-					+ (proprietario != null ? proprietario.getNome() + " - " + proprietario.getEmail() : pedido
-							.getCliente().getId()));
-		} else if (isPedidoNovo && pedido.isVenda() && vendaPermitida) {
-
-			// Efetuando o vinculo entre o vendedor e o pedido pois o vendedor
-			// eh
-			// obrigatorio pois agora eh possivel que um outro vendedor com o
-			// perfil
-			// de administrador faca cadastro de pedidos em nome de outro. Por
-			// isso
-			// estamos ajustando o vendedor correto.
-			Usuario vendedor = usuarioService.pesquisarVendedorResumidoByIdCliente(pedido.getCliente().getId());
-			if (vendedor == null) {
-				String nomeCliente = clienteService.pesquisarNomeFantasia(pedido.getCliente().getId());
-				throw new BusinessException("Não existe vendedor associado ao cliente " + nomeCliente);
+					+ (cliente != null ? cliente.getNomeCompleto() : idCli) + " não esta associado ao vendedor "
+					+ (proprietario != null ? proprietario.getNome() + " - " + proprietario.getEmail() : idCli));
+		} else if (pedido.isVenda() && vendaPermitida) {
+			/*
+			 * Garantindo que o vendedor do pedido eh o vendedor associado ao
+			 * cliente.
+			 */
+			Integer idVend = clienteService.pesquisarIdVendedorByIdCliente(pedido.getCliente().getId());
+			if (!idVend.equals(idProp)) {
+				/*
+				 * Efetuando o vinculo entre o vendedor e o pedido pois o
+				 * vendedor eh obrigatorio pois agora eh possivel que um outro
+				 * vendedor com o perfil de administrador faca cadastro de
+				 * pedidos em nome de outro. Por isso estamos ajustando o
+				 * vendedor correto.
+				 */
+				Usuario vend = usuarioService.pesquisarVendedorResumidoByIdCliente(pedido.getCliente().getId());
+				if (vend == null) {
+					String nomeCliente = clienteService.pesquisarNomeFantasia(pedido.getCliente().getId());
+					throw new BusinessException("Não existe vendedor associado ao cliente " + nomeCliente);
+				}
+				pedido.setVendedor(vend);
 			}
-			pedido.setVendedor(vendedor);
 		}
 
 		final Date dataEntrega = DateUtils.gerarDataSemHorario(pedido.getDataEntrega());

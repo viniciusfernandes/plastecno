@@ -230,7 +230,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public boolean isClienteAssociadoVendedor(Integer idCliente, Integer idVendedor) {
-		return usuarioDAO.pesquisarIdVendedorByIdCliente(idCliente, idVendedor) != null;
+		return usuarioDAO.pesquisarIdClienteAssociadoByIdVendedor(idCliente, idVendedor) != null;
 	}
 
 	@Override

@@ -42,8 +42,8 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 						.setParameter("idUsuario", idUsuario), boolean.class, false);
 	}
 
-	public Integer pesquisarIdVendedorByIdCliente(Integer idCliente, Integer idVendedor) {
-		Query query = this.entityManager
+	public Integer pesquisarIdClienteAssociadoByIdVendedor(Integer idCliente, Integer idVendedor) {
+		Query query = entityManager
 				.createQuery("select c.id from Cliente c where c.id =:id and c.vendedor.id = :idVendedor ");
 		query.setParameter("id", idCliente).setParameter("idVendedor", idVendedor);
 		return QueryUtil.gerarRegistroUnico(query, Integer.class, null);

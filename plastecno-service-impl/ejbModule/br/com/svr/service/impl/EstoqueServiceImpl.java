@@ -467,6 +467,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 		long qtdePendente = pedidoService.pesquisarTotalItemCompradoNaoRecebido(pedido.getId());
 		if (qtdePendente <= 0) {
 			pedido.setSituacaoPedido(SituacaoPedido.COMPRA_RECEBIDA);
+			// Essa chamada do DAO teve que ser adicionada pois um teste de
+			// integracao nao estava recuperando a alteracao da situacao do
+			// pedido de compra.
+			pedidoDAO.alterar(pedido);
 		}
 		return itemEstoque;
 	}

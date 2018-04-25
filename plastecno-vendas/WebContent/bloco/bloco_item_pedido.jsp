@@ -48,7 +48,7 @@ $(document).ready(function(){
 	inserirMascaraNCM('bloco_item_pedido #ncm');
 	inserirMascaraMonetaria('precoVenda', 7);
 	inserirMascaraNumerica('aliquotaIPI', '99');
-	inserirMascaraMonetaria('aliquotaComissao', 5);
+	inserirMascaraMonetariaComZero('aliquotaComissao', 5);
 	inserirMascaraNumerica('aliquotaICMS', '99');
 	inserirMascaraNumerica('quantidade', '9999999');
 	inserirMascaraMonetaria('comprimento', 8);

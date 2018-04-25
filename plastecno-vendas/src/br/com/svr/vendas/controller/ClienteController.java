@@ -154,6 +154,9 @@ public class ClienteController extends AbstractController {
 
             clienteService.inserirComentario(cliente.getId(), comentario, getCodigoUsuario());
 
+            // Limpando o campo de comentario no caso de sucesso, pois no caso
+            // de falha de validacao ele deve ser renderizado para o usuario.
+            comentario = "";
             gerarMensagemSucesso(mensagem.toString());
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
@@ -168,11 +171,14 @@ public class ClienteController extends AbstractController {
         } else {
             carregarVendedor(cliente);
             addAtributo("cliente", cliente);
-            addAtributo("listaLogradouro", clienteService.pesquisarLogradouroCliente(cliente.getId()));
+            // Os logradoros serao sempre os mesmos que vem da tela
+            addAtributo("listaLogradouro", listaLogradouro);
+            // Os contatos serao sempre os mesmos que vem da tela
             addAtributo("listaContato", listaContato);
+            addAtributo("comentario", comentario);
+            addAtributo("comentarios", formatarComentarios(cliente.getId()));
             addAtributo("ramoAtividadeSelecionado", cliente.getRamoAtividade() != null ? cliente.getRamoAtividade()
                     .getId() : null);
-            addAtributo("comentarios", formatarComentarios(cliente.getId()));
             try {
                 // Temos que manter as transportadoras escolhidas na tela em
                 // caso excecao de negocios

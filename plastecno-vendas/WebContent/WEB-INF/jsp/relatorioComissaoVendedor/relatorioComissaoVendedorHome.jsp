@@ -19,6 +19,8 @@
 <title>Relatório das Comissões dos Vendedores</title>
 <script type="text/javascript">
 	$(document).ready(function() {
+		ancorar('${ancora}');
+
 		$('#botaoLimpar').click(function () {
 			$('#formVazio').submit();
 		});
@@ -118,7 +120,8 @@ function recalcularComissao(idItem){
 							<c:if test="${iElemento.count le 1}">
 								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${pedido.totalElemento}">${pedido.id}</td>
 							</c:if>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
+							<%-- O id do grupo eh utilizado para realizar a ancoragem e scrollar a tela para a linha editada eplo usuario --%>
+							<td id="${item.id}" class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.sequencial}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.descricao}</td>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoItemFormatado}</td>

@@ -178,6 +178,7 @@ function removerDuplicata(botao, metodo, acao){
 					<c:forEach items="${grupo.listaElemento}" var="elemento" varStatus="iElemento">
 						<tr>
 							<c:if test="${iElemento.count le 1}">
+								<%-- O id do grupo eh utilizado para realizar a ancoragem e scrollar a tela para a linha editada eplo usuario --%>
 								<td id="${grupo.propriedades['dataSemLimitador']}" class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento + 2}">${grupo.propriedades['dataVencimentoFormatada']}</td>
 							</c:if>
 							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${elemento.nomeCliente}</td>

@@ -198,16 +198,20 @@ public final class ValidadorInformacao {
 				setConteudo(campo, obj, conteudoCampo);
 			}
 
-			if (informacao.intervaloComprimento().length > 0
-					&& COMPRIMENTO_STRING >= 0
-					&& (COMPRIMENTO_STRING < informacao.intervaloComprimento()[0] || COMPRIMENTO_STRING > informacao
-							.intervaloComprimento()[1])) {
+			try {
+				if (informacao.intervaloComprimento().length > 0
+						&& COMPRIMENTO_STRING >= 0
+						&& (COMPRIMENTO_STRING < informacao.intervaloComprimento()[0] || COMPRIMENTO_STRING > informacao
+								.intervaloComprimento()[1])) {
 
-				addMensagem(listaMensagem,
-						informacao.nomeExibicao() + " deve conter de " + informacao.intervaloComprimento()[0] + " a "
-								+ informacao.intervaloComprimento()[1] + " caracteres. Foi enviado "
-								+ COMPRIMENTO_STRING + " caracteres", valIdentif);
-				continue;
+					addMensagem(listaMensagem,
+							informacao.nomeExibicao() + " deve conter de " + informacao.intervaloComprimento()[0]
+									+ " a " + informacao.intervaloComprimento()[1] + " caracteres. Foi enviado "
+									+ COMPRIMENTO_STRING + " caracteres", valIdentif);
+					continue;
+				}
+			} catch (Exception e) {
+				System.out.println("xxxxxxxxxxx");
 			}
 
 			if (conteudoCampo != null && informacao.tamanho() >= 0 && COMPRIMENTO_STRING != informacao.tamanho()) {

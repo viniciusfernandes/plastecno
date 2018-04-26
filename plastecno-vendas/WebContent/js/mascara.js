@@ -30,10 +30,17 @@ function inserirMascaraNumerica(idCampo, mascara) {
 };
 
 function inserirMascaraMonetaria(idCampo, digitos) {
+	var c = $('#'+idCampo);
 	// Aqui adicionamos um caracter referente ao ponto da casa decimal
-	$('#'+idCampo).attr('maxlength', digitos + 1);
+	$(c).attr('maxlength', digitos + 1);
 	// A separacao entre os milhares nao pode ter simbolos de sepadas casas
-	$('#'+idCampo).maskMoney({thousands:'', decimal:'.'});
+	$(c).maskMoney({thousands:'', decimal:'.'});
+	return c;
+};
+
+function inserirMascaraMonetariaComZero(idCampo, digitos) {
+	var c = inserirMascaraMonetaria(idCampo, digitos);
+	$(c).maskMoney({allowZero: true, allowEmpty: true});
 };
 
 function inserirMascaraDecimal(idCampo, digitos, precisao) {

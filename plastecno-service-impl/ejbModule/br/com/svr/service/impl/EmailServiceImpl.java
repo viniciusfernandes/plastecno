@@ -36,6 +36,7 @@ public class EmailServiceImpl implements EmailService {
 	private Logger log = Logger.getLogger(this.getClass().getName());
 	@EJB
 	private UsuarioService usuarioService;
+	private Logger log = Logger.getLogger(this.getClass().getName());
 
 	public void enviar(MensagemEmail mensagemEmail) throws NotificacaoException {
 

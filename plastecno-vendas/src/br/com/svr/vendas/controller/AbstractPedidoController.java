@@ -288,9 +288,7 @@ public class AbstractPedidoController extends AbstractController {
                 itemPedido.setAliquotaIPI(NumeroUtils.gerarAliquota(aliquotaIPI));
             }
 
-            if (itemPedido.getAliquotaComissao() == null) {
-                itemPedido.setAliquotaComissao(0d);
-            } else {
+            if (itemPedido.getAliquotaComissao() != null) {
                 itemPedido.setAliquotaComissao(NumeroUtils.gerarAliquota(itemPedido.getAliquotaComissao(), 4));
             }
 

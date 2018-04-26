@@ -62,6 +62,7 @@ public class RelatorioComissaoVendedorController extends AbstractController {
         try {
             pedidoService.calcularComissaoItemPedido(idItem);
             gerarRelatorioComissaoVendedor(dataInicial, dataFinal, vendedor);
+            ancorarElemento(idItem);
         } catch (BusinessException e) {
             gerarListaMensagemErro(e);
             irTopoPagina();

@@ -36,7 +36,7 @@ public class ICMSGeral {
 	private Integer modalidadeDeterminacaoBCST;
 
 	@XmlElement(name = "motDesICMS")
-	@InformacaoValidavel(intervaloComprimento = 2, nomeExibicao = "Motivo de desoneração do ICMS")
+	@InformacaoValidavel(tamanho = 2, nomeExibicao = "Motivo de desoneração do ICMS")
 	private String motivoDesoneracao;
 
 	@XmlElement(name = "orig")

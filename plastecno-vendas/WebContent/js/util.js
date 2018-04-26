@@ -25,7 +25,7 @@ function toUpperCaseInput (){
 			$(this).val($(this).val().toUpperCase());
 		}
 	});
-}
+};
 
 function toLowerCaseInput (){
 	$("input, textArea").each(function(){
@@ -33,7 +33,7 @@ function toLowerCaseInput (){
 			$(this).val($(this).val().toLowerCase());
 		}
 	});
-}
+};
 
 function inicializarPaginador(inicializarFiltro, paginaSelecionada, totalPaginas) {
 	$("#paginador").paginate({
@@ -293,21 +293,9 @@ function limparComboBox(idCombo) {
 	var combo = $('#'+idCombo);
 	combo.empty();
 	combo.append($('<option value="">&lt&lt SELECIONE &gt&gt</option>'));
-}
-
-function gerarListaMensagemErro (listaMensagem) {
-	gerarListaMensagem(listaMensagem, 'mensagemErro');
 };
 
-function gerarListaMensagemAlerta (listaMensagem) {
-	gerarListaMensagem(listaMensagem, 'mensagemAlerta');
-};
-
-function gerarListaMensagemSucesso (listaMensagem) {
-	gerarListaMensagem(listaMensagem, 'mensagemSucesso');
-};
-
-function gerarListaMensagem (listaMensagem, cssMensagem) {
+function gerarListaMensagemByIdBloco (idBloco, listaMensagem, cssMensagem) {
 	
 	if (listaMensagem == undefined || listaMensagem == null) {
 		return;
@@ -320,11 +308,35 @@ function gerarListaMensagem (listaMensagem, cssMensagem) {
 	}
 	
 	// temos que remover as classes anteriores para exibir apenas a classe desejada
-	$('#bloco_mensagem').removeClass('mensagemErro mensagemAlerta mensagemSucesso');
-	$('#bloco_mensagem').addClass(cssMensagem);
-	$('#bloco_mensagem ul').html(li);
-	$('#bloco_mensagem').show();
+	$('#'+idBloco).removeClass('mensagemErro mensagemAlerta mensagemSucesso');
+	$('#'+idBloco).addClass(cssMensagem);
+	$('#'+idBloco +' ul').html(li);
+	$('#'+idBloco).show();
 	scrollTo('topo');
+};
+
+function gerarListaMensagemSucessoById (idBloco, listaMensagem) {
+	gerarListaMensagemByIdBloco(idBloco, listaMensagem, 'mensagemSucesso');
+};
+
+function gerarListaMensagem (listaMensagem, cssMensagem) {
+	gerarListaMensagemByIdBloco('bloco_mensagem', listaMensagem, cssMensagem);
+};
+
+function gerarListaMensagemErro (listaMensagem) {
+	gerarListaMensagem(listaMensagem, 'mensagemErro');
+};
+
+function gerarListaMensagemErroById (idBloco, listaMensagem) {
+	gerarListaMensagemByIdBloco(idBloco, listaMensagem, 'mensagemErro');
+};
+
+function gerarListaMensagemAlerta (listaMensagem) {
+	gerarListaMensagem(listaMensagem, 'mensagemAlerta');
+};
+
+function gerarListaMensagemSucesso (listaMensagem) {
+	gerarListaMensagem(listaMensagem, 'mensagemSucesso');
 };
 
 function gerarData(data) {
@@ -473,4 +485,19 @@ function ancorar(idElemento){
 	$('html, body').animate({
 	    scrollTop: ($(e).first().offset().top)
 	},0);
+};
+
+function limparTela(camposExclusao){
+	$("input, checkbox, textArea, select").each(function(){
+		$(this).val('');
+	});
+	$("table tbody tr").each(function(){
+		$(this).html('');
+	});
+	
+	if(camposExclusao!=undefined && camposExclusao!=null){
+		for (var i = 0; i < camposExclusao.length; i++) {
+			camposExclusao[i].campo.value =camposExclusao[i].val;
+		}
+	}
 };

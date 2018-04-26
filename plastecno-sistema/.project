@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>plastecno-sistema</name>
+	<name>svr-sistema</name>
 	<comment></comment>
 	<projects>
-		<project>plastecno-utils</project>
-		<project>plastecno-service</project>
-		<project>plastecno-vendas</project>
-		<project>plastecno-service-impl</project>
+		<project>svr-vendas</project>
+		<project>svr-utils</project>
+		<project>svr-service</project>
+		<project>svr-service-impl</project>
+		<project>svr-crm</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

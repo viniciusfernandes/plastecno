@@ -4,7 +4,6 @@
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/${initParam['padraoCSS']}/tabela.css?${versaoCache}"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/mensagem.css?${versaoCache}"/>" />
 
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/cadastro_pesquisa.css?${versaoCache}"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/botao.css?${versaoCache}"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/${initParam['padraoCSS']}/formulario.css?${versaoCache}"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/${initParam['padraoCSS']}/paginacao.css?${versaoCache}"/>" />
@@ -13,4 +12,5 @@
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/jquery-ui-1.10.4.dialog.min.css"/>" />
 
 
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/picklist.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/picklist.css?${versaoCache}"/>" />
+

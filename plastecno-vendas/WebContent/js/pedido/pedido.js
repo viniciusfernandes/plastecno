@@ -18,11 +18,15 @@ function habilitarPreenchimentoMedidaInterna(temMedidaInterna) {
 	habilitar('#bloco_item_pedido #medidaInterna', temMedidaInterna);
 };
 
-function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
-		urlInclusaoItemPedido) {
+function inserirPedido(config) {
 	toUpperCaseInput();
 	toLowerCaseInput();
 
+	var erros = null;
+	var hasIncItem = config.inserirItem != undefined && config.inserirItem!=null;
+	var hasEnvio = config.enviar!= undefined && config.enviar!=null;
+	var fail = false;
+	
 	var parametros = $('#formPedido').serialize();
 	parametros += serializarBloco('bloco_dados_nota_fiscal');
 	parametros += recuperarParametrosBlocoContato();
@@ -32,13 +36,12 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 			+ $('#formPedido #nomeCliente').val();
 	var request = $.ajax({
 		type : "post",
-		url : urlInclusaoPedido,
+		url : config.urlInclusao,
 		data : parametros
 	});
-
 	request
 			.done(function(response) {
-				var erros = response.erros;
+				erros = response.erros;
 				var contemErro = erros != undefined;
 				/*
 				 * Ocultando no caso de que o usuario envie um novo request com
@@ -75,39 +78,107 @@ function inserirPedido(itemPedidoAcionado, urlInclusaoPedido,
 					$('#formEnvioPedido #botaoEnviarPedido').show();
 
 					habilitar('#numeroPedidoPesquisa', false);
-
-					/*
-					 * Nao adicionaremos a mensagem de sucesso no caso em que o
-					 * usuario ja esteja incluindo os itens do pedido
-					 */
-					if (!itemPedidoAcionado) {
-						gerarListaMensagemSucesso(new Array('O pedido No. '
-								+ pedidoJson.id + ' foi incluido com sucesso.'));
+					if(!hasIncItem && !hasEnvio){
+						gerarListaMensagemSucesso(new Array('O pedido No. '+ pedidoJson.id + ' foi incluido com sucesso.'));
 					}
-
-				} else if (!contemErro && !contemPedido) {
-					gerarListaMensagemAlerta([ 'O usuario pode nao estar logado no sistema' ]);
-				} else if (contemErro) {
+				} else if (fail=!contemErro && !contemPedido) {
+					erros = ['O usuario pode nao estar logado no sistema'];
+					gerarListaMensagemAlerta(erros);
+				} else if (fail=contemErro) {
 					gerarListaMensagemErro(erros);
 				}
 			});
+	
+	request.always(function (response){
+		if(hasIncItem && hasEnvio){
+			alert('Nao eh possivel incluir e enviar na mesma requisicao.')
+			return;
+		}
+		if(!fail && hasIncItem){
+			config.inserirItem(config.urlInclusaoItem);
+		} else if(!fail && hasEnvio){
+			config.enviar();
+		}
+	});
+	
+	request.fail(function(request, textStatus, errorThrown) {
+		alert('Falha inclusao do pedido => Status da requisicao: ' + textStatus);
+	});
+	return erros;
+};
 
-	request
-			.always(function(response) {
-				// se nao contem erro e foi clicao o botao de inclusao de item
-				// de
-				// pedidos
-				var pedido = response.pedido;
-				if (itemPedidoAcionado && response.erros == undefined
-						&& pedido != undefined && pedido != null
-						&& !isEmpty(pedido.id)) {
-					inserirItemPedido(pedido.id, urlInclusaoItemPedido);
-				}
-			});
+function inserirOrcamento(config){
+	toUpperCaseInput();
+	toLowerCaseInput();
+	var hasIncItem = config.inserirItem != undefined && config.inserirItem!=null;
+	var hasEnvio = config.enviar!= undefined && config.enviar!=null;
+
+	var fail = false;
+
+	var parametros = serializarForm('formPedido');
+	var request = $.ajax({
+		type : "post",
+		url : config.urlInclusao,
+		data : parametros
+	});
+	request.done(function(response) {
+		var erros = response.erros;
+		var contemErro = erros != undefined;
+		/*
+		 * Ocultando no caso de que o usuario envie um novo request com a area
+		 * de mensagem renderizada e deve ser um hide para que o bloco suma
+		 * rapidamente apos novo request
+		 */
+		$('#bloco_mensagem').hide();
+
+		var pedidoJson = response.pedido;
+		var contemPedido =pedidoJson != undefined && pedidoJson != null;
+		if (!contemErro && contemPedido) {
+			/*
+			 * Temos que ter esse campo oculto pois o campo Numero do Pedido na
+			 * tela sera desabilitado e nao sera enviado no request.
+			 */
+			$('#idCliente').val(pedidoJson.idCliente);
+			$('#idPedido').val(pedidoJson.id);
+			$('#numeroPedido').val(pedidoJson.id);
+			$('#numeroPedidoPesquisa').val(pedidoJson.id);
+			$('#numeroPedidoCliente').val(pedidoJson.numeroPedidoCliente);
+			$('#situacaoPedido').val(pedidoJson.situacaoPedido);
+			$('#idSituacaoPedido').val(pedidoJson.situacaoPedido);
+			$('#dataInclusao').val(pedidoJson.dataInclusaoFormatada);
+			$('#proprietario').val(
+					pedidoJson.proprietario.nome + ' - '
+							+ pedidoJson.proprietario.email);
+			$('#idVendedor').val(pedidoJson.proprietario.id);
+			
+			habilitar('#numeroPedido', false);
+			if(!hasIncItem && !hasEnvio){
+				gerarListaMensagemSucesso(new Array('O orçamento No. ' + pedidoJson.id + ' foi incluido com sucesso.'));
+			}
+		} else if(fail=(!contemErro && !contemPedido)) {
+			erros =['O usuario pode nao estar logado no sistema'];
+			gerarListaMensagemAlerta(erros);
+		} else if(fail=contemErro) {
+			gerarListaMensagemErro(erros);
+		}
+	});
+
+	request.always(function (response){
+		if(hasIncItem && hasEnvio){
+			alert('Nao eh possivel incluir e enviar na mesma requisicao.')
+			return;
+		}
+		if(!fail && hasIncItem){
+			config.inserirItem(config.urlInclusaoItem);
+		} else if(!fail && hasEnvio){
+			config.enviar();
+		}
+	});
 
 	request.fail(function(request, status) {
-		alert('Falha inclusao do pedido => Status da requisicao: ' + status);
+		alert('Falha inclusao do orcamento => Status da requisicao: ' + status);
 	});
+
 };
 
 function recuperarParametrosBlocoContato() {
@@ -220,9 +291,9 @@ function inicializarAutocompleteDescricaoPeca(url) {
 	});
 };
 
-function inserirItemPedido(numeroPedido, urlInclusaoItemPedido) {
+function inserirItemPedido(urlInclusaoItemPedido) {
 	var parametros = serializarBloco('bloco_item_pedido');
-	parametros += '&numeroPedido=' + numeroPedido;
+	parametros += '&numeroPedido=' + $('#numeroPedido').val();
 	var request = $.ajax({
 		type : 'post',
 		url : urlInclusaoItemPedido,

@@ -17,6 +17,7 @@ import javax.persistence.Query;
 
 import br.com.svr.service.EstoqueService;
 import br.com.svr.service.PedidoService;
+import br.com.svr.service.RegistroEstoqueService;
 import br.com.svr.service.RepresentadaService;
 import br.com.svr.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.svr.service.constante.FormaMaterial;
@@ -37,6 +38,7 @@ import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.impl.anotation.REVIEW;
 import br.com.svr.service.impl.anotation.TODO;
 import br.com.svr.service.impl.calculo.CalculadoraItem;
+import br.com.svr.service.impl.util.QueryUtil;
 import br.com.svr.service.validacao.ValidadorInformacao;
 import br.com.svr.util.NumeroUtils;
 import br.com.svr.util.StringUtils;
@@ -45,6 +47,7 @@ import br.com.svr.util.StringUtils;
 public class EstoqueServiceImpl implements EstoqueService {
 	@PersistenceContext(name = "svr")
 	private EntityManager entityManager;
+
 	private ItemEstoqueDAO itemEstoqueDAO;
 
 	private ItemPedidoDAO itemPedidoDAO;
@@ -55,6 +58,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@EJB
 	private PedidoService pedidoService;
+
+	@EJB
+	private RegistroEstoqueService registroEstoqueService;
 
 	@EJB
 	private RepresentadaService representadaService;
@@ -74,22 +80,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 		quantidadeItem += quantidadeRecepcionada;
 		pedidoService.alterarQuantidadeRecepcionada(idItemCompra, quantidadeItem);
 
-		return alterarEstoque(idItemCompra, quantidadeRecepcionada);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Integer alterarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
-			throws BusinessException {
-		if (idItemCompra == null) {
-			return null;
-		}
-		if (quantidadeRecepcionada == null) {
-			quantidadeRecepcionada = 0;
-		}
-
-		pedidoService.alterarQuantidadeRecepcionada(idItemCompra, quantidadeRecepcionada);
-		return alterarEstoque(idItemCompra, quantidadeRecepcionada);
+		Integer idEst = alterarEstoque(idItemCompra, quantidadeRecepcionada);
+		registroEstoqueService.inserirRegistroEntradaItemCompra(idEst, idItemCompra, quantidadeRecepcionada);
+		return idEst;
 	}
 
 	@Override
@@ -99,6 +92,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (idItemCompra == null) {
 			return null;
 		}
+
 		Integer idItemEstoque = adicionarQuantidadeRecepcionadaItemCompra(idItemCompra, quantidadeRecepcionada);
 
 		Object[] materialFormaMaterial = pedidoService.pesquisarIdMaterialFormaMaterialItemPedido(idItemCompra);
@@ -143,6 +137,21 @@ public class EstoqueServiceImpl implements EstoqueService {
 		 */
 		calcularPrecoMedioFatorICMS(itemEstoque);
 		return inserirItemEstoque(itemEstoque);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Integer alterarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
+			throws BusinessException {
+		if (idItemCompra == null) {
+			return null;
+		}
+		if (quantidadeRecepcionada == null) {
+			quantidadeRecepcionada = 0;
+		}
+
+		pedidoService.alterarQuantidadeRecepcionada(idItemCompra, quantidadeRecepcionada);
+		return alterarEstoque(idItemCompra, quantidadeRecepcionada);
 	}
 
 	@Override
@@ -644,6 +653,14 @@ public class EstoqueServiceImpl implements EstoqueService {
 	}
 
 	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarQuantidadeByIdItemEstoque(Integer idItemEstoque) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.quantidade from ItemEstoque i where i.id = :idItemEstoque")
+						.setParameter("idItemEstoque", idItemEstoque), Integer.class, 0);
+	}
+
+	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void reajustarPrecoItemEstoque(ItemEstoque itemReajustado) throws BusinessException {
 		if (itemReajustado == null || itemReajustado.getAliquotaReajuste() == null
@@ -798,12 +815,15 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	private void reinserirItemPedidoEstoque(Integer idPedido) throws BusinessException {
 		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
-		ItemEstoque itemEstoque = null;
-		for (ItemPedido itemPedido : listaItemPedido) {
-			itemEstoque = pesquisarItemEstoque(itemPedido);
-			if (itemEstoque != null) {
-				itemEstoque.addQuantidade(itemPedido.getQuantidade());
-				itemEstoqueDAO.alterar(itemEstoque);
+		ItemEstoque iEst = null;
+		for (ItemPedido iPed : listaItemPedido) {
+			iEst = pesquisarItemEstoque(iPed);
+			if (iEst != null) {
+
+				iEst.addQuantidade(iPed.getQuantidadeReservada());
+				iEst = itemEstoqueDAO.alterar(iEst);
+				registroEstoqueService.inserirRegistroEntradaDevolucaoItemVenda(iEst.getId(), iPed.getId(),
+						iPed.getQuantidade());
 			}
 		}
 	}
@@ -904,13 +924,19 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 		if (quantidadeEstoque > 0) {
 			itemEstoque.setQuantidade(quantidadeEstoque - quantidadeReservada);
-			itemEstoqueDAO.alterar(itemEstoque);
-
+			itemEstoque = itemEstoqueDAO.alterar(itemEstoque);
 			if (!itemPedido.contemAlgumaReserva()) {
 				itemReservadoDAO.inserir(new ItemReservado(new Date(), itemEstoque, itemPedido));
 			}
 		}
-
+		// Sera incluido um registro apenas na existencia de um item do estoque.
+		if (itemEstoque != null) {
+			// Sera incluido um registro somente se existir um item de estoque,
+			// pois do contrario o item de pedido devera ser comprado e so
+			// depois ocorrera a baixa no estoque.
+			registroEstoqueService.inserirRegistroSaidaItemVenda(itemEstoque.getId(), itemPedido.getId(),
+					quantidadeReservada);
+		}
 		itemPedido.addQuantidadeReservada(quantidadeReservada);
 		itemPedidoDAO.alterar(itemPedido);
 		return situacao;

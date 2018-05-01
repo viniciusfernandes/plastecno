@@ -96,8 +96,13 @@ public class Representada implements Serializable {
 	}
 
 	public Representada(Integer id, String nomeFantasia) {
+		this(id, nomeFantasia, null);
+	}
+
+	public Representada(Integer id, String nomeFantasia, String email) {
 		this.id = id;
 		this.nomeFantasia = nomeFantasia;
+		this.email = email;
 	}
 
 	public Representada(Integer id, String nomeFantasia, TipoApresentacaoIPI tipoApresentacaoIPI,

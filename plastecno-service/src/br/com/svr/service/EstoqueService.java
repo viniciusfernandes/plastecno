@@ -17,10 +17,11 @@ import br.com.svr.service.exception.BusinessException;
 @Local
 public interface EstoqueService {
 
-	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada) throws BusinessException;
-
-	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada, String ncm)
+	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
 			throws BusinessException;
+
+	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada,
+			String ncm) throws BusinessException;
 
 	Integer alterarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
 			throws BusinessException;
@@ -74,6 +75,8 @@ public interface EstoqueService {
 	Double pesquisarPrecoMedioByIdItemEstoque(Integer idItemEstoque);
 
 	double pesquisarPrecoMedioItemEstoque(Item filtro);
+
+	Integer pesquisarQuantidadeByIdItemEstoque(Integer idItemEstoque);
 
 	void reajustarPrecoItemEstoque(ItemEstoque itemReajustado) throws BusinessException;
 

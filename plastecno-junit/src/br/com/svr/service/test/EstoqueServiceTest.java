@@ -1874,6 +1874,7 @@ public class EstoqueServiceTest extends AbstractTest {
 	@Test
 	public void testRemocaoItemPedido() {
 		ItemEstoque itemEsto = gerarItemEstoque();
+
 		Integer qtdeEstoque = itemEsto.getQuantidade();
 
 		Pedido p = gerarPedido(TipoPedido.REVENDA);
@@ -1895,6 +1896,10 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
+
+		itemEsto = estoqueService.pesquisarItemEstoqueById(itemEsto.getId());
+		assertEquals("Apos o envio do pedido o item do estoque deve estar zerado", (Integer) 0,
+				itemEsto.getQuantidade());
 
 		List<ItemReservado> lItemReserv = estoqueService.pesquisarItemReservadoByIdItemPedido(idItemPedido);
 		assertTrue("O item do pedido deveria ter um item reservado no estoque pois o estoque ja foi populado",

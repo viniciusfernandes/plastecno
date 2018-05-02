@@ -88,6 +88,8 @@ public interface EstoqueService {
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
+	void reinserirItemPedidoEstoqueByIdItem(Integer idItemPedido) throws BusinessException;
+
 	Integer removerEstoqueItemCompra(Integer idItemCompra, Integer quantidadeRemovida) throws BusinessException;
 
 	boolean reservarItemPedido(Integer idPedido) throws BusinessException;

@@ -14,12 +14,24 @@ public enum TipoPedido {
 	public String getDescricao() {
 		return this.descricao;
 	}
-	
-	public static boolean isCompra(TipoPedido tipoPedido){
+
+	public static boolean isCompra(TipoPedido tipoPedido) {
 		return COMPRA.equals(tipoPedido);
 	}
-	
-	public static boolean isVenda(TipoPedido tipoPedido){
+
+	public static boolean isVenda(TipoPedido tipoPedido) {
 		return !isCompra(tipoPedido);
+	}
+
+	public boolean isCompra() {
+		return COMPRA.equals(this);
+	}
+
+	public boolean isVenda() {
+		return !isCompra(this);
+	}
+
+	public boolean isRevenda() {
+		return REVENDA.equals(this);
 	}
 }

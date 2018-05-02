@@ -335,7 +335,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 	public void cancelarReservaEstoqueByIdPedido(Integer idPedido) throws BusinessException {
 		pedidoService.alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.CANCELADO);
 		removerItemReservadoByIdPedido(idPedido);
-		reinserirItemPedidoEstoque(idPedido);
+		reinserirItemPedidoEstoqueByIdPedido(idPedido);
 	}
 
 	@Override
@@ -813,8 +813,10 @@ public class EstoqueServiceImpl implements EstoqueService {
 		}
 	}
 
-	private void reinserirItemPedidoEstoque(Integer idPedido) throws BusinessException {
-		List<ItemPedido> listaItemPedido = pedidoService.pesquisarItemPedidoByIdPedido(idPedido);
+	private void reinserirItemPedidoEstoque(ItemPedido... listaItemPedido) throws BusinessException {
+		if (listaItemPedido == null || listaItemPedido.length <= 0) {
+			return;
+		}
 		ItemEstoque iEst = null;
 		for (ItemPedido iPed : listaItemPedido) {
 			iEst = pesquisarItemEstoque(iPed);
@@ -826,6 +828,18 @@ public class EstoqueServiceImpl implements EstoqueService {
 						iPed.getQuantidade());
 			}
 		}
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void reinserirItemPedidoEstoqueByIdItem(Integer idItemPedido) throws BusinessException {
+		reinserirItemPedidoEstoque(pedidoService.pesquisarItemPedidoResumidoMaterialEMedidas(idItemPedido));
+	}
+
+	private void reinserirItemPedidoEstoqueByIdPedido(Integer idPedido) throws BusinessException {
+		List<ItemPedido> listaItemPedido = pedidoService
+				.pesquisarItemPedidoResumidoMaterialEMedidasByIdPedido(idPedido);
+		reinserirItemPedidoEstoque(listaItemPedido.toArray(new ItemPedido[] {}));
 	}
 
 	@Override

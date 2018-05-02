@@ -543,6 +543,27 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 								.setParameter("idItemPedido", idItemPedido), ItemPedido.class, null);
 	}
 
+	public ItemPedido pesquisarItemPedidoResumidoMaterialEMedidas(Integer idItem) {
+		List<ItemPedido> l = pesquisarItemPedidoResumidoMaterialEMedidas(idItem, false);
+		return l.isEmpty() ? null : l.get(0);
+	}
+
+	private List<ItemPedido> pesquisarItemPedidoResumidoMaterialEMedidas(Integer id, boolean isByIdPedido) {
+		StringBuilder select = new StringBuilder(
+				"select new ItemPedido(i.comprimento, i.formaMaterial, i.id, i.material.id, i.medidaExterna, i.medidaInterna, i.quantidade, i.quantidadeReservada) from ItemPedido i ");
+		if (isByIdPedido) {
+			select.append("where i.pedido.id=:id");
+		} else {
+			select.append("where i.id=:id");
+		}
+		return entityManager.createQuery(select.toString(), ItemPedido.class).setParameter("id", id)
+				.getResultList();
+	}
+
+	public List<ItemPedido> pesquisarItemPedidoResumidoMaterialEMedidasByIdPedido(Integer idPedido) {
+		return pesquisarItemPedidoResumidoMaterialEMedidas(idPedido, true);
+	}
+
 	public ItemPedido pesquisarItemPedidoValoresComissaoById(Integer idItem) {
 		Object[] o = QueryUtil
 				.gerarRegistroUnico(

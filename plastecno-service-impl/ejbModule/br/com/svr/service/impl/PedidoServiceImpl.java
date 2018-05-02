@@ -39,6 +39,7 @@ import br.com.svr.service.constante.TipoFinalidadePedido;
 import br.com.svr.service.constante.TipoLogradouro;
 import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.dao.ItemPedidoDAO;
+import br.com.svr.service.dao.ItemReservadoDAO;
 import br.com.svr.service.dao.PedidoDAO;
 import br.com.svr.service.dao.crm.IndicadorClienteDAO;
 import br.com.svr.service.entity.Cliente;
@@ -97,6 +98,8 @@ public class PedidoServiceImpl implements PedidoService {
 	private IndicadorClienteDAO indicadorClienteDAO;
 
 	private ItemPedidoDAO itemPedidoDAO;
+
+	private ItemReservadoDAO itemReservadoDAO;
 
 	@EJB
 	private LogradouroService logradouroService;
@@ -529,13 +532,17 @@ public class PedidoServiceImpl implements PedidoService {
 		if (idPedido == null) {
 			throw new BusinessException("Não é possível cancelar o pedido pois ele não existe no sistema");
 		}
-		TipoPedido tipoPedido = pedidoDAO.pesquisarTipoPedidoById(idPedido);
-		// Essas condicoes serao analisadas quando um pedido for cancelado a
+		TipoPedido tp = pedidoDAO.pesquisarTipoPedidoById(idPedido);
+		SituacaoPedido st = pesquisarSituacaoPedidoById(idPedido);
+
+		if (st == null || tp == null) {
+			throw new BusinessException("O pedido No. " + idPedido + " não contém situação e tipo definidos.");
+		}
 		// partir
 		// de um "refazer do pedido".
-		if (TipoPedido.COMPRA.equals(tipoPedido)) {
+		if (tp.isCompra()) {
 			// estoqueService.devolverItemCompradoEstoqueByIdPedido(idPedido);
-		} else if (TipoPedido.REVENDA.equals(tipoPedido)) {
+		} else if (tp.isRevenda() && st.isVendaEfetivada()) {
 			estoqueService.cancelarReservaEstoqueByIdPedido(idPedido);
 		}
 		alterarSituacaoPedidoByIdPedido(idPedido, SituacaoPedido.CANCELADO);
@@ -1021,6 +1028,7 @@ public class PedidoServiceImpl implements PedidoService {
 	public void init() {
 		pedidoDAO = new PedidoDAO(entityManager);
 		itemPedidoDAO = new ItemPedidoDAO(entityManager);
+		itemReservadoDAO = new ItemReservadoDAO(entityManager);
 		indicadorClienteDAO = new IndicadorClienteDAO(entityManager);
 	}
 
@@ -1780,6 +1788,18 @@ public class PedidoServiceImpl implements PedidoService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ItemPedido pesquisarItemPedidoResumidoMaterialEMedidas(Integer idItem) {
+		return itemPedidoDAO.pesquisarItemPedidoResumidoMaterialEMedidas(idItem);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<ItemPedido> pesquisarItemPedidoResumidoMaterialEMedidasByIdPedido(Integer idPedido) {
+		return itemPedidoDAO.pesquisarItemPedidoResumidoMaterialEMedidasByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<ItemPedido> pesquisarItemPedidoRevendaByPeriodo(Periodo periodo) {
 		return pesquisarValoresItemPedidoResumidoByPeriodo(periodo, pesquisarSituacaoVendaEfetivada(),
 				TipoPedido.REVENDA);
@@ -2356,18 +2376,25 @@ public class PedidoServiceImpl implements PedidoService {
 		if (idItemPedido == null) {
 			return null;
 		}
-
+		// Nao me lembro o porque recuperar algumas informacoes sobre o pedido
+		// nesse ponto. Ach oque era para manter o estado da tela de pedidos.
 		Pedido pedido = pedidoDAO.pesquisarPedidoResumidoFinalidadeByIdItemPedido(idItemPedido);
 		if (pedido == null) {
 			return null;
 		}
 
 		try {
-			// Aqui vamos remover os itens reservados de devolver as quantidades
-			// reservadas do item do pedido para o estoque e zerar as
-			// quantidades reservadas do item do pedido.
-			estoqueService.devolverItemEstoque(idItemPedido);
-
+			SituacaoPedido st = pesquisarSituacaoPedidoByIdItemPedido(idItemPedido);
+			if (st.isVendaEfetivada()) {
+				// Aqui vamos utilizar essa estrategia pois ha poucas remocoes
+				// de
+				// itens no sistema. O Problema eh que nela existe uma pesquisa
+				// dos
+				// itens de estoque associados ao item do pedido que pode ser um
+				// pouco lenta.
+				estoqueService.reinserirItemPedidoEstoqueByIdItem(idItemPedido);
+				itemReservadoDAO.removerByIdItemPedido(idItemPedido);
+			}
 			itemPedidoDAO.remover(new ItemPedido(idItemPedido));
 
 			// Efetuando novamente o calculo pois na remocao o valor do pedido

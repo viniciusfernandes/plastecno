@@ -590,6 +590,40 @@ public class PedidoServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testDuploCancelamentoPedidoVenda() {
+		ItemPedido iCompra = gPedido.gerarItemPedidoNoEstoque();
+		Pedido pVenda = gPedido.gerarPedidoRevenda();
+		Integer qtdeAntes = estoqueService.pesquisarItemEstoque(iCompra).getQuantidade();
+		ItemPedido iVenda = null;
+		try {
+			iVenda = iCompra.clone();
+			pedidoService.inserirItemPedido(pVenda.getId(), iVenda);
+			pedidoService.enviarPedido(pVenda.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		Integer qtdeDepois = estoqueService.pesquisarItemEstoque(iCompra).getQuantidade();
+		assertEquals("Apos a venda de quantidade igual a do estoque o item do estoque deve estar zerado", (Integer) 0,
+				qtdeDepois);
+		try {
+			pedidoService.cancelarPedido(pVenda.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		qtdeDepois = estoqueService.pesquisarItemEstoque(iCompra).getQuantidade();
+		assertEquals("Apos o cancelamento da venda de quantidade do estoque deve ser igual a inicial", qtdeAntes,
+				qtdeDepois);
+		try {
+			pedidoService.cancelarPedido(pVenda.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		qtdeDepois = estoqueService.pesquisarItemEstoque(iCompra).getQuantidade();
+		assertEquals("Apos um segundo cancelamento da venda de quantidade do estoque deve ser igual a inicial",
+				qtdeAntes, qtdeDepois);
+	}
+
+	@Test
 	public void testEfetuarEncomendaItemPedido() {
 		Pedido pedido = gPedido.gerarPedidoRepresentacao();
 		Integer idPedido = pedido.getId();

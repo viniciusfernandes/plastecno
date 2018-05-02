@@ -221,6 +221,10 @@ public interface PedidoService {
 
 	List<ItemPedido> pesquisarItemPedidoRepresentacaoByPeriodo(Periodo periodo);
 
+	ItemPedido pesquisarItemPedidoResumidoMaterialEMedidas(Integer idItem);
+
+	List<ItemPedido> pesquisarItemPedidoResumidoMaterialEMedidasByIdPedido(Integer idPedido);
+
 	List<ItemPedido> pesquisarItemPedidoRevendaByPeriodo(Periodo periodo);
 
 	List<ItemPedido> pesquisarItemPedidoVendaByPeriodo(Periodo periodo, Integer idVendedor);

@@ -111,8 +111,15 @@ $(document).ready(function() {
 		if(isEmpty($(this).val())){
 			return;
 		}
-		$('<input>').attr('type','hidden').attr('name','idPedido').attr('value',$(this).val()).appendTo('#formVazio');
-		$('#formVazio').attr('action', '<c:url value="/pedidoassociado/pdf"/>').submit();
+		var f = document.createElement('FORM');
+		f.method='GET';
+		f.action='<c:url value="/pedidoassociado/pdf"/>';
+		f.id = 'formPDFAssociado';
+		document.body.appendChild(f);
+
+		adicionarInputHiddenFormulario('formPDFAssociado', 'tipoPedido', '<c:out value="${tipoPedidoAssociado}"/>');
+		adicionarInputHiddenFormulario('formPDFAssociado', 'idPedido', $(this).val());
+		f.submit();
 	});
 	</c:if>
 	

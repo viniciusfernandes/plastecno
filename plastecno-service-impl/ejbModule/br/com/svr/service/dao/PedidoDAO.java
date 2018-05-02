@@ -139,6 +139,8 @@ public class PedidoDAO extends GenericDAO<Pedido> {
 		return super.pesquisarById(Pedido.class, idPedido);
 	}
 
+	// ESsa pesquisa tem como filtro o tipo de pedido pois o pedido de compras
+	// nao pode aparecer na tela de pedido de vendas.
 	public Pedido pesquisarById(Integer idPedido, boolean isCompra) {
 		StringBuilder select = new StringBuilder();
 		select.append("select p from Pedido p ");

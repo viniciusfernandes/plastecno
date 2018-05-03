@@ -550,7 +550,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 
 	private List<ItemPedido> pesquisarItemPedidoResumidoMaterialEMedidas(Integer id, boolean isByIdPedido) {
 		StringBuilder select = new StringBuilder(
-				"select new ItemPedido(i.comprimento, i.formaMaterial, i.id, i.material.id, i.medidaExterna, i.medidaInterna, i.quantidade, i.quantidadeReservada) from ItemPedido i ");
+				"select new ItemPedido(i.comprimento, i.formaMaterial, i.id, i.material.id, i.medidaExterna, i.medidaInterna, i.quantidade, i.quantidadeReservada, i.sequencial) from ItemPedido i ");
 		if (isByIdPedido) {
 			select.append("where i.pedido.id=:id");
 		} else {

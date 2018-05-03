@@ -76,12 +76,12 @@ import br.com.svr.util.StringUtils;
 @Stateless
 public class PedidoServiceImpl implements PedidoService {
 
+	@EJB
+	private ClienteService clienteService;
+
 	// @EJB
 	// private AlteracaoIndicesNegociacaoPublisher
 	// alteracaoIndicesNegociacaoPublisher;
-
-	@EJB
-	private ClienteService clienteService;
 
 	@EJB
 	private ComissaoService comissaoService;
@@ -2045,6 +2045,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Representada pesquisarRepresentadaResumidaByIdPedido(Integer idPedido) {
 		return pedidoDAO.pesquisarRepresentadaResumidaByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public Integer pesquisarSequencialItemByIdItemPedido(Integer idItem) {
+		return itemPedidoDAO.pesquisarSequencialItemPedido(idItem);
 	}
 
 	@Override

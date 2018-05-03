@@ -9,14 +9,17 @@ import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.svr.service.EstoqueService;
 import br.com.svr.service.MaterialService;
+import br.com.svr.service.RegistroEstoqueService;
 import br.com.svr.service.constante.FormaMaterial;
 import br.com.svr.service.constante.TipoAcesso;
 import br.com.svr.service.entity.ItemEstoque;
 import br.com.svr.service.entity.Material;
+import br.com.svr.service.entity.RegistroEstoque;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.message.AlteracaoEstoquePublisher;
 import br.com.svr.service.wrapper.RelatorioWrapper;
 import br.com.svr.util.NumeroUtils;
+import br.com.svr.util.StringUtils;
 import br.com.svr.vendas.controller.anotacao.Servico;
 import br.com.svr.vendas.json.SerializacaoJson;
 import br.com.svr.vendas.login.UsuarioInfo;
@@ -32,6 +35,9 @@ public class EstoqueController extends AbstractController {
 
     @Servico
     private MaterialService materialService;
+
+    @Servico
+    private RegistroEstoqueService registroEstoqueService;
 
     public EstoqueController(Result result, UsuarioInfo usuarioInfo) {
         super(result, usuarioInfo);
@@ -125,7 +131,7 @@ public class EstoqueController extends AbstractController {
             itemPedido.setAliquotaICMS(NumeroUtils.gerarAliquota(itemPedido.getAliquotaICMS()));
             itemPedido.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemPedido.getMargemMinimaLucro()));
 
-            estoqueService.inserirItemEstoque(itemPedido);
+            estoqueService.inserirItemEstoque(getCodigoUsuario(), itemPedido, getNomeUsuario());
 
             gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
         } catch (BusinessException e) {
@@ -234,12 +240,25 @@ public class EstoqueController extends AbstractController {
         serializarJson(new SerializacaoJson("lista", lista));
     }
 
+    @Get("/estoque/registroestoque/item/{id}")
+    public void pesquisarRegistroEstoqueByIdItemEstoque(Integer id) {
+        List<RegistroEstoque> lRegistro = registroEstoqueService.pesquisarRegistroByIdItemEstoque(id);
+        for (RegistroEstoque r : lRegistro) {
+            r.setDataOperacaoFormatada(StringUtils.formatarDataHora(r.getDataOperacao()));
+        }
+
+        ItemEstoque iEst = estoqueService.pesquisarItemEstoqueById(id);
+        addAtributo("descricaoItem", iEst.getDescricaoSemFormatacao());
+        addAtributo("listaRegistroEstoque", lRegistro);
+        irTopoPagina();
+    }
+
     @Post("estoque/item/reajustarpreco")
     public void reajustarPrecoItemEstoque(ItemEstoque itemPedido, Material material, FormaMaterial formaMaterial) {
 
         itemPedido.setAliquotaReajuste(NumeroUtils.gerarAliquota(itemPedido.getAliquotaReajuste()));
         try {
-            estoqueService.reajustarPrecoItemEstoque(itemPedido);
+            estoqueService.reajustarPrecoItemEstoque(itemPedido, getCodigoUsuario(), getNomeUsuario());
 
             if (itemPedido.getId() != null) {
                 gerarMensagemSucesso("Item de estoque No. " + itemPedido.getId()
@@ -253,6 +272,8 @@ public class EstoqueController extends AbstractController {
             addAtributo("permanecerTopo", true);
             addAtributo("itemPedido", itemPedido);
         }
+        addAtributo("formaMaterial", formaMaterial);
+        addAtributo("material", material);
 
         addAtributo("permanecerTopo", true);
         if (material != null && formaMaterial != null) {
@@ -271,7 +292,7 @@ public class EstoqueController extends AbstractController {
                 itemEstoque.setAliquotaIPI(NumeroUtils.gerarAliquota(itemEstoque.getAliquotaIPI()));
                 itemEstoque.setAliquotaICMS(NumeroUtils.gerarAliquota(itemEstoque.getAliquotaICMS()));
                 itemEstoque.setMargemMinimaLucro(NumeroUtils.gerarAliquota(itemEstoque.getMargemMinimaLucro()));
-                estoqueService.redefinirItemEstoque(itemEstoque);
+                estoqueService.redefinirItemEstoque(getCodigoUsuario(), itemEstoque, getNomeUsuario());
                 gerarMensagemSucesso("Item de estoque inserido/alterado com sucesso.");
             }
         } catch (BusinessException e) {

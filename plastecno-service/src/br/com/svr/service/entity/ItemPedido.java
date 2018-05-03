@@ -254,9 +254,9 @@ public class ItemPedido extends Item {
 
 	// Construtor usado para recuperar as informacoes do item necessarias na
 	// pesquisa de um item de estoque.
-
 	public ItemPedido(Double comprimento, FormaMaterial formaMaterial, Integer id, Integer idMaterial,
-			Double medidaExterna, Double medidaInterna, Integer quantidade, Integer quantidadeReservada) {
+			Double medidaExterna, Double medidaInterna, Integer quantidade, Integer quantidadeReservada,
+			Integer sequencial) {
 		this.comprimento = comprimento;
 		this.formaMaterial = formaMaterial;
 		this.id = id;
@@ -265,6 +265,7 @@ public class ItemPedido extends Item {
 		this.medidaInterna = medidaInterna;
 		this.quantidade = quantidade;
 		this.quantidadeReservada = quantidadeReservada;
+		this.sequencial = sequencial;
 	}
 
 	public ItemPedido(Double precoUnidade, Integer quantidade, Double aliquotaIPI, Double aliquotaICMS) {

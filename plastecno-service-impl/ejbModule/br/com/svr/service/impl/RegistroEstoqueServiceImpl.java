@@ -36,47 +36,93 @@ public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
 		registroEstoqueDAO = new RegistroEstoqueDAO(entityManager);
 	}
 
-	private void inserirRegistro(Integer idItemEstoque, Integer idItemPedido, Integer quantidade,
-			TipoOperacaoEstoque tipoOperacao) {
+	private void inserirRegistro(Integer idItemEstoque, Integer idItemPedido, Integer idUsuario, String nomeUsuario,
+			Integer quantidadeAnterior, Integer quantidadeItem, Integer quantidadePosterior, Integer sequencialItem,
+			TipoOperacaoEstoque tipoOperacao, Double valorAnterior, Double valorPosterior) {
 		Integer idPed = pedidoService.pesquisarIdPedidoByIdItemPedido(idItemPedido);
-		Integer qtdeEst = estoqueService.pesquisarQuantidadeByIdItemEstoque(idItemEstoque);
 
-		// Estamos subtraindo/adicionando as quantidade pois nesse ponto
-		// espera-se que o sistema ja tenha atualizado as quantidades do estoque
-		// com os novos itens de compra/venda.
-		qtdeEst = tipoOperacao.isEntrada() ? qtdeEst - quantidade : qtdeEst + quantidade;
-		if (qtdeEst < 0) {
-			qtdeEst = 0;
+		if (!tipoOperacao.isManual()) {
+			// Nesse momento estamos o item do pedido ja foi incuido/excluido
+			// automaticamente do
+			// estoque, por isso estamos pesquisando a quantidade atual como
+			// quantidade posterior.
+			quantidadePosterior = estoqueService.pesquisarQuantidadeByIdItemEstoque(idItemEstoque);
+
+			if (quantidadeItem == null) {
+				quantidadeItem = 0;
+			}
+			// Estamos subtraindo/adicionando as quantidade pois nesse ponto
+			// espera-se que o sistema ja tenha atualizado as quantidades do
+			// estoque com os novos itens de compra/venda.
+			quantidadeAnterior = tipoOperacao.isEntrada() ? quantidadePosterior - quantidadeItem : quantidadePosterior
+					+ quantidadeItem;
+			if (quantidadeAnterior < 0) {
+				quantidadeAnterior = 0;
+			}
 		}
+
 		RegistroEstoque r = new RegistroEstoque();
 		r.setDataOperacao(new Date());
 		r.setIdItemEstoque(idItemEstoque);
 		r.setIdItemPedido(idItemPedido);
 		r.setIdPedido(idPed);
-		r.setIdUsuario(null);
+		r.setIdUsuario(idUsuario);
+		r.setNomeUsuario(nomeUsuario);
+		r.setQuantidadeAnterior(quantidadeAnterior);
+		r.setQuantidadePosterior(quantidadePosterior);
+		r.setQuantidadeItem(quantidadeItem);
+		r.setSequencialItemPedido(sequencialItem);
 		r.setTipoOperacao(tipoOperacao);
-		r.setQuantidadeRegistrada(quantidade);
-		r.setQuantidadeAnterior(qtdeEst);
-
+		r.setValorAnterior(valorAnterior);
+		r.setValorPosterior(valorPosterior);
 		registroEstoqueDAO.inserir(r);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirRegistroEntradaDevolucaoItemVenda(Integer idItemEstoque, Integer idItemPedido, Integer quantidade) {
-		inserirRegistro(idItemEstoque, idItemPedido, quantidade, TipoOperacaoEstoque.ENTRADA_DEVOLUCAO_VENDA);
+	public void inserirRegistroAlteracaoValorItemEstoque(Integer idItemEstoque, Integer idUsuario, String nomeUsuario,
+			Double valorAnterior, Double valorPosterior) {
+		inserirRegistro(idItemEstoque, null, idUsuario, nomeUsuario, null, null, null, null,
+				TipoOperacaoEstoque.ALTERACAO_MANUAL_VALOR, valorAnterior, valorPosterior);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirRegistroEntradaItemCompra(Integer idItemEstoque, Integer idItemPedido, Integer quantidade) {
-		inserirRegistro(idItemEstoque, idItemPedido, quantidade, TipoOperacaoEstoque.ENTRADA_PEDIDO_COMPRA);
+	public void inserirRegistroAlteracaoValorItemEstoque(Integer idItemEstoque, Integer idUsuario, String nomeUsuario,
+			Integer quantidadeAnterior, Integer quantidadePosterior, Double valorAnterior, Double valorPosterior) {
+		inserirRegistro(idItemEstoque, null, idUsuario, nomeUsuario, quantidadeAnterior, null, quantidadePosterior,
+				null, TipoOperacaoEstoque.ALTERACAO_MANUAL_VALOR, valorAnterior, valorPosterior);
 	}
-	
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void inserirRegistroSaidaItemVenda(Integer idItemEstoque, Integer idItemPedido, Integer quantidade) {
-		inserirRegistro(idItemEstoque, idItemPedido, quantidade, TipoOperacaoEstoque.SAIDA_PEDIDO_VENDA);
+	public void inserirRegistroConfiguracaoItemEstoque(Integer idItemEstoque) {
+		inserirRegistro(idItemEstoque, null, null, null, null, null, null, null,
+				TipoOperacaoEstoque.ENTRADA_DEVOLUCAO_VENDA, null, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void inserirRegistroEntradaDevolucaoItemVenda(Integer idItemEstoque, Integer idItemPedido,
+			Integer quantidade, Integer sequencialItem) {
+		inserirRegistro(idItemEstoque, idItemPedido, sequencialItem, null, null, quantidade, null, sequencialItem,
+				TipoOperacaoEstoque.ENTRADA_DEVOLUCAO_VENDA, null, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void inserirRegistroEntradaItemCompra(Integer idItemEstoque, Integer idItemPedido, Integer quantidade,
+			Integer sequencialItem) {
+		inserirRegistro(idItemEstoque, idItemPedido, null, null, null, quantidade, null, sequencialItem,
+				TipoOperacaoEstoque.ENTRADA_PEDIDO_COMPRA, null, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void inserirRegistroSaidaItemVenda(Integer idItemEstoque, Integer idItemPedido, Integer quantidade,
+			Integer sequencialItem) {
+		inserirRegistro(idItemEstoque, idItemPedido, null, null, null, quantidade, null, sequencialItem,
+				TipoOperacaoEstoque.SAIDA_PEDIDO_VENDA, null, null);
 	}
 
 	@Override
@@ -87,13 +133,13 @@ public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<RegistroEstoque> pesquisarRegistroByIdPedido(Integer idPedido) {
-		return registroEstoqueDAO.pesquisarRegistroByIdPedido(idPedido);
+	public List<RegistroEstoque> pesquisarRegistroByIdItemPedido(Integer idItemPedido) {
+		return registroEstoqueDAO.pesquisarRegistroEstoqueByIdItemPedido(idItemPedido);
 	}
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<RegistroEstoque> pesquisarRegistroEstoqueByIdItemPedido(Integer idItemPedido) {
-		return registroEstoqueDAO.pesquisarRegistroEstoqueByIdItemPedido(idItemPedido);
+	public List<RegistroEstoque> pesquisarRegistroByIdPedido(Integer idPedido) {
+		return registroEstoqueDAO.pesquisarRegistroByIdPedido(idPedido);
 	}
 }

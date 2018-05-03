@@ -48,6 +48,8 @@ public interface EstoqueService {
 
 	boolean inserirConfiguracaoNcmEstoque(Integer idMaterial, FormaMaterial formaMaterial, String ncm);
 
+	Integer inserirItemEstoque(Integer idUsuario, ItemEstoque itemEstoque, String nomeUsuario) throws BusinessException;
+
 	Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
 	Integer inserirItemPedido(Integer idItemPedido) throws BusinessException;
@@ -78,13 +80,16 @@ public interface EstoqueService {
 
 	Integer pesquisarQuantidadeByIdItemEstoque(Integer idItemEstoque);
 
-	void reajustarPrecoItemEstoque(ItemEstoque itemReajustado) throws BusinessException;
+	void reajustarPrecoItemEstoque(ItemEstoque itemReajustado, Integer idUsuario, String nomeUsuario)
+			throws BusinessException;
 
 	Integer recalcularEstoqueItemCompra(Integer idItemCompra, Integer quantidade) throws BusinessException;
 
 	ItemEstoque recalcularValorItemEstoque(ItemEstoque itemEstoque) throws AlgoritmoCalculoException;
 
 	Integer recortarItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
+
+	void redefinirItemEstoque(Integer idUsuario, ItemEstoque itemEstoque, String nomeUsuario) throws BusinessException;
 
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 

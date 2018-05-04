@@ -107,7 +107,7 @@ public class UsuarioController extends AbstractController {
     @Get("usuario/listagem")
     public void pesquisar(Usuario filtro, Integer paginaSelecionada) {
         final PaginacaoWrapper<Usuario> paginacao = this.usuarioService.paginarUsuario(filtro, false, false,
-                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumeroRegistrosPorPagina());
 
         for (Usuario usuario : paginacao.getLista()) {
             inserirMascaraDocumentos(usuario);

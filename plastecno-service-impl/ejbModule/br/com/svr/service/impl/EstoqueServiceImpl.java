@@ -552,8 +552,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Integer qPosterior = iEst.getQuantidade();
 		Double vPosterior = iEst.getPrecoMedio();
 
-		registroEstoqueService.inserirRegistroAlteracaoValorItemEstoque(iEst.getId(), null, null, qAnterior,
-				qPosterior, vAnterior, vPosterior);
+		registroEstoqueService.inserirRegistroAlteracaoValorItemEstoque(iEst.getId(), idUsuario, nomeUsuario,
+				qAnterior, qPosterior, vAnterior, vPosterior);
 		return iEst.getId();
 	}
 

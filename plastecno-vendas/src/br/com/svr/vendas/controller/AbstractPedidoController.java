@@ -265,7 +265,7 @@ public class AbstractPedidoController extends AbstractController {
         RelatorioWrapper<Pedido, ItemPedido> relatorio = relatorioService
                 .gerarRelatorioItemPedidoByIdClienteIdVendedorIdFornecedor(idCliente,
                         pesquisarTodos ? null : idUsuario, idFornecedor, isOrcamento, isCompra, indiceRegistroInicial,
-                        getNumerRegistrosPorPagina(), itemVendido);
+                        getNumeroRegistrosPorPagina(), itemVendido);
 
         for (GrupoWrapper<Pedido, ItemPedido> grupo : relatorio.getListaGrupo()) {
             formatarPedido(grupo.getId());

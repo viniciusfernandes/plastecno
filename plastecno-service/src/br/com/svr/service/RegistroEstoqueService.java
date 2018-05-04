@@ -3,6 +3,7 @@ package br.com.svr.service;
 import java.util.List;
 
 import br.com.svr.service.entity.RegistroEstoque;
+import br.com.svr.service.wrapper.PaginacaoWrapper;
 
 public interface RegistroEstoqueService {
 
@@ -19,7 +20,12 @@ public interface RegistroEstoqueService {
 
 	void inserirRegistroSaidaItemVenda(Integer idItemEstoque, Integer idItemPedido, Integer quantidade, Integer sequencialItem);
 
+	PaginacaoWrapper<RegistroEstoque> paginarRegistroByIdItemEstoque(Integer idItemEstoque, Integer indiceInicial, Integer numMaxRegistros);
+
 	List<RegistroEstoque> pesquisarRegistroByIdItemEstoque(Integer idItemEstoque);
+
+	List<RegistroEstoque> pesquisarRegistroByIdItemEstoque(Integer idItemEstoque, Integer indiceInicial,
+			Integer numeroMaxRegistros);
 
 	List<RegistroEstoque> pesquisarRegistroByIdItemPedido(Integer idItemPedido);
 

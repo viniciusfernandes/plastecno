@@ -17,6 +17,7 @@ import br.com.svr.service.entity.Material;
 import br.com.svr.service.entity.RegistroEstoque;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.message.AlteracaoEstoquePublisher;
+import br.com.svr.service.wrapper.PaginacaoWrapper;
 import br.com.svr.service.wrapper.RelatorioWrapper;
 import br.com.svr.util.NumeroUtils;
 import br.com.svr.util.StringUtils;
@@ -241,15 +242,26 @@ public class EstoqueController extends AbstractController {
     }
 
     @Get("/estoque/registroestoque/item/{id}")
-    public void pesquisarRegistroEstoqueByIdItemEstoque(Integer id) {
-        List<RegistroEstoque> lRegistro = registroEstoqueService.pesquisarRegistroByIdItemEstoque(id);
-        for (RegistroEstoque r : lRegistro) {
+    public void pesquisarRegistroEstoqueByIdItemEstoque(Integer id, FormaMaterial formaMaterial, Material material,
+            Integer paginaSelecionada) {
+        // Alterando a quantidade de registros por pagina
+        setNumeroRegistrosPorPagina(100);
+
+        PaginacaoWrapper<RegistroEstoque> paginacao = registroEstoqueService.paginarRegistroByIdItemEstoque(id,
+                calcularIndiceRegistroInicial(paginaSelecionada), getNumeroRegistrosPorPagina());
+
+        for (RegistroEstoque r : paginacao.getLista()) {
             r.setDataOperacaoFormatada(StringUtils.formatarDataHora(r.getDataOperacao()));
         }
 
+        inicializarPaginacao(paginaSelecionada, paginacao, "listaRegistroEstoque");
+
         ItemEstoque iEst = estoqueService.pesquisarItemEstoqueById(id);
+        addAtributo("idItemEstoque", id);
         addAtributo("descricaoItem", iEst.getDescricaoSemFormatacao());
-        addAtributo("listaRegistroEstoque", lRegistro);
+        addAtributo("material", material);
+        addAtributo("formaMaterial", formaMaterial);
+        addAtributo("paginaSelecionada", paginaSelecionada);
         irTopoPagina();
     }
 

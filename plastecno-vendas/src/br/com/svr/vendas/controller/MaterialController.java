@@ -91,7 +91,7 @@ public final class MaterialController extends AbstractController {
     @Get("material/listagem")
     public void pesquisar(Material filtro, Integer paginaSelecionada) {
         final PaginacaoWrapper<Material> paginacao = this.materialService.paginarMaterial(filtro, null,
-                calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+                calcularIndiceRegistroInicial(paginaSelecionada), getNumeroRegistrosPorPagina());
 
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaMaterial");
         addAtributo("material", filtro);

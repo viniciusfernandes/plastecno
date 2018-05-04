@@ -193,7 +193,7 @@ public class ClienteController extends AbstractController {
     @Get("cliente/listagem")
     public void pesquisar(Cliente filtro, Integer paginaSelecionada) {
         final PaginacaoWrapper<Cliente> paginacao = this.clienteService.paginarCliente(filtro, true,
-                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumeroRegistrosPorPagina());
 
         for (Cliente c : paginacao.getLista()) {
             formatarDocumento(c);

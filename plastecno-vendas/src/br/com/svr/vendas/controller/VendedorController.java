@@ -83,7 +83,7 @@ public class VendedorController extends AbstractController {
     @Get("vendedor/listagem")
     public void pesquisar(Usuario filtro, Integer paginaSelecionada) {
         final PaginacaoWrapper<Usuario> paginacao = this.usuarioService.paginarVendedor(filtro, null,
-                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumeroRegistrosPorPagina());
 
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaVendedor");
         addAtributo("vendedor", filtro);

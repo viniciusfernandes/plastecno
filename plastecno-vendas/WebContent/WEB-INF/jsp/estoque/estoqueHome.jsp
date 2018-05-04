@@ -13,6 +13,7 @@
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
@@ -31,6 +32,7 @@ $(document).ready(function() {
 	habilitarCamposEdicaoItem(false);
 	</c:if>
 	
+	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();
@@ -193,6 +195,12 @@ function inicializarFiltro() {
 
 	<form id="formVazio" action="<c:url value="/estoque"/>">
 	</form>
+	
+	<form id="formPesquisa" action="<c:url value="/estoque/registroestoque/item/${idItemEstoque}"/>">
+		<input type="hidden" name="material.id" value="${material.id}"/>
+		<input type="hidden" name="material.descricaoFormatada" value="${material.descricaoFormatada}"/>
+		<input type="hidden" name="formaMaterial" value="${formaSelecionada}"/>
+	</form>
 
 		<fieldset id="bloco_pesquisa">
 			<legend>::: Pesquisa de Itens do Estoque :::</legend>
@@ -302,6 +310,7 @@ function inicializarFiltro() {
 										<form action="<c:url value="/estoque/registroestoque/item/${item.id}"/>" method="get">
 											<!-- Esse dados foram submetidos para manter o estado da tela durante o filtro  -->
 											<input type="hidden" name="material.id" value="${material.id}"/>
+											<input type="hidden" name="material.descricaoFormatada" value="${material.descricaoFormatada}"/>
 											<input type="hidden" name="formaMaterial" value="${formaSelecionada}"/>
 											<input type="submit" title="Pesquisar Registros dos Itens do Estoque" value="" class="botaoPlanilhaPequeno"/>
 										</form>
@@ -321,6 +330,7 @@ function inicializarFiltro() {
 		<c:otherwise>
 			<fieldset>
 			<legend>::: Registro => ${descricaoItem} :::</legend>
+			<div id="paginador"></div>
 			<div>
 				<table class="listrada">
 					<thead>

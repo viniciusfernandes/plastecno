@@ -63,7 +63,7 @@ public abstract class AbstractController {
     private String homePath;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private String nomeTela;
-    private final Integer numerRegistrosPorPagina = 20;
+    private Integer numeroRegistrosPorPagina = 20;
     private Picklist picklist;
     private final String possuiMultiplosLogradouros = "possuiMultiplosLogradouros";
     private HttpServletRequest request;
@@ -214,7 +214,7 @@ public abstract class AbstractController {
         if (paginaSelecionada == null || paginaSelecionada <= 1) {
             return 0;
         } else {
-            return numerRegistrosPorPagina * (paginaSelecionada - 1);
+            return numeroRegistrosPorPagina * (paginaSelecionada - 1);
         }
     }
 
@@ -222,7 +222,7 @@ public abstract class AbstractController {
         if (totalRegistros == null || totalRegistros <= 0) {
             return 1;
         }
-        return (int) Math.ceil(((double) totalRegistros / numerRegistrosPorPagina));
+        return (int) Math.ceil(((double) totalRegistros / numeroRegistrosPorPagina));
     }
 
     void carregarVendedor(Cliente cliente) {
@@ -546,8 +546,8 @@ public abstract class AbstractController {
         return usuarioInfo.getNome();
     }
 
-    Integer getNumerRegistrosPorPagina() {
-        return numerRegistrosPorPagina;
+    Integer getNumeroRegistrosPorPagina() {
+        return numeroRegistrosPorPagina;
     }
 
     Object getSessao(String atributo) {
@@ -840,6 +840,10 @@ public abstract class AbstractController {
 
     void setNomeTela(String nomeTela) {
         this.nomeTela = nomeTela;
+    }
+
+    public void setNumeroRegistrosPorPagina(Integer numeroRegistrosPorPagina) {
+        this.numeroRegistrosPorPagina = numeroRegistrosPorPagina;
     }
 
     boolean temElementos(Collection<?> lista) {

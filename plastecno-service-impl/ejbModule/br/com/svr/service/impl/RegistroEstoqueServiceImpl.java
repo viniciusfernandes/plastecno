@@ -17,6 +17,7 @@ import br.com.svr.service.RegistroEstoqueService;
 import br.com.svr.service.constante.TipoOperacaoEstoque;
 import br.com.svr.service.dao.RegistroEstoqueDAO;
 import br.com.svr.service.entity.RegistroEstoque;
+import br.com.svr.service.wrapper.PaginacaoWrapper;
 
 @Stateless
 public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
@@ -127,8 +128,22 @@ public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public PaginacaoWrapper<RegistroEstoque> paginarRegistroByIdItemEstoque(Integer idItemEstoque, Integer indiceInicial, Integer numMaxRegistros) {
+		return new PaginacaoWrapper<RegistroEstoque>(registroEstoqueDAO.pesquisarTotalRegistroByItemEstoque(idItemEstoque), 
+				pesquisarRegistroByIdItemEstoque(idItemEstoque, indiceInicial, numMaxRegistros));
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<RegistroEstoque> pesquisarRegistroByIdItemEstoque(Integer idItemEstoque) {
-		return registroEstoqueDAO.pesquisarRegistroByIdItemEstoque(idItemEstoque);
+		return pesquisarRegistroByIdItemEstoque(idItemEstoque, null, null);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public List<RegistroEstoque> pesquisarRegistroByIdItemEstoque(Integer idItemEstoque, Integer indiceInicial,
+			Integer numeroMaxRegistros) {
+		return registroEstoqueDAO.pesquisarRegistroByIdItemEstoque(idItemEstoque, indiceInicial, numeroMaxRegistros);
 	}
 
 	@Override
@@ -136,7 +151,7 @@ public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
 	public List<RegistroEstoque> pesquisarRegistroByIdItemPedido(Integer idItemPedido) {
 		return registroEstoqueDAO.pesquisarRegistroEstoqueByIdItemPedido(idItemPedido);
 	}
-
+	
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<RegistroEstoque> pesquisarRegistroByIdPedido(Integer idPedido) {

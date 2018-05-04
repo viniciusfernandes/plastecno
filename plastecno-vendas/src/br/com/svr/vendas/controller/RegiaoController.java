@@ -90,7 +90,7 @@ public class RegiaoController extends AbstractController {
     @Get("regiao/listagem")
     public void pesquisar(Regiao filtro, Integer paginaSelecionada) {
         PaginacaoWrapper<Regiao> paginacao = this.regiaoService.paginarRegiao(filtro,
-                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumeroRegistrosPorPagina());
 
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaRegiao");
         addAtributo("regiao", filtro);

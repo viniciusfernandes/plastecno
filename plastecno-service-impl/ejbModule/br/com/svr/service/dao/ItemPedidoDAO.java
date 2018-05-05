@@ -543,6 +543,25 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 								.setParameter("idItemPedido", idItemPedido), ItemPedido.class, null);
 	}
 
+	public ItemPedido pesquisarItemPedidoQuantidadeESequencial(Integer idItem) {
+		Object[] o = QueryUtil
+				.gerarRegistroUnico(
+						entityManager
+								.createQuery(
+										"select i.quantidade, i.quantidadeRecepcionada, i.sequencial from ItemPedido i where i.id=:idItem")
+								.setParameter("idItem", idItem), Object[].class, null);
+
+		if (o == null) {
+			return null;
+		}
+		ItemPedido i = new ItemPedido();
+		i.setId(idItem);
+		i.setQuantidade((Integer) o[0]);
+		i.setQuantidadeRecepcionada((Integer) o[1]);
+		i.setSequencial(((Integer) o[2]));
+		return i;
+	}
+
 	public ItemPedido pesquisarItemPedidoResumidoMaterialEMedidas(Integer idItem) {
 		List<ItemPedido> l = pesquisarItemPedidoResumidoMaterialEMedidas(idItem, false);
 		return l.isEmpty() ? null : l.get(0);
@@ -556,8 +575,7 @@ public class ItemPedidoDAO extends GenericDAO<ItemPedido> {
 		} else {
 			select.append("where i.id=:id");
 		}
-		return entityManager.createQuery(select.toString(), ItemPedido.class).setParameter("id", id)
-				.getResultList();
+		return entityManager.createQuery(select.toString(), ItemPedido.class).setParameter("id", id).getResultList();
 	}
 
 	public List<ItemPedido> pesquisarItemPedidoResumidoMaterialEMedidasByIdPedido(Integer idPedido) {

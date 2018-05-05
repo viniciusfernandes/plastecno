@@ -81,12 +81,7 @@ public class EstoqueServiceImpl implements EstoqueService {
 		Integer quantidadeItem = pedidoService.pesquisarQuantidadeRecepcionadaItemPedido(idItemCompra);
 		quantidadeItem += quantidadeRecepcionada;
 		pedidoService.alterarQuantidadeRecepcionada(idItemCompra, quantidadeItem);
-		Integer sequencial = pedidoService.pesquisarSequencialItemByIdItemPedido(idItemCompra);
-
-		Integer idEst = alterarEstoque(idItemCompra, quantidadeRecepcionada);
-		registroEstoqueService
-				.inserirRegistroEntradaItemCompra(idEst, idItemCompra, quantidadeRecepcionada, sequencial);
-		return idEst;
+		return alterarEstoque(idItemCompra, quantidadeRecepcionada);
 	}
 
 	@Override
@@ -140,7 +135,8 @@ public class EstoqueServiceImpl implements EstoqueService {
 		 * icms em cada item do estoque que deve ser repassado para o cliente.
 		 */
 		calcularPrecoMedioFatorICMS(itemEstoque);
-		return inserirItemEstoque(itemEstoque);
+		return inserirItemEstoque(null, pedidoService.pesquisarItemPedidoQuantidadeESequencial(idItemCompra),
+				itemEstoque, null, true);
 	}
 
 	@Override
@@ -531,6 +527,11 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Integer inserirItemEstoque(Integer idUsuario, ItemEstoque itemEstoque, String nomeUsuario)
 			throws BusinessException {
+		return inserirItemEstoque(idUsuario, null, itemEstoque, null, false);
+	}
+
+	private Integer inserirItemEstoque(Integer idUsuario, ItemPedido itemCompra, ItemEstoque itemEstoque,
+			String nomeUsuario, boolean isRecepcaoCompra) throws BusinessException {
 		if (itemEstoque == null) {
 			throw new BusinessException("Não pode inserir iItem de estoque nulo");
 		}
@@ -544,16 +545,39 @@ public class EstoqueServiceImpl implements EstoqueService {
 		if (!itemEstoque.isPeca() && StringUtils.isNotEmpty(itemEstoque.getDescricaoPeca())) {
 			throw new BusinessException("A descrição é apenas itens do tipo peças. Remova a descrição.");
 		}
-		Integer qAnterior = itemEstoque.getQuantidade();
-		Double vAnterior = itemEstoque.getPrecoMedio();
 
-		ItemEstoque iEst = itemEstoqueDAO.alterar(recalcularValorItemEstoque(itemEstoque));
+		ItemEstoque iEst = null;
+		Integer qAnterior = null;
+		Double vAnterior = null;
+		// Esse bloco de codigo eh necessario para efetuar a configuracao das
+		// quatidades e valores anteriores a atleracao do estoque no caso em que
+		// o sistema esteja uma recepcao de um item de compra. Os itens do
+		// pedido de compra dao origem a um item de estoque.
+		if (isRecepcaoCompra) {
+			iEst = pesquisarItemEstoque(itemEstoque);
+			qAnterior = iEst == null ? 0 : iEst.getQuantidade();
+			vAnterior = iEst == null ? 0 : iEst.getPrecoMedio();
+			iEst = itemEstoqueDAO.alterar(recalcularValorItemEstoque(iEst, itemEstoque));
+
+		} else {
+			qAnterior = itemEstoque.getQuantidade();
+			vAnterior = itemEstoque.getPrecoMedio();
+			iEst = itemEstoqueDAO.alterar(recalcularValorItemEstoque(itemEstoque));
+		}
+
+		if (iEst == null) {
+			return null;
+		}
 
 		Integer qPosterior = iEst.getQuantidade();
 		Double vPosterior = iEst.getPrecoMedio();
-
-		registroEstoqueService.inserirRegistroAlteracaoValorItemEstoque(iEst.getId(), idUsuario, nomeUsuario,
-				qAnterior, qPosterior, vAnterior, vPosterior);
+		if (isRecepcaoCompra && itemCompra != null) {
+			registroEstoqueService.inserirRegistroEntradaItemCompra(iEst.getId(), itemCompra.getId(),
+					itemCompra.getQuantidadeRecepcionada(), itemCompra.getSequencial());
+		} else {
+			registroEstoqueService.inserirRegistroAlteracaoValorItemEstoque(iEst.getId(), idUsuario, nomeUsuario,
+					qAnterior, qPosterior, vAnterior, vPosterior);
+		}
 		return iEst.getId();
 	}
 
@@ -730,13 +754,19 @@ public class EstoqueServiceImpl implements EstoqueService {
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemEstoque recalcularValorItemEstoque(ItemEstoque itemEstoque) throws AlgoritmoCalculoException {
+		return recalcularValorItemEstoque(null, itemEstoque);
+	}
+
+	private ItemEstoque recalcularValorItemEstoque(ItemEstoque itemExistente, ItemEstoque itemEstoque)
+			throws AlgoritmoCalculoException {
 		itemEstoque.configurarMedidaInterna();
 
 		CalculadoraItem.validarVolume(itemEstoque);
 
 		// Verificando se existe item equivalente no estoque, caso nao exista
 		// vamos criar um novo.
-		ItemEstoque itemCadastrado = pesquisarItemEstoque(itemEstoque);
+		ItemEstoque itemCadastrado = itemExistente == null || itemExistente.getId() == null ? pesquisarItemEstoque(itemEstoque)
+				: itemExistente;
 		calcularPrecoMedioItemEstoque(itemCadastrado, itemEstoque);
 
 		if (itemCadastrado == null) {

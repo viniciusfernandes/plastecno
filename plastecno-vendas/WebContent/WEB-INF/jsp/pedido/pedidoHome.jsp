@@ -370,12 +370,12 @@ $(document).ready(function() {
 				<input type="button" id="botaoLimparNumeroPedido"
 					title="Limpar Pedido" value="" class="botaoLimparPequeno" />
 			</div>
-			<div class="input" style="width: 1%">
+			<div class="input" style="width: 3%">
 				<input type="button" id="botaoCopiarPedido"
 					title="Copiar Pedido" value="" class="botaoCopiarPequeno" />
 			</div>
 			
-			<div class="label" style="width: 12%">Nr. Pedido Cliente:</div>
+			<div class="label" style="width: 10%">Nr. Pedido Cliente:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoCliente"
 					name="pedido.numeroPedidoCliente"

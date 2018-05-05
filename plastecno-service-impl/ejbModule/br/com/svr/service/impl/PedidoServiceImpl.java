@@ -75,16 +75,15 @@ import br.com.svr.util.StringUtils;
 
 @Stateless
 public class PedidoServiceImpl implements PedidoService {
-
 	@EJB
 	private ClienteService clienteService;
+
+	@EJB
+	private ComissaoService comissaoService;
 
 	// @EJB
 	// private AlteracaoIndicesNegociacaoPublisher
 	// alteracaoIndicesNegociacaoPublisher;
-
-	@EJB
-	private ComissaoService comissaoService;
 
 	@EJB
 	private EmailService emailService;
@@ -1777,6 +1776,12 @@ public class PedidoServiceImpl implements PedidoService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido) {
 		return itemPedidoDAO.pesquisarItemPedidoPagamento(idItemPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public ItemPedido pesquisarItemPedidoQuantidadeESequencial(Integer idItem) {
+		return itemPedidoDAO.pesquisarItemPedidoQuantidadeESequencial(idItem);
 	}
 
 	@Override

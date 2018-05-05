@@ -219,6 +219,8 @@ public interface PedidoService {
 
 	ItemPedido pesquisarItemPedidoPagamento(Integer idItemPedido);
 
+	ItemPedido pesquisarItemPedidoQuantidadeESequencial(Integer idItem);
+
 	List<ItemPedido> pesquisarItemPedidoRepresentacaoByPeriodo(Periodo periodo);
 
 	ItemPedido pesquisarItemPedidoResumidoMaterialEMedidas(Integer idItem);

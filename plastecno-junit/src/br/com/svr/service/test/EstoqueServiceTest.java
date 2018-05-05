@@ -916,7 +916,12 @@ public class EstoqueServiceTest extends AbstractTest {
 		}
 
 		lRegistro = registroEstoqueService.pesquisarRegistroByIdItemPedido(i.getId());
+		assertTrue(
+				"Foi recebido apenas um item do pedido de compras, portanto deve haver apensa um registro de estoque",
+				lRegistro.size() == 1);
+
 		RegistroEstoque r = lRegistro.get(0);
+
 		assertNotNull("Apos a recepcao de compras deve haver registro de estoque", r);
 		assertEquals("As quantidade devem ser iguais pois o item todo foi recepcionado", r.getQuantidadeItem(),
 				i.getQuantidade());
@@ -1025,8 +1030,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		List<RegistroEstoque> lRegistroSai = registroEstoqueService.pesquisarRegistroByIdItemPedido(iVenda.getId());
 
 		RegistroEstoque rSai = lRegistroSai.get(0);
-		assertEquals("As quantidades de venda e anterior devem coincidir", qAnteriorVenda,
-				rSai.getQuantidadeItem());
+		assertEquals("As quantidades de venda e anterior devem coincidir", qAnteriorVenda, rSai.getQuantidadeItem());
 
 		assertEquals(
 				"Existiu apenas uma compra e uma venda no sistema, entao as quantidades registradas devem ser as mesmas",

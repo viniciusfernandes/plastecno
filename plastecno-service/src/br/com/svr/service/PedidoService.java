@@ -8,6 +8,7 @@ import javax.ejb.Local;
 
 import br.com.svr.service.calculo.exception.AlgoritmoCalculoException;
 import br.com.svr.service.constante.SituacaoPedido;
+import br.com.svr.service.constante.TipoFinalidadePedido;
 import br.com.svr.service.constante.TipoLogradouro;
 import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.entity.Cliente;
@@ -290,6 +291,8 @@ public interface PedidoService {
 	List<SituacaoPedido> pesquisarSituacaoVendaEfetivada();
 
 	Object[] pesquisarTelefoneContatoByIdPedido(Integer idPedido);
+
+	List<TipoFinalidadePedido> pesquisarTipoFinaldadePedidoFaturavel();
 
 	TipoPedido pesquisarTipoPedidoByIdPedido(Integer idPedido);
 

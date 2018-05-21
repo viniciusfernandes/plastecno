@@ -6,37 +6,33 @@ import br.com.svr.service.constante.TipoPagamento;
 
 public class Fluxo {
 	private final int ano;
-	private final int mes;
 	private final int dia;
-	private double valPagamento;
-	private double valDuplicata;
-	private double valCredICMS;
-	private TipoPagamento tipoPagamento;
-	private double valFluxo;
 	private Calendar dtVencimento;
+	private final int mes;
+	private TipoPagamento tipoPagamento;
+	private double valDuplicata;
+	private double valFluxo;
+	private double valPagamento;
 
-	public Fluxo(Calendar dtVencimento, double valPagamento, TipoPagamento tipoPagamento, double valCredICMS,
-			double valDuplicata) {
+	public Fluxo(Calendar dtVencimento, double valPagamento, TipoPagamento tipoPagamento, double valDuplicata) {
 		this.dtVencimento = dtVencimento;
 		this.ano = this.dtVencimento.get(Calendar.YEAR);
 		this.mes = this.dtVencimento.get(Calendar.MONTH);
 		this.dia = this.dtVencimento.get(Calendar.DAY_OF_MONTH);
 		this.tipoPagamento = tipoPagamento;
-		this.valCredICMS = valCredICMS;
 		this.valPagamento = valPagamento;
 		this.valDuplicata = valDuplicata;
 		calcularValoFluxo();
 	}
 
-	public void adicionar(double valPagamento, double valCredICMS, double valDuplicata) {
+	public void adicionar(double valPagamento, double valDuplicata) {
 		this.valPagamento += valPagamento;
-		this.valCredICMS += valCredICMS;
 		this.valDuplicata += valDuplicata;
 		calcularValoFluxo();
 	}
 
 	private void calcularValoFluxo() {
-		valFluxo = (this.valDuplicata - this.valPagamento) + this.valCredICMS;
+		valFluxo = valDuplicata - valPagamento;
 	}
 
 	public int getAno() {
@@ -57,10 +53,6 @@ public class Fluxo {
 
 	public TipoPagamento getTipoPagamento() {
 		return tipoPagamento;
-	}
-
-	public double getValCredICMS() {
-		return valCredICMS;
 	}
 
 	public double getValDuplicata() {

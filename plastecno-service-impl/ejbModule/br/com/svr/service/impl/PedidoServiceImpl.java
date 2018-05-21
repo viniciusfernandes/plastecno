@@ -1348,9 +1348,7 @@ public class PedidoServiceImpl implements PedidoService {
 	}
 
 	private boolean isCalculoComissaoPermitida(TipoFinalidadePedido tipoFinalidade) {
-		return TipoFinalidadePedido.INDUSTRIALIZACAO.equals(tipoFinalidade)
-				|| TipoFinalidadePedido.CONSUMO.equals(tipoFinalidade)
-				|| TipoFinalidadePedido.REVENDA.equals(tipoFinalidade);
+		return pesquisarTipoFinaldadePedidoFaturavel().contains(tipoFinalidade);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -2110,6 +2108,16 @@ public class PedidoServiceImpl implements PedidoService {
 
 		final Integer idRepresentada = pedidoDAO.pesquisarIdRepresentadaByIdPedido(itemPedido.getPedido().getId());
 		return representadaService.pesquisarTipoApresentacaoIPI(idRepresentada);
+	}
+
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@Override
+	public List<TipoFinalidadePedido> pesquisarTipoFinaldadePedidoFaturavel() {
+		List<TipoFinalidadePedido> l = new ArrayList<TipoFinalidadePedido>();
+		l.add(TipoFinalidadePedido.INDUSTRIALIZACAO);
+		l.add(TipoFinalidadePedido.CONSUMO);
+		l.add(TipoFinalidadePedido.REVENDA);
+		return l;
 	}
 
 	@Override

@@ -871,16 +871,9 @@ public class NFeServiceImpl implements NFeService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public List<NFePedido> pesquisarNFePedidoEntradaEmitidaByPeriodo(Periodo periodo) {
-		return nFePedidoDAO.pesquisarNFePedidoByPeriodo(periodo.getInicio(), periodo.getFim(), ENTRADA,
-				TipoSituacaoNFe.EMITIDA);
-	}
-
-	@Override
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<NFePedido> pesquisarNFePedidoSaidaEmitidaByPeriodo(Periodo periodo) {
 		return nFePedidoDAO.pesquisarNFePedidoByPeriodo(periodo.getInicio(), periodo.getFim(), SAIDA,
-				TipoSituacaoNFe.EMITIDA);
+				TipoSituacaoNFe.EMITIDA, pedidoService.pesquisarTipoFinaldadePedidoFaturavel());
 	}
 
 	@Override

@@ -54,8 +54,6 @@ public interface NFeService {
 
 	List<NFeItemFracionado> pesquisarNFeItemFracionadoQuantidades(Integer numeroNFe);
 
-	List<NFePedido> pesquisarNFePedidoEntradaEmitidaByPeriodo(Periodo periodo);
-
 	List<NFePedido> pesquisarNFePedidoSaidaEmitidaByPeriodo(Periodo periodo);
 
 	List<Integer> pesquisarNumeroNFeByIdPedido(Integer idPedido);

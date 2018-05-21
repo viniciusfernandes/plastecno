@@ -5,7 +5,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
+import br.com.svr.service.constante.TipoFinalidadePedido;
 import br.com.svr.service.entity.NFePedido;
 import br.com.svr.service.impl.util.QueryUtil;
 import br.com.svr.service.nfe.constante.TipoNFe;
@@ -20,7 +22,7 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 	public void inserirNFePedido(NFePedido p) {
 		StringBuilder s = new StringBuilder();
 		if (isEntidadeExistente(NFePedido.class, "numero", p.getNumero())) {
-			s.append("update NFePedido p set p.serie = :serie, p.modelo = :modelo, p.xmlNFe = :xmlNFe, p.idPedido = :idPedido, p.valor=:valor, p.valorICMS = :valorICMS ");
+			s.append("update NFePedido p set p.serie = :serie, p.modelo = :modelo, p.xmlNFe = :xmlNFe, p.pedido.id = :idPedido, p.valor=:valor, p.valorICMS = :valorICMS ");
 
 			if (p.getNumeroAssociado() != null) {
 				s.append(", p.numeroAssociado = :numeroAssociado ");
@@ -46,18 +48,25 @@ public class NFePedidoDAO extends GenericDAO<NFePedido> {
 
 	public Integer pesquisarIdPedidoByNumeroNFe(Integer numeroNFe) {
 		return QueryUtil.gerarRegistroUnico(
-				entityManager.createQuery("select p.idPedido from NFePedido p where :numeroNFe = p.numero ")
+				entityManager.createQuery("select p.pedido.id from NFePedido p where :numeroNFe = p.numero ")
 						.setParameter("numeroNFe", numeroNFe), Integer.class, null);
 	}
 
 	public List<NFePedido> pesquisarNFePedidoByPeriodo(Date dataInicial, Date dataFinal, TipoNFe tipoNFe,
-			TipoSituacaoNFe tipoSituacaoNFe) {
-		return entityManager
-				.createQuery(
-						"select new NFePedido(n.dataEmissao, n.idPedido, n.nomeCliente, n.numero, n.valor, n.valorICMS) from NFePedido n where n.tipoNFe=:tipoNFe and n.tipoSituacaoNFe=:tipoSituacaoNFe and n.dataEmissao >=:dataInicial and n.dataEmissao <=:dataFinal order by n.dataEmissao",
-						NFePedido.class).setParameter("tipoNFe", tipoNFe)
-				.setParameter("tipoSituacaoNFe", tipoSituacaoNFe).setParameter("dataInicial", dataInicial)
-				.setParameter("dataFinal", dataFinal).getResultList();
+			TipoSituacaoNFe tipoSituacaoNFe, List<TipoFinalidadePedido> listaFinalidadePed) {
+		StringBuilder s = new StringBuilder();
+		s.append("select new NFePedido(n.dataEmissao, n.pedido.id, n.nomeCliente, n.numero, n.valor, n.valorICMS) from NFePedido n where n.tipoNFe=:tipoNFe and n.tipoSituacaoNFe=:tipoSituacaoNFe and n.dataEmissao >=:dataInicial and n.dataEmissao <=:dataFinal ");
+		if (listaFinalidadePed != null && !listaFinalidadePed.isEmpty()) {
+			s.append("and n.pedido.finalidadePedido in (:listaFinalidadePed)");
+		}
+
+		TypedQuery<NFePedido> q = entityManager.createQuery(s.toString(), NFePedido.class)
+				.setParameter("tipoNFe", tipoNFe).setParameter("tipoSituacaoNFe", tipoSituacaoNFe)
+				.setParameter("dataInicial", dataInicial).setParameter("dataFinal", dataFinal);
+		if (listaFinalidadePed != null && !listaFinalidadePed.isEmpty()) {
+			q.setParameter("listaFinalidadePed", listaFinalidadePed);
+		}
+		return q.getResultList();
 	}
 
 	public Integer pesquisarNumeroNFe(Integer idPedido, boolean isTriangulacao) {

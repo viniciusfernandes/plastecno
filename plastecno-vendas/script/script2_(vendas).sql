@@ -655,8 +655,7 @@ create table vendas.tb_nfe_pedido (
 	xml_nfe text default null
 );
 ALTER TABLE vendas.tb_nfe_pedido ADD PRIMARY KEY (numero);
-create index idx_pedido_id_pedido on vendas.tb_nfe_pedido (id_pedido);
-create index idx_pedido_nfe_numero_triang on vendas.tb_nfe_pedido (numero_triang);
+create index idx_nfe_pedido_id_pedido on vendas.tb_nfe_pedido (id_pedido);
 
 
 create table vendas.tb_nfe_item_fracionado (

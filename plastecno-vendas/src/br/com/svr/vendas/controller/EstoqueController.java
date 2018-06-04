@@ -258,7 +258,8 @@ public class EstoqueController extends AbstractController {
 
         ItemEstoque iEst = estoqueService.pesquisarItemEstoqueById(id);
         addAtributo("idItemEstoque", id);
-        addAtributo("descricaoItem", iEst.getDescricaoSemFormatacao());
+        addAtributo("descricaoItem", iEst != null ? iEst.getDescricaoSemFormatacao() : "");
+
         addAtributo("material", material);
         addAtributo("formaMaterial", formaMaterial);
         addAtributo("paginaSelecionada", paginaSelecionada);

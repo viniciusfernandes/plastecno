@@ -18,6 +18,7 @@ import br.com.svr.service.constante.TipoOperacaoEstoque;
 import br.com.svr.service.dao.RegistroEstoqueDAO;
 import br.com.svr.service.entity.RegistroEstoque;
 import br.com.svr.service.wrapper.PaginacaoWrapper;
+import br.com.svr.util.DateUtils;
 
 @Stateless
 public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
@@ -128,8 +129,10 @@ public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public PaginacaoWrapper<RegistroEstoque> paginarRegistroByIdItemEstoque(Integer idItemEstoque, Integer indiceInicial, Integer numMaxRegistros) {
-		return new PaginacaoWrapper<RegistroEstoque>(registroEstoqueDAO.pesquisarTotalRegistroByItemEstoque(idItemEstoque), 
+	public PaginacaoWrapper<RegistroEstoque> paginarRegistroByIdItemEstoque(Integer idItemEstoque,
+			Integer indiceInicial, Integer numMaxRegistros) {
+		return new PaginacaoWrapper<RegistroEstoque>(
+				registroEstoqueDAO.pesquisarTotalRegistroByItemEstoque(idItemEstoque),
 				pesquisarRegistroByIdItemEstoque(idItemEstoque, indiceInicial, numMaxRegistros));
 	}
 
@@ -151,10 +154,17 @@ public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
 	public List<RegistroEstoque> pesquisarRegistroByIdItemPedido(Integer idItemPedido) {
 		return registroEstoqueDAO.pesquisarRegistroEstoqueByIdItemPedido(idItemPedido);
 	}
-	
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<RegistroEstoque> pesquisarRegistroByIdPedido(Integer idPedido) {
 		return registroEstoqueDAO.pesquisarRegistroByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerRegistroExpirado() {
+		Date dtExpiracao = DateUtils.fromNowMinusMonth(6);
+		registroEstoqueDAO.removerRegistroByDataLimite(dtExpiracao);
 	}
 }

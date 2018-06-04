@@ -1,11 +1,25 @@
 package br.com.svr.util;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 public final class DateUtils {
+
+	public static Date fromNowMinusDay(int days) {
+		return toDate(LocalDate.now().minusDays(days));
+	}
+
+	public static Date fromNowMinusMonth(int months) {
+		return toDate(LocalDate.now().minusMonths(months));
+	}
+
+	public static Date fromNowMinusYear(int years) {
+		return toDate(LocalDate.now().minusYears(years));
+	}
 
 	public static Calendar gerarCalendario(Date data) {
 
@@ -142,6 +156,13 @@ public final class DateUtils {
 		c.add(Calendar.MONTH, -dias);
 		c.add(Calendar.DAY_OF_MONTH, -meses);
 		return c.getTime();
+	}
+
+	public static Date toDate(LocalDate localDate) {
+		if (localDate == null) {
+			return null;
+		}
+		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
 
 	private DateUtils() {

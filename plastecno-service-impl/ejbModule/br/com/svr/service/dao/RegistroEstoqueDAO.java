@@ -1,5 +1,6 @@
 package br.com.svr.service.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,6 +11,11 @@ import br.com.svr.service.impl.util.QueryUtil;
 public class RegistroEstoqueDAO extends GenericDAO<RegistroEstoque> {
 	public RegistroEstoqueDAO(EntityManager entityManager) {
 		super(entityManager);
+	}
+
+	public void removerRegistroByDataLimite(Date dataLimite) {
+		entityManager.createQuery("delete from RegistroEstoque r where r.dataOperacao <= :dataLimite")
+				.setParameter("dataLimite", dataLimite).executeUpdate();
 	}
 
 	public List<RegistroEstoque> pesquisarRegistroByIdItemEstoque(Integer idItemEstoque) {

@@ -37,3 +37,5 @@ create index idx_registro_estoque_id_item_estoque on vendas.tb_registro_estoque 
 create index idx_registro_estoque_id_item_pedido on vendas.tb_registro_estoque (id_item_pedido);
 
 create sequence vendas.seq_registro_estoque_id increment by 1 minvalue 1 no maxvalue start with 1;
+
+INSERT INTO VENDAS.TB_CONFIGURACAO_SISTEMA VALUES ('EXPIRACAO_REGISTRO_ESTOQUE_MESES', '4');

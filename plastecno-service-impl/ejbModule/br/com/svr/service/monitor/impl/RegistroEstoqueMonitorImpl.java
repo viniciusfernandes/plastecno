@@ -29,5 +29,6 @@ public class RegistroEstoqueMonitorImpl implements RegistroEstoqueMonitor {
 					"Falha no monitoramento dos registros de estoque expirados. Possivel causa: "
 							+ e.getMensagemConcatenada(), e);
 		}
+
 	}
 }

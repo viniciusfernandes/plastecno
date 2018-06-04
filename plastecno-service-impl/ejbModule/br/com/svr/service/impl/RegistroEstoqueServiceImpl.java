@@ -172,10 +172,11 @@ public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
 	public void removerRegistroExpirado() throws BusinessException {
 		Integer meses = null;
 		try {
-			meses=Integer.parseInt(configuracaoSistemaService
+			meses = Integer.parseInt(configuracaoSistemaService
 					.pesquisar(ParametroConfiguracaoSistema.EXPIRACAO_REGISTRO_ESTOQUE_MESES));
 		} catch (Exception e) {
-			throw new BusinessException("Nao foi possivel parsear o valor dos meses de expiracao dos registros de estoque", e);
+			throw new BusinessException(
+					"Nao foi possivel parsear o valor dos meses de expiracao dos registros de estoque", e);
 		}
 		Date dtExpiracao = DateUtils.fromNowMinusMonth(meses);
 		registroEstoqueDAO.removerRegistroByDataLimite(dtExpiracao);

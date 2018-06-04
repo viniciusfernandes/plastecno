@@ -11,16 +11,23 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import br.com.svr.service.ConfiguracaoSistemaService;
 import br.com.svr.service.EstoqueService;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.RegistroEstoqueService;
+import br.com.svr.service.constante.ParametroConfiguracaoSistema;
 import br.com.svr.service.constante.TipoOperacaoEstoque;
 import br.com.svr.service.dao.RegistroEstoqueDAO;
 import br.com.svr.service.entity.RegistroEstoque;
+import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.wrapper.PaginacaoWrapper;
+import br.com.svr.util.DateUtils;
 
 @Stateless
 public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
+	@EJB
+	private ConfiguracaoSistemaService configuracaoSistemaService;
+
 	@PersistenceContext(name = "svr")
 	private EntityManager entityManager;
 
@@ -128,8 +135,10 @@ public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public PaginacaoWrapper<RegistroEstoque> paginarRegistroByIdItemEstoque(Integer idItemEstoque, Integer indiceInicial, Integer numMaxRegistros) {
-		return new PaginacaoWrapper<RegistroEstoque>(registroEstoqueDAO.pesquisarTotalRegistroByItemEstoque(idItemEstoque), 
+	public PaginacaoWrapper<RegistroEstoque> paginarRegistroByIdItemEstoque(Integer idItemEstoque,
+			Integer indiceInicial, Integer numMaxRegistros) {
+		return new PaginacaoWrapper<RegistroEstoque>(
+				registroEstoqueDAO.pesquisarTotalRegistroByItemEstoque(idItemEstoque),
 				pesquisarRegistroByIdItemEstoque(idItemEstoque, indiceInicial, numMaxRegistros));
 	}
 
@@ -151,10 +160,24 @@ public class RegistroEstoqueServiceImpl implements RegistroEstoqueService {
 	public List<RegistroEstoque> pesquisarRegistroByIdItemPedido(Integer idItemPedido) {
 		return registroEstoqueDAO.pesquisarRegistroEstoqueByIdItemPedido(idItemPedido);
 	}
-	
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<RegistroEstoque> pesquisarRegistroByIdPedido(Integer idPedido) {
 		return registroEstoqueDAO.pesquisarRegistroByIdPedido(idPedido);
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void removerRegistroExpirado() throws BusinessException {
+		Integer meses = null;
+		try {
+			meses=Integer.parseInt(configuracaoSistemaService
+					.pesquisar(ParametroConfiguracaoSistema.EXPIRACAO_REGISTRO_ESTOQUE_MESES));
+		} catch (Exception e) {
+			throw new BusinessException("Nao foi possivel parsear o valor dos meses de expiracao dos registros de estoque", e);
+		}
+		Date dtExpiracao = DateUtils.fromNowMinusMonth(meses);
+		registroEstoqueDAO.removerRegistroByDataLimite(dtExpiracao);
 	}
 }

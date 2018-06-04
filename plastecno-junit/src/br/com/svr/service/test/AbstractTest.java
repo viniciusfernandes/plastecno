@@ -78,6 +78,7 @@ public abstract class AbstractTest {
 		em.merge(new ConfiguracaoSistema("DIRETORIO_XML_NFE", "C:\\NFe"));
 		em.merge(new ConfiguracaoSistema("CNAE", "4689399"));
 		em.merge(new ConfiguracaoSistema("CODIGO_MUNICIPIO_GERADOR_ICMS", "3550308"));
+		em.merge(new ConfiguracaoSistema("EXPIRACAO_REGISTRO_ESTOQUE_MESES", "4"));
 
 		em.getTransaction().commit();
 		em.getTransaction().begin();

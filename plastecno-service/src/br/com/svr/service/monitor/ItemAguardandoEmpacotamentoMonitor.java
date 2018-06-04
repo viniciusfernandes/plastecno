@@ -1,4 +1,4 @@
-package br.com.svr.service;
+package br.com.svr.service.monitor;
 
 import java.util.Collection;
 

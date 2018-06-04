@@ -1,4 +1,4 @@
-package br.com.svr.service.impl;
+package br.com.svr.service.monitor.impl;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,9 +13,9 @@ import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 
-import br.com.svr.service.ItemAguardandoEmpacotamentoMonitor;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.exception.BusinessException;
+import br.com.svr.service.monitor.ItemAguardandoEmpacotamentoMonitor;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)

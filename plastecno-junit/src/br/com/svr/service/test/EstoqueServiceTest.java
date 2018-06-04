@@ -14,7 +14,6 @@ import java.util.Set;
 import org.junit.Test;
 
 import br.com.svr.service.EstoqueService;
-import br.com.svr.service.ItemAguardandoEmpacotamentoMonitor;
 import br.com.svr.service.MaterialService;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.RegistroEstoqueService;
@@ -35,6 +34,7 @@ import br.com.svr.service.entity.RegistroEstoque;
 import br.com.svr.service.entity.Representada;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.mensagem.email.AnexoEmail;
+import br.com.svr.service.monitor.ItemAguardandoEmpacotamentoMonitor;
 import br.com.svr.service.test.builder.ServiceBuilder;
 import br.com.svr.util.NumeroUtils;
 

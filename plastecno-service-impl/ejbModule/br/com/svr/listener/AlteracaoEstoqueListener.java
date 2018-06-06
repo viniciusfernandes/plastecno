@@ -6,7 +6,7 @@ import javax.ejb.MessageDriven;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-import br.com.svr.service.ItemAguardandoEmpacotamentoMonitor;
+import br.com.svr.service.monitor.ItemAguardandoEmpacotamentoMonitor;
 
 @MessageDriven(name = "AlteracaoEstoqueListener", activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),

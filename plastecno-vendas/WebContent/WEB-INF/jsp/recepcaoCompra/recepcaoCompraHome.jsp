@@ -168,7 +168,7 @@ function recepcionarItem(botao){
 			<div class="input" style="width: 26%">
 				<input type="text" id="listaNumeroPedido" value="${listaNumeroPedido}" style="width: 100%"/>
 			</div>
-			<div class="input" style="width: 2%">
+			<div class="input" style="width: 4%">
 				<input type="button" id="botaoPesquisaNumeroPedido" title="Pesquisar Pedido(s)" value="" class="botaoPesquisarPequeno"/>
 			</div>
 			<div class="bloco_botoes">

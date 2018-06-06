@@ -54,7 +54,7 @@ public class RepresentadaDAO extends GenericDAO<Representada> {
 	public List<Representada> pesquisarRepresentadaByTipoRelacionamento(String nomeFantasia, boolean ativo,
 			TipoRelacionamento... tipos) {
 		StringBuilder select = new StringBuilder(
-				"SELECT new Representada(r.id, r.nomeFantasia) FROM Representada r where r.ativo = :ativo ");
+				"SELECT new Representada(r.id, r.nomeFantasia, r.email) FROM Representada r where r.ativo = :ativo ");
 
 		if (tipos != null && tipos.length > 0) {
 			select.append("and r.tipoRelacionamento IN (:tipos) ");

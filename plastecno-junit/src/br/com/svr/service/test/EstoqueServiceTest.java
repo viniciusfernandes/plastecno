@@ -16,11 +16,13 @@ import org.junit.Test;
 import br.com.svr.service.EstoqueService;
 import br.com.svr.service.MaterialService;
 import br.com.svr.service.PedidoService;
+import br.com.svr.service.RegistroEstoqueService;
 import br.com.svr.service.RepresentadaService;
 import br.com.svr.service.constante.FormaMaterial;
 import br.com.svr.service.constante.SituacaoPedido;
 import br.com.svr.service.constante.SituacaoReservaEstoque;
 import br.com.svr.service.constante.TipoApresentacaoIPI;
+import br.com.svr.service.constante.TipoOperacaoEstoque;
 import br.com.svr.service.constante.TipoPedido;
 import br.com.svr.service.constante.TipoVenda;
 import br.com.svr.service.entity.ItemEstoque;
@@ -28,24 +30,30 @@ import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.ItemReservado;
 import br.com.svr.service.entity.Material;
 import br.com.svr.service.entity.Pedido;
+import br.com.svr.service.entity.RegistroEstoque;
 import br.com.svr.service.entity.Representada;
 import br.com.svr.service.exception.BusinessException;
 import br.com.svr.service.mensagem.email.AnexoEmail;
+import br.com.svr.service.monitor.ItemAguardandoEmpacotamentoMonitor;
 import br.com.svr.service.test.builder.ServiceBuilder;
 import br.com.svr.util.NumeroUtils;
 
 public class EstoqueServiceTest extends AbstractTest {
 	private EstoqueService estoqueService;
+	private ItemAguardandoEmpacotamentoMonitor itemAguardandoEmpacotamentoMonitor;
 	private MaterialService materialService;
 	private PedidoService pedidoService;
+	private RegistroEstoqueService registroEstoqueService;
 
 	private RepresentadaService representadaService;
 
 	public EstoqueServiceTest() {
 		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
-		pedidoService = ServiceBuilder.buildService(PedidoService.class);
 		materialService = ServiceBuilder.buildService(MaterialService.class);
+		pedidoService = ServiceBuilder.buildService(PedidoService.class);
+		registroEstoqueService = ServiceBuilder.buildService(RegistroEstoqueService.class);
 		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
+		itemAguardandoEmpacotamentoMonitor = ServiceBuilder.buildService(ItemAguardandoEmpacotamentoMonitor.class);
 	}
 
 	private ItemPedido enviarItemPedido(Integer quantidade, TipoPedido tipoPedido) {
@@ -135,6 +143,19 @@ public class EstoqueServiceTest extends AbstractTest {
 		return enviarItemPedido(TipoPedido.COMPRA);
 	}
 
+	private ItemEstoque gerarItemEstoque() {
+		ItemPedido iCompra = gerarItemCompraEnviado();
+		Integer idItemEstoque = null;
+		try {
+			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(),
+					iCompra.getQuantidade(), "99.11.22.33");
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		return estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+	}
+
 	private ItemEstoque gerarItemEstoqueComMedidaInterna(FormaMaterial formaMaterial) {
 		ItemEstoque item = eBuilder.buildItemEstoque();
 		item.setMaterial(gerarMaterial());
@@ -168,17 +189,15 @@ public class EstoqueServiceTest extends AbstractTest {
 		return gerarItemPedidoClone(null, item1);
 	}
 
-	private ItemEstoque gerarItemPedidoNoEstoque() {
-		ItemPedido iCompra = gerarItemCompraEnviado();
-		Integer idItemEstoque = null;
+	public ItemPedido gerarItemPedidoNoEstoque() {
+		ItemPedido i = gerarItemCompraEnviado();
 		try {
-			idItemEstoque = estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(),
-					iCompra.getQuantidade(), "99.11.22.33");
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), "99.99.99.99");
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
 
-		return estoqueService.pesquisarItemEstoqueById(idItemEstoque);
+		return i;
 	}
 
 	private ItemPedido gerarItemPedidoPeca(TipoPedido tipoPedido) {
@@ -676,7 +695,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemInexistenteEstoque() {
-		ItemEstoque item = gerarItemPedidoNoEstoque();
+		ItemEstoque item = gerarItemEstoque();
 		ItemEstoque item2 = item.clone();
 
 		Integer idItem = null;
@@ -697,7 +716,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoItemInvalidoComDescricao() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		itemEstoque.setDescricaoPeca("ENGRENAGEM TESTES");
 		boolean throwed = false;
 		try {
@@ -743,7 +762,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testInclusaoPecaExistenteEstoque() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		itemEstoque.setFormaMaterial(FormaMaterial.PC);
 		itemEstoque.setDescricaoPeca("ENGRENAGEM TESTES");
 		itemEstoque.setMedidaExterna(null);
@@ -757,8 +776,315 @@ public class EstoqueServiceTest extends AbstractTest {
 	}
 
 	@Test
+	public void testInclusaoRegistroAlteracaoValorItemEstoque() {
+		Pedido pCompra = gPedido.gerarPedidoCompra();
+		ItemPedido iCompra = null;
+		try {
+			iCompra = gPedido.gerarItemPedido(pCompra.getId());
+			pedidoService.inserirItemPedido(pCompra.getId(), iCompra);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(pCompra.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(), iCompra.getQuantidade(), null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		ItemEstoque iEst = estoqueService.pesquisarItemEstoque(iCompra);
+		double vlAntes = iEst.getPrecoMedio();
+		double vlDepois = 75.27;
+
+		ItemEstoque iClone = iEst.clone();
+		iClone.setAliquotaReajuste(0.10);
+
+		int idUsu = 10;
+		String nome = "VINICIUS";
+		try {
+			estoqueService.reajustarPrecoItemEstoque(iClone, idUsu, nome);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		List<RegistroEstoque> lRegistro = registroEstoqueService.pesquisarRegistroByIdItemEstoque(iEst.getId());
+		assertEquals(
+				"Deve haver 2 registros de estoque, o primeiro feito na inclusao do item de compra, o segundo na redefinicao do valor",
+				(Integer) 2, (Integer) lRegistro.size());
+		RegistroEstoque r = null;
+		for (RegistroEstoque reg : lRegistro) {
+			if (TipoOperacaoEstoque.ALTERACAO_MANUAL_VALOR.equals(reg.getTipoOperacao())) {
+				r = reg;
+			}
+		}
+		assertEquals("O valor anterior do registro deve ser o mesmo do valor editado",
+				NumeroUtils.arredondarValor2Decimais(vlAntes),
+				NumeroUtils.arredondarValor2Decimais(r.getValorAnterior()));
+		assertEquals("O valor posterior do registro deve ser o mesmo do valor editado",
+				NumeroUtils.arredondarValor2Decimais(vlDepois),
+				NumeroUtils.arredondarValor2Decimais(r.getValorPosterior()));
+	}
+
+	@Test
+	public void testInclusaoRegistroEntradaEstoqueViaDevolucaoItemVendas() {
+		Pedido pCompra = gPedido.gerarPedidoCompra();
+		ItemPedido iCompra = null;
+		try {
+			iCompra = gPedido.gerarItemPedido(pCompra.getId());
+			// Alterando a quantidade dos itens comprados para poder vender.
+			iCompra.setQuantidade(100);
+
+			pedidoService.inserirItemPedido(pCompra.getId(), iCompra);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(pCompra.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(), iCompra.getQuantidade(), null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Pedido pVenda = gPedido.gerarPedidoRevenda();
+		ItemPedido iVenda = iCompra.clone();
+		iVenda.setQuantidade(iVenda.getQuantidade() + 10);
+
+		try {
+			pedidoService.inserirItemPedido(pVenda.getId(), iVenda);
+			pedidoService.enviarPedido(pVenda.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.cancelarPedido(pVenda.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<RegistroEstoque> lRegistro = registroEstoqueService.pesquisarRegistroByIdPedido(pVenda.getId());
+
+		int totDevol = 0;
+		for (RegistroEstoque r : lRegistro) {
+			if (TipoOperacaoEstoque.ENTRADA_DEVOLUCAO_VENDA.equals(r.getTipoOperacao())) {
+				totDevol++;
+			}
+		}
+		assertEquals("No cancelamento deve haver apenas uma devolucao pois o pedido continha apenas 1 item",
+				(Integer) 1, (Integer) totDevol);
+		Integer qtdeEst = estoqueService.pesquisarItemEstoque(iVenda).getQuantidade();
+		assertEquals(
+				"apos a devolucao do item de venda a quantidade no estoque deve ser a mesma que a quantidade comprada no inicio",
+				(Integer) iCompra.getQuantidade(), qtdeEst);
+
+	}
+
+	@Test
+	public void testInclusaoRegistroEntradaViaPedidoCompras() {
+		Pedido compra = gPedido.gerarPedidoCompra();
+		ItemPedido i = null;
+		try {
+			i = gPedido.gerarItemPedido(compra.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		try {
+			pedidoService.enviarPedido(compra.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<RegistroEstoque> lRegistro = registroEstoqueService.pesquisarRegistroByIdItemPedido(i.getId());
+		assertTrue("Ate o momento o pedido de compras nao foi enviado entao nao pode haver registro de estoque",
+				lRegistro.size() == 0);
+
+		try {
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(i.getId(), i.getQuantidade(), null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		lRegistro = registroEstoqueService.pesquisarRegistroByIdItemPedido(i.getId());
+		assertTrue(
+				"Foi recebido apenas um item do pedido de compras, portanto deve haver apensa um registro de estoque",
+				lRegistro.size() == 1);
+
+		RegistroEstoque r = lRegistro.get(0);
+
+		assertNotNull("Apos a recepcao de compras deve haver registro de estoque", r);
+		assertEquals("As quantidade devem ser iguais pois o item todo foi recepcionado", r.getQuantidadeItem(),
+				i.getQuantidade());
+		assertEquals("A quantidade anterior deve ser zero pois nao havia dados no sistema", (Integer) 0,
+				r.getQuantidadeAnterior());
+	}
+
+	@Test
+	public void testInclusaoRegistroSaidaEstoqueViaItemVendas() {
+		Pedido pCompra = gPedido.gerarPedidoCompra();
+		ItemPedido iCompra = null;
+		try {
+			iCompra = gPedido.gerarItemPedido(pCompra.getId());
+			// Alterando a quantidade dos itens comprados para poder vender.
+			iCompra.setQuantidade(100);
+
+			pedidoService.inserirItemPedido(pCompra.getId(), iCompra);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			pedidoService.enviarPedido(pCompra.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		List<RegistroEstoque> lRegistroEnt = registroEstoqueService.pesquisarRegistroByIdItemPedido(iCompra.getId());
+		assertTrue("Ate o momento o pedido de compras nao foi recepcionado entao nao pode haver registro de estoque",
+				lRegistroEnt.size() == 0);
+
+		try {
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(), iCompra.getQuantidade(), null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		lRegistroEnt = registroEstoqueService.pesquisarRegistroByIdItemPedido(iCompra.getId());
+		assertTrue("Deve conter 1 registro de estoque no sistema pois houve uma entrada por compras",
+				lRegistroEnt.size() == 1);
+
+		Pedido pVenda = gPedido.gerarPedidoRevenda();
+		ItemPedido iVenda = null;
+		try {
+			iVenda = gPedido.gerarItemPedido(pVenda.getId());
+			iVenda.setQuantidade(iCompra.getQuantidade() - 1);
+			pedidoService.inserirItemPedido(pVenda.getId(), iVenda);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer qAnteriorVenda = estoqueService.pesquisarItemEstoque(iCompra).getQuantidade();
+
+		try {
+			pedidoService.enviarPedido(pVenda.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<RegistroEstoque> lRegistroSai = registroEstoqueService.pesquisarRegistroByIdItemPedido(iVenda.getId());
+
+		RegistroEstoque rEnt = lRegistroEnt.get(0);
+		RegistroEstoque rSai = lRegistroSai.get(0);
+
+		assertTrue("Existiu apenas uma entrada no sistema via compras, entao as quantidades anteriores deve ser zero",
+				rEnt.getQuantidadeAnterior().intValue() == 0);
+		assertEquals("As quantidades de compras e registrada devem coincidir", iCompra.getQuantidade(),
+				rEnt.getQuantidadeItem());
+
+		assertEquals("As quantidades de venda e registrada devem coincidir", iVenda.getQuantidade(),
+				rSai.getQuantidadeItem());
+
+		assertEquals(
+				"Existiu apenas uma compra e uma venda no sistema, entao as quantidades registradas devem ser as mesmas",
+				qAnteriorVenda, rSai.getQuantidadeAnterior());
+	}
+
+	@Test
+	public void testInclusaoRegistroSaidaEstoqueViaItemVendasPeloMonitoramentoDeCompras() {
+		ItemPedido iCompra = gerarItemCompraEnviado();
+		try {
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(), iCompra.getQuantidade(), null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Pedido pVenda = gPedido.gerarPedidoRevenda();
+		ItemPedido iVenda = null;
+		Integer qVenda = iCompra.getQuantidade() + 50;
+		try {
+			iVenda = gPedido.gerarItemPedido(pVenda.getId());
+			iVenda.setQuantidade(qVenda);
+
+			pedidoService.inserirItemPedido(pVenda.getId(), iVenda);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		Integer qAnteriorVenda = estoqueService.pesquisarItemEstoque(iCompra).getQuantidade();
+
+		try {
+			pedidoService.enviarPedido(pVenda.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		List<RegistroEstoque> lRegistroSai = registroEstoqueService.pesquisarRegistroByIdItemPedido(iVenda.getId());
+
+		RegistroEstoque rSai = lRegistroSai.get(0);
+		assertEquals("As quantidades de venda e anterior devem coincidir", qAnteriorVenda, rSai.getQuantidadeItem());
+
+		assertEquals(
+				"Existiu apenas uma compra e uma venda no sistema, entao as quantidades registradas devem ser as mesmas",
+				qAnteriorVenda, rSai.getQuantidadeAnterior());
+
+		qAnteriorVenda = estoqueService.pesquisarItemEstoque(iVenda).getQuantidade();
+
+		// Gerando um novo pedido de comprar para dar baixa no restante de
+		// vendas via monitor.
+		Pedido pCompra2 = gPedido.gerarPedidoCompra();
+		ItemPedido iCompra2 = null;
+		try {
+			iCompra2 = gPedido.gerarItemPedido(pCompra2.getId());
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+		iCompra2.setQuantidade(qVenda);
+		try {
+			pedidoService.inserirItemPedido(pCompra2.getId(), iCompra2);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		try {
+			pedidoService.enviarPedido(iCompra2.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e1) {
+			printMensagens(e1);
+		}
+
+		try {
+			// Entrando com a segunda compra no estoque
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra2.getId(), iCompra2.getQuantidade(), null);
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		itemAguardandoEmpacotamentoMonitor.monitorarItemPedidoAguardandoCompra();
+		lRegistroSai = registroEstoqueService.pesquisarRegistroByIdItemPedido(iVenda.getId());
+		assertEquals(
+				"O pedido de vendas deve ter dois registros de saida. A primeira foi parcial pois faltava no estoque, a segunda foi a saida do restante das quantidades. ",
+				(Integer) 2, (Integer) lRegistroSai.size());
+
+		int qSaidaRegistrada = 0;
+		for (RegistroEstoque r : lRegistroSai) {
+			qSaidaRegistrada += r.getQuantidadeItem();
+		}
+		assertEquals(
+				"A quantidade total de saide por vendas deve ser a mesma que a quantidade dos itens do pedido original",
+				(Integer) qVenda, (Integer) qSaidaRegistrada);
+
+	}
+
+	@Test
 	public void testPesquisarItemEstoqueCadastrado() {
-		ItemEstoque item1 = gerarItemPedidoNoEstoque();
+		ItemEstoque item1 = gerarItemEstoque();
 		ItemEstoque item2 = item1.clone();
 		Integer idItem2 = null;
 		try {
@@ -814,7 +1140,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		itemCH.setAliquotaReajuste(0.1);
 
 		try {
-			estoqueService.reajustarPrecoItemEstoque(itemCH);
+			estoqueService.reajustarPrecoItemEstoque(itemCH, null, null);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -845,7 +1171,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		itemCH.setId(null);
 		itemCH.setFormaMaterial(null);
 		try {
-			estoqueService.reajustarPrecoItemEstoque(itemCH);
+			estoqueService.reajustarPrecoItemEstoque(itemCH, null, null);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -857,7 +1183,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		itemCH.setFormaMaterial(FormaMaterial.CH);
 		itemCH.getMaterial().setId(null);
 		try {
-			estoqueService.reajustarPrecoItemEstoque(itemCH);
+			estoqueService.reajustarPrecoItemEstoque(itemCH, null, null);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -868,7 +1194,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		itemCH.setFormaMaterial(FormaMaterial.CH);
 		itemCH.setMaterial(null);
 		try {
-			estoqueService.reajustarPrecoItemEstoque(itemCH);
+			estoqueService.reajustarPrecoItemEstoque(itemCH, null, null);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -883,7 +1209,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		itemEstoque.setAliquotaReajuste(0.1);
 
 		try {
-			estoqueService.reajustarPrecoItemEstoque(itemEstoque);
+			estoqueService.reajustarPrecoItemEstoque(itemEstoque, null, null);
 		} catch (BusinessException e) {
 			printMensagens(e);
 		}
@@ -912,7 +1238,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		itemEstoque.setAliquotaReajuste(null);
 		boolean throwed = false;
 		try {
-			estoqueService.reajustarPrecoItemEstoque(itemEstoque);
+			estoqueService.reajustarPrecoItemEstoque(itemEstoque, null, null);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -922,7 +1248,7 @@ public class EstoqueServiceTest extends AbstractTest {
 		itemEstoque.setAliquotaReajuste(0d);
 		throwed = false;
 		try {
-			estoqueService.reajustarPrecoItemEstoque(itemEstoque);
+			estoqueService.reajustarPrecoItemEstoque(itemEstoque, null, null);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -931,7 +1257,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 		throwed = false;
 		try {
-			estoqueService.reajustarPrecoItemEstoque(null);
+			estoqueService.reajustarPrecoItemEstoque(null, null, null);
 		} catch (BusinessException e) {
 			throwed = true;
 		}
@@ -1222,7 +1548,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecortarItemEstoqueComprimentoInvalido() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		ItemEstoque itemRecortado = itemEstoque.clone();
 
 		itemRecortado.setId(itemEstoque.getId());
@@ -1239,7 +1565,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecortarItemEstoqueInexistente() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		ItemEstoque itemRecortado = new ItemEstoque();
 		// Alterando o ID para simular uma pesquisa de um item inexistente no
 		// estoque.
@@ -1255,7 +1581,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecortarItemEstoqueMedidaExternaInvalida() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		ItemEstoque itemRecortado = itemEstoque.clone();
 
 		itemRecortado.setId(itemEstoque.getId());
@@ -1272,7 +1598,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecortarItemEstoqueMedidaInternaInvalida() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		ItemEstoque itemRecortado = itemEstoque.clone();
 
 		itemRecortado.setId(itemEstoque.getId());
@@ -1289,7 +1615,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecortarItemEstoqueQuantidadeInvalida() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		ItemEstoque itemRecortado = itemEstoque.clone();
 
 		itemRecortado.setId(itemEstoque.getId());
@@ -1305,7 +1631,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRecortarPecaEstoque() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		itemEstoque.setFormaMaterial(FormaMaterial.PC);
 		boolean throwed = false;
 		try {
@@ -1603,7 +1929,8 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testRemocaoItemPedido() {
-		ItemEstoque itemEsto = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEsto = gerarItemEstoque();
+
 		Integer qtdeEstoque = itemEsto.getQuantidade();
 
 		Pedido p = gerarPedido(TipoPedido.REVENDA);
@@ -1625,6 +1952,10 @@ public class EstoqueServiceTest extends AbstractTest {
 		} catch (BusinessException e1) {
 			printMensagens(e1);
 		}
+
+		itemEsto = estoqueService.pesquisarItemEstoqueById(itemEsto.getId());
+		assertEquals("Apos o envio do pedido o item do estoque deve estar zerado", (Integer) 0,
+				itemEsto.getQuantidade());
 
 		List<ItemReservado> lItemReserv = estoqueService.pesquisarItemReservadoByIdItemPedido(idItemPedido);
 		assertTrue("O item do pedido deveria ter um item reservado no estoque pois o estoque ja foi populado",
@@ -1653,7 +1984,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testReservaItemEstoqueNaoExistente() {
-		gerarItemPedidoNoEstoque();
+		gerarItemEstoque();
 
 		ItemPedido item1 = enviarItemPedidoRevenda();
 		ItemPedido item2 = gerarItemPedidoClone(item1);
@@ -1670,7 +2001,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testReservaItemEstoqueQuantidadeIgualAoItemPedido() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		itemEstoque.setQuantidade(itemEstoque.getQuantidade() + 10);
 
 		try {
@@ -1710,7 +2041,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testReservaItemEstoqueQuantidadeInferiorAoItemPedido() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		ItemPedido item1 = enviarItemPedidoRevenda();
 
 		itemEstoque.setQuantidade(10);
@@ -1746,7 +2077,7 @@ public class EstoqueServiceTest extends AbstractTest {
 
 	@Test
 	public void testReservaItemEstoqueQuantidadeSuperiorAoItemPedido() {
-		ItemEstoque itemEstoque = gerarItemPedidoNoEstoque();
+		ItemEstoque itemEstoque = gerarItemEstoque();
 		itemEstoque.setQuantidade(itemEstoque.getQuantidade() + 10);
 
 		try {

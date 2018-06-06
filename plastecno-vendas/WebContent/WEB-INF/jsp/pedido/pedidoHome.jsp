@@ -111,8 +111,15 @@ $(document).ready(function() {
 		if(isEmpty($(this).val())){
 			return;
 		}
-		$('<input>').attr('type','hidden').attr('name','idPedido').attr('value',$(this).val()).appendTo('#formVazio');
-		$('#formVazio').attr('action', '<c:url value="/pedidoassociado/pdf"/>').submit();
+		var f = document.createElement('FORM');
+		f.method='GET';
+		f.action='<c:url value="/pedidoassociado/pdf"/>';
+		f.id = 'formPDFAssociado';
+		document.body.appendChild(f);
+
+		adicionarInputHiddenFormulario('formPDFAssociado', 'tipoPedido', '<c:out value="${tipoPedidoAssociado}"/>');
+		adicionarInputHiddenFormulario('formPDFAssociado', 'idPedido', $(this).val());
+		f.submit();
 	});
 	</c:if>
 	
@@ -363,12 +370,12 @@ $(document).ready(function() {
 				<input type="button" id="botaoLimparNumeroPedido"
 					title="Limpar Pedido" value="" class="botaoLimparPequeno" />
 			</div>
-			<div class="input" style="width: 1%">
+			<div class="input" style="width: 3%">
 				<input type="button" id="botaoCopiarPedido"
 					title="Copiar Pedido" value="" class="botaoCopiarPequeno" />
 			</div>
 			
-			<div class="label" style="width: 12%">Nr. Pedido Cliente:</div>
+			<div class="label" style="width: 10%">Nr. Pedido Cliente:</div>
 			<div class="input" style="width: 10%">
 				<input type="text" id="numeroPedidoCliente"
 					name="pedido.numeroPedidoCliente"

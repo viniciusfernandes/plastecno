@@ -1,31 +1,3 @@
-========== TEAM VIEWER SERVIDOR1 PLASTECNO ==========================
-IP 158137142
-SENHA 3039
-
-========== PAINEL DE GERENCIAMENTO NO SERVIDOR JAVA ==========================
-
-1) Para configurar serviços e datasource do servidor JBoss7 devemos acessar o painel de gerenciamento
-na URL http://plastecno.com:9990, com o usuario=fernando e senha=@jboss715
-
-2) Para criar um usuario novo deve-se ir ate o diretorio de instalacao do jboss <JBOSS_HOME>\bin 
-e executar o script add-user.bat. Para isso deve-se conectar via ftp. 
-
-========== DEPLOY DA APLICACAO NO SERVIDOR JAVA ==========================
-
-1) Acessar o painel do jboss: http://174.142.42.90:8666/zp/appservermgr/
-2) Autenticar do painel do jboss: user=plastecno,  senha=93104827
-3) Parar o servidor para efetuar o envio do pacote via FTP, pois a transferecia do pacote eh demorada
-	e o hot deploy pode apresentar problemas
-4) Utilizar o LeechFTP para enviar o pacote .ear: host=174.142.42.90, senha=93104827
-5) Copiar os arquivos .ear e o driver do banco de dados para appservers/jboss-7.x/standalone/deployments
-
-========== CRIACAO DO BANCO DE DADOS - ESQUEMA VENDAS =======================================
-
-1) Para acessar o banco de dados devemos ir ate o painel que fica em http://184.107.24.87/php-pg-admin/
-e autenticar com user=postgres, senha=XnJ@!1uK
-2) Selecionar o nó "esquema" da arvore e abrir a janela para execucao de "SQLs"
-3) Colar o script para criacao do esquema de vendas no 	SQL editor
-
 ========== CRIACAO DO BANCO DE DADOS - ESQUEMA ENDERECAMENTO =======================================
 
 1) Devemos construir o esquema de enderecamento via  "php-pg-admin"

@@ -9,6 +9,7 @@ import org.junit.Assert;
 
 import br.com.svr.service.ClienteService;
 import br.com.svr.service.ComissaoService;
+import br.com.svr.service.EstoqueService;
 import br.com.svr.service.MaterialService;
 import br.com.svr.service.PedidoService;
 import br.com.svr.service.PerfilAcessoService;
@@ -59,6 +60,8 @@ public class GeradorPedido {
 
 	private EntidadeBuilder eBuilder;
 
+	private EstoqueService estoqueService;
+
 	private GeradorRepresentada gRepresentada = GeradorRepresentada.getInstance();
 
 	private GeradorTransportadora gTransportadora = GeradorTransportadora.getInstance();
@@ -79,15 +82,16 @@ public class GeradorPedido {
 
 	private GeradorPedido() {
 		eBuilder = EntidadeBuilder.getInstance();
-		pedidoService = ServiceBuilder.buildService(PedidoService.class);
 		clienteService = ServiceBuilder.buildService(ClienteService.class);
-		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
-		materialService = ServiceBuilder.buildService(MaterialService.class);
-		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
 		comissaoService = ServiceBuilder.buildService(ComissaoService.class);
-		ramoAtividadeService = ServiceBuilder.buildService(RamoAtividadeService.class);
+		estoqueService = ServiceBuilder.buildService(EstoqueService.class);
+		materialService = ServiceBuilder.buildService(MaterialService.class);
+		pedidoService = ServiceBuilder.buildService(PedidoService.class);
 		perfilAcessoService = ServiceBuilder.buildService(PerfilAcessoService.class);
+		ramoAtividadeService = ServiceBuilder.buildService(RamoAtividadeService.class);
+		representadaService = ServiceBuilder.buildService(RepresentadaService.class);
 		serviceUtils = ServiceBuilder.buildService(ServiceUtils.class);
+		usuarioService = ServiceBuilder.buildService(UsuarioService.class);
 	}
 
 	public Material gerarAssociacaoMaterial(Material mat, Integer idRepresentada) {
@@ -201,6 +205,24 @@ public class GeradorPedido {
 
 		List<ItemPedido> l = pedidoService.pesquisarItemPedidoByIdPedido(pedido.getId());
 		return l.size() <= 0 ? null : l.get(0);
+	}
+
+	public ItemPedido gerarItemPedidoNoEstoque() {
+		Pedido pCompra = gerarPedidoCompra();
+		ItemPedido iCompra = gerarItemPedidoCompra();
+		try {
+			pedidoService.inserirItemPedido(pCompra.getId(), iCompra);
+			pedidoService.enviarPedido(pCompra.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+
+		try {
+			estoqueService.adicionarQuantidadeRecepcionadaItemCompra(iCompra.getId(), iCompra.getQuantidade());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		return iCompra;
 	}
 
 	public Material gerarMaterial(Representada representada) {

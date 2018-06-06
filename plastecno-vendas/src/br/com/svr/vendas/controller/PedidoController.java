@@ -226,7 +226,7 @@ public class PedidoController extends AbstractPedidoController {
 
     @Get("pedidoassociado/pdf")
     public Download downloadPedidoAssociadoPDF(Integer idPedido, TipoPedido tipoPedido) {
-        return downloadPDFPedido(idPedido, tipoPedido != null ? null : TipoPedido.COMPRA);
+        return downloadPDFPedido(idPedido, tipoPedido);
     }
 
     @Post("pedido/envio")
@@ -518,6 +518,7 @@ public class PedidoController extends AbstractPedidoController {
 
                 addAtributo("listaIdPedidoAssociado",
                         pedidoService.pesquisarIdPedidoAssociadoByIdPedidoOrigem(id, pedido.isCompra()));
+                addAtributo("tipoPedidoAssociado", pedido.isVenda() ? TipoPedido.COMPRA : TipoPedido.REVENDA);
                 addAtributo("listaTransportadora", listaTransportadora);
                 addAtributo("listaRedespacho", listaRedespacho);
                 addAtributo("listaItemPedido", listaItem);

@@ -108,6 +108,10 @@ public enum SituacaoPedido {
 		return situacaoPedido != null && listaOrcamentoAberto.contains(situacaoPedido);
 	}
 	
+	public boolean isVendaEfetivada() {
+		return listaVendaEfetivada.contains(this);
+	}
+	
 	public static boolean isVendaEfetivada(SituacaoPedido stPedido) {
 		return stPedido != null && listaVendaEfetivada.contains(stPedido);
 	}

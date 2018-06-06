@@ -12,12 +12,15 @@ import org.junit.Test;
 import br.com.svr.service.DuplicataService;
 import br.com.svr.service.NFeService;
 import br.com.svr.service.PedidoService;
+import br.com.svr.service.constante.TipoFinalidadePedido;
 import br.com.svr.service.constante.TipoPedido;
+import br.com.svr.service.constante.TipoVenda;
 import br.com.svr.service.entity.Cliente;
 import br.com.svr.service.entity.ItemPedido;
 import br.com.svr.service.entity.LogradouroCliente;
 import br.com.svr.service.entity.NFeDuplicata;
 import br.com.svr.service.entity.NFeItemFracionado;
+import br.com.svr.service.entity.NFePedido;
 import br.com.svr.service.entity.Pedido;
 import br.com.svr.service.entity.Transportadora;
 import br.com.svr.service.exception.BusinessException;
@@ -54,6 +57,8 @@ import br.com.svr.service.nfe.constante.TipoTributacaoCOFINS;
 import br.com.svr.service.nfe.constante.TipoTributacaoICMS;
 import br.com.svr.service.nfe.constante.TipoTributacaoPIS;
 import br.com.svr.service.test.builder.ServiceBuilder;
+import br.com.svr.service.validacao.InformacaoInvalidaException;
+import br.com.svr.service.wrapper.Periodo;
 
 public class NFeServiceTest extends AbstractTest {
 
@@ -241,6 +246,52 @@ public class NFeServiceTest extends AbstractTest {
 					numeroNFe);
 			assertTrue("Todos os itens do pedido foram emitidos e nao deve haver itens fracionados", totFrac.equals(0));
 		}
+	}
+
+	@Test
+	public void testRelatorioFaturamentoPedidoRevendaEnviado() {
+		Pedido p = gPedido.gerarPedidoRevenda();
+		ItemPedido i = null;
+		try {
+			i = gPedido.gerarItemPedido(p.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		i.setTipoVenda(TipoVenda.PECA);
+		i.setPrecoVenda(100d);
+		i.setQuantidade(20);
+		i.setAliquotaIPI(0d);
+
+		p.setValorFrete(200d);
+		p.setFinalidadePedido(TipoFinalidadePedido.INDUSTRIALIZACAO);
+		try {
+			pedidoService.inserirPedido(p);
+			pedidoService.inserirItemPedido(p.getId(), i);
+			pedidoService.enviarPedido(p.getId(), new AnexoEmail(new byte[] {}));
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		p = pedidoService.pesquisarPedidoById(p.getId());
+		i = pedidoService.pesquisarItemPedidoById(i.getId());
+		Double valPed = 2200d;
+		// p = recarregarEntidade(Pedido.class, p.getId());
+		// assertEquals("O valor total do pedido nao confere", valPed, (Double)
+		// p.getValorPedido());
+
+		NFe nfe = gerarNFeItensTodosItensPedido(p.getId());
+		String num = null;
+		try {
+			num = nFeService.emitirNFeSaida(nfe, p.getId());
+		} catch (BusinessException e) {
+			printMensagens(e);
+		}
+		List<NFePedido> lNfe = null;
+		try {
+			lNfe = nFeService.pesquisarNFePedidoSaidaEmitidaByPeriodo(new Periodo(p.getDataEnvio(), p.getDataEnvio()));
+		} catch (InformacaoInvalidaException e) {
+			printMensagens(e);
+		}
+		assertEquals((Integer) 1, (Integer) lNfe.size());
 	}
 
 	@Test

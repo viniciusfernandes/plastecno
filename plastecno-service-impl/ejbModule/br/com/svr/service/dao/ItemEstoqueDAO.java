@@ -323,6 +323,12 @@ public class ItemEstoqueDAO extends GenericDAO<ItemEstoque> {
 		return query.getResultList();
 	}
 
+	public Integer pesquisarQuantidadeByIdItemEstoque(Integer idItemEstoque) {
+		return QueryUtil.gerarRegistroUnico(
+				entityManager.createQuery("select i.quantidade from ItemEstoque i where i.id = :idItemEstoque")
+						.setParameter("idItemEstoque", idItemEstoque), Integer.class, 0);
+	}
+
 	@WARNING(data = "08/07/2015", descricao = "Esse metodo foi criado pois no banco de dados foram incluido elementos com duplicidade, alguns zerado ou nao, entao vamos retornar o primeiro com quantidade")
 	private ItemEstoque recuperarItemNaoZerado(List<ItemEstoque> listaItem) {
 		if (listaItem == null || listaItem.size() == 0) {

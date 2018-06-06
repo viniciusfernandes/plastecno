@@ -40,7 +40,7 @@ public class FluxoCaixa {
 			throw new BusinessException("A data de vencimento " + StringUtils.formatarData(dtVencimento)
 					+ " da duplicata com valor " + valor + " esta fora do periodo definido para o fluxo de caixa");
 		}
-		addFluxo(new Fluxo(DateUtils.gerarCalendarioSemHorario(dtVencimento), 0, null, 0, valor));
+		addFluxo(new Fluxo(DateUtils.gerarCalendarioSemHorario(dtVencimento), 0, null, valor));
 	}
 
 	public void addFluxo(Fluxo fluxo) {
@@ -62,7 +62,7 @@ public class FluxoCaixa {
 			throw new BusinessException("A data de vencimento " + StringUtils.formatarData(dtVencimento)
 					+ " do pagamento com valor " + valor + " esta fora do periodo definido para o fluxo de caixa");
 		}
-		addFluxo(new Fluxo(DateUtils.gerarCalendarioSemHorario(dtVencimento), valor, tipoPagamento, valorCredICMS, 0));
+		addFluxo(new Fluxo(DateUtils.gerarCalendarioSemHorario(dtVencimento), valor, tipoPagamento, 0));
 	}
 
 	public List<Fluxo> gerarFluxoByAno() {
@@ -74,12 +74,12 @@ public class FluxoCaixa {
 			ano = fluxo.getAno();
 			if ((f = mapAno.get(ano)) == null) {
 				f = new Fluxo(fluxo.getDtVencimento(), fluxo.getValPagamento(), fluxo.getTipoPagamento(),
-						fluxo.getValCredICMS(), fluxo.getValDuplicata());
+						fluxo.getValDuplicata());
 				mapAno.put(ano, f);
 				lFluxoAno.add(f);
 				continue;
 			}
-			f.adicionar(fluxo.getValPagamento(), fluxo.getValCredICMS(), fluxo.getValDuplicata());
+			f.adicionar(fluxo.getValPagamento(), fluxo.getValDuplicata());
 		}
 		ordernar(lFluxoAno);
 		return lFluxoAno;
@@ -103,13 +103,13 @@ public class FluxoCaixa {
 
 			if ((f = mapDia.get(ano)[mes][dia]) == null) {
 				f = new Fluxo(fluxo.getDtVencimento(), fluxo.getValPagamento(), fluxo.getTipoPagamento(),
-						fluxo.getValCredICMS(), fluxo.getValDuplicata());
+						fluxo.getValDuplicata());
 
 				mapDia.get(ano)[mes][dia] = f;
 				lFluxoDia.add(f);
 				continue;
 			}
-			f.adicionar(fluxo.getValPagamento(), fluxo.getValCredICMS(), fluxo.getValDuplicata());
+			f.adicionar(fluxo.getValPagamento(), fluxo.getValDuplicata());
 		}
 		ordernar(lFluxoDia);
 		return lFluxoDia;
@@ -131,12 +131,12 @@ public class FluxoCaixa {
 
 			if ((f = mapMes.get(ano)[mes]) == null) {
 				f = new Fluxo(fluxo.getDtVencimento(), fluxo.getValPagamento(), fluxo.getTipoPagamento(),
-						fluxo.getValCredICMS(), fluxo.getValDuplicata());
+						fluxo.getValDuplicata());
 				mapMes.get(ano)[mes] = f;
 				lFluxoMes.add(f);
 				continue;
 			}
-			f.adicionar(fluxo.getValPagamento(), fluxo.getValCredICMS(), fluxo.getValDuplicata());
+			f.adicionar(fluxo.getValPagamento(), fluxo.getValDuplicata());
 		}
 
 		ordernar(lFluxoMes);
@@ -156,12 +156,12 @@ public class FluxoCaixa {
 
 			if ((f = mapTipo.get(tpPag)) == null) {
 				f = new Fluxo(fluxo.getDtVencimento(), fluxo.getValPagamento(), fluxo.getTipoPagamento(),
-						fluxo.getValCredICMS(), fluxo.getValDuplicata());
+						fluxo.getValDuplicata());
 				mapTipo.put(tpPag, f);
 				lFluxoPag.add(f);
 				continue;
 			}
-			f.adicionar(fluxo.getValPagamento(), fluxo.getValCredICMS(), 0d);
+			f.adicionar(fluxo.getValPagamento(), 0d);
 		}
 		return lFluxoPag;
 	}

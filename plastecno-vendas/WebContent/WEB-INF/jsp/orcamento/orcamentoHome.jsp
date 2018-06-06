@@ -293,11 +293,11 @@ $(document).ready(function() {
 				<input type="button" id="botaoPesquisaOrcamento"
 					title="Pesquisar Pedido" value="" class="botaoPesquisarPequeno" />
 		</div>
-		<div class="input" style="width: 1%">
+		<div class="input" style="width: 2%">
 				<input type="button" id="botaoCopiarOrcamento"
 					title="Copiar Orçamento" value="" class="botaoCopiarPequeno" />
 		</div>
-		<div class="label" style="width: 8%">Núm. Cli.:</div>
+		<div class="label" style="width: 7%">Núm. Cli.:</div>
 		<div class="input" style="width: 11%">
 			<input type="text" id="numeroPedidoCliente" name="pedido.numeroPedidoCliente" 
 				value="${pedido.numeroPedidoCliente}" class="pesquisavel" style="width: 100%"/>

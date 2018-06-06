@@ -65,7 +65,7 @@ public class RamoAtividadeController extends AbstractController {
     public void pesquisar(RamoAtividade filtro, Integer paginaSelecionada) {
 
         final PaginacaoWrapper<RamoAtividade> paginacao = this.ramoAtividadeService.paginarRamoAtividade(filtro, null,
-                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+                this.calcularIndiceRegistroInicial(paginaSelecionada), getNumeroRegistrosPorPagina());
 
         addAtributo("ramoAtividade", filtro);
         this.inicializarPaginacao(paginaSelecionada, paginacao, "listaRamoAtividade");

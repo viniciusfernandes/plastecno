@@ -6,7 +6,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -25,8 +28,7 @@ public class NFePedido {
 
 	@Transient
 	private String dataEmissaoFormatada;
-	@Column(name = "id_pedido")
-	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Número do Pedido da NFe do pedido")
+	@Transient
 	private Integer idPedido;
 
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Número do modelo da NFe do pedido")
@@ -42,6 +44,11 @@ public class NFePedido {
 
 	@Column(name = "numero_associado")
 	private Integer numeroAssociado;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_pedidp")
+	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Pedido da NFe de Pedido")
+	private Pedido pedido;
 
 	@InformacaoValidavel(obrigatorio = true, nomeExibicao = "Série da NFe do pedido")
 	private Integer serie;
@@ -96,6 +103,7 @@ public class NFePedido {
 		this.serie = serie;
 		this.modelo = modelo;
 		this.idPedido = idPedido;
+		this.pedido = new Pedido(idPedido);
 		this.xmlNFe = xmlNFe;
 		this.numeroAssociado = numeroAssociado;
 		this.tipoNFe = tipoNFe;

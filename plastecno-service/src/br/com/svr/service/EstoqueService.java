@@ -17,10 +17,11 @@ import br.com.svr.service.exception.BusinessException;
 @Local
 public interface EstoqueService {
 
-	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada) throws BusinessException;
-
-	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada, String ncm)
+	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
 			throws BusinessException;
+
+	Integer adicionarQuantidadeRecepcionadaItemCompra(Integer idItemPedidoCompra, Integer quantidadeRecepcionada,
+			String ncm) throws BusinessException;
 
 	Integer alterarQuantidadeRecepcionadaItemCompra(Integer idItemCompra, Integer quantidadeRecepcionada)
 			throws BusinessException;
@@ -46,6 +47,8 @@ public interface EstoqueService {
 	void inserirConfiguracaoEstoque(ItemEstoque limite) throws BusinessException;
 
 	boolean inserirConfiguracaoNcmEstoque(Integer idMaterial, FormaMaterial formaMaterial, String ncm);
+
+	Integer inserirItemEstoque(Integer idUsuario, ItemEstoque itemEstoque, String nomeUsuario) throws BusinessException;
 
 	Integer inserirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
@@ -75,7 +78,10 @@ public interface EstoqueService {
 
 	double pesquisarPrecoMedioItemEstoque(Item filtro);
 
-	void reajustarPrecoItemEstoque(ItemEstoque itemReajustado) throws BusinessException;
+	Integer pesquisarQuantidadeByIdItemEstoque(Integer idItemEstoque);
+
+	void reajustarPrecoItemEstoque(ItemEstoque itemReajustado, Integer idUsuario, String nomeUsuario)
+			throws BusinessException;
 
 	Integer recalcularEstoqueItemCompra(Integer idItemCompra, Integer quantidade) throws BusinessException;
 
@@ -83,7 +89,11 @@ public interface EstoqueService {
 
 	Integer recortarItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
 
+	void redefinirItemEstoque(Integer idUsuario, ItemEstoque itemEstoque, String nomeUsuario) throws BusinessException;
+
 	void redefinirItemEstoque(ItemEstoque itemEstoque) throws BusinessException;
+
+	void reinserirItemPedidoEstoqueByIdItem(Integer idItemPedido) throws BusinessException;
 
 	Integer removerEstoqueItemCompra(Integer idItemCompra, Integer quantidadeRemovida) throws BusinessException;
 

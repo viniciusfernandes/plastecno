@@ -129,7 +129,7 @@ public class RepresentadaController extends AbstractController {
         this.paginarPesquisa(paginaSelecionada, representadaService.pesquisarTotalRegistros(filtro, null));
 
         List<Representada> lista = representadaService.pesquisarBy(filtro, null,
-                calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+                calcularIndiceRegistroInicial(paginaSelecionada), getNumeroRegistrosPorPagina());
 
         for (Representada representada : lista) {
             formatarDocumento(representada);

@@ -20,17 +20,25 @@ function removerCaracteresNaoDigitos(valor){
 };
 
 function toUpperCaseInput (){
-	$("input, textArea").each(function(){
-		if(!$(this).hasClass('uppercaseBloqueado')){
-			$(this).val($(this).val().toUpperCase());
+	$("input[type=text], input[type=hidden], textArea").each(function(){
+		try{
+			if(!$(this).hasClass('uppercaseBloqueado')){
+				$(this).val($(this).val().toUpperCase());
+			}
+		} catch(e){
+			alert('Falha em upper case do campo id='+$(this).attr('id')+'. Causa: '+e.message);
 		}
 	});
 };
 
 function toLowerCaseInput (){
-	$("input, textArea").each(function(){
-		if($(this).hasClass('apenasLowerCase')){
-			$(this).val($(this).val().toLowerCase());
+	$("input[type=text], input[type=hidden], textArea").each(function(){
+		try{	
+			if($(this).hasClass('apenasLowerCase')){
+				$(this).val($(this).val().toLowerCase());
+			}
+		} catch(e){
+			alert('Falha em lower case do campo id='+$(this).attr('id')+'. Causa: '+e.message);
 		}
 	});
 };

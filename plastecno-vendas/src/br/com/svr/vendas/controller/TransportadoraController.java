@@ -90,7 +90,7 @@ public class TransportadoraController extends AbstractController {
         filtro.setCnpj(this.removerMascaraDocumento(filtro.getCnpj()));
 
         PaginacaoWrapper<Transportadora> paginacao = transportadoraService.paginarTransportadora(filtro, null,
-                calcularIndiceRegistroInicial(paginaSelecionada), getNumerRegistrosPorPagina());
+                calcularIndiceRegistroInicial(paginaSelecionada), getNumeroRegistrosPorPagina());
         for (Transportadora t : paginacao.getValor()) {
             formatarDocumentos(t);
         }

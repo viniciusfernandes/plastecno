@@ -13,6 +13,7 @@
 <script type="text/javascript" src="<c:url value="/js/jquery-min.1.8.3.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.mask.min.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery.maskMoney.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery.paginate.js"/>"></script>
 
 <script type="text/javascript" src="<c:url value="/js/mascara.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/js/jquery-ui-1.10.4.dialog.min.js"/>"></script>
@@ -31,6 +32,7 @@ $(document).ready(function() {
 	habilitarCamposEdicaoItem(false);
 	</c:if>
 	
+	<jsp:include page="/bloco/bloco_paginador.jsp" />
 	
 	$('#botaoLimpar').click(function () {
 		$('#formVazio').submit();
@@ -193,6 +195,12 @@ function inicializarFiltro() {
 
 	<form id="formVazio" action="<c:url value="/estoque"/>">
 	</form>
+	
+	<form id="formPesquisa" action="<c:url value="/estoque/registroestoque/item/${idItemEstoque}"/>">
+		<input type="hidden" name="material.id" value="${material.id}"/>
+		<input type="hidden" name="material.descricaoFormatada" value="${material.descricaoFormatada}"/>
+		<input type="hidden" name="formaMaterial" value="${formaSelecionada}"/>
+	</form>
 
 		<fieldset id="bloco_pesquisa">
 			<legend>::: Pesquisa de Itens do Estoque :::</legend>
@@ -230,85 +238,138 @@ function inicializarFiltro() {
 			<input id="botaoLimpar" type="button" value="" title="Limpar Dados do Item de Estoque" class="botaoLimpar" />
 		</div>
 	
-	<c:if test="${acessoManutencaoEstoquePermitido}">
+	<c:if test="${acessoManutencaoEstoquePermitido and not empty relatorio}">
 		<jsp:include page="/bloco/bloco_edicao_item.jsp"/>
 	</c:if>
 	
 	<a id="rodape"></a>
-	<fieldset>
-		<legend>::: Resultado da Pesquisa de Itens de Estoque :::</legend>
-		<div>
-			<table class="listrada">
-				<thead>
-					<tr>
-						<th style="width: 20%">Material</th>
-						<th style="width: 5%">Qtde.</th>
-					<c:if test="${acessoManutencaoEstoquePermitido}">
-						<th style="width: 5%">Qtde Min.</th>
-					</c:if>
-						<th style="width: 10%">Med. Externa</th>
-						<th style="width: 10%">Med. Interna</th>
-						<th style="width: 10%">Comprimento</th>
-					<c:if test="${acessoManutencaoEstoquePermitido}">
-						<th style="width: 10%">Valor Unid. (R$)</th>
-						<th style="width: 10%">Marg. Min. (%)</th>
-					</c:if>
-						<th style="width: 10%">Preç. Min. (R$)</th>
-						<th style="width: 5%">Ações</th>
-					</tr>
-				</thead>
-
-				<tbody>
-				
-				<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iGrupo">
-					<c:forEach items="${grupo.listaElemento}" var="item" varStatus="iElemento">
+	<c:choose>
+		<c:when test="${not empty relatorio}">
+			<fieldset>
+			<legend>::: Resultado da Pesquisa de Itens de Estoque :::</legend>
+			<div>
+				<table class="listrada">
+					<thead>
 						<tr>
-							<c:if test="${iElemento.count le 1}">
-								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id}</td>
-							</c:if>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
-						
+							<th style="width: 20%">Material</th>
+							<th style="width: 5%">Qtde.</th>
 						<c:if test="${acessoManutencaoEstoquePermitido}">
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeMinima}</td>
+							<th style="width: 5%">Qtde Min.</th>
 						</c:if>
-						
-							<c:choose>
-								<c:when test="${item.peca}">
-									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" colspan="3">${item.descricaoPeca}</td>
-								</c:when>
-								<c:otherwise>
-									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.medidaExterna}</td>
-									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.medidaInterna}</td>
-									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.comprimento}</td>
-								</c:otherwise>
-							</c:choose>
-							
+							<th style="width: 10%">Med. Externa</th>
+							<th style="width: 10%">Med. Interna</th>
+							<th style="width: 10%">Comprimento</th>
 						<c:if test="${acessoManutencaoEstoquePermitido}">
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMedio}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.margemMinimaLucro}</td>
-						</c:if>	
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMinimo}</td>
-							<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
-								<c:if test="${acessoManutencaoEstoquePermitido}">
-								<div class="coluna_acoes_listagem">
-									<form action="<c:url value="/estoque/item/${item.id}"/>" method="post">
-										<!-- Esse dados foram submetidos para manter o estado da tela durante o filtro  -->
-										<input type="hidden" name="material.id" value="${material.id}"/>
-										<input type="hidden" name="formaMaterial" value="${formaSelecionada}"/>
-										<input type="submit" title="Editar Item do Estoque" value="" class="botaoEditar"/>
-									</form>
-								</div>
-								</c:if>
-							</td>
+							<th style="width: 10%">Valor Unid. (R$)</th>
+							<th style="width: 10%">Marg. Min. (%)</th>
+						</c:if>
+							<th style="width: 10%">Preç. Min. (R$)</th>
+							<th style="width: 5%">Ações</th>
 						</tr>
+					</thead>
+	
+					<tbody>
+					
+					<c:forEach items="${relatorio.listaGrupo}" var="grupo" varStatus="iGrupo">
+						<c:forEach items="${grupo.listaElemento}" var="item" varStatus="iElemento">
+							<tr>
+								<c:if test="${iElemento.count le 1}">
+									<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" rowspan="${grupo.totalElemento}">${grupo.id}</td>
+								</c:if>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidade}</td>
+							
+							<c:if test="${acessoManutencaoEstoquePermitido}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.quantidadeMinima}</td>
+							</c:if>
+							
+								<c:choose>
+									<c:when test="${item.peca}">
+										<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}" colspan="3">${item.descricaoPeca}</td>
+									</c:when>
+									<c:otherwise>
+										<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.medidaExterna}</td>
+										<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.medidaInterna}</td>
+										<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.comprimento}</td>
+									</c:otherwise>
+								</c:choose>
+								
+							<c:if test="${acessoManutencaoEstoquePermitido}">
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMedio}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.margemMinimaLucro}</td>
+							</c:if>	
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">${item.precoMinimo}</td>
+								<td class="fundo${iGrupo.index % 2 == 0 ? 1 : 2}">
+									<c:if test="${acessoManutencaoEstoquePermitido}">
+									<div class="coluna_acoes_listagem">
+										<form action="<c:url value="/estoque/item/${item.id}"/>" method="post">
+											<!-- Esse dados foram submetidos para manter o estado da tela durante o filtro  -->
+											<input type="hidden" name="material.id" value="${material.id}"/>
+											<input type="hidden" name="formaMaterial" value="${formaSelecionada}"/>
+											<input type="submit" title="Editar Item do Estoque" value="" class="botaoEditar"/>
+										</form>
+										<form action="<c:url value="/estoque/registroestoque/item/${item.id}"/>" method="get">
+											<!-- Esse dados foram submetidos para manter o estado da tela durante o filtro  -->
+											<input type="hidden" name="material.id" value="${material.id}"/>
+											<input type="hidden" name="material.descricaoFormatada" value="${material.descricaoFormatada}"/>
+											<input type="hidden" name="formaMaterial" value="${formaSelecionada}"/>
+											<input type="submit" title="Pesquisar Registros dos Itens do Estoque" value="" class="botaoPlanilhaPequeno"/>
+										</form>
+									</div>
+									</c:if>
+								</td>
+							</tr>
+						</c:forEach>
 					</c:forEach>
-				</c:forEach>
-				
-				</tbody>
-
-			</table>
-		</div>
-	</fieldset>
+					
+					</tbody>
+	
+				</table>
+			</div>
+		</fieldset>
+		</c:when>
+		<c:otherwise>
+			<fieldset>
+			<legend>::: Registro => ${descricaoItem} :::</legend>
+			<div id="paginador"></div>
+			<div>
+				<table class="listrada">
+					<thead>
+						<tr>
+							<th style="width: 5%">Qtde Ant.</th>
+							<th style="width: 5%">Qtde Post.</th>
+							<th style="width: 5%">Ant.(R$)</th>
+							<th style="width: 5%">Post.(R$)</th>
+							<th style="width: 5%">Qtde Item.</th>
+							<th style="width: 10%">Pedido</th>
+							<th style="width: 5%">Item Ped.</th>
+							<th style="width: 15%">Data</th>
+							<th style="width: 15%">Usuário</th>
+							<th style="width: 20%">Operação</th>
+						</tr>
+					</thead>
+	
+					<tbody>
+					<c:forEach items="${listaRegistroEstoque}" var="registro" varStatus="iGrupo">
+						<tr>
+							<td style="width: 5%">${registro.quantidadeAnterior}</td>
+							<td style="width: 5%">${registro.quantidadePosterior}</td>
+							<td style="width: 5%">${registro.valorAnterior}</td>
+							<td style="width: 5%">${registro.valorPosterior}</td>
+							<td style="width: 5%">${registro.quantidadeItem}</td>
+							<td style="width: 10%">${registro.idPedido}</td>
+							<td style="width: 5%">${registro.sequencialItemPedido}</td>
+							<td style="width: 15%">${registro.dataOperacaoFormatada}</td>
+							<td style="width: 15%">${registro.nomeUsuario}</td>
+							<td style="width: 20%">${registro.tipoOperacao}</td>
+						</tr>			
+					</c:forEach>
+					</tbody>
+				</table>
+			</div>
+		</fieldset>
+		</c:otherwise>
+	</c:choose>
+	
 
 </body>
 </html>

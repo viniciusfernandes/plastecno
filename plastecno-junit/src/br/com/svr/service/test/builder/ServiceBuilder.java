@@ -29,7 +29,7 @@ public class ServiceBuilder {
 	private final static Map<Class<?>, Object> mapTemporarioServices = new HashMap<Class<?>, Object>();
 
 	private static void buildEmailService() {
-	
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -41,7 +41,15 @@ public class ServiceBuilder {
 
 		buildEmailService();
 
-		String serviceNameImpl = classe.getName().replace("service", "service.impl") + "Impl";
+		String serviceNameImpl = null;
+		if (classe.getName().contains("monitor")) {
+			serviceNameImpl = classe.getName().replace("service.monitor", "service.monitor.impl") + "Impl";
+		} else if (classe.getName().contains("message")) {
+			serviceNameImpl = classe.getName().replace("service.message", "service.message.impl") + "Impl";
+		} else {
+			serviceNameImpl = classe.getName().replace("service", "service.impl") + "Impl";
+		}
+
 		try {
 			/*
 			 * ESSE ATRIBUTO FOI CRIADO PARA CONTORNAR O PROBLEMA DE REFERENCIAS

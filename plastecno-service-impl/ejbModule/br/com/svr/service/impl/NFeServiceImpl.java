@@ -880,7 +880,7 @@ public class NFeServiceImpl implements NFeService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<Integer> pesquisarNumeroNFeByIdPedido(Integer idPedido) {
 		return entityManager
-				.createQuery("select p.numero from NFePedido p where p.idPedido = :idPedido order by p.numero asc",
+				.createQuery("select n.numero from NFePedido n where n.pedido.id = :idPedido order by n.numero asc",
 						Integer.class).setParameter("idPedido", idPedido).getResultList();
 	}
 

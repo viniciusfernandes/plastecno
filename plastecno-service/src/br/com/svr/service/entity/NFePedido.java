@@ -46,7 +46,7 @@ public class NFePedido {
 	private Integer numeroAssociado;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_pedidp")
+	@JoinColumn(name = "id_pedido")
 	@InformacaoValidavel(relacionamentoObrigatorio = true, nomeExibicao = "Pedido da NFe de Pedido")
 	private Pedido pedido;
 

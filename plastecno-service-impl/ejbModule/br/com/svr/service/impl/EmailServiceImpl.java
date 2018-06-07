@@ -34,7 +34,6 @@ public class EmailServiceImpl implements EmailService {
 	private ConfiguracaoSistemaService configuracaoSistemaService;
 
 	private Logger log = Logger.getLogger(this.getClass().getName());
-
 	@EJB
 	private UsuarioService usuarioService;
 
